@@ -1,0 +1,15 @@
+name: PR Workflow
+run-name: ${{ github.actor }} pull request
+on: 
+  pull_request:
+    types:
+      - opened
+    branches:
+      - 'main'
+jobs:
+  LintAndTestPRbranch:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "hello world"
+    #  - run: npm lint
+    #  - run: npm test
