@@ -37,6 +37,10 @@
         "react/react-in-jsx-scope": [
             0,
             "off"
+        ],
+        "no-undef": [
+            0,
+            "off"
         ]
     }
 }
