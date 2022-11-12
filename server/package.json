@@ -6,8 +6,8 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node build/index.js",
-    "lint": "npx eslint ./*.ts ./**/*.ts",
-    "lint:fix": "npx eslint ./*.ts ./**/*.ts --fix"
+    "lint": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'`",
+    "lint:fix": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'` --fix"
   },
   "author": "",
   "license": "",
