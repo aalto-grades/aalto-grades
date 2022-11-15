@@ -93,6 +93,31 @@ app.post('/v1/auth/signup', express.json(), (req: Request, res: Response) => {
   });
 });
 
+app.post('/v1/auth/signup', express.json(), (req: Request, res: Response) => {
+  if (!validateSignupFormat(req.body)) {
+    res.status(400); 
+    return res.send({
+        success: false,
+        error: "Invalid signup request format",
+    });
+  }
+
+  // TODO: Rather use Promises here? Team feedback needed
+  if (!performSignup(req.body.username, req.body.email, req.body.password)) {
+    // 403 or 400 or 500? The Promise architecture with appropriate rejections should
+    // carry this info
+    res.status(400);
+    return res.send({
+      success: false,
+      error: "Signup failed",
+    });
+  }
+
+  return res.send({
+    success: true
+  });
+});
+
 app.get('*', (req: Request, res: Response) => {
   res.send(`Hello ${req.path}`);
 });
