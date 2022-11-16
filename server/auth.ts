@@ -10,5 +10,5 @@ export async function validateLogin(username: string, password: PlainPassword): 
 }
 
 export async function performSignup(username: string, email: string, plainPassword: PlainPassword, role: UserRole) {
-
+  return;
 }
