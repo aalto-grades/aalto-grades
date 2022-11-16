@@ -2,11 +2,11 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 
 const CourseView = () => {
-    let { courseCode } = useParams();
+  let { courseCode } = useParams();
 
-    return(
-        <p>{"Hello course " + courseCode + "!"}</p>
-    )
-}
+  return(
+    <p>{'Hello course ' + courseCode + '!'}</p>
+  );
+};
 
 export default CourseView;
