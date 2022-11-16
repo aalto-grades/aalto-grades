@@ -6,7 +6,7 @@ import { Routes, Route } from 'react-router-dom';
 import Main from './components/Main';
 import Info from './components/Info';
 import Login from './components/Login';
-import Signup from './components/Signup'
+import Signup from './components/Signup';
 import Link from '@mui/material/Link';
 import Container from '@mui/material/Container';
 import AppBar from '@mui/material/AppBar';
