@@ -2,7 +2,7 @@ import express, { Application, Request, Response } from 'express';
 import { validateLogin, performSignup, PlainPassword, UserRole } from './auth';
 
 const app: Application = express();
-const parsedPort: number = Number(process.env.AALTO_GRADES_BACKEND_PORT);
+const parsedPort = Number(process.env.AALTO_GRADES_BACKEND_PORT);
 const port: number = isNaN(parsedPort) ? 3000 : parsedPort;
 
 interface LoginRequest {
