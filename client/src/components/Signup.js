@@ -5,13 +5,16 @@ import userService from '../services/user';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio from '@mui/material/Radio';
+import Grid from '@mui/material/Grid';
 
 const Signup = () => {
+  
+
   const [username, setUsername] = useState(''); 
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [studentID, setStudentID] = useState('');
-  const [role, setRole] = useState('teacher');
+  const [role, setRole] = useState('Teacher');
 
   const handleSignup = async (event) => {
     event.preventDefault();
@@ -19,7 +22,7 @@ const Signup = () => {
       const user = await userService.signup({
         username, password, email, studentID, role
       });
-      setUser(user);
+      console.log(user);
       setUsername('');
       setPassword('');
     } catch (exception) {
@@ -33,59 +36,65 @@ const Signup = () => {
       <form onSubmit={handleSignup}>
         <div>
           <TextField
-            type="username"
+            type='username'
             value={username}
-            name="Username"
-            label="Username"
+            name='Username'
+            label='Username'
             onChange={({ target }) => setUsername(target.value)}
             InputLabelProps={{ shrink: true }}
-            margin="normal"
+            margin='normal'
           />
         </div>
         <div>
           <TextField
-            type="email"
+            type='email'
             value={email}
-            name="Email"
-            label="Email"
+            name='Email'
+            label='Email'
             onChange={({ target }) => setEmail(target.value)}
             InputLabelProps={{ shrink: true }}
-            margin="normal"
+            margin='normal'
           />
         </div>
         <div>
           <TextField
-            type="studentID"
+            type='studentID'
             value={studentID}
-            name="StudentID"
-            label="StudentID"
+            name='StudentID'
+            label='StudentID'
             onChange={({ target }) => setStudentID(target.value)}
             InputLabelProps={{ shrink: true }}
-            margin="normal"
+            margin='normal'
           />
         </div>
         <div>
           <TextField
-            type="password"
+            type='password'
             value={password}
-            name="Password"
-            label="Password"
+            name='Password'
+            label='Password'
             onChange={({ target }) => setPassword(target.value)}
             InputLabelProps={{ shrink: true }}
-            margin="normal"
+            margin='normal'
           />
         </div>
-        <RadioGroup
-          defaultValue="teacher"
-          name="radio-buttons-group"
-          onChange={({ target }) => setRole(target.value)}>
-          <FormControlLabel value="teacher" control={<Radio />} label="Teacher" />
-          <FormControlLabel value="student" control={<Radio />} label="Student" />
-          <FormControlLabel value="admin" control={<Radio />} label="Admin" />
-        </RadioGroup>
-        <div>
-        </div>
-        <Button type="submit">Sign up</Button>
+        <Grid
+          container
+          spacing={0}
+          direction='column'
+          alignItems='center'
+          justifyContent='center'
+        >
+          <RadioGroup
+            defaultValue='teacher'
+            name='radio-buttons-group'
+            onChange={({ target }) => setRole(target.value)}>
+            <FormControlLabel value='Teacher' control={<Radio />} label='Teacher' />
+            <FormControlLabel value='Student' control={<Radio />} label='Student' />
+            <FormControlLabel value='Admin' control={<Radio />} label='Admin' />
+          </RadioGroup>
+        </Grid>
+        <Button type='submit' variant='contained'>Sign up</Button>
       </form>
     </div>
   );

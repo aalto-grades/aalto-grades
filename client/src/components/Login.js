@@ -13,7 +13,7 @@ const Login= () => {
       const user = await userService.login({
         username, password,
       });
-      setUser(user);
+      console.log(user);
       setUsername('');
       setPassword('');
     } catch (exception) {
