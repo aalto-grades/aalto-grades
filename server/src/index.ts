@@ -45,7 +45,7 @@ const validateSignupFormat = (body: any): body is SignupRequest =>
     typeof body.email === 'string';
 
 
-app.post('/v1/auth/login', express.json(), (req: Request, res: Response) => {
+app.post('/v1/auth/login', express.json(), async (req: Request, res: Response) => {
   if (!validateLoginFormat(req.body)) {
     res.status(400);
     return res.send({
@@ -54,22 +54,22 @@ app.post('/v1/auth/login', express.json(), (req: Request, res: Response) => {
     });
   }
 
-  // TODO: Rather use Promises here? Team feedback needed
-  validateLogin(req.body.username, req.body.password).then(role => {
+  try {
+    const role = await validateLogin(req.body.username, req.body.password);
     res.send({
       success: true,
       role: role,
     });
-  }).catch(error => {
+  } catch(error) {
     res.status(401);
     res.send({
       success: false,
       error: error,
     });
-  });
+  }
 });
 
-app.post('/v1/auth/signup', express.json(), (req: Request, res: Response) => {
+app.post('/v1/auth/signup', express.json(), async (req: Request, res: Response) => {
   if (!validateSignupFormat(req.body)) {
     res.status(400); 
     return res.send({
@@ -78,11 +78,12 @@ app.post('/v1/auth/signup', express.json(), (req: Request, res: Response) => {
     });
   }
 
-  performSignup(req.body.username, req.body.email, req.body.password, req.body.role).then(() => {
+  try {
+    await performSignup(req.body.username, req.body.email, req.body.password, req.body.role);
     res.send({
       success: true
     });
-  }).catch(error => {
+  } catch (error) {
     // 403 or 400 or 500? The Promise architecture with appropriate rejections should
     // carry this info
     res.status(400);
@@ -90,7 +91,7 @@ app.post('/v1/auth/signup', express.json(), (req: Request, res: Response) => {
       success: false,
       error: error,
     });
-  });
+  }
 });
 
 app.post('/v1/auth/signup', express.json(), (req: Request, res: Response) => {
