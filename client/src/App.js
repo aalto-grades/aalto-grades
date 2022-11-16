@@ -1,6 +1,8 @@
 import { Routes, Route } from 'react-router-dom';
 import Main from './components/Main';
 import Info from './components/Info';
+import Login from './components/Login';
+import Signup from './components/Signup'
 import Link from '@mui/material/Link';
 import Container from '@mui/material/Container';
 import AppBar from '@mui/material/AppBar';
@@ -22,11 +24,14 @@ function App() {
           </Typography>
           <Link href="/" underline="none" color="white" sx={{ mr: 2 }}>To Main</Link>
           <Link href="/info" underline="none" color="white" sx={{ mr: 2 }}>To Info</Link>
+          <Link href="/login" underline="none" color="white" sx={{ mr: 2 }}>To Login</Link>
       </Toolbar>
       </AppBar>
     <Routes>
       <Route path='/info' element={<Info/>} />
       <Route path='/' element={<Main/>} />
+      <Route path='/login' element={<Login/>} />
+      <Route path='/signup' element={<Signup/>} />
     </Routes>
     </AppContainer>
   );
