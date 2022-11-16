@@ -9,7 +9,7 @@ import styled from 'styled-components'
 
 const AppContainer = styled(Container)`
   text-align: center;
-`
+`;
 
 function App() {
   return (

@@ -5,14 +5,25 @@
   "main": "",
   "scripts": {
     "build": "npx tsc",
-    "start": "node build/index.js"
+    "start": "node build/index.js",
+    "lint": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'`",
+    "lint:fix": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'` --fix"
   },
   "author": "",
   "license": "",
   "dependencies": {
     "@types/express": "^4.17.14",
     "@types/node": "^18.11.9",
-    "express": "^4.18.2",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.42.1",
+    "@typescript-eslint/parser": "^5.42.1",
+    "eslint": "^8.27.0",
+    "eslint-config-standard-with-typescript": "^23.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.5.1",
+    "eslint-plugin-promise": "^6.1.1",
     "typescript": "^4.8.4"
   }
 }
