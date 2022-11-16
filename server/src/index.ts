@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import express, { Application, Request, Response } from 'express';
-import { validateLogin, performSignup, PlainPassword } from './auth';
+import { validateLogin, performSignup, PlainPassword, UserRole } from './auth';
 
 const app: Application = express();
 const parsedPort = Number(process.env.AALTO_GRADES_BACKEND_PORT);
@@ -18,7 +18,14 @@ interface SignupRequest {
     username: String,
     password: PlainPassword,
     email: String,
+    role: UserRole,
 }
+
+const validateUserRole = (role: any): role is UserRole => typeof role === "string" && (
+    role === "Teacher" ||
+    role === "Student" ||
+    role === "Admin"
+);
 
 const validateLoginFormat = (body: any): body is LoginRequest =>
     body &&
@@ -32,6 +39,7 @@ const validateSignupFormat = (body: any): body is SignupRequest =>
     body.username &&
     body.password &&
     body.email &&
+    validateUserRole(body.role) &&
     typeof body.username === "string" &&
     typeof body.password === "string" &&
     typeof body.email === "string";
@@ -47,16 +55,17 @@ app.post('/v1/auth/login', express.json(), (req: Request, res: Response) => {
   }
 
   // TODO: Rather use Promises here? Team feedback needed
-  if (!validateLogin(req.body.username, req.body.password)) {
+  validateLogin(req.body.username, req.body.password).then(role => {
+      res.send({
+          success: true,
+          role: role,
+      });
+  }).catch(error => {
     res.status(401);
-    return res.send({
+    res.send({
       success: false,
-      error: "Invalid login credentials",
+      error: error,
     });
-  }
-
-  return res.send({
-      success: true
   });
 });
 
@@ -69,19 +78,18 @@ app.post('/v1/auth/signup', express.json(), (req: Request, res: Response) => {
     });
   }
 
-  // TODO: Rather use Promises here? Team feedback needed
-  if (!performSignup(req.body.username, req.body.email, req.body.password)) {
+  performSignup(req.body.username, req.body.email, req.body.password, req.body.role).then(() => {
+    res.send({
+        success: true
+      });
+  }).catch(error => {
     // 403 or 400 or 500? The Promise architecture with appropriate rejections should
     // carry this info
     res.status(400);
     return res.send({
       success: false,
-      error: "Signup failed",
+      error: error,
     });
-  }
-
-  return res.send({
-    success: true
   });
 });
 
