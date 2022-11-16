@@ -15,7 +15,7 @@ Debian: `# apt install nodejs npm`
 
 Install the necessary Node.js modules:
 ```
-$ npm install
+$ npm ci
 ```
 Compile and start the program:
 ```
