@@ -102,19 +102,18 @@ app.post('/v1/auth/signup', express.json(), (req: Request, res: Response) => {
     });
   }
 
-  // TODO: Rather use Promises here? Team feedback needed
-  if (!performSignup(req.body.username, req.body.email, req.body.password)) {
+  performSignup(req.body.username, req.body.email, req.body.password, req.body.role).then(() => {
+    res.send({
+        success: true
+      });
+  }).catch(error => {
     // 403 or 400 or 500? The Promise architecture with appropriate rejections should
     // carry this info
     res.status(400);
     return res.send({
       success: false,
-      error: "Signup failed",
+      error: error,
     });
-  }
-
-  return res.send({
-    success: true
   });
 });
 
