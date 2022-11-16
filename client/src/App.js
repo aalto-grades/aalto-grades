@@ -1,11 +1,10 @@
 import { Routes, Route } from 'react-router-dom';
-import Main from './components/Main';
-import Info from './components/Info';
+import FrontPage from './components/FrontPage';
+import CourseView from './components/CourseView';
 import Link from '@mui/material/Link';
 import Container from '@mui/material/Container';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
 import styled from 'styled-components'
 
 const AppContainer = styled(Container)`
@@ -14,19 +13,24 @@ const AppContainer = styled(Container)`
 
 function App() {
   return (
-    <AppContainer maxWidth="false" disableGutters="true">
+    <AppContainer maxWidth="false" disableGutters={true}>
       <AppBar position="static">
       <Toolbar>
-          <Typography variant="h5" component="div" align="left" sx={{ flexGrow: 1 }}>
-            Hello world!
-          </Typography>
-          <Link href="/" underline="none" color="white" sx={{ mr: 2 }}>To Main</Link>
-          <Link href="/info" underline="none" color="white" sx={{ mr: 2 }}>To Info</Link>
+        <Link 
+            href="/" 
+            underline="none" 
+            color="white" 
+            variant="h5" 
+            align="left"
+            sx={{ mr: 2 }}
+        >
+          Aalto Grades
+        </Link>
       </Toolbar>
       </AppBar>
     <Routes>
-      <Route path='/info' element={<Info/>} />
-      <Route path='/' element={<Main/>} />
+      <Route path='/' element={<FrontPage/>} />
+      <Route path='/course-view/:courseCode' element={<CourseView/>}/>  {/* Add nested routes when needed */}
     </Routes>
     </AppContainer>
   );
