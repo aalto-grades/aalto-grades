@@ -3,9 +3,35 @@ import FrontPage from './components/FrontPage';
 import CourseView from './components/CourseView';
 import Link from '@mui/material/Link';
 import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import styled from 'styled-components';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      light: '#8187ff',
+      main: '#3d5afe',
+      dark: '#0031ca',
+      contrastText: '#fff',
+    },
+    secondary: {
+      light: '#b2fab4',
+      main: '#66bb6a',
+      dark: '#519657',
+      contrastText: '#000',
+    },
+    info: {
+      light: '#ffc046',
+      main: '#ff8f00',
+      dark: '#c56000',
+      contrastText: '#000',
+    },
+    contrastThreshold: 4.5
+  },
+});
 
 const AppContainer = styled(Container)`
   text-align: center;
@@ -13,7 +39,7 @@ const AppContainer = styled(Container)`
 
 function App() {
   return (
-    <AppContainer maxWidth="false" disableGutters={true}>
+    <ThemeProvider theme={theme}>
       <AppBar position="static">
         <Toolbar>
           <Link 
@@ -28,11 +54,15 @@ function App() {
           </Link>
         </Toolbar>
       </AppBar>
-      <Routes>
-        <Route path='/' element={<FrontPage/>} />
-        <Route path='/course-view/:courseCode' element={<CourseView/>}/>  {/* Add nested routes when needed */}
-      </Routes>
-    </AppContainer>
+      <AppContainer maxWidth="lg">
+        <Box mx={5} my={5}>
+          <Routes>
+            <Route path='/' element={<FrontPage/>} />
+            <Route path='/course-view/:courseCode' element={<CourseView/>}/>  {/* Add nested routes when needed */}
+          </Routes>
+        </Box>
+      </AppContainer>
+    </ThemeProvider>
   );
 }
 
