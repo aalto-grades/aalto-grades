@@ -12,7 +12,7 @@ Make sure you have npm installed. You can check it with the command `npm -v`
 
 Install node modules: 
 ```
-$ npm install
+$ npm ci
 ```
 Start the program in browser: 
 ```
