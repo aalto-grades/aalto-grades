@@ -8,6 +8,9 @@ services:
     ports:
     - "3005:3005"
     container_name: frontend-server
+    environment:
+      BACKEND_URL: "back-end"
+      BACKEND_PORT: "3000"
     networks:
       - local
 
@@ -17,6 +20,11 @@ services:
     ports:
     - "3000:3000"
     container_name: backend-server
+    environment:
+      POSTGRES_URL: "database"
+      POSTGRES_USER: "postgres"
+      POSTGRES_DATABASE: "postgres"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     networks:
       - local
 
@@ -24,7 +32,7 @@ services:
     image: postgres
     restart: always
     environment:
-      POSTGRES_PASSWORD: tester
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     networks:
       - local
 
