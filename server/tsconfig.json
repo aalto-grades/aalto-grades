@@ -4,6 +4,7 @@
     "outDir": "build",
     "esModuleInterop": true,
     "strict": true
+    "target": "es6"
   },
   "exclude": [
     "node_modules"
