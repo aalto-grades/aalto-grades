@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import express, { Application, Request, Response } from 'express';
 
 const app: Application = express();
