@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY . .
 
+RUN chown -R node:node ./*
+
 RUN npm install
 
 RUN npm run build
