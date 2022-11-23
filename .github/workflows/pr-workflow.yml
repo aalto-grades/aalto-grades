@@ -21,7 +21,7 @@ jobs:
         with:
           node-version: '18'
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Run tests
         run: npm test
       - name: Run linter
@@ -39,7 +39,7 @@ jobs:
         with:
           node-version: '18'
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Run tests
         run: echo "No server tests exist"
       - name: Run linter
