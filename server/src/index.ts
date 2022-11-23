@@ -4,7 +4,7 @@
 
 import express, { Application, Request, Response } from 'express';
 import { connectToDatabase } from './src/database';
-import Course from './src/database/models/course';
+import models from './src/database/models';
 
 const app: Application = express();
 const parsedPort = Number(process.env.AALTO_GRADES_BACKEND_PORT);
@@ -14,7 +14,7 @@ app.get('/v1/test/db', async (req: Request, res: Response) => {
   try {
     res.json({
       success: true,
-      data: await Course.findAll(),
+      data: await models.User.findAll(),
     });
   } catch (err) {
     res.status(500);
