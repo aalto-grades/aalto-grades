@@ -10,7 +10,7 @@ services:
     build: ./client
     restart: always
     ports:
-    - "3005:3005"
+      - "3005:3005"
     container_name: frontend-server
     networks:
       - local
@@ -19,7 +19,7 @@ services:
     build: ./server
     restart: always
     ports:
-    - "3000:3000"
+      - "3000:3000"
     container_name: backend-server
     networks:
       - local
