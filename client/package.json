@@ -1,6 +1,8 @@
 {
-  "name": "sw_project_demo",
-  "version": "0.1.0",
+  "name": "aalto-grades-client",
+  "version": "0.0.0",
+  "author": "The Aalto Grades Developers",
+  "license": "Expat (MIT)",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.10.5",
@@ -21,7 +23,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "npx eslint `find . -name '*.js' -not -path './node_modules/*'`",
+    "lint:fix": "npx eslint `find . -name '*.js' -not -path './node_modules/*'` --fix"
   },
   "eslintConfig": {
     "extends": [
@@ -40,5 +44,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "eslint": "^8.27.0",
+    "eslint-plugin-react": "^7.31.10"
   }
 }
