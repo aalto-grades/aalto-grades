@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+
+SPDX-License-Identifier: MIT
+-->
+
 # Aalto-Grades backend
 
 ## Installing Node.js

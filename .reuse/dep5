@@ -1,0 +1,8 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Aalto Grades
+Upstream-Contact: The Aalto Grades Developers
+Source: https://github.com/aalto-grades
+
+Files: *.json client/.env
+Copyright: 2022 The Aalto Grades Developers
+License: MIT
