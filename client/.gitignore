@@ -1,8 +1,11 @@
+# SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+
 # dependencies
 /node_modules
 /.pnp
 .pnp.js
-package-lock.json
 
 # testing
 /coverage
