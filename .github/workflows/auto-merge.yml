@@ -6,6 +6,7 @@ name: Enable auto-merge
 run-name: Auto-merge ${{ github.actor }} pull request
 on:
   pull_request:
+    types: [opened, ready_for_review]
     branches:
       - main
 
