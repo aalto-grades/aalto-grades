@@ -7,16 +7,16 @@ SPDX-License-Identifier: MIT
 # base-repository
 Repo for Aalto-Grades Program
 
-# Development build
+## Development build
 
-You can run the development build of the software by running "docker-compose" up in the root folder of the project.
+You can run the development build of the software by running `docker-compose up` in the root folder of the project.
 
-This command has one requirement which is defining the environmental variable "POSTGRES_PASSWORD" before execution.
+This command has one requirement which is defining the environmental variable `POSTGRES_PASSWORD` before execution.
 
 Demo flow:
 ```
-    export POSTGRES_PASSWORD=XXXX
-    docker-compose up
+$ export POSTGRES_PASSWORD=XXXX
+$ docker-compose up
 ```
 
 ## Development environment
