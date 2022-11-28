@@ -6,8 +6,6 @@ name: PR Open Workflow
 run-name: ${{ github.actor }} pull request
 on:
   pull_request:
-    types:
-      - opened
     branches:
       - main
     
@@ -24,6 +22,6 @@ jobs:
           message: |
             ${{ github.actor }} created a pull request:
 
-            PR Branch: ${{ github.base_ref }}
+            PR Branch: ${{ github.head_ref }}
             
             See changes: https://github.com/${{ github.repository }}/pull/${{ github.ref_name }}
