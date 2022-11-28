@@ -6,8 +6,7 @@ name: PR Open Workflow
 run-name: ${{ github.actor }} pull request
 on:
   pull_request:
-    types:
-      - opened
+    types: [opened, ready_for_review]
     branches:
       - main
     
@@ -16,7 +15,7 @@ jobs:
     name: Notify Telegram On PR Open
     runs-on: ubuntu-latest
     steps:
-      - name: send default message
+      - name: Send PR message to telegram
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_GROUP_ID }}
