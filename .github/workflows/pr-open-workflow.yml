@@ -6,6 +6,8 @@ name: PR Open Workflow
 run-name: ${{ github.actor }} pull request
 on:
   pull_request:
+    types:
+      - opened
     branches:
       - main
     
