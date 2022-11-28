@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+
+name: PR Open Workflow
+run-name: ${{ github.actor }} pull request
+on:
+  pull_request:
+    types:
+      - opened
+    branches:
+      - main
+    
+jobs:
+  notify_telegram:
+    name: Notify Telegram On PR Open
+    runs-on: ubuntu-latest
+    steps:
+      - name: send default message
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_GROUP_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
