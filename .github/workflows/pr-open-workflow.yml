@@ -21,3 +21,9 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_GROUP_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: |
+            ${{ github.actor }} created a pull request:
+
+            Repository: ${{ github.repository }}
+            
+            See changes: https://github.com/${{ github.repository }}/pull/${{ github.ref_name }}
