@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send PR message to telegram
-        uses: appleboy/telegram-action@master
+        uses: appleboy/telegram-action@v0.1.1
         with:
           to: ${{ secrets.TELEGRAM_GROUP_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
