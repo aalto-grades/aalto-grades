@@ -1,5 +1,6 @@
 import express, { Application, Request, Response } from 'express';
 import { validateLogin, performSignup, PlainPassword, UserRole } from './auth';
+import cors from 'cors';
 
 const app: Application = express();
 const parsedPort = Number(process.env.AALTO_GRADES_BACKEND_PORT);
@@ -40,6 +41,9 @@ const validateSignupFormat = (body: any): body is SignupRequest =>
     typeof body.password === 'string' &&
     typeof body.email === 'string';
 
+app.use(cors({
+  origin: 'http://localhost:3005'
+}));
 
 app.post('/v1/auth/login', express.json(), async (req: Request, res: Response) => {
   if (!validateLoginFormat(req.body)) {
