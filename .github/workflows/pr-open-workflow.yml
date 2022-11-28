@@ -24,6 +24,6 @@ jobs:
           message: |
             ${{ github.actor }} created a pull request:
 
-            Repository: ${{ github.repository }}
+            PR Branch: ${{ github.base_ref }}
             
             See changes: https://github.com/${{ github.repository }}/pull/${{ github.ref_name }}
