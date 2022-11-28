@@ -1,48 +1,50 @@
 import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey } from 'sequelize';
 import { sequelize } from '..';
 import Course from './course';
+import CourseInstance from './courseInstance';
 
-export default class CourseInstance extends Model<InferAttributes<CourseInstance>, InferCreationAttributes<CourseInstance>> {
+export default class CourseInstancePartialGrade extends Model<InferAttributes<CourseInstancePartialGrade>, InferCreationAttributes<CourseInstancePartialGrade>> {
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
-  declare gradingType: string;
-  declare teachingPeriod: string;
-  declare teachingMethod: string;
-  declare responsibleTeacher: string;
-  declare startDate: Date;
-  declare endDate: Date;
+  declare courseInstanceId: ForeignKey<CourseInstance['id']>;
+  declare type: string;
+  declare platform: string;
+  declare maxPoints: number;
+  declare minPoints: number;
+  declare weight: number;
+  declare expireAt: Date;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
 
-CourseInstance.init(
+CourseInstancePartialGrade.init(
   {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true
     },
-    gradingType: {
-      type: DataTypes.ENUM('PASSFAIL', 'NUMERICAL'),
+    type: {
+      type: DataTypes.ENUM('EXAM', 'EXERCISE', 'ATTENDANCE', 'FEEDBACK'),
       allowNull: false
     },
-    teachingPeriod: {
-      type: DataTypes.STRING,
+    platform: {
+      type: DataTypes.ENUM('APLUS', 'MYCOURSES', 'OTHER'),
       allowNull: false
     },
-    teachingMethod: {
-      type: DataTypes.ENUM('LECTURE', 'EXAM'),
+    maxPoints: {
+      type: DataTypes.FLOAT,
       allowNull: false
     },
-    responsibleTeacher: {
-      type: DataTypes.STRING,
+    minPoints: {
+      type: DataTypes.FLOAT,
       allowNull: false
     },
-    startDate: {
-      type: new DataTypes.DATEONLY,
+    weight: {
+      type: DataTypes.FLOAT,
       allowNull: false
     },
-    endDate: {
+    expireAt: {
       type: new DataTypes.DATEONLY,
       allowNull: false,
     },
