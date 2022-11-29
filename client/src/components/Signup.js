@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import React, {useState} from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
