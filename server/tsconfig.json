@@ -4,5 +4,11 @@
     "outDir": "build",
     "esModuleInterop": true,
     "strict": true
-  }
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "src/**/*"
+  ]
 }

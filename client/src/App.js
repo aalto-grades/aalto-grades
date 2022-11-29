@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import { Routes, Route } from 'react-router-dom';
 import FrontPage from './components/FrontPage';
 import CourseView from './components/CourseView';
