@@ -6,6 +6,20 @@ SPDX-License-Identifier: MIT
 
 # Aalto Grades contributing guidelines
 
+## Getting started
+
+The project uses [Node.js](https://nodejs.org/en/) as its runtime environment
+and npm to manage dependencies.
+
+Most major GNU/Linux and BSD distributions contain packages for Node.js and
+npm. You can find a list of some common distributions and their Node.js and npm
+packages at: https://nodejs.org/en/download/package-manager/
+
+Windows and macOS users can install Node.js from:
+https://nodejs.org/en/download/
+
+For more instructions, see `client/README.md` and `server/README.md`.
+
 ## Bug reports
 
 Bug reports should contain at least the following points:
