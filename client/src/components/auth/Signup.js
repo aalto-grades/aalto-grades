@@ -1,15 +1,16 @@
 import React, {useState} from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import userService from '../services/user';
+import userService from '../../services/user';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio from '@mui/material/Radio';
 import Grid from '@mui/material/Grid';
+import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
   
-
+  const navigate = useNavigate();
   const [username, setUsername] = useState(''); 
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -23,8 +24,10 @@ const Signup = () => {
         username, password, email, studentID, role
       });
       console.log(user);
-      setUsername('');
-      setPassword('');
+      window.localStorage.setItem(
+        'loggedUser', JSON.stringify(user)
+      );
+      navigate('/', {replace: true});
     } catch (exception) {
       console.log('Error: signup failed');
     }
@@ -61,7 +64,7 @@ const Signup = () => {
             type='studentID'
             value={studentID}
             name='StudentID'
-            label='StudentID'
+            label='Student ID'
             onChange={({ target }) => setStudentID(target.value)}
             InputLabelProps={{ shrink: true }}
             margin='normal'

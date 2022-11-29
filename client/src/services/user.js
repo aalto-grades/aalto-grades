@@ -11,5 +11,13 @@ const signup = async credentials => {
   const response = await axios.post('/v1/auth/signup', credentials);
   return response.data;
 };
+
+const isLoggedIn = () => {
+  const loggedUserJSON = window.localStorage.getItem('loggedUser');
+  if (loggedUserJSON) {
+    return true;
+  }
+  return false;
+};
   
-export default { login, signup };
+export default { login, signup, isLoggedIn };

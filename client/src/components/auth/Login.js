@@ -1,11 +1,19 @@
 import React, {useState} from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import userService from '../services/user';
+import userService from '../../services/user';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+
+const StyledText = styled.p` 
+    color: red;
+`;
 
 const Login= () => {
+  const navigate = useNavigate();
   const [username, setUsername] = useState(''); 
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -14,10 +22,12 @@ const Login= () => {
         username, password,
       });
       console.log(user);
-      setUsername('');
-      setPassword('');
+      window.localStorage.setItem(
+        'loggedUser', JSON.stringify(user)
+      );
+      navigate('/', {replace: true});
     } catch (exception) {
-      console.log('Error: wrong credentials');
+      setErrorMessage('Invalid username or password');
     }
   };
 
@@ -25,6 +35,7 @@ const Login= () => {
     <div>
       <h1>Login</h1>
       <p>{'Don\'t have an account yet?'} <a href={'/Signup'}>Sign up</a></p>
+      <StyledText>{errorMessage}</StyledText>
       <form onSubmit={handleLogin}>
         <div>
           <TextField
