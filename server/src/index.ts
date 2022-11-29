@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import express, { Application, Request, Response } from 'express';
 import { validateLogin, performSignup, PlainPassword, UserRole } from './auth';
 import cors from 'cors';
@@ -92,6 +96,30 @@ app.post('/v1/auth/signup', express.json(), async (req: Request, res: Response) 
       error: error,
     });
   }
+});
+
+app.post('/v1/auth/signup', express.json(), (req: Request, res: Response) => {
+  if (!validateSignupFormat(req.body)) {
+    res.status(400); 
+    return res.send({
+      success: false,
+      error: 'Invalid signup request format',
+    });
+  }
+
+  performSignup(req.body.username, req.body.email, req.body.password, req.body.role).then(() => {
+    res.send({
+      success: true
+    });
+  }).catch(error => {
+    // 403 or 400 or 500? The Promise architecture with appropriate rejections should
+    // carry this info
+    res.status(400);
+    return res.send({
+      success: false,
+      error: error,
+    });
+  });
 });
 
 app.get('*', (req: Request, res: Response) => {

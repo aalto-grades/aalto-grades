@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import PrivateRoute from './components/auth/PrivateRoute';

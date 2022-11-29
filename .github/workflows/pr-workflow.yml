@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+
 name: PR Workflow
 run-name: ${{ github.actor }} pull request
 on:
@@ -21,7 +25,7 @@ jobs:
         with:
           node-version: '18'
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Run tests
         run: npm test
       - name: Run linter
@@ -39,8 +43,15 @@ jobs:
         with:
           node-version: '18'
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Run tests
         run: echo "No server tests exist"
       - name: Run linter
         run: npm run lint
+
+  reuse_lint:
+    name: Check REUSE compliance
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: fsfe/reuse-action@v1

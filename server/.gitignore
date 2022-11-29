@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+
 build
 node_modules
-package-lock.json

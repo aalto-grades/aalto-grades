@@ -1,6 +1,8 @@
 {
   "name": "aalto-grades-server",
   "version": "0.0.0",
+  "author": "The Aalto Grades Developers",
+  "license": "Expat (MIT)",
   "description": "",
   "main": "",
   "scripts": {
@@ -9,8 +11,6 @@
     "lint": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'`",
     "lint:fix": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'` --fix"
   },
-  "author": "",
-  "license": "",
   "dependencies": {
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.14",
