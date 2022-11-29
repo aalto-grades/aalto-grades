@@ -102,15 +102,15 @@ app.post('/v1/auth/signup', express.json(), (req: Request, res: Response) => {
   if (!validateSignupFormat(req.body)) {
     res.status(400); 
     return res.send({
-        success: false,
-        error: "Invalid signup request format",
+      success: false,
+      error: 'Invalid signup request format',
     });
   }
 
   performSignup(req.body.username, req.body.email, req.body.password, req.body.role).then(() => {
     res.send({
-        success: true
-      });
+      success: true
+    });
   }).catch(error => {
     // 403 or 400 or 500? The Promise architecture with appropriate rejections should
     // carry this info
