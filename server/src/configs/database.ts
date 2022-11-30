@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 const username = String(process.env.POSTGRES_USER);
 const password = String(process.env.POSTGRES_PASSWORD);
 const database = String(process.env.POSTGRES_DATABASE);

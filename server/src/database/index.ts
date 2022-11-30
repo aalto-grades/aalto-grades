@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import { Sequelize } from 'sequelize';
 import dbCreds from '../configs/database';
 

@@ -1,3 +1,7 @@
+-- SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+--
+-- SPDX-License-Identifier: MIT
+
 INSERT INTO public.course_instance (course_id, grading_type, teaching_period, teaching_method, responsible_teacher, start_date, end_date, created_at, updated_at) VALUES
 (1, 'NUMERICAL', 'I-II', 'LECTURE', 'Herbert Garrison', '2022-09-05', '2022-12-09', NOW(), NOW()),
 (2, 'PASSFAIL', 'III-IV', 'LECTURE', 'Larry Lecturer', '2023-01-05', '2023-04-23', NOW(), NOW()),

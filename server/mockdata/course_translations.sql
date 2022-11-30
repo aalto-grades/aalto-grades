@@ -1,3 +1,7 @@
+-- SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+--
+-- SPDX-License-Identifier: MIT
+
 INSERT INTO public.course_translation (course_id, language, department, course_name, created_at, updated_at) VALUES
 (1, 'EN', 'Department of Computer Science', 'Programming 1', NOW(), NOW()),
 (1, 'FI', 'Tietotekniikan laitos', 'Ohjelmointi 1', NOW(), NOW()),

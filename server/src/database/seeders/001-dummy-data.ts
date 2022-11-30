@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import { QueryInterface, Transaction } from 'sequelize';
 import fs from 'fs';
 import path from 'path';

@@ -1,3 +1,7 @@
+-- SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+--
+-- SPDX-License-Identifier: MIT
+
 -- DISCLAIMER
 -- All names and student id's portrayed in this file are fictitious.
 -- Any resemblance to actual person or student id, living or dead, active or inactive, is purely coincidental.

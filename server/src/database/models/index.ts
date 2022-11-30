@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import CourseInstancePartialGrade from './courseInstancePartialGrade';
 import UserAssignmentGrade from './userAssignmentGrade';
 import CourseTranslation from './courseTranslation';
