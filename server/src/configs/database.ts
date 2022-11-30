@@ -1,26 +1,13 @@
-module.exports = {
-  development: {
-    username: String(process.env.DB_USERNAME),
-    password: String(process.env.DB_PASSWORD),
-    database: String(process.env.DB_DATABASE),
-    host: String(process.env.DB_HOST),
-    dialect: 'postgres',
-    migrationStorageTableName: 'migrations'
-  },
-  test: {
-    username: String(process.env.DB_USERNAME),
-    password: String(process.env.DB_PASSWORD),
-    database: String(process.env.DB_DATABASE),
-    host: String(process.env.DB_HOST),
-    dialect: 'postgres',
-    migrationStorageTableName: 'migrations'
-  },
-  production: {
-    username: String(process.env.DB_USERNAME),
-    password: String(process.env.DB_PASSWORD),
-    database: String(process.env.DB_DATABASE),
-    host: String(process.env.DB_HOST),
-    dialect: 'postgres',
-    migrationStorageTableName: 'migrations'
-  }
+const username = String(process.env.POSTGRES_USER);
+const password = String(process.env.POSTGRES_PASSWORD);
+const database = String(process.env.POSTGRES_DATABASE);
+const host = String(process.env.POSTGRES_URL);
+
+export = {
+  username: username,
+  password: password,
+  database: database,
+  host: host,
+  dialect: 'postgres',
+  migrationStorageTableName: 'migrations'
 };

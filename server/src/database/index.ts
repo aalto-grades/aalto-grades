@@ -1,11 +1,8 @@
 import { Sequelize } from 'sequelize';
-const database = String(process.env.DB_DATABASE);
-const username = String(process.env.DB_USERNAME);
-const password = String(process.env.DB_PASSWORD);
-const host = String(process.env.DB_HOST);
+import dbCreds from '../configs/database';
 
-export const sequelize = new Sequelize(database, username, password, {
-  host: host,
+export const sequelize = new Sequelize(dbCreds.database, dbCreds.username, dbCreds.password, {
+  host: dbCreds.host,
   dialect: 'postgres',
   dialectOptions: {
     ssl: {
