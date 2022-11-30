@@ -101,7 +101,7 @@ const Signup = () => {
             <FormControlLabel value='Admin' control={<Radio />} label='Admin' />
           </RadioGroup>
         </Grid>
-        <Button type='submit' variant='contained'>Sign up</Button>
+        <Button type='submit'>Sign up</Button>
       </form>
     </div>
   );
