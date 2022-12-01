@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+
+version: "3.7"
+
+services:
+
+  front-end:
+    build: ./client
+    restart: always
+    ports:
+    - "3005:3005"
+    container_name: frontend-server
+    environment:
+      BACKEND_URL: "back-end"
+      BACKEND_PORT: "3000"
+    networks:
+      - local
+
+  back-end:
+    build: ./server
+    restart: always
+    ports:
+    - "3000:3000"
+    container_name: backend-server
+    environment:
+      POSTGRES_URL: "database"
+      POSTGRES_USER: "postgres"
+      POSTGRES_DATABASE: "postgres"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    networks:
+      - local
+
+  database:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    networks:
+      - local
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - local
+
+networks:
+  local:
+    driver: bridge
