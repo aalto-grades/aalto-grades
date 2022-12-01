@@ -10,8 +10,7 @@ export const sequelize = new Sequelize(dbCreds.database, dbCreds.username, dbCre
   dialect: 'postgres',
   dialectOptions: {
     ssl: {
-      require: true,
-      rejectUnauthorized: false
+      require: true
     },
   },
   define: {
