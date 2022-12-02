@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import express, { Application, Request, Response } from 'express';
-import { connectToDatabase, sequelize } from './src/database';
+import { connectToDatabase, sequelize } from './database/index';
 import { QueryTypes } from 'sequelize';
-import models from './src/database/models';
+import models from './database/models';
 
 const app: Application = express();
 const parsedPort = Number(process.env.AALTO_GRADES_BACKEND_PORT);
