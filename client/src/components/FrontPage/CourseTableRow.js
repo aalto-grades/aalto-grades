@@ -7,24 +7,25 @@ import { useNavigate } from 'react-router-dom';
 
 const CourseTableRow = ({course}) => {
   let navigate = useNavigate();
+  const { id, name, courseCode, department } = course;
 
   return(
     <TableRow
-      key={course.code} 
+      key={id} 
       hover={true}
-      onClick={() => { navigate('/course-view/' + course.code); }}
+      onClick={() => { navigate('/course-view/' + courseCode); }}
     >
       <TableCell>
         <Link 
-          href={'/course-view/' + course.code}
+          href={'/course-view/' + courseCode}
           underline="hover"
           color="inherit"
         >
-          {course.code}
+          {courseCode}
         </Link>
       </TableCell>
-      <TableCell>{course.name}</TableCell>
-      <TableCell>{course.department}</TableCell>
+      <TableCell>{name.en}</TableCell>
+      <TableCell>{department.en}</TableCell>
     </TableRow>
   );
 };
@@ -32,7 +33,7 @@ const CourseTableRow = ({course}) => {
 CourseTableRow.propTypes = {
   course: PropTypes.object,
   name: PropTypes.string,
-  code: PropTypes.string,
+  courseCode: PropTypes.string,
   department: PropTypes.string
 };
 

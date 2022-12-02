@@ -11,7 +11,7 @@ const BasicGrid = ({data}) => {
     <Grid2 container spacing={3} sx={{ my: 2 }}>
       {data.map(course => {
         return(
-          <Grid2 xs={12} sm={6} md={6} lg={4} xl={3} key={course.code}>
+          <Grid2 xs={12} sm={6} md={6} lg={4} xl={3} key={course.id}>
             <CourseCard course={course}/>
           </Grid2>
         );

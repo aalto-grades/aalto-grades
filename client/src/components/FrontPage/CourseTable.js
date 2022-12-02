@@ -26,10 +26,10 @@ const CourseTable = ({data}) => {
         <CourseHeadTableRow/>
       </TableHead>
       <TableBody>
-        {data.sort((a, b) => sortByCode(a.code, b.code))
+        {data.sort((a, b) => sortByCode(a.courseCode, b.courseCode))
           .slice()
           .map((course) => (
-            <CourseTableRow course={course} key={course.code}/>
+            <CourseTableRow course={course} key={course.id}/>
           ))}
       </TableBody>
     </Table>

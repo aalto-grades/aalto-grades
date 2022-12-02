@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import express, { Application, Request, Response } from 'express';
+import cors from 'cors';
 
 const app: Application = express();
 const parsedPort = Number(process.env.AALTO_GRADES_BACKEND_PORT);
@@ -80,6 +81,10 @@ export async function teacherCourses(userId: number): Promise<TeacherCourses> {
     ]
   };
 }
+
+app.use(cors({
+  origin: 'http://localhost:3005'
+}));
 
 app.get('/v1/user/courses', async (req: Request, res: Response) => {
   try {

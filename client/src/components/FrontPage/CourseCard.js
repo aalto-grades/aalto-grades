@@ -11,19 +11,19 @@ import { useNavigate } from 'react-router-dom';
 // add spacing before action part
 const CourseCard = ({course}) => {
   let navigate = useNavigate();
-  const { name, code, department } = course;
+  const { name, courseCode, department } = course;
 
   return(
     <Card>
       <CardContent>
         <Typography variant="h6" component="div" align="left" sx={{ flexGrow: 1 }}>
-          {code + ' – ' + name}
+          {courseCode + ' – ' + name.en}
         </Typography>
-        <Typography variant="subtitle1" align="left">{department}</Typography>
+        <Typography variant="subtitle1" align="left">{department.en}</Typography>
       </CardContent>
       <Divider variant="middle"/>
       <CardActions>
-        <Button size="small" onClick={() => { navigate('/course-view/' + code); }}>
+        <Button size="small" onClick={() => { navigate('/course-view/' + courseCode); }}>
                     See instances
         </Button>
       </CardActions>
