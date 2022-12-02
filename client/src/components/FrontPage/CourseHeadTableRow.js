@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import React from 'react';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
