@@ -88,8 +88,14 @@ export default {
           allowNull: false
         },
         responsible_teacher: {
-          type: DataTypes.STRING,
-          allowNull: false
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          references: {
+            model: 'user',
+            key: 'id'
+          },
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE'
         },
         start_date: {
           type: new DataTypes.DATEONLY,

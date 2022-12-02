@@ -5,6 +5,7 @@
 import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey } from 'sequelize';
 import { sequelize } from '..';
 import Course from './course';
+import User from './user';
 
 export default class CourseInstance extends Model<InferAttributes<CourseInstance>, InferCreationAttributes<CourseInstance>> {
   declare id: CreationOptional<number>;
@@ -12,7 +13,7 @@ export default class CourseInstance extends Model<InferAttributes<CourseInstance
   declare gradingType: string;
   declare teachingPeriod: string;
   declare teachingMethod: string;
-  declare responsibleTeacher: string;
+  declare responsibleTeacher: ForeignKey<User['id']>;
   declare startDate: Date;
   declare endDate: Date;
   declare createdAt: CreationOptional<Date>;
@@ -36,10 +37,6 @@ CourseInstance.init(
     },
     teachingMethod: {
       type: DataTypes.ENUM('LECTURE', 'EXAM'),
-      allowNull: false
-    },
-    responsibleTeacher: {
-      type: DataTypes.STRING,
       allowNull: false
     },
     startDate: {
