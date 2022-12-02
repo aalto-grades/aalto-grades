@@ -21,7 +21,7 @@ export const sequelize = new Sequelize(dbCreds.database, dbCreds.username, dbCre
   logging: console.log
 });
 
-export const connectToDatabase = async () => {
+export const connectToDatabase = async (): Promise<void | NodeJS.Process> => {
   try {
     await sequelize.authenticate();
     console.log('database connected');
@@ -29,5 +29,4 @@ export const connectToDatabase = async () => {
     console.log('database connecting failed', error);
     return process.exit(1);
   }
-  return null;
 };
