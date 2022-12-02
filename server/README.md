@@ -10,7 +10,8 @@ SPDX-License-Identifier: MIT
 
 - [Installing Node.js](#installing-nodejs)
 - [Running the program](#running-the-program)
-- [Migrations and Seeds](#migrations-and-seeds)
+- [Migrations](#migrations)
+- [Seeds](#seeds)
 
 ## Installing Node.js
 
@@ -38,15 +39,31 @@ After running the last command, visit `http://localhost:3000/world` on a web
 browser. You should see the output "Hello /world".
 
 
-## Migrations and Seeds
+## Migrations
 
-Uses The Sequelize [Command Line Interface](https://github.com/sequelize/cli).
-More information in Sequelize [documentation](https://sequelize.org/docs/v6/other-topics/migrations/).
-The database which CLI will connect is defined in `/src/configs/database.ts`, more information
-on options [here](https://github.com/sequelize/cli/blob/main/docs/README.md).
-Migration, seeder, config and model paths defined in *.sequelizerc*.
+Migrations to keep track of changes to the database. With migrations 
+you can transfer existing database into another state and vice versa. 
+Those state transitions are saved in migration files, which describe 
+how to get to the new state and how to revert the changes in order 
+to get back to the old state.
 
-Run database migrations:
+Migration files are placed in `/src/database/migrations`.
+Migration files are named with ascending numbering and name describing 
+the actions migration does to the database state. For an example:
+```
+001-initial-migration.ts
+002-add-indexes.ts
+```
+
+Migrations utilize the Sequelize [Command Line Interface](https://github.com/sequelize/cli).
+The database which CLI will connect is defined in `/src/configs/database.ts`,
+more information on options [here](https://github.com/sequelize/cli/blob/main/docs/README.md).
+Detailed information about migrations in the Sequelize 
+[documentation](https://sequelize.org/docs/v6/other-topics/migrations/).
+
+Migration, seeder, config and model paths are defined in `.sequelizerc`.
+
+Run database migrations all the way to latest one:
 ```
 $ npm run migration:up
 ```
@@ -56,16 +73,26 @@ Run one migration down:
 $ npm run migration:down
 ```
 
-You can populate tables with dummy data with seed files from seeders folder.
-Seed files are some change in data that can be used to populate database 
-tables with sample or test data.
 
-Run all seeders:
+## Seeds
+
+To manage data migrations to the database, you can use seeders. 
+Seed files include the data you want populate the database with (sample or test data).
+
+Seeder files are placed in `/src/database/seeders`.
+Seeder files are named with ascending numbering and name describing 
+the actions seeder does to the database state. For an example:
+```
+001-load-test-data.ts
+002-add-more-data-points.ts
+```
+
+Run seeder files all the way to latest one:
 ```
 $ npm run seed:up
 ```
 
-Clear one seeders:
+Run one seeder file down (delete the populated data from database for that seeder):
 ```
 $ npm run seed:down
 ```
