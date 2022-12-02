@@ -11,6 +11,7 @@ const app: Application = express();
 const parsedPort = Number(process.env.AALTO_GRADES_BACKEND_PORT);
 const port: number = isNaN(parsedPort) ? 3000 : parsedPort;
 
+// TODO: remove this test endpoint after working endpoint has been added
 app.get('/v1/test/db', async (req: Request, res: Response) => {
   try {
     res.json({
@@ -27,6 +28,7 @@ app.get('/v1/test/db', async (req: Request, res: Response) => {
   }
 });
 
+// TODO: remove this test endpoint after working endpoint has been added
 app.get('/v1/test/db/courses/:langId', async (req: Request, res: Response) => {
   try {
     const language: string = req.params.langId.toUpperCase(); // uppercase to avoid invalid enum error
