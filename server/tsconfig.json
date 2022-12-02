@@ -3,7 +3,7 @@
     "module": "commonjs",
     "outDir": "build",
     "esModuleInterop": true,
-    "strict": true
+    "strict": true,
     "target": "es6"
   },
   "exclude": [
