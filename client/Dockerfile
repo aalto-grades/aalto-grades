@@ -6,17 +6,17 @@ FROM node:16-alpine
 
 WORKDIR /app
 
+COPY . .
+
 RUN chown -R node:node ./
 
-COPY --chown=node:node package.json .
+USER node
 
 RUN npm install
 
-COPY --chown=node:node . .
+RUN chown -R node:node ./
 
 RUN npm run build
-
-USER node
 
 CMD ["npm", "start"]
 
