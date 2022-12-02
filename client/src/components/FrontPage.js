@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import React from 'react';
 import Typography from '@mui/material/Typography';
 import BasicGrid from './FrontPage/BasicGrid';
