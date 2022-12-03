@@ -11,7 +11,8 @@ export default class CourseInstance extends Model<InferAttributes<CourseInstance
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
   declare gradingType: string;
-  declare teachingPeriod: string;
+  declare startingPeriod: string;
+  declare endingPeriod: string;
   declare teachingMethod: string;
   declare responsibleTeacher: ForeignKey<User['id']>;
   declare startDate: Date;
@@ -31,8 +32,12 @@ CourseInstance.init(
       type: DataTypes.ENUM('PASSFAIL', 'NUMERICAL'),
       allowNull: false
     },
-    teachingPeriod: {
-      type: DataTypes.STRING,
+    startingPeriod: {
+      type: DataTypes.ENUM('I', 'II', 'III', 'IV', 'V'),
+      allowNull: false
+    },
+    endingPeriod: {
+      type: DataTypes.ENUM('I', 'II', 'III', 'IV', 'V'),
       allowNull: false
     },
     teachingMethod: {

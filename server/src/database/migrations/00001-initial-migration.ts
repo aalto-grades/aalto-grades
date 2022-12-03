@@ -79,8 +79,12 @@ export default {
           type: DataTypes.ENUM('PASSFAIL', 'NUMERICAL'),
           allowNull: false
         },
-        teaching_period: {
-          type: DataTypes.STRING,
+        starting_period: {
+          type: DataTypes.ENUM('I', 'II', 'III', 'IV', 'V'),
+          allowNull: false
+        },
+        ending_period: {
+          type: DataTypes.ENUM('I', 'II', 'III', 'IV', 'V'),
           allowNull: false
         },
         teaching_method: {
@@ -381,6 +385,8 @@ export default {
       await queryInterface.sequelize.query('DROP TYPE IF EXISTS enum_course_translation_language;', { transaction });
       await queryInterface.sequelize.query('DROP TYPE IF EXISTS enum_course_instance_partial_grade_type;', { transaction });
       await queryInterface.sequelize.query('DROP TYPE IF EXISTS enum_course_instance_partial_grade_platform;', { transaction });
+      await queryInterface.sequelize.query('DROP TYPE IF EXISTS enum_course_instance_starting_period;', { transaction });
+      await queryInterface.sequelize.query('DROP TYPE IF EXISTS enum_course_instance_ending_period;', { transaction });
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
