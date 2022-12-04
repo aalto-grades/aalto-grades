@@ -12,9 +12,10 @@ app.get('*', (req: Request, res: Response) => {
   res.send(`Hello ${req.path}`);
 });
 
-if (require.main === module)
+if (require.main === module) {
   app.listen(port, () => {
     console.log(`Hello server, running on port ${port}`);
   });
+}
 
 module.exports = app;
