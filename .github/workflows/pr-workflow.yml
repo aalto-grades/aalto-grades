@@ -45,7 +45,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Run tests
-        run: echo "No server tests exist"
+        run: npm test
       - name: Run linter
         run: npm run lint
 
