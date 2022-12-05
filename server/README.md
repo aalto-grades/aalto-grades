@@ -33,7 +33,8 @@ browser. You should see the output "Hello /world".
 
 ## Running the unit tests
 
-Jest is used as the unit test framework. Additionally, supertest is used for
+[Jest](https://jestjs.io/docs/getting-started) is used as the unit test framework. 
+Additionally, [supertest](https://www.npmjs.com/package/supertest) is used for
 testing API functionality.
 
 Run the unit tests:
