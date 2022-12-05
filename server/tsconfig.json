@@ -2,6 +2,7 @@
   "compilerOptions": {
     "module": "commonjs",
     "outDir": "build",
+    "types": ["node", "jest"],
     "esModuleInterop": true,
     "strict": true
   },
@@ -9,6 +10,7 @@
     "node_modules"
   ],
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "test/**/*"
   ]
 }
