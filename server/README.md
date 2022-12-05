@@ -30,3 +30,14 @@ $ npm run start
 ```
 After running the last command, visit `http://localhost:3000/world` on a web
 browser. You should see the output "Hello /world".
+
+## Running the unit tests
+
+[Jest](https://jestjs.io/docs/getting-started) is used as the unit test framework. 
+Additionally, [supertest](https://www.npmjs.com/package/supertest) is used for
+testing API functionality.
+
+Run the unit tests:
+```
+$ npm test
+```
