@@ -20,12 +20,32 @@ https://nodejs.org/en/download/
 
 For more instructions, see `client/README.md` and `server/README.md`.
 
-## Bug reports
+## Issues
 
-Bug reports should contain at least the following points:
+### Bug reports
+
+The title of the bug report should be short and descriptive, providing a brief
+overview of what went wrong and how.
+
+In more detail, the bug report should explain at least the following:
 - Steps to reproduce
 - Expected outcome
 - Actual outcome
+
+An estimate of the severity of the bug in terms of how much it impacts
+functionality and/or security should be included.
+- **Low**: Minor problem, does not significantly impact functionality.
+- **Medium**: Noticeable impact on functionality without completely breaking
+  the application.
+- **High**: Breakage of major functionality or a severe security issue.
+
+### Design issues
+
+<!--TODO-->
+
+### Feature requests
+
+<!--TODO-->
 
 ## Code style
 
