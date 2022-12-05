@@ -162,7 +162,7 @@ export default {
           onUpdate: 'CASCADE'
         },
         language: {
-          type: new DataTypes.ENUM('EN', 'FI', 'SE'),
+          type: new DataTypes.ENUM('EN', 'FI', 'SV'),
           allowNull: false
         },
         department: {
