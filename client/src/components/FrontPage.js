@@ -12,14 +12,14 @@ const FrontPage = () => {
 
   const [currentCourses, setCurrentCourses] = useState([]);
   const [previousCourses, setPreviousCourses] = useState([]);
-  
+
   useEffect(() => {
-    coursesService.courses()
+    coursesService.getCourses()
       .then((data) => setCurrentCourses(data.courses.current));
   }, []);
 
   useEffect(() => {
-    coursesService.courses()
+    coursesService.getCourses()
       .then((data) => setPreviousCourses(data.courses.previous));
   }, []);
 

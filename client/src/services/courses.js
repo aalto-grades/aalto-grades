@@ -4,10 +4,10 @@
 
 import axios from './axios';
 
-const courses = async () => {
+const getCourses = async () => {
   const response = await axios.get('/v1/user/courses');
   console.log(response.data);
   return response.data;
 };
 
-export default {courses};
+export default {getCourses};
