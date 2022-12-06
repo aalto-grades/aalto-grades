@@ -4,10 +4,15 @@
 
 import express, { Application, Request, Response } from 'express';
 import { TeacherCourses, getTeacherCourses } from './services/courses';
+import cors from 'cors';
 
 const app: Application = express();
 const parsedPort = Number(process.env.AALTO_GRADES_BACKEND_PORT);
 const port: number = isNaN(parsedPort) ? 3000 : parsedPort;
+
+app.use(cors({
+  origin: 'http://localhost:3005'
+}));
 
 app.get('/v1/user/courses', async (req: Request, res: Response) => {
   try {
