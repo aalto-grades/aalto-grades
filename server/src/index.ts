@@ -6,6 +6,8 @@ import express, { Application, Request, Response } from 'express';
 import { connectToDatabase, sequelize } from './database/index';
 import { QueryTypes } from 'sequelize';
 import models from './database/models';
+import { TeacherCourses, getTeacherCourses } from './services/courses';
+import cors from 'cors';
 
 const app: Application = express();
 const parsedPort = Number(process.env.AALTO_GRADES_BACKEND_PORT);
@@ -60,6 +62,26 @@ app.get('/v1/test/db/courses/:langId', async (req: Request, res: Response) => {
     res.json({
       success: false,
       error: '',
+    });
+  }
+});
+
+app.use(cors({
+  origin: 'http://localhost:3005'
+}));
+
+app.get('/v1/user/courses', async (req: Request, res: Response) => {
+  try {
+    const courses: TeacherCourses = await getTeacherCourses(0);
+    res.send({
+      success: true,
+      courses: courses,
+    });
+  } catch (error) {
+    res.status(401);
+    res.send({
+      success: false,
+      error: error,
     });
   }
 });
