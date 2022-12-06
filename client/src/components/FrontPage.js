@@ -15,12 +15,14 @@ const FrontPage = () => {
 
   useEffect(() => {
     coursesService.getCourses()
-      .then((data) => setCurrentCourses(data.courses.current));
+      .then((data) => setCurrentCourses(data.courses.current))
+      .catch((e) => console.log(e.message));
   }, []);
 
   useEffect(() => {
     coursesService.getCourses()
-      .then((data) => setPreviousCourses(data.courses.previous));
+      .then((data) => setPreviousCourses(data.courses.previous))
+      .catch((e) => console.log(e.message));
   }, []);
 
   return(

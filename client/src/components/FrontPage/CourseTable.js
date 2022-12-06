@@ -9,19 +9,7 @@ import TableBody from '@mui/material/TableBody';
 import TableHead from '@mui/material/TableHead';
 import CourseTableRow from './CourseTableRow';
 import CourseHeadTableRow from './CourseHeadTableRow';
-
-//used to sort the table rows by course code
-function sortByCode(a, b) {
-  const codeA = a.toUpperCase();
-  const codeB = b.toUpperCase();
-  if (codeA < codeB) {
-    return -1;
-  }
-  if (codeA > codeB) {
-    return 1;
-  }
-  return 0;
-}
+import sortingServices from '../../services/sorting';
 
 const CourseTable = ({data}) => {
   return(
@@ -30,7 +18,7 @@ const CourseTable = ({data}) => {
         <CourseHeadTableRow/>
       </TableHead>
       <TableBody>
-        {data.sort((a, b) => sortByCode(a.courseCode, b.courseCode))
+        {data.sort((a, b) => sortingServices.sortByCode(a.courseCode, b.courseCode))
           .slice()
           .map((course) => (
             <CourseTableRow course={course} key={course.id}/>
