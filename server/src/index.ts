@@ -16,10 +16,10 @@ interface LoginRequest {
 }
 
 interface SignupRequest {
-    username: string,
-    password: PlainPassword,
-    email: string,
-    role: UserRole,
+  username: string,
+  password: PlainPassword,
+  email: string,
+  role: UserRole,
 }
 
 const validateUserRole = (role: any): role is UserRole => typeof role === 'string' && (
