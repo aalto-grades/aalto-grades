@@ -7,7 +7,7 @@
   "main": "",
   "scripts": {
     "build": "npx tsc",
-    "start": "node build/src/index.js",
+    "start": "node build/src/server.js",
     "test": "jest",
     "lint": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'`",
     "lint:fix": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'` --fix"
