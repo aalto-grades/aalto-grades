@@ -3,11 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 import React, {useState} from 'react';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
 import userService from '../../services/user';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import LoginForm from './LoginForm';
 
 const StyledText = styled.p` 
     color: red;
@@ -15,16 +14,11 @@ const StyledText = styled.p`
 
 const Login= () => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState(''); 
-  const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
+  const addUser = async (userObject) => {
     try {
-      const user = await userService.login({
-        username, password,
-      });
+      const user = await userService.login(userObject);
       console.log(user);
       window.localStorage.setItem(
         'loggedUser', JSON.stringify(user)
@@ -40,31 +34,7 @@ const Login= () => {
       <h1>Login</h1>
       <p>{'Don\'t have an account yet?'} <a href={'/Signup'}>Sign up</a></p>
       <StyledText>{errorMessage}</StyledText>
-      <form onSubmit={handleLogin}>
-        <div>
-          <TextField
-            type='username'
-            value={username}
-            name='Username'
-            label='Username'
-            onChange={({ target }) => setUsername(target.value)}
-            InputLabelProps={{ shrink: true }}
-            margin='normal'
-          />
-        </div>
-        <div>
-          <TextField
-            type='password'
-            value={password}
-            name='Password'
-            label='Password'
-            onChange={({ target }) => setPassword(target.value)}
-            InputLabelProps={{ shrink: true }}
-            margin='normal'
-          />
-        </div>
-        <Button type='submit'>login</Button>
-      </form>
+      <LoginForm addUser={addUser}/>
     </div>
   );
 };
