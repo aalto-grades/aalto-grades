@@ -7,7 +7,7 @@
   "main": "",
   "scripts": {
     "build": "npx tsc",
-    "start": "node build/index.js",
+    "start": "node build/src/index.js",
     "test": "jest",
     "lint": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'`",
     "lint:fix": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'` --fix"
@@ -15,9 +15,11 @@
   "dependencies": {
     "@types/express": "^4.17.14",
     "@types/node": "^18.11.9",
+    "cors": "^2.8.5",
     "express": "^4.18.2"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.12",
     "@types/jest": "^29.2.3",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.42.1",
