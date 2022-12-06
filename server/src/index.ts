@@ -22,21 +22,24 @@ interface SignupRequest {
   role: UserRole,
 }
 
-const validateUserRole = (role: any): role is UserRole => typeof role === 'string' && (
-  role === 'Teacher' ||
+function validateUserRole(role: any): role is UserRole {
+  return typeof role === 'string' && (
+    role === 'Teacher' ||
     role === 'Student' ||
     role === 'Admin'
-);
+  );
+}
 
-const validateLoginFormat = (body: any): body is LoginRequest =>
-  body &&
+function validateLoginFormat(body: any): body is LoginRequest {
+  return body &&
     body.username &&
     body.password &&
     typeof body.username === 'string' &&
     typeof body.password === 'string';
+}
 
-const validateSignupFormat = (body: any): body is SignupRequest =>
-  body &&
+function validateSignupFormat(body: any): body is SignupRequest {
+  return body &&
     body.username &&
     body.password &&
     body.email &&
@@ -44,6 +47,7 @@ const validateSignupFormat = (body: any): body is SignupRequest =>
     typeof body.username === 'string' &&
     typeof body.password === 'string' &&
     typeof body.email === 'string';
+}
 
 app.use(cors({
   origin: 'http://localhost:3005'
