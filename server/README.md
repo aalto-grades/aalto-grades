@@ -96,3 +96,14 @@ Run one seeder file down (delete the populated data from database for that seede
 ```
 $ npm run seed:down
 ```
+
+## Running the unit tests
+
+[Jest](https://jestjs.io/docs/getting-started) is used as the unit test framework. 
+Additionally, [supertest](https://www.npmjs.com/package/supertest) is used for
+testing API functionality.
+
+Run the unit tests:
+```
+$ npm test
+```
