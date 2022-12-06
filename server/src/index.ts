@@ -4,6 +4,7 @@
 
 import express, { Application, Request, Response } from 'express';
 import { validateLogin, performSignup, PlainPassword, UserRole } from './auth';
+import { TeacherCourses, getTeacherCourses } from './services/courses';
 import cors from 'cors';
 
 const app: Application = express();
@@ -77,6 +78,22 @@ app.post('/v1/auth/login', express.json(), async (req: Request, res: Response) =
   }
 });
 
+app.get('/v1/user/courses', async (req: Request, res: Response) => {
+  try {
+    const courses: TeacherCourses = await getTeacherCourses(0);
+    res.send({
+      success: true,
+      courses: courses,
+    });
+  } catch (error) {
+    res.status(401);
+    res.send({
+      success: false,
+      error: error,
+    });
+  }
+});
+
 app.post('/v1/auth/signup', express.json(), async (req: Request, res: Response) => {
   if (!validateSignupFormat(req.body)) {
     res.status(400); 
@@ -130,6 +147,10 @@ app.get('*', (req: Request, res: Response) => {
   res.send(`Hello ${req.path}`);
 });
 
-app.listen(port, () => {
-  console.log(`Hello server, running on port ${port}`);
-});
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`Hello server, running on port ${port}`);
+  });
+}
+
+module.exports = app;

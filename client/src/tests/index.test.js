@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import axios from 'axios';
-
-export default axios.create({
-  baseURL: 'http://localhost:3000',
+test('temporary placeholder test', () => {
+  expect(true).toBe(true);
 });
