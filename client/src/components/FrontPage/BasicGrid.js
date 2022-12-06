@@ -7,9 +7,7 @@ import PropTypes from 'prop-types';
 import Grid2 from '@mui/material/Unstable_Grid2';
 import CourseCard from './CourseCard';
 
-// disableEqualOverflow ?
-// is course code unique for all here?
-// xs, sm etc
+
 const BasicGrid = ({data}) => {
   return(
     <Grid2 container spacing={3} sx={{ my: 2 }}>
