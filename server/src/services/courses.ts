@@ -70,6 +70,27 @@ export async function getTeacherCourses(userId: number): Promise<TeacherCourses>
           sv: '',
           en: ''
         }
+      },
+      {
+        id: 2,
+        courseCode: 'CS-C3120',
+        minCredits: 5,
+        maxCredits: 5,
+        department: {
+          fi: '',
+          sv: '',
+          en: 'Department of Communications and Networking'
+        },
+        name: {
+          fi: '',
+          sv: '',
+          en: 'Human-Computer Interaction'
+        },
+        evaluationInformation: {
+          fi: '',
+          sv: '',
+          en: ''
+        }
       }
     ]
   };
