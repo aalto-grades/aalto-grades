@@ -3,11 +3,15 @@
 // SPDX-License-Identifier: MIT
 
 export type PlainPassword = string;
-export type UserRole = 'Teacher' | 'Student' | 'Admin';
+export enum UserRole {
+  Student,
+  Teacher,
+  Admin,
+};
 
 export async function validateLogin(username: string, password: PlainPassword): Promise<UserRole> {
   if (username.toLowerCase() === 'aalto' && password === 'grades') {
-    return 'Admin';
+    return UserRole.Admin;
   } else {
     throw 'Invalid credentials';
   }
