@@ -7,7 +7,7 @@ export enum UserRole {
   Student,
   Teacher,
   Admin,
-};
+}
 
 export async function validateLogin(username: string, password: PlainPassword): Promise<UserRole> {
   if (username.toLowerCase() === 'aalto' && password === 'grades') {
