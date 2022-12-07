@@ -5,7 +5,7 @@
 import { Sequelize } from 'sequelize';
 import dbCreds from '../configs/database';
 
-export const sequelize = new Sequelize(dbCreds.database, dbCreds.username, dbCreds.password, {
+export const sequelize: Sequelize = new Sequelize(dbCreds.database, dbCreds.username, dbCreds.password, {
   host: dbCreds.host,
   dialect: 'postgres',
   dialectOptions: {
