@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { Request, Response, Router } from 'express';
-import { getUserCourses } from './controllers/user';
+import { getUserCourses } from '../controllers/user';
 
 export const router: Router = Router();
 

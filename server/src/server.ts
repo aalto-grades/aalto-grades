@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { app } from './index';
+import { app } from './app';
 
 const parsedPort: number = Number(process.env.AALTO_GRADES_BACKEND_PORT);
 const port: number = isNaN(parsedPort) ? 3000 : parsedPort;

@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { Request, Response } from 'express';
 import { Course } from './course';
 
 export interface TeacherCourses {
@@ -10,7 +11,7 @@ export interface TeacherCourses {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function getTeacherCourses(userId: number): Promise<TeacherCourses> {
+async function getTeacherCourses(userId: number): Promise<TeacherCourses> {
   return {
     current: [
       {
@@ -80,4 +81,21 @@ export async function getTeacherCourses(userId: number): Promise<TeacherCourses>
       }
     ]
   };
+}
+
+export async function getUserCourses(req: Request, res: Response): Promise<void> {
+  try {
+    const userId: number = Number(req.params.userId);
+    const courses: TeacherCourses = await getTeacherCourses(userId);
+    res.send({
+      success: true,
+      courses: courses,
+    });
+  } catch (error) {
+    res.status(401);
+    res.send({
+      success: false,
+      error: error,
+    });
+  }
 }
