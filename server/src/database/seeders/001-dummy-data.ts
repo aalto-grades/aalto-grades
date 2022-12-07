@@ -5,10 +5,10 @@
 import { QueryInterface, Transaction } from 'sequelize';
 import fs from 'fs';
 import path from 'path';
-const users: string = fs.readFileSync(path.resolve(__dirname, '../../../mockdata/users.sql'), 'utf8');
-const courses: string = fs.readFileSync(path.resolve(__dirname, '../../../mockdata/courses.sql'), 'utf8');
-const courseInstances: string = fs.readFileSync(path.resolve(__dirname, '../../../mockdata/course_instances.sql'), 'utf8');
-const courseTranslation: string = fs.readFileSync(path.resolve(__dirname, '../../../mockdata/course_translations.sql'), 'utf8');
+const users: string = fs.readFileSync(path.resolve(__dirname, '../../../../mockdata/users.sql'), 'utf8');
+const courses: string = fs.readFileSync(path.resolve(__dirname, '../../../../mockdata/courses.sql'), 'utf8');
+const courseInstances: string = fs.readFileSync(path.resolve(__dirname, '../../../../mockdata/course_instances.sql'), 'utf8');
+const courseTranslation: string = fs.readFileSync(path.resolve(__dirname, '../../../../mockdata/course_translations.sql'), 'utf8');
 
 export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
