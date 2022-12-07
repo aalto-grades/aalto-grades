@@ -27,6 +27,6 @@ export const connectToDatabase = async (): Promise<void | NodeJS.Process> => {
     console.log('database connected');
   } catch (error) {
     console.log('database connecting failed', error);
-    return process.exit(1);
+    throw new Error('database connection failed');
   }
 };
