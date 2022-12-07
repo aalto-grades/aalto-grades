@@ -5,9 +5,9 @@
 import { Request, Response } from 'express';
 import { TeacherCourses, getTeacherCourses } from '../../services/user';
 
-export async function getUserCourses(req: Request, res: Response) {
+export async function getUserCourses(req: Request, res: Response): Promise<void> {
   try {
-    const userId = Number(req.params.userId);
+    const userId: number = Number(req.params.userId);
     const courses: TeacherCourses = await getTeacherCourses(userId);
     res.send({
       success: true,

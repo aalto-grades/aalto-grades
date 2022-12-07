@@ -4,7 +4,7 @@
 
 import { app } from './index';
 
-const parsedPort = Number(process.env.AALTO_GRADES_BACKEND_PORT);
+const parsedPort: number = Number(process.env.AALTO_GRADES_BACKEND_PORT);
 const port: number = isNaN(parsedPort) ? 3000 : parsedPort;
 
 app.listen(port, () => {

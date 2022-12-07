@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Course } from '../services/course';
+import { Course } from './course';
 
 export interface TeacherCourses {
   current: Array<Course>,
