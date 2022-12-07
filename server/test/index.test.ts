@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { app } from '../src/index';
-import supertest = require('supertest');
+import supertest from 'supertest';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 
