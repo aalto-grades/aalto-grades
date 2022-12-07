@@ -1,0 +1,11 @@
+// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+const path = require('path');
+
+module.exports = {
+  'config': path.resolve('build/configs', 'database.js'),
+  'models-path': path.resolve('build/database', 'models'),
+  'seeders-path': path.resolve('build/database', 'seeders'),
+  'migrations-path': path.resolve('build/database', 'migrations')
+};
