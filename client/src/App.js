@@ -5,7 +5,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import PrivateRoute from './components/auth/PrivateRoute';
-import Info from './components/Info';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
 import FrontPage from './components/FrontPage';
@@ -61,8 +60,6 @@ function App() {
           >
           Aalto Grades
           </Link>
-          <Link href="/info" underline="none" color="white" sx={{ mr: 2 }}>To Info</Link>
-          <Link href="/login" underline="none" color="white" sx={{ mr: 2 }}>To Login</Link>
         </Toolbar>
       </AppBar>
       <AppContainer maxWidth="lg">
@@ -72,9 +69,8 @@ function App() {
             <Route path='/signup' element={<Signup/>} />
             <Route element={<PrivateRoute/>}>
               <Route path='/' element={<FrontPage/>} />
-              <Route path='info' element={<Info />} />
+              <Route path='/course-view/:courseCode' element={<CourseView/>}/>  {/* Add nested routes when needed */}
             </Route>
-            <Route path='/course-view/:courseCode' element={<CourseView/>}/>  {/* Add nested routes when needed */}
           </Routes>
         </Box>
       </AppContainer>

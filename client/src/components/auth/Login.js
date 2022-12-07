@@ -5,16 +5,18 @@
 import React, {useState} from 'react';
 import userService from '../../services/user';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import LoginForm from './LoginForm';
-
-const StyledText = styled.p` 
-    color: red;
-`;
+import { useTheme } from '@mui/material/styles';
 
 const Login= () => {
+
+  // Login credentials currently saved to local storage
+  // since no sign out has been implemented, credentials can be removed with
+  // the command: window.localStorage.clear()
+
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
+  const theme = useTheme();
 
   const addUser = async (userObject) => {
     try {
@@ -33,7 +35,7 @@ const Login= () => {
     <div>
       <h1>Login</h1>
       <p>{'Don\'t have an account yet?'} <a href={'/Signup'}>Sign up</a></p>
-      <StyledText>{errorMessage}</StyledText>
+      <p style={{ color: `${theme.palette.primary.dark}`}}>{errorMessage}</p>
       <LoginForm addUser={addUser}/>
     </div>
   );
