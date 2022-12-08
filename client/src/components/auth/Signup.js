@@ -18,7 +18,7 @@ const Signup = () => {
       window.localStorage.setItem(
         'loggedUser', JSON.stringify(user)
       );
-      navigate('/', {replace: true});
+      navigate('/', { replace: true });
     } catch (exception) {
       console.log('Error: signup failed');
     }

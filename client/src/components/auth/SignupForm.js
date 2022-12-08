@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -11,7 +11,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio from '@mui/material/Radio';
 import Grid from '@mui/material/Grid';
 
-const SignupForm = ({addUser}) => {
+const SignupForm = ({ addUser }) => {
 
   const [username, setUsername] = useState(''); 
   const [password, setPassword] = useState('');

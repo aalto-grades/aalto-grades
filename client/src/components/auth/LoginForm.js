@@ -2,12 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 
-const LoginForm = ({addUser}) => {
+const LoginForm = ({ addUser }) => {
 
   const [username, setUsername] = useState(''); 
   const [password, setPassword] = useState('');
