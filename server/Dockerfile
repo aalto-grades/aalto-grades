@@ -10,12 +10,12 @@ COPY . .
 
 RUN chown -R node:node ./*
 
-RUN npm install
+RUN npm ci
 
 RUN npm run build
 
 USER node
 
-CMD ["npm", "run", "start"]
+CMD ["/bin/sh", "-c", "npm run migration:up && npm run seed:up && npm run start"]
 
 EXPOSE 3000
