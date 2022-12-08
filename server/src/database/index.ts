@@ -9,9 +9,11 @@ export const sequelize: Sequelize = new Sequelize(dbCreds.database, dbCreds.user
   host: dbCreds.host,
   dialect: 'postgres',
   dialectOptions: {
-    ssl: {
-      require: true
-    },
+    // Temporarily commented out so local database connections work
+    // TODO: Find a better solution or enable again when taking the system to use?
+    //ssl: {
+    //  require: true
+    //},
   },
   define: {
     timestamps: true,
