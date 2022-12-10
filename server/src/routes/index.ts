@@ -8,7 +8,7 @@ import { testDbFindAllUsers, testDbFindAllCourses } from '../controllers/test';
 
 export const router: Router = Router();
 
-router.get('/user/:userId/courses', getUserCourses);
+router.get('/v1/user/:userId/courses', getUserCourses);
 
 // TODO: remove this test endpoint after working endpoint has been added
 router.get('/v1/test/db', testDbFindAllUsers);

@@ -8,7 +8,7 @@ export interface LocalizedString {
   en: string
 }
 
-export interface Course {
+export interface CourseData {
   id: number,
   courseCode: string,
   minCredits: number,
@@ -16,4 +16,10 @@ export interface Course {
   department: LocalizedString,
   name: LocalizedString,
   evaluationInformation: LocalizedString
+}
+
+export enum Language {
+  English = 0,
+  Finnish = 1,
+  Swedish = 2
 }

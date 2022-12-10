@@ -5,7 +5,7 @@
 import axios from './axios';
 
 const getCourses = async () => {
-  const response = await axios.get('/user/0/courses');
+  const response = await axios.get('/v1/user/8/courses');
   console.log(response.data);
   return response.data;
 };
