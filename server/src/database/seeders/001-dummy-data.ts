@@ -31,6 +31,10 @@ export default {
       await queryInterface.bulkDelete('course_instance', {}, { transaction });
       await queryInterface.bulkDelete('course', {}, { transaction });
       await queryInterface.bulkDelete('user', {}, { transaction });
+      await queryInterface.sequelize.query('ALTER SEQUENCE course_translation_id_seq RESTART WITH 1;', { transaction });
+      await queryInterface.sequelize.query('ALTER SEQUENCE course_instance_id_seq RESTART WITH 1;', { transaction });
+      await queryInterface.sequelize.query('ALTER SEQUENCE course_id_seq RESTART WITH 1;', { transaction });
+      await queryInterface.sequelize.query('ALTER SEQUENCE user_id_seq RESTART WITH 1;', { transaction });
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
