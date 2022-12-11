@@ -2,10 +2,20 @@
 //
 // SPDX-License-Identifier: MIT
 
-import express, { Application } from 'express';
+import { Request, Response, Router } from 'express';
+import { getUserCourses } from '../controllers/user';
+import { testDbFindAllUsers, testDbFindAllCourses } from '../controllers/test';
 
-const app: Application = express();
+export const router: Router = Router();
 
-export {
-  app
-};
+router.get('/user/:userId/courses', getUserCourses);
+
+// TODO: remove this test endpoint after working endpoint has been added
+router.get('/v1/test/db', testDbFindAllUsers);
+
+// TODO: remove this test endpoint after working endpoint has been added
+router.get('/v1/test/db/courses/:langId', testDbFindAllCourses);
+
+router.get('*', (req: Request, res: Response) => {
+  res.send(`Hello ${req.path}`);
+});

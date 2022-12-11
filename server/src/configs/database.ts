@@ -2,10 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-const username = String(process.env.POSTGRES_USER);
-const password = String(process.env.POSTGRES_PASSWORD);
-const database = String(process.env.POSTGRES_DATABASE);
-const host = String(process.env.POSTGRES_URL);
+const username: string = String(process.env.POSTGRES_USER);
+const password: string = String(process.env.POSTGRES_PASSWORD);
+const database: string = String(process.env.POSTGRES_DATABASE);
+const host: string = String(process.env.POSTGRES_URL);
 
 export = {
   username: username,
