@@ -26,12 +26,10 @@ export async function validateLogin(username: string, password: PlainPassword): 
     }
   });
   if (user === null) {
-    console.log('no such user');
     throw new InvalidCredentials();
   }
-  const match = await argon.verify(user.password, password);
+  const match = await argon.verify(user.password.trim(), password);
   if (!match) {
-    console.log('not matching');
     throw new InvalidCredentials();
   }
   return UserRole.Admin;
