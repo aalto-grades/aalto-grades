@@ -4,6 +4,7 @@
 
 import User from '../database/models/user';
 import argon from 'argon2';
+import Op from 'sequelize/types/operators';
 
 export type PlainPassword = string;
 export enum UserRole {
@@ -15,6 +16,18 @@ export enum UserRole {
 export class InvalidCredentials extends Error {
   constructor() {
     super('invalid credentials');
+  }
+}
+
+export class UserExists extends Error {
+  constructor() {
+    super('user exists already');
+  }
+}
+
+export class InvalidFormat extends Error {
+  constructor() {
+    super('credential format is invalid, possibly bad email');
   }
 }
 
@@ -35,6 +48,28 @@ export async function validateLogin(username: string, password: PlainPassword): 
   return UserRole.Admin;
 }
 
-export async function performSignup(username: string, email: string, plainPassword: PlainPassword, role: UserRole) {
-  return;
+export async function performSignup(username: string, email: string, plainPassword: PlainPassword, studentId: string): Promise<void> {
+  const exists = await User.findOne({
+    where: {
+      [Op.or]: [
+        { email },
+        { name: username },
+      ]
+    }
+  });
+
+  if (exists !== null) {
+    throw new UserExists();
+  }
+
+  try {
+    await User.create({
+      name: username,
+      email,
+      password: await argon.hash(plainPassword),
+      studentId,
+    });
+  } catch (_e) {
+      throw new InvalidFormat();
+  }
 }
