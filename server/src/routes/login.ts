@@ -2,18 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import express, { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import { IVerifyOptions } from 'passport-local';
-import { UserRole, PlainPassword } from '../services/auth';
-import { app } from '.';
+import { UserRole, PlainPassword, validateLogin, InvalidCredentials } from '../controllers/auth';
+import { Strategy as LocalStrategy } from 'passport-local';
 import { jwtSecret } from '../configs';
 
-interface LoginRequest {
-  username: string,
-  password: PlainPassword,
-}
 interface SignupRequest {
   username: string,
   password: PlainPassword,
@@ -29,14 +25,6 @@ function validateUserRole(role: any): role is UserRole {
   );
 }
 
-function validateLoginFormat(body: any): body is LoginRequest {
-  return body &&
-    body.username &&
-    body.password &&
-    typeof body.username === 'string' &&
-    typeof body.password === 'string';
-}
-
 function validateSignupFormat(body: any): body is SignupRequest {
   return body &&
     body.username &&
@@ -48,7 +36,7 @@ function validateSignupFormat(body: any): body is SignupRequest {
     typeof body.email === 'string';
 }
 
-app.post('/v1/auth/login', express.json(), async (req: Request, res: Response, next) => {
+export async function authLogin(req: Request, res: Response, next: NextFunction) {
   passport.authenticate(
     'login',
     async (err, role: UserRole | boolean, options: IVerifyOptions | null | undefined) => {
@@ -93,9 +81,9 @@ app.post('/v1/auth/login', express.json(), async (req: Request, res: Response, n
       }
     }
   )(req, res, next);
-});
+}
 
-app.post('/v1/auth/signup', express.json(), async (req: Request, res: Response) => {
+export async function authSignup(req: Request, res: Response) {
   if (!validateSignupFormat(req.body)) {
     res.status(400); 
     return res.send({
@@ -119,4 +107,26 @@ app.post('/v1/auth/signup', express.json(), async (req: Request, res: Response) 
       error: error,
     });
   }
-});
+}
+
+passport.use(
+  'login',
+  new LocalStrategy(
+    {
+      usernameField: 'username',
+      passwordField: 'password'
+    },
+    async (username, password, done) => {
+      try {
+        const role = await validateLogin(username, password);
+        return done(null, role, { message: 'success' });
+      } catch (error) {
+        if (error instanceof InvalidCredentials) {
+          return done(null, false, { message: 'invalid credentials' });
+        }
+        return done(error);
+      }
+    }
+  ),
+);
+
