@@ -4,12 +4,15 @@
 
 import React, { useState, useEffect } from 'react';
 import Typography from '@mui/material/Typography';
-import BasicGrid from './FrontPage/BasicGrid';
-import CourseTable from './FrontPage/CourseTable';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import BasicGrid from './front-page/BasicGrid';
+import CourseTable from './front-page/CourseTable';
 import coursesService from '../services/courses';
+import { useNavigate } from 'react-router-dom';
 
 const FrontPage = () => {
-
+  let navigate = useNavigate();
   const [currentCourses, setCurrentCourses] = useState([]);
   const [previousCourses, setPreviousCourses] = useState([]);
 
@@ -27,9 +30,14 @@ const FrontPage = () => {
 
   return(
     <>
-      <Typography variant="h3" component="div" align="left" sx={{ flexGrow: 1 }}>
+      <Box component="span" sx={{ display: 'flex', alignItems: 'center',  justifyContent: 'space-between', flexDirection: 'row' }}>
+        <Typography variant="h3" component="div" align="left" sx={{ flexGrow: 1 }}>
                 Your Current Courses
-      </Typography>
+        </Typography>
+        <Button size='large' variant='contained' onClick={() => { navigate('/create-course'); }}>
+                Create New Course
+        </Button>
+      </Box>
       <BasicGrid data={currentCourses}/>
       <Typography variant="h4" component="div" align="left" sx={{ flexGrow: 1, mt: 4 }}>
                 Inactive Courses
