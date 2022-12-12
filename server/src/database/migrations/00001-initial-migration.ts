@@ -32,7 +32,7 @@ export default {
           }
         },
         password: {
-          type: new DataTypes.CHAR(60),
+          type: new DataTypes.CHAR(255),
           allowNull: false
         },
         created_at: DataTypes.DATE,
