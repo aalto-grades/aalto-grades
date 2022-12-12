@@ -40,7 +40,7 @@ User.init(
       },
     },
     password: {
-      type: new DataTypes.CHAR(60),
+      type: new DataTypes.CHAR(255),
       allowNull: false
     },
     createdAt: DataTypes.DATE,
