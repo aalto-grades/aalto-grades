@@ -69,7 +69,6 @@ describe('Test GET /v1/user/:userId/courses', () => {
     expect(res.statusCode).toBe(200);
 
     const courses: TeacherCourses = res.body.courses as TeacherCourses;
-    console.log(`Current: ${courses.current.length}, previous: ${courses.previous.length}`);
     expect(courses.current.length).toBe(1);
     expect(courses.current[0].courseCode).toBe('PHYS-A1130');
     expect(courses.previous.length).toBe(1);
