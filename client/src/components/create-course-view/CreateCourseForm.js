@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import TextFieldBox from './TextFieldBox';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
@@ -25,29 +26,50 @@ const organizerData = {
   fieldHelperText: 'Give the organizer of the new course.'
 };
 
-const teachersData = {
+/*const teachersData = {
   fieldId: 'teachers',
   fieldLabel: 'Responsibe Teachers',
   fieldHelperText: 'Give the emails of the responsible teachers of the new course.'
-};
+};*/
 
-const CreateCourseForm = () => {
+const CreateCourseForm = ({ addCourse }) => {
 
   const [courseCode, setCode] = useState('');
-  const [courseName, setName] = useState('');
-  const [organizer, setOrganizer] = useState('');
-  const [teacher, setTeacher] = useState(''); 
+  const [name, setName] = useState('');
+  const [department, setOrganizer] = useState('');
+  //const [teacher, setTeacher] = useState(''); 
+
+  const id = 100;
+  const minCredits = 5;
+  const maxCredits = 5;
+  const evaluationInformation = 'General scale, 0-5';
 
   const handleSubmit = (event) => {
     event.preventDefault();
     try {
       const courseObject = ({
+        id,
         courseCode,
-        courseName,
-        organizer,
-        teacher
+        minCredits,
+        maxCredits,
+        department: {
+          fi: '',
+          sv: '',
+          en: department,
+        },
+        name: {
+          fi: '',
+          sv: '',
+          en: name,
+        },
+        evaluationInformation: {
+          fi: '',
+          sv: '',
+          en: evaluationInformation,
+        }
+        //teacher
       });
-      console.log(courseObject);
+      addCourse(courseObject);
     } catch (exception) {
       console.log(exception);
     }
@@ -59,7 +81,6 @@ const CreateCourseForm = () => {
         <TextFieldBox fieldData={codeData} setFunction={setCode}/>
         <TextFieldBox fieldData={nameData} setFunction={setName}/>
         <TextFieldBox fieldData={organizerData} setFunction={setOrganizer}/>
-        <TextFieldBox fieldData={teachersData} setFunction={setTeacher}/>
         <Button size='medium' variant='contained' type='submit'>
           Create Course
         </Button>
@@ -67,5 +88,11 @@ const CreateCourseForm = () => {
     </Container>
   );
 };
+
+CreateCourseForm.propTypes = {
+  addCourse: PropTypes.func
+};
+
+// <TextFieldBox fieldData={teachersData} setFunction={setTeacher}/>
 
 export default CreateCourseForm;
