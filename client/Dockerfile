@@ -12,7 +12,7 @@ RUN chown -R node:node ./
 
 USER node
 
-RUN npm install
+RUN npm ci
 
 RUN chown -R node:node ./
 
