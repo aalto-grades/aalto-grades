@@ -41,14 +41,14 @@ browser. You should see the output "Hello /world".
 
 ## Migrations
 
-Migrations to keep track of changes to the database. With migrations 
-you can transfer existing database into another state and vice versa. 
-Those state transitions are saved in migration files, which describe 
-how to get to the new state and how to revert the changes in order 
+Migrations to keep track of changes to the database. With migrations
+you can transfer existing database into another state and vice versa.
+Those state transitions are saved in migration files, which describe
+how to get to the new state and how to revert the changes in order
 to get back to the old state.
 
 Migration files are placed in `/src/database/migrations`.
-Migration files are named with ascending numbering and name describing 
+Migration files are named with ascending numbering and name describing
 the actions migration does to the database state. For an example:
 ```
 001-initial-migration.ts
@@ -58,7 +58,7 @@ the actions migration does to the database state. For an example:
 Migrations utilize the Sequelize [Command Line Interface](https://github.com/sequelize/cli).
 The database which CLI will connect is defined in `/src/configs/database.ts`,
 more information on options [here](https://github.com/sequelize/cli/blob/main/docs/README.md).
-Detailed information about migrations in the Sequelize 
+Detailed information about migrations in the Sequelize
 [documentation](https://sequelize.org/docs/v6/other-topics/migrations/).
 
 Migration, seeder, config and model paths are defined in `.sequelizerc`.
@@ -76,11 +76,11 @@ $ npm run migration:down
 
 ## Seeds
 
-To manage data migrations to the database, you can use seeders. 
+To manage data migrations to the database, you can use seeders.
 Seed files include the data you want populate the database with (sample or test data).
 
 Seeder files are placed in `/src/database/seeders`.
-Seeder files are named with ascending numbering and name describing 
+Seeder files are named with ascending numbering and name describing
 the actions seeder does to the database state. For an example:
 ```
 001-load-test-data.ts
@@ -99,11 +99,22 @@ $ npm run seed:down
 
 ## Running the unit tests
 
-[Jest](https://jestjs.io/docs/getting-started) is used as the unit test framework. 
+[Jest](https://jestjs.io/docs/getting-started) is used as the unit test framework.
 Additionally, [supertest](https://www.npmjs.com/package/supertest) is used for
 testing API functionality.
 
-Run the unit tests:
+The tests depend on having a local database running. This can be done with the
+Docker Compose configuration at the root of the project. You will need to set
+the appropriate environment variables as in `../docker-compose.yaml`, and then
+to run the database:
+```
+$ docker-compose --file ../docker-compose.yaml up database
+```
+
+After the database is running, you may need to run `migration:up` and `seed:up`
+if you haven't previously populated the database already.
+
+Then in another terminal, to run the unit tests, use:
 ```
 $ npm test
 ```

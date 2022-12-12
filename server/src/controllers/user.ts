@@ -50,7 +50,7 @@ export async function getUserCourses(req: Request, res: Response): Promise<void>
 
     // Construct CourseData objects and determine whether the course is current
     // or previous.
-    const currentDate: Date = new Date();
+    const currentDate: Date = new Date(Date.now());
     for (const i in instances) {
       const courseInstance: CourseInstance = instances[i];
       const course: Course = await models.Course.findByPk(courseInstance.courseId) as Course;
