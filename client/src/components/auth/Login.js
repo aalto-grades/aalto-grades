@@ -19,12 +19,11 @@ const Login = () => {
 
   const addUser = async (userObject) => {
     try {
-      const user = await userService.login(userObject);
+      const response = await userService.login(userObject);
 
-      console.log(user);
+      console.log(response);
 
-      const accessToken = user.accessToken;
-      setAuth({ user, accessToken });
+      setAuth({ userId: response.id, role: response.role });
 
       navigate('/', { replace: true });
 
