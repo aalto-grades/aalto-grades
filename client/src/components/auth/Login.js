@@ -7,12 +7,11 @@ import userService from '../../services/user';
 import { useNavigate } from 'react-router-dom';
 import LoginForm from './LoginForm';
 import { useTheme } from '@mui/material/styles';
+import useAuth from '../../hooks/useAuth';
 
 const Login = () => {
 
-  // Login credentials currently saved to local storage
-  // since no sign out has been implemented, credentials can be removed with
-  // the command: window.localStorage.clear()
+  const { setAuth } = useAuth();
 
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
@@ -21,11 +20,14 @@ const Login = () => {
   const addUser = async (userObject) => {
     try {
       const user = await userService.login(userObject);
+
       console.log(user);
-      window.localStorage.setItem(
-        'loggedUser', JSON.stringify(user)
-      );
+
+      const accessToken = user.accessToken;
+      setAuth({ user, accessToken });
+
       navigate('/', { replace: true });
+
     } catch (exception) {
       setErrorMessage('Invalid username or password');
     }

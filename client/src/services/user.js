@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import axios from './axios';
+import useAuth from '../hooks/useAuth';
 
 const login = async credentials => {
   const response = await axios.post('/v1/auth/login', credentials);
@@ -10,13 +11,20 @@ const login = async credentials => {
 };
 
 const signup = async credentials => {
-  const response = await axios.post('/v1/auth/signup', credentials);
+  const response = await axios.post('/v1/auth/signup',
+    credentials,
+    {
+      headers: { 'Content-Type': 'application/json' },
+      withCredentials: true
+    }
+  );
   return response.data;
 };
 
 const isLoggedIn = () => {
-  const loggedUserJSON = window.localStorage.getItem('loggedUser');
-  if (loggedUserJSON) {
+  const { auth } = useAuth();
+  const loggedUser = auth?.user;
+  if (loggedUser) {
     return true;
   }
   return false;

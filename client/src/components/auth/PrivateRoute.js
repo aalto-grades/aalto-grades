@@ -10,7 +10,8 @@ import { PropTypes } from 'prop-types';
 import userService from '../../services/user';
 import { Outlet } from 'react-router-dom';
 
-function PrivateRoute({ children }) {
+const PrivateRoute = ({ children }) => {
+
   const isLoggedIn = userService.isLoggedIn();
     
   if (!isLoggedIn) {
@@ -24,7 +25,7 @@ function PrivateRoute({ children }) {
       <Outlet />
     </>
   );
-}
+};
 
 PrivateRoute.propTypes = {
   children: PropTypes.element
