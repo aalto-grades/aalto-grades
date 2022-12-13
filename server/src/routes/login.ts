@@ -4,6 +4,7 @@
 
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import { ExtractJwt, Strategy as JWTStrategy } from 'passport-jwt';
 import passport from 'passport';
 import { IVerifyOptions } from 'passport-local';
 import { UserRole, PlainPassword, validateLogin, InvalidCredentials, performSignup } from '../controllers/auth';
@@ -16,6 +17,11 @@ interface SignupRequest {
   email: string,
   studentId: string,
   role: UserRole,
+}
+
+interface JwtClaims {
+  role: UserRole,
+  id: number,
 }
 
 function validateUserRole(role: any): role is UserRole {
@@ -97,9 +103,10 @@ export async function authSignup(req: Request, res: Response) {
 
   try {
     // TODO signup
-    await performSignup(req.body.username, req.body.email, req.body.password, req.body.studentId);
-    const body = {
+    const id = await performSignup(req.body.username, req.body.email, req.body.password, req.body.studentId);
+    const body: JwtClaims = {
       role: req.body.role,
+      id,
     };
     const token = jwt.sign({ user: body }, jwtSecret);
     res.cookie('jwt', token, {
@@ -122,6 +129,14 @@ export async function authSignup(req: Request, res: Response) {
   }
 }
 
+export async function authSelfInfo(req: Request, res: Response) {
+  const user = req.user as JwtClaims;
+  return res.send({
+    id: user.id,
+    role: user.role,
+  });
+}
+
 passport.use(
   'login',
   new LocalStrategy(
@@ -141,4 +156,22 @@ passport.use(
       }
     }
   ),
+);
+
+passport.use(
+  new JWTStrategy(
+    {
+      secretOrKey: jwtSecret,
+      jwtFromRequest: (req: Request) => {
+        return (req && req.cookies) ? req.cookies['jwt'] : null;
+      }
+    },
+    async (token: { body: JwtClaims }, done) => {
+      try {
+        return done(null, token.body);
+      } catch(e) {
+        return done(e);
+      }
+    }
+  )
 );
