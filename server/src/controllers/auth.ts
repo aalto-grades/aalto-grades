@@ -66,7 +66,7 @@ export async function performSignup(username: string, email: string, plainPasswo
     await User.create({
       name: username,
       email,
-      password: await argon.hash(plainPassword),
+      password: await argon.hash(plainPassword.trim()),
       studentId,
     });
   } catch (_e) {

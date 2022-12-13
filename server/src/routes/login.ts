@@ -6,7 +6,7 @@ import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import { IVerifyOptions } from 'passport-local';
-import { UserRole, PlainPassword, validateLogin, InvalidCredentials } from '../controllers/auth';
+import { UserRole, PlainPassword, validateLogin, InvalidCredentials, performSignup } from '../controllers/auth';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { jwtSecret } from '../configs';
 
@@ -14,6 +14,7 @@ interface SignupRequest {
   username: string,
   password: PlainPassword,
   email: string,
+  studentId: string,
   role: UserRole,
 }
 
@@ -30,10 +31,12 @@ function validateSignupFormat(body: any): body is SignupRequest {
     body.username &&
     body.password &&
     body.email &&
+    body.studentID &&
     validateUserRole(body.role) &&
     typeof body.username === 'string' &&
     typeof body.password === 'string' &&
-    typeof body.email === 'string';
+    typeof body.email === 'string' &&
+    typeof body.studentID === 'string';
 }
 
 export async function authLogin(req: Request, res: Response, next: NextFunction) {
@@ -94,7 +97,17 @@ export async function authSignup(req: Request, res: Response) {
 
   try {
     // TODO signup
-    //await performSignup(req.body.username, req.body.email, req.body.password, req.body.role);
+    await performSignup(req.body.username, req.body.email, req.body.password, req.body.studentId);
+    const body = {
+      role: req.body.role,
+    };
+    const token = jwt.sign({ user: body }, jwtSecret);
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: true,
+      maxAge: 24 * 60 * 60 * 1000 // one day
+    });
     res.send({
       success: true
     });
@@ -129,4 +142,3 @@ passport.use(
     }
   ),
 );
-
