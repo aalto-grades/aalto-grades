@@ -4,12 +4,14 @@
 
 import express, { Application } from 'express';
 import { router } from './routes/index';
+import { courseRouter } from './routes/courses';
 import cors from 'cors';
 
 export const app: Application = express();
 
-app.use('/', router);
-
 app.use(cors({
   origin: 'http://localhost:3005'
 }));
+
+app.use('/courses', courseRouter)
+app.use('/', router);
