@@ -17,3 +17,7 @@ export interface Course {
   name: LocalizedString,
   evaluationInformation: LocalizedString
 }
+
+export interface CourseInstances {
+  courseInstances: Array<Course>
+}
