@@ -48,7 +48,7 @@ export async function validateLogin(username: string, password: PlainPassword): 
   return UserRole.Admin;
 }
 
-export async function performSignup(username: string, email: string, plainPassword: PlainPassword, studentId: string): Promise<void> {
+export async function performSignup(username: string, email: string, plainPassword: PlainPassword, studentId: string): Promise<number> {
   const exists = await User.findOne({
     where: {
       [Op.or]: [
@@ -63,12 +63,13 @@ export async function performSignup(username: string, email: string, plainPasswo
   }
 
   try {
-    await User.create({
+    const model = await User.create({
       name: username,
       email,
       password: await argon.hash(plainPassword.trim()),
       studentId,
     });
+    return model.id;
   } catch (_e) {
       throw new InvalidFormat();
   }

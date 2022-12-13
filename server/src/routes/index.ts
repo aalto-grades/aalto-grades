@@ -5,7 +5,8 @@
 import express, { Request, Response, Router } from 'express';
 import { getUserCourses } from '../controllers/user';
 import { testDbFindAllUsers, testDbFindAllCourses } from '../controllers/test';
-import { authLogin, authSignup } from './login';
+import { authLogin, authSelfInfo, authSignup } from './login';
+import passport from 'passport';
 
 export const router: Router = Router();
 
@@ -19,6 +20,7 @@ router.get('/v1/test/db/courses/:langId', testDbFindAllCourses);
 
 router.post('/v1/auth/login', express.json(), authLogin);
 router.post('/v1/auth/signup', express.json(), authSignup);
+router.get('/v1/auth/self-info', passport.authenticate('jwt', { session: false }), express.json(), authSelfInfo);
 
 router.get('*', (req: Request, res: Response) => {
   res.send(`Hello ${req.path}`);
