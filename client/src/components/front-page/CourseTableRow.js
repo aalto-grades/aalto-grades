@@ -9,7 +9,7 @@ import TableRow from '@mui/material/TableRow';
 import Link from '@mui/material/Link';
 import { useNavigate } from 'react-router-dom';
 
-const CourseTableRow = ({course}) => {
+const CourseTableRow = ({ course }) => {
   let navigate = useNavigate();
   const { id, name, courseCode, department } = course;
 
