@@ -39,7 +39,7 @@ const CreateCourseForm = ({ addCourse }) => {
   const [department, setOrganizer] = useState('');
   //const [teacher, setTeacher] = useState(''); 
 
-  const id = 100;
+  const id = -1;
   const minCredits = 5;
   const maxCredits = 5;
   const evaluationInformation = 'General scale, 0-5';

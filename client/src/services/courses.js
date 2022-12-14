@@ -11,7 +11,7 @@ const getCourses = async () => {
 };
 
 const addCourse = async (course) => {
-  const response = await axios.post('/user/0/courses', course);
+  const response = await axios.post('/v1/courses', course);
   return response.data;
 };
 
