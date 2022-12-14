@@ -8,7 +8,7 @@ import Grid2 from '@mui/material/Unstable_Grid2';
 import CourseCard from './CourseCard';
 
 
-const BasicGrid = ({data}) => {
+const BasicGrid = ({ data }) => {
   return(
     <Grid2 container spacing={3} sx={{ my: 2 }}>
       {data.map(course => {

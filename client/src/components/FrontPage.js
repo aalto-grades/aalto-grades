@@ -12,7 +12,7 @@ import coursesService from '../services/courses';
 import { useNavigate } from 'react-router-dom';
 
 const FrontPage = () => {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
   const [currentCourses, setCurrentCourses] = useState([]);
   const [previousCourses, setPreviousCourses] = useState([]);
 

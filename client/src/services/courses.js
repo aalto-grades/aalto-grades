@@ -15,4 +15,4 @@ const addCourse = async (course) => {
   return response.data;
 };
 
-export default {getCourses, addCourse};
+export default { getCourses, addCourse };

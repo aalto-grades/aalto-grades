@@ -51,25 +51,25 @@ describe('Tests for CreateCourseView components', () => {
 
     expect(mockCourse).toHaveBeenCalledTimes(1);
     expect(mockCourse).toHaveBeenCalledWith({
-        id: 100,
-        courseCode: 'Test code',
-        minCredits: 5,
-        maxCredits: 5,
-        department: {
-          fi: '',
-          sv: '',
-          en: 'Test department',
-        },
-        name: {
-          fi: '',
-          sv: '',
-          en: 'Test name',
-        },
-        evaluationInformation: {
-          fi: '',
-          sv: '',
-          en: 'General scale, 0-5',
-        }
+      id: 100,
+      courseCode: 'Test code',
+      minCredits: 5,
+      maxCredits: 5,
+      department: {
+        fi: '',
+        sv: '',
+        en: 'Test department',
+      },
+      name: {
+        fi: '',
+        sv: '',
+        en: 'Test name',
+      },
+      evaluationInformation: {
+        fi: '',
+        sv: '',
+        en: 'General scale, 0-5',
+      }
     });
   });
 

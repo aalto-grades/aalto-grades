@@ -19,7 +19,7 @@ const inputProps = {
   }
 };
   
-const TextFieldBox = ({fieldData, setFunction}) => {
+const TextFieldBox = ({ fieldData, setFunction }) => {
   const { fieldId, fieldLabel, fieldHelperText } = fieldData;
   return(
     <Box sx={{ 
