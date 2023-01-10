@@ -4,7 +4,7 @@
 
 import User from '../database/models/user';
 import argon from 'argon2';
-import Op from 'sequelize/types/operators';
+import { Op } from 'sequelize';
 
 export type PlainPassword = string;
 export enum UserRole {
