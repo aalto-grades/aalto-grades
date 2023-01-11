@@ -10,11 +10,11 @@ This Docker Compose creates an environment where backend tests can be executed a
 
 Define a PostgreSQL password in the environment variable POSTGRES_PASSWORD, for example:
 ```
-export POSTGRES_DATABASE="your-wanted-password"
+$ export POSTGRES_PASSWORD="your-wanted-password"
 ```
 Execute Docker Compose:
 ```
-docker-compose up --abort-on-container-exit --exit-code-from back-end-test
+$ docker-compose up --abort-on-container-exit --exit-code-from back-end-test
 ```
 
 ## Known Issue
@@ -23,5 +23,5 @@ When running `docker-compose up` for the second time, Sequelize will attempt to 
 
 If you don't like the errors and don't care about the data in the database, you can always recreate the database container by running:
 ```
-docker-compose up --abort-on-container-exit --exit-code-from back-end-test --build --force-recreate
+$ docker-compose up --abort-on-container-exit --exit-code-from back-end-test --build --force-recreate
 ```
