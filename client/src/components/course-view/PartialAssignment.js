@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 
-const PartialAssignment = ({courseInstance}) => {
+const PartialAssignment = ({ courseInstance }) => {
   const { type, description, points, weight } = courseInstance;
 
   return (

@@ -12,7 +12,7 @@ import InstanceTableRow from './InstanceTableRow';
 import sortingServices from '../../services/sorting';
 
 
-const InstancesTable = ({data}) => {
+const InstancesTable = ({ data }) => {
   return(
     <Table>
       <TableHead>

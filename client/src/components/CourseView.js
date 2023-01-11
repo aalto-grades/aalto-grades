@@ -11,14 +11,14 @@ import OngoingInstanceInfo from './course-view/OngoingInstanceInfo';
 import Assignments from './course-view/Assignments';
 import InstancesTable from './course-view/InstancesTable';
 
-const dummyInfo = {period: '2021-2022 Autumn I-II', startDate: new Date(2021, 8, 14), endDate: new Date(2021, 11, 13), type: 'Lecture', credits: 5, scale: 'General scale, 0-5', organizer: 'Department of computer science', institution: 'Aalto University' };
+const dummyInfo = { period: '2021-2022 Autumn I-II', startDate: new Date(2021, 8, 14), endDate: new Date(2021, 11, 13), type: 'Lecture', credits: 5, scale: 'General scale, 0-5', organizer: 'Department of computer science', institution: 'Aalto University' };
 
-const dummyAssignments = [{type: 'Exercises', description: '10 mandatory exercises', points: 30, weight: 0.2, id: 1},
-  {type: 'Projects', description: '1 mandatory project', points: 30, weight: 0.20, id: 2},
-  {type: 'Exams', description: '1 mandatory exam', points: 40, weight: 0.55, id: 3}];
+const dummyAssignments = [{ type: 'Exercises', description: '10 mandatory exercises', points: 30, weight: 0.2, id: 1 },
+  { type: 'Projects', description: '1 mandatory project', points: 30, weight: 0.20, id: 2 },
+  { type: 'Exams', description: '1 mandatory exam', points: 40, weight: 0.55, id: 3 }];
 
-const dummyPastInstances = [{period: '2020-2021 Autumn I-II', startDate: new Date(2020, 8, 8), endDate: new Date(2020, 11, 7), type: 'Lecture', id: 1},
-  {period: '2019-2020 Autumn I-II', startDate: new Date(2019, 8, 9), endDate: new Date(2019, 11, 8), type: 'Lecture', id: 2}];
+const dummyPastInstances = [{ period: '2020-2021 Autumn I-II', startDate: new Date(2020, 8, 8), endDate: new Date(2020, 11, 7), type: 'Lecture', id: 1 },
+  { period: '2019-2020 Autumn I-II', startDate: new Date(2019, 8, 9), endDate: new Date(2019, 11, 8), type: 'Lecture', id: 2 }];
 
 const CourseView = () => {
   let { courseCode } = useParams();

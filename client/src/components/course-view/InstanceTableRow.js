@@ -8,7 +8,7 @@ import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import textFormatServices from '../../services/textFormat';
 
-const InstanceTableRow = ({instance}) => {
+const InstanceTableRow = ({ instance }) => {
   const { period, startDate, endDate, type, id } = instance;
     
   return(

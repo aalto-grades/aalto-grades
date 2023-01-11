@@ -7,4 +7,4 @@ const formatDate = (date) => {
   return string.split(',')[0];
 };
 
-export default {formatDate};
+export default { formatDate };
