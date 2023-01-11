@@ -44,6 +44,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
+      - name: Install dependencies
+        run: npm ci
       - name: Run tests
         run: docker-compose --file ../docker-tests/docker-compose.yaml up --abort-on-container-exit --exit-code-from back-end-test
       - name: Run linter
