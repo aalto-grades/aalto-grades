@@ -13,7 +13,7 @@ export POSTGRES_DATABASE="your-wanted-password"
 ```
 - execute docker-compose
 ```
-docker-compose up --abort-on-container-exit --exit-code-from back-end
+docker-compose up --abort-on-container-exit --exit-code-from back-end-test
 ```
 
 
@@ -24,5 +24,5 @@ When running docker-compose up for the second time, sequalize will attempt to se
 If you don't like the errors, and don't care about the data in the database, you can always recreate the database container by running:
 
 ```
-docker-compose up --abort-on-container-exit --exit-code-from back-end --build --force-recreate
+docker-compose up --abort-on-container-exit --exit-code-from back-end-test --build --force-recreate
 ```

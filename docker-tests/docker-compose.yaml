@@ -6,24 +6,24 @@ version: "3.7"
 
 services:
 
-  back-end:
+  back-end-test:
     build: 
       context: ../server/
       dockerfile: ../server/Dockerfile.test
     depends_on:
-      - database
+      - database-test
     ports:
     - "3000:3000"
     container_name: backend-server
     environment:
-      POSTGRES_URL: "database"
+      POSTGRES_URL: "database-test"
       POSTGRES_USER: "postgres"
       POSTGRES_DATABASE: "postgres"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     networks:
       - local
 
-  database:
+  database-test:
     image: postgres
     restart: always
     environment:
