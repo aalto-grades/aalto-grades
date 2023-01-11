@@ -19,7 +19,10 @@ services:
       - local
 
   back-end:
-    build: ./server
+    build:
+      context: ./server
+      args:
+        SERVER_SKIP_CI: ${SERVER_SKIP_CI}
     restart: always
     ports:
     - "3000:3000"

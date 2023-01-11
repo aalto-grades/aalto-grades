@@ -6,11 +6,14 @@ FROM node:16-alpine
 
 WORKDIR /app
 
+ARG SERVER_SKIP_CI
+
 COPY . .
 
 RUN chown -R node:node ./*
 
-RUN npm ci
+RUN echo "$SERVER_SKIP_CI"
+RUN if [ -z "$SERVER_SKIP_CI" ] || [ $SERVER_SKIP_CI != 1 ]; then npm ci; fi
 
 RUN npm run build
 
