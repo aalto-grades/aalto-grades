@@ -4,8 +4,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-reuse addheader --copyright="The Aalto Grades Developers" --license="MIT" \
-      --skip-unrecognised --skip-existing -r . 1> /dev/null
+reuse annotate --year=2022 --copyright="The Aalto Grades Developers" \
+      --license="MIT" --skip-unrecognised --skip-existing -r . 1> /dev/null
 
 rm `find . -name '*.license'`
 
