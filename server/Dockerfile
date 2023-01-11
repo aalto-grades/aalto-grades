@@ -16,6 +16,6 @@ RUN npm run build
 
 USER node
 
-CMD ["/bin/sh", "-c", "npm run migration:up && npm run seed:up && npm run start"]
+CMD ["/bin/sh", "-c", "npm run migration:up && npm run seed:up && if [ $SERVER_RUN_TESTS == 1 ]; then npm test; else npm run start; fi"]
 
 EXPOSE 3000

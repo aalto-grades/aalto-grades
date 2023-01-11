@@ -29,6 +29,7 @@ services:
       POSTGRES_USER: "postgres"
       POSTGRES_DATABASE: "postgres"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      SERVER_RUN_TESTS: 0
     networks:
       - local
 

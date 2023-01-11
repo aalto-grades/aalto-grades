@@ -7,9 +7,7 @@ version: "3.7"
 services:
 
   back-end-test:
-    build: 
-      context: ../server/
-      dockerfile: ../server/Dockerfile.test
+    build: ../server/
     depends_on:
       - database-test
     ports:
@@ -20,6 +18,7 @@ services:
       POSTGRES_USER: "postgres"
       POSTGRES_DATABASE: "postgres"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      SERVER_RUN_TESTS: 1
     networks:
       - local
 
