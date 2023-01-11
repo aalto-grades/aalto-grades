@@ -13,7 +13,7 @@ import Divider from '@mui/material/Divider';
 import { useNavigate } from 'react-router-dom';
 
 // add spacing before action part
-const CourseCard = ({course}) => {
+const CourseCard = ({ course }) => {
   let navigate = useNavigate();
   const { name, courseCode, department } = course;
 

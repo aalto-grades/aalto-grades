@@ -9,6 +9,7 @@ import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
 import FrontPage from './components/FrontPage';
 import CourseView from './components/CourseView';
+import CreateCourseView from './components/CreateCourseView';
 import Link from '@mui/material/Link';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
@@ -69,6 +70,7 @@ function App() {
             <Route path='/signup' element={<Signup/>} />
             <Route element={<PrivateRoute/>}>
               <Route path='/' element={<FrontPage/>} />
+              <Route path='/create-course' element={<CreateCourseView/>}/>
               <Route path='/course-view/:courseCode' element={<CourseView/>}/>  {/* Add nested routes when needed */}
             </Route>
           </Routes>

@@ -8,9 +8,9 @@ import cors from 'cors';
 
 export const app: Application = express();
 
-app.use('/', router);
-
 app.use(cors({
   origin: 'http://localhost:3005',
   credentials: true
 }));
+
+app.use('/', router);
