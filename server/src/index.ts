@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { port } from './configs';
+/*import { port } from './configs';
 import express, { Application, Request, Response } from 'express';
 import { connectToDatabase } from './database/index';
 import cors from 'cors';
@@ -10,7 +10,7 @@ import cors from 'cors';
 export const app: Application = express();
 
 app.use(cors({
-  origin: 'http://localhost:3005',
+  origin: 'http://localhost:3006',
   credentials: true, 
 }));
 
@@ -25,4 +25,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = app;
+module.exports = app;*/
