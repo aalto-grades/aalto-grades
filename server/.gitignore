@@ -4,5 +4,6 @@
 
 build
 node_modules
+coverage
 package-lock.json
 .DS_Store
