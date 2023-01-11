@@ -1,0 +1,37 @@
+# SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+
+version: "3.7"
+
+services:
+
+  back-end:
+    build: 
+      context: ../server/
+      dockerfile: ../server/Dockerfile.test
+    depends_on:
+      - database
+    ports:
+    - "3000:3000"
+    container_name: backend-server
+    environment:
+      POSTGRES_URL: "database"
+      POSTGRES_USER: "postgres"
+      POSTGRES_DATABASE: "postgres"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    networks:
+      - local
+
+  database:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    networks:
+      - local
+
+networks:
+  local:
+    driver: bridge
+
