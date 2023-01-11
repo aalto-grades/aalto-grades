@@ -76,7 +76,7 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
             res.cookie('jwt', token, {
               httpOnly: true,
               secure: true,
-              sameSite: true,
+              sameSite: 'none',
               maxAge: 24 * 60 * 60 * 1000 // one day
             });
             return res.send({
@@ -112,7 +112,8 @@ export async function authSignup(req: Request, res: Response) {
     res.cookie('jwt', token, {
       httpOnly: true,
       secure: true,
-      sameSite: true,
+      sameSite: 'none', //MUOKATTU
+      domain: 'localhost',
       maxAge: 24 * 60 * 60 * 1000 // one day
     });
     res.send({

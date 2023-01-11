@@ -10,7 +10,8 @@ import cors from 'cors';
 export const app: Application = express();
 
 app.use(cors({
-  origin: 'http://localhost:3005'
+  origin: 'http://localhost:3005',
+  credentials: true, 
 }));
 
 app.get('*', (req: Request, res: Response) => {

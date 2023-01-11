@@ -5,7 +5,10 @@
 import axios from './axios';
 
 const login = async credentials => {
-  const response = await axios.post('/v1/auth/login', credentials);
+  const response = await axios.post('/v1/auth/login', credentials,
+    {
+      headers: { 'Content-Type': 'application/json' },
+    });
   return response.data;
 };
 
@@ -14,7 +17,6 @@ const signup = async credentials => {
     credentials,
     {
       headers: { 'Content-Type': 'application/json' },
-      withCredentials: true
     }
   );
   return response.data;
