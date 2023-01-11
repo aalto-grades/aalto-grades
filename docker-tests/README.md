@@ -4,25 +4,24 @@ SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 SPDX-License-Identifier: MIT
 -->
 
-This docker-compose creates an environment where backend tests can be executed against a postgresql instance running in a container.
+This Docker Compose creates an environment where backend tests can be executed against a PostgreSQL instance running in a container.
 
-How to use:
-- Define postgresql password environment variable POSTGRES_DATABASE, Example:
+## Usage
+
+Define a PostgreSQL password in the environment variable POSTGRES_PASSWORD, for example:
 ```
 export POSTGRES_DATABASE="your-wanted-password"
 ```
-- execute docker-compose
+Execute Docker Compose:
 ```
 docker-compose up --abort-on-container-exit --exit-code-from back-end-test
 ```
 
+## Known Issue
 
-Known Issue:
+When running `docker-compose up` for the second time, Sequelize will attempt to seed the data into the database again and fails because of duplicate entries existing in the database.
 
-When running docker-compose up for the second time, sequalize will attempt to seed the data again into the database, and will be refused because of duplicate data entries existing already in the database. 
-
-If you don't like the errors, and don't care about the data in the database, you can always recreate the database container by running:
-
+If you don't like the errors and don't care about the data in the database, you can always recreate the database container by running:
 ```
 docker-compose up --abort-on-container-exit --exit-code-from back-end-test --build --force-recreate
 ```
