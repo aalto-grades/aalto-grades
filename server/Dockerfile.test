@@ -10,14 +10,12 @@ COPY . .
 
 RUN chown -R node:node ./*
 
-RUN npm install
-
-RUN npm install --save-dev sequelize-cli
+RUN npm ci
 
 RUN npm run build
 
 USER node
 
-ENTRYPOINT [ "sh", "docker-run-tests.sh" ]
+CMD ["/bin/sh", "-c", "npm run migration:up && npm run seed:up && npm test"]
 
 EXPOSE 3000
