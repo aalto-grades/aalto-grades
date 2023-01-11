@@ -4,14 +4,18 @@
 
 import express, { Request, Response, Router } from 'express';
 import { getUserCourses } from '../controllers/user';
-import { addCourse } from '../controllers/course';
+import { getCourse, getInstance, addCourse } from '../controllers/course';
 import { testDbFindAllUsers, testDbFindAllCourses } from '../controllers/test';
 
 export const router: Router = Router();
 
+// User routes
 router.get('/user/:userId/courses', getUserCourses);
 
+// Course and instance routes
 router.post('/v1/courses', express.json(), addCourse);
+router.get('/v1/courses/:courseId', getCourse);
+router.get('/v1/courses/:courseId/instances/:instanceId', getInstance);
 
 // TODO: remove this test endpoint after working endpoint has been added
 router.get('/v1/test/db', testDbFindAllUsers);
