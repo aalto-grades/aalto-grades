@@ -5,6 +5,7 @@
 import { Routes, Route } from 'react-router-dom';
 import FrontPage from './components/FrontPage';
 import CourseView from './components/CourseView';
+import CreateCourseView from './components/CreateCourseView';
 import Link from '@mui/material/Link';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
@@ -62,6 +63,7 @@ function App() {
         <Box mx={5} my={5}>
           <Routes>
             <Route path='/' element={<FrontPage/>} />
+            <Route path='/create-course' element={<CreateCourseView/>}/>
             <Route path='/course-view/:courseCode' element={<CourseView/>}/>  {/* Add nested routes when needed */}
           </Routes>
         </Box>

@@ -11,7 +11,7 @@ import CourseTableRow from './CourseTableRow';
 import CourseHeadTableRow from './CourseHeadTableRow';
 import sortingServices from '../../services/sorting';
 
-const CourseTable = ({data}) => {
+const CourseTable = ({ data }) => {
   return(
     <Table>
       <TableHead>

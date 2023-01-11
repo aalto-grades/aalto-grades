@@ -20,4 +20,4 @@ const sortByDate = (a, b) => {
   return order < 0 ? 1 : order > 0 ? -1 : 0; 
 };
 
-export default {sortByCode, sortByDate};
+export default { sortByCode, sortByDate };
