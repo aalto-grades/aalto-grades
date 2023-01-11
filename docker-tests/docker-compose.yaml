@@ -14,7 +14,7 @@ services:
       - database-test
     ports:
     - "3000:3000"
-    container_name: backend-server
+    container_name: backend-server-test
     environment:
       POSTGRES_URL: "database-test"
       POSTGRES_USER: "postgres"
