@@ -12,7 +12,6 @@ COPY . .
 
 RUN chown -R node:node ./*
 
-RUN echo "$SERVER_SKIP_CI"
 RUN if [ -z "$SERVER_SKIP_CI" ] || [ $SERVER_SKIP_CI != 1 ]; then npm ci; fi
 
 RUN npm run build
