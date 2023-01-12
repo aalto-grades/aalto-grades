@@ -19,7 +19,7 @@ export interface CourseData {
 }
 
 export enum Language {
-  English = 0,
-  Finnish = 1,
-  Swedish = 2
+  English = 'EN',
+  Finnish = 'FI',
+  Swedish = 'SV'
 }

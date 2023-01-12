@@ -19,7 +19,7 @@ export async function getUserCourses(req: Request, res: Response): Promise<void>
     const teacherCourses: TeacherCourses = { current: [], previous: [] };
 
     // TODO: Go through course_role instead
-    let courses: Array<Course> = await models.Course.findAll({
+    const courses: Array<Course> = await models.Course.findAll({
       attributes: ['id', 'courseCode', 'minCredits', 'maxCredits'],
       include: [{
         model: CourseInstance,
@@ -55,14 +55,14 @@ export async function getUserCourses(req: Request, res: Response): Promise<void>
         minCredits: course.minCredits,
         maxCredits: course.maxCredits,
         department: {
-          fi: translations[Language.Finnish].department,
-          sv: translations[Language.Swedish].department,
-          en: translations[Language.English].department
+          fi: '',
+          sv: '',
+          en: ''
         },
         name: {
-          fi: translations[Language.Finnish].courseName,
-          sv: translations[Language.Swedish].courseName,
-          en: translations[Language.English].courseName
+          fi: '',
+          sv: '',
+          en: ''
         },
         evaluationInformation: {
           fi: '',
@@ -70,6 +70,23 @@ export async function getUserCourses(req: Request, res: Response): Promise<void>
           en: ''
         }
       };
+
+      translations.forEach((translation: CourseTranslation) => {
+        switch (translation.language) {
+        case Language.English:
+          courseData.department.en = translation.department;
+          courseData.name.en = translation.courseName;
+          break;
+        case Language.Finnish:
+          courseData.department.fi = translation.department;
+          courseData.name.fi = translation.courseName;
+          break;
+        case Language.Swedish:
+          courseData.department.sv = translation.department;
+          courseData.name.sv = translation.courseName;
+          break;
+        }
+      });
 
       if (currentDate <= new Date(String(instances[instances.length - 1].endDate))) {
         teacherCourses.current.push(courseData);
