@@ -10,4 +10,9 @@ const getCourses = async () => {
   return response.data;
 };
 
-export default {getCourses};
+const addCourse = async (course) => {
+  const response = await axios.post('/v1/courses', course);
+  return response.data;
+};
+
+export default { getCourses, addCourse };

@@ -40,6 +40,10 @@
     "no-undef": [
       0,
       "off"
+    ],
+    "object-curly-spacing": [
+      "error",
+      "always"
     ]
   }
 }

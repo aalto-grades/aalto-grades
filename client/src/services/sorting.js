@@ -15,4 +15,4 @@ const sortByCode = (a, b) => {
   return 0;
 };
 
-export default {sortByCode};
+export default { sortByCode };
