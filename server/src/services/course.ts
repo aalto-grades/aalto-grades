@@ -18,7 +18,7 @@ export interface CourseWithTranslationAndInstance extends Course {
  * depending on whether an instanceId is provided.
  * @param {number} courseId - The id of the course to be found.
  * @param {number | null} [instanceId=null] - The id of the course instance, defaults to null. If provided, it will include data from the CourseInstance model for the instance with that specific id.
-  * @returns {Promise<Course>} - A promise that resolves with the found course object.
+ * @returns {Promise<Course>} - A promise that resolves with the found course object.
  * @throws {Error} - If the course or course instance is not found, it throws an error with a message indicating the missing course or course instance.
  */
 export async function findCourseById(courseId: number, instanceId: number | null = null): Promise<CourseWithTranslationAndInstance> {
