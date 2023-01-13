@@ -32,7 +32,7 @@ describe('Test GET /v1/courses/:courseId', () => {
   });
 
   it('should respond with 404 not found, if non-existing course id', async () => {
-    const res: supertest.Response = await request.get('/v1/courses/9999999999999');
+    const res: supertest.Response = await request.get('/v1/courses/-1');
     expect(res.body.success).toBe(false);
     expect(res.body.course).not.toBeDefined();
     expect(res.body.error).toBeDefined();
@@ -64,7 +64,7 @@ describe('Test GET /v1/courses/:courseId/instances/:instanceId', () => {
   });
 
   it('should respond with 404 not found, if non-existing course instance id', async () => {
-    const res: supertest.Response = await request.get('/v1/courses/1/instances/99999999999');
+    const res: supertest.Response = await request.get('/v1/courses/1/instances/-1');
     expect(res.body.success).toBe(false);
     expect(res.body.instance).not.toBeDefined();
     expect(res.body.error).toBeDefined();
@@ -72,7 +72,7 @@ describe('Test GET /v1/courses/:courseId/instances/:instanceId', () => {
   });
 
   it('should respond with 404 not found, if non-existing course id', async () => {
-    const res: supertest.Response = await request.get('/v1/courses/9999999999/instances/1');
+    const res: supertest.Response = await request.get('/v1/courses/-1/instances/1');
     expect(res.body.success).toBe(false);
     expect(res.body.instance).not.toBeDefined();
     expect(res.body.error).toBeDefined();
