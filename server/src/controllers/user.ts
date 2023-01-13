@@ -9,14 +9,15 @@ import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
 import { CourseData, Language } from './course';
 
-export interface TeacherCourses {
+export interface TeacherCourseData {
   current: Array<CourseData>,
   previous: Array<CourseData>
 }
 
 export async function getUserCourses(req: Request, res: Response): Promise<void> {
   try {
-    const teacherCourses: TeacherCourses = { current: [], previous: [] };
+    const teacherCourseData: TeacherCourseData = { current: [], previous: [] };
+    const teacherId = Number(req.params.userId);
 
     // TODO: Go through course_role instead
     const courses: Array<Course> = await models.Course.findAll({
@@ -25,7 +26,7 @@ export async function getUserCourses(req: Request, res: Response): Promise<void>
         model: CourseInstance,
         attributes: ['endDate'],
         where: {
-          responsibleTeacher: Number(req.params.userId)
+          responsibleTeacher: teacherId
         },
       },
       {
@@ -89,15 +90,15 @@ export async function getUserCourses(req: Request, res: Response): Promise<void>
       });
 
       if (currentDate <= new Date(String(instances[instances.length - 1].endDate))) {
-        teacherCourses.current.push(courseData);
+        teacherCourseData.current.push(courseData);
       } else {
-        teacherCourses.previous.push(courseData);
+        teacherCourseData.previous.push(courseData);
       }
     }
 
     res.send({
       success: true,
-      courses: teacherCourses
+      courses: teacherCourseData
     });
   } catch (error) {
     res.status(401);

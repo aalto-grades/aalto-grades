@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { app } from '../../src/app';
-import { TeacherCourses } from '../../src/controllers/user';
+import { TeacherCourseData } from '../../src/controllers/user';
 import supertest from 'supertest';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
@@ -53,7 +53,7 @@ describe('Test GET /v1/user/:userId/courses', () => {
     expect(res.body.success).toBe(true);
     expect(res.statusCode).toBe(200);
 
-    const courses: TeacherCourses = res.body.courses as TeacherCourses;
+    const courses: TeacherCourseData = res.body.courses as TeacherCourseData;
     let n: number = 0;
     for (const i in courses.current) {
       if (courses.current[i].courseCode === 'CS-A1120')
@@ -68,7 +68,7 @@ describe('Test GET /v1/user/:userId/courses', () => {
     expect(res.body.success).toBe(true);
     expect(res.statusCode).toBe(200);
 
-    const courses: TeacherCourses = res.body.courses as TeacherCourses;
+    const courses: TeacherCourseData = res.body.courses as TeacherCourseData;
     expect(courses.current.length).toBe(1);
     expect(courses.current[0].courseCode).toBe('PHYS-A1130');
     expect(courses.previous.length).toBe(1);
