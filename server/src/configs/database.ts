@@ -13,5 +13,7 @@ export = {
   database: database,
   host: host,
   dialect: 'postgres',
-  migrationStorageTableName: 'migrations'
+  migrationStorageTableName: 'migrations',
+  seederStorage: 'sequelize',
+  seederStorageTableName: 'seeds'
 };
