@@ -6,16 +6,18 @@ FROM node:16-alpine
 
 WORKDIR /app
 
+ARG SERVER_SKIP_CI
+
 COPY . .
 
 RUN chown -R node:node ./*
 
-RUN npm ci
+RUN if [ -z "$SERVER_SKIP_CI" ] || [ $SERVER_SKIP_CI != 1 ]; then npm ci; fi
 
 RUN npm run build
 
 USER node
 
-CMD ["/bin/sh", "-c", "npm run migration:up && npm run seed:up && npm run start"]
+CMD ["/bin/sh", "-c", "npm run migration:up && npm run seed:up && if [ $SERVER_RUN_TESTS == 1 ]; then npm test; else npm run start; fi"]
 
 EXPOSE 3000
