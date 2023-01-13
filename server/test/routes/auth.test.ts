@@ -62,6 +62,7 @@ describe('Test signup route', () => {
       });
   });
   it('should allow creation of a new account', async () => {
+    // TODO: test login before and after
     return request.post('/v1/auth/signup')
     	.set('Accept', 'application/json')
       .send({ email: 'sysadmin2@aalto.fi', username: 'aalto2', password: 'grades2', studentID: '123457', role: 'Admin' })
