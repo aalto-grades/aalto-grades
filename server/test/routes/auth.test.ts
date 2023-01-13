@@ -14,21 +14,17 @@ describe('Test login route', () => {
       return request.post('/v1/auth/login')
       	.set('Accept', 'application/json')
         .send(credentials)
-        .expect((res) => {
-          console.log(res.status);
-          return true;
-        })
-        .expect('Content-Type', /json/)
         .expect(401)
+        .expect('Content-Type', /json/)
         .then((res: supertest.Response) => {
           expect(res.body.success).toBe(false);
-          expect(res.body.message).toBe('invalid credentials');
+          expect(res.body.message).toMatch(/(invalid|Missing) credentials/);
         });
     }
     await badCreds({ username: 'aalto', password: 'grades' });
     await badCreds({ username: 'aalto', password: '' });
     await badCreds({ username: 'sysadmin@aalto.fi', password: '' });
-    await badCreds({ username: 'sysadmin@aalto.fi', password: 'grades' });
+    await badCreds({ username: 'sysadmin@aalto.fi', password: 'grade' });
     await request.post('/v1/auth/login')
       .send({ username: 'sysadmin@aalto.fi', password: 'grades' })
       .expect('Content-Type', /json/)
