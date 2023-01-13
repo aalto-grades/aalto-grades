@@ -39,11 +39,6 @@ export enum Language {
   Swedish = 'SV'
 }
 
-export interface TeacherCourses {
-  current: Array<Course>,
-  previous: Array<Course>
-}
-
 export async function addCourse(req: Request, res: Response): Promise<void> {
   try {
     // TODO: add the course to the database
