@@ -25,6 +25,8 @@ describe('Test login route', () => {
     await badCreds({ username: 'aalto', password: '' });
     await badCreds({ username: 'sysadmin@aalto.fi', password: '' });
     await badCreds({ username: 'sysadmin@aalto.fi', password: 'grade' });
+  });
+  it('should allow logging in with the correct credentials', async() => {
     await request.post('/v1/auth/login')
       .send({ username: 'sysadmin@aalto.fi', password: 'grades' })
       .expect('Content-Type', /json/)
