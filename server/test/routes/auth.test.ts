@@ -21,10 +21,10 @@ describe('Test login route', () => {
           expect(res.body.message).toBe('invalid credentials');
         });
     }
-		badCreds({ username: 'aalto', password: 'grades' });
-		badCreds({ username: 'aalto', password: '' });
-		badCreds({ username: 'sysadmin@aalto.fi', password: '' });
-		badCreds({ username: 'sysadmin@aalto.fi', password: 'grades' });
+    badCreds({ username: 'aalto', password: 'grades' });
+    badCreds({ username: 'aalto', password: '' });
+    badCreds({ username: 'sysadmin@aalto.fi', password: '' });
+    badCreds({ username: 'sysadmin@aalto.fi', password: 'grades' });
     request.post('/v1/auth/login')
       .send({ username: 'sysadmin@aalto.fi', password: 'grades' })
       .expect('Content-Type', /json/)

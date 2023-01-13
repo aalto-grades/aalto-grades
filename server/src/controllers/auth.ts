@@ -71,6 +71,6 @@ export async function performSignup(username: string, email: string, plainPasswo
     });
     return model.id;
   } catch (_e) {
-      throw new InvalidFormat();
+    throw new InvalidFormat();
   }
 }

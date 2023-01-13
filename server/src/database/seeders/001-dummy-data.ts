@@ -22,9 +22,9 @@ export default {
       await queryInterface.sequelize.query(courseTranslation, { transaction });
       await User.create({
         name: 'aalto',
-		email: 'sysadmin@aalto.fi',
-		password: await argon2.hash('grades'),
-		studentId: '000000',
+        email: 'sysadmin@aalto.fi',
+        password: await argon2.hash('grades'),
+        studentId: '000000',
       });
       await transaction.commit();
     } catch (error) {
