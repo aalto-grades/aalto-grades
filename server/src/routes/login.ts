@@ -15,7 +15,7 @@ interface SignupRequest {
   username: string,
   password: PlainPassword,
   email: string,
-  studentId: string,
+  studentID: string,
   role: UserRole,
 }
 
@@ -101,7 +101,7 @@ export async function authSignup(req: Request, res: Response) {
 
   try {
     // TODO signup
-    const id = await performSignup(req.body.username, req.body.email, req.body.password, req.body.studentId);
+    const id = await performSignup(req.body.username, req.body.email, req.body.password, req.body.studentID);
     const body: JwtClaims = {
       role: req.body.role,
       id,
@@ -122,7 +122,7 @@ export async function authSignup(req: Request, res: Response) {
     // carry this info
     return res.status(400).send({
       success: false,
-      error: error,
+      error: error instanceof Error ? error.message : 'unknown error',
     });
   }
 }
