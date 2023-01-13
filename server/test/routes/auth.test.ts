@@ -9,9 +9,9 @@ import { UserRole } from '../../src/controllers/auth';
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 
 describe('Test login route', () => {
-  it('should respond disallow logging in with invalid credentials', () => {
-    function badCreds(credentials: { username: string, password: string }) {
-      request.post('/v1/auth/login')
+  it('should respond disallow logging in with invalid credentials', async () => {
+    async function badCreds(credentials: { username: string, password: string }) {
+      return request.post('/v1/auth/login')
       	.set('Accept', 'application/json')
         .send(credentials)
         .expect((res) => {
@@ -25,11 +25,11 @@ describe('Test login route', () => {
           expect(res.body.message).toBe('invalid credentials');
         });
     }
-    badCreds({ username: 'aalto', password: 'grades' });
-    badCreds({ username: 'aalto', password: '' });
-    badCreds({ username: 'sysadmin@aalto.fi', password: '' });
-    badCreds({ username: 'sysadmin@aalto.fi', password: 'grades' });
-    request.post('/v1/auth/login')
+    await badCreds({ username: 'aalto', password: 'grades' });
+    await badCreds({ username: 'aalto', password: '' });
+    await badCreds({ username: 'sysadmin@aalto.fi', password: '' });
+    await badCreds({ username: 'sysadmin@aalto.fi', password: 'grades' });
+    await request.post('/v1/auth/login')
       .send({ username: 'sysadmin@aalto.fi', password: 'grades' })
       .expect('Content-Type', /json/)
       .expect(200)
