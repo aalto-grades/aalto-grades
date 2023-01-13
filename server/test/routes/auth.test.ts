@@ -14,6 +14,10 @@ describe('Test login route', () => {
       request.post('/v1/auth/login')
       	.set('Accept', 'application/json')
         .send(credentials)
+        .expect((res) => {
+          console.log(res.status);
+          return true;
+        })
         .expect('Content-Type', /json/)
         .expect(401)
         .then((res: supertest.Response) => {
