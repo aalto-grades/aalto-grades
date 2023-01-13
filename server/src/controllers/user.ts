@@ -4,10 +4,10 @@
 
 import { Request, Response } from 'express';
 import models from '../database/models';
-import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
 import { CourseData, Language } from './course';
+import { courseService } from '../services';
 
 export interface TeacherCourseData {
   current: Array<CourseData>,
@@ -17,10 +17,10 @@ export interface TeacherCourseData {
 export async function getUserCourses(req: Request, res: Response): Promise<void> {
   try {
     const teacherCourseData: TeacherCourseData = { current: [], previous: [] };
-    const teacherId = Number(req.params.userId);
+    const teacherId: number = Number(req.params.userId);
 
     // TODO: Go through course_role instead
-    const courses: Array<Course> = await models.Course.findAll({
+    const courses: Array<courseService.CourseWithTranslationAndInstance> = await models.Course.findAll({
       attributes: ['id', 'courseCode', 'minCredits', 'maxCredits'],
       include: [{
         model: CourseInstance,
@@ -33,22 +33,13 @@ export async function getUserCourses(req: Request, res: Response): Promise<void>
         model: CourseTranslation,
         attributes: ['language', 'courseName', 'department'],
       }],
-    });
+    }) as Array<courseService.CourseWithTranslationAndInstance>;
 
     // Construct CourseData objects and determine whether the course is current
     // or previous.
     const currentDate: Date = new Date(Date.now());
     for (const i in courses) {
-      const course: Course = courses[i];
-
-      // Without these ts-ignores the program fails to build but works otherwise.
-      // TODO: How to do this without ts-ignore?
-
-      // @ts-ignore
-      const instances: Array<CourseInstance> = course.CourseInstances;
-
-      // @ts-ignore
-      const translations: Array<CourseTranslations> = course.CourseTranslations;
+      const course: courseService.CourseWithTranslationAndInstance = courses[i];
 
       const courseData: CourseData = {
         id: course.id,
@@ -72,7 +63,7 @@ export async function getUserCourses(req: Request, res: Response): Promise<void>
         }
       };
 
-      translations.forEach((translation: CourseTranslation) => {
+      course.CourseTranslations.forEach((translation: CourseTranslation) => {
         switch (translation.language) {
         case Language.English:
           courseData.department.en = translation.department;
@@ -89,7 +80,7 @@ export async function getUserCourses(req: Request, res: Response): Promise<void>
         }
       });
 
-      if (currentDate <= new Date(String(instances[instances.length - 1].endDate))) {
+      if (currentDate <= new Date(String(course.CourseInstances[course.CourseInstances.length - 1].endDate))) {
         teacherCourseData.current.push(courseData);
       } else {
         teacherCourseData.previous.push(courseData);
