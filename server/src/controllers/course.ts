@@ -13,7 +13,7 @@ export interface LocalizedString {
   en: string
 }
 
-export interface Course {
+export interface CourseData {
   id: number,
   courseCode: string,
   minCredits: number,
@@ -23,7 +23,7 @@ export interface Course {
   evaluationInformation: LocalizedString
 }
 
-export interface Instance extends Course {
+export interface InstanceData extends CourseData {
   startingPeriod: string,
   endingPeriod: string,
   startDate: Date,
@@ -61,7 +61,7 @@ export async function getCourse(req: Request, res: Response): Promise<Response> 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const course: any = await courseService.findCourseById(courseId, null);
   
-    const courseData: Course = {
+    const courseData: CourseData = {
       id: course.id,
       courseCode: course.courseCode,
       minCredits: course.minCredits,
@@ -133,7 +133,7 @@ export async function getInstance(req: Request, res: Response): Promise<Response
 
     const responsibleTeacher: User = await userService.findUserById(course.CourseInstances[0].responsibleTeacher);
     
-    const instanceData: Instance = {
+    const instanceData: InstanceData = {
       id: course.id,
       courseCode: course.courseCode,
       minCredits: course.minCredits,
