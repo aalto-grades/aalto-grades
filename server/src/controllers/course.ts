@@ -57,7 +57,7 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
 export async function getCourse(req: Request, res: Response): Promise<Response> {
   try {
     const courseId: number = Number(req.params.courseId);
-    const course: courseService.CourseWithTranslationAndInstance = await courseService.findCourseById(courseId, null);
+    const course: courseService.CourseWithTranslationAndInstance = await courseService.findCourseById(courseId);
   
     const courseData: CourseData = {
       id: course.id,
