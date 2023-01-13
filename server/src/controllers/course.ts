@@ -57,9 +57,7 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
 export async function getCourse(req: Request, res: Response): Promise<Response> {
   try {
     const courseId: number = Number(req.params.courseId);
-    
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const course: any = await courseService.findCourseById(courseId, null);
+    const course: courseService.CourseWithTranslationAndInstance = await courseService.findCourseById(courseId, null);
   
     const courseData: CourseData = {
       id: course.id,
@@ -127,10 +125,7 @@ export async function getInstance(req: Request, res: Response): Promise<Response
   try {
     const courseId: number = Number(req.params.courseId);
     const instanceId: number = Number(req.params.instanceId);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const course: any = await courseService.findCourseById(courseId, instanceId);
-
+    const course: courseService.CourseWithTranslationAndInstance = await courseService.findCourseById(courseId, instanceId);
     const responsibleTeacher: User = await userService.findUserById(course.CourseInstances[0].responsibleTeacher);
     
     const instanceData: InstanceData = {
