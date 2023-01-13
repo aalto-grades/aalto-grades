@@ -54,8 +54,7 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
           return next(err);
         }
         if (role == false || role == true) {
-          res.status(401);
-          return res.send({
+          return res.status(401).json().send({
             success: false,
             message: options ? options.message : 'unknown error',
           });
@@ -94,8 +93,7 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
 
 export async function authSignup(req: Request, res: Response) {
   if (!validateSignupFormat(req.body)) {
-    res.status(400); 
-    return res.send({
+    return res.status(400).json().send({
       success: false,
       error: 'Invalid signup request format',
     });
@@ -122,8 +120,7 @@ export async function authSignup(req: Request, res: Response) {
   } catch (error) {
     // 403 or 400 or 500? The Promise architecture with appropriate rejections should
     // carry this info
-    res.status(400);
-    return res.send({
+    return res.status(400).json().send({
       success: false,
       error: error,
     });

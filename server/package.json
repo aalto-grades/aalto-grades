@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
+    "@types/iconv-lite": "^0.0.1",
     "@types/jest": "^29.2.3",
     "@types/jsonwebtoken": "^8.5.9",
     "@types/passport-local": "^1.0.34",
