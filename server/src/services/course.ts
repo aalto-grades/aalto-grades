@@ -8,6 +8,14 @@ import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
 
+/**
+ * Finds a course by its id, and includes related data from the CourseTranslation and CourseInstance models,
+ * depending on whether an instanceId is provided.
+ * @param {number} courseId - The id of the course to be found.
+ * @param {number | null} instanceId - The id of the course instance. If provided, it will include data from the CourseInstance model for the instance with that specific id.
+ * @returns {Promise<Course>} - A promise that resolves with the found course object.
+ * @throws {Error} - If the course or course instance is not found, it throws an error with a message indicating the missing course or course instance.
+ */
 export async function findCourseById(courseId: number, instanceId: number | null): Promise<Course> {
   const include: Array<IncludeOptions> = [{
     model: CourseTranslation,
