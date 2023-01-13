@@ -97,24 +97,12 @@ Run one seeder file down (delete the populated data from database for that seede
 $ npm run seed:down
 ```
 
-## Running the unit tests
+## Unit tests
 
-[Jest](https://jestjs.io/docs/getting-started) is used as the unit test framework.
-Additionally, [supertest](https://www.npmjs.com/package/supertest) is used for
-testing API functionality.
+[Jest](https://jestjs.io/docs/getting-started) is used as the unit test
+framework. Additionally, [supertest](https://www.npmjs.com/package/supertest)
+is used for testing API functionality.
 
-The tests depend on having a local database running. This can be done with the
-Docker Compose configuration at the root of the project. You will need to set
-the appropriate environment variables as in `../docker-compose.yaml`, and then
-to run the database:
-```
-$ docker-compose --file ../docker-compose.yaml up database
-```
-
-After the database is running, you may need to run `migration:up` and `seed:up`
-if you haven't previously populated the database already.
-
-Then in another terminal, to run the unit tests, use:
-```
-$ npm test
-```
+The easiest way to run unit tests is with the Docker Compose located at
+`../docker-tests`. See `../docker-tests/README.md` for details on running unit
+tests.
