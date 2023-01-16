@@ -28,7 +28,9 @@ export default {
       await User.create({
         name: 'aalto',
         email: 'sysadmin@aalto.fi',
-        password: await argon2.hash('grades'),
+        password: await argon2.hash('grades', {
+          memoryCost: argon2.limits.memoryCost.min,
+        }),
         studentId: '000000',
       });
       console.log('after argon2');
