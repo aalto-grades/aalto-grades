@@ -83,7 +83,7 @@ describe('Test signup route', () => {
 });
 
 describe('Test session management', () => {
-  it('should protect routes and make them accessible', async () => {
+  it('should act differently when user is logged in or out', async () => {
     // Use the agent for cookie persistence
     const agent: SuperAgentTest = supertest.agent(app);
     await agent.get('/v1/auth/self-info').expect(401);
@@ -93,6 +93,8 @@ describe('Test session management', () => {
       .expect(200)
       .expect('set-cookie', /jwt=/)
       .expect('set-cookie', /httponly/i);
-    return agent.get('/v1/auth/self-info').expect(200);
+    await agent.get('/v1/auth/self-info').expect(200);
+    await agent.post('/v1/auth/logout').send({}).expect(200);
+    await agent.get('/v1/auth/self-info').expect(401);
   });
 });
