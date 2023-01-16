@@ -79,6 +79,8 @@ describe('Test GET /v1/courses/:courseId/instances/:instanceId', () => {
     expect(res.body.instance).not.toBeDefined();
     expect(res.body.error).toBeDefined();
     expect(res.statusCode).toBe(404);
+  });
+});
 
 describe('Test GET /v1/user/:userId/courses', () => {
   jest
