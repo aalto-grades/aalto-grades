@@ -10,7 +10,7 @@ import { testDbFindAllUsers, testDbFindAllCourses } from '../controllers/test';
 export const router: Router = Router();
 
 // User routes
-router.get('/user/:userId/courses', getUserCourses);
+router.get('/v1/user/:userId/courses', getUserCourses);
 
 // Course and instance routes
 router.post('/v1/courses', express.json(), addCourse);
