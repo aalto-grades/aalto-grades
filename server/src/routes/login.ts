@@ -95,7 +95,6 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
 export async function authLogout(_req: Request, res: Response): Promise<void> {
   res.clearCookie('jwt', {
     httpOnly: true,
-    domain: 'localhost',
   });
   res.send({
     success: true
@@ -123,7 +122,6 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
       httpOnly: true,
       secure: true,
       sameSite: 'none', //MUOKATTU
-      domain: 'localhost',
       maxAge: 24 * 60 * 60 * 1000 // one day
     });
     res.send({
