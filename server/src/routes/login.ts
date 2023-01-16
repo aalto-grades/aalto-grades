@@ -81,7 +81,7 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
             });
             return res.send({
               success: true,
-              loginResult
+              role: loginResult.role,
             });
           }
         );
