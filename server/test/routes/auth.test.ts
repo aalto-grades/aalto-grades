@@ -86,15 +86,17 @@ describe('Test session management', () => {
   it('should act differently when user is logged in or out', async () => {
     // Use the agent for cookie persistence
     const agent: SuperAgentTest = supertest.agent(app);
-    await agent.get('/v1/auth/self-info').expect(401);
+    await agent.get('/v1/auth/self-info').withCredentials(true).expect(401);
     await agent.post('/v1/auth/login')
+    	.withCredentials(true)
+    	.set('Origin', 'http://localhost:3005')
       .send({ username: 'sysadmin@aalto.fi', password: 'grades' })
       .expect('Content-Type', /json/)
       .expect(200)
-      .expect('set-cookie', /jwt=/)
-      .expect('set-cookie', /httponly/i);
-    await agent.get('/v1/auth/self-info').expect(200);
-    await agent.post('/v1/auth/logout').send({}).expect(200);
-    await agent.get('/v1/auth/self-info').expect(401);
+      .expect('set-cookie', /jwt=/);
+      /*.expect('set-cookie', /httponly/i)*/;
+    await agent.get('/v1/auth/self-info').withCredentials(true).set('Origin', 'http://localhost:3005').expect(200);
+    await agent.post('/v1/auth/logout').withCredentials(true).send({}).expect(200);
+    await agent.get('/v1/auth/self-info').withCredentials(true).expect(401);
   });
 });

@@ -74,10 +74,10 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
             };
             const token: string = jwt.sign({ user: body }, jwtSecret);
             res.cookie('jwt', token, {
-              httpOnly: true,
-              secure: true,
-              sameSite: 'none',
-              maxAge: 24 * 60 * 60 * 1000 // one day
+              //httpOnly: true,
+              //secure: true,
+              //sameSite: 'none',
+              //maxAge: 24 * 60 * 60 * 1000 // one day
             });
             return res.send({
               success: true,
@@ -119,10 +119,10 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
     };
     const token: string = jwt.sign({ user: body }, jwtSecret);
     res.cookie('jwt', token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none', //MUOKATTU
-      maxAge: 24 * 60 * 60 * 1000 // one day
+      //httpOnly: true,
+      //secure: true,
+      //sameSite: 'none', //MUOKATTU
+      //maxAge: 24 * 60 * 60 * 1000 // one day
     });
     res.send({
       success: true
@@ -172,10 +172,12 @@ passport.use(
 );
 
 passport.use(
+  'jwt',
   new JWTStrategy(
     {
       secretOrKey: jwtSecret,
       jwtFromRequest: (req: Request): string | null => {
+        console.log('checking jwt', req.cookies);
         return (req && req.cookies) ? req.cookies['jwt'] : null;
       }
     },

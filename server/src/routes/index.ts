@@ -9,8 +9,11 @@ import { testDbFindAllUsers, testDbFindAllCourses } from '../controllers/test';
 import { authLogin, authLogout, authSelfInfo, authSignup } from './login';
 import passport from 'passport';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 export const router: Router = Router();
+
+router.use(cookieParser());
 
 router.get('/v1/user/:userId/courses', getUserCourses);
 
