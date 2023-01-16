@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-FROM node:16-alpine
+FROM node:19-alpine
 
 WORKDIR /app
 
