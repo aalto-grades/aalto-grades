@@ -5,10 +5,10 @@
 import { QueryInterface, Transaction } from 'sequelize';
 import fs from 'fs';
 import path from 'path';
-const users: string = fs.readFileSync(path.resolve(__dirname, '../../../mockdata/users.sql'), 'utf8');
-const courses: string = fs.readFileSync(path.resolve(__dirname, '../../../mockdata/courses.sql'), 'utf8');
-const courseInstances: string = fs.readFileSync(path.resolve(__dirname, '../../../mockdata/course_instances.sql'), 'utf8');
-const courseTranslation: string = fs.readFileSync(path.resolve(__dirname, '../../../mockdata/course_translations.sql'), 'utf8');
+const users: string = fs.readFileSync(path.resolve(__dirname, '../../../../mockdata/users.sql'), 'utf8');
+const courses: string = fs.readFileSync(path.resolve(__dirname, '../../../../mockdata/courses.sql'), 'utf8');
+const courseInstances: string = fs.readFileSync(path.resolve(__dirname, '../../../../mockdata/course_instances.sql'), 'utf8');
+const courseTranslation: string = fs.readFileSync(path.resolve(__dirname, '../../../../mockdata/course_translations.sql'), 'utf8');
 
 export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
@@ -31,6 +31,10 @@ export default {
       await queryInterface.bulkDelete('course_instance', {}, { transaction });
       await queryInterface.bulkDelete('course', {}, { transaction });
       await queryInterface.bulkDelete('user', {}, { transaction });
+      await queryInterface.sequelize.query('ALTER SEQUENCE course_translation_id_seq RESTART;', { transaction });
+      await queryInterface.sequelize.query('ALTER SEQUENCE course_instance_id_seq RESTART;', { transaction });
+      await queryInterface.sequelize.query('ALTER SEQUENCE course_id_seq RESTART;', { transaction });
+      await queryInterface.sequelize.query('ALTER SEQUENCE user_id_seq RESTART;', { transaction });
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();

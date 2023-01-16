@@ -32,7 +32,7 @@ export default {
           }
         },
         password: {
-          type: new DataTypes.CHAR(60),
+          type: new DataTypes.CHAR(255),
           allowNull: false
         },
         created_at: DataTypes.DATE,
@@ -379,6 +379,7 @@ export default {
       await queryInterface.dropTable('course', { transaction });
       await queryInterface.dropTable('user', { transaction });
       await queryInterface.dropTable('migrations', { transaction });
+      await queryInterface.dropTable('seeds', { transaction });
       await queryInterface.sequelize.query('DROP TYPE IF EXISTS enum_course_instance_grading_type;', { transaction });
       await queryInterface.sequelize.query('DROP TYPE IF EXISTS enum_course_role_role;', { transaction });
       await queryInterface.sequelize.query('DROP TYPE IF EXISTS enum_course_instance_teaching_method;', { transaction });
