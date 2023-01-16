@@ -7,7 +7,7 @@ INSERT INTO public.course_translation (course_id, language, department, course_n
 (1, 'FI', 'Tietotekniikan laitos', 'Ohjelmointi 1', NOW(), NOW()),
 (1, 'SV', 'Institutionen för datateknik', 'Programmering 1', NOW(), NOW()),
 (2, 'EN', 'Department of Computer Science', 'Programming 2', NOW(), NOW()),
-(2, 'FI', 'Tietotekniikan laitos', 'Programming 1', NOW(), NOW()),
+(2, 'FI', 'Tietotekniikan laitos', 'Programming 2', NOW(), NOW()),
 (2, 'SV', 'Institutionen för datateknik', 'Programming 2', NOW(), NOW()),
 (3, 'EN', 'Department of Applied Physics', 'Electromagnetism (SCI)', NOW(), NOW()),
 (3, 'FI', 'Teknillisen fysiikan laitos', 'Sähkömagnetismi (SCI)', NOW(), NOW()),

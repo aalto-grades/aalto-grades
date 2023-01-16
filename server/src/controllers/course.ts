@@ -10,7 +10,7 @@ export interface LocalizedString {
   en: string
 }
 
-export interface Course {
+export interface CourseData {
   id: number,
   courseCode: string,
   minCredits: number,
@@ -22,6 +22,12 @@ export interface Course {
 
 export interface CourseInstances {
   courseInstances: Array<Course>
+}
+
+export enum Language {
+  English = 'EN',
+  Finnish = 'FI',
+  Swedish = 'SV'
 }
 
 export async function addCourse(req: Request, res: Response): Promise<void> {
