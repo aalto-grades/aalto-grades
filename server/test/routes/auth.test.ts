@@ -62,8 +62,11 @@ describe('Test signup route', () => {
       });
   });
   it('should allow creation of a new account', async () => {
-    // TODO: test login before and after
-    return request.post('/v1/auth/signup')
+    await request.post('/v1/auth/login')
+      .set('Accept', 'application/json')
+      .send({ username: 'sysadmin2@aalto.fi', password: 'grades2'})
+      .expect(401);
+    await request.post('/v1/auth/signup')
     	.set('Accept', 'application/json')
       .send({ email: 'sysadmin2@aalto.fi', username: 'aalto2', password: 'grades2', studentID: '123457', role: 'Admin' })
       .expect(200)
@@ -72,5 +75,9 @@ describe('Test signup route', () => {
         expect(res.body.success).toBe(true);
         expect(res.body.message);
       });
+    return request.post('/v1/auth/login')
+      .set('Accept', 'application/json')
+      .send({ username: 'sysadmin2@aalto.fi', password: 'grades2'})
+      .expect(200);
   });
 });
