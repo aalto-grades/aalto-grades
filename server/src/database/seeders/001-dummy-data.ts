@@ -16,16 +16,22 @@ export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction: Transaction = await queryInterface.sequelize.transaction();
     try {
+      console.log('prior to users');
       await queryInterface.sequelize.query(users, { transaction });
+      console.log('prior to courses');
       await queryInterface.sequelize.query(courses, { transaction });
+      console.log('prior to course instances');
       await queryInterface.sequelize.query(courseInstances, { transaction });
+      console.log('prior to course translation');
       await queryInterface.sequelize.query(courseTranslation, { transaction });
+      console.log('prior to argon2');
       await User.create({
         name: 'aalto',
         email: 'sysadmin@aalto.fi',
         password: await argon2.hash('grades'),
         studentId: '000000',
       });
+      console.log('after argon2');
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
