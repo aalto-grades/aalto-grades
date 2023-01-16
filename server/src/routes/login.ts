@@ -9,7 +9,7 @@ import passport from 'passport';
 import { IVerifyOptions } from 'passport-local';
 import { UserRole, PlainPassword, validateLogin, InvalidCredentials, performSignup, LoginResult } from '../controllers/auth';
 import { Strategy as LocalStrategy } from 'passport-local';
-import { jwtSecret } from '../configs';
+import { jwtSecret, testEnv } from '../configs';
 
 interface SignupRequest {
   username: string,
@@ -74,10 +74,10 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
             };
             const token: string = jwt.sign(body, jwtSecret);
             res.cookie('jwt', token, {
-              //httpOnly: true,
-              //secure: true,
-              //sameSite: 'none',
-              //maxAge: 24 * 60 * 60 * 1000 // one day
+              httpOnly: true,
+              secure: !testEnv,
+              sameSite: 'none',
+              maxAge: 24 * 60 * 60 * 1000 // one day
             });
             return res.send({
               success: true,
@@ -119,10 +119,10 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
     };
     const token: string = jwt.sign(body, jwtSecret);
     res.cookie('jwt', token, {
-      //httpOnly: true,
-      //secure: true,
-      //sameSite: 'none', //MUOKATTU
-      //maxAge: 24 * 60 * 60 * 1000 // one day
+      httpOnly: true,
+    secure: !testEnv,
+      sameSite: 'none', //MUOKATTU
+      maxAge: 24 * 60 * 60 * 1000 // one day
     });
     res.send({
       success: true

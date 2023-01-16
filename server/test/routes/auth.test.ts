@@ -92,8 +92,8 @@ describe('Test session management', () => {
       .send({ username: 'sysadmin@aalto.fi', password: 'grades' })
       .expect('Content-Type', /json/)
       .expect(200)
-      .expect('set-cookie', /jwt=/);
-      /*.expect('set-cookie', /httponly/i)*/;
+      .expect('set-cookie', /jwt=/)
+      .expect('set-cookie', /httponly/i);
     await agent.get('/v1/auth/self-info').withCredentials(true).expect(200);
     await agent.post('/v1/auth/logout').withCredentials(true).send({}).expect(200);
     await agent.get('/v1/auth/self-info').withCredentials(true).expect(401);
