@@ -72,7 +72,7 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
               role: loginResult.role,
               id: loginResult.id,
             };
-            const token: string = jwt.sign({ user: body }, jwtSecret);
+            const token: string = jwt.sign(body, jwtSecret);
             res.cookie('jwt', token, {
               //httpOnly: true,
               //secure: true,
@@ -117,7 +117,7 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
       role: req.body.role,
       id,
     };
-    const token: string = jwt.sign({ user: body }, jwtSecret);
+    const token: string = jwt.sign(body, jwtSecret);
     res.cookie('jwt', token, {
       //httpOnly: true,
       //secure: true,
@@ -177,13 +177,12 @@ passport.use(
     {
       secretOrKey: jwtSecret,
       jwtFromRequest: (req: Request): string | null => {
-        console.log('checking jwt', req.cookies);
         return (req && req.cookies) ? req.cookies['jwt'] : null;
       }
     },
-    async (token: { body: JwtClaims }, done: VerifiedCallback): Promise<void> => {
+    async (token: JwtClaims, done: VerifiedCallback): Promise<void> => {
       try {
-        return done(null, token.body);
+        return done(null, token);
       } catch(e) {
         return done(e);
       }
