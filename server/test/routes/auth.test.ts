@@ -3,16 +3,16 @@
 // SPDX-License-Identifier: MIT
 
 import { app } from '../../src/app';
-import supertest from 'supertest';
+import supertest, { SuperAgentTest } from 'supertest';
 import { UserRole } from '../../src/controllers/auth';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 
 describe('Test login route', () => {
   it('should respond disallow logging in with invalid credentials', async () => {
-    async function badCreds(credentials: { username: string, password: string }) {
+    async function badCreds(credentials: { username: string, password: string }): Promise<void> {
       return request.post('/v1/auth/login')
-      	.set('Accept', 'application/json')
+        .set('Accept', 'application/json')
         .send(credentials)
         .expect(401)
         .expect('Content-Type', /json/)
@@ -41,24 +41,24 @@ describe('Test login route', () => {
 describe('Test signup route', () => {
   it('should prevent creating a new account with a previously registered email', async () => {
     return request.post('/v1/auth/signup')
-    	.set('Accept', 'application/json')
+      .set('Accept', 'application/json')
       .send({ email: 'sysadmin@aalto.fi', username: 'aalto', password: 'grades', studentID: '123456', role: 'Admin' })
       .expect(400)
       .expect('Content-Type', /json/)
       .then((res: supertest.Response) => {
         expect(res.body.success).toBe(false);
-        expect(res.body.error).toMatch("user exists already");
+        expect(res.body.error).toMatch('user exists already');
       });
   });
   it('should error when the signup format is off', async () => {
     return request.post('/v1/auth/signup')
-    	.set('Accept', 'application/json')
+      .set('Accept', 'application/json')
       .send({ email: 'sysadmin@aalto.fi', password: 'grades' })
       .expect(400)
       .expect('Content-Type', /json/)
       .then((res: supertest.Response) => {
         expect(res.body.success).toBe(false);
-        expect(res.body.error).toMatch("Invalid signup request format");
+        expect(res.body.error).toMatch('Invalid signup request format');
       });
   });
   it('should allow creation of a new account', async () => {
@@ -67,7 +67,7 @@ describe('Test signup route', () => {
       .send({ username: 'sysadmin2@aalto.fi', password: 'grades2'})
       .expect(401);
     await request.post('/v1/auth/signup')
-    	.set('Accept', 'application/json')
+      .set('Accept', 'application/json')
       .send({ email: 'sysadmin2@aalto.fi', username: 'aalto2', password: 'grades2', studentID: '123457', role: 'Admin' })
       .expect(200)
       .expect('Content-Type', /json/)
@@ -79,5 +79,20 @@ describe('Test signup route', () => {
       .set('Accept', 'application/json')
       .send({ username: 'sysadmin2@aalto.fi', password: 'grades2'})
       .expect(200);
+  });
+});
+
+describe('Test session management', () => {
+  it('should protect routes and make them accessible', async () => {
+    // Use the agent for cookie persistence
+    const agent: SuperAgentTest = supertest.agent(app);
+    await agent.get('/v1/auth/self-info').expect(401);
+    await agent.post('/v1/auth/login')
+      .send({ username: 'sysadmin@aalto.fi', password: 'grades' })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .expect('set-cookie', /jwt=/)
+      .expect('set-cookie', /httponly/i);
+    return agent.get('/v1/auth/self-info').expect(200);
   });
 });
