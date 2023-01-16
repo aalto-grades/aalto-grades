@@ -120,7 +120,7 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
     const token: string = jwt.sign(body, jwtSecret);
     res.cookie('jwt', token, {
       httpOnly: true,
-    secure: !testEnv,
+      secure: !testEnv,
       sameSite: 'none', //MUOKATTU
       maxAge: 24 * 60 * 60 * 1000 // one day
     });

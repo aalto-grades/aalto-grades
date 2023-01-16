@@ -88,7 +88,7 @@ describe('Test session management', () => {
     const agent: SuperAgentTest = supertest.agent(app);
     await agent.get('/v1/auth/self-info').withCredentials(true).expect(401);
     await agent.post('/v1/auth/login')
-    	.withCredentials(true)
+      .withCredentials(true)
       .send({ username: 'sysadmin@aalto.fi', password: 'grades' })
       .expect('Content-Type', /json/)
       .expect(200)
