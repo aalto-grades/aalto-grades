@@ -34,7 +34,6 @@ $ docker-compose --profile prod up
 ```
 
 
-
 ## Development environment
 
 As one of the developers: in order to access the development environment, you
