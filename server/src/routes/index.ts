@@ -6,7 +6,7 @@ import express, { Request, Response, Router } from 'express';
 import { getUserCourses } from '../controllers/user';
 import { addCourse } from '../controllers/course';
 import { testDbFindAllUsers, testDbFindAllCourses } from '../controllers/test';
-import { authLogin, authSelfInfo, authSignup } from './login';
+import { authLogin, authLogout, authSelfInfo, authSignup } from './login';
 import passport from 'passport';
 import cors from 'cors';
 
@@ -23,6 +23,7 @@ router.get('/v1/test/db', testDbFindAllUsers);
 router.get('/v1/test/db/courses/:langId', testDbFindAllCourses);
 
 router.post('/v1/auth/login', express.json(), authLogin);
+router.post('/v1/auth/logout', passport.authenticate('jwt', { session: false }), express.json(), authLogout);
 router.post('/v1/auth/signup', express.json(), authSignup);
 router.get('/v1/auth/self-info', passport.authenticate('jwt', { session: false }), express.json(), authSelfInfo);
 

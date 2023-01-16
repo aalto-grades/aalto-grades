@@ -92,6 +92,16 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
   )(req, res, next);
 }
 
+export async function authLogout(_req: Request, res: Response): Promise<void> {
+  res.clearCookie('jwt', {
+    httpOnly: true,
+    domain: 'localhost',
+  });
+  res.send({
+    success: true
+  });
+}
+
 export async function authSignup(req: Request, res: Response): Promise<void> {
   if (!validateSignupFormat(req.body)) {
     res.status(400).send({
