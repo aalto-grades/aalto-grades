@@ -43,22 +43,24 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
   }
 }
 
+enum GradingType {
+  PassFail = 'PASSFAIL',
+  Numerical = 'NUMERICAL'
+}
+
+function validateGradingType(gradingType: any): gradingType is GradingType {
+  return typeof gradingType === 'string' && (
+    gradingType === 'PASSFAIL' ||
+      gradingType === 'NUMERICAL'
+  );
+}
+
 enum Period {
   I = 'I',
   II = 'II',
   III = 'III',
   IV = 'IV',
   V = 'V'
-}
-
-interface CourseInstanceAddRequest {
-  gradingType: string;
-  startingPeriod: Period;
-  endingPeriod: Period;
-  teachingMethod: string;
-  responsibleTeacher: number;
-  startDate: string;
-  endDate: string;
 }
 
 function validatePeriod(period: any): period is Period {
@@ -71,6 +73,28 @@ function validatePeriod(period: any): period is Period {
   );
 }
 
+enum TeachingMethod {
+  Lecture = 'LECTURE',
+  Exam = 'EXAM'
+}
+
+function validateTeachingMethod(teachingMethod: any): teachingMethod is TeachingMethod {
+  return typeof teachingMethod === 'string' && (
+    teachingMethod === 'LECTURE' ||
+      teachingMethod === 'EXAM'
+  );
+}
+
+interface CourseInstanceAddRequest {
+  gradingType: GradingType;
+  startingPeriod: Period;
+  endingPeriod: Period;
+  teachingMethod: TeachingMethod;
+  responsibleTeacher: number;
+  startDate: string;
+  endDate: string;
+}
+
 function validateCourseInstanceAddFormat(body: any): body is CourseInstanceAddRequest {
   return body &&
     body.gradingType &&
@@ -80,10 +104,10 @@ function validateCourseInstanceAddFormat(body: any): body is CourseInstanceAddRe
     body.responsibleTeacher &&
     body.startDate &&
     body.endDate &&
-    typeof body.gradingType === 'string' &&
+    validateGradingType(body.gradingType) &&
     validatePeriod(body.startingPeriod) &&
     validatePeriod(body.endingPeriod) &&
-    typeof body.teachingMethod === 'string' &&
+    validateTeachingMethod(body.teachingMethod) &&
     typeof body.responsibleTeacher === 'number' &&
     typeof body.startDate === 'string' &&
     typeof body.endDate === 'string';
