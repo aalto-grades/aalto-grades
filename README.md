@@ -9,15 +9,31 @@ Repo for Aalto-Grades Program
 
 ## Development build
 
-You can run the development build of the software by running `docker-compose up` in the root folder of the project.
+You can run the development build of the software by running `docker-compose --profile dev up` in the root folder of the project.
 
 This command has one requirement which is defining the environmental variable `POSTGRES_PASSWORD` before execution.
 
 Demo flow:
 ```
 $ export POSTGRES_PASSWORD=XXXX
+$ docker-compose --profile dev up
+```
+
+If you want to run the build without starting the frontend container or adminer
+
+```
+$ export POSTGRES_PASSWORD=XXXX
 $ docker-compose up
 ```
+
+If you want to run the build without starting adminer, but with the frontend container
+
+```
+$ export POSTGRES_PASSWORD=XXXX
+$ docker-compose --profile prod up
+```
+
+
 
 ## Development environment
 
