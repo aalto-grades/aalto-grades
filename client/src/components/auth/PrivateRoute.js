@@ -10,38 +10,71 @@ import { PropTypes } from 'prop-types';
 import userService from '../../services/user';
 import { Outlet } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
+import { useState, useEffect } from 'react';
 
 const PrivateRoute = ({ children }) => {
-
+  //const [isLoading, setIsLoading] = useState(true);
+  let [loading, setLoading] = useState(true);
   const { auth, setAuth } = useAuth();
 
-  const validateRefreshToken = async () => {
+  /*useEffect(() => {
+    let isMounted = true;
+
+    const verifyRefreshToken = async () => {
+      try {
+        setLoading(true);
+        const response = await userService.getRefreshToken();
+        //setAuth({ userId: response.id, role: response.role });
+        setAuth({ role: response.role });
+      }
+      catch (exception) {
+        console.error(exception);
+      }
+      finally {
+        isMounted && setIsLoading(false);
+      }
+    };
+    !auth?.accessToken ? verifyRefreshToken() : setIsLoading(false);
+
+    return () => isMounted = false;
+  }, []);*/
+  async function getAuthStatus() {
+    await setLoading(true);
     try {
       const response = await userService.getRefreshToken();
-      console.log(response);
-
-      setAuth({ userId: response.id, role: response.role });
-
-      return true;
-    } catch (exception) {
-      return false;
+      //setAuth({ userId: response.id, role: response.role });
+      setAuth({ role: response.role });
     }
-  };
-  if (auth?.role) {
-    // if role is found in context, check if previous login was still valid
+    catch (exception) {
+      console.error(exception);
+    }
+    finally {
+      setLoading(false);
+    }
+  }
 
-    if(validateRefreshToken()) {
-      // if refresh token is valid, let user access the page
+  async function isAuthenticated() {
+    await getAuthStatus();
+  }
+
+  useEffect(() => {
+    isAuthenticated();
+  }, []);
+
+  if (!loading) {
+    console.log(loading);
+    console.log(auth.role);
+    if(auth.role) {
       return (
         <>
           {children}
           <Outlet />
         </>
       );
+    } else {
+      return <Navigate to='/login' />;
     }
   }
-  // navigate to login if role is not found and no valid refresh token
-  return <Navigate to="/login" />;
 };
 
 PrivateRoute.propTypes = {
