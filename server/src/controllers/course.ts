@@ -123,9 +123,7 @@ export async function addCourseInstance(req: Request, res: Response): Promise<Re
       teachingMethod: request.teachingMethod,
       responsibleTeacher: request.responsibleTeacher,
       startDate: request.startDate,
-      endDate: request.endDate,
-      createdAt: new Date(Date.now()),
-      updatedAt: new Date(Date.now()),
+      endDate: request.endDate
     });
 
     return res.send({
