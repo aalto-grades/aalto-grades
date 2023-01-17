@@ -74,23 +74,39 @@ interface CourseInstanceAddRequest {
   endDate: Date;
 }
 
-const courseInstanceAddRequestSchema: yup.AnyObjectSchema = yup.object({
-  gradingType: yup.string().oneOf([GradingType.PassFail, GradingType.Numerical]).required(),
-  startingPeriod: yup.string().oneOf([Period.I, Period.II, Period.III, Period.IV, Period.V]).required(),
-  endingPeriod: yup.string().oneOf([Period.I, Period.II, Period.III, Period.IV, Period.V]).required(),
-  teachingMethod: yup.string().oneOf([TeachingMethod.Lecture, TeachingMethod.Exam]).required(),
-  responsibleTeacher: yup.number().required(),
-  startDate: yup.date().required(),
-  endDate: yup.date().required()
+const courseInstanceAddRequestSchema: yup.AnyObjectSchema = yup.object().shape({
+  gradingType: yup
+    .string()
+    .oneOf([GradingType.PassFail, GradingType.Numerical])
+    .required(),
+  startingPeriod: yup
+    .string()
+    .oneOf([Period.I, Period.II, Period.III, Period.IV, Period.V])
+    .required(),
+  endingPeriod: yup
+    .string()
+    .oneOf([Period.I, Period.II, Period.III, Period.IV, Period.V])
+    .required(),
+  teachingMethod: yup
+    .string()
+    .oneOf([TeachingMethod.Lecture, TeachingMethod.Exam])
+    .required(),
+  responsibleTeacher: yup
+    .number()
+    .required(),
+  startDate: yup
+    .date()
+    .required(),
+  endDate: yup
+    .date()
+    .required()
 });
 
 export async function addCourseInstance(req: Request, res: Response): Promise<Response> {
   try {
     const courseId: number = Number(req.params.courseId);
 
-    if (!await courseInstanceAddRequestSchema.validate(req.body)) {
-      throw new Error('Invalid course instance addition format');
-    }
+    await courseInstanceAddRequestSchema.validate(req.body, { abortEarly: false });
 
     const request: CourseInstanceAddRequest = req.body;
 
@@ -131,6 +147,15 @@ export async function addCourseInstance(req: Request, res: Response): Promise<Re
       instance: newInstance
     });
   } catch (error) {
+
+    if (error instanceof yup.ValidationError) {
+      res.status(400);
+      return res.send({
+        success: false,
+        error: error.errors
+      });
+    }
+
     res.status(401);
     return res.send({
       success: false,
