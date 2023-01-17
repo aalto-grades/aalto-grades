@@ -117,7 +117,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
           .send(input);
 
       expect(res.body.success).toBe(false);
-      expect(res.statusCode).toBe(401);
+      expect(res.statusCode).toBe(400);
     }
 
     await badInput({
