@@ -83,7 +83,7 @@ const courseInstanceAddRequestSchema: yup.AnyObjectSchema = yup.object({
   endDate: yup.date().required()
 });
 
-export async function addCourseInstance(req: Request, res: Response): Promise<void> {
+export async function addCourseInstance(req: Request, res: Response): Promise<Response> {
   try {
     const courseId: number = Number(req.params.courseId);
 
@@ -127,12 +127,12 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
       updatedAt: new Date(Date.now()),
     });
 
-    res.send({
+    return res.send({
       success: true
     });
   } catch (error) {
     res.status(401);
-    res.send({
+    return res.send({
       success: false,
       error: error
     });
