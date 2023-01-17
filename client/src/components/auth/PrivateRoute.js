@@ -62,7 +62,6 @@ const PrivateRoute = ({ children }) => {
   }, []);
 
   if (!loading) {
-    console.log(loading);
     console.log(auth.role);
     if(auth.role) {
       return (
