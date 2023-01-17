@@ -135,13 +135,35 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     });
 
     await badInput({
+      gradingType: 'PASSFAIL',
+      startingPeriod: {
+        junk: 'data'
+      },
+      endingPeriod: 'II',
+      teachingMethod: 'LECTURE',
+      responsibleTeacher: 1,
+      startDate: '2022-7-10',
+      endDate: '2022-11-10'
+    });
+
+    await badInput({
+      gradingType: 'PASSFAIL',
+      startingPeriod: 'I',
+      endingPeriod: 'II',
+      teachingMethod: 42,
+      responsibleTeacher: 1,
+      startDate: '2022-7-10',
+      endDate: '2022-11-10'
+    });
+
+    await badInput({
       gradingType: 'NUMERICAL',
       startingPeriod: 'I',
       endingPeriod: 'II',
       teachingMethod: 'LECTURE',
-      responsibleTeacher: '',
-      startDate: '',
-      endDate: ''
+      responsibleTeacher: 1,
+      startDate: 'not a date',
+      endDate: 'not a date either'
     });
   });
 
@@ -155,6 +177,24 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
           endingPeriod: 'II',
           teachingMethod: 'LECTURE',
           responsibleTeacher: 1,
+          startDate: '2022-7-10',
+          endDate: '2022-11-10'
+        });
+
+    expect(res.body.success).toBe(false);
+    expect(res.statusCode).toBe(401);
+  });
+
+  it('should return fail with nonexistent responsible teacher', async () => {
+    const res: supertest.Response =
+      await request
+        .post('/v1/courses/1/instances')
+        .send({
+          gradingType: 'NUMERICAL',
+          startingPeriod: 'I',
+          endingPeriod: 'II',
+          teachingMethod: 'LECTURE',
+          responsibleTeacher: -1,
           startDate: '2022-7-10',
           endDate: '2022-11-10'
         });

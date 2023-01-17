@@ -3,7 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import { Request, Response } from 'express';
+import * as yup from 'yup';
 import Course from '../database/models/course';
+import User from '../database/models/user';
 import models from '../database/models';
 
 export interface LocalizedString {
@@ -48,13 +50,6 @@ enum GradingType {
   Numerical = 'NUMERICAL'
 }
 
-function validateGradingType(gradingType: any): gradingType is GradingType {
-  return typeof gradingType === 'string' && (
-    gradingType === 'PASSFAIL' ||
-      gradingType === 'NUMERICAL'
-  );
-}
-
 enum Period {
   I = 'I',
   II = 'II',
@@ -63,26 +58,9 @@ enum Period {
   V = 'V'
 }
 
-function validatePeriod(period: any): period is Period {
-  return typeof period === 'string' && (
-    period === 'I' ||
-      period === 'II' ||
-      period === 'III' ||
-      period === 'IV' ||
-      period === 'V'
-  );
-}
-
 enum TeachingMethod {
   Lecture = 'LECTURE',
   Exam = 'EXAM'
-}
-
-function validateTeachingMethod(teachingMethod: any): teachingMethod is TeachingMethod {
-  return typeof teachingMethod === 'string' && (
-    teachingMethod === 'LECTURE' ||
-      teachingMethod === 'EXAM'
-  );
 }
 
 interface CourseInstanceAddRequest {
@@ -91,33 +69,25 @@ interface CourseInstanceAddRequest {
   endingPeriod: Period;
   teachingMethod: TeachingMethod;
   responsibleTeacher: number;
-  startDate: string;
-  endDate: string;
+  startDate: Date;
+  endDate: Date;
 }
 
-function validateCourseInstanceAddFormat(body: any): body is CourseInstanceAddRequest {
-  return body &&
-    body.gradingType &&
-    body.startingPeriod &&
-    body.endingPeriod &&
-    body.teachingMethod &&
-    body.responsibleTeacher &&
-    body.startDate &&
-    body.endDate &&
-    validateGradingType(body.gradingType) &&
-    validatePeriod(body.startingPeriod) &&
-    validatePeriod(body.endingPeriod) &&
-    validateTeachingMethod(body.teachingMethod) &&
-    typeof body.responsibleTeacher === 'number' &&
-    typeof body.startDate === 'string' &&
-    typeof body.endDate === 'string';
-}
+const courseInstanceAddRequestSchema = yup.object({
+  gradingType: yup.string().oneOf([GradingType.PassFail, GradingType.Numerical]).required(),
+  startingPeriod: yup.string().oneOf([Period.I, Period.II, Period.III, Period.IV, Period.V]).required(),
+  endingPeriod: yup.string().oneOf([Period.I, Period.II, Period.III, Period.IV, Period.V]).required(),
+  teachingMethod: yup.string().oneOf([TeachingMethod.Lecture, TeachingMethod.Exam]).required(),
+  responsibleTeacher: yup.number().required(),
+  startDate: yup.date().required(),
+  endDate: yup.date().required()
+});
 
 export async function addCourseInstance(req: Request, res: Response): Promise<void> {
   try {
     const courseId: number = Number(req.params.courseId);
 
-    if (!validateCourseInstanceAddFormat(req.body)) {
+    if (!await courseInstanceAddRequestSchema.validate(req.body)) {
       throw new Error('Invalid course instance addition format');
     }
 
@@ -133,15 +103,26 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
       throw new Error(`Course with ID ${courseId} does not exist`);
     }
 
+    const teacher: User | null = await models.User.findOne({
+      where: {
+        id: request.responsibleTeacher
+      },
+    });
+
+    // TODO: Also check that user has correct role
+    if (teacher == null) {
+      throw new Error(`Teacher with ID ${request.responsibleTeacher} does not exist`);
+    }
+
     models.CourseInstance.create({
       courseId: courseId,
       gradingType: request.gradingType,
       startingPeriod: request.startingPeriod,
       endingPeriod: request.endingPeriod,
       teachingMethod: request.teachingMethod,
-      responsibleTeacher: request.responsibleTeacher, // TODO: Is this fine?
-      startDate: new Date(request.startDate),
-      endDate: new Date(request.endDate),
+      responsibleTeacher: request.responsibleTeacher,
+      startDate: request.startDate,
+      endDate: request.endDate,
       createdAt: new Date(Date.now()),
       updatedAt: new Date(Date.now()),
     });
