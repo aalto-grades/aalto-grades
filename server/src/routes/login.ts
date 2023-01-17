@@ -4,12 +4,12 @@
 
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { ExtractJwt, Strategy as JWTStrategy } from 'passport-jwt';
+import { Strategy as JWTStrategy, VerifiedCallback } from 'passport-jwt';
 import passport from 'passport';
 import { IVerifyOptions } from 'passport-local';
-import { UserRole, PlainPassword, validateLogin, InvalidCredentials, performSignup } from '../controllers/auth';
+import { UserRole, PlainPassword, validateLogin, InvalidCredentials, performSignup, LoginResult } from '../controllers/auth';
 import { Strategy as LocalStrategy } from 'passport-local';
-import { jwtSecret } from '../configs';
+import { jwtSecret, testEnv } from '../configs';
 
 interface SignupRequest {
   username: string,
@@ -45,15 +45,15 @@ function validateSignupFormat(body: any): body is SignupRequest {
     typeof body.studentID === 'string';
 }
 
-export async function authLogin(req: Request, res: Response, next: NextFunction) {
+export async function authLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
   passport.authenticate(
     'login',
-    async (err, role: UserRole | boolean, options: IVerifyOptions | null | undefined) => {
+    async (err: any, loginResult: LoginResult | boolean, options: IVerifyOptions | null | undefined) => {
       try {
         if (err) {
           return next(err);
         }
-        if (role == false || role == true) {
+        if (loginResult == false || loginResult == true) {
           return res.status(401).send({
             success: false,
             message: options ? options.message : 'unknown error',
@@ -61,26 +61,27 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
         }
 
         req.login(
-          role,
+          loginResult,
           { session: false },
-          async (error) => {
+          async (error: any) => {
             if (error) {
               return next(error);
             }
 
-            const body = {
-              role,
+            const body: JwtClaims = {
+              role: loginResult.role,
+              id: loginResult.id,
             };
-            const token = jwt.sign({ user: body }, jwtSecret);
+            const token: string = jwt.sign(body, jwtSecret);
             res.cookie('jwt', token, {
               httpOnly: true,
-              secure: true,
+              secure: !testEnv,
               sameSite: 'none',
               maxAge: 24 * 60 * 60 * 1000 // one day
             });
             return res.send({
               success: true,
-              role
+              role: loginResult.role,
             });
           }
         );
@@ -91,27 +92,36 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
   )(req, res, next);
 }
 
-export async function authSignup(req: Request, res: Response) {
+export async function authLogout(_req: Request, res: Response): Promise<void> {
+  res.clearCookie('jwt', {
+    httpOnly: true,
+  });
+  res.send({
+    success: true
+  });
+}
+
+export async function authSignup(req: Request, res: Response): Promise<void> {
   if (!validateSignupFormat(req.body)) {
-    return res.status(400).send({
+    res.status(400).send({
       success: false,
       error: 'Invalid signup request format',
     });
+    return;
   }
 
   try {
     // TODO signup
-    const id = await performSignup(req.body.username, req.body.email, req.body.password, req.body.studentID);
+    const id: number = await performSignup(req.body.username, req.body.email, req.body.password, req.body.studentID);
     const body: JwtClaims = {
       role: req.body.role,
       id,
     };
-    const token = jwt.sign({ user: body }, jwtSecret);
+    const token: string = jwt.sign(body, jwtSecret);
     res.cookie('jwt', token, {
       httpOnly: true,
-      secure: true,
+      secure: !testEnv,
       sameSite: 'none', //MUOKATTU
-      domain: 'localhost',
       maxAge: 24 * 60 * 60 * 1000 // one day
     });
     res.send({
@@ -120,16 +130,21 @@ export async function authSignup(req: Request, res: Response) {
   } catch (error) {
     // 403 or 400 or 500? The Promise architecture with appropriate rejections should
     // carry this info
-    return res.status(400).send({
+    res.status(400).send({
       success: false,
       error: error instanceof Error ? error.message : 'unknown error',
     });
   }
 }
 
-export async function authSelfInfo(req: Request, res: Response) {
-  const user = req.user as JwtClaims;
-  return res.send({
+export async function authSelfInfo(req: Request, res: Response): Promise<void> {
+  if (!req.user) {
+    res.status(401);
+    res.send({ success: false, error: 'unauthorized' });
+    return;
+  }
+  const user: JwtClaims = req.user as JwtClaims;
+  res.send({
     id: user.id,
     role: user.role,
   });
@@ -142,9 +157,9 @@ passport.use(
       usernameField: 'username',
       passwordField: 'password'
     },
-    async (username, password, done) => {
+    async (username: string, password: string, done: (error: any, user?: any, options?: IVerifyOptions) => void) => {
       try {
-        const role = await validateLogin(username, password);
+        const role: LoginResult = await validateLogin(username, password);
         return done(null, role, { message: 'success' });
       } catch (error) {
         if (error instanceof InvalidCredentials) {
@@ -157,16 +172,17 @@ passport.use(
 );
 
 passport.use(
+  'jwt',
   new JWTStrategy(
     {
       secretOrKey: jwtSecret,
-      jwtFromRequest: (req: Request) => {
+      jwtFromRequest: (req: Request): string | null => {
         return (req && req.cookies) ? req.cookies['jwt'] : null;
       }
     },
-    async (token: { body: JwtClaims }, done) => {
+    async (token: JwtClaims, done: VerifiedCallback): Promise<void> => {
       try {
-        return done(null, token.body);
+        return done(null, token);
       } catch(e) {
         return done(e);
       }

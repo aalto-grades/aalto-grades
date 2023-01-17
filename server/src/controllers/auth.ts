@@ -12,6 +12,10 @@ export enum UserRole {
   Teacher,
   Admin,
 }
+export interface LoginResult {
+  role: UserRole,
+	id: number,
+}
 
 export class InvalidCredentials extends Error {
   constructor() {
@@ -31,9 +35,9 @@ export class InvalidFormat extends Error {
   }
 }
 
-export async function validateLogin(username: string, password: PlainPassword): Promise<UserRole> {
-  const user = await User.findOne({
-    attributes: ['password'],
+export async function validateLogin(username: string, password: PlainPassword): Promise<LoginResult> {
+  const user: User | null = await User.findOne({
+    attributes: ['id', 'password'],
     where: {
       email: username,
     }
@@ -41,15 +45,18 @@ export async function validateLogin(username: string, password: PlainPassword): 
   if (user === null) {
     throw new InvalidCredentials();
   }
-  const match = await argon.verify(user.password.trim(), password);
+  const match: boolean = await argon.verify(user.password.trim(), password);
   if (!match) {
     throw new InvalidCredentials();
   }
-  return UserRole.Admin;
+  return {
+    role: UserRole.Admin,
+    id: user.id,
+  };
 }
 
 export async function performSignup(username: string, email: string, plainPassword: PlainPassword, studentId: string): Promise<number> {
-  const exists = await User.findOne({
+  const exists: User | null = await User.findOne({
     where: {
       [Op.or]: [
         { email },
@@ -63,7 +70,7 @@ export async function performSignup(username: string, email: string, plainPasswo
   }
 
   try {
-    const model = await User.create({
+    const model: User = await User.create({
       name: username,
       email,
       password: await argon.hash(plainPassword.trim()),
