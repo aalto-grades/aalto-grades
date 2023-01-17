@@ -73,7 +73,7 @@ interface CourseInstanceAddRequest {
   endDate: Date;
 }
 
-const courseInstanceAddRequestSchema = yup.object({
+const courseInstanceAddRequestSchema: yup.AnyObjectSchema = yup.object({
   gradingType: yup.string().oneOf([GradingType.PassFail, GradingType.Numerical]).required(),
   startingPeriod: yup.string().oneOf([Period.I, Period.II, Period.III, Period.IV, Period.V]).required(),
   endingPeriod: yup.string().oneOf([Period.I, Period.II, Period.III, Period.IV, Period.V]).required(),

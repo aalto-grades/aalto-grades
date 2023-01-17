@@ -78,7 +78,7 @@ describe('Test GET /v1/user/:userId/courses', () => {
 
 describe('Test POST /v1/courses/:courseId/instances', () => {
   it('should return success with correct input', async () => {
-    async function goodInput(input: any): Promise<void> {
+    async function goodInput(input: object): Promise<void> {
       const res: supertest.Response =
         await request
           .post('/v1/courses/1/instances')
@@ -110,7 +110,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
   });
 
   it('should return fail with incorrect input', async () => {
-    async function badInput(input: any): Promise<void> {
+    async function badInput(input: object): Promise<void> {
       const res: supertest.Response =
         await request
           .post('/v1/courses/1/instances')
