@@ -4,6 +4,7 @@
 
 import { Request, Response } from 'express';
 import * as yup from 'yup';
+import CourseInstance from '../database/models/courseInstance';
 import Course from '../database/models/course';
 import User from '../database/models/user';
 import models from '../database/models';
@@ -114,7 +115,7 @@ export async function addCourseInstance(req: Request, res: Response): Promise<Re
       throw new Error(`Teacher with ID ${request.responsibleTeacher} does not exist`);
     }
 
-    models.CourseInstance.create({
+    const newInstance: CourseInstance = await models.CourseInstance.create({
       courseId: courseId,
       gradingType: request.gradingType,
       startingPeriod: request.startingPeriod,
@@ -128,7 +129,8 @@ export async function addCourseInstance(req: Request, res: Response): Promise<Re
     });
 
     return res.send({
-      success: true
+      success: true,
+      instance: newInstance
     });
   } catch (error) {
     res.status(401);
