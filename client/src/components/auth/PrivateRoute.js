@@ -13,36 +13,15 @@ import useAuth from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';
 
 const PrivateRoute = ({ children }) => {
-  //const [isLoading, setIsLoading] = useState(true);
+
   let [loading, setLoading] = useState(true);
   const { auth, setAuth } = useAuth();
 
-  /*useEffect(() => {
-    let isMounted = true;
-
-    const verifyRefreshToken = async () => {
-      try {
-        setLoading(true);
-        const response = await userService.getRefreshToken();
-        //setAuth({ userId: response.id, role: response.role });
-        setAuth({ role: response.role });
-      }
-      catch (exception) {
-        console.error(exception);
-      }
-      finally {
-        isMounted && setIsLoading(false);
-      }
-    };
-    !auth?.accessToken ? verifyRefreshToken() : setIsLoading(false);
-
-    return () => isMounted = false;
-  }, []);*/
-  async function getAuthStatus() {
+  const getAuthStatus = async () => {
     await setLoading(true);
     try {
       const response = await userService.getRefreshToken();
-      //setAuth({ userId: response.id, role: response.role });
+
       setAuth({ role: response.role });
     }
     catch (exception) {
@@ -51,11 +30,11 @@ const PrivateRoute = ({ children }) => {
     finally {
       setLoading(false);
     }
-  }
+  };
 
-  async function isAuthenticated() {
+  const isAuthenticated = async () => {
     await getAuthStatus();
-  }
+  };
 
   useEffect(() => {
     isAuthenticated();

@@ -17,6 +17,8 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import styled from 'styled-components';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import useLogout from './hooks/useLogout';
+import { useNavigate } from 'react-router-dom';
 
 const theme = createTheme({
   palette: {
@@ -47,6 +49,15 @@ const AppContainer = styled(Container)`
 `;
 
 function App() {
+  const logout = useLogout();
+  const navigate = useNavigate();
+
+  //temporary function for logging out, will be moved to a seperate file once toolbar is refined
+  const signOut = async () => {
+    await logout();
+    navigate('/login', { replace: true });
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <AppBar position="static">
@@ -61,6 +72,9 @@ function App() {
           >
           Aalto Grades
           </Link>
+          <button onClick={signOut}>
+            Sign out
+          </button>
         </Toolbar>
       </AppBar>
       <AppContainer maxWidth="lg">

@@ -23,7 +23,6 @@ const Login = () => {
 
       console.log(response);
 
-      //setAuth({ userId: response.id, role: response.role });
       setAuth({ role: response.role });
 
       navigate('/', { replace: true });

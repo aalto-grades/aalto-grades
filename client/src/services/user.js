@@ -26,5 +26,10 @@ const getRefreshToken = async () => {
   const response = await axios.get('/v1/auth/self-info');
   return response.data;
 };
+
+const logout = async () => {
+  const response = await axios.post('/v1/auth/logout');
+  return response.data;
+};
   
-export default { login, signup, getRefreshToken };
+export default { login, signup, getRefreshToken, logout };
