@@ -125,7 +125,9 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
       maxAge: 24 * 60 * 60 * 1000 // one day
     });
     res.send({
-      success: true
+      success: true,
+      role: req.body.role,
+      id,
     });
   } catch (error) {
     // 403 or 400 or 500? The Promise architecture with appropriate rejections should
