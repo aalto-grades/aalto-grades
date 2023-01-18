@@ -19,9 +19,9 @@ const Signup = () => {
   const addUser = async (userObject) => {
     try {
       const user = await userService.signup(userObject);
-      console.log(user);
 
-      setAuth({ role: response.role });
+      // if signup successfull, save user role to context
+      setAuth({ role: user.role });
 
       navigate('/', { replace: true });
     } catch (exception) {

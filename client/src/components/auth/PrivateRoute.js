@@ -18,30 +18,32 @@ const PrivateRoute = ({ children }) => {
   const { auth, setAuth } = useAuth();
 
   const getAuthStatus = async () => {
-    await setLoading(true);
+    // loading set to true so page doesn't load until token has been retrieved
+    setLoading(true);
     try {
       const response = await userService.getRefreshToken();
-
       setAuth({ role: response.role });
     }
     catch (exception) {
       console.error(exception);
     }
     finally {
+      // token has been retrieved, can load page
       setLoading(false);
     }
   };
 
-  const isAuthenticated = async () => {
+  /*const isAuthenticated = async () => {
     await getAuthStatus();
-  };
+  };*/
 
   useEffect(() => {
-    isAuthenticated();
+    getAuthStatus();
   }, []);
 
+  // only load page after token has been retrieved
   if (!loading) {
-    console.log(auth.role);
+    // if role can be found -> token exists -> can access page
     if(auth.role) {
       return (
         <>
@@ -49,6 +51,7 @@ const PrivateRoute = ({ children }) => {
           <Outlet />
         </>
       );
+    // no role found -> redirect to login
     } else {
       return <Navigate to='/login' />;
     }

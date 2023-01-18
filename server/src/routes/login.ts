@@ -121,7 +121,7 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
     res.cookie('jwt', token, {
       httpOnly: true,
       secure: !testEnv,
-      sameSite: 'none', //MUOKATTU
+      sameSite: 'none',
       maxAge: 24 * 60 * 60 * 1000 // one day
     });
     res.send({

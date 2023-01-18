@@ -20,9 +20,8 @@ const Login = () => {
   const addUser = async (userObject) => {
     try {
       const response = await userService.login(userObject);
-
-      console.log(response);
-
+      
+      // if login is successfull, save user role to context
       setAuth({ role: response.role });
 
       navigate('/', { replace: true });
