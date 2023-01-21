@@ -57,6 +57,7 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
 export async function getCourse(req: Request, res: Response): Promise<Response> {
   try {
     const courseId: number = Number(req.params.courseId);
+    if (isNaN(courseId)) throw new Error('course id must be a number');
     const course: courseService.CourseWithTranslationAndInstance = await courseService.findCourseById(courseId);
   
     const courseData: CourseData = {
@@ -117,6 +118,10 @@ export async function getInstance(req: Request, res: Response): Promise<Response
   try {
     const courseId: number = Number(req.params.courseId);
     const instanceId: number = Number(req.params.instanceId);
+    
+    if (isNaN(courseId)) throw new Error('course id must be a number');
+    if (isNaN(instanceId)) throw new Error('instance id must be a number');
+    
     const course: courseService.CourseWithTranslationAndInstance = await courseService.findCourseById(courseId, instanceId);
     const responsibleTeacher: User = await userService.findUserById(course.CourseInstances[0].responsibleTeacher);
     
