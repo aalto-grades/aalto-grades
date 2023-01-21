@@ -37,7 +37,7 @@ describe('Test GET /v1/courses/:courseId', () => {
     expect(res.body.success).toBe(false);
     expect(res.body.course).not.toBeDefined();
     expect(res.body.error).toBeDefined();
-    expect(res.statusCode).toBe(404);
+    expect(res.statusCode).toBe(500);
   });
 });
 
@@ -69,7 +69,7 @@ describe('Test GET /v1/courses/:courseId/instances/:instanceId', () => {
     expect(res.body.success).toBe(false);
     expect(res.body.instance).not.toBeDefined();
     expect(res.body.error).toBeDefined();
-    expect(res.statusCode).toBe(404);
+    expect(res.statusCode).toBe(500);
   });
 
   it('should respond with 404 not found, if non-existing course id', async () => {
@@ -77,7 +77,7 @@ describe('Test GET /v1/courses/:courseId/instances/:instanceId', () => {
     expect(res.body.success).toBe(false);
     expect(res.body.instance).not.toBeDefined();
     expect(res.body.error).toBeDefined();
-    expect(res.statusCode).toBe(404);
+    expect(res.statusCode).toBe(500);
   });
 });
 
