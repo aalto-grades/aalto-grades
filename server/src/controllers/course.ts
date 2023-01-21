@@ -105,16 +105,8 @@ export async function getCourse(req: Request, res: Response): Promise<Response> 
     });
   } catch (error: unknown) {
     console.log(error);
-  
-    if (error instanceof Error) {
-      res.status(404);
-      return res.send({
-        success: false,
-        error: error.message
-      });
-    }
-    res.status(500);
-    return res.send({
+
+    return res.status(500).send({
       success: false,
       error: 'Internal Server Error'
     });
@@ -181,16 +173,8 @@ export async function getInstance(req: Request, res: Response): Promise<Response
     });
   } catch (error: unknown) {
     console.log(error);
-  
-    if (error instanceof Error) {
-      res.status(404);
-      return res.send({
-        success: false,
-        error: error.message
-      });
-    }
-    res.status(500);
-    return res.send({
+
+    return res.status(500).send({
       success: false,
       error: 'Internal Server Error'
     });
