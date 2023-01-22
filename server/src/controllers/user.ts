@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MIT
 
 import { Request, Response } from 'express';
-import { Course } from './course';
+import { CourseData } from './course';
 
 export interface TeacherCourses {
-  current: Array<Course>,
-  previous: Array<Course>
+  current: Array<CourseData>,
+  previous: Array<CourseData>
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
