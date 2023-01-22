@@ -2,7 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import * as yup from 'yup';
+import Course from '../database/models/course';
 
 export interface LocalizedString {
   fi: string,
@@ -26,17 +28,57 @@ export enum Language {
   Swedish = 'SV'
 }
 
+interface JsonError extends Error {
+  expose?: boolean,
+  status?: number,
+  statusCode?: number,
+  body?: string,
+  type?: string
+}
+
+// Middleware function for handling errors in JSON parsing
+export function handleInvalidRequestJson(err: JsonError, req: Request, res: Response, next: NextFunction): void {
+  if (err instanceof SyntaxError && err.status === 400 && err.body !== undefined) {
+    res.status(400).send({
+      success: false,
+      errors: [ `SyntaxError: ${err.message}: ${err.body}` ]
+    });
+  } else
+    next();
+}
+
 export async function addCourse(req: Request, res: Response): Promise<void> {
+  const requestSchema: yup.AnyObjectSchema = yup.object().shape({
+    courseCode: yup.string().strict().required(),
+    minCredits: yup.number().min(0).required(),
+    maxCredits: yup.number().min(yup.ref('minCredits')).required()
+  });
+
   try {
-    // TODO: add the course to the database
-    res.send({
-      success: true
+    await requestSchema.validate(req.body, { abortEarly: false });
+
+    const course: Course = await Course.create({
+      courseCode: req.body.courseCode,
+      minCredits: req.body.minCredits,
+      maxCredits: req.body.maxCredits
+    });
+
+    res.json({ 
+      success: true,
+      data: course
     });
   } catch (error) {
-    res.status(401);
-    res.send({
-      success: false,
-      error: error,
-    });
+    // TODO: appropriate logging in case of errors
+    if (error instanceof yup.ValidationError) {
+      res.status(400).json({ 
+        success: false,
+        errors: error.errors
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        errors: [ 'Internal Server Error' ]
+      });
+    }
   }
 }

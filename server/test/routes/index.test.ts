@@ -75,3 +75,81 @@ describe('Test GET /v1/user/:userId/courses', () => {
     expect(courses.previous[0].courseCode).toBe('TU-A1100');
   });
 });
+
+describe('Test POST /v1/courses', () => {
+
+  it('should respond with course data on correct input', async () => {
+    const input: object = {
+      courseCode: 'ELEC-A7200',
+      minCredits: 3,
+      maxCredits: 5
+    };
+    const res: supertest.Response = await request.post('/v1/courses').send(input);
+    expect(res.statusCode).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.courseCode).toBe('ELEC-A7200');
+    expect(res.body.data.minCredits).toBe(3);
+    expect(res.body.data.maxCredits).toBe(5);
+    expect(Date.parse(res.body.data.createdAt)).toBeGreaterThanOrEqual(0);
+  });
+
+  it('should respond with validation error, if maxCredits is less than minCredits', async () => {
+    const input: object = {
+      courseCode: 'ELEC-A7200',
+      minCredits: 3,
+      maxCredits: 1
+    };
+    const res: supertest.Response = await request.post('/v1/courses').send(input);
+    expect(res.statusCode).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors).toContain('maxCredits must be greater than or equal to 3');
+  });
+
+  it('should respond with validation error, if minCredits is less than 0', async () => {
+    const input: object = {
+      courseCode: 'ELEC-A7200',
+      minCredits: -1,
+      maxCredits: 5
+    };
+    const res: supertest.Response = await request.post('/v1/courses').send(input);
+    expect(res.statusCode).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors).toContain('minCredits must be greater than or equal to 0');
+  });
+
+  it('should respond with validation errors, if value types are invalid', async () => {
+    const input: object = {
+      courseCode: 123,
+      minCredits: 'asdf',
+      maxCredits: 'asdf'
+    };
+    const res: supertest.Response = await request.post('/v1/courses').send(input);
+    expect(res.statusCode).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors).toContain('courseCode must be a `string` type, but the final value was: `123`.');
+    expect(res.body.errors).toContain('minCredits must be a `number` type, but the final value was: `NaN` (cast from the value `"asdf"`).');
+    expect(res.body.errors).toContain('maxCredits must be a `number` type, but the final value was: `NaN` (cast from the value `"asdf"`).');
+  });
+
+  it('should respond with validation errors, if required fields are missing', async () => {
+    const input: object = {};
+    const res: supertest.Response = await request.post('/v1/courses').send(input);
+    expect(res.statusCode).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors).toContain('courseCode is a required field');
+    expect(res.body.errors).toContain('minCredits is a required field');
+    expect(res.body.errors).toContain('maxCredits is a required field');
+  });
+
+  it('should respond with syntax error, if parsing request JSON fails', async() => {
+    const input: string = '{"courseCode": "ELEC-A7200"';
+    const res: supertest.Response = await request
+      .post('/v1/courses')
+      .send(input)
+      .set('Content-Type', 'application/json');
+    expect(res.statusCode).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors).toContain('SyntaxError: Unexpected end of JSON input: {"courseCode": "ELEC-A7200"');
+  });
+
+});
