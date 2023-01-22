@@ -9,6 +9,7 @@ services:
   front-end:
     build: ./client
     restart: always
+    profiles: ["dev", "prod"]
     ports:
     - "3005:3005"
     container_name: frontend-server
@@ -41,6 +42,8 @@ services:
   database:
     image: postgres
     restart: always
+    ports:
+      - 5432:5432
     environment:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     networks:
@@ -49,6 +52,7 @@ services:
   adminer:
     image: adminer
     restart: always
+    profiles: ["dev"]
     ports:
       - 8080:8080
     networks:

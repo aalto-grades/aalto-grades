@@ -9,7 +9,7 @@ import { testDbFindAllUsers, testDbFindAllCourses } from '../controllers/test';
 
 export const router: Router = Router();
 
-router.get('/user/:userId/courses', getUserCourses);
+router.get('/v1/user/:userId/courses', getUserCourses);
 
 // Sisu API routes
 router.get('/v1/courses/sisu/:courseId', fetchAllInstancesFromSisu);
