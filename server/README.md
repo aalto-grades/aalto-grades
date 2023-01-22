@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 
 - [Installing Node.js](#installing-nodejs)
 - [Running the program](#running-the-program)
+  - [Sisu API](#sisu-api)
 - [Migrations](#migrations)
 - [Seeds](#seeds)
 
@@ -37,6 +38,18 @@ $ npm run start
 ```
 After running the last command, visit `http://localhost:3000/world` on a web
 browser. You should see the output "Hello /world".
+
+### Sisu API
+
+To use the routes that communicate with Sisu, environment variables `SISU_API_KEY` 
+and `SISU_API_URL` must be provided. These are optional when not in production environment.
+
+For an example:
+```
+$ export SISU_API_KEY="your-api-key"
+$ export SISU_API_URL=www.api.com/api/sisu/v1
+
+```
 
 
 ## Migrations
