@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import { SisuInstance, SisuError } from '../../src/types/sisu';
 
 export const sisuInstance: SisuInstance = {
