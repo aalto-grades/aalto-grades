@@ -111,7 +111,7 @@ describe('Test GET v1/courses/sisu/instance/:instanceId', () => {
     mockedAxios.get.mockResolvedValue({
       data: sisuError
     });
-    const res: supertest.Response = await request.get('/v1/courses/sisu/instance/aalto-CUR-163498-3084205');
+    const res: supertest.Response = await request.get('/v1/courses/sisu/instance/abc');
     expect(res.body.success).toBe(false);
     expect(res.body.instance).not.toBeDefined();
     expect(res.body.error).toBeDefined();
@@ -147,7 +147,18 @@ describe('Test GET v1/courses/sisu/:courseId', () => {
     expect(res.status).toEqual(200);
   });
 
-  it('should respond with error when course does not exist/does not have active instances', async () => {
+  it('should respond with error when course does not exist', async () => {
+    mockedAxios.get.mockResolvedValue({
+      data: sisuError
+    });
+    const res: supertest.Response = await request.get('/v1/courses/sisu/abc');
+    expect(res.body.success).toBe(false);
+    expect(res.body.instances).not.toBeDefined();
+    expect(res.body.error).toBeDefined();
+    expect(res.status).toEqual(500);
+  });
+
+  it('should respond with error when course does not have active instances', async () => {
     mockedAxios.get.mockResolvedValue({
       data: sisuError
     });
