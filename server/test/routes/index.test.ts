@@ -80,7 +80,7 @@ describe('Test GET /v1/user/:userId/courses', () => {
   });
 });
 
-describe('Test GET v1/courses/sisu/instance/:instanceId', () => {
+describe('Test GET /v1/courses/sisu/instance/:instanceId', () => {
 
   it('should respond with correct data when instance exists', async () => {
     mockedAxios.get.mockResolvedValue({
@@ -119,7 +119,7 @@ describe('Test GET v1/courses/sisu/instance/:instanceId', () => {
   });
 });
 
-describe('Test GET v1/courses/sisu/:courseId', () => {
+describe('Test GET /v1/courses/sisu/:courseId', () => {
 
   it('should respond with correct data when course and active instances exist', async () => {
     mockedAxios.get.mockResolvedValue({
