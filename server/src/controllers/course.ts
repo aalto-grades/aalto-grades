@@ -67,7 +67,7 @@ export async function getCourse(req: Request, res: Response): Promise<Response> 
   try {
     const courseId: number = Number(req.params.courseId);
     await idSchema.validate({ id: courseId });
-    const course: courseService.CourseWithTranslationAndInstance = await courseService.findCourseById(courseId);
+    const course: courseService.CourseWithTranslation = await courseService.findCourseById(courseId);
   
     const courseData: CourseData = {
       id: course.id,
