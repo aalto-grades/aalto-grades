@@ -122,6 +122,13 @@ export async function getCourse(req: Request, res: Response): Promise<Response> 
       });
     }
 
+    if (error instanceof Error && error?.message.startsWith('course with an id')) {
+      return res.status(404).send({
+        success: false,
+        error: error.message
+      });
+    }
+
     return res.status(500).send({
       success: false,
       error: 'Internal Server Error'
@@ -197,6 +204,13 @@ export async function getInstance(req: Request, res: Response): Promise<Response
       return res.status(400).send({
         success: false,
         error: error.errors
+      });
+    }
+
+    if (error instanceof Error && error?.message.startsWith('course instance with an id')) {
+      return res.status(404).send({
+        success: false,
+        error: error.message
       });
     }
 

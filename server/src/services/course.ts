@@ -29,7 +29,7 @@ export async function findCourseById(courseId: number, instanceId: number | null
 
   if (instanceId) include.push({
     model: CourseInstance,
-    attributes: ['gradingType', 'startingPeriod', 'endingPeriod', 'teachingMethod', 'startDate', 'endDate', 'responsibleTeacher'],
+    attributes: ['id', 'gradingType', 'startingPeriod', 'endingPeriod', 'teachingMethod', 'startDate', 'endDate', 'responsibleTeacher'],
     where: {
       id: instanceId
     }
@@ -40,7 +40,7 @@ export async function findCourseById(courseId: number, instanceId: number | null
     include: include
   });
 
-  if (!course && instanceId) throw new Error (`course instance with id ${instanceId} and course id ${courseId} not found`);
+  if (!course && instanceId) throw new Error (`course with an id ${courseId} and instance id ${instanceId} not found`);
 
   if (!course) throw new Error (`course with an id ${courseId} not found`);
 

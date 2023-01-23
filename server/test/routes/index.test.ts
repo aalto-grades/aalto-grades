@@ -37,7 +37,15 @@ describe('Test GET /v1/courses/:courseId', () => {
     expect(res.body.success).toBe(false);
     expect(res.body.course).not.toBeDefined();
     expect(res.body.error).toBeDefined();
-    expect(res.statusCode).toBe(500);
+    expect(res.statusCode).toBe(404);
+  });
+
+  it('should respond with 400 bad request, if validation fails (non-number course id)', async () => {
+    const res: supertest.Response = await request.get('/v1/courses/abc');
+    expect(res.body.success).toBe(false);
+    expect(res.body.course).not.toBeDefined();
+    expect(res.body.error).toBeDefined();
+    expect(res.statusCode).toBe(400);
   });
 });
 
@@ -48,9 +56,6 @@ describe('Test GET /v1/instances/:instanceId', () => {
     expect(res.body.instance).toBeDefined();
     expect(res.body.error).not.toBeDefined();
     expect(res.body.instance.id).toBe(1);
-    expect(res.body.instance.courseCode).toBeDefined();
-    expect(res.body.instance.minCredits).toBeDefined();
-    expect(res.body.instance.maxCredits).toBeDefined();
     expect(res.body.instance.startingPeriod).toBeDefined();
     expect(res.body.instance.endingPeriod).toBeDefined();
     expect(res.body.instance.startDate).toBeDefined();
@@ -58,9 +63,12 @@ describe('Test GET /v1/instances/:instanceId', () => {
     expect(res.body.instance.courseType).toBeDefined();
     expect(res.body.instance.gradingType).toBeDefined();
     expect(res.body.instance.responsibleTeacher).toBeDefined();
-    expect(res.body.instance.department).toBeDefined();
-    expect(res.body.instance.name).toBeDefined();
-    expect(res.body.instance.evaluationInformation).toBeDefined();
+    expect(res.body.instance.courseData.courseCode).toBeDefined();
+    expect(res.body.instance.courseData.minCredits).toBeDefined();
+    expect(res.body.instance.courseData.maxCredits).toBeDefined();
+    expect(res.body.instance.courseData.department).toBeDefined();
+    expect(res.body.instance.courseData.name).toBeDefined();
+    expect(res.body.instance.courseData.evaluationInformation).toBeDefined();
     expect(res.statusCode).toBe(200);
   });
 
@@ -69,9 +77,16 @@ describe('Test GET /v1/instances/:instanceId', () => {
     expect(res.body.success).toBe(false);
     expect(res.body.instance).not.toBeDefined();
     expect(res.body.error).toBeDefined();
-    expect(res.statusCode).toBe(500);
+    expect(res.statusCode).toBe(404);
   });
 
+  it('should respond with 400 bad request, if validation fails (non-number instance id)', async () => {
+    const res: supertest.Response = await request.get('/v1/instances/abc');
+    expect(res.body.success).toBe(false);
+    expect(res.body.instance).not.toBeDefined();
+    expect(res.body.error).toBeDefined();
+    expect(res.statusCode).toBe(400);
+  });
 });
 
 describe('Test GET /v1/user/:userId/courses', () => {
