@@ -6,7 +6,7 @@ import { Request, Response } from 'express';
 import * as yup from 'yup';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
-import { userService, courseService } from '../services';
+import { userService, courseService, instanceService } from '../services';
 
 export interface LocalizedString {
   fi: string,
@@ -64,7 +64,7 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
 export async function getCourse(req: Request, res: Response): Promise<Response> {
   try {
     const courseId: number = Number(req.params.courseId);
-    await idSchema.validate({ id: courseId }, { abortEarly: false });
+    await idSchema.validate({ id: courseId });
     const course: courseService.CourseWithTranslationAndInstance = await courseService.findCourseById(courseId);
   
     const courseData: CourseData = {
@@ -106,8 +106,7 @@ export async function getCourse(req: Request, res: Response): Promise<Response> 
       }
     });
   
-    res.status(200);
-    return res.send({
+    return res.status(200).send({
       success: true,
       course: courseData
     });
@@ -115,8 +114,7 @@ export async function getCourse(req: Request, res: Response): Promise<Response> 
     console.log(error);
 
     if (error instanceof yup.ValidationError) {
-      res.status(400);
-      return res.send({
+      return res.status(400).send({
         success: false,
         error: error.errors
       });
@@ -131,25 +129,23 @@ export async function getCourse(req: Request, res: Response): Promise<Response> 
       
 export async function getInstance(req: Request, res: Response): Promise<Response> {
   try {
-    const courseId: number = Number(req.params.courseId);
     const instanceId: number = Number(req.params.instanceId);
-    await idSchema.validate({ id: courseId });
     await idSchema.validate({ id: instanceId });
+
+    const instance: instanceService.InstanceWithCourseAndTranslation = await instanceService.findInstanceById(instanceId);
+    const responsibleTeacher: User = await userService.findUserById(instance.responsibleTeacher);
     
-    const course: courseService.CourseWithTranslationAndInstance = await courseService.findCourseById(courseId, instanceId);
-    const responsibleTeacher: User = await userService.findUserById(course.CourseInstances[0].responsibleTeacher);
-    
-    const instanceData: InstanceData = {
-      id: course.id,
-      courseCode: course.courseCode,
-      minCredits: course.minCredits,
-      maxCredits: course.maxCredits,
-      startingPeriod: course.CourseInstances[0].startingPeriod,
-      endingPeriod: course.CourseInstances[0].endingPeriod,
-      startDate: course.CourseInstances[0].startDate,
-      endDate: course.CourseInstances[0].endDate,
-      courseType: course.CourseInstances[0].teachingMethod,
-      gradingType: course.CourseInstances[0].gradingType,
+    const parsedInstanceData: InstanceData = {
+      id: instance.id,
+      courseCode: instance.Course.courseCode,
+      minCredits: instance.Course.minCredits,
+      maxCredits: instance.Course.maxCredits,
+      startingPeriod: instance.startingPeriod,
+      endingPeriod: instance.endingPeriod,
+      startDate: instance.startDate,
+      endDate: instance.endDate,
+      courseType: instance.teachingMethod,
+      gradingType: instance.gradingType,
       responsibleTeacher: responsibleTeacher?.name ?? '-',
       department: {
         en: '',
@@ -167,35 +163,33 @@ export async function getInstance(req: Request, res: Response): Promise<Response
         sv: ''
       }
     };
-  
-    course.CourseTranslations.forEach((translation: CourseTranslation) => {
+
+    instance.Course.CourseTranslations.forEach((translation: CourseTranslation) => {
       switch (translation.language) {
       case Language.English:
-        instanceData.department.en = translation.department;
-        instanceData.name.en = translation.courseName;
+        parsedInstanceData.department.en = translation.department;
+        parsedInstanceData.name.en = translation.courseName;
         break;
       case Language.Finnish:
-        instanceData.department.fi = translation.department;
-        instanceData.name.fi = translation.courseName;
+        parsedInstanceData.department.fi = translation.department;
+        parsedInstanceData.name.fi = translation.courseName;
         break;
       case Language.Swedish:
-        instanceData.department.sv = translation.department;
-        instanceData.name.sv = translation.courseName;
+        parsedInstanceData.department.sv = translation.department;
+        parsedInstanceData.name.sv = translation.courseName;
         break;
       }
     });
-  
-    res.status(200);
-    return res.send({
+
+    return res.status(200).send({
       success: true,
-      instance: instanceData
+      instance: parsedInstanceData
     });
   } catch (error: unknown) {
     console.log(error);
 
     if (error instanceof yup.ValidationError) {
-      res.status(400);
-      return res.send({
+      return res.status(400).send({
         success: false,
         error: error.errors
       });

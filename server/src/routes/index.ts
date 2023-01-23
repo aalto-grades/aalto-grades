@@ -15,7 +15,7 @@ router.get('/v1/user/:userId/courses', getUserCourses);
 // Course and instance routes
 router.post('/v1/courses', express.json(), addCourse);
 router.get('/v1/courses/:courseId', getCourse);
-router.get('/v1/courses/:courseId/instances/:instanceId', getInstance);
+router.get('/v1/instances/:instanceId', getInstance);
 
 // TODO: remove this test endpoint after working endpoint has been added
 router.get('/v1/test/db', testDbFindAllUsers);

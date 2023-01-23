@@ -41,9 +41,9 @@ describe('Test GET /v1/courses/:courseId', () => {
   });
 });
 
-describe('Test GET /v1/courses/:courseId/instances/:instanceId', () => {
+describe('Test GET /v1/instances/:instanceId', () => {
   it('should respond with correct data when course instance exists', async () => {
-    const res: supertest.Response = await request.get('/v1/courses/1/instances/1');
+    const res: supertest.Response = await request.get('/v1/instances/1');
     expect(res.body.success).toBe(true);
     expect(res.body.instance).toBeDefined();
     expect(res.body.error).not.toBeDefined();
@@ -65,20 +65,13 @@ describe('Test GET /v1/courses/:courseId/instances/:instanceId', () => {
   });
 
   it('should respond with 404 not found, if non-existing course instance id', async () => {
-    const res: supertest.Response = await request.get('/v1/courses/1/instances/-1');
+    const res: supertest.Response = await request.get('/v1/instances/-1');
     expect(res.body.success).toBe(false);
     expect(res.body.instance).not.toBeDefined();
     expect(res.body.error).toBeDefined();
     expect(res.statusCode).toBe(500);
   });
 
-  it('should respond with 404 not found, if non-existing course id', async () => {
-    const res: supertest.Response = await request.get('/v1/courses/-1/instances/1');
-    expect(res.body.success).toBe(false);
-    expect(res.body.instance).not.toBeDefined();
-    expect(res.body.error).toBeDefined();
-    expect(res.statusCode).toBe(500);
-  });
 });
 
 describe('Test GET /v1/user/:userId/courses', () => {
