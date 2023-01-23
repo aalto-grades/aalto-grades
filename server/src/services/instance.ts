@@ -6,11 +6,10 @@ import models from '../database/models';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
+import { CourseWithTranslation } from './course';
 
 export interface InstanceWithCourseAndTranslation extends CourseInstance {
-  Course: Course & {
-    CourseTranslations: Array<CourseTranslation>
-  }
+  Course: CourseWithTranslation
 }
 
 /**
