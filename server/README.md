@@ -41,16 +41,14 @@ browser. You should see the output "Hello /world".
 
 ### Sisu API
 
-To use the routes that communicate with Sisu, environment variables `SISU_API_KEY` 
+To use the routes that communicate with Sisu, the environment variables `SISU_API_KEY` 
 and `SISU_API_URL` must be provided. These are optional when not in production environment.
 
 For an example:
 ```
 $ export SISU_API_KEY="your-api-key"
 $ export SISU_API_URL=www.api.com/api/sisu/v1
-
 ```
-
 
 ## Migrations
 
