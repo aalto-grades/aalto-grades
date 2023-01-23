@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { Request, Response } from 'express';
+import * as yup from 'yup';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 import { userService, courseService } from '../services';
@@ -39,6 +40,12 @@ export enum Language {
   Swedish = 'SV'
 }
 
+const idSchema: yup.AnyObjectSchema = yup.object().shape({
+  id: yup
+    .number()
+    .required()
+});
+
 export async function addCourse(req: Request, res: Response): Promise<void> {
   try {
     // TODO: add the course to the database
@@ -57,7 +64,7 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
 export async function getCourse(req: Request, res: Response): Promise<Response> {
   try {
     const courseId: number = Number(req.params.courseId);
-    if (isNaN(courseId)) throw new Error('course id must be a number');
+    await idSchema.validate({ id: courseId }, { abortEarly: false });
     const course: courseService.CourseWithTranslationAndInstance = await courseService.findCourseById(courseId);
   
     const courseData: CourseData = {
@@ -107,6 +114,14 @@ export async function getCourse(req: Request, res: Response): Promise<Response> 
   } catch (error: unknown) {
     console.log(error);
 
+    if (error instanceof yup.ValidationError) {
+      res.status(400);
+      return res.send({
+        success: false,
+        error: error.errors
+      });
+    }
+
     return res.status(500).send({
       success: false,
       error: 'Internal Server Error'
@@ -118,9 +133,8 @@ export async function getInstance(req: Request, res: Response): Promise<Response
   try {
     const courseId: number = Number(req.params.courseId);
     const instanceId: number = Number(req.params.instanceId);
-    
-    if (isNaN(courseId)) throw new Error('course id must be a number');
-    if (isNaN(instanceId)) throw new Error('instance id must be a number');
+    await idSchema.validate({ id: courseId });
+    await idSchema.validate({ id: instanceId });
     
     const course: courseService.CourseWithTranslationAndInstance = await courseService.findCourseById(courseId, instanceId);
     const responsibleTeacher: User = await userService.findUserById(course.CourseInstances[0].responsibleTeacher);
@@ -178,6 +192,14 @@ export async function getInstance(req: Request, res: Response): Promise<Response
     });
   } catch (error: unknown) {
     console.log(error);
+
+    if (error instanceof yup.ValidationError) {
+      res.status(400);
+      return res.send({
+        success: false,
+        error: error.errors
+      });
+    }
 
     return res.status(500).send({
       success: false,
