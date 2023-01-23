@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 
-const LoginForm = ({ addUser }) => {
+const LoginForm = ({ loginUser }) => {
 
   const [username, setUsername] = useState(''); 
   const [password, setPassword] = useState('');
@@ -19,7 +19,7 @@ const LoginForm = ({ addUser }) => {
         username,
         password,
       });
-      addUser(userObject);
+      loginUser(userObject);
     } catch (exception) {
       console.log(exception);
     }
@@ -30,9 +30,9 @@ const LoginForm = ({ addUser }) => {
       <form onSubmit={handleSubmit}>
         <div>
           <TextField
-            type='username'
+            type='text'
             value={username}
-            name='Username'
+            name='username'
             label='Username'
             onChange={({ target }) => setUsername(target.value)}
             InputLabelProps={{ shrink: true }}
@@ -43,7 +43,7 @@ const LoginForm = ({ addUser }) => {
           <TextField
             type='password'
             value={password}
-            name='Password'
+            name='password'
             label='Password'
             onChange={({ target }) => setPassword(target.value)}
             InputLabelProps={{ shrink: true }}
@@ -57,7 +57,7 @@ const LoginForm = ({ addUser }) => {
 };
 
 LoginForm.propTypes = {
-  addUser: PropTypes.func
+  loginUser: PropTypes.func
 };
 
 export default LoginForm;

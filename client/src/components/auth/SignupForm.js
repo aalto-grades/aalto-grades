@@ -36,9 +36,9 @@ const SignupForm = ({ addUser }) => {
       <form onSubmit={handleSubmit}>
         <div>
           <TextField
-            type='username'
+            type='text'
             value={username}
-            name='Username'
+            name='username'
             label='Username'
             onChange={({ target }) => setUsername(target.value)}
             InputLabelProps={{ shrink: true }}
@@ -49,7 +49,7 @@ const SignupForm = ({ addUser }) => {
           <TextField
             type='email'
             value={email}
-            name='Email'
+            name='email'
             label='Email'
             onChange={({ target }) => setEmail(target.value)}
             InputLabelProps={{ shrink: true }}
@@ -58,7 +58,7 @@ const SignupForm = ({ addUser }) => {
         </div>
         <div>
           <TextField
-            type='studentID'
+            type='text'
             value={studentID}
             name='StudentID'
             label='Student ID'
@@ -71,7 +71,7 @@ const SignupForm = ({ addUser }) => {
           <TextField
             type='password'
             value={password}
-            name='Password'
+            name='password'
             label='Password'
             onChange={({ target }) => setPassword(target.value)}
             InputLabelProps={{ shrink: true }}

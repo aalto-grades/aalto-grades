@@ -17,7 +17,7 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const theme = useTheme();
 
-  const addUser = async (userObject) => {
+  const loginUser = async (userObject) => {
     try {
       const response = await userService.login(userObject);
       
@@ -37,7 +37,7 @@ const Login = () => {
       <h1>Login</h1>
       <p>{'Don\'t have an account yet?'} <a href={'/Signup'}>Sign up</a></p>
       <p style={{ color: `${theme.palette.primary.dark}` }}>{errorMessage}</p>
-      <LoginForm addUser={addUser}/>
+      <LoginForm loginUser={loginUser}/>
     </div>
   );
 };

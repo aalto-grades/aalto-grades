@@ -12,12 +12,10 @@ const useLogout = () => {
   const { setAuth } = useAuth();
   
   const logout = async () => {
-
-    setAuth({});
-
     try {
 
       await userService.logout();
+      setAuth({});
 
     } catch (exception) {
 

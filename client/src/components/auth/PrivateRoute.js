@@ -14,7 +14,7 @@ import { useState, useEffect } from 'react';
 
 const PrivateRoute = ({ children }) => {
 
-  let [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const { auth, setAuth } = useAuth();
 
   const getAuthStatus = async () => {
