@@ -66,6 +66,7 @@ function parseSisuInstance (instance: SisuInstance): InstanceData {
     endingPeriod: '-',
     startDate: instance.startDate,
     endDate: instance.endDate,
+    // TODO use enums here
     courseType: instance.type === 'exam-exam' ? 'EXAM' : 'LECTURE',
     gradingType: instance.summary.gradingScale.fi === '0-5' ? 'NUMERICAL' : 'PASSFAIL',
     responsibleTeachers: instance.summary.teacherInCharge
