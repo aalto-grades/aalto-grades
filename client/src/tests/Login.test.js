@@ -35,7 +35,7 @@ describe('Tests for Login and LoginForm components', () => {
 
     const mockLoginUser = jest.fn();
 
-    render(<LoginForm addUser={mockLoginUser}/>);
+    render(<LoginForm loginUser={mockLoginUser}/>);
 
     const usernameField = screen.getByLabelText('Username');
     const passwordField = screen.getByLabelText('Password');
