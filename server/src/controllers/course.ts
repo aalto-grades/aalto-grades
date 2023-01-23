@@ -24,7 +24,9 @@ export interface CourseData {
   evaluationInformation: LocalizedString
 }
 
-export interface InstanceData extends CourseData {
+export interface InstanceData {
+  courseData: CourseData,
+  id: number,
   startingPeriod: string,
   endingPeriod: string,
   startDate: Date,
@@ -137,9 +139,6 @@ export async function getInstance(req: Request, res: Response): Promise<Response
     
     const parsedInstanceData: InstanceData = {
       id: instance.id,
-      courseCode: instance.Course.courseCode,
-      minCredits: instance.Course.minCredits,
-      maxCredits: instance.Course.maxCredits,
       startingPeriod: instance.startingPeriod,
       endingPeriod: instance.endingPeriod,
       startDate: instance.startDate,
@@ -147,36 +146,42 @@ export async function getInstance(req: Request, res: Response): Promise<Response
       courseType: instance.teachingMethod,
       gradingType: instance.gradingType,
       responsibleTeacher: responsibleTeacher?.name ?? '-',
-      department: {
-        en: '',
-        fi: '',
-        sv: ''
-      },
-      name: {
-        en: '',
-        fi: '',
-        sv: ''
-      },
-      evaluationInformation: {
-        en: '',
-        fi: '',
-        sv: ''
+      courseData: {
+        id: instance.Course.id,
+        courseCode: instance.Course.courseCode,
+        minCredits: instance.Course.minCredits,
+        maxCredits: instance.Course.maxCredits,
+        department: {
+          en: '',
+          fi: '',
+          sv: ''
+        },
+        name: {
+          en: '',
+          fi: '',
+          sv: ''
+        },
+        evaluationInformation: {
+          en: '',
+          fi: '',
+          sv: ''
+        }
       }
     };
 
     instance.Course.CourseTranslations.forEach((translation: CourseTranslation) => {
       switch (translation.language) {
       case Language.English:
-        parsedInstanceData.department.en = translation.department;
-        parsedInstanceData.name.en = translation.courseName;
+        parsedInstanceData.courseData.department.en = translation.department;
+        parsedInstanceData.courseData.name.en = translation.courseName;
         break;
       case Language.Finnish:
-        parsedInstanceData.department.fi = translation.department;
-        parsedInstanceData.name.fi = translation.courseName;
+        parsedInstanceData.courseData.department.fi = translation.department;
+        parsedInstanceData.courseData.name.fi = translation.courseName;
         break;
       case Language.Swedish:
-        parsedInstanceData.department.sv = translation.department;
-        parsedInstanceData.name.sv = translation.courseName;
+        parsedInstanceData.courseData.department.sv = translation.department;
+        parsedInstanceData.courseData.name.sv = translation.courseName;
         break;
       }
     });
