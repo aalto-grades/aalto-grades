@@ -25,8 +25,7 @@ const PrivateRoute = ({ children }) => {
       setAuth({ role: response.role });
     } catch (exception) {
       console.error(exception);
-    }
-    finally {
+    } finally {
       // token has been retrieved, can load page
       setLoading(false);
     }

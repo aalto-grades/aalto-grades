@@ -10,7 +10,7 @@ import AuthContext from '../context/authProvider';
 const useAuth = () => {
   const { auth } = useContext(AuthContext);
 
-  // debug indormation is displayed within the react dev tools
+  // debug information is displayed within the react dev tools
   useDebugValue(auth, auth => auth?.role ? 'Logged In' : 'Logged Out');
   return useContext(AuthContext);
 };
