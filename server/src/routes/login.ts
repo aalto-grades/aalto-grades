@@ -20,7 +20,7 @@ interface SignupRequest {
   role: UserRole,
 }
 
-const signupSchema = yup.object().shape({
+const signupSchema: yup.AnyObjectSchema = yup.object().shape({
   username: yup.string().required(),
   password: yup.string().required(),
   email: yup.string().required(),
@@ -36,7 +36,7 @@ interface JwtClaims {
 export async function authLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
   passport.authenticate(
     'login',
-    async (err: any, loginResult: LoginResult | boolean, options: IVerifyOptions | null | undefined) => {
+    async (err: unknown, loginResult: LoginResult | boolean, options: IVerifyOptions | null | undefined) => {
       try {
         if (err) {
           return next(err);
@@ -51,7 +51,7 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
         req.login(
           loginResult,
           { session: false },
-          async (error: any) => {
+          async (error: unknown) => {
             if (error) {
               return next(error);
             }
@@ -98,7 +98,7 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  const request = req.body as SignupRequest;
+  const request: SignupRequest = req.body as SignupRequest;
 
   try {
     // TODO signup
@@ -149,7 +149,7 @@ passport.use(
       usernameField: 'username',
       passwordField: 'password'
     },
-    async (username: string, password: string, done: (error: any, user?: any, options?: IVerifyOptions) => void) => {
+    async (username: string, password: string, done: (error: unknown | null, user?: LoginResult | false, options?: IVerifyOptions) => void) => {
       try {
         const role: LoginResult = await validateLogin(username, password);
         return done(null, role, { message: 'success' });
