@@ -50,7 +50,7 @@ describe('Test signup route', () => {
         expect(res.body.error).toMatch('user exists already');
       });
   });
-  it('should error when the signup format is off', async () => {
+  it('should error when the signup format is incorrect', async () => {
     return request.post('/v1/auth/signup')
       .set('Accept', 'application/json')
       .send({ email: 'sysadmin@aalto.fi', password: 'grades' })
