@@ -15,7 +15,7 @@ export interface LocalizedString {
 }
 
 export interface CourseData {
-  id: number | string,
+  id?: number,
   courseCode: string,
   minCredits: number,
   maxCredits: number,
@@ -24,7 +24,9 @@ export interface CourseData {
   evaluationInformation: LocalizedString
 }
 
-export interface InstanceData extends CourseData {
+export interface InstanceData {
+  courseData: CourseData,
+  id: number | string,
   startingPeriod: string,
   endingPeriod: string
   startDate: Date,
@@ -42,26 +44,7 @@ export enum Language {
 
 function parseSisuInstance(instance: SisuInstance): InstanceData {
   return {
-    // instance id here is Sisu instance id (string)
     id: instance.id,
-    courseCode: instance.code,
-    minCredits: instance.credits.min,
-    maxCredits: instance.credits.max,
-    department: {
-      en: instance.organizationName.en,
-      fi: instance.organizationName.fi,
-      sv: instance.organizationName.sv
-    },
-    name: {
-      en: instance.name.en,
-      fi: instance.name.fi,
-      sv: instance.name.sv
-    },
-    evaluationInformation: {
-      en: instance.summary.assesmentMethods.en,
-      fi: instance.summary.assesmentMethods.fi,
-      sv: instance.summary.assesmentMethods.sv
-    },
     startingPeriod: '-',
     endingPeriod: '-',
     startDate: instance.startDate,
@@ -69,7 +52,27 @@ function parseSisuInstance(instance: SisuInstance): InstanceData {
     // TODO use enums here
     courseType: instance.type === 'exam-exam' ? 'EXAM' : 'LECTURE',
     gradingType: instance.summary.gradingScale.fi === '0-5' ? 'NUMERICAL' : 'PASSFAIL',
-    responsibleTeachers: instance.summary.teacherInCharge
+    responsibleTeachers: instance.summary.teacherInCharge,
+    courseData: {
+      courseCode: instance.code,
+      minCredits: instance.credits.min,
+      maxCredits: instance.credits.max,
+      department: {
+        en: instance.organizationName.en,
+        fi: instance.organizationName.fi,
+        sv: instance.organizationName.sv
+      },
+      name: {
+        en: instance.name.en,
+        fi: instance.name.fi,
+        sv: instance.name.sv
+      },
+      evaluationInformation: {
+        en: instance.summary.assesmentMethods.en,
+        fi: instance.summary.assesmentMethods.fi,
+        sv: instance.summary.assesmentMethods.sv
+      }
+    }
   };
 }
 

@@ -91,12 +91,6 @@ describe('Test GET /v1/courses/sisu/instance/:instanceId', () => {
     expect(res.body.instance).toBeDefined();
     expect(res.body.error).not.toBeDefined();
     expect(res.body.instance.id).toBe(sisuInstance.id);
-    expect(res.body.instance.courseCode).toBeDefined();
-    expect(res.body.instance.minCredits).toBeDefined();
-    expect(res.body.instance.maxCredits).toBeDefined();
-    expect(res.body.instance.department).toBeDefined();
-    expect(res.body.instance.name).toBeDefined();
-    expect(res.body.instance.evaluationInformation).toBeDefined();
     expect(res.body.instance.startingPeriod).toBeDefined();
     expect(res.body.instance.endingPeriod).toBeDefined();
     expect(res.body.instance.startDate).toBeDefined();
@@ -104,6 +98,12 @@ describe('Test GET /v1/courses/sisu/instance/:instanceId', () => {
     expect(res.body.instance.courseType).toBeDefined();
     expect(res.body.instance.gradingType).toBeDefined();
     expect(res.body.instance.responsibleTeachers).toBeDefined();
+    expect(res.body.instance.courseData.courseCode).toBeDefined();
+    expect(res.body.instance.courseData.minCredits).toBeDefined();
+    expect(res.body.instance.courseData.maxCredits).toBeDefined();
+    expect(res.body.instance.courseData.department).toBeDefined();
+    expect(res.body.instance.courseData.name).toBeDefined();
+    expect(res.body.instance.courseData.evaluationInformation).toBeDefined();
     expect(res.status).toEqual(200);
   });
 
@@ -131,12 +131,12 @@ describe('Test GET /v1/courses/sisu/:courseId', () => {
     expect(res.body.error).not.toBeDefined();
     expect(res.body.instances.length).toBe(5);
     expect(res.body.instances[0].id).toBe(sisuInstance.id);
-    expect(res.body.instances[0].courseCode).toBeDefined();
-    expect(res.body.instances[0].minCredits).toBeDefined();
-    expect(res.body.instances[0].maxCredits).toBeDefined();
-    expect(res.body.instances[0].department).toBeDefined();
-    expect(res.body.instances[0].name).toBeDefined();
-    expect(res.body.instances[0].evaluationInformation).toBeDefined();
+    expect(res.body.instances[0].courseData.courseCode).toBeDefined();
+    expect(res.body.instances[0].courseData.minCredits).toBeDefined();
+    expect(res.body.instances[0].courseData.maxCredits).toBeDefined();
+    expect(res.body.instances[0].courseData.department).toBeDefined();
+    expect(res.body.instances[0].courseData.name).toBeDefined();
+    expect(res.body.instances[0].courseData.evaluationInformation).toBeDefined();
     expect(res.body.instances[0].startingPeriod).toBeDefined();
     expect(res.body.instances[0].endingPeriod).toBeDefined();
     expect(res.body.instances[0].startDate).toBeDefined();
