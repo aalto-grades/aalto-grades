@@ -23,8 +23,7 @@ const PrivateRoute = ({ children }) => {
     try {
       const response = await userService.getRefreshToken();
       setAuth({ role: response.role });
-    }
-    catch (exception) {
+    } catch (exception) {
       console.error(exception);
     }
     finally {
