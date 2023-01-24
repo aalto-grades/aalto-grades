@@ -8,9 +8,9 @@ import { Op } from 'sequelize';
 
 export type PlainPassword = string;
 export enum UserRole {
-  Student,
-  Teacher,
-  Admin,
+  Student = 'STUDENT',
+  Teacher = 'TEACHER',
+  Admin = 'ADMIN',
 }
 export interface LoginResult {
   role: UserRole,

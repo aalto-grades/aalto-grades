@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { NextFunction, Request, Response } from 'express';
+import * as yup from 'yup';
 import jwt from 'jsonwebtoken';
 import { Strategy as JWTStrategy, VerifiedCallback } from 'passport-jwt';
 import passport from 'passport';
@@ -19,30 +20,17 @@ interface SignupRequest {
   role: UserRole,
 }
 
+const signupSchema = yup.object().shape({
+  username: yup.string().required(),
+  password: yup.string().required(),
+  email: yup.string().required(),
+  studentID: yup.string().required(),
+  role: yup.string().oneOf(['ADMIN', 'STUDENT', 'TEACHER']),
+});
+
 interface JwtClaims {
   role: UserRole,
   id: number,
-}
-
-function validateUserRole(role: any): role is UserRole {
-  return typeof role === 'string' && (
-    role === 'Teacher' ||
-    role === 'Student' ||
-    role === 'Admin'
-  );
-}
-
-function validateSignupFormat(body: any): body is SignupRequest {
-  return body &&
-    body.username &&
-    body.password &&
-    body.email &&
-    body.studentID &&
-    validateUserRole(body.role) &&
-    typeof body.username === 'string' &&
-    typeof body.password === 'string' &&
-    typeof body.email === 'string' &&
-    typeof body.studentID === 'string';
 }
 
 export async function authLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -102,7 +90,7 @@ export async function authLogout(_req: Request, res: Response): Promise<void> {
 }
 
 export async function authSignup(req: Request, res: Response): Promise<void> {
-  if (!validateSignupFormat(req.body)) {
+  if (!signupSchema.validate(req.body)) {
     res.status(400).send({
       success: false,
       error: 'Invalid signup request format',
@@ -110,9 +98,11 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
     return;
   }
 
+  const request = req.body as SignupRequest;
+
   try {
     // TODO signup
-    const id: number = await performSignup(req.body.username, req.body.email, req.body.password, req.body.studentID);
+    const id: number = await performSignup(request.username, request.email, request.password, request.studentID);
     const body: JwtClaims = {
       role: req.body.role,
       id,
