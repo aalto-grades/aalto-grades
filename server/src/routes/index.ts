@@ -10,6 +10,7 @@ import { authLogin, authLogout, authSelfInfo, authSignup } from './login';
 import passport from 'passport';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import { frontendOrigin } from '../configs';
 
 export const router: Router = Router();
 
@@ -35,6 +36,6 @@ router.get('*', (req: Request, res: Response) => {
 });
 
 router.use(cors({
-  origin: 'http://localhost:3005',
+  origin: frontendOrigin,
   credentials: true, 
 }));
