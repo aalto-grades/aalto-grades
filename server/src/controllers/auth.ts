@@ -10,6 +10,7 @@ export enum UserRole {
   Student = 'STUDENT',
   Teacher = 'TEACHER',
   Admin = 'ADMIN',
+  Assistant = 'ASSISTANT',
 }
 export interface LoginResult {
   role: UserRole,
