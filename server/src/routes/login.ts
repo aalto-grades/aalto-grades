@@ -13,7 +13,7 @@ import { Strategy as LocalStrategy } from 'passport-local';
 import { jwtSecret, testEnv } from '../configs';
 
 interface SignupRequest {
-  username: string,
+  username: string, // In fact a personal name. Frontend-facing breaking API change could be negotiated to clarify this.
   password: PlainPassword,
   email: string,
   studentID: string,

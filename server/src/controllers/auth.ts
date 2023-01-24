@@ -4,7 +4,6 @@
 
 import User from '../database/models/user';
 import argon from 'argon2';
-import { Op } from 'sequelize';
 
 export type PlainPassword = string;
 export enum UserRole {
@@ -35,11 +34,11 @@ export class InvalidFormat extends Error {
   }
 }
 
-export async function validateLogin(username: string, password: PlainPassword): Promise<LoginResult> {
+export async function validateLogin(email: string, password: PlainPassword): Promise<LoginResult> {
   const user: User | null = await User.findOne({
     attributes: ['id', 'password'],
     where: {
-      email: username,
+      email: email,
     }
   });
   if (user === null) {
@@ -55,13 +54,10 @@ export async function validateLogin(username: string, password: PlainPassword): 
   };
 }
 
-export async function performSignup(username: string, email: string, plainPassword: PlainPassword, studentId: string): Promise<number> {
+export async function performSignup(name: string, email: string, plainPassword: PlainPassword, studentId: string): Promise<number> {
   const exists: User | null = await User.findOne({
     where: {
-      [Op.or]: [
-        { email },
-        { name: username },
-      ]
+      email: email,
     }
   });
 
@@ -71,10 +67,10 @@ export async function performSignup(username: string, email: string, plainPasswo
 
   try {
     const model: User = await User.create({
-      name: username,
-      email,
+      name: name,
+      email: email,
       password: await argon.hash(plainPassword.trim()),
-      studentId,
+      studentId: studentId,
     });
     return model.id;
   } catch (_e) {
