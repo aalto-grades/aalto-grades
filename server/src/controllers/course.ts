@@ -15,7 +15,8 @@ export interface LocalizedString {
 }
 
 export interface CourseData {
-  id?: number,
+  // course id is either number type id in grades db or undefined when representing parsed sisu data
+  id?: number | undefined,
   courseCode: string,
   minCredits: number,
   maxCredits: number,
@@ -26,6 +27,7 @@ export interface CourseData {
 
 export interface InstanceData {
   courseData: CourseData,
+  // instance id is either Sisu instance id (string) or number type id in grades db
   id: number | string,
   startingPeriod: string,
   endingPeriod: string
@@ -44,6 +46,7 @@ export enum Language {
 
 function parseSisuInstance(instance: SisuInstance): InstanceData {
   return {
+    // instance id is either Sisu instance id (string) or number type id in grades db
     id: instance.id,
     startingPeriod: '-',
     endingPeriod: '-',
