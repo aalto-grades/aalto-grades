@@ -42,7 +42,7 @@ describe('Test signup route', () => {
   it('should prevent creating a new account with a previously registered email', async () => {
     return request.post('/v1/auth/signup')
       .set('Accept', 'application/json')
-      .send({ email: 'sysadmin@aalto.fi', username: 'aalto', password: 'grades', studentID: '123456', role: 'Admin' })
+      .send({ email: 'sysadmin@aalto.fi', username: 'aalto', password: 'grades', studentID: '123456', role: 'ADMIN' })
       .expect(400)
       .expect('Content-Type', /json/)
       .then((res: supertest.Response) => {
@@ -68,7 +68,7 @@ describe('Test signup route', () => {
       .expect(401);
     await request.post('/v1/auth/signup')
       .set('Accept', 'application/json')
-      .send({ email: 'sysadmin2@aalto.fi', username: 'aalto2', password: 'grades2', studentID: '123457', role: 'Admin' })
+      .send({ email: 'sysadmin2@aalto.fi', username: 'aalto2', password: 'grades2', studentID: '123457', role: 'ADMIN' })
       .expect(200)
       .expect('Content-Type', /json/)
       .then((res: supertest.Response) => {
