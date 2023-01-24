@@ -25,7 +25,7 @@ const signupSchema: yup.AnyObjectSchema = yup.object().shape({
   password: yup.string().required(),
   email: yup.string().required(),
   studentID: yup.string().required(),
-  role: yup.string().oneOf(['ADMIN', 'STUDENT', 'TEACHER']),
+  role: yup.string().oneOf(['ADMIN', 'STUDENT', 'TEACHER', 'ASSISTANT']).required(),
 });
 
 interface JwtClaims {
@@ -90,7 +90,7 @@ export async function authLogout(_req: Request, res: Response): Promise<void> {
 }
 
 export async function authSignup(req: Request, res: Response): Promise<void> {
-  if (!signupSchema.validate(req.body)) {
+  if (!(await signupSchema.isValid(req.body))) {
     res.status(400).send({
       success: false,
       error: 'Invalid signup request format',
