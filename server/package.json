@@ -8,7 +8,7 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node build/src/server.js",
-    "test": "jest --detectOpenHandles",
+    "test": "jest --verbose --detectOpenHandles --coverage",
     "lint": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'`",
     "lint:fix": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'` --fix",
     "migration:up": "npx sequelize-cli db:migrate",
@@ -25,6 +25,7 @@
     "@types/sequelize": "^4.28.14",
     "argon2": "=0.27.2",
     "cookie-parser": "^1.4.6",
+    "axios": "^1.2.3",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
