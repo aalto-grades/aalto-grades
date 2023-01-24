@@ -14,7 +14,7 @@ export enum UserRole {
 }
 export interface LoginResult {
   role: UserRole,
-	id: number,
+  id: number,
 }
 
 export class InvalidCredentials extends Error {
