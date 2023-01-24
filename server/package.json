@@ -8,7 +8,7 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node build/src/server.js",
-    "test": "jest --detectOpenHandles",
+    "test": "jest --verbose --detectOpenHandles --coverage",
     "lint": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'`",
     "lint:fix": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'` --fix",
     "migration:up": "npx sequelize-cli db:migrate",
@@ -19,6 +19,7 @@
   "dependencies": {
     "@types/express": "^4.17.14",
     "@types/node": "^18.11.9",
+    "axios": "^1.2.3",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "pg": "^8.8.0",
