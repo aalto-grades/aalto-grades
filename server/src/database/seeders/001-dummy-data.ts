@@ -5,8 +5,6 @@
 import { QueryInterface, Transaction } from 'sequelize';
 import fs from 'fs';
 import path from 'path';
-import User from '../models/user';
-import argon2 from 'argon2';
 const users: string = fs.readFileSync(path.resolve(__dirname, '../../../../mockdata/users.sql'), 'utf8');
 const courses: string = fs.readFileSync(path.resolve(__dirname, '../../../../mockdata/courses.sql'), 'utf8');
 const courseInstances: string = fs.readFileSync(path.resolve(__dirname, '../../../../mockdata/course_instances.sql'), 'utf8');
@@ -16,22 +14,10 @@ export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction: Transaction = await queryInterface.sequelize.transaction();
     try {
-      console.log('prior to users');
       await queryInterface.sequelize.query(users, { transaction });
-      console.log('prior to courses');
       await queryInterface.sequelize.query(courses, { transaction });
-      console.log('prior to course instances');
       await queryInterface.sequelize.query(courseInstances, { transaction });
-      console.log('prior to course translation');
       await queryInterface.sequelize.query(courseTranslation, { transaction });
-      console.log('prior to argon2');
-      await User.create({
-        name: 'aalto',
-        email: 'sysadmin@aalto.fi',
-        password: await argon2.hash('grades'),
-        studentId: '000000',
-      });
-      console.log('after argon2');
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
