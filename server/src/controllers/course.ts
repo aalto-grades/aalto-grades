@@ -40,7 +40,7 @@ export enum Language {
   Swedish = 'SV'
 }
 
-function parseSisuInstance (instance: SisuInstance): InstanceData {
+function parseSisuInstance(instance: SisuInstance): InstanceData {
   return {
     // instance id here is Sisu instance id (string)
     id: instance.id,
