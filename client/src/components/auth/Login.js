@@ -21,7 +21,7 @@ const Login = () => {
     try {
       const response = await userService.login(userObject);
       
-      // if login is successfull, save user role to context
+      // if login is successful, save user role to context
       setAuth({ role: response.role });
 
       navigate('/', { replace: true });

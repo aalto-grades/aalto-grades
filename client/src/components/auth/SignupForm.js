@@ -17,7 +17,7 @@ const SignupForm = ({ addUser }) => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [studentID, setStudentID] = useState('');
-  const [role, setRole] = useState('Teacher');
+  const [role, setRole] = useState('TEACHER');
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -86,12 +86,13 @@ const SignupForm = ({ addUser }) => {
           justifyContent='center'
         >
           <RadioGroup
-            defaultValue='teacher'
+            defaultValue='TEACHER'
             name='radio-buttons-group'
             onChange={({ target }) => setRole(target.value)}>
-            <FormControlLabel value='Teacher' control={<Radio />} label='Teacher' />
-            <FormControlLabel value='Student' control={<Radio />} label='Student' />
-            <FormControlLabel value='Admin' control={<Radio />} label='Admin' />
+            <FormControlLabel value='TEACHER' control={<Radio />} label='Teacher' />
+            <FormControlLabel value='STUDENT' control={<Radio />} label='Student' />
+            <FormControlLabel value='ASSISTANT' control={<Radio />} label='Assistant' />
+            <FormControlLabel value='SYSADMIN' control={<Radio />} label='Admin' />
           </RadioGroup>
         </Grid>
         <Button type='submit'>sign up</Button>

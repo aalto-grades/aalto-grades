@@ -62,7 +62,7 @@ describe('Tests for Login component', () => {
       password: 'secret',
       email: 'test@email.com',
       studentID: '010101',
-      role: 'Teacher'
+      role: 'TEACHER'
     });
   });
 
