@@ -4,15 +4,13 @@
 
 import { app } from './app';
 import { connectToDatabase } from './database/index';
+import { PORT } from './configs/environment';
 
-const parsedPort: number = Number(process.env.AALTO_GRADES_BACKEND_PORT);
-const port: number = isNaN(parsedPort) ? 3000 : parsedPort;
-
-app.listen(port, async () => {
+app.listen(PORT, async () => {
   try {
     await connectToDatabase();
   } catch (error) {
     console.log(error);
   }
-  console.log(`Server running on port ${port}`);
+  console.log(`Server running on port ${PORT}`);
 });
