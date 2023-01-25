@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import textFormatServices from '../../services/textFormat';
 
-const LightLabelboldValue = ({ label, value }) => {
+const LightLabelBoldValue = ({ label, value }) => {
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', columnGap: 1 }}>
       <Typography variant='body2'>{label + ':'}</Typography>
@@ -18,7 +18,7 @@ const LightLabelboldValue = ({ label, value }) => {
   );
 };
 
-LightLabelboldValue.propTypes = {
+LightLabelBoldValue.propTypes = {
   label: PropTypes.string,
   value: PropTypes.oneOfType([
     PropTypes.string,
@@ -27,7 +27,7 @@ LightLabelboldValue.propTypes = {
 };
 
 const OngoingInstanceInfo = ({ info }) => {
-  const { period, startDate, endDate, type, credits, scale, organizer, institution } = info;
+  const { period, startDate, endDate, type, credits, scale, organizer, institution, teachers } = info;
 
   return(
     <Box sx={{ display: 'inline-block', pt: 1.5 }}>
@@ -36,21 +36,20 @@ const OngoingInstanceInfo = ({ info }) => {
         <Button>See attendees</Button>
       </Box>
       <Box textAlign='left' borderRadius={1} sx={{ bgcolor: 'secondary.light', p: 1.5, minWidth: '190px' }}>
-        <LightLabelboldValue label='Teaching Period' value={period} />
-        <LightLabelboldValue label='Starting Date' value={textFormatServices.formatDate(startDate)} />
-        <LightLabelboldValue label='Ending Date' value={textFormatServices.formatDate(endDate)} />
-        <LightLabelboldValue label='Type' value={type} />
+        <LightLabelBoldValue label='Teaching Period' value={period} />
+        <LightLabelBoldValue label='Starting Date' value={textFormatServices.formatDate(startDate)} />
+        <LightLabelBoldValue label='Ending Date' value={textFormatServices.formatDate(endDate)} />
+        <LightLabelBoldValue label='Type' value={type} />
       </Box>
       <Box textAlign='left' borderRadius={1} sx={{ bgcolor: 'secondary.light', p: 1.5, mt: 1, minWidth: '190px' }}>
-        <LightLabelboldValue label='Credits' value={credits} />
-        <LightLabelboldValue label='Grading Scale' value={scale} />
-        <LightLabelboldValue label='Organizer' value={organizer} />
-        <LightLabelboldValue label='Educational Institution' value={institution} />
+        <LightLabelBoldValue label='Credits' value={credits} />
+        <LightLabelBoldValue label='Grading Scale' value={scale} />
+        <LightLabelBoldValue label='Organizer' value={organizer} />
+        <LightLabelBoldValue label='Educational Institution' value={institution} />
       </Box>
       <Box sx={{ m: 1.5 }}>
         <Typography variant='h6' align='left' sx={{ pt: 1.5, pb: 1 }}>Responsible Teachers</Typography>
-        <Typography align='left'>Elisa Mekler (you)</Typography>
-        <Typography align='left'>David McGookin</Typography>
+        {teachers.map( (teacher) => <Typography align='left' key={teacher} >{teacher}</Typography> )}
       </Box>
     </Box>
   );
@@ -65,7 +64,8 @@ OngoingInstanceInfo.propTypes = {
   credits: PropTypes.number,
   scale: PropTypes.string,
   organizer: PropTypes.string,
-  institution: PropTypes.string
+  institution: PropTypes.string,
+  teachers: PropTypes.array
 };
 
 export default OngoingInstanceInfo;

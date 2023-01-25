@@ -29,7 +29,7 @@ describe('Tests for CourseView component', () => {
     const exampleOfInstancePeriod = screen.getByText('2020-2021 Autumn I-II');
 
     expect(instanceInfo).toBeDefined();
-    expect(teachersInfo ).toBeDefined();
+    expect(teachersInfo).toBeDefined();
     expect(assignments).toBeDefined();
     expect(exercises).toBeDefined();
     expect(projects).toBeDefined();

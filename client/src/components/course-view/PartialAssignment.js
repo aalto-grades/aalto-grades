@@ -7,10 +7,11 @@ import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import textFormatServices from '../../services/textFormat';
 
 
-const PartialAssignment = ({ courseInstance }) => {
-  const { type, description, points, weight } = courseInstance;
+const PartialAssignment = ({ assignment }) => {
+  const { type, description, points, weight, expiryDate } = assignment;
 
   return (
     <Box boxShadow={1} borderRadius={1} sx={{ pt: 1.5, pr: 1, pb: 1, pl: 3, width: '718px', bgcolor: 'white' }}>
@@ -23,10 +24,8 @@ const PartialAssignment = ({ courseInstance }) => {
         <Typography variant='body2'>{'Weight: ' + Math.round(weight * 100) + ' %'}</Typography>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography align='left' variant='caption'>Expiry date: 14.9.2024</Typography>
-        <Button>
-            Edit
-        </Button>
+        <Typography align='left' variant='caption'>{'Expiry date: ' + textFormatServices.formatDate(expiryDate)}</Typography>
+        <Button>Edit</Button>
       </Box>
     </Box>
   );
@@ -34,7 +33,7 @@ const PartialAssignment = ({ courseInstance }) => {
 
 
 PartialAssignment.propTypes = {
-  courseInstance: PropTypes.object,
+  assignment: PropTypes.object,
   type: PropTypes.string,
   description: PropTypes.string, 
   points: PropTypes.number, 
