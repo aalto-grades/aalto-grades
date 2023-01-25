@@ -21,4 +21,5 @@ INSERT INTO public.user (email, student_id, password, name, created_at, updated_
 ('mary.christie@aalto.fi', '216384', 'dsyqoqhkqkolscsudvnamtwmdryftfltgxlxcmtmolodgghygxjvuxhscvun', 'Mary Christie', '2020-2-14', '2022-10-10'),
 ('lawrence.smith@aalto.fi', '573857', 'fuqsorgejwmeslcgxelvuoionwkrflyoabwcsduktgxlhqmtuoxpygpopeph', 'Lawrence Smith', '2021-6-6', '2022-1-10'),
 ('joshua.mann@aalto.fi', '169639', 'emzrjejhikwpmrhhgpoeitnbwpzfjbmdlchmqmdhzigtyvcqoedwdcmlnjlk', 'Joshua Mann', '2020-1-15', '2022-7-8'),
-('theresa.lowery@aalto.fi', '581953', 'elomazckdrcmoibgpynvdivoakvpfhgqwrwbhdpjyaihddcwhdlukrasajnh', 'Theresa Lowery', '2021-5-19', '2022-6-4');
+('theresa.lowery@aalto.fi', '581953', 'elomazckdrcmoibgpynvdivoakvpfhgqwrwbhdpjyaihddcwhdlukrasajnh', 'Theresa Lowery', '2021-5-19', '2022-6-4'),
+('sysadmin@aalto.fi', '000000', '$argon2id$v=19$m=16,t=2,p=1$b005WTVET0RNbDRUWTBweg$cbF8wtyWQsJBNFTvj7fpnA', 'Aalto Sysadmin', '2023-1-23', '2023-1-24');
