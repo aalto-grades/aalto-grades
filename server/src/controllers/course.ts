@@ -162,7 +162,7 @@ export async function fetchInstanceFromSisu(req: Request, res: Response): Promis
     
 export async function getAllCourseInstances(req: Request, res: Response): Promise<Response> {
   try {
-    const courseId: number = Number(req.params.courseId)
+    const courseId: number = Number(req.params.courseId);
     await idSchema.validate({ id: courseId });
     const instances: Array<CourseInstance> = await courseService.findAllInstances(courseId);
 

@@ -88,44 +88,45 @@ describe('Test GET /v1/courses/:courseId/instances', () => {
     expect(res.statusCode).toBe(200);
 
     expect(res.body).toStrictEqual({
-      "success":true,
-      "instances":[
+      'success':true,
+      'instances':[
         {
-          "courseId":1,
-          "gradingType":"NUMERICAL",
-          "startingPeriod":"I",
-          "endingPeriod":"II"
+          'courseId':1,
+          'gradingType':'NUMERICAL',
+          'startingPeriod':'I',
+          'endingPeriod':'II'
         },
         {
-          "courseId":1,
-          "gradingType":"PASSFAIL",
-          "startingPeriod":"I",
-          "endingPeriod":"II"
+          'courseId':1,
+          'gradingType':'PASSFAIL',
+          'startingPeriod':'I',
+          'endingPeriod':'II'
         },
         {
-          "courseId":1,
-          "gradingType":"PASSFAIL",
-          "startingPeriod":"I",
-          "endingPeriod":"II"
+          'courseId':1,
+          'gradingType':'PASSFAIL',
+          'startingPeriod':'I',
+          'endingPeriod':'II'
         },
         {
-          "courseId":1,
-          "gradingType":"NUMERICAL",
-          "startingPeriod":"III",
-          "endingPeriod":"V"
+          'courseId':1,
+          'gradingType':'NUMERICAL',
+          'startingPeriod':'III',
+          'endingPeriod':'V'
         },
         {
-          "courseId":1,
-          "gradingType":"PASSFAIL",
-          "startingPeriod":"I",
-          "endingPeriod":"II"
+          'courseId':1,
+          'gradingType':'PASSFAIL',
+          'startingPeriod':'I',
+          'endingPeriod':'II'
         },
         {
-          "courseId":1,
-          "gradingType":"PASSFAIL",
-          "startingPeriod":"V",
-          "endingPeriod":"V"}
-    ]});
+          'courseId':1,
+          'gradingType':'PASSFAIL',
+          'startingPeriod':'V',
+          'endingPeriod':'V'
+        }
+      ]});
   });
 
   it('should respond with error if course does not exist', async () => {
