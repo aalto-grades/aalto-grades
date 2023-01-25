@@ -9,14 +9,14 @@ import TextField from '@mui/material/TextField';
 
 const LoginForm = ({ loginUser }) => {
 
-  const [username, setUsername] = useState(''); 
+  const [email, setEmail] = useState(''); 
   const [password, setPassword] = useState('');
 
   const handleSubmit = (event) => {
     event.preventDefault();
     try {
       const userObject = ({
-        username,
+        email,
         password,
       });
       loginUser(userObject);
@@ -30,11 +30,11 @@ const LoginForm = ({ loginUser }) => {
       <form onSubmit={handleSubmit}>
         <div>
           <TextField
-            type='text'
-            value={username}
-            name='username'
-            label='Username'
-            onChange={({ target }) => setUsername(target.value)}
+            type='email'
+            value={email}
+            name='email'
+            label='Email'
+            onChange={({ target }) => setEmail(target.value)}
             InputLabelProps={{ shrink: true }}
             margin='normal'
           />

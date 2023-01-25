@@ -20,14 +20,14 @@ describe('Tests for Login component', () => {
       </BrowserRouter>
     );
 
-    const usernameField = screen.getByLabelText('Username');
+    const nameField = screen.getByLabelText('Name');
     const passwordField = screen.getByLabelText('Password');
     const emailField = screen.getByLabelText('Email');
     const studentIdField = screen.getByLabelText('Student ID');
     const signupButton = screen.getByText('sign up');
     const textElement = screen.getByText('Sign up');
 
-    expect(usernameField).toBeDefined();
+    expect(nameField).toBeDefined();
     expect(passwordField).toBeDefined();
     expect(emailField).toBeDefined();
     expect(studentIdField).toBeDefined();
@@ -42,13 +42,13 @@ describe('Tests for Login component', () => {
 
     render(<SignupForm addUser={mockSignupUser}/>);
 
-    const usernameField = screen.getByLabelText('Username');
+    const nameField = screen.getByLabelText('Name');
     const passwordField = screen.getByLabelText('Password');
     const emailField = screen.getByLabelText('Email');
     const studentIdField = screen.getByLabelText('Student ID');
     const signupButton = screen.getByText('sign up');
 
-    userEvent.type(usernameField, 'TestUser');
+    userEvent.type(nameField, 'Test User');
     userEvent.type(passwordField, 'secret');
     userEvent.type(emailField, 'test@email.com');
     userEvent.type(studentIdField, '010101');
@@ -58,7 +58,7 @@ describe('Tests for Login component', () => {
     
     expect(mockSignupUser).toHaveBeenCalledTimes(1);
     expect(mockSignupUser).toHaveBeenCalledWith({
-      username: 'TestUser',
+      name: 'Test User',
       password: 'secret',
       email: 'test@email.com',
       studentID: '010101',

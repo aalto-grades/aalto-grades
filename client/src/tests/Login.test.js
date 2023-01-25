@@ -20,12 +20,12 @@ describe('Tests for Login and LoginForm components', () => {
       </BrowserRouter>
     );
 
-    const usernameField = screen.getByLabelText('Username');
+    const emailField = screen.getByLabelText('Email');
     const passwordField = screen.getByLabelText('Password');
     const loginButton = screen.getByText('login');
     const textElement = screen.getByText('Don\'t have an account yet?');
 
-    expect(usernameField).toBeDefined();
+    expect(emailField).toBeDefined();
     expect(passwordField).toBeDefined();
     expect(loginButton).toBeDefined();
     expect(textElement).toBeDefined();
@@ -37,17 +37,17 @@ describe('Tests for Login and LoginForm components', () => {
 
     render(<LoginForm loginUser={mockLoginUser}/>);
 
-    const usernameField = screen.getByLabelText('Username');
+    const emailField = screen.getByLabelText('Email');
     const passwordField = screen.getByLabelText('Password');
     const loginButton = screen.getByText('login');
 
-    userEvent.type(usernameField, 'TestUser');
+    userEvent.type(emailField, 'test@email.com');
     userEvent.type(passwordField, 'secret');
     userEvent.click(loginButton);
     
     expect(mockLoginUser).toHaveBeenCalledTimes(1);
     expect(mockLoginUser).toHaveBeenCalledWith({
-      username: 'TestUser',
+      email: 'test@email.com',
       password: 'secret'
     });
   });

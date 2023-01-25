@@ -13,7 +13,7 @@ import Grid from '@mui/material/Grid';
 
 const SignupForm = ({ addUser }) => {
 
-  const [username, setUsername] = useState(''); 
+  const [name, setName] = useState(''); 
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [studentID, setStudentID] = useState('');
@@ -23,7 +23,7 @@ const SignupForm = ({ addUser }) => {
     event.preventDefault();
     try {
       const userObject = ({
-        username, password, email, studentID, role,
+        name, password, email, studentID, role,
       });
       addUser(userObject);
     } catch (exception) {
@@ -37,10 +37,10 @@ const SignupForm = ({ addUser }) => {
         <div>
           <TextField
             type='text'
-            value={username}
-            name='username'
-            label='Username'
-            onChange={({ target }) => setUsername(target.value)}
+            value={name}
+            name='name'
+            label='Name'
+            onChange={({ target }) => setName(target.value)}
             InputLabelProps={{ shrink: true }}
             margin='normal'
           />
