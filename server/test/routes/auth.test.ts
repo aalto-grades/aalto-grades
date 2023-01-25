@@ -8,7 +8,7 @@ import { UserRole } from '../../src/controllers/auth';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 
-describe('Test login route', () => {
+describe('Test POST /v1/auth/login', () => {
   it('should respond disallow logging in with invalid credentials', async () => {
     async function badCreds(credentials: { username: string, password: string }): Promise<void> {
       return request.post('/v1/auth/login')
@@ -38,7 +38,7 @@ describe('Test login route', () => {
   });
 });
 
-describe('Test signup route', () => {
+describe('Test POST /v1/auth/signup', () => {
   it('should prevent creating a new account with a previously registered email', async () => {
     return request.post('/v1/auth/signup')
       .set('Accept', 'application/json')
@@ -82,7 +82,7 @@ describe('Test signup route', () => {
   });
 });
 
-describe('Test session management', () => {
+describe('Test GET /v1/auth/self-info and cookies', () => {
   it('should act differently when user is logged in or out', async () => {
     // Use the agent for cookie persistence
     const agent: SuperAgentTest = supertest.agent(app);
