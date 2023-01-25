@@ -9,7 +9,7 @@ export type PlainPassword = string;
 export enum UserRole {
   Student = 'STUDENT',
   Teacher = 'TEACHER',
-  Admin = 'ADMIN',
+  Admin = 'SYSADMIN',
   Assistant = 'ASSISTANT',
 }
 export interface LoginResult {

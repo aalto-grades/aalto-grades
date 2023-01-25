@@ -25,7 +25,12 @@ const signupSchema: yup.AnyObjectSchema = yup.object().shape({
   password: yup.string().required(),
   email: yup.string().required(),
   studentID: yup.string().required(),
-  role: yup.string().oneOf(['ADMIN', 'STUDENT', 'TEACHER', 'ASSISTANT']).required(),
+  role: yup.string().oneOf([
+    UserRole.Admin,
+    UserRole.Assistant,
+    UserRole.Student,
+    UserRole.Teacher
+  ]).required(),
 });
 
 interface JwtClaims {
