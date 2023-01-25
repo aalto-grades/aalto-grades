@@ -54,7 +54,7 @@ services:
     restart: always
     profiles: ["dev"]
     ports:
-      - 8080:8080
+      - "8080:8080"
     networks:
       - local
 
