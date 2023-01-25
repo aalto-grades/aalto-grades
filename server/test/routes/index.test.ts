@@ -75,3 +75,67 @@ describe('Test GET /v1/user/:userId/courses', () => {
     expect(courses.previous[0].courseCode).toBe('TU-A1100');
   });
 });
+
+describe('Test GET /v1/courses/:courseId/instances', () => {
+
+  it('should respond with correct data', async () => {
+    const res: supertest.Response = await request.get('/v1/courses/1/instances');
+    expect(res.body.success).toBe(true);
+    expect(res.statusCode).toBe(200);
+
+    expect(res.body).toStrictEqual({
+      "success":true,
+      "instances":[
+        {
+          "courseId":1,
+          "gradingType":"NUMERICAL",
+          "startingPeriod":"I",
+          "endingPeriod":"II"
+        },
+        {
+          "courseId":1,
+          "gradingType":"PASSFAIL",
+          "startingPeriod":"I",
+          "endingPeriod":"II"
+        },
+        {
+          "courseId":1,
+          "gradingType":"PASSFAIL",
+          "startingPeriod":"I",
+          "endingPeriod":"II"
+        },
+        {
+          "courseId":1,
+          "gradingType":"NUMERICAL",
+          "startingPeriod":"III",
+          "endingPeriod":"V"
+        },
+        {
+          "courseId":1,
+          "gradingType":"PASSFAIL",
+          "startingPeriod":"I",
+          "endingPeriod":"II"
+        },
+        {
+          "courseId":1,
+          "gradingType":"PASSFAIL",
+          "startingPeriod":"V",
+          "endingPeriod":"V"}
+    ]});
+  });
+
+  it('should respond with error if course does not exist', async () => {
+    const res: supertest.Response = await request.get('/v1/courses/-1/instances');
+    expect(res.statusCode).toBe(404);
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors).toContain('course with id');
+  });
+
+  it('should respond with validation error if courseId is not a number', async () => {
+    const res: supertest.Response = await request.get('/v1/courses/a/instances');
+    expect(res.statusCode).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors).toContain('id must be a `number` type');
+  });
+
+});

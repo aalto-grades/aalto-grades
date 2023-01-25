@@ -13,14 +13,21 @@ export interface CourseWithTranslationAndInstance extends Course {
 }
 
 export async function findAllInstances(courseId: number): Promise<Array<CourseInstance>> {
+  const course: Array<Course> | null = await models.Course.findAll({
+    attributes: ['id'],
+    where: {
+      id: courseId
+    }
+  });
+  
+  if (course == null || course.length == 0) throw new Error (`course with id ${courseId} not found`);
+
   const instances: Array<CourseInstance> | null = await models.CourseInstance.findAll({
     attributes: ['courseId', 'gradingType', 'startingPeriod', 'endingPeriod'],
     where: {
       courseId: courseId
     }
   });
-
-  if (!instances) throw new Error (`Instances with an id ${courseId} not found`);
 
   return instances;
 }

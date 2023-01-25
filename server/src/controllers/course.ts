@@ -4,6 +4,7 @@
 
 import { Request, Response } from 'express';
 import { courseService } from '../services';
+import * as yup from 'yup';
 import CourseInstance from '../database/models/courseInstance';
 
 export interface LocalizedString {
@@ -38,6 +39,12 @@ export enum Language {
   Swedish = 'SV'
 }
 
+const idSchema: yup.AnyObjectSchema = yup.object().shape({
+  id: yup
+    .number()
+    .required()
+});
+
 export async function addCourse(req: Request, res: Response): Promise<void> {
   try {
     // TODO: add the course to the database
@@ -53,20 +60,35 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
   }
 }
     
-export async function getAllCourseInstances(req: Request, res: Response): Promise<void> {
+export async function getAllCourseInstances(req: Request, res: Response): Promise<Response> {
   try {
-    const courseId: number = Number(req.params.courseId);
+    const courseId: number = Number(req.params.courseId)
+    await idSchema.validate({ id: courseId });
     const instances: Array<CourseInstance> = await courseService.findAllInstances(courseId);
 
-    res.send({
+    return res.status(200).send({
       success: true,
       instances: instances,
     });
-  } catch (error) {
-    res.status(401);
-    res.send({
+
+  } catch (error: unknown) {
+    if (error instanceof yup.ValidationError) {
+      return res.status(400).send({
+        success: false,
+        error: error.errors
+      });
+    }
+    
+    if (error instanceof Error && error?.message.startsWith('course with id')) {
+      return res.status(404).send({
+        success: false,
+        error: error.message
+      });
+    }
+
+    return res.status(500).send({
       success: false,
-      error: error,
+      error: 'Internal Server Error'
     });
   }
 }
