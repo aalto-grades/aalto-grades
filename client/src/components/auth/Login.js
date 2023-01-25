@@ -28,7 +28,7 @@ const Login = () => {
 
     } catch (exception) {
       console.log(exception);
-      setErrorMessage('Invalid username or password');
+      setErrorMessage('Invalid email or password');
     }
   };
 

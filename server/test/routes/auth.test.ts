@@ -10,7 +10,7 @@ const request: supertest.SuperTest<supertest.Test> = supertest(app);
 
 describe('Test POST /v1/auth/login', () => {
   it('should respond disallow logging in with invalid credentials', async () => {
-    async function badCreds(credentials: { username: string, password: string }): Promise<void> {
+    async function badCreds(credentials: { email: string, password: string }): Promise<void> {
       return request.post('/v1/auth/login')
         .set('Accept', 'application/json')
         .send(credentials)
@@ -21,14 +21,14 @@ describe('Test POST /v1/auth/login', () => {
           expect(res.body.message).toMatch(/(invalid|Missing) credentials/);
         });
     }
-    await badCreds({ username: 'aalto', password: 'grades' });
-    await badCreds({ username: 'aalto', password: '' });
-    await badCreds({ username: 'sysadmin@aalto.fi', password: '' });
-    await badCreds({ username: 'sysadmin@aalto.fi', password: 'grade' });
+    await badCreds({ email: 'aalto', password: 'grades' });
+    await badCreds({ email: 'aalto', password: '' });
+    await badCreds({ email: 'sysadmin@aalto.fi', password: '' });
+    await badCreds({ email: 'sysadmin@aalto.fi', password: 'grade' });
   });
   it('should allow logging in with the correct credentials', async() => {
     await request.post('/v1/auth/login')
-      .send({ username: 'sysadmin@aalto.fi', password: 'grades' })
+      .send({ email: 'sysadmin@aalto.fi', password: 'grades' })
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res: supertest.Response) => {
@@ -42,7 +42,7 @@ describe('Test POST /v1/auth/signup', () => {
   it('should prevent creating a new account with a previously registered email', async () => {
     return request.post('/v1/auth/signup')
       .set('Accept', 'application/json')
-      .send({ email: 'sysadmin@aalto.fi', username: 'aalto', password: 'grades', studentID: '123456', role: 'SYSADMIN' })
+      .send({ email: 'sysadmin@aalto.fi', name: 'aalto', password: 'grades', studentID: '123456', role: 'SYSADMIN' })
       .expect(400)
       .expect('Content-Type', /json/)
       .then((res: supertest.Response) => {
@@ -64,11 +64,11 @@ describe('Test POST /v1/auth/signup', () => {
   it('should allow creation of a new account', async () => {
     await request.post('/v1/auth/login')
       .set('Accept', 'application/json')
-      .send({ username: 'sysadmin2@aalto.fi', password: 'grades2'})
+      .send({ email: 'sysadmin2@aalto.fi', password: 'grades2'})
       .expect(401);
     await request.post('/v1/auth/signup')
       .set('Accept', 'application/json')
-      .send({ email: 'sysadmin2@aalto.fi', username: 'aalto2', password: 'grades2', studentID: '123457', role: 'SYSADMIN' })
+      .send({ email: 'sysadmin2@aalto.fi', name: 'aalto2', password: 'grades2', studentID: '123457', role: 'SYSADMIN' })
       .expect(200)
       .expect('Content-Type', /json/)
       .then((res: supertest.Response) => {
@@ -77,7 +77,7 @@ describe('Test POST /v1/auth/signup', () => {
       });
     return request.post('/v1/auth/login')
       .set('Accept', 'application/json')
-      .send({ username: 'sysadmin2@aalto.fi', password: 'grades2'})
+      .send({ email: 'sysadmin2@aalto.fi', password: 'grades2'})
       .expect(200);
   });
 });
@@ -89,7 +89,7 @@ describe('Test GET /v1/auth/self-info and cookies', () => {
     await agent.get('/v1/auth/self-info').withCredentials(true).expect(401);
     await agent.post('/v1/auth/login')
       .withCredentials(true)
-      .send({ username: 'sysadmin@aalto.fi', password: 'grades' })
+      .send({ email: 'sysadmin@aalto.fi', password: 'grades' })
       .expect('Content-Type', /json/)
       .expect(200)
       .expect('set-cookie', /jwt=/)

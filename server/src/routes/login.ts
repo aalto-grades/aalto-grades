@@ -13,7 +13,7 @@ import { Strategy as LocalStrategy } from 'passport-local';
 import { jwtSecret, testEnv } from '../configs';
 
 interface SignupRequest {
-  username: string, // In fact a personal name. Frontend-facing breaking API change could be negotiated to clarify this.
+  name: string,
   password: PlainPassword,
   email: string,
   studentID: string,
@@ -21,7 +21,7 @@ interface SignupRequest {
 }
 
 const signupSchema: yup.AnyObjectSchema = yup.object().shape({
-  username: yup.string().required(),
+  name: yup.string().required(),
   password: yup.string().required(),
   email: yup.string().required(),
   studentID: yup.string().required(),
@@ -107,7 +107,7 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
 
   try {
     // TODO signup
-    const id: number = await performSignup(request.username, request.email, request.password, request.studentID);
+    const id: number = await performSignup(request.name, request.email, request.password, request.studentID);
     const body: JwtClaims = {
       role: req.body.role,
       id,
@@ -151,12 +151,12 @@ passport.use(
   'login',
   new LocalStrategy(
     {
-      usernameField: 'username',
+      usernameField: 'email',
       passwordField: 'password'
     },
-    async (username: string, password: string, done: (error: unknown | null, user?: LoginResult | false, options?: IVerifyOptions) => void) => {
+    async (email: string, password: string, done: (error: unknown | null, user?: LoginResult | false, options?: IVerifyOptions) => void) => {
       try {
-        const role: LoginResult = await validateLogin(username, password);
+        const role: LoginResult = await validateLogin(email, password);
         return done(null, role, { message: 'success' });
       } catch (error) {
         if (error instanceof InvalidCredentials) {
