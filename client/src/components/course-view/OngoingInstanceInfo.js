@@ -7,24 +7,8 @@ import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 import textFormatServices from '../../services/textFormat';
-
-const LightLabelBoldValue = ({ label, value }) => {
-  return (
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', columnGap: 1 }}>
-      <Typography variant='body2'>{label + ':'}</Typography>
-      <Typography variant='body2' sx={{ fontWeight: 'bold' }}>{value}</Typography>
-    </Box>
-  );
-};
-
-LightLabelBoldValue.propTypes = {
-  label: PropTypes.string,
-  value: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number
-  ]),
-};
 
 const OngoingInstanceInfo = ({ info }) => {
   const { period, startDate, endDate, type, credits, scale, organizer, institution, teachers } = info;

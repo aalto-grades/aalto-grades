@@ -10,6 +10,8 @@ import Signup from './components/auth/Signup';
 import FrontPage from './components/FrontPage';
 import CourseView from './components/CourseView';
 import CreateCourseView from './components/CreateCourseView';
+import FetchInstancesView from './components/FetchInstancesView';
+import EditInstanceView from './components/EditInstanceView';
 import Link from '@mui/material/Link';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
@@ -86,6 +88,8 @@ function App() {
               <Route path='/' element={<FrontPage/>} />
               <Route path='/create-course' element={<CreateCourseView/>}/>
               <Route path='/course-view/:courseCode' element={<CourseView/>}/>  {/* Add nested routes when needed */}
+              <Route path='/fetch-instances/:courseCode' element={<FetchInstancesView/>}/>
+              <Route path='/edit-instance/:instanceId' element={<EditInstanceView/>}/>
             </Route>
           </Routes>
         </Box>
