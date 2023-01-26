@@ -7,6 +7,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components';
+import { AuthProvider } from './context/authProvider';
 
 const GlobalStyles = createGlobalStyle`
   body {
@@ -29,7 +30,9 @@ root.render(
   <React.StrictMode>
     <GlobalStyles />
     <BrowserRouter>
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
