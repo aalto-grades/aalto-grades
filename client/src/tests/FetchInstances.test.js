@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -16,11 +16,11 @@ describe('Tests for FetchInstancesView components', () => {
   test('FetchInstancesView should render the FetchedInstances and contain all of the appropriate components', () => {
 
     render(
-        <BrowserRouter>
-          <FetchInstancesView>
-            <FetchedInstances info={dummyInstances}/>
-          </FetchInstancesView>
-        </BrowserRouter>
+      <BrowserRouter>
+        <FetchInstancesView>
+          <FetchedInstances info={dummyInstances}/>
+        </FetchInstancesView>
+      </BrowserRouter>
     );
 
     const headingElement = screen.getByText('Instances Found from SISU');

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -20,7 +20,7 @@ const HoverBox = styled(Box)`
 
 const InstanceBox = ({ instance }) => {
   let navigate = useNavigate();
-  const { id, startDate, endDate, type } = instance;
+  const { id, startDate, endDate, courseType } = instance;
 
   return(
     <HoverBox 
@@ -35,10 +35,10 @@ const InstanceBox = ({ instance }) => {
         p: 2,
       }}
       onClick={() => { navigate('/edit-instance/' + id); }}>
-      <LightLabelBoldValue label='Type' value={type} />
+      <LightLabelBoldValue label='Type' value={textFormatServices.formatCourseType(courseType)} />
       <Box sx={{ mx: 2 }}/>
-      <LightLabelBoldValue label='Starting Date' value={textFormatServices.formatDate(startDate)} />
-      <LightLabelBoldValue label='Ending Date' value={textFormatServices.formatDate(endDate)} />
+      <LightLabelBoldValue label='Starting Date' value={textFormatServices.formatDateString(startDate)} />
+      <LightLabelBoldValue label='Ending Date' value={textFormatServices.formatDateString(endDate)} />
     </HoverBox>
   );
 };

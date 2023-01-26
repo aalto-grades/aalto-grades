@@ -88,7 +88,7 @@ function App() {
               <Route path='/' element={<FrontPage/>} />
               <Route path='/create-course' element={<CreateCourseView/>}/>
               <Route path='/course-view/:courseCode' element={<CourseView/>}/>  {/* Add nested routes when needed */}
-              <Route path='/fetch-instances/:courseCode' element={<FetchInstancesView/>}/>
+              <Route path='/fetch-instances/:courseId' element={<FetchInstancesView/>}/>
               <Route path='/edit-instance/:instanceId' element={<EditInstanceView/>}/>
             </Route>
           </Routes>

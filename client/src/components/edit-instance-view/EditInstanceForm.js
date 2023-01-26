@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -53,8 +53,8 @@ const teacherData = {
 const EditInstanceForm = ({ instance }) => {
 
   const [courseType, setType]           = useState(instance.type);
-  const [startDate, setStartDate]       = useState(textFormatServices.formatDate(instance.startDate));
-  const [endDate, setEndDate]           = useState(textFormatServices.formatDate(instance.endDate));
+  const [startDate, setStartDate]       = useState(textFormatServices.formatDateToString(instance.startDate));
+  const [endDate, setEndDate]           = useState(textFormatServices.formatDateToString(instance.endDate));
   const [teachers, setTeachers]         = useState(instance.responsibleTeachers);
   const [minCredits, setMinCredits]     = useState(instance.courseData.minCredits);
   const [maxCredits, setMaxCredits]     = useState(instance.courseData.maxCredits);

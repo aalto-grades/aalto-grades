@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -6,20 +6,27 @@ import React from 'react';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import EditInstanceForm from './edit-instance-view/EditInstanceForm';
-import { useParams } from 'react-router-dom';
 import dummyInstances from '../dummy-data/dummyInstances';
 
-// TODO: connect to backend updtae actual instances
+// TODO: connect to backend and update actual instances
 
+// Remove this when connection to backend is working
 const getInstance = (instanceId) => {
   return dummyInstances.find( instance => instance.id === instanceId);
 };
 
 const EditInstanceView = () => {
-  let { instanceId } = useParams();
-  const instance = getInstance(instanceId);
 
-  console.log(instance);
+  const instance = getInstance('mock-id-1');
+
+  //let { instanceId } = useParams();
+  /*const [instance, setInstance] = useState({});
+
+  useEffect(() => {
+    instancesService.getInstance(instanceId)
+      .then((data) => setInstance(data.instance))
+      .catch((e) => console.log(e.message));
+  }, []);*/
 
   return(
     <>

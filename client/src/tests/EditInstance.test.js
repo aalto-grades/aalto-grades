@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -16,9 +16,9 @@ describe('Tests for EditInstanceView components', () => {
     const instance = dummyInstances[0];
 
     render(
-        <BrowserRouter>
-          <EditInstanceForm instance={instance}/>
-        </BrowserRouter>
+      <BrowserRouter>
+        <EditInstanceForm instance={instance}/>
+      </BrowserRouter>
     );
 
     const typeField = screen.getByLabelText('Type');
@@ -39,6 +39,6 @@ describe('Tests for EditInstanceView components', () => {
     expect(endingField).toBeDefined();
     expect(gradingField).toBeDefined();
     expect(confirmButton).toBeDefined();
-  })
+  });
 
 });
