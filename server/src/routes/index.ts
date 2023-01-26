@@ -5,7 +5,6 @@
 import express, { Request, Response, Router } from 'express';
 import { getUserCourses } from '../controllers/user';
 import { addCourse, fetchAllInstancesFromSisu, fetchInstanceFromSisu } from '../controllers/course';
-import { testDbFindAllUsers, testDbFindAllCourses } from '../controllers/test';
 import { authLogin, authLogout, authSelfInfo, authSignup } from './login';
 import passport from 'passport';
 import cors from 'cors';
@@ -23,12 +22,6 @@ router.get('/v1/courses/sisu/:courseId', fetchAllInstancesFromSisu);
 router.get('/v1/courses/sisu/instance/:instanceId', fetchInstanceFromSisu);
 
 router.post('/v1/courses', express.json(), addCourse);
-
-// TODO: remove this test endpoint after working endpoint has been added
-router.get('/v1/test/db', testDbFindAllUsers);
-
-// TODO: remove this test endpoint after working endpoint has been added
-router.get('/v1/test/db/courses/:langId', testDbFindAllCourses);
 
 router.post('/v1/auth/login', express.json(), authLogin);
 router.post('/v1/auth/logout', passport.authenticate('jwt', { session: false }), express.json(), authLogout);
