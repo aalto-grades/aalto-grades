@@ -23,6 +23,14 @@ CourseTranslation.init(
       autoIncrement: true,
       primaryKey: true
     },
+    courseId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'course',
+        key: 'id'
+      }
+    },
     language: {
       type: new DataTypes.ENUM('EN', 'FI', 'SE'),
       allowNull: false

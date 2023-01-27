@@ -24,6 +24,22 @@ CourseResult.init(
       autoIncrement: true,
       primaryKey: true
     },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'user',
+        key: 'id'
+      }
+    },
+    courseInstanceId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'course_instance',
+        key: 'id'
+      }
+    },
     grade: {
       type: DataTypes.INTEGER,
       allowNull: false
