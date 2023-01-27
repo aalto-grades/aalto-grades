@@ -3,3 +3,5 @@
 // SPDX-License-Identifier: MIT
 
 export * as courseService from './course';
+export * as userService from './user';
+export * as instanceService from './instance';
