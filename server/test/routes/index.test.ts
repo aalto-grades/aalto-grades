@@ -28,8 +28,6 @@ describe('Test GET /v1/courses/:courseId', () => {
     expect(res.body.error).not.toBeDefined();
     expect(res.body.course.id).toBe(1);
     expect(res.body.course.courseCode).toBeDefined();
-    expect(res.body.course.minCredits).toBeDefined();
-    expect(res.body.course.maxCredits).toBeDefined();
     expect(res.body.course.department).toBeDefined();
     expect(res.body.course.name).toBeDefined();
     expect(res.body.course.evaluationInformation).toBeDefined();
@@ -62,14 +60,14 @@ describe('Test GET /v1/instances/:instanceId', () => {
     expect(res.body.instance.id).toBe(1);
     expect(res.body.instance.startingPeriod).toBeDefined();
     expect(res.body.instance.endingPeriod).toBeDefined();
+    expect(res.body.instance.minCredits).toBeDefined();
+    expect(res.body.instance.maxCredits).toBeDefined();
     expect(res.body.instance.startDate).toBeDefined();
     expect(res.body.instance.endDate).toBeDefined();
     expect(res.body.instance.courseType).toBeDefined();
     expect(res.body.instance.gradingType).toBeDefined();
     expect(res.body.instance.responsibleTeacher).toBeDefined();
     expect(res.body.instance.courseData.courseCode).toBeDefined();
-    expect(res.body.instance.courseData.minCredits).toBeDefined();
-    expect(res.body.instance.courseData.maxCredits).toBeDefined();
     expect(res.body.instance.courseData.department).toBeDefined();
     expect(res.body.instance.courseData.name).toBeDefined();
     expect(res.body.instance.courseData.evaluationInformation).toBeDefined();
@@ -111,8 +109,6 @@ describe('Test GET /v1/user/:userId/courses', () => {
         {
           'id': 1,
           'courseCode': 'CS-A1110',
-          'minCredits': 5,
-          'maxCredits': 5,
           'department': {
             'fi': 'Tietotekniikan laitos',
             'sv': 'Institutionen för datateknik',
@@ -166,64 +162,87 @@ describe('Test POST /v1/courses', () => {
   it('should respond with course data on correct input', async () => {
     const input: object = {
       courseCode: 'ELEC-A7200',
-      minCredits: 3,
-      maxCredits: 5
+      translations: [
+        {
+          lang: 'FI',
+          department: 'Sähkötekniikan korkeakoulu',
+          name: 'Signaalit ja järjestelmät'
+        },
+        {
+          lang: 'EN',
+          department: 'School of Electrical Engineering',
+          name: 'Signals and Systems'
+        }
+      ]
     };
     const res: supertest.Response = await request.post('/v1/courses').send(input);
     expect(res.statusCode).toBe(200);
     expect(res.body.success).toBe(true);
-    expect(res.body.data.courseCode).toBe('ELEC-A7200');
-    expect(res.body.data.minCredits).toBe(3);
-    expect(res.body.data.maxCredits).toBe(5);
-    expect(Date.parse(res.body.data.createdAt)).toBeGreaterThanOrEqual(0);
-  });
-
-  it('should respond with validation error, if maxCredits is less than minCredits', async () => {
-    const input: object = {
-      courseCode: 'ELEC-A7200',
-      minCredits: 3,
-      maxCredits: 1
-    };
-    const res: supertest.Response = await request.post('/v1/courses').send(input);
-    expect(res.statusCode).toBe(400);
-    expect(res.body.success).toBe(false);
-    expect(res.body.errors).toContain('maxCredits must be greater than or equal to 3');
-  });
-
-  it('should respond with validation error, if minCredits is less than 0', async () => {
-    const input: object = {
-      courseCode: 'ELEC-A7200',
-      minCredits: -1,
-      maxCredits: 5
-    };
-    const res: supertest.Response = await request.post('/v1/courses').send(input);
-    expect(res.statusCode).toBe(400);
-    expect(res.body.success).toBe(false);
-    expect(res.body.errors).toContain('minCredits must be greater than or equal to 0');
+    expect(res.body.course.courseCode).toBe('ELEC-A7200');
+    expect(res.body.course.name).toMatchObject({
+      'fi': 'Signaalit ja järjestelmät',
+      'en': 'Signals and Systems'
+    });
+    expect(res.body.course.department).toMatchObject({
+      'fi': 'Sähkötekniikan korkeakoulu',
+      'en': 'School of Electrical Engineering'
+    });
   });
 
   it('should respond with validation errors, if value types are invalid', async () => {
     const input: object = {
-      courseCode: 123,
-      minCredits: 'asdf',
-      maxCredits: 'asdf'
+      courseCode: 'ELEC-A7200',
+      translations: [
+        {
+          lang: 'not a language',
+          department: 'Sähkötekniikan korkeakoulu',
+          name: 'Signaalit ja järjestelmät'
+        },
+        {
+          lang: 30,
+          department: 'School of Electrical Engineering',
+          name: 'Signals and Systems'
+        }
+      ]
     };
     const res: supertest.Response = await request.post('/v1/courses').send(input);
     expect(res.statusCode).toBe(400);
     expect(res.body.success).toBe(false);
-    expect(res.body.errors).toContain('courseCode must be a `string` type, but the final value was: `123`.');
-    expect(res.body.errors).toContain('minCredits must be a `number` type, but the final value was: `NaN` (cast from the value `"asdf"`).');
-    expect(res.body.errors).toContain('maxCredits must be a `number` type, but the final value was: `NaN` (cast from the value `"asdf"`).');
+    expect(res.body.errors).toContain('translations[0].lang must be one of the following values: EN, FI, SV');
+    expect(res.body.errors).toContain('translations[1].lang must be one of the following values: EN, FI, SV');
   });
 
   it('should respond with validation errors, if required fields are missing', async () => {
-    const input: object = {};
-    const res: supertest.Response = await request.post('/v1/courses').send(input);
+    let input: object = {};
+    let res: supertest.Response = await request.post('/v1/courses').send(input);
     expect(res.statusCode).toBe(400);
     expect(res.body.success).toBe(false);
     expect(res.body.errors).toContain('courseCode is a required field');
-    expect(res.body.errors).toContain('minCredits is a required field');
-    expect(res.body.errors).toContain('maxCredits is a required field');
+    expect(res.body.errors).toContain('translations is a required field');
+
+    input = {
+      courseCode: 'ELEC-A7200',
+      translations: [
+        {
+          department: 'Sähkötekniikan korkeakoulu',
+          name: 'Signaalit ja järjestelmät'
+        },
+        {
+          lang: 'EN',
+          name: 'Signals and Systems'
+        },
+        {
+          lang: 'SV',
+          department: 'Högskolan för elektroteknik'
+        }
+      ]
+    };
+    res = await request.post('/v1/courses').send(input);
+    expect(res.statusCode).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors).toContain('translations[0].lang is a required field');
+    expect(res.body.errors).toContain('translations[1].department is a required field');
+    expect(res.body.errors).toContain('translations[2].name is a required field');
   });
 
   it('should respond with syntax error, if parsing request JSON fails', async() => {
@@ -251,14 +270,14 @@ describe('Test GET /v1/courses/sisu/instance/:instanceId', () => {
     expect(res.body.instance.id).toBe(sisuInstance.id);
     expect(res.body.instance.startingPeriod).toBeDefined();
     expect(res.body.instance.endingPeriod).toBeDefined();
+    expect(res.body.instance.minCredits).toBeDefined();
+    expect(res.body.instance.maxCredits).toBeDefined();
     expect(res.body.instance.startDate).toBeDefined();
     expect(res.body.instance.endDate).toBeDefined();
     expect(res.body.instance.courseType).toBeDefined();
     expect(res.body.instance.gradingType).toBeDefined();
     expect(res.body.instance.responsibleTeachers).toBeDefined();
     expect(res.body.instance.courseData.courseCode).toBeDefined();
-    expect(res.body.instance.courseData.minCredits).toBeDefined();
-    expect(res.body.instance.courseData.maxCredits).toBeDefined();
     expect(res.body.instance.courseData.department).toBeDefined();
     expect(res.body.instance.courseData.name).toBeDefined();
     expect(res.body.instance.courseData.evaluationInformation).toBeDefined();
@@ -290,8 +309,8 @@ describe('Test GET /v1/courses/sisu/:courseId', () => {
     expect(res.body.instances.length).toBe(5);
     expect(res.body.instances[0].id).toBe(sisuInstance.id);
     expect(res.body.instances[0].courseData.courseCode).toBeDefined();
-    expect(res.body.instances[0].courseData.minCredits).toBeDefined();
-    expect(res.body.instances[0].courseData.maxCredits).toBeDefined();
+    expect(res.body.instances[0].minCredits).toBeDefined();
+    expect(res.body.instances[0].maxCredits).toBeDefined();
     expect(res.body.instances[0].courseData.department).toBeDefined();
     expect(res.body.instances[0].courseData.name).toBeDefined();
     expect(res.body.instances[0].courseData.evaluationInformation).toBeDefined();

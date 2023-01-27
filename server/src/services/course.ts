@@ -19,7 +19,7 @@ export interface CourseWithTranslation extends Course {
 export async function findCourseById(courseId: number): Promise<CourseWithTranslation> {
 
   const course: Course | null = await models.Course.findByPk(courseId, {
-    attributes: ['id', 'courseCode', 'minCredits', 'maxCredits'],
+    attributes: ['id', 'courseCode'],
     include: {
       model: CourseTranslation,
       attributes: ['language', 'courseName', 'department'],

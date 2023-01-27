@@ -2,10 +2,10 @@
 --
 -- SPDX-License-Identifier: MIT
 
-INSERT INTO public.course (course_code, min_credits, max_credits, created_at, updated_at) VALUES
-('CS-A1110', 5, 5, NOW(), NOW()),
-('CS-A1120', 5, 5, NOW(), NOW()),
-('PHYS-A1130', 5, 5, NOW(), NOW()),
-('TU-A1100', 5, 5, NOW(), NOW()),
-('CS-A1150', 5, 5, NOW(), NOW()),
-('MS-A0102', 5, 5, NOW(), NOW());
+INSERT INTO public.course (course_code, created_at, updated_at) VALUES
+('CS-A1110', NOW(), NOW()),
+('CS-A1120', NOW(), NOW()),
+('PHYS-A1130', NOW(), NOW()),
+('TU-A1100', NOW(), NOW()),
+('CS-A1150', NOW(), NOW()),
+('MS-A0102', NOW(), NOW());

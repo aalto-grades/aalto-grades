@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { NextFunction, Request, Response } from 'express';
+import { Transaction } from 'sequelize';
 import * as yup from 'yup';
 import { userService, courseService, instanceService } from '../services';
 import CourseTranslation from '../database/models/courseTranslation';
@@ -11,6 +12,7 @@ import { axiosTimeout } from '../configs/config';
 import axios, { AxiosResponse } from 'axios';
 import { SisuInstance } from '../types/sisu';
 import User from '../database/models/user';
+import { sequelize } from '../database';
 import Course from '../database/models/course';
 
 export interface LocalizedString {
@@ -23,8 +25,6 @@ export interface CourseData {
   // course id is either number type id in grades db or undefined when representing parsed sisu data
   id?: number | undefined,
   courseCode: string,
-  minCredits: number,
-  maxCredits: number,
   department: LocalizedString,
   name: LocalizedString,
   evaluationInformation: LocalizedString
@@ -35,7 +35,9 @@ export interface InstanceData {
   // instance id is either Sisu instance id (string) or number type id in grades db
   id: number | string,
   startingPeriod: string,
-  endingPeriod: string
+  endingPeriod: string,
+  minCredits: number,
+  maxCredits: number,
   startDate: Date,
   endDate: Date,
   courseType: string,
@@ -70,6 +72,8 @@ function parseSisuInstance(instance: SisuInstance): InstanceData {
     id: instance.id,
     startingPeriod: '-',
     endingPeriod: '-',
+    minCredits: instance.credits.min,
+    maxCredits: instance.credits.max,
     startDate: instance.startDate,
     endDate: instance.endDate,
     // TODO use enums here
@@ -78,8 +82,6 @@ function parseSisuInstance(instance: SisuInstance): InstanceData {
     responsibleTeachers: instance.summary.teacherInCharge,
     courseData: {
       courseCode: instance.code,
-      minCredits: instance.credits.min,
-      maxCredits: instance.credits.max,
       department: {
         en: instance.organizationName.en,
         fi: instance.organizationName.fi,
@@ -112,26 +114,81 @@ export function handleInvalidRequestJson(err: JsonError, req: Request, res: Resp
 
 export async function addCourse(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
-    courseCode: yup.string().strict().required(),
-    minCredits: yup.number().min(0).required(),
-    maxCredits: yup.number().min(yup.ref('minCredits')).required()
+    courseCode: yup.string().required(),
+    translations: yup.array().of(yup.object().shape({
+      lang: yup.mixed<Language>().oneOf(Object.values(Language)).required(),
+      department: yup.string().required(),
+      name: yup.string().required()
+    })).required()
   });
+
+  const t: Transaction = await sequelize.transaction();
 
   try {
     await requestSchema.validate(req.body, { abortEarly: false });
 
     const course: Course = await Course.create({
-      courseCode: req.body.courseCode,
-      minCredits: req.body.minCredits,
-      maxCredits: req.body.maxCredits
+      courseCode: req.body.courseCode
     });
+
+    const courseData: CourseData = {
+      id: course.id,
+      courseCode: course.courseCode,
+      department: {
+        en: '',
+        fi: '',
+        sv: ''
+      },
+      name: {
+        en: '',
+        fi: '',
+        sv: ''
+      },
+      evaluationInformation: {
+        en: '',
+        fi: '',
+        sv: ''
+      }
+    };
+
+    for (const translation of req.body.translations) {
+      const courseTranslation: CourseTranslation = await CourseTranslation.create({
+        courseId: course.id,
+        language: translation.lang,
+        department: translation.department,
+        courseName: translation.name
+      });
+
+      switch (courseTranslation.language) {
+
+      case Language.English:
+        courseData.department.en = courseTranslation.department;
+        courseData.name.en = courseTranslation.courseName;
+        break;
+      
+      case Language.Finnish:
+        courseData.department.fi = courseTranslation.department;
+        courseData.name.fi = courseTranslation.courseName;
+        break;
+      
+      case Language.Swedish:
+        courseData.department.sv = courseTranslation.department;
+        courseData.name.sv = courseTranslation.courseName;
+        break;
+
+      }
+    }
+
+    await t.commit();
 
     res.json({ 
       success: true,
-      data: course
+      course: courseData
     });
   } catch (error) {
     // TODO: appropriate logging in case of errors
+    await t.rollback();
+
     if (error instanceof yup.ValidationError) {
       res.status(400).json({ 
         success: false,
@@ -155,8 +212,6 @@ export async function getCourse(req: Request, res: Response): Promise<Response> 
     const courseData: CourseData = {
       id: course.id,
       courseCode: course.courseCode,
-      minCredits: course.minCredits,
-      maxCredits: course.maxCredits,
       department: {
         en: '',
         fi: '',
@@ -231,6 +286,8 @@ export async function getInstance(req: Request, res: Response): Promise<Response
       id: instance.id,
       startingPeriod: instance.startingPeriod,
       endingPeriod: instance.endingPeriod,
+      minCredits: instance.minCredits,
+      maxCredits: instance.maxCredits,
       startDate: instance.startDate,
       endDate: instance.endDate,
       courseType: instance.teachingMethod,
@@ -239,8 +296,6 @@ export async function getInstance(req: Request, res: Response): Promise<Response
       courseData: {
         id: instance.Course.id,
         courseCode: instance.Course.courseCode,
-        minCredits: instance.Course.minCredits,
-        maxCredits: instance.Course.maxCredits,
         department: {
           en: '',
           fi: '',

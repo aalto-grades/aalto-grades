@@ -21,10 +21,10 @@ export interface InstanceWithCourseAndTranslation extends CourseInstance {
 export async function findInstanceById(instanceId: number): Promise<InstanceWithCourseAndTranslation> {
 
   const instance: CourseInstance | null = await models.CourseInstance.findByPk(instanceId, {
-    attributes: ['id', 'gradingType', 'startingPeriod', 'endingPeriod', 'teachingMethod', 'startDate', 'endDate', 'responsibleTeacher'],
+    attributes: ['id', 'gradingType', 'startingPeriod', 'endingPeriod', 'teachingMethod', 'minCredits', 'maxCredits', 'startDate', 'endDate', 'responsibleTeacher'],
     include: {
       model: Course,
-      attributes: ['id', 'courseCode', 'minCredits', 'maxCredits'],
+      attributes: ['id', 'courseCode' ],
       include: [
         {
           model: CourseTranslation,
