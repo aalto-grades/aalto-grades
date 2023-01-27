@@ -9,9 +9,13 @@ import Course from '../database/models/course';
 import User from '../database/models/user';
 import models from '../database/models';
 import axios, { AxiosResponse } from 'axios';
+import { userService, courseService, instanceService } from '../services';
+import CourseTranslation from '../database/models/courseTranslation';
 import { SISU_API_KEY, SISU_API_URL } from '../configs/environment';
 import { axiosTimeout } from '../configs/config';
+import axios, { AxiosResponse } from 'axios';
 import { SisuInstance } from '../types/sisu';
+import User from '../database/models/user';
 
 export interface LocalizedString {
   fi: string,
@@ -40,7 +44,8 @@ export interface InstanceData {
   endDate: Date,
   courseType: string,
   gradingType: string,
-  responsibleTeachers: Array<string>,
+  responsibleTeacher?: string | undefined,
+  responsibleTeachers?: Array<string>,
 }
 
 export enum Language {
@@ -48,6 +53,12 @@ export enum Language {
   Finnish = 'FI',
   Swedish = 'SV'
 }
+
+const idSchema: yup.AnyObjectSchema = yup.object().shape({
+  id: yup
+    .number()
+    .required()
+});
 
 function parseSisuInstance(instance: SisuInstance): InstanceData {
   return {
@@ -83,6 +94,7 @@ function parseSisuInstance(instance: SisuInstance): InstanceData {
     }
   };
 }
+
 
 export async function addCourse(req: Request, res: Response): Promise<void> {
   try {
@@ -213,6 +225,164 @@ export async function addCourseInstance(req: Request, res: Response): Promise<Re
     return res.send({
       success: false,
       error: error
+    });
+  }
+}
+
+export async function getCourse(req: Request, res: Response): Promise<Response> {
+  try {
+    const courseId: number = Number(req.params.courseId);
+    await idSchema.validate({ id: courseId });
+    const course: courseService.CourseWithTranslation = await courseService.findCourseById(courseId);
+
+    const courseData: CourseData = {
+      id: course.id,
+      courseCode: course.courseCode,
+      minCredits: course.minCredits,
+      maxCredits: course.maxCredits,
+      department: {
+        en: '',
+        fi: '',
+        sv: ''
+      },
+      name: {
+        en: '',
+        fi: '',
+        sv: ''
+      },
+      evaluationInformation: {
+        en: '',
+        fi: '',
+        sv: ''
+      }
+    };
+
+    course.CourseTranslations.forEach((translation: CourseTranslation) => {
+      switch (translation.language) {
+      case Language.English:
+        courseData.department.en = translation.department;
+        courseData.name.en = translation.courseName;
+        break;
+      case Language.Finnish:
+        courseData.department.fi = translation.department;
+        courseData.name.fi = translation.courseName;
+        break;
+      case Language.Swedish:
+        courseData.department.sv = translation.department;
+        courseData.name.sv = translation.courseName;
+        break;
+      }
+    });
+
+    return res.status(200).send({
+      success: true,
+      course: courseData
+    });
+  } catch (error: unknown) {
+    console.log(error);
+
+    if (error instanceof yup.ValidationError) {
+      return res.status(400).send({
+        success: false,
+        error: error.errors
+      });
+    }
+
+    if (error instanceof Error && error?.message.startsWith('course with an id')) {
+      return res.status(404).send({
+        success: false,
+        error: error.message
+      });
+    }
+
+    return res.status(500).send({
+      success: false,
+      error: 'Internal Server Error'
+    });
+  }
+}
+
+export async function getInstance(req: Request, res: Response): Promise<Response> {
+  try {
+    const instanceId: number = Number(req.params.instanceId);
+    await idSchema.validate({ id: instanceId });
+
+    const instance: instanceService.InstanceWithCourseAndTranslation = await instanceService.findInstanceById(instanceId);
+    const responsibleTeacher: User = await userService.findUserById(instance.responsibleTeacher);
+
+    const parsedInstanceData: InstanceData = {
+      id: instance.id,
+      startingPeriod: instance.startingPeriod,
+      endingPeriod: instance.endingPeriod,
+      startDate: instance.startDate,
+      endDate: instance.endDate,
+      courseType: instance.teachingMethod,
+      gradingType: instance.gradingType,
+      responsibleTeacher: responsibleTeacher?.name ?? '-',
+      courseData: {
+        id: instance.Course.id,
+        courseCode: instance.Course.courseCode,
+        minCredits: instance.Course.minCredits,
+        maxCredits: instance.Course.maxCredits,
+        department: {
+          en: '',
+          fi: '',
+          sv: ''
+        },
+        name: {
+          en: '',
+          fi: '',
+          sv: ''
+        },
+        evaluationInformation: {
+          en: '',
+          fi: '',
+          sv: ''
+        }
+      }
+    };
+
+    instance.Course.CourseTranslations.forEach((translation: CourseTranslation) => {
+      switch (translation.language) {
+      case Language.English:
+        parsedInstanceData.courseData.department.en = translation.department;
+        parsedInstanceData.courseData.name.en = translation.courseName;
+        break;
+      case Language.Finnish:
+        parsedInstanceData.courseData.department.fi = translation.department;
+        parsedInstanceData.courseData.name.fi = translation.courseName;
+        break;
+      case Language.Swedish:
+        parsedInstanceData.courseData.department.sv = translation.department;
+        parsedInstanceData.courseData.name.sv = translation.courseName;
+        break;
+      }
+    });
+
+    return res.status(200).send({
+      success: true,
+      instance: parsedInstanceData
+    });
+  } catch (error: unknown) {
+    console.log(error);
+
+    if (error instanceof yup.ValidationError) {
+      return res.status(400).send({
+        success: false,
+        error: error.errors
+      });
+    }
+
+    if (error instanceof Error && error?.message.startsWith('course instance with an id')) {
+      return res.status(404).send({
+        success: false,
+        error: error.message
+      });
+    }
+
+    return res.status(500).send({
+      success: false,
+      error: 'Internal Server Error'
     });
   }
 }

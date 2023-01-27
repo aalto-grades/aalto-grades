@@ -23,6 +23,22 @@ UserAssignmentGrade.init(
       autoIncrement: true,
       primaryKey: true
     },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'user',
+        key: 'id'
+      }
+    },
+    courseAssignmentId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'course_assignment',
+        key: 'id'
+      }
+    },
     points: {
       type: DataTypes.FLOAT,
       allowNull: false

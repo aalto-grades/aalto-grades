@@ -28,6 +28,14 @@ CourseInstance.init(
       autoIncrement: true,
       primaryKey: true
     },
+    courseId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'course',
+        key: 'id'
+      }
+    },
     gradingType: {
       type: DataTypes.ENUM('PASSFAIL', 'NUMERICAL'),
       allowNull: false
@@ -43,6 +51,14 @@ CourseInstance.init(
     teachingMethod: {
       type: DataTypes.ENUM('LECTURE', 'EXAM'),
       allowNull: false
+    },
+    responsibleTeacher: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'user',
+        key: 'id'
+      }
     },
     startDate: {
       type: new DataTypes.DATEONLY,
