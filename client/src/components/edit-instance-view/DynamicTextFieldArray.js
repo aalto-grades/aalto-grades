@@ -36,7 +36,7 @@ const DynamicTextFieldArray = ({ fieldData, values, setFunction }) => {
           <Box key={index} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <TextField
               id={fieldData.fieldId}
-              type={fieldData.fieldId}
+              type='text'
               label={fieldData.fieldLabel}
               InputLabelProps={{ shrink: true }}
               margin='normal'
@@ -51,7 +51,7 @@ const DynamicTextFieldArray = ({ fieldData, values, setFunction }) => {
           <Box key={index} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <TextField
               id={fieldData.fieldId}
-              type={fieldData.fieldId}
+              type='text'
               label={fieldData.fieldLabel}
               InputLabelProps={{ shrink: true }}
               margin='normal'

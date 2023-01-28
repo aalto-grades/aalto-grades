@@ -11,7 +11,7 @@ const StringTextField = ({ fieldData, value, setFunction }) => {
     <TextField
       key={fieldData.fieldId}
       id={fieldData.fieldId}
-      type={fieldData.fieldId}
+      type='text'
       label={fieldData.fieldLabel}
       InputLabelProps={{ shrink: true }}
       margin='normal'

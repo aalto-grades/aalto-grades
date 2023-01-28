@@ -10,10 +10,11 @@ const getSisuInstances = async (courseId) => {
   return response.data;
 };
 
-/*const getInstance = async (instanceId) => {
+const getSisuInstance = async (instanceId) => {
   const response = await axios.get('/v1/courses/sisu/instance/' + instanceId);
+  console.log(response);
   console.log(response.data);
   return response.data;
-};*/
+};
 
-export default { getSisuInstances };
+export default { getSisuInstances, getSisuInstance };

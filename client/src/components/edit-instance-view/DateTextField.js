@@ -6,12 +6,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@mui/material/TextField';
 
-const NumberTextField = ({ fieldData, value, setFunction }) => {
+const DateTextField = ({ fieldData, value, setFunction, minWidth }) => {
   return (
     <TextField
+      sx={{ minWidth: minWidth }}
       key={fieldData.fieldId}
       id={fieldData.fieldId}
-      type='number'
+      type='date'
       label={fieldData.fieldLabel}
       InputLabelProps={{ shrink: true }}
       margin='normal'
@@ -21,10 +22,11 @@ const NumberTextField = ({ fieldData, value, setFunction }) => {
   );
 };
   
-NumberTextField.propTypes = {
+DateTextField.propTypes = {
   fieldData: PropTypes.object,
-  value: PropTypes.number,
+  value: PropTypes.string,
   setFunction: PropTypes.func,
+  minWidth: PropTypes.number,
 };
-  
-export default NumberTextField;
+
+export default DateTextField;

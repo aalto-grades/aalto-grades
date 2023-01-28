@@ -31,4 +31,17 @@ const formatCourseType = (courseType) => {
   }
 };
 
-export default { formatDateToString, formatDateString, formatCourseType };
+// Change course type from "NUMERICAL" to "General Scale, 0-5", 
+// and from "PASSFAIL" to "Pass-Fail"
+const formatGradingType = (gradingType) => {
+  switch (gradingType) {
+  case 'NUMERICAL':
+    return 'General Scale, 0-5';
+  case 'PASSFAIL':
+    return 'Pass-Fail';
+  default:
+    return gradingType;
+  }
+};
+
+export default { formatDateToString, formatDateString, formatCourseType, formatGradingType };

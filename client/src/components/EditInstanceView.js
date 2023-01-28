@@ -2,34 +2,29 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import EditInstanceForm from './edit-instance-view/EditInstanceForm';
-import dummyInstances from '../dummy-data/dummyInstances';
+import instancesService from '../services/instances';
+import { useParams } from 'react-router-dom';
 
-// TODO: connect to backend and update actual instances
-
-// Remove this when connection to backend is working
-const getInstance = (instanceId) => {
-  return dummyInstances.find( instance => instance.id === instanceId);
-};
+// TODO: update actual instance/save basic information
 
 const EditInstanceView = () => {
-
-  const instance = getInstance('mock-id-1');
-
-  //let { instanceId } = useParams();
-  /*const [instance, setInstance] = useState({});
+  let { instanceId } = useParams();
+  const [instance, setInstance] = useState();
 
   useEffect(() => {
-    instancesService.getInstance(instanceId)
-      .then((data) => setInstance(data.instance))
+    instancesService.getSisuInstance(instanceId)
+      .then((data) => {
+        setInstance(data.instance);
+      })
       .catch((e) => console.log(e.message));
-  }, []);*/
+  }, []);
 
-  return(
-    <>
+  if (instance) {
+    return(
       <Container maxWidth="sm" sx={{ textAlign: 'right' }}>
         <Typography variant="h3" component="div" sx={{ flexGrow: 1, mb: 4, textAlign: 'left' }}>
           Edit Basic Information
@@ -39,8 +34,8 @@ const EditInstanceView = () => {
         </Typography>
         <EditInstanceForm instance={instance} />
       </Container>
-    </>
-  );
+    );
+  }
 };
 
 export default EditInstanceView;
