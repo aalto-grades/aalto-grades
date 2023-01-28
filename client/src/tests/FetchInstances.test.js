@@ -27,6 +27,7 @@ describe('Tests for FetchInstancesView components', () => {
     expect(headingElement).toBeDefined();
     expect(subHeading).toBeDefined();
     expect(scratchButton).toBeDefined();
+  
   }),
 
   test('FetchedInstances should contain all of the appropriate components', () => {
@@ -44,6 +45,7 @@ describe('Tests for FetchInstancesView components', () => {
     expect(courseType).toBeDefined();
     expect(startDate).toBeDefined();
     expect(endDate).toBeDefined();
-  })
+
+  });
 
 });

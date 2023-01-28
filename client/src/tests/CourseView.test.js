@@ -36,6 +36,6 @@ describe('Tests for CourseView component', () => {
     expect(pastInstances).toBeDefined();
     expect(exampleOfInstancePeriod).toBeDefined();
     
-  })
+  });
 
 });
