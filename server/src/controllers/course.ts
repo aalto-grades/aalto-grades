@@ -207,7 +207,7 @@ export async function addCourseInstance(req: Request, res: Response): Promise<Re
     return res.send({
       success: true,
       instance: {
-        id:  newInstance.id
+        id: newInstance.id
       }
     });
   } catch (error) {
