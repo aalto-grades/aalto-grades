@@ -10,6 +10,16 @@ export default {
     const transaction: Transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.addConstraint('course_instance', {
+        fields: ['min_credits'],
+        type: 'check',
+        where: {
+          min_credits: {
+            [Op.lte]: sequelize.col('max_credits')
+          }
+        },
+        transaction
+      });
+      await queryInterface.addConstraint('course_instance', {
         fields: ['start_date'],
         type: 'check',
         where: {
