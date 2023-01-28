@@ -14,6 +14,7 @@ import { SisuInstance } from '../types/sisu';
 import User from '../database/models/user';
 import { sequelize } from '../database';
 import Course from '../database/models/course';
+import { MessageParams } from 'yup/lib/types';
 
 export interface LocalizedString {
   fi: string,
@@ -66,6 +67,20 @@ const idSchema: yup.AnyObjectSchema = yup.object().shape({
     .required()
 });
 
+/* Yup validation schema for validating localized strings in requests
+ * Does not allow leaving the object empty, requires at least one translation
+ * Checks that keys match the ones defined in shape, throws error if they don't
+ */
+const localizedStringSchema: yup.AnyObjectSchema = yup.object().shape({
+  fi: yup.string(),
+  en: yup.string(),
+  sv: yup.string()
+}).test(
+  'localized-string-check-not-empty',
+  (params: MessageParams) => `${params.path} must contain at least one translation`,
+  (obj: object) => (obj === undefined || obj === null) ? true : Object.keys(obj).length !== 0
+).strict().noUnknown().default(undefined);
+
 function parseSisuInstance(instance: SisuInstance): InstanceData {
   return {
     // instance id is either Sisu instance id (string) or number type id in grades db
@@ -115,11 +130,8 @@ export function handleInvalidRequestJson(err: JsonError, req: Request, res: Resp
 export async function addCourse(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     courseCode: yup.string().required(),
-    translations: yup.array().of(yup.object().shape({
-      lang: yup.mixed<Language>().oneOf(Object.values(Language)).required(),
-      department: yup.string().required(),
-      name: yup.string().required()
-    })).required()
+    department: localizedStringSchema.required(),
+    name: localizedStringSchema.required()
   });
 
   const t: Transaction = await sequelize.transaction();
@@ -129,7 +141,30 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
 
     const course: Course = await Course.create({
       courseCode: req.body.courseCode
-    });
+    }, { transaction: t });
+
+    const courseTranslations: CourseTranslation[] = await CourseTranslation.bulkCreate([
+      {
+        courseId: course.id,
+        language: Language.Finnish,
+        department: req.body.department.fi ?? '',
+        courseName: req.body.name.fi ?? ''
+      },
+      {
+        courseId: course.id,
+        language: Language.English,
+        department: req.body.department.en ?? '',
+        courseName: req.body.name.en ?? ''
+      },
+      {
+        courseId: course.id,
+        language: Language.Swedish,
+        department: req.body.department.sv ?? '',
+        courseName: req.body.name.sv ?? ''
+      }
+    ], { transaction: t });
+
+    await t.commit();
 
     const courseData: CourseData = {
       id: course.id,
@@ -151,35 +186,26 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
       }
     };
 
-    for (const translation of req.body.translations) {
-      const courseTranslation: CourseTranslation = await CourseTranslation.create({
-        courseId: course.id,
-        language: translation.lang,
-        department: translation.department,
-        courseName: translation.name
-      });
-
-      switch (courseTranslation.language) {
+    for (const translation of courseTranslations) {
+      switch (translation.language) {
 
       case Language.English:
-        courseData.department.en = courseTranslation.department;
-        courseData.name.en = courseTranslation.courseName;
+        courseData.department.en = translation.department;
+        courseData.name.en = translation.courseName;
         break;
       
       case Language.Finnish:
-        courseData.department.fi = courseTranslation.department;
-        courseData.name.fi = courseTranslation.courseName;
+        courseData.department.fi = translation.department;
+        courseData.name.fi = translation.courseName;
         break;
       
       case Language.Swedish:
-        courseData.department.sv = courseTranslation.department;
-        courseData.name.sv = courseTranslation.courseName;
+        courseData.department.sv = translation.department;
+        courseData.name.sv = translation.courseName;
         break;
 
       }
     }
-
-    await t.commit();
 
     res.json({ 
       success: true,

@@ -160,89 +160,100 @@ describe('Test GET /v1/user/:userId/courses', () => {
 describe('Test POST /v1/courses', () => {
 
   it('should respond with course data on correct input', async () => {
-    const input: object = {
+    let input: object = {
       courseCode: 'ELEC-A7200',
-      translations: [
-        {
-          lang: 'FI',
-          department: 'Sähkötekniikan korkeakoulu',
-          name: 'Signaalit ja järjestelmät'
-        },
-        {
-          lang: 'EN',
-          department: 'School of Electrical Engineering',
-          name: 'Signals and Systems'
-        }
-      ]
+      department: {
+        fi: 'Sähkötekniikan korkeakoulu',
+        en: 'School of Electrical Engineering',
+        sv: 'Högskolan för elektroteknik'
+      },
+      name: {
+        fi: 'Signaalit ja järjestelmät',
+        en: 'Signals and Systems',
+        sv: ''
+      }
     };
-    const res: supertest.Response = await request.post('/v1/courses').send(input);
+    let res: supertest.Response = await request.post('/v1/courses').send(input);
     expect(res.statusCode).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.course.courseCode).toBe('ELEC-A7200');
-    expect(res.body.course.name).toMatchObject({
+    expect(res.body.course.name).toStrictEqual({
       'fi': 'Signaalit ja järjestelmät',
-      'en': 'Signals and Systems'
+      'en': 'Signals and Systems',
+      'sv': ''
     });
-    expect(res.body.course.department).toMatchObject({
+    expect(res.body.course.department).toStrictEqual({
       'fi': 'Sähkötekniikan korkeakoulu',
-      'en': 'School of Electrical Engineering'
+      'en': 'School of Electrical Engineering',
+      'sv': 'Högskolan för elektroteknik'
+    });
+
+    input = {
+      courseCode: 'ELEC-A7200',
+      department: {
+        fi: 'Sähkötekniikan korkeakoulu',
+        en: 'School of Electrical Engineering',
+      },
+      name: {
+        fi: 'Signaalit ja järjestelmät',
+        en: 'Signals and Systems',
+      }
+    };
+    res = await request.post('/v1/courses').send(input);
+    expect(res.statusCode).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.course.courseCode).toBe('ELEC-A7200');
+    expect(res.body.course.name).toStrictEqual({
+      'fi': 'Signaalit ja järjestelmät',
+      'en': 'Signals and Systems',
+      'sv': ''
+    });
+    expect(res.body.course.department).toStrictEqual({
+      'fi': 'Sähkötekniikan korkeakoulu',
+      'en': 'School of Electrical Engineering',
+      'sv': ''
     });
   });
 
-  it('should respond with validation errors, if value types are invalid', async () => {
+  it('should respond with validation errors, if required fields are undefined', async () => {
+    const input: object = {};
+    const res: supertest.Response = await request.post('/v1/courses').send(input);
+    expect(res.statusCode).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors).toContain('courseCode is a required field');
+    expect(res.body.errors).toContain('department is a required field');
+    expect(res.body.errors).toContain('name is a required field');
+  });
+
+  it('should respond with validation errors, if the object for a localized string is empty', async () => {
     const input: object = {
       courseCode: 'ELEC-A7200',
-      translations: [
-        {
-          lang: 'not a language',
-          department: 'Sähkötekniikan korkeakoulu',
-          name: 'Signaalit ja järjestelmät'
-        },
-        {
-          lang: 30,
-          department: 'School of Electrical Engineering',
-          name: 'Signals and Systems'
-        }
-      ]
+      department: {},
+      name: {}
     };
     const res: supertest.Response = await request.post('/v1/courses').send(input);
     expect(res.statusCode).toBe(400);
     expect(res.body.success).toBe(false);
-    expect(res.body.errors).toContain('translations[0].lang must be one of the following values: EN, FI, SV');
-    expect(res.body.errors).toContain('translations[1].lang must be one of the following values: EN, FI, SV');
+    expect(res.body.errors).toContain('department must contain at least one translation');
+    expect(res.body.errors).toContain('name must contain at least one translation');
   });
 
-  it('should respond with validation errors, if required fields are missing', async () => {
-    let input: object = {};
-    let res: supertest.Response = await request.post('/v1/courses').send(input);
-    expect(res.statusCode).toBe(400);
-    expect(res.body.success).toBe(false);
-    expect(res.body.errors).toContain('courseCode is a required field');
-    expect(res.body.errors).toContain('translations is a required field');
-
-    input = {
+  it('should respond with validation errors, if unknown translations are present in a localized string', async () => {
+    const input: object = {
       courseCode: 'ELEC-A7200',
-      translations: [
-        {
-          department: 'Sähkötekniikan korkeakoulu',
-          name: 'Signaalit ja järjestelmät'
-        },
-        {
-          lang: 'EN',
-          name: 'Signals and Systems'
-        },
-        {
-          lang: 'SV',
-          department: 'Högskolan för elektroteknik'
-        }
-      ]
+      department: {
+        fi: 'Sähkötekniikan korkeakoulu',
+        test: 'Should not be here'
+      },
+      name: {
+        test: 'Should not be here'
+      }
     };
-    res = await request.post('/v1/courses').send(input);
+    const res: supertest.Response = await request.post('/v1/courses').send(input);
     expect(res.statusCode).toBe(400);
     expect(res.body.success).toBe(false);
-    expect(res.body.errors).toContain('translations[0].lang is a required field');
-    expect(res.body.errors).toContain('translations[1].department is a required field');
-    expect(res.body.errors).toContain('translations[2].name is a required field');
+    expect(res.body.errors).toContain('department field has unspecified keys: test');
+    expect(res.body.errors).toContain('name field has unspecified keys: test');
   });
 
   it('should respond with syntax error, if parsing request JSON fails', async() => {
