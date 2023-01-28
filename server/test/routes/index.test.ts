@@ -170,6 +170,8 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
           .send(input);
 
       expect(res.body.success).toBe(true);
+      expect(res.body.instance).toBeDefined();
+      expect(res.body.instance.id).toBeDefined();
       expect(res.statusCode).toBe(200);
     }
 
