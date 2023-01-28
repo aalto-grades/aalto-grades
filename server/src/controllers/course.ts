@@ -189,9 +189,8 @@ export async function addCourseInstance(req: Request, res: Response): Promise<Re
       },
     });
 
-    // TODO: Also check that user has correct role
     if (teacher == null) {
-      throw new Error(`Teacher with ID ${request.responsibleTeacher} does not exist`);
+      throw new Error(`User with ID ${request.responsibleTeacher} does not exist`);
     }
 
     const newInstance: CourseInstance = await models.CourseInstance.create({
