@@ -24,7 +24,7 @@ export async function findInstanceById(instanceId: number): Promise<InstanceWith
     attributes: ['id', 'gradingType', 'startingPeriod', 'endingPeriod', 'teachingMethod', 'minCredits', 'maxCredits', 'startDate', 'endDate', 'responsibleTeacher'],
     include: {
       model: Course,
-      attributes: ['id', 'courseCode' ],
+      attributes: ['id', 'courseCode'],
       include: [
         {
           model: CourseTranslation,

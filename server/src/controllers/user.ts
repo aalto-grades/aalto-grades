@@ -26,7 +26,7 @@ export async function getUserCourses(req: Request, res: Response): Promise<void>
 
     // TODO: Go through course_role instead
     const courses: Array<CourseWithTranslationAndInstance> = await models.Course.findAll({
-      attributes: ['id', 'courseCode' ],
+      attributes: ['id', 'courseCode'],
       include: [{
         model: CourseInstance,
         attributes: ['endDate'],
