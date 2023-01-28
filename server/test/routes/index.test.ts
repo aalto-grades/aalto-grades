@@ -305,6 +305,18 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
       startDate: '2023-1-19',
       endDate: '2024-4-8'
     });
+
+    await goodInput({
+      gradingType: 'PASSFAIL',
+      startingPeriod: 'III',
+      endingPeriod: 'V',
+      teachingMethod: 'EXAM',
+      responsibleTeacher: 2,
+      minCredits: 0,
+      maxCredits: 1,
+      startDate: '2023-1-19',
+      endDate: '2024-4-8'
+    });
   });
 
   it('should return fail with incorrect input', async () => {
@@ -370,6 +382,30 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
       maxCredits: 5,
       startDate: 'not a date',
       endDate: 'not a date either'
+    });
+
+    await badInput({
+      gradingType: 'NUMERICAL',
+      startingPeriod: 'I',
+      endingPeriod: 'II',
+      teachingMethod: 'LECTURE',
+      responsibleTeacher: 1,
+      minCredits: 5,
+      maxCredits: 3,
+      startDate: '2022-7-10',
+      endDate: '2022-11-10'
+    });
+
+    await badInput({
+      gradingType: 'NUMERICAL',
+      startingPeriod: 'I',
+      endingPeriod: 'II',
+      teachingMethod: 'LECTURE',
+      responsibleTeacher: 1,
+      minCredits: -1,
+      maxCredits: 3,
+      startDate: '2022-7-10',
+      endDate: '2022-11-10'
     });
 
   });

@@ -283,9 +283,11 @@ const courseInstanceAddRequestSchema: yup.AnyObjectSchema = yup.object().shape({
     .required(),
   minCredits: yup
     .number()
+    .min(0)
     .required(),
   maxCredits: yup
     .number()
+    .min(yup.ref('minCredits'))
     .required(),
   startDate: yup
     .date()
