@@ -4,7 +4,7 @@
 
 import axios from './axios';
 
-const getInstances = async (courseId) => {
+const getSisuInstances = async (courseId) => {
   const response = await axios.get('/v1/courses/sisu/' + courseId);
   console.log(response.data);
   return response.data;
@@ -16,4 +16,4 @@ const getInstances = async (courseId) => {
   return response.data;
 };*/
 
-export default { getInstances };
+export default { getSisuInstances };

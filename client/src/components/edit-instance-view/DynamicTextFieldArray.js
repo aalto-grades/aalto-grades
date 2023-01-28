@@ -22,7 +22,7 @@ const DynamicTextFieldArray = ({ fieldData, values, setFunction }) => {
     setFunction(fields);
   };
   
-  const handleChange = (index, event)=>{
+  const handleChange = (index, event) => {
     const value = event.target.value;
     const fields = [...values];
     fields[index] = value;

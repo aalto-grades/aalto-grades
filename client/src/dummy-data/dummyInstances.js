@@ -6,9 +6,9 @@ const dummyInstances = [
   { id: 'mock-id-1',
     startingPeriod: '2022-2023 Autumn I-II',
     endingPeriod: '2022-2023 Autumn I-II',
-    startDate: new Date(2022, 8, 14),
-    endDate: new Date(2022, 11, 13),
-    type: 'Lecture',
+    startDate: '2022-08-14',
+    endDate: '2022-11-13',
+    type: 'LECTURE',
     gradingScale: 'General Scale, 0-5',
     responsibleTeachers: [
       'Elisa Mekler',
@@ -33,8 +33,8 @@ const dummyInstances = [
   { id: 'mock-id-2',
     startingPeriod: '2021-2022 Autumn I-II',
     endingPeriod: '2021-2022 Autumn I-II',
-    startDate: new Date(2021, 8, 14),
-    endDate: new Date(2021, 11, 13),
+    startDate: '2021-08-14',
+    endDate: '2021-11-13',
     type: 'Exam',
     gradingScale: 'General Scale, 0-5',
     responsibleTeachers: [

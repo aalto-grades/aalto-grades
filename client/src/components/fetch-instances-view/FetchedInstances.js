@@ -31,8 +31,8 @@ const InstanceBox = ({ instance }) => {
         justifyContent: 'space-around',
         boxShadow: 2, 
         borderRadius: 2,
-        my: 0.5,
-        p: 2,
+        my: 1,
+        p: 3,
       }}
       onClick={() => { navigate('/edit-instance/' + id); }}>
       <LightLabelBoldValue label='Type' value={textFormatServices.formatCourseType(courseType)} />

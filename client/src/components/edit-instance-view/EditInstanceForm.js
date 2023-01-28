@@ -47,7 +47,7 @@ const gradingScaleData = {
 
 const teacherData = {
   fieldId: 'teacher',
-  fieldLabel: 'Instance Teacher'
+  fieldLabel: 'Teacher of This Instance'
 };
 
 const EditInstanceForm = ({ instance }) => {
