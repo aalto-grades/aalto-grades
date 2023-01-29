@@ -19,7 +19,7 @@ describe('Tests for FetchInstancesView components', () => {
 
   const renderFetchInstancesView = async () => {
 
-    const mockResponse = {instances: dummyInstances};
+    const mockResponse = { instances: dummyInstances };
 
     instancesService.getSisuInstances.mockRejectedValue('Network error');
     instancesService.getSisuInstances.mockResolvedValue(mockResponse);

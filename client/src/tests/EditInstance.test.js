@@ -17,7 +17,7 @@ describe('Tests for EditInstanceView components', () => {
 
   const renderEditInstanceView = async () => {
 
-    const mockResponse = {instance: dummyInstances[0]};
+    const mockResponse = { instance: dummyInstances[0] };
 
     console.log(mockResponse);
 
@@ -26,7 +26,7 @@ describe('Tests for EditInstanceView components', () => {
 
     return render(
       <BrowserRouter>
-          <EditInstanceView />
+        <EditInstanceView />
       </BrowserRouter>
     );
   };
