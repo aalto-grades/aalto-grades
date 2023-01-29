@@ -225,36 +225,9 @@ describe('Test POST /v1/courses', () => {
     expect(res.body.errors).toContain('name is a required field');
   });
 
-  it('should respond with validation errors, if the object for a localized string is empty', async () => {
-    const input: object = {
-      courseCode: 'ELEC-A7200',
-      department: {},
-      name: {}
-    };
-    const res: supertest.Response = await request.post('/v1/courses').send(input);
-    expect(res.statusCode).toBe(400);
-    expect(res.body.success).toBe(false);
-    expect(res.body.errors).toContain('department must contain at least one translation');
-    expect(res.body.errors).toContain('name must contain at least one translation');
-  });
-
-  it('should respond with validation errors, if unknown translations are present in a localized string', async () => {
-    const input: object = {
-      courseCode: 'ELEC-A7200',
-      department: {
-        fi: 'Sähkötekniikan korkeakoulu',
-        test: 'Should not be here'
-      },
-      name: {
-        test: 'Should not be here'
-      }
-    };
-    const res: supertest.Response = await request.post('/v1/courses').send(input);
-    expect(res.statusCode).toBe(400);
-    expect(res.body.success).toBe(false);
-    expect(res.body.errors).toContain('department field has unspecified keys: test');
-    expect(res.body.errors).toContain('name field has unspecified keys: test');
-  });
+  /* TODO: move next test case elsewhere in future, after refactoring commonly
+   * reusable functionality (e.g. middleware) to their own modules / functions
+   */
 
   it('should respond with syntax error, if parsing request JSON fails', async() => {
     const input: string = '{"courseCode": "ELEC-A7200"';

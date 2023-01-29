@@ -73,7 +73,7 @@ const idSchema: yup.AnyObjectSchema = yup.object().shape({
  * Does not allow leaving the object empty, requires at least one translation
  * Checks that keys match the ones defined in shape, throws error if they don't
  */
-const localizedStringSchema: yup.AnyObjectSchema = yup.object().shape({
+export const localizedStringSchema: yup.AnyObjectSchema = yup.object().shape({
   fi: yup.string(),
   en: yup.string(),
   sv: yup.string()
