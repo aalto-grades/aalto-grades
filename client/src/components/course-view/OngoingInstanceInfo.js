@@ -8,6 +8,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import textFormatServices from '../../services/textFormat';
+import useAuth from '../../hooks/useAuth';
 
 const LightLabelBoldValue = ({ label, value }) => {
   return (
@@ -28,12 +29,16 @@ LightLabelBoldValue.propTypes = {
 
 const OngoingInstanceInfo = ({ info }) => {
   const { period, startDate, endDate, type, credits, scale, organizer, institution, teachers } = info;
+  const { auth } = useAuth();
 
   return(
     <Box sx={{ display: 'inline-block', pt: 1.5 }}>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', columnGap: 4, pb: 1 }}>
         <Typography variant='h6' align='left' sx={{ ml: 1.5 }} >Ongoing instance</Typography>
-        <Button>See attendees</Button>
+        { /* Only admins, teachers and assistants are allowed to see attendees*/
+          (auth.role == 'SYSADMIN' || auth.role == 'TEACHER'|| auth.role == 'ASSISTANT') && 
+          <Button>See attendees</Button>
+        }
       </Box>
       <Box textAlign='left' borderRadius={1} sx={{ bgcolor: 'secondary.light', p: 1.5, minWidth: '190px' }}>
         <LightLabelBoldValue label='Teaching Period' value={period} />

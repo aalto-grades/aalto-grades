@@ -10,6 +10,7 @@ import Button from '@mui/material/Button';
 import OngoingInstanceInfo from './course-view/OngoingInstanceInfo';
 import Assignments from './course-view/Assignments';
 import InstancesTable from './course-view/InstancesTable';
+import useAuth from '../hooks/useAuth';
 
 const dummyTeachers = ['Elisa Mekler (you)', 'David McGookin'];
 const dummyInfo = { period: '2021-2022 Autumn I-II', startDate: new Date(2021, 8, 14), endDate: new Date(2021, 11, 13), type: 'Lecture', credits: 5, scale: 'General scale, 0-5', organizer: 'Department of computer science', institution: 'Aalto University', teachers: dummyTeachers };
@@ -25,15 +26,23 @@ const dummyPastInstances = [{ period: '2020-2021 Autumn I-II', startDate: new Da
 const CourseView = () => {
   let { courseCode } = useParams();
 
+  const { auth } = useAuth();
+
   return(
     <Box sx={{ mr: -4, ml: -4 }}>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant='h3' sx={{ fontWeight: 'light' }}>{courseCode + ' – ' + dummyCourseName}</Typography>
-        <Button size='large' variant='contained'>New instance</Button>
+        { /* Only admins and teachers are allowed to create a new instance */
+          (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
+          <Button size='large' variant='contained'>New instance</Button>
+        }
       </Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-evenly', gap: 3 }}>
         <OngoingInstanceInfo info={dummyInfo} />
-        <Assignments assignments={dummyAssignments} />
+        { /* a different assignment component will be created for students */
+          (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
+          <Assignments assignments={dummyAssignments} />
+        }
       </Box>
       <Typography variant='h4' align='left' sx={{ fontWeight: 'light', mt: 8, mb: 3 }}>Past Instances</Typography>
       <InstancesTable data={dummyPastInstances} />
