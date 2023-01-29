@@ -145,7 +145,7 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
       courseCode: req.body.courseCode
     }, { transaction: t });
 
-    const courseTranslations: CourseTranslation[] = await CourseTranslation.bulkCreate([
+    const courseTranslations: Array<CourseTranslation> = await CourseTranslation.bulkCreate([
       {
         courseId: course.id,
         language: Language.Finnish,
