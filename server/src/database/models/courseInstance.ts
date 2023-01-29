@@ -15,6 +15,8 @@ export default class CourseInstance extends Model<InferAttributes<CourseInstance
   declare endingPeriod: string;
   declare teachingMethod: string;
   declare responsibleTeacher: ForeignKey<User['id']>;
+  declare minCredits: number;
+  declare maxCredits: number;
   declare startDate: Date;
   declare endDate: Date;
   declare createdAt: CreationOptional<Date>;
@@ -59,6 +61,14 @@ CourseInstance.init(
         model: 'user',
         key: 'id'
       }
+    },
+    minCredits: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    maxCredits: {
+      type: DataTypes.INTEGER,
+      allowNull: false
     },
     startDate: {
       type: new DataTypes.DATEONLY,
