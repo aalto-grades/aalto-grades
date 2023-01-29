@@ -9,7 +9,7 @@ export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction: Transaction = await queryInterface.sequelize.transaction();
     try {
-      await queryInterface.addConstraint('course', {
+      await queryInterface.addConstraint('course_instance', {
         fields: ['min_credits'],
         type: 'check',
         where: {

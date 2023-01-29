@@ -23,6 +23,22 @@ UserPartialGrade.init(
       autoIncrement: true,
       primaryKey: true
     },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'user',
+        key: 'id'
+      }
+    },
+    courseInstancePartialGradeId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'course_instance_partial_grade',
+        key: 'id'
+      }
+    },
     points: {
       type: DataTypes.FLOAT,
       allowNull: false

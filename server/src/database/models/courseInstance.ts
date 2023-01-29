@@ -15,6 +15,8 @@ export default class CourseInstance extends Model<InferAttributes<CourseInstance
   declare endingPeriod: string;
   declare teachingMethod: string;
   declare responsibleTeacher: ForeignKey<User['id']>;
+  declare minCredits: number;
+  declare maxCredits: number;
   declare startDate: Date;
   declare endDate: Date;
   declare createdAt: CreationOptional<Date>;
@@ -27,6 +29,14 @@ CourseInstance.init(
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true
+    },
+    courseId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'course',
+        key: 'id'
+      }
     },
     gradingType: {
       type: DataTypes.ENUM('PASSFAIL', 'NUMERICAL'),
@@ -42,6 +52,22 @@ CourseInstance.init(
     },
     teachingMethod: {
       type: DataTypes.ENUM('LECTURE', 'EXAM'),
+      allowNull: false
+    },
+    responsibleTeacher: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'user',
+        key: 'id'
+      }
+    },
+    minCredits: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    maxCredits: {
+      type: DataTypes.INTEGER,
       allowNull: false
     },
     startDate: {

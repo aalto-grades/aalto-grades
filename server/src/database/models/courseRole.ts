@@ -23,6 +23,22 @@ CourseRole.init(
       autoIncrement: true,
       primaryKey: true
     },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'user',
+        key: 'id'
+      }
+    },
+    courseInstanceId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'course_instance',
+        key: 'id'
+      }
+    },
     role: {
       type: DataTypes.ENUM('STUDENT', 'ASSISTANT', 'TEACHER', 'SYSADMIN'),
       allowNull: false

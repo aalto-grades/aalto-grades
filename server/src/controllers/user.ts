@@ -6,12 +6,17 @@ import { Request, Response } from 'express';
 import models from '../database/models';
 import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
+import Course from '../database/models/course';
 import { CourseData, Language } from './course';
-import { courseService } from '../services';
 
 export interface TeacherCourseData {
   current: Array<CourseData>,
   previous: Array<CourseData>
+}
+
+export interface CourseWithTranslationAndInstance extends Course {
+  CourseTranslations: Array<CourseTranslation>
+  CourseInstances: Array<CourseInstance>
 }
 
 export async function getUserCourses(req: Request, res: Response): Promise<void> {
@@ -20,8 +25,8 @@ export async function getUserCourses(req: Request, res: Response): Promise<void>
     const teacherId: number = Number(req.params.userId);
 
     // TODO: Go through course_role instead
-    const courses: Array<courseService.CourseWithTranslationAndInstance> = await models.Course.findAll({
-      attributes: ['id', 'courseCode', 'minCredits', 'maxCredits'],
+    const courses: Array<CourseWithTranslationAndInstance> = await models.Course.findAll({
+      attributes: ['id', 'courseCode'],
       include: [{
         model: CourseInstance,
         attributes: ['endDate'],
@@ -33,19 +38,17 @@ export async function getUserCourses(req: Request, res: Response): Promise<void>
         model: CourseTranslation,
         attributes: ['language', 'courseName', 'department'],
       }],
-    }) as Array<courseService.CourseWithTranslationAndInstance>;
+    }) as Array<CourseWithTranslationAndInstance>;
 
     // Construct CourseData objects and determine whether the course is current
     // or previous.
     const currentDate: Date = new Date(Date.now());
     for (const i in courses) {
-      const course: courseService.CourseWithTranslationAndInstance = courses[i];
+      const course: CourseWithTranslationAndInstance = courses[i];
 
       const courseData: CourseData = {
         id: course.id,
         courseCode: course.courseCode,
-        minCredits: course.minCredits,
-        maxCredits: course.maxCredits,
         department: {
           fi: '',
           sv: '',
