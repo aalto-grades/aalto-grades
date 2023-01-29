@@ -4,41 +4,59 @@
 
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import EditInstanceForm from '../components/edit-instance-view/EditInstanceForm';
+import EditInstanceView from '../components/EditInstanceView';
 import dummyInstances from '../dummy-data/dummyInstances';
+import instancesService from '../services/instances';
+
+jest.mock('../services/instances');
+afterEach(cleanup);
 
 describe('Tests for EditInstanceView components', () => {
 
-  test('EditInstanceView should render the EditInstanceForm and contain all of the appropriate components', () => {
+  const renderEditInstanceView = async () => {
 
-    const instance = dummyInstances[0];
+    const mockResponse = {instance: dummyInstances[0]};
 
-    render(
+    console.log(mockResponse);
+
+    instancesService.getSisuInstance.mockRejectedValue('Network error');
+    instancesService.getSisuInstance.mockResolvedValue(mockResponse);
+
+    return render(
       <BrowserRouter>
-        <EditInstanceForm instance={instance}/>
+          <EditInstanceView />
       </BrowserRouter>
     );
+  };
 
-    const typeField = screen.getByLabelText('Type');
-    const startingField = screen.getByLabelText('Starting Date');
-    const endingField = screen.getByLabelText('Ending Date');
-    const teacherField = screen.getAllByLabelText('Teacher of This Instance');
-    const minCreditsField = screen.getByLabelText('Min Credits');
-    const maxCreditsField = screen.getByLabelText('Max Credits');
-    const gradingField = screen.getByLabelText('Grading Scale');
-    const confirmButton = screen.getByText('Confirm Details');
+  test('EditInstanceView should render the EditInstanceForm and contain all of the appropriate components', async () => {
 
-    expect(typeField).toBeDefined();
-    expect(startingField).toBeDefined();
-    expect(endingField).toBeDefined();
-    expect(teacherField).toBeDefined();
-    expect(minCreditsField).toBeDefined();
-    expect(maxCreditsField).toBeDefined();
-    expect(endingField).toBeDefined();
-    expect(gradingField).toBeDefined();
-    expect(confirmButton).toBeDefined();
+    renderEditInstanceView();
+
+    await waitFor(() => {
+      const typeField = screen.getByLabelText('Type');
+      const startingField = screen.getByLabelText('Starting Date');
+      const endingField = screen.getByLabelText('Ending Date');
+      const teacherField = screen.getByLabelText('Teacher of This Instance');
+      const minCreditsField = screen.getByLabelText('Min Credits');
+      const maxCreditsField = screen.getByLabelText('Max Credits');
+      const gradingField = screen.getByLabelText('Grading Scale');
+      const confirmButton = screen.queryByText('Confirm Details');
+
+      console.log(teacherField);
+
+      expect(typeField).toBeInTheDocument();
+      expect(startingField).toBeInTheDocument();
+      expect(endingField).toBeInTheDocument();
+      expect(teacherField).toBeInTheDocument();
+      expect(minCreditsField).toBeInTheDocument();
+      expect(maxCreditsField).toBeInTheDocument();
+      expect(gradingField).toBeInTheDocument();
+      expect(confirmButton).toBeInTheDocument();
+    });
+
   });
 
 });

@@ -4,48 +4,57 @@
 
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import FetchedInstances from '../components/fetch-instances-view/FetchedInstances';
-import dummyInstances from '../dummy-data/dummyInstances';
+import instancesService from '../services/instances';
 import FetchInstancesView from '../components/FetchInstancesView';
+import dummyInstances from '../dummy-data/dummyInstances';
+
+jest.mock('../services/instances');
+afterEach(cleanup);
 
 describe('Tests for FetchInstancesView components', () => {
 
-  test('FetchInstancesView should contain all of the appropriate components', () => {
+  const instancesLength = dummyInstances.length;
+
+  const renderFetchInstancesView = async () => {
+
+    const mockResponse = {instances: dummyInstances};
+
+    instancesService.getSisuInstances.mockRejectedValue('Network error');
+    instancesService.getSisuInstances.mockResolvedValue(mockResponse);
+
+    return render(
+      <BrowserRouter>
+        <FetchInstancesView />
+      </BrowserRouter>
+    );
+  };
+
+  test('FetchInstancesView should contain all of the appropriate components', async () => {
     
-    render(
-      <BrowserRouter>
-        <FetchInstancesView/>
-      </BrowserRouter>
-    );
+    renderFetchInstancesView();
 
-    const headingElement = screen.getByText('Instances Found from SISU');
-    const subHeading = screen.getByText('Select the instance you wish to add');
-    const scratchButton = screen.getByText('Start from Scratch');
+    await waitFor(() => {
+      const headingElement = screen.queryByText('Instances Found from SISU');
+      const subHeading = screen.queryByText('Select the instance you wish to add');
+      const scratchButton = screen.queryByText('Start from Scratch');
+      const type = screen.queryAllByText('Type:');
+      const startDate = screen.queryAllByText('Starting Date:');
+      const endDate = screen.queryAllByText('Ending Date:');
+      const mockType = screen.queryByText('Lecture');
+      const mockDate = screen.queryByText('06.02.2023');
 
-    expect(headingElement).toBeDefined();
-    expect(subHeading).toBeDefined();
-    expect(scratchButton).toBeDefined();
+      expect(headingElement).toBeInTheDocument();
+      expect(subHeading).toBeInTheDocument();
+      expect(scratchButton).toBeInTheDocument();
+      expect(type).toHaveLength(instancesLength);
+      expect(startDate).toHaveLength(instancesLength);
+      expect(endDate).toHaveLength(instancesLength);
+      expect(mockType).toBeInTheDocument();
+      expect(mockDate).toBeInTheDocument();
+    });
   
-  }),
-
-  test('FetchedInstances should contain all of the appropriate components', () => {
-
-    render(
-      <BrowserRouter>
-        <FetchedInstances info={dummyInstances}/>
-      </BrowserRouter>
-    );
-
-    const courseType = screen.getAllByText('Type:');
-    const startDate = screen.getAllByText('Starting Date:');
-    const endDate = screen.getAllByText('Ending Date:');
-
-    expect(courseType).toBeDefined();
-    expect(startDate).toBeDefined();
-    expect(endDate).toBeDefined();
-
   });
 
 });
