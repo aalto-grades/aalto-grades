@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import { Transaction } from 'sequelize';
 import * as yup from 'yup';
 import CourseInstance from '../database/models/courseInstance';
 import Course from '../database/models/course';
@@ -14,6 +15,8 @@ import { axiosTimeout } from '../configs/config';
 import axios, { AxiosResponse } from 'axios';
 import { SisuInstance } from '../types/sisu';
 import User from '../database/models/user';
+import { sequelize } from '../database';
+import { MessageParams } from 'yup/lib/types';
 
 export interface LocalizedString {
   fi: string,
@@ -25,8 +28,6 @@ export interface CourseData {
   // course id is either number type id in grades db or undefined when representing parsed sisu data
   id?: number | undefined,
   courseCode: string,
-  minCredits: number,
-  maxCredits: number,
   department: LocalizedString,
   name: LocalizedString,
   evaluationInformation: LocalizedString
@@ -37,7 +38,9 @@ export interface InstanceData {
   // instance id is either Sisu instance id (string) or number type id in grades db
   id: number | string,
   startingPeriod: string,
-  endingPeriod: string
+  endingPeriod: string,
+  minCredits: number,
+  maxCredits: number,
   startDate: Date,
   endDate: Date,
   courseType: string,
@@ -52,11 +55,33 @@ export enum Language {
   Swedish = 'SV'
 }
 
+interface JsonError extends Error {
+  expose?: boolean,
+  status?: number,
+  statusCode?: number,
+  body?: string,
+  type?: string
+}
+
 const idSchema: yup.AnyObjectSchema = yup.object().shape({
   id: yup
     .number()
     .required()
 });
+
+/* Yup validation schema for validating localized strings in requests
+ * Does not allow leaving the object empty, requires at least one translation
+ * Checks that keys match the ones defined in shape, throws error if they don't
+ */
+export const localizedStringSchema: yup.AnyObjectSchema = yup.object().shape({
+  fi: yup.string(),
+  en: yup.string(),
+  sv: yup.string()
+}).test(
+  'localized-string-check-not-empty',
+  (params: MessageParams) => `${params.path} must contain at least one translation`,
+  (obj: object) => (obj === undefined || obj === null) ? true : Object.keys(obj).length !== 0
+).strict().noUnknown().default(undefined);
 
 function parseSisuInstance(instance: SisuInstance): InstanceData {
   return {
@@ -64,6 +89,8 @@ function parseSisuInstance(instance: SisuInstance): InstanceData {
     id: instance.id,
     startingPeriod: '-',
     endingPeriod: '-',
+    minCredits: instance.credits.min,
+    maxCredits: instance.credits.max,
     startDate: instance.startDate,
     endDate: instance.endDate,
     // TODO use enums here
@@ -72,8 +99,6 @@ function parseSisuInstance(instance: SisuInstance): InstanceData {
     responsibleTeachers: instance.summary.teacherInCharge,
     courseData: {
       courseCode: instance.code,
-      minCredits: instance.credits.min,
-      maxCredits: instance.credits.max,
       department: {
         en: instance.organizationName.en,
         fi: instance.organizationName.fi,
@@ -93,19 +118,116 @@ function parseSisuInstance(instance: SisuInstance): InstanceData {
   };
 }
 
+// Middleware function for handling errors in JSON parsing
+export function handleInvalidRequestJson(err: JsonError, req: Request, res: Response, next: NextFunction): void {
+  if (err instanceof SyntaxError && err.status === 400 && err.body !== undefined) {
+    res.status(400).send({
+      success: false,
+      errors: [ `SyntaxError: ${err.message}: ${err.body}` ]
+    });
+  } else
+    next();
+}
 
 export async function addCourse(req: Request, res: Response): Promise<void> {
+  const requestSchema: yup.AnyObjectSchema = yup.object().shape({
+    courseCode: yup.string().required(),
+    department: localizedStringSchema.required(),
+    name: localizedStringSchema.required()
+  });
+
+  const t: Transaction = await sequelize.transaction();
+
   try {
-    // TODO: add the course to the database
-    res.send({
-      success: true
+    await requestSchema.validate(req.body, { abortEarly: false });
+
+    const course: Course = await Course.create({
+      courseCode: req.body.courseCode
+    }, { transaction: t });
+
+    const courseTranslations: Array<CourseTranslation> = await CourseTranslation.bulkCreate([
+      {
+        courseId: course.id,
+        language: Language.Finnish,
+        department: req.body.department.fi ?? '',
+        courseName: req.body.name.fi ?? ''
+      },
+      {
+        courseId: course.id,
+        language: Language.English,
+        department: req.body.department.en ?? '',
+        courseName: req.body.name.en ?? ''
+      },
+      {
+        courseId: course.id,
+        language: Language.Swedish,
+        department: req.body.department.sv ?? '',
+        courseName: req.body.name.sv ?? ''
+      }
+    ], { transaction: t });
+
+    await t.commit();
+
+    const courseData: CourseData = {
+      id: course.id,
+      courseCode: course.courseCode,
+      department: {
+        en: '',
+        fi: '',
+        sv: ''
+      },
+      name: {
+        en: '',
+        fi: '',
+        sv: ''
+      },
+      evaluationInformation: {
+        en: '',
+        fi: '',
+        sv: ''
+      }
+    };
+
+    for (const translation of courseTranslations) {
+      switch (translation.language) {
+
+      case Language.English:
+        courseData.department.en = translation.department;
+        courseData.name.en = translation.courseName;
+        break;
+      
+      case Language.Finnish:
+        courseData.department.fi = translation.department;
+        courseData.name.fi = translation.courseName;
+        break;
+      
+      case Language.Swedish:
+        courseData.department.sv = translation.department;
+        courseData.name.sv = translation.courseName;
+        break;
+
+      }
+    }
+
+    res.json({ 
+      success: true,
+      course: courseData
     });
   } catch (error) {
-    res.status(401);
-    res.send({
-      success: false,
-      error: error,
-    });
+    // TODO: appropriate logging in case of errors
+    await t.rollback();
+
+    if (error instanceof yup.ValidationError) {
+      res.status(400).json({ 
+        success: false,
+        errors: error.errors
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        errors: [ 'Internal Server Error' ]
+      });
+    }
   }
 }
 
@@ -133,6 +255,8 @@ interface CourseInstanceAddRequest {
   endingPeriod: Period;
   teachingMethod: TeachingMethod;
   responsibleTeacher: number;
+  minCredits: number;
+  maxCredits: number;
   startDate: Date;
   endDate: Date;
 }
@@ -156,6 +280,14 @@ const courseInstanceAddRequestSchema: yup.AnyObjectSchema = yup.object().shape({
     .required(),
   responsibleTeacher: yup
     .number()
+    .required(),
+  minCredits: yup
+    .number()
+    .min(0)
+    .required(),
+  maxCredits: yup
+    .number()
+    .min(yup.ref('minCredits'))
     .required(),
   startDate: yup
     .date()
@@ -200,6 +332,8 @@ export async function addCourseInstance(req: Request, res: Response): Promise<Re
       endingPeriod: request.endingPeriod,
       teachingMethod: request.teachingMethod,
       responsibleTeacher: request.responsibleTeacher,
+      minCredits: request.minCredits,
+      maxCredits: request.maxCredits,
       startDate: request.startDate,
       endDate: request.endDate
     });
@@ -237,8 +371,6 @@ export async function getCourse(req: Request, res: Response): Promise<Response> 
     const courseData: CourseData = {
       id: course.id,
       courseCode: course.courseCode,
-      minCredits: course.minCredits,
-      maxCredits: course.maxCredits,
       department: {
         en: '',
         fi: '',
@@ -313,6 +445,8 @@ export async function getInstance(req: Request, res: Response): Promise<Response
       id: instance.id,
       startingPeriod: instance.startingPeriod,
       endingPeriod: instance.endingPeriod,
+      minCredits: instance.minCredits,
+      maxCredits: instance.maxCredits,
       startDate: instance.startDate,
       endDate: instance.endDate,
       courseType: instance.teachingMethod,
@@ -321,8 +455,6 @@ export async function getInstance(req: Request, res: Response): Promise<Response
       courseData: {
         id: instance.Course.id,
         courseCode: instance.Course.courseCode,
-        minCredits: instance.Course.minCredits,
-        maxCredits: instance.Course.maxCredits,
         department: {
           en: '',
           fi: '',

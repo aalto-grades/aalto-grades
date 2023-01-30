@@ -24,7 +24,7 @@ const PartialAssignment = ({ assignment }) => {
         <Typography variant='body2'>{'Weight: ' + Math.round(weight * 100) + ' %'}</Typography>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography align='left' variant='caption'>{'Expiry date: ' + textFormatServices.formatDate(expiryDate)}</Typography>
+        <Typography align='left' variant='caption'>{'Expiry date: ' + textFormatServices.formatDateToString(expiryDate)}</Typography>
         <Button>Edit</Button>
       </Box>
     </Box>

@@ -4,7 +4,7 @@
 
 import express, { Request, Response, Router } from 'express';
 import { getUserCourses } from '../controllers/user';
-import { addCourse, addCourseInstance, fetchAllInstancesFromSisu, fetchInstanceFromSisu, getCourse, getInstance } from '../controllers/course';
+import { addCourse, handleInvalidRequestJson, addCourseInstance, fetchAllInstancesFromSisu, fetchInstanceFromSisu, getCourse, getInstance } from '../controllers/course';
 import { authLogin, authLogout, authSelfInfo, authSignup } from './login';
 import passport from 'passport';
 import cors from 'cors';
@@ -23,7 +23,7 @@ router.get('/v1/courses/sisu/:courseId', fetchAllInstancesFromSisu);
 router.get('/v1/courses/sisu/instance/:instanceId', fetchInstanceFromSisu);
 
 // Course and instance routes
-router.post('/v1/courses', express.json(), addCourse);
+router.post('/v1/courses', express.json(), handleInvalidRequestJson, addCourse);
 router.post('/v1/courses/:courseId/instances', express.json(), addCourseInstance);
 
 router.get('/v1/courses/:courseId', getCourse);

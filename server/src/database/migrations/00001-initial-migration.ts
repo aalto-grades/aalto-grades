@@ -48,14 +48,6 @@ export default {
           type: new DataTypes.STRING,
           allowNull: false
         },
-        min_credits: {
-          type: new DataTypes.INTEGER,
-          allowNull: false
-        },
-        max_credits: {
-          type: new DataTypes.INTEGER,
-          allowNull: false,
-        },
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
@@ -100,6 +92,14 @@ export default {
           },
           onDelete: 'SET NULL',
           onUpdate: 'CASCADE'
+        },
+        min_credits: {
+          type: DataTypes.INTEGER,
+          allowNull: false
+        },
+        max_credits: {
+          type: DataTypes.INTEGER,
+          allowNull: false
         },
         start_date: {
           type: new DataTypes.DATEONLY,

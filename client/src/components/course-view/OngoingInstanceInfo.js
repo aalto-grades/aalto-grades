@@ -7,25 +7,9 @@ import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 import textFormatServices from '../../services/textFormat';
 import useAuth from '../../hooks/useAuth';
-
-const LightLabelBoldValue = ({ label, value }) => {
-  return (
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', columnGap: 1 }}>
-      <Typography variant='body2'>{label + ':'}</Typography>
-      <Typography variant='body2' sx={{ fontWeight: 'bold' }}>{value}</Typography>
-    </Box>
-  );
-};
-
-LightLabelBoldValue.propTypes = {
-  label: PropTypes.string,
-  value: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number
-  ]),
-};
 
 const OngoingInstanceInfo = ({ info }) => {
   const { period, startDate, endDate, type, credits, scale, organizer, institution, teachers } = info;
@@ -42,8 +26,8 @@ const OngoingInstanceInfo = ({ info }) => {
       </Box>
       <Box textAlign='left' borderRadius={1} sx={{ bgcolor: 'secondary.light', p: 1.5, minWidth: '190px' }}>
         <LightLabelBoldValue label='Teaching Period' value={period} />
-        <LightLabelBoldValue label='Starting Date' value={textFormatServices.formatDate(startDate)} />
-        <LightLabelBoldValue label='Ending Date' value={textFormatServices.formatDate(endDate)} />
+        <LightLabelBoldValue label='Starting Date' value={textFormatServices.formatDateToString(startDate)} />
+        <LightLabelBoldValue label='Ending Date' value={textFormatServices.formatDateToString(endDate)} />
         <LightLabelBoldValue label='Type' value={type} />
       </Box>
       <Box textAlign='left' borderRadius={1} sx={{ bgcolor: 'secondary.light', p: 1.5, mt: 1, minWidth: '190px' }}>
