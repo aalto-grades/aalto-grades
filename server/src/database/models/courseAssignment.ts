@@ -8,7 +8,7 @@ import CourseInstancePartialGrade from './courseInstancePartialGrade';
 
 export default class CourseAssignment extends Model<InferAttributes<CourseAssignment>, InferCreationAttributes<CourseAssignment>> {
   declare id: CreationOptional<number>;
-  declare courseInstanceId: ForeignKey<CourseInstancePartialGrade['id']>;
+  declare courseInstancePartialGradeId: ForeignKey<CourseInstancePartialGrade['id']>;
   declare assignmentId: string;
   declare maxPoints: number;
   declare createdAt: CreationOptional<Date>;
@@ -21,6 +21,14 @@ CourseAssignment.init(
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true
+    },
+    courseInstancePartialGradeId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'course_instance_partial_grade',
+        key: 'id'
+      }
     },
     assignmentId: {
       type: DataTypes.STRING,

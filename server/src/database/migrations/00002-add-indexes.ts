@@ -8,6 +8,10 @@ export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction: Transaction = await queryInterface.sequelize.transaction();
     try {
+      await queryInterface.addIndex('course', [ 'course_code' ], {
+        unique: false,
+        transaction
+      });
       await queryInterface.addIndex('course_instance', ['course_id'], {
         unique: false,
         transaction

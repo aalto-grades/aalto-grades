@@ -28,6 +28,22 @@ CourseInstancePartialGrade.init(
       autoIncrement: true,
       primaryKey: true
     },
+    courseId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'course',
+        key: 'id'
+      }
+    },
+    courseInstanceId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'course_instance',
+        key: 'id'
+      }
+    },
     type: {
       type: DataTypes.ENUM('EXAM', 'EXERCISE', 'ATTENDANCE', 'FEEDBACK'),
       allowNull: false

@@ -2,14 +2,35 @@
 //
 // SPDX-License-Identifier: MIT
 
+import models from '../database/models';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
-export interface CourseWithTranslationAndInstance extends Course {
+export interface CourseWithTranslation extends Course {
   CourseTranslations: Array<CourseTranslation>
-  CourseInstances: Array<CourseInstance>
+}
+
+/**
+ * Finds a course by its id, and include data from the CourseTranslation model.
+ * @param {number} courseId - The id of the course to be found.
+ * @returns {Promise<CourseWithTranslation>} - A promise that resolves with the found course object.
+ * @throws {Error} - If the course is not found, throws an error with a message indicating the missing course.
+ */
+export async function findCourseById(courseId: number): Promise<CourseWithTranslation> {
+
+  const course: Course | null = await models.Course.findByPk(courseId, {
+    attributes: ['id', 'courseCode'],
+    include: {
+      model: CourseTranslation,
+      attributes: ['language', 'courseName', 'department'],
+    }
+  });
+
+  if (!course) throw new Error (`course with an id ${courseId} not found`);
+
+  return course as CourseWithTranslation;
 }
 
 export interface InstanceWithTeacher {
@@ -24,13 +45,13 @@ export async function findAllInstances(courseId: number): Promise<Array<Course |
   if (!course) throw new Error (`course with id ${courseId} not found`);  
 
   const instances: Array<CourseInstance> = await CourseInstance.findAll({
-    attributes: ['id', 'courseId', 'gradingType', 'startingPeriod', 'endingPeriod', 'teachingMethod', 'responsibleTeacher', 'startDate', 'endDate', 'createdAt', 'updatedAt'],
+    attributes: ['id', 'courseId', 'gradingType', 'startingPeriod', 'endingPeriod', 'teachingMethod', 'responsibleTeacher', 'minCredits', 'maxCredits', 'startDate', 'endDate', 'createdAt', 'updatedAt'],
     where: {
       courseId: courseId
     }
   });
 
-  var instancesWithTeacher: Array<InstanceWithTeacher> = [];
+  const instancesWithTeacher: Array<InstanceWithTeacher> = [];
 
   if (instances.length != 0) {
     for (const instance of instances) {
@@ -39,8 +60,8 @@ export async function findAllInstances(courseId: number): Promise<Array<Course |
         CourseInstance: instance,
         Teacher: teacher
       });
-    };
-  };
+    }
+  }
 
   return [course, instancesWithTeacher];
 }
