@@ -2,32 +2,45 @@
 //
 // SPDX-License-Identifier: MIT
 
-import models from '../database/models';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
+import User from '../database/models/user';
 
 export interface CourseWithTranslationAndInstance extends Course {
   CourseTranslations: Array<CourseTranslation>
   CourseInstances: Array<CourseInstance>
 }
 
-export async function findAllInstances(courseId: number): Promise<Array<CourseInstance>> {
-  const course: Array<Course> | null = await models.Course.findAll({
-    attributes: ['id'],
-    where: {
-      id: courseId
-    }
-  });
-  
-  if (course == null || course.length == 0) throw new Error (`course with id ${courseId} not found`);
+export interface InstanceWithTeacher {
+  CourseInstance: CourseInstance
+  Teacher: User | null
+}
 
-  const instances: Array<CourseInstance> | null = await models.CourseInstance.findAll({
-    attributes: ['courseId', 'gradingType', 'startingPeriod', 'endingPeriod'],
+export async function findAllInstances(courseId: number): Promise<Array<Course | Array<InstanceWithTeacher>>> {
+  
+  const course: Course | null = await Course.findByPk(courseId);
+  
+  if (!course) throw new Error (`course with id ${courseId} not found`);  
+
+  const instances: Array<CourseInstance> = await CourseInstance.findAll({
+    attributes: ['id', 'courseId', 'gradingType', 'startingPeriod', 'endingPeriod', 'teachingMethod', 'responsibleTeacher', 'startDate', 'endDate', 'createdAt', 'updatedAt'],
     where: {
       courseId: courseId
     }
   });
 
-  return instances;
+  var instancesWithTeacher: Array<InstanceWithTeacher> = [];
+
+  if (instances.length != 0) {
+    for (const instance of instances) {
+      const teacher: User | null = await User.findByPk(instance.responsibleTeacher);
+      instancesWithTeacher.push({
+        CourseInstance: instance,
+        Teacher: teacher
+      });
+    };
+  };
+
+  return [course, instancesWithTeacher];
 }

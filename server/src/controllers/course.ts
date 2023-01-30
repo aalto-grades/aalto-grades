@@ -9,7 +9,8 @@ import { axiosTimeout } from '../configs/config';
 import { SisuInstance } from '../types/sisu';
 import { courseService } from '../services';
 import * as yup from 'yup';
-import CourseInstance from '../database/models/courseInstance';
+import Course from '../database/models/course';
+import { InstanceWithTeacher } from '../services/course';
 
 export interface LocalizedString {
   fi: string,
@@ -164,8 +165,51 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
   try {
     const courseId: number = Number(req.params.courseId);
     await idSchema.validate({ id: courseId });
-    const instances: Array<CourseInstance> = await courseService.findAllInstances(courseId);
+    const fetchedData: Array<Course | Array<InstanceWithTeacher>> = await courseService.findAllInstances(courseId);
+    const course: Course = fetchedData[0] as Course;
+    const seqInstances: Array<InstanceWithTeacher> = fetchedData[1] as Array<InstanceWithTeacher>;
+    var instances: Array<InstanceData> = [];
 
+    seqInstances.forEach(instanceWithTeacher => {
+      const instance: InstanceData = {
+        courseData: {
+          id: course.id,
+          courseCode: course.courseCode,
+          minCredits: course.minCredits,
+          maxCredits: course.maxCredits,
+          department: {
+            en: '',
+            fi: '',
+            sv: ''
+          },
+          name: {
+            en: '',
+            fi: '',
+            sv: ''
+          },
+          evaluationInformation: {
+            en: '',
+            fi: '',
+            sv: ''
+          }
+        },
+        id: instanceWithTeacher.CourseInstance.id,
+        startingPeriod: instanceWithTeacher.CourseInstance.startingPeriod,
+        endingPeriod: instanceWithTeacher.CourseInstance.endingPeriod,
+        startDate: instanceWithTeacher.CourseInstance.startDate,
+        endDate: instanceWithTeacher.CourseInstance.endDate,
+        courseType: '',
+        gradingType: instanceWithTeacher.CourseInstance.gradingType,
+        responsibleTeachers: [''],
+      }
+
+      if (instanceWithTeacher.Teacher) {
+        instance.responsibleTeachers = [instanceWithTeacher.Teacher.name]
+      }
+
+      instances.push(instance);
+
+    });
     return res.status(200).send({
       success: true,
       instances: instances,
