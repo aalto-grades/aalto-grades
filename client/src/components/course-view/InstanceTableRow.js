@@ -18,8 +18,8 @@ const InstanceTableRow = ({ instance }) => {
       onClick={() => {/* TODO: Add functionality to view old instances */ }}
     >
       <TableCell>{period}</TableCell>
-      <TableCell>{textFormatServices.formatDate(startDate)}</TableCell>
-      <TableCell>{textFormatServices.formatDate(endDate)}</TableCell>
+      <TableCell>{textFormatServices.formatDateToString(startDate)}</TableCell>
+      <TableCell>{textFormatServices.formatDateToString(endDate)}</TableCell>
       <TableCell>{type}</TableCell>
     </TableRow>
   );

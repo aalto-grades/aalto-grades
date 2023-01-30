@@ -10,6 +10,7 @@ import Button from '@mui/material/Button';
 import OngoingInstanceInfo from './course-view/OngoingInstanceInfo';
 import Assignments from './course-view/Assignments';
 import InstancesTable from './course-view/InstancesTable';
+import { useNavigate } from 'react-router-dom';
 
 const dummyTeachers = ['Elisa Mekler (you)', 'David McGookin'];
 const dummyInfo = { period: '2021-2022 Autumn I-II', startDate: new Date(2021, 8, 14), endDate: new Date(2021, 11, 13), type: 'Lecture', credits: 5, scale: 'General scale, 0-5', organizer: 'Department of computer science', institution: 'Aalto University', teachers: dummyTeachers };
@@ -23,13 +24,16 @@ const dummyPastInstances = [{ period: '2020-2021 Autumn I-II', startDate: new Da
   { period: '2019-2020 Autumn I-II', startDate: new Date(2019, 8, 9), endDate: new Date(2019, 11, 8), type: 'Lecture', id: 2 }];
 
 const CourseView = () => {
+  let navigate = useNavigate();
   let { courseCode } = useParams();
 
   return(
     <Box sx={{ mr: -4, ml: -4 }}>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant='h3' sx={{ fontWeight: 'light' }}>{courseCode + ' – ' + dummyCourseName}</Typography>
-        <Button size='large' variant='contained'>New instance</Button>
+        <Button size='large' variant='contained' onClick={() => { navigate('/fetch-instances/' + courseCode); }}>
+          New instance
+        </Button>
       </Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-evenly', gap: 3 }}>
         <OngoingInstanceInfo info={dummyInfo} />
