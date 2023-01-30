@@ -28,21 +28,20 @@ const FrontPage = () => {
       .catch((e) => console.log(e.message));
   }, []);
 
-  // Conditional rendering: only admin and teachers are shown the button for creating a new course
-  // current and inactive courses will later be rendered based on the student/teacher id
-
   return(
     <>
       <Box component="span" sx={{ display: 'flex', alignItems: 'center',  justifyContent: 'space-between', flexDirection: 'row' }}>
         <Typography variant="h3" component="div" align="left" sx={{ flexGrow: 1 }}>
                 Your Current Courses
         </Typography>
-        {auth.role == 'SYSADMIN' &&
+        { /* admins and teachers are shown the button for creating a new course */
+          auth.role == 'SYSADMIN' &&
           <Button size='large' variant='contained' onClick={() => { navigate('/create-course'); }}>
             Create New Course
           </Button>
         }
       </Box>
+      {/* current and inactive courses will later be rendered based on the student/teacher id */}
       <BasicGrid data={currentCourses}/>
       <Typography variant="h4" component="div" align="left" sx={{ flexGrow: 1, mt: 4 }}>
                 Inactive Courses
