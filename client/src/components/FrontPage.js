@@ -10,11 +10,14 @@ import BasicGrid from './front-page/BasicGrid';
 import CourseTable from './front-page/CourseTable';
 import coursesService from '../services/courses';
 import { useNavigate } from 'react-router-dom';
+import useAuth from '../hooks/useAuth';
 
 const FrontPage = () => {
   const navigate = useNavigate();
   const [currentCourses, setCurrentCourses] = useState([]);
   const [previousCourses, setPreviousCourses] = useState([]);
+
+  const { auth } = useAuth();
 
   useEffect(() => {
     coursesService.getCourses()
@@ -31,10 +34,14 @@ const FrontPage = () => {
         <Typography variant="h3" component="div" align="left" sx={{ flexGrow: 1 }}>
                 Your Current Courses
         </Typography>
-        <Button size='large' variant='contained' onClick={() => { navigate('/create-course'); }}>
-                Create New Course
-        </Button>
+        { /* admins and teachers are shown the button for creating a new course */
+          auth.role == 'SYSADMIN' &&
+          <Button size='large' variant='contained' onClick={() => { navigate('/create-course'); }}>
+            Create New Course
+          </Button>
+        }
       </Box>
+      {/* current and inactive courses will later be rendered based on the student/teacher id */}
       <BasicGrid data={currentCourses}/>
       <Typography variant="h4" component="div" align="left" sx={{ flexGrow: 1, mt: 4 }}>
                 Inactive Courses

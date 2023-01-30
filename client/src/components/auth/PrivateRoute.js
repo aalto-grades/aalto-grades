@@ -12,7 +12,7 @@ import { Outlet } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';
 
-const PrivateRoute = ({ children }) => {
+const PrivateRoute = ({ children, roles }) => {
 
   const [loading, setLoading] = useState(true);
   const { auth, setAuth } = useAuth();
@@ -41,15 +41,21 @@ const PrivateRoute = ({ children }) => {
 
   // only load page after token has been retrieved
   if (!loading) {
-    // if role can be found -> token exists -> can access page
+    // if role can be found -> token exists
     if(auth.role) {
-      return (
-        <>
-          {children}
-          <Outlet />
-        </>
-      );
-    // no role found -> redirect to login
+      // check if role is in the list of authorised roles
+      if (roles.includes(auth.role)) {
+        return (
+          <>
+            {children}
+            <Outlet />
+          </>
+        );
+      // if user is not authorised to access page -> redirect to front page
+      } else {
+        return <Navigate to='/' />;
+      }
+    // no role found -> no token -> redirect to login
     } else {
       return <Navigate to='/login' />;
     }
@@ -57,7 +63,8 @@ const PrivateRoute = ({ children }) => {
 };
 
 PrivateRoute.propTypes = {
-  children: PropTypes.element
+  children: PropTypes.element,
+  roles: PropTypes.array
 };
 
 export default PrivateRoute;

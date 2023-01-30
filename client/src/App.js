@@ -50,6 +50,13 @@ const AppContainer = styled(Container)`
   text-align: center;
 `;
 
+const roles = {
+  'admin': 'SYSADMIN',
+  'teacher': 'TEACHER',
+  'student': 'STUDENT',
+  'assistant': 'ASSISTANT'
+};
+
 function App() {
   const logout = useLogout();
   const navigate = useNavigate();
@@ -84,10 +91,17 @@ function App() {
           <Routes>
             <Route path='/login' element={<Login/>} />
             <Route path='/signup' element={<Signup/>} />
-            <Route element={<PrivateRoute/>}>
+            {/* All roles are authorised to access the front page, conditional rendering is done inside the component */}
+            <Route element={<PrivateRoute roles={[roles.admin, roles.teacher, roles.student, roles.assistant]}/>}>
               <Route path='/' element={<FrontPage/>} />
-              <Route path='/create-course' element={<CreateCourseView/>}/>
               <Route path='/course-view/:courseCode' element={<CourseView/>}/>  {/* Add nested routes when needed */}
+            </Route>
+            {/* Pages that are only authorised for admin */}
+            <Route element={<PrivateRoute roles={[roles.admin]}/>}>
+              <Route path='/create-course' element={<CreateCourseView/>}/>
+            </Route>
+            {/* Pages that are authorised for admin and teachers */}
+            <Route element={<PrivateRoute roles={[roles.admin, roles.teacher]}/>}>
               <Route path='/fetch-instances/:courseId' element={<FetchInstancesView/>}/>
               <Route path='/edit-instance/:instanceId' element={<EditInstanceView/>}/>
             </Route>
