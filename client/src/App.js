@@ -95,12 +95,15 @@ function App() {
             <Route element={<PrivateRoute roles={[roles.admin, roles.teacher, roles.student, roles.assistant]}/>}>
               <Route path='/' element={<FrontPage/>} />
               <Route path='/course-view/:courseCode' element={<CourseView/>}/>  {/* Add nested routes when needed */}
-              <Route path='/fetch-instances/:courseId' element={<FetchInstancesView/>}/>
-              <Route path='/edit-instance/:instanceId' element={<EditInstanceView/>}/>
             </Route>
             {/* Pages that are only authorised for admin */}
             <Route element={<PrivateRoute roles={[roles.admin]}/>}>
               <Route path='/create-course' element={<CreateCourseView/>}/>
+            </Route>
+            {/* Pages that are authorised for admin and teachers */}
+            <Route element={<PrivateRoute roles={[roles.admin, roles.teacher]}/>}>
+              <Route path='/fetch-instances/:courseId' element={<FetchInstancesView/>}/>
+              <Route path='/edit-instance/:instanceId' element={<EditInstanceView/>}/>
             </Route>
           </Routes>
         </Box>
