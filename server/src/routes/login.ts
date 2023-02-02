@@ -66,7 +66,7 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
               id: loginResult.id,
             };
             const token: string = jwt.sign(body, jwtSecret, {
-                expiresIn: '25h',
+              expiresIn: '25h',
             });
             res.cookie('jwt', token, {
               httpOnly: true,
@@ -115,7 +115,7 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
       id,
     };
     const token: string = jwt.sign(body, jwtSecret, {
-        expiresIn: '25h',
+      expiresIn: '25h',
     });
     res.cookie('jwt', token, {
       httpOnly: true,
