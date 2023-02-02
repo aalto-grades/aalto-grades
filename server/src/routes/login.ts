@@ -65,7 +65,9 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
               role: loginResult.role,
               id: loginResult.id,
             };
-            const token: string = jwt.sign(body, jwtSecret);
+            const token: string = jwt.sign(body, jwtSecret, {
+                expiresIn: '25h',
+            });
             res.cookie('jwt', token, {
               httpOnly: true,
               secure: !testEnv,
@@ -112,7 +114,9 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
       role: req.body.role,
       id,
     };
-    const token: string = jwt.sign(body, jwtSecret);
+    const token: string = jwt.sign(body, jwtSecret, {
+        expiresIn: '25h',
+    });
     res.cookie('jwt', token, {
       httpOnly: true,
       secure: !testEnv,
