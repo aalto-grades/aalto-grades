@@ -8,9 +8,7 @@ WORKDIR /app
 
 ARG SERVER_SKIP_CI
 
-COPY . .
-
-RUN chown -R node:node ./*
+COPY --chown=node:node . .
 
 RUN if [ -z "$SERVER_SKIP_CI" ] || [ $SERVER_SKIP_CI != 1 ]; then npm ci; fi
 
