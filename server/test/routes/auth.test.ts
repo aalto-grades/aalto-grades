@@ -104,7 +104,7 @@ describe('Test GET /v1/auth/self-info and cookies', () => {
 });
 
 describe('Test POST /v1/auth/login and expiry', () => {
-  it('should expire the session after 25 hours', async() => {
+  it('should expire the session after a set time', async() => {
     // Use the agent for cookie persistence
     const agent: SuperAgentTest = supertest.agent(app);
     const realDate: Date = new Date();
