@@ -11,6 +11,7 @@ import { IVerifyOptions } from 'passport-local';
 import { UserRole, PlainPassword, validateLogin, InvalidCredentials, performSignup, LoginResult } from '../controllers/auth';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { jwtSecret, testEnv } from '../configs';
+import { jwtCookieExpiryMs, jwtExpirySeconds } from '../configs/config';
 
 interface SignupRequest {
   name: string,
@@ -65,12 +66,14 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
               role: loginResult.role,
               id: loginResult.id,
             };
-            const token: string = jwt.sign(body, jwtSecret);
+            const token: string = jwt.sign(body, jwtSecret, {
+              expiresIn: jwtExpirySeconds,
+            });
             res.cookie('jwt', token, {
               httpOnly: true,
               secure: !testEnv,
               sameSite: 'none',
-              maxAge: 24 * 60 * 60 * 1000 // one day
+              maxAge: jwtCookieExpiryMs,
             });
             return res.send({
               success: true,
@@ -112,12 +115,14 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
       role: req.body.role,
       id,
     };
-    const token: string = jwt.sign(body, jwtSecret);
+    const token: string = jwt.sign(body, jwtSecret, {
+      expiresIn: jwtExpirySeconds,
+    });
     res.cookie('jwt', token, {
       httpOnly: true,
       secure: !testEnv,
       sameSite: 'none',
-      maxAge: 24 * 60 * 60 * 1000 // one day
+      maxAge: jwtCookieExpiryMs // one day
     });
     res.send({
       success: true,
