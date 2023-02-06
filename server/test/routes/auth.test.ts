@@ -6,6 +6,8 @@ import { app } from '../../src/app';
 import supertest, { SuperAgentTest } from 'supertest';
 import { UserRole } from '../../src/controllers/auth';
 import mockdate from 'mockdate';
+import { jwtCookieExpiryMs, jwtExpirySeconds } from '../../src/configs/config';
+import { CookieAccessInfo } from 'cookiejar';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 
@@ -112,9 +114,16 @@ describe('Test POST /v1/auth/login and expiry', () => {
       .expect('Content-Type', /json/)
       .expect(200);
     await agent.get('/v1/auth/self-info').withCredentials(true).expect(200);
-    mockdate.set(realDate.setHours(realDate.getHours() + 23));
+    const jwt = agent.jar.getCookie('jwt', CookieAccessInfo.All);
+    if (!jwt) {
+      throw new Error("jwt not available");
+    }
+    // Simulate situtation where the browser does not properly expire the cookie
+    mockdate.set(realDate.setMilliseconds(realDate.getMilliseconds() + jwtCookieExpiryMs + 1));
+    jwt.expiration_date = realDate.setSeconds(realDate.getSeconds() + jwtExpirySeconds * 2);
+    agent.jar.setCookie(jwt);
     await agent.get('/v1/auth/self-info').withCredentials(true).expect(200);
-    mockdate.set(realDate.setHours(realDate.getHours() + 26));
+    mockdate.set(realDate.setSeconds(realDate.getSeconds() + jwtExpirySeconds + 1));
     await agent.get('/v1/auth/self-info').withCredentials(true).expect(401);
   });
 });
