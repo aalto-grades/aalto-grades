@@ -10,12 +10,56 @@ import passport from 'passport';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { frontendOrigin } from '../configs';
+import { definition } from './swagger';
+
+import swaggerUI from 'swagger-ui-express';
+import swaggerJsdoc from 'swagger-jsdoc';
+
+const options = {
+  definition,
+  apis: ['./src/routes/*.ts'],
+};
+
+const openapiSpecification = swaggerJsdoc(options);
 
 export const router: Router = Router();
 
 router.use(cookieParser());
 
+router.use('/api-docs', swaggerUI.serve);
+router.get('/api-docs', swaggerUI.serve, swaggerUI.setup(openapiSpecification));
+
 // User routes
+
+
+/**
+ * @swagger
+ * /v1/user/{userId}/courses:
+ *   get:
+ *     tags: [User, Courses]
+ *     description: Fetch Courses of a user
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: True
+ *         schema:
+ *           type: integer
+ *         description: The ID of the user fetching courses
+ *     responses:
+ *       200:
+ *         description: Get Users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   description: The user ID.
+ *                 username:
+ *                   type: string
+ *                   description: The user name.
+ */
 router.get('/v1/user/:userId/courses', getUserCourses);
 
 // Sisu API routes
@@ -34,9 +78,6 @@ router.post('/v1/auth/logout', passport.authenticate('jwt', { session: false }),
 router.post('/v1/auth/signup', express.json(), authSignup);
 router.get('/v1/auth/self-info', passport.authenticate('jwt', { session: false }), express.json(), authSelfInfo);
 
-router.get('*', (req: Request, res: Response) => {
-  res.send(`Hello ${req.path}`);
-});
 
 router.use(cors({
   origin: frontendOrigin,
