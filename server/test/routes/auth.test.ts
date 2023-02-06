@@ -7,7 +7,7 @@ import supertest, { SuperAgentTest } from 'supertest';
 import { UserRole } from '../../src/controllers/auth';
 import mockdate from 'mockdate';
 import { jwtCookieExpiryMs, jwtExpirySeconds } from '../../src/configs/config';
-import { CookieAccessInfo } from 'cookiejar';
+import { Cookie, CookieAccessInfo } from 'cookiejar';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 
@@ -114,9 +114,9 @@ describe('Test POST /v1/auth/login and expiry', () => {
       .expect('Content-Type', /json/)
       .expect(200);
     await agent.get('/v1/auth/self-info').withCredentials(true).expect(200);
-    const jwt = agent.jar.getCookie('jwt', CookieAccessInfo.All);
+    const jwt: Cookie | undefined = agent.jar.getCookie('jwt', CookieAccessInfo.All);
     if (!jwt) {
-      throw new Error("jwt not available");
+      throw new Error('jwt not available');
     }
     // Simulate situtation where the browser does not properly expire the cookie
     mockdate.set(realDate.setMilliseconds(realDate.getMilliseconds() + jwtCookieExpiryMs + 1));
