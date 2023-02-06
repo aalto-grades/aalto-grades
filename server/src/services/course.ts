@@ -48,6 +48,10 @@ export async function findAllInstances(courseId: number): Promise<Array<Course |
     attributes: ['id', 'courseId', 'gradingType', 'startingPeriod', 'endingPeriod', 'teachingMethod', 'responsibleTeacher', 'minCredits', 'maxCredits', 'startDate', 'endDate', 'createdAt', 'updatedAt'],
     where: {
       courseId: courseId
+    },
+    include: {
+      model: User,
+      as: 'teacher'
     }
   });
 
