@@ -525,11 +525,11 @@ export async function getInstance(req: Request, res: Response): Promise<Response
 
 export async function getAllInstancesFromSisu(req: Request, res: Response): Promise<Response> {
   try {
-    const courseId: string = String(req.params.courseId);
+    const courseCode: string = String(req.params.courseCode);
     const instancesFromSisu: AxiosResponse = await axios.get(`${SISU_API_URL}/courseunitrealisations`, {
       timeout: axiosTimeout,
       params: {
-        code: courseId,
+        code: courseCode,
         USER_KEY: SISU_API_KEY
       }
     });
@@ -554,8 +554,8 @@ export async function getAllInstancesFromSisu(req: Request, res: Response): Prom
 export async function getInstanceFromSisu(req: Request, res: Response): Promise<Response> {
   try {
     // instance id here is sisu id (e.g., 'aalto-CUR-163498-3084205') not course code 
-    const instanceId: string = String(req.params.instanceId);
-    const instanceFromSisu: AxiosResponse = await axios.get(`${SISU_API_URL}/courseunitrealisations/${instanceId}`, {
+    const sisuInstanceId: string = String(req.params.sisuInstanceId);
+    const instanceFromSisu: AxiosResponse = await axios.get(`${SISU_API_URL}/courseunitrealisations/${sisuInstanceId}`, {
       timeout: axiosTimeout,
       params: {
         USER_KEY: SISU_API_KEY
