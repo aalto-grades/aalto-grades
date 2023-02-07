@@ -67,6 +67,11 @@ export default {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
         },
+        sisu_instance_id: {
+          type: DataTypes.STRING,
+          allowNull: true,
+          unique: true
+        },
         grading_type: {
           type: DataTypes.ENUM('PASSFAIL', 'NUMERICAL'),
           allowNull: false
