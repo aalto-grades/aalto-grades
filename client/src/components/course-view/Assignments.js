@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import PartialAssignment from './PartialAssignment';
+import Assignment from '../assignments/Assignment';
 
 
 const Assignments = ({ assignments }) => {
@@ -18,7 +18,7 @@ const Assignments = ({ assignments }) => {
         <Button>Add assignment</Button>
       </Box>
       <Box sx={{ display: 'inline-grid', gap: 1 }}>
-        {assignments.map(assignment => <PartialAssignment key={assignment.id} assignment={assignment} />)}
+        {assignments.map(assignment => <Assignment key={assignment.id} assignment={assignment} button={<Button>Edit</Button>} />)}
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
         <Button variant='outlined'>Calculate final grades</Button>
