@@ -35,8 +35,8 @@ export interface CourseData {
 
 export interface InstanceData {
   courseData: CourseData,
-  // instance id is either Sisu instance id (string) or number type id in grades db
-  id: number | string,
+  id: number | null,              // Instance id can be null when representing sisu instance data
+  sisuInstanceId: string | null,
   startingPeriod: string,
   endingPeriod: string,
   minCredits: number,
@@ -85,8 +85,8 @@ export const localizedStringSchema: yup.AnyObjectSchema = yup.object().shape({
 
 function parseSisuInstance(instance: SisuInstance): InstanceData {
   return {
-    // instance id is either Sisu instance id (string) or number type id in grades db
-    id: instance.id,
+    id: null,
+    sisuInstanceId: instance.id,
     startingPeriod: '-',
     endingPeriod: '-',
     minCredits: instance.credits.min,
@@ -250,6 +250,7 @@ enum TeachingMethod {
 }
 
 interface CourseInstanceAddRequest {
+  sisuInstanceId: string | null;
   gradingType: GradingType;
   startingPeriod: Period;
   endingPeriod: Period;
@@ -266,6 +267,8 @@ const courseInstanceAddRequestSchema: yup.AnyObjectSchema = yup.object().shape({
     .string()
     .oneOf([GradingType.PassFail, GradingType.Numerical])
     .required(),
+  sisuInstanceId: yup
+    .string(),
   startingPeriod: yup
     .string()
     .oneOf([Period.I, Period.II, Period.III, Period.IV, Period.V])
@@ -327,6 +330,7 @@ export async function addCourseInstance(req: Request, res: Response): Promise<Re
 
     const newInstance: CourseInstance = await models.CourseInstance.create({
       courseId: courseId,
+      sisuInstanceId: request.sisuInstanceId ?? null,
       gradingType: request.gradingType,
       startingPeriod: request.startingPeriod,
       endingPeriod: request.endingPeriod,
@@ -443,6 +447,7 @@ export async function getInstance(req: Request, res: Response): Promise<Response
 
     const parsedInstanceData: InstanceData = {
       id: instance.id,
+      sisuInstanceId: instance.sisuInstanceId,
       startingPeriod: instance.startingPeriod,
       endingPeriod: instance.endingPeriod,
       minCredits: instance.minCredits,
@@ -548,7 +553,7 @@ export async function fetchAllInstancesFromSisu(req: Request, res: Response): Pr
 
 export async function fetchInstanceFromSisu(req: Request, res: Response): Promise<Response> {
   try {
-    // instance id here is sisu id not course code, for example 'aalto-CUR-163498-3084205'
+    // instance id here is sisu id (e.g., 'aalto-CUR-163498-3084205') not course code 
     const instanceId: string = String(req.params.instanceId);
     const instanceFromSisu: AxiosResponse = await axios.get(`${SISU_API_URL}/courseunitrealisations/${instanceId}`, {
       timeout: axiosTimeout,
