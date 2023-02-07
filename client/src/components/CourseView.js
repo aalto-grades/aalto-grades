@@ -19,13 +19,14 @@ const dummyCourseName = 'Human-Computer Interaction';
 const dummyAssignments = [{ type: 'Exercises', name: '4 mandatory exercises', points: 20, weight: 0.2, id: 1, expiryDate: new Date(2024, 8, 14), 
   subAssignments: [{ type: 'Exercises', name: 'Exercise 1', points: 5, weight: 0.2, id: 11 }, 
     { type: 'Exercises', name: 'Exercise 2', points: 5, weight: 0.2, id: 12 }, 
-    { type: 'Exercises', name: 'Exercise 3', points: 5, weight: 0.2, id: 13 }, 
+    { type: 'Exercises', name: 'Exercise 3', points: 5, weight: 0.2, id: 13, 
+      subAssignments: [{ type: 'Exercises', name: 'Exercise 3.1', points: 5, weight: 0.2, id: 111 }, 
+        { type: 'Exercises', name: 'Exercise 3.2', points: 5, weight: 0.2, id: 112 }] }, 
     { type: 'Exercises', name: 'Exercise 4', points: 5, weight: 0.2, id: 14 }] },
-{ type: 'Exercises', name: '4 optional exercises', points: 20, weight: 0.2, id: 4, expiryDate: new Date(2024, 8, 14), 
+{ type: 'Exercises', name: '3 optional exercises', points: 20, weight: 0.2, id: 4, expiryDate: new Date(2024, 8, 14), 
   subAssignments: [{ type: 'Exercises', name: 'Exercise 5', points: 5, weight: 0.2, id: 15 }, 
     { type: 'Exercises', name: 'Exercise 6', points: 5, weight: 0.2, id: 16 }, 
-    { type: 'Exercises', name: 'Exercise 7', points: 5, weight: 0.2, id: 17 }, 
-    { type: 'Exercises', name: 'Exercise 8', points: 5, weight: 0.2, id: 18 }] },
+    { type: 'Exercises', name: 'Exercise 7', points: 5, weight: 0.2, id: 17 },] },
 { type: 'Projects', name: '1 mandatory project', points: 30, weight: 0.20, id: 2, expiryDate: new Date(2024, 8, 14) },
 { type: 'Exams', name: '1 mandatory exam', points: 40, weight: 0.55, id: 3, expiryDate: new Date(2024, 8, 14) }];
 
@@ -67,7 +68,7 @@ const CourseView = () => {
       </Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-evenly', gap: 3 }}>
         <OngoingInstanceInfo info={dummyInfo} />
-        <Assignments assignments={dummyAssignments} />
+        <Assignments assignments={assignments} />
       </Box>
       <Typography variant='h4' align='left' sx={{ fontWeight: 'light', mt: 8, mb: 3 }}>Past Instances</Typography>
       <InstancesTable data={dummyPastInstances} />

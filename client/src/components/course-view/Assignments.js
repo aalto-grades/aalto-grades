@@ -9,7 +9,8 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Assignment from '../assignments/Assignment';
 
-
+// Key used is the type of the first element in the array. 
+// This should be replaced when figuring out how to make distinct "assignment types"
 const Assignments = ({ assignments }) => {
   return (
     <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: 1.5, display: 'inline-block' }}>
@@ -18,7 +19,7 @@ const Assignments = ({ assignments }) => {
         <Button>Add assignment</Button>
       </Box>
       <Box sx={{ display: 'inline-grid', gap: 1 }}>
-        {assignments.map(assignment => <Assignment key={assignment.id} assignment={assignment} button={<Button>Edit</Button>} />)}
+        {assignments.map(assignment => <Assignment key={assignment[0].type} assignment={assignment} button={<Button>Edit</Button>} />)}
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
         <Button variant='outlined'>Calculate final grades</Button>
