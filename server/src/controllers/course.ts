@@ -26,7 +26,7 @@ export interface LocalizedString {
 
 export interface CourseData {
   // course id is either number type id in grades db or undefined when representing parsed sisu data
-  id?: number | undefined,
+  id?: number,
   courseCode: string,
   department: LocalizedString,
   name: LocalizedString,
