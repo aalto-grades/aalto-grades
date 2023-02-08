@@ -292,7 +292,7 @@ router.get('/v1/courses/:courseId', getCourse);
  *         description: The ID of the fetched course instance
  *     responses:
  *       200:
- *         description: User's Courses
+ *         description: Instance
  *         content:
  *           application/json:
  *             schema:
