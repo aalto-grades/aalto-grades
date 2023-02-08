@@ -15,12 +15,12 @@ import { definition } from './swagger';
 import swaggerUI from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 
-const options = {
+const options: object = {
   definition,
   apis: ['./src/routes/*.ts'],
 };
 
-const openapiSpecification = swaggerJsdoc(options);
+const openapiSpecification: object = swaggerJsdoc(options);
 
 export const router: Router = Router();
 
