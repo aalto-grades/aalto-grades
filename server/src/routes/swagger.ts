@@ -23,7 +23,6 @@ export const definition = {
             name: "Courses"
         }
     ], 
-
 }
 
 

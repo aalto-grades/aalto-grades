@@ -31,12 +31,111 @@ router.get('/api-docs', swaggerUI.serve, swaggerUI.setup(openapiSpecification));
 
 // User routes
 
-
+/**
+ * @swagger
+ * definitions:
+ *   Courses:
+ *     type: object
+ *     properties: 
+ *       success:
+ *         type: boolean
+ *         description: Success of the request
+ *       courses:
+ *         type: object
+ *         description: Object with current and past courses
+ *         properties:
+ *           current:
+ *             type: array
+ *             description: Current Courses
+ *             items:
+ *               type: object
+ *               description: Course Information
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   description: Course ID
+ *                 courseCode:
+ *                   type: string
+ *                   description: Course Code
+ *                 department: 
+ *                   type: object
+ *                   description: Object containing department with localization
+ *                   properties:
+ *                     fi:
+ *                       type: string
+ *                     sv:
+ *                       type: string
+ *                     en:
+ *                       type: string
+ *                 name: 
+ *                   type: object
+ *                   description: Object containing course name with localization
+ *                   properties:
+ *                     fi:
+ *                       type: string
+ *                     sv:
+ *                       type: string
+ *                     en:
+ *                       type: string
+ *                 evaluationInformation:
+ *                   type: object
+ *                   description: Object containing course evaluation information with localization
+ *                   properties:
+ *                     fi:
+ *                       type: string
+ *                     sv:
+ *                       type: string
+ *                     en:
+ *                       type: string
+ *           previous:
+ *             type: array
+ *             description: Previous Courses
+ *             items:
+ *               type: object
+ *               description: Course Information
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   description: Course ID
+ *                 courseCode:
+ *                   type: string
+ *                   description: Course Code
+ *                 department: 
+ *                   type: object
+ *                   description: Object containing department with localization
+ *                   properties:
+ *                     fi:
+ *                       type: string
+ *                     sv:
+ *                       type: string
+ *                     en:
+ *                       type: string
+ *                 name: 
+ *                   type: object
+ *                   description: Object containing course name with localization
+ *                   properties:
+ *                     fi:
+ *                       type: string
+ *                     sv:
+ *                       type: string
+ *                     en:
+ *                       type: string
+ *                 evaluationInformation:
+ *                   type: object
+ *                   description: Object containing course evaluation information with localization
+ *                   properties:
+ *                     fi:
+ *                       type: string
+ *                     sv:
+ *                       type: string
+ *                     en:
+ *                       type: string
+ */
 /**
  * @swagger
  * /v1/user/{userId}/courses:
  *   get:
- *     tags: [User, Courses]
+ *     tags: [Courses]
  *     description: Fetch Courses of a user
  *     parameters:
  *       - in: path
@@ -51,14 +150,7 @@ router.get('/api-docs', swaggerUI.serve, swaggerUI.setup(openapiSpecification));
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   description: The user ID.
- *                 username:
- *                   type: string
- *                   description: The user name.
+ *               $ref: '#/definitions/Courses'
  */
 router.get('/v1/user/:userId/courses', getUserCourses);
 
