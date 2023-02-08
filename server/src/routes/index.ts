@@ -31,10 +31,54 @@ router.get('/api-docs', swaggerUI.serve, swaggerUI.setup(openapiSpecification));
 
 // User routes
 
+
+
+
 /**
  * @swagger
  * definitions:
- *   Courses:
+ *   Course:
+ *     type: object
+ *     description: Course Information
+ *     properties:
+ *       id:
+ *         type: integer
+ *         description: Course ID
+ *       courseCode:
+ *         type: string
+ *         description: Course Code
+ *       department: 
+ *         type: object
+ *         description: Object containing department with localization
+ *         properties:
+ *           fi:
+ *             type: string
+ *           sv:
+ *             type: string
+ *           en:
+ *             type: string
+ *       name: 
+ *         type: object
+ *         description: Object containing course name with localization
+ *         properties:
+ *           fi:
+ *             type: string
+ *           sv:
+ *             type: string
+ *           en:
+ *             type: string
+ *       evaluationInformation:
+ *         type: object
+ *         description: Object containing course evaluation information with localization
+ *         properties:
+ *           fi:
+ *             type: string
+ *           sv:
+ *             type: string
+ *           en:
+ *             type: string
+ * 
+ *   UserCourses:
  *     type: object
  *     properties: 
  *       success:
@@ -48,88 +92,12 @@ router.get('/api-docs', swaggerUI.serve, swaggerUI.setup(openapiSpecification));
  *             type: array
  *             description: Current Courses
  *             items:
- *               type: object
- *               description: Course Information
- *               properties:
- *                 id:
- *                   type: integer
- *                   description: Course ID
- *                 courseCode:
- *                   type: string
- *                   description: Course Code
- *                 department: 
- *                   type: object
- *                   description: Object containing department with localization
- *                   properties:
- *                     fi:
- *                       type: string
- *                     sv:
- *                       type: string
- *                     en:
- *                       type: string
- *                 name: 
- *                   type: object
- *                   description: Object containing course name with localization
- *                   properties:
- *                     fi:
- *                       type: string
- *                     sv:
- *                       type: string
- *                     en:
- *                       type: string
- *                 evaluationInformation:
- *                   type: object
- *                   description: Object containing course evaluation information with localization
- *                   properties:
- *                     fi:
- *                       type: string
- *                     sv:
- *                       type: string
- *                     en:
- *                       type: string
+ *               $ref: '#/definitions/Course'
  *           previous:
  *             type: array
  *             description: Previous Courses
  *             items:
- *               type: object
- *               description: Course Information
- *               properties:
- *                 id:
- *                   type: integer
- *                   description: Course ID
- *                 courseCode:
- *                   type: string
- *                   description: Course Code
- *                 department: 
- *                   type: object
- *                   description: Object containing department with localization
- *                   properties:
- *                     fi:
- *                       type: string
- *                     sv:
- *                       type: string
- *                     en:
- *                       type: string
- *                 name: 
- *                   type: object
- *                   description: Object containing course name with localization
- *                   properties:
- *                     fi:
- *                       type: string
- *                     sv:
- *                       type: string
- *                     en:
- *                       type: string
- *                 evaluationInformation:
- *                   type: object
- *                   description: Object containing course evaluation information with localization
- *                   properties:
- *                     fi:
- *                       type: string
- *                     sv:
- *                       type: string
- *                     en:
- *                       type: string
+ *               $ref: '#/definitions/Course'
  */
 /**
  * @swagger
@@ -146,11 +114,11 @@ router.get('/api-docs', swaggerUI.serve, swaggerUI.setup(openapiSpecification));
  *         description: The ID of the user fetching courses
  *     responses:
  *       200:
- *         description: Get Users
+ *         description: User's Courses
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/definitions/Courses'
+ *               $ref: '#/definitions/UserCourses'
  */
 router.get('/v1/user/:userId/courses', getUserCourses);
 
