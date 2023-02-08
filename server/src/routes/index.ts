@@ -385,6 +385,11 @@ router.post('/v1/auth/signup', express.json(), authSignup);
 router.get('/v1/auth/self-info', passport.authenticate('jwt', { session: false }), express.json(), authSelfInfo);
 
 
+//Maybe no swagger required for this route, this should be removed as a part of refactoring.
+router.get('*', (req: Request, res: Response) => {
+  res.send(`Hello ${req.path}`);
+});
+
 router.use(cors({
   origin: frontendOrigin,
   credentials: true,
