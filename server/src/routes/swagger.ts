@@ -17,12 +17,15 @@ export const definition = {
     },
     tags:[
         {
-            name: 'User'
+            name: 'SISU'
         },
         {
-            name: "Courses"
+            name: "Course"
+        },
+        {
+            name: 'Session'
         }
-    ], 
+    ]
 }
 
 
