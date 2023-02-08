@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
 SPDX-License-Identifier: MIT
 -->
 
-# Aalto-Grades backend
+# Aalto Grades backend
 
 ## Table of Contents
 
