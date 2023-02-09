@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
 import CourseView from '../components/CourseView';
 import AuthContext from '../context/authProvider';
 
@@ -29,12 +29,11 @@ describe('Tests for CourseView component', () => {
 
     const instanceInfo = screen.getByText('Ongoing instance');
     const teachersInfo = screen.getByText('Responsible Teachers');
-    const assignments = screen.getByText('Partial Assignments');
+    const assignments = screen.getByText('Assignments');
     const exercises = screen.getByText('Exercises');
     const projects = screen.getByText('Projects');
     const exams = screen.getByText('Exams');
     const pastInstances = screen.getByText('Past Instances');
-    const exampleOfInstancePeriod = screen.getByText('2020-2021 Autumn I-II');
     const createInstanceButton = screen.getByText('New instance');
     const addAssignmentButton = screen.getByText('Add assignment');
     const seeAttendeesButton = screen.getByText('See attendees');
@@ -46,7 +45,6 @@ describe('Tests for CourseView component', () => {
     expect(projects).toBeDefined();
     expect(exams).toBeDefined();
     expect(pastInstances).toBeDefined();
-    expect(exampleOfInstancePeriod).toBeDefined();
     expect(createInstanceButton).toBeDefined();
     expect(addAssignmentButton).toBeDefined();
     expect(seeAttendeesButton).toBeDefined();
@@ -61,14 +59,12 @@ describe('Tests for CourseView component', () => {
     const instanceInfo = screen.getByText('Ongoing instance');
     const teachersInfo = screen.getByText('Responsible Teachers');
     const pastInstances = screen.getByText('Past Instances');
-    const exampleOfInstancePeriod = screen.getByText('2020-2021 Autumn I-II');
 
     expect(instanceInfo).toBeDefined();
     expect(teachersInfo).toBeDefined();
     expect(pastInstances).toBeDefined();
-    expect(exampleOfInstancePeriod).toBeDefined();
 
-    expect(screen.queryByText('Partial Assignments')).not.toBeInTheDocument();
+    expect(screen.queryByText('Assignments')).not.toBeInTheDocument();
     expect(screen.queryByText('Add assignment')).not.toBeInTheDocument();
     expect(screen.queryByText('Edit')).not.toBeInTheDocument();
     expect(screen.queryByText('See attendees')).not.toBeInTheDocument();

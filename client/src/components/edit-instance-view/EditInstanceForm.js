@@ -7,14 +7,15 @@ import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Grid2 from '@mui/material/Unstable_Grid2';
-import textFormatServices from '../../services/textFormat';
 import DynamicTextFieldArray from './DynamicTextFieldArray';
 import StringTextField from './StringTextField';
 import NumberTextField from './NumberTextField';
 import DateTextField from './DateTextField';
+import textFormatServices from '../../services/textFormat';
 
 // Should the teachers be given as emails?
 // Now they are given as full names
+// TODO: check that no text field is left empty
 
 const typeData = {
   fieldId: 'instanceType',
@@ -55,23 +56,26 @@ const textFieldMinWidth = 195;
 
 const EditInstanceForm = ({ instance }) => {
 
-  const [courseType, setType]           = useState(textFormatServices.formatCourseType(instance.courseType));
-  const [startDate, setStartDate]       = useState(instance.startDate);
-  const [endDate, setEndDate]           = useState(instance.endDate);
-  const [teachers, setTeachers]         = useState(instance.responsibleTeachers);
-  const [minCredits, setMinCredits]     = useState(instance.courseData.minCredits);
-  const [maxCredits, setMaxCredits]     = useState(instance.courseData.maxCredits);
-  const [gradingScale, setGradingScale] = useState(textFormatServices.formatGradingType(instance.gradingType));
+  const [courseType, setType]             = useState(textFormatServices.formatCourseType(instance.courseType));
+  const [startDate, setStartDate]         = useState(instance.startDate);
+  const [endDate, setEndDate]             = useState(instance.endDate);
+  const [teachers, setTeachers]           = useState(instance.responsibleTeachers);
+  const [stringMinCredits, setMinCredits] = useState(String(instance.minCredits));
+  const [stringMaxCredits, setMaxCredits] = useState(String(instance.maxCredits));
+  const [gradingScale, setGradingScale]   = useState(textFormatServices.formatGradingType(instance.gradingType));
 
   const handleSubmit = (event) => {
     event.preventDefault();
     try {
+      const minCredits = Number(stringMinCredits);
+      const maxCredits = Number(stringMaxCredits);
       const basicInfoObject = ({
         courseType,
         startDate,
         endDate,
         teachers,
-        credits,
+        minCredits,
+        maxCredits,
         gradingScale,
       });
       console.log(basicInfoObject);
@@ -102,9 +106,9 @@ const EditInstanceForm = ({ instance }) => {
         </Grid2>
         <DynamicTextFieldArray fieldData={teacherData} values={teachers} setFunction={setTeachers}/>
         <Grid2 container>
-          <Grid2 sx={{ minWidth: textFieldMinWidth }}><NumberTextField fieldData={minCreditsData} value={minCredits} setFunction={setMinCredits}/></Grid2>
+          <Grid2 sx={{ minWidth: textFieldMinWidth }}><NumberTextField fieldData={minCreditsData} value={stringMinCredits} setFunction={setMinCredits}/></Grid2>
           <Box sx={{ width: 15 }}/>
-          <Grid2 sx={{ minWidth: textFieldMinWidth }}><NumberTextField fieldData={maxCreditsData} value={maxCredits} setFunction={setMaxCredits}/></Grid2>
+          <Grid2 sx={{ minWidth: textFieldMinWidth }}><NumberTextField fieldData={maxCreditsData} value={stringMaxCredits} setFunction={setMaxCredits}/></Grid2>
         </Grid2>
         <StringTextField fieldData={gradingScaleData} value={gradingScale} setFunction={setGradingScale}/>
       </Box>
