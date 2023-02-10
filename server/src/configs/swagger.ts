@@ -1,9 +1,11 @@
 // SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
+
 import {OAS3Definition} from 'swagger-jsdoc';
+
 /**
- *  This file is used as a base definition for the Swagger compilation in routes/index.ts.
+ * This file is used as a base definition for the Swagger compilation in routes/index.ts.
  */
 
 export const definition: OAS3Definition = {
@@ -18,7 +20,7 @@ export const definition: OAS3Definition = {
       url: 'https://github.com/aalto-grades/base-repository/blob/main/LICENSE'
     }
   },
-  tags:[
+  tags: [
     {
       name: 'SISU'
     },
