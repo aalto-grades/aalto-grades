@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import BasicGrid from './front-page/BasicGrid';
 import CourseTable from './front-page/CourseTable';
 import coursesService from '../services/courses';
-import { useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 
 const FrontPage = () => {
@@ -41,7 +41,7 @@ const FrontPage = () => {
           </Button>
         }
       </Box>
-      {/* current and inactive courses will later be rendered based on the student/teacher id */}
+      { /* current and inactive courses will later be rendered based on the student/teacher id */ }
       <BasicGrid data={currentCourses}/>
       <Typography variant="h4" component="div" align="left" sx={{ flexGrow: 1, mt: 4 }}>
                 Inactive Courses

@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
 import EditInstanceView from '../components/EditInstanceView';
-import dummyInstances from '../dummy-data/dummyInstances';
 import instancesService from '../services/instances';
+import mockSisuInstances from '../mock-data/mockSisuInstances';
 
 jest.mock('../services/instances');
 afterEach(cleanup);
@@ -17,9 +17,7 @@ describe('Tests for EditInstanceView components', () => {
 
   const renderEditInstanceView = async () => {
 
-    const mockResponse = { instance: dummyInstances[0] };
-
-    console.log(mockResponse);
+    const mockResponse = { instance: mockSisuInstances[0] };
 
     instancesService.getSisuInstance.mockRejectedValue('Network error');
     instancesService.getSisuInstance.mockResolvedValue(mockResponse);
@@ -44,8 +42,6 @@ describe('Tests for EditInstanceView components', () => {
       const maxCreditsField = screen.getByLabelText('Max Credits');
       const gradingField = screen.getByLabelText('Grading Scale');
       const confirmButton = screen.queryByText('Confirm Details');
-
-      console.log(teacherField);
 
       expect(typeField).toBeInTheDocument();
       expect(startingField).toBeInTheDocument();

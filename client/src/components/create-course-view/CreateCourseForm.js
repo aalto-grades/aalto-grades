@@ -4,9 +4,9 @@
 
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import TextFieldBox from './TextFieldBox';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
+import TextFieldBox from './TextFieldBox';
 
 const codeData = {
   fieldId: 'courseCode',
@@ -40,9 +40,6 @@ const CreateCourseForm = ({ addCourse }) => {
   //const [teacher, setTeacher] = useState(''); 
 
   const id = -1;
-  const minCredits = 5;
-  const maxCredits = 5;
-  const evaluationInformation = 'General scale, 0-5';
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -50,8 +47,6 @@ const CreateCourseForm = ({ addCourse }) => {
       const courseObject = ({
         id,
         courseCode,
-        minCredits,
-        maxCredits,
         department: {
           fi: '',
           sv: '',
@@ -65,9 +60,9 @@ const CreateCourseForm = ({ addCourse }) => {
         evaluationInformation: {
           fi: '',
           sv: '',
-          en: evaluationInformation,
+          en: '',
         }
-        //teacher
+        // teacher
       });
       addCourse(courseObject);
     } catch (exception) {
@@ -93,6 +88,6 @@ CreateCourseForm.propTypes = {
   addCourse: PropTypes.func
 };
 
-// <TextFieldBox fieldData={teachersData} setFunction={setTeacher}/>
+//<TextFieldBox fieldData={teachersData} setFunction={setTeacher}/>
 
 export default CreateCourseForm;
