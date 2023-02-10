@@ -42,7 +42,7 @@ interface JwtClaims {
 export async function authLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
   passport.authenticate(
     'login',
-    async (err: unknown, loginResult: LoginResult | boolean, _options: IVerifyOptions | null | undefined) => {
+    async (err: unknown, loginResult: LoginResult | boolean) => {
       try {
         if (err) {
           return next(err);
