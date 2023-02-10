@@ -21,7 +21,7 @@ describe('Test POST /v1/auth/login', () => {
         .expect('Content-Type', /json/)
         .then((res: supertest.Response) => {
           expect(res.body.success).toBe(false);
-          expect(res.body.message).toMatch(/(invalid|Missing) credentials/);
+          expect(res.body.message).toMatch(/incorrect email or password/);
         });
     }
     await badCreds({ email: 'aalto', password: 'grades' });
@@ -36,7 +36,7 @@ describe('Test POST /v1/auth/login', () => {
       .expect(200)
       .then((res: supertest.Response) => {
         expect(res.body.success).toBe(true);
-        expect(res.body.role).toBe(UserRole.Admin);
+        expect(res.body.data.role).toBe(UserRole.Admin);
       });
   });
 });
@@ -46,11 +46,11 @@ describe('Test POST /v1/auth/signup', () => {
     return request.post('/v1/auth/signup')
       .set('Accept', 'application/json')
       .send({ email: 'sysadmin@aalto.fi', name: 'aalto', password: 'grades', studentID: '123456', role: 'SYSADMIN' })
-      .expect(400)
+      .expect(409)
       .expect('Content-Type', /json/)
       .then((res: supertest.Response) => {
         expect(res.body.success).toBe(false);
-        expect(res.body.error).toMatch('user exists already');
+        expect(res.body.error).toMatch('user account with the specified email already exists');
       });
   });
   it('should error when the signup format is incorrect', async () => {
@@ -61,7 +61,7 @@ describe('Test POST /v1/auth/signup', () => {
       .expect('Content-Type', /json/)
       .then((res: supertest.Response) => {
         expect(res.body.success).toBe(false);
-        expect(res.body.error).toMatch('Invalid signup request format');
+        expect(res.body.error).toMatch('invalid signup request format');
       });
   });
   it('should allow creation of a new account', async () => {
@@ -71,7 +71,7 @@ describe('Test POST /v1/auth/signup', () => {
       .expect(401);
     await request.post('/v1/auth/signup')
       .set('Accept', 'application/json')
-      .send({ email: 'sysadmin2@aalto.fi', name: 'aalto2', password: 'grades2', studentID: '123457', role: 'SYSADMIN' })
+      .send({ email: 'sysadmin2@aalto.fi', name: 'aalto2', password: 'grades2', role: 'SYSADMIN' }) // without student id
       .expect(200)
       .expect('Content-Type', /json/)
       .then((res: supertest.Response) => {

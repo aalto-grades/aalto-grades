@@ -8,7 +8,7 @@ import jwt from 'jsonwebtoken';
 import { Strategy as JWTStrategy, VerifiedCallback } from 'passport-jwt';
 import passport from 'passport';
 import { IVerifyOptions } from 'passport-local';
-import { UserRole, PlainPassword, validateLogin, InvalidCredentials, performSignup, LoginResult } from '../controllers/auth';
+import { UserRole, PlainPassword, validateLogin, InvalidCredentials, performSignup, LoginResult, UserExists } from '../controllers/auth';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { jwtSecret, testEnv } from '../configs';
 import { jwtCookieExpiryMs, jwtExpirySeconds } from '../configs/config';
@@ -17,7 +17,7 @@ interface SignupRequest {
   name: string,
   password: PlainPassword,
   email: string,
-  studentID: string,
+  studentID: string | undefined,
   role: UserRole,
 }
 
@@ -25,7 +25,7 @@ const signupSchema: yup.AnyObjectSchema = yup.object().shape({
   name: yup.string().required(),
   password: yup.string().required(),
   email: yup.string().required(),
-  studentID: yup.string().required(),
+  studentID: yup.string().notRequired(),
   role: yup.string().oneOf([
     UserRole.Admin,
     UserRole.Assistant,
@@ -42,7 +42,7 @@ interface JwtClaims {
 export async function authLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
   passport.authenticate(
     'login',
-    async (err: unknown, loginResult: LoginResult | boolean, options: IVerifyOptions | null | undefined) => {
+    async (err: unknown, loginResult: LoginResult | boolean, _options: IVerifyOptions | null | undefined) => {
       try {
         if (err) {
           return next(err);
@@ -50,7 +50,7 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
         if (loginResult == false || loginResult == true) {
           return res.status(401).send({
             success: false,
-            message: options ? options.message : 'unknown error',
+            message: 'incorrect email or password',
           });
         }
 
@@ -77,7 +77,9 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
             });
             return res.send({
               success: true,
-              role: loginResult.role,
+              data: {
+                role: loginResult.role,
+              }
             });
           }
         );
@@ -101,7 +103,7 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
   if (!(await signupSchema.isValid(req.body))) {
     res.status(400).send({
       success: false,
-      error: 'Invalid signup request format',
+      error: 'invalid signup request format',
     });
     return;
   }
@@ -122,19 +124,26 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
       httpOnly: true,
       secure: !testEnv,
       sameSite: 'none',
-      maxAge: jwtCookieExpiryMs // one day
+      maxAge: jwtCookieExpiryMs
     });
     res.send({
       success: true,
-      role: req.body.role,
-      id,
+      data: {
+        role: req.body.role,
+        id
+      }
     });
   } catch (error) {
-    // 403 or 400 or 500? The Promise architecture with appropriate rejections should
-    // carry this info
-    res.status(400).send({
+    if (error instanceof UserExists) {
+      res.status(409).send({
+        success: false,
+        error: 'user account with the specified email already exists',
+      });
+      return;
+    }
+    res.status(500).send({
       success: false,
-      error: error instanceof Error ? error.message : 'unknown error',
+      error: 'internal server error',
     });
   }
 }
@@ -142,7 +151,7 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
 export async function authSelfInfo(req: Request, res: Response): Promise<void> {
   if (!req.user) {
     res.status(401);
-    res.send({ success: false, error: 'unauthorized' });
+    res.send({ success: false, error: 'login required' });
     return;
   }
   const user: JwtClaims = req.user as JwtClaims;
