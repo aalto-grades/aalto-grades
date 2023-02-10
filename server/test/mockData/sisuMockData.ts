@@ -71,7 +71,7 @@ export const sisuInstance: SisuCourseInstance = {
       en: 'Basic concepts of systems-level programming. Basics of the C ' +
         'programming language. Dynamic memory management and its application ' +
         'in common data structures. Basic use of programming and debugging ' +
-        'tools for C. Small programming exercises in C.',
+        'tools for C. Small programming exercises in C.'
     },
     cefrLevel: '',
     level: {

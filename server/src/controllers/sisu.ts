@@ -73,9 +73,7 @@ export async function fetchAllCourseInstancesFromSisu(req: Request, res: Respons
     }
 
     const parsedInstances: Array<CourseInstanceData> = instancesFromSisu.data.map(
-      (instance: SisuCourseInstance) => {
-        parseSisuCourseInstance(instance);
-      }
+      (instance: SisuCourseInstance) => parseSisuCourseInstance(instance)
     );
 
     res.status(200).send({
