@@ -10,17 +10,17 @@ import passport from 'passport';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { frontendOrigin } from '../configs';
-import { definition } from './swagger';
+import { definition } from '../configs/swagger';
 
 import swaggerUI from 'swagger-ui-express';
-import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerJsdoc, { OAS3Options} from 'swagger-jsdoc';
 
 const options: object = {
   definition,
   apis: ['./src/routes/*.ts'],
 };
 
-const openapiSpecification: object = swaggerJsdoc(options);
+const openapiSpecification: OAS3Options = swaggerJsdoc(options);
 
 export const router: Router = Router();
 
