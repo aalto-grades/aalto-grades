@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
-import {OAS3Definition} from "swagger-jsdoc";
+import {OAS3Definition} from 'swagger-jsdoc';
 /**
  *  This file is used as a base definition for the Swagger compilation in routes/index.ts.
  */
