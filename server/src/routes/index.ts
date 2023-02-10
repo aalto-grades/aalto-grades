@@ -27,7 +27,7 @@ export const router: Router = Router();
 router.use(cookieParser());
 
 router.use('/api-docs', swaggerUI.serve);
-router.get('/api-docs', swaggerUI.serve, swaggerUI.setup(openapiSpecification));
+router.get('/api-docs', swaggerUI.setup(openapiSpecification));
 
 // User routes
 
