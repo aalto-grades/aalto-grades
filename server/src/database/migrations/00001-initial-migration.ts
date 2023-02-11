@@ -17,7 +17,7 @@ export default {
         student_id: {
           type: new DataTypes.STRING,
           unique: true,
-          allowNull: false
+          allowNull: true
         },
         name: {
           type: new DataTypes.STRING,
