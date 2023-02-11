@@ -38,6 +38,7 @@ export async function getUserCourses(req: Request, res: Response): Promise<void>
         model: CourseTranslation,
         attributes: ['language', 'courseName', 'department'],
       }],
+      order: [[CourseInstance, 'endDate', 'ASC']]
     }) as Array<CourseWithTranslationAndInstance>;
 
     // Construct CourseData objects and determine whether the course is current
