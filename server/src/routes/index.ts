@@ -4,7 +4,6 @@
 
 import express, { Router } from 'express';
 import cookieParser from 'cookie-parser';
-
 import cors from 'cors';
 import passport from 'passport';
 import swaggerJsdoc, { OAS3Options } from 'swagger-jsdoc';
