@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import CreateCourseForm from './create-course-view/CreateCourseForm';
 import coursesService from '../services/courses';
-import { useNavigate } from 'react-router-dom';
 
 const CreateCourseView = () => {
   const navigate = useNavigate();

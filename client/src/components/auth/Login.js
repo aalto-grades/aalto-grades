@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState } from 'react';
-import userService from '../../services/user';
 import { useNavigate } from 'react-router-dom';
-import LoginForm from './LoginForm';
 import { useTheme } from '@mui/material/styles';
+import LoginForm from './LoginForm';
+import userService from '../../services/user';
 import useAuth from '../../hooks/useAuth';
 
 const Login = () => {
@@ -20,12 +20,9 @@ const Login = () => {
   const loginUser = async (userObject) => {
     try {
       const response = await userService.login(userObject);
-      
       // if login is successful, save user role to context
       setAuth({ role: response.role });
-
       navigate('/', { replace: true });
-
     } catch (exception) {
       console.log(exception);
       setErrorMessage('Invalid email or password');
