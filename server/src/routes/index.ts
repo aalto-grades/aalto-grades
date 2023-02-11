@@ -19,7 +19,6 @@ import { fetchAllCourseInstancesFromSisu, fetchCourseInstanceFromSisu } from '..
 import { getCoursesOfUser } from '../controllers/user';
 import { handleInvalidRequestJson } from '../middleware';
 
-
 const options: object = {
   definition,
   apis: ['./src/routes/*.ts'],
