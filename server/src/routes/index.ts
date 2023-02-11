@@ -19,8 +19,8 @@ router.use(cookieParser());
 router.get('/v1/user/:userId/courses', getUserCourses);
 
 // Sisu API routes
-router.get('/v1/courses/sisu/:courseId', fetchAllInstancesFromSisu);
-router.get('/v1/courses/sisu/instance/:instanceId', fetchInstanceFromSisu);
+router.get('/v1/sisu/courses/:courseCode', fetchAllInstancesFromSisu);
+router.get('/v1/sisu/instances/:sisuInstanceId', fetchInstanceFromSisu);
 
 // Course and instance routes
 router.post('/v1/courses', express.json(), handleInvalidRequestJson, addCourse);
