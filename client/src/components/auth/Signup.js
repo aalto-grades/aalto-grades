@@ -20,7 +20,7 @@ const Signup = () => {
     try {
       const user = await userService.signup(userObject);
       // if signup successfull, save user role to context
-      setAuth({ role: user.role });
+      setAuth({ role: user.data.role });
       navigate('/', { replace: true });
     } catch (exception) {
       console.log(exception);

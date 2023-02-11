@@ -23,7 +23,7 @@ describe('Tests for Login component', () => {
     const nameField = screen.getByLabelText('Name');
     const passwordField = screen.getByLabelText('Password');
     const emailField = screen.getByLabelText('Email');
-    const studentIdField = screen.getByLabelText('Student ID');
+    const studentIdField = screen.getByLabelText('Student ID (not required)');
     const signupButton = screen.getByText('sign up');
     const textElement = screen.getByText('Sign up');
 
@@ -45,7 +45,7 @@ describe('Tests for Login component', () => {
     const nameField = screen.getByLabelText('Name');
     const passwordField = screen.getByLabelText('Password');
     const emailField = screen.getByLabelText('Email');
-    const studentIdField = screen.getByLabelText('Student ID');
+    const studentIdField = screen.getByLabelText('Student ID (not required)');
     const signupButton = screen.getByText('sign up');
 
     userEvent.type(nameField, 'Test User');

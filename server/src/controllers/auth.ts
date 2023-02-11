@@ -55,7 +55,7 @@ export async function validateLogin(email: string, password: PlainPassword): Pro
   };
 }
 
-export async function performSignup(name: string, email: string, plainPassword: PlainPassword, studentId: string): Promise<number> {
+export async function performSignup(name: string, email: string, plainPassword: PlainPassword, studentId: string | undefined): Promise<number> {
   const exists: User | null = await User.findOne({
     where: {
       email: email,
