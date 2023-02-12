@@ -268,7 +268,8 @@ const courseInstanceAddRequestSchema: yup.AnyObjectSchema = yup.object().shape({
     .oneOf([GradingType.PassFail, GradingType.Numerical])
     .required(),
   sisuInstanceId: yup
-    .string(),
+    .string()
+    .notRequired(),
   startingPeriod: yup
     .string()
     .oneOf([Period.I, Period.II, Period.III, Period.IV, Period.V])
