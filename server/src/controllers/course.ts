@@ -36,7 +36,7 @@ export interface CourseData {
 export interface InstanceData {
   courseData: CourseData,
   id: number | null,              // Instance id can be null when representing sisu instance data
-  sisuInstanceId: string | null,
+  sisuCourseInstanceId: string | null,
   startingPeriod: string,
   endingPeriod: string,
   minCredits: number,
@@ -86,7 +86,7 @@ export const localizedStringSchema: yup.AnyObjectSchema = yup.object().shape({
 function parseSisuInstance(instance: SisuInstance): InstanceData {
   return {
     id: null,
-    sisuInstanceId: instance.id,
+    sisuCourseInstanceId: instance.id,
     startingPeriod: '-',
     endingPeriod: '-',
     minCredits: instance.credits.min,
@@ -250,7 +250,7 @@ enum TeachingMethod {
 }
 
 interface CourseInstanceAddRequest {
-  sisuInstanceId: string | null;
+  sisuCourseInstanceId: string | null;
   gradingType: GradingType;
   startingPeriod: Period;
   endingPeriod: Period;
@@ -267,7 +267,7 @@ const courseInstanceAddRequestSchema: yup.AnyObjectSchema = yup.object().shape({
     .string()
     .oneOf([GradingType.PassFail, GradingType.Numerical])
     .required(),
-  sisuInstanceId: yup
+  sisuCourseInstanceId: yup
     .string()
     .notRequired(),
   startingPeriod: yup
@@ -331,7 +331,7 @@ export async function addCourseInstance(req: Request, res: Response): Promise<Re
 
     const newInstance: CourseInstance = await models.CourseInstance.create({
       courseId: courseId,
-      sisuInstanceId: request.sisuInstanceId ?? null,
+      sisuCourseInstanceId: request.sisuCourseInstanceId ?? null,
       gradingType: request.gradingType,
       startingPeriod: request.startingPeriod,
       endingPeriod: request.endingPeriod,
@@ -448,7 +448,7 @@ export async function getInstance(req: Request, res: Response): Promise<Response
 
     const parsedInstanceData: InstanceData = {
       id: instance.id,
-      sisuInstanceId: instance.sisuInstanceId,
+      sisuCourseInstanceId: instance.sisuCourseInstanceId,
       startingPeriod: instance.startingPeriod,
       endingPeriod: instance.endingPeriod,
       minCredits: instance.minCredits,
@@ -527,7 +527,7 @@ export async function getInstance(req: Request, res: Response): Promise<Response
 export async function fetchAllInstancesFromSisu(req: Request, res: Response): Promise<Response> {
   try {
     const courseCode: string = String(req.params.courseCode);
-    const instancesFromSisu: AxiosResponse = await axios.get(`${SISU_API_URL}/courseunitrealisations`, {
+    const courseInstancesFromSisu: AxiosResponse = await axios.get(`${SISU_API_URL}/courseunitrealisations`, {
       timeout: axiosTimeout,
       params: {
         code: courseCode,
@@ -535,12 +535,14 @@ export async function fetchAllInstancesFromSisu(req: Request, res: Response): Pr
       }
     });
 
-    if (instancesFromSisu.data?.error) throw new Error(instancesFromSisu.data.error.message);
-    const parsedInstances: Array<InstanceData> = instancesFromSisu.data.map((instance: SisuInstance) => parseSisuInstance(instance));
+    if (courseInstancesFromSisu.data?.error) throw new Error(courseInstancesFromSisu.data.error.message);
+    const parsedInstances: Array<InstanceData> = courseInstancesFromSisu.data.map((instance: SisuInstance) => parseSisuInstance(instance));
 
     return res.status(200).send({
       success: true,
-      instances: parsedInstances
+      data: {
+        courseInstances: parsedInstances
+      }
     });
   } catch (error: unknown) {
     console.log(error);
@@ -555,20 +557,22 @@ export async function fetchAllInstancesFromSisu(req: Request, res: Response): Pr
 export async function fetchInstanceFromSisu(req: Request, res: Response): Promise<Response> {
   try {
     // instance id here is sisu id (e.g., 'aalto-CUR-163498-3084205') not course code 
-    const sisuInstanceId: string = String(req.params.sisuInstanceId);
-    const instanceFromSisu: AxiosResponse = await axios.get(`${SISU_API_URL}/courseunitrealisations/${sisuInstanceId}`, {
+    const sisuCourseInstanceId: string = String(req.params.sisuCourseInstanceId);
+    const courseInstanceFromSisu: AxiosResponse = await axios.get(`${SISU_API_URL}/courseunitrealisations/${sisuCourseInstanceId}`, {
       timeout: axiosTimeout,
       params: {
         USER_KEY: SISU_API_KEY
       }
     });
 
-    if (instanceFromSisu.data?.error) throw new Error(instanceFromSisu.data.error.message);
-    const instance: InstanceData = parseSisuInstance(instanceFromSisu.data);
+    if (courseInstanceFromSisu.data?.error) throw new Error(courseInstanceFromSisu.data.error.message);
+    const instance: InstanceData = parseSisuInstance(courseInstanceFromSisu.data);
 
     return res.status(200).send({
       success: true,
-      instance: instance
+      data: {
+        courseInstance: instance
+      }
     });
 
   } catch (error: unknown) {

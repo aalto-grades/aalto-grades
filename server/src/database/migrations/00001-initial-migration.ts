@@ -67,7 +67,7 @@ export default {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
         },
-        sisu_instance_id: {
+        sisu_course_instance_id: {
           type: DataTypes.STRING,
           allowNull: true,
           unique: true

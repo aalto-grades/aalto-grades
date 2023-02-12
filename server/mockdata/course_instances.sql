@@ -2,7 +2,7 @@
 --
 -- SPDX-License-Identifier: MIT
 
-INSERT INTO public.course_instance (course_id, sisu_instance_id, grading_type, starting_period, ending_period, teaching_method, responsible_teacher, min_credits, max_credits, start_date, end_date, created_at, updated_at) VALUES
+INSERT INTO public.course_instance (course_id, sisu_course_instance_id, grading_type, starting_period, ending_period, teaching_method, responsible_teacher, min_credits, max_credits, start_date, end_date, created_at, updated_at) VALUES
 (1, 'aalto-CUR-165388-3874205', 'NUMERICAL', 'I', 'II', 'LECTURE', 1, 5, 5, '2022-09-05', '2022-12-09', NOW(), NOW()),
 (2, 'aalto-CUR-165768-3874205', 'PASSFAIL', 'III', 'IV', 'LECTURE', 2, 5, 5, '2023-01-05', '2023-04-23', NOW(), NOW()),
 (3, 'aalto-CUR-263388-3874205', 'NUMERICAL', 'I', 'II', 'LECTURE', 3, 5, 5, '2022-09-03', '2022-12-11', NOW(), NOW()),
