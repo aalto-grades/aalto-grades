@@ -34,6 +34,17 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
 /**
  * @swagger
  * definitions:
+ *   Failure:
+ *     type: object
+ *     description: A reason for a failure, with a chiefly developer-facing error message
+ *     properties:
+ *       success:
+ *         type: boolean
+ *         description: '`false` to indicate failure'
+ *         example: false
+ *       message:
+ *         type: string
+ *         description: An error message to explain the error
  *   Course:
  *     type: object
  *     description: Course Information
@@ -95,6 +106,28 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *             description: Previous Courses
  *             items:
  *               $ref: '#/definitions/Course'
+ *   Credentials:
+ *     type: object
+ *     properties:
+ *       email:
+ *         type: string
+ *         description: Email address, functioning as a username
+ *       password:
+ *         type: string
+ *         description: Plaintext password of the user
+ *   LoginResult:
+ *     type: object
+ *     properties:
+ *       success:
+ *         type: boolean
+ *         description: Success of the request
+ *       data:
+ *         type: object
+ *         properties:
+ *           role:
+ *             type: string
+ *             description: >
+ *               The role of the user in our system: `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
  */
 /**
  * @swagger
@@ -312,16 +345,33 @@ router.get('/v1/instances/:instanceId', getInstance);
  * /v1/auth/login:
  *   post:
  *     tags: [Session]
- *     description: Login with User
+ *     description: Log in as a user
  *     requestBody:
- *       description: Description of login POST body
+ *       description: The credentials for the user, currently consisting of the email and password.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/definitions/Credentials'
  *     responses:
  *       200:
- *         description: User's Courses
+ *         description: The login has succeeded, and an access token is return in a cookie.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/definitions/UserCourses'
+ *               $ref: '#/definitions/LoginResult'
+ *         headers:
+ *            Set-Cookie:
+ *              description: 'JWT token, storing an access token to allow using the API'
+ *              schema:
+ *                type: string
+ *                example: jwt=wliuerhlwieurh; Secure; HttpOnly; SameSite=None
+ *       401:
+ *         description: The login has failed, due to invalid credentials or an invalid request format.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ * 
  */
 router.post('/v1/auth/login', express.json(), authLogin);
 
@@ -381,6 +431,7 @@ router.post('/v1/auth/signup', express.json(), authSignup);
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/UserCourses'
+ *
  */
 router.get('/v1/auth/self-info', passport.authenticate('jwt', { session: false }), express.json(), authSelfInfo);
 
