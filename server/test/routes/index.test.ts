@@ -441,7 +441,7 @@ describe('Test GET /v1/courses/:courseId/instances', () => {
     expect(res.body.instances[0].endDate).toBeDefined();
     expect(res.body.instances[0].courseType).toBeDefined();
     expect(res.body.instances[0].gradingType).toBeDefined();
-    expect(res.body.instances[0].responsibleTeachers).toBeDefined();
+    expect(res.body.instances[0].responsibleTeacher).toBeDefined();
   });
 
   it('should respond with error if course does not exist', async () => {

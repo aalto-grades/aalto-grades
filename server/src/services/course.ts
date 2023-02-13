@@ -33,39 +33,28 @@ export async function findCourseById(courseId: number): Promise<CourseWithTransl
   return course as CourseWithTranslation;
 }
 
-export interface InstanceWithTeacher {
-  CourseInstance: CourseInstance
-  Teacher: User | null
+export interface InstanceWithTeachers extends CourseInstance {
+  teacher: User
 }
 
-export async function findAllInstances(courseId: number): Promise<Array<Course | Array<InstanceWithTeacher>>> {
+//TODO: ADD FUNCTIONALITY FOR MULTIPLE RESPONSIBLE TEACHERS THROUGH COURSEROLE
+export async function findAllInstances(courseId: number): Promise<[Course, Array<InstanceWithTeachers>]> {
   
   const course: Course | null = await Course.findByPk(courseId);
   
   if (!course) throw new Error (`course with id ${courseId} not found`);  
 
-  const instances: Array<CourseInstance> = await CourseInstance.findAll({
+  const instances: Array<InstanceWithTeachers> = await CourseInstance.findAll({
     attributes: ['id', 'courseId', 'gradingType', 'startingPeriod', 'endingPeriod', 'teachingMethod', 'responsibleTeacher', 'minCredits', 'maxCredits', 'startDate', 'endDate', 'createdAt', 'updatedAt'],
     where: {
       courseId: courseId
     },
+    //TODO: CHANGE TO GO THROUGH COURSE ROLE INSTEAD FOR GOING THOUGH RESPONSIBLETEACHER FOREIGN KEY
     include: {
       model: User,
       as: 'teacher'
     }
-  });
+  }) as Array<InstanceWithTeachers>;
 
-  const instancesWithTeacher: Array<InstanceWithTeacher> = [];
-
-  if (instances.length != 0) {
-    for (const instance of instances) {
-      const teacher: User | null = await User.findByPk(instance.responsibleTeacher);
-      instancesWithTeacher.push({
-        CourseInstance: instance,
-        Teacher: teacher
-      });
-    }
-  }
-
-  return [course, instancesWithTeacher];
+  return [course, instances];
 }

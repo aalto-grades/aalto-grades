@@ -17,7 +17,7 @@ import { SisuInstance } from '../types/sisu';
 import User from '../database/models/user';
 import { sequelize } from '../database';
 import { MessageParams } from 'yup/lib/types';
-import { InstanceWithTeacher } from '../services/course';
+import { InstanceWithTeachers } from '../services/course';
 
 export interface LocalizedString {
   fi: string,
@@ -554,7 +554,7 @@ export async function fetchInstanceFromSisu(req: Request, res: Response): Promis
     const instanceFromSisu: AxiosResponse = await axios.get(`${SISU_API_URL}/courseunitrealisations/${instanceId}`, {
       timeout: axiosTimeout,
       params: {
-        USER_KEY: SISU_API_KEY
+        USER_KEY: SISU_API_KEY  
       }
     });
 
@@ -580,12 +580,11 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
   try {
     const courseId: number = Number(req.params.courseId);
     await idSchema.validate({ id: courseId });
-    const fetchedData: Array<Course | Array<InstanceWithTeacher>> = await courseService.findAllInstances(courseId);
-    const course: Course = fetchedData[0] as Course;
-    const seqInstances: Array<InstanceWithTeacher> = fetchedData[1] as Array<InstanceWithTeacher>;
+    const data: [Course, Array<InstanceWithTeachers>] = await courseService.findAllInstances(courseId);
+    const course: Course = data[0];
     const instances: Array<InstanceData> = [];
 
-    seqInstances.forEach((instanceWithTeacher: InstanceWithTeacher) => {
+    data[1].forEach((instanceWithTeacher: InstanceWithTeachers) => {
       const instance: InstanceData = {
         courseData: {
           id: course.id,
@@ -606,22 +605,19 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
             sv: ''
           }
         },
-        id: instanceWithTeacher.CourseInstance.id,
-        startingPeriod: instanceWithTeacher.CourseInstance.startingPeriod,
-        endingPeriod: instanceWithTeacher.CourseInstance.endingPeriod,
-        minCredits: instanceWithTeacher.CourseInstance.minCredits,
-        maxCredits: instanceWithTeacher.CourseInstance.maxCredits,
-        startDate: instanceWithTeacher.CourseInstance.startDate,
-        endDate: instanceWithTeacher.CourseInstance.endDate,
+        id: instanceWithTeacher.id,
+        startingPeriod: instanceWithTeacher.startingPeriod,
+        endingPeriod: instanceWithTeacher.endingPeriod,
+        minCredits: instanceWithTeacher.minCredits,
+        maxCredits: instanceWithTeacher.maxCredits,
+        startDate: instanceWithTeacher.startDate,
+        endDate: instanceWithTeacher.endDate,
         courseType: '',
-        gradingType: instanceWithTeacher.CourseInstance.gradingType,
-        responsibleTeachers: [''],
+        gradingType: instanceWithTeacher.gradingType,
+        //TODO: SELECTS MULTIPLE RESPONISBLE TEACHERS
+        responsibleTeacher: instanceWithTeacher.teacher.name,
       };
-
-      if (instanceWithTeacher.Teacher) {
-        instance.responsibleTeachers = [instanceWithTeacher.Teacher.name];
-      }
-
+      
       instances.push(instance);
 
     });
