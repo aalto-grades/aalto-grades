@@ -10,6 +10,7 @@ import User from './user';
 export default class CourseInstance extends Model<InferAttributes<CourseInstance>, InferCreationAttributes<CourseInstance>> {
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
+  declare sisuCourseInstanceId: string | null;
   declare gradingType: string;
   declare startingPeriod: string;
   declare endingPeriod: string;
@@ -37,6 +38,11 @@ CourseInstance.init(
         model: 'course',
         key: 'id'
       }
+    },
+    sisuCourseInstanceId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: true
     },
     gradingType: {
       type: DataTypes.ENUM('PASSFAIL', 'NUMERICAL'),
