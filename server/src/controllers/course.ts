@@ -381,7 +381,9 @@ export async function getCourse(req: Request, res: Response, next: NextFunction)
       }
     }) as CourseWithTranslation;
   
-    if (!course) throw new CustomError(`course with an id ${courseId} not found`, HttpCode.NotFound);
+    if (!course) {
+      throw new CustomError(`course with an id ${courseId} not found`, HttpCode.NotFound);
+    }
 
     const courseData: CourseData = {
       id: course.id,
