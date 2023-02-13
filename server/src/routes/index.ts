@@ -14,7 +14,9 @@ import { definition } from '../configs/swagger';
 
 import { authLogin, authLogout, authSelfInfo, authSignup } from '../controllers/auth';
 import { addCourse, getCourse } from '../controllers/course';
-import { addCourseInstance, getCourseInstance } from '../controllers/courseInstance';
+import {
+  addCourseInstance, getAllCourseInstances, getCourseInstance
+} from '../controllers/courseInstance';
 import { fetchAllCourseInstancesFromSisu, fetchCourseInstanceFromSisu } from '../controllers/sisu';
 import { getCoursesOfUser } from '../controllers/user';
 import { handleInvalidRequestJson } from '../middleware';
@@ -310,6 +312,8 @@ router.get('/v1/courses/:courseId', getCourse);
  */
 router.get('/v1/instances/:instanceId', getCourseInstance);
 
+// TODO: Swagger documentation.
+router.get('/v1/courses/:courseId/instances', getAllCourseInstances);
 
 /**
  * @swagger

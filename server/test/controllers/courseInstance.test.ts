@@ -231,3 +231,37 @@ describe('Test GET /v1/instances/:instanceId', () => {
       expect(res.statusCode).toBe(400);
     });
 });
+
+describe('Test GET /v1/courses/:courseId/instances', () => {
+
+  it('should respond with correct data', async () => {
+    const res: supertest.Response = await request.get('/v1/courses/1/instances');
+    expect(res.body.success).toBe(true);
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data.courseInstances[0].courseData.id).toBeDefined();
+    expect(res.body.data.courseInstances[0].courseData.courseCode).toBeDefined();
+    expect(res.body.data.courseInstances[0].id).toBeDefined();
+    expect(res.body.data.courseInstances[0].sisuCourseInstanceId).toBeDefined();
+    expect(res.body.data.courseInstances[0].startingPeriod).toBeDefined();
+    expect(res.body.data.courseInstances[0].endingPeriod).toBeDefined();
+    expect(res.body.data.courseInstances[0].minCredits).toBeDefined();
+    expect(res.body.data.courseInstances[0].maxCredits).toBeDefined();
+    expect(res.body.data.courseInstances[0].startDate).toBeDefined();
+    expect(res.body.data.courseInstances[0].endDate).toBeDefined();
+    expect(res.body.data.courseInstances[0].courseType).toBeDefined();
+    expect(res.body.data.courseInstances[0].gradingType).toBeDefined();
+    expect(res.body.data.courseInstances[0].responsibleTeacher).toBeDefined();
+  });
+
+  it('should respond with error if course does not exist', async () => {
+    const res: supertest.Response = await request.get('/v1/courses/-1/instances');
+    expect(res.statusCode).toBe(404);
+    expect(res.body.success).toBe(false);
+  });
+
+  it('should respond with error if courseId is not a number', async () => {
+    const res: supertest.Response = await request.get('/v1/courses/a/instances');
+    expect(res.statusCode).toBe(400);
+    expect(res.body.success).toBe(false);
+  });
+});

@@ -136,6 +136,108 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
   }
 }
 
+export interface CourseInstanceWithTeachers extends CourseInstance {
+  teacher: User
+}
+
+export async function getAllCourseInstances(req: Request, res: Response): Promise<Response> {
+  try {
+    const courseId: number = Number(req.params.courseId);
+    await idSchema.validate({ id: courseId });
+
+    const course: Course | null = await Course.findByPk(courseId);
+
+    if (!course) {
+      throw new Error(`course with id ${courseId} not found`);
+    }
+
+    // TODO: ADD FUNCTIONALITY FOR MULTIPLE RESPONSIBLE TEACHERS THROUGH COURSEROLE
+    const instances: Array<CourseInstanceWithTeachers> = await CourseInstance.findAll({
+      attributes: [
+        'id', 'sisuCourseInstanceId', 'courseId', 'gradingType', 'startingPeriod',
+        'endingPeriod', 'teachingMethod', 'responsibleTeacher', 'minCredits',
+        'maxCredits', 'startDate', 'endDate', 'createdAt', 'updatedAt'
+      ],
+      where: {
+        courseId: courseId
+      },
+      // TODO: CHANGE TO GO THROUGH COURSE ROLE INSTEAD OF GOING THROUGH
+      // RESPONSIBLE TEACHER FOREIGN KEY
+      include: {
+        model: User,
+        as: 'teacher'
+      }
+    }) as Array<CourseInstanceWithTeachers>;
+
+    const instancesData: Array<CourseInstanceData> = [];
+
+    instances.forEach((instanceWithTeacher: CourseInstanceWithTeachers) => {
+      const instanceData: CourseInstanceData = {
+        courseData: {
+          id: course.id,
+          courseCode: course.courseCode,
+          department: {
+            en: '',
+            fi: '',
+            sv: ''
+          },
+          name: {
+            en: '',
+            fi: '',
+            sv: ''
+          },
+          evaluationInformation: {
+            en: '',
+            fi: '',
+            sv: ''
+          }
+        },
+        sisuCourseInstanceId: instanceWithTeacher.sisuCourseInstanceId,
+        id: instanceWithTeacher.id,
+        startingPeriod: instanceWithTeacher.startingPeriod,
+        endingPeriod: instanceWithTeacher.endingPeriod,
+        minCredits: instanceWithTeacher.minCredits,
+        maxCredits: instanceWithTeacher.maxCredits,
+        startDate: instanceWithTeacher.startDate,
+        endDate: instanceWithTeacher.endDate,
+        courseType: '',
+        gradingType: instanceWithTeacher.gradingType,
+        // TODO: Get multiple responsible teachers through course roles.
+        responsibleTeacher: instanceWithTeacher.teacher.name,
+      };
+
+      instancesData.push(instanceData);
+
+    });
+    return res.status(200).send({
+      success: true,
+      data: {
+        courseInstances: instancesData
+      }
+    });
+
+  } catch (error: unknown) {
+    if (error instanceof yup.ValidationError) {
+      return res.status(400).send({
+        success: false,
+        error: error.errors
+      });
+    }
+
+    if (error instanceof Error && error?.message.startsWith('course with id')) {
+      return res.status(404).send({
+        success: false,
+        error: error.message
+      });
+    }
+
+    return res.status(500).send({
+      success: false,
+      error: 'internal server error'
+    });
+  }
+}
+
 interface CourseInstanceAddRequest {
   sisuCourseInstanceId: string | null;
   gradingType: GradingType;
