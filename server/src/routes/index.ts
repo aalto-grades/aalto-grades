@@ -127,17 +127,17 @@ router.get('/v1/user/:userId/courses', getCoursesOfUser);
 
 /**
  * @swagger
- * /v1/courses/sisu/{courseId}:
+ * /v1/sisu/courses/{courseCode}:
  *   get:
  *     tags: [Course, SISU]
  *     description: Fetch All Instances of a Course from SISU
  *     parameters:
  *       - in: path
- *         name: courseId
+ *         name: courseCode
  *         required: True
  *         schema:
  *           type: string
- *         description: The ID of the course to be fetched from SISU
+ *         description: The course code of the course to be fetched from SISU
  *     responses:
  *       200:
  *         description: User's Courses
@@ -146,21 +146,21 @@ router.get('/v1/user/:userId/courses', getCoursesOfUser);
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.get('/v1/courses/sisu/:courseId', fetchAllCourseInstancesFromSisu);
+router.get('/v1/sisu/courses/:courseCode', fetchAllCourseInstancesFromSisu);
 
 /**
  * @swagger
- * /v1/courses/sisu/instance/{instanceId}:
+ * /v1/sisu/instances/{sisuCourseInstanceId}:
  *   get:
  *     tags: [Course, SISU]
  *     description: Fetch Course Instance Information from SISU
  *     parameters:
  *       - in: path
- *         name: instanceId
+ *         name: sisuCourseInstanceId
  *         required: True
  *         schema:
  *           type: string
- *         description: InstanceID of a course instance
+ *         description: InstanceID of a course instance in sisu
  *     responses:
  *       200:
  *         description: User's Courses
@@ -169,7 +169,7 @@ router.get('/v1/courses/sisu/:courseId', fetchAllCourseInstancesFromSisu);
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.get('/v1/courses/sisu/instance/:instanceId', fetchCourseInstanceFromSisu);
+router.get('/v1/sisu/instances/:sisuCourseInstanceId', fetchCourseInstanceFromSisu);
 
 // Course and instance routes
 /**

@@ -195,11 +195,9 @@ export async function getCourse(req: Request, res: Response): Promise<void> {
       });
       return;
     }
-
     res.status(500).send({
       success: false,
       error: 'Internal Server Error'
     });
-    return;
   }
 }

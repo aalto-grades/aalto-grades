@@ -31,8 +31,9 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
         instanceId,
         {
           attributes: [
-            'id', 'gradingType', 'startingPeriod', 'endingPeriod', 'teachingMethod',
-            'minCredits', 'maxCredits', 'startDate', 'endDate', 'responsibleTeacher'
+            'id', 'sisuCourseInstanceId', 'gradingType', 'startingPeriod',
+            'endingPeriod', 'teachingMethod', 'minCredits', 'maxCredits',
+            'startDate', 'endDate', 'responsibleTeacher'
           ],
           include: {
             model: Course,
@@ -55,6 +56,7 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
 
     const parsedInstanceData: CourseInstanceData = {
       id: instance.id,
+      sisuCourseInstanceId: instance.sisuCourseInstanceId,
       startingPeriod: instance.startingPeriod,
       endingPeriod: instance.endingPeriod,
       minCredits: instance.minCredits,
@@ -135,6 +137,7 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
 }
 
 interface CourseInstanceAddRequest {
+  sisuCourseInstanceId: string | null;
   gradingType: GradingType;
   startingPeriod: Period;
   endingPeriod: Period;
@@ -152,6 +155,9 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
       .string()
       .oneOf([GradingType.PassFail, GradingType.Numerical])
       .required(),
+    sisuCourseInstanceId: yup
+      .string()
+      .notRequired(),
     startingPeriod: yup
       .string()
       .oneOf([Period.I, Period.II, Period.III, Period.IV, Period.V])
@@ -212,6 +218,7 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
 
     const newInstance: CourseInstance = await models.CourseInstance.create({
       courseId: courseId,
+      sisuCourseInstanceId: request.sisuCourseInstanceId ?? null,
       gradingType: request.gradingType,
       startingPeriod: request.startingPeriod,
       endingPeriod: request.endingPeriod,

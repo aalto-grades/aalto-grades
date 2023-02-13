@@ -25,7 +25,7 @@ export enum TeachingMethod {
 export interface CourseData {
   // Course ID is either number type ID in the Aalto Grades database or
   // undefined when representing parsed Sisu data.
-  id?: number | undefined,
+  id?: number,
   courseCode: string,
   department: LocalizedString,
   name: LocalizedString,
@@ -34,9 +34,9 @@ export interface CourseData {
 
 export interface CourseInstanceData {
   courseData: CourseData,
-  // Course instance ID is either Sisu instance ID (string) or number type ID in
-  // the Aalto Grades database.
-  id: number | string,
+  // Course instance ID can be null when representing Sisu course instance data
+  id: number | null,
+  sisuCourseInstanceId: string | null,
   startingPeriod: string,
   endingPeriod: string,
   minCredits: number,
