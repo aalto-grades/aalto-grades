@@ -17,8 +17,8 @@ import { SisuInstance } from '../types/sisu';
 import User from '../database/models/user';
 import { sequelize } from '../database';
 import { MessageParams } from 'yup/lib/types';
-
-import { CustomError, HttpCode } from '../middleware/errorHandler';
+import { CustomError } from '../middleware/errorHandler';
+import { HttpCode } from '../types/httpCode';
 
 export interface LocalizedString {
   fi: string,

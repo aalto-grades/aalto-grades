@@ -5,13 +5,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { ValidationError } from 'yup';
 
-export enum HttpCode {
-  BadRequest = 400,
-  Unauthorized = 401,
-  NotFound = 404,
-  InternalServerError = 500,
-  BadGateway = 502
-}
+import { HttpCode } from '../types/httpCode';
 
 export class CustomError extends Error {
   public readonly statusCode: number;
