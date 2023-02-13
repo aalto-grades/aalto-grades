@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { SisuInstance, SisuError } from '../../src/types/sisu';
+import { SisuCourseInstance, SisuError } from '../../src/types/sisu';
 
-export const sisuInstance: SisuInstance = {
+export const sisuInstance: SisuCourseInstance = {
   id: 'aalto-CUR-163498-3084205',
   code: 'ELEC-A7100',
   startDate: new Date('2023-01-09'),
@@ -17,9 +17,15 @@ export const sisuInstance: SisuInstance = {
   },
   summary: {
     workload: {
-      fi: '4 h lectures assisted programming exercises with voluntary participation. There will be about 10 h of weekly exercise hours that can be taken as needed. 120 h individual study',
-      sv: '4 h lectures assisted programming exercises with voluntary participation. There will be about 10 h of weekly exercise hours that can be taken as needed. 120 h individual study',
-      en: '4 h lectures assisted programming exercises with voluntary participation. There will be about 10 h of weekly exercise hours that can be taken as needed. 120 h individual study'
+      fi: '4 h lectures assisted programming exercises with voluntary participation. ' +
+        'There will be about 10 h of weekly exercise hours that can be taken as needed. ' +
+        '120 h individual study',
+      sv: '4 h lectures assisted programming exercises with voluntary participation. ' +
+        'There will be about 10 h of weekly exercise hours that can be taken as needed. ' +
+        '120 h individual study',
+      en: '4 h lectures assisted programming exercises with voluntary participation. ' +
+        'There will be about 10 h of weekly exercise hours that can be taken as needed. ' +
+        '120 h individual study'
     },
     prerequisites: {
       fi: 'Basics in proramming (for example CS-A1111).',
@@ -27,14 +33,20 @@ export const sisuInstance: SisuInstance = {
       en: 'Basics in proramming (for example CS-A1111).'
     },
     learningOutcomes: {
-      fi: 'The student knows the basics of C programming language and can write short programs using the C language.',
-      sv: 'The student knows the basics of C programming language and can write short programs using the C language.',
-      en: 'The student knows the basics of C programming language and can write short programs using the C language.'
+      fi: 'The student knows the basics of C programming language and can write ' +
+        'short programs using the C language.',
+      sv: 'The student knows the basics of C programming language and can write ' +
+        'short programs using the C language.',
+      en: 'The student knows the basics of C programming language and can write ' +
+        'short programs using the C language.'
     },
     literature: {
-      en: 'Study materials and exercises are available in the web. Study materials and exercises are available also in Finnish.',
-      fi: 'Study materials and exercises are available in the web. Study materials and exercises are available also in Finnish.',
-      sv: 'Study materials and exercises are available in the web. Study materials and exercises are available also in Finnish.'
+      en: 'Study materials and exercises are available in the web. Study ' +
+        'materials and exercises are available also in Finnish.',
+      fi: 'Study materials and exercises are available in the web. Study ' +
+        'materials and exercises are available also in Finnish.',
+      sv: 'Study materials and exercises are available in the web. Study ' +
+        'materials and exercises are available also in Finnish.'
     },
     languageOfInstruction: {
       fi: 'en',
@@ -48,9 +60,18 @@ export const sisuInstance: SisuInstance = {
     },
     homepage: { },
     content: {
-      fi: 'Basic concepts of systems-level programming. Basics of the C programming language. Dynamic memory management and its application in common data structures. Basic use of programming and debugging tools for C. Small programming exercises in C.',
-      sv: 'Basic concepts of systems-level programming. Basics of the C programming language. Dynamic memory management and its application in common data structures. Basic use of programming and debugging tools for C. Small programming exercises in C.',
-      en: 'Basic concepts of systems-level programming. Basics of the C programming language. Dynamic memory management and its application in common data structures. Basic use of programming and debugging tools for C. Small programming exercises in C.'
+      fi: 'Basic concepts of systems-level programming. Basics of the C ' +
+        'programming language. Dynamic memory management and its application ' +
+        'in common data structures. Basic use of programming and debugging ' +
+        'tools for C. Small programming exercises in C.',
+      sv: 'Basic concepts of systems-level programming. Basics of the C ' +
+        'programming language. Dynamic memory management and its application ' +
+        'in common data structures. Basic use of programming and debugging ' +
+        'tools for C. Small programming exercises in C.',
+      en: 'Basic concepts of systems-level programming. Basics of the C ' +
+        'programming language. Dynamic memory management and its application ' +
+        'in common data structures. Basic use of programming and debugging ' +
+        'tools for C. Small programming exercises in C.'
     },
     cefrLevel: '',
     level: {
@@ -80,9 +101,17 @@ export const sisuInstance: SisuInstance = {
       ]
     },
     additionalInformation: {
-      fi: 'Opetusperiodi: 2020-2021 Spring III-V2021-2022 Spring III-VKurssin kotisivu: https://mycourses.aalto.fi/course/search.php?search&#61;ELEC-A7100Ilmoittautuminen: Lukuvuonna 2021-2022 opetukseen ilmoittaudutaan WebOodin sijaan Sisussa (sisu.aalto.fi).WebOodi',
-      sv: 'Undervisningsperiod: 2020-2021 Spring III-V2021-2022 Spring III-VKursens webbplats: https://mycourses.aalto.fi/course/search.php?search&#61;ELEC-A7100Anmälning: Anmälan till undervisningen för läsåret 2021-2022 sker i Sisu, inte i WebOodi.WebOodi',
-      en: 'Teaching Period: 2020-2021 Spring III-V2021-2022 Spring III-VCourse Homepage: https://mycourses.aalto.fi/course/search.php?search&#61;ELEC-A7100Registration for Courses: In the academic year 2021-2022, registration for courses will take place on Sisu (sisu.aalto.fi) instead of WebOodi.WebOodi'
+      fi: 'Opetusperiodi: 2020-2021 Spring III-V2021-2022 Spring III-VKurssin ' +
+        'kotisivu: https://mycourses.aalto.fi/course/search.php?search&#61;ELEC-A7100' +
+        'Ilmoittautuminen: Lukuvuonna 2021-2022 opetukseen ilmoittaudutaan ' +
+        'WebOodin sijaan Sisussa (sisu.aalto.fi).WebOodi',
+      sv: 'Undervisningsperiod: 2020-2021 Spring III-V2021-2022 Spring III-VKursens ' +
+        'webbplats: https://mycourses.aalto.fi/course/search.php?search&#61;ELEC-A7100Anmälning: ' +
+        'Anmälan till undervisningen för läsåret 2021-2022 sker i Sisu, inte i WebOodi.WebOodi',
+      en: 'Teaching Period: 2020-2021 Spring III-V2021-2022 Spring III-VCourse ' +
+        'Homepage: https://mycourses.aalto.fi/course/search.php?search&#61;ELEC-A7100' +
+        'Registration for Courses: In the academic year 2021-2022, registration for ' +
+        'courses will take place on Sisu (sisu.aalto.fi) instead of WebOodi.WebOodi'
     },
     gradingScale: {
       fi: '0-5',

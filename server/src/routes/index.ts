@@ -2,18 +2,22 @@
 //
 // SPDX-License-Identifier: MIT
 
-import express, { Request, Response, Router } from 'express';
-import { getUserCourses } from '../controllers/user';
-import { addCourse, handleInvalidRequestJson, addCourseInstance, fetchAllInstancesFromSisu, fetchInstanceFromSisu, getCourse, getInstance } from '../controllers/course';
-import { authLogin, authLogout, authSelfInfo, authSignup } from './login';
-import passport from 'passport';
-import cors from 'cors';
+import express, { Router } from 'express';
 import cookieParser from 'cookie-parser';
-import { frontendOrigin } from '../configs';
+import cors from 'cors';
+import passport from 'passport';
+import swaggerJsdoc, { OAS3Options } from 'swagger-jsdoc';
+import swaggerUI from 'swagger-ui-express';
+
+import { FRONTEND_ORIGIN } from '../configs/environment';
 import { definition } from '../configs/swagger';
 
-import swaggerUI from 'swagger-ui-express';
-import swaggerJsdoc, { OAS3Options} from 'swagger-jsdoc';
+import { authLogin, authLogout, authSelfInfo, authSignup } from '../controllers/auth';
+import { addCourse, getCourse } from '../controllers/course';
+import { addCourseInstance, getCourseInstance } from '../controllers/courseInstance';
+import { fetchAllCourseInstancesFromSisu, fetchCourseInstanceFromSisu } from '../controllers/sisu';
+import { getCoursesOfUser } from '../controllers/user';
+import { handleInvalidRequestJson } from '../middleware';
 
 const options: object = {
   definition,
@@ -44,7 +48,7 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *       courseCode:
  *         type: string
  *         description: Course Code
- *       department: 
+ *       department:
  *         type: object
  *         description: Object containing department with localization
  *         properties:
@@ -54,7 +58,7 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *             type: string
  *           en:
  *             type: string
- *       name: 
+ *       name:
  *         type: object
  *         description: Object containing course name with localization
  *         properties:
@@ -74,10 +78,10 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *             type: string
  *           en:
  *             type: string
- * 
+ *
  *   UserCourses:
  *     type: object
- *     properties: 
+ *     properties:
  *       success:
  *         type: boolean
  *         description: Success of the request
@@ -117,7 +121,7 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.get('/v1/user/:userId/courses', getUserCourses);
+router.get('/v1/user/:userId/courses', getCoursesOfUser);
 
 // Sisu API routes
 
@@ -142,7 +146,7 @@ router.get('/v1/user/:userId/courses', getUserCourses);
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.get('/v1/sisu/courses/:courseCode', fetchAllInstancesFromSisu);
+router.get('/v1/sisu/courses/:courseCode', fetchAllCourseInstancesFromSisu);
 
 /**
  * @swagger
@@ -165,7 +169,7 @@ router.get('/v1/sisu/courses/:courseCode', fetchAllInstancesFromSisu);
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.get('/v1/sisu/instances/:sisuCourseInstanceId', fetchInstanceFromSisu);
+router.get('/v1/sisu/instances/:sisuCourseInstanceId', fetchCourseInstanceFromSisu);
 
 // Course and instance routes
 /**
@@ -268,7 +272,7 @@ router.get('/v1/courses/:courseId', getCourse);
  *         description: Ending date in format year-month-day
  *       courseType:
  *         type: string
- *       gradingType: 
+ *       gradingType:
  *         type: string
  *       responsibleTeacher:
  *         type: string
@@ -304,7 +308,7 @@ router.get('/v1/courses/:courseId', getCourse);
  *                 course:
  *                   $ref: '#/definitions/Instance'
  */
-router.get('/v1/instances/:instanceId', getInstance);
+router.get('/v1/instances/:instanceId', getCourseInstance);
 
 
 /**
@@ -341,7 +345,12 @@ router.post('/v1/auth/login', express.json(), authLogin);
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.post('/v1/auth/logout', passport.authenticate('jwt', { session: false }), express.json(), authLogout);
+router.post(
+  '/v1/auth/logout',
+  passport.authenticate('jwt', { session: false }),
+  express.json(),
+  authLogout
+);
 
 /**
  * @swagger
@@ -382,15 +391,14 @@ router.post('/v1/auth/signup', express.json(), authSignup);
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.get('/v1/auth/self-info', passport.authenticate('jwt', { session: false }), express.json(), authSelfInfo);
-
-
-//Maybe no swagger required for this route, this should be removed as a part of refactoring.
-router.get('*', (req: Request, res: Response) => {
-  res.send(`Hello ${req.path}`);
-});
+router.get(
+  '/v1/auth/self-info',
+  passport.authenticate('jwt', { session: false }),
+  express.json(),
+  authSelfInfo
+);
 
 router.use(cors({
-  origin: frontendOrigin,
+  origin: FRONTEND_ORIGIN,
   credentials: true,
 }));
