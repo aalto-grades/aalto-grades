@@ -24,14 +24,18 @@ export default {
         unique: true,
         transaction
       });
-      await queryInterface.addIndex('course_instance_partial_grade', ['course_id', 'course_instance_id'], {
-        unique: false,
-        transaction
-      });
-      await queryInterface.addIndex('user_partial_grade', ['user_id', 'course_instance_partial_grade_id'], {
-        unique: true,
-        transaction
-      });
+      await queryInterface.addIndex(
+        'course_instance_partial_grade', [ 'course_id', 'course_instance_id' ], {
+          unique: false,
+          transaction
+        }
+      );
+      await queryInterface.addIndex(
+        'user_partial_grade', ['user_id', 'course_instance_partial_grade_id'], {
+          unique: true,
+          transaction
+        }
+      );
       await queryInterface.addIndex('course_assignment', ['course_instance_partial_grade_id'], {
         unique: false,
         transaction
@@ -53,14 +57,46 @@ export default {
   down: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction: Transaction = await queryInterface.sequelize.transaction();
     try {
-      await queryInterface.sequelize.query('DROP INDEX IF EXISTS course_instance_course_id', { transaction });
-      await queryInterface.sequelize.query('DROP INDEX IF EXISTS course_role_user_id_course_instance_id', { transaction });
-      await queryInterface.sequelize.query('DROP INDEX IF EXISTS course_translation_course_id_language', { transaction });
-      await queryInterface.sequelize.query('DROP INDEX IF EXISTS course_instance_partial_grade_course_id_course_instance_id', { transaction });
-      await queryInterface.sequelize.query('DROP INDEX IF EXISTS user_partial_grade_user_id_course_instance_partial_grade_id', { transaction });
-      await queryInterface.sequelize.query('DROP INDEX IF EXISTS course_assignment_course_instance_partial_grade_id', { transaction });
-      await queryInterface.sequelize.query('DROP INDEX IF EXISTS user_assignment_grade_user_id_course_assignment_id', { transaction });
-      await queryInterface.sequelize.query('DROP INDEX IF EXISTS course_result_user_id_course_instance_id', { transaction });
+      await queryInterface.sequelize.query(
+        'DROP INDEX IF EXISTS course_instance_course_id',
+        { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP INDEX IF EXISTS course_role_user_id_course_instance_id',
+        { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP INDEX IF EXISTS course_translation_course_id_language',
+        { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP INDEX IF EXISTS course_instance_partial_grade_course_id_course_instance_id',
+        { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP INDEX IF EXISTS user_partial_grade_user_id_course_instance_partial_grade_id',
+        { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP INDEX IF EXISTS course_assignment_course_instance_partial_grade_id',
+        { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP INDEX IF EXISTS user_assignment_grade_user_id_course_assignment_id',
+        { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP INDEX IF EXISTS course_result_user_id_course_instance_id',
+        { transaction }
+      );
+
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();

@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState }  from 'react';
-import userService from '../../services/user';
 import { useNavigate } from 'react-router-dom';
-import SignupForm from './SignupForm';
-import useAuth from '../../hooks/useAuth';
 import { useTheme } from '@mui/material/styles';
+import SignupForm from './SignupForm';
+import userService from '../../services/user';
+import useAuth from '../../hooks/useAuth';
 
 const Signup = () => {
   
@@ -19,10 +19,8 @@ const Signup = () => {
   const addUser = async (userObject) => {
     try {
       const user = await userService.signup(userObject);
-
       // if signup successfull, save user role to context
-      setAuth({ role: user.role });
-
+      setAuth({ role: user.data.role });
       navigate('/', { replace: true });
     } catch (exception) {
       console.log(exception);

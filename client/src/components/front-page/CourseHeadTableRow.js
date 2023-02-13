@@ -22,8 +22,8 @@ const headCells = [{
 },
 ];
 
-//for now the TableSortLabel element is static and displayd only for the code column
-//because the rows are sorted by the course code
+// for now the TableSortLabel element is static and displayd only for the code column
+// because the rows are sorted by the course code
 const CourseHeadTableRow = () => {
   return(
     <TableRow>

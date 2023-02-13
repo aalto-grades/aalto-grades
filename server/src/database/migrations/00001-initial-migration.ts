@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { QueryInterface, DataTypes, Transaction } from 'sequelize';
+import { DataTypes, QueryInterface, Transaction } from 'sequelize';
 
 export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
@@ -17,7 +17,7 @@ export default {
         student_id: {
           type: new DataTypes.STRING,
           unique: true,
-          allowNull: false
+          allowNull: true
         },
         name: {
           type: new DataTypes.STRING,
@@ -66,6 +66,11 @@ export default {
           },
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
+        },
+        sisu_course_instance_id: {
+          type: DataTypes.STRING,
+          allowNull: true,
+          unique: true
         },
         grading_type: {
           type: DataTypes.ENUM('PASSFAIL', 'NUMERICAL'),
@@ -380,14 +385,39 @@ export default {
       await queryInterface.dropTable('user', { transaction });
       await queryInterface.dropTable('migrations', { transaction });
       await queryInterface.dropTable('seeds', { transaction });
-      await queryInterface.sequelize.query('DROP TYPE IF EXISTS enum_course_instance_grading_type;', { transaction });
-      await queryInterface.sequelize.query('DROP TYPE IF EXISTS enum_course_role_role;', { transaction });
-      await queryInterface.sequelize.query('DROP TYPE IF EXISTS enum_course_instance_teaching_method;', { transaction });
-      await queryInterface.sequelize.query('DROP TYPE IF EXISTS enum_course_translation_language;', { transaction });
-      await queryInterface.sequelize.query('DROP TYPE IF EXISTS enum_course_instance_partial_grade_type;', { transaction });
-      await queryInterface.sequelize.query('DROP TYPE IF EXISTS enum_course_instance_partial_grade_platform;', { transaction });
-      await queryInterface.sequelize.query('DROP TYPE IF EXISTS enum_course_instance_starting_period;', { transaction });
-      await queryInterface.sequelize.query('DROP TYPE IF EXISTS enum_course_instance_ending_period;', { transaction });
+
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS enum_course_instance_grading_type;', { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS enum_course_role_role;', { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS enum_course_instance_teaching_method;', { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS enum_course_translation_language;', { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS enum_course_instance_partial_grade_type;', { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS enum_course_instance_partial_grade_platform;', { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS enum_course_instance_starting_period;', { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS enum_course_instance_ending_period;', { transaction }
+      );
+
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();

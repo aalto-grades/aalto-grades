@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import LoginForm from '../components/auth/LoginForm';
 import Login from '../components/auth/Login';
-import { BrowserRouter } from 'react-router-dom';
 
 describe('Tests for Login and LoginForm components', () => {
 

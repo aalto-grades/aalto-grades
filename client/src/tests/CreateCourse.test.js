@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CreateCourseView from '../components/CreateCourseView';
 import CreateCourseForm from '../components/create-course-view/CreateCourseForm';
-import { BrowserRouter } from 'react-router-dom';
 
 describe('Tests for CreateCourseView components', () => {
 
@@ -37,6 +37,10 @@ describe('Tests for CreateCourseView components', () => {
 
     const mockCourse= jest.fn();
 
+    const testCode = 'Test code';
+    const testName = 'Test name';
+    const testDepartment = 'Test department';
+
     render(<CreateCourseForm addCourse={mockCourse}/>);
 
     const codeField = screen.getByLabelText('Course Code');
@@ -44,31 +48,29 @@ describe('Tests for CreateCourseView components', () => {
     const organizerField = screen.getByLabelText('Organizer');
     const creationButton = screen.getByText('Create Course');
 
-    userEvent.type(codeField, 'Test code');
-    userEvent.type(nameField, 'Test name');
-    userEvent.type(organizerField, 'Test department');
+    userEvent.type(codeField, testCode);
+    userEvent.type(nameField, testName);
+    userEvent.type(organizerField, testDepartment);
     userEvent.click(creationButton);
 
     expect(mockCourse).toHaveBeenCalledTimes(1);
     expect(mockCourse).toHaveBeenCalledWith({
       id: -1,
-      courseCode: 'Test code',
-      minCredits: 5,
-      maxCredits: 5,
+      courseCode: testCode,
       department: {
         fi: '',
         sv: '',
-        en: 'Test department',
+        en: testDepartment,
       },
       name: {
         fi: '',
         sv: '',
-        en: 'Test name',
+        en: testName,
       },
       evaluationInformation: {
         fi: '',
         sv: '',
-        en: 'General scale, 0-5',
+        en: '',
       }
     });
   });

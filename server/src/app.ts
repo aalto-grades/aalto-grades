@@ -2,14 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import express, { Application } from 'express';
-import { router } from './routes/index';
 import cors from 'cors';
+import express, { Application } from 'express';
+
+import { FRONTEND_ORIGIN } from './configs/environment';
+
+import { router } from './routes/index';
 
 export const app: Application = express();
 
 app.use(cors({
-  origin: 'http://localhost:3005',
-  credentials: true, 
+  origin: FRONTEND_ORIGIN,
+  credentials: true,
 }));
+
 app.use('/', router);
