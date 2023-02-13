@@ -58,7 +58,7 @@ export function ErrorHandler(err: unknown, req: Request, res: Response, next: Ne
   // Fallback if no other error matches
   res.status(HttpCode.InternalServerError).send({
     success: false,
-    errors: ['Internal Server Error']
+    errors: ['internal server error']
   });
   return;
 }
