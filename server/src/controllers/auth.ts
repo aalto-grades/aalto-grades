@@ -233,8 +233,11 @@ export async function authSelfInfo(req: Request, res: Response): Promise<void> {
   }
   const user: JwtClaims = req.user as JwtClaims;
   res.send({
-    id: user.id,
-    role: user.role,
+    success: true,
+    data: {
+      id: user.id,
+      role: user.role,
+    }
   });
 }
 

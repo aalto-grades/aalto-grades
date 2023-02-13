@@ -5,19 +5,18 @@
 import express, { Router } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import passport from 'passport';
 import swaggerJsdoc, { OAS3Options } from 'swagger-jsdoc';
 import swaggerUI from 'swagger-ui-express';
 
 import { FRONTEND_ORIGIN } from '../configs/environment';
 import { definition } from '../configs/swagger';
 
-import { authLogin, authLogout, authSelfInfo, authSignup } from '../controllers/auth';
 import { addCourse, getCourse } from '../controllers/course';
 import { addCourseInstance, getCourseInstance } from '../controllers/courseInstance';
 import { fetchAllCourseInstancesFromSisu, fetchCourseInstanceFromSisu } from '../controllers/sisu';
 import { getCoursesOfUser } from '../controllers/user';
 import { handleInvalidRequestJson } from '../middleware';
+import { router as authRouter } from './session';
 
 const options: object = {
   definition,
@@ -29,6 +28,7 @@ const openapiSpecification: OAS3Options = swaggerJsdoc(options);
 export const router: Router = Router();
 
 router.use(cookieParser());
+router.use(authRouter);
 
 router.use('/api-docs', swaggerUI.serve);
 router.get('/api-docs', swaggerUI.setup(openapiSpecification));
@@ -37,6 +37,12 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
 
 /**
  * @swagger
+ * components:
+ *   securitySchemes:
+ *     jwtCookie:
+ *       type: apiKey
+ *       in: cookie
+ *       name: jwt
  * definitions:
  *   Failure:
  *     type: object
@@ -116,9 +122,11 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *       email:
  *         type: string
  *         description: Email address, functioning as a username
+ *         required: true
  *       password:
  *         type: string
  *         description: Plaintext password of the user
+ *         required: true
  *   LoginResult:
  *     type: object
  *     properties:
@@ -132,6 +140,64 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *             type: string
  *             description: >
  *               The role of the user in our system: `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
+ *   SignupRequest:
+ *     type: object
+ *     properties:
+ *       email:
+ *         type: string
+ *         description: Email address, to be used as a credential
+ *         required: true
+ *       password:
+ *         type: string
+ *         description: Plaintext password
+ *         required: true
+ *       studentID:
+ *         type: string
+ *         description: The student number assigned by the university.
+ *         required: false
+ *       name:
+ *         type: string
+ *         description: A personal name of the user (not a credential)
+ *         required: true
+ *       role:
+ *         type: string
+ *         description: >
+ *           The role of the user in our system: `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
+ *         required: true
+ *   SignupResult:
+ *     type: object
+ *     properties:
+ *       success:
+ *         type: boolean
+ *         description: Success of the request
+ *       data:
+ *         type: object
+ *         properties:
+ *           role:
+ *             type: string
+ *             description: >
+ *               The role of the user in our system: `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
+ *           id:
+ *             type: number
+ *             description: >
+ *               The database identifier of the user
+ *   AuthSelfInfo:
+ *     type: object
+ *     properties:
+ *       success:
+ *         type: boolean
+ *         description: Success of the request
+ *       data:
+ *         type: object
+ *         properties:
+ *           role:
+ *             type: string
+ *             description: >
+ *               The role of the user in our system: `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
+ *           id:
+ *             type: number
+ *             description: >
+ *               The database identifier of the user
  */
 /**
  * @swagger
@@ -342,112 +408,6 @@ router.get('/v1/courses/:courseId', getCourse);
  *                   $ref: '#/definitions/Instance'
  */
 router.get('/v1/instances/:instanceId', getCourseInstance);
-
-
-/**
- * @swagger
- * /v1/auth/login:
- *   post:
- *     tags: [Session]
- *     description: Log in as a user
- *     requestBody:
- *       description: The credentials for the user, currently consisting of the email and password.
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/definitions/Credentials'
- *     responses:
- *       200:
- *         description: The login has succeeded, and an access token is return in a cookie.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/LoginResult'
- *         headers:
- *            Set-Cookie:
- *              description: 'JWT token, storing an access token to allow using the API'
- *              schema:
- *                type: string
- *                example: jwt=wliuerhlwieurh; Secure; HttpOnly; SameSite=None
- *       401:
- *         description: The login has failed, due to invalid credentials or an invalid request format.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- * 
- */
-router.post('/v1/auth/login', express.json(), authLogin);
-
-/**
- * @swagger
- * /v1/auth/logout:
- *   post:
- *     tags: [Session]
- *     description: Logout of user
- *     requestBody:
- *       description: Description of logout POST body
- *     responses:
- *       200:
- *         description: User's Courses
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/UserCourses'
- */
-router.post(
-  '/v1/auth/logout',
-  passport.authenticate('jwt', { session: false }),
-  express.json(),
-  authLogout
-);
-
-/**
- * @swagger
- * /v1/auth/signup:
- *   post:
- *     tags: [Session]
- *     description: Sign Up user
- *     requestBody:
- *       description: Description of signup POST body
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: True
- *         schema:
- *           type: integer
- *         description: The ID of the user fetching courses
- *     responses:
- *       200:
- *         description: User's Courses
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/UserCourses'
- */
-router.post('/v1/auth/signup', express.json(), authSignup);
-
-/**
- * @swagger
- * /v1/auth/self-info:
- *   get:
- *     tags: [Session]
- *     description: Fetch Courses of a user
- *     responses:
- *       200:
- *         description: User's Courses
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/UserCourses'
- *
- */
-router.get(
-  '/v1/auth/self-info',
-  passport.authenticate('jwt', { session: false }),
-  express.json(),
-  authSelfInfo
-);
 
 router.use(cors({
   origin: FRONTEND_ORIGIN,
