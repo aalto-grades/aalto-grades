@@ -26,7 +26,7 @@ describe('Test GET /v1/courses/:courseId', () => {
     const res: supertest.Response = await request.get('/v1/courses/-1');
     expect(res.body.success).toBe(false);
     expect(res.body.course).not.toBeDefined();
-    expect(res.body.error).toBeDefined();
+    expect(res.body.errors).toBeDefined();
     expect(res.statusCode).toBe(404);
   });
 
@@ -35,7 +35,7 @@ describe('Test GET /v1/courses/:courseId', () => {
       const res: supertest.Response = await request.get('/v1/courses/abc');
       expect(res.body.success).toBe(false);
       expect(res.body.course).not.toBeDefined();
-      expect(res.body.error).toBeDefined();
+      expect(res.body.errors).toBeDefined();
       expect(res.statusCode).toBe(400);
     });
 });
