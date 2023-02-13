@@ -27,6 +27,7 @@ export class SisuError extends CustomError {
 }
 
 export function ErrorHandler(err: unknown, req: Request, res: Response, next: NextFunction): void {
+  // TODO: appropriate logging in case of errors
 
   if (err instanceof CustomError) {
     res.status(err.statusCode);

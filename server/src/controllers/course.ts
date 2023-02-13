@@ -104,7 +104,6 @@ export async function addCourse(req: Request, res: Response, next: NextFunction)
     });
     return;
   } catch (error) {
-    // TODO: appropriate logging in case of errors
     await t.rollback();
     next(error);
   }
