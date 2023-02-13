@@ -5,6 +5,7 @@
 import express, { Application } from 'express';
 import { router } from './routes/index';
 import cors from 'cors';
+import { ErrorHandler } from './middleware/errorHandler';
 
 export const app: Application = express();
 
@@ -13,3 +14,4 @@ app.use(cors({
   credentials: true, 
 }));
 app.use('/', router);
+app.use(ErrorHandler);

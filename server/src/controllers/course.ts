@@ -8,7 +8,7 @@ import * as yup from 'yup';
 import CourseInstance from '../database/models/courseInstance';
 import Course from '../database/models/course';
 import models from '../database/models';
-import { userService, courseService, instanceService } from '../services';
+import { userService, instanceService } from '../services';
 import CourseTranslation from '../database/models/courseTranslation';
 import { SISU_API_KEY, SISU_API_URL } from '../configs/environment';
 import { axiosTimeout } from '../configs/config';
@@ -17,6 +17,8 @@ import { SisuInstance } from '../types/sisu';
 import User from '../database/models/user';
 import { sequelize } from '../database';
 import { MessageParams } from 'yup/lib/types';
+
+import { CustomError, HttpCode } from '../middleware/errorHandler';
 
 export interface LocalizedString {
   fi: string,
@@ -362,11 +364,24 @@ export async function addCourseInstance(req: Request, res: Response): Promise<Re
   }
 }
 
-export async function getCourse(req: Request, res: Response): Promise<Response> {
+export interface CourseWithTranslation extends Course {
+  CourseTranslations: Array<CourseTranslation>
+}
+
+export async function getCourse(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const courseId: number = Number(req.params.courseId);
     await idSchema.validate({ id: courseId });
-    const course: courseService.CourseWithTranslation = await courseService.findCourseById(courseId);
+
+    const course: CourseWithTranslation | null = await models.Course.findByPk(courseId, {
+      attributes: ['id', 'courseCode'],
+      include: {
+        model: CourseTranslation,
+        attributes: ['language', 'courseName', 'department'],
+      }
+    }) as CourseWithTranslation;
+  
+    if (!course) throw new CustomError(`course with an id ${courseId} not found`, HttpCode.NotFound);
 
     const courseData: CourseData = {
       id: course.id,
@@ -405,31 +420,13 @@ export async function getCourse(req: Request, res: Response): Promise<Response> 
       }
     });
 
-    return res.status(200).send({
+    res.status(200).send({
       success: true,
       course: courseData
     });
+    return;
   } catch (error: unknown) {
-    console.log(error);
-
-    if (error instanceof yup.ValidationError) {
-      return res.status(400).send({
-        success: false,
-        error: error.errors
-      });
-    }
-
-    if (error instanceof Error && error?.message.startsWith('course with an id')) {
-      return res.status(404).send({
-        success: false,
-        error: error.message
-      });
-    }
-
-    return res.status(500).send({
-      success: false,
-      error: 'Internal Server Error'
-    });
+    next(error);
   }
 }
 
