@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { Transaction } from 'sequelize';
 import * as yup from 'yup';
 
@@ -11,12 +11,14 @@ import models from '../database/models';
 import Course from '../database/models/course';
 import CourseTranslation from '../database/models/courseTranslation';
 
+import { CustomError } from '../middleware/errorHandler';
 import { CourseData } from '../types/course';
 import { idSchema } from '../types/general';
+import { HttpCode } from '../types/httpCode';
 import { Language, localizedStringSchema } from '../types/language';
 import { CourseWithTranslation } from '../types/model';
 
-export async function addCourse(req: Request, res: Response): Promise<void> {
+export async function addCourse(req: Request, res: Response, next: NextFunction): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     courseCode: yup.string().required(),
     department: localizedStringSchema.required(),
@@ -100,25 +102,15 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
       success: true,
       course: courseData
     });
+    return;
   } catch (error) {
     // TODO: appropriate logging in case of errors
     await t.rollback();
-
-    if (error instanceof yup.ValidationError) {
-      res.status(400).json({
-        success: false,
-        errors: error.errors
-      });
-    } else {
-      res.status(500).json({
-        success: false,
-        errors: [ 'Internal Server Error' ]
-      });
-    }
+    next(error);
   }
 }
 
-export async function getCourse(req: Request, res: Response): Promise<void> {
+export async function getCourse(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const courseId: number = Number(req.params.courseId);
     await idSchema.validate({ id: courseId });
@@ -132,7 +124,7 @@ export async function getCourse(req: Request, res: Response): Promise<void> {
     }) as CourseWithTranslation;
 
     if (!course) {
-      throw new Error(`course with an id ${courseId} not found`);
+      throw new CustomError(`course with an id ${courseId} not found`, HttpCode.NotFound);
     }
 
     const courseData: CourseData = {
@@ -178,26 +170,6 @@ export async function getCourse(req: Request, res: Response): Promise<void> {
     });
     return;
   } catch (error: unknown) {
-    console.log(error);
-
-    if (error instanceof yup.ValidationError) {
-      res.status(400).send({
-        success: false,
-        error: error.errors
-      });
-      return;
-    }
-
-    if (error instanceof Error && error?.message.startsWith('course with an id')) {
-      res.status(404).send({
-        success: false,
-        error: error.message
-      });
-      return;
-    }
-    res.status(500).send({
-      success: false,
-      error: 'Internal Server Error'
-    });
+    next(error);
   }
 }

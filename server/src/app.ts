@@ -7,7 +7,6 @@ import express, { Application } from 'express';
 
 import { FRONTEND_ORIGIN } from './configs/environment';
 
-
 import { router } from './routes/index';
 import { ErrorHandler } from './middleware/errorHandler';
 
