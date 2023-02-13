@@ -2,9 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import express, { Application } from 'express';
-import { router } from './routes/index';
 import cors from 'cors';
+import express, { Application } from 'express';
+
+import { router } from './routes/index';
 import { ErrorHandler } from './middleware/errorHandler';
 
 export const app: Application = express();
