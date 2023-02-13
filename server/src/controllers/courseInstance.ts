@@ -151,7 +151,7 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
       throw new Error(`course with id ${courseId} not found`);
     }
 
-    // TODO: ADD FUNCTIONALITY FOR MULTIPLE RESPONSIBLE TEACHERS THROUGH COURS EROLE
+    // TODO: ADD FUNCTIONALITY FOR MULTIPLE RESPONSIBLE TEACHERS THROUGH COURSEROLE
     const instances: Array<CourseInstanceWithTeachers> = await CourseInstance.findAll({
       attributes: [
         'id', 'sisuCourseInstanceId', 'courseId', 'gradingType', 'startingPeriod',
