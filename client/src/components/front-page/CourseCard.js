@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -10,9 +11,7 @@ import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
-import { useNavigate } from 'react-router-dom';
 
-// add spacing before action part
 const CourseCard = ({ course }) => {
   let navigate = useNavigate();
   const { name, courseCode, department } = course;

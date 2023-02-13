@@ -6,9 +6,9 @@
 // if not, the user is redirected to the login page
 
 import { Navigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { PropTypes } from 'prop-types';
 import userService from '../../services/user';
-import { Outlet } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';
 
@@ -30,10 +30,6 @@ const PrivateRoute = ({ children, roles }) => {
       setLoading(false);
     }
   };
-
-  /*const isAuthenticated = async () => {
-    await getAuthStatus();
-  };*/
 
   useEffect(() => {
     getAuthStatus();

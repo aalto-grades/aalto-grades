@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import EditInstanceForm from './edit-instance-view/EditInstanceForm';
 import instancesService from '../services/instances';
-import { useParams } from 'react-router-dom';
 
 // TODO: update actual instance/save basic information
 

@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import styled from 'styled-components';
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 import textFormatServices from '../../services/textFormat';
 import sortingServices from '../../services/sorting';
-import { useNavigate } from 'react-router-dom';
 
 const HoverBox = styled(Box)`
   &:hover,

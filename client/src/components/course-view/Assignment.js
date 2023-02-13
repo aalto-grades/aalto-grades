@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import textFormatServices from '../../services/textFormat';
 
 
-const PartialAssignment = ({ assignment }) => {
+const Assignment = ({ assignment }) => {
   const { type, description, points, weight, expiryDate } = assignment;
 
   return (
@@ -32,7 +32,7 @@ const PartialAssignment = ({ assignment }) => {
 };
 
 
-PartialAssignment.propTypes = {
+Assignment.propTypes = {
   assignment: PropTypes.object,
   type: PropTypes.string,
   description: PropTypes.string, 
@@ -41,4 +41,4 @@ PartialAssignment.propTypes = {
 };
 
 
-export default PartialAssignment;
+export default Assignment;

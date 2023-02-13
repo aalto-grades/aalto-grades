@@ -13,12 +13,9 @@ const useLogout = () => {
   
   const logout = async () => {
     try {
-
       await userService.logout();
       setAuth({});
-
     } catch (exception) {
-
       console.log(exception);
     }
   };

@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
 import FetchedInstances from './fetch-instances-view/FetchedInstances';
-import { useParams } from 'react-router-dom';
 import instancesService from '../services/instances';
 
 const FetchInstancesView = () => {

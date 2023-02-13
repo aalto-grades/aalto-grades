@@ -2,12 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+import {
+  CreationOptional, DataTypes, Model, InferAttributes, InferCreationAttributes
+} from 'sequelize';
+
 import { sequelize } from '..';
 
-export default class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
+export default class User extends Model<
+  InferAttributes<User>,
+  InferCreationAttributes<User>
+> {
   declare id: CreationOptional<number>;
-  declare studentId: string;
+  declare studentId: CreationOptional<string>;
   declare name: string;
   declare email: string;
   declare password: string;
@@ -25,7 +31,7 @@ User.init(
     studentId: {
       type: new DataTypes.STRING,
       unique: true,
-      allowNull: false
+      allowNull: true
     },
     name: {
       type: new DataTypes.STRING,

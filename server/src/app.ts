@@ -5,14 +5,18 @@
 import cors from 'cors';
 import express, { Application } from 'express';
 
+import { FRONTEND_ORIGIN } from './configs/environment';
+
+
 import { router } from './routes/index';
 import { ErrorHandler } from './middleware/errorHandler';
 
 export const app: Application = express();
 
 app.use(cors({
-  origin: 'http://localhost:3005',
-  credentials: true, 
+  origin: FRONTEND_ORIGIN,
+  credentials: true,
 }));
+
 app.use('/', router);
 app.use(ErrorHandler);

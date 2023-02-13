@@ -3,25 +3,28 @@
 // SPDX-License-Identifier: MIT
 
 import { Request, Response } from 'express';
+
 import models from '../database/models';
+import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
-import Course from '../database/models/course';
-import { CourseData, Language } from './course';
 
-export interface TeacherCourseData {
-  current: Array<CourseData>,
-  previous: Array<CourseData>
-}
+import { CourseData } from '../types/course';
+import { Language } from '../types/language';
 
-export interface CourseWithTranslationAndInstance extends Course {
+interface CourseWithTranslationAndInstance extends Course {
   CourseTranslations: Array<CourseTranslation>
   CourseInstances: Array<CourseInstance>
 }
 
-export async function getUserCourses(req: Request, res: Response): Promise<void> {
+export interface CoursesOfUser {
+  current: Array<CourseData>,
+  previous: Array<CourseData>
+}
+
+export async function getCoursesOfUser(req: Request, res: Response): Promise<void> {
   try {
-    const teacherCourseData: TeacherCourseData = { current: [], previous: [] };
+    const coursesOfUser: CoursesOfUser = { current: [], previous: [] };
     const teacherId: number = Number(req.params.userId);
 
     // TODO: Go through course_role instead
@@ -38,6 +41,7 @@ export async function getUserCourses(req: Request, res: Response): Promise<void>
         model: CourseTranslation,
         attributes: ['language', 'courseName', 'department'],
       }],
+      order: [[CourseInstance, 'endDate', 'ASC']]
     }) as Array<CourseWithTranslationAndInstance>;
 
     // Construct CourseData objects and determine whether the course is current
@@ -83,20 +87,22 @@ export async function getUserCourses(req: Request, res: Response): Promise<void>
         }
       });
 
-      if (currentDate <= new Date(String(course.CourseInstances[course.CourseInstances.length - 1].endDate))) {
-        teacherCourseData.current.push(courseData);
+      const latestEndDate: Date =
+        new Date(String(course.CourseInstances[course.CourseInstances.length - 1].endDate));
+
+      if (currentDate <= latestEndDate) {
+        coursesOfUser.current.push(courseData);
       } else {
-        teacherCourseData.previous.push(courseData);
+        coursesOfUser.previous.push(courseData);
       }
     }
 
-    res.send({
+    res.status(200).send({
       success: true,
-      courses: teacherCourseData
+      courses: coursesOfUser
     });
   } catch (error) {
-    res.status(401);
-    res.send({
+    res.status(401).send({
       success: false,
       error: error
     });

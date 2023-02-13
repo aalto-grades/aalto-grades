@@ -2,9 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { PORT } from './configs/environment';
+
 import { app } from './app';
 import { connectToDatabase } from './database/index';
-import { PORT } from './configs/environment';
 
 app.listen(PORT, async () => {
   try {
