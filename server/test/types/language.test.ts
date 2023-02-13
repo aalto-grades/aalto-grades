@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import * as yup from 'yup';
+
 import { localizedStringSchema } from '../../src/types/language';
 
 describe('Test localizedStringSchema', () => {
