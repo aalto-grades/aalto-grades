@@ -139,7 +139,8 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *           role:
  *             type: string
  *             description: >
- *               The role of the user in our system: `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
+ *               The role of the user in our system:
+ *               `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
  *   SignupRequest:
  *     type: object
  *     properties:
@@ -176,7 +177,8 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *           role:
  *             type: string
  *             description: >
- *               The role of the user in our system: `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
+ *               The role of the user in our system:
+ *              `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
  *           id:
  *             type: number
  *             description: >
@@ -193,7 +195,8 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *           role:
  *             type: string
  *             description: >
- *               The role of the user in our system: `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
+ *               The role of the user in our system:
+ *               `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
  *           id:
  *             type: number
  *             description: >

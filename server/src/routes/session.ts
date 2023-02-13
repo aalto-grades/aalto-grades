@@ -1,4 +1,4 @@
-import express, { Router } from "express";
+import express, { Router } from 'express';
 import passport from 'passport';
 
 import { authLogin, authLogout, authSelfInfo, authSignup } from '../controllers/auth';
@@ -31,12 +31,13 @@ export const router: Router = Router();
  *                type: string
  *                example: jwt=wliuerhlwieurh; Secure; HttpOnly; SameSite=None
  *       401:
- *         description: The login has failed, due to invalid credentials or an invalid request format.
+ *         description: >
+ *           The login has failed, due to invalid credentials or an invalid request format.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
- * 
+ *
  */
 router.post('/v1/auth/login', express.json(), authLogin);
 
