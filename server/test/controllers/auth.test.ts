@@ -2,12 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { app } from '../../src/app';
-import supertest, { SuperAgentTest } from 'supertest';
-import { UserRole } from '../../src/controllers/auth';
-import mockdate from 'mockdate';
-import { jwtCookieExpiryMs, jwtExpirySeconds } from '../../src/configs/config';
 import { Cookie, CookieAccessInfo } from 'cookiejar';
+import mockdate from 'mockdate';
+import supertest, { SuperAgentTest } from 'supertest';
+
+import { JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS } from '../../src/configs/constants';
+
+import { app } from '../../src/app';
+import { UserRole } from '../../src/types/user';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 
@@ -29,7 +31,7 @@ describe('Test POST /v1/auth/login', () => {
     await badCreds({ email: 'sysadmin@aalto.fi', password: '' });
     await badCreds({ email: 'sysadmin@aalto.fi', password: 'grade' });
   });
-  it('should allow logging in with the correct credentials', async() => {
+  it('should allow logging in with the correct credentials', async () => {
     await request.post('/v1/auth/login')
       .send({ email: 'sysadmin@aalto.fi', password: 'grades' })
       .expect('Content-Type', /json/)
@@ -45,7 +47,13 @@ describe('Test POST /v1/auth/signup', () => {
   it('should prevent creating a new account with a previously registered email', async () => {
     return request.post('/v1/auth/signup')
       .set('Accept', 'application/json')
-      .send({ email: 'sysadmin@aalto.fi', name: 'aalto', password: 'grades', studentID: '123456', role: 'SYSADMIN' })
+      .send({
+        email: 'sysadmin@aalto.fi',
+        name: 'aalto',
+        password: 'grades',
+        studentID: '123456',
+        role: 'SYSADMIN'
+      })
       .expect(409)
       .expect('Content-Type', /json/)
       .then((res: supertest.Response) => {
@@ -71,7 +79,8 @@ describe('Test POST /v1/auth/signup', () => {
       .expect(401);
     await request.post('/v1/auth/signup')
       .set('Accept', 'application/json')
-      .send({ email: 'sysadmin2@aalto.fi', name: 'aalto2', password: 'grades2', role: 'SYSADMIN' }) // without student id
+      // without student id
+      .send({ email: 'sysadmin2@aalto.fi', name: 'aalto2', password: 'grades2', role: 'SYSADMIN' })
       .expect(200)
       .expect('Content-Type', /json/)
       .then((res: supertest.Response) => {
@@ -104,7 +113,7 @@ describe('Test GET /v1/auth/self-info and cookies', () => {
 });
 
 describe('Test POST /v1/auth/login and expiry', () => {
-  it('should expire the session after a set time', async() => {
+  it('should expire the session after a set time', async () => {
     // Use the agent for cookie persistence
     const agent: SuperAgentTest = supertest.agent(app);
     const realDate: Date = new Date();
@@ -119,11 +128,11 @@ describe('Test POST /v1/auth/login and expiry', () => {
       throw new Error('jwt not available');
     }
     // Simulate situtation where the browser does not properly expire the cookie
-    mockdate.set(realDate.setMilliseconds(realDate.getMilliseconds() + jwtCookieExpiryMs + 1));
-    jwt.expiration_date = realDate.setSeconds(realDate.getSeconds() + jwtExpirySeconds * 2);
+    mockdate.set(realDate.setMilliseconds(realDate.getMilliseconds() + JWT_COOKIE_EXPIRY_MS + 1));
+    jwt.expiration_date = realDate.setSeconds(realDate.getSeconds() + JWT_EXPIRY_SECONDS * 2);
     agent.jar.setCookie(jwt);
     await agent.get('/v1/auth/self-info').withCredentials(true).expect(200);
-    mockdate.set(realDate.setSeconds(realDate.getSeconds() + jwtExpirySeconds + 1));
+    mockdate.set(realDate.setSeconds(realDate.getSeconds() + JWT_EXPIRY_SECONDS + 1));
     await agent.get('/v1/auth/self-info').withCredentials(true).expect(401);
   });
 });
