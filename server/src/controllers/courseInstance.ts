@@ -140,7 +140,7 @@ export interface CourseInstanceWithTeachers extends CourseInstance {
   teacher: User
 }
 
-export async function getAllCourseInstances(req: Request, res: Response): Promise<Response> {
+export async function getAllCourseInstances(req: Request, res: Response): Promise<void> {
   try {
     const courseId: number = Number(req.params.courseId);
     await idSchema.validate({ id: courseId });
@@ -209,7 +209,7 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
       instancesData.push(instanceData);
 
     });
-    return res.status(200).send({
+    res.status(200).send({
       success: true,
       data: {
         courseInstances: instancesData
@@ -218,23 +218,26 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
 
   } catch (error: unknown) {
     if (error instanceof yup.ValidationError) {
-      return res.status(400).send({
+      res.status(400).send({
         success: false,
         error: error.errors
       });
+      return;
     }
 
     if (error instanceof Error && error?.message.startsWith('course with id')) {
-      return res.status(404).send({
+      res.status(404).send({
         success: false,
         error: error.message
       });
+      return;
     }
 
-    return res.status(500).send({
+    res.status(500).send({
       success: false,
       error: 'internal server error'
     });
+    return;
   }
 }
 
