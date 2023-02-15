@@ -3,23 +3,23 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
-import instancesService from '../services/instances';
 import FetchInstancesView from '../components/FetchInstancesView';
-import dummyInstances from '../dummy-data/dummyInstances';
+import instancesService from '../services/instances';
+import mockSisuInstances from '../mock-data/mockSisuInstances';
 
 jest.mock('../services/instances');
 afterEach(cleanup);
 
 describe('Tests for FetchInstancesView components', () => {
 
-  const instancesLength = dummyInstances.length;
+  const instancesLength = mockSisuInstances.length;
 
   const renderFetchInstancesView = async () => {
 
-    const mockResponse = { instances: dummyInstances };
+    const mockResponse = { instances: mockSisuInstances };
 
     instancesService.getSisuInstances.mockRejectedValue('Network error');
     instancesService.getSisuInstances.mockResolvedValue(mockResponse);

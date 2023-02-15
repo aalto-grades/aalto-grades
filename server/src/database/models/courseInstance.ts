@@ -2,14 +2,21 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey } from 'sequelize';
+import {
+  CreationOptional, DataTypes, ForeignKey, Model, InferAttributes, InferCreationAttributes
+} from 'sequelize';
+
 import { sequelize } from '..';
 import Course from './course';
 import User from './user';
 
-export default class CourseInstance extends Model<InferAttributes<CourseInstance>, InferCreationAttributes<CourseInstance>> {
+export default class CourseInstance extends Model<
+  InferAttributes<CourseInstance>,
+  InferCreationAttributes<CourseInstance>
+> {
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
+  declare sisuCourseInstanceId: string | null;
   declare gradingType: string;
   declare startingPeriod: string;
   declare endingPeriod: string;
@@ -37,6 +44,11 @@ CourseInstance.init(
         model: 'course',
         key: 'id'
       }
+    },
+    sisuCourseInstanceId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: true
     },
     gradingType: {
       type: DataTypes.ENUM('PASSFAIL', 'NUMERICAL'),

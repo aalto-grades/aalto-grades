@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
 SPDX-License-Identifier: MIT
 -->
 
-# Aalto-Grades backend
+# Aalto Grades backend
 
 ## Table of Contents
 
@@ -117,3 +117,14 @@ is used for testing API functionality.
 The easiest way to run unit tests is with the Docker Compose located at
 `../docker-tests`. See `../docker-tests/README.md` for details on running unit
 tests.
+
+## API Documentation
+
+API documentation written with the OpenAPI spec and displayed by Swagger can be found from the path 
+```
+<backend-url>/api-docs/
+```
+
+For more information about the OpenAPI spec:
+
+https://swagger.io/docs/specification/about/

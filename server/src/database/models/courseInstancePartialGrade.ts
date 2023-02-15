@@ -2,12 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey } from 'sequelize';
+import {
+  CreationOptional, DataTypes, ForeignKey, Model, InferAttributes, InferCreationAttributes
+} from 'sequelize';
+
 import { sequelize } from '..';
 import Course from './course';
 import CourseInstance from './courseInstance';
 
-export default class CourseInstancePartialGrade extends Model<InferAttributes<CourseInstancePartialGrade>, InferCreationAttributes<CourseInstancePartialGrade>> {
+export default class CourseInstancePartialGrade extends Model<
+  InferAttributes<CourseInstancePartialGrade>,
+  InferCreationAttributes<CourseInstancePartialGrade>
+> {
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
   declare courseInstanceId: ForeignKey<CourseInstance['id']>;

@@ -1,0 +1,127 @@
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
+import axios, { AxiosResponse } from 'axios';
+import { Request, Response } from 'express';
+
+import { AXIOS_TIMEOUT } from '../configs/constants';
+import { SISU_API_KEY, SISU_API_URL } from '../configs/environment';
+
+import { CourseInstanceData, GradingType, TeachingMethod } from '../types/course';
+import { SisuCourseInstance } from '../types/sisu';
+
+function parseSisuCourseInstance(instance: SisuCourseInstance): CourseInstanceData {
+  return {
+    id: null,
+    sisuCourseInstanceId: instance.id,
+    startingPeriod: '-',
+    endingPeriod: '-',
+    minCredits: instance.credits.min,
+    maxCredits: instance.credits.max,
+    startDate: instance.startDate,
+    endDate: instance.endDate,
+    courseType: (instance.type === 'exam-exam'
+      ? TeachingMethod.Exam
+      : TeachingMethod.Lecture),
+    gradingType: (instance.summary.gradingScale.fi === '0-5'
+      ? GradingType.Numerical
+      : GradingType.PassFail),
+    responsibleTeachers: instance.summary.teacherInCharge,
+    courseData: {
+      courseCode: instance.code,
+      department: {
+        en: instance.organizationName.en,
+        fi: instance.organizationName.fi,
+        sv: instance.organizationName.sv
+      },
+      name: {
+        en: instance.name.en,
+        fi: instance.name.fi,
+        sv: instance.name.sv
+      },
+      evaluationInformation: {
+        en: instance.summary.assesmentMethods.en,
+        fi: instance.summary.assesmentMethods.fi,
+        sv: instance.summary.assesmentMethods.sv
+      }
+    }
+  };
+}
+
+export async function fetchAllCourseInstancesFromSisu(req: Request, res: Response): Promise<void> {
+  try {
+    const courseCode: string = String(req.params.courseCode);
+    const courseInstancesFromSisu: AxiosResponse = await axios.get(
+      `${SISU_API_URL}/courseunitrealisations`,
+      {
+        timeout: AXIOS_TIMEOUT,
+        params: {
+          code: courseCode,
+          USER_KEY: SISU_API_KEY
+        }
+      }
+    );
+
+    if (courseInstancesFromSisu.data?.error) {
+      throw new Error(courseInstancesFromSisu.data.error.message);
+    }
+
+    const parsedInstances: Array<CourseInstanceData> = courseInstancesFromSisu.data.map(
+      (instance: SisuCourseInstance) => parseSisuCourseInstance(instance)
+    );
+
+    res.status(200).send({
+      success: true,
+      data: {
+        courseInstances: parsedInstances
+      }
+    });
+  } catch (error: unknown) {
+    console.log(error);
+
+    res.status(500).send({
+      success: false,
+      error: 'Internal Server Error'
+    });
+  }
+}
+
+export async function fetchCourseInstanceFromSisu(req: Request, res: Response): Promise<void> {
+  try {
+    // Instance ID here is a Sisu course instance ID (e.g., 'aalto-CUR-163498-3084205'),
+    // not a course code.
+    const sisuCourseInstanceId: string = String(req.params.sisuCourseInstanceId);
+    const courseInstanceFromSisu: AxiosResponse = await axios.get(
+      `${SISU_API_URL}/courseunitrealisations/${sisuCourseInstanceId}`,
+      {
+        timeout: AXIOS_TIMEOUT,
+        params: {
+          USER_KEY: SISU_API_KEY
+        }
+      }
+    );
+
+    if (courseInstanceFromSisu.data?.error) {
+      throw new Error(courseInstanceFromSisu.data.error.message);
+    }
+
+    const instance: CourseInstanceData = parseSisuCourseInstance(courseInstanceFromSisu.data);
+
+    res.status(200).send({
+      success: true,
+      data: {
+        courseInstance: instance
+      }
+    });
+    return;
+  } catch (error: unknown) {
+    console.log(error);
+
+    res.status(500).send({
+      success: false,
+      error: 'Internal Server Error'
+    });
+    return;
+  }
+}

@@ -2,10 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+import {
+  CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model
+} from 'sequelize';
+
 import { sequelize } from '..';
 
-export default class Course extends Model<InferAttributes<Course>, InferCreationAttributes<Course>> {
+export default class Course extends Model<
+  InferAttributes<Course>, InferCreationAttributes<Course>
+> {
   declare id: CreationOptional<number>;
   declare courseCode: string;
   declare createdAt: CreationOptional<Date>;

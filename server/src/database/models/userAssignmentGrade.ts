@@ -2,12 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey } from 'sequelize';
-import { sequelize } from '..';
-import User from './user';
-import CourseAssignment from './courseAssignment';
+import {
+  CreationOptional, DataTypes, ForeignKey, Model, InferAttributes, InferCreationAttributes
+} from 'sequelize';
 
-export default class UserAssignmentGrade extends Model<InferAttributes<UserAssignmentGrade>, InferCreationAttributes<UserAssignmentGrade>> {
+import { sequelize } from '..';
+import CourseAssignment from './courseAssignment';
+import User from './user';
+
+export default class UserAssignmentGrade extends Model<
+  InferAttributes<UserAssignmentGrade>,
+  InferCreationAttributes<UserAssignmentGrade>
+> {
   declare id: CreationOptional<number>;
   declare userId: ForeignKey<User['id']>;
   declare courseAssignmentId: ForeignKey<CourseAssignment['id']>;

@@ -9,10 +9,6 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Typography from '@mui/material/Typography';
 
 const headCells = [{
-  id: 'period',
-  label: 'Teaching Period',
-},
-{
   id: 'startDate',
   label: 'Starting Date',
 },
@@ -30,9 +26,9 @@ const InstanceTableHead = () => {
   return (
     <TableRow>
       {headCells.map((headCell) => (
-        headCell.id === 'period' ?
+        headCell.id === 'startDate' ?
           <TableCell key={headCell.id}>
-            <TableSortLabel active={headCell.id === 'period'} direction='asc'>
+            <TableSortLabel active={headCell.id === 'startDate'} direction='asc'>
               <Typography sx={{ fontWeight: 'bold' }}>
                 {headCell.label}
               </Typography>
