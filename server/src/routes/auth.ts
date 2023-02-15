@@ -12,6 +12,11 @@ export const router: Router = Router();
 /**
  * @swagger
  * definitions:
+ *   UserRole:
+ *     type: string
+ *     description: >
+ *       The role of the user in our system (`UserRole`):
+ *       `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
  *   Credentials:
  *     type: object
  *     properties:
@@ -33,10 +38,7 @@ export const router: Router = Router();
  *         type: object
  *         properties:
  *           role:
- *             type: string
- *             description: >
- *               The role of the user in our system:
- *               `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
+ *             $ref: '#/definitions/UserRole'
  *   SignupRequest:
  *     type: object
  *     properties:
@@ -57,10 +59,7 @@ export const router: Router = Router();
  *         description: A personal name of the user (not a credential)
  *         required: true
  *       role:
- *         type: string
- *         description: >
- *           The role of the user in our system:
- *           `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
+ *         $ref: '#/definitions/UserRole'
  *         required: true
  *   SignupResult:
  *     type: object
@@ -72,10 +71,7 @@ export const router: Router = Router();
  *         type: object
  *         properties:
  *           role:
- *             type: string
- *             description: >
- *               The role of the user in our system:
- *               `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
+ *             $ref: '#/definitions/UserRole'
  *           id:
  *             type: number
  *             description: >
@@ -90,10 +86,7 @@ export const router: Router = Router();
  *         type: object
  *         properties:
  *           role:
- *             type: string
- *             description: >
- *               The role of the user in our system:
- *               `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
+ *             $ref: '#/definitions/UserRole'
  *           id:
  *             type: number
  *             description: >
@@ -145,12 +138,6 @@ router.post('/v1/auth/login', express.json(), authLogin);
  *       Log out of a session, removing the session key from the browser.
  *       This requires the user to be already logged in, authenticated via a
  *       JWT token in the cookie.
- *     requestBody:
- *       description: Empty body is sufficient
- *       content:
- *         application/json:
- *           schema:
- *             type: object
  *     responses:
  *       200:
  *         description: The user has successfully logged out.
