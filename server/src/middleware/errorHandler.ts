@@ -26,6 +26,7 @@ export class SisuError extends CustomError {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function ErrorHandler(err: unknown, req: Request, res: Response, next: NextFunction): void {
   // TODO: appropriate logging in case of errors
 
