@@ -7,6 +7,7 @@ import supertest from 'supertest';
 import { app } from '../../src/app';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
+const badId: number = 1000000;
 
 describe('Test POST /v1/courses/:courseId/instances', () => {
   it('should return success with correct input', async () => {
@@ -215,7 +216,7 @@ describe('Test GET /v1/instances/:instanceId', () => {
   });
 
   it('should respond with 404 not found, if non-existing course instance id', async () => {
-    const res: supertest.Response = await request.get('/v1/instances/-1');
+    const res: supertest.Response = await request.get(`/v1/instances/${badId}`);
     expect(res.body.success).toBe(false);
     expect(res.body.instance).not.toBeDefined();
     expect(res.body.error).toBeDefined();
@@ -254,7 +255,7 @@ describe('Test GET /v1/courses/:courseId/instances', () => {
   });
 
   it('should respond with error if course does not exist', async () => {
-    const res: supertest.Response = await request.get('/v1/courses/-1/instances');
+    const res: supertest.Response = await request.get(`/v1/courses/${badId}/instances`);
     expect(res.statusCode).toBe(404);
     expect(res.body.success).toBe(false);
   });
