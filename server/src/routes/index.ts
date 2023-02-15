@@ -1,8 +1,9 @@
+/* eslint-disable max-len */
 // SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
-import express, { Router } from 'express';
+import express, { NextFunction, Router } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import passport from 'passport';
@@ -34,6 +35,17 @@ router.use(cookieParser());
 
 router.use('/api-docs', swaggerUI.serve);
 router.get('/api-docs', swaggerUI.setup(openapiSpecification));
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function handleErrors(fn: any): any {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      return await fn(req, res, next);
+    } catch (err: unknown) {
+      next(err);
+    }
+  };
+}
 
 // User routes
 
@@ -123,7 +135,7 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.get('/v1/user/:userId/courses', getCoursesOfUser);
+router.get('/v1/user/:userId/courses', handleErrors(getCoursesOfUser));
 
 // Sisu API routes
 
@@ -148,7 +160,7 @@ router.get('/v1/user/:userId/courses', getCoursesOfUser);
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.get('/v1/sisu/courses/:courseCode', fetchAllCourseInstancesFromSisu);
+router.get('/v1/sisu/courses/:courseCode', handleErrors(fetchAllCourseInstancesFromSisu));
 
 /**
  * @swagger
@@ -171,7 +183,7 @@ router.get('/v1/sisu/courses/:courseCode', fetchAllCourseInstancesFromSisu);
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.get('/v1/sisu/instances/:sisuCourseInstanceId', fetchCourseInstanceFromSisu);
+router.get('/v1/sisu/instances/:sisuCourseInstanceId', handleErrors(fetchCourseInstanceFromSisu));
 
 // Course and instance routes
 /**
@@ -190,7 +202,7 @@ router.get('/v1/sisu/instances/:sisuCourseInstanceId', fetchCourseInstanceFromSi
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.post('/v1/courses', express.json(), handleInvalidRequestJson, addCourse);
+router.post('/v1/courses', express.json(), handleInvalidRequestJson, handleErrors(addCourse));
 
 /**
  * @swagger
@@ -215,7 +227,7 @@ router.post('/v1/courses', express.json(), handleInvalidRequestJson, addCourse);
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.post('/v1/courses/:courseId/instances', express.json(), addCourseInstance);
+router.post('/v1/courses/:courseId/instances', express.json(), handleErrors(addCourseInstance));
 
 /**
  * @swagger
@@ -244,7 +256,7 @@ router.post('/v1/courses/:courseId/instances', express.json(), addCourseInstance
  *                 course:
  *                   $ref: '#/definitions/Course'
  */
-router.get('/v1/courses/:courseId', getCourse);
+router.get('/v1/courses/:courseId', handleErrors(getCourse));
 
 /**
  * @swagger
@@ -310,10 +322,10 @@ router.get('/v1/courses/:courseId', getCourse);
  *                 course:
  *                   $ref: '#/definitions/Instance'
  */
-router.get('/v1/instances/:instanceId', getCourseInstance);
+router.get('/v1/instances/:instanceId', handleErrors(getCourseInstance));
 
 // TODO: Swagger documentation.
-router.get('/v1/courses/:courseId/instances', getAllCourseInstances);
+router.get('/v1/courses/:courseId/instances', handleErrors(getAllCourseInstances));
 
 /**
  * @swagger
@@ -331,7 +343,7 @@ router.get('/v1/courses/:courseId/instances', getAllCourseInstances);
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.post('/v1/auth/login', express.json(), authLogin);
+router.post('/v1/auth/login', express.json(), handleErrors(authLogin));
 
 /**
  * @swagger
@@ -353,7 +365,7 @@ router.post(
   '/v1/auth/logout',
   passport.authenticate('jwt', { session: false }),
   express.json(),
-  authLogout
+  handleErrors(authLogout)
 );
 
 /**
@@ -379,7 +391,7 @@ router.post(
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.post('/v1/auth/signup', express.json(), authSignup);
+router.post('/v1/auth/signup', express.json(), handleErrors(authSignup));
 
 /**
  * @swagger
@@ -399,7 +411,7 @@ router.get(
   '/v1/auth/self-info',
   passport.authenticate('jwt', { session: false }),
   express.json(),
-  authSelfInfo
+  handleErrors(authSelfInfo)
 );
 
 router.use(cors({
