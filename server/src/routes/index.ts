@@ -19,12 +19,12 @@ import { getCoursesOfUser } from '../controllers/user';
 import { router as courseInstanceRouter } from './courseInstance';
 import { handleInvalidRequestJson } from '../middleware';
 
-const options: object = {
+const options: OAS3Options = {
   definition,
   apis: ['./src/routes/*.ts'],
 };
 
-const openapiSpecification: OAS3Options = swaggerJsdoc(options);
+const openapiSpecification: object = swaggerJsdoc(options);
 
 export const router: Router = Router();
 
@@ -39,7 +39,7 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
 /**
  * @swagger
  * definitions:
- *   Course:
+ *   CourseData:
  *     type: object
  *     description: Course Information
  *     properties:
@@ -94,12 +94,12 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *             type: array
  *             description: Current Courses
  *             items:
- *               $ref: '#/definitions/Course'
+ *               $ref: '#/definitions/CourseData'
  *           previous:
  *             type: array
  *             description: Previous Courses
  *             items:
- *               $ref: '#/definitions/Course'
+ *               $ref: '#/definitions/CourseData'
  */
 /**
  * @swagger

@@ -13,6 +13,21 @@ export const router: Router = Router();
 /**
  * @swagger
  * definitions:
+ *   Period:
+ *     type: string
+ *     description: >
+ *       Teaching period (`Period`):
+ *       `'I' | 'II' | 'III' | 'IV' | 'V'`.
+ *   GradingType:
+ *     type: string
+ *     description: >
+ *       Grading method (`GradingType`):
+ *       `'PASFAIL' | 'NUMERICAL'`.
+ *   TeachingMethod:
+ *     type: string
+ *     description: >
+ *       Teaching method (`TeachingMethod`):
+ *         `'LECTURE' | 'EXAM'`.
  *   CourseInstanceData:
  *     type: object
  *     description: Course instance information.
@@ -20,49 +35,52 @@ export const router: Router = Router();
  *       id:
  *         type: integer
  *         description: Course instance ID.
+ *       sisuCourseInstanceId:
+ *         type: string
+ *         description: ID of the corresponding course instance in Sisu.
  *       startingPeriod:
- *         type: string
- *         description: Starting Period as String
+ *         $ref: '#/definitions/Period'
  *       endingPeriod:
- *         type: string
- *         description: Ending Period as String
+ *         $ref: '#/definitions/Period'
  *       minCredits:
  *         type: integer
  *       maxCredits:
  *         type: integer
  *       startDate:
  *         type: string
- *         description: Starting date in format year-month-day
+ *         description: Starting date in format year-month-day.
  *       endDate:
  *         type: string
- *         description: Ending date in format year-month-day
- *       courseType:
- *         type: string
+ *         description: Ending date in format year-month-day.
+ *       teachingMethod:
+ *         $ref: '#/definitions/TeachingMethod'
  *       gradingType:
- *         type: string
+ *         $ref: '#/definitions/GradingType'
  *       responsibleTeacher:
  *         type: string
- *         description: name of responsible teacher
+ *         description: Name of the responsible teacher.
  *       courseData:
- *         $ref: '#/definitions/Course'
+ *         $ref: '#/definitions/CourseData'
  */
 
 /**
  * @swagger
  * /v1/courses/instances/{instanceId}:
  *   get:
- *     tags: [CourseInstance]
- *     description: Get a course instance
+ *     tags: [Course Instance]
+ *     description: Get a course instance.
  *     parameters:
  *       - in: path
  *         name: instanceId
  *         required: True
  *         schema:
- *           type: string
- *         description: The ID of the fetched course instance
+ *           type: integer
+ *         description: The ID of the desired course instance.
  *     responses:
  *       200:
- *         description: Instance
+ *         description: >
+ *           A course instance with the given ID was found and information
+ *           about it is returned in the CourseInstanceData format.
  *         content:
  *           application/json:
  *             schema:
@@ -70,37 +88,168 @@ export const router: Router = Router();
  *               properties:
  *                 success:
  *                   type: boolean
- *                   description: Success of the request
- *                 course:
- *                   $ref: '#/definitions/Instance'
+ *                   description: Success of the request.
+ *                 data:
+ *                   $ref: '#/definitions/CourseInstanceData'
+ *       400:
+ *         description: >
+ *           A validation error has occurred in the URL, the given course
+ *           instance ID is not a positive integer.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       404:
+ *         description: A course instance with the given ID was not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
  */
 router.get('/v1/courses/instances/:instanceId', getCourseInstance);
 
-// TODO: Swagger documentation.
+/**
+ * @swagger
+ * /v1/courses/{courseId}/instances:
+ *   get:
+ *     tags: [Course Instance]
+ *     description: Get all instances of a course.
+ *     parameters:
+ *       - in: path
+ *         name: instanceId
+ *         required: True
+ *         schema:
+ *           type: integer
+ *         description: The ID of the desired course.
+ *     responses:
+ *       200:
+ *         description: >
+ *           A course with the given ID was found and a list of all of its
+ *           instances is returned.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request.
+ *                 data:
+ *                   type: array
+ *                   description: All instances of the course with the given ID.
+ *                   items:
+ *                     $ref: '#/definitions/CourseInstanceData'
+ *       400:
+ *         description: >
+ *           A validation error has occurred in the URL, the given course ID is
+ *           not a positive integer.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       404:
+ *         description: A course with the given ID was not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ */
 router.get('/v1/courses/:courseId/instances', getAllCourseInstances);
-
 
 /**
  * @swagger
  * /v1/courses/{courseId}/instances:
  *   post:
- *     tags: [CourseInstance]
+ *     tags: [Course Instance]
  *     description: Add a course instance to a course.
  *     parameters:
  *       - in: path
  *         name: courseId
  *         required: True
  *         schema:
- *           type: string
+ *           type: integer
  *         description: The ID of the course to add the instance to.
  *     requestBody:
- *       description: Description of add course instance POST body
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               gradingType:
+ *                 $ref: '#/definitions/GradingType'
+ *               sisuCourseInstanceId:
+ *                 type: string
+ *                 description: ID of the corresponding course instance in Sisu.
+ *               startingPeriod:
+ *                 $ref: '#/definitions/Period'
+ *               endingPeriod:
+ *                 $ref: '#/definitions/Period'
+ *               teachingMethod:
+ *                 $ref: '#/definitions/TeachingMethod'
+ *               responsibleTeacher:
+ *                 type: integer
+ *                 description: >
+ *                   ID of the user to be assigned as the responsible teacher.
+ *               minCredits:
+ *                 type: integer
+ *               maxCredits:
+ *                 type: integer
+ *               startDate:
+ *                 type: string
+ *                 description: Starting date in format year-month-day.
+ *               endDate:
+ *                 type: string
+ *                 description: Ending date in format year-month-day.
  *     responses:
  *       200:
- *         description: User's Courses
+ *         description: The course instance was successfully added.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/definitions/UserCourses'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request.
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       description: The ID of the newly added course instance.
+ *       400:
+ *         description: >
+ *           A validation error has occurred either in the URL or the request
+ *           body.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       401:
+ *         description: The requester is not logged in.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       403:
+ *         description: >
+ *           The requester is not authorized to add a course instance.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       404:
+ *         description: A course with the given ID was not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       422:
+ *         description: >
+ *           A user with the given responsible teacher ID was not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
  */
 router.post('/v1/courses/:courseId/instances', express.json(), addCourseInstance);

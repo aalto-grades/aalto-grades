@@ -15,13 +15,13 @@ function parseSisuCourseInstance(instance: SisuCourseInstance): CourseInstanceDa
   return {
     id: null,
     sisuCourseInstanceId: instance.id,
-    startingPeriod: '-',
-    endingPeriod: '-',
+    startingPeriod: null,
+    endingPeriod: null,
     minCredits: instance.credits.min,
     maxCredits: instance.credits.max,
     startDate: instance.startDate,
     endDate: instance.endDate,
-    courseType: (instance.type === 'exam-exam'
+    teachingMethod: (instance.type === 'exam-exam'
       ? TeachingMethod.Exam
       : TeachingMethod.Lecture),
     gradingType: (instance.summary.gradingScale.fi === '0-5'
