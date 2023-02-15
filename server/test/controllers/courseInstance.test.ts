@@ -21,7 +21,7 @@ describe('Test GET /v1/courses/instances/:instanceId', () => {
     expect(res.body.instance.maxCredits).toBeDefined();
     expect(res.body.instance.startDate).toBeDefined();
     expect(res.body.instance.endDate).toBeDefined();
-    expect(res.body.instance.courseType).toBeDefined();
+    expect(res.body.instance.teachingMethod).toBeDefined();
     expect(res.body.instance.gradingType).toBeDefined();
     expect(res.body.instance.responsibleTeacher).toBeDefined();
     expect(res.body.instance.courseData.courseCode).toBeDefined();
@@ -65,7 +65,7 @@ describe('Test GET /v1/courses/:courseId/instances', () => {
     expect(res.body.data.courseInstances[0].maxCredits).toBeDefined();
     expect(res.body.data.courseInstances[0].startDate).toBeDefined();
     expect(res.body.data.courseInstances[0].endDate).toBeDefined();
-    expect(res.body.data.courseInstances[0].courseType).toBeDefined();
+    expect(res.body.data.courseInstances[0].teachingMethod).toBeDefined();
     expect(res.body.data.courseInstances[0].gradingType).toBeDefined();
     expect(res.body.data.courseInstances[0].responsibleTeacher).toBeDefined();
   });
