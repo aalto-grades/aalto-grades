@@ -12,7 +12,9 @@ import { FRONTEND_ORIGIN } from '../configs/environment';
 import { definition } from '../configs/swagger';
 
 import { addCourse, getCourse } from '../controllers/course';
-import { addCourseInstance, getCourseInstance } from '../controllers/courseInstance';
+import {
+  addCourseInstance, getAllCourseInstances, getCourseInstance
+} from '../controllers/courseInstance';
 import { fetchAllCourseInstancesFromSisu, fetchCourseInstanceFromSisu } from '../controllers/sisu';
 import { getCoursesOfUser } from '../controllers/user';
 import { handleInvalidRequestJson } from '../middleware';
@@ -411,6 +413,9 @@ router.get('/v1/courses/:courseId', getCourse);
  *                   $ref: '#/definitions/Instance'
  */
 router.get('/v1/instances/:instanceId', getCourseInstance);
+
+// TODO: Swagger documentation.
+router.get('/v1/courses/:courseId/instances', getAllCourseInstances);
 
 router.use(cors({
   origin: FRONTEND_ORIGIN,
