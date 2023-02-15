@@ -20,6 +20,7 @@ import CourseView from './components/CourseView';
 import CreateCourseView from './components/CreateCourseView';
 import FetchInstancesView from './components/FetchInstancesView';
 import EditInstanceView from './components/EditInstanceView';
+import CreateAssignmentView from './components/CreateAssignmentView';
 import useLogout from './hooks/useLogout';
 
 const theme = createTheme({

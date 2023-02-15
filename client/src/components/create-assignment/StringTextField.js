@@ -5,18 +5,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@mui/material/TextField';
-import subAssignmentServices from '../../services/subAssignments';
+import subAssignmentServices from '../../services/assignments';
+
+// A TextField component used for the 'name' of an assignment.
+// This component could possibly be used for the 'attribute' textfields as well 
+// that might be required after specifying a formula.
 
 const StringTextField = ({ fieldData, indices, assignments, setAssignments }) => {
 
+  // Functions for handling the change of the values in the 'New Name' textfield
   const handleChange = (event) => {
     const value = event.target.value;
     const updatedAssignments = JSON.parse(JSON.stringify(assignments));
-    switch (fieldData.fieldId) {
-    case 'assignmentName':
+    if (fieldData.fieldId === 'assignmentName') {
       subAssignmentServices.setProperty(indices, updatedAssignments, 'name', value);
-      break;
-    default:
+    } else {
       console.log(fieldData.fieldId);
     }
     setAssignments(updatedAssignments);
@@ -24,17 +27,9 @@ const StringTextField = ({ fieldData, indices, assignments, setAssignments }) =>
 
   const getValue = () => {
     let updatedAssignments = JSON.parse(JSON.stringify(assignments));
-    let subAssignments = [];
-    const lastIndex = indices[indices.length - 1];
-    for (let i = 0; i < indices.length - 1; i++) {
-      const index = indices[i];
-      subAssignments = updatedAssignments[index].subAssignments;
-      updatedAssignments = subAssignments;
-    }
-    switch (fieldData.fieldId) {
-    case 'assignmentName':
-      return updatedAssignments[lastIndex]['name'];
-    default:
+    if (fieldData.fieldId === 'assignmentName') {
+      return subAssignmentServices.getProperty(indices, updatedAssignments, 'name');
+    } else {
       return console.log(fieldData.fieldId);
     }
   };
@@ -50,7 +45,8 @@ const StringTextField = ({ fieldData, indices, assignments, setAssignments }) =>
       margin='normal'
       value={getValue()}
       sx={{
-        marginTop: 0
+        marginTop: 0,
+        width: '100%'
       }}
       onChange={(event) => handleChange(event)}
     />
