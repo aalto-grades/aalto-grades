@@ -11,10 +11,101 @@ export const router: Router = Router();
 
 /**
  * @swagger
+ * definitions:
+ *   Credentials:
+ *     type: object
+ *     properties:
+ *       email:
+ *         type: string
+ *         description: Email address, functioning as a username
+ *         required: true
+ *       password:
+ *         type: string
+ *         description: Plaintext password of the user
+ *         required: true
+ *   LoginResult:
+ *     type: object
+ *     properties:
+ *       success:
+ *         type: boolean
+ *         description: Success of the request
+ *       data:
+ *         type: object
+ *         properties:
+ *           role:
+ *             type: string
+ *             description: >
+ *               The role of the user in our system:
+ *               `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
+ *   SignupRequest:
+ *     type: object
+ *     properties:
+ *       email:
+ *         type: string
+ *         description: Email address, to be used as a credential
+ *         required: true
+ *       password:
+ *         type: string
+ *         description: Plaintext password
+ *         required: true
+ *       studentID:
+ *         type: string
+ *         description: The student number assigned by the university.
+ *         required: false
+ *       name:
+ *         type: string
+ *         description: A personal name of the user (not a credential)
+ *         required: true
+ *       role:
+ *         type: string
+ *         description: >
+ *           The role of the user in our system:
+ *           `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
+ *         required: true
+ *   SignupResult:
+ *     type: object
+ *     properties:
+ *       success:
+ *         type: boolean
+ *         description: Success of the request
+ *       data:
+ *         type: object
+ *         properties:
+ *           role:
+ *             type: string
+ *             description: >
+ *               The role of the user in our system:
+ *               `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
+ *           id:
+ *             type: number
+ *             description: >
+ *               The database identifier of the user
+ *   AuthSelfInfo:
+ *     type: object
+ *     properties:
+ *       success:
+ *         type: boolean
+ *         description: Success of the request
+ *       data:
+ *         type: object
+ *         properties:
+ *           role:
+ *             type: string
+ *             description: >
+ *               The role of the user in our system:
+ *               `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
+ *           id:
+ *             type: number
+ *             description: >
+ *               The database identifier of the user
+*/
+
+/**
+ * @swagger
  * /v1/auth/login:
  *   post:
  *     tags: [Session]
- *     description: Log in as a user
+ *     description: Log in as a user.
  *     requestBody:
  *       description: The credentials for the user, currently consisting of the email and password.
  *       content:
@@ -30,7 +121,7 @@ export const router: Router = Router();
  *               $ref: '#/definitions/LoginResult'
  *         headers:
  *            Set-Cookie:
- *              description: 'JWT token, storing an access token to allow using the API'
+ *              description: JWT token, storing an access token to allow using the API.
  *              schema:
  *                type: string
  *                example: jwt=wliuerhlwieurh; Secure; HttpOnly; SameSite=None
@@ -62,7 +153,7 @@ router.post('/v1/auth/login', express.json(), authLogin);
  *             type: object
  *     responses:
  *       200:
- *         description: The user has successfully logged out
+ *         description: The user has successfully logged out.
  *         content:
  *           application/json:
  *             schema:
@@ -70,7 +161,7 @@ router.post('/v1/auth/login', express.json(), authLogin);
  *               properties:
  *                 success:
  *                   type: boolean
- *                   description: Whether the operationsucceeded
+ *                   description: Whether the operation succeeded.
  *       401:
  *         description: The user is not logged in, or the JWT token is invalid.
  *         content:
@@ -96,26 +187,26 @@ router.post(
  *       Attempts to create a new user with the specified information, for
  *       logging in to the system.
  *     requestBody:
- *       description: Basic user information
+ *       description: Basic user information.
  *       content:
  *         application/json:
  *           schema:
  *             $ref: '#/definitions/SignupRequest'
  *     responses:
  *       200:
- *         description: The user has been created and logged in
+ *         description: The user has been created and logged in.
  *         content:
  *           application/json:
  *             schema:
  *               $req: '#/definitions/SignupResult'
  *         headers:
  *           Set-Cookie:
- *             description: 'JWT token, storing an access token to allow using the API'
+ *             description: JWT token, storing an access token to allow using the API.
  *             schema:
  *               type: string
  *               example: jwt=wliuerhlwieurh; Secure; HttpOnly; SameSite=None
  *       409:
- *         description: A user with the specified email already exists
+ *         description: A user with the specified email already exists.
  *         content:
  *           application/json:
  *             schema:
@@ -129,10 +220,10 @@ router.post('/v1/auth/signup', express.json(), authSignup);
  *   get:
  *     tags: [Session]
  *     description: >
- *       Retrieves information about the user that is currently logged in
+ *       Retrieves information about the user that is currently logged in.
  *     responses:
  *       200:
- *         description: Information about the user who is logged in
+ *         description: Information about the user who is logged in.
  *         content:
  *           application/json:
  *             schema:
