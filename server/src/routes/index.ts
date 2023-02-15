@@ -18,7 +18,7 @@ import {
 import { fetchAllCourseInstancesFromSisu, fetchCourseInstanceFromSisu } from '../controllers/sisu';
 import { getCoursesOfUser } from '../controllers/user';
 import { handleInvalidRequestJson } from '../middleware';
-import { router as authRouter } from './session';
+import { router as authRouter } from './auth';
 
 const options: object = {
   definition,
