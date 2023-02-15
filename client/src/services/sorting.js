@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-//used to sort by course code, takes two codes (or strings) as parameters
+// used to sort by course code, takes two codes (or strings) as parameters
 const sortByCode = (a, b) => {
   const codeA = a.toUpperCase();
   const codeB = b.toUpperCase();
@@ -15,7 +15,7 @@ const sortByCode = (a, b) => {
   return 0;
 };
 
-//used sort dates in descending order
+// used sort dates in descending order
 const sortByDate = (a, b) => {
   const order = a - b;
   return order < 0 ? 1 : (order > 0 ? -1 : 0); 

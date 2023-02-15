@@ -2,16 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-const username: string = String(process.env.POSTGRES_USER);
-const password: string = String(process.env.POSTGRES_PASSWORD);
-const database: string = String(process.env.POSTGRES_DATABASE);
-const host: string = String(process.env.POSTGRES_URL);
+// This file defines database credentials for use with Sequelize.
+
+const USER: string = String(process.env.POSTGRES_USER);
+const PASSWORD: string = String(process.env.POSTGRES_PASSWORD);
+const DATABASE: string = String(process.env.POSTGRES_DATABASE);
+const URL: string = String(process.env.POSTGRES_URL);
 
 export = {
-  username: username,
-  password: password,
-  database: database,
-  host: host,
+  username: USER,
+  password: PASSWORD,
+  database: DATABASE,
+  host: URL,
   dialect: 'postgres',
   migrationStorageTableName: 'migrations',
   seederStorage: 'sequelize',

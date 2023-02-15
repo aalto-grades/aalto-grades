@@ -3,12 +3,13 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
 import FrontPage from '../components/FrontPage';
-import AuthContext from '../context/authProvider';
 import coursesService from '../services/courses';
+import AuthContext from '../context/authProvider';
+import mockCourses from '../mock-data/mockCourses';
 
 jest.mock('../services/courses');
 afterEach(cleanup);
@@ -17,31 +18,7 @@ describe('Tests for FrontPage component', () => {
 
   const renderFrontPage = async (auth) => {
 
-    const mockResponse = {
-      courses: {
-        current: [{
-          id: 5,
-          courseCode:'CS-A1150',
-          department: {
-            en: 'Department of Computer Science'
-          }, 
-          name: {
-            en: 'Databases'
-          },
-        }],
-        previous: [{
-          id: 1,
-          courseCode:'CS-A1110',
-          department: {
-            en: 'Department of Computer Science'
-          }, 
-          name: {
-            en: 'Programming 1'
-          },
-        }]
-      }
-
-    };
+    const mockResponse = { courses: mockCourses };
 
     coursesService.getCourses.mockRejectedValue('Network error');
     coursesService.getCourses.mockResolvedValue(mockResponse);
@@ -73,7 +50,6 @@ describe('Tests for FrontPage component', () => {
   
     const auth = { role: 'TEACHER' };
     renderFrontPage(auth);
-
     await waitFor(() => expect(screen.queryByText('Create New Course')).not.toBeInTheDocument());
   });
 

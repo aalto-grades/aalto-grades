@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { LocalizedString } from '../controllers/course';
+import { LocalizedString } from './language';
 
 export interface Organizations {
   organisationId: string,
@@ -23,7 +23,7 @@ export interface CourseUnit {
   credits: number | string | null
 }
 
-export interface SisuInstance {
+export interface SisuCourseInstance {
   id: string,
   code: string,
   startDate: Date,

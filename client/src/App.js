@@ -4,6 +4,14 @@
 
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import Link from '@mui/material/Link';
+import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import styled from 'styled-components';
 import PrivateRoute from './components/auth/PrivateRoute';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
@@ -12,35 +20,26 @@ import CourseView from './components/CourseView';
 import CreateCourseView from './components/CreateCourseView';
 import FetchInstancesView from './components/FetchInstancesView';
 import EditInstanceView from './components/EditInstanceView';
-import CreateAssignmentView from './components/CreateAssignmentView';
-import Link from '@mui/material/Link';
-import Container from '@mui/material/Container';
-import Box from '@mui/material/Box';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import styled from 'styled-components';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 import useLogout from './hooks/useLogout';
-import { useNavigate } from 'react-router-dom';
 
 const theme = createTheme({
   palette: {
     primary: {
       light: '#EFF3FB',
-      main: '#3d5afe',
-      dark: '#0031ca',
-      contrastText: '#fff',
+      main: '#3D5AFE',
+      dark: '#0031CA',
+      contrastText: '#FFF',
     },
     secondary: {
-      light: '#f1f8f0',
-      main: '#96cf99',
+      light: '#F1F8F0',
+      main: '#96CF99',
       dark: '#519657',
       contrastText: '#000',
     },
     info: {
-      light: '#ffc046',
-      main: '#ff8f00',
-      dark: '#c56000',
+      light: '#FFC046',
+      main: '#FF8F00',
+      dark: '#C56000',
       contrastText: '#000',
     },
     contrastThreshold: 4.5
@@ -62,7 +61,7 @@ function App() {
   const logout = useLogout();
   const navigate = useNavigate();
 
-  //temporary function for logging out, will be moved to a seperate file once toolbar is refined
+  // temporary function for logging out, will be moved to a seperate file once toolbar is refined
   const signOut = async () => {
     await logout();
     navigate('/login', { replace: true });
@@ -89,19 +88,19 @@ function App() {
       </AppBar>
       <AppContainer maxWidth="lg">
         <Box mx={5} my={5}>
-          <Routes>
+          <Routes> { /* Add nested routes when needed */ }
             <Route path='/login' element={<Login/>} />
             <Route path='/signup' element={<Signup/>} />
-            {/* All roles are authorised to access the front page, conditional rendering is done inside the component */}
+            { /* All roles are authorised to access the front page, conditional rendering is done inside the component */ }
             <Route element={<PrivateRoute roles={[roles.admin, roles.teacher, roles.student, roles.assistant]}/>}>
               <Route path='/' element={<FrontPage/>} />
-              <Route path='/course-view/:courseCode' element={<CourseView/>}/>  {/* Add nested routes when needed */}
+              <Route path='/course-view/:courseCode' element={<CourseView/>}/>
             </Route>
-            {/* Pages that are only authorised for admin */}
+            { /* Pages that are only authorised for admin */ }
             <Route element={<PrivateRoute roles={[roles.admin]}/>}>
               <Route path='/create-course' element={<CreateCourseView/>}/>
             </Route>
-            {/* Pages that are authorised for admin and teachers */}
+            { /* Pages that are authorised for admin and teachers */ }
             <Route element={<PrivateRoute roles={[roles.admin, roles.teacher]}/>}>
               <Route path='/fetch-instances/:courseId' element={<FetchInstancesView/>}/>
               <Route path='/edit-instance/:instanceId' element={<EditInstanceView/>}/>
