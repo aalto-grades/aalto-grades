@@ -5,6 +5,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import PrivateRoute from './components/auth/PrivateRoute';
+import InstanceCreationRoute from './context/InstanceCreationRoute';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
 import FrontPage from './components/FrontPage';
@@ -12,6 +13,8 @@ import CourseView from './components/CourseView';
 import CreateCourseView from './components/CreateCourseView';
 import FetchInstancesView from './components/FetchInstancesView';
 import EditInstanceView from './components/EditInstanceView';
+import AddAssignmentsView from './components/AddAssignmentsView';
+import InstanceSummaryView from './components/InstanceSummaryView';
 import Link from '@mui/material/Link';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
@@ -90,6 +93,10 @@ function App() {
               <Route path='/course-view/:courseCode' element={<CourseView/>}/>  {/* Add nested routes when needed */}
               <Route path='/fetch-instances/:courseId' element={<FetchInstancesView/>}/>
               <Route path='/edit-instance/:instanceId' element={<EditInstanceView/>}/>
+              <Route element={<InstanceCreationRoute/>}>
+                <Route path='/add-assignments/:instanceId' element={<AddAssignmentsView/>}/>
+                <Route path='/instance-summary/:instanceId' element={<InstanceSummaryView/>}/>
+              </Route>
             </Route>
           </Routes>
         </Box>

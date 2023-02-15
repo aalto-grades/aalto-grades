@@ -68,7 +68,7 @@ const CourseView = () => {
       </Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-evenly', gap: 3 }}>
         <OngoingInstanceInfo info={dummyInfo} />
-        <Assignments assignments={assignments} />
+        <Assignments assignments={assignments} formula={'Weighted Average'} />
       </Box>
       <Typography variant='h4' align='left' sx={{ fontWeight: 'light', mt: 8, mb: 3 }}>Past Instances</Typography>
       <InstancesTable data={dummyPastInstances} />

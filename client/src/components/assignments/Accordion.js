@@ -104,7 +104,6 @@ const CustomAccordion = ({ assignments }) => {
   // curried function syntax, google for a good explanation
   // basically add the panel's id to the set of expanded panels if opened, else delete from set
   const handleChange = (panel_id) => (e, newExpanded) => {
-    console.log('this is newExpanded: ' + newExpanded);
     setExpanded(newExpanded ? addToSet(panel_id, expanded) : deleteFromSet(panel_id, expanded));
     setSelected(newExpanded ? panel_id : false);
   };

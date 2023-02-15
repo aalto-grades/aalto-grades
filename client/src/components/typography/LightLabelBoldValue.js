@@ -7,17 +7,20 @@ import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
-const LightLabelBoldValue = ({ label, value }) => {
+const LightLabelBoldValue = ({ label, value, small }) => {
+  const textSize = small ? 'body2' : 'body1';
+
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', columnGap: 1, mx: 1 }}>
-      <Typography variant='body2'>{label + ':'}</Typography>
-      <Typography variant='body2' sx={{ fontWeight: 'bold' }}>{value}</Typography>
+      <Typography variant={textSize} >{label + ':'}</Typography>
+      <Typography variant={textSize} sx={{ fontWeight: 'bold' }}>{value}</Typography>
     </Box>
   );
 };
    
 LightLabelBoldValue.propTypes = {
   label: PropTypes.string,
+  small: PropTypes.bool,
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number

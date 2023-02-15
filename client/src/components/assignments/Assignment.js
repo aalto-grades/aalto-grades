@@ -6,12 +6,11 @@ import Typography from '@mui/material/Typography';
 import { AccordionDetails, AssignmentText } from './Accordion';
 import textFormatServices from '../../services/textFormat';
 
-const Assignment = ({ assignment, button }) => {
-  const { type, name, points, weight, expiryDate, subAssignments } = assignment[0]; //must be at least one
-  if(weight) console.log('fun');
+const Assignment = ({ assignment, button, width }) => {
+  const { type, name, points, expiryDate, subAssignments } = assignment[0]; //must be at least one
 
   return (
-    <Box boxShadow={3} borderRadius={1} sx={{ pt: 2, pb: 0.5, bgcolor: 'white', width: '50vw' }}>
+    <Box boxShadow={3} borderRadius={1} sx={{ pt: 2, pb: 0.5, bgcolor: 'white', width: width }}>
       <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pr: '21px', pb: '16px', pl: '21px' }}>
         <Typography sx={{ fontWeight: 'bold' }} align='left'>{type}</Typography>
         <Typography align='left' variant='body2'>{'Total points: ' + points}</Typography>
@@ -35,7 +34,8 @@ Assignment.propTypes = {
   name: PropTypes.string, 
   points: PropTypes.number, 
   weight: PropTypes.number,
-  button: PropTypes.element
+  button: PropTypes.element,
+  width: PropTypes.string
 };
 
 export default Assignment;
