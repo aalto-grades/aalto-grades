@@ -18,8 +18,8 @@ import {
   addCourseInstance, getAllCourseInstances, getCourseInstance
 } from '../controllers/courseInstance';
 import { fetchAllCourseInstancesFromSisu, fetchCourseInstanceFromSisu } from '../controllers/sisu';
-import { getCoursesOfUser } from '../controllers/user';
 import { handleInvalidRequestJson } from '../middleware';
+import { router as userRouter } from './user';
 
 const options: object = {
   definition,
@@ -40,7 +40,7 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
 /**
  * @swagger
  * definitions:
- *   Course:
+ *   CourseData:
  *     type: object
  *     description: Course Information
  *     properties:
@@ -80,50 +80,7 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *             type: string
  *           en:
  *             type: string
- *
- *   UserCourses:
- *     type: object
- *     properties:
- *       success:
- *         type: boolean
- *         description: Success of the request
- *       courses:
- *         type: object
- *         description: Object with current and past courses
- *         properties:
- *           current:
- *             type: array
- *             description: Current Courses
- *             items:
- *               $ref: '#/definitions/Course'
- *           previous:
- *             type: array
- *             description: Previous Courses
- *             items:
- *               $ref: '#/definitions/Course'
  */
-/**
- * @swagger
- * /v1/user/{userId}/courses:
- *   get:
- *     tags: [Course]
- *     description: Fetch Courses of a user
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: True
- *         schema:
- *           type: integer
- *         description: The ID of the user fetching courses
- *     responses:
- *       200:
- *         description: User's Courses
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/UserCourses'
- */
-router.get('/v1/user/:userId/courses', getCoursesOfUser);
 
 // Sisu API routes
 
