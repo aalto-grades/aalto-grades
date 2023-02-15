@@ -17,30 +17,12 @@ export class CustomError extends Error {
   }
 }
 
-export class SisuError extends CustomError {
-  public readonly sisuErrorCode: number;
-
-  constructor(sisuErrorCode: number) {
-    super(`external API error: ${sisuErrorCode}`, HttpCode.BadGateway);
-    this.sisuErrorCode = sisuErrorCode;
-  }
-}
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function ErrorHandler(err: unknown, req: Request, res: Response, next: NextFunction): void {
   // TODO: appropriate logging in case of errors
 
   if (err instanceof CustomError) {
     res.status(err.statusCode);
-
-    if (err instanceof SisuError) {
-      res.send({
-        success: false,
-        errors: [err.message],
-        sisuStatusCode: err.sisuErrorCode
-      });
-      return;
-    }
 
     res.send({
       success: false,
