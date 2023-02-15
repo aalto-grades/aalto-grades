@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import express, { Router } from 'express';
 import passport from 'passport';
 
