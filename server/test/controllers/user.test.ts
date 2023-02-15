@@ -6,6 +6,7 @@ import supertest from 'supertest';
 
 import { app } from '../../src/app';
 import { CoursesOfUser } from '../../src/controllers/user';
+import { HttpCode } from '../../src/types/httpCode';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 
@@ -19,9 +20,10 @@ describe('Test GET /v1/user/:userId/courses', () => {
   it('should respond with correct data', async () => {
     const res: supertest.Response = await request.get('/v1/user/1/courses');
     expect(res.body.success).toBe(true);
-    expect(res.statusCode).toBe(200);
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.statusCode).toBe(HttpCode.ok);
 
-    expect(res.body.courses).toStrictEqual({
+    expect(res.body.data.courses).toStrictEqual({
       'current': [],
       'previous': [
         {
@@ -50,9 +52,10 @@ describe('Test GET /v1/user/:userId/courses', () => {
   it('should not contain duplicate courses', async () => {
     const res: supertest.Response = await request.get('/v1/user/2/courses');
     expect(res.body.success).toBe(true);
-    expect(res.statusCode).toBe(200);
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.statusCode).toBe(HttpCode.ok);
 
-    const courses: CoursesOfUser = res.body.courses as CoursesOfUser;
+    const courses: CoursesOfUser = res.body.data.courses as CoursesOfUser;
     let n: number = 0;
     for (const i in courses.current) {
       if (courses.current[i].courseCode === 'CS-A1120')
@@ -65,12 +68,29 @@ describe('Test GET /v1/user/:userId/courses', () => {
   it('should correctly identify whether a course is current or previous', async () => {
     const res: supertest.Response = await request.get('/v1/user/3/courses');
     expect(res.body.success).toBe(true);
-    expect(res.statusCode).toBe(200);
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.statusCode).toBe(HttpCode.ok);
 
-    const courses: CoursesOfUser = res.body.courses as CoursesOfUser;
+    const courses: CoursesOfUser = res.body.data.courses as CoursesOfUser;
     expect(courses.current.length).toBe(1);
     expect(courses.current[0].courseCode).toBe('PHYS-A1130');
     expect(courses.previous.length).toBe(1);
     expect(courses.previous[0].courseCode).toBe('TU-A1100');
+  });
+
+  it('should return fail with non-existing user id', async () => {
+    const res: supertest.Response = await request.get('/v1/user/9999999/courses');
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors).toBeDefined();
+    expect(res.body.data).not.toBeDefined();
+    expect(res.statusCode).toBe(HttpCode.NotFound);
+  });
+
+  it('should respond with 400 bad request, if validation fails (non-number user id)', async () => {
+    const res: supertest.Response = await request.get('/v1/user/abc/courses');
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors).toBeDefined();
+    expect(res.body.data).not.toBeDefined();
+    expect(res.statusCode).toBe(HttpCode.BadRequest);
   });
 });
