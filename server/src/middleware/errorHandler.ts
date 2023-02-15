@@ -6,6 +6,7 @@ import { NextFunction, Request, Response } from 'express';
 import { ValidationError } from 'yup';
 
 import { HttpCode } from '../types/httpCode';
+import { UserExists } from '../controllers/auth';
 
 export class ApiError extends Error {
   public readonly statusCode: number;
@@ -27,6 +28,14 @@ export function ErrorHandler(err: unknown, req: Request, res: Response, next: Ne
     res.send({
       success: false,
       errors: [err.message],
+    });
+    return;
+  }
+
+  if (err instanceof UserExists) {
+    res.status(HttpCode.Conflict).send({
+      success: false,
+      errors: ['user account with the specified email already exists']
     });
     return;
   }
