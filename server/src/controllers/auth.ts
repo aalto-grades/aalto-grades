@@ -13,8 +13,8 @@ import * as yup from 'yup';
 import { JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS } from '../configs/constants';
 import { JWT_SECRET, TEST_ENV } from '../configs/environment';
 
+import { HttpCode } from '../types/httpCode';
 import User from '../database/models/user';
-
 import { UserRole } from '../types/user';
 
 export type PlainPassword = string;
@@ -118,49 +118,45 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
   passport.authenticate(
     'login',
     async (err: unknown, loginResult: LoginResult | boolean) => {
-      try {
-        if (err) {
-          return next(err);
-        }
-        if (loginResult == false || loginResult == true) {
-          return res.status(401).send({
-            success: false,
-            message: 'incorrect email or password',
+      if (err) {
+        return next(err);
+      }
+      if (loginResult == false || loginResult == true) {
+        return res.status(HttpCode.Unauthorized).send({
+          success: false,
+          errors: ['incorrect email or password']
+        });
+      }
+
+      req.login(
+        loginResult,
+        { session: false },
+        async (error: unknown) => {
+          if (error) {
+            return next(error);
+          }
+
+          const body: JwtClaims = {
+            role: loginResult.role,
+            id: loginResult.id,
+          };
+          const token: string = jwt.sign(body, JWT_SECRET, {
+            expiresIn: JWT_EXPIRY_SECONDS,
+          });
+          res.cookie('jwt', token, {
+            httpOnly: true,
+            secure: !TEST_ENV,
+            sameSite: 'none',
+            maxAge: JWT_COOKIE_EXPIRY_MS,
+          });
+          return res.send({
+            success: true,
+            data: {
+              role: loginResult.role,
+            }
           });
         }
-
-        req.login(
-          loginResult,
-          { session: false },
-          async (error: unknown) => {
-            if (error) {
-              return next(error);
-            }
-
-            const body: JwtClaims = {
-              role: loginResult.role,
-              id: loginResult.id,
-            };
-            const token: string = jwt.sign(body, JWT_SECRET, {
-              expiresIn: JWT_EXPIRY_SECONDS,
-            });
-            res.cookie('jwt', token, {
-              httpOnly: true,
-              secure: !TEST_ENV,
-              sameSite: 'none',
-              maxAge: JWT_COOKIE_EXPIRY_MS,
-            });
-            return res.send({
-              success: true,
-              data: {
-                role: loginResult.role,
-              }
-            });
-          }
-        );
-      } catch (error) {
-        return next(error);
-      }
+      );
     }
   )(req, res, next);
 }
@@ -172,62 +168,50 @@ export async function authLogout(_req: Request, res: Response): Promise<void> {
   res.send({
     success: true
   });
+  return;
 }
 
 export async function authSignup(req: Request, res: Response): Promise<void> {
   if (!(await signupSchema.isValid(req.body))) {
-    res.status(400).send({
+    res.status(HttpCode.BadRequest).send({
       success: false,
-      error: 'invalid signup request format',
+      errors: ['invalid signup request format']
     });
     return;
   }
 
   const request: SignupRequest = req.body as SignupRequest;
 
-  try {
-    // TODO signup
-    const id: number = await performSignup(
-      request.name, request.email, request.password, request.studentID
-    );
-    const body: JwtClaims = {
+  // TODO signup
+  const id: number = await performSignup(
+    request.name, request.email, request.password, request.studentID
+  );
+  const body: JwtClaims = {
+    role: req.body.role,
+    id,
+  };
+  const token: string = jwt.sign(body, JWT_SECRET, {
+    expiresIn: JWT_EXPIRY_SECONDS,
+  });
+  res.cookie('jwt', token, {
+    httpOnly: true,
+    secure: !TEST_ENV,
+    sameSite: 'none',
+    maxAge: JWT_COOKIE_EXPIRY_MS
+  });
+  res.send({
+    success: true,
+    data: {
       role: req.body.role,
-      id,
-    };
-    const token: string = jwt.sign(body, JWT_SECRET, {
-      expiresIn: JWT_EXPIRY_SECONDS,
-    });
-    res.cookie('jwt', token, {
-      httpOnly: true,
-      secure: !TEST_ENV,
-      sameSite: 'none',
-      maxAge: JWT_COOKIE_EXPIRY_MS
-    });
-    res.send({
-      success: true,
-      data: {
-        role: req.body.role,
-        id
-      }
-    });
-  } catch (error) {
-    if (error instanceof UserExists) {
-      res.status(409).send({
-        success: false,
-        error: 'user account with the specified email already exists',
-      });
-      return;
+      id
     }
-    res.status(500).send({
-      success: false,
-      error: 'internal server error',
-    });
-  }
+  });
+  return;
 }
 
 export async function authSelfInfo(req: Request, res: Response): Promise<void> {
   if (!req.user) {
-    res.status(401);
+    res.status(HttpCode.Unauthorized);
     res.send({ success: false, error: 'login required' });
     return;
   }

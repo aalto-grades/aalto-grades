@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 // SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
@@ -411,7 +410,7 @@ router.get(
   '/v1/auth/self-info',
   passport.authenticate('jwt', { session: false }),
   express.json(),
-  handleErrors(authSelfInfo)
+  authSelfInfo
 );
 
 router.use(cors({

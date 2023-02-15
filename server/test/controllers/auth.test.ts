@@ -9,6 +9,7 @@ import supertest, { SuperAgentTest } from 'supertest';
 import { JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS } from '../../src/configs/constants';
 
 import { app } from '../../src/app';
+import { HttpCode } from '../../src/types/httpCode';
 import { UserRole } from '../../src/types/user';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
@@ -19,11 +20,12 @@ describe('Test POST /v1/auth/login', () => {
       return request.post('/v1/auth/login')
         .set('Accept', 'application/json')
         .send(credentials)
-        .expect(401)
+        .expect(HttpCode.Unauthorized)
         .expect('Content-Type', /json/)
         .then((res: supertest.Response) => {
           expect(res.body.success).toBe(false);
-          expect(res.body.message).toMatch(/incorrect email or password/);
+          expect(res.body.data).not.toBeDefined();
+          expect(res.body.errors[0]).toMatch(/incorrect email or password/);
         });
     }
     await badCreds({ email: 'aalto', password: 'grades' });
@@ -35,9 +37,10 @@ describe('Test POST /v1/auth/login', () => {
     await request.post('/v1/auth/login')
       .send({ email: 'sysadmin@aalto.fi', password: 'grades' })
       .expect('Content-Type', /json/)
-      .expect(200)
+      .expect(HttpCode.ok)
       .then((res: supertest.Response) => {
         expect(res.body.success).toBe(true);
+        expect(res.body.errors).not.toBeDefined();
         expect(res.body.data.role).toBe(UserRole.Admin);
       });
   });
@@ -54,43 +57,46 @@ describe('Test POST /v1/auth/signup', () => {
         studentID: '123456',
         role: 'SYSADMIN'
       })
-      .expect(409)
+      .expect(HttpCode.Conflict)
       .expect('Content-Type', /json/)
       .then((res: supertest.Response) => {
         expect(res.body.success).toBe(false);
-        expect(res.body.error).toMatch('user account with the specified email already exists');
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors[0]).toMatch('user account with the specified email already exists');
       });
   });
   it('should error when the signup format is incorrect', async () => {
     return request.post('/v1/auth/signup')
       .set('Accept', 'application/json')
       .send({ email: 'sysadmin@aalto.fi', password: 'grades' })
-      .expect(400)
+      .expect(HttpCode.BadRequest)
       .expect('Content-Type', /json/)
       .then((res: supertest.Response) => {
         expect(res.body.success).toBe(false);
-        expect(res.body.error).toMatch('invalid signup request format');
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors[0]).toMatch('invalid signup request format');
       });
   });
   it('should allow creation of a new account', async () => {
     await request.post('/v1/auth/login')
       .set('Accept', 'application/json')
       .send({ email: 'sysadmin2@aalto.fi', password: 'grades2'})
-      .expect(401);
+      .expect(HttpCode.Unauthorized);
     await request.post('/v1/auth/signup')
       .set('Accept', 'application/json')
       // without student id
       .send({ email: 'sysadmin2@aalto.fi', name: 'aalto2', password: 'grades2', role: 'SYSADMIN' })
-      .expect(200)
+      .expect(HttpCode.ok)
       .expect('Content-Type', /json/)
       .then((res: supertest.Response) => {
         expect(res.body.success).toBe(true);
+        expect(res.body.errors).not.toBeDefined();
         expect(res.body.message);
       });
     return request.post('/v1/auth/login')
       .set('Accept', 'application/json')
       .send({ email: 'sysadmin2@aalto.fi', password: 'grades2'})
-      .expect(200);
+      .expect(HttpCode.ok);
   });
 });
 
@@ -98,17 +104,17 @@ describe('Test GET /v1/auth/self-info and cookies', () => {
   it('should act differently when user is logged in or out', async () => {
     // Use the agent for cookie persistence
     const agent: SuperAgentTest = supertest.agent(app);
-    await agent.get('/v1/auth/self-info').withCredentials(true).expect(401);
+    await agent.get('/v1/auth/self-info').withCredentials(true).expect(HttpCode.Unauthorized);
     await agent.post('/v1/auth/login')
       .withCredentials(true)
       .send({ email: 'sysadmin@aalto.fi', password: 'grades' })
       .expect('Content-Type', /json/)
-      .expect(200)
+      .expect(HttpCode.ok)
       .expect('set-cookie', /jwt=/)
       .expect('set-cookie', /httponly/i);
-    await agent.get('/v1/auth/self-info').withCredentials(true).expect(200);
-    await agent.post('/v1/auth/logout').withCredentials(true).send({}).expect(200);
-    await agent.get('/v1/auth/self-info').withCredentials(true).expect(401);
+    await agent.get('/v1/auth/self-info').withCredentials(true).expect(HttpCode.ok);
+    await agent.post('/v1/auth/logout').withCredentials(true).send({}).expect(HttpCode.ok);
+    await agent.get('/v1/auth/self-info').withCredentials(true).expect(HttpCode.Unauthorized);
   });
 });
 
@@ -121,8 +127,8 @@ describe('Test POST /v1/auth/login and expiry', () => {
       .withCredentials(true)
       .send({ email: 'sysadmin@aalto.fi', password: 'grades' })
       .expect('Content-Type', /json/)
-      .expect(200);
-    await agent.get('/v1/auth/self-info').withCredentials(true).expect(200);
+      .expect(HttpCode.ok);
+    await agent.get('/v1/auth/self-info').withCredentials(true).expect(HttpCode.ok);
     const jwt: Cookie | undefined = agent.jar.getCookie('jwt', CookieAccessInfo.All);
     if (!jwt) {
       throw new Error('jwt not available');
@@ -131,8 +137,8 @@ describe('Test POST /v1/auth/login and expiry', () => {
     mockdate.set(realDate.setMilliseconds(realDate.getMilliseconds() + JWT_COOKIE_EXPIRY_MS + 1));
     jwt.expiration_date = realDate.setSeconds(realDate.getSeconds() + JWT_EXPIRY_SECONDS * 2);
     agent.jar.setCookie(jwt);
-    await agent.get('/v1/auth/self-info').withCredentials(true).expect(200);
+    await agent.get('/v1/auth/self-info').withCredentials(true).expect(HttpCode.ok);
     mockdate.set(realDate.setSeconds(realDate.getSeconds() + JWT_EXPIRY_SECONDS + 1));
-    await agent.get('/v1/auth/self-info').withCredentials(true).expect(401);
+    await agent.get('/v1/auth/self-info').withCredentials(true).expect(HttpCode.Unauthorized);
   });
 });
