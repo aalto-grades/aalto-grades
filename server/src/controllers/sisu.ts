@@ -8,7 +8,9 @@ import { Request, Response } from 'express';
 import { AXIOS_TIMEOUT } from '../configs/constants';
 import { SISU_API_KEY, SISU_API_URL } from '../configs/environment';
 
+import { ApiError } from '../middleware/errorHandler';
 import { CourseInstanceData, GradingType, TeachingMethod } from '../types/course';
+import { HttpCode } from '../types/httpCode';
 import { SisuCourseInstance } from '../types/sisu';
 
 function parseSisuCourseInstance(instance: SisuCourseInstance): CourseInstanceData {
@@ -50,78 +52,61 @@ function parseSisuCourseInstance(instance: SisuCourseInstance): CourseInstanceDa
 }
 
 export async function fetchAllCourseInstancesFromSisu(req: Request, res: Response): Promise<void> {
-  try {
-    const courseCode: string = String(req.params.courseCode);
-    const courseInstancesFromSisu: AxiosResponse = await axios.get(
-      `${SISU_API_URL}/courseunitrealisations`,
-      {
-        timeout: AXIOS_TIMEOUT,
-        params: {
-          code: courseCode,
-          USER_KEY: SISU_API_KEY
-        }
+  const courseCode: string = String(req.params.courseCode);
+  const courseInstancesFromSisu: AxiosResponse = await axios.get(
+    `${SISU_API_URL}/courseunitrealisations`,
+    {
+      timeout: AXIOS_TIMEOUT,
+      params: {
+        code: courseCode,
+        USER_KEY: SISU_API_KEY
       }
-    );
-
-    if (courseInstancesFromSisu.data?.error) {
-      throw new Error(courseInstancesFromSisu.data.error.message);
     }
+  );
 
-    const parsedInstances: Array<CourseInstanceData> = courseInstancesFromSisu.data.map(
-      (instance: SisuCourseInstance) => parseSisuCourseInstance(instance)
-    );
-
-    res.status(200).send({
-      success: true,
-      data: {
-        courseInstances: parsedInstances
-      }
-    });
-  } catch (error: unknown) {
-    console.log(error);
-
-    res.status(500).send({
-      success: false,
-      error: 'Internal Server Error'
-    });
+  if (courseInstancesFromSisu.data?.error) {
+    throw new ApiError(
+      `external API error: ${courseInstancesFromSisu.data.error.code}`, HttpCode.BadGateway);
   }
+
+  const parsedInstances: Array<CourseInstanceData> = courseInstancesFromSisu.data.map(
+    (instance: SisuCourseInstance) => parseSisuCourseInstance(instance)
+  );
+
+  res.status(HttpCode.ok).send({
+    success: true,
+    data: {
+      courseInstances: parsedInstances
+    }
+  });
 }
 
 export async function fetchCourseInstanceFromSisu(req: Request, res: Response): Promise<void> {
-  try {
-    // Instance ID here is a Sisu course instance ID (e.g., 'aalto-CUR-163498-3084205'),
-    // not a course code.
-    const sisuCourseInstanceId: string = String(req.params.sisuCourseInstanceId);
-    const courseInstanceFromSisu: AxiosResponse = await axios.get(
-      `${SISU_API_URL}/courseunitrealisations/${sisuCourseInstanceId}`,
-      {
-        timeout: AXIOS_TIMEOUT,
-        params: {
-          USER_KEY: SISU_API_KEY
-        }
+  // Instance ID here is a Sisu course instance ID (e.g., 'aalto-CUR-163498-3084205'),
+  // not a course code.
+  const sisuCourseInstanceId: string = String(req.params.sisuCourseInstanceId);
+  const courseInstanceFromSisu: AxiosResponse = await axios.get(
+    `${SISU_API_URL}/courseunitrealisations/${sisuCourseInstanceId}`,
+    {
+      timeout: AXIOS_TIMEOUT,
+      params: {
+        USER_KEY: SISU_API_KEY
       }
-    );
-
-    if (courseInstanceFromSisu.data?.error) {
-      throw new Error(courseInstanceFromSisu.data.error.message);
     }
+  );
 
-    const instance: CourseInstanceData = parseSisuCourseInstance(courseInstanceFromSisu.data);
-
-    res.status(200).send({
-      success: true,
-      data: {
-        courseInstance: instance
-      }
-    });
-    return;
-  } catch (error: unknown) {
-    console.log(error);
-
-    res.status(500).send({
-      success: false,
-      error: 'Internal Server Error'
-    });
-    return;
+  if (courseInstanceFromSisu.data?.error) {
+    throw new ApiError(
+      `external API error: ${courseInstanceFromSisu.data.error.code}`, HttpCode.BadGateway);
   }
+
+  const instance: CourseInstanceData = parseSisuCourseInstance(courseInstanceFromSisu.data);
+
+  res.status(HttpCode.ok).send({
+    success: true,
+    data: {
+      courseInstance: instance
+    }
+  });
+  return;
 }
