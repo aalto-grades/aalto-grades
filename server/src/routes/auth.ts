@@ -137,10 +137,10 @@ router.post('/v1/auth/login', express.json(), authLogin);
  *     description: >
  *       Log out of a session, requesting the browser to remove
  *       its session JWT token.
- * 
+ *
  *       This requires the user to be already logged in, authenticated via a
  *       JWT token in the cookie.
- * 
+ *
  *       Note that this does not explicitly invalidate any existing JWT tokens
  *       for that user, at the moment.
  *     responses:
