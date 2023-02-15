@@ -24,19 +24,7 @@ export default {
         unique: true,
         transaction
       });
-      await queryInterface.addIndex(
-        'course_instance_partial_grade', [ 'course_id', 'course_instance_id' ], {
-          unique: false,
-          transaction
-        }
-      );
-      await queryInterface.addIndex(
-        'user_partial_grade', ['user_id', 'course_instance_partial_grade_id'], {
-          unique: true,
-          transaction
-        }
-      );
-      await queryInterface.addIndex('course_assignment', ['course_instance_partial_grade_id'], {
+      await queryInterface.addIndex('course_assignment', ['course_instance_id'], {
         unique: false,
         transaction
       });
@@ -73,17 +61,7 @@ export default {
       );
 
       await queryInterface.sequelize.query(
-        'DROP INDEX IF EXISTS course_instance_partial_grade_course_id_course_instance_id',
-        { transaction }
-      );
-
-      await queryInterface.sequelize.query(
-        'DROP INDEX IF EXISTS user_partial_grade_user_id_course_instance_partial_grade_id',
-        { transaction }
-      );
-
-      await queryInterface.sequelize.query(
-        'DROP INDEX IF EXISTS course_assignment_course_instance_partial_grade_id',
+        'DROP INDEX IF EXISTS course_assignment_course_instance_id',
         { transaction }
       );
 

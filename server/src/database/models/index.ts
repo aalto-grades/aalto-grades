@@ -5,13 +5,11 @@
 import Course from './course';
 import CourseAssignment from './courseAssignment';
 import CourseInstance from './courseInstance';
-import CourseInstancePartialGrade from './courseInstancePartialGrade';
 import CourseResult from './courseResult';
 import CourseRole from './courseRole';
 import CourseTranslation from './courseTranslation';
 import User from './user';
 import UserAssignmentGrade from './userAssignmentGrade';
-import UserPartialGrade from './userPartialGrade';
 
 User.belongsToMany(CourseInstance, {
   through: CourseRole,
@@ -72,9 +70,14 @@ CourseResult.belongsTo(CourseInstance, {
   foreignKey: 'courseInstanceId'
 });
 
-CourseInstance.hasMany(CourseInstancePartialGrade, {
+CourseInstance.hasMany(CourseAssignment, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
+});
+
+CourseAssignment.belongsTo(CourseInstance, {
+  targetKey: 'id',
+  foreignKey: 'courseInstanceId'
 });
 
 CourseResult.belongsTo(CourseInstance, {
@@ -82,24 +85,9 @@ CourseResult.belongsTo(CourseInstance, {
   foreignKey: 'courseInstanceId'
 });
 
-Course.hasMany(CourseInstancePartialGrade, {
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
-
 CourseResult.belongsTo(Course, {
   targetKey: 'id',
   foreignKey: 'courseId'
-});
-
-CourseInstancePartialGrade.hasMany(CourseAssignment, {
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
-
-CourseAssignment.belongsTo(CourseInstancePartialGrade, {
-  targetKey: 'id',
-  foreignKey: 'courseInstancePartialGradeId'
 });
 
 User.hasMany(UserAssignmentGrade, {
@@ -122,35 +110,13 @@ UserAssignmentGrade.belongsTo(CourseAssignment, {
   foreignKey: 'courseAssignmentId'
 });
 
-User.hasMany(UserPartialGrade, {
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
-
-UserPartialGrade.belongsTo(User, {
-  targetKey: 'id',
-  foreignKey: 'userId'
-});
-
-CourseInstancePartialGrade.hasMany(UserPartialGrade, {
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
-
-UserPartialGrade.belongsTo(CourseInstancePartialGrade, {
-  targetKey: 'id',
-  foreignKey: 'courseInstancePartialGradeId'
-});
-
 export default {
   Course,
   CourseAssignment,
   CourseInstance,
-  CourseInstancePartialGrade,
   CourseResult,
   CourseRole,
   CourseTranslation,
   User,
-  UserAssignmentGrade,
-  UserPartialGrade
+  UserAssignmentGrade
 };

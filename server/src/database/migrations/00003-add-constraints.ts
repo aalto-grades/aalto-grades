@@ -30,16 +30,6 @@ export default {
         },
         transaction
       });
-      await queryInterface.addConstraint('course_instance_partial_grade', {
-        fields: ['min_points'],
-        type: 'check',
-        where: {
-          min_points: {
-            [Op.lte]: sequelize.col('max_points')
-          }
-        },
-        transaction
-      });
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
@@ -58,12 +48,6 @@ export default {
       await queryInterface.removeConstraint(
         'course_instance',
         'course_instance_start_date_ck',
-        { transaction }
-      );
-
-      await queryInterface.removeConstraint(
-        'course_instance_partial_grade',
-        'course_instance_partial_grade_min_points_ck',
         { transaction }
       );
 

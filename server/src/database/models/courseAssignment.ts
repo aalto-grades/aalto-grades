@@ -7,16 +7,17 @@ import {
 } from 'sequelize';
 
 import { sequelize } from '..';
-import CourseInstancePartialGrade from './courseInstancePartialGrade';
+import CourseInstance from './courseInstance';
 
 export default class CourseAssignment extends Model<
   InferAttributes<CourseAssignment>,
   InferCreationAttributes<CourseAssignment>
 > {
   declare id: CreationOptional<number>;
-  declare courseInstancePartialGradeId: ForeignKey<CourseInstancePartialGrade['id']>;
-  declare assignmentId: string;
-  declare maxPoints: number;
+  declare courseInstanceId: ForeignKey<CourseInstance['id']>;
+  declare name: string;
+  declare executionDate: Date;
+  declare expiryDate: Date;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -28,20 +29,24 @@ CourseAssignment.init(
       autoIncrement: true,
       primaryKey: true
     },
-    courseInstancePartialGradeId: {
+    courseInstanceId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'course_instance_partial_grade',
+        model: 'course_instance',
         key: 'id'
       }
     },
-    assignmentId: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    maxPoints: {
-      type: DataTypes.FLOAT,
+    executionDate: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+    expiryDate: {
+      type: DataTypes.DATE,
       allowNull: false
     },
     createdAt: DataTypes.DATE,
