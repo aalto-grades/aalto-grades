@@ -11,7 +11,7 @@ import models from '../database/models';
 import Course from '../database/models/course';
 import CourseTranslation from '../database/models/courseTranslation';
 
-import { CustomError } from '../middleware/errorHandler';
+import { ApiError } from '../middleware/errorHandler';
 import { CourseData } from '../types/course';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
@@ -123,7 +123,7 @@ export async function getCourse(req: Request, res: Response, next: NextFunction)
     }) as CourseWithTranslation;
 
     if (!course) {
-      throw new CustomError(`course with an id ${courseId} not found`, HttpCode.NotFound);
+      throw new ApiError(`course with an id ${courseId} not found`, HttpCode.NotFound);
     }
 
     const courseData: CourseData = {

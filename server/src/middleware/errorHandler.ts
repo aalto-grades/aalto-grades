@@ -7,13 +7,13 @@ import { ValidationError } from 'yup';
 
 import { HttpCode } from '../types/httpCode';
 
-export class CustomError extends Error {
+export class ApiError extends Error {
   public readonly statusCode: number;
 
   constructor(message: string, statusCode: HttpCode) {
     super(message);
     this.statusCode = statusCode;
-    this.name = 'CustomError';
+    this.name = 'ApiError';
   }
 }
 
@@ -21,7 +21,7 @@ export class CustomError extends Error {
 export function ErrorHandler(err: unknown, req: Request, res: Response, next: NextFunction): void {
   // TODO: appropriate logging in case of errors
 
-  if (err instanceof CustomError) {
+  if (err instanceof ApiError) {
     res.status(err.statusCode);
 
     res.send({
