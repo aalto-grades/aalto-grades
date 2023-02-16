@@ -10,15 +10,14 @@ import { HttpCode } from '../types/httpCode';
 import { UserExists } from '../controllers/auth';
 
 export function handleErrors<
-  P, ResBody, ReqBody, ReqQuery, Locals extends Record<string, any>
+ T, P, ResBody, ReqBody, ReqQuery, Locals extends Record<string, T>
 >(
   fn: (
     req: express.Request<P, ResBody, ReqBody, ReqQuery, Locals>,
     res: express.Response<ResBody, Locals>,
     next: NextFunction,
   ) => Promise<void>
-): RequestHandler<P, ResBody, ReqBody, ReqQuery, Locals>
-{
+): RequestHandler<P, ResBody, ReqBody, ReqQuery, Locals> {
   return async (
     req: express.Request<P, ResBody, ReqBody, ReqQuery, Locals>,
     res: express.Response<ResBody, Locals>,
