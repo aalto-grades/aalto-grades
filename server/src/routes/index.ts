@@ -39,7 +39,8 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
 export function handleErrors(fn: any): any {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      return await fn(req, res, next);
+      await fn(req, res, next);
+      return;
     } catch (err: unknown) {
       next(err);
     }
