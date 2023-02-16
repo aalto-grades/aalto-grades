@@ -20,7 +20,7 @@ import {
 import { fetchAllCourseInstancesFromSisu, fetchCourseInstanceFromSisu } from '../controllers/sisu';
 import { getCoursesOfUser } from '../controllers/user';
 import { handleInvalidRequestJson } from '../middleware';
-import { handleErrors } from '../middleware/handleErrors';
+import { handleErrors } from '../middleware/errorHandler';
 
 const options: object = {
   definition,
