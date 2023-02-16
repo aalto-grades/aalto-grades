@@ -96,7 +96,7 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
     }
   }
 
-  res.status(HttpCode.ok).json({
+  res.status(HttpCode.Ok).json({
     success: true,
     data: {
       course: courseData
@@ -158,7 +158,7 @@ export async function getCourse(req: Request, res: Response): Promise<void> {
     }
   });
 
-  res.status(HttpCode.ok).json({
+  res.status(HttpCode.Ok).json({
     success: true,
     data: {
       course: courseData

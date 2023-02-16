@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 export enum HttpCode {
-  ok = 200,
-  created = 201,
+  Ok = 200,
+  Created = 201,
   BadRequest = 400,
   Unauthorized = 401,
   NotFound = 404,

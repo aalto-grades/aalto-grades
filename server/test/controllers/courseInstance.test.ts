@@ -22,7 +22,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
       expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
       expect(res.body.data.instance.id).toBeDefined();
-      expect(res.statusCode).toBe(HttpCode.ok);
+      expect(res.statusCode).toBe(HttpCode.Ok);
     }
 
     await goodInput({
@@ -221,7 +221,7 @@ describe('Test GET /v1/instances/:instanceId', () => {
     expect(res.body.data.instance.courseData.department).toBeDefined();
     expect(res.body.data.instance.courseData.name).toBeDefined();
     expect(res.body.data.instance.courseData.evaluationInformation).toBeDefined();
-    expect(res.statusCode).toBe(HttpCode.ok);
+    expect(res.statusCode).toBe(HttpCode.Ok);
   });
 
   it('should respond with 404 not found, if non-existing course instance id', async () => {
@@ -247,7 +247,7 @@ describe('Test GET /v1/courses/:courseId/instances', () => {
   it('should respond with correct data', async () => {
     const res: supertest.Response = await request.get('/v1/courses/1/instances');
     expect(res.body.success).toBe(true);
-    expect(res.statusCode).toBe(HttpCode.ok);
+    expect(res.statusCode).toBe(HttpCode.Ok);
     expect(res.body.data.courseInstances[0].courseData.id).toBeDefined();
     expect(res.body.data.courseInstances[0].courseData.courseCode).toBeDefined();
     expect(res.body.data.courseInstances[0].id).toBeDefined();

@@ -21,7 +21,7 @@ describe('Test GET /v1/user/:userId/courses', () => {
     const res: supertest.Response = await request.get('/v1/user/1/courses');
     expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
-    expect(res.statusCode).toBe(HttpCode.ok);
+    expect(res.statusCode).toBe(HttpCode.Ok);
 
     expect(res.body.data.courses).toStrictEqual({
       'current': [],
@@ -53,7 +53,7 @@ describe('Test GET /v1/user/:userId/courses', () => {
     const res: supertest.Response = await request.get('/v1/user/2/courses');
     expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
-    expect(res.statusCode).toBe(HttpCode.ok);
+    expect(res.statusCode).toBe(HttpCode.Ok);
 
     const courses: CoursesOfUser = res.body.data.courses as CoursesOfUser;
     let n: number = 0;
@@ -69,7 +69,7 @@ describe('Test GET /v1/user/:userId/courses', () => {
     const res: supertest.Response = await request.get('/v1/user/3/courses');
     expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
-    expect(res.statusCode).toBe(HttpCode.ok);
+    expect(res.statusCode).toBe(HttpCode.Ok);
 
     const courses: CoursesOfUser = res.body.data.courses as CoursesOfUser;
     expect(courses.current.length).toBe(1);

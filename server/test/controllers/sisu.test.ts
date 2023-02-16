@@ -39,7 +39,7 @@ describe('Test GET /v1/sisu/instances/:sisuCourseInstanceId', () => {
     expect(res.body.data.courseInstance.courseData.department).toBeDefined();
     expect(res.body.data.courseInstance.courseData.name).toBeDefined();
     expect(res.body.data.courseInstance.courseData.evaluationInformation).toBeDefined();
-    expect(res.status).toEqual(HttpCode.ok);
+    expect(res.status).toEqual(HttpCode.Ok);
   });
 
   it('should respond with error when instance does not exist', async () => {
@@ -81,7 +81,7 @@ describe('Test GET /v1/sisu/courses/:courseCode', () => {
     expect(res.body.data.courseInstances[0].courseType).toBeDefined();
     expect(res.body.data.courseInstances[0].gradingType).toBeDefined();
     expect(res.body.data.courseInstances[0].responsibleTeachers).toBeDefined();
-    expect(res.status).toEqual(HttpCode.ok);
+    expect(res.status).toEqual(HttpCode.Ok);
   });
 
   it('should respond with error when course does not exist', async () => {

@@ -73,7 +73,7 @@ export async function fetchAllCourseInstancesFromSisu(req: Request, res: Respons
     (instance: SisuCourseInstance) => parseSisuCourseInstance(instance)
   );
 
-  res.status(HttpCode.ok).send({
+  res.status(HttpCode.Ok).send({
     success: true,
     data: {
       courseInstances: parsedInstances
@@ -102,7 +102,7 @@ export async function fetchCourseInstanceFromSisu(req: Request, res: Response): 
 
   const instance: CourseInstanceData = parseSisuCourseInstance(courseInstanceFromSisu.data);
 
-  res.status(HttpCode.ok).send({
+  res.status(HttpCode.Ok).send({
     success: true,
     data: {
       courseInstance: instance

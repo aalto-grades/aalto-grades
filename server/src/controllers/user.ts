@@ -102,7 +102,7 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
     }
   }
 
-  res.status(HttpCode.ok).send({
+  res.status(HttpCode.Ok).send({
     success: true,
     data: {
       courses: coursesOfUser

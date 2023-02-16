@@ -23,7 +23,7 @@ describe('Test GET /v1/courses/:courseId', () => {
     expect(res.body.data.course.department).toBeDefined();
     expect(res.body.data.course.name).toBeDefined();
     expect(res.body.data.course.evaluationInformation).toBeDefined();
-    expect(res.statusCode).toBe(HttpCode.ok);
+    expect(res.statusCode).toBe(HttpCode.Ok);
   });
 
   it('should respond with 404 not found, if non-existing course id', async () => {
@@ -61,7 +61,7 @@ describe('Test POST /v1/courses', () => {
       }
     };
     let res: supertest.Response = await request.post('/v1/courses').send(input);
-    expect(res.statusCode).toBe(HttpCode.ok);
+    expect(res.statusCode).toBe(HttpCode.Ok);
     expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
     expect(res.body.data.course.courseCode).toBe('ELEC-A7200');
@@ -88,7 +88,7 @@ describe('Test POST /v1/courses', () => {
       }
     };
     res = await request.post('/v1/courses').send(input);
-    expect(res.statusCode).toBe(HttpCode.ok);
+    expect(res.statusCode).toBe(HttpCode.Ok);
     expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
     expect(res.body.data.course.courseCode).toBe('ELEC-A7200');

@@ -106,7 +106,7 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
     }
   });
 
-  res.status(HttpCode.ok).send({
+  res.status(HttpCode.Ok).send({
     success: true,
     data: {
       instance: parsedInstanceData
@@ -183,7 +183,7 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
     instancesData.push(instanceData);
   });
 
-  res.status(HttpCode.ok).send({
+  res.status(HttpCode.Ok).send({
     success: true,
     data: {
       courseInstances: instancesData
@@ -271,7 +271,7 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
     endDate: request.endDate
   });
 
-  res.status(HttpCode.ok).send({
+  res.status(HttpCode.Ok).send({
     success: true,
     data: {
       instance: {
