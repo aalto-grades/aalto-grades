@@ -48,15 +48,17 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  * definitions:
  *   Failure:
  *     type: object
- *     description: A reason for a failure, with a chiefly developer-facing error message
+ *     description: A reason for a failure, with a chiefly developer-facing error message.
  *     properties:
  *       success:
  *         type: boolean
- *         description: '`false` to indicate failure'
+ *         description: '`false` to indicate failure.'
  *         example: false
- *       message:
- *         type: string
- *         description: An error message to explain the error
+ *       errors:
+ *         type: array
+ *         items:
+ *           type: string
+ *         description: An error message to explain the error.
  *   Course:
  *     type: object
  *     description: Course Information
