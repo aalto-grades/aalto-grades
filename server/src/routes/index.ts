@@ -20,7 +20,7 @@ import {
 import { fetchAllCourseInstancesFromSisu, fetchCourseInstanceFromSisu } from '../controllers/sisu';
 import { getCoursesOfUser } from '../controllers/user';
 import { handleInvalidRequestJson } from '../middleware';
-import { handleErrors } from '../middleware/errorHandler';
+import { controllerDispatcher } from '../middleware/errorHandler';
 
 const options: object = {
   definition,
@@ -124,7 +124,7 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.get('/v1/user/:userId/courses', handleErrors(getCoursesOfUser));
+router.get('/v1/user/:userId/courses', controllerDispatcher(getCoursesOfUser));
 
 // Sisu API routes
 
@@ -149,7 +149,7 @@ router.get('/v1/user/:userId/courses', handleErrors(getCoursesOfUser));
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.get('/v1/sisu/courses/:courseCode', handleErrors(fetchAllCourseInstancesFromSisu));
+router.get('/v1/sisu/courses/:courseCode', controllerDispatcher(fetchAllCourseInstancesFromSisu));
 
 /**
  * @swagger
@@ -172,7 +172,10 @@ router.get('/v1/sisu/courses/:courseCode', handleErrors(fetchAllCourseInstancesF
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.get('/v1/sisu/instances/:sisuCourseInstanceId', handleErrors(fetchCourseInstanceFromSisu));
+router.get(
+  '/v1/sisu/instances/:sisuCourseInstanceId',
+  controllerDispatcher(fetchCourseInstanceFromSisu)
+);
 
 // Course and instance routes
 /**
@@ -191,7 +194,12 @@ router.get('/v1/sisu/instances/:sisuCourseInstanceId', handleErrors(fetchCourseI
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.post('/v1/courses', express.json(), handleInvalidRequestJson, handleErrors(addCourse));
+router.post(
+  '/v1/courses',
+  express.json(),
+  handleInvalidRequestJson,
+  controllerDispatcher(addCourse)
+);
 
 /**
  * @swagger
@@ -216,7 +224,11 @@ router.post('/v1/courses', express.json(), handleInvalidRequestJson, handleError
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.post('/v1/courses/:courseId/instances', express.json(), handleErrors(addCourseInstance));
+router.post(
+  '/v1/courses/:courseId/instances',
+  express.json(),
+  controllerDispatcher(addCourseInstance)
+);
 
 /**
  * @swagger
@@ -245,7 +257,7 @@ router.post('/v1/courses/:courseId/instances', express.json(), handleErrors(addC
  *                 course:
  *                   $ref: '#/definitions/Course'
  */
-router.get('/v1/courses/:courseId', handleErrors(getCourse));
+router.get('/v1/courses/:courseId', controllerDispatcher(getCourse));
 
 /**
  * @swagger
@@ -311,10 +323,10 @@ router.get('/v1/courses/:courseId', handleErrors(getCourse));
  *                 course:
  *                   $ref: '#/definitions/Instance'
  */
-router.get('/v1/instances/:instanceId', handleErrors(getCourseInstance));
+router.get('/v1/instances/:instanceId', controllerDispatcher(getCourseInstance));
 
 // TODO: Swagger documentation.
-router.get('/v1/courses/:courseId/instances', handleErrors(getAllCourseInstances));
+router.get('/v1/courses/:courseId/instances', controllerDispatcher(getAllCourseInstances));
 
 /**
  * @swagger
@@ -332,7 +344,7 @@ router.get('/v1/courses/:courseId/instances', handleErrors(getAllCourseInstances
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.post('/v1/auth/login', express.json(), handleErrors(authLogin));
+router.post('/v1/auth/login', express.json(), controllerDispatcher(authLogin));
 
 /**
  * @swagger
@@ -354,7 +366,7 @@ router.post(
   '/v1/auth/logout',
   passport.authenticate('jwt', { session: false }),
   express.json(),
-  handleErrors(authLogout)
+  controllerDispatcher(authLogout)
 );
 
 /**
@@ -380,7 +392,7 @@ router.post(
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.post('/v1/auth/signup', express.json(), handleErrors(authSignup));
+router.post('/v1/auth/signup', express.json(), controllerDispatcher(authSignup));
 
 /**
  * @swagger

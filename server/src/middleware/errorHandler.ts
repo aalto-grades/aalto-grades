@@ -9,7 +9,7 @@ import { ApiError } from '../types/error';
 import { HttpCode } from '../types/httpCode';
 import { UserExists } from '../controllers/auth';
 
-export function handleErrors<
+export function controllerDispatcher<
  T, P, ResBody, ReqBody, ReqQuery, Locals extends Record<string, T>
 >(
   fn: (
