@@ -13,7 +13,7 @@ const badId: number = 1000000;
 describe('Test GET /v1/courses/instances/:instanceId', () => {
 
   it('should respond with correct data when course instance exists', async () => {
-    const res: supertest.Response = await request.get('/v1/instances/1');
+    const res: supertest.Response = await request.get('/v1/courses/instances/1');
     expect(res.body.success).toBe(true);
     expect(res.body.data.courseInstance).toBeDefined();
     expect(res.body.errors).not.toBeDefined();
@@ -24,7 +24,7 @@ describe('Test GET /v1/courses/instances/:instanceId', () => {
     expect(res.body.data.courseInstance.maxCredits).toBeDefined();
     expect(res.body.data.courseInstance.startDate).toBeDefined();
     expect(res.body.data.courseInstance.endDate).toBeDefined();
-    expect(res.body.data.courseInstance.courseType).toBeDefined();
+    expect(res.body.data.courseInstance.teachingMethod).toBeDefined();
     expect(res.body.data.courseInstance.gradingType).toBeDefined();
     expect(res.body.data.courseInstance.responsibleTeacher).toBeDefined();
     expect(res.body.data.courseInstance.courseData.courseCode).toBeDefined();
@@ -68,7 +68,7 @@ describe('Test GET /v1/courses/:courseId/instances', () => {
     expect(res.body.data.courseInstances[0].maxCredits).toBeDefined();
     expect(res.body.data.courseInstances[0].startDate).toBeDefined();
     expect(res.body.data.courseInstances[0].endDate).toBeDefined();
-    expect(res.body.data.courseInstances[0].courseType).toBeDefined();
+    expect(res.body.data.courseInstances[0].teachingMethod).toBeDefined();
     expect(res.body.data.courseInstances[0].gradingType).toBeDefined();
     expect(res.body.data.courseInstances[0].responsibleTeacher).toBeDefined();
   });
@@ -277,6 +277,6 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     expect(res.body.success).toBe(false);
     expect(res.body.data).not.toBeDefined();
     expect(res.body.errors).toBeDefined();
-    expect(res.statusCode).toBe(HttpCode.NotFound);
+    expect(res.statusCode).toBe(HttpCode.UnprocessableEntity);
   });
 });
