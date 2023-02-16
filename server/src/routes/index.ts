@@ -14,10 +14,10 @@ import { definition } from '../configs/swagger';
 import { router as authRouter } from './auth';
 import { addCourse, getCourse } from '../controllers/course';
 import { fetchAllCourseInstancesFromSisu, fetchCourseInstanceFromSisu } from '../controllers/sisu';
-import { getCoursesOfUser } from '../controllers/user';
 import { router as courseInstanceRouter } from './courseInstance';
 import { handleInvalidRequestJson } from '../middleware';
 import { controllerDispatcher } from '../middleware/errorHandler';
+import { router as userRouter } from './user';
 
 const options: OAS3Options = {
   definition,
@@ -31,6 +31,7 @@ export const router: Router = Router();
 router.use(cookieParser());
 router.use(authRouter);
 router.use(courseInstanceRouter);
+router.use(userRouter);
 
 router.use('/api-docs', swaggerUI.serve);
 router.get('/api-docs', swaggerUI.setup(openapiSpecification));
@@ -99,51 +100,7 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *             type: string
  *           en:
  *             type: string
- *
- *   UserCourses:
- *     type: object
- *     properties:
- *       success:
- *         type: boolean
- *         description: Success of the request
- *       courses:
- *         type: object
- *         description: Object with current and past courses
- *         properties:
- *           current:
- *             type: array
- *             description: Current Courses
- *             items:
- *               $ref: '#/definitions/CourseData'
- *           previous:
- *             type: array
- *             description: Previous Courses
- *             items:
- *               $ref: '#/definitions/CourseData'
  */
-
-/**
- * @swagger
- * /v1/user/{userId}/courses:
- *   get:
- *     tags: [Course]
- *     description: Fetch Courses of a user
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: True
- *         schema:
- *           type: integer
- *         description: The ID of the user fetching courses
- *     responses:
- *       200:
- *         description: User's Courses
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/UserCourses'
- */
-router.get('/v1/user/:userId/courses', controllerDispatcher(getCoursesOfUser));
 
 // Sisu API routes
 
