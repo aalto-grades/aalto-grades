@@ -97,7 +97,7 @@ export const router: Router = Router();
  * @swagger
  * /v1/auth/login:
  *   post:
- *     tags: [Session]
+ *     tags: [Auth]
  *     description: Log in as a user.
  *     requestBody:
  *       description: The credentials for the user, currently consisting of the email and password.
@@ -133,7 +133,7 @@ router.post('/v1/auth/login', express.json(), authLogin);
  * @swagger
  * /v1/auth/logout:
  *   post:
- *     tags: [Session]
+ *     tags: [Auth]
  *     description: >
  *       Log out of a session, requesting the browser to remove
  *       its session JWT token.
@@ -174,7 +174,7 @@ router.post(
  * @swagger
  * /v1/auth/signup:
  *   post:
- *     tags: [Session]
+ *     tags: [Auth]
  *     description: >
  *       Attempts to create a new user with the specified information, for
  *       logging in to the system.
@@ -210,7 +210,7 @@ router.post('/v1/auth/signup', express.json(), authSignup);
  * @swagger
  * /v1/auth/self-info:
  *   get:
- *     tags: [Session]
+ *     tags: [Auth]
  *     description: >
  *       Retrieves information about the user that is currently logged in.
  *     responses:
