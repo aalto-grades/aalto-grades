@@ -99,7 +99,7 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
     });
 
     const latestEndDate: Date =
-        new Date(String(course.CourseInstances[course.CourseInstances.length - 1].endDate));
+      new Date(String(course.CourseInstances[course.CourseInstances.length - 1].endDate));
 
     if (currentDate <= latestEndDate) {
       coursesOfUser.current.push(courseData);
