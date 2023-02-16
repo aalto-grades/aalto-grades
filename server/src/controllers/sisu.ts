@@ -110,5 +110,4 @@ export async function fetchCourseInstanceFromSisu(req: Request, res: Response): 
       courseInstance: instance
     }
   });
-  return;
 }

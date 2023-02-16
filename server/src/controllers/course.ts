@@ -102,7 +102,6 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
       course: courseData
     }
   });
-  return;
 }
 
 export async function getCourse(req: Request, res: Response): Promise<void> {
@@ -164,5 +163,4 @@ export async function getCourse(req: Request, res: Response): Promise<void> {
       course: courseData
     }
   });
-  return;
 }

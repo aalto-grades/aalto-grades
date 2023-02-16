@@ -112,7 +112,6 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
       instance: parsedInstanceData
     }
   });
-  return;
 }
 
 export interface CourseInstanceWithTeachers extends CourseInstance {
@@ -189,7 +188,6 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
       courseInstances: instancesData
     }
   });
-  return;
 }
 
 interface CourseInstanceAddRequest {
@@ -279,5 +277,4 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
       }
     }
   });
-  return;
 }
