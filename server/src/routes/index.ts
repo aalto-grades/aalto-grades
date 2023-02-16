@@ -20,6 +20,7 @@ import {
 import { fetchAllCourseInstancesFromSisu, fetchCourseInstanceFromSisu } from '../controllers/sisu';
 import { getCoursesOfUser } from '../controllers/user';
 import { handleInvalidRequestJson } from '../middleware';
+import { handleErrors } from '../middleware/handleErrors';
 
 const options: object = {
   definition,
@@ -34,18 +35,6 @@ router.use(cookieParser());
 
 router.use('/api-docs', swaggerUI.serve);
 router.get('/api-docs', swaggerUI.setup(openapiSpecification));
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function handleErrors(fn: any): any {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      await fn(req, res, next);
-      return;
-    } catch (err: unknown) {
-      next(err);
-    }
-  };
-}
 
 // User routes
 
