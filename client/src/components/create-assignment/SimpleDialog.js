@@ -48,7 +48,7 @@ function SimpleDialog({ onClose, open, addSubAssignments, indices, assignments }
           label={numberData.fieldLabel}
           InputLabelProps={{ shrink: true }}
           margin='normal'
-          inputProps={{ inputMode: 'numeric', pattern: '[1-9]+' }}
+          inputProps={{ min: 1, maxLength: 2, inputMode: 'numeric', pattern: '[0-9]*' }}
           value={numOfAssignments}
           error={error}
           helperText={error ? 'Value needs to be a positive integer' : ''}
@@ -59,7 +59,9 @@ function SimpleDialog({ onClose, open, addSubAssignments, indices, assignments }
           <Button size='medium' sx={{ mr: 1 }} onClick={onClose}>
             Cancel
           </Button>
-          <Button size='medium' variant='outlined' type='submit' onClick={onClose}>
+          <Button size='medium' variant='outlined' type='submit' onClick={() => {
+            if (!error) onClose;
+          }}>
             Confirm
           </Button>
         </Box>
