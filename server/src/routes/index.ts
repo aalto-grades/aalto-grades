@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import express, { NextFunction, Router } from 'express';
+import express, { Router } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import passport from 'passport';
