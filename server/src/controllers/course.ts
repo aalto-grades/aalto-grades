@@ -26,34 +26,37 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
   });
 
   await requestSchema.validate(req.body, { abortEarly: false });
-  const t: Transaction = await sequelize.transaction();
 
-  const course: Course = await Course.create({
-    courseCode: req.body.courseCode
-  }, { transaction: t });
+  const [course, translations]: [Course, Array<CourseTranslation>] = await sequelize.transaction(
+    async (t: Transaction): Promise<[Course, Array<CourseTranslation>]> => {
 
-  const courseTranslations: Array<CourseTranslation> = await CourseTranslation.bulkCreate([
-    {
-      courseId: course.id,
-      language: Language.Finnish,
-      department: req.body.department.fi ?? '',
-      courseName: req.body.name.fi ?? ''
-    },
-    {
-      courseId: course.id,
-      language: Language.English,
-      department: req.body.department.en ?? '',
-      courseName: req.body.name.en ?? ''
-    },
-    {
-      courseId: course.id,
-      language: Language.Swedish,
-      department: req.body.department.sv ?? '',
-      courseName: req.body.name.sv ?? ''
-    }
-  ], { transaction: t });
+      const course: Course = await Course.create({
+        courseCode: req.body.courseCode
+      }, { transaction: t });
 
-  await t.commit();
+      const translations: Array<CourseTranslation> = await CourseTranslation.bulkCreate([
+        {
+          courseId: course.id,
+          language: Language.Finnish,
+          department: req.body.department.fi ?? '',
+          courseName: req.body.name.fi ?? ''
+        },
+        {
+          courseId: course.id,
+          language: Language.English,
+          department: req.body.department.en ?? '',
+          courseName: req.body.name.en ?? ''
+        },
+        {
+          courseId: course.id,
+          language: Language.Swedish,
+          department: req.body.department.sv ?? '',
+          courseName: req.body.name.sv ?? ''
+        }
+      ], { transaction: t });
+
+      return [course, translations];
+    });
 
   const courseData: CourseData = {
     id: course.id,
@@ -75,7 +78,7 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
     }
   };
 
-  for (const translation of courseTranslations) {
+  for (const translation of translations) {
     switch (translation.language) {
 
     case Language.English:
