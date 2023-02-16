@@ -8,7 +8,7 @@ import { Request, Response } from 'express';
 import { AXIOS_TIMEOUT } from '../configs/constants';
 import { SISU_API_KEY, SISU_API_URL } from '../configs/environment';
 
-import { ApiError } from '../middleware/errorHandler';
+import { ApiError } from '../types/error';
 import { CourseInstanceData, GradingType, TeachingMethod } from '../types/course';
 import { HttpCode } from '../types/httpCode';
 import { SisuCourseInstance } from '../types/sisu';

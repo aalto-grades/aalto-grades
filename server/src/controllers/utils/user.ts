@@ -4,7 +4,7 @@
 
 import User from '../../database/models/user';
 
-import { ApiError } from '../../middleware/errorHandler';
+import { ApiError } from '../../types/error';
 import { HttpCode } from '../../types/httpCode';
 
 /**

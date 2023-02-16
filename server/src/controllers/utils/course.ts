@@ -4,7 +4,7 @@
 
 import Course from '../../database/models/course';
 
-import { ApiError } from '../../middleware/errorHandler';
+import { ApiError } from '../../types/error';
 import { HttpCode } from '../../types/httpCode';
 
 /**

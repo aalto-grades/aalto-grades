@@ -11,7 +11,7 @@ import models from '../database/models';
 import Course from '../database/models/course';
 import CourseTranslation from '../database/models/courseTranslation';
 
-import { ApiError } from '../middleware/errorHandler';
+import { ApiError } from '../types/error';
 import { CourseData } from '../types/course';
 import { HttpCode } from '../types/httpCode';
 import { idSchema } from '../types/general';

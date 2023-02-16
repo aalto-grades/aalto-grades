@@ -5,18 +5,9 @@
 import { NextFunction, Request, Response } from 'express';
 import { ValidationError } from 'yup';
 
+import { ApiError } from '../types/error';
 import { HttpCode } from '../types/httpCode';
 import { UserExists } from '../controllers/auth';
-
-export class ApiError extends Error {
-  public readonly statusCode: number;
-
-  constructor(message: string, statusCode: HttpCode) {
-    super(message);
-    this.statusCode = statusCode;
-    this.name = 'ApiError';
-  }
-}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function errorHandler(err: unknown, req: Request, res: Response, next: NextFunction): void {

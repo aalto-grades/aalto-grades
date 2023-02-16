@@ -11,7 +11,7 @@ import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
-import { ApiError } from '../middleware/errorHandler';
+import { ApiError } from '../types/error';
 import { CourseInstanceData, GradingType, Period, TeachingMethod } from '../types/course';
 import { HttpCode } from '../types/httpCode';
 import { idSchema } from '../types/general';
