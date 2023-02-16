@@ -16,24 +16,24 @@ export const router: Router = Router();
  *     type: string
  *     description: >
  *       The role of the user in our system (`UserRole`):
- *       `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`
+ *       `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`.
  *   Credentials:
  *     type: object
  *     properties:
  *       email:
  *         type: string
- *         description: Email address, functioning as a username
+ *         description: Email address, functioning as a username.
  *         required: true
  *       password:
  *         type: string
- *         description: Plaintext password of the user
+ *         description: Plaintext password of the user.
  *         required: true
  *   LoginResult:
  *     type: object
  *     properties:
  *       success:
  *         type: boolean
- *         description: Success of the request
+ *         description: Success of the request.
  *       data:
  *         type: object
  *         properties:
@@ -44,11 +44,11 @@ export const router: Router = Router();
  *     properties:
  *       email:
  *         type: string
- *         description: Email address, to be used as a credential
+ *         description: Email address, to be used as a credential.
  *         required: true
  *       password:
  *         type: string
- *         description: Plaintext password
+ *         description: Plaintext password.
  *         required: true
  *       studentID:
  *         type: string
@@ -56,7 +56,7 @@ export const router: Router = Router();
  *         required: false
  *       name:
  *         type: string
- *         description: A personal name of the user (not a credential)
+ *         description: A personal name of the user (not a credential).
  *         required: true
  *       role:
  *         $ref: '#/definitions/UserRole'
@@ -66,7 +66,7 @@ export const router: Router = Router();
  *     properties:
  *       success:
  *         type: boolean
- *         description: Success of the request
+ *         description: Success of the request.
  *       data:
  *         type: object
  *         properties:
@@ -75,13 +75,13 @@ export const router: Router = Router();
  *           id:
  *             type: number
  *             description: >
- *               The database identifier of the user
+ *               The database identifier of the user.
  *   AuthSelfInfo:
  *     type: object
  *     properties:
  *       success:
  *         type: boolean
- *         description: Success of the request
+ *         description: Success of the request.
  *       data:
  *         type: object
  *         properties:
@@ -90,8 +90,8 @@ export const router: Router = Router();
  *           id:
  *             type: number
  *             description: >
- *               The database identifier of the user
-*/
+ *               The database identifier of the user.
+ */
 
 /**
  * @swagger
