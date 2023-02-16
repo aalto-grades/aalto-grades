@@ -5,14 +5,13 @@
 import express, { Router } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import passport from 'passport';
 import swaggerJsdoc, { OAS3Options } from 'swagger-jsdoc';
 import swaggerUI from 'swagger-ui-express';
 
 import { FRONTEND_ORIGIN } from '../configs/environment';
 import { definition } from '../configs/swagger';
 
-import { authLogin, authLogout, authSelfInfo, authSignup } from '../controllers/auth';
+import { router as authRouter } from './auth';
 import { addCourse, getCourse } from '../controllers/course';
 import {
   addCourseInstance, getAllCourseInstances, getCourseInstance
@@ -32,6 +31,7 @@ const openapiSpecification: OAS3Options = swaggerJsdoc(options);
 export const router: Router = Router();
 
 router.use(cookieParser());
+router.use(authRouter);
 
 router.use('/api-docs', swaggerUI.serve);
 router.get('/api-docs', swaggerUI.setup(openapiSpecification));
@@ -40,7 +40,26 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
 
 /**
  * @swagger
+ * components:
+ *   securitySchemes:
+ *     jwtCookie:
+ *       type: apiKey
+ *       in: cookie
+ *       name: jwt
  * definitions:
+ *   Failure:
+ *     type: object
+ *     description: A reason for a failure, with a chiefly developer-facing error message.
+ *     properties:
+ *       success:
+ *         type: boolean
+ *         description: '`false` to indicate failure.'
+ *         example: false
+ *       errors:
+ *         type: array
+ *         items:
+ *           type: string
+ *         description: An error message to explain the error.
  *   Course:
  *     type: object
  *     description: Course Information
@@ -103,6 +122,7 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *             items:
  *               $ref: '#/definitions/Course'
  */
+
 /**
  * @swagger
  * /v1/user/{userId}/courses:
@@ -327,93 +347,6 @@ router.get('/v1/instances/:instanceId', controllerDispatcher(getCourseInstance))
 
 // TODO: Swagger documentation.
 router.get('/v1/courses/:courseId/instances', controllerDispatcher(getAllCourseInstances));
-
-/**
- * @swagger
- * /v1/auth/login:
- *   post:
- *     tags: [Session]
- *     description: Login with User
- *     requestBody:
- *       description: Description of login POST body
- *     responses:
- *       200:
- *         description: User's Courses
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/UserCourses'
- */
-router.post('/v1/auth/login', express.json(), controllerDispatcher(authLogin));
-
-/**
- * @swagger
- * /v1/auth/logout:
- *   post:
- *     tags: [Session]
- *     description: Logout of user
- *     requestBody:
- *       description: Description of logout POST body
- *     responses:
- *       200:
- *         description: User's Courses
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/UserCourses'
- */
-router.post(
-  '/v1/auth/logout',
-  passport.authenticate('jwt', { session: false }),
-  express.json(),
-  controllerDispatcher(authLogout)
-);
-
-/**
- * @swagger
- * /v1/auth/signup:
- *   post:
- *     tags: [Session]
- *     description: Sign Up user
- *     requestBody:
- *       description: Description of signup POST body
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: True
- *         schema:
- *           type: integer
- *         description: The ID of the user fetching courses
- *     responses:
- *       200:
- *         description: User's Courses
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/UserCourses'
- */
-router.post('/v1/auth/signup', express.json(), controllerDispatcher(authSignup));
-
-/**
- * @swagger
- * /v1/auth/self-info:
- *   get:
- *     tags: [Session]
- *     description: Fetch Courses of a user
- *     responses:
- *       200:
- *         description: User's Courses
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/UserCourses'
- */
-router.get(
-  '/v1/auth/self-info',
-  passport.authenticate('jwt', { session: false }),
-  express.json(),
-  authSelfInfo
-);
 
 router.use(cors({
   origin: FRONTEND_ORIGIN,
