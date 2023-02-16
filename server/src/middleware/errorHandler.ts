@@ -25,7 +25,8 @@ export function handleErrors<
     next: NextFunction
   ): Promise<void> => {
     try {
-      return await fn(req, res, next);
+      await fn(req, res, next);
+      return;
     } catch (err: unknown) {
       next(err);
     }
