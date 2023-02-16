@@ -66,7 +66,8 @@ export async function fetchAllCourseInstancesFromSisu(req: Request, res: Respons
 
   if (courseInstancesFromSisu.data?.error) {
     throw new ApiError(
-      `external API error: ${courseInstancesFromSisu.data.error.code}`, HttpCode.BadGateway);
+      `external API error: ${courseInstancesFromSisu.data.error.code}`, HttpCode.BadGateway
+    );
   }
 
   const parsedInstances: Array<CourseInstanceData> = courseInstancesFromSisu.data.map(
@@ -97,7 +98,8 @@ export async function fetchCourseInstanceFromSisu(req: Request, res: Response): 
 
   if (courseInstanceFromSisu.data?.error) {
     throw new ApiError(
-      `external API error: ${courseInstanceFromSisu.data.error.code}`, HttpCode.BadGateway);
+      `external API error: ${courseInstanceFromSisu.data.error.code}`, HttpCode.BadGateway
+    );
   }
 
   const instance: CourseInstanceData = parseSisuCourseInstance(courseInstanceFromSisu.data);
