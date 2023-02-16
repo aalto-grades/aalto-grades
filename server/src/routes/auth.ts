@@ -6,6 +6,7 @@ import express, { Router } from 'express';
 import passport from 'passport';
 
 import { authLogin, authLogout, authSelfInfo, authSignup } from '../controllers/auth';
+import { controllerDispatcher } from '../middleware/errorHandler';
 
 export const router: Router = Router();
 
@@ -127,7 +128,7 @@ export const router: Router = Router();
  *               $ref: '#/definitions/Failure'
  *
  */
-router.post('/v1/auth/login', express.json(), authLogin);
+router.post('/v1/auth/login', express.json(), controllerDispatcher(authLogin));
 
 /**
  * @swagger
@@ -167,7 +168,7 @@ router.post(
   '/v1/auth/logout',
   passport.authenticate('jwt', { session: false }),
   express.json(),
-  authLogout
+  controllerDispatcher(authLogout)
 );
 
 /**
@@ -204,7 +205,7 @@ router.post(
  *             schema:
  *               $ref: '#/definitions/Failure'
  */
-router.post('/v1/auth/signup', express.json(), authSignup);
+router.post('/v1/auth/signup', express.json(), controllerDispatcher(authSignup));
 
 /**
  * @swagger

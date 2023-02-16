@@ -11,6 +11,7 @@ import swaggerUI from 'swagger-ui-express';
 import { FRONTEND_ORIGIN } from '../configs/environment';
 import { definition } from '../configs/swagger';
 
+import { router as authRouter } from './auth';
 import { addCourse, getCourse } from '../controllers/course';
 import {
   addCourseInstance, getAllCourseInstances, getCourseInstance
@@ -18,7 +19,7 @@ import {
 import { fetchAllCourseInstancesFromSisu, fetchCourseInstanceFromSisu } from '../controllers/sisu';
 import { getCoursesOfUser } from '../controllers/user';
 import { handleInvalidRequestJson } from '../middleware';
-import { router as authRouter } from './auth';
+import { controllerDispatcher } from '../middleware/errorHandler';
 
 const options: object = {
   definition,
@@ -143,7 +144,7 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.get('/v1/user/:userId/courses', getCoursesOfUser);
+router.get('/v1/user/:userId/courses', controllerDispatcher(getCoursesOfUser));
 
 // Sisu API routes
 
@@ -168,7 +169,7 @@ router.get('/v1/user/:userId/courses', getCoursesOfUser);
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.get('/v1/sisu/courses/:courseCode', fetchAllCourseInstancesFromSisu);
+router.get('/v1/sisu/courses/:courseCode', controllerDispatcher(fetchAllCourseInstancesFromSisu));
 
 /**
  * @swagger
@@ -191,7 +192,10 @@ router.get('/v1/sisu/courses/:courseCode', fetchAllCourseInstancesFromSisu);
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.get('/v1/sisu/instances/:sisuCourseInstanceId', fetchCourseInstanceFromSisu);
+router.get(
+  '/v1/sisu/instances/:sisuCourseInstanceId',
+  controllerDispatcher(fetchCourseInstanceFromSisu)
+);
 
 // Course and instance routes
 /**
@@ -210,7 +214,12 @@ router.get('/v1/sisu/instances/:sisuCourseInstanceId', fetchCourseInstanceFromSi
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.post('/v1/courses', express.json(), handleInvalidRequestJson, addCourse);
+router.post(
+  '/v1/courses',
+  express.json(),
+  handleInvalidRequestJson,
+  controllerDispatcher(addCourse)
+);
 
 /**
  * @swagger
@@ -235,7 +244,11 @@ router.post('/v1/courses', express.json(), handleInvalidRequestJson, addCourse);
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.post('/v1/courses/:courseId/instances', express.json(), addCourseInstance);
+router.post(
+  '/v1/courses/:courseId/instances',
+  express.json(),
+  controllerDispatcher(addCourseInstance)
+);
 
 /**
  * @swagger
@@ -264,7 +277,7 @@ router.post('/v1/courses/:courseId/instances', express.json(), addCourseInstance
  *                 course:
  *                   $ref: '#/definitions/Course'
  */
-router.get('/v1/courses/:courseId', getCourse);
+router.get('/v1/courses/:courseId', controllerDispatcher(getCourse));
 
 /**
  * @swagger
@@ -330,10 +343,10 @@ router.get('/v1/courses/:courseId', getCourse);
  *                 course:
  *                   $ref: '#/definitions/Instance'
  */
-router.get('/v1/instances/:instanceId', getCourseInstance);
+router.get('/v1/instances/:instanceId', controllerDispatcher(getCourseInstance));
 
 // TODO: Swagger documentation.
-router.get('/v1/courses/:courseId/instances', getAllCourseInstances);
+router.get('/v1/courses/:courseId/instances', controllerDispatcher(getAllCourseInstances));
 
 router.use(cors({
   origin: FRONTEND_ORIGIN,
