@@ -11,7 +11,7 @@ import { HttpCode } from '../../types/httpCode';
  * Finds a user by its ID.
  * @param {number} userId - The ID of the user to be found.
  * @returns {Promise<User>} - A promise that resolves with the found user model object.
- * @throws {Error} - If the user is not found, it throws an error with a message
+ * @throws {ApiError} - If the user is not found, it throws an error with a message
  * indicating the missing user with the specific ID.
  */
 export async function findUserById(userId: number): Promise<User> {
