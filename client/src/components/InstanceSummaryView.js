@@ -20,11 +20,16 @@ const InstanceSummaryView = () => {
     startDate, 
     endDate, 
     courseType, 
-    minCredits, 
-    maxCredits, 
+    stringMinCredits, 
+    stringMaxCredits, 
     gradingScale, 
     teachers 
   } = useOutletContext();
+
+  const onCreateInstance = () => {
+    // TODO: actually create the instance
+    navigate('/course-view/' + 'testi');
+  };
 
   return(
     <Box sx={{ display: 'grid', gap: 1.5, ml: '7.5vw', mr: '7.5vw' }}>
@@ -32,10 +37,10 @@ const InstanceSummaryView = () => {
       <Typography align='left' sx={{ ml: 1.5 }} >Basic Information</Typography>
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', display: 'inline-block' }}>
         <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-          <LightLabelBoldValue label='Starting Date' value={textFormatServices.formatDateToString(startDate)} />
-          <LightLabelBoldValue label='Min Credits' value={minCredits} />
-          <LightLabelBoldValue label='Ending Date' value={textFormatServices.formatDateToString(endDate)} />
-          <LightLabelBoldValue label='Max Credits' value={maxCredits} />
+          <LightLabelBoldValue label='Starting Date' value={textFormatServices.formatDateString(startDate)} />
+          <LightLabelBoldValue label='Min Credits' value={stringMinCredits} />
+          <LightLabelBoldValue label='Ending Date' value={textFormatServices.formatDateString(endDate)} />
+          <LightLabelBoldValue label='Max Credits' value={stringMaxCredits} />
           <LightLabelBoldValue label='Type' value={courseType} />
           <LightLabelBoldValue label='Grading Scale' value={gradingScale} />
         </Box>
@@ -48,14 +53,14 @@ const InstanceSummaryView = () => {
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', display: 'inline-block' }}>
         {addedAssignments.length !== 0 &&
           <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch', pb: '8px' }}>
-            {addedAssignments.map(assignment => <Assignment key={assignment[0].type} assignment={assignment} button={<Button>Edit</Button>} />)}
+            {addedAssignments.map(assignment => <Assignment key={assignment.category} assignment={assignment} />)}
           </Box>
         }
         <Typography variant='body2' color='primary.main' sx={{ m: '8px 0px' }} >You can also add assignments after creating the instance</Typography>
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 6 }}>
         <Button variant='outlined' onClick={() => { navigate('/add-assignments/' + instanceId); }}>Go back</Button>
-        <Button variant='contained'>Create instance</Button>
+        <Button variant='contained' onClick={() => onCreateInstance()}>Create instance</Button>
       </Box>
     </Box>
   );

@@ -20,7 +20,7 @@ const Assignments = ({ assignments, formula }) => {
         <Button>Edit formula</Button>
       </Box>
       <Box sx={{ display: 'inline-grid', gap: 1 }}>
-        {assignments.map(assignment => <Assignment key={assignment[0].type} assignment={assignment} button={<Button>Edit</Button>} width={'50vw'} />)}
+        {assignments.map(assignment => <Assignment key={assignment.category} assignment={assignment} button={<Button>Edit</Button>} width={'50vw'} />)}
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
         <Button>Add assignment</Button>

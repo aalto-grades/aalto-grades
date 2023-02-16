@@ -106,8 +106,9 @@ function App() {
             { /* Pages that are authorised for admin and teachers */ }
             <Route element={<PrivateRoute roles={[roles.admin, roles.teacher]}/>}>
               <Route path='/fetch-instances/:courseId' element={<FetchInstancesView/>}/>
-              <Route path='/edit-instance/:instanceId' element={<EditInstanceView/>}/>
+              { /* Pages under this route share instance creation context */ }
               <Route element={<InstanceCreationRoute/>}>
+                <Route path='/edit-instance/:instanceId' element={<EditInstanceView/>}/>
                 <Route path='/add-assignments/:instanceId' element={<AddAssignmentsView/>}/>
                 <Route path='/instance-summary/:instanceId' element={<InstanceSummaryView/>}/>
               </Route>

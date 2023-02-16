@@ -5,18 +5,20 @@
 import { useState, useMemo } from 'react';
 import { Outlet } from 'react-router-dom';
 
-const dummyTeachers = ['Elisa Mekler (you)', 'David McGookin'];
-const dummyInfo = { startDate: new Date(2021, 8, 14), endDate: new Date(2021, 11, 13), type: 'Lecture', minCredits: 5, maxCredits: 5, scale: 'General scale, 0-5', teachers: dummyTeachers };
+//const dummyTeachers = ['Elisa Mekler (you)', 'David McGookin'];
+//const dummyInfo = { startDate: new Date(2021, 8, 14), endDate: new Date(2021, 11, 13), type: 'Lecture', minCredits: 5, maxCredits: 5, scale: 'General scale, 0-5', teachers: dummyTeachers };
+
+// TODO ON INSTANCE CREATION END: EMPTY THIS CONTEXT!
 
 export const InstanceCreationRoute = () => {
-  const [addedAssignments, setAddedAssignments]   = useState([]);
-  const [courseType, setType]           = useState(dummyInfo.type);
-  const [startDate, setStartDate]       = useState(dummyInfo.startDate);
-  const [endDate, setEndDate]           = useState(dummyInfo.endDate);
-  const [teachers, setTeachers]         = useState(dummyInfo.teachers);
-  const [minCredits, setMinCredits]     = useState(dummyInfo.minCredits);
-  const [maxCredits, setMaxCredits]     = useState(dummyInfo.maxCredits);
-  const [gradingScale, setGradingScale] = useState(dummyInfo.scale);
+  const [addedAssignments, setAddedAssignments] = useState([]);
+  const [courseType, setType]                   = useState('');
+  const [startDate, setStartDate]               = useState('');
+  const [endDate, setEndDate]                   = useState('');
+  const [teachers, setTeachers]                 = useState([]);
+  const [stringMinCredits, setMinCredits]       = useState('');
+  const [stringMaxCredits, setMaxCredits]       = useState('');
+  const [gradingScale, setGradingScale]         = useState('');
 
   const value = useMemo(() => (
     { addedAssignments, setAddedAssignments,
@@ -24,11 +26,11 @@ export const InstanceCreationRoute = () => {
       startDate, setStartDate,
       endDate, setEndDate,
       teachers, setTeachers,
-      minCredits, setMinCredits,
-      maxCredits, setMaxCredits,
+      stringMinCredits, setMinCredits,
+      stringMaxCredits, setMaxCredits,
       gradingScale, setGradingScale,
     }
-  ), [courseType, startDate, endDate, teachers, minCredits, maxCredits, gradingScale, addedAssignments]);
+  ), [courseType, startDate, endDate, teachers, stringMinCredits, stringMaxCredits, gradingScale, addedAssignments]);
 
   return <Outlet context={value} />;
 };

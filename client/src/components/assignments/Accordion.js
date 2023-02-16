@@ -121,12 +121,12 @@ const CustomAccordion = ({ assignments }) => {
               id={assignment.id + '-header'} 
               expanded={expanded.has(assignment.id).toString()} 
               nowselected={(selected === assignment.id).toString()}>
-              <AssignmentText name={assignment.name} points={assignment.points} />
+              <AssignmentText name={assignment.description} points={assignment.points} />
             </AccordionSummary>
             {assignment.subAssignments.map(subAssignment => {
               return (
                 subAssignment.subAssignments === undefined
-                  ? <AccordionDetails key={subAssignment.id + 'details'}><AssignmentText name={subAssignment.name} points={subAssignment.points} /></AccordionDetails>
+                  ? <AccordionDetails key={subAssignment.id + 'details'}><AssignmentText name={subAssignment.description} points={subAssignment.points} /></AccordionDetails>
                   : <Box key={subAssignment.id + 'subAccordion'} sx={{ pl: '39px' }}>{<CustomAccordion assignments={[subAssignment]} />}</Box> /*is this correct assignments here*/
               );
             })}
@@ -138,8 +138,7 @@ const CustomAccordion = ({ assignments }) => {
 };
 
 CustomAccordion.propTypes = {
-  assignments: PropTypes.array,
-  subBranch: PropTypes.element
+  assignments: PropTypes.array
 };
 
 export default CustomAccordion;

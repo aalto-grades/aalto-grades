@@ -7,21 +7,23 @@ import { AccordionDetails, AssignmentText } from './Accordion';
 import textFormatServices from '../../services/textFormat';
 
 const Assignment = ({ assignment, button, width }) => {
-  const { type, name, points, expiryDate, subAssignments } = assignment[0]; //must be at least one
+  const { category, totalPoints, assignments } = assignment;
+  console.log(assignments);
+  const { description, points, expiryDate, subAssignments } = assignments[0]; //must be at least one
 
   return (
     <Box boxShadow={3} borderRadius={1} sx={{ pt: 2, pb: 0.5, bgcolor: 'white', width: width }}>
       <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pr: '21px', pb: '16px', pl: '21px' }}>
-        <Typography sx={{ fontWeight: 'bold' }} align='left'>{type}</Typography>
-        <Typography align='left' variant='body2'>{'Total points: ' + points}</Typography>
+        <Typography sx={{ fontWeight: 'bold' }} align='left'>{category}</Typography>
+        <Typography align='left' variant='body2'>{'Total points: ' + totalPoints}</Typography>
       </Box>
       { subAssignments 
-        ? <CustomAccordion assignments={assignment} />
-        : <AccordionDetails out={true}><AssignmentText name={name} points={points} /></AccordionDetails>
+        ? <CustomAccordion assignments={assignments} />
+        : <AccordionDetails out={true}><AssignmentText name={description} points={points} /></AccordionDetails>
       }
       <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pl: '21px', pr: '6px', pt: '8px' }}>
         <Typography align='left' variant='caption'>{'Expiry date: ' + textFormatServices.formatDateToString(expiryDate)}</Typography>
-        {button}
+        {button ?? <Box height='30.5px'></Box>}
       </Box>
     </Box>
   );
@@ -29,11 +31,12 @@ const Assignment = ({ assignment, button, width }) => {
 
 Assignment.propTypes = {
   subAssignments: PropTypes.array,
-  assignment: PropTypes.array,
-  type: PropTypes.string,
-  name: PropTypes.string, 
+  assignments: PropTypes.array,
+  category: PropTypes.string,
+  totalPoints: PropTypes.number,
+  assignment: PropTypes.object,
+  description: PropTypes.string, 
   points: PropTypes.number, 
-  weight: PropTypes.number,
   button: PropTypes.element,
   width: PropTypes.string
 };
