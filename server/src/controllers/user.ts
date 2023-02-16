@@ -30,6 +30,12 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
   const teacherId: number = Number(req.params.userId);
   await idSchema.validate({ id: teacherId });
 
+  /*
+   * TODO: Check that the requester is logged in, 401 Unauthorized if not
+   * TODO: Check that the requester is authorized to add a course instance, 403
+   * Forbidden if not
+   */
+
   // Confirm that teacher exists
   await findUserById(teacherId);
 
