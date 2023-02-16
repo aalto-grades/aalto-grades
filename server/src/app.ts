@@ -8,6 +8,7 @@ import express, { Application } from 'express';
 import { FRONTEND_ORIGIN } from './configs/environment';
 
 import { router } from './routes/index';
+import { errorHandler } from './middleware/errorHandler';
 
 export const app: Application = express();
 
@@ -17,3 +18,4 @@ app.use(cors({
 }));
 
 app.use('/', router);
+app.use(errorHandler);

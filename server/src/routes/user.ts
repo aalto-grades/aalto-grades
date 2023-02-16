@@ -5,6 +5,7 @@
 import { Router } from 'express';
 
 import { getCoursesOfUser } from '../controllers/user';
+import { controllerDispatcher } from '../middleware/errorHandler';
 
 export const router: Router = Router();
 
@@ -87,4 +88,7 @@ export const router: Router = Router();
  *             schema:
  *               $ref: '#/definitions/Failure'
  */
-router.get('/v1/user/:userId/courses', getCoursesOfUser);
+router.get(
+  '/v1/user/:userId/courses',
+  controllerDispatcher(getCoursesOfUser)
+);
