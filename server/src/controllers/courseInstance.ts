@@ -11,10 +11,13 @@ import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
+import { ApiError } from '../types/error';
 import { CourseInstanceData, GradingType, Period, TeachingMethod } from '../types/course';
+import { HttpCode } from '../types/httpCode';
 import { idSchema } from '../types/general';
 import { Language } from '../types/language';
 import { CourseWithTranslation } from '../types/model';
+import { findCourseById } from './utils/course';
 import { findUserById } from './utils/user';
 
 interface CourseInstanceWithCourseAndTranslation extends CourseInstance {
@@ -22,11 +25,10 @@ interface CourseInstanceWithCourseAndTranslation extends CourseInstance {
 }
 
 export async function getCourseInstance(req: Request, res: Response): Promise<void> {
-  try {
-    const instanceId: number = Number(req.params.instanceId);
-    await idSchema.validate({ id: instanceId });
+  const instanceId: number = Number(req.params.instanceId);
+  await idSchema.validate({ id: instanceId });
 
-    const instance: CourseInstanceWithCourseAndTranslation | null =
+  const instance: CourseInstanceWithCourseAndTranslation | null =
       await models.CourseInstance.findByPk(
         instanceId,
         {
@@ -48,27 +50,105 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
         }
       ) as CourseInstanceWithCourseAndTranslation;
 
-    if (!instance) {
-      throw new Error(`course instance with an id ${instanceId} not found`);
+  if (!instance) {
+    throw new ApiError(`course instance with ID ${instanceId} not found`, HttpCode.NotFound);
+  }
+
+  const responsibleTeacher: User = await findUserById(instance.responsibleTeacher);
+
+  const parsedInstanceData: CourseInstanceData = {
+    id: instance.id,
+    sisuCourseInstanceId: instance.sisuCourseInstanceId,
+    startingPeriod: instance.startingPeriod as Period,
+    endingPeriod: instance.endingPeriod as Period,
+    minCredits: instance.minCredits,
+    maxCredits: instance.maxCredits,
+    startDate: instance.startDate,
+    endDate: instance.endDate,
+    teachingMethod: instance.teachingMethod as TeachingMethod,
+    gradingType: instance.gradingType as GradingType,
+    responsibleTeacher: responsibleTeacher?.name ?? '-',
+    courseData: {
+      id: instance.Course.id,
+      courseCode: instance.Course.courseCode,
+      department: {
+        en: '',
+        fi: '',
+        sv: ''
+      },
+      name: {
+        en: '',
+        fi: '',
+        sv: ''
+      },
+      evaluationInformation: {
+        en: '',
+        fi: '',
+        sv: ''
+      }
     }
+  };
 
-    const responsibleTeacher: User = await findUserById(instance.responsibleTeacher);
+  instance.Course.CourseTranslations.forEach((translation: CourseTranslation) => {
+    switch (translation.language) {
+    case Language.English:
+      parsedInstanceData.courseData.department.en = translation.department;
+      parsedInstanceData.courseData.name.en = translation.courseName;
+      break;
+    case Language.Finnish:
+      parsedInstanceData.courseData.department.fi = translation.department;
+      parsedInstanceData.courseData.name.fi = translation.courseName;
+      break;
+    case Language.Swedish:
+      parsedInstanceData.courseData.department.sv = translation.department;
+      parsedInstanceData.courseData.name.sv = translation.courseName;
+      break;
+    }
+  });
 
-    const parsedInstanceData: CourseInstanceData = {
-      id: instance.id,
-      sisuCourseInstanceId: instance.sisuCourseInstanceId,
-      startingPeriod: instance.startingPeriod as Period,
-      endingPeriod: instance.endingPeriod as Period,
-      minCredits: instance.minCredits,
-      maxCredits: instance.maxCredits,
-      startDate: instance.startDate,
-      endDate: instance.endDate,
-      teachingMethod: instance.teachingMethod as TeachingMethod,
-      gradingType: instance.gradingType as GradingType,
-      responsibleTeacher: responsibleTeacher?.name ?? '-',
+  res.status(HttpCode.Ok).send({
+    success: true,
+    data: {
+      courseInstance: parsedInstanceData
+    }
+  });
+}
+
+export interface CourseInstanceWithTeachers extends CourseInstance {
+  teacher: User
+}
+
+export async function getAllCourseInstances(req: Request, res: Response): Promise<void> {
+  const courseId: number = Number(req.params.courseId);
+  await idSchema.validate({ id: courseId });
+
+  const course: Course = await findCourseById(courseId);
+
+  // TODO: ADD FUNCTIONALITY FOR MULTIPLE RESPONSIBLE TEACHERS THROUGH COURSEROLE
+  const instances: Array<CourseInstanceWithTeachers> = await CourseInstance.findAll({
+    attributes: [
+      'id', 'sisuCourseInstanceId', 'courseId', 'gradingType', 'startingPeriod',
+      'endingPeriod', 'teachingMethod', 'responsibleTeacher', 'minCredits',
+      'maxCredits', 'startDate', 'endDate', 'createdAt', 'updatedAt'
+    ],
+    where: {
+      courseId: courseId
+    },
+    // TODO: CHANGE TO GO THROUGH COURSE ROLE INSTEAD OF GOING THROUGH
+    // RESPONSIBLE TEACHER FOREIGN KEY
+    include: {
+      model: User,
+      as: 'teacher'
+    }
+  }) as Array<CourseInstanceWithTeachers>;
+
+  const instancesData: Array<CourseInstanceData> = [];
+
+  instances.forEach((instanceWithTeacher: CourseInstanceWithTeachers) => {
+    const instanceData: CourseInstanceData = {
       courseData: {
-        id: instance.Course.id,
-        courseCode: instance.Course.courseCode,
+        id: course.id,
+        courseCode: course.courseCode,
         department: {
           en: '',
           fi: '',
@@ -84,161 +164,30 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
           fi: '',
           sv: ''
         }
-      }
+      },
+      sisuCourseInstanceId: instanceWithTeacher.sisuCourseInstanceId,
+      id: instanceWithTeacher.id,
+      startingPeriod: instanceWithTeacher.startingPeriod as Period,
+      endingPeriod: instanceWithTeacher.endingPeriod as Period,
+      minCredits: instanceWithTeacher.minCredits,
+      maxCredits: instanceWithTeacher.maxCredits,
+      startDate: instanceWithTeacher.startDate,
+      endDate: instanceWithTeacher.endDate,
+      teachingMethod: instanceWithTeacher.teachingMethod as TeachingMethod,
+      gradingType: instanceWithTeacher.gradingType as GradingType,
+      // TODO: Get multiple responsible teachers through course roles.
+      responsibleTeacher: instanceWithTeacher.teacher.name,
     };
 
-    instance.Course.CourseTranslations.forEach((translation: CourseTranslation) => {
-      switch (translation.language) {
-      case Language.English:
-        parsedInstanceData.courseData.department.en = translation.department;
-        parsedInstanceData.courseData.name.en = translation.courseName;
-        break;
-      case Language.Finnish:
-        parsedInstanceData.courseData.department.fi = translation.department;
-        parsedInstanceData.courseData.name.fi = translation.courseName;
-        break;
-      case Language.Swedish:
-        parsedInstanceData.courseData.department.sv = translation.department;
-        parsedInstanceData.courseData.name.sv = translation.courseName;
-        break;
-      }
-    });
+    instancesData.push(instanceData);
+  });
 
-    res.status(200).send({
-      success: true,
-      instance: parsedInstanceData
-    });
-    return;
-  } catch (error: unknown) {
-    console.log(error);
-
-    if (error instanceof yup.ValidationError) {
-      res.status(400).send({
-        success: false,
-        error: error.errors
-      });
-      return;
+  res.status(HttpCode.Ok).send({
+    success: true,
+    data: {
+      courseInstances: instancesData
     }
-
-    if (error instanceof Error && error?.message.startsWith('course instance with an id')) {
-      res.status(404).send({
-        success: false,
-        error: error.message
-      });
-      return;
-    }
-
-    res.status(500).send({
-      success: false,
-      error: 'Internal Server Error'
-    });
-    return;
-  }
-}
-
-export interface CourseInstanceWithTeachers extends CourseInstance {
-  teacher: User
-}
-
-export async function getAllCourseInstances(req: Request, res: Response): Promise<void> {
-  try {
-    const courseId: number = Number(req.params.courseId);
-    await idSchema.validate({ id: courseId });
-
-    const course: Course | null = await Course.findByPk(courseId);
-
-    if (!course) {
-      throw new Error(`course with id ${courseId} not found`);
-    }
-
-    // TODO: ADD FUNCTIONALITY FOR MULTIPLE RESPONSIBLE TEACHERS THROUGH COURSEROLE
-    const instances: Array<CourseInstanceWithTeachers> = await CourseInstance.findAll({
-      attributes: [
-        'id', 'sisuCourseInstanceId', 'courseId', 'gradingType', 'startingPeriod',
-        'endingPeriod', 'teachingMethod', 'responsibleTeacher', 'minCredits',
-        'maxCredits', 'startDate', 'endDate', 'createdAt', 'updatedAt'
-      ],
-      where: {
-        courseId: courseId
-      },
-      // TODO: CHANGE TO GO THROUGH COURSE ROLE INSTEAD OF GOING THROUGH
-      // RESPONSIBLE TEACHER FOREIGN KEY
-      include: {
-        model: User,
-        as: 'teacher'
-      }
-    }) as Array<CourseInstanceWithTeachers>;
-
-    const instancesData: Array<CourseInstanceData> = [];
-
-    instances.forEach((instanceWithTeacher: CourseInstanceWithTeachers) => {
-      const instanceData: CourseInstanceData = {
-        courseData: {
-          id: course.id,
-          courseCode: course.courseCode,
-          department: {
-            en: '',
-            fi: '',
-            sv: ''
-          },
-          name: {
-            en: '',
-            fi: '',
-            sv: ''
-          },
-          evaluationInformation: {
-            en: '',
-            fi: '',
-            sv: ''
-          }
-        },
-        sisuCourseInstanceId: instanceWithTeacher.sisuCourseInstanceId,
-        id: instanceWithTeacher.id,
-        startingPeriod: instanceWithTeacher.startingPeriod as Period,
-        endingPeriod: instanceWithTeacher.endingPeriod as Period,
-        minCredits: instanceWithTeacher.minCredits,
-        maxCredits: instanceWithTeacher.maxCredits,
-        startDate: instanceWithTeacher.startDate,
-        endDate: instanceWithTeacher.endDate,
-        teachingMethod: instanceWithTeacher.teachingMethod as TeachingMethod,
-        gradingType: instanceWithTeacher.gradingType as GradingType,
-        // TODO: Get multiple responsible teachers through course roles.
-        responsibleTeacher: instanceWithTeacher.teacher.name,
-      };
-
-      instancesData.push(instanceData);
-
-    });
-    res.status(200).send({
-      success: true,
-      data: {
-        courseInstances: instancesData
-      }
-    });
-
-  } catch (error: unknown) {
-    if (error instanceof yup.ValidationError) {
-      res.status(400).send({
-        success: false,
-        error: error.errors
-      });
-      return;
-    }
-
-    if (error instanceof Error && error?.message.startsWith('course with id')) {
-      res.status(404).send({
-        success: false,
-        error: error.message
-      });
-      return;
-    }
-
-    res.status(500).send({
-      success: false,
-      error: 'internal server error'
-    });
-    return;
-  }
+  });
 }
 
 interface CourseInstanceAddRequest {
@@ -294,68 +243,38 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
       .required()
   });
 
-  try {
-    const courseId: number = Number(req.params.courseId);
+  const courseId: number = Number(req.params.courseId);
 
-    await requestSchema.validate(req.body, { abortEarly: false });
+  await requestSchema.validate(req.body, { abortEarly: false });
 
-    const request: CourseInstanceAddRequest = req.body;
+  const request: CourseInstanceAddRequest = req.body;
 
-    const course: Course | null = await models.Course.findOne({
-      where: {
-        id: courseId
-      },
-    });
+  // Confirm that course exists
+  await findCourseById(courseId);
 
-    if (course == null) {
-      throw new Error(`Course with ID ${courseId} does not exist`);
-    }
+  // Confirm that teacher exists
+  await findUserById(request.responsibleTeacher);
 
-    const teacher: User | null = await models.User.findOne({
-      where: {
-        id: request.responsibleTeacher
-      },
-    });
+  const newInstance: CourseInstance = await models.CourseInstance.create({
+    courseId: courseId,
+    sisuCourseInstanceId: request.sisuCourseInstanceId ?? null,
+    gradingType: request.gradingType,
+    startingPeriod: request.startingPeriod,
+    endingPeriod: request.endingPeriod,
+    teachingMethod: request.teachingMethod,
+    responsibleTeacher: request.responsibleTeacher,
+    minCredits: request.minCredits,
+    maxCredits: request.maxCredits,
+    startDate: request.startDate,
+    endDate: request.endDate
+  });
 
-    if (teacher == null) {
-      throw new Error(`User with ID ${request.responsibleTeacher} does not exist`);
-    }
-
-    const newInstance: CourseInstance = await models.CourseInstance.create({
-      courseId: courseId,
-      sisuCourseInstanceId: request.sisuCourseInstanceId ?? null,
-      gradingType: request.gradingType,
-      startingPeriod: request.startingPeriod,
-      endingPeriod: request.endingPeriod,
-      teachingMethod: request.teachingMethod,
-      responsibleTeacher: request.responsibleTeacher,
-      minCredits: request.minCredits,
-      maxCredits: request.maxCredits,
-      startDate: request.startDate,
-      endDate: request.endDate
-    });
-
-    res.send({
-      success: true,
+  res.status(HttpCode.Ok).send({
+    success: true,
+    data: {
       instance: {
         id: newInstance.id
       }
-    });
-    return;
-  } catch (error) {
-
-    if (error instanceof yup.ValidationError) {
-      res.status(400).send({
-        success: false,
-        error: error.errors
-      });
-      return;
     }
-
-    res.status(401).send({
-      success: false,
-      error: error
-    });
-    return;
-  }
+  });
 }

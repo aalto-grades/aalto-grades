@@ -7,6 +7,7 @@ import express, { Router } from 'express';
 import {
   addCourseInstance, getAllCourseInstances, getCourseInstance
 } from '../controllers/courseInstance';
+import { controllerDispatcher } from '../middleware/errorHandler';
 
 export const router: Router = Router();
 
@@ -106,7 +107,10 @@ export const router: Router = Router();
  *             schema:
  *               $ref: '#/definitions/Failure'
  */
-router.get('/v1/courses/instances/:instanceId', getCourseInstance);
+router.get(
+  '/v1/courses/instances/:instanceId',
+  controllerDispatcher(getCourseInstance)
+);
 
 /**
  * @swagger
@@ -154,7 +158,10 @@ router.get('/v1/courses/instances/:instanceId', getCourseInstance);
  *             schema:
  *               $ref: '#/definitions/Failure'
  */
-router.get('/v1/courses/:courseId/instances', getAllCourseInstances);
+router.get(
+  '/v1/courses/:courseId/instances',
+  controllerDispatcher(getAllCourseInstances)
+);
 
 /**
  * @swagger
@@ -252,4 +259,8 @@ router.get('/v1/courses/:courseId/instances', getAllCourseInstances);
  *             schema:
  *               $ref: '#/definitions/Failure'
  */
-router.post('/v1/courses/:courseId/instances', express.json(), addCourseInstance);
+router.post(
+  '/v1/courses/:courseId/instances',
+  express.json(),
+  controllerDispatcher(addCourseInstance)
+);
