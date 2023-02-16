@@ -102,7 +102,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
 
       expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
-      expect(res.body.data.instance.id).toBeDefined();
+      expect(res.body.data.courseInstance.id).toBeDefined();
       expect(res.statusCode).toBe(HttpCode.Ok);
     }
 

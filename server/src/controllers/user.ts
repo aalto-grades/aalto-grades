@@ -31,7 +31,7 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
   await idSchema.validate({ id: teacherId });
 
   // Confirm that teacher exists
-  await findUserById(teacherId);
+  await findUserById(teacherId, HttpCode.NotFound);
 
   // TODO: Go through course_role instead
   const courses: Array<CourseWithTranslationAndInstance> = await models.Course.findAll({
