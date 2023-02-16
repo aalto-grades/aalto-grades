@@ -19,7 +19,7 @@ export class ApiError extends Error {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function ErrorHandler(err: unknown, req: Request, res: Response, next: NextFunction): void {
+export function errorHandler(err: unknown, req: Request, res: Response, next: NextFunction): void {
   // TODO: appropriate logging in case of errors
 
   if (err instanceof ApiError) {
