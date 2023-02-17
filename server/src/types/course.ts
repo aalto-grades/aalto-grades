@@ -48,3 +48,11 @@ export interface CourseInstanceData {
   responsibleTeacher?: string | undefined,
   responsibleTeachers?: Array<string>,
 }
+
+export interface Assignment {
+  id?: number,
+  courseInstanceId: number,
+  name: string,
+  executionDate: Date,
+  expiryDate: Date
+}

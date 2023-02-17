@@ -14,6 +14,7 @@ import { definition } from '../configs/swagger';
 
 import { authLogin, authLogout, authSelfInfo, authSignup } from '../controllers/auth';
 import { addCourse, getCourse } from '../controllers/course';
+import { addAssignment, updateAssignment } from '../controllers/courseAssignment';
 import {
   addCourseInstance, getAllCourseInstances, getCourseInstance
 } from '../controllers/courseInstance';
@@ -314,6 +315,69 @@ router.get('/v1/instances/:instanceId', getCourseInstance);
 
 // TODO: Swagger documentation.
 router.get('/v1/courses/:courseId/instances', getAllCourseInstances);
+
+// Assignment routes
+
+/**
+ * @swagger
+ * /v1/assignment:
+ *   post:
+ *     tags: [Assignment]
+ *     description: Add a new assignment.
+ *     requestBody:
+ *       description: New assignment data.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/definitions/CreateAssignment'
+ *     responses:
+ *       200:
+ *         description: Assignment created succesfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Assignment'
+ *       400:
+ *         description: Creation failed, due to malformed/missing parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ */
+router.post('/v1/assignment', express.json(), handleInvalidRequestJson, addAssignment);
+
+/**
+ * @swagger
+ * /v1/assignment/{assignmentId}:
+ *   put:
+ *     tags: [Assignment]
+ *     description: Update existing assignment.
+ *     requestBody:
+ *       description:  Assignment data to be updated.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/definitions/Assignment'
+ *     responses:
+ *       200:
+ *         description: Updated assignment.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Assignment'
+ *       400:
+ *         description: Creation failed, due to malformed/missing parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ */
+router.put(
+  '/v1/assignment/:assignmentId',
+  express.json(),
+  handleInvalidRequestJson,
+  updateAssignment
+);
 
 /**
  * @swagger
