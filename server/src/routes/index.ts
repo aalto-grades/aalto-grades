@@ -11,9 +11,9 @@ import swaggerUI from 'swagger-ui-express';
 import { FRONTEND_ORIGIN } from '../configs/environment';
 import { definition } from '../configs/swagger';
 
+import { router as assignmentRouter } from './assignment';
 import { router as authRouter } from './auth';
 import { addCourse, getCourse } from '../controllers/course';
-import { addAssignment, updateAssignment } from '../controllers/courseAssignment';
 import {
   addCourseInstance, getAllCourseInstances, getCourseInstance
 } from '../controllers/courseInstance';
@@ -34,6 +34,7 @@ export const router: Router = Router();
 router.use(cookieParser());
 router.use(authRouter);
 router.use(userRouter);
+router.use(assignmentRouter);
 
 router.use('/api-docs', swaggerUI.serve);
 router.get('/api-docs', swaggerUI.setup(openapiSpecification));
@@ -62,31 +63,6 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *         items:
  *           type: string
  *         description: An error message to explain the error.
- *   CreateAssignment:
- *     type: object
- *     description: Assignment Information for creating an assignment.
- *     properties:
- *       courseInstanceId:
- *         type: number
- *         description: Course instance id to which the assignment belongs to.
- *       name:
- *         type: string
- *         description: Assignment name.
- *       executionDate:
- *         type: string
- *         description: Date when the assignment is completed (e.g. deadline date or exam date).
- *       expiryDate:
- *         type: string
- *         description: Date when the assignment expires.
- *   Assignment:
- *     description: Existing assignment Information.
- *     allOf:
- *       - type: object
- *         properties:
- *           id:
- *             type: number
- *             description: Newly created assignment ID in the database.
- *       - $ref: '#/definitions/CreateAssignment'
  *   CourseData:
  *     type: object
  *     description: Course Information
@@ -330,74 +306,6 @@ router.get('/v1/instances/:instanceId', controllerDispatcher(getCourseInstance))
 
 // TODO: Swagger documentation.
 router.get('/v1/courses/:courseId/instances', controllerDispatcher(getAllCourseInstances));
-
-// Assignment routes
-
-/**
- * @swagger
- * /v1/assignment:
- *   post:
- *     tags: [Assignment]
- *     description: Add a new assignment.
- *     requestBody:
- *       description: New assignment data.
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/definitions/CreateAssignment'
- *     responses:
- *       200:
- *         description: Assignment created succesfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Assignment'
- *       400:
- *         description: Creation failed, due to malformed/missing parameters.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- */
-router.post(
-  '/v1/assignment',
-  express.json(),
-  handleInvalidRequestJson,
-  controllerDispatcher(addAssignment)
-);
-
-/**
- * @swagger
- * /v1/assignment/{assignmentId}:
- *   put:
- *     tags: [Assignment]
- *     description: Update existing assignment.
- *     requestBody:
- *       description:  Assignment data to be updated.
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/definitions/Assignment'
- *     responses:
- *       200:
- *         description: Updated assignment.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Assignment'
- *       400:
- *         description: Creation failed, due to malformed/missing parameters.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- */
-router.put(
-  '/v1/assignment/:assignmentId',
-  express.json(),
-  handleInvalidRequestJson,
-  controllerDispatcher(updateAssignment)
-);
 
 router.use(cors({
   origin: FRONTEND_ORIGIN,
