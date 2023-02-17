@@ -10,6 +10,8 @@ import { Assignment } from '../../src/types/course';
 import { HttpCode } from '../../src/types/httpCode';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
+const badId: number = 1000000;
+const badInput: string = 'not valid';
 
 const payload: Assignment = {
   courseInstanceId: 1,
@@ -37,7 +39,7 @@ describe('Test POST /v1/assignment', () => {
     async () => {
       const res: supertest.Response = await request.post('/v1/assignment')
         .send({
-          courseInstanceId: 999999,
+          courseInstanceId: badId,
           name: payload.name,
           executionDate: payload.executionDate,
           expiryDate: payload.expiryDate
@@ -55,7 +57,7 @@ describe('Test POST /v1/assignment', () => {
     async () => {
       const res: supertest.Response = await request.post('/v1/assignment')
         .send({
-          courseInstanceId: 'abc',
+          courseInstanceId: badInput,
           name: payload.name,
           executionDate: payload.executionDate,
           expiryDate: payload.expiryDate
@@ -75,7 +77,7 @@ describe('Test POST /v1/assignment', () => {
         .send({
           courseInstanceId: payload.courseInstanceId,
           name: payload.name,
-          executionDate: 'not valid',
+          executionDate: badInput,
           expiryDate: payload.expiryDate
         })
         .set('Content-Type', 'application/json');
@@ -94,7 +96,7 @@ describe('Test POST /v1/assignment', () => {
           courseInstanceId: payload.courseInstanceId,
           name: payload.name,
           executionDate: payload.executionDate,
-          expiryDate: 'not valid'
+          expiryDate: badInput
         })
         .set('Content-Type', 'application/json');
 
