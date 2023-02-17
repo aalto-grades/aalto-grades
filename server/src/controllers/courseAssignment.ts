@@ -9,6 +9,8 @@ import models from '../database/models';
 import CourseAssignment from '../database/models/courseAssignment';
 
 import { Assignment } from '../types/course';
+import { HttpCode } from '../types/httpCode';
+import { findCourseAssignmentById } from './utils/courseAssignment';
 import { findCourseInstanceById } from './utils/courseInstance';
 
 export async function addAssignment(req: Request, res: Response): Promise<void> {
@@ -40,7 +42,7 @@ export async function addAssignment(req: Request, res: Response): Promise<void> 
     expiryDate: expiryDate
   });
 
-  res.status(200).json({
+  res.status(HttpCode.Ok).json({
     success: true,
     data: {
       assignment: {
@@ -73,11 +75,7 @@ export async function updateAssignment(req: Request, res: Response): Promise<voi
   await requestSchema.validate({ id: id, ...req.body }, { abortEarly: false });
   const { courseInstanceId, name, executionDate, expiryDate }: Assignment = req.body;
 
-  const assignment: CourseAssignment | null = await models.CourseAssignment.findByPk(id);
-
-  if (!assignment) {
-    throw new Error(`assignment with ID ${id} does not exist`);
-  }
+  const assignment: CourseAssignment = await findCourseAssignmentById(id);
 
   // If updating courseInstanceId, check that the instance exists.
   if (courseInstanceId) {
@@ -91,7 +89,7 @@ export async function updateAssignment(req: Request, res: Response): Promise<voi
     expiryDate: expiryDate ?? assignment.expiryDate
   }).save();
 
-  res.status(200).json({
+  res.status(HttpCode.Ok).json({
     success: true,
     data: {
       assignment: assignment
