@@ -5,22 +5,22 @@
 import express, { Router } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import passport from 'passport';
 import swaggerJsdoc, { OAS3Options } from 'swagger-jsdoc';
 import swaggerUI from 'swagger-ui-express';
 
 import { FRONTEND_ORIGIN } from '../configs/environment';
 import { definition } from '../configs/swagger';
 
-import { authLogin, authLogout, authSelfInfo, authSignup } from '../controllers/auth';
+import { router as authRouter } from './auth';
 import { addCourse, getCourse } from '../controllers/course';
 import { addAssignment, updateAssignment } from '../controllers/courseAssignment';
 import {
   addCourseInstance, getAllCourseInstances, getCourseInstance
 } from '../controllers/courseInstance';
 import { fetchAllCourseInstancesFromSisu, fetchCourseInstanceFromSisu } from '../controllers/sisu';
-import { getCoursesOfUser } from '../controllers/user';
 import { handleInvalidRequestJson } from '../middleware';
+import { controllerDispatcher } from '../middleware/errorHandler';
+import { router as userRouter } from './user';
 
 const options: object = {
   definition,
@@ -32,6 +32,8 @@ const openapiSpecification: OAS3Options = swaggerJsdoc(options);
 export const router: Router = Router();
 
 router.use(cookieParser());
+router.use(authRouter);
+router.use(userRouter);
 
 router.use('/api-docs', swaggerUI.serve);
 router.get('/api-docs', swaggerUI.setup(openapiSpecification));
@@ -40,8 +42,52 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
 
 /**
  * @swagger
+ * components:
+ *   securitySchemes:
+ *     jwtCookie:
+ *       type: apiKey
+ *       in: cookie
+ *       name: jwt
  * definitions:
- *   Course:
+ *   Failure:
+ *     type: object
+ *     description: A reason for a failure, with a chiefly developer-facing error message.
+ *     properties:
+ *       success:
+ *         type: boolean
+ *         description: '`false` to indicate failure.'
+ *         example: false
+ *       errors:
+ *         type: array
+ *         items:
+ *           type: string
+ *         description: An error message to explain the error.
+ *   CreateAssignment:
+ *     type: object
+ *     description: Assignment Information for creating an assignment.
+ *     properties:
+ *       courseInstanceId:
+ *         type: number
+ *         description: Course instance id to which the assignment belongs to.
+ *       name:
+ *         type: string
+ *         description: Assignment name.
+ *       executionDate:
+ *         type: string
+ *         description: Date when the assignment is completed (e.g. deadline date or exam date).
+ *       expiryDate:
+ *         type: string
+ *         description: Date when the assignment expires.
+ *   Assignment:
+ *     description: Existing assignment Information.
+ *     allOf:
+ *       - type: object
+ *         properties:
+ *           id:
+ *             type: number
+ *             description: Newly created assignment ID in the database.
+ *       - $ref: '#/definitions/CreateAssignment'
+ *   CourseData:
  *     type: object
  *     description: Course Information
  *     properties:
@@ -81,50 +127,7 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *             type: string
  *           en:
  *             type: string
- *
- *   UserCourses:
- *     type: object
- *     properties:
- *       success:
- *         type: boolean
- *         description: Success of the request
- *       courses:
- *         type: object
- *         description: Object with current and past courses
- *         properties:
- *           current:
- *             type: array
- *             description: Current Courses
- *             items:
- *               $ref: '#/definitions/Course'
- *           previous:
- *             type: array
- *             description: Previous Courses
- *             items:
- *               $ref: '#/definitions/Course'
  */
-/**
- * @swagger
- * /v1/user/{userId}/courses:
- *   get:
- *     tags: [Course]
- *     description: Fetch Courses of a user
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: True
- *         schema:
- *           type: integer
- *         description: The ID of the user fetching courses
- *     responses:
- *       200:
- *         description: User's Courses
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/UserCourses'
- */
-router.get('/v1/user/:userId/courses', getCoursesOfUser);
 
 // Sisu API routes
 
@@ -149,7 +152,7 @@ router.get('/v1/user/:userId/courses', getCoursesOfUser);
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.get('/v1/sisu/courses/:courseCode', fetchAllCourseInstancesFromSisu);
+router.get('/v1/sisu/courses/:courseCode', controllerDispatcher(fetchAllCourseInstancesFromSisu));
 
 /**
  * @swagger
@@ -172,7 +175,10 @@ router.get('/v1/sisu/courses/:courseCode', fetchAllCourseInstancesFromSisu);
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.get('/v1/sisu/instances/:sisuCourseInstanceId', fetchCourseInstanceFromSisu);
+router.get(
+  '/v1/sisu/instances/:sisuCourseInstanceId',
+  controllerDispatcher(fetchCourseInstanceFromSisu)
+);
 
 // Course and instance routes
 /**
@@ -191,7 +197,12 @@ router.get('/v1/sisu/instances/:sisuCourseInstanceId', fetchCourseInstanceFromSi
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.post('/v1/courses', express.json(), handleInvalidRequestJson, addCourse);
+router.post(
+  '/v1/courses',
+  express.json(),
+  handleInvalidRequestJson,
+  controllerDispatcher(addCourse)
+);
 
 /**
  * @swagger
@@ -216,7 +227,11 @@ router.post('/v1/courses', express.json(), handleInvalidRequestJson, addCourse);
  *             schema:
  *               $ref: '#/definitions/UserCourses'
  */
-router.post('/v1/courses/:courseId/instances', express.json(), addCourseInstance);
+router.post(
+  '/v1/courses/:courseId/instances',
+  express.json(),
+  controllerDispatcher(addCourseInstance)
+);
 
 /**
  * @swagger
@@ -245,7 +260,7 @@ router.post('/v1/courses/:courseId/instances', express.json(), addCourseInstance
  *                 course:
  *                   $ref: '#/definitions/Course'
  */
-router.get('/v1/courses/:courseId', getCourse);
+router.get('/v1/courses/:courseId', controllerDispatcher(getCourse));
 
 /**
  * @swagger
@@ -311,10 +326,10 @@ router.get('/v1/courses/:courseId', getCourse);
  *                 course:
  *                   $ref: '#/definitions/Instance'
  */
-router.get('/v1/instances/:instanceId', getCourseInstance);
+router.get('/v1/instances/:instanceId', controllerDispatcher(getCourseInstance));
 
 // TODO: Swagger documentation.
-router.get('/v1/courses/:courseId/instances', getAllCourseInstances);
+router.get('/v1/courses/:courseId/instances', controllerDispatcher(getAllCourseInstances));
 
 // Assignment routes
 
@@ -377,93 +392,6 @@ router.put(
   express.json(),
   handleInvalidRequestJson,
   updateAssignment
-);
-
-/**
- * @swagger
- * /v1/auth/login:
- *   post:
- *     tags: [Session]
- *     description: Login with User
- *     requestBody:
- *       description: Description of login POST body
- *     responses:
- *       200:
- *         description: User's Courses
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/UserCourses'
- */
-router.post('/v1/auth/login', express.json(), authLogin);
-
-/**
- * @swagger
- * /v1/auth/logout:
- *   post:
- *     tags: [Session]
- *     description: Logout of user
- *     requestBody:
- *       description: Description of logout POST body
- *     responses:
- *       200:
- *         description: User's Courses
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/UserCourses'
- */
-router.post(
-  '/v1/auth/logout',
-  passport.authenticate('jwt', { session: false }),
-  express.json(),
-  authLogout
-);
-
-/**
- * @swagger
- * /v1/auth/signup:
- *   post:
- *     tags: [Session]
- *     description: Sign Up user
- *     requestBody:
- *       description: Description of signup POST body
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: True
- *         schema:
- *           type: integer
- *         description: The ID of the user fetching courses
- *     responses:
- *       200:
- *         description: User's Courses
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/UserCourses'
- */
-router.post('/v1/auth/signup', express.json(), authSignup);
-
-/**
- * @swagger
- * /v1/auth/self-info:
- *   get:
- *     tags: [Session]
- *     description: Fetch Courses of a user
- *     responses:
- *       200:
- *         description: User's Courses
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/UserCourses'
- */
-router.get(
-  '/v1/auth/self-info',
-  passport.authenticate('jwt', { session: false }),
-  express.json(),
-  authSelfInfo
 );
 
 router.use(cors({
