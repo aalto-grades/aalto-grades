@@ -7,6 +7,7 @@ import supertest from 'supertest';
 import { app } from '../../src/app';
 
 import { Assignment } from '../../src/types/course';
+import { HttpCode } from '../../src/types/httpCode';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 
@@ -28,11 +29,11 @@ describe('Test POST /v1/assignment', () => {
     expect(res.body.data).toBeDefined();
     expect(res.body.error).not.toBeDefined();
     expect(res.body.data.assignment.id).toBeDefined();
-    expect(res.statusCode).toBe(200);
+    expect(res.statusCode).toBe(HttpCode.Ok);
   });
 
   // Todo: correct the status codes after error hander added
-  it('should respond with 500, if course instance does not exist',
+  it('should respond with 404 not found, if course instance does not exist',
     async () => {
       const res: supertest.Response = await request.post('/v1/assignment')
         .send({
@@ -47,7 +48,7 @@ describe('Test POST /v1/assignment', () => {
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
       expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      expect(res.statusCode).toBe(500);
+      expect(res.statusCode).toBe(HttpCode.NotFound);
     });
 
   it('should respond with 400 bad request, if validation fails (non-number course instance id)',
@@ -65,7 +66,7 @@ describe('Test POST /v1/assignment', () => {
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
       expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      expect(res.statusCode).toBe(400);
+      expect(res.statusCode).toBe(HttpCode.BadRequest);
     });
 
   it('should respond with 400 bad request, if validation fails (executionDate not valid date)',
@@ -83,7 +84,7 @@ describe('Test POST /v1/assignment', () => {
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
       expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      expect(res.statusCode).toBe(400);
+      expect(res.statusCode).toBe(HttpCode.BadRequest);
     });
 
   it('should respond with 400 bad request, if validation fails (expiryDate not valid date)',
@@ -101,6 +102,6 @@ describe('Test POST /v1/assignment', () => {
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
       expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      expect(res.statusCode).toBe(400);
+      expect(res.statusCode).toBe(HttpCode.BadRequest);
     });
 });

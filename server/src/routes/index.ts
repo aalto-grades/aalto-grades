@@ -359,7 +359,12 @@ router.get('/v1/courses/:courseId/instances', controllerDispatcher(getAllCourseI
  *             schema:
  *               $ref: '#/definitions/Failure'
  */
-router.post('/v1/assignment', express.json(), handleInvalidRequestJson, addAssignment);
+router.post(
+  '/v1/assignment',
+  express.json(),
+  handleInvalidRequestJson,
+  controllerDispatcher(addAssignment)
+);
 
 /**
  * @swagger
@@ -391,7 +396,7 @@ router.put(
   '/v1/assignment/:assignmentId',
   express.json(),
   handleInvalidRequestJson,
-  updateAssignment
+  controllerDispatcher(updateAssignment)
 );
 
 router.use(cors({

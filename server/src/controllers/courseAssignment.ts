@@ -27,46 +27,27 @@ export async function addAssignment(req: Request, res: Response): Promise<void> 
       .required()
   });
 
-  try {
-    await requestSchema.validate(req.body, { abortEarly: false });
-    const { courseInstanceId, name, executionDate, expiryDate }: Assignment = req.body;
+  await requestSchema.validate(req.body, { abortEarly: false });
+  const { courseInstanceId, name, executionDate, expiryDate }: Assignment = req.body;
 
-    // Check that instance exists.
-    await findCourseInstanceById(courseInstanceId);
+  // Check that instance exists.
+  await findCourseInstanceById(courseInstanceId);
 
-    const assignment: CourseAssignment = await models.CourseAssignment.create({
-      courseInstanceId: courseInstanceId,
-      name: name,
-      executionDate: executionDate,
-      expiryDate: expiryDate
-    });
+  const assignment: CourseAssignment = await models.CourseAssignment.create({
+    courseInstanceId: courseInstanceId,
+    name: name,
+    executionDate: executionDate,
+    expiryDate: expiryDate
+  });
 
-    res.status(200).json({
-      success: true,
-      data: {
-        assignment: {
-          id: assignment.id
-        }
+  res.status(200).json({
+    success: true,
+    data: {
+      assignment: {
+        id: assignment.id
       }
-    });
-    return;
-  } catch (error) {
-    console.log(error);
-
-    if (error instanceof yup.ValidationError) {
-      res.status(400).send({
-        success: false,
-        errors: error.errors
-      });
-      return;
     }
-
-    res.status(500).send({
-      success: false,
-      errors: ['internal server error']
-    });
-    return;
-  }
+  });
 }
 
 export async function updateAssignment(req: Request, res: Response): Promise<void> {
@@ -87,51 +68,33 @@ export async function updateAssignment(req: Request, res: Response): Promise<voi
       .date()
       .notRequired()
   });
-  try {
-    const id: number = Number(req.params.assignmentId);
-    await requestSchema.validate({ id: id, ...req.body }, { abortEarly: false });
-    const { courseInstanceId, name, executionDate, expiryDate }: Assignment = req.body;
 
-    const assignment: CourseAssignment | null = await models.CourseAssignment.findByPk(id);
+  const id: number = Number(req.params.assignmentId);
+  await requestSchema.validate({ id: id, ...req.body }, { abortEarly: false });
+  const { courseInstanceId, name, executionDate, expiryDate }: Assignment = req.body;
 
-    if (!assignment) {
-      throw new Error(`assignment with ID ${id} does not exist`);
-    }
+  const assignment: CourseAssignment | null = await models.CourseAssignment.findByPk(id);
 
-    // If updating courseInstanceId, check that the instance exists.
-    if (courseInstanceId) {
-      await findCourseInstanceById(courseInstanceId);
-    }
-
-    await assignment.set({
-      courseInstanceId: courseInstanceId ?? assignment.courseInstanceId,
-      name: name ?? assignment.name,
-      executionDate: executionDate ?? assignment.executionDate,
-      expiryDate: expiryDate ?? assignment.expiryDate
-    }).save();
-
-    res.status(200).json({
-      success: true,
-      data: {
-        assignment: assignment
-      }
-    });
-    return;
-  } catch (error) {
-    console.log(error);
-
-    if (error instanceof yup.ValidationError) {
-      res.status(400).send({
-        success: false,
-        errors: error.errors
-      });
-      return;
-    }
-
-    res.status(500).send({
-      success: false,
-      errors: ['internal server error']
-    });
-    return;
+  if (!assignment) {
+    throw new Error(`assignment with ID ${id} does not exist`);
   }
+
+  // If updating courseInstanceId, check that the instance exists.
+  if (courseInstanceId) {
+    await findCourseInstanceById(courseInstanceId);
+  }
+
+  await assignment.set({
+    courseInstanceId: courseInstanceId ?? assignment.courseInstanceId,
+    name: name ?? assignment.name,
+    executionDate: executionDate ?? assignment.executionDate,
+    expiryDate: expiryDate ?? assignment.expiryDate
+  }).save();
+
+  res.status(200).json({
+    success: true,
+    data: {
+      assignment: assignment
+    }
+  });
 }
