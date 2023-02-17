@@ -56,7 +56,6 @@ router.get(
   controllerDispatcher(fetchCourseInstanceFromSisu)
 );
 
-
 /**
  * @swagger
  * /v1/sisu/courses/{courseCode}:
