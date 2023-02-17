@@ -37,14 +37,14 @@ export interface CourseInstanceData {
   // Course instance ID can be null when representing Sisu course instance data
   id: number | null,
   sisuCourseInstanceId: string | null,
-  startingPeriod: string,
-  endingPeriod: string,
+  startingPeriod: Period | null,
+  endingPeriod: Period | null,
   minCredits: number,
   maxCredits: number,
   startDate: Date,
   endDate: Date,
-  courseType: string,
-  gradingType: string,
+  teachingMethod: TeachingMethod,
+  gradingType: GradingType,
   responsibleTeacher?: string | undefined,
   responsibleTeachers?: Array<string>,
 }
