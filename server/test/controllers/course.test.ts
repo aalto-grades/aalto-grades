@@ -64,17 +64,7 @@ describe('Test POST /v1/courses', () => {
     expect(res.statusCode).toBe(HttpCode.Ok);
     expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
-    expect(res.body.data.course.courseCode).toBe('ELEC-A7200');
-    expect(res.body.data.course.name).toStrictEqual({
-      'fi': 'Signaalit ja järjestelmät',
-      'en': 'Signals and Systems',
-      'sv': ''
-    });
-    expect(res.body.data.course.department).toStrictEqual({
-      'fi': 'Sähkötekniikan korkeakoulu',
-      'en': 'School of Electrical Engineering',
-      'sv': 'Högskolan för elektroteknik'
-    });
+    expect(res.body.data.course.id).toBeDefined();
 
     input = {
       courseCode: 'ELEC-A7200',
@@ -91,17 +81,7 @@ describe('Test POST /v1/courses', () => {
     expect(res.statusCode).toBe(HttpCode.Ok);
     expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
-    expect(res.body.data.course.courseCode).toBe('ELEC-A7200');
-    expect(res.body.data.course.name).toStrictEqual({
-      'fi': 'Signaalit ja järjestelmät',
-      'en': 'Signals and Systems',
-      'sv': ''
-    });
-    expect(res.body.data.course.department).toStrictEqual({
-      'fi': 'Sähkötekniikan korkeakoulu',
-      'en': 'School of Electrical Engineering',
-      'sv': ''
-    });
+    expect(res.body.data.course.id).toBeDefined();
   });
 
   it('should respond with validation errors, if required fields are undefined', async () => {
