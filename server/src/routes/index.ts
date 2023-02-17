@@ -13,10 +13,10 @@ import { definition } from '../configs/swagger';
 
 import { router as authRouter } from './auth';
 import { addCourse, getCourse } from '../controllers/course';
-import { fetchAllCourseInstancesFromSisu, fetchCourseInstanceFromSisu } from '../controllers/sisu';
 import { router as courseInstanceRouter } from './courseInstance';
 import { handleInvalidRequestJson } from '../middleware';
 import { controllerDispatcher } from '../middleware/errorHandler';
+import { router as sisuRouter } from './sisu';
 import { router as userRouter } from './user';
 
 const options: OAS3Options = {
@@ -31,12 +31,11 @@ export const router: Router = Router();
 router.use(cookieParser());
 router.use(authRouter);
 router.use(courseInstanceRouter);
+router.use(sisuRouter);
 router.use(userRouter);
 
 router.use('/api-docs', swaggerUI.serve);
 router.get('/api-docs', swaggerUI.setup(openapiSpecification));
-
-// User routes
 
 /**
  * @swagger
@@ -102,58 +101,6 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *             type: string
  */
 
-// Sisu API routes
-
-/**
- * @swagger
- * /v1/sisu/courses/{courseCode}:
- *   get:
- *     tags: [Course, SISU]
- *     description: Fetch All Instances of a Course from SISU
- *     parameters:
- *       - in: path
- *         name: courseCode
- *         required: True
- *         schema:
- *           type: string
- *         description: The course code of the course to be fetched from SISU
- *     responses:
- *       200:
- *         description: User's Courses
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/UserCourses'
- */
-router.get('/v1/sisu/courses/:courseCode', controllerDispatcher(fetchAllCourseInstancesFromSisu));
-
-/**
- * @swagger
- * /v1/sisu/instances/{sisuCourseInstanceId}:
- *   get:
- *     tags: [Course, SISU]
- *     description: Fetch Course Instance Information from SISU
- *     parameters:
- *       - in: path
- *         name: sisuCourseInstanceId
- *         required: True
- *         schema:
- *           type: string
- *         description: InstanceID of a course instance in sisu
- *     responses:
- *       200:
- *         description: User's Courses
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/UserCourses'
- */
-router.get(
-  '/v1/sisu/instances/:sisuCourseInstanceId',
-  controllerDispatcher(fetchCourseInstanceFromSisu)
-);
-
-// Course routes
 /**
  * @swagger
  * /v1/courses:
