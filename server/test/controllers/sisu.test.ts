@@ -5,8 +5,9 @@
 import axios, { AxiosStatic } from 'axios';
 import supertest from 'supertest';
 
-import { sisuInstance, sisuError } from '../mockData/sisuMockData';
 import { app } from '../../src/app';
+import { HttpCode } from '../../src/types/httpCode';
+import { sisuInstance, sisuError } from '../mockData/sisuMockData';
 
 jest.mock('axios');
 const mockedAxios: jest.Mocked<AxiosStatic> = axios as jest.Mocked<typeof axios>;
@@ -22,7 +23,7 @@ describe('Test GET /v1/sisu/instances/:sisuCourseInstanceId', () => {
     const res: supertest.Response = await request.get(`/v1/sisu/instances/${sisuInstance.id}`);
     expect(res.body.success).toBe(true);
     expect(res.body.data.courseInstance).toBeDefined();
-    expect(res.body.error).not.toBeDefined();
+    expect(res.body.errors).not.toBeDefined();
     expect(res.body.data.courseInstance.id).toBeDefined();
     expect(res.body.data.courseInstance.sisuCourseInstanceId).toBe(sisuInstance.id);
     expect(res.body.data.courseInstance.startingPeriod).toBeDefined();
@@ -31,14 +32,14 @@ describe('Test GET /v1/sisu/instances/:sisuCourseInstanceId', () => {
     expect(res.body.data.courseInstance.maxCredits).toBeDefined();
     expect(res.body.data.courseInstance.startDate).toBeDefined();
     expect(res.body.data.courseInstance.endDate).toBeDefined();
-    expect(res.body.data.courseInstance.courseType).toBeDefined();
+    expect(res.body.data.courseInstance.teachingMethod).toBeDefined();
     expect(res.body.data.courseInstance.gradingType).toBeDefined();
     expect(res.body.data.courseInstance.responsibleTeachers).toBeDefined();
     expect(res.body.data.courseInstance.courseData.courseCode).toBeDefined();
     expect(res.body.data.courseInstance.courseData.department).toBeDefined();
     expect(res.body.data.courseInstance.courseData.name).toBeDefined();
     expect(res.body.data.courseInstance.courseData.evaluationInformation).toBeDefined();
-    expect(res.status).toEqual(200);
+    expect(res.status).toEqual(HttpCode.Ok);
   });
 
   it('should respond with error when instance does not exist', async () => {
@@ -48,8 +49,8 @@ describe('Test GET /v1/sisu/instances/:sisuCourseInstanceId', () => {
     const res: supertest.Response = await request.get('/v1/sisu/instances/abc');
     expect(res.body.success).toBe(false);
     expect(res.body.instance).not.toBeDefined();
-    expect(res.body.error).toBeDefined();
-    expect(res.status).toEqual(500);
+    expect(res.body.errors).toBeDefined();
+    expect(res.status).toEqual(HttpCode.BadGateway);
   });
 });
 
@@ -63,7 +64,7 @@ describe('Test GET /v1/sisu/courses/:courseCode', () => {
     const res: supertest.Response = await request.get('/v1/sisu/courses/ELEC-A7100');
     expect(res.body.success).toBe(true);
     expect(res.body.data.courseInstances).toBeDefined();
-    expect(res.body.error).not.toBeDefined();
+    expect(res.body.errors).not.toBeDefined();
     expect(res.body.data.courseInstances.length).toBe(5);
     expect(res.body.data.courseInstances[0].id).toBeDefined();
     expect(res.body.data.courseInstances[0].sisuCourseInstanceId).toBe(sisuInstance.id);
@@ -77,10 +78,10 @@ describe('Test GET /v1/sisu/courses/:courseCode', () => {
     expect(res.body.data.courseInstances[0].endingPeriod).toBeDefined();
     expect(res.body.data.courseInstances[0].startDate).toBeDefined();
     expect(res.body.data.courseInstances[0].endDate).toBeDefined();
-    expect(res.body.data.courseInstances[0].courseType).toBeDefined();
+    expect(res.body.data.courseInstances[0].teachingMethod).toBeDefined();
     expect(res.body.data.courseInstances[0].gradingType).toBeDefined();
     expect(res.body.data.courseInstances[0].responsibleTeachers).toBeDefined();
-    expect(res.status).toEqual(200);
+    expect(res.status).toEqual(HttpCode.Ok);
   });
 
   it('should respond with error when course does not exist', async () => {
@@ -90,8 +91,8 @@ describe('Test GET /v1/sisu/courses/:courseCode', () => {
     const res: supertest.Response = await request.get('/v1/sisu/courses/abc');
     expect(res.body.success).toBe(false);
     expect(res.body.data).not.toBeDefined();
-    expect(res.body.error).toBeDefined();
-    expect(res.status).toEqual(500);
+    expect(res.body.errors).toBeDefined();
+    expect(res.status).toEqual(HttpCode.BadGateway);
   });
 
   it('should respond with error when course does not have active instances', async () => {
@@ -101,7 +102,7 @@ describe('Test GET /v1/sisu/courses/:courseCode', () => {
     const res: supertest.Response = await request.get('/v1/sisu/courses/ELEC-A7100');
     expect(res.body.success).toBe(false);
     expect(res.body.data).not.toBeDefined();
-    expect(res.body.error).toBeDefined();
-    expect(res.status).toEqual(500);
+    expect(res.body.errors).toBeDefined();
+    expect(res.status).toEqual(HttpCode.BadGateway);
   });
 });
