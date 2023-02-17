@@ -17,7 +17,6 @@ const StringTextField = ({ fieldData, value, setFunction }) => {
       margin='normal'
       value={value}
       onChange={({ target }) => setFunction(target.value)}
-      required
     />
   );
 };

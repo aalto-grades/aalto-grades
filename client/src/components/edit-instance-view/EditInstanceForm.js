@@ -16,8 +16,7 @@ import textFormatServices from '../../services/textFormat';
 
 // Should the teachers be given as emails?
 // Now they are given as full names
-// TODO: check that no text field is left empty: 
-//   --> UPDATE: required added to all but dynamicTextFieldArray
+// TODO: check that no text field is left empty
 
 const typeData = {
   fieldId: 'instanceType',
@@ -58,7 +57,7 @@ const textFieldMinWidth = 195;
 
 const EditInstanceForm = ({ instance }) => {
   let navigate = useNavigate();
-  let { instanceId } = useParams();
+  let { courseId, instanceId } = useParams();
 
   const { 
     courseType, setType,
@@ -82,14 +81,6 @@ const EditInstanceForm = ({ instance }) => {
     }
   }, []);
 
-  //const [courseType, setType]             = useState(textFormatServices.formatCourseType(instance.courseType));
-  //const [startDate, setStartDate]         = useState(instance.startDate);
-  //const [endDate, setEndDate]             = useState(instance.endDate);
-  //const [teachers, setTeachers]           = useState(instance.responsibleTeachers);
-  //const [stringMinCredits, setMinCredits] = useState(String(instance.minCredits));
-  //const [stringMaxCredits, setMaxCredits] = useState(String(instance.maxCredits));
-  //const [gradingScale, setGradingScale]   = useState(textFormatServices.formatGradingType(instance.gradingType));
-
   const handleSubmit = (event) => {
     event.preventDefault();
     try {
@@ -105,7 +96,7 @@ const EditInstanceForm = ({ instance }) => {
         gradingScale,
       });
       console.log(basicInfoObject);
-      navigate('/add-assignments/' + instanceId);
+      navigate('/' + courseId + '/add-assignments/' + instanceId);
     } catch (exception) {
       console.log(exception);
     }

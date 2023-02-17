@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import styled from 'styled-components';
@@ -20,6 +20,7 @@ const HoverBox = styled(Box)`
 
 const InstanceBox = ({ instance }) => {
   let navigate = useNavigate();
+  let { courseId } = useParams();
   const { id, startDate, endDate, courseType } = instance;
 
   return(
@@ -34,7 +35,7 @@ const InstanceBox = ({ instance }) => {
         my: 1,
         p: 3,
       }}
-      onClick={() => { navigate('/edit-instance/' + id); }}>
+      onClick={() => { navigate('/' + courseId + '/edit-instance/' + id); }}>
       <LightLabelBoldValue label='Type' value={textFormatServices.formatCourseType(courseType)} />
       <Box sx={{ mx: 2 }}/>
       <LightLabelBoldValue label='Starting Date' value={textFormatServices.formatDateString(startDate)} />

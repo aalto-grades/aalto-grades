@@ -22,7 +22,6 @@ const NumberTextField = ({ fieldData, value, setFunction }) => {
       error={error}
       helperText={error ? 'Value needs to be an integer' : ''}
       onChange={({ target }) => setFunction(target.value)}
-      required
     />
   );
 };

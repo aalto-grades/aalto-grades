@@ -2,18 +2,23 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Assignment from './assignments/Assignment';
+import AlertSnackbar from './alerts/AlertSnackbar';
 import LightLabelBoldValue from './typography/LightLabelBoldValue';
 import textFormatServices from '../services/textFormat';
 
+const loadingMsg = { msg: 'Creating instance...', severity: 'info' };
+const successMsg = { msg: 'Instance created, you will be redirected to the course page.', severity: 'success' };
+const errorMsg = { msg: 'Instance creation failed.', severity: 'error' };
+
 const InstanceSummaryView = () => {
   let navigate = useNavigate();
-  let { instanceId } = useParams();
+  let { courseId, instanceId } = useParams();
 
   const { 
     addedAssignments,
@@ -26,13 +31,45 @@ const InstanceSummaryView = () => {
     teachers 
   } = useOutletContext();
 
-  const onCreateInstance = () => {
-    // TODO: actually create the instance
-    navigate('/course-view/' + 'testi');
+  const [snackPack, setSnackPack] = useState([]);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [messageInfo, setMessageInfo] = useState(undefined);
+
+  useEffect(() => {
+    if (snackPack.length && !messageInfo) {
+      // Set a new snack when we don't have an active one
+      console.log('opening');
+      setMessageInfo({ ...snackPack[0] });
+      setSnackPack((prev) => prev.slice(1));
+      setAlertOpen(true);
+    } else if (snackPack.length && messageInfo && alertOpen) {
+      // Close the active one when a new one is added
+      console.log('closing');
+      setAlertOpen(false);
+    }
+  }, [snackPack, messageInfo, alertOpen]);
+
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  const onCreateInstance = async () => {
+    setSnackPack((prev) => [...prev, loadingMsg]);
+    // TODO: actually create the instance 
+    await sleep(2000);
+    const success = true;
+    // TODO: change the code below to respond to the progress of the creation
+    await sleep(1000);
+    if (success) {
+      setSnackPack((prev) => [...prev, successMsg]);
+      await sleep(4000);
+      navigate('/course-view/' + courseId);
+    } else {
+      setSnackPack((prev) => [...prev, errorMsg]);
+    }
   };
 
   return(
     <Box sx={{ display: 'grid', gap: 1.5, ml: '7.5vw', mr: '7.5vw' }}>
+      <AlertSnackbar messageInfo={messageInfo} setMessageInfo={setMessageInfo} open={alertOpen} setOpen={setAlertOpen} />
       <Typography variant='h3' sx={{ mb: 4, textAlign: 'left', fontWeight: 'light' }}>Summary</Typography>
       <Typography align='left' sx={{ ml: 1.5 }} >Basic Information</Typography>
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', display: 'inline-block' }}>
@@ -59,7 +96,7 @@ const InstanceSummaryView = () => {
         <Typography variant='body2' color='primary.main' sx={{ m: '8px 0px' }} >You can also add assignments after creating the instance</Typography>
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 6 }}>
-        <Button variant='outlined' onClick={() => { navigate('/add-assignments/' + instanceId); }}>Go back</Button>
+        <Button variant='outlined' onClick={() => { navigate('/' + courseId + '/add-assignments/' + instanceId); }}>Go back</Button>
         <Button variant='contained' onClick={() => onCreateInstance()}>Create instance</Button>
       </Box>
     </Box>

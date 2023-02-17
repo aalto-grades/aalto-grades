@@ -108,9 +108,9 @@ function App() {
               <Route path='/fetch-instances/:courseId' element={<FetchInstancesView/>}/>
               { /* Pages under this route share instance creation context */ }
               <Route element={<InstanceCreationRoute/>}>
-                <Route path='/edit-instance/:instanceId' element={<EditInstanceView/>}/>
-                <Route path='/add-assignments/:instanceId' element={<AddAssignmentsView/>}/>
-                <Route path='/instance-summary/:instanceId' element={<InstanceSummaryView/>}/>
+                <Route path=':courseId/edit-instance/:instanceId' element={<EditInstanceView/>}/>
+                <Route path=':courseId/add-assignments/:instanceId' element={<AddAssignmentsView/>}/>
+                <Route path=':courseId/instance-summary/:instanceId' element={<InstanceSummaryView/>}/>
               </Route>
             </Route>
           </Routes>

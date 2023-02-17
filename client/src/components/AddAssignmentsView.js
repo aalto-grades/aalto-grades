@@ -12,7 +12,7 @@ import mockSuggestedAssignments from '../mock-data/mockSuggestedAssignments';
 
 const AddAssignmentsView = () => {
   let navigate = useNavigate();
-  let { instanceId } = useParams();
+  let { courseId, instanceId } = useParams();
 
   const { addedAssignments, setAddedAssignments } = useOutletContext();
   const [suggestedAssignments, setSuggestedAssignments] = useState([]);
@@ -34,7 +34,7 @@ const AddAssignmentsView = () => {
   };
 
   const onConfirmAssignments = () => {
-    navigate('/instance-summary/' + instanceId);
+    navigate('/' + courseId + '/instance-summary/' + instanceId);
   };
 
   return(
@@ -62,7 +62,7 @@ const AddAssignmentsView = () => {
         <Typography variant='body2' color='primary.main' sx={{ m: '8px 0px' }} >You can also add assignments after creating the instance</Typography>
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 6 }}>
-        <Button variant='outlined' onClick={() => { navigate('/edit-instance/' + instanceId); }}>Go back</Button>
+        <Button variant='outlined' onClick={() => { navigate('/' + courseId + '/edit-instance/' + instanceId); }}>Go back</Button>
         <Button variant='contained' onClick={() => onConfirmAssignments()}>Confirm assignments</Button>
       </Box>
     </Box>

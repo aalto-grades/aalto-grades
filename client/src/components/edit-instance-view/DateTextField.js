@@ -18,7 +18,6 @@ const DateTextField = ({ fieldData, value, setFunction, minWidth }) => {
       margin='normal'
       value={value}
       onChange={({ target }) => setFunction(target.value)}
-      required
     />
   );
 };
