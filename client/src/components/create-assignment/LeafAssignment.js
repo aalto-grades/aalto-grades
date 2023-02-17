@@ -138,7 +138,7 @@ const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignment
       </Box>
       <SimpleDialog
         open={openDialog}
-        onClose={handleClose}
+        handleClose={handleClose}
         addSubAssignments={addSubAssignments}
         indices={indices}
         assignments={assignments}

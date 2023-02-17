@@ -18,7 +18,7 @@ const numberData = {
   fieldLabel: 'Number of sub-assignments'
 };
     
-function SimpleDialog({ onClose, open, addSubAssignments, indices, assignments }) {
+function SimpleDialog({ handleClose, open, addSubAssignments, indices, assignments }) {
 
   const [numOfAssignments, setSubAssignments] = useState('1');
 
@@ -29,6 +29,7 @@ function SimpleDialog({ onClose, open, addSubAssignments, indices, assignments }
     event.preventDefault();
     try {
       addSubAssignments(numOfAssignments);
+      handleClose();
     } catch (exception) {
       console.log(exception);
     }
@@ -40,7 +41,7 @@ function SimpleDialog({ onClose, open, addSubAssignments, indices, assignments }
         <DialogTitle>Create Sub-Assignments</DialogTitle>
         :
         <DialogTitle>Add Sub-Assignments</DialogTitle>}
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <form style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <TextField
           key={numberData.fieldId}
           id={numberData.fieldId}
@@ -56,11 +57,13 @@ function SimpleDialog({ onClose, open, addSubAssignments, indices, assignments }
           onChange={({ target }) => setSubAssignments(target.value)}
         />
         <Box sx={{ alignSelf: 'flex-end', m: 2 }}>
-          <Button size='medium' sx={{ mr: 1 }} onClick={onClose}>
+          <Button size='medium' sx={{ mr: 1 }} onClick={handleClose}>
             Cancel
           </Button>
-          <Button size='medium' variant='outlined' type='submit' onClick={() => {
-            if (!error) onClose;
+          <Button size='medium' variant='outlined' type='submit' onClick={(event) => {
+            if (!error) {
+              handleSubmit(event);
+            }
           }}>
             Confirm
           </Button>
@@ -71,7 +74,7 @@ function SimpleDialog({ onClose, open, addSubAssignments, indices, assignments }
 }
 
 SimpleDialog.propTypes = {
-  onClose: PropTypes.func,
+  handleClose: PropTypes.func,
   open: PropTypes.bool,
   addSubAssignments: PropTypes.func,
   assignments: PropTypes.array,

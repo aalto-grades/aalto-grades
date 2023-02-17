@@ -44,7 +44,7 @@ const CreateAssignmentView = () => {
         <Typography variant="h3" component="div" sx={{ flexGrow: 1, mb: 4, textAlign: 'left' }}>
             Create Assignment
         </Typography>
-        <form onSubmit={handleSubmit}>
+        <form>
           <Box sx={{ 
             bgcolor: 'primary.light',
             display: 'flex',
@@ -66,7 +66,7 @@ const CreateAssignmentView = () => {
           <Button size='medium' variant='outlined' sx={{ mr: 1 }}>
                 Cancel
           </Button>
-          <Button size='medium' variant='contained' type='submit' sx={{ mr: 2 }}>
+          <Button size='medium' variant='contained' type='submit' onClick={handleSubmit} sx={{ mr: 2 }}>
                 Confirm
           </Button>
         </form>
