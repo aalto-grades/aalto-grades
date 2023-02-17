@@ -13,13 +13,13 @@ export const router: Router = Router();
 /**
  * @swagger
  * definitions:
- *   CreateAssignment:
+ *   AddAssignment:
  *     type: object
- *     description: Assignment Information for creating an assignment.
+ *     description: Assignment Information for adding a new assignment.
  *     properties:
  *       courseInstanceId:
  *         type: number
- *         description: Course instance id to which the assignment belongs to.
+ *         description: Course instance ID to which the assignment belongs to.
  *       name:
  *         type: string
  *         description: Assignment name.
@@ -30,14 +30,15 @@ export const router: Router = Router();
  *         type: string
  *         description: Date when the assignment expires.
  *   Assignment:
- *     description: Existing assignment Information.
+ *     description: Current assignment Information.
  *     allOf:
  *       - type: object
  *         properties:
  *           id:
  *             type: number
- *             description: Newly created assignment ID in the database.
- *       - $ref: '#/definitions/CreateAssignment'
+ *             required: true
+ *             description: Assignment ID.
+ *       - $ref: '#/definitions/AddAssignment'
  */
 
 /**
@@ -51,16 +52,22 @@ export const router: Router = Router();
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/definitions/CreateAssignment'
+ *             $ref: '#/definitions/AddAssignment'
  *     responses:
  *       200:
- *         description: Assignment created succesfully
+ *         description: New assignment succesfully added.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Assignment'
  *       400:
  *         description: Creation failed, due to malformed/missing parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       404:
+ *         description: Course instance does not exist.
  *         content:
  *           application/json:
  *             schema:
@@ -87,13 +94,25 @@ router.post(
  *             $ref: '#/definitions/Assignment'
  *     responses:
  *       200:
- *         description: Updated assignment.
+ *         description: Assignment updated succesfully.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Assignment'
  *       400:
  *         description: Creation failed, due to malformed/missing parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       404:
+ *         description: Course instance does not exist.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       404:
+ *         description: Assignment does not exist.
  *         content:
  *           application/json:
  *             schema:
