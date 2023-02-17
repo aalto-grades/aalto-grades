@@ -56,11 +56,11 @@ const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignme
           </IconButton>
           : 
           <IconButton size='small' onClick={handleClick} sx={{ height: '32px', width: '32px', mr: 1 }}>
-            <ExpandMore sx={{ color: 'rgba(0, 0, 0, 0.6)' }}/>
+            <ExpandMore sx={{ color: '#6E6E6E' }}/>
           </IconButton>}
         <Box sx={{ display: 'flex', flexDirection: 'column',  width: '100%' }}>
           <Collapse in={!open} unmountOnExit >
-            <Typography variant="body2" component="div" sx={{ mt: 0.6, mb: 2, flexGrow: 1, textAlign: 'left', color: 'rgba(0, 0, 0, 0.6)' }}>
+            <Typography variant="body2" component="div" sx={{ mt: 0.6, mb: 2, flexGrow: 1, textAlign: 'left', color: '#6E6E6E' }}>
               See sub-assignments
             </Typography>
           </Collapse>

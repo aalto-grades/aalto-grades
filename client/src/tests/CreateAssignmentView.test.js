@@ -53,12 +53,12 @@ describe('Tests for CreateAssignmentView components', () => {
     const testExpiry = '2025-09-01';
 
     const mockAssignments = [{
-        category: testCategory,
-        name: testCategory,
-        date: testDate,
-        expiryDate: testExpiry,
-        subAssignments: [],
-    }]
+      category: testCategory,
+      name: testCategory,
+      date: testDate,
+      expiryDate: testExpiry,
+      subAssignments: [],
+    }];
 
     render(<CreateAssignmentView/>);
 
@@ -96,12 +96,12 @@ describe('Tests for CreateAssignmentView components', () => {
     const testExpiry = '2025-09-01';
 
     const mockAssignments = [{
-        category: testCategory,
-        name: testName,
-        date: testDate,
-        expiryDate: testExpiry,
-        subAssignments: [],
-    }]
+      category: testCategory,
+      name: testName,
+      date: testDate,
+      expiryDate: testExpiry,
+      subAssignments: [],
+    }];
 
     render(<CreateAssignmentView/>);
 

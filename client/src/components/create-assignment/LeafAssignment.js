@@ -10,6 +10,7 @@ import Collapse from '@mui/material/Collapse';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import SimpleDialog from './SimpleDialog';
+import ConfirmationDialog from './ConfirmationDialog';
 import StringTextField from './StringTextField';
 import DateTextField from './DateTextField';
 import subAssignmentServices from '../../services/assignments';
@@ -68,14 +69,25 @@ const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignment
   const [displayNewName, setDisplayNewName] = useState(getValue(categoryData) === 'Other');
 
   // Functions and varibales for opening and closing the dialog that asks for the number of sub-assignments
-  const [openDialog, setOpenDialog] = useState(false);
+  const [openCountDialog, setOpenCountDialog] = useState(false);
 
-  const handleClickOpen = () => {
-    setOpenDialog(true);
+  const handleCountDialogOpen = () => {
+    setOpenCountDialog(true);
   };
 
-  const handleClose = () => {
-    setOpenDialog(false);
+  const handleCountDialogClose = () => {
+    setOpenCountDialog(false);
+  };
+
+  // Functions and varibales for opening and closing the dialog for confirming sub-assignment deletion
+  const [openConfDialog, setOpenConfDialog] = useState(false);
+
+  const handleConfDialogOpen = () => {
+    setOpenConfDialog(true);
+  };
+
+  const handleConfDialogClose = () => {
+    setOpenConfDialog(false);
   };
 
   return (
@@ -124,21 +136,30 @@ const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignment
         justifyContent: 'space-between'
       }}>
         {JSON.stringify(indices) !== '[0]' ?
-          <Button size='small' sx={{ my: 1 }} onClick={() => removeAssignment(indices, JSON.parse(JSON.stringify(assignments)))}>Delete</Button>
+          <Button size='small' sx={{ my: 1 }} onClick={handleConfDialogOpen}>
+            Delete
+          </Button>
           : 
           <Box sx={{ width: '1px' }}/>}
+        <ConfirmationDialog
+          open={openConfDialog}
+          handleClose={handleConfDialogClose}
+          removeAssignment={removeAssignment}
+          indices={indices}
+          assignments={assignments}
+        />
         {subAssignmentServices.getSubAssignments(indices, assignments).length === 0 ?
-          <Button size='small' sx={{ my: 1, alignSelf: 'flex-end', textAlign: 'right' }} onClick={handleClickOpen}>
+          <Button size='small' sx={{ my: 1, alignSelf: 'flex-end', textAlign: 'right' }} onClick={handleCountDialogOpen}>
             Create sub-assignments
           </Button>
           :
-          <Button size='small' sx={{ my: 1 }} onClick={handleClickOpen}>
+          <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
             Add sub-assignments
           </Button>}
       </Box>
       <SimpleDialog
-        open={openDialog}
-        handleClose={handleClose}
+        open={openCountDialog}
+        handleClose={handleCountDialogClose}
         addSubAssignments={addSubAssignments}
         indices={indices}
         assignments={assignments}

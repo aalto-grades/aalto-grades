@@ -6,9 +6,10 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
 import subAssignmentServices from '../../services/assignments';
 
 // A Dialog component for asking the number of sub-assignments
@@ -41,23 +42,25 @@ function SimpleDialog({ handleClose, open, addSubAssignments, indices, assignmen
         <DialogTitle>Create Sub-Assignments</DialogTitle>
         :
         <DialogTitle>Add Sub-Assignments</DialogTitle>}
-      <form style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <TextField
-          key={numberData.fieldId}
-          id={numberData.fieldId}
-          type='text'
-          label={numberData.fieldLabel}
-          InputLabelProps={{ shrink: true }}
-          margin='normal'
-          inputProps={{ min: 1, maxLength: 2, inputMode: 'numeric', pattern: '[0-9]*' }}
-          value={numOfAssignments}
-          error={error}
-          helperText={error ? 'Value needs to be a positive integer' : ''}
-          sx={{ width: '88%' }}
-          onChange={({ target }) => setSubAssignments(target.value)}
-        />
-        <Box sx={{ alignSelf: 'flex-end', m: 2 }}>
-          <Button size='medium' sx={{ mr: 1 }} onClick={handleClose}>
+      <form>
+        <DialogContent sx={{ px: 3, py: 1 }}>
+          <TextField
+            key={numberData.fieldId}
+            id={numberData.fieldId}
+            type='text'
+            label={numberData.fieldLabel}
+            InputLabelProps={{ shrink: true }}
+            margin='normal'
+            inputProps={{ min: 1, maxLength: 2, inputMode: 'numeric', pattern: '[0-9]*' }}
+            value={numOfAssignments}
+            error={error}
+            helperText={error ? 'Value needs to be a positive integer' : ''}
+            sx={{ width: '100%' }}
+            onChange={({ target }) => setSubAssignments(target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button size='medium' onClick={handleClose}>
             Cancel
           </Button>
           <Button size='medium' variant='outlined' type='submit' onClick={(event) => {
@@ -67,7 +70,7 @@ function SimpleDialog({ handleClose, open, addSubAssignments, indices, assignmen
           }}>
             Confirm
           </Button>
-        </Box>
+        </DialogActions>
       </form>
     </Dialog>
   );
