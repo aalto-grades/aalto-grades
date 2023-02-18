@@ -17,7 +17,7 @@ const FetchInstancesView = () => {
 
   useEffect(() => {
     instancesService.getSisuInstances(courseId)
-      .then((data) => setInstances(data.instances))
+      .then((data) => setInstances(data.courseInstances))
       .catch((e) => console.log(e.message));
   }, []);
 
