@@ -71,7 +71,7 @@ const EditInstanceForm = ({ instance }) => {
 
   useEffect(() => {
     if (courseType === '') {
-      setType(textFormatServices.formatCourseType(instance.courseType));
+      setType(textFormatServices.formatCourseType(instance.teachingMethod));
       setStartDate(instance.startDate);
       setEndDate(instance.endDate);
       setTeachers(instance.responsibleTeachers);

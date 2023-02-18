@@ -7,12 +7,12 @@ import axios from './axios';
 const getCourses = async () => {
   const response = await axios.get('/v1/user/8/courses');
   console.log(response.data);
-  return response.data;
+  return response.data.data;
 };
 
-const addCourse = async (course) => {
+const addCourse = async (course) => {  // viivin kannattaa varmaan tarkistaa onko tää ok !!
   const response = await axios.post('/v1/courses', course);
-  return response.data;
+  return response.data.data;
 };
 
 export default { getCourses, addCourse };

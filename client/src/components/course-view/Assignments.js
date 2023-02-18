@@ -22,10 +22,12 @@ const Assignments = ({ assignments, formula }) => {
       <Box sx={{ display: 'inline-grid', gap: 1 }}>
         {assignments.map(assignment => <Assignment key={assignment.category} assignment={assignment} button={<Button>Edit</Button>} width={'50vw'} />)}
       </Box>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
         <Button>Add assignment</Button>
-        <Button variant='outlined'>Calculate final grades</Button>
-        <Button variant='contained'>Add points</Button>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}>
+          <Button variant='outlined'>Calculate final grades</Button>
+          <Button variant='contained'>Add points</Button>
+        </Box>
       </Box>
     </Box>
   );

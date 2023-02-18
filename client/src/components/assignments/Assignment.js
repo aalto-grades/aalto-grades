@@ -6,9 +6,9 @@ import Typography from '@mui/material/Typography';
 import { AccordionDetails, AssignmentText } from './Accordion';
 import textFormatServices from '../../services/textFormat';
 
+// TODO: replace the points with formulas
 const Assignment = ({ assignment, button, width }) => {
   const { category, totalPoints, assignments } = assignment;
-  console.log(assignments);
   const { description, points, expiryDate, subAssignments } = assignments[0]; //must be at least one
 
   return (
