@@ -21,8 +21,8 @@ import ViewFormulaAccordion from './ViewFormulaAccordion';
 
 const StyledBox = styled(Box)`
   width: 53vw;
-  minWidth:  400px;
-  maxWidth: 1000px;
+  min-width:  400px;
+  max-width: 1000px;
 `;
 
 const SelectFormulaForm = ({ assignments, formulas, instaceId }) => {
@@ -65,7 +65,7 @@ const SelectFormulaForm = ({ assignments, formulas, instaceId }) => {
     return (
       <>
         { assignments.map((assignment) => (
-          <FormControlLabel key={assignment.name} control={
+          <FormControlLabel key={assignment.id} control={
             <Checkbox name={assignment.name} onChange={(event) => {
               if(event.target.checked) {
                 setSelectedAssignments(prev => [...prev, event.target.name]);
@@ -101,7 +101,7 @@ const SelectFormulaForm = ({ assignments, formulas, instaceId }) => {
         <FormControl sx={{ m: 3, mt: 3, minWidth: 280 }} variant='standard'>
           <InputLabel id='formulaLabel' shrink={true} sx={{ fontSize: '20px', mb: -2, position: 'relative' }}>Formula</InputLabel>
           <Select label='Formula' labelId='formulaLabel' value={formula} onChange={handleFormulaChange} defaultValue='Weighted average' data-testid='select'>
-            { formulas.map((formula) => <MenuItem key={formula.name} value={formula.name} data-testid='select-option'>{formula.name}</MenuItem> ) }
+            { formulas.map((formula) => <MenuItem key={formula.id} value={formula.name} data-testid='select-option'>{formula.name}</MenuItem> ) }
           </Select>
         </FormControl>
         <StyledBox>
@@ -113,13 +113,13 @@ const SelectFormulaForm = ({ assignments, formulas, instaceId }) => {
           flexWrap: 'wrap',
           justifyContent: 'space-between'
         }}>
-          <Typography width={300} m={3}>Specify the attribute values for the sub-assignments now or leave it for later</Typography>
+          <Typography width={350} m={3}>Specify attribute values for the sub-assignments</Typography>
           <Box sx={{ m: 3, mt: 0, alignSelf: 'flex-end',display: 'flex', lexDirection: 'column', }}>
-            <Button size='small' variant='contained' type='submit' name='specifyAttributes' sx={{ mr: 2 }}>
-              Specify  attributes
-            </Button>
-            <Button size='small' variant='outlined' type='submit' name='skipAttributes' >
+            <Button size='small' variant='outlined' type='submit' name='skipAttributes' sx={{ mr: 2 }}>
               Skip for now
+            </Button>
+            <Button size='small' variant='contained' type='submit' name='specifyAttributes'>
+              Specify  attributes
             </Button>
           </Box>
         </StyledBox>

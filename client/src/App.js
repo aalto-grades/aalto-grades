@@ -92,7 +92,7 @@ function App() {
           <Routes> { /* Add nested routes when needed */ }
             <Route path='/login' element={<Login/>} />
             <Route path='/signup' element={<Signup/>} />
-            {/* All roles are authorised to access the front page, conditional rendering is done inside the component */}
+            { /* All roles are authorised to access the front page, conditional rendering is done inside the component */ }
             <Route element={<PrivateRoute roles={[roles.admin, roles.teacher, roles.student, roles.assistant]}/>}>
               <Route path='/' element={<FrontPage/>} />
               <Route path='/course-view/:courseCode' element={<CourseView/>}/>

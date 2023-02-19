@@ -9,7 +9,7 @@ import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import SelectFormulaView from '../components/SelectFormulaView';
 import instancesService from '../services/instances';
 import formulasService from '../services/formulas';
-import dummyAssignments from '../mock-data/dummyAssignments';
+import mockAssignments from '../mock-data/mockAssignments';
 import mockFormulas from '../mock-data/mockFormulas';
 
 jest.mock('../services/instances');
@@ -21,7 +21,7 @@ describe('Tests for SelectFormulaView components', () => {
   const renderSelectFormulaView = async () => {
 
     instancesService.getAssignments.mockRejectedValue('Network error');
-    instancesService.getAssignments.mockResolvedValue(dummyAssignments);
+    instancesService.getAssignments.mockResolvedValue(mockAssignments);
     formulasService.getFormulas.mockRejectedValue('Network error');
     formulasService.getFormulas.mockResolvedValue(mockFormulas);
     return render(
@@ -40,10 +40,10 @@ describe('Tests for SelectFormulaView components', () => {
       const subHeadingElement = screen.queryByText('Result: Course Total Grade');
       const assignmentSelection = screen.queryByText('Select the sub-assignments you want to include in the calculation');
       const projectsCheckbox = screen.queryByText('Projects');
-      const examCheckbox = screen.queryByText('Exam');
+      const examCheckbox = screen.queryByText('Exams');
       const formulaSelector = screen.queryByText('Formula');
       const formulaPreview = screen.queryByText('Preview of the formula');
-      const submitInstructions = screen.queryByText('Specify the attribute values for the sub-assignments now or leave it for later');
+      const submitInstructions = screen.queryByText('Specify attribute values for the sub-assignments');
       const specifyAttributesButton = screen.queryByText('Specify attributes');
       const skipAttributesButton = screen.queryByText('Skip for now');
 

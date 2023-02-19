@@ -9,7 +9,7 @@ import Box from '@mui/material/Box';
 import SelectFormulaForm from './select-formula-view/SelectFormulaForm';
 import instancesService from '../services/instances';
 import formulasService from '../services/formulas';
-import dummyAssignments from '../mock-data/dummyAssignments';
+import mockAssignments from '../mock-data/mockAssignments';
 import mockFormulas from '../mock-data/mockFormulas';
 
 const SelectFormulaView = () => {
@@ -32,7 +32,7 @@ const SelectFormulaView = () => {
       })
       .catch((e) => console.log(e.message));
     // DELETE THIS AFTER ROUTES WORK!
-    setAssignments(dummyAssignments);
+    setAssignments(mockAssignments);
     setFormulas(mockFormulas);
   }, []);
 
