@@ -23,6 +23,7 @@ import FetchInstancesView from './components/FetchInstancesView';
 import EditInstanceView from './components/EditInstanceView';
 import AddAssignmentsView from './components/AddAssignmentsView';
 import InstanceSummaryView from './components/InstanceSummaryView';
+import CreateAssignmentView from './components/CreateAssignmentView';
 import useLogout from './hooks/useLogout';
 
 const theme = createTheme({
@@ -112,6 +113,7 @@ function App() {
                 <Route path=':courseId/add-assignments/:instanceId' element={<AddAssignmentsView/>}/>
                 <Route path=':courseId/instance-summary/:instanceId' element={<InstanceSummaryView/>}/>
               </Route>
+              <Route path='/create-assignment/:instanceId' element={<CreateAssignmentView/>}/>
             </Route>
           </Routes>
         </Box>

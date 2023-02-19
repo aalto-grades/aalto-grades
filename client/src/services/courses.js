@@ -10,7 +10,8 @@ const getCourses = async () => {
   return response.data.data;
 };
 
-const addCourse = async (course) => {  // viivin kannattaa varmaan tarkistaa onko tää ok !!
+// .data added here too, not tested though
+const addCourse = async (course) => {
   const response = await axios.post('/v1/courses', course);
   return response.data.data;
 };
