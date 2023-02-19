@@ -61,18 +61,20 @@ const SelectFormulaForm = ({ assignments, formulas, instaceId }) => {
     }
   };
 
+  const handleCheckboxChange = (event) => {
+    if(event.target.checked) {
+      setSelectedAssignments(prev => [...prev, event.target.name]);
+    } else {
+      setSelectedAssignments(prev => prev.filter(assignment => assignment !== event.target.name));
+    }
+  };
+
   const assignmentCheckboxes = () => {
     return (
       <>
         { assignments.map((assignment) => (
           <FormControlLabel key={assignment.id} control={
-            <Checkbox name={assignment.name} onChange={(event) => {
-              if(event.target.checked) {
-                setSelectedAssignments(prev => [...prev, event.target.name]);
-              } else {
-                setSelectedAssignments(prev => prev.filter(fruit => fruit !== event.target.name));
-              }
-            }}/>
+            <Checkbox name={assignment.name} onChange={handleCheckboxChange}/>
           } label={assignment.name} />
         ))
         }
