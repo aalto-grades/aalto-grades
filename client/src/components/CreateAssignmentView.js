@@ -8,7 +8,7 @@ import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Assignment from './create-assignment/Assignment';
-import subAssignmentServices from '../services/assignments';
+import assignmentServices from '../services/assignments';
 
 const CreateAssignmentView = () => {
 
@@ -33,7 +33,7 @@ const CreateAssignmentView = () => {
   };
 
   const removeAssignment = (indices) => {
-    const updatedAssignments = subAssignmentServices.removeAssignment(indices, assignments);
+    const updatedAssignments = assignmentServices.removeAssignment(indices, assignments);
     setAssignments(updatedAssignments);
   };
 

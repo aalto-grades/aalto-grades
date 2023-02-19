@@ -5,7 +5,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@mui/material/TextField';
-import subAssignmentServices from '../../services/assignments';
+import assignmentServices from '../../services/assignments';
 
 // A TextField component used for the 'date' of an assignment and the 'expiryDate'
 
@@ -15,10 +15,10 @@ const DateTextField = ({ fieldData, indices, assignments, setAssignments }) => {
   const handleChange = (event) => {
     const value = event.target.value;
     if (fieldData.fieldId === 'assignmentDate') {
-      const updatedAssignments = subAssignmentServices.setProperty(indices, assignments, 'date', value);
+      const updatedAssignments = assignmentServices.setProperty(indices, assignments, 'date', value);
       setAssignments(updatedAssignments);
     } else if (fieldData.fieldId === 'expiryDate') {
-      const updatedAssignments = subAssignmentServices.setProperty(indices, assignments, 'expiryDate', value);
+      const updatedAssignments = assignmentServices.setProperty(indices, assignments, 'expiryDate', value);
       setAssignments(updatedAssignments);
     } else {
       console.log(fieldData.fieldId);
@@ -27,11 +27,11 @@ const DateTextField = ({ fieldData, indices, assignments, setAssignments }) => {
 
   const getValue = () => {
     if (fieldData.fieldId === 'assignmentDate') {
-      return subAssignmentServices.getProperty(indices, assignments, 'date');
+      return assignmentServices.getProperty(indices, assignments, 'date');
     } else if (fieldData.fieldId === 'expiryDate') {
-      return subAssignmentServices.getProperty(indices, assignments, 'expiryDate');
+      return assignmentServices.getProperty(indices, assignments, 'expiryDate');
     } else {
-      return console.log(fieldData.fieldId);
+      console.log(fieldData.fieldId);
     }
   };
 

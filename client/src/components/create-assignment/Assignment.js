@@ -6,20 +6,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import LeafAssignment from './LeafAssignment';
 import ParentAssignment from './ParentAssignment';
-import subAssignmentServices from '../../services/assignments';
+import assignmentServices from '../../services/assignments';
 
 // Parent component for the components LeafAssignment and ParentAssignment 
 
 const Assignment = ({ indices, assignments, setAssignments, removeAssignment }) => {
 
   const addSubAssignments = (numOfAssignments) => {
-    const updatedAssignments = subAssignmentServices.addSubAssignments(indices, assignments, numOfAssignments);
+    const updatedAssignments = assignmentServices.addSubAssignments(indices, assignments, numOfAssignments);
     setAssignments(updatedAssignments);
   };
   
   return (
     <>
-      {subAssignmentServices.getSubAssignments(indices, assignments).length === 0 ?
+      {assignmentServices.getSubAssignments(indices, assignments).length === 0 ?
         <LeafAssignment 
           indices={indices}
           addSubAssignments={addSubAssignments}

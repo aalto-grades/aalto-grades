@@ -13,7 +13,7 @@ import SimpleDialog from './SimpleDialog';
 import ConfirmationDialog from './ConfirmationDialog';
 import StringTextField from './StringTextField';
 import DateTextField from './DateTextField';
-import subAssignmentServices from '../../services/assignments';
+import assignmentServices from '../../services/assignments';
 
 // An Assignmnet component without subassignments and hence without a formula as well.
 // If this isn't the root Assignment, this can be deleted
@@ -45,22 +45,22 @@ const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignment
   // otherwise the name is the same as the category
   const handleChange = (event) => {
     const value = event.target.value;
-    let updatedAssignments = subAssignmentServices.setProperty(indices, assignments, 'category', value);
+    let updatedAssignments = assignmentServices.setProperty(indices, assignments, 'category', value);
     if (value === 'Other') {
       setDisplayNewName(true);
-      updatedAssignments = subAssignmentServices.setProperty(indices, updatedAssignments, 'name', '');
+      updatedAssignments = assignmentServices.setProperty(indices, updatedAssignments, 'name', '');
     } else {
       setDisplayNewName(false);
-      updatedAssignments = subAssignmentServices.setProperty(indices, updatedAssignments, 'name', value);
+      updatedAssignments = assignmentServices.setProperty(indices, updatedAssignments, 'name', value);
     }
     setAssignments(updatedAssignments);
   };
 
   const getValue = (fieldData) => {
     if (fieldData.fieldId === 'category') {
-      return subAssignmentServices.getProperty(indices, assignments, 'category');
+      return assignmentServices.getProperty(indices, assignments, 'category');
     } else {
-      return console.log(fieldData.fieldId);
+      console.log(fieldData.fieldId);
     }
   };
 
@@ -146,8 +146,8 @@ const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignment
           indices={indices}
           assignments={assignments}
         />
-        {subAssignmentServices.getSubAssignments(indices, assignments).length === 0 ?
-          <Button size='small' sx={{ my: 1, alignSelf: 'flex-end', textAlign: 'right' }} onClick={handleCountDialogOpen}>
+        {assignmentServices.getSubAssignments(indices, assignments).length === 0 ?
+          <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
             Create sub-assignments
           </Button>
           :

@@ -41,7 +41,7 @@ const CourseView = () => {
         <OngoingInstanceInfo info={mockCurrentInstance} />
         { /* a different assignment component will be created for students */
           (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
-          <Assignments assignments={mockAssignments} />
+          <Assignments assignments={mockAssignments} instance={mockCurrentInstance} />
         }
       </Box>
       <Typography variant='h4' align='left' sx={{ fontWeight: 'light', mt: 8, mb: 3 }}>Past Instances</Typography>
