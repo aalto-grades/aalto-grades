@@ -5,10 +5,7 @@
 import { useState, useMemo } from 'react';
 import { Outlet } from 'react-router-dom';
 
-//const dummyTeachers = ['Elisa Mekler (you)', 'David McGookin'];
-//const dummyInfo = { startDate: new Date(2021, 8, 14), endDate: new Date(2021, 11, 13), type: 'Lecture', minCredits: 5, maxCredits: 5, scale: 'General scale, 0-5', teachers: dummyTeachers };
-
-// TODO ON INSTANCE CREATION END: EMPTY THIS CONTEXT!
+// TODO ON INSTANCE CREATION END: EMPTY THIS CONTEXT?
 
 export const InstanceCreationRoute = () => {
   const [addedAssignments, setAddedAssignments] = useState([]);
