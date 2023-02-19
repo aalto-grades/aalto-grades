@@ -25,7 +25,7 @@ const StyledBox = styled(Box)`
   max-width: 1000px;
 `;
 
-const SelectFormulaForm = ({ assignments, formulas, instaceId }) => {
+const SelectFormulaForm = ({ assignments, formulas, courseId }) => {
 
   const [formula, setFormula] = useState('');
   const [codeSnippet, setCodeSnippet] = useState('');
@@ -50,8 +50,7 @@ const SelectFormulaForm = ({ assignments, formulas, instaceId }) => {
       console.log(formulaObject);
 
       if (event.nativeEvent.submitter.name == 'skipAttributes') {
-        // should this be course id instead? 
-        navigate(`/course-view/${instaceId}`, { replace: true });
+        navigate(`/course-view/${courseId}`, { replace: true });
       } else {
         // TODO: redirect to specify attribures
       }
@@ -134,7 +133,7 @@ const SelectFormulaForm = ({ assignments, formulas, instaceId }) => {
 SelectFormulaForm.propTypes = {
   assignments: PropTypes.array,
   formulas: PropTypes.array,
-  instaceId: PropTypes.string,
+  courseId: PropTypes.string,
 };
 
 export default SelectFormulaForm;

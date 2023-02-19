@@ -105,7 +105,8 @@ function App() {
             <Route element={<PrivateRoute roles={[roles.admin, roles.teacher]}/>}>
               <Route path='/fetch-instances/:courseId' element={<FetchInstancesView/>}/>
               <Route path='/edit-instance/:instanceId' element={<EditInstanceView/>}/>
-              <Route path='/select-formula' element={<SelectFormulaView/>}/> { /* Path will be replaced with '/select-formula/:instanceId/:assignmentId' once component is connected to a page */ }
+              <Route path='/select-formula' element={<SelectFormulaView/>}/>
+              { /* Path above will be replaced with '/select-formula/:instanceId/:assignmentId' once component is connected to a page */ }
             </Route>
           </Routes>
         </Box>

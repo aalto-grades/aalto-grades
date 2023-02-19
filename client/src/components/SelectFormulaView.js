@@ -13,7 +13,7 @@ import mockAssignments from '../mock-data/mockAssignments';
 import mockFormulas from '../mock-data/mockFormulas';
 
 const SelectFormulaView = () => {
-  const { instanceId } = useParams();
+  const { instanceId, courseId } = useParams();
   const [assignments, setAssignments] = useState([]);
   const [formulas, setFormulas] = useState([]);
 
@@ -42,12 +42,12 @@ const SelectFormulaView = () => {
     <Box display="flex" justifyContent='center' alignItems='center' flexDirection='column'>
       <Box textAlign='left' alignItems='left'>
         <Typography variant="h3" component="div" sx={{ flexGrow: 1, my: 4 }}>
-        Select Grading Formula
+          Select Grading Formula
         </Typography>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1, mb: 2 }}>
-        Result: Course Total Grade
+          Result: Course Total Grade
         </Typography>
-        <SelectFormulaForm assignments={assignments} formulas={formulas} instanceId={instanceId} />
+        <SelectFormulaForm assignments={assignments} formulas={formulas} courseId={courseId} />
       </Box>
     </Box>
 

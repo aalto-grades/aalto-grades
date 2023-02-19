@@ -31,8 +31,8 @@ const ViewFormulaAccordion = ({ codeSnippet }) => {
         >
           <Typography>Preview of the formula</Typography>
         </AccordionSummary>
-        <AccordionDetails sx={{ bgcolor: 'primary.light', overflow: 'scroll' }}>
-          <Container>
+        <AccordionDetails sx={{ bgcolor: 'primary.light', p:'10px' }}>
+          <Container disableGutters sx={{ overflowX: 'scroll' }}>
             <pre>
               <code>{codeSnippet}</code>
             </pre>
