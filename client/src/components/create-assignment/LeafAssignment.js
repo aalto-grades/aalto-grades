@@ -45,22 +45,20 @@ const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignment
   // otherwise the name is the same as the category
   const handleChange = (event) => {
     const value = event.target.value;
-    const updatedAssignments = JSON.parse(JSON.stringify(assignments));
-    subAssignmentServices.setProperty(indices, updatedAssignments, 'category', value);
+    let updatedAssignments = subAssignmentServices.setProperty(indices, assignments, 'category', value);
     if (value === 'Other') {
       setDisplayNewName(true);
-      subAssignmentServices.setProperty(indices, updatedAssignments, 'name', '');
+      updatedAssignments = subAssignmentServices.setProperty(indices, updatedAssignments, 'name', '');
     } else {
       setDisplayNewName(false);
-      subAssignmentServices.setProperty(indices, updatedAssignments, 'name', value);
+      updatedAssignments = subAssignmentServices.setProperty(indices, updatedAssignments, 'name', value);
     }
     setAssignments(updatedAssignments);
   };
 
   const getValue = (fieldData) => {
-    let updatedAssignments = JSON.parse(JSON.stringify(assignments));
     if (fieldData.fieldId === 'category') {
-      return subAssignmentServices.getProperty(indices, updatedAssignments, 'category');
+      return subAssignmentServices.getProperty(indices, assignments, 'category');
     } else {
       return console.log(fieldData.fieldId);
     }

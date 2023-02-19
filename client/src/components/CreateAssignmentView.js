@@ -33,8 +33,7 @@ const CreateAssignmentView = () => {
   };
 
   const removeAssignment = (indices) => {
-    const updatedAssignments = JSON.parse(JSON.stringify(assignments));
-    subAssignmentServices.removeAssignment(indices, updatedAssignments);
+    const updatedAssignments = subAssignmentServices.removeAssignment(indices, assignments);
     setAssignments(updatedAssignments);
   };
 

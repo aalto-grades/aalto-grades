@@ -13,8 +13,7 @@ import subAssignmentServices from '../../services/assignments';
 const Assignment = ({ indices, assignments, setAssignments, removeAssignment }) => {
 
   const addSubAssignments = (numOfAssignments) => {
-    const updatedAssignments = JSON.parse(JSON.stringify(assignments));
-    subAssignmentServices.addSubAssignments(indices, updatedAssignments, numOfAssignments);
+    const updatedAssignments = subAssignmentServices.addSubAssignments(indices, assignments, numOfAssignments);
     setAssignments(updatedAssignments);
   };
   

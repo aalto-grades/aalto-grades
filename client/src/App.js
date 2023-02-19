@@ -105,7 +105,7 @@ function App() {
             <Route element={<PrivateRoute roles={[roles.admin, roles.teacher]}/>}>
               <Route path='/fetch-instances/:courseId' element={<FetchInstancesView/>}/>
               <Route path='/edit-instance/:instanceId' element={<EditInstanceView/>}/>
-              <Route path='/create-assignment/:instanceId' element={<CreateAssignmentView/>}/>
+              <Route path='/create-assignment/:instanceId/:assignmentId' element={<CreateAssignmentView/>}/>
             </Route>
           </Routes>
         </Box>

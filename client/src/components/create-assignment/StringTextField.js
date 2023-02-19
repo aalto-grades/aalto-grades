@@ -16,19 +16,17 @@ const StringTextField = ({ fieldData, indices, assignments, setAssignments }) =>
   // Functions for handling the change of the values in the 'New Name' textfield
   const handleChange = (event) => {
     const value = event.target.value;
-    const updatedAssignments = JSON.parse(JSON.stringify(assignments));
     if (fieldData.fieldId === 'assignmentName') {
-      subAssignmentServices.setProperty(indices, updatedAssignments, 'name', value);
+      const updatedAssignments = subAssignmentServices.setProperty(indices, assignments, 'name', value);
+      setAssignments(updatedAssignments);
     } else {
       console.log(fieldData.fieldId);
     }
-    setAssignments(updatedAssignments);
   };
 
   const getValue = () => {
-    let updatedAssignments = JSON.parse(JSON.stringify(assignments));
     if (fieldData.fieldId === 'assignmentName') {
-      return subAssignmentServices.getProperty(indices, updatedAssignments, 'name');
+      return subAssignmentServices.getProperty(indices, assignments, 'name');
     } else {
       return console.log(fieldData.fieldId);
     }
