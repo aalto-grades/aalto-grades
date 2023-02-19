@@ -17,7 +17,7 @@ describe('Tests for EditInstanceView components', () => {
 
   const renderEditInstanceView = async () => {
 
-    const mockResponse = { instance: mockSisuInstances[0] };
+    const mockResponse = { courseInstance: mockSisuInstances[0] };
 
     instancesService.getSisuInstance.mockRejectedValue('Network error');
     instancesService.getSisuInstance.mockResolvedValue(mockResponse);

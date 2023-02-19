@@ -56,7 +56,7 @@ const textFieldMinWidth = 195;
 
 const EditInstanceForm = ({ instance }) => {
 
-  const [courseType, setType]             = useState(textFormatServices.formatCourseType(instance.courseType));
+  const [courseType, setType]             = useState(textFormatServices.formatCourseType(instance.teachingMethod));
   const [startDate, setStartDate]         = useState(instance.startDate);
   const [endDate, setEndDate]             = useState(instance.endDate);
   const [teachers, setTeachers]           = useState(instance.responsibleTeachers);
