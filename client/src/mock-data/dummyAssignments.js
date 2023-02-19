@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+// This file should be deleted once we decide how mock assignment data will be formatted
+
 const dummyAssignments = [
   {
     id: 'mock-assignment-1',

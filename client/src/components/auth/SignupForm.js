@@ -23,7 +23,11 @@ const SignupForm = ({ addUser }) => {
     event.preventDefault();
     try {
       const userObject = ({
-        name, password, email, studentID, role,
+        name,
+        password,
+        email,
+        role,
+        ...(studentID != '' && { studentID: studentID }),
       });
       addUser(userObject);
     } catch (exception) {
@@ -61,7 +65,7 @@ const SignupForm = ({ addUser }) => {
             type='text'
             value={studentID}
             name='StudentID'
-            label='Student ID'
+            label='Student ID (not required)'
             onChange={({ target }) => setStudentID(target.value)}
             InputLabelProps={{ shrink: true }}
             margin='normal'

@@ -9,8 +9,8 @@ import Box from '@mui/material/Box';
 import SelectFormulaForm from './select-formula-view/SelectFormulaForm';
 import instancesService from '../services/instances';
 import formulasService from '../services/formulas';
-import dummyAssignments from '../dummy-data/dummyAssignments';
-import dummyFormulas from '../dummy-data/dummyFormulas';
+import dummyAssignments from '../mock-data/dummyAssignments';
+import mockFormulas from '../mock-data/mockFormulas';
 
 const SelectFormulaView = () => {
   const { instanceId } = useParams();
@@ -33,7 +33,7 @@ const SelectFormulaView = () => {
       .catch((e) => console.log(e.message));
     // DELETE THIS AFTER ROUTES WORK!
     setAssignments(dummyAssignments);
-    setFormulas(dummyFormulas);
+    setFormulas(mockFormulas);
   }, []);
 
   // TODO: How to differentiate between course total grade and assigment grade?

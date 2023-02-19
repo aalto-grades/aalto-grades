@@ -2,10 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-const dummyInstances = [
+const mockSisuInstances = [
   { id: 'mock-id-1',
-    startingPeriod: '2022-2023 Autumn I-II',
+    startingPeriod: '2021-2022 Autumn I-II',
     endingPeriod: '2022-2023 Autumn I-II',
+    minCredits: 5,
+    maxCredits: 5,
     startDate: '2022-08-14',
     endDate: '2022-11-13',
     type: 'LECTURE',
@@ -16,8 +18,6 @@ const dummyInstances = [
     ],
     courseData: {
       courseCode: 'CS-C3120',
-      minCredits: 5,
-      maxCredits: 5,
       department: {
         en: 'Department of computer science',
         fi: 'Department of computer science',
@@ -32,7 +32,7 @@ const dummyInstances = [
   },
   { id: 'mock-id-2',
     startingPeriod: '2021-2022 Autumn I-II',
-    endingPeriod: '2021-2022 Autumn I-II',
+    endingPeriod: '2022-2023 Autumn I-II',
     startDate: '2021-08-14',
     endDate: '2021-11-13',
     type: 'EXAM',
@@ -64,7 +64,9 @@ const dummyInstances = [
     endDate: '2023-05-19', 
     courseType: 'LECTURE',
     gradingType: 'NUMERICAL', 
-    responsibleTeachers: ['Kerttu Maaria Pollari-Malmi'],
+    responsibleTeachers: [
+      'Kerttu Maaria Pollari-Malmi'
+    ],
     courseData: {
       courseCode: 'CS-A1150', 
       minCredits: 5, 
@@ -88,4 +90,4 @@ const dummyInstances = [
   }
 ];
 
-export default dummyInstances;
+export default mockSisuInstances;

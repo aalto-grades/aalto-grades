@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-const dummyFormulas = [
+const mockFormulas = [
   {
     name: 'Weighted average',
     attributes: ['Max Points', 'Min required points', 'Weight'],
@@ -21,4 +21,4 @@ const dummyFormulas = [
   },  
 ];
   
-export default dummyFormulas;
+export default mockFormulas;

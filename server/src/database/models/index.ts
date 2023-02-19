@@ -2,21 +2,22 @@
 //
 // SPDX-License-Identifier: MIT
 
-import CourseInstancePartialGrade from './courseInstancePartialGrade';
-import UserAssignmentGrade from './userAssignmentGrade';
-import CourseTranslation from './courseTranslation';
-import UserPartialGrade from './userPartialGrade';
+import Course from './course';
 import CourseAssignment from './courseAssignment';
 import CourseInstance from './courseInstance';
+import CourseInstancePartialGrade from './courseInstancePartialGrade';
 import CourseResult from './courseResult';
 import CourseRole from './courseRole';
-import Course from './course';
+import CourseTranslation from './courseTranslation';
 import User from './user';
+import UserAssignmentGrade from './userAssignmentGrade';
+import UserPartialGrade from './userPartialGrade';
 
 User.belongsToMany(CourseInstance, {
   through: CourseRole,
   onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
+  onUpdate: 'CASCADE',
+  as: 'student'
 });
 
 CourseInstance.belongsToMany(User, {
@@ -37,7 +38,8 @@ CourseInstance.belongsTo(Course, {
 
 CourseInstance.belongsTo(User, {
   targetKey: 'id',
-  foreignKey: 'responsibleTeacher'
+  foreignKey: 'responsibleTeacher',
+  as: 'teacher'
 });
 
 Course.hasMany(CourseTranslation, {
@@ -141,14 +143,14 @@ UserPartialGrade.belongsTo(CourseInstancePartialGrade, {
 });
 
 export default {
-  CourseInstancePartialGrade,
-  UserAssignmentGrade,
-  CourseTranslation,
-  UserPartialGrade,
+  Course,
   CourseAssignment,
   CourseInstance,
+  CourseInstancePartialGrade,
   CourseResult,
   CourseRole,
-  Course,
-  User
+  CourseTranslation,
+  User,
+  UserAssignmentGrade,
+  UserPartialGrade
 };

@@ -9,8 +9,8 @@ import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import SelectFormulaView from '../components/SelectFormulaView';
 import instancesService from '../services/instances';
 import formulasService from '../services/formulas';
-import dummyAssignments from '../dummy-data/dummyAssignments';
-import dummyFormulas from '../dummy-data/dummyFormulas';
+import dummyAssignments from '../mock-data/dummyAssignments';
+import mockFormulas from '../mock-data/mockFormulas';
 
 jest.mock('../services/instances');
 jest.mock('../services/formulas');
@@ -23,7 +23,7 @@ describe('Tests for SelectFormulaView components', () => {
     instancesService.getAssignments.mockRejectedValue('Network error');
     instancesService.getAssignments.mockResolvedValue(dummyAssignments);
     formulasService.getFormulas.mockRejectedValue('Network error');
-    formulasService.getFormulas.mockResolvedValue(dummyFormulas);
+    formulasService.getFormulas.mockResolvedValue(mockFormulas);
     return render(
       <BrowserRouter>
         <SelectFormulaView />

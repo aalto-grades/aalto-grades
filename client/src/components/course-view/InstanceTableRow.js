@@ -9,18 +9,17 @@ import TableCell from '@mui/material/TableCell';
 import textFormatServices from '../../services/textFormat';
 
 const InstanceTableRow = ({ instance }) => {
-  const { period, startDate, endDate, type, id } = instance;
+  const { id, startDate, endDate, courseType } = instance;
     
   return(
     <TableRow
       key={id} 
       hover={true}
-      onClick={() => {/* TODO: Add functionality to view old instances */ }}
+      onClick={() => { /* TODO: Add functionality to view old instances */ }}
     >
-      <TableCell>{period}</TableCell>
       <TableCell>{textFormatServices.formatDateToString(startDate)}</TableCell>
       <TableCell>{textFormatServices.formatDateToString(endDate)}</TableCell>
-      <TableCell>{type}</TableCell>
+      <TableCell>{courseType}</TableCell>
     </TableRow>
   );
 };

@@ -2,43 +2,211 @@
 //
 // SPDX-License-Identifier: MIT
 
-import express, { Request, Response, Router } from 'express';
-import { getUserCourses } from '../controllers/user';
-import { addCourse, handleInvalidRequestJson, addCourseInstance, fetchAllInstancesFromSisu, fetchInstanceFromSisu, getCourse, getInstance } from '../controllers/course';
-import { authLogin, authLogout, authSelfInfo, authSignup } from './login';
-import passport from 'passport';
-import cors from 'cors';
+import express, { Router } from 'express';
 import cookieParser from 'cookie-parser';
-import { frontendOrigin } from '../configs';
+import cors from 'cors';
+import swaggerJsdoc, { OAS3Options } from 'swagger-jsdoc';
+import swaggerUI from 'swagger-ui-express';
+
+import { FRONTEND_ORIGIN } from '../configs/environment';
+import { definition } from '../configs/swagger';
+
+import { router as authRouter } from './auth';
+import { addCourse, getCourse } from '../controllers/course';
+import { fetchAllCourseInstancesFromSisu, fetchCourseInstanceFromSisu } from '../controllers/sisu';
+import { router as courseInstanceRouter } from './courseInstance';
+import { handleInvalidRequestJson } from '../middleware';
+import { controllerDispatcher } from '../middleware/errorHandler';
+import { router as userRouter } from './user';
+
+const options: OAS3Options = {
+  definition,
+  apis: ['./src/routes/*.ts'],
+};
+
+const openapiSpecification: object = swaggerJsdoc(options);
 
 export const router: Router = Router();
 
 router.use(cookieParser());
+router.use(authRouter);
+router.use(courseInstanceRouter);
+router.use(userRouter);
+
+router.use('/api-docs', swaggerUI.serve);
+router.get('/api-docs', swaggerUI.setup(openapiSpecification));
 
 // User routes
-router.get('/v1/user/:userId/courses', getUserCourses);
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     jwtCookie:
+ *       type: apiKey
+ *       in: cookie
+ *       name: jwt
+ * definitions:
+ *   Failure:
+ *     type: object
+ *     description: A reason for a failure, with a chiefly developer-facing error message.
+ *     properties:
+ *       success:
+ *         type: boolean
+ *         description: '`false` to indicate failure.'
+ *         example: false
+ *       errors:
+ *         type: array
+ *         items:
+ *           type: string
+ *         description: An error message to explain the error.
+ *   CourseData:
+ *     type: object
+ *     description: Course Information
+ *     properties:
+ *       id:
+ *         type: integer
+ *         description: Course ID
+ *       courseCode:
+ *         type: string
+ *         description: Course Code
+ *       department:
+ *         type: object
+ *         description: Object containing department with localization
+ *         properties:
+ *           fi:
+ *             type: string
+ *           sv:
+ *             type: string
+ *           en:
+ *             type: string
+ *       name:
+ *         type: object
+ *         description: Object containing course name with localization
+ *         properties:
+ *           fi:
+ *             type: string
+ *           sv:
+ *             type: string
+ *           en:
+ *             type: string
+ *       evaluationInformation:
+ *         type: object
+ *         description: Object containing course evaluation information with localization
+ *         properties:
+ *           fi:
+ *             type: string
+ *           sv:
+ *             type: string
+ *           en:
+ *             type: string
+ */
 
 // Sisu API routes
-router.get('/v1/courses/sisu/:courseId', fetchAllInstancesFromSisu);
-router.get('/v1/courses/sisu/instance/:instanceId', fetchInstanceFromSisu);
 
-// Course and instance routes
-router.post('/v1/courses', express.json(), handleInvalidRequestJson, addCourse);
-router.post('/v1/courses/:courseId/instances', express.json(), addCourseInstance);
+/**
+ * @swagger
+ * /v1/sisu/courses/{courseCode}:
+ *   get:
+ *     tags: [Course, SISU]
+ *     description: Fetch All Instances of a Course from SISU
+ *     parameters:
+ *       - in: path
+ *         name: courseCode
+ *         required: True
+ *         schema:
+ *           type: string
+ *         description: The course code of the course to be fetched from SISU
+ *     responses:
+ *       200:
+ *         description: User's Courses
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/UserCourses'
+ */
+router.get('/v1/sisu/courses/:courseCode', controllerDispatcher(fetchAllCourseInstancesFromSisu));
 
-router.get('/v1/courses/:courseId', getCourse);
-router.get('/v1/instances/:instanceId', getInstance);
+/**
+ * @swagger
+ * /v1/sisu/instances/{sisuCourseInstanceId}:
+ *   get:
+ *     tags: [Course, SISU]
+ *     description: Fetch Course Instance Information from SISU
+ *     parameters:
+ *       - in: path
+ *         name: sisuCourseInstanceId
+ *         required: True
+ *         schema:
+ *           type: string
+ *         description: InstanceID of a course instance in sisu
+ *     responses:
+ *       200:
+ *         description: User's Courses
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/UserCourses'
+ */
+router.get(
+  '/v1/sisu/instances/:sisuCourseInstanceId',
+  controllerDispatcher(fetchCourseInstanceFromSisu)
+);
 
-router.post('/v1/auth/login', express.json(), authLogin);
-router.post('/v1/auth/logout', passport.authenticate('jwt', { session: false }), express.json(), authLogout);
-router.post('/v1/auth/signup', express.json(), authSignup);
-router.get('/v1/auth/self-info', passport.authenticate('jwt', { session: false }), express.json(), authSelfInfo);
+// Course routes
+/**
+ * @swagger
+ * /v1/courses:
+ *   post:
+ *     tags: [Course]
+ *     description: Add a course
+ *     requestBody:
+ *       description: Description of add course POST body
+ *     responses:
+ *       200:
+ *         description: User's Courses
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/UserCourses'
+ */
+router.post(
+  '/v1/courses',
+  express.json(),
+  handleInvalidRequestJson,
+  controllerDispatcher(addCourse)
+);
 
-router.get('*', (req: Request, res: Response) => {
-  res.send(`Hello ${req.path}`);
-});
+/**
+ * @swagger
+ * /v1/courses/{courseId}:
+ *   get:
+ *     tags: [Course]
+ *     description: Get Course Information
+ *     parameters:
+ *       - in: path
+ *         name: courseId
+ *         required: True
+ *         schema:
+ *           type: string
+ *         description: The ID of the fetched course
+ *     responses:
+ *       200:
+ *         description: Course
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request
+ *                 course:
+ *                   $ref: '#/definitions/Course'
+ */
+router.get('/v1/courses/:courseId', controllerDispatcher(getCourse));
 
 router.use(cors({
-  origin: frontendOrigin,
+  origin: FRONTEND_ORIGIN,
   credentials: true,
 }));
