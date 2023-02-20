@@ -8,7 +8,7 @@ import * as yup from 'yup';
 import models from '../database/models';
 import CourseAssignment from '../database/models/courseAssignment';
 
-import { Assignment } from '../types/course';
+import { CourseAssignmentData } from '../types/course';
 import { HttpCode } from '../types/httpCode';
 import { findCourseAssignmentById } from './utils/courseAssignment';
 import { findCourseInstanceById } from './utils/courseInstance';
@@ -30,7 +30,7 @@ export async function addAssignment(req: Request, res: Response): Promise<void> 
   });
 
   await requestSchema.validate(req.body, { abortEarly: false });
-  const { courseInstanceId, name, executionDate, expiryDate }: Assignment = req.body;
+  const { courseInstanceId, name, executionDate, expiryDate }: CourseAssignmentData = req.body;
 
   // Check that instance exists.
   await findCourseInstanceById(courseInstanceId, HttpCode.NotFound);
@@ -73,7 +73,7 @@ export async function updateAssignment(req: Request, res: Response): Promise<voi
 
   const id: number = Number(req.params.assignmentId);
   await requestSchema.validate({ id: id, ...req.body }, { abortEarly: false });
-  const { courseInstanceId, name, executionDate, expiryDate }: Assignment = req.body;
+  const { courseInstanceId, name, executionDate, expiryDate }: CourseAssignmentData = req.body;
 
   const assignment: CourseAssignment = await findCourseAssignmentById(id, HttpCode.NotFound);
 

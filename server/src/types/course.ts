@@ -49,7 +49,7 @@ export interface CourseInstanceData {
   responsibleTeachers?: Array<string>,
 }
 
-export interface Assignment {
+export interface CourseAssignmentData {
   id?: number,
   courseInstanceId: number,
   name: string,
