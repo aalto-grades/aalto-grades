@@ -35,7 +35,7 @@ export const router: Router = Router();
  *     properties:
  *       id:
  *         type: integer
- *         description: Course instance ID.
+ *         description: Internal course instance database ID.
  *       sisuCourseInstanceId:
  *         type: string
  *         description: ID of the corresponding course instance in Sisu.
@@ -69,7 +69,7 @@ export const router: Router = Router();
  * /v1/courses/instances/{instanceId}:
  *   get:
  *     tags: [Course Instance]
- *     description: Get a course instance.
+ *     description: Get information about a course instance.
  *     parameters:
  *       - in: path
  *         name: instanceId
@@ -91,7 +91,10 @@ export const router: Router = Router();
  *                   type: boolean
  *                   description: Success of the request.
  *                 data:
- *                   $ref: '#/definitions/CourseInstanceData'
+ *                   type: object
+ *                   properties:
+ *                     courseInstance:
+ *                       $ref: '#/definitions/CourseInstanceData'
  *       400:
  *         description: >
  *           A validation error has occurred in the URL, the given course
@@ -221,9 +224,12 @@ router.get(
  *                 data:
  *                   type: object
  *                   properties:
- *                     id:
- *                       type: integer
- *                       description: The ID of the newly added course instance.
+ *                     courseInstance:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                           description: The ID of the newly added course instance.
  *       400:
  *         description: >
  *           A validation error has occurred either in the URL or the request
