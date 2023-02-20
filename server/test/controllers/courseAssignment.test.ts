@@ -6,14 +6,14 @@ import supertest from 'supertest';
 
 import { app } from '../../src/app';
 
-import { Assignment } from '../../src/types/course';
+import { CourseAssignmentData } from '../../src/types/course';
 import { HttpCode } from '../../src/types/httpCode';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
 const badInput: string = 'notValid';
 
-const payload: Assignment = {
+const payload: CourseAssignmentData = {
   courseInstanceId: 1,
   name: 'exam assignment 1.1',
   executionDate: new Date('2022-02-02'),
