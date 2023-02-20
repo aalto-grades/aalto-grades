@@ -32,9 +32,9 @@ const openapiSpecification: OAS3Options = swaggerJsdoc(options);
 export const router: Router = Router();
 
 router.use(cookieParser());
+router.use(assignmentRouter);
 router.use(authRouter);
 router.use(userRouter);
-router.use(assignmentRouter);
 
 router.use('/api-docs', swaggerUI.serve);
 router.get('/api-docs', swaggerUI.setup(openapiSpecification));
