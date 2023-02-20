@@ -18,7 +18,7 @@ const EditInstanceView = () => {
   useEffect(() => {
     instancesService.getSisuInstance(instanceId)
       .then((data) => {
-        setInstance(data.instance);
+        setInstance(data.courseInstance);
       })
       .catch((e) => console.log(e.message));
   }, []);

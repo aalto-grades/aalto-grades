@@ -3,14 +3,14 @@
 // SPDX-License-Identifier: MIT
 
 const mockSisuInstances = [
-  { id: 'mock-id-1',
+  { sisuCourseInstanceId: 'mock-id-1',
     startingPeriod: '2021-2022 Autumn I-II',
     endingPeriod: '2022-2023 Autumn I-II',
     minCredits: 5,
     maxCredits: 5,
     startDate: '2022-08-14',
     endDate: '2022-11-13',
-    type: 'LECTURE',
+    teachingMethod: 'LECTURE',
     gradingScale: 'General Scale, 0-5',
     responsibleTeachers: [
       'Elisa Mekler',
@@ -30,12 +30,12 @@ const mockSisuInstances = [
       }
     }
   },
-  { id: 'mock-id-2',
+  { sisuCourseInstanceId: 'mock-id-2',
     startingPeriod: '2021-2022 Autumn I-II',
     endingPeriod: '2022-2023 Autumn I-II',
     startDate: '2021-08-14',
     endDate: '2021-11-13',
-    type: 'EXAM',
+    teachingMethod: 'EXAM',
     gradingScale: 'General Scale, 0-5',
     responsibleTeachers: [
       'Elisa Mekler'
@@ -57,12 +57,12 @@ const mockSisuInstances = [
     }
   },
   {
-    id: 'mock-id-3', 
+    sisuCourseInstanceId: 'mock-id-3', 
     startingPeriod: '-', 
     endingPeriod: '-', 
     startDate: '2023-02-06', 
     endDate: '2023-05-19', 
-    courseType: 'LECTURE',
+    teachingMethod: 'EXAM',
     gradingType: 'NUMERICAL', 
     responsibleTeachers: [
       'Kerttu Maaria Pollari-Malmi'
