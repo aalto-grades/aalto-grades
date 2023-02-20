@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -55,14 +56,30 @@ const teacherData = {
 const textFieldMinWidth = 195;
 
 const EditInstanceForm = ({ instance }) => {
+  let navigate = useNavigate();
+  let { courseId, instanceId } = useParams();
 
-  const [courseType, setType]             = useState(textFormatServices.formatCourseType(instance.teachingMethod));
-  const [startDate, setStartDate]         = useState(instance.startDate);
-  const [endDate, setEndDate]             = useState(instance.endDate);
-  const [teachers, setTeachers]           = useState(instance.responsibleTeachers);
-  const [stringMinCredits, setMinCredits] = useState(String(instance.minCredits));
-  const [stringMaxCredits, setMaxCredits] = useState(String(instance.maxCredits));
-  const [gradingScale, setGradingScale]   = useState(textFormatServices.formatGradingType(instance.gradingType));
+  const { 
+    courseType, setType,
+    startDate, setStartDate,
+    endDate, setEndDate,
+    teachers, setTeachers,
+    stringMinCredits, setMinCredits,
+    stringMaxCredits, setMaxCredits,
+    gradingScale, setGradingScale,
+  } = useOutletContext();
+
+  useEffect(() => {
+    if (courseType === '') {
+      setType(textFormatServices.formatCourseType(instance.teachingMethod));
+      setStartDate(instance.startDate);
+      setEndDate(instance.endDate);
+      setTeachers(instance.responsibleTeachers);
+      setMinCredits(String(instance.minCredits));
+      setMaxCredits(String(instance.maxCredits));
+      setGradingScale(textFormatServices.formatGradingType(instance.gradingType));
+    }
+  }, []);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -79,8 +96,7 @@ const EditInstanceForm = ({ instance }) => {
         gradingScale,
       });
       console.log(basicInfoObject);
-      // TODO: possibly save instance information to DB 
-      // (save info at least somewhere until the creation of the instance is done or disrupted)
+      navigate('/' + courseId + '/add-assignments/' + instanceId);
     } catch (exception) {
       console.log(exception);
     }
