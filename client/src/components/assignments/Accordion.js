@@ -126,7 +126,7 @@ const CustomAccordion = ({ assignments }) => {
 
   return (
     <>
-      {assignments.map(assignment => {
+      { assignments.map(assignment => {
         return (
           <Accordion 
             key={assignment.id + 'accordion'} 

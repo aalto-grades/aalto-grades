@@ -13,7 +13,6 @@ import Toolbar from '@mui/material/Toolbar';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import styled from 'styled-components';
 import PrivateRoute from './components/auth/PrivateRoute';
-import InstanceCreationRoute from './context/InstanceCreationRoute';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
 import FrontPage from './components/FrontPage';
@@ -24,6 +23,7 @@ import EditInstanceView from './components/EditInstanceView';
 import AddAssignmentsView from './components/AddAssignmentsView';
 import InstanceSummaryView from './components/InstanceSummaryView';
 import CreateAssignmentView from './components/CreateAssignmentView';
+import InstanceCreationRoute from './context/InstanceCreationRoute';
 import useLogout from './hooks/useLogout';
 
 const theme = createTheme({

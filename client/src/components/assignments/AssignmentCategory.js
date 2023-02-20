@@ -5,8 +5,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
-import CustomAccordion from './Accordion';
 import Typography from '@mui/material/Typography';
+import CustomAccordion from './Accordion';
 import { AccordionDetails, AssignmentText } from './Accordion';
 import textFormatServices from '../../services/textFormat';
 

@@ -35,7 +35,6 @@ const AlertSnackbar = ({ messageInfo, setMessageInfo, open, setOpen }) => {
 
   return (
     <div>
-      {/*<Button onClick={handleClick}>Open simple snackbar</Button>*/}
       <ThemeProvider theme={darkTheme}>
         <Snackbar
           key={messageInfo?.msg}

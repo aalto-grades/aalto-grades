@@ -68,7 +68,7 @@ const AddAssignmentsView = () => {
       </Box>
       <Typography align='left' sx={{ ml: 1.5 }} >Added assignments</Typography>
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', display: 'inline-block' }}>
-        {addedAssignments.length !== 0 &&
+        { addedAssignments.length !== 0 &&
           <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch', pb: '8px' }}>
             { addedAssignments.map(group => {
               return (
