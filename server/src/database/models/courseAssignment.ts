@@ -16,7 +16,7 @@ export default class CourseAssignment extends Model<
   declare id: CreationOptional<number>;
   declare courseInstanceId: ForeignKey<CourseInstance['id']>;
   declare name: string;
-  declare executionDate: Date;
+  declare executionDate: Date; // Date when assignment is done (e.g., deadline or exam date)
   declare expiryDate: Date;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
