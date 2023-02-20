@@ -7,7 +7,7 @@ import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import Assignment from './assignments/Assignment';
+import AssignmentCategory from './assignments/AssignmentCategory';
 import mockSuggestedAssignments from '../mock-data/mockSuggestedAssignments';
 
 const AddAssignmentsView = () => {
@@ -21,16 +21,22 @@ const AddAssignmentsView = () => {
     if (addedAssignments.length === 0) {
       setSuggestedAssignments(mockSuggestedAssignments);
     } else {
+      // if some assignments have been added, filter the suggestions to make sure there aren't duplicates
+      // another possibility is to save the suggestions in context too, will consider if the retrieval is slow
       const allSuggested = mockSuggestedAssignments;
       const nonAdded = allSuggested.filter(suggested => !addedAssignments.some(added => added.category === suggested.category));
       setSuggestedAssignments(nonAdded);
     }
-  }, []); // change to when assignments change? Although probs not gonna happen without a page reload anyway
+  }, []);
 
   const onAddClick = (assignment) => () => {
     const newSuggested = suggestedAssignments.filter(a => a.category !== assignment.category);
     setSuggestedAssignments(newSuggested);
     setAddedAssignments(addedAssignments.concat([assignment]));
+  };
+
+  const onGoBack = () => {
+    navigate('/' + courseId + '/edit-instance/' + instanceId);
   };
 
   const onConfirmAssignments = () => {
@@ -43,7 +49,15 @@ const AddAssignmentsView = () => {
       <Typography align='left' sx={{ ml: 1.5 }}>Suggested assignments from previous instances</Typography>
       <Box borderRadius={1} sx={{ bgcolor: 'secondary.light', p: '16px 12px', display: 'inline-block' }}>
         <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch' }}>
-          {suggestedAssignments.map(assignment => <Assignment key={assignment.category} assignment={assignment} button={<Button onClick={onAddClick(assignment)}>Add</Button>} />)}
+          { suggestedAssignments.map(group => {
+            return (
+              <AssignmentCategory 
+                key={group.category} 
+                categoryObject={group} 
+                button={<Button onClick={onAddClick(group)}>Add</Button>} 
+              />
+            );}
+          ) }
         </Box>
       </Box>
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', mb: 5, mt: 1, display: 'inline-block' }}>
@@ -56,13 +70,21 @@ const AddAssignmentsView = () => {
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', display: 'inline-block' }}>
         {addedAssignments.length !== 0 &&
           <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch', pb: '8px' }}>
-            {addedAssignments.map(assignment => <Assignment key={assignment.category} assignment={assignment} button={<Button>Edit</Button>} />)}
+            { addedAssignments.map(group => {
+              return (
+                <AssignmentCategory 
+                  key={group.category} 
+                  categoryObject={group} 
+                  button={<Button>Edit</Button>} 
+                />
+              );}
+            ) }
           </Box>
         }
         <Typography variant='body2' color='primary.main' sx={{ m: '8px 0px' }} >You can also add assignments after creating the instance</Typography>
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 6 }}>
-        <Button variant='outlined' onClick={() => { navigate('/' + courseId + '/edit-instance/' + instanceId); }}>Go back</Button>
+        <Button variant='outlined' onClick={() => onGoBack()}>Go back</Button>
         <Button variant='contained' onClick={() => onConfirmAssignments()}>Confirm assignments</Button>
       </Box>
     </Box>

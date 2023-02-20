@@ -12,32 +12,6 @@ import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
 import MuiAccordion from '@mui/material/Accordion';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
 
-const AssignmentText = ({ name, points }) => {
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', width: '100%', columnGap: 3 }}>
-      <Typography variant='body2'>{name}</Typography>
-      <Typography variant='caption' align='left'>{points + ' points'}</Typography>
-    </Box>
-  );
-};
-
-AssignmentText.propTypes = {
-  name: PropTypes.string,
-  points: PropTypes.number
-};
-
-
-const addToSet = (item, set) => {
-  const copySet = new Set([...set]);
-  return copySet.add(item);
-};
-
-const deleteFromSet = (item, set) => {
-  const copySet = new Set([...set]);
-  copySet.delete(item);
-  return copySet;
-};
-
 const Accordion = styled((props) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
 ))(() => ({
@@ -82,7 +56,17 @@ const AccordionSummary = styled((props) => (
 const AccordionDetails = ({ out, children }) => {
   const margin = out ? '21px' : '60px';
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginLeft: margin, columnGap: '15px', pr: '21px', minHeight: '36px', maxHeight: '36px' }}>
+    <Box sx={{ 
+      display: 'flex', 
+      flexDirection: 'row', 
+      justifyContent: 'flex-start', 
+      alignItems: 'center', 
+      marginLeft: margin, 
+      columnGap: '15px', 
+      pr: '21px', 
+      minHeight: '36px', 
+      maxHeight: '36px' 
+    }}>
       <PanoramaFishEyeIcon sx={{ fontSize: '0.6rem', display: 'block', margin: '0px 0px 0px 2px' }} />
       {children}
     </Box>
@@ -94,12 +78,44 @@ AccordionDetails.propTypes = {
   out: PropTypes.bool
 };
 
+const AssignmentText = ({ name, points }) => {
+  return (
+    <Box sx={{ display: 'flex', 
+      flexDirection: 'row', 
+      flexWrap: 'wrap', 
+      justifyContent: 'space-between', 
+      alignItems: 'center', 
+      width: '100%', 
+      columnGap: 3 
+    }}>
+      <Typography variant='body2'>{name}</Typography>
+      <Typography variant='caption' align='left'>{points + ' points'}</Typography>
+    </Box>
+  );
+};
+
+AssignmentText.propTypes = {
+  name: PropTypes.string,
+  points: PropTypes.number
+};
+
 export { AccordionDetails, AssignmentText };
 
 const CustomAccordion = ({ assignments }) => {
 
   const [expanded, setExpanded] = useState(new Set());
   const [selected, setSelected] = useState('');
+
+  const addToSet = (item, set) => {
+    const copySet = new Set([...set]);
+    return copySet.add(item);
+  };
+  
+  const deleteFromSet = (item, set) => {
+    const copySet = new Set([...set]);
+    copySet.delete(item);
+    return copySet;
+  };
 
   // curried function syntax, google for a good explanation
   // basically add the panel's id to the set of expanded panels if opened, else delete from set
@@ -115,19 +131,26 @@ const CustomAccordion = ({ assignments }) => {
           <Accordion 
             key={assignment.id + 'accordion'} 
             expanded={expanded.has(assignment.id)} 
-            onChange={handleChange(assignment.id)}>
+            onChange={handleChange(assignment.id)}
+          >
             <AccordionSummary 
               aria-controls={assignment.id + '-content'} 
               id={assignment.id + '-header'} 
               expanded={expanded.has(assignment.id).toString()} 
-              nowselected={(selected === assignment.id).toString()}>
+              nowselected={(selected === assignment.id).toString()}
+            >
               <AssignmentText name={assignment.description} points={assignment.points} />
             </AccordionSummary>
-            {assignment.subAssignments.map(subAssignment => {
+            { assignment.subAssignments.map(subAssignment => {
               return (
-                subAssignment.subAssignments === undefined
-                  ? <AccordionDetails key={subAssignment.id + 'details'}><AssignmentText name={subAssignment.description} points={subAssignment.points} /></AccordionDetails>
-                  : <Box key={subAssignment.id + 'subAccordion'} sx={{ pl: '39px' }}>{<CustomAccordion assignments={[subAssignment]} />}</Box> /*is this correct assignments here*/
+                subAssignment.subAssignments === undefined ?              // is the assignment a leaf? If yes, render details, else another accordion
+                  <AccordionDetails key={subAssignment.id + 'details'}>
+                    <AssignmentText name={subAssignment.description} points={subAssignment.points} />
+                  </AccordionDetails>
+                  : 
+                  <Box key={subAssignment.id + 'subAccordion'} sx={{ pl: '39px' }}>
+                    {<CustomAccordion assignments={[subAssignment]} />}
+                  </Box>
               );
             })}
           </Accordion>

@@ -6,9 +6,11 @@ import Typography from '@mui/material/Typography';
 import { AccordionDetails, AssignmentText } from './Accordion';
 import textFormatServices from '../../services/textFormat';
 
+// This component renders a "category" of assignments, e.g. all assignments that are exams
 // TODO: replace the points with formulas
-const Assignment = ({ assignment, button, width }) => {
-  const { category, totalPoints, assignments } = assignment;
+const AssignmentCategory = ({ categoryObject, button, width }) => {
+
+  const { category, totalPoints, assignments } = categoryObject;
   const { description, points, expiryDate, subAssignments } = assignments[0]; //must be at least one
 
   return (
@@ -29,16 +31,13 @@ const Assignment = ({ assignment, button, width }) => {
   );
 };
 
-Assignment.propTypes = {
-  subAssignments: PropTypes.array,
-  assignments: PropTypes.array,
+AssignmentCategory.propTypes = {
+  categoryObject: PropTypes.object,
   category: PropTypes.string,
   totalPoints: PropTypes.number,
-  assignment: PropTypes.object,
-  description: PropTypes.string, 
-  points: PropTypes.number, 
+  assignments: PropTypes.array,
   button: PropTypes.element,
   width: PropTypes.string
 };
 
-export default Assignment;
+export default AssignmentCategory;
