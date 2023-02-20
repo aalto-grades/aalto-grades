@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
