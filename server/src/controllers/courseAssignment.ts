@@ -9,6 +9,7 @@ import models from '../database/models';
 import CourseAssignment from '../database/models/courseAssignment';
 
 import { CourseAssignmentData } from '../types/course';
+import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { findCourseAssignmentById } from './utils/courseAssignment';
 import { findCourseInstanceById } from './utils/courseInstance';
@@ -54,9 +55,6 @@ export async function addAssignment(req: Request, res: Response): Promise<void> 
 
 export async function updateAssignment(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
-    id: yup
-      .number()
-      .required(),
     courseInstanceId: yup
       .number()
       .notRequired(),
@@ -72,7 +70,8 @@ export async function updateAssignment(req: Request, res: Response): Promise<voi
   });
 
   const id: number = Number(req.params.assignmentId);
-  await requestSchema.validate({ id: id, ...req.body }, { abortEarly: false });
+  await idSchema.validate(id, { abortEarly: false });
+  await requestSchema.validate(req.body, { abortEarly: false });
   const { courseInstanceId, name, executionDate, expiryDate }: CourseAssignmentData = req.body;
 
   const assignment: CourseAssignment = await findCourseAssignmentById(id, HttpCode.NotFound);
