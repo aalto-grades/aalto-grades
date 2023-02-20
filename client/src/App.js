@@ -21,6 +21,7 @@ import CreateCourseView from './components/CreateCourseView';
 import FetchInstancesView from './components/FetchInstancesView';
 import EditInstanceView from './components/EditInstanceView';
 import SelectFormulaView from './components/SelectFormulaView';
+import CreateAssignmentView from './components/CreateAssignmentView';
 import useLogout from './hooks/useLogout';
 
 const theme = createTheme({
@@ -107,6 +108,7 @@ function App() {
               <Route path='/edit-instance/:instanceId' element={<EditInstanceView/>}/>
               <Route path='/select-formula' element={<SelectFormulaView/>}/>
               { /* Path above will be replaced with '/select-formula/:instanceId/:assignmentId' once component is connected to a page */ }
+              <Route path='/create-assignment/:instanceId' element={<CreateAssignmentView/>}/>
             </Route>
           </Routes>
         </Box>
