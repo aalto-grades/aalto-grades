@@ -106,13 +106,7 @@ router.post(
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       404:
- *         description: Course instance does not exist.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *       404:
- *         description: Assignment does not exist.
+ *         description: The given course instance or assignment does not exist.
  *         content:
  *           application/json:
  *             schema:
