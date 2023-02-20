@@ -33,7 +33,7 @@ export async function addAssignment(req: Request, res: Response): Promise<void> 
   const { courseInstanceId, name, executionDate, expiryDate }: Assignment = req.body;
 
   // Check that instance exists.
-  await findCourseInstanceById(courseInstanceId);
+  await findCourseInstanceById(courseInstanceId, HttpCode.NotFound);
 
   const assignment: CourseAssignment = await models.CourseAssignment.create({
     courseInstanceId: courseInstanceId,
@@ -75,11 +75,11 @@ export async function updateAssignment(req: Request, res: Response): Promise<voi
   await requestSchema.validate({ id: id, ...req.body }, { abortEarly: false });
   const { courseInstanceId, name, executionDate, expiryDate }: Assignment = req.body;
 
-  const assignment: CourseAssignment = await findCourseAssignmentById(id);
+  const assignment: CourseAssignment = await findCourseAssignmentById(id, HttpCode.NotFound);
 
   // If updating courseInstanceId, check that the instance exists.
   if (courseInstanceId) {
-    await findCourseInstanceById(courseInstanceId);
+    await findCourseInstanceById(courseInstanceId, HttpCode.NotFound);
   }
 
   await assignment.set({
