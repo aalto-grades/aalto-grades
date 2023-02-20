@@ -12,10 +12,9 @@ import { FRONTEND_ORIGIN } from '../configs/environment';
 import { definition } from '../configs/swagger';
 
 import { router as authRouter } from './auth';
-import { fetchAllCourseInstancesFromSisu, fetchCourseInstanceFromSisu } from '../controllers/sisu';
 import { router as courseRouter } from './course';
 import { router as courseInstanceRouter } from './courseInstance';
-import { controllerDispatcher } from '../middleware/errorHandler';
+import { router as sisuRouter } from './sisu';
 import { router as userRouter } from './user';
 
 const options: OAS3Options = {
@@ -31,6 +30,7 @@ router.use(cookieParser());
 router.use(authRouter);
 router.use(courseRouter);
 router.use(courseInstanceRouter);
+router.use(sisuRouter);
 router.use(userRouter);
 
 router.use('/api-docs', swaggerUI.serve);
@@ -59,55 +59,6 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *           type: string
  *         description: An error message to explain the error.
  */
-
-/**
- * @swagger
- * /v1/sisu/courses/{courseCode}:
- *   get:
- *     tags: [Course, SISU]
- *     description: Fetch All Instances of a Course from SISU
- *     parameters:
- *       - in: path
- *         name: courseCode
- *         required: True
- *         schema:
- *           type: string
- *         description: The course code of the course to be fetched from SISU
- *     responses:
- *       200:
- *         description: User's Courses
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/UserCourses'
- */
-router.get('/v1/sisu/courses/:courseCode', controllerDispatcher(fetchAllCourseInstancesFromSisu));
-
-/**
- * @swagger
- * /v1/sisu/instances/{sisuCourseInstanceId}:
- *   get:
- *     tags: [Course, SISU]
- *     description: Fetch Course Instance Information from SISU
- *     parameters:
- *       - in: path
- *         name: sisuCourseInstanceId
- *         required: True
- *         schema:
- *           type: string
- *         description: InstanceID of a course instance in sisu
- *     responses:
- *       200:
- *         description: User's Courses
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/UserCourses'
- */
-router.get(
-  '/v1/sisu/instances/:sisuCourseInstanceId',
-  controllerDispatcher(fetchCourseInstanceFromSisu)
-);
 
 router.use(cors({
   origin: FRONTEND_ORIGIN,
