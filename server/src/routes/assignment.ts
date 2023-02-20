@@ -87,7 +87,7 @@ router.post(
  *     tags: [Assignment]
  *     description: Update existing assignment.
  *     requestBody:
- *       description:  Assignment data to be updated.
+ *       description: Assignment data to be updated.
  *       content:
  *         application/json:
  *           schema:
