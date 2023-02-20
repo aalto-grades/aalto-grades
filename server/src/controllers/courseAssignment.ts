@@ -70,7 +70,7 @@ export async function updateAssignment(req: Request, res: Response): Promise<voi
   });
 
   const id: number = Number(req.params.assignmentId);
-  await idSchema.validate(id, { abortEarly: false });
+  await idSchema.validate({ id: id }, { abortEarly: false });
   await requestSchema.validate(req.body, { abortEarly: false });
   const { courseInstanceId, name, executionDate, expiryDate }: CourseAssignmentData = req.body;
 
