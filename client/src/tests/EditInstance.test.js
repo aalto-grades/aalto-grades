@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
-import { MemoryRouter, Routes, Route} from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import InstanceCreationRoute from '../context/InstanceCreationRoute';
