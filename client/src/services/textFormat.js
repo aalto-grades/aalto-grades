@@ -9,6 +9,12 @@ const formatDateToString = (date) => {
   return string.split(',')[0];
 };
 
+// Format Date type values to strings of the format "2023-01-01"
+const formatDateToSlashString = (date) => {
+  const string = date.toLocaleString('en-GB');
+  return string.split('T')[0];
+};
+
 // Change date string from format "2012-07-20" to "20.07.2012"
 const formatDateString = (dateString) => {
   const attributes = dateString.split('-');
@@ -44,4 +50,4 @@ const formatGradingType = (gradingType) => {
   }
 };
 
-export default { formatDateToString, formatDateString, formatCourseType, formatGradingType };
+export default { formatDateToString, formatDateToSlashString, formatDateString, formatCourseType, formatGradingType };

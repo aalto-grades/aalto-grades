@@ -3,21 +3,27 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState }  from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import Assignment from './create-assignment/Assignment';
 import assignmentServices from '../services/assignments';
-import mockAssignments2 from '../mock-data/mockAssignments2';
+import mockAssignmentsServer from '../mock-data/mockAssignmentsServer';
 
 const EditAssignmentView = () => {
-  // The property 'category' must be specified for each assignment in order to populate the textfields correctly
-  const [assignments, setAssignments] = useState(
-    assignmentServices.constructTreeAssignmets(JSON.parse(JSON.stringify(mockAssignments2)))
-  );
+  const navigate = useNavigate();
+  const { courseId } = useParams();
 
-  console.log(assignments);
-  console.log(setAssignments);
+  const getAssignments = (assignments) => {
+    let updatedAssignments = [assignmentServices.constructTreeAssignmets(assignments)];
+    updatedAssignments = assignmentServices.addCategories(updatedAssignments);
+    updatedAssignments = assignmentServices.formatDates(updatedAssignments);
+    return updatedAssignments;
+  };
+  
+  const [assignments, setAssignments] = useState(getAssignments(mockAssignmentsServer));
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -28,6 +34,16 @@ const EditAssignmentView = () => {
     } catch (exception) {
       console.log(exception);
     }
+  };
+
+  const deleteAssignment = () => {
+    // TODO: connect to backend and delete assignmentes from DB,
+    navigate('/course-view/' + courseId);
+  };
+
+  const removeAssignment = (indices) => {
+    const updatedAssignments = assignmentServices.removeAssignment(indices, assignments);
+    setAssignments(updatedAssignments);
   };
 
   return(
@@ -47,13 +63,20 @@ const EditAssignmentView = () => {
             pb: 1,
             px: 2,
           }}>
+            <Assignment 
+              indices={[0]}
+              assignments={assignments} 
+              setAssignments={setAssignments} 
+              removeAssignment={removeAssignment}
+            />
           </Box>
-          <Button size='medium' variant='outlined' sx={{ mr: 1 }}>
-                Cancel
-          </Button>
-          <Button size='medium' variant='contained' type='submit' onClick={handleSubmit} sx={{ mr: 2 }}>
-                Confirm
-          </Button>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
+            <Button size='medium' variant='outlined' color='error' onClick={deleteAssignment} sx={{ ml: 2 }}>Delete assignment</Button>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}>
+              <Button size='medium' variant='outlined'>Cancel</Button>
+              <Button size='medium' variant='contained' type='submit' onClick={handleSubmit} sx={{ mr: 2 }}>Confirm</Button>
+            </Box>
+          </Box>
         </form>
       </Container>
     </>

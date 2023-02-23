@@ -97,7 +97,6 @@ function App() {
           <Routes> { /* Add nested routes when needed */ }
             <Route path='/login' element={<Login/>} />
             <Route path='/signup' element={<Signup/>} />
-            <Route path='/edit-assignment/:instanceId/:assignmentId' element={<EditAssignmentView/>}/>
             { /* All roles are authorised to access the front page, conditional rendering is done inside the component */ }
             <Route element={<PrivateRoute roles={[roles.admin, roles.teacher, roles.student, roles.assistant]}/>}>
               <Route path='/' element={<FrontPage/>} />
@@ -119,6 +118,7 @@ function App() {
               <Route path='/select-formula' element={<SelectFormulaView/>}/>
               { /* Path above will be replaced with '/select-formula/:instanceId/:assignmentId' once component is connected to a page */ }
               <Route path='/create-assignment/:instanceId' element={<CreateAssignmentView/>}/>
+              <Route path='/edit-assignment/:courseId/:instanceId/:assignmentId' element={<EditAssignmentView/>}/>
             </Route>
           </Routes>
         </Box>

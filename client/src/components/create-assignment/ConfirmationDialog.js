@@ -19,7 +19,7 @@ function ConfirmationDialog({ handleClose, open, removeAssignment, indices, assi
       <DialogTitle >Delete sub-assignment</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Are you sure you want to delete this sub-assignment?
+          Are you sure you want to delete this sub-assignment and all of the assignments below it?
         </DialogContentText>
       </DialogContent>
       <DialogActions>
