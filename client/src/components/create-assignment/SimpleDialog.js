@@ -10,7 +10,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import subAssignmentServices from '../../services/assignments';
+import assignmentServices from '../../services/assignments';
 
 // A Dialog component for asking the number of sub-assignments
 
@@ -38,7 +38,7 @@ function SimpleDialog({ handleClose, open, addSubAssignments, indices, assignmen
 
   return (
     <Dialog open={open} >
-      {subAssignmentServices.getSubAssignments(indices, assignments).length === 0 ?
+      {assignmentServices.getSubAssignments(indices, assignments).length === 0 ?
         <DialogTitle>Create Sub-Assignments</DialogTitle>
         :
         <DialogTitle>Add Sub-Assignments</DialogTitle>}

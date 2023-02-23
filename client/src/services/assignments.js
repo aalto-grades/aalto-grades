@@ -36,10 +36,31 @@ const getSubAssignments = (indices, assignments) => {
   }
   return subAssignments;
 };
-  
-// Get sub-assignments from the assignments array (of nested arrays) according to the indices
+
+// Set the proprety of the object that is in the location specified by the indices in the assignments array,
+// the property is set to have the value given as a parameter
+const setProperty = (indices, assignments, property, value) => {
+  const updatedAssignments = JSON.parse(JSON.stringify(assignments));
+  const lastIndex = indices[indices.length - 1];
+  const indicesWithoutLast = indices.slice(0, -1);
+  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAssignments, updatedAssignments);
+  array[lastIndex][property] = value;
+  return updatedAssignments;
+};
+
+// Get the property of an assignment that is at the location specified by indices
+const getProperty = (indices, assignments, property) => {
+  const updatedAssignments = JSON.parse(JSON.stringify(assignments));
+  const lastIndex = indices[indices.length - 1];
+  const indicesWithoutLast = indices.slice(0, -1);
+  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAssignments, updatedAssignments);
+  return array[lastIndex][property];
+};
+
+// Add sub-assignments to the assignments array (of nested arrays) according to the indices
 const addSubAssignments = (indices, assignments, numOfAssignments) => {
-  const defaultExpiryDate = getProperty(indices, assignments, 'expiryDate');
+  let updatedAssignments = JSON.parse(JSON.stringify(assignments));
+  const defaultExpiryDate = getProperty(indices, updatedAssignments, 'expiryDate');
   const newSubAssignments = new Array(Number(numOfAssignments)).fill({
     category: '',
     name: '',
@@ -47,59 +68,20 @@ const addSubAssignments = (indices, assignments, numOfAssignments) => {
     expiryDate: defaultExpiryDate,
     subAssignments: [],
   });
-  const currentSubAssignments = getSubAssignments(indices, assignments);
-  const subAssignments = currentSubAssignments.concat(newSubAssignments );
-  setProperty(indices, assignments, 'subAssignments', subAssignments);
+  const currentSubAssignments = getSubAssignments(indices, updatedAssignments);
+  const subAssignments = currentSubAssignments.concat(newSubAssignments);
+  updatedAssignments = setProperty(indices, updatedAssignments, 'subAssignments', subAssignments);
+  return updatedAssignments;
 };
-  
+
 // Remove an assignment that is at the location specified by indices
 const removeAssignment = (indices, assignments) => {
+  const updatedAssignments = JSON.parse(JSON.stringify(assignments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAssignments, assignments);
+  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAssignments, updatedAssignments);
   array.splice(lastIndex, 1);
-};
-  
-// Get the property of an assignment that is at the location specified by indices
-const getProperty = (indices, assignments, property) => {
-  const lastIndex = indices[indices.length - 1];
-  const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAssignments, assignments);
-  return array[lastIndex][property];
-};
-  
-// Set the proprety of the object that is in the location specified by the indices in the assignments array,
-// the property is set to have the value given as a parameter
-const setProperty = (indices, assignments, property, value) => {
-  const lastIndex = indices[indices.length - 1];
-  const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAssignments, assignments);
-  array[lastIndex][property] = value;
+  return updatedAssignments;
 };
 
-const constructTreeAssignmets = (assignments) => {
-  const assignmentsMap = assignments.reduce(function(map, node) {
-    map[node.id] = node;
-    return map;
-  }, {});
-
-  let root = [];
-  assignments.forEach((assignment) => {
-    assignment.subAssignments = [];
-    const parentId = assignment.parentId;
-    if (parentId === 0) {
-      root = assignment;        
-    } else {  
-      const parentAssignment = assignmentsMap[parentId];
-      delete assignment.parentId;
-      if (parentAssignment.subAssignments) {
-        parentAssignment.subAssignments.push(assignment);
-      } else {
-        parentAssignment.subAssignments = [assignment];
-      }
-    }
-  });
-  return root;
-};
-
-export default { getSubAssignments, addSubAssignments, removeAssignment, getProperty, setProperty, constructTreeAssignmets };
+export default { getSubAssignments, addSubAssignments, removeAssignment, getProperty, setProperty };

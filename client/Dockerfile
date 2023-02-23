@@ -6,7 +6,9 @@ FROM node:16-alpine
 
 WORKDIR /app
 
-COPY --chown=node:node . .
+COPY . .
+
+RUN chown -R node:node ./
 
 RUN npm ci
 

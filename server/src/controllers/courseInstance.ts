@@ -51,22 +51,26 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
       ) as CourseInstanceWithCourseAndTranslation;
 
   if (!instance) {
-    throw new ApiError(`course instance with ID ${instanceId} not found`, HttpCode.NotFound);
+    throw new ApiError(
+      `course instance with ID ${instanceId} not found`, HttpCode.NotFound
+    );
   }
 
-  const responsibleTeacher: User = await findUserById(instance.responsibleTeacher);
+  const responsibleTeacher: User = await findUserById(
+    instance.responsibleTeacher, HttpCode.NotFound
+  );
 
   const parsedInstanceData: CourseInstanceData = {
     id: instance.id,
     sisuCourseInstanceId: instance.sisuCourseInstanceId,
-    startingPeriod: instance.startingPeriod,
-    endingPeriod: instance.endingPeriod,
+    startingPeriod: instance.startingPeriod as Period,
+    endingPeriod: instance.endingPeriod as Period,
     minCredits: instance.minCredits,
     maxCredits: instance.maxCredits,
     startDate: instance.startDate,
     endDate: instance.endDate,
-    courseType: instance.teachingMethod,
-    gradingType: instance.gradingType,
+    teachingMethod: instance.teachingMethod as TeachingMethod,
+    gradingType: instance.gradingType as GradingType,
     responsibleTeacher: responsibleTeacher?.name ?? '-',
     courseData: {
       id: instance.Course.id,
@@ -109,7 +113,7 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
   res.status(HttpCode.Ok).send({
     success: true,
     data: {
-      instance: parsedInstanceData
+      courseInstance: parsedInstanceData
     }
   });
 }
@@ -122,9 +126,9 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
   const courseId: number = Number(req.params.courseId);
   await idSchema.validate({ id: courseId });
 
-  const course: Course = await findCourseById(courseId);
+  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
 
-  // TODO: ADD FUNCTIONALITY FOR MULTIPLE RESPONSIBLE TEACHERS THROUGH COURSEROLE
+  // TODO: ADD FUNCTIONALITY FOR MULTIPLE RESPONSIBLE TEACHERS THROUGH COURSE ROLE
   const instances: Array<CourseInstanceWithTeachers> = await CourseInstance.findAll({
     attributes: [
       'id', 'sisuCourseInstanceId', 'courseId', 'gradingType', 'startingPeriod',
@@ -167,14 +171,14 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
       },
       sisuCourseInstanceId: instanceWithTeacher.sisuCourseInstanceId,
       id: instanceWithTeacher.id,
-      startingPeriod: instanceWithTeacher.startingPeriod,
-      endingPeriod: instanceWithTeacher.endingPeriod,
+      startingPeriod: instanceWithTeacher.startingPeriod as Period,
+      endingPeriod: instanceWithTeacher.endingPeriod as Period,
       minCredits: instanceWithTeacher.minCredits,
       maxCredits: instanceWithTeacher.maxCredits,
       startDate: instanceWithTeacher.startDate,
       endDate: instanceWithTeacher.endDate,
-      courseType: '',
-      gradingType: instanceWithTeacher.gradingType,
+      teachingMethod: instanceWithTeacher.teachingMethod as TeachingMethod,
+      gradingType: instanceWithTeacher.gradingType as GradingType,
       // TODO: Get multiple responsible teachers through course roles.
       responsibleTeacher: instanceWithTeacher.teacher.name,
     };
@@ -243,17 +247,23 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
       .required()
   });
 
+  /*
+   * TODO: Check that the requester is logged in, 401 Unauthorized if not
+   * TODO: Check that the requester is authorized to add a course instance, 403
+   * Forbidden if not
+   */
+
   const courseId: number = Number(req.params.courseId);
 
   await requestSchema.validate(req.body, { abortEarly: false });
 
   const request: CourseInstanceAddRequest = req.body;
 
-  // Confirm that course exists
-  await findCourseById(courseId);
+  // Confirm that course exists.
+  await findCourseById(courseId, HttpCode.NotFound);
 
-  // Confirm that teacher exists
-  await findUserById(request.responsibleTeacher);
+  // Confirm that teacher exists.
+  await findUserById(request.responsibleTeacher, HttpCode.UnprocessableEntity);
 
   const newInstance: CourseInstance = await models.CourseInstance.create({
     courseId: courseId,
@@ -272,7 +282,7 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
   res.status(HttpCode.Ok).send({
     success: true,
     data: {
-      instance: {
+      courseInstance: {
         id: newInstance.id
       }
     }

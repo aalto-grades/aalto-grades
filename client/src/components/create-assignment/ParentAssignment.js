@@ -14,7 +14,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import LeafAssignment from './LeafAssignment';
 import Assignment from './Assignment';
-import subAssignmentServices from '../../services/assignments';
+import assignmentServices from '../../services/assignments';
 
 // An Assignmnet component with subassignments and a formula
 
@@ -66,7 +66,7 @@ const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignme
           </Collapse>
           <Collapse in={open} timeout='auto' unmountOnExit>
             <List component="div" disablePadding>
-              {subAssignmentServices.getSubAssignments(indices, assignments).map((item, i) => (
+              {assignmentServices.getSubAssignments(indices, assignments).map((item, i) => (
                 <Assignment 
                   indices={indices.concat(i)}
                   key={i}

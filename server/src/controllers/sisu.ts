@@ -17,13 +17,13 @@ function parseSisuCourseInstance(instance: SisuCourseInstance): CourseInstanceDa
   return {
     id: null,
     sisuCourseInstanceId: instance.id,
-    startingPeriod: '-',
-    endingPeriod: '-',
+    startingPeriod: null,
+    endingPeriod: null,
     minCredits: instance.credits.min,
     maxCredits: instance.credits.max,
     startDate: instance.startDate,
     endDate: instance.endDate,
-    courseType: (instance.type === 'exam-exam'
+    teachingMethod: (instance.type === 'exam-exam'
       ? TeachingMethod.Exam
       : TeachingMethod.Lecture),
     gradingType: (instance.summary.gradingScale.fi === '0-5'
@@ -51,37 +51,6 @@ function parseSisuCourseInstance(instance: SisuCourseInstance): CourseInstanceDa
   };
 }
 
-export async function fetchAllCourseInstancesFromSisu(req: Request, res: Response): Promise<void> {
-  const courseCode: string = String(req.params.courseCode);
-  const courseInstancesFromSisu: AxiosResponse = await axios.get(
-    `${SISU_API_URL}/courseunitrealisations`,
-    {
-      timeout: AXIOS_TIMEOUT,
-      params: {
-        code: courseCode,
-        USER_KEY: SISU_API_KEY
-      }
-    }
-  );
-
-  if (courseInstancesFromSisu.data?.error) {
-    throw new ApiError(
-      `external API error: ${courseInstancesFromSisu.data.error.code}`, HttpCode.BadGateway
-    );
-  }
-
-  const parsedInstances: Array<CourseInstanceData> = courseInstancesFromSisu.data.map(
-    (instance: SisuCourseInstance) => parseSisuCourseInstance(instance)
-  );
-
-  res.status(HttpCode.Ok).send({
-    success: true,
-    data: {
-      courseInstances: parsedInstances
-    }
-  });
-}
-
 export async function fetchCourseInstanceFromSisu(req: Request, res: Response): Promise<void> {
   // Instance ID here is a Sisu course instance ID (e.g., 'aalto-CUR-163498-3084205'),
   // not a course code.
@@ -98,7 +67,8 @@ export async function fetchCourseInstanceFromSisu(req: Request, res: Response): 
 
   if (courseInstanceFromSisu.data?.error) {
     throw new ApiError(
-      `external API error: ${courseInstanceFromSisu.data.error.code}`, HttpCode.BadGateway
+      `external API error: ${courseInstanceFromSisu.data.error.code}`,
+      HttpCode.BadGateway
     );
   }
 
@@ -108,6 +78,38 @@ export async function fetchCourseInstanceFromSisu(req: Request, res: Response): 
     success: true,
     data: {
       courseInstance: instance
+    }
+  });
+}
+
+export async function fetchAllCourseInstancesFromSisu(req: Request, res: Response): Promise<void> {
+  const courseCode: string = String(req.params.courseCode);
+  const courseInstancesFromSisu: AxiosResponse = await axios.get(
+    `${SISU_API_URL}/courseunitrealisations`,
+    {
+      timeout: AXIOS_TIMEOUT,
+      params: {
+        code: courseCode,
+        USER_KEY: SISU_API_KEY
+      }
+    }
+  );
+
+  if (courseInstancesFromSisu.data?.error) {
+    throw new ApiError(
+      `external API error: ${courseInstancesFromSisu.data.error.code}`,
+      HttpCode.BadGateway
+    );
+  }
+
+  const parsedInstances: Array<CourseInstanceData> = courseInstancesFromSisu.data.map(
+    (instance: SisuCourseInstance) => parseSisuCourseInstance(instance)
+  );
+
+  res.status(HttpCode.Ok).send({
+    success: true,
+    data: {
+      courseInstances: parsedInstances
     }
   });
 }

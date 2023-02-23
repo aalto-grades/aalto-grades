@@ -16,7 +16,7 @@ import Button from '@mui/material/Button';
 function ConfirmationDialog({ handleClose, open, removeAssignment, indices, assignments }) {
   return (
     <Dialog open={open} >
-      <DialogTitle >Delete sub-assignment?</DialogTitle>
+      <DialogTitle >Delete sub-assignment</DialogTitle>
       <DialogContent>
         <DialogContentText>
           Are you sure you want to delete this sub-assignment?

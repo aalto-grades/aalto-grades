@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import styled from 'styled-components';
@@ -20,7 +20,8 @@ const HoverBox = styled(Box)`
 
 const InstanceBox = ({ instance }) => {
   let navigate = useNavigate();
-  const { id, startDate, endDate, courseType } = instance;
+  let { courseId } = useParams();
+  const { sisuCourseInstanceId, startDate, endDate, teachingMethod } = instance;
 
   return(
     <HoverBox 
@@ -34,8 +35,8 @@ const InstanceBox = ({ instance }) => {
         my: 1,
         p: 3,
       }}
-      onClick={() => { navigate('/edit-instance/' + id); }}>
-      <LightLabelBoldValue label='Type' value={textFormatServices.formatCourseType(courseType)} />
+      onClick={() => { navigate('/' + courseId + '/edit-instance/' + sisuCourseInstanceId); }}>
+      <LightLabelBoldValue label='Type' value={textFormatServices.formatCourseType(teachingMethod)} />
       <Box sx={{ mx: 2 }}/>
       <LightLabelBoldValue label='Starting Date' value={textFormatServices.formatDateString(startDate)} />
       <LightLabelBoldValue label='Ending Date' value={textFormatServices.formatDateString(endDate)} />
@@ -56,7 +57,7 @@ const FetchedInstances = ({ info }) => {
       {info.sort((a, b) => sortingServices.sortByDate(a.startDate, b.startDate))
         .slice()
         .map((instance) => (
-          <InstanceBox instance={instance} key={instance.id}/>
+          <InstanceBox instance={instance} key={instance.sisuCourseInstanceId}/>
         ))}        
     </Box>
   );

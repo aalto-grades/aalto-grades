@@ -3,9 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
+import InstanceCreationRoute from '../context/InstanceCreationRoute';
 import EditInstanceView from '../components/EditInstanceView';
 import instancesService from '../services/instances';
 import mockSisuInstances from '../mock-data/mockSisuInstances';
@@ -17,15 +18,19 @@ describe('Tests for EditInstanceView components', () => {
 
   const renderEditInstanceView = async () => {
 
-    const mockResponse = { instance: mockSisuInstances[0] };
+    const mockResponse = { courseInstance: mockSisuInstances[0] };
 
     instancesService.getSisuInstance.mockRejectedValue('Network error');
     instancesService.getSisuInstance.mockResolvedValue(mockResponse);
 
     return render(
-      <BrowserRouter>
-        <EditInstanceView />
-      </BrowserRouter>
+      <MemoryRouter initialEntries={['/A-12345/edit-instance/test']}>
+        <Routes>
+          <Route element={<InstanceCreationRoute/>}>
+            <Route path=':courseId/edit-instance/:instanceId' element={<EditInstanceView/>}/>
+          </Route>
+        </Routes>
+      </MemoryRouter>
     );
   };
 
