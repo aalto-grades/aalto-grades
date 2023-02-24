@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import axios from './axios';
+import mockFormulas from '../mock-data/mockFormulas';
 
 const getFormulas = async () => {
   // TODO: specify route
@@ -18,4 +19,11 @@ const setFormula = async (formulaInfo) => {
   return response.data;
 };
 
-export default { getFormulas, setFormula };
+// A temporary function to get a mock formula
+const getFormula = (formulaId) => {
+  const formula = mockFormulas.find( formula => formula.id === formulaId);
+  const formulaName = formula ? formula.name : 'None';
+  return formulaName;
+};
+
+export default { getFormulas, setFormula, getFormula };

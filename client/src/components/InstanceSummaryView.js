@@ -95,7 +95,7 @@ const InstanceSummaryView = () => {
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', display: 'inline-block' }}>
         { addedAssignments.length !== 0 &&
           <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch', pb: '8px' }}>
-            { addedAssignments.map(group => <AssignmentCategory key={group.category} categoryObject={group} />) }
+            { addedAssignments.map(assignment => <AssignmentCategory key={assignment.id} assignment={assignment} />) }
           </Box>
         }
         <Typography variant='body2' color='primary.main' sx={{ m: '8px 0px' }} >You can also add assignments after creating the instance</Typography>

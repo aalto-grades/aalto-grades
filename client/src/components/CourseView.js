@@ -13,7 +13,7 @@ import Assignments from './course-view/Assignments';
 import InstancesTable from './course-view/InstancesTable';
 import useAuth from '../hooks/useAuth';
 import mockInstances from '../mock-data/mockInstances';
-import mockSuggestedAssignments from '../mock-data/mockSuggestedAssignments';
+import mockAssignmentsClient from '../mock-data/mockAssignmentsClient';
 
 const mockCurrentInstance = mockInstances[0];
 const mockPastInstances = mockInstances
@@ -41,7 +41,7 @@ const CourseView = () => {
         <OngoingInstanceInfo info={mockCurrentInstance} />
         { /* a different assignment component will be created for students */
           (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
-          <Assignments assignments={mockSuggestedAssignments} formula={'Weighted Average'} instance={mockCurrentInstance} /> /* TODO: Retrieve real formula */
+          <Assignments assignments={mockAssignmentsClient} formula={'Weighted Average'} instance={mockCurrentInstance} /> /* TODO: Retrieve real formula */
         }
       </Box>
       <Typography variant='h4' align='left' sx={{ fontWeight: 'light', mt: 8, mb: 3 }}>Past Instances</Typography>

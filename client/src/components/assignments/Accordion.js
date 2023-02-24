@@ -11,6 +11,7 @@ import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
 import MuiAccordion from '@mui/material/Accordion';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
+import formulasService from '../../services/formulas';
 
 const Accordion = styled((props) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -78,7 +79,7 @@ AccordionDetails.propTypes = {
   out: PropTypes.bool
 };
 
-const AssignmentText = ({ name, points }) => {
+const AssignmentText = ({ name, formulaId }) => {
   return (
     <Box sx={{ display: 'flex', 
       flexDirection: 'row', 
@@ -89,14 +90,17 @@ const AssignmentText = ({ name, points }) => {
       columnGap: 3 
     }}>
       <Typography variant='body2'>{name}</Typography>
-      <Typography variant='caption' align='left'>{points + ' points'}</Typography>
+      { formulaId 
+        ? <Typography variant='caption' align='left'>{'Formula: ' + formulasService.getFormula(formulaId)}</Typography>
+        : <></>
+      }
     </Box>
   );
 };
 
 AssignmentText.propTypes = {
   name: PropTypes.string,
-  points: PropTypes.number
+  formulaId: PropTypes.number,
 };
 
 export { AccordionDetails, AssignmentText };
@@ -139,13 +143,13 @@ const CustomAccordion = ({ assignments }) => {
               expanded={expanded.has(assignment.id).toString()} 
               nowselected={(selected === assignment.id).toString()}
             >
-              <AssignmentText name={assignment.description} points={assignment.points} />
+              <AssignmentText name={assignment.name} formulaId={assignment.formulaId} />
             </AccordionSummary>
             { assignment.subAssignments.map(subAssignment => {
               return (
-                subAssignment.subAssignments === undefined ?              // is the assignment a leaf? If yes, render details, else another accordion
+                subAssignment.subAssignments.length === 0 ?  // is the assignment a leaf? If yes, render details, else another accordion
                   <AccordionDetails key={subAssignment.id + 'details'}>
-                    <AssignmentText name={subAssignment.description} points={subAssignment.points} />
+                    <AssignmentText name={subAssignment.name} formulaId={subAssignment.formulaId} />
                   </AccordionDetails>
                   : 
                   <Box key={subAssignment.id + 'subAccordion'} sx={{ pl: '39px' }}>
