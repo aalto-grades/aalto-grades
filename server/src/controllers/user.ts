@@ -27,8 +27,8 @@ export interface CoursesOfUser {
 
 export async function getCoursesOfUser(req: Request, res: Response): Promise<void> {
   const coursesOfUser: CoursesOfUser = { current: [], previous: [] };
-  const teacherId: number = Number(req.params.userId);
-  await idSchema.validate({ id: teacherId });
+  const userId: number = Number(req.params.userId);
+  await idSchema.validate({ id: userId });
 
   /*
    * TODO: Check that the requester is logged in, 401 Unauthorized if not
@@ -36,8 +36,8 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
    * Forbidden if not
    */
 
-  // Confirm that teacher exists
-  await findUserById(teacherId, HttpCode.NotFound);
+  // Confirm that user exists.
+  await findUserById(userId, HttpCode.NotFound);
 
   // TODO: Go through course_role instead
   const courses: Array<CourseWithTranslationAndInstance> = await models.Course.findAll({
@@ -45,9 +45,7 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
     include: [{
       model: CourseInstance,
       attributes: ['endDate'],
-      where: {
-        responsibleTeacher: teacherId
-      },
+      // ...where User has any role on the course
     },
     {
       model: CourseTranslation,

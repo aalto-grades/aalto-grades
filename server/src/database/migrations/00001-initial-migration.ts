@@ -88,16 +88,6 @@ export default {
           type: DataTypes.ENUM('LECTURE', 'EXAM'),
           allowNull: false
         },
-        responsible_teacher: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-          references: {
-            model: 'user',
-            key: 'id'
-          },
-          onDelete: 'SET NULL',
-          onUpdate: 'CASCADE'
-        },
         min_credits: {
           type: DataTypes.INTEGER,
           allowNull: false
@@ -144,7 +134,7 @@ export default {
           onUpdate: 'CASCADE'
         },
         role: {
-          type: DataTypes.ENUM('STUDENT', 'ASSISTANT', 'TEACHER', 'SYSADMIN'),
+          type: DataTypes.ENUM('STUDENT', 'TEACHER', 'TEACHERINCHARGE'),
           allowNull: false
         },
         created_at: DataTypes.DATE,

@@ -21,7 +21,6 @@ export default class CourseInstance extends Model<
   declare startingPeriod: string;
   declare endingPeriod: string;
   declare teachingMethod: string;
-  declare responsibleTeacher: ForeignKey<User['id']>;
   declare minCredits: number;
   declare maxCredits: number;
   declare startDate: Date;
@@ -65,14 +64,6 @@ CourseInstance.init(
     teachingMethod: {
       type: DataTypes.ENUM('LECTURE', 'EXAM'),
       allowNull: false
-    },
-    responsibleTeacher: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'user',
-        key: 'id'
-      }
     },
     minCredits: {
       type: DataTypes.INTEGER,

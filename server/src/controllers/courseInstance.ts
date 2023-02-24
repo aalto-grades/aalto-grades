@@ -12,7 +12,9 @@ import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
 import { ApiError } from '../types/error';
-import { CourseInstanceData, GradingType, Period, TeachingMethod } from '../types/course';
+import {
+  CourseInstanceData, CourseRole, GradingType, Period, TeachingMethod
+} from '../types/course';
 import { HttpCode } from '../types/httpCode';
 import { idSchema } from '../types/general';
 import { Language } from '../types/language';
@@ -21,7 +23,8 @@ import { findCourseById } from './utils/course';
 import { findUserById } from './utils/user';
 
 interface CourseInstanceWithCourseAndTranslation extends CourseInstance {
-  Course: CourseWithTranslation
+  Course: CourseWithTranslation,
+  Users: User
 }
 
 export async function getCourseInstance(req: Request, res: Response): Promise<void> {
@@ -29,15 +32,16 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
   await idSchema.validate({ id: instanceId });
 
   const instance: CourseInstanceWithCourseAndTranslation | null =
-      await models.CourseInstance.findByPk(
-        instanceId,
-        {
-          attributes: [
-            'id', 'sisuCourseInstanceId', 'gradingType', 'startingPeriod',
-            'endingPeriod', 'teachingMethod', 'minCredits', 'maxCredits',
-            'startDate', 'endDate', 'responsibleTeacher'
-          ],
-          include: {
+    await models.CourseInstance.findByPk(
+      instanceId,
+      {
+        attributes: [
+          'id', 'sisuCourseInstanceId', 'gradingType', 'startingPeriod',
+          'endingPeriod', 'teachingMethod', 'minCredits', 'maxCredits',
+          'startDate', 'endDate'
+        ],
+        include: [
+          {
             model: Course,
             attributes: ['id', 'courseCode'],
             include: [
@@ -46,19 +50,21 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
                 attributes: ['language', 'courseName', 'department']
               }
             ]
+          },
+          {
+            model: User,
+            attributes: ['name'],
+            // ...where User has CourseRole TeacherInCharge
           }
-        }
-      ) as CourseInstanceWithCourseAndTranslation;
+        ]
+      }
+    ) as CourseInstanceWithCourseAndTranslation;
 
   if (!instance) {
     throw new ApiError(
       `course instance with ID ${instanceId} not found`, HttpCode.NotFound
     );
   }
-
-  const responsibleTeacher: User = await findUserById(
-    instance.responsibleTeacher, HttpCode.NotFound
-  );
 
   const parsedInstanceData: CourseInstanceData = {
     id: instance.id,
@@ -71,7 +77,7 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
     endDate: instance.endDate,
     teachingMethod: instance.teachingMethod as TeachingMethod,
     gradingType: instance.gradingType as GradingType,
-    responsibleTeacher: responsibleTeacher?.name ?? '-',
+    teachersInCharge: [],
     courseData: {
       id: instance.Course.id,
       courseCode: instance.Course.courseCode,
@@ -119,7 +125,7 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
 }
 
 export interface CourseInstanceWithTeachers extends CourseInstance {
-  teacher: User
+  Users: User
 }
 
 export async function getAllCourseInstances(req: Request, res: Response): Promise<void> {
@@ -128,21 +134,19 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
 
   const course: Course = await findCourseById(courseId, HttpCode.NotFound);
 
-  // TODO: ADD FUNCTIONALITY FOR MULTIPLE RESPONSIBLE TEACHERS THROUGH COURSE ROLE
   const instances: Array<CourseInstanceWithTeachers> = await CourseInstance.findAll({
     attributes: [
       'id', 'sisuCourseInstanceId', 'courseId', 'gradingType', 'startingPeriod',
-      'endingPeriod', 'teachingMethod', 'responsibleTeacher', 'minCredits',
-      'maxCredits', 'startDate', 'endDate', 'createdAt', 'updatedAt'
+      'endingPeriod', 'teachingMethod', 'minCredits', 'maxCredits', 'startDate',
+      'endDate', 'createdAt', 'updatedAt'
     ],
     where: {
       courseId: courseId
     },
-    // TODO: CHANGE TO GO THROUGH COURSE ROLE INSTEAD OF GOING THROUGH
-    // RESPONSIBLE TEACHER FOREIGN KEY
     include: {
       model: User,
-      as: 'teacher'
+      attributes: ['name'],
+      // ...where User has CourseRole TeacherInCharge
     }
   }) as Array<CourseInstanceWithTeachers>;
 
@@ -179,8 +183,7 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
       endDate: instanceWithTeacher.endDate,
       teachingMethod: instanceWithTeacher.teachingMethod as TeachingMethod,
       gradingType: instanceWithTeacher.gradingType as GradingType,
-      // TODO: Get multiple responsible teachers through course roles.
-      responsibleTeacher: instanceWithTeacher.teacher.name,
+      teachersInCharge: [],
     };
 
     instancesData.push(instanceData);
@@ -200,11 +203,11 @@ interface CourseInstanceAddRequest {
   startingPeriod: Period;
   endingPeriod: Period;
   teachingMethod: TeachingMethod;
-  responsibleTeacher: number;
   minCredits: number;
   maxCredits: number;
   startDate: Date;
   endDate: Date;
+  teachersInCharge: Array<number>;
 }
 
 export async function addCourseInstance(req: Request, res: Response): Promise<void> {
@@ -228,9 +231,6 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
       .string()
       .oneOf([TeachingMethod.Lecture, TeachingMethod.Exam])
       .required(),
-    responsibleTeacher: yup
-      .number()
-      .required(),
     minCredits: yup
       .number()
       .min(0)
@@ -244,6 +244,10 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
       .required(),
     endDate: yup
       .date()
+      .required(),
+    teachersInCharge: yup
+      .array()
+      .of(yup.number().moreThan(0))
       .required()
   });
 
@@ -262,8 +266,10 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
   // Confirm that course exists.
   await findCourseById(courseId, HttpCode.NotFound);
 
-  // Confirm that teacher exists.
-  await findUserById(request.responsibleTeacher, HttpCode.UnprocessableEntity);
+  // Confirm that teachers exist.
+  for (const teacher of request.teachersInCharge) {
+    await findUserById(teacher, HttpCode.UnprocessableEntity);
+  }
 
   const newInstance: CourseInstance = await models.CourseInstance.create({
     courseId: courseId,
@@ -272,12 +278,19 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
     startingPeriod: request.startingPeriod,
     endingPeriod: request.endingPeriod,
     teachingMethod: request.teachingMethod,
-    responsibleTeacher: request.responsibleTeacher,
     minCredits: request.minCredits,
     maxCredits: request.maxCredits,
     startDate: request.startDate,
     endDate: request.endDate
   });
+
+  for (const teacher of request.teachersInCharge) {
+    await models.CourseRole.create({
+      userId: teacher,
+      courseInstanceId: newInstance.id,
+      role: CourseRole.TeacherInCharge
+    });
+  }
 
   res.status(HttpCode.Ok).send({
     success: true,

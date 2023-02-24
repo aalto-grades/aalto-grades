@@ -45,6 +45,13 @@ export interface CourseInstanceData {
   endDate: Date,
   teachingMethod: TeachingMethod,
   gradingType: GradingType,
-  responsibleTeacher?: string | undefined,
-  responsibleTeachers?: Array<string>,
+  // TODO: There should maybe be a UserData interface if more data is needed,
+  // for example ID of user.
+  teachersInCharge?: Array<string>
+}
+
+export enum CourseRole {
+  Student = 'STUDENT',
+  Teacher = 'TEACHER',
+  TeacherInCharge = 'TEACHERINCHARGE',
 }

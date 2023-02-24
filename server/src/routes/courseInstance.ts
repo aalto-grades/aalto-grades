@@ -57,9 +57,11 @@ export const router: Router = Router();
  *         $ref: '#/definitions/TeachingMethod'
  *       gradingType:
  *         $ref: '#/definitions/GradingType'
- *       responsibleTeacher:
- *         type: string
- *         description: Name of the responsible teacher.
+ *       teachersInCharge:
+ *         type: array
+ *         description: Names of all teachers in charge of this course instance.
+ *         items:
+ *           type: string
  *       courseData:
  *         $ref: '#/definitions/CourseData'
  */

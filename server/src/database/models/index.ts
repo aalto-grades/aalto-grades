@@ -17,7 +17,6 @@ User.belongsToMany(CourseInstance, {
   through: CourseRole,
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
-  as: 'student'
 });
 
 CourseInstance.belongsToMany(User, {
@@ -34,12 +33,6 @@ Course.hasMany(CourseInstance, {
 CourseInstance.belongsTo(Course, {
   targetKey: 'id',
   foreignKey: 'courseId'
-});
-
-CourseInstance.belongsTo(User, {
-  targetKey: 'id',
-  foreignKey: 'responsibleTeacher',
-  as: 'teacher'
 });
 
 Course.hasMany(CourseTranslation, {
