@@ -6,16 +6,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import SelectFormulaForm from './select-formula-view/SelectFormulaForm';
+import FormulaAttributesForm from './formula-attributes-view/FormulaAttributesForm';
 import instancesService from '../services/instances';
-import formulasService from '../services/formulas';
 import mockAssignments from '../mock-data/mockAssignments';
-import mockFormulas from '../mock-data/mockFormulas';
 
-const SelectFormulaView = () => {
+const FormulaAttributesView = () => {
   const { instanceId, courseId } = useParams();
   const [assignments, setAssignments] = useState([]);
-  const [formulas, setFormulas] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,14 +24,8 @@ const SelectFormulaView = () => {
       })
       .catch((e) => console.log(e.message));
     // TODO: fetch formulas
-    formulasService.getFormulas()
-      .then((data) => {
-        setFormulas(data);
-      })
-      .catch((e) => console.log(e.message));
     // DELETE THIS AFTER ROUTES WORK!
     setAssignments(mockAssignments);
-    setFormulas(mockFormulas);
   }, []);
 
   const navigateToCourseView = () => {
@@ -47,16 +38,16 @@ const SelectFormulaView = () => {
     <Box display="flex" justifyContent='center' alignItems='center' flexDirection='column'>
       <Box textAlign='left' alignItems='left'>
         <Typography variant="h3" component="div" sx={{ flexGrow: 1, my: 4 }}>
-          Select Grading Formula
+          Specify Formula Attributes
         </Typography>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1, mb: 2 }}>
           Result: Course Total Grade
         </Typography>
-        <SelectFormulaForm assignments={assignments} formulas={formulas} navigateToCourseView={navigateToCourseView} />
+        <FormulaAttributesForm assignments={assignments} navigateToCourseView={navigateToCourseView} />
       </Box>
     </Box>
 
   );
 };
 
-export default SelectFormulaView;
+export default FormulaAttributesView;

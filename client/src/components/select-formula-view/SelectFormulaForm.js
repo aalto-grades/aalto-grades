@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -16,21 +15,15 @@ import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import styled from 'styled-components';
+import StyledBox from './StyledBox';
 import ViewFormulaAccordion from './ViewFormulaAccordion';
 
-const StyledBox = styled(Box)`
-  width: 53vw;
-  min-width:  400px;
-  max-width: 1000px;
-`;
 
-const SelectFormulaForm = ({ assignments, formulas, courseId }) => {
+const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView }) => {
 
   const [formula, setFormula] = useState('');
   const [codeSnippet, setCodeSnippet] = useState('');
   const [selectedAssignments, setSelectedAssignments] = useState([]);
-  const navigate = useNavigate();
 
   const handleFormulaChange = (event) => {
     const newFormula = formulas.find(formula => formula.name == event.target.value);
@@ -42,7 +35,7 @@ const SelectFormulaForm = ({ assignments, formulas, courseId }) => {
     event.preventDefault();
     console.log(event.nativeEvent.submitter.name);
     try {
-      // TODO: send formula to backend -> needs instance id?
+      // TODO: send formula to backend (should only be done if user pressed skipAttributes?)
       const formulaObject = ({
         formula,
         selectedAssignments
@@ -50,7 +43,8 @@ const SelectFormulaForm = ({ assignments, formulas, courseId }) => {
       console.log(formulaObject);
 
       if (event.nativeEvent.submitter.name == 'skipAttributes') {
-        navigate(`/course-view/${courseId}`, { replace: true });
+        // TODO: add notification "formula saved, you will be redirected to course view"
+        navigateToCourseView();
       } else {
         // TODO: redirect to specify attribures
       }
@@ -133,7 +127,7 @@ const SelectFormulaForm = ({ assignments, formulas, courseId }) => {
 SelectFormulaForm.propTypes = {
   assignments: PropTypes.array,
   formulas: PropTypes.array,
-  courseId: PropTypes.string,
+  navigateToCourseView: PropTypes.func,
 };
 
 export default SelectFormulaForm;

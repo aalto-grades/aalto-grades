@@ -19,7 +19,7 @@ const Assignments = ({ assignments, formula, instance }) => {
       <Typography variant='h6' align='left' sx={{ ml: 1.5 }} >Assignments</Typography>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
         <Typography align='left' sx={{ ml: 1.5 }} >{'Grading Formula: ' + formula}</Typography>
-        <Button>Edit formula</Button>
+        <Button onClick={() => navigate('/select-formula/' + instance.id) }>Edit formula</Button>
       </Box>
       <Box sx={{ display: 'inline-grid', gap: 1 }}>
         { assignments.map(group => {
