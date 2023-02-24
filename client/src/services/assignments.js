@@ -2,8 +2,6 @@
 
 // SPDX-License-Identifier: MIT
 
-import textFormatServices from './textFormat';
-
 // The parameter 'indices' used in the following functions is an array of integres 
 // that displays the indices of an assignment on different levels.
 // EXAMPLE: The indices of the 'assignment 0.1' below would be [0, 1].
@@ -86,84 +84,4 @@ const removeAssignment = (indices, assignments) => {
   return updatedAssignments;
 };
 
-// Creates a tree structure of assignments from an array of assignments with parent Ids
-const constructTreeAssignmets = (assignments) => {
-  const updatedAssignments = JSON.parse(JSON.stringify(assignments));
-  let map = {};
-  let root;
-
-  updatedAssignments.forEach((assignment) => {
-    map[assignment.id] = updatedAssignments.find( element => element.id === assignment.parentId );
-  }); 
-
-  updatedAssignments.forEach((assignment) => {
-    assignment.subAssignments = [];
-    if (assignment.parentId === 0) { // parent id === instance id
-      root = assignment;
-    } else {
-      const parentNode = map[assignment.id];
-      if (parentNode.subAssignments) {
-        parentNode.subAssignments.push(assignment);
-      } else {
-        parentNode.subAssignments = [assignment];
-      }
-    }
-  });
-
-  return root;
-};
-
-// Recursive function to add the 'category' property for each assignment
-const addCategories = (assignments) => {
-
-  const addCategory = (modifiabelAssignments) => {
-    modifiabelAssignments.forEach((assignment) => {
-      const name = assignment.name;
-      if (name === 'Exam' || name === 'Exercise' || name === 'Project') {
-        assignment.category = name;
-      } else {
-        assignment.category = 'Other';
-      }
-      if (assignment.subAssignments.length !== 0) {
-        addCategory(assignment.subAssignments);
-      }
-    });
-  };
-
-  const updatedAssignments = JSON.parse(JSON.stringify(assignments));
-  addCategory(updatedAssignments);
-  return updatedAssignments;
-
-};
-
-// Format Date type values of the assignments to strings of the format '2023-01-01'
-const formatDates = (assignments) => {
-
-  const formatDate = (modifiabelAssignments) => {
-    modifiabelAssignments.forEach((assignment) => {
-      const date = assignment.date;
-      const expiryDate = assignment.expiryDate;
-      assignment.date = textFormatServices.formatDateToSlashString(date);
-      assignment.expiryDate = textFormatServices.formatDateToSlashString(expiryDate);
-      if (assignment.subAssignments.length !== 0) {
-        formatDate(assignment.subAssignments);
-      }
-    });
-  };
-
-  const updatedAssignments = JSON.parse(JSON.stringify(assignments));
-  formatDate(updatedAssignments);
-  return updatedAssignments;
-
-};
-
-export default { 
-  getSubAssignments, 
-  addSubAssignments, 
-  removeAssignment, 
-  getProperty, 
-  setProperty, 
-  constructTreeAssignmets, 
-  addCategories, 
-  formatDates 
-};
+export default { getSubAssignments, addSubAssignments, removeAssignment, getProperty, setProperty };

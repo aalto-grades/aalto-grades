@@ -24,7 +24,6 @@ import AddAssignmentsView from './components/AddAssignmentsView';
 import InstanceSummaryView from './components/InstanceSummaryView';
 import SelectFormulaView from './components/SelectFormulaView';
 import CreateAssignmentView from './components/CreateAssignmentView';
-import EditAssignmentView from './components/EditAssignmentView';
 import InstanceCreationRoute from './context/InstanceCreationRoute';
 import useLogout from './hooks/useLogout';
 
@@ -118,7 +117,6 @@ function App() {
               <Route path='/select-formula' element={<SelectFormulaView/>}/>
               { /* Path above will be replaced with '/select-formula/:instanceId/:assignmentId' once component is connected to a page */ }
               <Route path='/create-assignment/:instanceId' element={<CreateAssignmentView/>}/>
-              <Route path='/edit-assignment/:courseId/:instanceId/:assignmentId' element={<EditAssignmentView/>}/>
             </Route>
           </Routes>
         </Box>
