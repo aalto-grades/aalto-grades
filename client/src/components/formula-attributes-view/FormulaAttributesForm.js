@@ -5,8 +5,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
 import StyledBox from '../select-formula-view/StyledBox';
-import Assignments from './Assignments';
+import Assignment from './Assignment';
 
 const FormulaAttributesForm = ({ assignments, navigateToCourseView }) => {
 
@@ -32,16 +33,19 @@ const FormulaAttributesForm = ({ assignments, navigateToCourseView }) => {
         justifyContent: 'space-between',
         bgcolor: 'primary.light'
       }}>
-        <Assignments assignments={assignments}/>
-        <StyledBox sx={{ m: 3, mt: 0, alignSelf: 'flex-end',display: 'flex', lexDirection: 'column', }}>
+        { assignments.map((assignment) => <Assignment assignment={assignment} key={assignment.id} />) }
+      </StyledBox>
+      <StyledBox sx={{ display: 'flex', flexDirection: 'column', }}>
+        <Box sx={{ m: 3, mr: 1, alignSelf: 'flex-end' }}>
           <Button size='small' variant='outlined' type='submit' name='goBack' sx={{ mr: 2 }}>
-              Go back
+            Go back
           </Button>
           <Button size='small' variant='contained' type='submit' name='confirm'>
-              Confirm
+            Confirm
           </Button>
-        </StyledBox>
+        </Box>
       </StyledBox>
+      
     </form>
   );
 };

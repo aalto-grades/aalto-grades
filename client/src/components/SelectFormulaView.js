@@ -41,6 +41,10 @@ const SelectFormulaView = () => {
     navigate(`/course-view/${courseId}`, { replace: true });
   };
 
+  const navigateToAttributeSelection = () => {
+    navigate(`/${courseId}/formula-attributes/${instanceId}`, { replace: true });
+  };
+
   // TODO: How to differentiate between course total grade and assigment grade?
 
   return (
@@ -52,7 +56,12 @@ const SelectFormulaView = () => {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1, mb: 2 }}>
           Result: Course Total Grade
         </Typography>
-        <SelectFormulaForm assignments={assignments} formulas={formulas} navigateToCourseView={navigateToCourseView} />
+        <SelectFormulaForm
+          assignments={assignments}
+          formulas={formulas}
+          navigateToCourseView={navigateToCourseView} 
+          navigateToAttributeSelection={navigateToAttributeSelection}
+        />
       </Box>
     </Box>
 

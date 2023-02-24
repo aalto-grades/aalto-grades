@@ -19,7 +19,7 @@ import StyledBox from './StyledBox';
 import ViewFormulaAccordion from './ViewFormulaAccordion';
 
 
-const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView }) => {
+const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, navigateToAttributeSelection }) => {
 
   const [formula, setFormula] = useState('');
   const [codeSnippet, setCodeSnippet] = useState('');
@@ -36,6 +36,7 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView }) => {
     console.log(event.nativeEvent.submitter.name);
     try {
       // TODO: send formula to backend (should only be done if user pressed skipAttributes?)
+      // TODO: throw error if no assignments have been chosen?
       const formulaObject = ({
         formula,
         selectedAssignments
@@ -46,7 +47,7 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView }) => {
         // TODO: add notification "formula saved, you will be redirected to course view"
         navigateToCourseView();
       } else {
-        // TODO: redirect to specify attribures
+        navigateToAttributeSelection();
       }
       
     } catch (exception) {
@@ -128,6 +129,7 @@ SelectFormulaForm.propTypes = {
   assignments: PropTypes.array,
   formulas: PropTypes.array,
   navigateToCourseView: PropTypes.func,
+  navigateToAttributeSelection: PropTypes.func,
 };
 
 export default SelectFormulaForm;
