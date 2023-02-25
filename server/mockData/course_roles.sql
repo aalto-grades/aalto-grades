@@ -2,7 +2,7 @@
 --
 -- SPDX-License-Identifier: MIT
 
-INSERT INTO public.course_role (user_id, course_instance_id, role, created_at, updated_ad) VALUES
+INSERT INTO public.course_role (user_id, course_instance_id, role, created_at, updated_at) VALUES
 (1, 1, 'TEACHERINCHARGE', NOW(), NOW()),
 (2, 2, 'TEACHERINCHARGE', NOW(), NOW()),
 (3, 3, 'TEACHERINCHARGE', NOW(), NOW()),
@@ -23,4 +23,4 @@ INSERT INTO public.course_role (user_id, course_instance_id, role, created_at, u
 (6, 18, 'TEACHERINCHARGE', NOW(), NOW()),
 (8, 19, 'TEACHERINCHARGE', NOW(), NOW()),
 (2, 20, 'TEACHERINCHARGE', NOW(), NOW()),
-(9, 21, 'TEACHERINCHARGE', NOW(), NOW()),
+(9, 21, 'TEACHERINCHARGE', NOW(), NOW());

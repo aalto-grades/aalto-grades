@@ -34,7 +34,7 @@ describe('Test GET /v1/sisu/instances/:sisuCourseInstanceId', () => {
     expect(res.body.data.courseInstance.endDate).toBeDefined();
     expect(res.body.data.courseInstance.teachingMethod).toBeDefined();
     expect(res.body.data.courseInstance.gradingType).toBeDefined();
-    expect(res.body.data.courseInstance.responsibleTeachers).toBeDefined();
+    expect(res.body.data.courseInstance.teachersInCharge).toBeDefined();
     expect(res.body.data.courseInstance.courseData.courseCode).toBeDefined();
     expect(res.body.data.courseInstance.courseData.department).toBeDefined();
     expect(res.body.data.courseInstance.courseData.name).toBeDefined();
@@ -80,7 +80,7 @@ describe('Test GET /v1/sisu/courses/:courseCode', () => {
     expect(res.body.data.courseInstances[0].endDate).toBeDefined();
     expect(res.body.data.courseInstances[0].teachingMethod).toBeDefined();
     expect(res.body.data.courseInstances[0].gradingType).toBeDefined();
-    expect(res.body.data.courseInstances[0].responsibleTeachers).toBeDefined();
+    expect(res.body.data.courseInstances[0].teachersInCharge).toBeDefined();
     expect(res.status).toEqual(HttpCode.Ok);
   });
 

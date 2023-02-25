@@ -29,7 +29,7 @@ function parseSisuCourseInstance(instance: SisuCourseInstance): CourseInstanceDa
     gradingType: (instance.summary.gradingScale.fi === '0-5'
       ? GradingType.Numerical
       : GradingType.PassFail),
-    responsibleTeachers: instance.summary.teacherInCharge,
+    teachersInCharge: instance.summary.teacherInCharge,
     courseData: {
       courseCode: instance.code,
       department: {

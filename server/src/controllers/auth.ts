@@ -15,7 +15,14 @@ import { JWT_SECRET, TEST_ENV } from '../configs/environment';
 
 import { HttpCode } from '../types/httpCode';
 import User from '../database/models/user';
-import { UserRole } from '../types/user';
+
+// TODO: Temporary, remove or update!
+export enum UserRole {
+  Student = 'STUDENT',
+  Teacher = 'TEACHER',
+  Assistant = 'ASSISTANT',
+  Admin = 'SYSADMIN'
+}
 
 export type PlainPassword = string;
 
