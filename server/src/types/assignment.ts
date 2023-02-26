@@ -5,7 +5,6 @@
 export interface AssignmentParams {
   min: number;
   max: number;
-  [key: string]: any;
 }
 export type ManuallyGradedParams = {
   min: number;
@@ -13,7 +12,10 @@ export type ManuallyGradedParams = {
 }
 
 export abstract class Assignment<P extends AssignmentParams> {
-  public abstract calculateGrade(subGrades: this extends ManuallyGradedAssignment ? number: Array<number>): Promise<number>;
+  public abstract calculateGrade(
+    subGrades:
+      this extends ManuallyGradedAssignment ? number: Array<number>
+  ): Promise<number>;
   protected parameters: P;
 
   constructor(parameters: P) {
@@ -35,7 +37,16 @@ export type WeightedAssignmentParams = {
 
 export class WeightedAssignment extends Assignment<WeightedAssignmentParams> {
   public async calculateGrade(subGrades: Array<number>): Promise<number> {
-    let weighted = this.parameters.weights.reduce((acc, weight, i) => acc + weight * (subGrades[i] || 0), 0);
+    const weighted: number =
+      this.parameters.weights
+        .reduce(
+          (
+            acc: number,
+            weight: number,
+            i: number
+          ) => acc + weight * (subGrades[i] || 0),
+          0
+        );
     return weighted;
   }
 }
