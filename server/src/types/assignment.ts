@@ -11,10 +11,6 @@ export type ManuallyGradedParams = {
   min: number;
   max: number;
 }
-export type GradeCalculator<P extends AssignmentParams> = (
-  subGrades: P extends ManuallyGradedParams ? number : Array<number>,
-  parameters: P
-) => Promise<number>;
 
 export abstract class Assignment<P extends AssignmentParams> {
   public abstract calculateGrade(subGrades: this extends ManuallyGradedAssignment ? number: Array<number>): Promise<number>;
