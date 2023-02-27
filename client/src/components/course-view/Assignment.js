@@ -25,7 +25,7 @@ const Assignment = ({ assignment }) => {
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography align='left' variant='caption'>{'Expiry date: ' + textFormatServices.formatDateToString(expiryDate)}</Typography>
-        <Button>Edit</Button>
+        <Button onClick={ () => navigate('/edit-assignment/1/1') }>Edit</Button>
       </Box>
     </Box>
   );
