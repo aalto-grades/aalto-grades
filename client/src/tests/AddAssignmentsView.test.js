@@ -9,7 +9,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import InstanceCreationRoute from '../context/InstanceCreationRoute';
 import AddAssignmentsView from '../components/AddAssignmentsView';
-import mockSuggestedAssignments from '../mock-data/mockSuggestedAssignments';
+import mockAssignmentsClient from '../mock-data/mockAssignmentsClient';
 
 describe('Tests for AddAssignmentsView components', () => {
 
@@ -30,9 +30,9 @@ describe('Tests for AddAssignmentsView components', () => {
     renderAddAssignmentsView();
 
     await waitFor(() => {
-      const assignment1 = screen.getByText(mockSuggestedAssignments[0].category);
-      const assignment2 = screen.getByText(mockSuggestedAssignments[1].category);
-      const assignment3 = screen.getByText(mockSuggestedAssignments[2].category);
+      const assignment1 = screen.getByText(mockAssignmentsClient[0].name);
+      const assignment2 = screen.getByText(mockAssignmentsClient[0].name);
+      const assignment3 = screen.getByText(mockAssignmentsClient[0].name);
       const createButton = screen.getByText('Create assignment');
       const confirmButton = screen.getByText('Confirm assignments');
       const goBackButton = screen.getByText('Go back');
@@ -45,7 +45,7 @@ describe('Tests for AddAssignmentsView components', () => {
       expect(goBackButton).toBeInTheDocument();
 
       const addButtons = screen.getAllByText('Add');
-      expect(addButtons.length).toBe(mockSuggestedAssignments.length);
+      expect(addButtons.length).toBe(mockAssignmentsClient.length);
       const editButtons = screen.queryByText('Edit');
       expect(editButtons).toBe(null);
     });
@@ -58,11 +58,11 @@ describe('Tests for AddAssignmentsView components', () => {
 
     await waitFor(() => {
       const addButtons = screen.getAllByText('Add');
-      expect(addButtons.length).toBe(mockSuggestedAssignments.length);
+      expect(addButtons.length).toBe(mockAssignmentsClient.length);
       userEvent.click(addButtons[0]);
 
       const newAddButtons = screen.getAllByText('Add');
-      expect(newAddButtons.length).toBe(mockSuggestedAssignments.length - 1);
+      expect(newAddButtons.length).toBe(mockAssignmentsClient.length - 1);
 
       const editButtons = screen.getAllByText('Edit');
       expect(editButtons.length).toBe(1);
