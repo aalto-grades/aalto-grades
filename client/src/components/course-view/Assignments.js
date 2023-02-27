@@ -27,7 +27,7 @@ const Assignments = ({ assignments, formula, instance }) => {
             <AssignmentCategory 
               key={assignment.id} 
               assignment={assignment} 
-              button={<Button>Edit</Button>} 
+              button={<Button onClick={ () => navigate('/edit-assignment/1/1') }>Edit</Button>} 
               width={'50vw'} 
             />
           );}
