@@ -22,13 +22,11 @@ const AssignmentCategory = ({ assignment, button, width }) => {
       <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pr: '21px', pb: titlepb, pl: '21px' }}>
         <Typography sx={{ fontWeight: 'bold' }} align='left'>{name}</Typography>
         { formulaId 
-          ? <Typography align='left' variant='body2'>{'Formula: ' + formulasService.getFormula(formulaId)}</Typography>
-          : <></>
+          && <Typography align='left' variant='body2'>{'Formula: ' + formulasService.getFormula(formulaId)}</Typography>
         }
       </Box>
       { subAssignments.length !== 0
-        ? <CustomAccordion assignments={subAssignments} />
-        : <></>
+        && <CustomAccordion assignments={subAssignments} />
       }
       <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pl: '21px', pr: '6px', pt: '8px' }}>
         <Typography align='left' variant='caption'>{'Expiry date: ' + textFormatServices.formatDateToString(expiryDate)}</Typography>

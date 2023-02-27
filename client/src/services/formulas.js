@@ -21,7 +21,7 @@ const setFormula = async (formulaInfo) => {
 
 // A temporary function to get a mock formula
 const getFormula = (formulaId) => {
-  const formula = mockFormulas.find( formula => formula.id === formulaId);
+  const formula = mockFormulas.find(formula => formula.id === formulaId);
   const formulaName = formula ? formula.name : 'None';
   return formulaName;
 };

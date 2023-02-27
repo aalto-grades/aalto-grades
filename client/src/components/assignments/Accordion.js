@@ -91,8 +91,7 @@ const AssignmentText = ({ name, formulaId }) => {
     }}>
       <Typography variant='body2'>{name}</Typography>
       { formulaId 
-        ? <Typography variant='caption' align='left'>{'Formula: ' + formulasService.getFormula(formulaId)}</Typography>
-        : <></>
+        && <Typography variant='caption' align='left'>{'Formula: ' + formulasService.getFormula(formulaId)}</Typography>
       }
     </Box>
   );
