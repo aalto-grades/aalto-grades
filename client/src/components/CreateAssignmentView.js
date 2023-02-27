@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState }  from 'react';
+import { useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
@@ -11,6 +12,7 @@ import Assignment from './create-assignment/Assignment';
 import assignmentServices from '../services/assignments';
 
 const CreateAssignmentView = () => {
+  const navigate = useNavigate();
 
   // The property 'category' must be specified for each assignment in order to populate the textfields correctly
   const [assignments, setAssignments] = useState([{
@@ -62,7 +64,7 @@ const CreateAssignmentView = () => {
               removeAssignment={removeAssignment}
             />
           </Box>
-          <Button size='medium' variant='outlined' sx={{ mr: 1 }}>
+          <Button size='medium' variant='outlined' onClick={ () => navigate(-1) } sx={{ mr: 1 }}>
                 Cancel
           </Button>
           <Button size='medium' variant='contained' type='submit' onClick={handleSubmit} sx={{ mr: 2 }}>

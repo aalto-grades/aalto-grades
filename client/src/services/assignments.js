@@ -136,7 +136,7 @@ const addCategories = (assignments) => {
 
 };
 
-// Format Date type values of the assignments to strings of the format '2023-01-01'
+// Recursive function to format Date type values of the assignments to strings of the format '2023-01-01'
 const formatDates = (assignments) => {
 
   const formatDate = (modifiabelAssignments) => {

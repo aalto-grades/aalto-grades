@@ -29,7 +29,7 @@ const EditAssignmentView = () => {
     event.preventDefault();
     try {
       console.log(assignments);
-      // TODO: connect to backend and add assignmentes to DB,
+      // TODO: connect to backend and add assignments to DB,
       // Add possible attributes and delete unnecessary ones
     } catch (exception) {
       console.log(exception);
@@ -37,7 +37,7 @@ const EditAssignmentView = () => {
   };
 
   const deleteAssignment = () => {
-    // TODO: connect to backend and delete assignmentes from DB,
+    // TODO: connect to backend and delete assignments from DB,
     navigate('/course-view/' + courseId);
   };
 
@@ -73,7 +73,7 @@ const EditAssignmentView = () => {
           <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
             <Button size='medium' variant='outlined' color='error' onClick={deleteAssignment} sx={{ ml: 2 }}>Delete assignment</Button>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}>
-              <Button size='medium' variant='outlined'>Cancel</Button>
+              <Button size='medium' variant='outlined' onClick={ () => navigate(-1) }>Cancel</Button>
               <Button size='medium' variant='contained' type='submit' onClick={handleSubmit} sx={{ mr: 2 }}>Confirm</Button>
             </Box>
           </Box>

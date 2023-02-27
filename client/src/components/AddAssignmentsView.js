@@ -63,7 +63,7 @@ const AddAssignmentsView = () => {
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', mb: 5, mt: 1, display: 'inline-block' }}>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography align='left' sx={{ ml: 1.5 }} >Create and add a new assignment:</Typography>
-          <Button variant='outlined'>Create assignment</Button>
+          <Button variant='outlined' onClick={ () => navigate('/create-assignment/1') }>Create assignment</Button>
         </Box>
       </Box>
       <Typography align='left' sx={{ ml: 1.5 }} >Added assignments</Typography>
@@ -75,7 +75,7 @@ const AddAssignmentsView = () => {
                 <AssignmentCategory 
                   key={group.category} 
                   categoryObject={group} 
-                  button={<Button>Edit</Button>} 
+                  button={<Button onClick={ () => navigate('/edit-assignment/1/1') }>Edit</Button>} 
                 />
               );}
             ) }
