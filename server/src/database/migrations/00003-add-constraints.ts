@@ -40,8 +40,8 @@ export default {
     const transaction: Transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.removeConstraint(
-        'course',
-        'course_min_credits_ck',
+        'course_instance',
+        'course_instance_min_credits_ck',
         { transaction }
       );
 

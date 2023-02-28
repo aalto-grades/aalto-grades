@@ -181,17 +181,37 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
-      await queryInterface.createTable('course_assignment', {
+      await queryInterface.createTable('attainable', {
         id: {
           type: DataTypes.INTEGER,
           autoIncrement: true,
           primaryKey: true
+        },
+        course_id: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          references: {
+            model: 'course',
+            key: 'id'
+          },
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE'
         },
         course_instance_id: {
           type: DataTypes.INTEGER,
           allowNull: false,
           references: {
             model: 'course_instance',
+            key: 'id'
+          },
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE'
+        },
+        attainable_id: {
+          type: DataTypes.INTEGER,
+          allowNull: true,
+          references: {
+            model: 'attainable',
             key: 'id'
           },
           onDelete: 'CASCADE',
@@ -212,7 +232,7 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
-      await queryInterface.createTable('user_assignment_grade', {
+      await queryInterface.createTable('user_attainable_grade', {
         id: {
           type: DataTypes.INTEGER,
           autoIncrement: true,
@@ -228,11 +248,11 @@ export default {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
         },
-        course_assignment_id: {
+        attainable_id: {
           type: DataTypes.INTEGER,
           allowNull: false,
           references: {
-            model: 'course_assignment',
+            model: 'attainable',
             key: 'id'
           },
           onDelete: 'CASCADE',
@@ -292,8 +312,8 @@ export default {
     const transaction: Transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.dropTable('course_result', { transaction });
-      await queryInterface.dropTable('user_assignment_grade', { transaction });
-      await queryInterface.dropTable('course_assignment', { transaction });
+      await queryInterface.dropTable('user_attainable_grade', { transaction });
+      await queryInterface.dropTable('attainable', { transaction });
       await queryInterface.dropTable('course_translation', { transaction });
       await queryInterface.dropTable('course_role', { transaction });
       await queryInterface.dropTable('course_instance', { transaction });
