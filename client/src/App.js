@@ -20,7 +20,11 @@ import CourseView from './components/CourseView';
 import CreateCourseView from './components/CreateCourseView';
 import FetchInstancesView from './components/FetchInstancesView';
 import EditInstanceView from './components/EditInstanceView';
+import AddAssignmentsView from './components/AddAssignmentsView';
+import InstanceSummaryView from './components/InstanceSummaryView';
+import SelectFormulaView from './components/SelectFormulaView';
 import CreateAssignmentView from './components/CreateAssignmentView';
+import InstanceCreationRoute from './context/InstanceCreationRoute';
 import useLogout from './hooks/useLogout';
 
 const theme = createTheme({
@@ -104,7 +108,14 @@ function App() {
             { /* Pages that are authorised for admin and teachers */ }
             <Route element={<PrivateRoute roles={[roles.admin, roles.teacher]}/>}>
               <Route path='/fetch-instances/:courseId' element={<FetchInstancesView/>}/>
-              <Route path='/edit-instance/:instanceId' element={<EditInstanceView/>}/>
+              { /* Pages under this route share instance creation context */ }
+              <Route element={<InstanceCreationRoute/>}>
+                <Route path=':courseId/edit-instance/:instanceId' element={<EditInstanceView/>}/>
+                <Route path=':courseId/add-assignments/:instanceId' element={<AddAssignmentsView/>}/>
+                <Route path=':courseId/instance-summary/:instanceId' element={<InstanceSummaryView/>}/>
+              </Route>
+              <Route path='/select-formula' element={<SelectFormulaView/>}/>
+              { /* Path above will be replaced with '/select-formula/:instanceId/:assignmentId' once component is connected to a page */ }
               <Route path='/create-assignment/:instanceId' element={<CreateAssignmentView/>}/>
             </Route>
           </Routes>
