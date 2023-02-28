@@ -49,9 +49,8 @@ export interface CourseInstanceData {
   responsibleTeachers?: Array<string>,
 }
 
-export interface CourseAssignmentData {
-  id?: number,
-  courseInstanceId: number,
+export interface AttainableData {
+  attainableId?: number,
   name: string,
   executionDate: Date,
   expiryDate: Date
