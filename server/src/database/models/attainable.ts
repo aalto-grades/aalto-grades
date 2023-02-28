@@ -17,6 +17,7 @@ export default class Attainable extends Model<
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
   declare courseInstanceId: ForeignKey<CourseInstance['id']>;
+  // TODO rename to parentId, atm sequelize forces name as "model + key" when querying.
   declare attainableId: CreationOptional<ForeignKey<Attainable['id']>>;
   declare name: string;
   declare executionDate: Date; // Date when assignment is done (e.g., deadline or exam date)
