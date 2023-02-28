@@ -187,3 +187,95 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/attainments', ()
       expect(res.statusCode).toBe(HttpCode.Conflict);
     });
 });
+
+describe('Test PUT /v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId', () => {
+  let id: number;
+
+  it('should update field succesfully on an existing attainment', async () => {
+    // Create a new assignment.
+    let res: supertest.Response = await request
+      .post('/v1/courses/1/instances/1/attainments')
+      .send(payload)
+      .set('Content-Type', 'application/json');
+
+    id = res.body.data.attainment.id;
+
+    res = await request
+      .put(`/v1/courses/1/instances/1/attainments/${id}`)
+      .send({
+        name: 'new name',
+        executionDate: payload.executionDate,
+        expiryDate: payload.expiryDate
+      })
+      .set('Content-Type', 'application/json');
+
+    expect(res.body.success).toBe(true);
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data.attainment.id).toBe(id);
+    expect(res.body.data.attainment.courseId).toBe(1);
+    expect(res.body.data.attainment.courseInstanceId).toBe(1);
+    expect(res.body.data.attainment.attainableId).toBe(null);
+    expect(res.body.data.attainment.createdAt).toBeDefined();
+    expect(res.body.data.attainment.updatedAt).toBeDefined();
+    expect(res.body.data.attainment.name).toBe('new name');
+    expect(new Date(res.body.data.attainment.executionDate).getTime())
+      .toBe(payload.executionDate.getTime());
+    expect(new Date(res.body.data.attainment.expiryDate).getTime())
+      .toBe(payload.expiryDate.getTime());
+    expect(res.statusCode).toBe(HttpCode.Ok);
+  });
+
+  it('should respond with 404 not found, if attainment does not exist', async () => {
+    const res: supertest.Response = await request
+      .put(`/v1/courses/1/instances/1/attainments/${badId}`)
+      .send(payload)
+      .set('Content-Type', 'application/json');
+
+    expect(res.body.success).toBe(false);
+    expect(res.body.data).not.toBeDefined();
+    expect(res.body.errors[0]).toBe(`study attainment with ID ${badId} not found`);
+    expect(res.statusCode).toBe(HttpCode.NotFound);
+  });
+
+  it('should respond with 400 bad request, if validation fails (non-number course instance id)',
+    async () => {
+      const res: supertest.Response = await request
+        .put(`/v1/courses/1/instances/${badInput}/attainments/${id}`)
+        .send(payload)
+        .set('Content-Type', 'application/json');
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+      expect(res.statusCode).toBe(HttpCode.BadRequest);
+    });
+
+  it('should respond with 400 bad request, if validation fails (non-number course id)',
+    async () => {
+      const res: supertest.Response = await request
+        .put(`/v1/courses/${badInput}/instances/1/attainments/${id}`)
+        .send(payload)
+        .set('Content-Type', 'application/json');
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+      expect(res.statusCode).toBe(HttpCode.BadRequest);
+    });
+
+  it('should respond with 400 bad request, if validation fails (non-number attainment id)',
+    async () => {
+      const res: supertest.Response = await request
+        .put(`/v1/courses/1/instances/1/attainments/${badInput}`)
+        .send(payload)
+        .set('Content-Type', 'application/json');
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+      expect(res.statusCode).toBe(HttpCode.BadRequest);
+    });
+});
