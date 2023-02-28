@@ -2,14 +2,24 @@
 //
 // SPDX-License-Identifier: MIT
 
+import Attainable from './attainable';
 import Course from './course';
-import CourseAssignment from './courseAssignment';
 import CourseInstance from './courseInstance';
 import CourseResult from './courseResult';
 import CourseRole from './courseRole';
 import CourseTranslation from './courseTranslation';
 import User from './user';
-import UserAssignmentGrade from './userAssignmentGrade';
+import UserAttainableGrade from './userAttainableGrade';
+
+Attainable.hasMany(Attainable, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+Attainable.belongsTo(Attainable, {
+  targetKey: 'id',
+  foreignKey: 'attainableId'
+});
 
 User.belongsToMany(CourseInstance, {
   through: CourseRole,
@@ -70,14 +80,24 @@ CourseResult.belongsTo(CourseInstance, {
   foreignKey: 'courseInstanceId'
 });
 
-CourseInstance.hasMany(CourseAssignment, {
+CourseInstance.hasMany(Attainable, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
 
-CourseAssignment.belongsTo(CourseInstance, {
+Attainable.belongsTo(CourseInstance, {
   targetKey: 'id',
   foreignKey: 'courseInstanceId'
+});
+
+Course.hasMany(Attainable, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+Attainable.belongsTo(Course, {
+  targetKey: 'id',
+  foreignKey: 'courseId'
 });
 
 CourseResult.belongsTo(CourseInstance, {
@@ -90,33 +110,33 @@ CourseResult.belongsTo(Course, {
   foreignKey: 'courseId'
 });
 
-User.hasMany(UserAssignmentGrade, {
+User.hasMany(UserAttainableGrade, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
 
-UserAssignmentGrade.belongsTo(User, {
+UserAttainableGrade.belongsTo(User, {
   targetKey: 'id',
   foreignKey: 'userId'
 });
 
-CourseAssignment.hasMany(UserAssignmentGrade, {
+Attainable.hasMany(UserAttainableGrade, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
 
-UserAssignmentGrade.belongsTo(CourseAssignment, {
+UserAttainableGrade.belongsTo(Attainable, {
   targetKey: 'id',
-  foreignKey: 'courseAssignmentId'
+  foreignKey: 'attainableId'
 });
 
 export default {
+  Attainable,
   Course,
-  CourseAssignment,
   CourseInstance,
   CourseResult,
   CourseRole,
   CourseTranslation,
   User,
-  UserAssignmentGrade
+  UserAttainableGrade
 };
