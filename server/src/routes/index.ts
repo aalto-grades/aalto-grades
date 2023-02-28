@@ -11,7 +11,7 @@ import swaggerUI from 'swagger-ui-express';
 import { FRONTEND_ORIGIN } from '../configs/environment';
 import { definition } from '../configs/swagger';
 
-import { router as assignmentRouter } from './assignment';
+import { router as attainableRouter } from './attainable';
 import { router as authRouter } from './auth';
 import { addCourse, getCourse } from '../controllers/course';
 import { fetchAllCourseInstancesFromSisu, fetchCourseInstanceFromSisu } from '../controllers/sisu';
@@ -30,7 +30,7 @@ const openapiSpecification: object = swaggerJsdoc(options);
 export const router: Router = Router();
 
 router.use(cookieParser());
-router.use(assignmentRouter);
+router.use(attainableRouter);
 router.use(authRouter);
 router.use(courseInstanceRouter);
 router.use(userRouter);
