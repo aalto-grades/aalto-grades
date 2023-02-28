@@ -33,6 +33,18 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/attainments', ()
     expect(res.statusCode).toBe(HttpCode.Ok);
   });
 
+  it('should create a new assignment with parent attainment', async () => {
+    const res: supertest.Response = await request
+      .post('/v1/courses/1/instances/1/attainments')
+      .send({ parentId: 1, ...payload })
+      .set('Content-Type', 'application/json');
+
+    expect(res.body.success).toBe(true);
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data.attainment.id).toBeDefined();
+    expect(res.statusCode).toBe(HttpCode.Ok);
+  });
+
   it('should respond with 404 not found, if course instance does not exist',
     async () => {
       const res: supertest.Response = await request
