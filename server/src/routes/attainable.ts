@@ -13,61 +13,81 @@ export const router: Router = Router();
 /**
  * @swagger
  * definitions:
- *   AddAssignment:
+ *   AddAttainment:
  *     type: object
- *     description: Assignment Information for adding a new assignment.
+ *     description: Information for adding a new study attainment.
  *     properties:
- *       courseInstanceId:
+ *       parentId:
  *         type: number
- *         description: Course instance ID to which the assignment belongs to.
+ *         required: false
+ *         description: Optional parent attainment ID to which the study attainment belongs to.
  *       name:
  *         type: string
- *         description: Assignment name.
+ *         required: true
+ *         description: Study attainment name.
  *       executionDate:
  *         type: string
- *         description: Date when the assignment is completed (e.g. deadline date or exam date).
+ *         required: true
+ *         description: Date when the attainment is completed (e.g. deadline date or exam date).
  *       expiryDate:
  *         type: string
- *         description: Date when the assignment expires.
- *   Assignment:
- *     description: Current assignment Information.
+ *         required: true
+ *         description: Date when the attainment expires.
+ *   Attainment:
+ *     description: Study attainment information.
  *     allOf:
  *       - type: object
  *         properties:
  *           id:
  *             type: number
  *             required: true
- *             description: Assignment ID.
- *       - $ref: '#/definitions/AddAssignment'
+ *             description: Study attainment ID.
+ *           courseId:
+ *             type: number
+ *             required: true
+ *             description: Course ID to which the study attainment belongs to.
+ *           courseInstanceId:
+ *             type: number
+ *             required: true
+ *             description: Course instance ID to which the study attainment belongs to.
+ *       - $ref: '#/definitions/AddAttainment'
  */
 
 /**
  * @swagger
  * /v1/courses/{courseId}/instances/{instanceId}/attainments:
  *   post:
- *     tags: [Assignment]
- *     description: Add a new assignment.
+ *     tags: [Attainment]
+ *     description: Add a new study attainment.
  *     requestBody:
- *       description: New assignment data.
+ *       description: New study attainment data.
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/definitions/AddAssignment'
+ *             $ref: '#/definitions/AddAttainment'
  *     responses:
  *       200:
- *         description: New assignment succesfully added.
+ *         description: New study attainment added succesfully.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/definitions/Assignment'
+ *               $ref: '#/definitions/Attainment'
  *       400:
- *         description: Creation failed, due to malformed/missing parameters.
+ *         description: Creation failed, due to validation errors or missing parameters.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       404:
- *         description: Course instance does not exist.
+ *         description: Course, course instance, or parent study attainment does not exist.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: >
+ *           Course instance does not belong to the course or
+ *           parent study attainment does not belong to the course instance.
  *         content:
  *           application/json:
  *             schema:
@@ -84,29 +104,29 @@ router.post(
  * @swagger
  * /v1/courses/{courseId}/instances/{instanceId}/attainments/{attainmentId}:
  *   put:
- *     tags: [Assignment]
- *     description: Update existing assignment.
+ *     tags: [Attainment]
+ *     description: Update existing study attainment.
  *     requestBody:
- *       description: Assignment data to be updated.
+ *       description: Study attainment data to be updated.
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/definitions/Assignment'
+ *             $ref: '#/definitions/Attainment'
  *     responses:
  *       200:
- *         description: Assignment updated succesfully.
+ *         description: Study attainment updated succesfully.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/definitions/Assignment'
+ *               $ref: '#/definitions/Attainment'
  *       400:
- *         description: Creation failed, due to malformed/missing parameters.
+ *         description: Creation failed, due to validation errors or missing parameters.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       404:
- *         description: The given course instance or assignment does not exist.
+ *         description: The given study attainment does not exist.
  *         content:
  *           application/json:
  *             schema:
