@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import List from '@mui/material/List';
 import Button from '@mui/material/Button';
@@ -15,10 +16,12 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import LeafAssignment from './LeafAssignment';
 import Assignment from './Assignment';
 import assignmentServices from '../../services/assignments';
+import formulasService from '../../services/formulas';
 
 // An Assignmnet component with subassignments and a formula
 
-const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignments, removeAssignment }) => {
+const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignments, removeAssignment, formulaAttributeNames }) => {
+  let navigate = useNavigate();
 
   // Functions and varibales for opening and closing the list of sub-assignments
   const [open, setOpen] = useState(true);
@@ -26,6 +29,17 @@ const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignme
   const handleClick = () => {
     setOpen(!open);
   };
+
+  /* Functions to get the formula attributes.
+     formulaId specifies the formula that is used to calculate this assignmnet's garde,
+     subFormulaAttributeNames are the attributes that need to be specified for the direct sub assignments of this assignments,
+     so that the grade for this assignment can be calculated. 
+     Observe that formulaAttributeNames that is as a parameter for this component are the attributes that need to specified for this assignmnet,
+     so that the grade of this assignment's parent assignment can be calculated.
+  */
+  const formulaId = assignmentServices.getProperty(indices, assignments, 'formulaId');
+  const formulaName = formulasService.getFormula(formulaId);
+  const subFormulaAttributeNames = formulasService.getFormulaAttributes(formulaId);
 
   return (
     <>
@@ -36,9 +50,9 @@ const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignme
         px: 1
       }}>
         <Typography variant="body1" component="div" sx={{ flexGrow: 1, textAlign: 'left', mb: 0.5 }}>
-          Grading Formula: None
+          {'Grading Formula: ' + formulaName}
         </Typography>
-        <Button size='small' sx={{ mb: 0.5 }}>
+        <Button size='small' sx={{ mb: 0.5 }} onClick={ () => navigate('/select-formula') }>
           Edit formula
         </Button>
       </Box>
@@ -48,6 +62,7 @@ const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignme
         assignments={assignments} 
         setAssignments={setAssignments} 
         removeAssignment={removeAssignment}
+        formulaAttributeNames={formulaAttributeNames}
       />
       <Box sx={{ display: 'flex', flexDirection: 'row' }}>
         {open ? 
@@ -73,6 +88,7 @@ const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignme
                   assignments={assignments} 
                   setAssignments={setAssignments} 
                   removeAssignment={removeAssignment}
+                  formulaAttributeNames={subFormulaAttributeNames ? subFormulaAttributeNames : []}
                 />
               ))}
             </List>
@@ -88,7 +104,8 @@ ParentAssignment.propTypes = {
   indices: PropTypes.array,
   assignments: PropTypes.array,
   setAssignments: PropTypes.func,
-  removeAssignment: PropTypes.func
+  removeAssignment: PropTypes.func,
+  formulaAttributeNames: PropTypes.array,
 };
 
 export default ParentAssignment;

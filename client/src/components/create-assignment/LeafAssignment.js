@@ -38,7 +38,34 @@ const expiryData = {
   fieldLabel: 'Expiry Date'
 };
 
-const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignments, removeAssignment }) => {
+/* String textfields for the formula attributes. These attributes affect the parent assignment's grade
+   The textfield IDs are of format 'attribute0', 'attribute1' and so on. 
+   The numbers in the end are used to fill in the correct values of the 'formulaAttribute' property of an assignment.
+   This is considered in the function of the nested component StringTextField.
+*/
+const AttributeTextFields = ({ formulaAttributeNames, indices, setAssignments, assignments }) => {
+  return (
+    formulaAttributeNames.map((attribute, index) => {
+      return(
+        <StringTextField 
+          key={index}
+          fieldData={{ fieldId: 'attribute' + index, fieldLabel: attribute }}
+          indices={indices} 
+          setAssignments={setAssignments} 
+          assignments={assignments}
+        />);})
+  );
+};
+
+AttributeTextFields.propTypes = {
+  formulaAttributeNames: PropTypes.array,
+  indices: PropTypes.array,
+  assignments: PropTypes.array,
+  setAssignments: PropTypes.func,
+  removeAssignment: PropTypes.func
+};
+
+const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignments, removeAssignment, formulaAttributeNames }) => {
 
   // Functions and varibales for handling the change of the value in the 'Name' (category) textfield.
   // If the value is 'Other', then the 'New Name' textfield is displayed; 
@@ -88,6 +115,9 @@ const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignment
     setOpenConfDialog(false);
   };
 
+  // See if this assignment affects the parent assignment's grade
+  const affectCalculation = assignmentServices.getProperty(indices, assignments, 'affectCalculation');
+
   return (
     <Box sx={{
       bgcolor: '#FFFFFF',
@@ -116,7 +146,7 @@ const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignment
           InputLabelProps={{ shrink: true }} 
           sx={{ textAlign: 'left' }} 
           select>
-          <MenuItem value='Exercise'>Exercise</MenuItem>
+          <MenuItem value='Assignments'>Assignments</MenuItem>
           <MenuItem value='Exam'>Exam</MenuItem>
           <MenuItem value='Project'>Project</MenuItem>
           <MenuItem value='Other'>Other</MenuItem>
@@ -126,6 +156,9 @@ const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignment
         </Collapse>
         <DateTextField fieldData={dateData} indices={indices} setAssignments={setAssignments} assignments={assignments}/>
         <DateTextField fieldData={expiryData} indices={indices} setAssignments={setAssignments} assignments={assignments}/>
+        { (formulaAttributeNames && affectCalculation) &&
+            <AttributeTextFields formulaAttributeNames={formulaAttributeNames} indices={indices} setAssignments={setAssignments} assignments={assignments}/>
+        }
       </Box>
       <Box sx={{ 
         display: 'flex', 
@@ -171,7 +204,8 @@ LeafAssignment.propTypes = {
   indices: PropTypes.array,
   assignments: PropTypes.array,
   setAssignments: PropTypes.func,
-  removeAssignment: PropTypes.func
+  removeAssignment: PropTypes.func,
+  formulaAttributeNames: PropTypes.array,
 };
 
 export default LeafAssignment;

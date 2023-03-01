@@ -57,10 +57,16 @@ describe('Tests for CreateAssignmentView components', () => {
       name: testCategory,
       date: testDate,
       expiryDate: testExpiry,
+      affectCalculation: false,
+      formulaAttributes: [],
       subAssignments: [],
     }];
 
-    render(<CreateAssignmentView/>);
+    render(
+      <BrowserRouter>
+        <CreateAssignmentView />
+      </BrowserRouter>
+    );
 
     const selectLabel = 'Name';
     const categoryField = await screen.findByLabelText(selectLabel);
@@ -100,10 +106,16 @@ describe('Tests for CreateAssignmentView components', () => {
       name: testName,
       date: testDate,
       expiryDate: testExpiry,
+      affectCalculation: false,
+      formulaAttributes: [],
       subAssignments: [],
     }];
 
-    render(<CreateAssignmentView/>);
+    render(
+      <BrowserRouter>
+        <CreateAssignmentView />
+      </BrowserRouter>
+    );
 
     const selectLabel = 'Name';
     const categoryField = await screen.findByLabelText(selectLabel);
@@ -139,11 +151,15 @@ describe('Tests for CreateAssignmentView components', () => {
       name: '',
       date: '',
       expiryDate: '',
+      affectCalculation: false,
+      formulaAttributes: [],
       subAssignments: [{
         category: '',
         name: '',
         date: '',
         expiryDate: '',
+        affectCalculation: false,
+        formulaAttributes: [],
         subAssignments: [],
       }]
     }];

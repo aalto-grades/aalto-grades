@@ -20,6 +20,9 @@ const CreateAssignmentView = () => {
     name: '',
     date: '',
     expiryDate: '',
+    //formulaId: null,
+    affectCalculation: false,
+    formulaAttributes: [],
     subAssignments: [],
   }]);
 

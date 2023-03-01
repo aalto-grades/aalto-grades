@@ -75,7 +75,7 @@ const AddAssignmentsView = () => {
                 <AssignmentCategory 
                   key={assignment.id} 
                   assignment={assignment}  
-                  button={<Button onClick={ () => navigate('/edit-assignment/1/1') }>Edit</Button>}
+                  button={<Button onClick={ () => navigate('/edit-assignment/' + instanceId + '/' + assignment.id) }>Edit</Button>}
                 />
               );}
             ) }

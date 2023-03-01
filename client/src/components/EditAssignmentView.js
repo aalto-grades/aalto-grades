@@ -10,21 +10,15 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Assignment from './create-assignment/Assignment';
 import assignmentServices from '../services/assignments';
-import mockAssignmentsServer from '../mock-data/mockAssignmentsServer';
+import mockAssignmentsClient from '../mock-data/mockAssignmentsClient';
 
 const EditAssignmentView = () => {
   const navigate = useNavigate();
-  const { courseId } = useParams();
+  const { assignmentId } = useParams();
 
-  const getAssignments = (assignments) => {
-    let updatedAssignments = [assignmentServices.constructTreeAssignmets(assignments)];
-    updatedAssignments = assignmentServices.addCategories(updatedAssignments);
-    updatedAssignments = assignmentServices.formatDates(updatedAssignments);
-    return updatedAssignments;
-  };
+  // TODO: replace with a function that gets the actual data from the server
+  const [assignments, setAssignments] = useState(assignmentServices.getFinalAssignmentById(mockAssignmentsClient, Number(assignmentId)));
   
-  const [assignments, setAssignments] = useState(getAssignments(mockAssignmentsServer));
-
   const handleSubmit = (event) => {
     event.preventDefault();
     try {
@@ -38,7 +32,7 @@ const EditAssignmentView = () => {
 
   const deleteAssignment = () => {
     // TODO: connect to backend and delete assignments from DB,
-    navigate('/course-view/' + courseId);
+    navigate(-1);
   };
 
   const removeAssignment = (indices) => {
