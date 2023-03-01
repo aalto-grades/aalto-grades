@@ -5,7 +5,7 @@
 import React from 'react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import EditAssignmentView from '../components/EditAssignmentView';
 import assignmentServices from '../services/assignments';
@@ -40,8 +40,8 @@ describe('Tests for EditAssignmentView components', () => {
       expect(headingElement).toBeInTheDocument();
       expect(categoryField).toHaveLength(numOfAssignments);
       expect(confirmButton).toBeInTheDocument();
-    })
-  })
+    });
+  });
 
   test('EditAssignmentView should return the same data it gets if it is not changed', async () => {
 
@@ -62,7 +62,7 @@ describe('Tests for EditAssignmentView components', () => {
       expect(logSpy).toHaveBeenCalledWith(mockAssignment);
 
       logSpy.mockRestore();
-    })
+    });
 
   });
 
