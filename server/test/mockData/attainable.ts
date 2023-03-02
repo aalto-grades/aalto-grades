@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import { AttainableData } from '../../src/types/course';
 
 export const mockAttainables: AttainableData = {
