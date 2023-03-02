@@ -26,7 +26,7 @@ describe('Test GET /v1/courses/instances/:instanceId', () => {
     expect(res.body.data.courseInstance.endDate).toBeDefined();
     expect(res.body.data.courseInstance.teachingMethod).toBeDefined();
     expect(res.body.data.courseInstance.gradingType).toBeDefined();
-    expect(res.body.data.courseInstance.responsibleTeacher).toBeDefined();
+    expect(res.body.data.courseInstance.teachersInCharge).toBeDefined();
     expect(res.body.data.courseInstance.courseData.courseCode).toBeDefined();
     expect(res.body.data.courseInstance.courseData.department).toBeDefined();
     expect(res.body.data.courseInstance.courseData.name).toBeDefined();
@@ -70,7 +70,7 @@ describe('Test GET /v1/courses/:courseId/instances', () => {
     expect(res.body.data.courseInstances[0].endDate).toBeDefined();
     expect(res.body.data.courseInstances[0].teachingMethod).toBeDefined();
     expect(res.body.data.courseInstances[0].gradingType).toBeDefined();
-    expect(res.body.data.courseInstances[0].responsibleTeacher).toBeDefined();
+    expect(res.body.data.courseInstances[0].teachersInCharge).toBeDefined();
   });
 
   it('should respond with error if course does not exist', async () => {

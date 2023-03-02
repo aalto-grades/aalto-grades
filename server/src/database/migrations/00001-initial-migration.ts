@@ -107,7 +107,7 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE,
       }, { transaction });
-      await queryInterface.createTable('course_role', {
+      await queryInterface.createTable('course_instance_role', {
         id: {
           type: DataTypes.INTEGER,
           autoIncrement: true,
@@ -369,7 +369,7 @@ export default {
       await queryInterface.dropTable('user_partial_grade', { transaction });
       await queryInterface.dropTable('course_instance_partial_grade', { transaction });
       await queryInterface.dropTable('course_translation', { transaction });
-      await queryInterface.dropTable('course_role', { transaction });
+      await queryInterface.dropTable('course_instance_role', { transaction });
       await queryInterface.dropTable('course_instance', { transaction });
       await queryInterface.dropTable('course', { transaction });
       await queryInterface.dropTable('user', { transaction });
@@ -381,7 +381,7 @@ export default {
       );
 
       await queryInterface.sequelize.query(
-        'DROP TYPE IF EXISTS enum_course_role_role;', { transaction }
+        'DROP TYPE IF EXISTS enum_course_instance_role_role;', { transaction }
       );
 
       await queryInterface.sequelize.query(

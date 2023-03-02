@@ -42,15 +42,17 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
   // TODO: Go through course_role instead
   const courses: Array<CourseWithTranslationAndInstance> = await models.Course.findAll({
     attributes: ['id', 'courseCode'],
-    include: [{
-      model: CourseInstance,
-      attributes: ['endDate'],
-      // ...where User has any role on the course
-    },
-    {
-      model: CourseTranslation,
-      attributes: ['language', 'courseName', 'department'],
-    }],
+    include: [
+      {
+        model: CourseInstance,
+        attributes: ['endDate'],
+        // ...where User has any role on the course
+      },
+      {
+        model: CourseTranslation,
+        attributes: ['language', 'courseName', 'department'],
+      }
+    ],
     order: [[CourseInstance, 'endDate', 'ASC']]
   }) as Array<CourseWithTranslationAndInstance>;
 

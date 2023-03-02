@@ -13,7 +13,7 @@ import User from '../database/models/user';
 
 import { ApiError } from '../types/error';
 import {
-  CourseInstanceData, CourseRole, GradingType, Period, TeachingMethod
+  CourseInstanceData, CourseInstanceRoleType, GradingType, Period, TeachingMethod
 } from '../types/course';
 import { HttpCode } from '../types/httpCode';
 import { idSchema } from '../types/general';
@@ -54,7 +54,9 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
           {
             model: User,
             attributes: ['name'],
-            // ...where User has CourseRole TeacherInCharge
+            where: {
+              '$Users->CourseInstanceRole.role$': CourseInstanceRoleType.TeacherInCharge
+            }
           }
         ]
       }
@@ -125,7 +127,7 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
 }
 
 export interface CourseInstanceWithTeachers extends CourseInstance {
-  Users: User
+  Users: Array<User>
 }
 
 export async function getAllCourseInstances(req: Request, res: Response): Promise<void> {
@@ -146,7 +148,9 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
     include: {
       model: User,
       attributes: ['name'],
-      // ...where User has CourseRole TeacherInCharge
+      where: {
+        '$Users->CourseInstanceRole.role$': CourseInstanceRoleType.TeacherInCharge
+      }
     }
   }) as Array<CourseInstanceWithTeachers>;
 
@@ -185,6 +189,10 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
       gradingType: instanceWithTeacher.gradingType as GradingType,
       teachersInCharge: [],
     };
+
+    for (const teacher of instanceWithTeacher.Users) {
+      instanceData.teachersInCharge?.push(teacher.name);
+    }
 
     instancesData.push(instanceData);
   });
@@ -285,10 +293,10 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
   });
 
   for (const teacher of request.teachersInCharge) {
-    await models.CourseRole.create({
+    await models.CourseInstanceRole.create({
       userId: teacher,
       courseInstanceId: newInstance.id,
-      role: CourseRole.TeacherInCharge
+      role: CourseInstanceRoleType.TeacherInCharge
     });
   }
 

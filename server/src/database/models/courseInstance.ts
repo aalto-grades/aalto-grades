@@ -8,7 +8,6 @@ import {
 
 import { sequelize } from '..';
 import Course from './course';
-import User from './user';
 
 export default class CourseInstance extends Model<
   InferAttributes<CourseInstance>,

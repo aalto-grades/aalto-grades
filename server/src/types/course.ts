@@ -50,7 +50,7 @@ export interface CourseInstanceData {
   teachersInCharge?: Array<string>
 }
 
-export enum CourseRole {
+export enum CourseInstanceRoleType {
   Student = 'STUDENT',
   Teacher = 'TEACHER',
   TeacherInCharge = 'TEACHERINCHARGE',
