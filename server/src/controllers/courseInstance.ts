@@ -17,42 +17,38 @@ import { HttpCode } from '../types/httpCode';
 import { idSchema } from '../types/general';
 import { Language } from '../types/language';
 import { CourseWithTranslation } from '../types/model';
-import { findCourseById } from './utils/course';
+import { findCourseById, findCourseWithTranslationById } from './utils/course';
 import { findUserById } from './utils/user';
 
-interface CourseInstanceWithCourseAndTranslation extends CourseInstance {
-  Course: CourseWithTranslation
-}
-
 export async function getCourseInstance(req: Request, res: Response): Promise<void> {
+  // Validate IDs.
+  const courseId: number = Number(req.params.courseId);
+  await idSchema.validate({ id: courseId });
+
   const instanceId: number = Number(req.params.instanceId);
   await idSchema.validate({ id: instanceId });
 
-  const instance: CourseInstanceWithCourseAndTranslation | null =
-      await models.CourseInstance.findByPk(
-        instanceId,
-        {
-          attributes: [
-            'id', 'sisuCourseInstanceId', 'gradingType', 'startingPeriod',
-            'endingPeriod', 'teachingMethod', 'minCredits', 'maxCredits',
-            'startDate', 'endDate', 'responsibleTeacher'
-          ],
-          include: {
-            model: Course,
-            attributes: ['id', 'courseCode'],
-            include: [
-              {
-                model: CourseTranslation,
-                attributes: ['language', 'courseName', 'department']
-              }
-            ]
-          }
-        }
-      ) as CourseInstanceWithCourseAndTranslation;
+  // Find course and course instance information.
+  const course: CourseWithTranslation = await findCourseWithTranslationById(
+    courseId, HttpCode.NotFound
+  );
 
+  const instance: CourseInstance | null = await CourseInstance.findByPk(
+    instanceId
+  );
+
+  // Verify that a course instance was found.
   if (!instance) {
     throw new ApiError(
       `course instance with ID ${instanceId} not found`, HttpCode.NotFound
+    );
+  }
+
+  // Verify that the course instance belongs to the found course.
+  if (instance.courseId != courseId) {
+    throw new ApiError(
+      `course instance with ID ${instanceId} belonging to course with ID ${courseId} not found`,
+      HttpCode.NotFound
     );
   }
 
@@ -73,8 +69,8 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
     gradingType: instance.gradingType as GradingType,
     responsibleTeacher: responsibleTeacher?.name ?? '-',
     courseData: {
-      id: instance.Course.id,
-      courseCode: instance.Course.courseCode,
+      id: course.id,
+      courseCode: course.courseCode,
       department: {
         en: '',
         fi: '',
@@ -93,7 +89,7 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
     }
   };
 
-  instance.Course.CourseTranslations.forEach((translation: CourseTranslation) => {
+  course.CourseTranslations.forEach((translation: CourseTranslation) => {
     switch (translation.language) {
     case Language.English:
       parsedInstanceData.courseData.department.en = translation.department;
