@@ -18,7 +18,7 @@ import { findAttainableById, generateAttainableTag } from './utils/attainable';
 import { findCourseById } from './utils/course';
 import { findCourseInstanceById } from './utils/courseInstance';
 
-const requestSchema: yup.AnyObjectSchema = yup.object().shape({
+const addAndEditSchema: yup.AnyObjectSchema = yup.object().shape({
   parentId: yup
     .number()
     .notRequired(),
@@ -33,7 +33,7 @@ const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     .required(),
   subAssignments: yup
     .array()
-    .of(yup.lazy(() => requestSchema.default(undefined)) as never)
+    .of(yup.lazy(() => addAndEditSchema.default(undefined)) as never)
     .notRequired()
 });
 
@@ -42,7 +42,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
   const courseInstanceId: number = Number(req.params.instanceId);
   await idSchema.validate({ id: courseId }, { abortEarly: false });
   await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
-  await requestSchema.validate(req.body, { abortEarly: false });
+  await addAndEditSchema.validate(req.body, { abortEarly: false });
 
   const course: Course = await findCourseById(courseId, HttpCode.NotFound);
 
@@ -176,7 +176,7 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
   await idSchema.validate({ id: courseId }, { abortEarly: false });
   await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
   await idSchema.validate({ id: attainableId }, { abortEarly: false });
-  await requestSchema.validate(req.body, { abortEarly: false });
+  await addAndEditSchema.validate(req.body, { abortEarly: false });
 
   const name: string = req.body.name;
   const executionDate: Date = req.body.executionDate;
