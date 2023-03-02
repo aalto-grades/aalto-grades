@@ -32,7 +32,9 @@ export const router: Router = Router();
  *       expiryDate:
  *         type: string
  *         required: true
- *         description: Date when the attainment expires.
+ *         description: >
+ *           Date when the attainment expires. Once an attainment has expired, it is no longer
+ *           eligible to count as completion for future course instances.
  *   Attainment:
  *     description: Study attainment information.
  *     allOf:
