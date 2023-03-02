@@ -22,3 +22,18 @@ export async function findAttainableById(id: number, errorCode: HttpCode): Promi
   }
   return attainable;
 }
+
+/**
+ * Create a tag for attainable based on its id's.
+ * @param {number} attainableId - The ID of the attainable.
+ * @param {number} courseId - The ID of the course the attainable belongs to.
+ * @param {number} courseInstanceId - The ID of the course instance the attainable belongs to.
+ * @returns {string} - Generated tag.
+ */
+export function generateAttainableTag(
+  attainableId: number,
+  courseId: number,
+  courseInstanceId: number
+): string {
+  return `C${courseId}I${courseInstanceId}A${attainableId}`;
+}
