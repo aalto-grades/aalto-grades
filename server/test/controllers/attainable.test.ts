@@ -16,7 +16,8 @@ const badInput: string = 'notValid';
 const payload: AttainableData = {
   name: 'exam assignment 1.1',
   executionDate: new Date('2022-02-02'),
-  expiryDate: new Date('2022-01-01')
+  expiryDate: new Date('2022-01-01'),
+  subAssignments: []
 };
 
 describe('Test POST /v1/courses/:courseId/instances/:instanceId/attainments', () => {
