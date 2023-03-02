@@ -50,8 +50,15 @@ export interface CourseInstanceData {
 }
 
 export interface AttainableData {
-  attainableId?: number,
+  id?: number,
+  courseId?: number,
+  courseInstanceId?: number,
+  parentId?: number,
+  tag?: string,
   name: string,
   executionDate: Date,
-  expiryDate: Date
+  expiryDate: Date,
+  updatedAt?: Date,
+  createdAt?: Date,
+  subAssignments: Array<AttainableData>
 }
