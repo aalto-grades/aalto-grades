@@ -10,9 +10,9 @@ import { sequelize } from '..';
 import Attainable from './attainable';
 import User from './user';
 
-export default class UserAttainableGrade extends Model<
-  InferAttributes<UserAttainableGrade>,
-  InferCreationAttributes<UserAttainableGrade>
+export default class UserAttainmentGrade extends Model<
+  InferAttributes<UserAttainmentGrade>,
+  InferCreationAttributes<UserAttainmentGrade>
 > {
   declare id: CreationOptional<number>;
   declare userId: ForeignKey<User['id']>;
@@ -22,7 +22,7 @@ export default class UserAttainableGrade extends Model<
   declare updatedAt: CreationOptional<Date>;
 }
 
-UserAttainableGrade.init(
+UserAttainmentGrade.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -54,6 +54,6 @@ UserAttainableGrade.init(
   },
   {
     sequelize,
-    tableName: 'user_attainable_grade'
+    tableName: 'user_attainment_grade'
   }
 );

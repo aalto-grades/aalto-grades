@@ -232,7 +232,7 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
-      await queryInterface.createTable('user_attainable_grade', {
+      await queryInterface.createTable('user_attainment_grade', {
         id: {
           type: DataTypes.INTEGER,
           autoIncrement: true,
@@ -312,7 +312,7 @@ export default {
     const transaction: Transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.dropTable('course_result', { transaction });
-      await queryInterface.dropTable('user_attainable_grade', { transaction });
+      await queryInterface.dropTable('user_attainment_grade', { transaction });
       await queryInterface.dropTable('attainable', { transaction });
       await queryInterface.dropTable('course_translation', { transaction });
       await queryInterface.dropTable('course_role', { transaction });

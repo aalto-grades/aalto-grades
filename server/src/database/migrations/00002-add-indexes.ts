@@ -32,7 +32,7 @@ export default {
         unique: false,
         transaction
       });
-      await queryInterface.addIndex('user_attainable_grade', ['user_id', 'attainable_id'], {
+      await queryInterface.addIndex('user_attainment_grade', ['user_id', 'attainable_id'], {
         unique: true,
         transaction
       });
@@ -80,7 +80,7 @@ export default {
       );
 
       await queryInterface.sequelize.query(
-        'DROP INDEX IF EXISTS user_attainable_grade_user_id_attainable_id',
+        'DROP INDEX IF EXISTS user_attainment_grade_user_id_attainable_id',
         { transaction }
       );
 

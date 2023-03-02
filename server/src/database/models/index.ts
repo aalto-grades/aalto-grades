@@ -9,7 +9,7 @@ import CourseResult from './courseResult';
 import CourseRole from './courseRole';
 import CourseTranslation from './courseTranslation';
 import User from './user';
-import UserAttainableGrade from './userAttainableGrade';
+import UserAttainmentGrade from './userAttainmentGrade';
 
 Attainable.hasMany(Attainable, {
   onDelete: 'CASCADE',
@@ -110,22 +110,22 @@ CourseResult.belongsTo(Course, {
   foreignKey: 'courseId'
 });
 
-User.hasMany(UserAttainableGrade, {
+User.hasMany(UserAttainmentGrade, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
 
-UserAttainableGrade.belongsTo(User, {
+UserAttainmentGrade.belongsTo(User, {
   targetKey: 'id',
   foreignKey: 'userId'
 });
 
-Attainable.hasMany(UserAttainableGrade, {
+Attainable.hasMany(UserAttainmentGrade, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
 
-UserAttainableGrade.belongsTo(Attainable, {
+UserAttainmentGrade.belongsTo(Attainable, {
   targetKey: 'id',
   foreignKey: 'attainableId'
 });
@@ -138,5 +138,5 @@ export default {
   CourseRole,
   CourseTranslation,
   User,
-  UserAttainableGrade
+  UserAttainmentGrade
 };
