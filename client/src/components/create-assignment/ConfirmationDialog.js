@@ -23,14 +23,14 @@ function ConfirmationDialog({ handleClose, open, removeAssignment, indices, assi
         </DialogContentText>
       </DialogContent>
       <DialogActions>
+        <Button size='medium' variant='outlined' onClick={handleClose}>
+          Cancel
+        </Button>
         <Button size='medium' onClick={() => {
           removeAssignment(indices, JSON.parse(JSON.stringify(assignments)));
           handleClose();
         }}>
           Delete
-        </Button>
-        <Button size='medium' variant='outlined' onClick={handleClose}>
-          Cancel
         </Button>
       </DialogActions>
     </Dialog>
