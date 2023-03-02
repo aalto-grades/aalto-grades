@@ -21,7 +21,7 @@ const payload: AttainableData = {
 
 describe('Test POST /v1/courses/:courseId/instances/:instanceId/attainments', () => {
 
-  it('should create a new assignment when course and course instance exists', async () => {
+  it('should create a new attainable when course and course instance exists', async () => {
     const res: supertest.Response = await request
       .post('/v1/courses/1/instances/1/attainments')
       .send(payload)
@@ -33,7 +33,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/attainments', ()
     expect(res.statusCode).toBe(HttpCode.Ok);
   });
 
-  it('should create a new assignment with parent attainment', async () => {
+  it('should create a new attainable with parent attainment', async () => {
     const res: supertest.Response = await request
       .post('/v1/courses/1/instances/1/attainments')
       .send({ parentId: 1, ...payload })
@@ -203,8 +203,8 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/attainments', ()
 describe('Test PUT /v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId', () => {
   let id: number;
 
-  it('should update field succesfully on an existing attainment', async () => {
-    // Create a new assignment.
+  it('should update field succesfully on an existing attainable', async () => {
+    // Create a new attainable.
     let res: supertest.Response = await request
       .post('/v1/courses/1/instances/1/attainments')
       .send(payload)
