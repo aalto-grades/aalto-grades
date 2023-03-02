@@ -81,7 +81,7 @@ export const router: Router = Router();
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       404:
- *         description: Course, course instance, or parent study attainment does not exist.
+ *         description: Course or course instance does not exist.
  *         content:
  *           application/json:
  *             schema:
@@ -90,6 +90,12 @@ export const router: Router = Router();
  *         description: >
  *           Course instance does not belong to the course or
  *           parent study attainment does not belong to the course instance.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       422:
+ *         description: Parent study attainment does not exist.
  *         content:
  *           application/json:
  *             schema:
@@ -128,7 +134,7 @@ router.post(
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       404:
- *         description: The given study attainment does not exist.
+ *         description: The given study attainment or the parent attainment does not exist.
  *         content:
  *           application/json:
  *             schema:

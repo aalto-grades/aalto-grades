@@ -66,7 +66,9 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
 
   // If linked to a parent id, check that it exists and belongs to the same course instance.
   if (parentId) {
-    const parentAttainable: Attainable = await findAttainableById(parentId, HttpCode.NotFound);
+    const parentAttainable: Attainable = await findAttainableById(
+      parentId, HttpCode.UnprocessableEntity
+    );
 
     if (parentAttainable.courseInstanceId !== courseInstanceId) {
       throw new ApiError(
