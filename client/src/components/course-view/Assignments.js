@@ -22,11 +22,11 @@ const Assignments = ({ assignments, formula, instance }) => {
         <Button>Edit formula</Button>
       </Box>
       <Box sx={{ display: 'inline-grid', gap: 1 }}>
-        { assignments.map(group => {
+        { assignments.map(assignment => {
           return (
             <AssignmentCategory 
-              key={group.category} 
-              categoryObject={group} 
+              key={assignment.id} 
+              assignment={assignment} 
               button={<Button>Edit</Button>} 
               width={'50vw'} 
             />
