@@ -221,7 +221,7 @@ export default {
           type: DataTypes.STRING,
           allowNull: false
         },
-        execution_date: {
+        date: {
           type: DataTypes.DATE,
           allowNull: false
         },

@@ -14,7 +14,7 @@ const badInput: string = 'notValid';
 
 const payload: AttainableData = {
   name: 'exam assignment 1.1',
-  executionDate: new Date('2022-02-02'),
+  date: new Date('2022-02-02'),
   expiryDate: new Date('2022-01-01'),
   subAttainables: []
 };
@@ -126,13 +126,13 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/attainments', ()
       expect(res.statusCode).toBe(HttpCode.BadRequest);
     });
 
-  it('should respond with 400 bad request, if validation fails (executionDate not valid date)',
+  it('should respond with 400 bad request, if validation fails (date not valid date)',
     async () => {
       const res: supertest.Response = await request
         .post('/v1/courses/1/instances/1/attainments')
         .send({
           name: payload.name,
-          executionDate: badInput,
+          date: badInput,
           expiryDate: payload.expiryDate
         })
         .set('Content-Type', 'application/json');
@@ -150,7 +150,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/attainments', ()
         .post('/v1/courses/1/instances/1/attainments')
         .send({
           name: payload.name,
-          executionDate: payload.executionDate,
+          date: payload.date,
           expiryDate: badInput
         })
         .set('Content-Type', 'application/json');
@@ -216,7 +216,7 @@ describe('Test PUT /v1/courses/:courseId/instances/:instanceId/attainments/:atta
       .put(`/v1/courses/1/instances/1/attainments/${id}`)
       .send({
         name: 'new name',
-        executionDate: payload.executionDate,
+        date: payload.date,
         expiryDate: payload.expiryDate
       })
       .set('Content-Type', 'application/json');
@@ -230,8 +230,8 @@ describe('Test PUT /v1/courses/:courseId/instances/:instanceId/attainments/:atta
     expect(res.body.data.attainment.createdAt).toBeDefined();
     expect(res.body.data.attainment.updatedAt).toBeDefined();
     expect(res.body.data.attainment.name).toBe('new name');
-    expect(new Date(res.body.data.attainment.executionDate).getTime())
-      .toBe(payload.executionDate.getTime());
+    expect(new Date(res.body.data.attainment.date).getTime())
+      .toBe(payload.date.getTime());
     expect(new Date(res.body.data.attainment.expiryDate).getTime())
       .toBe(payload.expiryDate.getTime());
     expect(res.statusCode).toBe(HttpCode.Ok);

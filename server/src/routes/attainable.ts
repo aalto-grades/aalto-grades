@@ -25,7 +25,7 @@ export const router: Router = Router();
  *         type: string
  *         required: true
  *         description: Study attainment name.
- *       executionDate:
+ *       date:
  *         type: string
  *         required: true
  *         description: Date when the attainment is completed (e.g. deadline date or exam date).

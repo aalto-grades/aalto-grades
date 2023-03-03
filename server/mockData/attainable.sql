@@ -2,7 +2,7 @@
 --
 -- SPDX-License-Identifier: MIT
 
-INSERT INTO public.attainable (course_id, course_instance_id, attainable_id, name, execution_date, expiry_date, created_at, updated_at) VALUES
+INSERT INTO public.attainable (course_id, course_instance_id, attainable_id, name, date, expiry_date, created_at, updated_at) VALUES
 (1, 1, null, 'test assignment 1.1', '2022-01-13', '2023-04-23', NOW(), NOW()),
 (2, 2, null, 'test assignment tree', '2022-05-08', '2023-04-23', NOW(), NOW()),
 (3, 3, null, 'test assignment 3.1', '2022-08-05', '2023-04-23', NOW(), NOW()),

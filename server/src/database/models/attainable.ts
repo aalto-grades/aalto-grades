@@ -20,7 +20,7 @@ export default class Attainable extends Model<
   // TODO rename to parentId, atm sequelize forces name as "model + key" when querying.
   declare attainableId: CreationOptional<ForeignKey<Attainable['id']>>;
   declare name: string;
-  declare executionDate: Date; // Date when assignment is done (e.g., deadline or exam date)
+  declare date: Date; // Date when assignment is done (e.g., deadline or exam date)
   declare expiryDate: Date;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -61,7 +61,7 @@ Attainable.init(
       type: DataTypes.STRING,
       allowNull: false
     },
-    executionDate: {
+    date: {
       type: DataTypes.DATE,
       allowNull: false
     },

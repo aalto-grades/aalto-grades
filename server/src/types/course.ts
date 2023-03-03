@@ -56,7 +56,7 @@ export interface AttainableData {
   parentId?: number,
   tag?: string,
   name: string,
-  executionDate: Date,
+  date: Date,
   expiryDate: Date,
   updatedAt?: Date,
   createdAt?: Date,

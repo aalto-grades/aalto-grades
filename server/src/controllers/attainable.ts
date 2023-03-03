@@ -25,7 +25,7 @@ const addAndEditSchema: yup.AnyObjectSchema = yup.object().shape({
   name: yup
     .string()
     .required(),
-  executionDate: yup
+  date: yup
     .date()
     .required(),
   expiryDate: yup
@@ -61,7 +61,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
 
   const parentId: number = req.body.parentId;
   const name: string = req.body.name;
-  const executionDate: Date = req.body.executionDate;
+  const date: Date = req.body.date;
   const expiryDate: Date = req.body.expiryDate;
   const subAssignments: Array<AttainableData> = req.body.subAssignments;
 
@@ -84,7 +84,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
     attainableId: parentId,
     courseInstanceId: courseInstanceId,
     name: name,
-    executionDate: executionDate,
+    date: date,
     expiryDate: expiryDate
   });
 
@@ -96,7 +96,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
           courseId: attainable.courseId,
           courseInstanceId: attainable.courseInstanceId,
           name: attainable.name,
-          executionDate: attainable.executionDate,
+          date: attainable.date,
           expiryDate: attainable.expiryDate,
           parentId: attainable.attainableId,
           tag: generateAttainableTag(
@@ -120,7 +120,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
         courseId: courseId,
         courseInstanceId: courseInstanceId,
         name: attainable.name,
-        executionDate: attainable.executionDate,
+        date: attainable.date,
         expiryDate: attainable.expiryDate
       });
 
@@ -133,7 +133,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
         courseId: dbEntry.courseId,
         courseInstanceId: dbEntry.courseInstanceId,
         name: dbEntry.name,
-        executionDate: dbEntry.executionDate,
+        date: dbEntry.date,
         expiryDate: dbEntry.expiryDate,
         parentId: dbEntry.attainableId,
         tag: generateAttainableTag(
@@ -157,7 +157,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
         courseId: attainable.courseId,
         courseInstanceId: attainable.courseInstanceId,
         name: attainable.name,
-        executionDate: attainable.executionDate,
+        date: attainable.date,
         expiryDate: attainable.expiryDate,
         parentId: attainable.attainableId,
         tag: generateAttainableTag(
@@ -180,7 +180,7 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
   await addAndEditSchema.validate(req.body, { abortEarly: false });
 
   const name: string = req.body.name;
-  const executionDate: Date = req.body.executionDate;
+  const date: Date = req.body.date;
   const expiryDate: Date = req.body.expiryDate;
   const parentId: number = req.body.parentId;
 
@@ -202,7 +202,7 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
 
   await attainable.set({
     name: name ?? attainable.name,
-    executionDate: executionDate ?? attainable.executionDate,
+    date: date ?? attainable.date,
     expiryDate: expiryDate ?? attainable.expiryDate,
     attainableId: parentId ?? attainable.attainableId
   }).save();
@@ -215,7 +215,7 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
         courseId: attainable.courseId,
         courseInstanceId: attainable.courseInstanceId,
         name: attainable.name,
-        executionDate: attainable.executionDate,
+        date: attainable.date,
         expiryDate: attainable.expiryDate,
         parentId: attainable.attainableId,
         tag: generateAttainableTag(
