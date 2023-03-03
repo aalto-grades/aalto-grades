@@ -18,31 +18,31 @@ import { findAttainableById, generateAttainableTag } from './utils/attainable';
 import { findCourseById } from './utils/course';
 import { findCourseInstanceById } from './utils/courseInstance';
 
-const addAndEditSchema: yup.AnyObjectSchema = yup.object().shape({
-  parentId: yup
-    .number()
-    .notRequired(),
-  name: yup
-    .string()
-    .required(),
-  date: yup
-    .date()
-    .required(),
-  expiryDate: yup
-    .date()
-    .required(),
-  subAttainments: yup
-    .array()
-    .of(yup.lazy(() => addAndEditSchema.default(undefined)) as never)
-    .notRequired()
-});
-
 export async function addAttainable(req: Request, res: Response): Promise<void> {
+  const requestSchema: yup.AnyObjectSchema = yup.object().shape({
+    parentId: yup
+      .number()
+      .notRequired(),
+    name: yup
+      .string()
+      .required(),
+    date: yup
+      .date()
+      .required(),
+    expiryDate: yup
+      .date()
+      .required(),
+    subAttainments: yup
+      .array()
+      .of(yup.lazy(() => requestSchema.default(undefined)) as never)
+      .notRequired()
+  });
+
   const courseId: number = Number(req.params.courseId);
   const courseInstanceId: number = Number(req.params.instanceId);
   await idSchema.validate({ id: courseId }, { abortEarly: false });
   await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
-  await addAndEditSchema.validate(req.body, { abortEarly: false });
+  await requestSchema.validate(req.body, { abortEarly: false });
 
   const course: Course = await findCourseById(courseId, HttpCode.NotFound);
 
@@ -172,6 +172,21 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
 }
 
 export async function updateAttainable(req: Request, res: Response): Promise<void> {
+  const requestSchema: yup.AnyObjectSchema = yup.object().shape({
+    parentId: yup
+      .number()
+      .notRequired(),
+    name: yup
+      .string()
+      .notRequired(),
+    date: yup
+      .date()
+      .notRequired(),
+    expiryDate: yup
+      .date()
+      .notRequired()
+  });
+
   const courseId: number = Number(req.params.courseId);
   const courseInstanceId: number = Number(req.params.instanceId);
   const attainableId: number = Number(req.params.attainmentId);
@@ -179,12 +194,12 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
   await idSchema.validate({ id: courseId }, { abortEarly: false });
   await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
   await idSchema.validate({ id: attainableId }, { abortEarly: false });
-  await addAndEditSchema.validate(req.body, { abortEarly: false });
+  await requestSchema.validate(req.body, { abortEarly: false });
 
-  const name: string = req.body.name;
-  const date: Date = req.body.date;
-  const expiryDate: Date = req.body.expiryDate;
-  const parentId: number = req.body.parentId;
+  const name: string | undefined = req.body.name;
+  const date: Date | undefined = req.body.date;
+  const expiryDate: Date | undefined = req.body.expiryDate;
+  const parentId: number| undefined = req.body.parentId;
 
   const attainable: Attainable = await findAttainableById(attainableId, HttpCode.NotFound);
 
@@ -195,8 +210,8 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
 
     if (parentAttainable.courseInstanceId !== attainable.courseInstanceId) {
       throw new ApiError(
-        `parent attainment ID ${parentId} does not belong to 
-        the same instance as attainment ID ${attainableId}`,
+        `parent attainment ID ${parentId} does not belong to ` +
+        `the same instance as attainment ID ${attainableId}`,
         HttpCode.Conflict
       );
     }
@@ -222,7 +237,7 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
         parentId: attainable.attainableId,
         tag: generateAttainableTag(
           attainable.id, attainable.courseId, attainable.courseInstanceId
-        ),
+        )
       }
     }
   });
