@@ -48,17 +48,3 @@ export interface CourseInstanceData {
   responsibleTeacher?: string | undefined,
   responsibleTeachers?: Array<string>,
 }
-
-export interface AttainableData {
-  id?: number,
-  courseId?: number,
-  courseInstanceId?: number,
-  parentId?: number,
-  tag?: string,
-  name: string,
-  date: Date,
-  expiryDate: Date,
-  updatedAt?: Date,
-  createdAt?: Date,
-  subAttainables: Array<AttainableData>
-}
