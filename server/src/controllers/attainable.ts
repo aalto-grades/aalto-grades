@@ -10,7 +10,7 @@ import Attainable from '../database/models/attainable';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 
-import { AttainableData } from '../types/course';
+import { AttainableData, AttainableRequestData } from '../types/attainable';
 import { ApiError } from '../types/error';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
@@ -53,17 +53,17 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
   // Check that instance belongs to the course.
   if (instance.courseId !== course.id) {
     throw new ApiError(
-      `course instance with ID ${courseInstanceId} 
-      does not belong to the course with ID ${courseId}`,
+      `course instance with ID ${courseInstanceId} ` +
+      `does not belong to the course with ID ${courseId}`,
       HttpCode.Conflict
     );
   }
 
-  const parentId: number = req.body.parentId;
+  const parentId: number | undefined = req.body.parentId;
   const name: string = req.body.name;
   const date: Date = req.body.date;
   const expiryDate: Date = req.body.expiryDate;
-  let subAttainables: Array<AttainableData> = req.body.subAttainments;
+  const requestSubAttainables: Array<AttainableRequestData> | undefined = req.body.subAttainments;
 
   // If linked to a parent id, check that it exists and belongs to the same course instance.
   if (parentId) {
@@ -73,7 +73,8 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
 
     if (parentAttainable.courseInstanceId !== courseInstanceId) {
       throw new ApiError(
-        `parent attainment ID ${parentId} does not belong to the instance ID ${courseInstanceId}`,
+        `parent attainment ID ${parentId} does not belong ` +
+        `to the course instance ID ${courseInstanceId}`,
         HttpCode.Conflict
       );
     }
@@ -88,11 +89,12 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
     expiryDate: expiryDate
   });
 
-  if (subAttainables.length === 0) {
+  if (!requestSubAttainables  || requestSubAttainables.length === 0) {
     res.status(HttpCode.Ok).json({
       success: true,
       data: {
         attainment: {
+          id: attainable.id,
           courseId: attainable.courseId,
           courseInstanceId: attainable.courseInstanceId,
           name: attainable.name,
@@ -109,7 +111,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
   }
 
   async function processSubAttainables(
-    unprocessedAttainables: Array<AttainableData>, parentId: number
+    unprocessedAttainables: Array<AttainableRequestData>, parentId: number
   ): Promise<Array<AttainableData>> {
     const attainables: Array<AttainableData> = [];
     let subAttainables: Array<AttainableData> = [];
@@ -124,8 +126,8 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
         expiryDate: attainable.expiryDate
       });
 
-      if (attainable.subAttainables.length > 0) {
-        subAttainables = await processSubAttainables(attainable.subAttainables, dbEntry.id);
+      if (attainable.subAttainments.length > 0) {
+        subAttainables = await processSubAttainables(attainable.subAttainments, dbEntry.id);
       }
 
       attainables.push({
@@ -139,14 +141,14 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
         tag: generateAttainableTag(
           dbEntry.id, dbEntry.courseId, dbEntry.courseInstanceId
         ),
-        subAttainables: subAttainables
+        subAttainments: subAttainables
       });
     }
     return attainables;
   }
 
-  subAttainables = await processSubAttainables(
-    subAttainables, attainable.id
+  const subAttainables: Array<AttainableData> = await processSubAttainables(
+    requestSubAttainables, attainable.id
   );
 
   res.status(HttpCode.Ok).json({
