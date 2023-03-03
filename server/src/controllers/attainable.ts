@@ -53,7 +53,8 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
   // Check that instance belongs to the course.
   if (instance.courseId !== course.id) {
     throw new ApiError(
-      `instance ID ${courseInstanceId} does not belong to the course ID ${courseId}`,
+      `course instance with ID ${courseInstanceId} 
+      does not belong to the course with ID ${courseId}`,
       HttpCode.Conflict
     );
   }
