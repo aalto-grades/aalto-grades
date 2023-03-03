@@ -31,7 +31,7 @@ const addAndEditSchema: yup.AnyObjectSchema = yup.object().shape({
   expiryDate: yup
     .date()
     .required(),
-  subAssignments: yup
+  subAttainments: yup
     .array()
     .of(yup.lazy(() => addAndEditSchema.default(undefined)) as never)
     .notRequired()
@@ -63,7 +63,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
   const name: string = req.body.name;
   const date: Date = req.body.date;
   const expiryDate: Date = req.body.expiryDate;
-  const subAssignments: Array<AttainableData> = req.body.subAssignments;
+  let subAttainables: Array<AttainableData> = req.body.subAttainments;
 
   // If linked to a parent id, check that it exists and belongs to the same course instance.
   if (parentId) {
@@ -88,7 +88,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
     expiryDate: expiryDate
   });
 
-  if (subAssignments.length === 0) {
+  if (subAttainables.length === 0) {
     res.status(HttpCode.Ok).json({
       success: true,
       data: {
@@ -145,8 +145,8 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
     return attainables;
   }
 
-  const subAttainables: Array<AttainableData> = await processSubAttainables(
-    subAssignments, attainable.id
+  subAttainables = await processSubAttainables(
+    subAttainables, attainable.id
   );
 
   res.status(HttpCode.Ok).json({
@@ -163,7 +163,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
         tag: generateAttainableTag(
           attainable.id, attainable.courseId, attainable.courseInstanceId
         ),
-        subAssignments: subAttainables
+        subAttainments: subAttainables
       }
     }
   });
