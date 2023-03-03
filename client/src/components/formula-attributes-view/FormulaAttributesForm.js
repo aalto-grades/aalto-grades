@@ -2,15 +2,34 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import StyledBox from '../select-formula-view/StyledBox';
 import Assignment from './Assignment';
 
-const FormulaAttributesForm = ({ assignments, navigateToCourseView }) => {
+const FormulaAttributesForm = ({ assignments, navigateToCourseView, formula }) => {
 
+  const [attributeValues, setAttributeValues] = useState([]);
+
+  useEffect(() => {
+    setAttributeValues(Array(assignments.length).fill(Array(formula.attributes.length).fill('')));
+  }, [assignments, formula]);
+
+  const handleAttributeChange = (assignmentIndex, attributeIndex, event) => {
+    const newAttributeValues = attributeValues.map((a, index) => {
+      if (assignmentIndex == index) {
+        const newAttributes = a.map((attribute, i) => {
+          return (attributeIndex == i) ? event.target.value : attribute;
+        });
+        return newAttributes;
+      } else {
+        return a;
+      }
+    });
+    setAttributeValues(newAttributeValues);
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -31,16 +50,25 @@ const FormulaAttributesForm = ({ assignments, navigateToCourseView }) => {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
-        bgcolor: 'primary.light'
+        bgcolor: 'primary.light',
+        borderRadius: 1,
+        pt: 2
       }}>
-        { assignments.map((assignment) => <Assignment assignment={assignment} key={assignment.id} />) }
+        { assignments.map((assignment, assignmentIndex) =>
+          <Assignment
+            assignment={assignment}
+            key={assignment.id}
+            assignmentIndex={assignmentIndex}
+            attributes={formula.attributes}
+            handleAttributeChange={handleAttributeChange}
+          />) }
       </StyledBox>
-      <StyledBox sx={{ display: 'flex', flexDirection: 'column', }}>
-        <Box sx={{ m: 3, mr: 1, alignSelf: 'flex-end' }}>
-          <Button size='small' variant='outlined' type='submit' name='goBack' sx={{ mr: 2 }}>
+      <StyledBox sx={{ display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ alignSelf: 'flex-end', m: '20px' }}>
+          <Button size='medium' variant='outlined' type='submit' name='goBack' sx={{ mr: 2 }}>
             Go back
           </Button>
-          <Button size='small' variant='contained' type='submit' name='confirm'>
+          <Button size='medium' variant='contained' type='submit' name='confirm'>
             Confirm
           </Button>
         </Box>
@@ -53,6 +81,7 @@ const FormulaAttributesForm = ({ assignments, navigateToCourseView }) => {
 FormulaAttributesForm.propTypes = {
   assignments: PropTypes.array,
   navigateToCourseView: PropTypes.func,
+  formula: PropTypes.object,
 };
 
 export default FormulaAttributesForm;

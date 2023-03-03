@@ -111,10 +111,10 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
         }}>
           <Typography width={350} m={3}>Specify attribute values for the sub-assignments</Typography>
           <Box sx={{ m: 3, mt: 0, alignSelf: 'flex-end',display: 'flex', lexDirection: 'column', }}>
-            <Button size='small' variant='outlined' type='submit' name='skipAttributes' sx={{ mr: 2 }}>
+            <Button size='medium' variant='outlined' type='submit' name='skipAttributes' sx={{ mr: 2 }}>
               Skip for now
             </Button>
-            <Button size='small' variant='contained' type='submit' name='specifyAttributes'>
+            <Button size='medium' variant='contained' type='submit' name='specifyAttributes'>
               Specify  attributes
             </Button>
           </Box>

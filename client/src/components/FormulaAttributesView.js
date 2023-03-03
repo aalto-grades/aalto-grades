@@ -9,6 +9,7 @@ import Box from '@mui/material/Box';
 import FormulaAttributesForm from './formula-attributes-view/FormulaAttributesForm';
 import instancesService from '../services/instances';
 import mockAssignments from '../mock-data/mockAssignments';
+import mockFormulas from '../mock-data/mockFormulas';
 
 const FormulaAttributesView = () => {
   const { instanceId, courseId } = useParams();
@@ -43,7 +44,7 @@ const FormulaAttributesView = () => {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1, mb: 2 }}>
           Result: Course Total Grade
         </Typography>
-        <FormulaAttributesForm assignments={assignments} navigateToCourseView={navigateToCourseView} />
+        <FormulaAttributesForm assignments={assignments} navigateToCourseView={navigateToCourseView} formula={mockFormulas[0]} />
       </Box>
     </Box>
 
