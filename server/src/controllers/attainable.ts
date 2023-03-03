@@ -123,8 +123,8 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
         expiryDate: attainable.expiryDate
       });
 
-      if (attainable.subAssignments.length > 0) {
-        subAttainables = await processSubAttainables(attainable.subAssignments, dbEntry.id);
+      if (attainable.subAttainables.length > 0) {
+        subAttainables = await processSubAttainables(attainable.subAttainables, dbEntry.id);
       }
 
       attainables.push({
@@ -138,7 +138,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
         tag: generateAttainableTag(
           dbEntry.id, dbEntry.courseId, dbEntry.courseInstanceId
         ),
-        subAssignments: subAttainables
+        subAttainables: subAttainables
       });
     }
     return attainables;

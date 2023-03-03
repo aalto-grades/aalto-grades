@@ -16,7 +16,7 @@ const payload: AttainableData = {
   name: 'exam assignment 1.1',
   executionDate: new Date('2022-02-02'),
   expiryDate: new Date('2022-01-01'),
-  subAssignments: []
+  subAttainables: []
 };
 
 describe('Test POST /v1/courses/:courseId/instances/:instanceId/attainments', () => {

@@ -60,5 +60,5 @@ export interface AttainableData {
   expiryDate: Date,
   updatedAt?: Date,
   createdAt?: Date,
-  subAssignments: Array<AttainableData>
+  subAttainables: Array<AttainableData>
 }
