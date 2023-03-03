@@ -206,6 +206,14 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
   // If linked to a parent id, check that it exists and belongs
   // to the same course instance as the attainable being edited.
   if (parentId) {
+
+    if (parentId === attainable.id) {
+      throw new ApiError(
+        'attainment cannot refer to itself in the parent ID',
+        HttpCode.Conflict
+      );
+    }
+
     const parentAttainable: Attainable = await findAttainableById(parentId, HttpCode.NotFound);
 
     if (parentAttainable.courseInstanceId !== attainable.courseInstanceId) {
