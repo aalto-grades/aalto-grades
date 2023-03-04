@@ -24,8 +24,7 @@ describe('Test GET /v1/user/:userId/courses', () => {
     expect(res.statusCode).toBe(HttpCode.Ok);
 
     expect(res.body.data.courses).toStrictEqual({
-      'current': [],
-      'previous': [
+      'current': [
         {
           'id': 1,
           'courseCode': 'CS-A1110',
@@ -45,7 +44,8 @@ describe('Test GET /v1/user/:userId/courses', () => {
             'en': ''
           }
         }
-      ]
+      ],
+      'previous': []
     });
   });
 

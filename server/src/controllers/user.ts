@@ -8,6 +8,7 @@ import models from '../database/models';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
+import User from '../database/models/user';
 
 import { CourseData } from '../types/course';
 import { findUserById } from './utils/user';
@@ -39,27 +40,42 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
   // Confirm that user exists.
   await findUserById(userId, HttpCode.NotFound);
 
-  // TODO: Go through course_role instead
+  // TODO: This query is likely not ideal.
   const courses: Array<CourseWithTranslationAndInstance> = await models.Course.findAll({
     attributes: ['id', 'courseCode'],
     include: [
       {
         model: CourseInstance,
         attributes: ['endDate'],
-        // ...where User has any role on the course
+        include: [
+          {
+            model: User,
+            where: {
+              id: userId
+            }
+          }
+        ]
       },
       {
         model: CourseTranslation,
         attributes: ['language', 'courseName', 'department'],
       }
     ],
-    order: [[CourseInstance, 'endDate', 'ASC']]
+    order: [[CourseInstance, 'endDate', 'DESC']]
   }) as Array<CourseWithTranslationAndInstance>;
 
   // Construct CourseData objects and determine whether the course is current or previous.
   const currentDate: Date = new Date(Date.now());
-  for (const i in courses) {
-    const course: CourseWithTranslationAndInstance = courses[i];
+  for (const course of courses) {
+    /*
+     * If the course instance array is empty, this user has no role in any
+     * instance of this course. Meaning the user has not taken any part in this
+     * course and it shouldn't be included in the result.
+     *
+     * TODO: Don't include courses like this in the query result to begin with.
+     */
+    if (course.CourseInstances.length == 0)
+      continue;
 
     const courseData: CourseData = {
       id: course.id,
@@ -98,8 +114,7 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
       }
     });
 
-    const latestEndDate: Date =
-      new Date(String(course.CourseInstances[course.CourseInstances.length - 1].endDate));
+    const latestEndDate: Date = new Date(String(course.CourseInstances[0].endDate));
 
     if (currentDate <= latestEndDate) {
       coursesOfUser.current.push(courseData);
