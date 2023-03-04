@@ -16,7 +16,7 @@ export default class CourseInstance extends Model<
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
   declare sisuCourseInstanceId: string | null;
-  declare gradingType: string;
+  declare gradingScale: string;
   declare startingPeriod: string;
   declare endingPeriod: string;
   declare teachingMethod: string;
@@ -48,8 +48,8 @@ CourseInstance.init(
       allowNull: true,
       unique: true
     },
-    gradingType: {
-      type: DataTypes.ENUM('PASSFAIL', 'NUMERICAL'),
+    gradingScale: {
+      type: DataTypes.ENUM('PASS_FAIL', 'NUMERICAL'),
       allowNull: false
     },
     startingPeriod: {

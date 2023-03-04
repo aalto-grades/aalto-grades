@@ -19,11 +19,11 @@ export const router: Router = Router();
  *     description: >
  *       Teaching period (`Period`):
  *       `'I' | 'II' | 'III' | 'IV' | 'V'`.
- *   GradingType:
+ *   GradingScale:
  *     type: string
  *     description: >
- *       Grading method (`GradingType`):
- *       `'PASFAIL' | 'NUMERICAL'`.
+ *       Grading method (`GradingScale`):
+ *       `'PASS_FAIL' | 'NUMERICAL'`.
  *   TeachingMethod:
  *     type: string
  *     description: >
@@ -55,8 +55,8 @@ export const router: Router = Router();
  *         description: Ending date in format year-month-day.
  *       teachingMethod:
  *         $ref: '#/definitions/TeachingMethod'
- *       gradingType:
- *         $ref: '#/definitions/GradingType'
+ *       gradingScale:
+ *         $ref: '#/definitions/GradingScale'
  *       teachersInCharge:
  *         type: array
  *         description: Names of all teachers in charge of this course instance.
@@ -187,8 +187,8 @@ router.get(
  *           schema:
  *             type: object
  *             properties:
- *               gradingType:
- *                 $ref: '#/definitions/GradingType'
+ *               gradingScale:
+ *                 $ref: '#/definitions/GradingScale'
  *               sisuCourseInstanceId:
  *                 type: string
  *                 description: ID of the corresponding course instance in Sisu.

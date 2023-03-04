@@ -9,7 +9,7 @@ import { AXIOS_TIMEOUT } from '../configs/constants';
 import { SISU_API_KEY, SISU_API_URL } from '../configs/environment';
 
 import { ApiError } from '../types/error';
-import { CourseInstanceData, GradingType, TeachingMethod } from '../types/course';
+import { CourseInstanceData, GradingScale, TeachingMethod } from '../types/course';
 import { HttpCode } from '../types/httpCode';
 import { SisuCourseInstance } from '../types/sisu';
 
@@ -26,9 +26,9 @@ function parseSisuCourseInstance(instance: SisuCourseInstance): CourseInstanceDa
     teachingMethod: (instance.type === 'exam-exam'
       ? TeachingMethod.Exam
       : TeachingMethod.Lecture),
-    gradingType: (instance.summary.gradingScale.fi === '0-5'
-      ? GradingType.Numerical
-      : GradingType.PassFail),
+    gradingScale: (instance.summary.gradingScale.fi === '0-5'
+      ? GradingScale.Numerical
+      : GradingScale.PassFail),
     teachersInCharge: instance.summary.teacherInCharge,
     courseData: {
       courseCode: instance.code,

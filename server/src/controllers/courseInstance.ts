@@ -13,7 +13,7 @@ import User from '../database/models/user';
 
 import { ApiError } from '../types/error';
 import {
-  CourseInstanceData, CourseInstanceRoleType, GradingType, Period, TeachingMethod
+  CourseInstanceData, CourseInstanceRoleType, GradingScale, Period, TeachingMethod
 } from '../types/course';
 import { HttpCode } from '../types/httpCode';
 import { idSchema } from '../types/general';
@@ -35,11 +35,6 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
     await models.CourseInstance.findByPk(
       instanceId,
       {
-        attributes: [
-          'id', 'sisuCourseInstanceId', 'gradingType', 'startingPeriod',
-          'endingPeriod', 'teachingMethod', 'minCredits', 'maxCredits',
-          'startDate', 'endDate'
-        ],
         include: [
           {
             model: Course,
@@ -78,7 +73,7 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
     startDate: instance.startDate,
     endDate: instance.endDate,
     teachingMethod: instance.teachingMethod as TeachingMethod,
-    gradingType: instance.gradingType as GradingType,
+    gradingScale: instance.gradingScale as GradingScale,
     teachersInCharge: [],
     courseData: {
       id: instance.Course.id,
@@ -137,11 +132,6 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
   const course: Course = await findCourseById(courseId, HttpCode.NotFound);
 
   const instances: Array<CourseInstanceWithTeachers> = await CourseInstance.findAll({
-    attributes: [
-      'id', 'sisuCourseInstanceId', 'courseId', 'gradingType', 'startingPeriod',
-      'endingPeriod', 'teachingMethod', 'minCredits', 'maxCredits', 'startDate',
-      'endDate', 'createdAt', 'updatedAt'
-    ],
     where: {
       courseId: courseId
     },
@@ -186,7 +176,7 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
       startDate: instanceWithTeacher.startDate,
       endDate: instanceWithTeacher.endDate,
       teachingMethod: instanceWithTeacher.teachingMethod as TeachingMethod,
-      gradingType: instanceWithTeacher.gradingType as GradingType,
+      gradingScale: instanceWithTeacher.gradingScale as GradingScale,
       teachersInCharge: [],
     };
 
@@ -207,7 +197,7 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
 
 interface CourseInstanceAddRequest {
   sisuCourseInstanceId: string | null;
-  gradingType: GradingType;
+  gradingScale: GradingScale;
   startingPeriod: Period;
   endingPeriod: Period;
   teachingMethod: TeachingMethod;
@@ -220,9 +210,9 @@ interface CourseInstanceAddRequest {
 
 export async function addCourseInstance(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
-    gradingType: yup
+    gradingScale: yup
       .string()
-      .oneOf([GradingType.PassFail, GradingType.Numerical])
+      .oneOf([GradingScale.PassFail, GradingScale.Numerical])
       .required(),
     sisuCourseInstanceId: yup
       .string()
@@ -282,7 +272,7 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
   const newInstance: CourseInstance = await models.CourseInstance.create({
     courseId: courseId,
     sisuCourseInstanceId: request.sisuCourseInstanceId ?? null,
-    gradingType: request.gradingType,
+    gradingScale: request.gradingScale,
     startingPeriod: request.startingPeriod,
     endingPeriod: request.endingPeriod,
     teachingMethod: request.teachingMethod,

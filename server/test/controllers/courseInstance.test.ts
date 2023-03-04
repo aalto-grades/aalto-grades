@@ -25,7 +25,7 @@ describe('Test GET /v1/courses/instances/:instanceId', () => {
     expect(res.body.data.courseInstance.startDate).toBeDefined();
     expect(res.body.data.courseInstance.endDate).toBeDefined();
     expect(res.body.data.courseInstance.teachingMethod).toBeDefined();
-    expect(res.body.data.courseInstance.gradingType).toBeDefined();
+    expect(res.body.data.courseInstance.gradingScale).toBeDefined();
     expect(res.body.data.courseInstance.teachersInCharge).toBeDefined();
     expect(res.body.data.courseInstance.courseData.courseCode).toBeDefined();
     expect(res.body.data.courseInstance.courseData.department).toBeDefined();
@@ -69,7 +69,7 @@ describe('Test GET /v1/courses/:courseId/instances', () => {
     expect(res.body.data.courseInstances[0].startDate).toBeDefined();
     expect(res.body.data.courseInstances[0].endDate).toBeDefined();
     expect(res.body.data.courseInstances[0].teachingMethod).toBeDefined();
-    expect(res.body.data.courseInstances[0].gradingType).toBeDefined();
+    expect(res.body.data.courseInstances[0].gradingScale).toBeDefined();
     expect(res.body.data.courseInstances[0].teachersInCharge).toBeDefined();
   });
 
@@ -107,7 +107,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     }
 
     await goodInput({
-      gradingType: 'NUMERICAL',
+      gradingScale: 'NUMERICAL',
       startingPeriod: 'I',
       endingPeriod: 'II',
       teachingMethod: 'LECTURE',
@@ -119,7 +119,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     });
 
     await goodInput({
-      gradingType: 'PASSFAIL',
+      gradingScale: 'PASS_FAIL',
       startingPeriod: 'III',
       endingPeriod: 'V',
       teachingMethod: 'EXAM',
@@ -131,7 +131,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     });
 
     await goodInput({
-      gradingType: 'PASSFAIL',
+      gradingScale: 'PASS_FAIL',
       startingPeriod: 'III',
       endingPeriod: 'V',
       teachingMethod: 'EXAM',
@@ -161,7 +161,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     });
 
     await badInput({
-      gradingType: 'Wrong enum',
+      gradingScale: 'Wrong enum',
       startingPeriod: 'I',
       endingPeriod: 'II',
       teachingMethod: 'LECTURE',
@@ -173,7 +173,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     });
 
     await badInput({
-      gradingType: 'PASSFAIL',
+      gradingScale: 'PASS_FAIL',
       startingPeriod: {
         junk: 'data'
       },
@@ -187,7 +187,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     });
 
     await badInput({
-      gradingType: 'PASSFAIL',
+      gradingScale: 'PASS_FAIL',
       startingPeriod: 'I',
       endingPeriod: 'II',
       teachingMethod: 42,
@@ -199,7 +199,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     });
 
     await badInput({
-      gradingType: 'NUMERICAL',
+      gradingScale: 'NUMERICAL',
       startingPeriod: 'I',
       endingPeriod: 'II',
       teachingMethod: 'LECTURE',
@@ -211,7 +211,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     });
 
     await badInput({
-      gradingType: 'NUMERICAL',
+      gradingScale: 'NUMERICAL',
       startingPeriod: 'I',
       endingPeriod: 'II',
       teachingMethod: 'LECTURE',
@@ -223,7 +223,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     });
 
     await badInput({
-      gradingType: 'NUMERICAL',
+      gradingScale: 'NUMERICAL',
       startingPeriod: 'I',
       endingPeriod: 'II',
       teachingMethod: 'LECTURE',
@@ -241,7 +241,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
       await request
         .post('/v1/courses/9999999/instances')
         .send({
-          gradingType: 'NUMERICAL',
+          gradingScale: 'NUMERICAL',
           startingPeriod: 'I',
           endingPeriod: 'II',
           teachingMethod: 'LECTURE',
@@ -263,7 +263,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
       await request
         .post('/v1/courses/1/instances')
         .send({
-          gradingType: 'NUMERICAL',
+          gradingScale: 'NUMERICAL',
           startingPeriod: 'I',
           endingPeriod: 'II',
           teachingMethod: 'LECTURE',

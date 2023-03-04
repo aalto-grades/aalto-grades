@@ -72,8 +72,8 @@ export default {
           allowNull: true,
           unique: true
         },
-        grading_type: {
-          type: DataTypes.ENUM('PASSFAIL', 'NUMERICAL'),
+        grading_scale: {
+          type: DataTypes.ENUM('PASS_FAIL', 'NUMERICAL'),
           allowNull: false
         },
         starting_period: {
@@ -377,7 +377,7 @@ export default {
       await queryInterface.dropTable('seeds', { transaction });
 
       await queryInterface.sequelize.query(
-        'DROP TYPE IF EXISTS enum_course_instance_grading_type;', { transaction }
+        'DROP TYPE IF EXISTS enum_course_instance_grading_scale;', { transaction }
       );
 
       await queryInterface.sequelize.query(
