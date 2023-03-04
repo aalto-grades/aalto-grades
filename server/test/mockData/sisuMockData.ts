@@ -80,7 +80,7 @@ export const sisuInstance: SisuCourseInstance = {
       en: 'basic-studies'
     },
     teacherInCharge: [
-      'Yusein Redzheb Ali'
+      'Ted Teacher'
     ],
     assesmentMethods: {
       fi: 'Exercises and programming test. ',
@@ -148,7 +148,7 @@ export const sisuInstance: SisuCourseInstance = {
     'en'
   ],
   teachers: [
-    'Yusein Redzheb Ali'
+    'Ted Teacher'
   ],
   enrolmentStartDate: '2022-12-12',
   enrolmentEndDate: '2023-01-16',
