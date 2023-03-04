@@ -198,10 +198,13 @@ router.get(
  *                 $ref: '#/definitions/Period'
  *               teachingMethod:
  *                 $ref: '#/definitions/TeachingMethod'
- *               responsibleTeacher:
- *                 type: integer
+ *               teachersInCharge:
+ *                 type: array
  *                 description: >
- *                   ID of the user to be assigned as the responsible teacher.
+ *                   IDs of the users to be assigned as teachers in charge of
+ *                   this course instance.
+ *                 items:
+ *                   type: integer
  *               minCredits:
  *                 type: integer
  *               maxCredits:
