@@ -13,14 +13,14 @@ export const router: Router = Router();
 /**
  * @swagger
  * definitions:
- *   AddAttainment:
+ *   AddAndEditAttainment:
  *     type: object
  *     description: Information for adding a new study attainment.
  *     properties:
  *       parentId:
  *         type: number
  *         required: false
- *         description: Optional parent attainment ID to which the study attainment belongs to.
+ *         description: (Optional) parent attainment ID to which the study attainment belongs to.
  *       name:
  *         type: string
  *         required: true
@@ -52,7 +52,7 @@ export const router: Router = Router();
  *             type: number
  *             required: true
  *             description: Course instance ID to which the study attainment belongs to.
- *       - $ref: '#/definitions/AddAttainment'
+ *       - $ref: '#/definitions/AddAndEditAttainment'
  */
 
 /**
@@ -66,7 +66,7 @@ export const router: Router = Router();
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/definitions/AddAttainment'
+ *             $ref: '#/definitions/AddAndEditAttainment'
  *     responses:
  *       200:
  *         description: New study attainment added succesfully.
@@ -119,7 +119,7 @@ router.post(
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/definitions/Attainment'
+ *             $ref: '#/definitions/AddAndEditAttainment'
  *     responses:
  *       200:
  *         description: Study attainment updated succesfully.
@@ -135,6 +135,20 @@ router.post(
  *               $ref: '#/definitions/Failure'
  *       404:
  *         description: The given study attainment or the parent attainment does not exist.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: >
+ *           Parent study attainment does not belong to the course instance or
+ *           attainment tries to refer to itself as the parent.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       422:
+ *         description: Parent study attainment does not exist.
  *         content:
  *           application/json:
  *             schema:
