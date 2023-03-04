@@ -24,7 +24,7 @@ import { findUserById } from './utils/user';
 
 interface CourseInstanceWithCourseAndTranslation extends CourseInstance {
   Course: CourseWithTranslation,
-  Users: User
+  Users: Array<User>
 }
 
 export async function getCourseInstance(req: Request, res: Response): Promise<void> {
@@ -95,6 +95,10 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
       }
     }
   };
+
+  for (const teacher of instance.Users) {
+    parsedInstanceData.teachersInCharge?.push(teacher.name);
+  }
 
   instance.Course.CourseTranslations.forEach((translation: CourseTranslation) => {
     switch (translation.language) {
