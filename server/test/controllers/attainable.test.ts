@@ -442,6 +442,19 @@ describe('Test PUT /v1/courses/:courseId/instances/:instanceId/attainments/:atta
     expect(res.statusCode).toBe(HttpCode.NotFound);
   });
 
+  it('should respond with 422 unprocessable entity, if parent attainable does not exist',
+    async () => {
+      const res: supertest.Response = await request
+        .put(`/v1/courses/1/instances/1/attainments/${subAttainable.id}`)
+        .send({ parentId: badId })
+        .set('Content-Type', 'application/json');
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors[0]).toBe(`study attainment with ID ${badId} not found`);
+      expect(res.statusCode).toBe(HttpCode.UnprocessableEntity);
+    });
+
   it('should respond with 400 bad request, if validation fails (non-number course instance id)',
     async () => {
       const res: supertest.Response = await request

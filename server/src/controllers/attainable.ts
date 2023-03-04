@@ -214,7 +214,10 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
       );
     }
 
-    const parentAttainable: Attainable = await findAttainableById(parentId, HttpCode.NotFound);
+    const parentAttainable: Attainable = await findAttainableById(
+      parentId,
+      HttpCode.UnprocessableEntity
+    );
 
     if (parentAttainable.courseInstanceId !== attainable.courseInstanceId) {
       throw new ApiError(
