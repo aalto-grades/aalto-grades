@@ -24,11 +24,6 @@ export const router: Router = Router();
  *     description: >
  *       Grading method (`GradingScale`):
  *       `'PASS_FAIL' | 'NUMERICAL'`.
- *   TeachingMethod:
- *     type: string
- *     description: >
- *       Teaching method (`TeachingMethod`):
- *         `'LECTURE' | 'EXAM'`.
  *   CourseInstanceData:
  *     type: object
  *     description: Course instance information.
@@ -53,8 +48,9 @@ export const router: Router = Router();
  *       endDate:
  *         type: string
  *         description: Ending date in format year-month-day.
- *       teachingMethod:
- *         $ref: '#/definitions/TeachingMethod'
+ *       type:
+ *         type: string
+ *         description: Type of course instance, 'Lecture', 'Exam', etc.
  *       gradingScale:
  *         $ref: '#/definitions/GradingScale'
  *       teachersInCharge:
@@ -196,8 +192,9 @@ router.get(
  *                 $ref: '#/definitions/Period'
  *               endingPeriod:
  *                 $ref: '#/definitions/Period'
- *               teachingMethod:
- *                 $ref: '#/definitions/TeachingMethod'
+ *               type:
+ *                 type: string
+ *                 description: Type of course instance, 'Lecture', 'Exam', etc.
  *               teachersInCharge:
  *                 type: array
  *                 description: >

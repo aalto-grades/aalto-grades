@@ -17,11 +17,6 @@ export enum Period {
   V = 'V'
 }
 
-export enum TeachingMethod {
-  Lecture = 'LECTURE',
-  Exam = 'EXAM'
-}
-
 export interface CourseData {
   // Course ID is either number type ID in the Aalto Grades database or
   // undefined when representing parsed Sisu data.
@@ -43,7 +38,7 @@ export interface CourseInstanceData {
   maxCredits: number,
   startDate: Date,
   endDate: Date,
-  teachingMethod: TeachingMethod,
+  type: string,
   gradingScale: GradingScale,
   // TODO: There should maybe be a UserData interface if more data is needed,
   // for example ID of user.

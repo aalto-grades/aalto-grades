@@ -84,8 +84,8 @@ export default {
           type: DataTypes.ENUM('I', 'II', 'III', 'IV', 'V'),
           allowNull: false
         },
-        teaching_method: {
-          type: DataTypes.ENUM('LECTURE', 'EXAM'),
+        type: {
+          type: new DataTypes.STRING,
           allowNull: false
         },
         min_credits: {

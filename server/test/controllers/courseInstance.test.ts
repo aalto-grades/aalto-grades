@@ -24,7 +24,7 @@ describe('Test GET /v1/courses/instances/:instanceId', () => {
     expect(res.body.data.courseInstance.maxCredits).toBeDefined();
     expect(res.body.data.courseInstance.startDate).toBeDefined();
     expect(res.body.data.courseInstance.endDate).toBeDefined();
-    expect(res.body.data.courseInstance.teachingMethod).toBeDefined();
+    expect(res.body.data.courseInstance.type).toBeDefined();
     expect(res.body.data.courseInstance.gradingScale).toBeDefined();
     expect(res.body.data.courseInstance.teachersInCharge).toBeDefined();
     expect(res.body.data.courseInstance.courseData.courseCode).toBeDefined();
@@ -68,7 +68,7 @@ describe('Test GET /v1/courses/:courseId/instances', () => {
     expect(res.body.data.courseInstances[0].maxCredits).toBeDefined();
     expect(res.body.data.courseInstances[0].startDate).toBeDefined();
     expect(res.body.data.courseInstances[0].endDate).toBeDefined();
-    expect(res.body.data.courseInstances[0].teachingMethod).toBeDefined();
+    expect(res.body.data.courseInstances[0].type).toBeDefined();
     expect(res.body.data.courseInstances[0].gradingScale).toBeDefined();
     expect(res.body.data.courseInstances[0].teachersInCharge).toBeDefined();
   });
@@ -110,7 +110,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
       gradingScale: 'NUMERICAL',
       startingPeriod: 'I',
       endingPeriod: 'II',
-      teachingMethod: 'LECTURE',
+      type: 'LECTURE',
       teachersInCharge: [1],
       minCredits: 5,
       maxCredits: 5,
@@ -122,7 +122,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
       gradingScale: 'PASS_FAIL',
       startingPeriod: 'III',
       endingPeriod: 'V',
-      teachingMethod: 'EXAM',
+      type: 'EXAM',
       teachersInCharge: [2],
       minCredits: 3,
       maxCredits: 5,
@@ -134,7 +134,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
       gradingScale: 'PASS_FAIL',
       startingPeriod: 'III',
       endingPeriod: 'V',
-      teachingMethod: 'EXAM',
+      type: 'EXAM',
       teachersInCharge: [2, 1],
       minCredits: 0,
       maxCredits: 1,
@@ -164,7 +164,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
       gradingScale: 'Wrong enum',
       startingPeriod: 'I',
       endingPeriod: 'II',
-      teachingMethod: 'LECTURE',
+      type: 'LECTURE',
       teachersInCharge: 1,
       minCredits: 5,
       maxCredits: 5,
@@ -178,7 +178,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
         junk: 'data'
       },
       endingPeriod: 'II',
-      teachingMethod: 'LECTURE',
+      type: 'LECTURE',
       teachersInCharge: [1],
       minCredits: 5,
       maxCredits: 5,
@@ -190,7 +190,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
       gradingScale: 'PASS_FAIL',
       startingPeriod: 'I',
       endingPeriod: 'II',
-      teachingMethod: 42,
+      type: 42,
       teachersInCharge: 1,
       minCredits: 5,
       maxCredits: 5,
@@ -202,7 +202,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
       gradingScale: 'NUMERICAL',
       startingPeriod: 'I',
       endingPeriod: 'II',
-      teachingMethod: 'LECTURE',
+      type: 'LECTURE',
       teachersInCharge: [1],
       minCredits: 5,
       maxCredits: 5,
@@ -214,7 +214,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
       gradingScale: 'NUMERICAL',
       startingPeriod: 'I',
       endingPeriod: 'II',
-      teachingMethod: 'LECTURE',
+      type: 'LECTURE',
       teachersInCharge: [1],
       minCredits: 5,
       maxCredits: 3,
@@ -226,7 +226,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
       gradingScale: 'NUMERICAL',
       startingPeriod: 'I',
       endingPeriod: 'II',
-      teachingMethod: 'LECTURE',
+      type: 'LECTURE',
       teachersInCharge: [1],
       minCredits: -1,
       maxCredits: 3,
@@ -244,7 +244,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
           gradingScale: 'NUMERICAL',
           startingPeriod: 'I',
           endingPeriod: 'II',
-          teachingMethod: 'LECTURE',
+          type: 'LECTURE',
           teachersInCharge: [1],
           minCredits: 5,
           maxCredits: 5,
@@ -266,7 +266,7 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
           gradingScale: 'NUMERICAL',
           startingPeriod: 'I',
           endingPeriod: 'II',
-          teachingMethod: 'LECTURE',
+          type: 'LECTURE',
           teachersInCharge: [9999999],
           minCredits: 5,
           maxCredits: 5,

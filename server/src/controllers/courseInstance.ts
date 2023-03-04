@@ -13,7 +13,7 @@ import User from '../database/models/user';
 
 import { ApiError } from '../types/error';
 import {
-  CourseInstanceData, CourseInstanceRoleType, GradingScale, Period, TeachingMethod
+  CourseInstanceData, CourseInstanceRoleType, GradingScale, Period
 } from '../types/course';
 import { HttpCode } from '../types/httpCode';
 import { idSchema } from '../types/general';
@@ -72,7 +72,7 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
     maxCredits: instance.maxCredits,
     startDate: instance.startDate,
     endDate: instance.endDate,
-    teachingMethod: instance.teachingMethod as TeachingMethod,
+    type: instance.type,
     gradingScale: instance.gradingScale as GradingScale,
     teachersInCharge: [],
     courseData: {
@@ -175,7 +175,7 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
       maxCredits: instanceWithTeacher.maxCredits,
       startDate: instanceWithTeacher.startDate,
       endDate: instanceWithTeacher.endDate,
-      teachingMethod: instanceWithTeacher.teachingMethod as TeachingMethod,
+      type: instanceWithTeacher.type,
       gradingScale: instanceWithTeacher.gradingScale as GradingScale,
       teachersInCharge: [],
     };
@@ -200,7 +200,7 @@ interface CourseInstanceAddRequest {
   gradingScale: GradingScale;
   startingPeriod: Period;
   endingPeriod: Period;
-  teachingMethod: TeachingMethod;
+  type: string;
   minCredits: number;
   maxCredits: number;
   startDate: Date;
@@ -225,9 +225,8 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
       .string()
       .oneOf([Period.I, Period.II, Period.III, Period.IV, Period.V])
       .required(),
-    teachingMethod: yup
+    type: yup
       .string()
-      .oneOf([TeachingMethod.Lecture, TeachingMethod.Exam])
       .required(),
     minCredits: yup
       .number()
@@ -275,7 +274,7 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
     gradingScale: request.gradingScale,
     startingPeriod: request.startingPeriod,
     endingPeriod: request.endingPeriod,
-    teachingMethod: request.teachingMethod,
+    type: request.type,
     minCredits: request.minCredits,
     maxCredits: request.maxCredits,
     startDate: request.startDate,

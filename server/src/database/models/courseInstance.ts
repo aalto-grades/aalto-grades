@@ -19,7 +19,7 @@ export default class CourseInstance extends Model<
   declare gradingScale: string;
   declare startingPeriod: string;
   declare endingPeriod: string;
-  declare teachingMethod: string;
+  declare type: string;
   declare minCredits: number;
   declare maxCredits: number;
   declare startDate: Date;
@@ -60,8 +60,8 @@ CourseInstance.init(
       type: DataTypes.ENUM('I', 'II', 'III', 'IV', 'V'),
       allowNull: false
     },
-    teachingMethod: {
-      type: DataTypes.ENUM('LECTURE', 'EXAM'),
+    type: {
+      type: DataTypes.STRING,
       allowNull: false
     },
     minCredits: {
