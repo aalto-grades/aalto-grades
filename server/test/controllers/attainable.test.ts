@@ -46,7 +46,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/attainments', ()
       expect(res.body.data.attainment.name).toBe(mockAttainable.name);
       expect(res.body.data.attainment.parentId).toBe(null);
       expect(res.body.data.attainment.tag).toBeDefined();
-      expect(res.body.data.attainment.subAttainments).not.toBeDefined();
+      expect(res.body.data.attainment.subAttainments).toBeDefined();
       expect(new Date(res.body.data.attainment.date).getTime())
         .toBe(mockAttainable.date.getTime());
       expect(new Date(res.body.data.attainment.expiryDate).getTime())

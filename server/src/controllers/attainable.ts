@@ -64,6 +64,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
   const date: Date = req.body.date;
   const expiryDate: Date = req.body.expiryDate;
   const requestSubAttainables: Array<AttainableRequestData> | undefined = req.body.subAttainments;
+  let subAttainables: Array<AttainableData> = [];
 
   // If linked to a parent id, check that it exists and belongs to the same course instance.
   if (parentId) {
@@ -88,27 +89,6 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
     date: date,
     expiryDate: expiryDate
   });
-
-  if (!requestSubAttainables  || requestSubAttainables.length === 0) {
-    res.status(HttpCode.Ok).json({
-      success: true,
-      data: {
-        attainment: {
-          id: attainable.id,
-          courseId: attainable.courseId,
-          courseInstanceId: attainable.courseInstanceId,
-          name: attainable.name,
-          date: attainable.date,
-          expiryDate: attainable.expiryDate,
-          parentId: attainable.attainableId,
-          tag: generateAttainableTag(
-            attainable.id, attainable.courseId, attainable.courseInstanceId
-          )
-        }
-      }
-    });
-    return;
-  }
 
   async function processSubAttainables(
     unprocessedAttainables: Array<AttainableRequestData>, parentId: number
@@ -147,9 +127,9 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
     return attainables;
   }
 
-  const subAttainables: Array<AttainableData> = await processSubAttainables(
-    requestSubAttainables, attainable.id
-  );
+  if (requestSubAttainables) {
+    subAttainables = await processSubAttainables(requestSubAttainables, attainable.id);
+  }
 
   res.status(HttpCode.Ok).json({
     success: true,
