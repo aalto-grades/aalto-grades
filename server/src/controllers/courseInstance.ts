@@ -47,8 +47,9 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
   // Verify that the course instance belongs to the found course.
   if (instance.courseId != courseId) {
     throw new ApiError(
-      `course instance with ID ${instanceId} belonging to course with ID ${courseId} not found`,
-      HttpCode.NotFound
+      `course instance with ID ${instanceId} ` +
+      `does not belong to the course with ID ${courseId}`,
+      HttpCode.Conflict
     );
   }
 

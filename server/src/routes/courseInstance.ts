@@ -111,8 +111,16 @@ export const router: Router = Router();
  *               $ref: '#/definitions/Failure'
  *       404:
  *         description: >
- *           A course with the given course ID was not found or a course instance
- *           with the given ID belonging to the course was not found.
+ *           A course with the given course ID or a course instance with the
+ *           given instance ID was not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: >
+ *           The found course instance with the given instance ID does not belong
+ *           to the course with the given course ID.
  *         content:
  *           application/json:
  *             schema:
