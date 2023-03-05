@@ -20,7 +20,7 @@ const OngoingInstanceInfo = ({ info }) => {
   return(
     <Box sx={{ display: 'inline-block', pt: 1.5 }}>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', columnGap: 4, pb: 1 }}>
-        <Typography variant='h6' align='left' sx={{ ml: 1.5 }} >Ongoing instance</Typography>
+        <Typography variant='h6' align='left' sx={{ ml: 1.5 }} >Ongoing Instance</Typography>
         { /* Only admins, teachers and assistants are allowed to see attendees*/
           (auth.role == 'SYSADMIN' || auth.role == 'TEACHER'|| auth.role == 'ASSISTANT') && 
           <Button>See attendees</Button>

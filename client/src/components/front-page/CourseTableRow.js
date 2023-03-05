@@ -17,11 +17,11 @@ const CourseTableRow = ({ course }) => {
     <TableRow
       key={id} 
       hover={true}
-      onClick={() => { navigate('/course-view/' + courseCode); }}
+      onClick={() => { navigate('/course-view/' + id); }}
     >
       <TableCell>
         <Link 
-          href={'/course-view/' + courseCode}
+          href={'/course-view/' + id}
           underline="hover"
           color="inherit"
         >
