@@ -66,11 +66,17 @@ export const router: Router = Router();
 
 /**
  * @swagger
- * /v1/courses/instances/{instanceId}:
+ * /v1/courses/{courseId}/instances/{instanceId}:
  *   get:
  *     tags: [Course Instance]
  *     description: Get information about a course instance.
  *     parameters:
+ *       - in: path
+ *         name: courseId
+ *         required: True
+ *         schema:
+ *           type: integer
+ *         description: The ID of the course the instance belongs to.
  *       - in: path
  *         name: instanceId
  *         required: True
@@ -104,14 +110,24 @@ export const router: Router = Router();
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       404:
- *         description: A course instance with the given ID was not found.
+ *         description: >
+ *           A course with the given course ID or a course instance with the
+ *           given instance ID was not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: >
+ *           The found course instance with the given instance ID does not belong
+ *           to the course with the given course ID.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
  */
 router.get(
-  '/v1/courses/instances/:instanceId',
+  '/v1/courses/:courseId/instances/:instanceId',
   controllerDispatcher(getCourseInstance)
 );
 
