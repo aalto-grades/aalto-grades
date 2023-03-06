@@ -28,6 +28,10 @@ interface CourseInstanceWithCourseAndTranslation extends CourseInstance {
 }
 
 export async function getCourseInstance(req: Request, res: Response): Promise<void> {
+  // Validate IDs.
+  const courseId: number = Number(req.params.courseId);
+  await idSchema.validate({ id: courseId });
+
   const instanceId: number = Number(req.params.instanceId);
   await idSchema.validate({ id: instanceId });
 
@@ -57,9 +61,19 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
       }
     ) as CourseInstanceWithCourseAndTranslation;
 
+  // Verify that a course instance was found.
   if (!instance) {
     throw new ApiError(
       `course instance with ID ${instanceId} not found`, HttpCode.NotFound
+    );
+  }
+
+  // Verify that the course instance belongs to the found course.
+  if (instance.courseId != courseId) {
+    throw new ApiError(
+      `course instance with ID ${instanceId} ` +
+      `does not belong to the course with ID ${courseId}`,
+      HttpCode.Conflict
     );
   }
 
