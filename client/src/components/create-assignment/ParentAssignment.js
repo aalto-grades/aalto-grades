@@ -76,7 +76,7 @@ const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignme
         <Box sx={{ display: 'flex', flexDirection: 'column',  width: '100%' }}>
           <Collapse in={!open} unmountOnExit >
             <Typography variant="body2" component="div" sx={{ mt: 0.6, mb: 2, flexGrow: 1, textAlign: 'left', color: '#6E6E6E' }}>
-              See sub-assignments
+              See sub-attainments
             </Typography>
           </Collapse>
           <Collapse in={open} timeout='auto' unmountOnExit>

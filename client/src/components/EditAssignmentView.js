@@ -44,7 +44,7 @@ const EditAssignmentView = () => {
     <>
       <Container maxWidth="md" sx={{ textAlign: 'right' }}>
         <Typography variant="h3" component="div" sx={{ flexGrow: 1, mb: 4, textAlign: 'left' }}>
-            Edit Assignment
+            Edit Study Attainment
         </Typography>
         <form>
           <Box sx={{ 
@@ -65,7 +65,7 @@ const EditAssignmentView = () => {
             />
           </Box>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
-            <Button size='medium' variant='outlined' color='error' onClick={deleteAssignment} sx={{ ml: 2 }}>Delete assignment</Button>
+            <Button size='medium' variant='outlined' color='error' onClick={deleteAssignment} sx={{ ml: 2 }}>Delete Attainment</Button>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}>
               <Button size='medium' variant='outlined' onClick={ () => navigate(-1) }>Cancel</Button>
               <Button size='medium' variant='contained' type='submit' onClick={handleSubmit} sx={{ mr: 2 }}>Confirm</Button>

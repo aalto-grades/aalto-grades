@@ -16,7 +16,7 @@ import assignmentServices from '../../services/assignments';
 
 const numberData = {
   fieldId: 'numberData',
-  fieldLabel: 'Number of sub-assignments'
+  fieldLabel: 'Number of sub-attainments'
 };
     
 function SimpleDialog({ handleClose, open, addSubAssignments, indices, assignments }) {
@@ -39,9 +39,9 @@ function SimpleDialog({ handleClose, open, addSubAssignments, indices, assignmen
   return (
     <Dialog open={open} >
       {assignmentServices.getSubAssignments(indices, assignments).length === 0 ?
-        <DialogTitle>Create Sub-Assignments</DialogTitle>
+        <DialogTitle>Create Sub-Attainments</DialogTitle>
         :
-        <DialogTitle>Add Sub-Assignments</DialogTitle>}
+        <DialogTitle>Add Sub-Attainments</DialogTitle>}
       <form>
         <DialogContent sx={{ px: 3, py: 1 }}>
           <TextField

@@ -50,7 +50,7 @@ const gradingScaleData = {
 
 const teacherData = {
   fieldId: 'teacher',
-  fieldLabel: 'Teacher of This Instance'
+  fieldLabel: 'Teacher in Charge'
 };
 
 const textFieldMinWidth = 195;

@@ -20,7 +20,7 @@ const OngoingInstanceInfo = ({ info }) => {
   return(
     <Box sx={{ display: 'inline-block', pt: 1.5 }}>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', columnGap: 4, pb: 1 }}>
-        <Typography variant='h6' align='left' sx={{ ml: 1.5 }} >Ongoing instance</Typography>
+        <Typography variant='h6' align='left' sx={{ ml: 1.5 }} >Ongoing Instance</Typography>
         { /* Only admins, teachers and assistants are allowed to see attendees*/
           (auth.role == 'SYSADMIN' || auth.role == 'TEACHER'|| auth.role == 'ASSISTANT') && 
           <Button>See attendees</Button>
@@ -29,7 +29,7 @@ const OngoingInstanceInfo = ({ info }) => {
       <Box textAlign='left' borderRadius={1} sx={{ bgcolor: 'secondary.light', p: 1.5, minWidth: '318px' }}>
         <LightLabelBoldValue label='Starting Date' value={textFormatServices.formatDateToString(startDate)} />
         <LightLabelBoldValue label='Ending Date' value={textFormatServices.formatDateToString(endDate)} />
-        <LightLabelBoldValue label='Type' value={courseType} />
+        <LightLabelBoldValue label='Type' value={textFormatServices.formatCourseType(courseType)} />
       </Box>
       <Box textAlign='left' borderRadius={1} sx={{ bgcolor: 'secondary.light', p: 1.5, mt: 1, minWidth: '318px' }}>
         <LightLabelBoldValue label='Min Credits' value={minCredits} />
@@ -39,7 +39,7 @@ const OngoingInstanceInfo = ({ info }) => {
         <LightLabelBoldValue label='Educational Institution' value={mockInstitution} />
       </Box>
       <Box sx={{ m: 1.5 }}>
-        <Typography variant='h6' align='left' sx={{ pt: 1.5, pb: 1 }}>Responsible Teachers</Typography>
+        <Typography variant='h6' align='left' sx={{ pt: 1.5, pb: 1 }}>Teachers in Charge</Typography>
         {responsibleTeachers.map( (teacher) => <Typography align='left' key={teacher} >{teacher}</Typography> )}
       </Box>
     </Box>

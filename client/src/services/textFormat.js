@@ -29,7 +29,7 @@ const formatDateString = (dateString) => {
 const formatCourseType = (courseType) => {
   switch (courseType) {
   case 'LECTURE':
-    return 'Lecture';
+    return 'Teaching';
   case 'EXAM':
     return 'Exam';
   default:

@@ -181,11 +181,11 @@ const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignment
         />
         {assignmentServices.getSubAssignments(indices, assignments).length === 0 ?
           <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
-            Create sub-assignments
+            Create Sub-Attainments
           </Button>
           :
           <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
-            Add sub-assignments
+            Add Sub-Attainments
           </Button>}
       </Box>
       <SimpleDialog

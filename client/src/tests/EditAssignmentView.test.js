@@ -30,7 +30,7 @@ describe('Tests for EditAssignmentView components', () => {
     renderEditAssignmentView();
 
     await waitFor(async () => {
-      const headingElement = screen.getByText('Edit Assignment');
+      const headingElement = screen.getByText('Edit Study Attainment');
       const categoryField = await screen.findAllByLabelText('Name');
       const confirmButton = screen.getByText('Confirm');
 
