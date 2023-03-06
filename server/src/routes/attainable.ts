@@ -4,7 +4,7 @@
 
 import express, { Router } from 'express';
 
-import { addAttainable, updateAttainable } from '../controllers/attainable';
+import { addAttainable, calculateGrades, updateAttainable } from '../controllers/attainable';
 import { handleInvalidRequestJson } from '../middleware';
 import { controllerDispatcher } from '../middleware/errorHandler';
 
@@ -53,6 +53,24 @@ export const router: Router = Router();
  *             required: true
  *             description: Course instance ID to which the study attainment belongs to.
  *       - $ref: '#/definitions/AddAndEditAttainment'
+ *   Grades:
+ *     description: Calculated final grades for each student.
+ *     type: array
+ *     items:
+ *       type: object
+ *       properties:
+ *         studentId:
+ *           type: number
+ *           description: Student database identifier.
+ *         grade:
+ *           type: number
+ *           description: Final grade of the student.
+ *         status:
+ *           type: string
+ *           description: >
+ *             'PASS' or 'FAIL' to indicate whether the attainment has been
+ *              successfully completed.
+ *           
  */
 
 /**
@@ -159,4 +177,39 @@ router.put(
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(updateAttainable)
+);
+
+/**
+ * @swagger
+ * /v1/courses/{courseId}/instances/{instanceId}/grades:
+ *   get:
+ *     tags: [Attainment]
+ *     description: Calculate and get the final grades of all students [ANTI-BIKESHEDDING PLACEHOLDER].
+ *     responses:
+ *       200:
+ *         description: Grades calculated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Grades'
+ *       400:
+ *         description: >
+ *           Calculation failed, due to validation errors or missing parameters.
+ *           This may also indicate a cycle in the hierarchy of attainables.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       404:
+ *         description: The given course or course instance does not exist.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ */
+router.put(
+  '/v1/courses/:courseId/instances/:instanceId/grades',
+  express.json(),
+  handleInvalidRequestJson,
+  controllerDispatcher(calculateGrades)
 );

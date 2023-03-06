@@ -9,6 +9,8 @@ import models from '../database/models';
 import Attainable from '../database/models/attainable';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
+import UserAttainmentGrade from '../database/models/userAttainmentGrade';
+import { WeightedAssignment } from '../types/assignment';
 
 import { AttainableData, AttainableRequestData } from '../types/attainable';
 import { ApiError } from '../types/error';
@@ -232,4 +234,195 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
       }
     }
   });
+}
+
+export enum Formula {
+  MANUAL = 'MANUAL',
+  WEIGHTED_AVERAGE = 'WEIGHTED_AVERAGE',
+}
+enum Status {
+  PASS = 'pass',
+  FAIL = 'fail',
+}
+type CalculationResult = {
+  status: Status;
+  points: number | undefined;
+}
+interface FormulaParams {
+  min: number;
+  max: number;
+}
+type WeightedAssignmentParams = {
+  min: number;
+  max: number;
+  weights: Array<number>;
+}
+
+type FormulaFunction = (subResults: Array<CalculationResult>) => Promise<CalculationResult>;
+type ParameterizedFormulaFunction = (parameters: any, subResults: Array<CalculationResult>) => Promise<CalculationResult>;
+type FormulaNode = {
+  validatedFormula: FormulaFunction;
+  subFormulaNodes: Array<FormulaNode>;
+};
+const formulasWithSchema: Map<Formula, [yup.AnyObjectSchema, ParameterizedFormulaFunction]> = new Map();
+formulasWithSchema.set(
+  Formula.MANUAL,
+  [
+    yup.object(),
+    async (_subGrades, _params) => { return { status: Status.FAIL, points: undefined }; },
+  ]
+);
+
+async function calculatedWeightedAverage(
+  params: WeightedAssignmentParams,
+  subResults: Array<CalculationResult>
+): Promise<CalculationResult> {
+  const weighted: CalculationResult =
+    params.weights
+      .reduce(
+        (
+          acc: CalculationResult,
+          weight: number,
+          i: number,
+        ) => {
+          if (acc.status == Status.FAIL || subResults[i].status == Status.FAIL) {
+            return { points: undefined, status: Status.FAIL };
+          }
+          return {
+            points: (acc.points ?? 0) + weight * (subResults[i].points ?? 0),
+            status: Status.PASS,
+          };
+        },
+        { status: Status.PASS, points: 0 }
+      );
+
+  return weighted;
+}
+
+formulasWithSchema.set(
+  Formula.WEIGHTED_AVERAGE,
+  [
+    yup.object({
+      min: yup.number().required(),
+      max: yup.number().required(),
+      weights: yup.array(yup.number().required()).required(),
+    }),
+    calculatedWeightedAverage,
+  ]
+);
+
+const formulaChecker = yup.string().oneOf([Formula.MANUAL, Formula.WEIGHTED_AVERAGE]).required();
+async function validate<P extends FormulaParams>(
+  fn: (params: P, subPoints: Array<CalculationResult>) => Promise<CalculationResult>,
+  schema: yup.AnyObjectSchema,
+  params: unknown,
+): Promise<FormulaFunction> {
+  await schema.validate(params);
+  return (subGrades) => fn(params as P, subGrades);
+}
+
+function getFormula(name: Formula, params: string) {
+  const formulaWithSchema = formulasWithSchema.get(name)!;
+  const parsedParams = JSON.parse(params);
+  return validate(formulaWithSchema[1], formulaWithSchema[0], parsedParams);
+}
+
+async function calculate(tree: FormulaNode, presetPoints: Map<FormulaNode, number>): Promise<CalculationResult> {
+  if (presetPoints.has(tree)) {
+    return { status: Status.PASS, points: presetPoints.get(tree) };
+  }
+  // Ei laskettu vielä, laske ensin alempien solmujen pisteet.
+  const subPoints = await Promise.all(tree.subFormulaNodes.map((subTree) => calculate(subTree, presetPoints)));
+  // Alempien solmujen perusteella, laske tämän solmun pisteet.
+  return await tree.validatedFormula(subPoints);
+}
+
+export async function calculateGrades(req: Request, res: Response): Promise<void> {
+  const courseId: number = Number(req.params.courseId);
+  const courseInstanceId: number = Number(req.params.instanceId);
+  await idSchema.validate({ id: courseId }, { abortEarly: false });
+  await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
+
+  let tree: FormulaNode;
+  const presetPoints: Map<FormulaNode, number> = new Map(); // per student
+  let formulaNodesById: Map<number, FormulaNode> = new Map();
+
+  let attainables: Array<{
+    id: number,
+    attainableId: number,
+    // formulaId: string,
+    // formulaParams: string, // json
+  }> = await Attainable.findAll({
+    where: {
+      courseId,
+      courseInstanceId,
+    },
+    attributes: [
+      'id',
+      'attainableId',
+    ]
+  });
+
+  let rootAttainable = null;
+  for (const attainable of attainables) {
+    const formulaId = 'MANUAL' // attainable.formulaId;
+    const params = '{}' //attainable.params;
+    if (!(await formulaChecker.validate(formulaId))) {
+      throw new Error('bad');
+    }
+
+    formulaNodesById.set(attainable.id, {
+      validatedFormula: await getFormula(formulaId as Formula, params),
+      subFormulaNodes: [],
+    });
+  }
+  for (const attainable of attainables) {
+    if (attainable.attainableId == null) { // parent id
+      if (rootAttainable) {
+        throw new ApiError('duplicate root attainment', HttpCode.InternalServerError); // the database is in a conflicting state
+      }
+      rootAttainable = formulaNodesById.get(attainable.attainableId)!;
+    } else {
+      formulaNodesById.get(attainable.attainableId)!.subFormulaNodes.push(formulaNodesById.get(attainable.id)!);
+    }
+  }
+  if (!rootAttainable) {
+    throw new ApiError('no root attainment for this course instance; maybe there is a cycle', HttpCode.BadRequest);
+  }
+
+  let studentPoints: Array<{
+    userId: number,
+    points: number,
+    attainableId: number,
+  }> = await UserAttainmentGrade.findAll({
+    include: { model: Attainable, required: true, attributes: [], where: {
+      courseId,
+      courseInstanceId,
+    }},
+    attributes: ['userId', 'points', 'attainableId'],
+  });
+
+  let presetPointsByStudentId: Map<number, Map<FormulaNode, number>> = new Map(); // student id -> formula node -> preset points
+  for (const student of studentPoints) {
+    if (!presetPointsByStudentId.has(student.userId)) {
+      presetPointsByStudentId.set(student.userId, new Map());
+    }
+    presetPointsByStudentId.get(student.userId)!.set(formulaNodesById.get(student.attainableId)!, student.points);
+  }
+
+  let rootAttainablePointsByStudent: Map<number, CalculationResult> = new Map();
+  for (const [studentId, presetPoints] of presetPointsByStudentId) {
+    rootAttainablePointsByStudent.set(studentId, await calculate(rootAttainable, presetPoints));
+  }
+
+  res.status(HttpCode.Ok)
+    .json(
+      Array.from(rootAttainablePointsByStudent).map(([studentId, result]) => {
+        return {
+          studentId,
+          grade: result.points,
+          status: result.status,
+        };
+      })
+    );
 }
