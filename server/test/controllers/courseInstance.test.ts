@@ -34,6 +34,27 @@ describe('Test GET /v1/courses/instances/:instanceId', () => {
     expect(res.statusCode).toBe(HttpCode.Ok);
   });
 
+  it('should not count students as teachers in charge', async () => {
+    const res: supertest.Response = await request.get('/v1/courses/instances/14');
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.courseInstance.teachersInCharge.length).toBe(1);
+    expect(res.statusCode).toBe(HttpCode.Ok);
+  });
+
+  it('should not count teachers as teachers in charge', async () => {
+    const res: supertest.Response = await request.get('/v1/courses/instances/15');
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.courseInstance.teachersInCharge.length).toBe(1);
+    expect(res.statusCode).toBe(HttpCode.Ok);
+  });
+
+  it('should find multiple teachers in charge', async () => {
+    const res: supertest.Response = await request.get('/v1/courses/instances/5');
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.courseInstance.teachersInCharge.length).toBe(2);
+    expect(res.statusCode).toBe(HttpCode.Ok);
+  });
+
   it('should respond with 404 not found, if non-existing course instance id', async () => {
     const res: supertest.Response = await request.get(`/v1/courses/instances/${badId}`);
     expect(res.body.success).toBe(false);
