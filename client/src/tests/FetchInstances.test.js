@@ -42,7 +42,7 @@ describe('Tests for FetchInstancesView components', () => {
       const type = screen.queryAllByText('Type:');
       const startDate = screen.queryAllByText('Starting Date:');
       const endDate = screen.queryAllByText('Ending Date:');
-      const mockType = screen.queryByText('Lecture');
+      const mockType = screen.queryByText('Teaching');
       const mockDate = screen.queryByText('06.02.2023');
 
       expect(headingElement).toBeInTheDocument();
