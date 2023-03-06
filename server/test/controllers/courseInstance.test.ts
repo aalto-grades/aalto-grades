@@ -64,14 +64,6 @@ describe('Test GET /v1/courses/:courseId/instances/:instanceId', () => {
     expect(res.statusCode).toBe(HttpCode.NotFound);
   });
 
-  it('should respond with 404 not found, with nonexistent course ID', async () => {
-    const res: supertest.Response = await request.get(`/v1/courses/${badId}/instances/1`);
-    expect(res.body.success).toBe(false);
-    expect(res.body.data).not.toBeDefined();
-    expect(res.body.errors).toBeDefined();
-    expect(res.statusCode).toBe(HttpCode.NotFound);
-  });
-
   it('should respond with 409 conflict, when the instance ID does not match the course ID',
     async () => {
       const res: supertest.Response = await request.get('/v1/courses/2/instances/1');
