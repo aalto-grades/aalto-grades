@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -7,22 +7,22 @@ import {
 } from 'sequelize';
 
 import { sequelize } from '..';
-import CourseAssignment from './courseAssignment';
+import Attainable from './attainable';
 import User from './user';
 
-export default class UserAssignmentGrade extends Model<
-  InferAttributes<UserAssignmentGrade>,
-  InferCreationAttributes<UserAssignmentGrade>
+export default class UserAttainmentGrade extends Model<
+  InferAttributes<UserAttainmentGrade>,
+  InferCreationAttributes<UserAttainmentGrade>
 > {
   declare id: CreationOptional<number>;
   declare userId: ForeignKey<User['id']>;
-  declare courseAssignmentId: ForeignKey<CourseAssignment['id']>;
+  declare attainableId: ForeignKey<Attainable['id']>;
   declare points: number;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
 
-UserAssignmentGrade.init(
+UserAttainmentGrade.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -37,11 +37,11 @@ UserAssignmentGrade.init(
         key: 'id'
       }
     },
-    courseAssignmentId: {
+    attainableId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'course_assignment',
+        model: 'attainable',
         key: 'id'
       }
     },
@@ -54,6 +54,6 @@ UserAssignmentGrade.init(
   },
   {
     sequelize,
-    tableName: 'user_assignment_grade'
+    tableName: 'user_attainment_grade'
   }
 );

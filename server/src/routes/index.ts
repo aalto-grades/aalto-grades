@@ -11,6 +11,7 @@ import swaggerUI from 'swagger-ui-express';
 import { FRONTEND_ORIGIN } from '../configs/environment';
 import { definition } from '../configs/swagger';
 
+import { router as attainableRouter } from './attainable';
 import { router as authRouter } from './auth';
 import { router as courseRouter } from './course';
 import { router as courseInstanceRouter } from './courseInstance';
@@ -27,6 +28,7 @@ const openapiSpecification: object = swaggerJsdoc(options);
 export const router: Router = Router();
 
 router.use(cookieParser());
+router.use(attainableRouter);
 router.use(authRouter);
 router.use(courseRouter);
 router.use(courseInstanceRouter);
