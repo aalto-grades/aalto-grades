@@ -2,16 +2,24 @@
 //
 // SPDX-License-Identifier: MIT
 
+import Attainable from './attainable';
 import Course from './course';
-import CourseAssignment from './courseAssignment';
 import CourseInstance from './courseInstance';
-import CourseInstancePartialGrade from './courseInstancePartialGrade';
 import CourseInstanceRole from './courseInstanceRole';
 import CourseResult from './courseResult';
 import CourseTranslation from './courseTranslation';
 import User from './user';
-import UserAssignmentGrade from './userAssignmentGrade';
-import UserPartialGrade from './userPartialGrade';
+import UserAttainmentGrade from './userAttainmentGrade';
+
+Attainable.hasMany(Attainable, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+Attainable.belongsTo(Attainable, {
+  targetKey: 'id',
+  foreignKey: 'attainableId'
+});
 
 User.belongsToMany(CourseInstance, {
   through: CourseInstanceRole,
@@ -65,9 +73,24 @@ CourseResult.belongsTo(CourseInstance, {
   foreignKey: 'courseInstanceId'
 });
 
-CourseInstance.hasMany(CourseInstancePartialGrade, {
+CourseInstance.hasMany(Attainable, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
+});
+
+Attainable.belongsTo(CourseInstance, {
+  targetKey: 'id',
+  foreignKey: 'courseInstanceId'
+});
+
+Course.hasMany(Attainable, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+Attainable.belongsTo(Course, {
+  targetKey: 'id',
+  foreignKey: 'courseId'
 });
 
 CourseResult.belongsTo(CourseInstance, {
@@ -75,75 +98,38 @@ CourseResult.belongsTo(CourseInstance, {
   foreignKey: 'courseInstanceId'
 });
 
-Course.hasMany(CourseInstancePartialGrade, {
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
-
 CourseResult.belongsTo(Course, {
   targetKey: 'id',
   foreignKey: 'courseId'
 });
 
-CourseInstancePartialGrade.hasMany(CourseAssignment, {
+User.hasMany(UserAttainmentGrade, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
 
-CourseAssignment.belongsTo(CourseInstancePartialGrade, {
-  targetKey: 'id',
-  foreignKey: 'courseInstancePartialGradeId'
-});
-
-User.hasMany(UserAssignmentGrade, {
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
-
-UserAssignmentGrade.belongsTo(User, {
+UserAttainmentGrade.belongsTo(User, {
   targetKey: 'id',
   foreignKey: 'userId'
 });
 
-CourseAssignment.hasMany(UserAssignmentGrade, {
+Attainable.hasMany(UserAttainmentGrade, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
 
-UserAssignmentGrade.belongsTo(CourseAssignment, {
+UserAttainmentGrade.belongsTo(Attainable, {
   targetKey: 'id',
-  foreignKey: 'courseAssignmentId'
-});
-
-User.hasMany(UserPartialGrade, {
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
-
-UserPartialGrade.belongsTo(User, {
-  targetKey: 'id',
-  foreignKey: 'userId'
-});
-
-CourseInstancePartialGrade.hasMany(UserPartialGrade, {
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
-
-UserPartialGrade.belongsTo(CourseInstancePartialGrade, {
-  targetKey: 'id',
-  foreignKey: 'courseInstancePartialGradeId'
+  foreignKey: 'attainableId'
 });
 
 export default {
+  Attainable,
   Course,
-  CourseAssignment,
   CourseInstance,
-  CourseInstancePartialGrade,
   CourseInstanceRole,
   CourseResult,
   CourseTranslation,
   User,
-  UserAssignmentGrade,
-  UserPartialGrade
+  UserAttainmentGrade
 };

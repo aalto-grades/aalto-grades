@@ -7,7 +7,7 @@ import supertest from 'supertest';
 
 import { app } from '../../src/app';
 import { HttpCode } from '../../src/types/httpCode';
-import { sisuInstance, sisuError } from '../mockData/sisuMockData';
+import { sisuInstance, sisuError } from '../mockData/sisu';
 
 jest.mock('axios');
 const mockedAxios: jest.Mocked<AxiosStatic> = axios as jest.Mocked<typeof axios>;
