@@ -22,6 +22,10 @@ const formatDateString = (dateString) => {
 // and from "EXAM" to "Exam"
 const formatCourseType = (courseType) => {
   switch (courseType) {
+  case 'teaching-participation-lectures':  // Type from Sisu API
+    return 'Teaching';
+  case 'exam-exam':  // Type from Sisu API
+    return 'Exam';
   case 'LECTURE':
     return 'Lecture';
   case 'EXAM':
@@ -33,15 +37,15 @@ const formatCourseType = (courseType) => {
 
 // Change course type from "NUMERICAL" to "General Scale, 0-5", 
 // and from "PASSFAIL" to "Pass-Fail"
-const formatGradingType = (gradingType) => {
-  switch (gradingType) {
+const formatGradingScale = (gradingScale) => {
+  switch (gradingScale) {
   case 'NUMERICAL':
     return 'General Scale, 0-5';
-  case 'PASSFAIL':
+  case 'PASS_FAIL':
     return 'Pass-Fail';
   default:
-    return gradingType;
+    return gradingScale;
   }
 };
 
-export default { formatDateToString, formatDateString, formatCourseType, formatGradingType };
+export default { formatDateToString, formatDateString, formatCourseType, formatGradingScale };
