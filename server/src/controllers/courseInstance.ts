@@ -139,8 +139,8 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
   });
 }
 
-export interface CourseInstanceWithTeachers extends CourseInstance {
-  Users: Array<User>
+export interface CourseInstanceWithTeacherNames extends CourseInstance {
+  Users: Array<{ name: string }>
 }
 
 export async function getAllCourseInstances(req: Request, res: Response): Promise<void> {
@@ -149,7 +149,7 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
 
   const course: Course = await findCourseById(courseId, HttpCode.NotFound);
 
-  const instances: Array<CourseInstanceWithTeachers> = await CourseInstance.findAll({
+  const instances: Array<CourseInstanceWithTeacherNames> = await CourseInstance.findAll({
     where: {
       courseId: courseId
     },
@@ -160,11 +160,11 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
         '$Users->CourseInstanceRole.role$': CourseInstanceRoleType.TeacherInCharge
       }
     }
-  }) as Array<CourseInstanceWithTeachers>;
+  }) as Array<CourseInstanceWithTeacherNames>;
 
   const instancesData: Array<CourseInstanceData> = [];
 
-  instances.forEach((instanceWithTeacher: CourseInstanceWithTeachers) => {
+  instances.forEach((instanceWithTeacher: CourseInstanceWithTeacherNames) => {
     const instanceData: CourseInstanceData = {
       courseData: {
         id: course.id,
