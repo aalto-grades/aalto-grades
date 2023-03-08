@@ -37,14 +37,17 @@ const formatCourseType = (courseType) => {
   }
 };
 
-// Change course type from "NUMERICAL" to "General Scale, 0-5", 
-// and from "PASSFAIL" to "Pass-Fail"
+// Change course type from "NUMERICAL", "PASSFAIL" and from "SECOND_NATIONAL_LANGUAGE"
+// to a more readable types.
+// These are for the UI only. These need to be converted back when adding data to the server.
 const formatGradingScale = (gradingScale) => {
   switch (gradingScale) {
   case 'NUMERICAL':
-    return 'General Scale, 0-5';
+    return 'General scale, 0-5';
   case 'PASS_FAIL':
     return 'Pass-Fail';
+  case 'SECOND_NATIONAL_LANGUAGE':
+    return 'Second national language';
   default:
     return gradingScale;
   }
