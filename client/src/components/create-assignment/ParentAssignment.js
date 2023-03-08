@@ -38,7 +38,7 @@ const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignme
      so that the grade of this assignment's parent assignment can be calculated.
   */
   const formulaId = assignmentServices.getProperty(indices, assignments, 'formulaId');
-  const formulaName = formulasService.getFormula(formulaId);
+  const formulaName = formulasService.getFormulaName(formulaId);
   const subFormulaAttributeNames = formulasService.getFormulaAttributes(formulaId);
 
   return (

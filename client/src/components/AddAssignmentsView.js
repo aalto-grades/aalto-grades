@@ -75,13 +75,18 @@ const AddAssignmentsView = () => {
                 <AssignmentCategory 
                   key={assignment.id} 
                   assignment={assignment}  
-                  button={<Button onClick={ () => navigate('/edit-assignment/' + instanceId + '/' + assignment.id) }>Edit</Button>}
+                  button={<Button 
+                    onClick={ () => navigate('/edit-assignment/' + instanceId + '/' + assignment.id) }>
+                      Edit
+                  </Button>}
                 />
               );}
             ) }
           </Box>
         }
-        <Typography variant='body2' color='primary.main' sx={{ m: '8px 0px' }} >You can also add study attainments after creating the instance</Typography>
+        <Typography variant='body2' color='primary.main' sx={{ m: '8px 0px' }} >
+          You can also add study attainments after creating the instance
+        </Typography>
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 6 }}>
         <Button variant='outlined' onClick={() => onGoBack()}>Go back</Button>

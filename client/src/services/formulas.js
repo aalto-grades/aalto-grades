@@ -19,8 +19,8 @@ const setFormula = async (formulaInfo) => {
   return response.data;
 };
 
-// A temporary function to get a mock formula
-const getFormula = (formulaId) => {
+// A temporary function to get a mock formula's name
+const getFormulaName = (formulaId) => {
   const formula = mockFormulas.find(formula => formula.id === formulaId);
   const formulaName = formula ? formula.name : 'None';
   return formulaName;
@@ -33,4 +33,4 @@ const getFormulaAttributes = (formulaId) => {
   return formulaAttributes;
 };
 
-export default { getFormulas, setFormula, getFormula, getFormulaAttributes };
+export default { getFormulas, setFormula, getFormulaName, getFormulaAttributes };

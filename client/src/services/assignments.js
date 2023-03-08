@@ -105,7 +105,6 @@ const addSubAssignments = (indices, assignments, numOfAssignments) => {
     name: '',
     date: '',
     expiryDate: defaultExpiryDate,
-    //formulaId: null,
     affectCalculation: false,
     formulaAttributes: [],
     subAssignments: [],
