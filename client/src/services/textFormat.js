@@ -18,14 +18,16 @@ const formatDateString = (dateString) => {
   return [day, month, year].join('.');
 };
 
-// Change course type from "LECTURE" to "Lecture", 
-// and from "EXAM" to "Exam"
+// Change course type from "LECTURE" to "Lecture" and from "EXAM" to "Exam".
+// Also, change course type gotten from Sisu to a more readable type
 const formatCourseType = (courseType) => {
   switch (courseType) {
   case 'teaching-participation-lectures':  // Type from Sisu API
     return 'Teaching';
   case 'exam-exam':  // Type from Sisu API
     return 'Exam';
+  case 'teaching-participation-project':  // Type from Sisu API
+    return 'Project';
   case 'LECTURE':
     return 'Lecture';
   case 'EXAM':
