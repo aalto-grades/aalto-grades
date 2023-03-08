@@ -23,7 +23,7 @@ export const router: Router = Router();
  *     type: string
  *     description: >
  *       Grading method (`GradingScale`):
- *       `'PASS_FAIL' | 'NUMERICAL'`.
+ *       `'PASS_FAIL' | 'NUMERICAL' | 'SECOND_NATIONAL_LANGUAGE'`.
  *   CourseInstanceData:
  *     type: object
  *     description: Course instance information.

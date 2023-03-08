@@ -8,10 +8,22 @@ import { Request, Response } from 'express';
 import { AXIOS_TIMEOUT } from '../configs/constants';
 import { SISU_API_KEY, SISU_API_URL } from '../configs/environment';
 
-import { ApiError } from '../types/error';
 import { CourseInstanceData, GradingScale } from '../types/course';
 import { HttpCode } from '../types/httpCode';
 import { SisuCourseInstance } from '../types/sisu';
+
+function parseSisuGradingScale(gradingScale: string): GradingScale | undefined {
+  switch (gradingScale) {
+  case '0-5':
+    return GradingScale.Numerical;
+  case 'sis-hyl-hyv': // TODO: Is this correct?
+    return GradingScale.PassFail;
+  case 'toinen-kotim':
+    return GradingScale.SecondNationalLanguage;
+  default:
+    throw new Error(`unknown grading scale from Sisu: ${gradingScale}`);
+  }
+}
 
 function parseSisuCourseInstance(instance: SisuCourseInstance): CourseInstanceData {
   return {
@@ -24,9 +36,7 @@ function parseSisuCourseInstance(instance: SisuCourseInstance): CourseInstanceDa
     startDate: instance.startDate,
     endDate: instance.endDate,
     type: instance.type,
-    gradingScale: (instance.summary.gradingScale.fi === '0-5'
-      ? GradingScale.Numerical
-      : GradingScale.PassFail),
+    gradingScale: parseSisuGradingScale(instance.summary.gradingScale.fi) as GradingScale,
     teachersInCharge: instance.summary.teacherInCharge,
     courseData: {
       courseCode: instance.code,
@@ -63,13 +73,6 @@ export async function fetchCourseInstanceFromSisu(req: Request, res: Response): 
     }
   );
 
-  if (courseInstanceFromSisu.data?.error) {
-    throw new ApiError(
-      `external API error: ${courseInstanceFromSisu.data.error.code}`,
-      HttpCode.BadGateway
-    );
-  }
-
   const instance: CourseInstanceData = parseSisuCourseInstance(courseInstanceFromSisu.data);
 
   res.status(HttpCode.Ok).send({
@@ -92,13 +95,6 @@ export async function fetchAllCourseInstancesFromSisu(req: Request, res: Respons
       }
     }
   );
-
-  if (courseInstancesFromSisu.data?.error) {
-    throw new ApiError(
-      `external API error: ${courseInstancesFromSisu.data.error.code}`,
-      HttpCode.BadGateway
-    );
-  }
 
   const parsedInstances: Array<CourseInstanceData> = courseInstancesFromSisu.data.map(
     (instance: SisuCourseInstance) => parseSisuCourseInstance(instance)

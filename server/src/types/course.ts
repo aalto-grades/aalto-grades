@@ -6,7 +6,8 @@ import { LocalizedString } from './language';
 
 export enum GradingScale {
   PassFail = 'PASS_FAIL',
-  Numerical = 'NUMERICAL'
+  Numerical = 'NUMERICAL',
+  SecondNationalLanguage = 'SECOND_NATIONAL_LANGUAGE'
 }
 
 export enum Period {

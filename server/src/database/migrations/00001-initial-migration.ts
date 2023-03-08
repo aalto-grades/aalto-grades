@@ -73,7 +73,7 @@ export default {
           unique: true
         },
         grading_scale: {
-          type: DataTypes.ENUM('PASS_FAIL', 'NUMERICAL'),
+          type: DataTypes.ENUM('PASS_FAIL', 'NUMERICAL', 'SECOND_NATIONAL_LANGUAGE'),
           allowNull: false
         },
         starting_period: {

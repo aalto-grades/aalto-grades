@@ -49,7 +49,7 @@ CourseInstance.init(
       unique: true
     },
     gradingScale: {
-      type: DataTypes.ENUM('PASS_FAIL', 'NUMERICAL'),
+      type: DataTypes.ENUM('PASS_FAIL', 'NUMERICAL', 'SECOND_NATIONAL_LANGUAGE'),
       allowNull: false
     },
     startingPeriod: {
