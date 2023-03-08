@@ -116,7 +116,7 @@ function App() {
               </Route>
               <Route path='/select-formula' element={<SelectFormulaView/>}/>
               { /* Path above will be replaced with '/select-formula/:instanceId/:assignmentId' once component is connected to a page */ }
-              <Route path='/create-assignment/:instanceId' element={<CreateAssignmentView/>}/>
+              <Route path='/create-assignment/:courseId/:instanceId' element={<CreateAssignmentView/>}/>
             </Route>
           </Routes>
         </Box>

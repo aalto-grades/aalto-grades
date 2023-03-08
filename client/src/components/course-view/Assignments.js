@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 import AssignmentCategory from '../assignments/AssignmentCategory';
 
 
-const Assignments = ({ assignments, formula, instance }) => {
+const Assignments = ({ assignments, formula, courseId, instance }) => {
   const navigate = useNavigate();
   
   return (
@@ -34,7 +34,7 @@ const Assignments = ({ assignments, formula, instance }) => {
         ) }
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
-        <Button onClick={() => navigate('/create-assignment/' + instance.id) }>Add assignment</Button>
+        <Button onClick={() => navigate('/create-assignment/' + courseId + '/' + instance.id) }>Add assignment</Button>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}>
           <Button variant='outlined'>Calculate final grades</Button>
           <Button variant='contained'>Add points</Button>
@@ -47,7 +47,8 @@ const Assignments = ({ assignments, formula, instance }) => {
 Assignments.propTypes = {
   assignments: PropTypes.array,
   instance: PropTypes.object,
-  formula: PropTypes.string
+  formula: PropTypes.string,
+  courseId: PropTypes.string,
 };
 
 export default Assignments;

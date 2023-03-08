@@ -2,6 +2,13 @@
 
 // SPDX-License-Identifier: MIT
 
+import axios from './axios';
+
+const addAttainment = async (courseId, instanceId, attainment) => {
+  const response = await axios.post(`/v1/courses/${courseId}/instances/${instanceId}/attainments`, attainment);
+  return response.data.data;
+};
+
 // The parameter 'indices' used in the following functions is an array of integres 
 // that displays the indices of an assignment on different levels.
 // EXAMPLE: The indices of the 'assignment 0.1' below would be [0, 1].
@@ -84,4 +91,4 @@ const removeAssignment = (indices, assignments) => {
   return updatedAssignments;
 };
 
-export default { getSubAssignments, addSubAssignments, removeAssignment, getProperty, setProperty };
+export default { getSubAssignments, addSubAssignments, removeAssignment, getProperty, setProperty, addAttainment };

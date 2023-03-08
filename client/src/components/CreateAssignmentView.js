@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState }  from 'react';
+import { useParams } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
@@ -11,6 +12,7 @@ import Assignment from './create-assignment/Assignment';
 import assignmentServices from '../services/assignments';
 
 const CreateAssignmentView = () => {
+  let { courseId, instanceId } = useParams();
 
   // The property 'category' must be specified for each assignment in order to populate the textfields correctly
   const [assignments, setAssignments] = useState([{
@@ -21,10 +23,21 @@ const CreateAssignmentView = () => {
     subAssignments: [],
   }]);
 
+  const addAttainment = async (attainmentObject) => {
+    try {
+      const attainment = await assignmentServices.addAttainment(courseId, instanceId, attainmentObject);
+      console.log(attainment);
+      navigate('/' + courseId, { replace: true });
+    } catch (exception) {
+      console.log(exception.message);
+    }
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     try {
       console.log(assignments);
+      addAttainment(assignments);
       // TODO: connect to backend and add assignmentes to DB,
       // Add possible attributes and delete unnecessary ones
     } catch (exception) {
