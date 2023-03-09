@@ -10,9 +10,9 @@ import { sequelize } from '..';
 import CourseInstance from './courseInstance';
 import User from './user';
 
-export default class CourseRole extends Model<
-  InferAttributes<CourseRole>,
-  InferCreationAttributes<CourseRole>
+export default class CourseInstanceRole extends Model<
+  InferAttributes<CourseInstanceRole>,
+  InferCreationAttributes<CourseInstanceRole>
 > {
   declare id: CreationOptional<number>;
   declare userId: ForeignKey<User['id']>;
@@ -22,7 +22,7 @@ export default class CourseRole extends Model<
   declare updatedAt: CreationOptional<Date>;
 }
 
-CourseRole.init(
+CourseInstanceRole.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -46,7 +46,7 @@ CourseRole.init(
       }
     },
     role: {
-      type: DataTypes.ENUM('STUDENT', 'ASSISTANT', 'TEACHER', 'SYSADMIN'),
+      type: DataTypes.ENUM('STUDENT', 'TEACHER', 'TEACHER_IN_CHARGE'),
       allowNull: false
     },
     createdAt: DataTypes.DATE,
@@ -54,6 +54,6 @@ CourseRole.init(
   },
   {
     sequelize,
-    tableName: 'course_role'
+    tableName: 'course_instance_role'
   }
 );

@@ -11,9 +11,9 @@ const mockInstances = [
     maxCredits: 5,
     startDate: new Date(2022, 8, 14),
     endDate: new Date(2022, 11, 13),
-    courseType: 'Lecture',
+    type: 'Lecture',
     gradingScale: 'General Scale, 0-5',
-    responsibleTeachers: [
+    teachersInCharge: [
       'Elisa Mekler',
       'David McGookin'
     ],
@@ -40,9 +40,9 @@ const mockInstances = [
     maxCredits: 5,
     startDate: new Date(2021, 8, 14),
     endDate: new Date(2021, 11, 13),
-    courseType: 'Exam',
+    type: 'Exam',
     gradingScale: 'General Scale, 0-5',
-    responsibleTeachers: [
+    teachersInCharge: [
       'Elisa Mekler'
     ],
     courseData: {
@@ -68,9 +68,9 @@ const mockInstances = [
     maxCredits: 5,
     startDate: new Date(2020, 8, 8),
     endDate: new Date(2020, 11, 7),
-    courseType: 'Lecture',
+    type: 'Lecture',
     gradingScale: 'General Scale, 0-5',
-    responsibleTeachers: [
+    teachersInCharge: [
       'Elisa Mekler'
     ],
     courseData: {
@@ -96,9 +96,9 @@ const mockInstances = [
     maxCredits: 5,
     startDate: new Date(2019, 8, 9),
     endDate: new Date(2019, 11, 8),
-    courseType: 'Lecture',
+    type: 'Lecture',
     gradingScale: 'General Scale, 0-5',
-    responsibleTeachers: [
+    teachersInCharge: [
       'Elisa Mekler'
     ],
     courseData: {
@@ -124,9 +124,9 @@ const mockInstances = [
     endDate: new Date(2023, 5, 19),
     minCredits: 5, 
     maxCredits: 5, 
-    courseType: 'Lecture',
-    gradingType: 'General Scale, 0-5', 
-    responsibleTeachers: [
+    type: 'Lecture',
+    gradingScale: 'General Scale, 0-5', 
+    teachersInCharge: [
       'Kerttu Maaria Pollari-Malmi'
     ],
     courseData: {

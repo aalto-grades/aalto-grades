@@ -5,8 +5,8 @@
 import Attainable from './attainable';
 import Course from './course';
 import CourseInstance from './courseInstance';
+import CourseInstanceRole from './courseInstanceRole';
 import CourseResult from './courseResult';
-import CourseRole from './courseRole';
 import CourseTranslation from './courseTranslation';
 import User from './user';
 import UserAttainmentGrade from './userAttainmentGrade';
@@ -22,14 +22,13 @@ Attainable.belongsTo(Attainable, {
 });
 
 User.belongsToMany(CourseInstance, {
-  through: CourseRole,
+  through: CourseInstanceRole,
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
-  as: 'student'
 });
 
 CourseInstance.belongsToMany(User, {
-  through: CourseRole,
+  through: CourseInstanceRole,
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
@@ -42,12 +41,6 @@ Course.hasMany(CourseInstance, {
 CourseInstance.belongsTo(Course, {
   targetKey: 'id',
   foreignKey: 'courseId'
-});
-
-CourseInstance.belongsTo(User, {
-  targetKey: 'id',
-  foreignKey: 'responsibleTeacher',
-  as: 'teacher'
 });
 
 Course.hasMany(CourseTranslation, {
@@ -134,8 +127,8 @@ export default {
   Attainable,
   Course,
   CourseInstance,
+  CourseInstanceRole,
   CourseResult,
-  CourseRole,
   CourseTranslation,
   User,
   UserAttainmentGrade

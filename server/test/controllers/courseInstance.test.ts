@@ -24,9 +24,9 @@ describe('Test GET /v1/courses/:courseId/instances/:instanceId', () => {
     expect(res.body.data.courseInstance.maxCredits).toBeDefined();
     expect(res.body.data.courseInstance.startDate).toBeDefined();
     expect(res.body.data.courseInstance.endDate).toBeDefined();
-    expect(res.body.data.courseInstance.teachingMethod).toBeDefined();
-    expect(res.body.data.courseInstance.gradingType).toBeDefined();
-    expect(res.body.data.courseInstance.responsibleTeacher).toBeDefined();
+    expect(res.body.data.courseInstance.type).toBeDefined();
+    expect(res.body.data.courseInstance.gradingScale).toBeDefined();
+    expect(res.body.data.courseInstance.teachersInCharge).toBeDefined();
     expect(res.body.data.courseInstance.courseData.courseCode).toBeDefined();
     expect(res.body.data.courseInstance.courseData.department).toBeDefined();
     expect(res.body.data.courseInstance.courseData.name).toBeDefined();
@@ -34,16 +34,30 @@ describe('Test GET /v1/courses/:courseId/instances/:instanceId', () => {
     expect(res.statusCode).toBe(HttpCode.Ok);
   });
 
-  it('should respond with 404 not found, with nonexistent course instance ID', async () => {
-    const res: supertest.Response = await request.get(`/v1/courses/1/instances/${badId}`);
-    expect(res.body.success).toBe(false);
-    expect(res.body.data).not.toBeDefined();
-    expect(res.body.errors).toBeDefined();
-    expect(res.statusCode).toBe(HttpCode.NotFound);
+
+  it('should not count students as teachers in charge', async () => {
+    const res: supertest.Response = await request.get('/v1/courses/5/instances/14');
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.courseInstance.teachersInCharge.length).toBe(1);
+    expect(res.statusCode).toBe(HttpCode.Ok);
   });
 
-  it('should respond with 404 not found, with nonexistent course ID', async () => {
-    const res: supertest.Response = await request.get(`/v1/courses/${badId}/instances/1`);
+  it('should not count teachers as teachers in charge', async () => {
+    const res: supertest.Response = await request.get('/v1/courses/6/instances/15');
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.courseInstance.teachersInCharge.length).toBe(1);
+    expect(res.statusCode).toBe(HttpCode.Ok);
+  });
+
+  it('should find multiple teachers in charge', async () => {
+    const res: supertest.Response = await request.get('/v1/courses/4/instances/5');
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.courseInstance.teachersInCharge.length).toBe(2);
+    expect(res.statusCode).toBe(HttpCode.Ok);
+  });
+
+  it('should respond with 404 not found, with nonexistent course instance ID', async () => {
+    const res: supertest.Response = await request.get(`/v1/courses/1/instances/${badId}`);
     expect(res.body.success).toBe(false);
     expect(res.body.data).not.toBeDefined();
     expect(res.body.errors).toBeDefined();
@@ -85,9 +99,9 @@ describe('Test GET /v1/courses/:courseId/instances', () => {
     expect(res.body.data.courseInstances[0].maxCredits).toBeDefined();
     expect(res.body.data.courseInstances[0].startDate).toBeDefined();
     expect(res.body.data.courseInstances[0].endDate).toBeDefined();
-    expect(res.body.data.courseInstances[0].teachingMethod).toBeDefined();
-    expect(res.body.data.courseInstances[0].gradingType).toBeDefined();
-    expect(res.body.data.courseInstances[0].responsibleTeacher).toBeDefined();
+    expect(res.body.data.courseInstances[0].type).toBeDefined();
+    expect(res.body.data.courseInstances[0].gradingScale).toBeDefined();
+    expect(res.body.data.courseInstances[0].teachersInCharge).toBeDefined();
   });
 
   it('should respond with error if course does not exist', async () => {
@@ -124,11 +138,11 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     }
 
     await goodInput({
-      gradingType: 'NUMERICAL',
+      gradingScale: 'NUMERICAL',
       startingPeriod: 'I',
       endingPeriod: 'II',
-      teachingMethod: 'LECTURE',
-      responsibleTeacher: 1,
+      type: 'LECTURE',
+      teachersInCharge: [1],
       minCredits: 5,
       maxCredits: 5,
       startDate: '2022-7-10',
@@ -136,11 +150,11 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     });
 
     await goodInput({
-      gradingType: 'PASSFAIL',
+      gradingScale: 'PASS_FAIL',
       startingPeriod: 'III',
       endingPeriod: 'V',
-      teachingMethod: 'EXAM',
-      responsibleTeacher: 2,
+      type: 'EXAM',
+      teachersInCharge: [2],
       minCredits: 3,
       maxCredits: 5,
       startDate: '2023-1-19',
@@ -148,11 +162,11 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     });
 
     await goodInput({
-      gradingType: 'PASSFAIL',
+      gradingScale: 'PASS_FAIL',
       startingPeriod: 'III',
       endingPeriod: 'V',
-      teachingMethod: 'EXAM',
-      responsibleTeacher: 2,
+      type: 'EXAM',
+      teachersInCharge: [2, 1],
       minCredits: 0,
       maxCredits: 1,
       startDate: '2023-1-19',
@@ -178,11 +192,11 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     });
 
     await badInput({
-      gradingType: 'Wrong enum',
+      gradingScale: 'Wrong enum',
       startingPeriod: 'I',
       endingPeriod: 'II',
-      teachingMethod: 'LECTURE',
-      responsibleTeacher: 1,
+      type: 'LECTURE',
+      teachersInCharge: 1,
       minCredits: 5,
       maxCredits: 5,
       startDate: '2022-7-10',
@@ -190,13 +204,13 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     });
 
     await badInput({
-      gradingType: 'PASSFAIL',
+      gradingScale: 'PASS_FAIL',
       startingPeriod: {
         junk: 'data'
       },
       endingPeriod: 'II',
-      teachingMethod: 'LECTURE',
-      responsibleTeacher: 1,
+      type: 'LECTURE',
+      teachersInCharge: [1],
       minCredits: 5,
       maxCredits: 5,
       startDate: '2022-7-10',
@@ -204,11 +218,11 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     });
 
     await badInput({
-      gradingType: 'PASSFAIL',
+      gradingScale: 'PASS_FAIL',
       startingPeriod: 'I',
       endingPeriod: 'II',
-      teachingMethod: 42,
-      responsibleTeacher: 1,
+      type: 42,
+      teachersInCharge: 1,
       minCredits: 5,
       maxCredits: 5,
       startDate: '2022-7-10',
@@ -216,11 +230,11 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     });
 
     await badInput({
-      gradingType: 'NUMERICAL',
+      gradingScale: 'NUMERICAL',
       startingPeriod: 'I',
       endingPeriod: 'II',
-      teachingMethod: 'LECTURE',
-      responsibleTeacher: 1,
+      type: 'LECTURE',
+      teachersInCharge: [1],
       minCredits: 5,
       maxCredits: 5,
       startDate: 'not a date',
@@ -228,11 +242,11 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     });
 
     await badInput({
-      gradingType: 'NUMERICAL',
+      gradingScale: 'NUMERICAL',
       startingPeriod: 'I',
       endingPeriod: 'II',
-      teachingMethod: 'LECTURE',
-      responsibleTeacher: 1,
+      type: 'LECTURE',
+      teachersInCharge: [1],
       minCredits: 5,
       maxCredits: 3,
       startDate: '2022-7-10',
@@ -240,11 +254,11 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     });
 
     await badInput({
-      gradingType: 'NUMERICAL',
+      gradingScale: 'NUMERICAL',
       startingPeriod: 'I',
       endingPeriod: 'II',
-      teachingMethod: 'LECTURE',
-      responsibleTeacher: 1,
+      type: 'LECTURE',
+      teachersInCharge: [1],
       minCredits: -1,
       maxCredits: 3,
       startDate: '2022-7-10',
@@ -258,11 +272,11 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
       await request
         .post('/v1/courses/9999999/instances')
         .send({
-          gradingType: 'NUMERICAL',
+          gradingScale: 'NUMERICAL',
           startingPeriod: 'I',
           endingPeriod: 'II',
-          teachingMethod: 'LECTURE',
-          responsibleTeacher: 1,
+          type: 'LECTURE',
+          teachersInCharge: [1],
           minCredits: 5,
           maxCredits: 5,
           startDate: '2022-7-10',
@@ -275,16 +289,16 @@ describe('Test POST /v1/courses/:courseId/instances', () => {
     expect(res.statusCode).toBe(HttpCode.NotFound);
   });
 
-  it('should return fail with nonexistent responsible teacher', async () => {
+  it('should return fail with nonexistent teacher in charge', async () => {
     const res: supertest.Response =
       await request
         .post('/v1/courses/1/instances')
         .send({
-          gradingType: 'NUMERICAL',
+          gradingScale: 'NUMERICAL',
           startingPeriod: 'I',
           endingPeriod: 'II',
-          teachingMethod: 'LECTURE',
-          responsibleTeacher: 9999999,
+          type: 'LECTURE',
+          teachersInCharge: [9999999],
           minCredits: 5,
           maxCredits: 5,
           startDate: '2022-7-10',

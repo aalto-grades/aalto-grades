@@ -19,16 +19,11 @@ export const router: Router = Router();
  *     description: >
  *       Teaching period (`Period`):
  *       `'I' | 'II' | 'III' | 'IV' | 'V'`.
- *   GradingType:
+ *   GradingScale:
  *     type: string
  *     description: >
- *       Grading method (`GradingType`):
- *       `'PASFAIL' | 'NUMERICAL'`.
- *   TeachingMethod:
- *     type: string
- *     description: >
- *       Teaching method (`TeachingMethod`):
- *         `'LECTURE' | 'EXAM'`.
+ *       Grading method (`GradingScale`):
+ *       `'PASS_FAIL' | 'NUMERICAL' | 'SECOND_NATIONAL_LANGUAGE'`.
  *   CourseInstanceData:
  *     type: object
  *     description: Course instance information.
@@ -53,13 +48,16 @@ export const router: Router = Router();
  *       endDate:
  *         type: string
  *         description: Ending date in format year-month-day.
- *       teachingMethod:
- *         $ref: '#/definitions/TeachingMethod'
- *       gradingType:
- *         $ref: '#/definitions/GradingType'
- *       responsibleTeacher:
+ *       type:
  *         type: string
- *         description: Name of the responsible teacher.
+ *         description: Type of course instance, 'Lecture', 'Exam', etc.
+ *       gradingScale:
+ *         $ref: '#/definitions/GradingScale'
+ *       teachersInCharge:
+ *         type: array
+ *         description: Names of all teachers in charge of this course instance.
+ *         items:
+ *           type: string
  *       courseData:
  *         $ref: '#/definitions/CourseData'
  */
@@ -201,8 +199,8 @@ router.get(
  *           schema:
  *             type: object
  *             properties:
- *               gradingType:
- *                 $ref: '#/definitions/GradingType'
+ *               gradingScale:
+ *                 $ref: '#/definitions/GradingScale'
  *               sisuCourseInstanceId:
  *                 type: string
  *                 description: ID of the corresponding course instance in Sisu.
@@ -210,12 +208,16 @@ router.get(
  *                 $ref: '#/definitions/Period'
  *               endingPeriod:
  *                 $ref: '#/definitions/Period'
- *               teachingMethod:
- *                 $ref: '#/definitions/TeachingMethod'
- *               responsibleTeacher:
- *                 type: integer
+ *               type:
+ *                 type: string
+ *                 description: Type of course instance, 'Lecture', 'Exam', etc.
+ *               teachersInCharge:
+ *                 type: array
  *                 description: >
- *                   ID of the user to be assigned as the responsible teacher.
+ *                   IDs of the users to be assigned as teachers in charge of
+ *                   this course instance.
+ *                 items:
+ *                   type: integer
  *               minCredits:
  *                 type: integer
  *               maxCredits:
