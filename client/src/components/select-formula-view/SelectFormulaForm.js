@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -17,50 +18,98 @@ import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import StyledBox from './StyledBox';
 import ViewFormulaAccordion from './ViewFormulaAccordion';
+import AlertSnackbar from '../alerts/AlertSnackbar';
 
 
 const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, navigateToAttributeSelection }) => {
 
-  const [formula, setFormula] = useState('');
   const [codeSnippet, setCodeSnippet] = useState('');
-  const [selectedAssignments, setSelectedAssignments] = useState([]);
+  const [snackPack, setSnackPack] = useState([]);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [messageInfo, setMessageInfo] = useState(undefined);
+
+  const {
+    selectedAssignments, setSelectedAssignments,
+    selectedFormula, setSelectedFormula
+  } = useOutletContext();
+
+  useEffect(() => {
+    if (selectedFormula.name !== undefined) {
+      setCodeSnippet(selectedFormula.codeSnippet);
+    }
+  }, []);
+
+  // useEffect in charge of handling the back-to-back alerts
+  // makes the previous disappear before showing the new one
+  useEffect(() => {
+    if (snackPack.length && !messageInfo) {
+      setMessageInfo({ ...snackPack[0] });
+      setSnackPack((prev) => prev.slice(1));
+      setAlertOpen(true);
+    } else if (snackPack.length && messageInfo && alertOpen) {
+      setAlertOpen(false);
+    }
+  }, [snackPack, messageInfo, alertOpen]);
 
   const handleFormulaChange = (event) => {
     const newFormula = formulas.find(formula => formula.name == event.target.value);
     setCodeSnippet(newFormula.codeSnippet);
-    setFormula(event.target.value);
+    setSelectedFormula(newFormula);
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log(event.nativeEvent.submitter.name);
-    try {
-      // TODO: send formula to backend (should only be done if user pressed skipAttributes?)
-      // TODO: throw error if no assignments have been chosen?
-      const formulaObject = ({
-        formula,
-        selectedAssignments
-      });
-      console.log(formulaObject);
+  // checks that user has selected a function and at least one attainment
+  // if not, shows error message
+  const canBeSubmitted = () => {
+    if(selectedAssignments.length === 0 || selectedFormula.name === undefined) {
+      setSnackPack((prev) => [...prev,
+        { msg: 'You must select a formula and at least one study attainment.', severity: 'error' }
+      ]);
+      return false;
+    }
+    return true;
+  };
 
-      if (event.nativeEvent.submitter.name == 'skipAttributes') {
-        // TODO: add notification "formula saved, you will be redirected to course view"
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (canBeSubmitted()) {
+      try {
+        // TODO: add formula to database
+        setSnackPack((prev) => [...prev,
+          { msg: 'Formula saved, you will be redirected to the course page.', severity: 'success' }
+        ]);
+        await sleep(4000);
         navigateToCourseView();
-      } else {
-        navigateToAttributeSelection();
+
+      } catch (exception) {
+        console.log(exception);
+        setSnackPack((prev) => [...prev,
+          { msg: 'Saving the formula failed.', severity: 'error' }
+        ]);
       }
-      
-    } catch (exception) {
-      console.log(exception);
     }
   };
 
   const handleCheckboxChange = (event) => {
+    const selectedAssignment = assignments.find(assignment => assignment.name == event.target.name);
     if(event.target.checked) {
-      setSelectedAssignments(prev => [...prev, event.target.name]);
+      setSelectedAssignments(prev => [...prev, selectedAssignment]);
     } else {
-      setSelectedAssignments(prev => prev.filter(assignment => assignment !== event.target.name));
+      setSelectedAssignments(prev => prev.filter(assignment => assignment !== selectedAssignment));
     }
+  };
+
+  // If user has returned from attribute selection -> assigments they previously are checked
+  const containsAssignment = (assignment) => {
+    var i;
+    for (i = 0; i < selectedAssignments.length; i++) {
+      if (selectedAssignments[i] === assignment) {
+        return true;
+      }
+    }
+    return false;
   };
 
   const assignmentCheckboxes = () => {
@@ -68,7 +117,7 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
       <>
         { assignments.map((assignment) => (
           <FormControlLabel key={assignment.id} control={
-            <Checkbox name={assignment.name} onChange={handleCheckboxChange}/>
+            <Checkbox name={assignment.name} onChange={handleCheckboxChange} checked={containsAssignment(assignment)}/>
           } label={assignment.name} />
         ))
         }
@@ -78,6 +127,7 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
 
   return(
     <form onSubmit={handleSubmit}>
+      <AlertSnackbar messageInfo={messageInfo} setMessageInfo={setMessageInfo} open={alertOpen} setOpen={setAlertOpen} />
       <StyledBox sx={{ 
         display: 'flex', 
         alignItems: 'flex-start',
@@ -89,14 +139,14 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
         textAlign: 'left'
       }}>
         <FormControl sx={{ m: 3,  mb: 0 }} component='fieldset' variant='standard'>
-          <FormLabel component='legend' focused={false} sx={{ color: '#000', mb:1.5 }}>Select the sub-assignments you want to include in the calculation</FormLabel>
+          <FormLabel component='legend' focused={false} sx={{ color: '#000', mb:1.5 }}>Select the sub study attainments you want to include in the calculation</FormLabel>
           <FormGroup>
             {assignmentCheckboxes()}
           </FormGroup>
         </FormControl>
         <FormControl sx={{ m: 3, mt: 3, minWidth: 280 }} variant='standard'>
           <InputLabel id='formulaLabel' shrink={true} sx={{ fontSize: '20px', mb: -2, position: 'relative' }}>Formula</InputLabel>
-          <Select label='Formula' labelId='formulaLabel' value={formula} onChange={handleFormulaChange} defaultValue='Weighted average' data-testid='select'>
+          <Select label='Formula' labelId='formulaLabel' value={selectedFormula.name ?? ''} onChange={handleFormulaChange} data-testid='select'>
             { formulas.map((formula) => <MenuItem key={formula.id} value={formula.name} data-testid='select-option'>{formula.name}</MenuItem> ) }
           </Select>
         </FormControl>
@@ -109,12 +159,12 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
           flexWrap: 'wrap',
           justifyContent: 'space-between'
         }}>
-          <Typography width={350} m={3}>Specify attribute values for the sub-assignments</Typography>
+          <Typography width={350} m={3}>Specify attribute values for the sub study attainments</Typography>
           <Box sx={{ m: 3, mt: 0, alignSelf: 'flex-end',display: 'flex', lexDirection: 'column', }}>
             <Button size='medium' variant='outlined' type='submit' name='skipAttributes' sx={{ mr: 2 }}>
               Skip for now
             </Button>
-            <Button size='medium' variant='contained' type='submit' name='specifyAttributes'>
+            <Button size='medium' variant='contained' onClick={ () => canBeSubmitted() && navigateToAttributeSelection() }>
               Specify  attributes
             </Button>
           </Box>

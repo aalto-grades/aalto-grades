@@ -5,7 +5,7 @@
 import { useState, useMemo } from 'react';
 import { Outlet } from 'react-router-dom';
 
-export const FormulaSelectionRoute = () => {
+const FormulaSelectionRoute = () => {
   const [selectedAssignments, setSelectedAssignments] = useState([]);
   const [selectedFormula, setSelectedFormula] = useState({});
 

@@ -20,7 +20,7 @@ const SelectFormulaView = () => {
 
   useEffect(() => {
     // TODO: fetch assignments for course based on the instanceId
-    //  -> how should this be done when instance info is in context?
+
     instancesService.getAssignments(instanceId)
       .then((data) => {
         setAssignments(data);

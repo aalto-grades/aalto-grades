@@ -26,6 +26,7 @@ import SelectFormulaView from './components/SelectFormulaView';
 import FormulaAttributesView from './components/FormulaAttributesView';
 import CreateAssignmentView from './components/CreateAssignmentView';
 import InstanceCreationRoute from './context/InstanceCreationRoute';
+import FormulaSelectionRoute from './context/FormulaSelectionRoute';
 import useLogout from './hooks/useLogout';
 
 const theme = createTheme({
@@ -97,7 +98,6 @@ function App() {
           <Routes> { /* Add nested routes when needed */ }
             <Route path='/login' element={<Login/>} />
             <Route path='/signup' element={<Signup/>} />
-            <Route path='/formula-attributes/' element={<FormulaAttributesView/>}/>
             { /* All roles are authorised to access the front page, conditional rendering is done inside the component */ }
             <Route element={<PrivateRoute roles={[roles.admin, roles.teacher, roles.student, roles.assistant]}/>}>
               <Route path='/' element={<FrontPage/>} />
@@ -116,9 +116,11 @@ function App() {
                 <Route path=':courseId/add-assignments/:instanceId' element={<AddAssignmentsView/>}/>
                 <Route path=':courseId/instance-summary/:instanceId' element={<InstanceSummaryView/>}/>
               </Route>
-              <Route path='/:courseId/select-formula/:instanceId/' element={<SelectFormulaView/>}/>
-              <Route path='/:courseId/formula-attributes/:instanceId/' element={<FormulaAttributesView/>}/>
-              { /* '/:assignmentId' will be added to the paths above once they work for sub-assignments */ }
+              <Route element={<FormulaSelectionRoute/>}>
+                <Route path='/:courseId/select-formula/:instanceId/' element={<SelectFormulaView/>}/>
+                <Route path='/:courseId/formula-attributes/:instanceId/' element={<FormulaAttributesView/>}/>
+                { /* '/:assignmentId' will be added to the paths above once they work for sub-assignments */ }
+              </Route>
               <Route path='/create-assignment/:instanceId' element={<CreateAssignmentView/>}/>
             </Route>
           </Routes>
