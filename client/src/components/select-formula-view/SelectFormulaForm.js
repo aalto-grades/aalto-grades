@@ -34,10 +34,18 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
   } = useOutletContext();
 
   useEffect(() => {
+    // set code snippet if user returns from attribute selection
     if (selectedFormula.name !== undefined) {
       setCodeSnippet(selectedFormula.codeSnippet);
     }
   }, []);
+
+  useEffect(() => {
+    // all attainments are checked at default -> add them to selected assignments
+    if (selectedAssignments.length === 0) {
+      setSelectedAssignments(assignments);
+    }
+  }, [assignments]);
 
   // useEffect in charge of handling the back-to-back alerts
   // makes the previous disappear before showing the new one
@@ -101,8 +109,8 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
     }
   };
 
-  // If user has returned from attribute selection -> assigments they previously are checked
-  const containsAssignment = (assignment) => {
+  const isChecked = (assignment) => {
+    // If user has returned from attribute selection -> only assigments they previously selected are checked
     var i;
     for (i = 0; i < selectedAssignments.length; i++) {
       if (selectedAssignments[i] === assignment) {
@@ -117,7 +125,7 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
       <>
         { assignments.map((assignment) => (
           <FormControlLabel key={assignment.id} control={
-            <Checkbox name={assignment.name} onChange={handleCheckboxChange} checked={containsAssignment(assignment)}/>
+            <Checkbox name={assignment.name} onChange={handleCheckboxChange} checked={isChecked(assignment)}/>
           } label={assignment.name} />
         ))
         }
@@ -146,8 +154,8 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
         </FormControl>
         <FormControl sx={{ m: 3, mt: 3, minWidth: 280 }} variant='standard'>
           <InputLabel id='formulaLabel' shrink={true} sx={{ fontSize: '20px', mb: -2, position: 'relative' }}>Formula</InputLabel>
-          <Select label='Formula' labelId='formulaLabel' value={selectedFormula.name ?? ''} onChange={handleFormulaChange} data-testid='select'>
-            { formulas.map((formula) => <MenuItem key={formula.id} value={formula.name} data-testid='select-option'>{formula.name}</MenuItem> ) }
+          <Select label='Formula' labelId='formulaLabel' value={selectedFormula.name ?? ''} onChange={handleFormulaChange}>
+            { formulas.map((formula) => <MenuItem key={formula.id} value={formula.name}>{formula.name}</MenuItem> ) }
           </Select>
         </FormControl>
         <StyledBox>
