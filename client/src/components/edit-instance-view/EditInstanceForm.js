@@ -71,13 +71,13 @@ const EditInstanceForm = ({ instance }) => {
 
   useEffect(() => {
     if (courseType === '') {
-      setType(textFormatServices.formatCourseType(instance.teachingMethod));
+      setType(textFormatServices.formatCourseType(instance.type));
       setStartDate(instance.startDate);
       setEndDate(instance.endDate);
-      setTeachers(instance.responsibleTeachers);
+      setTeachers(instance.teachersInCharge);
       setMinCredits(String(instance.minCredits));
       setMaxCredits(String(instance.maxCredits));
-      setGradingScale(textFormatServices.formatGradingType(instance.gradingType));
+      setGradingScale(textFormatServices.formatGradingScale(instance.gradingScale));
     }
   }, []);
 

@@ -7,32 +7,23 @@ import { Transaction } from 'sequelize';
 import * as yup from 'yup';
 
 import { sequelize } from '../database';
-import models from '../database/models';
 import Course from '../database/models/course';
 import CourseTranslation from '../database/models/courseTranslation';
 
 import { CourseData } from '../types/course';
-import { ApiError } from '../types/error';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { Language, localizedStringSchema } from '../types/language';
 import { CourseWithTranslation } from '../types/model';
+import { findCourseWithTranslationById } from './utils/course';
 
 export async function getCourse(req: Request, res: Response): Promise<void> {
   const courseId: number = Number(req.params.courseId);
   await idSchema.validate({ id: courseId });
 
-  const course: CourseWithTranslation | null = await models.Course.findByPk(courseId, {
-    attributes: ['id', 'courseCode'],
-    include: {
-      model: CourseTranslation,
-      attributes: ['language', 'courseName', 'department'],
-    }
-  }) as CourseWithTranslation;
-
-  if (!course) {
-    throw new ApiError(`course with an id ${courseId} not found`, HttpCode.NotFound);
-  }
+  const course: CourseWithTranslation = await findCourseWithTranslationById(
+    courseId, HttpCode.NotFound
+  );
 
   const courseData: CourseData = {
     id: course.id,

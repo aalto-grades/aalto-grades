@@ -4,9 +4,10 @@
 
 import { LocalizedString } from './language';
 
-export enum GradingType {
-  PassFail = 'PASSFAIL',
-  Numerical = 'NUMERICAL'
+export enum GradingScale {
+  PassFail = 'PASS_FAIL',
+  Numerical = 'NUMERICAL',
+  SecondNationalLanguage = 'SECOND_NATIONAL_LANGUAGE'
 }
 
 export enum Period {
@@ -15,11 +16,6 @@ export enum Period {
   III = 'III',
   IV = 'IV',
   V = 'V'
-}
-
-export enum TeachingMethod {
-  Lecture = 'LECTURE',
-  Exam = 'EXAM'
 }
 
 export interface CourseData {
@@ -43,8 +39,15 @@ export interface CourseInstanceData {
   maxCredits: number,
   startDate: Date,
   endDate: Date,
-  teachingMethod: TeachingMethod,
-  gradingType: GradingType,
-  responsibleTeacher?: string | undefined,
-  responsibleTeachers?: Array<string>,
+  type: string,
+  gradingScale: GradingScale,
+  // TODO: There should maybe be a UserData interface if more data is needed,
+  // for example ID of user.
+  teachersInCharge?: Array<string>
+}
+
+export enum CourseInstanceRoleType {
+  Student = 'STUDENT',
+  Teacher = 'TEACHER',
+  TeacherInCharge = 'TEACHER_IN_CHARGE',
 }
