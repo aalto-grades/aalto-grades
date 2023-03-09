@@ -13,10 +13,10 @@ import mockFormulas from '../mock-data/mockFormulas';
 
 describe('Tests for FormulaAttributesView components', () => {
 
-    const mockData = {
-      selectedAssignments: mockAssignments,
-      selectedFormula: mockFormulas[0]
-    }
+  const mockData = {
+    selectedAssignments: mockAssignments,
+    selectedFormula: mockFormulas[0]
+  };
 
   const renderFormulaAttributesView = async () => {
 
@@ -27,7 +27,7 @@ describe('Tests for FormulaAttributesView components', () => {
             <Route path=':courseId/formula-attributes/:instanceId' element={<FormulaAttributesView />}/>
           </Route>
         </Routes>
-       </MemoryRouter>
+      </MemoryRouter>
     );
   };
 

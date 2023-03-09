@@ -33,7 +33,7 @@ describe('Tests for SelectFormulaView components', () => {
             <Route path=':courseId/select-formula/:instanceId' element={<SelectFormulaView />}/>
           </Route>
         </Routes>
-       </MemoryRouter>
+      </MemoryRouter>
     );
   };
 
