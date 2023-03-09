@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import axios from './axios';
+import textFormatServices from './textFormat';
 
 const addAttainment = async (courseId, instanceId, attainment) => {
   const response = await axios.post(`/v1/courses/${courseId}/instances/${instanceId}/attainments`, attainment);
@@ -91,4 +92,25 @@ const removeAssignment = (indices, assignments) => {
   return updatedAssignments;
 };
 
-export default { getSubAssignments, addSubAssignments, removeAssignment, getProperty, setProperty, addAttainment };
+// Recursive function to format strings of the format '2023-01-01' to Date type values
+const formatStringsToDates = (assignments) => {
+
+  const formatStringToDate = (modifiabelAssignments) => {
+    modifiabelAssignments.forEach((assignment) => {
+      const dateString = assignment.date;
+      const expiryDateString = assignment.expiryDate;
+      assignment.date = textFormatServices.formatStringToDate(dateString);
+      assignment.expiryDate = textFormatServices.formatStringToDate(expiryDateString);
+      if (assignment.subAssignments.length !== 0) {
+        formatStringToDate(assignment.subAssignments);
+      }
+    });
+  };
+
+  const updatedAssignments = JSON.parse(JSON.stringify(assignments));
+  formatStringToDate(updatedAssignments);
+  return updatedAssignments;
+
+};
+
+export default { getSubAssignments, addSubAssignments, removeAssignment, getProperty, setProperty, addAttainment, formatStringsToDates };

@@ -9,6 +9,12 @@ const formatDateToString = (date) => {
   return string.split(',')[0];
 };
 
+// Change date string of format "2012-07-20" to Date type
+const formatStringToDate = (string) => {
+  const date = new Date(string);
+  return date;
+};
+
 // Change date string from format "2012-07-20" to "20.07.2012"
 const formatDateString = (dateString) => {
   const attributes = dateString.split('-');
@@ -53,4 +59,4 @@ const formatGradingScale = (gradingScale) => {
   }
 };
 
-export default { formatDateToString, formatDateString, formatCourseType, formatGradingScale };
+export default { formatDateToString, formatStringToDate, formatDateString, formatCourseType, formatGradingScale };
