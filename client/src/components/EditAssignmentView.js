@@ -10,19 +10,44 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Assignment from './create-assignment/Assignment';
 import assignmentServices from '../services/assignments';
-import mockAssignmentsClient from '../mock-data/mockAssignmentsClient';
+import mockAssignmentsServer from '../mock-data/mockAssignmentsServer';
 
 const EditAssignmentView = () => {
   const navigate = useNavigate();
-  const { assignmentId } = useParams();
+  const { courseId, instanceId, assignmentId } = useParams();
 
   // TODO: replace with a function that gets the actual data from the server
-  const [assignments, setAssignments] = useState(assignmentServices.getFinalAssignmentById(mockAssignmentsClient, Number(assignmentId)));
-  
+  const [assignments, setAssignments] = useState(assignmentServices.getFinalAssignmentById(mockAssignmentsServer, Number(assignmentId)));
+
+  const editAttainment = async (attainmentObject) => {
+    try {
+      console.log(attainmentObject);
+      const attainment = await assignmentServices.editAttainment(courseId, instanceId, attainmentObject);
+      console.log(attainment);
+      //navigate('/' + courseId, { replace: true });
+    } catch (exception) {
+      console.log(exception.message);
+    }
+  };
+
+  const addAttainment = async (attainmentObject) => {
+    try {
+      const attainment = await assignmentServices.addAttainment(courseId, instanceId, attainmentObject);
+      console.log(attainment);
+      //navigate('/' + courseId, { replace: true });
+    } catch (exception) {
+      console.log(exception.message);
+    }
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     try {
-      console.log(assignments);
+      const updatedAssignments = assignmentServices.formatStringsToDates(assignments);
+      const existingAttainments = assignmentServices.getExistingAttainments(updatedAssignments);
+      const newAttainments = assignmentServices.getNewAttainments(updatedAssignments);
+      existingAttainments.forEach((attainment) => editAttainment(attainment));
+      newAttainments.forEach((attainment) => addAttainment(attainment));
       // TODO: connect to backend and add assignments to DB,
       // Add possible attributes and delete unnecessary ones
     } catch (exception) {

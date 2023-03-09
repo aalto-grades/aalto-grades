@@ -27,14 +27,14 @@ const Assignments = ({ assignments, formula, courseId, instance }) => {
             <AssignmentCategory 
               key={assignment.id} 
               assignment={assignment} 
-              button={<Button onClick={ () => navigate('/edit-assignment/' + instance.id + '/' + assignment.id) }>Edit</Button>} 
+              button={<Button onClick={ () => navigate(`/${courseId}/edit-assignment/${instance.id}/${assignment.id}`) }>Edit</Button>} 
               width={'50vw'} 
             />
           );}
         ) }
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
-        <Button onClick={() => navigate('/create-assignment/' + courseId + '/' + instance.id) }>Add attainment</Button>
+        <Button onClick={() => navigate(`/${courseId}/create-assignment/${instance.id}`) }>Add attainment</Button>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}>
           <Button variant='outlined'>Calculate final grades</Button>
           <Button variant='contained'>Add points</Button>

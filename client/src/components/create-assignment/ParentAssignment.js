@@ -18,9 +18,9 @@ import Assignment from './Assignment';
 import assignmentServices from '../../services/assignments';
 import formulasService from '../../services/formulas';
 
-// An Assignmnet component with subassignments and a formula
+// An Assignmnet component with subAttainments and a formula
 
-const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignments, removeAssignment, formulaAttributeNames }) => {
+const ParentAssignment = ({ indices, addSubAttainments, setAssignments, assignments, removeAssignment, formulaAttributeNames }) => {
   let navigate = useNavigate();
 
   // Functions and varibales for opening and closing the list of sub-assignments
@@ -58,7 +58,7 @@ const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignme
       </Box>
       <LeafAssignment
         indices={indices}
-        addSubAssignments={addSubAssignments}
+        addSubAttainments={addSubAttainments}
         assignments={assignments} 
         setAssignments={setAssignments} 
         removeAssignment={removeAssignment}
@@ -81,7 +81,7 @@ const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignme
           </Collapse>
           <Collapse in={open} timeout='auto' unmountOnExit>
             <List component="div" disablePadding>
-              {assignmentServices.getSubAssignments(indices, assignments).map((item, i) => (
+              {assignmentServices.getSubAttainments(indices, assignments).map((item, i) => (
                 <Assignment 
                   indices={indices.concat(i)}
                   key={i}
@@ -100,7 +100,7 @@ const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignme
 };
 
 ParentAssignment.propTypes = {
-  addSubAssignments: PropTypes.func,
+  addSubAttainments: PropTypes.func,
   indices: PropTypes.array,
   assignments: PropTypes.array,
   setAssignments: PropTypes.func,

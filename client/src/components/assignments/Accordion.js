@@ -144,9 +144,9 @@ const CustomAccordion = ({ assignments }) => {
             >
               <AssignmentText name={assignment.name} formulaId={assignment.formulaId} />
             </AccordionSummary>
-            { assignment.subAssignments.map(subAssignment => {
+            { assignment.subAttainments.map(subAssignment => {
               return (
-                subAssignment.subAssignments.length === 0 ?  // is the assignment a leaf? If yes, render details, else another accordion
+                subAssignment.subAttainments.length === 0 ?  // is the assignment a leaf? If yes, render details, else another accordion
                   <AccordionDetails key={subAssignment.id + 'details'}>
                     <AssignmentText name={subAssignment.name} formulaId={subAssignment.formulaId} />
                   </AccordionDetails>

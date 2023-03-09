@@ -3,17 +3,20 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState }  from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Assignment from './create-assignment/Assignment';
-import assignmentServices from '../services/assignments';
+import assignmentServices from '../services/assignments'; 
 
 const CreateAssignmentView = () => {
   const navigate = useNavigate();
   let { courseId, instanceId } = useParams();
+  const { addedAssignments, setAddedAssignments } = useOutletContext();
+
+  console.log(addedAssignments);
 
   // The property 'category' must be specified for each assignment in order to populate the textfields correctly
   const [assignments, setAssignments] = useState([{
@@ -21,17 +24,16 @@ const CreateAssignmentView = () => {
     name: '',
     date: '',
     expiryDate: '',
-    //formulaId: null,
     affectCalculation: false,
     formulaAttributes: [],
-    subAssignments: [],
+    subAttainments: [],
   }]);
 
   const addAttainment = async (attainmentObject) => {
     try {
       const attainment = await assignmentServices.addAttainment(courseId, instanceId, attainmentObject);
       console.log(attainment);
-      navigate('/' + courseId, { replace: true });
+      //navigate('/' + courseId, { replace: true });
     } catch (exception) {
       console.log(exception.message);
     }
@@ -40,9 +42,15 @@ const CreateAssignmentView = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     try {
-      const updatedAssignments = assignmentServices.formatStringsToDates(assignments);
-      console.log(updatedAssignments[0]);
-      addAttainment(updatedAssignments[0]);
+      // If this view is opened from the course view, add to DB
+      // Else the attainment is being created during the creation of an instance so only add to the context
+      if (isNaN(instanceId)) {  // change to 'is defined' type clause
+        setAddedAssignments(addedAssignments.concat(assignments));
+        navigate(-1);
+      } else {
+        const updatedAssignments = assignmentServices.formatStringsToDates(assignments)[0];
+        addAttainment(updatedAssignments);
+      }
       // TODO: connect to backend and add assignmentes to DB,
       // Add possible attributes and delete unnecessary ones
     } catch (exception) {

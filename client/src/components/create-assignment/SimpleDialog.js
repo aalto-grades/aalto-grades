@@ -19,9 +19,9 @@ const numberData = {
   fieldLabel: 'Number of sub-attainments'
 };
     
-function SimpleDialog({ handleClose, open, addSubAssignments, indices, assignments }) {
+function SimpleDialog({ handleClose, open, addSubAttainments, indices, assignments }) {
 
-  const [numOfAssignments, setSubAssignments] = useState('1');
+  const [numOfAssignments, setSubAttainments] = useState('1');
 
   // The value given should be an integer of one or higher
   const error = !(!isNaN(numOfAssignments) && (Number.isInteger(Number(numOfAssignments))) && (Number(numOfAssignments) >= 1));
@@ -29,7 +29,7 @@ function SimpleDialog({ handleClose, open, addSubAssignments, indices, assignmen
   const handleSubmit = (event) => {
     event.preventDefault();
     try {
-      addSubAssignments(numOfAssignments);
+      addSubAttainments(numOfAssignments);
       handleClose();
     } catch (exception) {
       console.log(exception);
@@ -38,7 +38,7 @@ function SimpleDialog({ handleClose, open, addSubAssignments, indices, assignmen
 
   return (
     <Dialog open={open} >
-      {assignmentServices.getSubAssignments(indices, assignments).length === 0 ?
+      {assignmentServices.getSubAttainments(indices, assignments).length === 0 ?
         <DialogTitle>Create Sub Study Attainments</DialogTitle>
         :
         <DialogTitle>Add Sub Study Attainments</DialogTitle>}
@@ -56,7 +56,7 @@ function SimpleDialog({ handleClose, open, addSubAssignments, indices, assignmen
             error={error}
             helperText={error ? 'Value needs to be a positive integer' : ''}
             sx={{ width: '100%' }}
-            onChange={({ target }) => setSubAssignments(target.value)}
+            onChange={({ target }) => setSubAttainments(target.value)}
           />
         </DialogContent>
         <DialogActions>
@@ -79,7 +79,7 @@ function SimpleDialog({ handleClose, open, addSubAssignments, indices, assignmen
 SimpleDialog.propTypes = {
   handleClose: PropTypes.func,
   open: PropTypes.bool,
-  addSubAssignments: PropTypes.func,
+  addSubAttainments: PropTypes.func,
   assignments: PropTypes.array,
   indices: PropTypes.array
 };

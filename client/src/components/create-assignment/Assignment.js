@@ -12,17 +12,17 @@ import assignmentServices from '../../services/assignments';
 
 const Assignment = ({ indices, assignments, setAssignments, removeAssignment, formulaAttributeNames }) => {
 
-  const addSubAssignments = (numOfAssignments) => {
-    const updatedAssignments = assignmentServices.addSubAssignments(indices, assignments, numOfAssignments);
+  const addSubAttainments = (numOfAssignments) => {
+    const updatedAssignments = assignmentServices.addSubAttainments(indices, assignments, numOfAssignments);
     setAssignments(updatedAssignments);
   };
   
   return (
     <>
-      {assignmentServices.getSubAssignments(indices, assignments).length === 0 ?
+      {assignmentServices.getSubAttainments(indices, assignments).length === 0 ?
         <LeafAssignment 
           indices={indices}
-          addSubAssignments={addSubAssignments}
+          addSubAttainments={addSubAttainments}
           assignments={assignments} 
           setAssignments={setAssignments} 
           removeAssignment={removeAssignment}
@@ -31,7 +31,7 @@ const Assignment = ({ indices, assignments, setAssignments, removeAssignment, fo
         :
         <ParentAssignment
           indices={indices}
-          addSubAssignments={addSubAssignments}
+          addSubAttainments={addSubAttainments}
           assignments={assignments} 
           setAssignments={setAssignments} 
           removeAssignment={removeAssignment}

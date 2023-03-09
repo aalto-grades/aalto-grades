@@ -59,7 +59,7 @@ describe('Tests for CreateAssignmentView components', () => {
       expiryDate: testExpiry,
       affectCalculation: false,
       formulaAttributes: [],
-      subAssignments: [],
+      subAttainments: [],
     }];
 
     render(
@@ -108,7 +108,7 @@ describe('Tests for CreateAssignmentView components', () => {
       expiryDate: testExpiry,
       affectCalculation: false,
       formulaAttributes: [],
-      subAssignments: [],
+      subAttainments: [],
     }];
 
     render(
@@ -153,14 +153,14 @@ describe('Tests for CreateAssignmentView components', () => {
       expiryDate: '',
       affectCalculation: false,
       formulaAttributes: [],
-      subAssignments: [{
+      subAttainments: [{
         category: '',
         name: '',
         date: '',
         expiryDate: '',
         affectCalculation: false,
         formulaAttributes: [],
-        subAssignments: [],
+        subAttainments: [],
       }]
     }];
 

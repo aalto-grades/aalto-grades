@@ -15,7 +15,7 @@ import StringTextField from './StringTextField';
 import DateTextField from './DateTextField';
 import assignmentServices from '../../services/assignments';
 
-// An Assignmnet component without subassignments and hence without a formula as well.
+// An Assignmnet component without subAttainments and hence without a formula as well.
 // If this isn't the root Assignment, this can be deleted
 
 const categoryData = {
@@ -65,7 +65,7 @@ AttributeTextFields.propTypes = {
   removeAssignment: PropTypes.func
 };
 
-const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignments, removeAssignment, formulaAttributeNames }) => {
+const LeafAssignment = ({ indices, addSubAttainments, setAssignments, assignments, removeAssignment, formulaAttributeNames }) => {
 
   // Functions and varibales for handling the change of the value in the 'Name' (category) textfield.
   // If the value is 'Other', then the 'New Name' textfield is displayed; 
@@ -179,7 +179,7 @@ const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignment
           indices={indices}
           assignments={assignments}
         />
-        {assignmentServices.getSubAssignments(indices, assignments).length === 0 ?
+        {assignmentServices.getSubAttainments(indices, assignments).length === 0 ?
           <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
             Create Sub-Attainments
           </Button>
@@ -191,7 +191,7 @@ const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignment
       <SimpleDialog
         open={openCountDialog}
         handleClose={handleCountDialogClose}
-        addSubAssignments={addSubAssignments}
+        addSubAttainments={addSubAttainments}
         indices={indices}
         assignments={assignments}
       />
@@ -200,7 +200,7 @@ const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignment
 };
 
 LeafAssignment.propTypes = {
-  addSubAssignments: PropTypes.func,
+  addSubAttainments: PropTypes.func,
   indices: PropTypes.array,
   assignments: PropTypes.array,
   setAssignments: PropTypes.func,

@@ -13,7 +13,7 @@ const formatDateToString = (date) => {
 const formatStringToDate = (string) => {
   const date = new Date(string);
   return date;
-}
+};
 
 // Format Date type values to strings of the format "2023-01-01"
 const formatDateToSlashString = (date) => {

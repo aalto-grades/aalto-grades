@@ -9,7 +9,7 @@ const mockAssignmentsClient = [
     date: new Date(2023, 9, 1),
     expiryDate: new Date(2024, 8, 14), 
     formulaId: 1,  // formulaId is specified for assignments that have sub-assignments
-    subAssignments: [ 
+    subAttainments: [ 
       { id: 11, 
         name: '4 mandatory exercises',
         category: 'Other',
@@ -18,7 +18,7 @@ const mockAssignmentsClient = [
         formulaId: 1,
         affectCalculation: true,
         formulaAttributes: ['', '', ''],
-        subAssignments: [
+        subAttainments: [
           { id: 111, 
             name: 'Exercise 1',
             category: 'Other',
@@ -26,7 +26,7 @@ const mockAssignmentsClient = [
             expiryDate: new Date(2024, 8, 14),
             affectCalculation: true,
             formulaAttributes: ['', '', ''],
-            subAssignments: [],
+            subAttainments: [],
           }, 
           { id: 112, 
             name: 'Exercise 2',
@@ -35,7 +35,7 @@ const mockAssignmentsClient = [
             expiryDate: new Date(2024, 8, 14),
             affectCalculation: true,
             formulaAttributes: ['', '', ''],
-            subAssignments: [],
+            subAttainments: [],
           }, 
           { id: 113, 
             name: 'Exercise 3',
@@ -45,7 +45,7 @@ const mockAssignmentsClient = [
             formulaId: 1,
             affectCalculation: true,
             formulaAttributes: ['', '', ''],
-            subAssignments: [
+            subAttainments: [
               { id: 1131, 
                 name: 'Exercise 3.1',
                 category: 'Other',
@@ -53,7 +53,7 @@ const mockAssignmentsClient = [
                 expiryDate: new Date(2024, 8, 14),
                 affectCalculation: true,
                 formulaAttributes: ['', '', ''],
-                subAssignments: [],
+                subAttainments: [],
               }, 
               { id: 1132,
                 name: 'Exercise 3.2',
@@ -62,7 +62,7 @@ const mockAssignmentsClient = [
                 expiryDate: new Date(2024, 8, 14), 
                 affectCalculation: true,
                 formulaAttributes: ['', '', ''],
-                subAssignments: [],
+                subAttainments: [],
               }
             ] 
           }, 
@@ -73,7 +73,7 @@ const mockAssignmentsClient = [
             expiryDate: new Date(2024, 8, 14),
             affectCalculation: true,
             formulaAttributes: ['', '', ''],
-            subAssignments: [],
+            subAttainments: [],
           }
         ] 
       },
@@ -85,7 +85,7 @@ const mockAssignmentsClient = [
         formulaId: 1,
         affectCalculation: false,  // optional exercises don't affect the grade of Exercises
         formulaAttributes: ['', '', ''],
-        subAssignments: [
+        subAttainments: [
           { id: 121, 
             name: 'Exercise 5',
             category: 'Other',
@@ -93,7 +93,7 @@ const mockAssignmentsClient = [
             expiryDate: new Date(2024, 8, 14),
             affectCalculation: true,  // The grade for optional exercises is still calculated 
             formulaAttributes: ['', '', ''],
-            subAssignments: [],
+            subAttainments: [],
           }, 
           { id: 122, 
             name: 'Exercise 6',
@@ -102,7 +102,7 @@ const mockAssignmentsClient = [
             expiryDate: new Date(2024, 8, 14),
             affectCalculation: true,  // The grade for optional exercises is still calculated 
             formulaAttributes: ['', '', ''],
-            subAssignments: [],
+            subAttainments: [],
           }, 
           { id: 123, 
             name: 'Exercise 7',
@@ -111,7 +111,7 @@ const mockAssignmentsClient = [
             expiryDate: new Date(2024, 8, 14),
             affectCalculation: true,  // The grade for optional exercses is still calculated 
             formulaAttributes: ['', '', ''],
-            subAssignments: [],
+            subAttainments: [],
           },
         ] 
       }
@@ -122,14 +122,14 @@ const mockAssignmentsClient = [
     category: 'Project',
     date: new Date(2023, 9, 1), 
     expiryDate: new Date(2024, 8, 14),
-    subAssignments: [],
+    subAttainments: [],
   },
   { id: 3,
     name: 'Exam',
     category: 'Exam',
     date: new Date(2023, 9, 1), 
     expiryDate: new Date(2024, 8, 14),
-    subAssignments: [],
+    subAttainments: [],
   }
 ];
 

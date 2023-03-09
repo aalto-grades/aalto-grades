@@ -6,7 +6,16 @@ import axios from './axios';
 import textFormatServices from './textFormat';
 
 const addAttainment = async (courseId, instanceId, attainment) => {
-  const response = await axios.post(`/v1/courses/${courseId}/instances/${instanceId}/attainments`, attainment);
+  const response = await axios.post(
+    `/v1/courses/${courseId}/instances/${instanceId}/attainments`,
+    attainment);
+  return response.data.data;
+};
+
+const editAttainment = async (courseId, instanceId, attainment) => {
+  const response = await axios.put(
+    `/v1/courses/${courseId}/instances/${instanceId}/attainments/${attainment.id}`,
+    attainment);
   return response.data.data;
 };
 
@@ -17,16 +26,16 @@ const addAttainment = async (courseId, instanceId, attainment) => {
     { 
       name: 'assignment 0', 
       date: '',
-      subAssignments: [
+      subAttainments: [
         { 
           name: 'assignment 0.0', 
           date: '',
-          subAssignments: []
+          subAttainments: []
         },
         {
           name: 'assignment 0.1', 
           date: '',
-          subAssignments: []
+          subAttainments: []
         }
       ]
     }
@@ -35,15 +44,15 @@ const addAttainment = async (courseId, instanceId, attainment) => {
 // Replace indices with assignment IDs if it seems simpler/more effective
 
 // Get sub-assignments from the assignments array (of nested arrays) according to the indices
-const getSubAssignments = (indices, assignments) => {
+const getSubAttainments = (indices, assignments) => {
   let updatedAssignments = JSON.parse(JSON.stringify(assignments));
-  let subAssignments = [];
+  let subAttainments = [];
   for (let i = 0; i < indices.length; i++) {
     const index = indices[i];
-    subAssignments = updatedAssignments[index].subAssignments;
-    updatedAssignments = subAssignments;
+    subAttainments = updatedAssignments[index].subAttainments;
+    updatedAssignments = subAttainments;
   }
-  return subAssignments;
+  return subAttainments;
 };
 
 // Set the proprety of the object that is in the location specified by the indices in the assignments array,
@@ -52,7 +61,7 @@ const setProperty = (indices, assignments, property, value) => {
   const updatedAssignments = JSON.parse(JSON.stringify(assignments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAssignments, updatedAssignments);
+  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAssignments);
   array[lastIndex][property] = value;
   return updatedAssignments;
 };
@@ -71,7 +80,7 @@ const getProperty = (indices, assignments, property) => {
   const updatedAssignments = JSON.parse(JSON.stringify(assignments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAssignments, updatedAssignments);
+  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAssignments);
   return array[lastIndex][property];
 };
 
@@ -88,7 +97,7 @@ const setFormulaAttribute = (indices, assignments, attributeIndex, value) => {
   const updatedAssignments = JSON.parse(JSON.stringify(assignments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAssignments, updatedAssignments);
+  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAssignments);
   array[lastIndex]['formulaAttributes'][attributeIndex] = value;
   return updatedAssignments;
 };
@@ -98,26 +107,28 @@ const getFormulaAttribute = (indices, assignments, attributeIndex) => {
   const updatedAssignments = JSON.parse(JSON.stringify(assignments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAssignments, updatedAssignments);
+  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAssignments);
   return array[lastIndex]['formulaAttributes'][attributeIndex];
 };
 
 // Add sub-assignments to the assignments array (of nested arrays) according to the indices
-const addSubAssignments = (indices, assignments, numOfAssignments) => {
+const addSubAttainments = (indices, assignments, numOfAssignments) => {
   let updatedAssignments = JSON.parse(JSON.stringify(assignments));
   const defaultExpiryDate = getProperty(indices, updatedAssignments, 'expiryDate');
-  const newSubAssignments = new Array(Number(numOfAssignments)).fill({
+  const parentId = getProperty(indices, updatedAssignments, 'id');
+  const newSubAttainments = new Array(Number(numOfAssignments)).fill({
     category: '',
     name: '',
     date: '',
     expiryDate: defaultExpiryDate,
+    parentId: parentId,
     affectCalculation: false,
     formulaAttributes: [],
-    subAssignments: [],
+    subAttainments: [],
   });
-  const currentSubAssignments = getSubAssignments(indices, updatedAssignments);
-  const subAssignments = currentSubAssignments.concat(newSubAssignments);
-  updatedAssignments = setProperty(indices, updatedAssignments, 'subAssignments', subAssignments);
+  const currentSubAttainments = getSubAttainments(indices, updatedAssignments);
+  const subAttainments = currentSubAttainments.concat(newSubAttainments);
+  updatedAssignments = setProperty(indices, updatedAssignments, 'subAttainments', subAttainments);
   return updatedAssignments;
 };
 
@@ -126,7 +137,7 @@ const removeAssignment = (indices, assignments) => {
   const updatedAssignments = JSON.parse(JSON.stringify(assignments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAssignments, updatedAssignments);
+  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAssignments);
   array.splice(lastIndex, 1);
   return updatedAssignments;
 };
@@ -142,15 +153,15 @@ const constructTreeAssignmets = (assignments) => {
   }); 
 
   updatedAssignments.forEach((assignment) => {
-    assignment.subAssignments = [];
+    assignment.subAttainments = [];
     if (assignment.parentId === 0) { // parent id === instance id
       root = assignment;
     } else {
       const parentNode = map[assignment.id];
-      if (parentNode.subAssignments) {
-        parentNode.subAssignments.push(assignment);
+      if (parentNode.subAttainments) {
+        parentNode.subAttainments.push(assignment);
       } else {
-        parentNode.subAssignments = [assignment];
+        parentNode.subAttainments = [assignment];
       }
     }
   });
@@ -169,8 +180,8 @@ const addCategories = (assignments) => {
       } else {
         assignment.category = 'Other';
       }
-      if (assignment.subAssignments.length !== 0) {
-        addCategory(assignment.subAssignments);
+      if (assignment.subAttainments.length !== 0) {
+        addCategory(assignment.subAttainments);
       }
     });
   };
@@ -190,8 +201,8 @@ const formatDates = (assignments) => {
       const expiryDate = assignment.expiryDate;
       assignment.date = textFormatServices.formatDateToSlashString(date);
       assignment.expiryDate = textFormatServices.formatDateToSlashString(expiryDate);
-      if (assignment.subAssignments.length !== 0) {
-        formatDate(assignment.subAssignments);
+      if (assignment.subAttainments.length !== 0) {
+        formatDate(assignment.subAttainments);
       }
     });
   };
@@ -211,14 +222,14 @@ const formatStringsToDates = (assignments) => {
       const expiryDateString = assignment.expiryDate;
       assignment.date = textFormatServices.formatStringToDate(dateString);
       assignment.expiryDate = textFormatServices.formatStringToDate(expiryDateString);
-      if (assignment.subAssignments.length !== 0) {
-        formatStringToDate(assignment.subAssignments);
+      if (assignment.subAttainments.length !== 0) {
+        formatStringToDate(assignment.subAttainments);
       }
     });
   };
 
   const updatedAssignments = JSON.parse(JSON.stringify(assignments));
-  formatStringsToDates(updatedAssignments);
+  formatStringToDate(updatedAssignments);
   return updatedAssignments;
 
 };
@@ -233,8 +244,8 @@ const getAssignmentById = (assignments, assignmentId) => {
       if (assignment.id === assignmentId) {
         finalAssignment = assignment;
         return;
-      } else if (assignment.subAssignments.length !== 0) {
-        findAssignment(assignment.subAssignments);
+      } else if (assignment.subAttainments.length !== 0) {
+        findAssignment(assignment.subAttainments);
       } else {
         return;
       }
@@ -266,8 +277,8 @@ const getNumOfAssignments = (assignments) => {
   const countAssignment = (modifiabelAssignments) => {
     modifiabelAssignments.forEach((assignment) => {
       sum += 1;
-      if (assignment.subAssignments.length !== 0) {
-        countAssignment(assignment.subAssignments);
+      if (assignment.subAttainments.length !== 0) {
+        countAssignment(assignment.subAttainments);
       } else {
         return;
       }
@@ -280,9 +291,58 @@ const getNumOfAssignments = (assignments) => {
 
 };
 
+const getExistingAttainments = (attainments) => {
+
+  let existingAttainments = [];
+
+  const findExisting = (modifiabelAttainments) => {
+    modifiabelAttainments.forEach((attainment) => {
+      if (attainment.id) {
+        existingAttainments.push(attainment);
+      }
+      if (attainment.subAttainments && attainment.subAttainments.length !== 0) {
+        findExisting(attainment.subAttainments);
+      }
+    });
+  };
+
+  let updatedAattainments = JSON.parse(JSON.stringify(attainments));
+  findExisting(updatedAattainments);
+  updatedAattainments = existingAttainments;
+  return updatedAattainments;
+};
+
+const getNewAttainments = (attainments) => {
+
+  let newAttainments = [];
+
+  const findNew = (modifiabelAttainments) => {
+    modifiabelAttainments.forEach((attainment) => {
+      if (!attainment.id) {
+        newAttainments.push(attainment);
+      } else if (attainment.subAttainments && attainment.subAttainments.length !== 0) {
+        findNew(attainment.subAttainments);
+      }
+    });
+  };
+
+  let updatedAattainments = JSON.parse(JSON.stringify(attainments));
+  findNew(updatedAattainments);
+  updatedAattainments = newAttainments;
+  return updatedAattainments;
+};
+
+const deleteSubAttainments = (attainments) => {
+  let updatedAattainments = JSON.parse(JSON.stringify(attainments));
+  updatedAattainments.forEach((attainment) => delete attainment.subAttainments);
+  return updatedAattainments;
+};
+
 export default { 
-  getSubAssignments, 
-  addSubAssignments, 
+  addAttainment,
+  editAttainment,
+  getSubAttainments, 
+  addSubAttainments, 
   removeAssignment, 
   getProperty, 
   setProperty, 
@@ -294,5 +354,8 @@ export default {
   getFinalAssignmentById,
   setFormulaAttribute,
   getFormulaAttribute,
-  getNumOfAssignments
+  getNumOfAssignments,
+  getExistingAttainments,
+  getNewAttainments,
+  deleteSubAttainments,
 };

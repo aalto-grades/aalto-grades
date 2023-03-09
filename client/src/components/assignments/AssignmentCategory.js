@@ -14,8 +14,8 @@ import formulasService from '../../services/formulas';
 // TODO: replace the points with formulas
 const AssignmentCategory = ({ assignment, button, width }) => {
 
-  const { name, formulaId, expiryDate, subAssignments } = assignment;
-  const titlepb = subAssignments.length !== 0 ? '16px' : '0px';  // title padding-bottom
+  const { name, formulaId, expiryDate, subAttainments } = assignment;
+  const titlepb = subAttainments.length !== 0 ? '16px' : '0px';  // title padding-bottom
 
   return (
     <Box boxShadow={3} borderRadius={1} sx={{ pt: 2, pb: 0.5, bgcolor: 'white', width: width }}>
@@ -25,8 +25,8 @@ const AssignmentCategory = ({ assignment, button, width }) => {
           && <Typography align='left' variant='body2'>{'Formula: ' + formulasService.getFormulaName(formulaId)}</Typography>
         }
       </Box>
-      { subAssignments.length !== 0
-        && <CustomAccordion assignments={subAssignments} />
+      { subAttainments.length !== 0
+        && <CustomAccordion assignments={subAttainments} />
       }
       <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pl: '21px', pr: '6px', pt: '8px' }}>
         <Typography align='left' variant='caption'>{'Expiry date: ' + textFormatServices.formatDateToString(expiryDate)}</Typography>
