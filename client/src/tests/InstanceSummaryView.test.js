@@ -35,7 +35,7 @@ describe('Tests for InstanceSummaryView components', () => {
       const minCreditsField = screen.getByText('Min Credits:');
       const maxCreditsField = screen.getByText('Max Credits:');
       const gradingField = screen.getByText('Grading Scale:');
-      const teacherField = screen.getByText('Instance Teachers');
+      const teacherField = screen.getByText('Teachers in Charge');
 
       expect(startingField).toBeInTheDocument();
       expect(endingField).toBeInTheDocument();

@@ -9,6 +9,12 @@ const formatDateToString = (date) => {
   return string.split(',')[0];
 };
 
+// Format Date type values to strings of the format "2023-01-01"
+const formatDateToSlashString = (date) => {
+  const string = date.toLocaleString('en-GB');
+  return string.split('T')[0];
+};
+
 // Change date string from format "2012-07-20" to "20.07.2012"
 const formatDateString = (dateString) => {
   const attributes = dateString.split('-');
@@ -29,7 +35,7 @@ const formatCourseType = (courseType) => {
   case 'teaching-participation-project':  // Type from Sisu API
     return 'Project';
   case 'LECTURE':
-    return 'Lecture';
+    return 'Teaching';
   case 'EXAM':
     return 'Exam';
   default:
@@ -53,4 +59,4 @@ const formatGradingScale = (gradingScale) => {
   }
 };
 
-export default { formatDateToString, formatDateString, formatCourseType, formatGradingScale };
+export default { formatDateToString, formatDateToSlashString, formatDateString, formatCourseType, formatGradingScale };

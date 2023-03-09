@@ -50,7 +50,7 @@ const gradingScaleData = {
 
 const teacherData = {
   fieldId: 'teacher',
-  fieldLabel: 'Teacher of This Instance'
+  fieldLabel: 'Teacher in Charge'
 };
 
 const textFieldMinWidth = 195;
@@ -128,7 +128,7 @@ const EditInstanceForm = ({ instance }) => {
         </Grid2>
         <StringTextField fieldData={gradingScaleData} value={gradingScale} setFunction={setGradingScale}/>
       </Box>
-      <Button size='small' variant='contained' type='submit'>
+      <Button variant='contained' type='submit'>
           Confirm Details
       </Button>
     </form>

@@ -38,12 +38,12 @@ describe('Tests for SelectFormulaView components', () => {
     await waitFor(() => {
       const headingElement = screen.queryByText('Select Grading Formula');
       const subHeadingElement = screen.queryByText('Result: Course Total Grade');
-      const assignmentSelection = screen.queryByText('Select the sub-assignments you want to include in the calculation');
+      const assignmentSelection = screen.queryByText('Select the sub study attainments you want to include in the calculation');
       const projectsCheckbox = screen.queryByText('Projects');
       const examCheckbox = screen.queryByText('Exams');
       const formulaSelector = screen.queryByText('Formula');
       const formulaPreview = screen.queryByText('Preview of the formula');
-      const submitInstructions = screen.queryByText('Specify attribute values for the sub-assignments');
+      const submitInstructions = screen.queryByText('Specify attribute values for the sub study attainnments');
       const specifyAttributesButton = screen.queryByText('Specify attributes');
       const skipAttributesButton = screen.queryByText('Skip for now');
 

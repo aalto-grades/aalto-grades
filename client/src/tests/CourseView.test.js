@@ -27,15 +27,15 @@ describe('Tests for CourseView component', () => {
     const auth = { role: 'TEACHER' };
     renderCourseView(auth);
 
-    const instanceInfo = screen.getByText('Ongoing instance');
-    const teachersInfo = screen.getByText('Responsible Teachers');
-    const assignments = screen.getByText('Assignments');
+    const instanceInfo = screen.getByText('Ongoing Instance');
+    const teachersInfo = screen.getByText('Teachers in Charge');
+    const assignments = screen.getByText('Study Attainments');
     const exercises = screen.getByText('Exercises');  // Assignment
     const projects = screen.getByText('Project');  // Assignment
     const exams = screen.getAllByText('Exam');  // Assignmnets and instance types
     const pastInstances = screen.getByText('Past Instances');
     const createInstanceButton = screen.getByText('New instance');
-    const addAssignmentButton = screen.getByText('Add assignment');
+    const addAssignmentButton = screen.getByText('Add attainment');
     const seeAttendeesButton = screen.getByText('See attendees');
 
     expect(instanceInfo).toBeDefined();
@@ -56,16 +56,16 @@ describe('Tests for CourseView component', () => {
     const auth = { role: 'STUDENT' };
     renderCourseView(auth);
 
-    const instanceInfo = screen.getByText('Ongoing instance');
-    const teachersInfo = screen.getByText('Responsible Teachers');
+    const instanceInfo = screen.getByText('Ongoing Instance');
+    const teachersInfo = screen.getByText('Teachers in Charge');
     const pastInstances = screen.getByText('Past Instances');
 
     expect(instanceInfo).toBeDefined();
     expect(teachersInfo).toBeDefined();
     expect(pastInstances).toBeDefined();
 
-    expect(screen.queryByText('Assignments')).not.toBeInTheDocument();
-    expect(screen.queryByText('Add assignment')).not.toBeInTheDocument();
+    expect(screen.queryByText('Study Attainments')).not.toBeInTheDocument();
+    expect(screen.queryByText('Add attainment')).not.toBeInTheDocument();
     expect(screen.queryByText('Edit')).not.toBeInTheDocument();
     expect(screen.queryByText('See attendees')).not.toBeInTheDocument();
     
