@@ -16,14 +16,14 @@ import Button from '@mui/material/Button';
 function ConfirmationDialog({ handleClose, open, removeAssignment, indices, assignments }) {
   return (
     <Dialog open={open} >
-      <DialogTitle >Delete sub-assignment</DialogTitle>
+      <DialogTitle >Delete Sub-Attainments</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Are you sure you want to delete this sub-assignment?
+          Are you sure you want to delete this sub-attainment and all of the attainments below it?
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button size='medium' onClick={handleClose}>
+        <Button size='medium' variant='outlined' onClick={handleClose}>
           Cancel
         </Button>
         <Button size='medium' onClick={() => {

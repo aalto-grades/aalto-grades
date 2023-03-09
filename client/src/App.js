@@ -25,6 +25,7 @@ import InstanceSummaryView from './components/InstanceSummaryView';
 import SelectFormulaView from './components/SelectFormulaView';
 import FormulaAttributesView from './components/FormulaAttributesView';
 import CreateAssignmentView from './components/CreateAssignmentView';
+import EditAssignmentView from './components/EditAssignmentView';
 import InstanceCreationRoute from './context/InstanceCreationRoute';
 import FormulaSelectionRoute from './context/FormulaSelectionRoute';
 import useLogout from './hooks/useLogout';
@@ -115,13 +116,14 @@ function App() {
                 <Route path=':courseId/edit-instance/:instanceId' element={<EditInstanceView/>}/>
                 <Route path=':courseId/add-assignments/:instanceId' element={<AddAssignmentsView/>}/>
                 <Route path=':courseId/instance-summary/:instanceId' element={<InstanceSummaryView/>}/>
+                <Route path='/create-assignment/:instanceId' element={<CreateAssignmentView/>}/>
+                <Route path='/edit-assignment/:instanceId/:assignmentId' element={<EditAssignmentView/>}/>
               </Route>
               <Route element={<FormulaSelectionRoute/>}>
                 <Route path='/:courseId/select-formula/:instanceId/' element={<SelectFormulaView/>}/>
                 <Route path='/:courseId/formula-attributes/:instanceId/' element={<FormulaAttributesView/>}/>
                 { /* '/:assignmentId' will be added to the paths above once they work for sub-assignments */ }
               </Route>
-              <Route path='/create-assignment/:instanceId' element={<CreateAssignmentView/>}/>
             </Route>
           </Routes>
         </Box>

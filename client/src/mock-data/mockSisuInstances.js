@@ -10,9 +10,9 @@ const mockSisuInstances = [
     maxCredits: 5,
     startDate: '2022-08-14',
     endDate: '2022-11-13',
-    teachingMethod: 'LECTURE',
+    type: 'teaching-participation-lectures',
     gradingScale: 'General Scale, 0-5',
-    responsibleTeachers: [
+    teachersInCharge: [
       'Elisa Mekler',
       'David McGookin'
     ],
@@ -35,9 +35,9 @@ const mockSisuInstances = [
     endingPeriod: '2022-2023 Autumn I-II',
     startDate: '2021-08-14',
     endDate: '2021-11-13',
-    teachingMethod: 'EXAM',
+    type: 'exam-exam',
     gradingScale: 'General Scale, 0-5',
-    responsibleTeachers: [
+    teachersInCharge: [
       'Elisa Mekler'
     ],
     courseData: {
@@ -62,9 +62,9 @@ const mockSisuInstances = [
     endingPeriod: '-', 
     startDate: '2023-02-06', 
     endDate: '2023-05-19', 
-    teachingMethod: 'EXAM',
-    gradingType: 'NUMERICAL', 
-    responsibleTeachers: [
+    type: 'exam-exam',
+    gradingScale: 'NUMERICAL', 
+    teachersInCharge: [
       'Kerttu Maaria Pollari-Malmi'
     ],
     courseData: {

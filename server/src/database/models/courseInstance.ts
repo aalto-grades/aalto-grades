@@ -8,7 +8,6 @@ import {
 
 import { sequelize } from '..';
 import Course from './course';
-import User from './user';
 
 export default class CourseInstance extends Model<
   InferAttributes<CourseInstance>,
@@ -17,11 +16,10 @@ export default class CourseInstance extends Model<
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
   declare sisuCourseInstanceId: string | null;
-  declare gradingType: string;
+  declare gradingScale: string;
   declare startingPeriod: string;
   declare endingPeriod: string;
-  declare teachingMethod: string;
-  declare responsibleTeacher: ForeignKey<User['id']>;
+  declare type: string;
   declare minCredits: number;
   declare maxCredits: number;
   declare startDate: Date;
@@ -50,8 +48,8 @@ CourseInstance.init(
       allowNull: true,
       unique: true
     },
-    gradingType: {
-      type: DataTypes.ENUM('PASSFAIL', 'NUMERICAL'),
+    gradingScale: {
+      type: DataTypes.ENUM('PASS_FAIL', 'NUMERICAL', 'SECOND_NATIONAL_LANGUAGE'),
       allowNull: false
     },
     startingPeriod: {
@@ -62,17 +60,9 @@ CourseInstance.init(
       type: DataTypes.ENUM('I', 'II', 'III', 'IV', 'V'),
       allowNull: false
     },
-    teachingMethod: {
-      type: DataTypes.ENUM('LECTURE', 'EXAM'),
+    type: {
+      type: DataTypes.STRING,
       allowNull: false
-    },
-    responsibleTeacher: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'user',
-        key: 'id'
-      }
     },
     minCredits: {
       type: DataTypes.INTEGER,

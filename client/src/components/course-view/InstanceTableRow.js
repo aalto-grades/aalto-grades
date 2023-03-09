@@ -9,7 +9,7 @@ import TableCell from '@mui/material/TableCell';
 import textFormatServices from '../../services/textFormat';
 
 const InstanceTableRow = ({ instance }) => {
-  const { id, startDate, endDate, courseType } = instance;
+  const { id, startDate, endDate, type } = instance;
     
   return(
     <TableRow
@@ -19,7 +19,7 @@ const InstanceTableRow = ({ instance }) => {
     >
       <TableCell>{textFormatServices.formatDateToString(startDate)}</TableCell>
       <TableCell>{textFormatServices.formatDateToString(endDate)}</TableCell>
-      <TableCell>{courseType}</TableCell>
+      <TableCell>{textFormatServices.formatCourseType(type)}</TableCell>
     </TableRow>
   );
 };

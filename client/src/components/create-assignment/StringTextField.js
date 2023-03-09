@@ -8,16 +8,20 @@ import TextField from '@mui/material/TextField';
 import assignmentServices from '../../services/assignments';
 
 // A TextField component used for the 'name' of an assignment.
-// This component could possibly be used for the 'attribute' textfields as well 
-// that might be required after specifying a formula.
+// This component is also used for the formula attribute textfields that are required after specifying a formula.
 
 const StringTextField = ({ fieldData, indices, assignments, setAssignments }) => {
 
-  // Functions for handling the change of the values in the 'New Name' textfield
+  // Functions for handling the change of the values in the 'New Name' textfield 
+  // and the textfields that represent formula attributes
   const handleChange = (event) => {
     const value = event.target.value;
     if (fieldData.fieldId === 'assignmentName') {
       const updatedAssignments = assignmentServices.setProperty(indices, assignments, 'name', value);
+      setAssignments(updatedAssignments);
+    } else if (fieldData.fieldId.startsWith('attribute')) {
+      const attributeIndex = Number(fieldData.fieldId.slice(-1));
+      const updatedAssignments = assignmentServices.setFormulaAttribute(indices, assignments, attributeIndex, value);
       setAssignments(updatedAssignments);
     } else {
       console.log(fieldData.fieldId);
@@ -27,6 +31,9 @@ const StringTextField = ({ fieldData, indices, assignments, setAssignments }) =>
   const getValue = () => {
     if (fieldData.fieldId === 'assignmentName') {
       return assignmentServices.getProperty(indices, assignments, 'name');
+    } else if (fieldData.fieldId.startsWith('attribute')) {
+      const attributeIndex = Number(fieldData.fieldId.slice(-1));
+      return assignmentServices.getFormulaAttribute(indices, assignments, attributeIndex);
     } else {
       console.log(fieldData.fieldId);
     }
