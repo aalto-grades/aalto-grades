@@ -72,8 +72,8 @@ export default {
           allowNull: true,
           unique: true
         },
-        grading_type: {
-          type: DataTypes.ENUM('PASSFAIL', 'NUMERICAL'),
+        grading_scale: {
+          type: DataTypes.ENUM('PASS_FAIL', 'NUMERICAL', 'SECOND_NATIONAL_LANGUAGE'),
           allowNull: false
         },
         starting_period: {
@@ -84,19 +84,9 @@ export default {
           type: DataTypes.ENUM('I', 'II', 'III', 'IV', 'V'),
           allowNull: false
         },
-        teaching_method: {
-          type: DataTypes.ENUM('LECTURE', 'EXAM'),
+        type: {
+          type: new DataTypes.STRING,
           allowNull: false
-        },
-        responsible_teacher: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-          references: {
-            model: 'user',
-            key: 'id'
-          },
-          onDelete: 'SET NULL',
-          onUpdate: 'CASCADE'
         },
         min_credits: {
           type: DataTypes.INTEGER,
@@ -117,7 +107,7 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE,
       }, { transaction });
-      await queryInterface.createTable('course_role', {
+      await queryInterface.createTable('course_instance_role', {
         id: {
           type: DataTypes.INTEGER,
           autoIncrement: true,
@@ -144,7 +134,7 @@ export default {
           onUpdate: 'CASCADE'
         },
         role: {
-          type: DataTypes.ENUM('STUDENT', 'ASSISTANT', 'TEACHER', 'SYSADMIN'),
+          type: DataTypes.ENUM('STUDENT', 'TEACHER', 'TEACHER_IN_CHARGE'),
           allowNull: false
         },
         created_at: DataTypes.DATE,
@@ -315,7 +305,7 @@ export default {
       await queryInterface.dropTable('user_attainment_grade', { transaction });
       await queryInterface.dropTable('attainable', { transaction });
       await queryInterface.dropTable('course_translation', { transaction });
-      await queryInterface.dropTable('course_role', { transaction });
+      await queryInterface.dropTable('course_instance_role', { transaction });
       await queryInterface.dropTable('course_instance', { transaction });
       await queryInterface.dropTable('course', { transaction });
       await queryInterface.dropTable('user', { transaction });
@@ -323,11 +313,11 @@ export default {
       await queryInterface.dropTable('seeds', { transaction });
 
       await queryInterface.sequelize.query(
-        'DROP TYPE IF EXISTS enum_course_instance_grading_type;', { transaction }
+        'DROP TYPE IF EXISTS enum_course_instance_grading_scale;', { transaction }
       );
 
       await queryInterface.sequelize.query(
-        'DROP TYPE IF EXISTS enum_course_role_role;', { transaction }
+        'DROP TYPE IF EXISTS enum_course_instance_role_role;', { transaction }
       );
 
       await queryInterface.sequelize.query(

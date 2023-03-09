@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { AxiosError } from 'axios';
 import express, { NextFunction, Request, RequestHandler, Response } from 'express';
 import { ValidationError } from 'yup';
 
@@ -60,6 +61,17 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
       errors: err.errors
     });
     return;
+  }
+
+  if (err instanceof AxiosError) {
+    res.status(HttpCode.BadGateway).send({
+      success: false,
+      errors: [
+        err.response
+          ? `external API error: ${err.response?.status}`
+          : err.message
+      ]
+    });
   }
 
   // Fallback if no other error matches
