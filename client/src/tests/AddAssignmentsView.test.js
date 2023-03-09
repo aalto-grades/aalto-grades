@@ -33,8 +33,8 @@ describe('Tests for AddAssignmentsView components', () => {
       const assignment1 = screen.getByText(mockAssignmentsClient[0].name);
       const assignment2 = screen.getByText(mockAssignmentsClient[0].name);
       const assignment3 = screen.getByText(mockAssignmentsClient[0].name);
-      const createButton = screen.getByText('Create assignment');
-      const confirmButton = screen.getByText('Confirm assignments');
+      const createButton = screen.getByText('Create attainment');
+      const confirmButton = screen.getByText('Confirm attainments');
       const goBackButton = screen.getByText('Go back');
 
       expect(assignment1).toBeInTheDocument();

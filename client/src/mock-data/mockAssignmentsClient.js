@@ -8,7 +8,7 @@ const mockAssignmentsClient = [
     category: 'Other',
     date: new Date(2023, 9, 1),
     expiryDate: new Date(2024, 8, 14), 
-    formulaId: 1,
+    formulaId: 1,  // formulaId is specified for assignments that have sub-assignments
     subAssignments: [ 
       { id: 11, 
         name: '4 mandatory exercises',
@@ -16,12 +16,16 @@ const mockAssignmentsClient = [
         date: new Date(2023, 9, 1), 
         expiryDate: new Date(2024, 8, 14), 
         formulaId: 1,
+        affectCalculation: true,
+        formulaAttributes: ['', '', ''],
         subAssignments: [
           { id: 111, 
             name: 'Exercise 1',
             category: 'Other',
             date: new Date(2023, 9, 1), 
             expiryDate: new Date(2024, 8, 14),
+            affectCalculation: true,
+            formulaAttributes: ['', '', ''],
             subAssignments: [],
           }, 
           { id: 112, 
@@ -29,6 +33,8 @@ const mockAssignmentsClient = [
             category: 'Other',
             date: new Date(2023, 9, 1), 
             expiryDate: new Date(2024, 8, 14),
+            affectCalculation: true,
+            formulaAttributes: ['', '', ''],
             subAssignments: [],
           }, 
           { id: 113, 
@@ -37,12 +43,16 @@ const mockAssignmentsClient = [
             date: new Date(2023, 9, 1), 
             expiryDate: new Date(2024, 8, 14), 
             formulaId: 1,
+            affectCalculation: true,
+            formulaAttributes: ['', '', ''],
             subAssignments: [
               { id: 1131, 
                 name: 'Exercise 3.1',
                 category: 'Other',
                 date: new Date(2023, 9, 1), 
                 expiryDate: new Date(2024, 8, 14),
+                affectCalculation: true,
+                formulaAttributes: ['', '', ''],
                 subAssignments: [],
               }, 
               { id: 1132,
@@ -50,6 +60,8 @@ const mockAssignmentsClient = [
                 category: 'Other',
                 date: new Date(2023, 9, 1), 
                 expiryDate: new Date(2024, 8, 14), 
+                affectCalculation: true,
+                formulaAttributes: ['', '', ''],
                 subAssignments: [],
               }
             ] 
@@ -59,6 +71,8 @@ const mockAssignmentsClient = [
             category: 'Other',
             date: new Date(2023, 9, 1), 
             expiryDate: new Date(2024, 8, 14),
+            affectCalculation: true,
+            formulaAttributes: ['', '', ''],
             subAssignments: [],
           }
         ] 
@@ -69,12 +83,16 @@ const mockAssignmentsClient = [
         date: new Date(2023, 9, 1), 
         expiryDate: new Date(2024, 8, 14), 
         formulaId: 1,
+        affectCalculation: false,  // optional exercises don't affect the grade of Exercises
+        formulaAttributes: ['', '', ''],
         subAssignments: [
           { id: 121, 
             name: 'Exercise 5',
             category: 'Other',
             date: new Date(2023, 9, 1), 
             expiryDate: new Date(2024, 8, 14),
+            affectCalculation: true,  // The grade for optional exercises is still calculated 
+            formulaAttributes: ['', '', ''],
             subAssignments: [],
           }, 
           { id: 122, 
@@ -82,6 +100,8 @@ const mockAssignmentsClient = [
             category: 'Other',
             date: new Date(2023, 9, 1), 
             expiryDate: new Date(2024, 8, 14),
+            affectCalculation: true,  // The grade for optional exercises is still calculated 
+            formulaAttributes: ['', '', ''],
             subAssignments: [],
           }, 
           { id: 123, 
@@ -89,6 +109,8 @@ const mockAssignmentsClient = [
             category: 'Other',
             date: new Date(2023, 9, 1), 
             expiryDate: new Date(2024, 8, 14),
+            affectCalculation: true,  // The grade for optional exercses is still calculated 
+            formulaAttributes: ['', '', ''],
             subAssignments: [],
           },
         ] 

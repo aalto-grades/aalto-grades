@@ -16,10 +16,10 @@ const Assignments = ({ assignments, formula, courseId, instance }) => {
   
   return (
     <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: 1.5, display: 'inline-block' }}>
-      <Typography variant='h6' align='left' sx={{ ml: 1.5 }} >Assignments</Typography>
+      <Typography variant='h6' align='left' sx={{ ml: 1.5 }} >Study Attainments</Typography>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
         <Typography align='left' sx={{ ml: 1.5 }} >{'Grading Formula: ' + formula}</Typography>
-        <Button>Edit formula</Button>
+        <Button onClick={ () => navigate('/select-formula') }>Edit formula</Button>
       </Box>
       <Box sx={{ display: 'inline-grid', gap: 1 }}>
         { assignments.map(assignment => {
@@ -27,14 +27,14 @@ const Assignments = ({ assignments, formula, courseId, instance }) => {
             <AssignmentCategory 
               key={assignment.id} 
               assignment={assignment} 
-              button={<Button>Edit</Button>} 
+              button={<Button onClick={ () => navigate('/edit-assignment/' + instance.id + '/' + assignment.id) }>Edit</Button>} 
               width={'50vw'} 
             />
           );}
         ) }
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
-        <Button onClick={() => navigate('/create-assignment/' + courseId + '/' + instance.id) }>Add assignment</Button>
+        <Button onClick={() => navigate('/create-assignment/' + courseId + '/' + instance.id) }>Add attainment</Button>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}>
           <Button variant='outlined'>Calculate final grades</Button>
           <Button variant='contained'>Add points</Button>

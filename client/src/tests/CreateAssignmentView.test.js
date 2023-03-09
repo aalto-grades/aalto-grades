@@ -19,12 +19,12 @@ describe('Tests for CreateAssignmentView components', () => {
       </BrowserRouter>
     );
 
-    const headingElement = screen.getByText('Create Assignment');
+    const headingElement = screen.getByText('Create Study Attainment');
     const selectLabel = 'Name';
     const categoryField = await screen.findByLabelText(selectLabel);
     const dateField = screen.getByLabelText('Date');
     const expiryField = screen.getByLabelText('Expiry Date');
-    const creationButton = screen.getByText('Create sub-assignments');
+    const creationButton = screen.getByText('Create Sub-Attainments');
     const confirmButton = screen.getByText('Confirm');
 
     userEvent.click(categoryField);
@@ -57,10 +57,16 @@ describe('Tests for CreateAssignmentView components', () => {
       name: testCategory,
       date: testDate,
       expiryDate: testExpiry,
+      affectCalculation: false,
+      formulaAttributes: [],
       subAssignments: [],
     }];
 
-    render(<CreateAssignmentView/>);
+    render(
+      <BrowserRouter>
+        <CreateAssignmentView />
+      </BrowserRouter>
+    );
 
     const selectLabel = 'Name';
     const categoryField = await screen.findByLabelText(selectLabel);
@@ -100,10 +106,16 @@ describe('Tests for CreateAssignmentView components', () => {
       name: testName,
       date: testDate,
       expiryDate: testExpiry,
+      affectCalculation: false,
+      formulaAttributes: [],
       subAssignments: [],
     }];
 
-    render(<CreateAssignmentView/>);
+    render(
+      <BrowserRouter>
+        <CreateAssignmentView />
+      </BrowserRouter>
+    );
 
     const selectLabel = 'Name';
     const categoryField = await screen.findByLabelText(selectLabel);
@@ -139,11 +151,15 @@ describe('Tests for CreateAssignmentView components', () => {
       name: '',
       date: '',
       expiryDate: '',
+      affectCalculation: false,
+      formulaAttributes: [],
       subAssignments: [{
         category: '',
         name: '',
         date: '',
         expiryDate: '',
+        affectCalculation: false,
+        formulaAttributes: [],
         subAssignments: [],
       }]
     }];
@@ -154,13 +170,13 @@ describe('Tests for CreateAssignmentView components', () => {
       </BrowserRouter>
     );
 
-    const creationButton = screen.getByText('Create sub-assignments');
+    const creationButton = screen.getByText('Create Sub-Attainments');
     expect(creationButton).toBeInTheDocument();
 
     // Create one sub-assignment
     userEvent.click(creationButton);
 
-    const numberField = screen.getByLabelText('Number of sub-assignments');
+    const numberField = screen.getByLabelText('Number of sub-attainments');
     expect(numberField).toBeInTheDocument();
 
     const confirmButtons = await screen.findAllByText('Confirm');
@@ -171,7 +187,7 @@ describe('Tests for CreateAssignmentView components', () => {
 
     // Check that there is one sub-assignment so one 'Cancel'-button
     const cancelButtons = await screen.findAllByText('Cancel');
-    const addButton = screen.getByText('Add sub-assignments');
+    const addButton = screen.getByText('Add Sub-Attainments');
 
     expect(cancelButtons).toHaveLength(1);
     expect(addButton).toBeInTheDocument();

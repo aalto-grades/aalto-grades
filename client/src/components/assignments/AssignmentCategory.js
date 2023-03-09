@@ -22,7 +22,7 @@ const AssignmentCategory = ({ assignment, button, width }) => {
       <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pr: '21px', pb: titlepb, pl: '21px' }}>
         <Typography sx={{ fontWeight: 'bold' }} align='left'>{name}</Typography>
         { formulaId 
-          && <Typography align='left' variant='body2'>{'Formula: ' + formulasService.getFormula(formulaId)}</Typography>
+          && <Typography align='left' variant='body2'>{'Formula: ' + formulasService.getFormulaName(formulaId)}</Typography>
         }
       </Box>
       { subAssignments.length !== 0

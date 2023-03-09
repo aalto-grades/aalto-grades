@@ -3,51 +3,36 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState }  from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Assignment from './create-assignment/Assignment';
 import assignmentServices from '../services/assignments';
+import mockAssignmentsClient from '../mock-data/mockAssignmentsClient';
 
-const CreateAssignmentView = () => {
+const EditAssignmentView = () => {
   const navigate = useNavigate();
-  let { courseId, instanceId } = useParams();
+  const { assignmentId } = useParams();
 
-  // The property 'category' must be specified for each assignment in order to populate the textfields correctly
-  const [assignments, setAssignments] = useState([{
-    category: '',
-    name: '',
-    date: '',
-    expiryDate: '',
-    //formulaId: null,
-    affectCalculation: false,
-    formulaAttributes: [],
-    subAssignments: [],
-  }]);
-
-  const addAttainment = async (attainmentObject) => {
-    try {
-      const attainment = await assignmentServices.addAttainment(courseId, instanceId, attainmentObject);
-      console.log(attainment);
-      navigate('/' + courseId, { replace: true });
-    } catch (exception) {
-      console.log(exception.message);
-    }
-  };
-
+  // TODO: replace with a function that gets the actual data from the server
+  const [assignments, setAssignments] = useState(assignmentServices.getFinalAssignmentById(mockAssignmentsClient, Number(assignmentId)));
+  
   const handleSubmit = (event) => {
     event.preventDefault();
     try {
-      const updatedAssignments = assignmentServices.formatStringsToDates(assignments);
-      console.log(updatedAssignments[0]);
-      addAttainment(updatedAssignments[0]);
-      // TODO: connect to backend and add assignmentes to DB,
+      console.log(assignments);
+      // TODO: connect to backend and add assignments to DB,
       // Add possible attributes and delete unnecessary ones
     } catch (exception) {
       console.log(exception);
     }
+  };
+
+  const deleteAssignment = () => {
+    // TODO: connect to backend and delete assignments from DB,
+    navigate(-1);
   };
 
   const removeAssignment = (indices) => {
@@ -59,7 +44,7 @@ const CreateAssignmentView = () => {
     <>
       <Container maxWidth="md" sx={{ textAlign: 'right' }}>
         <Typography variant="h3" component="div" sx={{ flexGrow: 1, mb: 4, textAlign: 'left' }}>
-            Create Study Attainment
+            Edit Study Attainment
         </Typography>
         <form>
           <Box sx={{ 
@@ -72,7 +57,6 @@ const CreateAssignmentView = () => {
             pb: 1,
             px: 2,
           }}>
-            {/* Create the root assignment */}
             <Assignment 
               indices={[0]}
               assignments={assignments} 
@@ -80,16 +64,17 @@ const CreateAssignmentView = () => {
               removeAssignment={removeAssignment}
             />
           </Box>
-          <Button size='medium' variant='outlined' onClick={ () => navigate(-1) } sx={{ mr: 1 }}>
-                Cancel
-          </Button>
-          <Button size='medium' variant='contained' type='submit' onClick={handleSubmit} sx={{ mr: 2 }}>
-                Confirm
-          </Button>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
+            <Button size='medium' variant='outlined' color='error' onClick={deleteAssignment} sx={{ ml: 2 }}>Delete Attainment</Button>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}>
+              <Button size='medium' variant='outlined' onClick={ () => navigate(-1) }>Cancel</Button>
+              <Button size='medium' variant='contained' type='submit' onClick={handleSubmit} sx={{ mr: 2 }}>Confirm</Button>
+            </Box>
+          </Box>
         </form>
       </Container>
     </>
   );
 };
 
-export default CreateAssignmentView;
+export default EditAssignmentView;
