@@ -39,9 +39,9 @@ function SimpleDialog({ handleClose, open, addSubAssignments, indices, assignmen
   return (
     <Dialog open={open} >
       {assignmentServices.getSubAssignments(indices, assignments).length === 0 ?
-        <DialogTitle>Create Sub-Attainments</DialogTitle>
+        <DialogTitle>Create Sub Study Attainments</DialogTitle>
         :
-        <DialogTitle>Add Sub-Attainments</DialogTitle>}
+        <DialogTitle>Add Sub Study Attainments</DialogTitle>}
       <form>
         <DialogContent sx={{ px: 3, py: 1 }}>
           <TextField
