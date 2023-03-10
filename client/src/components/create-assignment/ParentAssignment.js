@@ -60,7 +60,7 @@ const ParentAssignment = ({ indices, addSubAttainments, setAttainments, attainme
         indices={indices}
         addSubAttainments={addSubAttainments}
         attainments={attainments} 
-        setAttainmentts={setAttainments} 
+        setAttainments={setAttainments} 
         removeAttainment={removeAttainment}
         formulaAttributeNames={formulaAttributeNames}
       />
@@ -86,7 +86,7 @@ const ParentAssignment = ({ indices, addSubAttainments, setAttainments, attainme
                   indices={indices.concat(i)}
                   key={i}
                   attainments={attainments} 
-                  setAttainmentts={setAttainments} 
+                  setAttainments={setAttainments} 
                   removeAttainment={removeAttainment}
                   formulaAttributeNames={subFormulaAttributeNames ? subFormulaAttributeNames : []}
                 />
