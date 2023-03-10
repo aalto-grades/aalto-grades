@@ -9,6 +9,8 @@ import { Outlet } from 'react-router-dom';
 
 export const InstanceCreationRoute = () => {
   const [addedAttainments, setAddedAttainments] = useState([]);
+  const [suggestedAttainments, setSuggestedAttainments] = useState([]);
+  const [attainmentIncrementId, setIncrementId] = useState(0);
   const [courseType, setType]                   = useState('');
   const [startDate, setStartDate]               = useState('');
   const [endDate, setEndDate]                   = useState('');
@@ -19,6 +21,8 @@ export const InstanceCreationRoute = () => {
 
   const value = useMemo(() => (
     { addedAttainments, setAddedAttainments,
+      suggestedAttainments, setSuggestedAttainments,
+      attainmentIncrementId, setIncrementId,
       courseType, setType,
       startDate, setStartDate,
       endDate, setEndDate,
@@ -27,7 +31,7 @@ export const InstanceCreationRoute = () => {
       stringMaxCredits, setMaxCredits,
       gradingScale, setGradingScale,
     }
-  ), [courseType, startDate, endDate, teachers, stringMinCredits, stringMaxCredits, gradingScale, addedAttainments]);
+  ), [courseType, startDate, endDate, teachers, stringMinCredits, stringMaxCredits, gradingScale, addedAttainments, suggestedAttainments, attainmentIncrementId]);
 
   return <Outlet context={value} />;
 };

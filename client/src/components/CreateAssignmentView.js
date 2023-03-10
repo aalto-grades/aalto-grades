@@ -13,8 +13,11 @@ import assignmentServices from '../services/assignments';
 
 const CreateAssignmentView = () => {
   const navigate = useNavigate();
-  let { courseId, instanceId } = useParams();
-  const { addedAttainments, setAddedAttainments } = useOutletContext();
+  const { courseId, instanceId, sisuInstanceId } = useParams();
+  const { 
+    addedAttainments, setAddedAttainments,
+    attainmentIncrementId, setIncrementId,
+  } = useOutletContext();
 
   console.log(addedAttainments);
 
@@ -44,12 +47,15 @@ const CreateAssignmentView = () => {
     try {
       // If this view is opened from the course view, add to DB
       // Else the attainment is being created during the creation of an instance so only add to the context
-      if (isNaN(instanceId)) {  // change to 'is defined' type clause
-        setAddedAttainments(addedAttainments.concat(attainments));
-        navigate(-1);
-      } else {
+      if (instanceId) {
         const updatedAttainments = assignmentServices.formatStringsToDates(attainments)[0];
         addAttainment(updatedAttainments);
+      } else if (sisuInstanceId) {
+        const temporaryId = attainmentIncrementId;
+        const [updatedAttainments, newTemporaryId] = assignmentServices.createTemporaryAttainment(addedAttainments, attainments[0], temporaryId);
+        setAddedAttainments(updatedAttainments);
+        setIncrementId(newTemporaryId);
+        navigate(-1);
       }
       // TODO: connect to backend and add attainments to DB,
       // Add possible attributes and delete unnecessary ones

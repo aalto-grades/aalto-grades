@@ -16,6 +16,7 @@ const AssignmentCategory = ({ attainment, button, width }) => {
 
   const { name, formulaId, expiryDate, subAttainments } = attainment;
   const titlepb = subAttainments.length !== 0 ? '16px' : '0px';  // title padding-bottom
+  const expiryDateString = textFormatServices.formatDateString(textFormatServices.formatDateToSlashString(expiryDate));
 
   return (
     <Box boxShadow={3} borderRadius={1} sx={{ pt: 2, pb: 0.5, bgcolor: 'white', width: width }}>
@@ -29,7 +30,7 @@ const AssignmentCategory = ({ attainment, button, width }) => {
         && <CustomAccordion attainments={subAttainments} />
       }
       <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pl: '21px', pr: '6px', pt: '8px' }}>
-        <Typography align='left' variant='caption'>{'Expiry date: ' + textFormatServices.formatDateToString(expiryDate)}</Typography>
+        <Typography align='left' variant='caption'>{'Expiry date: ' + expiryDateString}</Typography>
         {button ?? <Box height='30.5px'></Box>}
       </Box>
     </Box>

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState }  from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
@@ -14,10 +14,27 @@ import mockAttainmentsServer from '../mock-data/mockAttainmentsServer';
 
 const EditAssignmentView = () => {
   const navigate = useNavigate();
-  const { courseId, instanceId, attainmentId } = useParams();
+  const { courseId, instanceId, sisuInstanceId, attainmentId } = useParams();
+  const { 
+    addedAttainments, setAddedAttainments,
+  } = useOutletContext();
 
-  // TODO: replace with a function that gets the actual data from the server
-  const [attainments, setAttainments] = useState(assignmentServices.getFinalAttainmentById(mockAttainmentsServer, Number(attainmentId)));
+  const getAttainment = () => {
+    // If this view is opened from the course view, get attainment from DB
+    // Else the attainment is being edited during the creation of an instance so gotten from the context
+    if (instanceId) {
+      // TODO: replace with a function that gets the actual data from the server
+      return assignmentServices.getFinalAttainmentById(mockAttainmentsServer, Number(attainmentId));
+    } else if (sisuInstanceId) {
+      let attainment = addedAttainments.find(attainment => attainment.temporaryId === Number(attainmentId));
+      attainment = assignmentServices.formatDates([attainment]);
+      return attainment;
+    } else {
+      console.log('ERROR: Attainment could not be found');
+    }
+  };
+
+  const [attainments, setAttainments] = useState(getAttainment());
 
   const editAttainment = async (attainmentObject) => {
     try {
@@ -43,11 +60,19 @@ const EditAssignmentView = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     try {
-      const updatedAttainments = assignmentServices.formatStringsToDates(attainments);
-      const existingAttainments = assignmentServices.getExistingAttainments(updatedAttainments);
-      const newAttainments = assignmentServices.getNewAttainments(updatedAttainments);
-      existingAttainments.forEach((attainment) => editAttainment(attainment));
-      newAttainments.forEach((attainment) => addAttainment(attainment));
+      // If this view is opened from the course view, update DB
+      // Else the attainment is being edited during the creation of an instance so only update the context
+      if (instanceId) {
+        const updatedAttainments = assignmentServices.formatStringsToDates(attainments);
+        const existingAttainments = assignmentServices.getExistingAttainments(updatedAttainments);
+        const newAttainments = assignmentServices.getNewAttainments(updatedAttainments);
+        existingAttainments.forEach((attainment) => editAttainment(attainment));
+        newAttainments.forEach((attainment) => addAttainment(attainment));
+      } else if (sisuInstanceId) {
+        const updatedAttainments = assignmentServices.updateTemporaryAttainment(addedAttainments, attainments[0]);
+        setAddedAttainments(updatedAttainments);
+        navigate(-1);
+      }
       // TODO: connect to backend and add attainments to DB,
       // Add possible attributes and delete unnecessary ones
     } catch (exception) {

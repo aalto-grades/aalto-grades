@@ -2,37 +2,45 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import AssignmentCategory from './assignments/AssignmentCategory';
-import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
+import assignmentServices from '../services/assignments';
 
 const AddAssignmentsView = () => {
   let navigate = useNavigate();
   let { courseId, sisuInstanceId } = useParams();
 
-  const { addedAttainments, setAddedAttainments } = useOutletContext();
-  const [suggestedAttainments, setSuggestedAttainments] = useState([]);
+  const { 
+    addedAttainments, setAddedAttainments,
+    suggestedAttainments, setSuggestedAttainments,
+    attainmentIncrementId, setIncrementId,
+  } = useOutletContext();
+
+  console.log(addedAttainments);
 
   useEffect(() => {
     if (addedAttainments.length === 0) {
-      setSuggestedAttainments(mockAttainmentsClient);
+      let allSuggestedAttainments = assignmentServices.getSuggestedAttainments();
+      let [updatedAttainments, newTemporaryId] = assignmentServices.addTemporaryIds(allSuggestedAttainments, attainmentIncrementId); 
+      setIncrementId(newTemporaryId);
+      setSuggestedAttainments(updatedAttainments);
     } else {
       // if some attainments have been added, filter the suggestions to make sure there aren't duplicates
       // another possibility is to save the suggestions in context too, will consider if the retrieval is slow
-      const allSuggested = mockAttainmentsClient;
-      const nonAdded = allSuggested.filter(suggested => !addedAttainments.some(added => added.id === suggested.id));
+      const nonAdded = suggestedAttainments.filter(suggested => !addedAttainments.some(added => added.temporaryId === suggested.temporaryId));
       setSuggestedAttainments(nonAdded);
     }
   }, []);
 
   const onAddClick = (attainment) => () => {
-    const newSuggested = suggestedAttainments.filter(a => a.id !== attainment.id);
+    const newSuggested = suggestedAttainments.filter(a => a.temporaryId !== attainment.temporaryId);
     setSuggestedAttainments(newSuggested);
-    setAddedAttainments(addedAttainments.concat([attainment]));
+    const updatedAttainments = assignmentServices.addTemporaryAttainment(addedAttainments, attainment);
+    setAddedAttainments(updatedAttainments);
   };
 
   const onGoBack = () => {
@@ -52,7 +60,7 @@ const AddAssignmentsView = () => {
           { suggestedAttainments.map(attainment => {
             return (
               <AssignmentCategory 
-                key={attainment.id} 
+                key={attainment.temporaryId} 
                 attainment={attainment} 
                 button={<Button onClick={onAddClick(attainment)}>Add</Button>} 
               />
@@ -73,10 +81,10 @@ const AddAssignmentsView = () => {
             { addedAttainments.map(attainment => {
               return (
                 <AssignmentCategory 
-                  key={attainment.id} 
+                  key={attainment.temporaryId} 
                   attainment={attainment}  
                   button={<Button 
-                    onClick={ () => navigate(`/${courseId}/edit-attainment/${sisuInstanceId}/${attainment.id}`) }>
+                    onClick={ () => navigate(`/${courseId}/edit-attainment/${sisuInstanceId}/${attainment.temporaryId}`) }>
                       Edit
                   </Button>}
                 />

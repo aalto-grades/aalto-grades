@@ -4,6 +4,7 @@
 
 import axios from './axios';
 import textFormatServices from './textFormat';
+import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 
 const addAttainment = async (courseId, instanceId, attainment) => {
   const response = await axios.post(
@@ -17,6 +18,48 @@ const editAttainment = async (courseId, instanceId, attainment) => {
     `/v1/courses/${courseId}/instances/${instanceId}/attainments/${attainment.id}`,
     attainment);
   return response.data.data;
+};
+
+// Function to get mock attainments and assign temporary Ids to the top attainments (the ones with no parents).
+// Should eventually be replaced with a function that gets data from the server.
+const getSuggestedAttainments = () => { return mockAttainmentsClient; };
+
+// Function to get mock attainments and assign temporary Ids to the top attainments (the ones with no parents).
+// Should eventually be replaced with a function that gets data from the server.
+const addTemporaryIds = (attainments, temporaryId) => { 
+  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  let newTemporaryId = temporaryId;
+  updatedAttainments.forEach((attainment) => {
+    attainment.temporaryId = newTemporaryId;
+    newTemporaryId += 1;
+  });
+  return [updatedAttainments, newTemporaryId]; 
+};
+
+// Add an attainment to a temporary list of attainments and give it an ID.
+const addTemporaryAttainment = (attainments, newAttainment) => {
+  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  let updatedNewAttainment = JSON.parse(JSON.stringify(newAttainment));
+  updatedAttainments.push(updatedNewAttainment);
+  return updatedAttainments;
+};
+
+// Add an attainment to a temporary list of attainments and give it an ID.
+const createTemporaryAttainment = (attainments, newAttainment, temporaryId) => {
+  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  let updatedNewAttainment = JSON.parse(JSON.stringify(newAttainment));
+  updatedNewAttainment.temporaryId = temporaryId;
+  updatedAttainments.push(updatedNewAttainment);
+  const newTemporaryId = temporaryId + 1;
+  return [updatedAttainments, newTemporaryId];
+};
+
+// Add an attainment to a temporary list of attainments and give it an ID.
+const updateTemporaryAttainment = (attainments, newAttainment) => {
+  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  updatedAttainments = updatedAttainments.map((attainment) => attainment.temporaryId === newAttainment.temporaryId ? newAttainment : attainment);
+  console.log(updatedAttainments);
+  return updatedAttainments;
 };
 
 // The parameter 'indices' used in the following functions is an array of integres 
@@ -341,6 +384,11 @@ const deleteSubAttainments = (attainments) => {
 export default { 
   addAttainment,
   editAttainment,
+  getSuggestedAttainments,
+  addTemporaryIds,
+  addTemporaryAttainment,
+  createTemporaryAttainment,
+  updateTemporaryAttainment,
   getSubAttainments, 
   addSubAttainments, 
   removeAttainment, 
