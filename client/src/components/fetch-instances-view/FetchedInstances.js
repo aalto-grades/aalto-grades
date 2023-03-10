@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import styled from 'styled-components';
@@ -18,9 +18,8 @@ const HoverBox = styled(Box)`
   }
 `;
 
-const InstanceBox = ({ instance }) => {
+const InstanceBox = ({ courseId, instance }) => {
   let navigate = useNavigate();
-  let { courseId } = useParams();
   const { sisuCourseInstanceId, startDate, endDate, type } = instance;
 
   return(
@@ -45,25 +44,27 @@ const InstanceBox = ({ instance }) => {
 };
   
 InstanceBox.propTypes = {
+  courseId: PropTypes.string,  // Once courseId is fixed to courseId from courseCode, change to number
   instance: PropTypes.object,
   startDate: PropTypes.instanceOf(Date),
   endDate: PropTypes.instanceOf(Date),
   type: PropTypes.string,
 };
 
-const FetchedInstances = ({ info }) => {
+const FetchedInstances = ({ courseId, info }) => {
   return(
     <Box>
       {info.sort((a, b) => sortingServices.sortByDate(a.startDate, b.startDate))
         .slice()
         .map((instance) => (
-          <InstanceBox instance={instance} key={instance.sisuCourseInstanceId}/>
+          <InstanceBox courseId={courseId} instance={instance} key={instance.sisuCourseInstanceId}/>
         ))}        
     </Box>
   );
 };
 
 FetchedInstances.propTypes = {
+  courseId: PropTypes.string,  // Once courseId is fixed to courseId from courseCode, change to number
   info: PropTypes.array
 };
 

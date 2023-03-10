@@ -12,7 +12,7 @@ import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 
 const AddAssignmentsView = () => {
   let navigate = useNavigate();
-  let { courseId, instanceId } = useParams();
+  let { courseId, sisuInstanceId } = useParams();
 
   const { addedAttainments, setAddedAttainments } = useOutletContext();
   const [suggestedAttainments, setSuggestedAttainments] = useState([]);
@@ -36,11 +36,11 @@ const AddAssignmentsView = () => {
   };
 
   const onGoBack = () => {
-    navigate('/' + courseId + '/edit-instance/' + instanceId);
+    navigate('/' + courseId + '/edit-instance/' + sisuInstanceId);
   };
 
   const onConfirmAttainments = () => {
-    navigate('/' + courseId + '/instance-summary/' + instanceId);
+    navigate('/' + courseId + '/instance-summary/' + sisuInstanceId);
   };
 
   return(
@@ -63,7 +63,7 @@ const AddAssignmentsView = () => {
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', mb: 5, mt: 1, display: 'inline-block' }}>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography align='left' sx={{ ml: 1.5 }} >Create and add a new study attainment:</Typography>
-          <Button variant='outlined' onClick={ () => navigate(`/${courseId}/create-attainment/${instanceId}`) }>Create attainment</Button>
+          <Button variant='outlined' onClick={ () => navigate(`/${courseId}/create-attainment/${sisuInstanceId}`) }>Create attainment</Button>
         </Box>
       </Box>
       <Typography align='left' sx={{ ml: 1.5 }} >Added study attainments</Typography>
@@ -76,7 +76,7 @@ const AddAssignmentsView = () => {
                   key={attainment.id} 
                   attainment={attainment}  
                   button={<Button 
-                    onClick={ () => navigate(`/${courseId}/edit-attainment/${instanceId}/${attainment.id}`) }>
+                    onClick={ () => navigate(`/${courseId}/edit-attainment/${sisuInstanceId}/${attainment.id}`) }>
                       Edit
                   </Button>}
                 />

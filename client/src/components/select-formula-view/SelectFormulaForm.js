@@ -25,11 +25,11 @@ const StyledBox = styled(Box)`
   max-width: 1000px;
 `;
 
-const SelectFormulaForm = ({ assignments, formulas, courseId }) => {
+const SelectFormulaForm = ({ attainments, formulas, courseId }) => {
 
   const [formula, setFormula] = useState('');
   const [codeSnippet, setCodeSnippet] = useState('');
-  const [selectedAssignments, setSelectedAssignments] = useState([]);
+  const [selectedAttainments, setSelectedAttainments] = useState([]);
   const navigate = useNavigate();
 
   const handleFormulaChange = (event) => {
@@ -45,7 +45,7 @@ const SelectFormulaForm = ({ assignments, formulas, courseId }) => {
       // TODO: send formula to backend -> needs instance id?
       const formulaObject = ({
         formula,
-        selectedAssignments
+        selectedAttainments
       });
       console.log(formulaObject);
 
@@ -62,19 +62,19 @@ const SelectFormulaForm = ({ assignments, formulas, courseId }) => {
 
   const handleCheckboxChange = (event) => {
     if(event.target.checked) {
-      setSelectedAssignments(prev => [...prev, event.target.name]);
+      setSelectedAttainments(prev => [...prev, event.target.name]);
     } else {
-      setSelectedAssignments(prev => prev.filter(assignment => assignment !== event.target.name));
+      setSelectedAttainments(prev => prev.filter(attainment => attainment !== event.target.name));
     }
   };
 
-  const assignmentCheckboxes = () => {
+  const attainmentCheckboxes = () => {
     return (
       <>
-        { assignments.map((assignment) => (
-          <FormControlLabel key={assignment.id} control={
-            <Checkbox name={assignment.name} onChange={handleCheckboxChange}/>
-          } label={assignment.name} />
+        { attainments.map((attainment) => (
+          <FormControlLabel key={attainment.id} control={
+            <Checkbox name={attainment.name} onChange={handleCheckboxChange}/>
+          } label={attainment.name} />
         ))
         }
       </>
@@ -96,7 +96,7 @@ const SelectFormulaForm = ({ assignments, formulas, courseId }) => {
         <FormControl sx={{ m: 3,  mb: 0 }} component='fieldset' variant='standard'>
           <FormLabel component='legend' focused={false} sx={{ color: '#000', mb:1.5 }}>Select the sub study attainments you want to include in the calculation</FormLabel>
           <FormGroup>
-            {assignmentCheckboxes()}
+            {attainmentCheckboxes()}
           </FormGroup>
         </FormControl>
         <FormControl sx={{ m: 3, mt: 3, minWidth: 280 }} variant='standard'>
@@ -131,7 +131,7 @@ const SelectFormulaForm = ({ assignments, formulas, courseId }) => {
 };
 
 SelectFormulaForm.propTypes = {
-  assignments: PropTypes.array,
+  attainments: PropTypes.array,
   formulas: PropTypes.array,
   courseId: PropTypes.string,
 };

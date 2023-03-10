@@ -14,15 +14,15 @@ import mockFormulas from '../mock-data/mockFormulas';
 
 const SelectFormulaView = () => {
   const { instanceId, courseId } = useParams();
-  const [assignments, setAssignments] = useState([]);
+  const [attainments, setAttainments] = useState([]);
   const [formulas, setFormulas] = useState([]);
 
   useEffect(() => {
-    // TODO: fetch assignments for course based on the instanceId
+    // TODO: fetch attainments for course based on the instanceId
     //  -> how should this be done when instance info is in context?
-    instancesService.getAssignments(instanceId)
+    instancesService.getAttainments(instanceId)
       .then((data) => {
-        setAssignments(data);
+        setAttainments(data);
       })
       .catch((e) => console.log(e.message));
     // TODO: fetch formulas
@@ -32,7 +32,7 @@ const SelectFormulaView = () => {
       })
       .catch((e) => console.log(e.message));
     // DELETE THIS AFTER ROUTES WORK!
-    setAssignments(mockAttainments);
+    setAttainments(mockAttainments);
     setFormulas(mockFormulas);
   }, []);
 
@@ -47,7 +47,7 @@ const SelectFormulaView = () => {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1, mb: 2 }}>
           Result: Course Total Grade
         </Typography>
-        <SelectFormulaForm assignments={assignments} formulas={formulas} courseId={courseId} />
+        <SelectFormulaForm attainments={attainments} formulas={formulas} courseId={courseId} />
       </Box>
     </Box>
 

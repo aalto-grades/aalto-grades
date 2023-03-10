@@ -23,6 +23,7 @@ const mockPastInstances = mockInstances
 const CourseView = () => {
   let navigate = useNavigate();
   let { courseCode } = useParams();
+  const courseId = courseCode;  // Fetch courseId from params when possible
 
   const { auth } = useAuth();
 
@@ -32,7 +33,9 @@ const CourseView = () => {
         <Typography variant='h3' sx={{ fontWeight: 'light' }}>{courseCode + ' – ' + mockCurrentInstance.courseData.name.en}</Typography>
         { /* Only admins and teachers are allowed to create a new instance */
           (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
-          <Button size='large' variant='contained' onClick={() => { navigate('/fetch-instances/' + courseCode); }}>
+          <Button size='large' variant='contained' onClick={() => { 
+            navigate(`/${courseId}/fetch-instances/${courseCode}`); 
+          }}>
             New instance
           </Button>
         }
@@ -41,7 +44,7 @@ const CourseView = () => {
         <OngoingInstanceInfo info={mockCurrentInstance} />
         { /* a different attainment component will be created for students */
           (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
-          <Assignments attainments={mockAttainmentsClient} formula={'Weighted Average'} courseId={courseCode} instance={mockCurrentInstance} /> /* TODO: Retrieve real formula */
+          <Assignments attainments={mockAttainmentsClient} formula={'Weighted Average'} courseId={courseId} instance={mockCurrentInstance} /> /* TODO: Retrieve real formula */
         }
       </Box>
       <Typography variant='h4' align='left' sx={{ fontWeight: 'light', mt: 8, mb: 3 }}>Past Instances</Typography>
