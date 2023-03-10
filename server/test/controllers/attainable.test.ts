@@ -311,7 +311,8 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/attainments', ()
       let res: supertest.Response = await request
         .post('/v1/courses/1/instances/1/attainments')
         .send(mockAttainable)
-        .set('Content-Type', 'application/json');
+        .set('Content-Type', 'application/json')
+        .expect(HttpCode.Ok);
 
       const id: number = Number(res.body.data.attainment.id);
 
@@ -370,7 +371,8 @@ describe('Test PUT /v1/courses/:courseId/instances/:instanceId/attainments/:atta
     let res: supertest.Response = await request
       .post('/v1/courses/1/instances/1/attainments')
       .send(mockAttainable)
-      .set('Content-Type', 'application/json');
+      .set('Content-Type', 'application/json')
+      .expect(HttpCode.Ok);
 
     parentAttainable = res.body.data.attainment;
 
@@ -399,7 +401,8 @@ describe('Test PUT /v1/courses/:courseId/instances/:instanceId/attainments/:atta
       let res: supertest.Response = await request
         .post('/v1/courses/2/instances/2/attainments')
         .send(mockAttainable)
-        .set('Content-Type', 'application/json');
+        .set('Content-Type', 'application/json')
+        .expect(HttpCode.Ok);
 
       parentAttainable = res.body.data.attainment;
 
@@ -496,4 +499,13 @@ describe('Test PUT /v1/courses/:courseId/instances/:instanceId/attainments/:atta
       expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
       expect(res.statusCode).toBe(HttpCode.BadRequest);
     });
+});
+
+describe('Test GET /v1/courses/:courseId/instances/:instanceId/grades', () => {
+  it('should calculate correct grades', async () => {
+    // Create a new attainables.
+    let res: supertest.Response = await request
+      .get('/v1/courses/2/instances/2/grades')
+      .expect(HttpCode.Ok);
+  });
 });

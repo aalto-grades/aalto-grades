@@ -11,7 +11,7 @@ import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 import UserAttainmentGrade from '../database/models/userAttainmentGrade';
 
-import { AttainableData, AttainableRequestData } from '../types/attainable';
+import { AttainableData, AttainableRequestData, Formula, FormulaParams } from '../types/attainable';
 import { ApiError } from '../types/error';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
@@ -88,7 +88,8 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
     courseInstanceId: courseInstanceId,
     name: name,
     date: date,
-    expiryDate: expiryDate
+    expiryDate: expiryDate,
+    formulaId: Formula.MANUAL,
   });
 
   async function processSubAttainables(
@@ -104,7 +105,8 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
         courseInstanceId: courseInstanceId,
         name: attainable.name,
         date: attainable.date,
-        expiryDate: attainable.expiryDate
+        expiryDate: attainable.expiryDate,
+        formulaId: Formula.MANUAL,
       });
 
       if (attainable.subAttainments.length > 0) {
@@ -235,10 +237,6 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
   });
 }
 
-export enum Formula {
-  MANUAL = 'MANUAL',
-  WEIGHTED_AVERAGE = 'WEIGHTED_AVERAGE',
-}
 enum Status {
   PASS = 'pass',
   FAIL = 'fail',
@@ -246,10 +244,6 @@ enum Status {
 type CalculationResult = {
   status: Status;
   points: number | undefined;
-}
-interface FormulaParams {
-  min: number;
-  max: number;
 }
 type WeightedAssignmentParams = {
   min: number;
@@ -320,10 +314,9 @@ async function validate<P extends FormulaParams>(
   return (subGrades) => fn(params as P, subGrades);
 }
 
-function getFormula(name: Formula, params: string) {
+function getFormula(name: Formula, params: FormulaParams) {
   const formulaWithSchema = formulasWithSchema.get(name)!;
-  const parsedParams = JSON.parse(params);
-  return validate(formulaWithSchema[1], formulaWithSchema[0], parsedParams);
+  return validate(formulaWithSchema[1], formulaWithSchema[0], params);
 }
 
 async function calculate(tree: FormulaNode, presetPoints: Map<FormulaNode, number>): Promise<CalculationResult> {
@@ -347,8 +340,8 @@ export async function calculateGrades(req: Request, res: Response): Promise<void
   let attainables: Array<{
     id: number,
     attainableId: number,
-    // formulaId: string,
-    // formulaParams: string, // json
+    formulaId: Formula | null,
+    formulaParams: FormulaParams | null,
   }> = await Attainable.findAll({
     where: {
       courseId,
@@ -357,15 +350,20 @@ export async function calculateGrades(req: Request, res: Response): Promise<void
     attributes: [
       'id',
       'attainableId',
+      'formulaId',
+      'formulaParams',
     ]
   });
 
   let rootAttainable = null;
   for (const attainable of attainables) {
-    const formulaId = 'MANUAL' // attainable.formulaId;
-    const params = '{}' //attainable.params;
+    const formulaId = attainable.formulaId;
+    const params = attainable.formulaParams;
     if (!(await formulaChecker.validate(formulaId))) {
       throw new Error('bad');
+    }
+    if (params === null) {
+      throw new ApiError('the parameters for a formula haven\'t been set', HttpCode.BadRequest);
     }
 
     formulaNodesById.set(attainable.id, {

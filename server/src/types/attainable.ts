@@ -22,3 +22,12 @@ export interface AttainableData {
   subAttainables?: Array<AttainableData>
   subAttainments?: Array<AttainableData>
 }
+
+export enum Formula {
+  MANUAL = 'MANUAL',
+  WEIGHTED_AVERAGE = 'WEIGHTED_AVERAGE',
+}
+export interface FormulaParams {
+  min: number;
+  max: number;
+}

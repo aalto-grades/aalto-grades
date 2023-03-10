@@ -207,7 +207,7 @@ router.put(
  *             schema:
  *               $ref: '#/definitions/Failure'
  */
-router.put(
+router.get(
   '/v1/courses/:courseId/instances/:instanceId/grades',
   express.json(),
   handleInvalidRequestJson,
