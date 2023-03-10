@@ -10,11 +10,11 @@ import CustomAccordion from './Accordion';
 import textFormatServices from '../../services/textFormat';
 import formulasService from '../../services/formulas';
 
-// This component renders a "category" of assignments, e.g. all assignments that are exams
+// This component renders a "category" of attainments, e.g. all attainments that are exams
 // TODO: replace the points with formulas
-const AssignmentCategory = ({ assignment, button, width }) => {
+const AssignmentCategory = ({ attainment, button, width }) => {
 
-  const { name, formulaId, expiryDate, subAttainments } = assignment;
+  const { name, formulaId, expiryDate, subAttainments } = attainment;
   const titlepb = subAttainments.length !== 0 ? '16px' : '0px';  // title padding-bottom
 
   return (
@@ -26,7 +26,7 @@ const AssignmentCategory = ({ assignment, button, width }) => {
         }
       </Box>
       { subAttainments.length !== 0
-        && <CustomAccordion assignments={subAttainments} />
+        && <CustomAccordion attainments={subAttainments} />
       }
       <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pl: '21px', pr: '6px', pt: '8px' }}>
         <Typography align='left' variant='caption'>{'Expiry date: ' + textFormatServices.formatDateToString(expiryDate)}</Typography>
@@ -37,7 +37,7 @@ const AssignmentCategory = ({ assignment, button, width }) => {
 };
 
 AssignmentCategory.propTypes = {
-  assignment: PropTypes.object,
+  attainment: PropTypes.object,
   button: PropTypes.element,
   width: PropTypes.string
 };

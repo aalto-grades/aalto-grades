@@ -29,29 +29,29 @@ describe('Tests for CourseView component', () => {
 
     const instanceInfo = screen.getByText('Ongoing Instance');
     const teachersInfo = screen.getByText('Teachers in Charge');
-    const assignments = screen.getByText('Study Attainments');
-    const exercises = screen.getByText('Exercises');  // Assignment
-    const projects = screen.getByText('Project');  // Assignment
-    const exams = screen.getAllByText('Exam');  // Assignmnets and instance types
+    const attainments = screen.getByText('Study Attainments');
+    const exercises = screen.getByText('Exercises');  // Attainment
+    const projects = screen.getByText('Project');  // Attainment
+    const exams = screen.getAllByText('Exam');  // Attainments and instance types
     const pastInstances = screen.getByText('Past Instances');
     const createInstanceButton = screen.getByText('New instance');
-    const addAssignmentButton = screen.getByText('Add attainment');
+    const addAttainmentButton = screen.getByText('Add attainment');
     const seeAttendeesButton = screen.getByText('See attendees');
 
     expect(instanceInfo).toBeDefined();
     expect(teachersInfo).toBeDefined();
-    expect(assignments).toBeDefined();
+    expect(attainments).toBeDefined();
     expect(exercises).toBeDefined();
     expect(projects).toBeDefined();
     expect(exams).toBeDefined();
     expect(pastInstances).toBeDefined();
     expect(createInstanceButton).toBeDefined();
-    expect(addAssignmentButton).toBeDefined();
+    expect(addAttainmentButton).toBeDefined();
     expect(seeAttendeesButton).toBeDefined();
     
   });
 
-  test('CourseView should not render new instance button, see attendees or allow editing assignments for students', () => {
+  test('CourseView should not render new instance button, see attendees or allow editing attainments for students', () => {
 
     const auth = { role: 'STUDENT' };
     renderCourseView(auth);

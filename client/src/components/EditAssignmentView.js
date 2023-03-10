@@ -10,14 +10,14 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Assignment from './create-assignment/Assignment';
 import assignmentServices from '../services/assignments';
-import mockAssignmentsServer from '../mock-data/mockAssignmentsServer';
+import mockAttainmentsServer from '../mock-data/mockAttainmentsServer';
 
 const EditAssignmentView = () => {
   const navigate = useNavigate();
-  const { courseId, instanceId, assignmentId } = useParams();
+  const { courseId, instanceId, attainmentId } = useParams();
 
   // TODO: replace with a function that gets the actual data from the server
-  const [assignments, setAssignments] = useState(assignmentServices.getFinalAssignmentById(mockAssignmentsServer, Number(assignmentId)));
+  const [attainments, setAttainments] = useState(assignmentServices.getFinalAttainmentById(mockAttainmentsServer, Number(attainmentId)));
 
   const editAttainment = async (attainmentObject) => {
     try {
@@ -43,26 +43,26 @@ const EditAssignmentView = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     try {
-      const updatedAssignments = assignmentServices.formatStringsToDates(assignments);
-      const existingAttainments = assignmentServices.getExistingAttainments(updatedAssignments);
-      const newAttainments = assignmentServices.getNewAttainments(updatedAssignments);
+      const updatedAttainments = assignmentServices.formatStringsToDates(attainments);
+      const existingAttainments = assignmentServices.getExistingAttainments(updatedAttainments);
+      const newAttainments = assignmentServices.getNewAttainments(updatedAttainments);
       existingAttainments.forEach((attainment) => editAttainment(attainment));
       newAttainments.forEach((attainment) => addAttainment(attainment));
-      // TODO: connect to backend and add assignments to DB,
+      // TODO: connect to backend and add attainments to DB,
       // Add possible attributes and delete unnecessary ones
     } catch (exception) {
       console.log(exception);
     }
   };
 
-  const deleteAssignment = () => {
-    // TODO: connect to backend and delete assignments from DB,
+  const deleteAttainment = () => {
+    // TODO: connect to backend and delete attainments from DB,
     navigate(-1);
   };
 
-  const removeAssignment = (indices) => {
-    const updatedAssignments = assignmentServices.removeAssignment(indices, assignments);
-    setAssignments(updatedAssignments);
+  const removeAttainment = (indices) => {
+    const updatedAttainments = assignmentServices.removeAttainment(indices, attainments);
+    setAttainments(updatedAttainments);
   };
 
   return(
@@ -84,13 +84,13 @@ const EditAssignmentView = () => {
           }}>
             <Assignment 
               indices={[0]}
-              assignments={assignments} 
-              setAssignments={setAssignments} 
-              removeAssignment={removeAssignment}
+              attainments={attainments} 
+              setAttainments={setAttainments} 
+              removeAttainment={removeAttainment}
             />
           </Box>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
-            <Button size='medium' variant='outlined' color='error' onClick={deleteAssignment} sx={{ ml: 2 }}>Delete Attainment</Button>
+            <Button size='medium' variant='outlined' color='error' onClick={deleteAttainment} sx={{ ml: 2 }}>Delete Attainment</Button>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}>
               <Button size='medium' variant='outlined' onClick={ () => navigate(-1) }>Cancel</Button>
               <Button size='medium' variant='contained' type='submit' onClick={handleSubmit} sx={{ mr: 2 }}>Confirm</Button>

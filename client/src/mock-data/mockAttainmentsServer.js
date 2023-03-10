@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-const mockAssignmentsServer = [
+const mockAttainmentsServer = [
   { 
     courseId: 2,
     instanceId: 2,
@@ -14,5 +14,5 @@ const mockAssignmentsServer = [
   },
 ];
   
-export default mockAssignmentsServer;
+export default mockAttainmentsServer;
   

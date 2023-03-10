@@ -16,10 +16,10 @@ const getSisuInstance = async (instanceId) => {
   return response.data.data;
 };
 
-const getAssignments = async (instanceId) => {
+const getAttainments = async (instanceId) => {
   const response = await axios.get('/v1/??' + instanceId);
   console.log(response.data);
   return response.data;
 };
 
-export default { getSisuInstances, getSisuInstance, getAssignments };
+export default { getSisuInstances, getSisuInstance, getAttainments };

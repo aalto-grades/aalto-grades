@@ -96,7 +96,7 @@ const EditInstanceForm = ({ instance }) => {
         gradingScale,
       });
       console.log(basicInfoObject);
-      navigate('/' + courseId + '/add-assignments/' + instanceId);
+      navigate('/' + courseId + '/add-attainments/' + instanceId);
     } catch (exception) {
       console.log(exception);
     }

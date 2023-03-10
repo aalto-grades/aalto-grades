@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-const mockAssignmentsClient = [
+const mockAttainmentsClient = [
   { id: 1,
     name: 'Exercises',
     category: 'Other',
@@ -133,4 +133,4 @@ const mockAssignmentsClient = [
   }
 ];
 
-export default mockAssignmentsClient;
+export default mockAttainmentsClient;

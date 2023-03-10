@@ -10,31 +10,31 @@ import assignmentServices from '../../services/assignments';
 
 // Parent component for the components LeafAssignment and ParentAssignment 
 
-const Assignment = ({ indices, assignments, setAssignments, removeAssignment, formulaAttributeNames }) => {
+const Assignment = ({ indices, attainments, setAttainments, removeAttainment, formulaAttributeNames }) => {
 
-  const addSubAttainments = (numOfAssignments) => {
-    const updatedAssignments = assignmentServices.addSubAttainments(indices, assignments, numOfAssignments);
-    setAssignments(updatedAssignments);
+  const addSubAttainments = (numOfAttainments) => {
+    const updatedAttainments = assignmentServices.addSubAttainments(indices, attainments, numOfAttainments);
+    setAttainments(updatedAttainments);
   };
   
   return (
     <>
-      {assignmentServices.getSubAttainments(indices, assignments).length === 0 ?
+      {assignmentServices.getSubAttainments(indices, attainments).length === 0 ?
         <LeafAssignment 
           indices={indices}
           addSubAttainments={addSubAttainments}
-          assignments={assignments} 
-          setAssignments={setAssignments} 
-          removeAssignment={removeAssignment}
+          attainments={attainments} 
+          setAttainments={setAttainments} 
+          removeAttainment={removeAttainment}
           formulaAttributeNames={formulaAttributeNames}
         />
         :
         <ParentAssignment
           indices={indices}
           addSubAttainments={addSubAttainments}
-          assignments={assignments} 
-          setAssignments={setAssignments} 
-          removeAssignment={removeAssignment}
+          attainments={attainments} 
+          setAttainments={setAttainments} 
+          removeAttainment={removeAttainment}
           formulaAttributeNames={formulaAttributeNames}
         />}
     </>
@@ -42,10 +42,10 @@ const Assignment = ({ indices, assignments, setAssignments, removeAssignment, fo
 };
 
 Assignment.propTypes = {
-  assignments: PropTypes.array,
-  setAssignments: PropTypes.func,
+  attainments: PropTypes.array,
+  setAttainments: PropTypes.func,
   indices: PropTypes.array,
-  removeAssignment: PropTypes.func,
+  removeAttainment: PropTypes.func,
   formulaAttributeNames: PropTypes.array,
 };
 

@@ -44,7 +44,7 @@ describe('Tests for CreateAssignmentView components', () => {
     expect(confirmButton).toBeInTheDocument();
   }),
 
-  test('CreateAssignmentView should allow a teacher to create an assignment with a ready category', async () => {
+  test('CreateAssignmentView should allow a teacher to create an attainment with a ready category', async () => {
 
     const logSpy = jest.spyOn(global.console, 'log');
 
@@ -52,7 +52,7 @@ describe('Tests for CreateAssignmentView components', () => {
     const testDate = '2023-09-01';
     const testExpiry = '2025-09-01';
 
-    const mockAssignments = [{
+    const mockAttainments = [{
       category: testCategory,
       name: testCategory,
       date: testDate,
@@ -84,15 +84,15 @@ describe('Tests for CreateAssignmentView components', () => {
     userEvent.type(expiryField, testExpiry);
     userEvent.click(confirmButton);
 
-    // Eventually test the function that adds an assignment to backend
+    // Eventually test the function that adds an attainment to backend
     expect(logSpy).toHaveBeenCalledTimes(1); 
-    expect(logSpy).toHaveBeenCalledWith(mockAssignments);
+    expect(logSpy).toHaveBeenCalledWith(mockAttainments);
 
     logSpy.mockRestore();
 
   });
 
-  test('CreateAssignmentView should allow a teacher to create an assignment with a new category', async () => {
+  test('CreateAssignmentView should allow a teacher to create an attainment with a new category', async () => {
 
     const logSpy = jest.spyOn(global.console, 'log');
 
@@ -101,7 +101,7 @@ describe('Tests for CreateAssignmentView components', () => {
     const testDate = '2023-09-01';
     const testExpiry = '2025-09-01';
 
-    const mockAssignments = [{
+    const mockAttainments = [{
       category: testCategory,
       name: testName,
       date: testDate,
@@ -135,18 +135,18 @@ describe('Tests for CreateAssignmentView components', () => {
     userEvent.type(expiryField, testExpiry);
     userEvent.click(confirmButton);
 
-    // Eventually test the function that adds an assignment to backend
+    // Eventually test the function that adds an attainment to backend
     expect(logSpy).toHaveBeenCalledTimes(1); 
-    expect(logSpy).toHaveBeenCalledWith(mockAssignments);
+    expect(logSpy).toHaveBeenCalledWith(mockAttainments);
 
     logSpy.mockRestore();
   });
 
-  test('CreateAssignmentView should allow a teacher to create sub-assignments', async () => {
+  test('CreateAssignmentView should allow a teacher to create sub-attainments', async () => {
 
     const logSpy = jest.spyOn(global.console, 'log');
 
-    const mockAssignments = [{
+    const mockAttainments = [{
       category: '',
       name: '',
       date: '',
@@ -173,7 +173,7 @@ describe('Tests for CreateAssignmentView components', () => {
     const creationButton = screen.getByText('Create Sub-Attainments');
     expect(creationButton).toBeInTheDocument();
 
-    // Create one sub-assignment
+    // Create one sub-attainment
     userEvent.click(creationButton);
 
     const numberField = screen.getByLabelText('Number of sub-attainments');
@@ -182,10 +182,10 @@ describe('Tests for CreateAssignmentView components', () => {
     const confirmButtons = await screen.findAllByText('Confirm');
     const numConfirmButton = confirmButtons[1]; // the second one aka the one in the dialog
 
-    // the default number of sub-assignments in the Dialog element is 1 so this call creates one sub-assignment
+    // the default number of sub-attainments in the Dialog element is 1 so this call creates one sub-attainment
     userEvent.click(numConfirmButton);
 
-    // Check that there is one sub-assignment so one 'Cancel'-button
+    // Check that there is one sub-attainment so one 'Cancel'-button
     const cancelButtons = await screen.findAllByText('Cancel');
     const addButton = screen.getByText('Add Sub-Attainments');
 
@@ -194,9 +194,9 @@ describe('Tests for CreateAssignmentView components', () => {
 
     userEvent.click(confirmButtons[0]);
 
-    // Eventually test the function that adds an assignment to backend
+    // Eventually test the function that adds an attainment to backend
     expect(logSpy).toHaveBeenCalledTimes(1); 
-    expect(logSpy).toHaveBeenCalledWith(mockAssignments);
+    expect(logSpy).toHaveBeenCalledWith(mockAttainments);
 
     logSpy.mockRestore();
   });

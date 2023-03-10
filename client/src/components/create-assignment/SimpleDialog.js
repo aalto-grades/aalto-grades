@@ -12,24 +12,24 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import assignmentServices from '../../services/assignments';
 
-// A Dialog component for asking the number of sub-assignments
+// A Dialog component for asking the number of sub-attainments
 
 const numberData = {
   fieldId: 'numberData',
   fieldLabel: 'Number of sub-attainments'
 };
     
-function SimpleDialog({ handleClose, open, addSubAttainments, indices, assignments }) {
+function SimpleDialog({ handleClose, open, addSubAttainments, indices, attainments }) {
 
-  const [numOfAssignments, setSubAttainments] = useState('1');
+  const [numOfAttainments, setSubAttainments] = useState('1');
 
   // The value given should be an integer of one or higher
-  const error = !(!isNaN(numOfAssignments) && (Number.isInteger(Number(numOfAssignments))) && (Number(numOfAssignments) >= 1));
+  const error = !(!isNaN(numOfAttainments) && (Number.isInteger(Number(numOfAttainments))) && (Number(numOfAttainments) >= 1));
 
   const handleSubmit = (event) => {
     event.preventDefault();
     try {
-      addSubAttainments(numOfAssignments);
+      addSubAttainments(numOfAttainments);
       handleClose();
     } catch (exception) {
       console.log(exception);
@@ -38,7 +38,7 @@ function SimpleDialog({ handleClose, open, addSubAttainments, indices, assignmen
 
   return (
     <Dialog open={open} >
-      {assignmentServices.getSubAttainments(indices, assignments).length === 0 ?
+      {assignmentServices.getSubAttainments(indices, attainments).length === 0 ?
         <DialogTitle>Create Sub Study Attainments</DialogTitle>
         :
         <DialogTitle>Add Sub Study Attainments</DialogTitle>}
@@ -52,7 +52,7 @@ function SimpleDialog({ handleClose, open, addSubAttainments, indices, assignmen
             InputLabelProps={{ shrink: true }}
             margin='normal'
             inputProps={{ min: 1, maxLength: 2, inputMode: 'numeric', pattern: '[0-9]*' }}
-            value={numOfAssignments}
+            value={numOfAttainments}
             error={error}
             helperText={error ? 'Value needs to be a positive integer' : ''}
             sx={{ width: '100%' }}
@@ -80,7 +80,7 @@ SimpleDialog.propTypes = {
   handleClose: PropTypes.func,
   open: PropTypes.bool,
   addSubAttainments: PropTypes.func,
-  assignments: PropTypes.array,
+  attainments: PropTypes.array,
   indices: PropTypes.array
 };
 

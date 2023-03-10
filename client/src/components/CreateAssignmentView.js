@@ -14,12 +14,12 @@ import assignmentServices from '../services/assignments';
 const CreateAssignmentView = () => {
   const navigate = useNavigate();
   let { courseId, instanceId } = useParams();
-  const { addedAssignments, setAddedAssignments } = useOutletContext();
+  const { addedAttainments, setAddedAttainments } = useOutletContext();
 
-  console.log(addedAssignments);
+  console.log(addedAttainments);
 
-  // The property 'category' must be specified for each assignment in order to populate the textfields correctly
-  const [assignments, setAssignments] = useState([{
+  // The property 'category' must be specified for each attainment in order to populate the textfields correctly
+  const [attainments, setAttainments] = useState([{
     category: '',
     name: '',
     date: '',
@@ -45,22 +45,22 @@ const CreateAssignmentView = () => {
       // If this view is opened from the course view, add to DB
       // Else the attainment is being created during the creation of an instance so only add to the context
       if (isNaN(instanceId)) {  // change to 'is defined' type clause
-        setAddedAssignments(addedAssignments.concat(assignments));
+        setAddedAttainments(addedAttainments.concat(attainments));
         navigate(-1);
       } else {
-        const updatedAssignments = assignmentServices.formatStringsToDates(assignments)[0];
-        addAttainment(updatedAssignments);
+        const updatedAttainments = assignmentServices.formatStringsToDates(attainments)[0];
+        addAttainment(updatedAttainments);
       }
-      // TODO: connect to backend and add assignmentes to DB,
+      // TODO: connect to backend and add attainments to DB,
       // Add possible attributes and delete unnecessary ones
     } catch (exception) {
       console.log(exception);
     }
   };
 
-  const removeAssignment = (indices) => {
-    const updatedAssignments = assignmentServices.removeAssignment(indices, assignments);
-    setAssignments(updatedAssignments);
+  const removeAttainment = (indices) => {
+    const updatedAttainments = assignmentServices.removeAttainment(indices, attainments);
+    setAttainments(updatedAttainments);
   };
 
   return(
@@ -80,12 +80,12 @@ const CreateAssignmentView = () => {
             pb: 1,
             px: 2,
           }}>
-            {/* Create the root assignment */}
+            {/* Create the root attainment */}
             <Assignment 
               indices={[0]}
-              assignments={assignments} 
-              setAssignments={setAssignments} 
-              removeAssignment={removeAssignment}
+              attainments={attainments} 
+              setAttainments={setAttainments} 
+              removeAttainment={removeAttainment}
             />
           </Box>
           <Button size='medium' variant='outlined' onClick={ () => navigate(-1) } sx={{ mr: 1 }}>

@@ -9,7 +9,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import EditAssignmentView from '../components/EditAssignmentView';
 import assignmentServices from '../services/assignments';
-import mockAssignmentsClient from '../mock-data/mockAssignmentsClient';
+import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 
 const mockAssignmentId = 1;
 
@@ -17,9 +17,9 @@ describe('Tests for EditAssignmentView components', () => {
 
   const renderEditAssignmentView = async () => {
     return render(
-      <MemoryRouter initialEntries={['/edit-assignment/A-12345/' + mockAssignmentId]}>
+      <MemoryRouter initialEntries={['/edit-attainment/A-12345/' + mockAssignmentId]}>
         <Routes>
-          <Route path='/edit-assignment/:instanceId/:assignmentId' element={<EditAssignmentView/>}/>
+          <Route path='/edit-attainment/:instanceId/:attainmentId' element={<EditAssignmentView/>}/>
         </Routes>
       </MemoryRouter>
     );
@@ -34,11 +34,11 @@ describe('Tests for EditAssignmentView components', () => {
       const categoryField = await screen.findAllByLabelText('Name');
       const confirmButton = screen.getByText('Confirm');
 
-      let mockAssignment = [mockAssignmentsClient.find((assignment) => assignment.id === mockAssignmentId)];
-      const numOfAssignments = assignmentServices.getNumOfAssignments(mockAssignment);
+      let mockAssignment = [mockAttainmentsClient.find((attainment) => attainment.id === mockAssignmentId)];
+      const numOfAttainments = assignmentServices.getNumOfAttainments(mockAssignment);
 
       expect(headingElement).toBeInTheDocument();
-      expect(categoryField).toHaveLength(numOfAssignments);
+      expect(categoryField).toHaveLength(numOfAttainments);
       expect(confirmButton).toBeInTheDocument();
     });
   });
@@ -47,7 +47,7 @@ describe('Tests for EditAssignmentView components', () => {
 
     const logSpy = jest.spyOn(global.console, 'log');
 
-    let mockAssignment = [mockAssignmentsClient.find((assignment) => assignment.id === mockAssignmentId)];
+    let mockAssignment = [mockAttainmentsClient.find((attainment) => attainment.id === mockAssignmentId)];
     mockAssignment = assignmentServices.formatDates(mockAssignment);
 
     renderEditAssignmentView();
@@ -57,7 +57,7 @@ describe('Tests for EditAssignmentView components', () => {
       const confirmButton = screen.getByText('Confirm');
       userEvent.click(confirmButton);
 
-      // Eventually test the function that adds an assignment to backend
+      // Eventually test the function that adds an attainment to backend
       expect(logSpy).toHaveBeenCalledTimes(1); 
       expect(logSpy).toHaveBeenCalledWith(mockAssignment);
 

@@ -112,15 +112,15 @@ function App() {
               { /* Pages under this route share instance creation context */ }
               <Route element={<InstanceCreationRoute/>}>
                 <Route path=':courseId/edit-instance/:instanceId' element={<EditInstanceView/>}/>
-                <Route path=':courseId/add-assignments/:instanceId' element={<AddAssignmentsView/>}/>
+                <Route path=':courseId/add-attainments/:instanceId' element={<AddAssignmentsView/>}/>
                 <Route path=':courseId/instance-summary/:instanceId' element={<InstanceSummaryView/>}/>
-                <Route path=':courseId/create-assignment/:instanceId' element={<CreateAssignmentView/>}/>
-                <Route path=':courseId/edit-assignment/:instanceId/:assignmentId' element={<EditAssignmentView/>}/>
+                <Route path=':courseId/create-attainment/:instanceId' element={<CreateAssignmentView/>}/>
+                <Route path=':courseId/edit-attainment/:instanceId/:attainmentId' element={<EditAssignmentView/>}/>
               </Route>
               <Route path='/select-formula' element={<SelectFormulaView/>}/>
-              { /* Path above will be replaced with '/select-formula/:instanceId/:assignmentId' once component is connected to a page */ }
-              <Route path=':courseId/create-assignment/:instanceId' element={<CreateAssignmentView/>}/>
-              <Route path=':courseId/edit-assignment/:instanceId/:assignmentId' element={<EditAssignmentView/>}/>
+              { /* Path above will be replaced with '/select-formula/:instanceId/:aattainmentId' once component is connected to a page */ }
+              <Route path=':courseId/create-attainment/:instanceId' element={<CreateAssignmentView/>}/>
+              <Route path=':courseId/edit-attainment/:instanceId/:attainmentId' element={<EditAssignmentView/>}/>
             </Route>
           </Routes>
         </Box>
