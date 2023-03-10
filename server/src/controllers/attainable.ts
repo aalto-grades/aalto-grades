@@ -10,7 +10,6 @@ import Attainable from '../database/models/attainable';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 import UserAttainmentGrade from '../database/models/userAttainmentGrade';
-import { WeightedAssignment } from '../types/assignment';
 
 import { AttainableData, AttainableRequestData } from '../types/attainable';
 import { ApiError } from '../types/error';
@@ -343,8 +342,6 @@ export async function calculateGrades(req: Request, res: Response): Promise<void
   await idSchema.validate({ id: courseId }, { abortEarly: false });
   await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
 
-  let tree: FormulaNode;
-  const presetPoints: Map<FormulaNode, number> = new Map(); // per student
   let formulaNodesById: Map<number, FormulaNode> = new Map();
 
   let attainables: Array<{
