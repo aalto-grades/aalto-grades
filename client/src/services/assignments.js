@@ -6,6 +6,8 @@ import axios from './axios';
 import textFormatServices from './textFormat';
 import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 
+// Functions that are (or will be) connected to the server.
+
 const addAttainment = async (courseId, instanceId, attainment) => {
   const response = await axios.post(
     `/v1/courses/${courseId}/instances/${instanceId}/attainments`,
@@ -20,16 +22,19 @@ const editAttainment = async (courseId, instanceId, attainment) => {
   return response.data.data;
 };
 
-// Function to get mock attainments and assign temporary Ids to the top attainments (the ones with no parents).
+// Function to get mock attainments.
 // Should eventually be replaced with a function that gets data from the server.
 const getSuggestedAttainments = () => { return mockAttainmentsClient; };
 
-// Function to get mock attainments and assign temporary Ids to the top attainments (the ones with no parents).
-// Should eventually be replaced with a function that gets data from the server.
+
+// The following functions are used to add temporary ids, and to create, add and delete temporary attainments.
+// These functions are mainly used in order to complete the functionality of creating, adding and editing
+// attainments duing the creation of an instance.
+
+// Function to assign temporary Ids to attainments.
 const addTemporaryIds = (attainments, temporaryId) => {
-
+  
   let newTemporaryId = temporaryId;
-
   const addTemporaryId = (modifiabelAttainments) => {
     modifiabelAttainments.forEach((attainment) => {
       attainment.temporaryId = newTemporaryId;
@@ -43,10 +48,9 @@ const addTemporaryIds = (attainments, temporaryId) => {
   const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   addTemporaryId(updatedAttainments);
   return [updatedAttainments, newTemporaryId];
-
 };
 
-// Add an attainment to a temporary list of attainments and give it an ID.
+// Add an attainment to a temporary list of attainments.
 const addTemporaryAttainment = (attainments, newAttainment) => {
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
   let updatedNewAttainment = JSON.parse(JSON.stringify(newAttainment));
@@ -54,7 +58,7 @@ const addTemporaryAttainment = (attainments, newAttainment) => {
   return updatedAttainments;
 };
 
-// Add an attainment to a temporary list of attainments and give it an ID.
+// Add an attainment to a temporary list of attainments and give it a temporary id.
 const createTemporaryAttainment = (attainments, newAttainment, temporaryId) => {
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
   let updatedNewAttainment = JSON.parse(JSON.stringify(newAttainment));
@@ -64,20 +68,23 @@ const createTemporaryAttainment = (attainments, newAttainment, temporaryId) => {
   return [updatedAttainments, newTemporaryId];
 };
 
-// Add an attainment to a temporary list of attainments and give it an ID.
+// Update an attainment in a temporary list of attainments.
 const updateTemporaryAttainment = (attainments, newAttainment) => {
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
   updatedAttainments = updatedAttainments.map((attainment) => attainment.temporaryId === newAttainment.temporaryId ? newAttainment : attainment);
   return updatedAttainments;
 };
 
-// Add an attainment to a temporary list of attainments and give it an ID.
+// Delete an attainment from a temporary list of attainments.
 const deleteTemporaryAttainment = (attainments, newAttainment) => {
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
   updatedAttainments = updatedAttainments.filter((attainment) => attainment.temporaryId !== newAttainment.temporaryId);
-  console.log(updatedAttainments);
   return updatedAttainments;
 };
+
+
+// The following functions are used to cmoplete the functionality that is needed 
+// for the components used in CreateAssignmentView and EditAssignmentView
 
 // The parameter 'indices' used in the following functions is an array of integres 
 // that displays the indices of an attainment on different levels.
@@ -306,7 +313,6 @@ const formatStringsToDates = (attainments) => {
 const getAttainmentById = (attainments, attainmentId) => {
 
   let finalAttainment = {};
-
   const findAttainment = (modifiabelAttainments) => {
     modifiabelAttainments.forEach((attainment) => {
       if (attainment.id === attainmentId) {
@@ -341,7 +347,6 @@ const getFinalAttainmentById = (allAttainments, attainmentId) => {
 const getNumOfAttainments = (attainments) => {
 
   let sum = 0;
-
   const countAttainment = (modifiabelAttainments) => {
     modifiabelAttainments.forEach((attainment) => {
       sum += 1;
@@ -359,10 +364,10 @@ const getNumOfAttainments = (attainments) => {
 
 };
 
+// Get the attainments that have ids so that they are already existing in the database
 const getExistingAttainments = (attainments) => {
 
   let existingAttainments = [];
-
   const findExisting = (modifiabelAttainments) => {
     modifiabelAttainments.forEach((attainment) => {
       if (attainment.id) {
@@ -380,10 +385,10 @@ const getExistingAttainments = (attainments) => {
   return updatedAattainments;
 };
 
+// Get the attainments that don't have ids so that they aren't existing in the database
 const getNewAttainments = (attainments) => {
 
   let newAttainments = [];
-
   const findNew = (modifiabelAttainments) => {
     modifiabelAttainments.forEach((attainment) => {
       if (!attainment.id) {
@@ -397,12 +402,6 @@ const getNewAttainments = (attainments) => {
   let updatedAattainments = JSON.parse(JSON.stringify(attainments));
   findNew(updatedAattainments);
   updatedAattainments = newAttainments;
-  return updatedAattainments;
-};
-
-const deleteSubAttainments = (attainments) => {
-  let updatedAattainments = JSON.parse(JSON.stringify(attainments));
-  updatedAattainments.forEach((attainment) => delete attainment.subAttainments);
   return updatedAattainments;
 };
 
@@ -430,6 +429,5 @@ export default {
   getFormulaAttribute,
   getNumOfAttainments,
   getExistingAttainments,
-  getNewAttainments,
-  deleteSubAttainments,
+  getNewAttainments
 };

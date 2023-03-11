@@ -16,6 +16,7 @@ const CreateAssignmentView = () => {
   const { courseId, instanceId, sisuInstanceId } = useParams();
   let addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId;
   
+  // If this view is opened during the creation of an instance, get the necessary data from the context
   if (sisuInstanceId) {
     ({ addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId } = useOutletContext());
   }
@@ -31,6 +32,7 @@ const CreateAssignmentView = () => {
     subAttainments: [],
   }]);
 
+  // Function to add data to the database
   const addAttainment = async (attainmentObject) => {
     try {
       const attainment = await assignmentServices.addAttainment(courseId, instanceId, attainmentObject);
@@ -58,8 +60,6 @@ const CreateAssignmentView = () => {
         setIncrementId(newTemporaryId);
         navigate(-1);
       }
-      // TODO: connect to backend and add attainments to DB,
-      // Add possible attributes and delete unnecessary ones
     } catch (exception) {
       console.log(exception);
     }

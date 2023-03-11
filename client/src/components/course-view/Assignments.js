@@ -23,6 +23,8 @@ const Assignments = ({ attainments, formula, courseId, instance }) => {
       </Box>
       <Box sx={{ display: 'inline-grid', gap: 1 }}>
         { attainments.map(attainment => {
+          /* Since the attainments are displayed by the course view, they exist in the database
+             and their actual ids can be used are keys of the attainment accoridon */
           return (
             <AssignmentCategory 
               key={attainment.id} 

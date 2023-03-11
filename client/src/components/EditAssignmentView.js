@@ -11,13 +11,14 @@ import Box from '@mui/material/Box';
 import Assignment from './create-assignment/Assignment';
 import ConfirmationDialog from './create-assignment/ConfirmationDialog';
 import assignmentServices from '../services/assignments';
-import mockAttainmentsServer from '../mock-data/mockAttainmentsServer';
+import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 
 const EditAssignmentView = () => {
   const navigate = useNavigate();
   const { courseId, instanceId, sisuInstanceId, attainmentId } = useParams();
   let addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId;
   
+  // If this view is opened during the creation of an instance, get the necessary data from the context
   if (sisuInstanceId) {
     ({ addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId } = useOutletContext());
   }
@@ -27,7 +28,7 @@ const EditAssignmentView = () => {
     // Else the attainment is being edited during the creation of an instance so gotten from the context
     if (instanceId) {
       // TODO: replace with a function that gets the actual data from the server
-      return assignmentServices.getFinalAttainmentById(mockAttainmentsServer, Number(attainmentId));
+      return assignmentServices.getFinalAttainmentById(mockAttainmentsClient, Number(attainmentId));
     } else if (sisuInstanceId && addedAttainments.length !== 0) {
       let attainment = addedAttainments.find(attainment => attainment.temporaryId === Number(attainmentId));
       if (attainment) {
@@ -43,6 +44,7 @@ const EditAssignmentView = () => {
 
   const [attainments, setAttainments] = useState(getAttainment());
 
+  // Function to edit the data that is in the database
   const editAttainment = async (attainmentObject) => {
     try {
       const attainment = await assignmentServices.editAttainment(courseId, instanceId, attainmentObject);
@@ -53,6 +55,7 @@ const EditAssignmentView = () => {
     }
   };
 
+  // Function to add data to the database
   const addAttainment = async (attainmentObject) => {
     try {
       const attainment = await assignmentServices.addAttainment(courseId, instanceId, attainmentObject);
@@ -79,14 +82,12 @@ const EditAssignmentView = () => {
         setAddedAttainments(updatedAttainments);
         navigate(-1);
       }
-      // TODO: connect to backend and add attainments to DB,
-      // Add possible attributes and delete unnecessary ones
     } catch (exception) {
       console.log(exception);
     }
   };
 
-  // Functions and varibales for opening and closing the dialog for confirming sub-attainment deletion
+  // Functions and varibales for opening and closing the dialog for confirming attainment deletion
   const [openConfDialog, setOpenConfDialog] = useState(false);
 
   const handleConfDialogOpen = () => {

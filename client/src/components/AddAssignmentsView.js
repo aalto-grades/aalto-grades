@@ -56,6 +56,9 @@ const AddAssignmentsView = () => {
       <Box borderRadius={1} sx={{ bgcolor: 'secondary.light', p: '16px 12px', display: 'inline-block' }}>
         <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch' }}>
           { suggestedAttainments.map(attainment => {
+            /* Since the attainments are displayed by during the creation of an instance, 
+               all of them might not exist in the database (since new one can be created)
+               so temporary ids are used as keys for the attainment accoridons */
             return (
               <AssignmentCategory 
                 key={attainment.temporaryId} 

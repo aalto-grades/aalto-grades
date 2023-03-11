@@ -10,12 +10,14 @@ import CustomAccordion from './Accordion';
 import textFormatServices from '../../services/textFormat';
 import formulasService from '../../services/formulas';
 
-// This component renders a "category" of attainments, e.g. all attainments that are exams
-// TODO: replace the points with formulas
+// This component renders a top attainment (only has the intance as its parent)
 const AssignmentCategory = ({ attainment, button, width, attainmentKey }) => {
 
   const { name, formulaId, expiryDate, subAttainments } = attainment;
   const titlepb = subAttainments.length !== 0 ? '16px' : '0px';  // title padding-bottom
+
+  // For some reason the Date type value is formated differently 
+  // by the toLocaleString('en-GB') function depending on the view
   const expiryDateString = attainmentKey === 'id' ?
     textFormatServices.formatDateToString(expiryDate) :
     textFormatServices.formatDateString(textFormatServices.formatDateToSlashString(expiryDate));
