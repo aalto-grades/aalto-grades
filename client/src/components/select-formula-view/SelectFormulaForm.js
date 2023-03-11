@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState, useEffect } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -27,6 +27,8 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
   const [snackPack, setSnackPack] = useState([]);
   const [alertOpen, setAlertOpen] = useState(false);
   const [messageInfo, setMessageInfo] = useState(undefined);
+  
+  const navigate = useNavigate();
 
   const {
     selectedAssignments, setSelectedAssignments,
@@ -165,10 +167,10 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
           display: 'flex', 
           flexDirection: 'row',
           flexWrap: 'wrap',
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
         }}>
-          <Typography width={350} m={3}>Specify attribute values for the sub study attainments</Typography>
-          <Box sx={{ m: 3, mt: 0, alignSelf: 'flex-end',display: 'flex', lexDirection: 'column', }}>
+          <Typography width={320} sx={{ m: 3, mb: 1.5 }}>Specify attribute values for the sub study attainments</Typography>
+          <Box sx={{ mx: 3, mt: 0, mb: 1.5, alignSelf: 'flex-end',display: 'flex', lexDirection: 'column', }}>
             <Button size='medium' variant='outlined' type='submit' name='skipAttributes' sx={{ mr: 2 }}>
               Skip for now
             </Button>
@@ -177,6 +179,9 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
             </Button>
           </Box>
         </StyledBox>
+        <Button sx={{ mt: 0, mb: 1.5, ml: 2.2 }} size='medium' variant='text' onClick={ () => navigate(-1)}>
+          Cancel
+        </Button>
       </StyledBox>
     </form>
   );

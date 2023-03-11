@@ -20,6 +20,7 @@ const Assignments = ({ assignments, formula, instance, courseCode }) => {
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
         <Typography align='left' sx={{ ml: 1.5 }} >{'Grading Formula: ' + formula}</Typography>
         <Button onClick={() => navigate(`/${courseCode}/select-formula/${instance.id}`) }>Edit formula</Button>
+        { /* The path above should be changes once courseId can be fetched from the path */ }
       </Box>
       <Box sx={{ display: 'inline-grid', gap: 1 }}>
         { assignments.map(assignment => {

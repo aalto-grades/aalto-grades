@@ -38,7 +38,8 @@ const Assignment = ({ assignment, attributes, handleAttributeChange, assignmentI
       boxShadow: 2, 
       borderRadius: 2,
       px: 3,
-      py: 1,
+      pt: 1,
+      pb: 1.5,
       width: 1,
       mx: 1.5,
       mb: 2
