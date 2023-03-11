@@ -18,6 +18,27 @@ import { findAttainableById, generateAttainableTag } from './utils/attainable';
 import { findCourseById } from './utils/course';
 import { findCourseInstanceById } from './utils/courseInstance';
 
+async function validateCourseAndInstance(
+  courseId: number, courseInstanceId: number
+): Promise<void> {
+  // Ensure that course exists.
+  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
+
+  // Ensure that course instance exists.
+  const instance: CourseInstance = await findCourseInstanceById(
+    courseInstanceId, HttpCode.NotFound
+  );
+
+  // Check that instance belongs to the course.
+  if (instance.courseId !== course.id) {
+    throw new ApiError(
+      `course instance with ID ${courseInstanceId} ` +
+      `does not belong to the course with ID ${courseId}`,
+      HttpCode.Conflict
+    );
+  }
+}
+
 export async function addAttainable(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     parentId: yup
@@ -38,26 +59,15 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
       .notRequired()
   });
 
+  // Get path parameters.
   const courseId: number = Number(req.params.courseId);
   const courseInstanceId: number = Number(req.params.instanceId);
+
+  // Validation.
   await idSchema.validate({ id: courseId }, { abortEarly: false });
   await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
   await requestSchema.validate(req.body, { abortEarly: false });
-
-  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
-
-  const instance: CourseInstance = await findCourseInstanceById(
-    courseInstanceId, HttpCode.NotFound
-  );
-
-  // Check that instance belongs to the course.
-  if (instance.courseId !== course.id) {
-    throw new ApiError(
-      `course instance with ID ${courseInstanceId} ` +
-      `does not belong to the course with ID ${courseId}`,
-      HttpCode.Conflict
-    );
-  }
+  await validateCourseAndInstance(courseId, courseInstanceId);
 
   const parentId: number | undefined = req.body.parentId;
   const name: string = req.body.name;
@@ -151,6 +161,70 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
   });
 }
 
+export async function deleteAttainable(req: Request, res: Response): Promise<void> {
+  /*
+   * TODO: Check that the requester is logged in, 401 Unauthorized if not
+   * TODO: Check that the requester is authorized to add a course instance, 403
+   * Forbidden if not
+   */
+
+  // Get path parameters.
+  const courseId: number = Number(req.params.courseId);
+  const courseInstanceId: number = Number(req.params.instanceId);
+  const attainableId: number = Number(req.params.attainmentId);
+
+  // Validation.
+  await idSchema.validate({ id: courseId }, { abortEarly: false });
+  await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
+  await idSchema.validate({ id: attainableId }, { abortEarly: false });
+  await validateCourseAndInstance(courseId, courseInstanceId);
+
+  const attainable: Attainable = await findAttainableById(attainableId, HttpCode.NotFound);
+
+  // IDs of attainables to be deleted.
+  const ids: Array<number> = [attainable.id];
+
+  function findAllSubAttainables(
+    parentId: number,
+    allAttainables: Array<Attainable>
+  ): void {
+    for (const otherAttainable of allAttainables) {
+      if (otherAttainable.attainableId === parentId) {
+        ids.push(otherAttainable.id);
+        findAllSubAttainables(otherAttainable.id, allAttainables);
+      }
+    }
+  }
+
+  findAllSubAttainables(
+    attainable.id,
+    await Attainable.findAll({
+      attributes: ['id', 'attainable_id'],
+      where: {
+        courseInstanceId: courseInstanceId
+      }
+    })
+  );
+
+  /*
+   * TODO: Also delete grades of these attainables.
+   * TODO: Query inside for loop may be bad, is there a better way to delete
+   * multiple entries?
+   */
+  for (const id of ids) {
+    Attainable.destroy({
+      where: {
+        id: id
+      }
+    });
+  }
+
+  res.status(HttpCode.Ok).send({
+    success: true,
+    data: {}
+  });
+}
+
 export async function updateAttainable(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     parentId: yup
@@ -175,6 +249,7 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
   await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
   await idSchema.validate({ id: attainableId }, { abortEarly: false });
   await requestSchema.validate(req.body, { abortEarly: false });
+  await validateCourseAndInstance(courseId, courseInstanceId);
 
   const name: string | undefined = req.body.name;
   const date: Date | undefined = req.body.date;
