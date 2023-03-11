@@ -24,8 +24,7 @@ describe('Test GET /v1/user/:userId/courses', () => {
     expect(res.statusCode).toBe(HttpCode.Ok);
 
     expect(res.body.data.courses).toStrictEqual({
-      'current': [],
-      'previous': [
+      'current': [
         {
           'id': 1,
           'courseCode': 'CS-A1110',
@@ -45,7 +44,8 @@ describe('Test GET /v1/user/:userId/courses', () => {
             'en': ''
           }
         }
-      ]
+      ],
+      'previous': []
     });
   });
 
@@ -63,6 +63,17 @@ describe('Test GET /v1/user/:userId/courses', () => {
     }
 
     expect(n).toBe(1);
+  });
+
+  it('should contain courses from all roles', async () => {
+    const res: supertest.Response = await request.get('/v1/user/4/courses');
+    expect(res.body.success).toBe(true);
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.statusCode).toBe(HttpCode.Ok);
+
+    const courses: CoursesOfUser = res.body.data.courses as CoursesOfUser;
+    expect(courses.current.length).toBe(2);
+    expect(courses.previous.length).toBe(1);
   });
 
   it('should correctly identify whether a course is current or previous', async () => {

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -7,22 +7,22 @@ import {
 } from 'sequelize';
 
 import { sequelize } from '..';
-import CourseInstance from './courseInstance';
+import Attainable from './attainable';
 import User from './user';
 
-export default class CourseRole extends Model<
-  InferAttributes<CourseRole>,
-  InferCreationAttributes<CourseRole>
+export default class UserAttainmentGrade extends Model<
+  InferAttributes<UserAttainmentGrade>,
+  InferCreationAttributes<UserAttainmentGrade>
 > {
   declare id: CreationOptional<number>;
   declare userId: ForeignKey<User['id']>;
-  declare courseInstanceId: ForeignKey<CourseInstance['id']>;
-  declare role: string;
+  declare attainableId: ForeignKey<Attainable['id']>;
+  declare points: number;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
 
-CourseRole.init(
+UserAttainmentGrade.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -37,16 +37,16 @@ CourseRole.init(
         key: 'id'
       }
     },
-    courseInstanceId: {
+    attainableId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'course_instance',
+        model: 'attainable',
         key: 'id'
       }
     },
-    role: {
-      type: DataTypes.ENUM('STUDENT', 'ASSISTANT', 'TEACHER', 'SYSADMIN'),
+    points: {
+      type: DataTypes.FLOAT,
       allowNull: false
     },
     createdAt: DataTypes.DATE,
@@ -54,6 +54,6 @@ CourseRole.init(
   },
   {
     sequelize,
-    tableName: 'course_role'
+    tableName: 'user_attainment_grade'
   }
 );

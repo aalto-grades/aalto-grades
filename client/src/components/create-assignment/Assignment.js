@@ -10,7 +10,7 @@ import assignmentServices from '../../services/assignments';
 
 // Parent component for the components LeafAssignment and ParentAssignment 
 
-const Assignment = ({ indices, assignments, setAssignments, removeAssignment }) => {
+const Assignment = ({ indices, assignments, setAssignments, removeAssignment, formulaAttributeNames }) => {
 
   const addSubAssignments = (numOfAssignments) => {
     const updatedAssignments = assignmentServices.addSubAssignments(indices, assignments, numOfAssignments);
@@ -26,6 +26,7 @@ const Assignment = ({ indices, assignments, setAssignments, removeAssignment }) 
           assignments={assignments} 
           setAssignments={setAssignments} 
           removeAssignment={removeAssignment}
+          formulaAttributeNames={formulaAttributeNames}
         />
         :
         <ParentAssignment
@@ -34,6 +35,7 @@ const Assignment = ({ indices, assignments, setAssignments, removeAssignment }) 
           assignments={assignments} 
           setAssignments={setAssignments} 
           removeAssignment={removeAssignment}
+          formulaAttributeNames={formulaAttributeNames}
         />}
     </>
   );
@@ -43,7 +45,8 @@ Assignment.propTypes = {
   assignments: PropTypes.array,
   setAssignments: PropTypes.func,
   indices: PropTypes.array,
-  removeAssignment: PropTypes.func
+  removeAssignment: PropTypes.func,
+  formulaAttributeNames: PropTypes.array,
 };
 
 export default Assignment;

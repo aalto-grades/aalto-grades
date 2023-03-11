@@ -8,10 +8,23 @@ import { Request, Response } from 'express';
 import { AXIOS_TIMEOUT } from '../configs/constants';
 import { SISU_API_KEY, SISU_API_URL } from '../configs/environment';
 
+import { CourseInstanceData, GradingScale } from '../types/course';
 import { ApiError } from '../types/error';
-import { CourseInstanceData, GradingType, TeachingMethod } from '../types/course';
 import { HttpCode } from '../types/httpCode';
 import { SisuCourseInstance } from '../types/sisu';
+
+function parseSisuGradingScale(gradingScale: string): GradingScale | undefined {
+  switch (gradingScale) {
+  case '0-5':
+    return GradingScale.Numerical;
+  case 'sis-hyl-hyv': // TODO: Is this correct?
+    return GradingScale.PassFail;
+  case 'toinen-kotim':
+    return GradingScale.SecondNationalLanguage;
+  default:
+    throw new Error(`unknown grading scale from Sisu: ${gradingScale}`);
+  }
+}
 
 function parseSisuCourseInstance(instance: SisuCourseInstance): CourseInstanceData {
   return {
@@ -23,13 +36,9 @@ function parseSisuCourseInstance(instance: SisuCourseInstance): CourseInstanceDa
     maxCredits: instance.credits.max,
     startDate: instance.startDate,
     endDate: instance.endDate,
-    teachingMethod: (instance.type === 'exam-exam'
-      ? TeachingMethod.Exam
-      : TeachingMethod.Lecture),
-    gradingType: (instance.summary.gradingScale.fi === '0-5'
-      ? GradingType.Numerical
-      : GradingType.PassFail),
-    responsibleTeachers: instance.summary.teacherInCharge,
+    type: instance.type,
+    gradingScale: parseSisuGradingScale(instance.summary.gradingScale.fi) as GradingScale,
+    teachersInCharge: instance.summary.teacherInCharge,
     courseData: {
       courseCode: instance.code,
       department: {

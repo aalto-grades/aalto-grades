@@ -19,7 +19,7 @@ const InstanceTableRow = ({ instance }) => {
     >
       <TableCell>{textFormatServices.formatDateToString(startDate)}</TableCell>
       <TableCell>{textFormatServices.formatDateToString(endDate)}</TableCell>
-      <TableCell>{teachingMethod}</TableCell>
+      <TableCell>{textFormatServices.formatCourseType(teachingMethod)}</TableCell>
     </TableRow>
   );
 };
