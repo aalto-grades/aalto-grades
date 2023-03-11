@@ -14,7 +14,7 @@ RUN if [ -z "$SERVER_SKIP_CI" ] || [ $SERVER_SKIP_CI != 1 ]; then npm ci; fi
 
 RUN npm run build
 
-RUN mkdir /app/coverage && chown -R node:node /app/coverage
+RUN mkdir -p /app/coverage && chown -R node:node /app/coverage
 
 USER node
 
