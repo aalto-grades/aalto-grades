@@ -230,18 +230,18 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     gradingScale: yup
       .string()
-      .oneOf([GradingScale.PassFail, GradingScale.Numerical])
+      .oneOf(Object.values(GradingScale))
       .required(),
     sisuCourseInstanceId: yup
       .string()
       .notRequired(),
     startingPeriod: yup
       .string()
-      .oneOf([Period.I, Period.II, Period.III, Period.IV, Period.V])
+      .oneOf(Object.values(Period))
       .required(),
     endingPeriod: yup
       .string()
-      .oneOf([Period.I, Period.II, Period.III, Period.IV, Period.V])
+      .oneOf(Object.values(Period))
       .required(),
     type: yup
       .string()
