@@ -359,7 +359,6 @@ export async function calculateGrades(req: Request, res: Response): Promise<void
   for (const attainable of attainables) {
     const formulaId = attainable.formulaId;
     const params = attainable.formulaParams;
-    console.log(attainable);
     if (!(await formulaChecker.validate(formulaId))) {
       throw new Error('bad');
     }
@@ -373,7 +372,6 @@ export async function calculateGrades(req: Request, res: Response): Promise<void
     });
   }
   for (const attainable of attainables) {
-    console.log(attainable, attainable.attainableId);
     if (attainable.attainableId === null) { // parent id
       if (rootAttainable) {
         throw new ApiError('duplicate root attainment', HttpCode.InternalServerError); // the database is in a conflicting state

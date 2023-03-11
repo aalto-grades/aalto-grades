@@ -510,5 +510,7 @@ describe('Test GET /v1/courses/:courseId/instances/:instanceId/grades', () => {
     expect(res.body.errors).not.toBeDefined();
     expect(res.body.success).toBe(true);
     expect(res.statusCode).toBe(HttpCode.Ok);
+    expect(res.body.data).toBeDefined();
+    expect(res.body.data.grades).toEqual([{ studentId: 1, grade: 1.24, status: "pass" }]);
   });
 });
