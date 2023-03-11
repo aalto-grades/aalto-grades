@@ -71,7 +71,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Run tests
-        working-directory: ../docker-tests
+        working-directory: docker-tests
         run: docker-compose --file docker-compose-robot.yaml up --abort-on-container-exit --exit-code-from robot
 
 
