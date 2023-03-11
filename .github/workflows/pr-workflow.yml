@@ -58,3 +58,20 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: fsfe/reuse-action@v1
+
+  run_end_to_end_test:
+    name: Run End-to-End Robot Framework Tests
+    runs-on: ubuntu-latest
+    env:
+      POSTGRES_PASSWORD: postgres
+      SERVER_SKIP_CI: 1
+    defaults:
+      run:
+        working-directory: ./server
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run tests
+        working-directory: ../docker-tests
+        run: docker-compose --file docker-compose-robot.yaml up --abort-on-container-exit --exit-code-from robot
+
+

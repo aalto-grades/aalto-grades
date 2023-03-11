@@ -16,15 +16,15 @@ View a course instance of an inactive course
     Verify Instance Contains Required Data and is inactive
     Sign Out
 
-
 Add a new course instance to a course using SISU
     Login as Admin Account
     Open Instances of Course    CS-A1150
     Navigate to course instance creation view
-
+    Select Base from SISU       "BASE"
 
 Add a new course instance to a course without SISU
     Login as Admin Account
     Open Instances of Course    CS-A1150
     Navigate to course instance creation view
+    Select to start course instance creation from scratch
     

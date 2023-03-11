@@ -8,9 +8,9 @@ ${signUpPassword}           input[name="password"]
 ${signUpAdminSelector}      input[value="SYSADMIN"]
 ${signUpSubmit}             button[type="submit"]
 ${createNewCourseButton}    //button[text()="Create New Course"]
-${adminUsername}            testi
-${adminEmail}               testeri@aalto.fi
-${adminStudentID}           213494
+${adminUsername}            testi45
+${adminEmail}               testeri456@aalto.fi
+${adminStudentID}           213512
 ${adminPassword}            testi
 
 ${logInEmailField}          input[name="email"]

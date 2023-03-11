@@ -1,4 +1,4 @@
 ***Variables***
 
-${localhostURL}             http://localhost:3005
+${localhostURL}             %{LOCALHOST_URL}
 ${signOutButton}            //button[text()="Sign out"]
