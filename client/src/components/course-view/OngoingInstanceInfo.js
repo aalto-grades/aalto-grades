@@ -11,10 +11,8 @@ import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 import textFormatServices from '../../services/textFormat';
 import useAuth from '../../hooks/useAuth';
 
-const mockInstitution = 'Aalto University';
-
 const OngoingInstanceInfo = ({ info }) => {
-  const { minCredits, maxCredits, startDate, endDate, type, gradingScale, teachersInCharge, courseData } = info;
+  const { minCredits, maxCredits, startDate, endDate, type, gradingScale, teachersInCharge, department, institution } = info;
   const { auth } = useAuth();
 
   return(
@@ -27,16 +25,16 @@ const OngoingInstanceInfo = ({ info }) => {
         }
       </Box>
       <Box textAlign='left' borderRadius={1} sx={{ bgcolor: 'secondary.light', p: 1.5, minWidth: '318px' }}>
-        <LightLabelBoldValue label='Starting Date' value={textFormatServices.formatDateToString(startDate)} />
-        <LightLabelBoldValue label='Ending Date' value={textFormatServices.formatDateToString(endDate)} />
+        <LightLabelBoldValue label='Starting Date' value={textFormatServices.formatDateString(startDate)} />
+        <LightLabelBoldValue label='Ending Date' value={textFormatServices.formatDateString(endDate)} />
         <LightLabelBoldValue label='Type' value={textFormatServices.formatCourseType(type)} />
       </Box>
       <Box textAlign='left' borderRadius={1} sx={{ bgcolor: 'secondary.light', p: 1.5, mt: 1, minWidth: '318px' }}>
         <LightLabelBoldValue label='Min Credits' value={minCredits} />
         <LightLabelBoldValue label='Max Credits' value={maxCredits} />
-        <LightLabelBoldValue label='Grading Scale' value={gradingScale} />
-        <LightLabelBoldValue label='Organizer' value={courseData.department.en} />
-        <LightLabelBoldValue label='Educational Institution' value={mockInstitution} />
+        <LightLabelBoldValue label='Grading Scale' value={textFormatServices.formatGradingScale(gradingScale)} />
+        <LightLabelBoldValue label='Organizer' value={department.en} />
+        <LightLabelBoldValue label='Educational Institution' value={institution} />
       </Box>
       <Box sx={{ m: 1.5 }}>
         <Typography variant='h6' align='left' sx={{ pt: 1.5, pb: 1 }}>Teachers in Charge</Typography>
@@ -54,7 +52,7 @@ OngoingInstanceInfo.propTypes = {
   type: PropTypes.string,
   credits: PropTypes.number,
   scale: PropTypes.string,
-  organizer: PropTypes.string,
+  department: PropTypes.string,
   institution: PropTypes.string,
   teachers: PropTypes.array
 };
