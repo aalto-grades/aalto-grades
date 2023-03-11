@@ -14,12 +14,11 @@ import assignmentServices from '../services/assignments';
 const CreateAssignmentView = () => {
   const navigate = useNavigate();
   const { courseId, instanceId, sisuInstanceId } = useParams();
-  const { 
-    addedAttainments, setAddedAttainments,
-    attainmentIncrementId, setIncrementId,
-  } = useOutletContext();
-
-  console.log(addedAttainments);
+  let addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId;
+  
+  if (sisuInstanceId) {
+    ({ addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId } = useOutletContext());
+  }
 
   // The property 'category' must be specified for each attainment in order to populate the textfields correctly
   const [attainments, setAttainments] = useState([{
@@ -47,7 +46,9 @@ const CreateAssignmentView = () => {
     try {
       // If this view is opened from the course view, add to DB
       // Else the attainment is being created during the creation of an instance so only add to the context
+      console.log(instanceId);
       if (instanceId) {
+        console.log(attainments);
         const updatedAttainments = assignmentServices.formatStringsToDates(attainments)[0];
         addAttainment(updatedAttainments);
       } else if (sisuInstanceId) {
@@ -92,6 +93,8 @@ const CreateAssignmentView = () => {
               attainments={attainments} 
               setAttainments={setAttainments} 
               removeAttainment={removeAttainment}
+              temporaryId={attainmentIncrementId}
+              setIncrementId={setIncrementId}
             />
           </Box>
           <Button size='medium' variant='outlined' onClick={ () => navigate(-1) } sx={{ mr: 1 }}>

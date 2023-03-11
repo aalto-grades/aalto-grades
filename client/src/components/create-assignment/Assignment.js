@@ -10,11 +10,12 @@ import assignmentServices from '../../services/assignments';
 
 // Parent component for the components LeafAssignment and ParentAssignment 
 
-const Assignment = ({ indices, attainments, setAttainments, removeAttainment, formulaAttributeNames }) => {
+const Assignment = ({ indices, attainments, setAttainments, removeAttainment, formulaAttributeNames, temporaryId, setIncrementId }) => {
 
   const addSubAttainments = (numOfAttainments) => {
-    const updatedAttainments = assignmentServices.addSubAttainments(indices, attainments, numOfAttainments);
+    const [updatedAttainments, newTemporaryId] = assignmentServices.addSubAttainments(indices, attainments, numOfAttainments, temporaryId);
     setAttainments(updatedAttainments);
+    if (setIncrementId) setIncrementId(newTemporaryId);
   };
   
   return (
@@ -36,6 +37,8 @@ const Assignment = ({ indices, attainments, setAttainments, removeAttainment, fo
           setAttainments={setAttainments} 
           removeAttainment={removeAttainment}
           formulaAttributeNames={formulaAttributeNames}
+          temporaryId={temporaryId}
+          setIncrementId={setIncrementId}
         />}
     </>
   );
@@ -47,6 +50,8 @@ Assignment.propTypes = {
   indices: PropTypes.array,
   removeAttainment: PropTypes.func,
   formulaAttributeNames: PropTypes.array,
+  temporaryId: PropTypes.number,
+  setIncrementId: PropTypes.func
 };
 
 export default Assignment;

@@ -115,8 +115,8 @@ function App() {
                 <Route path=':courseId/edit-instance/:sisuInstanceId' element={<EditInstanceView/>}/>
                 <Route path=':courseId/add-attainments/:sisuInstanceId' element={<AddAssignmentsView/>}/>
                 <Route path=':courseId/instance-summary/:sisuInstanceId' element={<InstanceSummaryView/>}/>
-                <Route path=':courseId/create-attainment/:sisuInstanceId' element={<CreateAssignmentView/>}/>
-                <Route path=':courseId/edit-attainment/:sisuInstanceId/:attainmentId' element={<EditAssignmentView/>}/>
+                <Route path=':courseId/create-temporary-attainment/:sisuInstanceId' element={<CreateAssignmentView/>}/>
+                <Route path=':courseId/edit-temporary-attainment/:sisuInstanceId/:attainmentId' element={<EditAssignmentView/>}/>
               </Route>
               <Route path='/select-formula' element={<SelectFormulaView/>}/>
               { /* Path above will be replaced with '/select-formula/:instanceId/:aattainmentId' once component is connected to a page */ }

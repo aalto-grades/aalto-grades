@@ -95,7 +95,7 @@ const InstanceSummaryView = () => {
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', display: 'inline-block' }}>
         { addedAttainments.length !== 0 &&
           <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch', pb: '8px' }}>
-            { addedAttainments.map(attainment => <AssignmentCategory key={attainment.temporaryId} attainment={attainment} />) }
+            { addedAttainments.map(attainment => <AssignmentCategory key={attainment.temporaryId} attainment={attainment} attainmentKey={'temporaryId'} />) }
           </Box>
         }
         <Typography variant='body2' color='primary.main' sx={{ m: '8px 0px' }} >You can also add study attainments after creating the instance</Typography>

@@ -173,9 +173,11 @@ const LeafAssignment = ({ indices, addSubAttainments, setAttainments, attainment
           : 
           <Box sx={{ width: '1px' }}/>}
         <ConfirmationDialog
+          title={'Sub Study Attainments'}
+          subject={'sub study attainment'}
           open={openConfDialog}
           handleClose={handleConfDialogClose}
-          removeAttainment={removeAttainment}
+          deleteAttainment={removeAttainment}
           indices={indices}
           attainments={attainments}
         />

@@ -9,15 +9,18 @@ import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Assignment from './create-assignment/Assignment';
+import ConfirmationDialog from './create-assignment/ConfirmationDialog';
 import assignmentServices from '../services/assignments';
 import mockAttainmentsServer from '../mock-data/mockAttainmentsServer';
 
 const EditAssignmentView = () => {
   const navigate = useNavigate();
   const { courseId, instanceId, sisuInstanceId, attainmentId } = useParams();
-  const { 
-    addedAttainments, setAddedAttainments,
-  } = useOutletContext();
+  let addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId;
+  
+  if (sisuInstanceId) {
+    ({ addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId } = useOutletContext());
+  }
 
   const getAttainment = () => {
     // If this view is opened from the course view, get attainment from DB
@@ -25,12 +28,16 @@ const EditAssignmentView = () => {
     if (instanceId) {
       // TODO: replace with a function that gets the actual data from the server
       return assignmentServices.getFinalAttainmentById(mockAttainmentsServer, Number(attainmentId));
-    } else if (sisuInstanceId) {
+    } else if (sisuInstanceId && addedAttainments.length !== 0) {
       let attainment = addedAttainments.find(attainment => attainment.temporaryId === Number(attainmentId));
-      attainment = assignmentServices.formatDates([attainment]);
-      return attainment;
+      if (attainment) {
+        attainment = assignmentServices.formatDates([attainment]);
+        return attainment;
+      } else {
+        console.log('Attainment could not be found');
+      }
     } else {
-      console.log('ERROR: Attainment could not be found');
+      console.log('Attainment could not be found');
     }
   };
 
@@ -38,7 +45,6 @@ const EditAssignmentView = () => {
 
   const editAttainment = async (attainmentObject) => {
     try {
-      console.log(attainmentObject);
       const attainment = await assignmentServices.editAttainment(courseId, instanceId, attainmentObject);
       console.log(attainment);
       //navigate('/' + courseId, { replace: true });
@@ -80,9 +86,28 @@ const EditAssignmentView = () => {
     }
   };
 
+  // Functions and varibales for opening and closing the dialog for confirming sub-attainment deletion
+  const [openConfDialog, setOpenConfDialog] = useState(false);
+
+  const handleConfDialogOpen = () => {
+    setOpenConfDialog(true);
+  };
+
+  const handleConfDialogClose = () => {
+    setOpenConfDialog(false);
+  };
+
   const deleteAttainment = () => {
-    // TODO: connect to backend and delete attainments from DB,
-    navigate(-1);
+    // If this view is opened from the course view, delete from DB
+    // Else the attainment is being edited during the creation of an instance so only delete from the context
+    if (instanceId) {
+      // TODO:Ddelete from DB
+      navigate(-1);
+    } else if (sisuInstanceId) {
+      const updatedAttainments = assignmentServices.deleteTemporaryAttainment(addedAttainments, attainments[0]);
+      setAddedAttainments(updatedAttainments);
+      navigate(-1);
+    }
   };
 
   const removeAttainment = (indices) => {
@@ -112,10 +137,21 @@ const EditAssignmentView = () => {
               attainments={attainments} 
               setAttainments={setAttainments} 
               removeAttainment={removeAttainment}
+              temporaryId={attainmentIncrementId}
+              setIncrementId={setIncrementId}
             />
           </Box>
+          <ConfirmationDialog
+            title={'Study Attainment'}
+            subject={'study attainment'}
+            open={openConfDialog}
+            handleClose={handleConfDialogClose}
+            deleteAttainment={deleteAttainment}
+            indices={[0]}
+            attainments={attainments}
+          />
           <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
-            <Button size='medium' variant='outlined' color='error' onClick={deleteAttainment} sx={{ ml: 2 }}>Delete Attainment</Button>
+            <Button size='medium' variant='outlined' color='error' onClick={handleConfDialogOpen} sx={{ ml: 2 }}>Delete Attainment</Button>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}>
               <Button size='medium' variant='outlined' onClick={ () => navigate(-1) }>Cancel</Button>
               <Button size='medium' variant='contained' type='submit' onClick={handleSubmit} sx={{ mr: 2 }}>Confirm</Button>

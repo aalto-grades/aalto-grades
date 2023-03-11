@@ -27,6 +27,7 @@ const Assignments = ({ attainments, formula, courseId, instance }) => {
             <AssignmentCategory 
               key={attainment.id} 
               attainment={attainment} 
+              attainmentKey={'id'}
               button={<Button onClick={ () => navigate(`/${courseId}/edit-attainment/${instance.id}/${attainment.id}`) }>Edit</Button>} 
               width={'50vw'} 
             />

@@ -26,14 +26,24 @@ const getSuggestedAttainments = () => { return mockAttainmentsClient; };
 
 // Function to get mock attainments and assign temporary Ids to the top attainments (the ones with no parents).
 // Should eventually be replaced with a function that gets data from the server.
-const addTemporaryIds = (attainments, temporaryId) => { 
-  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
+const addTemporaryIds = (attainments, temporaryId) => {
+
   let newTemporaryId = temporaryId;
-  updatedAttainments.forEach((attainment) => {
-    attainment.temporaryId = newTemporaryId;
-    newTemporaryId += 1;
-  });
-  return [updatedAttainments, newTemporaryId]; 
+
+  const addTemporaryId = (modifiabelAttainments) => {
+    modifiabelAttainments.forEach((attainment) => {
+      attainment.temporaryId = newTemporaryId;
+      newTemporaryId += 1;
+      if (attainment.subAttainments.length !== 0) {
+        addTemporaryId(attainment.subAttainments);
+      }
+    });
+  };
+
+  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  addTemporaryId(updatedAttainments);
+  return [updatedAttainments, newTemporaryId];
+
 };
 
 // Add an attainment to a temporary list of attainments and give it an ID.
@@ -58,6 +68,13 @@ const createTemporaryAttainment = (attainments, newAttainment, temporaryId) => {
 const updateTemporaryAttainment = (attainments, newAttainment) => {
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
   updatedAttainments = updatedAttainments.map((attainment) => attainment.temporaryId === newAttainment.temporaryId ? newAttainment : attainment);
+  return updatedAttainments;
+};
+
+// Add an attainment to a temporary list of attainments and give it an ID.
+const deleteTemporaryAttainment = (attainments, newAttainment) => {
+  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  updatedAttainments = updatedAttainments.filter((attainment) => attainment.temporaryId !== newAttainment.temporaryId);
   console.log(updatedAttainments);
   return updatedAttainments;
 };
@@ -155,24 +172,32 @@ const getFormulaAttribute = (indices, attainments, attributeIndex) => {
 };
 
 // Add sub-attainments to the attainments array (of nested arrays) according to the indices
-const addSubAttainments = (indices, attainments, numOfAttainments) => {
+const addSubAttainments = (indices, attainments, numOfAttainments, temporaryId) => {
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  let newTemporaryId = temporaryId;
   const defaultExpiryDate = getProperty(indices, updatedAttainments, 'expiryDate');
   const parentId = getProperty(indices, updatedAttainments, 'id');
-  const newSubAttainments = new Array(Number(numOfAttainments)).fill({
-    category: '',
-    name: '',
-    date: '',
-    expiryDate: defaultExpiryDate,
-    parentId: parentId,
-    affectCalculation: false,
-    formulaAttributes: [],
-    subAttainments: [],
-  });
+
+  let newSubAttainments = [];
+  for (let i = 0; i < numOfAttainments; i++) {
+    newSubAttainments.push({
+      temporaryId: newTemporaryId,
+      category: '',
+      name: '',
+      date: '',
+      expiryDate: defaultExpiryDate,
+      parentId: parentId,
+      affectCalculation: false,
+      formulaAttributes: [],
+      subAttainments: [],
+    });
+    newTemporaryId += 1;
+  }
+
   const currentSubAttainments = getSubAttainments(indices, updatedAttainments);
   const subAttainments = currentSubAttainments.concat(newSubAttainments);
   updatedAttainments = setProperty(indices, updatedAttainments, 'subAttainments', subAttainments);
-  return updatedAttainments;
+  return [updatedAttainments, newTemporaryId];
 };
 
 // Remove an attainment that is at the location specified by indices
@@ -389,6 +414,7 @@ export default {
   addTemporaryAttainment,
   createTemporaryAttainment,
   updateTemporaryAttainment,
+  deleteTemporaryAttainment,
   getSubAttainments, 
   addSubAttainments, 
   removeAttainment, 

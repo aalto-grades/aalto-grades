@@ -20,7 +20,7 @@ import formulasService from '../../services/formulas';
 
 // An Assignmnet component with subAttainments and a formula
 
-const ParentAssignment = ({ indices, addSubAttainments, setAttainments, attainments, removeAttainment, formulaAttributeNames }) => {
+const ParentAssignment = ({ indices, addSubAttainments, setAttainments, attainments, removeAttainment, formulaAttributeNames, temporaryId, setIncrementId }) => {
   let navigate = useNavigate();
 
   // Functions and varibales for opening and closing the list of sub-attainments
@@ -89,6 +89,8 @@ const ParentAssignment = ({ indices, addSubAttainments, setAttainments, attainme
                   setAttainments={setAttainments} 
                   removeAttainment={removeAttainment}
                   formulaAttributeNames={subFormulaAttributeNames ? subFormulaAttributeNames : []}
+                  temporaryId={temporaryId}
+                  setIncrementId={setIncrementId}
                 />
               ))}
             </List>
@@ -106,6 +108,8 @@ ParentAssignment.propTypes = {
   setAttainments: PropTypes.func,
   removeAttainment: PropTypes.func,
   formulaAttributeNames: PropTypes.array,
+  temporaryId: PropTypes.number,
+  setIncrementId: PropTypes.func
 };
 
 export default ParentAssignment;

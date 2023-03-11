@@ -4,9 +4,9 @@
 
 const mockAttainmentsServer = [
   { 
-    courseId: 2,
-    instanceId: 2,
-    id: 25,
+    courseId: 1,
+    instanceId: 1,
+    id: 22,
     name: 'Exam',
     date: new Date(2023, 3, 26), 
     expiryDate: new Date(2025, 3, 26), 
