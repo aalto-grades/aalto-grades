@@ -24,10 +24,10 @@ const FetchInstancesView = () => {
   return(
     <>
       <Container maxWidth="md" sx={{ textAlign: 'right' }}>
-        <Typography variant="h3" component="div" sx={{ flexGrow: 1, mb: 4, textAlign: 'left' }}>
+        <Typography variant="h1" component="div" sx={{ flexGrow: 1, mb: 5, textAlign: 'left' }}>
           Instances Found from SISU
         </Typography>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1, mb: 4, textAlign: 'left' }}>
+        <Typography variant="h3" component="div" sx={{ flexGrow: 1, mb: 4, textAlign: 'left' }}>
           Select the instance you wish to add 
         </Typography>
         <FetchedInstances info={instances} />

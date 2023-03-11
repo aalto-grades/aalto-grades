@@ -64,7 +64,7 @@ const CourseView = () => {
       {courseDetails && currentInstance && instances &&
         <> 
           <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-            <Typography variant='h3' sx={{ fontWeight: 'light' }}>{courseDetails.courseCode + ' – ' + courseDetails.name.en}</Typography>
+            <Typography variant='h1'>{courseDetails.courseCode + ' – ' + courseDetails.name.en}</Typography>
             { /* Only admins and teachers are allowed to create a new instance */
               (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
             <Button size='large' variant='contained' onClick={() => { navigate(`/fetch-instances/${courseId}/${courseDetails.courseCode}`); }}>  {/* TODO: Check path */}
@@ -87,7 +87,7 @@ const CourseView = () => {
               </Grow>
             }
           </Box>
-          <Typography variant='h4' align='left' sx={{ fontWeight: 'light', mt: 6, mb: 3 }}>All Past Instances</Typography>
+          <Typography variant='h2' align='left' sx={{ mt: 6, mb: 3 }}>All Past Instances</Typography>
           <InstancesTable data={instances} current={currentInstance.id} onClick={onChangeInstance} />
         </>
       }

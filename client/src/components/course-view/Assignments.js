@@ -16,7 +16,7 @@ const Assignments = ({ assignments, formula, instance }) => {
   
   return (
     <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: 1.5, display: 'inline-block' }}>
-      <Typography variant='h6' align='left' sx={{ ml: 1.5 }} >Study Attainments</Typography>
+      <Typography variant='h3' align='left' sx={{ ml: 1.5, mt: 0.6, mb: 1.5 }} >Study Attainments</Typography>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
         <Typography align='left' sx={{ ml: 1.5 }} >{'Grading Formula: ' + formula}</Typography>
         <Button onClick={ () => navigate('/select-formula') }>Edit formula</Button>
