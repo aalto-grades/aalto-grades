@@ -48,9 +48,7 @@ const CreateAssignmentView = () => {
     try {
       // If this view is opened from the course view, add to DB
       // Else the attainment is being created during the creation of an instance so only add to the context
-      console.log(instanceId);
       if (instanceId) {
-        console.log(attainments);
         const updatedAttainments = assignmentServices.formatStringsToDates(attainments)[0];
         addAttainment(updatedAttainments);
       } else if (sisuInstanceId) {
