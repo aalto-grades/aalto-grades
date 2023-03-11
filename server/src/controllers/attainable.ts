@@ -359,6 +359,7 @@ export async function calculateGrades(req: Request, res: Response): Promise<void
   for (const attainable of attainables) {
     const formulaId = attainable.formulaId;
     const params = attainable.formulaParams;
+    console.log(attainable);
     if (!(await formulaChecker.validate(formulaId))) {
       throw new Error('bad');
     }
@@ -372,11 +373,12 @@ export async function calculateGrades(req: Request, res: Response): Promise<void
     });
   }
   for (const attainable of attainables) {
-    if (attainable.attainableId == null) { // parent id
+    console.log(attainable, attainable.attainableId);
+    if (attainable.attainableId === null) { // parent id
       if (rootAttainable) {
         throw new ApiError('duplicate root attainment', HttpCode.InternalServerError); // the database is in a conflicting state
       }
-      rootAttainable = formulaNodesById.get(attainable.attainableId)!;
+      rootAttainable = formulaNodesById.get(attainable.id)!;
     } else {
       formulaNodesById.get(attainable.attainableId)!.subFormulaNodes.push(formulaNodesById.get(attainable.id)!);
     }
@@ -411,13 +413,16 @@ export async function calculateGrades(req: Request, res: Response): Promise<void
   }
 
   res.status(HttpCode.Ok)
-    .json(
-      Array.from(rootAttainablePointsByStudent).map(([studentId, result]) => {
-        return {
-          studentId,
-          grade: result.points,
-          status: result.status,
-        };
-      })
-    );
+    .json({
+      success: true,
+      data: {
+        grades: Array.from(rootAttainablePointsByStudent).map(([studentId, result]) => {
+          return {
+            studentId,
+            grade: result.points,
+            status: result.status,
+          };
+        })
+      }
+    });
 }

@@ -505,7 +505,10 @@ describe('Test GET /v1/courses/:courseId/instances/:instanceId/grades', () => {
   it('should calculate correct grades', async () => {
     // Create a new attainables.
     let res: supertest.Response = await request
-      .get('/v1/courses/2/instances/2/grades')
-      .expect(HttpCode.Ok);
+      .get('/v1/courses/5/instances/8/grades');
+
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.body.success).toBe(true);
+    expect(res.statusCode).toBe(HttpCode.Ok);
   });
 });
