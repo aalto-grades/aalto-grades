@@ -63,8 +63,9 @@ const CourseView = () => {
     <Box sx={{ mr: -4, ml: -4 }}>
       {courseDetails && currentInstance && instances &&
         <> 
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-            <Typography variant='h1'>{courseDetails.courseCode + ' – ' + courseDetails.name.en}</Typography>
+          <Typography variant='h1' align='left'>{courseDetails.courseCode}</Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', mb: 4, columnGap: 6 }}>
+            <Typography variant='h2' align='left'>{courseDetails.name.en}</Typography>
             { /* Only admins and teachers are allowed to create a new instance */
               (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
             <Button size='large' variant='contained' onClick={() => { navigate(`/fetch-instances/${courseId}/${courseDetails.courseCode}`); }}>  {/* TODO: Check path */}
