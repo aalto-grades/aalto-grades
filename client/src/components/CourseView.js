@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grow from '@mui/material/Grow';
+import FileLoadDialog from './course-view/FileLoadDialog';
 import OngoingInstanceInfo from './course-view/OngoingInstanceInfo';
 import Assignments from './course-view/Assignments';
 import InstancesTable from './course-view/InstancesTable';
@@ -31,6 +32,7 @@ const CourseView = () => {
   const [instances, setInstances] = useState([]);
 
   const [animation, setAnimation] = useState(false);
+  const [open, setOpen] = React.useState(false);
 
   useEffect(() => {
     instancesService.getInstances(courseId)
@@ -52,6 +54,14 @@ const CourseView = () => {
     setAnimation(true);
   }, [currentInstance]);
 
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   const onChangeInstance = (instance) => {
     if(instance.id !== currentInstance.id) {
       setAnimation(false);
@@ -68,7 +78,11 @@ const CourseView = () => {
             <Typography variant='h2' align='left'>{courseDetails.name.en}</Typography>
             { /* Only admins and teachers are allowed to create a new instance */
               (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
-            <Button size='large' variant='contained' onClick={() => { navigate(`/fetch-instances/${courseId}/${courseDetails.courseCode}`); }}>  {/* TODO: Check path */}
+            <Button 
+              size='large' 
+              variant='contained' 
+              onClick={() => { navigate(`/fetch-instances/${courseId}/${courseDetails.courseCode}`); }}
+            >  {/* TODO: Check path */}
               New instance
             </Button>
             }
@@ -76,20 +90,32 @@ const CourseView = () => {
           <Box sx={{ display: 'flex', justifyContent: 'space-evenly', gap: 3 }}>
             <Grow in={animation} style={{ transformOrigin: '50% 0 0' }} {...(animation? { timeout: 500 } : { timeout: 0 })}>
               <div>
-                <OngoingInstanceInfo info={ { ...currentInstance, department: courseDetails.department, institution: mockInstitution } } />
+                <OngoingInstanceInfo 
+                  info={ { 
+                    ...currentInstance, 
+                    department: courseDetails.department, 
+                    institution: mockInstitution 
+                  } } 
+                />
               </div>
             </Grow>
             { /* a different assignment component will be created for students */
               (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
               <Grow in={animation} style={{ transformOrigin: '0 0 0' }} {...(animation? { timeout: 1000 } : { timeout: 0 })}>
                 <div>
-                  <Assignments assignments={mockAssignmentsClient} formula={'Weighted Average'} instance={currentInstance} /> {/* TODO: Retrieve real formula */}
+                  <Assignments 
+                    assignments={mockAssignmentsClient} 
+                    formula={'Weighted Average'} 
+                    instance={currentInstance} 
+                    handleAddPoints={handleClickOpen} 
+                  /> {/* TODO: Retrieve real formula */}
                 </div>
               </Grow>
             }
           </Box>
-          <Typography variant='h2' align='left' sx={{ mt: 6, mb: 3 }}>All Past Instances</Typography>
+          <Typography variant='h2' align='left' sx={{ mt: 6, mb: 3 }}>All Instances</Typography>
           <InstancesTable data={instances} current={currentInstance.id} onClick={onChangeInstance} />
+          <FileLoadDialog open={open} handleClose={handleClose}/>
         </>
       }
     </Box>

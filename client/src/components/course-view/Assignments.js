@@ -9,10 +9,15 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import AssignmentCategory from '../assignments/AssignmentCategory';
+import MenuButton from './MenuButton';
 
-
-const Assignments = ({ assignments, formula, instance }) => {
+const Assignments = ({ assignments, formula, instance, handleAddPoints }) => {
   const navigate = useNavigate();
+
+  const actionOptions = [
+    { description: 'Upload a file', handleClick: handleAddPoints }, 
+    { description: 'Import from A+', handleClick: () => {} }
+  ];
   
   return (
     <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: 1.5, display: 'inline-block' }}>
@@ -37,7 +42,7 @@ const Assignments = ({ assignments, formula, instance }) => {
         <Button onClick={() => navigate('/create-assignment/' + instance.id) }>Add attainment</Button>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}>
           <Button variant='outlined'>Calculate final grades</Button>
-          <Button variant='contained'>Add points</Button>
+          <MenuButton label='Add points' options={actionOptions} />
         </Box>
       </Box>
     </Box>
@@ -47,7 +52,8 @@ const Assignments = ({ assignments, formula, instance }) => {
 Assignments.propTypes = {
   assignments: PropTypes.array,
   instance: PropTypes.object,
-  formula: PropTypes.string
+  formula: PropTypes.string,
+  handleAddPoints: PropTypes.func
 };
 
 export default Assignments;
