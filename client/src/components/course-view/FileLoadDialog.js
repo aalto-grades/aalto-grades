@@ -24,6 +24,7 @@ const FileLoadDialog = ({ handleClose, open }) => {
   const getFileName = file => file.split('\\').pop();
 
   const uploadFile = () => {
+    // TODO: validate that a file is selected, else display error
     // TODO: send file to backend
     console.log('sent: ' + getFileName(file));
   };
