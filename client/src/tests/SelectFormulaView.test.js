@@ -74,11 +74,12 @@ describe('Tests for SelectFormulaView components', () => {
     await waitFor( async () => {
       const specifyAttributesButton = screen.queryByText('Specify attributes');
 
-      expect(await screen.queryByText('You must select a formula and at least one study attainment.')).not.toBeInTheDocument();
+      expect(await screen.queryByText('You must select a formula')).not.toBeInTheDocument();
+      expect(await screen.queryByText('You must select at least one study attainment')).not.toBeInTheDocument();
 
       userEvent.click(specifyAttributesButton);
 
-      expect(await screen.findByText('You must select a formula and at least one study attainment.')).toBeInTheDocument();
+      expect(await screen.findByText('You must select a formula')).toBeInTheDocument();
     });
 
   });

@@ -16,6 +16,7 @@ import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
+import FormHelperText from '@mui/material/FormHelperText';
 import StyledBox from './StyledBox';
 import ViewFormulaAccordion from './ViewFormulaAccordion';
 import AlertSnackbar from '../alerts/AlertSnackbar';
@@ -27,6 +28,8 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
   const [snackPack, setSnackPack] = useState([]);
   const [alertOpen, setAlertOpen] = useState(false);
   const [messageInfo, setMessageInfo] = useState(undefined);
+  const [checkboxError, setCheckboxError] = useState('');
+  const [formulaError, setFormulaError] = useState('');
   
   const navigate = useNavigate();
 
@@ -70,13 +73,21 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
   // checks that user has selected a function and at least one attainment
   // if not, shows error message
   const canBeSubmitted = () => {
-    if(selectedAssignments.length === 0 || selectedFormula.name === undefined) {
-      setSnackPack((prev) => [...prev,
-        { msg: 'You must select a formula and at least one study attainment.', severity: 'error' }
-      ]);
-      return false;
+    var noErrors = true;
+    if(selectedAssignments.length === 0) {
+      setCheckboxError('You must select at least one study attainment');
+      noErrors = false;
+    } else {
+      // if an error was previously present, clear it
+      setCheckboxError('');
     }
-    return true;
+    if(selectedFormula.name === undefined) {
+      setFormulaError('You must select a formula');
+      noErrors = false;
+    } else {
+      setFormulaError('');
+    }
+    return noErrors;
   };
 
   const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -153,12 +164,20 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
           <FormGroup>
             {assignmentCheckboxes()}
           </FormGroup>
+          <FormHelperText error={checkboxError !== ''}>{ checkboxError }</FormHelperText>
         </FormControl>
         <FormControl sx={{ m: 3, mt: 3, minWidth: 280 }} variant='standard'>
           <InputLabel id='formulaLabel' shrink={true} sx={{ fontSize: '20px', mb: -2, position: 'relative' }}>Formula</InputLabel>
-          <Select label='Formula' labelId='formulaLabel' value={selectedFormula.name ?? ''} onChange={handleFormulaChange}>
+          <Select
+            label='Formula'
+            labelId='formulaLabel'
+            value={selectedFormula.name ?? ''}
+            onChange={handleFormulaChange}
+            error={formulaError !== ''}
+          >
             { formulas.map((formula) => <MenuItem key={formula.id} value={formula.name}>{formula.name}</MenuItem> ) }
           </Select>
+          <FormHelperText error={formulaError !== ''}>{ formulaError }</FormHelperText>
         </FormControl>
         <StyledBox>
           <ViewFormulaAccordion codeSnippet={codeSnippet}/>
