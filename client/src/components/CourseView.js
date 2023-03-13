@@ -17,7 +17,6 @@ import courseService from '../services/courses';
 import instancesService from '../services/instances';
 import sortingServices from '../services/sorting';
 import useAuth from '../hooks/useAuth';
-//import mockInstances from '../mock-data/mockInstances';
 import mockAssignmentsClient from '../mock-data/mockAssignmentsClient';
 
 const mockInstitution = 'Aalto University';   // REPLACE SOME DAY? currently this info can't be fetched from database
@@ -35,17 +34,17 @@ const CourseView = () => {
   const [open, setOpen] = React.useState(false);
 
   useEffect(() => {
+    courseService.getCourse(courseId)
+      .then((data) => {
+        setCourseDetails(data.course);
+      })
+      .catch((e) => console.log(e.message));
+
     instancesService.getInstances(courseId)
       .then((data) => {
         const sortedInstances = data.courseInstances.sort((a, b) => sortingServices.sortByDate(a.startDate, b.startDate));
         setInstances(sortedInstances);
         setCurrentInstance(sortedInstances[0]);
-      })
-      .catch((e) => console.log(e.message));
-    
-    courseService.getCourse(courseId)
-      .then((data) => {
-        setCourseDetails(data.course);
       })
       .catch((e) => console.log(e.message));
   }, []);
