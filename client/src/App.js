@@ -23,9 +23,11 @@ import EditInstanceView from './components/EditInstanceView';
 import AddAssignmentsView from './components/AddAssignmentsView';
 import InstanceSummaryView from './components/InstanceSummaryView';
 import SelectFormulaView from './components/SelectFormulaView';
+import FormulaAttributesView from './components/FormulaAttributesView';
 import CreateAssignmentView from './components/CreateAssignmentView';
 import EditAssignmentView from './components/EditAssignmentView';
 import InstanceCreationRoute from './context/InstanceCreationRoute';
+import FormulaSelectionRoute from './context/FormulaSelectionRoute';
 import useLogout from './hooks/useLogout';
 
 const theme = createTheme({
@@ -117,8 +119,11 @@ function App() {
                 <Route path='/create-assignment/:instanceId' element={<CreateAssignmentView/>}/>
                 <Route path='/edit-assignment/:instanceId/:assignmentId' element={<EditAssignmentView/>}/>
               </Route>
-              <Route path='/select-formula' element={<SelectFormulaView/>}/>
-              { /* Path above will be replaced with '/select-formula/:instanceId/:assignmentId' once component is connected to a page */ }
+              <Route element={<FormulaSelectionRoute/>}>
+                <Route path='/:courseId/select-formula/:instanceId/' element={<SelectFormulaView/>}/>
+                <Route path='/:courseId/formula-attributes/:instanceId/' element={<FormulaAttributesView/>}/>
+                { /* '/:assignmentId' will be added to the paths above once they work for sub-assignments */ }
+              </Route>
             </Route>
           </Routes>
         </Box>
