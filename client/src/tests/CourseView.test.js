@@ -5,7 +5,7 @@
 import React from 'react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, waitFor, screen, cleanup } from '@testing-library/react';
+import { render, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CourseView from '../components/CourseView';
 import coursesService from '../services/courses';
@@ -122,10 +122,10 @@ describe('Tests for CourseView component', () => {
     expect(uploadOption).toBeDefined();
     userEvent.click(uploadOption);
 
-    const dialogTitle = screen.getByText('Add Grades from File');
-    const uploadFileButton = screen.getByText('Upload file');
-    const cancelButton = screen.getByText('Cancel');
-    const confirmButton = screen.getByText('Confirm');
+    const dialogTitle = getByText('Add Grades from File');
+    const uploadFileButton = getByText('Upload file');
+    const cancelButton = getByText('Cancel');
+    const confirmButton = getByText('Confirm');
 
     expect(dialogTitle).toBeVisible();
     expect(uploadFileButton).toBeVisible();
