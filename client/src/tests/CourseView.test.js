@@ -96,12 +96,12 @@ describe('Tests for CourseView component', () => {
   test('CourseView should allow changing the instance that is displayed in detail', async () => {
 
     const auth = { role: 'TEACHER' };
-    const { getByText, findByText, findAllByRole } = renderCourseView(auth);
+    const { findByText, findAllByRole } = renderCourseView(auth);
 
     const instanceRows = await findAllByRole('row');
     expect(instanceRows.length - 1).toEqual(mockInstances.length);    // - 1 because heading row
 
-    const firstTeacherInCharge = await findByText('Elisa Mekler')
+    const firstTeacherInCharge = await findByText('Elisa Mekler');
     expect(firstTeacherInCharge).toBeInTheDocument();
 
     userEvent.click(instanceRows[5]);   // click a row that isn't the first, changes teacher
