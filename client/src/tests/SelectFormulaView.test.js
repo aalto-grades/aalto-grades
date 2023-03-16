@@ -3,12 +3,14 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import SelectFormulaView from '../components/SelectFormulaView';
 import instancesService from '../services/instances';
 import formulasService from '../services/formulas';
+import FormulaSelectionRoute from '../context/FormulaSelectionRoute';
 import mockAttainments from '../mock-data/mockAttainments';
 import mockFormulas from '../mock-data/mockFormulas';
 
@@ -25,9 +27,13 @@ describe('Tests for SelectFormulaView components', () => {
     formulasService.getFormulas.mockRejectedValue('Network error');
     formulasService.getFormulas.mockResolvedValue(mockFormulas);
     return render(
-      <BrowserRouter>
-        <SelectFormulaView />
-      </BrowserRouter>
+      <MemoryRouter initialEntries={['/A-12345/select-formula/test']}>
+        <Routes>
+          <Route element={<FormulaSelectionRoute/>}>
+            <Route path=':courseId/select-formula/:instanceId' element={<SelectFormulaView />}/>
+          </Route>
+        </Routes>
+      </MemoryRouter>
     );
   };
 
@@ -43,7 +49,7 @@ describe('Tests for SelectFormulaView components', () => {
       const examCheckbox = screen.queryByText('Exams');
       const formulaSelector = screen.queryByText('Formula');
       const formulaPreview = screen.queryByText('Preview of the formula');
-      const submitInstructions = screen.queryByText('Specify attribute values for the sub study attainnments');
+      const submitInstructions = screen.queryByText('Specify attribute values for the sub study attainments');
       const specifyAttributesButton = screen.queryByText('Specify attributes');
       const skipAttributesButton = screen.queryByText('Skip for now');
 
@@ -58,6 +64,24 @@ describe('Tests for SelectFormulaView components', () => {
       expect(specifyAttributesButton).toBeInTheDocument();
       expect(skipAttributesButton).toBeInTheDocument();
     });
-  
+   
   });
+
+  test('SelectFormulaView should render an alert if "Specify attributes" is clicked without selecting any attainments or a formula', async () => {
+
+    renderSelectFormulaView();
+
+    await waitFor( async () => {
+      const specifyAttributesButton = screen.queryByText('Specify attributes');
+
+      expect(await screen.queryByText('You must select a formula')).not.toBeInTheDocument();
+      expect(await screen.queryByText('You must select at least one study attainment')).not.toBeInTheDocument();
+
+      userEvent.click(specifyAttributesButton);
+
+      expect(await screen.findByText('You must select a formula')).toBeInTheDocument();
+    });
+
+  });
+  
 });
