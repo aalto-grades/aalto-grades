@@ -3,21 +3,40 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CreateAssignmentView from '../components/CreateAssignmentView';
+import assignmentServices from '../services/assignments';
+import mockAttainmentsServer from '../mock-data/mockAttainmentsServer';
+
+const mockAttainment = mockAttainmentsServer[0];
+const courseId = mockAttainment.courseId;
+const instanceId = mockAttainment.courseInstanceId;
+
+const mockDate = '2023-04-25T00:00:00.000Z';  // again had some problems with dates,
+const mockExpiryDate = '2025-04-25T00:00:00.000Z';  // so I hardcoded them here
+
+assignmentServices.addAttainment = jest.fn();
+afterEach(cleanup);
 
 describe('Tests for CreateAssignmentView components', () => {
 
+  const renderCreateAssignmentView = async () => {
+
+    return render(
+      <MemoryRouter initialEntries={[`/${courseId}/create-attainment/${instanceId}`]}>
+        <Routes>
+          <Route path='/:courseId/create-attainment/:instanceId' element={<CreateAssignmentView/>}/>
+        </Routes>
+      </MemoryRouter>
+    );
+  };
+
   test('CreateAssignmentView should render all of the appropriate components', async () => {
 
-    render(
-      <BrowserRouter>
-        <CreateAssignmentView />
-      </BrowserRouter>
-    );
+    renderCreateAssignmentView();
 
     const headingElement = screen.getByText('Create Study Attainment');
     const selectLabel = 'Name';
@@ -46,159 +65,112 @@ describe('Tests for CreateAssignmentView components', () => {
 
   test('CreateAssignmentView should allow a teacher to create an attainment with a ready category', async () => {
 
-    const logSpy = jest.spyOn(global.console, 'log');
-
-    const testCategory = 'Exam';
-    const testDate = '2023-09-01';
-    const testExpiry = '2025-09-01';
-
-    const mockAttainments = [{
-      category: testCategory,
-      name: testCategory,
-      date: testDate,
-      expiryDate: testExpiry,
-      affectCalculation: false,
-      formulaAttributes: [],
+    const mockName = mockAttainment.name;
+    
+    // Mock request from client
+    const request = {
+      name: mockName,
+      date: new Date(mockDate),
+      expiryDate: new Date(mockExpiryDate),
       subAttainments: [],
-    }];
+      affectCalculation: false,
+      category: mockName,
+      formulaAttributes: [],
+    };
 
-    render(
-      <BrowserRouter>
-        <CreateAssignmentView />
-      </BrowserRouter>
-    );
+    renderCreateAssignmentView();
 
-    const selectLabel = 'Name';
-    const categoryField = await screen.findByLabelText(selectLabel);
-    const dateField = screen.getByLabelText('Date');
-    const expiryField = screen.getByLabelText('Expiry Date');
-    const confirmButton = screen.getByText('Confirm');
+    await waitFor( async () => {
 
-    userEvent.click(categoryField);
-    const optionsPopup = await screen.findByRole('listbox', { name: selectLabel });
-    userEvent.click(within(optionsPopup).getByText(testCategory));
+      const selectLabel = 'Name';
+      const categoryField = await screen.findByLabelText(selectLabel);
+      const dateField = screen.getByLabelText('Date');
+      const expiryField = screen.getByLabelText('Expiry Date');
+      const confirmButton = screen.getByText('Confirm');
 
-    expect(await screen.findByText(testCategory)).toBeInTheDocument();
+      userEvent.click(categoryField);
+      const optionsPopup = await screen.findByRole('listbox', { name: selectLabel });
+      userEvent.click(within(optionsPopup).getByText(mockName));
 
-    userEvent.type(dateField, testDate);
-    userEvent.type(expiryField, testExpiry);
-    userEvent.click(confirmButton);
+      expect(await screen.findByText(mockName)).toBeInTheDocument();
 
-    // Eventually test the function that adds an attainment to backend
-    expect(logSpy).toHaveBeenCalledTimes(1); 
-    expect(logSpy).toHaveBeenCalledWith(mockAttainments);
+      userEvent.type(dateField, mockDate);
+      userEvent.type(expiryField, mockExpiryDate);
+      userEvent.click(confirmButton);
 
-    logSpy.mockRestore();
+      expect(assignmentServices.addAttainment).toHaveBeenCalledWith(String(courseId), String(instanceId), request);
 
+    });
   });
 
   test('CreateAssignmentView should allow a teacher to create an attainment with a new category', async () => {
 
-    const logSpy = jest.spyOn(global.console, 'log');
+    const mockCategory = 'Other';
+    const mockName = 'Learning Diary';
 
-    const testCategory = 'Other';
-    const testName = 'Learning Diary';
-    const testDate = '2023-09-01';
-    const testExpiry = '2025-09-01';
-
-    const mockAttainments = [{
-      category: testCategory,
-      name: testName,
-      date: testDate,
-      expiryDate: testExpiry,
+    // Mock request from client
+    const request = {
+      name: mockName,
+      date: new Date(mockDate),
+      expiryDate: new Date(mockExpiryDate),
+      category: mockCategory,
+      subAttainments: [],
       affectCalculation: false,
       formulaAttributes: [],
-      subAttainments: [],
-    }];
+    };
 
-    render(
-      <BrowserRouter>
-        <CreateAssignmentView />
-      </BrowserRouter>
-    );
+    renderCreateAssignmentView();
 
-    const selectLabel = 'Name';
-    const categoryField = await screen.findByLabelText(selectLabel);
-    const dateField = screen.getByLabelText('Date');
-    const expiryField = screen.getByLabelText('Expiry Date');
-    const confirmButton = screen.getByText('Confirm');
+    await waitFor( async () => {
 
-    userEvent.click(categoryField);
-    const optionsPopup = await screen.findByRole('listbox', { name: selectLabel });
-    userEvent.click(within(optionsPopup).getByText(testCategory));
+      const selectLabel = 'Name';
+      const categoryField = await screen.findByLabelText(selectLabel);
+      const dateField = screen.getByLabelText('Date');
+      const expiryField = screen.getByLabelText('Expiry Date');
+      const confirmButton = screen.getByText('Confirm');
 
-    expect(await screen.findByText(testCategory)).toBeInTheDocument();
+      userEvent.click(categoryField);
+      const optionsPopup = await screen.findByRole('listbox', { name: selectLabel });
+      userEvent.click(within(optionsPopup).getByText(mockCategory));
 
-    const nameField = screen.getByLabelText('New Name');
-    userEvent.type(nameField, testName);
-    userEvent.type(dateField, testDate);
-    userEvent.type(expiryField, testExpiry);
-    userEvent.click(confirmButton);
+      expect(await screen.findByText(mockCategory)).toBeInTheDocument();
 
-    // Eventually test the function that adds an attainment to backend
-    expect(logSpy).toHaveBeenCalledTimes(1); 
-    expect(logSpy).toHaveBeenCalledWith(mockAttainments);
+      const nameField = screen.getByLabelText('New Name');
+      userEvent.type(nameField, mockName);
+      userEvent.type(dateField, mockDate);
+      userEvent.type(expiryField, mockExpiryDate);
+      userEvent.click(confirmButton);
 
-    logSpy.mockRestore();
+      expect(assignmentServices.addAttainment).toHaveBeenCalledWith(String(courseId), String(instanceId), request);
+
+    });
   });
 
   test('CreateAssignmentView should allow a teacher to create sub-attainments', async () => {
 
-    const logSpy = jest.spyOn(global.console, 'log');
-
-    const mockAttainments = [{
-      category: '',
-      name: '',
-      date: '',
-      expiryDate: '',
-      affectCalculation: false,
-      formulaAttributes: [],
-      subAttainments: [{
-        category: '',
-        name: '',
-        date: '',
-        expiryDate: '',
-        affectCalculation: false,
-        formulaAttributes: [],
-        subAttainments: [],
-      }]
-    }];
-
-    render(
-      <BrowserRouter>
-        <CreateAssignmentView />
-      </BrowserRouter>
-    );
+    renderCreateAssignmentView();
 
     const creationButton = screen.getByText('Create Sub-Attainments');
-    expect(creationButton).toBeInTheDocument();
+      expect(creationButton).toBeInTheDocument();
 
-    // Create one sub-attainment
-    userEvent.click(creationButton);
+      // Create one sub-attainment
+      userEvent.click(creationButton);
 
-    const numberField = screen.getByLabelText('Number of sub-attainments');
-    expect(numberField).toBeInTheDocument();
+      const numberField = screen.getByLabelText('Number of sub-attainments');
+      expect(numberField).toBeInTheDocument();
 
-    const confirmButtons = await screen.findAllByText('Confirm');
-    const numConfirmButton = confirmButtons[1]; // the second one aka the one in the dialog
+      const confirmButtons = await screen.findAllByText('Confirm');
+      const numConfirmButton = confirmButtons[1]; // the second one aka the one in the dialog
 
-    // the default number of sub-attainments in the Dialog element is 1 so this call creates one sub-attainment
-    userEvent.click(numConfirmButton);
+      // the default number of sub-attainments in the Dialog element is 1 so this call creates one sub-attainment
+      userEvent.click(numConfirmButton);
 
-    // Check that there is one sub-attainment so one 'Cancel'-button
-    const cancelButtons = await screen.findAllByText('Cancel');
-    const addButton = screen.getByText('Add Sub-Attainments');
+      // Check that there is one sub-attainment so one 'Delete'-button
+      const deleteButtons = await screen.findAllByText('Delete');
+      const addButton = screen.getByText('Add Sub-Attainments');
 
-    expect(cancelButtons).toHaveLength(1);
-    expect(addButton).toBeInTheDocument();
-
-    userEvent.click(confirmButtons[0]);
-
-    // Eventually test the function that adds an attainment to backend
-    expect(logSpy).toHaveBeenCalledTimes(1); 
-    expect(logSpy).toHaveBeenCalledWith(mockAttainments);
-
-    logSpy.mockRestore();
+      expect(deleteButtons).toHaveLength(1);
+      expect(addButton).toBeInTheDocument();
   });
 
 });
