@@ -194,8 +194,8 @@ describe('Tests for EditAssignmentView components', () => {
 
     let mockAttainment = getMockAttainment()[0];  // object
     mockAttainment.temporaryId = mockAttainment.id;
-    mockAttainment.date = mockAttainment.date.split('T')[0];
-    mockAttainment.expiryDate = mockAttainment.expiryDate.split('T')[0];
+    mockAttainment.date = mockDate.split('T')[0];
+    mockAttainment.expiryDate = mockExpiryDate.split('T')[0];
 
     renderTemporaryEditAssignmentView();
 
