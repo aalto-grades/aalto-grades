@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-// These mock assignments are temporary and they will be modified later
+// These mock attainments are temporary and they will be modified later
 // They have been kept in order to not break any tests or content currently in main
 
 const mockAttainments = [

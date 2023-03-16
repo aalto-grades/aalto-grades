@@ -8,7 +8,7 @@ const mockAttainmentsClient = [
     category: 'Other',
     date: new Date(2023, 9, 1),
     expiryDate: new Date(2024, 8, 14), 
-    formulaId: 1,  // formulaId is specified for assignments that have sub-assignments
+    formulaId: 1,  // formulaId is specified for attainments that have sub-attinments
     subAttainments: [ 
       { id: 11, 
         name: '4 mandatory exercises',
