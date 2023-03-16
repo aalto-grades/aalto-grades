@@ -120,7 +120,7 @@ describe('Tests for EditAssignmentView components', () => {
       subAttainments: [],
       affectCalculation: false,
       formulaAttributes: [],
-    }
+    };
 
     // Mock request from client,
     // TODO: needs to be modified to match the final format used by the server.
