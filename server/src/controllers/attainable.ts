@@ -13,7 +13,13 @@ import UserAttainmentGrade from '../database/models/userAttainmentGrade';
 
 import { AttainableData, AttainableRequestData, Formula, FormulaParams } from '../types/attainable';
 import { ApiError } from '../types/error';
-import { CalculationResult, formulaChecker, FormulaNode, getFormula, Status } from '../types/formulas';
+import {
+  CalculationResult,
+  formulaChecker,
+  FormulaNode,
+  getFormula,
+  Status
+} from '../types/formulas';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { findAttainableById, generateAttainableTag } from './utils/attainable';
@@ -238,17 +244,28 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
   });
 }
 
-async function calculate(tree: FormulaNode, presetPoints: Map<FormulaNode, number>): Promise<CalculationResult> {
+async function calculate(
+  tree: FormulaNode,
+  presetPoints: Map<FormulaNode, number>
+): Promise<CalculationResult> {
   if (presetPoints.has(tree)) {
     return { status: Status.Pass, points: presetPoints.get(tree) };
   }
   // Not calculated so far, so calculate the points for lower nodes.
-  const subPoints = await Promise.all(tree.subFormulaNodes.map((subTree) => calculate(subTree, presetPoints)));
+  const subPoints: Array<CalculationResult> =
+    await Promise.all(
+      tree.subFormulaNodes.map(
+        (subTree: FormulaNode) => calculate(subTree, presetPoints)
+      )
+    );
   // Based on the results from lower nodes, calculate the points for this node.
   return await tree.validatedFormula(subPoints);
 }
 
-export async function calculateGrades(req: Request, res: Response): Promise<void> {
+export async function calculateGrades(
+  req: Request,
+  res: Response
+): Promise<void> {
   const courseId: number = Number(req.params.courseId);
   const courseInstanceId: number = Number(req.params.instanceId);
   await idSchema.validate({ id: courseId }, { abortEarly: false });
@@ -274,10 +291,10 @@ export async function calculateGrades(req: Request, res: Response): Promise<void
     ]
   });
 
-  let rootAttainable = null;
+  let rootAttainable: null | FormulaNode = null;
   for (const attainable of attainables) {
-    const formulaId = attainable.formulaId;
-    const params = attainable.formulaParams;
+    const formulaId: Formula | null = attainable.formulaId;
+    const params: FormulaParams | null = attainable.formulaParams;
     if (!(await formulaChecker.validate(formulaId))) {
       throw new Error('bad');
     }
@@ -294,16 +311,26 @@ export async function calculateGrades(req: Request, res: Response): Promise<void
   for (const attainable of attainables) {
     if (attainable.attainableId === null) { // parent id
       if (rootAttainable) {
-        throw new ApiError('duplicate root attainment', HttpCode.InternalServerError); // the database is in a conflicting state
+        // the database is in a conflicting state
+        throw new ApiError(
+          'duplicate root attainment',
+          HttpCode.InternalServerError
+        );
       }
       rootAttainable = formulaNodesById.get(attainable.id)!;
     } else {
-      formulaNodesById.get(attainable.attainableId)!.subFormulaNodes.push(formulaNodesById.get(attainable.id)!);
+      formulaNodesById
+        .get(attainable.attainableId)!
+        .subFormulaNodes
+        .push(formulaNodesById.get(attainable.id)!);
     }
   }
 
   if (!rootAttainable) {
-    throw new ApiError('no root attainment for this course instance; maybe there is a cycle', HttpCode.BadRequest);
+    throw new ApiError(
+      'no root attainment for this course instance; maybe there is a cycle',
+      HttpCode.BadRequest
+    );
   }
 
   const studentPoints: Array<{
@@ -318,30 +345,38 @@ export async function calculateGrades(req: Request, res: Response): Promise<void
     attributes: ['userId', 'points', 'attainableId'],
   });
 
-  const presetPointsByStudentId: Map<number, Map<FormulaNode, number>> = new Map(); // student id -> formula node -> preset points
+  // student id -> formula node -> preset points
+  const presetPointsByStudentId: Map<number, Map<FormulaNode, number>> = new Map();
+
   for (const student of studentPoints) {
     if (!presetPointsByStudentId.has(student.userId)) {
       presetPointsByStudentId.set(student.userId, new Map());
     }
-    presetPointsByStudentId.get(student.userId)!.set(formulaNodesById.get(student.attainableId)!, student.points);
+    presetPointsByStudentId
+      .get(student.userId)!
+      .set(formulaNodesById.get(student.attainableId)!, student.points);
   }
 
   const rootAttainablePointsByStudent: Map<number, CalculationResult> = new Map();
   for (const [studentId, presetPoints] of presetPointsByStudentId) {
-    rootAttainablePointsByStudent.set(studentId, await calculate(rootAttainable, presetPoints));
+    rootAttainablePointsByStudent.set(
+      studentId,
+      await calculate(rootAttainable, presetPoints)
+    );
   }
 
   res.status(HttpCode.Ok)
     .json({
       success: true,
       data: {
-        grades: Array.from(rootAttainablePointsByStudent).map(([studentId, result]) => {
-          return {
-            studentId,
-            grade: result.points,
-            status: result.status,
-          };
-        })
+        grades: Array.from(rootAttainablePointsByStudent)
+          .map(([studentId, result]: [number, CalculationResult]) => {
+            return {
+              studentId,
+              grade: result.points,
+              status: result.status,
+            };
+          })
       }
     });
 }

@@ -70,7 +70,6 @@ export const router: Router = Router();
  *           description: >
  *             'pass' or 'fail' to indicate whether the attainment has been
  *              successfully completed.
- *           
  */
 
 /**
@@ -184,7 +183,9 @@ router.put(
  * /v1/courses/{courseId}/instances/{instanceId}/grades:
  *   get:
  *     tags: [Attainment]
- *     description: Calculate and get the final grades of all students [ANTI-BIKESHEDDING PLACEHOLDER].
+ *     description: >
+ *       Calculate and get the final grades of all students.
+ *       [ANTI-BIKESHEDDING PLACEHOLDER]
  *     responses:
  *       200:
  *         description: Grades calculated successfully.

@@ -503,13 +503,13 @@ describe('Test PUT /v1/courses/:courseId/instances/:instanceId/attainments/:atta
 
 describe('Test GET /v1/courses/:courseId/instances/:instanceId/grades', () => {
   it('should calculate correct grades', async () => {
-    let res: supertest.Response = await request
+    const res: supertest.Response = await request
       .get('/v1/courses/5/instances/8/grades');
 
     expect(res.body.errors).not.toBeDefined();
     expect(res.body.success).toBe(true);
     expect(res.statusCode).toBe(HttpCode.Ok);
     expect(res.body.data).toBeDefined();
-    expect(res.body.data.grades).toEqual([{ studentId: 1, grade: 1.24, status: "pass" }]);
+    expect(res.body.data.grades).toEqual([{ studentId: 1, grade: 1.24, status: 'pass' }]);
   });
 });
