@@ -24,8 +24,8 @@ export interface AttainableData {
 }
 
 export enum Formula {
-  MANUAL = 'MANUAL',
-  WEIGHTED_AVERAGE = 'WEIGHTED_AVERAGE',
+  Manual = 'MANUAL',
+  WeightedAverage = 'WEIGHTED_AVERAGE',
 }
 export interface FormulaParams {
   min: number;

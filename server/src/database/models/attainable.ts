@@ -61,9 +61,9 @@ Attainable.init(
       }
     },
     formulaId: {
-      type: DataTypes.ENUM(Formula.MANUAL, Formula.WEIGHTED_AVERAGE),
+      type: DataTypes.ENUM(Formula.Manual, Formula.WeightedAverage),
       allowNull: false,
-      defaultValue: Formula.MANUAL,
+      defaultValue: Formula.Manual,
     },
     formulaParams: {
       type: DataTypes.JSONB,

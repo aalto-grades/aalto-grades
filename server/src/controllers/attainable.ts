@@ -89,7 +89,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
     name: name,
     date: date,
     expiryDate: expiryDate,
-    formulaId: Formula.MANUAL,
+    formulaId: Formula.Manual,
   });
 
   async function processSubAttainables(
@@ -106,7 +106,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
         name: attainable.name,
         date: attainable.date,
         expiryDate: attainable.expiryDate,
-        formulaId: Formula.MANUAL,
+        formulaId: Formula.Manual,
       });
 
       if (attainable.subAttainments.length > 0) {
@@ -259,7 +259,7 @@ type FormulaNode = {
 };
 const formulasWithSchema: Map<Formula, [yup.AnyObjectSchema, ParameterizedFormulaFunction]> = new Map();
 formulasWithSchema.set(
-  Formula.MANUAL,
+  Formula.Manual,
   [
     yup.object(),
     async (_subGrades, _params) => { return { status: Status.FAIL, points: undefined }; },
@@ -293,7 +293,7 @@ async function calculatedWeightedAverage(
 }
 
 formulasWithSchema.set(
-  Formula.WEIGHTED_AVERAGE,
+  Formula.WeightedAverage,
   [
     yup.object({
       min: yup.number().required(),
@@ -304,7 +304,7 @@ formulasWithSchema.set(
   ]
 );
 
-const formulaChecker = yup.string().oneOf([Formula.MANUAL, Formula.WEIGHTED_AVERAGE]).required();
+const formulaChecker = yup.string().oneOf([Formula.Manual, Formula.WeightedAverage]).required();
 async function validate<P extends FormulaParams>(
   fn: (params: P, subPoints: Array<CalculationResult>) => Promise<CalculationResult>,
   schema: yup.AnyObjectSchema,

@@ -209,9 +209,9 @@ export default {
           onUpdate: 'CASCADE'
         },
         formula_id: {
-          type: DataTypes.ENUM(Formula.MANUAL, Formula.WEIGHTED_AVERAGE),
+          type: DataTypes.ENUM(Formula.Manual, Formula.WeightedAverage),
           allowNull: false,
-          defaultValue: Formula.MANUAL,
+          defaultValue: Formula.Manual,
         },
         formula_params: {
           type: DataTypes.JSONB,
