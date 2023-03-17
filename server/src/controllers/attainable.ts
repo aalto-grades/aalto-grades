@@ -242,12 +242,12 @@ enum Status {
   Fail = 'fail',
 }
 
-type CalculationResult = {
+interface CalculationResult {
   status: Status;
   points: number | undefined;
 }
 
-type WeightedAssignmentParams = {
+interface WeightedAssignmentParams {
   min: number;
   max: number;
   weights: Array<number>;
@@ -255,7 +255,7 @@ type WeightedAssignmentParams = {
 
 type FormulaFunction = (subResults: Array<CalculationResult>) => Promise<CalculationResult>;
 type ParameterizedFormulaFunction = (parameters: any, subResults: Array<CalculationResult>) => Promise<CalculationResult>;
-type FormulaNode = {
+interface FormulaNode {
   validatedFormula: FormulaFunction;
   subFormulaNodes: Array<FormulaNode>;
 };
