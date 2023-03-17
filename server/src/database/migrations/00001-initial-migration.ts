@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import { DataTypes, QueryInterface, Transaction } from 'sequelize';
-import { Formula } from '../../types/attainable';
 
 export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
@@ -209,9 +208,9 @@ export default {
           onUpdate: 'CASCADE'
         },
         formula_id: {
-          type: DataTypes.ENUM(Formula.Manual, Formula.WeightedAverage),
+          type: DataTypes.ENUM('MANUAL', 'WEIGHTED_AVERAGE'),
           allowNull: false,
-          defaultValue: Formula.Manual,
+          defaultValue: 'MANUAL',
         },
         formula_params: {
           type: DataTypes.JSONB,
