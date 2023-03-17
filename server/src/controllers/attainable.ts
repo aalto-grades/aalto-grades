@@ -371,6 +371,7 @@ export async function calculateGrades(req: Request, res: Response): Promise<void
       subFormulaNodes: [],
     });
   }
+
   for (const attainable of attainables) {
     if (attainable.attainableId === null) { // parent id
       if (rootAttainable) {
@@ -381,6 +382,7 @@ export async function calculateGrades(req: Request, res: Response): Promise<void
       formulaNodesById.get(attainable.attainableId)!.subFormulaNodes.push(formulaNodesById.get(attainable.id)!);
     }
   }
+
   if (!rootAttainable) {
     throw new ApiError('no root attainment for this course instance; maybe there is a cycle', HttpCode.BadRequest);
   }

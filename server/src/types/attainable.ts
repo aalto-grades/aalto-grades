@@ -27,6 +27,7 @@ export enum Formula {
   Manual = 'MANUAL',
   WeightedAverage = 'WEIGHTED_AVERAGE',
 }
+
 export interface FormulaParams {
   min: number;
   max: number;
