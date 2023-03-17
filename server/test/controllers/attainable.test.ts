@@ -503,7 +503,6 @@ describe('Test PUT /v1/courses/:courseId/instances/:instanceId/attainments/:atta
 
 describe('Test GET /v1/courses/:courseId/instances/:instanceId/grades', () => {
   it('should calculate correct grades', async () => {
-    // Create a new attainables.
     let res: supertest.Response = await request
       .get('/v1/courses/5/instances/8/grades');
 
