@@ -339,9 +339,9 @@ export async function calculateGrades(req: Request, res: Response): Promise<void
   await idSchema.validate({ id: courseId }, { abortEarly: false });
   await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
 
-  let formulaNodesById: Map<number, FormulaNode> = new Map();
+  const formulaNodesById: Map<number, FormulaNode> = new Map();
 
-  let attainables: Array<{
+  const attainables: Array<{
     id: number,
     attainableId: number,
     formulaId: Formula | null,
@@ -391,7 +391,7 @@ export async function calculateGrades(req: Request, res: Response): Promise<void
     throw new ApiError('no root attainment for this course instance; maybe there is a cycle', HttpCode.BadRequest);
   }
 
-  let studentPoints: Array<{
+  const studentPoints: Array<{
     userId: number,
     points: number,
     attainableId: number,
@@ -403,7 +403,7 @@ export async function calculateGrades(req: Request, res: Response): Promise<void
     attributes: ['userId', 'points', 'attainableId'],
   });
 
-  let presetPointsByStudentId: Map<number, Map<FormulaNode, number>> = new Map(); // student id -> formula node -> preset points
+  const presetPointsByStudentId: Map<number, Map<FormulaNode, number>> = new Map(); // student id -> formula node -> preset points
   for (const student of studentPoints) {
     if (!presetPointsByStudentId.has(student.userId)) {
       presetPointsByStudentId.set(student.userId, new Map());
@@ -411,7 +411,7 @@ export async function calculateGrades(req: Request, res: Response): Promise<void
     presetPointsByStudentId.get(student.userId)!.set(formulaNodesById.get(student.attainableId)!, student.points);
   }
 
-  let rootAttainablePointsByStudent: Map<number, CalculationResult> = new Map();
+  const rootAttainablePointsByStudent: Map<number, CalculationResult> = new Map();
   for (const [studentId, presetPoints] of presetPointsByStudentId) {
     rootAttainablePointsByStudent.set(studentId, await calculate(rootAttainable, presetPoints));
   }
