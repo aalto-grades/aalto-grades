@@ -68,7 +68,7 @@ export const router: Router = Router();
  *         status:
  *           type: string
  *           description: >
- *             'PASS' or 'FAIL' to indicate whether the attainment has been
+ *             'pass' or 'fail' to indicate whether the attainment has been
  *              successfully completed.
  *           
  */
