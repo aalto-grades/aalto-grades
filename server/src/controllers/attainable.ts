@@ -307,7 +307,7 @@ formulasWithSchema.set(
   ]
 );
 
-const formulaChecker = yup.string().oneOf([Formula.Manual, Formula.WeightedAverage]).required();
+const formulaChecker = yup.string().oneOf(Object.values(Formula)).required();
 
 async function validate<P extends FormulaParams>(
   fn: (params: P, subPoints: Array<CalculationResult>) => Promise<CalculationResult>,
