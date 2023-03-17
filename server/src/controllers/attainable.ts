@@ -327,9 +327,9 @@ async function calculate(tree: FormulaNode, presetPoints: Map<FormulaNode, numbe
   if (presetPoints.has(tree)) {
     return { status: Status.Pass, points: presetPoints.get(tree) };
   }
-  // Ei laskettu vielä, laske ensin alempien solmujen pisteet.
+  // Not calculated so far, so calculate the points for lower nodes.
   const subPoints = await Promise.all(tree.subFormulaNodes.map((subTree) => calculate(subTree, presetPoints)));
-  // Alempien solmujen perusteella, laske tämän solmun pisteet.
+  // Based on the results from lower nodes, calculate the points for this node.
   return await tree.validatedFormula(subPoints);
 }
 
