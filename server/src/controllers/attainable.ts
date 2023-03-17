@@ -238,13 +238,15 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
 }
 
 enum Status {
-  PASS = 'pass',
-  FAIL = 'fail',
+  Pass = 'pass',
+  Fail = 'fail',
 }
+
 type CalculationResult = {
   status: Status;
   points: number | undefined;
 }
+
 type WeightedAssignmentParams = {
   min: number;
   max: number;
@@ -257,12 +259,13 @@ type FormulaNode = {
   validatedFormula: FormulaFunction;
   subFormulaNodes: Array<FormulaNode>;
 };
+
 const formulasWithSchema: Map<Formula, [yup.AnyObjectSchema, ParameterizedFormulaFunction]> = new Map();
 formulasWithSchema.set(
   Formula.Manual,
   [
     yup.object(),
-    async (_subGrades, _params) => { return { status: Status.FAIL, points: undefined }; },
+    async (_subGrades, _params) => { return { status: Status.Fail, points: undefined }; },
   ]
 );
 
@@ -278,15 +281,15 @@ async function calculatedWeightedAverage(
           weight: number,
           i: number,
         ) => {
-          if (acc.status == Status.FAIL || subResults[i].status == Status.FAIL) {
-            return { points: undefined, status: Status.FAIL };
+          if (acc.status == Status.Fail || subResults[i].status == Status.Fail) {
+            return { points: undefined, status: Status.Fail };
           }
           return {
             points: (acc.points ?? 0) + weight * (subResults[i].points ?? 0),
-            status: Status.PASS,
+            status: Status.Pass,
           };
         },
-        { status: Status.PASS, points: 0 }
+        { status: Status.Pass, points: 0 }
       );
 
   return weighted;
@@ -305,6 +308,7 @@ formulasWithSchema.set(
 );
 
 const formulaChecker = yup.string().oneOf([Formula.Manual, Formula.WeightedAverage]).required();
+
 async function validate<P extends FormulaParams>(
   fn: (params: P, subPoints: Array<CalculationResult>) => Promise<CalculationResult>,
   schema: yup.AnyObjectSchema,
@@ -321,7 +325,7 @@ function getFormula(name: Formula, params: FormulaParams) {
 
 async function calculate(tree: FormulaNode, presetPoints: Map<FormulaNode, number>): Promise<CalculationResult> {
   if (presetPoints.has(tree)) {
-    return { status: Status.PASS, points: presetPoints.get(tree) };
+    return { status: Status.Pass, points: presetPoints.get(tree) };
   }
   // Ei laskettu vielä, laske ensin alempien solmujen pisteet.
   const subPoints = await Promise.all(tree.subFormulaNodes.map((subTree) => calculate(subTree, presetPoints)));
