@@ -11,14 +11,14 @@ import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 import textFormatServices from '../../services/textFormat';
 import useAuth from '../../hooks/useAuth';
 
-const OngoingInstanceInfo = ({ info }) => {
+const InstanceDetails = ({ info }) => {
   const { minCredits, maxCredits, startDate, endDate, type, gradingScale, teachersInCharge, department, institution } = info;
   const { auth } = useAuth();
 
   return(
     <Box sx={{ display: 'inline-block', pt: 1.5 }}>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', columnGap: 4, pb: 1 }}>
-        <Typography variant='h6' align='left' sx={{ ml: 1.5 }} >Ongoing Instance</Typography>
+        <Typography variant='h6' align='left' sx={{ ml: 1.5 }} >Instance Details</Typography>
         { /* Only admins, teachers and assistants are allowed to see attendees*/
           (auth.role == 'SYSADMIN' || auth.role == 'TEACHER'|| auth.role == 'ASSISTANT') && 
           <Button>See attendees</Button>
@@ -44,7 +44,7 @@ const OngoingInstanceInfo = ({ info }) => {
   );
 };
 
-OngoingInstanceInfo.propTypes = {
+InstanceDetails.propTypes = {
   info: PropTypes.object,
   period: PropTypes.string,
   startDate: PropTypes.instanceOf(Date),
@@ -57,4 +57,4 @@ OngoingInstanceInfo.propTypes = {
   teachers: PropTypes.array
 };
 
-export default OngoingInstanceInfo;
+export default InstanceDetails;

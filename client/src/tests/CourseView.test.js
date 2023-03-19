@@ -43,29 +43,29 @@ describe('Tests for CourseView component', () => {
   };
 
 
-  test('CourseView should render OngoingInstanceInfo, Assignments and InstancesTable components for teachers', async () => {
+  test('CourseView should render InstanceDetails, Attainments and InstancesTable components for teachers', async () => {
 
     const auth = { role: 'TEACHER' };
     const { getByText, getAllByText } = renderCourseView(auth);
 
     await waitFor(() => {
-      const instanceInfo = getByText('Ongoing Instance');
+      const instanceInfo = getByText('Instance Details');
       const teachersInfo = getByText('Teachers in Charge');         
-      const assignments = getByText('Study Attainments');
-      const exercises = getByText('Exercises');  // Assignment
-      const projects = getByText('Project');  // Assignment
-      const exams = getAllByText('Exam');  // Assignmnets and instance types
-      const pastInstances = getByText('All Past Instances');
+      const attainments = getByText('Study Attainments');
+      const exercises = getByText('Exercises');  
+      const projects = getByText('Project'); 
+      const exams = getAllByText('Exam');  
+      const instances = getByText('All Instances');
       const createInstanceButton = getByText('New instance');
       const addAssignmentButton = getByText('Add attainment');
       const seeAttendeesButton = getByText('See attendees');
       expect(instanceInfo).toBeDefined();
       expect(teachersInfo).toBeDefined();
-      expect(assignments).toBeDefined();
+      expect(attainments).toBeDefined();
       expect(exercises).toBeDefined();
       expect(projects).toBeDefined();
       expect(exams).toBeDefined();
-      expect(pastInstances).toBeDefined();
+      expect(instances).toBeDefined();
       expect(createInstanceButton).toBeDefined();
       expect(addAssignmentButton).toBeDefined();
       expect(seeAttendeesButton).toBeDefined();
@@ -78,13 +78,13 @@ describe('Tests for CourseView component', () => {
     const auth = { role: 'STUDENT' };
     const { getByText, findByText, queryByText } = renderCourseView(auth);
 
-    const instanceInfo = await findByText('Ongoing Instance');  // with the new animation, wait is needed before components are rendered
+    const instanceInfo = await findByText('Instance Details');  // with the new animation, wait is needed before components are rendered
     const teachersInfo = getByText('Teachers in Charge');       // since previous is in document, so are the rest
-    const pastInstances = getByText('All Past Instances');
+    const instances = getByText('All Instances');
 
     expect(instanceInfo).toBeDefined();
     expect(teachersInfo).toBeDefined();
-    expect(pastInstances).toBeDefined();
+    expect(instances).toBeDefined();
 
     expect(queryByText('Study Attainments')).not.toBeInTheDocument();
     expect(queryByText('Add attainment')).not.toBeInTheDocument();
