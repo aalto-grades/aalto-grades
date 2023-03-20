@@ -4,7 +4,7 @@
 
 import express, { Router } from 'express';
 
-import { addAttainable, calculateGrades, updateAttainable } from '../controllers/attainable';
+import { addAttainable, updateAttainable } from '../controllers/attainable';
 import { handleInvalidRequestJson } from '../middleware';
 import { controllerDispatcher } from '../middleware/errorHandler';
 
@@ -176,41 +176,4 @@ router.put(
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(updateAttainable)
-);
-
-/**
- * @swagger
- * /v1/courses/{courseId}/instances/{instanceId}/grades:
- *   get:
- *     tags: [Attainment]
- *     description: >
- *       Calculate and get the final grades of all students.
- *       [ANTI-BIKESHEDDING PLACEHOLDER]
- *     responses:
- *       200:
- *         description: Grades calculated successfully.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Grades'
- *       400:
- *         description: >
- *           Calculation failed, due to validation errors or missing parameters.
- *           This may also indicate a cycle in the hierarchy of attainables.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *       404:
- *         description: The given course or course instance does not exist.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- */
-router.get(
-  '/v1/courses/:courseId/instances/:instanceId/grades',
-  express.json(),
-  handleInvalidRequestJson,
-  controllerDispatcher(calculateGrades)
 );
