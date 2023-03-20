@@ -53,7 +53,7 @@ formulasWithSchema.set(
   ]
 );
 
-async function calculatedWeightedAverage(
+async function calculateWeightedAverage(
   params: WeightedAssignmentParams,
   subResults: Array<CalculationResult>
 ): Promise<CalculationResult> {
@@ -87,7 +87,7 @@ formulasWithSchema.set(
       max: yup.number().required(),
       weights: yup.array(yup.number().required()).required(),
     }),
-    calculatedWeightedAverage,
+    calculateWeightedAverage,
   ]
 );
 
