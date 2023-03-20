@@ -9,11 +9,32 @@ import { controllerDispatcher } from '../middleware/errorHandler';
 
 export const router: Router = Router();
 
+/* @swagger
+ * definitions:
+ *   Grades:
+ *     description: Calculated final grades for each student.
+ *     type: array
+ *     items:
+ *       type: object
+ *       properties:
+ *         studentId:
+ *           type: number
+ *           description: Student database identifier.
+ *         grade:
+ *           type: number
+ *           description: Final grade of the student.
+ *         status:
+ *           type: string
+ *           description: >
+ *             'pass' or 'fail' to indicate whether the attainment has been
+ *              successfully completed.
+ */
+
 /**
  * @swagger
  * /v1/courses/{courseId}/instances/{instanceId}/grades/calculate:
  *   post:
- *     tags: [Attainment]
+ *     tags: [Grades]
  *     description: >
  *       Calculate and get the final grades of all students.
  *       [ANTI-BIKESHEDDING PLACEHOLDER]
