@@ -38,58 +38,13 @@ const formulasWithSchema: Map<
   [yup.AnyObjectSchema, ParameterizedFormulaFunction]
 > = new Map();
 
-formulasWithSchema.set(
-  Formula.Manual,
-  [
-    yup.object(),
-    // If no points have been input for a student, assume the attainment
-    // has been failed.
-    async (
-      _params: any,
-      _subGrades: Array<CalculationResult>,
-    ): Promise<CalculationResult> => {
-      return { status: Status.Fail, points: undefined };
-    },
-  ]
-);
-
-async function calculateWeightedAverage(
-  params: WeightedAssignmentParams,
-  subResults: Array<CalculationResult>
-): Promise<CalculationResult> {
-  const weighted: CalculationResult =
-    params.weights
-      .reduce(
-        (
-          acc: CalculationResult,
-          weight: number,
-          i: number,
-        ) => {
-          if (acc.status == Status.Fail || subResults[i].status == Status.Fail) {
-            return { points: undefined, status: Status.Fail };
-          }
-          return {
-            points: (acc.points ?? 0) + weight * (subResults[i].points ?? 0),
-            status: Status.Pass,
-          };
-        },
-        { status: Status.Pass, points: 0 }
-      );
-
-  return weighted;
+export function registerFormula(
+  name: Formula,
+  schema: yup.AnyObjectSchema,
+  impl: ParameterizedFormulaFunction,
+): void {
+  formulasWithSchema.set(name, [schema, impl]);
 }
-
-formulasWithSchema.set(
-  Formula.WeightedAverage,
-  [
-    yup.object({
-      min: yup.number().required(),
-      max: yup.number().required(),
-      weights: yup.array(yup.number().required()).required(),
-    }),
-    calculateWeightedAverage,
-  ]
-);
 
 // formulaChecker verifies that a provided string is valid for `type Formula`.
 export const formulaChecker: yup.StringSchema =
