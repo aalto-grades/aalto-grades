@@ -164,7 +164,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
 export async function deleteAttainable(req: Request, res: Response): Promise<void> {
   /*
    * TODO: Check that the requester is logged in, 401 Unauthorized if not
-   * TODO: Check that the requester is authorized to add a course instance, 403
+   * TODO: Check that the requester is authorized to delete attainables, 403
    * Forbidden if not
    */
 
