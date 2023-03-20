@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 import AssignmentCategory from '../assignments/AssignmentCategory';
 
 
-const Assignments = ({ assignments, formula, instance }) => {
+const Assignments = ({ assignments, formula, instance, courseCode }) => {
   const navigate = useNavigate();
   
   return (
@@ -19,7 +19,8 @@ const Assignments = ({ assignments, formula, instance }) => {
       <Typography variant='h6' align='left' sx={{ ml: 1.5 }} >Study Attainments</Typography>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
         <Typography align='left' sx={{ ml: 1.5 }} >{'Grading Formula: ' + formula}</Typography>
-        <Button onClick={ () => navigate('/select-formula') }>Edit formula</Button>
+        <Button onClick={() => navigate(`/${courseCode}/select-formula/${instance.id}`) }>Edit formula</Button>
+        { /* The path above should be changes once courseId can be fetched from the path */ }
       </Box>
       <Box sx={{ display: 'inline-grid', gap: 1 }}>
         { assignments.map(assignment => {
@@ -47,7 +48,8 @@ const Assignments = ({ assignments, formula, instance }) => {
 Assignments.propTypes = {
   assignments: PropTypes.array,
   instance: PropTypes.object,
-  formula: PropTypes.string
+  formula: PropTypes.string,
+  courseCode: PropTypes.string
 };
 
 export default Assignments;

@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useOutletContext, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -16,56 +16,121 @@ import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import styled from 'styled-components';
+import FormHelperText from '@mui/material/FormHelperText';
+import StyledBox from './StyledBox';
 import ViewFormulaAccordion from './ViewFormulaAccordion';
+import AlertSnackbar from '../alerts/AlertSnackbar';
 
-const StyledBox = styled(Box)`
-  width: 53vw;
-  min-width:  400px;
-  max-width: 1000px;
-`;
 
-const SelectFormulaForm = ({ assignments, formulas, courseId }) => {
+const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, navigateToAttributeSelection }) => {
 
-  const [formula, setFormula] = useState('');
   const [codeSnippet, setCodeSnippet] = useState('');
-  const [selectedAssignments, setSelectedAssignments] = useState([]);
+  const [snackPack, setSnackPack] = useState([]);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [messageInfo, setMessageInfo] = useState(undefined);
+  const [checkboxError, setCheckboxError] = useState('');
+  const [formulaError, setFormulaError] = useState('');
+  
   const navigate = useNavigate();
+
+  const {
+    selectedAssignments, setSelectedAssignments,
+    selectedFormula, setSelectedFormula
+  } = useOutletContext();
+
+  useEffect(() => {
+    // set code snippet if user returns from attribute selection
+    if (selectedFormula.name !== undefined) {
+      setCodeSnippet(selectedFormula.codeSnippet);
+    }
+  }, []);
+
+  useEffect(() => {
+    // all attainments are checked at default -> add them to selected assignments
+    if (selectedAssignments.length === 0) {
+      setSelectedAssignments(assignments);
+    }
+  }, [assignments]);
+
+  // useEffect in charge of handling the back-to-back alerts
+  // makes the previous disappear before showing the new one
+  useEffect(() => {
+    if (snackPack.length && !messageInfo) {
+      setMessageInfo({ ...snackPack[0] });
+      setSnackPack((prev) => prev.slice(1));
+      setAlertOpen(true);
+    } else if (snackPack.length && messageInfo && alertOpen) {
+      setAlertOpen(false);
+    }
+  }, [snackPack, messageInfo, alertOpen]);
 
   const handleFormulaChange = (event) => {
     const newFormula = formulas.find(formula => formula.name == event.target.value);
     setCodeSnippet(newFormula.codeSnippet);
-    setFormula(event.target.value);
+    setSelectedFormula(newFormula);
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log(event.nativeEvent.submitter.name);
-    try {
-      // TODO: send formula to backend -> needs instance id?
-      const formulaObject = ({
-        formula,
-        selectedAssignments
-      });
-      console.log(formulaObject);
+  // checks that user has selected a function and at least one attainment
+  // if not, shows error message
+  const canBeSubmitted = () => {
+    var noErrors = true;
+    if(selectedAssignments.length === 0) {
+      setCheckboxError('You must select at least one study attainment');
+      noErrors = false;
+    } else {
+      // if an error was previously present, clear it
+      setCheckboxError('');
+    }
+    if(selectedFormula.name === undefined) {
+      setFormulaError('You must select a formula');
+      noErrors = false;
+    } else {
+      setFormulaError('');
+    }
+    return noErrors;
+  };
 
-      if (event.nativeEvent.submitter.name == 'skipAttributes') {
-        navigate(`/course-view/${courseId}`, { replace: true });
-      } else {
-        // TODO: redirect to specify attribures
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (canBeSubmitted()) {
+      try {
+        // TODO: add formula to database
+        setSnackPack((prev) => [...prev,
+          { msg: 'Formula saved, you will be redirected to the course page.', severity: 'success' }
+        ]);
+        await sleep(4000);
+        navigateToCourseView();
+
+      } catch (exception) {
+        console.log(exception);
+        setSnackPack((prev) => [...prev,
+          { msg: 'Saving the formula failed.', severity: 'error' }
+        ]);
       }
-      
-    } catch (exception) {
-      console.log(exception);
     }
   };
 
   const handleCheckboxChange = (event) => {
+    const selectedAssignment = assignments.find(assignment => assignment.name == event.target.name);
     if(event.target.checked) {
-      setSelectedAssignments(prev => [...prev, event.target.name]);
+      setSelectedAssignments(prev => [...prev, selectedAssignment]);
     } else {
-      setSelectedAssignments(prev => prev.filter(assignment => assignment !== event.target.name));
+      setSelectedAssignments(prev => prev.filter(assignment => assignment !== selectedAssignment));
     }
+  };
+
+  const isChecked = (assignment) => {
+    // If user has returned from attribute selection -> only assigments they previously selected are checked
+    var i;
+    for (i = 0; i < selectedAssignments.length; i++) {
+      if (selectedAssignments[i] === assignment) {
+        return true;
+      }
+    }
+    return false;
   };
 
   const assignmentCheckboxes = () => {
@@ -73,7 +138,7 @@ const SelectFormulaForm = ({ assignments, formulas, courseId }) => {
       <>
         { assignments.map((assignment) => (
           <FormControlLabel key={assignment.id} control={
-            <Checkbox name={assignment.name} onChange={handleCheckboxChange}/>
+            <Checkbox name={assignment.name} onChange={handleCheckboxChange} checked={isChecked(assignment)}/>
           } label={assignment.name} />
         ))
         }
@@ -83,6 +148,7 @@ const SelectFormulaForm = ({ assignments, formulas, courseId }) => {
 
   return(
     <form onSubmit={handleSubmit}>
+      <AlertSnackbar messageInfo={messageInfo} setMessageInfo={setMessageInfo} open={alertOpen} setOpen={setAlertOpen} />
       <StyledBox sx={{ 
         display: 'flex', 
         alignItems: 'flex-start',
@@ -98,12 +164,20 @@ const SelectFormulaForm = ({ assignments, formulas, courseId }) => {
           <FormGroup>
             {assignmentCheckboxes()}
           </FormGroup>
+          <FormHelperText error={checkboxError !== ''}>{ checkboxError }</FormHelperText>
         </FormControl>
         <FormControl sx={{ m: 3, mt: 3, minWidth: 280 }} variant='standard'>
           <InputLabel id='formulaLabel' shrink={true} sx={{ fontSize: '20px', mb: -2, position: 'relative' }}>Formula</InputLabel>
-          <Select label='Formula' labelId='formulaLabel' value={formula} onChange={handleFormulaChange} defaultValue='Weighted average' data-testid='select'>
-            { formulas.map((formula) => <MenuItem key={formula.id} value={formula.name} data-testid='select-option'>{formula.name}</MenuItem> ) }
+          <Select
+            label='Formula'
+            labelId='formulaLabel'
+            value={selectedFormula.name ?? ''}
+            onChange={handleFormulaChange}
+            error={formulaError !== ''}
+          >
+            { formulas.map((formula) => <MenuItem key={formula.id} value={formula.name}>{formula.name}</MenuItem> ) }
           </Select>
+          <FormHelperText error={formulaError !== ''}>{ formulaError }</FormHelperText>
         </FormControl>
         <StyledBox>
           <ViewFormulaAccordion codeSnippet={codeSnippet}/>
@@ -112,18 +186,21 @@ const SelectFormulaForm = ({ assignments, formulas, courseId }) => {
           display: 'flex', 
           flexDirection: 'row',
           flexWrap: 'wrap',
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
         }}>
-          <Typography width={350} m={3}>Specify attribute values for the sub study attainnments</Typography>
-          <Box sx={{ m: 3, mt: 0, alignSelf: 'flex-end',display: 'flex', lexDirection: 'column', }}>
-            <Button size='small' variant='outlined' type='submit' name='skipAttributes' sx={{ mr: 2 }}>
+          <Typography width={320} sx={{ m: 3, mb: 1.5 }}>Specify attribute values for the sub study attainments</Typography>
+          <Box sx={{ mx: 3, mt: 0, mb: 1.5, alignSelf: 'flex-end',display: 'flex', lexDirection: 'column', }}>
+            <Button size='medium' variant='outlined' type='submit' name='skipAttributes' sx={{ mr: 2 }}>
               Skip for now
             </Button>
-            <Button size='small' variant='contained' type='submit' name='specifyAttributes'>
+            <Button size='medium' variant='contained' onClick={ () => canBeSubmitted() && navigateToAttributeSelection() }>
               Specify  attributes
             </Button>
           </Box>
         </StyledBox>
+        <Button sx={{ mt: 0, mb: 1.5, ml: 2.2 }} size='medium' variant='text' onClick={ () => navigate(-1)}>
+          Cancel
+        </Button>
       </StyledBox>
     </form>
   );
@@ -133,7 +210,8 @@ const SelectFormulaForm = ({ assignments, formulas, courseId }) => {
 SelectFormulaForm.propTypes = {
   assignments: PropTypes.array,
   formulas: PropTypes.array,
-  courseId: PropTypes.string,
+  navigateToCourseView: PropTypes.func,
+  navigateToAttributeSelection: PropTypes.func,
 };
 
 export default SelectFormulaForm;
