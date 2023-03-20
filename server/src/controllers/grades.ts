@@ -7,12 +7,13 @@ import { Request, Response } from 'express';
 import Attainable from '../database/models/attainable';
 import UserAttainmentGrade from '../database/models/userAttainmentGrade';
 
-import { Formula, FormulaParams } from '../types/attainable';
 import { ApiError } from '../types/error';
 import {
   CalculationResult,
+  Formula,
   formulaChecker,
   FormulaNode,
+  FormulaParams,
   getFormula,
   Status
 } from '../types/formulas';

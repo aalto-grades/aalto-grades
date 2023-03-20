@@ -4,9 +4,9 @@
 
 import * as yup from 'yup';
 
-import { Formula } from '../types/attainable';
 import {
   CalculationResult,
+  Formula,
   registerFormula,
   Status,
   WeightedAssignmentParams

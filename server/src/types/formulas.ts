@@ -2,8 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Formula, FormulaParams } from './attainable';
 import * as yup from 'yup';
+
+export enum Formula {
+  Manual = 'MANUAL',
+  WeightedAverage = 'WEIGHTED_AVERAGE',
+}
+
+export interface FormulaParams {
+  min: number;
+  max: number;
+}
 
 export enum Status {
   Pass = 'pass',
