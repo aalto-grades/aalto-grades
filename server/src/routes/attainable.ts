@@ -53,23 +53,6 @@ export const router: Router = Router();
  *             required: true
  *             description: Course instance ID to which the study attainment belongs to.
  *       - $ref: '#/definitions/AddAndEditAttainment'
- *   Grades:
- *     description: Calculated final grades for each student.
- *     type: array
- *     items:
- *       type: object
- *       properties:
- *         studentId:
- *           type: number
- *           description: Student database identifier.
- *         grade:
- *           type: number
- *           description: Final grade of the student.
- *         status:
- *           type: string
- *           description: >
- *             'pass' or 'fail' to indicate whether the attainment has been
- *              successfully completed.
  */
 
 /**
