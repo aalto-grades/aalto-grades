@@ -7,7 +7,7 @@ import {
 } from 'sequelize';
 
 import { sequelize } from '..';
-import { Formula, FormulaParams } from '../../types/attainable';
+import { Formula, FormulaParams } from '../../types/formulas';
 import Course from './course';
 import CourseInstance from './courseInstance';
 
