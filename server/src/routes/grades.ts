@@ -1,7 +1,7 @@
-import express, { Router } from "express";
-import { calculateGrades } from "../controllers/grades";
-import { handleInvalidRequestJson } from "../middleware";
-import { controllerDispatcher } from "../middleware/errorHandler";
+import express, { Router } from 'express';
+import { calculateGrades } from '../controllers/grades';
+import { handleInvalidRequestJson } from '../middleware';
+import { controllerDispatcher } from '../middleware/errorHandler';
 
 export const router: Router = Router();
 
@@ -14,7 +14,7 @@ export const router: Router = Router();
  *       Calculate and get the final grades of all students.
  *       [ANTI-BIKESHEDDING PLACEHOLDER]
  *     requestBody:
- *       description: The request body should be empty. 
+ *       description: The request body should be empty.
  *     responses:
  *       200:
  *         description: Grades calculated successfully.

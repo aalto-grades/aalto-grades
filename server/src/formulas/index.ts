@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 
-import { Formula } from "../types/attainable";
-import { CalculationResult, registerFormula, Status } from "../types/formulas";
+import { Formula } from '../types/attainable';
+import { CalculationResult, registerFormula, Status } from '../types/formulas';
 
 registerFormula(
   Formula.Manual,

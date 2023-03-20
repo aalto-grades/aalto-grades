@@ -1,15 +1,20 @@
 import * as yup from 'yup';
 
-import { Formula } from "../types/attainable";
-import { CalculationResult, registerFormula, Status, WeightedAssignmentParams } from "../types/formulas";
+import { Formula } from '../types/attainable';
+import {
+  CalculationResult,
+  registerFormula,
+  Status,
+  WeightedAssignmentParams
+} from '../types/formulas';
 
 async function calculateWeightedAverage(
   params: WeightedAssignmentParams,
   subResults: Array<CalculationResult>
 ): Promise<CalculationResult> {
-  let total = 0;
+  let total: number = 0;
 
-  for (let i = 0; i < subResults.length; ++i) {
+  for (let i: number = 0; i < subResults.length; ++i) {
     if (subResults[i].status != Status.Pass) {
       return {
         points: undefined,
@@ -30,5 +35,3 @@ registerFormula(
   }),
   calculateWeightedAverage,
 );
-
-
