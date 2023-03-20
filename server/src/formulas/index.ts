@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import * as yup from 'yup';
 
 import { Formula } from '../types/attainable';

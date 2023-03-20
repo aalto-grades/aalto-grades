@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import express, { Router } from 'express';
 import { calculateGrades } from '../controllers/grades';
 import { handleInvalidRequestJson } from '../middleware';

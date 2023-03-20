@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import { Request, Response } from 'express';
 
 import Attainable from '../database/models/attainable';
