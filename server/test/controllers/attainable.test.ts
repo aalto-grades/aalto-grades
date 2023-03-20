@@ -4,6 +4,8 @@
 
 import supertest from 'supertest';
 
+import Attainable from '../../src/database/models/attainable';
+
 import { mockAttainable } from '../mockData/attainable';
 import { app } from '../../src/app';
 import { AttainableData } from '../../src/types/attainable';
@@ -327,6 +329,35 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/attainments', ()
         `parent attainment ID ${id} does not belong to the course instance ID 2`);
       expect(res.statusCode).toBe(HttpCode.Conflict);
     });
+});
+
+describe('Test DELETE /v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId', () => {
+  it('should succesfully delete single attainable', async () => {
+    const add: supertest.Response = await request
+      .post('/v1/courses/1/instances/1/attainments')
+      .send({
+        ...mockAttainable,
+        subAttainments: undefined
+      });
+
+    const addedAttainable: number = add.body.data.attainment.id;
+
+    const res: supertest.Response = await request
+      .delete(`/v1/courses/1/instances/1/attainments/${addedAttainable}`);
+
+    expect(res.statusCode).toBe(HttpCode.Ok);
+    expect(res.body.success).toBe(true);
+
+    expect(await Attainable.findByPk(addedAttainable)).toBeNull;
+  });
+
+  it('should respond with 404 not found for non-existent attainable ID', async () => {
+    const res: supertest.Response = await request
+      .delete(`/v1/courses/1/instances/1/attainments/${badId}`);
+
+    expect(res.statusCode).toBe(HttpCode.NotFound);
+    expect(res.body.success).toBe(false);
+  });
 });
 
 describe('Test PUT /v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId', () => {
