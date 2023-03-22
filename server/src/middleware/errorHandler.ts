@@ -3,7 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import { AxiosError } from 'axios';
+import { CsvError } from 'csv-parse';
 import express, { NextFunction, Request, RequestHandler, Response } from 'express';
+import { MulterError } from 'multer';
 import { ValidationError } from 'yup';
 
 import { ApiError } from '../types/error';
@@ -72,6 +74,14 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
           : err.message
       ]
     });
+  }
+
+  if (err instanceof CsvError || err instanceof MulterError) {
+    res.status(HttpCode.BadRequest).send({
+      success: false,
+      errors: [err.message]
+    });
+    return;
   }
 
   // Fallback if no other error matches
