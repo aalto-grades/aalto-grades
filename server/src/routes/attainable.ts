@@ -4,7 +4,7 @@
 
 import express, { Router } from 'express';
 
-import { addAttainable, deleteAttainable, updateAttainable } from '../controllers/attainable';
+import { addAttainable, deleteAttainment, updateAttainable } from '../controllers/attainable';
 import { handleInvalidRequestJson } from '../middleware';
 import { controllerDispatcher } from '../middleware/errorHandler';
 
@@ -110,7 +110,7 @@ router.post(
 
 router.delete(
   '/v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId',
-  controllerDispatcher(deleteAttainable)
+  controllerDispatcher(deleteAttainment)
 );
 
 /**

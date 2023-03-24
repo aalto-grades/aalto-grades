@@ -164,7 +164,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
 export async function deleteAttainment(req: Request, res: Response): Promise<void> {
   /*
    * TODO: Check that the requester is logged in, 401 Unauthorized if not
-   * TODO: Check that the requester is authorized to delete attainables, 403
+   * TODO: Check that the requester is authorized to delete attainments, 403
    * Forbidden if not
    */
 
@@ -179,45 +179,13 @@ export async function deleteAttainment(req: Request, res: Response): Promise<voi
   await idSchema.validate({ id: attainmentId }, { abortEarly: false });
   await validateCourseAndInstance(courseId, courseInstanceId);
 
-  const attainable: Attainable = await findAttainableById(attainmentId, HttpCode.NotFound);
+  // Find the attainment to be deleted.
+  const attainment: Attainable = await findAttainableById(attainmentId, HttpCode.NotFound);
 
-  // IDs of attainables to be deleted.
-  const ids: Array<number> = [attainable.id];
-
-  function findAllSubAttainables(
-    parentId: number,
-    allAttainables: Array<Attainable>
-  ): void {
-    for (const otherAttainable of allAttainables) {
-      if (otherAttainable.attainableId === parentId) {
-        ids.push(otherAttainable.id);
-        findAllSubAttainables(otherAttainable.id, allAttainables);
-      }
-    }
-  }
-
-  findAllSubAttainables(
-    attainable.id,
-    await Attainable.findAll({
-      attributes: ['id', 'attainable_id'],
-      where: {
-        courseInstanceId: courseInstanceId
-      }
-    })
-  );
-
-  /*
-   * TODO: Also delete grades of these attainables.
-   * TODO: Query inside for loop may be bad, is there a better way to delete
-   * multiple entries?
-   */
-  for (const id of ids) {
-    Attainable.destroy({
-      where: {
-        id: id
-      }
-    });
-  }
+  // Delete the attainment, this automatically also deletes all of the
+  // subattainments of this attainment.
+  // TODO: Also delete grades of these attainments?
+  await attainment.destroy();
 
   res.status(HttpCode.Ok).send({
     success: true,
