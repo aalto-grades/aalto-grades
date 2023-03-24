@@ -108,6 +108,49 @@ router.post(
   controllerDispatcher(addAttainable)
 );
 
+/**
+ * @swagger
+ * /v1/courses/{courseId}/instances/{instanceId}/attainments/{attainmentId}:
+ *   delete:
+ *     tags: [Attainment]
+ *     description: Delete a study attainment and all of its subattainments.
+ *     responses:
+ *       200:
+ *         description: Study attainments were successfully deleted.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request.
+ *                 data:
+ *                   type: object
+ *       400:
+ *         description: >
+ *           A validation error occurred in the URL. Either the course ID,
+ *           instance ID, or attainment ID is not a positive integer.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       404:
+ *         description: >
+ *           The given course, course instance, or study attainment does not
+ *           exist.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: >
+ *           The given course instance does not belong to the given course.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ */
 router.delete(
   '/v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId',
   controllerDispatcher(deleteAttainment)
