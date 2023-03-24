@@ -161,7 +161,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
   });
 }
 
-export async function deleteAttainable(req: Request, res: Response): Promise<void> {
+export async function deleteAttainment(req: Request, res: Response): Promise<void> {
   /*
    * TODO: Check that the requester is logged in, 401 Unauthorized if not
    * TODO: Check that the requester is authorized to delete attainables, 403
@@ -171,15 +171,15 @@ export async function deleteAttainable(req: Request, res: Response): Promise<voi
   // Get path parameters.
   const courseId: number = Number(req.params.courseId);
   const courseInstanceId: number = Number(req.params.instanceId);
-  const attainableId: number = Number(req.params.attainmentId);
+  const attainmentId: number = Number(req.params.attainmentId);
 
   // Validation.
   await idSchema.validate({ id: courseId }, { abortEarly: false });
   await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
-  await idSchema.validate({ id: attainableId }, { abortEarly: false });
+  await idSchema.validate({ id: attainmentId }, { abortEarly: false });
   await validateCourseAndInstance(courseId, courseInstanceId);
 
-  const attainable: Attainable = await findAttainableById(attainableId, HttpCode.NotFound);
+  const attainable: Attainable = await findAttainableById(attainmentId, HttpCode.NotFound);
 
   // IDs of attainables to be deleted.
   const ids: Array<number> = [attainable.id];

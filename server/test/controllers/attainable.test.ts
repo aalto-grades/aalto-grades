@@ -332,7 +332,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/attainments', ()
 });
 
 describe('Test DELETE /v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId', () => {
-  it('should succesfully delete single attainable', async () => {
+  it('should succesfully delete single attainment', async () => {
     const add: supertest.Response = await request
       .post('/v1/courses/1/instances/1/attainments')
       .send({
@@ -340,18 +340,18 @@ describe('Test DELETE /v1/courses/:courseId/instances/:instanceId/attainments/:a
         subAttainments: undefined
       });
 
-    const addedAttainable: number = add.body.data.attainment.id;
+    const addedAttainment: number = add.body.data.attainment.id;
 
     const res: supertest.Response = await request
-      .delete(`/v1/courses/1/instances/1/attainments/${addedAttainable}`);
+      .delete(`/v1/courses/1/instances/1/attainments/${addedAttainment}`);
 
     expect(res.statusCode).toBe(HttpCode.Ok);
     expect(res.body.success).toBe(true);
 
-    expect(await Attainable.findByPk(addedAttainable)).toBeNull;
+    expect(await Attainable.findByPk(addedAttainment)).toBeNull;
   });
 
-  it('should respond with 404 not found for non-existent attainable ID', async () => {
+  it('should respond with 404 not found for non-existent attainment ID', async () => {
     const res: supertest.Response = await request
       .delete(`/v1/courses/1/instances/1/attainments/${badId}`);
 
