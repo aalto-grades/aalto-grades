@@ -22,7 +22,7 @@ const upload: Multer = multer({
     if (file.mimetype == 'text/csv') {
       callback(null, true);
     } else {
-      callback(new ApiError('incorrect file format, use csv format', HttpCode.BadRequest));
+      callback(new ApiError('incorrect file format, use the CSV format', HttpCode.BadRequest));
     }
   }
 });
