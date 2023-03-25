@@ -48,7 +48,8 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
       console.log('CSV:', csvData);
 
       res.status(HttpCode.Ok).json({
-        success: true
+        success: true,
+        data: {}
       });
       return;
     });
