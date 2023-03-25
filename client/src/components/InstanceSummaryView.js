@@ -18,7 +18,7 @@ const errorMsg = { msg: 'Instance creation failed.', severity: 'error' };
 
 const InstanceSummaryView = () => {
   let navigate = useNavigate();
-  let { courseId, instanceId } = useParams();
+  let { courseId, sisuInstanceId } = useParams();
 
   const { 
     addedAssignments,
@@ -49,7 +49,7 @@ const InstanceSummaryView = () => {
   }, [snackPack, messageInfo, alertOpen]);
 
   const onGoBack = () => {
-    navigate('/' + courseId + '/add-assignments/' + instanceId);
+    navigate('/' + courseId + '/add-assignments/' + sisuInstanceId);
   };
 
   // Temporary to fake the effect of loading

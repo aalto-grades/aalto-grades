@@ -12,7 +12,7 @@ import mockAssignmentsClient from '../mock-data/mockAssignmentsClient';
 
 const AddAssignmentsView = () => {
   let navigate = useNavigate();
-  let { courseId, instanceId } = useParams();
+  let { courseId, sisuInstanceId } = useParams();
 
   const { addedAssignments, setAddedAssignments } = useOutletContext();
   const [suggestedAssignments, setSuggestedAssignments] = useState([]);
@@ -36,11 +36,11 @@ const AddAssignmentsView = () => {
   };
 
   const onGoBack = () => {
-    navigate('/' + courseId + '/edit-instance/' + instanceId);
+    navigate('/' + courseId + '/edit-instance/' + sisuInstanceId);
   };
 
   const onConfirmAssignments = () => {
-    navigate('/' + courseId + '/instance-summary/' + instanceId);
+    navigate('/' + courseId + '/instance-summary/' + sisuInstanceId);
   };
 
   return(
@@ -76,7 +76,7 @@ const AddAssignmentsView = () => {
                   key={assignment.id} 
                   assignment={assignment}  
                   button={<Button 
-                    onClick={ () => navigate('/edit-assignment/' + instanceId + '/' + assignment.id) }>
+                    onClick={ () => navigate('/edit-assignment/' + sisuInstanceId + '/' + assignment.id) }>
                       Edit
                   </Button>}
                 />

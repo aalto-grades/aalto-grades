@@ -122,7 +122,14 @@ const mockAssignmentsClient = [
     category: 'Project',
     date: new Date(2023, 9, 1), 
     expiryDate: new Date(2024, 8, 14),
-    subAssignments: [],
+    subAssignments: [{
+      id: 21,
+      name: 'Project 1',
+      category: 'Other',
+      date: new Date(2023, 9, 1), 
+      expiryDate: new Date(2024, 8, 14),
+      subAssignments: [],
+    }]
   },
   { id: 3,
     name: 'Exam',
