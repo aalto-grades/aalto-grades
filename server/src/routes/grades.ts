@@ -13,10 +13,16 @@ import { HttpCode } from '../types/httpCode';
 
 export const router: Router = Router();
 
+/**
+ * Multer middleware configuration for handling CSV file uploads. This configuration sets up
+ * multer to use memory storage, allowing for temporary storage of uploaded files in memory.
+ * It also sets a file size limit of 1 MB and enforces that the uploaded file is in the CSV
+ * format by checking the files mimetype.
+ */
 const upload: Multer = multer({
-  storage: memoryStorage(),   // Store csv temporarily on the memory.
+  storage: memoryStorage(),
   limits: {
-    fileSize: 1024 * 1024     // The max file size (in bytes), limit to 1 MB.
+    fileSize: 1048576
   },
   fileFilter: (_req: Request, file: Express.Multer.File, callback: FileFilterCallback) => {
     if (file.mimetype == 'text/csv') {
