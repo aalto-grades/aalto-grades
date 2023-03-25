@@ -44,7 +44,7 @@ const upload: Multer = multer({
  *         multipart/form-data:
  *     responses:
  *       200:
- *         description: Grading csv uploaded and parsed succesfully.
+ *         description: Grading CSV uploaded and parsed succesfully.
  *         content:
  *           application/json:
  *             schema:
@@ -54,7 +54,7 @@ const upload: Multer = multer({
  *                   type: boolean
  *                   description: Success of the request.
  *       400:
- *         description: A validation or parsing error with the csv has occurred.
+ *         description: A validation or parsing error with the CSV has occurred.
  *         content:
  *           application/json:
  *             schema:
