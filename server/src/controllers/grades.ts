@@ -24,7 +24,10 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
    */
 
   if (!req?.file) {
-    throw new ApiError('csv file loading failed, please try again', HttpCode.BadRequest);
+    throw new ApiError(
+      'CSV file not found in the request. To send CSV file, set input name as "csv_data"',
+      HttpCode.BadRequest
+    );
   }
 
   const data: string = req.file.buffer.toString();
