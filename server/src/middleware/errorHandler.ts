@@ -38,6 +38,7 @@ export function controllerDispatcher<
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function errorHandler(err: unknown, req: Request, res: Response, next: NextFunction): void {
   // TODO: appropriate logging in case of errors
+  console.log(err);
 
   if (err instanceof ApiError) {
     res.status(err.statusCode);
@@ -77,9 +78,14 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
   }
 
   if (err instanceof CsvError || err instanceof MulterError) {
+    // If field name is incorrect, change the error message to more informative.
+    const message: string = err.message === 'Unexpected field'?
+      'Unexpected field. To upload CSV file, set input field name as "csv_data"' :
+      err.message;
+
     res.status(HttpCode.BadRequest).send({
       success: false,
-      errors: [err.message]
+      errors: [message]
     });
     return;
   }

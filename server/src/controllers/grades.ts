@@ -37,7 +37,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
   if (!req?.file) {
     throw new ApiError(
-      'CSV file not found in the request. To send CSV file, set input name as "csv_data"',
+      'CSV file not found in the request. To upload CSV file, set input field name as "csv_data"',
       HttpCode.BadRequest
     );
   }

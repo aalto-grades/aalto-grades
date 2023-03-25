@@ -22,9 +22,9 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
 
     const res: supertest.Response = await request
       .post('/v1/courses/1/instances/1/grades/csv')
-      .set('Content-Type', 'multipart/form-data')
-      .attach('csv_data', csvData, 'grades.csv');
+      .attach('csv_data', csvData, { contentType: 'text/csv'});
 
+    console.log(res.body);
     expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
     expect(res.body.data).toBeDefined();
@@ -38,8 +38,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
 
     const res: supertest.Response = await request
       .post('/v1/courses/1/instances/1/grades/csv')
-      .set('Content-Type', 'multipart/form-data')
-      .attach('csv_data', csvData, 'grades.csv');
+      .attach('csv_data', csvData, { contentType: 'text/csv'});
 
     expect(res.body.success).toBe(false);
     expect(res.body.errors).toBeDefined();
@@ -47,6 +46,44 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
     expect(res.body.data).not.toBeDefined();
     expect(res.statusCode).toBe(HttpCode.BadRequest);
   });
+
+  it('should respond with 400 bad request, if the CSV file field name not "csv_data"', async () => {
+    const csvData: fs.ReadStream = fs.createReadStream(
+      path.resolve(__dirname, '../mockData/csv/grades.csv'), 'utf8'
+    );
+
+    const res: supertest.Response = await request
+      .post('/v1/courses/1/instances/1/grades/csv')
+      .attach(badInput, csvData, { contentType: 'text/csv'});
+
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors).toBeDefined();
+    expect(res.body.errors).toContain(
+      'Unexpected field. To upload CSV file, set input field name as "csv_data"'
+    );
+    expect(res.body.data).not.toBeDefined();
+    expect(res.statusCode).toBe(HttpCode.BadRequest);
+  });
+
+  it('should respond with 400 bad request, if the file content-type not text/csv',
+    async () => {
+      const csvData: fs.ReadStream = fs.createReadStream(
+        path.resolve(__dirname, '../mockData/csv/grades.csv'), 'utf8'
+      );
+
+      const res: supertest.Response = await request
+        .post('/v1/courses/1/instances/1/grades/csv')
+        .attach('csv_data', csvData, { contentType: 'application/json'});
+
+      console.log(res.body);
+      expect(res.body.success).toBe(false);
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors).toContain(
+        'incorrect file format, use the CSV format'
+      );
+      expect(res.body.data).not.toBeDefined();
+      expect(res.statusCode).toBe(HttpCode.BadRequest);
+    });
 
   it('should respond with 400 bad request, if validation fails (non-number course id)',
     async () => {
@@ -56,8 +93,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
 
       const res: supertest.Response = await request
         .post(`/v1/courses/${badInput}/instances/1/grades/csv`)
-        .set('Content-Type', 'multipart/form-data')
-        .attach('csv_data', csvData, 'grades.csv');
+        .attach('csv_data', csvData, { contentType: 'text/csv'});
 
       expect(res.body.success).toBe(false);
       expect(res.body.errors).toBeDefined();
@@ -77,8 +113,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
 
       const res: supertest.Response = await request
         .post(`/v1/courses/1/instances/${badInput}/grades/csv`)
-        .set('Content-Type', 'multipart/form-data')
-        .attach('csv_data', csvData, 'grades.csv');
+        .attach('csv_data', csvData, { contentType: 'text/csv'});
 
       expect(res.body.success).toBe(false);
       expect(res.body.errors).toBeDefined();
@@ -96,8 +131,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
 
     const res: supertest.Response = await request
       .post(`/v1/courses/${badId}/instances/1/grades/csv`)
-      .set('Content-Type', 'multipart/form-data')
-      .attach('csv_data', csvData, 'grades.csv');
+      .attach('csv_data', csvData, { contentType: 'text/csv'});
 
     expect(res.body.success).toBe(false);
     expect(res.body.errors).toBeDefined();
@@ -113,8 +147,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
 
     const res: supertest.Response = await request
       .post(`/v1/courses/1/instances/${badId}/grades/csv`)
-      .set('Content-Type', 'multipart/form-data')
-      .attach('csv_data', csvData, 'grades.csv');
+      .attach('csv_data', csvData, { contentType: 'text/csv'});
 
     expect(res.body.success).toBe(false);
     expect(res.body.errors).toBeDefined();
@@ -130,8 +163,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
 
     const res: supertest.Response = await request
       .post('/v1/courses/1/instances/2/grades/csv')
-      .set('Content-Type', 'multipart/form-data')
-      .attach('csv_data', csvData, 'grades.csv');
+      .attach('csv_data', csvData, { contentType: 'text/csv'});
 
     expect(res.body.success).toBe(false);
     expect(res.body.errors).toBeDefined();
