@@ -49,7 +49,7 @@ const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignme
         alignItems: 'center',
         px: 1
       }}>
-        <Typography variant="body1" component="div" sx={{ flexGrow: 1, textAlign: 'left', mb: 0.5 }}>
+        <Typography variant="body1" sx={{ flexGrow: 1, textAlign: 'left', mb: 0.5 }}>
           {'Grading Formula: ' + formulaName}
         </Typography>
         <Button size='small' sx={{ mb: 0.5 }} onClick={ () => navigate('/select-formula') }>
@@ -75,7 +75,7 @@ const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignme
           </IconButton>}
         <Box sx={{ display: 'flex', flexDirection: 'column',  width: '100%' }}>
           <Collapse in={!open} unmountOnExit >
-            <Typography variant="body2" component="div" sx={{ mt: 0.6, mb: 2, flexGrow: 1, textAlign: 'left', color: '#6E6E6E' }}>
+            <Typography variant="body2" sx={{ mt: 0.6, mb: 2, flexGrow: 1, textAlign: 'left', color: '#6E6E6E' }}>
               See sub-attainments
             </Typography>
           </Collapse>

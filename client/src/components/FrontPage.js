@@ -31,7 +31,7 @@ const FrontPage = () => {
   return(
     <>
       <Box component="span" sx={{ display: 'flex', alignItems: 'center',  justifyContent: 'space-between', flexDirection: 'row' }}>
-        <Typography variant="h1" component="div" align="left" sx={{ flexGrow: 1 }}>
+        <Typography variant="h1" align="left" sx={{ flexGrow: 1 }}>
                 Your Current Courses
         </Typography>
         { /* admins and teachers are shown the button for creating a new course */
@@ -43,7 +43,7 @@ const FrontPage = () => {
       </Box>
       { /* current and inactive courses will later be rendered based on the student/teacher id */ }
       <BasicGrid data={currentCourses}/>
-      <Typography variant="h2" component="div" align="left" sx={{ flexGrow: 1, mt: 4 }}>
+      <Typography variant="h2" align="left" sx={{ flexGrow: 1, mt: 4 }}>
                 Inactive Courses
       </Typography>
       <CourseTable data={previousCourses}/>

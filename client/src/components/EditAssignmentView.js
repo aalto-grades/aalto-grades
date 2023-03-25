@@ -43,7 +43,7 @@ const EditAssignmentView = () => {
   return(
     <>
       <Container maxWidth="md" sx={{ textAlign: 'right' }}>
-        <Typography variant="h1" component="div" align='left' sx={{ flexGrow: 1, mb: 4 }}>
+        <Typography variant="h1" align='left' sx={{ flexGrow: 1, mb: 4 }}>
             Edit Study Attainment
         </Typography>
         <form>
