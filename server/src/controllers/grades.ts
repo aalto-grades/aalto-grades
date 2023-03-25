@@ -6,7 +6,9 @@ import { parse, Parser } from 'csv-parse';
 import { NextFunction, Request, Response } from 'express';
 
 import { ApiError } from '../types/error';
+import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
+import { validateCourseAndInstance } from './attainable';
 
 /**
  * Asynchronously adds grades from a CSV file to the database.
@@ -21,7 +23,17 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
    * TODO: Check that the requester is logged in, 401 Unauthorized if not
    * TODO: Check that the requester is authorized to add grades, 403 Forbidden if not
    * TODO: Validate csv fields, csv has to match predetermined format, 400 Bad request?
+   * TODO: Validate attainments belong to the course instance, 409 Conflict?
    */
+
+  // Get path parameters.
+  const courseId: number = Number(req.params.courseId);
+  const courseInstanceId: number = Number(req.params.instanceId);
+
+  // Validation.
+  await idSchema.validate({ id: courseId }, { abortEarly: false });
+  await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
+  await validateCourseAndInstance(courseId, courseInstanceId);
 
   if (!req?.file) {
     throw new ApiError(
