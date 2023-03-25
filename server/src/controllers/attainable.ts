@@ -184,7 +184,6 @@ export async function deleteAttainment(req: Request, res: Response): Promise<voi
 
   // Delete the attainment, this automatically also deletes all of the
   // subattainments of this attainment.
-  // TODO: Also delete grades of these attainments?
   await attainment.destroy();
 
   res.status(HttpCode.Ok).send({
