@@ -2,53 +2,94 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import OngoingInstanceInfo from './course-view/OngoingInstanceInfo';
+import Grow from '@mui/material/Grow';
+import InstanceDetails from './course-view/InstanceDetails';
 import Assignments from './course-view/Assignments';
 import InstancesTable from './course-view/InstancesTable';
+import courseService from '../services/courses';
+import instancesService from '../services/instances';
+import sortingServices from '../services/sorting';
 import useAuth from '../hooks/useAuth';
-import mockInstances from '../mock-data/mockInstances';
-import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
+import mockAssignmentsClient from '../mock-data/mockAssignmentsClient';
 
-const mockCurrentInstance = mockInstances[0];
-const mockPastInstances = mockInstances
-  .filter( instance => instance.courseData.id === mockCurrentInstance.courseData.id )
-  .filter( instance => instance.id != mockCurrentInstance.id );
+const mockInstitution = 'Aalto University';   // REPLACE SOME DAY? currently this info can't be fetched from database
 
 const CourseView = () => {
   let navigate = useNavigate();
-  let { courseCode } = useParams();
-  const courseId = courseCode;  // Fetch courseId from params when possible
-
+  let { courseId } = useParams();
   const { auth } = useAuth();
+
+  const [courseDetails, setCourseDetails] = useState(null);
+  const [currentInstance, setCurrentInstance] = useState(null);
+  const [instances, setInstances] = useState([]);
+
+  const [animation, setAnimation] = useState(false);
+
+  useEffect(() => {
+    instancesService.getInstances(courseId)
+      .then((data) => {
+        const sortedInstances = data.courseInstances.sort((a, b) => sortingServices.sortByDate(a.startDate, b.startDate));
+        setInstances(sortedInstances);
+        setCurrentInstance(sortedInstances[0]);
+      })
+      .catch((e) => console.log(e.message));
+    
+    courseService.getCourse(courseId)
+      .then((data) => {
+        setCourseDetails(data.course);
+      })
+      .catch((e) => console.log(e.message));
+  }, []);
+
+  useEffect(() => {
+    setAnimation(true);
+  }, [currentInstance]);
+
+  const onChangeInstance = (instance) => {
+    if(instance.id !== currentInstance.id) {
+      setAnimation(false);
+      setCurrentInstance(instance);
+    }
+  };
 
   return(
     <Box sx={{ mr: -4, ml: -4 }}>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-        <Typography variant='h3' sx={{ fontWeight: 'light' }}>{courseCode + ' – ' + mockCurrentInstance.courseData.name.en}</Typography>
-        { /* Only admins and teachers are allowed to create a new instance */
-          (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
-          <Button size='large' variant='contained' onClick={() => { 
-            navigate(`/${courseId}/fetch-instances/${courseCode}`); 
-          }}>
-            New instance
-          </Button>
-        }
-      </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-evenly', gap: 3 }}>
-        <OngoingInstanceInfo info={mockCurrentInstance} />
-        { /* a different attainment component will be created for students */
-          (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
-          <Assignments attainments={mockAttainmentsClient} formula={'Weighted Average'} courseId={courseId} instance={mockCurrentInstance} /> /* TODO: Retrieve real formula */
-        }
-      </Box>
-      <Typography variant='h4' align='left' sx={{ fontWeight: 'light', mt: 8, mb: 3 }}>Past Instances</Typography>
-      <InstancesTable data={mockPastInstances} />
+      {courseDetails && currentInstance && instances &&
+        <> 
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+            <Typography variant='h3' sx={{ fontWeight: 'light' }}>{courseDetails.courseCode + ' – ' + courseDetails.name.en}</Typography>
+            { /* Only admins and teachers are allowed to create a new instance */
+              (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
+            <Button size='large' variant='contained' onClick={() => { navigate(`/${courseId}/fetch-instances/${courseDetails.courseCode}`); }}>  {/* TODO: Check path */}
+              New instance
+            </Button>
+            }
+          </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-evenly', gap: 3 }}>
+            <Grow in={animation} style={{ transformOrigin: '50% 0 0' }} {...(animation? { timeout: 500 } : { timeout: 0 })}>
+              <div>
+                <InstanceDetails info={ { ...currentInstance, department: courseDetails.department, institution: mockInstitution } } />
+              </div>
+            </Grow>
+            { /* a different assignment component will be created for students */
+              (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
+              <Grow in={animation} style={{ transformOrigin: '0 0 0' }} {...(animation? { timeout: 1000 } : { timeout: 0 })}>
+                <div>
+                  <Assignments assignments={mockAssignmentsClient} formula={'Weighted Average'} instance={currentInstance} /> {/* TODO: Retrieve real formula */}
+                </div>
+              </Grow>
+            }
+          </Box>
+          <Typography variant='h4' align='left' sx={{ fontWeight: 'light', mt: 6, mb: 3 }}>All Instances</Typography>
+          <InstancesTable data={instances} current={currentInstance.id} onClick={onChangeInstance} />
+        </>
+      }
     </Box>
   );
 };
