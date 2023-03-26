@@ -10,7 +10,6 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import AssignmentCategory from '../assignments/AssignmentCategory';
 
-
 const Assignments = ({ attainments, formula, courseId, instance }) => {
   const navigate = useNavigate();
   

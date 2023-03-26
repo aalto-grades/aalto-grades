@@ -16,7 +16,7 @@ import courseService from '../services/courses';
 import instancesService from '../services/instances';
 import sortingServices from '../services/sorting';
 import useAuth from '../hooks/useAuth';
-import mockAssignmentsClient from '../mock-data/mockAssignmentsClient';
+import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 
 const mockInstitution = 'Aalto University';   // REPLACE SOME DAY? currently this info can't be fetched from database
 
@@ -81,7 +81,7 @@ const CourseView = () => {
               (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
               <Grow in={animation} style={{ transformOrigin: '0 0 0' }} {...(animation? { timeout: 1000 } : { timeout: 0 })}>
                 <div>
-                  <Assignments assignments={mockAssignmentsClient} formula={'Weighted Average'} instance={currentInstance} /> {/* TODO: Retrieve real formula */}
+                  <Assignments attainments={mockAttainmentsClient} courseId={courseId} formula={'Weighted Average'} instance={currentInstance} /> {/* TODO: Retrieve real formula */}
                 </div>
               </Grow>
             }
