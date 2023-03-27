@@ -4,10 +4,10 @@
 
 import * as yup from 'yup';
 
+import { registerFormula } from '.';
 import {
   CalculationResult,
   Formula,
-  registerFormula,
   Status,
   WeightedAssignmentParams
 } from '../types/formulas';
