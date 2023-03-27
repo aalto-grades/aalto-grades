@@ -8,7 +8,7 @@ import { NextFunction, Request, Response } from 'express';
 import { ApiError } from '../types/error';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
-import { validateCourseAndInstance } from './attainable';
+import { validateCourseAndInstance } from './utils/courseInstance';
 
 /**
  * Asynchronously adds grades from a CSV file to the database.

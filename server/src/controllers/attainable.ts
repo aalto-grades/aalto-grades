@@ -18,27 +18,6 @@ import { findAttainableById, generateAttainableTag } from './utils/attainable';
 import { findCourseById } from './utils/course';
 import { findCourseInstanceById } from './utils/courseInstance';
 
-export async function validateCourseAndInstance(
-  courseId: number, courseInstanceId: number
-): Promise<void> {
-  // Ensure that course exists.
-  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
-
-  // Ensure that course instance exists.
-  const instance: CourseInstance = await findCourseInstanceById(
-    courseInstanceId, HttpCode.NotFound
-  );
-
-  // Check that instance belongs to the course.
-  if (instance.courseId !== course.id) {
-    throw new ApiError(
-      `course instance with ID ${courseInstanceId} ` +
-      `does not belong to the course with ID ${courseId}`,
-      HttpCode.Conflict
-    );
-  }
-}
-
 export async function addAttainable(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     parentId: yup
