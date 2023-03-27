@@ -14,14 +14,14 @@ import AlertSnackbar from '../alerts/AlertSnackbar';
 const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
 
   const [attributeValues, setAttributeValues] = useState([]);
-  const { selectedAssignments, selectedFormula } = useOutletContext();
+  const { selectedAttainments, selectedFormula } = useOutletContext();
   const [snackPack, setSnackPack] = useState([]);
   const [alertOpen, setAlertOpen] = useState(false);
   const [messageInfo, setMessageInfo] = useState(undefined);
 
   useEffect(() => {
-    setAttributeValues(Array(selectedAssignments.length).fill(Array(selectedFormula .attributes.length).fill('')));
-  }, [selectedAssignments, selectedFormula]);
+    setAttributeValues(Array(selectedAttainments.length).fill(Array(selectedFormula.attributes.length).fill('')));
+  }, [selectedAttainments, selectedFormula]);
 
   // useEffect in charge of handling the back-to-back alerts
   // makes the previous disappear before showing the new one
@@ -35,9 +35,9 @@ const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
     }
   }, [snackPack, messageInfo, alertOpen]);
 
-  const handleAttributeChange = (assignmentIndex, attributeIndex, event) => {
+  const handleAttributeChange = (attainmentIndex, attributeIndex, event) => {
     const newAttributeValues = attributeValues.map((a, index) => {
-      if (assignmentIndex == index) {
+      if (attainmentIndex == index) {
         const newAttributes = a.map((attribute, i) => {
           return (attributeIndex == i) ? event.target.value : attribute;
         });
@@ -83,11 +83,11 @@ const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
         borderRadius: 1,
         pt: 2
       }}>
-        { selectedAssignments.map((assignment, assignmentIndex) =>
+        { selectedAttainments.map((attainment, attainmentIndex) =>
           <Assignment
-            assignment={assignment}
-            key={assignment.id}
-            assignmentIndex={assignmentIndex}
+            attainment={attainment}
+            key={attainment.id}
+            attainmentIndex={attainmentIndex}
             attributes={selectedFormula.attributes}
             handleAttributeChange={handleAttributeChange}
           />) }

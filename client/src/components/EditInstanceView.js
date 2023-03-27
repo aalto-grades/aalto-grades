@@ -13,11 +13,11 @@ import instancesService from '../services/instances';
 // TODO: update actual instance/save basic information
 
 const EditInstanceView = () => {
-  let { instanceId } = useParams();
+  let { sisuInstanceId } = useParams();
   const [instance, setInstance] = useState();
 
   useEffect(() => {
-    instancesService.getSisuInstance(instanceId)
+    instancesService.getSisuInstance(sisuInstanceId)
       .then((data) => {
         setInstance(data.courseInstance);
       })

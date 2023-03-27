@@ -8,17 +8,18 @@ import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import textFormatServices from '../../services/textFormat';
 
-const InstanceTableRow = ({ instance }) => {
+const InstanceTableRow = ({ instance, onClick, selected }) => {
   const { id, startDate, endDate, type } = instance;
     
   return(
     <TableRow
       key={id} 
       hover={true}
-      onClick={() => { /* TODO: Add functionality to view old instances */ }}
+      selected={selected}
+      onClick={() => onClick(instance)}
     >
-      <TableCell>{textFormatServices.formatDateToString(startDate)}</TableCell>
-      <TableCell>{textFormatServices.formatDateToString(endDate)}</TableCell>
+      <TableCell>{textFormatServices.formatDateString(startDate)}</TableCell>
+      <TableCell>{textFormatServices.formatDateString(endDate)}</TableCell>
       <TableCell>{textFormatServices.formatCourseType(type)}</TableCell>
     </TableRow>
   );
@@ -30,7 +31,9 @@ InstanceTableRow.propTypes = {
   startDate: PropTypes.instanceOf(Date),
   endDate: PropTypes.instanceOf(Date),
   type: PropTypes.string,
-  id: PropTypes.number
+  id: PropTypes.number,
+  onClick: PropTypes.func,
+  selected: PropTypes.bool
 };
 
 export default InstanceTableRow;

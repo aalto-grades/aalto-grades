@@ -35,7 +35,7 @@ describe('Tests for CreateCourseView components', () => {
 
   test('CreateCourseForm should allow an admin to create a course', () => {
 
-    const mockCourse= jest.fn();
+    const mockCourse = jest.fn();
 
     const testCode = 'Test code';
     const testName = 'Test name';

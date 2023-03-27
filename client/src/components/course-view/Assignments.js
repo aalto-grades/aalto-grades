@@ -10,8 +10,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import AssignmentCategory from '../assignments/AssignmentCategory';
 
-
-const Assignments = ({ assignments, formula, instance, courseCode }) => {
+const Assignments = ({ attainments, formula, courseId, instance }) => {
   const navigate = useNavigate();
   
   return (
@@ -19,23 +18,26 @@ const Assignments = ({ assignments, formula, instance, courseCode }) => {
       <Typography variant='h6' align='left' sx={{ ml: 1.5 }} >Study Attainments</Typography>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
         <Typography align='left' sx={{ ml: 1.5 }} >{'Grading Formula: ' + formula}</Typography>
-        <Button onClick={() => navigate(`/${courseCode}/select-formula/${instance.id}`) }>Edit formula</Button>
+        <Button onClick={() => navigate(`/${courseId}/select-formula/${instance.id}`) }>Edit formula</Button>
         { /* The path above should be changes once courseId can be fetched from the path */ }
       </Box>
       <Box sx={{ display: 'inline-grid', gap: 1 }}>
-        { assignments.map(assignment => {
+        { attainments.map(attainment => {
+          /* Since the attainments are displayed by the course view, they exist in the database
+             and their actual ids can be used are keys of the attainment accoridon */
           return (
             <AssignmentCategory 
-              key={assignment.id} 
-              assignment={assignment} 
-              button={<Button onClick={ () => navigate('/edit-assignment/' + instance.id + '/' + assignment.id) }>Edit</Button>} 
+              key={attainment.id} 
+              attainment={attainment} 
+              attainmentKey={'id'}
+              button={<Button onClick={ () => navigate(`/${courseId}/edit-attainment/${instance.id}/${attainment.id}`) }>Edit</Button>} 
               width={'50vw'} 
             />
           );}
         ) }
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
-        <Button onClick={() => navigate('/create-assignment/' + instance.id) }>Add attainment</Button>
+        <Button onClick={() => navigate(`/${courseId}/create-attainment/${instance.id}`) }>Add attainment</Button>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}>
           <Button variant='outlined'>Calculate final grades</Button>
           <Button variant='contained'>Add points</Button>
@@ -46,10 +48,10 @@ const Assignments = ({ assignments, formula, instance, courseCode }) => {
 };
 
 Assignments.propTypes = {
-  assignments: PropTypes.array,
+  attainments: PropTypes.array,
   instance: PropTypes.object,
   formula: PropTypes.string,
-  courseCode: PropTypes.string
+  courseId: PropTypes.string,
 };
 
 export default Assignments;

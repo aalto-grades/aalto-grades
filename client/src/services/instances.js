@@ -4,22 +4,27 @@
 
 import axios from './axios';
 
+const getInstances = async (courseId) => {
+  const response = await axios.get(`/v1/courses/${courseId}/instances`);
+  return response.data.data;
+};
+
 const getSisuInstances = async (courseId) => {
   const response = await axios.get('/v1/sisu/courses/' + courseId);
   console.log(response.data);
   return response.data.data;
 };
 
-const getSisuInstance = async (instanceId) => {
-  const response = await axios.get('/v1/sisu/instances/' + instanceId);
+const getSisuInstance = async (sisuInstanceId) => {
+  const response = await axios.get('/v1/sisu/instances/' + sisuInstanceId);
   console.log(response.data);
   return response.data.data;
 };
 
-const getAssignments = async (instanceId) => {
+const getAttainments = async (instanceId) => {
   const response = await axios.get('/v1/??' + instanceId);
   console.log(response.data);
   return response.data;
 };
 
-export default { getSisuInstances, getSisuInstance, getAssignments };
+export default { getInstances, getSisuInstances, getSisuInstance, getAttainments };

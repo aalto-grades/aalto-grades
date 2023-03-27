@@ -2,149 +2,241 @@
 
 // SPDX-License-Identifier: MIT
 
+import axios from './axios';
 import textFormatServices from './textFormat';
+import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
+
+// Functions that are (or will be) connected to the server.
+
+const addAttainment = async (courseId, instanceId, attainment) => {
+  const response = await axios.post(
+    `/v1/courses/${courseId}/instances/${instanceId}/attainments`,
+    attainment);
+  return response.data.data;
+};
+
+const editAttainment = async (courseId, instanceId, attainment) => {
+  const response = await axios.put(
+    `/v1/courses/${courseId}/instances/${instanceId}/attainments/${attainment.id}`,
+    attainment);
+  return response.data.data;
+};
+
+// Function to get mock attainments.
+// Should eventually be replaced with a function that gets data from the server.
+const getSuggestedAttainments = () => { return mockAttainmentsClient; };
+
+
+// The following functions are used to add temporary ids, and to create, add and delete temporary attainments.
+// These functions are mainly used in order to complete the functionality of creating, adding and editing
+// attainments duing the creation of an instance.
+
+// Function to assign temporary Ids to attainments.
+const addTemporaryIds = (attainments, temporaryId) => {
+  
+  let newTemporaryId = temporaryId;
+  const addTemporaryId = (modifiabelAttainments) => {
+    modifiabelAttainments.forEach((attainment) => {
+      attainment.temporaryId = newTemporaryId;
+      newTemporaryId += 1;
+      if (attainment.subAttainments.length !== 0) {
+        addTemporaryId(attainment.subAttainments);
+      }
+    });
+  };
+
+  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  addTemporaryId(updatedAttainments);
+  return [updatedAttainments, newTemporaryId];
+};
+
+// Add an attainment to a temporary list of attainments.
+const addTemporaryAttainment = (attainments, newAttainment) => {
+  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  let updatedNewAttainment = JSON.parse(JSON.stringify(newAttainment));
+  updatedAttainments.push(updatedNewAttainment);
+  return updatedAttainments;
+};
+
+// Add an attainment to a temporary list of attainments and give it a temporary id.
+const createTemporaryAttainment = (attainments, newAttainment, temporaryId) => {
+  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  let updatedNewAttainment = JSON.parse(JSON.stringify(newAttainment));
+  updatedNewAttainment.temporaryId = temporaryId;
+  updatedAttainments.push(updatedNewAttainment);
+  const newTemporaryId = temporaryId + 1;
+  return [updatedAttainments, newTemporaryId];
+};
+
+// Update an attainment in a temporary list of attainments.
+const updateTemporaryAttainment = (attainments, newAttainment) => {
+  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  updatedAttainments = updatedAttainments.map((attainment) => attainment.temporaryId === newAttainment.temporaryId ? newAttainment : attainment);
+  return updatedAttainments;
+};
+
+// Delete an attainment from a temporary list of attainments.
+const deleteTemporaryAttainment = (attainments, newAttainment) => {
+  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  updatedAttainments = updatedAttainments.filter((attainment) => attainment.temporaryId !== newAttainment.temporaryId);
+  return updatedAttainments;
+};
+
+
+// The following functions are used to cmoplete the functionality that is needed 
+// for the components used in CreateAssignmentView and EditAssignmentView
 
 // The parameter 'indices' used in the following functions is an array of integres 
-// that displays the indices of an assignment on different levels.
-// EXAMPLE: The indices of the 'assignment 0.1' below would be [0, 1].
-/* Assignments = [
+// that displays the indices of an attainment on different levels.
+// EXAMPLE: The indices of the 'attainment 0.1' below would be [0, 1].
+/* Attainments = [
     { 
-      name: 'assignment 0', 
+      name: 'attainment 0', 
       date: '',
-      subAssignments: [
+      subAttainments: [
         { 
-          name: 'assignment 0.0', 
+          name: 'attainment 0.0', 
           date: '',
-          subAssignments: []
+          subAttainments: []
         },
         {
-          name: 'assignment 0.1', 
+          name: 'attainment 0.1', 
           date: '',
-          subAssignments: []
+          subAttainments: []
         }
       ]
     }
   ]
 */
-// Replace indices with assignment IDs if it seems simpler/more effective
+// Replace indices with attainment IDs if it seems simpler/more effective
 
-// Get sub-assignments from the assignments array (of nested arrays) according to the indices
-const getSubAssignments = (indices, assignments) => {
-  let updatedAssignments = JSON.parse(JSON.stringify(assignments));
-  let subAssignments = [];
+// Get sub-attainments from the attainments array (of nested arrays) according to the indices
+const getSubAttainments = (indices, attainments) => {
+  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  let subAttainments = [];
   for (let i = 0; i < indices.length; i++) {
     const index = indices[i];
-    subAssignments = updatedAssignments[index].subAssignments;
-    updatedAssignments = subAssignments;
+    subAttainments = updatedAttainments[index].subAttainments;
+    updatedAttainments = subAttainments;
   }
-  return subAssignments;
+  return subAttainments;
 };
 
-// Set the proprety of the object that is in the location specified by the indices in the assignments array,
+// Set the proprety of the object that is in the location specified by the indices in the attainments array,
 // the property is set to have the value given as a parameter
-const setProperty = (indices, assignments, property, value) => {
-  const updatedAssignments = JSON.parse(JSON.stringify(assignments));
+const setProperty = (indices, attainments, property, value) => {
+  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAssignments, updatedAssignments);
+  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
   array[lastIndex][property] = value;
-  return updatedAssignments;
+  return updatedAttainments;
 };
 
-// Same function as above but to be used with assignment IDs instead of indices
-/*const setProperty = (id, assignments, property, value) => {
-  let updatedAssignments = JSON.parse(JSON.stringify(assignments));
-  const assigment = getAssignmentById(updatedAssignments, id);
+// Same function as above but to be used with attainment IDs instead of indices
+/*const setProperty = (id, attainments, property, value) => {
+  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  const assigment = getAttainmentById(updatedAttainments, id);
   assigment[property] = value;
-  Object.assign(updatedAssignments, assigment);
-  return updatedAssignments;
+  Object.assign(updatedAttainments, assigment);
+  return updatedAttainments;
 };*/
 
-// Get the property of an assignment that is at the location specified by indices
-const getProperty = (indices, assignments, property) => {
-  const updatedAssignments = JSON.parse(JSON.stringify(assignments));
+// Get the property of an attainment that is at the location specified by indices
+const getProperty = (indices, attainments, property) => {
+  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAssignments, updatedAssignments);
+  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
   return array[lastIndex][property];
 };
 
-// Same function as above but to be used with assignment IDs instead of indices
-/*const getProperty = (id, assignments, property) => {
-  const updatedAssignments = JSON.parse(JSON.stringify(assignments));
-  const assigment = getAssignmentById(updatedAssignments, id);
+// Same function as above but to be used with attainment IDs instead of indices
+/*const getProperty = (id, attainments, property) => {
+  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  const assigment = getAttainmentById(updatedAttainments, id);
   console.log(assigment[property]);
   return assigment[property];
 };*/
 
-// Set the formula attribute an assignment
-const setFormulaAttribute = (indices, assignments, attributeIndex, value) => {
-  const updatedAssignments = JSON.parse(JSON.stringify(assignments));
+// Set the formula attribute an attainment
+const setFormulaAttribute = (indices, attainments, attributeIndex, value) => {
+  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAssignments, updatedAssignments);
+  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
   array[lastIndex]['formulaAttributes'][attributeIndex] = value;
-  return updatedAssignments;
+  return updatedAttainments;
 };
 
-// Get the formula attribute an assignment
-const getFormulaAttribute = (indices, assignments, attributeIndex) => {
-  const updatedAssignments = JSON.parse(JSON.stringify(assignments));
+// Get the formula attribute an attainment
+const getFormulaAttribute = (indices, attainments, attributeIndex) => {
+  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAssignments, updatedAssignments);
+  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
   return array[lastIndex]['formulaAttributes'][attributeIndex];
 };
 
-// Add sub-assignments to the assignments array (of nested arrays) according to the indices
-const addSubAssignments = (indices, assignments, numOfAssignments) => {
-  let updatedAssignments = JSON.parse(JSON.stringify(assignments));
-  const defaultExpiryDate = getProperty(indices, updatedAssignments, 'expiryDate');
-  const newSubAssignments = new Array(Number(numOfAssignments)).fill({
-    category: '',
-    name: '',
-    date: '',
-    expiryDate: defaultExpiryDate,
-    affectCalculation: false,
-    formulaAttributes: [],
-    subAssignments: [],
-  });
-  const currentSubAssignments = getSubAssignments(indices, updatedAssignments);
-  const subAssignments = currentSubAssignments.concat(newSubAssignments);
-  updatedAssignments = setProperty(indices, updatedAssignments, 'subAssignments', subAssignments);
-  return updatedAssignments;
+// Add sub-attainments to the attainments array (of nested arrays) according to the indices
+const addSubAttainments = (indices, attainments, numOfAttainments, temporaryId) => {
+  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  let newTemporaryId = temporaryId;
+  const defaultExpiryDate = getProperty(indices, updatedAttainments, 'expiryDate');
+  const parentId = getProperty(indices, updatedAttainments, 'id');
+
+  let newSubAttainments = [];
+  for (let i = 0; i < numOfAttainments; i++) {
+    newSubAttainments.push({
+      temporaryId: newTemporaryId,
+      category: '',
+      name: '',
+      date: '',
+      expiryDate: defaultExpiryDate,
+      parentId: parentId,
+      affectCalculation: false,
+      formulaAttributes: [],
+      subAttainments: [],
+    });
+    newTemporaryId += 1;
+  }
+
+  const currentSubAttainments = getSubAttainments(indices, updatedAttainments);
+  const subAttainments = currentSubAttainments.concat(newSubAttainments);
+  updatedAttainments = setProperty(indices, updatedAttainments, 'subAttainments', subAttainments);
+  return [updatedAttainments, newTemporaryId];
 };
 
-// Remove an assignment that is at the location specified by indices
-const removeAssignment = (indices, assignments) => {
-  const updatedAssignments = JSON.parse(JSON.stringify(assignments));
+// Remove an attainment that is at the location specified by indices
+const removeAttainment = (indices, attainments) => {
+  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAssignments, updatedAssignments);
+  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
   array.splice(lastIndex, 1);
-  return updatedAssignments;
+  return updatedAttainments;
 };
 
-// Creates a tree structure of assignments from an array of assignments with parent Ids
-const constructTreeAssignmets = (assignments) => {
-  const updatedAssignments = JSON.parse(JSON.stringify(assignments));
+// Creates a tree structure of attainments from an array of attainments with parent Ids
+const constructTreeAssignmets = (attainments) => {
+  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   let map = {};
   let root;
 
-  updatedAssignments.forEach((assignment) => {
-    map[assignment.id] = updatedAssignments.find(element => element.id === assignment.parentId);
+  updatedAttainments.forEach((attainment) => {
+    map[attainment.id] = updatedAttainments.find(element => element.id === attainment.parentId);
   }); 
 
-  updatedAssignments.forEach((assignment) => {
-    assignment.subAssignments = [];
-    if (assignment.parentId === 0) { // parent id === instance id
-      root = assignment;
+  updatedAttainments.forEach((attainment) => {
+    attainment.subAttainments = [];
+    if (attainment.parentId === 0) { // parent id === instance id
+      root = attainment;
     } else {
-      const parentNode = map[assignment.id];
-      if (parentNode.subAssignments) {
-        parentNode.subAssignments.push(assignment);
+      const parentNode = map[attainment.id];
+      if (parentNode.subAttainments) {
+        parentNode.subAttainments.push(attainment);
       } else {
-        parentNode.subAssignments = [assignment];
+        parentNode.subAttainments = [attainment];
       }
     }
   });
@@ -152,119 +244,190 @@ const constructTreeAssignmets = (assignments) => {
   return root;
 };
 
-// Recursive function to add the 'category' property for each assignment
-const addCategories = (assignments) => {
+// Recursive function to add the 'category' property for each attainment
+const addCategories = (attainments) => {
 
-  const addCategory = (modifiabelAssignments) => {
-    modifiabelAssignments.forEach((assignment) => {
-      const name = assignment.name;
-      if (name === 'Exam' || name === 'Assignments' || name === 'Project') {
-        assignment.category = name;
+  const addCategory = (modifiabelAttainments) => {
+    modifiabelAttainments.forEach((attainment) => {
+      const name = attainment.name;
+      if (name === 'Exam' || name === 'Attainments' || name === 'Project') {
+        attainment.category = name;
       } else {
-        assignment.category = 'Other';
+        attainment.category = 'Other';
       }
-      if (assignment.subAssignments.length !== 0) {
-        addCategory(assignment.subAssignments);
-      }
-    });
-  };
-
-  const updatedAssignments = JSON.parse(JSON.stringify(assignments));
-  addCategory(updatedAssignments);
-  return updatedAssignments;
-
-};
-
-// Recursive function to format Date type values of the assignments to strings of the format '2023-01-01'
-const formatDates = (assignments) => {
-
-  const formatDate = (modifiabelAssignments) => {
-    modifiabelAssignments.forEach((assignment) => {
-      const date = assignment.date;
-      const expiryDate = assignment.expiryDate;
-      assignment.date = textFormatServices.formatDateToSlashString(date);
-      assignment.expiryDate = textFormatServices.formatDateToSlashString(expiryDate);
-      if (assignment.subAssignments.length !== 0) {
-        formatDate(assignment.subAssignments);
+      if (attainment.subAttainments.length !== 0) {
+        addCategory(attainment.subAttainments);
       }
     });
   };
 
-  const updatedAssignments = JSON.parse(JSON.stringify(assignments));
-  formatDate(updatedAssignments);
-  return updatedAssignments;
+  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  addCategory(updatedAttainments);
+  return updatedAttainments;
 
 };
 
-// Get an assignment from a tree structure of assignments based on its ID
-const getAssignmentById = (assignments, assignmentId) => {
+// Recursive function to format Date type values of the attainments to strings of the format '2023-01-01'
+const formatDates = (attainments) => {
 
-  let finalAssignment = {};
+  const formatDate = (modifiabelAttainments) => {
+    modifiabelAttainments.forEach((attainment) => {
+      const date = attainment.date;
+      const expiryDate = attainment.expiryDate;
+      attainment.date = textFormatServices.formatDateToSlashString(date);
+      attainment.expiryDate = textFormatServices.formatDateToSlashString(expiryDate);
+      if (attainment.subAttainments.length !== 0) {
+        formatDate(attainment.subAttainments);
+      }
+    });
+  };
 
-  const findAssignment = (modifiabelAssignments) => {
-    modifiabelAssignments.forEach((assignment) => {
-      if (assignment.id === assignmentId) {
-        finalAssignment = assignment;
+  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  formatDate(updatedAttainments);
+  return updatedAttainments;
+
+};
+
+// Recursive function to format strings of the format '2023-01-01' to Date type values
+const formatStringsToDates = (attainments) => {
+
+  const formatStringToDate = (modifiabelAttainments) => {
+    modifiabelAttainments.forEach((attainment) => {
+      const dateString = attainment.date;
+      const expiryDateString = attainment.expiryDate;
+      attainment.date = textFormatServices.formatStringToDate(dateString);
+      attainment.expiryDate = textFormatServices.formatStringToDate(expiryDateString);
+      if (attainment.subAttainments.length !== 0) {
+        formatStringToDate(attainment.subAttainments);
+      }
+    });
+  };
+
+  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  formatStringToDate(updatedAttainments);
+  return updatedAttainments;
+
+};
+
+// Get an attainment from a tree structure of attainments based on its ID
+const getAttainmentById = (attainments, attainmentId) => {
+
+  let finalAttainment = {};
+  const findAttainment = (modifiabelAttainments) => {
+    modifiabelAttainments.forEach((attainment) => {
+      if (attainment.id === attainmentId) {
+        finalAttainment = attainment;
         return;
-      } else if (assignment.subAssignments.length !== 0) {
-        findAssignment(assignment.subAssignments);
+      } else if (attainment.subAttainments.length !== 0) {
+        findAttainment(attainment.subAttainments);
       } else {
         return;
       }
     });
   };
 
-  let updatedAssignments = JSON.parse(JSON.stringify(assignments));
-  findAssignment(updatedAssignments);
-  updatedAssignments = finalAssignment;
-  return updatedAssignments;
+  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  findAttainment(updatedAttainments);
+  updatedAttainments = finalAttainment;
+  return updatedAttainments;
 
 };
 
-// Get an assignment based on its ID, add categories to the assignments, and format the dates of assignments
-const getFinalAssignmentById = (allAssignments, assignmentId) => {
-  let updatedAssignments = JSON.parse(JSON.stringify(allAssignments));
-  //updatedAssignments = [constructTreeAssignmets(updatedAssignments)];  // Not needed if the structure is already a tree
-  updatedAssignments = [getAssignmentById(updatedAssignments, assignmentId)];
-  updatedAssignments = addCategories(updatedAssignments);
-  updatedAssignments = formatDates(updatedAssignments);
-  return updatedAssignments;
+// Get an attainment based on its ID, add categories to the attainments, and format the dates of attainments
+const getFinalAttainmentById = (allAttainments, attainmentId) => {
+  let updatedAttainments = JSON.parse(JSON.stringify(allAttainments));
+  //updatedAttainments = [constructTreeAssignmets(updatedAttainments)];  // Not needed if the structure is already a tree
+  updatedAttainments = [getAttainmentById(updatedAttainments, attainmentId)];
+  updatedAttainments = addCategories(updatedAttainments);
+  updatedAttainments = formatDates(updatedAttainments);
+  return updatedAttainments;
 };
 
-// Get number of assignments from a tree structure, for tests
-const getNumOfAssignments = (assignments) => {
+// Get number of attainments from a tree structure, for tests
+const getNumOfAttainments = (attainments) => {
 
   let sum = 0;
-
-  const countAssignment = (modifiabelAssignments) => {
-    modifiabelAssignments.forEach((assignment) => {
+  const countAttainment = (modifiabelAttainments) => {
+    modifiabelAttainments.forEach((attainment) => {
       sum += 1;
-      if (assignment.subAssignments.length !== 0) {
-        countAssignment(assignment.subAssignments);
+      if (attainment.subAttainments.length !== 0) {
+        countAttainment(attainment.subAttainments);
       } else {
         return;
       }
     });
   };
 
-  let updatedAssignments = JSON.parse(JSON.stringify(assignments));
-  countAssignment(updatedAssignments);
+  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  countAttainment(updatedAttainments);
   return sum;
 
 };
 
+// Get the attainments that have ids so that they are already existing in the database
+const getExistingAttainments = (attainments) => {
+
+  let existingAttainments = [];
+  const findExisting = (modifiabelAttainments) => {
+    modifiabelAttainments.forEach((attainment) => {
+      if (attainment.id) {
+        existingAttainments.push(attainment);
+      }
+      if (attainment.subAttainments && attainment.subAttainments.length !== 0) {
+        findExisting(attainment.subAttainments);
+      }
+    });
+  };
+
+  let updatedAattainments = JSON.parse(JSON.stringify(attainments));
+  findExisting(updatedAattainments);
+  updatedAattainments = existingAttainments;
+  return updatedAattainments;
+};
+
+// Get the attainments that don't have ids so that they aren't existing in the database
+const getNewAttainments = (attainments) => {
+
+  let newAttainments = [];
+  const findNew = (modifiabelAttainments) => {
+    modifiabelAttainments.forEach((attainment) => {
+      if (!attainment.id) {
+        newAttainments.push(attainment);
+      } else if (attainment.subAttainments && attainment.subAttainments.length !== 0) {
+        findNew(attainment.subAttainments);
+      }
+    });
+  };
+
+  let updatedAattainments = JSON.parse(JSON.stringify(attainments));
+  findNew(updatedAattainments);
+  updatedAattainments = newAttainments;
+  return updatedAattainments;
+};
+
 export default { 
-  getSubAssignments, 
-  addSubAssignments, 
-  removeAssignment, 
+  addAttainment,
+  editAttainment,
+  getSuggestedAttainments,
+  addTemporaryIds,
+  addTemporaryAttainment,
+  createTemporaryAttainment,
+  updateTemporaryAttainment,
+  deleteTemporaryAttainment,
+  getSubAttainments, 
+  addSubAttainments, 
+  removeAttainment, 
   getProperty, 
   setProperty, 
   constructTreeAssignmets, 
   addCategories, 
   formatDates,
-  getAssignmentById,
-  getFinalAssignmentById,
+  formatStringsToDates,
+  getAttainmentById,
+  getFinalAttainmentById,
   setFormulaAttribute,
   getFormulaAttribute,
-  getNumOfAssignments
+  getNumOfAttainments,
+  getExistingAttainments,
+  getNewAttainments
 };

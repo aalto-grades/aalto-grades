@@ -15,7 +15,7 @@ import StringTextField from './StringTextField';
 import DateTextField from './DateTextField';
 import assignmentServices from '../../services/assignments';
 
-// An Assignmnet component without subassignments and hence without a formula as well.
+// An Assignmnet component without subAttainments and hence without a formula as well.
 // If this isn't the root Assignment, this can be deleted
 
 const categoryData = {
@@ -24,12 +24,12 @@ const categoryData = {
 };
 
 const nameData = {
-  fieldId: 'assignmentName',
+  fieldId: 'attainmentName',
   fieldLabel: 'New Name'
 };
   
 const dateData = {
-  fieldId: 'assignmentDate',
+  fieldId: 'attainmentDate',
   fieldLabel: 'Date'
 };
     
@@ -38,12 +38,12 @@ const expiryData = {
   fieldLabel: 'Expiry Date'
 };
 
-/* String textfields for the formula attributes. These attributes affect the parent assignment's grade
+/* String textfields for the formula attributes. These attributes affect the parent attainment's grade
    The textfield IDs are of format 'attribute0', 'attribute1' and so on. 
-   The numbers in the end are used to fill in the correct values of the 'formulaAttribute' property of an assignment.
+   The numbers in the end are used to fill in the correct values of the 'formulaAttribute' property of an attainment.
    This is considered in the function of the nested component StringTextField.
 */
-const AttributeTextFields = ({ formulaAttributeNames, indices, setAssignments, assignments }) => {
+const AttributeTextFields = ({ formulaAttributeNames, indices, setAttainments, attainments }) => {
   return (
     formulaAttributeNames.map((attribute, index) => {
       return(
@@ -51,8 +51,8 @@ const AttributeTextFields = ({ formulaAttributeNames, indices, setAssignments, a
           key={index}
           fieldData={{ fieldId: 'attribute' + index, fieldLabel: attribute }}
           indices={indices} 
-          setAssignments={setAssignments} 
-          assignments={assignments}
+          setAttainments={setAttainments} 
+          attainments={attainments}
         />);})
   );
 };
@@ -60,32 +60,32 @@ const AttributeTextFields = ({ formulaAttributeNames, indices, setAssignments, a
 AttributeTextFields.propTypes = {
   formulaAttributeNames: PropTypes.array,
   indices: PropTypes.array,
-  assignments: PropTypes.array,
-  setAssignments: PropTypes.func,
-  removeAssignment: PropTypes.func
+  attainments: PropTypes.array,
+  setAttainments: PropTypes.func,
+  removeAttainment: PropTypes.func
 };
 
-const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignments, removeAssignment, formulaAttributeNames }) => {
+const LeafAssignment = ({ indices, addSubAttainments, setAttainments, attainments, removeAttainment, formulaAttributeNames }) => {
 
   // Functions and varibales for handling the change of the value in the 'Name' (category) textfield.
   // If the value is 'Other', then the 'New Name' textfield is displayed; 
   // otherwise the name is the same as the category
   const handleChange = (event) => {
     const value = event.target.value;
-    let updatedAssignments = assignmentServices.setProperty(indices, assignments, 'category', value);
+    let updatedAttainments = assignmentServices.setProperty(indices, attainments, 'category', value);
     if (value === 'Other') {
       setDisplayNewName(true);
-      updatedAssignments = assignmentServices.setProperty(indices, updatedAssignments, 'name', '');
+      updatedAttainments = assignmentServices.setProperty(indices, updatedAttainments, 'name', '');
     } else {
       setDisplayNewName(false);
-      updatedAssignments = assignmentServices.setProperty(indices, updatedAssignments, 'name', value);
+      updatedAttainments = assignmentServices.setProperty(indices, updatedAttainments, 'name', value);
     }
-    setAssignments(updatedAssignments);
+    setAttainments(updatedAttainments);
   };
 
   const getValue = (fieldData) => {
     if (fieldData.fieldId === 'category') {
-      return assignmentServices.getProperty(indices, assignments, 'category');
+      return assignmentServices.getProperty(indices, attainments, 'category');
     } else {
       console.log(fieldData.fieldId);
     }
@@ -93,7 +93,7 @@ const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignment
 
   const [displayNewName, setDisplayNewName] = useState(getValue(categoryData) === 'Other');
 
-  // Functions and varibales for opening and closing the dialog that asks for the number of sub-assignments
+  // Functions and varibales for opening and closing the dialog that asks for the number of sub-attainments
   const [openCountDialog, setOpenCountDialog] = useState(false);
 
   const handleCountDialogOpen = () => {
@@ -104,7 +104,7 @@ const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignment
     setOpenCountDialog(false);
   };
 
-  // Functions and varibales for opening and closing the dialog for confirming sub-assignment deletion
+  // Functions and varibales for opening and closing the dialog for confirming sub-attainment deletion
   const [openConfDialog, setOpenConfDialog] = useState(false);
 
   const handleConfDialogOpen = () => {
@@ -115,8 +115,8 @@ const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignment
     setOpenConfDialog(false);
   };
 
-  // See if this assignment affects the parent assignment's grade
-  const affectCalculation = assignmentServices.getProperty(indices, assignments, 'affectCalculation');
+  // See if this attainment affects the parent attainment's grade
+  const affectCalculation = assignmentServices.getProperty(indices, attainments, 'affectCalculation');
 
   return (
     <Box sx={{
@@ -152,12 +152,12 @@ const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignment
           <MenuItem value='Other'>Other</MenuItem>
         </TextField>
         <Collapse in={displayNewName} timeout={0} unmountOnExit>
-          <StringTextField fieldData={nameData} indices={indices} setAssignments={setAssignments} assignments={assignments}/>
+          <StringTextField fieldData={nameData} indices={indices} setAttainments={setAttainments} attainments={attainments}/>
         </Collapse>
-        <DateTextField fieldData={dateData} indices={indices} setAssignments={setAssignments} assignments={assignments}/>
-        <DateTextField fieldData={expiryData} indices={indices} setAssignments={setAssignments} assignments={assignments}/>
+        <DateTextField fieldData={dateData} indices={indices} setAttainments={setAttainments} attainments={attainments}/>
+        <DateTextField fieldData={expiryData} indices={indices} setAttainments={setAttainments} attainments={attainments}/>
         { (formulaAttributeNames && affectCalculation) &&
-            <AttributeTextFields formulaAttributeNames={formulaAttributeNames} indices={indices} setAssignments={setAssignments} assignments={assignments}/>
+            <AttributeTextFields formulaAttributeNames={formulaAttributeNames} indices={indices} setAttainments={setAttainments} attainments={attainments}/>
         }
       </Box>
       <Box sx={{ 
@@ -173,13 +173,15 @@ const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignment
           : 
           <Box sx={{ width: '1px' }}/>}
         <ConfirmationDialog
+          title={'Sub Study Attainments'}
+          subject={'sub study attainment'}
           open={openConfDialog}
           handleClose={handleConfDialogClose}
-          removeAssignment={removeAssignment}
+          deleteAttainment={removeAttainment}
           indices={indices}
-          assignments={assignments}
+          attainments={attainments}
         />
-        {assignmentServices.getSubAssignments(indices, assignments).length === 0 ?
+        {assignmentServices.getSubAttainments(indices, attainments).length === 0 ?
           <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
             Create Sub-Attainments
           </Button>
@@ -191,20 +193,20 @@ const LeafAssignment = ({ indices, addSubAssignments, setAssignments, assignment
       <SimpleDialog
         open={openCountDialog}
         handleClose={handleCountDialogClose}
-        addSubAssignments={addSubAssignments}
+        addSubAttainments={addSubAttainments}
         indices={indices}
-        assignments={assignments}
+        attainments={attainments}
       />
     </Box>
   );
 };
 
 LeafAssignment.propTypes = {
-  addSubAssignments: PropTypes.func,
+  addSubAttainments: PropTypes.func,
   indices: PropTypes.array,
-  assignments: PropTypes.array,
-  setAssignments: PropTypes.func,
-  removeAssignment: PropTypes.func,
+  attainments: PropTypes.array,
+  setAttainments: PropTypes.func,
+  removeAttainment: PropTypes.func,
   formulaAttributeNames: PropTypes.array,
 };
 
