@@ -28,6 +28,7 @@ import CreateAssignmentView from './components/CreateAssignmentView';
 import EditAssignmentView from './components/EditAssignmentView';
 import InstanceCreationRoute from './context/InstanceCreationRoute';
 import FormulaSelectionRoute from './context/FormulaSelectionRoute';
+import CourseResultsView from './components/CourseResultsView';
 import useLogout from './hooks/useLogout';
 
 const theme = createTheme({
@@ -97,6 +98,7 @@ function App() {
       <AppContainer maxWidth="lg">
         <Box mx={5} my={5}>
           <Routes> { /* Add nested routes when needed */ }
+            <Route path='/course-results' element={<CourseResultsView/>} /> { /* DELETE!*/ }
             <Route path='/login' element={<Login/>} />
             <Route path='/signup' element={<Signup/>} />
             { /* All roles are authorised to access the front page, conditional rendering is done inside the component */ }
