@@ -64,7 +64,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       POSTGRES_PASSWORD: postgres
-      SERVER_SKIP_CI: 1
     defaults:
       run:
         working-directory: ./server
