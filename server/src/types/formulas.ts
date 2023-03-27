@@ -30,6 +30,12 @@ export interface WeightedAssignmentParams {
 
 // A FormulaFunction represents a grade formula calculation operation, including
 // user-defined parameters and their values.
+// 
+// For instance,
+// `getFormula({ min: 0, max: 5, weights: [2, 3] }, Formula.WeightedAverage)`
+// produces an `func: FormulaFunction` that expects two subResults.
+// The produced function calculates a weighted average with weights 2, 3
+// respectively.
 export type FormulaFunction = (subResults: Array<CalculationResult>) => Promise<CalculationResult>;
 
 // A ParametrizedFormulaFunction represents a grade formula calculation operation,
