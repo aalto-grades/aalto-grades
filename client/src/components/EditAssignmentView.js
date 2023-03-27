@@ -102,7 +102,7 @@ const EditAssignmentView = () => {
     // If this view is opened from the course view, delete from DB
     // Else the attainment is being edited during the creation of an instance so only delete from the context
     if (instanceId) {
-      // TODO:Ddelete from DB
+      // TODO: Delete from DB
       navigate(-1);
     } else if (sisuInstanceId) {
       const updatedAttainments = assignmentServices.deleteTemporaryAttainment(addedAttainments, attainments[0]);

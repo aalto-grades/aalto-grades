@@ -73,7 +73,10 @@ const AddAssignmentsView = () => {
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', mb: 5, mt: 1, display: 'inline-block' }}>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography align='left' sx={{ ml: 1.5 }} >Create and add a new study attainment:</Typography>
-          <Button variant='outlined' onClick={ () => navigate(`/${courseId}/create-temporary-attainment/${sisuInstanceId}`) }>Create attainment</Button>
+          <Button variant='outlined' onClick={ () => 
+            navigate(`/${courseId}/create-temporary-attainment/${sisuInstanceId}`) }>
+              Create attainment
+          </Button>
         </Box>
       </Box>
       <Typography align='left' sx={{ ml: 1.5 }} >Added study attainments</Typography>
