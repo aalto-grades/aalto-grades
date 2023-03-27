@@ -6,19 +6,19 @@ import { Request, Response } from 'express';
 import * as yup from 'yup';
 
 import models from '../database/models';
-import Attainable from '../database/models/attainable';
+import Attainment from '../database/models/attainment';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 
-import { AttainableData, AttainableRequestData } from '../types/attainable';
+import { AttainmentData, AttainmentRequestData } from '../types/attainment';
 import { ApiError } from '../types/error';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
-import { findAttainableById, generateAttainableTag } from './utils/attainable';
+import { findAttainmentById, generateAttainmentTag } from './utils/attainment';
 import { findCourseById } from './utils/course';
 import { findCourseInstanceById } from './utils/courseInstance';
 
-export async function addAttainable(req: Request, res: Response): Promise<void> {
+export async function addAttainment(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     parentId: yup
       .number()
@@ -63,16 +63,16 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
   const name: string = req.body.name;
   const date: Date = req.body.date;
   const expiryDate: Date = req.body.expiryDate;
-  const requestSubAttainables: Array<AttainableRequestData> | undefined = req.body.subAttainments;
-  let subAttainables: Array<AttainableData> = [];
+  const requestSubAttainments: Array<AttainmentRequestData> | undefined = req.body.subAttainments;
+  let subAttainments: Array<AttainmentData> = [];
 
   // If linked to a parent id, check that it exists and belongs to the same course instance.
   if (parentId) {
-    const parentAttainable: Attainable = await findAttainableById(
+    const parentAttainment: Attainment = await findAttainmentById(
       parentId, HttpCode.UnprocessableEntity
     );
 
-    if (parentAttainable.courseInstanceId !== courseInstanceId) {
+    if (parentAttainment.courseInstanceId !== courseInstanceId) {
       throw new ApiError(
         `parent attainment ID ${parentId} does not belong ` +
         `to the course instance ID ${courseInstanceId}`,
@@ -81,77 +81,77 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
     }
   }
 
-  const attainable: Attainable = await models.Attainable.create({
+  const attainment: Attainment = await models.Attainment.create({
     courseId: courseId,
-    attainableId: parentId,
+    attainmentId: parentId,
     courseInstanceId: courseInstanceId,
     name: name,
     date: date,
     expiryDate: expiryDate
   });
 
-  async function processSubAttainables(
-    unprocessedAttainables: Array<AttainableRequestData>, parentId: number
-  ): Promise<Array<AttainableData>> {
-    const attainables: Array<AttainableData> = [];
-    let subAttainables: Array<AttainableData> = [];
+  async function processSubAttainments(
+    unprocessedAttainments: Array<AttainmentRequestData>, parentId: number
+  ): Promise<Array<AttainmentData>> {
+    const attainments: Array<AttainmentData> = [];
+    let subAttainments: Array<AttainmentData> = [];
 
-    for (const attainable of unprocessedAttainables) {
-      const dbEntry: Attainable = await models.Attainable.create({
-        attainableId: parentId,
+    for (const attainment of unprocessedAttainments) {
+      const dbEntry: Attainment = await models.Attainment.create({
+        attainmentId: parentId,
         courseId: courseId,
         courseInstanceId: courseInstanceId,
-        name: attainable.name,
-        date: attainable.date,
-        expiryDate: attainable.expiryDate
+        name: attainment.name,
+        date: attainment.date,
+        expiryDate: attainment.expiryDate
       });
 
-      if (attainable.subAttainments.length > 0) {
-        subAttainables = await processSubAttainables(attainable.subAttainments, dbEntry.id);
+      if (attainment.subAttainments.length > 0) {
+        subAttainments = await processSubAttainments(attainment.subAttainments, dbEntry.id);
       }
 
-      attainables.push({
+      attainments.push({
         id: dbEntry.id,
         courseId: dbEntry.courseId,
         courseInstanceId: dbEntry.courseInstanceId,
         name: dbEntry.name,
         date: dbEntry.date,
         expiryDate: dbEntry.expiryDate,
-        parentId: dbEntry.attainableId,
-        tag: generateAttainableTag(
+        parentId: dbEntry.attainmentId,
+        tag: generateAttainmentTag(
           dbEntry.id, dbEntry.courseId, dbEntry.courseInstanceId
         ),
-        subAttainments: subAttainables
+        subAttainments: subAttainments
       });
     }
-    return attainables;
+    return attainments;
   }
 
-  if (requestSubAttainables) {
-    subAttainables = await processSubAttainables(requestSubAttainables, attainable.id);
+  if (requestSubAttainments) {
+    subAttainments = await processSubAttainments(requestSubAttainments, attainment.id);
   }
 
   res.status(HttpCode.Ok).json({
     success: true,
     data: {
       attainment: {
-        id: attainable.id,
-        courseId: attainable.courseId,
-        courseInstanceId: attainable.courseInstanceId,
-        name: attainable.name,
-        date: attainable.date,
-        expiryDate: attainable.expiryDate,
-        parentId: attainable.attainableId,
-        tag: generateAttainableTag(
-          attainable.id, attainable.courseId, attainable.courseInstanceId
+        id: attainment.id,
+        courseId: attainment.courseId,
+        courseInstanceId: attainment.courseInstanceId,
+        name: attainment.name,
+        date: attainment.date,
+        expiryDate: attainment.expiryDate,
+        parentId: attainment.attainmentId,
+        tag: generateAttainmentTag(
+          attainment.id, attainment.courseId, attainment.courseInstanceId
         ),
-        subAttainments: subAttainables
+        subAttainments: subAttainments
       }
     }
   });
 }
 
-export async function updateAttainable(req: Request, res: Response): Promise<void> {
+export async function updateAttainment(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     parentId: yup
       .number()
@@ -169,11 +169,11 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
 
   const courseId: number = Number(req.params.courseId);
   const courseInstanceId: number = Number(req.params.instanceId);
-  const attainableId: number = Number(req.params.attainmentId);
+  const attainmentId: number = Number(req.params.attainmentId);
 
   await idSchema.validate({ id: courseId }, { abortEarly: false });
   await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
-  await idSchema.validate({ id: attainableId }, { abortEarly: false });
+  await idSchema.validate({ id: attainmentId }, { abortEarly: false });
   await requestSchema.validate(req.body, { abortEarly: false });
 
   const name: string | undefined = req.body.name;
@@ -181,53 +181,53 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
   const expiryDate: Date | undefined = req.body.expiryDate;
   const parentId: number| undefined = req.body.parentId;
 
-  const attainable: Attainable = await findAttainableById(attainableId, HttpCode.NotFound);
+  const attainment: Attainment = await findAttainmentById(attainmentId, HttpCode.NotFound);
 
   // If linked to a parent id, check that it exists and belongs
-  // to the same course instance as the attainable being edited.
+  // to the same course instance as the attainment being edited.
   if (parentId) {
 
-    if (parentId === attainable.id) {
+    if (parentId === attainment.id) {
       throw new ApiError(
         'attainment cannot refer to itself in the parent ID',
         HttpCode.Conflict
       );
     }
 
-    const parentAttainable: Attainable = await findAttainableById(
+    const parentAttainment: Attainment = await findAttainmentById(
       parentId,
       HttpCode.UnprocessableEntity
     );
 
-    if (parentAttainable.courseInstanceId !== attainable.courseInstanceId) {
+    if (parentAttainment.courseInstanceId !== attainment.courseInstanceId) {
       throw new ApiError(
         `parent attainment ID ${parentId} does not belong to ` +
-        `the same instance as attainment ID ${attainableId}`,
+        `the same instance as attainment ID ${attainmentId}`,
         HttpCode.Conflict
       );
     }
   }
 
-  await attainable.set({
-    name: name ?? attainable.name,
-    date: date ?? attainable.date,
-    expiryDate: expiryDate ?? attainable.expiryDate,
-    attainableId: parentId ?? attainable.attainableId
+  await attainment.set({
+    name: name ?? attainment.name,
+    date: date ?? attainment.date,
+    expiryDate: expiryDate ?? attainment.expiryDate,
+    attainmentId: parentId ?? attainment.attainmentId
   }).save();
 
   res.status(HttpCode.Ok).json({
     success: true,
     data: {
       attainment: {
-        id: attainable.id,
-        courseId: attainable.courseId,
-        courseInstanceId: attainable.courseInstanceId,
-        name: attainable.name,
-        date: attainable.date,
-        expiryDate: attainable.expiryDate,
-        parentId: attainable.attainableId,
-        tag: generateAttainableTag(
-          attainable.id, attainable.courseId, attainable.courseInstanceId
+        id: attainment.id,
+        courseId: attainment.courseId,
+        courseInstanceId: attainment.courseInstanceId,
+        name: attainment.name,
+        date: attainment.date,
+        expiryDate: attainment.expiryDate,
+        parentId: attainment.attainmentId,
+        tag: generateAttainmentTag(
+          attainment.id, attainment.courseId, attainment.courseInstanceId
         )
       }
     }

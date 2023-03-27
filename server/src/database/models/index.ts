@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import Attainable from './attainable';
+import Attainment from './attainment';
 import Course from './course';
 import CourseInstance from './courseInstance';
 import CourseInstanceRole from './courseInstanceRole';
@@ -11,14 +11,14 @@ import CourseTranslation from './courseTranslation';
 import User from './user';
 import UserAttainmentGrade from './userAttainmentGrade';
 
-Attainable.hasMany(Attainable, {
+Attainment.hasMany(Attainment, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
 
-Attainable.belongsTo(Attainable, {
+Attainment.belongsTo(Attainment, {
   targetKey: 'id',
-  foreignKey: 'attainableId'
+  foreignKey: 'attainmentId'
 });
 
 User.belongsToMany(CourseInstance, {
@@ -73,22 +73,22 @@ CourseResult.belongsTo(CourseInstance, {
   foreignKey: 'courseInstanceId'
 });
 
-CourseInstance.hasMany(Attainable, {
+CourseInstance.hasMany(Attainment, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
 
-Attainable.belongsTo(CourseInstance, {
+Attainment.belongsTo(CourseInstance, {
   targetKey: 'id',
   foreignKey: 'courseInstanceId'
 });
 
-Course.hasMany(Attainable, {
+Course.hasMany(Attainment, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
 
-Attainable.belongsTo(Course, {
+Attainment.belongsTo(Course, {
   targetKey: 'id',
   foreignKey: 'courseId'
 });
@@ -113,18 +113,18 @@ UserAttainmentGrade.belongsTo(User, {
   foreignKey: 'userId'
 });
 
-Attainable.hasMany(UserAttainmentGrade, {
+Attainment.hasMany(UserAttainmentGrade, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
 
-UserAttainmentGrade.belongsTo(Attainable, {
+UserAttainmentGrade.belongsTo(Attainment, {
   targetKey: 'id',
-  foreignKey: 'attainableId'
+  foreignKey: 'attainmentId'
 });
 
 export default {
-  Attainable,
+  Attainment,
   Course,
   CourseInstance,
   CourseInstanceRole,
