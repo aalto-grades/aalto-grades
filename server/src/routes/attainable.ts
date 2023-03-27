@@ -4,7 +4,7 @@
 
 import express, { Router } from 'express';
 
-import { addAttainable, updateAttainable } from '../controllers/attainable';
+import { addAttainable, getAttainments, updateAttainable } from '../controllers/attainable';
 import { handleInvalidRequestJson } from '../middleware';
 import { controllerDispatcher } from '../middleware/errorHandler';
 
@@ -159,4 +159,54 @@ router.put(
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(updateAttainable)
+);
+
+/**
+ * @swagger
+ * /v1/courses/{courseId}/instances/{instanceId}/attainments/{attainmentId}:
+ *  get:
+ *     tags: [Attainment]
+ *     description: Get single attainment or subtree downwards.
+ *     requestBody:
+ *       description: 
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/definitions/AddAndEditAttainment'
+ *     responses:
+ *       200:
+ *         description: 
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Attainment'
+ *       400:
+ *         description: 
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       404:
+ *         description: 
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: 
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       422:
+ *         description: 
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ */
+
+router.get(
+  '/v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId',
+  controllerDispatcher(getAttainments)
 );

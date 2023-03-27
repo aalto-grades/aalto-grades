@@ -233,3 +233,39 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
     }
   });
 }
+
+export async function getAttainments(req: Request, res: Response): Promise<void> {
+  const courseId: number = Number(req.params.courseId);
+  await idSchema.validate({ id: courseId });
+
+  const instanceId: number = Number(req.params.instanceId);
+  await idSchema.validate({ id: instanceId });
+
+  const attainmentId: number = Number(req.params.attainmentId);
+  await idSchema.validate({ id: instanceId });
+
+  const queryString: string = String(req.query.tree);
+
+  if (queryString == "children") {
+    const attainables: Attainable | null = await Attainable.findAll({
+      attributes: []
+    })
+  } else if (queryString == "descendants") {
+
+  } else () {
+  
+  }
+
+  const attainable: Attainable | null = await Attainable.findByPk(attainmentId, {
+    include: Attainable
+  });
+  
+  if (!attainable) {
+    throw new ApiError(`study attainment with ID ${attainmentId} not found`, HttpCode.NotFound);
+  }
+
+  res.status(HttpCode.Ok).json({
+    success: true,
+    data: attainable,
+  });
+} 
