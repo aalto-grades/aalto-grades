@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+
+SPDX-License-Identifier: MIT
+-->
+
 ## Robot Framework End-to-end Testing
 
 This end to end testing is implemented utilizing Robot Framework and notably the browser library of robot framework.
