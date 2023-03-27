@@ -6,35 +6,41 @@ import { Request, Response } from 'express';
 
 import Attainable from '../database/models/attainable';
 import UserAttainmentGrade from '../database/models/userAttainmentGrade';
+import { formulaChecker, getFormula } from '../formulas';
 
 import { ApiError } from '../types/error';
 import {
   CalculationResult,
   Formula,
-  formulaChecker,
   FormulaNode,
   FormulaParams,
-  getFormula,
   Status
 } from '../types/formulas';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 
-async function calculate(
+async function calculateSingleNode(
   tree: FormulaNode,
   presetPoints: Map<FormulaNode, number>
 ): Promise<CalculationResult> {
   if (presetPoints.has(tree)) {
-    return { status: Status.Pass, points: presetPoints.get(tree) };
+    // If the teacher has manually specified a grade for a certain attainment,
+    // we should use that instead of re-calculating the grade from lower
+    // levels.
+    return {
+      status: Status.Pass,
+      points: presetPoints.get(tree)
+    };
   }
-  // Not calculated so far, so calculate the points for lower nodes.
+  // No preset grade available, so calculate the points for lower nodes.
   const subPoints: Array<CalculationResult> =
     await Promise.all(
       tree.subFormulaNodes.map(
-        (subTree: FormulaNode) => calculate(subTree, presetPoints)
+        (subTree: FormulaNode) => calculateSingleNode(subTree, presetPoints)
       )
     );
-  // Based on the results from lower nodes, calculate the points for this node.
+  // Based on the results from lower nodes, calculate the points for this node
+  // using the node-specific formula.
   return await tree.validatedFormula(subPoints);
 }
 
@@ -47,7 +53,7 @@ export async function calculateGrades(
   await idSchema.validate({ id: courseId }, { abortEarly: false });
   await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
 
-  const formulaNodesById: Map<number, FormulaNode> = new Map();
+  const formulaNodesByAttainmentId: Map<number, FormulaNode> = new Map();
 
   const attainables: Array<{
     id: number,
@@ -78,7 +84,7 @@ export async function calculateGrades(
       throw new ApiError('the parameters for a formula haven\'t been set', HttpCode.BadRequest);
     }
 
-    formulaNodesById.set(attainable.id, {
+    formulaNodesByAttainmentId.set(attainable.id, {
       validatedFormula: await getFormula(formulaId as Formula, params),
       subFormulaNodes: [],
     });
@@ -93,12 +99,12 @@ export async function calculateGrades(
           HttpCode.InternalServerError
         );
       }
-      rootAttainable = formulaNodesById.get(attainable.id)!;
+      rootAttainable = formulaNodesByAttainmentId.get(attainable.id)!;
     } else {
-      formulaNodesById
+      formulaNodesByAttainmentId
         .get(attainable.attainableId)!
         .subFormulaNodes
-        .push(formulaNodesById.get(attainable.id)!);
+        .push(formulaNodesByAttainmentId.get(attainable.id)!);
     }
   }
 
@@ -130,14 +136,14 @@ export async function calculateGrades(
     }
     presetPointsByStudentId
       .get(student.userId)!
-      .set(formulaNodesById.get(student.attainableId)!, student.points);
+      .set(formulaNodesByAttainmentId.get(student.attainableId)!, student.points);
   }
 
   const rootAttainablePointsByStudent: Map<number, CalculationResult> = new Map();
   for (const [studentId, presetPoints] of presetPointsByStudentId) {
     rootAttainablePointsByStudent.set(
       studentId,
-      await calculate(rootAttainable, presetPoints)
+      await calculateSingleNode(rootAttainable, presetPoints)
     );
   }
 
