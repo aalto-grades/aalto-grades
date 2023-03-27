@@ -24,28 +24,28 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
       .post('/v1/courses/1/instances/1/grades/csv')
       .attach('csv_data', csvData, { contentType: 'text/csv'});
 
-    console.log(res.body);
     expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
     expect(res.body.data).toBeDefined();
     expect(res.statusCode).toBe(HttpCode.Ok);
   });
 
-  it('should respond with 400 bad request, if the CSV file parsing fails', async () => {
-    const csvData: fs.ReadStream = fs.createReadStream(
-      path.resolve(__dirname, '../mockData/csv/grades_invalid_row.csv'), 'utf8'
-    );
+  it('should respond with 400 bad request, if the CSV file parsing fails (one row invalid length)',
+    async () => {
+      const invalidCsvData: fs.ReadStream = fs.createReadStream(
+        path.resolve(__dirname, '../mockData/csv/grades_invalid_row.csv'), 'utf8'
+      );
 
-    const res: supertest.Response = await request
-      .post('/v1/courses/1/instances/1/grades/csv')
-      .attach('csv_data', csvData, { contentType: 'text/csv'});
+      const res: supertest.Response = await request
+        .post('/v1/courses/1/instances/1/grades/csv')
+        .attach('csv_data', invalidCsvData, { contentType: 'text/csv'});
 
-    expect(res.body.success).toBe(false);
-    expect(res.body.errors).toBeDefined();
-    expect(res.body.errors).toContain('Invalid Record Length: expect 6, got 5 on line 4');
-    expect(res.body.data).not.toBeDefined();
-    expect(res.statusCode).toBe(HttpCode.BadRequest);
-  });
+      expect(res.body.success).toBe(false);
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors).toContain('Invalid Record Length: expect 6, got 5 on line 4');
+      expect(res.body.data).not.toBeDefined();
+      expect(res.statusCode).toBe(HttpCode.BadRequest);
+    });
 
   it('should respond with 400 bad request, if the CSV file field name not "csv_data"', async () => {
     const csvData: fs.ReadStream = fs.createReadStream(
@@ -75,11 +75,44 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
         .post('/v1/courses/1/instances/1/grades/csv')
         .attach('csv_data', csvData, { contentType: 'application/json'});
 
-      console.log(res.body);
       expect(res.body.success).toBe(false);
       expect(res.body.errors).toBeDefined();
       expect(res.body.errors).toContain(
         'incorrect file format, use the CSV format'
+      );
+      expect(res.body.data).not.toBeDefined();
+      expect(res.statusCode).toBe(HttpCode.BadRequest);
+    });
+
+  it('should respond with 400 bad request, if the file extension incorrect (.txt)',
+    async () => {
+      const txtFile: fs.ReadStream = fs.createReadStream(
+        path.resolve(__dirname, '../mockData/csv/wrong_file_type.txt'), 'utf8'
+      );
+
+      const res: supertest.Response = await request
+        .post('/v1/courses/1/instances/1/grades/csv')
+        .attach('csv_data', txtFile, { contentType: 'text/csv'});
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors).toContain(
+        'incorrect file format, use the CSV format'
+      );
+      expect(res.body.data).not.toBeDefined();
+      expect(res.statusCode).toBe(HttpCode.BadRequest);
+    });
+
+  it('should respond with 400 bad request, if the CSV file not found in the request.',
+    async () => {
+      const res: supertest.Response = await request
+        .post('/v1/courses/1/instances/1/grades/csv')
+        .attach('csv_data', false, { contentType: 'text/csv'});
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors).toContain(
+        'CSV file not found in the request. To upload CSV file, set input field name as "csv_data"'
       );
       expect(res.body.data).not.toBeDefined();
       expect(res.statusCode).toBe(HttpCode.BadRequest);
