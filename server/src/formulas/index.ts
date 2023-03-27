@@ -34,7 +34,10 @@ export function registerFormula(
 export const formulaChecker: yup.StringSchema =
   yup.string().oneOf(Object.values(Formula)).required();
 
-async function validate<P extends FormulaParams>(
+// formulaWithParameters validates the user parameters for the formula, and
+// produces a handy closure that automatically applies to parameters to each
+// subsequent call of the formula function.
+async function formulaWithParameters<P extends FormulaParams>(
   fn: (params: P, subPoints: Array<CalculationResult>) => Promise<CalculationResult>,
   schema: yup.AnyObjectSchema,
   params: unknown,
@@ -47,7 +50,7 @@ async function validate<P extends FormulaParams>(
 export function getFormula(name: Formula, params: FormulaParams): Promise<FormulaFunction> {
   const formulaWithSchema: [yup.AnyObjectSchema, ParameterizedFormulaFunction] =
     formulasWithSchema.get(name)!;
-  return validate(formulaWithSchema[1], formulaWithSchema[0], params);
+  return formulaWithParameters(formulaWithSchema[1], formulaWithSchema[0], params);
 }
 
 registerFormula(
