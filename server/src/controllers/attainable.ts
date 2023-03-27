@@ -7,37 +7,13 @@ import * as yup from 'yup';
 
 import models from '../database/models';
 import Attainable from '../database/models/attainable';
-import Course from '../database/models/course';
-import CourseInstance from '../database/models/courseInstance';
 
 import { AttainableData, AttainableRequestData } from '../types/attainable';
 import { ApiError } from '../types/error';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { findAttainableById, generateAttainableTag } from './utils/attainable';
-import { findCourseById } from './utils/course';
-import { findCourseInstanceById } from './utils/courseInstance';
-
-async function validateCourseAndInstance(
-  courseId: number, courseInstanceId: number
-): Promise<void> {
-  // Ensure that course exists.
-  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
-
-  // Ensure that course instance exists.
-  const instance: CourseInstance = await findCourseInstanceById(
-    courseInstanceId, HttpCode.NotFound
-  );
-
-  // Check that instance belongs to the course.
-  if (instance.courseId !== course.id) {
-    throw new ApiError(
-      `course instance with ID ${courseInstanceId} ` +
-      `does not belong to the course with ID ${courseId}`,
-      HttpCode.Conflict
-    );
-  }
-}
+import { validateCourseAndInstance } from './utils/courseInstance';
 
 export async function addAttainable(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
