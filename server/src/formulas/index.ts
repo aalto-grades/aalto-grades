@@ -13,11 +13,15 @@ import {
   Status
 } from '../types/formulas';
 
+// The registry of formula implementations corresponding to their names, along
+// with a schema specifying what form their user parameters should take.
 const formulasWithSchema: Map<
   Formula,
   [yup.AnyObjectSchema, ParameterizedFormulaFunction]
 > = new Map();
 
+// registerFormula adds a formula implemntation to the formula registry.
+// The caller should specify a schema for the user-configurable per-formula.
 export function registerFormula(
   name: Formula,
   schema: yup.AnyObjectSchema,
