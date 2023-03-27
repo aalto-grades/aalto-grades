@@ -11,7 +11,7 @@ import SelectFormulaView from '../components/SelectFormulaView';
 import instancesService from '../services/instances';
 import formulasService from '../services/formulas';
 import FormulaSelectionRoute from '../context/FormulaSelectionRoute';
-import mockAssignments from '../mock-data/mockAssignments';
+import mockAttainments from '../mock-data/mockAttainments';
 import mockFormulas from '../mock-data/mockFormulas';
 
 jest.mock('../services/instances');
@@ -22,8 +22,8 @@ describe('Tests for SelectFormulaView components', () => {
 
   const renderSelectFormulaView = async () => {
 
-    instancesService.getAssignments.mockRejectedValue('Network error');
-    instancesService.getAssignments.mockResolvedValue(mockAssignments);
+    instancesService.getAttainments.mockRejectedValue('Network error');
+    instancesService.getAttainments.mockResolvedValue(mockAttainments);
     formulasService.getFormulas.mockRejectedValue('Network error');
     formulasService.getFormulas.mockResolvedValue(mockFormulas);
     return render(
@@ -44,7 +44,7 @@ describe('Tests for SelectFormulaView components', () => {
     await waitFor(() => {
       const headingElement = screen.queryByText('Select Grading Formula');
       const subHeadingElement = screen.queryByText('Result: Course Total Grade');
-      const assignmentSelection = screen.queryByText('Select the sub study attainments you want to include in the calculation');
+      const attainmentSelection = screen.queryByText('Select the sub study attainments you want to include in the calculation');
       const projectsCheckbox = screen.queryByText('Projects');
       const examCheckbox = screen.queryByText('Exams');
       const formulaSelector = screen.queryByText('Formula');
@@ -55,7 +55,7 @@ describe('Tests for SelectFormulaView components', () => {
 
       expect(headingElement).toBeInTheDocument();
       expect(subHeadingElement).toBeInTheDocument();
-      expect(assignmentSelection).toBeInTheDocument();
+      expect(attainmentSelection).toBeInTheDocument();
       expect(projectsCheckbox).toBeInTheDocument();
       expect(examCheckbox).toBeInTheDocument();
       expect(formulaSelector).toBeInTheDocument();
@@ -67,7 +67,7 @@ describe('Tests for SelectFormulaView components', () => {
    
   });
 
-  test('SelectFormulaView should render an alert if "Specify attributes" is clicked without selecting any assignments or a formula', async () => {
+  test('SelectFormulaView should render an alert if "Specify attributes" is clicked without selecting any attainments or a formula', async () => {
 
     renderSelectFormulaView();
 

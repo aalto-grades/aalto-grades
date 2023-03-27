@@ -8,7 +8,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 
-const Assignment = ({ assignment, attributes, handleAttributeChange, assignmentIndex }) => {
+const Assignment = ({ attainment, attributes, handleAttributeChange, attainmentIndex }) => {
 
   const attributeTextFields = () => {
     return (
@@ -24,7 +24,7 @@ const Assignment = ({ assignment, attributes, handleAttributeChange, assignmentI
             marginTop: 0,
             width: '100%'
           }}
-          onChange={event => handleAttributeChange(assignmentIndex, attributeIndex, event)}
+          onChange={event => handleAttributeChange(attainmentIndex, attributeIndex, event)}
         />
       ))
     );
@@ -45,7 +45,7 @@ const Assignment = ({ assignment, attributes, handleAttributeChange, assignmentI
       mb: 2
     }}>
       <Typography sx={{ fontWeight: 'bold', my: 1 }} align='left'>
-        {assignment.name}
+        {attainment.name}
       </Typography>
       <Box sx={{ 
         display: 'grid',
@@ -62,10 +62,10 @@ const Assignment = ({ assignment, attributes, handleAttributeChange, assignmentI
 };
 
 Assignment.propTypes = {
-  assignment: PropTypes.object,
+  attainment: PropTypes.object,
   attributes: PropTypes.array,
   handleAttributeChange: PropTypes.func,
-  assignmentIndex: PropTypes.number
+  attainmentIndex: PropTypes.number
 };
 
 export default Assignment;

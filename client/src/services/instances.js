@@ -15,16 +15,16 @@ const getSisuInstances = async (courseId) => {
   return response.data.data;
 };
 
-const getSisuInstance = async (instanceId) => {
-  const response = await axios.get('/v1/sisu/instances/' + instanceId);
+const getSisuInstance = async (sisuInstanceId) => {
+  const response = await axios.get('/v1/sisu/instances/' + sisuInstanceId);
   console.log(response.data);
   return response.data.data;
 };
 
-const getAssignments = async (instanceId) => {
+const getAttainments = async (instanceId) => {
   const response = await axios.get('/v1/??' + instanceId);
   console.log(response.data);
   return response.data;
 };
 
-export default { getInstances, getSisuInstances, getSisuInstance, getAssignments };
+export default { getInstances, getSisuInstances, getSisuInstance, getAttainments };

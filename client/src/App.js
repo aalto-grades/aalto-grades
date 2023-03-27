@@ -110,15 +110,17 @@ function App() {
             </Route>
             { /* Pages that are authorised for admin and teachers */ }
             <Route element={<PrivateRoute roles={[roles.admin, roles.teacher]}/>}>
-              <Route path='/fetch-instances/:courseId/:courseCode' element={<FetchInstancesView/>}/>
+              <Route path=':courseId/fetch-instances/:courseCode' element={<FetchInstancesView/>}/>
               { /* Pages under this route share instance creation context */ }
               <Route element={<InstanceCreationRoute/>}>
                 <Route path=':courseId/edit-instance/:sisuInstanceId' element={<EditInstanceView/>}/>
-                <Route path=':courseId/add-assignments/:sisuInstanceId' element={<AddAssignmentsView/>}/>
+                <Route path=':courseId/add-attainments/:sisuInstanceId' element={<AddAssignmentsView/>}/>
                 <Route path=':courseId/instance-summary/:sisuInstanceId' element={<InstanceSummaryView/>}/>
-                <Route path='/create-assignment/:instanceId' element={<CreateAssignmentView/>}/>
-                <Route path='/edit-assignment/:instanceId/:assignmentId' element={<EditAssignmentView/>}/>
+                <Route path=':courseId/create-temporary-attainment/:sisuInstanceId' element={<CreateAssignmentView/>}/>
+                <Route path=':courseId/edit-temporary-attainment/:sisuInstanceId/:attainmentId' element={<EditAssignmentView/>}/>
               </Route>
+              <Route path=':courseId/create-attainment/:instanceId' element={<CreateAssignmentView/>}/>
+              <Route path=':courseId/edit-attainment/:instanceId/:attainmentId' element={<EditAssignmentView/>}/>
               <Route element={<FormulaSelectionRoute/>}>
                 <Route path='/:courseId/select-formula/:instanceId/' element={<SelectFormulaView/>}/>
                 <Route path='/:courseId/formula-attributes/:instanceId/' element={<FormulaAttributesView/>}/>
