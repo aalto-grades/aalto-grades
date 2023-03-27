@@ -22,7 +22,7 @@ import ViewFormulaAccordion from './ViewFormulaAccordion';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 
 
-const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, navigateToAttributeSelection }) => {
+const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, navigateToAttributeSelection }) => {
 
   const [codeSnippet, setCodeSnippet] = useState('');
   const [snackPack, setSnackPack] = useState([]);
@@ -34,7 +34,7 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
   const navigate = useNavigate();
 
   const {
-    selectedAssignments, setSelectedAssignments,
+    selectedAttainments, setSelectedAttainments,
     selectedFormula, setSelectedFormula
   } = useOutletContext();
 
@@ -46,11 +46,11 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
   }, []);
 
   useEffect(() => {
-    // all attainments are checked at default -> add them to selected assignments
-    if (selectedAssignments.length === 0) {
-      setSelectedAssignments(assignments);
+    // all attainments are checked at default -> add them to selected attainments
+    if (selectedAttainments.length === 0) {
+      setSelectedAttainments(attainments);
     }
-  }, [assignments]);
+  }, [attainments]);
 
   // useEffect in charge of handling the back-to-back alerts
   // makes the previous disappear before showing the new one
@@ -74,7 +74,7 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
   // if not, shows error message
   const canBeSubmitted = () => {
     var noErrors = true;
-    if(selectedAssignments.length === 0) {
+    if(selectedAttainments.length === 0) {
       setCheckboxError('You must select at least one study attainment');
       noErrors = false;
     } else {
@@ -94,7 +94,6 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
     if (canBeSubmitted()) {
       try {
         // TODO: add formula to database
@@ -114,32 +113,32 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
   };
 
   const handleCheckboxChange = (event) => {
-    const selectedAssignment = assignments.find(assignment => assignment.name == event.target.name);
+    const selectedAttainment = attainments.find(attainment => attainment.name == event.target.name);
     if(event.target.checked) {
-      setSelectedAssignments(prev => [...prev, selectedAssignment]);
+      setSelectedAttainments(prev => [...prev, selectedAttainment]);
     } else {
-      setSelectedAssignments(prev => prev.filter(assignment => assignment !== selectedAssignment));
+      setSelectedAttainments(prev => prev.filter(attainment => attainment !== selectedAttainment));
     }
   };
 
-  const isChecked = (assignment) => {
+  const isChecked = (attainment) => {
     // If user has returned from attribute selection -> only assigments they previously selected are checked
     var i;
-    for (i = 0; i < selectedAssignments.length; i++) {
-      if (selectedAssignments[i] === assignment) {
+    for (i = 0; i < selectedAttainments.length; i++) {
+      if (selectedAttainments[i] === attainment) {
         return true;
       }
     }
     return false;
   };
 
-  const assignmentCheckboxes = () => {
+  const attainmentCheckboxes = () => {
     return (
       <>
-        { assignments.map((assignment) => (
-          <FormControlLabel key={assignment.id} control={
-            <Checkbox name={assignment.name} onChange={handleCheckboxChange} checked={isChecked(assignment)}/>
-          } label={assignment.name} />
+        { attainments.map((attainment) => (
+          <FormControlLabel key={attainment.id} control={
+            <Checkbox name={attainment.name} onChange={handleCheckboxChange} checked={isChecked(attainment)}/>
+          } label={attainment.name} />
         ))
         }
       </>
@@ -162,7 +161,7 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
         <FormControl sx={{ m: 3,  mb: 0 }} component='fieldset' variant='standard'>
           <FormLabel component='legend' focused={false} sx={{ color: '#000', mb:1.5 }}>Select the sub study attainments you want to include in the calculation</FormLabel>
           <FormGroup>
-            {assignmentCheckboxes()}
+            {attainmentCheckboxes()}
           </FormGroup>
           <FormHelperText error={checkboxError !== ''}>{ checkboxError }</FormHelperText>
         </FormControl>
@@ -208,7 +207,7 @@ const SelectFormulaForm = ({ assignments, formulas, navigateToCourseView, naviga
 };
 
 SelectFormulaForm.propTypes = {
-  assignments: PropTypes.array,
+  attainments: PropTypes.array,
   formulas: PropTypes.array,
   navigateToCourseView: PropTypes.func,
   navigateToAttributeSelection: PropTypes.func,

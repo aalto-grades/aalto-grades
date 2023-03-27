@@ -8,7 +8,9 @@ import { Outlet } from 'react-router-dom';
 // TODO ON INSTANCE CREATION END: EMPTY THIS CONTEXT?
 
 export const InstanceCreationRoute = () => {
-  const [addedAssignments, setAddedAssignments] = useState([]);
+  const [addedAttainments, setAddedAttainments] = useState([]);
+  const [suggestedAttainments, setSuggestedAttainments] = useState([]);
+  const [attainmentIncrementId, setIncrementId] = useState(0);
   const [courseType, setType]                   = useState('');
   const [startDate, setStartDate]               = useState('');
   const [endDate, setEndDate]                   = useState('');
@@ -18,7 +20,9 @@ export const InstanceCreationRoute = () => {
   const [gradingScale, setGradingScale]         = useState('');
 
   const value = useMemo(() => (
-    { addedAssignments, setAddedAssignments,
+    { addedAttainments, setAddedAttainments,
+      suggestedAttainments, setSuggestedAttainments,
+      attainmentIncrementId, setIncrementId,
       courseType, setType,
       startDate, setStartDate,
       endDate, setEndDate,
@@ -27,7 +31,7 @@ export const InstanceCreationRoute = () => {
       stringMaxCredits, setMaxCredits,
       gradingScale, setGradingScale,
     }
-  ), [courseType, startDate, endDate, teachers, stringMinCredits, stringMaxCredits, gradingScale, addedAssignments]);
+  ), [courseType, startDate, endDate, teachers, stringMinCredits, stringMaxCredits, gradingScale, addedAttainments, suggestedAttainments, attainmentIncrementId]);
 
   return <Outlet context={value} />;
 };

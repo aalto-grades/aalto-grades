@@ -6,14 +6,14 @@ import { useState, useMemo } from 'react';
 import { Outlet } from 'react-router-dom';
 
 const FormulaSelectionRoute = () => {
-  const [selectedAssignments, setSelectedAssignments] = useState([]);
+  const [selectedAttainments, setSelectedAttainments] = useState([]);
   const [selectedFormula, setSelectedFormula] = useState({});
 
   const value = useMemo(() => (
-    { selectedAssignments, setSelectedAssignments,
+    { selectedAttainments, setSelectedAttainments,
       selectedFormula, setSelectedFormula
     }
-  ), [selectedAssignments, selectedFormula]);
+  ), [selectedAttainments, selectedFormula]);
 
   return <Outlet context={value} />;
 };
