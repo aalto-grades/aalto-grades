@@ -2,9 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import express, { Router } from 'express';
+import { Router } from 'express';
 import { calculateGrades } from '../controllers/grades';
-import { handleInvalidRequestJson } from '../middleware';
 import { controllerDispatcher } from '../middleware/errorHandler';
 
 export const router: Router = Router();

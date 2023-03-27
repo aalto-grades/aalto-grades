@@ -62,7 +62,10 @@ registerFormula(
     _params: any,
     _subGrades: Array<CalculationResult>,
   ): Promise<CalculationResult> => {
-    return { status: Status.Fail, points: undefined };
+    return {
+      status: Status.Fail,
+      points: undefined,
+    };
   },
 );
 
