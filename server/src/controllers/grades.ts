@@ -57,7 +57,7 @@ export async function calculateGrades(
 
   const attainables: Array<{
     id: number,
-    attainableId: number,
+    attainableId: number, // id of parent attainment
     formulaId: Formula | null,
     formulaParams: FormulaParams | null,
   }> = await Attainable.findAll({
@@ -70,7 +70,7 @@ export async function calculateGrades(
       'attainableId',
       'formulaId',
       'formulaParams',
-    ]
+    ],
   });
 
   let rootAttainable: null | FormulaNode = null;
@@ -78,7 +78,12 @@ export async function calculateGrades(
     const formulaId: Formula | null = attainable.formulaId;
     const params: FormulaParams | null = attainable.formulaParams;
     if (!(await formulaChecker.validate(formulaId))) {
-      throw new Error('bad');
+      // This invariant should be checked when inputting the parameters
+      // for this formula. Hence we throw 500.
+      throw new ApiError(
+        'the parameters for a formula do not match the schema',
+        HttpCode.InternalServerError
+      );
     }
     if (params === null) {
       throw new ApiError('the parameters for a formula haven\'t been set', HttpCode.BadRequest);
