@@ -27,7 +27,10 @@ async function calculateWeightedAverage(
     }
     total += subResults[i].points! * params.weights[i];
   }
-  return { points: total, status: Status.Pass };
+  return {
+    points: total,
+    status: Status.Pass,
+  };
 }
 
 registerFormula(
