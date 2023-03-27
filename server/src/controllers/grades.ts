@@ -74,6 +74,7 @@ export async function calculateGrades(
   });
 
   let rootAttainable: null | FormulaNode = null;
+  // Collect all attainment formulas into a Map.
   for (const attainable of attainables) {
     const formulaId: Formula | null = attainable.formulaId;
     const params: FormulaParams | null = attainable.formulaParams;
@@ -95,6 +96,8 @@ export async function calculateGrades(
     });
   }
 
+  // Build up the tree structure of Formula nodes using the Map by iterating
+  // again.
   for (const attainable of attainables) {
     if (attainable.attainableId === null) { // parent id
       if (rootAttainable) {
