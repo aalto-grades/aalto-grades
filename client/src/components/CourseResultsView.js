@@ -6,7 +6,7 @@ import React, { useState, useEffect }from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import CourseResultsTable from './course-results-view/CourseResultsTable';
-import mockAssignmentsClient from '../mock-data/mockAssignmentsClient';
+import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 import mockStudentGrades from '../mock-data/mockStudentGrades';
 
 const CourseResultsView = () => {
@@ -17,7 +17,7 @@ const CourseResultsView = () => {
     
   useEffect(() => {
     // TODO: get attainments from backend
-    setAttainments(mockAssignmentsClient);
+    setAttainments(mockAttainmentsClient);
     // TODO: get student grades from backend
     // modify the grades to fit the row structure
     setStudents(mockStudentGrades);
