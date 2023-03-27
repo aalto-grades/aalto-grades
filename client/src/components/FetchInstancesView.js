@@ -12,11 +12,11 @@ import FetchedInstances from './fetch-instances-view/FetchedInstances';
 import instancesService from '../services/instances';
 
 const FetchInstancesView = () => {
-  let { courseId } = useParams();
+  let { courseCode } = useParams();
   const [instances, setInstances] = useState([]);
 
   useEffect(() => {
-    instancesService.getSisuInstances(courseId)
+    instancesService.getSisuInstances(courseCode)
       .then((data) => setInstances(data.courseInstances))
       .catch((e) => console.log(e.message));
   }, []);

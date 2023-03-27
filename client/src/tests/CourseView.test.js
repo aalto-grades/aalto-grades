@@ -3,72 +3,110 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, screen } from '@testing-library/react';
+import { render, waitFor, cleanup } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import CourseView from '../components/CourseView';
+import coursesService from '../services/courses';
+import instancesService from '../services/instances';
 import AuthContext from '../context/authProvider';
+import mockCourses from '../mock-data/mockCourses';
+import mockInstances from '../mock-data/mockInstancesWithStringDates';
+
+jest.mock('../services/courses');
+jest.mock('../services/instances');
+afterEach(cleanup);
 
 describe('Tests for CourseView component', () => {
 
   const renderCourseView = (auth) => {
+
+    const mockResponseInstances = { courseInstances: mockInstances };
+    instancesService.getInstances.mockRejectedValue('Network error');
+    instancesService.getInstances.mockResolvedValue(mockResponseInstances);
+
+
+    const mockResponseCourse = { course: mockCourses.current[0] };
+    coursesService.getCourse.mockRejectedValue('Network error');
+    coursesService.getCourse.mockResolvedValue(mockResponseCourse);
+
     return render(
-      <BrowserRouter>
+      <MemoryRouter initialEntries={['/course-view/1']}>
         <AuthContext.Provider value={{ auth }}>
-          <CourseView />
+          <Routes>
+            <Route path='/course-view/:courseId' element={<CourseView/>}/>
+          </Routes>
         </AuthContext.Provider>
-      </BrowserRouter>
+      </MemoryRouter>
     );
   };
 
 
-  test('CourseView should render OngoingInstanceInfo, Assignments and InstancesTable components for teachers', () => {
+  test('CourseView should render InstanceDetails, Attainments and InstancesTable components for teachers', async () => {
 
     const auth = { role: 'TEACHER' };
-    renderCourseView(auth);
+    const { getByText, getAllByText } = renderCourseView(auth);
 
-    const instanceInfo = screen.getByText('Ongoing Instance');
-    const teachersInfo = screen.getByText('Teachers in Charge');
-    const assignments = screen.getByText('Study Attainments');
-    const exercises = screen.getByText('Exercises');  // Assignment
-    const projects = screen.getByText('Project');  // Assignment
-    const exams = screen.getAllByText('Exam');  // Assignmnets and instance types
-    const pastInstances = screen.getByText('Past Instances');
-    const createInstanceButton = screen.getByText('New instance');
-    const addAssignmentButton = screen.getByText('Add attainment');
-    const seeAttendeesButton = screen.getByText('See attendees');
-
-    expect(instanceInfo).toBeDefined();
-    expect(teachersInfo).toBeDefined();
-    expect(assignments).toBeDefined();
-    expect(exercises).toBeDefined();
-    expect(projects).toBeDefined();
-    expect(exams).toBeDefined();
-    expect(pastInstances).toBeDefined();
-    expect(createInstanceButton).toBeDefined();
-    expect(addAssignmentButton).toBeDefined();
-    expect(seeAttendeesButton).toBeDefined();
+    await waitFor(() => {
+      const instanceInfo = getByText('Instance Details');
+      const teachersInfo = getByText('Teachers in Charge');         
+      const attainments = getByText('Study Attainments');
+      const exercises = getByText('Exercises');  
+      const projects = getByText('Project'); 
+      const exams = getAllByText('Exam');  
+      const instances = getByText('All Instances');
+      const createInstanceButton = getByText('New instance');
+      const addAssignmentButton = getByText('Add attainment');
+      const seeAttendeesButton = getByText('See attendees');
+      expect(instanceInfo).toBeDefined();
+      expect(teachersInfo).toBeDefined();
+      expect(attainments).toBeDefined();
+      expect(exercises).toBeDefined();
+      expect(projects).toBeDefined();
+      expect(exams).toBeDefined();
+      expect(instances).toBeDefined();
+      expect(createInstanceButton).toBeDefined();
+      expect(addAssignmentButton).toBeDefined();
+      expect(seeAttendeesButton).toBeDefined();
+    });
     
   });
 
-  test('CourseView should not render new instance button, see attendees or allow editing assignments for students', () => {
+  test('CourseView should not render new instance button, see attendees or allow editing assignments for students', async () => {
 
     const auth = { role: 'STUDENT' };
-    renderCourseView(auth);
+    const { getByText, findByText, queryByText } = renderCourseView(auth);
 
-    const instanceInfo = screen.getByText('Ongoing Instance');
-    const teachersInfo = screen.getByText('Teachers in Charge');
-    const pastInstances = screen.getByText('Past Instances');
+    const instanceInfo = await findByText('Instance Details');  // with the new animation, wait is needed before components are rendered
+    const teachersInfo = getByText('Teachers in Charge');       // since previous is in document, so are the rest
+    const instances = getByText('All Instances');
 
     expect(instanceInfo).toBeDefined();
     expect(teachersInfo).toBeDefined();
-    expect(pastInstances).toBeDefined();
+    expect(instances).toBeDefined();
 
-    expect(screen.queryByText('Study Attainments')).not.toBeInTheDocument();
-    expect(screen.queryByText('Add attainment')).not.toBeInTheDocument();
-    expect(screen.queryByText('Edit')).not.toBeInTheDocument();
-    expect(screen.queryByText('See attendees')).not.toBeInTheDocument();
+    expect(queryByText('Study Attainments')).not.toBeInTheDocument();
+    expect(queryByText('Add attainment')).not.toBeInTheDocument();
+    expect(queryByText('Edit')).not.toBeInTheDocument();
+    expect(queryByText('See attendees')).not.toBeInTheDocument();
     
+  });
+
+  test('CourseView should allow changing the instance that is displayed in detail', async () => {
+
+    const auth = { role: 'TEACHER' };
+    const { findByText, findAllByRole } = renderCourseView(auth);
+
+    const instanceRows = await findAllByRole('row');
+    expect(instanceRows.length - 1).toEqual(mockInstances.length);    // - 1 because heading row
+
+    const firstTeacherInCharge = await findByText('Elisa Mekler');
+    expect(firstTeacherInCharge).toBeInTheDocument();
+
+    userEvent.click(instanceRows[5]);   // click a row that isn't the first, changes teacher
+    expect(await findByText('Kerttu Maaria Pollari-Malmi')).toBeInTheDocument();
+    expect(firstTeacherInCharge).not.toBeInTheDocument();
   });
 
 });
