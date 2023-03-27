@@ -26,8 +26,8 @@ const courseTranslation: string = fs.readFileSync(
   path.resolve(__dirname, '../../../../mockData/course_translations.sql'), 'utf8'
 );
 
-const attainable: string = fs.readFileSync(
-  path.resolve(__dirname, '../../../../mockData/attainable.sql'), 'utf8'
+const attainment: string = fs.readFileSync(
+  path.resolve(__dirname, '../../../../mockData/attainment.sql'), 'utf8'
 );
 
 export default {
@@ -38,7 +38,7 @@ export default {
       await queryInterface.sequelize.query(courses, { transaction });
       await queryInterface.sequelize.query(courseInstances, { transaction });
       await queryInterface.sequelize.query(courseInstanceRoles, { transaction });
-      await queryInterface.sequelize.query(attainable, { transaction });
+      await queryInterface.sequelize.query(attainment, { transaction });
       await queryInterface.sequelize.query(courseTranslation, { transaction });
       await transaction.commit();
     } catch (error) {
@@ -51,7 +51,7 @@ export default {
     try {
       await queryInterface.bulkDelete('course_translation', {}, { transaction });
       await queryInterface.bulkDelete('course_instance_role', {}, { transaction });
-      await queryInterface.bulkDelete('attainable', {}, { transaction });
+      await queryInterface.bulkDelete('attainment', {}, { transaction });
       await queryInterface.bulkDelete('course_instance', {}, { transaction });
       await queryInterface.bulkDelete('course', {}, { transaction });
       await queryInterface.bulkDelete('user', {}, { transaction });
@@ -65,7 +65,7 @@ export default {
       );
 
       await queryInterface.sequelize.query(
-        'ALTER SEQUENCE attainable_id_seq RESTART;', { transaction }
+        'ALTER SEQUENCE attainment_id_seq RESTART;', { transaction }
       );
 
       await queryInterface.sequelize.query(

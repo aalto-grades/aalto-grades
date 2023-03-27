@@ -4,7 +4,7 @@
 
 import express, { Router } from 'express';
 
-import { addAttainable, getAttainments, updateAttainable } from '../controllers/attainable';
+import { addAttainment, getAttainments, updateAttainment } from '../controllers/attainment';
 import { handleInvalidRequestJson } from '../middleware';
 import { controllerDispatcher } from '../middleware/errorHandler';
 
@@ -105,7 +105,7 @@ router.post(
   '/v1/courses/:courseId/instances/:instanceId/attainments',
   express.json(),
   handleInvalidRequestJson,
-  controllerDispatcher(addAttainable)
+  controllerDispatcher(addAttainment)
 );
 
 /**
@@ -158,7 +158,7 @@ router.put(
   '/v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId',
   express.json(),
   handleInvalidRequestJson,
-  controllerDispatcher(updateAttainable)
+  controllerDispatcher(updateAttainment)
 );
 
 /**
