@@ -64,7 +64,5 @@ export const router: Router = Router();
  */
 router.post(
   '/v1/courses/:courseId/instances/:instanceId/grades/calculate',
-  express.json(),
-  handleInvalidRequestJson,
   controllerDispatcher(calculateGrades)
 );
