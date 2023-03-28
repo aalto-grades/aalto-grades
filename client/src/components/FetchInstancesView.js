@@ -12,7 +12,7 @@ import FetchedInstances from './fetch-instances-view/FetchedInstances';
 import instancesService from '../services/instances';
 
 const FetchInstancesView = () => {
-  let { courseCode } = useParams();
+  let { courseId, courseCode } = useParams();
   const [instances, setInstances] = useState([]);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const FetchInstancesView = () => {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1, mb: 4, textAlign: 'left' }}>
           Select the instance you wish to add 
         </Typography>
-        <FetchedInstances info={instances} />
+        <FetchedInstances courseId={courseId} info={instances} />
         <Divider sx={{ my: 5 }}/>
       </Container>
       <Button size='medium' variant='outlined'>

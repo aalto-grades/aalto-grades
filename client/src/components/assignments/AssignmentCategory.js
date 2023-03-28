@@ -10,12 +10,17 @@ import CustomAccordion from './Accordion';
 import textFormatServices from '../../services/textFormat';
 import formulasService from '../../services/formulas';
 
-// This component renders a "category" of assignments, e.g. all assignments that are exams
-// TODO: replace the points with formulas
-const AssignmentCategory = ({ assignment, button, width }) => {
+// This component renders a top attainment (only has the intance as its parent)
+const AssignmentCategory = ({ attainment, button, width, attainmentKey }) => {
 
-  const { name, formulaId, expiryDate, subAssignments } = assignment;
-  const titlepb = subAssignments.length !== 0 ? '16px' : '0px';  // title padding-bottom
+  const { name, formulaId, expiryDate, subAttainments } = attainment;
+  const titlepb = subAttainments.length !== 0 ? '16px' : '0px';  // title padding-bottom
+
+  // For some reason the Date type value is formated differently 
+  // by the toLocaleString('en-GB') function depending on the view
+  const expiryDateString = attainmentKey === 'id' ?
+    textFormatServices.formatDateToString(expiryDate) :
+    textFormatServices.formatDateString(textFormatServices.formatDateToSlashString(expiryDate));
 
   return (
     <Box boxShadow={3} borderRadius={1} sx={{ pt: 2, pb: 0.5, bgcolor: 'white', width: width }}>
@@ -25,11 +30,11 @@ const AssignmentCategory = ({ assignment, button, width }) => {
           && <Typography align='left' variant='body2'>{'Formula: ' + formulasService.getFormulaName(formulaId)}</Typography>
         }
       </Box>
-      { subAssignments.length !== 0
-        && <CustomAccordion assignments={subAssignments} />
+      { subAttainments.length !== 0
+        && <CustomAccordion attainments={subAttainments} attainmentKey={attainmentKey} />
       }
       <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pl: '21px', pr: '6px', pt: '8px' }}>
-        <Typography align='left' variant='caption'>{'Expiry date: ' + textFormatServices.formatDateToString(expiryDate)}</Typography>
+        <Typography align='left' variant='caption'>{'Expiry date: ' + expiryDateString}</Typography>
         {button ?? <Box height='30.5px'></Box>}
       </Box>
     </Box>
@@ -37,9 +42,10 @@ const AssignmentCategory = ({ assignment, button, width }) => {
 };
 
 AssignmentCategory.propTypes = {
-  assignment: PropTypes.object,
+  attainment: PropTypes.object,
   button: PropTypes.element,
-  width: PropTypes.string
+  width: PropTypes.string,
+  attainmentKey: PropTypes.string,
 };
 
 export default AssignmentCategory;

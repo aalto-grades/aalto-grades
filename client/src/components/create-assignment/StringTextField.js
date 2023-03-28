@@ -7,33 +7,33 @@ import PropTypes from 'prop-types';
 import TextField from '@mui/material/TextField';
 import assignmentServices from '../../services/assignments';
 
-// A TextField component used for the 'name' of an assignment.
+// A TextField component used for the 'name' of an attainment.
 // This component is also used for the formula attribute textfields that are required after specifying a formula.
 
-const StringTextField = ({ fieldData, indices, assignments, setAssignments }) => {
+const StringTextField = ({ fieldData, indices, attainments, setAttainments }) => {
 
   // Functions for handling the change of the values in the 'New Name' textfield 
   // and the textfields that represent formula attributes
   const handleChange = (event) => {
     const value = event.target.value;
-    if (fieldData.fieldId === 'assignmentName') {
-      const updatedAssignments = assignmentServices.setProperty(indices, assignments, 'name', value);
-      setAssignments(updatedAssignments);
+    if (fieldData.fieldId === 'attainmentName') {
+      const updatedAttainments = assignmentServices.setProperty(indices, attainments, 'name', value);
+      setAttainments(updatedAttainments);
     } else if (fieldData.fieldId.startsWith('attribute')) {
       const attributeIndex = Number(fieldData.fieldId.slice(-1));
-      const updatedAssignments = assignmentServices.setFormulaAttribute(indices, assignments, attributeIndex, value);
-      setAssignments(updatedAssignments);
+      const updatedAttainments = assignmentServices.setFormulaAttribute(indices, attainments, attributeIndex, value);
+      setAttainments(updatedAttainments);
     } else {
       console.log(fieldData.fieldId);
     }
   };
 
   const getValue = () => {
-    if (fieldData.fieldId === 'assignmentName') {
-      return assignmentServices.getProperty(indices, assignments, 'name');
+    if (fieldData.fieldId === 'attainmentName') {
+      return assignmentServices.getProperty(indices, attainments, 'name');
     } else if (fieldData.fieldId.startsWith('attribute')) {
       const attributeIndex = Number(fieldData.fieldId.slice(-1));
-      return assignmentServices.getFormulaAttribute(indices, assignments, attributeIndex);
+      return assignmentServices.getFormulaAttribute(indices, attainments, attributeIndex);
     } else {
       console.log(fieldData.fieldId);
     }
@@ -63,8 +63,8 @@ StringTextField.propTypes = {
   fieldId: PropTypes.string,
   fieldLabel: PropTypes.string,
   indices: PropTypes.array,
-  assignments: PropTypes.array,
-  setAssignments: PropTypes.func
+  attainments: PropTypes.array,
+  setAttainments: PropTypes.func
 };
 
 export default StringTextField;
