@@ -7,7 +7,6 @@ import multer, { FileFilterCallback, memoryStorage, Multer } from 'multer';
 import path from 'path';
 
 import { addGrades } from '../controllers/grades';
-
 import { controllerDispatcher } from '../middleware/errorHandler';
 import { ApiError } from '../types/error';
 import { HttpCode } from '../types/httpCode';
@@ -39,8 +38,8 @@ const upload: Multer = multer({
  * @swagger
  * /v1/courses/{courseId}/instances/{instanceId}/grades/csv:
  *   post:
- *     tags: [Course]
- *     description: Add attainment points for users for specific course instance.
+ *     tags: [Grades]
+ *     description: Add attainment points for users enrolled in a specific course instance.
  *     requestBody:
  *       content:
  *         multipart/form-data:
@@ -76,7 +75,7 @@ const upload: Multer = multer({
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       404:
- *         description: Course, course instance, or any of the attainable does not exist.
+ *         description: A course or course instance with the given ID was not found.
  *         content:
  *           application/json:
  *             schema:
@@ -85,6 +84,13 @@ const upload: Multer = multer({
  *         description: >
  *           Course instance does not belong to the course or
  *           study attainment does not belong to the course instance.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       422:
+ *         description: >
+ *           At least one of the attainments listed in the CSV file was not found with the given ID.
  *         content:
  *           application/json:
  *             schema:
