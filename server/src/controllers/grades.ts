@@ -43,9 +43,13 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
     );
   }
 
+  // Convert CSV to string for the parser.
   const data: string = req.file.buffer.toString();
+
+  // Array for collecting CSV row data.
   const csvData: Array<Array<string>> = [];
 
+  // TODO: should user be allowed to define delimiter in the request.
   const parser: Parser = parse({
     delimiter: ','
   });
@@ -58,9 +62,17 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
       }
     })
     .on('error', function (err: unknown): void {
+      // Pass the error manually to the error handler, controllerDispatcher will not catch here.
       next(err);
     })
     .on('end', function (): void {
+
+      /**
+       * TODO:
+       * - Check students exists in the database, create new entries if needed.
+       * - Check attainments exists in the database.
+       * - Add the grading data to the database.
+       */
       console.log('CSV:', csvData);
 
       res.status(HttpCode.Ok).json({
@@ -70,9 +82,9 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
       return;
     });
 
-  // Write data to the stream
+  // Write stringified CSV data to the csv-parser's stream.
   parser.write(data);
 
-  // Close the readable stream
+  // Close the readable stream once data reading finished.
   parser.end();
 }
