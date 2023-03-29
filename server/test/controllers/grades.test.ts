@@ -21,7 +21,7 @@ function checkErrorRes(errorMessage: string, errorCode: HttpCode): void {
   expect(res.statusCode).toBe(errorCode);
 }
 
-describe('YYYY Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () => {
+describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () => {
 
   it('should process CSV succesfully when course and course instance exist', async () => {
     const csvData: fs.ReadStream = fs.createReadStream(
