@@ -34,7 +34,7 @@ services:
       SISU_API_KEY: "${SISU_API_KEY}"
       SISU_API_URL: "${SISU_API_URL}"
       SERVER_RUN_TESTS: 0
-      AALTO_GRADES_FRONTED_CORS_ORIGIN: "http://front-end:3005"
+      AALTO_GRADES_FRONTEND_CORS_ORIGIN: "http://front-end:3005"
     networks:
       - local
 
@@ -54,7 +54,7 @@ services:
       LOCALHOST_URL: "http://front-end:3005"
     volumes: 
       - ../robot-tests:/test
-    entrypoint: ["./test/wait-for-frontend.sh","robot", "--outputdir", "test/output", "test"]
+    entrypoint: ["./test/wait-for-frontend.sh", "robot", "--outputdir", "test/output", "test"]
     depends_on:
       - back-end
       - front-end
