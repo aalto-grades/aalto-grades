@@ -68,4 +68,4 @@ jobs:
       - uses: actions/checkout@v3
       - name: Run tests
         working-directory: robot-tests
-        run: sudo docker-compose up --abort-on-container-exit --exit-code-from robot
+        run: chmod -R 777 . && docker-compose up --abort-on-container-exit --exit-code-from robot
