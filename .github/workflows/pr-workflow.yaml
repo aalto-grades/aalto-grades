@@ -64,8 +64,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       POSTGRES_PASSWORD: postgres
+    defaults:
+      run:
+        working-directory: ./robot-tests
     steps:
       - uses: actions/checkout@v3
+      - name: Set permissions
+        run: chmod -R 777 .
       - name: Run tests
-        working-directory: robot-tests
-        run: chmod -R 777 . && docker-compose up --abort-on-container-exit --exit-code-from robot
+        run: docker-compose up --abort-on-container-exit --exit-code-from robot

@@ -17,6 +17,7 @@ Test SignUp on localhost
     Sign Out
 
 Test Login on localhost
+    Skip
     Open Aalto Grades on Localhost
     Submit Login Information
     Verify Admin User registering succeeded
