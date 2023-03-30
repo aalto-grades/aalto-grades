@@ -50,7 +50,7 @@ const gradingScaleData = {
 
 const teacherData = {
   fieldId: 'teacher',
-  fieldLabel: 'Teacher of This Instance'
+  fieldLabel: 'Teacher in Charge'
 };
 
 const textFieldMinWidth = 195;
@@ -71,13 +71,13 @@ const EditInstanceForm = ({ instance }) => {
 
   useEffect(() => {
     if (courseType === '') {
-      setType(textFormatServices.formatCourseType(instance.teachingMethod));
+      setType(textFormatServices.formatCourseType(instance.type));
       setStartDate(instance.startDate);
       setEndDate(instance.endDate);
-      setTeachers(instance.responsibleTeachers);
+      setTeachers(instance.teachersInCharge);
       setMinCredits(String(instance.minCredits));
       setMaxCredits(String(instance.maxCredits));
-      setGradingScale(textFormatServices.formatGradingType(instance.gradingType));
+      setGradingScale(textFormatServices.formatGradingScale(instance.gradingScale));
     }
   }, []);
 
@@ -128,7 +128,7 @@ const EditInstanceForm = ({ instance }) => {
         </Grid2>
         <StringTextField fieldData={gradingScaleData} value={gradingScale} setFunction={setGradingScale}/>
       </Box>
-      <Button size='small' variant='contained' type='submit'>
+      <Button variant='contained' type='submit'>
           Confirm Details
       </Button>
     </form>

@@ -88,17 +88,17 @@ const InstanceSummaryView = () => {
         </Box>
       </Box>
       <Box borderRadius={1} sx={{ bgcolor: 'secondary.light', p: '16px 20px', mb: 5, display: 'inline-block' }}>
-        <Typography align='left' sx={{ pb: 1, fontSize: '20px' }}>Instance Teachers</Typography>
+        <Typography align='left' sx={{ pb: 1, fontSize: '20px' }}>Teachers in Charge</Typography>
         { teachers.map((teacher) => <Typography align='left' key={teacher} >{teacher}</Typography> )}
       </Box>
-      <Typography align='left' sx={{ ml: 1.5 }} >Added assignments</Typography>
+      <Typography align='left' sx={{ ml: 1.5 }} >Added study attainments</Typography>
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', display: 'inline-block' }}>
         { addedAssignments.length !== 0 &&
           <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch', pb: '8px' }}>
-            { addedAssignments.map(group => <AssignmentCategory key={group.category} categoryObject={group} />) }
+            { addedAssignments.map(assignment => <AssignmentCategory key={assignment.id} assignment={assignment} />) }
           </Box>
         }
-        <Typography variant='body2' color='primary.main' sx={{ m: '8px 0px' }} >You can also add assignments after creating the instance</Typography>
+        <Typography variant='body2' color='primary.main' sx={{ m: '8px 0px' }} >You can also add study attainments after creating the instance</Typography>
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 6 }}>
         <Button variant='outlined' onClick={() => onGoBack()} disabled={messageInfo?.severity === 'info'} >Go back</Button>

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -10,24 +10,23 @@ import { sequelize } from '..';
 import Course from './course';
 import CourseInstance from './courseInstance';
 
-export default class CourseInstancePartialGrade extends Model<
-  InferAttributes<CourseInstancePartialGrade>,
-  InferCreationAttributes<CourseInstancePartialGrade>
+export default class Attainable extends Model<
+  InferAttributes<Attainable>,
+  InferCreationAttributes<Attainable>
 > {
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
   declare courseInstanceId: ForeignKey<CourseInstance['id']>;
-  declare type: string;
-  declare platform: string;
-  declare maxPoints: number;
-  declare minPoints: number;
-  declare weight: number;
-  declare expireAt: Date;
+  // TODO rename to parentId, atm sequelize forces name as "model + key" when querying.
+  declare attainableId: CreationOptional<ForeignKey<Attainable['id']>>;
+  declare name: string;
+  declare date: Date; // Date when assignment is done (e.g., deadline or exam date)
+  declare expiryDate: Date;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
 
-CourseInstancePartialGrade.init(
+Attainable.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -50,35 +49,31 @@ CourseInstancePartialGrade.init(
         key: 'id'
       }
     },
-    type: {
-      type: DataTypes.ENUM('EXAM', 'EXERCISE', 'ATTENDANCE', 'FEEDBACK'),
+    attainableId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'attainable',
+        key: 'id'
+      }
+    },
+    name: {
+      type: DataTypes.STRING,
       allowNull: false
     },
-    platform: {
-      type: DataTypes.ENUM('APLUS', 'MYCOURSES', 'OTHER'),
+    date: {
+      type: DataTypes.DATE,
       allowNull: false
     },
-    maxPoints: {
-      type: DataTypes.FLOAT,
+    expiryDate: {
+      type: DataTypes.DATE,
       allowNull: false
-    },
-    minPoints: {
-      type: DataTypes.FLOAT,
-      allowNull: false
-    },
-    weight: {
-      type: DataTypes.FLOAT,
-      allowNull: false
-    },
-    expireAt: {
-      type: new DataTypes.DATEONLY,
-      allowNull: false,
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },
   {
     sequelize,
-    tableName: 'course_instance'
+    tableName: 'attainable'
   }
 );

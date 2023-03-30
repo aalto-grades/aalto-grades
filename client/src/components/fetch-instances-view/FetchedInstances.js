@@ -21,7 +21,7 @@ const HoverBox = styled(Box)`
 const InstanceBox = ({ instance }) => {
   let navigate = useNavigate();
   let { courseId } = useParams();
-  const { sisuCourseInstanceId, startDate, endDate, teachingMethod } = instance;
+  const { sisuCourseInstanceId, startDate, endDate, type } = instance;
 
   return(
     <HoverBox 
@@ -36,7 +36,7 @@ const InstanceBox = ({ instance }) => {
         p: 3,
       }}
       onClick={() => { navigate('/' + courseId + '/edit-instance/' + sisuCourseInstanceId); }}>
-      <LightLabelBoldValue label='Type' value={textFormatServices.formatCourseType(teachingMethod)} />
+      <LightLabelBoldValue label='Type' value={textFormatServices.formatCourseType(type)} />
       <Box sx={{ mx: 2 }}/>
       <LightLabelBoldValue label='Starting Date' value={textFormatServices.formatDateString(startDate)} />
       <LightLabelBoldValue label='Ending Date' value={textFormatServices.formatDateString(endDate)} />

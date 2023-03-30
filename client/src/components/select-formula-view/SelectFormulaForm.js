@@ -94,7 +94,7 @@ const SelectFormulaForm = ({ assignments, formulas, courseId }) => {
         textAlign: 'left'
       }}>
         <FormControl sx={{ m: 3,  mb: 0 }} component='fieldset' variant='standard'>
-          <FormLabel component='legend' focused={false} sx={{ color: '#000', mb:1.5 }}>Select the sub-assignments you want to include in the calculation</FormLabel>
+          <FormLabel component='legend' focused={false} sx={{ color: '#000', mb:1.5 }}>Select the sub study attainments you want to include in the calculation</FormLabel>
           <FormGroup>
             {assignmentCheckboxes()}
           </FormGroup>
@@ -114,7 +114,7 @@ const SelectFormulaForm = ({ assignments, formulas, courseId }) => {
           flexWrap: 'wrap',
           justifyContent: 'space-between'
         }}>
-          <Typography width={350} m={3}>Specify attribute values for the sub-assignments</Typography>
+          <Typography width={350} m={3}>Specify attribute values for the sub study attainnments</Typography>
           <Box sx={{ m: 3, mt: 0, alignSelf: 'flex-end',display: 'flex', lexDirection: 'column', }}>
             <Button size='small' variant='outlined' type='submit' name='skipAttributes' sx={{ mr: 2 }}>
               Skip for now

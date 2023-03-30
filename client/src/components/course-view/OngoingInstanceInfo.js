@@ -14,13 +14,13 @@ import useAuth from '../../hooks/useAuth';
 const mockInstitution = 'Aalto University';
 
 const OngoingInstanceInfo = ({ info }) => {
-  const { minCredits, maxCredits, startDate, endDate, courseType, gradingScale, responsibleTeachers, courseData } = info;
+  const { minCredits, maxCredits, startDate, endDate, type, gradingScale, teachersInCharge, courseData } = info;
   const { auth } = useAuth();
 
   return(
     <Box sx={{ display: 'inline-block', pt: 1.5 }}>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', columnGap: 4, pb: 1 }}>
-        <Typography variant='h6' align='left' sx={{ ml: 1.5 }} >Ongoing instance</Typography>
+        <Typography variant='h6' align='left' sx={{ ml: 1.5 }} >Ongoing Instance</Typography>
         { /* Only admins, teachers and assistants are allowed to see attendees*/
           (auth.role == 'SYSADMIN' || auth.role == 'TEACHER'|| auth.role == 'ASSISTANT') && 
           <Button>See attendees</Button>
@@ -29,7 +29,7 @@ const OngoingInstanceInfo = ({ info }) => {
       <Box textAlign='left' borderRadius={1} sx={{ bgcolor: 'secondary.light', p: 1.5, minWidth: '318px' }}>
         <LightLabelBoldValue label='Starting Date' value={textFormatServices.formatDateToString(startDate)} />
         <LightLabelBoldValue label='Ending Date' value={textFormatServices.formatDateToString(endDate)} />
-        <LightLabelBoldValue label='Type' value={courseType} />
+        <LightLabelBoldValue label='Type' value={textFormatServices.formatCourseType(type)} />
       </Box>
       <Box textAlign='left' borderRadius={1} sx={{ bgcolor: 'secondary.light', p: 1.5, mt: 1, minWidth: '318px' }}>
         <LightLabelBoldValue label='Min Credits' value={minCredits} />
@@ -39,8 +39,8 @@ const OngoingInstanceInfo = ({ info }) => {
         <LightLabelBoldValue label='Educational Institution' value={mockInstitution} />
       </Box>
       <Box sx={{ m: 1.5 }}>
-        <Typography variant='h6' align='left' sx={{ pt: 1.5, pb: 1 }}>Responsible Teachers</Typography>
-        {responsibleTeachers.map( (teacher) => <Typography align='left' key={teacher} >{teacher}</Typography> )}
+        <Typography variant='h6' align='left' sx={{ pt: 1.5, pb: 1 }}>Teachers in Charge</Typography>
+        {teachersInCharge.map( (teacher) => <Typography align='left' key={teacher} >{teacher}</Typography> )}
       </Box>
     </Box>
   );

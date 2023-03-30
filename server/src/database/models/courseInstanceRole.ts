@@ -7,22 +7,22 @@ import {
 } from 'sequelize';
 
 import { sequelize } from '..';
-import CourseAssignment from './courseAssignment';
+import CourseInstance from './courseInstance';
 import User from './user';
 
-export default class UserAssignmentGrade extends Model<
-  InferAttributes<UserAssignmentGrade>,
-  InferCreationAttributes<UserAssignmentGrade>
+export default class CourseInstanceRole extends Model<
+  InferAttributes<CourseInstanceRole>,
+  InferCreationAttributes<CourseInstanceRole>
 > {
   declare id: CreationOptional<number>;
   declare userId: ForeignKey<User['id']>;
-  declare courseAssignmentId: ForeignKey<CourseAssignment['id']>;
-  declare points: number;
+  declare courseInstanceId: ForeignKey<CourseInstance['id']>;
+  declare role: string;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
 
-UserAssignmentGrade.init(
+CourseInstanceRole.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -37,16 +37,16 @@ UserAssignmentGrade.init(
         key: 'id'
       }
     },
-    courseAssignmentId: {
+    courseInstanceId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'course_assignment',
+        model: 'course_instance',
         key: 'id'
       }
     },
-    points: {
-      type: DataTypes.FLOAT,
+    role: {
+      type: DataTypes.ENUM('STUDENT', 'TEACHER', 'TEACHER_IN_CHARGE'),
       allowNull: false
     },
     createdAt: DataTypes.DATE,
@@ -54,6 +54,6 @@ UserAssignmentGrade.init(
   },
   {
     sequelize,
-    tableName: 'user_assignment_grade'
+    tableName: 'course_instance_role'
   }
 );
