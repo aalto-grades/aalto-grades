@@ -34,8 +34,9 @@ services:
     environment:
       LOCALHOST_URL: "http://frontend:3005"
     volumes: 
-      - ../robot-tests:/test
-    entrypoint: ["./test/wait-for-frontend.sh", "robot", "--outputdir", "test/output", "test"]
+      - .:/test
+      - ./output:/output
+    entrypoint: ["./test/wait-for-frontend.sh", "robot", "--outputdir", "/output", "test"]
     depends_on:
       - backend
       - frontend
