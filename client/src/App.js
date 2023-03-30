@@ -26,9 +26,9 @@ import SelectFormulaView from './components/SelectFormulaView';
 import FormulaAttributesView from './components/FormulaAttributesView';
 import CreateAssignmentView from './components/CreateAssignmentView';
 import EditAssignmentView from './components/EditAssignmentView';
+import CourseResultsView from './components/CourseResultsView';
 import InstanceCreationRoute from './context/InstanceCreationRoute';
 import FormulaSelectionRoute from './context/FormulaSelectionRoute';
-import CourseResultsView from './components/CourseResultsView';
 import useLogout from './hooks/useLogout';
 
 const theme = createTheme({
@@ -98,7 +98,6 @@ function App() {
       <AppContainer maxWidth="lg">
         <Box mx={5} my={5}>
           <Routes> { /* Add nested routes when needed */ }
-            <Route path='/course-results' element={<CourseResultsView/>} /> { /* DELETE!*/ }
             <Route path='/login' element={<Login/>} />
             <Route path='/signup' element={<Signup/>} />
             { /* All roles are authorised to access the front page, conditional rendering is done inside the component */ }
@@ -113,6 +112,7 @@ function App() {
             { /* Pages that are authorised for admin and teachers */ }
             <Route element={<PrivateRoute roles={[roles.admin, roles.teacher]}/>}>
               <Route path=':courseId/fetch-instances/:courseCode' element={<FetchInstancesView/>}/>
+              <Route path=':courseId/course-results/:instanceId' element={<CourseResultsView/>}/>
               { /* Pages under this route share instance creation context */ }
               <Route element={<InstanceCreationRoute/>}>
                 <Route path=':courseId/edit-instance/:sisuInstanceId' element={<EditInstanceView/>}/>
