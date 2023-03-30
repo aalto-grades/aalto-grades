@@ -125,3 +125,4 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
     }
   });
 }
+

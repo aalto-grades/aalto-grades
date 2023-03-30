@@ -18,10 +18,10 @@ const errorMsg = { msg: 'Instance creation failed.', severity: 'error' };
 
 const InstanceSummaryView = () => {
   let navigate = useNavigate();
-  let { courseId, instanceId } = useParams();
+  let { courseId, sisuInstanceId } = useParams();
 
   const { 
-    addedAssignments,
+    addedAttainments,
     startDate, 
     endDate, 
     courseType, 
@@ -49,7 +49,7 @@ const InstanceSummaryView = () => {
   }, [snackPack, messageInfo, alertOpen]);
 
   const onGoBack = () => {
-    navigate('/' + courseId + '/add-assignments/' + instanceId);
+    navigate('/' + courseId + '/add-attainments/' + sisuInstanceId);
   };
 
   // Temporary to fake the effect of loading
@@ -93,9 +93,9 @@ const InstanceSummaryView = () => {
       </Box>
       <Typography align='left' sx={{ ml: 1.5 }} >Added study attainments</Typography>
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', display: 'inline-block' }}>
-        { addedAssignments.length !== 0 &&
+        { addedAttainments.length !== 0 &&
           <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch', pb: '8px' }}>
-            { addedAssignments.map(assignment => <AssignmentCategory key={assignment.id} assignment={assignment} />) }
+            { addedAttainments.map(attainment => <AssignmentCategory key={attainment.temporaryId} attainment={attainment} attainmentKey={'temporaryId'} />) }
           </Box>
         }
         <Typography variant='body2' color='primary.main' sx={{ m: '8px 0px' }} >You can also add study attainments after creating the instance</Typography>

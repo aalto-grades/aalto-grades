@@ -14,7 +14,7 @@ import Divider from '@mui/material/Divider';
 
 const CourseCard = ({ course }) => {
   let navigate = useNavigate();
-  const { name, courseCode, department } = course;
+  const { id, name, courseCode, department } = course;
 
   return(
     <Card>
@@ -26,7 +26,7 @@ const CourseCard = ({ course }) => {
       </CardContent>
       <Divider variant="middle"/>
       <CardActions>
-        <Button size="small" onClick={() => { navigate('/course-view/' + courseCode); }}>
+        <Button size="small" onClick={() => { navigate('/course-view/' + id); }}>
                     See instances
         </Button>
       </CardActions>

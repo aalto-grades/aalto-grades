@@ -57,7 +57,7 @@ const textFieldMinWidth = 195;
 
 const EditInstanceForm = ({ instance }) => {
   let navigate = useNavigate();
-  let { courseId, instanceId } = useParams();
+  let { courseId, sisuInstanceId } = useParams();
 
   const { 
     courseType, setType,
@@ -96,7 +96,7 @@ const EditInstanceForm = ({ instance }) => {
         gradingScale,
       });
       console.log(basicInfoObject);
-      navigate('/' + courseId + '/add-assignments/' + instanceId);
+      navigate('/' + courseId + '/add-attainments/' + sisuInstanceId);
     } catch (exception) {
       console.log(exception);
     }

@@ -5,6 +5,7 @@
 import { Sequelize } from 'sequelize';
 
 import dbCreds from '../configs/database';
+import { NODE_ENV } from '../configs/environment';
 
 export const sequelize: Sequelize = new Sequelize(
   dbCreds.database,
@@ -13,19 +14,17 @@ export const sequelize: Sequelize = new Sequelize(
   {
     host: dbCreds.host,
     dialect: 'postgres',
-    dialectOptions: {
-      // Temporarily commented out so local database connections work
-      // TODO: Find a better solution or enable again when taking the system to use?
-      //ssl: {
-      //  require: true
-      //},
-    },
+    dialectOptions: NODE_ENV === 'production' ? {
+      ssl: {
+        require: true
+      }
+    } : undefined,
     define: {
       timestamps: true,
       underscored: true,
       freezeTableName: true
     },
-    logging: console.log
+    logging: NODE_ENV === 'development' ? console.log : undefined
   }
 );
 
