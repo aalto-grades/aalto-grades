@@ -18,6 +18,7 @@ export default {
       });
       await queryInterface.addIndex('user', ['student_id'], {
         unique: false,
+        using: 'hash',
         transaction
       });
       await queryInterface.addIndex('course_instance_role', ['user_id', 'course_instance_id'], {
