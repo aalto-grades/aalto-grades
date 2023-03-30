@@ -42,6 +42,15 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
   if (err instanceof ApiError) {
     res.status(err.statusCode);
 
+    // If multiple errors present, return that in errors property.
+    if (err.multiError) {
+      res.send({
+        success: false,
+        errors: err.multiError,
+      });
+      return;
+    }
+
     res.send({
       success: false,
       errors: [err.message],
