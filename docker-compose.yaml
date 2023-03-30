@@ -2,51 +2,31 @@
 #
 # SPDX-License-Identifier: MIT
 
+# This is a Docker Compose configuration for executing Aalto Grades normally,
+# optionally without the frontend
+
 version: "3.7"
 
 services:
-  front-end:
-    build: ./client
-    restart: always
-    profiles: ["dev", "prod"]
-    ports:
-    - "3005:3005"
+  frontend:
+    extends:
+      file: ./common-services.yaml
+      service: frontend
     container_name: frontend-server
-    environment:
-      BACKEND_URL: "back-end"
-      BACKEND_PORT: "3000"
-    networks:
-      - local
-
-  back-end:
-    build:
-      context: ./server
-      args:
-        SERVER_SKIP_CI: ${SERVER_SKIP_CI}
+    profiles: ["dev", "prod"]
     restart: always
-    ports:
-    - "3000:3000"
+
+  backend:
+    extends:
+      file: ./common-services.yaml
+      service: backend
     container_name: backend-server
-    environment:
-      POSTGRES_URL: "database"
-      POSTGRES_USER: "postgres"
-      POSTGRES_DATABASE: "postgres"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      SISU_API_KEY: "${SISU_API_KEY}"
-      SISU_API_URL: "${SISU_API_URL}"
-      SERVER_RUN_TESTS: 0
-    networks:
-      - local
+    restart: always
 
   database:
-    image: postgres
-    restart: always
-    ports:
-      - 5432:5432
-    environment:
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-    networks:
-      - local
+    extends:
+      file: ./common-services.yaml
+      service: database
 
 networks:
   local:

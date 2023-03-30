@@ -114,13 +114,23 @@ $ npm run seed:down
 framework. Additionally, [supertest](https://www.npmjs.com/package/supertest)
 is used for testing API functionality.
 
-The easiest way to run unit tests is with the Docker Compose located at
-`../docker-tests`. See `../docker-tests/README.md` for details on running unit
-tests.
+The easiest way to run unit tests is with the Docker Compose located at this
+directory. In order to run it, define a PostgreSQL password in the environment
+variable `POSTGRES_PASSWORD`, for example:
+```
+$ export POSTGRES_PASSWORD="your-wanted-password"
+```
+Execute Docker Compose:
+```
+$ docker-compose up --abort-on-container-exit --exit-code-from backend
+```
+This Docker Compose creates an environment where backend tests can be executed
+against a PostgreSQL instance running in a container.
 
 ## API Documentation
 
-API documentation written with the OpenAPI spec and displayed by Swagger can be found from the path 
+API documentation written with the OpenAPI spec and displayed by Swagger can
+be found from the path
 ```
 <backend-url>/api-docs/
 ```
