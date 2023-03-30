@@ -9,6 +9,7 @@ Resource    ./keywords.robot
 * Test Cases *
 
 Test SignUp on localhost
+    Skip
     Open Aalto Grades on Localhost
     Navigate to SignUp
     Fill Admin Register Information

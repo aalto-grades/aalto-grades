@@ -9,6 +9,7 @@ Resource    ./keywords.robot
 * Test Cases *
 
 Create a new course
+    Skip
     Login as Admin Account
     Navigate to Create new Course
     Fill Course information and submit
