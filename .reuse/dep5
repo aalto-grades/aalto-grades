@@ -7,6 +7,6 @@ Files: client/*.json server/*.json *.csv client/.env
 Copyright: The Aalto Grades Developers
 License: MIT
 
-Files: docker-tests/seccomp_profile.json
+Files: robot-tests/seccomp_profile.json
 Copyright: Microsoft
 License: Apache-2.0
