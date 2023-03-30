@@ -4,6 +4,8 @@
 
 import supertest from 'supertest';
 
+import Attainable from '../../src/database/models/attainable';
+
 import { mockAttainable } from '../mockData/attainable';
 import { app } from '../../src/app';
 import { AttainableData } from '../../src/types/attainable';
@@ -328,6 +330,114 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/attainments', ()
       expect(res.statusCode).toBe(HttpCode.Conflict);
     });
 });
+
+interface AttainmentNode {
+  id: number,
+  subAttainments: Array<AttainmentNode>
+}
+
+describe(
+  'Test DELETE /v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId',
+  () => {
+    async function testAttainmentTreeDeletion(tree: object): Promise<void> {
+      // Add an attainment tree.
+      const add: supertest.Response = await request
+        .post('/v1/courses/1/instances/1/attainments').send(tree);
+
+      // Adds the IDs of all subattainemnts of the given tree to the given
+      // attainments array.
+      function findSubattainmentIds(tree: AttainmentNode, attainments: Array<number>): void {
+        for (const leaf of tree.subAttainments) {
+          attainments.push(leaf.id);
+          findSubattainmentIds(leaf, attainments);
+        }
+      }
+
+      // Find the IDs of all the added attainments.
+      const rootAttainment: number = add.body.data.attainment.id;
+      const addedAttainments: Array<number> = [rootAttainment];
+      findSubattainmentIds(add.body.data.attainment, addedAttainments);
+
+      // Verify that the attainments were added.
+      for (const addedAttainment of addedAttainments)
+        expect(await Attainable.findByPk(addedAttainment)).not.toBeNull;
+
+      // Delete the root attainment.
+      const res: supertest.Response = await request
+        .delete(`/v1/courses/1/instances/1/attainments/${rootAttainment}`);
+
+      // Verify that the root attainment as well as all of its subattainments
+      // were deleted.
+      expect(res.statusCode).toBe(HttpCode.Ok);
+      expect(res.body.success).toBe(true);
+      for (const addedAttainment of addedAttainments)
+        expect(await Attainable.findByPk(addedAttainment)).toBeNull;
+    }
+
+    it('should succesfully delete single attainment', async () => {
+      // Add an attainment.
+      const add: supertest.Response = await request
+        .post('/v1/courses/1/instances/1/attainments')
+        .send(
+          {
+            name: 'Test exercise',
+            date: new Date(),
+            expiryDate: new Date(),
+            subAttainments: []
+          }
+        );
+
+      // Verify that the attainment was added.
+      const addedAttainment: number = add.body.data.attainment.id;
+      expect(await Attainable.findByPk(addedAttainment)).not.toBeNull;
+
+      // Delete the added attainment.
+      const res: supertest.Response = await request
+        .delete(`/v1/courses/1/instances/1/attainments/${addedAttainment}`);
+
+      // Verify that the attainment was deleted.
+      expect(res.statusCode).toBe(HttpCode.Ok);
+      expect(res.body.success).toBe(true);
+      expect(await Attainable.findByPk(addedAttainment)).toBeNull;
+    });
+
+    it('should succesfully delete a tree of attainments with depth 1', async () => {
+      await testAttainmentTreeDeletion(
+        {
+          name: 'Test exercise',
+          date: new Date(),
+          expiryDate: new Date(),
+          subAttainments: [
+            {
+              name: 'Test exercise 1.1',
+              date: new Date(),
+              expiryDate: new Date(),
+              subAttainments: []
+            },
+            {
+              name: 'Test exercise 1.2',
+              date: new Date(),
+              expiryDate: new Date(),
+              subAttainments: []
+            }
+          ]
+        }
+      );
+    });
+
+    it('should succesfully delete a tree of attainments with depth greater than 1', async () => {
+      await testAttainmentTreeDeletion(mockAttainable);
+    });
+
+    it('should respond with 404 not found for non-existent attainment ID', async () => {
+      const res: supertest.Response = await request
+        .delete(`/v1/courses/1/instances/1/attainments/${badId}`);
+
+      expect(res.statusCode).toBe(HttpCode.NotFound);
+      expect(res.body.success).toBe(false);
+    });
+  }
+);
 
 describe('Test PUT /v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId', () => {
   let subAttainable: AttainableData;
