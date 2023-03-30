@@ -7,8 +7,119 @@ import { NextFunction, Request, Response } from 'express';
 
 import { ApiError } from '../types/error';
 import { idSchema } from '../types/general';
+import { Grade, Student } from '../types/grades';
 import { HttpCode } from '../types/httpCode';
 import { validateCourseAndInstance } from './utils/courseInstance';
+
+/**
+ * Parse and extract attainment id's from the CSV file header.
+ * Correct format: "StudentNo,C3I9A1,C3I9A2,C3I9A3,C3I9A4,C3I9A5..."
+ * @param {Array<string>} header - Header part of the CSV file.
+ * @returns {Array<number>} - Array containing the id's of attainments.
+ * @throws {ApiError} - If first column not "StudentNo" (case-insensitive)
+ * header array is empty or any of the attainment tags malformed or missing.
+ */
+export function parseHeader(header: Array<string>): Array<number> {
+  const attainmentIds: Array<number> = [];
+  const errors: Array<string> = [];
+
+  if (header.length === 0) {
+    throw new ApiError(
+      'CSV file header empty, please upload valid CSV.',
+      HttpCode.UnprocessableEntity
+    );
+  }
+
+  // Check that first column matches requirements.
+  if (header[0].toLocaleLowerCase() !== 'studentno') {
+    errors.push(
+      `CSV parse error, header row column 1 must be "StudentNo", received "${header[0]}"`
+    );
+  }
+
+  // Remove first input "StudentNo" by slicing. Avoid shifting, will have side-effects later on.
+  const attainmentData: Array<string> = header.slice(1);
+
+  if (attainmentData.length === 0) {
+    throw new ApiError(
+      'No attainments found from the header, please upload valid CSV.',
+      HttpCode.UnprocessableEntity
+    );
+  }
+
+  // Regex for checking attainment matches the desired format e.g., C1I1A1.
+  const regex: RegExp = /C\d+I\d+A(\d+)\b/;
+
+  attainmentData.forEach((str: string) => {
+    const match: RegExpMatchArray | null = str.match(regex);
+    if (match && match[1]) {
+      attainmentIds.push(parseInt(match[1], 10));
+    } else {
+      errors.push(
+        // eslint-disable-next-line max-len
+        `Header attainment data parsing failed at column ${attainmentData.indexOf(str) + 2}. Use format C{courseId}I{courseInstanceId}A{attainmentId}.`
+      );
+    }
+  });
+
+  if (errors.length > 0) {
+    throw new ApiError('', HttpCode.BadRequest, errors);
+  }
+  return attainmentIds;
+}
+
+/**
+ * Parses student grading data from a CSV file and creates an array of Student objects.
+ * @param {Array<Array<string>>} studentGradingData - Body part of the CSV file.
+ * @param {Array<number>} attainmentIds - Array of attainment ID corresponding to each grade column.
+ * @returns {Array<Student>} - Array of Student objects containing their student number and
+ * an array of their grades.
+ * @throws {ApiError} - If there is an error in the CSV file (e.g. incorrect data type in a cell).
+ * Collects all errors found to an array, does not throw error immediately on first incorrect value.
+*/
+export function parseGrades(
+  studentGradingData: Array<Array<string>>, attainmentIds: Array<number>
+): Array<Student> {
+  const students: Array<Student> = [];
+  const errors: Array<string> = [];
+  let currentRow: number = 2;
+
+  for (const row of studentGradingData) {
+    const studentNumber: string = row[0];
+    const gradingData: Array<string> = row.slice(1);
+
+    if (row.length === 0) {
+      continue;
+    }
+
+    const student: Student = {
+      studentNumber,
+      grades: [],
+    };
+
+    for (let i: number = 0; i < attainmentIds.length; i++) {
+
+      if (isNaN(Number(gradingData[i]))) {
+        errors.push(
+          `CSV file row ${currentRow} column ${i + 2} expected number, received "${gradingData[i]}"`
+        );
+      } else {
+        const grade: Grade = {
+          attainmentId: attainmentIds[i],
+          points: parseInt(gradingData[i], 10)
+        };
+        student.grades.push(grade);
+      }
+    }
+    ++currentRow;
+    students.push(student);
+  }
+
+  if (errors.length > 0) {
+    throw new ApiError('', HttpCode.BadRequest, errors);
+  }
+  return students;
+}
 
 /**
  * Asynchronously adds grades from a CSV file to the database.
@@ -47,7 +158,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
   const data: string = req.file.buffer.toString();
 
   // Array for collecting CSV row data.
-  const csvData: Array<Array<string>> = [];
+  const studentGradingData: Array<Array<string>> = [];
 
   // TODO: should user be allowed to define delimiter in the request.
   const parser: Parser = parse({
@@ -58,14 +169,14 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
     .on('readable', function (): void {
       let row: Array<string>;
       while ((row = parser.read()) !== null) {
-        csvData.push(row);
+        studentGradingData.push(row);
       }
     })
     .on('error', function (err: unknown): void {
       // Pass the error manually to the error handler, controllerDispatcher will not catch here.
       next(err);
     })
-    .on('end', function (): void {
+    .on('end', async function (): Promise<void> {
 
       /**
        * TODO:
@@ -73,13 +184,26 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
        * - Check attainments exists in the database.
        * - Add the grading data to the database.
        */
-      console.log('CSV:', csvData);
 
-      res.status(HttpCode.Ok).json({
-        success: true,
-        data: {}
-      });
-      return;
+      try {
+        // Header having colum information, e.g., StudentNo,C3I9A1,C3I9A2,C3I9A3,C3I9A4,C3I9A5...
+        const header: Array<string> = studentGradingData.shift() as Array<string>;
+
+        // Parse header and grades separately. Always first parse header before
+        // parsing the grades as the grade parser needs the attainment id array.
+        const attainmentIds: Array<number> = parseHeader(header);
+        const parsedStudentData: Array<Student> = parseGrades(studentGradingData, attainmentIds);
+
+        console.log(parsedStudentData);
+
+        res.status(HttpCode.Ok).json({
+          success: true,
+          data: {}
+        });
+        return;
+      } catch (err: unknown) {
+        next(err);
+      }
     });
 
   // Write stringified CSV data to the csv-parser's stream.
