@@ -4,6 +4,9 @@
 
 import { parse, Parser } from 'csv-parse';
 import { NextFunction, Request, Response } from 'express';
+import { Op } from 'sequelize';
+
+import Attainable from '../database/models/attainable';
 
 import { ApiError } from '../types/error';
 import { idSchema } from '../types/general';
@@ -195,6 +198,32 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         const parsedStudentData: Array<Student> = parseGrades(studentGradingData, attainmentIds);
 
         console.log(parsedStudentData);
+
+        // Fetch all attainments from db based on the id's extracted from the CSV.
+        const attainments: Array<Attainable> = await Attainable.findAll({
+          attributes: ['id'],
+          where: {
+            id: {
+              [Op.in]: attainmentIds
+            },
+            courseId,
+            courseInstanceId,
+          }
+        });
+
+        // Check if any of the CSV attainment id's does not exist in the db, throw ApiError if so.
+        const foundIds: Array<number> = attainments.map((attainment: Attainable) => attainment.id);
+        const nonExistingIds: Array<number> = attainmentIds.filter(
+          (id: number) => !foundIds.includes(id)
+        );
+
+        if (nonExistingIds.length > 0) {
+          throw new ApiError(
+            // eslint-disable-next-line max-len
+            `Attainments with following IDs do not exist or belong to this course instance: ${nonExistingIds.join(', ')}.`,
+            HttpCode.UnprocessableEntity
+          );
+        }
 
         res.status(HttpCode.Ok).json({
           success: true,
