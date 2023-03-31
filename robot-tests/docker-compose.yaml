@@ -29,11 +29,11 @@ services:
       file: ../common-services.yaml
       service: database
 
-  robot: 
+  robot:
     image: marketsquare/robotframework-browser:latest
     environment:
       LOCALHOST_URL: "http://frontend:3005"
-    volumes: 
+    volumes:
       - .:/test
     entrypoint: ["./test/wait-for-frontend.sh", "robot", "--outputdir", "test/output", "test"]
     depends_on:
