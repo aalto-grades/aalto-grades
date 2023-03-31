@@ -29,12 +29,14 @@ describe('Tests for CourseResultsView components', () => {
       const finalGradeHeader = screen.queryByText('Final Grade');
       const viewValidGradesText = screen.queryByText('View valid grades from past instances:');
       const viewAllGradesButton = screen.queryByText('View all grades');
+      const calculateGradesButton = screen.queryByText('Calculate final grades');
 
       expect(headingElement).toBeInTheDocument();
       expect(studentIdHeader).toBeInTheDocument();
       expect(finalGradeHeader).toBeInTheDocument();
       expect(viewValidGradesText).toBeInTheDocument();
       expect(viewAllGradesButton).toBeInTheDocument();
+      expect(calculateGradesButton).toBeInTheDocument();
     });
     
   });
@@ -66,6 +68,20 @@ describe('Tests for CourseResultsView components', () => {
 
     const lastStudentListed = await screen.findByText('997214');
     expect(lastStudentListed).toBeInTheDocument();
+  });
+
+  test('CourseResultsView should display an alert when grade calculation is started', async () => {
+
+    renderCourseResultsView();
+
+    await waitFor( async () => {
+      expect(await screen.queryByText('Calculating final grades...')).not.toBeInTheDocument();
+
+      const calculateGradesButton = screen.queryByText('Calculate final grades');
+      userEvent.click(calculateGradesButton);
+
+      expect(await screen.findByText('Calculating final grades...')).toBeInTheDocument();
+    });
   });
 
 });

@@ -39,7 +39,7 @@ const Assignments = ({ attainments, formula, courseId, instance }) => {
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
         <Button onClick={() => navigate(`/${courseId}/create-attainment/${instance.id}`) }>Add attainment</Button>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}>
-          <Button variant='outlined'>Calculate final grades</Button>
+          <Button variant='outlined' onClick={() => navigate(`/${courseId}/course-results/${instance.id}`)}>See course results</Button>
           <Button variant='contained'>Add points</Button>
         </Box>
       </Box>

@@ -47,7 +47,7 @@ const stableSort = (array, comparator) => {
   return stabilizedThis.map((el) => el[0]);
 };
 
-const CourseResultsTable = ({ attainments, students }) => {
+const CourseResultsTable = ({ attainments, students, calculateFinalGrades }) => {
 
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('studentID');
@@ -59,6 +59,7 @@ const CourseResultsTable = ({ attainments, students }) => {
 
   useEffect(() => {
     setStudentsToShow(search === '' ? students : students.filter(s => s.studentID.includes(search)));
+    setPage(0);
   }, [search, students]);
 
   const handleRequestSort = (event, property) => {
@@ -87,7 +88,11 @@ const CourseResultsTable = ({ attainments, students }) => {
   return (
     <Box sx={{ width: '100%', minWidth: '600px' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <CourseResultsTableToolbar search={search} setSearch={setSearch}/>
+        <CourseResultsTableToolbar
+          search={search}
+          setSearch={setSearch}
+          calculateFinalGrades={calculateFinalGrades}
+        />
         <TableContainer>
           <Table
             sx={{ minWidth: 75, mx: 4 }}
@@ -184,7 +189,8 @@ const CourseResultsTable = ({ attainments, students }) => {
 
 CourseResultsTable.propTypes = {
   attainments: PropTypes.array,
-  students: PropTypes.array
+  students: PropTypes.array,
+  calculateFinalGrades: PropTypes.func
 };
 
 export default CourseResultsTable;
