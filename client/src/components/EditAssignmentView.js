@@ -43,6 +43,7 @@ const EditAssignmentView = () => {
   };
 
   const [attainments, setAttainments] = useState(getAttainment());
+  const [deletedAttainments, setDeletedAttainments] = useState([]);
 
   // Function to edit the data that is in the database
   const editAttainment = async (attainmentObject) => {
@@ -66,6 +67,21 @@ const EditAssignmentView = () => {
     }
   };
 
+  // Function to delete data from the database or from the context
+  const deleteAttainment = async (attainmentId) => {
+    // If this view is opened from the course view, delete from DB
+    // Else the attainment is being edited during the creation of an instance so only delete from the context
+    if (instanceId) {
+      const attainment = await assignmentServices.deleteAttainment(courseId, instanceId, attainmentId);
+      console.log(attainment);
+      navigate(-1);
+    } else if (sisuInstanceId) {
+      const updatedAttainments = assignmentServices.deleteTemporaryAttainment(addedAttainments, attainments[0]);
+      setAddedAttainments(updatedAttainments);
+      navigate(-1);
+    }
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     try {
@@ -77,6 +93,10 @@ const EditAssignmentView = () => {
         const newAttainments = assignmentServices.getNewAttainments(updatedAttainments);
         existingAttainments.forEach((attainment) => editAttainment(attainment));
         newAttainments.forEach((attainment) => addAttainment(attainment));
+        deletedAttainments.forEach((attainment) => {
+          if (attainment.id) deleteAttainment(attainment.id);
+        });
+        navigate(-1);
       } else if (sisuInstanceId) {
         const updatedAttainments = assignmentServices.updateTemporaryAttainment(addedAttainments, attainments[0]);
         setAddedAttainments(updatedAttainments);
@@ -98,22 +118,15 @@ const EditAssignmentView = () => {
     setOpenConfDialog(false);
   };
 
-  const deleteAttainment = () => {
-    // If this view is opened from the course view, delete from DB
-    // Else the attainment is being edited during the creation of an instance so only delete from the context
-    if (instanceId) {
-      // TODO: Delete from DB
-      navigate(-1);
-    } else if (sisuInstanceId) {
-      const updatedAttainments = assignmentServices.deleteTemporaryAttainment(addedAttainments, attainments[0]);
-      setAddedAttainments(updatedAttainments);
-      navigate(-1);
-    }
-  };
-
   const removeAttainment = (indices) => {
-    const updatedAttainments = assignmentServices.removeAttainment(indices, attainments);
-    setAttainments(updatedAttainments);
+    if (JSON.stringify(indices) === '[0]') {
+      deleteAttainment(attainmentId);
+    } else {
+      const deletedAttainment = assignmentServices.getAttainmentByIndices(indices, attainments);
+      const updatedAttainments = assignmentServices.removeAttainment(indices, attainments);
+      setDeletedAttainments([...deletedAttainments, deletedAttainment]);
+      setAttainments(updatedAttainments);
+    }
   };
 
   return(
@@ -147,7 +160,7 @@ const EditAssignmentView = () => {
             subject={'study attainment'}
             open={openConfDialog}
             handleClose={handleConfDialogClose}
-            deleteAttainment={deleteAttainment}
+            deleteAttainment={removeAttainment}
             indices={[0]}
             attainments={attainments}
           />

@@ -22,6 +22,12 @@ const editAttainment = async (courseId, instanceId, attainment) => {
   return response.data.data;
 };
 
+const deleteAttainment = async (courseId, instanceId, attainmentId) => {
+  const response = await axios.delete(
+    `/v1/courses/${courseId}/instances/${instanceId}/attainments/${attainmentId}`);
+  return response.data.data;
+};
+
 // Function to get mock attainments.
 // Should eventually be replaced with a function that gets data from the server.
 const getSuggestedAttainments = () => { return mockAttainmentsClient; };
@@ -209,12 +215,21 @@ const addSubAttainments = (indices, attainments, numOfAttainments, temporaryId) 
 
 // Remove an attainment that is at the location specified by indices
 const removeAttainment = (indices, attainments) => {
-  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
   const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
   array.splice(lastIndex, 1);
   return updatedAttainments;
+};
+
+// Get an attainment from a tree structure of attainments based on its location defined by indices
+const getAttainmentByIndices = (indices, attainments) => {
+  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  const lastIndex = indices[indices.length - 1];
+  const indicesWithoutLast = indices.slice(0, -1);
+  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
+  return array[lastIndex];
 };
 
 // Creates a tree structure of attainments from an array of attainments with parent Ids
@@ -408,6 +423,7 @@ const getNewAttainments = (attainments) => {
 export default { 
   addAttainment,
   editAttainment,
+  deleteAttainment,
   getSuggestedAttainments,
   addTemporaryIds,
   addTemporaryAttainment,
@@ -417,6 +433,7 @@ export default {
   getSubAttainments, 
   addSubAttainments, 
   removeAttainment, 
+  getAttainmentByIndices,
   getProperty, 
   setProperty, 
   constructTreeAssignmets, 

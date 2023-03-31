@@ -51,6 +51,7 @@ const CreateAssignmentView = () => {
       if (instanceId) {
         const updatedAttainments = assignmentServices.formatStringsToDates(attainments)[0];
         addAttainment(updatedAttainments);
+        navigate(-1);
       } else if (sisuInstanceId) {
         const temporaryId = attainmentIncrementId;
         const [updatedAttainments, newTemporaryId] = assignmentServices.createTemporaryAttainment(addedAttainments, attainments[0], temporaryId);
