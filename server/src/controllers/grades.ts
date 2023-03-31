@@ -4,9 +4,12 @@
 
 import { parse, Parser } from 'csv-parse';
 import { NextFunction, Request, Response } from 'express';
-import { Op } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
+import { sequelize } from '../database';
 
 import Attainable from '../database/models/attainable';
+import CourseInstanceRole from '../database/models/courseInstanceRole';
+import User from '../database/models/user';
 
 import { ApiError } from '../types/error';
 import { idSchema } from '../types/general';
@@ -224,6 +227,88 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
             HttpCode.UnprocessableEntity
           );
         }
+
+        // After this point all attainments are confirmed to exist and belong to the instance.
+
+        // Check all users (students) exists in db, create new users if needed.
+        const studentNumbers: Array<string> = parsedStudentData.map(
+          (student: Student) => student.studentNumber
+        );
+
+        let students: Array<User> = await User.findAll({
+          attributes: ['id', 'studentId'],
+          where: {
+            studentId: {
+              [Op.in]: studentNumbers
+            }
+          }
+        });
+
+        const foundStudents: Array<string> = students.map((student: User) => student.studentId);
+        const nonExistingStudents: Array<string> = studentNumbers.filter(
+          (id: string) => !foundStudents.includes(id)
+        );
+
+        // TODO: check that teacher id is not listed accidentally in the CSV/students list
+        // to prevent accidental role change from TEACHER or TEACHER_IN_CHARGE to STUDENT.
+
+        // Check (and add if needed) that existing users have 'STUDENT' role on the instance.
+        // Note. updateOnDuplicate works as an UPSERT operation in bulkCreate.
+        await CourseInstanceRole.bulkCreate(
+          students.map((user: User) => {
+            return {
+              userId: user.id,
+              courseInstanceId,
+              role: 'STUDENT'
+            };
+          }), {
+            updateOnDuplicate: ['role']
+          }
+        );
+
+        // Create new users (students) and add to the course instance with role 'STUDENT'.
+        if (nonExistingStudents.length > 0) {
+
+          await sequelize.transaction(async (t: Transaction) => {
+            const newUsers: Array<User> = await User.bulkCreate(
+              nonExistingStudents.map((studentNo: string) => {
+                return {
+                  studentId: studentNo
+                };
+              }), { transaction: t }
+            );
+
+            await CourseInstanceRole.bulkCreate(
+              newUsers.map((user: User) => {
+                return {
+                  userId: user.id,
+                  courseInstanceId,
+                  role: 'STUDENT'
+                };
+              }), { transaction: t }
+            );
+
+            students = students.concat(newUsers);
+          });
+        }
+
+        // After this point all students are confirmed to exist and belong to the instance.
+
+        // Input users db id to the parsedStudentData based on student number.
+        const studentsWithId: Array<Student> = parsedStudentData.map(
+          (student: Student): Student => {
+
+            const matchingUser: User | undefined = students.find(
+              (user: User) => user.dataValues.studentId === student.studentNumber
+            );
+
+            return {
+              ...student,
+              id: matchingUser?.id as number
+            };
+          });
+
+        console.log(studentsWithId);
 
         res.status(HttpCode.Ok).json({
           success: true,
