@@ -9,7 +9,6 @@ Resource    ./keywords.robot
 * Test Cases *
 
 Test SignUp on localhost
-    Skip
     Open Aalto Grades on Localhost
     Navigate to SignUp
     Fill Admin Register Information
@@ -17,7 +16,6 @@ Test SignUp on localhost
     Sign Out
 
 Test Login on localhost
-    Skip
     Open Aalto Grades on Localhost
     Submit Login Information
     Verify Admin User registering succeeded
