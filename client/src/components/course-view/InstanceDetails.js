@@ -11,7 +11,7 @@ import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 import textFormatServices from '../../services/textFormat';
 import useAuth from '../../hooks/useAuth';
 
-const OngoingInstanceInfo = ({ info }) => {
+const InstanceDetails = ({ info }) => {
   const { minCredits, maxCredits, startDate, endDate, type, gradingScale, teachersInCharge, department, institution } = info;
   const { auth } = useAuth();
 
@@ -44,7 +44,7 @@ const OngoingInstanceInfo = ({ info }) => {
   );
 };
 
-OngoingInstanceInfo.propTypes = {
+InstanceDetails.propTypes = {
   info: PropTypes.object,
   period: PropTypes.string,
   startDate: PropTypes.instanceOf(Date),
@@ -57,4 +57,4 @@ OngoingInstanceInfo.propTypes = {
   teachers: PropTypes.array
 };
 
-export default OngoingInstanceInfo;
+export default InstanceDetails;

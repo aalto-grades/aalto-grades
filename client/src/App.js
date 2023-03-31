@@ -23,9 +23,11 @@ import EditInstanceView from './components/EditInstanceView';
 import AddAssignmentsView from './components/AddAssignmentsView';
 import InstanceSummaryView from './components/InstanceSummaryView';
 import SelectFormulaView from './components/SelectFormulaView';
+import FormulaAttributesView from './components/FormulaAttributesView';
 import CreateAssignmentView from './components/CreateAssignmentView';
 import EditAssignmentView from './components/EditAssignmentView';
 import InstanceCreationRoute from './context/InstanceCreationRoute';
+import FormulaSelectionRoute from './context/FormulaSelectionRoute';
 import useLogout from './hooks/useLogout';
 
 const theme = createTheme({
@@ -154,17 +156,22 @@ function App() {
             </Route>
             { /* Pages that are authorised for admin and teachers */ }
             <Route element={<PrivateRoute roles={[roles.admin, roles.teacher]}/>}>
-              <Route path='/fetch-instances/:courseId/:courseCode' element={<FetchInstancesView/>}/>
+              <Route path=':courseId/fetch-instances/:courseCode' element={<FetchInstancesView/>}/>
               { /* Pages under this route share instance creation context */ }
               <Route element={<InstanceCreationRoute/>}>
                 <Route path=':courseId/edit-instance/:sisuInstanceId' element={<EditInstanceView/>}/>
-                <Route path=':courseId/add-assignments/:sisuInstanceId' element={<AddAssignmentsView/>}/>
+                <Route path=':courseId/add-attainments/:sisuInstanceId' element={<AddAssignmentsView/>}/>
                 <Route path=':courseId/instance-summary/:sisuInstanceId' element={<InstanceSummaryView/>}/>
-                <Route path='/create-assignment/:instanceId' element={<CreateAssignmentView/>}/>
-                <Route path='/edit-assignment/:instanceId/:assignmentId' element={<EditAssignmentView/>}/>
+                <Route path=':courseId/create-temporary-attainment/:sisuInstanceId' element={<CreateAssignmentView/>}/>
+                <Route path=':courseId/edit-temporary-attainment/:sisuInstanceId/:attainmentId' element={<EditAssignmentView/>}/>
               </Route>
-              <Route path='/select-formula' element={<SelectFormulaView/>}/>
-              { /* Path above will be replaced with '/select-formula/:instanceId/:assignmentId' once component is connected to a page */ }
+              <Route path=':courseId/create-attainment/:instanceId' element={<CreateAssignmentView/>}/>
+              <Route path=':courseId/edit-attainment/:instanceId/:attainmentId' element={<EditAssignmentView/>}/>
+              <Route element={<FormulaSelectionRoute/>}>
+                <Route path='/:courseId/select-formula/:instanceId/' element={<SelectFormulaView/>}/>
+                <Route path='/:courseId/formula-attributes/:instanceId/' element={<FormulaAttributesView/>}/>
+                { /* '/:assignmentId' will be added to the paths above once they work for sub-assignments */ }
+              </Route>
             </Route>
           </Routes>
         </Box>

@@ -43,7 +43,7 @@ describe('Tests for CourseView component', () => {
   };
 
 
-  test('CourseView should render OngoingInstanceInfo, Assignments and InstancesTable components for teachers', async () => {
+  test('CourseView should render InstanceDetails, Attainments and InstancesTable components for teachers', async () => {
 
     const auth = { role: 'TEACHER' };
     const { getByText, getAllByText } = renderCourseView(auth);
@@ -51,21 +51,21 @@ describe('Tests for CourseView component', () => {
     await waitFor(() => {
       const instanceInfo = getByText('Instance Details');
       const teachersInfo = getByText('Teachers in Charge');         
-      const assignments = getByText('Study Attainments');
-      const exercises = getByText('Exercises');  // Assignment
-      const projects = getByText('Project');  // Assignment
-      const exams = getAllByText('Exam');  // Assignmnets and instance types
-      const pastInstances = getByText('All Instances');
+      const attainments = getByText('Study Attainments');
+      const exercises = getByText('Exercises');  
+      const projects = getByText('Project'); 
+      const exams = getAllByText('Exam');  
+      const instances = getByText('All Instances');
       const createInstanceButton = getByText('New instance');
       const addAssignmentButton = getByText('Add attainment');
       const seeAttendeesButton = getByText('See attendees');
       expect(instanceInfo).toBeDefined();
       expect(teachersInfo).toBeDefined();
-      expect(assignments).toBeDefined();
+      expect(attainments).toBeDefined();
       expect(exercises).toBeDefined();
       expect(projects).toBeDefined();
       expect(exams).toBeDefined();
-      expect(pastInstances).toBeDefined();
+      expect(instances).toBeDefined();
       expect(createInstanceButton).toBeDefined();
       expect(addAssignmentButton).toBeDefined();
       expect(seeAttendeesButton).toBeDefined();
@@ -80,11 +80,11 @@ describe('Tests for CourseView component', () => {
 
     const instanceInfo = await findByText('Instance Details');  // with the new animation, wait is needed before components are rendered
     const teachersInfo = getByText('Teachers in Charge');       // since previous is in document, so are the rest
-    const pastInstances = getByText('All Instances');
+    const instances = getByText('All Instances');
 
     expect(instanceInfo).toBeDefined();
     expect(teachersInfo).toBeDefined();
-    expect(pastInstances).toBeDefined();
+    expect(instances).toBeDefined();
 
     expect(queryByText('Study Attainments')).not.toBeInTheDocument();
     expect(queryByText('Add attainment')).not.toBeInTheDocument();
@@ -96,12 +96,12 @@ describe('Tests for CourseView component', () => {
   test('CourseView should allow changing the instance that is displayed in detail', async () => {
 
     const auth = { role: 'TEACHER' };
-    const { getByText, findByText, findAllByRole } = renderCourseView(auth);
+    const { findByText, findAllByRole } = renderCourseView(auth);
 
     const instanceRows = await findAllByRole('row');
     expect(instanceRows.length - 1).toEqual(mockInstances.length);    // - 1 because heading row
 
-    const firstTeacherInCharge = await findByText('Elisa Mekler')
+    const firstTeacherInCharge = await findByText('Elisa Mekler');
     expect(firstTeacherInCharge).toBeInTheDocument();
 
     userEvent.click(instanceRows[5]);   // click a row that isn't the first, changes teacher

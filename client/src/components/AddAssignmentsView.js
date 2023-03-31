@@ -2,44 +2,50 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import AssignmentCategory from './assignments/AssignmentCategory';
-import mockAssignmentsClient from '../mock-data/mockAssignmentsClient';
+import assignmentServices from '../services/assignments';
 
 const AddAssignmentsView = () => {
   let navigate = useNavigate();
   let { courseId, sisuInstanceId } = useParams();
 
-  const { addedAssignments, setAddedAssignments } = useOutletContext();
-  const [suggestedAssignments, setSuggestedAssignments] = useState([]);
+  const { 
+    addedAttainments, setAddedAttainments,
+    suggestedAttainments, setSuggestedAttainments,
+    attainmentIncrementId, setIncrementId,
+  } = useOutletContext();
 
-  useEffect(() => {
-    if (addedAssignments.length === 0) {
-      setSuggestedAssignments(mockAssignmentsClient);
+  useEffect(() => {  // Better if handling here
+    if (addedAttainments.length === 0) {
+      let allSuggestedAttainments = assignmentServices.getSuggestedAttainments();
+      let [updatedAttainments, newTemporaryId] = assignmentServices.addTemporaryIds(allSuggestedAttainments, attainmentIncrementId); 
+      setIncrementId(newTemporaryId);
+      setSuggestedAttainments(updatedAttainments);
     } else {
-      // if some assignments have been added, filter the suggestions to make sure there aren't duplicates
+      // if some attainments have been added, filter the suggestions to make sure there aren't duplicates
       // another possibility is to save the suggestions in context too, will consider if the retrieval is slow
-      const allSuggested = mockAssignmentsClient;
-      const nonAdded = allSuggested.filter(suggested => !addedAssignments.some(added => added.id === suggested.id));
-      setSuggestedAssignments(nonAdded);
+      const nonAdded = suggestedAttainments.filter(suggested => !addedAttainments.some(added => added.temporaryId === suggested.temporaryId));
+      setSuggestedAttainments(nonAdded);
     }
   }, []);
 
-  const onAddClick = (assignment) => () => {
-    const newSuggested = suggestedAssignments.filter(a => a.id !== assignment.id);
-    setSuggestedAssignments(newSuggested);
-    setAddedAssignments(addedAssignments.concat([assignment]));
+  const onAddClick = (attainment) => () => {
+    const newSuggested = suggestedAttainments.filter(a => a.temporaryId !== attainment.temporaryId);
+    setSuggestedAttainments(newSuggested);
+    const updatedAttainments = assignmentServices.addTemporaryAttainment(addedAttainments, attainment);
+    setAddedAttainments(updatedAttainments);
   };
 
   const onGoBack = () => {
     navigate('/' + courseId + '/edit-instance/' + sisuInstanceId);
   };
 
-  const onConfirmAssignments = () => {
+  const onConfirmAttainments = () => {
     navigate('/' + courseId + '/instance-summary/' + sisuInstanceId);
   };
 
@@ -49,12 +55,16 @@ const AddAssignmentsView = () => {
       <Typography variant='h3' align='left' sx={{ ml: 1.5 }}>Suggested study attainments from previous instances</Typography>
       <Box borderRadius={1} sx={{ bgcolor: 'secondary.light', p: '16px 12px', display: 'inline-block' }}>
         <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch' }}>
-          { suggestedAssignments.map(assignment => {
+          { suggestedAttainments.map(attainment => {
+            /* Since the attainments are displayed by during the creation of an instance, 
+               all of them might not exist in the database (since new one can be created)
+               so temporary ids are used as keys for the attainment accoridons */
             return (
               <AssignmentCategory 
-                key={assignment.id} 
-                assignment={assignment} 
-                button={<Button onClick={onAddClick(assignment)}>Add</Button>} 
+                key={attainment.temporaryId} 
+                attainment={attainment} 
+                attainmentKey={'temporaryId'}
+                button={<Button onClick={onAddClick(attainment)}>Add</Button>} 
               />
             );}
           ) }
@@ -63,20 +73,24 @@ const AddAssignmentsView = () => {
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', mb: 5, mt: 1, display: 'inline-block' }}>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography align='left' sx={{ ml: 1.5 }} >Create and add a new study attainment:</Typography>
-          <Button variant='outlined' onClick={ () => navigate('/create-assignment/1') }>Create attainment</Button>
+          <Button variant='outlined' onClick={ () => 
+            navigate(`/${courseId}/create-temporary-attainment/${sisuInstanceId}`) }>
+              Create attainment
+          </Button>
         </Box>
       </Box>
       <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >Added study attainments</Typography>
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', display: 'inline-block' }}>
-        { addedAssignments.length !== 0 &&
+        { addedAttainments.length !== 0 &&
           <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch', pb: '8px' }}>
-            { addedAssignments.map(assignment => {
+            { addedAttainments.map(attainment => {
               return (
                 <AssignmentCategory 
-                  key={assignment.id} 
-                  assignment={assignment}  
+                  key={attainment.temporaryId} 
+                  attainment={attainment}  
+                  attainmentKey={'temporaryId'}
                   button={<Button 
-                    onClick={ () => navigate('/edit-assignment/' + sisuInstanceId + '/' + assignment.id) }>
+                    onClick={ () => navigate(`/${courseId}/edit-temporary-attainment/${sisuInstanceId}/${attainment.temporaryId}`) }>
                       Edit
                   </Button>}
                 />
@@ -90,7 +104,7 @@ const AddAssignmentsView = () => {
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 6 }}>
         <Button variant='outlined' onClick={() => onGoBack()}>Go back</Button>
-        <Button variant='contained' onClick={() => onConfirmAssignments()}>Confirm attainments</Button>
+        <Button variant='contained' onClick={() => onConfirmAttainments()}>Confirm attainments</Button>
       </Box>
     </Box>
   );

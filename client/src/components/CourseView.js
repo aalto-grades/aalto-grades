@@ -10,14 +10,14 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grow from '@mui/material/Grow';
 import FileLoadDialog from './course-view/FileLoadDialog';
-import OngoingInstanceInfo from './course-view/OngoingInstanceInfo';
+import InstanceDetails from './course-view/InstanceDetails';
 import Assignments from './course-view/Assignments';
 import InstancesTable from './course-view/InstancesTable';
 import courseService from '../services/courses';
 import instancesService from '../services/instances';
 import sortingServices from '../services/sorting';
 import useAuth from '../hooks/useAuth';
-import mockAssignmentsClient from '../mock-data/mockAssignmentsClient';
+import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 
 const mockInstitution = 'Aalto University';   // REPLACE SOME DAY? currently this info can't be fetched from database
 
@@ -80,7 +80,7 @@ const CourseView = () => {
             <Button 
               size='large' 
               variant='contained' 
-              onClick={() => { navigate(`/fetch-instances/${courseId}/${courseDetails.courseCode}`); }}
+              onClick={() => { navigate(`/${courseId}/fetch-instances/${courseDetails.courseCode}`); }}
             >  {/* TODO: Check path */}
               New instance
             </Button>
@@ -89,13 +89,7 @@ const CourseView = () => {
           <Box sx={{ display: 'flex', justifyContent: 'space-evenly', gap: 3 }}>
             <Grow in={animation} style={{ transformOrigin: '50% 0 0' }} {...(animation? { timeout: 500 } : { timeout: 0 })}>
               <div>
-                <OngoingInstanceInfo 
-                  info={ { 
-                    ...currentInstance, 
-                    department: courseDetails.department, 
-                    institution: mockInstitution 
-                  } } 
-                />
+                <InstanceDetails info={ { ...currentInstance, department: courseDetails.department, institution: mockInstitution } } />
               </div>
             </Grow>
             { /* a different assignment component will be created for students */
@@ -103,10 +97,11 @@ const CourseView = () => {
               <Grow in={animation} style={{ transformOrigin: '0 0 0' }} {...(animation? { timeout: 1000 } : { timeout: 0 })}>
                 <div>
                   <Assignments 
-                    assignments={mockAssignmentsClient} 
+                    attainments={mockAttainmentsClient} 
+                    courseId={courseId} 
                     formula={'Weighted Average'} 
                     instance={currentInstance} 
-                    handleAddPoints={handleClickOpen} 
+                    handleAddPoints={handleClickOpen}
                   /> {/* TODO: Retrieve real formula */}
                 </div>
               </Grow>

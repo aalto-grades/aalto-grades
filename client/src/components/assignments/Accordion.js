@@ -104,7 +104,7 @@ AssignmentText.propTypes = {
 
 export { AccordionDetails, AssignmentText };
 
-const CustomAccordion = ({ assignments }) => {
+const CustomAccordion = ({ attainments, attainmentKey }) => {
 
   const [expanded, setExpanded] = useState(new Set());
   const [selected, setSelected] = useState('');
@@ -129,30 +129,30 @@ const CustomAccordion = ({ assignments }) => {
 
   return (
     <>
-      { assignments.map(assignment => {
+      { attainments.map(attainment => {
         return (
           <Accordion 
-            key={assignment.id + 'accordion'} 
-            expanded={expanded.has(assignment.id)} 
-            onChange={handleChange(assignment.id)}
+            key={attainment[attainmentKey] + 'accordion'} 
+            expanded={expanded.has(attainment[attainmentKey])} 
+            onChange={handleChange(attainment[attainmentKey])}
           >
             <AccordionSummary 
-              aria-controls={assignment.id + '-content'} 
-              id={assignment.id + '-header'} 
-              expanded={expanded.has(assignment.id).toString()} 
-              nowselected={(selected === assignment.id).toString()}
+              aria-controls={attainment[attainmentKey] + '-content'} 
+              id={attainment[attainmentKey] + '-header'} 
+              expanded={expanded.has(attainment[attainmentKey]).toString()} 
+              nowselected={(selected === attainment[attainmentKey]).toString()}
             >
-              <AssignmentText name={assignment.name} formulaId={assignment.formulaId} />
+              <AssignmentText name={attainment.name} formulaId={attainment.formulaId} />
             </AccordionSummary>
-            { assignment.subAssignments.map(subAssignment => {
+            { attainment.subAttainments.map(subAttainment => {
               return (
-                subAssignment.subAssignments.length === 0 ?  // is the assignment a leaf? If yes, render details, else another accordion
-                  <AccordionDetails key={subAssignment.id + 'details'}>
-                    <AssignmentText name={subAssignment.name} formulaId={subAssignment.formulaId} />
+                subAttainment.subAttainments.length === 0 ?  // is the attainment a leaf? If yes, render details, else another accordion
+                  <AccordionDetails key={subAttainment[attainmentKey] + 'details'}>
+                    <AssignmentText name={subAttainment.name} formulaId={subAttainment.formulaId} />
                   </AccordionDetails>
                   : 
-                  <Box key={subAssignment.id + 'subAccordion'} sx={{ pl: '39px' }}>
-                    {<CustomAccordion assignments={[subAssignment]} />}
+                  <Box key={subAttainment[attainmentKey] + 'subAccordion'} sx={{ pl: '39px' }}>
+                    {<CustomAccordion attainments={[subAttainment]} attainmentKey={attainmentKey}/>}
                   </Box>
               );
             })}
@@ -164,7 +164,8 @@ const CustomAccordion = ({ assignments }) => {
 };
 
 CustomAccordion.propTypes = {
-  assignments: PropTypes.array
+  attainments: PropTypes.array,
+  attainmentKey: PropTypes.string,
 };
 
 export default CustomAccordion;
