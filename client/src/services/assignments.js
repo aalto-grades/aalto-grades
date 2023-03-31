@@ -116,6 +116,15 @@ const deleteTemporaryAttainment = (attainments, newAttainment) => {
 */
 // Replace indices with attainment IDs if it seems simpler/more effective
 
+// Get an attainment from a tree structure of attainments based on its location defined by indices
+const getAttainmentByIndices = (indices, attainments) => {
+  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  const lastIndex = indices[indices.length - 1];
+  const indicesWithoutLast = indices.slice(0, -1);
+  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
+  return array[lastIndex];
+};
+
 // Get sub-attainments from the attainments array (of nested arrays) according to the indices
 const getSubAttainments = (indices, attainments) => {
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
@@ -150,11 +159,7 @@ const setProperty = (indices, attainments, property, value) => {
 
 // Get the property of an attainment that is at the location specified by indices
 const getProperty = (indices, attainments, property) => {
-  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
-  const lastIndex = indices[indices.length - 1];
-  const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
-  return array[lastIndex][property];
+  return getAttainmentByIndices(indices, attainments)[property];
 };
 
 // Same function as above but to be used with attainment IDs instead of indices
@@ -177,11 +182,7 @@ const setFormulaAttribute = (indices, attainments, attributeIndex, value) => {
 
 // Get the formula attribute an attainment
 const getFormulaAttribute = (indices, attainments, attributeIndex) => {
-  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
-  const lastIndex = indices[indices.length - 1];
-  const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
-  return array[lastIndex]['formulaAttributes'][attributeIndex];
+  return getAttainmentByIndices(indices, attainments)['formulaAttributes'][attributeIndex];
 };
 
 // Add sub-attainments to the attainments array (of nested arrays) according to the indices
@@ -221,15 +222,6 @@ const removeAttainment = (indices, attainments) => {
   const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
   array.splice(lastIndex, 1);
   return updatedAttainments;
-};
-
-// Get an attainment from a tree structure of attainments based on its location defined by indices
-const getAttainmentByIndices = (indices, attainments) => {
-  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
-  const lastIndex = indices[indices.length - 1];
-  const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
-  return array[lastIndex];
 };
 
 // Creates a tree structure of attainments from an array of attainments with parent Ids
