@@ -10,10 +10,11 @@ import { sequelize } from '../database';
 import Attainable from '../database/models/attainable';
 import CourseInstanceRole from '../database/models/courseInstanceRole';
 import User from '../database/models/user';
+import UserAttainmentGrade from '../database/models/userAttainmentGrade';
 
 import { ApiError } from '../types/error';
 import { idSchema } from '../types/general';
-import { Grade, Student } from '../types/grades';
+import { AttainmentGrade, Grade, Student } from '../types/grades';
 import { HttpCode } from '../types/httpCode';
 import { validateCourseAndInstance } from './utils/courseInstance';
 
@@ -133,7 +134,8 @@ export function parseGrades(
  * @param {Response} res - The HTTP response to be sent to the client.
  * @param {NextFunction} next - The next middleware function to be executed in the pipeline.
  * @returns {Promise<void>} - A Promise that resolves when the function has completed its execution.
- * @throws {ApiError} - If the CSV file loading fails.
+ * @throws {ApiError} - If the CSV file loading fails, parsing header/body of the CSV or attainments
+ * not belonging to the specified course/course instance.
 */
 export async function addGrades(req: Request, res: Response, next: NextFunction): Promise<void> {
   /*
@@ -308,7 +310,29 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
             };
           });
 
-        console.log(studentsWithId);
+        // Use studentsWithId to update attainables by flatmapping each students
+        // grades into a one array of all the grades.
+        const preparedBulkCreate: Array<AttainmentGrade> = studentsWithId.flatMap(
+          (student: Student): Array<AttainmentGrade> => {
+            const studentGradingData: Array<AttainmentGrade> = student.grades.map(
+              (grade: Grade): AttainmentGrade => {
+                return {
+                  userId: student.id as number,
+                  attainableId: grade.attainmentId,
+                  points: grade.points
+                };
+              });
+            return studentGradingData;
+          });
+
+        await UserAttainmentGrade.bulkCreate(
+          preparedBulkCreate,
+          {
+            updateOnDuplicate: ['points']
+          }
+        );
+
+        // After this point all students attainemnt grades are created or updated in the database.
 
         res.status(HttpCode.Ok).json({
           success: true,
