@@ -35,7 +35,6 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
       SISU_API_KEY: "${SISU_API_KEY}"
       SISU_API_URL: "${SISU_API_URL}"
-      SERVER_RUN_TESTS: 0
     networks:
       - local
 

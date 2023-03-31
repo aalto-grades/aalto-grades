@@ -13,7 +13,7 @@ services:
       service: backend
     container_name: backend-server-test
     environment:
-      SERVER_RUN_TESTS: 1
+      NODE_ENV: "test"
       
   database:
     extends:
