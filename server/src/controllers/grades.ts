@@ -202,8 +202,6 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         const attainmentIds: Array<number> = parseHeader(header);
         const parsedStudentData: Array<Student> = parseGrades(studentGradingData, attainmentIds);
 
-        console.log(parsedStudentData);
-
         // Fetch all attainments from db based on the id's extracted from the CSV.
         const attainments: Array<Attainable> = await Attainable.findAll({
           attributes: ['id'],

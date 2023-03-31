@@ -63,7 +63,7 @@ INSERT INTO public.course_instance_role (user_id, course_instance_id, role, crea
 (44, 16, 'STUDENT', NOW(), NOW()),
 (45, 3, 'STUDENT', NOW(), NOW()),
 (46, 6, 'STUDENT', NOW(), NOW()),
-(47, 1, 'TEACHER', NOW(), NOW()),
+(47, 1, 'STUDENT', NOW(), NOW()),
 (48, 18, 'STUDENT', NOW(), NOW()),
 (49, 15, 'STUDENT', NOW(), NOW()),
 (50, 7, 'STUDENT', NOW(), NOW()),
