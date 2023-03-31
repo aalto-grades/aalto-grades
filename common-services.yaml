@@ -11,8 +11,6 @@ services:
   frontend:
     build: ./client
     restart: always
-    ports:
-      - 3005:3005
     tty: true
     environment:
       BACKEND_URL: "backend"
@@ -25,8 +23,6 @@ services:
       context: ./server
       args:
         SERVER_SKIP_NPM_CI: ${SERVER_SKIP_NPM_CI}
-    ports:
-      - 3000:3000
     tty: true
     environment:
       POSTGRES_URL: "database"
@@ -41,8 +37,6 @@ services:
   database:
     image: postgres
     restart: always
-    ports:
-      - 5432:5432
     environment:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     networks:
