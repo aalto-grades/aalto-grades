@@ -1,0 +1,44 @@
+# SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+
+# This Docker Compose file defines common configuration for use in all other
+# Docker Compose files
+
+version: "3.7"
+
+services:
+  frontend:
+    build: ./client
+    restart: always
+    tty: true
+    environment:
+      BACKEND_URL: "backend"
+      BACKEND_PORT: "3000"
+    networks:
+      - local
+
+  backend:
+    build:
+      context: ./server
+      args:
+        SERVER_SKIP_NPM_CI: ${SERVER_SKIP_NPM_CI}
+    tty: true
+    environment:
+      POSTGRES_URL: "database"
+      POSTGRES_USER: "postgres"
+      POSTGRES_DATABASE: "postgres"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      SISU_API_KEY: "${SISU_API_KEY}"
+      SISU_API_URL: "${SISU_API_URL}"
+    networks:
+      - local
+
+  database:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    networks:
+      - local
+      

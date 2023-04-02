@@ -3,6 +3,10 @@ Upstream-Name: Aalto Grades
 Upstream-Contact: The Aalto Grades Developers
 Source: https://github.com/aalto-grades
 
-Files: *.json *.csv client/.env
-Copyright: 2022 The Aalto Grades Developers
+Files: client/*.json server/*.json *.csv client/.env
+Copyright: The Aalto Grades Developers
 License: MIT
+
+Files: robot-tests/seccomp_profile.json
+Copyright: Microsoft
+License: Apache-2.0
