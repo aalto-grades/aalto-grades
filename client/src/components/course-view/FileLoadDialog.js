@@ -13,6 +13,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import FormHelperText from '@mui/material/FormHelperText';
+import mockStudentGrades from '../../mock-data/mockStudentGrades';
 
 // A Dialog component for uploading a file
 
@@ -20,7 +21,7 @@ const instructions = 'Upload a CSV file with the header "studentNo" and headers 
   attainment tags you wish to add grades for. You can see an example of a CSV file of the correct format below.';
 const exampleText = 'A student with the student number 222222 has gotten 8 points from the attainment \'C3I9A1\' and 7 points from attainment \'C3I9A2\'.';
 
-const FileLoadDialog = ({ handleClose, open }) => {
+const FileLoadDialog = ({ handleClose, open, returnImportedGrades }) => {
   const [file, setFile] = useState(null);
   const [error, setError] = useState('');
 
@@ -30,6 +31,14 @@ const FileLoadDialog = ({ handleClose, open }) => {
     // TODO: validate csv ?? 
     // TODO: send file to backend
     console.log('sent: ' + getFileName(file));
+
+    // If csv is updated from course results view, the view needs to be updated
+    if (returnImportedGrades) {
+      // TODO: replace mock grades with response from backend
+      // or fetch updated grades from backend
+      returnImportedGrades(mockStudentGrades);
+    }
+
   };
 
   return (
@@ -99,6 +108,7 @@ const FileLoadDialog = ({ handleClose, open }) => {
 FileLoadDialog.propTypes = {
   handleClose: PropTypes.func,
   open: PropTypes.bool,
+  returnImportedGrades: PropTypes.func
 };
 
 export default FileLoadDialog;

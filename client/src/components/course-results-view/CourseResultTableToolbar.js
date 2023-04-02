@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Toolbar from '@mui/material/Toolbar';
 import TextField from '@mui/material/TextField';
@@ -11,8 +12,21 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import DownloadIcon from '@mui/icons-material/Download';
+import MenuButton from '../course-view/MenuButton';
+import FileLoadDialog from '../course-view/FileLoadDialog';
 
-const CourseResultsTableToolbar = ({ search, setSearch, calculateFinalGrades }) => {
+const CourseResultsTableToolbar = ({ search, setSearch, calculateFinalGrades, updateGrades }) => {
+
+  const [open, setOpen] = useState(false);
+
+  const actionOptions = [
+    { description: 'Import from file', handleClick: () => setOpen(true) }, 
+    { description: 'Import from A+', handleClick: () => {} }
+  ];
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
     <Toolbar
@@ -44,8 +58,10 @@ const CourseResultsTableToolbar = ({ search, setSearch, calculateFinalGrades }) 
             </IconButton>
           </Tooltip>
         </Box>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 2 }}>
           <Button variant='outlined' onClick={() => calculateFinalGrades()}>Calculate final grades</Button>
+          <MenuButton label='Import grades' options={actionOptions} />
+          <FileLoadDialog open={open} handleClose={handleClose} returnImportedGrades={updateGrades}/>
         </Box>
       </Box>
     </Toolbar>
@@ -55,7 +71,8 @@ const CourseResultsTableToolbar = ({ search, setSearch, calculateFinalGrades }) 
 CourseResultsTableToolbar.propTypes = {
   search: PropTypes.string,
   setSearch: PropTypes.func,
-  calculateFinalGrades: PropTypes.func
+  calculateFinalGrades: PropTypes.func,
+  updateGrades: PropTypes.func
 };
 
 export default CourseResultsTableToolbar;

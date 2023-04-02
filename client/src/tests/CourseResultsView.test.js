@@ -41,33 +41,39 @@ describe('Tests for CourseResultsView components', () => {
     
   });
 
-  test('CourseResultsTable should render the correct number of rows', async () => {
+  test('CourseResultsTable should show a dialog for uploading a file when clicking on a menu button and choosing that option', async () => {
+
+    renderCourseResultsView();
+
+    const importGradesMenuButton = await screen.findByText('Import grades');
+    expect(importGradesMenuButton).toBeDefined();
+    userEvent.click(importGradesMenuButton);
+
+    const uploadOption = screen.getByText('Import from file');
+    expect(uploadOption).toBeDefined();
+    userEvent.click(uploadOption);
+
+    const dialogTitle = screen.getByText('Add Grades from File');
+    const uploadFileButton = screen.getByText('Upload file');
+    const cancelButton = screen.getByText('Cancel');
+    const confirmButton = screen.getByText('Confirm');
+
+    expect(dialogTitle).toBeVisible();
+    expect(uploadFileButton).toBeVisible();
+    expect(cancelButton).toBeVisible();
+    expect(confirmButton).toBeVisible();
+
+    userEvent.click(cancelButton);
+    expect(dialogTitle).not.toBeVisible();
+  });
+
+  test('CourseResultsTable should not render any rows before grades are imported', async () => {
 
     renderCourseResultsView();
 
     const studentRows = await screen.findAllByRole('row');
-    expect(studentRows.length).toEqual(26); // 25 rows are displayed by default + 1 for header row
+    expect(studentRows.length).toEqual(1); // 25 rows are displayed by default + 1 for header row
 
-    // these students should be found on the first page
-    const firstStudentListed = await screen.findByText('111235');
-    expect(firstStudentListed).toBeInTheDocument();
-
-    const lastStudentListed = await screen.findByText('288979');
-    expect(lastStudentListed).toBeInTheDocument();
-  });
-
-  test('CourseResultsTable should search correctly based on student ID', async () => {
-
-    renderCourseResultsView();
-
-    const searchField = await screen.findByLabelText('Search by Student ID');
-
-    expect(searchField).toBeInTheDocument();
-
-    userEvent.type(searchField, '99');
-
-    const lastStudentListed = await screen.findByText('997214');
-    expect(lastStudentListed).toBeInTheDocument();
   });
 
   test('CourseResultsView should display an alert when grade calculation is started', async () => {

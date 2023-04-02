@@ -8,7 +8,6 @@ import Typography from '@mui/material/Typography';
 import CourseResultsTable from './course-results-view/CourseResultsTable';
 import AlertSnackbar from './alerts/AlertSnackbar';
 import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
-import mockStudentGrades from '../mock-data/mockStudentGrades';
 import mockStudentGradesFinal from '../mock-data/mockStudentGradesFinal';
 
 const CourseResultsView = () => {
@@ -27,7 +26,6 @@ const CourseResultsView = () => {
     setAttainments(mockAttainmentsClient);
     // TODO: get student grades from backend
     // modify the grades to fit the row structure
-    setStudents(mockStudentGrades);
   }, []);
 
   // useEffect in charge of handling the back-to-back alerts
@@ -49,20 +47,42 @@ const CourseResultsView = () => {
     setSnackPack((prev) => [...prev,
       { msg: 'Calculating final grades...', severity: 'info' }
     ]);
-    await sleep(4000);
+    await sleep(3000);
     try {
       // TODO: connect to backend
       setSnackPack((prev) => [...prev,
-        { msg: 'Final grades calculated.', severity: 'success' }
+        { msg: 'Final grades calculated successfully.', severity: 'success' }
       ]);
       setStudents(mockStudentGradesFinal);
-      await sleep(4000);
+      await sleep(3000);
       setAlertOpen(false);
 
     } catch (exception) {
       console.log(exception);
       setSnackPack((prev) => [...prev,
         { msg: 'Calculating the final grades failed.', severity: 'error' }
+      ]);
+    }
+  };
+
+  const updateGrades = async (newGrades) => {
+    setSnackPack((prev) => [...prev,
+      { msg: 'Importing grades...', severity: 'info' }
+    ]);
+    await sleep(3000);
+    try {
+      // TODO: connect to backend
+      setSnackPack((prev) => [...prev,
+        { msg: 'Grades imported successfully.', severity: 'success' }
+      ]);
+      setStudents(newGrades);
+      await sleep(3000);
+      setAlertOpen(false);
+
+    } catch (exception) {
+      console.log(exception);
+      setSnackPack((prev) => [...prev,
+        { msg: 'Grade import failed.', severity: 'error' }
       ]);
     }
   };
@@ -77,6 +97,7 @@ const CourseResultsView = () => {
         attainments={attainments}
         students={students}
         calculateFinalGrades={calculateFinalGrades}
+        updateGrades={updateGrades}
       />
     </Box>
     

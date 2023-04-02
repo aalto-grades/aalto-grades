@@ -47,7 +47,7 @@ const stableSort = (array, comparator) => {
   return stabilizedThis.map((el) => el[0]);
 };
 
-const CourseResultsTable = ({ attainments, students, calculateFinalGrades }) => {
+const CourseResultsTable = ({ attainments, students, calculateFinalGrades, updateGrades }) => {
 
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('studentID');
@@ -92,6 +92,7 @@ const CourseResultsTable = ({ attainments, students, calculateFinalGrades }) => 
           search={search}
           setSearch={setSearch}
           calculateFinalGrades={calculateFinalGrades}
+          updateGrades={updateGrades}
         />
         <TableContainer>
           <Table
@@ -190,7 +191,8 @@ const CourseResultsTable = ({ attainments, students, calculateFinalGrades }) => 
 CourseResultsTable.propTypes = {
   attainments: PropTypes.array,
   students: PropTypes.array,
-  calculateFinalGrades: PropTypes.func
+  calculateFinalGrades: PropTypes.func,
+  updateGrades: PropTypes.func
 };
 
 export default CourseResultsTable;
