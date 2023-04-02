@@ -17,16 +17,18 @@ https://marketsquare.github.io/robotframework-browser/Browser.html
 
 ## Fast track to keywords
 
-Robot Framework tests are written utilizing an abstraction called keywords,
-these keywords are then used as building blocks for new keywords:
+Robot Framework tests are written utilizing an abstraction called keywords.
+These keywords are then used as building blocks for new keywords:
 
 Python implementation -> Base keyword abstraction -> Higher level keywords in
 infinite layers
 
-For example in the authentication test cases we utilize a keyword:
+For example in the authentication test cases we utilize the following keyword:
+
 ```
 Verify Admin User registering succeeded
 ```
+
 The implementation of this keyword is located in
 `authentication/keywords.robot`.
 
@@ -39,22 +41,23 @@ by the library.
 
 ## Structure of the directory
 
-The structure of this directory is built in the following way:
+This directory is structured in the following way:
+
 ```
 common/
 output/
 high-level-feature-directories/
 ```
 
-The common directory contains keywords utilized by all the different features
-for basic usage.
+The common directory contains generic keywords utilized by most tests.
+
 ```
 keywords.robot
 variables.robot
 ```
 
-The output directory is used as a place to store the output of robot framework
-after execution.
+The output directory is an automatically generated directory used as a place
+to store the output of the Robot Framework after execution.
 
 The high-level feature directories such as authentication and courses contain
 the following files:
@@ -65,30 +68,31 @@ variables.robot
 low-level-features.robot
 ```
 
-The test cases are written in the low-level feature Robot files which import
-the directories keyword.robot which contains the implementation for the
-keywords utilized in the low-level feature robot files.
+`keywords.robot` in these feature directories define keywords to be imported
+and used in the corresponding low-level feature tests. They also import
+`common/keywords.robot` and the local `variables.robot`.
 
-The `keywords.robot` file in each high-level feature directory imports the
-common `keywords.robot` file as well as the `variables.robot` file of the same
-directory.
+## Running the tests
 
-As the implementation of authentication is written in its own high-level
-feature file, the implementation is located there.
+The end-to-end tests are run in GitHub Actions through the Docker Compose
+configuration located in this directory. The same Docker Compose configuration
+can be used to run the tests locally:
 
-## Running the program
-
-The end-to-end tests are run in GitHub actions through a Dockerfile located
-under `docker-tests` at the root of the project.
+```
+$ docker-compose up --abort-on-container-exit --exit-code-from robot
+```
 
 The tests can be ran locally by installing the following Python packages:
+
 ```
 $ pip install robotframework
 $ pip install robotframework-browser
 ```
+
 Note that using a virtual environment for pip is recommended.
 
 After that the tests can be ran by writing
+
 ```
 robot --outputdir output/ .
 ```
