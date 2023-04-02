@@ -26,10 +26,10 @@ const FormulaAttributesView = () => {
   return (
     <Box display="flex" justifyContent='center' alignItems='center' flexDirection='column'>
       <Box textAlign='left' alignItems='left'>
-        <Typography variant="h3" component="div" sx={{ flexGrow: 1, my: 4 }}>
+        <Typography variant="h1" sx={{ flexGrow: 1, my: 4 }}>
           Specify Formula Attributes
         </Typography>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1, mb: 2 }}>
+        <Typography variant="h3" sx={{ flexGrow: 1, mb: 2 }}>
           Result: Course Total Grade
         </Typography>
         <FormulaAttributesForm navigateToCourseView={navigateToCourseView} navigateBack={navigateBack}/>
