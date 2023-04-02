@@ -21,9 +21,6 @@ services:
     restart: always
     container_name: frontend-server
     tty: true
-    environment:
-      REACT_APP_BACKEND_URL: "http://backend"
-      REACT_APP_BACKEND_PORT: "3000"
     networks:
       - local
 
@@ -39,7 +36,7 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
       SISU_API_KEY: "${SISU_API_KEY}"
       SISU_API_URL: "${SISU_API_URL}"
-      AALTO_GRADES_FRONTEND_CORS_ORIGIN: "http://reverse-proxy"
+      AALTO_GRADES_FRONTEND_CORS_ORIGIN: "https://https://aalto-grades.cs.aalto.fi"
     networks:
       - local
 
