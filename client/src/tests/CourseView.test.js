@@ -73,7 +73,7 @@ describe('Tests for CourseView component', () => {
     
   });
 
-  test('CourseView should not render new instance button, see attendees or allow editing assignments for students', async () => {
+  test('CourseView should not render new instance button, see attendees or allow editing attainments for students', async () => {
 
     const auth = { role: 'STUDENT' };
     const { getByText, findByText, queryByText } = renderCourseView(auth);
@@ -107,6 +107,33 @@ describe('Tests for CourseView component', () => {
     userEvent.click(instanceRows[5]);   // click a row that isn't the first, changes teacher
     expect(await findByText('Kerttu Maaria Pollari-Malmi')).toBeInTheDocument();
     expect(firstTeacherInCharge).not.toBeInTheDocument();
+  });
+
+  test('CourseView should show a dialog for uploading a file when clicking on a menu button and choosing that option', async () => {
+
+    const auth = { role: 'TEACHER' };
+    const { getByText, findByText } = renderCourseView(auth);
+
+    const importGradesMenuButton = await findByText('Import grades');
+    expect(importGradesMenuButton).toBeDefined();
+    userEvent.click(importGradesMenuButton);
+
+    const uploadOption = getByText('Import from file');
+    expect(uploadOption).toBeDefined();
+    userEvent.click(uploadOption);
+
+    const dialogTitle = getByText('Add Grades from File');
+    const uploadFileButton = getByText('Upload file');
+    const cancelButton = getByText('Cancel');
+    const confirmButton = getByText('Confirm');
+
+    expect(dialogTitle).toBeVisible();
+    expect(uploadFileButton).toBeVisible();
+    expect(cancelButton).toBeVisible();
+    expect(confirmButton).toBeVisible();
+
+    userEvent.click(cancelButton);
+    expect(dialogTitle).not.toBeVisible();
   });
 
 });

@@ -7,16 +7,13 @@ import * as yup from 'yup';
 
 import models from '../database/models';
 import Attainable from '../database/models/attainable';
-import Course from '../database/models/course';
-import CourseInstance from '../database/models/courseInstance';
 
 import { AttainableData, AttainableRequestData } from '../types/attainable';
 import { ApiError } from '../types/error';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { findAttainableById, generateAttainableTag } from './utils/attainable';
-import { findCourseById } from './utils/course';
-import { findCourseInstanceById } from './utils/courseInstance';
+import { validateCourseAndInstance } from './utils/courseInstance';
 
 export async function addAttainable(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
@@ -38,26 +35,15 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
       .notRequired()
   });
 
+  // Get path parameters.
   const courseId: number = Number(req.params.courseId);
   const courseInstanceId: number = Number(req.params.instanceId);
+
+  // Validation.
   await idSchema.validate({ id: courseId }, { abortEarly: false });
   await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
   await requestSchema.validate(req.body, { abortEarly: false });
-
-  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
-
-  const instance: CourseInstance = await findCourseInstanceById(
-    courseInstanceId, HttpCode.NotFound
-  );
-
-  // Check that instance belongs to the course.
-  if (instance.courseId !== course.id) {
-    throw new ApiError(
-      `course instance with ID ${courseInstanceId} ` +
-      `does not belong to the course with ID ${courseId}`,
-      HttpCode.Conflict
-    );
-  }
+  await validateCourseAndInstance(courseId, courseInstanceId);
 
   const parentId: number | undefined = req.body.parentId;
   const name: string = req.body.name;
@@ -151,6 +137,37 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
   });
 }
 
+export async function deleteAttainment(req: Request, res: Response): Promise<void> {
+  /*
+   * TODO: Check that the requester is logged in, 401 Unauthorized if not
+   * TODO: Check that the requester is authorized to delete attainments, 403
+   * Forbidden if not
+   */
+
+  // Get path parameters.
+  const courseId: number = Number(req.params.courseId);
+  const courseInstanceId: number = Number(req.params.instanceId);
+  const attainmentId: number = Number(req.params.attainmentId);
+
+  // Validation.
+  await idSchema.validate({ id: courseId }, { abortEarly: false });
+  await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
+  await idSchema.validate({ id: attainmentId }, { abortEarly: false });
+  await validateCourseAndInstance(courseId, courseInstanceId);
+
+  // Find the attainment to be deleted.
+  const attainment: Attainable = await findAttainableById(attainmentId, HttpCode.NotFound);
+
+  // Delete the attainment, this automatically also deletes all of the
+  // subattainments of this attainment.
+  await attainment.destroy();
+
+  res.status(HttpCode.Ok).send({
+    success: true,
+    data: {}
+  });
+}
+
 export async function updateAttainable(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     parentId: yup
@@ -175,6 +192,7 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
   await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
   await idSchema.validate({ id: attainableId }, { abortEarly: false });
   await requestSchema.validate(req.body, { abortEarly: false });
+  await validateCourseAndInstance(courseId, courseInstanceId);
 
   const name: string | undefined = req.body.name;
   const date: Date | undefined = req.body.date;

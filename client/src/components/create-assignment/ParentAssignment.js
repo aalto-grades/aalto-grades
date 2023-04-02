@@ -32,7 +32,7 @@ const ParentAssignment = ({ indices, addSubAttainments, setAttainments, attainme
 
   /* Functions to get the formula attributes.
      formulaId specifies the formula that is used to calculate this assignmnet's garde,
-     subFormulaAttributeNames are the attributes that need to be specified for the direct sub attainments of this assignments,
+     subFormulaAttributeNames are the attributes that need to be specified for the direct sub attainments of this attainments,
      so that the grade for this attainment can be calculated. 
      Observe that formulaAttributeNames that is as a parameter for this component are the attributes that need to specified for this assignmnet,
      so that the grade of this attainment's parent attainment can be calculated.
@@ -49,7 +49,7 @@ const ParentAssignment = ({ indices, addSubAttainments, setAttainments, attainme
         alignItems: 'center',
         px: 1
       }}>
-        <Typography variant="body1" component="div" sx={{ flexGrow: 1, textAlign: 'left', mb: 0.5 }}>
+        <Typography variant="body1" sx={{ flexGrow: 1, textAlign: 'left', mb: 0.5 }}>
           {'Grading Formula: ' + formulaName}
         </Typography>
         <Button size='small' sx={{ mb: 0.5 }} onClick={ () => navigate('/select-formula') }>
@@ -71,16 +71,16 @@ const ParentAssignment = ({ indices, addSubAttainments, setAttainments, attainme
           </IconButton>
           : 
           <IconButton size='small' onClick={handleClick} sx={{ height: '32px', width: '32px', mr: 1 }}>
-            <ExpandMore sx={{ color: '#6E6E6E' }}/>
+            <ExpandMore sx={{ color: 'hoverGrey3' }}/>
           </IconButton>}
         <Box sx={{ display: 'flex', flexDirection: 'column',  width: '100%' }}>
           <Collapse in={!open} unmountOnExit >
-            <Typography variant="body2" component="div" sx={{ mt: 0.6, mb: 2, flexGrow: 1, textAlign: 'left', color: '#6E6E6E' }}>
+            <Typography variant="body2" align='left' sx={{ mt: 0.6, mb: 2, flexGrow: 1, color: 'hoverGrey3' }}>
               See sub-attainments
             </Typography>
           </Collapse>
           <Collapse in={open} timeout='auto' unmountOnExit>
-            <List component="div" disablePadding>
+            <List disablePadding>
               {assignmentServices.getSubAttainments(indices, attainments).map((item, i) => (
                 <Assignment 
                   indices={indices.concat(i)}

@@ -10,13 +10,13 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Container from '@mui/material/Container';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 
-const HoverExpandMoreIcon = styled(ExpandMoreIcon)`
-  &:hover {
-    background: #f4f4f4;
+const HoverExpandMoreIcon = styled(ExpandMoreIcon)(({ theme }) => ({
+  '&:hover': {
+    background: theme.palette.hoverGrey1
   }
-`;
+}));
 
 const ViewFormulaAccordion = ({ codeSnippet }) => {
 

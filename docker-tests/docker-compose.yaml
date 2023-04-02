@@ -22,7 +22,6 @@ services:
       POSTGRES_USER: "postgres"
       POSTGRES_DATABASE: "postgres"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      AALTO_GRADES_TEST_ENVIRONMENT: "true"
       SERVER_RUN_TESTS: 1
     networks:
       - local

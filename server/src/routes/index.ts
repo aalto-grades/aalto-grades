@@ -15,6 +15,7 @@ import { router as attainableRouter } from './attainable';
 import { router as authRouter } from './auth';
 import { router as courseRouter } from './course';
 import { router as courseInstanceRouter } from './courseInstance';
+import { router as gradesRouter } from './grades';
 import { router as sisuRouter } from './sisu';
 import { router as userRouter } from './user';
 
@@ -32,6 +33,7 @@ router.use(attainableRouter);
 router.use(authRouter);
 router.use(courseRouter);
 router.use(courseInstanceRouter);
+router.use(gradesRouter);
 router.use(sisuRouter);
 router.use(userRouter);
 

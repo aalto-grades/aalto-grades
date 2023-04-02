@@ -11,7 +11,7 @@ import { IVerifyOptions, Strategy as LocalStrategy } from 'passport-local';
 import * as yup from 'yup';
 
 import { JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS } from '../configs/constants';
-import { JWT_SECRET, TEST_ENV } from '../configs/environment';
+import { JWT_SECRET, NODE_ENV } from '../configs/environment';
 
 import { HttpCode } from '../types/httpCode';
 import User from '../database/models/user';
@@ -123,7 +123,7 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
       if (err) {
         return next(err);
       }
-      if (loginResult == false || loginResult == true) {
+      if (typeof loginResult === 'boolean') {
         return res.status(HttpCode.Unauthorized).send({
           success: false,
           errors: ['incorrect email or password']
@@ -147,7 +147,7 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
           });
           res.cookie('jwt', token, {
             httpOnly: true,
-            secure: !TEST_ENV,
+            secure: NODE_ENV === 'production',
             sameSite: 'none',
             maxAge: JWT_COOKIE_EXPIRY_MS,
           });
@@ -197,7 +197,7 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
   });
   res.cookie('jwt', token, {
     httpOnly: true,
-    secure: !TEST_ENV,
+    secure: NODE_ENV === 'production',
     sameSite: 'none',
     maxAge: JWT_COOKIE_EXPIRY_MS
   });
