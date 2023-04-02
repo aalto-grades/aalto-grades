@@ -7,7 +7,7 @@ run-name: ${{ github.actor }} pull request
 on:
   push:
     branches:
-      - main
+      - deployment-configuration
 
 env:
   REGISTRY: ghcr.io

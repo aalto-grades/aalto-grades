@@ -20,9 +20,6 @@ services:
     image: ghcr.io/aalto-grades/aalto-grades-frontend:deployment-configuration
     restart: always
     container_name: frontend-server
-    environment:
-      BACKEND_URL: "backend"
-      BACKEND_PORT: "3000"
     networks:
       - local
 

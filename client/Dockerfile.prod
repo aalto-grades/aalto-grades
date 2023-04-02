@@ -6,6 +6,8 @@ FROM node:16-alpine as build
 WORKDIR /app
 COPY . .
 RUN chown -R node:node ./
+ARG REACT_APP_BACKEND_URL="http://backend"
+ARG REACT_APP_BACKEND_PORT="3000"
 RUN npm ci
 RUN npm run build
 USER node
