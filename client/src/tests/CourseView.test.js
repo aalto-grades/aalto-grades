@@ -73,7 +73,7 @@ describe('Tests for CourseView component', () => {
     
   });
 
-  test('CourseView should not render new instance button, see attendees or allow editing assignments for students', async () => {
+  test('CourseView should not render new instance button, see attendees or allow editing attainments for students', async () => {
 
     const auth = { role: 'STUDENT' };
     const { getByText, findByText, queryByText } = renderCourseView(auth);
@@ -114,11 +114,11 @@ describe('Tests for CourseView component', () => {
     const auth = { role: 'TEACHER' };
     const { getByText, findByText } = renderCourseView(auth);
 
-    const addPointsMenuButton = await findByText('Add points');
-    expect(addPointsMenuButton).toBeDefined();
-    userEvent.click(addPointsMenuButton);
+    const importGradesMenuButton = await findByText('Import grades');
+    expect(importGradesMenuButton).toBeDefined();
+    userEvent.click(importGradesMenuButton);
 
-    const uploadOption = getByText('Upload a file');
+    const uploadOption = getByText('Import from file');
     expect(uploadOption).toBeDefined();
     userEvent.click(uploadOption);
 

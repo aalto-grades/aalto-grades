@@ -53,7 +53,8 @@ const theme = createTheme({
     },
     hoverGrey1: '#EAEAEA',
     hoverGrey2: '#F4F4F4',
-    //hoverGrey3: '#6E6E6E',
+    hoverGrey3: '#6E6E6E',
+    infoGrey: '#545454',
     contrastThreshold: 4.5
   },
   typography: {
@@ -170,7 +171,7 @@ function App() {
               <Route element={<FormulaSelectionRoute/>}>
                 <Route path='/:courseId/select-formula/:instanceId/' element={<SelectFormulaView/>}/>
                 <Route path='/:courseId/formula-attributes/:instanceId/' element={<FormulaAttributesView/>}/>
-                { /* '/:assignmentId' will be added to the paths above once they work for sub-assignments */ }
+                { /* '/:attainmentId' will be added to the paths above once they work for sub-attainments */ }
               </Route>
             </Route>
           </Routes>

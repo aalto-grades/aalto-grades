@@ -92,7 +92,7 @@ const CourseView = () => {
                 <InstanceDetails info={ { ...currentInstance, department: courseDetails.department, institution: mockInstitution } } />
               </div>
             </Grow>
-            { /* a different assignment component will be created for students */
+            { /* a different attainment component will be created for students */
               (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
               <Grow in={animation} style={{ transformOrigin: '0 0 0' }} {...(animation? { timeout: 1000 } : { timeout: 0 })}>
                 <div>

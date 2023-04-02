@@ -15,7 +15,7 @@ const Assignments = ({ attainments, formula, courseId, instance, handleAddPoints
   const navigate = useNavigate();
 
   const actionOptions = [
-    { description: 'Upload a file', handleClick: handleAddPoints }, 
+    { description: 'Import from file', handleClick: handleAddPoints }, 
     { description: 'Import from A+', handleClick: () => {} }
   ];
   
@@ -24,7 +24,7 @@ const Assignments = ({ attainments, formula, courseId, instance, handleAddPoints
       <Typography variant='h3' align='left' sx={{ ml: 1.5, mt: 0.6, mb: 1.5 }} >Study Attainments</Typography>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
         <Typography align='left' sx={{ ml: 1.5 }} >{'Grading Formula: ' + formula}</Typography>
-        <Button onClick={() => navigate(`/${courseId}/select-formula/${instance.id}`) }>Edit formula</Button>
+        <Button onClick={() => navigate(`/${courseId}/select-formula/${instance.id}`)}>Edit formula</Button>
         { /* The path above should be changes once courseId can be fetched from the path */ }
       </Box>
       <Box sx={{ display: 'inline-grid', gap: 1 }}>
@@ -36,7 +36,7 @@ const Assignments = ({ attainments, formula, courseId, instance, handleAddPoints
               key={attainment.id} 
               attainment={attainment} 
               attainmentKey={'id'}
-              button={<Button onClick={ () => navigate(`/${courseId}/edit-attainment/${instance.id}/${attainment.id}`) }>Edit</Button>} 
+              button={<Button onClick={() => navigate(`/${courseId}/edit-attainment/${instance.id}/${attainment.id}`)}>Edit</Button>} 
               width={'50vw'} 
             />
           );}
@@ -46,7 +46,7 @@ const Assignments = ({ attainments, formula, courseId, instance, handleAddPoints
         <Button onClick={() => navigate(`/${courseId}/create-attainment/${instance.id}`) }>Add attainment</Button>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}>
           <Button variant='outlined'>Calculate final grades</Button>
-          <MenuButton label='Add points' options={actionOptions} />
+          <MenuButton label='Import grades' options={actionOptions} />
         </Box>
       </Box>
     </Box>
