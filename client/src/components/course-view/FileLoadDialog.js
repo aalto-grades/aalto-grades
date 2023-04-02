@@ -35,7 +35,7 @@ const FileLoadDialog = ({ handleClose, open }) => {
   return (
     <Dialog open={open} >
       <DialogTitle >Add Grades from File</DialogTitle>
-      <DialogContent sx={{ pr: 6 }}>
+      <DialogContent sx={{ pb: 0 }}>
         <DialogContentText sx={{ mb: 3, color: 'black' }}>{instructions}</DialogContentText>
         <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', columnGap: 2, mb: 3 }}>
           <Typography variant='body2' sx={{ color: 'infoGrey' }}>
