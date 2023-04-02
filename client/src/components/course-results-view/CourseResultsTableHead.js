@@ -45,7 +45,7 @@ const CourseResultsTableHead = (props) => {
             <TableSortLabel
               active={orderBy === attainment.id}
               direction={orderBy === attainment.id ? order : 'asc'}
-              onClick={createSortHandler(attainment.id)} //HERE
+              onClick={createSortHandler(attainment.id)}
             >
               {attainment.name}
               {orderBy === attainment.id ? (
