@@ -5,13 +5,14 @@
 import { parse, Parser } from 'csv-parse';
 import { NextFunction, Request, Response } from 'express';
 import { Op, Transaction } from 'sequelize';
-import { sequelize } from '../database';
 
+import { sequelize } from '../database';
 import Attainable from '../database/models/attainable';
 import CourseInstanceRole from '../database/models/courseInstanceRole';
 import User from '../database/models/user';
 import UserAttainmentGrade from '../database/models/userAttainmentGrade';
 
+import { CourseInstanceRoleType } from '../types/course';
 import { ApiError } from '../types/error';
 import { idSchema } from '../types/general';
 import { AttainmentGrade, Grade, Student } from '../types/grades';
@@ -93,6 +94,7 @@ export function parseGrades(
   let currentRow: number = 2; // Takes into consideration header row and start index of 0.
 
   for (const row of studentGradingData) {
+    // TODO: validate with regex that valid student number?
     const studentNumber: string = row[0];
     const gradingData: Array<string> = row.slice(1);
 
@@ -185,9 +187,8 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
     })
     .on('error', next) // Stream causes uncaught exception, pass error manually to the errorHandler.
     .on('end', async function (): Promise<void> {
-
       try {
-        // Header having colum information, e.g., StudentNo,C3I9A1,C3I9A2,C3I9A3,C3I9A4,C3I9A5...
+        // Header having colum information, e.g., "StudentNo,C3I9A1,C3I9A2,C3I9A3,C3I9A4,C3I9A5..."
         const header: Array<string> = studentGradingData.shift() as Array<string>;
 
         // Parse header and grades separately. Always first parse header before
@@ -242,27 +243,46 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
           (id: string) => !foundStudents.includes(id)
         );
 
-        // TODO: check that teacher id is not listed accidentally in the CSV/students list
+        // Check that teacher id is not listed accidentally in the CSV/students list
         // to prevent accidental role change from TEACHER or TEACHER_IN_CHARGE to STUDENT.
-
-        // Check (and add if needed) that existing users have 'STUDENT' role on the instance.
-        // Note. updateOnDuplicate works as an UPSERT operation in bulkCreate.
-        await CourseInstanceRole.bulkCreate(
-          students.map((user: User) => {
-            return {
-              userId: user.id,
-              courseInstanceId,
-              role: 'STUDENT'
-            };
-          }), {
-            updateOnDuplicate: ['role']
+        const teachers: Array<CourseInstanceRole> = await CourseInstanceRole.findAll({
+          attributes: ['userId'],
+          where: {
+            userId: {
+              [Op.in]: students.map((student: User) => student.id)
+            },
+            role: {
+              [Op.in]: [CourseInstanceRoleType.Teacher, CourseInstanceRoleType.TeacherInCharge]
+            },
+            courseInstanceId
           }
-        );
+        });
 
-        // Create new users (students) and add to the course instance with role 'STUDENT'.
-        if (nonExistingStudents.length > 0) {
+        if (teachers.length > 0) {
+          throw new ApiError(
+            'Users with role "TEACHER" or "TEACHER_IN_CHARGE" found from the CSV.',
+            HttpCode.Conflict
+          );
+        }
 
-          await sequelize.transaction(async (t: Transaction) => {
+        await sequelize.transaction(async (t: Transaction) => {
+          // Check (and add if needed) that existing users have 'STUDENT' role on the instance.
+          // Note. updateOnDuplicate works as an UPSERT operation in bulkCreate.
+          await CourseInstanceRole.bulkCreate(
+            students.map((user: User) => {
+              return {
+                userId: user.id,
+                courseInstanceId,
+                role: 'STUDENT'
+              };
+            }), {
+              transaction: t,
+              updateOnDuplicate: ['role']
+            }
+          );
+
+          // Create new users (students) and add to the course instance with role 'STUDENT'.
+          if (nonExistingStudents.length > 0) {
             const newUsers: Array<User> = await User.bulkCreate(
               nonExistingStudents.map((studentNo: string) => {
                 return {
@@ -280,29 +300,27 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
                 };
               }), { transaction: t }
             );
-
             students = students.concat(newUsers);
-          });
-        }
+          }
+        });
 
-        // After this point all students are confirmed to exist and belong to the instance.
+        // After this point all students confirmed to exist and belong to the instance as STUDENTs.
 
         // Input users db id to the parsedStudentData based on student number.
         const studentsWithId: Array<Student> = parsedStudentData.map(
           (student: Student): Student => {
-
-            const matchingUser: User | undefined = students.find(
+            const matchingUser: User = students.find(
               (user: User) => user.dataValues.studentId === student.studentNumber
-            );
+            ) as User;
 
             return {
               ...student,
-              id: matchingUser?.id as number
+              id: matchingUser.id
             };
           });
 
-        // Use studentsWithId to update attainables by flatmapping each students
-        // grades into a one array of all the grades.
+        // Use studentsWithId to update attainables by flatmapping each
+        // students grades into a one array of all the grades.
         const preparedBulkCreate: Array<AttainmentGrade> = studentsWithId.flatMap(
           (student: Student): Array<AttainmentGrade> => {
             const studentGradingData: Array<AttainmentGrade> = student.grades.map(
@@ -316,14 +334,10 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
             return studentGradingData;
           });
 
-        await UserAttainmentGrade.bulkCreate(
-          preparedBulkCreate,
-          {
-            updateOnDuplicate: ['points']
-          }
-        );
+        await UserAttainmentGrade.bulkCreate(preparedBulkCreate, { updateOnDuplicate: ['points'] });
 
-        // After this point all students attainemnt grades are created or updated in the database.
+        // After this point all students attainemnt grades are created or updated
+        // in the database for each students.
 
         res.status(HttpCode.Ok).json({
           success: true,
