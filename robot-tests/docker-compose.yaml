@@ -1,0 +1,51 @@
+# SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+
+# This is a Docker Compose configuration for executing Robot end-to-end tests
+
+version: "3.7"
+
+services:
+  frontend:
+    extends:
+      file: ../common-services.yaml
+      service: frontend
+    container_name: frontend-server-robot
+    environment:
+      REACT_APP_BACKEND_URL: "http://backend"
+      REACT_APP_BACKEND_PORT: "3000"
+
+  backend:
+    extends:
+      file: ../common-services.yaml
+      service: backend
+    container_name: backend-server-robot
+    environment:
+      AALTO_GRADES_FRONTEND_CORS_ORIGIN: "http://frontend:3005"
+
+  database:
+    extends:
+      file: ../common-services.yaml
+      service: database
+
+  robot:
+    image: marketsquare/robotframework-browser:latest
+    environment:
+      LOCALHOST_URL: "http://frontend:3005"
+    volumes:
+      - .:/test
+    entrypoint: ["./test/wait-for-frontend.sh", "robot", "--outputdir", "test/output", "test"]
+    depends_on:
+      - backend
+      - frontend
+    user: pwuser
+    ipc: host
+    security_opt:
+      - seccomp=seccomp_profile.json
+    networks:
+      - local
+
+networks:
+  local:
+    driver: bridge
