@@ -65,7 +65,7 @@ export function parseHeader(header: Array<string>): Array<number> {
     } else {
       errors.push(
         // eslint-disable-next-line max-len
-        `Header attainment data parsing failed at column ${attainmentData.indexOf(str) + 2}. Use format C{courseId}I{courseInstanceId}A{attainmentId}.`
+        `Header attainment data parsing failed at column ${attainmentData.indexOf(str) + 2}. Received ${str}, expected format C{courseId}I{courseInstanceId}A{attainmentId}.`
       );
     }
   });
@@ -260,7 +260,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
         if (teachers.length > 0) {
           throw new ApiError(
-            'Users with role "TEACHER" or "TEACHER_IN_CHARGE" found from the CSV.',
+            'User(s) with role "TEACHER" or "TEACHER_IN_CHARGE" found from the CSV.',
             HttpCode.Conflict
           );
         }
