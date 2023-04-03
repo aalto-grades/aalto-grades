@@ -6,17 +6,19 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 import textFormatServices from '../../services/textFormat';
 import sortingServices from '../../services/sorting';
 
-const HoverBox = styled(Box)`
-  &:hover,
-  &:focus {
-    background: #f4f4f4;
+const HoverBox = styled(Box)(({ theme }) => ({
+  '&:hover': {
+    background: theme.palette.hoverGrey2
+  },
+  '&:focus': {
+    background: theme.palette.hoverGrey2
   }
-`;
+}));
 
 const InstanceBox = ({ courseId, instance }) => {
   let navigate = useNavigate();

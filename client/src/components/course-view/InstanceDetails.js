@@ -18,7 +18,7 @@ const InstanceDetails = ({ info }) => {
   return(
     <Box sx={{ display: 'inline-block', pt: 1.5 }}>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', columnGap: 4, pb: 1 }}>
-        <Typography variant='h6' align='left' sx={{ ml: 1.5 }} >Instance Details</Typography>
+        <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >Instance Details</Typography>
         { /* Only admins, teachers and assistants are allowed to see attendees*/
           (auth.role == 'SYSADMIN' || auth.role == 'TEACHER'|| auth.role == 'ASSISTANT') && 
           <Button>See attendees</Button>
@@ -37,7 +37,7 @@ const InstanceDetails = ({ info }) => {
         <LightLabelBoldValue label='Educational Institution' value={institution} />
       </Box>
       <Box sx={{ m: 1.5 }}>
-        <Typography variant='h6' align='left' sx={{ pt: 1.5, pb: 1 }}>Teachers in Charge</Typography>
+        <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>Teachers in Charge</Typography>
         {teachersInCharge.map( (teacher) => <Typography align='left' key={teacher} >{teacher}</Typography> )}
       </Box>
     </Box>

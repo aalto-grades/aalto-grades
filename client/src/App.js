@@ -32,6 +32,7 @@ import useLogout from './hooks/useLogout';
 
 const theme = createTheme({
   palette: {
+    black: '#000000',
     primary: {
       light: '#EFF3FB',
       main: '#3D5AFE',
@@ -50,8 +51,54 @@ const theme = createTheme({
       dark: '#C56000',
       contrastText: '#000',
     },
+    hoverGrey1: '#EAEAEA',
+    hoverGrey2: '#F4F4F4',
+    hoverGrey3: '#6E6E6E',
+    infoGrey: '#545454',
     contrastThreshold: 4.5
   },
+  typography: {
+    h1: {
+      fontSize: '48px',
+      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+      fontWeight: '400'
+    },
+    h2: {
+      fontSize: '34px',
+      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+      fontWeight: '400'
+    },
+    h3: {
+      fontSize: '20px',
+      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+      fontWeight: '400'
+    },
+    body1: {
+      fontSize: '16px',
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      fontWeight: '400'
+    },
+    body2: {
+      fontSize: '14px',
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      fontWeight: '400'
+    },
+    textInput: {
+      fontSize: '16px',
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      fontWeight: '400'
+    },
+    button: {
+      fontSize: '14px',
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      fontWeight: '500'
+    },
+    caption: {
+      fontSize: '12px',
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      fontWeight: '400'
+    },
+  }
 });
 
 const AppContainer = styled(Container)`
@@ -124,7 +171,7 @@ function App() {
               <Route element={<FormulaSelectionRoute/>}>
                 <Route path='/:courseId/select-formula/:instanceId/' element={<SelectFormulaView/>}/>
                 <Route path='/:courseId/formula-attributes/:instanceId/' element={<FormulaAttributesView/>}/>
-                { /* '/:assignmentId' will be added to the paths above once they work for sub-assignments */ }
+                { /* '/:attainmentId' will be added to the paths above once they work for sub-attainments */ }
               </Route>
             </Route>
           </Routes>
