@@ -24,12 +24,26 @@ function checkErrorRes(errorMessages: Array<string>, errorCode: HttpCode): void 
 
 describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () => {
 
-  it('should process CSV succesfully when course and course instance exist', async () => {
+  it('should process CSV succesfully when course, course instance and users exist', async () => {
     const csvData: fs.ReadStream = fs.createReadStream(
       path.resolve(__dirname, '../mockData/csv/grades.csv'), 'utf8'
     );
     res = await request
       .post('/v1/courses/1/instances/1/grades/csv')
+      .attach('csv_data', csvData, { contentType: 'text/csv'});
+
+    expect(res.body.success).toBe(true);
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data).toBeDefined();
+    expect(res.statusCode).toBe(HttpCode.Ok);
+  });
+
+  it('should process big CSV succesfully (1100 x 178 = 195 800 individual attainment grades)', async () => {
+    const csvData: fs.ReadStream = fs.createReadStream(
+      path.resolve(__dirname, '../mockData/csv/grades_big.csv'), 'utf8'
+    );
+    res = await request
+      .post('/v1/courses/6/instances/9/grades/csv')
       .attach('csv_data', csvData, { contentType: 'text/csv'});
 
     expect(res.body.success).toBe(true);
@@ -65,7 +79,6 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
         .post('/v1/courses/1/instances/1/grades/csv')
         .attach('csv_data', invalidCsvData, { contentType: 'text/csv'});
 
-      console.log(res.body);
       const expectedErrors: Array<string> = [
         'CSV file row 3 column 5 expected number, received "7r"',
         'CSV file row 5 column 2 expected number, received "xx"',

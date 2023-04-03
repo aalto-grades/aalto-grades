@@ -306,7 +306,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
         // After this point all students confirmed to exist and belong to the instance as STUDENTs.
 
-        // Input users db id to the parsedStudentData based on student number.
+        // Add users db id to the parsedStudentData based on student number.
         const studentsWithId: Array<Student> = parsedStudentData.map(
           (student: Student): Student => {
             const matchingUser: User = students.find(
@@ -337,7 +337,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         await UserAttainmentGrade.bulkCreate(preparedBulkCreate, { updateOnDuplicate: ['points'] });
 
         // After this point all students attainemnt grades are created or updated
-        // in the database for each students.
+        // in the database for each student.
 
         res.status(HttpCode.Ok).json({
           success: true,

@@ -14,6 +14,25 @@ const mockedAxios: jest.Mocked<AxiosStatic> = axios as jest.Mocked<typeof axios>
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function checkRes(courseInstance: any): void {
+  expect(courseInstance.id).toBeDefined();
+  expect(courseInstance.sisuCourseInstanceId).toBe(sisuInstance.id);
+  expect(courseInstance.startingPeriod).toBeDefined();
+  expect(courseInstance.endingPeriod).toBeDefined();
+  expect(courseInstance.minCredits).toBeDefined();
+  expect(courseInstance.maxCredits).toBeDefined();
+  expect(courseInstance.startDate).toBeDefined();
+  expect(courseInstance.endDate).toBeDefined();
+  expect(courseInstance.type).toBeDefined();
+  expect(courseInstance.gradingScale).toBeDefined();
+  expect(courseInstance.teachersInCharge).toBeDefined();
+  expect(courseInstance.courseData.courseCode).toBeDefined();
+  expect(courseInstance.courseData.department).toBeDefined();
+  expect(courseInstance.courseData.name).toBeDefined();
+  expect(courseInstance.courseData.evaluationInformation).toBeDefined();
+}
+
 describe('Test GET /v1/sisu/instances/:sisuCourseInstanceId', () => {
 
   it('should respond with correct data when instance exists', async () => {
@@ -24,21 +43,7 @@ describe('Test GET /v1/sisu/instances/:sisuCourseInstanceId', () => {
     expect(res.body.success).toBe(true);
     expect(res.body.data.courseInstance).toBeDefined();
     expect(res.body.errors).not.toBeDefined();
-    expect(res.body.data.courseInstance.id).toBeDefined();
-    expect(res.body.data.courseInstance.sisuCourseInstanceId).toBe(sisuInstance.id);
-    expect(res.body.data.courseInstance.startingPeriod).toBeDefined();
-    expect(res.body.data.courseInstance.endingPeriod).toBeDefined();
-    expect(res.body.data.courseInstance.minCredits).toBeDefined();
-    expect(res.body.data.courseInstance.maxCredits).toBeDefined();
-    expect(res.body.data.courseInstance.startDate).toBeDefined();
-    expect(res.body.data.courseInstance.endDate).toBeDefined();
-    expect(res.body.data.courseInstance.type).toBeDefined();
-    expect(res.body.data.courseInstance.gradingScale).toBeDefined();
-    expect(res.body.data.courseInstance.teachersInCharge).toBeDefined();
-    expect(res.body.data.courseInstance.courseData.courseCode).toBeDefined();
-    expect(res.body.data.courseInstance.courseData.department).toBeDefined();
-    expect(res.body.data.courseInstance.courseData.name).toBeDefined();
-    expect(res.body.data.courseInstance.courseData.evaluationInformation).toBeDefined();
+    checkRes(res.body.data.courseInstance);
     expect(res.status).toEqual(HttpCode.Ok);
   });
 
@@ -66,21 +71,8 @@ describe('Test GET /v1/sisu/courses/:courseCode', () => {
     expect(res.body.data.courseInstances).toBeDefined();
     expect(res.body.errors).not.toBeDefined();
     expect(res.body.data.courseInstances.length).toBe(5);
-    expect(res.body.data.courseInstances[0].id).toBeDefined();
-    expect(res.body.data.courseInstances[0].sisuCourseInstanceId).toBe(sisuInstance.id);
-    expect(res.body.data.courseInstances[0].courseData.courseCode).toBeDefined();
-    expect(res.body.data.courseInstances[0].minCredits).toBeDefined();
-    expect(res.body.data.courseInstances[0].maxCredits).toBeDefined();
-    expect(res.body.data.courseInstances[0].courseData.department).toBeDefined();
-    expect(res.body.data.courseInstances[0].courseData.name).toBeDefined();
-    expect(res.body.data.courseInstances[0].courseData.evaluationInformation).toBeDefined();
-    expect(res.body.data.courseInstances[0].startingPeriod).toBeDefined();
-    expect(res.body.data.courseInstances[0].endingPeriod).toBeDefined();
-    expect(res.body.data.courseInstances[0].startDate).toBeDefined();
-    expect(res.body.data.courseInstances[0].endDate).toBeDefined();
-    expect(res.body.data.courseInstances[0].type).toBeDefined();
-    expect(res.body.data.courseInstances[0].gradingScale).toBeDefined();
-    expect(res.body.data.courseInstances[0].teachersInCharge).toBeDefined();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    res.body.data.courseInstances.forEach((courseInstance: any) => checkRes(courseInstance));
     expect(res.status).toEqual(HttpCode.Ok);
   });
 
