@@ -44,7 +44,7 @@ export function parseHeader(header: Array<string>): Array<number> {
     );
   }
 
-  // Remove first input "StudentNo" by slicing. Avoid shifting, will have side-effects later on.
+  // Remove first input "StudentNo". Avoid using shift(), will have side-effects outside function.
   const attainmentData: Array<string> = header.slice(1);
 
   if (attainmentData.length === 0) {
@@ -55,10 +55,10 @@ export function parseHeader(header: Array<string>): Array<number> {
   }
 
   // Regex for checking attainment matches the desired format e.g., C1I1A1.
-  const regex: RegExp = /C\d+I\d+A(\d+)\b/;
+  const attainmentTagRegex: RegExp = /C\d+I\d+A(\d+)\b/;
 
   attainmentData.forEach((str: string) => {
-    const match: RegExpMatchArray | null = str.match(regex);
+    const match: RegExpMatchArray | null = str.match(attainmentTagRegex);
     if (match && match[1]) {
       attainmentIds.push(parseInt(match[1], 10));
     } else {
@@ -69,6 +69,7 @@ export function parseHeader(header: Array<string>): Array<number> {
     }
   });
 
+  // If any column parsing fails, throw error with invalid column info.
   if (errors.length > 0) {
     throw new ApiError('', HttpCode.BadRequest, errors);
   }
@@ -89,7 +90,7 @@ export function parseGrades(
 ): Array<Student> {
   const students: Array<Student> = [];
   const errors: Array<string> = [];
-  let currentRow: number = 2;
+  let currentRow: number = 2; // Takes into consideration header row and start index of 0.
 
   for (const row of studentGradingData) {
     const studentNumber: string = row[0];
@@ -108,6 +109,7 @@ export function parseGrades(
 
       if (isNaN(Number(gradingData[i]))) {
         errors.push(
+          // Columm is i + 2 because first one is student numbers, starting index = 0.
           `CSV file row ${currentRow} column ${i + 2} expected number, received "${gradingData[i]}"`
         );
       } else {
@@ -122,6 +124,7 @@ export function parseGrades(
     students.push(student);
   }
 
+  // If any row parsing fails, throw error with invalid row info.
   if (errors.length > 0) {
     throw new ApiError('', HttpCode.BadRequest, errors);
   }
@@ -182,13 +185,6 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
     })
     .on('error', next) // Stream causes uncaught exception, pass error manually to the errorHandler.
     .on('end', async function (): Promise<void> {
-
-      /**
-       * TODO:
-       * - Check students exists in the database, create new entries if needed.
-       * - Check attainments exists in the database.
-       * - Add the grading data to the database.
-       */
 
       try {
         // Header having colum information, e.g., StudentNo,C3I9A1,C3I9A2,C3I9A3,C3I9A4,C3I9A5...
