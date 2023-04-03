@@ -180,10 +180,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         studentGradingData.push(row);
       }
     })
-    .on('error', function (err: unknown): void {
-      // Pass the error manually to the error handler, controllerDispatcher will not catch here.
-      next(err);
-    })
+    .on('error', next) // Stream causes uncaught exception, pass error manually to the errorHandler.
     .on('end', async function (): Promise<void> {
 
       /**
