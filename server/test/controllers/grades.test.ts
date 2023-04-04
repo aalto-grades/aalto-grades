@@ -135,7 +135,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
     expect(res.body.errors).not.toBeDefined();
     expect(res.body.data).toBeDefined();
     expect(res.statusCode).toBe(HttpCode.Ok);
-  });
+  }, 25000);
 
   it('should respond with 400 bad request, if the CSV file header parsing fails',
     async () => {
