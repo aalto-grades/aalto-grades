@@ -5,7 +5,12 @@
 
 import * as fs from 'fs';
 import path from 'path';
+import { Op } from 'sequelize';
 import supertest from 'supertest';
+
+import CourseInstanceRole from '../../src/database/models/courseInstanceRole';
+import User from '../../src/database/models/user';
+import UserAttainmentGrade from '../../src/database/models/userAttainmentGrade';
 
 import { app } from '../../src/app';
 import { HttpCode } from '../../src/types/httpCode';
@@ -32,6 +37,86 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
       .post('/v1/courses/1/instances/1/grades/csv')
       .attach('csv_data', csvData, { contentType: 'text/csv'});
 
+    expect(res.body.success).toBe(true);
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data).toBeDefined();
+    expect(res.statusCode).toBe(HttpCode.Ok);
+  });
+
+  it('should create and add users to the course with role STUDENT when user does not exist in the db', async () => {
+    let users: Array<User> = await User.findAll({
+      where: {
+        studentId: {
+          [Op.in]: ['987654', '998877']
+        }
+      }
+    });
+
+    expect(users.length).toBe(0);
+    const csvData: fs.ReadStream = fs.createReadStream(
+      path.resolve(__dirname, '../mockData/csv/grades_non-existing_students.csv'), 'utf8'
+    );
+    res = await request
+      .post('/v1/courses/1/instances/1/grades/csv')
+      .attach('csv_data', csvData, { contentType: 'text/csv'});
+
+    users = await User.findAll({
+      where: {
+        studentId: {
+          [Op.in]: ['987654', '998877']
+        }
+      }
+    });
+
+    const roles: Array<CourseInstanceRole> = await CourseInstanceRole.findAll({
+      where: {
+        userId: {
+          [Op.in]: users.map((user: User) => user.id)
+        },
+        courseInstanceId: 1,
+        role: 'STUDENT'
+      }
+    });
+
+    expect(users.length).toBe(2);
+    expect(roles.length).toBe(2);
+    expect(res.body.success).toBe(true);
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data).toBeDefined();
+    expect(res.statusCode).toBe(HttpCode.Ok);
+  });
+
+  it('should update attainment grade if user grading data already exist in the db', async () => {
+    const user: User = await User.findOne({
+      where: {
+        studentId: '662292'
+      }
+    }) as User;
+
+    let userAttainment: UserAttainmentGrade = await UserAttainmentGrade.findOne({
+      where: {
+        userId: user.id,
+        attainableId: 1
+      }
+    }) as UserAttainmentGrade;
+
+    expect(userAttainment.points).toBe(6);
+
+    const csvData: fs.ReadStream = fs.createReadStream(
+      path.resolve(__dirname, '../mockData/csv/grades_updated.csv'), 'utf8'
+    );
+    res = await request
+      .post('/v1/courses/1/instances/1/grades/csv')
+      .attach('csv_data', csvData, { contentType: 'text/csv'});
+
+    userAttainment = await UserAttainmentGrade.findOne({
+      where: {
+        userId: user.id,
+        attainableId: 1
+      }
+    }) as UserAttainmentGrade;
+
+    expect(userAttainment.points).toBe(16);
     expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
     expect(res.body.data).toBeDefined();

@@ -98,10 +98,6 @@ export function parseGrades(
     const studentNumber: string = row[0];
     const gradingData: Array<string> = row.slice(1);
 
-    if (row.length === 0) {
-      continue;
-    }
-
     const student: Student = {
       studentNumber,
       grades: [],
