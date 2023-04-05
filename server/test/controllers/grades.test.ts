@@ -137,6 +137,18 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
     expect(res.statusCode).toBe(HttpCode.Ok);
   }, 25000);
 
+  it('should respond with 400 bad request, if the CSV file has only student numbers and no grading data',
+    async () => {
+      const invalidCsvData: fs.ReadStream = fs.createReadStream(
+        path.resolve(__dirname, '../mockData/csv/grades_only_student_numbers.csv'), 'utf8'
+      );
+      res = await request
+        .post('/v1/courses/1/instances/1/grades/csv')
+        .attach('csv_data', invalidCsvData, { contentType: 'text/csv'});
+
+      checkErrorRes(['No attainments found from the header, please upload valid CSV.'], HttpCode.BadRequest);
+    });
+
   it('should respond with 400 bad request, if the CSV file header parsing fails',
     async () => {
       const invalidCsvData: fs.ReadStream = fs.createReadStream(

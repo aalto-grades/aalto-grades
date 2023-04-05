@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 // SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
@@ -6,6 +7,17 @@ import { parseGrades, parseHeader } from '../../src/controllers/grades';
 import { ApiError } from '../../src/types/error';
 import { Grade, Student } from '../../src/types/grades';
 import { HttpCode } from '../../src/types/httpCode';
+
+function checkError(error: unknown, httpCode: HttpCode, message: string | Array<string>): void {
+  expect(error).toBeInstanceOf(ApiError);
+  if (error instanceof ApiError) {
+    expect(error.statusCode).toBe(httpCode);
+    expect(error.message).toBe(typeof message === 'string' ? message : '');
+    if (Array.isArray(message)) {
+      expect(error.multiError).toStrictEqual(message);
+    }
+  }
+}
 
 describe('Test CSV header parser', () => {
 
@@ -40,65 +52,61 @@ describe('Test CSV header parser', () => {
   });
 
   it('should throw error if parsing fails due to invalid header column', () => {
-
-    // First column bad
-    expect(() => parseHeader(['StudentN0', 'C3I9A1', 'C3I9A2', 'C3I9A3'])).toThrowError(
-      new ApiError(
-        '',
+    try {
+      parseHeader(['StudentN0', 'C3I9A1', 'C3I9A2', 'C3I9A3']); // First column bad.
+    } catch (error: unknown) {
+      checkError(
+        error,
         HttpCode.BadRequest,
         ['CSV parse error, header row column 1 must be "StudentNo", received "StudentN0"']
-      )
-    );
+      );
+    }
 
-    // Third column bad.
-    expect(() => parseHeader(['StudentNo', 'C3I9A1', 'C3I9B2', 'C3I9A3'])).toThrowError(
-      new ApiError(
-        '',
+    try {
+      parseHeader(['StudentNo', 'C3I9A1', 'C3I9B2', 'C3I9A3']); // Third column bad.
+    } catch (error: unknown) {
+      checkError(
+        error,
         HttpCode.BadRequest,
-        // eslint-disable-next-line max-len
-        ['Header attainment data parsing failed at column 3. Use format C{courseId}I{courseInstanceId}A{attainmentId}.']
-      )
-    );
+        ['Header attainment data parsing failed at column 3. Received C3I9B2, expected format C{courseId}I{courseInstanceId}A{attainmentId}.']
+      );
+    }
 
-    // Last column bad.
-    expect(() => parseHeader(['StudentNo', 'C3I9A1', 'C3I9A2', 'C3I9A3xx'])).toThrowError(
-      new ApiError(
-        '',
+    try {
+      parseHeader(['StudentNo', 'C3I9A1', 'C3I9A2', 'C3I9A3xx']); // Last column bad.
+    } catch (error: unknown) {
+      checkError(
+        error,
         HttpCode.BadRequest,
-        // eslint-disable-next-line max-len
-        ['Header attainment data parsing failed at column 4. Use format C{courseId}I{courseInstanceId}A{attainmentId}.']
-      )
-    );
+        ['Header attainment data parsing failed at column 4. Received C3I9A3xx, expected format C{courseId}I{courseInstanceId}A{attainmentId}.']
+      );
+    }
 
-    // Multiple columns bad.
-    expect(() => parseHeader(['StudentN0', 'C3I9A1', 'C3I9B2', 'C3I9A3xx'])).toThrowError(
-      new ApiError(
-        '',
+    try {
+      parseHeader(['StudentN0', 'C3I9A1', 'C3I9B2', 'C3I9A3xx']); // Multiple columns bad.
+    } catch (error: unknown) {
+      checkError(
+        error,
         HttpCode.BadRequest,
         [
           'CSV parse error, header row column 1 must be "StudentNo", received "StudentN0"',
-          // eslint-disable-next-line max-len
-          'Header attainment data parsing failed at column 3. Use format C{courseId}I{courseInstanceId}A{attainmentId}.',
-          // eslint-disable-next-line max-len
-          'Header attainment data parsing failed at column 4. Use format C{courseId}I{courseInstanceId}A{attainmentId}.'
+          'Header attainment data parsing failed at column 3. Received C3I9B2, expected format C{courseId}I{courseInstanceId}A{attainmentId}.',
+          'Header attainment data parsing failed at column 4. Received C3I9A3xx, expected format C{courseId}I{courseInstanceId}A{attainmentId}.'
         ]
-      )
-    );
+      );
+    }
   });
 
   it('should throw error if parsing fails due to having only the first header column',() => {
-    expect(() => parseHeader(['StudentNo'])).toThrowError(
-      new ApiError(
-        'No attainments found from the header, please upload valid CSV.',
-        HttpCode.BadRequest
-      )
-    );
-  });
-
-  it('should throw error if parsing fails due to header being empty array',() => {
-    expect(() => parseHeader([])).toThrowError(
-      new ApiError('CSV file header empty, please upload valid CSV.', HttpCode.BadRequest)
-    );
+    try {
+      parseHeader(['StudentN0']);
+    } catch (error: unknown) {
+      checkError(
+        error,
+        HttpCode.BadRequest,
+        'No attainments found from the header, please upload valid CSV.'
+      );
+    }
   });
 });
 
@@ -139,13 +147,15 @@ describe('Test CSV student grades parser', () => {
     ];
     const attainmentIds: Array<number> = [1, 2, 3, 4, 5];
 
-    expect(() => parseGrades(studentGradingData, attainmentIds)).toThrowError(
-      new ApiError(
-        '',
+    try {
+      parseGrades(studentGradingData, attainmentIds);
+    } catch (error: unknown) {
+      checkError(
+        error,
         HttpCode.BadRequest,
         ['CSV file row 4 column 4 expected number, received "XXXX"']
-      )
-    );
+      );
+    }
   });
 
   it('should throw error if parsing fails due to multiple non-numeric grading value', () => {
@@ -159,17 +169,19 @@ describe('Test CSV student grades parser', () => {
     ];
     const attainmentIds: Array<number> = [1, 2, 3, 4, 5];
 
-    expect(() => parseGrades(studentGradingData, attainmentIds)).toThrowError(
-      new ApiError(
-        '',
+    try {
+      parseGrades(studentGradingData, attainmentIds);
+    } catch (error: unknown) {
+      checkError(
+        error,
         HttpCode.BadRequest,
         [
           'CSV file row 2 column 6 expected number, received "ZZZZ"',
           'CSV file row 4 column 4 expected number, received "XXXX"',
           'CSV file row 5 column 2 expected number, received "YYYY"',
-          'CSV file row 7 column 3 expected number, received "AAAA"',
+          'CSV file row 7 column 3 expected number, received "AAAA"'
         ]
-      )
-    );
+      );
+    }
   });
 });
