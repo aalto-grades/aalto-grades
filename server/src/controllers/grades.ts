@@ -31,13 +31,6 @@ export function parseHeader(header: Array<string>): Array<number> {
   const attainmentIds: Array<number> = [];
   const errors: Array<string> = [];
 
-  if (header.length === 0) {
-    throw new ApiError(
-      'CSV file header empty, please upload valid CSV.',
-      HttpCode.UnprocessableEntity
-    );
-  }
-
   // Check that first column matches requirements.
   if (header[0].toLocaleLowerCase() !== 'studentno') {
     errors.push(
@@ -48,15 +41,15 @@ export function parseHeader(header: Array<string>): Array<number> {
   // Remove first input "StudentNo". Avoid using shift(), will have side-effects outside function.
   const attainmentData: Array<string> = header.slice(1);
 
+  // Regex for checking attainment matches the desired format e.g., C1I1A1.
+  const attainmentTagRegex: RegExp = /C\d+I\d+A(\d+)\b/;
+
   if (attainmentData.length === 0) {
     throw new ApiError(
       'No attainments found from the header, please upload valid CSV.',
-      HttpCode.UnprocessableEntity
+      HttpCode.BadRequest
     );
   }
-
-  // Regex for checking attainment matches the desired format e.g., C1I1A1.
-  const attainmentTagRegex: RegExp = /C\d+I\d+A(\d+)\b/;
 
   attainmentData.forEach((str: string) => {
     const match: RegExpMatchArray | null = str.match(attainmentTagRegex);
@@ -190,7 +183,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         // Parse header and grades separately. Always first parse header before
         // parsing the grades as the grade parser needs the attainment id array.
         const attainmentIds: Array<number> = parseHeader(header);
-        const parsedStudentData: Array<Student> = parseGrades(studentGradingData, attainmentIds);
+        let parsedStudentData: Array<Student> = parseGrades(studentGradingData, attainmentIds);
 
         // Fetch all attainments from db based on the id's extracted from the CSV.
         const attainments: Array<Attainable> = await Attainable.findAll({
@@ -303,7 +296,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         // After this point all students confirmed to exist and belong to the instance as STUDENTs.
 
         // Add users db id to the parsedStudentData based on student number.
-        const studentsWithId: Array<Student> = parsedStudentData.map(
+        parsedStudentData = parsedStudentData.map(
           (student: Student): Student => {
             const matchingUser: User = students.find(
               (user: User) => user.dataValues.studentId === student.studentNumber
@@ -317,7 +310,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
         // Use studentsWithId to update attainables by flatmapping each
         // students grades into a one array of all the grades.
-        const preparedBulkCreate: Array<AttainmentGrade> = studentsWithId.flatMap(
+        const preparedBulkCreate: Array<AttainmentGrade> = parsedStudentData.flatMap(
           (student: Student): Array<AttainmentGrade> => {
             const studentGradingData: Array<AttainmentGrade> = student.grades.map(
               (grade: Grade): AttainmentGrade => {
@@ -330,6 +323,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
             return studentGradingData;
           });
 
+        // TODO: check grading points are not higher than max points of the attainment?
         await UserAttainmentGrade.bulkCreate(preparedBulkCreate, { updateOnDuplicate: ['points'] });
 
         // After this point all students attainemnt grades are created or updated
