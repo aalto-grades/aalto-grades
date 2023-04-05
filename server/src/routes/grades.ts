@@ -84,13 +84,15 @@ const upload: Multer = multer({
  *         description: >
  *           Course instance does not belong to the course or
  *           study attainment does not belong to the course instance.
+ *           User with course role 'TEACHER' or 'TEACHER_IN_CHARGE' listed in the gdaring data.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       422:
  *         description: >
- *           At least one of the attainments listed in the CSV file was not found with the given ID.
+ *           At least one of the attainments listed in the CSV file was not found with the given ID
+ *           or does not belong to the course instance.
  *         content:
  *           application/json:
  *             schema:

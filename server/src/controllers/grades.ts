@@ -136,8 +136,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
    * TODO:
    * - Check that the requester is logged in, 401 Unauthorized if not.
    * - Check that the requester is authorized to add grades, 403 Forbidden if not.
-   * - Validate csv fields, csv has to match predetermined format, 400 Bad request.
-   * - Validate attainments belong to the course instance, 409 Conflict.
+   * - Check grading points are not higher than max points of the attainment.
    */
 
   // Get path parameters.
@@ -323,7 +322,6 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
             return studentGradingData;
           });
 
-        // TODO: check grading points are not higher than max points of the attainment?
         await UserAttainmentGrade.bulkCreate(preparedBulkCreate, { updateOnDuplicate: ['points'] });
 
         // After this point all students attainemnt grades are created or updated
