@@ -322,6 +322,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
             return studentGradingData;
           });
 
+        // TODO: Optimize if datasets are big.
         await UserAttainmentGrade.bulkCreate(preparedBulkCreate, { updateOnDuplicate: ['points'] });
 
         // After this point all students attainemnt grades are created or updated
