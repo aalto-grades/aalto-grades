@@ -18,12 +18,12 @@ import Assignment from './Assignment';
 import assignmentServices from '../../services/assignments';
 import formulasService from '../../services/formulas';
 
-// An Assignmnet component with subassignments and a formula
+// An Assignmnet component with subAttainments and a formula
 
-const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignments, removeAssignment, formulaAttributeNames }) => {
+const ParentAssignment = ({ indices, addSubAttainments, setAttainments, attainments, removeAttainment, formulaAttributeNames, temporaryId, setIncrementId }) => {
   let navigate = useNavigate();
 
-  // Functions and varibales for opening and closing the list of sub-assignments
+  // Functions and varibales for opening and closing the list of sub-attainments
   const [open, setOpen] = useState(true);
 
   const handleClick = () => {
@@ -32,12 +32,12 @@ const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignme
 
   /* Functions to get the formula attributes.
      formulaId specifies the formula that is used to calculate this assignmnet's garde,
-     subFormulaAttributeNames are the attributes that need to be specified for the direct sub assignments of this assignments,
-     so that the grade for this assignment can be calculated. 
+     subFormulaAttributeNames are the attributes that need to be specified for the direct sub attainments of this attainments,
+     so that the grade for this attainment can be calculated. 
      Observe that formulaAttributeNames that is as a parameter for this component are the attributes that need to specified for this assignmnet,
-     so that the grade of this assignment's parent assignment can be calculated.
+     so that the grade of this attainment's parent attainment can be calculated.
   */
-  const formulaId = assignmentServices.getProperty(indices, assignments, 'formulaId');
+  const formulaId = assignmentServices.getProperty(indices, attainments, 'formulaId');
   const formulaName = formulasService.getFormulaName(formulaId);
   const subFormulaAttributeNames = formulasService.getFormulaAttributes(formulaId);
 
@@ -49,7 +49,7 @@ const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignme
         alignItems: 'center',
         px: 1
       }}>
-        <Typography variant="body1" component="div" sx={{ flexGrow: 1, textAlign: 'left', mb: 0.5 }}>
+        <Typography variant="body1" sx={{ flexGrow: 1, textAlign: 'left', mb: 0.5 }}>
           {'Grading Formula: ' + formulaName}
         </Typography>
         <Button size='small' sx={{ mb: 0.5 }} onClick={ () => navigate('/select-formula') }>
@@ -58,10 +58,10 @@ const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignme
       </Box>
       <LeafAssignment
         indices={indices}
-        addSubAssignments={addSubAssignments}
-        assignments={assignments} 
-        setAssignments={setAssignments} 
-        removeAssignment={removeAssignment}
+        addSubAttainments={addSubAttainments}
+        attainments={attainments} 
+        setAttainments={setAttainments} 
+        removeAttainment={removeAttainment}
         formulaAttributeNames={formulaAttributeNames}
       />
       <Box sx={{ display: 'flex', flexDirection: 'row' }}>
@@ -71,24 +71,26 @@ const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignme
           </IconButton>
           : 
           <IconButton size='small' onClick={handleClick} sx={{ height: '32px', width: '32px', mr: 1 }}>
-            <ExpandMore sx={{ color: '#6E6E6E' }}/>
+            <ExpandMore sx={{ color: 'hoverGrey3' }}/>
           </IconButton>}
         <Box sx={{ display: 'flex', flexDirection: 'column',  width: '100%' }}>
           <Collapse in={!open} unmountOnExit >
-            <Typography variant="body2" component="div" sx={{ mt: 0.6, mb: 2, flexGrow: 1, textAlign: 'left', color: '#6E6E6E' }}>
+            <Typography variant="body2" align='left' sx={{ mt: 0.6, mb: 2, flexGrow: 1, color: 'hoverGrey3' }}>
               See sub-attainments
             </Typography>
           </Collapse>
           <Collapse in={open} timeout='auto' unmountOnExit>
-            <List component="div" disablePadding>
-              {assignmentServices.getSubAssignments(indices, assignments).map((item, i) => (
+            <List disablePadding>
+              {assignmentServices.getSubAttainments(indices, attainments).map((item, i) => (
                 <Assignment 
                   indices={indices.concat(i)}
                   key={i}
-                  assignments={assignments} 
-                  setAssignments={setAssignments} 
-                  removeAssignment={removeAssignment}
+                  attainments={attainments} 
+                  setAttainments={setAttainments} 
+                  removeAttainment={removeAttainment}
                   formulaAttributeNames={subFormulaAttributeNames ? subFormulaAttributeNames : []}
+                  temporaryId={temporaryId}
+                  setIncrementId={setIncrementId}
                 />
               ))}
             </List>
@@ -100,12 +102,14 @@ const ParentAssignment = ({ indices, addSubAssignments, setAssignments, assignme
 };
 
 ParentAssignment.propTypes = {
-  addSubAssignments: PropTypes.func,
+  addSubAttainments: PropTypes.func,
   indices: PropTypes.array,
-  assignments: PropTypes.array,
-  setAssignments: PropTypes.func,
-  removeAssignment: PropTypes.func,
+  attainments: PropTypes.array,
+  setAttainments: PropTypes.func,
+  removeAttainment: PropTypes.func,
   formulaAttributeNames: PropTypes.array,
+  temporaryId: PropTypes.number,
+  setIncrementId: PropTypes.func
 };
 
 export default ParentAssignment;

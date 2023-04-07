@@ -23,7 +23,7 @@ const CreateCourseView = () => {
 
   return(
     <>
-      <Typography variant="h3" component="div" sx={{ flexGrow: 1, mb: 4 }}>
+      <Typography variant="h1" sx={{ flexGrow: 1, mb: 4 }}>
                     Create a New Course
       </Typography>
       <CreateCourseForm addCourse={addCourse}/>

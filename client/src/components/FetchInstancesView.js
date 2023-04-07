@@ -12,11 +12,11 @@ import FetchedInstances from './fetch-instances-view/FetchedInstances';
 import instancesService from '../services/instances';
 
 const FetchInstancesView = () => {
-  let { courseId } = useParams();
+  let { courseId, courseCode } = useParams();
   const [instances, setInstances] = useState([]);
 
   useEffect(() => {
-    instancesService.getSisuInstances(courseId)
+    instancesService.getSisuInstances(courseCode)
       .then((data) => setInstances(data.courseInstances))
       .catch((e) => console.log(e.message));
   }, []);
@@ -24,13 +24,13 @@ const FetchInstancesView = () => {
   return(
     <>
       <Container maxWidth="md" sx={{ textAlign: 'right' }}>
-        <Typography variant="h3" component="div" sx={{ flexGrow: 1, mb: 4, textAlign: 'left' }}>
+        <Typography variant="h1" sx={{ flexGrow: 1, mb: 5, textAlign: 'left' }}>
           Instances Found from SISU
         </Typography>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1, mb: 4, textAlign: 'left' }}>
+        <Typography variant="h3" sx={{ flexGrow: 1, mb: 4, textAlign: 'left' }}>
           Select the instance you wish to add 
         </Typography>
-        <FetchedInstances info={instances} />
+        <FetchedInstances courseId={courseId} info={instances} />
         <Divider sx={{ my: 5 }}/>
       </Container>
       <Button size='medium' variant='outlined'>

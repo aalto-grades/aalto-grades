@@ -12,7 +12,7 @@ import InstanceTableRow from './InstanceTableRow';
 import sortingServices from '../../services/sorting';
 
 
-const InstancesTable = ({ data }) => {
+const InstancesTable = ({ data, current, onClick }) => {
   return(
     <Table>
       <TableHead>
@@ -22,7 +22,7 @@ const InstancesTable = ({ data }) => {
         {data.sort((a, b) => sortingServices.sortByDate(a.startDate, b.startDate))
           .slice()
           .map((instance) => (
-            <InstanceTableRow instance={instance} key={instance.id}/>
+            <InstanceTableRow key={instance.id} instance={instance} onClick={onClick} selected={current === instance.id} />
           ))}
       </TableBody>
     </Table>
@@ -30,7 +30,9 @@ const InstancesTable = ({ data }) => {
 };
 
 InstancesTable.propTypes = {
-  data: PropTypes.array
+  data: PropTypes.array,
+  current: PropTypes.number,
+  onClick: PropTypes.func
 };
     
 export default InstancesTable;

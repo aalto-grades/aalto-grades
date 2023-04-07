@@ -14,19 +14,19 @@ import Divider from '@mui/material/Divider';
 
 const CourseCard = ({ course }) => {
   let navigate = useNavigate();
-  const { name, courseCode, department } = course;
+  const { id, name, courseCode, department } = course;
 
   return(
     <Card>
       <CardContent>
-        <Typography variant="h6" component="div" align="left" sx={{ flexGrow: 1 }}>
+        <Typography variant="h6" align="left" sx={{ flexGrow: 1 }}>
           {courseCode + ' – ' + name.en}
         </Typography>
         <Typography variant="subtitle1" align="left">{department.en}</Typography>
       </CardContent>
       <Divider variant="middle"/>
       <CardActions>
-        <Button size="small" onClick={() => { navigate('/course-view/' + courseCode); }}>
+        <Button size="small" onClick={() => { navigate('/course-view/' + id); }}>
                     See instances
         </Button>
       </CardActions>

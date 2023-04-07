@@ -13,13 +13,13 @@ import Button from '@mui/material/Button';
 
 // A Dialog component for confirming deletion
    
-function ConfirmationDialog({ handleClose, open, removeAssignment, indices, assignments }) {
+function ConfirmationDialog({ title, subject, handleClose, open, deleteAttainment, indices, attainments }) {
   return (
     <Dialog open={open} >
-      <DialogTitle >Delete Sub-Attainments</DialogTitle>
+      <DialogTitle >Delete {title}</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Are you sure you want to delete this sub-attainment and all of the attainments below it?
+          Are you sure you want to delete this {subject} and all of the attainments below it?
         </DialogContentText>
       </DialogContent>
       <DialogActions>
@@ -27,7 +27,7 @@ function ConfirmationDialog({ handleClose, open, removeAssignment, indices, assi
           Cancel
         </Button>
         <Button size='medium' onClick={() => {
-          removeAssignment(indices, JSON.parse(JSON.stringify(assignments)));
+          deleteAttainment(indices, JSON.parse(JSON.stringify(attainments)));
           handleClose();
         }}>
           Delete
@@ -38,10 +38,12 @@ function ConfirmationDialog({ handleClose, open, removeAssignment, indices, assi
 }
 
 ConfirmationDialog.propTypes = {
+  title: PropTypes.string,
+  subject: PropTypes.string,
   handleClose: PropTypes.func,
   open: PropTypes.bool,
-  removeAssignment: PropTypes.func,
-  assignments: PropTypes.array,
+  deleteAttainment: PropTypes.func,
+  attainments: PropTypes.array,
   indices: PropTypes.array
 };
 

@@ -17,15 +17,18 @@ export default {
         student_id: {
           type: new DataTypes.STRING,
           unique: true,
-          allowNull: true
+          allowNull: true,
+          defaultValue: null
         },
         name: {
           type: new DataTypes.STRING,
-          allowNull: false
+          allowNull: true,
+          defaultValue: null
         },
         email: {
           type: new DataTypes.STRING(255),
-          allowNull: false,
+          allowNull: true,
+          defaultValue: null,
           unique: true,
           validate: {
             isEmail: true
@@ -33,7 +36,8 @@ export default {
         },
         password: {
           type: new DataTypes.CHAR(255),
-          allowNull: false
+          allowNull: true,
+          defaultValue: null
         },
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE

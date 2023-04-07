@@ -3,7 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import { AxiosError } from 'axios';
+import { CsvError } from 'csv-parse';
 import express, { NextFunction, Request, RequestHandler, Response } from 'express';
+import { MulterError } from 'multer';
 import { ValidationError } from 'yup';
 
 import { ApiError } from '../types/error';
@@ -72,6 +74,19 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
           : err.message
       ]
     });
+  }
+
+  if (err instanceof CsvError || err instanceof MulterError) {
+    // If field name is incorrect, change the error message to more informative.
+    const message: string = err.message === 'Unexpected field'?
+      'Unexpected field. To upload CSV file, set input field name as "csv_data"' :
+      err.message;
+
+    res.status(HttpCode.BadRequest).send({
+      success: false,
+      errors: [message]
+    });
+    return;
   }
 
   // Fallback if no other error matches

@@ -18,10 +18,10 @@ const errorMsg = { msg: 'Instance creation failed.', severity: 'error' };
 
 const InstanceSummaryView = () => {
   let navigate = useNavigate();
-  let { courseId, instanceId } = useParams();
+  let { courseId, sisuInstanceId } = useParams();
 
   const { 
-    addedAssignments,
+    addedAttainments,
     startDate, 
     endDate, 
     courseType, 
@@ -49,7 +49,7 @@ const InstanceSummaryView = () => {
   }, [snackPack, messageInfo, alertOpen]);
 
   const onGoBack = () => {
-    navigate('/' + courseId + '/add-assignments/' + instanceId);
+    navigate('/' + courseId + '/add-attainments/' + sisuInstanceId);
   };
 
   // Temporary to fake the effect of loading
@@ -75,8 +75,8 @@ const InstanceSummaryView = () => {
   return(
     <Box sx={{ display: 'grid', gap: 1.5, ml: '7.5vw', mr: '7.5vw' }}>
       <AlertSnackbar messageInfo={messageInfo} setMessageInfo={setMessageInfo} open={alertOpen} setOpen={setAlertOpen} />
-      <Typography variant='h3' sx={{ mb: 4, textAlign: 'left', fontWeight: 'light' }}>Summary</Typography>
-      <Typography align='left' sx={{ ml: 1.5 }} >Basic Information</Typography>
+      <Typography variant='h1' align='left' sx={{ mb: 4 }}>Summary</Typography>
+      <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >Basic Information</Typography>
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', display: 'inline-block' }}>
         <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
           <LightLabelBoldValue label='Starting Date' value={textFormatServices.formatDateString(startDate)} />
@@ -88,17 +88,17 @@ const InstanceSummaryView = () => {
         </Box>
       </Box>
       <Box borderRadius={1} sx={{ bgcolor: 'secondary.light', p: '16px 20px', mb: 5, display: 'inline-block' }}>
-        <Typography align='left' sx={{ pb: 1, fontSize: '20px' }}>Teachers in Charge</Typography>
+        <Typography variant='h3' align='left' sx={{ pb: 1 }}>Teachers in Charge</Typography>
         { teachers.map((teacher) => <Typography align='left' key={teacher} >{teacher}</Typography> )}
       </Box>
-      <Typography align='left' sx={{ ml: 1.5 }} >Added study attainments</Typography>
+      <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >Added study attainments</Typography>
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', display: 'inline-block' }}>
-        { addedAssignments.length !== 0 &&
+        { addedAttainments.length !== 0 &&
           <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch', pb: '8px' }}>
-            { addedAssignments.map(assignment => <AssignmentCategory key={assignment.id} assignment={assignment} />) }
+            { addedAttainments.map(attainment => <AssignmentCategory key={attainment.temporaryId} attainment={attainment} attainmentKey={'temporaryId'} />) }
           </Box>
         }
-        <Typography variant='body2' color='primary.main' sx={{ m: '8px 0px' }} >You can also add study attainments after creating the instance</Typography>
+        <Typography variant='body1' color='primary.main' sx={{ m: '8px 0px' }} >You can also add study attainments after creating the instance</Typography>
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 6 }}>
         <Button variant='outlined' onClick={() => onGoBack()} disabled={messageInfo?.severity === 'info'} >Go back</Button>
