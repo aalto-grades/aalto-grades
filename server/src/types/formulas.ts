@@ -30,7 +30,7 @@ export interface WeightedAssignmentParams {
 
 // A FormulaFunction represents a grade formula calculation operation, including
 // user-defined parameters and their values.
-// 
+//
 // For instance,
 // `getFormula({ min: 0, max: 5, weights: [2, 3] }, Formula.WeightedAverage)`
 // produces an `func: FormulaFunction` that expects two subResults.
@@ -41,7 +41,7 @@ export type FormulaFunction = (subResults: Array<CalculationResult>) => Promise<
 // A ParametrizedFormulaFunction represents a grade formula calculation operation,
 // without specific parameter values having been bound at the current time.
 export type ParameterizedFormulaFunction =
-  (parameters: any, subResults: Array<CalculationResult>) => Promise<CalculationResult>;
+  (parameters: unknown, subResults: Array<CalculationResult>) => Promise<CalculationResult>;
 
 // A FormulaNode represents a grade formula calculation operation, including
 // information about the formulas that are lower in the hierarchy tree.
