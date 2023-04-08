@@ -57,8 +57,8 @@ export function parseHeaderFromCsv(header: Array<string>): Array<number> {
       attainmentIds.push(parseInt(match[1], 10));
     } else {
       errors.push(
-        // eslint-disable-next-line max-len
-        `Header attainment data parsing failed at column ${attainmentData.indexOf(str) + 2}. Received ${str}, expected format C{courseId}I{courseInstanceId}A{attainmentId}.`
+        `Header attainment data parsing failed at column ${attainmentData.indexOf(str) + 2}.` +
+        ` Received ${str}, expected format C{courseId}I{courseInstanceId}A{attainmentId}.`
       );
     }
   });
@@ -206,8 +206,8 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
         if (nonExistingIds.length > 0) {
           throw new ApiError(
-            // eslint-disable-next-line max-len
-            `Attainments with following IDs do not exist or belong to this course instance: ${nonExistingIds.join(', ')}.`,
+            'Attainments with following IDs do not exist or' +
+            ` belong to this course instance: ${nonExistingIds.join(', ')}.`,
             HttpCode.UnprocessableEntity
           );
         }
