@@ -147,7 +147,7 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
           });
           res.cookie('jwt', token, {
             httpOnly: true,
-            secure: NODE_ENV === 'production',
+            secure: NODE_ENV !== 'test',
             sameSite: 'none',
             maxAge: JWT_COOKIE_EXPIRY_MS,
           });
@@ -197,7 +197,7 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
   });
   res.cookie('jwt', token, {
     httpOnly: true,
-    secure: NODE_ENV === 'production',
+    secure: NODE_ENV !== 'test',
     sameSite: 'none',
     maxAge: JWT_COOKIE_EXPIRY_MS
   });
