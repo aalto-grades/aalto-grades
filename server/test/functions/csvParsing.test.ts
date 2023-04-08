@@ -5,7 +5,7 @@
 
 import { parseGradesFromCsv, parseHeaderFromCsv } from '../../src/controllers/grades';
 import { ApiError } from '../../src/types/error';
-import { Grade, Student } from '../../src/types/grades';
+import { StudentGrades, UserAttainmentGradeData } from '../../src/types/grades';
 import { HttpCode } from '../../src/types/httpCode';
 
 function checkError(error: unknown, httpCode: HttpCode, message: string | Array<string>): void {
@@ -122,14 +122,14 @@ describe('Test CSV student grades parser', () => {
       [ '666666', '16', '4', '0', '15', '2' ]
     ];
     const attainmentIds: Array<number> = [1, 2, 3, 4, 5];
-    const result: Array<Student> = parseGradesFromCsv(studentGradingData, attainmentIds);
+    const result: Array<StudentGrades> = parseGradesFromCsv(studentGradingData, attainmentIds);
 
-    result.forEach((student: Student, index: number) => {
+    result.forEach((student: StudentGrades, index: number) => {
       const rowData: Array<string> = studentGradingData[index];
       expect(student.studentNumber).toBe(rowData[0]);
 
-      student.grades.forEach((grade: Grade, index: number) => {
-        expect(grade.attainmentId).toBe(attainmentIds[index]);
+      student.grades.forEach((grade: UserAttainmentGradeData, index: number) => {
+        expect(grade.attainableId).toBe(attainmentIds[index]);
         expect(grade.points).toBe(Number(rowData[index + 1]));
       });
     });

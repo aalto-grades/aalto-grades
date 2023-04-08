@@ -2,19 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
-export interface Grade {
-  attainmentId: number,
-  points: number
-}
-
-export interface Student {
-  id?: number,
-  studentNumber: string,
-  grades: Array<Grade>
-}
-
 export interface UserAttainmentGradeData {
-  userId: number,
+  userId?: number,
   attainableId: number,
   points: number
+}
+
+export interface StudentGrades {
+  // Students ID (PK) in the database user table.
+  id?: number,
+  studentNumber: string,
+  grades: Array<UserAttainmentGradeData>
 }

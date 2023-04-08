@@ -15,7 +15,7 @@ import UserAttainmentGrade from '../database/models/userAttainmentGrade';
 import { CourseInstanceRoleType } from '../types/course';
 import { ApiError } from '../types/error';
 import { idSchema } from '../types/general';
-import { UserAttainmentGradeData, Grade, Student } from '../types/grades';
+import { UserAttainmentGradeData, StudentGrades } from '../types/grades';
 import { HttpCode } from '../types/httpCode';
 import { validateCourseAndInstance } from './utils/courseInstance';
 
@@ -81,8 +81,8 @@ export function parseHeaderFromCsv(header: Array<string>): Array<number> {
 */
 export function parseGradesFromCsv(
   studentGradingData: Array<Array<string>>, attainmentIds: Array<number>
-): Array<Student> {
-  const students: Array<Student> = [];
+): Array<StudentGrades> {
+  const students: Array<StudentGrades> = [];
   const errors: Array<string> = [];
   let currentRow: number = 2; // Takes into consideration header row and start index of 0.
 
@@ -91,7 +91,7 @@ export function parseGradesFromCsv(
     const studentNumber: string = row[0];
     const gradingData: Array<string> = row.slice(1);
 
-    const student: Student = {
+    const student: StudentGrades = {
       studentNumber,
       grades: [],
     };
@@ -104,8 +104,8 @@ export function parseGradesFromCsv(
           `CSV file row ${currentRow} column ${i + 2} expected number, received "${gradingData[i]}"`
         );
       } else {
-        const grade: Grade = {
-          attainmentId: attainmentIds[i],
+        const grade: UserAttainmentGradeData = {
+          attainableId: attainmentIds[i],
           points: parseInt(gradingData[i], 10)
         };
         student.grades.push(grade);
@@ -182,7 +182,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         // Parse header and grades separately. Always first parse header before
         // parsing the grades as the grade parser needs the attainment id array.
         const attainmentIds: Array<number> = parseHeaderFromCsv(header);
-        let parsedStudentData: Array<Student> = parseGradesFromCsv(
+        let parsedStudentData: Array<StudentGrades> = parseGradesFromCsv(
           studentGradingData, attainmentIds
         );
 
@@ -216,7 +216,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
         // Check all users (students) exists in db, create new users if needed.
         const studentNumbers: Array<string> = parsedStudentData.map(
-          (student: Student) => student.studentNumber
+          (student: StudentGrades) => student.studentNumber
         );
 
         let students: Array<User> = await User.findAll({
@@ -289,7 +289,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
         // Add users db id to the parsedStudentData based on student number.
         parsedStudentData = parsedStudentData.map(
-          (student: Student): Student => {
+          (student: StudentGrades): StudentGrades => {
             const matchingUser: User = students.find(
               (user: User) => user.dataValues.studentId === student.studentNumber
             ) as User;
@@ -303,13 +303,12 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         // Use studentsWithId to update attainments by flatmapping each
         // students grades into a one array of all the grades.
         const preparedBulkCreate: Array<UserAttainmentGradeData> = parsedStudentData.flatMap(
-          (student: Student): Array<UserAttainmentGradeData> => {
+          (student: StudentGrades): Array<UserAttainmentGradeData> => {
             const studentGradingData: Array<UserAttainmentGradeData> = student.grades.map(
-              (grade: Grade): UserAttainmentGradeData => {
+              (grade: UserAttainmentGradeData): UserAttainmentGradeData => {
                 return {
                   userId: student.id as number,
-                  attainableId: grade.attainmentId,
-                  points: grade.points
+                  ...grade
                 };
               });
             return studentGradingData;
