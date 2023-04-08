@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+import * as yup from 'yup';
+
 export enum Formula {
   Manual = 'MANUAL',
   WeightedAverage = 'WEIGHTED_AVERAGE',
@@ -12,9 +14,14 @@ export enum Status {
   Fail = 'fail',
 }
 
-export interface CalculationResult {
+export interface GradingResult {
   status: Status;
-  grade: number | undefined;
+  grade: number;
+}
+
+export interface GradingInput {
+  subResult: GradingResult;
+  params: object | null;
 }
 
 // A FormulaFunction represents a grade formula calculation operation, including
@@ -25,17 +32,18 @@ export interface CalculationResult {
 // produces an `func: FormulaFunction` that expects two subResults.
 // The produced function calculates a weighted average with weights 2, 3
 // respectively.
-export type FormulaFunction =
-  (subResults: Array<CalculationResult>) => Promise<CalculationResult>;
+export type FormulaFunction = (inputs: Array<GradingInput>) => Promise<GradingResult>;
 
-// A ParametrizedFormulaFunction represents a grade formula calculation operation,
-// without specific parameter values having been bound at the current time.
-export type ParameterizedFormulaFunction =
-  (params: object, subResults: Array<CalculationResult>) => Promise<CalculationResult>;
+export interface FormulaImplementation {
+  formulaFunction: FormulaFunction;
+  paramSchema: yup.AnyObjectSchema;
+}
 
 // A FormulaNode represents a grade formula calculation operation, including
 // information about the formulas that are lower in the hierarchy tree.
 export interface FormulaNode {
-  validatedFormula: FormulaFunction;
+  formulaImplementation: FormulaImplementation;
   subFormulaNodes: Array<FormulaNode>;
+
+  parentFormulaParams: object | null;
 }

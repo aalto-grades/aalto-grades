@@ -9,9 +9,9 @@ import * as yup from 'yup';
 import Attainable from '../database/models/attainable';
 import UserAttainmentGrade from '../database/models/userAttainmentGrade';
 
-import { getFormulaFunction } from '../formulas';
+import { getFormulaImplementation } from '../formulas';
 import { ApiError } from '../types/error';
-import { CalculationResult, Formula, FormulaNode, Status } from '../types/formulas';
+import { Formula, FormulaNode, GradingInput, GradingResult, Status } from '../types/formulas';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { validateCourseAndInstance } from './utils/courseInstance';
@@ -95,18 +95,21 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
   parser.end();
 }
 
-async function calculateSingleNode(
-  tree: FormulaNode,
+// TODO: Save calculated grades to the database.
+async function calculateFormulaNode(
+  formulaNode: FormulaNode,
   presetGrades: Map<FormulaNode, number>
-): Promise<CalculationResult> {
-  if (presetGrades.has(tree)) {
+): Promise<GradingResult> {
+  if (presetGrades.has(formulaNode)) {
     // If a teacher has manually specified a grade for a this attainment,
     // the manually specified grade will be used. A grade has to be manually
     // specified when using the 'Manual' formula and to allow for overriding
     // grade calculation functions in special cases.
     return {
       status: Status.Pass,
-      grade: presetGrades.get(tree)
+
+      // We already checked this is defined.
+      grade: presetGrades.get(formulaNode)! // eslint-disable-line
     };
   }
 
@@ -114,17 +117,21 @@ async function calculateSingleNode(
   // the grade will be calculated based on the given formula and the grades
   // from this attainment's subattainments.
 
+  const inputs: Array<GradingInput> = [];
+
   // First, recursively calculate the grades the subattainments.
-  const subGrades: Array<CalculationResult> =
-    await Promise.all(
-      tree.subFormulaNodes.map(
-        (subTree: FormulaNode) => calculateSingleNode(subTree, presetGrades)
-      )
-    );
+  for (const subFormulaNode of formulaNode.subFormulaNodes) {
+    const input: GradingInput = {
+      subResult: await calculateFormulaNode(subFormulaNode, presetGrades),
+      params: subFormulaNode.parentFormulaParams
+    };
+
+    inputs.push(input);
+  }
 
   // Then, calculate the grade of this attainment using the formula specified
   // for this attainment and the grades of the subattainments.
-  return await tree.validatedFormula(subGrades);
+  return await formulaNode.formulaImplementation.formulaFunction(inputs);
 }
 
 export async function calculateGrades(
@@ -156,98 +163,120 @@ export async function calculateGrades(
 
   // Attainment ID -> Formula used to calculate the grade of the given attainment.
   const formulaNodesByAttainmentId: Map<number, FormulaNode> = new Map();
-  let rootAttainmentFormulaNode: FormulaNode | null = null;
+  let rootFormulaNode: FormulaNode | null = null;
 
   // Collect all attainment formulas into the formulaNodesByAttainmentId Map.
   for (const attainment of attainments) {
     const formulaId: Formula | null = attainment.formulaId;
-    const params: object | null = attainment.formulaParams;
 
     // Ensure that the formula specified for this attainment is valid.
     if (!yup.string().oneOf(Object.values(Formula)).required().validate(formulaId)) {
-      // This invariant should be checked when inputting the parameters
-      // for this formula. Hence we throw 500.
       throw new ApiError(
-        'the parameters for a formula do not match the schema',
+        `invalid formula ${formulaId} for attainment with ID ${attainment.id}`,
         HttpCode.InternalServerError
       );
     }
 
-    // Ensure that the required formula parameters have been specified.
-    if (params === null) {
-      throw new ApiError('the parameters for a formula haven\'t been set', HttpCode.BadRequest);
-    }
-
     formulaNodesByAttainmentId.set(attainment.id, {
-      validatedFormula: await getFormulaFunction(formulaId as Formula, params),
+      formulaImplementation: await getFormulaImplementation(formulaId as Formula),
       subFormulaNodes: [],
+      parentFormulaParams: attainment.formulaParams
     });
   }
 
-  // Build up the tree structure of Formula nodes using the Map by iterating
-  // again.
+  // Build the tree structure of FormulaNodes using the Map by iterating again.
   for (const attainment of attainments) {
-    if (attainment.attainableId === null) { // parent id
-      if (rootAttainmentFormulaNode) {
-        // the database is in a conflicting state
+    const formulaNode: FormulaNode | undefined = formulaNodesByAttainmentId.get(attainment.id);
+
+    if (!formulaNode) {
+      throw new ApiError(
+        `found undefined formula node for attainment with ID ${attainment.id}`,
+        HttpCode.InternalServerError
+      );
+    }
+
+    if (attainment.attainableId === null) { // parent ID
+      if (rootFormulaNode) {
         throw new ApiError(
           'duplicate root attainment',
           HttpCode.InternalServerError
         );
       }
-      rootAttainmentFormulaNode = formulaNodesByAttainmentId.get(attainment.id)!;
+
+      rootFormulaNode = formulaNode;
     } else {
-      formulaNodesByAttainmentId
-        .get(attainment.attainableId)!
-        .subFormulaNodes
-        .push(formulaNodesByAttainmentId.get(attainment.id)!);
+      const parentFormulaNode: FormulaNode | undefined =
+        formulaNodesByAttainmentId.get(attainment.attainableId);
+
+      if (!parentFormulaNode) {
+        throw new ApiError(
+          `found undefined formula node for attainment with ID ${attainment.id}`,
+          HttpCode.InternalServerError
+        );
+      }
+
+      // Ensure that the formula params match formula of the parent attainment.
+      await parentFormulaNode.formulaImplementation.paramSchema.validate(
+        formulaNode.parentFormulaParams
+      );
+
+      parentFormulaNode.subFormulaNodes.push(formulaNode);
     }
   }
 
-  if (!rootAttainmentFormulaNode) {
+  if (!rootFormulaNode) {
     throw new ApiError(
       'no root attainment found for this course instance; maybe there is a cycle',
       HttpCode.BadRequest
     );
   }
 
-  const studentGrades: Array<{
+  const presetGrades: Array<{
     userId: number,
     grade: number,
     attainableId: number,
   }> = await UserAttainmentGrade.findAll({
-    include: { model: Attainable, required: true, attributes: [], where: {
-      courseId,
-      courseInstanceId,
-    }},
+    include: {
+      model: Attainable, required: true, attributes: [], where: {
+        courseId,
+        courseInstanceId,
+      }
+    },
     attributes: ['userId', 'grade', 'attainableId'],
   });
 
   // User ID -> formula node -> preset grade
   const presetGradesByUserId: Map<number, Map<FormulaNode, number>> = new Map();
 
-  for (const student of studentGrades) {
-    if (!presetGradesByUserId.has(student.userId)) {
-      presetGradesByUserId.set(student.userId, new Map());
+  for (const presetGrade of presetGrades) {
+    if (!presetGradesByUserId.has(presetGrade.userId)) {
+      presetGradesByUserId.set(presetGrade.userId, new Map());
     }
-    presetGradesByUserId
-      .get(student.userId)!
-      .set(formulaNodesByAttainmentId.get(student.attainableId)!, student.grade);
+
+    // TODO: Find a sensible way to avoid non-null assertion?
+    const userPresetGrades: Map<FormulaNode, number> =
+      presetGradesByUserId.get(presetGrade.userId)!; // eslint-disable-line
+
+    // TODO: Avoid non-null assertion?
+    userPresetGrades.set(
+      formulaNodesByAttainmentId.get(presetGrade.attainableId)!, // eslint-disable-line
+      presetGrade.grade
+    );
   }
 
-  const rootAttainableGradesByUserId: Map<number, CalculationResult> = new Map();
+  const rootAttainmentGradesByUserId: Map<number, GradingResult> = new Map();
   for (const [userId, presetGrades] of presetGradesByUserId) {
-    rootAttainableGradesByUserId.set(
+    rootAttainmentGradesByUserId.set(
       userId,
-      await calculateSingleNode(rootAttainmentFormulaNode, presetGrades)
+      await calculateFormulaNode(rootFormulaNode, presetGrades)
     );
   }
 
   res.status(HttpCode.Ok).json({
     success: true,
     data: {
-      grades: Array.from(rootAttainableGradesByUserId)
-        .map(([userId, result]: [number, CalculationResult]) => {
+      grades: Array.from(rootAttainmentGradesByUserId)
+        .map(([userId, result]: [number, GradingResult]) => {
           return {
             userId, // TODO: Return student number
             grade: result.grade,

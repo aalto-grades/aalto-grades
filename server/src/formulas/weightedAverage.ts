@@ -5,39 +5,39 @@
 import * as yup from 'yup';
 
 import { registerFormula } from '.';
-import { CalculationResult, Formula, ParameterizedFormulaFunction, Status } from '../types/formulas';
+import { Formula, GradingInput, GradingResult, Status } from '../types/formulas';
 
 interface WeightedAverageParams {
   min: number;
   max: number;
-  weights: Array<number>;
+  weight: number;
 }
 
 async function calculateWeightedAverage(
-  params: WeightedAverageParams,
-  subResults: Array<CalculationResult>
-): Promise<CalculationResult> {
-  let total: number = 0;
+  inputs: Array<GradingInput>
+): Promise<GradingResult> {
+  let grade: number = 0;
+  let status: Status = Status.Pass;
 
-  for (let i: number = 0; i < subResults.length; i++) {
-    if (subResults[i].status != Status.Pass) {
-      return {
-        grade: undefined,
-        status: subResults[i].status,
-      };
-    }
-    total += subResults[i].grade! * params.weights[i];
+  for (const input of inputs) {
+    const subResult: GradingResult = input.subResult;
+    const params: WeightedAverageParams = input.params as WeightedAverageParams;
+
+    if (subResult.status !== Status.Pass)
+      status = Status.Fail;
+
+    grade += subResult.grade * params.weight;
   }
 
   return {
-    grade: total,
-    status: Status.Pass,
+    grade: grade,
+    status: status,
   };
 }
 
 registerFormula(
   Formula.WeightedAverage,
-  calculateWeightedAverage as ParameterizedFormulaFunction,
+  calculateWeightedAverage,
   yup.object({
     min: yup.number().required(),
     max: yup.number().required(),

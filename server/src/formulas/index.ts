@@ -4,17 +4,7 @@
 
 import * as yup from 'yup';
 
-import {
-  CalculationResult,
-  Formula,
-  FormulaFunction,
-  ParameterizedFormulaFunction
-} from '../types/formulas';
-
-interface FormulaImplementation {
-  formulaFunction: ParameterizedFormulaFunction;
-  paramSchema: yup.AnyObjectSchema;
-}
+import { Formula, FormulaFunction, FormulaImplementation } from '../types/formulas';
 
 // The registry of formula implementations corresponding to their names, along
 // with a schema specifying what form their user parameters should take.
@@ -25,7 +15,7 @@ const formulaImplementations: Map<Formula, FormulaImplementation> = new Map();
 // per-formula.
 export function registerFormula(
   formulaId: Formula,
-  formulaFunction: ParameterizedFormulaFunction,
+  formulaFunction: FormulaFunction,
   paramSchema: yup.AnyObjectSchema
 ): void {
   formulaImplementations.set(
@@ -37,10 +27,9 @@ export function registerFormula(
   );
 }
 
-// Gets a FormulaFunction based on a given name and user parameters.
-export async function getFormulaFunction(
-  formulaId: Formula, params: object
-): Promise<FormulaFunction> {
+export async function getFormulaImplementation(
+  formulaId: Formula
+): Promise<FormulaImplementation> {
   const formulaImplementation: FormulaImplementation | undefined =
     formulaImplementations.get(formulaId);
 
@@ -48,9 +37,5 @@ export async function getFormulaFunction(
     throw new Error(`invalid formula ID ${formulaId}`);
   }
 
-  await formulaImplementation.paramSchema.validate(params);
-
-  return (subGrades: Array<CalculationResult>) =>
-    formulaImplementation.formulaFunction(params, subGrades);
+  return formulaImplementation;
 }
-

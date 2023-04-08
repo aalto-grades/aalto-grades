@@ -15,9 +15,9 @@ INSERT INTO public.attainable (course_id, course_instance_id, attainable_id, nam
 (2, 2, 2, 'test assignment 1st level child 2', '2022-05-13', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
 (3, 3, null, 'test assignment 3.3', '2022-08-26', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
 (4, 5, null, 'test assignment 4.3', '2022-04-25', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
-(5, 8, null, 'test assignment tree', '2022-05-08', '2023-04-23', NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "min": 0, "max": 3, "weights": [2, 1] }'),
-(5, 8, 13, 'test assignment 1st level child 1', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 1 }'),
-(5, 8, 13, 'test assignment 1st level child 2', '2022-05-13', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 1 }');
+(5, 8, null, 'test assignment tree', '2022-05-08', '2023-04-23', NOW(), NOW(), 'WEIGHTED_AVERAGE', NULL),
+(5, 8, 13, 'test assignment 1st level child 1', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 3, "weight": 2 }'),
+(5, 8, 13, 'test assignment 1st level child 2', '2022-05-13', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 3, "weight": 1 }');
 
 INSERT INTO public.user_attainment_grade (user_id, attainable_id, points, created_at, updated_at) VALUES
 (1, 14, 0.37, NOW(), NOW()),
