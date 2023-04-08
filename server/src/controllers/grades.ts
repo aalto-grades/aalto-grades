@@ -138,8 +138,7 @@ export async function calculateGrades(
 ): Promise<void> {
   const courseId: number = Number(req.params.courseId);
   const courseInstanceId: number = Number(req.params.instanceId);
-  await idSchema.validate({ id: courseId }, { abortEarly: false });
-  await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
+  validateCourseAndInstance(courseId, courseInstanceId);
 
   const formulaNodesByAttainmentId: Map<number, FormulaNode> = new Map();
 
