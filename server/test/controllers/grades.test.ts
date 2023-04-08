@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 // SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
@@ -43,48 +42,50 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
     expect(res.statusCode).toBe(HttpCode.Ok);
   });
 
-  it('should create and add users to the course with role STUDENT when user does not exist in the db', async () => {
-    let users: Array<User> = await User.findAll({
-      where: {
-        studentId: {
-          [Op.in]: ['987654', '998877']
+  it(
+    'should create and add users to the course with role STUDENT when user does not exist in db',
+    async () => {
+      let users: Array<User> = await User.findAll({
+        where: {
+          studentId: {
+            [Op.in]: ['987654', '998877']
+          }
         }
-      }
-    });
+      });
 
-    expect(users.length).toBe(0);
-    const csvData: fs.ReadStream = fs.createReadStream(
-      path.resolve(__dirname, '../mockData/csv/grades_non-existing_students.csv'), 'utf8'
-    );
-    res = await request
-      .post('/v1/courses/1/instances/1/grades/csv')
-      .attach('csv_data', csvData, { contentType: 'text/csv'});
+      expect(users.length).toBe(0);
+      const csvData: fs.ReadStream = fs.createReadStream(
+        path.resolve(__dirname, '../mockData/csv/grades_non-existing_students.csv'), 'utf8'
+      );
+      res = await request
+        .post('/v1/courses/1/instances/1/grades/csv')
+        .attach('csv_data', csvData, { contentType: 'text/csv'});
 
-    users = await User.findAll({
-      where: {
-        studentId: {
-          [Op.in]: ['987654', '998877']
+      users = await User.findAll({
+        where: {
+          studentId: {
+            [Op.in]: ['987654', '998877']
+          }
         }
-      }
-    });
+      });
 
-    const roles: Array<CourseInstanceRole> = await CourseInstanceRole.findAll({
-      where: {
-        userId: {
-          [Op.in]: users.map((user: User) => user.id)
-        },
-        courseInstanceId: 1,
-        role: 'STUDENT'
-      }
-    });
+      const roles: Array<CourseInstanceRole> = await CourseInstanceRole.findAll({
+        where: {
+          userId: {
+            [Op.in]: users.map((user: User) => user.id)
+          },
+          courseInstanceId: 1,
+          role: 'STUDENT'
+        }
+      });
 
-    expect(users.length).toBe(2);
-    expect(roles.length).toBe(2);
-    expect(res.body.success).toBe(true);
-    expect(res.body.errors).not.toBeDefined();
-    expect(res.body.data).toBeDefined();
-    expect(res.statusCode).toBe(HttpCode.Ok);
-  });
+      expect(users.length).toBe(2);
+      expect(roles.length).toBe(2);
+      expect(res.body.success).toBe(true);
+      expect(res.body.errors).not.toBeDefined();
+      expect(res.body.data).toBeDefined();
+      expect(res.statusCode).toBe(HttpCode.Ok);
+    });
 
   it('should update attainment grade if user grading data already exist in the db', async () => {
     const user: User = await User.findOne({
@@ -123,21 +124,23 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
     expect(res.statusCode).toBe(HttpCode.Ok);
   });
 
-  it('should process big CSV succesfully (1100 x 178 = 195 800 individual attainment grades)', async () => {
-    const csvData: fs.ReadStream = fs.createReadStream(
-      path.resolve(__dirname, '../mockData/csv/grades_big.csv'), 'utf8'
-    );
-    res = await request
-      .post('/v1/courses/6/instances/9/grades/csv')
-      .attach('csv_data', csvData, { contentType: 'text/csv'});
+  it('should process big CSV succesfully (1100 x 178 = 195 800 individual attainment grades)',
+    async () => {
+      const csvData: fs.ReadStream = fs.createReadStream(
+        path.resolve(__dirname, '../mockData/csv/grades_big.csv'), 'utf8'
+      );
+      res = await request
+        .post('/v1/courses/6/instances/9/grades/csv')
+        .attach('csv_data', csvData, { contentType: 'text/csv'});
 
-    expect(res.body.success).toBe(true);
-    expect(res.body.errors).not.toBeDefined();
-    expect(res.body.data).toBeDefined();
-    expect(res.statusCode).toBe(HttpCode.Ok);
-  }, 25000);
+      expect(res.body.success).toBe(true);
+      expect(res.body.errors).not.toBeDefined();
+      expect(res.body.data).toBeDefined();
+      expect(res.statusCode).toBe(HttpCode.Ok);
+    }, 25000);
 
-  it('should respond with 400 bad request, if the CSV file has only student numbers and no grading data',
+  it(
+    'should respond with 400 bad request, if the CSV has only student numbers and no grading data',
     async () => {
       const invalidCsvData: fs.ReadStream = fs.createReadStream(
         path.resolve(__dirname, '../mockData/csv/grades_only_student_numbers.csv'), 'utf8'
@@ -146,7 +149,9 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
         .post('/v1/courses/1/instances/1/grades/csv')
         .attach('csv_data', invalidCsvData, { contentType: 'text/csv'});
 
-      checkErrorRes(['No attainments found from the header, please upload valid CSV.'], HttpCode.BadRequest);
+      checkErrorRes(
+        ['No attainments found from the header, please upload valid CSV.'], HttpCode.BadRequest
+      );
     });
 
   it('should respond with 400 bad request, if the CSV file header parsing fails',
@@ -160,9 +165,12 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
 
       const expectedErrors: Array<string> = [
         'CSV parse error, header row column 1 must be "StudentNo", received "StudentN0"',
-        'Header attainment data parsing failed at column 2. Received C1IYA1, expected format C{courseId}I{courseInstanceId}A{attainmentId}.',
-        'Header attainment data parsing failed at column 4. Received X1I1A11, expected format C{courseId}I{courseInstanceId}A{attainmentId}.',
-        'Header attainment data parsing failed at column 6. Received C1I1AT7, expected format C{courseId}I{courseInstanceId}A{attainmentId}.'
+        'Header attainment data parsing failed at column 2.' +
+        ' Received C1IYA1, expected format C{courseId}I{courseInstanceId}A{attainmentId}.',
+        'Header attainment data parsing failed at column 4.' +
+        ' Received X1I1A11, expected format C{courseId}I{courseInstanceId}A{attainmentId}.',
+        'Header attainment data parsing failed at column 6.' +
+        ' Received C1I1AT7, expected format C{courseId}I{courseInstanceId}A{attainmentId}.'
       ];
       checkErrorRes(expectedErrors, HttpCode.BadRequest);
     });
@@ -241,7 +249,10 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
         .attach('csv_data', false, { contentType: 'text/csv'});
 
       checkErrorRes(
-        ['CSV file not found in the request. To upload CSV file, set input field name as "csv_data"'],
+        [
+          'CSV file not found in the request. To upload CSV file,' +
+          ' set input field name as "csv_data"'
+        ],
         HttpCode.BadRequest
       );
     });
@@ -312,7 +323,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
     );
   });
 
-  it('should respond with 409 conflict, if CSV has users with role TEACHER or TEACHER_IN_CHARGE in grading data',
+  it('should respond with 409 conflict, if CSV includes users with role TEACHER/TEACHER_IN_CHARGE',
     async () => {
       const csvData: fs.ReadStream = fs.createReadStream(
         path.resolve(__dirname, '../mockData/csv/grades_teacher_in_row.csv'), 'utf8'
@@ -327,7 +338,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
       );
     });
 
-  it('should respond with 422 unprocessable entity, if any of the attainments do not belong on the course instance',
+  it('should respond with 422 unprocessable entity, if attainment does not belong to the instance',
     async () => {
       const csvData: fs.ReadStream = fs.createReadStream(
         path.resolve(__dirname, '../mockData/csv/grades_non_existing_attainables.csv'), 'utf8'
@@ -337,7 +348,9 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
         .attach('csv_data', csvData, { contentType: 'text/csv'});
 
       checkErrorRes(
-        ['Attainments with following IDs do not exist or belong to this course instance: 666, 999.'],
+        [
+          'Attainments with following IDs do not exist or belong to this course instance: 666, 999.'
+        ],
         HttpCode.UnprocessableEntity
       );
     });

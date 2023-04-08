@@ -15,7 +15,7 @@ import UserAttainmentGrade from '../database/models/userAttainmentGrade';
 import { CourseInstanceRoleType } from '../types/course';
 import { ApiError } from '../types/error';
 import { idSchema } from '../types/general';
-import { AttainmentGrade, Grade, Student } from '../types/grades';
+import { UserAttainmentGradeData, Grade, Student } from '../types/grades';
 import { HttpCode } from '../types/httpCode';
 import { validateCourseAndInstance } from './utils/courseInstance';
 
@@ -256,7 +256,20 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         }
 
         await sequelize.transaction(async (t: Transaction) => {
+          // Create new users (students) if any found from the CSV.
+          if (nonExistingStudents.length > 0) {
+            const newUsers: Array<User> = await User.bulkCreate(
+              nonExistingStudents.map((studentNo: string) => {
+                return {
+                  studentId: studentNo
+                };
+              }), { transaction: t }
+            );
+            students = students.concat(newUsers);
+          }
+
           // Check (and add if needed) that existing users have 'STUDENT' role on the instance.
+          // Add also newly created users to the course instance with role 'STUDENT'.
           // Note. updateOnDuplicate works as an UPSERT operation in bulkCreate.
           await CourseInstanceRole.bulkCreate(
             students.map((user: User) => {
@@ -270,28 +283,6 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
               updateOnDuplicate: ['role']
             }
           );
-
-          // Create new users (students) and add to the course instance with role 'STUDENT'.
-          if (nonExistingStudents.length > 0) {
-            const newUsers: Array<User> = await User.bulkCreate(
-              nonExistingStudents.map((studentNo: string) => {
-                return {
-                  studentId: studentNo
-                };
-              }), { transaction: t }
-            );
-
-            await CourseInstanceRole.bulkCreate(
-              newUsers.map((user: User) => {
-                return {
-                  userId: user.id,
-                  courseInstanceId,
-                  role: CourseInstanceRoleType.Student
-                };
-              }), { transaction: t }
-            );
-            students = students.concat(newUsers);
-          }
         });
 
         // After this point all students confirmed to exist and belong to the instance as STUDENTs.
@@ -311,10 +302,10 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
         // Use studentsWithId to update attainments by flatmapping each
         // students grades into a one array of all the grades.
-        const preparedBulkCreate: Array<AttainmentGrade> = parsedStudentData.flatMap(
-          (student: Student): Array<AttainmentGrade> => {
-            const studentGradingData: Array<AttainmentGrade> = student.grades.map(
-              (grade: Grade): AttainmentGrade => {
+        const preparedBulkCreate: Array<UserAttainmentGradeData> = parsedStudentData.flatMap(
+          (student: Student): Array<UserAttainmentGradeData> => {
+            const studentGradingData: Array<UserAttainmentGradeData> = student.grades.map(
+              (grade: Grade): UserAttainmentGradeData => {
                 return {
                   userId: student.id as number,
                   attainableId: grade.attainmentId,

@@ -13,7 +13,7 @@ export interface Student {
   grades: Array<Grade>
 }
 
-export interface AttainmentGrade {
+export interface UserAttainmentGradeData {
   userId: number,
   attainableId: number,
   points: number
