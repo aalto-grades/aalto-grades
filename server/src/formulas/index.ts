@@ -8,64 +8,49 @@ import {
   CalculationResult,
   Formula,
   FormulaFunction,
-  FormulaParams,
-  ParameterizedFormulaFunction,
-  Status
+  ParameterizedFormulaFunction
 } from '../types/formulas';
+
+interface FormulaImplementation {
+  formulaFunction: ParameterizedFormulaFunction;
+  paramSchema: yup.AnyObjectSchema;
+}
 
 // The registry of formula implementations corresponding to their names, along
 // with a schema specifying what form their user parameters should take.
-const formulasWithSchema: Map<
-  Formula,
-  [yup.AnyObjectSchema, ParameterizedFormulaFunction]
-> = new Map();
+const formulaImplementations: Map<Formula, FormulaImplementation> = new Map();
 
-// registerFormula adds a formula implemntation to the formula registry.
-// The caller should specify a schema for the user-configurable per-formula.
+// registerFormula adds a formula implementation to the formula registry.
+// The caller should specify a schema for the user-configurable parameters
+// per-formula.
 export function registerFormula(
-  name: Formula,
-  schema: yup.AnyObjectSchema,
-  impl: ParameterizedFormulaFunction,
+  formulaId: Formula,
+  formulaFunction: ParameterizedFormulaFunction,
+  paramSchema: yup.AnyObjectSchema
 ): void {
-  formulasWithSchema.set(name, [schema, impl]);
+  formulaImplementations.set(
+    formulaId,
+    {
+      formulaFunction: formulaFunction,
+      paramSchema: paramSchema
+    }
+  );
 }
 
-// formulaChecker verifies that a provided string is valid for `type Formula`.
-export const formulaChecker: yup.StringSchema =
-  yup.string().oneOf(Object.values(Formula)).required();
-
-// formulaWithParameters validates the user parameters for the formula, and
-// produces a handy closure that automatically applies to parameters to each
-// subsequent call of the formula function.
-async function formulaWithParameters<P extends FormulaParams>(
-  fn: (params: P, subGrades: Array<CalculationResult>) => Promise<CalculationResult>,
-  schema: yup.AnyObjectSchema,
-  params: unknown,
+// Gets a FormulaFunction based on a given name and user parameters.
+export async function getFormulaFunction(
+  formulaId: Formula, params: object
 ): Promise<FormulaFunction> {
-  await schema.validate(params);
-  return (subGrades: Array<CalculationResult>) => fn(params as P, subGrades);
-}
+  const formulaImplementation: FormulaImplementation | undefined =
+    formulaImplementations.get(formulaId);
 
-// getFormula fetches a FormulaFunction based on a given name and user parameters.
-export function getFormula(name: Formula, params: FormulaParams): Promise<FormulaFunction> {
-  const formulaWithSchema: [yup.AnyObjectSchema, ParameterizedFormulaFunction] =
-    formulasWithSchema.get(name)!;
-  return formulaWithParameters(formulaWithSchema[1], formulaWithSchema[0], params);
-}
+  if (!formulaImplementation) {
+    throw new Error(`invalid formula ID ${formulaId}`);
+  }
 
-registerFormula(
-  Formula.Manual,
-  yup.object(),
-  // If no grade has been input for a student, assume the attainment
-  // has been failed.
-  async (
-    _params: any,
-    _subGrades: Array<CalculationResult>,
-  ): Promise<CalculationResult> => {
-    return {
-      status: Status.Fail,
-      grade: undefined,
-    };
-  },
-);
+  await formulaImplementation.paramSchema.validate(params);
+
+  return (subGrades: Array<CalculationResult>) =>
+    formulaImplementation.formulaFunction(params, subGrades);
+}
 

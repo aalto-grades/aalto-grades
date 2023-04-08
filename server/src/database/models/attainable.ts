@@ -7,7 +7,7 @@ import {
 } from 'sequelize';
 
 import { sequelize } from '..';
-import { Formula, FormulaParams } from '../../types/formulas';
+import { Formula } from '../../types/formulas';
 import Course from './course';
 import CourseInstance from './courseInstance';
 
@@ -22,7 +22,7 @@ export default class Attainable extends Model<
   declare attainableId: CreationOptional<ForeignKey<Attainable['id']>>;
   declare name: string;
   declare formulaId: Formula;
-  declare formulaParams: CreationOptional<FormulaParams>;
+  declare formulaParams: CreationOptional<object>;
   declare date: Date; // Date when assignment is done (e.g., deadline or exam date)
   declare expiryDate: Date;
   declare createdAt: CreationOptional<Date>;

@@ -7,11 +7,6 @@ export enum Formula {
   WeightedAverage = 'WEIGHTED_AVERAGE',
 }
 
-export interface FormulaParams {
-  min: number;
-  max: number;
-}
-
 export enum Status {
   Pass = 'pass',
   Fail = 'fail',
@@ -22,12 +17,6 @@ export interface CalculationResult {
   grade: number | undefined;
 }
 
-export interface WeightedAssignmentParams {
-  min: number;
-  max: number;
-  weights: Array<number>;
-}
-
 // A FormulaFunction represents a grade formula calculation operation, including
 // user-defined parameters and their values.
 //
@@ -36,12 +25,13 @@ export interface WeightedAssignmentParams {
 // produces an `func: FormulaFunction` that expects two subResults.
 // The produced function calculates a weighted average with weights 2, 3
 // respectively.
-export type FormulaFunction = (subResults: Array<CalculationResult>) => Promise<CalculationResult>;
+export type FormulaFunction =
+  (subResults: Array<CalculationResult>) => Promise<CalculationResult>;
 
 // A ParametrizedFormulaFunction represents a grade formula calculation operation,
 // without specific parameter values having been bound at the current time.
 export type ParameterizedFormulaFunction =
-  (parameters: unknown, subResults: Array<CalculationResult>) => Promise<CalculationResult>;
+  (params: object, subResults: Array<CalculationResult>) => Promise<CalculationResult>;
 
 // A FormulaNode represents a grade formula calculation operation, including
 // information about the formulas that are lower in the hierarchy tree.

@@ -8,8 +8,9 @@ import * as yup from 'yup';
 import models from '../database/models';
 import Attainable from '../database/models/attainable';
 
-import { AttainableData, AttainableRequestData, Formula } from '../types/attainable';
+import { AttainableData, AttainableRequestData } from '../types/attainable';
 import { ApiError } from '../types/error';
+import { Formula } from '../types/formulas';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { findAttainableById, generateAttainableTag } from './utils/attainable';

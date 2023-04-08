@@ -4,19 +4,14 @@
 
 import { parse, Parser } from 'csv-parse';
 import { NextFunction, Request, Response } from 'express';
+import * as yup from 'yup';
 
 import Attainable from '../database/models/attainable';
 import UserAttainmentGrade from '../database/models/userAttainmentGrade';
 
-import { formulaChecker, getFormula } from '../formulas';
+import { getFormulaFunction } from '../formulas';
 import { ApiError } from '../types/error';
-import {
-  CalculationResult,
-  Formula,
-  FormulaNode,
-  FormulaParams,
-  Status
-} from '../types/formulas';
+import { CalculationResult, Formula, FormulaNode, Status } from '../types/formulas';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { validateCourseAndInstance } from './utils/courseInstance';
@@ -140,13 +135,12 @@ export async function calculateGrades(
   const courseInstanceId: number = Number(req.params.instanceId);
   validateCourseAndInstance(courseId, courseInstanceId);
 
-  const formulaNodesByAttainmentId: Map<number, FormulaNode> = new Map();
-
-  const attainables: Array<{
+  // Get all attainments in this course instance.
+  const attainments: Array<{
     id: number,
-    attainableId: number, // id of parent attainment
+    attainableId: number, // ID of parent attainment
     formulaId: Formula | null,
-    formulaParams: FormulaParams | null,
+    formulaParams: object | null,
   }> = await Attainable.findAll({
     where: {
       courseId,
@@ -160,12 +154,17 @@ export async function calculateGrades(
     ],
   });
 
-  let rootAttainable: null | FormulaNode = null;
-  // Collect all attainment formulas into a Map.
-  for (const attainable of attainables) {
-    const formulaId: Formula | null = attainable.formulaId;
-    const params: FormulaParams | null = attainable.formulaParams;
-    if (!(await formulaChecker.validate(formulaId))) {
+  // Attainment ID -> Formula used to calculate the grade of the given attainment.
+  const formulaNodesByAttainmentId: Map<number, FormulaNode> = new Map();
+  let rootAttainmentFormulaNode: FormulaNode | null = null;
+
+  // Collect all attainment formulas into the formulaNodesByAttainmentId Map.
+  for (const attainment of attainments) {
+    const formulaId: Formula | null = attainment.formulaId;
+    const params: object | null = attainment.formulaParams;
+
+    // Ensure that the formula specified for this attainment is valid.
+    if (!yup.string().oneOf(Object.values(Formula)).required().validate(formulaId)) {
       // This invariant should be checked when inputting the parameters
       // for this formula. Hence we throw 500.
       throw new ApiError(
@@ -173,39 +172,41 @@ export async function calculateGrades(
         HttpCode.InternalServerError
       );
     }
+
+    // Ensure that the required formula parameters have been specified.
     if (params === null) {
       throw new ApiError('the parameters for a formula haven\'t been set', HttpCode.BadRequest);
     }
 
-    formulaNodesByAttainmentId.set(attainable.id, {
-      validatedFormula: await getFormula(formulaId as Formula, params),
+    formulaNodesByAttainmentId.set(attainment.id, {
+      validatedFormula: await getFormulaFunction(formulaId as Formula, params),
       subFormulaNodes: [],
     });
   }
 
   // Build up the tree structure of Formula nodes using the Map by iterating
   // again.
-  for (const attainable of attainables) {
-    if (attainable.attainableId === null) { // parent id
-      if (rootAttainable) {
+  for (const attainment of attainments) {
+    if (attainment.attainableId === null) { // parent id
+      if (rootAttainmentFormulaNode) {
         // the database is in a conflicting state
         throw new ApiError(
           'duplicate root attainment',
           HttpCode.InternalServerError
         );
       }
-      rootAttainable = formulaNodesByAttainmentId.get(attainable.id)!;
+      rootAttainmentFormulaNode = formulaNodesByAttainmentId.get(attainment.id)!;
     } else {
       formulaNodesByAttainmentId
-        .get(attainable.attainableId)!
+        .get(attainment.attainableId)!
         .subFormulaNodes
-        .push(formulaNodesByAttainmentId.get(attainable.id)!);
+        .push(formulaNodesByAttainmentId.get(attainment.id)!);
     }
   }
 
-  if (!rootAttainable) {
+  if (!rootAttainmentFormulaNode) {
     throw new ApiError(
-      'no root attainment for this course instance; maybe there is a cycle',
+      'no root attainment found for this course instance; maybe there is a cycle',
       HttpCode.BadRequest
     );
   }
@@ -238,7 +239,7 @@ export async function calculateGrades(
   for (const [studentId, presetGrades] of presetGradesByStudentId) {
     rootAttainableGradesByStudent.set(
       studentId,
-      await calculateSingleNode(rootAttainable, presetGrades)
+      await calculateSingleNode(rootAttainmentFormulaNode, presetGrades)
     );
   }
 
