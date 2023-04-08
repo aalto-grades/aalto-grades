@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 // SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
@@ -68,7 +67,10 @@ describe('Test CSV header parser', () => {
       checkError(
         error,
         HttpCode.BadRequest,
-        ['Header attainment data parsing failed at column 3. Received C3I9B2, expected format C{courseId}I{courseInstanceId}A{attainmentId}.']
+        [
+          'Header attainment data parsing failed at column 3.' +
+          ' Received C3I9B2, expected format C{courseId}I{courseInstanceId}A{attainmentId}.'
+        ]
       );
     }
 
@@ -78,7 +80,10 @@ describe('Test CSV header parser', () => {
       checkError(
         error,
         HttpCode.BadRequest,
-        ['Header attainment data parsing failed at column 4. Received C3I9A3xx, expected format C{courseId}I{courseInstanceId}A{attainmentId}.']
+        [
+          'Header attainment data parsing failed at column 4.' +
+          ' Received C3I9A3xx, expected format C{courseId}I{courseInstanceId}A{attainmentId}.'
+        ]
       );
     }
 
@@ -90,8 +95,10 @@ describe('Test CSV header parser', () => {
         HttpCode.BadRequest,
         [
           'CSV parse error, header row column 1 must be "StudentNo", received "StudentN0"',
-          'Header attainment data parsing failed at column 3. Received C3I9B2, expected format C{courseId}I{courseInstanceId}A{attainmentId}.',
-          'Header attainment data parsing failed at column 4. Received C3I9A3xx, expected format C{courseId}I{courseInstanceId}A{attainmentId}.'
+          'Header attainment data parsing failed at column 3.' +
+          ' Received C3I9B2, expected format C{courseId}I{courseInstanceId}A{attainmentId}.',
+          'Header attainment data parsing failed at column 4.' +
+          ' Received C3I9A3xx, expected format C{courseId}I{courseInstanceId}A{attainmentId}.'
         ]
       );
     }
