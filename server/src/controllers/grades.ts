@@ -223,22 +223,22 @@ export async function calculateGrades(
     attributes: ['userId', 'grade', 'attainableId'],
   });
 
-  // student id -> formula node -> preset grade
-  const presetGradesByStudentId: Map<number, Map<FormulaNode, number>> = new Map();
+  // User ID -> formula node -> preset grade
+  const presetGradesByUserId: Map<number, Map<FormulaNode, number>> = new Map();
 
   for (const student of studentGrades) {
-    if (!presetGradesByStudentId.has(student.userId)) {
-      presetGradesByStudentId.set(student.userId, new Map());
+    if (!presetGradesByUserId.has(student.userId)) {
+      presetGradesByUserId.set(student.userId, new Map());
     }
-    presetGradesByStudentId
+    presetGradesByUserId
       .get(student.userId)!
       .set(formulaNodesByAttainmentId.get(student.attainableId)!, student.grade);
   }
 
-  const rootAttainableGradesByStudent: Map<number, CalculationResult> = new Map();
-  for (const [studentId, presetGrades] of presetGradesByStudentId) {
-    rootAttainableGradesByStudent.set(
-      studentId,
+  const rootAttainableGradesByUserId: Map<number, CalculationResult> = new Map();
+  for (const [userId, presetGrades] of presetGradesByUserId) {
+    rootAttainableGradesByUserId.set(
+      userId,
       await calculateSingleNode(rootAttainmentFormulaNode, presetGrades)
     );
   }
@@ -246,10 +246,10 @@ export async function calculateGrades(
   res.status(HttpCode.Ok).json({
     success: true,
     data: {
-      grades: Array.from(rootAttainableGradesByStudent)
-        .map(([studentId, result]: [number, CalculationResult]) => {
+      grades: Array.from(rootAttainableGradesByUserId)
+        .map(([userId, result]: [number, CalculationResult]) => {
           return {
-            studentId,
+            userId, // TODO: Return student number
             grade: result.grade,
             status: result.status,
           };

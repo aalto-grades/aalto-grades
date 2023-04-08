@@ -21,9 +21,9 @@ export const router: Router = Router();
  *     items:
  *       type: object
  *       properties:
- *         studentId:
- *           type: number
- *           description: Student database identifier.
+ *         studentNumber:
+ *           type: string
+ *           description: Aalto student number.
  *         grade:
  *           type: number
  *           description: Final grade of the student.
