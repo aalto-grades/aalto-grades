@@ -19,7 +19,7 @@ export enum Status {
 
 export interface CalculationResult {
   status: Status;
-  points: number | undefined;
+  grade: number | undefined;
 }
 
 export interface WeightedAssignmentParams {

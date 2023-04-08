@@ -102,27 +102,34 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
 async function calculateSingleNode(
   tree: FormulaNode,
-  presetPoints: Map<FormulaNode, number>
+  presetGrades: Map<FormulaNode, number>
 ): Promise<CalculationResult> {
-  if (presetPoints.has(tree)) {
-    // If the teacher has manually specified a grade for a certain attainment,
-    // we should use that instead of re-calculating the grade from lower
-    // levels.
+  if (presetGrades.has(tree)) {
+    // If a teacher has manually specified a grade for a this attainment,
+    // the manually specified grade will be used. A grade has to be manually
+    // specified when using the 'Manual' formula and to allow for overriding
+    // grade calculation functions in special cases.
     return {
       status: Status.Pass,
-      points: presetPoints.get(tree)
+      grade: presetGrades.get(tree)
     };
   }
-  // No preset grade available, so calculate the points for lower nodes.
-  const subPoints: Array<CalculationResult> =
+
+  // A teacher has not manually specified a grade for this attainment, therefore
+  // the grade will be calculated based on the given formula and the grades
+  // from this attainment's subattainments.
+
+  // First, recursively calculate the grades the subattainments.
+  const subGrades: Array<CalculationResult> =
     await Promise.all(
       tree.subFormulaNodes.map(
-        (subTree: FormulaNode) => calculateSingleNode(subTree, presetPoints)
+        (subTree: FormulaNode) => calculateSingleNode(subTree, presetGrades)
       )
     );
-  // Based on the results from lower nodes, calculate the points for this node
-  // using the node-specific formula.
-  return await tree.validatedFormula(subPoints);
+
+  // Then, calculate the grade of this attainment using the formula specified
+  // for this attainment and the grades of the subattainments.
+  return await tree.validatedFormula(subGrades);
 }
 
 export async function calculateGrades(
@@ -204,50 +211,49 @@ export async function calculateGrades(
     );
   }
 
-  const studentPoints: Array<{
+  const studentGrades: Array<{
     userId: number,
-    points: number,
+    grade: number,
     attainableId: number,
   }> = await UserAttainmentGrade.findAll({
     include: { model: Attainable, required: true, attributes: [], where: {
       courseId,
       courseInstanceId,
     }},
-    attributes: ['userId', 'points', 'attainableId'],
+    attributes: ['userId', 'grade', 'attainableId'],
   });
 
-  // student id -> formula node -> preset points
-  const presetPointsByStudentId: Map<number, Map<FormulaNode, number>> = new Map();
+  // student id -> formula node -> preset grade
+  const presetGradesByStudentId: Map<number, Map<FormulaNode, number>> = new Map();
 
-  for (const student of studentPoints) {
-    if (!presetPointsByStudentId.has(student.userId)) {
-      presetPointsByStudentId.set(student.userId, new Map());
+  for (const student of studentGrades) {
+    if (!presetGradesByStudentId.has(student.userId)) {
+      presetGradesByStudentId.set(student.userId, new Map());
     }
-    presetPointsByStudentId
+    presetGradesByStudentId
       .get(student.userId)!
-      .set(formulaNodesByAttainmentId.get(student.attainableId)!, student.points);
+      .set(formulaNodesByAttainmentId.get(student.attainableId)!, student.grade);
   }
 
-  const rootAttainablePointsByStudent: Map<number, CalculationResult> = new Map();
-  for (const [studentId, presetPoints] of presetPointsByStudentId) {
-    rootAttainablePointsByStudent.set(
+  const rootAttainableGradesByStudent: Map<number, CalculationResult> = new Map();
+  for (const [studentId, presetGrades] of presetGradesByStudentId) {
+    rootAttainableGradesByStudent.set(
       studentId,
-      await calculateSingleNode(rootAttainable, presetPoints)
+      await calculateSingleNode(rootAttainable, presetGrades)
     );
   }
 
-  res.status(HttpCode.Ok)
-    .json({
-      success: true,
-      data: {
-        grades: Array.from(rootAttainablePointsByStudent)
-          .map(([studentId, result]: [number, CalculationResult]) => {
-            return {
-              studentId,
-              grade: result.points,
-              status: result.status,
-            };
-          })
-      }
-    });
+  res.status(HttpCode.Ok).json({
+    success: true,
+    data: {
+      grades: Array.from(rootAttainableGradesByStudent)
+        .map(([studentId, result]: [number, CalculationResult]) => {
+          return {
+            studentId,
+            grade: result.grade,
+            status: result.status,
+          };
+        })
+    }
+  });
 }

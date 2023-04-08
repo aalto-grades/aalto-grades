@@ -60,7 +60,7 @@ const upload: Multer = multer({
  * /v1/courses/{courseId}/instances/{instanceId}/grades/csv:
  *   post:
  *     tags: [Grades]
- *     description: Add attainment points for users enrolled in a specific course instance.
+ *     description: Add attainment grades for users enrolled in a specific course instance.
  *     requestBody:
  *       content:
  *         multipart/form-data:

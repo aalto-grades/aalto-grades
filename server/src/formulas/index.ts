@@ -38,7 +38,7 @@ export const formulaChecker: yup.StringSchema =
 // produces a handy closure that automatically applies to parameters to each
 // subsequent call of the formula function.
 async function formulaWithParameters<P extends FormulaParams>(
-  fn: (params: P, subPoints: Array<CalculationResult>) => Promise<CalculationResult>,
+  fn: (params: P, subGrades: Array<CalculationResult>) => Promise<CalculationResult>,
   schema: yup.AnyObjectSchema,
   params: unknown,
 ): Promise<FormulaFunction> {
@@ -56,7 +56,7 @@ export function getFormula(name: Formula, params: FormulaParams): Promise<Formul
 registerFormula(
   Formula.Manual,
   yup.object(),
-  // If no points have been input for a student, assume the attainment
+  // If no grade has been input for a student, assume the attainment
   // has been failed.
   async (
     _params: any,
@@ -64,7 +64,7 @@ registerFormula(
   ): Promise<CalculationResult> => {
     return {
       status: Status.Fail,
-      points: undefined,
+      grade: undefined,
     };
   },
 );

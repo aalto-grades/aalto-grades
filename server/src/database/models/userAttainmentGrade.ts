@@ -17,7 +17,7 @@ export default class UserAttainmentGrade extends Model<
   declare id: CreationOptional<number>;
   declare userId: ForeignKey<User['id']>;
   declare attainableId: ForeignKey<Attainable['id']>;
-  declare points: number;
+  declare grade: number;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -45,7 +45,7 @@ UserAttainmentGrade.init(
         key: 'id'
       }
     },
-    points: {
+    grade: {
       type: DataTypes.FLOAT,
       allowNull: false
     },

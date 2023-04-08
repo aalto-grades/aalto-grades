@@ -261,7 +261,7 @@ export default {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
         },
-        points: {
+        grade: {
           type: DataTypes.FLOAT,
           allowNull: false
         },

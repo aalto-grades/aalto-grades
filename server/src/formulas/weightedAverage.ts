@@ -21,14 +21,15 @@ async function calculateWeightedAverage(
   for (let i: number = 0; i < subResults.length; ++i) {
     if (subResults[i].status != Status.Pass) {
       return {
-        points: undefined,
+        grade: undefined,
         status: subResults[i].status,
       };
     }
-    total += subResults[i].points! * params.weights[i];
+    total += subResults[i].grade! * params.weights[i];
   }
+
   return {
-    points: total,
+    grade: total,
     status: Status.Pass,
   };
 }
