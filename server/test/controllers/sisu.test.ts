@@ -6,6 +6,7 @@ import axios, { AxiosStatic } from 'axios';
 import supertest from 'supertest';
 
 import { app } from '../../src/app';
+import { CourseInstanceData } from '../../src/types/course';
 import { HttpCode } from '../../src/types/httpCode';
 import { sisuInstance, sisuError } from '../mockData/sisu';
 
@@ -14,8 +15,7 @@ const mockedAxios: jest.Mocked<AxiosStatic> = axios as jest.Mocked<typeof axios>
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function checkRes(courseInstance: any): void {
+function checkRes(courseInstance: CourseInstanceData): void {
   expect(courseInstance.id).toBeDefined();
   expect(courseInstance.sisuCourseInstanceId).toBe(sisuInstance.id);
   expect(courseInstance.startingPeriod).toBeDefined();

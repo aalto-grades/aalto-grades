@@ -5,26 +5,29 @@
 import { HttpCode } from '../types/httpCode';
 
 /**
- * ApiError class represents a custom error that includes status code and optional multiple
- * error messages. This class extends the native Error class and adds a status code and
- * an optional array of multiple error messages. It is useful for providing more context
+ * ApiError class represents a custom API related error, extends the native Error class. Includes
+ * error message that is either string or an array of strings describing multiple errors. Status
+ * code represents HTTP status code associated with the error. Useful for providing more context
  * about an API-related error that occurred during the execution of an operation.
  * @extends {Error}
 */
 export class ApiError extends Error {
   public readonly statusCode: number;
-  public readonly multiError: Array<string> | undefined;
+  public readonly multipleErrors: Array<string> | undefined;
 
   /**
    * Creates an instance of ApiError.
-   * @param {string} message - The error message.
+   * @param {string | Array<string>} message - The error message(s).
    * @param {HttpCode} statusCode - The HTTP status code associated with the error.
-   * @param {Array<string>} [multiError] - Optional array of multiple error messages.
   */
-  constructor(message: string, statusCode: HttpCode, multiError?: Array<string>,) {
-    super(message);
+  constructor(message: string | Array<string>, statusCode: HttpCode) {
+    if (Array.isArray(message)) {
+      super('');
+      this.multipleErrors = message;
+    } else {
+      super(message);
+    }
     this.statusCode = statusCode;
-    this.multiError = multiError;
     this.name = 'ApiError';
   }
 }

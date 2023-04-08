@@ -20,14 +20,14 @@ import { HttpCode } from '../types/httpCode';
 import { validateCourseAndInstance } from './utils/courseInstance';
 
 /**
- * Parse and extract attainment id's from the CSV file header.
+ * Parse and extract attainment IDs from the CSV file header.
  * Correct format: "StudentNo,C3I9A1,C3I9A2,C3I9A3,C3I9A4,C3I9A5..."
  * @param {Array<string>} header - Header part of the CSV file.
  * @returns {Array<number>} - Array containing the id's of attainments.
  * @throws {ApiError} - If first column not "StudentNo" (case-insensitive)
  * header array is empty or any of the attainment tags malformed or missing.
  */
-export function parseHeader(header: Array<string>): Array<number> {
+export function parseHeaderFromCsv(header: Array<string>): Array<number> {
   const attainmentIds: Array<number> = [];
   const errors: Array<string> = [];
 
@@ -65,7 +65,7 @@ export function parseHeader(header: Array<string>): Array<number> {
 
   // If any column parsing fails, throw error with invalid column info.
   if (errors.length > 0) {
-    throw new ApiError('', HttpCode.BadRequest, errors);
+    throw new ApiError(errors, HttpCode.BadRequest);
   }
   return attainmentIds;
 }
@@ -79,7 +79,7 @@ export function parseHeader(header: Array<string>): Array<number> {
  * @throws {ApiError} - If there is an error in the CSV file (e.g. incorrect data type in a cell).
  * Collects all errors found to an array, does not throw error immediately on first incorrect value.
 */
-export function parseGrades(
+export function parseGradesFromCsv(
   studentGradingData: Array<Array<string>>, attainmentIds: Array<number>
 ): Array<Student> {
   const students: Array<Student> = [];
@@ -117,7 +117,7 @@ export function parseGrades(
 
   // If any row parsing fails, throw error with invalid row info.
   if (errors.length > 0) {
-    throw new ApiError('', HttpCode.BadRequest, errors);
+    throw new ApiError(errors, HttpCode.BadRequest);
   }
   return students;
 }
@@ -174,15 +174,17 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
       }
     })
     .on('error', next) // Stream causes uncaught exception, pass error manually to the errorHandler.
-    .on('end', async function (): Promise<void> {
+    .on('end', async (): Promise<void> => {
       try {
         // Header having colum information, e.g., "StudentNo,C3I9A1,C3I9A2,C3I9A3,C3I9A4,C3I9A5..."
         const header: Array<string> = studentGradingData.shift() as Array<string>;
 
         // Parse header and grades separately. Always first parse header before
         // parsing the grades as the grade parser needs the attainment id array.
-        const attainmentIds: Array<number> = parseHeader(header);
-        let parsedStudentData: Array<Student> = parseGrades(studentGradingData, attainmentIds);
+        const attainmentIds: Array<number> = parseHeaderFromCsv(header);
+        let parsedStudentData: Array<Student> = parseGradesFromCsv(
+          studentGradingData, attainmentIds
+        );
 
         // Fetch all attainments from db based on the id's extracted from the CSV.
         const attainments: Array<Attainable> = await Attainable.findAll({
@@ -261,7 +263,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
               return {
                 userId: user.id,
                 courseInstanceId,
-                role: 'STUDENT'
+                role: CourseInstanceRoleType.Student
               };
             }), {
               transaction: t,
@@ -284,7 +286,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
                 return {
                   userId: user.id,
                   courseInstanceId,
-                  role: 'STUDENT'
+                  role: CourseInstanceRoleType.Student
                 };
               }), { transaction: t }
             );
@@ -307,7 +309,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
             };
           });
 
-        // Use studentsWithId to update attainables by flatmapping each
+        // Use studentsWithId to update attainments by flatmapping each
         // students grades into a one array of all the grades.
         const preparedBulkCreate: Array<AttainmentGrade> = parsedStudentData.flatMap(
           (student: Student): Array<AttainmentGrade> => {

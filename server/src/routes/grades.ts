@@ -84,7 +84,7 @@ const upload: Multer = multer({
  *         description: >
  *           Course instance does not belong to the course or
  *           study attainment does not belong to the course instance.
- *           User with course role 'TEACHER' or 'TEACHER_IN_CHARGE' listed in the gdaring data.
+ *           User with course role 'TEACHER' or 'TEACHER_IN_CHARGE' listed in the grading data.
  *         content:
  *           application/json:
  *             schema:

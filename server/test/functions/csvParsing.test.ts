@@ -3,7 +3,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { parseGrades, parseHeader } from '../../src/controllers/grades';
+import { parseGradesFromCsv, parseHeaderFromCsv } from '../../src/controllers/grades';
 import { ApiError } from '../../src/types/error';
 import { Grade, Student } from '../../src/types/grades';
 import { HttpCode } from '../../src/types/httpCode';
@@ -13,8 +13,8 @@ function checkError(error: unknown, httpCode: HttpCode, message: string | Array<
   if (error instanceof ApiError) {
     expect(error.statusCode).toBe(httpCode);
     expect(error.message).toBe(typeof message === 'string' ? message : '');
-    if (Array.isArray(message)) {
-      expect(error.multiError).toStrictEqual(message);
+    if (error.multipleErrors) {
+      expect(error.multipleErrors).toStrictEqual(message);
     }
   }
 }
@@ -22,28 +22,28 @@ function checkError(error: unknown, httpCode: HttpCode, message: string | Array<
 describe('Test CSV header parser', () => {
 
   it('should parse correctly formatted header of attainment CSV file', () => {
-    let result: Array<number> = parseHeader(
+    let result: Array<number> = parseHeaderFromCsv(
       ['StudentNo', 'C3I9A1', 'C3I9A2', 'C3I9A3', 'C3I9A4', 'C3I9A5']
     );
     expect(result.length).toBe(5);
     expect(result).toEqual(expect.arrayContaining([1, 2, 3, 4, 5]));
     expect(result.every((value: number) => !isNaN(value))).toBeTruthy();
 
-    result = parseHeader(
+    result = parseHeaderFromCsv(
       ['STUDENTNO', 'C33I9A1', 'C33I9A2', 'C33I9A3', 'C33I9A4', 'C33I9A5']
     );
     expect(result.length).toBe(5);
     expect(result).toEqual(expect.arrayContaining([1, 2, 3, 4, 5]));
     expect(result.every((value: number) => !isNaN(value))).toBeTruthy();
 
-    result = parseHeader(
+    result = parseHeaderFromCsv(
       ['studentno', 'C3I69A11', 'C3I69A22', 'C3I69A33', 'C3I69A44', 'C3I69A55']
     );
     expect(result.length).toBe(5);
     expect(result).toEqual(expect.arrayContaining([11, 22, 33, 44, 55]));
     expect(result.every((value: number) => !isNaN(value))).toBeTruthy();
 
-    result = parseHeader(
+    result = parseHeaderFromCsv(
       ['studentno', 'C3I69A1']
     );
     expect(result.length).toBe(1);
@@ -53,7 +53,7 @@ describe('Test CSV header parser', () => {
 
   it('should throw error if parsing fails due to invalid header column', () => {
     try {
-      parseHeader(['StudentN0', 'C3I9A1', 'C3I9A2', 'C3I9A3']); // First column bad.
+      parseHeaderFromCsv(['StudentN0', 'C3I9A1', 'C3I9A2', 'C3I9A3']); // First column bad.
     } catch (error: unknown) {
       checkError(
         error,
@@ -63,7 +63,7 @@ describe('Test CSV header parser', () => {
     }
 
     try {
-      parseHeader(['StudentNo', 'C3I9A1', 'C3I9B2', 'C3I9A3']); // Third column bad.
+      parseHeaderFromCsv(['StudentNo', 'C3I9A1', 'C3I9B2', 'C3I9A3']); // Third column bad.
     } catch (error: unknown) {
       checkError(
         error,
@@ -73,7 +73,7 @@ describe('Test CSV header parser', () => {
     }
 
     try {
-      parseHeader(['StudentNo', 'C3I9A1', 'C3I9A2', 'C3I9A3xx']); // Last column bad.
+      parseHeaderFromCsv(['StudentNo', 'C3I9A1', 'C3I9A2', 'C3I9A3xx']); // Last column bad.
     } catch (error: unknown) {
       checkError(
         error,
@@ -83,7 +83,7 @@ describe('Test CSV header parser', () => {
     }
 
     try {
-      parseHeader(['StudentN0', 'C3I9A1', 'C3I9B2', 'C3I9A3xx']); // Multiple columns bad.
+      parseHeaderFromCsv(['StudentN0', 'C3I9A1', 'C3I9B2', 'C3I9A3xx']); // Multiple columns bad.
     } catch (error: unknown) {
       checkError(
         error,
@@ -99,7 +99,7 @@ describe('Test CSV header parser', () => {
 
   it('should throw error if parsing fails due to having only the first header column',() => {
     try {
-      parseHeader(['StudentN0']);
+      parseHeaderFromCsv(['StudentN0']);
     } catch (error: unknown) {
       checkError(
         error,
@@ -122,7 +122,7 @@ describe('Test CSV student grades parser', () => {
       [ '666666', '16', '4', '0', '15', '2' ]
     ];
     const attainmentIds: Array<number> = [1, 2, 3, 4, 5];
-    const result: Array<Student> = parseGrades(studentGradingData, attainmentIds);
+    const result: Array<Student> = parseGradesFromCsv(studentGradingData, attainmentIds);
 
     result.forEach((student: Student, index: number) => {
       const rowData: Array<string> = studentGradingData[index];
@@ -148,7 +148,7 @@ describe('Test CSV student grades parser', () => {
     const attainmentIds: Array<number> = [1, 2, 3, 4, 5];
 
     try {
-      parseGrades(studentGradingData, attainmentIds);
+      parseGradesFromCsv(studentGradingData, attainmentIds);
     } catch (error: unknown) {
       checkError(
         error,
@@ -170,7 +170,7 @@ describe('Test CSV student grades parser', () => {
     const attainmentIds: Array<number> = [1, 2, 3, 4, 5];
 
     try {
-      parseGrades(studentGradingData, attainmentIds);
+      parseGradesFromCsv(studentGradingData, attainmentIds);
     } catch (error: unknown) {
       checkError(
         error,
