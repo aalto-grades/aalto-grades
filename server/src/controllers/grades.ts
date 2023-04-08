@@ -84,7 +84,22 @@ export function parseGradesFromCsv(
 ): Array<StudentGrades> {
   const students: Array<StudentGrades> = [];
   const errors: Array<string> = [];
-  let currentRow: number = 2; // Takes into consideration header row and start index of 0.
+
+  /**
+   * currentRow and currentColumn expresses the user uploaded CSV file row and column.
+   * From CSV file point of view function parseGradesFromCsv starts grade parsing from row 2.
+   * Both of these values are incremented after row/column parsing operation.
+   *
+   *        | column 1  | column 2 | column 3 |
+   *  --------------------------------------------
+   *  row 1:| StudentNo | C1I1A1   | C1I1A6   |
+   *  row 2:| 812472    | 12       | 32       |
+   *  row 3:| 545761    | 0        | 15       |
+   *  ...
+   *  row n:| ...
+   */
+  let currentRow: number = 2;
+  let currentColumn: number = 2;
 
   for (const row of studentGradingData) {
     // TODO: validate with regex that valid student number?
@@ -100,8 +115,8 @@ export function parseGradesFromCsv(
 
       if (isNaN(Number(gradingData[i]))) {
         errors.push(
-          // Columm is i + 2 because first one is student numbers, starting index = 0.
-          `CSV file row ${currentRow} column ${i + 2} expected number, received "${gradingData[i]}"`
+          `CSV file row ${currentRow} column ${currentColumn}` +
+          ` expected number, received "${gradingData[i]}"`
         );
       } else {
         const grade: UserAttainmentGradeData = {
@@ -110,7 +125,10 @@ export function parseGradesFromCsv(
         };
         student.grades.push(grade);
       }
+      ++currentColumn;
     }
+    // Reset column number to 2, after row parsing finished.
+    currentColumn = 2;
     ++currentRow;
     students.push(student);
   }
