@@ -19,6 +19,6 @@ INSERT INTO public.attainable (course_id, course_instance_id, attainable_id, nam
 (5, 8, 13, 'test assignment 1st level child 1', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 3, "weight": 2 }'),
 (5, 8, 13, 'test assignment 1st level child 2', '2022-05-13', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 3, "weight": 1 }');
 
-INSERT INTO public.user_attainment_grade (user_id, attainable_id, points, created_at, updated_at) VALUES
+INSERT INTO public.user_attainment_grade (user_id, attainable_id, grade, created_at, updated_at) VALUES
 (1, 14, 0.37, NOW(), NOW()),
 (1, 15, 0.5, NOW(), NOW());
