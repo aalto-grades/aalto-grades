@@ -65,7 +65,21 @@ const formatGradingScale = (gradingScale) => {
   }
 };
 
+const convertToServerGradingScale = (gradingScale) => {
+  switch (gradingScale) {
+  case 'General scale, 0-5':
+    return 'NUMERICAL';
+  case 'Pass-Fail':
+    return 'PASS-FAIL';
+  case 'Second national language':
+    return 'SECOND_NATIONAL_LANGUAGE';
+  default:
+    return gradingScale;
+  }
+};
+
 export default { 
+  convertToServerGradingScale,
   formatDateToString, 
   formatStringToDate, 
   formatDateToSlashString, 

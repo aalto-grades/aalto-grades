@@ -18,6 +18,8 @@ export const InstanceCreationRoute = () => {
   const [stringMinCredits, setMinCredits]       = useState('');
   const [stringMaxCredits, setMaxCredits]       = useState('');
   const [gradingScale, setGradingScale]         = useState('');
+  const [startingPeriod, setStartingPeriod]     = useState('');
+  const [endingPeriod, setEndingPeriod]         = useState('');
 
   const value = useMemo(() => (
     { addedAttainments, setAddedAttainments,
@@ -30,8 +32,10 @@ export const InstanceCreationRoute = () => {
       stringMinCredits, setMinCredits,
       stringMaxCredits, setMaxCredits,
       gradingScale, setGradingScale,
+      startingPeriod, setStartingPeriod,
+      endingPeriod, setEndingPeriod
     }
-  ), [courseType, startDate, endDate, teachers, stringMinCredits, stringMaxCredits, gradingScale, addedAttainments, suggestedAttainments, attainmentIncrementId]);
+  ), [courseType, startDate, endDate, teachers, stringMinCredits, stringMaxCredits, gradingScale, startingPeriod, endingPeriod, addedAttainments, suggestedAttainments, attainmentIncrementId]);
 
   return <Outlet context={value} />;
 };

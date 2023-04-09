@@ -11,10 +11,16 @@ import AssignmentCategory from './assignments/AssignmentCategory';
 import AlertSnackbar from './alerts/AlertSnackbar';
 import LightLabelBoldValue from './typography/LightLabelBoldValue';
 import textFormatServices from '../services/textFormat';
+import instancesService from '../services/instances';
+//import assignmentServices from '../services/assignments'; 
 
-const loadingMsg = { msg: 'Creating instance...', severity: 'info' };
-const successMsg = { msg: 'Instance created, you will be redirected to the course page.', severity: 'success' };
-const errorMsg = { msg: 'Instance creation failed.', severity: 'error' };
+const loadingMsgInstance = { msg: 'Creating instance...', severity: 'info' };
+const successMsg = { msg: 'Instance created successfully.', severity: 'success' };
+const errorMsgInstance = { msg: 'Instance creation failed.', severity: 'error' };
+
+//const loadingMsgAttainments = { msg: 'Adding attainments to the instance...', severity: 'info' };
+const successMsgA = { msg: 'Attainments added, you will be redirected to the course page.', severity: 'success' };
+//const errorMsgAttainments = { msg: 'Something went wrong with adding the attainments. In a moment you will be redirected to the instance where you can add attainments.', severity: 'error' };
 
 const InstanceSummaryView = () => {
   let navigate = useNavigate();
@@ -28,7 +34,9 @@ const InstanceSummaryView = () => {
     stringMinCredits, 
     stringMaxCredits, 
     gradingScale, 
-    teachers 
+    teachers,
+    startingPeriod,
+    endingPeriod 
   } = useOutletContext();
 
   // state variables handling the alert messages
@@ -52,24 +60,59 @@ const InstanceSummaryView = () => {
     navigate('/' + courseId + '/add-attainments/' + sisuInstanceId);
   };
 
-  // Temporary to fake the effect of loading
+  // Helper function
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
   const onCreateInstance = async () => {
-    setSnackPack((prev) => [...prev, loadingMsg]);
+    setSnackPack((prev) => [...prev, loadingMsgInstance]);
 
     // TODO: replace and actually create the instance, 
     // make success dependant on the result 
-    await sleep(2000);
-    const success = true; 
-    await sleep(1000);
-    if (success) {
+
+    // 1. create instance
+    // 2. loop through assignments and add them to the created instance
+
+    try {
+      const instanceObj = { 
+        gradingScale: textFormatServices.convertToServerGradingScale(gradingScale),
+        sisuCourseInstanceId: sisuInstanceId,
+        type: courseType,
+        teachersInCharge: teachers,
+        startingPeriod: startingPeriod,
+        endingPeriod: endingPeriod,
+        minCredits: stringMinCredits,
+        maxCredits: stringMaxCredits,
+        startDate: startDate,
+        endDate: endDate
+      };
+      console.log(instanceObj);
+      const instanceResponse = await instancesService.createInstance(courseId, instanceObj);
       setSnackPack((prev) => [...prev, successMsg]);
+
+      addedAttainments.forEach(attainment => {
+        console.log(instanceResponse.courseInstance.id);
+        //const attainment = await assignmentServices.addAttainment(courseId, instanceResponse.courseInstance.id, attainmentObject);
+        console.log(attainment);
+      });
+      setSnackPack((prev) => [...prev, successMsgA]);
+
       await sleep(4000);
       navigate('/course-view/' + courseId);
-    } else {
-      setSnackPack((prev) => [...prev, errorMsg]);
+    } catch (err) {
+      console.log(err);
+      setSnackPack((prev) => [...prev, errorMsgInstance]);
     }
+
+    //await sleep(2000);
+    //const success = true; 
+    //await sleep(1000);
+    //if (success) {
+    //  setSnackPack((prev) => [...prev, successMsg]);
+    //  await sleep(4000);
+    //  navigate('/course-view/' + courseId);
+    //} else {
+    //  setSnackPack((prev) => [...prev, errorMsgInstance]);
+    //}
   };
 
   return(
