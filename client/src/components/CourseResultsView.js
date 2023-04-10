@@ -48,21 +48,28 @@ const CourseResultsView = () => {
       { msg: 'Calculating final grades...', severity: 'info' }
     ]);
     await sleep(3000);
-    try {
-      // TODO: connect to backend
+    // Throw error if no grades have been added
+    if (students.length === 0) {
       setSnackPack((prev) => [...prev,
-        { msg: 'Final grades calculated successfully.', severity: 'success' }
+        { msg: 'Import student grades before calculating the final grade.', severity: 'error' }
       ]);
-      setStudents(mockStudentGradesFinal);
-      await sleep(3000);
-      setAlertOpen(false);
-
-    } catch (exception) {
-      console.log(exception);
-      setSnackPack((prev) => [...prev,
-        { msg: 'Calculating the final grades failed.', severity: 'error' }
-      ]);
+    } else {
+      try {
+        // TODO: connect to backend
+        setSnackPack((prev) => [...prev,
+          { msg: 'Final grades calculated successfully.', severity: 'success' }
+        ]);
+        setStudents(mockStudentGradesFinal);
+  
+      } catch (exception) {
+        console.log(exception);
+        setSnackPack((prev) => [...prev,
+          { msg: 'Calculating the final grades failed.', severity: 'error' }
+        ]);
+      }
     }
+    await sleep(4000);
+    setAlertOpen(false);
   };
 
   const updateGrades = async (newGrades) => {
@@ -90,7 +97,7 @@ const CourseResultsView = () => {
   return (
     <Box textAlign='left' alignItems='left'>
       <AlertSnackbar messageInfo={messageInfo} setMessageInfo={setMessageInfo} open={alertOpen} setOpen={setAlertOpen} />
-      <Typography variant="h3" component="div" sx={{ flexGrow: 1, mt: 8, mb: 4 }}>
+      <Typography variant="h1" sx={{ flexGrow: 1, mt: 8, mb: 4 }}>
         Course Results
       </Typography>
       <CourseResultsTable
