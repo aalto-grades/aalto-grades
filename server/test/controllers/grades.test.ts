@@ -164,7 +164,6 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
         .attach('csv_data', invalidCsvData, { contentType: 'text/csv'});
 
       const expectedErrors: Array<string> = [
-        'CSV parse error, header row column 1 must be "StudentNo", received "StudentN0"',
         'Header attainment data parsing failed at column 2.' +
         ' Received C1IYA1, expected format C{courseId}I{courseInstanceId}A{attainmentId}.',
         'Header attainment data parsing failed at column 4.' +

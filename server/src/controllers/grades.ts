@@ -31,13 +31,6 @@ export function parseHeaderFromCsv(header: Array<string>): Array<number> {
   const attainmentIds: Array<number> = [];
   const errors: Array<string> = [];
 
-  // Check that first column matches requirements.
-  if (header[0].toLocaleLowerCase() !== 'studentno') {
-    errors.push(
-      `CSV parse error, header row column 1 must be "StudentNo", received "${header[0]}"`
-    );
-  }
-
   // Remove first input "StudentNo". Avoid using shift(), will have side-effects outside function.
   const attainmentData: Array<string> = header.slice(1);
 
