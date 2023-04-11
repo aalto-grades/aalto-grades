@@ -39,10 +39,32 @@ const upload: Multer = multer({
  * /v1/courses/{courseId}/instances/{instanceId}/grades/csv:
  *   post:
  *     tags: [Grades]
- *     description: Add attainment points for users enrolled in a specific course instance.
+ *     description: >
+ *       Add attainment grades for users enrolled in a specific course instance. Attainment grading
+ *       data is provided in CSV file. When sending data set **Content-Type** header as
+ *       **multipart/form-data** and file name as "csv_data".
+ *     parameters:
+ *       - in: path
+ *         name: courseId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the course.
+ *       - in: path
+ *         name: instanceId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the course instance.
  *     requestBody:
  *       content:
  *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               csv_data:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       200:
  *         description: Grading CSV uploaded and parsed succesfully.
