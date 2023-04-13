@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState } from 'react';
+import React, { useState, createRef } from 'react';
+import { useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -13,23 +14,31 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import FormHelperText from '@mui/material/FormHelperText';
+import gradesService from '../../services/grades';
 
 // A Dialog component for uploading a file
 
 const instructions = 'Upload a CSV file with the header "studentNo" and headers matching to the study \
   attainment tags you wish to add grades for. You can see an example of a CSV file of the correct format below.';
 const exampleText = 'A student with the student number 222222 has gotten 8 points from the attainment \'C3I9A1\' and 7 points from attainment \'C3I9A2\'.';
+const errorInstructions = 'The input file could not be processed because of the issues listed below. They need to be fixed.';
 
-const FileLoadDialog = ({ handleClose, open }) => {
-  const [file, setFile] = useState(null);
-  const [error, setError] = useState('');
+const FileLoadDialog = ({ instanceId, handleClose, open }) => {
+  let { courseId } = useParams();
+  const fileInput = createRef();
 
-  const getFileName = file => file.split('\\').pop();
+  const [fileName, setFileName] = useState(null);
+  const [validationError, setValidationError] = useState('');
+  const [fileErrors, setFileErrors] = useState([]);
 
-  const uploadFile = () => {
-    // TODO: validate csv ?? 
-    // TODO: send file to backend
-    console.log('sent: ' + getFileName(file));
+  const uploadFile = async () => {
+    try {
+      await gradesService.importCsv(courseId, instanceId, fileInput.current.files[0]);
+      handleClose();
+      setFileName(null);
+    } catch (err) {
+      setFileErrors(err.response.data.errors);
+    }
   };
 
   return (
@@ -56,38 +65,46 @@ const FileLoadDialog = ({ handleClose, open }) => {
           <Button component='label'>
             Upload file
             <input 
-              hidden 
+              hidden
+              name='file_input' 
+              ref={fileInput}
               type='file' 
               accept='.csv' 
               onChange={(event) => {
-                if (event.target.value) {
-                  setError('');
+                event.preventDefault();
+                if (event.target.value) { // new input -> clear errors
+                  setValidationError('');
+                  setFileErrors([]);
                 }
-                setFile(event.target.value);
+                setFileName(fileInput.current.files[0].name);
               }} 
             />  {/* accept multiple?? */}
           </Button>
-          <Typography>{file ? getFileName(file) : 'Select a file'}</Typography>  {/* Name of the file here */}
+          <Typography>{fileName ?? 'Select a file'}</Typography>
         </Box>
-        <FormHelperText error={error !== ''}>{error}</FormHelperText>
+        {validationError && <FormHelperText error={true}>{validationError}</FormHelperText>}
+        {fileErrors.length !== 0 && 
+          <>
+            <Typography id={'file_content_errors'} sx={{ mt: 2 }}>{errorInstructions}</Typography>
+            {fileErrors.map(err => <FormHelperText key={err} error={true}>{err}</FormHelperText>)}
+          </>
+        }
       </DialogContent>
       <DialogActions sx={{ pr: 4, pb: 3 }}>
         <Button size='medium' onClick={() => {
           handleClose();
-          setFile(null);
-          setError('');
+          setFileName(null);
+          setValidationError('');
+          setFileErrors([]);
         }}>
           Cancel
         </Button>
         <Button size='medium' variant='outlined' onClick={() => {
-          if (!file) {
-            setError('You must select a csv file to submit');
+          if (!fileName) {
+            setValidationError('You must select a csv file to submit');
             return;
           }
           uploadFile();
-          handleClose();
-          setFile(null);
-          setError('');
         }}>
           Confirm
         </Button>
@@ -97,6 +114,7 @@ const FileLoadDialog = ({ handleClose, open }) => {
 };
 
 FileLoadDialog.propTypes = {
+  instanceId: PropTypes.number,
   handleClose: PropTypes.func,
   open: PropTypes.bool,
 };
