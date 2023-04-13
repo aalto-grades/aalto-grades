@@ -26,6 +26,7 @@ import SelectFormulaView from './components/SelectFormulaView';
 import FormulaAttributesView from './components/FormulaAttributesView';
 import CreateAssignmentView from './components/CreateAssignmentView';
 import EditAssignmentView from './components/EditAssignmentView';
+import CourseResultsView from './components/CourseResultsView';
 import InstanceCreationRoute from './context/InstanceCreationRoute';
 import FormulaSelectionRoute from './context/FormulaSelectionRoute';
 import useLogout from './hooks/useLogout';
@@ -158,6 +159,7 @@ function App() {
             { /* Pages that are authorised for admin and teachers */ }
             <Route element={<PrivateRoute roles={[roles.admin, roles.teacher]}/>}>
               <Route path=':courseId/fetch-instances/:courseCode' element={<FetchInstancesView/>}/>
+              <Route path=':courseId/course-results/:instanceId' element={<CourseResultsView/>}/>
               { /* Pages under this route share instance creation context */ }
               <Route element={<InstanceCreationRoute/>}>
                 <Route path=':courseId/edit-instance/:sisuInstanceId' element={<EditInstanceView/>}/>
