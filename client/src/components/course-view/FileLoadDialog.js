@@ -16,6 +16,7 @@ import Button from '@mui/material/Button';
 import FormHelperText from '@mui/material/FormHelperText';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import gradesService from '../../services/grades';
+import mockStudentGrades from '../../mock-data/mockStudentGrades';
 
 // A Dialog component for uploading a file
 
@@ -28,7 +29,7 @@ const loadingMsg = { msg: 'Importing grades...', severity: 'info' };
 const successMsg = { msg: 'File processed successfully, grades imported.', severity: 'success' };
 const errorMsg = { msg: 'There was an issue progressing the file, the grades were not imported', severity: 'error' };
 
-const FileLoadDialog = ({ instanceId, handleClose, open }) => {
+const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades }) => {
   let { courseId } = useParams();
   const fileInput = createRef();
 
@@ -59,6 +60,12 @@ const FileLoadDialog = ({ instanceId, handleClose, open }) => {
       await gradesService.importCsv(courseId, instanceId, fileInput.current.files[0]);
 
       setSnackPack((prev) => [...prev, successMsg]);
+
+      if (returnImportedGrades) {
+        // TODO: replace mock grades with response from backend
+        // or fetch updated grades from backend
+        returnImportedGrades(mockStudentGrades);
+      }
 
       handleClose();
       setFileName(null);
@@ -147,6 +154,7 @@ FileLoadDialog.propTypes = {
   instanceId: PropTypes.number,
   handleClose: PropTypes.func,
   open: PropTypes.bool,
+  returnImportedGrades: PropTypes.func
 };
 
 export default FileLoadDialog;
