@@ -117,7 +117,7 @@ describe('FileLoadDialog test with proper csv', () => {
       fireEvent.change(getByText('Upload file').querySelector('input[type="file"]'), {
         target: { files: [file] },
       })
-    )
+    );
 
     const confirmButton = getByText('Confirm');
     await act(async () => await userEvent.click(confirmButton));
@@ -170,7 +170,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
       fireEvent.change(getByText('Upload file').querySelector('input[type="file"]'), {
         target: { files: [file] },
       })
-    )
+    );
     
     const confirmButton = getByText('Confirm');
     userEvent.click(confirmButton);
