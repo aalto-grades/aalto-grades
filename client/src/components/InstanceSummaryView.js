@@ -12,7 +12,7 @@ import AlertSnackbar from './alerts/AlertSnackbar';
 import LightLabelBoldValue from './typography/LightLabelBoldValue';
 import textFormatServices from '../services/textFormat';
 import instancesService from '../services/instances';
-//import assignmentServices from '../services/assignments'; 
+import assignmentServices from '../services/assignments'; 
 
 const loadingMsgInstance = { msg: 'Creating instance...', severity: 'info' };
 const successMsg = { msg: 'Instance created successfully.', severity: 'success' };
@@ -66,9 +66,6 @@ const InstanceSummaryView = () => {
   const onCreateInstance = async () => {
     setSnackPack((prev) => [...prev, loadingMsgInstance]);
 
-    // TODO: replace and actually create the instance, 
-    // make success dependant on the result 
-
     // 1. create instance
     // 2. loop through assignments and add them to the created instance
 
@@ -77,42 +74,33 @@ const InstanceSummaryView = () => {
         gradingScale: textFormatServices.convertToServerGradingScale(gradingScale),
         sisuCourseInstanceId: sisuInstanceId,
         type: courseType,
-        teachersInCharge: teachers,
-        startingPeriod: startingPeriod,
-        endingPeriod: endingPeriod,
+        teachersInCharge: [1],                   // fake ! TODO: replace with teachers when figured out how to fetch ids (currently strings)
+        startingPeriod: startingPeriod ?? 'I',   // fake ! TODO: replace with just startingPeriod when it's not just null anymore
+        endingPeriod: endingPeriod ?? 'III',     // fake ! TODO: replace with just endingPeriod when it's not just null anymore
         minCredits: stringMinCredits,
         maxCredits: stringMaxCredits,
         startDate: startDate,
         endDate: endDate
       };
-      console.log(instanceObj);
       const instanceResponse = await instancesService.createInstance(courseId, instanceObj);
       setSnackPack((prev) => [...prev, successMsg]);
 
-      addedAttainments.forEach(attainment => {
-        console.log(instanceResponse.courseInstance.id);
-        //const attainment = await assignmentServices.addAttainment(courseId, instanceResponse.courseInstance.id, attainmentObject);
-        console.log(attainment);
-      });
+      await sleep(4000);
+
+      const formattedAttainments = assignmentServices.formatStringsToDates(addedAttainments);
+      await Promise.all(formattedAttainments.map(async (attainment) => {
+        const res = await assignmentServices.addAttainment(courseId, instanceResponse.courseInstance.id, attainment);
+        console.log(res);
+      }));
+
       setSnackPack((prev) => [...prev, successMsgA]);
 
-      await sleep(4000);
+      await sleep(3000);
       navigate('/course-view/' + courseId);
     } catch (err) {
       console.log(err);
-      setSnackPack((prev) => [...prev, errorMsgInstance]);
+      setSnackPack((prev) => [...prev, errorMsgInstance]); // TODO: differentiate the error based on which fails
     }
-
-    //await sleep(2000);
-    //const success = true; 
-    //await sleep(1000);
-    //if (success) {
-    //  setSnackPack((prev) => [...prev, successMsg]);
-    //  await sleep(4000);
-    //  navigate('/course-view/' + courseId);
-    //} else {
-    //  setSnackPack((prev) => [...prev, errorMsgInstance]);
-    //}
   };
 
   return(
