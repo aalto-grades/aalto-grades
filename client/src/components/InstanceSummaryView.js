@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -13,14 +13,13 @@ import LightLabelBoldValue from './typography/LightLabelBoldValue';
 import textFormatServices from '../services/textFormat';
 import instancesService from '../services/instances';
 import assignmentServices from '../services/assignments'; 
+import useSnackPackAlerts from '../hooks/useSnackPackAlerts';
 
-const loadingMsgInstance = { msg: 'Creating instance...', severity: 'info' };
-const successMsg = { msg: 'Instance created successfully.', severity: 'success' };
+const successMsgInstance = { msg: 'Instance created successfully.', severity: 'success' };
 const errorMsgInstance = { msg: 'Instance creation failed.', severity: 'error' };
 
-//const loadingMsgAttainments = { msg: 'Adding attainments to the instance...', severity: 'info' };
-const successMsgA = { msg: 'Attainments added, you will be redirected to the course page.', severity: 'success' };
-//const errorMsgAttainments = { msg: 'Something went wrong with adding the attainments. In a moment you will be redirected to the instance where you can add attainments.', severity: 'error' };
+const successMsgAttainments = { msg: 'Attainments added successfully. Redirecting to course page in 30 seconds.', severity: 'success' };
+const errorMsgAttainments = { msg: 'Something went wrong while adding attainments. Redirecting to course page in 30 seconds. Attainments can be modified there.', severity: 'error' };
 
 const InstanceSummaryView = () => {
   let navigate = useNavigate();
@@ -39,22 +38,10 @@ const InstanceSummaryView = () => {
     endingPeriod 
   } = useOutletContext();
 
-  // state variables handling the alert messages
-  const [snackPack, setSnackPack] = useState([]);
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [messageInfo, setMessageInfo] = useState(undefined);
+  const [created, setCreated] = useState(false);
 
-  // useEffect in charge of handling the back-to-back alerts
-  // makes the previous disappear before showing the new one
-  useEffect(() => {
-    if (snackPack.length && !messageInfo) {
-      setMessageInfo({ ...snackPack[0] });
-      setSnackPack((prev) => prev.slice(1));
-      setAlertOpen(true);
-    } else if (snackPack.length && messageInfo && alertOpen) {
-      setAlertOpen(false);
-    }
-  }, [snackPack, messageInfo, alertOpen]);
+  const [setInstanceAlert, messageInfo, setMessageInfo, alertOpen, setAlertOpen] = useSnackPackAlerts();
+  const [setAttainmentAlert, messageInfo2, setMessageInfo2, alertOpen2, setAlertOpen2] = useSnackPackAlerts();
 
   const onGoBack = () => {
     navigate('/' + courseId + '/add-attainments/' + sisuInstanceId);
@@ -64,11 +51,8 @@ const InstanceSummaryView = () => {
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
   const onCreateInstance = async () => {
-    setSnackPack((prev) => [...prev, loadingMsgInstance]);
 
-    // 1. create instance
-    // 2. loop through assignments and add them to the created instance
-
+    // attempt to create instance
     try {
       const instanceObj = { 
         gradingScale: textFormatServices.convertToServerGradingScale(gradingScale),
@@ -83,29 +67,33 @@ const InstanceSummaryView = () => {
         endDate: endDate
       };
       const instanceResponse = await instancesService.createInstance(courseId, instanceObj);
-      setSnackPack((prev) => [...prev, successMsg]);
+      setInstanceAlert((prev) => [...prev, successMsgInstance]);
+      setCreated(true);
 
-      await sleep(4000);
+      // attempt to add all assignments
+      try {
+        const formattedAttainments = assignmentServices.formatStringsToDates(addedAttainments);
+        await Promise.all(formattedAttainments.map(async (attainment) => {
+          const res = await assignmentServices.addAttainment(courseId, instanceResponse.courseInstance.id + 2000, attainment);
+          console.log(res);
+        }));
+        setAttainmentAlert((prev) => [...prev, successMsgAttainments]);
+      } catch (attainmentErr) {
+        setAttainmentAlert((prev) => [...prev, errorMsgAttainments]);
+      }
 
-      const formattedAttainments = assignmentServices.formatStringsToDates(addedAttainments);
-      await Promise.all(formattedAttainments.map(async (attainment) => {
-        const res = await assignmentServices.addAttainment(courseId, instanceResponse.courseInstance.id, attainment);
-        console.log(res);
-      }));
-
-      setSnackPack((prev) => [...prev, successMsgA]);
-
-      await sleep(3000);
-      navigate('/course-view/' + courseId);
+      // return to the course page even if error in attainment creation
+      await sleep(30000);
+      navigate('/course-view/' + courseId);   
     } catch (err) {
-      console.log(err);
-      setSnackPack((prev) => [...prev, errorMsgInstance]); // TODO: differentiate the error based on which fails
+      setInstanceAlert((prev) => [...prev, errorMsgInstance]);
     }
   };
 
   return(
     <Box sx={{ display: 'grid', gap: 1.5, ml: '7.5vw', mr: '7.5vw' }}>
       <AlertSnackbar messageInfo={messageInfo} setMessageInfo={setMessageInfo} open={alertOpen} setOpen={setAlertOpen} />
+      <AlertSnackbar position={2} messageInfo={messageInfo2} setMessageInfo={setMessageInfo2} open={alertOpen2} setOpen={setAlertOpen2} />
       <Typography variant='h1' align='left' sx={{ mb: 4 }}>Summary</Typography>
       <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >Basic Information</Typography>
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', display: 'inline-block' }}>
@@ -131,10 +119,19 @@ const InstanceSummaryView = () => {
         }
         <Typography variant='body1' color='primary.main' sx={{ m: '8px 0px' }} >You can also add study attainments after creating the instance</Typography>
       </Box>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 6 }}>
-        <Button variant='outlined' onClick={() => onGoBack()} disabled={messageInfo?.severity === 'info'} >Go back</Button>
-        <Button variant='contained' onClick={() => onCreateInstance()} disabled={messageInfo?.severity === 'info'}>Create instance</Button>
-      </Box>
+      { created ?
+        <Button 
+          variant='contained' 
+          sx={{ width: 'fit-content', justifySelf: 'center', mb: 6  }} 
+          onClick={() => navigate('/course-view/' + courseId)} >
+          Return to course view
+        </Button>
+        :
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 6 }}>
+          <Button variant='outlined' onClick={() => onGoBack()} disabled={messageInfo?.severity === 'info'} >Go back</Button>
+          <Button variant='contained' onClick={() => onCreateInstance()} disabled={messageInfo?.severity === 'info'}>Create instance</Button>
+        </Box>
+      }
     </Box>
   );
 };
