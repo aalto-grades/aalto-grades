@@ -16,6 +16,7 @@ import assignmentServices from '../services/assignments';
 import useSnackPackAlerts from '../hooks/useSnackPackAlerts';
 
 const successMsgInstance = { msg: 'Instance created successfully.', severity: 'success' };
+const successMsgWithoutAttainments = { msg: 'Instance created successfully. Redirecting to course page in 30 seconds.', severity: 'success' };
 const errorMsgInstance = { msg: 'Instance creation failed.', severity: 'error' };
 
 const successMsgAttainments = { msg: 'Attainments added successfully. Redirecting to course page in 30 seconds.', severity: 'success' };
@@ -67,19 +68,22 @@ const InstanceSummaryView = () => {
         endDate: endDate
       };
       const instanceResponse = await instancesService.createInstance(courseId, instanceObj);
-      setInstanceAlert((prev) => [...prev, successMsgInstance]);
+      setInstanceAlert((prev) => [...prev, 
+        addedAttainments.length === 0 ? successMsgWithoutAttainments : successMsgInstance]
+      );
       setCreated(true);
 
       // attempt to add all assignments
-      try {
-        const formattedAttainments = assignmentServices.formatStringsToDates(addedAttainments);
-        await Promise.all(formattedAttainments.map(async (attainment) => {
-          const res = await assignmentServices.addAttainment(courseId, instanceResponse.courseInstance.id + 2000, attainment);
-          console.log(res);
-        }));
-        setAttainmentAlert((prev) => [...prev, successMsgAttainments]);
-      } catch (attainmentErr) {
-        setAttainmentAlert((prev) => [...prev, errorMsgAttainments]);
+      if (addedAttainments.length > 0) {
+        try {
+          const formattedAttainments = assignmentServices.formatStringsToDates(addedAttainments);
+          await Promise.all(formattedAttainments.map(async (attainment) => {
+            await assignmentServices.addAttainment(courseId, instanceResponse.courseInstance.id, attainment);
+          }));
+          setAttainmentAlert((prev) => [...prev, successMsgAttainments]);
+        } catch (attainmentErr) {
+          setAttainmentAlert((prev) => [...prev, errorMsgAttainments]);
+        }
       }
 
       // return to the course page even if error in attainment creation
