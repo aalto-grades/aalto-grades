@@ -41,6 +41,6 @@ registerFormula(
   yup.object({
     min: yup.number().required(),
     max: yup.number().required(),
-    weights: yup.array(yup.number().required()).required(),
+    weight: yup.number().required()
   })
 );
