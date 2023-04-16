@@ -187,7 +187,7 @@ export async function calculateGrades(
         parentId: attainment.attainableId,
         formula: attainment.formula,
         parentFormulaParams: attainment.parentFormulaParams
-      }
+      };
     }
   );
 
