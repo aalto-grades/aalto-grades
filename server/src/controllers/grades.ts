@@ -139,8 +139,8 @@ export function parseGradesFromCsv(
  * @param {Response} res - The HTTP response to be sent to the client.
  * @param {NextFunction} next - The next middleware function to be executed in the pipeline.
  * @returns {Promise<void>} - A Promise that resolves when the function has completed its execution.
- * @throws {ApiError} - If the CSV file loading fails, parsing header/body of the CSV or attainments
- * not belonging to the specified course/course instance.
+ * @throws {ApiError} - If loading the CSV file fails, parsing the header or body of the CSV fails, or 
+ * the CSV file contains attainments which don't belong to the specified course or course instance.
 */
 export async function addGrades(req: Request, res: Response, next: NextFunction): Promise<void> {
   /*
