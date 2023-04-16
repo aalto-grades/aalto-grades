@@ -30,4 +30,8 @@ export class ApiError extends Error {
     this.statusCode = statusCode;
     this.name = 'ApiError';
   }
+
+  get errors(): Array<string> {
+    return this.multipleErrors ?? [this.message];
+  }
 }
