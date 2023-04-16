@@ -120,7 +120,7 @@ export function parseGradesFromCsv(
       }
       ++currentColumn;
     }
-    // Reset column number to 2, after row parsing finished.
+    // Reset column number to 2 for parsing the next row.
     currentColumn = 2;
     ++currentRow;
     students.push(student);
