@@ -75,7 +75,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
     name: name,
     date: date,
     expiryDate: expiryDate,
-    formulaId: Formula.Manual,
+    formula: Formula.Manual,
   });
 
   async function processSubAttainables(
@@ -92,7 +92,7 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
         name: attainable.name,
         date: attainable.date,
         expiryDate: attainable.expiryDate,
-        formulaId: Formula.Manual,
+        formula: Formula.Manual,
       });
 
       if (attainable.subAttainments.length > 0) {
