@@ -54,6 +54,19 @@ const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      const updatedAttainments = selectedAttainments.map((attainment, index) => {
+        const values = attributeValues[index];
+        const attributeObj = {};
+        selectedFormula.attributes.forEach((elem, i) => {
+          attributeObj[elem] = values[i];
+        });
+        return {
+          ...attainment,
+          affectCalculation: true,
+          formulaAttributes: attributeObj
+        };
+      });
+      console.log(updatedAttainments);
       // TODO: add formula and attributes to database
       // Depending on how long adding the formula and attributes to the database takes,
       // a loading messsage may need to be added

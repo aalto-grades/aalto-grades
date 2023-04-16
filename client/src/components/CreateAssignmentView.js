@@ -28,7 +28,7 @@ const CreateAssignmentView = () => {
     date: '',
     expiryDate: '',
     affectCalculation: false,
-    formulaAttributes: [],
+    formulaAttributes: {},
     subAttainments: [],
   }]);
 

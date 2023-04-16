@@ -96,7 +96,23 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
     event.preventDefault();
     if (canBeSubmitted()) {
       try {
-        // TODO: add formula to database
+
+        const updatedAttainments = selectedAttainments.map((attainment) => {
+          const attributeObj = {};
+          selectedFormula.attributes.forEach((elem) => {
+            attributeObj[elem] = '';
+          });
+          return {
+            ...attainment,
+            affectCalculation: true,
+            formulaAttributes: attributeObj
+          };
+        });
+        console.log(updatedAttainments);
+
+        // TODO: send formula to database
+        // TODO: add updated attainments to database
+
         setSnackPack((prev) => [...prev,
           { msg: 'Formula saved, you will be redirected to the course page.', severity: 'success' }
         ]);

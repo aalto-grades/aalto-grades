@@ -17,7 +17,11 @@ const mockAttainmentsClient = [
         expiryDate: new Date(2024, 8, 14), 
         formulaId: 1,
         affectCalculation: true,
-        formulaAttributes: ['', '', ''],
+        formulaAttributes: {
+          maxPoints: '',
+          minRequiredPoints: '',
+          weight: ''
+        },
         subAttainments: [
           { id: 111, 
             name: 'Exercise 1',
@@ -25,7 +29,11 @@ const mockAttainmentsClient = [
             date: new Date(2023, 9, 1), 
             expiryDate: new Date(2024, 8, 14),
             affectCalculation: true,
-            formulaAttributes: ['', '', ''],
+            formulaAttributes: {
+              maxPoints: '',
+              minRequiredPoints: '',
+              weight: ''
+            },
             subAttainments: [],
           }, 
           { id: 112, 
@@ -34,7 +42,11 @@ const mockAttainmentsClient = [
             date: new Date(2023, 9, 1), 
             expiryDate: new Date(2024, 8, 14),
             affectCalculation: true,
-            formulaAttributes: ['', '', ''],
+            formulaAttributes: {
+              maxPoints: '',
+              minRequiredPoints: '',
+              weight: ''
+            },
             subAttainments: [],
           }, 
           { id: 113, 
@@ -44,7 +56,11 @@ const mockAttainmentsClient = [
             expiryDate: new Date(2024, 8, 14), 
             formulaId: 1,
             affectCalculation: true,
-            formulaAttributes: ['', '', ''],
+            formulaAttributes: {
+              maxPoints: '',
+              minRequiredPoints: '',
+              weight: ''
+            },
             subAttainments: [
               { id: 1131, 
                 name: 'Exercise 3.1',
@@ -52,7 +68,11 @@ const mockAttainmentsClient = [
                 date: new Date(2023, 9, 1), 
                 expiryDate: new Date(2024, 8, 14),
                 affectCalculation: true,
-                formulaAttributes: ['', '', ''],
+                formulaAttributes: {
+                  maxPoints: '',
+                  minRequiredPoints: '',
+                  weight: ''
+                },
                 subAttainments: [],
               }, 
               { id: 1132,
@@ -61,7 +81,11 @@ const mockAttainmentsClient = [
                 date: new Date(2023, 9, 1), 
                 expiryDate: new Date(2024, 8, 14), 
                 affectCalculation: true,
-                formulaAttributes: ['', '', ''],
+                formulaAttributes: {
+                  maxPoints: '',
+                  minRequiredPoints: '',
+                  weight: ''
+                },
                 subAttainments: [],
               }
             ] 
@@ -72,7 +96,11 @@ const mockAttainmentsClient = [
             date: new Date(2023, 9, 1), 
             expiryDate: new Date(2024, 8, 14),
             affectCalculation: true,
-            formulaAttributes: ['', '', ''],
+            formulaAttributes: {
+              maxPoints: '',
+              minRequiredPoints: '',
+              weight: ''
+            },
             subAttainments: [],
           }
         ] 
@@ -84,7 +112,11 @@ const mockAttainmentsClient = [
         expiryDate: new Date(2024, 8, 14), 
         formulaId: 1,
         affectCalculation: false,  // optional exercises don't affect the grade of Exercises
-        formulaAttributes: ['', '', ''],
+        fformulaAttributes: {
+          maxPoints: '',
+          minRequiredPoints: '',
+          weight: ''
+        },
         subAttainments: [
           { id: 121, 
             name: 'Exercise 5',
@@ -92,7 +124,11 @@ const mockAttainmentsClient = [
             date: new Date(2023, 9, 1), 
             expiryDate: new Date(2024, 8, 14),
             affectCalculation: true,  // The grade for optional exercises is still calculated 
-            formulaAttributes: ['', '', ''],
+            formulaAttributes: {
+              maxPoints: '',
+              minRequiredPoints: '',
+              weight: ''
+            },
             subAttainments: [],
           }, 
           { id: 122, 
@@ -101,7 +137,11 @@ const mockAttainmentsClient = [
             date: new Date(2023, 9, 1), 
             expiryDate: new Date(2024, 8, 14),
             affectCalculation: true,  // The grade for optional exercises is still calculated 
-            formulaAttributes: ['', '', ''],
+            formulaAttributes: {
+              maxPoints: '',
+              minRequiredPoints: '',
+              weight: ''
+            },
             subAttainments: [],
           }, 
           { id: 123, 
@@ -110,7 +150,11 @@ const mockAttainmentsClient = [
             date: new Date(2023, 9, 1), 
             expiryDate: new Date(2024, 8, 14),
             affectCalculation: true,  // The grade for optional exercses is still calculated 
-            formulaAttributes: ['', '', ''],
+            formulaAttributes: {
+              maxPoints: '',
+              minRequiredPoints: '',
+              weight: ''
+            },
             subAttainments: [],
           },
         ] 

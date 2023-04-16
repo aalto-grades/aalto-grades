@@ -14,6 +14,7 @@ import ConfirmationDialog from './ConfirmationDialog';
 import StringTextField from './StringTextField';
 import DateTextField from './DateTextField';
 import assignmentServices from '../../services/assignments';
+import formulaService from '../../services/formulas';
 
 // An Assignmnet component without subAttainments and hence without a formula as well.
 // If this isn't the root Assignment, this can be deleted
@@ -45,11 +46,12 @@ const expiryData = {
 */
 const AttributeTextFields = ({ formulaAttributeNames, indices, setAttainments, attainments }) => {
   return (
-    formulaAttributeNames.map((attribute, index) => {
+    formulaAttributeNames.map((attribute) => {
+      const attributeLabel = formulaService.getAttributeLabel(attribute);
       return(
         <StringTextField 
-          key={index}
-          fieldData={{ fieldId: 'attribute' + index, fieldLabel: attribute }}
+          key={attribute}
+          fieldData={{ fieldId: 'attribute_'+attribute, fieldLabel: attributeLabel }}
           indices={indices} 
           setAttainments={setAttainments} 
           attainments={attainments}

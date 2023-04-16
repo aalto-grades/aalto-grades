@@ -160,22 +160,23 @@ const getProperty = (indices, attainments, property) => {
 };*/
 
 // Set the formula attribute an attainment
-const setFormulaAttribute = (indices, attainments, attributeIndex, value) => {
+const setFormulaAttribute = (indices, attainments, attributeKey, value) => {
   const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
   const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
-  array[lastIndex]['formulaAttributes'][attributeIndex] = value;
+  array[lastIndex]['formulaAttributes'][attributeKey] = value;
+  console.log(updatedAttainments);
   return updatedAttainments;
 };
 
 // Get the formula attribute an attainment
-const getFormulaAttribute = (indices, attainments, attributeIndex) => {
+const getFormulaAttribute = (indices, attainments, attributeKey) => {
   const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
   const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
-  return array[lastIndex]['formulaAttributes'][attributeIndex];
+  return array[lastIndex]['formulaAttributes'][attributeKey];
 };
 
 // Add sub-attainments to the attainments array (of nested arrays) according to the indices
@@ -195,7 +196,7 @@ const addSubAttainments = (indices, attainments, numOfAttainments, temporaryId) 
       expiryDate: defaultExpiryDate,
       parentId: parentId,
       affectCalculation: false,
-      formulaAttributes: [],
+      formulaAttributes: {},
       subAttainments: [],
     });
     newTemporaryId += 1;

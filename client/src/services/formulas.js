@@ -33,4 +33,13 @@ const getFormulaAttributes = (formulaId) => {
   return formulaAttributes;
 };
 
-export default { getFormulas, setFormula, getFormulaName, getFormulaAttributes };
+// A function for getting the displayable label from a label key
+// for example: the label key maxPoints would return Max Points
+const getAttributeLabel = (labelKey) => {
+  const splitString = labelKey.split(/(?=[A-Z])/);
+  const label = splitString.join(' ');
+  const capitalizedLabel = label.charAt(0).toUpperCase() + label.slice(1);
+  return capitalizedLabel; 
+};
+
+export default { getFormulas, setFormula, getFormulaName, getFormulaAttributes, getAttributeLabel };
