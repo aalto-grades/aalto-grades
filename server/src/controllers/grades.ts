@@ -264,7 +264,7 @@ export async function calculateGrades(
         studentNumber: attainmentGrade.User.studentId,
         grade: attainmentGrade.grade,
         attainmentId: attainmentGrade.attainableId
-      }
+      };
     }
   );
 
