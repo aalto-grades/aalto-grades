@@ -15,6 +15,7 @@ import { Formula, GradingResult, Status } from '../types/formulas';
 async function manualGradeUnspecified(): Promise<GradingResult> {
   // If no grade has been input for a student, assume the attainment
   // has been failed.
+  // TODO: This assumption should not be made.
   return {
     status: Status.Fail,
     grade: 0,

@@ -24,26 +24,25 @@ export interface GradingInput {
   params: object | null;
 }
 
-// A FormulaFunction represents a grade formula calculation operation, including
-// user-defined parameters and their values.
-//
-// For instance,
-// `getFormula({ min: 0, max: 5, weights: [2, 3] }, Formula.WeightedAverage)`
-// produces an `func: FormulaFunction` that expects two subResults.
-// The produced function calculates a weighted average with weights 2, 3
-// respectively.
+/**
+ * Type of functions implementing grade calculation formulas.
+ */
 export type FormulaFunction = (inputs: Array<GradingInput>) => Promise<GradingResult>;
 
+/**
+ * Stores a formula function as well as the Yup schema for validating its
+ * parameters.
+ */
 export interface FormulaImplementation {
   formulaFunction: FormulaFunction;
   paramSchema: yup.AnyObjectSchema;
 }
 
-// A FormulaNode represents a grade formula calculation operation, including
-// information about the formulas that are lower in the hierarchy tree.
+/**
+ * Stores information needed for calculating the grade of an attainment.
+ */
 export interface FormulaNode {
   formulaImplementation: FormulaImplementation;
   subFormulaNodes: Array<FormulaNode>;
-
   parentFormulaParams: object | null;
 }
