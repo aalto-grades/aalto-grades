@@ -328,8 +328,8 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         // TODO: Optimize if datasets are big.
         await UserAttainmentGrade.bulkCreate(preparedBulkCreate, { updateOnDuplicate: ['points'] });
 
-        // After this point all students attainemnt grades are created or updated
-        // in the database for each student.
+        // After this point all the students' attainment grades have been created or
+        // updated in the database.
 
         res.status(HttpCode.Ok).json({
           success: true,
