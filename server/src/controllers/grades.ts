@@ -79,9 +79,10 @@ export function parseGradesFromCsv(
   const errors: Array<string> = [];
 
   /**
-   * currentRow and currentColumn expresses the user uploaded CSV file row and column.
-   * From CSV file point of view function parseGradesFromCsv starts grade parsing from row 2.
-   * Both of these values are incremented after row/column parsing operation.
+   * currentRow and currentColumn are user facing row and column numbers of the
+   * uploaded CSV file. They are the index of the row and column plus 1,
+   * so the first row and column in the CSV file will have the index 0 but the
+   * number 1. See an example of row and column numbers below.
    *
    *        | column 1  | column 2 | column 3 |
    *  --------------------------------------------
@@ -90,6 +91,12 @@ export function parseGradesFromCsv(
    *  row 3:| 545761    | 0        | 15       |
    *  ...
    *  row n:| ...
+   *
+   * currentRow is incremented after a row has been parsed, currentColumn is
+   * incremented after a column of a row has been parsed and is reset to 2
+   * when the current row has been fully parsed.
+   *
+   * Row and column 1 are handled separately.
    */
   let currentRow: number = 2;
   let currentColumn: number = 2;
