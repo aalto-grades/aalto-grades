@@ -39,3 +39,7 @@ export async function getFormulaImplementation(
 
   return formulaImplementation;
 }
+
+// Call registerFormula in all formula definition files.
+require('./manual');
+require('./weightedAverage');

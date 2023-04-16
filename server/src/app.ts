@@ -10,6 +10,9 @@ import { FRONTEND_ORIGIN } from './configs/environment';
 import { router } from './routes/index';
 import { errorHandler } from './middleware/errorHandler';
 
+// Register formulas before starting Express.
+require('./formulas');
+
 export const app: Application = express();
 
 app.use(cors({
