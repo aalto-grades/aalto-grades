@@ -26,6 +26,7 @@ const InstanceBox = ({ courseId, instance }) => {
 
   return(
     <HoverBox 
+      className='ag_fetched_instance_option'
       sx={{ 
         display: 'flex', 
         alignItems: 'flex-start',  
