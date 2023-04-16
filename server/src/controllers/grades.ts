@@ -176,7 +176,7 @@ export async function calculateGrades(
       'id',
       'attainableId',
       'formula',
-      'formulaParams',
+      'parentFormulaParams',
     ],
   })).map(
     // TODO: Remove this map() call.
