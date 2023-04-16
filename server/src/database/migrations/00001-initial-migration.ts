@@ -211,12 +211,12 @@ export default {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
         },
-        formula_id: {
+        formula: {
           type: DataTypes.ENUM('MANUAL', 'WEIGHTED_AVERAGE'),
           allowNull: false,
           defaultValue: 'MANUAL',
         },
-        formula_params: {
+        parent_formula_params: {
           type: DataTypes.JSONB,
           allowNull: true,
         },

@@ -96,28 +96,39 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
   parser.end();
 }
 
-// TODO: Save calculated grades to the database.
+/**
+ * Recursively calculates the grade for a particular attainment by its formula
+ * node.
+ *
+ * TODO: Save calculated grades to the database.
+ */
 async function calculateFormulaNode(
   formulaNode: FormulaNode,
   presetGrades: Map<FormulaNode, number>
 ): Promise<GradingResult> {
-  if (presetGrades.has(formulaNode)) {
-    // If a teacher has manually specified a grade for a this attainment,
-    // the manually specified grade will be used. A grade has to be manually
-    // specified when using the 'Manual' formula and to allow for overriding
-    // grade calculation functions in special cases.
+  /*
+   * If a teacher has manually specified a grade for this attainment,
+   * the manually specified grade will be used.
+   *
+   * A grade has to be manually specified when using the 'Manual' formula
+   * and a grade may be manually specified for overriding grade calculation
+   * functions in special cases.
+   */
+  const presetGrade: number | undefined = presetGrades.get(formulaNode);
+  if (presetGrade) {
     return {
       status: Status.Pass,
-
-      // We already checked this is defined.
-      grade: presetGrades.get(formulaNode)! // eslint-disable-line
+      grade: presetGrade
     };
   }
 
-  // A teacher has not manually specified a grade for this attainment, therefore
-  // the grade will be calculated based on the given formula and the grades
-  // from this attainment's subattainments.
+  /*
+   * A teacher has not manually specified a grade for this attainment, therefore
+   * the grade will be calculated based on the given formula and the grades
+   * from this attainment's subattainments.
+   */
 
+  // Inputs for the formula of this attainment.
   const inputs: Array<GradingInput> = [];
 
   // First, recursively calculate the grades the subattainments.
@@ -147,13 +158,16 @@ export async function calculateGrades(
   const courseInstanceId: number = Number(req.params.instanceId);
   validateCourseAndInstance(courseId, courseInstanceId);
 
-  // Get all attainments in this course instance.
+  /*
+   * First we need to get all the attainments in this course instance.
+   */
+
   const attainments: Array<{
     id: number,
-    attainableId: number, // ID of parent attainment
-    formulaId: Formula | null,
-    formulaParams: object | null,
-  }> = await Attainable.findAll({
+    parentId: number,
+    formula: Formula | null,
+    parentFormulaParams: object | null,
+  }> = (await Attainable.findAll({
     where: {
       courseId,
       courseInstanceId,
@@ -161,35 +175,67 @@ export async function calculateGrades(
     attributes: [
       'id',
       'attainableId',
-      'formulaId',
+      'formula',
       'formulaParams',
     ],
-  });
+  })).map(
+    // TODO: Remove this map() call.
+    // map() is called as a temporary measure to translate attainableId to parentId.
+    (attainment: Attainable) => {
+      return {
+        id: attainment.id,
+        parentId: attainment.attainableId,
+        formula: attainment.formula,
+        parentFormulaParams: attainment.parentFormulaParams
+      }
+    }
+  );
 
-  // Attainment ID -> Formula used to calculate the grade of the given attainment.
+  /*
+   * Then we need to find the formulas used to calculate the grade of each
+   * attainment.
+   *
+   * For each attainment, we will construct a formula node object containing:
+   *   - The formula implementation storing the actual formula function as well
+   *     as the Yup schema for validating its parameters.
+   *   - The formula nodes of the subattainments of this attainment.
+   *   - The formula parameters needed for calculating the grade of this
+   *     attainment's parent attainment.
+   */
+
+  // Stores the formula nodes of each attainment.
+  // Attainment ID -> Formula node of the given attainment.
   const formulaNodesByAttainmentId: Map<number, FormulaNode> = new Map();
-  let rootFormulaNode: FormulaNode | null = null;
 
-  // Collect all attainment formulas into the formulaNodesByAttainmentId Map.
+  /*
+   * First find the formula implementation and formula parameters for the parent
+   * attainment's formula.
+   */
   for (const attainment of attainments) {
-    const formulaId: Formula | null = attainment.formulaId;
+    const formula: Formula | null = attainment.formula;
 
     // Ensure that the formula specified for this attainment is valid.
-    if (!yup.string().oneOf(Object.values(Formula)).required().validate(formulaId)) {
+    if (!yup.string().oneOf(Object.values(Formula)).required().validate(formula)) {
       throw new ApiError(
-        `invalid formula ${formulaId} for attainment with ID ${attainment.id}`,
+        `invalid formula ${formula} for attainment with ID ${attainment.id}`,
         HttpCode.InternalServerError
       );
     }
 
     formulaNodesByAttainmentId.set(attainment.id, {
-      formulaImplementation: await getFormulaImplementation(formulaId as Formula),
+      formulaImplementation: await getFormulaImplementation(formula as Formula),
       subFormulaNodes: [],
-      parentFormulaParams: attainment.formulaParams
+      parentFormulaParams: attainment.parentFormulaParams
     });
   }
 
-  // Build the tree structure of FormulaNodes using the Map by iterating again.
+  /*
+   * Then we will find the formula nodes of each attainment's subattainments.
+   * This will construct a tree structure, and a reference to the root of this
+   * tree is stored in the rootFormulaNode variable.
+   */
+  let rootFormulaNode: FormulaNode | null = null;
+
   for (const attainment of attainments) {
     const formulaNode: FormulaNode | undefined = formulaNodesByAttainmentId.get(attainment.id);
 
@@ -200,7 +246,17 @@ export async function calculateGrades(
       );
     }
 
-    if (attainment.attainableId === null) { // parent ID
+    /*
+     * Check whether this attainment is the root attainment. The root attainment
+     * has no parent.
+     */
+    if (attainment.parentId === null) {
+      /*
+       * This attainment is the root attainment. Store a reference to its formula
+       * node in the rootFormulaNode variable.
+       */
+
+      // There should only be one root attainment.
       if (rootFormulaNode) {
         throw new ApiError(
           'duplicate root attainment',
@@ -210,17 +266,24 @@ export async function calculateGrades(
 
       rootFormulaNode = formulaNode;
     } else {
+      /*
+       * This attainment is not the root attainment. So we will get its parent
+       * attainment's formula node and add this attainment's formula node to
+       * the parent's list of sub formula nodes.
+       */
+
       const parentFormulaNode: FormulaNode | undefined =
-        formulaNodesByAttainmentId.get(attainment.attainableId);
+        formulaNodesByAttainmentId.get(attainment.parentId);
 
       if (!parentFormulaNode) {
         throw new ApiError(
-          `found undefined formula node for attainment with ID ${attainment.id}`,
+          `found undefined formula node for attainment with ID ${attainment.parentId}`,
           HttpCode.InternalServerError
         );
       }
 
-      // Ensure that the formula params match formula of the parent attainment.
+      // Ensure that the parent formula parameters specified for this attainment
+      // match the schema of the parent attainment's formula.
       await parentFormulaNode.formulaImplementation.paramSchema.validate(
         formulaNode.parentFormulaParams
       );
@@ -229,14 +292,27 @@ export async function calculateGrades(
     }
   }
 
+  // If rootFormulaNode is still null, then no root attainment was found. This
+  // is a conflict, and we are unable to calculate the grades of this course
+  // instance.
   if (!rootFormulaNode) {
     throw new ApiError(
       'no root attainment found for this course instance; maybe there is a cycle',
-      HttpCode.BadRequest
+      HttpCode.Conflict
     );
   }
 
-  const presetGrades: Array<{
+  /*
+   * Now we know which formula to use to calculate the grade of each attainment
+   * as well as their parameters.
+   *
+   * Next we need to find the grades already manually specified by a teacher to
+   * use as a basis to calculate grades.
+   */
+
+  // Stores the grades of each student for each attainment which were manually
+  // specified by a teacher.
+  const unorganizedPresetGrades: Array<{
     studentNumber: string,
     grade: number,
     attainmentId: number
@@ -268,44 +344,78 @@ export async function calculateGrades(
     }
   );
 
-  // Student number -> formula node -> preset grade
-  const presetGradesByStudentNumber: Map<string, Map<FormulaNode, number>> = new Map();
+  /*
+   * Next we'll organize the preset grades by student number.
+   */
 
-  for (const presetGrade of presetGrades) {
-    if (!presetGradesByStudentNumber.has(presetGrade.studentNumber)) {
-      presetGradesByStudentNumber.set(presetGrade.studentNumber, new Map());
+  // Store the preset grades of all attainments per student. Stores all the
+  // same information as unorganizedPresetGrades.
+  // Student number -> Formula node -> Preset grade.
+  const organizedPresetGrades: Map<string, Map<FormulaNode, number>> = new Map();
+
+  for (const presetGrade of unorganizedPresetGrades) {
+    let userPresetGrades: Map<FormulaNode, number> | undefined =
+      organizedPresetGrades.get(presetGrade.studentNumber);
+
+    if (!userPresetGrades) {
+      userPresetGrades = new Map();
+      organizedPresetGrades.set(presetGrade.studentNumber, userPresetGrades);
     }
 
-    // TODO: Find a sensible way to avoid non-null assertion?
-    const userPresetGrades: Map<FormulaNode, number> =
-      presetGradesByStudentNumber.get(presetGrade.studentNumber)!; // eslint-disable-line
+    const formulaNode: FormulaNode | undefined =
+      formulaNodesByAttainmentId.get(presetGrade.attainmentId);
 
-    // TODO: Avoid non-null assertion?
-    userPresetGrades.set(
-      formulaNodesByAttainmentId.get(presetGrade.attainmentId)!, // eslint-disable-line
-      presetGrade.grade
+    if (!formulaNode) {
+      throw new ApiError(
+        `found undefined formula node for attainment with ID ${presetGrade.attainmentId}`,
+        HttpCode.InternalServerError
+      );
+    }
+
+    userPresetGrades.set(formulaNode, presetGrade.grade);
+  }
+
+  /*
+   * Finally we're ready to calculate the grades of each student starting from
+   * the root attainment.
+   */
+
+  const finalGradesByStudentNumber: Map<string, GradingResult> = new Map();
+  for (const [studentNumber, presetGrades] of organizedPresetGrades) {
+    finalGradesByStudentNumber.set(
+      studentNumber,
+      await calculateFormulaNode(rootFormulaNode, presetGrades)
     );
   }
 
-  const rootAttainmentGradesByStudentNumber: Map<string, GradingResult> = new Map();
-  for (const [studentNumber, presetGrades] of presetGradesByStudentNumber) {
-    rootAttainmentGradesByStudentNumber.set(
-      studentNumber,
-      await calculateFormulaNode(rootFormulaNode, presetGrades)
+  /*
+   * The grades have been calculated. Now we just need to collect them in
+   * an array and return it.
+   *
+   * TODO: Don't return final grades, save grades to database in
+   * calculateFormulaNode instead?
+   */
+
+  const finalGrades: Array<{
+    studentNumber: string,
+    grade: number,
+    status: Status
+  }> = [];
+
+  for (const [studentNumber, finalGrade] of finalGradesByStudentNumber) {
+    finalGrades.push(
+      {
+        studentNumber: studentNumber,
+        grade: finalGrade.grade,
+        status: finalGrade.status
+      }
     );
   }
 
   res.status(HttpCode.Ok).json({
     success: true,
     data: {
-      grades: Array.from(rootAttainmentGradesByStudentNumber)
-        .map(([studentNumber, result]: [string, GradingResult]) => {
-          return {
-            studentNumber: studentNumber,
-            grade: result.grade,
-            status: result.status,
-          };
-        })
+      grades: finalGrades
     }
   });
 }
