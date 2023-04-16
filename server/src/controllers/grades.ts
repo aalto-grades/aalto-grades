@@ -7,6 +7,7 @@ import { NextFunction, Request, Response } from 'express';
 import * as yup from 'yup';
 
 import Attainable from '../database/models/attainable';
+import User from '../database/models/user';
 import UserAttainmentGrade from '../database/models/userAttainmentGrade';
 
 import { getFormulaImplementation } from '../formulas';
@@ -134,6 +135,10 @@ async function calculateFormulaNode(
   return await formulaNode.formulaImplementation.formulaFunction(inputs);
 }
 
+interface UserAttainmentGradeWithUser extends UserAttainmentGrade {
+  User: User
+}
+
 export async function calculateGrades(
   req: Request,
   res: Response
@@ -232,42 +237,60 @@ export async function calculateGrades(
   }
 
   const presetGrades: Array<{
-    userId: number,
+    studentNumber: string,
     grade: number,
-    attainableId: number,
-  }> = await UserAttainmentGrade.findAll({
-    include: {
-      model: Attainable, required: true, attributes: [], where: {
-        courseId,
-        courseInstanceId,
+    attainmentId: number
+  }> = (await UserAttainmentGrade.findAll({
+    include: [
+      {
+        model: Attainable,
+        required: true,
+        attributes: [],
+        where: {
+          courseId,
+          courseInstanceId,
+        }
+      },
+      {
+        model: User,
+        required: true,
+        attributes: ['studentId']
       }
-    },
-    attributes: ['userId', 'grade', 'attainableId'],
-  });
+    ],
+    attributes: ['grade', 'attainableId'],
+  }) as Array<UserAttainmentGradeWithUser>).map(
+    (attainmentGrade: UserAttainmentGradeWithUser) => {
+      return {
+        studentNumber: attainmentGrade.User.studentId,
+        grade: attainmentGrade.grade,
+        attainmentId: attainmentGrade.attainableId
+      }
+    }
+  );
 
-  // User ID -> formula node -> preset grade
-  const presetGradesByUserId: Map<number, Map<FormulaNode, number>> = new Map();
+  // Student number -> formula node -> preset grade
+  const presetGradesByStudentNumber: Map<string, Map<FormulaNode, number>> = new Map();
 
   for (const presetGrade of presetGrades) {
-    if (!presetGradesByUserId.has(presetGrade.userId)) {
-      presetGradesByUserId.set(presetGrade.userId, new Map());
+    if (!presetGradesByStudentNumber.has(presetGrade.studentNumber)) {
+      presetGradesByStudentNumber.set(presetGrade.studentNumber, new Map());
     }
 
     // TODO: Find a sensible way to avoid non-null assertion?
     const userPresetGrades: Map<FormulaNode, number> =
-      presetGradesByUserId.get(presetGrade.userId)!; // eslint-disable-line
+      presetGradesByStudentNumber.get(presetGrade.studentNumber)!; // eslint-disable-line
 
     // TODO: Avoid non-null assertion?
     userPresetGrades.set(
-      formulaNodesByAttainmentId.get(presetGrade.attainableId)!, // eslint-disable-line
+      formulaNodesByAttainmentId.get(presetGrade.attainmentId)!, // eslint-disable-line
       presetGrade.grade
     );
   }
 
-  const rootAttainmentGradesByUserId: Map<number, GradingResult> = new Map();
-  for (const [userId, presetGrades] of presetGradesByUserId) {
-    rootAttainmentGradesByUserId.set(
-      userId,
+  const rootAttainmentGradesByStudentNumber: Map<string, GradingResult> = new Map();
+  for (const [studentNumber, presetGrades] of presetGradesByStudentNumber) {
+    rootAttainmentGradesByStudentNumber.set(
+      studentNumber,
       await calculateFormulaNode(rootFormulaNode, presetGrades)
     );
   }
@@ -275,10 +298,10 @@ export async function calculateGrades(
   res.status(HttpCode.Ok).json({
     success: true,
     data: {
-      grades: Array.from(rootAttainmentGradesByUserId)
-        .map(([userId, result]: [number, GradingResult]) => {
+      grades: Array.from(rootAttainmentGradesByStudentNumber)
+        .map(([studentNumber, result]: [string, GradingResult]) => {
           return {
-            userId, // TODO: Return student number
+            studentNumber: studentNumber,
             grade: result.grade,
             status: result.status,
           };

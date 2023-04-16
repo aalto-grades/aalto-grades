@@ -175,6 +175,12 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
     expect(res.body.success).toBe(true);
     expect(res.statusCode).toBe(HttpCode.Ok);
     expect(res.body.data).toBeDefined();
-    expect(res.body.data.grades).toEqual([{ userId: 1, grade: 1.24, status: 'pass' }]);
+    expect(res.body.data.grades).toEqual([
+      {
+        studentNumber: '352772',
+        grade: 1.24,
+        status: 'pass'
+      }
+    ]);
   });
 });
