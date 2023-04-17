@@ -380,29 +380,16 @@ export async function calculateGrades(
    * the root attainment.
    */
 
-  const finalGradesByStudentNumber: Map<string, GradingResult> = new Map();
-  for (const [studentNumber, presetGrades] of organizedPresetGrades) {
-    finalGradesByStudentNumber.set(
-      studentNumber,
-      await calculateFormulaNode(rootFormulaNode, presetGrades)
-    );
-  }
-
-  /*
-   * The grades have been calculated. Now we just need to collect them in
-   * an array and return it.
-   *
-   * TODO: Don't return final grades, save grades to database in
-   * calculateFormulaNode instead?
-   */
-
   const finalGrades: Array<{
     studentNumber: string,
     grade: number,
     status: Status
   }> = [];
 
-  for (const [studentNumber, finalGrade] of finalGradesByStudentNumber) {
+  for (const [studentNumber, presetGrades] of organizedPresetGrades) {
+    const finalGrade: GradingResult =
+      await calculateFormulaNode(rootFormulaNode, presetGrades);
+
     finalGrades.push(
       {
         studentNumber: studentNumber,
@@ -411,6 +398,11 @@ export async function calculateGrades(
       }
     );
   }
+
+  /*
+   * TODO: Don't return final grades, save grades to database in
+   * calculateFormulaNode instead?
+   */
 
   res.status(HttpCode.Ok).json({
     success: true,
