@@ -51,7 +51,7 @@ const AttributeTextFields = ({ formulaAttributeNames, indices, setAttainments, a
       return(
         <StringTextField 
           key={attribute}
-          fieldData={{ fieldId: 'attribute_'+attribute, fieldLabel: attributeLabel }}
+          fieldData={{ fieldId: 'attribute_' + attribute, fieldLabel: attributeLabel }}
           indices={indices} 
           setAttainments={setAttainments} 
           attainments={attainments}
@@ -168,12 +168,12 @@ const LeafAssignment = ({ indices, addSubAttainments, setAttainments, attainment
         alignItems: 'center',
         justifyContent: 'space-between'
       }}>
-        {JSON.stringify(indices) !== '[0]' ?
+        { JSON.stringify(indices) !== '[0]' ?
           <Button size='small' sx={{ my: 1 }} onClick={handleConfDialogOpen}>
             Delete
           </Button>
           : 
-          <Box sx={{ width: '1px' }}/>}
+          <Box sx={{ width: '1px' }}/> }
         <ConfirmationDialog
           title={'Sub Study Attainments'}
           subject={'sub study attainment'}
