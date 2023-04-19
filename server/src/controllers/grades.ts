@@ -162,34 +162,25 @@ export async function calculateGrades(
    * First we need to get all the attainments in this course instance.
    */
 
-  const attainments: Array<{
+  type AttainableInfo = {
     id: number,
     parentId: number,
     formula: Formula | null,
     parentFormulaParams: object | null,
-  }> = (await Attainable.findAll({
+  }; 
+  const attainments: Array<AttainableInfo> = await Attainable.findAll({
+    raw: true,
     where: {
       courseId,
       courseInstanceId,
     },
     attributes: [
       'id',
-      'attainableId',
+      ['attainable_id', 'parentId'],
       'formula',
       'parentFormulaParams',
     ],
-  })).map(
-    // TODO: Remove this map() call.
-    // map() is called as a temporary measure to translate attainableId to parentId.
-    (attainment: Attainable) => {
-      return {
-        id: attainment.id,
-        parentId: attainment.attainableId,
-        formula: attainment.formula,
-        parentFormulaParams: attainment.parentFormulaParams
-      };
-    }
-  );
+  }) as unknown as Array<AttainableInfo>;
 
   /*
    * Then we need to find the formulas used to calculate the grade of each
