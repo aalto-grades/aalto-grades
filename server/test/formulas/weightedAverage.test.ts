@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import { getFormulaImplementation } from "../../src/formulas";
 import { Formula, GradingInput, Status } from "../../src/types/formulas";
 
