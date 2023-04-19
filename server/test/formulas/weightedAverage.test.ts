@@ -2,16 +2,24 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { getFormulaImplementation } from "../../src/formulas";
-import { Formula, GradingInput, Status } from "../../src/types/formulas";
+import { getFormulaImplementation } from '../../src/formulas';
+import {
+  Formula,
+  FormulaImplementation,
+  GradingInput,
+  GradingResult,
+  Status,
+} from '../../src/types/formulas';
 
 describe('Test weighted average calculation', () => {
   it('should accept parameters of the appropriate form', async () => {
-    let implementation = await getFormulaImplementation(Formula.WeightedAverage);
+    const implementation: FormulaImplementation =
+      await getFormulaImplementation(Formula.WeightedAverage);
     await implementation.paramSchema.validate({ min: 0, max: 30, weight: 8 });
   });
   it('should forbid parameters of invalid form', async () => {
-    let implementation = await getFormulaImplementation(Formula.WeightedAverage);
+    const implementation: FormulaImplementation =
+      await getFormulaImplementation(Formula.WeightedAverage);
     for (
       const invalid of [
         {},
@@ -26,24 +34,26 @@ describe('Test weighted average calculation', () => {
     }
   });
   it('should calculate a passing grade when subgrades are passing', async () => {
-    let implementation = await getFormulaImplementation(Formula.WeightedAverage);
+    const implementation: FormulaImplementation =
+      await getFormulaImplementation(Formula.WeightedAverage);
     const input: Array<GradingInput> = [
       { params: { min: 0, max: 20, weight: 0.3 }, subResult: { grade: 10, status: Status.Pass } },
       { params: { min: 0, max: 20, weight: 0.7 }, subResult: { grade: 14, status: Status.Pass } },
       { params: { min: 0, max: 3, weight: 1 }, subResult: { grade: 3, status: Status.Pass } },
     ];
-    let computedGrade = await implementation.formulaFunction(input);
+    const computedGrade: GradingResult = await implementation.formulaFunction(input);
     expect(computedGrade.grade).toBeCloseTo(15.8);
     expect(computedGrade.status).toBe(Status.Pass);
   });
   it('should calculate a failing grade when a subgrade is failing', async () => {
-    let implementation = await getFormulaImplementation(Formula.WeightedAverage);
+    const implementation: FormulaImplementation =
+      await getFormulaImplementation(Formula.WeightedAverage);
     const input: Array<GradingInput> = [
       { params: { min: 0, max: 20, weight: 0.3 }, subResult: { grade: 10, status: Status.Pass } },
       { params: { min: 0, max: 20, weight: 0.7 }, subResult: { grade: 14, status: Status.Fail } },
       { params: { min: 0, max: 3, weight: 1 }, subResult: { grade: 3, status: Status.Fail} },
     ];
-    let computedGrade = await implementation.formulaFunction(input);
+    const computedGrade: GradingResult = await implementation.formulaFunction(input);
     expect(computedGrade.grade).toBeCloseTo(15.8);
     expect(computedGrade.status).toBe(Status.Fail);
   });
