@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Toolbar from '@mui/material/Toolbar';
 import TextField from '@mui/material/TextField';
@@ -16,6 +17,7 @@ import MenuButton from '../course-view/MenuButton';
 import FileLoadDialog from '../course-view/FileLoadDialog';
 
 const CourseResultsTableToolbar = ({ search, setSearch, calculateFinalGrades, updateGrades }) => {
+  let { instanceId } = useParams();
 
   const [open, setOpen] = useState(false);
 
@@ -61,7 +63,12 @@ const CourseResultsTableToolbar = ({ search, setSearch, calculateFinalGrades, up
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 2 }}>
           <Button variant='outlined' onClick={() => calculateFinalGrades()}>Calculate final grades</Button>
           <MenuButton label='Import grades' options={actionOptions} />
-          <FileLoadDialog open={open} handleClose={handleClose} returnImportedGrades={updateGrades}/>
+          <FileLoadDialog 
+            instanceId={Number(instanceId)} 
+            open={open} 
+            handleClose={handleClose} 
+            returnImportedGrades={updateGrades}
+          />
         </Box>
       </Box>
     </Toolbar>

@@ -27,7 +27,7 @@ const errorInstructions = 'The input file could not be processed because of the 
 
 const loadingMsg = { msg: 'Importing grades...', severity: 'info' };
 const successMsg = { msg: 'File processed successfully, grades imported.', severity: 'success' };
-const errorMsg = { msg: 'There was an issue progressing the file, the grades were not imported', severity: 'error' };
+const errorMsg = { msg: 'There was an issue progressing the file, the grades were not imported.', severity: 'error' };
 
 const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades }) => {
   let { courseId } = useParams();
@@ -70,7 +70,10 @@ const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades })
       handleClose();
       setFileName(null);
     } catch (err) {
-      setFileErrors(err.response.data.errors);
+      console.log(err);
+      if (err.response.status === 400 && err.response.data.success === false ) {
+        setFileErrors(err.response.data.errors);
+      }
       setSnackPack((prev) => [...prev, errorMsg]);
     }
   };
@@ -117,11 +120,11 @@ const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades })
             </Button>
             <Typography>{fileName ?? 'Select a file'}</Typography>
           </Box>
-          {validationError && <FormHelperText error={true}>{validationError}</FormHelperText>}
-          {fileErrors.length !== 0 && 
+          { validationError && <FormHelperText error={true}>{validationError}</FormHelperText> }
+          { fileErrors.length !== 0 && 
             <>
               <Typography id={'file_content_errors'} sx={{ mt: 2 }}>{errorInstructions}</Typography>
-              {fileErrors.map(err => <FormHelperText key={err} error={true}>{err}</FormHelperText>)}
+              { fileErrors.map(err => <FormHelperText key={err} error={true}>{err}</FormHelperText>) }
             </>
           }
         </DialogContent>
