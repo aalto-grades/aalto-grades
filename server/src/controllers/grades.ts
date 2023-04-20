@@ -167,7 +167,7 @@ export async function calculateGrades(
     parentId: number,
     formula: Formula | null,
     parentFormulaParams: object | null
-  };
+  }
 
   const attainments: Array<AttainmentInfo> = await Attainable.findAll({
     raw: true,
