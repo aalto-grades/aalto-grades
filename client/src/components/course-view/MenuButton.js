@@ -64,6 +64,7 @@ const MenuButton = ({ label, options }) => {
     return (
       options.map(option => (
         <MenuItem 
+          className='ag_menu_btn_option'
           key={option.description} 
           disableRipple
           onClick={() => { 

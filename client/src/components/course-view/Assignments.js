@@ -24,7 +24,7 @@ const Assignments = ({ attainments, formula, courseId, instance, handleAddPoints
       <Typography variant='h3' align='left' sx={{ ml: 1.5, mt: 0.6, mb: 1.5 }} >Study Attainments</Typography>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
         <Typography align='left' sx={{ ml: 1.5 }} >{'Grading Formula: ' + formula}</Typography>
-        <Button onClick={() => navigate(`/${courseId}/select-formula/${instance.id}`)}>Edit formula</Button>
+        <Button id='ag_edit_formula_btn' onClick={() => navigate(`/${courseId}/select-formula/${instance.id}`)}>Edit formula</Button>
         { /* The path above should be changes once courseId can be fetched from the path */ }
       </Box>
       <Box sx={{ display: 'inline-grid', gap: 1 }}>
@@ -45,7 +45,13 @@ const Assignments = ({ attainments, formula, courseId, instance, handleAddPoints
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
         <Button onClick={() => navigate(`/${courseId}/create-attainment/${instance.id}`) }>Add attainment</Button>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}>
-          <Button variant='outlined' onClick={() => navigate(`/${courseId}/course-results/${instance.id}`)}>See course results</Button>
+          <Button 
+            id='ag_course_results_btn' 
+            variant='outlined' 
+            onClick={() => navigate(`/${courseId}/course-results/${instance.id}`)}
+          >
+            See course results
+          </Button>
           <MenuButton label='Import grades' options={actionOptions} />
         </Box>
       </Box>
