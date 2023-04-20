@@ -167,7 +167,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
 });
 
 describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate', () => {
-  it('should calculate correct grades', async () => {
+  it('should calculate one correct grade', async () => {
     const res: supertest.Response = await request
       .post('/v1/courses/5/instances/8/grades/calculate');
 
@@ -182,5 +182,17 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
         status: 'pass'
       }
     ]);
+  });
+
+  it('should calculate multiple correct grades', async () => {
+    // TODO
+  });
+
+  it('should calculate correct grades in higher depths', async () => {
+    // TODO
+  });
+
+  it('should allow manually overriding a student\'s grade', async () => {
+    // TODO
   });
 });
