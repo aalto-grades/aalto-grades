@@ -2,12 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-name: PR Workflow
+name: Image Creation Workflow
 run-name: ${{ github.actor }} pull request
 on:
   push:
     branches:
-      - deployment-configuration
+      - main
 env:
   REGISTRY: ghcr.io
   FRONTEND_IMAGE_NAME: aalto-grades/aalto-grades-frontend
