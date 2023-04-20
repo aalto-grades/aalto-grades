@@ -13,27 +13,6 @@ import { HttpCode } from '../types/httpCode';
 
 export const router: Router = Router();
 
-/* @swagger
- * definitions:
- *   Grades:
- *     description: Calculated final grades for each student.
- *     type: array
- *     items:
- *       type: object
- *       properties:
- *         studentNumber:
- *           type: string
- *           description: Aalto student number.
- *         grade:
- *           type: number
- *           description: Final grade of the student.
- *         status:
- *           type: string
- *           description: >
- *             'pass' or 'fail' to indicate whether the attainment has been
- *              successfully completed.
- */
-
 /**
  * Multer middleware configuration for handling CSV file uploads. This configuration sets up
  * multer to use memory storage, allowing for temporary storage of uploaded files in memory.
@@ -130,7 +109,6 @@ router.post(
  *     tags: [Grades]
  *     description: >
  *       Calculate and get the final grades of all students.
- *       [ANTI-BIKESHEDDING PLACEHOLDER]
  *     requestBody:
  *       description: The request body should be empty.
  *     responses:
@@ -139,7 +117,28 @@ router.post(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/definitions/Grades'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Success of the request.
+ *                 data:
+ *                   description: Calculated final grades for each student.
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       studentNumber:
+ *                         type: string
+ *                         description: Aalto student number.
+ *                       grade:
+ *                         type: number
+ *                         description: Final grade of the student.
+ *                       status:
+ *                         type: string
+ *                         description: >
+ *                           'pass' or 'fail' to indicate whether the attainment
+ *                            has been successfully completed.
  *       400:
  *         description: >
  *           Calculation failed, due to validation errors or missing parameters.
@@ -150,6 +149,13 @@ router.post(
  *               $ref: '#/definitions/Failure'
  *       404:
  *         description: The given course or course instance does not exist.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: >
+ *           The given course instance does not belong to the given course.
  *         content:
  *           application/json:
  *             schema:
