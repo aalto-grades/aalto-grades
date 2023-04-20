@@ -17,6 +17,7 @@ describe('Test weighted average calculation', () => {
       await getFormulaImplementation(Formula.WeightedAverage);
     await implementation.paramSchema.validate({ min: 0, max: 30, weight: 8 });
   });
+
   it('should forbid parameters of invalid form', async () => {
     const implementation: FormulaImplementation =
       await getFormulaImplementation(Formula.WeightedAverage);
@@ -33,6 +34,7 @@ describe('Test weighted average calculation', () => {
       await expect(() => implementation.paramSchema.validate(invalid)).rejects.toThrow();
     }
   });
+
   it('should calculate a passing grade when subgrades are passing', async () => {
     const implementation: FormulaImplementation =
       await getFormulaImplementation(Formula.WeightedAverage);
@@ -45,6 +47,7 @@ describe('Test weighted average calculation', () => {
     expect(computedGrade.grade).toBeCloseTo(15.8);
     expect(computedGrade.status).toBe(Status.Pass);
   });
+
   it('should calculate a failing grade when a subgrade is failing', async () => {
     const implementation: FormulaImplementation =
       await getFormulaImplementation(Formula.WeightedAverage);
