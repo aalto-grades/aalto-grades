@@ -137,7 +137,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
     const mockResponseCourse = { course: mockCourses.current[0] };
     coursesService.getCourse.mockResolvedValue(mockResponseCourse);
 
-    gradesService.importCsv.mockRejectedValue({ response: { data: { errors: ['Error 1', 'Error 2'] } } }); // mock the error
+    gradesService.importCsv.mockRejectedValue({ response: { status: 400, data: { success: false, errors: ['Error 1', 'Error 2'] } } }); // mock the error
 
     return render(
       <MemoryRouter initialEntries={['/course-view/1']}>

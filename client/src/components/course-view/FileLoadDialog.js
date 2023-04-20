@@ -70,7 +70,6 @@ const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades })
       handleClose();
       setFileName(null);
     } catch (err) {
-      console.log(err);
       if (err.response.status === 400 && err.response.data.success === false ) {
         setFileErrors(err.response.data.errors);
       }
