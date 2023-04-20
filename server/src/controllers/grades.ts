@@ -162,13 +162,14 @@ export async function calculateGrades(
    * First we need to get all the attainments in this course instance.
    */
 
-  type AttainableInfo = {
+  interface AttainmentInfo {
     id: number,
     parentId: number,
     formula: Formula | null,
-    parentFormulaParams: object | null,
+    parentFormulaParams: object | null
   };
-  const attainments: Array<AttainableInfo> = await Attainable.findAll({
+
+  const attainments: Array<AttainmentInfo> = await Attainable.findAll({
     raw: true,
     where: {
       courseId,
@@ -176,11 +177,15 @@ export async function calculateGrades(
     },
     attributes: [
       'id',
+      // Translates attainableId to parentId.
+      // TODO: Rename in model if possible.
       ['attainable_id', 'parentId'],
       'formula',
       'parentFormulaParams',
     ],
-  }) as unknown as Array<AttainableInfo>;
+    // Cast to unknown is required because AttainmentInfo does not extend the
+    // model type.
+  }) as unknown as Array<AttainmentInfo>;
 
   /*
    * Then we need to find the formulas used to calculate the grade of each
