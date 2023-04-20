@@ -76,7 +76,7 @@ const CreateCourseForm = ({ addCourse }) => {
         <TextFieldBox fieldData={codeData} setFunction={setCode}/>
         <TextFieldBox fieldData={nameData} setFunction={setName}/>
         <TextFieldBox fieldData={organizerData} setFunction={setOrganizer}/>
-        <Button size='medium' variant='contained' type='submit'>
+        <Button id='ag_create_course_btn' size='medium' variant='contained' type='submit'>
           Create Course
         </Button>
       </form>

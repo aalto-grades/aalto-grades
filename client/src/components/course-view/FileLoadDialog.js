@@ -100,7 +100,7 @@ const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades })
             />
           </Box>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', columnGap: 2 }}>
-            <Button component='label'>
+            <Button id='ag_select_file_btn' component='label'>
               Upload file
               <input 
                 hidden
@@ -137,13 +137,18 @@ const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades })
           }}>
             Cancel
           </Button>
-          <Button size='medium' variant='outlined' onClick={() => {
-            if (!fileName) {
-              setValidationError('You must select a csv file to submit');
-              return;
-            }
-            uploadFile();
-          }}>
+          <Button 
+            id='ag_confirm_file_upload_btn' 
+            size='medium' 
+            variant='outlined' 
+            onClick={() => {
+              if (!fileName) {
+                setValidationError('You must select a csv file to submit');
+                return;
+              }
+              uploadFile();
+            }}
+          >
             Confirm
           </Button>
         </DialogActions>
