@@ -45,7 +45,13 @@ const Assignments = ({ attainments, formula, courseId, instance, handleAddPoints
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
         <Button onClick={() => navigate(`/${courseId}/create-attainment/${instance.id}`) }>Add attainment</Button>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}>
-          <Button id='ag_course_results_btn' variant='outlined' onClick={() => navigate(`/${courseId}/course-results/${instance.id}`)}>See course results</Button>
+          <Button 
+            id='ag_course_results_btn' 
+            variant='outlined' 
+            onClick={() => navigate(`/${courseId}/course-results/${instance.id}`)}
+          >
+            See course results
+          </Button>
           <MenuButton label='Import grades' options={actionOptions} />
         </Box>
       </Box>
