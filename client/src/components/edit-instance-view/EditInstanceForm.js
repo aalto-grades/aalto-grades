@@ -132,7 +132,7 @@ const EditInstanceForm = ({ instance }) => {
         </Grid2>
         <StringTextField fieldData={gradingScaleData} value={gradingScale} setFunction={setGradingScale}/>
       </Box>
-      <Button variant='contained' type='submit'>
+      <Button id='ag_confirm_instance_details_btn' variant='contained' type='submit'>
           Confirm Details
       </Button>
     </form>

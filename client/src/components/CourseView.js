@@ -78,6 +78,7 @@ const CourseView = () => {
             { /* Only admins and teachers are allowed to create a new instance */
               (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
             <Button 
+              id='ag_new_instance_btn'
               size='large' 
               variant='contained' 
               onClick={() => { navigate(`/${courseId}/fetch-instances/${courseDetails.courseCode}`); }}

@@ -50,7 +50,7 @@ const LoginForm = ({ loginUser }) => {
             margin='normal'
           />
         </div>
-        <Button type='submit'>login</Button>
+        <Button id='ag_login_btn' type='submit'>login</Button>
       </form>
     </>
   );

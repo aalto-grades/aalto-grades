@@ -132,8 +132,21 @@ const InstanceSummaryView = () => {
         </Button>
         :
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 6 }}>
-          <Button variant='outlined' onClick={() => onGoBack()} disabled={messageInfo?.severity === 'info'} >Go back</Button>
-          <Button variant='contained' onClick={() => onCreateInstance()} disabled={messageInfo?.severity === 'info'}>Create instance</Button>
+          <Button 
+            variant='outlined' 
+            onClick={() => onGoBack()} 
+            disabled={messageInfo?.severity === 'info'} 
+          >
+            Go back
+          </Button>
+          <Button 
+            id='ag_create_instance_btn' 
+            variant='contained' 
+            onClick={() => onCreateInstance()} 
+            disabled={messageInfo?.severity === 'info'}
+          >
+            Create instance
+          </Button>
         </Box>
       }
     </Box>
