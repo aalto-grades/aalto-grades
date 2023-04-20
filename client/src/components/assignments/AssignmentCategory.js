@@ -6,7 +6,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import CustomAccordion from './Accordion';
+import CustomAccordion from './CustomAccordion';
 import textFormatServices from '../../services/textFormat';
 import formulasService from '../../services/formulas';
 
