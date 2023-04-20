@@ -9,16 +9,22 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import AssignmentCategory from '../assignments/AssignmentCategory';
+import MenuButton from './MenuButton';
 
-const Assignments = ({ attainments, formula, courseId, instance }) => {
+const Assignments = ({ attainments, formula, courseId, instance, handleAddPoints }) => {
   const navigate = useNavigate();
+
+  const actionOptions = [
+    { description: 'Import from file', handleClick: handleAddPoints }, 
+    { description: 'Import from A+', handleClick: () => {} }
+  ];
   
   return (
     <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: 1.5, display: 'inline-block' }}>
-      <Typography variant='h6' align='left' sx={{ ml: 1.5 }} >Study Attainments</Typography>
+      <Typography variant='h3' align='left' sx={{ ml: 1.5, mt: 0.6, mb: 1.5 }} >Study Attainments</Typography>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
         <Typography align='left' sx={{ ml: 1.5 }} >{'Grading Formula: ' + formula}</Typography>
-        <Button onClick={() => navigate(`/${courseId}/select-formula/${instance.id}`) }>Edit formula</Button>
+        <Button onClick={() => navigate(`/${courseId}/select-formula/${instance.id}`)}>Edit formula</Button>
         { /* The path above should be changes once courseId can be fetched from the path */ }
       </Box>
       <Box sx={{ display: 'inline-grid', gap: 1 }}>
@@ -30,7 +36,7 @@ const Assignments = ({ attainments, formula, courseId, instance }) => {
               key={attainment.id} 
               attainment={attainment} 
               attainmentKey={'id'}
-              button={<Button onClick={ () => navigate(`/${courseId}/edit-attainment/${instance.id}/${attainment.id}`) }>Edit</Button>} 
+              button={<Button onClick={() => navigate(`/${courseId}/edit-attainment/${instance.id}/${attainment.id}`)}>Edit</Button>} 
               width={'50vw'} 
             />
           );}
@@ -39,8 +45,8 @@ const Assignments = ({ attainments, formula, courseId, instance }) => {
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
         <Button onClick={() => navigate(`/${courseId}/create-attainment/${instance.id}`) }>Add attainment</Button>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}>
-          <Button variant='outlined'>Calculate final grades</Button>
-          <Button variant='contained'>Add points</Button>
+          <Button variant='outlined' onClick={() => navigate(`/${courseId}/course-results/${instance.id}`)}>See course results</Button>
+          <MenuButton label='Import grades' options={actionOptions} />
         </Box>
       </Box>
     </Box>
@@ -51,6 +57,7 @@ Assignments.propTypes = {
   attainments: PropTypes.array,
   instance: PropTypes.object,
   formula: PropTypes.string,
+  handleAddPoints: PropTypes.func,
   courseId: PropTypes.string,
 };
 
