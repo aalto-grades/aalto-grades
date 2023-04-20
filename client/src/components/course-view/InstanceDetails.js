@@ -32,7 +32,7 @@ const InstanceDetails = ({ info }) => {
       <Box textAlign='left' borderRadius={1} sx={{ bgcolor: 'secondary.light', p: 1.5, mt: 1, minWidth: '318px' }}>
         <LightLabelBoldValue label='Min Credits' value={minCredits} />
         <LightLabelBoldValue label='Max Credits' value={maxCredits} />
-        <LightLabelBoldValue label='Grading Scale' value={textFormatServices.formatGradingScale(gradingScale)} />
+        <LightLabelBoldValue label='Grading Scale' value={textFormatServices.convertToClientGradingScale(gradingScale)} />
         <LightLabelBoldValue label='Organizer' value={department.en} />
         <LightLabelBoldValue label='Educational Institution' value={institution} />
       </Box>

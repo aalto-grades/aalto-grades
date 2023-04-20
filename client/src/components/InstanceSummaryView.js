@@ -60,8 +60,8 @@ const InstanceSummaryView = () => {
         sisuCourseInstanceId: sisuInstanceId,
         type: courseType,
         teachersInCharge: [1],                   // fake ! TODO: replace with teachers when figured out how to fetch ids (currently strings)
-        startingPeriod: startingPeriod ?? 'I',   // fake ! TODO: replace with just startingPeriod when it's not just null anymore
-        endingPeriod: endingPeriod ?? 'III',     // fake ! TODO: replace with just endingPeriod when it's not just null anymore
+        startingPeriod: startingPeriod ?? 'I',   // fake ! TODO: delete from context and here once not required by the server in validation
+        endingPeriod: endingPeriod ?? 'III',     // fake ! TODO: delete from context and here once not required by the server in validation
         minCredits: stringMinCredits,
         maxCredits: stringMaxCredits,
         startDate: startDate,

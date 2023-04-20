@@ -16,7 +16,7 @@ jest.mock('../services/instances');
 jest.spyOn(assignmentServices, 'addAttainment');
 afterEach(cleanup);
 
-const mockContextWithoutAssignments = {
+const mockContextWithoutAttainments = {
   addedAttainments: [],
   courseType: undefined, 
   startDate: '2023-05-06',
@@ -29,7 +29,7 @@ const mockContextWithoutAssignments = {
   endingPeriod: undefined
 };
 
-const mockContextWithAssignments = {
+const mockContextWithAttainments = {
   addedAttainments: [{ ...mockAttainmentsClient[2], temporaryId: 1, date: '01 Jan 1970 00:00:00 GMT', expiryDate: '01 Jan 1971 00:00:00 GMT' }],
   courseType: undefined, 
   startDate: '2023-05-06',
@@ -54,7 +54,7 @@ describe('Test InstanceSummaryView components when no attainments and successful
     return render(
       <MemoryRouter initialEntries={['/A-12345/instance-summary/aalto-CUR-168938-2370795']}>
         <Routes>
-          <Route element={<Outlet context={mockContextWithoutAssignments}/>}>
+          <Route element={<Outlet context={mockContextWithoutAttainments}/>}>
             <Route path=':courseId/instance-summary/:instanceId' element={<InstanceSummaryView/>}/>
           </Route>
         </Routes>
@@ -115,7 +115,7 @@ describe('Test InstanceSummaryView components when some attainments and successf
     return render(
       <MemoryRouter initialEntries={['/A-12345/instance-summary/aalto-CUR-168938-2370795']}>
         <Routes>
-          <Route element={<Outlet context={mockContextWithAssignments}/>}>
+          <Route element={<Outlet context={mockContextWithAttainments}/>}>
             <Route path=':courseId/instance-summary/:instanceId' element={<InstanceSummaryView/>}/>
           </Route>
         </Routes>
@@ -148,7 +148,7 @@ describe('Test InstanceSummaryView components when some attainments and successf
     return render(
       <MemoryRouter initialEntries={['/A-12345/instance-summary/aalto-CUR-168938-2370795']}>
         <Routes>
-          <Route element={<Outlet context={mockContextWithAssignments}/>}>
+          <Route element={<Outlet context={mockContextWithAttainments}/>}>
             <Route path=':courseId/instance-summary/:instanceId' element={<InstanceSummaryView/>}/>
           </Route>
         </Routes>
@@ -178,7 +178,7 @@ describe('Test InstanceSummaryView components when some attainments and error in
     return render(
       <MemoryRouter initialEntries={['/A-12345/instance-summary/aalto-CUR-168938-2370795']}>
         <Routes>
-          <Route element={<Outlet context={mockContextWithAssignments}/>}>
+          <Route element={<Outlet context={mockContextWithAttainments}/>}>
             <Route path=':courseId/instance-summary/:instanceId' element={<InstanceSummaryView/>}/>
           </Route>
         </Routes>

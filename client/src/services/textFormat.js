@@ -52,7 +52,7 @@ const formatCourseType = (courseType) => {
 // Change course type from "NUMERICAL", "PASSFAIL" and from "SECOND_NATIONAL_LANGUAGE"
 // to a more readable types.
 // These are for the UI only. These need to be converted back when adding data to the server.
-const formatGradingScale = (gradingScale) => {
+const convertToClientGradingScale = (gradingScale) => {
   switch (gradingScale) {
   case 'NUMERICAL':
     return 'General scale, 0-5';
@@ -85,5 +85,5 @@ export default {
   formatDateToSlashString, 
   formatDateString, 
   formatCourseType, 
-  formatGradingScale 
+  convertToClientGradingScale 
 };
