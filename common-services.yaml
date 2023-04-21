@@ -9,7 +9,6 @@ version: "3.7"
 
 services:
   frontend:
-    build: ./client
     restart: always
     tty: true
     environment:
@@ -19,10 +18,6 @@ services:
       - local
 
   backend:
-    build:
-      context: ./server
-      args:
-        SERVER_SKIP_NPM_CI: ${SERVER_SKIP_NPM_CI}
     tty: true
     environment:
       POSTGRES_URL: "database"
