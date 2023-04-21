@@ -25,6 +25,7 @@ services:
       file: ./common-services.yaml
       service: frontend-minimum
     image: ghcr.io/aalto-grades/aalto-grades-frontend:latest
+    container_name: frontend-server
 
   backend:
     extends:
