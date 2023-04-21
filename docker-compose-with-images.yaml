@@ -24,14 +24,14 @@ services:
     extends:
       file: ./common-services.yaml
       service: frontend-minimum
-    image: ghcr.io/aalto-grades/aalto-grades-frontend:latest
+    image: ghcr.io/aalto-grades/aalto-grades-frontend:main
     container_name: frontend-server
 
   backend:
     extends:
       file: ./common-services.yaml
       service: backend-minimum
-    image: ghcr.io/aalto-grades/aalto-grades-backend:latest
+    image: ghcr.io/aalto-grades/aalto-grades-backend:main
     container_name: backend-server
     environment:
       AALTO_GRADES_JWT_SECRET: "${AALTO_GRADES_JWT_SECRET}"
