@@ -17,37 +17,26 @@ services:
     - local
 
   frontend:
+    extends:
+      file: ./common-services.yaml
+      service: frontend
     image: ghcr.io/aalto-grades/aalto-grades-frontend:deployment-configuration
-    restart: always
     container_name: frontend-server
-    tty: true
-    networks:
-      - local
 
   backend:
+    extends:
+      file: ./common-services.yaml
+      service: backend
     image: ghcr.io/aalto-grades/aalto-grades-backend:deployment-configuration
-    tty: true
-    restart: always
     container_name: backend-server
     environment:
-      POSTGRES_URL: "database"
-      POSTGRES_USER: "postgres"
-      POSTGRES_DATABASE: "postgres"
       AALTO_GRADES_JWT_SECRET: "${AALTO_GRADES_JWT_SECRET}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      SISU_API_KEY: "${SISU_API_KEY}"
-      SISU_API_URL: "${SISU_API_URL}"
-      AALTO_GRADES_FRONTEND_CORS_ORIGIN: "https://https://aalto-grades.cs.aalto.fi"
-    networks:
-      - local
+      AALTO_GRADES_FRONTEND_CORS_ORIGIN: "https://aalto-grades.cs.aalto.fi"
 
   database:
-    image: postgres
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-    networks:
-      - local
+    extends:
+      file: ./common-services.yaml
+      service: database
       
 networks:
   local:
