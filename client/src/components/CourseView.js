@@ -78,6 +78,7 @@ const CourseView = () => {
             { /* Only admins and teachers are allowed to create a new instance */
               (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
             <Button 
+              id='ag_new_instance_btn'
               size='large' 
               variant='contained' 
               onClick={() => { navigate(`/${courseId}/fetch-instances/${courseDetails.courseCode}`); }}
@@ -109,7 +110,7 @@ const CourseView = () => {
           </Box>
           <Typography variant='h2' align='left' sx={{ mt: 6, mb: 3 }}>All Instances</Typography>
           <InstancesTable data={instances} current={currentInstance.id} onClick={onChangeInstance} />
-          <FileLoadDialog open={open} handleClose={handleClose}/>
+          <FileLoadDialog instanceId={currentInstance.id} open={open} handleClose={handleClose}/>
         </>
       }
     </Box>

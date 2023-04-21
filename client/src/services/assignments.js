@@ -22,6 +22,12 @@ const editAttainment = async (courseId, instanceId, attainment) => {
   return response.data.data;
 };
 
+const deleteAttainment = async (courseId, instanceId, attainmentId) => {
+  const response = await axios.delete(
+    `/v1/courses/${courseId}/instances/${instanceId}/attainments/${attainmentId}`);
+  return response.data.data;
+};
+
 // Function to get mock attainments.
 // Should eventually be replaced with a function that gets data from the server.
 const getSuggestedAttainments = () => { return mockAttainmentsClient; };
@@ -110,6 +116,15 @@ const deleteTemporaryAttainment = (attainments, newAttainment) => {
 */
 // Replace indices with attainment IDs if it seems simpler/more effective
 
+// Get an attainment from a tree structure of attainments based on its location defined by indices
+const getAttainmentByIndices = (indices, attainments) => {
+  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  const lastIndex = indices[indices.length - 1];
+  const indicesWithoutLast = indices.slice(0, -1);
+  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
+  return array[lastIndex];
+};
+
 // Get sub-attainments from the attainments array (of nested arrays) according to the indices
 const getSubAttainments = (indices, attainments) => {
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
@@ -144,11 +159,7 @@ const setProperty = (indices, attainments, property, value) => {
 
 // Get the property of an attainment that is at the location specified by indices
 const getProperty = (indices, attainments, property) => {
-  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
-  const lastIndex = indices[indices.length - 1];
-  const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
-  return array[lastIndex][property];
+  return getAttainmentByIndices(indices, attainments)[property];
 };
 
 // Same function as above but to be used with attainment IDs instead of indices
@@ -172,11 +183,7 @@ const setFormulaAttribute = (indices, attainments, attributeKey, value) => {
 
 // Get the formula attribute an attainment
 const getFormulaAttribute = (indices, attainments, attributeKey) => {
-  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
-  const lastIndex = indices[indices.length - 1];
-  const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
-  return array[lastIndex]['formulaAttributes'][attributeKey];
+  return getAttainmentByIndices(indices, attainments)['formulaAttributes'][attributeKey];
 };
 
 // Add sub-attainments to the attainments array (of nested arrays) according to the indices
@@ -210,7 +217,7 @@ const addSubAttainments = (indices, attainments, numOfAttainments, temporaryId) 
 
 // Remove an attainment that is at the location specified by indices
 const removeAttainment = (indices, attainments) => {
-  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
   const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
@@ -409,6 +416,7 @@ const getNewAttainments = (attainments) => {
 export default { 
   addAttainment,
   editAttainment,
+  deleteAttainment,
   getSuggestedAttainments,
   addTemporaryIds,
   addTemporaryAttainment,
@@ -418,6 +426,7 @@ export default {
   getSubAttainments, 
   addSubAttainments, 
   removeAttainment, 
+  getAttainmentByIndices,
   getProperty, 
   setProperty, 
   constructTreeAssignmets, 

@@ -15,6 +15,7 @@ const CourseTableRow = ({ course }) => {
 
   return(
     <TableRow
+      id={`ag_see_instances_tr_${id}`}
       key={id} 
       hover={true}
       onClick={() => { navigate('/course-view/' + id); }}
