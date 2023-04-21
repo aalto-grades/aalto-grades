@@ -12,7 +12,8 @@ services:
     restart: always
     container_name: reverse-proxy
     ports:
-    - 8080:80
+    - 443:443
+    - 80:80
     networks:
     - local
 
