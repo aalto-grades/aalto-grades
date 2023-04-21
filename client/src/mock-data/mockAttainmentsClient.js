@@ -117,7 +117,7 @@ const mockAttainmentsClient = [
       }
     ]
   },
-  { id: 17,
+  { id: 2,
     name: 'Project',
     category: 'Project',
     date: new Date(2023, 9, 1), 
