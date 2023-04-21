@@ -9,6 +9,16 @@ version: "3.7"
 
 services:
   frontend:
+    build: ./client
+    restart: always
+    tty: true
+    environment:
+      BACKEND_URL: "backend"
+      BACKEND_PORT: "3000"
+    networks:
+      - local
+
+  frontend-minimum:
     restart: always
     tty: true
     environment:
@@ -18,6 +28,22 @@ services:
       - local
 
   backend:
+    build:
+      context: ./server
+      args:
+        SERVER_SKIP_NPM_CI: ${SERVER_SKIP_NPM_CI}
+    tty: true
+    environment:
+      POSTGRES_URL: "database"
+      POSTGRES_USER: "postgres"
+      POSTGRES_DATABASE: "postgres"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      SISU_API_KEY: "${SISU_API_KEY}"
+      SISU_API_URL: "${SISU_API_URL}"
+    networks:
+      - local
+
+  backend-minimum:
     tty: true
     environment:
       POSTGRES_URL: "database"

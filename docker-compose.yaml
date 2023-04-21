@@ -10,9 +10,6 @@ version: "3.7"
 services:
   frontend:
     build: ./client
-    extends:
-      file: ./common-services.yaml
-      service: frontend
     container_name: frontend-server
     ports:
       - 3005:3005
@@ -20,10 +17,6 @@ services:
     restart: always
 
   backend:
-    build:
-      context: ./server
-      args:
-        SERVER_SKIP_NPM_CI: ${SERVER_SKIP_NPM_CI}
     extends:
       file: ./common-services.yaml
       service: backend

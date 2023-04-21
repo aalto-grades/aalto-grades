@@ -19,14 +19,14 @@ services:
   frontend:
     extends:
       file: ./common-services.yaml
-      service: frontend
+      service: frontend-minimum
     image: ghcr.io/aalto-grades/aalto-grades-frontend:deployment-configuration
     container_name: frontend-server
 
   backend:
     extends:
       file: ./common-services.yaml
-      service: backend
+      service: backend-minimum
     image: ghcr.io/aalto-grades/aalto-grades-backend:deployment-configuration
     container_name: backend-server
     environment:

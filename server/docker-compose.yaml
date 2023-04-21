@@ -8,10 +8,6 @@ version: "3.7"
 
 services:
   backend:
-    build:
-      context: ./server
-      args:
-        SERVER_SKIP_NPM_CI: ${SERVER_SKIP_NPM_CI}
     extends:
       file: ../common-services.yaml
       service: backend
