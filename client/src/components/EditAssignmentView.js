@@ -72,14 +72,16 @@ const EditAssignmentView = () => {
     // If this view is opened from the course view, delete from DB
     // Else the attainment is being edited during the creation of an instance so only delete from the context
     if (instanceId) {
-      const attainment = await assignmentServices.deleteAttainment(courseId, instanceId, attainmentId);
-      console.log(attainment);
-      navigate(-1);
+      try {
+        await assignmentServices.deleteAttainment(courseId, instanceId, attainmentId);
+      } catch (exception) {
+        console.log(exception.message);
+      }
     } else if (sisuInstanceId) {
       const updatedAttainments = assignmentServices.deleteTemporaryAttainment(addedAttainments, attainments[0]);
       setAddedAttainments(updatedAttainments);
-      navigate(-1);
     }
+    navigate(-1);
   };
 
   const handleSubmit = (event) => {
@@ -118,6 +120,9 @@ const EditAssignmentView = () => {
     setOpenConfDialog(false);
   };
 
+  // A function that temporarily removes an attainment from the 'attainments', 
+  // and then this attainment is deleted as are also the 'deletedAttainments' 
+  // when the Confirm or Delete Attainment buttons are pressed
   const removeAttainment = (indices) => {
     if (JSON.stringify(indices) === '[0]') {
       deleteAttainment(attainmentId);
