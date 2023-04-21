@@ -110,7 +110,7 @@ const CourseView = () => {
           </Box>
           <Typography variant='h2' align='left' sx={{ mt: 6, mb: 3 }}>All Instances</Typography>
           <InstancesTable data={instances} current={currentInstance.id} onClick={onChangeInstance} />
-          <FileLoadDialog open={open} handleClose={handleClose}/>
+          <FileLoadDialog instanceId={currentInstance.id} open={open} handleClose={handleClose}/>
         </>
       }
     </Box>
