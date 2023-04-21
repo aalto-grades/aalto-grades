@@ -9,6 +9,9 @@ services:
   reverse-proxy:
     build:
       context: ./reverse-proxy
+      args:
+        CERT_LOCATION: "${CERT_LOCATION}"
+        CERT_KEY_LOCATION: "${CERT_KEY_LOCATION}"
     restart: always
     container_name: reverse-proxy
     ports:
