@@ -20,7 +20,7 @@ const Assignments = ({ attainments, formula, courseId, instance, handleAddPoints
   ];
   
   return (
-    <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: 1.5, display: 'inline-block' }}>
+    <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: 1.5, display: 'flex', flexDirection: 'column' }}>
       <Typography variant='h3' align='left' sx={{ ml: 1.5, mt: 0.6, mb: 1.5 }} >Study Attainments</Typography>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
         <Typography align='left' sx={{ ml: 1.5 }} >{'Grading Formula: ' + formula}</Typography>
@@ -37,7 +37,6 @@ const Assignments = ({ attainments, formula, courseId, instance, handleAddPoints
               attainment={attainment} 
               attainmentKey={'id'}
               button={<Button onClick={() => navigate(`/${courseId}/edit-attainment/${instance.id}/${attainment.id}`)}>Edit</Button>} 
-              width={'50vw'} 
             />
           );}
         ) }

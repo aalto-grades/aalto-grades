@@ -20,16 +20,15 @@ import FormHelperText from '@mui/material/FormHelperText';
 import StyledBox from './StyledBox';
 import ViewFormulaAccordion from './ViewFormulaAccordion';
 import AlertSnackbar from '../alerts/AlertSnackbar';
+import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
 
 
 const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, navigateToAttributeSelection }) => {
 
   const [codeSnippet, setCodeSnippet] = useState('');
-  const [snackPack, setSnackPack] = useState([]);
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [messageInfo, setMessageInfo] = useState(undefined);
   const [checkboxError, setCheckboxError] = useState('');
   const [formulaError, setFormulaError] = useState('');
+  const [setSnackPack, messageInfo, setMessageInfo, alertOpen, setAlertOpen] = useSnackPackAlerts();
   
   const navigate = useNavigate();
 
@@ -51,18 +50,6 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
       setSelectedAttainments(attainments);
     }
   }, [attainments]);
-
-  // useEffect in charge of handling the back-to-back alerts
-  // makes the previous disappear before showing the new one
-  useEffect(() => {
-    if (snackPack.length && !messageInfo) {
-      setMessageInfo({ ...snackPack[0] });
-      setSnackPack((prev) => prev.slice(1));
-      setAlertOpen(true);
-    } else if (snackPack.length && messageInfo && alertOpen) {
-      setAlertOpen(false);
-    }
-  }, [snackPack, messageInfo, alertOpen]);
 
   const handleFormulaChange = (event) => {
     const newFormula = formulas.find(formula => formula.name == event.target.value);

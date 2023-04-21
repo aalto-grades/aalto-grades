@@ -67,6 +67,8 @@ const EditInstanceForm = ({ instance }) => {
     stringMinCredits, setMinCredits,
     stringMaxCredits, setMaxCredits,
     gradingScale, setGradingScale,
+    setStartingPeriod,
+    setEndingPeriod
   } = useOutletContext();
 
   useEffect(() => {
@@ -77,7 +79,9 @@ const EditInstanceForm = ({ instance }) => {
       setTeachers(instance.teachersInCharge);
       setMinCredits(String(instance.minCredits));
       setMaxCredits(String(instance.maxCredits));
-      setGradingScale(textFormatServices.formatGradingScale(instance.gradingScale));
+      setGradingScale(textFormatServices.convertToClientGradingScale(instance.gradingScale));
+      setStartingPeriod(instance.startingPeriod);
+      setEndingPeriod(instance.endingPeriod);
     }
   }, []);
 

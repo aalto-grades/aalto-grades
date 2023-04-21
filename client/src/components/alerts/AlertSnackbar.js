@@ -20,7 +20,10 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 // TODO: Consider if the key attribute works properly of if something else should be used?
-const AlertSnackbar = ({ messageInfo, setMessageInfo, open, setOpen }) => {
+// position allows "stacked look", starts from 1 but really needed only from 2 onwards
+const AlertSnackbar = ({ messageInfo, setMessageInfo, open, setOpen, position }) => {
+
+  const margin = position ? (position - 1) * 7 : 0;
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -43,8 +46,9 @@ const AlertSnackbar = ({ messageInfo, setMessageInfo, open, setOpen }) => {
           onClose={handleClose}
           TransitionComponent={Slide}
           TransitionProps={{ onExited: handleExited }}
+          sx={{ mt: margin, maxWidth: '45vw', textAlign: 'left' }}
         >
-          <Alert onClose={handleClose} severity={messageInfo?.severity} sx={{ width: '100%' }}>
+          <Alert onClose={handleClose} severity={messageInfo?.severity ?? 'info'} sx={{ width: '100%' }}>
             {messageInfo?.msg}
           </Alert>
         </Snackbar>
@@ -57,7 +61,8 @@ AlertSnackbar.propTypes = {
   messageInfo: PropTypes.object,
   setMessageInfo: PropTypes.func,
   open: PropTypes.bool,
-  setOpen: PropTypes.func
+  setOpen: PropTypes.func,
+  position: PropTypes.number
 };
 
 export default AlertSnackbar;
