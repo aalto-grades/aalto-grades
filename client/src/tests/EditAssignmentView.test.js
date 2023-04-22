@@ -119,7 +119,7 @@ describe('Tests for EditAssignmentView components', () => {
       parentId: attainmentId,
       subAttainments: [],
       affectCalculation: false,
-      formulaAttributes: [],
+      formulaAttributes: {},
     };
 
     // Mock request from client,

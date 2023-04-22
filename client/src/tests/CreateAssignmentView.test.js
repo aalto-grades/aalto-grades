@@ -95,7 +95,7 @@ describe('Tests for CreateAssignmentView components', () => {
       subAttainments: [],
       affectCalculation: false,
       category: mockName,
-      formulaAttributes: [],
+      formulaAttributes: {},
     };
 
     renderCreateAssignmentView();
@@ -136,7 +136,7 @@ describe('Tests for CreateAssignmentView components', () => {
       category: mockCategory,
       subAttainments: [],
       affectCalculation: false,
-      formulaAttributes: [],
+      formulaAttributes: {},
     };
 
     renderCreateAssignmentView();
@@ -234,7 +234,7 @@ describe('Tests for CreateAssignmentView components', () => {
       subAttainments: [],
       affectCalculation: false,
       category: mockName,
-      formulaAttributes: [],
+      formulaAttributes: {},
     };
 
     renderTemporaryCreateAssignmentView();

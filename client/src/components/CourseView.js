@@ -69,15 +69,16 @@ const CourseView = () => {
   };
 
   return(
-    <Box sx={{ mr: -4, ml: -4 }}>
+    <Box sx={{ mx: -2.5 }}>
       {courseDetails && currentInstance && instances &&
         <> 
           <Typography variant='h1' align='left'>{courseDetails.courseCode}</Typography>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', mb: 4, columnGap: 6 }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', mb: 4, columnGap: 6 }}>
             <Typography variant='h2' align='left'>{courseDetails.name.en}</Typography>
             { /* Only admins and teachers are allowed to create a new instance */
               (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
             <Button 
+              id='ag_new_instance_btn'
               size='large' 
               variant='contained' 
               onClick={() => { navigate(`/${courseId}/fetch-instances/${courseDetails.courseCode}`); }}
@@ -86,7 +87,7 @@ const CourseView = () => {
             </Button>
             }
           </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-evenly', gap: 3 }}>
+          <Box sx={{ display: 'flex', gap: 3 }}>
             <Grow in={animation} style={{ transformOrigin: '50% 0 0' }} {...(animation? { timeout: 500 } : { timeout: 0 })}>
               <div>
                 <InstanceDetails info={ { ...currentInstance, department: courseDetails.department, institution: mockInstitution } } />
@@ -95,7 +96,7 @@ const CourseView = () => {
             { /* a different attainment component will be created for students */
               (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
               <Grow in={animation} style={{ transformOrigin: '0 0 0' }} {...(animation? { timeout: 1000 } : { timeout: 0 })}>
-                <div>
+                <div style={{ width: '100%' }}>
                   <Assignments 
                     attainments={mockAttainmentsClient} 
                     courseId={courseId} 
@@ -109,7 +110,7 @@ const CourseView = () => {
           </Box>
           <Typography variant='h2' align='left' sx={{ mt: 6, mb: 3 }}>All Instances</Typography>
           <InstancesTable data={instances} current={currentInstance.id} onClick={onChangeInstance} />
-          <FileLoadDialog open={open} handleClose={handleClose}/>
+          <FileLoadDialog instanceId={currentInstance.id} open={open} handleClose={handleClose}/>
         </>
       }
     </Box>

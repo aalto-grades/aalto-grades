@@ -26,8 +26,8 @@ const CourseCard = ({ course }) => {
       </CardContent>
       <Divider variant="middle"/>
       <CardActions>
-        <Button size="small" onClick={() => { navigate('/course-view/' + id); }}>
-                    See instances
+        <Button id={`ag_see_instances_btn_${id}`} size="small" onClick={() => { navigate('/course-view/' + id); }}>
+          See instances
         </Button>
       </CardActions>
     </Card>

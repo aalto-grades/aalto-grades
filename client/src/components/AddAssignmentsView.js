@@ -104,7 +104,7 @@ const AddAssignmentsView = () => {
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 6 }}>
         <Button variant='outlined' onClick={() => onGoBack()}>Go back</Button>
-        <Button variant='contained' onClick={() => onConfirmAttainments()}>Confirm attainments</Button>
+        <Button id='ag_confirm_instance_attainments_btn' variant='contained' onClick={() => onConfirmAttainments()}>Confirm attainments</Button>
       </Box>
     </Box>
   );

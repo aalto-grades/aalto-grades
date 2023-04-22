@@ -10,30 +10,17 @@ import Box from '@mui/material/Box';
 import StyledBox from '../select-formula-view/StyledBox';
 import Assignment from './Assignment';
 import AlertSnackbar from '../alerts/AlertSnackbar';
+import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
 
 const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
 
   const [attributeValues, setAttributeValues] = useState([]);
   const { selectedAttainments, selectedFormula } = useOutletContext();
-  const [snackPack, setSnackPack] = useState([]);
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [messageInfo, setMessageInfo] = useState(undefined);
+  const [setSnackPack, messageInfo, setMessageInfo, alertOpen, setAlertOpen] = useSnackPackAlerts();
 
   useEffect(() => {
     setAttributeValues(Array(selectedAttainments.length).fill(Array(selectedFormula.attributes.length).fill('')));
   }, [selectedAttainments, selectedFormula]);
-
-  // useEffect in charge of handling the back-to-back alerts
-  // makes the previous disappear before showing the new one
-  useEffect(() => {
-    if (snackPack.length && !messageInfo) {
-      setMessageInfo({ ...snackPack[0] });
-      setSnackPack((prev) => prev.slice(1));
-      setAlertOpen(true);
-    } else if (snackPack.length && messageInfo && alertOpen) {
-      setAlertOpen(false);
-    }
-  }, [snackPack, messageInfo, alertOpen]);
 
   const handleAttributeChange = (attainmentIndex, attributeIndex, event) => {
     const newAttributeValues = attributeValues.map((a, index) => {
@@ -54,6 +41,19 @@ const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      const updatedAttainments = selectedAttainments.map((attainment, index) => {
+        const values = attributeValues[index];
+        const attributeObj = {};
+        selectedFormula.attributes.forEach((elem, i) => {
+          attributeObj[elem] = values[i];
+        });
+        return {
+          ...attainment,
+          affectCalculation: true,
+          formulaAttributes: attributeObj
+        };
+      });
+      console.log(updatedAttainments);
       // TODO: add formula and attributes to database
       // Depending on how long adding the formula and attributes to the database takes,
       // a loading messsage may need to be added
