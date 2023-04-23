@@ -4,35 +4,26 @@
 
 *** Settings ***
 
-Resource    ./keywords.robot
+Resource          ./keywords.robot
+Test Setup       Login as Admin Account
+Test Teardown    Sign Out
 
 * Test Cases *
 
 View a course instance
-    Skip
-    Login as Admin Account
-    Open Instances of Course    CS-A1150
+    Open Instances of Course    CS-A1150 – Databases
     Verify Instance Contains Required Data
-    Sign Out
-
-View a course instance of an inactive course
-    Skip
-    Login as Admin Account
-    Open Inactive course        CS-A1110
-    Verify Instance Contains Required Data and is inactive
-    Sign Out
 
 Add a new course instance to a course using SISU
-    Skip
-    Login as Admin Account
-    Open Instances of Course    CS-A1150
+    Open Instances of Course    CS-A1150 – Databases
     Navigate to course instance creation view
-    Select Base from SISU       "BASE"
+    Select Base from SISU       Teaching
+    Complete Attainment Creation
 
 Add a new course instance to a course without SISU
     Skip
-    Login as Admin Account
-    Open Instances of Course    CS-A1150
+    Open Instances of Course    CS-A1150 – Databases
     Navigate to course instance creation view
     Select to start course instance creation from scratch
+    Verify the table opens without text being filled
     
