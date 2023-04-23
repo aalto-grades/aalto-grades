@@ -10,6 +10,10 @@ version: "3.7"
 services:
   frontend:
     build: ./client
+    extends:
+      service: frontend-minimum
+
+  frontend-minimum:
     restart: always
     tty: true
     environment:
@@ -23,6 +27,10 @@ services:
       context: ./server
       args:
         SERVER_SKIP_NPM_CI: ${SERVER_SKIP_NPM_CI}
+    extends:
+      service: backend-minimum
+
+  backend-minimum:
     tty: true
     environment:
       POSTGRES_URL: "database"
