@@ -169,7 +169,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv', () 
         'Header attainment data parsing failed at column 2.' +
         ' Received C1IYA1, expected format C{courseId}I{courseInstanceId}A{attainmentId}.',
         'Header attainment data parsing failed at column 4.' +
-        ' Received X1I1A11, expected format C{courseId}I{courseInstanceId}A{attainmentId}.',
+        ' Received X1I1A9, expected format C{courseId}I{courseInstanceId}A{attainmentId}.',
         'Header attainment data parsing failed at column 6.' +
         ' Received C1I1AT7, expected format C{courseId}I{courseInstanceId}A{attainmentId}.'
       ];
