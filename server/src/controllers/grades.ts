@@ -124,7 +124,7 @@ export function parseGradesFromCsv(
       } else {
         const grade: UserAttainmentGradeData = {
           attainableId: attainmentIds[i],
-          points: parseInt(gradingData[i], 10)
+          grade: parseInt(gradingData[i], 10)
         };
         student.grades.push(grade);
       }
@@ -336,7 +336,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
           });
 
         // TODO: Optimize if datasets are big.
-        await UserAttainmentGrade.bulkCreate(preparedBulkCreate, { updateOnDuplicate: ['points'] });
+        await UserAttainmentGrade.bulkCreate(preparedBulkCreate, { updateOnDuplicate: ['grade'] });
 
         // After this point all the students' attainment grades have been created or
         // updated in the database.

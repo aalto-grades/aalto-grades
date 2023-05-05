@@ -5,7 +5,7 @@
 export interface UserAttainmentGradeData {
   userId?: number,
   attainableId: number,
-  points: number
+  grade: number
 }
 
 export interface StudentGrades {
