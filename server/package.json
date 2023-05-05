@@ -8,6 +8,7 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node build/src/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "test": "jest --verbose --detectOpenHandles --coverage",
     "lint": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'`",
     "lint:fix": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'` --fix",
