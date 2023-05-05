@@ -14,7 +14,6 @@ export default class UserAttainmentGrade extends Model<
   InferAttributes<UserAttainmentGrade>,
   InferCreationAttributes<UserAttainmentGrade>
 > {
-  declare id: CreationOptional<number>;
   declare userId: ForeignKey<User['id']>;
   declare attainableId: ForeignKey<Attainable['id']>;
   declare grade: number;
@@ -24,14 +23,9 @@ export default class UserAttainmentGrade extends Model<
 
 UserAttainmentGrade.init(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true
-    },
     userId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      primaryKey: true,
       references: {
         model: 'user',
         key: 'id'
@@ -39,7 +33,7 @@ UserAttainmentGrade.init(
     },
     attainableId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      primaryKey: true,
       references: {
         model: 'attainable',
         key: 'id'

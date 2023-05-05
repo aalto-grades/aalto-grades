@@ -6,12 +6,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import CustomAccordion from './Accordion';
+import CustomAccordion from './CustomAccordion';
 import textFormatServices from '../../services/textFormat';
 import formulasService from '../../services/formulas';
 
 // This component renders a top attainment (only has the intance as its parent)
-const AssignmentCategory = ({ attainment, button, width, attainmentKey }) => {
+const AssignmentCategory = ({ attainment, button, attainmentKey }) => {
 
   const { name, formulaId, expiryDate, subAttainments } = attainment;
   const titlepb = subAttainments.length !== 0 ? '16px' : '0px';  // title padding-bottom
@@ -23,7 +23,7 @@ const AssignmentCategory = ({ attainment, button, width, attainmentKey }) => {
     textFormatServices.formatDateString(textFormatServices.formatDateToSlashString(expiryDate));
 
   return (
-    <Box boxShadow={3} borderRadius={1} sx={{ pt: 2, pb: 0.5, bgcolor: 'white', width: width }}>
+    <Box boxShadow={3} borderRadius={1} sx={{ pt: 2, pb: 0.5, bgcolor: 'white' }}>
       <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pr: '21px', pb: titlepb, pl: '21px' }}>
         <Typography sx={{ fontWeight: 'bold' }} align='left'>{name}</Typography>
         { formulaId 
@@ -44,7 +44,6 @@ const AssignmentCategory = ({ attainment, button, width, attainmentKey }) => {
 AssignmentCategory.propTypes = {
   attainment: PropTypes.object,
   button: PropTypes.element,
-  width: PropTypes.string,
   attainmentKey: PropTypes.string,
 };
 

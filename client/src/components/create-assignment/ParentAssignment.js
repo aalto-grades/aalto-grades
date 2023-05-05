@@ -52,6 +52,7 @@ const ParentAssignment = ({ indices, addSubAttainments, setAttainments, attainme
         <Typography variant="body1" sx={{ flexGrow: 1, textAlign: 'left', mb: 0.5 }}>
           {'Grading Formula: ' + formulaName}
         </Typography>
+        { /* Navigation below doesn't work because formula selection has only been implemented for course grade */ }
         <Button size='small' sx={{ mb: 0.5 }} onClick={ () => navigate('/select-formula') }>
           Edit formula
         </Button>

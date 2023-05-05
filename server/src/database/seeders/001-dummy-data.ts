@@ -61,10 +61,6 @@ export default {
       );
 
       await queryInterface.sequelize.query(
-        'ALTER SEQUENCE course_instance_role_id_seq RESTART;', { transaction }
-      );
-
-      await queryInterface.sequelize.query(
         'ALTER SEQUENCE attainable_id_seq RESTART;', { transaction }
       );
 

@@ -39,10 +39,32 @@ const upload: Multer = multer({
  * /v1/courses/{courseId}/instances/{instanceId}/grades/csv:
  *   post:
  *     tags: [Grades]
- *     description: Add attainment grades for users enrolled in a specific course instance.
+ *     description: >
+ *       Add attainment grades for users enrolled in a specific course instance. Attainment grading
+ *       data is provided in CSV file. When sending data set **Content-Type** header as
+ *       **multipart/form-data** and file name as "csv_data".
+ *     parameters:
+ *       - in: path
+ *         name: courseId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the course.
+ *       - in: path
+ *         name: instanceId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the course instance.
  *     requestBody:
  *       content:
  *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               csv_data:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       200:
  *         description: Grading CSV uploaded and parsed succesfully.
@@ -84,13 +106,15 @@ const upload: Multer = multer({
  *         description: >
  *           Course instance does not belong to the course or
  *           study attainment does not belong to the course instance.
+ *           User with course role 'TEACHER' or 'TEACHER_IN_CHARGE' listed in the grading data.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       422:
  *         description: >
- *           At least one of the attainments listed in the CSV file was not found with the given ID.
+ *           At least one of the attainments listed in the CSV file was not found with the given ID
+ *           or does not belong to the course instance.
  *         content:
  *           application/json:
  *             schema:

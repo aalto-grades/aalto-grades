@@ -36,7 +36,7 @@ const FrontPage = () => {
         </Typography>
         { /* admins and teachers are shown the button for creating a new course */
           auth.role == 'SYSADMIN' &&
-          <Button size='large' variant='contained' onClick={() => { navigate('/create-course'); }}>
+          <Button id='ag_new_course_btn' size='large' variant='contained' onClick={() => { navigate('/create-course'); }}>
             Create New Course
           </Button>
         }

@@ -1,0 +1,50 @@
+# SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+
+# This is a Docker Compose configuration for deploying Aalto Grades to a Virtual machine, requires correct setup work to be done on the VM Side. 
+# Documentation for that available under the VM's root users deployment folder.
+
+version: "3.7"
+
+services:
+
+  reverse-proxy:
+    build:
+      context: ./reverse-proxy
+      args:
+        CERT_LOCATION: "${CERT_LOCATION}"
+        CERT_KEY_LOCATION: "${CERT_KEY_LOCATION}"
+    restart: always
+    container_name: reverse-proxy
+    ports:
+    - 443:443
+    - 80:80
+    networks:
+    - local
+
+  frontend:
+    extends:
+      file: ./common-services.yaml
+      service: frontend-minimum
+    image: ghcr.io/aalto-grades/aalto-grades-frontend:main
+    container_name: frontend-server
+
+  backend:
+    extends:
+      file: ./common-services.yaml
+      service: backend-minimum
+    image: ghcr.io/aalto-grades/aalto-grades-backend:main
+    container_name: backend-server
+    environment:
+      AALTO_GRADES_JWT_SECRET: "${AALTO_GRADES_JWT_SECRET}"
+      AALTO_GRADES_FRONTEND_CORS_ORIGIN: "https://aalto-grades.cs.aalto.fi"
+
+  database:
+    extends:
+      file: ./common-services.yaml
+      service: database
+      
+networks:
+  local:
+    driver: bridge

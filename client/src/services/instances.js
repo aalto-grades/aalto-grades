@@ -9,6 +9,11 @@ const getInstances = async (courseId) => {
   return response.data.data;
 };
 
+const createInstance = async (courseId, instance) => {
+  const response = await axios.post(`/v1/courses/${courseId}/instances`, instance);
+  return response.data.data;
+};
+
 const getSisuInstances = async (courseId) => {
   const response = await axios.get('/v1/sisu/courses/' + courseId);
   console.log(response.data);
@@ -27,4 +32,4 @@ const getAttainments = async (instanceId) => {
   return response.data;
 };
 
-export default { getInstances, getSisuInstances, getSisuInstance, getAttainments };
+export default { createInstance, getInstances, getSisuInstances, getSisuInstance, getAttainments };
