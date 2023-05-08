@@ -339,6 +339,10 @@ export default {
         'DROP TYPE IF EXISTS enum_course_instance_ending_period;', { transaction }
       );
 
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS enum_attainable_formula;', { transaction }
+      );
+
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
