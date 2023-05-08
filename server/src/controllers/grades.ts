@@ -418,7 +418,9 @@ export async function calculateGrades(
 ): Promise<void> {
   const courseId: number = Number(req.params.courseId);
   const courseInstanceId: number = Number(req.params.instanceId);
-  validateCourseAndInstance(courseId, courseInstanceId);
+  await validateCourseAndInstance(courseId, courseInstanceId);
+
+  // TODO: once jwt authorization connecte to route, check requester id has teacher role.
 
   /*
    * First we need to get all the attainments in this course instance.
