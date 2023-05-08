@@ -199,7 +199,3 @@ INSERT INTO public.attainable (course_id, course_instance_id, attainable_id, nam
 (6, 9, null, 'test assignment course 6, instance 9', '2022-01-05', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
 (6, 9, null, 'test assignment course 6, instance 9', '2022-01-05', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
 (6, 9, null, 'test assignment course 6, instance 9', '2022-01-05', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL);
-
-INSERT INTO public.user_attainment_grade (user_id, attainable_id, grade, created_at, updated_at) VALUES
-(1, 14, 0.37, NOW(), NOW()),
-(1, 15, 0.5, NOW(), NOW());
