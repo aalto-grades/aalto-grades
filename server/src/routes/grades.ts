@@ -133,6 +133,19 @@ router.post(
  *     tags: [Grades]
  *     description: >
  *       Calculate and get the final grades of all students.
+ *     parameters:
+ *       - in: path
+ *         name: courseId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the course.
+ *       - in: path
+ *         name: instanceId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the course instance.
  *     requestBody:
  *       description: The request body should be empty.
  *     responses:
