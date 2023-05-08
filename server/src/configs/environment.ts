@@ -4,6 +4,8 @@
 
 // This file reads all environment variables and defines their values as constants.
 
+require('./env');
+
 const parsedPort: number = Number(process.env.AALTO_GRADES_BACKEND_PORT);
 export const PORT: number = isNaN(parsedPort) ? 3000 : parsedPort;
 

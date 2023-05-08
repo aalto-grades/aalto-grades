@@ -4,6 +4,8 @@
 
 // This file defines database credentials for use with Sequelize.
 
+require('./env');
+
 const USER: string = String(process.env.POSTGRES_USER);
 const PASSWORD: string = String(process.env.POSTGRES_PASSWORD);
 const DATABASE: string = String(process.env.POSTGRES_DATABASE);
