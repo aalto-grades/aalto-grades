@@ -19,6 +19,7 @@ describe('Test weighted average calculation', () => {
   });
 
   it('should forbid parameters of invalid form', async () => {
+    // Test with both missing and extra inputs. Incorrect types should raise error also.
     const implementation: FormulaImplementation =
       await getFormulaImplementation(Formula.WeightedAverage);
     for (
@@ -27,8 +28,11 @@ describe('Test weighted average calculation', () => {
         { min: 0, max: 30 },
         { min: 0, max: 30, Weight: 8 },
         { min: 0, max: 30, mix: 8 },
-        // The yup library allows extra fields, which might be okay.
-        // { min: 0, max: 30, mix: 999, weight: 8 },
+        { min: 0, max: 30, mix: 999, weight: 8 },
+        { min: 'x', max: 30, weight: 8 },
+        { min: 0, max: 'x', weight: 8 },
+        { min: 0, max: 30, weight: 'x' },
+        { min: 31, max: 30, weight: 8 }
       ]
     ) {
       await expect(() => implementation.paramSchema.validate(invalid)).rejects.toThrow();

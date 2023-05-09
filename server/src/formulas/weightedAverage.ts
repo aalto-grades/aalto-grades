@@ -40,7 +40,7 @@ registerFormula(
   calculateWeightedAverage,
   yup.object({
     min: yup.number().required(),
-    max: yup.number().required(),
+    max: yup.number().min(yup.ref('min')).required(),
     weight: yup.number().required()
-  })
+  }).noUnknown().strict()
 );
