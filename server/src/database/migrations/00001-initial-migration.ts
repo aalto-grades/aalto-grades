@@ -112,14 +112,9 @@ export default {
         updated_at: DataTypes.DATE,
       }, { transaction });
       await queryInterface.createTable('course_instance_role', {
-        id: {
-          type: DataTypes.INTEGER,
-          autoIncrement: true,
-          primaryKey: true
-        },
         user_id: {
           type: DataTypes.INTEGER,
-          allowNull: false,
+          primaryKey: true,
           references: {
             model: 'user',
             key: 'id'
@@ -129,7 +124,7 @@ export default {
         },
         course_instance_id: {
           type: DataTypes.INTEGER,
-          allowNull: false,
+          primaryKey: true,
           references: {
             model: 'course_instance',
             key: 'id'
@@ -227,14 +222,9 @@ export default {
         updated_at: DataTypes.DATE
       }, { transaction });
       await queryInterface.createTable('user_attainment_grade', {
-        id: {
-          type: DataTypes.INTEGER,
-          autoIncrement: true,
-          primaryKey: true
-        },
         user_id: {
           type: DataTypes.INTEGER,
-          allowNull: false,
+          primaryKey: true,
           references: {
             model: 'user',
             key: 'id'
@@ -244,7 +234,7 @@ export default {
         },
         attainable_id: {
           type: DataTypes.INTEGER,
-          allowNull: false,
+          primaryKey: true,
           references: {
             model: 'attainable',
             key: 'id'

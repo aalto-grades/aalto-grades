@@ -44,7 +44,7 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
 
     res.send({
       success: false,
-      errors: [err.message],
+      errors: err.errors
     });
     return;
   }
