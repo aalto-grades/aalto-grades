@@ -21,35 +21,40 @@ export const router: Router = Router();
  *     parameters:
  *       - in: path
  *         name: sisuCourseInstanceId
- *         required: True
+ *         required: true
+ *         example: aalto-CUR-163498-3084205
  *         schema:
  *           type: string
- *         description: >
- *           Course instance ID used in Sisu, e.g., aalto-CUR-163498-3084205.
+ *         description: Course instance ID used in Sisu.
  *     responses:
  *       200:
  *         description: >
- *           A course instance with the given ID was found in Sisu and
- *           information about it is returned in the CourseInstanceData format.
+ *           A course instance with the given ID was found in Sisu.
+ *           Instance information returned in the CourseInstanceData format.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
  *                 success:
- *                   type: boolean
- *                   description: Success of the request.
+ *                   $ref: '#/definitions/Success'
  *                 data:
  *                   type: object
  *                   properties:
  *                     courseInstance:
  *                       $ref: '#/definitions/CourseInstanceData'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
+ *       403:
+ *         $ref: '#/components/responses/AuthorizationError'
  *       502:
  *         description: The Sisu API returned an error.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
+ *     security:
+ *       - cookieAuth: []
  */
 router.get(
   '/v1/sisu/instances/:sisuCourseInstanceId',
@@ -66,24 +71,21 @@ router.get(
  *     parameters:
  *       - in: path
  *         name: courseCode
- *         required: True
+ *         required: true
+ *         example: CS-A1110
  *         schema:
  *           type: string
- *         description: Course code (e.g., CS-A1110) of the desired course.
+ *         description: Course code of the desired course.
  *     responses:
  *       200:
- *         description: >
- *           A course with instances with the given course code was found in
- *           Sisu and information about the course instances is returned in an
- *           array of objects in the CourseInstanceData format.
+ *         description: A course including instances found with the given course code.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
  *                 success:
- *                   type: boolean
- *                   description: Success of the request.
+ *                   $ref: '#/definitions/Success'
  *                 data:
  *                   type: object
  *                   properties:
@@ -91,12 +93,18 @@ router.get(
  *                       type: array
  *                       items:
  *                         $ref: '#/definitions/CourseInstanceData'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
+ *       403:
+ *         $ref: '#/components/responses/AuthorizationError'
  *       502:
  *         description: The Sisu API returned an error.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
+ *     security:
+ *       - cookieAuth: []
  */
 router.get(
   '/v1/sisu/courses/:courseCode',
