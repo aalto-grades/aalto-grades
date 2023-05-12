@@ -205,6 +205,7 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
   // to the same course instance as the attainable being edited.
   if (parentId) {
 
+    // TODO: check that does not refer to itself transitionally through some other attainable.
     if (parentId === attainable.id) {
       throw new ApiError(
         'attainment cannot refer to itself in the parent ID',
