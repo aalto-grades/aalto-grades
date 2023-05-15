@@ -168,7 +168,8 @@ export async function authLogout(_req: Request, res: Response): Promise<void> {
     httpOnly: true,
   });
   res.send({
-    success: true
+    success: true,
+    data: {}
   });
   return;
 }

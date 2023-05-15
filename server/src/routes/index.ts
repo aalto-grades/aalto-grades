@@ -48,10 +48,54 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *       type: apiKey
  *       in: cookie
  *       name: jwt
+ *   parameters:
+ *     courseId:
+ *       in: path
+ *       name: courseId
+ *       schema:
+ *         type: integer
+ *         format: int32
+ *         minimum: 1
+ *       required: true
+ *       example: 1
+ *       description: The ID of the course.
+ *     instanceId:
+ *       in: path
+ *       name: instanceId
+ *       schema:
+ *         type: integer
+ *         format: int32
+ *         minimum: 1
+ *       required: true
+ *       example: 1
+ *       description: The ID of the course instance.
+ *     attainmentId:
+ *       in: path
+ *       name: attainmentId
+ *       schema:
+ *         type: integer
+ *         format: int32
+ *         minimum: 1
+ *       required: true
+ *       example: 1
+ *       description: The ID of the study attainment.
+ *   responses:
+ *     AuthenticationError:
+ *       description: Authentication credentials were missing or jwt expired.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/definitions/Failure'
+ *     AuthorizationError:
+ *       description: The requester is not authorized to execute actions.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/definitions/Failure'
  * definitions:
  *   Failure:
  *     type: object
- *     description: A reason for a failure, with a chiefly developer-facing error message.
+ *     description: A reason for a failure.
  *     properties:
  *       success:
  *         type: boolean
@@ -61,7 +105,12 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *         type: array
  *         items:
  *           type: string
- *         description: An error message to explain the error.
+ *         description: Error message(s) explaining the error(s).
+ *         example: ['course with ID 157 not found', 'course instance ID must be type of integer']
+ *   Success:
+ *     type: boolean
+ *     description: Success of the request.
+ *     example: true
  */
 
 router.use(cors({
