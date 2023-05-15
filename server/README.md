@@ -9,7 +9,8 @@ SPDX-License-Identifier: MIT
 ## Table of Contents
 
 - [Installing Node.js](#installing-nodejs)
-- [Running the program](#running-the-program)
+- [Running the server](#running-the-server)
+  - [Development locally](#development-locally)
   - [Sisu API](#sisu-api)
 - [Migrations](#migrations)
 - [Seeds](#seeds)
@@ -25,19 +26,31 @@ npm. For example:
 Arch: `# pacman -S nodejs npm`  
 Debian: `# apt install nodejs npm`
 
-## Running the program
+## Running the server
 
 Install the necessary Node.js modules:
 ```
 $ npm ci
 ```
-Compile and start the program:
+Compile and start the server:
 ```
 $ npm run build
 $ npm run start
 ```
 After running the last command, visit `http://localhost:3000/world` on a web
 browser. You should see the output "Hello /world".
+
+### Development locally
+
+You can run the server in local development mode with command:
+```
+npm run dev
+```
+
+In development mode, after any changes to the code are saved, server is automatically restarted.
+
+It is possible to set environment variables to `.env` file  in the server directory root.
+See `.env.example` file for variable list, rename to `.env` before running server.
 
 ### Sisu API
 
