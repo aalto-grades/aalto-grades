@@ -19,4 +19,5 @@ Sign Out
 
 Page Contains Element
     [Arguments]     ${element}
-    Get Element Count   ${element}    >   0 
+#   Get Element Count   ${element}    >   0 
+    Wait For Elements State    ${element}    visible

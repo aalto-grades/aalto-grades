@@ -11,7 +11,7 @@ ${signUpStudentIdField}     input[name="StudentID"]
 ${signUpPassword}           input[name="password"]
 ${signUpAdminSelector}      input[value="SYSADMIN"]
 ${signUpSubmit}             button[type="submit"]
-${createNewCourseButton}    //button[text()="Create New Course"]
+${createNewCourseButton}    button[id=ag_new_course_btn]
 ${adminUsername}            testi45
 ${adminEmail}               testeri456@aalto.fi
 ${adminStudentID}           213512
