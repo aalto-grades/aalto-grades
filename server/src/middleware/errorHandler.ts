@@ -74,6 +74,7 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
           : err.message
       ]
     });
+    return;
   }
 
   if (err instanceof CsvError || err instanceof MulterError) {
