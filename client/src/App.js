@@ -30,6 +30,7 @@ import CourseResultsView from './components/CourseResultsView';
 import InstanceCreationRoute from './context/InstanceCreationRoute';
 import FormulaSelectionRoute from './context/FormulaSelectionRoute';
 import useLogout from './hooks/useLogout';
+import UserButton from './components/auth/UserButton';
 
 const theme = createTheme({
   palette: {
@@ -133,13 +134,11 @@ function App() {
             color="white" 
             variant="h5" 
             align="left"
-            sx={{ mr: 2 }}
+            sx={{ mr: 2, flexGrow: 1 }}
           >
           Aalto Grades
           </Link>
-          <button onClick={signOut}>
-            Sign out
-          </button>
+          <UserButton signOut={signOut} />
         </Toolbar>
       </AppBar>
       <AppContainer maxWidth="lg">
