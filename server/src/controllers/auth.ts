@@ -13,9 +13,11 @@ import * as yup from 'yup';
 import { JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS } from '../configs/constants';
 import { JWT_SECRET, NODE_ENV } from '../configs/environment';
 
-import { HttpCode } from '../types/httpCode';
 import User from '../database/models/user';
+
 import { ApiError } from '../types/error';
+import { HttpCode } from '../types/httpCode';
+import { findUserById } from './utils/user';
 
 // TODO: Temporary, remove or update!
 export enum UserRole {
@@ -67,14 +69,14 @@ export async function performSignup(
     throw new ApiError('user account with the specified email already exists', HttpCode.Conflict);
   }
 
-  const model: User = await User.create({
+  const newUser: User = await User.create({
     name: name,
     email: email,
     password: await argon.hash(plainPassword.trim()),
     studentId: studentId,
   });
 
-  return model.id;
+  return newUser.id;
 }
 
 interface SignupRequest {
@@ -185,8 +187,9 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
   res.send({
     success: true,
     data: {
+      id,
       role: req.body.role,
-      id
+      name: request.name
     }
   });
   return;
@@ -197,11 +200,15 @@ export async function authSelfInfo(req: Request, res: Response): Promise<void> {
     throw new ApiError('login required', HttpCode.Unauthorized);
   }
   const user: JwtClaims = req.user as JwtClaims;
+
+  const userFromDb: User = await findUserById(user.id, HttpCode.NotFound);
+
   res.send({
     success: true,
     data: {
       id: user.id,
       role: user.role,
+      name: userFromDb.name
     }
   });
 }
