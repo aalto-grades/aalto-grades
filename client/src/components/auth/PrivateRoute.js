@@ -22,7 +22,11 @@ const PrivateRoute = ({ children, roles }) => {
     setLoading(true);
     try {
       const response = await userService.getRefreshToken();
-      setAuth({ role: response.data.role });
+      setAuth({
+        id: response.data.is,
+        role: response.data.role,
+        name: response.data.name
+      });
     } catch (exception) {
       console.error(exception);
     } finally {
