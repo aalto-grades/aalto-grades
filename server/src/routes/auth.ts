@@ -28,20 +28,28 @@ export const router: Router = Router();
  *     format: email
  *     description: Email address, to be used as a credential.
  *     example: john.doe@aalto.fi
- *     required: true
+ *   StudentID:
+ *     type: string
+ *     description: The student number assigned by the university.
+ *     example: 12345A
+ *   Name:
+ *     type: string
+ *     description: A personal name of the user (not a credential).'
+ *     example: John Doe
  *   Password:
  *     type: string
  *     format: password
  *     description: Plaintext password.
  *     example: MySuperSecretPassword123
- *     required: true
  *   Credentials:
  *     type: object
  *     properties:
  *       email:
  *         $ref: '#/definitions/Email'
+ *         required: true
  *       password:
  *         $ref: '#/definitions/Password'
+ *         required: true
  *   LoginResult:
  *     type: object
  *     properties:
@@ -50,40 +58,30 @@ export const router: Router = Router();
  *       data:
  *         type: object
  *         properties:
+ *           id:
+ *             $ref: '#/definitions/UserId'
  *           role:
  *             $ref: '#/definitions/UserRole'
+ *           name:
+ *             $ref: '#/definitions/Name'
  *   SignupRequest:
  *     type: object
  *     properties:
  *       email:
  *         $ref: '#/definitions/Email'
+ *         required: true
  *       password:
  *         $ref: '#/definitions/Password'
+ *         required: true
  *       studentID:
- *         type: string
- *         description: The student number assigned by the university.
- *         example: 123456
+ *         $ref: '#/definitions/StudentID'
  *         required: false
  *       name:
- *         type: string
- *         description: A personal name of the user (not a credential).'
- *         example: John Doe
+ *         $ref: '#/definitions/Name'
  *         required: true
  *       role:
  *         $ref: '#/definitions/UserRole'
  *         required: true
- *   SignupResult:
- *     type: object
- *     properties:
- *       success:
- *         $ref: '#/definitions/Success'
- *       data:
- *         type: object
- *         properties:
- *           role:
- *             $ref: '#/definitions/UserRole'
- *           id:
- *             $ref: '#/definitions/UserId'
  *   SignupAndSelfInfo:
  *     type: object
  *     properties:
@@ -92,10 +90,12 @@ export const router: Router = Router();
  *       data:
  *         type: object
  *         properties:
- *           role:
- *             $ref: '#/definitions/UserRole'
  *           id:
  *             $ref: '#/definitions/UserId'
+ *           role:
+ *             $ref: '#/definitions/UserRole'
+ *           name:
+ *             $ref: '#/definitions/Name'
  */
 
 /**
