@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
-import { PropTypes } from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
@@ -12,11 +12,20 @@ import PersonIcon from '@mui/icons-material/Person';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 import useAuth from '../../hooks/useAuth';
+import useLogout from '../../hooks/useLogout';
 
-function UserButton({ signOut }) {
+function UserButton() {
+  const logout = useLogout();
+  const navigate = useNavigate();
   const { auth } = useAuth();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
+
+  // temporary function for logging out, will be moved to a seperate file once toolbar is refined
+  const signOut = async () => {
+    await logout();
+    navigate('/login', { replace: true });
+  };
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -27,7 +36,7 @@ function UserButton({ signOut }) {
   };
 
   if (!auth?.name) {
-    return (<></>);
+    return (<div data-testid="not-logged-in"></div>);
   }
 
   return (
@@ -60,10 +69,5 @@ function UserButton({ signOut }) {
     </>
   );
 }
-
-UserButton.propTypes = {
-  signOut: PropTypes.func,
-  name: PropTypes.string
-};
 
 export default UserButton;
