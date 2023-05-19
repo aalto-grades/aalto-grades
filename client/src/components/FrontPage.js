@@ -20,7 +20,7 @@ const FrontPage = () => {
   const { auth } = useAuth();
 
   useEffect(() => {
-    coursesService.getCourses()
+    coursesService.getCourses(auth.id)
       .then((data) => {
         setCurrentCourses(data.courses.current);
         setPreviousCourses(data.courses.previous);
