@@ -16,28 +16,38 @@ export const router: Router = Router();
  *   LocalizedString:
  *     type: object
  *     description: >
- *       Object containing translations of a string in Finnish, Swedish, and
- *       English.
+ *       Object containing translations of a string in Finnish, Swedish, and English.
  *     properties:
  *       fi:
  *         type: string
  *         description: Finnish translation.
+ *         example: Ohjelmointi 1
  *       sv:
  *         type: string
  *         description: Swedish translation.
+ *         example: Programmering 1
  *       en:
  *         type: string
  *         description: English translation.
+ *         example: Programming 1
+ *   CourseId:
+ *     type: integer
+ *     description: Internal course database ID.
+ *     format: int32
+ *     minimum: 1
+ *     example: 1
+ *   CourseCode:
+ *     type: string
+ *     description: Aalto Course code.
+ *     example: CS-A1110
  *   CourseData:
  *     type: object
- *     description: Course information.
+ *     description: Course general information with translations.
  *     properties:
  *       id:
- *         type: integer
- *         description: Internal course database ID.
+ *         $ref: '#/definitions/CourseId'
  *       courseCode:
- *         type: string
- *         description: Course code, e.g. CS-A1110.
+ *         $ref: '#/definitions/CourseCode'
  *       department:
  *         $ref: '#/definitions/LocalizedString'
  *       name:
@@ -51,14 +61,9 @@ export const router: Router = Router();
  * /v1/courses/{courseId}:
  *   get:
  *     tags: [Course]
- *     description: Get information about a course.
+ *     description: Get course information.
  *     parameters:
- *       - in: path
- *         name: courseId
- *         required: True
- *         schema:
- *           type: integer
- *         description: The ID of the desired course.
+ *       - $ref: '#/components/parameters/courseId'
  *     responses:
  *       200:
  *         description: >
@@ -70,19 +75,28 @@ export const router: Router = Router();
  *               type: object
  *               properties:
  *                 success:
- *                   type: boolean
- *                   description: Success of the request.
+ *                   $ref: '#/definitions/Success'
  *                 data:
  *                   type: object
  *                   properties:
  *                     course:
  *                       $ref: '#/definitions/CourseData'
+ *       400:
+ *         description: Course ID validation failed.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
  *       404:
  *         description: A course with the given ID was not found.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
+ *     security:
+ *       - cookieAuth: []
  */
 router.get(
   '/v1/courses/:courseId',
@@ -94,7 +108,7 @@ router.get(
  * /v1/courses:
  *   post:
  *     tags: [Course]
- *     description: Create a course.
+ *     description: Create a new course.
  *     requestBody:
  *       content:
  *         application/json:
@@ -102,8 +116,7 @@ router.get(
  *             type: object
  *             properties:
  *               courseCode:
- *                 type: string
- *                 description: Course code, e.g. CS-A1110.
+ *                 $ref: '#/definitions/CourseCode'
  *               department:
  *                 $ref: '#/definitions/LocalizedString'
  *               name:
@@ -117,8 +130,7 @@ router.get(
  *               type: object
  *               properties:
  *                 success:
- *                   type: boolean
- *                   description: Success of the request.
+ *                   $ref: '#/definitions/Success'
  *                 data:
  *                   type: object
  *                   properties:
@@ -126,8 +138,7 @@ router.get(
  *                       type: object
  *                       properties:
  *                         id:
- *                           type: integer
- *                           description: The ID of the newly added course.
+ *                           $ref: '#/definitions/CourseId'
  *       400:
  *         description: A validation error has occurred in the request body.
  *         content:
@@ -135,17 +146,11 @@ router.get(
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       401:
- *         description: The requester is not logged in.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
+ *         $ref: '#/components/responses/AuthenticationError'
  *       403:
- *         description: The requester is not authorized to create a course.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
+ *         $ref: '#/components/responses/AuthorizationError'
+ *     security:
+ *       - cookieAuth: []
  */
 router.post(
   '/v1/courses',

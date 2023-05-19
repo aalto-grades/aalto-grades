@@ -14,9 +14,10 @@ Open Aalto Grades on Localhost
     New Page    ${localhostURL}
 
 Sign Out
+    Click       ${showSignOutButton}
     Click       ${signOutButton}
-
 
 Page Contains Element
     [Arguments]     ${element}
-    Get Element Count   ${element}    >   0 
+#   Get Element Count   ${element}    >   0 
+    Wait For Elements State    ${element}    visible

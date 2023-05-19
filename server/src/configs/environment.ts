@@ -4,6 +4,10 @@
 
 // This file reads all environment variables and defines their values as constants.
 
+// Config dotenv so environment variables are also accessible from .env file.
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 const parsedPort: number = Number(process.env.AALTO_GRADES_BACKEND_PORT);
 export const PORT: number = isNaN(parsedPort) ? 3000 : parsedPort;
 

@@ -13,85 +13,89 @@ export const router: Router = Router();
 /**
  * @swagger
  * definitions:
+ *   UserId:
+ *     type: integer
+ *     description: The database identifier of the user.
+ *     format: int32
+ *     minimum: 1
+ *     example: 1
  *   UserRole:
  *     type: string
- *     description: >
- *       The role of the user in our system (`UserRole`):
- *       `'SYSADMIN' | 'TEACHER' | 'ASSISTANT' | 'STUDENT'`.
+ *     enum: [SYSADMIN, TEACHER, ASSISTANT, STUDENT]
+ *     description: The role of the user.
+ *   Email:
+ *     type: string
+ *     format: email
+ *     description: Email address, to be used as a credential.
+ *     example: john.doe@aalto.fi
+ *   StudentID:
+ *     type: string
+ *     description: The student number assigned by the university.
+ *     example: 12345A
+ *   Name:
+ *     type: string
+ *     description: A personal name of the user (not a credential).'
+ *     example: John Doe
+ *   Password:
+ *     type: string
+ *     format: password
+ *     description: Plaintext password.
+ *     example: MySuperSecretPassword123
  *   Credentials:
  *     type: object
  *     properties:
  *       email:
- *         type: string
- *         description: Email address, functioning as a username.
+ *         $ref: '#/definitions/Email'
  *         required: true
  *       password:
- *         type: string
- *         description: Plaintext password of the user.
+ *         $ref: '#/definitions/Password'
  *         required: true
  *   LoginResult:
  *     type: object
  *     properties:
  *       success:
- *         type: boolean
- *         description: Success of the request.
+ *         $ref: '#/definitions/Success'
  *       data:
  *         type: object
  *         properties:
+ *           id:
+ *             $ref: '#/definitions/UserId'
  *           role:
  *             $ref: '#/definitions/UserRole'
+ *           name:
+ *             $ref: '#/definitions/Name'
  *   SignupRequest:
  *     type: object
  *     properties:
  *       email:
- *         type: string
- *         description: Email address, to be used as a credential.
+ *         $ref: '#/definitions/Email'
  *         required: true
  *       password:
- *         type: string
- *         description: Plaintext password.
+ *         $ref: '#/definitions/Password'
  *         required: true
  *       studentID:
- *         type: string
- *         description: The student number assigned by the university.
+ *         $ref: '#/definitions/StudentID'
  *         required: false
  *       name:
- *         type: string
- *         description: A personal name of the user (not a credential).
+ *         $ref: '#/definitions/Name'
  *         required: true
  *       role:
  *         $ref: '#/definitions/UserRole'
  *         required: true
- *   SignupResult:
+ *   SignupAndSelfInfo:
  *     type: object
  *     properties:
  *       success:
- *         type: boolean
- *         description: Success of the request.
+ *         $ref: '#/definitions/Success'
  *       data:
  *         type: object
  *         properties:
+ *           id:
+ *             $ref: '#/definitions/UserId'
  *           role:
  *             $ref: '#/definitions/UserRole'
- *           id:
- *             type: number
- *             description: >
- *               The database identifier of the user.
- *   AuthSelfInfo:
- *     type: object
- *     properties:
- *       success:
- *         type: boolean
- *         description: Success of the request.
- *       data:
- *         type: object
- *         properties:
- *           role:
- *             $ref: '#/definitions/UserRole'
- *           id:
- *             type: number
- *             description: >
- *               The database identifier of the user.
+ *           name:
+ *             $ref: '#/definitions/Name'
  */
 
 /**
@@ -128,7 +132,11 @@ export const router: Router = Router();
  *               $ref: '#/definitions/Failure'
  *
  */
-router.post('/v1/auth/login', express.json(), controllerDispatcher(authLogin));
+router.post(
+  '/v1/auth/login',
+  express.json(),
+  controllerDispatcher(authLogin)
+);
 
 /**
  * @swagger
@@ -138,9 +146,6 @@ router.post('/v1/auth/login', express.json(), controllerDispatcher(authLogin));
  *     description: >
  *       Log out of a session, requesting the browser to remove
  *       its session JWT token.
- *
- *       This requires the user to be already logged in, authenticated via a
- *       JWT token in the cookie.
  *
  *       Note that this does not explicitly invalidate any existing JWT tokens
  *       for that user, at the moment.
@@ -153,14 +158,12 @@ router.post('/v1/auth/login', express.json(), controllerDispatcher(authLogin));
  *               type: object
  *               properties:
  *                 success:
- *                   type: boolean
- *                   description: Whether the operation succeeded.
+ *                   $ref: '#/definitions/Success'
+ *                 data:
+ *                   description: Empty data object.
+ *                   type: object
  *       401:
- *         description: The user is not logged in, or the JWT token is invalid.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
+ *         $ref: '#/components/responses/AuthenticationError'
  *     security:
  *       - cookieAuth: []
  */
@@ -191,13 +194,13 @@ router.post(
  *         content:
  *           application/json:
  *             schema:
- *               $req: '#/definitions/SignupResult'
+ *               $ref: '#/definitions/SignupAndSelfInfo'
  *         headers:
- *           Set-Cookie:
- *             description: JWT token, storing an access token to allow using the API.
- *             schema:
- *               type: string
- *               example: jwt=wliuerhlwieurh; Secure; HttpOnly; SameSite=None
+ *            Set-Cookie:
+ *              description: JWT token, storing an access token to allow using the API.
+ *              schema:
+ *                type: string
+ *                example: jwt=wliuerhlwieurh; Secure; HttpOnly; SameSite=None
  *       409:
  *         description: A user with the specified email already exists.
  *         content:
@@ -205,7 +208,11 @@ router.post(
  *             schema:
  *               $ref: '#/definitions/Failure'
  */
-router.post('/v1/auth/signup', express.json(), controllerDispatcher(authSignup));
+router.post(
+  '/v1/auth/signup',
+  express.json(),
+  controllerDispatcher(authSignup)
+);
 
 /**
  * @swagger
@@ -220,13 +227,9 @@ router.post('/v1/auth/signup', express.json(), controllerDispatcher(authSignup))
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/definitions/AuthSelfInfo'
+ *               $ref: '#/definitions/SignupAndSelfInfo'
  *       401:
- *         description: The user is not logged in, or the JWT token is invalid.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
+ *         $ref: '#/components/responses/AuthenticationError'
  *     security:
  *       - cookieAuth: []
  *

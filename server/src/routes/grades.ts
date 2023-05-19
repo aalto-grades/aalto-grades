@@ -42,20 +42,11 @@ const upload: Multer = multer({
  *     description: >
  *       Add attainment grades for users enrolled in a specific course instance. Attainment grading
  *       data is provided in CSV file. When sending data set **Content-Type** header as
- *       **multipart/form-data** and file name as "csv_data".
+ *       **multipart/form-data** and file name as "csv_data". Example csv files available
+ *       [here](https://github.com/aalto-grades/base-repository/tree/main/server/test/mockData/csv)
  *     parameters:
- *       - in: path
- *         name: courseId
- *         schema:
- *           type: integer
- *         required: true
- *         description: The ID of the course.
- *       - in: path
- *         name: instanceId
- *         schema:
- *           type: integer
- *         required: true
- *         description: The ID of the course instance.
+ *       - $ref: '#/components/parameters/courseId'
+ *       - $ref: '#/components/parameters/instanceId'
  *     requestBody:
  *       content:
  *         multipart/form-data:
@@ -74,8 +65,10 @@ const upload: Multer = multer({
  *               type: object
  *               properties:
  *                 success:
- *                   type: boolean
- *                   description: Success of the request.
+ *                   $ref: '#/definitions/Success'
+ *                 data:
+ *                   description: Empty data object.
+ *                   type: object
  *       400:
  *         description: A validation or parsing error with the CSV has occurred.
  *         content:
@@ -83,11 +76,7 @@ const upload: Multer = multer({
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       401:
- *         description: The requester is not logged in.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
+ *         $ref: '#/components/responses/AuthenticationError'
  *       403:
  *         description: >
  *           The requester is not authorized to add grading data
@@ -114,11 +103,13 @@ const upload: Multer = multer({
  *       422:
  *         description: >
  *           At least one of the attainments listed in the CSV file was not found with the given ID
- *           or does not belong to the course instance.
+ *           or does not belong to the course instance to which the grading data is being imported.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
+ *     security:
+ *       - cookieAuth: []
  */
 router.post(
   '/v1/courses/:courseId/instances/:instanceId/grades/csv',

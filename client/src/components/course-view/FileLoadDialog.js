@@ -17,17 +17,21 @@ import FormHelperText from '@mui/material/FormHelperText';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import gradesService from '../../services/grades';
 import mockStudentGrades from '../../mock-data/mockStudentGrades';
+import FileErrorDialog from './FileErrorDialog';
 
 // A Dialog component for uploading a file
 
 const instructions = 'Upload a CSV file with the header "studentNo" and headers matching to the study \
   attainment tags you wish to add grades for. You can see an example of a CSV file of the correct format below.';
 const exampleText = 'A student with the student number 222222 has gotten 8 points from the attainment \'C3I9A1\' and 7 points from attainment \'C3I9A2\'.';
-const errorInstructions = 'The input file could not be processed because of the issues listed below. They need to be fixed.';
+const errorInstructions = 'The input file cannot be processed due to the following issues that must be addressed and fixed:';
 
 const loadingMsg = { msg: 'Importing grades...', severity: 'info' };
 const successMsg = { msg: 'File processed successfully, grades imported.', severity: 'success' };
 const errorMsg = { msg: 'There was an issue progressing the file, the grades were not imported.', severity: 'error' };
+
+// How many errors are initially rendered visible in the dialog.
+export const maxErrorsToShow = 5;
 
 const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades }) => {
   let { courseId } = useParams();
@@ -36,7 +40,12 @@ const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades })
   // state variables handling the alert messages
   const [snackPack, setSnackPack] = useState([]);
   const [alertOpen, setAlertOpen] = useState(false);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [messageInfo, setMessageInfo] = useState(undefined);
+
+  const toggleErrorDialog = () => {
+    setShowErrorDialog(!showErrorDialog);
+  };
 
   // useEffect in charge of handling the back-to-back alerts
   // makes the previous disappear before showing the new one
@@ -70,7 +79,8 @@ const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades })
       handleClose();
       setFileName(null);
     } catch (err) {
-      if (err.response.status === 400 && err.response.data.success === false ) {
+      // Possible CSV errors are returned with http codes 400, 409, 422
+      if (err.response?.status && [400, 409, 422].includes(err.response.status)) {
         setFileErrors(err.response.data.errors);
       }
       setSnackPack((prev) => [...prev, errorMsg]);
@@ -123,7 +133,21 @@ const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades })
           { fileErrors.length !== 0 && 
             <>
               <Typography id={'file_content_errors'} sx={{ mt: 2 }}>{errorInstructions}</Typography>
-              { fileErrors.map(err => <FormHelperText key={err} error={true}>{err}</FormHelperText>) }
+              { fileErrors.length > maxErrorsToShow ?
+                <>
+                  <ul>
+                    { fileErrors.slice(0, maxErrorsToShow).map(err => <li key={err}><FormHelperText error={true}>{err}</FormHelperText></li>) }
+                  </ul>
+                  <Typography id='multiple_errors' sx={{ mt: 2 }}>
+                    {`And ${fileErrors.length - maxErrorsToShow} more errors found.`}
+                    <Button onClick={toggleErrorDialog}>Show all</Button>
+                  </Typography>
+                </>
+                :
+                <ul>
+                  { fileErrors.map(err => <li key={err}><FormHelperText error={true}>{err}</FormHelperText></li>) }
+                </ul>
+              }
             </>
           }
         </DialogContent>
@@ -153,6 +177,7 @@ const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades })
         </DialogActions>
       </Dialog>
       <AlertSnackbar messageInfo={messageInfo} setMessageInfo={setMessageInfo} open={alertOpen} setOpen={setAlertOpen} />
+      <FileErrorDialog handleClose={toggleErrorDialog} open={showErrorDialog} errors={fileErrors} />
     </>
   );
 };
