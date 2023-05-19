@@ -22,7 +22,7 @@ const Login = () => {
       const response = await userService.login(userObject);
       // if login is successful, save user role to context
       setAuth({
-        id: response.data.is,
+        id: response.data.id,
         role: response.data.role,
         name: response.data.name
       });

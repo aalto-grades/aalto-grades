@@ -21,7 +21,7 @@ const Signup = () => {
       const user = await userService.signup(userObject);
       // if signup successfull, save user role to context
       setAuth({
-        id: user.data.is,
+        id: user.data.id,
         role: user.data.role,
         name: user.data.name
       });
