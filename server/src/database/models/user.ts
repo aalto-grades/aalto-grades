@@ -19,6 +19,7 @@ export default class User extends Model<
   declare password: CreationOptional<string>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
+  static findByEmail: (email: string) => Promise<User | null>;
 }
 
 User.init(
@@ -61,3 +62,12 @@ User.init(
     tableName: 'user'
   }
 );
+
+User.findByEmail = async function (email: string): Promise<User | null> {
+  return await User.findOne({
+    attributes: ['id', 'password', 'name'],
+    where: {
+      email
+    }
+  });
+};

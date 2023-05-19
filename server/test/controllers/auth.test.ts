@@ -14,8 +14,9 @@ import { HttpCode } from '../../src/types/httpCode';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 
-describe('Test POST /v1/auth/login', () => {
-  it('should respond disallow logging in with invalid credentials', async () => {
+describe('Test POST /v1/auth/login - logging in with an existing user', () => {
+
+  it('should respond with 401 unauthorized, if logging in with invalid credentials', async () => {
     async function badCreds(credentials: { email: string, password: string }): Promise<void> {
       return request.post('/v1/auth/login')
         .set('Accept', 'application/json')
@@ -33,6 +34,7 @@ describe('Test POST /v1/auth/login', () => {
     await badCreds({ email: 'sysadmin@aalto.fi', password: '' });
     await badCreds({ email: 'sysadmin@aalto.fi', password: 'grade' });
   });
+
   it('should allow logging in with the correct credentials', async () => {
     await request.post('/v1/auth/login')
       .send({ email: 'sysadmin@aalto.fi', password: 'grades' })
@@ -42,12 +44,14 @@ describe('Test POST /v1/auth/login', () => {
         expect(res.body.success).toBe(true);
         expect(res.body.errors).not.toBeDefined();
         expect(res.body.data.role).toBe(UserRole.Admin);
+        expect(res.body.data.name).toBe('Aalto Sysadmin');
       });
   });
 });
 
-describe('Test POST /v1/auth/signup', () => {
-  it('should prevent creating a new account with a previously registered email', async () => {
+describe('Test POST /v1/auth/signup - create a new user', () => {
+
+  it('should respond with 409 conflict, if email address already taken', async () => {
     return request.post('/v1/auth/signup')
       .set('Accept', 'application/json')
       .send({
@@ -65,7 +69,8 @@ describe('Test POST /v1/auth/signup', () => {
         expect(res.body.errors[0]).toMatch('user account with the specified email already exists');
       });
   });
-  it('should error when the signup format is incorrect', async () => {
+
+  it('should respond with 400 bad request, if the signup format is incorrect', async () => {
     return request.post('/v1/auth/signup')
       .set('Accept', 'application/json')
       .send({ email: 'sysadmin@aalto.fi', password: 'grades' })
@@ -77,6 +82,7 @@ describe('Test POST /v1/auth/signup', () => {
         expect(res.body.errors[0]).toMatch('invalid signup request format');
       });
   });
+
   it('should allow creation of a new account', async () => {
     await request.post('/v1/auth/login')
       .set('Accept', 'application/json')
@@ -96,11 +102,20 @@ describe('Test POST /v1/auth/signup', () => {
     return request.post('/v1/auth/login')
       .set('Accept', 'application/json')
       .send({ email: 'sysadmin2@aalto.fi', password: 'grades2'})
-      .expect(HttpCode.Ok);
+      .expect(HttpCode.Ok)
+      .then((res: supertest.Response) => {
+        expect(res.body.success).toBe(true);
+        expect(res.body.errors).not.toBeDefined();
+        expect(res.body.data.role).toBe(UserRole.Admin);
+        expect(res.body.data.name).toBe('aalto2');
+      });
+
+
   });
 });
 
-describe('Test GET /v1/auth/self-info and cookies', () => {
+describe('Test GET /v1/auth/self-info - check users own info', () => {
+
   it('should act differently when user is logged in or out', async () => {
     // Use the agent for cookie persistence
     const agent: SuperAgentTest = supertest.agent(app);
@@ -112,13 +127,22 @@ describe('Test GET /v1/auth/self-info and cookies', () => {
       .expect(HttpCode.Ok)
       .expect('set-cookie', /jwt=/)
       .expect('set-cookie', /httponly/i);
-    await agent.get('/v1/auth/self-info').withCredentials(true).expect(HttpCode.Ok);
+    // eslint-disable-next-line max-len
+    await agent.get('/v1/auth/self-info').withCredentials(true)
+      .expect(HttpCode.Ok)
+      .then((res: supertest.Response) => {
+        expect(res.body.success).toBe(true);
+        expect(res.body.errors).not.toBeDefined();
+        expect(res.body.data.role).toBe(UserRole.Admin);
+        expect(res.body.data.name).toBe('Aalto Sysadmin');
+      });
     await agent.post('/v1/auth/logout').withCredentials(true).send({}).expect(HttpCode.Ok);
     await agent.get('/v1/auth/self-info').withCredentials(true).expect(HttpCode.Unauthorized);
   });
 });
 
 describe('Test POST /v1/auth/login and expiry', () => {
+
   it('should expire the session after a set time', async () => {
     // Use the agent for cookie persistence
     const agent: SuperAgentTest = supertest.agent(app);

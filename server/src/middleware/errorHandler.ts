@@ -10,7 +10,6 @@ import { ValidationError } from 'yup';
 
 import { ApiError } from '../types/error';
 import { HttpCode } from '../types/httpCode';
-import { UserExists } from '../controllers/auth';
 
 export function controllerDispatcher(
   handler: (req: Request, res: Response, next: NextFunction) => Promise<unknown>
@@ -30,14 +29,6 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
     res.send({
       success: false,
       errors: err.errors
-    });
-    return;
-  }
-
-  if (err instanceof UserExists) {
-    res.status(HttpCode.Conflict).send({
-      success: false,
-      errors: ['user account with the specified email already exists']
     });
     return;
   }
@@ -64,7 +55,7 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
 
   if (err instanceof CsvError || err instanceof MulterError) {
     // If field name is incorrect, change the error message to more informative.
-    const message: string = err.message === 'Unexpected field'?
+    const message: string = err.message === 'Unexpected field' ?
       'Unexpected field. To upload CSV file, set input field name as "csv_data"' :
       err.message;
 
