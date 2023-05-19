@@ -5,4 +5,5 @@
 ***Variables***
 
 ${localhostURL}             %{LOCALHOST_URL}
-${signOutButton}            //button[text()="Sign out"]
+${showSignOutButton}        //button[text()="testi45"]
+${signOutButton}            //button[text()="Logout"]

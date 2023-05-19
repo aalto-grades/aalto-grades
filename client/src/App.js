@@ -4,7 +4,6 @@
 
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
@@ -29,7 +28,7 @@ import EditAssignmentView from './components/EditAssignmentView';
 import CourseResultsView from './components/CourseResultsView';
 import InstanceCreationRoute from './context/InstanceCreationRoute';
 import FormulaSelectionRoute from './context/FormulaSelectionRoute';
-import useLogout from './hooks/useLogout';
+import UserButton from './components/auth/UserButton';
 
 const theme = createTheme({
   palette: {
@@ -114,14 +113,6 @@ const roles = {
 };
 
 function App() {
-  const logout = useLogout();
-  const navigate = useNavigate();
-
-  // temporary function for logging out, will be moved to a seperate file once toolbar is refined
-  const signOut = async () => {
-    await logout();
-    navigate('/login', { replace: true });
-  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -133,20 +124,18 @@ function App() {
             color="white" 
             variant="h5" 
             align="left"
-            sx={{ mr: 2 }}
+            sx={{ mr: 2, flexGrow: 1 }}
           >
           Aalto Grades
           </Link>
-          <button onClick={signOut}>
-            Sign out
-          </button>
+          <UserButton/>
         </Toolbar>
       </AppBar>
       <AppContainer maxWidth="lg">
         <Box mx={5} my={5}>
           <Routes> { /* Add nested routes when needed */ }
-            <Route path='/login' element={<Login/>} />
-            <Route path='/signup' element={<Signup/>} />
+            <Route path='/login' element={<Login/>}/>
+            <Route path='/signup' element={<Signup/>}/>
             { /* All roles are authorised to access the front page, conditional rendering is done inside the component */ }
             <Route element={<PrivateRoute roles={[roles.admin, roles.teacher, roles.student, roles.assistant]}/>}>
               <Route path='/' element={<FrontPage/>} />

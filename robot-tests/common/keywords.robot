@@ -14,8 +14,8 @@ Open Aalto Grades on Localhost
     New Page    ${localhostURL}
 
 Sign Out
+    Click       ${showSignOutButton}
     Click       ${signOutButton}
-
 
 Page Contains Element
     [Arguments]     ${element}
