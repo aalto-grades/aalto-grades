@@ -4,7 +4,7 @@
 
 import { AxiosError } from 'axios';
 import { CsvError } from 'csv-parse';
-import express, { NextFunction, Request, RequestHandler, Response } from 'express';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { MulterError } from 'multer';
 import { ValidationError } from 'yup';
 
