@@ -16,6 +16,10 @@ export default {
         unique: false,
         transaction
       });
+      await queryInterface.addIndex('user', ['student_id'], {
+        unique: false,
+        transaction
+      });
       await queryInterface.addIndex('course_instance_role', ['user_id', 'course_instance_id'], {
         unique: true,
         transaction
@@ -56,6 +60,11 @@ export default {
 
       await queryInterface.sequelize.query(
         'DROP INDEX IF EXISTS course_instance_course_id',
+        { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP INDEX IF EXISTS user_student_id',
         { transaction }
       );
 

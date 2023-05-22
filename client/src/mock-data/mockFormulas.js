@@ -6,7 +6,7 @@ const mockFormulas = [
   {
     id: 1,
     name: 'Weighted average',
-    attributes: ['Max Points', 'Min required points', 'Weight'],
+    attributes: ['maxPoints', 'minRequiredPoints', 'weight'],
     codeSnippet: 
     `
     const weightedAverage = (nums, weights) => {

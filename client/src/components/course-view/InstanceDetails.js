@@ -5,24 +5,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 import textFormatServices from '../../services/textFormat';
-import useAuth from '../../hooks/useAuth';
 
 const InstanceDetails = ({ info }) => {
   const { minCredits, maxCredits, startDate, endDate, type, gradingScale, teachersInCharge, department, institution } = info;
-  const { auth } = useAuth();
 
   return(
     <Box sx={{ display: 'inline-block', pt: 1.5 }}>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', columnGap: 4, pb: 1 }}>
-        <Typography variant='h6' align='left' sx={{ ml: 1.5 }} >Instance Details</Typography>
-        { /* Only admins, teachers and assistants are allowed to see attendees*/
-          (auth.role == 'SYSADMIN' || auth.role == 'TEACHER'|| auth.role == 'ASSISTANT') && 
-          <Button>See attendees</Button>
-        }
+        <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >Instance Details</Typography>
       </Box>
       <Box textAlign='left' borderRadius={1} sx={{ bgcolor: 'secondary.light', p: 1.5, minWidth: '318px' }}>
         <LightLabelBoldValue label='Starting Date' value={textFormatServices.formatDateString(startDate)} />
@@ -32,12 +25,12 @@ const InstanceDetails = ({ info }) => {
       <Box textAlign='left' borderRadius={1} sx={{ bgcolor: 'secondary.light', p: 1.5, mt: 1, minWidth: '318px' }}>
         <LightLabelBoldValue label='Min Credits' value={minCredits} />
         <LightLabelBoldValue label='Max Credits' value={maxCredits} />
-        <LightLabelBoldValue label='Grading Scale' value={textFormatServices.formatGradingScale(gradingScale)} />
+        <LightLabelBoldValue label='Grading Scale' value={textFormatServices.convertToClientGradingScale(gradingScale)} />
         <LightLabelBoldValue label='Organizer' value={department.en} />
         <LightLabelBoldValue label='Educational Institution' value={institution} />
       </Box>
       <Box sx={{ m: 1.5 }}>
-        <Typography variant='h6' align='left' sx={{ pt: 1.5, pb: 1 }}>Teachers in Charge</Typography>
+        <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>Teachers in Charge</Typography>
         {teachersInCharge.map( (teacher) => <Typography align='left' key={teacher} >{teacher}</Typography> )}
       </Box>
     </Box>

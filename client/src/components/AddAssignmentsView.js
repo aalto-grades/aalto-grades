@@ -51,8 +51,8 @@ const AddAssignmentsView = () => {
 
   return(
     <Box sx={{ display: 'grid', gap: 1.5, ml: '7.5vw', mr: '7.5vw' }}>
-      <Typography variant='h3' sx={{ mb: 4, textAlign: 'left', fontWeight: 'light' }}>Add Study Attainments</Typography>
-      <Typography align='left' sx={{ ml: 1.5 }}>Suggested study attainments from previous instances</Typography>
+      <Typography variant='h1' align='left' sx={{ mb: 4 }}>Add Study Attainments</Typography>
+      <Typography variant='h3' align='left' sx={{ ml: 1.5 }}>Suggested study attainments from previous instances</Typography>
       <Box borderRadius={1} sx={{ bgcolor: 'secondary.light', p: '16px 12px', display: 'inline-block' }}>
         <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch' }}>
           { suggestedAttainments.map(attainment => {
@@ -79,7 +79,7 @@ const AddAssignmentsView = () => {
           </Button>
         </Box>
       </Box>
-      <Typography align='left' sx={{ ml: 1.5 }} >Added study attainments</Typography>
+      <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >Added study attainments</Typography>
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', display: 'inline-block' }}>
         { addedAttainments.length !== 0 &&
           <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch', pb: '8px' }}>
@@ -98,13 +98,13 @@ const AddAssignmentsView = () => {
             ) }
           </Box>
         }
-        <Typography variant='body2' color='primary.main' sx={{ m: '8px 0px' }} >
+        <Typography variant='body1' color='primary.main' sx={{ m: '8px 0px' }} >
           You can also add study attainments after creating the instance
         </Typography>
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 6 }}>
         <Button variant='outlined' onClick={() => onGoBack()}>Go back</Button>
-        <Button variant='contained' onClick={() => onConfirmAttainments()}>Confirm attainments</Button>
+        <Button id='ag_confirm_instance_attainments_btn' variant='contained' onClick={() => onConfirmAttainments()}>Confirm attainments</Button>
       </Box>
     </Box>
   );

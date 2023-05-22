@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+
+# name: Enable auto-merge
+# run-name: Auto-merge ${{ github.actor }} pull request
+# on:
+  # pull_request:
+    # types: [opened, reopened, ready_for_review]
+    # branches:
+    #   - main
+
+# jobs:
+  # auto-merge:
+    # runs-on: ubuntu-latest
+    # if: github.event.pull_request.draft == false
+    # steps:
+      # - uses: peter-evans/enable-pull-request-automerge@v2
+        # with:
+          # token: "${{ secrets.GITHUB_TOKEN }}"
+          # merge-method: squash
+          # pull-request-number: ${{ github.event.number }}

@@ -20,7 +20,7 @@ const FrontPage = () => {
   const { auth } = useAuth();
 
   useEffect(() => {
-    coursesService.getCourses()
+    coursesService.getCourses(auth.id)
       .then((data) => {
         setCurrentCourses(data.courses.current);
         setPreviousCourses(data.courses.previous);
@@ -31,19 +31,19 @@ const FrontPage = () => {
   return(
     <>
       <Box component="span" sx={{ display: 'flex', alignItems: 'center',  justifyContent: 'space-between', flexDirection: 'row' }}>
-        <Typography variant="h3" component="div" align="left" sx={{ flexGrow: 1 }}>
+        <Typography variant="h1" align="left" sx={{ flexGrow: 1 }}>
                 Your Current Courses
         </Typography>
         { /* admins and teachers are shown the button for creating a new course */
           auth.role == 'SYSADMIN' &&
-          <Button size='large' variant='contained' onClick={() => { navigate('/create-course'); }}>
+          <Button id='ag_new_course_btn' size='large' variant='contained' onClick={() => { navigate('/create-course'); }}>
             Create New Course
           </Button>
         }
       </Box>
       { /* current and inactive courses will later be rendered based on the student/teacher id */ }
       <BasicGrid data={currentCourses}/>
-      <Typography variant="h4" component="div" align="left" sx={{ flexGrow: 1, mt: 4 }}>
+      <Typography variant="h2" align="left" sx={{ flexGrow: 1, mt: 4 }}>
                 Inactive Courses
       </Typography>
       <CourseTable data={previousCourses}/>

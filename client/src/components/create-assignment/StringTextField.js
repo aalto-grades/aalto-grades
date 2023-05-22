@@ -20,8 +20,8 @@ const StringTextField = ({ fieldData, indices, attainments, setAttainments }) =>
       const updatedAttainments = assignmentServices.setProperty(indices, attainments, 'name', value);
       setAttainments(updatedAttainments);
     } else if (fieldData.fieldId.startsWith('attribute')) {
-      const attributeIndex = Number(fieldData.fieldId.slice(-1));
-      const updatedAttainments = assignmentServices.setFormulaAttribute(indices, attainments, attributeIndex, value);
+      const attributeKey = fieldData.fieldId.split('_')[1];
+      const updatedAttainments = assignmentServices.setFormulaAttribute(indices, attainments, attributeKey, value);
       setAttainments(updatedAttainments);
     } else {
       console.log(fieldData.fieldId);
@@ -32,8 +32,8 @@ const StringTextField = ({ fieldData, indices, attainments, setAttainments }) =>
     if (fieldData.fieldId === 'attainmentName') {
       return assignmentServices.getProperty(indices, attainments, 'name');
     } else if (fieldData.fieldId.startsWith('attribute')) {
-      const attributeIndex = Number(fieldData.fieldId.slice(-1));
-      return assignmentServices.getFormulaAttribute(indices, attainments, attributeIndex);
+      const attributeKey = fieldData.fieldId.split('_')[1];
+      return assignmentServices.getFormulaAttribute(indices, attainments, attributeKey);
     } else {
       console.log(fieldData.fieldId);
     }

@@ -17,15 +17,18 @@ export default {
         student_id: {
           type: new DataTypes.STRING,
           unique: true,
-          allowNull: true
+          allowNull: true,
+          defaultValue: null
         },
         name: {
           type: new DataTypes.STRING,
-          allowNull: false
+          allowNull: true,
+          defaultValue: null
         },
         email: {
           type: new DataTypes.STRING(255),
-          allowNull: false,
+          allowNull: true,
+          defaultValue: null,
           unique: true,
           validate: {
             isEmail: true
@@ -33,7 +36,8 @@ export default {
         },
         password: {
           type: new DataTypes.CHAR(255),
-          allowNull: false
+          allowNull: true,
+          defaultValue: null
         },
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
@@ -108,14 +112,9 @@ export default {
         updated_at: DataTypes.DATE,
       }, { transaction });
       await queryInterface.createTable('course_instance_role', {
-        id: {
-          type: DataTypes.INTEGER,
-          autoIncrement: true,
-          primaryKey: true
-        },
         user_id: {
           type: DataTypes.INTEGER,
-          allowNull: false,
+          primaryKey: true,
           references: {
             model: 'user',
             key: 'id'
@@ -125,7 +124,7 @@ export default {
         },
         course_instance_id: {
           type: DataTypes.INTEGER,
-          allowNull: false,
+          primaryKey: true,
           references: {
             model: 'course_instance',
             key: 'id'
@@ -223,14 +222,9 @@ export default {
         updated_at: DataTypes.DATE
       }, { transaction });
       await queryInterface.createTable('user_attainment_grade', {
-        id: {
-          type: DataTypes.INTEGER,
-          autoIncrement: true,
-          primaryKey: true
-        },
         user_id: {
           type: DataTypes.INTEGER,
-          allowNull: false,
+          primaryKey: true,
           references: {
             model: 'user',
             key: 'id'
@@ -240,7 +234,7 @@ export default {
         },
         attainment_id: {
           type: DataTypes.INTEGER,
-          allowNull: false,
+          primaryKey: true,
           references: {
             model: 'attainment',
             key: 'id'

@@ -4,6 +4,10 @@
 
 // This file reads all environment variables and defines their values as constants.
 
+// Config dotenv so environment variables are also accessible from .env file.
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 const parsedPort: number = Number(process.env.AALTO_GRADES_BACKEND_PORT);
 export const PORT: number = isNaN(parsedPort) ? 3000 : parsedPort;
 
@@ -17,7 +21,6 @@ if ((!SISU_API_KEY || !SISU_API_URL) && NODE_ENV === 'production') {
   );
 }
 
-export const TEST_ENV: boolean = process.env.AALTO_GRADES_TEST_ENVIRONMENT === 'true';
 export const JWT_SECRET: string = process.env.AALTO_GRADES_JWT_SECRET || 'TOP_SECRET';
 export const FRONTEND_ORIGIN: string =
   process.env.AALTO_GRADES_FRONTEND_CORS_ORIGIN || 'http://localhost:3005';

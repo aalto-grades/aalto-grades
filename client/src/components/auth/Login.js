@@ -21,7 +21,11 @@ const Login = () => {
     try {
       const response = await userService.login(userObject);
       // if login is successful, save user role to context
-      setAuth({ role: response.data.role });
+      setAuth({
+        id: response.data.id,
+        role: response.data.role,
+        name: response.data.name
+      });
       navigate('/', { replace: true });
     } catch (exception) {
       console.log(exception);

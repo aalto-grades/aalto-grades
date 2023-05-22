@@ -28,7 +28,7 @@ const CreateAssignmentView = () => {
     date: '',
     expiryDate: '',
     affectCalculation: false,
-    formulaAttributes: [],
+    formulaAttributes: {},
     subAttainments: [],
   }]);
 
@@ -51,6 +51,7 @@ const CreateAssignmentView = () => {
       if (instanceId) {
         const updatedAttainments = assignmentServices.formatStringsToDates(attainments)[0];
         addAttainment(updatedAttainments);
+        navigate(-1);
       } else if (sisuInstanceId) {
         const temporaryId = attainmentIncrementId;
         const [updatedAttainments, newTemporaryId] = assignmentServices.createTemporaryAttainment(addedAttainments, attainments[0], temporaryId);
@@ -71,7 +72,7 @@ const CreateAssignmentView = () => {
   return(
     <>
       <Container maxWidth="md" sx={{ textAlign: 'right' }}>
-        <Typography variant="h3" component="div" sx={{ flexGrow: 1, mb: 4, textAlign: 'left' }}>
+        <Typography variant="h1" align='left' sx={{ flexGrow: 1, mb: 4 }}>
             Create Study Attainment
         </Typography>
         <form>

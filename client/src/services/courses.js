@@ -4,8 +4,8 @@
 
 import axios from './axios';
 
-const getCourses = async () => {
-  const response = await axios.get('/v1/user/4/courses');
+const getCourses = async (userId) => {
+  const response = await axios.get(`/v1/user/${userId}/courses`);
   console.log(response.data);
   return response.data.data;
 };

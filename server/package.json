@@ -8,6 +8,7 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node build/src/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "test": "jest --verbose --detectOpenHandles --coverage",
     "lint": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'`",
     "lint:fix": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'` --fix",
@@ -29,8 +30,11 @@
     "axios": "^1.2.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "csv-parse": "^5.3.6",
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
+    "multer": "^1.4.5-lts.1",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
@@ -48,6 +52,7 @@
     "@types/iconv-lite": "^0.0.1",
     "@types/jest": "^29.2.3",
     "@types/jsonwebtoken": "^8.5.9",
+    "@types/multer": "^1.4.7",
     "@types/passport-local": "^1.0.34",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.42.1",
@@ -63,6 +68,7 @@
     "sequelize-cli": "^6.5.2",
     "supertest": "^6.3.2",
     "ts-jest": "^29.0.3",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^4.8.4"
   }
 }

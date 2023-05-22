@@ -14,11 +14,12 @@ export default class User extends Model<
 > {
   declare id: CreationOptional<number>;
   declare studentId: CreationOptional<string>;
-  declare name: string;
-  declare email: string;
-  declare password: string;
+  declare name: CreationOptional<string>;
+  declare email: CreationOptional<string>;
+  declare password: CreationOptional<string>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
+  static findByEmail: (email: string) => Promise<User | null>;
 }
 
 User.init(
@@ -31,15 +32,18 @@ User.init(
     studentId: {
       type: new DataTypes.STRING,
       unique: true,
-      allowNull: true
+      allowNull: true,
+      defaultValue: null
     },
     name: {
       type: new DataTypes.STRING,
-      allowNull: false
+      allowNull: true,
+      defaultValue: null
     },
     email: {
       type: new DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
+      defaultValue: null,
       unique: true,
       validate: {
         isEmail: true,
@@ -47,7 +51,8 @@ User.init(
     },
     password: {
       type: new DataTypes.CHAR(255),
-      allowNull: false
+      allowNull: true,
+      defaultValue: null
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
@@ -57,3 +62,12 @@ User.init(
     tableName: 'user'
   }
 );
+
+User.findByEmail = async function (email: string): Promise<User | null> {
+  return await User.findOne({
+    attributes: ['id', 'password', 'name'],
+    where: {
+      email
+    }
+  });
+};

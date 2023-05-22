@@ -7,26 +7,29 @@ import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
+import formulaService from '../../services/formulas';
 
 const Assignment = ({ attainment, attributes, handleAttributeChange, attainmentIndex }) => {
 
   const attributeTextFields = () => {
     return (
-      attributes.map((attribute, attributeIndex) => (
-        <TextField
-          type='text'
-          key={attribute}
-          variant='standard' 
-          label={attribute}
-          InputLabelProps={{ shrink: true }}
-          margin='normal'
-          sx={{
-            marginTop: 0,
-            width: '100%'
-          }}
-          onChange={event => handleAttributeChange(attainmentIndex, attributeIndex, event)}
-        />
-      ))
+      attributes.map((attribute, attributeIndex) => {
+        const attributeLabel = formulaService.getAttributeLabel(attribute);
+        return (
+          <TextField
+            type='text'
+            key={attribute}
+            variant='standard' 
+            label={attributeLabel}
+            InputLabelProps={{ shrink: true }}
+            margin='normal'
+            sx={{
+              marginTop: 0,
+              width: '100%'
+            }}
+            onChange={event => handleAttributeChange(attainmentIndex, attributeIndex, event)}
+          />
+        );})
     );
   };
 

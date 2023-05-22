@@ -58,7 +58,6 @@ describe('Tests for CourseView component', () => {
       const instances = getByText('All Instances');
       const createInstanceButton = getByText('New instance');
       const addAssignmentButton = getByText('Add attainment');
-      const seeAttendeesButton = getByText('See attendees');
       expect(instanceInfo).toBeDefined();
       expect(teachersInfo).toBeDefined();
       expect(attainments).toBeDefined();
@@ -68,12 +67,11 @@ describe('Tests for CourseView component', () => {
       expect(instances).toBeDefined();
       expect(createInstanceButton).toBeDefined();
       expect(addAssignmentButton).toBeDefined();
-      expect(seeAttendeesButton).toBeDefined();
     });
     
   });
 
-  test('CourseView should not render new instance button, see attendees or allow editing assignments for students', async () => {
+  test('CourseView should not render new instance button, see attendees or allow editing attainments for students', async () => {
 
     const auth = { role: 'STUDENT' };
     const { getByText, findByText, queryByText } = renderCourseView(auth);

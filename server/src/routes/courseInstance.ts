@@ -16,46 +16,64 @@ export const router: Router = Router();
  * definitions:
  *   Period:
  *     type: string
- *     description: >
- *       Teaching period (`Period`):
- *       `'I' | 'II' | 'III' | 'IV' | 'V'`.
+ *     enum: [I, II, III, IV, V]
+ *     description: Teaching period.
+ *     example: III
  *   GradingScale:
  *     type: string
- *     description: >
- *       Grading method (`GradingScale`):
- *       `'PASS_FAIL' | 'NUMERICAL' | 'SECOND_NATIONAL_LANGUAGE'`.
+ *     enum: [PASS_FAIL, NUMERICAL, SECOND_NATIONAL_LANGUAGE]
+ *     description: Course instance specific grading method.
+ *     example: NUMERICAL
+ *   CourseInstanceId:
+ *     type: integer
+ *     description: Internal course instance database ID.
+ *     format: int32
+ *     minimum: 1
+ *     example: 1
+ *   SisuCourseInstanceId:
+ *     type: string
+ *     description: ID of the corresponding course instance in Sisu.
+ *     example: aalto-CUR-163498-3084205
  *   CourseInstanceData:
  *     type: object
  *     description: Course instance information.
  *     properties:
  *       id:
- *         type: integer
- *         description: Internal course instance database ID.
+ *        $ref: '#/definitions/CourseInstanceId'
  *       sisuCourseInstanceId:
- *         type: string
- *         description: ID of the corresponding course instance in Sisu.
+ *        $ref: '#/definitions/SisuCourseInstanceId'
  *       startingPeriod:
  *         $ref: '#/definitions/Period'
  *       endingPeriod:
  *         $ref: '#/definitions/Period'
  *       minCredits:
  *         type: integer
+ *         description: Minimum amount credits student can receive from passing the course.
+ *         example: 3
  *       maxCredits:
  *         type: integer
+ *         description: Maximum amount credits student can receive from passing the course.
+ *         example: 5
  *       startDate:
  *         type: string
+ *         format: date
  *         description: Starting date in format year-month-day.
+ *         example: 2022-9-22
  *       endDate:
  *         type: string
+ *         format: date
  *         description: Ending date in format year-month-day.
+ *         example: 2022-12-6
  *       type:
  *         type: string
  *         description: Type of course instance, 'Lecture', 'Exam', etc.
+ *         example: Lecture
  *       gradingScale:
  *         $ref: '#/definitions/GradingScale'
  *       teachersInCharge:
  *         type: array
  *         description: Names of all teachers in charge of this course instance.
+ *         example: ['John Doe', 'Jane Doe']
  *         items:
  *           type: string
  *       courseData:
@@ -69,18 +87,8 @@ export const router: Router = Router();
  *     tags: [Course Instance]
  *     description: Get information about a course instance.
  *     parameters:
- *       - in: path
- *         name: courseId
- *         required: True
- *         schema:
- *           type: integer
- *         description: The ID of the course the instance belongs to.
- *       - in: path
- *         name: instanceId
- *         required: True
- *         schema:
- *           type: integer
- *         description: The ID of the desired course instance.
+ *       - $ref: '#/components/parameters/courseId'
+ *       - $ref: '#/components/parameters/instanceId'
  *     responses:
  *       200:
  *         description: >
@@ -92,8 +100,7 @@ export const router: Router = Router();
  *               type: object
  *               properties:
  *                 success:
- *                   type: boolean
- *                   description: Success of the request.
+ *                   $ref: '#/definitions/Success'
  *                 data:
  *                   type: object
  *                   properties:
@@ -102,7 +109,15 @@ export const router: Router = Router();
  *       400:
  *         description: >
  *           A validation error has occurred in the URL, the given course
- *           instance ID is not a positive integer.
+ *           or course instance ID is not a positive integer.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
+ *       403:
+ *         description: The requester is not authorized to delete attainments.
  *         content:
  *           application/json:
  *             schema:
@@ -123,6 +138,8 @@ export const router: Router = Router();
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
+ *     security:
+ *       - cookieAuth: []
  */
 router.get(
   '/v1/courses/:courseId/instances/:instanceId',
@@ -136,12 +153,7 @@ router.get(
  *     tags: [Course Instance]
  *     description: Get all instances of a course.
  *     parameters:
- *       - in: path
- *         name: instanceId
- *         required: True
- *         schema:
- *           type: integer
- *         description: The ID of the desired course.
+ *       - $ref: '#/components/parameters/courseId'
  *     responses:
  *       200:
  *         description: >
@@ -153,8 +165,7 @@ router.get(
  *               type: object
  *               properties:
  *                 success:
- *                   type: boolean
- *                   description: Success of the request.
+ *                   $ref: '#/definitions/Success'
  *                 data:
  *                   type: array
  *                   description: All instances of the course with the given ID.
@@ -168,12 +179,16 @@ router.get(
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
  *       404:
  *         description: A course with the given ID was not found.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
+ *     security:
+ *       - cookieAuth: []
  */
 router.get(
   '/v1/courses/:courseId/instances',
@@ -187,12 +202,7 @@ router.get(
  *     tags: [Course Instance]
  *     description: Add a course instance to a course.
  *     parameters:
- *       - in: path
- *         name: courseId
- *         required: True
- *         schema:
- *           type: integer
- *         description: The ID of the course to add the instance to.
+ *       - $ref: '#/components/parameters/courseId'
  *     requestBody:
  *       content:
  *         application/json:
@@ -203,7 +213,7 @@ router.get(
  *                 $ref: '#/definitions/GradingScale'
  *               sisuCourseInstanceId:
  *                 type: string
- *                 description: ID of the corresponding course instance in Sisu.
+ *                 $ref: '#/definitions/SisuCourseInstanceId'
  *               startingPeriod:
  *                 $ref: '#/definitions/Period'
  *               endingPeriod:
@@ -211,8 +221,10 @@ router.get(
  *               type:
  *                 type: string
  *                 description: Type of course instance, 'Lecture', 'Exam', etc.
+ *                 example: Lecture
  *               teachersInCharge:
  *                 type: array
+ *                 example: [1, 2, 3]
  *                 description: >
  *                   IDs of the users to be assigned as teachers in charge of
  *                   this course instance.
@@ -220,14 +232,22 @@ router.get(
  *                   type: integer
  *               minCredits:
  *                 type: integer
+ *                 description: Minimum amount credits student can receive from passing the course.
+ *                 example: 3
  *               maxCredits:
  *                 type: integer
+ *                 description: Maximum amount credits student can receive from passing the course.
+ *                 example: 5
  *               startDate:
  *                 type: string
+ *                 format: date
  *                 description: Starting date in format year-month-day.
+ *                 example: 2022-9-22
  *               endDate:
  *                 type: string
+ *                 format: date
  *                 description: Ending date in format year-month-day.
+ *                 example: 2022-12-6
  *     responses:
  *       200:
  *         description: The course instance was successfully added.
@@ -237,8 +257,7 @@ router.get(
  *               type: object
  *               properties:
  *                 success:
- *                   type: boolean
- *                   description: Success of the request.
+ *                   $ref: '#/definitions/Success'
  *                 data:
  *                   type: object
  *                   properties:
@@ -246,8 +265,7 @@ router.get(
  *                       type: object
  *                       properties:
  *                         id:
- *                           type: integer
- *                           description: The ID of the newly added course instance.
+ *                           $ref: '#/definitions/CourseInstanceId'
  *       400:
  *         description: >
  *           A validation error has occurred either in the URL or the request
@@ -257,18 +275,9 @@ router.get(
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       401:
- *         description: The requester is not logged in.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
+ *         $ref: '#/components/responses/AuthenticationError'
  *       403:
- *         description: >
- *           The requester is not authorized to add a course instance.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
+ *         $ref: '#/components/responses/AuthorizationError'
  *       404:
  *         description: A course with the given ID was not found.
  *         content:
@@ -282,6 +291,8 @@ router.get(
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
+ *     security:
+ *       - cookieAuth: []
  */
 router.post(
   '/v1/courses/:courseId/instances',
