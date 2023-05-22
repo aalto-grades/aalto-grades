@@ -105,7 +105,7 @@ describe(
         }
       }) as UserAttainmentGrade;
 
-      expect(userAttainment.points).toBe(6);
+      expect(userAttainment.grade).toBe(6);
 
       const csvData: fs.ReadStream = fs.createReadStream(
         path.resolve(__dirname, '../mockData/csv/grades_updated.csv'), 'utf8'
@@ -121,7 +121,7 @@ describe(
         }
       }) as UserAttainmentGrade;
 
-      expect(userAttainment.points).toBe(16);
+      expect(userAttainment.grade).toBe(16);
       expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
       expect(res.body.data).toBeDefined();
