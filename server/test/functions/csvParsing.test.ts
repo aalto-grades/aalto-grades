@@ -52,42 +52,48 @@ describe('Test CSV header parser', () => {
 
   it('should throw error if parsing fails due to invalid header column', () => {
     try {
-      parseHeaderFromCsv(['StudentN0', 'C3I9A1', 'C3I9B2', 'C3I9A3']); // Third column bad.
+      // Third column bad, attainment id not a number.
+      parseHeaderFromCsv(['StudentN0', 'A3R9A1', 'C3I9Ax', 'CYI9A4']);
+
+
     } catch (error: unknown) {
+      console.log(error);
       checkError(
         error,
         HttpCode.BadRequest,
         [
           'Header attainment data parsing failed at column 3.' +
-          ' Received C3I9B2, expected format C{courseId}I{courseInstanceId}A{attainmentId}.'
+          ' Expected attainment id to type of number, received string.'
         ]
       );
     }
 
     try {
-      parseHeaderFromCsv(['StudentNo', 'C3I9A1', 'C3I9A2', 'C3I9A3xx']); // Last column bad.
+      parseHeaderFromCsv(['StudentNo', 'C3I9A1', 'C3I9A2', 'C3I9Axx']); // Last column bad.
     } catch (error: unknown) {
       checkError(
         error,
         HttpCode.BadRequest,
         [
           'Header attainment data parsing failed at column 4.' +
-          ' Received C3I9A3xx, expected format C{courseId}I{courseInstanceId}A{attainmentId}.'
+          ' Expected attainment id to type of number, received string.'
         ]
       );
     }
 
     try {
-      parseHeaderFromCsv(['StudentNo', 'C3I9A1', 'C3I9B2', 'C3I9A3xx']); // Multiple columns bad.
+      parseHeaderFromCsv(['StudentNo', 'C3I9At', 'C3I9B&', 'C3I9A3xx']); // Multiple columns bad.
     } catch (error: unknown) {
       checkError(
         error,
         HttpCode.BadRequest,
         [
+          'Header attainment data parsing failed at column 2.' +
+          ' Expected attainment id to type of number, received string.',
           'Header attainment data parsing failed at column 3.' +
-          ' Received C3I9B2, expected format C{courseId}I{courseInstanceId}A{attainmentId}.',
+          ' Expected attainment id to type of number, received string.',
           'Header attainment data parsing failed at column 4.' +
-          ' Received C3I9A3xx, expected format C{courseId}I{courseInstanceId}A{attainmentId}.'
+          ' Expected attainment id to type of number, received string.'
         ]
       );
     }
