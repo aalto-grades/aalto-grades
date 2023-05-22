@@ -34,8 +34,8 @@ export function parseHeaderFromCsv(header: Array<string>): Array<number> {
   // Remove first input "StudentNo". Avoid using shift(), will have side-effects outside function.
   const attainmentData: Array<string> = header.slice(1);
 
-  // Regex for checking attainment matches the desired format e.g., C1I1A1.
-  const attainmentTagRegex: RegExp = /C\d+I\d+A(\d+)\b/;
+  // Regex for checking type and extracting attainment id from the header column.
+  const attainmentTagRegex: RegExp = /(\d+)$/;
 
   if (attainmentData.length === 0) {
     throw new ApiError(
@@ -51,7 +51,7 @@ export function parseHeaderFromCsv(header: Array<string>): Array<number> {
     } else {
       errors.push(
         `Header attainment data parsing failed at column ${attainmentData.indexOf(str) + 2}.` +
-        ` Received ${str}, expected format C{courseId}I{courseInstanceId}A{attainmentId}.`
+        ` Expected attainment id to type of number, received ${typeof str}.`
       );
     }
   });
