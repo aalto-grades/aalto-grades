@@ -1,0 +1,40 @@
+# SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+
+version: "3.7"
+
+services:
+
+  back-end-test:
+    build: 
+      context: ../server/
+      args:
+        SERVER_SKIP_NPM_CI: ${SERVER_SKIP_NPM_CI}
+    depends_on:
+      - database-test
+    ports:
+    - "3000:3000"
+    tty: true
+    container_name: backend-server-test
+    environment:
+      POSTGRES_URL: "database-test"
+      POSTGRES_USER: "postgres"
+      POSTGRES_DATABASE: "postgres"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      NODE_ENV: "test"
+    networks:
+      - local
+
+  database-test:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    networks:
+      - local
+
+networks:
+  local:
+    driver: bridge
+
