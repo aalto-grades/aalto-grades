@@ -193,5 +193,6 @@ router.post(
  */
 router.post(
   '/v1/courses/:courseId/instances/:instanceId/grades/calculate',
+  authorization,
   controllerDispatcher(calculateGrades)
 );
