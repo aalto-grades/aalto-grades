@@ -78,7 +78,6 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
   });
 
   /*
-   * TODO: Check that the requester is logged in, 401 Unauthorized if not
    * TODO: Check that the requester is authorized to add a course instance, 403
    * Forbidden if not
    */

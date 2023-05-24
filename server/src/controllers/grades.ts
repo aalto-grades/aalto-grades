@@ -152,7 +152,6 @@ export function parseGradesFromCsv(
 export async function addGrades(req: Request, res: Response, next: NextFunction): Promise<void> {
   /*
    * TODO:
-   * - Check that the requester is logged in, 401 Unauthorized if not.
    * - Check that the requester is authorized to add grades, 403 Forbidden if not.
    * - Check grading points are not higher than max points of the attainment.
    */
