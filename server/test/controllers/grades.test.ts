@@ -447,7 +447,9 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
 
   it('should calculate one correct grade', async () => {
     checkSuccessRes(
-      await request.post('/v1/courses/5/instances/8/grades/calculate'),
+      await request
+        .post('/v1/courses/5/instances/8/grades/calculate')
+        .set('Cookie', authCookie),
       [
         {
           studentNumber: '352772',
@@ -540,7 +542,9 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
     });
 
     checkSuccessRes(
-      await request.post('/v1/courses/1/instances/1/grades/calculate'),
+      await request
+        .post('/v1/courses/1/instances/1/grades/calculate')
+        .set('Cookie', authCookie),
       [
         {
           studentNumber: '111111',
@@ -686,7 +690,9 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
     });
 
     checkSuccessRes(
-      await request.post('/v1/courses/1/instances/1/grades/calculate'),
+      await request
+        .post('/v1/courses/1/instances/1/grades/calculate')
+        .set('Cookie', authCookie),
       [
         {
           studentNumber: '123456',
@@ -758,7 +764,9 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
     });
 
     checkSuccessRes(
-      await request.post('/v1/courses/1/instances/1/grades/calculate'),
+      await request
+        .post('/v1/courses/1/instances/1/grades/calculate')
+        .set('Cookie', authCookie),
       [
         {
           studentNumber: '654321',
@@ -768,4 +776,15 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
       ]
     );
   });
+
+  it('should respond with 401 unauthorized, if not logged in', async () => {
+    res = await request
+      .post('/v1/courses/1/instances/1/grades/calculate')
+      .expect(HttpCode.Unauthorized);
+
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors[0]).toBe('unauthorized');
+    expect(res.body.data).not.toBeDefined();
+  });
+
 });

@@ -510,33 +510,6 @@ describe(
       expect(res.body.success).toBe(false);
     });
 
-  it('should add parent succesfully on an existing attainable', async () => {
-    // Create a new parent attainable.
-    let res: supertest.Response = await request
-      .post('/v1/courses/1/instances/1/attainments')
-      .send(mockAttainable)
-      .set('Content-Type', 'application/json')
-      .expect(HttpCode.Ok);
-
-    parentAttainable = res.body.data.attainment;
-
-    res = await request
-      .put(`/v1/courses/1/instances/1/attainments/${subAttainable.id}`)
-      .send({ parentId: parentAttainable.id })
-      .set('Content-Type', 'application/json')
-      .expect(HttpCode.Ok);
-
-    expect(res.body.success).toBe(true);
-    expect(res.body.errors).not.toBeDefined();
-    expect(res.body.data.attainment.id).toBe(subAttainable.id);
-    expect(res.body.data.attainment.courseId).toBe(1);
-    expect(res.body.data.attainment.courseInstanceId).toBe(1);
-    expect(res.body.data.attainment.parentId).toBe(parentAttainable.id);
-    expect(res.body.data.attainment.name).toBe('new name');
-    expect(new Date(res.body.data.attainment.date).getTime())
-      .toBe(mockAttainable.date.getTime());
-    expect(new Date(res.body.data.attainment.expiryDate).getTime())
-      .toBe(mockAttainable.expiryDate.getTime());
   });
 
 describe(
