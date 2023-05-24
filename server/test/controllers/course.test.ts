@@ -122,6 +122,21 @@ describe('Test POST /v1/courses - create new course', () => {
     expect(res.body.data.course.id).toBeDefined();
   });
 
+  it('should respond with 400 bad request, if required fields are undefined', async () => {
+    const res: supertest.Response = await request
+      .post('/v1/courses')
+      .send({})
+      .set('Cookie', authCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.BadRequest);
+
+    expect(res.body.success).toBe(false);
+    expect(res.body.data).not.toBeDefined();
+    expect(res.body.errors).toContain('courseCode is a required field');
+    expect(res.body.errors).toContain('department is a required field');
+    expect(res.body.errors).toContain('name is a required field');
+  });
+
   it('should respond with 401 unauthorized, if not logged in', async () => {
     const res: supertest.Response = await request
       .post('/v1/courses')
@@ -132,22 +147,6 @@ describe('Test POST /v1/courses - create new course', () => {
     expect(res.body.success).toBe(false);
     expect(res.body.errors[0]).toBe('unauthorized');
     expect(res.body.data).not.toBeDefined();
-  });
-
-  it('should respond with 404 bad request, if required fields are undefined', async () => {
-    const input: object = {};
-    const res: supertest.Response = await request
-      .post('/v1/courses')
-      .send(input)
-      .set('Cookie', authCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.BadRequest);
-
-    expect(res.body.success).toBe(false);
-    expect(res.body.data).not.toBeDefined();
-    expect(res.body.errors).toContain('courseCode is a required field');
-    expect(res.body.errors).toContain('department is a required field');
-    expect(res.body.errors).toContain('name is a required field');
   });
 
   /* TODO: move next test case elsewhere in future, after refactoring commonly

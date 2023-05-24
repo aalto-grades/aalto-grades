@@ -138,8 +138,7 @@ describe(
       expect(res.body.data).toBeDefined();
     });
 
-    // eslint-disable-next-line max-len
-    it.skip('should process big CSV succesfully (1100 x 178 = 195 800 individual attainment grades)',
+    it('should process big CSV succesfully (1100 x 178 = 195 800 individual attainment grades)',
       async () => {
         const csvData: fs.ReadStream = fs.createReadStream(
           path.resolve(__dirname, '../mockData/csv/grades_big.csv'), 'utf8'

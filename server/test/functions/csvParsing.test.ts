@@ -55,9 +55,7 @@ describe('Test CSV header parser', () => {
       // Third column bad, attainment id not a number.
       parseHeaderFromCsv(['StudentN0', 'A3R9A1', 'C3I9Ax', 'CYI9A4']);
 
-
     } catch (error: unknown) {
-      console.log(error);
       checkError(
         error,
         HttpCode.BadRequest,
@@ -110,6 +108,7 @@ describe('Test CSV header parser', () => {
       );
     }
   });
+
 });
 
 describe('Test CSV student grades parser', () => {
@@ -186,4 +185,5 @@ describe('Test CSV student grades parser', () => {
       );
     }
   });
+
 });

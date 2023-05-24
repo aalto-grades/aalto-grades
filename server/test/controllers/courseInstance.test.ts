@@ -252,7 +252,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
     const res: supertest.Response = await request
       .post('/v1/courses/1/instances')
       .send({})
-      .set('Cookie', authCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Unauthorized);
 
