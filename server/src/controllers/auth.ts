@@ -244,7 +244,13 @@ passport.use(
     {
       secretOrKey: JWT_SECRET,
       jwtFromRequest: (req: Request): string | null => {
-        return (req && req.cookies) ? req.cookies['jwt'] : null;
+        const jwt: string | null = (req && req.cookies) ? req.cookies['jwt'] : null;
+
+        if (!jwt) {
+          throw new ApiError('unauthorized', HttpCode.Unauthorized);
+        }
+
+        return jwt;
       }
     },
     async (token: JwtClaims, done: VerifiedCallback): Promise<void> => {

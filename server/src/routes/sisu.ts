@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { Router } from 'express';
+import passport from 'passport';
 
 import {
   fetchAllCourseInstancesFromSisu, fetchCourseInstanceFromSisu
@@ -58,6 +59,7 @@ export const router: Router = Router();
  */
 router.get(
   '/v1/sisu/instances/:sisuCourseInstanceId',
+  passport.authenticate('jwt', { session: false }),
   controllerDispatcher(fetchCourseInstanceFromSisu)
 );
 
@@ -108,5 +110,6 @@ router.get(
  */
 router.get(
   '/v1/sisu/courses/:courseCode',
+  passport.authenticate('jwt', { session: false }),
   controllerDispatcher(fetchAllCourseInstancesFromSisu)
 );

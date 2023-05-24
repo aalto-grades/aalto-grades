@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { Router } from 'express';
+import passport from 'passport';
 
 import { getCoursesOfUser } from '../controllers/user';
 import { controllerDispatcher } from '../middleware/errorHandler';
@@ -80,5 +81,6 @@ export const router: Router = Router();
  */
 router.get(
   '/v1/user/:userId/courses',
+  passport.authenticate('jwt', { session: false }),
   controllerDispatcher(getCoursesOfUser)
 );

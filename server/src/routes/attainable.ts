@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import express, { Router } from 'express';
+import passport from 'passport';
 
 import { addAttainable, deleteAttainment, updateAttainable } from '../controllers/attainable';
 import { handleInvalidRequestJson } from '../middleware';
@@ -138,6 +139,7 @@ export const router: Router = Router();
  */
 router.post(
   '/v1/courses/:courseId/instances/:instanceId/attainments',
+  passport.authenticate('jwt', { session: false }),
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(addAttainable)
@@ -197,6 +199,7 @@ router.post(
  */
 router.delete(
   '/v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId',
+  passport.authenticate('jwt', { session: false }),
   controllerDispatcher(deleteAttainment)
 );
 
@@ -263,6 +266,7 @@ router.delete(
  */
 router.put(
   '/v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId',
+  passport.authenticate('jwt', { session: false }),
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(updateAttainable)

@@ -4,6 +4,7 @@
 
 import { Request, Router } from 'express';
 import multer, { FileFilterCallback, memoryStorage, Multer } from 'multer';
+import passport from 'passport';
 import path from 'path';
 
 import { addGrades } from '../controllers/grades';
@@ -113,6 +114,7 @@ const upload: Multer = multer({
  */
 router.post(
   '/v1/courses/:courseId/instances/:instanceId/grades/csv',
+  passport.authenticate('jwt', { session: false }),
   upload.single('csv_data'),
   controllerDispatcher(addGrades)
 );

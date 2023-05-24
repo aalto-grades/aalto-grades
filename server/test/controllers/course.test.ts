@@ -6,14 +6,25 @@ import supertest from 'supertest';
 
 import { app } from '../../src/app';
 import { HttpCode } from '../../src/types/httpCode';
+import { getCookies } from '../util/getCookies';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
+let authCookie: Array<string> = [];
 
-describe('Test GET /v1/courses/:courseId', () => {
+beforeAll(async () => {
+  authCookie = await getCookies();
+});
+
+describe('Test GET /v1/courses/:courseId - get course by ID', () => {
 
   it('should respond with correct data when course exists', async () => {
-    const res: supertest.Response = await request.get('/v1/courses/1');
+    const res: supertest.Response = await request
+      .get('/v1/courses/1')
+      .set('Cookie', authCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
     expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
     expect(res.body.data.course).toBeDefined();
@@ -23,28 +34,47 @@ describe('Test GET /v1/courses/:courseId', () => {
     expect(res.body.data.course.department).toBeDefined();
     expect(res.body.data.course.name).toBeDefined();
     expect(res.body.data.course.evaluationInformation).toBeDefined();
-    expect(res.statusCode).toBe(HttpCode.Ok);
-  });
-
-  it('should respond with 404 not found, if non-existing course id', async () => {
-    const res: supertest.Response = await request.get(`/v1/courses/${badId}`);
-    expect(res.body.success).toBe(false);
-    expect(res.body.data).not.toBeDefined();
-    expect(res.body.errors).toBeDefined();
-    expect(res.statusCode).toBe(HttpCode.NotFound);
   });
 
   it('should respond with 400 bad request, if validation fails (non-number course id)',
     async () => {
-      const res: supertest.Response = await request.get('/v1/courses/abc');
+      const res: supertest.Response = await request
+        .get('/v1/courses/abc')
+        .set('Cookie', authCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadRequest);
+
       expect(res.body.success).toBe(false);
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
-      expect(res.statusCode).toBe(HttpCode.BadRequest);
     });
+
+  it('should respond with 401 unauthorized, if not logged in', async () => {
+    const res: supertest.Response = await request
+      .get('/v1/courses/1')
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Unauthorized);
+
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors[0]).toBe('unauthorized');
+    expect(res.body.data).not.toBeDefined();
+  });
+
+  it('should respond with 404 not found, if nonexistent course id', async () => {
+    const res: supertest.Response = await request
+      .get(`/v1/courses/${badId}`)
+      .set('Cookie', authCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.NotFound);
+
+    expect(res.body.success).toBe(false);
+    expect(res.body.data).not.toBeDefined();
+    expect(res.body.errors).toBeDefined();
+  });
+
 });
 
-describe('Test POST /v1/courses', () => {
+describe('Test POST /v1/courses - create new course', () => {
 
   it('should respond with course data on correct input', async () => {
     let input: object = {
@@ -60,8 +90,12 @@ describe('Test POST /v1/courses', () => {
         sv: ''
       }
     };
-    let res: supertest.Response = await request.post('/v1/courses').send(input);
-    expect(res.statusCode).toBe(HttpCode.Ok);
+    let res: supertest.Response = await request
+      .post('/v1/courses').send(input)
+      .set('Cookie', authCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
     expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
     expect(res.body.data.course.id).toBeDefined();
@@ -77,17 +111,38 @@ describe('Test POST /v1/courses', () => {
         en: 'Signals and Systems',
       }
     };
-    res = await request.post('/v1/courses').send(input);
-    expect(res.statusCode).toBe(HttpCode.Ok);
+    res = await request.post('/v1/courses')
+      .send(input)
+      .set('Cookie', authCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
     expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
     expect(res.body.data.course.id).toBeDefined();
   });
 
-  it('should respond with validation errors, if required fields are undefined', async () => {
+  it('should respond with 401 unauthorized, if not logged in', async () => {
+    const res: supertest.Response = await request
+      .post('/v1/courses')
+      .send({})
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Unauthorized);
+
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors[0]).toBe('unauthorized');
+    expect(res.body.data).not.toBeDefined();
+  });
+
+  it('should respond with 404 bad request, if required fields are undefined', async () => {
     const input: object = {};
-    const res: supertest.Response = await request.post('/v1/courses').send(input);
-    expect(res.statusCode).toBe(HttpCode.BadRequest);
+    const res: supertest.Response = await request
+      .post('/v1/courses')
+      .send(input)
+      .set('Cookie', authCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.BadRequest);
+
     expect(res.body.success).toBe(false);
     expect(res.body.data).not.toBeDefined();
     expect(res.body.errors).toContain('courseCode is a required field');
@@ -104,12 +159,16 @@ describe('Test POST /v1/courses', () => {
     const res: supertest.Response = await request
       .post('/v1/courses')
       .send(input)
-      .set('Content-Type', 'application/json');
-    expect(res.statusCode).toBe(HttpCode.BadRequest);
+      .set('Content-Type', 'application/json')
+      .set('Cookie', authCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.BadRequest);
+
     expect(res.body.success).toBe(false);
     expect(res.body.data).not.toBeDefined();
     expect(res.body.errors).toContain(
       'SyntaxError: Unexpected end of JSON input: {"courseCode": "ELEC-A7200"'
     );
   });
+
 });
