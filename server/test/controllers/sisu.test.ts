@@ -9,11 +9,17 @@ import { app } from '../../src/app';
 import { CourseInstanceData } from '../../src/types/course';
 import { HttpCode } from '../../src/types/httpCode';
 import { sisuInstance, sisuError } from '../mockData/sisu';
+import { getCookies } from '../util/getCookies';
 
 jest.mock('axios');
 const mockedAxios: jest.Mocked<AxiosStatic> = axios as jest.Mocked<typeof axios>;
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
+let authCookie: Array<string> = [];
+
+beforeAll(async () => {
+  authCookie = await getCookies();
+});
 
 function checkRes(courseInstance: CourseInstanceData): void {
   expect(courseInstance.id).toBeDefined();
@@ -33,68 +39,119 @@ function checkRes(courseInstance: CourseInstanceData): void {
   expect(courseInstance.courseData.evaluationInformation).toBeDefined();
 }
 
-describe('Test GET /v1/sisu/instances/:sisuCourseInstanceId', () => {
+describe(
+  'Test GET /v1/sisu/instances/:sisuCourseInstanceId - fetch one Sisu intance by Sisu id',
+  () => {
 
-  it('should respond with correct data when instance exists', async () => {
-    mockedAxios.get.mockResolvedValue({
-      data: sisuInstance
+    it('should respond with correct data when instance exists', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: sisuInstance
+      });
+      const res: supertest.Response = await request
+        .get(`/v1/sisu/instances/${sisuInstance.id}`)
+        .set('Cookie', authCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.courseInstance).toBeDefined();
+      expect(res.body.errors).not.toBeDefined();
+      checkRes(res.body.data.courseInstance);
     });
-    const res: supertest.Response = await request.get(`/v1/sisu/instances/${sisuInstance.id}`);
-    expect(res.body.success).toBe(true);
-    expect(res.body.data.courseInstance).toBeDefined();
-    expect(res.body.errors).not.toBeDefined();
-    checkRes(res.body.data.courseInstance);
-    expect(res.status).toEqual(HttpCode.Ok);
+
+    it('should respond with 401 unauthorized, if not logged in', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/sisu/courses/ELEC-A7100')
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Unauthorized);
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.errors[0]).toBe('unauthorized');
+      expect(res.body.data).not.toBeDefined();
+    });
+
+    it('should respond with 502 bad gateway, if instance does not exist', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: sisuError
+      });
+      const res: supertest.Response = await request
+        .get('/v1/sisu/instances/abc')
+        .set('Cookie', authCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadGateway);
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.instance).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+    });
+
   });
 
-  it('should respond with error when instance does not exist', async () => {
-    mockedAxios.get.mockResolvedValue({
-      data: sisuError
-    });
-    const res: supertest.Response = await request.get('/v1/sisu/instances/abc');
-    expect(res.body.success).toBe(false);
-    expect(res.body.instance).not.toBeDefined();
-    expect(res.body.errors).toBeDefined();
-    expect(res.status).toEqual(HttpCode.BadGateway);
-  });
-});
+describe(
+  'Test GET /v1/sisu/courses/:courseCode - fetch all Sisu instance by aalto course code',
+  () => {
 
-describe('Test GET /v1/sisu/courses/:courseCode', () => {
+    it(
+      'should respond with correct data when course and at least one active instances exist',
+      async () => {
+        mockedAxios.get.mockResolvedValue({
+          data: Array(5).fill(sisuInstance)
+        });
+        const res: supertest.Response = await request
+          .get('/v1/sisu/courses/ELEC-A7100')
+          .set('Cookie', authCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
 
-  it('should respond with correct data when course and at least one active' +
-    'instances exist', async () => {
-    mockedAxios.get.mockResolvedValue({
-      data: Array(5).fill(sisuInstance)
-    });
-    const res: supertest.Response = await request.get('/v1/sisu/courses/ELEC-A7100');
-    expect(res.body.success).toBe(true);
-    expect(res.body.data.courseInstances).toBeDefined();
-    expect(res.body.errors).not.toBeDefined();
-    expect(res.body.data.courseInstances.length).toBe(5);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    res.body.data.courseInstances.forEach((courseInstance: any) => checkRes(courseInstance));
-    expect(res.status).toEqual(HttpCode.Ok);
-  });
+        expect(res.body.success).toBe(true);
+        expect(res.body.data.courseInstances).toBeDefined();
+        expect(res.body.errors).not.toBeDefined();
+        expect(res.body.data.courseInstances.length).toBe(5);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        res.body.data.courseInstances.forEach((courseInstance: any) => checkRes(courseInstance));
+      });
 
-  it('should respond with error when course does not exist', async () => {
-    mockedAxios.get.mockResolvedValue({
-      data: sisuError
-    });
-    const res: supertest.Response = await request.get('/v1/sisu/courses/abc');
-    expect(res.body.success).toBe(false);
-    expect(res.body.data).not.toBeDefined();
-    expect(res.body.errors).toBeDefined();
-    expect(res.status).toEqual(HttpCode.BadGateway);
-  });
+    it('should respond with 401 unauthorized, if not logged in', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/sisu/courses/ELEC-A7100')
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Unauthorized);
 
-  it('should respond with error when course does not have active instances', async () => {
-    mockedAxios.get.mockResolvedValue({
-      data: sisuError
+      expect(res.body.success).toBe(false);
+      expect(res.body.errors[0]).toBe('unauthorized');
+      expect(res.body.data).not.toBeDefined();
     });
-    const res: supertest.Response = await request.get('/v1/sisu/courses/ELEC-A7100');
-    expect(res.body.success).toBe(false);
-    expect(res.body.data).not.toBeDefined();
-    expect(res.body.errors).toBeDefined();
-    expect(res.status).toEqual(HttpCode.BadGateway);
+
+    it('should respond with 502 bad gateway, if course does not exist', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: sisuError
+      });
+      const res: supertest.Response = await request
+        .get('/v1/sisu/courses/abc')
+        .set('Cookie', authCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadGateway);
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+    });
+
+    it(
+      'should respond with 502 bad gateway, if course does not have active instances',
+      async () => {
+        mockedAxios.get.mockResolvedValue({
+          data: sisuError
+        });
+        const res: supertest.Response = await request
+          .get('/v1/sisu/courses/ELEC-A7100')
+          .set('Cookie', authCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.BadGateway);
+
+        expect(res.body.success).toBe(false);
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors).toBeDefined();
+      });
+
   });
-});

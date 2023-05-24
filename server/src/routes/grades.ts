@@ -7,6 +7,7 @@ import multer, { FileFilterCallback, memoryStorage, Multer } from 'multer';
 import path from 'path';
 
 import { addGrades } from '../controllers/grades';
+import { authorization } from '../middleware/authorization';
 import { controllerDispatcher } from '../middleware/errorHandler';
 import { ApiError } from '../types/error';
 import { HttpCode } from '../types/httpCode';
@@ -113,6 +114,7 @@ const upload: Multer = multer({
  */
 router.post(
   '/v1/courses/:courseId/instances/:instanceId/grades/csv',
+  authorization,
   upload.single('csv_data'),
   controllerDispatcher(addGrades)
 );

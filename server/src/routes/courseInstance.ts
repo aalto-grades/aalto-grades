@@ -7,6 +7,7 @@ import express, { Router } from 'express';
 import {
   addCourseInstance, getAllCourseInstances, getCourseInstance
 } from '../controllers/courseInstance';
+import { authorization } from '../middleware/authorization';
 import { controllerDispatcher } from '../middleware/errorHandler';
 
 export const router: Router = Router();
@@ -143,6 +144,7 @@ export const router: Router = Router();
  */
 router.get(
   '/v1/courses/:courseId/instances/:instanceId',
+  authorization,
   controllerDispatcher(getCourseInstance)
 );
 
@@ -192,6 +194,7 @@ router.get(
  */
 router.get(
   '/v1/courses/:courseId/instances',
+  authorization,
   controllerDispatcher(getAllCourseInstances)
 );
 
@@ -296,6 +299,7 @@ router.get(
  */
 router.post(
   '/v1/courses/:courseId/instances',
+  authorization,
   express.json(),
   controllerDispatcher(addCourseInstance)
 );

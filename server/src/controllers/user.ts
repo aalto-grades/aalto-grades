@@ -32,7 +32,6 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
   await idSchema.validate({ id: userId });
 
   /*
-   * TODO: Check that the requester is logged in, 401 Unauthorized if not
    * TODO: Check that the requester is authorized to add a course instance, 403
    * Forbidden if not
    */
