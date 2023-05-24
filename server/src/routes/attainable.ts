@@ -6,6 +6,7 @@ import express, { Router } from 'express';
 
 import { addAttainable, deleteAttainment, updateAttainable } from '../controllers/attainable';
 import { handleInvalidRequestJson } from '../middleware';
+import { authorization } from '../middleware/authorization';
 import { controllerDispatcher } from '../middleware/errorHandler';
 
 export const router: Router = Router();
@@ -138,6 +139,7 @@ export const router: Router = Router();
  */
 router.post(
   '/v1/courses/:courseId/instances/:instanceId/attainments',
+  authorization,
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(addAttainable)
@@ -197,6 +199,7 @@ router.post(
  */
 router.delete(
   '/v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId',
+  authorization,
   controllerDispatcher(deleteAttainment)
 );
 
@@ -263,6 +266,7 @@ router.delete(
  */
 router.put(
   '/v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId',
+  authorization,
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(updateAttainable)

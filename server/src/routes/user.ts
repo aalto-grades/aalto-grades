@@ -5,6 +5,7 @@
 import { Router } from 'express';
 
 import { getCoursesOfUser } from '../controllers/user';
+import { authorization } from '../middleware/authorization';
 import { controllerDispatcher } from '../middleware/errorHandler';
 
 export const router: Router = Router();
@@ -80,5 +81,6 @@ export const router: Router = Router();
  */
 router.get(
   '/v1/user/:userId/courses',
+  authorization,
   controllerDispatcher(getCoursesOfUser)
 );
