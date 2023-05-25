@@ -22,3 +22,4 @@ export interface AttainableData {
   subAttainables?: Array<AttainableData>
   subAttainments?: Array<AttainableData>
 }
+

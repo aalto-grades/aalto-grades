@@ -526,7 +526,8 @@ describe(
         .send(mockAttainable)
         .set('Content-Type', 'application/json')
         .set('Cookie', authCookie)
-        .set('Accept', 'application/json');
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
 
       subAttainable = res.body.data.attainment;
 

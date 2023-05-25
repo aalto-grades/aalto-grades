@@ -12,6 +12,9 @@ import { router } from './routes/index';
 import { ApiError } from './types/error';
 import { HttpCode } from './types/httpCode';
 
+// Register formulas before starting Express.
+require('./formulas');
+
 export const app: Application = express();
 
 app.use(cors({

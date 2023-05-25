@@ -10,6 +10,7 @@ import Attainable from '../database/models/attainable';
 
 import { AttainableData, AttainableRequestData } from '../types/attainable';
 import { ApiError } from '../types/error';
+import { Formula } from '../types/formulas';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { findAttainableById, generateAttainableTag } from './utils/attainable';
@@ -73,7 +74,8 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
     courseInstanceId: courseInstanceId,
     name: name,
     date: date,
-    expiryDate: expiryDate
+    expiryDate: expiryDate,
+    formula: Formula.Manual,
   });
 
   async function processSubAttainables(
@@ -89,7 +91,8 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
         courseInstanceId: courseInstanceId,
         name: attainable.name,
         date: attainable.date,
-        expiryDate: attainable.expiryDate
+        expiryDate: attainable.expiryDate,
+        formula: Formula.Manual,
       });
 
       if (attainable.subAttainments.length > 0) {
@@ -251,3 +254,4 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
     }
   });
 }
+

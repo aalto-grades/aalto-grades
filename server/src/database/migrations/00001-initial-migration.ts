@@ -206,6 +206,15 @@ export default {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
         },
+        formula: {
+          type: DataTypes.ENUM('MANUAL', 'WEIGHTED_AVERAGE'),
+          allowNull: false,
+          defaultValue: 'MANUAL',
+        },
+        parent_formula_params: {
+          type: DataTypes.JSONB,
+          allowNull: true,
+        },
         name: {
           type: DataTypes.STRING,
           allowNull: false
@@ -242,7 +251,7 @@ export default {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
         },
-        points: {
+        grade: {
           type: DataTypes.FLOAT,
           allowNull: false
         },
@@ -328,6 +337,10 @@ export default {
 
       await queryInterface.sequelize.query(
         'DROP TYPE IF EXISTS enum_course_instance_ending_period;', { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS enum_attainable_formula;', { transaction }
       );
 
       await transaction.commit();
