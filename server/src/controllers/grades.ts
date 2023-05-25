@@ -5,7 +5,6 @@
 import { parse, Parser } from 'csv-parse';
 import { NextFunction, Request, Response } from 'express';
 import { Op, Transaction } from 'sequelize';
-import * as yup from 'yup';
 
 import { sequelize } from '../database';
 import Attainable from '../database/models/attainable';
@@ -428,7 +427,7 @@ export async function calculateGrades(
   interface AttainmentInfo {
     id: number,
     parentId: number,
-    formula: Formula | null,
+    formula: Formula,
     parentFormulaParams: object | null
   }
 
@@ -473,15 +472,7 @@ export async function calculateGrades(
    * attainment's formula.
    */
   for (const attainment of attainments) {
-    const formula: Formula | null = attainment.formula;
-
-    // Ensure that the formula specified for this attainment is valid.
-    if (!yup.string().oneOf(Object.values(Formula)).required().validate(formula)) {
-      throw new ApiError(
-        `invalid formula ${formula} for attainment with ID ${attainment.id}`,
-        HttpCode.InternalServerError
-      );
-    }
+    const formula: Formula = attainment.formula;
 
     formulaNodesByAttainmentId.set(attainment.id, {
       formulaImplementation: await getFormulaImplementation(formula as Formula),
