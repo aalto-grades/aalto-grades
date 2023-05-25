@@ -10,8 +10,8 @@ export enum Formula {
 }
 
 export enum Status {
-  Pass = 'pass',
-  Fail = 'fail',
+  Pass = 'PASS',
+  Fail = 'FAIL',
 }
 
 export interface GradingResult {
