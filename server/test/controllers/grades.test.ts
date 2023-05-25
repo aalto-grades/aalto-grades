@@ -454,7 +454,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
         {
           studentNumber: '352772',
           grade: 1.24,
-          status: 'pass'
+          status: 'PASS'
         }
       ]
     );
@@ -549,17 +549,17 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
         {
           studentNumber: '111111',
           grade: 1.5,
-          status: 'pass'
+          status: 'PASS'
         },
         {
           studentNumber: '222222',
           grade: 4.75,
-          status: 'pass'
+          status: 'PASS'
         },
         {
           studentNumber: '333333',
           grade: 3.25,
-          status: 'pass'
+          status: 'PASS'
         }
       ]
     );
@@ -697,7 +697,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
         {
           studentNumber: '123456',
           grade: 3.12,
-          status: 'pass'
+          status: 'PASS'
         }
       ]
     );
@@ -771,7 +771,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
         {
           studentNumber: '654321',
           grade: 5,
-          status: 'pass'
+          status: 'PASS'
         }
       ]
     );
