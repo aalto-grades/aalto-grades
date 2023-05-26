@@ -10,6 +10,7 @@ import Attainment from '../database/models/attainment';
 
 import { AttainmentData, AttainmentRequestData } from '../types/attainment';
 import { ApiError } from '../types/error';
+import { Formula } from '../types/formulas';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 
@@ -74,7 +75,8 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     courseInstanceId: courseInstanceId,
     name: name,
     date: date,
-    expiryDate: expiryDate
+    expiryDate: expiryDate,
+    formula: Formula.Manual,
   });
 
   async function processSubAttainments(
@@ -90,7 +92,8 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
         courseInstanceId: courseInstanceId,
         name: attainment.name,
         date: attainment.date,
-        expiryDate: attainment.expiryDate
+        expiryDate: attainment.expiryDate,
+        formula: Formula.Manual
       });
 
       if (attainment.subAttainments.length > 0) {
@@ -140,7 +143,6 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
 
 export async function deleteAttainment(req: Request, res: Response): Promise<void> {
   /*
-   * TODO: Check that the requester is logged in, 401 Unauthorized if not
    * TODO: Check that the requester is authorized to delete attainments, 403
    * Forbidden if not
    */

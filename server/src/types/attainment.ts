@@ -21,3 +21,4 @@ export interface AttainmentData {
   expiryDate: Date,
   subAttainments?: Array<AttainmentData>
 }
+

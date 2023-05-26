@@ -95,7 +95,7 @@ const signupSchema: yup.AnyObjectSchema = yup.object().shape({
   role: yup.string().oneOf(Object.values(UserRole)).required(),
 });
 
-interface JwtClaims {
+export interface JwtClaims {
   role: UserRole,
   id: number,
 }
@@ -103,9 +103,9 @@ interface JwtClaims {
 export async function authLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
   passport.authenticate(
     'login',
-    async (err: unknown, loginResult: LoginResult | boolean) => {
-      if (err) {
-        return next(err);
+    async (error: unknown, loginResult: LoginResult | boolean) => {
+      if (error) {
+        return next(error);
       }
       if (typeof loginResult === 'boolean') {
         return res.status(HttpCode.Unauthorized).send({
@@ -228,7 +228,7 @@ passport.use(
       try {
         const role: LoginResult = await validateLogin(email, password);
         return done(null, role, { message: 'success' });
-      } catch (error) {
+      } catch (error: unknown) {
         if (error instanceof InvalidCredentials) {
           return done(null, false, { message: 'invalid credentials' });
         }
@@ -250,8 +250,8 @@ passport.use(
     async (token: JwtClaims, done: VerifiedCallback): Promise<void> => {
       try {
         return done(null, token);
-      } catch(e) {
-        return done(e);
+      } catch(error: unknown) {
+        return done(error, false);
       }
     }
   )

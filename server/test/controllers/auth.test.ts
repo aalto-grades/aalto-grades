@@ -47,6 +47,7 @@ describe('Test POST /v1/auth/login - logging in with an existing user', () => {
         expect(res.body.data.name).toBe('Aalto Sysadmin');
       });
   });
+
 });
 
 describe('Test POST /v1/auth/signup - create a new user', () => {
@@ -109,9 +110,8 @@ describe('Test POST /v1/auth/signup - create a new user', () => {
         expect(res.body.data.role).toBe(UserRole.Admin);
         expect(res.body.data.name).toBe('aalto2');
       });
-
-
   });
+
 });
 
 describe('Test GET /v1/auth/self-info - check users own info', () => {
@@ -139,6 +139,7 @@ describe('Test GET /v1/auth/self-info - check users own info', () => {
     await agent.post('/v1/auth/logout').withCredentials(true).send({}).expect(HttpCode.Ok);
     await agent.get('/v1/auth/self-info').withCredentials(true).expect(HttpCode.Unauthorized);
   });
+
 });
 
 describe('Test POST /v1/auth/login and expiry', () => {
@@ -165,4 +166,5 @@ describe('Test POST /v1/auth/login and expiry', () => {
     mockdate.set(realDate.setSeconds(realDate.getSeconds() + JWT_EXPIRY_SECONDS + 1));
     await agent.get('/v1/auth/self-info').withCredentials(true).expect(HttpCode.Unauthorized);
   });
+
 });

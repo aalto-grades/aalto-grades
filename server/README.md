@@ -37,8 +37,8 @@ Compile and start the server:
 $ npm run build
 $ npm run start
 ```
-After running the last command, visit `http://localhost:3000/world` on a web
-browser. You should see the output "Hello /world".
+
+After running the last command, server is available at http://localhost:3000.
 
 ### Development locally
 
@@ -51,6 +51,32 @@ In development mode, after any changes to the code are saved, server is automati
 
 It is possible to set environment variables to `.env` file  in the server directory root.
 See `.env.example` file for variable list, rename to `.env` before running server.
+
+### Run with docker
+
+You can also run locally with docker-compose. Before running, 
+set environment variable `POSTGRES_PASSWORD` and `NODE_ENV`, following:
+```
+$ export POSTGRES_PASSWORD="postgres"
+$ export NODE_ENV="test"
+```
+
+Execute Docker Compose:
+```
+docker-compose --profile development up
+```
+
+Backend server will be made available on address http://localhost:3000.
+
+This will also launch [pgAdmin](https://www.pgadmin.org/docs/pgadmin4/7.1/index.html)
+for accessing and configuring database using browser. pgAdmin will be accessible from http://localhost:5050.
+
+Login credentials for pgAdmin:
+- Email: `admin@admin.com`
+- Password: `root`
+
+From left side menu select `Servers` and `Grades server` to access the grades database.
+If prompted, use the password `postgres` to connect.
 
 ### Sisu API
 
@@ -97,7 +123,6 @@ Run one migration down:
 $ npm run migration:down
 ```
 
-
 ## Seeds
 
 To manage data migrations to the database, you can use seeders.
@@ -128,10 +153,10 @@ framework. Additionally, [supertest](https://www.npmjs.com/package/supertest)
 is used for testing API functionality.
 
 The easiest way to run unit tests is with the Docker Compose located at this
-directory. In order to run it, define a PostgreSQL password in the environment
-variable `POSTGRES_PASSWORD`, for example:
+directory. In order to run it, define a PostgreSQL password and node environment in the environment variable `POSTGRES_PASSWORD` and `NODE_ENV` as follows:
 ```
-$ export POSTGRES_PASSWORD="your-wanted-password"
+$ export POSTGRES_PASSWORD="postgres"
+$ export NODE_ENV="test"
 ```
 Execute Docker Compose:
 ```

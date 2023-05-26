@@ -30,6 +30,10 @@ const attainment: string = fs.readFileSync(
   path.resolve(__dirname, '../../../../mockData/attainment.sql'), 'utf8'
 );
 
+const userAttainmentGrade: string = fs.readFileSync(
+  path.resolve(__dirname, '../../../../mockData/user_attainment_grade.sql'), 'utf8'
+);
+
 export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction: Transaction = await queryInterface.sequelize.transaction();
@@ -40,6 +44,7 @@ export default {
       await queryInterface.sequelize.query(courseInstanceRoles, { transaction });
       await queryInterface.sequelize.query(attainment, { transaction });
       await queryInterface.sequelize.query(courseTranslation, { transaction });
+      await queryInterface.sequelize.query(userAttainmentGrade, { transaction });
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
@@ -49,6 +54,7 @@ export default {
   down: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction: Transaction = await queryInterface.sequelize.transaction();
     try {
+      await queryInterface.bulkDelete('user_attainment_grade', {}, { transaction });
       await queryInterface.bulkDelete('course_translation', {}, { transaction });
       await queryInterface.bulkDelete('course_instance_role', {}, { transaction });
       await queryInterface.bulkDelete('attainment', {}, { transaction });
