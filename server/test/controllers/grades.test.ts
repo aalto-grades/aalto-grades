@@ -307,7 +307,8 @@ describe(
         checkErrorRes(
           [
             'id must be a `number` type, but the final value was:' +
-            ' `NaN` (cast from the value `NaN`).'
+            // eslint-disable-next-line no-useless-escape
+            ' `NaN` (cast from the value `\"notValid\"`).'
           ],
           HttpCode.BadRequest
         );
@@ -327,7 +328,8 @@ describe(
         checkErrorRes(
           [
             'id must be a `number` type, but the final value was:' +
-            ' `NaN` (cast from the value `NaN`).'
+            // eslint-disable-next-line no-useless-escape
+            ' `NaN` (cast from the value `\"notValid\"`).'
           ],
           HttpCode.BadRequest
         );
@@ -788,3 +790,71 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
   });
 
 });
+
+describe(
+  'Test GET /v1/courses/:courseId/instances/:instanceId/grades/csv/sisu' +
+  ' - export Sisu compatible grading in CSV',
+  () => {
+
+    it('should export CSV succesfully when course results are found', async () => {
+      res = await request
+        .get('/v1/courses/1/instances/1/grades/csv/sisu')
+        .set('Cookie', authCookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+
+      expect(res.text).toBeDefined();
+      expect(res.headers['content-disposition']).toBe(
+        'attachment; filename="final_grades_course_CS-A1110_' +
+        `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
+      );
+    });
+
+    // TODO: check that lang and date work as params. check that text is correct
+
+    it(
+      'should respond with 400 bad request, if (optional) assessmentDate param is not valid date',
+      async () => {
+        res = await request
+          .get('/v1/courses/1/instances/1/grades/csv/sisu?assessmentDate=notValidDate')
+          .set('Cookie', authCookie);
+
+        checkErrorRes([
+          'assessmentDate must be a `date` type, but the final value was:' +
+          ' `Invalid Date` (cast from the value `"notValidDate"`).'
+        ], HttpCode.BadRequest);
+      });
+
+    it('should respond with 401 unauthorized, if not logged in', async () => {
+      res = await request.get('/v1/courses/1/instances/1/grades/csv/sisu');
+      checkErrorRes(['unauthorized'], HttpCode.Unauthorized);
+    });
+
+    it('should respond with 404 not found, if course does not exist', async () => {
+      res = await request
+        .get(`/v1/courses/${badId}/instances/1/grades/csv/sisu`)
+        .set('Cookie', authCookie);
+
+      checkErrorRes([`course with ID ${badId} not found`], HttpCode.NotFound);
+    });
+
+    it('should respond with 404 not found, if course instance does not exist', async () => {
+      res = await request
+        .get(`/v1/courses/1/instances/${badId}/grades/csv/sisu`)
+        .set('Cookie', authCookie);
+
+      checkErrorRes([`course instance with ID ${badId} not found`], HttpCode.NotFound);
+    });
+
+    it('should respond with 409 conflict, if instance does not belong to the course', async () => {
+      res = await request
+        .get('/v1/courses/1/instances/2/grades/csv/sisu')
+        .set('Cookie', authCookie);
+
+      checkErrorRes(
+        ['course instance with ID 2 does not belong to the course with ID 1'],
+        HttpCode.Conflict
+      );
+    });
+
+  });
