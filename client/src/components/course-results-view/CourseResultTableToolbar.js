@@ -15,19 +15,27 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import DownloadIcon from '@mui/icons-material/Download';
 import MenuButton from '../course-view/MenuButton';
 import FileLoadDialog from '../course-view/FileLoadDialog';
+import SisuExportDialog from './SisuExportDialog';
 
-const CourseResultsTableToolbar = ({ search, setSearch, calculateFinalGrades, updateGrades }) => {
+const CourseResultsTableToolbar = (
+  { search, setSearch, calculateFinalGrades, updateGrades }
+) => {
   let { instanceId } = useParams();
 
-  const [open, setOpen] = useState(false);
+  const [showFileDialog, setShowFileDialog] = useState(false);
+  const [showSisuDialog, setShowSisuDialog] = useState(false);
 
   const actionOptions = [
     { description: 'Import from file', handleClick: () => setOpen(true) }, 
     { description: 'Import from A+', handleClick: () => {} }
   ];
 
-  const handleClose = () => {
-    setOpen(false);
+  const handleCloseFileDialog = () => {
+    setShowFileDialog(false);
+  };
+
+  const handleCloseSisuDialog = () => {
+    setShowSisuDialog(false);
   };
 
   return (
@@ -61,12 +69,17 @@ const CourseResultsTableToolbar = ({ search, setSearch, calculateFinalGrades, up
           </Tooltip>
         </Box>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 2 }}>
+          <Button variant='outlined' onClick={() => setShowSisuDialog(true)}>Export to Sisu CSV</Button>
           <Button variant='outlined' onClick={() => calculateFinalGrades()}>Calculate final grades</Button>
           <MenuButton label='Import grades' options={actionOptions} />
+          <SisuExportDialog 
+            open={showSisuDialog} 
+            handleClose={handleCloseSisuDialog}
+          />
           <FileLoadDialog 
             instanceId={Number(instanceId)} 
-            open={open} 
-            handleClose={handleClose} 
+            open={showFileDialog} 
+            handleClose={handleCloseFileDialog} 
             returnImportedGrades={updateGrades}
           />
         </Box>
