@@ -13,6 +13,7 @@ import Attainable from '../database/models/attainable';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 import CourseInstanceRole from '../database/models/courseInstanceRole';
+import CourseResult from '../database/models/courseResult';
 import User from '../database/models/user';
 import UserAttainmentGrade from '../database/models/userAttainmentGrade';
 
@@ -20,25 +21,9 @@ import { getFormulaImplementation } from '../formulas';
 import { CourseInstanceRoleType } from '../types/course';
 import { ApiError } from '../types/error';
 import { Formula, FormulaNode, GradingInput, GradingResult, Status } from '../types/formulas';
-// import { idSchema } from '../types/general';
 import { UserAttainmentGradeData, StudentGrades, GradingResultsWithUser } from '../types/grades';
 import { HttpCode } from '../types/httpCode';
 import { validateCourseAndInstance } from './utils/courseInstance';
-import CourseResult from '../database/models/courseResult';
-
-/*
-async function validateAndFetchIds(
-  courseId: unknown,
-  courseInstanceId: unknown
-): Promise<[Course, CourseInstance]> {
-  const courseIdValidated: number =
-    (await idSchema.validate({ id: courseId }, { abortEarly: false })).id;
-  const instanceIdValidated: number =
-    (await idSchema.validate({ id: courseInstanceId }, { abortEarly: false })).id;
-
-  return await validateCourseAndInstance(courseIdValidated, instanceIdValidated);
-}
-*/
 
 /**
  * Parse and extract attainment IDs from the CSV file header.
@@ -682,6 +667,8 @@ export async function calculateGrades(
 
 /**
  * Get grading data formatted to Sisu compatible format for exporting grades to Sisu.
+ * Documentation and requirements for Sisu CSV file structure available at
+ * https://wiki.aalto.fi/display/SISEN/Assessment+of+implementations
  * @param {Request} req - The HTTP request.
  * @param {Response} res - The HTTP response containing the CSV file.
  * @returns {Promise<void>} - A Promise that resolves when the function has completed its execution.
@@ -695,27 +682,31 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
       .notRequired(),
     completionLanguage: yup
       .string()
+      .transform((value: string, originalValue: string) => {
+        return originalValue ? originalValue.toLowerCase() : value;
+      })
+      // All Sisu accepted language codes.
+      .oneOf(['fi', 'sv', 'en', 'es', 'ja', 'zh', 'pt', 'fr', 'de', 'ru'])
       .notRequired()
   });
 
   const { assessmentDate, completionLanguage }:
-  { assessmentDate: Date | undefined,completionLanguage: string | undefined }
+  { assessmentDate: Date | undefined, completionLanguage: string | undefined }
   = await urlParams.validate(req.query, { abortEarly: false });
 
   const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
     await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
 
-  // TODO: only one grade per user per instance is allowed,
-  // what if grades are re calculated, should the old grade be saved?
+  /**
+   * TODO:
+   * - only one grade per user per instance is allowed,
+   *   what if grades are recalculated, should we keep track of old grades?
+   * - Define and implement authorization on who has the access rights to trigger export,
+   *   Sisu allows teacher and responsible teacher of the implementation to save grades to Sisu.
+   */
 
-  const courseResults: Array<{
-    studentNumber: string,
-    grade: string,
-    credits: number,
-    assessmentDate: string,
-    completionLanguage: string
-  }> = (await CourseResult.findAll({
-    attributes: ['grade', 'credits', 'updatedAt'],
+  const gradingResults: Array<GradingResultsWithUser> = await CourseResult.findAll({
+    attributes: ['grade', 'credits'],
     where: {
       courseInstanceId: courseInstance.id
     },
@@ -723,31 +714,43 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
       model: User,
       attributes: ['studentId']
     }
-  }) as Array<GradingResultsWithUser>).map(
-    (courseResult: GradingResultsWithUser) => {
-      return {
-        studentNumber: courseResult.User.studentId,
-        grade: courseResult.grade,
-        credits: courseResult.credits,
-        assessmentDate:
-          (new Date(assessmentDate ?? courseResult.updatedAt)).toLocaleDateString('fi-FI'),
-        completionLanguage: completionLanguage ?? 'en'
-      };
-    }
-  );
+  }) as Array<GradingResultsWithUser>;
 
-  if (courseResults.length === 0) {
+  if (gradingResults.length === 0) {
     throw new ApiError(
       'no grades found, make sure grades have been calculated before requesting course result CSV',
       HttpCode.NotFound
     );
   }
 
+  const courseResults: Array<{
+    studentNumber: string,
+    grade: string,
+    credits: number,
+    assessmentDate: string,
+    completionLanguage: string,
+    comment: string
+  }> = gradingResults.map(
+    (courseResult: GradingResultsWithUser) => {
+      return {
+        studentNumber: courseResult.User.studentId,
+        grade: courseResult.grade,
+        credits: courseResult.credits,
+        // Assesment date must be in form dd.mm.yyyy.
+        assessmentDate:
+          (new Date(assessmentDate ?? courseInstance.endDate)).toLocaleDateString('fi-FI'),
+        completionLanguage: completionLanguage ?? 'en',
+        // Comment column is required, but can be empty.
+        comment: ''
+      };
+    }
+  );
+
   stringify(
     courseResults,
     {
       header: true,
-      delimiter: ','
+      delimiter: ',' // NOTE, accepted delimiters in Sisu are semicolon ; and comma ,
     },
     (_err: unknown, data: string) => {
       res
