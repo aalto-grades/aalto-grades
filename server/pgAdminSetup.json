@@ -1,0 +1,14 @@
+{
+  "Servers": {
+      "1": {
+          "Name": "Grades server",
+          "Group": "Servers",
+          "Port": 5432,
+          "Username": "postgres",
+          "Host": "database",
+          "SSLMode": "prefer",
+          "MaintenanceDB": "postgres",
+          "PassFile": "/pgpass"
+      }
+  }
+}

@@ -36,6 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       POSTGRES_PASSWORD: postgres
+      NODE_ENV: test
       SERVER_SKIP_NPM_CI: 1
     defaults:
       run:
