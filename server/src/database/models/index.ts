@@ -93,15 +93,14 @@ Attainable.belongsTo(Course, {
   foreignKey: 'courseId'
 });
 
-CourseResult.belongsTo(CourseInstance, {
-  targetKey: 'id',
-  foreignKey: 'courseInstanceId'
-});
+/*
+Disabled since CourseResult does not have FK course id at the moment
 
 CourseResult.belongsTo(Course, {
   targetKey: 'id',
   foreignKey: 'courseId'
 });
+*/
 
 User.hasMany(UserAttainmentGrade, {
   onDelete: 'CASCADE',

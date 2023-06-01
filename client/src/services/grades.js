@@ -4,6 +4,17 @@
 
 import axios from './axios';
 
+const exportSisuCsv = async (courseId, instanceId, params) => {
+  const response = await axios.get(
+    `/v1/courses/${courseId}/instances/${instanceId}/grades/csv/sisu`,
+    {
+      responseType: 'blob',
+      params
+    }
+  );
+  return response.data;
+};
+
 const importCsv = async (courseId, instanceId, csv) => {
   const response = await axios.postForm(`/v1/courses/${courseId}/instances/${instanceId}/grades/csv`, {
     csv_data: csv // FileList will be unwrapped as sepate fields
@@ -11,4 +22,4 @@ const importCsv = async (courseId, instanceId, csv) => {
   return response.data.data;
 };
 
-export default { importCsv };
+export default { exportSisuCsv, importCsv };

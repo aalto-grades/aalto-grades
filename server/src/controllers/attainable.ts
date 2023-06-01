@@ -7,6 +7,8 @@ import * as yup from 'yup';
 
 import models from '../database/models';
 import Attainable from '../database/models/attainable';
+import Course from '../database/models/course';
+import CourseInstance from '../database/models/courseInstance';
 
 import { AttainableData, AttainableRequestData } from '../types/attainable';
 import { ApiError } from '../types/error';
@@ -36,15 +38,9 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
       .notRequired()
   });
 
-  // Get path parameters.
-  const courseId: number = Number(req.params.courseId);
-  const courseInstanceId: number = Number(req.params.instanceId);
-
-  // Validation.
-  await idSchema.validate({ id: courseId }, { abortEarly: false });
-  await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
   await requestSchema.validate(req.body, { abortEarly: false });
-  await validateCourseAndInstance(courseId, courseInstanceId);
+  const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
+  await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
 
   const parentId: number | undefined = req.body.parentId;
   const name: string = req.body.name;
@@ -59,22 +55,22 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
       parentId, HttpCode.UnprocessableEntity
     );
 
-    if (parentAttainable.courseInstanceId !== courseInstanceId) {
+    if (parentAttainable.courseInstanceId !== courseInstance.id) {
       throw new ApiError(
         `parent attainment ID ${parentId} does not belong ` +
-        `to the course instance ID ${courseInstanceId}`,
+        `to the course instance ID ${courseInstance.id}`,
         HttpCode.Conflict
       );
     }
   }
 
   const attainable: Attainable = await models.Attainable.create({
-    courseId: courseId,
+    courseId: course.id,
     attainableId: parentId,
-    courseInstanceId: courseInstanceId,
-    name: name,
-    date: date,
-    expiryDate: expiryDate,
+    courseInstanceId: courseInstance.id,
+    name,
+    date,
+    expiryDate,
     formula: Formula.Manual,
   });
 
@@ -87,8 +83,8 @@ export async function addAttainable(req: Request, res: Response): Promise<void> 
     for (const attainable of unprocessedAttainables) {
       const dbEntry: Attainable = await models.Attainable.create({
         attainableId: parentId,
-        courseId: courseId,
-        courseInstanceId: courseInstanceId,
+        courseId: course.id,
+        courseInstanceId: courseInstance.id,
         name: attainable.name,
         date: attainable.date,
         expiryDate: attainable.expiryDate,
@@ -147,22 +143,15 @@ export async function deleteAttainment(req: Request, res: Response): Promise<voi
    */
 
   // Get path parameters.
-  const courseId: number = Number(req.params.courseId);
-  const courseInstanceId: number = Number(req.params.instanceId);
   const attainmentId: number = Number(req.params.attainmentId);
 
   // Validation.
-  await idSchema.validate({ id: courseId }, { abortEarly: false });
-  await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
   await idSchema.validate({ id: attainmentId }, { abortEarly: false });
-  await validateCourseAndInstance(courseId, courseInstanceId);
+  await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
 
-  // Find the attainment to be deleted.
-  const attainment: Attainable = await findAttainableById(attainmentId, HttpCode.NotFound);
-
-  // Delete the attainment, this automatically also deletes all of the
-  // subattainments of this attainment.
-  await attainment.destroy();
+  // Delete the attainment if found from db. This automatically
+  // also deletes all of the subattainments of this attainment.
+  (await findAttainableById(attainmentId, HttpCode.NotFound)).destroy();
 
   res.status(HttpCode.Ok).send({
     success: true,
@@ -186,15 +175,10 @@ export async function updateAttainable(req: Request, res: Response): Promise<voi
       .notRequired()
   });
 
-  const courseId: number = Number(req.params.courseId);
-  const courseInstanceId: number = Number(req.params.instanceId);
   const attainableId: number = Number(req.params.attainmentId);
-
-  await idSchema.validate({ id: courseId }, { abortEarly: false });
-  await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
   await idSchema.validate({ id: attainableId }, { abortEarly: false });
   await requestSchema.validate(req.body, { abortEarly: false });
-  await validateCourseAndInstance(courseId, courseInstanceId);
+  await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
 
   const name: string | undefined = req.body.name;
   const date: Date | undefined = req.body.date;

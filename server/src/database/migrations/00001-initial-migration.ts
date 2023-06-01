@@ -285,7 +285,7 @@ export default {
           onUpdate: 'CASCADE'
         },
         grade: {
-          type: DataTypes.INTEGER,
+          type: DataTypes.STRING,
           allowNull: false
         },
         credits: {

@@ -67,6 +67,26 @@ describe('Tests for CourseResultsView components', () => {
     expect(dialogTitle).not.toBeVisible();
   });
 
+  test('CourseResultsTable should show a dialog for exporting Sisu CSV when clicking on a export button', async () => {
+
+    renderCourseResultsView();
+
+    const exportGradesMenuButton = await screen.findByText('Export to Sisu CSV');
+    expect(exportGradesMenuButton).toBeDefined();
+    userEvent.click(exportGradesMenuButton);
+
+    const dialogTitle = screen.getByText('Export final grades to Sisu CSV');
+    const exportButton = screen.getByText('Export');
+    const cancelButton = screen.getByText('Cancel');
+
+    expect(dialogTitle).toBeVisible();
+    expect(exportButton).toBeVisible();
+    expect(cancelButton).toBeVisible();
+
+    userEvent.click(cancelButton);
+    expect(dialogTitle).not.toBeVisible();
+  });
+
   test('CourseResultsTable should not render any rows before grades are imported', async () => {
 
     renderCourseResultsView();
