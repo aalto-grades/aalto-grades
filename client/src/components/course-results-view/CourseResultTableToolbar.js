@@ -26,7 +26,7 @@ const CourseResultsTableToolbar = (
   const [showSisuDialog, setShowSisuDialog] = useState(false);
 
   const actionOptions = [
-    { description: 'Import from file', handleClick: () => setOpen(true) }, 
+    { description: 'Import from file', handleClick: () => setShowFileDialog(true) }, 
     { description: 'Import from A+', handleClick: () => {} }
   ];
 

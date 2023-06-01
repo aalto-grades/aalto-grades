@@ -21,6 +21,7 @@ import gradesService from '../../services/grades';
 const instructions = 'Set the completion language and assesment date for the grading, these values are optional. Click export to export the grades.';
 const loadingMsg = { msg: 'Fetching Sisu CSV...', severity: 'info' };
 const successMsg = { msg: 'Final grades exported to Sisu CSV format succesfully.', severity: 'success' };
+const errorMsg = { msg: 'Fetching CSV failed, please try again. Make sure grades have been calculated before exporting.', severity: 'error' };
 
 // Available completion languages used in Sisu.
 const languageOptions = [
@@ -108,17 +109,15 @@ const SisuExportDialog = ({ open, handleClose }) => {
 
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
+      // Set file name.
       link.download = `grades_course_${courseId}_instance_${instanceId}.csv`;
       // Download file automatically to the users computer.
       link.click();
 
       setSnackPack((prev) => [...prev, successMsg]);
     } catch (exception) {
-      const msg = exception?.response?.data?.errors ?
-        exception?.response?.data?.errors[0] :
-        'Fetching CSV failed, please try again.';
-
-      setSnackPack((prev) => [...prev, { msg, severity: 'error' }]);
+      console.log(exception);
+      setSnackPack((prev) => [...prev, errorMsg]);
     } finally {
       setAlertOpen(false);
     }
