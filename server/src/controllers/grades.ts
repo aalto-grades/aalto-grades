@@ -18,7 +18,7 @@ import User from '../database/models/user';
 import UserAttainmentGrade from '../database/models/userAttainmentGrade';
 
 import { getFormulaImplementation } from '../formulas';
-import { CourseInstanceRoleType } from '../types/course';
+import { CourseInstanceRoleType, GradingScale } from '../types/course';
 import { ApiError } from '../types/error';
 import { Formula, FormulaNode, GradingInput, GradingResult, Status } from '../types/formulas';
 import { UserAttainmentGradeData, StudentGrades, GradingResultsWithUser } from '../types/grades';
@@ -405,9 +405,11 @@ async function calculateFormulaNode(
   return await formulaNode.formulaImplementation.formulaFunction(inputs);
 }
 
+/*
 interface UserAttainmentGradeWithUser extends UserAttainmentGrade {
   User: User
 }
+*/
 
 export async function calculateGrades(
   req: Request,
@@ -570,7 +572,24 @@ export async function calculateGrades(
    * Stores the grades of each student for each attainment which were manually
    * specified by a teacher.
    */
+  const unorganizedPresetGrades: Array<UserAttainmentGrade> = await UserAttainmentGrade.findAll({
+    include: [
+      {
+        model: Attainable,
+        required: true,
+        attributes: [],
+        where: {
+          courseId: course.id,
+          courseInstanceId: courseInstance.id,
+        }
+      }
+    ],
+    attributes: ['grade', 'attainableId', 'userId'],
+  });
+
+  /*
   const unorganizedPresetGrades: Array<{
+    userId: number,
     studentNumber: string,
     grade: number,
     attainmentId: number
@@ -595,12 +614,14 @@ export async function calculateGrades(
   }) as Array<UserAttainmentGradeWithUser>).map(
     (attainmentGrade: UserAttainmentGradeWithUser) => {
       return {
+        userId: attainmentGrade.userId,
         studentNumber: attainmentGrade.User.studentId,
         grade: attainmentGrade.grade,
         attainmentId: attainmentGrade.attainableId
       };
     }
   );
+  */
 
   /*
    * Next we'll organize the preset grades by student number.
@@ -611,19 +632,19 @@ export async function calculateGrades(
    * same information as unorganizedPresetGrades.
    * Student number -> Formula node -> Preset grade.
    */
-  const organizedPresetGrades: Map<string, Map<FormulaNode, number>> = new Map();
+  const organizedPresetGrades: Map<number, Map<FormulaNode, number>> = new Map();
 
   for (const presetGrade of unorganizedPresetGrades) {
     let userPresetGrades: Map<FormulaNode, number> | undefined =
-      organizedPresetGrades.get(presetGrade.studentNumber);
+      organizedPresetGrades.get(presetGrade.userId);
 
     if (!userPresetGrades) {
       userPresetGrades = new Map();
-      organizedPresetGrades.set(presetGrade.studentNumber, userPresetGrades);
+      organizedPresetGrades.set(presetGrade.userId, userPresetGrades);
     }
 
     userPresetGrades.set(
-      getFormulaNode(presetGrade.attainmentId),
+      getFormulaNode(presetGrade.attainableId),
       presetGrade.grade
     );
   }
@@ -634,33 +655,147 @@ export async function calculateGrades(
    */
 
   const finalGrades: Array<{
-    studentNumber: string,
-    grade: number,
-    status: Status
+    userId: number,
+    courseInstanceId: number,
+    grade: string,
+    //status: Status,
+    credits: number
   }> = [];
 
-  for (const [studentNumber, presetGrades] of organizedPresetGrades) {
+  for (const [userId, presetGrades] of organizedPresetGrades) {
     const finalGrade: GradingResult =
       await calculateFormulaNode(rootFormulaNode, presetGrades);
 
     finalGrades.push(
       {
-        studentNumber: studentNumber,
-        grade: finalGrade.grade,
-        status: finalGrade.status
+        userId: userId,
+        courseInstanceId: courseInstance.id,
+        grade:
+        courseInstance.gradingScale === GradingScale.Numerical ? finalGrade.status === Status.Pass ?
+          String(finalGrade.grade) : '0' : finalGrade.status,
+        //status: finalGrade.status,
+        credits: courseInstance.maxCredits
       }
     );
   }
+
+  /*
+export enum GradingScale {
+  PassFail = 'PASS_FAIL',
+  Numerical = 'NUMERICAL',
+  SecondNationalLanguage = 'SECOND_NATIONAL_LANGUAGE'
+}
+
+  */
 
   /*
    * TODO: Don't return final grades, save grades to database in
    * calculateFormulaNode instead?
    */
 
+
+  //      await queryInterface.addIndex('user_attainment_grade', ['user_id', 'attainable_id'], {
+
+  /*
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'user',
+        key: 'id'
+      }
+    },
+    courseInstanceId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'course_instance',
+        key: 'id'
+      }
+    },
+    grade: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    credits: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+  */
+
+  /*
+    interface CourseResultData {
+      userId: number
+      courseInstanceId: number
+      grade: string
+      credits: number
+    }
+
+    const resultsForDb: Array<CourseResultData> = finalGrades.map(())
+    */
+
+
+  // Use studentsWithId to update attainments by flatmapping each
+  // students grades into a one array of all the grades.
+  /*
+  const preparedBulkCreate: Array<UserAttainmentGradeData> = parsedStudentData.flatMap(
+    (student: StudentGrades): Array<UserAttainmentGradeData> => {
+      const studentGradingData: Array<UserAttainmentGradeData> = student.grades.map(
+        (grade: UserAttainmentGradeData): UserAttainmentGradeData => {
+          return {
+            userId: student.id as number,
+            ...grade
+          };
+        });
+      return studentGradingData;
+    });
+    */
+
+  // eslint-disable-next-line @typescript-eslint/typedef
+  //const [instance, created] = await CourseResult.upsert(finalGrades);
+
+  console.log(finalGrades);
+
+
+  await CourseResult.bulkCreate(
+    finalGrades,
+    {
+      updateOnDuplicate: ['grade', 'credits'],
+    });
+
+
+  /*
+  for (const finalGrade of finalGrades) {
+    await CourseResult.upsert(
+      finalGrade,
+      {
+        conflictFields: ['userId', 'courseInstanceId']
+      }
+    );
+  }
+
+  /*
+  Service.upsert(
+    { team, date, service, organisation, count },
+    { conflictFields: ["service", "date", "organisation"] },
+    { returning: true }
+)
+*/
+
+
+
+
+
   res.status(HttpCode.Ok).json({
     success: true,
     data: {
-      grades: finalGrades
+      finalGrades,
+      unorganizedPresetGrades
     }
   });
 }
