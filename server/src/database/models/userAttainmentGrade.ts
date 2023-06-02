@@ -8,6 +8,7 @@ import {
 
 import { sequelize } from '..';
 import Attainable from './attainable';
+import CourseInstance from './courseInstance';
 import User from './user';
 
 export default class UserAttainmentGrade extends Model<
@@ -15,6 +16,8 @@ export default class UserAttainmentGrade extends Model<
   InferCreationAttributes<UserAttainmentGrade>
 > {
   declare userId: ForeignKey<User['id']>;
+  declare courseId: ForeignKey<CourseInstance['courseId']>;
+  declare courseInstanceId: ForeignKey<CourseInstance['id']>;
   declare attainableId: ForeignKey<Attainable['id']>;
   declare grade: number;
   declare createdAt: CreationOptional<Date>;
@@ -28,6 +31,24 @@ UserAttainmentGrade.init(
       primaryKey: true,
       references: {
         model: 'user',
+        key: 'id'
+      }
+    },
+    courseId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      references: {
+        model: 'course_instance',
+        key: 'course_id'
+      }
+    },
+    courseInstanceId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      references: {
+        model: 'course_instance',
         key: 'id'
       }
     },

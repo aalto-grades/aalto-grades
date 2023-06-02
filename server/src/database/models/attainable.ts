@@ -8,7 +8,6 @@ import {
 
 import { sequelize } from '..';
 import { Formula } from '../../types/formulas';
-import Course from './course';
 import CourseInstance from './courseInstance';
 
 export default class Attainable extends Model<
@@ -16,7 +15,7 @@ export default class Attainable extends Model<
   InferCreationAttributes<Attainable>
 > {
   declare id: CreationOptional<number>;
-  declare courseId: ForeignKey<Course['id']>;
+  declare courseId: ForeignKey<CourseInstance['courseId']>;
   declare courseInstanceId: ForeignKey<CourseInstance['id']>;
   // TODO rename to parentId, atm sequelize forces name as "model + key" when querying.
   declare attainableId: CreationOptional<ForeignKey<Attainable['id']>>;
@@ -39,14 +38,16 @@ Attainable.init(
     courseId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      primaryKey: true,
       references: {
-        model: 'course',
-        key: 'id'
+        model: 'course_instance',
+        key: 'course_id'
       }
     },
     courseInstanceId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      primaryKey: true,
       references: {
         model: 'course_instance',
         key: 'id'

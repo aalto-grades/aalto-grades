@@ -15,6 +15,7 @@ export default class CourseInstanceRole extends Model<
   InferCreationAttributes<CourseInstanceRole>
 > {
   declare userId: ForeignKey<User['id']>;
+  declare courseId: ForeignKey<CourseInstance['courseId']>;
   declare courseInstanceId: ForeignKey<CourseInstance['id']>;
   declare role: string;
   declare createdAt: CreationOptional<Date>;
@@ -29,6 +30,14 @@ CourseInstanceRole.init(
       references: {
         model: 'user',
         key: 'id'
+      }
+    },
+    courseId: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      references: {
+        model: 'course_instance',
+        key: 'course_id'
       }
     },
     courseInstanceId: {

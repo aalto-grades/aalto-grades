@@ -8,6 +8,15 @@ export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction: Transaction = await queryInterface.sequelize.transaction();
     try {
+      /*
+       * Sequelize does not support composite foreign keys (as of the writing
+       * of this comment), so raw queries are needed to add composite foreign
+       * keys.
+       *
+       * Sequelize issue for composite foreign keys:
+       * https://github.com/sequelize/sequelize/issues/311
+       */
+
       await queryInterface.createTable('user', {
         id: {
           type: DataTypes.INTEGER,
@@ -42,6 +51,7 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
+
       await queryInterface.createTable('course', {
         id: {
           type: DataTypes.INTEGER,
@@ -55,6 +65,7 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
+
       await queryInterface.createTable('course_instance', {
         id: {
           type: DataTypes.INTEGER,
@@ -64,6 +75,7 @@ export default {
         course_id: {
           type: DataTypes.INTEGER,
           allowNull: false,
+          primaryKey: true,
           references: {
             model: 'course',
             key: 'id'
@@ -111,6 +123,7 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE,
       }, { transaction });
+
       await queryInterface.createTable('course_instance_role', {
         user_id: {
           type: DataTypes.INTEGER,
@@ -122,15 +135,13 @@ export default {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
         },
+        course_id: {
+          type: DataTypes.INTEGER,
+          primaryKey: true,
+        },
         course_instance_id: {
           type: DataTypes.INTEGER,
           primaryKey: true,
-          references: {
-            model: 'course_instance',
-            key: 'id'
-          },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE'
         },
         role: {
           type: DataTypes.ENUM('STUDENT', 'TEACHER', 'TEACHER_IN_CHARGE'),
@@ -139,6 +150,15 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
+
+      await queryInterface.sequelize.query(
+        'ALTER TABLE course_instance_role'
+          + ' ADD FOREIGN KEY (course_id, course_instance_id)'
+          + ' REFERENCES course_instance (course_id, id)'
+          + ' ON DELETE CASCADE ON UPDATE CASCADE;',
+        { transaction }
+      );
+
       await queryInterface.createTable('course_translation', {
         id: {
           type: DataTypes.INTEGER,
@@ -170,6 +190,7 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
+
       await queryInterface.createTable('attainable', {
         id: {
           type: DataTypes.INTEGER,
@@ -179,32 +200,23 @@ export default {
         course_id: {
           type: DataTypes.INTEGER,
           allowNull: false,
-          references: {
-            model: 'course',
-            key: 'id'
-          },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE'
+          primaryKey: true,
         },
         course_instance_id: {
           type: DataTypes.INTEGER,
           allowNull: false,
-          references: {
-            model: 'course_instance',
-            key: 'id'
-          },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE'
+          primaryKey: true,
         },
         attainable_id: {
           type: DataTypes.INTEGER,
           allowNull: true,
-          references: {
+          // This might need a new table
+          /*references: {
             model: 'attainable',
             key: 'id'
           },
           onDelete: 'CASCADE',
-          onUpdate: 'CASCADE'
+          onUpdate: 'CASCADE'*/
         },
         formula: {
           type: DataTypes.ENUM('MANUAL', 'WEIGHTED_AVERAGE'),
@@ -230,6 +242,15 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
+
+      await queryInterface.sequelize.query(
+        'ALTER TABLE attainable'
+          + ' ADD FOREIGN KEY (course_id, course_instance_id)'
+          + ' REFERENCES course_instance (course_id, id)'
+          + ' ON DELETE CASCADE ON UPDATE CASCADE;',
+        { transaction }
+      );
+
       await queryInterface.createTable('user_attainment_grade', {
         user_id: {
           type: DataTypes.INTEGER,
@@ -241,15 +262,17 @@ export default {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
         },
+        course_id: {
+          type: DataTypes.INTEGER,
+          primaryKey: true
+        },
+        course_instance_id: {
+          type: DataTypes.INTEGER,
+          primaryKey: true
+        },
         attainable_id: {
           type: DataTypes.INTEGER,
-          primaryKey: true,
-          references: {
-            model: 'attainable',
-            key: 'id'
-          },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE'
+          primaryKey: true
         },
         grade: {
           type: DataTypes.FLOAT,
@@ -258,15 +281,20 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
+
+      await queryInterface.sequelize.query(
+        'ALTER TABLE user_attainment_grade'
+          + ' ADD FOREIGN KEY (course_id, course_instance_id, attainable_id)'
+          + ' REFERENCES attainable (course_id, course_instance_id, id)'
+          + ' ON DELETE CASCADE ON UPDATE CASCADE;',
+        { transaction }
+      );
+
       await queryInterface.createTable('course_result', {
-        id: {
-          type: DataTypes.INTEGER,
-          autoIncrement: true,
-          primaryKey: true
-        },
         user_id: {
           type: DataTypes.INTEGER,
           allowNull: false,
+          primaryKey: true,
           references: {
             model: 'user',
             key: 'id'
@@ -274,15 +302,15 @@ export default {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
         },
+        course_id: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          primaryKey: true
+        },
         course_instance_id: {
           type: DataTypes.INTEGER,
           allowNull: false,
-          references: {
-            model: 'course_instance',
-            key: 'id'
-          },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE'
+          primaryKey: true
         },
         grade: {
           type: DataTypes.STRING,
@@ -295,6 +323,15 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
+
+      await queryInterface.sequelize.query(
+        'ALTER TABLE course_result'
+          + ' ADD FOREIGN KEY (course_id, course_instance_id)'
+          + ' REFERENCES course_instance (course_id, id)'
+          + ' ON DELETE CASCADE ON UPDATE CASCADE;',
+        { transaction }
+      );
+
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();

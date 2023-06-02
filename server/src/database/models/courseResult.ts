@@ -14,8 +14,8 @@ export default class CourseResult extends Model<
   InferAttributes<CourseResult>,
   InferCreationAttributes<CourseResult>
 > {
-  declare id: CreationOptional<number>;
   declare userId: ForeignKey<User['id']>;
+  declare courseId: ForeignKey<CourseInstance['courseId']>;
   declare courseInstanceId: ForeignKey<CourseInstance['id']>;
   declare grade: string;
   declare credits: number;
@@ -25,22 +25,28 @@ export default class CourseResult extends Model<
 
 CourseResult.init(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true
-    },
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      primaryKey: true,
       references: {
         model: 'user',
         key: 'id'
       }
     },
+    courseId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      references: {
+        model: 'course_instance',
+        key: 'course_id'
+      }
+    },
     courseInstanceId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      primaryKey: true,
       references: {
         model: 'course_instance',
         key: 'id'

@@ -38,6 +38,7 @@ CourseInstance.init(
     courseId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      primaryKey: true,
       references: {
         model: 'course',
         key: 'id'
