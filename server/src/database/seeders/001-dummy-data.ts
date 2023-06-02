@@ -7,35 +7,35 @@ import path from 'path';
 import { QueryInterface, Transaction } from 'sequelize';
 
 const users: string = fs.readFileSync(
-  path.resolve(__dirname, '../../../../mockData/users.sql'), 'utf8'
+  path.resolve(__dirname, '../../../../mock-data/users.sql'), 'utf8'
 );
 
 const courses: string = fs.readFileSync(
-  path.resolve(__dirname, '../../../../mockData/courses.sql'), 'utf8'
+  path.resolve(__dirname, '../../../../mock-data/courses.sql'), 'utf8'
 );
 
 const courseInstances: string = fs.readFileSync(
-  path.resolve(__dirname, '../../../../mockData/course_instances.sql'), 'utf8'
+  path.resolve(__dirname, '../../../../mock-data/course_instances.sql'), 'utf8'
 );
 
 const courseInstanceRoles: string = fs.readFileSync(
-  path.resolve(__dirname, '../../../../mockData/course_instance_roles.sql'), 'utf8'
+  path.resolve(__dirname, '../../../../mock-data/course_instance_roles.sql'), 'utf8'
 );
 
 const courseTranslation: string = fs.readFileSync(
-  path.resolve(__dirname, '../../../../mockData/course_translations.sql'), 'utf8'
+  path.resolve(__dirname, '../../../../mock-data/course_translations.sql'), 'utf8'
 );
 
 const attainable: string = fs.readFileSync(
-  path.resolve(__dirname, '../../../../mockData/attainable.sql'), 'utf8'
+  path.resolve(__dirname, '../../../../mock-data/attainable.sql'), 'utf8'
 );
 
 const userAttainmentGrade: string = fs.readFileSync(
-  path.resolve(__dirname, '../../../../mockData/user_attainment_grade.sql'), 'utf8'
+  path.resolve(__dirname, '../../../../mock-data/user_attainment_grade.sql'), 'utf8'
 );
 
 const courseResults: string = fs.readFileSync(
-  path.resolve(__dirname, '../../../../mockData/course_result.sql'), 'utf8'
+  path.resolve(__dirname, '../../../../mock-data/course_result.sql'), 'utf8'
 );
 
 export default {
