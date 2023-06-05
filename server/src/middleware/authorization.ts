@@ -3,20 +3,24 @@
 // SPDX-License-Identifier: MIT
 
 import { NextFunction, Request, Response } from 'express';
-import passport from 'passport';
 
-import { JwtClaims } from '../controllers/auth';
+import { JwtClaims, UserRole } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 
-export function authorization(req: Request, res: Response, next: NextFunction): void {
-  passport.authenticate('jwt', { session: false }, (err: unknown, user: JwtClaims | boolean) => {
-    if (err || !user) {
-      res.status(HttpCode.Unauthorized).json({
+export function authorization(
+  allowedRoles: Array<UserRole>
+): (req: Request, res: Response, next: NextFunction) => void {
+
+  return async function (req: Request, res: Response, next: NextFunction) {
+    const user: JwtClaims = req.user as JwtClaims;
+
+    if (!allowedRoles.includes(user.role)) {
+      res.status(HttpCode.Forbidden).send({
         success: false,
-        errors: ['unauthorized']
+        errors: ['forbidden']
       });
       return;
     }
     next();
-  })(req, res, next);
+  };
 }
