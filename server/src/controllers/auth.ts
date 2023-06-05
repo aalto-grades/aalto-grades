@@ -16,67 +16,16 @@ import { JWT_SECRET, NODE_ENV } from '../configs/environment';
 import User from '../database/models/user';
 
 import { ApiError } from '../types/error';
+import { JwtClaims, UserRole } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { findUserById } from './utils/user';
 
-// TODO: Temporary, remove or update!
-export enum UserRole {
-  Student = 'STUDENT',
-  Teacher = 'TEACHER',
-  Assistant = 'ASSISTANT',
-  Admin = 'SYSADMIN'
-}
+type PlainPassword = string;
 
-export type PlainPassword = string;
-
-export interface LoginResult {
-  role: UserRole,
+interface LoginResult {
   id: number,
-  name: string
-}
-
-export class InvalidCredentials extends Error {
-  constructor() {
-    super('invalid credentials');
-  }
-}
-
-export async function validateLogin(email: string, password: PlainPassword): Promise<LoginResult> {
-  const user: User | null = await User.findByEmail(email);
-
-  if (user === null) {
-    throw new InvalidCredentials();
-  }
-
-  const match: boolean = await argon.verify(user.password.trim(), password);
-
-  if (!match) {
-    throw new InvalidCredentials();
-  }
-  return {
-    role: UserRole.Admin,
-    id: user.id,
-    name: user.name ?? ''
-  };
-}
-
-export async function performSignup(
-  name: string, email: string, plainPassword: PlainPassword, studentId: string | undefined
-): Promise<number> {
-  const exists: User | null = await User.findByEmail(email);
-
-  if (exists) {
-    throw new ApiError('user account with the specified email already exists', HttpCode.Conflict);
-  }
-
-  const newUser: User = await User.create({
-    name: name,
-    email: email,
-    password: await argon.hash(plainPassword.trim()),
-    studentId: studentId,
-  });
-
-  return newUser.id;
+  name: string,
+  role: UserRole
 }
 
 interface SignupRequest {
@@ -84,20 +33,27 @@ interface SignupRequest {
   password: PlainPassword,
   email: string,
   studentID: string | undefined,
-  role: UserRole,
+  role: UserRole | undefined
 }
 
-const signupSchema: yup.AnyObjectSchema = yup.object().shape({
-  name: yup.string().required(),
-  password: yup.string().required(),
-  email: yup.string().email().required(),
-  studentID: yup.string().notRequired(),
-  role: yup.string().oneOf(Object.values(UserRole)).required(),
-});
+export async function validateLogin(email: string, password: PlainPassword): Promise<LoginResult> {
+  const user: User | null = await User.findByEmail(email);
 
-export interface JwtClaims {
-  role: UserRole,
-  id: number,
+  if (user === null) {
+    throw new ApiError('invalid credentials', HttpCode.Unauthorized);
+  }
+
+  const match: boolean = await argon.verify(user.password.trim(), password);
+
+  if (!match) {
+    throw new ApiError('invalid credentials', HttpCode.Unauthorized);
+  }
+
+  return {
+    id: user.id,
+    role: user.role as UserRole,
+    name: user.name ?? '-'
+  };
 }
 
 export async function authLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -123,23 +79,26 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
           }
 
           const body: JwtClaims = {
-            role: loginResult.role,
             id: loginResult.id,
+            role: loginResult.role
           };
+
           const token: string = jwt.sign(body, JWT_SECRET, {
             expiresIn: JWT_EXPIRY_SECONDS,
           });
+
           res.cookie('jwt', token, {
             httpOnly: true,
             secure: NODE_ENV !== 'test',
             sameSite: 'none',
             maxAge: JWT_COOKIE_EXPIRY_MS,
           });
+
           return res.send({
             success: true,
             data: {
               id: loginResult.id,
-              role: loginResult.role,
+              role: loginResult.role as string,
               name: loginResult.name
             }
           });
@@ -153,52 +112,70 @@ export async function authLogout(_req: Request, res: Response): Promise<void> {
   res.clearCookie('jwt', {
     httpOnly: true,
   });
+
   res.send({
     success: true,
     data: {}
   });
-  return;
 }
 
 export async function authSignup(req: Request, res: Response): Promise<void> {
-  if (!(await signupSchema.isValid(req.body))) {
-    throw new ApiError('invalid signup request format', HttpCode.BadRequest);
+  const requestSchema: yup.AnyObjectSchema = yup.object().shape({
+    name: yup.string().required(),
+    password: yup.string().required(),
+    email: yup.string().email().required(),
+    studentID: yup.string().notRequired(),
+    role: yup.string()
+      .transform((value: string, originalValue: string) => {
+        return originalValue ? originalValue.toUpperCase() : value;
+      })
+      .oneOf(Object.values(UserRole))
+      .notRequired()
+  });
+
+  const request: SignupRequest = await requestSchema.validate(req.body, { abortEarly: false });
+
+  const exists: User | null = await User.findByEmail(request.email);
+
+  if (exists) {
+    throw new ApiError('user account with the specified email already exists', HttpCode.Conflict);
   }
 
-  const request: SignupRequest = req.body as SignupRequest;
+  const newUser: User = await User.create({
+    name: request.name,
+    email: request.email,
+    password: await argon.hash(request.password.trim()),
+    studentId: request.studentID,
+    role: request.role ?? UserRole.User
+  });
 
-  // TODO signup
-  const id: number = await performSignup(
-    request.name, request.email, request.password, request.studentID
-  );
   const body: JwtClaims = {
-    role: req.body.role,
-    id,
+    role: newUser.role as UserRole,
+    id: newUser.id
   };
+
   const token: string = jwt.sign(body, JWT_SECRET, {
     expiresIn: JWT_EXPIRY_SECONDS,
   });
+
   res.cookie('jwt', token, {
     httpOnly: true,
     secure: NODE_ENV !== 'test',
     sameSite: 'none',
     maxAge: JWT_COOKIE_EXPIRY_MS
   });
+
   res.send({
     success: true,
     data: {
-      id,
-      role: req.body.role,
-      name: request.name
+      id: newUser.id,
+      role: newUser.role,
+      name: newUser.name
     }
   });
-  return;
 }
 
 export async function authSelfInfo(req: Request, res: Response): Promise<void> {
-  if (!req.user) {
-    throw new ApiError('login required', HttpCode.Unauthorized);
-  }
   const user: JwtClaims = req.user as JwtClaims;
 
   const userFromDb: User = await findUserById(user.id, HttpCode.NotFound);
@@ -206,8 +183,8 @@ export async function authSelfInfo(req: Request, res: Response): Promise<void> {
   res.send({
     success: true,
     data: {
-      id: user.id,
-      role: user.role,
+      id: userFromDb.id,
+      role: userFromDb.role,
       name: userFromDb.name
     }
   });
@@ -229,8 +206,8 @@ passport.use(
         const role: LoginResult = await validateLogin(email, password);
         return done(null, role, { message: 'success' });
       } catch (error: unknown) {
-        if (error instanceof InvalidCredentials) {
-          return done(null, false, { message: 'invalid credentials' });
+        if (error instanceof ApiError) {
+          return done(null, false, { message: error.message });
         }
         return done(error);
       }
