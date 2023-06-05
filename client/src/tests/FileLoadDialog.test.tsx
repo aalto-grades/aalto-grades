@@ -5,8 +5,7 @@
 import React from 'react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, waitFor, cleanup, fireEvent, screen } from '@testing-library/react';
-import { act } from 'react-dom/test-utils';
+import { act, render, waitFor, cleanup, fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CourseView from '../components/CourseView';
 import coursesService from '../services/courses';
@@ -72,11 +71,11 @@ describe('FileLoadDialog test with proper csv', () => {
 
     const importGradesMenuButton = await findByText('Import grades');
     expect(importGradesMenuButton).toBeDefined();
-    userEvent.click(importGradesMenuButton);
+    act(() => userEvent.click(importGradesMenuButton));
 
     const uploadOption = getByText('Import from file');
     expect(uploadOption).toBeDefined();
-    userEvent.click(uploadOption);
+    act(() => userEvent.click(uploadOption));
 
     const dialogTitle = getByText('Add Grades from File');
     const uploadFileButton = getByText('Upload file');
@@ -88,7 +87,7 @@ describe('FileLoadDialog test with proper csv', () => {
     expect(cancelButton).toBeVisible();
     expect(confirmButton).toBeVisible();
 
-    userEvent.click(cancelButton);
+    act(() => userEvent.click(cancelButton));
     expect(dialogTitle).not.toBeVisible();
 
   });
@@ -100,16 +99,16 @@ describe('FileLoadDialog test with proper csv', () => {
 
     const importGradesMenuButton = await findByText('Import grades');
     expect(importGradesMenuButton).toBeDefined();
-    userEvent.click(importGradesMenuButton);
+    act(() => userEvent.click(importGradesMenuButton));
 
     const uploadOption = getByText('Import from file');
     expect(uploadOption).toBeDefined();
-    userEvent.click(uploadOption);
+    act(() => userEvent.click(uploadOption));
 
     const dialogTitle = getByText('Add Grades from File');
     const confirmButton = getByText('Confirm');
 
-    userEvent.click(confirmButton);
+    act(() => userEvent.click(confirmButton));
     expect(dialogTitle).toBeVisible();
 
     const validationError = await findByText('You must select a csv file to submit');
@@ -123,11 +122,11 @@ describe('FileLoadDialog test with proper csv', () => {
 
     const importGradesMenuButton = await findByText('Import grades');
     expect(importGradesMenuButton).toBeDefined();
-    userEvent.click(importGradesMenuButton);
+    act(() => userEvent.click(importGradesMenuButton));
 
     const uploadOption = getByText('Import from file');
     expect(uploadOption).toBeDefined();
-    userEvent.click(uploadOption);
+    act(() => userEvent.click(uploadOption));
 
     const dialogTitle = getByText('Add Grades from File');
 
@@ -178,11 +177,11 @@ describe('FileLoadDialog test where server does not accept the file', () => {
 
     const importGradesMenuButton = await findByText('Import grades');
     expect(importGradesMenuButton).toBeDefined();
-    userEvent.click(importGradesMenuButton);
+    act(() => userEvent.click(importGradesMenuButton));
 
     const uploadOption = getByText('Import from file');
     expect(uploadOption).toBeDefined();
-    userEvent.click(uploadOption);
+    act(() => userEvent.click(uploadOption));
 
     const dialogTitle = getByText('Add Grades from File');
 
@@ -193,7 +192,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
     );
 
     const confirmButton = getByText('Confirm');
-    userEvent.click(confirmButton);
+    act(() => userEvent.click(confirmButton));
 
     expect(dialogTitle).toBeVisible();
     const errorInstructions = await findByText('The input file cannot be processed due to the following issues that must be addressed and fixed:');
@@ -226,11 +225,11 @@ describe('FileLoadDialog test where server does not accept the file', () => {
 
       const importGradesMenuButton = await findByText('Import grades');
       expect(importGradesMenuButton).toBeDefined();
-      userEvent.click(importGradesMenuButton);
+      act(() => userEvent.click(importGradesMenuButton));
 
       const uploadOption = getByText('Import from file');
       expect(uploadOption).toBeDefined();
-      userEvent.click(uploadOption);
+      act(() => userEvent.click(uploadOption));
 
       const dialogTitle = getByText('Add Grades from File');
 
@@ -252,7 +251,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
       });
 
       const confirmButton = getByText('Confirm');
-      userEvent.click(confirmButton);
+      act(() => userEvent.click(confirmButton));
 
       expect(dialogTitle).toBeVisible();
       const errorInstructions = await findByText('The input file cannot be processed due to the following issues that must be addressed and fixed:');

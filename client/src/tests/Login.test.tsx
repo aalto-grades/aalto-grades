@@ -5,7 +5,7 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import LoginForm from '../components/auth/LoginForm';
 import Login from '../components/auth/Login';
@@ -41,9 +41,9 @@ describe('Tests for Login and LoginForm components', () => {
     const passwordField = screen.getByLabelText('Password');
     const loginButton = screen.getByText('login');
 
-    userEvent.type(emailField, 'test@email.com');
-    userEvent.type(passwordField, 'secret');
-    userEvent.click(loginButton);
+    act(() => userEvent.type(emailField, 'test@email.com'));
+    act(() => userEvent.type(passwordField, 'secret'));
+    act(() => userEvent.click(loginButton));
 
     expect(mockLoginUser).toHaveBeenCalledTimes(1);
     expect(mockLoginUser).toHaveBeenCalledWith({

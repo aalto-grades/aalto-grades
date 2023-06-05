@@ -5,7 +5,7 @@
 import React from 'react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, waitFor, cleanup } from '@testing-library/react';
+import { act, render, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CourseView from '../components/CourseView';
 import coursesService from '../services/courses';
@@ -102,7 +102,7 @@ describe('Tests for CourseView component', () => {
     const firstTeacherInCharge = await findByText('Elisa Mekler');
     expect(firstTeacherInCharge).toBeInTheDocument();
 
-    userEvent.click(instanceRows[5]);   // click a row that isn't the first, changes teacher
+    act(() => userEvent.click(instanceRows[5]));   // click a row that isn't the first, changes teacher
     expect(await findByText('Kerttu Maaria Pollari-Malmi')).toBeInTheDocument();
     expect(firstTeacherInCharge).not.toBeInTheDocument();
   });

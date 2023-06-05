@@ -5,7 +5,7 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CreateCourseView from '../components/CreateCourseView';
 import CreateCourseForm from '../components/create-course-view/CreateCourseForm';
@@ -48,10 +48,10 @@ describe('Tests for CreateCourseView components', () => {
     const organizerField = screen.getByLabelText('Organizer');
     const creationButton = screen.getByText('Create Course');
 
-    userEvent.type(codeField, testCode);
-    userEvent.type(nameField, testName);
-    userEvent.type(organizerField, testDepartment);
-    userEvent.click(creationButton);
+    act(() => userEvent.type(codeField, testCode));
+    act(() => userEvent.type(nameField, testName));
+    act(() => userEvent.type(organizerField, testDepartment));
+    act(() => userEvent.click(creationButton));
 
     expect(mockCourse).toHaveBeenCalledTimes(1);
     expect(mockCourse).toHaveBeenCalledWith({

@@ -5,7 +5,7 @@
 import React from 'react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import InstanceCreationRoute from '../context/InstanceCreationRoute';
 import AddAssignmentsView from '../components/AddAssignmentsView';
@@ -59,7 +59,7 @@ describe('Tests for AddAssignmentsView components', () => {
     await waitFor(() => {
       const addButtons = screen.getAllByText('Add');
       expect(addButtons.length).toBe(mockAttainmentsClient.length);
-      userEvent.click(addButtons[0]);
+      act(() => userEvent.click(addButtons[0]));
 
       const newAddButtons = screen.getAllByText('Add');
       expect(newAddButtons.length).toBe(mockAttainmentsClient.length - 1);

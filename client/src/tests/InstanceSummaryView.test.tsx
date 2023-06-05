@@ -5,7 +5,7 @@
 import React from 'react';
 import { MemoryRouter, Routes, Route, Outlet } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, screen, waitFor, cleanup } from '@testing-library/react';
+import { act, render, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import InstanceSummaryView from '../components/InstanceSummaryView';
 import instancesService from '../services/instances';
@@ -96,7 +96,7 @@ describe('Test InstanceSummaryView components when no attainments and successful
     const { getByText, findByText } = renderInstanceSummaryView();
 
     const createButton = getByText('Create instance');
-    userEvent.click(createButton);
+    act(() => userEvent.click(createButton));
 
     expect(await findByText('Instance created successfully. Redirecting to course page in 30 seconds.')).toBeInTheDocument();
   });
@@ -128,7 +128,7 @@ describe('Test InstanceSummaryView components when some attainments and successf
     const { getByText, findByText } = renderInstanceSummaryView();
 
     const createButton = getByText('Create instance');
-    userEvent.click(createButton);
+    act(() => userEvent.click(createButton));
 
     expect(await findByText('Instance created successfully.')).toBeInTheDocument();
     expect(await findByText('Attainments added successfully. Redirecting to course page in 30 seconds.')).toBeInTheDocument();
@@ -161,7 +161,7 @@ describe('Test InstanceSummaryView components when some attainments and successf
     const { getByText, findByText } = renderInstanceSummaryView();
 
     const createButton = getByText('Create instance');
-    userEvent.click(createButton);
+    act(() => userEvent.click(createButton));
 
     expect(await findByText('Instance created successfully.')).toBeInTheDocument();
     expect(await findByText(
@@ -193,7 +193,7 @@ describe('Test InstanceSummaryView components when some attainments and error in
     const { getByText, findByText } = renderInstanceSummaryView();
 
     const createButton = getByText('Create instance');
-    userEvent.click(createButton);
+    act(() => userEvent.click(createButton));
 
     expect(await findByText('Instance creation failed.')).toBeInTheDocument();
   });

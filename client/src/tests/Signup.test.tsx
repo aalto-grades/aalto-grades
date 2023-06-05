@@ -5,7 +5,7 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SignupForm from '../components/auth/SignupForm';
 import Signup from '../components/auth/Signup';
@@ -48,11 +48,11 @@ describe('Tests for Login component', () => {
     const studentIdField = screen.getByLabelText('Student ID (not required)');
     const signupButton = screen.getByText('sign up');
 
-    userEvent.type(nameField, 'Test User');
-    userEvent.type(passwordField, 'secret');
-    userEvent.type(emailField, 'test@email.com');
-    userEvent.type(studentIdField, '010101');
-    userEvent.click(signupButton);
+    act(() => userEvent.type(nameField, 'Test User'));
+    act(() => userEvent.type(passwordField, 'secret'));
+    act(() => userEvent.type(emailField, 'test@email.com'));
+    act(() => userEvent.type(studentIdField, '010101'));
+    act(() => userEvent.click(signupButton));
 
     // Teacher should be the default role if no role has been specified
 

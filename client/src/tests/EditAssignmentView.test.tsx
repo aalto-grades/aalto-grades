@@ -5,7 +5,7 @@
 import React from 'react';
 import { MemoryRouter, Routes, Route, Outlet } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, screen, waitFor, cleanup } from '@testing-library/react';
+import { act, render, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import EditAssignmentView from '../components/EditAssignmentView';
 import assignmentServices from '../services/assignments';
@@ -138,14 +138,14 @@ describe('Tests for EditAssignmentView components', () => {
     const dateField = screen.getByLabelText('Date');
     const expiryField = screen.getByLabelText('Expiry Date');
 
-    userEvent.type(dateField, mockDate);
-    userEvent.type(expiryField, mockExpiryDate);
+    act(() => userEvent.type(dateField, mockDate));
+    act(() => userEvent.type(expiryField, mockExpiryDate));
 
     // Create one sub-attainment:
     const creationButton = screen.getByText('Create Sub-Attainments');
     expect(creationButton).toBeInTheDocument();
 
-    userEvent.click(creationButton);
+    act(() => userEvent.click(creationButton));
 
     const numberField = screen.getByLabelText('Number of sub-attainments');
     expect(numberField).toBeInTheDocument();
@@ -154,7 +154,7 @@ describe('Tests for EditAssignmentView components', () => {
     const numConfirmButton = confirmButtons[1]; // the second one aka the one in the dialog
 
     // the default number of sub-attainments in the Dialog element is 1 so this call creates one sub-attainment
-    userEvent.click(numConfirmButton);
+    act(() => userEvent.click(numConfirmButton));
 
     // Check that there is one sub-attainment so one 'Delete'-button
     const deleteButtons = await screen.findAllByText('Delete');
@@ -164,7 +164,7 @@ describe('Tests for EditAssignmentView components', () => {
     expect(addButton).toBeInTheDocument();
 
     // Edit the original attainment and add one sub attainment to it
-    userEvent.click(confirmButtons[0]);
+    act(() => userEvent.click(confirmButtons[0]));
 
     expect(assignmentServices.editAttainment).toHaveBeenCalledWith(String(courseId), String(instanceId), mockAttainment);
     expect(assignmentServices.addAttainment).toHaveBeenCalledWith(String(courseId), String(instanceId), newAttainment);

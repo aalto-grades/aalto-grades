@@ -5,7 +5,7 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CourseResultsView from '../components/CourseResultsView';
 
@@ -47,11 +47,11 @@ describe('Tests for CourseResultsView components', () => {
 
     const importGradesMenuButton = await screen.findByText('Import grades');
     expect(importGradesMenuButton).toBeDefined();
-    userEvent.click(importGradesMenuButton);
+    act(() => userEvent.click(importGradesMenuButton));
 
     const uploadOption = screen.getByText('Import from file');
     expect(uploadOption).toBeDefined();
-    userEvent.click(uploadOption);
+    act(() => userEvent.click(uploadOption));
 
     const dialogTitle = screen.getByText('Add Grades from File');
     const uploadFileButton = screen.getByText('Upload file');
@@ -63,7 +63,7 @@ describe('Tests for CourseResultsView components', () => {
     expect(cancelButton).toBeVisible();
     expect(confirmButton).toBeVisible();
 
-    userEvent.click(cancelButton);
+    act(() => userEvent.click(cancelButton));
     expect(dialogTitle).not.toBeVisible();
   });
 
@@ -73,7 +73,7 @@ describe('Tests for CourseResultsView components', () => {
 
     const exportGradesMenuButton = await screen.findByText('Export to Sisu CSV');
     expect(exportGradesMenuButton).toBeDefined();
-    userEvent.click(exportGradesMenuButton);
+    act(() => userEvent.click(exportGradesMenuButton));
 
     const dialogTitle = screen.getByText('Export final grades to Sisu CSV');
     const exportButton = screen.getByText('Export');
@@ -83,7 +83,7 @@ describe('Tests for CourseResultsView components', () => {
     expect(exportButton).toBeVisible();
     expect(cancelButton).toBeVisible();
 
-    userEvent.click(cancelButton);
+    act(() => userEvent.click(cancelButton));
     expect(dialogTitle).not.toBeVisible();
   });
 
@@ -104,7 +104,7 @@ describe('Tests for CourseResultsView components', () => {
       expect(await screen.queryByText('Calculating final grades...')).not.toBeInTheDocument();
 
       const calculateGradesButton = screen.queryByText('Calculate final grades');
-      userEvent.click(calculateGradesButton);
+      act(() => userEvent.click(calculateGradesButton));
 
       expect(await screen.findByText('Calculating final grades...')).toBeInTheDocument();
     });

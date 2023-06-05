@@ -5,7 +5,7 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, screen, waitFor, cleanup } from '@testing-library/react';
+import { act, render, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import AuthContext from '../context/authProvider';
 import UserButton from '../components/auth/UserButton';
@@ -43,7 +43,7 @@ describe('Tests for button component displaying user data and logout', () => {
 
     const button = screen.getByText('John Doe');
     expect(button).toBeDefined();
-    userEvent.click(button);
+    act(() => userEvent.click(button));
 
     const logoutButton = screen.getByText('Logout');
     expect(logoutButton).toBeDefined();

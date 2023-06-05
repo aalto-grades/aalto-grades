@@ -5,7 +5,7 @@
 import React from 'react';
 import { MemoryRouter, Route, Routes, Outlet } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, screen, waitFor, within, cleanup } from '@testing-library/react';
+import { act, render, screen, waitFor, within, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CreateAssignmentView from '../components/CreateAssignmentView';
 import assignmentServices from '../services/assignments';
@@ -66,9 +66,9 @@ describe('Tests for CreateAssignmentView components', () => {
     const creationButton = screen.getByText('Create Sub-Attainments');
     const confirmButton = screen.getByText('Confirm');
 
-    userEvent.click(categoryField);
+    act(() => userEvent.click(categoryField));
     const optionsPopup = await screen.findByRole('listbox', { name: selectLabel });
-    userEvent.click(within(optionsPopup).getByText('Other'));
+    act(() => userEvent.click(within(optionsPopup).getByText('Other')));
 
     expect(await screen.findByText('Other')).toBeInTheDocument();
 
@@ -174,7 +174,7 @@ describe('Tests for CreateAssignmentView components', () => {
     expect(creationButton).toBeInTheDocument();
 
     // Create one sub-attainment
-    userEvent.click(creationButton);
+    act(() => userEvent.click(creationButton));
 
     const numberField = screen.getByLabelText('Number of sub-attainments');
     expect(numberField).toBeInTheDocument();
@@ -183,7 +183,7 @@ describe('Tests for CreateAssignmentView components', () => {
     const numConfirmButton = confirmButtons[1]; // the second one aka the one in the dialog
 
     // the default number of sub-attainments in the Dialog element is 1 so this call creates one sub-attainment
-    userEvent.click(numConfirmButton);
+    act(() => userEvent.click(numConfirmButton));
 
     // Check that there is one sub-attainment so one 'Delete'-button
     const deleteButtons = await screen.findAllByText('Delete');
@@ -205,9 +205,9 @@ describe('Tests for CreateAssignmentView components', () => {
     const creationButton = screen.getByText('Create Sub-Attainments');
     const confirmButton = screen.getByText('Confirm');
 
-    userEvent.click(categoryField);
+    act(() => userEvent.click(categoryField));
     const optionsPopup = await screen.findByRole('listbox', { name: selectLabel });
-    userEvent.click(within(optionsPopup).getByText('Other'));
+    act(() => userEvent.click(within(optionsPopup).getByText('Other')));
 
     expect(await screen.findByText('Other')).toBeInTheDocument();
 
