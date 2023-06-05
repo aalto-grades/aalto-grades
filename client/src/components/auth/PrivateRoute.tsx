@@ -7,7 +7,7 @@
 
 import { Navigate } from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
-import { PropTypes } from 'prop-types';
+import PropTypes from 'prop-types';
 import userService from '../../services/user';
 import useAuth from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';

@@ -32,7 +32,8 @@ import UserButton from './components/auth/UserButton';
 
 const theme = createTheme({
   palette: {
-    black: '#000000',
+    /* TODO: Fix TS */
+    //black: '#000000',
     primary: {
       light: '#EFF3FB',
       main: '#3D5AFE',
@@ -51,10 +52,11 @@ const theme = createTheme({
       dark: '#C56000',
       contrastText: '#000',
     },
-    hoverGrey1: '#EAEAEA',
-    hoverGrey2: '#F4F4F4',
-    hoverGrey3: '#6E6E6E',
-    infoGrey: '#545454',
+    /* TODO: Fix TS */
+    //hoverGrey1: '#EAEAEA',
+    //hoverGrey2: '#F4F4F4',
+    //hoverGrey3: '#6E6E6E',
+    //infoGrey: '#545454',
     contrastThreshold: 4.5
   },
   typography: {
@@ -83,11 +85,12 @@ const theme = createTheme({
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
       fontWeight: '400'
     },
-    textInput: {
-      fontSize: '16px',
-      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-      fontWeight: '400'
-    },
+    /* TODO: Fix TS */
+    //textInput: {
+    //  fontSize: '16px',
+    //  fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    //  fontWeight: '400'
+    //},
     button: {
       fontSize: '14px',
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',

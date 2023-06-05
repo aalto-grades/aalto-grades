@@ -95,7 +95,7 @@ const SisuExportDialog = ({ open, handleClose }) => {
     setSnackPack((prev) => [...prev, loadingMsg]);
 
     try {
-      const params = {};
+      const params: any = {};
       if (completionLanguage) {
         params.completionLanguage = completionLanguage;
       }
@@ -154,7 +154,7 @@ const SisuExportDialog = ({ open, handleClose }) => {
               </TextField>
             </div>
             <div>
-              <TextField
+              <TextField<any>
                 id="select-grading-assessment-date"
                 InputLabelProps={{ shrink: true }}
                 type="date"

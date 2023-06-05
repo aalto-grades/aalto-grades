@@ -37,7 +37,7 @@ const InstanceSummaryView = () => {
     teachers,
     startingPeriod,
     endingPeriod 
-  } = useOutletContext();
+  } = useOutletContext<any>();
 
   const [created, setCreated] = useState(false);
 

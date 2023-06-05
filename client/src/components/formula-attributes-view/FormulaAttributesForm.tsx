@@ -15,7 +15,7 @@ import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
 const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
 
   const [attributeValues, setAttributeValues] = useState([]);
-  const { selectedAttainments, selectedFormula } = useOutletContext();
+  const { selectedAttainments, selectedFormula } = useOutletContext<any>();
   const [setSnackPack, messageInfo, setMessageInfo, alertOpen, setAlertOpen] = useSnackPackAlerts();
 
   useEffect(() => {

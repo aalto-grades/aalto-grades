@@ -13,7 +13,7 @@ import MuiAccordion from '@mui/material/Accordion';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import formulasService from '../../services/formulas';
 
-const Accordion = styled((props) => (
+const Accordion = styled<any>((props) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
 ))(() => ({
   '&:last-child': {
@@ -24,7 +24,7 @@ const Accordion = styled((props) => (
   },
 }));
 
-const AccordionSummary = styled((props) => (
+const AccordionSummary = styled<any>((props) => (
   <MuiAccordionSummary
     expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.9rem', color: props.expanded === 'true' ? 'primary.main' : 'grey.600' }} />}
     {...props}

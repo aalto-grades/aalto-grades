@@ -20,7 +20,7 @@ const EditAssignmentView = () => {
   
   // If this view is opened during the creation of an instance, get the necessary data from the context
   if (sisuInstanceId) {
-    ({ addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId } = useOutletContext());
+    ({ addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId } = useOutletContext<any>());
   }
 
   const getAttainment = () => {

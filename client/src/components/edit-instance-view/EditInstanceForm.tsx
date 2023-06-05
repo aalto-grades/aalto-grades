@@ -69,7 +69,7 @@ const EditInstanceForm = ({ instance }) => {
     gradingScale, setGradingScale,
     setStartingPeriod,
     setEndingPeriod
-  } = useOutletContext();
+  } = useOutletContext<any>();
 
   useEffect(() => {
     if (courseType === '') {

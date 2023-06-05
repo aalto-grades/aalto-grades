@@ -29,13 +29,13 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
   const [checkboxError, setCheckboxError] = useState('');
   const [formulaError, setFormulaError] = useState('');
   const [setSnackPack, messageInfo, setMessageInfo, alertOpen, setAlertOpen] = useSnackPackAlerts();
-  
+
   const navigate = useNavigate();
 
   const {
     selectedAttainments, setSelectedAttainments,
     selectedFormula, setSelectedFormula
-  } = useOutletContext();
+  } = useOutletContext<any>();
 
   useEffect(() => {
     // set code snippet if user returns from attribute selection

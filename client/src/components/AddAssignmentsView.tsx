@@ -18,7 +18,7 @@ const AddAssignmentsView = () => {
     addedAttainments, setAddedAttainments,
     suggestedAttainments, setSuggestedAttainments,
     attainmentIncrementId, setIncrementId,
-  } = useOutletContext();
+  } = useOutletContext<any>();
 
   useEffect(() => {  // Better if handling here
     if (addedAttainments.length === 0) {

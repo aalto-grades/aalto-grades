@@ -18,7 +18,7 @@ const CreateAssignmentView = () => {
   
   // If this view is opened during the creation of an instance, get the necessary data from the context
   if (sisuInstanceId) {
-    ({ addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId } = useOutletContext());
+    ({ addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId } = useOutletContext<any>());
   }
 
   // The property 'category' must be specified for each attainment in order to populate the textfields correctly
