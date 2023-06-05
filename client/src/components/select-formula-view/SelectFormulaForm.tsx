@@ -151,11 +151,11 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
   return(
     <form onSubmit={handleSubmit}>
       <AlertSnackbar messageInfo={messageInfo} setMessageInfo={setMessageInfo} open={alertOpen} setOpen={setAlertOpen} />
-      <StyledBox sx={{ 
-        display: 'flex', 
+      <StyledBox sx={{
+        display: 'flex',
         alignItems: 'flex-start',
-        flexDirection: 'column', 
-        boxShadow: 2, 
+        flexDirection: 'column',
+        boxShadow: 2,
         borderRadius: 2,
         p: 1,
         my: 3,
@@ -184,8 +184,8 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
         <StyledBox>
           <ViewFormulaAccordion codeSnippet={codeSnippet}/>
         </StyledBox>
-        <StyledBox sx={{ 
-          display: 'flex', 
+        <StyledBox sx={{
+          display: 'flex',
           flexDirection: 'row',
           flexWrap: 'wrap',
           justifyContent: 'space-between',

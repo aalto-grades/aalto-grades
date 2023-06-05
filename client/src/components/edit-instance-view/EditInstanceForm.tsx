@@ -59,7 +59,7 @@ const EditInstanceForm = ({ instance }) => {
   let navigate = useNavigate();
   let { courseId, sisuInstanceId } = useParams();
 
-  const { 
+  const {
     courseType, setType,
     startDate, setStartDate,
     endDate, setEndDate,
@@ -108,12 +108,12 @@ const EditInstanceForm = ({ instance }) => {
 
   return(
     <form onSubmit={handleSubmit}>
-      <Box sx={{ 
-        display: 'flex', 
+      <Box sx={{
+        display: 'flex',
         alignItems: 'flex-start',
-        flexDirection: 'column', 
+        flexDirection: 'column',
         justifyContent: 'space-around',
-        boxShadow: 2, 
+        boxShadow: 2,
         borderRadius: 2,
         my: 2,
         p: 2

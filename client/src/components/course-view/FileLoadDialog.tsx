@@ -111,12 +111,12 @@ const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades })
           <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', columnGap: 2 }}>
             <Button id='ag_select_file_btn' component='label'>
               Upload file
-              <input 
+              <input
                 hidden
-                name='file_input' 
+                name='file_input'
                 ref={fileInput}
-                type='file' 
-                accept='.csv' 
+                type='file'
+                accept='.csv'
                 onChange={(event) => {
                   event.preventDefault();
                   if (event.target.value) { // new input -> clear errors
@@ -124,13 +124,13 @@ const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades })
                     setFileErrors([]);
                   }
                   setFileName(fileInput.current.files[0].name);
-                }} 
+                }}
               />  {/* accept multiple?? */}
             </Button>
             <Typography>{fileName ?? 'Select a file'}</Typography>
           </Box>
           { validationError && <FormHelperText error={true}>{validationError}</FormHelperText> }
-          { fileErrors.length !== 0 && 
+          { fileErrors.length !== 0 &&
             <>
               <Typography id={'file_content_errors'} sx={{ mt: 2 }}>{errorInstructions}</Typography>
               { fileErrors.length > maxErrorsToShow ?
@@ -160,10 +160,10 @@ const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades })
           }}>
             Cancel
           </Button>
-          <Button 
-            id='ag_confirm_file_upload_btn' 
-            size='medium' 
-            variant='outlined' 
+          <Button
+            id='ag_confirm_file_upload_btn'
+            size='medium'
+            variant='outlined'
             onClick={() => {
               if (!fileName) {
                 setValidationError('You must select a csv file to submit');

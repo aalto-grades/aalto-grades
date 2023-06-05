@@ -39,7 +39,7 @@ const getAttributeLabel: any = (labelKey) => {
   const splitString = labelKey.split(/(?=[A-Z])/);
   const label = splitString.join(' ');
   const capitalizedLabel = label.charAt(0).toUpperCase() + label.slice(1);
-  return capitalizedLabel; 
+  return capitalizedLabel;
 };
 
 export default { getFormulas, setFormula, getFormulaName, getFormulaAttributes, getAttributeLabel };

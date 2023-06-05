@@ -9,13 +9,13 @@ import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Assignment from './create-assignment/Assignment';
-import assignmentServices from '../services/assignments'; 
+import assignmentServices from '../services/assignments';
 
 const CreateAssignmentView = () => {
   const navigate = useNavigate();
   const { courseId, instanceId, sisuInstanceId } = useParams();
   let addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId;
-  
+
   // If this view is opened during the creation of an instance, get the necessary data from the context
   if (sisuInstanceId) {
     ({ addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId } = useOutletContext<any>());
@@ -76,7 +76,7 @@ const CreateAssignmentView = () => {
             Create Study Attainment
         </Typography>
         <form>
-          <Box sx={{ 
+          <Box sx={{
             bgcolor: 'primary.light',
             display: 'flex',
             flexDirection: 'column',
@@ -87,10 +87,10 @@ const CreateAssignmentView = () => {
             px: 2,
           }}>
             {/* Create the root attainment */}
-            <Assignment 
+            <Assignment
               indices={[0]}
-              attainments={attainments} 
-              setAttainments={setAttainments} 
+              attainments={attainments}
+              setAttainments={setAttainments}
               removeAttainment={removeAttainment}
               temporaryId={attainmentIncrementId}
               setIncrementId={setIncrementId}

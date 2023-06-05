@@ -74,8 +74,8 @@ const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
   return (
     <form onSubmit={handleSubmit} data-testid='attributeForm'>
       <AlertSnackbar messageInfo={messageInfo} setMessageInfo={setMessageInfo} open={alertOpen} setOpen={setAlertOpen} />
-      <StyledBox sx={{ 
-        display: 'flex', 
+      <StyledBox sx={{
+        display: 'flex',
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
@@ -102,7 +102,7 @@ const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
           </Button>
         </Box>
       </StyledBox>
-      
+
     </form>
   );
 };

@@ -17,7 +17,7 @@ const EditAssignmentView = () => {
   const navigate = useNavigate();
   const { courseId, instanceId, sisuInstanceId, attainmentId } = useParams();
   let addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId;
-  
+
   // If this view is opened during the creation of an instance, get the necessary data from the context
   if (sisuInstanceId) {
     ({ addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId } = useOutletContext<any>());
@@ -96,7 +96,8 @@ const EditAssignmentView = () => {
         existingAttainments.forEach((attainment) => editAttainment(attainment));
         newAttainments.forEach((attainment) => addAttainment(attainment));
         deletedAttainments.forEach((attainment) => {
-          if (attainment.id) deleteAttainment(attainment.id);
+          if (attainment.id)
+            deleteAttainment(attainment.id);
         });
         navigate(-1);
       } else if (sisuInstanceId) {
@@ -120,8 +121,8 @@ const EditAssignmentView = () => {
     setOpenConfDialog(false);
   };
 
-  // A function that temporarily removes an attainment from the 'attainments', 
-  // and then this attainment is deleted as are also the 'deletedAttainments' 
+  // A function that temporarily removes an attainment from the 'attainments',
+  // and then this attainment is deleted as are also the 'deletedAttainments'
   // when the Confirm or Delete Attainment buttons are pressed
   const removeAttainment = (indices) => {
     if (JSON.stringify(indices) === '[0]') {
@@ -141,7 +142,7 @@ const EditAssignmentView = () => {
             Edit Study Attainment
         </Typography>
         <form>
-          <Box sx={{ 
+          <Box sx={{
             bgcolor: 'primary.light',
             display: 'flex',
             flexDirection: 'column',
@@ -151,10 +152,10 @@ const EditAssignmentView = () => {
             pb: 1,
             px: 2,
           }}>
-            <Assignment 
+            <Assignment
               indices={[0]}
-              attainments={attainments} 
-              setAttainments={setAttainments} 
+              attainments={attainments}
+              setAttainments={setAttainments}
               removeAttainment={removeAttainment}
               temporaryId={attainmentIncrementId}
               setIncrementId={setIncrementId}

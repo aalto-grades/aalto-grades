@@ -12,31 +12,38 @@ import AlertSnackbar from './alerts/AlertSnackbar';
 import LightLabelBoldValue from './typography/LightLabelBoldValue';
 import textFormatServices from '../services/textFormat';
 import instancesService from '../services/instances';
-import assignmentServices from '../services/assignments'; 
+import assignmentServices from '../services/assignments';
 import useSnackPackAlerts from '../hooks/useSnackPackAlerts';
 
 const successMsgInstance = { msg: 'Instance created successfully.', severity: 'success' };
 const successMsgWithoutAttainments = { msg: 'Instance created successfully. Redirecting to course page in 30 seconds.', severity: 'success' };
 const errorMsgInstance = { msg: 'Instance creation failed.', severity: 'error' };
 
-const successMsgAttainments = { msg: 'Attainments added successfully. Redirecting to course page in 30 seconds.', severity: 'success' };
-const errorMsgAttainments = { msg: 'Something went wrong while adding attainments. Redirecting to course page in 30 seconds. Attainments can be modified there.', severity: 'error' };
+const successMsgAttainments = {
+  msg: 'Attainments added successfully. Redirecting to course page in 30 seconds.',
+  severity: 'success'
+};
+
+const errorMsgAttainments = {
+  msg: 'Something went wrong while adding attainments. Redirecting to course page in 30 seconds. Attainments can be modified there.',
+  severity: 'error'
+};
 
 const InstanceSummaryView = () => {
   let navigate = useNavigate();
   let { courseId, sisuInstanceId } = useParams();
 
-  const { 
+  const {
     addedAttainments,
-    startDate, 
-    endDate, 
-    courseType, 
-    stringMinCredits, 
-    stringMaxCredits, 
-    gradingScale, 
+    startDate,
+    endDate,
+    courseType,
+    stringMinCredits,
+    stringMaxCredits,
+    gradingScale,
     teachers,
     startingPeriod,
-    endingPeriod 
+    endingPeriod
   } = useOutletContext<any>();
 
   const [created, setCreated] = useState(false);
@@ -55,7 +62,7 @@ const InstanceSummaryView = () => {
 
     // attempt to create instance
     try {
-      const instanceObj = { 
+      const instanceObj = {
         gradingScale: textFormatServices.convertToServerGradingScale(gradingScale),
         sisuCourseInstanceId: sisuInstanceId,
         type: courseType,
@@ -68,7 +75,7 @@ const InstanceSummaryView = () => {
         endDate: endDate
       };
       const instanceResponse = await instancesService.createInstance(courseId, instanceObj);
-      setInstanceAlert((prev) => [...prev, 
+      setInstanceAlert((prev) => [...prev,
         addedAttainments.length === 0 ? successMsgWithoutAttainments : successMsgInstance]
       );
       setCreated(true);
@@ -88,7 +95,7 @@ const InstanceSummaryView = () => {
 
       // return to the course page even if error in attainment creation
       await sleep(30000);
-      navigate('/course-view/' + courseId);   
+      navigate('/course-view/' + courseId);
     } catch (err) {
       setInstanceAlert((prev) => [...prev, errorMsgInstance]);
     }
@@ -124,25 +131,25 @@ const InstanceSummaryView = () => {
         <Typography variant='body1' color='primary.main' sx={{ m: '8px 0px' }} >You can also add study attainments after creating the instance</Typography>
       </Box>
       { created ?
-        <Button 
-          variant='contained' 
-          sx={{ width: 'fit-content', justifySelf: 'center', mb: 6  }} 
+        <Button
+          variant='contained'
+          sx={{ width: 'fit-content', justifySelf: 'center', mb: 6  }}
           onClick={() => navigate('/course-view/' + courseId)} >
           Return to course view
         </Button>
         :
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 6 }}>
-          <Button 
-            variant='outlined' 
-            onClick={() => onGoBack()} 
-            disabled={messageInfo?.severity === 'info'} 
+          <Button
+            variant='outlined'
+            onClick={() => onGoBack()}
+            disabled={messageInfo?.severity === 'info'}
           >
             Go back
           </Button>
-          <Button 
-            id='ag_create_instance_btn' 
-            variant='contained' 
-            onClick={() => onCreateInstance()} 
+          <Button
+            id='ag_create_instance_btn'
+            variant='contained'
+            onClick={() => onCreateInstance()}
             disabled={messageInfo?.severity === 'info'}
           >
             Create instance

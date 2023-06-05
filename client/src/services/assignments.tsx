@@ -30,7 +30,9 @@ const deleteAttainment: any = async (courseId, instanceId, attainmentId) => {
 
 // Function to get mock attainments.
 // Should eventually be replaced with a function that gets data from the server.
-const getSuggestedAttainments: any = () => { return mockAttainmentsClient; };
+const getSuggestedAttainments: any = () => {
+  return mockAttainmentsClient;
+};
 
 
 // The following functions are used to add temporary ids, and to create, add and delete temporary attainments.
@@ -88,24 +90,24 @@ const deleteTemporaryAttainment: any = (attainments, newAttainment) => {
 };
 
 
-// The following functions are used to cmoplete the functionality that is needed 
+// The following functions are used to cmoplete the functionality that is needed
 // for the components used in CreateAssignmentView and EditAssignmentView
 
-// The parameter 'indices' used in the following functions is an array of integres 
+// The parameter 'indices' used in the following functions is an array of integres
 // that displays the indices of an attainment on different levels.
 // EXAMPLE: The indices of the 'attainment 0.1' below would be [0, 1].
 /* Attainments = [
-    { 
-      name: 'attainment 0', 
+    {
+      name: 'attainment 0',
       date: '',
       subAttainments: [
-        { 
-          name: 'attainment 0.0', 
+        {
+          name: 'attainment 0.0',
           date: '',
           subAttainments: []
         },
         {
-          name: 'attainment 0.1', 
+          name: 'attainment 0.1',
           date: '',
           subAttainments: []
         }
@@ -232,7 +234,7 @@ const constructTreeAssignmets: any = (attainments) => {
 
   updatedAttainments.forEach((attainment) => {
     map[attainment.id] = updatedAttainments.find(element => element.id === attainment.parentId);
-  }); 
+  });
 
   updatedAttainments.forEach((attainment) => {
     attainment.subAttainments = [];
@@ -412,7 +414,7 @@ const getNewAttainments: any = (attainments) => {
   return updatedAattainments;
 };
 
-export default { 
+export default {
   addAttainment,
   editAttainment,
   deleteAttainment,
@@ -422,14 +424,14 @@ export default {
   createTemporaryAttainment,
   updateTemporaryAttainment,
   deleteTemporaryAttainment,
-  getSubAttainments, 
-  addSubAttainments, 
-  removeAttainment, 
+  getSubAttainments,
+  addSubAttainments,
+  removeAttainment,
   getAttainmentByIndices,
-  getProperty, 
-  setProperty, 
-  constructTreeAssignmets, 
-  addCategories, 
+  getProperty,
+  setProperty,
+  constructTreeAssignmets,
+  addCategories,
   formatDates,
   formatStringsToDates,
   getAttainmentById,

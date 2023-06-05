@@ -23,7 +23,7 @@ const AddAssignmentsView = () => {
   useEffect(() => {  // Better if handling here
     if (addedAttainments.length === 0) {
       let allSuggestedAttainments = assignmentServices.getSuggestedAttainments();
-      let [updatedAttainments, newTemporaryId] = assignmentServices.addTemporaryIds(allSuggestedAttainments, attainmentIncrementId); 
+      let [updatedAttainments, newTemporaryId] = assignmentServices.addTemporaryIds(allSuggestedAttainments, attainmentIncrementId);
       setIncrementId(newTemporaryId);
       setSuggestedAttainments(updatedAttainments);
     } else {
@@ -66,14 +66,15 @@ const AddAssignmentsView = () => {
                 attainmentKey={'temporaryId'}
                 button={<Button onClick={onAddClick(attainment)}>Add</Button>}
               />
-            );}
+            );
+          }
           ) }
         </Box>
       </Box>
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', mb: 5, mt: 1, display: 'inline-block' }}>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography align='left' sx={{ ml: 1.5 }} >Create and add a new study attainment:</Typography>
-          <Button variant='outlined' onClick={ () => 
+          <Button variant='outlined' onClick={ () =>
             navigate(`/${courseId}/create-temporary-attainment/${sisuInstanceId}`) }>
               Create attainment
           </Button>
@@ -85,16 +86,17 @@ const AddAssignmentsView = () => {
           <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch', pb: '8px' }}>
             { addedAttainments.map(attainment => {
               return (
-                <AssignmentCategory 
-                  key={attainment.temporaryId} 
-                  attainment={attainment}  
+                <AssignmentCategory
+                  key={attainment.temporaryId}
+                  attainment={attainment}
                   attainmentKey={'temporaryId'}
-                  button={<Button 
+                  button={<Button
                     onClick={ () => navigate(`/${courseId}/edit-temporary-attainment/${sisuInstanceId}/${attainment.temporaryId}`) }>
                       Edit
                   </Button>}
                 />
-              );}
+              );
+            }
             ) }
           </Box>
         }

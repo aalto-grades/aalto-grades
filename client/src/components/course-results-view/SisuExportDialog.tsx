@@ -144,7 +144,9 @@ const SisuExportDialog = ({ open, handleClose }) => {
                 label="Completion language"
                 defaultValue="en"
                 helperText="If not provided, the default will be English."
-                onChange={(e) => { setCompletionLanguage(e.target.value); }}
+                onChange={(e) => {
+                  setCompletionLanguage(e.target.value);
+                }}
               >
                 {languageOptions.map((option) => (
                   <MenuItem key={option.id} value={option.id}>
@@ -162,20 +164,26 @@ const SisuExportDialog = ({ open, handleClose }) => {
                 /* TODO: Fix TS */
                 //format="DD-MM-YYYY"
                 helperText="If not provided, the default will be course instance ending date."
-                onChange={(e) => { setAssessmentDate(e.target.value); }}
+                onChange={(e) => {
+                  setAssessmentDate(e.target.value);
+                }}
               />
             </div>
           </Box>
         </DialogContent>
         <DialogActions sx={{ pr: 4, pb: 3 }}>
-          <Button size='medium' onClick={() => { handleClose(); }}>
+          <Button size='medium' onClick={() => {
+            handleClose();
+          }}>
             Cancel
           </Button>
-          <Button 
-            id='ag_confirm_file_upload_btn' 
-            size='medium' 
-            variant='outlined' 
-            onClick={() => { exportSisuCsvGrades(); }}
+          <Button
+            id='ag_confirm_file_upload_btn'
+            size='medium'
+            variant='outlined'
+            onClick={() => {
+              exportSisuCsvGrades();
+            }}
           >
             Export
           </Button>
