@@ -9,7 +9,7 @@ import supertest, { SuperAgentTest } from 'supertest';
 import { JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS } from '../../src/configs/constants';
 
 import { app } from '../../src/app';
-import { UserRole } from '../../src/controllers/auth';
+import { UserRole } from '../../src/types/general';
 import { HttpCode } from '../../src/types/httpCode';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
