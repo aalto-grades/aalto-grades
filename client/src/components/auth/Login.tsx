@@ -14,7 +14,7 @@ const Login = () => {
   const { setAuth } = useAuth();
 
   const navigate = useNavigate();
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState<any>('');
   const theme = useTheme();
 
   const loginUser = async (userObject) => {

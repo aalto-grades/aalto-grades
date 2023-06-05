@@ -13,11 +13,11 @@ import Grid from '@mui/material/Grid';
 
 const SignupForm = ({ addUser }) => {
 
-  const [name, setName] = useState(''); 
-  const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
-  const [studentID, setStudentID] = useState('');
-  const [role, setRole] = useState('TEACHER');
+  const [name, setName] = useState<any>(''); 
+  const [password, setPassword] = useState<any>('');
+  const [email, setEmail] = useState<any>('');
+  const [studentID, setStudentID] = useState<any>('');
+  const [role, setRole] = useState<any>('TEACHER');
 
   const handleSubmit = (event) => {
     event.preventDefault();

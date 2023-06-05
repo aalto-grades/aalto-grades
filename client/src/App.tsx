@@ -104,7 +104,7 @@ const theme = createTheme({
   }
 });
 
-const AppContainer = styled(Container)`
+const AppContainer = styled<any>(Container)`
   text-align: center;
 `;
 

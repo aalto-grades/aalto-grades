@@ -71,13 +71,13 @@ const SisuExportDialog = ({ open, handleClose }) => {
   const { courseId, instanceId } = useParams();
 
   // state variables handling the alert messages.
-  const [snackPack, setSnackPack] = useState([]);
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [messageInfo, setMessageInfo] = useState(undefined);
+  const [snackPack, setSnackPack] = useState<any>([]);
+  const [alertOpen, setAlertOpen] = useState<any>(false);
+  const [messageInfo, setMessageInfo] = useState<any>(undefined);
 
   // state variables handling the assessment date and completion language.
-  const [assessmentDate, setAssessmentDate] = useState(null);
-  const [completionLanguage, setCompletionLanguage] = useState(null);
+  const [assessmentDate, setAssessmentDate] = useState<any>(null);
+  const [completionLanguage, setCompletionLanguage] = useState<any>(null);
 
   // useEffect in charge of handling the back-to-back alerts
   // makes the previous disappear before showing the new one
@@ -111,7 +111,7 @@ const SisuExportDialog = ({ open, handleClose }) => {
       link.href = URL.createObjectURL(blob);
       // Set file name.
       link.download = `grades_course_${courseId}_instance_${instanceId}.csv`;
-      // Download file automatically to the users computer.
+      // Download file automatically to the user's computer.
       link.click();
 
       setSnackPack((prev) => [...prev, successMsg]);
@@ -154,12 +154,13 @@ const SisuExportDialog = ({ open, handleClose }) => {
               </TextField>
             </div>
             <div>
-              <TextField<any>
+              <TextField
                 id="select-grading-assessment-date"
                 InputLabelProps={{ shrink: true }}
                 type="date"
                 label="Assessment Date"
-                format="DD-MM-YYYY"
+                /* TODO: Fix TS */
+                //format="DD-MM-YYYY"
                 helperText="If not provided, the default will be course instance ending date."
                 onChange={(e) => { setAssessmentDate(e.target.value); }}
               />

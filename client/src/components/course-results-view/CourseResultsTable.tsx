@@ -22,13 +22,13 @@ import sortingServices from '../../services/sorting';
 
 const CourseResultsTable = ({ attainments, students, calculateFinalGrades, updateGrades }) => {
 
-  const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('studentID');
-  const [page, setPage] = useState(0);
-  const [dense, setDense] = useState(true);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [search, setSearch] = useState('');
-  const [studentsToShow, setStudentsToShow] = useState(students);
+  const [order, setOrder] = useState<any>('asc');
+  const [orderBy, setOrderBy] = useState<any>('studentID');
+  const [page, setPage] = useState<any>(0);
+  const [dense, setDense] = useState<any>(true);
+  const [rowsPerPage, setRowsPerPage] = useState<any>(25);
+  const [search, setSearch] = useState<any>('');
+  const [studentsToShow, setStudentsToShow] = useState<any>(students);
 
   useEffect(() => {
     setStudentsToShow(search === '' ? students : students.filter(s => s.studentID.includes(search)));

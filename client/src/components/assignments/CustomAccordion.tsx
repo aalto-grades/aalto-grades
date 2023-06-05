@@ -106,8 +106,8 @@ export { AccordionDetails, AssignmentText };
 
 const CustomAccordion = ({ attainments, attainmentKey }) => {
 
-  const [expanded, setExpanded] = useState(new Set());
-  const [selected, setSelected] = useState('');
+  const [expanded, setExpanded] = useState<any>(new Set());
+  const [selected, setSelected] = useState<any>('');
 
   const addToSet = (item, set) => {
     const copySet = new Set([...set]);

@@ -14,7 +14,7 @@ import Box from '@mui/material/Box';
 const CourseResultsTableHead = (props) => {
 
   const { order, orderBy, onRequestSort, attainments } = props;
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState<any>([]);
 
   useEffect(() => {
     const headObject = [{

@@ -18,7 +18,7 @@ function UserButton() {
   const logout = useLogout();
   const navigate = useNavigate();
   const { auth } = useAuth();
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = React.useState<any>(null);
   const open = Boolean(anchorEl);
 
   // temporary function for logging out, will be moved to a seperate file once toolbar is refined

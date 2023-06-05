@@ -24,7 +24,7 @@ const ParentAssignment = ({ indices, addSubAttainments, setAttainments, attainme
   let navigate = useNavigate();
 
   // Functions and varibales for opening and closing the list of sub-attainments
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState<any>(true);
 
   const handleClick = () => {
     setOpen(!open);

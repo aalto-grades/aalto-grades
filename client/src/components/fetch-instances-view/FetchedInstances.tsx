@@ -11,7 +11,7 @@ import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 import textFormatServices from '../../services/textFormat';
 import sortingServices from '../../services/sorting';
 
-const HoverBox = styled(Box)(({ theme }) => ({
+const HoverBox = styled<any>(Box)(({ theme }) => ({
   '&:hover': {
     background: theme.palette.hoverGrey2
   },

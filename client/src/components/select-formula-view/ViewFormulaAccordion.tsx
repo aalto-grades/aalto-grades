@@ -12,7 +12,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Container from '@mui/material/Container';
 import { styled } from '@mui/material/styles';
 
-const HoverExpandMoreIcon = styled(ExpandMoreIcon)(({ theme }) => ({
+const HoverExpandMoreIcon = styled<any>(ExpandMoreIcon)(({ theme }) => ({
   '&:hover': {
     background: theme.palette.hoverGrey1
   }

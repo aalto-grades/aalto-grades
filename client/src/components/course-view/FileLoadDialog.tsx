@@ -35,13 +35,13 @@ export const maxErrorsToShow = 5;
 
 const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades }) => {
   let { courseId } = useParams();
-  const fileInput = createRef();
+  const fileInput = createRef<any>();
 
   // state variables handling the alert messages
-  const [snackPack, setSnackPack] = useState([]);
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [showErrorDialog, setShowErrorDialog] = useState(false);
-  const [messageInfo, setMessageInfo] = useState(undefined);
+  const [snackPack, setSnackPack] = useState<any>([]);
+  const [alertOpen, setAlertOpen] = useState<any>(false);
+  const [showErrorDialog, setShowErrorDialog] = useState<any>(false);
+  const [messageInfo, setMessageInfo] = useState<any>(undefined);
 
   const toggleErrorDialog = () => {
     setShowErrorDialog(!showErrorDialog);
@@ -59,9 +59,9 @@ const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades })
     }
   }, [snackPack, messageInfo, alertOpen]);
 
-  const [fileName, setFileName] = useState(null);
-  const [validationError, setValidationError] = useState('');
-  const [fileErrors, setFileErrors] = useState([]);
+  const [fileName, setFileName] = useState<any>(null);
+  const [validationError, setValidationError] = useState<any>('');
+  const [fileErrors, setFileErrors] = useState<any>([]);
 
   const uploadFile = async () => {
     setSnackPack((prev) => [...prev, loadingMsg]);

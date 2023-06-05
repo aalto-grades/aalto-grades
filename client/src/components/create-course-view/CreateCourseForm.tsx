@@ -34,10 +34,10 @@ const organizerData = {
 
 const CreateCourseForm = ({ addCourse }) => {
 
-  const [courseCode, setCode] = useState('');
-  const [name, setName] = useState('');
-  const [department, setOrganizer] = useState('');
-  //const [teacher, setTeacher] = useState(''); 
+  const [courseCode, setCode] = useState<any>('');
+  const [name, setName] = useState<any>('');
+  const [department, setOrganizer] = useState<any>('');
+  //const [teacher, setTeacher] = useState<any>(''); 
 
   const id = -1;
 

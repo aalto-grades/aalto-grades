@@ -12,7 +12,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 // A styled menu button. When clicked, a dropdown menu appears
 
-const StyledMenu = styled((props) => (
+const StyledMenu = styled<any>((props) => (
   <Menu
     elevation={0}
     anchorOrigin={{
@@ -50,7 +50,7 @@ const StyledMenu = styled((props) => (
 }));
 
 const MenuButton = ({ label, options }) => {
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState<any>(null);
   const open = Boolean(anchorEl);
 
   const handleClick = (event) => {

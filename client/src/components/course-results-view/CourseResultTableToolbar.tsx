@@ -22,8 +22,8 @@ const CourseResultsTableToolbar = (
 ) => {
   let { instanceId } = useParams();
 
-  const [showFileDialog, setShowFileDialog] = useState(false);
-  const [showSisuDialog, setShowSisuDialog] = useState(false);
+  const [showFileDialog, setShowFileDialog] = useState<any>(false);
+  const [showSisuDialog, setShowSisuDialog] = useState<any>(false);
 
   const actionOptions = [
     { description: 'Import from file', handleClick: () => setShowFileDialog(true) }, 

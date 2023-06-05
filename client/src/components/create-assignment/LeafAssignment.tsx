@@ -93,10 +93,10 @@ const LeafAssignment = ({ indices, addSubAttainments, setAttainments, attainment
     }
   };
 
-  const [displayNewName, setDisplayNewName] = useState(getValue(categoryData) === 'Other');
+  const [displayNewName, setDisplayNewName] = useState<any>(getValue(categoryData) === 'Other');
 
   // Functions and varibales for opening and closing the dialog that asks for the number of sub-attainments
-  const [openCountDialog, setOpenCountDialog] = useState(false);
+  const [openCountDialog, setOpenCountDialog] = useState<any>(false);
 
   const handleCountDialogOpen = () => {
     setOpenCountDialog(true);
@@ -107,7 +107,7 @@ const LeafAssignment = ({ indices, addSubAttainments, setAttainments, attainment
   };
 
   // Functions and varibales for opening and closing the dialog for confirming sub-attainment deletion
-  const [openConfDialog, setOpenConfDialog] = useState(false);
+  const [openConfDialog, setOpenConfDialog] = useState<any>(false);
 
   const handleConfDialogOpen = () => {
     setOpenConfDialog(true);

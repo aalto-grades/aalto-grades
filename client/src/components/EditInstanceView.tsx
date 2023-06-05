@@ -14,7 +14,7 @@ import instancesService from '../services/instances';
 
 const EditInstanceView = () => {
   let { sisuInstanceId } = useParams();
-  const [instance, setInstance] = useState();
+  const [instance, setInstance] = useState<any>();
 
   useEffect(() => {
     instancesService.getSisuInstance(sisuInstanceId)

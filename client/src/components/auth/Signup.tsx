@@ -14,7 +14,7 @@ const Signup = () => {
   const navigate = useNavigate();
   const { setAuth } = useAuth();
   const theme = useTheme();
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState<any>('');
 
   const addUser = async (userObject) => {
     try {

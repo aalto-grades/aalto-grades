@@ -8,21 +8,21 @@ import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 
 // Functions that are (or will be) connected to the server.
 
-const addAttainment = async (courseId, instanceId, attainment) => {
+const addAttainment: any = async (courseId, instanceId, attainment) => {
   const response = await axios.post(
     `/v1/courses/${courseId}/instances/${instanceId}/attainments`,
     attainment);
   return response.data.data;
 };
 
-const editAttainment = async (courseId, instanceId, attainment) => {
+const editAttainment: any = async (courseId, instanceId, attainment) => {
   const response = await axios.put(
     `/v1/courses/${courseId}/instances/${instanceId}/attainments/${attainment.id}`,
     attainment);
   return response.data.data;
 };
 
-const deleteAttainment = async (courseId, instanceId, attainmentId) => {
+const deleteAttainment: any = async (courseId, instanceId, attainmentId) => {
   const response = await axios.delete(
     `/v1/courses/${courseId}/instances/${instanceId}/attainments/${attainmentId}`);
   return response.data.data;
@@ -30,7 +30,7 @@ const deleteAttainment = async (courseId, instanceId, attainmentId) => {
 
 // Function to get mock attainments.
 // Should eventually be replaced with a function that gets data from the server.
-const getSuggestedAttainments = () => { return mockAttainmentsClient; };
+const getSuggestedAttainments: any = () => { return mockAttainmentsClient; };
 
 
 // The following functions are used to add temporary ids, and to create, add and delete temporary attainments.
@@ -38,8 +38,7 @@ const getSuggestedAttainments = () => { return mockAttainmentsClient; };
 // attainments duing the creation of an instance.
 
 // Function to assign temporary Ids to attainments.
-const addTemporaryIds = (attainments, temporaryId) => {
-  
+const addTemporaryIds: any = (attainments, temporaryId) => {
   let newTemporaryId = temporaryId;
   const addTemporaryId = (modifiabelAttainments) => {
     modifiabelAttainments.forEach((attainment) => {
@@ -57,7 +56,7 @@ const addTemporaryIds = (attainments, temporaryId) => {
 };
 
 // Add an attainment to a temporary list of attainments.
-const addTemporaryAttainment = (attainments, newAttainment) => {
+const addTemporaryAttainment: any = (attainments, newAttainment) => {
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
   let updatedNewAttainment = JSON.parse(JSON.stringify(newAttainment));
   updatedAttainments.push(updatedNewAttainment);
@@ -65,7 +64,7 @@ const addTemporaryAttainment = (attainments, newAttainment) => {
 };
 
 // Add an attainment to a temporary list of attainments and give it a temporary id.
-const createTemporaryAttainment = (attainments, newAttainment, temporaryId) => {
+const createTemporaryAttainment: any = (attainments, newAttainment, temporaryId) => {
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
   let updatedNewAttainment = JSON.parse(JSON.stringify(newAttainment));
   updatedNewAttainment.temporaryId = temporaryId;
@@ -75,14 +74,14 @@ const createTemporaryAttainment = (attainments, newAttainment, temporaryId) => {
 };
 
 // Update an attainment in a temporary list of attainments.
-const updateTemporaryAttainment = (attainments, newAttainment) => {
+const updateTemporaryAttainment: any = (attainments, newAttainment) => {
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
   updatedAttainments = updatedAttainments.map((attainment) => attainment.temporaryId === newAttainment.temporaryId ? newAttainment : attainment);
   return updatedAttainments;
 };
 
 // Delete an attainment from a temporary list of attainments.
-const deleteTemporaryAttainment = (attainments, newAttainment) => {
+const deleteTemporaryAttainment: any = (attainments, newAttainment) => {
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
   updatedAttainments = updatedAttainments.filter((attainment) => attainment.temporaryId !== newAttainment.temporaryId);
   return updatedAttainments;
@@ -117,7 +116,7 @@ const deleteTemporaryAttainment = (attainments, newAttainment) => {
 // Replace indices with attainment IDs if it seems simpler/more effective
 
 // Get an attainment from a tree structure of attainments based on its location defined by indices
-const getAttainmentByIndices = (indices, attainments) => {
+const getAttainmentByIndices: any = (indices, attainments) => {
   const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
@@ -126,7 +125,7 @@ const getAttainmentByIndices = (indices, attainments) => {
 };
 
 // Get sub-attainments from the attainments array (of nested arrays) according to the indices
-const getSubAttainments = (indices, attainments) => {
+const getSubAttainments: any = (indices, attainments) => {
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
   let subAttainments = [];
   for (let i = 0; i < indices.length; i++) {
@@ -139,7 +138,7 @@ const getSubAttainments = (indices, attainments) => {
 
 // Set the proprety of the object that is in the location specified by the indices in the attainments array,
 // the property is set to have the value given as a parameter
-const setProperty = (indices, attainments, property, value) => {
+const setProperty: any = (indices, attainments, property, value) => {
   const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
@@ -158,7 +157,7 @@ const setProperty = (indices, attainments, property, value) => {
 };*/
 
 // Get the property of an attainment that is at the location specified by indices
-const getProperty = (indices, attainments, property) => {
+const getProperty: any = (indices, attainments, property) => {
   return getAttainmentByIndices(indices, attainments)[property];
 };
 
@@ -171,7 +170,7 @@ const getProperty = (indices, attainments, property) => {
 };*/
 
 // Set the formula attribute an attainment
-const setFormulaAttribute = (indices, attainments, attributeKey, value) => {
+const setFormulaAttribute: any = (indices, attainments, attributeKey, value) => {
   const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
@@ -182,12 +181,12 @@ const setFormulaAttribute = (indices, attainments, attributeKey, value) => {
 };
 
 // Get the formula attribute an attainment
-const getFormulaAttribute = (indices, attainments, attributeKey) => {
+const getFormulaAttribute: any = (indices, attainments, attributeKey) => {
   return getAttainmentByIndices(indices, attainments)['formulaAttributes'][attributeKey];
 };
 
 // Add sub-attainments to the attainments array (of nested arrays) according to the indices
-const addSubAttainments = (indices, attainments, numOfAttainments, temporaryId) => {
+const addSubAttainments: any = (indices, attainments, numOfAttainments, temporaryId) => {
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
   let newTemporaryId = temporaryId;
   const defaultExpiryDate = getProperty(indices, updatedAttainments, 'expiryDate');
@@ -216,7 +215,7 @@ const addSubAttainments = (indices, attainments, numOfAttainments, temporaryId) 
 };
 
 // Remove an attainment that is at the location specified by indices
-const removeAttainment = (indices, attainments) => {
+const removeAttainment: any = (indices, attainments) => {
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
@@ -226,7 +225,7 @@ const removeAttainment = (indices, attainments) => {
 };
 
 // Creates a tree structure of attainments from an array of attainments with parent Ids
-const constructTreeAssignmets = (attainments) => {
+const constructTreeAssignmets: any = (attainments) => {
   const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   let map = {};
   let root;
@@ -253,7 +252,7 @@ const constructTreeAssignmets = (attainments) => {
 };
 
 // Recursive function to add the 'category' property for each attainment
-const addCategories = (attainments) => {
+const addCategories: any = (attainments) => {
 
   const addCategory = (modifiabelAttainments) => {
     modifiabelAttainments.forEach((attainment) => {
@@ -276,7 +275,7 @@ const addCategories = (attainments) => {
 };
 
 // Recursive function to format Date type values of the attainments to strings of the format '2023-01-01'
-const formatDates = (attainments) => {
+const formatDates: any = (attainments) => {
 
   const formatDate = (modifiabelAttainments) => {
     modifiabelAttainments.forEach((attainment) => {
@@ -297,7 +296,7 @@ const formatDates = (attainments) => {
 };
 
 // Recursive function to format strings of the format '2023-01-01' to Date type values
-const formatStringsToDates = (attainments) => {
+const formatStringsToDates: any = (attainments) => {
 
   const formatStringToDate = (modifiabelAttainments) => {
     modifiabelAttainments.forEach((attainment) => {
@@ -318,7 +317,7 @@ const formatStringsToDates = (attainments) => {
 };
 
 // Get an attainment from a tree structure of attainments based on its ID
-const getAttainmentById = (attainments, attainmentId) => {
+const getAttainmentById: any = (attainments, attainmentId) => {
 
   let finalAttainment = {};
   const findAttainment = (modifiabelAttainments) => {
@@ -352,7 +351,7 @@ const getFinalAttainmentById = (allAttainments, attainmentId) => {
 };
 
 // Get number of attainments from a tree structure, for tests
-const getNumOfAttainments = (attainments) => {
+const getNumOfAttainments: any = (attainments) => {
 
   let sum = 0;
   const countAttainment = (modifiabelAttainments) => {
@@ -373,7 +372,7 @@ const getNumOfAttainments = (attainments) => {
 };
 
 // Get the attainments that have ids so that they are already existing in the database
-const getExistingAttainments = (attainments) => {
+const getExistingAttainments: any = (attainments) => {
 
   let existingAttainments = [];
   const findExisting = (modifiabelAttainments) => {
@@ -394,7 +393,7 @@ const getExistingAttainments = (attainments) => {
 };
 
 // Get the attainments that don't have ids so that they aren't existing in the database
-const getNewAttainments = (attainments) => {
+const getNewAttainments: any = (attainments) => {
 
   let newAttainments = [];
   const findNew = (modifiabelAttainments) => {

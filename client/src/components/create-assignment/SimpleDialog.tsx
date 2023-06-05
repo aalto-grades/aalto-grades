@@ -18,10 +18,10 @@ const numberData = {
   fieldId: 'numberData',
   fieldLabel: 'Number of sub-attainments'
 };
-    
+
 function SimpleDialog({ handleClose, open, addSubAttainments, indices, attainments }) {
 
-  const [numOfAttainments, setSubAttainments] = useState('1');
+  const [numOfAttainments, setSubAttainments] = useState<any>('1');
 
   // The value given should be an integer of one or higher
   const error = !(!isNaN(numOfAttainments) && (Number.isInteger(Number(numOfAttainments))) && (Number(numOfAttainments) >= 1));

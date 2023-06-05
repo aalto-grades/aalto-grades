@@ -25,9 +25,9 @@ import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
 
 const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, navigateToAttributeSelection }) => {
 
-  const [codeSnippet, setCodeSnippet] = useState('');
-  const [checkboxError, setCheckboxError] = useState('');
-  const [formulaError, setFormulaError] = useState('');
+  const [codeSnippet, setCodeSnippet] = useState<any>('');
+  const [checkboxError, setCheckboxError] = useState<any>('');
+  const [formulaError, setFormulaError] = useState<any>('');
   const [setSnackPack, messageInfo, setMessageInfo, alertOpen, setAlertOpen] = useSnackPackAlerts();
 
   const navigate = useNavigate();
