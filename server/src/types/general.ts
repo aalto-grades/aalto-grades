@@ -11,3 +11,13 @@ export const idSchema: yup.AnyObjectSchema = yup.object().shape({
     .min(1)
     .required()
 });
+
+export enum UserRole {
+  User = 'USER',
+  Admin = 'ADMIN'
+}
+
+export interface JwtClaims {
+  role: UserRole,
+  id: number
+}
