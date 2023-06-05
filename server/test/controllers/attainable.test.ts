@@ -170,7 +170,7 @@ describe(
       async () => {
         const res: supertest.Response = await request
           .post('/v1/courses/1/instances/1/attainments')
-          .send({ ...mockAttainable, date: badInput,})
+          .send({ ...mockAttainable, date: badInput, })
           .set('Content-Type', 'application/json')
           .set('Cookie', authCookie)
           .set('Accept', 'application/json')
@@ -186,7 +186,7 @@ describe(
       async () => {
         const res: supertest.Response = await request
           .post('/v1/courses/1/instances/1/attainments')
-          .send({ ...mockAttainable, expiryDate: badInput,})
+          .send({ ...mockAttainable, expiryDate: badInput, })
           .set('Content-Type', 'application/json')
           .set('Cookie', authCookie)
           .set('Accept', 'application/json')
@@ -210,7 +210,7 @@ describe(
               expiryDate: new Date(2024, 8, 14),
               subAttainments: [],
             }
-          ]})
+          ] })
           .set('Content-Type', 'application/json')
           .set('Cookie', authCookie)
           .set('Accept', 'application/json')
@@ -238,7 +238,7 @@ describe(
                 }
               ],
             }
-          ]})
+          ] })
           .set('Content-Type', 'application/json')
           .set('Cookie', authCookie)
           .set('Accept', 'application/json')
@@ -273,7 +273,7 @@ describe(
                 }
               ],
             }
-          ]})
+          ] })
           .set('Content-Type', 'application/json')
           .set('Cookie', authCookie)
           .set('Accept', 'application/json')

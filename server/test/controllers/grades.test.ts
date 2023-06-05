@@ -44,7 +44,7 @@ describe(
       );
       res = await request
         .post('/v1/courses/1/instances/1/grades/csv')
-        .attach('csv_data', csvData, { contentType: 'text/csv'})
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
         .set('Cookie', authCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
@@ -71,7 +71,7 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'text/csv'})
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
           .set('Cookie', authCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
@@ -122,7 +122,7 @@ describe(
       );
       res = await request
         .post('/v1/courses/1/instances/1/grades/csv')
-        .attach('csv_data', csvData, { contentType: 'text/csv'})
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
         .set('Cookie', authCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
@@ -147,7 +147,7 @@ describe(
         );
         res = await request
           .post('/v1/courses/6/instances/9/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'text/csv'})
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
           .set('Cookie', authCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
@@ -165,7 +165,7 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', invalidCsvData, { contentType: 'text/csv'})
+          .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
           .set('Cookie', authCookie)
           .set('Accept', 'application/json');
 
@@ -181,7 +181,7 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', invalidCsvData, { contentType: 'text/csv'})
+          .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
           .set('Cookie', authCookie)
           .set('Accept', 'application/json');
 
@@ -203,7 +203,7 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', invalidCsvData, { contentType: 'text/csv'})
+          .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
           .set('Cookie', authCookie)
           .set('Accept', 'application/json');
 
@@ -223,7 +223,7 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', invalidCsvData, { contentType: 'text/csv'})
+          .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
           .set('Cookie', authCookie)
           .set('Accept', 'application/json');
 
@@ -238,7 +238,7 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach(badInput, csvData, { contentType: 'text/csv'})
+          .attach(badInput, csvData, { contentType: 'text/csv' })
           .set('Cookie', authCookie)
           .set('Accept', 'application/json');
 
@@ -255,7 +255,7 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'application/json'})
+          .attach('csv_data', csvData, { contentType: 'application/json' })
           .set('Cookie', authCookie)
           .set('Accept', 'application/json');
 
@@ -269,7 +269,7 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', txtFile, { contentType: 'text/csv'})
+          .attach('csv_data', txtFile, { contentType: 'text/csv' })
           .set('Cookie', authCookie)
           .set('Accept', 'application/json');
 
@@ -280,7 +280,7 @@ describe(
       async () => {
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', false, { contentType: 'text/csv'})
+          .attach('csv_data', false, { contentType: 'text/csv' })
           .set('Cookie', authCookie)
           .set('Accept', 'application/json');
 
@@ -300,7 +300,7 @@ describe(
         );
         res = await request
           .post(`/v1/courses/${badInput}/instances/1/grades/csv`)
-          .attach('csv_data', csvData, { contentType: 'text/csv'})
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
           .set('Cookie', authCookie)
           .set('Accept', 'application/json');
 
@@ -321,7 +321,7 @@ describe(
         );
         res = await request
           .post(`/v1/courses/1/instances/${badInput}/grades/csv`)
-          .attach('csv_data', csvData, { contentType: 'text/csv'})
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
           .set('Cookie', authCookie)
           .set('Accept', 'application/json');
 
@@ -341,7 +341,7 @@ describe(
       );
       res = await request
         .post('/v1/courses/1/instances/1/grades/csv')
-        .attach('csv_data', csvData, { contentType: 'text/csv'})
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
         .set('Accept', 'application/json')
         .expect(HttpCode.Unauthorized);
 
@@ -356,7 +356,7 @@ describe(
       );
       res = await request
         .post(`/v1/courses/${badId}/instances/1/grades/csv`)
-        .attach('csv_data', csvData, { contentType: 'text/csv'})
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
         .set('Cookie', authCookie)
         .set('Accept', 'application/json');
 
@@ -369,7 +369,7 @@ describe(
       );
       res = await request
         .post(`/v1/courses/1/instances/${badId}/grades/csv`)
-        .attach('csv_data', csvData, { contentType: 'text/csv'})
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
         .set('Cookie', authCookie)
         .set('Accept', 'application/json');
 
@@ -382,7 +382,7 @@ describe(
       );
       res = await request
         .post('/v1/courses/1/instances/2/grades/csv')
-        .attach('csv_data', csvData, { contentType: 'text/csv'})
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
         .set('Cookie', authCookie)
         .set('Accept', 'application/json');
 
@@ -400,7 +400,7 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'text/csv'})
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
           .set('Cookie', authCookie)
           .set('Accept', 'application/json');
 
@@ -418,7 +418,7 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'text/csv'})
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
           .set('Cookie', authCookie)
           .set('Accept', 'application/json');
 
