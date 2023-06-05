@@ -60,7 +60,7 @@ describe('Test POST /v1/auth/signup - create a new user', () => {
         name: 'aalto',
         password: 'grades',
         studentID: '123456',
-        role: 'SYSADMIN'
+        role: 'ADMIN'
       })
       .expect(HttpCode.Conflict)
       .expect('Content-Type', /json/)
@@ -80,7 +80,7 @@ describe('Test POST /v1/auth/signup - create a new user', () => {
       .then((res: supertest.Response) => {
         expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors[0]).toMatch('invalid signup request format');
+        expect(res.body.errors[0]).toMatch('name is a required field');
       });
   });
 
@@ -92,7 +92,7 @@ describe('Test POST /v1/auth/signup - create a new user', () => {
     await request.post('/v1/auth/signup')
       .set('Accept', 'application/json')
       // without student id
-      .send({ email: 'sysadmin2@aalto.fi', name: 'aalto2', password: 'grades2', role: 'SYSADMIN' })
+      .send({ email: 'sysadmin2@aalto.fi', name: 'aalto2', password: 'grades2', role: 'ADMIN' })
       .expect(HttpCode.Ok)
       .expect('Content-Type', /json/)
       .then((res: supertest.Response) => {
@@ -102,7 +102,7 @@ describe('Test POST /v1/auth/signup - create a new user', () => {
       });
     return request.post('/v1/auth/login')
       .set('Accept', 'application/json')
-      .send({ email: 'sysadmin2@aalto.fi', password: 'grades2'})
+      .send({ email: 'sysadmin2@aalto.fi', password: 'grades2' })
       .expect(HttpCode.Ok)
       .then((res: supertest.Response) => {
         expect(res.body.success).toBe(true);
