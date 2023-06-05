@@ -21,8 +21,9 @@ export const router: Router = Router();
  *     example: 1
  *   UserRole:
  *     type: string
- *     enum: [SYSADMIN, TEACHER, ASSISTANT, STUDENT]
- *     description: The role of the user.
+ *     enum: [USER, ADMIN]
+ *     description: The role of the user. Used for system level authorization.
+ *     example: USER
  *   Email:
  *     type: string
  *     format: email
