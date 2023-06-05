@@ -15,10 +15,10 @@ const Assignments = ({ attainments, formula, courseId, instance, handleAddPoints
   const navigate = useNavigate();
 
   const actionOptions = [
-    { description: 'Import from file', handleClick: handleAddPoints }, 
+    { description: 'Import from file', handleClick: handleAddPoints },
     { description: 'Import from A+', handleClick: () => {} }
   ];
-  
+
   return (
     <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: 1.5, display: 'flex', flexDirection: 'column' }}>
       <Typography variant='h3' align='left' sx={{ ml: 1.5, mt: 0.6, mb: 1.5 }} >Study Attainments</Typography>
@@ -32,21 +32,22 @@ const Assignments = ({ attainments, formula, courseId, instance, handleAddPoints
           /* Since the attainments are displayed by the course view, they exist in the database
              and their actual ids can be used are keys of the attainment accoridon */
           return (
-            <AssignmentCategory 
-              key={attainment.id} 
-              attainment={attainment} 
+            <AssignmentCategory
+              key={attainment.id}
+              attainment={attainment}
               attainmentKey={'id'}
-              button={<Button onClick={() => navigate(`/${courseId}/edit-attainment/${instance.id}/${attainment.id}`)}>Edit</Button>} 
+              button={<Button onClick={() => navigate(`/${courseId}/edit-attainment/${instance.id}/${attainment.id}`)}>Edit</Button>}
             />
-          );}
+          );
+        }
         ) }
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
         <Button onClick={() => navigate(`/${courseId}/create-attainment/${instance.id}`) }>Add attainment</Button>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}>
-          <Button 
-            id='ag_course_results_btn' 
-            variant='outlined' 
+          <Button
+            id='ag_course_results_btn'
+            variant='outlined'
             onClick={() => navigate(`/${courseId}/course-results/${instance.id}`)}
           >
             See course results

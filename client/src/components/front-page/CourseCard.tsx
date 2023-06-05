@@ -26,7 +26,9 @@ const CourseCard = ({ course }) => {
       </CardContent>
       <Divider variant="middle"/>
       <CardActions>
-        <Button id={`ag_see_instances_btn_${id}`} size="small" onClick={() => { navigate('/course-view/' + id); }}>
+        <Button id={`ag_see_instances_btn_${id}`} size="small" onClick={() => {
+          navigate('/course-view/' + id);
+        }}>
           See instances
         </Button>
       </CardActions>
@@ -40,6 +42,6 @@ CourseCard.propTypes = {
   code: PropTypes.string,
   department: PropTypes.string
 };
-  
+
 export default CourseCard;
 

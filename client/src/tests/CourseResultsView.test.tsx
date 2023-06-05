@@ -38,7 +38,7 @@ describe('Tests for CourseResultsView components', () => {
       expect(viewAllGradesButton).toBeInTheDocument();
       expect(calculateGradesButton).toBeInTheDocument();
     });
-    
+
   });
 
   test('CourseResultsTable should show a dialog for uploading a file when clicking on a menu button and choosing that option', async () => {

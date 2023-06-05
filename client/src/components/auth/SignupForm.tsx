@@ -13,7 +13,7 @@ import Grid from '@mui/material/Grid';
 
 const SignupForm = ({ addUser }) => {
 
-  const [name, setName] = useState<any>(''); 
+  const [name, setName] = useState<any>('');
   const [password, setPassword] = useState<any>('');
   const [email, setEmail] = useState<any>('');
   const [studentID, setStudentID] = useState<any>('');

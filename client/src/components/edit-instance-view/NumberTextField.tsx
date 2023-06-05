@@ -25,11 +25,11 @@ const NumberTextField = ({ fieldData, value, setFunction }) => {
     />
   );
 };
-  
+
 NumberTextField.propTypes = {
   fieldData: PropTypes.object,
   value: PropTypes.string,
   setFunction: PropTypes.func,
 };
-  
+
 export default NumberTextField;

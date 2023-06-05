@@ -12,8 +12,8 @@ const mockCourses = {
       en: 'Department of Computer Science'
     },
     name: {
-      fi: 'Tietokannat', 
-      sv: 'Databaser', 
+      fi: 'Tietokannat',
+      sv: 'Databaser',
       en: 'Databases'
     },
     evaluationInformation: {

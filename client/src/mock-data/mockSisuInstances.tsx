@@ -57,20 +57,20 @@ const mockSisuInstances = [
     }
   },
   {
-    sisuCourseInstanceId: 'mock-id-3', 
-    startingPeriod: '-', 
-    endingPeriod: '-', 
-    startDate: '2023-02-06', 
-    endDate: '2023-05-19', 
+    sisuCourseInstanceId: 'mock-id-3',
+    startingPeriod: '-',
+    endingPeriod: '-',
+    startDate: '2023-02-06',
+    endDate: '2023-05-19',
     type: 'exam-exam',
-    gradingScale: 'NUMERICAL', 
+    gradingScale: 'NUMERICAL',
     teachersInCharge: [
       'Kerttu Maaria Pollari-Malmi'
     ],
     courseData: {
-      courseCode: 'CS-A1150', 
-      minCredits: 5, 
-      maxCredits: 5, 
+      courseCode: 'CS-A1150',
+      minCredits: 5,
+      maxCredits: 5,
       department: {
         en: 'Department of Computer Science',
         fi: 'Tietotekniikan laitos',
@@ -81,10 +81,10 @@ const mockSisuInstances = [
         fi: 'Tietokannat, Luento-opetus',
         sv: 'Databaser, Föreläsning'
       },
-      evaluationInformation: { 
+      evaluationInformation: {
         en: 'Final examination and an compulsory assignment. Possibility to get extra credits from exercises.',
         fi: 'Tentti ja pakollinen harjoitustyö. Mahdollisuus saada lisäpisteitä harjoitustehtävistä. ',
-        sv: 'Tentamen samt ett obligatoriskt övningsarbete. Räkneövningarna ger möjlighet till tilläggspoäng.' 
+        sv: 'Tentamen samt ett obligatoriskt övningsarbete. Räkneövningarna ger möjlighet till tilläggspoäng.'
       }
     }
   }

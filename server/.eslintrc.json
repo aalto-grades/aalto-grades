@@ -35,6 +35,10 @@
       "error",
       "always"
     ],
+    "object-curly-spacing": [
+      "error",
+      "always"
+    ],
     "max-len": [
       "error",
       {

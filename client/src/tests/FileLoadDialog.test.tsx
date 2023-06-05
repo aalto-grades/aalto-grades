@@ -90,7 +90,7 @@ describe('FileLoadDialog test with proper csv', () => {
 
     userEvent.click(cancelButton);
     expect(dialogTitle).not.toBeVisible();
-    
+
   });
 
   test('FileLoadDialog should show error when trying to submit without selecting file', async () => {
@@ -191,10 +191,10 @@ describe('FileLoadDialog test where server does not accept the file', () => {
         target: { files: [file] },
       })
     );
-    
+
     const confirmButton = getByText('Confirm');
     userEvent.click(confirmButton);
-    
+
     expect(dialogTitle).toBeVisible();
     const errorInstructions = await findByText('The input file cannot be processed due to the following issues that must be addressed and fixed:');
     expect(errorInstructions).toBeVisible();
@@ -214,7 +214,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
 
     // Show all errors button should be visible.
     const showErrorsButton = screen.queryByText('Show all');
-    expect(showErrorsButton).toBeDefined();  
+    expect(showErrorsButton).toBeDefined();
   });
 
   test(
@@ -250,10 +250,10 @@ describe('FileLoadDialog test where server does not accept the file', () => {
           }
         }
       });
-    
+
       const confirmButton = getByText('Confirm');
       userEvent.click(confirmButton);
-    
+
       expect(dialogTitle).toBeVisible();
       const errorInstructions = await findByText('The input file cannot be processed due to the following issues that must be addressed and fixed:');
       expect(errorInstructions).toBeVisible();
@@ -265,9 +265,9 @@ describe('FileLoadDialog test where server does not accept the file', () => {
 
       // Additional errors text should not be rendered.
       const additionalErrors = screen.queryByText('more errors found');
-      expect(additionalErrors).toBeNull();  
+      expect(additionalErrors).toBeNull();
 
       const showErrorsButton = screen.queryByText('Show all');
-      expect(showErrorsButton).toBeNull(); 
+      expect(showErrorsButton).toBeNull();
     });
 });

@@ -26,7 +26,7 @@ const CourseResultsTableToolbar = (
   const [showSisuDialog, setShowSisuDialog] = useState<any>(false);
 
   const actionOptions = [
-    { description: 'Import from file', handleClick: () => setShowFileDialog(true) }, 
+    { description: 'Import from file', handleClick: () => setShowFileDialog(true) },
     { description: 'Import from A+', handleClick: () => {} }
   ];
 
@@ -72,14 +72,14 @@ const CourseResultsTableToolbar = (
           <Button variant='outlined' onClick={() => setShowSisuDialog(true)}>Export to Sisu CSV</Button>
           <Button variant='outlined' onClick={() => calculateFinalGrades()}>Calculate final grades</Button>
           <MenuButton label='Import grades' options={actionOptions} />
-          <SisuExportDialog 
-            open={showSisuDialog} 
+          <SisuExportDialog
+            open={showSisuDialog}
             handleClose={handleCloseSisuDialog}
           />
-          <FileLoadDialog 
-            instanceId={Number(instanceId)} 
-            open={showFileDialog} 
-            handleClose={handleCloseFileDialog} 
+          <FileLoadDialog
+            instanceId={Number(instanceId)}
+            open={showFileDialog}
+            handleClose={handleCloseFileDialog}
             returnImportedGrades={updateGrades}
           />
         </Box>

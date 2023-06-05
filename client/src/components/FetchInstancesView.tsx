@@ -28,7 +28,7 @@ const FetchInstancesView = () => {
           Instances Found from SISU
         </Typography>
         <Typography variant="h3" sx={{ flexGrow: 1, mb: 4, textAlign: 'left' }}>
-          Select the instance you wish to add 
+          Select the instance you wish to add
         </Typography>
         <FetchedInstances courseId={courseId} info={instances} />
         <Divider sx={{ my: 5 }}/>

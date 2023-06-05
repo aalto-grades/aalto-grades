@@ -34,5 +34,5 @@ InstancesTable.propTypes = {
   current: PropTypes.number,
   onClick: PropTypes.func
 };
-    
+
 export default InstancesTable;

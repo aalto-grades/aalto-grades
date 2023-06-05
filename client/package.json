@@ -34,8 +34,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "npx eslint `find . -name '*.js' -not -path './node_modules/*'`",
-    "lint:fix": "npx eslint `find . -name '*.js' -not -path './node_modules/*'` --fix"
+    "lint": "npx eslint `find . -name '*.tsx' -not -path './node_modules/*'`",
+    "lint:fix": "npx eslint `find . -name '*.tsx' -not -path './node_modules/*'` --fix"
   },
   "eslintConfig": {
     "extends": [

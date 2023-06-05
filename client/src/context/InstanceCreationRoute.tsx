@@ -35,7 +35,7 @@ export const InstanceCreationRoute = () => {
       startingPeriod, setStartingPeriod,
       endingPeriod, setEndingPeriod
     }
-  ), [courseType, startDate, endDate, teachers, stringMinCredits, stringMaxCredits, gradingScale, 
+  ), [courseType, startDate, endDate, teachers, stringMinCredits, stringMaxCredits, gradingScale,
     startingPeriod, endingPeriod, addedAttainments, suggestedAttainments, attainmentIncrementId]
   );
 

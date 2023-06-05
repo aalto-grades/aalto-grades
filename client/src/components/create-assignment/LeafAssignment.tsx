@@ -28,19 +28,19 @@ const nameData = {
   fieldId: 'attainmentName',
   fieldLabel: 'New Name'
 };
-  
+
 const dateData = {
   fieldId: 'attainmentDate',
   fieldLabel: 'Date'
 };
-    
+
 const expiryData = {
   fieldId: 'expiryDate',
   fieldLabel: 'Expiry Date'
 };
 
 /* String textfields for the formula attributes. These attributes affect the parent attainment's grade
-   The textfield IDs are of format 'attribute0', 'attribute1' and so on. 
+   The textfield IDs are of format 'attribute0', 'attribute1' and so on.
    The numbers in the end are used to fill in the correct values of the 'formulaAttribute' property of an attainment.
    This is considered in the function of the nested component StringTextField.
 */
@@ -49,13 +49,14 @@ const AttributeTextFields = ({ formulaAttributeNames, indices, setAttainments, a
     formulaAttributeNames.map((attribute) => {
       const attributeLabel = formulaService.getAttributeLabel(attribute);
       return(
-        <StringTextField 
+        <StringTextField
           key={attribute}
           fieldData={{ fieldId: 'attribute_' + attribute, fieldLabel: attributeLabel }}
-          indices={indices} 
-          setAttainments={setAttainments} 
+          indices={indices}
+          setAttainments={setAttainments}
           attainments={attainments}
-        />);})
+        />);
+    })
   );
 };
 
@@ -70,7 +71,7 @@ AttributeTextFields.propTypes = {
 const LeafAssignment = ({ indices, addSubAttainments, setAttainments, attainments, removeAttainment, formulaAttributeNames }) => {
 
   // Functions and varibales for handling the change of the value in the 'Name' (category) textfield.
-  // If the value is 'Other', then the 'New Name' textfield is displayed; 
+  // If the value is 'Other', then the 'New Name' textfield is displayed;
   // otherwise the name is the same as the category
   const handleChange = (event) => {
     const value = event.target.value;
@@ -125,13 +126,13 @@ const LeafAssignment = ({ indices, addSubAttainments, setAttainments, attainment
       bgcolor: '#FFFFFF',
       display: 'flex',
       flexDirection: 'column',
-      boxShadow: 2, 
+      boxShadow: 2,
       borderRadius: 2,
       px: 3,
       py: 1,
       mb: 1
     }}>
-      <Box sx={{ 
+      <Box sx={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
         gridTemplateRows: 'auto',
@@ -139,14 +140,14 @@ const LeafAssignment = ({ indices, addSubAttainments, setAttainments, attainment
         rowGap: 1,
         mt: 2,
       }}>
-        <TextField 
+        <TextField
           id={categoryData.fieldId}
           label={categoryData.fieldLabel}
-          variant='standard' 
+          variant='standard'
           value={getValue(categoryData)}
           onChange={(event) => handleChange(event)}
-          InputLabelProps={{ shrink: true }} 
-          sx={{ textAlign: 'left' }} 
+          InputLabelProps={{ shrink: true }}
+          sx={{ textAlign: 'left' }}
           select>
           <MenuItem value='Assignments'>Assignments</MenuItem>
           <MenuItem value='Exam'>Exam</MenuItem>
@@ -162,8 +163,8 @@ const LeafAssignment = ({ indices, addSubAttainments, setAttainments, attainment
             <AttributeTextFields formulaAttributeNames={formulaAttributeNames} indices={indices} setAttainments={setAttainments} attainments={attainments}/>
         }
       </Box>
-      <Box sx={{ 
-        display: 'flex', 
+      <Box sx={{
+        display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between'
@@ -172,7 +173,7 @@ const LeafAssignment = ({ indices, addSubAttainments, setAttainments, attainment
           <Button size='small' sx={{ my: 1 }} onClick={handleConfDialogOpen}>
             Delete
           </Button>
-          : 
+          :
           <Box sx={{ width: '1px' }}/> }
         <ConfirmationDialog
           title={'Sub Study Attainments'}

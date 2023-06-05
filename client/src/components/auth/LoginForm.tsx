@@ -9,7 +9,7 @@ import TextField from '@mui/material/TextField';
 
 const LoginForm = ({ loginUser }) => {
 
-  const [email, setEmail] = useState<any>(''); 
+  const [email, setEmail] = useState<any>('');
   const [password, setPassword] = useState<any>('');
 
   const handleSubmit = (event) => {

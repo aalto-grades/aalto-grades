@@ -32,7 +32,7 @@ describe('Tests for FetchInstancesView components', () => {
   };
 
   test('FetchInstancesView should contain all of the appropriate components', async () => {
-    
+
     renderFetchInstancesView();
 
     await waitFor(() => {
@@ -54,7 +54,7 @@ describe('Tests for FetchInstancesView components', () => {
       expect(mockType).toBeInTheDocument();
       expect(mockDate).toBeInTheDocument();
     });
-  
+
   });
 
 });

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 const mockInstances = [
-  { 
+  {
     id: 1,
     startingPeriod: '2021-2022 Autumn I-II',
     endingPeriod: '2022-2023 Autumn I-II',
@@ -32,7 +32,7 @@ const mockInstances = [
       }
     }
   },
-  { 
+  {
     id: 2,
     startingPeriod: '2021-2022 Autumn I-II',
     endingPeriod: '2022-2023 Autumn I-II',
@@ -60,7 +60,7 @@ const mockInstances = [
       }
     }
   },
-  { 
+  {
     id: 3,
     startingPeriod: '2019-2020 Autumn I-II',
     endingPeriod: '2020-2021 Autumn I-II',
@@ -88,7 +88,7 @@ const mockInstances = [
       }
     }
   },
-  { 
+  {
     id: 4,
     startingPeriod: '2019-2020 Autumn I-II',
     endingPeriod: '2020-2021 Autumn I-II',
@@ -117,21 +117,21 @@ const mockInstances = [
     }
   },
   {
-    id: 5, 
-    startingPeriod: '-', 
-    endingPeriod: '-', 
+    id: 5,
+    startingPeriod: '-',
+    endingPeriod: '-',
     startDate: new Date(2023, 2, 6),
     endDate: new Date(2023, 5, 19),
-    minCredits: 5, 
-    maxCredits: 5, 
+    minCredits: 5,
+    maxCredits: 5,
     type: 'Lecture',
-    gradingScale: 'General Scale, 0-5', 
+    gradingScale: 'General Scale, 0-5',
     teachersInCharge: [
       'Kerttu Maaria Pollari-Malmi'
     ],
     courseData: {
       id: 2,
-      courseCode: 'CS-A1150', 
+      courseCode: 'CS-A1150',
       department: {
         en: 'Department of Computer Science',
         fi: 'Tietotekniikan laitos',

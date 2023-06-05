@@ -121,11 +121,11 @@ function App() {
     <ThemeProvider theme={theme}>
       <AppBar position="static">
         <Toolbar>
-          <Link 
-            href="/" 
-            underline="none" 
-            color="white" 
-            variant="h5" 
+          <Link
+            href="/"
+            underline="none"
+            color="white"
+            variant="h5"
             align="left"
             sx={{ mr: 2, flexGrow: 1 }}
           >

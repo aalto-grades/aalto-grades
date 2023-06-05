@@ -58,7 +58,7 @@ const SelectFormulaView = () => {
         <SelectFormulaForm
           attainments={attainments}
           formulas={formulas}
-          navigateToCourseView={navigateToCourseView} 
+          navigateToCourseView={navigateToCourseView}
           navigateToAttributeSelection={navigateToAttributeSelection}
         />
       </Box>

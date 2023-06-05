@@ -33,7 +33,7 @@ describe('Tests for Login component', () => {
     expect(studentIdField).toBeDefined();
     expect(signupButton).toBeDefined();
     expect(textElement).toBeDefined();
-    
+
   });
 
   test('LoginForm should allow a user to submit their credentials', () => {
@@ -55,7 +55,7 @@ describe('Tests for Login component', () => {
     userEvent.click(signupButton);
 
     // Teacher should be the default role if no role has been specified
-    
+
     expect(mockSignupUser).toHaveBeenCalledTimes(1);
     expect(mockSignupUser).toHaveBeenCalledWith({
       name: 'Test User',

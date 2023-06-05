@@ -71,17 +71,19 @@ const CourseView = () => {
   return(
     <Box sx={{ mx: -2.5 }}>
       {courseDetails && currentInstance && instances &&
-        <> 
+        <>
           <Typography variant='h1' align='left'>{courseDetails.courseCode}</Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', mb: 4, columnGap: 6 }}>
             <Typography variant='h2' align='left'>{courseDetails.name.en}</Typography>
             { /* Only admins and teachers are allowed to create a new instance */
-              (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
-            <Button 
+              (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') &&
+            <Button
               id='ag_new_instance_btn'
-              size='large' 
-              variant='contained' 
-              onClick={() => { navigate(`/${courseId}/fetch-instances/${courseDetails.courseCode}`); }}
+              size='large'
+              variant='contained'
+              onClick={() => {
+                navigate(`/${courseId}/fetch-instances/${courseDetails.courseCode}`);
+              }}
             >  {/* TODO: Check path */}
               New instance
             </Button>
@@ -94,14 +96,14 @@ const CourseView = () => {
               </div>
             </Grow>
             { /* a different attainment component will be created for students */
-              (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') && 
+              (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') &&
               <Grow in={animation} style={{ transformOrigin: '0 0 0' }} {...(animation? { timeout: 1000 } : { timeout: 0 })}>
                 <div style={{ width: '100%' }}>
-                  <Assignments 
-                    attainments={mockAttainmentsClient} 
-                    courseId={courseId} 
-                    formula={'Weighted Average'} 
-                    instance={currentInstance} 
+                  <Assignments
+                    attainments={mockAttainmentsClient}
+                    courseId={courseId}
+                    formula={'Weighted Average'}
+                    instance={currentInstance}
                     handleAddPoints={handleClickOpen}
                   /> {/* TODO: Retrieve real formula */}
                 </div>

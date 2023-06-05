@@ -38,7 +38,7 @@ describe('Tests for SelectFormulaView components', () => {
   };
 
   test('SelectFormulaView should contain all of the appropriate components when calculating total grade', async () => {
-    
+
     renderSelectFormulaView();
 
     await waitFor(() => {
@@ -64,7 +64,7 @@ describe('Tests for SelectFormulaView components', () => {
       expect(specifyAttributesButton).toBeInTheDocument();
       expect(skipAttributesButton).toBeInTheDocument();
     });
-   
+
   });
 
   test('SelectFormulaView should render an alert if "Specify attributes" is clicked without selecting any attainments or a formula', async () => {
@@ -83,5 +83,5 @@ describe('Tests for SelectFormulaView components', () => {
     });
 
   });
-  
+
 });

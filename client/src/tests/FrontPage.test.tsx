@@ -31,7 +31,7 @@ describe('Tests for FrontPage component', () => {
       </BrowserRouter>
     );
   };
-  
+
   test('FrontPage should render current courses and previous courses regardless of user role', async () => {
     const auth = { role: null };
     renderFrontPage(auth);
@@ -47,7 +47,7 @@ describe('Tests for FrontPage component', () => {
   });
 
   test('FrontPage should not render Create New Course for teacher', async () => {
-  
+
     const auth = { role: 'TEACHER' };
     renderFrontPage(auth);
     await waitFor(() => expect(screen.queryByText('Create New Course')).not.toBeInTheDocument());
@@ -55,15 +55,15 @@ describe('Tests for FrontPage component', () => {
 
 
   test('FrontPage should render Create New Course for admin', async () => {
-    
+
     const auth = { role: 'SYSADMIN' };
     renderFrontPage(auth);
     await waitFor(() => expect(screen.queryByText('Create New Course')).toBeInTheDocument());
-    
+
   });
 
   test('FrontPage should not render Create New Course for students', async () => {
-    
+
     const auth = { role: 'STUDENT' };
     renderFrontPage(auth);
     await waitFor(() => expect(screen.queryByText('Create New Course')).not.toBeInTheDocument());

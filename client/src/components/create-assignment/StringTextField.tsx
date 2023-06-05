@@ -12,7 +12,7 @@ import assignmentServices from '../../services/assignments';
 
 const StringTextField = ({ fieldData, indices, attainments, setAttainments }) => {
 
-  // Functions for handling the change of the values in the 'New Name' textfield 
+  // Functions for handling the change of the values in the 'New Name' textfield
   // and the textfields that represent formula attributes
   const handleChange = (event) => {
     const value = event.target.value;
@@ -44,7 +44,7 @@ const StringTextField = ({ fieldData, indices, attainments, setAttainments }) =>
       type='text'
       key={fieldData.fieldId}
       id={fieldData.fieldId}
-      variant='standard' 
+      variant='standard'
       label={fieldData.fieldLabel}
       InputLabelProps={{ shrink: true }}
       margin='normal'
@@ -57,7 +57,7 @@ const StringTextField = ({ fieldData, indices, attainments, setAttainments }) =>
     />
   );
 };
-  
+
 StringTextField.propTypes = {
   fieldData: PropTypes.object,
   fieldId: PropTypes.string,

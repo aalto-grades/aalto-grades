@@ -57,16 +57,16 @@ const AccordionSummary = styled<any>((props) => (
 const AccordionDetails = ({ out, children }) => {
   const margin = out ? '21px' : '60px';
   return (
-    <Box sx={{ 
-      display: 'flex', 
-      flexDirection: 'row', 
-      justifyContent: 'flex-start', 
-      alignItems: 'center', 
-      marginLeft: margin, 
-      columnGap: '15px', 
-      pr: '21px', 
-      minHeight: '36px', 
-      maxHeight: '36px' 
+    <Box sx={{
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+      marginLeft: margin,
+      columnGap: '15px',
+      pr: '21px',
+      minHeight: '36px',
+      maxHeight: '36px'
     }}>
       <PanoramaFishEyeIcon sx={{ fontSize: '0.6rem', display: 'block', margin: '0px 0px 0px 2px' }} />
       {children}
@@ -81,16 +81,16 @@ AccordionDetails.propTypes = {
 
 const AssignmentText = ({ name, formulaId }) => {
   return (
-    <Box sx={{ display: 'flex', 
-      flexDirection: 'row', 
-      flexWrap: 'wrap', 
-      justifyContent: 'space-between', 
-      alignItems: 'center', 
-      width: '100%', 
-      columnGap: 3 
+    <Box sx={{ display: 'flex',
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      width: '100%',
+      columnGap: 3
     }}>
       <Typography variant='body2'>{name}</Typography>
-      { formulaId 
+      { formulaId
         && <Typography variant='caption' align='left'>{'Formula: ' + formulasService.getFormulaName(formulaId)}</Typography>
       }
     </Box>
@@ -113,7 +113,7 @@ const CustomAccordion = ({ attainments, attainmentKey }) => {
     const copySet = new Set([...set]);
     return copySet.add(item);
   };
-  
+
   const deleteFromSet = (item, set) => {
     const copySet = new Set([...set]);
     copySet.delete(item);
@@ -131,15 +131,15 @@ const CustomAccordion = ({ attainments, attainmentKey }) => {
     <>
       { attainments.map(attainment => {
         return (
-          <Accordion 
-            key={attainment[attainmentKey] + 'accordion'} 
-            expanded={expanded.has(attainment[attainmentKey])} 
+          <Accordion
+            key={attainment[attainmentKey] + 'accordion'}
+            expanded={expanded.has(attainment[attainmentKey])}
             onChange={handleChange(attainment[attainmentKey])}
           >
-            <AccordionSummary 
-              aria-controls={attainment[attainmentKey] + '-content'} 
-              id={attainment[attainmentKey] + '-header'} 
-              expanded={expanded.has(attainment[attainmentKey]).toString()} 
+            <AccordionSummary
+              aria-controls={attainment[attainmentKey] + '-content'}
+              id={attainment[attainmentKey] + '-header'}
+              expanded={expanded.has(attainment[attainmentKey]).toString()}
               nowselected={(selected === attainment[attainmentKey]).toString()}
             >
               <AssignmentText name={attainment.name} formulaId={attainment.formulaId} />
@@ -150,7 +150,7 @@ const CustomAccordion = ({ attainments, attainmentKey }) => {
                   <AccordionDetails key={subAttainment[attainmentKey] + 'details'}>
                     <AssignmentText name={subAttainment.name} formulaId={subAttainment.formulaId} />
                   </AccordionDetails>
-                  : 
+                  :
                   <Box key={subAttainment[attainmentKey] + 'subAccordion'} sx={{ pl: '39px' }}>
                     {<CustomAccordion attainments={[subAttainment]} attainmentKey={attainmentKey}/>}
                   </Box>

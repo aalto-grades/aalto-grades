@@ -10,10 +10,10 @@ import textFormatServices from '../../services/textFormat';
 
 const InstanceTableRow = ({ instance, onClick, selected }) => {
   const { id, startDate, endDate, type } = instance;
-    
+
   return(
     <TableRow
-      key={id} 
+      key={id}
       hover={true}
       selected={selected}
       onClick={() => onClick(instance)}
@@ -24,7 +24,7 @@ const InstanceTableRow = ({ instance, onClick, selected }) => {
     </TableRow>
   );
 };
-    
+
 InstanceTableRow.propTypes = {
   instance: PropTypes.object,
   period: PropTypes.string,

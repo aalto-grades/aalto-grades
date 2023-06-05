@@ -24,7 +24,7 @@ describe('Tests for button component displaying user data and logout', () => {
       </BrowserRouter>
     );
   };
-  
+
   test('User button should display the currently logged in users name', async () => {
     const auth = { id: 1, role: 'TEACHER', name: 'John Doe' };
     renderButton(auth);

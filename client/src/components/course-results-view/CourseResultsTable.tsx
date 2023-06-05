@@ -131,8 +131,8 @@ const CourseResultsTable = ({ attainments, students, calculateFinalGrades, updat
             </TableBody>
           </Table>
         </TableContainer>
-        <Box sx={{ 
-          display: 'flex', 
+        <Box sx={{
+          display: 'flex',
           flexDirection: 'row',
           flexWrap: 'wrap',
           justifyContent: 'space-between',

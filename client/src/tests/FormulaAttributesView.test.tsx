@@ -46,7 +46,7 @@ describe('Tests for FormulaAttributesView components', () => {
       expect(goBackButton).toBeInTheDocument();
       expect(confirmButton).toBeInTheDocument();
     });
-   
+
   });
 
   test('Formula attributes view should render a message if "Confirm" is clicked', async () => {
@@ -63,5 +63,5 @@ describe('Tests for FormulaAttributesView components', () => {
     });
 
   });
-  
+
 });

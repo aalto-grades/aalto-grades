@@ -31,5 +31,5 @@ const CourseTable = ({ data }) => {
 CourseTable.propTypes = {
   data: PropTypes.array
 };
-    
+
 export default CourseTable;

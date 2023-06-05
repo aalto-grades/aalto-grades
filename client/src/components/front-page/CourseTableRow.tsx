@@ -16,12 +16,14 @@ const CourseTableRow = ({ course }) => {
   return(
     <TableRow
       id={`ag_see_instances_tr_${id}`}
-      key={id} 
+      key={id}
       hover={true}
-      onClick={() => { navigate('/course-view/' + id); }}
+      onClick={() => {
+        navigate('/course-view/' + id);
+      }}
     >
       <TableCell>
-        <Link 
+        <Link
           href={'/course-view/' + id}
           underline="hover"
           color="inherit"

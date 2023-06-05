@@ -20,7 +20,10 @@ import formulasService from '../../services/formulas';
 
 // An Assignmnet component with subAttainments and a formula
 
-const ParentAssignment = ({ indices, addSubAttainments, setAttainments, attainments, removeAttainment, formulaAttributeNames, temporaryId, setIncrementId }) => {
+const ParentAssignment = ({
+  indices, addSubAttainments, setAttainments, attainments, removeAttainment,
+  formulaAttributeNames, temporaryId, setIncrementId
+}) => {
   let navigate = useNavigate();
 
   // Functions and varibales for opening and closing the list of sub-attainments
@@ -33,7 +36,7 @@ const ParentAssignment = ({ indices, addSubAttainments, setAttainments, attainme
   /* Functions to get the formula attributes.
      formulaId specifies the formula that is used to calculate this assignmnet's garde,
      subFormulaAttributeNames are the attributes that need to be specified for the direct sub attainments of this attainments,
-     so that the grade for this attainment can be calculated. 
+     so that the grade for this attainment can be calculated.
      Observe that formulaAttributeNames that is as a parameter for this component are the attributes that need to specified for this assignmnet,
      so that the grade of this attainment's parent attainment can be calculated.
   */
@@ -60,17 +63,17 @@ const ParentAssignment = ({ indices, addSubAttainments, setAttainments, attainme
       <LeafAssignment
         indices={indices}
         addSubAttainments={addSubAttainments}
-        attainments={attainments} 
-        setAttainments={setAttainments} 
+        attainments={attainments}
+        setAttainments={setAttainments}
         removeAttainment={removeAttainment}
         formulaAttributeNames={formulaAttributeNames}
       />
       <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-        {open ? 
+        {open ?
           <IconButton size='small' onClick={handleClick} sx={{ height: '32px', width: '32px', mr: 1  }}>
             <ExpandLess sx={{ color: 'primary.main' }}/>
           </IconButton>
-          : 
+          :
           <IconButton size='small' onClick={handleClick} sx={{ height: '32px', width: '32px', mr: 1 }}>
             <ExpandMore sx={{ color: 'hoverGrey3' }}/>
           </IconButton>}
@@ -83,11 +86,11 @@ const ParentAssignment = ({ indices, addSubAttainments, setAttainments, attainme
           <Collapse in={open} timeout='auto' unmountOnExit>
             <List disablePadding>
               {assignmentServices.getSubAttainments(indices, attainments).map((item, i) => (
-                <Assignment 
+                <Assignment
                   indices={indices.concat(i)}
                   key={i}
-                  attainments={attainments} 
-                  setAttainments={setAttainments} 
+                  attainments={attainments}
+                  setAttainments={setAttainments}
                   removeAttainment={removeAttainment}
                   formulaAttributeNames={subFormulaAttributeNames ? subFormulaAttributeNames : []}
                   temporaryId={temporaryId}

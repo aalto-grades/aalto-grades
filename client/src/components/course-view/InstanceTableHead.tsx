@@ -21,7 +21,7 @@ const headCells = [{
   label: 'Type',
 }
 ];
-  
+
 const InstanceTableHead = () => {
   return (
     <TableRow>

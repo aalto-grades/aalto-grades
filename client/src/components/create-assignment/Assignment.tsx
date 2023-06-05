@@ -8,24 +8,25 @@ import LeafAssignment from './LeafAssignment';
 import ParentAssignment from './ParentAssignment';
 import assignmentServices from '../../services/assignments';
 
-// Parent component for the components LeafAssignment and ParentAssignment 
+// Parent component for the components LeafAssignment and ParentAssignment
 
 const Assignment = ({ indices, attainments, setAttainments, removeAttainment, formulaAttributeNames, temporaryId, setIncrementId }) => {
 
   const addSubAttainments = (numOfAttainments) => {
     const [updatedAttainments, newTemporaryId] = assignmentServices.addSubAttainments(indices, attainments, numOfAttainments, temporaryId);
     setAttainments(updatedAttainments);
-    if (setIncrementId) setIncrementId(newTemporaryId);
+    if (setIncrementId)
+      setIncrementId(newTemporaryId);
   };
-  
+
   return (
     <>
       {assignmentServices.getSubAttainments(indices, attainments).length === 0 ?
-        <LeafAssignment 
+        <LeafAssignment
           indices={indices}
           addSubAttainments={addSubAttainments}
-          attainments={attainments} 
-          setAttainments={setAttainments} 
+          attainments={attainments}
+          setAttainments={setAttainments}
           removeAttainment={removeAttainment}
           formulaAttributeNames={formulaAttributeNames}
         />
@@ -33,8 +34,8 @@ const Assignment = ({ indices, attainments, setAttainments, removeAttainment, fo
         <ParentAssignment
           indices={indices}
           addSubAttainments={addSubAttainments}
-          attainments={attainments} 
-          setAttainments={setAttainments} 
+          attainments={attainments}
+          setAttainments={setAttainments}
           removeAttainment={removeAttainment}
           formulaAttributeNames={formulaAttributeNames}
           temporaryId={temporaryId}

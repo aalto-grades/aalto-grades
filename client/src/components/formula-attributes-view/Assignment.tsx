@@ -19,7 +19,7 @@ const Assignment = ({ attainment, attributes, handleAttributeChange, attainmentI
           <TextField
             type='text'
             key={attribute}
-            variant='standard' 
+            variant='standard'
             label={attributeLabel}
             InputLabelProps={{ shrink: true }}
             margin='normal'
@@ -29,7 +29,8 @@ const Assignment = ({ attainment, attributes, handleAttributeChange, attainmentI
             }}
             onChange={event => handleAttributeChange(attainmentIndex, attributeIndex, event)}
           />
-        );})
+        );
+      })
     );
   };
 
@@ -38,7 +39,7 @@ const Assignment = ({ attainment, attributes, handleAttributeChange, attainmentI
       bgcolor: '#FFFFFF',
       display: 'flex',
       flexDirection: 'column',
-      boxShadow: 2, 
+      boxShadow: 2,
       borderRadius: 2,
       px: 3,
       pt: 1,
@@ -50,7 +51,7 @@ const Assignment = ({ attainment, attributes, handleAttributeChange, attainmentI
       <Typography sx={{ fontWeight: 'bold', my: 1 }} align='left'>
         {attainment.name}
       </Typography>
-      <Box sx={{ 
+      <Box sx={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
         gridTemplateRows: 'auto',

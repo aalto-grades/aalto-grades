@@ -31,7 +31,7 @@ const CourseResultsTableHead = (props) => {
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
-  
+
   return (
     <TableHead>
       <TableRow>
@@ -60,7 +60,7 @@ const CourseResultsTableHead = (props) => {
     </TableHead>
   );
 };
-  
+
 CourseResultsTableHead.propTypes = {
   onRequestSort: PropTypes.func.isRequired,
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,

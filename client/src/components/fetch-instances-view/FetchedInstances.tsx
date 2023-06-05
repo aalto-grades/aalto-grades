@@ -25,19 +25,21 @@ const InstanceBox = ({ courseId, instance }) => {
   const { sisuCourseInstanceId, startDate, endDate, type } = instance;
 
   return(
-    <HoverBox 
+    <HoverBox
       className='ag_fetched_instance_option'
-      sx={{ 
-        display: 'flex', 
-        alignItems: 'flex-start',  
-        flexDirection: 'row', 
+      sx={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        flexDirection: 'row',
         justifyContent: 'space-around',
-        boxShadow: 2, 
+        boxShadow: 2,
         borderRadius: 2,
         my: 1,
         p: 3,
       }}
-      onClick={() => { navigate('/' + courseId + '/edit-instance/' + sisuCourseInstanceId); }}>
+      onClick={() => {
+        navigate('/' + courseId + '/edit-instance/' + sisuCourseInstanceId);
+      }}>
       <LightLabelBoldValue label='Type' value={textFormatServices.formatCourseType(type)} />
       <Box sx={{ mx: 2 }}/>
       <LightLabelBoldValue label='Starting Date' value={textFormatServices.formatDateString(startDate)} />
@@ -45,7 +47,7 @@ const InstanceBox = ({ courseId, instance }) => {
     </HoverBox>
   );
 };
-  
+
 InstanceBox.propTypes = {
   courseId: PropTypes.string,  // Once courseId is fixed to courseId from courseCode, change to number
   instance: PropTypes.object,
@@ -61,7 +63,7 @@ const FetchedInstances = ({ courseId, info }) => {
         .slice()
         .map((instance) => (
           <InstanceBox courseId={courseId} instance={instance} key={instance.sisuCourseInstanceId}/>
-        ))}        
+        ))}
     </Box>
   );
 };

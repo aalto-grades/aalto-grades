@@ -19,16 +19,16 @@ const TextFieldBox = ({ fieldData, setFunction }) => {
   const theme = useTheme();
 
   return(
-    <Box sx={{ 
-      display: 'flex', 
-      alignItems: 'flex-start',  
-      flexDirection: 'column', 
-      boxShadow: 2, 
+    <Box sx={{
+      display: 'flex',
+      alignItems: 'flex-start',
+      flexDirection: 'column',
+      boxShadow: 2,
       borderRadius: 2,
       my: 2,
       p: 2
     }}>
-      <TextField id={fieldId} type={fieldId} label={fieldLabel} variant='standard' color='primary' 
+      <TextField id={fieldId} type={fieldId} label={fieldLabel} variant='standard' color='primary'
         sx={{ my: 1 }}
         InputLabelProps={{
           shrink: true,

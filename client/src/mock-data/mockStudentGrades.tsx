@@ -466,5 +466,5 @@ const mockStudentGrades = [
     'finalGrade': undefined
   }
 ];
-  
+
 export default mockStudentGrades;

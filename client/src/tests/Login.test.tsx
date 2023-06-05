@@ -44,7 +44,7 @@ describe('Tests for Login and LoginForm components', () => {
     userEvent.type(emailField, 'test@email.com');
     userEvent.type(passwordField, 'secret');
     userEvent.click(loginButton);
-    
+
     expect(mockLoginUser).toHaveBeenCalledTimes(1);
     expect(mockLoginUser).toHaveBeenCalledWith({
       email: 'test@email.com',

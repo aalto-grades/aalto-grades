@@ -9,7 +9,7 @@ import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import InstanceSummaryView from '../components/InstanceSummaryView';
 import instancesService from '../services/instances';
-import assignmentServices from '../services/assignments'; 
+import assignmentServices from '../services/assignments';
 import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 
 jest.mock('../services/instances');
@@ -18,7 +18,7 @@ afterEach(cleanup);
 
 const mockContextWithoutAttainments = {
   addedAttainments: [],
-  courseType: undefined, 
+  courseType: undefined,
   startDate: '2023-05-06',
   endDate: '2024-05-06',
   teachers: [],
@@ -31,7 +31,7 @@ const mockContextWithoutAttainments = {
 
 const mockContextWithAttainments = {
   addedAttainments: [{ ...mockAttainmentsClient[2], temporaryId: 1, date: '01 Jan 1970 00:00:00 GMT', expiryDate: '01 Jan 1971 00:00:00 GMT' }],
-  courseType: undefined, 
+  courseType: undefined,
   startDate: '2023-05-06',
   endDate: '2024-05-06',
   teachers: [],
@@ -164,7 +164,9 @@ describe('Test InstanceSummaryView components when some attainments and successf
     userEvent.click(createButton);
 
     expect(await findByText('Instance created successfully.')).toBeInTheDocument();
-    expect(await findByText('Something went wrong while adding attainments. Redirecting to course page in 30 seconds. Attainments can be modified there.')).toBeInTheDocument();
+    expect(await findByText(
+      'Something went wrong while adding attainments. Redirecting to course page in 30 seconds. Attainments can be modified there.'
+    )).toBeInTheDocument();
   });
 
 });

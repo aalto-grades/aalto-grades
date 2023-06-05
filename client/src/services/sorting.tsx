@@ -18,7 +18,7 @@ const sortByCode = (a, b) => {
 // used sort dates in descending order
 const sortByDate = (a, b) => {
   const order = a - b;
-  return order < 0 ? 1 : (order > 0 ? -1 : 0); 
+  return order < 0 ? 1 : (order > 0 ? -1 : 0);
 };
 
 // Three following functions are used by CourseResultsTable for sortin the table

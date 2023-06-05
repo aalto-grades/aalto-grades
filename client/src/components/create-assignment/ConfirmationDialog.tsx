@@ -12,7 +12,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import Button from '@mui/material/Button';
 
 // A Dialog component for confirming deletion
-   
+
 function ConfirmationDialog({ title, subject, handleClose, open, deleteAttainment, indices, attainments }) {
   return (
     <Dialog open={open} >

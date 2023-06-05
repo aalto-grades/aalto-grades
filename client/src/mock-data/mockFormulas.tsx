@@ -7,7 +7,7 @@ const mockFormulas = [
     id: 1,
     name: 'Weighted average',
     attributes: ['maxPoints', 'minRequiredPoints', 'weight'],
-    codeSnippet: 
+    codeSnippet:
     `
     const weightedAverage = (nums, weights) => {
       const [sum, weightSum] = weights.reduce(
@@ -21,7 +21,7 @@ const mockFormulas = [
       return sum / weightSum;
     };
     `,
-  },  
+  },
 ];
-  
+
 export default mockFormulas;

@@ -86,7 +86,7 @@ describe('Tests for CreateAssignmentView components', () => {
   test('CreateAssignmentView should allow a teacher to create an attainment with a ready category', async () => {
 
     const mockName = mockAttainment.name;
-    
+
     // Mock request from client
     const request = {
       name: mockName,
@@ -225,7 +225,7 @@ describe('Tests for CreateAssignmentView components', () => {
   test('CreateAssignmentView should allow to add an attainment to context during instance creation', async () => {
 
     const mockName = mockAttainment.name;
-    
+
     // Mock request from client
     const request = {
       name: mockName,

@@ -40,7 +40,7 @@ const DateTextField = ({ fieldData, indices, attainments, setAttainments }) => {
       type='date'
       key={fieldData.fieldId}
       id={fieldData.fieldId}
-      variant='standard' 
+      variant='standard'
       label={fieldData.fieldLabel}
       InputLabelProps={{ shrink: true }}
       margin='normal'
@@ -52,7 +52,7 @@ const DateTextField = ({ fieldData, indices, attainments, setAttainments }) => {
     />
   );
 };
-  
+
 DateTextField.propTypes = {
   fieldData: PropTypes.object,
   fieldId: PropTypes.string,

@@ -20,7 +20,7 @@ const CourseResultsView = () => {
   const [alertOpen, setAlertOpen] = useState(false);
   const [messageInfo, setMessageInfo] = useState(undefined);
 
-    
+
   useEffect(() => {
     // TODO: get attainments from backend
     setAttainments(mockAttainmentsClient);
@@ -60,7 +60,7 @@ const CourseResultsView = () => {
           { msg: 'Final grades calculated successfully.', severity: 'success' }
         ]);
         setStudents(mockStudentGradesFinal);
-  
+
       } catch (exception) {
         console.log(exception);
         setSnackPack((prev) => [...prev,
@@ -107,7 +107,7 @@ const CourseResultsView = () => {
         updateGrades={updateGrades}
       />
     </Box>
-    
+
   );
 
 };

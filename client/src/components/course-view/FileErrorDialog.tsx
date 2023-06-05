@@ -16,7 +16,7 @@ const gridColumns = [{
   type: 'string',
   width: 500,
 }];
-  
+
 const FileErrorDialog = ({ handleClose, open, errors }) => {
   return (
     <Dialog

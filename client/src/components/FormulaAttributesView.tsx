@@ -9,7 +9,7 @@ import Box from '@mui/material/Box';
 import FormulaAttributesForm from './formula-attributes-view/FormulaAttributesForm';
 
 const FormulaAttributesView = () => {
-  
+
   const { courseId, instanceId } = useParams();
   const navigate = useNavigate();
 

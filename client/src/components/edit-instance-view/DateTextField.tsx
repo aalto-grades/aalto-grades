@@ -21,7 +21,7 @@ const DateTextField = ({ fieldData, value, setFunction, minWidth }) => {
     />
   );
 };
-  
+
 DateTextField.propTypes = {
   fieldData: PropTypes.object,
   value: PropTypes.string,

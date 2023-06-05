@@ -7,14 +7,14 @@ const mockAttainmentsClient = [
     name: 'Exercises',
     category: 'Other',
     date: new Date(2023, 9, 1),
-    expiryDate: new Date(2024, 8, 14), 
+    expiryDate: new Date(2024, 8, 14),
     formulaId: 1,  // formulaId is specified for attainments that have sub-attinments
-    subAttainments: [ 
-      { id: 11, 
+    subAttainments: [
+      { id: 11,
         name: '4 mandatory exercises',
         category: 'Other',
-        date: new Date(2023, 9, 1), 
-        expiryDate: new Date(2024, 8, 14), 
+        date: new Date(2023, 9, 1),
+        expiryDate: new Date(2024, 8, 14),
         formulaId: 1,
         affectCalculation: true,
         formulaAttributes: {
@@ -23,10 +23,10 @@ const mockAttainmentsClient = [
           weight: ''
         },
         subAttainments: [
-          { id: 111, 
+          { id: 111,
             name: 'Exercise 1',
             category: 'Other',
-            date: new Date(2023, 9, 1), 
+            date: new Date(2023, 9, 1),
             expiryDate: new Date(2024, 8, 14),
             affectCalculation: true,
             formulaAttributes: {
@@ -35,11 +35,11 @@ const mockAttainmentsClient = [
               weight: ''
             },
             subAttainments: [],
-          }, 
-          { id: 112, 
+          },
+          { id: 112,
             name: 'Exercise 2',
             category: 'Other',
-            date: new Date(2023, 9, 1), 
+            date: new Date(2023, 9, 1),
             expiryDate: new Date(2024, 8, 14),
             affectCalculation: true,
             formulaAttributes: {
@@ -48,12 +48,12 @@ const mockAttainmentsClient = [
               weight: ''
             },
             subAttainments: [],
-          }, 
-          { id: 113, 
+          },
+          { id: 113,
             name: 'Exercise 3',
             category: 'Other',
-            date: new Date(2023, 9, 1), 
-            expiryDate: new Date(2024, 8, 14), 
+            date: new Date(2023, 9, 1),
+            expiryDate: new Date(2024, 8, 14),
             formulaId: 1,
             affectCalculation: true,
             formulaAttributes: {
@@ -62,10 +62,10 @@ const mockAttainmentsClient = [
               weight: ''
             },
             subAttainments: [
-              { id: 1131, 
+              { id: 1131,
                 name: 'Exercise 3.1',
                 category: 'Other',
-                date: new Date(2023, 9, 1), 
+                date: new Date(2023, 9, 1),
                 expiryDate: new Date(2024, 8, 14),
                 affectCalculation: true,
                 formulaAttributes: {
@@ -74,12 +74,12 @@ const mockAttainmentsClient = [
                   weight: ''
                 },
                 subAttainments: [],
-              }, 
+              },
               { id: 1132,
                 name: 'Exercise 3.2',
                 category: 'Other',
-                date: new Date(2023, 9, 1), 
-                expiryDate: new Date(2024, 8, 14), 
+                date: new Date(2023, 9, 1),
+                expiryDate: new Date(2024, 8, 14),
                 affectCalculation: true,
                 formulaAttributes: {
                   maxPoints: '',
@@ -88,12 +88,12 @@ const mockAttainmentsClient = [
                 },
                 subAttainments: [],
               }
-            ] 
-          }, 
-          { id: 114, 
+            ]
+          },
+          { id: 114,
             name: 'Exercise 4',
             category: 'Other',
-            date: new Date(2023, 9, 1), 
+            date: new Date(2023, 9, 1),
             expiryDate: new Date(2024, 8, 14),
             affectCalculation: true,
             formulaAttributes: {
@@ -103,13 +103,13 @@ const mockAttainmentsClient = [
             },
             subAttainments: [],
           }
-        ] 
+        ]
       },
-      { id: 12, 
-        name: '3 optional exercises', 
+      { id: 12,
+        name: '3 optional exercises',
         category: 'Other',
-        date: new Date(2023, 9, 1), 
-        expiryDate: new Date(2024, 8, 14), 
+        date: new Date(2023, 9, 1),
+        expiryDate: new Date(2024, 8, 14),
         formulaId: 1,
         affectCalculation: false,  // optional exercises don't affect the grade of Exercises
         fformulaAttributes: {
@@ -118,38 +118,12 @@ const mockAttainmentsClient = [
           weight: ''
         },
         subAttainments: [
-          { id: 121, 
+          { id: 121,
             name: 'Exercise 5',
             category: 'Other',
-            date: new Date(2023, 9, 1), 
+            date: new Date(2023, 9, 1),
             expiryDate: new Date(2024, 8, 14),
-            affectCalculation: true,  // The grade for optional exercises is still calculated 
-            formulaAttributes: {
-              maxPoints: '',
-              minRequiredPoints: '',
-              weight: ''
-            },
-            subAttainments: [],
-          }, 
-          { id: 122, 
-            name: 'Exercise 6',
-            category: 'Other',
-            date: new Date(2023, 9, 1), 
-            expiryDate: new Date(2024, 8, 14),
-            affectCalculation: true,  // The grade for optional exercises is still calculated 
-            formulaAttributes: {
-              maxPoints: '',
-              minRequiredPoints: '',
-              weight: ''
-            },
-            subAttainments: [],
-          }, 
-          { id: 123, 
-            name: 'Exercise 7',
-            category: 'Other',
-            date: new Date(2023, 9, 1), 
-            expiryDate: new Date(2024, 8, 14),
-            affectCalculation: true,  // The grade for optional exercses is still calculated 
+            affectCalculation: true,  // The grade for optional exercises is still calculated
             formulaAttributes: {
               maxPoints: '',
               minRequiredPoints: '',
@@ -157,21 +131,47 @@ const mockAttainmentsClient = [
             },
             subAttainments: [],
           },
-        ] 
+          { id: 122,
+            name: 'Exercise 6',
+            category: 'Other',
+            date: new Date(2023, 9, 1),
+            expiryDate: new Date(2024, 8, 14),
+            affectCalculation: true,  // The grade for optional exercises is still calculated
+            formulaAttributes: {
+              maxPoints: '',
+              minRequiredPoints: '',
+              weight: ''
+            },
+            subAttainments: [],
+          },
+          { id: 123,
+            name: 'Exercise 7',
+            category: 'Other',
+            date: new Date(2023, 9, 1),
+            expiryDate: new Date(2024, 8, 14),
+            affectCalculation: true,  // The grade for optional exercses is still calculated
+            formulaAttributes: {
+              maxPoints: '',
+              minRequiredPoints: '',
+              weight: ''
+            },
+            subAttainments: [],
+          },
+        ]
       }
     ]
   },
   { id: 2,
     name: 'Project',
     category: 'Project',
-    date: new Date(2023, 9, 1), 
+    date: new Date(2023, 9, 1),
     expiryDate: new Date(2024, 8, 14),
     subAttainments: [],
   },
   { id: 3,
     name: 'Exam',
     category: 'Exam',
-    date: new Date(2023, 9, 1), 
+    date: new Date(2023, 9, 1),
     expiryDate: new Date(2024, 8, 14),
     subAttainments: [],
   }

@@ -10,7 +10,7 @@ import userService from '../../services/user';
 import useAuth from '../../hooks/useAuth';
 
 const Signup = () => {
-  
+
   const navigate = useNavigate();
   const { setAuth } = useAuth();
   const theme = useTheme();

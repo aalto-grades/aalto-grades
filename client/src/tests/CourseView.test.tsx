@@ -50,11 +50,11 @@ describe('Tests for CourseView component', () => {
 
     await waitFor(() => {
       const instanceInfo = getByText('Instance Details');
-      const teachersInfo = getByText('Teachers in Charge');         
+      const teachersInfo = getByText('Teachers in Charge');
       const attainments = getByText('Study Attainments');
-      const exercises = getByText('Exercises');  
-      const projects = getByText('Project'); 
-      const exams = getAllByText('Exam');  
+      const exercises = getByText('Exercises');
+      const projects = getByText('Project');
+      const exams = getAllByText('Exam');
       const instances = getByText('All Instances');
       const createInstanceButton = getByText('New instance');
       const addAssignmentButton = getByText('Add attainment');
@@ -68,7 +68,7 @@ describe('Tests for CourseView component', () => {
       expect(createInstanceButton).toBeDefined();
       expect(addAssignmentButton).toBeDefined();
     });
-    
+
   });
 
   test('CourseView should not render new instance button, see attendees or allow editing attainments for students', async () => {
@@ -88,7 +88,7 @@ describe('Tests for CourseView component', () => {
     expect(queryByText('Add attainment')).not.toBeInTheDocument();
     expect(queryByText('Edit')).not.toBeInTheDocument();
     expect(queryByText('See attendees')).not.toBeInTheDocument();
-    
+
   });
 
   test('CourseView should allow changing the instance that is displayed in detail', async () => {

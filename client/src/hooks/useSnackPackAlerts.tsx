@@ -15,7 +15,7 @@ To display an alert:
 
 In render:
   <AlertSnackbar messageInfo={messageInfo} setMessageInfo={setMessageInfo} open={alertOpen} setOpen={setAlertOpen} />
-*/ 
+*/
 
 const useSnackPackAlerts = () => {
 

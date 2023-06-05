@@ -20,7 +20,7 @@ const StringTextField = ({ fieldData, value, setFunction }) => {
     />
   );
 };
-  
+
 StringTextField.propTypes = {
   fieldData: PropTypes.object,
   value: PropTypes.string,

@@ -63,13 +63,13 @@ const MenuButton = ({ label, options }) => {
   const renderOptions = (options) => {
     return (
       options.map(option => (
-        <MenuItem 
+        <MenuItem
           className='ag_menu_btn_option'
-          key={option.description} 
+          key={option.description}
           disableRipple
-          onClick={() => { 
-            option.handleClick(); 
-            handleClose(); 
+          onClick={() => {
+            option.handleClick();
+            handleClose();
           }}>
           {option.description}
         </MenuItem>

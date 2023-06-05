@@ -2,7 +2,7 @@
 
 // SPDX-License-Identifier: MIT
 
-// use 'en-GB' to get "20.07.2012, 05:00:00" 
+// use 'en-GB' to get "20.07.2012, 05:00:00"
 // (instead of 'fi-GB' which produces "20.7.2012 klo 5.00.00")
 const formatDateToString = (date) => {
   const string = date.toLocaleString('en-GB').replaceAll('/', '.');
@@ -78,12 +78,12 @@ const convertToServerGradingScale = (gradingScale) => {
   }
 };
 
-export default { 
+export default {
   convertToServerGradingScale,
-  formatDateToString, 
-  formatStringToDate, 
-  formatDateToSlashString, 
-  formatDateString, 
-  formatCourseType, 
-  convertToClientGradingScale 
+  formatDateToString,
+  formatStringToDate,
+  formatDateToSlashString,
+  formatDateString,
+  formatCourseType,
+  convertToClientGradingScale
 };

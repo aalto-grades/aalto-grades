@@ -17,7 +17,7 @@ const LightLabelBoldValue = ({ label, value, small }) => {
     </Box>
   );
 };
-   
+
 LightLabelBoldValue.propTypes = {
   label: PropTypes.string,
   small: PropTypes.bool,

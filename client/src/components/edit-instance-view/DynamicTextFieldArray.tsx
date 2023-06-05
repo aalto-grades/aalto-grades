@@ -14,21 +14,21 @@ const DynamicTextFieldArray = ({ fieldData, values, setFunction }) => {
 
   const addFields = () => {
     setFunction([...values, '']);
-  }; 
-  
+  };
+
   const removeFields = (index) => {
     const fields = [...values];
     fields.splice(index, 1);
     setFunction(fields);
   };
-  
+
   const handleChange = (index, event) => {
     const value = event.target.value;
     const fields = [...values];
     fields[index] = value;
     setFunction(fields);
   };
-  
+
   return(
     <Box sx={{ display: 'flex',  alignItems: 'flex-start', flexDirection: 'column' }}>
       {values.map((item, index) => (
@@ -66,7 +66,7 @@ const DynamicTextFieldArray = ({ fieldData, values, setFunction }) => {
     </Box>
   );
 };
-  
+
 DynamicTextFieldArray.propTypes = {
   values: PropTypes.array,
   fieldData: PropTypes.object,
