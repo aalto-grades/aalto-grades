@@ -71,7 +71,6 @@ User.init(
 
 User.findByEmail = async function (email: string): Promise<User | null> {
   return await User.findOne({
-    attributes: ['id', 'password', 'name'],
     where: {
       email
     }
