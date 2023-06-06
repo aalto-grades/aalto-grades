@@ -161,8 +161,10 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
         my: 3,
         textAlign: 'left'
       }}>
-        <FormControl sx={{ m: 3,  mb: 0 }} component='fieldset' variant='standard'>
-          <FormLabel component='legend' focused={false} sx={{ color: 'secondary.contrastText', mb:1.5 }}>Select the sub study attainments you want to include in the calculation</FormLabel>
+        <FormControl sx={{ m: 3, mb: 0 }} component='fieldset' variant='standard'>
+          <FormLabel component='legend' focused={false} sx={{ color: 'secondary.contrastText', mb: 1.5 }}>
+            Select the sub study attainments you want to include in the calculation
+          </FormLabel>
           <FormGroup>
             {attainmentCheckboxes()}
           </FormGroup>

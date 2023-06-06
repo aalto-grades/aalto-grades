@@ -104,7 +104,9 @@ const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades })
                 width: 283,
                 boxShadow: '0px 3px 4px rgba(0, 0, 0, 0.25)'
               }}
-              alt="A picture of a sheet with three columns. First one is student numbers (StudentNo), the next is points from attainment C3I9A1 and the third column is points from attainment C3I9A2."
+              alt={'A picture of a sheet with three columns. First one is student '
+                + 'numbers (StudentNo), the next is points from attainment C3I9A1 '
+                + 'and the third column is points from attainment C3I9A2.'}
               src="/Import-grades-file-example.jpg"
             />
           </Box>

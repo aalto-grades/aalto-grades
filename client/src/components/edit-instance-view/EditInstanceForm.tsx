@@ -118,13 +118,17 @@ const EditInstanceForm = ({ instance }) => {
         my: 2,
         p: 2
       }}>
-        <StringTextField fieldData={typeData} value={courseType} setFunction={setType}/>
+        <StringTextField fieldData={typeData} value={courseType} setFunction={setType} />
         <Grid2 container>
-          <Grid2 sx={{ minWidth: textFieldMinWidth }}><DateTextField fieldData={startDateData} value={startDate} setFunction={setStartDate} minWidth={textFieldMinWidth}/></Grid2>
-          <Box sx={{ width: 15 }}/>
-          <Grid2 sx={{ minWidth: textFieldMinWidth }}><DateTextField fieldData={endDateData} value={endDate} setFunction={setEndDate} minWidth={textFieldMinWidth}/></Grid2>
+          <Grid2 sx={{ minWidth: textFieldMinWidth }}>
+            <DateTextField fieldData={startDateData} value={startDate} setFunction={setStartDate} minWidth={textFieldMinWidth} />
+          </Grid2>
+          <Box sx={{ width: 15 }} />
+          <Grid2 sx={{ minWidth: textFieldMinWidth }}>
+            <DateTextField fieldData={endDateData} value={endDate} setFunction={setEndDate} minWidth={textFieldMinWidth} />
+          </Grid2>
         </Grid2>
-        <DynamicTextFieldArray fieldData={teacherData} values={teachers} setFunction={setTeachers}/>
+        <DynamicTextFieldArray fieldData={teacherData} values={teachers} setFunction={setTeachers} />
         <Grid2 container>
           <Grid2 sx={{ minWidth: textFieldMinWidth }}><NumberTextField fieldData={minCreditsData} value={stringMinCredits} setFunction={setMinCredits}/></Grid2>
           <Box sx={{ width: 15 }}/>
