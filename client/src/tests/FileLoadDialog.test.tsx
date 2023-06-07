@@ -67,7 +67,8 @@ describe('FileLoadDialog test with proper csv', () => {
 
   test('FileLoadDialog should render', async () => {
 
-    const auth = { role: SystemRole.User };
+    // TODO, role here must be checked here based on a course/instance level role.
+    const auth = { role: SystemRole.Admin };
     const { getByText, findByText } = renderCourseView(auth);
 
     const importGradesMenuButton = await findByText('Import grades');
@@ -95,7 +96,8 @@ describe('FileLoadDialog test with proper csv', () => {
 
   test('FileLoadDialog should show error when trying to submit without selecting file', async () => {
 
-    const auth = { role: SystemRole.User };
+    // TODO, role here must be checked here based on a course/instance level role.
+    const auth = { role: SystemRole.Admin };
     const { getByText, findByText } = renderCourseView(auth);
 
     const importGradesMenuButton = await findByText('Import grades');
@@ -118,7 +120,8 @@ describe('FileLoadDialog test with proper csv', () => {
 
   test('FileLoadDialog should close when submitted file is okay', async () => {
 
-    const auth = { role: SystemRole.User };
+    // TODO, role here must be checked here based on a course/instance level role.
+    const auth = { role: SystemRole.Admin };
     const { getByText, findByText } = renderCourseView(auth);
 
     const importGradesMenuButton = await findByText('Import grades');
@@ -173,7 +176,8 @@ describe('FileLoadDialog test where server does not accept the file', () => {
 
   test('FileLoadDialog should not close with bad csv', async () => {
 
-    const auth = { role: SystemRole.User };
+    // TODO, role here must be checked here based on a course/instance level role.
+    const auth = { role: SystemRole.Admin };
     const { getByText, findByText } = renderCourseView(auth);
 
     const importGradesMenuButton = await findByText('Import grades');
@@ -221,7 +225,8 @@ describe('FileLoadDialog test where server does not accept the file', () => {
     `FileLoadDialog should not render show all errors button if amount of errors less or equal to limit of ${maxErrorsToShow}`,
     async () => {
 
-      const auth = { role: SystemRole.User };
+      // TODO, role here must be checked here based on a course/instance level role.
+      const auth = { role: SystemRole.Admin };
       const { getByText, findByText } = renderCourseView(auth);
 
       const importGradesMenuButton = await findByText('Import grades');

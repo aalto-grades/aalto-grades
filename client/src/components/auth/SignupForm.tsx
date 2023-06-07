@@ -98,7 +98,7 @@ const SignupForm = ({ addUser }) => {
             <FormControlLabel value={SystemRole.Admin} control={<Radio />} label='Admin' />
           </RadioGroup>
         </Grid>
-        <Button type='submit'>Sign up</Button>
+        <Button type='submit'>sign up</Button>
       </form>
     </>
   );

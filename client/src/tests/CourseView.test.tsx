@@ -46,7 +46,8 @@ describe('Tests for CourseView component', () => {
 
   test('CourseView should render InstanceDetails, Attainments and InstancesTable components for teachers of the course', async () => {
 
-    const auth = { role: SystemRole.User };
+    // TODO, role here must be checked here based on a course/instance level role.
+    const auth = { role: SystemRole.Admin };
     const { getByText, getAllByText } = renderCourseView(auth);
 
     await waitFor(() => {
