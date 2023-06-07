@@ -24,14 +24,14 @@ describe('Tests for Login component', () => {
     const nameField = screen.getByLabelText('Name');
     const passwordField = screen.getByLabelText('Password');
     const emailField = screen.getByLabelText('Email');
-    const studentIdField = screen.getByLabelText('Student ID (not required)');
+    const studentNumberField = screen.getByLabelText('Student Number (not required)');
     const signupButton = screen.getByText('sign up');
     const textElement = screen.getByText('Sign up');
 
     expect(nameField).toBeDefined();
     expect(passwordField).toBeDefined();
     expect(emailField).toBeDefined();
-    expect(studentIdField).toBeDefined();
+    expect(studentNumberField).toBeDefined();
     expect(signupButton).toBeDefined();
     expect(textElement).toBeDefined();
 
@@ -46,13 +46,13 @@ describe('Tests for Login component', () => {
     const nameField = screen.getByLabelText('Name');
     const passwordField = screen.getByLabelText('Password');
     const emailField = screen.getByLabelText('Email');
-    const studentIdField = screen.getByLabelText('Student ID (not required)');
+    const studentNumberField = screen.getByLabelText('Student Number (not required)');
     const signupButton = screen.getByText('sign up');
 
     act(() => userEvent.type(nameField, 'Test User'));
     act(() => userEvent.type(passwordField, 'secret'));
     act(() => userEvent.type(emailField, 'test@email.com'));
-    act(() => userEvent.type(studentIdField, '010101'));
+    act(() => userEvent.type(studentNumberField, '010101'));
     act(() => userEvent.click(signupButton));
 
     // Role "User" should be the default role if no role has been specified.
@@ -62,7 +62,7 @@ describe('Tests for Login component', () => {
       name: 'Test User',
       password: 'secret',
       email: 'test@email.com',
-      studentID: '010101',
+      studentNumber: '010101',
       role: SystemRole.User
     });
   });

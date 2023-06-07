@@ -16,7 +16,7 @@ export default {
         unique: false,
         transaction
       });
-      await queryInterface.addIndex('user', ['student_id'], {
+      await queryInterface.addIndex('user', ['student_number'], {
         unique: false,
         transaction
       });
@@ -64,7 +64,7 @@ export default {
       );
 
       await queryInterface.sequelize.query(
-        'DROP INDEX IF EXISTS user_student_id',
+        'DROP INDEX IF EXISTS user_student_number',
         { transaction }
       );
 

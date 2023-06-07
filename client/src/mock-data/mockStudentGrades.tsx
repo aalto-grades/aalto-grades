@@ -7,462 +7,462 @@ const mockStudentGrades = [
     '1': 3,
     '2': 2,
     '3': 3,
-    'studentID': '754787',
+    'studentNumber': '754787',
     'finalGrade': undefined
   },
   {
     '1': 4,
     '2': 5,
     '3': 5,
-    'studentID': '189659',
+    'studentNumber': '189659',
     'finalGrade': undefined
   },
   {
     '1': 4,
     '2': 1,
     '3': 3,
-    'studentID': '342499',
+    'studentNumber': '342499',
     'finalGrade': undefined
   },
   {
     '1': 4,
     '2': 2,
     '3': 3,
-    'studentID': '829295',
+    'studentNumber': '829295',
     'finalGrade': undefined
   },
   {
     '1': 3,
     '2': 4,
     '3': 4,
-    'studentID': '383823',
+    'studentNumber': '383823',
     'finalGrade': undefined
   },
   {
     '1': 3,
     '2': 3,
     '3': 1,
-    'studentID': '653421',
+    'studentNumber': '653421',
     'finalGrade': undefined
   },
   {
     '1': 4,
     '2': 2,
     '3': 2,
-    'studentID': '174964',
+    'studentNumber': '174964',
     'finalGrade': undefined
   },
   {
     '1': 4,
     '2': 1,
     '3': 2,
-    'studentID': '628883',
+    'studentNumber': '628883',
     'finalGrade': undefined
   },
   {
     '1': 3,
     '2': 4,
     '3': 2,
-    'studentID': '813869',
+    'studentNumber': '813869',
     'finalGrade': undefined
   },
   {
     '1': 2,
     '2': 2,
     '3': 2,
-    'studentID': '362275',
+    'studentNumber': '362275',
     'finalGrade': undefined
   },
   {
     '1': 5,
     '2': 5,
     '3': 1,
-    'studentID': '368723',
+    'studentNumber': '368723',
     'finalGrade': undefined
   },
   {
     '1': 3,
     '2': 5,
     '3': 4,
-    'studentID': '255746',
+    'studentNumber': '255746',
     'finalGrade': undefined
   },
   {
     '1': 2,
     '2': 1,
     '3': 3,
-    'studentID': '383691',
+    'studentNumber': '383691',
     'finalGrade': undefined
   },
   {
     '1': 2,
     '2': 3,
     '3': 3,
-    'studentID': '165912',
+    'studentNumber': '165912',
     'finalGrade': undefined
   },
   {
     '1': 2,
     '2': 3,
     '3': 2,
-    'studentID': '252685',
+    'studentNumber': '252685',
     'finalGrade': undefined
   },
   {
     '1': 1,
     '2': 1,
     '3': 2,
-    'studentID': '412379',
+    'studentNumber': '412379',
     'finalGrade': undefined
   },
   {
     '1': 4,
     '2': 1,
     '3': 2,
-    'studentID': '143228',
+    'studentNumber': '143228',
     'finalGrade': undefined
   },
   {
     '1': 5,
     '2': 4,
     '3': 1,
-    'studentID': '113456',
+    'studentNumber': '113456',
     'finalGrade': undefined
   },
   {
     '1': 3,
     '2': 4,
     '3': 1,
-    'studentID': '179845',
+    'studentNumber': '179845',
     'finalGrade': undefined
   },
   {
     '1': 1,
     '2': 5,
     '3': 2,
-    'studentID': '159597',
+    'studentNumber': '159597',
     'finalGrade': undefined
   },
   {
     '1': 2,
     '2': 5,
     '3': 3,
-    'studentID': '332522',
+    'studentNumber': '332522',
     'finalGrade': undefined
   },
   {
     '1': 3,
     '2': 4,
     '3': 3,
-    'studentID': '288979',
+    'studentNumber': '288979',
     'finalGrade': undefined
   },
   {
     '1': 4,
     '2': 4,
     '3': 3,
-    'studentID': '229889',
+    'studentNumber': '229889',
     'finalGrade': undefined
   },
   {
     '1': 5,
     '2': 4,
     '3': 2,
-    'studentID': '146745',
+    'studentNumber': '146745',
     'finalGrade': undefined
   },
   {
     '1': 3,
     '2': 5,
     '3': 5,
-    'studentID': '614927',
+    'studentNumber': '614927',
     'finalGrade': undefined
   },
   {
     '1': 1,
     '2': 2,
     '3': 3,
-    'studentID': '713598',
+    'studentNumber': '713598',
     'finalGrade': undefined
   },
   {
     '1': 5,
     '2': 5,
     '3': 2,
-    'studentID': '925725',
+    'studentNumber': '925725',
     'finalGrade': undefined
   },
   {
     '1': 3,
     '2': 2,
     '3': 5,
-    'studentID': '957762',
+    'studentNumber': '957762',
     'finalGrade': undefined
   },
   {
     '1': 2,
     '2': 5,
     '3': 4,
-    'studentID': '568237',
+    'studentNumber': '568237',
     'finalGrade': undefined
   },
   {
     '1': 4,
     '2': 4,
     '3': 4,
-    'studentID': '344594',
+    'studentNumber': '344594',
     'finalGrade': undefined
   },
   {
     '1': 4,
     '2': 1,
     '3': 1,
-    'studentID':'517418',
+    'studentNumber':'517418',
     'finalGrade': undefined
   },
   {
     '1': 1,
     '2': 1,
     '3': 3,
-    'studentID': '553796',
+    'studentNumber': '553796',
     'finalGrade': undefined
   },
   {
     '1': 1,
     '2': 1,
     '3': 2,
-    'studentID': '861812',
+    'studentNumber': '861812',
     'finalGrade': undefined
   },
   {
     '1': 2,
     '2': 5,
     '3': 4,
-    'studentID': '884396',
+    'studentNumber': '884396',
     'finalGrade': undefined
   },
   {
     '1': 1,
     '2': 5,
     '3': 4,
-    'studentID': '776995',
+    'studentNumber': '776995',
     'finalGrade': undefined
   },
   {
     '1': 2,
     '2': 1,
     '3': 4,
-    'studentID': '765712',
+    'studentNumber': '765712',
     'finalGrade': undefined
   },
   {
     '1': 4,
     '2': 1,
     '3': 1,
-    'studentID': '319877',
+    'studentNumber': '319877',
     'finalGrade': undefined
   },
   {
     '1': 1,
     '2': 4,
     '3': 2,
-    'studentID': '244216',
+    'studentNumber': '244216',
     'finalGrade': undefined
   },
   {
     '1': 1,
     '2': 3,
     '3': 3,
-    'studentID': '137118',
+    'studentNumber': '137118',
     'finalGrade': undefined
   },
   {
     '1': 4,
     '2': 2,
     '3': 5,
-    'studentID': '185676',
+    'studentNumber': '185676',
     'finalGrade': undefined
   },
   {
     '1': 3,
     '2': 5,
     '3': 5,
-    'studentID': '243949',
+    'studentNumber': '243949',
     'finalGrade': undefined
   },
   {
     '1': 4,
     '2': 4,
     '3': 3,
-    'studentID': '435694',
+    'studentNumber': '435694',
     'finalGrade': undefined
   },
   {
     '1': 3,
     '2': 1,
     '3': 3,
-    'studentID': '451722',
+    'studentNumber': '451722',
     'finalGrade': undefined
   },
   {
     '1': 5,
     '2': 1,
     '3': 5,
-    'studentID': '111235',
+    'studentNumber': '111235',
     'finalGrade': undefined
   },
   {
     '1': 4,
     '2': 2,
     '3': 1,
-    'studentID': '186234',
+    'studentNumber': '186234',
     'finalGrade': undefined
   },
   {
     '1': 2,
     '2': 2,
     '3': 4,
-    'studentID': '122634',
+    'studentNumber': '122634',
     'finalGrade': undefined
   },
   {
     '1': 2,
     '2': 3,
     '3': 4,
-    'studentID': '561726',
+    'studentNumber': '561726',
     'finalGrade': undefined
   },
   {
     '1': 3,
     '2': 4,
     '3': 2,
-    'studentID': '439542',
+    'studentNumber': '439542',
     'finalGrade': undefined
   },
   {
     '1': 2,
     '2': 4,
     '3': 1,
-    'studentID': '843632',
+    'studentNumber': '843632',
     'finalGrade': undefined
   },
   {
     '1': 3,
     '2': 3,
     '3': 5,
-    'studentID': '518493',
+    'studentNumber': '518493',
     'finalGrade': undefined
   },
   {
     '1': 3,
     '2': 3,
     '3': 3,
-    'studentID': '472634',
+    'studentNumber': '472634',
     'finalGrade': undefined
   },
   {
     '1': 1,
     '2': 2,
     '3': 4,
-    'studentID': '649315',
+    'studentNumber': '649315',
     'finalGrade': undefined
   },
   {
     '1': 2,
     '2': 5,
     '3': 3,
-    'studentID': '268531',
+    'studentNumber': '268531',
     'finalGrade': undefined
   },
   {
     '1': 3,
     '2': 1,
     '3': 5,
-    'studentID': '218754',
+    'studentNumber': '218754',
     'finalGrade': undefined
   },
   {
     '1': 3,
     '2': 3,
     '3': 5,
-    'studentID': '763587',
+    'studentNumber': '763587',
     'finalGrade': undefined
   },
   {
     '1': 1,
     '2': 2,
     '3': 4,
-    'studentID': '199429',
+    'studentNumber': '199429',
     'finalGrade': undefined
   },
   {
     '1': 5,
     '2': 5,
     '3': 2,
-    'studentID': '388837',
+    'studentNumber': '388837',
     'finalGrade': undefined
   },
   {
     '1': 3,
     '2': 5,
     '3': 2,
-    'studentID': '347382',
+    'studentNumber': '347382',
     'finalGrade': undefined
   },
   {
     '1': 4,
     '2': 2,
     '3': 5,
-    'studentID': '286325',
+    'studentNumber': '286325',
     'finalGrade': undefined
   },
   {
     '1': 1,
     '2': 2,
     '3': 3,
-    'studentID': '997214',
+    'studentNumber': '997214',
     'finalGrade': undefined
   },
   {
     '1': 2,
     '2': 5,
     '3': 5,
-    'studentID': '581153',
+    'studentNumber': '581153',
     'finalGrade': undefined
   },
   {
     '1': 4,
     '2': 3,
     '3': 4,
-    'studentID': '562142',
+    'studentNumber': '562142',
     'finalGrade': undefined
   },
   {
     '1': 2,
     '2': 1,
     '3': 2,
-    'studentID': '188547',
+    'studentNumber': '188547',
     'finalGrade': undefined
   },
   {
     '1': 2,
     '2': 1,
     '3': 1,
-    'studentID': '745765',
+    'studentNumber': '745765',
     'finalGrade': undefined
   },
   {
     '1': 5,
     '2': 5,
     '3': 3,
-    'studentID': '645825',
+    'studentNumber': '645825',
     'finalGrade': undefined
   },
   {
     '1': 5,
     '2': 3,
     '3': 5,
-    'studentID': '158329',
+    'studentNumber': '158329',
     'finalGrade': undefined
   }
 ];

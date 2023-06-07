@@ -32,8 +32,8 @@ interface SignupRequest {
   name: string,
   password: PlainPassword,
   email: string,
-  studentID: string | undefined,
-  role: SystemRole | undefined
+  studentNumber?: string,
+  role?: SystemRole
 }
 
 export async function validateLogin(email: string, password: PlainPassword): Promise<LoginResult> {
@@ -145,7 +145,7 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
     name: request.name,
     email: request.email,
     password: await argon.hash(request.password.trim()),
-    studentId: request.studentID,
+    studentNumber: request.studentNumber,
     role: request.role ?? SystemRole.User
   });
 
