@@ -9,6 +9,7 @@ import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SignupForm from '../components/auth/SignupForm';
 import Signup from '../components/auth/Signup';
+import { SystemRole } from '../types/general';
 
 describe('Tests for Login component', () => {
 
@@ -54,7 +55,7 @@ describe('Tests for Login component', () => {
     act(() => userEvent.type(studentIdField, '010101'));
     act(() => userEvent.click(signupButton));
 
-    // Teacher should be the default role if no role has been specified
+    // Role "User" should be the default role if no role has been specified.
 
     expect(mockSignupUser).toHaveBeenCalledTimes(1);
     expect(mockSignupUser).toHaveBeenCalledWith({
@@ -62,7 +63,7 @@ describe('Tests for Login component', () => {
       password: 'secret',
       email: 'test@email.com',
       studentID: '010101',
-      role: 'TEACHER'
+      role: SystemRole.User
     });
   });
 

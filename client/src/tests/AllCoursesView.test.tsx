@@ -10,6 +10,7 @@ import AllCoursesView from '../components/AllCoursesView';
 import coursesService from '../services/courses';
 import AuthContext from '../context/authProvider';
 import mockCourses from '../mock-data/mockCourses';
+import { SystemRole } from '../types/general';
 
 jest.mock('../services/courses');
 afterEach(cleanup);
@@ -46,7 +47,7 @@ describe('Tests for FrontPage component', () => {
 
   test('AllCoursesView should render Create New Course for admin', async () => {
 
-    const auth = { role: 'SYSADMIN' };
+    const auth = { role: SystemRole.Admin };
     renderAllCoursesView(auth);
     await waitFor(() => expect(screen.queryByText('Create New Course')).toBeInTheDocument());
 
@@ -54,7 +55,7 @@ describe('Tests for FrontPage component', () => {
 
   test('AllCoursesView should not render Create New Course for non-admin users', async () => {
 
-    const auth = { role: 'TEACHER' };
+    const auth = { role: SystemRole.User };
     renderAllCoursesView(auth);
     await waitFor(() => expect(screen.queryByText('Create New Course')).not.toBeInTheDocument());
   });

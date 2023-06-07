@@ -32,8 +32,7 @@ const FrontPage = (): JSX.Element => {
           Your Current Courses
         </Typography>
       </Box>
-      { /* current and inactive courses will later be rendered based on the student/teacher id */}
-      <BasicGrid data={currentCourses} />
+      <BasicGrid data={currentCourses}/>
       <Typography variant="h2" align="left" sx={{ flexGrow: 1, mt: 4 }}>
         Inactive Courses
       </Typography>

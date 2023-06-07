@@ -15,6 +15,7 @@ export default class User extends Model<
   declare id: CreationOptional<number>;
   declare studentId: CreationOptional<string>;
   declare name: CreationOptional<string>;
+  declare role: CreationOptional<string>;
   declare email: CreationOptional<string>;
   declare password: CreationOptional<string>;
   declare createdAt: CreationOptional<Date>;
@@ -39,6 +40,11 @@ User.init(
       type: new DataTypes.STRING,
       allowNull: true,
       defaultValue: null
+    },
+    role: {
+      type: DataTypes.ENUM('USER', 'ADMIN'),
+      allowNull: false,
+      defaultValue: 'USER'
     },
     email: {
       type: new DataTypes.STRING(255),
@@ -65,7 +71,6 @@ User.init(
 
 User.findByEmail = async function (email: string): Promise<User | null> {
   return await User.findOne({
-    attributes: ['id', 'password', 'name'],
     where: {
       email
     }
