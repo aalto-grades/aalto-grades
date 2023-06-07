@@ -19,10 +19,15 @@ describe('Tests for FrontPage component', () => {
 
   const renderFrontPage = async (auth) => {
 
-    const mockResponse = { courses: mockCourses };
+    const mockResponse = {
+      courses: {
+        current: [mockCourses[0]],
+        previous: [mockCourses[1]]
+      }
+    };
 
-    coursesService.getCourses.mockRejectedValue('Network error');
-    coursesService.getCourses.mockResolvedValue(mockResponse);
+    coursesService.getCoursesOfUser.mockRejectedValue('Network error');
+    coursesService.getCoursesOfUser.mockResolvedValue(mockResponse);
 
     return render(
       <BrowserRouter>

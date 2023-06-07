@@ -49,7 +49,7 @@ describe('FileLoadDialog test with proper csv', () => {
     const mockResponseInstances = { courseInstances: mockInstances };
     instancesService.getInstances.mockResolvedValue(mockResponseInstances);
 
-    const mockResponseCourse = { course: mockCourses.current[0] };
+    const mockResponseCourse = { course: mockCourses[0] };
     coursesService.getCourse.mockResolvedValue(mockResponseCourse);
 
     gradesService.importCsv.mockResolvedValue({}); // succeess, nothing to worry about
@@ -155,7 +155,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
     const mockResponseInstances = { courseInstances: mockInstances };
     instancesService.getInstances.mockResolvedValue(mockResponseInstances);
 
-    const mockResponseCourse = { course: mockCourses.current[0] };
+    const mockResponseCourse = { course: mockCourses[0] };
     coursesService.getCourse.mockResolvedValue(mockResponseCourse);
 
     // Mock the error.

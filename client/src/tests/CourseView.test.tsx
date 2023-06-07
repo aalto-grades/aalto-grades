@@ -28,7 +28,7 @@ describe('Tests for CourseView component', () => {
     instancesService.getInstances.mockResolvedValue(mockResponseInstances);
 
 
-    const mockResponseCourse = { course: mockCourses.current[0] };
+    const mockResponseCourse = { course: mockCourses[0] };
     coursesService.getCourse.mockRejectedValue('Network error');
     coursesService.getCourse.mockResolvedValue(mockResponseCourse);
 
