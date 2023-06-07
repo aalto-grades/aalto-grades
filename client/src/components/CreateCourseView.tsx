@@ -15,7 +15,7 @@ const CreateCourseView = () => {
     try {
       const course = await coursesService.addCourse(courseObject);
       console.log(course);
-      navigate('/', { replace: true });
+      navigate('/course-view', { replace: true });
     } catch (exception) {
       console.log(exception.message);
     }
