@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-const mockCourses = {
-  current: [{
+const mockCourses = [
+  {
     id: 5,
     courseCode: 'CS-A1150',
     department: {
@@ -21,8 +21,8 @@ const mockCourses = {
       sv:'',
       en:''
     }
-  }],
-  previous: [{
+  },
+  {
     id: 1,
     courseCode: 'CS-A1110',
     department: {
@@ -40,7 +40,7 @@ const mockCourses = {
       sv:'',
       en:''
     }
-  }]
-};
+  }
+];
 
 export default mockCourses;

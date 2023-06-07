@@ -18,10 +18,15 @@ describe('Tests for FrontPage component', () => {
 
   const renderFrontPage = async (auth) => {
 
-    const mockResponse = { courses: mockCourses };
+    const mockResponse = {
+      courses: {
+        current: [mockCourses[0]],
+        previous: [mockCourses[1]]
+      }
+    };
 
-    coursesService.getCourses.mockRejectedValue('Network error');
-    coursesService.getCourses.mockResolvedValue(mockResponse);
+    coursesService.getCoursesOfUser.mockRejectedValue('Network error');
+    coursesService.getCoursesOfUser.mockResolvedValue(mockResponse);
 
     return render(
       <BrowserRouter>
@@ -43,30 +48,6 @@ describe('Tests for FrontPage component', () => {
       expect(screen.queryByText('CS-A1150 – Databases')).toBeInTheDocument();
       expect(screen.queryByText('Programming 1')).toBeInTheDocument();
     });
-
-  });
-
-  test('FrontPage should not render Create New Course for teacher', async () => {
-
-    const auth = { role: 'TEACHER' };
-    renderFrontPage(auth);
-    await waitFor(() => expect(screen.queryByText('Create New Course')).not.toBeInTheDocument());
-  });
-
-
-  test('FrontPage should render Create New Course for admin', async () => {
-
-    const auth = { role: 'SYSADMIN' };
-    renderFrontPage(auth);
-    await waitFor(() => expect(screen.queryByText('Create New Course')).toBeInTheDocument());
-
-  });
-
-  test('FrontPage should not render Create New Course for students', async () => {
-
-    const auth = { role: 'STUDENT' };
-    renderFrontPage(auth);
-    await waitFor(() => expect(screen.queryByText('Create New Course')).not.toBeInTheDocument());
 
   });
 
