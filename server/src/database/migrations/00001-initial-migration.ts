@@ -25,6 +25,11 @@ export default {
           allowNull: true,
           defaultValue: null
         },
+        role: {
+          type: DataTypes.ENUM('USER', 'ADMIN'),
+          allowNull: false,
+          defaultValue: 'USER'
+        },
         email: {
           type: new DataTypes.STRING(255),
           allowNull: true,
@@ -341,6 +346,10 @@ export default {
 
       await queryInterface.sequelize.query(
         'DROP TYPE IF EXISTS enum_attainable_formula;', { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS enum_user_role;', { transaction }
       );
 
       await transaction.commit();
