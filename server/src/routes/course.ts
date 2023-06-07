@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import express, { Router } from 'express';
-import passport from 'passport';
 
 import { addCourse, getAllCourses, getCourse } from '../controllers/course';
 import { handleInvalidRequestJson } from '../middleware';
@@ -137,7 +136,7 @@ router.get(
  */
 router.get(
   '/v1/courses',
-  passport.authenticate('jwt', { session: false }),
+  authorization,
   controllerDispatcher(getAllCourses)
 );
 
