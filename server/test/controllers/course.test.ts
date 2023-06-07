@@ -74,6 +74,31 @@ describe('Test GET /v1/courses/:courseId - get course by ID', () => {
 });
 
 
+describe('Test GET /v1/courses - get all courses', () => {
+  it('should respond with correct data', async () => {
+    const res: supertest.Response = await request
+      .get('/v1/courses')
+      .set('Cookie', authCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    expect(res.body.success).toBe(true);
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data.courses).toBeDefined();
+    expect(res.body.data.courses[0].id).toBeDefined();
+    expect(res.body.data.courses[0].courseCode).toBeDefined();
+    expect(res.body.data.courses[0].department).toBeDefined();
+    expect(res.body.data.courses[0].name).toBeDefined();
+    expect(res.body.data.courses[0].evaluationInformation).toBeDefined();
+  });
+
+  it('should respond with 401 unauthorized, if not logged in', async () => {
+    const res: supertest.Response = await request
+      .get('/v1/courses')
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Unauthorized);
+  });
+});
 
 
 describe('Test POST /v1/courses - create new course', () => {
