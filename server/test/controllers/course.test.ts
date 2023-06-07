@@ -78,7 +78,7 @@ describe('Test GET /v1/courses - get all courses', () => {
   it('should respond with correct data', async () => {
     const res: supertest.Response = await request
       .get('/v1/courses')
-      .set('Cookie', authCookie)
+      .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
@@ -93,7 +93,7 @@ describe('Test GET /v1/courses - get all courses', () => {
   });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
-    const res: supertest.Response = await request
+    await request
       .get('/v1/courses')
       .set('Accept', 'application/json')
       .expect(HttpCode.Unauthorized);
