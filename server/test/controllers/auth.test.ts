@@ -60,7 +60,7 @@ describe('Test POST /v1/auth/signup - create a new user', () => {
         name: 'aalto',
         password: 'grades',
         studentID: '123456',
-        role: 'ADMIN'
+        role: UserRole.Admin
       })
       .expect(HttpCode.Conflict)
       .expect('Content-Type', /json/)
@@ -92,7 +92,12 @@ describe('Test POST /v1/auth/signup - create a new user', () => {
     await request.post('/v1/auth/signup')
       .set('Accept', 'application/json')
       // without student id
-      .send({ email: 'sysadmin2@aalto.fi', name: 'aalto2', password: 'grades2', role: 'ADMIN' })
+      .send({
+        email: 'sysadmin2@aalto.fi',
+        name: 'aalto2',
+        password: 'grades2',
+        role: UserRole.Admin
+      })
       .expect(HttpCode.Ok)
       .expect('Content-Type', /json/)
       .then((res: supertest.Response) => {
