@@ -29,6 +29,7 @@ import CourseResultsView from './components/CourseResultsView';
 import InstanceCreationRoute from './context/InstanceCreationRoute';
 import FormulaSelectionRoute from './context/FormulaSelectionRoute';
 import UserButton from './components/auth/UserButton';
+import { UserRole } from './types/general';
 
 const theme = createTheme({
   palette: {
@@ -105,13 +106,6 @@ const AppContainer = styled<any>(Container)`
   text-align: center;
 `;
 
-const roles = {
-  'admin': 'SYSADMIN',
-  'teacher': 'TEACHER',
-  'student': 'STUDENT',
-  'assistant': 'ASSISTANT'
-};
-
 function App() {
 
   return (
@@ -137,16 +131,16 @@ function App() {
             <Route path='/login' element={<Login/>}/>
             <Route path='/signup' element={<Signup/>}/>
             { /* All roles are authorised to access the front page, conditional rendering is done inside the component */ }
-            <Route element={<PrivateRoute roles={[roles.admin, roles.teacher, roles.student, roles.assistant]}/>}>
+            <Route element={<PrivateRoute roles={Object.values(UserRole)}/>}>
               <Route path='/' element={<FrontPage/>} />
               <Route path='/course-view/:courseId' element={<CourseView/>}/>
             </Route>
             { /* Pages that are only authorised for admin */ }
-            <Route element={<PrivateRoute roles={[roles.admin]}/>}>
+            <Route element={<PrivateRoute roles={[UserRole.Admin]}/>}>
               <Route path='/create-course' element={<CreateCourseView/>}/>
             </Route>
             { /* Pages that are authorised for admin and teachers */ }
-            <Route element={<PrivateRoute roles={[roles.admin, roles.teacher]}/>}>
+            <Route element={<PrivateRoute roles={[UserRole.Admin]}/>}>
               <Route path=':courseId/fetch-instances/:courseCode' element={<FetchInstancesView/>}/>
               <Route path=':courseId/course-results/:instanceId' element={<CourseResultsView/>}/>
               { /* Pages under this route share instance creation context */ }
