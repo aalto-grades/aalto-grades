@@ -52,7 +52,7 @@ const CourseResultsTableToolbar = (
             type='strig'
             value={search}
             name='search'
-            label='Search by Student ID'
+            label='Search by Student Number'
             onChange={({ target }) => setSearch(target.value)}
             InputLabelProps={{ shrink: true }}
             margin='normal'

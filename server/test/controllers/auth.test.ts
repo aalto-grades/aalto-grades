@@ -59,7 +59,7 @@ describe('Test POST /v1/auth/signup - create a new user', () => {
         email: 'sysadmin@aalto.fi',
         name: 'aalto',
         password: 'grades',
-        studentID: '123456',
+        studentNumber: '123456',
         role: SystemRole.Admin
       })
       .expect(HttpCode.Conflict)
@@ -91,7 +91,7 @@ describe('Test POST /v1/auth/signup - create a new user', () => {
       .expect(HttpCode.Unauthorized);
     await request.post('/v1/auth/signup')
       .set('Accept', 'application/json')
-      // without student id
+      // without student number
       .send({
         email: 'sysadmin2@aalto.fi',
         name: 'aalto2',

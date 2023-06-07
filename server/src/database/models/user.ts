@@ -13,7 +13,7 @@ export default class User extends Model<
   InferCreationAttributes<User>
 > {
   declare id: CreationOptional<number>;
-  declare studentId: CreationOptional<string>;
+  declare studentNumber: CreationOptional<string>;
   declare name: CreationOptional<string>;
   declare role: CreationOptional<string>;
   declare email: CreationOptional<string>;
@@ -30,7 +30,7 @@ User.init(
       autoIncrement: true,
       primaryKey: true
     },
-    studentId: {
+    studentNumber: {
       type: new DataTypes.STRING,
       unique: true,
       allowNull: true,

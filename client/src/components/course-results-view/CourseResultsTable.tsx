@@ -23,7 +23,7 @@ import sortingServices from '../../services/sorting';
 const CourseResultsTable = ({ attainments, students, calculateFinalGrades, updateGrades }) => {
 
   const [order, setOrder] = useState<any>('asc');
-  const [orderBy, setOrderBy] = useState<any>('studentID');
+  const [orderBy, setOrderBy] = useState<any>('studentNumber');
   const [page, setPage] = useState<any>(0);
   const [dense, setDense] = useState<any>(true);
   const [rowsPerPage, setRowsPerPage] = useState<any>(25);
@@ -31,7 +31,7 @@ const CourseResultsTable = ({ attainments, students, calculateFinalGrades, updat
   const [studentsToShow, setStudentsToShow] = useState<any>(students);
 
   useEffect(() => {
-    setStudentsToShow(search === '' ? students : students.filter(s => s.studentID.includes(search)));
+    setStudentsToShow(search === '' ? students : students.filter(s => s.studentNumber.includes(search)));
     setPage(0);
   }, [search, students]);
 
@@ -89,23 +89,23 @@ const CourseResultsTable = ({ attainments, students, calculateFinalGrades, updat
                     <TableRow
                       hover
                       tabIndex={-1}
-                      key={student.studentID}
+                      key={student.studentNumber}
                     >
                       <TableCell
                         sx={{ width: '100px' }}
                         component="th"
-                        id={student.studentID}
+                        id={student.studentNumber}
                         scope="row"
                         padding="normal"
                       >
-                        {student.studentID}
+                        {student.studentNumber}
                       </TableCell>
                       {attainments.map((attainment) => {
                         return (
                           <TableCell
                             sx={{ width: '100px' }}
                             align="left"
-                            key={`${student.studentID}_${attainment.id}`}>
+                            key={`${student.studentNumber}_${attainment.id}`}>
                             {student[attainment.id]}
                           </TableCell>
                         );
@@ -113,7 +113,7 @@ const CourseResultsTable = ({ attainments, students, calculateFinalGrades, updat
                       <TableCell
                         sx={{ width: '100px' }}
                         align="left"
-                        key={`${student.studentID}_finalGrade`}>
+                        key={`${student.studentNumber}_finalGrade`}>
                         {student.finalGrade}
                       </TableCell>
                     </TableRow>

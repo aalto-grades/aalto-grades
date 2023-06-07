@@ -5,7 +5,7 @@
 -- DISCLAIMER
 -- All names and student id's portrayed in this file are fictitious.
 -- Any resemblance to actual person or student id, living or dead, active or inactive, is purely coincidental.
-INSERT INTO public.user (email, student_id, password, name, created_at, updated_at, role) VALUES
+INSERT INTO public.user (email, student_number, password, name, created_at, updated_at, role) VALUES
 ('amanda.germain@aalto.fi', '352772', 'oybqmgvqaftydpssvufmdpiqyaknxqhpeoqavmcuryaaswntzovmeqadyunz', 'Amanda Germain', '2020-10-15', '2021-7-2', 'USER'),
 ('beth.holmes@aalto.fi', '476617', 'bdrvtzjvbdgzefoofabxkttdqfokxopkvevlprmrdavrlbqqnvwprylymjlp', 'Beth Holmes', '2020-7-9', '2021-4-1', 'USER'),
 ('mark.ortiz@aalto.fi', '344625', 'onlcozbrcxrrevpcqqreqknwwrstjeymjdfnwzndgqgykkwgwouzaedqmdvr', 'Mark Ortiz', '2020-5-17', '2021-3-10', 'USER'),

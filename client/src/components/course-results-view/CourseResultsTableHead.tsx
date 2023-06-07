@@ -18,8 +18,8 @@ const CourseResultsTableHead = (props) => {
 
   useEffect(() => {
     const headObject = [{
-      id: 'studentID',
-      name: 'Student ID'
+      id: 'studentNumber',
+      name: 'Student Number'
     }];
     const tailObject = [{
       id: 'finalGrade',

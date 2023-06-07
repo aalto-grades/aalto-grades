@@ -29,7 +29,7 @@ export const router: Router = Router();
  *     format: email
  *     description: Email address, to be used as a credential.
  *     example: john.doe@aalto.fi
- *   StudentID:
+ *   StudentNumber:
  *     type: string
  *     description: The student number assigned by the university.
  *     example: 12345A
@@ -74,8 +74,8 @@ export const router: Router = Router();
  *       password:
  *         $ref: '#/definitions/Password'
  *         required: true
- *       studentID:
- *         $ref: '#/definitions/StudentID'
+ *       studentNumber:
+ *         $ref: '#/definitions/StudentNumber'
  *         required: false
  *       name:
  *         $ref: '#/definitions/Name'

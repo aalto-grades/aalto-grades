@@ -24,7 +24,7 @@ export async function getCookies(): Promise<Cookies> {
       email: adminEmail,
       name: 'aalto tester',
       password: 'grades',
-      studentID: new Date().getTime(),
+      studentNumber: new Date().getTime(),
       role: SystemRole.Admin
     });
 
@@ -34,7 +34,7 @@ export async function getCookies(): Promise<Cookies> {
       email: userEmail,
       name: 'aalto tester',
       password: 'grades',
-      studentID: new Date().getTime(),
+      studentNumber: new Date().getTime(),
       role: SystemRole.User
     });
 

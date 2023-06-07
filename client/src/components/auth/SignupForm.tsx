@@ -17,7 +17,7 @@ const SignupForm = ({ addUser }) => {
   const [name, setName] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [email, setEmail] = useState<string>('');
-  const [studentID, setStudentID] = useState<string | undefined>(undefined);
+  const [studentNumber, setStudentNumber] = useState<string | undefined>(undefined);
   const [role, setRole] = useState<SystemRole>(SystemRole.User);
 
   const handleSubmit = (event) => {
@@ -28,7 +28,7 @@ const SignupForm = ({ addUser }) => {
         password,
         email,
         role,
-        studentID
+        studentNumber
       });
       addUser(userObject);
     } catch (exception) {
@@ -64,10 +64,10 @@ const SignupForm = ({ addUser }) => {
         <div>
           <TextField
             type='text'
-            value={studentID}
-            name='StudentID'
-            label='Student ID (not required)'
-            onChange={({ target }) => setStudentID(target.value)}
+            value={studentNumber}
+            name='StudentNumber'
+            label='Student Number (not required)'
+            onChange={({ target }) => setStudentNumber(target.value)}
             InputLabelProps={{ shrink: true }}
             margin='normal'
           />

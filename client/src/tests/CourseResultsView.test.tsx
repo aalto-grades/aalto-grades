@@ -25,14 +25,14 @@ describe('Tests for CourseResultsView components', () => {
 
     await waitFor(() => {
       const headingElement = screen.queryByText('Course Results');
-      const studentIdHeader = screen.queryByText('Student ID');
+      const studentNumberHeader = screen.queryByText('Student Number');
       const finalGradeHeader = screen.queryByText('Final Grade');
       const viewValidGradesText = screen.queryByText('View valid grades from past instances:');
       const viewAllGradesButton = screen.queryByText('View all grades');
       const calculateGradesButton = screen.queryByText('Calculate final grades');
 
       expect(headingElement).toBeInTheDocument();
-      expect(studentIdHeader).toBeInTheDocument();
+      expect(studentNumberHeader).toBeInTheDocument();
       expect(finalGradeHeader).toBeInTheDocument();
       expect(viewValidGradesText).toBeInTheDocument();
       expect(viewAllGradesButton).toBeInTheDocument();
