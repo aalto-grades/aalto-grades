@@ -10,14 +10,15 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio from '@mui/material/Radio';
 import Grid from '@mui/material/Grid';
+import { UserRole } from '../../types/general';
 
 const SignupForm = ({ addUser }) => {
 
-  const [name, setName] = useState<any>('');
-  const [password, setPassword] = useState<any>('');
-  const [email, setEmail] = useState<any>('');
-  const [studentID, setStudentID] = useState<any>('');
-  const [role, setRole] = useState<any>('TEACHER');
+  const [name, setName] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [studentID, setStudentID] = useState<string | undefined>(undefined);
+  const [role, setRole] = useState<UserRole>(UserRole.User);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -27,7 +28,7 @@ const SignupForm = ({ addUser }) => {
         password,
         email,
         role,
-        ...(studentID != '' && { studentID: studentID }),
+        studentID
       });
       addUser(userObject);
     } catch (exception) {
@@ -90,16 +91,14 @@ const SignupForm = ({ addUser }) => {
           justifyContent='center'
         >
           <RadioGroup
-            defaultValue='TEACHER'
+            defaultValue={UserRole.User}
             name='radio-buttons-group'
-            onChange={({ target }) => setRole(target.value)}>
-            <FormControlLabel value='TEACHER' control={<Radio />} label='Teacher' />
-            <FormControlLabel value='STUDENT' control={<Radio />} label='Student' />
-            <FormControlLabel value='ASSISTANT' control={<Radio />} label='Assistant' />
-            <FormControlLabel value='SYSADMIN' control={<Radio />} label='Admin' />
+            onChange={({ target }) => setRole(target.value as UserRole)}>
+            <FormControlLabel value={UserRole.User} control={<Radio />} label='User' />
+            <FormControlLabel value={UserRole.Admin} control={<Radio />} label='Admin' />
           </RadioGroup>
         </Grid>
-        <Button type='submit'>sign up</Button>
+        <Button type='submit'>Sign up</Button>
       </form>
     </>
   );
