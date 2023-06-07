@@ -11,7 +11,7 @@ import BasicGrid from './front-page/BasicGrid';
 import CourseTable from './front-page/CourseTable';
 import coursesService from '../services/courses';
 import useAuth from '../hooks/useAuth';
-import { UserRole } from '../types/general';
+import { SystemRole } from '../types/general';
 
 const FrontPage = () => {
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ const FrontPage = () => {
           Your Current Courses
         </Typography>
         { /* admins are shown the button for creating a new course */
-          auth.role == UserRole.Admin &&
+          auth.role == SystemRole.Admin &&
           <Button id='ag_new_course_btn' size='large' variant='contained' onClick={() => {
             navigate('/create-course');
           }}>

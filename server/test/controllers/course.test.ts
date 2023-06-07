@@ -75,6 +75,7 @@ describe('Test GET /v1/courses/:courseId - get course by ID', () => {
 
 
 describe('Test GET /v1/courses - get all courses', () => {
+
   it('should respond with correct data', async () => {
     const res: supertest.Response = await request
       .get('/v1/courses')
@@ -98,8 +99,16 @@ describe('Test GET /v1/courses - get all courses', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.Unauthorized);
   });
-});
 
+  it('should respond with 403 forbidden, if insufficient rights', async () => {
+    await request
+      .get('/v1/courses')
+      .set('Cookie', cookies.userCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Forbidden);
+  });
+
+});
 
 describe('Test POST /v1/courses - create new course', () => {
 

@@ -9,7 +9,7 @@ import { addCourse, getAllCourses, getCourse } from '../controllers/course';
 import { handleInvalidRequestJson } from '../middleware';
 import { authorization } from '../middleware/authorization';
 import { controllerDispatcher } from '../middleware/errorHandler';
-import { UserRole } from '../types/general';
+import { SystemRole } from '../types/general';
 
 export const router: Router = Router();
 
@@ -133,12 +133,15 @@ router.get(
  *                         $ref: '#/definitions/CourseData'
  *       401:
  *         $ref: '#/components/responses/AuthenticationError'
+ *       403:
+ *         $ref: '#/components/responses/AuthorizationError'
  *     security:
  *       - cookieAuth: []
  */
 router.get(
   '/v1/courses',
-  authorization,
+  passport.authenticate('jwt', { session: false }),
+  authorization([SystemRole.Admin]),
   controllerDispatcher(getAllCourses)
 );
 
@@ -194,7 +197,7 @@ router.get(
 router.post(
   '/v1/courses',
   passport.authenticate('jwt', { session: false }),
-  authorization([UserRole.Admin]),
+  authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(addCourse)

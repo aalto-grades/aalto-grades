@@ -10,7 +10,7 @@ import FrontPage from '../components/FrontPage';
 import coursesService from '../services/courses';
 import AuthContext from '../context/authProvider';
 import mockCourses from '../mock-data/mockCourses';
-import { UserRole } from '../types/general';
+import { SystemRole } from '../types/general';
 
 jest.mock('../services/courses');
 afterEach(cleanup);
@@ -49,7 +49,7 @@ describe('Tests for FrontPage component', () => {
 
   test('FrontPage should not render Create New Course for non admin', async () => {
 
-    const auth = { role: UserRole.User };
+    const auth = { role: SystemRole.User };
     renderFrontPage(auth);
     await waitFor(() => expect(screen.queryByText('Create New Course')).not.toBeInTheDocument());
   });
@@ -57,7 +57,7 @@ describe('Tests for FrontPage component', () => {
 
   test('FrontPage should render Create New Course for admin', async () => {
 
-    const auth = { role: UserRole.Admin };
+    const auth = { role: SystemRole.Admin };
     renderFrontPage(auth);
     await waitFor(() => expect(screen.queryByText('Create New Course')).toBeInTheDocument());
 

@@ -19,7 +19,7 @@ export const router: Router = Router();
  *     format: int32
  *     minimum: 1
  *     example: 1
- *   UserRole:
+ *   SystemRole:
  *     type: string
  *     enum: [USER, ADMIN]
  *     description: The role of the user. Used for system level authorization.
@@ -62,7 +62,7 @@ export const router: Router = Router();
  *           id:
  *             $ref: '#/definitions/UserId'
  *           role:
- *             $ref: '#/definitions/UserRole'
+ *             $ref: '#/definitions/SystemRole'
  *           name:
  *             $ref: '#/definitions/Name'
  *   SignupRequest:
@@ -81,7 +81,7 @@ export const router: Router = Router();
  *         $ref: '#/definitions/Name'
  *         required: true
  *       role:
- *         $ref: '#/definitions/UserRole'
+ *         $ref: '#/definitions/SystemRole'
  *         required: true
  *   SignupAndSelfInfo:
  *     type: object
@@ -94,7 +94,7 @@ export const router: Router = Router();
  *           id:
  *             $ref: '#/definitions/UserId'
  *           role:
- *             $ref: '#/definitions/UserRole'
+ *             $ref: '#/definitions/SystemRole'
  *           name:
  *             $ref: '#/definitions/Name'
  */

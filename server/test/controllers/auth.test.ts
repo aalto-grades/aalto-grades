@@ -9,7 +9,7 @@ import supertest, { SuperAgentTest } from 'supertest';
 import { JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS } from '../../src/configs/constants';
 
 import { app } from '../../src/app';
-import { UserRole } from '../../src/types/general';
+import { SystemRole } from '../../src/types/general';
 import { HttpCode } from '../../src/types/httpCode';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
@@ -43,7 +43,7 @@ describe('Test POST /v1/auth/login - logging in with an existing user', () => {
       .then((res: supertest.Response) => {
         expect(res.body.success).toBe(true);
         expect(res.body.errors).not.toBeDefined();
-        expect(res.body.data.role).toBe(UserRole.Admin);
+        expect(res.body.data.role).toBe(SystemRole.Admin);
         expect(res.body.data.name).toBe('Aalto Sysadmin');
       });
   });
@@ -60,7 +60,7 @@ describe('Test POST /v1/auth/signup - create a new user', () => {
         name: 'aalto',
         password: 'grades',
         studentID: '123456',
-        role: UserRole.Admin
+        role: SystemRole.Admin
       })
       .expect(HttpCode.Conflict)
       .expect('Content-Type', /json/)
@@ -96,7 +96,7 @@ describe('Test POST /v1/auth/signup - create a new user', () => {
         email: 'sysadmin2@aalto.fi',
         name: 'aalto2',
         password: 'grades2',
-        role: UserRole.Admin
+        role: SystemRole.Admin
       })
       .expect(HttpCode.Ok)
       .expect('Content-Type', /json/)
@@ -112,7 +112,7 @@ describe('Test POST /v1/auth/signup - create a new user', () => {
       .then((res: supertest.Response) => {
         expect(res.body.success).toBe(true);
         expect(res.body.errors).not.toBeDefined();
-        expect(res.body.data.role).toBe(UserRole.Admin);
+        expect(res.body.data.role).toBe(SystemRole.Admin);
         expect(res.body.data.name).toBe('aalto2');
       });
   });
@@ -138,7 +138,7 @@ describe('Test GET /v1/auth/self-info - check users own info', () => {
       .then((res: supertest.Response) => {
         expect(res.body.success).toBe(true);
         expect(res.body.errors).not.toBeDefined();
-        expect(res.body.data.role).toBe(UserRole.Admin);
+        expect(res.body.data.role).toBe(SystemRole.Admin);
         expect(res.body.data.name).toBe('Aalto Sysadmin');
       });
     await agent.post('/v1/auth/logout').withCredentials(true).send({}).expect(HttpCode.Ok);

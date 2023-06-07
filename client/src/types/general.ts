@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 /* eslint-disable no-unused-vars */
-export enum UserRole {
+export enum SystemRole {
   User = 'USER',
   Admin = 'ADMIN'
 }

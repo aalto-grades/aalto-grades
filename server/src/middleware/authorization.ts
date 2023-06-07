@@ -4,11 +4,11 @@
 
 import { NextFunction, Request, Response } from 'express';
 
-import { JwtClaims, UserRole } from '../types/general';
+import { JwtClaims, SystemRole } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 
 export function authorization(
-  allowedRoles: Array<UserRole>
+  allowedRoles: Array<SystemRole>
 ): (req: Request, res: Response, next: NextFunction) => void {
 
   return async function (req: Request, res: Response, next: NextFunction) {

@@ -10,7 +10,7 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio from '@mui/material/Radio';
 import Grid from '@mui/material/Grid';
-import { UserRole } from '../../types/general';
+import { SystemRole } from '../../types/general';
 
 const SignupForm = ({ addUser }) => {
 
@@ -18,7 +18,7 @@ const SignupForm = ({ addUser }) => {
   const [password, setPassword] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [studentID, setStudentID] = useState<string | undefined>(undefined);
-  const [role, setRole] = useState<UserRole>(UserRole.User);
+  const [role, setRole] = useState<SystemRole>(SystemRole.User);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -91,11 +91,11 @@ const SignupForm = ({ addUser }) => {
           justifyContent='center'
         >
           <RadioGroup
-            defaultValue={UserRole.User}
+            defaultValue={SystemRole.User}
             name='radio-buttons-group'
-            onChange={({ target }) => setRole(target.value as UserRole)}>
-            <FormControlLabel value={UserRole.User} control={<Radio />} label='User' />
-            <FormControlLabel value={UserRole.Admin} control={<Radio />} label='Admin' />
+            onChange={({ target }) => setRole(target.value as SystemRole)}>
+            <FormControlLabel value={SystemRole.User} control={<Radio />} label='User' />
+            <FormControlLabel value={SystemRole.Admin} control={<Radio />} label='Admin' />
           </RadioGroup>
         </Grid>
         <Button type='submit'>Sign up</Button>

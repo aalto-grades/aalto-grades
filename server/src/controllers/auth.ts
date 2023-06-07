@@ -16,7 +16,7 @@ import { JWT_SECRET, NODE_ENV } from '../configs/environment';
 import User from '../database/models/user';
 
 import { ApiError } from '../types/error';
-import { JwtClaims, UserRole } from '../types/general';
+import { JwtClaims, SystemRole } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { findUserById } from './utils/user';
 
@@ -25,7 +25,7 @@ type PlainPassword = string;
 interface LoginResult {
   id: number,
   name: string,
-  role: UserRole
+  role: SystemRole
 }
 
 interface SignupRequest {
@@ -33,7 +33,7 @@ interface SignupRequest {
   password: PlainPassword,
   email: string,
   studentID: string | undefined,
-  role: UserRole | undefined
+  role: SystemRole | undefined
 }
 
 export async function validateLogin(email: string, password: PlainPassword): Promise<LoginResult> {
@@ -51,7 +51,7 @@ export async function validateLogin(email: string, password: PlainPassword): Pro
 
   return {
     id: user.id,
-    role: user.role as UserRole,
+    role: user.role as SystemRole,
     name: user.name ?? '-'
   };
 }
@@ -129,7 +129,7 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
       .transform((value: string, originalValue: string) => {
         return originalValue ? originalValue.toUpperCase() : value;
       })
-      .oneOf(Object.values(UserRole))
+      .oneOf(Object.values(SystemRole))
       .notRequired()
   });
 
@@ -146,11 +146,11 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
     email: request.email,
     password: await argon.hash(request.password.trim()),
     studentId: request.studentID,
-    role: request.role ?? UserRole.User
+    role: request.role ?? SystemRole.User
   });
 
   const body: JwtClaims = {
-    role: newUser.role as UserRole,
+    role: newUser.role as SystemRole,
     id: newUser.id
   };
 

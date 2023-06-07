@@ -9,7 +9,7 @@ import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SignupForm from '../components/auth/SignupForm';
 import Signup from '../components/auth/Signup';
-import { UserRole } from '../types/general';
+import { SystemRole } from '../types/general';
 
 describe('Tests for Login component', () => {
 
@@ -63,7 +63,7 @@ describe('Tests for Login component', () => {
       password: 'secret',
       email: 'test@email.com',
       studentID: '010101',
-      role: UserRole.User
+      role: SystemRole.User
     });
   });
 

@@ -5,7 +5,7 @@
 import supertest from 'supertest';
 
 import { app } from '../../src/app';
-import { UserRole } from '../../src/types/general';
+import { SystemRole } from '../../src/types/general';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 
@@ -25,7 +25,7 @@ export async function getCookies(): Promise<Cookies> {
       name: 'aalto tester',
       password: 'grades',
       studentID: new Date().getTime(),
-      role: UserRole.Admin
+      role: SystemRole.Admin
     });
 
   await request.post('/v1/auth/signup')
@@ -35,7 +35,7 @@ export async function getCookies(): Promise<Cookies> {
       name: 'aalto tester',
       password: 'grades',
       studentID: new Date().getTime(),
-      role: UserRole.User
+      role: SystemRole.User
     });
 
   const adminRes: supertest.Response = await request
