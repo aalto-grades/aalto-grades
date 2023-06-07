@@ -13,11 +13,11 @@ import SimpleDialog from './SimpleDialog';
 import ConfirmationDialog from './ConfirmationDialog';
 import StringTextField from './StringTextField';
 import DateTextField from './DateTextField';
-import assignmentServices from '../../services/assignments';
+import attainmentServices from '../../services/attainments';
 import formulaService from '../../services/formulas';
 
 // An Assignmnet component without subAttainments and hence without a formula as well.
-// If this isn't the root Assignment, this can be deleted
+// If this isn't the root Attainment, this can be deleted
 
 const categoryData = {
   fieldId: 'category',
@@ -68,27 +68,27 @@ AttributeTextFields.propTypes = {
   removeAttainment: PropTypes.func
 };
 
-const LeafAssignment = ({ indices, addSubAttainments, setAttainments, attainments, removeAttainment, formulaAttributeNames }) => {
+const LeafAttainment = ({ indices, addSubAttainments, setAttainments, attainments, removeAttainment, formulaAttributeNames }) => {
 
   // Functions and varibales for handling the change of the value in the 'Name' (category) textfield.
   // If the value is 'Other', then the 'New Name' textfield is displayed;
   // otherwise the name is the same as the category
   const handleChange = (event) => {
     const value = event.target.value;
-    let updatedAttainments = assignmentServices.setProperty(indices, attainments, 'category', value);
+    let updatedAttainments = attainmentServices.setProperty(indices, attainments, 'category', value);
     if (value === 'Other') {
       setDisplayNewName(true);
-      updatedAttainments = assignmentServices.setProperty(indices, updatedAttainments, 'name', '');
+      updatedAttainments = attainmentServices.setProperty(indices, updatedAttainments, 'name', '');
     } else {
       setDisplayNewName(false);
-      updatedAttainments = assignmentServices.setProperty(indices, updatedAttainments, 'name', value);
+      updatedAttainments = attainmentServices.setProperty(indices, updatedAttainments, 'name', value);
     }
     setAttainments(updatedAttainments);
   };
 
   const getValue = (fieldData) => {
     if (fieldData.fieldId === 'category') {
-      return assignmentServices.getProperty(indices, attainments, 'category');
+      return attainmentServices.getProperty(indices, attainments, 'category');
     } else {
       console.log(fieldData.fieldId);
     }
@@ -119,7 +119,7 @@ const LeafAssignment = ({ indices, addSubAttainments, setAttainments, attainment
   };
 
   // See if this attainment affects the parent attainment's grade
-  const affectCalculation = assignmentServices.getProperty(indices, attainments, 'affectCalculation');
+  const affectCalculation = attainmentServices.getProperty(indices, attainments, 'affectCalculation');
 
   return (
     <Box sx={{
@@ -149,7 +149,7 @@ const LeafAssignment = ({ indices, addSubAttainments, setAttainments, attainment
           InputLabelProps={{ shrink: true }}
           sx={{ textAlign: 'left' }}
           select>
-          <MenuItem value='Assignments'>Assignments</MenuItem>
+          <MenuItem value='Attainments'>Attainments</MenuItem>
           <MenuItem value='Exam'>Exam</MenuItem>
           <MenuItem value='Project'>Project</MenuItem>
           <MenuItem value='Other'>Other</MenuItem>
@@ -184,7 +184,7 @@ const LeafAssignment = ({ indices, addSubAttainments, setAttainments, attainment
           indices={indices}
           attainments={attainments}
         />
-        {assignmentServices.getSubAttainments(indices, attainments).length === 0 ?
+        {attainmentServices.getSubAttainments(indices, attainments).length === 0 ?
           <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
             Create Sub-Attainments
           </Button>
@@ -204,7 +204,7 @@ const LeafAssignment = ({ indices, addSubAttainments, setAttainments, attainment
   );
 };
 
-LeafAssignment.propTypes = {
+LeafAttainment.propTypes = {
   addSubAttainments: PropTypes.func,
   indices: PropTypes.array,
   attainments: PropTypes.array,
@@ -213,4 +213,4 @@ LeafAssignment.propTypes = {
   formulaAttributeNames: PropTypes.array,
 };
 
-export default LeafAssignment;
+export default LeafAttainment;

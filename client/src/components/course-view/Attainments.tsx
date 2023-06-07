@@ -8,10 +8,10 @@ import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import AssignmentCategory from '../assignments/AssignmentCategory';
+import AttainmentCategory from '../attainments/AttainmentCategory';
 import MenuButton from './MenuButton';
 
-const Assignments = ({ attainments, formula, courseId, instance, handleAddPoints }) => {
+const Attainments = ({ attainments, formula, courseId, instance, handleAddPoints }) => {
   const navigate = useNavigate();
 
   const actionOptions = [
@@ -32,7 +32,7 @@ const Assignments = ({ attainments, formula, courseId, instance, handleAddPoints
           /* Since the attainments are displayed by the course view, they exist in the database
              and their actual ids can be used are keys of the attainment accoridon */
           return (
-            <AssignmentCategory
+            <AttainmentCategory
               key={attainment.id}
               attainment={attainment}
               attainmentKey={'id'}
@@ -59,7 +59,7 @@ const Assignments = ({ attainments, formula, courseId, instance, handleAddPoints
   );
 };
 
-Assignments.propTypes = {
+Attainments.propTypes = {
   attainments: PropTypes.array,
   instance: PropTypes.object,
   formula: PropTypes.string,
@@ -67,4 +67,4 @@ Assignments.propTypes = {
   courseId: PropTypes.string,
 };
 
-export default Assignments;
+export default Attainments;

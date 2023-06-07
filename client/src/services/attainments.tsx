@@ -91,7 +91,7 @@ const deleteTemporaryAttainment: any = (attainments, newAttainment) => {
 
 
 // The following functions are used to cmoplete the functionality that is needed
-// for the components used in CreateAssignmentView and EditAssignmentView
+// for the components used in CreateAttainmentView and EditAttainmentView
 
 // The parameter 'indices' used in the following functions is an array of integres
 // that displays the indices of an attainment on different levels.

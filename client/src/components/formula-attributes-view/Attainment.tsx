@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import formulaService from '../../services/formulas';
 
-const Assignment = ({ attainment, attributes, handleAttributeChange, attainmentIndex }) => {
+const Attainment = ({ attainment, attributes, handleAttributeChange, attainmentIndex }) => {
 
   const attributeTextFields = () => {
     return (
@@ -65,11 +65,11 @@ const Assignment = ({ attainment, attributes, handleAttributeChange, attainmentI
   );
 };
 
-Assignment.propTypes = {
+Attainment.propTypes = {
   attainment: PropTypes.object,
   attributes: PropTypes.array,
   handleAttributeChange: PropTypes.func,
   attainmentIndex: PropTypes.number
 };
 
-export default Assignment;
+export default Attainment;

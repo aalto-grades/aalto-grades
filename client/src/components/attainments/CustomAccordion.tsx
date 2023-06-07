@@ -79,7 +79,7 @@ AccordionDetails.propTypes = {
   out: PropTypes.bool
 };
 
-const AssignmentText = ({ name, formulaId }) => {
+const AttainmentText = ({ name, formulaId }) => {
   return (
     <Box sx={{ display: 'flex',
       flexDirection: 'row',
@@ -97,12 +97,12 @@ const AssignmentText = ({ name, formulaId }) => {
   );
 };
 
-AssignmentText.propTypes = {
+AttainmentText.propTypes = {
   name: PropTypes.string,
   formulaId: PropTypes.number,
 };
 
-export { AccordionDetails, AssignmentText };
+export { AccordionDetails, AttainmentText };
 
 const CustomAccordion = ({ attainments, attainmentKey }) => {
 
@@ -142,13 +142,13 @@ const CustomAccordion = ({ attainments, attainmentKey }) => {
               expanded={expanded.has(attainment[attainmentKey]).toString()}
               nowselected={(selected === attainment[attainmentKey]).toString()}
             >
-              <AssignmentText name={attainment.name} formulaId={attainment.formulaId} />
+              <AttainmentText name={attainment.name} formulaId={attainment.formulaId} />
             </AccordionSummary>
             { attainment.subAttainments.map(subAttainment => {
               return (
                 subAttainment.subAttainments.length === 0 ?  // is the attainment a leaf? If yes, render details, else another accordion
                   <AccordionDetails key={subAttainment[attainmentKey] + 'details'}>
-                    <AssignmentText name={subAttainment.name} formulaId={subAttainment.formulaId} />
+                    <AttainmentText name={subAttainment.name} formulaId={subAttainment.formulaId} />
                   </AccordionDetails>
                   :
                   <Box key={subAttainment[attainmentKey] + 'subAccordion'} sx={{ pl: '39px' }}>

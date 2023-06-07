@@ -7,8 +7,8 @@ import { MemoryRouter, Routes, Route, Outlet } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { act, render, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import EditAssignmentView from '../components/EditAssignmentView';
-import assignmentServices from '../services/assignments';
+import EditAttainmentView from '../components/EditAttainmentView';
+import attainmentServices from '../services/attainments';
 import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 
 const courseId = 1;
@@ -24,17 +24,17 @@ const getMockAttainment = () => {
   ));
 };
 
-assignmentServices.addAttainment = jest.fn();
-assignmentServices.editAttainment = jest.fn();
+attainmentServices.addAttainment = jest.fn();
+attainmentServices.editAttainment = jest.fn();
 afterEach(cleanup);
 
-describe('Tests for EditAssignmentView components', () => {
+describe('Tests for EditAttainmentView components', () => {
 
-  const renderEditAssignmentView = async () => {
+  const renderEditAttainmentView = async () => {
     return render(
       <MemoryRouter initialEntries={[`/${courseId}/edit-attainment/${instanceId}/` + attainmentId]}>
         <Routes>
-          <Route path='/:courseId/edit-attainment/:instanceId/:attainmentId' element={<EditAssignmentView/>}/>
+          <Route path='/:courseId/edit-attainment/:instanceId/:attainmentId' element={<EditAttainmentView/>}/>
         </Routes>
       </MemoryRouter>
     );
@@ -50,22 +50,22 @@ describe('Tests for EditAssignmentView components', () => {
     setIncrementId: jest.fn(),
   };
 
-  const renderTemporaryEditAssignmentView = async () => {
+  const renderTemporaryEditAttainmentView = async () => {
 
     return render(
       <MemoryRouter initialEntries={[`/${courseId}/edit-temporary-attainment/${instanceId}/` + attainmentId]}>
         <Routes>
           <Route element={<Outlet context={mockContext}/>}>
-            <Route path='/:courseId/edit-temporary-attainment/:sisuInstanceId/:attainmentId' element={<EditAssignmentView/>}/>
+            <Route path='/:courseId/edit-temporary-attainment/:sisuInstanceId/:attainmentId' element={<EditAttainmentView/>}/>
           </Route>
         </Routes>
       </MemoryRouter>
     );
   };
 
-  test('EditAssignmentView should render the appropriate amount of components', async () => {
+  test('EditAttainmentView should render the appropriate amount of components', async () => {
 
-    renderEditAssignmentView();
+    renderEditAttainmentView();
 
     await waitFor(async () => {
       const headingElement = screen.getByText('Edit Study Attainment');
@@ -73,7 +73,7 @@ describe('Tests for EditAssignmentView components', () => {
       const confirmButton = screen.getByText('Confirm');
 
       let mockAttainment = getMockAttainment();  // array with one object
-      const numOfAttainments = assignmentServices.getNumOfAttainments(mockAttainment);
+      const numOfAttainments = attainmentServices.getNumOfAttainments(mockAttainment);
 
       expect(headingElement).toBeInTheDocument();
       expect(categoryField).toHaveLength(numOfAttainments);
@@ -81,7 +81,7 @@ describe('Tests for EditAssignmentView components', () => {
     });
   });
 
-  test('EditAssignmentView should only edit attainments if new ones are not created', async () => {
+  test('EditAttainmentView should only edit attainments if new ones are not created', async () => {
 
     // Mock request from client,
     // TODO: needs to be modified to match the final format used by the server.
@@ -90,7 +90,7 @@ describe('Tests for EditAssignmentView components', () => {
     mockAttainment.date = mockDate;
     mockAttainment.expiryDate = mockExpiryDate;
 
-    renderEditAssignmentView();
+    renderEditAttainmentView();
 
     await waitFor(async () => {
 
@@ -103,13 +103,13 @@ describe('Tests for EditAssignmentView components', () => {
       const confirmButton = screen.getByText('Confirm');
       userEvent.click(confirmButton);
 
-      expect(assignmentServices.editAttainment).toHaveBeenCalledWith(String(courseId), String(instanceId), mockAttainment);
-      expect(assignmentServices.addAttainment).not.toHaveBeenCalledWith(String(courseId), String(instanceId), mockAttainment);
+      expect(attainmentServices.editAttainment).toHaveBeenCalledWith(String(courseId), String(instanceId), mockAttainment);
+      expect(attainmentServices.addAttainment).not.toHaveBeenCalledWith(String(courseId), String(instanceId), mockAttainment);
     });
 
   });
 
-  test('EditAssignmentView should edit and add attainments if also new attainments are created', async () => {
+  test('EditAttainmentView should edit and add attainments if also new attainments are created', async () => {
 
     const newAttainment = {
       name: '',
@@ -132,7 +132,7 @@ describe('Tests for EditAssignmentView components', () => {
 
     console.log(mockAttainment);
 
-    renderEditAssignmentView();
+    renderEditAttainmentView();
 
     // Set the top attainment's dates
     const dateField = screen.getByLabelText('Date');
@@ -166,14 +166,14 @@ describe('Tests for EditAssignmentView components', () => {
     // Edit the original attainment and add one sub attainment to it
     act(() => userEvent.click(confirmButtons[0]));
 
-    expect(assignmentServices.editAttainment).toHaveBeenCalledWith(String(courseId), String(instanceId), mockAttainment);
-    expect(assignmentServices.addAttainment).toHaveBeenCalledWith(String(courseId), String(instanceId), newAttainment);
+    expect(attainmentServices.editAttainment).toHaveBeenCalledWith(String(courseId), String(instanceId), mockAttainment);
+    expect(attainmentServices.addAttainment).toHaveBeenCalledWith(String(courseId), String(instanceId), newAttainment);
 
   });
 
-  test('EditAssignmentView should render the appropriate amount of components during instance creation', async () => {
+  test('EditAttainmentView should render the appropriate amount of components during instance creation', async () => {
 
-    renderTemporaryEditAssignmentView();
+    renderTemporaryEditAttainmentView();
 
     await waitFor(async () => {
       const headingElement = screen.getByText('Edit Study Attainment');
@@ -181,7 +181,7 @@ describe('Tests for EditAssignmentView components', () => {
       const confirmButton = screen.getByText('Confirm');
 
       let mockAttainment = getMockAttainment();  // array with one object
-      const numOfAttainments = assignmentServices.getNumOfAttainments(mockAttainment);
+      const numOfAttainments = attainmentServices.getNumOfAttainments(mockAttainment);
 
       expect(headingElement).toBeInTheDocument();
       expect(categoryField).toHaveLength(numOfAttainments);
@@ -190,14 +190,14 @@ describe('Tests for EditAssignmentView components', () => {
 
   });
 
-  test('EditAssignmentView should update the context during instance creation', async () => {
+  test('EditAttainmentView should update the context during instance creation', async () => {
 
     let mockAttainment = getMockAttainment()[0];  // object
     mockAttainment.temporaryId = mockAttainment.id;
     mockAttainment.date = mockDate.split('T')[0];
     mockAttainment.expiryDate = mockExpiryDate.split('T')[0];
 
-    renderTemporaryEditAssignmentView();
+    renderTemporaryEditAttainmentView();
 
     await waitFor(async () => {
 
@@ -210,7 +210,7 @@ describe('Tests for EditAssignmentView components', () => {
       const confirmButton = screen.getByText('Confirm');
       userEvent.click(confirmButton);
 
-      const updatedAttainments = assignmentServices.updateTemporaryAttainment(mockContext.addedAttainments, mockAttainment);
+      const updatedAttainments = attainmentServices.updateTemporaryAttainment(mockContext.addedAttainments, mockAttainment);
 
       expect(mockContext.setAddedAttainments).toHaveBeenCalledWith(updatedAttainments);
 

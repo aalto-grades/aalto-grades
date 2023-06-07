@@ -4,16 +4,16 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import LeafAssignment from './LeafAssignment';
-import ParentAssignment from './ParentAssignment';
-import assignmentServices from '../../services/assignments';
+import LeafAttainment from './LeafAttainment';
+import ParentAttainment from './ParentAttainment';
+import attainmentServices from '../../services/attainments';
 
-// Parent component for the components LeafAssignment and ParentAssignment
+// Parent component for the components LeafAttainment and ParentAttainment
 
-const Assignment = ({ indices, attainments, setAttainments, removeAttainment, formulaAttributeNames, temporaryId, setIncrementId }) => {
+const Attainment = ({ indices, attainments, setAttainments, removeAttainment, formulaAttributeNames, temporaryId, setIncrementId }) => {
 
   const addSubAttainments = (numOfAttainments) => {
-    const [updatedAttainments, newTemporaryId] = assignmentServices.addSubAttainments(indices, attainments, numOfAttainments, temporaryId);
+    const [updatedAttainments, newTemporaryId] = attainmentServices.addSubAttainments(indices, attainments, numOfAttainments, temporaryId);
     setAttainments(updatedAttainments);
     if (setIncrementId)
       setIncrementId(newTemporaryId);
@@ -21,8 +21,8 @@ const Assignment = ({ indices, attainments, setAttainments, removeAttainment, fo
 
   return (
     <>
-      {assignmentServices.getSubAttainments(indices, attainments).length === 0 ?
-        <LeafAssignment
+      {attainmentServices.getSubAttainments(indices, attainments).length === 0 ?
+        <LeafAttainment
           indices={indices}
           addSubAttainments={addSubAttainments}
           attainments={attainments}
@@ -31,7 +31,7 @@ const Assignment = ({ indices, attainments, setAttainments, removeAttainment, fo
           formulaAttributeNames={formulaAttributeNames}
         />
         :
-        <ParentAssignment
+        <ParentAttainment
           indices={indices}
           addSubAttainments={addSubAttainments}
           attainments={attainments}
@@ -45,7 +45,7 @@ const Assignment = ({ indices, attainments, setAttainments, removeAttainment, fo
   );
 };
 
-Assignment.propTypes = {
+Attainment.propTypes = {
   attainments: PropTypes.array,
   setAttainments: PropTypes.func,
   indices: PropTypes.array,
@@ -55,4 +55,4 @@ Assignment.propTypes = {
   setIncrementId: PropTypes.func
 };
 
-export default Assignment;
+export default Attainment;
