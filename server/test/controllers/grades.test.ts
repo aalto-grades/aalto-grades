@@ -344,7 +344,7 @@ describe(
       );
       await request
         .post('/v1/courses/1/instances/1/grades/csv')
-        .attach('csv_data', csvData, { contentType: 'text/csv'})
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
         .set('Accept', 'application/json')
         .expect(HttpCode.Unauthorized);
     });

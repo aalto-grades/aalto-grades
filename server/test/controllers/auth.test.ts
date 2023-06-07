@@ -87,7 +87,7 @@ describe('Test POST /v1/auth/signup - create a new user', () => {
   it('should allow creation of a new account', async () => {
     await request.post('/v1/auth/login')
       .set('Accept', 'application/json')
-      .send({ email: 'sysadmin2@aalto.fi', password: 'grades2'})
+      .send({ email: 'sysadmin2@aalto.fi', password: 'grades2' })
       .expect(HttpCode.Unauthorized);
     await request.post('/v1/auth/signup')
       .set('Accept', 'application/json')
