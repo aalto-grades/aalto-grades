@@ -32,8 +32,8 @@ interface SignupRequest {
   name: string,
   password: PlainPassword,
   email: string,
-  studentID: string | undefined,
-  role: SystemRole | undefined
+  studentNumber?: string,
+  role?: SystemRole
 }
 
 export async function validateLogin(email: string, password: PlainPassword): Promise<LoginResult> {
@@ -54,46 +54,6 @@ export async function validateLogin(email: string, password: PlainPassword): Pro
     role: user.role as SystemRole,
     name: user.name ?? '-'
   };
-}
-
-export async function performSignup(
-  name: string, email: string, plainPassword: PlainPassword, studentNumber: string | undefined
-): Promise<number> {
-  const exists: User | null = await User.findByEmail(email);
-
-  if (exists) {
-    throw new ApiError('user account with the specified email already exists', HttpCode.Conflict);
-  }
-
-  const newUser: User = await User.create({
-    name: name,
-    email: email,
-    password: await argon.hash(plainPassword.trim()),
-    studentNumber: studentNumber,
-  });
-
-  return newUser.id;
-}
-
-interface SignupRequest {
-  name: string,
-  password: PlainPassword,
-  email: string,
-  studentNumber: string | undefined,
-  role: UserRole,
-}
-
-const signupSchema: yup.AnyObjectSchema = yup.object().shape({
-  name: yup.string().required(),
-  password: yup.string().required(),
-  email: yup.string().email().required(),
-  studentNumber: yup.string().notRequired(),
-  role: yup.string().oneOf(Object.values(UserRole)).required(),
-});
-
-export interface JwtClaims {
-  role: UserRole,
-  id: number,
 }
 
 export async function authLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -185,15 +145,10 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
     name: request.name,
     email: request.email,
     password: await argon.hash(request.password.trim()),
-    studentId: request.studentID,
+    studentNumber: request.studentNumber,
     role: request.role ?? SystemRole.User
   });
 
-  // TODO signup
-  const id: number = await performSignup(
-    request.name, request.email, request.password, request.studentNumber
-  );
- 
   const body: JwtClaims = {
     role: newUser.role as SystemRole,
     id: newUser.id
