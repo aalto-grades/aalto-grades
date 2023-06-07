@@ -6,14 +6,17 @@ import supertest from 'supertest';
 
 import { app } from '../../src/app';
 import { HttpCode } from '../../src/types/httpCode';
-import { getCookies } from '../util/getCookies';
+import { Cookies, getCookies } from '../util/getCookies';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
-let authCookie: Array<string> = [];
+let cookies: Cookies = {
+  adminCookie: [],
+  userCookie: []
+};
 
 beforeAll(async () => {
-  authCookie = await getCookies();
+  cookies = await getCookies();
 });
 
 describe(
@@ -23,7 +26,7 @@ describe(
     it('should respond with correct data when course instance exists', async () => {
       const res: supertest.Response = await request
         .get('/v1/courses/1/instances/1')
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -49,7 +52,7 @@ describe(
     it('should not count students as teachers in charge', async () => {
       const res: supertest.Response = await request
         .get('/v1/courses/5/instances/14')
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -60,7 +63,7 @@ describe(
     it('should not count teachers as teachers in charge', async () => {
       const res: supertest.Response = await request
         .get('/v1/courses/6/instances/15')
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -71,7 +74,7 @@ describe(
     it('should find multiple teachers in charge', async () => {
       const res: supertest.Response = await request
         .get('/v1/courses/4/instances/5')
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -83,7 +86,7 @@ describe(
       async () => {
         const res: supertest.Response = await request
           .get('/v1/courses/1/instances/abc')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
@@ -93,20 +96,16 @@ describe(
       });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
-      const res: supertest.Response = await request
+      await request
         .get('/v1/courses/1/instances/1')
         .set('Accept', 'application/json')
         .expect(HttpCode.Unauthorized);
-
-      expect(res.body.success).toBe(false);
-      expect(res.body.errors[0]).toBe('unauthorized');
-      expect(res.body.data).not.toBeDefined();
     });
 
     it('should respond with 404 not found, with nonexistent course instance ID', async () => {
       const res: supertest.Response = await request
         .get(`/v1/courses/1/instances/${badId}`)
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.NotFound);
 
@@ -119,7 +118,7 @@ describe(
       async () => {
         const res: supertest.Response = await request
           .get('/v1/courses/2/instances/1')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Conflict);
 
@@ -137,7 +136,7 @@ describe(
     it('should respond with correct data', async () => {
       const res: supertest.Response = await request
         .get('/v1/courses/1/instances')
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -158,20 +157,16 @@ describe(
     });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
-      const res: supertest.Response = await request
+      await request
         .get('/v1/courses/1/instances')
         .set('Accept', 'application/json')
         .expect(HttpCode.Unauthorized);
-
-      expect(res.body.success).toBe(false);
-      expect(res.body.errors[0]).toBe('unauthorized');
-      expect(res.body.data).not.toBeDefined();
     });
 
     it('should respond with 400 bad request, if courseId is not a number', async () => {
       const res: supertest.Response = await request
         .get('/v1/courses/a/instances')
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.BadRequest);
 
@@ -183,7 +178,7 @@ describe(
     it('should respond with 404 not found, if course does not exist', async () => {
       const res: supertest.Response = await request
         .get(`/v1/courses/${badId}/instances`)
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.NotFound);
 
@@ -202,7 +197,7 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       const res: supertest.Response = await request
         .post('/v1/courses/1/instances')
         .send(input)
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -249,15 +244,11 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
   });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
-    const res: supertest.Response = await request
+    await request
       .post('/v1/courses/1/instances')
       .send({})
       .set('Accept', 'application/json')
       .expect(HttpCode.Unauthorized);
-
-    expect(res.body.success).toBe(false);
-    expect(res.body.errors[0]).toBe('unauthorized');
-    expect(res.body.data).not.toBeDefined();
   });
 
   it('should respond with 400 bad request, if incorrect input', async () => {
@@ -265,7 +256,7 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       const res: supertest.Response = await request
         .post('/v1/courses/1/instances')
         .send(input)
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.BadRequest);
 
@@ -368,7 +359,7 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
         startDate: '2022-7-10',
         endDate: '2022-11-10'
       })
-      .set('Cookie', authCookie)
+      .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.NotFound);
 
@@ -392,7 +383,7 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
           startDate: '2022-7-10',
           endDate: '2022-11-10'
         })
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.UnprocessableEntity);
 

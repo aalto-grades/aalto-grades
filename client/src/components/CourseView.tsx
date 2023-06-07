@@ -18,10 +18,12 @@ import instancesService from '../services/instances';
 import sortingServices from '../services/sorting';
 import useAuth from '../hooks/useAuth';
 import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
+import { SystemRole } from '../types/general';
 
-const mockInstitution = 'Aalto University';   // REPLACE SOME DAY? currently this info can't be fetched from database
+// REPLACE SOME DAY? currently this info can't be fetched from database
+const mockInstitution: string = 'Aalto University';
 
-const CourseView = () => {
+const CourseView = (): JSX.Element => {
   let navigate = useNavigate();
   let { courseId } = useParams();
   const { auth } = useAuth();
@@ -53,15 +55,15 @@ const CourseView = () => {
     setAnimation(true);
   }, [currentInstance]);
 
-  const handleClickOpen = () => {
+  const handleClickOpen = (): void => {
     setOpen(true);
   };
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     setOpen(false);
   };
 
-  const onChangeInstance = (instance) => {
+  const onChangeInstance = (instance): void => {
     if(instance.id !== currentInstance.id) {
       setAnimation(false);
       setCurrentInstance(instance);
@@ -70,13 +72,14 @@ const CourseView = () => {
 
   return(
     <Box sx={{ mx: -2.5 }}>
-      {courseDetails && currentInstance && instances &&
+      {
+        courseDetails &&
         <>
           <Typography variant='h1' align='left'>{courseDetails.courseCode}</Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', mb: 4, columnGap: 6 }}>
             <Typography variant='h2' align='left'>{courseDetails.name.en}</Typography>
             { /* Only admins and teachers are allowed to create a new instance */
-              (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') &&
+              auth.role == SystemRole.Admin &&
             <Button
               id='ag_new_instance_btn'
               size='large'
@@ -89,30 +92,43 @@ const CourseView = () => {
             </Button>
             }
           </Box>
-          <Box sx={{ display: 'flex', gap: 3 }}>
-            <Grow in={animation} style={{ transformOrigin: '50% 0 0' }} {...(animation? { timeout: 500 } : { timeout: 0 })}>
-              <div>
-                <InstanceDetails info={ { ...currentInstance, department: courseDetails.department, institution: mockInstitution } } />
-              </div>
-            </Grow>
-            { /* a different attainment component will be created for students */
-              (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') &&
-              <Grow in={animation} style={{ transformOrigin: '0 0 0' }} {...(animation? { timeout: 1000 } : { timeout: 0 })}>
-                <div style={{ width: '100%' }}>
-                  <Attainments
-                    attainments={mockAttainmentsClient}
-                    courseId={courseId}
-                    formula={'Weighted Average'}
-                    instance={currentInstance}
-                    handleAddPoints={handleClickOpen}
-                  /> {/* TODO: Retrieve real formula */}
-                </div>
-              </Grow>
-            }
-          </Box>
-          <Typography variant='h2' align='left' sx={{ mt: 6, mb: 3 }}>All Instances</Typography>
-          <InstancesTable data={instances} current={currentInstance.id} onClick={onChangeInstance} />
-          <FileLoadDialog instanceId={currentInstance.id} open={open} handleClose={handleClose}/>
+          {
+            currentInstance && instances &&
+            <>
+              <Box sx={{ display: 'flex', gap: 3 }}>
+                <Grow in={animation} style={{ transformOrigin: '50% 0 0' }} {...(animation ? { timeout: 500 } : { timeout: 0 })}>
+                  <div>
+                    <InstanceDetails info={{ ...currentInstance, department: courseDetails.department, institution: mockInstitution }} />
+                  </div>
+                </Grow>
+                { /* a different attainment component will be created for students */
+                  auth.role == SystemRole.Admin &&
+                  <Grow in={animation} style={{ transformOrigin: '0 0 0' }} {...(animation ? { timeout: 1000 } : { timeout: 0 })}>
+                    <div style={{ width: '100%' }}>
+                      <Attainments
+                        attainments={mockAttainmentsClient}
+                        courseId={courseId}
+                        formula={'Weighted Average'}
+                        instance={currentInstance}
+                        handleAddPoints={handleClickOpen}
+                      /> {/* TODO: Retrieve real formula */}
+                    </div>
+                  </Grow>
+                }
+              </Box>
+              <Typography variant='h2' align='left' sx={{ mt: 6, mb: 3 }}>All Instances</Typography>
+              <InstancesTable data={instances} current={currentInstance.id} onClick={onChangeInstance} />
+              <FileLoadDialog instanceId={currentInstance.id} open={open} handleClose={handleClose} />
+            </>
+            ||
+            <Typography variant='h3'>
+              This course has no instances. <a href={
+                `/${courseId}/fetch-instances/${courseDetails.courseCode}`
+              }>
+                Add a new instance.
+              </a>
+            </Typography>
+          }
         </>
       }
     </Box>

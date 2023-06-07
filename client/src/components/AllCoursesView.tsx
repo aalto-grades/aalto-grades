@@ -10,6 +10,7 @@ import Box from '@mui/material/Box';
 import CourseTable from './front-page/CourseTable';
 import coursesService from '../services/courses';
 import useAuth from '../hooks/useAuth';
+import { SystemRole } from '../types/general';
 
 const AllCoursesView = (): JSX.Element => {
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ const AllCoursesView = (): JSX.Element => {
           Courses
         </Typography>
         { /* Admins are shown the button for creating a new course */
-          auth.role == 'SYSADMIN' &&
+          auth.role == SystemRole.Admin &&
           <Button id='ag_new_course_btn' size='large' variant='contained' onClick={() => {
             navigate('/create-course');
           }}>

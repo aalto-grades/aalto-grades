@@ -13,9 +13,9 @@ const CreateCourseView = () => {
 
   const addCourse = async (courseObject) => {
     try {
-      const course = await coursesService.addCourse(courseObject);
-      console.log(course);
-      navigate('/', { replace: true });
+      const data = await coursesService.addCourse(courseObject);
+      console.log(data);
+      navigate(`/course-view/${data.course.id}`, { replace: true });
     } catch (exception) {
       console.log(exception.message);
     }
@@ -24,7 +24,7 @@ const CreateCourseView = () => {
   return(
     <>
       <Typography variant="h1" sx={{ flexGrow: 1, mb: 4 }}>
-                    Create a New Course
+        Create a New Course
       </Typography>
       <CreateCourseForm addCourse={addCourse}/>
     </>
