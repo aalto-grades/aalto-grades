@@ -13,6 +13,7 @@ import instancesService from '../services/instances';
 import AuthContext from '../context/authProvider';
 import mockCourses from '../mock-data/mockCourses';
 import mockInstances from '../mock-data/mockInstancesWithStringDates';
+import { UserRole } from '../types/general';
 
 jest.mock('../services/courses');
 jest.mock('../services/instances');
@@ -43,9 +44,9 @@ describe('Tests for CourseView component', () => {
   };
 
 
-  test('CourseView should render InstanceDetails, Attainments and InstancesTable components for teachers', async () => {
+  test('CourseView should render InstanceDetails, Attainments and InstancesTable components for teachers of the course', async () => {
 
-    const auth = { role: 'TEACHER' };
+    const auth = { role: UserRole.User };
     const { getByText, getAllByText } = renderCourseView(auth);
 
     await waitFor(() => {
@@ -73,7 +74,7 @@ describe('Tests for CourseView component', () => {
 
   test('CourseView should not render new instance button, see attendees or allow editing attainments for students', async () => {
 
-    const auth = { role: 'STUDENT' };
+    const auth = { role: UserRole.User };
     const { getByText, findByText, queryByText } = renderCourseView(auth);
 
     const instanceInfo = await findByText('Instance Details');  // with the new animation, wait is needed before components are rendered
@@ -93,7 +94,7 @@ describe('Tests for CourseView component', () => {
 
   test('CourseView should allow changing the instance that is displayed in detail', async () => {
 
-    const auth = { role: 'TEACHER' };
+    const auth = { role: UserRole.User };
     const { findByText, findAllByRole } = renderCourseView(auth);
 
     const instanceRows = await findAllByRole('row');

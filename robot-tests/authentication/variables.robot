@@ -9,7 +9,7 @@ ${signUpNameField}          input[name="name"]
 ${signUpEmailField}         input[name="email"]
 ${signUpStudentIdField}     input[name="StudentID"]
 ${signUpPassword}           input[name="password"]
-${signUpAdminSelector}      input[value="SYSADMIN"]
+${signUpAdminSelector}      input[value="ADMIN"]
 ${signUpSubmit}             button[type="submit"]
 ${createNewCourseButton}    button[id=ag_new_course_btn]
 ${adminUsername}            testi45

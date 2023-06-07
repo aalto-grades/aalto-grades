@@ -15,6 +15,7 @@ import AuthContext from '../context/authProvider';
 import mockCourses from '../mock-data/mockCourses';
 import mockInstances from '../mock-data/mockInstancesWithStringDates';
 import { maxErrorsToShow } from '../components/course-view/FileLoadDialog';
+import { UserRole } from '../types/general';
 
 let file = new File(['idk'], 'grades_test.csv', { type: 'csv' });
 
@@ -66,7 +67,7 @@ describe('FileLoadDialog test with proper csv', () => {
 
   test('FileLoadDialog should render', async () => {
 
-    const auth = { role: 'TEACHER' };
+    const auth = { role: UserRole.User };
     const { getByText, findByText } = renderCourseView(auth);
 
     const importGradesMenuButton = await findByText('Import grades');
@@ -94,7 +95,7 @@ describe('FileLoadDialog test with proper csv', () => {
 
   test('FileLoadDialog should show error when trying to submit without selecting file', async () => {
 
-    const auth = { role: 'TEACHER' };
+    const auth = { role: UserRole.User };
     const { getByText, findByText } = renderCourseView(auth);
 
     const importGradesMenuButton = await findByText('Import grades');
@@ -117,7 +118,7 @@ describe('FileLoadDialog test with proper csv', () => {
 
   test('FileLoadDialog should close when submitted file is okay', async () => {
 
-    const auth = { role: 'TEACHER' };
+    const auth = { role: UserRole.User };
     const { getByText, findByText } = renderCourseView(auth);
 
     const importGradesMenuButton = await findByText('Import grades');
@@ -172,7 +173,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
 
   test('FileLoadDialog should not close with bad csv', async () => {
 
-    const auth = { role: 'TEACHER' };
+    const auth = { role: UserRole.User };
     const { getByText, findByText } = renderCourseView(auth);
 
     const importGradesMenuButton = await findByText('Import grades');
@@ -220,7 +221,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
     `FileLoadDialog should not render show all errors button if amount of errors less or equal to limit of ${maxErrorsToShow}`,
     async () => {
 
-      const auth = { role: 'TEACHER' };
+      const auth = { role: UserRole.User };
       const { getByText, findByText } = renderCourseView(auth);
 
       const importGradesMenuButton = await findByText('Import grades');

@@ -9,6 +9,7 @@ import { act, render, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import AuthContext from '../context/authProvider';
 import UserButton from '../components/auth/UserButton';
+import { UserRole } from '../types/general';
 
 jest.mock('../services/courses');
 afterEach(cleanup);
@@ -26,7 +27,7 @@ describe('Tests for button component displaying user data and logout', () => {
   };
 
   test('User button should display the currently logged in users name', async () => {
-    const auth = { id: 1, role: 'TEACHER', name: 'John Doe' };
+    const auth = { id: 1, role: UserRole.User, name: 'John Doe' };
     renderButton(auth);
     await waitFor(() => expect(screen.queryByText('John Doe')).toBeInTheDocument());
   });
@@ -38,7 +39,7 @@ describe('Tests for button component displaying user data and logout', () => {
   });
 
   test('Clicking user button should display logout option', async () => {
-    const auth = { id: 1, role: 'TEACHER', name: 'John Doe' };
+    const auth = { id: 1, role: UserRole.User, name: 'John Doe' };
     renderButton(auth);
 
     const button = screen.getByText('John Doe');
