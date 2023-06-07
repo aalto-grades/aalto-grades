@@ -17,7 +17,7 @@ export async function getCookies(): Promise<Array<string>> {
       email,
       name: 'aalto tester',
       password: 'grades',
-      studentID: new Date().getTime(),
+      studentNumber: new Date().getTime(),
       role: 'SYSADMIN'
     });
 

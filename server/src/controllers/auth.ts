@@ -61,7 +61,7 @@ export async function validateLogin(email: string, password: PlainPassword): Pro
 }
 
 export async function performSignup(
-  name: string, email: string, plainPassword: PlainPassword, studentId: string | undefined
+  name: string, email: string, plainPassword: PlainPassword, studentNumber: string | undefined
 ): Promise<number> {
   const exists: User | null = await User.findByEmail(email);
 
@@ -73,7 +73,7 @@ export async function performSignup(
     name: name,
     email: email,
     password: await argon.hash(plainPassword.trim()),
-    studentId: studentId,
+    studentNumber: studentNumber,
   });
 
   return newUser.id;
@@ -83,7 +83,7 @@ interface SignupRequest {
   name: string,
   password: PlainPassword,
   email: string,
-  studentID: string | undefined,
+  studentNumber: string | undefined,
   role: UserRole,
 }
 
@@ -91,7 +91,7 @@ const signupSchema: yup.AnyObjectSchema = yup.object().shape({
   name: yup.string().required(),
   password: yup.string().required(),
   email: yup.string().email().required(),
-  studentID: yup.string().notRequired(),
+  studentNumber: yup.string().notRequired(),
   role: yup.string().oneOf(Object.values(UserRole)).required(),
 });
 
@@ -169,7 +169,7 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
 
   // TODO signup
   const id: number = await performSignup(
-    request.name, request.email, request.password, request.studentID
+    request.name, request.email, request.password, request.studentNumber
   );
   const body: JwtClaims = {
     role: req.body.role,

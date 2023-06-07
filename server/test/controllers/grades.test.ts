@@ -59,7 +59,7 @@ describe(
       async () => {
         let users: Array<User> = await User.findAll({
           where: {
-            studentId: {
+            studentNumber: {
               [Op.in]: ['987654', '998877']
             }
           }
@@ -78,7 +78,7 @@ describe(
 
         users = await User.findAll({
           where: {
-            studentId: {
+            studentNumber: {
               [Op.in]: ['987654', '998877']
             }
           }
@@ -104,7 +104,7 @@ describe(
     it('should update attainment grade if user grading data already exist in the db', async () => {
       const user: User = await User.findOne({
         where: {
-          studentId: '662292'
+          studentNumber: '662292'
         }
       }) as User;
 
@@ -500,42 +500,42 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
       return [
         {
           User: {
-            studentId: '111111'
+            studentNumber: '111111'
           },
           grade: 1,
           attainableId: 2,
         },
         {
           User: {
-            studentId: '111111'
+            studentNumber: '111111'
           },
           grade: 3,
           attainableId: 3,
         },
         {
           User: {
-            studentId: '222222'
+            studentNumber: '222222'
           },
           grade: 5,
           attainableId: 2,
         },
         {
           User: {
-            studentId: '222222'
+            studentNumber: '222222'
           },
           grade: 4,
           attainableId: 3,
         },
         {
           User: {
-            studentId: '333333'
+            studentNumber: '333333'
           },
           grade: 4,
           attainableId: 2,
         },
         {
           User: {
-            studentId: '333333'
+            studentNumber: '333333'
           },
           grade: 1,
           attainableId: 3,
@@ -655,35 +655,35 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
       return [
         {
           User: {
-            studentId: '123456'
+            studentNumber: '123456'
           },
           grade: 3,
           attainableId: 2,
         },
         {
           User: {
-            studentId: '123456'
+            studentNumber: '123456'
           },
           grade: 4,
           attainableId: 4,
         },
         {
           User: {
-            studentId: '123456'
+            studentNumber: '123456'
           },
           grade: 4,
           attainableId: 5,
         },
         {
           User: {
-            studentId: '123456'
+            studentNumber: '123456'
           },
           grade: 1,
           attainableId: 7,
         },
         {
           User: {
-            studentId: '123456'
+            studentNumber: '123456'
           },
           grade: 5,
           attainableId: 8,
@@ -743,21 +743,21 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
       return [
         {
           User: {
-            studentId: '654321'
+            studentNumber: '654321'
           },
           grade: 5,
           attainableId: 1,
         },
         {
           User: {
-            studentId: '654321'
+            studentNumber: '654321'
           },
           grade: 0,
           attainableId: 2,
         },
         {
           User: {
-            studentId: '654321'
+            studentNumber: '654321'
           },
           grade: 0,
           attainableId: 3,

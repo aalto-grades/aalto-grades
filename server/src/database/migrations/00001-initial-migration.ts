@@ -14,7 +14,7 @@ export default {
           autoIncrement: true,
           primaryKey: true
         },
-        student_id: {
+        student_number: {
           type: new DataTypes.STRING,
           unique: true,
           allowNull: true,
