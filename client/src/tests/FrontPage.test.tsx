@@ -20,8 +20,8 @@ describe('Tests for FrontPage component', () => {
 
     const mockResponse = { courses: mockCourses };
 
-    coursesService.getCourses.mockRejectedValue('Network error');
-    coursesService.getCourses.mockResolvedValue(mockResponse);
+    coursesService.getCoursesOfUser.mockRejectedValue('Network error');
+    coursesService.getCoursesOfUser.mockResolvedValue(mockResponse);
 
     return render(
       <BrowserRouter>

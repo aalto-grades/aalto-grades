@@ -25,7 +25,13 @@ const Signup = () => {
         role: user.data.role,
         name: user.data.name
       });
-      navigate('/', { replace: true });
+
+      console.log(`${user.data.role}`);
+      if (user.data.role === 'SYSADMIN') {
+        navigate('/course-view', { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
     } catch (exception) {
       console.log(exception);
       setErrorMessage('Error: signup failed');

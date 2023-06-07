@@ -26,7 +26,13 @@ const Login = () => {
         role: response.data.role,
         name: response.data.name
       });
-      navigate('/', { replace: true });
+
+      console.log(`${response.data.role}`);
+      if (response.data.role === 'SYSADMIN') {
+        navigate('/course-view', { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
     } catch (exception) {
       console.log(exception);
       setErrorMessage('Invalid email or password');
