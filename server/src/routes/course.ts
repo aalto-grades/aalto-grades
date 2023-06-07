@@ -3,8 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import express, { Router } from 'express';
+import passport from 'passport';
 
-import { addCourse, getCourse } from '../controllers/course';
+import { addCourse, getAllCourses, getCourse } from '../controllers/course';
 import { handleInvalidRequestJson } from '../middleware';
 import { authorization } from '../middleware/authorization';
 import { controllerDispatcher } from '../middleware/errorHandler';
@@ -103,6 +104,41 @@ router.get(
   '/v1/courses/:courseId',
   authorization,
   controllerDispatcher(getCourse)
+);
+
+/**
+ * @swagger
+ * /v1/courses:
+ *   get:
+ *     tags: [Course]
+ *     description: Get information about all courses.
+ *     responses:
+ *       200:
+ *         description: >
+ *           All of the courses in the database in the CourseData format.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   $ref: '#/definitions/Success'
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     courses:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/definitions/CourseData'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
+ *     security:
+ *       - cookieAuth: []
+ */
+router.get(
+  '/v1/courses',
+  passport.authenticate('jwt', { session: false }),
+  controllerDispatcher(getAllCourses)
 );
 
 /**
