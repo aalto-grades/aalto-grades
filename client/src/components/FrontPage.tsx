@@ -10,12 +10,15 @@ import CourseTable from './front-page/CourseTable';
 import coursesService from '../services/courses';
 import useAuth from '../hooks/useAuth';
 import { SystemRole } from '../types/general';
+import Button from '@mui/material/Button';
+import { useNavigate } from 'react-router-dom';
 
 const FrontPage = (): JSX.Element => {
   const [currentCourses, setCurrentCourses] = useState([]);
   const [previousCourses, setPreviousCourses] = useState([]);
 
   const { auth } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     coursesService.getCoursesOfUser(auth.id)
@@ -32,9 +35,16 @@ const FrontPage = (): JSX.Element => {
         <Typography variant="h1" align="left" sx={{ flexGrow: 1 }}>
           Your Current Courses
         </Typography>
+        { /* admins are shown the button for creating a new course */
+          auth.role == SystemRole.Admin &&
+          <Button id='ag_new_course_btn' size='large' variant='contained' onClick={() => {
+            navigate('/create-course');
+          }}>
+            Create New Course
+          </Button>
+        }
       </Box>
-      { /* current and inactive courses will later be rendered based on the student/teacher id */}
-      <BasicGrid data={currentCourses} />
+      <BasicGrid data={currentCourses}/>
       <Typography variant="h2" align="left" sx={{ flexGrow: 1, mt: 4 }}>
         Inactive Courses
       </Typography>
