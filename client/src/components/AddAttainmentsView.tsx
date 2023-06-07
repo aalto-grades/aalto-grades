@@ -7,10 +7,10 @@ import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import AssignmentCategory from './assignments/AssignmentCategory';
-import assignmentServices from '../services/assignments';
+import AttainmentCategory from './attainments/AttainmentCategory';
+import attainmentServices from '../services/attainments';
 
-const AddAssignmentsView = () => {
+const AddAttainmentsView = () => {
   let navigate = useNavigate();
   let { courseId, sisuInstanceId } = useParams();
 
@@ -22,8 +22,8 @@ const AddAssignmentsView = () => {
 
   useEffect(() => {  // Better if handling here
     if (addedAttainments.length === 0) {
-      let allSuggestedAttainments = assignmentServices.getSuggestedAttainments();
-      let [updatedAttainments, newTemporaryId] = assignmentServices.addTemporaryIds(allSuggestedAttainments, attainmentIncrementId);
+      let allSuggestedAttainments = attainmentServices.getSuggestedAttainments();
+      let [updatedAttainments, newTemporaryId] = attainmentServices.addTemporaryIds(allSuggestedAttainments, attainmentIncrementId);
       setIncrementId(newTemporaryId);
       setSuggestedAttainments(updatedAttainments);
     } else {
@@ -37,7 +37,7 @@ const AddAssignmentsView = () => {
   const onAddClick = (attainment) => () => {
     const newSuggested = suggestedAttainments.filter(a => a.temporaryId !== attainment.temporaryId);
     setSuggestedAttainments(newSuggested);
-    const updatedAttainments = assignmentServices.addTemporaryAttainment(addedAttainments, attainment);
+    const updatedAttainments = attainmentServices.addTemporaryAttainment(addedAttainments, attainment);
     setAddedAttainments(updatedAttainments);
   };
 
@@ -60,7 +60,7 @@ const AddAssignmentsView = () => {
                all of them might not exist in the database (since new one can be created)
                so temporary ids are used as keys for the attainment accoridons */
             return (
-              <AssignmentCategory
+              <AttainmentCategory
                 key={attainment.temporaryId}
                 attainment={attainment}
                 attainmentKey={'temporaryId'}
@@ -86,7 +86,7 @@ const AddAssignmentsView = () => {
           <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch', pb: '8px' }}>
             { addedAttainments.map(attainment => {
               return (
-                <AssignmentCategory
+                <AttainmentCategory
                   key={attainment.temporaryId}
                   attainment={attainment}
                   attainmentKey={'temporaryId'}
@@ -112,4 +112,4 @@ const AddAssignmentsView = () => {
   );
 };
 
-export default AddAssignmentsView;
+export default AddAttainmentsView;

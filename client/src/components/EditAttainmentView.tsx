@@ -8,12 +8,12 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import Assignment from './create-assignment/Assignment';
-import ConfirmationDialog from './create-assignment/ConfirmationDialog';
-import assignmentServices from '../services/assignments';
+import Attainment from './create-attainment/Attainment';
+import ConfirmationDialog from './create-attainment/ConfirmationDialog';
+import attainmentServices from '../services/attainments';
 import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 
-const EditAssignmentView = () => {
+const EditAttainmentView = () => {
   const navigate = useNavigate();
   const { courseId, instanceId, sisuInstanceId, attainmentId } = useParams();
   let addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId;
@@ -28,11 +28,11 @@ const EditAssignmentView = () => {
     // Else the attainment is being edited during the creation of an instance so gotten from the context
     if (instanceId) {
       // TODO: replace with a function that gets the actual data from the server
-      return assignmentServices.getFinalAttainmentById(mockAttainmentsClient, Number(attainmentId));
+      return attainmentServices.getFinalAttainmentById(mockAttainmentsClient, Number(attainmentId));
     } else if (sisuInstanceId && addedAttainments.length !== 0) {
       let attainment = addedAttainments.find(attainment => attainment.temporaryId === Number(attainmentId));
       if (attainment) {
-        attainment = assignmentServices.formatDates([attainment]);
+        attainment = attainmentServices.formatDates([attainment]);
         return attainment;
       } else {
         console.log('Attainment could not be found');
@@ -48,7 +48,7 @@ const EditAssignmentView = () => {
   // Function to edit the data that is in the database
   const editAttainment = async (attainmentObject) => {
     try {
-      const attainment = await assignmentServices.editAttainment(courseId, instanceId, attainmentObject);
+      const attainment = await attainmentServices.editAttainment(courseId, instanceId, attainmentObject);
       console.log(attainment);
       //navigate('/' + courseId, { replace: true });
     } catch (exception) {
@@ -59,7 +59,7 @@ const EditAssignmentView = () => {
   // Function to add data to the database
   const addAttainment = async (attainmentObject) => {
     try {
-      const attainment = await assignmentServices.addAttainment(courseId, instanceId, attainmentObject);
+      const attainment = await attainmentServices.addAttainment(courseId, instanceId, attainmentObject);
       console.log(attainment);
       //navigate('/' + courseId, { replace: true });
     } catch (exception) {
@@ -73,12 +73,12 @@ const EditAssignmentView = () => {
     // Else the attainment is being edited during the creation of an instance so only delete from the context
     if (instanceId) {
       try {
-        await assignmentServices.deleteAttainment(courseId, instanceId, attainmentId);
+        await attainmentServices.deleteAttainment(courseId, instanceId, attainmentId);
       } catch (exception) {
         console.log(exception.message);
       }
     } else if (sisuInstanceId) {
-      const updatedAttainments = assignmentServices.deleteTemporaryAttainment(addedAttainments, attainments[0]);
+      const updatedAttainments = attainmentServices.deleteTemporaryAttainment(addedAttainments, attainments[0]);
       setAddedAttainments(updatedAttainments);
     }
     navigate(-1);
@@ -90,9 +90,9 @@ const EditAssignmentView = () => {
       // If this view is opened from the course view, update DB
       // Else the attainment is being edited during the creation of an instance so only update the context
       if (instanceId) {
-        const updatedAttainments = assignmentServices.formatStringsToDates(attainments);
-        const existingAttainments = assignmentServices.getExistingAttainments(updatedAttainments);
-        const newAttainments = assignmentServices.getNewAttainments(updatedAttainments);
+        const updatedAttainments = attainmentServices.formatStringsToDates(attainments);
+        const existingAttainments = attainmentServices.getExistingAttainments(updatedAttainments);
+        const newAttainments = attainmentServices.getNewAttainments(updatedAttainments);
         existingAttainments.forEach((attainment) => editAttainment(attainment));
         newAttainments.forEach((attainment) => addAttainment(attainment));
         deletedAttainments.forEach((attainment) => {
@@ -101,7 +101,7 @@ const EditAssignmentView = () => {
         });
         navigate(-1);
       } else if (sisuInstanceId) {
-        const updatedAttainments = assignmentServices.updateTemporaryAttainment(addedAttainments, attainments[0]);
+        const updatedAttainments = attainmentServices.updateTemporaryAttainment(addedAttainments, attainments[0]);
         setAddedAttainments(updatedAttainments);
         navigate(-1);
       }
@@ -128,8 +128,8 @@ const EditAssignmentView = () => {
     if (JSON.stringify(indices) === '[0]') {
       deleteAttainment(attainmentId);
     } else {
-      const deletedAttainment = assignmentServices.getAttainmentByIndices(indices, attainments);
-      const updatedAttainments = assignmentServices.removeAttainment(indices, attainments);
+      const deletedAttainment = attainmentServices.getAttainmentByIndices(indices, attainments);
+      const updatedAttainments = attainmentServices.removeAttainment(indices, attainments);
       setDeletedAttainments([...deletedAttainments, deletedAttainment]);
       setAttainments(updatedAttainments);
     }
@@ -152,7 +152,7 @@ const EditAssignmentView = () => {
             pb: 1,
             px: 2,
           }}>
-            <Assignment
+            <Attainment
               indices={[0]}
               attainments={attainments}
               setAttainments={setAttainments}
@@ -183,4 +183,4 @@ const EditAssignmentView = () => {
   );
 };
 
-export default EditAssignmentView;
+export default EditAttainmentView;

@@ -11,7 +11,7 @@ import Button from '@mui/material/Button';
 import Grow from '@mui/material/Grow';
 import FileLoadDialog from './course-view/FileLoadDialog';
 import InstanceDetails from './course-view/InstanceDetails';
-import Assignments from './course-view/Assignments';
+import Attainments from './course-view/Attainments';
 import InstancesTable from './course-view/InstancesTable';
 import courseService from '../services/courses';
 import instancesService from '../services/instances';
@@ -99,7 +99,7 @@ const CourseView = () => {
               (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') &&
               <Grow in={animation} style={{ transformOrigin: '0 0 0' }} {...(animation? { timeout: 1000 } : { timeout: 0 })}>
                 <div style={{ width: '100%' }}>
-                  <Assignments
+                  <Attainments
                     attainments={mockAttainmentsClient}
                     courseId={courseId}
                     formula={'Weighted Average'}

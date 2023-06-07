@@ -8,26 +8,26 @@ import '@testing-library/jest-dom/extend-expect';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import InstanceCreationRoute from '../context/InstanceCreationRoute';
-import AddAssignmentsView from '../components/AddAssignmentsView';
+import AddAttainmentsView from '../components/AddAttainmentsView';
 import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 
-describe('Tests for AddAssignmentsView components', () => {
+describe('Tests for AddAttainmentsView components', () => {
 
-  const renderAddAssignmentsView = async () => {
+  const renderAddAttainmentsView = async () => {
     return render(
       <MemoryRouter initialEntries={['/A-12345/add-attainments/test']}>
         <Routes>
           <Route element={<InstanceCreationRoute/>}>
-            <Route path=':courseId/add-attainments/:instanceId' element={<AddAssignmentsView/>}/>
+            <Route path=':courseId/add-attainments/:instanceId' element={<AddAttainmentsView/>}/>
           </Route>
         </Routes>
       </MemoryRouter>
     );
   };
 
-  test('AddAssignmentsView should render the AddAssignmentsView and contain appropriate components', async () => {
+  test('AddAttainmentsView should render the AddAttainmentsView and contain appropriate components', async () => {
 
-    renderAddAssignmentsView();
+    renderAddAttainmentsView();
 
     await waitFor(() => {
       const attainment1 = screen.getByText(mockAttainmentsClient[0].name);
@@ -52,9 +52,9 @@ describe('Tests for AddAssignmentsView components', () => {
 
   });
 
-  test('AddAssignmentsView should allow adding a suggested attainment to the added attainments and delete it from suggested', async () => {
+  test('AddAttainmentsView should allow adding a suggested attainment to the added attainments and delete it from suggested', async () => {
 
-    renderAddAssignmentsView();
+    renderAddAttainmentsView();
 
     await waitFor(() => {
       const addButtons = screen.getAllByText('Add');

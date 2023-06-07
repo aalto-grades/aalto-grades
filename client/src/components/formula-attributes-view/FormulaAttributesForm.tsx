@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import StyledBox from '../select-formula-view/StyledBox';
-import Assignment from './Assignment';
+import Attainment from './Attainment';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
 
@@ -84,7 +84,7 @@ const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
         pt: 2
       }}>
         { selectedAttainments.map((attainment, attainmentIndex) =>
-          <Assignment
+          <Attainment
             attainment={attainment}
             key={attainment.id}
             attainmentIndex={attainmentIndex}
