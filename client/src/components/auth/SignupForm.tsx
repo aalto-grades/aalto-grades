@@ -16,7 +16,7 @@ const SignupForm = ({ addUser }) => {
   const [name, setName] = useState<any>('');
   const [password, setPassword] = useState<any>('');
   const [email, setEmail] = useState<any>('');
-  const [studentID, setStudentID] = useState<any>('');
+  const [studentNumber, setStudentNumber] = useState<any>('');
   const [role, setRole] = useState<any>('TEACHER');
 
   const handleSubmit = (event) => {
@@ -27,7 +27,7 @@ const SignupForm = ({ addUser }) => {
         password,
         email,
         role,
-        ...(studentID != '' && { studentID: studentID }),
+        ...(studentNumber != '' && { studentNumber: studentNumber }),
       });
       addUser(userObject);
     } catch (exception) {
@@ -63,10 +63,10 @@ const SignupForm = ({ addUser }) => {
         <div>
           <TextField
             type='text'
-            value={studentID}
-            name='StudentID'
-            label='Student ID (not required)'
-            onChange={({ target }) => setStudentID(target.value)}
+            value={studentNumber}
+            name='StudentNumber'
+            label='Student Number (not required)'
+            onChange={({ target }) => setStudentNumber(target.value)}
             InputLabelProps={{ shrink: true }}
             margin='normal'
           />
