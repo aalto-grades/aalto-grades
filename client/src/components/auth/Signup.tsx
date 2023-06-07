@@ -8,6 +8,7 @@ import { useTheme } from '@mui/material/styles';
 import SignupForm from './SignupForm';
 import userService from '../../services/user';
 import useAuth from '../../hooks/useAuth';
+import { SystemRole } from '../../types/general';
 
 const Signup = () => {
 
@@ -27,7 +28,7 @@ const Signup = () => {
       });
 
       console.log(`${user.data.role}`);
-      if (user.data.role === 'SYSADMIN') {
+      if (user.data.role === SystemRole.Admin) {
         navigate('/course-view', { replace: true });
       } else {
         navigate('/', { replace: true });

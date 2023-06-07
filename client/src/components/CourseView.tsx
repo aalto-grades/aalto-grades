@@ -18,6 +18,7 @@ import instancesService from '../services/instances';
 import sortingServices from '../services/sorting';
 import useAuth from '../hooks/useAuth';
 import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
+import { SystemRole } from '../types/general';
 
 // REPLACE SOME DAY? currently this info can't be fetched from database
 const mockInstitution: string = 'Aalto University';
@@ -78,7 +79,7 @@ const CourseView = (): JSX.Element => {
           <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', mb: 4, columnGap: 6 }}>
             <Typography variant='h2' align='left'>{courseDetails.name.en}</Typography>
             { /* Only admins and teachers are allowed to create a new instance */
-              (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') &&
+              auth.role == SystemRole.Admin &&
             <Button
               id='ag_new_instance_btn'
               size='large'
@@ -101,7 +102,7 @@ const CourseView = (): JSX.Element => {
                   </div>
                 </Grow>
                 { /* a different attainment component will be created for students */
-                  (auth.role == 'SYSADMIN' || auth.role == 'TEACHER') &&
+                  auth.role == SystemRole.Admin &&
                   <Grow in={animation} style={{ transformOrigin: '0 0 0' }} {...(animation ? { timeout: 1000 } : { timeout: 0 })}>
                     <div style={{ width: '100%' }}>
                       <Assignments
