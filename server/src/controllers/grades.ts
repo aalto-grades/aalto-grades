@@ -17,8 +17,8 @@ import CourseResult from '../database/models/courseResult';
 import User from '../database/models/user';
 import UserAttainmentGrade from '../database/models/userAttainmentGrade';
 
+import { CourseInstanceRoleType } from 'aalto-grades-common/types/course';
 import { getFormulaImplementation } from '../formulas';
-import { CourseInstanceRoleType } from '../types/course';
 import { ApiError } from '../types/error';
 import { Formula, FormulaNode, GradingInput, GradingResult, Status } from '../types/formulas';
 import { UserAttainmentGradeData, StudentGrades, GradingResultsWithUser } from '../types/grades';

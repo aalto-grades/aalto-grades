@@ -10,11 +10,12 @@ import Box from '@mui/material/Box';
 import CourseTable from './front-page/CourseTable';
 import coursesService from '../services/courses';
 import useAuth from '../hooks/useAuth';
-import { SystemRole } from '../types/general';
+import { CourseData } from 'aalto-grades-common/types/course';
+import { SystemRole } from 'aalto-grades-common/types/general';
 
 const AllCoursesView = (): JSX.Element => {
   const navigate = useNavigate();
-  const [courses, setCourses] = useState([]);
+  const [courses, setCourses] = useState<Array<CourseData>>([]);
 
   const { auth } = useAuth();
 

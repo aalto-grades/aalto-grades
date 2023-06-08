@@ -15,7 +15,6 @@ services:
     container_name: frontend-server
     ports:
       - 3005:3005
-    profiles: ["dev", "prod"]
     restart: always
 
   backend:

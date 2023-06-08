@@ -1,0 +1,8 @@
+{
+  "name": "aalto-grades-common",
+  "author": "The Aalto Grades Developers",
+  "license": "Expat (MIT)",
+  "scripts": {
+    "build": "tsc **/*.ts"
+  }
+}

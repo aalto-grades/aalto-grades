@@ -18,14 +18,14 @@ import instancesService from '../services/instances';
 import sortingServices from '../services/sorting';
 import useAuth from '../hooks/useAuth';
 import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
-import { SystemRole } from '../types/general';
+import { SystemRole } from 'aalto-grades-common/types/general';
 
 // REPLACE SOME DAY? currently this info can't be fetched from database
 const mockInstitution: string = 'Aalto University';
 
 const CourseView = (): JSX.Element => {
   let navigate = useNavigate();
-  let { courseId } = useParams();
+  let { courseId }: any = useParams();
   const { auth } = useAuth();
 
   const [courseDetails, setCourseDetails] = useState(null);

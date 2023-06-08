@@ -8,7 +8,7 @@ import { useTheme } from '@mui/material/styles';
 import LoginForm from './LoginForm';
 import userService from '../../services/user';
 import useAuth from '../../hooks/useAuth';
-import { SystemRole } from '../../types/general';
+import { SystemRole } from 'aalto-grades-common/types/general';
 
 const Login = () => {
 

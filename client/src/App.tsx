@@ -30,7 +30,7 @@ import CourseResultsView from './components/CourseResultsView';
 import InstanceCreationRoute from './context/InstanceCreationRoute';
 import FormulaSelectionRoute from './context/FormulaSelectionRoute';
 import UserButton from './components/auth/UserButton';
-import { SystemRole } from './types/general';
+import { SystemRole } from 'aalto-grades-common/types/general';
 
 const theme = createTheme({
   palette: {

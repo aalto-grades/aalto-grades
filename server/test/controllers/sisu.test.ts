@@ -6,7 +6,8 @@ import axios, { AxiosStatic } from 'axios';
 import supertest from 'supertest';
 
 import { app } from '../../src/app';
-import { CourseInstanceData } from '../../src/types/course';
+
+import { CourseInstanceData } from 'aalto-grades-common/types/course';
 import { HttpCode } from '../../src/types/httpCode';
 import { sisuInstance, sisuError } from '../mockData/sisu';
 import { Cookies, getCookies } from '../util/getCookies';

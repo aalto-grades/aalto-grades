@@ -10,7 +10,7 @@ import AllCoursesView from '../components/AllCoursesView';
 import coursesService from '../services/courses';
 import AuthContext from '../context/authProvider';
 import mockCourses from '../mock-data/mockCourses';
-import { SystemRole } from '../types/general';
+import { SystemRole } from 'aalto-grades-common/types/general';
 
 jest.mock('../services/courses');
 afterEach(cleanup);
@@ -21,8 +21,8 @@ describe('Tests for FrontPage component', () => {
 
     const mockResponse = { courses: mockCourses };
 
-    coursesService.getAllCourses.mockRejectedValue('Network error');
-    coursesService.getAllCourses.mockResolvedValue(mockResponse);
+    (coursesService.getAllCourses as jest.Mock).mockRejectedValue('Network error');
+    (coursesService.getAllCourses as jest.Mock).mockResolvedValue(mockResponse);
 
     return render(
       <BrowserRouter>

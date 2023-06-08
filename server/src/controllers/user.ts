@@ -10,10 +10,10 @@ import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
-import { CourseData } from '../types/course';
+import { CourseData } from 'aalto-grades-common/types/course';
+import { Language } from 'aalto-grades-common/types/language';
 import { findUserById } from './utils/user';
 import { idSchema } from '../types/general';
-import { Language } from '../types/language';
 import { HttpCode } from '../types/httpCode';
 
 interface CourseWithTranslationAndInstance extends Course {

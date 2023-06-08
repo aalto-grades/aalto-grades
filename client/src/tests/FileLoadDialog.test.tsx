@@ -15,7 +15,7 @@ import AuthContext from '../context/authProvider';
 import mockCourses from '../mock-data/mockCourses';
 import mockInstances from '../mock-data/mockInstancesWithStringDates';
 import { maxErrorsToShow } from '../components/course-view/FileLoadDialog';
-import { SystemRole } from '../types/general';
+import { SystemRole } from 'aalto-grades-common/types/general';
 
 let file = new File(['idk'], 'grades_test.csv', { type: 'csv' });
 
@@ -50,7 +50,7 @@ describe('FileLoadDialog test with proper csv', () => {
     instancesService.getInstances.mockResolvedValue(mockResponseInstances);
 
     const mockResponseCourse = { course: mockCourses[0] };
-    coursesService.getCourse.mockResolvedValue(mockResponseCourse);
+    (coursesService.getCourse as jest.Mock).mockResolvedValue(mockResponseCourse);
 
     gradesService.importCsv.mockResolvedValue({}); // succeess, nothing to worry about
 
@@ -156,7 +156,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
     instancesService.getInstances.mockResolvedValue(mockResponseInstances);
 
     const mockResponseCourse = { course: mockCourses[0] };
-    coursesService.getCourse.mockResolvedValue(mockResponseCourse);
+    (coursesService.getCourse as jest.Mock).mockResolvedValue(mockResponseCourse);
 
     // Mock the error.
     gradesService.importCsv.mockRejectedValue({
