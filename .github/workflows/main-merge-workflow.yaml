@@ -8,10 +8,6 @@ on:
   push:
     branches:
       - main
-  # Temporarily enabled on PRs for testing
-  pull_request:
-    branches:
-      - main
 env:
   REGISTRY: ghcr.io
   FRONTEND_IMAGE_NAME: aalto-grades/aalto-grades-frontend
