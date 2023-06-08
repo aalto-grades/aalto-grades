@@ -35,8 +35,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "npm --prefix ../common run build && react-scripts start",
-    "build": "react-scripts build",
+    "start": "react-scripts start",
+    "build": "npm --prefix ../common run build && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "npx eslint `find . -name '*.tsx' -not -path './node_modules/*'`",

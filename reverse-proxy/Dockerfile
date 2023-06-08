@@ -11,4 +11,4 @@ ARG CERT_KEY_LOCATION
 COPY reverse-proxy.conf /etc/nginx/conf.d/default.conf
 COPY $CERT_LOCATION /etc/ssl/certs/aalto-grades.cs.aalto.fi.crt
 COPY $CERT_KEY_LOCATION /etc/ssl/private/aalto-grades.cs.aalto.fi.key
-CMD ["nginx", "-g", "daemon off;"] 
+CMD ["nginx", "-g", "daemon off;"]
