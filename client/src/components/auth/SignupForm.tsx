@@ -10,7 +10,7 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio from '@mui/material/Radio';
 import Grid from '@mui/material/Grid';
-import { SystemRole } from '../../types/general';
+import { SystemRole } from 'aalto-grades-common/types/general';
 
 const SignupForm = ({ addUser }) => {
 

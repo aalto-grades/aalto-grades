@@ -3,7 +3,7 @@ Upstream-Name: Aalto Grades
 Upstream-Contact: The Aalto Grades Developers
 Source: https://github.com/aalto-grades
 
-Files: client/*.json server/*.json *.csv client/.env server/pgAdminpass
+Files: client/*.json client/.env server/*.json *.csv server/pgAdminpass common/*.json
 Copyright: The Aalto Grades Developers
 License: MIT
 

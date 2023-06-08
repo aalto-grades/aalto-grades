@@ -10,7 +10,7 @@ import Box from '@mui/material/Box';
 import CourseTable from './front-page/CourseTable';
 import coursesService from '../services/courses';
 import useAuth from '../hooks/useAuth';
-import { SystemRole } from '../types/general';
+import { SystemRole } from 'aalto-grades-common/types/general';
 
 const AllCoursesView = (): JSX.Element => {
   const navigate = useNavigate();

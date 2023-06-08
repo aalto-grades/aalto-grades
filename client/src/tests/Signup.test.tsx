@@ -9,7 +9,7 @@ import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SignupForm from '../components/auth/SignupForm';
 import Signup from '../components/auth/Signup';
-import { SystemRole } from '../types/general';
+import { SystemRole } from 'aalto-grades-common/types/general';
 
 describe('Tests for Login component', () => {
 

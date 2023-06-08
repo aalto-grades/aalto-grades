@@ -10,7 +10,7 @@ import AllCoursesView from '../components/AllCoursesView';
 import coursesService from '../services/courses';
 import AuthContext from '../context/authProvider';
 import mockCourses from '../mock-data/mockCourses';
-import { SystemRole } from '../types/general';
+import { SystemRole } from 'aalto-grades-common/types/general';
 
 jest.mock('../services/courses');
 afterEach(cleanup);

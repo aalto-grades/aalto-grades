@@ -4,6 +4,9 @@
   "author": "The Aalto Grades Developers",
   "license": "Expat (MIT)",
   "private": true,
+  "workspaces": [
+    "../common"
+  ],
   "dependencies": {
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
@@ -21,6 +24,7 @@
     "@types/react-dom": "^18.2.4",
     "@types/styled-components": "^5.1.26",
     "@typescript-eslint/parser": "^5.59.8",
+    "aalto-grades-common": "*",
     "axios": "^1.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -36,7 +40,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "npx eslint `find . -name '*.tsx' -not -path './node_modules/*'`",
-    "lint:fix": "npx eslint `find . -name '*.tsx' -not -path './node_modules/*'` --fix"
+    "lint:fix": "npx eslint `find . -name '*.tsx' -not -path './node_modules/*'` --fix",
+    "build-common": "cd ../common && npm run build"
   },
   "eslintConfig": {
     "extends": [
