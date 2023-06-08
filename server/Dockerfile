@@ -10,7 +10,7 @@ ARG SERVER_SKIP_NPM_CI
 
 COPY --chown=node:node . .
 
-RUN if [ -z "$SERVER_SKIP_NPM_CI" ] || [ $SERVER_SKIP_NPM_CI != 1 ]; then npm ci; fi
+RUN if [ -z "$SERVER_SKIP_NPM_CI" ] || [ $SERVER_SKIP_NPM_CI != 1 ]; then npm run build-common && npm ci; fi
 
 RUN npm run build
 

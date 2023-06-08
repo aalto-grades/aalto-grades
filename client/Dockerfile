@@ -12,7 +12,7 @@ COPY . .
 
 RUN chown -R node:node ./
 
-RUN if [ -z "$CLIENT_SKIP_NPM_CI" ] || [ $CLIENT_SKIP_NPM_CI != 1 ]; then npm ci; fi
+RUN if [ -z "$CLIENT_SKIP_NPM_CI" ] || [ $CLIENT_SKIP_NPM_CI != 1 ]; then npm run build-common && npm ci; fi
 
 RUN npm run build
 
