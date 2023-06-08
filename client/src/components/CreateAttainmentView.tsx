@@ -8,10 +8,10 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import Assignment from './create-assignment/Assignment';
-import assignmentServices from '../services/assignments';
+import Attainment from './create-attainment/Attainment';
+import attainmentServices from '../services/attainments';
 
-const CreateAssignmentView = () => {
+const CreateAttainmentView = () => {
   const navigate = useNavigate();
   const { courseId, instanceId, sisuInstanceId } = useParams();
   let addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId;
@@ -35,7 +35,7 @@ const CreateAssignmentView = () => {
   // Function to add data to the database
   const addAttainment = async (attainmentObject) => {
     try {
-      const attainment = await assignmentServices.addAttainment(courseId, instanceId, attainmentObject);
+      const attainment = await attainmentServices.addAttainment(courseId, instanceId, attainmentObject);
       console.log(attainment);
       //navigate('/' + courseId, { replace: true });
     } catch (exception) {
@@ -49,12 +49,12 @@ const CreateAssignmentView = () => {
       // If this view is opened from the course view, add to DB
       // Else the attainment is being created during the creation of an instance so only add to the context
       if (instanceId) {
-        const updatedAttainments = assignmentServices.formatStringsToDates(attainments)[0];
+        const updatedAttainments = attainmentServices.formatStringsToDates(attainments)[0];
         addAttainment(updatedAttainments);
         navigate(-1);
       } else if (sisuInstanceId) {
         const temporaryId = attainmentIncrementId;
-        const [updatedAttainments, newTemporaryId] = assignmentServices.createTemporaryAttainment(addedAttainments, attainments[0], temporaryId);
+        const [updatedAttainments, newTemporaryId] = attainmentServices.createTemporaryAttainment(addedAttainments, attainments[0], temporaryId);
         setAddedAttainments(updatedAttainments);
         setIncrementId(newTemporaryId);
         navigate(-1);
@@ -65,7 +65,7 @@ const CreateAssignmentView = () => {
   };
 
   const removeAttainment = (indices) => {
-    const updatedAttainments = assignmentServices.removeAttainment(indices, attainments);
+    const updatedAttainments = attainmentServices.removeAttainment(indices, attainments);
     setAttainments(updatedAttainments);
   };
 
@@ -87,7 +87,7 @@ const CreateAssignmentView = () => {
             px: 2,
           }}>
             {/* Create the root attainment */}
-            <Assignment
+            <Attainment
               indices={[0]}
               attainments={attainments}
               setAttainments={setAttainments}
@@ -108,4 +108,4 @@ const CreateAssignmentView = () => {
   );
 };
 
-export default CreateAssignmentView;
+export default CreateAttainmentView;

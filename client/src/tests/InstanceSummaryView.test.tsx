@@ -9,11 +9,11 @@ import { act, render, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import InstanceSummaryView from '../components/InstanceSummaryView';
 import instancesService from '../services/instances';
-import assignmentServices from '../services/assignments';
+import attainmentServices from '../services/attainments';
 import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 
 jest.mock('../services/instances');
-jest.spyOn(assignmentServices, 'addAttainment');
+jest.spyOn(attainmentServices, 'addAttainment');
 afterEach(cleanup);
 
 const mockContextWithoutAttainments = {
@@ -49,7 +49,7 @@ describe('Test InstanceSummaryView components when no attainments and successful
     const mockResponseInstanceCreation = { courseInstance: { id: 22 } };
     instancesService.createInstance.mockResolvedValue(mockResponseInstanceCreation);
 
-    assignmentServices.addAttainment.mockResolvedValue({ success: true, data: {} });
+    attainmentServices.addAttainment.mockResolvedValue({ success: true, data: {} });
 
     return render(
       <MemoryRouter initialEntries={['/A-12345/instance-summary/aalto-CUR-168938-2370795']}>
@@ -110,7 +110,7 @@ describe('Test InstanceSummaryView components when some attainments and successf
     const mockResponseInstanceCreation = { courseInstance: { id: 22 } };
     instancesService.createInstance.mockResolvedValue(mockResponseInstanceCreation);
 
-    assignmentServices.addAttainment.mockResolvedValue({ success: true, data: {} });
+    attainmentServices.addAttainment.mockResolvedValue({ success: true, data: {} });
 
     return render(
       <MemoryRouter initialEntries={['/A-12345/instance-summary/aalto-CUR-168938-2370795']}>
@@ -143,7 +143,7 @@ describe('Test InstanceSummaryView components when some attainments and successf
     const mockResponseInstanceCreation = { courseInstance: { id: 22 } };
     instancesService.createInstance.mockResolvedValue(mockResponseInstanceCreation);
 
-    assignmentServices.addAttainment.mockRejectedValue({});
+    attainmentServices.addAttainment.mockRejectedValue({});
 
     return render(
       <MemoryRouter initialEntries={['/A-12345/instance-summary/aalto-CUR-168938-2370795']}>

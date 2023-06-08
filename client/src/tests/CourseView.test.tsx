@@ -59,7 +59,7 @@ describe('Tests for CourseView component', () => {
       const exams = getAllByText('Exam');
       const instances = getByText('All Instances');
       const createInstanceButton = getByText('New instance');
-      const addAssignmentButton = getByText('Add attainment');
+      const addAttainmentButton = getByText('Add attainment');
       expect(instanceInfo).toBeDefined();
       expect(teachersInfo).toBeDefined();
       expect(attainments).toBeDefined();
@@ -68,7 +68,7 @@ describe('Tests for CourseView component', () => {
       expect(exams).toBeDefined();
       expect(instances).toBeDefined();
       expect(createInstanceButton).toBeDefined();
-      expect(addAssignmentButton).toBeDefined();
+      expect(addAttainmentButton).toBeDefined();
     });
 
   });

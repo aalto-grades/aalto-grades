@@ -7,8 +7,8 @@ import { MemoryRouter, Route, Routes, Outlet } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { act, render, screen, waitFor, within, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import CreateAssignmentView from '../components/CreateAssignmentView';
-import assignmentServices from '../services/assignments';
+import CreateAttainmentView from '../components/CreateAttainmentView';
+import attainmentServices from '../services/attainments';
 import mockAttainmentsServer from '../mock-data/mockAttainmentsServer';
 
 const mockAttainment = mockAttainmentsServer[0];
@@ -18,17 +18,17 @@ const instanceId = mockAttainment.courseInstanceId;
 const mockDate = '2023-04-25T00:00:00.000Z';  // again had some problems with dates,
 const mockExpiryDate = '2025-04-25T00:00:00.000Z';  // so I hardcoded them here
 
-assignmentServices.addAttainment = jest.fn();
+attainmentServices.addAttainment = jest.fn();
 afterEach(cleanup);
 
-describe('Tests for CreateAssignmentView components', () => {
+describe('Tests for CreateAttainmentView components', () => {
 
-  const renderCreateAssignmentView = async () => {
+  const renderCreateAttainmentView = async () => {
 
     return render(
       <MemoryRouter initialEntries={[`/${courseId}/create-attainment/${instanceId}`]}>
         <Routes>
-          <Route path='/:courseId/create-attainment/:instanceId' element={<CreateAssignmentView/>}/>
+          <Route path='/:courseId/create-attainment/:instanceId' element={<CreateAttainmentView/>}/>
         </Routes>
       </MemoryRouter>
     );
@@ -41,22 +41,22 @@ describe('Tests for CreateAssignmentView components', () => {
     setIncrementId: jest.fn(),
   };
 
-  const renderTemporaryCreateAssignmentView = async () => {
+  const renderTemporaryCreateAttainmentView = async () => {
 
     return render(
       <MemoryRouter initialEntries={[`/${courseId}/create-temporary-attainment/${instanceId}`]}>
         <Routes>
           <Route element={<Outlet context={mockContext}/>}>
-            <Route path='/:courseId/create-temporary-attainment/:sisuInstanceId' element={<CreateAssignmentView/>}/>
+            <Route path='/:courseId/create-temporary-attainment/:sisuInstanceId' element={<CreateAttainmentView/>}/>
           </Route>
         </Routes>
       </MemoryRouter>
     );
   };
 
-  test('CreateAssignmentView should render all of the appropriate components', async () => {
+  test('CreateAttainmentView should render all of the appropriate components', async () => {
 
-    renderCreateAssignmentView();
+    renderCreateAttainmentView();
 
     const headingElement = screen.getByText('Create Study Attainment');
     const selectLabel = 'Name';
@@ -83,7 +83,7 @@ describe('Tests for CreateAssignmentView components', () => {
     expect(confirmButton).toBeInTheDocument();
   });
 
-  test('CreateAssignmentView should allow a teacher to create an attainment with a ready category', async () => {
+  test('CreateAttainmentView should allow a teacher to create an attainment with a ready category', async () => {
 
     const mockName = mockAttainment.name;
 
@@ -98,7 +98,7 @@ describe('Tests for CreateAssignmentView components', () => {
       formulaAttributes: {},
     };
 
-    renderCreateAssignmentView();
+    renderCreateAttainmentView();
 
     await waitFor( async () => {
 
@@ -118,12 +118,12 @@ describe('Tests for CreateAssignmentView components', () => {
       userEvent.type(expiryField, mockExpiryDate);
       userEvent.click(confirmButton);
 
-      expect(assignmentServices.addAttainment).toHaveBeenCalledWith(String(courseId), String(instanceId), request);
+      expect(attainmentServices.addAttainment).toHaveBeenCalledWith(String(courseId), String(instanceId), request);
 
     });
   });
 
-  test('CreateAssignmentView should allow a teacher to create an attainment with a new category', async () => {
+  test('CreateAttainmentView should allow a teacher to create an attainment with a new category', async () => {
 
     const mockCategory = 'Other';
     const mockName = 'Learning Diary';
@@ -139,7 +139,7 @@ describe('Tests for CreateAssignmentView components', () => {
       formulaAttributes: {},
     };
 
-    renderCreateAssignmentView();
+    renderCreateAttainmentView();
 
     await waitFor( async () => {
 
@@ -161,14 +161,14 @@ describe('Tests for CreateAssignmentView components', () => {
       userEvent.type(expiryField, mockExpiryDate);
       userEvent.click(confirmButton);
 
-      expect(assignmentServices.addAttainment).toHaveBeenCalledWith(String(courseId), String(instanceId), request);
+      expect(attainmentServices.addAttainment).toHaveBeenCalledWith(String(courseId), String(instanceId), request);
 
     });
   });
 
-  test('CreateAssignmentView should allow a teacher to create sub-attainments', async () => {
+  test('CreateAttainmentView should allow a teacher to create sub-attainments', async () => {
 
-    renderCreateAssignmentView();
+    renderCreateAttainmentView();
 
     const creationButton = screen.getByText('Create Sub-Attainments');
     expect(creationButton).toBeInTheDocument();
@@ -193,9 +193,9 @@ describe('Tests for CreateAssignmentView components', () => {
     expect(addButton).toBeInTheDocument();
   });
 
-  test('CreateAssignmentView should render all of the appropriate components during instance creation', async () => {
+  test('CreateAttainmentView should render all of the appropriate components during instance creation', async () => {
 
-    renderTemporaryCreateAssignmentView();
+    renderTemporaryCreateAttainmentView();
 
     const headingElement = screen.getByText('Create Study Attainment');
     const selectLabel = 'Name';
@@ -222,7 +222,7 @@ describe('Tests for CreateAssignmentView components', () => {
     expect(confirmButton).toBeInTheDocument();
   });
 
-  test('CreateAssignmentView should allow to add an attainment to context during instance creation', async () => {
+  test('CreateAttainmentView should allow to add an attainment to context during instance creation', async () => {
 
     const mockName = mockAttainment.name;
 
@@ -237,7 +237,7 @@ describe('Tests for CreateAssignmentView components', () => {
       formulaAttributes: {},
     };
 
-    renderTemporaryCreateAssignmentView();
+    renderTemporaryCreateAttainmentView();
 
     await waitFor( async () => {
 
@@ -258,7 +258,7 @@ describe('Tests for CreateAssignmentView components', () => {
       userEvent.click(confirmButton);
 
       const temporaryId = mockContext.attainmentIncrementId;
-      const [updatedAttainments, newTemporaryId] = assignmentServices.createTemporaryAttainment(mockContext.addedAttainments, request, temporaryId);
+      const [updatedAttainments, newTemporaryId] = attainmentServices.createTemporaryAttainment(mockContext.addedAttainments, request, temporaryId);
 
       expect(mockContext.setAddedAttainments).toHaveBeenCalledWith(updatedAttainments);
       expect(mockContext.setIncrementId).toHaveBeenCalledWith(newTemporaryId);

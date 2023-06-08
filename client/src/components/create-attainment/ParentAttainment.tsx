@@ -13,14 +13,14 @@ import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import LeafAssignment from './LeafAssignment';
-import Assignment from './Assignment';
-import assignmentServices from '../../services/assignments';
+import LeafAttainment from './LeafAttainment';
+import Attainment from './Attainment';
+import attainmentServices from '../../services/attainments';
 import formulasService from '../../services/formulas';
 
 // An Assignmnet component with subAttainments and a formula
 
-const ParentAssignment = ({
+const ParentAttainment = ({
   indices, addSubAttainments, setAttainments, attainments, removeAttainment,
   formulaAttributeNames, temporaryId, setIncrementId
 }) => {
@@ -40,7 +40,7 @@ const ParentAssignment = ({
      Observe that formulaAttributeNames that is as a parameter for this component are the attributes that need to specified for this assignmnet,
      so that the grade of this attainment's parent attainment can be calculated.
   */
-  const formulaId = assignmentServices.getProperty(indices, attainments, 'formulaId');
+  const formulaId = attainmentServices.getProperty(indices, attainments, 'formulaId');
   const formulaName = formulasService.getFormulaName(formulaId);
   const subFormulaAttributeNames = formulasService.getFormulaAttributes(formulaId);
 
@@ -60,7 +60,7 @@ const ParentAssignment = ({
           Edit formula
         </Button>
       </Box>
-      <LeafAssignment
+      <LeafAttainment
         indices={indices}
         addSubAttainments={addSubAttainments}
         attainments={attainments}
@@ -85,8 +85,8 @@ const ParentAssignment = ({
           </Collapse>
           <Collapse in={open} timeout='auto' unmountOnExit>
             <List disablePadding>
-              {assignmentServices.getSubAttainments(indices, attainments).map((item, i) => (
-                <Assignment
+              {attainmentServices.getSubAttainments(indices, attainments).map((item, i) => (
+                <Attainment
                   indices={indices.concat(i)}
                   key={i}
                   attainments={attainments}
@@ -105,7 +105,7 @@ const ParentAssignment = ({
   );
 };
 
-ParentAssignment.propTypes = {
+ParentAttainment.propTypes = {
   addSubAttainments: PropTypes.func,
   indices: PropTypes.array,
   attainments: PropTypes.array,
@@ -116,4 +116,4 @@ ParentAssignment.propTypes = {
   setIncrementId: PropTypes.func
 };
 
-export default ParentAssignment;
+export default ParentAttainment;

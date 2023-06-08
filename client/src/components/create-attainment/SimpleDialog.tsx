@@ -10,7 +10,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import assignmentServices from '../../services/assignments';
+import attainmentServices from '../../services/attainments';
 
 // A Dialog component for asking the number of sub-attainments
 
@@ -38,7 +38,7 @@ function SimpleDialog({ handleClose, open, addSubAttainments, indices, attainmen
 
   return (
     <Dialog open={open} >
-      {assignmentServices.getSubAttainments(indices, attainments).length === 0 ?
+      {attainmentServices.getSubAttainments(indices, attainments).length === 0 ?
         <DialogTitle>Create Sub Study Attainments</DialogTitle>
         :
         <DialogTitle>Add Sub Study Attainments</DialogTitle>}

@@ -11,7 +11,7 @@ import textFormatServices from '../../services/textFormat';
 import formulasService from '../../services/formulas';
 
 // This component renders a top attainment (only has the intance as its parent)
-const AssignmentCategory = ({ attainment, button, attainmentKey }) => {
+const AttainmentCategory = ({ attainment, button, attainmentKey }) => {
 
   const { name, formulaId, expiryDate, subAttainments } = attainment;
   const titlepb = subAttainments.length !== 0 ? '16px' : '0px';  // title padding-bottom
@@ -49,10 +49,10 @@ const AssignmentCategory = ({ attainment, button, attainmentKey }) => {
   );
 };
 
-AssignmentCategory.propTypes = {
+AttainmentCategory.propTypes = {
   attainment: PropTypes.object,
   button: PropTypes.element,
   attainmentKey: PropTypes.string,
 };
 
-export default AssignmentCategory;
+export default AttainmentCategory;

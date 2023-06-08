@@ -20,12 +20,12 @@ import AllCoursesView from './components/AllCoursesView';
 import CreateCourseView from './components/CreateCourseView';
 import FetchInstancesView from './components/FetchInstancesView';
 import EditInstanceView from './components/EditInstanceView';
-import AddAssignmentsView from './components/AddAssignmentsView';
+import AddAttainmentsView from './components/AddAttainmentsView';
 import InstanceSummaryView from './components/InstanceSummaryView';
 import SelectFormulaView from './components/SelectFormulaView';
 import FormulaAttributesView from './components/FormulaAttributesView';
-import CreateAssignmentView from './components/CreateAssignmentView';
-import EditAssignmentView from './components/EditAssignmentView';
+import CreateAttainmentView from './components/CreateAttainmentView';
+import EditAttainmentView from './components/EditAttainmentView';
 import CourseResultsView from './components/CourseResultsView';
 import InstanceCreationRoute from './context/InstanceCreationRoute';
 import FormulaSelectionRoute from './context/FormulaSelectionRoute';
@@ -148,13 +148,13 @@ function App() {
               { /* Pages under this route share instance creation context */ }
               <Route element={<InstanceCreationRoute/>}>
                 <Route path=':courseId/edit-instance/:sisuInstanceId' element={<EditInstanceView/>}/>
-                <Route path=':courseId/add-attainments/:sisuInstanceId' element={<AddAssignmentsView/>}/>
+                <Route path=':courseId/add-attainments/:sisuInstanceId' element={<AddAttainmentsView/>}/>
                 <Route path=':courseId/instance-summary/:sisuInstanceId' element={<InstanceSummaryView/>}/>
-                <Route path=':courseId/create-temporary-attainment/:sisuInstanceId' element={<CreateAssignmentView/>}/>
-                <Route path=':courseId/edit-temporary-attainment/:sisuInstanceId/:attainmentId' element={<EditAssignmentView/>}/>
+                <Route path=':courseId/create-temporary-attainment/:sisuInstanceId' element={<CreateAttainmentView/>}/>
+                <Route path=':courseId/edit-temporary-attainment/:sisuInstanceId/:attainmentId' element={<EditAttainmentView/>}/>
               </Route>
-              <Route path=':courseId/create-attainment/:instanceId' element={<CreateAssignmentView/>}/>
-              <Route path=':courseId/edit-attainment/:instanceId/:attainmentId' element={<EditAssignmentView/>}/>
+              <Route path=':courseId/create-attainment/:instanceId' element={<CreateAttainmentView/>}/>
+              <Route path=':courseId/edit-attainment/:instanceId/:attainmentId' element={<EditAttainmentView/>}/>
               <Route element={<FormulaSelectionRoute/>}>
                 <Route path='/:courseId/select-formula/:instanceId/' element={<SelectFormulaView/>}/>
                 <Route path='/:courseId/formula-attributes/:instanceId/' element={<FormulaAttributesView/>}/>
