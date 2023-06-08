@@ -35,13 +35,12 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "npm --prefix ../common run build && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "npx eslint `find . -name '*.tsx' -not -path './node_modules/*'`",
-    "lint:fix": "npx eslint `find . -name '*.tsx' -not -path './node_modules/*'` --fix",
-    "build-common": "cd ../common && npm run build"
+    "lint:fix": "npx eslint `find . -name '*.tsx' -not -path './node_modules/*'` --fix"
   },
   "eslintConfig": {
     "extends": [

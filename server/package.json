@@ -9,7 +9,7 @@
     "../common"
   ],
   "scripts": {
-    "build": "npx tsc",
+    "build": "npm --prefix ../common run build && npx tsc",
     "start": "node build/src/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "test": "jest --verbose --detectOpenHandles --coverage",
@@ -18,8 +18,7 @@
     "migration:up": "npx sequelize-cli db:migrate",
     "migration:down": "npx sequelize-cli db:migrate:undo",
     "seed:up": "npx sequelize-cli db:seed:all",
-    "seed:down": "npx sequelize-cli db:seed:undo",
-    "build-common": "cd ../common && npm run build"
+    "seed:down": "npx sequelize-cli db:seed:undo"
   },
   "dependencies": {
     "@types/cors": "^2.8.12",

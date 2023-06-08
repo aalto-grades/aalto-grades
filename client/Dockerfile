@@ -6,17 +6,17 @@ FROM node:16-alpine
 
 WORKDIR /app
 
+COPY --chown=node:node common common
+COPY --chown=node:node client client
+
+WORKDIR /app/client
+USER node
+
 ARG CLIENT_SKIP_NPM_CI
-
-COPY . .
-
-RUN chown -R node:node ./
-
-RUN if [ -z "$CLIENT_SKIP_NPM_CI" ] || [ $CLIENT_SKIP_NPM_CI != 1 ]; then npm run build-common && npm ci; fi
+RUN if [ -z "$CLIENT_SKIP_NPM_CI" ] || [ $CLIENT_SKIP_NPM_CI != 1 ]; \
+    then npm ci; fi
 
 RUN npm run build
-
-USER node
 
 CMD ["npm", "start"]
 
