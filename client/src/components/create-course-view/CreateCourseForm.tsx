@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import TextFieldBox from './TextFieldBox';
+import { CourseData } from 'aalto-grades-common/types/course';
 
 const codeData = {
   fieldId: 'courseCode',
@@ -44,7 +45,7 @@ const CreateCourseForm = ({ addCourse }) => {
   const handleSubmit = (event) => {
     event.preventDefault();
     try {
-      const courseObject = ({
+      const courseObject: CourseData = ({
         id,
         courseCode,
         department: {

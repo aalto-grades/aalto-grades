@@ -29,8 +29,8 @@ describe('Tests for CourseView component', () => {
 
 
     const mockResponseCourse = { course: mockCourses[0] };
-    coursesService.getCourse.mockRejectedValue('Network error');
-    coursesService.getCourse.mockResolvedValue(mockResponseCourse);
+    (coursesService.getCourse as jest.Mock).mockRejectedValue('Network error');
+    (coursesService.getCourse as jest.Mock).mockResolvedValue(mockResponseCourse);
 
     return render(
       <MemoryRouter initialEntries={['/course-view/1']}>

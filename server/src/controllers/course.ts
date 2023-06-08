@@ -10,10 +10,11 @@ import { sequelize } from '../database';
 import Course from '../database/models/course';
 import CourseTranslation from '../database/models/courseTranslation';
 
-import { CourseData } from '../types/course';
+import { CourseData } from 'aalto-grades-common/types/course';
+import { Language } from 'aalto-grades-common/types/language';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
-import { Language, localizedStringSchema } from '../types/language';
+import { localizedStringSchema } from '../types/language';
 import { CourseWithTranslation } from '../types/model';
 import { findCourseWithTranslationById } from './utils/course';
 

@@ -6,9 +6,3 @@ export enum SystemRole {
   User = 'USER',
   Admin = 'ADMIN'
 }
-
-export enum CourseInstanceRole {
-  Student = 'STUDENT',
-  Teacher = 'TEACHER',
-  TeacherInCharge = 'TEACHER_IN_CHARGE',
-}

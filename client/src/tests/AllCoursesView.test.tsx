@@ -21,8 +21,8 @@ describe('Tests for FrontPage component', () => {
 
     const mockResponse = { courses: mockCourses };
 
-    coursesService.getAllCourses.mockRejectedValue('Network error');
-    coursesService.getAllCourses.mockResolvedValue(mockResponse);
+    (coursesService.getAllCourses as jest.Mock).mockRejectedValue('Network error');
+    (coursesService.getAllCourses as jest.Mock).mockResolvedValue(mockResponse);
 
     return render(
       <BrowserRouter>

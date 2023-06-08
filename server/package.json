@@ -5,6 +5,9 @@
   "license": "Expat (MIT)",
   "description": "",
   "main": "",
+  "workspaces": [
+    "../common"
+  ],
   "scripts": {
     "build": "npx tsc",
     "start": "node build/src/server.js",
@@ -15,7 +18,8 @@
     "migration:up": "npx sequelize-cli db:migrate",
     "migration:down": "npx sequelize-cli db:migrate:undo",
     "seed:up": "npx sequelize-cli db:seed:all",
-    "seed:down": "npx sequelize-cli db:seed:undo"
+    "seed:down": "npx sequelize-cli db:seed:undo",
+    "build-common": "cd ../common && npm run build"
   },
   "dependencies": {
     "@types/cors": "^2.8.12",
@@ -26,6 +30,7 @@
     "@types/sequelize": "^4.28.14",
     "@types/swagger-jsdoc": "^6.0.1",
     "@types/swagger-ui-express": "^4.1.3",
+    "aalto-grades-common": "*",
     "argon2": "=0.27.2",
     "axios": "^1.2.3",
     "cookie-parser": "^1.4.6",

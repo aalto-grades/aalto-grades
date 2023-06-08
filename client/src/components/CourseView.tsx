@@ -25,7 +25,7 @@ const mockInstitution: string = 'Aalto University';
 
 const CourseView = (): JSX.Element => {
   let navigate = useNavigate();
-  let { courseId } = useParams();
+  let { courseId }: any = useParams();
   const { auth } = useAuth();
 
   const [courseDetails, setCourseDetails] = useState(null);
