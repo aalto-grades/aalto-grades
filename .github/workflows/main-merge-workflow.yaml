@@ -8,16 +8,17 @@ on:
   push:
     branches:
       - main
+  # Temporarily enabled on PRs for testing
   pull_request:
-    types:
-      - closed
+    branches:
+      - main
 env:
   REGISTRY: ghcr.io
   FRONTEND_IMAGE_NAME: aalto-grades/aalto-grades-frontend
   BACKEND_IMAGE_NAME: aalto-grades/aalto-grades-backend
 
 jobs:
-  build-and-push-frontend-and-backend:
+  build_and_push_frontend_and_backend:
     runs-on: ubuntu-latest
     permissions:
       contents: read
