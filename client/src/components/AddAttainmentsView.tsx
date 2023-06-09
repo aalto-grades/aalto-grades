@@ -35,10 +35,23 @@ const AddAttainmentsView = () => {
   }, []);
 
   const onAddClick = (attainment) => () => {
-    const newSuggested = suggestedAttainments.filter(a => a.temporaryId !== attainment.temporaryId);
-    setSuggestedAttainments(newSuggested);
-    const updatedAttainments = attainmentServices.addTemporaryAttainment(addedAttainments, attainment);
-    setAddedAttainments(updatedAttainments);
+    setSuggestedAttainments(
+      suggestedAttainments.filter(a => a.temporaryId !== attainment.temporaryId)
+    );
+
+    setAddedAttainments(
+      attainmentServices.addTemporaryAttainment(addedAttainments, attainment)
+    );
+  };
+
+  const onRemoveClick = (attainment) => () => {
+    setSuggestedAttainments(
+      attainmentServices.addTemporaryAttainment(suggestedAttainments, attainment)
+    );
+
+    setAddedAttainments(
+      addedAttainments.filter(a => a.temporaryId !== attainment.temporaryId)
+    );
   };
 
   const onGoBack = () => {
@@ -49,26 +62,33 @@ const AddAttainmentsView = () => {
     navigate('/' + courseId + '/instance-summary/' + sisuInstanceId);
   };
 
-  return(
+  return (
     <Box sx={{ display: 'grid', gap: 1.5, ml: '7.5vw', mr: '7.5vw' }}>
       <Typography variant='h1' align='left' sx={{ mb: 4 }}>Add Study Attainments</Typography>
       <Typography variant='h3' align='left' sx={{ ml: 1.5 }}>Suggested study attainments from previous instances</Typography>
       <Box borderRadius={1} sx={{ bgcolor: 'secondary.light', p: '16px 12px', display: 'inline-block' }}>
         <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch' }}>
-          { suggestedAttainments.map(attainment => {
-            /* Since the attainments are displayed by during the creation of an instance,
-               all of them might not exist in the database (since new one can be created)
-               so temporary ids are used as keys for the attainment accoridons */
-            return (
-              <AttainmentCategory
-                key={attainment.temporaryId}
-                attainment={attainment}
-                attainmentKey={'temporaryId'}
-                button={<Button onClick={onAddClick(attainment)}>Add</Button>}
-              />
-            );
+          {
+            suggestedAttainments.map(attainment => {
+              /* Since the attainments are displayed by during the creation of an instance,
+                 all of them might not exist in the database (since new one can be created)
+                 so temporary ids are used as keys for the attainment accoridons */
+              return (
+                <AttainmentCategory
+                  key={attainment.temporaryId}
+                  attainment={attainment}
+                  attainmentKey={'temporaryId'}
+                  buttons={
+                    [
+                      <Button key='add' onClick={onAddClick(attainment)}>
+                        Add
+                      </Button>
+                    ]
+                  }
+                />
+              );
+            })
           }
-          ) }
         </Box>
       </Box>
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', mb: 5, mt: 1, display: 'inline-block' }}>
@@ -82,22 +102,36 @@ const AddAttainmentsView = () => {
       </Box>
       <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >Added study attainments</Typography>
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', display: 'inline-block' }}>
-        { addedAttainments.length !== 0 &&
+        {
+          addedAttainments.length !== 0 &&
           <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch', pb: '8px' }}>
-            { addedAttainments.map(attainment => {
-              return (
-                <AttainmentCategory
-                  key={attainment.temporaryId}
-                  attainment={attainment}
-                  attainmentKey={'temporaryId'}
-                  button={<Button
-                    onClick={ () => navigate(`/${courseId}/edit-temporary-attainment/${sisuInstanceId}/${attainment.temporaryId}`) }>
-                      Edit
-                  </Button>}
-                />
-              );
+            {
+              addedAttainments.map(attainment => {
+                return (
+                  <AttainmentCategory
+                    key={attainment.temporaryId}
+                    attainment={attainment}
+                    attainmentKey={'temporaryId'}
+                    buttons={
+                      [
+                        <Button
+                          key='remove'
+                          onClick={onRemoveClick(attainment)}
+                        >
+                          Remove
+                        </Button>,
+                        <Button
+                          key='edit'
+                          onClick={() => navigate(`/${courseId}/edit-temporary-attainment/${sisuInstanceId}/${attainment.temporaryId}`)}
+                        >
+                          Edit
+                        </Button>
+                      ]
+                    }
+                  />
+                );
+              })
             }
-            ) }
           </Box>
         }
         <Typography variant='body1' color='primary.main' sx={{ m: '8px 0px' }} >

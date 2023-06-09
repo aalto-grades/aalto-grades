@@ -12,6 +12,8 @@ services:
       file: ../common-services.yaml
       service: backend
     container_name: "backend-server-${NODE_ENV}"
+    ports:
+      - 3000:3000
     environment:
       NODE_ENV: "${NODE_ENV}"
       

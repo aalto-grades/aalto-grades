@@ -129,36 +129,39 @@ const CustomAccordion = ({ attainments, attainmentKey }) => {
 
   return (
     <>
-      { attainments.map(attainment => {
-        return (
-          <Accordion
-            key={attainment[attainmentKey] + 'accordion'}
-            expanded={expanded.has(attainment[attainmentKey])}
-            onChange={handleChange(attainment[attainmentKey])}
-          >
-            <AccordionSummary
-              aria-controls={attainment[attainmentKey] + '-content'}
-              id={attainment[attainmentKey] + '-header'}
-              expanded={expanded.has(attainment[attainmentKey]).toString()}
-              nowselected={(selected === attainment[attainmentKey]).toString()}
+      {
+        attainments.map(attainment => {
+          return (
+            <Accordion
+              key={attainment[attainmentKey] + 'accordion'}
+              expanded={expanded.has(attainment[attainmentKey])}
+              onChange={handleChange(attainment[attainmentKey])}
             >
-              <AttainmentText name={attainment.name} formulaId={attainment.formulaId} />
-            </AccordionSummary>
-            { attainment.subAttainments.map(subAttainment => {
-              return (
-                subAttainment.subAttainments.length === 0 ?  // is the attainment a leaf? If yes, render details, else another accordion
-                  <AccordionDetails key={subAttainment[attainmentKey] + 'details'}>
-                    <AttainmentText name={subAttainment.name} formulaId={subAttainment.formulaId} />
-                  </AccordionDetails>
-                  :
-                  <Box key={subAttainment[attainmentKey] + 'subAccordion'} sx={{ pl: '39px' }}>
-                    {<CustomAccordion attainments={[subAttainment]} attainmentKey={attainmentKey}/>}
-                  </Box>
-              );
-            })}
-          </Accordion>
-        );
-      })}
+              <AccordionSummary
+                aria-controls={attainment[attainmentKey] + '-content'}
+                id={attainment[attainmentKey] + '-header'}
+                expanded={expanded.has(attainment[attainmentKey]).toString()}
+                nowselected={(selected === attainment[attainmentKey]).toString()}
+              >
+                <AttainmentText name={attainment.name} formulaId={attainment.formulaId} />
+              </AccordionSummary>
+              {
+                attainment.subAttainments.map(subAttainment => {
+                  return (
+                    subAttainment.subAttainments.length === 0 ?  // is the attainment a leaf? If yes, render details, else another accordion
+                      <AccordionDetails key={subAttainment[attainmentKey] + 'details'}>
+                        <AttainmentText name={subAttainment.name} formulaId={subAttainment.formulaId} />
+                      </AccordionDetails>
+                      :
+                      <Box key={subAttainment[attainmentKey] + 'subAccordion'} sx={{ pl: '39px' }}>
+                        {<CustomAccordion attainments={[subAttainment]} attainmentKey={attainmentKey} />}
+                      </Box>
+                  );
+                })
+              }
+            </Accordion>
+          );
+        })}
     </>
   );
 };
