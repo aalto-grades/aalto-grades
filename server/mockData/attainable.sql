@@ -198,4 +198,12 @@ INSERT INTO public.attainable (course_id, course_instance_id, attainable_id, nam
 (6, 9, 19, 'test assignment course 6, instance 9', '2022-01-05', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 3, "weight": 1 }'),
 (6, 9, 19, 'test assignment course 6, instance 9', '2022-01-05', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 3, "weight": 1 }'),
 (6, 9, 19, 'test assignment course 6, instance 9', '2022-01-05', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 3, "weight": 1 }'),
-(6, 9, 19, 'test assignment course 6, instance 9', '2022-01-05', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 3, "weight": 1 }');
+(6, 9, 19, 'test assignment course 6, instance 9', '2022-01-05', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 3, "weight": 1 }'),
+(4, 7, null, 'test assignment tree c:4 i:7', '2023-05-08', '2023-04-23', NOW(), NOW(), 'WEIGHTED_AVERAGE', NULL),
+(4, 7, 197, 'test assignment tree c:4 i:7', '2023-05-08', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.4 }'),
+(4, 7, 197, 'test assignment tree c:4 i:7', '2023-05-08', '2023-04-23', NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "min": 0, "max": 5, "weight": 0.6 }'),
+(4, 7, 199, 'test assignment tree c:4 i:7', '2023-05-08', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.1 }'),
+(4, 7, 199, 'test assignment tree c:4 i:7', '2023-05-08', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.1 }'),
+(4, 7, 199, 'test assignment tree c:4 i:7', '2023-05-08', '2023-04-23', NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "min": 0, "max": 5, "weight": 0.8 }'),
+(4, 7, 202, 'test assignment tree c:4 i:7', '2023-05-08', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.5 }'),
+(4, 7, 202, 'test assignment tree c:4 i:7', '2023-05-08', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.5 }');
