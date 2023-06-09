@@ -10,15 +10,18 @@ import { mockAttainable } from '../mockData/attainable';
 import { app } from '../../src/app';
 import { AttainableData } from '../../src/types/attainable';
 import { HttpCode } from '../../src/types/httpCode';
-import { getCookies } from '../util/getCookies';
+import { Cookies, getCookies } from '../util/getCookies';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
 const badInput: string = 'notValid';
-let authCookie: Array<string> = [];
+let cookies: Cookies = {
+  adminCookie: [],
+  userCookie: []
+};
 
 beforeAll(async () => {
-  authCookie = await getCookies();
+  cookies = await getCookies();
 });
 
 interface AttainmentNode {
@@ -52,7 +55,7 @@ describe(
           .post('/v1/courses/1/instances/1/attainments')
           .send({ ...mockAttainable, subAttainments: undefined })
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
@@ -77,7 +80,7 @@ describe(
           .post('/v1/courses/1/instances/1/attainments')
           .send(mockAttainable)
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
@@ -105,7 +108,7 @@ describe(
         .post('/v1/courses/1/instances/1/attainments')
         .send({ parentId: 1, ...mockAttainable })
         .set('Content-Type', 'application/json')
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -124,7 +127,7 @@ describe(
           .post(`/v1/courses/1/instances/${badInput}/attainments`)
           .send(mockAttainable)
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
@@ -140,7 +143,7 @@ describe(
           .post(`/v1/courses/${badInput}/instances/1/attainments`)
           .send(mockAttainable)
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
@@ -156,7 +159,7 @@ describe(
           .post('/v1/courses/1/instances/1/attainments')
           .send({ parentId: badInput, ...mockAttainable })
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
@@ -170,9 +173,9 @@ describe(
       async () => {
         const res: supertest.Response = await request
           .post('/v1/courses/1/instances/1/attainments')
-          .send({ ...mockAttainable, date: badInput,})
+          .send({ ...mockAttainable, date: badInput, })
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
@@ -186,9 +189,9 @@ describe(
       async () => {
         const res: supertest.Response = await request
           .post('/v1/courses/1/instances/1/attainments')
-          .send({ ...mockAttainable, expiryDate: badInput,})
+          .send({ ...mockAttainable, expiryDate: badInput, })
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
@@ -210,9 +213,9 @@ describe(
               expiryDate: new Date(2024, 8, 14),
               subAttainments: [],
             }
-          ]})
+          ] })
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
@@ -238,9 +241,9 @@ describe(
                 }
               ],
             }
-          ]})
+          ] })
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
@@ -273,9 +276,9 @@ describe(
                 }
               ],
             }
-          ]})
+          ] })
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
@@ -286,15 +289,11 @@ describe(
       });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
-      const res: supertest.Response = await request
+      await request
         .post('/v1/courses/1/instances/1/attainments')
         .send(mockAttainable)
         .set('Content-Type', 'application/json')
         .expect(HttpCode.Unauthorized);
-
-      expect(res.body.success).toBe(false);
-      expect(res.body.errors[0]).toBe('unauthorized');
-      expect(res.body.data).not.toBeDefined();
     });
 
     it('should respond with 404 not found, if course instance does not exist',
@@ -303,7 +302,7 @@ describe(
           .post(`/v1/courses/1/instances/${badId}/attainments`)
           .send(mockAttainable)
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.NotFound);
 
@@ -318,7 +317,7 @@ describe(
           .post(`/v1/courses/${badId}/instances/1/attainments`)
           .send(mockAttainable)
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.NotFound);
 
@@ -333,7 +332,7 @@ describe(
           .post('/v1/courses/1/instances/2/attainments')
           .send(mockAttainable)
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Conflict);
 
@@ -351,7 +350,7 @@ describe(
           .post('/v1/courses/1/instances/1/attainments')
           .send(mockAttainable)
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         const id: number = Number(res.body.data.attainment.id);
@@ -361,7 +360,7 @@ describe(
           .post('/v1/courses/2/instances/2/attainments')
           .send({ parentId: id, ...mockAttainable })
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Conflict);
 
@@ -378,7 +377,7 @@ describe(
           .post('/v1/courses/1/instances/1/attainments')
           .send({ parentId: badId, ...mockAttainable })
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.UnprocessableEntity);
 
@@ -396,7 +395,7 @@ describe(
       // Add an attainment tree.
       const add: supertest.Response = await request
         .post('/v1/courses/1/instances/1/attainments').send(tree)
-        .set('Cookie', authCookie);
+        .set('Cookie', cookies.adminCookie);
 
       // Adds the IDs of all subattainemnts of the given tree to the given
       // attainments array.
@@ -419,7 +418,7 @@ describe(
       // Delete the root attainment.
       const res: supertest.Response = await request
         .delete(`/v1/courses/1/instances/1/attainments/${rootAttainment}`)
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -442,7 +441,7 @@ describe(
             subAttainments: []
           }
         )
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json');
 
       // Verify that the attainment was added.
@@ -452,7 +451,7 @@ describe(
       // Delete the added attainment.
       const res: supertest.Response = await request
         .delete(`/v1/courses/1/instances/1/attainments/${addedAttainment}`)
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -490,20 +489,16 @@ describe(
     });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
-      const res: supertest.Response = await request
+      await request
         .delete('/v1/courses/1/instances/1/attainments/1')
         .set('Accept', 'application/json')
         .expect(HttpCode.Unauthorized);
-
-      expect(res.body.success).toBe(false);
-      expect(res.body.errors[0]).toBe('unauthorized');
-      expect(res.body.data).not.toBeDefined();
     });
 
     it('should respond with 404 not found for non-existent attainment ID', async () => {
       const res: supertest.Response = await request
         .delete(`/v1/courses/1/instances/1/attainments/${badId}`)
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.NotFound);
 
@@ -525,7 +520,7 @@ describe(
         .post('/v1/courses/1/instances/1/attainments')
         .send(mockAttainable)
         .set('Content-Type', 'application/json')
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -539,7 +534,7 @@ describe(
           expiryDate: mockAttainable.expiryDate
         })
         .set('Content-Type', 'application/json')
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -562,7 +557,7 @@ describe(
         .post('/v1/courses/1/instances/1/attainments')
         .send(mockAttainable)
         .set('Content-Type', 'application/json')
-        .set('Cookie', authCookie);
+        .set('Cookie', cookies.adminCookie);
 
       parentAttainable = res.body.data.attainment;
 
@@ -570,7 +565,7 @@ describe(
         .put(`/v1/courses/1/instances/1/attainments/${subAttainable.id}`)
         .send({ parentId: parentAttainable.id })
         .set('Content-Type', 'application/json')
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .expect(HttpCode.Ok);
 
       expect(res.body.success).toBe(true);
@@ -592,7 +587,7 @@ describe(
           .put(`/v1/courses/1/instances/${badInput}/attainments/${subAttainable.id}`)
           .send(mockAttainable)
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.BadRequest);
 
         expect(res.body.success).toBe(false);
@@ -607,7 +602,7 @@ describe(
           .put(`/v1/courses/${badInput}/instances/1/attainments/${subAttainable.id}`)
           .send(mockAttainable)
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.BadRequest);
 
         expect(res.body.success).toBe(false);
@@ -622,7 +617,7 @@ describe(
           .put(`/v1/courses/1/instances/1/attainments/${badInput}`)
           .send(mockAttainable)
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.BadRequest);
 
         expect(res.body.success).toBe(false);
@@ -632,14 +627,10 @@ describe(
       });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
-      const res: supertest.Response = await request
+      await request
         .put('/v1/courses/1/instances/1/attainments/1')
         .set('Accept', 'application/json')
         .expect(HttpCode.Unauthorized);
-
-      expect(res.body.success).toBe(false);
-      expect(res.body.errors[0]).toBe('unauthorized');
-      expect(res.body.data).not.toBeDefined();
     });
 
     it('should respond with 404 not found, if attainable does not exist', async () => {
@@ -647,7 +638,7 @@ describe(
         .put(`/v1/courses/1/instances/1/attainments/${badId}`)
         .send(mockAttainable)
         .set('Content-Type', 'application/json')
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .expect(HttpCode.NotFound);
 
       expect(res.body.success).toBe(false);
@@ -663,7 +654,7 @@ describe(
           .post('/v1/courses/2/instances/2/attainments')
           .send(mockAttainable)
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie);
+          .set('Cookie', cookies.adminCookie);
 
         parentAttainable = res.body.data.attainment;
 
@@ -671,7 +662,7 @@ describe(
           .put(`/v1/courses/1/instances/1/attainments/${subAttainable.id}`)
           .send({ parentId: parentAttainable.id })
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.Conflict);
 
         expect(res.body.success).toBe(false);
@@ -688,7 +679,7 @@ describe(
           .put(`/v1/courses/1/instances/1/attainments/${subAttainable.id}`)
           .send({ ...subAttainable, parentId: subAttainable.id })
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.Conflict);
 
         expect(res.body.success).toBe(false);
@@ -702,7 +693,7 @@ describe(
           .put(`/v1/courses/1/instances/1/attainments/${subAttainable.id}`)
           .send({ parentId: badId })
           .set('Content-Type', 'application/json')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.UnprocessableEntity);
 
         expect(res.body.success).toBe(false);

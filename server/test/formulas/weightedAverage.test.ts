@@ -58,7 +58,7 @@ describe('Test weighted average calculation', () => {
     const input: Array<GradingInput> = [
       { params: { min: 0, max: 20, weight: 0.3 }, subResult: { grade: 10, status: Status.Pass } },
       { params: { min: 0, max: 20, weight: 0.7 }, subResult: { grade: 14, status: Status.Fail } },
-      { params: { min: 0, max: 3, weight: 1 }, subResult: { grade: 3, status: Status.Fail} },
+      { params: { min: 0, max: 3, weight: 1 }, subResult: { grade: 3, status: Status.Fail } },
     ];
     const computedGrade: GradingResult = await implementation.formulaFunction(input);
     expect(computedGrade.grade).toBeCloseTo(15.8);

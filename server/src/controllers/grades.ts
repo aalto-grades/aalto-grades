@@ -17,8 +17,8 @@ import CourseResult from '../database/models/courseResult';
 import User from '../database/models/user';
 import UserAttainmentGrade from '../database/models/userAttainmentGrade';
 
+import { CourseInstanceRoleType, GradingScale } from 'aalto-grades-common/types/course';
 import { getFormulaImplementation } from '../formulas';
-import { CourseInstanceRoleType, GradingScale } from '../types/course';
 import { ApiError } from '../types/error';
 import { Formula, FormulaNode, GradingInput, GradingResult, Status } from '../types/formulas';
 import { UserAttainmentGradeData, StudentGrades, GradingResultsWithUser } from '../types/grades';
@@ -238,15 +238,15 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         );
 
         let students: Array<User> = await User.findAll({
-          attributes: ['id', 'studentId'],
+          attributes: ['id', 'studentNumber'],
           where: {
-            studentId: {
+            studentNumber: {
               [Op.in]: studentNumbers
             }
           }
         });
 
-        const foundStudents: Array<string> = students.map((student: User) => student.studentId);
+        const foundStudents: Array<string> = students.map((student: User) => student.studentNumber);
         const nonExistingStudents: Array<string> = studentNumbers.filter(
           (id: string) => !foundStudents.includes(id)
         );
@@ -279,7 +279,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
             const newUsers: Array<User> = await User.bulkCreate(
               nonExistingStudents.map((studentNo: string) => {
                 return {
-                  studentId: studentNo
+                  studentNumber: studentNo
                 };
               }), { transaction: t }
             );
@@ -309,7 +309,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         parsedStudentData = parsedStudentData.map(
           (student: StudentGrades): StudentGrades => {
             const matchingUser: User = students.find(
-              (user: User) => user.dataValues.studentId === student.studentNumber
+              (user: User) => user.dataValues.studentNumber === student.studentNumber
             ) as User;
 
             return {
@@ -715,7 +715,7 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
     },
     include: {
       model: User,
-      attributes: ['studentId']
+      attributes: ['studentNumber']
     }
   }) as Array<GradingResultsWithUser>;
 
@@ -736,7 +736,7 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
   }> = gradingResults.map(
     (courseResult: GradingResultsWithUser) => {
       return {
-        studentNumber: courseResult.User.studentId,
+        studentNumber: courseResult.User.studentNumber,
         grade: courseResult.grade,
         credits: courseResult.credits,
         // Assesment date must be in form dd.mm.yyyy.

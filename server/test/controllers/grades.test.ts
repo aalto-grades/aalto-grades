@@ -15,17 +15,20 @@ import UserAttainmentGrade from '../../src/database/models/userAttainmentGrade';
 import { app } from '../../src/app';
 import { Formula } from '../../src/types/formulas';
 import { HttpCode } from '../../src/types/httpCode';
-import { getCookies } from '../util/getCookies';
+import { getCookies, Cookies } from '../util/getCookies';
 import CourseResult from '../../src/database/models/courseResult';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
-let authCookie: Array<string> = [];
 const badId: number = 1000000;
 const badInput: string = 'notValid';
 let res: supertest.Response;
+let cookies: Cookies = {
+  adminCookie: [],
+  userCookie: []
+};
 
 beforeAll(async () => {
-  authCookie = await getCookies();
+  cookies = await getCookies();
 });
 
 function checkErrorRes(errorMessages: Array<string>, errorCode: HttpCode): void {
@@ -45,8 +48,8 @@ describe(
       );
       res = await request
         .post('/v1/courses/1/instances/1/grades/csv')
-        .attach('csv_data', csvData, { contentType: 'text/csv'})
-        .set('Cookie', authCookie)
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -60,7 +63,7 @@ describe(
       async () => {
         let users: Array<User> = await User.findAll({
           where: {
-            studentId: {
+            studentNumber: {
               [Op.in]: ['987654', '998877']
             }
           }
@@ -72,14 +75,14 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
         users = await User.findAll({
           where: {
-            studentId: {
+            studentNumber: {
               [Op.in]: ['987654', '998877']
             }
           }
@@ -105,7 +108,7 @@ describe(
     it('should update attainment grade if user grading data already exist in the db', async () => {
       const user: User = await User.findOne({
         where: {
-          studentId: '662292'
+          studentNumber: '662292'
         }
       }) as User;
 
@@ -123,8 +126,8 @@ describe(
       );
       res = await request
         .post('/v1/courses/1/instances/1/grades/csv')
-        .attach('csv_data', csvData, { contentType: 'text/csv'})
-        .set('Cookie', authCookie)
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -148,8 +151,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/6/instances/9/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
@@ -166,8 +169,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', invalidCsvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(
@@ -182,8 +185,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', invalidCsvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         const expectedErrors: Array<string> = [
@@ -204,8 +207,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', invalidCsvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         const expectedErrors: Array<string> = [
@@ -224,8 +227,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', invalidCsvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(['Invalid Record Length: expect 7, got 6 on line 4'], HttpCode.BadRequest);
@@ -239,8 +242,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach(badInput, csvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach(badInput, csvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(
@@ -256,8 +259,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'application/json'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', csvData, { contentType: 'application/json' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(['incorrect file format, use the CSV format'], HttpCode.BadRequest);
@@ -270,8 +273,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', txtFile, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', txtFile, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(['incorrect file format, use the CSV format'], HttpCode.BadRequest);
@@ -281,8 +284,8 @@ describe(
       async () => {
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', false, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', false, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(
@@ -301,8 +304,8 @@ describe(
         );
         res = await request
           .post(`/v1/courses/${badInput}/instances/1/grades/csv`)
-          .attach('csv_data', csvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(
@@ -322,8 +325,8 @@ describe(
         );
         res = await request
           .post(`/v1/courses/1/instances/${badInput}/grades/csv`)
-          .attach('csv_data', csvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(
@@ -340,15 +343,11 @@ describe(
       const csvData: fs.ReadStream = fs.createReadStream(
         path.resolve(__dirname, '../mockData/csv/grades.csv'), 'utf8'
       );
-      res = await request
+      await request
         .post('/v1/courses/1/instances/1/grades/csv')
-        .attach('csv_data', csvData, { contentType: 'text/csv'})
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
         .set('Accept', 'application/json')
         .expect(HttpCode.Unauthorized);
-
-      expect(res.body.success).toBe(false);
-      expect(res.body.errors[0]).toBe('unauthorized');
-      expect(res.body.data).not.toBeDefined();
     });
 
     it('should respond with 404 not found, if course does not exist', async () => {
@@ -357,8 +356,8 @@ describe(
       );
       res = await request
         .post(`/v1/courses/${badId}/instances/1/grades/csv`)
-        .attach('csv_data', csvData, { contentType: 'text/csv'})
-        .set('Cookie', authCookie)
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json');
 
       checkErrorRes([`course with ID ${badId} not found`], HttpCode.NotFound);
@@ -370,8 +369,8 @@ describe(
       );
       res = await request
         .post(`/v1/courses/1/instances/${badId}/grades/csv`)
-        .attach('csv_data', csvData, { contentType: 'text/csv'})
-        .set('Cookie', authCookie)
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json');
 
       checkErrorRes([`course instance with ID ${badId} not found`], HttpCode.NotFound);
@@ -383,8 +382,8 @@ describe(
       );
       res = await request
         .post('/v1/courses/1/instances/2/grades/csv')
-        .attach('csv_data', csvData, { contentType: 'text/csv'})
-        .set('Cookie', authCookie)
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json');
 
       checkErrorRes(
@@ -401,8 +400,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(
@@ -419,8 +418,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(
@@ -451,7 +450,7 @@ describe('XXX Test POST /v1/courses/:courseId/instances/:instanceId/grades/calcu
   it('should calculate one correct grade', async () => {
     await request
       .post('/v1/courses/5/instances/8/grades/calculate')
-      .set('Cookie', authCookie);
+      .set('Cookie', cookies.userCookie);
 
     const result: CourseResult | null = await CourseResult.findOne({
       where: {
@@ -507,42 +506,42 @@ describe('XXX Test POST /v1/courses/:courseId/instances/:instanceId/grades/calcu
       return [
         {
           User: {
-            studentId: '111111'
+            studentNumber: '111111'
           },
           grade: 1,
           attainableId: 2,
         },
         {
           User: {
-            studentId: '111111'
+            studentNumber: '111111'
           },
           grade: 3,
           attainableId: 3,
         },
         {
           User: {
-            studentId: '222222'
+            studentNumber: '222222'
           },
           grade: 5,
           attainableId: 2,
         },
         {
           User: {
-            studentId: '222222'
+            studentNumber: '222222'
           },
           grade: 4,
           attainableId: 3,
         },
         {
           User: {
-            studentId: '333333'
+            studentNumber: '333333'
           },
           grade: 4,
           attainableId: 2,
         },
         {
           User: {
-            studentId: '333333'
+            studentNumber: '333333'
           },
           grade: 1,
           attainableId: 3,
@@ -553,7 +552,7 @@ describe('XXX Test POST /v1/courses/:courseId/instances/:instanceId/grades/calcu
     checkSuccessRes(
       await request
         .post('/v1/courses/1/instances/1/grades/calculate')
-        .set('Cookie', authCookie),
+        .set('Cookie', cookies.adminCookie),
       [
         {
           studentNumber: '111111',
@@ -577,7 +576,7 @@ describe('XXX Test POST /v1/courses/:courseId/instances/:instanceId/grades/calcu
   it('should calculate correct grades in higher depths', async () => {
     await request
       .post('/v1/courses/1/instances/1/grades/calculate')
-      .set('Cookie', authCookie);
+      .set('Cookie', cookies.userCookie);
 
     const result: CourseResult | null = await CourseResult.findOne({
       where: {
@@ -586,9 +585,18 @@ describe('XXX Test POST /v1/courses/:courseId/instances/:instanceId/grades/calcu
       }
     });
 
-    expect(result).not.toBe(null);
-    expect(result?.grade).toBe('3.12');
-    expect(result?.credits).toBe(5);
+    checkSuccessRes(
+      await request
+        .post('/v1/courses/1/instances/1/grades/calculate')
+        .set('Cookie', cookies.userCookie),
+      [
+        {
+          studentNumber: '123456',
+          grade: 3.12,
+          status: 'PASS'
+        }
+      ]
+    );
   });
 
   it('should allow manually overriding a student\'s grade', async () => {
@@ -629,21 +637,21 @@ describe('XXX Test POST /v1/courses/:courseId/instances/:instanceId/grades/calcu
       return [
         {
           User: {
-            studentId: '654321'
+            studentNumber: '654321'
           },
           grade: 5,
           attainableId: 1,
         },
         {
           User: {
-            studentId: '654321'
+            studentNumber: '654321'
           },
           grade: 0,
           attainableId: 2,
         },
         {
           User: {
-            studentId: '654321'
+            studentNumber: '654321'
           },
           grade: 0,
           attainableId: 3,
@@ -654,7 +662,7 @@ describe('XXX Test POST /v1/courses/:courseId/instances/:instanceId/grades/calcu
     checkSuccessRes(
       await request
         .post('/v1/courses/1/instances/1/grades/calculate')
-        .set('Cookie', authCookie),
+        .set('Cookie', cookies.userCookie),
       [
         {
           studentNumber: '654321',
@@ -666,13 +674,9 @@ describe('XXX Test POST /v1/courses/:courseId/instances/:instanceId/grades/calcu
   });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
-    res = await request
+    await request
       .post('/v1/courses/1/instances/1/grades/calculate')
       .expect(HttpCode.Unauthorized);
-
-    expect(res.body.success).toBe(false);
-    expect(res.body.errors[0]).toBe('unauthorized');
-    expect(res.body.data).not.toBeDefined();
   });
 
 });
@@ -685,7 +689,7 @@ describe(
     it('should export CSV succesfully when course results are found', async () => {
       res = await request
         .get('/v1/courses/1/instances/1/grades/csv/sisu')
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'text/csv')
         .expect(HttpCode.Ok);
 
@@ -715,7 +719,7 @@ describe(
         res = await request
         // eslint-disable-next-line max-len
           .get('/v1/courses/1/instances/1/grades/csv/sisu?assessmentDate=2023-05-12&completionLanguage=sv')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'text/csv')
           .expect(HttpCode.Ok);
 
@@ -745,7 +749,7 @@ describe(
       async () => {
         res = await request
           .get('/v1/courses/1/instances/1/grades/csv/sisu?completionLanguage=xy')
-          .set('Cookie', authCookie);
+          .set('Cookie', cookies.adminCookie);
 
         checkErrorRes([
           'completionLanguage must be one of the following values:' +
@@ -758,7 +762,7 @@ describe(
       async () => {
         res = await request
           .get('/v1/courses/1/instances/1/grades/csv/sisu?assessmentDate=notValidDate')
-          .set('Cookie', authCookie);
+          .set('Cookie', cookies.adminCookie);
 
         checkErrorRes([
           'assessmentDate must be a `date` type, but the final value was:' +
@@ -767,14 +771,14 @@ describe(
       });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
-      res = await request.get('/v1/courses/1/instances/1/grades/csv/sisu');
-      checkErrorRes(['unauthorized'], HttpCode.Unauthorized);
+      await request.get('/v1/courses/1/instances/1/grades/csv/sisu')
+        .expect(HttpCode.Unauthorized);
     });
 
     it('should respond with 404 not found, if grades have not been calculated yet', async () => {
       res = await request
         .get('/v1/courses/2/instances/2/grades/csv/sisu')
-        .set('Cookie', authCookie);
+        .set('Cookie', cookies.adminCookie);
 
       checkErrorRes(
         [
@@ -787,7 +791,7 @@ describe(
     it('should respond with 404 not found, if course does not exist', async () => {
       res = await request
         .get(`/v1/courses/${badId}/instances/1/grades/csv/sisu`)
-        .set('Cookie', authCookie);
+        .set('Cookie', cookies.adminCookie);
 
       checkErrorRes([`course with ID ${badId} not found`], HttpCode.NotFound);
     });
@@ -795,7 +799,7 @@ describe(
     it('should respond with 404 not found, if course instance does not exist', async () => {
       res = await request
         .get(`/v1/courses/1/instances/${badId}/grades/csv/sisu`)
-        .set('Cookie', authCookie);
+        .set('Cookie', cookies.adminCookie);
 
       checkErrorRes([`course instance with ID ${badId} not found`], HttpCode.NotFound);
     });
@@ -803,7 +807,7 @@ describe(
     it('should respond with 409 conflict, if instance does not belong to the course', async () => {
       res = await request
         .get('/v1/courses/1/instances/2/grades/csv/sisu')
-        .set('Cookie', authCookie);
+        .set('Cookie', cookies.adminCookie);
 
       checkErrorRes(
         ['course instance with ID 2 does not belong to the course with ID 1'],

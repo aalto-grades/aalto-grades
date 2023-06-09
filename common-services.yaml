@@ -9,7 +9,11 @@ version: "3.7"
 
 services:
   frontend:
-    build: ./client
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
+      args:
+        CLIENT_SKIP_NPM_CI: ${CLIENT_SKIP_NPM_CI}
     extends:
       service: frontend-minimum
 
@@ -24,7 +28,8 @@ services:
 
   backend:
     build:
-      context: ./server
+      context: .
+      dockerfile: ./server/Dockerfile
       args:
         SERVER_SKIP_NPM_CI: ${SERVER_SKIP_NPM_CI}
     extends:

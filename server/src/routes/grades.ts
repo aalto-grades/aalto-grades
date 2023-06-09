@@ -4,10 +4,10 @@
 
 import { Request, Router } from 'express';
 import multer, { FileFilterCallback, memoryStorage, Multer } from 'multer';
+import passport from 'passport';
 import path from 'path';
 
 import { addGrades, calculateGrades, getSisuFormattedGradingCSV } from '../controllers/grades';
-import { authorization } from '../middleware/authorization';
 import { controllerDispatcher } from '../middleware/errorHandler';
 import { ApiError } from '../types/error';
 import { HttpCode } from '../types/httpCode';
@@ -114,7 +114,7 @@ const upload: Multer = multer({
  */
 router.post(
   '/v1/courses/:courseId/instances/:instanceId/grades/csv',
-  authorization,
+  passport.authenticate('jwt', { session: false }),
   upload.single('csv_data'),
   controllerDispatcher(addGrades)
 );
@@ -181,7 +181,7 @@ router.post(
  */
 router.post(
   '/v1/courses/:courseId/instances/:instanceId/grades/calculate',
-  authorization,
+  passport.authenticate('jwt', { session: false }),
   controllerDispatcher(calculateGrades)
 );
 
@@ -253,6 +253,6 @@ router.post(
  */
 router.get(
   '/v1/courses/:courseId/instances/:instanceId/grades/csv/sisu',
-  authorization,
+  passport.authenticate('jwt', { session: false }),
   controllerDispatcher(getSisuFormattedGradingCSV)
 );
