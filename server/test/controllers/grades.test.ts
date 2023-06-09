@@ -16,6 +16,7 @@ import { app } from '../../src/app';
 import { Formula } from '../../src/types/formulas';
 import { HttpCode } from '../../src/types/httpCode';
 import { getCookies } from '../util/getCookies';
+import CourseResult from '../../src/database/models/courseResult';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 let authCookie: Array<string> = [];
@@ -433,7 +434,7 @@ describe(
 
   });
 
-describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate', () => {
+describe('XXX Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate', () => {
   /*
    * no-explicit-any is disabled in the following tests to mock Sequelize
    * return values more easily.
@@ -448,19 +449,25 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
   }
 
   it('should calculate one correct grade', async () => {
-    checkSuccessRes(
-      await request
-        .post('/v1/courses/5/instances/8/grades/calculate')
-        .set('Cookie', authCookie),
-      [
-        {
-          studentNumber: '352772',
-          grade: 1.24,
-          status: 'PASS'
-        }
-      ]
-    );
+    await request
+      .post('/v1/courses/5/instances/8/grades/calculate')
+      .set('Cookie', authCookie);
+
+    const result: CourseResult | null = await CourseResult.findOne({
+      where: {
+        courseInstanceId: 8,
+        userId: 1
+      }
+    });
+
+    expect(result).not.toBe(null);
+    expect(result?.grade).toBe('1.24');
+    expect(result?.credits).toBe(5);
   });
+
+
+
+
 
   it('should calculate multiple correct grades', async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -568,141 +575,20 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
   });
 
   it('should calculate correct grades in higher depths', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    jest.spyOn(Attainable, 'findAll').mockImplementation((): any => {
-      return [
-        {
-          id: 1,
-          parentId: null,
-          formula: Formula.WeightedAverage,
-          parentFormulaParams: null
-        },
-        {
-          id: 2,
-          parentId: 1,
-          formula: Formula.Manual,
-          parentFormulaParams: {
-            min: 0,
-            max: 5,
-            weight: 0.4
-          }
-        },
-        {
-          id: 3,
-          parentId: 1,
-          formula: Formula.WeightedAverage,
-          parentFormulaParams: {
-            min: 0,
-            max: 5,
-            weight: 0.6
-          }
-        },
-        {
-          id: 4,
-          parentId: 3,
-          formula: Formula.Manual,
-          parentFormulaParams: {
-            min: 0,
-            max: 5,
-            weight: 0.1
-          }
-        },
-        {
-          id: 5,
-          parentId: 3,
-          formula: Formula.Manual,
-          parentFormulaParams: {
-            min: 0,
-            max: 5,
-            weight: 0.1
-          }
-        },
-        {
-          id: 6,
-          parentId: 3,
-          formula: Formula.WeightedAverage,
-          parentFormulaParams: {
-            min: 0,
-            max: 5,
-            weight: 0.8
-          }
-        },
-        {
-          id: 7,
-          parentId: 6,
-          formula: Formula.Manual,
-          parentFormulaParams: {
-            min: 0,
-            max: 5,
-            weight: 0.5
-          }
-        },
-        {
-          id: 8,
-          parentId: 6,
-          formula: Formula.Manual,
-          parentFormulaParams: {
-            min: 0,
-            max: 5,
-            weight: 0.5
-          }
-        }
-      ];
+    await request
+      .post('/v1/courses/1/instances/1/grades/calculate')
+      .set('Cookie', authCookie);
+
+    const result: CourseResult | null = await CourseResult.findOne({
+      where: {
+        courseInstanceId: 7,
+        userId: 25
+      }
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    jest.spyOn(UserAttainmentGrade, 'findAll').mockImplementation((): any => {
-      return [
-        {
-          User: {
-            studentId: '123456'
-          },
-          grade: 3,
-          attainableId: 2,
-        },
-        {
-          User: {
-            studentId: '123456'
-          },
-          grade: 4,
-          attainableId: 4,
-        },
-        {
-          User: {
-            studentId: '123456'
-          },
-          grade: 4,
-          attainableId: 5,
-        },
-        {
-          User: {
-            studentId: '123456'
-          },
-          grade: 1,
-          attainableId: 7,
-        },
-        {
-          User: {
-            studentId: '123456'
-          },
-          grade: 5,
-          attainableId: 8,
-        }
-      ];
-    });
-
-    checkSuccessRes(
-      await request
-        .post('/v1/courses/1/instances/1/grades/calculate')
-        .set('Cookie', authCookie),
-      [
-        {
-          studentNumber: '123456',
-          grade: 3.12,
-          status: 'PASS'
-        }
-      ]
-    );
+    expect(result).not.toBe(null);
+    expect(result?.grade).toBe('3.12');
+    expect(result?.credits).toBe(5);
   });
 
   it('should allow manually overriding a student\'s grade', async () => {
