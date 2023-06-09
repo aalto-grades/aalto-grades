@@ -74,7 +74,6 @@ describe('Tests for AddAttainmentsView components', () => {
 
     renderAddAttainmentsView();
 
-    console.log('HEREEEEEEEEEEE!');
     await waitFor(() => {
       const addButtons = screen.getAllByText('Add');
       expect(addButtons.length).toBe(mockAttainmentsClient.length);
