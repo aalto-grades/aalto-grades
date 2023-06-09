@@ -206,4 +206,10 @@ INSERT INTO public.attainable (course_id, course_instance_id, attainable_id, nam
 (4, 7, 199, 'test assignment tree c:4 i:7', '2023-05-08', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.1 }'),
 (4, 7, 199, 'test assignment tree c:4 i:7', '2023-05-08', '2023-04-23', NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "min": 0, "max": 5, "weight": 0.8 }'),
 (4, 7, 202, 'test assignment tree c:4 i:7', '2023-05-08', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.5 }'),
-(4, 7, 202, 'test assignment tree c:4 i:7', '2023-05-08', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.5 }');
+(4, 7, 202, 'test assignment tree c:4 i:7', '2023-05-08', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.5 }'),
+(3, 4, null, 'test assignment tree c:3 i:4', '2023-05-08', '2023-04-23', NOW(), NOW(), 'WEIGHTED_AVERAGE', NULL),
+(3, 4, 205, 'test assignment tree c:3 i:4, sub', '2023-05-08', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.5 }'),
+(3, 4, 205, 'test assignment tree c:3 i:4, sub', '2023-05-08', '2023-04-23', NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "min": 0, "max": 5, "weight": 0.5 }'),
+(4, 6, null, 'test assignment tree c:4 i:6', '2023-05-08', '2023-04-23', NOW(), NOW(), 'WEIGHTED_AVERAGE', NULL),
+(4, 6, 208, 'test assignment tree c:4 i:6, sub', '2023-05-08', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.75 }'),
+(4, 6, 208, 'test assignment tree c:4 i:6, sub', '2023-05-08', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.25 }');

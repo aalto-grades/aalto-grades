@@ -39,4 +39,11 @@ INSERT INTO public.user_attainment_grade (user_id, attainable_id, grade, created
 (25, 200, 4, NOW(), NOW()),
 (25, 201, 4, NOW(), NOW()),
 (25, 203, 1, NOW(), NOW()),
-(25, 204, 5, NOW(), NOW());
+(25, 204, 5, NOW(), NOW()),
+(13, 205, 5, NOW(), NOW()),
+(13, 206, 0, NOW(), NOW()),
+(13, 207, 0, NOW(), NOW()),
+(35, 209, 1, NOW(), NOW()),
+(35, 210, 3, NOW(), NOW()),
+(90, 209, 5, NOW(), NOW()),
+(90, 210, 4, NOW(), NOW());

@@ -433,19 +433,7 @@ describe(
 
   });
 
-describe('XXX Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate', () => {
-  /*
-   * no-explicit-any is disabled in the following tests to mock Sequelize
-   * return values more easily.
-   */
-
-  function checkSuccessRes(res: supertest.Response, finalGrades: Array<object>): void {
-    expect(res.body.errors).not.toBeDefined();
-    expect(res.body.success).toBe(true);
-    expect(res.statusCode).toBe(HttpCode.Ok);
-    expect(res.body.data).toBeDefined();
-    expect(res.body.data.grades).toEqual(finalGrades);
-  }
+describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate', () => {
 
   it('should calculate one correct grade', async () => {
     await request
@@ -458,124 +446,40 @@ describe('XXX Test POST /v1/courses/:courseId/instances/:instanceId/grades/calcu
         userId: 1
       }
     });
-
     expect(result).not.toBe(null);
     expect(result?.grade).toBe('1.24');
     expect(result?.credits).toBe(5);
   });
 
-
-
-
-
   it('should calculate multiple correct grades', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    jest.spyOn(Attainable, 'findAll').mockImplementation((): any => {
-      return [
-        {
-          id: 1,
-          parentId: null,
-          formula: Formula.WeightedAverage,
-          parentFormulaParams: null
-        },
-        {
-          id: 2,
-          parentId: 1,
-          formula: Formula.Manual,
-          parentFormulaParams: {
-            min: 0,
-            max: 5,
-            weight: 0.75
-          }
-        },
-        {
-          id: 3,
-          parentId: 1,
-          formula: Formula.Manual,
-          parentFormulaParams: {
-            min: 0,
-            max: 5,
-            weight: 0.25
-          }
-        },
-      ];
-    });
+    await request
+      .post('/v1/courses/4/instances/6/grades/calculate')
+      .set('Cookie', cookies.userCookie);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    jest.spyOn(UserAttainmentGrade, 'findAll').mockImplementation((): any => {
-      return [
-        {
-          User: {
-            studentNumber: '111111'
-          },
-          grade: 1,
-          attainableId: 2,
-        },
-        {
-          User: {
-            studentNumber: '111111'
-          },
-          grade: 3,
-          attainableId: 3,
-        },
-        {
-          User: {
-            studentNumber: '222222'
-          },
-          grade: 5,
-          attainableId: 2,
-        },
-        {
-          User: {
-            studentNumber: '222222'
-          },
-          grade: 4,
-          attainableId: 3,
-        },
-        {
-          User: {
-            studentNumber: '333333'
-          },
-          grade: 4,
-          attainableId: 2,
-        },
-        {
-          User: {
-            studentNumber: '333333'
-          },
-          grade: 1,
-          attainableId: 3,
-        }
-      ];
+    let result: CourseResult | null = await CourseResult.findOne({
+      where: {
+        courseInstanceId: 6,
+        userId: 35
+      }
     });
+    expect(result).not.toBe(null);
+    expect(result?.grade).toBe('1.5');
+    expect(result?.credits).toBe(5);
 
-    checkSuccessRes(
-      await request
-        .post('/v1/courses/1/instances/1/grades/calculate')
-        .set('Cookie', cookies.adminCookie),
-      [
-        {
-          studentNumber: '111111',
-          grade: 1.5,
-          status: 'PASS'
-        },
-        {
-          studentNumber: '222222',
-          grade: 4.75,
-          status: 'PASS'
-        },
-        {
-          studentNumber: '333333',
-          grade: 3.25,
-          status: 'PASS'
-        }
-      ]
-    );
+    result = await CourseResult.findOne({
+      where: {
+        courseInstanceId: 6,
+        userId: 90
+      }
+    });
+    expect(result).not.toBe(null);
+    expect(result?.grade).toBe('4.75');
+    expect(result?.credits).toBe(5);
   });
 
   it('should calculate correct grades in higher depths', async () => {
     await request
-      .post('/v1/courses/1/instances/1/grades/calculate')
+      .post('/v1/courses/4/instances/7/grades/calculate')
       .set('Cookie', cookies.userCookie);
 
     const result: CourseResult | null = await CourseResult.findOne({
@@ -584,93 +488,25 @@ describe('XXX Test POST /v1/courses/:courseId/instances/:instanceId/grades/calcu
         userId: 25
       }
     });
-
-    checkSuccessRes(
-      await request
-        .post('/v1/courses/1/instances/1/grades/calculate')
-        .set('Cookie', cookies.userCookie),
-      [
-        {
-          studentNumber: '123456',
-          grade: 3.12,
-          status: 'PASS'
-        }
-      ]
-    );
+    expect(result).not.toBe(null);
+    expect(result?.grade).toBe('3.12');
+    expect(result?.credits).toBe(5);
   });
 
   it('should allow manually overriding a student\'s grade', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    jest.spyOn(Attainable, 'findAll').mockImplementation((): any => {
-      return [
-        {
-          id: 1,
-          parentId: null,
-          formula: Formula.WeightedAverage,
-          parentFormulaParams: null
-        },
-        {
-          id: 2,
-          parentId: 1,
-          formula: Formula.Manual,
-          parentFormulaParams: {
-            min: 0,
-            max: 5,
-            weight: 0.5
-          }
-        },
-        {
-          id: 3,
-          parentId: 1,
-          formula: Formula.WeightedAverage,
-          parentFormulaParams: {
-            min: 0,
-            max: 5,
-            weight: 0.5
-          }
-        }
-      ];
-    });
+    await request
+      .post('/v1/courses/3/instances/4/grades/calculate')
+      .set('Cookie', cookies.userCookie);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    jest.spyOn(UserAttainmentGrade, 'findAll').mockImplementation((): any => {
-      return [
-        {
-          User: {
-            studentNumber: '654321'
-          },
-          grade: 5,
-          attainableId: 1,
-        },
-        {
-          User: {
-            studentNumber: '654321'
-          },
-          grade: 0,
-          attainableId: 2,
-        },
-        {
-          User: {
-            studentNumber: '654321'
-          },
-          grade: 0,
-          attainableId: 3,
-        }
-      ];
+    const result: CourseResult | null = await CourseResult.findOne({
+      where: {
+        courseInstanceId: 4,
+        userId: 13
+      }
     });
-
-    checkSuccessRes(
-      await request
-        .post('/v1/courses/1/instances/1/grades/calculate')
-        .set('Cookie', cookies.userCookie),
-      [
-        {
-          studentNumber: '654321',
-          grade: 5,
-          status: 'PASS'
-        }
-      ]
-    );
+    expect(result).not.toBe(null);
+    expect(result?.grade).toBe('5');
+    expect(result?.credits).toBe(5);
   });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
