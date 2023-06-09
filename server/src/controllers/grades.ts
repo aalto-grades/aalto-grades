@@ -5,7 +5,7 @@
 import { parse, Parser } from 'csv-parse';
 import { stringify } from 'csv-stringify';
 import { NextFunction, Request, Response } from 'express';
-import { Op, Transaction } from 'sequelize';
+import { Op, QueryTypes, Transaction } from 'sequelize';
 import * as yup from 'yup';
 
 import { sequelize } from '../database';
@@ -405,12 +405,6 @@ async function calculateFormulaNode(
   return await formulaNode.formulaImplementation.formulaFunction(inputs);
 }
 
-/*
-interface UserAttainmentGradeWithUser extends UserAttainmentGrade {
-  User: User
-}
-*/
-
 export async function calculateGrades(
   req: Request,
   res: Response
@@ -418,7 +412,7 @@ export async function calculateGrades(
   const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
     await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
 
-  // TODO: once jwt authorization connected to route, check requester id has teacher role.
+  // TODO: check requester id has teacher role on instance.
 
   /*
    * First we need to get all the attainments in this course instance.
@@ -588,42 +582,6 @@ export async function calculateGrades(
   });
 
   /*
-  const unorganizedPresetGrades: Array<{
-    userId: number,
-    studentNumber: string,
-    grade: number,
-    attainmentId: number
-  }> = (await UserAttainmentGrade.findAll({
-    include: [
-      {
-        model: Attainable,
-        required: true,
-        attributes: [],
-        where: {
-          courseId: course.id,
-          courseInstanceId: courseInstance.id,
-        }
-      },
-      {
-        model: User,
-        required: true,
-        attributes: ['studentId']
-      }
-    ],
-    attributes: ['grade', 'attainableId'],
-  }) as Array<UserAttainmentGradeWithUser>).map(
-    (attainmentGrade: UserAttainmentGradeWithUser) => {
-      return {
-        userId: attainmentGrade.userId,
-        studentNumber: attainmentGrade.User.studentId,
-        grade: attainmentGrade.grade,
-        attainmentId: attainmentGrade.attainableId
-      };
-    }
-  );
-  */
-
-  /*
    * Next we'll organize the preset grades by student number.
    */
 
@@ -653,12 +611,10 @@ export async function calculateGrades(
    * Finally we're ready to calculate the grades of each student starting from
    * the root attainment.
    */
-
   const finalGrades: Array<{
     userId: number,
     courseInstanceId: number,
     grade: string,
-    //status: Status,
     credits: number
   }> = [];
 
@@ -671,132 +627,44 @@ export async function calculateGrades(
         userId: userId,
         courseInstanceId: courseInstance.id,
         grade:
+        // If grading scale numerical save numerical value, otherwise final grade status (PASS/FAIL)
         courseInstance.gradingScale === GradingScale.Numerical ? finalGrade.status === Status.Pass ?
           String(finalGrade.grade) : '0' : finalGrade.status,
-        //status: finalGrade.status,
         credits: courseInstance.maxCredits
       }
     );
   }
 
-  /*
-export enum GradingScale {
-  PassFail = 'PASS_FAIL',
-  Numerical = 'NUMERICAL',
-  SecondNationalLanguage = 'SECOND_NATIONAL_LANGUAGE'
-}
+  // TODO manual or auto calculation flag
 
-  */
-
-  /*
-   * TODO: Don't return final grades, save grades to database in
-   * calculateFormulaNode instead?
-   */
-
-
-  //      await queryInterface.addIndex('user_attainment_grade', ['user_id', 'attainable_id'], {
-
-  /*
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true
-    },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'user',
-        key: 'id'
-      }
-    },
-    courseInstanceId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'course_instance',
-        key: 'id'
-      }
-    },
-    grade: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    credits: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-  */
-
-  /*
-    interface CourseResultData {
-      userId: number
-      courseInstanceId: number
-      grade: string
-      credits: number
+  await sequelize.transaction(async (transaction: Transaction) => {
+    for (const finalGrade of finalGrades) {
+      await sequelize.query(
+        `INSERT INTO course_result (
+        user_id, course_instance_id, grade,
+        credits, created_at, updated_at
+      )
+      VALUES
+        (:userId, :courseInstanceId, :grade, :credits, NOW(), NOW())
+        ON CONFLICT (user_id, course_instance_id) DO UPDATE
+      SET
+        user_id = :userId,
+        course_instance_id = :courseInstanceId,
+        grade = :grade,
+        credits = :credits,
+        updated_at = NOW();`,
+        {
+          replacements: finalGrade,
+          type: QueryTypes.INSERT,
+          transaction
+        }
+      );
     }
-
-    const resultsForDb: Array<CourseResultData> = finalGrades.map(())
-    */
-
-
-  // Use studentsWithId to update attainments by flatmapping each
-  // students grades into a one array of all the grades.
-  /*
-  const preparedBulkCreate: Array<UserAttainmentGradeData> = parsedStudentData.flatMap(
-    (student: StudentGrades): Array<UserAttainmentGradeData> => {
-      const studentGradingData: Array<UserAttainmentGradeData> = student.grades.map(
-        (grade: UserAttainmentGradeData): UserAttainmentGradeData => {
-          return {
-            userId: student.id as number,
-            ...grade
-          };
-        });
-      return studentGradingData;
-    });
-    */
-
-  // eslint-disable-next-line @typescript-eslint/typedef
-  //const [instance, created] = await CourseResult.upsert(finalGrades);
-
-  console.log(finalGrades);
-
-
-  await CourseResult.bulkCreate(
-    finalGrades,
-    {
-      updateOnDuplicate: ['grade', 'credits'],
-    });
-
-
-  /*
-  for (const finalGrade of finalGrades) {
-    await CourseResult.upsert(
-      finalGrade,
-      {
-        conflictFields: ['userId', 'courseInstanceId']
-      }
-    );
-  }
-
-  /*
-  Service.upsert(
-    { team, date, service, organisation, count },
-    { conflictFields: ["service", "date", "organisation"] },
-    { returning: true }
-)
-*/
-
-
-
-
+  });
 
   res.status(HttpCode.Ok).json({
     success: true,
-    data: {
-      finalGrades,
-      unorganizedPresetGrades
-    }
+    data: {}
   });
 }
 
