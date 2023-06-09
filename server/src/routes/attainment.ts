@@ -8,7 +8,7 @@ import {
   addAttainment,
   deleteAttainment,
   updateAttainment,
-  getAttainments
+  getAttainment
 } from '../controllers/attainment';
 import { handleInvalidRequestJson } from '../middleware';
 import { authorization } from '../middleware/authorization';
@@ -283,39 +283,38 @@ router.put(
  *  get:
  *     tags: [Attainment]
  *     description: Get single attainment or subtree downwards.
- *     requestBody:
- *       description: 
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/definitions/AddAndEditAttainment'
+ *     parameters:
+ *       - $ref: '#/components/parameters/courseId'
+ *       - $ref: '#/components/parameters/instanceId'
+ *       - $ref: '#/components/parameters/attainmentId'
+ *       - $ref: '#/components/parameters/tree'
  *     responses:
  *       200:
- *         description: 
+ *         description:
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Attainment'
  *       400:
- *         description: 
+ *         description:
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       404:
- *         description: 
+ *         description:
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       409:
- *         description: 
+ *         description:
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       422:
- *         description: 
+ *         description:
  *         content:
  *           application/json:
  *             schema:
@@ -324,5 +323,6 @@ router.put(
 
 router.get(
   '/v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId',
-  controllerDispatcher(getAttainments)
+  authorization,
+  controllerDispatcher(getAttainment)
 );

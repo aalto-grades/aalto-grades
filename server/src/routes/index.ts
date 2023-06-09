@@ -79,6 +79,16 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *       required: true
  *       example: 1
  *       description: The ID of the study attainment.
+ *     tree:
+ *       in: query
+ *       name: tree
+ *       schema:
+ *         type: string
+ *         enum: [children, descendants]
+ *       description: >
+ *         The type of the attainment tree fetched. Optional.
+ *          * `children` - Fetch only the direct subattainments of the attainment.
+ *          * `descendants` - Fetch the whole tree of subattainments.
  *   responses:
  *     AuthenticationError:
  *       description: Authentication credentials were missing or jwt expired.

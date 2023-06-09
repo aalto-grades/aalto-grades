@@ -198,4 +198,6 @@ INSERT INTO public.attainment (course_id, course_instance_id, attainment_id, nam
 (6, 9, null, 'test assignment course 6, instance 9', '2022-01-05', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
 (6, 9, null, 'test assignment course 6, instance 9', '2022-01-05', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
 (6, 9, null, 'test assignment course 6, instance 9', '2022-01-05', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
-(6, 9, null, 'test assignment course 6, instance 9', '2022-01-05', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL);
+(6, 9, null, 'test assignment course 6, instance 9', '2022-01-05', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
+(2, 2, 6, 'test assignment 2nd level child 1', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
+(2, 2, 197, 'test assignment 3rd level child 1', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL);

@@ -711,3 +711,143 @@ describe(
       });
 
   });
+
+describe(
+  'Test GET /v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId'
+  + '- get attainment (tree)',
+  () => {
+
+    function verifyAttainmentData(
+      data: AttainmentData,
+      id: number,
+      courseId: number,
+      courseInstanceId: number,
+      subAttainments: boolean
+    ): void {
+      expect(data.id).toBe(id);
+      expect(data.courseId).toBe(courseId);
+      expect(data.courseInstanceId).toBe(courseInstanceId);
+      expect(data.tag).toBeDefined();
+      expect(data.name).toBeDefined();
+      expect(data.date).toBeDefined();
+      expect(data.expiryDate).toBeDefined();
+      if (subAttainments)
+        expect(data.subAttainments).toBeDefined();
+      else
+        expect(data.subAttainments).not.toBeDefined();
+    }
+
+    it('should respond with a single attainment without subattainments, '
+      + 'if query string is not present', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/2/instances/2/attainments/2')
+        .set('Cookie', authCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toBeDefined();
+      expect(res.body.errors).not.toBeDefined();
+      verifyAttainmentData(res.body.data, 2, 2, 2, false);
+    });
+
+    it('should respond with a single attainment with one level of subattainments, '
+      + 'if "tree" parameter in query equals "children"', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/2/instances/2/attainments/2?tree=children')
+        .set('Cookie', authCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toBeDefined();
+      expect(res.body.errors).not.toBeDefined();
+      verifyAttainmentData(res.body.data, 2, 2, 2, true);
+      verifyAttainmentData(res.body.data.subAttainments[0], 6, 2, 2, false);
+      verifyAttainmentData(res.body.data.subAttainments[1], 10, 2, 2, false);
+
+    });
+
+    it('should respond with a single attainment with a full tree of subattainments, '
+      + 'if "tree" parameter in query equals "descendants"', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/2/instances/2/attainments/2?tree=descendants')
+        .set('Cookie', authCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toBeDefined();
+      expect(res.body.errors).not.toBeDefined();
+      verifyAttainmentData(res.body.data, 2, 2, 2, true);
+      verifyAttainmentData(res.body.data.subAttainments[0], 6, 2, 2, true);
+      verifyAttainmentData(
+        res.body.data.subAttainments[0].subAttainments[0],
+        197,
+        2,
+        2,
+        true
+      );
+      verifyAttainmentData(
+        res.body.data.subAttainments[0].subAttainments[0].subAttainments[0],
+        198,
+        2,
+        2,
+        false
+      );
+      verifyAttainmentData(res.body.data.subAttainments[1], 10, 2, 2, false);
+
+    });
+
+    it('should respond with 400 Bad Request, if "tree" parameter in query string '
+      + 'is invalid', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/2/instances/2/attainments/2?tree=fail')
+        .set('Cookie', authCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadRequest);
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors[0]).toBe('tree must be one of the '
+        + 'following values: children, descendants');
+    });
+
+    it('should respond with 400 Bad Request, if "tree" parameter is given twice '
+      + '(array instead of string)', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/2/instances/2/attainments/2?tree=children&tree=descendants')
+        .set('Cookie', authCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadRequest);
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors[0]).toBe('tree must be a `string` type, but the final value was: '
+        + '`[\n  "\\"children\\"",\n  "\\"descendants\\""\n]`.');
+    });
+
+    it('should respond with 400 Bad Request, if unknown parameters are present '
+      + 'in query string', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/2/instances/2/attainments/2?tree=children&foo=bar')
+        .set('Cookie', authCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadRequest);
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors[0]).toBe('this field has unspecified keys: foo');
+    });
+
+    it('should respond with 404 Not Found, if the attainment is not found '
+      + 'for the specified course and instance', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/1/instances/1/attainments/2')
+        .set('Cookie', authCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.NotFound);
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors[0]).toBe('Attainment with id 2 was not found for '
+        + 'the specified course and instance');
+    });
+  });

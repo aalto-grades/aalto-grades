@@ -14,7 +14,11 @@ import { Formula } from '../types/formulas';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 
-import { findAttainmentById, generateAttainmentTag } from './utils/attainment';
+import {
+  findAttainmentById,
+  generateAttainmentTag,
+  generateAttainmentTree
+} from './utils/attainment';
 import { validateCourseAndInstance } from './utils/courseInstance';
 
 export async function addAttainment(req: Request, res: Response): Promise<void> {
@@ -256,35 +260,68 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   });
 }
 
-export async function getAttainments(req: Request, res: Response): Promise<void> {
+export async function getAttainment(req: Request, res: Response): Promise<void> {
   const courseId: number = Number(req.params.courseId);
-  await idSchema.validate({ id: courseId });
-
   const instanceId: number = Number(req.params.instanceId);
-  await idSchema.validate({ id: instanceId });
-
   const attainmentId: number = Number(req.params.attainmentId);
-  await idSchema.validate({ id: instanceId });
 
-  const queryString: string = String(req.query.tree);
-  const Attainments: Attainment | null = await Attainment.findByPk(attainmentId)
+  const querySchema: yup.AnyObjectSchema = yup.object().shape({
+    tree: yup.string().oneOf(['children', 'descendants'])
+  }).noUnknown(true).strict();
 
-  if (queryString == "children") {
-    // TODO: implement correct db-query  
-    const Attainments: Attainment | null = await Attainment.findByPk(attainmentId)
-  } else if (queryString == "descendants") {
-    // TODO: implement correct db-query
-    const Attainments: Attainment | null = await Attainment.findByPk(attainmentId)
-  } else {
-    const Attainments: Attainment | null = await Attainment.findByPk(attainmentId)
+  await idSchema.validate({ id: courseId }, { abortEarly: false });
+  await idSchema.validate({ id: instanceId }, { abortEarly: false });
+  await idSchema.validate({ id: attainmentId }, { abortEarly: false });
+  await querySchema.validate(req.query, { abortEarly: false });
+
+  // Assert string type, as the query is validated above
+  const tree: string = <string>req.query.tree;
+
+  const attainments: Array<Attainment> = await Attainment.findAll({
+    where: {
+      courseId: courseId,
+      courseInstanceId: instanceId
+    }
+  });
+
+  const attainmentData: Array<AttainmentData> = attainments.map((el: Attainment) => {
+    return {
+      id: el.id,
+      courseId: el.courseId,
+      courseInstanceId: el.courseInstanceId,
+      parentId: el.attainmentId ?? undefined,
+      tag: generateAttainmentTag(el.id, el.courseId, el.courseInstanceId),
+      name: el.name,
+      date: el.date,
+      expiryDate: el.expiryDate
+    };
+  });
+
+  const attainment: AttainmentData | undefined = attainmentData.find(
+    (el: AttainmentData) => el.id === attainmentId);
+
+  if (!attainment) {
+    throw new ApiError(`Attainment with id ${attainmentId} was not found ` +
+      'for the specified course and instance', HttpCode.NotFound);
   }
- 
-  if (!Attainments) {
-    throw new ApiError(`study attainment with ID ${attainmentId} not found`, HttpCode.NotFound);
+
+  switch (tree) {
+
+  case 'children':
+    generateAttainmentTree(attainment, attainmentData, true);
+    break;
+
+  case 'descendants':
+    generateAttainmentTree(attainment, attainmentData);
+    break;
+
+  default:
+    break;
+
   }
 
   res.status(HttpCode.Ok).json({
     success: true,
-    data: Attainments,
+    data: attainment,
   });
-} 
+}
