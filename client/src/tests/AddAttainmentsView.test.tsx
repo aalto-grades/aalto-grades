@@ -70,4 +70,27 @@ describe('Tests for AddAttainmentsView components', () => {
 
   });
 
+  test('AddAttainmentsView should allow removing added attainments and moving them back to suggested', async () => {
+
+    renderAddAttainmentsView();
+
+    console.log('HEREEEEEEEEEEE!');
+    await waitFor(() => {
+      const addButtons = screen.getAllByText('Add');
+      expect(addButtons.length).toBe(mockAttainmentsClient.length);
+      act(() => userEvent.click(addButtons[0]));
+
+      const newAddButtons = screen.getAllByText('Add');
+      expect(newAddButtons.length).toBe(mockAttainmentsClient.length - 1);
+
+      const removeButtons = screen.getAllByText('Remove');
+      expect(removeButtons.length).toBe(1);
+      act(() => userEvent.click(removeButtons[0]));
+
+      const newRemoveButtons = screen.getAllByText('Remove');
+      expect(newRemoveButtons.length).toBe(0);
+    });
+
+  });
+
 });
