@@ -86,8 +86,8 @@ describe('Tests for AddAttainmentsView components', () => {
       expect(removeButtons.length).toBe(1);
       act(() => userEvent.click(removeButtons[0]));
 
-      const newRemoveButtons = screen.getAllByText('Remove');
-      expect(newRemoveButtons.length).toBe(0);
+      const newRemoveButtons = screen.queryByText('Remove');
+      expect(newRemoveButtons).toBe(null);
     });
 
   });

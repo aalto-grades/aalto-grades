@@ -62,7 +62,7 @@ const AddAttainmentsView = () => {
     navigate('/' + courseId + '/instance-summary/' + sisuInstanceId);
   };
 
-  return(
+  return (
     <Box sx={{ display: 'grid', gap: 1.5, ml: '7.5vw', mr: '7.5vw' }}>
       <Typography variant='h1' align='left' sx={{ mb: 4 }}>Add Study Attainments</Typography>
       <Typography variant='h3' align='left' sx={{ ml: 1.5 }}>Suggested study attainments from previous instances</Typography>
