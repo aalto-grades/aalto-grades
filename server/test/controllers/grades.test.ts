@@ -7,16 +7,14 @@ import path from 'path';
 import { Op } from 'sequelize';
 import supertest from 'supertest';
 
-import Attainable from '../../src/database/models/attainable';
 import CourseInstanceRole from '../../src/database/models/courseInstanceRole';
+import CourseResult from '../../src/database/models/courseResult';
 import User from '../../src/database/models/user';
 import UserAttainmentGrade from '../../src/database/models/userAttainmentGrade';
 
 import { app } from '../../src/app';
-import { Formula } from '../../src/types/formulas';
 import { HttpCode } from '../../src/types/httpCode';
 import { getCookies, Cookies } from '../util/getCookies';
-import CourseResult from '../../src/database/models/courseResult';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
@@ -36,6 +34,13 @@ function checkErrorRes(errorMessages: Array<string>, errorCode: HttpCode): void 
   errorMessages.forEach((error: string) => expect(res.body.errors).toContain(error));
   expect(res.body.data).not.toBeDefined();
   expect(res.statusCode).toBe(errorCode);
+}
+
+function checkSuccessRes(res: supertest.Response): void {
+  expect(res.body.success).toBe(true);
+  expect(res.body.data).toBeDefined();
+  expect(res.body.errors).not.toBeDefined();
+  expect(res.statusCode).toBe(HttpCode.Ok);
 }
 
 describe(
@@ -435,10 +440,10 @@ describe(
 
 describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate', () => {
 
-  it('should calculate one correct grade', async () => {
-    await request
+  it('should calculate correct grade, numeric grade', async () => {
+    checkSuccessRes(await request
       .post('/v1/courses/5/instances/8/grades/calculate')
-      .set('Cookie', cookies.userCookie);
+      .set('Cookie', cookies.userCookie));
 
     const result: CourseResult | null = await CourseResult.findOne({
       where: {
@@ -451,10 +456,36 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
     expect(result?.credits).toBe(5);
   });
 
+  it('should calculate correct grade, PASS/FAIL grade', async () => {
+    checkSuccessRes(await request
+      .post('/v1/courses/1/instances/10/grades/calculate')
+      .set('Cookie', cookies.userCookie));
+
+    let result: CourseResult | null = await CourseResult.findOne({
+      where: {
+        courseInstanceId: 10,
+        userId: 95
+      }
+    });
+    expect(result).not.toBe(null);
+    expect(result?.grade).toBe('PASS');
+    expect(result?.credits).toBe(5);
+
+    result = await CourseResult.findOne({
+      where: {
+        courseInstanceId: 10,
+        userId: 100
+      }
+    });
+    expect(result).not.toBe(null);
+    expect(result?.grade).toBe('FAIL');
+    expect(result?.credits).toBe(5);
+  });
+
   it('should calculate multiple correct grades', async () => {
-    await request
+    checkSuccessRes(await request
       .post('/v1/courses/4/instances/6/grades/calculate')
-      .set('Cookie', cookies.userCookie);
+      .set('Cookie', cookies.userCookie));
 
     let result: CourseResult | null = await CourseResult.findOne({
       where: {
@@ -478,9 +509,9 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
   });
 
   it('should calculate correct grades in higher depths', async () => {
-    await request
+    checkSuccessRes(await request
       .post('/v1/courses/4/instances/7/grades/calculate')
-      .set('Cookie', cookies.userCookie);
+      .set('Cookie', cookies.userCookie));
 
     const result: CourseResult | null = await CourseResult.findOne({
       where: {
@@ -494,9 +525,9 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
   });
 
   it('should allow manually overriding a student\'s grade', async () => {
-    await request
+    checkSuccessRes(await request
       .post('/v1/courses/3/instances/4/grades/calculate')
-      .set('Cookie', cookies.userCookie);
+      .set('Cookie', cookies.userCookie));
 
     const result: CourseResult | null = await CourseResult.findOne({
       where: {
