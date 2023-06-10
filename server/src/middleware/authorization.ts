@@ -4,7 +4,8 @@
 
 import { NextFunction, Request, Response } from 'express';
 
-import { JwtClaims, SystemRole } from '../types/general';
+import { SystemRole } from 'aalto-grades-common/types/auth';
+import { JwtClaims } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 
 export function authorization(

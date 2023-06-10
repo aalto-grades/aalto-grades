@@ -3,8 +3,11 @@
 // SPDX-License-Identifier: MIT
 
 import axios from './axios';
+import { ApiResponse } from '../types/general';
 
-const exportSisuCsv: any = async (courseId, instanceId, params) => {
+async function exportSisuCsv(
+  courseId: number, instanceId: number, params
+): Promise<ApiResponse<object>> {
   const response = await axios.get(
     `/v1/courses/${courseId}/instances/${instanceId}/grades/csv/sisu`,
     {
@@ -13,13 +16,13 @@ const exportSisuCsv: any = async (courseId, instanceId, params) => {
     }
   );
   return response.data;
-};
+}
 
-const importCsv: any = async (courseId, instanceId, csv) => {
+async function importCsv(courseId: number, instanceId: number, csv) {
   const response = await axios.postForm(`/v1/courses/${courseId}/instances/${instanceId}/grades/csv`, {
     csv_data: csv // FileList will be unwrapped as sepate fields
   });
   return response.data.data;
-};
+}
 
 export default { exportSisuCsv, importCsv };

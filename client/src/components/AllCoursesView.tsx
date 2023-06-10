@@ -11,7 +11,7 @@ import CourseTable from './front-page/CourseTable';
 import coursesService from '../services/courses';
 import useAuth from '../hooks/useAuth';
 import { CourseData } from 'aalto-grades-common/types/course';
-import { SystemRole } from 'aalto-grades-common/types/general';
+import { SystemRole } from 'aalto-grades-common/types/auth';
 
 const AllCoursesView = (): JSX.Element => {
   const navigate = useNavigate();

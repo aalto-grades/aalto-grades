@@ -3,25 +3,40 @@
 // SPDX-License-Identifier: MIT
 
 import axios from './axios';
+import { LoginResult, SystemRole } from 'aalto-grades-common/types/auth';
+import { ApiResponse } from '../types/general';
 
-const login: any = async credentials => {
+interface LoginCredentials {
+  email: string,
+  password: string
+}
+
+async function login(credentials: LoginCredentials): Promise<ApiResponse<LoginResult>> {
   const response = await axios.post('/v1/auth/login', credentials);
   return response.data;
-};
+}
 
-const signup: any = async credentials => {
+interface SignupCredentials {
+  email: string,
+  password: string,
+  studentNumber: string,
+  name: string,
+  role: SystemRole
+}
+
+async function signup(credentials: SignupCredentials): Promise<ApiResponse<LoginResult>> {
   const response = await axios.post('/v1/auth/signup', credentials);
   return response.data;
-};
+}
 
-const getRefreshToken: any = async () => {
+async function getRefreshToken(): Promise<ApiResponse<LoginResult>> {
   const response = await axios.get('/v1/auth/self-info');
   return response.data;
-};
+}
 
-const logout: any = async () => {
+async function logout(): Promise<ApiResponse<object>> {
   const response = await axios.post('/v1/auth/logout');
   return response.data;
-};
+}
 
 export default { login, signup, getRefreshToken, logout };

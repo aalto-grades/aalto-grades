@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-export enum SystemRole {
-  User = 'USER',
-  Admin = 'ADMIN'
+export interface ApiResponse<T> {
+  success: boolean,
+  data?: T,
+  errors?: Array<string>
 }

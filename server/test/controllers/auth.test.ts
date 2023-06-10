@@ -8,8 +8,8 @@ import supertest, { SuperAgentTest } from 'supertest';
 
 import { JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS } from '../../src/configs/constants';
 
+import { SystemRole } from 'aalto-grades-common/types/auth';
 import { app } from '../../src/app';
-import { SystemRole } from '../../src/types/general';
 import { HttpCode } from '../../src/types/httpCode';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);

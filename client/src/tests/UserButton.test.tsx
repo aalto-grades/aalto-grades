@@ -9,7 +9,7 @@ import { act, render, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import AuthContext from '../context/authProvider';
 import UserButton from '../components/auth/UserButton';
-import { SystemRole } from 'aalto-grades-common/types/general';
+import { SystemRole } from 'aalto-grades-common/types/auth';
 
 jest.mock('../services/courses');
 afterEach(cleanup);

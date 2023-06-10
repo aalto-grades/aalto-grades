@@ -15,18 +15,13 @@ import { JWT_SECRET, NODE_ENV } from '../configs/environment';
 
 import User from '../database/models/user';
 
+import { LoginResult, SystemRole } from 'aalto-grades-common/types/auth';
 import { ApiError } from '../types/error';
-import { JwtClaims, SystemRole } from '../types/general';
+import { JwtClaims } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { findUserById } from './utils/user';
 
 type PlainPassword = string;
-
-interface LoginResult {
-  id: number,
-  name: string,
-  role: SystemRole
-}
 
 interface SignupRequest {
   name: string,

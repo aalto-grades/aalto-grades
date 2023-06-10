@@ -15,7 +15,7 @@ import AuthContext from '../context/authProvider';
 import mockCourses from '../mock-data/mockCourses';
 import mockInstances from '../mock-data/mockInstancesWithStringDates';
 import { maxErrorsToShow } from '../components/course-view/FileLoadDialog';
-import { SystemRole } from 'aalto-grades-common/types/general';
+import { SystemRole } from 'aalto-grades-common/types/auth';
 
 let file = new File(['idk'], 'grades_test.csv', { type: 'csv' });
 

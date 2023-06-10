@@ -13,7 +13,7 @@ import instancesService from '../services/instances';
 import AuthContext from '../context/authProvider';
 import mockCourses from '../mock-data/mockCourses';
 import mockInstances from '../mock-data/mockInstancesWithStringDates';
-import { SystemRole } from 'aalto-grades-common/types/general';
+import { SystemRole } from 'aalto-grades-common/types/auth';
 
 jest.mock('../services/courses');
 jest.mock('../services/instances');
