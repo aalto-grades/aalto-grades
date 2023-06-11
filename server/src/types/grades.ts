@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+import CourseResult from '../database/models/courseResult';
+import User from '../database/models/user';
+
 export interface UserAttainmentGradeData {
   userId?: number,
   attainmentId: number,
@@ -13,4 +16,8 @@ export interface StudentGrades {
   id?: number,
   studentNumber: string,
   grades: Array<UserAttainmentGradeData>
+}
+
+export interface GradingResultsWithUser extends CourseResult {
+  User: User
 }

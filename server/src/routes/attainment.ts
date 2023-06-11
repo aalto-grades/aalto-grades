@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import express, { Router } from 'express';
+import passport from 'passport';
 
 import {
   addAttainment,
@@ -11,7 +12,6 @@ import {
   getAttainment
 } from '../controllers/attainment';
 import { handleInvalidRequestJson } from '../middleware';
-import { authorization } from '../middleware/authorization';
 import { controllerDispatcher } from '../middleware/errorHandler';
 
 export const router: Router = Router();
@@ -144,7 +144,7 @@ export const router: Router = Router();
  */
 router.post(
   '/v1/courses/:courseId/instances/:instanceId/attainments',
-  authorization,
+  passport.authenticate('jwt', { session: false }),
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(addAttainment)
@@ -204,7 +204,7 @@ router.post(
  */
 router.delete(
   '/v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId',
-  authorization,
+  passport.authenticate('jwt', { session: false }),
   controllerDispatcher(deleteAttainment)
 );
 
@@ -271,7 +271,7 @@ router.delete(
  */
 router.put(
   '/v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId',
-  authorization,
+  passport.authenticate('jwt', { session: false }),
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(updateAttainment)
@@ -323,6 +323,6 @@ router.put(
 
 router.get(
   '/v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId',
-  authorization,
+  passport.authenticate('jwt', { session: false }),
   controllerDispatcher(getAttainment)
 );

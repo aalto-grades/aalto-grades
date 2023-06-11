@@ -4,10 +4,10 @@
 
 import { Request, Router } from 'express';
 import multer, { FileFilterCallback, memoryStorage, Multer } from 'multer';
+import passport from 'passport';
 import path from 'path';
 
-import { addGrades, calculateGrades } from '../controllers/grades';
-import { authorization } from '../middleware/authorization';
+import { addGrades, calculateGrades, getSisuFormattedGradingCSV } from '../controllers/grades';
 import { controllerDispatcher } from '../middleware/errorHandler';
 import { ApiError } from '../types/error';
 import { HttpCode } from '../types/httpCode';
@@ -114,7 +114,7 @@ const upload: Multer = multer({
  */
 router.post(
   '/v1/courses/:courseId/instances/:instanceId/grades/csv',
-  authorization,
+  passport.authenticate('jwt', { session: false }),
   upload.single('csv_data'),
   controllerDispatcher(addGrades)
 );
@@ -125,7 +125,7 @@ router.post(
  *   post:
  *     tags: [Grades]
  *     description: >
- *       Calculate and get the final grades of all students.
+ *       Calculate the final grades of all students.
  *     parameters:
  *       - in: path
  *         name: courseId
@@ -177,6 +177,8 @@ router.post(
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
  *       404:
  *         description: The given course or course instance does not exist.
  *         content:
@@ -193,6 +195,78 @@ router.post(
  */
 router.post(
   '/v1/courses/:courseId/instances/:instanceId/grades/calculate',
-  authorization,
+  passport.authenticate('jwt', { session: false }),
   controllerDispatcher(calculateGrades)
+);
+
+/**
+ * @swagger
+ * /v1/courses/{courseId}/instances/{instanceId}/grades/csv/sisu:
+ *   get:
+ *     tags: [Grades]
+ *     description: >
+ *       Get the final grades of all students in a Sisu compatible CSV format.
+ *     parameters:
+ *       - $ref: '#/components/parameters/courseId'
+ *       - $ref: '#/components/parameters/instanceId'
+ *       - in: query
+ *         name: assessmentDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         required: false
+ *         description: >
+ *           Assessment date marked on the grade CSV.
+ *           Defaults to end date of the course instance.
+ *         example: 2022-9-22
+ *       - in: query
+ *         name: completionLanguage
+ *         schema:
+ *           type: string
+ *           enum: [fi, sv, en, es, ja, zh, pt, fr, de, ru]
+ *         required: false
+ *         description: Completion language marked on the grade CSV. Defaults to en.
+ *         example: en
+ *     responses:
+ *       200:
+ *         description: Grades calculated successfully.
+ *         content:
+ *           text/csv:
+ *             description: CSV file with course results.
+ *             schema:
+ *               type: string
+ *             example: |
+ *               studentNumber,grade,credits,assessmentDate,completionLanguage
+ *               352772,5,5,26.5.2023,fi
+ *               812472,4,5,26.5.2023,fi
+ *               545761,5,5,26.5.2023,fi
+ *               662292,2,5,26.5.2023,fi
+ *       400:
+ *         description: Fetching failed, due to validation errors in the query parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
+ *       404:
+ *         description: >
+ *           The given course or course instance does not exist
+ *           or no course results found for the instance.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: >
+ *           The given course instance does not belong to the given course.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ */
+router.get(
+  '/v1/courses/:courseId/instances/:instanceId/grades/csv/sisu',
+  passport.authenticate('jwt', { session: false }),
+  controllerDispatcher(getSisuFormattedGradingCSV)
 );

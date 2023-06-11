@@ -91,7 +91,7 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *          * `descendants` - Fetch the whole tree of subattainments.
  *   responses:
  *     AuthenticationError:
- *       description: Authentication credentials were missing or jwt expired.
+ *       description: Authentication credentials were missing or JWT expired.
  *       content:
  *         application/json:
  *           schema:

@@ -3,21 +3,25 @@
 // SPDX-License-Identifier: MIT
 
 import { parse, Parser } from 'csv-parse';
+import { stringify } from 'csv-stringify';
 import { NextFunction, Request, Response } from 'express';
 import { Op, Transaction } from 'sequelize';
+import * as yup from 'yup';
 
 import { sequelize } from '../database';
 import Attainment from '../database/models/attainment';
+import Course from '../database/models/course';
+import CourseInstance from '../database/models/courseInstance';
 import CourseInstanceRole from '../database/models/courseInstanceRole';
+import CourseResult from '../database/models/courseResult';
 import User from '../database/models/user';
 import UserAttainmentGrade from '../database/models/userAttainmentGrade';
 
+import { CourseInstanceRoleType } from 'aalto-grades-common/types/course';
 import { getFormulaImplementation } from '../formulas';
-import { CourseInstanceRoleType } from '../types/course';
 import { ApiError } from '../types/error';
 import { Formula, FormulaNode, GradingInput, GradingResult, Status } from '../types/formulas';
-import { idSchema } from '../types/general';
-import { UserAttainmentGradeData, StudentGrades } from '../types/grades';
+import { UserAttainmentGradeData, StudentGrades, GradingResultsWithUser } from '../types/grades';
 import { HttpCode } from '../types/httpCode';
 import { validateCourseAndInstance } from './utils/courseInstance';
 
@@ -158,14 +162,9 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
    * - Check grading points are not higher than max points of the attainment.
    */
 
-  // Get path parameters.
-  const courseId: number = Number(req.params.courseId);
-  const courseInstanceId: number = Number(req.params.instanceId);
-
-  // Validation.
-  await idSchema.validate({ id: courseId }, { abortEarly: false });
-  await idSchema.validate({ id: courseInstanceId }, { abortEarly: false });
-  await validateCourseAndInstance(courseId, courseInstanceId);
+  // Validation path parameters.
+  const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
+    await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
 
   if (!req?.file) {
     throw new ApiError(
@@ -212,8 +211,8 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
             id: {
               [Op.in]: attainmentIds
             },
-            courseId,
-            courseInstanceId,
+            courseId: course.id,
+            courseInstanceId: courseInstance.id
           }
         });
 
@@ -239,15 +238,15 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         );
 
         let students: Array<User> = await User.findAll({
-          attributes: ['id', 'studentId'],
+          attributes: ['id', 'studentNumber'],
           where: {
-            studentId: {
+            studentNumber: {
               [Op.in]: studentNumbers
             }
           }
         });
 
-        const foundStudents: Array<string> = students.map((student: User) => student.studentId);
+        const foundStudents: Array<string> = students.map((student: User) => student.studentNumber);
         const nonExistingStudents: Array<string> = studentNumbers.filter(
           (id: string) => !foundStudents.includes(id)
         );
@@ -263,7 +262,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
             role: {
               [Op.in]: [CourseInstanceRoleType.Teacher, CourseInstanceRoleType.TeacherInCharge]
             },
-            courseInstanceId
+            courseInstanceId: courseInstance.id
           }
         });
 
@@ -280,7 +279,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
             const newUsers: Array<User> = await User.bulkCreate(
               nonExistingStudents.map((studentNo: string) => {
                 return {
-                  studentId: studentNo
+                  studentNumber: studentNo
                 };
               }), { transaction: t }
             );
@@ -294,7 +293,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
             students.map((user: User) => {
               return {
                 userId: user.id,
-                courseInstanceId,
+                courseInstanceId: courseInstance.id,
                 role: CourseInstanceRoleType.Student
               };
             }), {
@@ -310,7 +309,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         parsedStudentData = parsedStudentData.map(
           (student: StudentGrades): StudentGrades => {
             const matchingUser: User = students.find(
-              (user: User) => user.dataValues.studentId === student.studentNumber
+              (user: User) => user.dataValues.studentNumber === student.studentNumber
             ) as User;
 
             return {
@@ -414,9 +413,8 @@ export async function calculateGrades(
   req: Request,
   res: Response
 ): Promise<void> {
-  const courseId: number = Number(req.params.courseId);
-  const courseInstanceId: number = Number(req.params.instanceId);
-  await validateCourseAndInstance(courseId, courseInstanceId);
+  const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
+    await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
 
   // TODO: once jwt authorization connected to route, check requester id has teacher role.
 
@@ -434,8 +432,8 @@ export async function calculateGrades(
   const attainments: Array<AttainmentInfo> = await Attainment.findAll({
     raw: true,
     where: {
-      courseId,
-      courseInstanceId,
+      courseId: course.id,
+      courseInstanceId: courseInstance.id,
     },
     attributes: [
       'id',
@@ -583,21 +581,21 @@ export async function calculateGrades(
         required: true,
         attributes: [],
         where: {
-          courseId,
-          courseInstanceId,
+          courseId: course.id,
+          courseInstanceId: courseInstance.id,
         }
       },
       {
         model: User,
         required: true,
-        attributes: ['studentId']
+        attributes: ['studentNumber']
       }
     ],
     attributes: ['grade', 'attainmentId'],
   }) as Array<UserAttainmentGradeWithUser>).map(
     (attainmentGrade: UserAttainmentGradeWithUser) => {
       return {
-        studentNumber: attainmentGrade.User.studentId,
+        studentNumber: attainmentGrade.User.studentNumber,
         grade: attainmentGrade.grade,
         attainmentId: attainmentGrade.attainmentId
       };
@@ -665,4 +663,103 @@ export async function calculateGrades(
       grades: finalGrades
     }
   });
+}
+
+/**
+ * Get grading data formatted to Sisu compatible format for exporting grades to Sisu.
+ * Documentation and requirements for Sisu CSV file structure available at
+ * https://wiki.aalto.fi/display/SISEN/Assessment+of+implementations
+ * @param {Request} req - The HTTP request.
+ * @param {Response} res - The HTTP response containing the CSV file.
+ * @returns {Promise<void>} - A Promise that resolves when the function has completed its execution.
+ * @throws {ApiError} - If course and/or course instance not found, instance does not belong to
+ * the course, or no course results found/calculated before calling the endpoint.
+*/
+export async function getSisuFormattedGradingCSV(req: Request, res: Response): Promise<void> {
+  const urlParams: yup.AnyObjectSchema = yup.object({
+    assessmentDate: yup
+      .date()
+      .notRequired(),
+    completionLanguage: yup
+      .string()
+      .transform((value: string, originalValue: string) => {
+        return originalValue ? originalValue.toLowerCase() : value;
+      })
+      // All Sisu accepted language codes.
+      .oneOf(['fi', 'sv', 'en', 'es', 'ja', 'zh', 'pt', 'fr', 'de', 'ru'])
+      .notRequired()
+  });
+
+  const { assessmentDate, completionLanguage }:
+  { assessmentDate: Date | undefined, completionLanguage: string | undefined }
+  = await urlParams.validate(req.query, { abortEarly: false });
+
+  const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
+    await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
+
+  /**
+   * TODO:
+   * - only one grade per user per instance is allowed,
+   *   what if grades are recalculated, should we keep track of old grades?
+   * - Define and implement authorization on who has the access rights to trigger export,
+   *   Sisu allows teacher and responsible teacher of the implementation to save grades to Sisu.
+   */
+
+  const gradingResults: Array<GradingResultsWithUser> = await CourseResult.findAll({
+    attributes: ['grade', 'credits'],
+    where: {
+      courseInstanceId: courseInstance.id
+    },
+    include: {
+      model: User,
+      attributes: ['studentNumber']
+    }
+  }) as Array<GradingResultsWithUser>;
+
+  if (gradingResults.length === 0) {
+    throw new ApiError(
+      'no grades found, make sure grades have been calculated before requesting course result CSV',
+      HttpCode.NotFound
+    );
+  }
+
+  const courseResults: Array<{
+    studentNumber: string,
+    grade: string,
+    credits: number,
+    assessmentDate: string,
+    completionLanguage: string,
+    comment: string
+  }> = gradingResults.map(
+    (courseResult: GradingResultsWithUser) => {
+      return {
+        studentNumber: courseResult.User.studentNumber,
+        grade: courseResult.grade,
+        credits: courseResult.credits,
+        // Assesment date must be in form dd.mm.yyyy.
+        assessmentDate:
+          (new Date(assessmentDate ?? courseInstance.endDate)).toLocaleDateString('fi-FI'),
+        completionLanguage: completionLanguage ?? 'en',
+        // Comment column is required, but can be empty.
+        comment: ''
+      };
+    }
+  );
+
+  stringify(
+    courseResults,
+    {
+      header: true,
+      delimiter: ',' // NOTE, accepted delimiters in Sisu are semicolon ; and comma ,
+    },
+    (_err: unknown, data: string) => {
+      res
+        .status(HttpCode.Ok)
+        .setHeader('Content-Type', 'text/csv')
+        .attachment(
+          `final_grades_course_${course.courseCode}_${(new Date()).toLocaleDateString('fi-FI')}.csv`
+        )
+        .send(data);
+      return;
+    });
 }

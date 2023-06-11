@@ -6,19 +6,23 @@ import axios, { AxiosStatic } from 'axios';
 import supertest from 'supertest';
 
 import { app } from '../../src/app';
-import { CourseInstanceData } from '../../src/types/course';
+
+import { CourseInstanceData } from 'aalto-grades-common/types/course';
 import { HttpCode } from '../../src/types/httpCode';
 import { sisuInstance, sisuError } from '../mockData/sisu';
-import { getCookies } from '../util/getCookies';
+import { Cookies, getCookies } from '../util/getCookies';
 
 jest.mock('axios');
 const mockedAxios: jest.Mocked<AxiosStatic> = axios as jest.Mocked<typeof axios>;
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
-let authCookie: Array<string> = [];
+let cookies: Cookies = {
+  adminCookie: [],
+  userCookie: []
+};
 
 beforeAll(async () => {
-  authCookie = await getCookies();
+  cookies = await getCookies();
 });
 
 function checkRes(courseInstance: CourseInstanceData): void {
@@ -49,7 +53,7 @@ describe(
       });
       const res: supertest.Response = await request
         .get(`/v1/sisu/instances/${sisuInstance.id}`)
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -60,14 +64,10 @@ describe(
     });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
-      const res: supertest.Response = await request
+      await request
         .get('/v1/sisu/courses/ELEC-A7100')
         .set('Accept', 'application/json')
         .expect(HttpCode.Unauthorized);
-
-      expect(res.body.success).toBe(false);
-      expect(res.body.errors[0]).toBe('unauthorized');
-      expect(res.body.data).not.toBeDefined();
     });
 
     it('should respond with 502 bad gateway, if instance does not exist', async () => {
@@ -76,7 +76,7 @@ describe(
       });
       const res: supertest.Response = await request
         .get('/v1/sisu/instances/abc')
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.BadGateway);
 
@@ -99,7 +99,7 @@ describe(
         });
         const res: supertest.Response = await request
           .get('/v1/sisu/courses/ELEC-A7100')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
@@ -112,14 +112,10 @@ describe(
       });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
-      const res: supertest.Response = await request
+      await request
         .get('/v1/sisu/courses/ELEC-A7100')
         .set('Accept', 'application/json')
         .expect(HttpCode.Unauthorized);
-
-      expect(res.body.success).toBe(false);
-      expect(res.body.errors[0]).toBe('unauthorized');
-      expect(res.body.data).not.toBeDefined();
     });
 
     it('should respond with 502 bad gateway, if course does not exist', async () => {
@@ -128,7 +124,7 @@ describe(
       });
       const res: supertest.Response = await request
         .get('/v1/sisu/courses/abc')
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.BadGateway);
 
@@ -145,7 +141,7 @@ describe(
         });
         const res: supertest.Response = await request
           .get('/v1/sisu/courses/ELEC-A7100')
-          .set('Cookie', authCookie)
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.BadGateway);
 

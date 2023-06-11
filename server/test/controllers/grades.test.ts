@@ -15,16 +15,19 @@ import UserAttainmentGrade from '../../src/database/models/userAttainmentGrade';
 import { app } from '../../src/app';
 import { Formula } from '../../src/types/formulas';
 import { HttpCode } from '../../src/types/httpCode';
-import { getCookies } from '../util/getCookies';
+import { Cookies, getCookies } from '../util/getCookies';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
-let authCookie: Array<string> = [];
 const badId: number = 1000000;
 const badInput: string = 'notValid';
 let res: supertest.Response;
+let cookies: Cookies = {
+  adminCookie: [],
+  userCookie: []
+};
 
 beforeAll(async () => {
-  authCookie = await getCookies();
+  cookies = await getCookies();
 });
 
 function checkErrorRes(errorMessages: Array<string>, errorCode: HttpCode): void {
@@ -44,8 +47,8 @@ describe(
       );
       res = await request
         .post('/v1/courses/1/instances/1/grades/csv')
-        .attach('csv_data', csvData, { contentType: 'text/csv'})
-        .set('Cookie', authCookie)
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -59,7 +62,7 @@ describe(
       async () => {
         let users: Array<User> = await User.findAll({
           where: {
-            studentId: {
+            studentNumber: {
               [Op.in]: ['987654', '998877']
             }
           }
@@ -71,14 +74,14 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
         users = await User.findAll({
           where: {
-            studentId: {
+            studentNumber: {
               [Op.in]: ['987654', '998877']
             }
           }
@@ -104,7 +107,7 @@ describe(
     it('should update attainment grade if user grading data already exist in the db', async () => {
       const user: User = await User.findOne({
         where: {
-          studentId: '662292'
+          studentNumber: '662292'
         }
       }) as User;
 
@@ -122,8 +125,8 @@ describe(
       );
       res = await request
         .post('/v1/courses/1/instances/1/grades/csv')
-        .attach('csv_data', csvData, { contentType: 'text/csv'})
-        .set('Cookie', authCookie)
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -147,8 +150,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/6/instances/9/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
@@ -165,8 +168,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', invalidCsvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(
@@ -181,8 +184,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', invalidCsvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         const expectedErrors: Array<string> = [
@@ -203,8 +206,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', invalidCsvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         const expectedErrors: Array<string> = [
@@ -223,8 +226,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', invalidCsvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(['Invalid Record Length: expect 7, got 6 on line 4'], HttpCode.BadRequest);
@@ -238,8 +241,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach(badInput, csvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach(badInput, csvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(
@@ -255,8 +258,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'application/json'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', csvData, { contentType: 'application/json' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(['incorrect file format, use the CSV format'], HttpCode.BadRequest);
@@ -269,8 +272,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', txtFile, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', txtFile, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(['incorrect file format, use the CSV format'], HttpCode.BadRequest);
@@ -280,8 +283,8 @@ describe(
       async () => {
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', false, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', false, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(
@@ -300,14 +303,15 @@ describe(
         );
         res = await request
           .post(`/v1/courses/${badInput}/instances/1/grades/csv`)
-          .attach('csv_data', csvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(
           [
             'id must be a `number` type, but the final value was:' +
-            ' `NaN` (cast from the value `NaN`).'
+            // eslint-disable-next-line no-useless-escape
+            ' `NaN` (cast from the value `\"notValid\"`).'
           ],
           HttpCode.BadRequest
         );
@@ -320,14 +324,15 @@ describe(
         );
         res = await request
           .post(`/v1/courses/1/instances/${badInput}/grades/csv`)
-          .attach('csv_data', csvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(
           [
             'id must be a `number` type, but the final value was:' +
-            ' `NaN` (cast from the value `NaN`).'
+            // eslint-disable-next-line no-useless-escape
+            ' `NaN` (cast from the value `\"notValid\"`).'
           ],
           HttpCode.BadRequest
         );
@@ -337,15 +342,11 @@ describe(
       const csvData: fs.ReadStream = fs.createReadStream(
         path.resolve(__dirname, '../mockData/csv/grades.csv'), 'utf8'
       );
-      res = await request
+      await request
         .post('/v1/courses/1/instances/1/grades/csv')
-        .attach('csv_data', csvData, { contentType: 'text/csv'})
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
         .set('Accept', 'application/json')
         .expect(HttpCode.Unauthorized);
-
-      expect(res.body.success).toBe(false);
-      expect(res.body.errors[0]).toBe('unauthorized');
-      expect(res.body.data).not.toBeDefined();
     });
 
     it('should respond with 404 not found, if course does not exist', async () => {
@@ -354,8 +355,8 @@ describe(
       );
       res = await request
         .post(`/v1/courses/${badId}/instances/1/grades/csv`)
-        .attach('csv_data', csvData, { contentType: 'text/csv'})
-        .set('Cookie', authCookie)
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json');
 
       checkErrorRes([`course with ID ${badId} not found`], HttpCode.NotFound);
@@ -367,8 +368,8 @@ describe(
       );
       res = await request
         .post(`/v1/courses/1/instances/${badId}/grades/csv`)
-        .attach('csv_data', csvData, { contentType: 'text/csv'})
-        .set('Cookie', authCookie)
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json');
 
       checkErrorRes([`course instance with ID ${badId} not found`], HttpCode.NotFound);
@@ -380,8 +381,8 @@ describe(
       );
       res = await request
         .post('/v1/courses/1/instances/2/grades/csv')
-        .attach('csv_data', csvData, { contentType: 'text/csv'})
-        .set('Cookie', authCookie)
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json');
 
       checkErrorRes(
@@ -398,8 +399,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(
@@ -416,8 +417,8 @@ describe(
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'text/csv'})
-          .set('Cookie', authCookie)
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(
@@ -449,7 +450,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
     checkSuccessRes(
       await request
         .post('/v1/courses/5/instances/8/grades/calculate')
-        .set('Cookie', authCookie),
+        .set('Cookie', cookies.adminCookie),
       [
         {
           studentNumber: '352772',
@@ -498,42 +499,42 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
       return [
         {
           User: {
-            studentId: '111111'
+            studentNumber: '111111'
           },
           grade: 1,
           attainmentId: 2,
         },
         {
           User: {
-            studentId: '111111'
+            studentNumber: '111111'
           },
           grade: 3,
           attainmentId: 3,
         },
         {
           User: {
-            studentId: '222222'
+            studentNumber: '222222'
           },
           grade: 5,
           attainmentId: 2,
         },
         {
           User: {
-            studentId: '222222'
+            studentNumber: '222222'
           },
           grade: 4,
           attainmentId: 3,
         },
         {
           User: {
-            studentId: '333333'
+            studentNumber: '333333'
           },
           grade: 4,
           attainmentId: 2,
         },
         {
           User: {
-            studentId: '333333'
+            studentNumber: '333333'
           },
           grade: 1,
           attainmentId: 3,
@@ -544,7 +545,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
     checkSuccessRes(
       await request
         .post('/v1/courses/1/instances/1/grades/calculate')
-        .set('Cookie', authCookie),
+        .set('Cookie', cookies.adminCookie),
       [
         {
           studentNumber: '111111',
@@ -653,35 +654,35 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
       return [
         {
           User: {
-            studentId: '123456'
+            studentNumber: '123456'
           },
           grade: 3,
           attainmentId: 2,
         },
         {
           User: {
-            studentId: '123456'
+            studentNumber: '123456'
           },
           grade: 4,
           attainmentId: 4,
         },
         {
           User: {
-            studentId: '123456'
+            studentNumber: '123456'
           },
           grade: 4,
           attainmentId: 5,
         },
         {
           User: {
-            studentId: '123456'
+            studentNumber: '123456'
           },
           grade: 1,
           attainmentId: 7,
         },
         {
           User: {
-            studentId: '123456'
+            studentNumber: '123456'
           },
           grade: 5,
           attainmentId: 8,
@@ -692,7 +693,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
     checkSuccessRes(
       await request
         .post('/v1/courses/1/instances/1/grades/calculate')
-        .set('Cookie', authCookie),
+        .set('Cookie', cookies.adminCookie),
       [
         {
           studentNumber: '123456',
@@ -741,21 +742,21 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
       return [
         {
           User: {
-            studentId: '654321'
+            studentNumber: '654321'
           },
           grade: 5,
           attainmentId: 1,
         },
         {
           User: {
-            studentId: '654321'
+            studentNumber: '654321'
           },
           grade: 0,
           attainmentId: 2,
         },
         {
           User: {
-            studentId: '654321'
+            studentNumber: '654321'
           },
           grade: 0,
           attainmentId: 3,
@@ -766,7 +767,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
     checkSuccessRes(
       await request
         .post('/v1/courses/1/instances/1/grades/calculate')
-        .set('Cookie', authCookie),
+        .set('Cookie', cookies.adminCookie),
       [
         {
           studentNumber: '654321',
@@ -778,13 +779,145 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
   });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
-    res = await request
+    await request
       .post('/v1/courses/1/instances/1/grades/calculate')
       .expect(HttpCode.Unauthorized);
-
-    expect(res.body.success).toBe(false);
-    expect(res.body.errors[0]).toBe('unauthorized');
-    expect(res.body.data).not.toBeDefined();
   });
 
 });
+
+describe(
+  'Test GET /v1/courses/:courseId/instances/:instanceId/grades/csv/sisu' +
+  ' - export Sisu compatible grading in CSV',
+  () => {
+
+    it('should export CSV succesfully when course results are found', async () => {
+      res = await request
+        .get('/v1/courses/1/instances/1/grades/csv/sisu')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+
+      expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+117486,Pass,5,9.12.2022,en,
+114732,5,5,9.12.2022,en,
+472886,3,5,9.12.2022,en,
+335462,Pass,5,9.12.2022,en,
+874623,2,5,9.12.2022,en,
+345752,Pass,5,9.12.2022,en,
+353418,4,5,9.12.2022,en,
+986957,Fail,5,9.12.2022,en,
+611238,4,5,9.12.2022,en,
+691296,1,5,9.12.2022,en,
+271778,Fail,5,9.12.2022,en,
+344644,1,5,9.12.2022,en,
+954954,5,5,9.12.2022,en,
+`);
+      expect(res.headers['content-disposition']).toBe(
+        'attachment; filename="final_grades_course_CS-A1110_' +
+        `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
+      );
+    });
+
+    it('should export CSV succesfully with custom assessmentDate and completionLanguage',
+      async () => {
+        res = await request
+        // eslint-disable-next-line max-len
+          .get('/v1/courses/1/instances/1/grades/csv/sisu?assessmentDate=2023-05-12&completionLanguage=sv')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'text/csv')
+          .expect(HttpCode.Ok);
+
+        expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+117486,Pass,5,12.5.2023,sv,
+114732,5,5,12.5.2023,sv,
+472886,3,5,12.5.2023,sv,
+335462,Pass,5,12.5.2023,sv,
+874623,2,5,12.5.2023,sv,
+345752,Pass,5,12.5.2023,sv,
+353418,4,5,12.5.2023,sv,
+986957,Fail,5,12.5.2023,sv,
+611238,4,5,12.5.2023,sv,
+691296,1,5,12.5.2023,sv,
+271778,Fail,5,12.5.2023,sv,
+344644,1,5,12.5.2023,sv,
+954954,5,5,12.5.2023,sv,
+`);
+        expect(res.headers['content-disposition']).toBe(
+          'attachment; filename="final_grades_course_CS-A1110_' +
+        `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
+        );
+      });
+
+    it(
+      'should respond with 400 bad request, if (optional) completionLanguage param is not valid',
+      async () => {
+        res = await request
+          .get('/v1/courses/1/instances/1/grades/csv/sisu?completionLanguage=xy')
+          .set('Cookie', cookies.adminCookie);
+
+        checkErrorRes([
+          'completionLanguage must be one of the following values:' +
+          ' fi, sv, en, es, ja, zh, pt, fr, de, ru'
+        ], HttpCode.BadRequest);
+      });
+
+    it(
+      'should respond with 400 bad request, if (optional) assessmentDate param is not valid date',
+      async () => {
+        res = await request
+          .get('/v1/courses/1/instances/1/grades/csv/sisu?assessmentDate=notValidDate')
+          .set('Cookie', cookies.adminCookie);
+
+        checkErrorRes([
+          'assessmentDate must be a `date` type, but the final value was:' +
+          ' `Invalid Date` (cast from the value `"notValidDate"`).'
+        ], HttpCode.BadRequest);
+      });
+
+    it('should respond with 401 unauthorized, if not logged in', async () => {
+      await request.get('/v1/courses/1/instances/1/grades/csv/sisu')
+        .expect(HttpCode.Unauthorized);
+    });
+
+    it('should respond with 404 not found, if grades have not been calculated yet', async () => {
+      res = await request
+        .get('/v1/courses/2/instances/2/grades/csv/sisu')
+        .set('Cookie', cookies.adminCookie);
+
+      checkErrorRes(
+        [
+          'no grades found, make sure grades have been' +
+        ' calculated before requesting course result CSV'
+        ],
+        HttpCode.NotFound);
+    });
+
+    it('should respond with 404 not found, if course does not exist', async () => {
+      res = await request
+        .get(`/v1/courses/${badId}/instances/1/grades/csv/sisu`)
+        .set('Cookie', cookies.adminCookie);
+
+      checkErrorRes([`course with ID ${badId} not found`], HttpCode.NotFound);
+    });
+
+    it('should respond with 404 not found, if course instance does not exist', async () => {
+      res = await request
+        .get(`/v1/courses/1/instances/${badId}/grades/csv/sisu`)
+        .set('Cookie', cookies.adminCookie);
+
+      checkErrorRes([`course instance with ID ${badId} not found`], HttpCode.NotFound);
+    });
+
+    it('should respond with 409 conflict, if instance does not belong to the course', async () => {
+      res = await request
+        .get('/v1/courses/1/instances/2/grades/csv/sisu')
+        .set('Cookie', cookies.adminCookie);
+
+      checkErrorRes(
+        ['course instance with ID 2 does not belong to the course with ID 1'],
+        HttpCode.Conflict
+      );
+    });
+
+  });

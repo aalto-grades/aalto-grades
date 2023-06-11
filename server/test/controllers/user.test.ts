@@ -7,13 +7,16 @@ import supertest from 'supertest';
 import { app } from '../../src/app';
 import { CoursesOfUser } from '../../src/controllers/user';
 import { HttpCode } from '../../src/types/httpCode';
-import { getCookies } from '../util/getCookies';
+import { Cookies, getCookies } from '../util/getCookies';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
-let authCookie: Array<string> = [];
+let cookies: Cookies = {
+  adminCookie: [],
+  userCookie: []
+};
 
 beforeAll(async () => {
-  authCookie = await getCookies();
+  cookies = await getCookies();
 });
 
 describe('Test GET /v1/user/:userId/courses - get all courses user has role in', () => {
@@ -26,7 +29,7 @@ describe('Test GET /v1/user/:userId/courses - get all courses user has role in',
   it('should respond with correct data', async () => {
     const res: supertest.Response = await request
       .get('/v1/user/1/courses')
-      .set('Cookie', authCookie)
+      .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
@@ -61,7 +64,7 @@ describe('Test GET /v1/user/:userId/courses - get all courses user has role in',
   it('should not contain duplicate courses', async () => {
     const res: supertest.Response = await request
       .get('/v1/user/2/courses')
-      .set('Cookie', authCookie)
+      .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
@@ -80,7 +83,7 @@ describe('Test GET /v1/user/:userId/courses - get all courses user has role in',
   it('should contain courses from all roles', async () => {
     const res: supertest.Response = await request
       .get('/v1/user/4/courses')
-      .set('Cookie', authCookie)
+      .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
@@ -94,7 +97,7 @@ describe('Test GET /v1/user/:userId/courses - get all courses user has role in',
   it('should correctly identify whether a course is current or previous', async () => {
     const res: supertest.Response = await request
       .get('/v1/user/3/courses')
-      .set('Cookie', authCookie)
+      .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
@@ -110,7 +113,7 @@ describe('Test GET /v1/user/:userId/courses - get all courses user has role in',
   it('should respond with 400 bad request, if validation fails (non-number user id)', async () => {
     const res: supertest.Response = await request
       .get('/v1/user/abc/courses')
-      .set('Cookie', authCookie)
+      .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.BadRequest);
 
@@ -120,20 +123,16 @@ describe('Test GET /v1/user/:userId/courses - get all courses user has role in',
   });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
-    const res: supertest.Response = await request
+    await request
       .get('/v1/user/1/courses')
       .set('Accept', 'application/json')
       .expect(HttpCode.Unauthorized);
-
-    expect(res.body.success).toBe(false);
-    expect(res.body.errors[0]).toBe('unauthorized');
-    expect(res.body.data).not.toBeDefined();
   });
 
   it('should respond with 404 not found, if non-existing user id', async () => {
     const res: supertest.Response = await request
       .get('/v1/user/9999999/courses')
-      .set('Cookie', authCookie)
+      .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.NotFound);
 

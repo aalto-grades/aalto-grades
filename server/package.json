@@ -5,8 +5,11 @@
   "license": "Expat (MIT)",
   "description": "",
   "main": "",
+  "workspaces": [
+    "../common"
+  ],
   "scripts": {
-    "build": "npx tsc",
+    "build": "npm --prefix ../common run build && npx tsc",
     "start": "node build/src/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "test": "jest --verbose --detectOpenHandles --coverage",
@@ -26,11 +29,13 @@
     "@types/sequelize": "^4.28.14",
     "@types/swagger-jsdoc": "^6.0.1",
     "@types/swagger-ui-express": "^4.1.3",
+    "aalto-grades-common": "*",
     "argon2": "=0.27.2",
     "axios": "^1.2.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "csv-parse": "^5.3.6",
+    "csv-stringify": "^6.4.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",

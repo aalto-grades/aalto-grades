@@ -5,18 +5,6 @@
 import * as yup from 'yup';
 import { MessageParams } from 'yup/lib/types';
 
-export enum Language {
-  English = 'EN',
-  Finnish = 'FI',
-  Swedish = 'SV'
-}
-
-export interface LocalizedString {
-  fi: string,
-  sv: string,
-  en: string
-}
-
 /**
  * Yup validation schema for validating localized strings in requests.
  * Does not allow leaving the object empty, requires at least one translation.

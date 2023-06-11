@@ -7,6 +7,7 @@ import CourseInstance from '../../database/models/courseInstance';
 
 import { findCourseById } from './course';
 import { ApiError } from '../../types/error';
+import { idSchema } from '../../types/general';
 import { HttpCode } from '../../types/httpCode';
 
 /**
@@ -29,21 +30,28 @@ export async function findCourseInstanceById(
 
 /**
  * Validates that course and course instance exists and that course instance belongs to the course.
- * @param {number} courseId - The ID of the course.
- * @param {number} courseId - The ID of the course instance.
+ * @param {unknown} courseId - The ID of the course.
+ * @param {unknown} courseId - The ID of the course instance.
  * @returns {Promise<[Course, CourseInstance]>} - The found course and course instance model object.
+ * @throws {ValidationError} - If id validation fails.
  * @throws {ApiError} - If the course or instance is not found, or the course instance does no
  * belong to the course, throws an error with a message indicating missing or conflicting resource.
  */
 export async function validateCourseAndInstance(
-  courseId: number, courseInstanceId: number
+  courseId: unknown, courseInstanceId: unknown
 ): Promise<[Course, CourseInstance]> {
+  // Validate id types.
+  const courseIdValidated: number =
+  (await idSchema.validate({ id: courseId }, { abortEarly: false })).id;
+  const instanceIdValidated: number =
+  (await idSchema.validate({ id: courseInstanceId }, { abortEarly: false })).id;
+
   // Ensure that course exists.
-  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
+  const course: Course = await findCourseById(courseIdValidated, HttpCode.NotFound);
 
   // Ensure that course instance exists.
   const instance: CourseInstance = await findCourseInstanceById(
-    courseInstanceId, HttpCode.NotFound
+    instanceIdValidated, HttpCode.NotFound
   );
 
   // Check that instance belongs to the course.

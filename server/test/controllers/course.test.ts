@@ -6,14 +6,17 @@ import supertest from 'supertest';
 
 import { app } from '../../src/app';
 import { HttpCode } from '../../src/types/httpCode';
-import { getCookies } from '../util/getCookies';
+import { Cookies, getCookies } from '../util/getCookies';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
-let authCookie: Array<string> = [];
+let cookies: Cookies = {
+  adminCookie: [],
+  userCookie: []
+};
 
 beforeAll(async () => {
-  authCookie = await getCookies();
+  cookies = await getCookies();
 });
 
 describe('Test GET /v1/courses/:courseId - get course by ID', () => {
@@ -21,7 +24,7 @@ describe('Test GET /v1/courses/:courseId - get course by ID', () => {
   it('should respond with correct data when course exists', async () => {
     const res: supertest.Response = await request
       .get('/v1/courses/1')
-      .set('Cookie', authCookie)
+      .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
@@ -40,7 +43,7 @@ describe('Test GET /v1/courses/:courseId - get course by ID', () => {
     async () => {
       const res: supertest.Response = await request
         .get('/v1/courses/abc')
-        .set('Cookie', authCookie)
+        .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.BadRequest);
 
@@ -50,26 +53,59 @@ describe('Test GET /v1/courses/:courseId - get course by ID', () => {
     });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
-    const res: supertest.Response = await request
+    await request
       .get('/v1/courses/1')
       .set('Accept', 'application/json')
       .expect(HttpCode.Unauthorized);
-
-    expect(res.body.success).toBe(false);
-    expect(res.body.errors[0]).toBe('unauthorized');
-    expect(res.body.data).not.toBeDefined();
   });
 
   it('should respond with 404 not found, if nonexistent course id', async () => {
     const res: supertest.Response = await request
       .get(`/v1/courses/${badId}`)
-      .set('Cookie', authCookie)
+      .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.NotFound);
 
     expect(res.body.success).toBe(false);
     expect(res.body.data).not.toBeDefined();
     expect(res.body.errors).toBeDefined();
+  });
+
+});
+
+
+describe('Test GET /v1/courses - get all courses', () => {
+
+  it('should respond with correct data', async () => {
+    const res: supertest.Response = await request
+      .get('/v1/courses')
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    expect(res.body.success).toBe(true);
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data.courses).toBeDefined();
+    expect(res.body.data.courses[0].id).toBeDefined();
+    expect(res.body.data.courses[0].courseCode).toBeDefined();
+    expect(res.body.data.courses[0].department).toBeDefined();
+    expect(res.body.data.courses[0].name).toBeDefined();
+    expect(res.body.data.courses[0].evaluationInformation).toBeDefined();
+  });
+
+  it('should respond with 401 unauthorized, if not logged in', async () => {
+    await request
+      .get('/v1/courses')
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Unauthorized);
+  });
+
+  it('should respond with 403 forbidden, if insufficient rights', async () => {
+    await request
+      .get('/v1/courses')
+      .set('Cookie', cookies.userCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Forbidden);
   });
 
 });
@@ -92,7 +128,7 @@ describe('Test POST /v1/courses - create new course', () => {
     };
     let res: supertest.Response = await request
       .post('/v1/courses').send(input)
-      .set('Cookie', authCookie)
+      .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
@@ -113,7 +149,7 @@ describe('Test POST /v1/courses - create new course', () => {
     };
     res = await request.post('/v1/courses')
       .send(input)
-      .set('Cookie', authCookie)
+      .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
@@ -126,7 +162,7 @@ describe('Test POST /v1/courses - create new course', () => {
     const res: supertest.Response = await request
       .post('/v1/courses')
       .send({})
-      .set('Cookie', authCookie)
+      .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.BadRequest);
 
@@ -138,15 +174,20 @@ describe('Test POST /v1/courses - create new course', () => {
   });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
-    const res: supertest.Response = await request
+    await request
       .post('/v1/courses')
       .send({})
       .set('Accept', 'application/json')
       .expect(HttpCode.Unauthorized);
+  });
 
-    expect(res.body.success).toBe(false);
-    expect(res.body.errors[0]).toBe('unauthorized');
-    expect(res.body.data).not.toBeDefined();
+  it('should respond with 403 forbidden, if insufficient rights', async () => {
+    await request
+      .post('/v1/courses')
+      .send({})
+      .set('Cookie', cookies.userCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Forbidden);
   });
 
   /* TODO: move next test case elsewhere in future, after refactoring commonly
@@ -159,7 +200,7 @@ describe('Test POST /v1/courses - create new course', () => {
       .post('/v1/courses')
       .send(input)
       .set('Content-Type', 'application/json')
-      .set('Cookie', authCookie)
+      .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.BadRequest);
 

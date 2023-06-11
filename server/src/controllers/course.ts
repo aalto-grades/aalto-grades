@@ -10,21 +10,15 @@ import { sequelize } from '../database';
 import Course from '../database/models/course';
 import CourseTranslation from '../database/models/courseTranslation';
 
-import { CourseData } from '../types/course';
+import { CourseData } from 'aalto-grades-common/types/course';
+import { Language } from 'aalto-grades-common/types/language';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
-import { Language, localizedStringSchema } from '../types/language';
+import { localizedStringSchema } from '../types/language';
 import { CourseWithTranslation } from '../types/model';
 import { findCourseWithTranslationById } from './utils/course';
 
-export async function getCourse(req: Request, res: Response): Promise<void> {
-  const courseId: number = Number(req.params.courseId);
-  await idSchema.validate({ id: courseId });
-
-  const course: CourseWithTranslation = await findCourseWithTranslationById(
-    courseId, HttpCode.NotFound
-  );
-
+function parseCourseWithTranslation(course: CourseWithTranslation): CourseData {
   const courseData: CourseData = {
     id: course.id,
     courseCode: course.courseCode,
@@ -62,10 +56,42 @@ export async function getCourse(req: Request, res: Response): Promise<void> {
     }
   });
 
+  return courseData;
+}
+
+export async function getCourse(req: Request, res: Response): Promise<void> {
+  const courseId: number = Number(req.params.courseId);
+  await idSchema.validate({ id: courseId });
+
+  const course: CourseWithTranslation = await findCourseWithTranslationById(
+    courseId, HttpCode.NotFound
+  );
+
   res.status(HttpCode.Ok).json({
     success: true,
     data: {
-      course: courseData
+      course: parseCourseWithTranslation(course)
+    }
+  });
+}
+
+export async function getAllCourses(req: Request, res: Response): Promise<void> {
+  const courses: Array<CourseWithTranslation> = await Course.findAll({
+    include: {
+      model: CourseTranslation
+    }
+  }) as Array<CourseWithTranslation>;
+
+  const coursesData: Array<CourseData> = [];
+
+  for (const course of courses) {
+    coursesData.push(parseCourseWithTranslation(course));
+  }
+
+  res.status(HttpCode.Ok).json({
+    success: true,
+    data: {
+      courses: coursesData
     }
   });
 }

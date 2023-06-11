@@ -11,13 +11,13 @@ import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
-import { ApiError } from '../types/error';
 import {
   CourseInstanceData, CourseInstanceRoleType, GradingScale, Period
-} from '../types/course';
+} from 'aalto-grades-common/types/course';
+import { Language } from 'aalto-grades-common/types/language';
+import { ApiError } from '../types/error';
 import { HttpCode } from '../types/httpCode';
 import { idSchema } from '../types/general';
-import { Language } from '../types/language';
 import { CourseWithTranslation } from '../types/model';
 import { findCourseById } from './utils/course';
 import { findUserById } from './utils/user';

@@ -8,16 +8,13 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    types:
-      - closed
 env:
   REGISTRY: ghcr.io
   FRONTEND_IMAGE_NAME: aalto-grades/aalto-grades-frontend
   BACKEND_IMAGE_NAME: aalto-grades/aalto-grades-backend
 
 jobs:
-  build-and-push-frontend-and-backend:
+  build_and_push_frontend_and_backend:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -49,7 +46,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
-          context: client
+          context: .
           file: client/Dockerfile.prod
           push: true
           tags: ${{ steps.meta_front.outputs.tags }}
@@ -58,7 +55,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
-          context: server
+          context: .
+          file: server/Dockerfile
           push: true
           tags: ${{ steps.meta_back.outputs.tags }}
           labels: ${{ steps.meta_back.outputs.labels }}

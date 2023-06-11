@@ -17,7 +17,7 @@ export default class CourseResult extends Model<
   declare id: CreationOptional<number>;
   declare userId: ForeignKey<User['id']>;
   declare courseInstanceId: ForeignKey<CourseInstance['id']>;
-  declare grade: number;
+  declare grade: string;
   declare credits: number;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -47,7 +47,7 @@ CourseResult.init(
       }
     },
     grade: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false
     },
     credits: {

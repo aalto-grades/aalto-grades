@@ -14,7 +14,7 @@ export default {
           autoIncrement: true,
           primaryKey: true
         },
-        student_id: {
+        student_number: {
           type: new DataTypes.STRING,
           unique: true,
           allowNull: true,
@@ -24,6 +24,11 @@ export default {
           type: new DataTypes.STRING,
           allowNull: true,
           defaultValue: null
+        },
+        role: {
+          type: DataTypes.ENUM('USER', 'ADMIN'),
+          allowNull: false,
+          defaultValue: 'USER'
         },
         email: {
           type: new DataTypes.STRING(255),
@@ -285,7 +290,7 @@ export default {
           onUpdate: 'CASCADE'
         },
         grade: {
-          type: DataTypes.INTEGER,
+          type: DataTypes.STRING,
           allowNull: false
         },
         credits: {
@@ -341,6 +346,10 @@ export default {
 
       await queryInterface.sequelize.query(
         'DROP TYPE IF EXISTS enum_attainment_formula;', { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS enum_user_role;', { transaction }
       );
 
       await transaction.commit();
