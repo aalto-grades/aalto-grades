@@ -11,8 +11,8 @@ import CourseView from '../components/CourseView';
 import coursesService from '../services/courses';
 import instancesService from '../services/instances';
 import AuthContext from '../context/authProvider';
-import mockCourses from '../mock-data/mockCourses';
-import mockInstances from '../mock-data/mockInstancesWithStringDates';
+import mockCourses from './mock-data/mockCourses';
+import mockInstances from './mock-data/mockInstancesWithStringDates';
 import { SystemRole } from 'aalto-grades-common/types/general';
 
 jest.mock('../services/courses');

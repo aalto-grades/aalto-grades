@@ -9,7 +9,7 @@ import { app } from '../../src/app';
 
 import { CourseInstanceData } from 'aalto-grades-common/types/course';
 import { HttpCode } from '../../src/types/httpCode';
-import { sisuInstance, sisuError } from '../mockData/sisu';
+import { sisuInstance, sisuError } from '../mock-data/sisu';
 import { Cookies, getCookies } from '../util/getCookies';
 
 jest.mock('axios');
