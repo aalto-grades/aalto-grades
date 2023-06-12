@@ -5,7 +5,7 @@
 import { parse, Parser } from 'csv-parse';
 import { stringify } from 'csv-stringify';
 import { NextFunction, Request, Response } from 'express';
-import { Op, Transaction } from 'sequelize';
+import { Op, QueryTypes, Transaction } from 'sequelize';
 import * as yup from 'yup';
 
 import { sequelize } from '../database';
@@ -17,7 +17,7 @@ import CourseResult from '../database/models/courseResult';
 import User from '../database/models/user';
 import UserAttainmentGrade from '../database/models/userAttainmentGrade';
 
-import { CourseInstanceRoleType } from 'aalto-grades-common/types/course';
+import { CourseInstanceRoleType, GradingScale } from 'aalto-grades-common/types/course';
 import { getFormulaImplementation } from '../formulas';
 import { ApiError } from '../types/error';
 import { Formula, FormulaNode, GradingInput, GradingResult, Status } from '../types/formulas';
@@ -405,10 +405,6 @@ async function calculateFormulaNode(
   return await formulaNode.formulaImplementation.formulaFunction(inputs);
 }
 
-interface UserAttainmentGradeWithUser extends UserAttainmentGrade {
-  User: User
-}
-
 export async function calculateGrades(
   req: Request,
   res: Response
@@ -416,7 +412,7 @@ export async function calculateGrades(
   const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
     await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
 
-  // TODO: once jwt authorization connected to route, check requester id has teacher role.
+  // TODO: check requester id has teacher role on instance.
 
   /*
    * First we need to get all the attainments in this course instance.
@@ -570,11 +566,7 @@ export async function calculateGrades(
    * Stores the grades of each student for each attainment which were manually
    * specified by a teacher.
    */
-  const unorganizedPresetGrades: Array<{
-    studentNumber: string,
-    grade: number,
-    attainmentId: number
-  }> = (await UserAttainmentGrade.findAll({
+  const unorganizedPresetGrades: Array<UserAttainmentGrade> = await UserAttainmentGrade.findAll({
     include: [
       {
         model: Attainment,
@@ -584,23 +576,10 @@ export async function calculateGrades(
           courseId: course.id,
           courseInstanceId: courseInstance.id,
         }
-      },
-      {
-        model: User,
-        required: true,
-        attributes: ['studentNumber']
       }
     ],
-    attributes: ['grade', 'attainmentId'],
-  }) as Array<UserAttainmentGradeWithUser>).map(
-    (attainmentGrade: UserAttainmentGradeWithUser) => {
-      return {
-        studentNumber: attainmentGrade.User.studentNumber,
-        grade: attainmentGrade.grade,
-        attainmentId: attainmentGrade.attainmentId
-      };
-    }
-  );
+    attributes: ['grade', 'attainmentId', 'userId'],
+  });
 
   /*
    * Next we'll organize the preset grades by student number.
@@ -609,17 +588,17 @@ export async function calculateGrades(
   /*
    * Store the preset grades of all attainments per student. Stores all the
    * same information as unorganizedPresetGrades.
-   * Student number -> Formula node -> Preset grade.
+   * User ID -> Formula node -> Preset grade.
    */
-  const organizedPresetGrades: Map<string, Map<FormulaNode, number>> = new Map();
+  const organizedPresetGrades: Map<number, Map<FormulaNode, number>> = new Map();
 
   for (const presetGrade of unorganizedPresetGrades) {
     let userPresetGrades: Map<FormulaNode, number> | undefined =
-      organizedPresetGrades.get(presetGrade.studentNumber);
+      organizedPresetGrades.get(presetGrade.userId);
 
     if (!userPresetGrades) {
       userPresetGrades = new Map();
-      organizedPresetGrades.set(presetGrade.studentNumber, userPresetGrades);
+      organizedPresetGrades.set(presetGrade.userId, userPresetGrades);
     }
 
     userPresetGrades.set(
@@ -632,36 +611,60 @@ export async function calculateGrades(
    * Finally we're ready to calculate the grades of each student starting from
    * the root attainment.
    */
-
   const finalGrades: Array<{
-    studentNumber: string,
-    grade: number,
-    status: Status
+    userId: number,
+    courseInstanceId: number,
+    grade: string,
+    credits: number
   }> = [];
 
-  for (const [studentNumber, presetGrades] of organizedPresetGrades) {
+  for (const [userId, presetGrades] of organizedPresetGrades) {
     const finalGrade: GradingResult =
       await calculateFormulaNode(rootFormulaNode, presetGrades);
 
     finalGrades.push(
       {
-        studentNumber: studentNumber,
-        grade: finalGrade.grade,
-        status: finalGrade.status
+        userId: userId,
+        courseInstanceId: courseInstance.id,
+        grade:
+        // If grading scale numerical save numerical value, otherwise final grade status (PASS/FAIL)
+        courseInstance.gradingScale === GradingScale.Numerical ? finalGrade.status === Status.Pass ?
+          String(finalGrade.grade) : '0' : finalGrade.status,
+        credits: courseInstance.maxCredits
       }
     );
   }
 
-  /*
-   * TODO: Don't return final grades, save grades to database in
-   * calculateFormulaNode instead?
-   */
+  // TODO manual or auto calculation flag
+
+  await sequelize.transaction(async (transaction: Transaction) => {
+    for (const finalGrade of finalGrades) {
+      await sequelize.query(
+        `INSERT INTO course_result (
+        user_id, course_instance_id, grade,
+        credits, created_at, updated_at
+      )
+      VALUES
+        (:userId, :courseInstanceId, :grade, :credits, NOW(), NOW())
+        ON CONFLICT (user_id, course_instance_id) DO UPDATE
+      SET
+        user_id = :userId,
+        course_instance_id = :courseInstanceId,
+        grade = :grade,
+        credits = :credits,
+        updated_at = NOW();`,
+        {
+          replacements: finalGrade,
+          type: QueryTypes.INSERT,
+          transaction
+        }
+      );
+    }
+  });
 
   res.status(HttpCode.Ok).json({
     success: true,
-    data: {
-      grades: finalGrades
-    }
+    data: {}
   });
 }
 

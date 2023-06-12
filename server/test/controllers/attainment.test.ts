@@ -797,14 +797,14 @@ describe(
       verifyAttainmentData(res.body.data.subAttainments[1], 6, 2, 2, true);
       verifyAttainmentData(
         res.body.data.subAttainments[1].subAttainments[0],
-        197,
+        214,
         2,
         2,
         true
       );
       verifyAttainmentData(
         res.body.data.subAttainments[1].subAttainments[0].subAttainments[0],
-        198,
+        215,
         2,
         2,
         false
