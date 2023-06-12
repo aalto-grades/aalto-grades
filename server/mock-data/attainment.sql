@@ -21,7 +21,7 @@ INSERT INTO public.attainment (course_id, course_instance_id, attainment_id, nam
 (1, 1, 1, 'test assignment 1.4', 'tag16', '2022-01-05', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 3, "weight": 2 }'),
 (1, 1, 1, 'test assignment 1.5', 'tag17', '2022-01-05', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 3, "weight": 2 }'),
 (1, 1, 1, 'test assignment 1.6', 'tag18', '2022-01-05', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 3, "weight": 2 }'),
-(6, 9, null, 'test assignment course 6, instance 9', 'tag19' '2022-01-05', '2023-04-23', NOW(), NOW(), 'WEIGHTED_AVERAGE', NULL),
+(6, 9, null, 'test assignment course 6, instance 9', 'tag19', '2022-01-05', '2023-04-23', NOW(), NOW(), 'WEIGHTED_AVERAGE', NULL),
 (6, 9, 19, 'test assignment course 6, instance 9', 'tag20', '2022-01-05', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 3, "weight": 1 }'),
 (6, 9, 19, 'test assignment course 6, instance 9', 'tag21', '2022-01-05', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 3, "weight": 1 }'),
 (6, 9, 19, 'test assignment course 6, instance 9', 'tag22', '2022-01-05', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 3, "weight": 1 }'),
