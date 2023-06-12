@@ -153,22 +153,8 @@ router.post(
  *                   type: boolean
  *                   description: Success of the request.
  *                 data:
- *                   description: Calculated final grades for each student.
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       studentNumber:
- *                         type: string
- *                         description: Aalto student number.
- *                       grade:
- *                         type: number
- *                         description: Final grade of the student.
- *                       status:
- *                         type: string
- *                         description: >
- *                           'pass' or 'fail' to indicate whether the attainment
- *                            has been successfully completed.
+ *                   description: Empty data object.
+ *                   type: object
  *       400:
  *         description: >
  *           Calculation failed, due to validation errors or missing parameters.
