@@ -9,7 +9,7 @@ import { Op, Transaction } from 'sequelize';
 import * as yup from 'yup';
 
 import { sequelize } from '../database';
-import Attainable from '../database/models/attainable';
+import Attainment from '../database/models/attainment';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 import CourseInstanceRole from '../database/models/courseInstanceRole';
@@ -126,7 +126,7 @@ export function parseGradesFromCsv(
         );
       } else {
         const grade: UserAttainmentGradeData = {
-          attainableId: attainmentIds[i],
+          attainmentId: attainmentIds[i],
           grade: parseInt(gradingData[i], 10)
         };
         student.grades.push(grade);
@@ -205,7 +205,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         );
 
         // Fetch all attainments from db based on the id's extracted from the CSV.
-        const attainments: Array<Attainable> = await Attainable.findAll({
+        const attainments: Array<Attainment> = await Attainment.findAll({
           attributes: ['id'],
           where: {
             id: {
@@ -217,7 +217,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         });
 
         // Check if any of the CSV attainment id's does not exist in the db, throw ApiError if so.
-        const foundIds: Array<number> = attainments.map((attainment: Attainable) => attainment.id);
+        const foundIds: Array<number> = attainments.map((attainment: Attainment) => attainment.id);
         const nonExistingIds: Array<number> = attainmentIds.filter(
           (id: number) => !foundIds.includes(id)
         );
@@ -429,7 +429,7 @@ export async function calculateGrades(
     parentFormulaParams: object | null
   }
 
-  const attainments: Array<AttainmentInfo> = await Attainable.findAll({
+  const attainments: Array<AttainmentInfo> = await Attainment.findAll({
     raw: true,
     where: {
       courseId: course.id,
@@ -437,9 +437,9 @@ export async function calculateGrades(
     },
     attributes: [
       'id',
-      // Translates attainableId to parentId.
+      // Translates attainmentId to parentId.
       // TODO: Rename in model if possible.
-      ['attainable_id', 'parentId'],
+      ['attainment_id', 'parentId'],
       'formula',
       'parentFormulaParams',
     ],
@@ -577,7 +577,7 @@ export async function calculateGrades(
   }> = (await UserAttainmentGrade.findAll({
     include: [
       {
-        model: Attainable,
+        model: Attainment,
         required: true,
         attributes: [],
         where: {
@@ -591,13 +591,13 @@ export async function calculateGrades(
         attributes: ['studentNumber']
       }
     ],
-    attributes: ['grade', 'attainableId'],
+    attributes: ['grade', 'attainmentId'],
   }) as Array<UserAttainmentGradeWithUser>).map(
     (attainmentGrade: UserAttainmentGradeWithUser) => {
       return {
         studentNumber: attainmentGrade.User.studentNumber,
         grade: attainmentGrade.grade,
-        attainmentId: attainmentGrade.attainableId
+        attainmentId: attainmentGrade.attainmentId
       };
     }
   );

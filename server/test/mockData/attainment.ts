@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainableRequestData } from '../../src/types/attainable';
+import { AttainmentRequestData } from '../../src/types/attainment';
 
-export const mockAttainable: AttainableRequestData = {
+export const mockAttainment: AttainmentRequestData = {
   name: '2 optional exercises',
   date: new Date(2023, 9, 1),
   expiryDate: new Date(2024, 8, 14),

@@ -130,7 +130,7 @@ describe('Test CSV student grades parser', () => {
       expect(student.studentNumber).toBe(rowData[0]);
 
       student.grades.forEach((grade: UserAttainmentGradeData, index: number) => {
-        expect(grade.attainableId).toBe(attainmentIds[index]);
+        expect(grade.attainmentId).toBe(attainmentIds[index]);
         expect(grade.grade).toBe(Number(rowData[index + 1]));
       });
     });

@@ -26,8 +26,8 @@ const courseTranslation: string = fs.readFileSync(
   path.resolve(__dirname, '../../../../mock-data/course_translations.sql'), 'utf8'
 );
 
-const attainable: string = fs.readFileSync(
-  path.resolve(__dirname, '../../../../mock-data/attainable.sql'), 'utf8'
+const attainment: string = fs.readFileSync(
+  path.resolve(__dirname, '../../../../mock-data/attainment.sql'), 'utf8'
 );
 
 const userAttainmentGrade: string = fs.readFileSync(
@@ -46,7 +46,7 @@ export default {
       await queryInterface.sequelize.query(courses, { transaction });
       await queryInterface.sequelize.query(courseInstances, { transaction });
       await queryInterface.sequelize.query(courseInstanceRoles, { transaction });
-      await queryInterface.sequelize.query(attainable, { transaction });
+      await queryInterface.sequelize.query(attainment, { transaction });
       await queryInterface.sequelize.query(courseTranslation, { transaction });
       await queryInterface.sequelize.query(userAttainmentGrade, { transaction });
       await queryInterface.sequelize.query(courseResults, { transaction });
@@ -63,7 +63,7 @@ export default {
       await queryInterface.bulkDelete('user_attainment_grade', {}, { transaction });
       await queryInterface.bulkDelete('course_translation', {}, { transaction });
       await queryInterface.bulkDelete('course_instance_role', {}, { transaction });
-      await queryInterface.bulkDelete('attainable', {}, { transaction });
+      await queryInterface.bulkDelete('attainment', {}, { transaction });
       await queryInterface.bulkDelete('course_instance', {}, { transaction });
       await queryInterface.bulkDelete('course', {}, { transaction });
       await queryInterface.bulkDelete('user', {}, { transaction });
@@ -77,7 +77,7 @@ export default {
       );
 
       await queryInterface.sequelize.query(
-        'ALTER SEQUENCE attainable_id_seq RESTART;', { transaction }
+        'ALTER SEQUENCE attainment_id_seq RESTART;', { transaction }
       );
 
       await queryInterface.sequelize.query(

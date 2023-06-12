@@ -11,7 +11,7 @@ import swaggerUI from 'swagger-ui-express';
 import { FRONTEND_ORIGIN } from '../configs/environment';
 import { definition } from '../configs/swagger';
 
-import { router as attainableRouter } from './attainable';
+import { router as attainmentRouter } from './attainment';
 import { router as authRouter } from './auth';
 import { router as courseRouter } from './course';
 import { router as courseInstanceRouter } from './courseInstance';
@@ -29,7 +29,7 @@ const openapiSpecification: object = swaggerJsdoc(options);
 export const router: Router = Router();
 
 router.use(cookieParser());
-router.use(attainableRouter);
+router.use(attainmentRouter);
 router.use(authRouter);
 router.use(courseRouter);
 router.use(courseInstanceRouter);
@@ -79,6 +79,16 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *       required: true
  *       example: 1
  *       description: The ID of the study attainment.
+ *     tree:
+ *       in: query
+ *       name: tree
+ *       schema:
+ *         type: string
+ *         enum: [children, descendants]
+ *       description: >
+ *         The type of the attainment tree fetched. Optional.
+ *          * `children` - Fetch only the direct subattainments of the attainment.
+ *          * `descendants` - Fetch the whole tree of subattainments.
  *   responses:
  *     AuthenticationError:
  *       description: Authentication credentials were missing or JWT expired.

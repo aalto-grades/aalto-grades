@@ -7,7 +7,7 @@ import path from 'path';
 import { Op } from 'sequelize';
 import supertest from 'supertest';
 
-import Attainable from '../../src/database/models/attainable';
+import Attainment from '../../src/database/models/attainment';
 import CourseInstanceRole from '../../src/database/models/courseInstanceRole';
 import User from '../../src/database/models/user';
 import UserAttainmentGrade from '../../src/database/models/userAttainmentGrade';
@@ -114,7 +114,7 @@ describe(
       let userAttainment: UserAttainmentGrade = await UserAttainmentGrade.findOne({
         where: {
           userId: user.id,
-          attainableId: 1
+          attainmentId: 1
         }
       }) as UserAttainmentGrade;
 
@@ -133,7 +133,7 @@ describe(
       userAttainment = await UserAttainmentGrade.findOne({
         where: {
           userId: user.id,
-          attainableId: 1
+          attainmentId: 1
         }
       }) as UserAttainmentGrade;
 
@@ -413,7 +413,7 @@ describe(
       'should respond with 422 unprocessable entity, if attainment does not belong to the instance',
       async () => {
         const csvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mockData/csv/grades_non_existing_attainables.csv'), 'utf8'
+          path.resolve(__dirname, '../mockData/csv/grades_non_existing_attainments.csv'), 'utf8'
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
@@ -463,7 +463,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
 
   it('should calculate multiple correct grades', async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    jest.spyOn(Attainable, 'findAll').mockImplementation((): any => {
+    jest.spyOn(Attainment, 'findAll').mockImplementation((): any => {
       return [
         {
           id: 1,
@@ -502,42 +502,42 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
             studentNumber: '111111'
           },
           grade: 1,
-          attainableId: 2,
+          attainmentId: 2,
         },
         {
           User: {
             studentNumber: '111111'
           },
           grade: 3,
-          attainableId: 3,
+          attainmentId: 3,
         },
         {
           User: {
             studentNumber: '222222'
           },
           grade: 5,
-          attainableId: 2,
+          attainmentId: 2,
         },
         {
           User: {
             studentNumber: '222222'
           },
           grade: 4,
-          attainableId: 3,
+          attainmentId: 3,
         },
         {
           User: {
             studentNumber: '333333'
           },
           grade: 4,
-          attainableId: 2,
+          attainmentId: 2,
         },
         {
           User: {
             studentNumber: '333333'
           },
           grade: 1,
-          attainableId: 3,
+          attainmentId: 3,
         }
       ];
     });
@@ -568,7 +568,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
 
   it('should calculate correct grades in higher depths', async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    jest.spyOn(Attainable, 'findAll').mockImplementation((): any => {
+    jest.spyOn(Attainment, 'findAll').mockImplementation((): any => {
       return [
         {
           id: 1,
@@ -657,35 +657,35 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
             studentNumber: '123456'
           },
           grade: 3,
-          attainableId: 2,
+          attainmentId: 2,
         },
         {
           User: {
             studentNumber: '123456'
           },
           grade: 4,
-          attainableId: 4,
+          attainmentId: 4,
         },
         {
           User: {
             studentNumber: '123456'
           },
           grade: 4,
-          attainableId: 5,
+          attainmentId: 5,
         },
         {
           User: {
             studentNumber: '123456'
           },
           grade: 1,
-          attainableId: 7,
+          attainmentId: 7,
         },
         {
           User: {
             studentNumber: '123456'
           },
           grade: 5,
-          attainableId: 8,
+          attainmentId: 8,
         }
       ];
     });
@@ -706,7 +706,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
 
   it('should allow manually overriding a student\'s grade', async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    jest.spyOn(Attainable, 'findAll').mockImplementation((): any => {
+    jest.spyOn(Attainment, 'findAll').mockImplementation((): any => {
       return [
         {
           id: 1,
@@ -745,21 +745,21 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
             studentNumber: '654321'
           },
           grade: 5,
-          attainableId: 1,
+          attainmentId: 1,
         },
         {
           User: {
             studentNumber: '654321'
           },
           grade: 0,
-          attainableId: 2,
+          attainmentId: 2,
         },
         {
           User: {
             studentNumber: '654321'
           },
           grade: 0,
-          attainableId: 3,
+          attainmentId: 3,
         }
       ];
     });

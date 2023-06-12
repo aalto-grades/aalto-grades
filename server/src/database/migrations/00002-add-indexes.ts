@@ -28,15 +28,15 @@ export default {
         unique: true,
         transaction
       });
-      await queryInterface.addIndex('attainable', ['id', 'course_id', 'course_instance_id'], {
+      await queryInterface.addIndex('attainment', ['id', 'course_id', 'course_instance_id'], {
         unique: true,
         transaction
       });
-      await queryInterface.addIndex('attainable', ['attainable_id'], {
+      await queryInterface.addIndex('attainment', ['attainment_id'], {
         unique: false,
         transaction
       });
-      await queryInterface.addIndex('user_attainment_grade', ['user_id', 'attainable_id'], {
+      await queryInterface.addIndex('user_attainment_grade', ['user_id', 'attainment_id'], {
         unique: true,
         transaction
       });
@@ -79,17 +79,17 @@ export default {
       );
 
       await queryInterface.sequelize.query(
-        'DROP INDEX IF EXISTS attainable_id_course_id_course_instance_id',
+        'DROP INDEX IF EXISTS attainment_id_course_id_course_instance_id',
         { transaction }
       );
 
       await queryInterface.sequelize.query(
-        'DROP INDEX IF EXISTS attainable_attainable_id',
+        'DROP INDEX IF EXISTS attainment_attainment_id',
         { transaction }
       );
 
       await queryInterface.sequelize.query(
-        'DROP INDEX IF EXISTS user_attainment_grade_user_id_attainable_id',
+        'DROP INDEX IF EXISTS user_attainment_grade_user_id_attainment_id',
         { transaction }
       );
 
