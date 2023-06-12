@@ -10,13 +10,14 @@ import Attainment from '../database/models/attainment';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 
-import { AttainmentData, AttainmentRequestData } from '../types/attainment';
+import { AttainmentData, AttainmentRequestData, treeSchema } from '../types/attainment';
 import { ApiError } from '../types/error';
 import { Formula } from '../types/formulas';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 
 import {
+  findAllAttainmentsForInstance,
   findAttainmentById,
   generateAttainmentTag,
   generateAttainmentTree
@@ -249,37 +250,18 @@ export async function getAttainment(req: Request, res: Response): Promise<void> 
   const instanceId: number = Number(req.params.instanceId);
   const attainmentId: number = Number(req.params.attainmentId);
 
-  const querySchema: yup.AnyObjectSchema = yup.object().shape({
-    tree: yup.string().oneOf(['children', 'descendants'])
-  }).noUnknown(true).strict();
-
   await idSchema.validate({ id: courseId }, { abortEarly: false });
   await idSchema.validate({ id: instanceId }, { abortEarly: false });
   await idSchema.validate({ id: attainmentId }, { abortEarly: false });
-  await querySchema.validate(req.query, { abortEarly: false });
+  await treeSchema.validate(req.query, { abortEarly: false });
 
   // Assert string type, as the query is validated above
-  const tree: string = <string>req.query.tree;
+  const tree: string | undefined = <string | undefined>req.query.tree;
 
-  const attainments: Array<Attainment> = await Attainment.findAll({
-    where: {
-      courseId: courseId,
-      courseInstanceId: instanceId
-    }
-  });
-
-  const attainmentData: Array<AttainmentData> = attainments.map((el: Attainment) => {
-    return {
-      id: el.id,
-      courseId: el.courseId,
-      courseInstanceId: el.courseInstanceId,
-      parentId: el.attainmentId ?? undefined,
-      tag: generateAttainmentTag(el.id, el.courseId, el.courseInstanceId),
-      name: el.name,
-      date: el.date,
-      expiryDate: el.expiryDate
-    };
-  });
+  const attainmentData: Array<AttainmentData> = await findAllAttainmentsForInstance(
+    courseId,
+    instanceId
+  );
 
   const attainment: AttainmentData | undefined = attainmentData.find(
     (el: AttainmentData) => el.id === attainmentId);
@@ -308,4 +290,38 @@ export async function getAttainment(req: Request, res: Response): Promise<void> 
     success: true,
     data: attainment,
   });
+}
+
+export async function getAllAttainments(req: Request, res: Response): Promise<void> {
+  const courseId: number = Number(req.params.courseId);
+  const instanceId: number = Number(req.params.instanceId);
+
+  await idSchema.validate({ id: courseId }, { abortEarly: false });
+  await idSchema.validate({ id: instanceId }, { abortEarly: false });
+  await treeSchema.validate(req.query, { abortEarly: false });
+
+  // Assert string type, as the query is validated above
+  const tree: string | undefined = <string | undefined>req.query.tree;
+
+  const allAttainmentData: Array<AttainmentData> = await findAllAttainmentsForInstance(
+    courseId,
+    instanceId
+  );
+
+  const rootAttainments: Array<AttainmentData> = allAttainmentData.filter(
+    (el: AttainmentData) => !el.parentId
+  );
+
+  if (tree) {
+    const onlyChildren: boolean = tree === 'children' ? true : false;
+    rootAttainments.forEach((el: AttainmentData) => {
+      generateAttainmentTree(el, allAttainmentData, onlyChildren);
+    });
+  }
+
+  res.status(HttpCode.Ok).json({
+    success: true,
+    data: rootAttainments,
+  });
+
 }

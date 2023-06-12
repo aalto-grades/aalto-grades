@@ -9,7 +9,8 @@ import {
   addAttainment,
   deleteAttainment,
   updateAttainment,
-  getAttainment
+  getAttainment,
+  getAllAttainments
 } from '../controllers/attainment';
 import { handleInvalidRequestJson } from '../middleware';
 import { controllerDispatcher } from '../middleware/errorHandler';
@@ -325,4 +326,53 @@ router.get(
   '/v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId',
   passport.authenticate('jwt', { session: false }),
   controllerDispatcher(getAttainment)
+);
+
+/**
+ * @swagger
+ * /v1/courses/{courseId}/instances/{instanceId}/attainments:
+ *  get:
+ *     tags: [Attainment]
+ *     description: Get all root attainments of the course instance or subtree downwards.
+ *     parameters:
+ *       - $ref: '#/components/parameters/courseId'
+ *       - $ref: '#/components/parameters/instanceId'
+ *       - $ref: '#/components/parameters/tree'
+ *     responses:
+ *       200:
+ *         description:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Attainment'
+ *       400:
+ *         description:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       404:
+ *         description:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       422:
+ *         description:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ */
+
+router.get(
+  '/v1/courses/:courseId/instances/:instanceId/attainments',
+  passport.authenticate('jwt', { session: false }),
+  controllerDispatcher(getAllAttainments)
 );

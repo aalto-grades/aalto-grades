@@ -25,6 +25,46 @@ export async function findAttainmentById(id: number, errorCode: HttpCode): Promi
 }
 
 /**
+ * Finds all attainments for a specific course instance.
+ * @param {number} courseId - The ID of the course.
+ * @param {number} instanceId - The ID of the course instance.
+ * @returns {Promise<Array<AttainmentData>>} - The resulting array of AttainmentData.
+ * @throws {ApiError} - If no attainments were found, it throws an error
+ * with a message indicating that the attainments were not found for the course instance.
+ */
+export async function findAllAttainmentsForInstance(
+  courseId: number,
+  instanceId: number
+): Promise<Array<AttainmentData>> {
+  const attainments: Array<Attainment> = await Attainment.findAll({
+    where: {
+      courseId: courseId,
+      courseInstanceId: instanceId
+    }
+  });
+
+  if (attainments.length === 0) {
+    throw new ApiError('Attainments were not found ' +
+      'for the specified course and instance', HttpCode.NotFound);
+  }
+
+  const attainmentData: Array<AttainmentData> = attainments.map((el: Attainment) => {
+    return {
+      id: el.id,
+      courseId: el.courseId,
+      courseInstanceId: el.courseInstanceId,
+      parentId: el.attainmentId ?? undefined,
+      tag: generateAttainmentTag(el.id, el.courseId, el.courseInstanceId),
+      name: el.name,
+      date: el.date,
+      expiryDate: el.expiryDate
+    };
+  });
+
+  return attainmentData;
+}
+
+/**
  * Create a tag for attainment based on its id's.
  * @param {number} attainmentId - The ID of the attainment.
  * @param {number} courseId - The ID of the course the attainment belongs to.

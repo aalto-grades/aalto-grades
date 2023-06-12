@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+import * as yup from 'yup';
+
 export interface AttainmentRequestData {
   parentId?: number,
   name: string,
@@ -21,4 +23,8 @@ export interface AttainmentData {
   expiryDate: Date,
   subAttainments?: Array<AttainmentData>
 }
+
+export const treeSchema: yup.AnyObjectSchema = yup.object().shape({
+  tree: yup.string().oneOf(['children', 'descendants'])
+}).noUnknown(true).strict();
 
