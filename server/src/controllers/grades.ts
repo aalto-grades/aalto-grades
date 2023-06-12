@@ -588,7 +588,7 @@ export async function calculateGrades(
   /*
    * Store the preset grades of all attainments per student. Stores all the
    * same information as unorganizedPresetGrades.
-   * Student number -> Formula node -> Preset grade.
+   * User ID -> Formula node -> Preset grade.
    */
   const organizedPresetGrades: Map<number, Map<FormulaNode, number>> = new Map();
 
