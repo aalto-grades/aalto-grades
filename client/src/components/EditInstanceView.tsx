@@ -13,7 +13,7 @@ import instancesService from '../services/instances';
 // TODO: update actual instance/save basic information
 
 const EditInstanceView = () => {
-  let { sisuInstanceId } = useParams();
+  const { sisuInstanceId } = useParams();
   const [instance, setInstance] = useState<any>();
 
   useEffect(() => {

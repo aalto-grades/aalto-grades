@@ -40,7 +40,7 @@ describe('Tests for EditAttainmentView components', () => {
     );
   };
 
-  let mockAttainment = getMockAttainment()[0];  // object
+  const mockAttainment = getMockAttainment()[0];  // object
   mockAttainment.temporaryId = mockAttainment.id;
 
   const mockContext = {
@@ -72,7 +72,7 @@ describe('Tests for EditAttainmentView components', () => {
       const categoryField = await screen.findAllByLabelText('Name');
       const confirmButton = screen.getByText('Confirm');
 
-      let mockAttainment = getMockAttainment();  // array with one object
+      const mockAttainment = getMockAttainment();  // array with one object
       const numOfAttainments = attainmentServices.getNumOfAttainments(mockAttainment);
 
       expect(headingElement).toBeInTheDocument();
@@ -86,7 +86,7 @@ describe('Tests for EditAttainmentView components', () => {
     // Mock request from client,
     // TODO: needs to be modified to match the final format used by the server.
     // Now the format is different since data isn't gotten from the server yet.
-    let mockAttainment = getMockAttainment()[0];  // object
+    const mockAttainment = getMockAttainment()[0];  // object
     mockAttainment.date = mockDate;
     mockAttainment.expiryDate = mockExpiryDate;
 
@@ -125,7 +125,7 @@ describe('Tests for EditAttainmentView components', () => {
     // Mock request from client,
     // TODO: needs to be modified to match the final format used by the server.
     // Now the format is different since data isn't gotten from the server yet.
-    let mockAttainment = getMockAttainment()[0];  // object
+    const mockAttainment = getMockAttainment()[0];  // object
     mockAttainment.date = mockDate;
     mockAttainment.expiryDate = mockExpiryDate;
     mockAttainment.subAttainments = [newAttainment];
@@ -180,7 +180,7 @@ describe('Tests for EditAttainmentView components', () => {
       const categoryField = await screen.findAllByLabelText('Name');
       const confirmButton = screen.getByText('Confirm');
 
-      let mockAttainment = getMockAttainment();  // array with one object
+      const mockAttainment = getMockAttainment();  // array with one object
       const numOfAttainments = attainmentServices.getNumOfAttainments(mockAttainment);
 
       expect(headingElement).toBeInTheDocument();
@@ -192,7 +192,7 @@ describe('Tests for EditAttainmentView components', () => {
 
   test('EditAttainmentView should update the context during instance creation', async () => {
 
-    let mockAttainment = getMockAttainment()[0];  // object
+    const mockAttainment = getMockAttainment()[0];  // object
     mockAttainment.temporaryId = mockAttainment.id;
     mockAttainment.date = mockDate.split('T')[0];
     mockAttainment.expiryDate = mockExpiryDate.split('T')[0];

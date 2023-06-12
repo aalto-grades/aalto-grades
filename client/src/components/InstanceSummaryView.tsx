@@ -31,8 +31,8 @@ const errorMsgAttainments: Message = {
 };
 
 const InstanceSummaryView = () => {
-  let navigate = useNavigate();
-  let { courseId, sisuInstanceId } = useParams();
+  const navigate = useNavigate();
+  const { courseId, sisuInstanceId } = useParams();
 
   const {
     addedAttainments,

@@ -24,7 +24,7 @@ const ParentAttainment = ({
   indices, addSubAttainments, setAttainments, attainments, removeAttainment,
   formulaAttributeNames, temporaryId, setIncrementId
 }) => {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   // Functions and varibales for opening and closing the list of sub-attainments
   const [open, setOpen] = useState<any>(true);

@@ -13,8 +13,8 @@ import FetchedInstances from './fetch-instances-view/FetchedInstances';
 import instancesService from '../services/instances';
 
 const FetchInstancesView = (): JSX.Element => {
-  let navigate = useNavigate();
-  let { courseId, courseCode } = useParams();
+  const navigate = useNavigate();
+  const { courseId, courseCode } = useParams();
   const [instances, setInstances] = useState([]);
 
   useEffect(() => {

@@ -11,8 +11,8 @@ import AttainmentCategory from './attainments/AttainmentCategory';
 import attainmentServices from '../services/attainments';
 
 const AddAttainmentsView = () => {
-  let navigate = useNavigate();
-  let { courseId, sisuInstanceId } = useParams();
+  const navigate = useNavigate();
+  const { courseId, sisuInstanceId } = useParams();
 
   const {
     addedAttainments, setAddedAttainments,
@@ -22,8 +22,8 @@ const AddAttainmentsView = () => {
 
   useEffect(() => {  // Better if handling here
     if (addedAttainments.length === 0) {
-      let allSuggestedAttainments = attainmentServices.getSuggestedAttainments();
-      let [updatedAttainments, newTemporaryId] = attainmentServices.addTemporaryIds(allSuggestedAttainments, attainmentIncrementId);
+      const allSuggestedAttainments = attainmentServices.getSuggestedAttainments();
+      const [updatedAttainments, newTemporaryId] = attainmentServices.addTemporaryIds(allSuggestedAttainments, attainmentIncrementId);
       setIncrementId(newTemporaryId);
       setSuggestedAttainments(updatedAttainments);
     } else {

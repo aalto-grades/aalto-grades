@@ -10,7 +10,7 @@ import TableRow from '@mui/material/TableRow';
 import Link from '@mui/material/Link';
 
 const CourseTableRow = ({ course }) => {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
   const { id, name, courseCode, department } = course;
 
   return(
