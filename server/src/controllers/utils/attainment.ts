@@ -25,21 +25,6 @@ export async function findAttainmentById(id: number, errorCode: HttpCode): Promi
 }
 
 /**
- * Create a tag for attainment based on its id's.
- * @param {number} attainmentId - The ID of the attainment.
- * @param {number} courseId - The ID of the course the attainment belongs to.
- * @param {number} courseInstanceId - The ID of the course instance the attainment belongs to.
- * @returns {string} - Generated tag.
- */
-export function generateAttainmentTag(
-  attainmentId: number,
-  courseId: number,
-  courseInstanceId: number
-): string {
-  return `C${courseId}I${courseInstanceId}A${attainmentId}`;
-}
-
-/**
  * Recursive function for creating a tree of descendant attainments.
  * @param {AttainmentData} attainment - The root attainment, based on which the tree is built.
  * @param {Array<AttainmentData>} allAttainments - Array of attainments, containing the children.
