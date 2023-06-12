@@ -9,7 +9,7 @@ import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import InstanceCreationRoute from '../context/InstanceCreationRoute';
 import EditInstanceView from '../components/EditInstanceView';
 import instancesService from '../services/instances';
-import mockSisuInstances from '../mock-data/mockSisuInstances';
+import mockSisuInstances from './mock-data/mockSisuInstances';
 
 jest.mock('../services/instances');
 afterEach(cleanup);

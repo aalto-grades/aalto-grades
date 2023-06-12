@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 const mockSisuInstances = [
-  { sisuCourseInstanceId: 'mock-id-1',
+  {
+    sisuCourseInstanceId: 'mock-id-1',
     startingPeriod: '2021-2022 Autumn I-II',
     endingPeriod: '2022-2023 Autumn I-II',
     minCredits: 5,
@@ -30,7 +31,8 @@ const mockSisuInstances = [
       }
     }
   },
-  { sisuCourseInstanceId: 'mock-id-2',
+  {
+    sisuCourseInstanceId: 'mock-id-2',
     startingPeriod: '2021-2022 Autumn I-II',
     endingPeriod: '2022-2023 Autumn I-II',
     startDate: '2021-08-14',

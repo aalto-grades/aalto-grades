@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
@@ -24,7 +23,7 @@ const InstanceBox = ({ courseId, instance }) => {
   let navigate = useNavigate();
   const { sisuCourseInstanceId, startDate, endDate, type } = instance;
 
-  return(
+  return (
     <HoverBox
       className='ag_fetched_instance_option'
       sx={{
@@ -57,7 +56,7 @@ InstanceBox.propTypes = {
 };
 
 const FetchedInstances = ({ courseId, info }) => {
-  return(
+  return (
     <Box>
       {info.sort((a, b) => sortingServices.sortByDate(a.startDate, b.startDate))
         .slice()

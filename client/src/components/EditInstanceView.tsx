@@ -24,19 +24,20 @@ const EditInstanceView = () => {
       .catch((e) => console.log(e.message));
   }, []);
 
-  return(
+  return (
     <Container maxWidth="sm" sx={{ textAlign: 'right' }}>
       <Typography variant="h1" sx={{ flexGrow: 1, mb: 5, textAlign: 'left' }}>
         Edit Basic Information
       </Typography>
-      { instance ?
-        <>
-          <Typography variant="h3" sx={{ flexGrow: 1, mb: 2, textAlign: 'left' }}>
-            {instance.courseData.courseCode + ' - ' + instance.courseData.name.en}
-          </Typography>
-          <EditInstanceForm instance={instance} />
-        </>
-        : <LinearProgress sx={{ margin: '200px 50px 0px 50px' }}/>
+      {
+        instance ?
+          <>
+            <Typography variant="h3" sx={{ flexGrow: 1, mb: 2, textAlign: 'left' }}>
+              {instance.courseData.courseCode + ' - ' + instance.courseData.name.en}
+            </Typography>
+            <EditInstanceForm instance={instance} />
+          </>
+          : <LinearProgress sx={{ margin: '200px 50px 0px 50px' }} />
       }
     </Container>
   );
