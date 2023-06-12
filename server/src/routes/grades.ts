@@ -7,7 +7,9 @@ import multer, { FileFilterCallback, memoryStorage, Multer } from 'multer';
 import passport from 'passport';
 import path from 'path';
 
-import { addGrades, calculateGrades, getSisuFormattedGradingCSV } from '../controllers/grades';
+import {
+  addGrades, calculateGrades, getFinalGrades, getSisuFormattedGradingCSV
+} from '../controllers/grades';
 import { controllerDispatcher } from '../middleware/errorHandler';
 import { ApiError } from '../types/error';
 import { HttpCode } from '../types/httpCode';
@@ -34,6 +36,34 @@ const upload: Multer = multer({
     }
   }
 });
+
+/**
+ * @swagger
+ * definitions:
+ *   GradingData:
+ *     type: object
+ *     description: Students final grade data.
+ *     properties:
+ *       id:
+ *         type: integer
+ *         description: Student final grade database ID.
+ *         format: int32
+ *         minimum: 1
+ *         example: 1
+ *       studentNumber:
+ *         $ref: '#/definitions/StudentNumber'
+ *       grade:
+ *         type: string
+ *         description: >
+ *           Final grade for the student. Either numeric (0, 1, 2, 3, 4, 5) or PASS/FAIL scale.
+ *         example: PASS
+ *       credits:
+ *         type: integer
+ *         description: How many course credits (ECTS) student receives from course.
+ *         format: int32
+ *         minimum: 0
+ *         example: 5
+ */
 
 /**
  * @swagger
@@ -255,4 +285,61 @@ router.get(
   '/v1/courses/:courseId/instances/:instanceId/grades/csv/sisu',
   passport.authenticate('jwt', { session: false }),
   controllerDispatcher(getSisuFormattedGradingCSV)
+);
+
+/**
+ * @swagger
+ * /v1/courses/{courseId}/instances/{instanceId}/grades:
+ *   get:
+ *     tags: [Grades]
+ *     description: >
+ *       Get the final grades of all students.
+ *     parameters:
+ *       - $ref: '#/components/parameters/courseId'
+ *       - $ref: '#/components/parameters/instanceId'
+ *     responses:
+ *       200:
+ *         description: Grades fetched successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   $ref: '#/definitions/Success'
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     finalGrades:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/definitions/GradingData'
+ *       400:
+ *         description: Fetching failed, due to validation errors in parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
+ *       404:
+ *         description: >
+ *           The given course or course instance does not exist
+ *           or no course results found for the instance.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: >
+ *           The given course instance does not belong to the given course.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ */
+router.get(
+  '/v1/courses/:courseId/instances/:instanceId/grades',
+  passport.authenticate('jwt', { session: false }),
+  controllerDispatcher(getFinalGrades)
 );
