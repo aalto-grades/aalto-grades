@@ -120,7 +120,7 @@ describe(
       let userAttainment: UserAttainmentGrade = await UserAttainmentGrade.findOne({
         where: {
           userId: user.id,
-          attainableId: 1
+          attainmentId: 1
         }
       }) as UserAttainmentGrade;
 
@@ -139,7 +139,7 @@ describe(
       userAttainment = await UserAttainmentGrade.findOne({
         where: {
           userId: user.id,
-          attainableId: 1
+          attainmentId: 1
         }
       }) as UserAttainmentGrade;
 
@@ -419,7 +419,7 @@ describe(
       'should respond with 422 unprocessable entity, if attainment does not belong to the instance',
       async () => {
         const csvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mockData/csv/grades_non_existing_attainables.csv'), 'utf8'
+          path.resolve(__dirname, '../mockData/csv/grades_non_existing_attainments.csv'), 'utf8'
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')

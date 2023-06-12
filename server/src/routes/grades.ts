@@ -158,7 +158,7 @@ router.post(
  *       400:
  *         description: >
  *           Calculation failed, due to validation errors or missing parameters.
- *           This may also indicate a cycle in the hierarchy of attainables.
+ *           This may also indicate a cycle in the hierarchy of attainments.
  *         content:
  *           application/json:
  *             schema:
