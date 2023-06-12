@@ -85,6 +85,10 @@ const EditInstanceForm = ({ instance }) => {
     }
   }, []);
 
+  const onCancel = (): void => {
+    navigate('/course-view/' + courseId);
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     try {
@@ -130,15 +134,27 @@ const EditInstanceForm = ({ instance }) => {
         </Grid2>
         <DynamicTextFieldArray fieldData={teacherData} values={teachers} setFunction={setTeachers} />
         <Grid2 container>
-          <Grid2 sx={{ minWidth: textFieldMinWidth }}><NumberTextField fieldData={minCreditsData} value={stringMinCredits} setFunction={setMinCredits}/></Grid2>
-          <Box sx={{ width: 15 }}/>
-          <Grid2 sx={{ minWidth: textFieldMinWidth }}><NumberTextField fieldData={maxCreditsData} value={stringMaxCredits} setFunction={setMaxCredits}/></Grid2>
+          <Grid2 sx={{ minWidth: textFieldMinWidth }}>
+            <NumberTextField fieldData={minCreditsData} value={stringMinCredits} setFunction={setMinCredits} />
+          </Grid2>
+          <Box sx={{ width: 15 }} />
+          <Grid2 sx={{ minWidth: textFieldMinWidth }}>
+            <NumberTextField fieldData={maxCreditsData} value={stringMaxCredits} setFunction={setMaxCredits} />
+          </Grid2>
         </Grid2>
-        <StringTextField fieldData={gradingScaleData} value={gradingScale} setFunction={setGradingScale}/>
+        <StringTextField fieldData={gradingScaleData} value={gradingScale} setFunction={setGradingScale} />
       </Box>
-      <Button id='ag_confirm_instance_details_btn' variant='contained' type='submit'>
+      <Box sx={{
+        display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
+        alignItems: 'center', pb: 6
+      }}>
+        <Button size='medium' variant='outlined' onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button id='ag_confirm_instance_details_btn' variant='contained' type='submit'>
           Confirm Details
-      </Button>
+        </Button>
+      </Box>
     </form>
   );
 };

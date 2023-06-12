@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
