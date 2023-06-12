@@ -39,8 +39,8 @@ const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades })
 
   // state variables handling the alert messages
   const [snackPack, setSnackPack] = useState<any>([]);
-  const [alertOpen, setAlertOpen] = useState<any>(false);
-  const [showErrorDialog, setShowErrorDialog] = useState<any>(false);
+  const [alertOpen, setAlertOpen] = useState<boolean>(false);
+  const [showErrorDialog, setShowErrorDialog] = useState<boolean>(false);
   const [messageInfo, setMessageInfo] = useState<any>(undefined);
 
   const toggleErrorDialog = () => {

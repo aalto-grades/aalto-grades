@@ -8,6 +8,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Slide from '@mui/material/Slide';
 import MuiAlert from '@mui/material/Alert';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { Message } from '../../types/general';
 
 const darkTheme = createTheme({
   palette: {
@@ -21,20 +22,26 @@ const Alert: any = React.forwardRef(function Alert(props, ref) {
 
 // TODO: Consider if the key attribute works properly of if something else should be used?
 // position allows "stacked look", starts from 1 but really needed only from 2 onwards
-const AlertSnackbar = ({ messageInfo, setMessageInfo, open, setOpen, position }) => {
+const AlertSnackbar = ({ messageInfo, setMessageInfo, open, setOpen, position }: {
+  messageInfo: Message | undefined,
+  setMessageInfo: (messageInfo: Message | undefined) => void,
+  open: boolean,
+  setOpen: (open: boolean) => void,
+  position: number
+}) => {
 
   const margin = position ? (position - 1) * 7 : 0;
 
-  const handleClose = (event, reason) => {
+  function handleClose(event: React.SyntheticEvent, reason: string) {
     if (reason === 'clickaway') {
       return;
     }
     setOpen(false);
-  };
+  }
 
-  const handleExited = () => {
+  function handleExited() {
     setMessageInfo(undefined);
-  };
+  }
 
   return (
     <div>

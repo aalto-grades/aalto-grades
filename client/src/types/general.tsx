@@ -7,3 +7,8 @@ export interface ApiResponse<T> {
   data?: T,
   errors?: Array<string>
 }
+
+export interface Message {
+  msg: string,
+  severity: string // TODO: Enum?
+}

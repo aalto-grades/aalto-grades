@@ -6,24 +6,27 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import { LoginCredentials } from '../../types/auth';
 
-const LoginForm = ({ loginUser }) => {
+const LoginForm = ({ loginUser }: {
+  loginUser: (userObject: LoginCredentials) => Promise<void>
+}) => {
 
-  const [email, setEmail] = useState<any>('');
-  const [password, setPassword] = useState<any>('');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
 
-  const handleSubmit = (event) => {
+  function handleSubmit(event: React.SyntheticEvent) {
     event.preventDefault();
     try {
-      const userObject = ({
+      const userObject: LoginCredentials = {
         email,
         password,
-      });
+      };
       loginUser(userObject);
     } catch (exception) {
       console.log(exception);
     }
-  };
+  }
 
   return (
     <>
