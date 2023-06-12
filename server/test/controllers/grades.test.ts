@@ -49,7 +49,7 @@ describe(
 
     it('should process CSV succesfully when course, course instance and users exist', async () => {
       const csvData: fs.ReadStream = fs.createReadStream(
-        path.resolve(__dirname, '../mockData/csv/grades.csv'), 'utf8'
+        path.resolve(__dirname, '../mock-data/csv/grades.csv'), 'utf8'
       );
       res = await request
         .post('/v1/courses/1/instances/1/grades/csv')
@@ -76,7 +76,7 @@ describe(
 
         expect(users.length).toBe(0);
         const csvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mockData/csv/grades_non-existing_students.csv'), 'utf8'
+          path.resolve(__dirname, '../mock-data/csv/grades_non-existing_students.csv'), 'utf8'
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
@@ -127,7 +127,7 @@ describe(
       expect(userAttainment.grade).toBe(6);
 
       const csvData: fs.ReadStream = fs.createReadStream(
-        path.resolve(__dirname, '../mockData/csv/grades_updated.csv'), 'utf8'
+        path.resolve(__dirname, '../mock-data/csv/grades_updated.csv'), 'utf8'
       );
       res = await request
         .post('/v1/courses/1/instances/1/grades/csv')
@@ -152,7 +152,7 @@ describe(
     it('should process big CSV succesfully (1100 x 178 = 195 800 individual attainment grades)',
       async () => {
         const csvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mockData/csv/grades_big.csv'), 'utf8'
+          path.resolve(__dirname, '../mock-data/csv/grades_big.csv'), 'utf8'
         );
         res = await request
           .post('/v1/courses/6/instances/9/grades/csv')
@@ -170,7 +170,7 @@ describe(
       'should respond with 400 bad request, if the CSV has only student numbers, no grading data',
       async () => {
         const invalidCsvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mockData/csv/grades_only_student_numbers.csv'), 'utf8'
+          path.resolve(__dirname, '../mock-data/csv/grades_only_student_numbers.csv'), 'utf8'
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
@@ -186,7 +186,7 @@ describe(
     it('should respond with 400 bad request, if the CSV file header parsing fails',
       async () => {
         const invalidCsvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mockData/csv/grades_incorrect_header_columns.csv'), 'utf8'
+          path.resolve(__dirname, '../mock-data/csv/grades_incorrect_header_columns.csv'), 'utf8'
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
@@ -208,7 +208,7 @@ describe(
     it('should respond with 400 bad request, if the CSV file grading data parsing fails',
       async () => {
         const invalidCsvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mockData/csv/grades_incorrect_grade_rows.csv'), 'utf8'
+          path.resolve(__dirname, '../mock-data/csv/grades_incorrect_grade_rows.csv'), 'utf8'
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
@@ -228,7 +228,7 @@ describe(
       'should respond with 400 bad request, if the CSV file parsing fails (one row invalid length)',
       async () => {
         const invalidCsvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mockData/csv/grades_invalid_row.csv'), 'utf8'
+          path.resolve(__dirname, '../mock-data/csv/grades_invalid_row.csv'), 'utf8'
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
@@ -243,7 +243,7 @@ describe(
       'should respond with 400 bad request, if the CSV file field name not "csv_data"',
       async () => {
         const csvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mockData/csv/grades.csv'), 'utf8'
+          path.resolve(__dirname, '../mock-data/csv/grades.csv'), 'utf8'
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
@@ -260,7 +260,7 @@ describe(
     it('should respond with 400 bad request, if the file content-type not text/csv',
       async () => {
         const csvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mockData/csv/grades.csv'), 'utf8'
+          path.resolve(__dirname, '../mock-data/csv/grades.csv'), 'utf8'
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
@@ -274,7 +274,7 @@ describe(
     it('should respond with 400 bad request, if the file extension incorrect (.txt)',
       async () => {
         const txtFile: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mockData/csv/wrong_file_type.txt'), 'utf8'
+          path.resolve(__dirname, '../mock-data/csv/wrong_file_type.txt'), 'utf8'
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
@@ -305,7 +305,7 @@ describe(
     it('should respond with 400 bad request, if validation fails (non-number course id)',
       async () => {
         const csvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mockData/csv/grades.csv'), 'utf8'
+          path.resolve(__dirname, '../mock-data/csv/grades.csv'), 'utf8'
         );
         res = await request
           .post(`/v1/courses/${badInput}/instances/1/grades/csv`)
@@ -326,7 +326,7 @@ describe(
     it('should respond with 400 bad request, if validation fails (non-number course instance id)',
       async () => {
         const csvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mockData/csv/grades.csv'), 'utf8'
+          path.resolve(__dirname, '../mock-data/csv/grades.csv'), 'utf8'
         );
         res = await request
           .post(`/v1/courses/1/instances/${badInput}/grades/csv`)
@@ -346,7 +346,7 @@ describe(
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
       const csvData: fs.ReadStream = fs.createReadStream(
-        path.resolve(__dirname, '../mockData/csv/grades.csv'), 'utf8'
+        path.resolve(__dirname, '../mock-data/csv/grades.csv'), 'utf8'
       );
       await request
         .post('/v1/courses/1/instances/1/grades/csv')
@@ -357,7 +357,7 @@ describe(
 
     it('should respond with 404 not found, if course does not exist', async () => {
       const csvData: fs.ReadStream = fs.createReadStream(
-        path.resolve(__dirname, '../mockData/csv/grades.csv'), 'utf8'
+        path.resolve(__dirname, '../mock-data/csv/grades.csv'), 'utf8'
       );
       res = await request
         .post(`/v1/courses/${badId}/instances/1/grades/csv`)
@@ -370,7 +370,7 @@ describe(
 
     it('should respond with 404 not found, if course instance does not exist', async () => {
       const csvData: fs.ReadStream = fs.createReadStream(
-        path.resolve(__dirname, '../mockData/csv/grades.csv'), 'utf8'
+        path.resolve(__dirname, '../mock-data/csv/grades.csv'), 'utf8'
       );
       res = await request
         .post(`/v1/courses/1/instances/${badId}/grades/csv`)
@@ -383,7 +383,7 @@ describe(
 
     it('should respond with 409 conflict, if instance does not belong to the course', async () => {
       const csvData: fs.ReadStream = fs.createReadStream(
-        path.resolve(__dirname, '../mockData/csv/grades.csv'), 'utf8'
+        path.resolve(__dirname, '../mock-data/csv/grades.csv'), 'utf8'
       );
       res = await request
         .post('/v1/courses/1/instances/2/grades/csv')
@@ -401,7 +401,7 @@ describe(
       'should respond with 409 conflict, if CSV includes users with role TEACHER/TEACHER_IN_CHARGE',
       async () => {
         const csvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mockData/csv/grades_teacher_in_row.csv'), 'utf8'
+          path.resolve(__dirname, '../mock-data/csv/grades_teacher_in_row.csv'), 'utf8'
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')
@@ -419,7 +419,7 @@ describe(
       'should respond with 422 unprocessable entity, if attainment does not belong to the instance',
       async () => {
         const csvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mockData/csv/grades_non_existing_attainments.csv'), 'utf8'
+          path.resolve(__dirname, '../mock-data/csv/grades_non_existing_attainments.csv'), 'utf8'
         );
         res = await request
           .post('/v1/courses/1/instances/1/grades/csv')

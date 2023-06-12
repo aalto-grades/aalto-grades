@@ -8,7 +8,7 @@ import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import FetchInstancesView from '../components/FetchInstancesView';
 import instancesService from '../services/instances';
-import mockSisuInstances from '../mock-data/mockSisuInstances';
+import mockSisuInstances from './mock-data/mockSisuInstances';
 
 jest.mock('../services/instances');
 afterEach(cleanup);

@@ -9,7 +9,7 @@ import { act, render, screen, waitFor, within, cleanup } from '@testing-library/
 import userEvent from '@testing-library/user-event';
 import CreateAttainmentView from '../components/CreateAttainmentView';
 import attainmentServices from '../services/attainments';
-import mockAttainmentsServer from '../mock-data/mockAttainmentsServer';
+import mockAttainmentsServer from './mock-data/mockAttainmentsServer';
 
 const mockAttainment = mockAttainmentsServer[0];
 const courseId = mockAttainment.courseId;
