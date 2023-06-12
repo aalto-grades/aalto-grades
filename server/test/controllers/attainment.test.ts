@@ -77,7 +77,7 @@ describe(
     it('should create a new attainment with sub-attainments when course and course instance exist',
       async () => {
         const res: supertest.Response = await request
-          .post('/v1/courses/1/instances/1/attainments')
+          .post('/v1/courses/2/instances/2/attainments')
           .send(mockAttainment)
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -87,8 +87,8 @@ describe(
         expect(res.body.success).toBe(true);
         expect(res.body.errors).not.toBeDefined();
         expect(res.body.data.attainment.id).toBeDefined();
-        expect(res.body.data.attainment.courseId).toBe(1);
-        expect(res.body.data.attainment.courseInstanceId).toBe(1);
+        expect(res.body.data.attainment.courseId).toBe(2);
+        expect(res.body.data.attainment.courseInstanceId).toBe(2);
         expect(res.body.data.attainment.name).toBe(mockAttainment.name);
         expect(res.body.data.attainment.parentId).toBe(null);
         expect(res.body.data.attainment.tag).toBeDefined();
@@ -105,8 +105,8 @@ describe(
 
     it('should create a new attainment with parent attainment', async () => {
       const res: supertest.Response = await request
-        .post('/v1/courses/1/instances/1/attainments')
-        .send({ parentId: 1, ...mockAttainment })
+        .post('/v1/courses/3/instances/3/attainments')
+        .send({ parentId: 3, ...mockAttainment })
         .set('Content-Type', 'application/json')
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
@@ -114,7 +114,7 @@ describe(
 
       expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
-      expect(res.body.data.attainment.parentId).toBe(1);
+      expect(res.body.data.attainment.parentId).toBe(3);
 
       for (const subAttainment of res.body.data.attainment.subAttainments) {
         evaluateSubAttainment(subAttainment);
@@ -156,7 +156,7 @@ describe(
     it('should respond with 400 bad request, if validation fails (non-number parent attainment id)',
       async () => {
         const res: supertest.Response = await request
-          .post('/v1/courses/1/instances/1/attainments')
+          .post('/v1/courses/3/instances/4/attainments')
           .send({ parentId: badInput, ...mockAttainment })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -172,7 +172,7 @@ describe(
     it('should respond with 400 bad request, if validation fails (date not valid date)',
       async () => {
         const res: supertest.Response = await request
-          .post('/v1/courses/1/instances/1/attainments')
+          .post('/v1/courses/3/instances/4/attainments')
           .send({ ...mockAttainment, date: badInput, })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -188,7 +188,7 @@ describe(
     it('should respond with 400 bad request, if validation fails (expiryDate not valid date)',
       async () => {
         const res: supertest.Response = await request
-          .post('/v1/courses/1/instances/1/attainments')
+          .post('/v1/courses/3/instances/4/attainments')
           .send({ ...mockAttainment, expiryDate: badInput, })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -203,17 +203,20 @@ describe(
 
     it('should respond with 400 bad request, if validation fails in the sub-attainment level',
       async () => {
-      // Validate on level 1
+        // Validate on level 1
         let res: supertest.Response = await request
-          .post('/v1/courses/1/instances/1/attainments')
-          .send({ ...mockAttainment, subAttainments: [
-            {
-              name: 'Exercise 1',
-              date: badInput,
-              expiryDate: new Date(2024, 8, 14),
-              subAttainments: [],
-            }
-          ] })
+          .post('/v1/courses/3/instances/4/attainments')
+          .send({
+            ...mockAttainment, subAttainments: [
+              {
+                name: 'Exercise 1',
+                tag: 'tag-for-bad-input',
+                date: badInput,
+                expiryDate: new Date(2024, 8, 14),
+                subAttainments: [],
+              }
+            ]
+          })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
@@ -226,22 +229,26 @@ describe(
 
         // Validate on level 2
         res = await request
-          .post('/v1/courses/1/instances/1/attainments')
-          .send({ ...mockAttainment, subAttainments: [
-            {
-              name: 'Exercise 1',
-              date: new Date(2024, 8, 14),
-              expiryDate: new Date(2024, 8, 14),
-              subAttainments: [
-                {
-                  name: 'Exercise 1',
-                  date: new Date(2024, 8, 14),
-                  expiryDate: new Date(2024, 8, 14),
-                  subAttainments: badInput,
-                }
-              ],
-            }
-          ] })
+          .post('/v1/courses/3/instances/4/attainments')
+          .send({
+            ...mockAttainment, subAttainments: [
+              {
+                name: 'Exercise 1',
+                tag: 'test-ex-1-1',
+                date: new Date(2024, 8, 14),
+                expiryDate: new Date(2024, 8, 14),
+                subAttainments: [
+                  {
+                    name: 'Exercise 1',
+                    tag: 'test-ex-1-2',
+                    date: new Date(2024, 8, 14),
+                    expiryDate: new Date(2024, 8, 14),
+                    subAttainments: badInput,
+                  }
+                ],
+              }
+            ]
+          })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
@@ -255,28 +262,33 @@ describe(
         // Validate on level 3
         res = await request
           .post('/v1/courses/1/instances/1/attainments')
-          .send({ ...mockAttainment, subAttainments: [
-            {
-              name: 'Exercise 1',
-              date: new Date(2024, 8, 14),
-              expiryDate: new Date(2024, 8, 14),
-              subAttainments: [
-                {
-                  name: 'Exercise 1',
-                  date: new Date(2024, 8, 14),
-                  expiryDate: new Date(2024, 8, 14),
-                  subAttainments: [
-                    {
-                      name: 'Exercise 1',
-                      date: new Date(2024, 8, 14),
-                      expiryDate: badInput,
-                      subAttainments: [],
-                    }
-                  ],
-                }
-              ],
-            }
-          ] })
+          .send({
+            ...mockAttainment, subAttainments: [
+              {
+                name: 'Exercise 1',
+                tag: 'test-ex-1-3',
+                date: new Date(2024, 8, 14),
+                expiryDate: new Date(2024, 8, 14),
+                subAttainments: [
+                  {
+                    name: 'Exercise 1',
+                    tag: 'test-ex-1-4',
+                    date: new Date(2024, 8, 14),
+                    expiryDate: new Date(2024, 8, 14),
+                    subAttainments: [
+                      {
+                        name: 'Exercise 1',
+                        tag: 'test-ex-1-5',
+                        date: new Date(2024, 8, 14),
+                        expiryDate: badInput,
+                        subAttainments: [],
+                      }
+                    ],
+                  }
+                ],
+              }
+            ]
+          })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
@@ -347,7 +359,7 @@ describe(
       async () => {
         // Create parent attainment for course instance 1.
         let res: supertest.Response = await request
-          .post('/v1/courses/1/instances/1/attainments')
+          .post('/v1/courses/4/instances/5/attainments')
           .send(mockAttainment)
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -357,7 +369,7 @@ describe(
 
         // Try to add new attainment with previously created parent to instance 2.
         res = await request
-          .post('/v1/courses/2/instances/2/attainments')
+          .post('/v1/courses/4/instances/6/attainments')
           .send({ parentId: id, ...mockAttainment })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -367,7 +379,7 @@ describe(
         expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe(
-          `parent attainment ID ${id} does not belong to the course instance ID 2`
+          `parent attainment ID ${id} does not belong to the course instance ID 6`
         );
       });
 
@@ -394,7 +406,7 @@ describe(
     async function testAttainmentTreeDeletion(tree: object): Promise<void> {
       // Add an attainment tree.
       const add: supertest.Response = await request
-        .post('/v1/courses/1/instances/1/attainments').send(tree)
+        .post('/v1/courses/4/instances/7/attainments').send(tree)
         .set('Cookie', cookies.adminCookie);
 
       // Adds the IDs of all subattainemnts of the given tree to the given
@@ -417,7 +429,7 @@ describe(
 
       // Delete the root attainment.
       const res: supertest.Response = await request
-        .delete(`/v1/courses/1/instances/1/attainments/${rootAttainment}`)
+        .delete(`/v1/courses/4/instances/7/attainments/${rootAttainment}`)
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
@@ -432,10 +444,11 @@ describe(
     it('should succesfully delete single attainment', async () => {
       // Add an attainment.
       const add: supertest.Response = await request
-        .post('/v1/courses/1/instances/1/attainments')
+        .post('/v1/courses/4/instances/7/attainments')
         .send(
           {
             name: 'Test exercise',
+            tag: 'delete-test-1',
             date: new Date(),
             expiryDate: new Date(),
             subAttainments: []
@@ -450,7 +463,7 @@ describe(
 
       // Delete the added attainment.
       const res: supertest.Response = await request
-        .delete(`/v1/courses/1/instances/1/attainments/${addedAttainment}`)
+        .delete(`/v1/courses/4/instances/7/attainments/${addedAttainment}`)
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
@@ -464,17 +477,20 @@ describe(
       await testAttainmentTreeDeletion(
         {
           name: 'Test exercise',
+          tag: 'delete-test-2',
           date: new Date(),
           expiryDate: new Date(),
           subAttainments: [
             {
               name: 'Test exercise 1.1',
+              tag: 'delete-test-2-1.1',
               date: new Date(),
               expiryDate: new Date(),
               subAttainments: []
             },
             {
               name: 'Test exercise 1.2',
+              tag: 'delete-test-2-1.2',
               date: new Date(),
               expiryDate: new Date(),
               subAttainments: []
@@ -490,14 +506,14 @@ describe(
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
       await request
-        .delete('/v1/courses/1/instances/1/attainments/1')
+        .delete('/v1/courses/4/instances/7/attainments/1')
         .set('Accept', 'application/json')
         .expect(HttpCode.Unauthorized);
     });
 
     it('should respond with 404 not found for non-existent attainment ID', async () => {
       const res: supertest.Response = await request
-        .delete(`/v1/courses/1/instances/1/attainments/${badId}`)
+        .delete(`/v1/courses/4/instances/7/attainments/${badId}`)
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.NotFound);
@@ -517,7 +533,7 @@ describe(
     it('should update field succesfully on an existing attainment', async () => {
     // Create a new attainments.
       let res: supertest.Response = await request
-        .post('/v1/courses/1/instances/1/attainments')
+        .post('/v1/courses/1/instances/12/attainments')
         .send(mockAttainment)
         .set('Content-Type', 'application/json')
         .set('Cookie', cookies.adminCookie)
@@ -527,9 +543,10 @@ describe(
       subAttainment = res.body.data.attainment;
 
       res = await request
-        .put(`/v1/courses/1/instances/1/attainments/${subAttainment.id}`)
+        .put(`/v1/courses/1/instances/12/attainments/${subAttainment.id}`)
         .send({
           name: 'new name',
+          tag: 'new tag',
           date: mockAttainment.date,
           expiryDate: mockAttainment.expiryDate
         })
@@ -542,9 +559,10 @@ describe(
       expect(res.body.errors).not.toBeDefined();
       expect(res.body.data.attainment.id).toBe(subAttainment.id);
       expect(res.body.data.attainment.courseId).toBe(1);
-      expect(res.body.data.attainment.courseInstanceId).toBe(1);
+      expect(res.body.data.attainment.courseInstanceId).toBe(12);
       expect(res.body.data.attainment.parentId).toBe(null);
       expect(res.body.data.attainment.name).toBe('new name');
+      expect(res.body.data.attainment.tag).toBe('new tag');
       expect(new Date(res.body.data.attainment.date).getTime())
         .toBe(mockAttainment.date.getTime());
       expect(new Date(res.body.data.attainment.expiryDate).getTime())
@@ -552,17 +570,23 @@ describe(
     });
 
     it('should add parent succesfully on an existing attainment', async () => {
-    // Create a new parent attainment.
+      // Create a new parent attainment.
       let res: supertest.Response = await request
-        .post('/v1/courses/1/instances/1/attainments')
-        .send(mockAttainment)
+        .post('/v1/courses/1/instances/12/attainments')
+        .send({
+          name: 'No parent',
+          tag: 'no-parent',
+          date: new Date(2024, 4, 5),
+          expiryDate: new Date (2025, 4, 5)
+        })
         .set('Content-Type', 'application/json')
-        .set('Cookie', cookies.adminCookie);
+        .set('Cookie', cookies.adminCookie)
+        .expect(HttpCode.Ok);
 
       parentAttainment = res.body.data.attainment;
 
       res = await request
-        .put(`/v1/courses/1/instances/1/attainments/${subAttainment.id}`)
+        .put(`/v1/courses/1/instances/12/attainments/${subAttainment.id}`)
         .send({ parentId: parentAttainment.id })
         .set('Content-Type', 'application/json')
         .set('Cookie', cookies.adminCookie)
@@ -572,7 +596,7 @@ describe(
       expect(res.body.errors).not.toBeDefined();
       expect(res.body.data.attainment.id).toBe(subAttainment.id);
       expect(res.body.data.attainment.courseId).toBe(1);
-      expect(res.body.data.attainment.courseInstanceId).toBe(1);
+      expect(res.body.data.attainment.courseInstanceId).toBe(12);
       expect(res.body.data.attainment.parentId).toBe(parentAttainment.id);
       expect(res.body.data.attainment.name).toBe('new name');
       expect(new Date(res.body.data.attainment.date).getTime())
@@ -614,7 +638,7 @@ describe(
     it('should respond with 400 bad request, if validation fails (non-number attainment id)',
       async () => {
         const res: supertest.Response = await request
-          .put(`/v1/courses/1/instances/1/attainments/${badInput}`)
+          .put(`/v1/courses/2/instances/11/attainments/${badInput}`)
           .send(mockAttainment)
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -628,14 +652,14 @@ describe(
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
       await request
-        .put('/v1/courses/1/instances/1/attainments/1')
+        .put('/v1/courses/2/instances/11/attainments/1')
         .set('Accept', 'application/json')
         .expect(HttpCode.Unauthorized);
     });
 
     it('should respond with 404 not found, if attainment does not exist', async () => {
       const res: supertest.Response = await request
-        .put(`/v1/courses/1/instances/1/attainments/${badId}`)
+        .put(`/v1/courses/2/instances/11/attainments/${badId}`)
         .send(mockAttainment)
         .set('Content-Type', 'application/json')
         .set('Cookie', cookies.adminCookie)
@@ -651,15 +675,16 @@ describe(
       async () => {
         // Create a new parent attainment on a different instance.
         let res: supertest.Response = await request
-          .post('/v1/courses/2/instances/2/attainments')
+          .post('/v1/courses/4/instances/13/attainments')
           .send(mockAttainment)
           .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie);
+          .set('Cookie', cookies.adminCookie)
+          .expect(HttpCode.Ok);
 
         parentAttainment = res.body.data.attainment;
 
         res = await request
-          .put(`/v1/courses/1/instances/1/attainments/${subAttainment.id}`)
+          .put(`/v1/courses/1/instances/12/attainments/${subAttainment.id}`)
           .send({ parentId: parentAttainment.id })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -676,7 +701,7 @@ describe(
     it('should respond with 409 conflict, if attainment tries to refer itself in the parent id',
       async () => {
         const res: supertest.Response = await request
-          .put(`/v1/courses/1/instances/1/attainments/${subAttainment.id}`)
+          .put(`/v1/courses/2/instances/11/attainments/${subAttainment.id}`)
           .send({ ...subAttainment, parentId: subAttainment.id })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -690,7 +715,7 @@ describe(
     it('should respond with 422 unprocessable entity, if parent attainment does not exist',
       async () => {
         const res: supertest.Response = await request
-          .put(`/v1/courses/1/instances/1/attainments/${subAttainment.id}`)
+          .put(`/v1/courses/2/instances/11/attainments/${subAttainment.id}`)
           .send({ parentId: badId })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -752,8 +777,9 @@ describe(
       expect(res.body.data).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
       verifyAttainmentData(res.body.data, 2, 2, 2, true);
-      verifyAttainmentData(res.body.data.subAttainments[0], 6, 2, 2, false);
-      verifyAttainmentData(res.body.data.subAttainments[1], 10, 2, 2, false);
+
+      verifyAttainmentData(res.body.data.subAttainments[1], 6, 2, 2, false);
+      verifyAttainmentData(res.body.data.subAttainments[0], 10, 2, 2, false);
 
     });
 
@@ -768,22 +794,22 @@ describe(
       expect(res.body.data).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
       verifyAttainmentData(res.body.data, 2, 2, 2, true);
-      verifyAttainmentData(res.body.data.subAttainments[0], 6, 2, 2, true);
+      verifyAttainmentData(res.body.data.subAttainments[1], 6, 2, 2, true);
       verifyAttainmentData(
-        res.body.data.subAttainments[0].subAttainments[0],
+        res.body.data.subAttainments[1].subAttainments[0],
         214,
         2,
         2,
         true
       );
       verifyAttainmentData(
-        res.body.data.subAttainments[0].subAttainments[0].subAttainments[0],
+        res.body.data.subAttainments[1].subAttainments[0].subAttainments[0],
         215,
         2,
         2,
         false
       );
-      verifyAttainmentData(res.body.data.subAttainments[1], 10, 2, 2, false);
+      verifyAttainmentData(res.body.data.subAttainments[0], 10, 2, 2, false);
 
     });
 

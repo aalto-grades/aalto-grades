@@ -5,6 +5,7 @@
 export interface AttainmentRequestData {
   parentId?: number,
   name: string,
+  tag: string,
   date: Date,
   expiryDate: Date,
   subAttainments: Array<AttainmentRequestData>

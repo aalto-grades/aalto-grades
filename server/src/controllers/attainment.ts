@@ -16,11 +16,7 @@ import { Formula } from '../types/formulas';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 
-import {
-  findAttainmentById,
-  generateAttainmentTag,
-  generateAttainmentTree
-} from './utils/attainment';
+import { findAttainmentById, generateAttainmentTree } from './utils/attainment';
 import { validateCourseAndInstance } from './utils/courseInstance';
 
 export async function addAttainment(req: Request, res: Response): Promise<void> {
@@ -29,6 +25,9 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       .number()
       .notRequired(),
     name: yup
+      .string()
+      .required(),
+    tag: yup
       .string()
       .required(),
     date: yup
@@ -49,6 +48,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
 
   const parentId: number | undefined = req.body.parentId;
   const name: string = req.body.name;
+  const tag: string = req.body.tag;
   const date: Date = req.body.date;
   const expiryDate: Date = req.body.expiryDate;
   const requestSubAttainments: Array<AttainmentRequestData> | undefined = req.body.subAttainments;
@@ -74,6 +74,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     attainmentId: parentId,
     courseInstanceId: courseInstance.id,
     name,
+    tag,
     date,
     expiryDate,
     formula: Formula.Manual,
@@ -91,6 +92,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
         courseId: course.id,
         courseInstanceId: courseInstance.id,
         name: attainment.name,
+        tag: attainment.tag,
         date: attainment.date,
         expiryDate: attainment.expiryDate,
         formula: Formula.Manual
@@ -105,12 +107,10 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
         courseId: dbEntry.courseId,
         courseInstanceId: dbEntry.courseInstanceId,
         name: dbEntry.name,
+        tag: dbEntry.tag,
         date: dbEntry.date,
         expiryDate: dbEntry.expiryDate,
         parentId: dbEntry.attainmentId,
-        tag: generateAttainmentTag(
-          dbEntry.id, dbEntry.courseId, dbEntry.courseInstanceId
-        ),
         subAttainments: subAttainments
       });
     }
@@ -129,12 +129,10 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
         courseId: attainment.courseId,
         courseInstanceId: attainment.courseInstanceId,
         name: attainment.name,
+        tag: attainment.tag,
         date: attainment.date,
         expiryDate: attainment.expiryDate,
         parentId: attainment.attainmentId,
-        tag: generateAttainmentTag(
-          attainment.id, attainment.courseId, attainment.courseInstanceId
-        ),
         subAttainments: subAttainments
       }
     }
@@ -172,6 +170,9 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     name: yup
       .string()
       .notRequired(),
+    tag: yup
+      .string()
+      .notRequired(),
     date: yup
       .date()
       .notRequired(),
@@ -186,6 +187,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
 
   const name: string | undefined = req.body.name;
+  const tag: string | undefined = req.body.tag;
   const date: Date | undefined = req.body.date;
   const expiryDate: Date | undefined = req.body.expiryDate;
   const parentId: number| undefined = req.body.parentId;
@@ -220,6 +222,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
 
   await attainment.set({
     name: name ?? attainment.name,
+    tag: tag ?? attainment.tag,
     date: date ?? attainment.date,
     expiryDate: expiryDate ?? attainment.expiryDate,
     attainmentId: parentId ?? attainment.attainmentId
@@ -233,12 +236,10 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
         courseId: attainment.courseId,
         courseInstanceId: attainment.courseInstanceId,
         name: attainment.name,
+        tag: attainment.tag,
         date: attainment.date,
         expiryDate: attainment.expiryDate,
-        parentId: attainment.attainmentId,
-        tag: generateAttainmentTag(
-          attainment.id, attainment.courseId, attainment.courseInstanceId
-        )
+        parentId: attainment.attainmentId
       }
     }
   });
@@ -259,7 +260,7 @@ export async function getAttainment(req: Request, res: Response): Promise<void> 
   await querySchema.validate(req.query, { abortEarly: false });
 
   // Assert string type, as the query is validated above
-  const tree: string = <string>req.query.tree;
+  const tree: string = req.query.tree as string;
 
   const attainments: Array<Attainment> = await Attainment.findAll({
     where: {
@@ -274,19 +275,22 @@ export async function getAttainment(req: Request, res: Response): Promise<void> 
       courseId: el.courseId,
       courseInstanceId: el.courseInstanceId,
       parentId: el.attainmentId ?? undefined,
-      tag: generateAttainmentTag(el.id, el.courseId, el.courseInstanceId),
       name: el.name,
+      tag: el.tag,
       date: el.date,
       expiryDate: el.expiryDate
     };
   });
 
   const attainment: AttainmentData | undefined = attainmentData.find(
-    (el: AttainmentData) => el.id === attainmentId);
+    (el: AttainmentData) => el.id === attainmentId
+  );
 
   if (!attainment) {
-    throw new ApiError(`Attainment with id ${attainmentId} was not found ` +
-      'for the specified course and instance', HttpCode.NotFound);
+    throw new ApiError(
+      `Attainment with id ${attainmentId} was not found ` +
+        'for the specified course and instance', HttpCode.NotFound
+    );
   }
 
   switch (tree) {
