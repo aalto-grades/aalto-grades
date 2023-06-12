@@ -308,18 +308,6 @@ router.put(
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
- *       409:
- *         description:
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *       422:
- *         description:
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
  */
 
 router.get(
@@ -352,18 +340,6 @@ router.get(
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       404:
- *         description:
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *       409:
- *         description:
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *       422:
  *         description:
  *         content:
  *           application/json:
