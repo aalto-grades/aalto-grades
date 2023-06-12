@@ -766,3 +766,58 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
       return;
     });
 }
+
+/**
+ * Get course instance final grading data in JSON format.
+ * @param {Request} req - The HTTP request.
+ * @param {Response} res - The HTTP response containing the CSV file.
+ * @returns {Promise<void>} - A Promise that resolves when the function has completed its execution.
+ * @throws {ApiError} - If course and/or course instance not found, instance does not belong to
+ * the course, or no course results found/calculated before calling the endpoint.
+*/
+export async function getFinalGrades(req: Request, res: Response): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
+    await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
+
+  const gradingResults: Array<GradingResultsWithUser> = await CourseResult.findAll({
+    attributes: ['id', 'grade', 'credits'],
+    where: {
+      courseInstanceId: courseInstance.id
+    },
+    include: {
+      model: User,
+      attributes: ['studentNumber']
+    }
+  }) as Array<GradingResultsWithUser>;
+
+  if (gradingResults.length === 0) {
+    throw new ApiError(
+      'no grades found, make sure grades have been calculated before requesting course results',
+      HttpCode.NotFound
+    );
+  }
+
+  const finalGrades: Array<{
+    id: number,
+    studentNumber: string,
+    grade: string,
+    credits: number
+  }> = gradingResults.map(
+    (courseResult: GradingResultsWithUser) => {
+      return {
+        id: courseResult.id,
+        studentNumber: courseResult.User.studentNumber,
+        grade: courseResult.grade,
+        credits: courseResult.credits
+      };
+    }
+  );
+
+  res.status(HttpCode.Ok).json({
+    success: true,
+    data: {
+      finalGrades
+    }
+  });
+}
