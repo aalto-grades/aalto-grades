@@ -98,6 +98,21 @@ const upload: Multer = multer({
  *               $ref: '#/definitions/Failure'
  *       401:
  *         $ref: '#/components/responses/AuthenticationError'
+ *       404:
+ *         description: >
+ *           The given course or course instance does not exist, or the course
+ *           instance has no attainments.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: >
+ *           The given course instance does not belong to the given course.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
  */
 router.get(
   '/v1/courses/:courseId/instances/:instanceId/grades/csv',

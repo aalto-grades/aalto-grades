@@ -23,4 +23,6 @@ INSERT INTO public.course_instance (course_id, sisu_course_instance_id, grading_
 (6, 'aalto-CUR-165488-3869805', 'PASS_FAIL', 'II', 'II', 'EXAM', 5, 5, '2023-02-28', '2023-02-28', NOW(), NOW()),
 (1, null, 'PASS_FAIL', 'I', 'II', 'LECTURE', 5, 5, '2022-05-05', '2022-12-09', NOW(), NOW()),
 (5, 'aalto-CUR-169788-3875405', 'NUMERICAL', 'III', 'IV', 'LECTURE', 5, 5, '2023-01-05', '2023-04-23', NOW(), NOW()),
-(1, null, 'PASS_FAIL', 'V', 'V', 'EXAM', 5, 5, '2023-06-03', '2023-06-03', NOW(), NOW());
+(1, null, 'PASS_FAIL', 'V', 'V', 'EXAM', 5, 5, '2023-06-03', '2023-06-03', NOW(), NOW()),
+(6, null, 'PASS_FAIL', 'V', 'V', 'EXAM', 5, 5, '2023-06-03', '2023-06-03', NOW(), NOW()),
+(6, null, 'PASS_FAIL', 'V', 'V', 'EXAM', 5, 5, '2023-06-03', '2023-06-03', NOW(), NOW());

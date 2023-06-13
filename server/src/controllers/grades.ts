@@ -37,6 +37,14 @@ export async function getCsvTemplate(req: Request, res: Response): Promise<void>
     }
   })).map((attainment: { tag: string }) => attainment.tag);
 
+  if (attainmentTags.length === 0) {
+    throw new ApiError(
+      `no attainments found for course instance with ID ${courseInstance.id}, `
+        + 'add attainments to the course instance to generate a template',
+      HttpCode.NotFound
+    );
+  }
+
   const template: Array<Array<string>> = [
     ['StudentNo', ...attainmentTags]
   ];

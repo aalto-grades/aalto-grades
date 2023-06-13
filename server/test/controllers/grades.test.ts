@@ -80,12 +80,35 @@ describe(
     });
 
     it('should get correct CSV template with attainments and no students', async () => {
-      // TODO
+      res = await request
+        .get('/v1/courses/6/instances/22/grades/csv')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+
+      expect(res.text).toBe(
+        'StudentNo,tag221,tag222,tag223\n'
+      );
+
+      expect(res.headers['content-disposition']).toBe(
+        'attachment; filename="course_MS-A0102_grading_template.csv"'
+      );
     });
 
-    it('should get correct CSV template with students and no attainments', async () => {
-      // TODO: Error?
-    });
+    it(
+      'should respond with 404 not found if the course instance has no attainments',
+      async () => {
+        res = await request
+          .get('/v1/courses/6/instances/23/grades/csv')
+          .set('Cookie', cookies.adminCookie);
+
+        checkErrorRes(
+          ['no attainments found for course instance with ID 23, '
+            + 'add attainments to the course instance to generate a template'],
+          HttpCode.NotFound
+        );
+      }
+    );
   }
 );
 
