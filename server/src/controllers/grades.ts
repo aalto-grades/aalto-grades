@@ -27,39 +27,63 @@ import { validateCourseAndInstance } from './utils/courseInstance';
 
 /**
  * Parse and extract attainment IDs from the CSV file header.
- * Correct format: "StudentNo,C3I9A1,C3I9A2,C3I9A3,C3I9A4,C3I9A5..."
+ * Correct format: "StudentNo,exam,exercise,project,..."
  * @param {Array<string>} header - Header part of the CSV file.
- * @returns {Array<number>} - Array containing the id's of attainments.
+ * @returns {Array<number>} - Array containing the IDs of attainments.
  * @throws {ApiError} - If first column not "StudentNo" (case-insensitive)
  * header array is empty or any of the attainment tags malformed or missing.
  */
-export function parseHeaderFromCsv(header: Array<string>): Array<number> {
-  const attainmentIds: Array<number> = [];
+export async function parseHeaderFromCsv(
+  header: Array<string>, courseInstanceId: number
+): Promise<Array<number>> {
   const errors: Array<string> = [];
 
   // Remove first input "StudentNo". Avoid using shift(), will have side-effects outside function.
-  const attainmentData: Array<string> = header.slice(1);
+  const attainmentTags: Array<string> = header.slice(1);
 
-  // Regex for checking type and extracting attainment id from the header column.
-  const attainmentTagRegex: RegExp = /(\d+)$/;
-
-  if (attainmentData.length === 0) {
+  if (attainmentTags.length === 0) {
     throw new ApiError(
       'No attainments found from the header, please upload valid CSV.',
       HttpCode.BadRequest
     );
   }
 
-  attainmentData.forEach((str: string) => {
-    const match: RegExpMatchArray | null = str.match(attainmentTagRegex);
-    if (match && match[1]) {
-      attainmentIds.push(parseInt(match[1], 10));
-    } else {
-      errors.push(
-        `Header attainment data parsing failed at column ${attainmentData.indexOf(str) + 2}.` +
-        ` Expected attainment id to type of number, received ${typeof str}.`
-      );
+  interface IdAndTag {
+    id: number,
+    tag: string
+  }
+
+  const attainments: Array<IdAndTag> = await Attainment.findAll({
+    attributes: ['id', 'tag'],
+    where: {
+      [Op.and]: [
+        {
+          courseInstanceId: courseInstanceId
+        },
+        {
+          tag: {
+            [Op.in]: attainmentTags
+          }
+        }
+      ]
     }
+  });
+
+  if (attainmentTags.length > attainments.length) {
+    for (const attainmentTag of attainmentTags) {
+      if (!attainments.find((attainment: IdAndTag) => attainment.tag === attainmentTag)) {
+        errors.push(
+          'Header attainment data parsing failed at column '
+            + `${attainmentTags.indexOf(attainmentTag) + 2}. `
+            + `Could not find an attainment with tag ${attainmentTag} in `
+            + `course instance with ID ${courseInstanceId}.`
+        );
+      }
+    }
+  }
+
+  const attainmentIds: Array<number> = attainments.map((attainment: IdAndTag) => {
+    return attainment.id
   });
 
   // If any column parsing fails, throw error with invalid column info.
@@ -92,7 +116,7 @@ export function parseGradesFromCsv(
    *
    *        | column 1  | column 2 | column 3 |
    *  --------------------------------------------
-   *  row 1:| StudentNo | C1I1A1   | C1I1A6   |
+   *  row 1:| StudentNo | exercise | exam     |
    *  row 2:| 812472    | 12       | 32       |
    *  row 3:| 545761    | 0        | 15       |
    *  ...
@@ -199,38 +223,12 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
         // Parse header and grades separately. Always first parse header before
         // parsing the grades as the grade parser needs the attainment id array.
-        const attainmentIds: Array<number> = parseHeaderFromCsv(header);
+        const attainmentIds: Array<number> = await parseHeaderFromCsv(
+          header, courseInstance.id
+        );
         let parsedStudentData: Array<StudentGrades> = parseGradesFromCsv(
           studentGradingData, attainmentIds
         );
-
-        // Fetch all attainments from db based on the id's extracted from the CSV.
-        const attainments: Array<Attainment> = await Attainment.findAll({
-          attributes: ['id'],
-          where: {
-            id: {
-              [Op.in]: attainmentIds
-            },
-            courseId: course.id,
-            courseInstanceId: courseInstance.id
-          }
-        });
-
-        // Check if any of the CSV attainment id's does not exist in the db, throw ApiError if so.
-        const foundIds: Array<number> = attainments.map((attainment: Attainment) => attainment.id);
-        const nonExistingIds: Array<number> = attainmentIds.filter(
-          (id: number) => !foundIds.includes(id)
-        );
-
-        if (nonExistingIds.length > 0) {
-          throw new ApiError(
-            'Attainments with following IDs do not exist or' +
-            ` belong to this course instance: ${nonExistingIds.join(', ')}.`,
-            HttpCode.UnprocessableEntity
-          );
-        }
-
-        // After this point all attainments are confirmed to exist and belong to the instance.
 
         // Check all users (students) exists in db, create new users if needed.
         const studentNumbers: Array<string> = parsedStudentData.map(
