@@ -54,7 +54,7 @@ export async function findAllAttainmentsForInstance(
       courseId: el.courseId,
       courseInstanceId: el.courseInstanceId,
       parentId: el.attainmentId ?? undefined,
-      tag: generateAttainmentTag(el.id, el.courseId, el.courseInstanceId),
+      tag: el.tag,
       name: el.name,
       date: el.date,
       expiryDate: el.expiryDate
@@ -62,21 +62,6 @@ export async function findAllAttainmentsForInstance(
   });
 
   return attainmentData;
-}
-
-/**
- * Create a tag for attainment based on its id's.
- * @param {number} attainmentId - The ID of the attainment.
- * @param {number} courseId - The ID of the course the attainment belongs to.
- * @param {number} courseInstanceId - The ID of the course instance the attainment belongs to.
- * @returns {string} - Generated tag.
- */
-export function generateAttainmentTag(
-  attainmentId: number,
-  courseId: number,
-  courseInstanceId: number
-): string {
-  return `C${courseId}I${courseInstanceId}A${attainmentId}`;
 }
 
 /**

@@ -211,6 +211,14 @@ export default {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
         },
+        name: {
+          type: DataTypes.STRING,
+          allowNull: false
+        },
+        tag: {
+          type: DataTypes.STRING,
+          allowNull: false
+        },
         formula: {
           type: DataTypes.ENUM('MANUAL', 'WEIGHTED_AVERAGE'),
           allowNull: false,
@@ -219,10 +227,6 @@ export default {
         parent_formula_params: {
           type: DataTypes.JSONB,
           allowNull: true,
-        },
-        name: {
-          type: DataTypes.STRING,
-          allowNull: false
         },
         date: {
           type: DataTypes.DATE,

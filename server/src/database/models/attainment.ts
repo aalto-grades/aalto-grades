@@ -21,6 +21,7 @@ export default class Attainment extends Model<
   // TODO rename to parentId, atm sequelize forces name as "model + key" when querying.
   declare attainmentId: CreationOptional<ForeignKey<Attainment['id']>>;
   declare name: string;
+  declare tag: string;
   declare formula: Formula;
   declare parentFormulaParams: CreationOptional<object>;
   declare date: Date; // Date when assignment is done (e.g., deadline or exam date)
@@ -60,6 +61,14 @@ Attainment.init(
         key: 'id'
       }
     },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    tag: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
     formula: {
       type: DataTypes.ENUM(Formula.Manual, Formula.WeightedAverage),
       allowNull: false,
@@ -68,10 +77,6 @@ Attainment.init(
     parentFormulaParams: {
       type: DataTypes.JSONB,
       allowNull: true,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false
     },
     date: {
       type: DataTypes.DATE,

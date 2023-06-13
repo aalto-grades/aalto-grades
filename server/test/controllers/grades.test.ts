@@ -683,3 +683,99 @@ describe(
     });
 
   });
+
+describe(
+  'Test GET /v1/courses/:courseId/instances/:instanceId/grades - get final grades in JSON', () => {
+
+    it('should get final grades succesfully when course results are found', async () => {
+      res = await request
+        .get('/v1/courses/1/instances/1/grades')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json');
+
+      checkSuccessRes(res);
+      expect(res.body.data.finalGrades).toEqual([
+        { id: 1, studentNumber: '117486', grade: 'Pass', credits: 5 },
+        { id: 2, studentNumber: '114732', grade: '5', credits: 5 },
+        { id: 3, studentNumber: '472886', grade: '3', credits: 5 },
+        { id: 4, studentNumber: '335462', grade: 'Pass', credits: 5 },
+        { id: 5, studentNumber: '874623', grade: '2', credits: 5 },
+        { id: 6, studentNumber: '345752', grade: 'Pass', credits: 5 },
+        { id: 7, studentNumber: '353418', grade: '4', credits: 5 },
+        { id: 8, studentNumber: '986957', grade: 'Fail', credits: 5 },
+        { id: 9, studentNumber: '611238', grade: '4', credits: 5 },
+        { id: 10, studentNumber: '691296', grade: '1', credits: 5 },
+        { id: 11, studentNumber: '271778', grade: 'Fail', credits: 5 },
+        { id: 12, studentNumber: '344644', grade: '1', credits: 5 },
+        { id: 13, studentNumber: '954954', grade: '5', credits: 5 }
+      ]);
+    });
+
+    it(
+      'should respond with 400 bad request, if course or instance ID not is valid', async () => {
+        res = await request
+          .get(`/v1/courses/${badInput}/instances/1/grades`)
+          .set('Cookie', cookies.adminCookie);
+
+        checkErrorRes([
+          'id must be a `number` type, but the final value was:' +
+          // eslint-disable-next-line no-useless-escape
+          ' `NaN` (cast from the value `\"notValid\"`).'], HttpCode.BadRequest);
+
+        res = await request
+          .get(`/v1/courses/1/instances/${badInput}/grades`)
+          .set('Cookie', cookies.adminCookie);
+
+        checkErrorRes([
+          'id must be a `number` type, but the final value was:' +
+            // eslint-disable-next-line no-useless-escape
+            ' `NaN` (cast from the value `\"notValid\"`).'], HttpCode.BadRequest);
+      });
+
+    it('should respond with 401 unauthorized, if not logged in', async () => {
+      await request.get('/v1/courses/1/instances/1/grades')
+        .expect(HttpCode.Unauthorized);
+    });
+
+    it('should respond with 404 not found, if grades have not been calculated yet', async () => {
+      res = await request
+        .get('/v1/courses/2/instances/2/grades')
+        .set('Cookie', cookies.adminCookie)
+        .expect(HttpCode.NotFound);
+
+      checkErrorRes(
+        [
+          'no grades found, make sure grades have been' +
+          ' calculated before requesting course results'
+        ],
+        HttpCode.NotFound);
+    });
+
+    it('should respond with 404 not found, if course does not exist', async () => {
+      res = await request
+        .get(`/v1/courses/${badId}/instances/1/grades`)
+        .set('Cookie', cookies.adminCookie);
+
+      checkErrorRes([`course with ID ${badId} not found`], HttpCode.NotFound);
+    });
+
+    it('should respond with 404 not found, if course instance does not exist', async () => {
+      res = await request
+        .get(`/v1/courses/1/instances/${badId}/grades`)
+        .set('Cookie', cookies.adminCookie);
+
+      checkErrorRes([`course instance with ID ${badId} not found`], HttpCode.NotFound);
+    });
+
+    it('should respond with 409 conflict, if instance does not belong to the course', async () => {
+      res = await request
+        .get('/v1/courses/1/instances/2/grades')
+        .set('Cookie', cookies.adminCookie);
+
+      checkErrorRes(
+        ['course instance with ID 2 does not belong to the course with ID 1'],
+        HttpCode.Conflict
+      );
+    });
+
+  });
