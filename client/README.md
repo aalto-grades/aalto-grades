@@ -4,9 +4,7 @@ SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
 SPDX-License-Identifier: MIT
 -->
 
-# Aalto Grades Frontend
-
-Make sure you have npm installed. You can check it with the command `npm -v`.
+# Aalto Grades frontend
 
 ## Running the Program
 

@@ -6,32 +6,34 @@ SPDX-License-Identifier: MIT
 
 # Aalto Grades
 
-Repo for Aalto Grades Program
+Repository for the Aalto Grades program.
+
+## Getting started
+
+The project uses [Node.js](https://nodejs.org/en/) as its runtime environment
+and npm to manage dependencies.
+
+Most major GNU/Linux and BSD distributions contain packages for Node.js and
+npm. You can find a list of some common distributions and their Node.js and npm
+packages at: https://nodejs.org/en/download/package-manager/
+
+Windows and macOS users can install Node.js from:
+https://nodejs.org/en/download/
+
+For more instructions, see `client/README.md` and `server/README.md`.
 
 ## Development build
 
-You can run the development build of the software by running `docker-compose --profile dev up` in the root folder of the project.
+You can run the development build of the whole Aalto Grades system, including
+the frontend, backend, and database, by running `docker-compose up` at the root
+of the project.
 
-This command has one requirement which is defining the environmental variable `POSTGRES_PASSWORD` before execution.
-
-Demo flow:
-```
-$ export POSTGRES_PASSWORD=XXXX
-$ docker-compose --profile dev up
-```
-
-If you want to run the build without starting the frontend container or adminer
+In order to run the program, you must define the `POSTGRES_PASSWORD`
+environment variable with a password of your choice.
 
 ```
 $ export POSTGRES_PASSWORD=XXXX
 $ docker-compose up
-```
-
-If you want to run the build without starting adminer, but with the frontend container
-
-```
-$ export POSTGRES_PASSWORD=XXXX
-$ docker-compose --profile prod up
 ```
 
 ## Development environment
@@ -45,9 +47,9 @@ for the first time):
 ```ssh
 # ~/.ssh/config
 Host kosh
-  User hannula7 # REPLACE
+  User myaaltousername # REPLACE
 Host grades
-  User hannula7 # REPLACE
+  User myaaltousername # REPLACE
 ```
 
 2. Log in using the provided configuration file (which uses your own SSH
@@ -60,10 +62,10 @@ $ ssh -F ssh.config grades
 3. Ensure that the Docker model is running:
 
 ```
-hannula7@aalto-grades$ cd /srv/aalto-grades
-hannula7@aalto-grades$ sudo docker-compose top
+@aalto-grades$ cd /srv/aalto-grades
+@aalto-grades$ sudo docker-compose top
 # if not running:
-hannula7@aalto-grades$ sudo docker-compose up
+@aalto-grades$ sudo docker-compose up
 ```
 
 4. Now, the dev environment services can be accessed from your local computer:

@@ -8,23 +8,11 @@ SPDX-License-Identifier: MIT
 
 ## Table of Contents
 
-- [Installing Node.js](#installing-nodejs)
 - [Running the server](#running-the-server)
   - [Development locally](#development-locally)
   - [Sisu API](#sisu-api)
 - [Migrations](#migrations)
 - [Seeds](#seeds)
-
-## Installing Node.js
-
-For Windows and macOS users, Node.js can be installed from:
-https://nodejs.org/en/download/
-
-For GNU/Linux users, your distribution likely contains packages for Node.js and
-npm. For example:
-
-Arch: `# pacman -S nodejs npm`  
-Debian: `# apt install nodejs npm`
 
 ## Running the server
 
@@ -54,7 +42,7 @@ See `.env.example` file for variable list, rename to `.env` before running serve
 
 ### Run with docker
 
-You can also run locally with docker-compose. Before running, 
+You can also run locally with docker-compose. Before running,
 set environment variable `POSTGRES_PASSWORD` and `NODE_ENV`, following:
 ```
 $ export POSTGRES_PASSWORD="postgres"
@@ -153,7 +141,8 @@ framework. Additionally, [supertest](https://www.npmjs.com/package/supertest)
 is used for testing API functionality.
 
 The easiest way to run unit tests is with the Docker Compose located at this
-directory. In order to run it, define a PostgreSQL password and node environment in the environment variable `POSTGRES_PASSWORD` and `NODE_ENV` as follows:
+directory. In order to run it, define a PostgreSQL password and node environment
+in the environment variable `POSTGRES_PASSWORD` and `NODE_ENV` as follows:
 ```
 $ export POSTGRES_PASSWORD="postgres"
 $ export NODE_ENV="test"
