@@ -217,4 +217,12 @@ INSERT INTO public.attainment (course_id, course_instance_id, attainment_id, nam
 (1, 10, 211, 'test assignment tree c:1 i:10, sub', 'tag212', '2023-05-08', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.75 }'),
 (1, 10, 211, 'test assignment tree c:1 i:10, sub', 'tag213', '2023-05-08', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.25 }'),
 (2, 2, 6, 'test assignment 2nd level child 1', 'tag214', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
-(2, 2, 214, 'test assignment 3rd level child 1', 'tag215', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL);
+(2, 2, 214, 'test assignment 3rd level child 1', 'tag215', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
+(6, 15, null, 'test csv template', 'tag216', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
+(6, 15, 216, 'test csv template', 'tag217', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
+(6, 15, 216, 'test csv template', 'tag218', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
+(6, 15, 217, 'test csv template', 'tag219', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
+(6, 15, 218, 'test csv template', 'tag220', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
+(6, 22, null, 'test csv template no students', 'tag221', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
+(6, 22, 221, 'test csv template no students', 'tag222', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
+(6, 22, 221, 'test csv template no students', 'tag223', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL);
