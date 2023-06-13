@@ -54,7 +54,7 @@ describe(
         .expect(HttpCode.Ok);
 
       expect(res.text).toBe(
-        'StudentNo,tag226,tag227,tag228,tag229,tag230\n949181\n482499\n928455\n'
+        'StudentNo,tag216,tag217,tag218,tag219,tag220\n949181\n482499\n928455\n'
           + '967943\n758134\n669632\n972741\n581345\n146776\n841628\n489575\n'
           + '233634\n792991\n272775\n989786\n848131\n414196\n768469\n135698\n'
           + '654446\n876383\n869596\n873688\n218613\n382863\n395254\n156582\n'
@@ -240,13 +240,17 @@ describe(
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
+        function errorMessage(column: number, tag: string, instanceId: number): string {
+          return `Header attainment data parsing failed at column ${column}. `
+            + `Could not find an attainment with tag ${tag} in `
+            + `course instance with ID ${instanceId}.`;
+        }
+
         const expectedErrors: Array<string> = [
-          'Header attainment data parsing failed at column 2.' +
-        ' Expected attainment id to type of number, received string.',
-          'Header attainment data parsing failed at column 4.' +
-        ' Expected attainment id to type of number, received string.',
-          'Header attainment data parsing failed at column 6.' +
-        ' Expected attainment id to type of number, received string.'
+          errorMessage(2, 'first-fake', 1),
+          errorMessage(3, 'tag2', 1),
+          errorMessage(4, 'second-fake;', 1),
+          errorMessage(6, 'third-fake', 1)
         ];
         checkErrorRes(expectedErrors, HttpCode.BadRequest);
       });
@@ -458,27 +462,6 @@ describe(
         checkErrorRes(
           ['User(s) with role "TEACHER" or "TEACHER_IN_CHARGE" found from the CSV.'],
           HttpCode.Conflict
-        );
-      });
-
-    it(
-      'should respond with 422 unprocessable entity, if attainment does not belong to the instance',
-      async () => {
-        const csvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mock-data/csv/grades_non_existing_attainments.csv'), 'utf8'
-        );
-        res = await request
-          .post('/v1/courses/1/instances/1/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'text/csv' })
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json');
-
-        checkErrorRes(
-          [
-            'Attainments with following IDs do not exist' +
-            ' or belong to this course instance: 666, 999.'
-          ],
-          HttpCode.UnprocessableEntity
         );
       });
 
