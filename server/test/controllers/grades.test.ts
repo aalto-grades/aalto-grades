@@ -194,17 +194,13 @@ describe(
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
-        function errorMessage(column: number, tag: string, instanceId: number): string {
-          return `Header attainment data parsing failed at column ${column}. `
-            + `Could not find an attainment with tag ${tag} in `
-            + `course instance with ID ${instanceId}.`
-        }
-
         const expectedErrors: Array<string> = [
-          errorMessage(2, 'first-fake', 1),
-          errorMessage(3, 'tag2', 1),
-          errorMessage(4, 'second-fake;', 1),
-          errorMessage(6, 'third-fake', 1)
+          'Header attainment data parsing failed at column 2.' +
+        ' Expected attainment id to type of number, received string.',
+          'Header attainment data parsing failed at column 4.' +
+        ' Expected attainment id to type of number, received string.',
+          'Header attainment data parsing failed at column 6.' +
+        ' Expected attainment id to type of number, received string.'
         ];
         checkErrorRes(expectedErrors, HttpCode.BadRequest);
       });
@@ -416,6 +412,27 @@ describe(
         checkErrorRes(
           ['User(s) with role "TEACHER" or "TEACHER_IN_CHARGE" found from the CSV.'],
           HttpCode.Conflict
+        );
+      });
+
+    it(
+      'should respond with 422 unprocessable entity, if attainment does not belong to the instance',
+      async () => {
+        const csvData: fs.ReadStream = fs.createReadStream(
+          path.resolve(__dirname, '../mock-data/csv/grades_non_existing_attainments.csv'), 'utf8'
+        );
+        res = await request
+          .post('/v1/courses/1/instances/1/grades/csv')
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json');
+
+        checkErrorRes(
+          [
+            'Attainments with following IDs do not exist' +
+            ' or belong to this course instance: 666, 999.'
+          ],
+          HttpCode.UnprocessableEntity
         );
       });
 
