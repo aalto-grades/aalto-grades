@@ -83,7 +83,7 @@ export async function parseHeaderFromCsv(
   }
 
   const attainmentIds: Array<number> = attainments.map((attainment: IdAndTag) => {
-    return attainment.id
+    return attainment.id;
   });
 
   // If any column parsing fails, throw error with invalid column info.
@@ -187,6 +187,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
    */
 
   // Validation path parameters.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
     await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
 

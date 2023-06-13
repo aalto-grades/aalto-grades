@@ -197,7 +197,7 @@ describe(
         function errorMessage(column: number, tag: string, instanceId: number): string {
           return `Header attainment data parsing failed at column ${column}. `
             + `Could not find an attainment with tag ${tag} in `
-            + `course instance with ID ${instanceId}.`
+            + `course instance with ID ${instanceId}.`;
         }
 
         const expectedErrors: Array<string> = [
