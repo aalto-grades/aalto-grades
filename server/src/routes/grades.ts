@@ -8,7 +8,7 @@ import passport from 'passport';
 import path from 'path';
 
 import {
-  addGrades, calculateGrades, getFinalGrades, getSisuFormattedGradingCSV
+  addGrades, calculateGrades, getCsvTemplate, getFinalGrades, getSisuFormattedGradingCSV
 } from '../controllers/grades';
 import { controllerDispatcher } from '../middleware/errorHandler';
 import { ApiError } from '../types/error';
@@ -64,6 +64,46 @@ const upload: Multer = multer({
  *         minimum: 0
  *         example: 5
  */
+
+/**
+ * @swagger
+ * /v1/courses/{courseId}/instances/{instanceId}/grades/csv:
+ *   get:
+ *     tags: [Grades]
+ *     description: >
+ *       Returns a template CSV file for a particular course instance for
+ *       uploading grades.
+ *     parameters:
+ *       - $ref: '#/components/parameters/courseId'
+ *       - $ref: '#/components/parameters/instanceId'
+ *     responses:
+ *       200:
+ *         description: Template generated succesfully.
+ *         content:
+ *           text/csv:
+ *             description: CSV template for uploading grades.
+ *             schema:
+ *               type: string
+ *             example: |
+ *               StudentNo,exam,exercises,project
+ *               352772
+ *               812472
+ *               545761
+ *               662292
+ *       400:
+ *         description: Fetching failed, due to validation errors in parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
+ */
+router.get(
+  '/v1/courses/:courseId/instances/:instanceId/grades/csv',
+  passport.authenticate('jwt', { session: false }),
+  controllerDispatcher(getCsvTemplate)
+);
 
 /**
  * @swagger

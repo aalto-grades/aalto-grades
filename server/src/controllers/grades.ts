@@ -25,6 +25,54 @@ import { UserAttainmentGradeData, StudentGrades, GradingResultsWithUser } from '
 import { HttpCode } from '../types/httpCode';
 import { validateCourseAndInstance } from './utils/courseInstance';
 
+export async function getCsvTemplate(req: Request, res: Response): Promise<void> {
+  const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
+    await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
+
+  const attainmentTags: Array<string> = (await Attainment.findAll({
+    attributes: ['tag'],
+    where: {
+      courseId: course.id,
+      courseInstanceId: courseInstance.id
+    }
+  })).map((attainment: { tag: string }) => attainment.tag);
+
+  const template: Array<Array<string>> = [
+    ['StudentNo', ...attainmentTags]
+  ];
+
+  const students: Array<{ studentNumber: string }> = await User.findAll({
+    attributes: ['studentNumber'],
+    include: {
+      model: CourseInstance,
+      attributes: [],
+      where: {
+        id: courseInstance.id,
+        '$CourseInstances->CourseInstanceRole.role$': CourseInstanceRoleType.Student
+      }
+    }
+  });
+
+  for (const student of students) {
+    template.push([student.studentNumber]);
+  }
+
+  stringify(
+    template,
+    {
+      delimiter: ','
+    },
+    (_err: unknown, data: string) => {
+      res
+        .status(HttpCode.Ok)
+        .setHeader('Content-Type', 'text/csv')
+        .attachment(`course_${course.courseCode}_grading_template.csv`)
+        .send(data);
+      return;
+    }
+  );
+}
+
 /**
  * Parse and extract attainment IDs from the CSV file header.
  * Correct format: "StudentNo,C3I9A1,C3I9A2,C3I9A3,C3I9A4,C3I9A5..."

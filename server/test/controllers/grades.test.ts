@@ -44,6 +44,52 @@ function checkSuccessRes(res: supertest.Response): void {
 }
 
 describe(
+  'Test GET /v1/courses/:courseId/instance/:instanceId/grades/csv - get grading CSV template',
+  () => {
+    it('should get correct CSV template with attainments and students', async () => {
+      res = await request
+        .get('/v1/courses/6/instances/15/grades/csv')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+
+      expect(res.text).toBe(
+        'StudentNo,tag226,tag227,tag228,tag229,tag230\n949181\n482499\n928455\n'
+          + '967943\n758134\n669632\n972741\n581345\n146776\n841628\n489575\n'
+          + '233634\n792991\n272775\n989786\n848131\n414196\n768469\n135698\n'
+          + '654446\n876383\n869596\n873688\n218613\n382863\n395254\n156582\n'
+          + '153965\n298593\n823351\n543974\n257456\n327634\n412821\n392124\n'
+          + '812362\n861871\n836789\n812536\n115692\n859475\n365471\n952346\n'
+          + '731177\n387822\n483962\n647769\n712925\n948346\n133993\n681869\n'
+          + '117313\n713371\n818764\n317532\n385351\n186126\n519242\n536588\n'
+          + '289563\n578931\n512972\n877485\n673513\n611453\n699727\n399482\n'
+          + '436666\n187433\n861319\n258347\n524823\n354773\n869149\n674834\n'
+          + '883356\n665637\n393391\n794738\n352731\n326834\n939318\n621823\n'
+          + '914239\n655213\n112293\n174777\n851683\n398362\n968298\n864639\n'
+          + '787375\n332761\n991474\n179892\n935676\n935881\n618951\n783616\n'
+          + '479434\n894162\n429213\n699121\n724447\n648857\n689995\n654799\n'
+          + '548649\n679949\n511163\n431272\n533544\n341544\n657956\n415513\n'
+          + '591948\n472965\n866641\n898626\n563574\n482446\n583676\n886993\n'
+          + '211572\n755449\n295741\n777493\n797459\n633789\n358639\n927369\n'
+          + '333414\n674485\n'
+      );
+
+      expect(res.headers['content-disposition']).toBe(
+        'attachment; filename="course_MS-A0102_grading_template.csv"'
+      );
+    });
+
+    it('should get correct CSV template with attainments and no students', async () => {
+      // TODO
+    });
+
+    it('should get correct CSV template with students and no attainments', async () => {
+      // TODO: Error?
+    });
+  }
+);
+
+describe(
   'Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv - import grading data from CSV',
   () => {
 
@@ -436,7 +482,8 @@ describe(
         );
       });
 
-  });
+  }
+);
 
 describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate', () => {
 
