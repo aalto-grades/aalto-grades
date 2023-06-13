@@ -20,8 +20,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import sortingServices from '../../services/sorting';
 
-const CourseResultsTable = ({ attainments, students, calculateFinalGrades, updateGrades }) => {
-
+const CourseResultsTable = ({ students, calculateFinalGrades, updateGrades }) => {
   const [order, setOrder] = useState<any>('asc');
   const [orderBy, setOrderBy] = useState<any>('studentNumber');
   const [page, setPage] = useState<any>(0);
@@ -77,7 +76,6 @@ const CourseResultsTable = ({ attainments, students, calculateFinalGrades, updat
               order={order}
               orderBy={orderBy}
               onRequestSort={handleRequestSort}
-              attainments = {attainments}
             />
             <TableBody>
               { sortingServices.stableSort(studentsToShow,
@@ -100,21 +98,20 @@ const CourseResultsTable = ({ attainments, students, calculateFinalGrades, updat
                       >
                         {student.studentNumber}
                       </TableCell>
-                      {attainments.map((attainment) => {
-                        return (
-                          <TableCell
-                            sx={{ width: '100px' }}
-                            align="left"
-                            key={`${student.studentNumber}_${attainment.id}`}>
-                            {student[attainment.id]}
-                          </TableCell>
-                        );
-                      })}
+                      <TableCell
+                        sx={{ width: '100px' }}
+                        component="th"
+                        id={student.credits}
+                        scope="row"
+                        padding="normal"
+                      >
+                        {student.credits}
+                      </TableCell>
                       <TableCell
                         sx={{ width: '100px' }}
                         align="left"
-                        key={`${student.studentNumber}_finalGrade`}>
-                        {student.finalGrade}
+                        key={`${student.studentNumber}_grade`}>
+                        {student.grade}
                       </TableCell>
                     </TableRow>
                   );
@@ -162,7 +159,6 @@ const CourseResultsTable = ({ attainments, students, calculateFinalGrades, updat
 };
 
 CourseResultsTable.propTypes = {
-  attainments: PropTypes.array,
   students: PropTypes.array,
   calculateFinalGrades: PropTypes.func,
   updateGrades: PropTypes.func

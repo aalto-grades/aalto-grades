@@ -7,26 +7,18 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import CourseResultsTable from './course-results-view/CourseResultsTable';
 import AlertSnackbar from './alerts/AlertSnackbar';
-import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
-import mockStudentGradesFinal from '../mock-data/mockStudentGradesFinal';
+import gradesService from '../services/grades';
+import { useParams } from 'react-router-dom';
+
 
 const CourseResultsView = () => {
 
-  const [attainments, setAttainments] = useState([]);
   const [students, setStudents] = useState([]);
-  // TODO: get instance ID from props
+  const { courseId, instanceId } = useParams();
 
   const [snackPack, setSnackPack] = useState([]);
   const [alertOpen, setAlertOpen] = useState(false);
   const [messageInfo, setMessageInfo] = useState(undefined);
-
-
-  useEffect(() => {
-    // TODO: get attainments from backend
-    setAttainments(mockAttainmentsClient);
-    // TODO: get student grades from backend
-    // modify the grades to fit the row structure
-  }, []);
 
   // useEffect in charge of handling the back-to-back alerts
   // makes the previous disappear before showing the new one
@@ -40,36 +32,36 @@ const CourseResultsView = () => {
     }
   }, [snackPack, messageInfo, alertOpen]);
 
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
   // Triggers the calculation of final grades
   const calculateFinalGrades = async () => {
-    setSnackPack((prev) => [...prev,
-      { msg: 'Calculating final grades...', severity: 'info' }
-    ]);
-    await sleep(3000);
-    // Throw error if no grades have been added
-    if (students.length === 0) {
+    try {
       setSnackPack((prev) => [...prev,
-        { msg: 'Import student grades before calculating the final grade.', severity: 'error' }
+        { msg: 'Calculating final grades...', severity: 'info' }
       ]);
-    } else {
-      try {
-        // TODO: connect to backend
+      await sleep(2000);
+      const success = await gradesService.calculateFinalGrades(courseId, instanceId);
+
+      if (success) {
         setSnackPack((prev) => [...prev,
           { msg: 'Final grades calculated successfully.', severity: 'success' }
         ]);
-        setStudents(mockStudentGradesFinal);
+        await sleep(2000);
 
-      } catch (exception) {
-        console.log(exception);
         setSnackPack((prev) => [...prev,
-          { msg: 'Calculating the final grades failed.', severity: 'error' }
+          { msg: 'Fething final grades...', severity: 'info' }
         ]);
+        const data = await gradesService.getFinalGrades(courseId, instanceId);
+        setStudents(data.finalGrades);
+        setAlertOpen(false);
       }
+    } catch (exception) {
+      console.log(exception);
+      setSnackPack((prev) => [...prev,
+        { msg: 'Import student grades before calculating the final grade.', severity: 'error' }
+      ]);
     }
-    await sleep(4000);
-    setAlertOpen(false);
   };
 
   const updateGrades = async (newGrades) => {
@@ -101,15 +93,12 @@ const CourseResultsView = () => {
         Course Results
       </Typography>
       <CourseResultsTable
-        attainments={attainments}
         students={students}
         calculateFinalGrades={calculateFinalGrades}
         updateGrades={updateGrades}
       />
     </Box>
-
   );
-
 };
 
 export default CourseResultsView;
