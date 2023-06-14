@@ -16,7 +16,6 @@ import Button from '@mui/material/Button';
 import FormHelperText from '@mui/material/FormHelperText';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import gradesService from '../../services/grades';
-import mockStudentGrades from '../../mock-data/mockStudentGrades';
 import FileErrorDialog from './FileErrorDialog';
 import { Message } from '../../types/general';
 
@@ -41,7 +40,7 @@ const loadingMsg: Message = {
 };
 
 const successMsg: Message = {
-  msg: 'File processed successfully, grades imported.',
+  msg: 'File processed successfully, grades imported. To refresh final grades, press "calculate final grades"',
   severity: 'success'
 };
 
@@ -51,10 +50,10 @@ const errorMsg: Message = {
 };
 
 // How many errors are initially rendered visible in the dialog.
-export const maxErrorsToShow = 5;
+export const maxErrorsToShow: number = 5;
 
-const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades }) => {
-  const { courseId }: any = useParams();
+const FileLoadDialog = ({ instanceId, handleClose, open }) => {
+  const { courseId } = useParams();
   const fileInput = createRef<any>();
 
   // state variables handling the alert messages
@@ -87,15 +86,7 @@ const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades })
     setSnackPack((prev) => [...prev, loadingMsg]);
     try {
       await gradesService.importCsv(courseId, instanceId, fileInput.current.files[0]);
-
       setSnackPack((prev) => [...prev, successMsg]);
-
-      if (returnImportedGrades) {
-        // TODO: replace mock grades with response from backend
-        // or fetch updated grades from backend
-        returnImportedGrades(mockStudentGrades);
-      }
-
       handleClose();
       setFileName(null);
     } catch (err) {

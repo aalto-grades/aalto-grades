@@ -5,14 +5,14 @@
 import axios from './axios';
 import { CourseInstanceData } from 'aalto-grades-common/types/course';
 
-async function getInstances(courseId: number): Promise<{
+async function getInstances(courseId: number | string): Promise<{
   courseInstances: Array<CourseInstanceData>
 }> {
   const response = await axios.get(`/v1/courses/${courseId}/instances`);
   return response.data.data;
 }
 
-async function createInstance(courseId: number, instance: object) {
+async function createInstance(courseId: number | string, instance: object) {
   const response = await axios.post(`/v1/courses/${courseId}/instances`, instance);
   return response.data.data;
 }
@@ -33,7 +33,7 @@ async function getSisuInstance(sisuInstanceId: string): Promise<{
   return response.data.data;
 }
 
-async function getAttainments(instanceId: number): Promise<any> {
+async function getAttainments(instanceId: number | string): Promise<any> {
   const response = await axios.get('/v1/??' + instanceId);
   console.log(response.data);
   return response.data;

@@ -2,30 +2,36 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState, useEffect }from 'react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import CourseResultsTable from './course-results-view/CourseResultsTable';
 import AlertSnackbar from './alerts/AlertSnackbar';
-import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
-import mockStudentGradesFinal from '../mock-data/mockStudentGradesFinal';
+import gradesService from '../services/grades';
 
-const CourseResultsView = () => {
+const CourseResultsView = (): JSX.Element => {
+  const { courseId, instanceId } = useParams();
 
-  const [attainments, setAttainments] = useState([]);
   const [students, setStudents] = useState([]);
-  // TODO: get instance ID from props
-
   const [snackPack, setSnackPack] = useState([]);
   const [alertOpen, setAlertOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [messageInfo, setMessageInfo] = useState(undefined);
 
-
   useEffect(() => {
-    // TODO: get attainments from backend
-    setAttainments(mockAttainmentsClient);
-    // TODO: get student grades from backend
-    // modify the grades to fit the row structure
+    setLoading(true);
+    gradesService.getFinalGrades(courseId, instanceId).then(data => {
+      setStudents(data.finalGrades);
+    }).catch(exception => {
+      console.log(exception);
+      setSnackPack((prev) => [...prev,
+        { msg: 'Fetching final grades failed, make sure grades are imported and calculated.', severity: 'error' }
+      ]);
+    }).finally(() => {
+      setLoading(false);
+      setAlertOpen(false);
+    });
   }, []);
 
   // useEffect in charge of handling the back-to-back alerts
@@ -40,47 +46,59 @@ const CourseResultsView = () => {
     }
   }, [snackPack, messageInfo, alertOpen]);
 
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  function sleep(ms: number): Promise<any> {
+    return new Promise(r => setTimeout(r, ms));
+  }
 
   // Triggers the calculation of final grades
-  const calculateFinalGrades = async () => {
-    setSnackPack((prev) => [...prev,
-      { msg: 'Calculating final grades...', severity: 'info' }
-    ]);
-    await sleep(3000);
-    // Throw error if no grades have been added
-    if (students.length === 0) {
+  async function calculateFinalGrades(): Promise<void> {
+    try {
       setSnackPack((prev) => [...prev,
-        { msg: 'Import student grades before calculating the final grade.', severity: 'error' }
+        { msg: 'Calculating final grades...', severity: 'info' }
       ]);
-    } else {
-      try {
-        // TODO: connect to backend
+      await sleep(2000);
+      const success = await gradesService.calculateFinalGrades(courseId, instanceId);
+
+      if (success) {
         setSnackPack((prev) => [...prev,
           { msg: 'Final grades calculated successfully.', severity: 'success' }
         ]);
-        setStudents(mockStudentGradesFinal);
+        await sleep(2000);
 
-      } catch (exception) {
-        console.log(exception);
+        setLoading(true);
         setSnackPack((prev) => [...prev,
-          { msg: 'Calculating the final grades failed.', severity: 'error' }
+          { msg: 'Fetching final grades...', severity: 'info' }
         ]);
+        const data = await gradesService.getFinalGrades(courseId, instanceId);
+        setStudents(data.finalGrades);
       }
+    } catch (exception) {
+      console.log(exception);
+      setSnackPack((prev) => [...prev,
+        { msg: 'Import student grades before calculating the final grade.', severity: 'error' }
+      ]);
+    } finally {
+      setLoading(false);
     }
-    await sleep(4000);
-    setAlertOpen(false);
-  };
+  }
 
-  const updateGrades = async (newGrades) => {
-    setSnackPack((prev) => [...prev,
-      { msg: 'Importing grades...', severity: 'info' }
+  async function updateGrades(newGrades): Promise<void> {
+    setSnackPack((prev) => [
+      ...prev,
+      {
+        msg: 'Importing grades...',
+        severity: 'info'
+      }
     ]);
-    await sleep(3000);
+    await sleep(2000);
     try {
       // TODO: connect to backend
-      setSnackPack((prev) => [...prev,
-        { msg: 'Grades imported successfully.', severity: 'success' }
+      setSnackPack((prev) => [
+        ...prev,
+        {
+          msg: 'Grades imported successfully.',
+          severity: 'success'
+        }
       ]);
       setStudents(newGrades);
       await sleep(3000);
@@ -88,28 +106,74 @@ const CourseResultsView = () => {
 
     } catch (exception) {
       console.log(exception);
-      setSnackPack((prev) => [...prev,
-        { msg: 'Grade import failed.', severity: 'error' }
+      setSnackPack((prev) => [
+        ...prev,
+        {
+          msg: 'Grade import failed.',
+          severity: 'error'
+        }
       ]);
     }
-  };
+  }
+
+  async function downloadCsvTemplate(): Promise<void> {
+    setSnackPack((prev) => [
+      ...prev,
+      {
+        msg: 'Downloading CSV template',
+        severity: 'info'
+      }
+    ]);
+
+    try {
+      const res = await gradesService.downloadCsvTemplate(courseId, instanceId);
+
+      const blob = new Blob([res.data], { type: 'text/csv' });
+
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'template.csv'; // TODO: Get filename from Content-Disposition
+      link.click();
+
+      setSnackPack((prev) => [
+        ...prev,
+        {
+          msg: 'CSV template downloaded successfully.',
+          severity: 'success'
+        }
+      ]);
+    } catch (e) {
+      console.log(e);
+      setSnackPack((prev) => [
+        ...prev,
+        {
+          msg: 'Downloading CSV template failed. Make sure there are attainments in the instance.',
+          severity: 'error'
+        }
+      ]);
+    } finally {
+      setAlertOpen(false);
+    }
+  }
 
   return (
     <Box textAlign='left' alignItems='left'>
-      <AlertSnackbar messageInfo={messageInfo} setMessageInfo={setMessageInfo} open={alertOpen} setOpen={setAlertOpen} />
+      <AlertSnackbar
+        messageInfo={messageInfo} setMessageInfo={setMessageInfo}
+        open={alertOpen} setOpen={setAlertOpen}
+      />
       <Typography variant="h1" sx={{ flexGrow: 1, mt: 8, mb: 4 }}>
         Course Results
       </Typography>
       <CourseResultsTable
-        attainments={attainments}
         students={students}
+        loading={loading}
         calculateFinalGrades={calculateFinalGrades}
         updateGrades={updateGrades}
+        downloadCsvTemplate={downloadCsvTemplate}
       />
     </Box>
-
   );
-
 };
 
 export default CourseResultsView;
