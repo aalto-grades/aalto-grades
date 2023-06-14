@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import { MemoryRouter, Routes, Route, Outlet } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { act, render, screen, waitFor, cleanup } from '@testing-library/react';
@@ -54,7 +53,7 @@ describe('Test InstanceSummaryView components when no attainments and successful
   const renderInstanceSummaryView = () => {
 
     const mockResponseInstanceCreation = { courseInstance: { id: 22 } };
-    instancesService.createInstance.mockResolvedValue(mockResponseInstanceCreation);
+    (instancesService.createInstance as jest.Mock).mockResolvedValue(mockResponseInstanceCreation);
 
     attainmentServices.addAttainment.mockResolvedValue({ success: true, data: {} });
 
@@ -115,7 +114,7 @@ describe('Test InstanceSummaryView components when some attainments and successf
   const renderInstanceSummaryView = () => {
 
     const mockResponseInstanceCreation = { courseInstance: { id: 22 } };
-    instancesService.createInstance.mockResolvedValue(mockResponseInstanceCreation);
+    (instancesService.createInstance as jest.Mock).mockResolvedValue(mockResponseInstanceCreation);
 
     attainmentServices.addAttainment.mockResolvedValue({ success: true, data: {} });
 
@@ -148,7 +147,7 @@ describe('Test InstanceSummaryView components when some attainments and successf
   const renderInstanceSummaryView = () => {
 
     const mockResponseInstanceCreation = { courseInstance: { id: 22 } };
-    instancesService.createInstance.mockResolvedValue(mockResponseInstanceCreation);
+    (instancesService.createInstance as jest.Mock).mockResolvedValue(mockResponseInstanceCreation);
 
     attainmentServices.addAttainment.mockRejectedValue({});
 
@@ -185,7 +184,7 @@ describe('Test InstanceSummaryView components when some attainments and error in
 
   const renderInstanceSummaryView = () => {
 
-    instancesService.createInstance.mockRejectedValue(new Error('Internal server error'));
+    (instancesService.createInstance as jest.Mock).mockRejectedValue(new Error('Internal server error'));
 
     return render(
       <MemoryRouter initialEntries={['/A-12345/instance-summary/aalto-CUR-168938-2370795']}>

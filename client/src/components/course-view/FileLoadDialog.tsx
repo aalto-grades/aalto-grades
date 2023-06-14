@@ -54,7 +54,7 @@ const errorMsg: Message = {
 export const maxErrorsToShow = 5;
 
 const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades }) => {
-  const { courseId } = useParams();
+  const { courseId }: any = useParams();
   const fileInput = createRef<any>();
 
   // state variables handling the alert messages
@@ -206,8 +206,17 @@ const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades })
           </Button>
         </DialogActions>
       </Dialog>
-      <AlertSnackbar messageInfo={messageInfo} setMessageInfo={setMessageInfo} open={alertOpen} setOpen={setAlertOpen} />
-      <FileErrorDialog handleClose={toggleErrorDialog} open={showErrorDialog} errors={fileErrors} />
+      <AlertSnackbar
+        messageInfo={messageInfo}
+        setMessageInfo={setMessageInfo}
+        open={alertOpen}
+        setOpen={setAlertOpen}
+      />
+      <FileErrorDialog
+        handleClose={toggleErrorDialog}
+        open={showErrorDialog}
+        errors={fileErrors}
+      />
     </>
   );
 };

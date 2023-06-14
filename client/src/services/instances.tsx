@@ -5,7 +5,9 @@
 import axios from './axios';
 import { CourseInstanceData } from 'aalto-grades-common/types/course';
 
-async function getInstances(courseId: number): Promise<Array<CourseInstanceData>> {
+async function getInstances(courseId: number): Promise<{
+  courseInstances: Array<CourseInstanceData>
+}> {
   const response = await axios.get(`/v1/courses/${courseId}/instances`);
   return response.data.data;
 }
@@ -15,10 +17,10 @@ async function createInstance(courseId: number, instance: object) {
   return response.data.data;
 }
 
-async function getSisuInstances(courseId: number): Promise<{
+async function getSisuInstances(courseCode: string): Promise<{
   courseInstances: Array<CourseInstanceData>
 }> {
-  const response = await axios.get('/v1/sisu/courses/' + courseId);
+  const response = await axios.get('/v1/sisu/courses/' + courseCode);
   console.log(response.data);
   return response.data.data;
 }
@@ -31,7 +33,7 @@ async function getSisuInstance(sisuInstanceId: string): Promise<{
   return response.data.data;
 }
 
-async function getAttainments(instanceId: number): Promise<unknown> {
+async function getAttainments(instanceId: number): Promise<any> {
   const response = await axios.get('/v1/??' + instanceId);
   console.log(response.data);
   return response.data;

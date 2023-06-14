@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
@@ -22,8 +21,8 @@ describe('Tests for SelectFormulaView components', () => {
 
   const renderSelectFormulaView = async () => {
 
-    instancesService.getAttainments.mockRejectedValue('Network error');
-    instancesService.getAttainments.mockResolvedValue(mockAttainments);
+    (instancesService.getAttainments as jest.Mock).mockRejectedValue('Network error');
+    (instancesService.getAttainments as jest.Mock).mockResolvedValue(mockAttainments);
     formulasService.getFormulas.mockRejectedValue('Network error');
     formulasService.getFormulas.mockResolvedValue(mockFormulas);
     return render(

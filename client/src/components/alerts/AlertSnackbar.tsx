@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
+import React, { SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
 import Snackbar from '@mui/material/Snackbar';
 import Slide from '@mui/material/Slide';
@@ -27,12 +27,12 @@ const AlertSnackbar = ({ messageInfo, setMessageInfo, open, setOpen, position }:
   setMessageInfo: (messageInfo: Message | undefined) => void,
   open: boolean,
   setOpen: (open: boolean) => void,
-  position: number
+  position?: number
 }) => {
 
   const margin = position ? (position - 1) * 7 : 0;
 
-  function handleClose(event: React.SyntheticEvent, reason: string) {
+  function handleClose(event: SyntheticEvent, reason: string) {
     if (reason === 'clickaway') {
       return;
     }

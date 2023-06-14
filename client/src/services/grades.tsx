@@ -3,11 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 import axios from './axios';
-import { ApiResponse } from '../types/general';
 
 async function exportSisuCsv(
   courseId: number, instanceId: number, params
-): Promise<ApiResponse<object>> {
+): Promise<BlobPart> {
   const response = await axios.get(
     `/v1/courses/${courseId}/instances/${instanceId}/grades/csv/sisu`,
     {

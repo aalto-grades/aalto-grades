@@ -43,7 +43,7 @@ const errorMsgAttainments: Message = {
 
 const InstanceSummaryView = () => {
   const navigate = useNavigate();
-  const { courseId, sisuInstanceId } = useParams();
+  const { courseId, sisuInstanceId }: any = useParams();
 
   const {
     addedAttainments,

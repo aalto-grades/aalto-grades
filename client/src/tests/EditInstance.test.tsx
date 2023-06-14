@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
@@ -20,8 +19,8 @@ describe('Tests for EditInstanceView components', () => {
 
     const mockResponse = { courseInstance: mockSisuInstances[0] };
 
-    instancesService.getSisuInstance.mockRejectedValue('Network error');
-    instancesService.getSisuInstance.mockResolvedValue(mockResponse);
+    (instancesService.getSisuInstance as jest.Mock).mockRejectedValue('Network error');
+    (instancesService.getSisuInstance as jest.Mock).mockResolvedValue(mockResponse);
 
     return render(
       <MemoryRouter initialEntries={['/A-12345/edit-instance/test']}>

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Dialog from '@mui/material/Dialog';
@@ -83,12 +83,12 @@ const languageOptions = [
 ];
 
 const SisuExportDialog = ({ open, handleClose }) => {
-  const { courseId, instanceId } = useParams();
+  const { courseId, instanceId }: any = useParams();
 
   // state variables handling the alert messages.
   const [snackPack, setSnackPack] = useState<any>([]);
-  const [alertOpen, setAlertOpen] = useState<any>(false);
-  const [messageInfo, setMessageInfo] = useState<any>(undefined);
+  const [alertOpen, setAlertOpen] = useState<boolean>(false);
+  const [messageInfo, setMessageInfo] = useState<Message | undefined>(undefined);
 
   // state variables handling the assessment date and completion language.
   const [assessmentDate, setAssessmentDate] = useState<any>(null);
@@ -117,7 +117,9 @@ const SisuExportDialog = ({ open, handleClose }) => {
       if (assessmentDate) {
         params.assessmentDate = assessmentDate;
       }
-      const data = await gradesService.exportSisuCsv(courseId, instanceId, params);
+      const data: BlobPart = await gradesService.exportSisuCsv(
+        courseId, instanceId, params
+      );
 
       // Create a blob object from the response data
       const blob = new Blob([data], { type: 'text/csv' });
@@ -204,7 +206,12 @@ const SisuExportDialog = ({ open, handleClose }) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <AlertSnackbar messageInfo={messageInfo} setMessageInfo={setMessageInfo} open={alertOpen} setOpen={setAlertOpen} />
+      <AlertSnackbar
+        messageInfo={messageInfo}
+        setMessageInfo={setMessageInfo}
+        open={alertOpen}
+        setOpen={setAlertOpen}
+      />
     </>
   );
 };
