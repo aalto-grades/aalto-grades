@@ -30,7 +30,14 @@ const mockContextWithoutAttainments = {
 };
 
 const mockContextWithAttainments = {
-  addedAttainments: [{ ...mockAttainmentsClient[2], temporaryId: 1, date: '01 Jan 1970 00:00:00 GMT', expiryDate: '01 Jan 1971 00:00:00 GMT' }],
+  addedAttainments: [
+    {
+      ...mockAttainmentsClient[2],
+      temporaryId: 1,
+      date: '01 Jan 1970 00:00:00 GMT',
+      expiryDate: '01 Jan 1971 00:00:00 GMT'
+    }
+  ],
   courseType: undefined,
   startDate: '2023-05-06',
   endDate: '2024-05-06',
@@ -156,18 +163,21 @@ describe('Test InstanceSummaryView components when some attainments and successf
     );
   };
 
-  test('InstanceSummaryView should render 2 alerts after "create instance" button is clicked when instance creation ok but attainments not', async () => {
+  test(
+    'InstanceSummaryView should render 2 alerts after "create instance" button is clicked when instance creation ok but attainments not',
+    async () => {
 
-    const { getByText, findByText } = renderInstanceSummaryView();
+      const { getByText, findByText } = renderInstanceSummaryView();
 
-    const createButton = getByText('Create instance');
-    act(() => userEvent.click(createButton));
+      const createButton = getByText('Create instance');
+      act(() => userEvent.click(createButton));
 
-    expect(await findByText('Instance created successfully.')).toBeInTheDocument();
-    expect(await findByText(
-      'Something went wrong while adding attainments. Redirecting to course page in 30 seconds. Attainments can be modified there.'
-    )).toBeInTheDocument();
-  });
+      expect(await findByText('Instance created successfully.')).toBeInTheDocument();
+      expect(await findByText(
+        'Something went wrong while adding attainments. Redirecting to course page in 30 seconds. Attainments can be modified there.'
+      )).toBeInTheDocument();
+    }
+  );
 
 });
 

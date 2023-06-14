@@ -78,7 +78,9 @@ const createTemporaryAttainment: any = (attainments, newAttainment, temporaryId)
 // Update an attainment in a temporary list of attainments.
 const updateTemporaryAttainment: any = (attainments, newAttainment) => {
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
-  updatedAttainments = updatedAttainments.map((attainment) => attainment.temporaryId === newAttainment.temporaryId ? newAttainment : attainment);
+  updatedAttainments = updatedAttainments.map((attainment) => {
+    return attainment.temporaryId === newAttainment.temporaryId ? newAttainment : attainment;
+  });
   return updatedAttainments;
 };
 

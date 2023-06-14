@@ -67,21 +67,24 @@ describe('Tests for SelectFormulaView components', () => {
 
   });
 
-  test('SelectFormulaView should render an alert if "Specify attributes" is clicked without selecting any attainments or a formula', async () => {
+  test(
+    'SelectFormulaView should render an alert if "Specify attributes" is clicked without selecting any attainments or a formula',
+    async () => {
 
-    renderSelectFormulaView();
+      renderSelectFormulaView();
 
-    await waitFor( async () => {
-      const specifyAttributesButton = screen.queryByText('Specify attributes');
+      await waitFor(async () => {
+        const specifyAttributesButton = screen.queryByText('Specify attributes');
 
-      expect(await screen.queryByText('You must select a formula')).not.toBeInTheDocument();
-      expect(await screen.queryByText('You must select at least one study attainment')).not.toBeInTheDocument();
+        expect(await screen.queryByText('You must select a formula')).not.toBeInTheDocument();
+        expect(await screen.queryByText('You must select at least one study attainment')).not.toBeInTheDocument();
 
-      userEvent.click(specifyAttributesButton);
+        userEvent.click(specifyAttributesButton);
 
-      expect(await screen.findByText('You must select a formula')).toBeInTheDocument();
-    });
+        expect(await screen.findByText('You must select a formula')).toBeInTheDocument();
+      });
 
-  });
+    }
+  );
 
 });

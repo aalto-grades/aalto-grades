@@ -34,10 +34,14 @@ const ParentAttainment = ({
   };
 
   /* Functions to get the formula attributes.
-     formulaId specifies the formula that is used to calculate this assignmnet's garde,
-     subFormulaAttributeNames are the attributes that need to be specified for the direct sub attainments of this attainments,
+
+     formulaId specifies the formula that is used to calculate this
+     attainment's grade, subFormulaAttributeNames are the attributes that need
+     to be specified for the direct sub attainments of this attainments,
      so that the grade for this attainment can be calculated.
-     Observe that formulaAttributeNames that is as a parameter for this component are the attributes that need to specified for this assignmnet,
+
+     Observe that formulaAttributeNames which is as a parameter for this
+     component are the attributes that need to specified for this attainment,
      so that the grade of this attainment's parent attainment can be calculated.
   */
   const formulaId = attainmentServices.getProperty(indices, attainments, 'formulaId');

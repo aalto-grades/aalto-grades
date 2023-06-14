@@ -200,7 +200,9 @@ describe('FileLoadDialog test where server does not accept the file', () => {
     act(() => userEvent.click(confirmButton));
 
     expect(dialogTitle).toBeVisible();
-    const errorInstructions = await findByText('The input file cannot be processed due to the following issues that must be addressed and fixed:');
+    const errorInstructions = await findByText(
+      'The input file cannot be processed due to the following issues that must be addressed and fixed:'
+    );
     expect(errorInstructions).toBeVisible();
 
     // First n errors should be rendered visible.
@@ -260,7 +262,9 @@ describe('FileLoadDialog test where server does not accept the file', () => {
       act(() => userEvent.click(confirmButton));
 
       expect(dialogTitle).toBeVisible();
-      const errorInstructions = await findByText('The input file cannot be processed due to the following issues that must be addressed and fixed:');
+      const errorInstructions = await findByText(
+        'The input file cannot be processed due to the following issues that must be addressed and fixed:'
+      );
       expect(errorInstructions).toBeVisible();
 
       for (let i = 0; i < maxErrorsToShow; i++) {

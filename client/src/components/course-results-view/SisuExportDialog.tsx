@@ -16,12 +16,27 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import gradesService from '../../services/grades';
+import { Message } from '../../types/general';
 
 // A Dialog component for exporting Sisu grades CSV.
-const instructions = 'Set the completion language and assesment date for the grading, these values are optional. Click export to export the grades.';
-const loadingMsg = { msg: 'Fetching Sisu CSV...', severity: 'info' };
-const successMsg = { msg: 'Final grades exported to Sisu CSV format succesfully.', severity: 'success' };
-const errorMsg = { msg: 'Fetching CSV failed, please try again. Make sure grades have been calculated before exporting.', severity: 'error' };
+const instructions =
+  'Set the completion language and assesment date for the grading, these values'
+  + ' are optional. Click export to export the grades.';
+
+const loadingMsg: Message = {
+  msg: 'Fetching Sisu CSV...',
+  severity: 'info'
+};
+
+const successMsg: Message = {
+  msg: 'Final grades exported to Sisu CSV format succesfully.',
+  severity: 'success'
+};
+
+const errorMsg: Message = {
+  msg: 'Fetching CSV failed, please try again. Make sure grades have been calculated before exporting.',
+  severity: 'error'
+};
 
 // Available completion languages used in Sisu.
 const languageOptions = [
