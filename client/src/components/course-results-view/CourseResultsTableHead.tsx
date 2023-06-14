@@ -1,9 +1,8 @@
-/* eslint-disable no-unused-vars */
 // SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import TableHead from '@mui/material/TableHead';
 import TableSortLabel from '@mui/material/TableSortLabel';
@@ -21,7 +20,7 @@ const CourseResultsTableHead = ({ order, orderBy, onRequestSort }) => {
     },
     {
       id: 'credits',
-      name: 'Credits (ETCS)'
+      name: 'Credits (ECTS)'
     },
     {
       id: 'finalGrade',
