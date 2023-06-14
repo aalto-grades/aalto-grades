@@ -52,7 +52,7 @@ describe('FileLoadDialog test with proper csv', () => {
     const mockResponseCourse = { course: mockCourses[0] };
     (coursesService.getCourse as jest.Mock).mockResolvedValue(mockResponseCourse);
 
-    gradesService.importCsv.mockResolvedValue({}); // succeess, nothing to worry about
+    (gradesService.importCsv as jest.Mock).mockResolvedValue({}); // succeess, nothing to worry about
 
     return render(
       <MemoryRouter initialEntries={['/course-view/1']}>
@@ -159,7 +159,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
     (coursesService.getCourse as jest.Mock).mockResolvedValue(mockResponseCourse);
 
     // Mock the error.
-    gradesService.importCsv.mockRejectedValue({
+    (gradesService.importCsv as jest.Mock).mockRejectedValue({
       response: mockErrorResponse
     });
 
@@ -246,7 +246,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
       );
 
       // Include only maxErrorsToShow amount of error messages to test conditional rendering.
-      gradesService.importCsv.mockRejectedValue({
+      (gradesService.importCsv as jest.Mock).mockRejectedValue({
         response: {
           status: mockErrorResponse.status,
           data: {

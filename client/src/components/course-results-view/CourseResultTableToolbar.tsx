@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Toolbar from '@mui/material/Toolbar';
@@ -18,25 +18,25 @@ import FileLoadDialog from '../course-view/FileLoadDialog';
 import SisuExportDialog from './SisuExportDialog';
 
 const CourseResultsTableToolbar = (
-  { search, setSearch, calculateFinalGrades, updateGrades }
-) => {
-  let { instanceId } = useParams();
+  { search, setSearch, calculateFinalGrades, updateGrades, downloadCsvTemplate }
+): JSX.Element => {
+  let { instanceId }: any = useParams();
 
-  const [showFileDialog, setShowFileDialog] = useState<any>(false);
-  const [showSisuDialog, setShowSisuDialog] = useState<any>(false);
+  const [showFileDialog, setShowFileDialog] = useState<boolean>(false);
+  const [showSisuDialog, setShowSisuDialog] = useState<boolean>(false);
 
   const actionOptions = [
     { description: 'Import from file', handleClick: () => setShowFileDialog(true) },
     { description: 'Import from A+', handleClick: () => {} }
   ];
 
-  const handleCloseFileDialog = () => {
+  function handleCloseFileDialog(): void {
     setShowFileDialog(false);
-  };
+  }
 
-  const handleCloseSisuDialog = () => {
+  function handleCloseSisuDialog(): void {
     setShowSisuDialog(false);
-  };
+  }
 
   return (
     <Toolbar
@@ -45,8 +45,14 @@ const CourseResultsTableToolbar = (
         pt: 2,
       }}
     >
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center' }}>
+      <Box sx={{
+        display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
+        alignItems: 'center', width: '100%'
+      }}>
+        <Box sx={{
+          display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start',
+          alignItems: 'center'
+        }}>
           <TextField
             size='small'
             type='strig'
@@ -68,9 +74,19 @@ const CourseResultsTableToolbar = (
             </IconButton>
           </Tooltip>
         </Box>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 2 }}>
-          <Button variant='outlined' onClick={() => setShowSisuDialog(true)}>Export to Sisu CSV</Button>
-          <Button variant='outlined' onClick={() => calculateFinalGrades()}>Calculate final grades</Button>
+        <Box sx={{
+          display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start',
+          alignItems: 'center', gap: 2
+        }}>
+          <Button variant='outlined' onClick={() => setShowSisuDialog(true)}>
+            Export to Sisu CSV
+          </Button>
+          <Button variant='outlined' onClick={() => calculateFinalGrades()}>
+            Calculate final grades
+          </Button>
+          <Button variant='outlined' onClick={() => downloadCsvTemplate()}>
+            Download CSV template
+          </Button>
           <MenuButton label='Import grades' options={actionOptions} />
           <SisuExportDialog
             open={showSisuDialog}
@@ -92,7 +108,8 @@ CourseResultsTableToolbar.propTypes = {
   search: PropTypes.string,
   setSearch: PropTypes.func,
   calculateFinalGrades: PropTypes.func,
-  updateGrades: PropTypes.func
+  updateGrades: PropTypes.func,
+  downloadCsvTemplate: PropTypes.func
 };
 
 export default CourseResultsTableToolbar;

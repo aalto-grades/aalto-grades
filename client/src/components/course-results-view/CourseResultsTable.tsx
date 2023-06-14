@@ -21,7 +21,10 @@ import Typography from '@mui/material/Typography';
 import sortingServices from '../../services/sorting';
 import CircularProgress from '@mui/material/CircularProgress';
 
-const CourseResultsTable = ({ students, calculateFinalGrades, updateGrades, loading }) => {
+const CourseResultsTable = (
+  { students, calculateFinalGrades, updateGrades, downloadCsvTemplate, loading }
+): JSX.Element => {
+
   const [order, setOrder] = useState<any>('asc');
   const [orderBy, setOrderBy] = useState<any>('studentNumber');
   const [page, setPage] = useState<any>(0);
@@ -35,24 +38,24 @@ const CourseResultsTable = ({ students, calculateFinalGrades, updateGrades, load
     setPage(0);
   }, [search, students]);
 
-  const handleRequestSort = (event, property) => {
+  function handleRequestSort(event, property) {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
-  };
+  }
 
-  const handleChangePage = (event, newPage) => {
+  function handleChangePage(event, newPage) {
     setPage(newPage);
-  };
+  }
 
-  const handleChangeRowsPerPage = (event) => {
+  function handleChangeRowsPerPage(event) {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  };
+  }
 
-  const handleChangeDense = (event) => {
+  function handleChangeDense(event) {
     setDense(event.target.checked);
-  };
+  }
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -66,6 +69,7 @@ const CourseResultsTable = ({ students, calculateFinalGrades, updateGrades, load
           setSearch={setSearch}
           calculateFinalGrades={calculateFinalGrades}
           updateGrades={updateGrades}
+          downloadCsvTemplate={downloadCsvTemplate}
         />
         { loading
           ?
@@ -170,6 +174,7 @@ CourseResultsTable.propTypes = {
   students: PropTypes.array,
   calculateFinalGrades: PropTypes.func,
   updateGrades: PropTypes.func,
+  downloadCsvTemplate: PropTypes.func,
   loading: PropTypes.bool
 };
 

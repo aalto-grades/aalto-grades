@@ -18,10 +18,24 @@ import AlertSnackbar from '../alerts/AlertSnackbar';
 import gradesService from '../../services/grades';
 
 // A Dialog component for exporting Sisu grades CSV.
-const instructions = 'Set the completion language and assesment date for the grading, these values are optional. Click export to export the grades.';
-const loadingMsg = { msg: 'Fetching Sisu CSV...', severity: 'info' };
-const successMsg = { msg: 'Final grades exported to Sisu CSV format succesfully.', severity: 'success' };
-const errorMsg = { msg: 'Fetching CSV failed, please try again. Make sure grades have been calculated before exporting.', severity: 'error' };
+const instructions =
+  'Set the completion language and assesment date for the grading, these values'
+  + ' are optional. Click export to export the grades.';
+
+const loadingMsg = {
+  msg: 'Fetching Sisu CSV...',
+  severity: 'info'
+};
+
+const successMsg = {
+  msg: 'Final grades exported to Sisu CSV format succesfully.',
+  severity: 'success'
+};
+
+const errorMsg = {
+  msg: 'Fetching CSV failed, please try again. Make sure grades have been calculated before exporting.',
+  severity: 'error'
+};
 
 // Available completion languages used in Sisu.
 const languageOptions = [
@@ -67,8 +81,8 @@ const languageOptions = [
   }
 ];
 
-const SisuExportDialog = ({ open, handleClose }) => {
-  const { courseId, instanceId } = useParams();
+const SisuExportDialog = ({ open, handleClose }): JSX.Element => {
+  const { courseId, instanceId }: any = useParams();
 
   // state variables handling the alert messages.
   const [snackPack, setSnackPack] = useState<any>([]);
@@ -91,7 +105,7 @@ const SisuExportDialog = ({ open, handleClose }) => {
     }
   }, [snackPack, messageInfo, alertOpen]);
 
-  const exportSisuCsvGrades = async () => {
+  async function exportSisuCsvGrades(): Promise<void> {
     setSnackPack((prev) => [...prev, loadingMsg]);
 
     try {
@@ -121,14 +135,16 @@ const SisuExportDialog = ({ open, handleClose }) => {
     } finally {
       setAlertOpen(false);
     }
-  };
+  }
 
   return (
     <>
       <Dialog open={open} transitionDuration={{ exit: 800 }}>
         <DialogTitle >Export final grades to Sisu CSV</DialogTitle>
         <DialogContent sx={{ pb: 0 }}>
-          <DialogContentText sx={{ mb: 3, color: 'black' }}>{instructions}</DialogContentText>
+          <DialogContentText sx={{ mb: 3, color: 'black' }}>
+            {instructions}
+          </DialogContentText>
           <Box
             component="form"
             sx={{
@@ -148,11 +164,13 @@ const SisuExportDialog = ({ open, handleClose }) => {
                   setCompletionLanguage(e.target.value);
                 }}
               >
-                {languageOptions.map((option) => (
-                  <MenuItem key={option.id} value={option.id}>
-                    {option.language}
-                  </MenuItem>
-                ))}
+                {
+                  languageOptions.map((option) => (
+                    <MenuItem key={option.id} value={option.id}>
+                      {option.language}
+                    </MenuItem>
+                  ))
+                }
               </TextField>
             </div>
             <div>
@@ -189,7 +207,10 @@ const SisuExportDialog = ({ open, handleClose }) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <AlertSnackbar messageInfo={messageInfo} setMessageInfo={setMessageInfo} open={alertOpen} setOpen={setAlertOpen} />
+      <AlertSnackbar
+        messageInfo={messageInfo} setMessageInfo={setMessageInfo}
+        open={alertOpen} setOpen={setAlertOpen}
+      />
     </>
   );
 };

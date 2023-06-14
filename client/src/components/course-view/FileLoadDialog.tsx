@@ -30,7 +30,7 @@ const successMsg = { msg: 'File processed successfully, grades imported. To refr
 const errorMsg = { msg: 'There was an issue progressing the file, the grades were not imported.', severity: 'error' };
 
 // How many errors are initially rendered visible in the dialog.
-export const maxErrorsToShow = 5;
+export const maxErrorsToShow: number = 5;
 
 const FileLoadDialog = ({ instanceId, handleClose, open,  }) => {
   let { courseId } = useParams();
