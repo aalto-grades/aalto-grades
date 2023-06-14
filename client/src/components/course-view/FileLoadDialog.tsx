@@ -34,7 +34,7 @@ const errorMsg = { msg: 'There was an issue progressing the file, the grades wer
 export const maxErrorsToShow = 5;
 
 const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades }) => {
-  let { courseId } = useParams();
+  let { courseId }: any = useParams();
   const fileInput = createRef<any>();
 
   // state variables handling the alert messages

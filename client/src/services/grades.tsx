@@ -4,7 +4,7 @@
 
 import axios from './axios';
 
-const exportSisuCsv: any = async (courseId, instanceId, params) => {
+async function exportSisuCsv(courseId: number, instanceId: number, params) {
   const response = await axios.get(
     `/v1/courses/${courseId}/instances/${instanceId}/grades/csv/sisu`,
     {
@@ -13,13 +13,23 @@ const exportSisuCsv: any = async (courseId, instanceId, params) => {
     }
   );
   return response.data;
-};
+}
 
-const importCsv: any = async (courseId, instanceId, csv) => {
-  const response = await axios.postForm(`/v1/courses/${courseId}/instances/${instanceId}/grades/csv`, {
-    csv_data: csv // FileList will be unwrapped as sepate fields
-  });
+async function importCsv(courseId: number, instanceId: number, csv) {
+  const response = await axios.postForm(
+    `/v1/courses/${courseId}/instances/${instanceId}/grades/csv`,
+    {
+      csv_data: csv // FileList will be unwrapped as sepate fields
+    }
+  );
   return response.data.data;
-};
+}
 
-export default { exportSisuCsv, importCsv };
+async function downloadCsvTemplate(courseId: number, instanceId: number) {
+  const response = await axios.get(
+    `/v1/courses/${courseId}/instances/${instanceId}/grades/csv`
+  );
+  return response;
+}
+
+export default { exportSisuCsv, importCsv, downloadCsvTemplate };
