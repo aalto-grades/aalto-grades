@@ -80,7 +80,7 @@ const CourseResultsView = (): JSX.Element => {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   async function updateGrades(newGrades): Promise<void> {
     setSnackPack((prev) => [
