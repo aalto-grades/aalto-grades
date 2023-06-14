@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import { MemoryRouter, Routes, Route, Outlet } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { act, render, screen, waitFor, cleanup } from '@testing-library/react';
@@ -30,7 +29,14 @@ const mockContextWithoutAttainments = {
 };
 
 const mockContextWithAttainments = {
-  addedAttainments: [{ ...mockAttainmentsClient[2], temporaryId: 1, date: '01 Jan 1970 00:00:00 GMT', expiryDate: '01 Jan 1971 00:00:00 GMT' }],
+  addedAttainments: [
+    {
+      ...mockAttainmentsClient[2],
+      temporaryId: 1,
+      date: '01 Jan 1970 00:00:00 GMT',
+      expiryDate: '01 Jan 1971 00:00:00 GMT'
+    }
+  ],
   courseType: undefined,
   startDate: '2023-05-06',
   endDate: '2024-05-06',
@@ -47,7 +53,7 @@ describe('Test InstanceSummaryView components when no attainments and successful
   const renderInstanceSummaryView = () => {
 
     const mockResponseInstanceCreation = { courseInstance: { id: 22 } };
-    instancesService.createInstance.mockResolvedValue(mockResponseInstanceCreation);
+    (instancesService.createInstance as jest.Mock).mockResolvedValue(mockResponseInstanceCreation);
 
     attainmentServices.addAttainment.mockResolvedValue({ success: true, data: {} });
 
@@ -108,7 +114,7 @@ describe('Test InstanceSummaryView components when some attainments and successf
   const renderInstanceSummaryView = () => {
 
     const mockResponseInstanceCreation = { courseInstance: { id: 22 } };
-    instancesService.createInstance.mockResolvedValue(mockResponseInstanceCreation);
+    (instancesService.createInstance as jest.Mock).mockResolvedValue(mockResponseInstanceCreation);
 
     attainmentServices.addAttainment.mockResolvedValue({ success: true, data: {} });
 
@@ -141,7 +147,7 @@ describe('Test InstanceSummaryView components when some attainments and successf
   const renderInstanceSummaryView = () => {
 
     const mockResponseInstanceCreation = { courseInstance: { id: 22 } };
-    instancesService.createInstance.mockResolvedValue(mockResponseInstanceCreation);
+    (instancesService.createInstance as jest.Mock).mockResolvedValue(mockResponseInstanceCreation);
 
     attainmentServices.addAttainment.mockRejectedValue({});
 
@@ -156,18 +162,21 @@ describe('Test InstanceSummaryView components when some attainments and successf
     );
   };
 
-  test('InstanceSummaryView should render 2 alerts after "create instance" button is clicked when instance creation ok but attainments not', async () => {
+  test(
+    'InstanceSummaryView should render 2 alerts after "create instance" button is clicked when instance creation ok but attainments not',
+    async () => {
 
-    const { getByText, findByText } = renderInstanceSummaryView();
+      const { getByText, findByText } = renderInstanceSummaryView();
 
-    const createButton = getByText('Create instance');
-    act(() => userEvent.click(createButton));
+      const createButton = getByText('Create instance');
+      act(() => userEvent.click(createButton));
 
-    expect(await findByText('Instance created successfully.')).toBeInTheDocument();
-    expect(await findByText(
-      'Something went wrong while adding attainments. Redirecting to course page in 30 seconds. Attainments can be modified there.'
-    )).toBeInTheDocument();
-  });
+      expect(await findByText('Instance created successfully.')).toBeInTheDocument();
+      expect(await findByText(
+        'Something went wrong while adding attainments. Redirecting to course page in 30 seconds. Attainments can be modified there.'
+      )).toBeInTheDocument();
+    }
+  );
 
 });
 
@@ -175,7 +184,7 @@ describe('Test InstanceSummaryView components when some attainments and error in
 
   const renderInstanceSummaryView = () => {
 
-    instancesService.createInstance.mockRejectedValue(new Error('Internal server error'));
+    (instancesService.createInstance as jest.Mock).mockRejectedValue(new Error('Internal server error'));
 
     return render(
       <MemoryRouter initialEntries={['/A-12345/instance-summary/aalto-CUR-168938-2370795']}>

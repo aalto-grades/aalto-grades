@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Dialog from '@mui/material/Dialog';
@@ -16,23 +16,24 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import gradesService from '../../services/grades';
+import { Message } from '../../types/general';
 
 // A Dialog component for exporting Sisu grades CSV.
 const instructions =
   'Set the completion language and assesment date for the grading, these values'
   + ' are optional. Click export to export the grades.';
 
-const loadingMsg = {
+const loadingMsg: Message = {
   msg: 'Fetching Sisu CSV...',
   severity: 'info'
 };
 
-const successMsg = {
+const successMsg: Message = {
   msg: 'Final grades exported to Sisu CSV format succesfully.',
   severity: 'success'
 };
 
-const errorMsg = {
+const errorMsg: Message = {
   msg: 'Fetching CSV failed, please try again. Make sure grades have been calculated before exporting.',
   severity: 'error'
 };
@@ -82,12 +83,12 @@ const languageOptions = [
 ];
 
 const SisuExportDialog = ({ open, handleClose }): JSX.Element => {
-  const { courseId, instanceId }: any = useParams();
+  const { courseId, instanceId } = useParams();
 
   // state variables handling the alert messages.
   const [snackPack, setSnackPack] = useState<any>([]);
-  const [alertOpen, setAlertOpen] = useState<any>(false);
-  const [messageInfo, setMessageInfo] = useState<any>(undefined);
+  const [alertOpen, setAlertOpen] = useState<boolean>(false);
+  const [messageInfo, setMessageInfo] = useState<Message | undefined>(undefined);
 
   // state variables handling the assessment date and completion language.
   const [assessmentDate, setAssessmentDate] = useState<any>(null);
@@ -116,7 +117,9 @@ const SisuExportDialog = ({ open, handleClose }): JSX.Element => {
       if (assessmentDate) {
         params.assessmentDate = assessmentDate;
       }
-      const data = await gradesService.exportSisuCsv(courseId, instanceId, params);
+      const data: BlobPart = await gradesService.exportSisuCsv(
+        courseId, instanceId, params
+      );
 
       // Create a blob object from the response data
       const blob = new Blob([data], { type: 'text/csv' });

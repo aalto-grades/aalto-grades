@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -155,12 +155,18 @@ const LeafAttainment = ({ indices, addSubAttainments, setAttainments, attainment
           <MenuItem value='Other'>Other</MenuItem>
         </TextField>
         <Collapse in={displayNewName} timeout={0} unmountOnExit>
-          <StringTextField fieldData={nameData} indices={indices} setAttainments={setAttainments} attainments={attainments}/>
+          <StringTextField fieldData={nameData} indices={indices} setAttainments={setAttainments} attainments={attainments} />
         </Collapse>
-        <DateTextField fieldData={dateData} indices={indices} setAttainments={setAttainments} attainments={attainments}/>
-        <DateTextField fieldData={expiryData} indices={indices} setAttainments={setAttainments} attainments={attainments}/>
-        { (formulaAttributeNames && affectCalculation) &&
-            <AttributeTextFields formulaAttributeNames={formulaAttributeNames} indices={indices} setAttainments={setAttainments} attainments={attainments}/>
+        <DateTextField fieldData={dateData} indices={indices} setAttainments={setAttainments} attainments={attainments} />
+        <DateTextField fieldData={expiryData} indices={indices} setAttainments={setAttainments} attainments={attainments} />
+        {
+          (formulaAttributeNames && affectCalculation) &&
+          <AttributeTextFields
+            formulaAttributeNames={formulaAttributeNames}
+            indices={indices}
+            setAttainments={setAttainments}
+            attainments={attainments}
+          />
         }
       </Box>
       <Box sx={{

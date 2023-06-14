@@ -11,21 +11,25 @@ import PropTypes from 'prop-types';
 import userService from '../../services/user';
 import useAuth from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';
+import { SystemRole } from 'aalto-grades-common/types/auth';
 
-const PrivateRoute = ({ children, roles }) => {
+const PrivateRoute = ({ children, roles }: {
+  children?: JSX.Element,
+  roles: Array<SystemRole>
+}): JSX.Element | null => {
 
   const [loading, setLoading] = useState<any>(true);
   const { auth, setAuth } = useAuth();
 
-  const getAuthStatus = async () => {
+  async function getAuthStatus(): Promise<void> {
     // loading set to true so page doesn't load until token has been retrieved
     setLoading(true);
     try {
       const response = await userService.getRefreshToken();
       setAuth({
-        id: response.data.id,
-        role: response.data.role,
-        name: response.data.name
+        id: response.data!.id,
+        role: response.data!.role,
+        name: response.data!.name
       });
     } catch (exception) {
       console.error(exception);
@@ -33,7 +37,7 @@ const PrivateRoute = ({ children, roles }) => {
       // token has been retrieved, can load page
       setLoading(false);
     }
-  };
+  }
 
   useEffect(() => {
     getAuthStatus();
@@ -42,7 +46,7 @@ const PrivateRoute = ({ children, roles }) => {
   // only load page after token has been retrieved
   if (!loading) {
     // if role can be found -> token exists
-    if(auth.role) {
+    if (auth.role) {
       // check if role is in the list of authorised roles
       if (roles.includes(auth.role)) {
         return (
@@ -60,6 +64,8 @@ const PrivateRoute = ({ children, roles }) => {
       return <Navigate to='/login' />;
     }
   }
+
+  return null;
 };
 
 PrivateRoute.propTypes = {

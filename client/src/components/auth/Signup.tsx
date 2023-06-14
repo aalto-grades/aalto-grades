@@ -8,27 +8,28 @@ import { useTheme } from '@mui/material/styles';
 import SignupForm from './SignupForm';
 import userService from '../../services/user';
 import useAuth from '../../hooks/useAuth';
-import { SystemRole } from 'aalto-grades-common/types/general';
+import { SystemRole } from 'aalto-grades-common/types/auth';
+import { SignupCredentials } from '../../types/auth';
 
-const Signup = () => {
+const Signup = (): JSX.Element => {
 
   const navigate = useNavigate();
   const { setAuth } = useAuth();
   const theme = useTheme();
-  const [errorMessage, setErrorMessage] = useState<any>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const addUser = async (userObject) => {
+  async function addUser(userObject: SignupCredentials): Promise<void> {
     try {
-      const user = await userService.signup(userObject);
+      const response = await userService.signup(userObject);
       // if signup successfull, save user role to context
       setAuth({
-        id: user.data.id,
-        role: user.data.role,
-        name: user.data.name
+        id: response.data!.id,
+        role: response.data!.role,
+        name: response.data!.name
       });
 
-      console.log(`${user.data.role}`);
-      if (user.data.role === SystemRole.Admin) {
+      console.log(`${response.data!.role}`);
+      if (response.data!.role === SystemRole.Admin) {
         navigate('/course-view', { replace: true });
       } else {
         navigate('/', { replace: true });
@@ -37,7 +38,7 @@ const Signup = () => {
       console.log(exception);
       setErrorMessage('Error: signup failed');
     }
-  };
+  }
 
   return (
     <div>

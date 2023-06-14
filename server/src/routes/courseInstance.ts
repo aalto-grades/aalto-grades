@@ -169,10 +169,13 @@ router.get(
  *                 success:
  *                   $ref: '#/definitions/Success'
  *                 data:
- *                   type: array
- *                   description: All instances of the course with the given ID.
- *                   items:
- *                     $ref: '#/definitions/CourseInstanceData'
+ *                   type: object
+ *                   properties:
+ *                     courseInstances:
+ *                       type: array
+ *                       description: All instances of the course with the given ID.
+ *                       items:
+ *                         $ref: '#/definitions/CourseInstanceData'
  *       400:
  *         description: >
  *           A validation error has occurred in the URL, the given course ID is

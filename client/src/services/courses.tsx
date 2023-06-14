@@ -5,7 +5,7 @@
 import axios from './axios';
 import { CourseData } from 'aalto-grades-common/types/course';
 
-async function getCoursesOfUser(userId: number): Promise<{
+async function getCoursesOfUser(userId: number | string): Promise<{
   courses: {
     current: Array<CourseData>,
     previous: Array<CourseData>
@@ -16,7 +16,7 @@ async function getCoursesOfUser(userId: number): Promise<{
   return response.data.data;
 }
 
-async function getCourse(courseId: number): Promise<{ course: CourseData }> {
+async function getCourse(courseId: number | string): Promise<{ course: CourseData }> {
   const response = await axios.get(`/v1/courses/${courseId}`);
   return response.data.data;
 }

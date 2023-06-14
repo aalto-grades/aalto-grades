@@ -11,8 +11,8 @@ import AttainmentCategory from './attainments/AttainmentCategory';
 import attainmentServices from '../services/attainments';
 
 const AddAttainmentsView = () => {
-  let navigate = useNavigate();
-  let { courseId, sisuInstanceId } = useParams();
+  const navigate = useNavigate();
+  const { courseId, sisuInstanceId } = useParams();
 
   const {
     addedAttainments, setAddedAttainments,
@@ -22,14 +22,16 @@ const AddAttainmentsView = () => {
 
   useEffect(() => {  // Better if handling here
     if (addedAttainments.length === 0) {
-      let allSuggestedAttainments = attainmentServices.getSuggestedAttainments();
-      let [updatedAttainments, newTemporaryId] = attainmentServices.addTemporaryIds(allSuggestedAttainments, attainmentIncrementId);
+      const allSuggestedAttainments = attainmentServices.getSuggestedAttainments();
+      const [updatedAttainments, newTemporaryId] = attainmentServices.addTemporaryIds(allSuggestedAttainments, attainmentIncrementId);
       setIncrementId(newTemporaryId);
       setSuggestedAttainments(updatedAttainments);
     } else {
       // if some attainments have been added, filter the suggestions to make sure there aren't duplicates
       // another possibility is to save the suggestions in context too, will consider if the retrieval is slow
-      const nonAdded = suggestedAttainments.filter(suggested => !addedAttainments.some(added => added.temporaryId === suggested.temporaryId));
+      const nonAdded = suggestedAttainments.filter((suggested) => {
+        return !addedAttainments.some(added => added.temporaryId === suggested.temporaryId);
+      });
       setSuggestedAttainments(nonAdded);
     }
   }, []);
@@ -139,8 +141,16 @@ const AddAttainmentsView = () => {
         </Typography>
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 6 }}>
-        <Button variant='outlined' onClick={() => onGoBack()}>Go back</Button>
-        <Button id='ag_confirm_instance_attainments_btn' variant='contained' onClick={() => onConfirmAttainments()}>Confirm attainments</Button>
+        <Button variant='outlined' onClick={() => onGoBack()}>
+          Go back
+        </Button>
+        <Button
+          id='ag_confirm_instance_attainments_btn'
+          variant='contained'
+          onClick={() => onConfirmAttainments()}
+        >
+          Confirm attainments
+        </Button>
       </Box>
     </Box>
   );

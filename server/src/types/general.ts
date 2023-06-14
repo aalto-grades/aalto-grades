@@ -4,6 +4,8 @@
 
 import * as yup from 'yup';
 
+import { SystemRole } from 'aalto-grades-common/types/auth';
+
 export const idSchema: yup.AnyObjectSchema = yup.object().shape({
   id: yup
     .number()
@@ -11,11 +13,6 @@ export const idSchema: yup.AnyObjectSchema = yup.object().shape({
     .min(1)
     .required()
 });
-
-export enum SystemRole {
-  User = 'USER',
-  Admin = 'ADMIN'
-}
 
 export interface JwtClaims {
   role: SystemRole,

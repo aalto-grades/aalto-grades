@@ -13,7 +13,7 @@ import instancesService from '../services/instances';
 import AuthContext from '../context/authProvider';
 import mockCourses from './mock-data/mockCourses';
 import mockInstances from './mock-data/mockInstancesWithStringDates';
-import { SystemRole } from 'aalto-grades-common/types/general';
+import { SystemRole } from 'aalto-grades-common/types/auth';
 
 jest.mock('../services/courses');
 jest.mock('../services/instances');
@@ -24,8 +24,8 @@ describe('Tests for CourseView component', () => {
   const renderCourseView = (auth) => {
 
     const mockResponseInstances = { courseInstances: mockInstances };
-    instancesService.getInstances.mockRejectedValue('Network error');
-    instancesService.getInstances.mockResolvedValue(mockResponseInstances);
+    (instancesService.getInstances as jest.Mock).mockRejectedValue('Network error');
+    (instancesService.getInstances as jest.Mock).mockResolvedValue(mockResponseInstances);
 
 
     const mockResponseCourse = { course: mockCourses[0] };

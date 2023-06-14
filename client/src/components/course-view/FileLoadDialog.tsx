@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState, useEffect, createRef } from 'react';
+import { useState, useEffect, createRef } from 'react';
 import { useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Dialog from '@mui/material/Dialog';
@@ -17,29 +17,49 @@ import FormHelperText from '@mui/material/FormHelperText';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import gradesService from '../../services/grades';
 import FileErrorDialog from './FileErrorDialog';
+import { Message } from '../../types/general';
 
 // A Dialog component for uploading a file
 
-const instructions = 'Upload a CSV file with the header "studentNo" and headers matching to the study \
-  attainment tags you wish to add grades for. You can see an example of a CSV file of the correct format below.';
-const exampleText = 'A student with the student number 222222 has gotten 8 points from the attainment \'C3I9A1\' and 7 points from attainment \'C3I9A2\'.';
-const errorInstructions = 'The input file cannot be processed due to the following issues that must be addressed and fixed:';
+const instructions: string =
+  'Upload a CSV file with the header "studentNo" and headers matching to the'
+  + ' study attainment tags you wish to add grades for. You can see an example'
+  + ' of a CSV file of the correct format below.';
 
-const loadingMsg = { msg: 'Importing grades...', severity: 'info' };
-const successMsg = { msg: 'File processed successfully, grades imported. To refresh final grades, press "calculate final grades"', severity: 'success' };
-const errorMsg = { msg: 'There was an issue progressing the file, the grades were not imported.', severity: 'error' };
+const exampleText: string =
+  'A student with the student number 222222 has gotten 8 points from the'
+  + ' attainment \'C3I9A1\' and 7 points from attainment \'C3I9A2\'.';
+
+const errorInstructions: string =
+  'The input file cannot be processed due to the following issues that must be'
+  + ' addressed and fixed:';
+
+const loadingMsg: Message = {
+  msg: 'Importing grades...',
+  severity: 'info'
+};
+
+const successMsg: Message = {
+  msg: 'File processed successfully, grades imported. To refresh final grades, press "calculate final grades"',
+  severity: 'success'
+};
+
+const errorMsg: Message = {
+  msg: 'There was an issue progressing the file, the grades were not imported.',
+  severity: 'error'
+};
 
 // How many errors are initially rendered visible in the dialog.
 export const maxErrorsToShow: number = 5;
 
-const FileLoadDialog = ({ instanceId, handleClose, open,  }) => {
-  let { courseId } = useParams();
+const FileLoadDialog = ({ instanceId, handleClose, open }) => {
+  const { courseId } = useParams();
   const fileInput = createRef<any>();
 
   // state variables handling the alert messages
   const [snackPack, setSnackPack] = useState<any>([]);
-  const [alertOpen, setAlertOpen] = useState<any>(false);
-  const [showErrorDialog, setShowErrorDialog] = useState<any>(false);
+  const [alertOpen, setAlertOpen] = useState<boolean>(false);
+  const [showErrorDialog, setShowErrorDialog] = useState<boolean>(false);
   const [messageInfo, setMessageInfo] = useState<any>(undefined);
 
   const toggleErrorDialog = () => {
@@ -122,14 +142,22 @@ const FileLoadDialog = ({ instanceId, handleClose, open,  }) => {
             </Button>
             <Typography>{fileName ?? 'Select a file'}</Typography>
           </Box>
-          { validationError && <FormHelperText error={true}>{validationError}</FormHelperText> }
-          { fileErrors.length !== 0 &&
+          {validationError && <FormHelperText error={true}>{validationError}</FormHelperText>}
+          {fileErrors.length !== 0 &&
             <>
               <Typography id={'file_content_errors'} sx={{ mt: 2 }}>{errorInstructions}</Typography>
-              { fileErrors.length > maxErrorsToShow ?
+              {fileErrors.length > maxErrorsToShow ?
                 <>
                   <ul>
-                    { fileErrors.slice(0, maxErrorsToShow).map(err => <li key={err}><FormHelperText error={true}>{err}</FormHelperText></li>) }
+                    {
+                      fileErrors.slice(0, maxErrorsToShow).map((err) => {
+                        return (
+                          <li key={err}>
+                            <FormHelperText error={true}>{err}</FormHelperText>
+                          </li>
+                        );
+                      })
+                    }
                   </ul>
                   <Typography id='multiple_errors' sx={{ mt: 2 }}>
                     {`And ${fileErrors.length - maxErrorsToShow} more errors found.`}
@@ -169,8 +197,17 @@ const FileLoadDialog = ({ instanceId, handleClose, open,  }) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <AlertSnackbar messageInfo={messageInfo} setMessageInfo={setMessageInfo} open={alertOpen} setOpen={setAlertOpen} />
-      <FileErrorDialog handleClose={toggleErrorDialog} open={showErrorDialog} errors={fileErrors} />
+      <AlertSnackbar
+        messageInfo={messageInfo}
+        setMessageInfo={setMessageInfo}
+        open={alertOpen}
+        setOpen={setAlertOpen}
+      />
+      <FileErrorDialog
+        handleClose={toggleErrorDialog}
+        open={showErrorDialog}
+        errors={fileErrors}
+      />
     </>
   );
 };

@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { act, render, waitFor, cleanup, fireEvent, screen } from '@testing-library/react';
@@ -15,9 +14,9 @@ import AuthContext from '../context/authProvider';
 import mockCourses from './mock-data/mockCourses';
 import mockInstances from './mock-data/mockInstancesWithStringDates';
 import { maxErrorsToShow } from '../components/course-view/FileLoadDialog';
-import { SystemRole } from 'aalto-grades-common/types/general';
+import { SystemRole } from 'aalto-grades-common/types/auth';
 
-let file = new File(['idk'], 'grades_test.csv', { type: 'csv' });
+const file = new File(['idk'], 'grades_test.csv', { type: 'csv' });
 
 jest.mock('../services/courses');
 jest.mock('../services/instances');
@@ -47,7 +46,7 @@ describe('FileLoadDialog test with proper csv', () => {
   const renderCourseView = (auth) => {
 
     const mockResponseInstances = { courseInstances: mockInstances };
-    instancesService.getInstances.mockResolvedValue(mockResponseInstances);
+    (instancesService.getInstances as jest.Mock).mockResolvedValue(mockResponseInstances);
 
     const mockResponseCourse = { course: mockCourses[0] };
     (coursesService.getCourse as jest.Mock).mockResolvedValue(mockResponseCourse);
@@ -153,7 +152,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
   const renderCourseView = (auth) => {
 
     const mockResponseInstances = { courseInstances: mockInstances };
-    instancesService.getInstances.mockResolvedValue(mockResponseInstances);
+    (instancesService.getInstances as jest.Mock).mockResolvedValue(mockResponseInstances);
 
     const mockResponseCourse = { course: mockCourses[0] };
     (coursesService.getCourse as jest.Mock).mockResolvedValue(mockResponseCourse);
@@ -200,7 +199,9 @@ describe('FileLoadDialog test where server does not accept the file', () => {
     act(() => userEvent.click(confirmButton));
 
     expect(dialogTitle).toBeVisible();
-    const errorInstructions = await findByText('The input file cannot be processed due to the following issues that must be addressed and fixed:');
+    const errorInstructions = await findByText(
+      'The input file cannot be processed due to the following issues that must be addressed and fixed:'
+    );
     expect(errorInstructions).toBeVisible();
 
     // First n errors should be rendered visible.
@@ -260,7 +261,9 @@ describe('FileLoadDialog test where server does not accept the file', () => {
       act(() => userEvent.click(confirmButton));
 
       expect(dialogTitle).toBeVisible();
-      const errorInstructions = await findByText('The input file cannot be processed due to the following issues that must be addressed and fixed:');
+      const errorInstructions = await findByText(
+        'The input file cannot be processed due to the following issues that must be addressed and fixed:'
+      );
       expect(errorInstructions).toBeVisible();
 
       for (let i = 0; i < maxErrorsToShow; i++) {

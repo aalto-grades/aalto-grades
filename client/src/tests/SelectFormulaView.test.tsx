@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
@@ -22,8 +21,8 @@ describe('Tests for SelectFormulaView components', () => {
 
   const renderSelectFormulaView = async () => {
 
-    instancesService.getAttainments.mockRejectedValue('Network error');
-    instancesService.getAttainments.mockResolvedValue(mockAttainments);
+    (instancesService.getAttainments as jest.Mock).mockRejectedValue('Network error');
+    (instancesService.getAttainments as jest.Mock).mockResolvedValue(mockAttainments);
     formulasService.getFormulas.mockRejectedValue('Network error');
     formulasService.getFormulas.mockResolvedValue(mockFormulas);
     return render(
@@ -67,21 +66,24 @@ describe('Tests for SelectFormulaView components', () => {
 
   });
 
-  test('SelectFormulaView should render an alert if "Specify attributes" is clicked without selecting any attainments or a formula', async () => {
+  test(
+    'SelectFormulaView should render an alert if "Specify attributes" is clicked without selecting any attainments or a formula',
+    async () => {
 
-    renderSelectFormulaView();
+      renderSelectFormulaView();
 
-    await waitFor( async () => {
-      const specifyAttributesButton = screen.queryByText('Specify attributes');
+      await waitFor(async () => {
+        const specifyAttributesButton = screen.queryByText('Specify attributes');
 
-      expect(await screen.queryByText('You must select a formula')).not.toBeInTheDocument();
-      expect(await screen.queryByText('You must select at least one study attainment')).not.toBeInTheDocument();
+        expect(await screen.queryByText('You must select a formula')).not.toBeInTheDocument();
+        expect(await screen.queryByText('You must select at least one study attainment')).not.toBeInTheDocument();
 
-      userEvent.click(specifyAttributesButton);
+        userEvent.click(specifyAttributesButton);
 
-      expect(await screen.findByText('You must select a formula')).toBeInTheDocument();
-    });
+        expect(await screen.findByText('You must select a formula')).toBeInTheDocument();
+      });
 
-  });
+    }
+  );
 
 });

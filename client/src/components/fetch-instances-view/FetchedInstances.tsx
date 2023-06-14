@@ -20,7 +20,7 @@ const HoverBox = styled<any>(Box)(({ theme }) => ({
 }));
 
 const InstanceBox = ({ courseId, instance }) => {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
   const { sisuCourseInstanceId, startDate, endDate, type } = instance;
 
   return (

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -14,24 +14,36 @@ import textFormatServices from '../services/textFormat';
 import instancesService from '../services/instances';
 import attainmentServices from '../services/attainments';
 import useSnackPackAlerts from '../hooks/useSnackPackAlerts';
+import { Message } from '../types/general';
 
-const successMsgInstance = { msg: 'Instance created successfully.', severity: 'success' };
-const successMsgWithoutAttainments = { msg: 'Instance created successfully. Redirecting to course page in 30 seconds.', severity: 'success' };
-const errorMsgInstance = { msg: 'Instance creation failed.', severity: 'error' };
+const successMsgInstance: Message = {
+  msg: 'Instance created successfully.',
+  severity: 'success'
+};
 
-const successMsgAttainments = {
+const successMsgWithoutAttainments: Message = {
+  msg: 'Instance created successfully. Redirecting to course page in 30 seconds.',
+  severity: 'success'
+};
+
+const errorMsgInstance: Message = {
+  msg: 'Instance creation failed.',
+  severity: 'error'
+};
+
+const successMsgAttainments: Message = {
   msg: 'Attainments added successfully. Redirecting to course page in 30 seconds.',
   severity: 'success'
 };
 
-const errorMsgAttainments = {
+const errorMsgAttainments: Message = {
   msg: 'Something went wrong while adding attainments. Redirecting to course page in 30 seconds. Attainments can be modified there.',
   severity: 'error'
 };
 
 const InstanceSummaryView = () => {
-  let navigate = useNavigate();
-  let { courseId, sisuInstanceId } = useParams();
+  const navigate = useNavigate();
+  const { courseId, sisuInstanceId } = useParams();
 
   const {
     addedAttainments,
@@ -123,14 +135,26 @@ const InstanceSummaryView = () => {
       </Box>
       <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >Added study attainments</Typography>
       <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', display: 'inline-block' }}>
-        { addedAttainments.length !== 0 &&
+        {addedAttainments.length !== 0 &&
           <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch', pb: '8px' }}>
-            { addedAttainments.map(attainment => <AttainmentCategory key={attainment.temporaryId} attainment={attainment} attainmentKey={'temporaryId'} />) }
+            {
+              addedAttainments.map((attainment) => {
+                return (
+                  <AttainmentCategory
+                    key={attainment.temporaryId}
+                    attainment={attainment}
+                    attainmentKey={'temporaryId'}
+                  />
+                );
+              })
+            }
           </Box>
         }
-        <Typography variant='body1' color='primary.main' sx={{ m: '8px 0px' }} >You can also add study attainments after creating the instance</Typography>
+        <Typography variant='body1' color='primary.main' sx={{ m: '8px 0px' }} >
+          You can also add study attainments after creating the instance
+        </Typography>
       </Box>
-      { created ?
+      {created ?
         <Button
           variant='contained'
           sx={{ width: 'fit-content', justifySelf: 'center', mb: 6  }}

@@ -5,11 +5,11 @@
 import express, { Router } from 'express';
 import passport from 'passport';
 
+import { SystemRole } from 'aalto-grades-common/types/auth';
 import { addCourse, getAllCourses, getCourse } from '../controllers/course';
 import { handleInvalidRequestJson } from '../middleware';
 import { authorization } from '../middleware/authorization';
 import { controllerDispatcher } from '../middleware/errorHandler';
-import { SystemRole } from '../types/general';
 
 export const router: Router = Router();
 

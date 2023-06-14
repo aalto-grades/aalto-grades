@@ -21,8 +21,8 @@ describe('Tests for FetchInstancesView components', () => {
 
     const mockResponse = { courseInstances: mockSisuInstances };
 
-    instancesService.getSisuInstances.mockRejectedValue('Network error');
-    instancesService.getSisuInstances.mockResolvedValue(mockResponse);
+    (instancesService.getSisuInstances as jest.Mock).mockRejectedValue('Network error');
+    (instancesService.getSisuInstances as jest.Mock).mockResolvedValue(mockResponse);
 
     return render(
       <BrowserRouter>

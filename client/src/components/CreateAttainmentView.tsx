@@ -54,7 +54,9 @@ const CreateAttainmentView = () => {
         navigate(-1);
       } else if (sisuInstanceId) {
         const temporaryId = attainmentIncrementId;
-        const [updatedAttainments, newTemporaryId] = attainmentServices.createTemporaryAttainment(addedAttainments, attainments[0], temporaryId);
+        const [updatedAttainments, newTemporaryId] = attainmentServices.createTemporaryAttainment(
+          addedAttainments, attainments[0], temporaryId
+        );
         setAddedAttainments(updatedAttainments);
         setIncrementId(newTemporaryId);
         navigate(-1);

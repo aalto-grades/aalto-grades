@@ -4,7 +4,9 @@
 
 import axios from './axios';
 
-async function exportSisuCsv(courseId: number | string, instanceId: number | string, params: unknown) {
+async function exportSisuCsv(
+  courseId: number | string, instanceId: number | string, params: unknown
+): Promise<BlobPart> {
   const response = await axios.get(
     `/v1/courses/${courseId}/instances/${instanceId}/grades/csv/sisu`,
     {

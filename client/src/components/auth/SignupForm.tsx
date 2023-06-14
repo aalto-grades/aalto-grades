@@ -10,9 +10,12 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio from '@mui/material/Radio';
 import Grid from '@mui/material/Grid';
-import { SystemRole } from 'aalto-grades-common/types/general';
+import { SystemRole } from 'aalto-grades-common/types/auth';
+import { SignupCredentials } from '../../types/auth';
 
-const SignupForm = ({ addUser }) => {
+const SignupForm = ({ addUser }: {
+  addUser: (userObject: SignupCredentials) => Promise<void>
+}) => {
 
   const [name, setName] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -20,21 +23,21 @@ const SignupForm = ({ addUser }) => {
   const [studentNumber, setStudentNumber] = useState<string | undefined>(undefined);
   const [role, setRole] = useState<SystemRole>(SystemRole.User);
 
-  const handleSubmit = (event) => {
+  function handleSubmit(event: React.SyntheticEvent) {
     event.preventDefault();
     try {
-      const userObject = ({
+      const userObject: SignupCredentials = {
         name,
         password,
         email,
         role,
         studentNumber
-      });
+      };
       addUser(userObject);
     } catch (exception) {
       console.log(exception);
     }
-  };
+  }
 
   return (
     <>

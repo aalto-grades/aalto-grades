@@ -6,3 +6,9 @@ export enum SystemRole {
   User = 'USER',
   Admin = 'ADMIN'
 }
+
+export interface LoginResult {
+  id: number,
+  name: string,
+  role: SystemRole
+}

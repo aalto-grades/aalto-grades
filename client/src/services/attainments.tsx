@@ -59,16 +59,16 @@ const addTemporaryIds: any = (attainments, temporaryId) => {
 
 // Add an attainment to a temporary list of attainments.
 const addTemporaryAttainment: any = (attainments, newAttainment) => {
-  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
-  let updatedNewAttainment = JSON.parse(JSON.stringify(newAttainment));
+  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  const updatedNewAttainment = JSON.parse(JSON.stringify(newAttainment));
   updatedAttainments.push(updatedNewAttainment);
   return updatedAttainments;
 };
 
 // Add an attainment to a temporary list of attainments and give it a temporary id.
 const createTemporaryAttainment: any = (attainments, newAttainment, temporaryId) => {
-  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
-  let updatedNewAttainment = JSON.parse(JSON.stringify(newAttainment));
+  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  const updatedNewAttainment = JSON.parse(JSON.stringify(newAttainment));
   updatedNewAttainment.temporaryId = temporaryId;
   updatedAttainments.push(updatedNewAttainment);
   const newTemporaryId = temporaryId + 1;
@@ -78,7 +78,9 @@ const createTemporaryAttainment: any = (attainments, newAttainment, temporaryId)
 // Update an attainment in a temporary list of attainments.
 const updateTemporaryAttainment: any = (attainments, newAttainment) => {
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
-  updatedAttainments = updatedAttainments.map((attainment) => attainment.temporaryId === newAttainment.temporaryId ? newAttainment : attainment);
+  updatedAttainments = updatedAttainments.map((attainment) => {
+    return attainment.temporaryId === newAttainment.temporaryId ? newAttainment : attainment;
+  });
   return updatedAttainments;
 };
 
@@ -194,7 +196,7 @@ const addSubAttainments: any = (indices, attainments, numOfAttainments, temporar
   const defaultExpiryDate = getProperty(indices, updatedAttainments, 'expiryDate');
   const parentId = getProperty(indices, updatedAttainments, 'id');
 
-  let newSubAttainments = [];
+  const newSubAttainments = [];
   for (let i = 0; i < numOfAttainments; i++) {
     newSubAttainments.push({
       temporaryId: newTemporaryId,
@@ -218,7 +220,7 @@ const addSubAttainments: any = (indices, attainments, numOfAttainments, temporar
 
 // Remove an attainment that is at the location specified by indices
 const removeAttainment: any = (indices, attainments) => {
-  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
   const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
@@ -229,7 +231,7 @@ const removeAttainment: any = (indices, attainments) => {
 // Creates a tree structure of attainments from an array of attainments with parent Ids
 const constructTreeAssignmets: any = (attainments) => {
   const updatedAttainments = JSON.parse(JSON.stringify(attainments));
-  let map = {};
+  const map = {};
   let root;
 
   updatedAttainments.forEach((attainment) => {
@@ -367,7 +369,7 @@ const getNumOfAttainments: any = (attainments) => {
     });
   };
 
-  let updatedAttainments = JSON.parse(JSON.stringify(attainments));
+  const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   countAttainment(updatedAttainments);
   return sum;
 
@@ -376,7 +378,7 @@ const getNumOfAttainments: any = (attainments) => {
 // Get the attainments that have ids so that they are already existing in the database
 const getExistingAttainments: any = (attainments) => {
 
-  let existingAttainments = [];
+  const existingAttainments = [];
   const findExisting = (modifiabelAttainments) => {
     modifiabelAttainments.forEach((attainment) => {
       if (attainment.id) {
@@ -397,7 +399,7 @@ const getExistingAttainments: any = (attainments) => {
 // Get the attainments that don't have ids so that they aren't existing in the database
 const getNewAttainments: any = (attainments) => {
 
-  let newAttainments = [];
+  const newAttainments = [];
   const findNew = (modifiabelAttainments) => {
     modifiabelAttainments.forEach((attainment) => {
       if (!attainment.id) {

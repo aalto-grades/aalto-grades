@@ -18,14 +18,15 @@ import instancesService from '../services/instances';
 import sortingServices from '../services/sorting';
 import useAuth from '../hooks/useAuth';
 import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
-import { SystemRole } from 'aalto-grades-common/types/general';
+import { SystemRole } from 'aalto-grades-common/types/auth';
+import { CourseInstanceData } from 'aalto-grades-common/types/course';
 
 // REPLACE SOME DAY? currently this info can't be fetched from database
-const mockInstitution: string = 'Aalto University';
+const mockInstitution = 'Aalto University';
 
 const CourseView = (): JSX.Element => {
-  let navigate = useNavigate();
-  let { courseId }: any = useParams();
+  const navigate = useNavigate();
+  const { courseId } = useParams();
   const { auth } = useAuth();
 
   const [courseDetails, setCourseDetails] = useState(null);
@@ -44,7 +45,9 @@ const CourseView = (): JSX.Element => {
 
     instancesService.getInstances(courseId)
       .then((data) => {
-        const sortedInstances = data.courseInstances.sort((a, b) => sortingServices.sortByDate(a.startDate, b.startDate));
+        const sortedInstances: Array<CourseInstanceData> = data.courseInstances.sort((a, b) => {
+          return sortingServices.sortByDate(a.startDate, b.startDate);
+        });
         setInstances(sortedInstances);
         setCurrentInstance(sortedInstances[0]);
       })

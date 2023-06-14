@@ -258,7 +258,9 @@ describe('Tests for CreateAttainmentView components', () => {
       userEvent.click(confirmButton);
 
       const temporaryId = mockContext.attainmentIncrementId;
-      const [updatedAttainments, newTemporaryId] = attainmentServices.createTemporaryAttainment(mockContext.addedAttainments, request, temporaryId);
+      const [updatedAttainments, newTemporaryId] = attainmentServices.createTemporaryAttainment(
+        mockContext.addedAttainments, request, temporaryId
+      );
 
       expect(mockContext.setAddedAttainments).toHaveBeenCalledWith(updatedAttainments);
       expect(mockContext.setIncrementId).toHaveBeenCalledWith(newTemporaryId);
