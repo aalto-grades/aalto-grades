@@ -5,7 +5,12 @@
 import express, { Router } from 'express';
 import passport from 'passport';
 
-import { addAttainable, deleteAttainment, updateAttainable } from '../controllers/attainable';
+import {
+  addAttainment,
+  deleteAttainment,
+  updateAttainment,
+  getAttainment
+} from '../controllers/attainment';
 import { handleInvalidRequestJson } from '../middleware';
 import { controllerDispatcher } from '../middleware/errorHandler';
 
@@ -142,7 +147,7 @@ router.post(
   passport.authenticate('jwt', { session: false }),
   express.json(),
   handleInvalidRequestJson,
-  controllerDispatcher(addAttainable)
+  controllerDispatcher(addAttainment)
 );
 
 /**
@@ -269,5 +274,55 @@ router.put(
   passport.authenticate('jwt', { session: false }),
   express.json(),
   handleInvalidRequestJson,
-  controllerDispatcher(updateAttainable)
+  controllerDispatcher(updateAttainment)
+);
+
+/**
+ * @swagger
+ * /v1/courses/{courseId}/instances/{instanceId}/attainments/{attainmentId}:
+ *  get:
+ *     tags: [Attainment]
+ *     description: Get single attainment or subtree downwards.
+ *     parameters:
+ *       - $ref: '#/components/parameters/courseId'
+ *       - $ref: '#/components/parameters/instanceId'
+ *       - $ref: '#/components/parameters/attainmentId'
+ *       - $ref: '#/components/parameters/tree'
+ *     responses:
+ *       200:
+ *         description:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Attainment'
+ *       400:
+ *         description:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       404:
+ *         description:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       422:
+ *         description:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ */
+
+router.get(
+  '/v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId',
+  passport.authenticate('jwt', { session: false }),
+  controllerDispatcher(getAttainment)
 );

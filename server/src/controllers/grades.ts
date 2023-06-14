@@ -5,11 +5,11 @@
 import { parse, Parser } from 'csv-parse';
 import { stringify } from 'csv-stringify';
 import { NextFunction, Request, Response } from 'express';
-import { Op, Transaction } from 'sequelize';
+import { Op, QueryTypes, Transaction } from 'sequelize';
 import * as yup from 'yup';
 
 import { sequelize } from '../database';
-import Attainable from '../database/models/attainable';
+import Attainment from '../database/models/attainment';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 import CourseInstanceRole from '../database/models/courseInstanceRole';
@@ -17,7 +17,7 @@ import CourseResult from '../database/models/courseResult';
 import User from '../database/models/user';
 import UserAttainmentGrade from '../database/models/userAttainmentGrade';
 
-import { CourseInstanceRoleType } from 'aalto-grades-common/types/course';
+import { CourseInstanceRoleType, GradingScale } from 'aalto-grades-common/types/course';
 import { getFormulaImplementation } from '../formulas';
 import { ApiError } from '../types/error';
 import { Formula, FormulaNode, GradingInput, GradingResult, Status } from '../types/formulas';
@@ -25,41 +25,121 @@ import { UserAttainmentGradeData, StudentGrades, GradingResultsWithUser } from '
 import { HttpCode } from '../types/httpCode';
 import { validateCourseAndInstance } from './utils/courseInstance';
 
+export async function getCsvTemplate(req: Request, res: Response): Promise<void> {
+  const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
+    await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
+
+  const attainmentTags: Array<string> = (await Attainment.findAll({
+    attributes: ['tag'],
+    where: {
+      courseId: course.id,
+      courseInstanceId: courseInstance.id
+    }
+  })).map((attainment: { tag: string }) => attainment.tag);
+
+  if (attainmentTags.length === 0) {
+    throw new ApiError(
+      `no attainments found for course instance with ID ${courseInstance.id}, `
+        + 'add attainments to the course instance to generate a template',
+      HttpCode.NotFound
+    );
+  }
+
+  const template: Array<Array<string>> = [
+    ['StudentNo', ...attainmentTags]
+  ];
+
+  const students: Array<{ studentNumber: string }> = await User.findAll({
+    attributes: ['studentNumber'],
+    include: {
+      model: CourseInstance,
+      attributes: [],
+      where: {
+        id: courseInstance.id,
+        '$CourseInstances->CourseInstanceRole.role$': CourseInstanceRoleType.Student
+      }
+    }
+  });
+
+  for (const student of students) {
+    template.push([student.studentNumber]);
+  }
+
+  stringify(
+    template,
+    {
+      delimiter: ','
+    },
+    (_err: unknown, data: string) => {
+      res
+        .status(HttpCode.Ok)
+        .setHeader('Content-Type', 'text/csv')
+        .attachment(`course_${course.courseCode}_grading_template.csv`)
+        .send(data);
+      return;
+    }
+  );
+}
+
 /**
  * Parse and extract attainment IDs from the CSV file header.
- * Correct format: "StudentNo,C3I9A1,C3I9A2,C3I9A3,C3I9A4,C3I9A5..."
+ * Correct format: "StudentNo,exam,exercise,project,..."
  * @param {Array<string>} header - Header part of the CSV file.
- * @returns {Array<number>} - Array containing the id's of attainments.
+ * @returns {Array<number>} - Array containing the IDs of attainments.
  * @throws {ApiError} - If first column not "StudentNo" (case-insensitive)
  * header array is empty or any of the attainment tags malformed or missing.
  */
-export function parseHeaderFromCsv(header: Array<string>): Array<number> {
-  const attainmentIds: Array<number> = [];
+export async function parseHeaderFromCsv(
+  header: Array<string>, courseInstanceId: number
+): Promise<Array<number>> {
   const errors: Array<string> = [];
 
   // Remove first input "StudentNo". Avoid using shift(), will have side-effects outside function.
-  const attainmentData: Array<string> = header.slice(1);
+  const attainmentTags: Array<string> = header.slice(1);
 
-  // Regex for checking type and extracting attainment id from the header column.
-  const attainmentTagRegex: RegExp = /(\d+)$/;
-
-  if (attainmentData.length === 0) {
+  if (attainmentTags.length === 0) {
     throw new ApiError(
       'No attainments found from the header, please upload valid CSV.',
       HttpCode.BadRequest
     );
   }
 
-  attainmentData.forEach((str: string) => {
-    const match: RegExpMatchArray | null = str.match(attainmentTagRegex);
-    if (match && match[1]) {
-      attainmentIds.push(parseInt(match[1], 10));
-    } else {
-      errors.push(
-        `Header attainment data parsing failed at column ${attainmentData.indexOf(str) + 2}.` +
-        ` Expected attainment id to type of number, received ${typeof str}.`
-      );
+  interface IdAndTag {
+    id: number,
+    tag: string
+  }
+
+  const attainments: Array<IdAndTag> = await Attainment.findAll({
+    attributes: ['id', 'tag'],
+    where: {
+      [Op.and]: [
+        {
+          courseInstanceId: courseInstanceId
+        },
+        {
+          tag: {
+            [Op.in]: attainmentTags
+          }
+        }
+      ]
     }
+  });
+
+  if (attainmentTags.length > attainments.length) {
+    for (const attainmentTag of attainmentTags) {
+      if (!attainments.find((attainment: IdAndTag) => attainment.tag === attainmentTag)) {
+        errors.push(
+          'Header attainment data parsing failed at column '
+            + `${attainmentTags.indexOf(attainmentTag) + 2}. `
+            + `Could not find an attainment with tag ${attainmentTag} in `
+            + `course instance with ID ${courseInstanceId}.`
+        );
+      }
+    }
+  }
+
+  const attainmentIds: Array<number> = attainments.map((attainment: IdAndTag) => {
+    return attainment.id;
   });
 
   // If any column parsing fails, throw error with invalid column info.
@@ -92,7 +172,7 @@ export function parseGradesFromCsv(
    *
    *        | column 1  | column 2 | column 3 |
    *  --------------------------------------------
-   *  row 1:| StudentNo | C1I1A1   | C1I1A6   |
+   *  row 1:| StudentNo | exercise | exam     |
    *  row 2:| 812472    | 12       | 32       |
    *  row 3:| 545761    | 0        | 15       |
    *  ...
@@ -126,7 +206,7 @@ export function parseGradesFromCsv(
         );
       } else {
         const grade: UserAttainmentGradeData = {
-          attainableId: attainmentIds[i],
+          attainmentId: attainmentIds[i],
           grade: parseInt(gradingData[i], 10)
         };
         student.grades.push(grade);
@@ -163,6 +243,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
    */
 
   // Validation path parameters.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
     await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
 
@@ -199,38 +280,12 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
         // Parse header and grades separately. Always first parse header before
         // parsing the grades as the grade parser needs the attainment id array.
-        const attainmentIds: Array<number> = parseHeaderFromCsv(header);
+        const attainmentIds: Array<number> = await parseHeaderFromCsv(
+          header, courseInstance.id
+        );
         let parsedStudentData: Array<StudentGrades> = parseGradesFromCsv(
           studentGradingData, attainmentIds
         );
-
-        // Fetch all attainments from db based on the id's extracted from the CSV.
-        const attainments: Array<Attainable> = await Attainable.findAll({
-          attributes: ['id'],
-          where: {
-            id: {
-              [Op.in]: attainmentIds
-            },
-            courseId: course.id,
-            courseInstanceId: courseInstance.id
-          }
-        });
-
-        // Check if any of the CSV attainment id's does not exist in the db, throw ApiError if so.
-        const foundIds: Array<number> = attainments.map((attainment: Attainable) => attainment.id);
-        const nonExistingIds: Array<number> = attainmentIds.filter(
-          (id: number) => !foundIds.includes(id)
-        );
-
-        if (nonExistingIds.length > 0) {
-          throw new ApiError(
-            'Attainments with following IDs do not exist or' +
-            ` belong to this course instance: ${nonExistingIds.join(', ')}.`,
-            HttpCode.UnprocessableEntity
-          );
-        }
-
-        // After this point all attainments are confirmed to exist and belong to the instance.
 
         // Check all users (students) exists in db, create new users if needed.
         const studentNumbers: Array<string> = parsedStudentData.map(
@@ -405,10 +460,6 @@ async function calculateFormulaNode(
   return await formulaNode.formulaImplementation.formulaFunction(inputs);
 }
 
-interface UserAttainmentGradeWithUser extends UserAttainmentGrade {
-  User: User
-}
-
 export async function calculateGrades(
   req: Request,
   res: Response
@@ -416,7 +467,7 @@ export async function calculateGrades(
   const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
     await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
 
-  // TODO: once jwt authorization connected to route, check requester id has teacher role.
+  // TODO: check requester id has teacher role on instance.
 
   /*
    * First we need to get all the attainments in this course instance.
@@ -429,7 +480,7 @@ export async function calculateGrades(
     parentFormulaParams: object | null
   }
 
-  const attainments: Array<AttainmentInfo> = await Attainable.findAll({
+  const attainments: Array<AttainmentInfo> = await Attainment.findAll({
     raw: true,
     where: {
       courseId: course.id,
@@ -437,9 +488,9 @@ export async function calculateGrades(
     },
     attributes: [
       'id',
-      // Translates attainableId to parentId.
+      // Translates attainmentId to parentId.
       // TODO: Rename in model if possible.
-      ['attainable_id', 'parentId'],
+      ['attainment_id', 'parentId'],
       'formula',
       'parentFormulaParams',
     ],
@@ -570,37 +621,20 @@ export async function calculateGrades(
    * Stores the grades of each student for each attainment which were manually
    * specified by a teacher.
    */
-  const unorganizedPresetGrades: Array<{
-    studentNumber: string,
-    grade: number,
-    attainmentId: number
-  }> = (await UserAttainmentGrade.findAll({
+  const unorganizedPresetGrades: Array<UserAttainmentGrade> = await UserAttainmentGrade.findAll({
     include: [
       {
-        model: Attainable,
+        model: Attainment,
         required: true,
         attributes: [],
         where: {
           courseId: course.id,
           courseInstanceId: courseInstance.id,
         }
-      },
-      {
-        model: User,
-        required: true,
-        attributes: ['studentNumber']
       }
     ],
-    attributes: ['grade', 'attainableId'],
-  }) as Array<UserAttainmentGradeWithUser>).map(
-    (attainmentGrade: UserAttainmentGradeWithUser) => {
-      return {
-        studentNumber: attainmentGrade.User.studentNumber,
-        grade: attainmentGrade.grade,
-        attainmentId: attainmentGrade.attainableId
-      };
-    }
-  );
+    attributes: ['grade', 'attainmentId', 'userId'],
+  });
 
   /*
    * Next we'll organize the preset grades by student number.
@@ -609,17 +643,17 @@ export async function calculateGrades(
   /*
    * Store the preset grades of all attainments per student. Stores all the
    * same information as unorganizedPresetGrades.
-   * Student number -> Formula node -> Preset grade.
+   * User ID -> Formula node -> Preset grade.
    */
-  const organizedPresetGrades: Map<string, Map<FormulaNode, number>> = new Map();
+  const organizedPresetGrades: Map<number, Map<FormulaNode, number>> = new Map();
 
   for (const presetGrade of unorganizedPresetGrades) {
     let userPresetGrades: Map<FormulaNode, number> | undefined =
-      organizedPresetGrades.get(presetGrade.studentNumber);
+      organizedPresetGrades.get(presetGrade.userId);
 
     if (!userPresetGrades) {
       userPresetGrades = new Map();
-      organizedPresetGrades.set(presetGrade.studentNumber, userPresetGrades);
+      organizedPresetGrades.set(presetGrade.userId, userPresetGrades);
     }
 
     userPresetGrades.set(
@@ -632,36 +666,60 @@ export async function calculateGrades(
    * Finally we're ready to calculate the grades of each student starting from
    * the root attainment.
    */
-
   const finalGrades: Array<{
-    studentNumber: string,
-    grade: number,
-    status: Status
+    userId: number,
+    courseInstanceId: number,
+    grade: string,
+    credits: number
   }> = [];
 
-  for (const [studentNumber, presetGrades] of organizedPresetGrades) {
+  for (const [userId, presetGrades] of organizedPresetGrades) {
     const finalGrade: GradingResult =
       await calculateFormulaNode(rootFormulaNode, presetGrades);
 
     finalGrades.push(
       {
-        studentNumber: studentNumber,
-        grade: finalGrade.grade,
-        status: finalGrade.status
+        userId: userId,
+        courseInstanceId: courseInstance.id,
+        grade:
+        // If grading scale numerical save numerical value, otherwise final grade status (PASS/FAIL)
+        courseInstance.gradingScale === GradingScale.Numerical ? finalGrade.status === Status.Pass ?
+          String(finalGrade.grade) : '0' : finalGrade.status,
+        credits: courseInstance.maxCredits
       }
     );
   }
 
-  /*
-   * TODO: Don't return final grades, save grades to database in
-   * calculateFormulaNode instead?
-   */
+  // TODO manual or auto calculation flag
+
+  await sequelize.transaction(async (transaction: Transaction) => {
+    for (const finalGrade of finalGrades) {
+      await sequelize.query(
+        `INSERT INTO course_result (
+        user_id, course_instance_id, grade,
+        credits, created_at, updated_at
+      )
+      VALUES
+        (:userId, :courseInstanceId, :grade, :credits, NOW(), NOW())
+        ON CONFLICT (user_id, course_instance_id) DO UPDATE
+      SET
+        user_id = :userId,
+        course_instance_id = :courseInstanceId,
+        grade = :grade,
+        credits = :credits,
+        updated_at = NOW();`,
+        {
+          replacements: finalGrade,
+          type: QueryTypes.INSERT,
+          transaction
+        }
+      );
+    }
+  });
 
   res.status(HttpCode.Ok).json({
     success: true,
-    data: {
-      grades: finalGrades
-    }
+    data: {}
   });
 }
 
@@ -762,4 +820,59 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
         .send(data);
       return;
     });
+}
+
+/**
+ * Get course instance final grading data in JSON format.
+ * @param {Request} req - The HTTP request.
+ * @param {Response} res - The HTTP response containing the CSV file.
+ * @returns {Promise<void>} - A Promise that resolves when the function has completed its execution.
+ * @throws {ApiError} - If course and/or course instance not found, instance does not belong to
+ * the course, or no course results found/calculated before calling the endpoint.
+*/
+export async function getFinalGrades(req: Request, res: Response): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
+    await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
+
+  const gradingResults: Array<GradingResultsWithUser> = await CourseResult.findAll({
+    attributes: ['id', 'grade', 'credits'],
+    where: {
+      courseInstanceId: courseInstance.id
+    },
+    include: {
+      model: User,
+      attributes: ['studentNumber']
+    }
+  }) as Array<GradingResultsWithUser>;
+
+  if (gradingResults.length === 0) {
+    throw new ApiError(
+      'no grades found, make sure grades have been calculated before requesting course results',
+      HttpCode.NotFound
+    );
+  }
+
+  const finalGrades: Array<{
+    id: number,
+    studentNumber: string,
+    grade: string,
+    credits: number
+  }> = gradingResults.map(
+    (courseResult: GradingResultsWithUser) => {
+      return {
+        id: courseResult.id,
+        studentNumber: courseResult.User.studentNumber,
+        grade: courseResult.grade,
+        credits: courseResult.credits
+      };
+    }
+  );
+
+  res.status(HttpCode.Ok).json({
+    success: true,
+    data: {
+      finalGrades
+    }
+  });
 }

@@ -135,7 +135,7 @@ const EditAttainmentView = () => {
     }
   };
 
-  return(
+  return (
     <>
       <Container maxWidth="md" sx={{ textAlign: 'right' }}>
         <Typography variant="h1" align='left' sx={{ flexGrow: 1, mb: 4 }}>

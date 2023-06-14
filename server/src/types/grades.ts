@@ -7,7 +7,7 @@ import User from '../database/models/user';
 
 export interface UserAttainmentGradeData {
   userId?: number,
-  attainableId: number,
+  attainmentId: number,
   grade: number
 }
 

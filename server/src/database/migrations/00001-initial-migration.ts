@@ -175,7 +175,7 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
-      await queryInterface.createTable('attainable', {
+      await queryInterface.createTable('attainment', {
         id: {
           type: DataTypes.INTEGER,
           autoIncrement: true,
@@ -201,15 +201,23 @@ export default {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
         },
-        attainable_id: {
+        attainment_id: {
           type: DataTypes.INTEGER,
           allowNull: true,
           references: {
-            model: 'attainable',
+            model: 'attainment',
             key: 'id'
           },
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
+        },
+        name: {
+          type: DataTypes.STRING,
+          allowNull: false
+        },
+        tag: {
+          type: DataTypes.STRING,
+          allowNull: false
         },
         formula: {
           type: DataTypes.ENUM('MANUAL', 'WEIGHTED_AVERAGE'),
@@ -219,10 +227,6 @@ export default {
         parent_formula_params: {
           type: DataTypes.JSONB,
           allowNull: true,
-        },
-        name: {
-          type: DataTypes.STRING,
-          allowNull: false
         },
         date: {
           type: DataTypes.DATE,
@@ -246,11 +250,11 @@ export default {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
         },
-        attainable_id: {
+        attainment_id: {
           type: DataTypes.INTEGER,
           primaryKey: true,
           references: {
-            model: 'attainable',
+            model: 'attainment',
             key: 'id'
           },
           onDelete: 'CASCADE',
@@ -311,7 +315,7 @@ export default {
     try {
       await queryInterface.dropTable('course_result', { transaction });
       await queryInterface.dropTable('user_attainment_grade', { transaction });
-      await queryInterface.dropTable('attainable', { transaction });
+      await queryInterface.dropTable('attainment', { transaction });
       await queryInterface.dropTable('course_translation', { transaction });
       await queryInterface.dropTable('course_instance_role', { transaction });
       await queryInterface.dropTable('course_instance', { transaction });
@@ -345,7 +349,7 @@ export default {
       );
 
       await queryInterface.sequelize.query(
-        'DROP TYPE IF EXISTS enum_attainable_formula;', { transaction }
+        'DROP TYPE IF EXISTS enum_attainment_formula;', { transaction }
       );
 
       await queryInterface.sequelize.query(

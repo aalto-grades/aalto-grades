@@ -12,8 +12,8 @@ import coursesService from '../services/courses';
 import instancesService from '../services/instances';
 import gradesService from '../services/grades';
 import AuthContext from '../context/authProvider';
-import mockCourses from '../mock-data/mockCourses';
-import mockInstances from '../mock-data/mockInstancesWithStringDates';
+import mockCourses from './mock-data/mockCourses';
+import mockInstances from './mock-data/mockInstancesWithStringDates';
 import { maxErrorsToShow } from '../components/course-view/FileLoadDialog';
 import { SystemRole } from 'aalto-grades-common/types/auth';
 

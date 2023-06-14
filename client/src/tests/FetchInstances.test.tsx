@@ -8,7 +8,7 @@ import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import FetchInstancesView from '../components/FetchInstancesView';
 import instancesService from '../services/instances';
-import mockSisuInstances from '../mock-data/mockSisuInstances';
+import mockSisuInstances from './mock-data/mockSisuInstances';
 
 jest.mock('../services/instances');
 afterEach(cleanup);
@@ -36,8 +36,9 @@ describe('Tests for FetchInstancesView components', () => {
     renderFetchInstancesView();
 
     await waitFor(() => {
-      const headingElement = screen.queryByText('Instances Found from SISU');
+      const headingElement = screen.queryByText('Instances Found from Sisu');
       const subHeading = screen.queryByText('Select the instance you wish to add');
+      const cancelButton = screen.queryByText('Cancel');
       const scratchButton = screen.queryByText('Start from Scratch');
       const type = screen.queryAllByText('Type:');
       const startDate = screen.queryAllByText('Starting Date:');
@@ -47,6 +48,7 @@ describe('Tests for FetchInstancesView components', () => {
 
       expect(headingElement).toBeInTheDocument();
       expect(subHeading).toBeInTheDocument();
+      expect(cancelButton).toBeInTheDocument();
       expect(scratchButton).toBeInTheDocument();
       expect(type).toHaveLength(instancesLength);
       expect(startDate).toHaveLength(instancesLength);

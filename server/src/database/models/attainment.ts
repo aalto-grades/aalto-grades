@@ -11,16 +11,17 @@ import { Formula } from '../../types/formulas';
 import Course from './course';
 import CourseInstance from './courseInstance';
 
-export default class Attainable extends Model<
-  InferAttributes<Attainable>,
-  InferCreationAttributes<Attainable>
+export default class Attainment extends Model<
+  InferAttributes<Attainment>,
+  InferCreationAttributes<Attainment>
 > {
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
   declare courseInstanceId: ForeignKey<CourseInstance['id']>;
   // TODO rename to parentId, atm sequelize forces name as "model + key" when querying.
-  declare attainableId: CreationOptional<ForeignKey<Attainable['id']>>;
+  declare attainmentId: CreationOptional<ForeignKey<Attainment['id']>>;
   declare name: string;
+  declare tag: string;
   declare formula: Formula;
   declare parentFormulaParams: CreationOptional<object>;
   declare date: Date; // Date when assignment is done (e.g., deadline or exam date)
@@ -29,7 +30,7 @@ export default class Attainable extends Model<
   declare updatedAt: CreationOptional<Date>;
 }
 
-Attainable.init(
+Attainment.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -52,13 +53,21 @@ Attainable.init(
         key: 'id'
       }
     },
-    attainableId: {
+    attainmentId: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'attainable',
+        model: 'attainment',
         key: 'id'
       }
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    tag: {
+      type: DataTypes.STRING,
+      allowNull: false
     },
     formula: {
       type: DataTypes.ENUM(Formula.Manual, Formula.WeightedAverage),
@@ -68,10 +77,6 @@ Attainable.init(
     parentFormulaParams: {
       type: DataTypes.JSONB,
       allowNull: true,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false
     },
     date: {
       type: DataTypes.DATE,
@@ -86,6 +91,6 @@ Attainable.init(
   },
   {
     sequelize,
-    tableName: 'attainable'
+    tableName: 'attainment'
   }
 );

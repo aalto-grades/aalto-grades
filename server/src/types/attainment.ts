@@ -2,15 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
-export interface AttainableRequestData {
+export interface AttainmentRequestData {
   parentId?: number,
   name: string,
+  tag: string,
   date: Date,
   expiryDate: Date,
-  subAttainments: Array<AttainableRequestData>
+  subAttainments: Array<AttainmentRequestData>
 }
 
-export interface AttainableData {
+export interface AttainmentData {
   id: number,
   courseId: number,
   courseInstanceId: number,
@@ -19,7 +20,6 @@ export interface AttainableData {
   name: string,
   date: Date,
   expiryDate: Date,
-  subAttainables?: Array<AttainableData>
-  subAttainments?: Array<AttainableData>
+  subAttainments?: Array<AttainmentData>
 }
 
