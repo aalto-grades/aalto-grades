@@ -13,7 +13,7 @@ import mockAttainments from '../mock-data/mockAttainments';
 import mockFormulas from '../mock-data/mockFormulas';
 
 const SelectFormulaView = () => {
-  const { instanceId, courseId }: any = useParams();
+  const { instanceId, courseId } = useParams();
   const [attainments, setAttainments] = useState([]);
   const [formulas, setFormulas] = useState([]);
   const navigate = useNavigate();
