@@ -19,10 +19,11 @@ import CourseResultsTableHead from './CourseResultsTableHead';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import sortingServices from '../../services/sorting';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const CourseResultsTable = (
-  { attainments, students, calculateFinalGrades, updateGrades, downloadCsvTemplate }
-) => {
+  { students, calculateFinalGrades, updateGrades, downloadCsvTemplate, loading }
+): JSX.Element => {
 
   const [order, setOrder] = useState<any>('asc');
   const [orderBy, setOrderBy] = useState<any>('studentNumber');
@@ -70,70 +71,75 @@ const CourseResultsTable = (
           updateGrades={updateGrades}
           downloadCsvTemplate={downloadCsvTemplate}
         />
-        <TableContainer>
-          <Table
-            sx={{ minWidth: 75, mx: 4 }}
-            aria-labelledby='courseResultsTable'
-            size={dense ? 'small' : 'medium'}
-          >
-            <CourseResultsTableHead
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-              attainments = {attainments}
-            />
-            <TableBody>
-              { sortingServices.stableSort(studentsToShow,
-                sortingServices.getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((student) => {
+        { loading
+          ?
+          <Box sx={{ margin: 'auto', alignItems: 'center', justifyContent: 'center', display: 'flex', mt: 3 }}>
+            <CircularProgress />
+          </Box>
+          :
+          <TableContainer>
+            <Table
+              sx={{ minWidth: 75, mx: 4 }}
+              aria-labelledby='courseResultsTable'
+              size={dense ? 'small' : 'medium'}
+            >
+              <CourseResultsTableHead
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={handleRequestSort}
+              />
+              <TableBody>
+                { sortingServices.stableSort(studentsToShow,
+                  sortingServices.getComparator(order, orderBy))
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((student) => {
 
-                  return (
-                    <TableRow
-                      hover
-                      tabIndex={-1}
-                      key={student.studentNumber}
-                    >
-                      <TableCell
-                        sx={{ width: '100px' }}
-                        component="th"
-                        id={student.studentNumber}
-                        scope="row"
-                        padding="normal"
+                    return (
+                      <TableRow
+                        hover
+                        tabIndex={-1}
+                        key={student.studentNumber}
                       >
-                        {student.studentNumber}
-                      </TableCell>
-                      {attainments.map((attainment) => {
-                        return (
-                          <TableCell
-                            sx={{ width: '100px' }}
-                            align="left"
-                            key={`${student.studentNumber}_${attainment.id}`}>
-                            {student[attainment.id]}
-                          </TableCell>
-                        );
-                      })}
-                      <TableCell
-                        sx={{ width: '100px' }}
-                        align="left"
-                        key={`${student.studentNumber}_finalGrade`}>
-                        {student.finalGrade}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: (dense ? 33 : 53) * emptyRows,
-                  }}
-                >
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                        <TableCell
+                          sx={{ width: '100px' }}
+                          component="th"
+                          id={student.studentNumber}
+                          scope="row"
+                          padding="normal"
+                        >
+                          {student.studentNumber}
+                        </TableCell>
+                        <TableCell
+                          sx={{ width: '100px' }}
+                          component="th"
+                          id={student.credits}
+                          scope="row"
+                          padding="normal"
+                        >
+                          {student.credits}
+                        </TableCell>
+                        <TableCell
+                          sx={{ width: '100px' }}
+                          align="left"
+                          key={`${student.studentNumber}_grade`}>
+                          {student.grade}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                {emptyRows > 0 && (
+                  <TableRow
+                    style={{
+                      height: (dense ? 33 : 53) * emptyRows,
+                    }}
+                  >
+                    <TableCell colSpan={6} />
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        }
         <Box sx={{
           display: 'flex',
           flexDirection: 'row',
@@ -165,11 +171,11 @@ const CourseResultsTable = (
 };
 
 CourseResultsTable.propTypes = {
-  attainments: PropTypes.array,
   students: PropTypes.array,
   calculateFinalGrades: PropTypes.func,
   updateGrades: PropTypes.func,
-  downloadCsvTemplate: PropTypes.func
+  downloadCsvTemplate: PropTypes.func,
+  loading: PropTypes.bool
 };
 
 export default CourseResultsTable;

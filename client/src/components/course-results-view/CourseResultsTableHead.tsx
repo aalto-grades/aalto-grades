@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import TableHead from '@mui/material/TableHead';
 import TableSortLabel from '@mui/material/TableSortLabel';
@@ -11,22 +11,22 @@ import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import Box from '@mui/material/Box';
 
-const CourseResultsTableHead = (props) => {
+const CourseResultsTableHead = ({ order, orderBy, onRequestSort }) => {
 
-  const { order, orderBy, onRequestSort, attainments } = props;
-  const [rows, setRows] = useState<any>([]);
-
-  useEffect(() => {
-    const headObject = [{
+  const rows = [
+    {
       id: 'studentNumber',
       name: 'Student Number'
-    }];
-    const tailObject = [{
+    },
+    {
+      id: 'credits',
+      name: 'Credits (ECTS)'
+    },
+    {
       id: 'finalGrade',
       name: 'Final Grade'
-    }];
-    setRows(headObject.concat(attainments).concat(tailObject));
-  }, [attainments]);
+    }
+  ];
 
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
@@ -35,20 +35,20 @@ const CourseResultsTableHead = (props) => {
   return (
     <TableHead>
       <TableRow>
-        {rows.map((attainment) => (
+        {rows.map((column) => (
           <TableCell
-            key={attainment.id}
+            key={column.id}
             align='left'
             padding='normal'
-            sortDirection={orderBy === attainment.id ? order : false}
+            sortDirection={orderBy === column.id ? order : false}
           >
             <TableSortLabel
-              active={orderBy === attainment.id}
-              direction={orderBy === attainment.id ? order : 'asc'}
-              onClick={createSortHandler(attainment.id)}
+              active={orderBy === column.id}
+              direction={orderBy === column.id ? order : 'asc'}
+              onClick={createSortHandler(column.id)}
             >
-              {attainment.name}
-              {orderBy === attainment.id ? (
+              {column.name}
+              {orderBy === column.id ? (
                 <Box component="span" sx={visuallyHidden}>
                   {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
                 </Box>
@@ -64,8 +64,7 @@ const CourseResultsTableHead = (props) => {
 CourseResultsTableHead.propTypes = {
   onRequestSort: PropTypes.func.isRequired,
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-  orderBy: PropTypes.any.isRequired,
-  attainments: PropTypes.array
+  orderBy: PropTypes.any.isRequired
 };
 
 export default CourseResultsTableHead;

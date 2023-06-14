@@ -4,7 +4,7 @@
 
 import axios from './axios';
 
-async function exportSisuCsv(courseId: number, instanceId: number, params) {
+async function exportSisuCsv(courseId: number | string, instanceId: number | string, params: unknown) {
   const response = await axios.get(
     `/v1/courses/${courseId}/instances/${instanceId}/grades/csv/sisu`,
     {
@@ -15,7 +15,9 @@ async function exportSisuCsv(courseId: number, instanceId: number, params) {
   return response.data;
 }
 
-async function importCsv(courseId: number, instanceId: number, csv) {
+async function importCsv(
+  courseId: number | string, instanceId: number | string, csv: unknown
+) {
   const response = await axios.postForm(
     `/v1/courses/${courseId}/instances/${instanceId}/grades/csv`,
     {
@@ -25,11 +27,31 @@ async function importCsv(courseId: number, instanceId: number, csv) {
   return response.data.data;
 }
 
-async function downloadCsvTemplate(courseId: number, instanceId: number) {
+async function downloadCsvTemplate(
+  courseId: number | string, instanceId: number | string
+) {
   const response = await axios.get(
     `/v1/courses/${courseId}/instances/${instanceId}/grades/csv`
   );
   return response;
 }
 
-export default { exportSisuCsv, importCsv, downloadCsvTemplate };
+export async function calculateFinalGrades(
+  courseId: number | string, instanceId: number | string
+) {
+  const response = await axios.post(
+    `/v1/courses/${courseId}/instances/${instanceId}/grades/calculate`
+  );
+  return response.data.success;
+}
+
+export async function getFinalGrades(
+  courseId: number | string, instanceId: number | string
+) {
+  const response = await axios.get(
+    `/v1/courses/${courseId}/instances/${instanceId}/grades`
+  );
+  return response.data.data;
+}
+
+export default { calculateFinalGrades, exportSisuCsv, getFinalGrades, importCsv, downloadCsvTemplate };

@@ -8,27 +8,30 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import CourseResultsTable from './course-results-view/CourseResultsTable';
 import AlertSnackbar from './alerts/AlertSnackbar';
-import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
-import mockStudentGradesFinal from '../mock-data/mockStudentGradesFinal';
 import gradesService from '../services/grades';
 
 const CourseResultsView = (): JSX.Element => {
-  let { courseId, instanceId }: any = useParams();
+  const { courseId, instanceId } = useParams();
 
-  const [attainments, setAttainments] = useState([]);
   const [students, setStudents] = useState([]);
-  // TODO: get instance ID from props
-
   const [snackPack, setSnackPack] = useState([]);
-  const [alertOpen, setAlertOpen] = useState<boolean>(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [messageInfo, setMessageInfo] = useState(undefined);
 
-
   useEffect(() => {
-    // TODO: get attainments from backend
-    setAttainments(mockAttainmentsClient);
-    // TODO: get student grades from backend
-    // modify the grades to fit the row structure
+    setLoading(true);
+    gradesService.getFinalGrades(courseId, instanceId).then(data => {
+      setStudents(data.finalGrades);
+    }).catch(exception => {
+      console.log(exception);
+      setSnackPack((prev) => [...prev,
+        { msg: 'Fetching final grades failed, make sure grades are imported and calculated.', severity: 'error' }
+      ]);
+    }).finally(() => {
+      setLoading(false);
+      setAlertOpen(false);
+    });
   }, []);
 
   // useEffect in charge of handling the back-to-back alerts
@@ -49,49 +52,35 @@ const CourseResultsView = (): JSX.Element => {
 
   // Triggers the calculation of final grades
   async function calculateFinalGrades(): Promise<void> {
-    setSnackPack((prev) => [
-      ...prev,
-      {
-        msg: 'Calculating final grades...',
-        severity: 'info'
-      }
-    ]);
-    await sleep(3000);
-    // Throw error if no grades have been added
-    if (students.length === 0) {
-      setSnackPack((prev) => [
-        ...prev,
-        {
-          msg: 'Import student grades before calculating the final grade.',
-          severity: 'error'
-        }
+    try {
+      setSnackPack((prev) => [...prev,
+        { msg: 'Calculating final grades...', severity: 'info' }
       ]);
-    } else {
-      try {
-        // TODO: connect to backend
-        setSnackPack((prev) => [
-          ...prev,
-          {
-            msg: 'Final grades calculated successfully.',
-            severity: 'success'
-          }
-        ]);
-        setStudents(mockStudentGradesFinal);
+      await sleep(2000);
+      const success = await gradesService.calculateFinalGrades(courseId, instanceId);
 
-      } catch (exception) {
-        console.log(exception);
-        setSnackPack((prev) => [
-          ...prev,
-          {
-            msg: 'Calculating the final grades failed.',
-            severity: 'error'
-          }
+      if (success) {
+        setSnackPack((prev) => [...prev,
+          { msg: 'Final grades calculated successfully.', severity: 'success' }
         ]);
+        await sleep(2000);
+
+        setLoading(true);
+        setSnackPack((prev) => [...prev,
+          { msg: 'Fetching final grades...', severity: 'info' }
+        ]);
+        const data = await gradesService.getFinalGrades(courseId, instanceId);
+        setStudents(data.finalGrades);
       }
+    } catch (exception) {
+      console.log(exception);
+      setSnackPack((prev) => [...prev,
+        { msg: 'Import student grades before calculating the final grade.', severity: 'error' }
+      ]);
+    } finally {
+      setLoading(false);
     }
-    await sleep(4000);
-    setAlertOpen(false);
-  }
+  };
 
   async function updateGrades(newGrades): Promise<void> {
     setSnackPack((prev) => [
@@ -101,7 +90,7 @@ const CourseResultsView = (): JSX.Element => {
         severity: 'info'
       }
     ]);
-    await sleep(3000);
+    await sleep(2000);
     try {
       // TODO: connect to backend
       setSnackPack((prev) => [
@@ -177,15 +166,14 @@ const CourseResultsView = (): JSX.Element => {
         Course Results
       </Typography>
       <CourseResultsTable
-        attainments={attainments}
         students={students}
+        loading={loading}
         calculateFinalGrades={calculateFinalGrades}
         updateGrades={updateGrades}
         downloadCsvTemplate={downloadCsvTemplate}
       />
     </Box>
   );
-
 };
 
 export default CourseResultsView;

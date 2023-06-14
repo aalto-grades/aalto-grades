@@ -16,7 +16,6 @@ import Button from '@mui/material/Button';
 import FormHelperText from '@mui/material/FormHelperText';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import gradesService from '../../services/grades';
-import mockStudentGrades from '../../mock-data/mockStudentGrades';
 import FileErrorDialog from './FileErrorDialog';
 
 // A Dialog component for uploading a file
@@ -27,14 +26,14 @@ const exampleText = 'A student with the student number 222222 has gotten 8 point
 const errorInstructions = 'The input file cannot be processed due to the following issues that must be addressed and fixed:';
 
 const loadingMsg = { msg: 'Importing grades...', severity: 'info' };
-const successMsg = { msg: 'File processed successfully, grades imported.', severity: 'success' };
+const successMsg = { msg: 'File processed successfully, grades imported. To refresh final grades, press "calculate final grades"', severity: 'success' };
 const errorMsg = { msg: 'There was an issue progressing the file, the grades were not imported.', severity: 'error' };
 
 // How many errors are initially rendered visible in the dialog.
-export const maxErrorsToShow = 5;
+export const maxErrorsToShow: number = 5;
 
-const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades }) => {
-  let { courseId }: any = useParams();
+const FileLoadDialog = ({ instanceId, handleClose, open,  }) => {
+  let { courseId } = useParams();
   const fileInput = createRef<any>();
 
   // state variables handling the alert messages
@@ -67,15 +66,7 @@ const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades })
     setSnackPack((prev) => [...prev, loadingMsg]);
     try {
       await gradesService.importCsv(courseId, instanceId, fileInput.current.files[0]);
-
       setSnackPack((prev) => [...prev, successMsg]);
-
-      if (returnImportedGrades) {
-        // TODO: replace mock grades with response from backend
-        // or fetch updated grades from backend
-        returnImportedGrades(mockStudentGrades);
-      }
-
       handleClose();
       setFileName(null);
     } catch (err) {
