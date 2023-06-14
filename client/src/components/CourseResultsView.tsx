@@ -12,13 +12,28 @@ import { useParams } from 'react-router-dom';
 
 
 const CourseResultsView = () => {
-
-  const [students, setStudents] = useState([]);
   const { courseId, instanceId } = useParams();
 
+  const [students, setStudents] = useState([]);
   const [snackPack, setSnackPack] = useState([]);
   const [alertOpen, setAlertOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [messageInfo, setMessageInfo] = useState(undefined);
+
+  useEffect(() => {
+    setLoading(true);
+    gradesService.getFinalGrades(courseId, instanceId).then(data => {
+      setStudents(data.finalGrades);
+    }).catch(exception => {
+      console.log(exception);
+      setSnackPack((prev) => [...prev,
+        { msg: 'Fetching final grades failed, make sure grades are imported and calculated.', severity: 'error' }
+      ]);
+    }).finally(() => {
+      setLoading(false);
+      setAlertOpen(false);
+    });
+  }, []);
 
   // useEffect in charge of handling the back-to-back alerts
   // makes the previous disappear before showing the new one
@@ -49,18 +64,20 @@ const CourseResultsView = () => {
         ]);
         await sleep(2000);
 
+        setLoading(true);
         setSnackPack((prev) => [...prev,
-          { msg: 'Fething final grades...', severity: 'info' }
+          { msg: 'Fetching final grades...', severity: 'info' }
         ]);
         const data = await gradesService.getFinalGrades(courseId, instanceId);
         setStudents(data.finalGrades);
-        setAlertOpen(false);
       }
     } catch (exception) {
       console.log(exception);
       setSnackPack((prev) => [...prev,
         { msg: 'Import student grades before calculating the final grade.', severity: 'error' }
       ]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,7 +85,7 @@ const CourseResultsView = () => {
     setSnackPack((prev) => [...prev,
       { msg: 'Importing grades...', severity: 'info' }
     ]);
-    await sleep(3000);
+    await sleep(2000);
     try {
       // TODO: connect to backend
       setSnackPack((prev) => [...prev,
@@ -94,6 +111,7 @@ const CourseResultsView = () => {
       </Typography>
       <CourseResultsTable
         students={students}
+        loading={loading}
         calculateFinalGrades={calculateFinalGrades}
         updateGrades={updateGrades}
       />
