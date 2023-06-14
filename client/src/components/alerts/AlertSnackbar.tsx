@@ -42,6 +42,7 @@ const AlertSnackbar = ({ messageInfo, setMessageInfo, open, setOpen, position })
         <Snackbar
           key={messageInfo?.msg}
           open={open}
+          autoHideDuration={4000}
           anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
           onClose={handleClose}
           TransitionComponent={Slide}
