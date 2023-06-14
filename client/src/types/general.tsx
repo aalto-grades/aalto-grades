@@ -10,5 +10,5 @@ export interface ApiResponse<T> {
 
 export interface Message {
   msg: string,
-  severity: string // TODO: Enum?
+  severity?: 'error' | 'warning' | 'info' | 'success'
 }
