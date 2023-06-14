@@ -47,7 +47,7 @@ const AlertSnackbar = ({ messageInfo, setMessageInfo, open, setOpen, position }:
     <div>
       <ThemeProvider theme={darkTheme}>
         <Snackbar
-          key={messageInfo.msg}
+          key={messageInfo?.msg}
           open={open}
           autoHideDuration={4000}
           anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
@@ -56,8 +56,8 @@ const AlertSnackbar = ({ messageInfo, setMessageInfo, open, setOpen, position }:
           TransitionProps={{ onExited: handleExited }}
           sx={{ mt: margin, maxWidth: '45vw', textAlign: 'left' }}
         >
-          <Alert onClose={handleClose} severity={messageInfo.severity ?? 'info'} sx={{ width: '100%' }}>
-            {messageInfo.msg}
+          <Alert onClose={handleClose} severity={messageInfo?.severity ?? 'info'} sx={{ width: '100%' }}>
+            {messageInfo?.msg}
           </Alert>
         </Snackbar>
       </ThemeProvider>
