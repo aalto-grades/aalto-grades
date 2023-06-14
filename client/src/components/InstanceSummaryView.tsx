@@ -14,24 +14,25 @@ import textFormatServices from '../services/textFormat';
 import instancesService from '../services/instances';
 import attainmentServices from '../services/attainments';
 import useSnackPackAlerts from '../hooks/useSnackPackAlerts';
+import { Message } from '../../types/general';
 
 const successMsgInstance = { msg: 'Instance created successfully.', severity: 'success' };
 const successMsgWithoutAttainments = { msg: 'Instance created successfully. Redirecting to course page in 30 seconds.', severity: 'success' };
 const errorMsgInstance = { msg: 'Instance creation failed.', severity: 'error' };
 
-const successMsgAttainments = {
+const successMsgAttainments: Message = {
   msg: 'Attainments added successfully. Redirecting to course page in 30 seconds.',
   severity: 'success'
 };
 
-const errorMsgAttainments = {
+const errorMsgAttainments: Message = {
   msg: 'Something went wrong while adding attainments. Redirecting to course page in 30 seconds. Attainments can be modified there.',
   severity: 'error'
 };
 
 const InstanceSummaryView = () => {
-  let navigate = useNavigate();
-  let { courseId, sisuInstanceId } = useParams();
+  const navigate = useNavigate();
+  const { courseId, sisuInstanceId } = useParams();
 
   const {
     addedAttainments,

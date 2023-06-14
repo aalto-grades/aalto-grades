@@ -60,7 +60,7 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
   // checks that user has selected a function and at least one attainment
   // if not, shows error message
   const canBeSubmitted = () => {
-    var noErrors = true;
+    let noErrors = true;
     if(selectedAttainments.length === 0) {
       setCheckboxError('You must select at least one study attainment');
       noErrors = false;
@@ -126,7 +126,7 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
 
   const isChecked = (attainment) => {
     // If user has returned from attribute selection -> only assigments they previously selected are checked
-    var i;
+    let i;
     for (i = 0; i < selectedAttainments.length; i++) {
       if (selectedAttainments[i] === attainment) {
         return true;

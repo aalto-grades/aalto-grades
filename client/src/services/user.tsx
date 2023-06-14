@@ -3,25 +3,13 @@
 // SPDX-License-Identifier: MIT
 
 import axios from './axios';
-import { LoginResult, SystemRole } from 'aalto-grades-common/types/auth';
+import { LoginResult } from 'aalto-grades-common/types/auth';
+import { LoginCredentials, SignupCredentials } from '../types/auth';
 import { ApiResponse } from '../types/general';
-
-interface LoginCredentials {
-  email: string,
-  password: string
-}
 
 async function login(credentials: LoginCredentials): Promise<ApiResponse<LoginResult>> {
   const response = await axios.post('/v1/auth/login', credentials);
   return response.data;
-}
-
-interface SignupCredentials {
-  email: string,
-  password: string,
-  studentNumber: string,
-  name: string,
-  role: SystemRole
 }
 
 async function signup(credentials: SignupCredentials): Promise<ApiResponse<LoginResult>> {

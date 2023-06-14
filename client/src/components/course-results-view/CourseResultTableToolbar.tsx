@@ -20,7 +20,7 @@ import SisuExportDialog from './SisuExportDialog';
 const CourseResultsTableToolbar = (
   { search, setSearch, calculateFinalGrades, updateGrades }
 ) => {
-  let { instanceId } = useParams();
+  const { instanceId } = useParams();
 
   const [showFileDialog, setShowFileDialog] = useState<any>(false);
   const [showSisuDialog, setShowSisuDialog] = useState<any>(false);

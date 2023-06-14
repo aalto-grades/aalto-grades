@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 
 const CourseCard = ({ course }) => {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
   const { id, name, courseCode, department } = course;
 
   return(

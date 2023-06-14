@@ -56,8 +56,8 @@ const teacherData = {
 const textFieldMinWidth = 195;
 
 const EditInstanceForm = ({ instance }) => {
-  let navigate = useNavigate();
-  let { courseId, sisuInstanceId } = useParams();
+  const navigate = useNavigate();
+  const { courseId, sisuInstanceId } = useParams();
 
   const {
     courseType, setType,

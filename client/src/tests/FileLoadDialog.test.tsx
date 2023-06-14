@@ -17,7 +17,7 @@ import mockInstances from './mock-data/mockInstancesWithStringDates';
 import { maxErrorsToShow } from '../components/course-view/FileLoadDialog';
 import { SystemRole } from 'aalto-grades-common/types/auth';
 
-let file = new File(['idk'], 'grades_test.csv', { type: 'csv' });
+const file = new File(['idk'], 'grades_test.csv', { type: 'csv' });
 
 jest.mock('../services/courses');
 jest.mock('../services/instances');

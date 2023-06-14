@@ -21,11 +21,11 @@ import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 import { SystemRole } from 'aalto-grades-common/types/auth';
 
 // REPLACE SOME DAY? currently this info can't be fetched from database
-const mockInstitution: string = 'Aalto University';
+const mockInstitution = 'Aalto University';
 
 const CourseView = (): JSX.Element => {
-  let navigate = useNavigate();
-  let { courseId }: any = useParams();
+  const navigate = useNavigate();
+  const { courseId }: any = useParams();
   const { auth } = useAuth();
 
   const [courseDetails, setCourseDetails] = useState(null);

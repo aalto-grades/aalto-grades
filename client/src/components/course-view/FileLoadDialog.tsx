@@ -34,13 +34,13 @@ const errorMsg = { msg: 'There was an issue progressing the file, the grades wer
 export const maxErrorsToShow = 5;
 
 const FileLoadDialog = ({ instanceId, handleClose, open, returnImportedGrades }) => {
-  let { courseId } = useParams();
+  const { courseId } = useParams();
   const fileInput = createRef<any>();
 
   // state variables handling the alert messages
   const [snackPack, setSnackPack] = useState<any>([]);
-  const [alertOpen, setAlertOpen] = useState<any>(false);
-  const [showErrorDialog, setShowErrorDialog] = useState<any>(false);
+  const [alertOpen, setAlertOpen] = useState<boolean>(false);
+  const [showErrorDialog, setShowErrorDialog] = useState<boolean>(false);
   const [messageInfo, setMessageInfo] = useState<any>(undefined);
 
   const toggleErrorDialog = () => {
