@@ -64,6 +64,18 @@ CourseResult.belongsTo(User, {
   foreignKey: 'userId'
 });
 
+User.hasMany(CourseResult, {
+  foreignKey: 'graderId',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+CourseResult.belongsTo(User, {
+  as: 'grader',
+  targetKey: 'id',
+  foreignKey: 'graderId'
+});
+
 CourseInstance.hasMany(CourseResult, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
@@ -111,6 +123,18 @@ User.hasMany(UserAttainmentGrade, {
 UserAttainmentGrade.belongsTo(User, {
   targetKey: 'id',
   foreignKey: 'userId'
+});
+
+User.hasMany(UserAttainmentGrade, {
+  foreignKey: 'graderId',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+UserAttainmentGrade.belongsTo(User, {
+  as: 'grader',
+  targetKey: 'id',
+  foreignKey: 'graderId'
 });
 
 Attainment.hasMany(UserAttainmentGrade, {
