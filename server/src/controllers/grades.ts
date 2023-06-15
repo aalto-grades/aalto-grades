@@ -21,6 +21,7 @@ import { CourseInstanceRoleType, GradingScale } from 'aalto-grades-common/types/
 import { getFormulaImplementation } from '../formulas';
 import { ApiError } from '../types/error';
 import { Formula, FormulaNode, GradingInput, GradingResult, Status } from '../types/formulas';
+import { JwtClaims } from '../types/general';
 import { UserAttainmentGradeData, StudentGrades, GradingResultsWithUser } from '../types/grades';
 import { HttpCode } from '../types/httpCode';
 import { validateCourseAndInstance } from './utils/courseInstance';
@@ -242,6 +243,8 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
    * - Check grading points are not higher than max points of the attainment.
    */
 
+  const grader: JwtClaims = req.user as JwtClaims;
+
   // Validation path parameters.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
@@ -374,6 +377,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
           });
 
         interface GradeCreation extends UserAttainmentGradeData {
+          graderId: number,
           manual: boolean
         }
 
@@ -385,6 +389,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
               (grade: UserAttainmentGradeData): GradeCreation => {
                 return {
                   userId: student.id as number,
+                  graderId: grader.id,
                   manual: true,
                   ...grade
                 };
@@ -473,6 +478,7 @@ export async function calculateGrades(
     await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
 
   // TODO: check requester id has teacher role on instance.
+  const grader: JwtClaims = req.user as JwtClaims;
 
   /*
    * First we need to get all the attainments in this course instance.
@@ -672,6 +678,7 @@ export async function calculateGrades(
   const finalGrades: Array<{
     userId: number,
     courseInstanceId: number,
+    graderId: number,
     grade: string,
     credits: number
   }> = [];
@@ -684,6 +691,7 @@ export async function calculateGrades(
       {
         userId: userId,
         courseInstanceId: courseInstance.id,
+        graderId: grader.id,
         grade:
         // If grading scale numerical save numerical value, otherwise final grade status (PASS/FAIL)
         courseInstance.gradingScale === GradingScale.Numerical ? finalGrade.status === Status.Pass ?
@@ -699,15 +707,16 @@ export async function calculateGrades(
     for (const finalGrade of finalGrades) {
       await sequelize.query(
         `INSERT INTO course_result (
-        user_id, course_instance_id, grade,
+        user_id, course_instance_id, grader_id, grade,
         credits, created_at, updated_at
       )
       VALUES
-        (:userId, :courseInstanceId, :grade, :credits, NOW(), NOW())
+        (:userId, :courseInstanceId, :graderId, :grade, :credits, NOW(), NOW())
         ON CONFLICT (user_id, course_instance_id) DO UPDATE
       SET
         user_id = :userId,
         course_instance_id = :courseInstanceId,
+        grader_id = :graderId,
         grade = :grade,
         credits = :credits,
         updated_at = NOW();`,

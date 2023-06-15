@@ -16,6 +16,7 @@ export default class UserAttainmentGrade extends Model<
 > {
   declare userId: ForeignKey<User['id']>;
   declare attainmentId: ForeignKey<Attainment['id']>;
+  declare graderId: ForeignKey<User['id']>;
   declare grade: number;
   declare manual: boolean;
   declare createdAt: CreationOptional<Date>;
@@ -37,6 +38,14 @@ UserAttainmentGrade.init(
       primaryKey: true,
       references: {
         model: 'attainment',
+        key: 'id'
+      }
+    },
+    graderId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'user',
         key: 'id'
       }
     },

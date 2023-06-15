@@ -226,4 +226,5 @@ INSERT INTO public.attainment (course_id, course_instance_id, parent_id, name, t
 (6, 22, null, 'test csv template no students', 'tag221', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
 (6, 22, 221, 'test csv template no students', 'tag222', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
 (6, 22, 221, 'test csv template no students', 'tag223', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
-(5, 14, null, 'test csv upload manual', 'tag224', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL);
+(5, 14, null, 'test csv upload manual', 'tag224', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
+(5, 14, null, 'test csv upload grader', 'tag225', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL);
