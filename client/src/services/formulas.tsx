@@ -5,12 +5,15 @@
 import axios from './axios';
 import mockFormulas from '../mock-data/mockFormulas';
 
-const getFormulas: any = async () => {
-  // TODO: specify route
-  const response = await axios.get('/??');
-  console.log(response.data);
-  return response.data;
-};
+async function getFormulas(): Promise<any> {
+  const response = await axios.get('/v1/formulas');
+  return response.data.data.formulas;
+}
+
+async function getFormulaDetails(formulaId: string): Promise<any> {
+  const response = await axios.get(`/v1/formulas/${formulaId}`);
+  return response.data.data.formula;
+}
 
 const setFormula: any = async (formulaInfo) => {
   // TODO: specify route
@@ -42,4 +45,4 @@ const getAttributeLabel: any = (labelKey) => {
   return capitalizedLabel;
 };
 
-export default { getFormulas, setFormula, getFormulaName, getFormulaAttributes, getAttributeLabel };
+export default { getFormulas, getFormulaDetails, setFormula, getFormulaName, getFormulaAttributes, getAttributeLabel };
