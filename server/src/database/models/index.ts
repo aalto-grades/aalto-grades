@@ -64,6 +64,17 @@ CourseResult.belongsTo(User, {
   foreignKey: 'userId'
 });
 
+User.hasMany(CourseResult, {
+  foreignKey: 'graderId',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+CourseResult.belongsTo(User, {
+  targetKey: 'id',
+  foreignKey: 'graderId'
+});
+
 CourseInstance.hasMany(CourseResult, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'

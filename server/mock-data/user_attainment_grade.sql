@@ -50,4 +50,5 @@ INSERT INTO public.user_attainment_grade (user_id, attainment_id, grader_id, gra
 (95, 212, 1, 1, true, NOW(), NOW()),
 (95, 213, 1, 3, true, NOW(), NOW()),
 (100, 212, 1, 5, true, NOW(), NOW()),
-(100, 213, 1, 0, true, NOW(), NOW());
+(100, 213, 1, 0, true, NOW(), NOW()),
+(52, 4, 1, 0, true, NOW(), NOW());

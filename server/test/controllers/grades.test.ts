@@ -650,6 +650,28 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
     expect(result?.credits).toBe(5);
   });
 
+  it('should mark correct grader ID for course result', async () => {
+    checkSuccessRes(await request
+      .post('/v1/courses/4/instances/5/grades/calculate')
+      .set('Cookie', cookies.userCookie));
+
+    const result: CourseResult = await CourseResult.findOne({
+      where: {
+        courseInstanceId: 5,
+        userId: 52
+      }
+    }) as CourseResult;
+
+    const selfInfo: supertest.Response = await request
+      .get('/v1/auth/self-info')
+      .set('Cookie', cookies.userCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    expect(result.graderId).toBe(selfInfo.body.data.id);
+    expect(result.userId).not.toBe(selfInfo.body.data.id);
+  });
+
   it('should respond with 401 unauthorized, if not logged in', async () => {
     await request
       .post('/v1/courses/1/instances/1/grades/calculate')
