@@ -2,7 +2,7 @@
 --
 -- SPDX-License-Identifier: MIT
 
-INSERT INTO public.attainment (course_id, course_instance_id, attainment_id, name, tag, date, expiry_date, created_at, updated_at, formula, parent_formula_params) VALUES
+INSERT INTO public.attainment (course_id, course_instance_id, parent_id, name, tag, date, expiry_date, created_at, updated_at, formula, parent_formula_params) VALUES
 (1, 1, null, 'test assignment 1.1', 'tag1', '2022-01-13', '2023-04-23', NOW(), NOW(), 'WEIGHTED_AVERAGE', NULL),
 (2, 2, null, 'test assignment tree', 'tag2', '2022-05-08', '2023-04-23', NOW(), NOW(), 'WEIGHTED_AVERAGE', NULL),
 (3, 3, null, 'test assignment 3.1', 'tag3', '2022-08-05', '2023-04-23', NOW(), NOW(), 'WEIGHTED_AVERAGE', NULL),
