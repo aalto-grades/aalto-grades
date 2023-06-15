@@ -37,6 +37,7 @@ function checkErrorRes(errorMessages: Array<string>, errorCode: HttpCode): void 
 }
 
 function checkSuccessRes(res: supertest.Response): void {
+  expect(res.body.errors).not.toBeDefined();
   expect(res.body.success).toBe(true);
   expect(res.body.data).toBeDefined();
   expect(res.body.errors).not.toBeDefined();
@@ -550,6 +551,17 @@ describe(
 
 describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate', () => {
 
+  async function checkGraderId(result: CourseResult): Promise<void> {
+    const selfInfo: supertest.Response = await request
+      .get('/v1/auth/self-info')
+      .set('Cookie', cookies.userCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    expect(result.graderId).toBe(selfInfo.body.data.id);
+    expect(result.userId).not.toBe(selfInfo.body.data.id);
+  }
+
   it('should calculate correct grade, numeric grade', async () => {
     checkSuccessRes(await request
       .post('/v1/courses/5/instances/8/grades/calculate')
@@ -564,6 +576,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
     expect(result).not.toBe(null);
     expect(result?.grade).toBe('1.24');
     expect(result?.credits).toBe(5);
+    checkGraderId(result as CourseResult);
   });
 
   it('should calculate correct grade, PASS/FAIL grade', async () => {
@@ -580,6 +593,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
     expect(result).not.toBe(null);
     expect(result?.grade).toBe('PASS');
     expect(result?.credits).toBe(5);
+    checkGraderId(result as CourseResult);
 
     result = await CourseResult.findOne({
       where: {
@@ -590,6 +604,7 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
     expect(result).not.toBe(null);
     expect(result?.grade).toBe('FAIL');
     expect(result?.credits).toBe(5);
+    checkGraderId(result as CourseResult);
   });
 
   it('should calculate multiple correct grades', async () => {
@@ -648,28 +663,6 @@ describe('Test POST /v1/courses/:courseId/instances/:instanceId/grades/calculate
     expect(result).not.toBe(null);
     expect(result?.grade).toBe('5');
     expect(result?.credits).toBe(5);
-  });
-
-  it('should mark correct grader ID for course result', async () => {
-    checkSuccessRes(await request
-      .post('/v1/courses/4/instances/5/grades/calculate')
-      .set('Cookie', cookies.userCookie));
-
-    const result: CourseResult = await CourseResult.findOne({
-      where: {
-        courseInstanceId: 5,
-        userId: 52
-      }
-    }) as CourseResult;
-
-    const selfInfo: supertest.Response = await request
-      .get('/v1/auth/self-info')
-      .set('Cookie', cookies.userCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Ok);
-
-    expect(result.graderId).toBe(selfInfo.body.data.id);
-    expect(result.userId).not.toBe(selfInfo.body.data.id);
   });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
