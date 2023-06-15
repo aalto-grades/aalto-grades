@@ -72,11 +72,12 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
     event.preventDefault();
     if (canBeSubmitted()) {
       try {
-        const formulaAttributes: Array<string> = (await formulasService.getFormulaDetails(selectedFormula.id)).attributes;
+        const formula: any = await formulasService.getFormulaDetails(selectedFormula.id);
+        setSelectedFormula(formula);
 
         const updatedAttainments = selectedAttainments.map((attainment) => {
           const attributeObj = {};
-          formulaAttributes.forEach((elem) => {
+          formula.attributes.forEach((elem) => {
             attributeObj[elem] = '';
           });
           return {

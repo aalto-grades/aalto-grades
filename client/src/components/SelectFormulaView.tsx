@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import SelectFormulaForm from './select-formula-view/SelectFormulaForm';
@@ -12,6 +12,7 @@ import formulasService from '../services/formulas';
 import mockAttainments from '../mock-data/mockAttainments';
 
 const SelectFormulaView = () => {
+  const { setSelectedFormula, selectedFormula } = useOutletContext<any>();
   const { instanceId, courseId } = useParams();
   const [attainments, setAttainments] = useState([]);
   const [formulas, setFormulas] = useState([]);
@@ -33,13 +34,16 @@ const SelectFormulaView = () => {
     setAttainments(mockAttainments);
   }, []);
 
-  const navigateToCourseView = () => {
+  function navigateToCourseView(): void {
     navigate(`/course-view/${courseId}`, { replace: true });
-  };
+  }
 
-  const navigateToAttributeSelection = () => {
-    navigate(`/${courseId}/formula-attributes/${instanceId}`, { replace: true });
-  };
+  function navigateToAttributeSelection(): void {
+    formulasService.getFormulaDetails(selectedFormula.id).then((formula: any) => {
+      setSelectedFormula(formula);
+      navigate(`/${courseId}/formula-attributes/${instanceId}`, { replace: true });
+    });
+  }
 
   // TODO: How to differentiate between course total grade and assigment grade?
 
