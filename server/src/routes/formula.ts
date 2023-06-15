@@ -6,6 +6,7 @@ import { Router } from 'express';
 import passport from 'passport';
 
 import { getFormula, getFormulas } from '../controllers/formula';
+import { controllerDispatcher } from '../middleware/errorHandler';
 
 export const router: Router = Router();
 
@@ -117,5 +118,5 @@ router.get(
 router.get(
   '/v1/formulas/:formulaId',
   passport.authenticate('jwt', { session: false }),
-  getFormula
+  controllerDispatcher(getFormula)
 );

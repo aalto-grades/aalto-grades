@@ -6,8 +6,7 @@ export const formulas: Array<FormulaPreview> = [
     name: 'Weighted average',
     attributes: ['maxPoints', 'minRequiredPoints', 'weight'],
     codeSnippet:
-    `
-    const weightedAverage = (nums, weights) => {
+    `const weightedAverage = (nums, weights) => {
       const [sum, weightSum] = weights.reduce(
         (acc, w, i) => {
           acc[0] = acc[0] + nums[i] * w;
@@ -17,7 +16,12 @@ export const formulas: Array<FormulaPreview> = [
         [0, 0]
       );
       return sum / weightSum;
-    };
-    `
+    };`
+  },
+  {
+    id: Formula.Manual,
+    name: 'Manual',
+    attributes: ['maxPoints', 'minRequiredPoints'],
+    codeSnippet: 'placeholder'
   }
 ];
