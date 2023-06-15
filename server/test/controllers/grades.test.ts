@@ -116,7 +116,7 @@ describe(
   'Test POST /v1/courses/:courseId/instances/:instanceId/grades/csv - import grading data from CSV',
   () => {
 
-    it('should process CSV succesfully when course, course instance and users exist', async () => {
+    it('should process CSV succesfully when attainments and users exist', async () => {
       const csvData: fs.ReadStream = fs.createReadStream(
         path.resolve(__dirname, '../mock-data/csv/grades.csv'), 'utf8'
       );
@@ -178,6 +178,32 @@ describe(
         expect(res.body.errors).not.toBeDefined();
         expect(res.body.data).toBeDefined();
       });
+
+    it('should mark attainment grades as manual', async () => {
+      const csvData: fs.ReadStream = fs.createReadStream(
+        path.resolve(__dirname, '../mock-data/csv/grades_one.csv'), 'utf8'
+      );
+
+      res = await request
+        .post('/v1/courses/5/instances/14/grades/csv')
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+
+      const userAttainment: UserAttainmentGrade = await UserAttainmentGrade.findOne({
+        where: {
+          userId: 4,
+          attainmentId: 224
+        }
+      }) as UserAttainmentGrade;
+
+      expect(userAttainment).not.toBeNull;
+      expect(userAttainment.manual).toBe(true);
+      expect(res.body.success).toBe(true);
+      expect(res.body.errors).not.toBeDefined();
+      expect(res.body.data).toBeDefined();
+    });
 
     it('should update attainment grade if user grading data already exist in the db', async () => {
       const user: User = await User.findOne({

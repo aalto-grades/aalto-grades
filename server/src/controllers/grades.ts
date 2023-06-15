@@ -373,14 +373,19 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
             };
           });
 
+        interface GradeCreation extends UserAttainmentGradeData {
+          manual: boolean
+        }
+
         // Use studentsWithId to update attainments by flatmapping each
         // students grades into a one array of all the grades.
-        const preparedBulkCreate: Array<UserAttainmentGradeData> = parsedStudentData.flatMap(
-          (student: StudentGrades): Array<UserAttainmentGradeData> => {
-            const studentGradingData: Array<UserAttainmentGradeData> = student.grades.map(
-              (grade: UserAttainmentGradeData): UserAttainmentGradeData => {
+        const preparedBulkCreate: Array<GradeCreation> = parsedStudentData.flatMap(
+          (student: StudentGrades): Array<GradeCreation> => {
+            const studentGradingData: Array<GradeCreation> = student.grades.map(
+              (grade: UserAttainmentGradeData): GradeCreation => {
                 return {
                   userId: student.id as number,
+                  manual: true,
                   ...grade
                 };
               });
