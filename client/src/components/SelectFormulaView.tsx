@@ -10,7 +10,6 @@ import SelectFormulaForm from './select-formula-view/SelectFormulaForm';
 import instancesService from '../services/instances';
 import formulasService from '../services/formulas';
 import mockAttainments from '../mock-data/mockAttainments';
-import mockFormulas from '../mock-data/mockFormulas';
 
 const SelectFormulaView = () => {
   const { instanceId, courseId } = useParams();
@@ -24,16 +23,14 @@ const SelectFormulaView = () => {
       .then((data) => {
         setAttainments(data);
       })
-      .catch((e) => console.log(e.message));
-    // TODO: fetch formulas
+      .catch((exception: Error) => console.log(exception.message));
     formulasService.getFormulas()
-      .then((data) => {
+      .then((data: any) => {
         setFormulas(data);
       })
-      .catch((e) => console.log(e.message));
-    // DELETE THIS AFTER ROUTES WORK!
+      .catch((exception: Error) => console.log(exception.message));
+    // TODO DELETE THIS AFTER ROUTES WORK!
     setAttainments(mockAttainments);
-    setFormulas(mockFormulas);
   }, []);
 
   const navigateToCourseView = () => {
