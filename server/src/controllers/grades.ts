@@ -21,6 +21,7 @@ import { CourseInstanceRoleType, GradingScale } from 'aalto-grades-common/types/
 import { getFormulaImplementation } from '../formulas';
 import { ApiError } from '../types/error';
 import { Formula, FormulaNode, GradingInput, GradingResult, Status } from '../types/formulas';
+import { JwtClaims } from '../types/general';
 import { UserAttainmentGradeData, StudentGrades, GradingResultsWithUser } from '../types/grades';
 import { HttpCode } from '../types/httpCode';
 import { validateCourseAndInstance } from './utils/courseInstance';
@@ -242,6 +243,8 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
    * - Check grading points are not higher than max points of the attainment.
    */
 
+  const grader: JwtClaims = req.user as JwtClaims;
+
   // Validation path parameters.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
@@ -374,6 +377,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
           });
 
         interface GradeCreation extends UserAttainmentGradeData {
+          graderId: number,
           manual: boolean
         }
 
@@ -385,6 +389,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
               (grade: UserAttainmentGradeData): GradeCreation => {
                 return {
                   userId: student.id as number,
+                  graderId: grader.id,
                   manual: true,
                   ...grade
                 };

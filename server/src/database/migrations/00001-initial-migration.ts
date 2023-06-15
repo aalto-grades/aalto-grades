@@ -265,6 +265,16 @@ export default {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
         },
+        grader_id: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          references: {
+            model: 'user',
+            key: 'id'
+          },
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE'
+        },
         grade: {
           type: DataTypes.FLOAT,
           allowNull: false

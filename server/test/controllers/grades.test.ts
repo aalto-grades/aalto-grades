@@ -205,6 +205,37 @@ describe(
       expect(res.body.data).toBeDefined();
     });
 
+    it('should mark correct grader ID', async () => {
+      const csvData: fs.ReadStream = fs.createReadStream(
+        path.resolve(__dirname, '../mock-data/csv/grades_one_2.csv'), 'utf8'
+      );
+
+      res = await request
+        .post('/v1/courses/5/instances/14/grades/csv')
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+
+      const userAttainment: UserAttainmentGrade = await UserAttainmentGrade.findOne({
+        where: {
+          userId: 4,
+          attainmentId: 225
+        }
+      }) as UserAttainmentGrade;
+
+      const selfInfo: supertest.Response = await request
+        .get('/v1/auth/self-info')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+
+      expect(userAttainment.graderId).toBe(selfInfo.body.data.id);
+      expect(res.body.success).toBe(true);
+      expect(res.body.errors).not.toBeDefined();
+      expect(res.body.data).toBeDefined();
+    });
+
     it('should update attainment grade if user grading data already exist in the db', async () => {
       const user: User = await User.findOne({
         where: {

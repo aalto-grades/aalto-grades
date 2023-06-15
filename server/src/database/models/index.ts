@@ -113,6 +113,17 @@ UserAttainmentGrade.belongsTo(User, {
   foreignKey: 'userId'
 });
 
+User.hasMany(UserAttainmentGrade, {
+  foreignKey: 'graderId',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+UserAttainmentGrade.belongsTo(User, {
+  targetKey: 'id',
+  foreignKey: 'graderId'
+});
+
 Attainment.hasMany(UserAttainmentGrade, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'

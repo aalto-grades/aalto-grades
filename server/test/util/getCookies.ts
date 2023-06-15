@@ -18,7 +18,7 @@ export async function getCookies(): Promise<Cookies> {
   const adminEmail: string = `admin${new Date().getTime()}@aalto.fi`;
   const userEmail: string = `user${new Date().getTime()}@aalto.fi`;
 
-  await request.post('/v1/auth/signup')
+  const adminRes: supertest.Response = await request.post('/v1/auth/signup')
     .set('Accept', 'application/json')
     .send({
       email: adminEmail,
@@ -28,7 +28,7 @@ export async function getCookies(): Promise<Cookies> {
       role: SystemRole.Admin
     });
 
-  await request.post('/v1/auth/signup')
+  const userRes: supertest.Response = await request.post('/v1/auth/signup')
     .set('Accept', 'application/json')
     .send({
       email: userEmail,
@@ -36,22 +36,6 @@ export async function getCookies(): Promise<Cookies> {
       password: 'grades',
       studentNumber: new Date().getTime(),
       role: SystemRole.User
-    });
-
-  const adminRes: supertest.Response = await request
-    .post('/v1/auth/login')
-    .set('Accept', 'application/json')
-    .send({
-      email: adminEmail,
-      password: 'grades'
-    });
-
-  const userRes: supertest.Response = await request
-    .post('/v1/auth/login')
-    .set('Accept', 'application/json')
-    .send({
-      email: userEmail,
-      password: 'grades'
     });
 
   return {
