@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import { Formula, FormulaPreview } from '../types/formulas';
 
 export const formulas: Array<FormulaPreview> = [
