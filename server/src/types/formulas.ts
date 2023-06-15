@@ -24,6 +24,13 @@ export interface GradingInput {
   params: object | null;
 }
 
+export interface FormulaPreview {
+  id: Formula;
+  name: string;
+  attributes: Array<string>;
+  codeSnippet: string;
+}
+
 /**
  * Type of functions implementing grade calculation formulas.
  */
