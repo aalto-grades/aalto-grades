@@ -47,6 +47,7 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
+
       await queryInterface.createTable('course', {
         id: {
           type: DataTypes.INTEGER,
@@ -60,6 +61,7 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
+
       await queryInterface.createTable('course_instance', {
         id: {
           type: DataTypes.INTEGER,
@@ -116,6 +118,7 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE,
       }, { transaction });
+
       await queryInterface.createTable('course_instance_role', {
         user_id: {
           type: DataTypes.INTEGER,
@@ -175,6 +178,7 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
+
       await queryInterface.createTable('attainment', {
         id: {
           type: DataTypes.INTEGER,
@@ -239,6 +243,7 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
+
       await queryInterface.createTable('user_attainment_grade', {
         user_id: {
           type: DataTypes.INTEGER,
@@ -264,9 +269,14 @@ export default {
           type: DataTypes.FLOAT,
           allowNull: false
         },
+        manual: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false
+        },
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
+
       await queryInterface.createTable('course_result', {
         id: {
           type: DataTypes.INTEGER,
@@ -304,6 +314,7 @@ export default {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
+
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
