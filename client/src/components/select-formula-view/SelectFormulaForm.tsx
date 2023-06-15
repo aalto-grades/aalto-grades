@@ -21,13 +21,12 @@ import StyledBox from './StyledBox';
 import ViewFormulaAccordion from './ViewFormulaAccordion';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
-
+import { sleep } from '../../utils/util';
+import formulasService from '../../services/formulas';
 
 const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, navigateToAttributeSelection }) => {
-
-  const [codeSnippet, setCodeSnippet] = useState<any>('');
-  const [checkboxError, setCheckboxError] = useState<any>('');
-  const [formulaError, setFormulaError] = useState<any>('');
+  const [checkboxError, setCheckboxError] = useState<string>('');
+  const [formulaError, setFormulaError] = useState<string>('');
   const [setSnackPack, messageInfo, setMessageInfo, alertOpen, setAlertOpen] = useSnackPackAlerts();
 
   const navigate = useNavigate();
@@ -38,13 +37,6 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
   } = useOutletContext<any>();
 
   useEffect(() => {
-    // set code snippet if user returns from attribute selection
-    if (selectedFormula.name !== undefined) {
-      setCodeSnippet(selectedFormula.codeSnippet);
-    }
-  }, []);
-
-  useEffect(() => {
     // all attainments are checked at default -> add them to selected attainments
     if (selectedAttainments.length === 0) {
       setSelectedAttainments(attainments);
@@ -53,13 +45,12 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
 
   const handleFormulaChange = (event) => {
     const newFormula = formulas.find(formula => formula.name == event.target.value);
-    setCodeSnippet(newFormula.codeSnippet);
     setSelectedFormula(newFormula);
   };
 
   // checks that user has selected a function and at least one attainment
   // if not, shows error message
-  const canBeSubmitted = () => {
+  function canBeSubmitted(): boolean {
     let noErrors = true;
     if(selectedAttainments.length === 0) {
       setCheckboxError('You must select at least one study attainment');
@@ -68,25 +59,24 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
       // if an error was previously present, clear it
       setCheckboxError('');
     }
-    if(selectedFormula.name === undefined) {
+    if(selectedFormula.id === undefined) {
       setFormulaError('You must select a formula');
       noErrors = false;
     } else {
       setFormulaError('');
     }
     return noErrors;
-  };
-
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (canBeSubmitted()) {
       try {
+        const formulaAttributes: Array<string> = (await formulasService.getFormulaDetails(selectedFormula.id)).attributes;
 
         const updatedAttainments = selectedAttainments.map((attainment) => {
           const attributeObj = {};
-          selectedFormula.attributes.forEach((elem) => {
+          formulaAttributes.forEach((elem) => {
             attributeObj[elem] = '';
           });
           return {
@@ -95,10 +85,10 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
             formulaAttributes: attributeObj
           };
         });
-        console.log(updatedAttainments);
 
         // TODO: send formula to database
         // TODO: add updated attainments to database
+        console.log(updatedAttainments);
 
         setSnackPack((prev) => [...prev,
           { msg: 'Formula saved, you will be redirected to the course page.', severity: 'success' }
@@ -126,8 +116,7 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
 
   const isChecked = (attainment) => {
     // If user has returned from attribute selection -> only assigments they previously selected are checked
-    let i;
-    for (i = 0; i < selectedAttainments.length; i++) {
+    for (let i = 0; i < selectedAttainments.length; i++) {
       if (selectedAttainments[i] === attainment) {
         return true;
       }
@@ -179,12 +168,12 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
             onChange={handleFormulaChange}
             error={formulaError !== ''}
           >
-            { formulas.map((formula) => <MenuItem key={formula.id} value={formula.name}>{formula.name}</MenuItem> ) }
+            { formulas.map((formula) => <MenuItem key={formula.id} value={formula.name}>{formula.name}</MenuItem>) }
           </Select>
           <FormHelperText error={formulaError !== ''}>{ formulaError }</FormHelperText>
         </FormControl>
         <StyledBox>
-          <ViewFormulaAccordion codeSnippet={codeSnippet}/>
+          <ViewFormulaAccordion formulaId={selectedFormula.id}/>
         </StyledBox>
         <StyledBox sx={{
           display: 'flex',
