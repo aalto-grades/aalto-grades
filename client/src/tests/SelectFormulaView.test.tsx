@@ -23,8 +23,9 @@ describe('Tests for SelectFormulaView components', () => {
 
     (instancesService.getAttainments as jest.Mock).mockRejectedValue('Network error');
     (instancesService.getAttainments as jest.Mock).mockResolvedValue(mockAttainments);
-    formulasService.getFormulas.mockRejectedValue('Network error');
-    formulasService.getFormulas.mockResolvedValue(mockFormulas);
+    (formulasService.getFormulas as jest.Mock).mockRejectedValue('Network error'); // succeess, nothing to worry about
+    (formulasService.getFormulas as jest.Mock).mockRejectedValue(mockFormulas); // succeess, nothing to worry about
+
     return render(
       <MemoryRouter initialEntries={['/A-12345/select-formula/test']}>
         <Routes>
