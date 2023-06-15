@@ -11,6 +11,7 @@ import StyledBox from '../select-formula-view/StyledBox';
 import Attainment from './Attainment';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
+import { sleep } from '../../utils/util';
 
 const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
 
@@ -35,8 +36,6 @@ const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
     });
     setAttributeValues(newAttributeValues);
   };
-
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
 
   const handleSubmit = async (event) => {
     event.preventDefault();

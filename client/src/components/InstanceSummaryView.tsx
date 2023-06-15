@@ -15,6 +15,7 @@ import instancesService from '../services/instances';
 import attainmentServices from '../services/attainments';
 import useSnackPackAlerts from '../hooks/useSnackPackAlerts';
 import { Message } from '../types/general';
+import { sleep } from '../utils/util';
 
 const successMsgInstance: Message = {
   msg: 'Instance created successfully.',
@@ -66,9 +67,6 @@ const InstanceSummaryView = () => {
   const onGoBack = () => {
     navigate('/' + courseId + '/add-attainments/' + sisuInstanceId);
   };
-
-  // Helper function
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
 
   const onCreateInstance = async () => {
 

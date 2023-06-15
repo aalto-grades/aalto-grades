@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import CourseResultsTable from './course-results-view/CourseResultsTable';
 import AlertSnackbar from './alerts/AlertSnackbar';
 import gradesService from '../services/grades';
+import { sleep } from '../utils/util';
 
 const CourseResultsView = (): JSX.Element => {
   const { courseId, instanceId } = useParams();
@@ -45,10 +46,6 @@ const CourseResultsView = (): JSX.Element => {
       setAlertOpen(false);
     }
   }, [snackPack, messageInfo, alertOpen]);
-
-  function sleep(ms: number): Promise<any> {
-    return new Promise(r => setTimeout(r, ms));
-  }
 
   // Triggers the calculation of final grades
   async function calculateFinalGrades(): Promise<void> {
