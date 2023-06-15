@@ -37,7 +37,6 @@ function checkErrorRes(errorMessages: Array<string>, errorCode: HttpCode): void 
 }
 
 function checkSuccessRes(res: supertest.Response): void {
-  expect(res.body.errors).not.toBeDefined();
   expect(res.body.success).toBe(true);
   expect(res.body.data).toBeDefined();
   expect(res.body.errors).not.toBeDefined();
