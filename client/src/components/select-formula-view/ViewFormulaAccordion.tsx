@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -11,6 +11,8 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Container from '@mui/material/Container';
 import { styled } from '@mui/material/styles';
+import formulasService from '../../services/formulas';
+import { Box, CircularProgress } from '@mui/material';
 
 const HoverExpandMoreIcon = styled<any>(ExpandMoreIcon)(({ theme }) => ({
   '&:hover': {
@@ -18,7 +20,17 @@ const HoverExpandMoreIcon = styled<any>(ExpandMoreIcon)(({ theme }) => ({
   }
 }));
 
-const ViewFormulaAccordion = ({ codeSnippet }) => {
+const ViewFormulaAccordion = ({ formulaId }) => {
+  const [codeSnippet, setCodeSnippet] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    formulasService.getFormulaDetails(formulaId)
+      .then((data: any) => {
+        setCodeSnippet(data.codeSnippet);
+        setLoading(false);
+      }).catch((exception: Error) => console.log(exception.message));
+  }, [formulaId]);
 
   return (
     <Container>
@@ -33,9 +45,18 @@ const ViewFormulaAccordion = ({ codeSnippet }) => {
         </AccordionSummary>
         <AccordionDetails sx={{ bgcolor: 'primary.light', p:'10px' }}>
           <Container disableGutters sx={{ overflowX: 'scroll' }}>
-            <pre>
-              <code>{codeSnippet}</code>
-            </pre>
+            { formulaId === undefined ?
+              <p>Select formula for previewing</p>
+              :
+              loading ?
+                <Box sx={{ margin: 'auto', alignItems: 'center', justifyContent: 'center', display: 'flex' }}>
+                  <CircularProgress />
+                </Box>
+                :
+                <pre>
+                  <code>{codeSnippet}</code>
+                </pre>
+            }
           </Container>
         </AccordionDetails>
       </Accordion>
@@ -44,7 +65,7 @@ const ViewFormulaAccordion = ({ codeSnippet }) => {
 };
 
 ViewFormulaAccordion.propTypes = {
-  codeSnippet: PropTypes.string,
+  formulaId: PropTypes.string,
 };
 
 export default ViewFormulaAccordion;
