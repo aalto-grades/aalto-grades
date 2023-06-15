@@ -32,7 +32,7 @@ export default {
         unique: true,
         transaction
       });
-      await queryInterface.addIndex('attainment', ['attainment_id'], {
+      await queryInterface.addIndex('attainment', ['parent_id'], {
         unique: false,
         transaction
       });
@@ -84,7 +84,7 @@ export default {
       );
 
       await queryInterface.sequelize.query(
-        'DROP INDEX IF EXISTS attainment_attainment_id',
+        'DROP INDEX IF EXISTS attainment_parent_id',
         { transaction }
       );
 

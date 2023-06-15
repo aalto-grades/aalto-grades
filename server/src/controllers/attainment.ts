@@ -71,7 +71,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
 
   const attainment: Attainment = await models.Attainment.create({
     courseId: course.id,
-    attainmentId: parentId,
+    parentId,
     courseInstanceId: courseInstance.id,
     name,
     tag,
@@ -88,7 +88,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
 
     for (const attainment of unprocessedAttainments) {
       const dbEntry: Attainment = await models.Attainment.create({
-        attainmentId: parentId,
+        parentId,
         courseId: course.id,
         courseInstanceId: courseInstance.id,
         name: attainment.name,
@@ -110,7 +110,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
         tag: dbEntry.tag,
         date: dbEntry.date,
         expiryDate: dbEntry.expiryDate,
-        parentId: dbEntry.attainmentId,
+        parentId: dbEntry.parentId,
         subAttainments: subAttainments
       });
     }
@@ -132,7 +132,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
         tag: attainment.tag,
         date: attainment.date,
         expiryDate: attainment.expiryDate,
-        parentId: attainment.attainmentId,
+        parentId: attainment.parentId,
         subAttainments: subAttainments
       }
     }
@@ -225,7 +225,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     tag: tag ?? attainment.tag,
     date: date ?? attainment.date,
     expiryDate: expiryDate ?? attainment.expiryDate,
-    attainmentId: parentId ?? attainment.attainmentId
+    parentId: parentId ?? attainment.parentId
   }).save();
 
   res.status(HttpCode.Ok).json({
@@ -239,7 +239,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
         tag: attainment.tag,
         date: attainment.date,
         expiryDate: attainment.expiryDate,
-        parentId: attainment.attainmentId
+        parentId: attainment.parentId
       }
     }
   });
@@ -274,7 +274,7 @@ export async function getAttainment(req: Request, res: Response): Promise<void> 
       id: el.id,
       courseId: el.courseId,
       courseInstanceId: el.courseInstanceId,
-      parentId: el.attainmentId ?? undefined,
+      parentId: el.parentId ?? undefined,
       name: el.name,
       tag: el.tag,
       date: el.date,

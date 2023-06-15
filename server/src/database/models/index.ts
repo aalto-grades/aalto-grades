@@ -12,13 +12,14 @@ import User from './user';
 import UserAttainmentGrade from './userAttainmentGrade';
 
 Attainment.hasMany(Attainment, {
+  foreignKey: 'parentId',
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
 
 Attainment.belongsTo(Attainment, {
   targetKey: 'id',
-  foreignKey: 'attainmentId'
+  foreignKey: 'parentId'
 });
 
 User.belongsToMany(CourseInstance, {
