@@ -205,7 +205,7 @@ export default {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
         },
-        attainment_id: {
+        parent_id: {
           type: DataTypes.INTEGER,
           allowNull: true,
           references: {

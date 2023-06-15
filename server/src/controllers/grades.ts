@@ -493,9 +493,7 @@ export async function calculateGrades(
     },
     attributes: [
       'id',
-      // Translates attainmentId to parentId.
-      // TODO: Rename in model if possible.
-      ['attainment_id', 'parentId'],
+      'parentId',
       'formula',
       'parentFormulaParams',
     ],

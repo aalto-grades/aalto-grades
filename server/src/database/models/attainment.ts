@@ -18,8 +18,7 @@ export default class Attainment extends Model<
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
   declare courseInstanceId: ForeignKey<CourseInstance['id']>;
-  // TODO rename to parentId, atm sequelize forces name as "model + key" when querying.
-  declare attainmentId: CreationOptional<ForeignKey<Attainment['id']>>;
+  declare parentId: CreationOptional<ForeignKey<Attainment['id']>>;
   declare name: string;
   declare tag: string;
   declare formula: Formula;
@@ -53,7 +52,7 @@ Attainment.init(
         key: 'id'
       }
     },
-    attainmentId: {
+    parentId: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
