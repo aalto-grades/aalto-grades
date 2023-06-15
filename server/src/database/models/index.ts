@@ -71,6 +71,7 @@ User.hasMany(CourseResult, {
 });
 
 CourseResult.belongsTo(User, {
+  as: 'grader',
   targetKey: 'id',
   foreignKey: 'graderId'
 });
@@ -131,6 +132,7 @@ User.hasMany(UserAttainmentGrade, {
 });
 
 UserAttainmentGrade.belongsTo(User, {
+  as: 'grader',
   targetKey: 'id',
   foreignKey: 'graderId'
 });
