@@ -32,8 +32,6 @@ function parseSisuCourseInstance(instance: SisuCourseInstance): CourseInstanceDa
     sisuCourseInstanceId: instance.id,
     startingPeriod: null,
     endingPeriod: null,
-    minCredits: instance.credits.min,
-    maxCredits: instance.credits.max,
     startDate: instance.startDate,
     endDate: instance.endDate,
     type: instance.type,
@@ -41,6 +39,8 @@ function parseSisuCourseInstance(instance: SisuCourseInstance): CourseInstanceDa
     teachersInCharge: instance.summary.teacherInCharge,
     courseData: {
       courseCode: instance.code,
+      minCredits: instance.credits.min,
+      maxCredits: instance.credits.max,
       department: {
         en: instance.organizationName.en,
         fi: instance.organizationName.fi,
