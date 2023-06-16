@@ -75,3 +75,35 @@ AttainmentGrade.init(
     tableName: 'attainment_grade'
   }
 );
+
+AttainmentGrade.belongsTo(User, {
+  targetKey: 'id',
+  foreignKey: 'userId'
+});
+
+User.hasMany(AttainmentGrade, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+AttainmentGrade.belongsTo(User, {
+  as: 'grader',
+  targetKey: 'id',
+  foreignKey: 'graderId'
+});
+
+User.hasMany(AttainmentGrade, {
+  foreignKey: 'graderId',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+AttainmentGrade.belongsTo(Attainment, {
+  targetKey: 'id',
+  foreignKey: 'attainmentId'
+});
+
+Attainment.hasMany(AttainmentGrade, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});

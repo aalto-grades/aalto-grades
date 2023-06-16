@@ -88,3 +88,13 @@ CourseInstance.init(
     tableName: 'course_instance'
   }
 );
+
+CourseInstance.belongsTo(Course, {
+  targetKey: 'id',
+  foreignKey: 'courseId'
+});
+
+Course.hasMany(CourseInstance, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});

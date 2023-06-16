@@ -47,3 +47,13 @@ AssessmentModel.init(
     tableName: 'assessment_model'
   }
 );
+
+AssessmentModel.belongsTo(Course, {
+  targetKey: 'id',
+  foreignKey: 'courseId'
+});
+
+Course.hasMany(AssessmentModel, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});

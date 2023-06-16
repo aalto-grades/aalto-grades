@@ -57,3 +57,13 @@ CourseTranslation.init(
     tableName: 'course_translation'
   }
 );
+
+CourseTranslation.belongsTo(Course, {
+  targetKey: 'id',
+  foreignKey: 'courseId'
+});
+
+Course.hasMany(CourseTranslation, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});

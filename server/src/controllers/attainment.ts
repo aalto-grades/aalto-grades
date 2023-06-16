@@ -53,7 +53,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
   const requestSubAttainments: Array<AttainmentRequestData> | undefined = req.body.subAttainments;
   let subAttainments: Array<AttainmentData> = [];
 
-  // If linked to a parent id, check that it exists and belongs to the same course instance.
+  // If linked to a parent id, check that it exists and belongs to the same assessment model.
   if (parentId) {
     const parentAttainment: Attainment = await findAttainmentById(
       parentId, HttpCode.UnprocessableEntity
@@ -186,7 +186,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   const attainment: Attainment = await findAttainmentById(attainmentId, HttpCode.NotFound);
 
   // If linked to a parent id, check that it exists and belongs
-  // to the same course instance as the attainment being edited.
+  // to the same assessment model as the attainment being edited.
   if (parentId) {
 
     // TODO: check that does not refer to itself transitionally through some other attainment.

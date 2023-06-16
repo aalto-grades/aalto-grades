@@ -48,8 +48,8 @@ export default {
     try {
       await queryInterface.sequelize.query(users, { transaction });
       await queryInterface.sequelize.query(courses, { transaction });
-      await queryInterface.sequelize.query(attainment, { transaction });
       await queryInterface.sequelize.query(assessmentModel, { transaction });
+      await queryInterface.sequelize.query(attainment, { transaction });
       await queryInterface.sequelize.query(attainmentGrade, { transaction });
       await queryInterface.sequelize.query(courseTranslation, { transaction });
       await queryInterface.sequelize.query(courseInstances, { transaction });
@@ -69,8 +69,8 @@ export default {
       await queryInterface.bulkDelete('course_instance', {}, { transaction });
       await queryInterface.bulkDelete('course_translation', {}, { transaction });
       await queryInterface.bulkDelete('attainment_grade', {}, { transaction });
-      await queryInterface.bulkDelete('assessment_model', {}, { transaction });
       await queryInterface.bulkDelete('attainment', {}, { transaction });
+      await queryInterface.bulkDelete('assessment_model', {}, { transaction });
       await queryInterface.bulkDelete('course', {}, { transaction });
       await queryInterface.bulkDelete('user', {}, { transaction });
 

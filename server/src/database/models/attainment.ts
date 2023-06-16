@@ -80,3 +80,24 @@ Attainment.init(
     tableName: 'attainment'
   }
 );
+
+Attainment.belongsTo(Attainment, {
+  targetKey: 'id',
+  foreignKey: 'parentId'
+});
+
+Attainment.hasMany(Attainment, {
+  foreignKey: 'parentId',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+Attainment.belongsTo(AssessmentModel, {
+  targetKey: 'id',
+  foreignKey: 'assessmentModelId'
+});
+
+AssessmentModel.hasMany(Attainment, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});

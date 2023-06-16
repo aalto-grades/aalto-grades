@@ -32,8 +32,10 @@ export interface CourseData {
 
 export interface CourseInstanceData {
   courseData: CourseData,
-  // Course instance ID can be null when representing Sisu course instance data
+  // Course instance and assessment model IDs can be null when representing
+  // Sisu course instance data
   id: number | null,
+  assessmentModelId: number | null,
   sisuCourseInstanceId: string | null,
   startingPeriod: Period | null,
   endingPeriod: Period | null,
