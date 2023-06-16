@@ -7,6 +7,7 @@ import {
 } from 'sequelize';
 
 import { sequelize } from '..';
+import AssessmentModel from './assessmentModel';
 import Course from './course';
 
 export default class CourseInstance extends Model<
@@ -15,13 +16,12 @@ export default class CourseInstance extends Model<
 > {
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
+  declare assessmentModelId: ForeignKey<AssessmentModel['id']>
   declare sisuCourseInstanceId: string | null;
   declare gradingScale: string;
   declare startingPeriod: string;
   declare endingPeriod: string;
   declare type: string;
-  declare minCredits: number;
-  declare maxCredits: number;
   declare startDate: Date;
   declare endDate: Date;
   declare createdAt: CreationOptional<Date>;
@@ -40,6 +40,14 @@ CourseInstance.init(
       allowNull: false,
       references: {
         model: 'course',
+        key: 'id'
+      }
+    },
+    assessmentModelId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'assessment_model',
         key: 'id'
       }
     },
@@ -62,14 +70,6 @@ CourseInstance.init(
     },
     type: {
       type: DataTypes.STRING,
-      allowNull: false
-    },
-    minCredits: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    maxCredits: {
-      type: DataTypes.INTEGER,
       allowNull: false
     },
     startDate: {

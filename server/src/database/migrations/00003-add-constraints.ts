@@ -32,13 +32,6 @@ export default {
         transaction
       });
 
-      await queryInterface.addConstraint('attainment', {
-        fields: ['course_instance_id', 'tag'],
-        type: 'unique',
-        name: 'attainment_course_instance_id_tag_ck',
-        transaction
-      });
-
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
@@ -57,12 +50,6 @@ export default {
       await queryInterface.removeConstraint(
         'course_instance',
         'course_instance_start_date_ck',
-        { transaction }
-      );
-
-      await queryInterface.removeConstraint(
-        'attainment',
-        'attainment_course_instance_id_tag_ck',
         { transaction }
       );
 

@@ -8,23 +8,19 @@ import {
 
 import { sequelize } from '..';
 import { Formula } from '../../types/formulas';
-import Course from './course';
-import CourseInstance from './courseInstance';
 
 export default class Attainment extends Model<
   InferAttributes<Attainment>,
   InferCreationAttributes<Attainment>
 > {
   declare id: CreationOptional<number>;
-  declare courseId: ForeignKey<Course['id']>;
-  declare courseInstanceId: ForeignKey<CourseInstance['id']>;
   declare parentId: CreationOptional<ForeignKey<Attainment['id']>>;
   declare name: string;
   declare tag: string;
+  // Default value, expiry date in AttainmentGrade takes precedence
+  declare daysValid: number;
   declare formula: Formula;
   declare parentFormulaParams: CreationOptional<object>;
-  declare date: Date; // Date when assignment is done (e.g., deadline or exam date)
-  declare expiryDate: Date;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -35,22 +31,6 @@ Attainment.init(
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true
-    },
-    courseId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'course',
-        key: 'id'
-      }
-    },
-    courseInstanceId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'course_instance',
-        key: 'id'
-      }
     },
     parentId: {
       type: DataTypes.INTEGER,
@@ -68,6 +48,10 @@ Attainment.init(
       type: DataTypes.STRING,
       allowNull: false
     },
+    daysValid: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
     formula: {
       type: DataTypes.ENUM(Formula.Manual, Formula.WeightedAverage),
       allowNull: false,
@@ -76,14 +60,6 @@ Attainment.init(
     parentFormulaParams: {
       type: DataTypes.JSONB,
       allowNull: true,
-    },
-    date: {
-      type: DataTypes.DATE,
-      allowNull: false
-    },
-    expiryDate: {
-      type: DataTypes.DATE,
-      allowNull: false
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,

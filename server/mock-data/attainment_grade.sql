@@ -2,7 +2,7 @@
 --
 -- SPDX-License-Identifier: MIT
 
-INSERT INTO public.user_attainment_grade (user_id, attainment_id, grader_id, grade, manual, created_at, updated_at) VALUES
+INSERT INTO public.attainment_grade (user_id, attainment_id, grader_id, grade, manual, created_at, updated_at) VALUES
 (1, 14, 1, 0.37, true, NOW(), NOW()),
 (1, 15, 1, 0.5, true, NOW(), NOW()),
 (519, 5, 1, 1.5, true, NOW(), NOW()),

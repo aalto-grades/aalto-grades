@@ -10,20 +10,22 @@ import { sequelize } from '..';
 import Attainment from './attainment';
 import User from './user';
 
-export default class UserAttainmentGrade extends Model<
-  InferAttributes<UserAttainmentGrade>,
-  InferCreationAttributes<UserAttainmentGrade>
+export default class AttainmentGrade extends Model<
+  InferAttributes<AttainmentGrade>,
+  InferCreationAttributes<AttainmentGrade>
 > {
   declare userId: ForeignKey<User['id']>;
   declare attainmentId: ForeignKey<Attainment['id']>;
   declare graderId: ForeignKey<User['id']>;
   declare grade: number;
   declare manual: boolean;
+  declare date: Date; // Date when assignment is done (e.g., deadline or exam date)
+  declare expiryDate: Date;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
 
-UserAttainmentGrade.init(
+AttainmentGrade.init(
   {
     userId: {
       type: DataTypes.INTEGER,
@@ -57,11 +59,19 @@ UserAttainmentGrade.init(
       type: DataTypes.BOOLEAN,
       allowNull: false
     },
+    date: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+    expiryDate: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },
   {
     sequelize,
-    tableName: 'user_attainment_grade'
+    tableName: 'attainment_grade'
   }
 );

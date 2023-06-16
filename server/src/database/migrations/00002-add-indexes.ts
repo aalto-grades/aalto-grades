@@ -12,38 +12,42 @@ export default {
         unique: false,
         transaction
       });
+
       await queryInterface.addIndex('course_instance', ['course_id'], {
         unique: false,
         transaction
       });
+
       await queryInterface.addIndex('user', ['student_number'], {
         unique: false,
         transaction
       });
+
       await queryInterface.addIndex('course_instance_role', ['user_id', 'course_instance_id'], {
         unique: true,
         transaction
       });
+
       await queryInterface.addIndex('course_translation', ['course_id', 'language'], {
         unique: true,
         transaction
       });
-      await queryInterface.addIndex('attainment', ['id', 'course_id', 'course_instance_id'], {
-        unique: true,
-        transaction
-      });
+
       await queryInterface.addIndex('attainment', ['parent_id'], {
         unique: false,
         transaction
       });
-      await queryInterface.addIndex('user_attainment_grade', ['user_id', 'attainment_id'], {
+
+      await queryInterface.addIndex('attainment_grade', ['user_id', 'attainment_id'], {
         unique: true,
         transaction
       });
+
       await queryInterface.addIndex('course_result', ['user_id', 'course_instance_id'], {
         unique: true,
         transaction
       });
+
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
@@ -75,11 +79,6 @@ export default {
 
       await queryInterface.sequelize.query(
         'DROP INDEX IF EXISTS course_translation_course_id_language',
-        { transaction }
-      );
-
-      await queryInterface.sequelize.query(
-        'DROP INDEX IF EXISTS attainment_id_course_id_course_instance_id',
         { transaction }
       );
 

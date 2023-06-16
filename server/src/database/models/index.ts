@@ -2,14 +2,35 @@
 //
 // SPDX-License-Identifier: MIT
 
+import AssessmentModel from './assessmentModel';
 import Attainment from './attainment';
+import AttainmentGrade from './attainmentGrade';
 import Course from './course';
 import CourseInstance from './courseInstance';
 import CourseInstanceRole from './courseInstanceRole';
 import CourseResult from './courseResult';
 import CourseTranslation from './courseTranslation';
 import User from './user';
-import UserAttainmentGrade from './userAttainmentGrade';
+
+AssessmentModel.belongsTo(Course, {
+  targetKey: 'id',
+  foreignKey: 'courseId'
+});
+
+Course.hasMany(AssessmentModel, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+AssessmentModel.belongsTo(Attainment, {
+  targetKey: 'id',
+  foreignKey: 'attainmentId'
+});
+
+Attainment.hasOne(AssessmentModel, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
 
 Attainment.hasMany(Attainment, {
   foreignKey: 'parentId',
@@ -91,21 +112,6 @@ CourseInstance.hasMany(Attainment, {
   onUpdate: 'CASCADE'
 });
 
-Attainment.belongsTo(CourseInstance, {
-  targetKey: 'id',
-  foreignKey: 'courseInstanceId'
-});
-
-Course.hasMany(Attainment, {
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
-
-Attainment.belongsTo(Course, {
-  targetKey: 'id',
-  foreignKey: 'courseId'
-});
-
 /*
 Disabled since CourseResult does not have FK course id at the moment
 
@@ -115,45 +121,46 @@ CourseResult.belongsTo(Course, {
 });
 */
 
-User.hasMany(UserAttainmentGrade, {
+User.hasMany(AttainmentGrade, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
 
-UserAttainmentGrade.belongsTo(User, {
+AttainmentGrade.belongsTo(User, {
   targetKey: 'id',
   foreignKey: 'userId'
 });
 
-User.hasMany(UserAttainmentGrade, {
+User.hasMany(AttainmentGrade, {
   foreignKey: 'graderId',
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
 
-UserAttainmentGrade.belongsTo(User, {
+AttainmentGrade.belongsTo(User, {
   as: 'grader',
   targetKey: 'id',
   foreignKey: 'graderId'
 });
 
-Attainment.hasMany(UserAttainmentGrade, {
+Attainment.hasMany(AttainmentGrade, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
 
-UserAttainmentGrade.belongsTo(Attainment, {
+AttainmentGrade.belongsTo(Attainment, {
   targetKey: 'id',
   foreignKey: 'attainmentId'
 });
 
 export default {
+  AssessmentModel,
   Attainment,
+  AttainmentGrade,
   Course,
   CourseInstance,
   CourseInstanceRole,
   CourseResult,
   CourseTranslation,
-  User,
-  UserAttainmentGrade
+  User
 };
