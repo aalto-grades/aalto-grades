@@ -18,7 +18,7 @@ export async function findAssessmentModelById(
   );
 
   if (!assessmentModel) {
-    throw new ApiError(`course with ID ${assessmentModelId} not found`, errorCode);
+    throw new ApiError(`assessment model with ID ${assessmentModelId} not found`, errorCode);
   }
   return assessmentModel;
 }

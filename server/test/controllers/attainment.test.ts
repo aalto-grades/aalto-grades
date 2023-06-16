@@ -260,7 +260,7 @@ describe(
         .expect(HttpCode.Unauthorized);
     });
 
-    it('should respond with 404 not found, if course instance does not exist',
+    it('should respond with 404 not found, if assessment model does not exist',
       async () => {
         const res: supertest.Response = await request
           .post(`/v1/courses/1/assessment-models/${badId}/attainments`)
@@ -309,7 +309,7 @@ describe(
 
     it('should respond with 409 conflict, if parent attainment does not belong to the assessment model',
       async () => {
-        // Create parent attainment for course instance 1.
+        // Create parent attainment for assessment model 1.
         let res: supertest.Response = await request
           .post('/v1/courses/4/assessment-models/5/attainments')
           .send(mockAttainment)
@@ -319,7 +319,7 @@ describe(
 
         const id: number = Number(res.body.data.attainment.id);
 
-        // Try to add new attainment with previously created parent to instance 2.
+        // Try to add new attainment with previously created parent to assessment model 2.
         res = await request
           .post('/v1/courses/4/assessment-models/6/attainments')
           .send({ parentId: id, ...mockAttainment })
@@ -540,7 +540,7 @@ describe(
       expect(res.body.data.attainment.assessmentModelId).toBe(12);
       expect(res.body.data.attainment.parentId).toBe(parentAttainment.id);
       expect(res.body.data.attainment.name).toBe('new name');
-      expect(res.body.data.attainment.tag).toBe('no-parent');
+      expect(res.body.data.attainment.tag).toBe('new tag');
       expect(res.body.data.attainment.daysValid).toBe(50);
     });
 
@@ -606,13 +606,13 @@ describe(
 
       expect(res.body.success).toBe(false);
       expect(res.body.data).not.toBeDefined();
-      expect(res.body.errors[0]).toBe(`study attainment with ID ${badId} not found`);
+      expect(res.body.errors[0]).toBe(`attainment with ID ${badId} not found`);
     });
 
     it(
       'should respond with 409 conflict, if parent attainment belongs to different assessment model',
       async () => {
-        // Create a new parent attainment on a different instance.
+        // Create a new parent attainment on a different assessment model.
         let res: supertest.Response = await request
           .post('/v1/courses/4/assessment-models/13/attainments')
           .send(mockAttainment)
@@ -789,7 +789,7 @@ describe(
     });
 
     it('should respond with 404 Not Found, if the attainment is not found '
-      + 'for the specified course and instance', async () => {
+      + 'for the specified course and assessment model', async () => {
       const res: supertest.Response = await request
         .get('/v1/courses/1/assessment-models/1/attainments/2')
         .set('Cookie', cookies.userCookie)

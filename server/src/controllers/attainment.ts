@@ -122,6 +122,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
         assessmentModelId: attainment.assessmentModelId,
         name: attainment.name,
         tag: attainment.tag,
+        daysValid: attainment.daysValid,
         parentId: attainment.parentId,
         subAttainments: subAttainments
       }
@@ -168,7 +169,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     daysValid: yup
       .number()
       .min(0)
-      .required()
+      .notRequired()
   });
 
   const attainmentId: number = Number(req.params.attainmentId);
