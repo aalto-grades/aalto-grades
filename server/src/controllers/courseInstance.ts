@@ -14,18 +14,12 @@ import User from '../database/models/user';
 import {
   CourseInstanceData, CourseInstanceRoleType, GradingScale, Period
 } from 'aalto-grades-common/types/course';
-import { Language } from 'aalto-grades-common/types/language';
 import { ApiError } from '../types/error';
 import { HttpCode } from '../types/httpCode';
 import { idSchema } from '../types/general';
 import { CourseWithTranslation } from '../types/model';
-import { findCourseById } from './utils/course';
+import { findCourseById, parseCourseWithTranslation } from './utils/course';
 import { findUserById } from './utils/user';
-
-interface CourseInstanceWithCourseAndTranslation extends CourseInstance {
-  Course: CourseWithTranslation,
-  Users: Array<User>
-}
 
 export async function getCourseInstance(req: Request, res: Response): Promise<void> {
   // Validate IDs.
@@ -35,6 +29,11 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
   const instanceId: number = Number(req.params.instanceId);
   await idSchema.validate({ id: instanceId });
 
+  interface CourseInstanceWithCourseAndTranslation extends CourseInstance {
+    Course: CourseWithTranslation,
+    Users: Array<User>
+  }
+
   const instance: CourseInstanceWithCourseAndTranslation | null =
     await models.CourseInstance.findByPk(
       instanceId,
@@ -42,11 +41,9 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
         include: [
           {
             model: Course,
-            attributes: ['id', 'courseCode'],
             include: [
               {
-                model: CourseTranslation,
-                attributes: ['language', 'courseName', 'department']
+                model: CourseTranslation
               }
             ]
           },
@@ -82,54 +79,17 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
     sisuCourseInstanceId: instance.sisuCourseInstanceId,
     startingPeriod: instance.startingPeriod as Period,
     endingPeriod: instance.endingPeriod as Period,
-    minCredits: instance.minCredits,
-    maxCredits: instance.maxCredits,
     startDate: instance.startDate,
     endDate: instance.endDate,
     type: instance.type,
     gradingScale: instance.gradingScale as GradingScale,
     teachersInCharge: [],
-    courseData: {
-      id: instance.Course.id,
-      courseCode: instance.Course.courseCode,
-      department: {
-        en: '',
-        fi: '',
-        sv: ''
-      },
-      name: {
-        en: '',
-        fi: '',
-        sv: ''
-      },
-      evaluationInformation: {
-        en: '',
-        fi: '',
-        sv: ''
-      }
-    }
+    courseData: parseCourseWithTranslation(instance.Course)
   };
 
   for (const teacher of instance.Users) {
     parsedInstanceData.teachersInCharge?.push(teacher.name);
   }
-
-  instance.Course.CourseTranslations.forEach((translation: CourseTranslation) => {
-    switch (translation.language) {
-    case Language.English:
-      parsedInstanceData.courseData.department.en = translation.department;
-      parsedInstanceData.courseData.name.en = translation.courseName;
-      break;
-    case Language.Finnish:
-      parsedInstanceData.courseData.department.fi = translation.department;
-      parsedInstanceData.courseData.name.fi = translation.courseName;
-      break;
-    case Language.Swedish:
-      parsedInstanceData.courseData.department.sv = translation.department;
-      parsedInstanceData.courseData.name.sv = translation.courseName;
-      break;
-    }
-  });
 
   res.status(HttpCode.Ok).send({
     success: true,
@@ -169,6 +129,8 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
       courseData: {
         id: course.id,
         courseCode: course.courseCode,
+        minCredits: course.minCredits,
+        maxCredits: course.maxCredits,
         department: {
           en: '',
           fi: '',
@@ -189,8 +151,6 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
       id: instanceWithTeacher.id,
       startingPeriod: instanceWithTeacher.startingPeriod as Period,
       endingPeriod: instanceWithTeacher.endingPeriod as Period,
-      minCredits: instanceWithTeacher.minCredits,
-      maxCredits: instanceWithTeacher.maxCredits,
       startDate: instanceWithTeacher.startDate,
       endDate: instanceWithTeacher.endDate,
       type: instanceWithTeacher.type,
@@ -213,19 +173,6 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
   });
 }
 
-interface CourseInstanceAddRequest {
-  sisuCourseInstanceId: string | null;
-  gradingScale: GradingScale;
-  startingPeriod: Period;
-  endingPeriod: Period;
-  type: string;
-  minCredits: number;
-  maxCredits: number;
-  startDate: Date;
-  endDate: Date;
-  teachersInCharge: Array<number>;
-}
-
 export async function addCourseInstance(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     gradingScale: yup
@@ -245,14 +192,6 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
       .required(),
     type: yup
       .string()
-      .required(),
-    minCredits: yup
-      .number()
-      .min(0)
-      .required(),
-    maxCredits: yup
-      .number()
-      .min(yup.ref('minCredits'))
       .required(),
     startDate: yup
       .date()
@@ -275,6 +214,17 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
 
   await requestSchema.validate(req.body, { abortEarly: false });
 
+  interface CourseInstanceAddRequest {
+    sisuCourseInstanceId: string | null;
+    gradingScale: GradingScale;
+    startingPeriod: Period;
+    endingPeriod: Period;
+    type: string;
+    startDate: Date;
+    endDate: Date;
+    teachersInCharge: Array<number>;
+  }
+
   const request: CourseInstanceAddRequest = req.body;
 
   // Confirm that course exists.
@@ -292,8 +242,6 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
     startingPeriod: request.startingPeriod,
     endingPeriod: request.endingPeriod,
     type: request.type,
-    minCredits: request.minCredits,
-    maxCredits: request.maxCredits,
     startDate: request.startDate,
     endDate: request.endDate
   });

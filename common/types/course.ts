@@ -23,11 +23,11 @@ export interface CourseData {
   // undefined when representing parsed Sisu data.
   id?: number,
   courseCode: string,
+  minCredits: number,
+  maxCredits: number,
   department: LocalizedString,
   name: LocalizedString,
-  evaluationInformation: LocalizedString,
-  minCredits: number,
-  maxCredits: number
+  evaluationInformation: LocalizedString
 }
 
 export interface CourseInstanceData {

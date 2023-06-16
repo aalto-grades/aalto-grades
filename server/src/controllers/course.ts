@@ -16,48 +16,9 @@ import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { localizedStringSchema } from '../types/language';
 import { CourseWithTranslation } from '../types/model';
-import { findCourseWithTranslationById } from './utils/course';
-
-function parseCourseWithTranslation(course: CourseWithTranslation): CourseData {
-  const courseData: CourseData = {
-    id: course.id,
-    courseCode: course.courseCode,
-    department: {
-      en: '',
-      fi: '',
-      sv: ''
-    },
-    name: {
-      en: '',
-      fi: '',
-      sv: ''
-    },
-    evaluationInformation: {
-      en: '',
-      fi: '',
-      sv: ''
-    }
-  };
-
-  course.CourseTranslations.forEach((translation: CourseTranslation) => {
-    switch (translation.language) {
-    case Language.English:
-      courseData.department.en = translation.department;
-      courseData.name.en = translation.courseName;
-      break;
-    case Language.Finnish:
-      courseData.department.fi = translation.department;
-      courseData.name.fi = translation.courseName;
-      break;
-    case Language.Swedish:
-      courseData.department.sv = translation.department;
-      courseData.name.sv = translation.courseName;
-      break;
-    }
-  });
-
-  return courseData;
-}
+import {
+  findCourseWithTranslationById, parseCourseWithTranslation
+} from './utils/course';
 
 export async function getCourse(req: Request, res: Response): Promise<void> {
   const courseId: number = Number(req.params.courseId);
@@ -99,6 +60,8 @@ export async function getAllCourses(req: Request, res: Response): Promise<void> 
 export async function addCourse(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     courseCode: yup.string().required(),
+    minCredits: yup.number().min(0).required(),
+    maxCredits: yup.number().min(yup.ref('minCredits')).required(),
     department: localizedStringSchema.required(),
     name: localizedStringSchema.required()
   });
@@ -114,7 +77,9 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
     async (t: Transaction): Promise<Course> => {
 
       const course: Course = await Course.create({
-        courseCode: req.body.courseCode
+        courseCode: req.body.courseCode,
+        minCredits: req.body.minCredits,
+        maxCredits: req.body.maxCredits
       }, { transaction: t });
 
       await CourseTranslation.bulkCreate([

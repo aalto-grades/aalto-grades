@@ -40,6 +40,8 @@ describe('Test GET /v1/user/:userId/courses - get all courses user has role in',
         {
           'id': 1,
           'courseCode': 'CS-A1110',
+          'minCredits': 5,
+          'maxCredits': 5,
           'department': {
             'fi': 'Tietotekniikan laitos',
             'sv': 'Institutionen för datateknik',

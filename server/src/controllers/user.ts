@@ -11,15 +11,10 @@ import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
 import { CourseData } from 'aalto-grades-common/types/course';
-import { Language } from 'aalto-grades-common/types/language';
-import { findUserById } from './utils/user';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
-
-interface CourseWithTranslationAndInstance extends Course {
-  CourseTranslations: Array<CourseTranslation>
-  CourseInstances: Array<CourseInstance>
-}
+import { parseCourseWithTranslation } from './utils/course';
+import { findUserById } from './utils/user';
 
 export interface CoursesOfUser {
   current: Array<CourseData>,
@@ -39,7 +34,11 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
   // Confirm that user exists.
   await findUserById(userId, HttpCode.NotFound);
 
-  // TODO: This query is likely not ideal.
+  interface CourseWithTranslationAndInstance extends Course {
+    CourseTranslations: Array<CourseTranslation>
+    CourseInstances: Array<CourseInstance>
+  }
+
   const courses: Array<CourseWithTranslationAndInstance> = await models.Course.findAll({
     attributes: ['id', 'courseCode'],
     include: [
@@ -76,42 +75,7 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
     if (course.CourseInstances.length == 0)
       continue;
 
-    const courseData: CourseData = {
-      id: course.id,
-      courseCode: course.courseCode,
-      department: {
-        fi: '',
-        sv: '',
-        en: ''
-      },
-      name: {
-        fi: '',
-        sv: '',
-        en: ''
-      },
-      evaluationInformation: {
-        fi: '',
-        sv: '',
-        en: ''
-      }
-    };
-
-    course.CourseTranslations.forEach((translation: CourseTranslation) => {
-      switch (translation.language) {
-      case Language.English:
-        courseData.department.en = translation.department;
-        courseData.name.en = translation.courseName;
-        break;
-      case Language.Finnish:
-        courseData.department.fi = translation.department;
-        courseData.name.fi = translation.courseName;
-        break;
-      case Language.Swedish:
-        courseData.department.sv = translation.department;
-        courseData.name.sv = translation.courseName;
-        break;
-      }
-    });
+    const courseData: CourseData = parseCourseWithTranslation(course);
 
     const latestEndDate: Date = new Date(String(course.CourseInstances[0].endDate));
 
