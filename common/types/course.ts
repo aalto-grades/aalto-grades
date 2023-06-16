@@ -25,7 +25,9 @@ export interface CourseData {
   courseCode: string,
   department: LocalizedString,
   name: LocalizedString,
-  evaluationInformation: LocalizedString
+  evaluationInformation: LocalizedString,
+  minCredits: number,
+  maxCredits: number
 }
 
 export interface CourseInstanceData {
@@ -35,8 +37,6 @@ export interface CourseInstanceData {
   sisuCourseInstanceId: string | null,
   startingPeriod: Period | null,
   endingPeriod: Period | null,
-  minCredits: number,
-  maxCredits: number,
   startDate: Date,
   endDate: Date,
   type: string,
