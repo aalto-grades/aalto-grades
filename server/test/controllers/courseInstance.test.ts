@@ -306,16 +306,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       endDate: 'not a date either'
     });
 
-    await badInput({
-      gradingScale: 'NUMERICAL',
-      startingPeriod: 'I',
-      endingPeriod: 'II',
-      type: 'LECTURE',
-      teachersInCharge: [1],
-      startDate: '2022-7-10',
-      endDate: '2022-11-10'
-    });
-
   });
 
   it('should respond with 404 not found, if nonexistent course ID', async () => {

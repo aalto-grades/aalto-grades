@@ -40,7 +40,6 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
   }
 
   const courses: Array<CourseWithTranslationAndInstance> = await models.Course.findAll({
-    attributes: ['id', 'courseCode'],
     include: [
       {
         model: CourseInstance,
