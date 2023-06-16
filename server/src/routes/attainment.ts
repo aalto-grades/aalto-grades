@@ -25,6 +25,10 @@ export const router: Router = Router();
  *     format: int32
  *     minimum: 1
  *     example: 32
+ *   AttainmentTag:
+ *     type: string
+ *     description: A unique user-facing identifier for an attainment.
+ *     example: a-plus-exercise-1.2
  *   AddAndEditAttainment:
  *     type: object
  *     description: Information for adding a new study attainment and its subattainment(s).
@@ -40,20 +44,16 @@ export const router: Router = Router();
  *         required: true
  *         description: Study attainment name.
  *         example: Exam attainment 1.1
- *       date:
- *         type: string
- *         format: date
- *         required: true
- *         description: Date when the attainment is completed (e.g. deadline date or exam date).
- *         example: 2023-7-24
- *       expiryDate:
- *         type: string
- *         format: date
+ *       tag:
+ *         $ref '#/definitions/AttainmentTag'
+ *       daysValid:
+ *         type: integer
  *         required: true
  *         description: >
- *           Date when the attainment expires. Once an attainment has expired, it is no longer
- *           eligible to count as completion for future course instances.
- *         example: 2023-12-24
+ *           How many days a completion of the attainment is valid for. Once
+ *           a grade has expired, it is no longer eligible to count as
+ *           completion for future course instances.
+ *         example: 365
  *       subAttainments:
  *         type: array
  *         required: false
@@ -66,14 +66,8 @@ export const router: Router = Router();
  *         properties:
  *           id:
  *             $ref: '#/definitions/AttainmentId'
- *           courseId:
- *             $ref: '#/definitions/CourseId'
- *           courseInstanceId:
- *             $ref: '#/definitions/CourseInstanceId'
- *           tag:
- *             type: string
- *             description: Tag formed from course (C), instance (I) and attainment (A) IDs.
- *             example: C1I1A32
+ *           assessmentModelId:
+ *             $ref: '#/definitions/AssessmentModelId'
  *       - $ref: '#/definitions/AddAndEditAttainment'
  */
 
@@ -84,10 +78,10 @@ export const router: Router = Router();
  *     tags: [Attainment]
  *     description: >
  *       Add a new study attainment and its possible
- *       subattainment(s) to an existing course instance.
+ *       subattainment(s) to an existing assessment model.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
- *       - $ref: '#/components/parameters/instanceId'
+ *       - $ref: '#/components/parameters/assessmentModelId'
  *     requestBody:
  *       description: New study attainment data.
  *       content:
@@ -120,15 +114,15 @@ export const router: Router = Router();
  *       403:
  *         $ref: '#/components/responses/AuthorizationError'
  *       404:
- *         description: Course or course instance does not exist.
+ *         description: Course or assessment model does not exist.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       409:
  *         description: >
- *           Course instance does not belong to the course or
- *           parent study attainment does not belong to the course instance.
+ *           Assessment model does not belong to the course or
+ *           parent study attainment does not belong to the assessment model.
  *         content:
  *           application/json:
  *             schema:
@@ -158,7 +152,7 @@ router.post(
  *     description: Delete a study attainment and all of its subattainments.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
- *       - $ref: '#/components/parameters/instanceId'
+ *       - $ref: '#/components/parameters/assessmentModelId'
  *       - $ref: '#/components/parameters/attainmentId'
  *     responses:
  *       200:
@@ -176,7 +170,7 @@ router.post(
  *       400:
  *         description: >
  *           A validation error occurred in the URL. Either the course ID,
- *           instance ID, or attainment ID is not a positive integer.
+ *           assessment model ID, or attainment ID is not a positive integer.
  *         content:
  *           application/json:
  *             schema:
@@ -187,14 +181,14 @@ router.post(
  *         $ref: '#/components/responses/AuthorizationError'
  *       404:
  *         description: >
- *           The given course, course instance, or study attainment does not exist.
+ *           The given course, assessment model, or study attainment does not exist.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       409:
  *         description: >
- *           The given course instance does not belong to the given course.
+ *           The given assessment model does not belong to the given course.
  *         content:
  *           application/json:
  *             schema:
@@ -216,7 +210,7 @@ router.delete(
  *     description: Update existing study attainment.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
- *       - $ref: '#/components/parameters/instanceId'
+ *       - $ref: '#/components/parameters/assessmentModelId'
  *       - $ref: '#/components/parameters/attainmentId'
  *     requestBody:
  *       description: Study attainment data to be updated.
@@ -254,7 +248,7 @@ router.delete(
  *               $ref: '#/definitions/Failure'
  *       409:
  *         description: >
- *           Parent study attainment does not belong to the course instance or
+ *           Parent study attainment does not belong to the assessment model or
  *           attainment tries to refer to itself as the parent.
  *         content:
  *           application/json:
@@ -285,7 +279,7 @@ router.put(
  *     description: Get single attainment or subtree downwards.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
- *       - $ref: '#/components/parameters/instanceId'
+ *       - $ref: '#/components/parameters/assessmentModelId'
  *       - $ref: '#/components/parameters/attainmentId'
  *       - $ref: '#/components/parameters/tree'
  *     responses:
