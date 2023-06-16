@@ -10,7 +10,7 @@ export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction: Transaction = await queryInterface.sequelize.transaction();
     try {
-      await queryInterface.addConstraint('course_instance', {
+      await queryInterface.addConstraint('course', {
         fields: ['min_credits'],
         type: 'check',
         where: {
@@ -32,6 +32,13 @@ export default {
         transaction
       });
 
+      await queryInterface.addConstraint('attainment', {
+        fields: ['assessment_model_id', 'tag'],
+        type: 'unique',
+        name: 'attainment_assessment_model_id_tag_ck',
+        transaction
+      });
+
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
@@ -42,14 +49,20 @@ export default {
     const transaction: Transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.removeConstraint(
-        'course_instance',
-        'course_instance_min_credits_ck',
+        'course',
+        'course_min_credits_ck',
         { transaction }
       );
 
       await queryInterface.removeConstraint(
         'course_instance',
         'course_instance_start_date_ck',
+        { transaction }
+      );
+
+      await queryInterface.removeConstraint(
+        'attainment',
+        'attainment_assessment_model_id_tag_ck',
         { transaction }
       );
 

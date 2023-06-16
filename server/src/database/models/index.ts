@@ -22,14 +22,14 @@ Course.hasMany(AssessmentModel, {
   onUpdate: 'CASCADE'
 });
 
-AssessmentModel.belongsTo(Attainment, {
-  targetKey: 'id',
-  foreignKey: 'attainmentId'
-});
-
-Attainment.hasOne(AssessmentModel, {
+AssessmentModel.hasMany(Attainment, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
+});
+
+Attainment.belongsTo(AssessmentModel, {
+  targetKey: 'id',
+  foreignKey: 'assessmentModelId'
 });
 
 Attainment.hasMany(Attainment, {

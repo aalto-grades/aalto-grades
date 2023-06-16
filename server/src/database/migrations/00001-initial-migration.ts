@@ -196,16 +196,6 @@ export default {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
         },
-        attainment_id: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-          references: {
-            model: 'attainment',
-            key: 'id'
-          },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE'
-        },
         name: {
           type: DataTypes.STRING,
           allowNull: false
@@ -219,6 +209,16 @@ export default {
           type: DataTypes.INTEGER,
           autoIncrement: true,
           primaryKey: true
+        },
+        assessment_model_id: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          references: {
+            model: 'assessment_model',
+            key: 'id'
+          },
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE'
         },
         parent_id: {
           type: DataTypes.INTEGER,

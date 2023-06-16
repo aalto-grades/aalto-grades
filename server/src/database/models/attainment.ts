@@ -7,6 +7,8 @@ import {
 } from 'sequelize';
 
 import { sequelize } from '..';
+import AssessmentModel from './assessmentModel';
+
 import { Formula } from '../../types/formulas';
 
 export default class Attainment extends Model<
@@ -14,6 +16,7 @@ export default class Attainment extends Model<
   InferCreationAttributes<Attainment>
 > {
   declare id: CreationOptional<number>;
+  declare assessmentModelId: ForeignKey<AssessmentModel['id']>;
   declare parentId: CreationOptional<ForeignKey<Attainment['id']>>;
   declare name: string;
   declare tag: string;
@@ -31,6 +34,14 @@ Attainment.init(
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true
+    },
+    assessmentModelId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'assessment_model',
+        key: 'id'
+      }
     },
     parentId: {
       type: DataTypes.INTEGER,
