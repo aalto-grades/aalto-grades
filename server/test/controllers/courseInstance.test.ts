@@ -34,6 +34,7 @@ describe(
       expect(res.body.data.courseInstance).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
       expect(res.body.data.courseInstance.id).toBe(1);
+      expect(res.body.data.courseInstance.assessmentModelId).toBe(1);
       expect(res.body.data.courseInstance.startingPeriod).toBeDefined();
       expect(res.body.data.courseInstance.endingPeriod).toBeDefined();
       expect(res.body.data.courseInstance.startDate).toBeDefined();
@@ -142,6 +143,7 @@ describe(
 
       expect(res.body.success).toBe(true);
       expect(res.body.data.courseInstances[0].courseData.id).toBeDefined();
+      expect(res.body.data.courseInstances[0].assessmentModelId).toBeDefined();
       expect(res.body.data.courseInstances[0].courseData.courseCode).toBeDefined();
       expect(res.body.data.courseInstances[0].id).toBeDefined();
       expect(res.body.data.courseInstances[0].sisuCourseInstanceId).toBeDefined();
@@ -225,6 +227,7 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
     });
 
     await goodInput({
+      assessmentModelId: 1,
       gradingScale: 'PASS_FAIL',
       startingPeriod: 'III',
       endingPeriod: 'V',

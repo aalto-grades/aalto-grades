@@ -6,6 +6,7 @@ import { Request, Response } from 'express';
 import * as yup from 'yup';
 
 import models from '../database/models';
+import AssessmentModel from '../database/models/assessmentModel';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
@@ -18,6 +19,7 @@ import { ApiError } from '../types/error';
 import { HttpCode } from '../types/httpCode';
 import { idSchema } from '../types/general';
 import { CourseWithTranslation } from '../types/model';
+import { findAssessmentModelById } from './utils/assessmentModel';
 import { findCourseById, parseCourseWithTranslation } from './utils/course';
 import { findUserById } from './utils/user';
 
@@ -76,6 +78,7 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
 
   const parsedInstanceData: CourseInstanceData = {
     id: instance.id,
+    assessmentModelId: instance.assessmentModelId,
     sisuCourseInstanceId: instance.sisuCourseInstanceId,
     startingPeriod: instance.startingPeriod as Period,
     endingPeriod: instance.endingPeriod as Period,
@@ -147,6 +150,7 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
           sv: ''
         }
       },
+      assessmentModelId: instanceWithTeacher.assessmentModelId,
       sisuCourseInstanceId: instanceWithTeacher.sisuCourseInstanceId,
       id: instanceWithTeacher.id,
       startingPeriod: instanceWithTeacher.startingPeriod as Period,
@@ -175,6 +179,9 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
 
 export async function addCourseInstance(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
+    assessmentModelId: yup
+      .number()
+      .notRequired(),
     gradingScale: yup
       .string()
       .oneOf(Object.values(GradingScale))
@@ -215,6 +222,7 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
   await requestSchema.validate(req.body, { abortEarly: false });
 
   interface CourseInstanceAddRequest {
+    assessmentModelId: number | undefined;
     sisuCourseInstanceId: string | null;
     gradingScale: GradingScale;
     startingPeriod: Period;
@@ -235,8 +243,23 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
     await findUserById(teacher, HttpCode.UnprocessableEntity);
   }
 
+  if (request.assessmentModelId) {
+    const assessmentModel: AssessmentModel = await findAssessmentModelById(
+      request.assessmentModelId, HttpCode.UnprocessableEntity
+    );
+
+    if (assessmentModel.courseId !== courseId) {
+      throw new ApiError(
+        `assessment model with ID ${assessmentModel.id} ` +
+        `does not belong to the course with ID ${courseId}`,
+        HttpCode.Conflict
+      );
+    }
+  }
+
   const newInstance: CourseInstance = await models.CourseInstance.create({
     courseId: courseId,
+    assessmentModelId: request.assessmentModelId,
     sisuCourseInstanceId: request.sisuCourseInstanceId ?? null,
     gradingScale: request.gradingScale,
     startingPeriod: request.startingPeriod,

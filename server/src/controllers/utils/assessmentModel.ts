@@ -10,7 +10,7 @@ import { ApiError } from '../../types/error';
 import { idSchema } from '../../types/general';
 import { HttpCode } from '../../types/httpCode';
 
-async function findAssessmentModelById(
+export async function findAssessmentModelById(
   assessmentModelId: number, errorCode: HttpCode
 ): Promise<AssessmentModel> {
   const assessmentModel: AssessmentModel | null = await AssessmentModel.findByPk(

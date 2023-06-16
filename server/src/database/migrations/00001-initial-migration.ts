@@ -86,6 +86,16 @@ export default {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
         },
+        assessment_model_id: {
+          type: DataTypes.INTEGER,
+          allowNull: true,
+          references: {
+            model: 'assessment_model',
+            key: 'id'
+          },
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE'
+        },
         sisu_course_instance_id: {
           type: DataTypes.STRING,
           allowNull: true,
