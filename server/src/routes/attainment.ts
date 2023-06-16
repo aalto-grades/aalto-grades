@@ -79,7 +79,7 @@ export const router: Router = Router();
 
 /**
  * @swagger
- * /v1/courses/{courseId}/instances/{instanceId}/attainments:
+ * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/attainments:
  *   post:
  *     tags: [Attainment]
  *     description: >
@@ -143,7 +143,7 @@ export const router: Router = Router();
  *       - cookieAuth: []
  */
 router.post(
-  '/v1/courses/:courseId/instances/:instanceId/attainments',
+  '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments',
   passport.authenticate('jwt', { session: false }),
   express.json(),
   handleInvalidRequestJson,
@@ -152,7 +152,7 @@ router.post(
 
 /**
  * @swagger
- * /v1/courses/{courseId}/instances/{instanceId}/attainments/{attainmentId}:
+ * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/attainments/{attainmentId}:
  *   delete:
  *     tags: [Attainment]
  *     description: Delete a study attainment and all of its subattainments.
@@ -203,14 +203,14 @@ router.post(
  *       - cookieAuth: []
  */
 router.delete(
-  '/v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId',
+  '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
   passport.authenticate('jwt', { session: false }),
   controllerDispatcher(deleteAttainment)
 );
 
 /**
  * @swagger
- * /v1/courses/{courseId}/instances/{instanceId}/attainments/{attainmentId}:
+ * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/attainments/{attainmentId}:
  *   put:
  *     tags: [Attainment]
  *     description: Update existing study attainment.
@@ -270,7 +270,7 @@ router.delete(
  *       - cookieAuth: []
  */
 router.put(
-  '/v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId',
+  '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
   passport.authenticate('jwt', { session: false }),
   express.json(),
   handleInvalidRequestJson,
@@ -279,7 +279,7 @@ router.put(
 
 /**
  * @swagger
- * /v1/courses/{courseId}/instances/{instanceId}/attainments/{attainmentId}:
+ * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/attainments/{attainmentId}:
  *  get:
  *     tags: [Attainment]
  *     description: Get single attainment or subtree downwards.
@@ -322,7 +322,7 @@ router.put(
  */
 
 router.get(
-  '/v1/courses/:courseId/instances/:instanceId/attainments/:attainmentId',
+  '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
   passport.authenticate('jwt', { session: false }),
   controllerDispatcher(getAttainment)
 );
