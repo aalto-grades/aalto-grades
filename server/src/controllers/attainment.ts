@@ -119,7 +119,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     data: {
       attainment: {
         id: attainment.id,
-        courseId: attainment.courseId,
+        assessmentModelId: attainment.assessmentModelId,
         name: attainment.name,
         tag: attainment.tag,
         parentId: attainment.parentId,
