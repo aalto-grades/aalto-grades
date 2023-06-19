@@ -9,8 +9,8 @@ export interface AttainmentGradeData {
   userId?: number,
   attainmentId: number,
   grade: number,
-  date: Date,
-  expiryDate: Date
+  date?: Date,
+  expiryDate?: Date
 }
 
 export interface StudentGrades {

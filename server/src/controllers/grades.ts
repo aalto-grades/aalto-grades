@@ -9,13 +9,14 @@ import { Op, QueryTypes, Transaction } from 'sequelize';
 import * as yup from 'yup';
 
 import { sequelize } from '../database';
+import AssessmentModel from '../database/models/assessmentModel';
 import Attainment from '../database/models/attainment';
+import AttainmentGrade from '../database/models/attainmentGrade';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 import CourseInstanceRole from '../database/models/courseInstanceRole';
 import CourseResult from '../database/models/courseResult';
 import User from '../database/models/user';
-import AttainmentGrade from '../database/models/attainmentGrade';
 
 import { CourseInstanceRoleType, GradingScale } from 'aalto-grades-common/types/course';
 import { getFormulaImplementation } from '../formulas';
@@ -24,6 +25,7 @@ import { Formula, FormulaNode, GradingInput, GradingResult, Status } from '../ty
 import { JwtClaims } from '../types/general';
 import { AttainmentGradeData, StudentGrades, GradingResultsWithUser } from '../types/grades';
 import { HttpCode } from '../types/httpCode';
+import { validateCourseAndAssessmentModel } from './utils/assessmentModel';
 import { validateCourseAndInstance } from './utils/courseInstance';
 
 export async function getCsvTemplate(req: Request, res: Response): Promise<void> {
@@ -86,16 +88,19 @@ export async function getCsvTemplate(req: Request, res: Response): Promise<void>
  * Parse and extract attainment IDs from the CSV file header.
  * Correct format: "StudentNo,exam,exercise,project,..."
  * @param {Array<string>} header - Header part of the CSV file.
- * @returns {Array<number>} - Array containing the IDs of attainments.
+ * @param {number} assessmentModelId - ID of the assessment model grades are
+ * being added to.
+ * @returns {Promise<Array<number>>} - Array containing the IDs of attainments.
  * @throws {ApiError} - If first column not "StudentNo" (case-insensitive)
  * header array is empty or any of the attainment tags malformed or missing.
  */
 export async function parseHeaderFromCsv(
-  header: Array<string>, courseInstanceId: number
+  header: Array<string>, assessmentModelId: number
 ): Promise<Array<number>> {
   const errors: Array<string> = [];
 
-  // Remove first input "StudentNo". Avoid using shift(), will have side-effects outside function.
+  // Remove first input "StudentNo". Avoid using shift(), will have side-effects
+  // outside function.
   const attainmentTags: Array<string> = header.slice(1);
 
   if (attainmentTags.length === 0) {
@@ -115,7 +120,7 @@ export async function parseHeaderFromCsv(
     where: {
       [Op.and]: [
         {
-          courseInstanceId: courseInstanceId
+          assessmentModelId: assessmentModelId
         },
         {
           tag: {
@@ -133,7 +138,7 @@ export async function parseHeaderFromCsv(
           'Header attainment data parsing failed at column '
             + `${attainmentTags.indexOf(attainmentTag) + 2}. `
             + `Could not find an attainment with tag ${attainmentTag} in `
-            + `course instance with ID ${courseInstanceId}.`
+            + `assessment model with ID ${assessmentModelId}.`
         );
       }
     }
@@ -247,8 +252,10 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
   // Validation path parameters.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
-    await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
+  const [course, assessmentModel]: [course: Course, assessmentModel: AssessmentModel] =
+    await validateCourseAndAssessmentModel(
+      req.params.courseId, req.params.assessmentModelId
+    );
 
   if (!req?.file) {
     throw new ApiError(
@@ -278,14 +285,15 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
     .on('error', next) // Stream causes uncaught exception, pass error manually to the errorHandler.
     .on('end', async (): Promise<void> => {
       try {
-        // Header having colum information, e.g., "StudentNo,C3I9A1,C3I9A2,C3I9A3,C3I9A4,C3I9A5..."
+        // Header having colum information, e.g., "StudentNo,exam,exercise,project,..."
         const header: Array<string> = studentGradingData.shift() as Array<string>;
 
         // Parse header and grades separately. Always first parse header before
         // parsing the grades as the grade parser needs the attainment id array.
         const attainmentIds: Array<number> = await parseHeaderFromCsv(
-          header, courseInstance.id
+          header, assessmentModel.id
         );
+
         let parsedStudentData: Array<StudentGrades> = parseGradesFromCsv(
           studentGradingData, attainmentIds
         );
@@ -311,6 +319,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
         // Check that teacher id is not listed accidentally in the CSV/students list
         // to prevent accidental role change from TEACHER or TEACHER_IN_CHARGE to STUDENT.
+        /*
         const teachers: Array<CourseInstanceRole> = await CourseInstanceRole.findAll({
           attributes: ['userId'],
           where: {
@@ -330,7 +339,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
             HttpCode.Conflict
           );
         }
-
+        */
         await sequelize.transaction(async (t: Transaction) => {
           // Create new users (students) if any found from the CSV.
           if (nonExistingStudents.length > 0) {
@@ -347,6 +356,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
           // Check (and add if needed) that existing users have 'STUDENT' role on the instance.
           // Add also newly created users to the course instance with role 'STUDENT'.
           // Note. updateOnDuplicate works as an UPSERT operation in bulkCreate.
+          /*
           await CourseInstanceRole.bulkCreate(
             students.map((user: User) => {
               return {
@@ -358,7 +368,8 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
               transaction: t,
               updateOnDuplicate: ['role']
             }
-          );
+            );
+            */
         });
 
         // After this point all students confirmed to exist and belong to the instance as STUDENTs.

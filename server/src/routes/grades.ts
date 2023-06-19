@@ -122,7 +122,7 @@ router.get(
 
 /**
  * @swagger
- * /v1/courses/{courseId}/instances/{instanceId}/grades/csv:
+ * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/csv:
  *   post:
  *     tags: [Grades]
  *     description: >
@@ -132,7 +132,7 @@ router.get(
  *       [here](https://github.com/aalto-grades/base-repository/tree/main/server/test/mockData/csv)
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
- *       - $ref: '#/components/parameters/instanceId'
+ *       - $ref: '#/components/parameters/assessmentModelId'
  *     requestBody:
  *       content:
  *         multipart/form-data:
@@ -179,9 +179,9 @@ router.get(
  *               $ref: '#/definitions/Failure'
  *       409:
  *         description: >
- *           Course instance does not belong to the course or
- *           study attainment does not belong to the course instance.
- *           User with course role 'TEACHER' or 'TEACHER_IN_CHARGE' listed in the grading data.
+ *           Assessment model does not belong to the course or attainment does
+ *           not belong to the assessment model. User with course role
+ *           'TEACHER' or 'TEACHER_IN_CHARGE' listed in the grading data.
  *         content:
  *           application/json:
  *             schema:
@@ -198,7 +198,7 @@ router.get(
  *       - cookieAuth: []
  */
 router.post(
-  '/v1/courses/:courseId/instances/:instanceId/grades/csv',
+  '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv',
   passport.authenticate('jwt', { session: false }),
   upload.single('csv_data'),
   controllerDispatcher(addGrades)
