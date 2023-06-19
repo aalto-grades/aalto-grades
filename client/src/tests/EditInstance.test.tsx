@@ -33,30 +33,34 @@ describe('Tests for EditInstanceView components', () => {
     );
   };
 
-  test('EditInstanceView should render the EditInstanceForm and contain all of the appropriate components', async () => {
+  test(
+    'EditInstanceView should render the EditInstanceForm and contain all of'
+    + ' the appropriate components',
+    async () => {
 
-    renderEditInstanceView();
+      renderEditInstanceView();
 
-    await waitFor(() => {
-      const typeField = screen.getByLabelText('Type');
-      const startingField = screen.getByLabelText('Starting Date');
-      const endingField = screen.getByLabelText('Ending Date');
-      const teacherField = screen.getByLabelText('Teacher in Charge');
-      const minCreditsField = screen.getByLabelText('Min Credits');
-      const maxCreditsField = screen.getByLabelText('Max Credits');
-      const gradingField = screen.getByLabelText('Grading Scale');
-      const confirmButton = screen.queryByText('Confirm Details');
+      await waitFor(() => {
+        const typeField = screen.getByLabelText('Type');
+        const startingField = screen.getByLabelText('Starting Date');
+        const endingField = screen.getByLabelText('Ending Date');
+        const teacherField = screen.getByLabelText('Teacher in Charge');
+        const minCreditsField = screen.getByLabelText('Min Credits');
+        const maxCreditsField = screen.getByLabelText('Max Credits');
+        const gradingField = screen.getByLabelText('Grading Scale');
+        const confirmButton = screen.queryByText('Confirm Details');
 
-      expect(typeField).toBeInTheDocument();
-      expect(startingField).toBeInTheDocument();
-      expect(endingField).toBeInTheDocument();
-      expect(teacherField).toBeInTheDocument();
-      expect(minCreditsField).toBeInTheDocument();
-      expect(maxCreditsField).toBeInTheDocument();
-      expect(gradingField).toBeInTheDocument();
-      expect(confirmButton).toBeInTheDocument();
-    });
+        expect(typeField).toBeInTheDocument();
+        expect(startingField).toBeInTheDocument();
+        expect(endingField).toBeInTheDocument();
+        expect(teacherField).toBeInTheDocument();
+        expect(minCreditsField).toBeInTheDocument();
+        expect(maxCreditsField).toBeInTheDocument();
+        expect(gradingField).toBeInTheDocument();
+        expect(confirmButton).toBeInTheDocument();
+      });
 
-  });
+    }
+  );
 
 });

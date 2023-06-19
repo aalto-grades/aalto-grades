@@ -36,38 +36,47 @@ describe('Tests for SelectFormulaView components', () => {
     );
   };
 
-  test('SelectFormulaView should contain all of the appropriate components when calculating total grade', async () => {
+  test(
+    'SelectFormulaView should contain all of the appropriate components when'
+    + ' calculating total grade',
+    async () => {
 
-    renderSelectFormulaView();
+      renderSelectFormulaView();
 
-    await waitFor(() => {
-      const headingElement = screen.queryByText('Select Grading Formula');
-      const subHeadingElement = screen.queryByText('Result: Course Total Grade');
-      const attainmentSelection = screen.queryByText('Select the sub study attainments you want to include in the calculation');
-      const projectsCheckbox = screen.queryByText('Projects');
-      const examCheckbox = screen.queryByText('Exams');
-      const formulaSelector = screen.queryByText('Formula');
-      const formulaPreview = screen.queryByText('Preview of the formula');
-      const submitInstructions = screen.queryByText('Specify attribute values for the sub study attainments');
-      const specifyAttributesButton = screen.queryByText('Specify attributes');
-      const skipAttributesButton = screen.queryByText('Skip for now');
+      await waitFor(() => {
+        const headingElement = screen.queryByText('Select Grading Formula');
+        const subHeadingElement = screen.queryByText('Result: Course Total Grade');
+        const attainmentSelection = screen.queryByText(
+          'Select the sub study attainments you want to include in the calculation'
+        );
+        const projectsCheckbox = screen.queryByText('Projects');
+        const examCheckbox = screen.queryByText('Exams');
+        const formulaSelector = screen.queryByText('Formula');
+        const formulaPreview = screen.queryByText('Preview of the formula');
+        const submitInstructions = screen.queryByText(
+          'Specify attribute values for the sub study attainments'
+        );
+        const specifyAttributesButton = screen.queryByText('Specify attributes');
+        const skipAttributesButton = screen.queryByText('Skip for now');
 
-      expect(headingElement).toBeInTheDocument();
-      expect(subHeadingElement).toBeInTheDocument();
-      expect(attainmentSelection).toBeInTheDocument();
-      expect(projectsCheckbox).toBeInTheDocument();
-      expect(examCheckbox).toBeInTheDocument();
-      expect(formulaSelector).toBeInTheDocument();
-      expect(formulaPreview).toBeInTheDocument();
-      expect(submitInstructions).toBeInTheDocument();
-      expect(specifyAttributesButton).toBeInTheDocument();
-      expect(skipAttributesButton).toBeInTheDocument();
-    });
+        expect(headingElement).toBeInTheDocument();
+        expect(subHeadingElement).toBeInTheDocument();
+        expect(attainmentSelection).toBeInTheDocument();
+        expect(projectsCheckbox).toBeInTheDocument();
+        expect(examCheckbox).toBeInTheDocument();
+        expect(formulaSelector).toBeInTheDocument();
+        expect(formulaPreview).toBeInTheDocument();
+        expect(submitInstructions).toBeInTheDocument();
+        expect(specifyAttributesButton).toBeInTheDocument();
+        expect(skipAttributesButton).toBeInTheDocument();
+      });
 
-  });
+    }
+  );
 
   test(
-    'SelectFormulaView should render an alert if "Specify attributes" is clicked without selecting any attainments or a formula',
+    'SelectFormulaView should render an alert if "Specify attributes" is'
+    + ' clicked without selecting any attainments or a formula',
     async () => {
 
       renderSelectFormulaView();
@@ -75,8 +84,10 @@ describe('Tests for SelectFormulaView components', () => {
       await waitFor(async () => {
         const specifyAttributesButton = screen.queryByText('Specify attributes');
 
-        expect(await screen.queryByText('You must select a formula')).not.toBeInTheDocument();
-        expect(await screen.queryByText('You must select at least one study attainment')).not.toBeInTheDocument();
+        expect(await screen.queryByText('You must select a formula'))
+          .not.toBeInTheDocument();
+        expect(await screen.queryByText('You must select at least one study attainment'))
+          .not.toBeInTheDocument();
 
         userEvent.click(specifyAttributesButton);
 
