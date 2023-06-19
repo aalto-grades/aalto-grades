@@ -156,7 +156,9 @@ router.post(
  *       - $ref: '#/components/parameters/attainmentId'
  *     responses:
  *       200:
- *         description: Study attainment and its possible subattainments were successfully deleted.
+ *         description: >
+ *           Study attainment and its possible subattainments were successfully
+ *           deleted.
  *         content:
  *           application/json:
  *             schema:

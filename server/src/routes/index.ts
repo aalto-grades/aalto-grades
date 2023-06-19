@@ -69,6 +69,16 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *       required: true
  *       example: 1
  *       description: The ID of the course instance.
+ *     assessmentModelId:
+ *       in: path
+ *       name: assessmentModelId
+ *       schema:
+ *         type: integer
+ *         format: int32
+ *         minimum: 1
+ *       required: true
+ *       example: 1
+ *       description: The ID of the assessment model.
  *     attainmentId:
  *       in: path
  *       name: attainmentId
