@@ -2,14 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import styled from 'styled-components';
 import PrivateRoute from './components/auth/PrivateRoute';
 import Login from './components/auth/Login';
@@ -31,6 +30,42 @@ import InstanceCreationRoute from './context/InstanceCreationRoute';
 import FormulaSelectionRoute from './context/FormulaSelectionRoute';
 import UserButton from './components/auth/UserButton';
 import { SystemRole } from 'aalto-grades-common/types/auth';
+
+declare module '@mui/material/styles' {
+  interface Theme {
+    palette: {
+      black: string,
+      hoverGrey1: string,
+      hoverGrey2: string,
+      hoverGrey3: string
+      infoGrey: string
+    },
+    typography: {
+      textInput: {
+        fontSize: string,
+        fontFamily: string,
+        fontWeight: string
+      },
+    }
+  }
+
+  interface PaletteOptions {
+    black?: string,
+    hoverGrey1?: string,
+    hoverGrey2?: string,
+    hoverGrey3?: string
+    infoGrey?: string
+  }
+
+  // TODO: This doesn't fix the type error below for some reason
+  interface TypographyOptions {
+    textInput?: {
+      fontSize?: string,
+      fontFamily?: string,
+      fontWeight?: string
+    }
+  }
+}
 
 const theme = createTheme({
   palette: {
@@ -100,14 +135,14 @@ const theme = createTheme({
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
       fontWeight: '400'
     },
-  }
-} as any);
+  } as any // TODO: Remove
+});
 
-const AppContainer = styled<any>(Container)`
+const AppContainer = styled(Container)`
   text-align: center;
 `;
 
-function App() {
+const App = (): JSX.Element => {
 
   return (
     <ThemeProvider theme={theme}>
@@ -128,37 +163,88 @@ function App() {
       </AppBar>
       <AppContainer maxWidth="lg">
         <Box mx={5} my={5}>
-          <Routes> { /* Add nested routes when needed */ }
-            <Route path='/login' element={<Login/>}/>
-            <Route path='/signup' element={<Signup/>}/>
-            { /* All roles are authorised to access the front page, conditional rendering is done inside the component */ }
-            <Route element={<PrivateRoute roles={Object.values(SystemRole)}/>}>
-              <Route path='/' element={<FrontPage/>} />
-              <Route path='/course-view' element={<AllCoursesView/>}/>
-              <Route path='/course-view/:courseId' element={<CourseView/>}/>
+          <Routes> { /* Add nested routes when needed */}
+            <Route path='/login' element={<Login />} />
+            <Route path='/signup' element={<Signup />} />
+            {
+              /* All roles are authorised to access the front page, conditional
+                 rendering is done inside the component */
+            }
+            <Route element={<PrivateRoute roles={Object.values(SystemRole)} />}>
+              <Route
+                path='/'
+                element={<FrontPage />}
+              />
+              <Route
+                path='/course-view'
+                element={<AllCoursesView />}
+              />
+              <Route
+                path='/course-view/:courseId'
+                element={<CourseView />}
+              />
             </Route>
-            { /* Pages that are only authorised for admin */ }
-            <Route element={<PrivateRoute roles={[SystemRole.Admin]}/>}>
-              <Route path='/create-course' element={<CreateCourseView/>}/>
+            { /* Pages that are only authorised for admin */}
+            <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
+              <Route
+                path='/create-course'
+                element={<CreateCourseView />}
+              />
             </Route>
-            { /* Pages that are authorised for admin and teachers */ }
-            <Route element={<PrivateRoute roles={[SystemRole.Admin]}/>}>
-              <Route path=':courseId/fetch-instances/:courseCode' element={<FetchInstancesView/>}/>
-              <Route path=':courseId/course-results/:instanceId' element={<CourseResultsView/>}/>
-              { /* Pages under this route share instance creation context */ }
-              <Route element={<InstanceCreationRoute/>}>
-                <Route path=':courseId/edit-instance/:sisuInstanceId' element={<EditInstanceView/>}/>
-                <Route path=':courseId/add-attainments/:sisuInstanceId' element={<AddAttainmentsView/>}/>
-                <Route path=':courseId/instance-summary/:sisuInstanceId' element={<InstanceSummaryView/>}/>
-                <Route path=':courseId/create-temporary-attainment/:sisuInstanceId' element={<CreateAttainmentView/>}/>
-                <Route path=':courseId/edit-temporary-attainment/:sisuInstanceId/:attainmentId' element={<EditAttainmentView/>}/>
+            { /* Pages that are authorised for admin and teachers */}
+            <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
+              <Route
+                path=':courseId/fetch-instances/:courseCode'
+                element={<FetchInstancesView />}
+              />
+              <Route
+                path=':courseId/course-results/:instanceId'
+                element={<CourseResultsView />}
+              />
+              { /* Pages under this route share instance creation context */}
+              <Route element={<InstanceCreationRoute />}>
+                <Route
+                  path=':courseId/edit-instance/:sisuInstanceId'
+                  element={<EditInstanceView />}
+                />
+                <Route
+                  path=':courseId/add-attainments/:sisuInstanceId'
+                  element={<AddAttainmentsView />}
+                />
+                <Route
+                  path=':courseId/instance-summary/:sisuInstanceId'
+                  element={<InstanceSummaryView />}
+                />
+                <Route
+                  path=':courseId/create-temporary-attainment/:sisuInstanceId'
+                  element={<CreateAttainmentView />}
+                />
+                <Route
+                  path=':courseId/edit-temporary-attainment/:sisuInstanceId/:attainmentId'
+                  element={<EditAttainmentView />}
+                />
               </Route>
-              <Route path=':courseId/create-attainment/:instanceId' element={<CreateAttainmentView/>}/>
-              <Route path=':courseId/edit-attainment/:instanceId/:attainmentId' element={<EditAttainmentView/>}/>
-              <Route element={<FormulaSelectionRoute/>}>
-                <Route path='/:courseId/select-formula/:instanceId/' element={<SelectFormulaView/>}/>
-                <Route path='/:courseId/formula-attributes/:instanceId/' element={<FormulaAttributesView/>}/>
-                { /* '/:attainmentId' will be added to the paths above once they work for sub-attainments */ }
+              <Route
+                path=':courseId/create-attainment/:instanceId'
+                element={<CreateAttainmentView />}
+              />
+              <Route
+                path=':courseId/edit-attainment/:instanceId/:attainmentId'
+                element={<EditAttainmentView />}
+              />
+              <Route element={<FormulaSelectionRoute />}>
+                <Route
+                  path='/:courseId/select-formula/:instanceId/'
+                  element={<SelectFormulaView />}
+                />
+                <Route
+                  path='/:courseId/formula-attributes/:instanceId/'
+                  element={<FormulaAttributesView />}
+                />
+                {
+                  /* '/:attainmentId' will be added to the paths above once
+                     they work for sub-attainments */
+                }
               </Route>
             </Route>
           </Routes>
@@ -166,6 +252,6 @@ function App() {
       </AppContainer>
     </ThemeProvider>
   );
-}
+};
 
 export default App;
