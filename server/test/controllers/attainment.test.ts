@@ -65,7 +65,7 @@ describe(
         expect(res.body.data.attainment.parentId).toBe(null);
         expect(res.body.data.attainment.tag).toBeDefined();
         expect(res.body.data.attainment.daysValid).toBeDefined();
-        expect(res.body.data.attainment.subAttainments).toBeDefined();;
+        expect(res.body.data.attainment.subAttainments).toBeDefined();
       });
 
     it('should create a new attainment with sub-attainments when course and assessment model exist',

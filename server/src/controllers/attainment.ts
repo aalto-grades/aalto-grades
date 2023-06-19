@@ -41,6 +41,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
   });
 
   await requestSchema.validate(req.body, { abortEarly: false });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, assessmentModel]: [course: Course, assessmentModel: AssessmentModel] =
     await validateCourseAndAssessmentModel(
       req.params.courseId, req.params.assessmentModelId
@@ -242,6 +243,7 @@ export async function getAttainment(req: Request, res: Response): Promise<void> 
   await querySchema.validate(req.query, { abortEarly: false });
   await idSchema.validate({ id: req.params.attainmentId }, { abortEarly: false });
   const attainmentId: number = Number(req.params.attainmentId);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, assessmentModel]: [course: Course, assessmentModel: AssessmentModel] =
     await validateCourseAndAssessmentModel(
       req.params.courseId, req.params.assessmentModelId
