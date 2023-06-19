@@ -15,14 +15,14 @@ import CourseInstance from '../database/models/courseInstance';
 import CourseInstanceRole from '../database/models/courseInstanceRole';
 import CourseResult from '../database/models/courseResult';
 import User from '../database/models/user';
-import UserAttainmentGrade from '../database/models/userAttainmentGrade';
+import AttainmentGrade from '../database/models/attainmentGrade';
 
 import { CourseInstanceRoleType, GradingScale } from 'aalto-grades-common/types/course';
 import { getFormulaImplementation } from '../formulas';
 import { ApiError } from '../types/error';
 import { Formula, FormulaNode, GradingInput, GradingResult, Status } from '../types/formulas';
 import { JwtClaims } from '../types/general';
-import { UserAttainmentGradeData, StudentGrades, GradingResultsWithUser } from '../types/grades';
+import { AttainmentGradeData, StudentGrades, GradingResultsWithUser } from '../types/grades';
 import { HttpCode } from '../types/httpCode';
 import { validateCourseAndInstance } from './utils/courseInstance';
 
@@ -206,7 +206,7 @@ export function parseGradesFromCsv(
           ` expected number, received "${gradingData[i]}"`
         );
       } else {
-        const grade: UserAttainmentGradeData = {
+        const grade: AttainmentGradeData = {
           attainmentId: attainmentIds[i],
           grade: parseInt(gradingData[i], 10)
         };
@@ -376,7 +376,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
             };
           });
 
-        interface GradeCreation extends UserAttainmentGradeData {
+        interface GradeCreation extends AttainmentGradeData {
           graderId: number,
           manual: boolean
         }
@@ -386,7 +386,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         const preparedBulkCreate: Array<GradeCreation> = parsedStudentData.flatMap(
           (student: StudentGrades): Array<GradeCreation> => {
             const studentGradingData: Array<GradeCreation> = student.grades.map(
-              (grade: UserAttainmentGradeData): GradeCreation => {
+              (grade: AttainmentGradeData): GradeCreation => {
                 return {
                   userId: student.id as number,
                   graderId: grader.id,
@@ -398,7 +398,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
           });
 
         // TODO: Optimize if datasets are big.
-        await UserAttainmentGrade.bulkCreate(preparedBulkCreate, { updateOnDuplicate: ['grade'] });
+        await AttainmentGrade.bulkCreate(preparedBulkCreate, { updateOnDuplicate: ['grade'] });
 
         // After this point all the students' attainment grades have been created or
         // updated in the database.
@@ -630,7 +630,7 @@ export async function calculateGrades(
    * Stores the grades of each student for each attainment which were manually
    * specified by a teacher.
    */
-  const unorganizedPresetGrades: Array<UserAttainmentGrade> = await UserAttainmentGrade.findAll({
+  const unorganizedPresetGrades: Array<AttainmentGrade> = await AttainmentGrade.findAll({
     include: [
       {
         model: Attainment,
@@ -646,7 +646,7 @@ export async function calculateGrades(
   });
 
   /*
-   * Next we'll organize the preset grades by student number.
+   * Next we'll organize the preset grades by user ID.
    */
 
   /*
@@ -696,7 +696,7 @@ export async function calculateGrades(
         // If grading scale numerical save numerical value, otherwise final grade status (PASS/FAIL)
         courseInstance.gradingScale === GradingScale.Numerical ? finalGrade.status === Status.Pass ?
           String(finalGrade.grade) : '0' : finalGrade.status,
-        credits: courseInstance.maxCredits
+        credits: course.maxCredits
       }
     );
   }
