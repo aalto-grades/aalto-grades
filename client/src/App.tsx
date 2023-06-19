@@ -32,23 +32,6 @@ import UserButton from './components/auth/UserButton';
 import { SystemRole } from 'aalto-grades-common/types/auth';
 
 declare module '@mui/material/styles' {
-  interface Theme {
-    palette: {
-      black: string,
-      hoverGrey1: string,
-      hoverGrey2: string,
-      hoverGrey3: string
-      infoGrey: string
-    },
-    typography: {
-      textInput: {
-        fontSize: string,
-        fontFamily: string,
-        fontWeight: string
-      },
-    }
-  }
-
   interface PaletteOptions {
     black?: string,
     hoverGrey1?: string,
