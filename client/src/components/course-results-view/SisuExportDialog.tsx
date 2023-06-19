@@ -34,7 +34,8 @@ const successMsg: Message = {
 };
 
 const errorMsg: Message = {
-  msg: 'Fetching CSV failed, please try again. Make sure grades have been calculated before exporting.',
+  msg: 'Fetching CSV failed, please try again.'
+    + ' Make sure grades have been calculated before exporting.',
   severity: 'error'
 };
 

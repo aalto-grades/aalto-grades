@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import BasicGrid from './front-page/BasicGrid';
@@ -27,12 +27,15 @@ const FrontPage = (): JSX.Element => {
 
   return (
     <>
-      <Box component="span" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
+      <Box component="span" sx={{
+        display: 'flex', alignItems: 'center',
+        justifyContent: 'space-between', flexDirection: 'row'
+      }}>
         <Typography variant="h1" align="left" sx={{ flexGrow: 1 }}>
           Your Current Courses
         </Typography>
       </Box>
-      <BasicGrid data={currentCourses}/>
+      <BasicGrid data={currentCourses} />
       <Typography variant="h2" align="left" sx={{ flexGrow: 1, mt: 4 }}>
         Inactive Courses
       </Typography>

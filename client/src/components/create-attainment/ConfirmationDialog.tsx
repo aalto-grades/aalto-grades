@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import PropTypes from 'prop-types';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -13,7 +12,9 @@ import Button from '@mui/material/Button';
 
 // A Dialog component for confirming deletion
 
-function ConfirmationDialog({ title, subject, handleClose, open, deleteAttainment, indices, attainments }) {
+function ConfirmationDialog({
+  title, subject, handleClose, open, deleteAttainment, indices, attainments
+}) {
   return (
     <Dialog open={open} >
       <DialogTitle >Delete {title}</DialogTitle>

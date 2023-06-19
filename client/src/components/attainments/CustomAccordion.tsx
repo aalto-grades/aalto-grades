@@ -26,7 +26,11 @@ const Accordion = styled<any>((props) => (
 
 const AccordionSummary = styled<any>((props) => (
   <MuiAccordionSummary
-    expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.9rem', color: props.expanded === 'true' ? 'primary.main' : 'grey.600' }} />}
+    expandIcon={
+      <ArrowForwardIosSharpIcon sx={{
+        fontSize: '0.9rem', color: props.expanded === 'true' ? 'primary.main' : 'grey.600'
+      }} />
+    }
     {...props}
   />
 ))(({ theme, nowselected }) => ({
@@ -68,7 +72,9 @@ const AccordionDetails = ({ out, children }) => {
       minHeight: '36px',
       maxHeight: '36px'
     }}>
-      <PanoramaFishEyeIcon sx={{ fontSize: '0.6rem', display: 'block', margin: '0px 0px 0px 2px' }} />
+      <PanoramaFishEyeIcon sx={{
+        fontSize: '0.6rem', display: 'block', margin: '0px 0px 0px 2px'
+      }} />
       {children}
     </Box>
   );
@@ -90,8 +96,11 @@ const AttainmentText = ({ name, formulaId }) => {
       columnGap: 3
     }}>
       <Typography variant='body2'>{name}</Typography>
-      { formulaId
-        && <Typography variant='caption' align='left'>{'Formula: ' + formulasService.getFormulaName(formulaId)}</Typography>
+      {
+        formulaId &&
+        <Typography variant='caption' align='left'>
+          {'Formula: ' + formulasService.getFormulaName(formulaId)}
+        </Typography>
       }
     </Box>
   );
@@ -148,13 +157,22 @@ const CustomAccordion = ({ attainments, attainmentKey }) => {
               {
                 attainment.subAttainments.map(subAttainment => {
                   return (
-                    subAttainment.subAttainments.length === 0 ?  // is the attainment a leaf? If yes, render details, else another accordion
+                    // is the attainment a leaf? If yes, render details, else another accordion
+                    subAttainment.subAttainments.length === 0 ?
                       <AccordionDetails key={subAttainment[attainmentKey] + 'details'}>
-                        <AttainmentText name={subAttainment.name} formulaId={subAttainment.formulaId} />
+                        <AttainmentText
+                          name={subAttainment.name}
+                          formulaId={subAttainment.formulaId}
+                        />
                       </AccordionDetails>
                       :
                       <Box key={subAttainment[attainmentKey] + 'subAccordion'} sx={{ pl: '39px' }}>
-                        {<CustomAccordion attainments={[subAttainment]} attainmentKey={attainmentKey} />}
+                        {
+                          <CustomAccordion
+                            attainments={[subAttainment]}
+                            attainmentKey={attainmentKey}
+                          />
+                        }
                       </Box>
                   );
                 })

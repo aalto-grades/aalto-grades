@@ -35,9 +35,10 @@ function getSuggestedAttainments() {
 }
 
 
-// The following functions are used to add temporary ids, and to create, add and delete temporary attainments.
-// These functions are mainly used in order to complete the functionality of creating, adding and editing
-// attainments duing the creation of an instance.
+// The following functions are used to add temporary ids, and to create, add
+// and delete temporary attainments. These functions are mainly used in order
+// to complete the functionality of creating, adding and editing attainments
+// duing the creation of an instance.
 
 // Function to assign temporary Ids to attainments.
 function addTemporaryIds(attainments, temporaryId) {
@@ -87,7 +88,10 @@ function updateTemporaryAttainment(attainments, newAttainment) {
 // Delete an attainment from a temporary list of attainments.
 function deleteTemporaryAttainment(attainments, newAttainment) {
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
-  updatedAttainments = updatedAttainments.filter((attainment) => attainment.temporaryId !== newAttainment.temporaryId);
+  updatedAttainments = updatedAttainments.filter((attainment) => {
+    return attainment.temporaryId !== newAttainment.temporaryId;
+  });
+
   return updatedAttainments;
 }
 
@@ -124,7 +128,9 @@ function getAttainmentByIndices(indices, attainments) {
   const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
+  const array = indicesWithoutLast.reduce((acc, current_index) => {
+    return acc[current_index].subAttainments, updatedAttainments;
+  });
   return array[lastIndex];
 }
 
@@ -140,13 +146,15 @@ function getSubAttainments(indices, attainments) {
   return subAttainments;
 }
 
-// Set the proprety of the object that is in the location specified by the indices in the attainments array,
-// the property is set to have the value given as a parameter
+// Set the proprety of the object that is in the location specified by the indices in the
+// attainments array, the property is set to have the value given as a parameter
 function setProperty(indices, attainments, property, value) {
   const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
+  const array = indicesWithoutLast.reduce((acc, current_index) => {
+    return acc[current_index].subAttainments, updatedAttainments;
+  });
   array[lastIndex][property] = value;
   return updatedAttainments;
 }
@@ -178,7 +186,9 @@ function setFormulaAttribute(indices, attainments, attributeKey, value) {
   const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
+  const array = indicesWithoutLast.reduce((acc, current_index) => {
+    return acc[current_index].subAttainments, updatedAttainments;
+  });
   array[lastIndex]['formulaAttributes'][attributeKey] = value;
   console.log(updatedAttainments);
   return updatedAttainments;
@@ -223,7 +233,9 @@ function removeAttainment(indices, attainments) {
   const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => acc[current_index].subAttainments, updatedAttainments);
+  const array = indicesWithoutLast.reduce((acc, current_index) => {
+    return acc[current_index].subAttainments, updatedAttainments;
+  });
   array.splice(lastIndex, 1);
   return updatedAttainments;
 }
@@ -278,7 +290,8 @@ function addCategories(attainments) {
 
 }
 
-// Recursive function to format Date type values of the attainments to strings of the format '2023-01-01'
+// Recursive function to format Date type values of the attainments to strings
+// of the format '2023-01-01'
 function formatDates(attainments) {
 
   const formatDate = (modifiabelAttainments) => {
@@ -343,10 +356,12 @@ function getAttainmentById(attainments, attainmentId) {
 
 }
 
-// Get an attainment based on its ID, add categories to the attainments, and format the dates of attainments
+// Get an attainment based on its ID, add categories to the attainments, and
+// format the dates of attainments
 function getFinalAttainmentById(allAttainments, attainmentId) {
   let updatedAttainments = JSON.parse(JSON.stringify(allAttainments));
-  //updatedAttainments = [constructTreeAssignmets(updatedAttainments)];  // Not needed if the structure is already a tree
+  // Not needed if the structure is already a tree
+  //updatedAttainments = [constructTreeAssignmets(updatedAttainments)];
   updatedAttainments = [getAttainmentById(updatedAttainments, attainmentId)];
   updatedAttainments = addCategories(updatedAttainments);
   updatedAttainments = formatDates(updatedAttainments);

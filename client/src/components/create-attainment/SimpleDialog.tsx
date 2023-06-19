@@ -24,7 +24,11 @@ function SimpleDialog({ handleClose, open, addSubAttainments, indices, attainmen
   const [numOfAttainments, setSubAttainments] = useState<any>('1');
 
   // The value given should be an integer of one or higher
-  const error = !(!isNaN(numOfAttainments) && (Number.isInteger(Number(numOfAttainments))) && (Number(numOfAttainments) >= 1));
+  const error = !(
+    !isNaN(numOfAttainments)
+    && (Number.isInteger(Number(numOfAttainments)))
+    && (Number(numOfAttainments) >= 1)
+  );
 
   const handleSubmit = (event) => {
     event.preventDefault();

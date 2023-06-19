@@ -9,7 +9,7 @@ import { LoginResult } from 'aalto-grades-common/types/auth';
 const AuthContext = createContext<{
   auth?: LoginResult,
   setAuth?: (auth: LoginResult) => void
-}>({});
+    }>({});
 
 export const AuthProvider = ({ children }: {
   children: JSX.Element

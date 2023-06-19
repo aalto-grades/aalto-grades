@@ -34,7 +34,9 @@ const CourseResultsTable = (
   const [studentsToShow, setStudentsToShow] = useState<any>(students);
 
   useEffect(() => {
-    setStudentsToShow(search === '' ? students : students.filter(s => s.studentNumber.includes(search)));
+    setStudentsToShow(search === '' ? students : students.filter((s) => {
+      return s.studentNumber.includes(search);
+    }));
     setPage(0);
   }, [search, students]);
 
@@ -73,7 +75,10 @@ const CourseResultsTable = (
         />
         { loading
           ?
-          <Box sx={{ margin: 'auto', alignItems: 'center', justifyContent: 'center', display: 'flex', mt: 3 }}>
+          <Box sx={{
+            margin: 'auto', alignItems: 'center', justifyContent: 'center',
+            display: 'flex', mt: 3
+          }}>
             <CircularProgress />
           </Box>
           :

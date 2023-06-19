@@ -67,6 +67,6 @@ const UserButton = (): JSX.Element => {
       </Menu>
     </>
   );
-}
+};
 
 export default UserButton;

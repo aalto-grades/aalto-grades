@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@mui/material/TextField';
 import attainmentServices from '../../services/attainments';
@@ -15,10 +14,16 @@ const DateTextField = ({ fieldData, indices, attainments, setAttainments }) => {
   const handleChange = (event) => {
     const value = event.target.value;
     if (fieldData.fieldId === 'attainmentDate') {
-      const updatedAttainments = attainmentServices.setProperty(indices, attainments, 'date', value);
+      const updatedAttainments = attainmentServices.setProperty(
+        indices, attainments, 'date', value
+      );
+
       setAttainments(updatedAttainments);
     } else if (fieldData.fieldId === 'expiryDate') {
-      const updatedAttainments = attainmentServices.setProperty(indices, attainments, 'expiryDate', value);
+      const updatedAttainments = attainmentServices.setProperty(
+        indices, attainments, 'expiryDate', value
+      );
+
       setAttainments(updatedAttainments);
     } else {
       console.log(fieldData.fieldId);

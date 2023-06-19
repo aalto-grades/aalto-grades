@@ -40,7 +40,8 @@ const loadingMsg: Message = {
 };
 
 const successMsg: Message = {
-  msg: 'File processed successfully, grades imported. To refresh final grades, press "calculate final grades"',
+  msg: 'File processed successfully, grades imported.'
+    + ' To refresh final grades, press "calculate final grades"',
   severity: 'success'
 };
 
@@ -103,8 +104,13 @@ const FileLoadDialog = ({ instanceId, handleClose, open }) => {
       <Dialog open={open} transitionDuration={{ exit: 800 }}>
         <DialogTitle >Add Grades from File</DialogTitle>
         <DialogContent sx={{ pb: 0 }}>
-          <DialogContentText sx={{ mb: 3, color: 'black' }}>{instructions}</DialogContentText>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', columnGap: 2, mb: 3 }}>
+          <DialogContentText sx={{ mb: 3, color: 'black' }}>
+            {instructions}
+          </DialogContentText>
+          <Box sx={{
+            display: 'flex', justifyContent: 'flex-start',
+            alignItems: 'center', columnGap: 2, mb: 3
+          }}>
             <Typography variant='body2' sx={{ color: 'infoGrey' }}>
               {exampleText}
             </Typography>
@@ -121,7 +127,10 @@ const FileLoadDialog = ({ instanceId, handleClose, open }) => {
               src="/Import-grades-file-example.jpg"
             />
           </Box>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', columnGap: 2 }}>
+          <Box sx={{
+            display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start',
+            alignItems: 'center', columnGap: 2
+          }}>
             <Button id='ag_select_file_btn' component='label'>
               Upload file
               <input
@@ -166,7 +175,17 @@ const FileLoadDialog = ({ instanceId, handleClose, open }) => {
                 </>
                 :
                 <ul>
-                  { fileErrors.map(err => <li key={err}><FormHelperText error={true}>{err}</FormHelperText></li>) }
+                  {
+                    fileErrors.map((err) => {
+                      return (
+                        <li key={err}>
+                          <FormHelperText error={true}>
+                            {err}
+                          </FormHelperText>
+                        </li>
+                      );
+                    })
+                  }
                 </ul>
               }
             </>

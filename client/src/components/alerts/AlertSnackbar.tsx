@@ -56,7 +56,11 @@ const AlertSnackbar = ({ messageInfo, setMessageInfo, open, setOpen, position }:
           TransitionProps={{ onExited: handleExited }}
           sx={{ mt: margin, maxWidth: '45vw', textAlign: 'left' }}
         >
-          <Alert onClose={handleClose} severity={messageInfo?.severity ?? 'info'} sx={{ width: '100%' }}>
+          <Alert
+            onClose={handleClose}
+            severity={messageInfo?.severity ?? 'info'}
+            sx={{ width: '100%' }}
+          >
             {messageInfo?.msg}
           </Alert>
         </Snackbar>

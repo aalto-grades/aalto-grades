@@ -29,7 +29,10 @@ const AllCoursesView = (): JSX.Element => {
 
   return (
     <>
-      <Box component="span" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
+      <Box component="span" sx={{
+        display: 'flex', alignItems: 'center',
+        justifyContent: 'space-between', flexDirection: 'row'
+      }}>
         <Typography variant="h1" align="left" sx={{ flexGrow: 1 }}>
           Courses
         </Typography>

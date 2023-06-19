@@ -58,20 +58,20 @@ const CourseView = (): JSX.Element => {
     setAnimation(true);
   }, [currentInstance]);
 
-  const handleClickOpen = (): void => {
+  function handleClickOpen(): void {
     setOpen(true);
-  };
+  }
 
-  const handleClose = (): void => {
+  function handleClose(): void {
     setOpen(false);
-  };
+  }
 
-  const onChangeInstance = (instance): void => {
-    if(instance.id !== currentInstance.id) {
+  function onChangeInstance(instance): void {
+    if (instance.id !== currentInstance.id) {
       setAnimation(false);
       setCurrentInstance(instance);
     }
-  };
+  }
 
   return(
     <Box sx={{ mx: -2.5 }}>
@@ -79,34 +79,49 @@ const CourseView = (): JSX.Element => {
         courseDetails &&
         <>
           <Typography variant='h1' align='left'>{courseDetails.courseCode}</Typography>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', mb: 4, columnGap: 6 }}>
+          <Box sx={{
+            display: 'flex', flexWrap: 'wrap',
+            justifyContent: 'space-between', mb: 4, columnGap: 6
+          }}>
             <Typography variant='h2' align='left'>{courseDetails.name.en}</Typography>
             { /* Only admins and teachers are allowed to create a new instance */
               auth.role == SystemRole.Admin &&
-            <Button
-              id='ag_new_instance_btn'
-              size='large'
-              variant='contained'
-              onClick={() => {
-                navigate(`/${courseId}/fetch-instances/${courseDetails.courseCode}`);
-              }}
-            >  {/* TODO: Check path */}
-              New instance
-            </Button>
+              <Button
+                id='ag_new_instance_btn'
+                size='large'
+                variant='contained'
+                onClick={() => {
+                  navigate(`/${courseId}/fetch-instances/${courseDetails.courseCode}`);
+                }}
+              >  {/* TODO: Check path */}
+                New instance
+              </Button>
             }
           </Box>
           {
             currentInstance && instances &&
             <>
               <Box sx={{ display: 'flex', gap: 3 }}>
-                <Grow in={animation} style={{ transformOrigin: '50% 0 0' }} {...(animation ? { timeout: 500 } : { timeout: 0 })}>
+                <Grow
+                  in={animation}
+                  style={{ transformOrigin: '50% 0 0' }}
+                  {...(animation ? { timeout: 500 } : { timeout: 0 })}
+                >
                   <div>
-                    <InstanceDetails info={{ ...currentInstance, department: courseDetails.department, institution: mockInstitution }} />
+                    <InstanceDetails info={{
+                      ...currentInstance,
+                      department: courseDetails.department,
+                      institution: mockInstitution
+                    }} />
                   </div>
                 </Grow>
                 { /* a different attainment component will be created for students */
                   auth.role == SystemRole.Admin &&
-                  <Grow in={animation} style={{ transformOrigin: '0 0 0' }} {...(animation ? { timeout: 1000 } : { timeout: 0 })}>
+                  <Grow
+                    in={animation}
+                    style={{ transformOrigin: '0 0 0' }}
+                    {...(animation ? { timeout: 1000 } : { timeout: 0 })}
+                  >
                     <div style={{ width: '100%' }}>
                       <Attainments
                         attainments={mockAttainmentsClient}
@@ -120,8 +135,16 @@ const CourseView = (): JSX.Element => {
                 }
               </Box>
               <Typography variant='h2' align='left' sx={{ mt: 6, mb: 3 }}>All Instances</Typography>
-              <InstancesTable data={instances} current={currentInstance.id} onClick={onChangeInstance} />
-              <FileLoadDialog instanceId={currentInstance.id} open={open} handleClose={handleClose} />
+              <InstancesTable
+                data={instances}
+                current={currentInstance.id}
+                onClick={onChangeInstance}
+              />
+              <FileLoadDialog
+                instanceId={currentInstance.id}
+                open={open}
+                handleClose={handleClose}
+              />
             </>
             ||
             <Typography variant='h3'>

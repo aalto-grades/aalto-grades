@@ -2,13 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@mui/material/TextField';
 import attainmentServices from '../../services/attainments';
 
 // A TextField component used for the 'name' of an attainment.
-// This component is also used for the formula attribute textfields that are required after specifying a formula.
+// This component is also used for the formula attribute textfields that are
+// required after specifying a formula.
 
 const StringTextField = ({ fieldData, indices, attainments, setAttainments }) => {
 
@@ -17,11 +17,17 @@ const StringTextField = ({ fieldData, indices, attainments, setAttainments }) =>
   const handleChange = (event) => {
     const value = event.target.value;
     if (fieldData.fieldId === 'attainmentName') {
-      const updatedAttainments = attainmentServices.setProperty(indices, attainments, 'name', value);
+      const updatedAttainments = attainmentServices.setProperty(
+        indices, attainments, 'name', value
+      );
+
       setAttainments(updatedAttainments);
     } else if (fieldData.fieldId.startsWith('attribute')) {
       const attributeKey = fieldData.fieldId.split('_')[1];
-      const updatedAttainments = attainmentServices.setFormulaAttribute(indices, attainments, attributeKey, value);
+      const updatedAttainments = attainmentServices.setFormulaAttribute(
+        indices, attainments, attributeKey, value
+      );
+
       setAttainments(updatedAttainments);
     } else {
       console.log(fieldData.fieldId);

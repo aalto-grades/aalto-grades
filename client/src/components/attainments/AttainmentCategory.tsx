@@ -31,7 +31,9 @@ const AttainmentCategory = ({ attainment, buttons, attainmentKey }): JSX.Element
         <Typography sx={{ fontWeight: 'bold' }} align='left'>{name}</Typography>
         {
           formulaId &&
-          <Typography align='left' variant='body2'>{'Formula: ' + formulasService.getFormulaName(formulaId)}</Typography>
+          <Typography align='left' variant='body2'>
+            {'Formula: ' + formulasService.getFormulaName(formulaId)}
+          </Typography>
         }
       </Box>
       {
