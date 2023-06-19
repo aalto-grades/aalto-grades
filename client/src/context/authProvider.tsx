@@ -14,7 +14,7 @@ const AuthContext = createContext<{
 export const AuthProvider = ({ children }: {
   children: JSX.Element
 }): JSX.Element => {
-  const [auth, setAuth] = useState<LoginResult>({});
+  const [auth, setAuth] = useState<LoginResult>(null);
 
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>
