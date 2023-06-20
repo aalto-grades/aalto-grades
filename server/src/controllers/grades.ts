@@ -762,7 +762,7 @@ async function getFinalGradesFor(
 
   if (finalGrades.length === 0) {
     throw new ApiError(
-      'no grades found, make sure grades have been calculated before requesting course result CSV',
+      'no grades found, make sure grades have been calculated before requesting course results',
       HttpCode.NotFound
     );
   }

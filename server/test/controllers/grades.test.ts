@@ -709,7 +709,7 @@ describe(
       checkErrorRes(
         [
           'no grades found, make sure grades have been' +
-        ' calculated before requesting course result CSV'
+        ' calculated before requesting course results'
         ],
         HttpCode.NotFound);
     });
