@@ -190,11 +190,11 @@ export default {
         },
         date: {
           type: DataTypes.DATE,
-          allowNull: false
+          allowNull: true
         },
         expiry_date: {
           type: DataTypes.DATE,
-          allowNull: false
+          allowNull: true
         },
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
