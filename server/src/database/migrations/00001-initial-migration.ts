@@ -184,6 +184,10 @@ export default {
           type: DataTypes.BOOLEAN,
           allowNull: false
         },
+        status: {
+          type: DataTypes.ENUM('PASS', 'FAIL'),
+          allowNull: false
+        },
         date: {
           type: DataTypes.DATE,
           allowNull: false

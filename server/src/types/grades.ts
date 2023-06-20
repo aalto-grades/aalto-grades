@@ -2,24 +2,25 @@
 //
 // SPDX-License-Identifier: MIT
 
-import CourseResult from '../database/models/courseResult';
-import User from '../database/models/user';
+export enum Status {
+  Pass = 'PASS',
+  Fail = 'FAIL',
+}
 
 export interface AttainmentGradeData {
   userId?: number,
   attainmentId: number,
+  graderId?: number,
   grade: number,
+  status: Status,
+  manual: boolean,
   date?: Date,
   expiryDate?: Date
 }
 
 export interface StudentGrades {
-  // Students ID (PK) in the database user table.
+  // User's ID (PK) in the database user table.
   id?: number,
   studentNumber: string,
   grades: Array<AttainmentGradeData>
-}
-
-export interface GradingResultsWithUser extends CourseResult {
-  User: User
 }

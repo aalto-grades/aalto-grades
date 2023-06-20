@@ -67,15 +67,15 @@ const upload: Multer = multer({
 
 /**
  * @swagger
- * /v1/courses/{courseId}/instances/{instanceId}/grades/csv:
+ * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/csv:
  *   get:
  *     tags: [Grades]
  *     description: >
- *       Returns a template CSV file for a particular course instance for
+ *       Returns a template CSV file for a particular assessment model for
  *       uploading grades.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
- *       - $ref: '#/components/parameters/instanceId'
+ *       - $ref: '#/components/parameters/assessmentModelId'
  *     responses:
  *       200:
  *         description: Template generated succesfully.
@@ -85,11 +85,7 @@ const upload: Multer = multer({
  *             schema:
  *               type: string
  *             example: |
- *               StudentNo,exam,exercises,project
- *               352772
- *               812472
- *               545761
- *               662292
+ *               StudentNumber,exam,exercises,project
  *       400:
  *         description: Fetching failed, due to validation errors in parameters.
  *         content:
@@ -100,22 +96,22 @@ const upload: Multer = multer({
  *         $ref: '#/components/responses/AuthenticationError'
  *       404:
  *         description: >
- *           The given course or course instance does not exist, or the course
- *           instance has no attainments.
+ *           The given course or assessment model does not exist, or the
+ *           assessment model has no attainments.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       409:
  *         description: >
- *           The given course instance does not belong to the given course.
+ *           The given assessment model does not belong to the given course.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
  */
 router.get(
-  '/v1/courses/:courseId/instances/:instanceId/grades/csv',
+  '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv',
   passport.authenticate('jwt', { session: false }),
   controllerDispatcher(getCsvTemplate)
 );
@@ -126,9 +122,10 @@ router.get(
  *   post:
  *     tags: [Grades]
  *     description: >
- *       Add attainment grades for users enrolled in a specific course instance. Attainment grading
- *       data is provided in CSV file. When sending data set **Content-Type** header as
- *       **multipart/form-data** and file name as "csv_data". Example csv files available
+ *       Add attainment grades for users in a particular assessment model.
+ *       Attainment grading data is provided in a CSV file. When sending data,
+ *       set the **Content-Type** header as **multipart/form-data** and the
+ *       file name as "csv_data". Example CSV files available
  *       [here](https://github.com/aalto-grades/base-repository/tree/main/server/test/mockData/csv)
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
@@ -172,7 +169,8 @@ router.get(
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       404:
- *         description: A course or course instance with the given ID was not found.
+ *         description: >
+ *           A course or assessment model with the given ID was not found.
  *         content:
  *           application/json:
  *             schema:
@@ -188,8 +186,9 @@ router.get(
  *               $ref: '#/definitions/Failure'
  *       422:
  *         description: >
- *           At least one of the attainments listed in the CSV file was not found with the given ID
- *           or does not belong to the course instance to which the grading data is being imported.
+ *           At least one of the attainments listed in the CSV file was not
+ *           found with the given ID or does not belong to the assessment model
+ *           to which the grading data is being imported.
  *         content:
  *           application/json:
  *             schema:
@@ -206,16 +205,26 @@ router.post(
 
 /**
  * @swagger
- * /v1/courses/{courseId}/instances/{instanceId}/grades/calculate:
+ * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/calculate:
  *   post:
  *     tags: [Grades]
  *     description: >
  *       Calculate the final grades of all students.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
- *       - $ref: '#/components/parameters/instanceId'
+ *       - $ref: '#/components/parameters/assessmentModelId'
  *     requestBody:
- *       description: The request body should be empty.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               studentNumbers:
+ *                 type: array
+ *                 description: List of students to include in the calculation.
+ *                 example: ['111111', '222222', '333333']
+ *                 items:
+ *                   type: string
  *     responses:
  *       200:
  *         description: Grades calculated successfully.
@@ -241,35 +250,35 @@ router.post(
  *       401:
  *         $ref: '#/components/responses/AuthenticationError'
  *       404:
- *         description: The given course or course instance does not exist.
+ *         description: The given course or assessment model does not exist.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       409:
  *         description: >
- *           The given course instance does not belong to the given course.
+ *           The given assessment model does not belong to the given course.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
  */
 router.post(
-  '/v1/courses/:courseId/instances/:instanceId/grades/calculate',
+  '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/calculate',
   passport.authenticate('jwt', { session: false }),
   controllerDispatcher(calculateGrades)
 );
 
 /**
  * @swagger
- * /v1/courses/{courseId}/instances/{instanceId}/grades/csv/sisu:
+ * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/csv/sisu:
  *   get:
  *     tags: [Grades]
  *     description: >
  *       Get the final grades of all students in a Sisu compatible CSV format.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
- *       - $ref: '#/components/parameters/instanceId'
+ *       - $ref: '#/components/parameters/assessmentModelId'
  *       - in: query
  *         name: assessmentDate
  *         schema:
@@ -312,7 +321,7 @@ router.post(
  *         $ref: '#/components/responses/AuthenticationError'
  *       404:
  *         description: >
- *           The given course or course instance does not exist
+ *           The given course or assessment model does not exist
  *           or no course results found for the instance.
  *         content:
  *           application/json:
@@ -320,28 +329,28 @@ router.post(
  *               $ref: '#/definitions/Failure'
  *       409:
  *         description: >
- *           The given course instance does not belong to the given course.
+ *           The given assessment model does not belong to the given course.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
  */
 router.get(
-  '/v1/courses/:courseId/instances/:instanceId/grades/csv/sisu',
+  '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv/sisu',
   passport.authenticate('jwt', { session: false }),
   controllerDispatcher(getSisuFormattedGradingCSV)
 );
 
 /**
  * @swagger
- * /v1/courses/{courseId}/instances/{instanceId}/grades:
+ * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades:
  *   get:
  *     tags: [Grades]
  *     description: >
  *       Get the final grades of all students.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
- *       - $ref: '#/components/parameters/instanceId'
+ *       - $ref: '#/components/parameters/assessmentModelId'
  *     responses:
  *       200:
  *         description: Grades fetched successfully.
@@ -369,7 +378,7 @@ router.get(
  *         $ref: '#/components/responses/AuthenticationError'
  *       404:
  *         description: >
- *           The given course or course instance does not exist
+ *           The given course or assessment model does not exist
  *           or no course results found for the instance.
  *         content:
  *           application/json:
@@ -377,14 +386,14 @@ router.get(
  *               $ref: '#/definitions/Failure'
  *       409:
  *         description: >
- *           The given course instance does not belong to the given course.
+ *           The given assessment model does not belong to the given course.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
  */
 router.get(
-  '/v1/courses/:courseId/instances/:instanceId/grades',
+  '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades',
   passport.authenticate('jwt', { session: false }),
   controllerDispatcher(getFinalGrades)
 );

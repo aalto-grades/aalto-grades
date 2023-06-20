@@ -19,8 +19,10 @@ export default class AttainmentGrade extends Model<
   declare graderId: ForeignKey<User['id']>;
   declare grade: number;
   declare manual: boolean;
-  declare date: Date; // Date when assignment is done (e.g., deadline or exam date)
-  declare expiryDate: Date;
+  declare status: string;
+  // Date when attainment is completed (e.g., deadline or exam date)
+  declare date: CreationOptional<Date>;
+  declare expiryDate: CreationOptional<Date>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -59,13 +61,17 @@ AttainmentGrade.init(
       type: DataTypes.BOOLEAN,
       allowNull: false
     },
+    status: {
+      type: DataTypes.ENUM('PASS', 'FAIL'),
+      allowNull: false
+    },
     date: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: true
     },
     expiryDate: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: true
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
