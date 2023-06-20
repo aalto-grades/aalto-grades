@@ -709,11 +709,15 @@ export async function calculateGrades(
  */
 interface FinalGradeRaw {
   grade: number,
+  Attainment: {
+    AssessmentModel: {
+      Course: {
+        maxCredits: number
+      }
+    }
+  },
   User: {
     studentNumber: string
-  },
-  Course: {
-    maxCredits: number
   }
 }
 
@@ -730,7 +734,19 @@ async function getFinalGradesFor(
         where: {
           assessmentModelId: assessmentModelId,
           parentId: null
-        }
+        },
+        include: [
+          {
+            model: AssessmentModel,
+            attributes: [],
+            include: [
+              {
+                model: Course,
+                attributes: ['maxCredits']
+              }
+            ]
+          }
+        ]
       },
       {
         model: User,
@@ -741,10 +757,6 @@ async function getFinalGradesFor(
           }
         }
       },
-      {
-        model: Course,
-        attributes: ['maxCredits']
-      }
     ]
   }) as unknown as Array<FinalGradeRaw>;
 
@@ -828,7 +840,7 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
       return {
         studentNumber: finalGrade.User.studentNumber,
         grade: String(finalGrade.grade),
-        credits: finalGrade.Course.maxCredits,
+        credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits,
         // Assesment date must be in form dd.mm.yyyy.
         assessmentDate: (
           assessmentDate ? new Date(assessmentDate) : new Date()
@@ -900,7 +912,7 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
       return {
         studentNumber: finalGrade.User.studentNumber,
         grade: String(finalGrade.grade),
-        credits: finalGrade.Course.maxCredits
+        credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits
       }
     }
   );
