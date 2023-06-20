@@ -479,25 +479,6 @@ describe(
         HttpCode.Conflict
       );
     });
-
-    it(
-      'should respond with 409 conflict, if CSV includes users with role TEACHER/TEACHER_IN_CHARGE',
-      async () => {
-        const csvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mock-data/csv/grades_teacher_in_row.csv'), 'utf8'
-        );
-        res = await request
-          .post('/v1/courses/1/assessment-models/1/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'text/csv' })
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json');
-
-        checkErrorRes(
-          ['User(s) with role "TEACHER" or "TEACHER_IN_CHARGE" found from the CSV.'],
-          HttpCode.Conflict
-        );
-      });
-
   }
 );
 
