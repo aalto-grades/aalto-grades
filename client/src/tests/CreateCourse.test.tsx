@@ -60,6 +60,8 @@ describe('Tests for CreateCourseView components', () => {
     expect(mockCourse).toHaveBeenCalledWith({
       id: -1,
       courseCode: testCode,
+      minCredits: 5,
+      maxCredits: 5,
       department: {
         fi: '',
         sv: '',
