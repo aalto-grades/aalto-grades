@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState }  from 'react';
+import { useState }  from 'react';
 import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
@@ -16,12 +16,19 @@ const CreateAttainmentView = () => {
   const { courseId, instanceId, sisuInstanceId } = useParams();
   let addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId;
 
-  // If this view is opened during the creation of an instance, get the necessary data from the context
+  // If this view is opened during the creation of an instance, get the necessary
+  // data from the context
   if (sisuInstanceId) {
-    ({ addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId } = useOutletContext<any>());
+    (
+      {
+        addedAttainments, setAddedAttainments,
+        attainmentIncrementId, setIncrementId
+      } = useOutletContext<any>()
+    );
   }
 
-  // The property 'category' must be specified for each attainment in order to populate the textfields correctly
+  // The property 'category' must be specified for each attainment in order to
+  // populate the textfields correctly
   const [attainments, setAttainments] = useState([{
     category: '',
     name: '',
@@ -33,21 +40,25 @@ const CreateAttainmentView = () => {
   }]);
 
   // Function to add data to the database
-  const addAttainment = async (attainmentObject) => {
+  async function addAttainment(attainmentObject): Promise<void> {
     try {
-      const attainment = await attainmentServices.addAttainment(courseId, instanceId, attainmentObject);
+      const attainment = await attainmentServices.addAttainment(
+        courseId, instanceId, attainmentObject
+      );
+
       console.log(attainment);
       //navigate('/' + courseId, { replace: true });
     } catch (exception) {
       console.log(exception.message);
     }
-  };
+  }
 
-  const handleSubmit = (event) => {
+  function handleSubmit(event): void {
     event.preventDefault();
     try {
       // If this view is opened from the course view, add to DB
-      // Else the attainment is being created during the creation of an instance so only add to the context
+      // Else the attainment is being created during the creation of an instance
+      // so only add to the context
       if (instanceId) {
         const updatedAttainments = attainmentServices.formatStringsToDates(attainments)[0];
         addAttainment(updatedAttainments);
@@ -64,12 +75,12 @@ const CreateAttainmentView = () => {
     } catch (exception) {
       console.log(exception);
     }
-  };
+  }
 
-  const removeAttainment = (indices) => {
+  function removeAttainment(indices): void {
     const updatedAttainments = attainmentServices.removeAttainment(indices, attainments);
     setAttainments(updatedAttainments);
-  };
+  }
 
   return(
     <>
@@ -98,11 +109,22 @@ const CreateAttainmentView = () => {
               setIncrementId={setIncrementId}
             />
           </Box>
-          <Button size='medium' variant='outlined' onClick={ () => navigate(-1) } sx={{ mr: 1 }}>
-                Cancel
+          <Button
+            size='medium'
+            variant='outlined'
+            onClick={() => navigate(-1)}
+            sx={{ mr: 1 }}
+          >
+            Cancel
           </Button>
-          <Button size='medium' variant='contained' type='submit' onClick={handleSubmit} sx={{ mr: 2 }}>
-                Confirm
+          <Button
+            size='medium'
+            variant='contained'
+            type='submit'
+            onClick={handleSubmit}
+            sx={{ mr: 2 }}
+          >
+            Confirm
           </Button>
         </form>
       </Container>

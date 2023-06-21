@@ -23,7 +23,9 @@ import AlertSnackbar from '../alerts/AlertSnackbar';
 import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
 
 
-const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, navigateToAttributeSelection }) => {
+const SelectFormulaForm = ({
+  attainments, formulas, navigateToCourseView, navigateToAttributeSelection
+}) => {
 
   const [codeSnippet, setCodeSnippet] = useState<any>('');
   const [checkboxError, setCheckboxError] = useState<any>('');
@@ -125,7 +127,8 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
   };
 
   const isChecked = (attainment) => {
-    // If user has returned from attribute selection -> only assigments they previously selected are checked
+    // If user has returned from attribute selection
+    // -> only assigments they previously selected are checked
     let i;
     for (i = 0; i < selectedAttainments.length; i++) {
       if (selectedAttainments[i] === attainment) {
@@ -138,9 +141,13 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
   const attainmentCheckboxes = () => {
     return (
       <>
-        { attainments.map((attainment) => (
+        {attainments.map((attainment) => (
           <FormControlLabel key={attainment.id} control={
-            <Checkbox name={attainment.name} onChange={handleCheckboxChange} checked={isChecked(attainment)}/>
+            <Checkbox
+              name={attainment.name}
+              onChange={handleCheckboxChange}
+              checked={isChecked(attainment)}
+            />
           } label={attainment.name} />
         ))
         }
@@ -148,9 +155,14 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
     );
   };
 
-  return(
+  return (
     <form onSubmit={handleSubmit}>
-      <AlertSnackbar messageInfo={messageInfo} setMessageInfo={setMessageInfo} open={alertOpen} setOpen={setAlertOpen} />
+      <AlertSnackbar
+        messageInfo={messageInfo}
+        setMessageInfo={setMessageInfo}
+        open={alertOpen}
+        setOpen={setAlertOpen}
+      />
       <StyledBox sx={{
         display: 'flex',
         alignItems: 'flex-start',
@@ -162,16 +174,24 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
         textAlign: 'left'
       }}>
         <FormControl sx={{ m: 3, mb: 0 }} component='fieldset' variant='standard'>
-          <FormLabel component='legend' focused={false} sx={{ color: 'secondary.contrastText', mb: 1.5 }}>
+          <FormLabel component='legend' focused={false} sx={{
+            color: 'secondary.contrastText', mb: 1.5
+          }}>
             Select the sub study attainments you want to include in the calculation
           </FormLabel>
           <FormGroup>
             {attainmentCheckboxes()}
           </FormGroup>
-          <FormHelperText error={checkboxError !== ''}>{ checkboxError }</FormHelperText>
+          <FormHelperText error={checkboxError !== ''}>{checkboxError}</FormHelperText>
         </FormControl>
         <FormControl sx={{ m: 3, mt: 3, minWidth: 280 }} variant='standard'>
-          <InputLabel id='formulaLabel' shrink={true} sx={{ fontSize: 'h3.fontSize', mb: -2, position: 'relative' }}>Formula</InputLabel>
+          <InputLabel
+            id='formulaLabel'
+            shrink={true}
+            sx={{ fontSize: 'h3.fontSize', mb: -2, position: 'relative' }}
+          >
+            Formula
+          </InputLabel>
           <Select
             label='Formula'
             labelId='formulaLabel'
@@ -179,12 +199,20 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
             onChange={handleFormulaChange}
             error={formulaError !== ''}
           >
-            { formulas.map((formula) => <MenuItem key={formula.id} value={formula.name}>{formula.name}</MenuItem> ) }
+            {
+              formulas.map((formula) => {
+                return (
+                  <MenuItem key={formula.id} value={formula.name}>
+                    {formula.name}
+                  </MenuItem>
+                );
+              })
+            }
           </Select>
-          <FormHelperText error={formulaError !== ''}>{ formulaError }</FormHelperText>
+          <FormHelperText error={formulaError !== ''}>{formulaError}</FormHelperText>
         </FormControl>
         <StyledBox>
-          <ViewFormulaAccordion codeSnippet={codeSnippet}/>
+          <ViewFormulaAccordion codeSnippet={codeSnippet} />
         </StyledBox>
         <StyledBox sx={{
           display: 'flex',
@@ -192,17 +220,37 @@ const SelectFormulaForm = ({ attainments, formulas, navigateToCourseView, naviga
           flexWrap: 'wrap',
           justifyContent: 'space-between',
         }}>
-          <Typography width={320} sx={{ m: 3, mb: 1.5 }}>Specify attribute values for the sub study attainments</Typography>
-          <Box sx={{ mx: 3, mt: 0, mb: 1.5, alignSelf: 'flex-end',display: 'flex', lexDirection: 'column', }}>
-            <Button size='medium' variant='outlined' type='submit' name='skipAttributes' sx={{ mr: 2 }}>
+          <Typography width={320} sx={{ m: 3, mb: 1.5 }}>
+            Specify attribute values for the sub study attainments
+          </Typography>
+          <Box sx={{
+            mx: 3, mt: 0, mb: 1.5, alignSelf: 'flex-end',
+            display: 'flex', lexDirection: 'column',
+          }}>
+            <Button
+              size='medium'
+              variant='outlined'
+              type='submit'
+              name='skipAttributes'
+              sx={{ mr: 2 }}
+            >
               Skip for now
             </Button>
-            <Button size='medium' variant='contained' onClick={ () => canBeSubmitted() && navigateToAttributeSelection() }>
+            <Button
+              size='medium'
+              variant='contained'
+              onClick={() => canBeSubmitted() && navigateToAttributeSelection()}
+            >
               Specify  attributes
             </Button>
           </Box>
         </StyledBox>
-        <Button sx={{ mt: 0, mb: 1.5, ml: 2.2 }} size='medium' variant='text' onClick={ () => navigate(-1)}>
+        <Button
+          sx={{ mt: 0, mb: 1.5, ml: 2.2 }}
+          size='medium'
+          variant='text'
+          onClick={() => navigate(-1)}
+        >
           Cancel
         </Button>
       </StyledBox>

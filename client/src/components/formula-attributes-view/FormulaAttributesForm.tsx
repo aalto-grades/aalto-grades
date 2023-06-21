@@ -16,10 +16,18 @@ const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
 
   const [attributeValues, setAttributeValues] = useState<any>([]);
   const { selectedAttainments, selectedFormula } = useOutletContext<any>();
-  const [setSnackPack, messageInfo, setMessageInfo, alertOpen, setAlertOpen] = useSnackPackAlerts();
+  const [
+    setSnackPack,
+    messageInfo, setMessageInfo,
+    alertOpen, setAlertOpen
+  ] = useSnackPackAlerts();
 
   useEffect(() => {
-    setAttributeValues(Array(selectedAttainments.length).fill(Array(selectedFormula.attributes.length).fill('')));
+    setAttributeValues(
+      Array(selectedAttainments.length).fill(
+        Array(selectedFormula.attributes.length).fill('')
+      )
+    );
   }, [selectedAttainments, selectedFormula]);
 
   const handleAttributeChange = (attainmentIndex, attributeIndex, event) => {
@@ -57,23 +65,36 @@ const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
       // TODO: add formula and attributes to database
       // Depending on how long adding the formula and attributes to the database takes,
       // a loading messsage may need to be added
-      setSnackPack((prev) => [...prev,
-        { msg: 'Formula attributes saved, you will be redirected to the course page.', severity: 'success' }
+      setSnackPack((prev) => [
+        ...prev,
+        {
+          msg: 'Formula attributes saved, you will be redirected to the course page.',
+          severity: 'success'
+        }
       ]);
       await sleep(4000);
       navigateToCourseView();
 
     } catch (exception) {
       console.log(exception);
-      setSnackPack((prev) => [...prev,
-        { msg: 'Saving the formula attributes failed.', severity: 'error' }
+      setSnackPack((prev) => [
+        ...prev,
+        {
+          msg: 'Saving the formula attributes failed.',
+          severity: 'error'
+        }
       ]);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} data-testid='attributeForm'>
-      <AlertSnackbar messageInfo={messageInfo} setMessageInfo={setMessageInfo} open={alertOpen} setOpen={setAlertOpen} />
+      <AlertSnackbar
+        messageInfo={messageInfo}
+        setMessageInfo={setMessageInfo}
+        open={alertOpen}
+        setOpen={setAlertOpen}
+      />
       <StyledBox sx={{
         display: 'flex',
         flexDirection: 'row',

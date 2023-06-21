@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -9,20 +9,18 @@ import {
 import { sequelize } from '..';
 import Course from './course';
 
-export default class CourseTranslation extends Model<
-  InferAttributes<CourseTranslation>,
-  InferCreationAttributes<CourseTranslation>
+export default class AssessmentModel extends Model<
+  InferAttributes<AssessmentModel>,
+  InferCreationAttributes<AssessmentModel>
 > {
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
-  declare language: string;
-  declare department: string;
-  declare courseName: string;
+  declare name: string;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
 
-CourseTranslation.init(
+AssessmentModel.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -37,15 +35,7 @@ CourseTranslation.init(
         key: 'id'
       }
     },
-    language: {
-      type: new DataTypes.ENUM('EN', 'FI', 'SE'),
-      allowNull: false
-    },
-    department: {
-      type: new DataTypes.STRING,
-      allowNull: false,
-    },
-    courseName: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false
     },
@@ -54,16 +44,16 @@ CourseTranslation.init(
   },
   {
     sequelize,
-    tableName: 'course_translation'
+    tableName: 'assessment_model'
   }
 );
 
-CourseTranslation.belongsTo(Course, {
+AssessmentModel.belongsTo(Course, {
   targetKey: 'id',
   foreignKey: 'courseId'
 });
 
-Course.hasMany(CourseTranslation, {
+Course.hasMany(AssessmentModel, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });

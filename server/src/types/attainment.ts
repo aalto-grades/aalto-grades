@@ -6,20 +6,23 @@ export interface AttainmentRequestData {
   parentId?: number,
   name: string,
   tag: string,
-  date: Date,
-  expiryDate: Date,
+  daysValid: number,
   subAttainments: Array<AttainmentRequestData>
 }
 
 export interface AttainmentData {
   id: number,
-  courseId: number,
-  courseInstanceId: number,
+  assessmentModelId: number,
   parentId?: number,
   tag: string,
   name: string,
-  date: Date,
-  expiryDate: Date,
+  daysValid: number,
   subAttainments?: Array<AttainmentData>
 }
 
+export interface AssessmentMethodData {
+  id: number,
+  courseId: number,
+  name: string
+  // TODO: Attainment tree?
+}

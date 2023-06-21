@@ -48,6 +48,8 @@ const CreateCourseForm = ({ addCourse }) => {
       const courseObject: CourseData = ({
         id,
         courseCode,
+        minCredits: 5,
+        maxCredits: 5,
         department: {
           fi: '',
           sv: '',

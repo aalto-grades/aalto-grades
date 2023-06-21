@@ -34,16 +34,17 @@ describe(
       expect(res.body.data.courseInstance).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
       expect(res.body.data.courseInstance.id).toBe(1);
+      expect(res.body.data.courseInstance.assessmentModelId).toBe(1);
       expect(res.body.data.courseInstance.startingPeriod).toBeDefined();
       expect(res.body.data.courseInstance.endingPeriod).toBeDefined();
-      expect(res.body.data.courseInstance.minCredits).toBeDefined();
-      expect(res.body.data.courseInstance.maxCredits).toBeDefined();
       expect(res.body.data.courseInstance.startDate).toBeDefined();
       expect(res.body.data.courseInstance.endDate).toBeDefined();
       expect(res.body.data.courseInstance.type).toBeDefined();
       expect(res.body.data.courseInstance.gradingScale).toBeDefined();
       expect(res.body.data.courseInstance.teachersInCharge).toBeDefined();
       expect(res.body.data.courseInstance.courseData.courseCode).toBeDefined();
+      expect(res.body.data.courseInstance.courseData.minCredits).toBeDefined();
+      expect(res.body.data.courseInstance.courseData.maxCredits).toBeDefined();
       expect(res.body.data.courseInstance.courseData.department).toBeDefined();
       expect(res.body.data.courseInstance.courseData.name).toBeDefined();
       expect(res.body.data.courseInstance.courseData.evaluationInformation).toBeDefined();
@@ -142,13 +143,12 @@ describe(
 
       expect(res.body.success).toBe(true);
       expect(res.body.data.courseInstances[0].courseData.id).toBeDefined();
+      expect(res.body.data.courseInstances[0].assessmentModelId).toBeDefined();
       expect(res.body.data.courseInstances[0].courseData.courseCode).toBeDefined();
       expect(res.body.data.courseInstances[0].id).toBeDefined();
       expect(res.body.data.courseInstances[0].sisuCourseInstanceId).toBeDefined();
       expect(res.body.data.courseInstances[0].startingPeriod).toBeDefined();
       expect(res.body.data.courseInstances[0].endingPeriod).toBeDefined();
-      expect(res.body.data.courseInstances[0].minCredits).toBeDefined();
-      expect(res.body.data.courseInstances[0].maxCredits).toBeDefined();
       expect(res.body.data.courseInstances[0].startDate).toBeDefined();
       expect(res.body.data.courseInstances[0].endDate).toBeDefined();
       expect(res.body.data.courseInstances[0].type).toBeDefined();
@@ -212,8 +212,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       endingPeriod: 'II',
       type: 'LECTURE',
       teachersInCharge: [1],
-      minCredits: 5,
-      maxCredits: 5,
       startDate: '2022-7-10',
       endDate: '2022-11-10'
     });
@@ -224,20 +222,17 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       endingPeriod: 'V',
       type: 'EXAM',
       teachersInCharge: [2],
-      minCredits: 3,
-      maxCredits: 5,
       startDate: '2023-1-19',
       endDate: '2024-4-8'
     });
 
     await goodInput({
+      assessmentModelId: 1,
       gradingScale: 'PASS_FAIL',
       startingPeriod: 'III',
       endingPeriod: 'V',
       type: 'EXAM',
       teachersInCharge: [2, 1],
-      minCredits: 0,
-      maxCredits: 1,
       startDate: '2023-1-19',
       endDate: '2024-4-8'
     });
@@ -275,8 +270,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       endingPeriod: 'II',
       type: 'LECTURE',
       teachersInCharge: 1,
-      minCredits: 5,
-      maxCredits: 5,
       startDate: '2022-7-10',
       endDate: '2022-11-10'
     });
@@ -289,8 +282,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       endingPeriod: 'II',
       type: 'LECTURE',
       teachersInCharge: [1],
-      minCredits: 5,
-      maxCredits: 5,
       startDate: '2022-7-10',
       endDate: '2022-11-10'
     });
@@ -301,8 +292,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       endingPeriod: 'II',
       type: 42,
       teachersInCharge: 1,
-      minCredits: 5,
-      maxCredits: 5,
       startDate: '2022-7-10',
       endDate: '2022-11-10'
     });
@@ -313,34 +302,8 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       endingPeriod: 'II',
       type: 'LECTURE',
       teachersInCharge: [1],
-      minCredits: 5,
-      maxCredits: 5,
       startDate: 'not a date',
       endDate: 'not a date either'
-    });
-
-    await badInput({
-      gradingScale: 'NUMERICAL',
-      startingPeriod: 'I',
-      endingPeriod: 'II',
-      type: 'LECTURE',
-      teachersInCharge: [1],
-      minCredits: 5,
-      maxCredits: 3,
-      startDate: '2022-7-10',
-      endDate: '2022-11-10'
-    });
-
-    await badInput({
-      gradingScale: 'NUMERICAL',
-      startingPeriod: 'I',
-      endingPeriod: 'II',
-      type: 'LECTURE',
-      teachersInCharge: [1],
-      minCredits: -1,
-      maxCredits: 3,
-      startDate: '2022-7-10',
-      endDate: '2022-11-10'
     });
 
   });
@@ -354,8 +317,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
         endingPeriod: 'II',
         type: 'LECTURE',
         teachersInCharge: [1],
-        minCredits: 5,
-        maxCredits: 5,
         startDate: '2022-7-10',
         endDate: '2022-11-10'
       })
@@ -378,8 +339,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
           endingPeriod: 'II',
           type: 'LECTURE',
           teachersInCharge: [9999999],
-          minCredits: 5,
-          maxCredits: 5,
           startDate: '2022-7-10',
           endDate: '2022-11-10'
         })

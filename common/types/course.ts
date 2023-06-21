@@ -23,6 +23,8 @@ export interface CourseData {
   // undefined when representing parsed Sisu data.
   id?: number,
   courseCode: string,
+  minCredits: number,
+  maxCredits: number,
   department: LocalizedString,
   name: LocalizedString,
   evaluationInformation: LocalizedString
@@ -30,13 +32,13 @@ export interface CourseData {
 
 export interface CourseInstanceData {
   courseData: CourseData,
-  // Course instance ID can be null when representing Sisu course instance data
+  // Course instance and assessment model IDs can be null when representing
+  // Sisu course instance data
   id: number | null,
+  assessmentModelId?: number | null,
   sisuCourseInstanceId: string | null,
   startingPeriod: Period | null,
   endingPeriod: Period | null,
-  minCredits: number,
-  maxCredits: number,
   startDate: Date,
   endDate: Date,
   type: string,

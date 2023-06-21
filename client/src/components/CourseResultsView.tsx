@@ -25,8 +25,12 @@ const CourseResultsView = (): JSX.Element => {
       setStudents(data.finalGrades);
     }).catch(exception => {
       console.log(exception);
-      setSnackPack((prev) => [...prev,
-        { msg: 'Fetching final grades failed, make sure grades are imported and calculated.', severity: 'error' }
+      setSnackPack((prev) => [
+        ...prev,
+        {
+          msg: 'Fetching final grades failed, make sure grades are imported and calculated.',
+          severity: 'error'
+        }
       ]);
     }).finally(() => {
       setLoading(false);

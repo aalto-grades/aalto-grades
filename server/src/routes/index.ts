@@ -69,6 +69,16 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *       required: true
  *       example: 1
  *       description: The ID of the course instance.
+ *     assessmentModelId:
+ *       in: path
+ *       name: assessmentModelId
+ *       schema:
+ *         type: integer
+ *         format: int32
+ *         minimum: 1
+ *       required: true
+ *       example: 1
+ *       description: The ID of the assessment model.
  *     attainmentId:
  *       in: path
  *       name: attainmentId
@@ -89,6 +99,15 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *         The type of the attainment tree fetched. Optional.
  *          * `children` - Fetch only the direct subattainments of the attainment.
  *          * `descendants` - Fetch the whole tree of subattainments.
+ *     studentNumbers:
+ *       in: query
+ *       name: studentNumbers
+ *       schema:
+ *         type: array
+ *         description: List of student numbers.
+ *         example: ['111111', '222222', '333333']
+ *         items:
+ *           type: string
  *   responses:
  *     AuthenticationError:
  *       description: Authentication credentials were missing or JWT expired.

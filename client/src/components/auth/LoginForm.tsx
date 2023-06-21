@@ -15,7 +15,7 @@ const LoginForm = ({ loginUser }: {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
-  function handleSubmit(event: React.SyntheticEvent) {
+  function handleSubmit(event: React.SyntheticEvent): void {
     event.preventDefault();
     try {
       const userObject: LoginCredentials = {

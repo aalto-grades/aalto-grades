@@ -5,6 +5,8 @@
 import Course from '../../database/models/course';
 import CourseTranslation from '../../database/models/courseTranslation';
 
+import { CourseData } from 'aalto-grades-common/types/course';
+import { Language } from 'aalto-grades-common/types/language';
 import { ApiError } from '../../types/error';
 import { HttpCode } from '../../types/httpCode';
 import { CourseWithTranslation } from '../../types/model';
@@ -50,4 +52,47 @@ export async function findCourseWithTranslationById(
   }
 
   return course;
+}
+
+export function parseCourseWithTranslation(course: CourseWithTranslation): CourseData {
+  const courseData: CourseData = {
+    id: course.id,
+    courseCode: course.courseCode,
+    minCredits: course.minCredits,
+    maxCredits: course.maxCredits,
+    department: {
+      en: '',
+      fi: '',
+      sv: ''
+    },
+    name: {
+      en: '',
+      fi: '',
+      sv: ''
+    },
+    evaluationInformation: {
+      en: '',
+      fi: '',
+      sv: ''
+    }
+  };
+
+  course.CourseTranslations.forEach((translation: CourseTranslation) => {
+    switch (translation.language) {
+    case Language.English:
+      courseData.department.en = translation.department;
+      courseData.name.en = translation.courseName;
+      break;
+    case Language.Finnish:
+      courseData.department.fi = translation.department;
+      courseData.name.fi = translation.courseName;
+      break;
+    case Language.Swedish:
+      courseData.department.sv = translation.department;
+      courseData.name.sv = translation.courseName;
+      break;
+    }
+  });
+
+  return courseData;
 }

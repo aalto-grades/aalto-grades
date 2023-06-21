@@ -56,4 +56,6 @@ export async function getFinalGrades(
   return response.data.data;
 }
 
-export default { calculateFinalGrades, exportSisuCsv, getFinalGrades, importCsv, downloadCsvTemplate };
+export default {
+  calculateFinalGrades, exportSisuCsv, getFinalGrades, importCsv, downloadCsvTemplate
+};

@@ -40,15 +40,22 @@ const InstanceBox = ({ courseId, instance }) => {
         navigate('/' + courseId + '/edit-instance/' + sisuCourseInstanceId);
       }}>
       <LightLabelBoldValue label='Type' value={textFormatServices.formatCourseType(type)} />
-      <Box sx={{ mx: 2 }}/>
-      <LightLabelBoldValue label='Starting Date' value={textFormatServices.formatDateString(startDate)} />
-      <LightLabelBoldValue label='Ending Date' value={textFormatServices.formatDateString(endDate)} />
+      <Box sx={{ mx: 2 }} />
+      <LightLabelBoldValue
+        label='Starting Date'
+        value={textFormatServices.formatDateString(startDate)}
+      />
+      <LightLabelBoldValue
+        label='Ending Date'
+        value={textFormatServices.formatDateString(endDate)}
+      />
     </HoverBox>
   );
 };
 
 InstanceBox.propTypes = {
-  courseId: PropTypes.string,  // Once courseId is fixed to courseId from courseCode, change to number
+  // Once courseId is fixed to courseId from courseCode, change to number
+  courseId: PropTypes.string,
   instance: PropTypes.object,
   startDate: PropTypes.instanceOf(Date),
   endDate: PropTypes.instanceOf(Date),
@@ -68,7 +75,8 @@ const FetchedInstances = ({ courseId, info }) => {
 };
 
 FetchedInstances.propTypes = {
-  courseId: PropTypes.string,  // Once courseId is fixed to courseId from courseCode, change to number
+  // Once courseId is fixed to courseId from courseCode, change to number
+  courseId: PropTypes.string,
   info: PropTypes.array
 };
 

@@ -48,163 +48,224 @@ const mockContextWithAttainments = {
   endingPeriod: undefined
 };
 
-describe('Test InstanceSummaryView components when no attainments and successfull instance creation', () => {
+describe(
+  'Test InstanceSummaryView components when no attainments and successfull instance creation',
+  () => {
 
-  const renderInstanceSummaryView = () => {
+    const renderInstanceSummaryView = () => {
 
-    const mockResponseInstanceCreation = { courseInstance: { id: 22 } };
-    (instancesService.createInstance as jest.Mock).mockResolvedValue(mockResponseInstanceCreation);
+      const mockResponseInstanceCreation = { courseInstance: { id: 22 } };
 
-    attainmentServices.addAttainment.mockResolvedValue({ success: true, data: {} });
+      (instancesService.createInstance as jest.Mock).mockResolvedValue(
+        mockResponseInstanceCreation
+      );
 
-    return render(
-      <MemoryRouter initialEntries={['/A-12345/instance-summary/aalto-CUR-168938-2370795']}>
-        <Routes>
-          <Route element={<Outlet context={mockContextWithoutAttainments}/>}>
-            <Route path=':courseId/instance-summary/:instanceId' element={<InstanceSummaryView/>}/>
-          </Route>
-        </Routes>
-      </MemoryRouter>
+      (attainmentServices.addAttainment as jest.Mock).mockResolvedValue({
+        success: true, data: {}
+      });
+
+      return render(
+        <MemoryRouter initialEntries={['/A-12345/instance-summary/aalto-CUR-168938-2370795']}>
+          <Routes>
+            <Route element={<Outlet context={mockContextWithoutAttainments} />}>
+              <Route
+                path=':courseId/instance-summary/:instanceId'
+                element={<InstanceSummaryView />}
+              />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      );
+    };
+
+    test(
+      'InstanceSummaryView should render the InstanceSummaryView and'
+      + ' contain appropriate components',
+      async () => {
+
+        renderInstanceSummaryView();
+
+        await waitFor(() => {
+          const startingField = screen.getByText('Starting Date:');
+          const endingField = screen.getByText('Ending Date:');
+          const typeField = screen.getByText('Type:');
+          const minCreditsField = screen.getByText('Min Credits:');
+          const maxCreditsField = screen.getByText('Max Credits:');
+          const gradingField = screen.getByText('Grading Scale:');
+          const teacherField = screen.getByText('Teachers in Charge');
+
+          expect(startingField).toBeInTheDocument();
+          expect(endingField).toBeInTheDocument();
+          expect(typeField).toBeInTheDocument();
+          expect(minCreditsField).toBeInTheDocument();
+          expect(maxCreditsField).toBeInTheDocument();
+          expect(gradingField).toBeInTheDocument();
+          expect(teacherField).toBeInTheDocument();
+
+          const createButton = screen.getByText('Create instance');
+          const goBackButton = screen.getByText('Go back');
+          expect(createButton).toBeInTheDocument();
+          expect(goBackButton).toBeInTheDocument();
+        });
+
+      }
     );
-  };
 
-  test('InstanceSummaryView should render the InstanceSummaryView and contain appropriate components', async () => {
+    test(
+      'InstanceSummaryView should render 1 success alert after'
+      + ' "create instance" button is clicked if response okay',
+      async () => {
 
-    renderInstanceSummaryView();
+        const { getByText, findByText } = renderInstanceSummaryView();
 
-    await waitFor(() => {
-      const startingField = screen.getByText('Starting Date:');
-      const endingField = screen.getByText('Ending Date:');
-      const typeField = screen.getByText('Type:');
-      const minCreditsField = screen.getByText('Min Credits:');
-      const maxCreditsField = screen.getByText('Max Credits:');
-      const gradingField = screen.getByText('Grading Scale:');
-      const teacherField = screen.getByText('Teachers in Charge');
+        const createButton = getByText('Create instance');
+        act(() => userEvent.click(createButton));
 
-      expect(startingField).toBeInTheDocument();
-      expect(endingField).toBeInTheDocument();
-      expect(typeField).toBeInTheDocument();
-      expect(minCreditsField).toBeInTheDocument();
-      expect(maxCreditsField).toBeInTheDocument();
-      expect(gradingField).toBeInTheDocument();
-      expect(teacherField).toBeInTheDocument();
-
-      const createButton = screen.getByText('Create instance');
-      const goBackButton = screen.getByText('Go back');
-      expect(createButton).toBeInTheDocument();
-      expect(goBackButton).toBeInTheDocument();
-    });
-
-  });
-
-  test('InstanceSummaryView should render 1 success alert after "create instance" button is clicked if response okay', async () => {
-
-    const { getByText, findByText } = renderInstanceSummaryView();
-
-    const createButton = getByText('Create instance');
-    act(() => userEvent.click(createButton));
-
-    expect(await findByText('Instance created successfully. Redirecting to course page in 30 seconds.')).toBeInTheDocument();
-  });
-
-});
-
-describe('Test InstanceSummaryView components when some attainments and successfull creations', () => {
-
-  const renderInstanceSummaryView = () => {
-
-    const mockResponseInstanceCreation = { courseInstance: { id: 22 } };
-    (instancesService.createInstance as jest.Mock).mockResolvedValue(mockResponseInstanceCreation);
-
-    attainmentServices.addAttainment.mockResolvedValue({ success: true, data: {} });
-
-    return render(
-      <MemoryRouter initialEntries={['/A-12345/instance-summary/aalto-CUR-168938-2370795']}>
-        <Routes>
-          <Route element={<Outlet context={mockContextWithAttainments}/>}>
-            <Route path=':courseId/instance-summary/:instanceId' element={<InstanceSummaryView/>}/>
-          </Route>
-        </Routes>
-      </MemoryRouter>
+        expect(await findByText(
+          'Instance created successfully. Redirecting to course page in 30 seconds.'
+        )).toBeInTheDocument();
+      }
     );
-  };
 
-  test('InstanceSummaryView should render 2 success alerts after "create instance" button is clicked if responses okay', async () => {
+  }
+);
 
-    const { getByText, findByText } = renderInstanceSummaryView();
+describe(
+  'Test InstanceSummaryView components when some attainments and successfull creations',
+  () => {
 
-    const createButton = getByText('Create instance');
-    act(() => userEvent.click(createButton));
+    const renderInstanceSummaryView = () => {
 
-    expect(await findByText('Instance created successfully.')).toBeInTheDocument();
-    expect(await findByText('Attainments added successfully. Redirecting to course page in 30 seconds.')).toBeInTheDocument();
-  });
+      const mockResponseInstanceCreation = { courseInstance: { id: 22 } };
 
-});
+      (instancesService.createInstance as jest.Mock).mockResolvedValue(
+        mockResponseInstanceCreation
+      );
 
-describe('Test InstanceSummaryView components when some attainments and successfull instance creation', () => {
+      (attainmentServices.addAttainment as jest.Mock).mockResolvedValue({
+        success: true, data: {}
+      });
 
-  const renderInstanceSummaryView = () => {
+      return render(
+        <MemoryRouter initialEntries={['/A-12345/instance-summary/aalto-CUR-168938-2370795']}>
+          <Routes>
+            <Route element={<Outlet context={mockContextWithAttainments} />}>
+              <Route
+                path=':courseId/instance-summary/:instanceId'
+                element={<InstanceSummaryView />}
+              />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      );
+    };
 
-    const mockResponseInstanceCreation = { courseInstance: { id: 22 } };
-    (instancesService.createInstance as jest.Mock).mockResolvedValue(mockResponseInstanceCreation);
+    test(
+      'InstanceSummaryView should render 2 success alerts after'
+      + ' "create instance" button is clicked if responses okay',
+      async () => {
 
-    attainmentServices.addAttainment.mockRejectedValue({});
+        const { getByText, findByText } = renderInstanceSummaryView();
 
-    return render(
-      <MemoryRouter initialEntries={['/A-12345/instance-summary/aalto-CUR-168938-2370795']}>
-        <Routes>
-          <Route element={<Outlet context={mockContextWithAttainments}/>}>
-            <Route path=':courseId/instance-summary/:instanceId' element={<InstanceSummaryView/>}/>
-          </Route>
-        </Routes>
-      </MemoryRouter>
+        const createButton = getByText('Create instance');
+        act(() => userEvent.click(createButton));
+
+        expect(await findByText('Instance created successfully.')).toBeInTheDocument();
+        expect(await findByText(
+          'Attainments added successfully. Redirecting to course page in 30 seconds.'
+        )).toBeInTheDocument();
+      }
     );
-  };
 
-  test(
-    'InstanceSummaryView should render 2 alerts after "create instance" button is clicked when instance creation ok but attainments not',
-    async () => {
+  }
+);
 
-      const { getByText, findByText } = renderInstanceSummaryView();
+describe(
+  'Test InstanceSummaryView components when some attainments and successfull instance creation',
+  () => {
 
-      const createButton = getByText('Create instance');
-      act(() => userEvent.click(createButton));
+    const renderInstanceSummaryView = () => {
 
-      expect(await findByText('Instance created successfully.')).toBeInTheDocument();
-      expect(await findByText(
-        'Something went wrong while adding attainments. Redirecting to course page in 30 seconds. Attainments can be modified there.'
-      )).toBeInTheDocument();
-    }
-  );
+      const mockResponseInstanceCreation = { courseInstance: { id: 22 } };
+      (instancesService.createInstance as jest.Mock).mockResolvedValue(
+        mockResponseInstanceCreation
+      );
 
-});
+      (attainmentServices.addAttainment as jest.Mock).mockRejectedValue({});
 
-describe('Test InstanceSummaryView components when some attainments and error in instance creation', () => {
+      return render(
+        <MemoryRouter initialEntries={['/A-12345/instance-summary/aalto-CUR-168938-2370795']}>
+          <Routes>
+            <Route element={<Outlet context={mockContextWithAttainments} />}>
+              <Route
+                path=':courseId/instance-summary/:instanceId'
+                element={<InstanceSummaryView />}
+              />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      );
+    };
 
-  const renderInstanceSummaryView = () => {
+    test(
+      'InstanceSummaryView should render 2 alerts after "create instance"'
+      + ' button is clicked when instance creation ok but attainments not',
+      async () => {
 
-    (instancesService.createInstance as jest.Mock).mockRejectedValue(new Error('Internal server error'));
+        const { getByText, findByText } = renderInstanceSummaryView();
 
-    return render(
-      <MemoryRouter initialEntries={['/A-12345/instance-summary/aalto-CUR-168938-2370795']}>
-        <Routes>
-          <Route element={<Outlet context={mockContextWithAttainments}/>}>
-            <Route path=':courseId/instance-summary/:instanceId' element={<InstanceSummaryView/>}/>
-          </Route>
-        </Routes>
-      </MemoryRouter>
+        const createButton = getByText('Create instance');
+        act(() => userEvent.click(createButton));
+
+        expect(await findByText('Instance created successfully.')).toBeInTheDocument();
+        expect(await findByText(
+          'Something went wrong while adding attainments.'
+          + ' Redirecting to course page in 30 seconds.'
+          + ' Attainments can be modified there.'
+        )).toBeInTheDocument();
+      }
     );
-  };
 
-  test('InstanceSummaryView should render 1 alert after "create instance" button is clicked when instance creation fails', async () => {
+  }
+);
 
-    const { getByText, findByText } = renderInstanceSummaryView();
+describe(
+  'Test InstanceSummaryView components when some attainments and error in instance creation',
+  () => {
 
-    const createButton = getByText('Create instance');
-    act(() => userEvent.click(createButton));
+    const renderInstanceSummaryView = () => {
 
-    expect(await findByText('Instance creation failed.')).toBeInTheDocument();
-  });
+      (instancesService.createInstance as jest.Mock).mockRejectedValue(
+        new Error('Internal server error')
+      );
 
-});
+      return render(
+        <MemoryRouter initialEntries={['/A-12345/instance-summary/aalto-CUR-168938-2370795']}>
+          <Routes>
+            <Route element={<Outlet context={mockContextWithAttainments} />}>
+              <Route
+                path=':courseId/instance-summary/:instanceId'
+                element={<InstanceSummaryView />}
+              />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      );
+    };
+
+    test(
+      'InstanceSummaryView should render 1 alert after "create instance"'
+      + ' button is clicked when instance creation fails',
+      async () => {
+
+        const { getByText, findByText } = renderInstanceSummaryView();
+
+        const createButton = getByText('Create instance');
+        act(() => userEvent.click(createButton));
+
+        expect(await findByText('Instance creation failed.')).toBeInTheDocument();
+      }
+    );
+
+  }
+);

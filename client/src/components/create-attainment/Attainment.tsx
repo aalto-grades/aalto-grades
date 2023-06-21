@@ -10,10 +10,16 @@ import attainmentServices from '../../services/attainments';
 
 // Parent component for the components LeafAttainment and ParentAttainment
 
-const Attainment = ({ indices, attainments, setAttainments, removeAttainment, formulaAttributeNames, temporaryId, setIncrementId }) => {
+const Attainment = ({
+  indices, attainments, setAttainments, removeAttainment,
+  formulaAttributeNames, temporaryId, setIncrementId
+}) => {
 
   const addSubAttainments = (numOfAttainments) => {
-    const [updatedAttainments, newTemporaryId] = attainmentServices.addSubAttainments(indices, attainments, numOfAttainments, temporaryId);
+    const [updatedAttainments, newTemporaryId] = attainmentServices.addSubAttainments(
+      indices, attainments, numOfAttainments, temporaryId
+    );
+
     setAttainments(updatedAttainments);
     if (setIncrementId)
       setIncrementId(newTemporaryId);

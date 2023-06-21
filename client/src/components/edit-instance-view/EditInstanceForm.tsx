@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
@@ -122,27 +122,54 @@ const EditInstanceForm = ({ instance }) => {
         my: 2,
         p: 2
       }}>
-        <StringTextField fieldData={typeData} value={courseType} setFunction={setType} />
+        <StringTextField fieldData={typeData} value={courseType} setFunction={setType}
+        />
         <Grid2 container>
           <Grid2 sx={{ minWidth: textFieldMinWidth }}>
-            <DateTextField fieldData={startDateData} value={startDate} setFunction={setStartDate} minWidth={textFieldMinWidth} />
+            <DateTextField
+              fieldData={startDateData}
+              value={startDate}
+              setFunction={setStartDate}
+              minWidth={textFieldMinWidth}
+            />
           </Grid2>
           <Box sx={{ width: 15 }} />
           <Grid2 sx={{ minWidth: textFieldMinWidth }}>
-            <DateTextField fieldData={endDateData} value={endDate} setFunction={setEndDate} minWidth={textFieldMinWidth} />
+            <DateTextField
+              fieldData={endDateData}
+              value={endDate}
+              setFunction={setEndDate}
+              minWidth={textFieldMinWidth}
+            />
           </Grid2>
         </Grid2>
-        <DynamicTextFieldArray fieldData={teacherData} values={teachers} setFunction={setTeachers} />
+        <DynamicTextFieldArray
+          fieldData={teacherData}
+          values={teachers}
+          setFunction={setTeachers}
+        />
         <Grid2 container>
           <Grid2 sx={{ minWidth: textFieldMinWidth }}>
-            <NumberTextField fieldData={minCreditsData} value={stringMinCredits} setFunction={setMinCredits} />
+            <NumberTextField
+              fieldData={minCreditsData}
+              value={stringMinCredits}
+              setFunction={setMinCredits}
+            />
           </Grid2>
           <Box sx={{ width: 15 }} />
           <Grid2 sx={{ minWidth: textFieldMinWidth }}>
-            <NumberTextField fieldData={maxCreditsData} value={stringMaxCredits} setFunction={setMaxCredits} />
+            <NumberTextField
+              fieldData={maxCreditsData}
+              value={stringMaxCredits}
+              setFunction={setMaxCredits}
+            />
           </Grid2>
         </Grid2>
-        <StringTextField fieldData={gradingScaleData} value={gradingScale} setFunction={setGradingScale} />
+        <StringTextField
+          fieldData={gradingScaleData}
+          value={gradingScale}
+          setFunction={setGradingScale}
+        />
       </Box>
       <Box sx={{
         display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',

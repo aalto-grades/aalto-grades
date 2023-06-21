@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 import { getFormulaImplementation } from '../../src/formulas';
+import { Status } from '../../src/types/grades';
 import {
   Formula,
   FormulaImplementation,
-  GradingInput,
-  GradingResult,
-  Status,
+  CalculationInput,
+  CalculationResult,
 } from '../../src/types/formulas';
 
 describe('Test weighted average calculation', () => {
@@ -42,12 +42,12 @@ describe('Test weighted average calculation', () => {
   it('should calculate a passing grade when subgrades are passing', async () => {
     const implementation: FormulaImplementation =
       await getFormulaImplementation(Formula.WeightedAverage);
-    const input: Array<GradingInput> = [
+    const input: Array<CalculationInput> = [
       { params: { min: 0, max: 20, weight: 0.3 }, subResult: { grade: 10, status: Status.Pass } },
       { params: { min: 0, max: 20, weight: 0.7 }, subResult: { grade: 14, status: Status.Pass } },
       { params: { min: 0, max: 3, weight: 1 }, subResult: { grade: 3, status: Status.Pass } },
     ];
-    const computedGrade: GradingResult = await implementation.formulaFunction(input);
+    const computedGrade: CalculationResult = await implementation.formulaFunction(input);
     expect(computedGrade.grade).toBeCloseTo(15.8);
     expect(computedGrade.status).toBe(Status.Pass);
   });
@@ -55,12 +55,12 @@ describe('Test weighted average calculation', () => {
   it('should calculate a failing grade when a subgrade is failing', async () => {
     const implementation: FormulaImplementation =
       await getFormulaImplementation(Formula.WeightedAverage);
-    const input: Array<GradingInput> = [
+    const input: Array<CalculationInput> = [
       { params: { min: 0, max: 20, weight: 0.3 }, subResult: { grade: 10, status: Status.Pass } },
       { params: { min: 0, max: 20, weight: 0.7 }, subResult: { grade: 14, status: Status.Fail } },
       { params: { min: 0, max: 3, weight: 1 }, subResult: { grade: 3, status: Status.Fail } },
     ];
-    const computedGrade: GradingResult = await implementation.formulaFunction(input);
+    const computedGrade: CalculationResult = await implementation.formulaFunction(input);
     expect(computedGrade.grade).toBeCloseTo(15.8);
     expect(computedGrade.status).toBe(Status.Fail);
   });

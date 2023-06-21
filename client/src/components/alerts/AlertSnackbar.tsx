@@ -28,18 +28,18 @@ const AlertSnackbar = ({ messageInfo, setMessageInfo, open, setOpen, position }:
   open: boolean,
   setOpen: (open: boolean) => void,
   position?: number
-}) => {
+}): JSX.Element => {
 
-  const margin = position ? (position - 1) * 7 : 0;
+  const margin: number = position ? (position - 1) * 7 : 0;
 
-  function handleClose(event: SyntheticEvent, reason: string) {
+  function handleClose(event: SyntheticEvent, reason: string): void {
     if (reason === 'clickaway') {
       return;
     }
     setOpen(false);
   }
 
-  function handleExited() {
+  function handleExited(): void {
     setMessageInfo(undefined);
   }
 
@@ -56,7 +56,11 @@ const AlertSnackbar = ({ messageInfo, setMessageInfo, open, setOpen, position }:
           TransitionProps={{ onExited: handleExited }}
           sx={{ mt: margin, maxWidth: '45vw', textAlign: 'left' }}
         >
-          <Alert onClose={handleClose} severity={messageInfo?.severity ?? 'info'} sx={{ width: '100%' }}>
+          <Alert
+            onClose={handleClose}
+            severity={messageInfo?.severity ?? 'info'}
+            sx={{ width: '100%' }}
+          >
             {messageInfo?.msg}
           </Alert>
         </Snackbar>

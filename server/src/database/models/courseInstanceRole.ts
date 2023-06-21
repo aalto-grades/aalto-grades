@@ -51,3 +51,15 @@ CourseInstanceRole.init(
     tableName: 'course_instance_role'
   }
 );
+
+User.belongsToMany(CourseInstance, {
+  through: CourseInstanceRole,
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+CourseInstance.belongsToMany(User, {
+  through: CourseInstanceRole,
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});

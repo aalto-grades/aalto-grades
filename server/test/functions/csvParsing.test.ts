@@ -4,7 +4,7 @@
 
 import { parseGradesFromCsv, parseHeaderFromCsv } from '../../src/controllers/grades';
 import { ApiError } from '../../src/types/error';
-import { StudentGrades, UserAttainmentGradeData } from '../../src/types/grades';
+import { AttainmentGradeData, StudentGrades } from '../../src/types/grades';
 import { HttpCode } from '../../src/types/httpCode';
 
 function checkError(error: unknown, httpCode: HttpCode, message: string | Array<string>): void {
@@ -48,7 +48,7 @@ describe('Test CSV header parser', () => {
     function errorMessage(column: number, tag: string, instanceId: number): string {
       return `Header attainment data parsing failed at column ${column}. `
         + `Could not find an attainment with tag ${tag} in `
-        + `course instance with ID ${instanceId}.`;
+        + `assessment model with ID ${instanceId}.`;
     }
 
     try {
@@ -126,7 +126,7 @@ describe('Test CSV student grades parser', () => {
       const rowData: Array<string> = studentGradingData[index];
       expect(student.studentNumber).toBe(rowData[0]);
 
-      student.grades.forEach((grade: UserAttainmentGradeData, index: number) => {
+      student.grades.forEach((grade: AttainmentGradeData, index: number) => {
         expect(grade.attainmentId).toBe(attainmentIds[index]);
         expect(grade.grade).toBe(Number(rowData[index + 1]));
       });

@@ -5,43 +5,65 @@
 import { parse, Parser } from 'csv-parse';
 import { stringify } from 'csv-stringify';
 import { NextFunction, Request, Response } from 'express';
-import { Op, QueryTypes, Transaction } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import * as yup from 'yup';
 
 import { sequelize } from '../database';
+import AssessmentModel from '../database/models/assessmentModel';
 import Attainment from '../database/models/attainment';
+import AttainmentGrade from '../database/models/attainmentGrade';
 import Course from '../database/models/course';
-import CourseInstance from '../database/models/courseInstance';
-import CourseInstanceRole from '../database/models/courseInstanceRole';
-import CourseResult from '../database/models/courseResult';
 import User from '../database/models/user';
-import UserAttainmentGrade from '../database/models/userAttainmentGrade';
 
-import { CourseInstanceRoleType, GradingScale } from 'aalto-grades-common/types/course';
 import { getFormulaImplementation } from '../formulas';
 import { ApiError } from '../types/error';
-import { Formula, FormulaNode, GradingInput, GradingResult, Status } from '../types/formulas';
+import { Formula, FormulaNode, CalculationInput, CalculationResult } from '../types/formulas';
 import { JwtClaims } from '../types/general';
-import { UserAttainmentGradeData, StudentGrades, GradingResultsWithUser } from '../types/grades';
+import { AttainmentGradeData, Status, StudentGrades } from '../types/grades';
 import { HttpCode } from '../types/httpCode';
-import { validateCourseAndInstance } from './utils/courseInstance';
+import { validateCourseAndAssessmentModel } from './utils/assessmentModel';
+
+async function studentNumbersExist(studentNumbers: Array<string>): Promise<void> {
+  const foundStudentNumbers: Array<string> = (await User.findAll({
+    attributes: ['studentNumber'],
+    where: {
+      studentNumber: {
+        [Op.in]: studentNumbers
+      }
+    }
+  })).map((student: User) => student.studentNumber);
+
+  if (foundStudentNumbers.length !== studentNumbers.length) {
+    const errors: Array<string> = [];
+
+    for (const studentNumber of studentNumbers) {
+      if (!foundStudentNumbers.includes(studentNumber)) {
+        errors.push(`user with student number ${studentNumber} not found`);
+      }
+    }
+
+    throw new ApiError(errors, HttpCode.UnprocessableEntity);
+  }
+}
 
 export async function getCsvTemplate(req: Request, res: Response): Promise<void> {
-  const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
-    await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [course, assessmentModel]: [course: Course, assessmentModel: AssessmentModel] =
+    await validateCourseAndAssessmentModel(
+      req.params.courseId, req.params.assessmentModelId
+    );
 
   const attainmentTags: Array<string> = (await Attainment.findAll({
     attributes: ['tag'],
     where: {
-      courseId: course.id,
-      courseInstanceId: courseInstance.id
+      assessmentModelId: assessmentModel.id
     }
   })).map((attainment: { tag: string }) => attainment.tag);
 
   if (attainmentTags.length === 0) {
     throw new ApiError(
-      `no attainments found for course instance with ID ${courseInstance.id}, `
-        + 'add attainments to the course instance to generate a template',
+      `no attainments found for assessment model with ID ${assessmentModel.id}, `
+        + 'add attainments to the assessment model to generate a template',
       HttpCode.NotFound
     );
   }
@@ -49,22 +71,6 @@ export async function getCsvTemplate(req: Request, res: Response): Promise<void>
   const template: Array<Array<string>> = [
     ['StudentNo', ...attainmentTags]
   ];
-
-  const students: Array<{ studentNumber: string }> = await User.findAll({
-    attributes: ['studentNumber'],
-    include: {
-      model: CourseInstance,
-      attributes: [],
-      where: {
-        id: courseInstance.id,
-        '$CourseInstances->CourseInstanceRole.role$': CourseInstanceRoleType.Student
-      }
-    }
-  });
-
-  for (const student of students) {
-    template.push([student.studentNumber]);
-  }
 
   stringify(
     template,
@@ -84,18 +90,21 @@ export async function getCsvTemplate(req: Request, res: Response): Promise<void>
 
 /**
  * Parse and extract attainment IDs from the CSV file header.
- * Correct format: "StudentNo,exam,exercise,project,..."
+ * Correct format: "StudentNumber,exam,exercise,project,..."
  * @param {Array<string>} header - Header part of the CSV file.
- * @returns {Array<number>} - Array containing the IDs of attainments.
- * @throws {ApiError} - If first column not "StudentNo" (case-insensitive)
+ * @param {number} assessmentModelId - ID of the assessment model grades are
+ * being added to.
+ * @returns {Promise<Array<number>>} - Array containing the IDs of attainments.
+ * @throws {ApiError} - If first column not "StudentNumber" (case-insensitive)
  * header array is empty or any of the attainment tags malformed or missing.
  */
 export async function parseHeaderFromCsv(
-  header: Array<string>, courseInstanceId: number
+  header: Array<string>, assessmentModelId: number
 ): Promise<Array<number>> {
   const errors: Array<string> = [];
 
-  // Remove first input "StudentNo". Avoid using shift(), will have side-effects outside function.
+  // Remove first input "StudentNumber". Avoid using shift(), which will have
+  // side-effects outside this function.
   const attainmentTags: Array<string> = header.slice(1);
 
   if (attainmentTags.length === 0) {
@@ -115,7 +124,7 @@ export async function parseHeaderFromCsv(
     where: {
       [Op.and]: [
         {
-          courseInstanceId: courseInstanceId
+          assessmentModelId: assessmentModelId
         },
         {
           tag: {
@@ -133,7 +142,7 @@ export async function parseHeaderFromCsv(
           'Header attainment data parsing failed at column '
             + `${attainmentTags.indexOf(attainmentTag) + 2}. `
             + `Could not find an attainment with tag ${attainmentTag} in `
-            + `course instance with ID ${courseInstanceId}.`
+            + `assessment model with ID ${assessmentModelId}.`
         );
       }
     }
@@ -171,11 +180,11 @@ export function parseGradesFromCsv(
    * so the first row and column in the CSV file will have the index 0 but the
    * number 1. See an example of row and column numbers below.
    *
-   *        | column 1  | column 2 | column 3 |
-   *  --------------------------------------------
-   *  row 1:| StudentNo | exercise | exam     |
-   *  row 2:| 812472    | 12       | 32       |
-   *  row 3:| 545761    | 0        | 15       |
+   *        | column 1      | column 2 | column 3 |
+   *  ---------------------------------------------
+   *  row 1:| StudentNumber | exercise | exam     |
+   *  row 2:| 812472        | 12       | 32       |
+   *  row 3:| 545761        | 0        | 15       |
    *  ...
    *  row n:| ...
    *
@@ -206,9 +215,11 @@ export function parseGradesFromCsv(
           ` expected number, received "${gradingData[i]}"`
         );
       } else {
-        const grade: UserAttainmentGradeData = {
+        const grade: AttainmentGradeData = {
           attainmentId: attainmentIds[i],
-          grade: parseInt(gradingData[i], 10)
+          grade: parseInt(gradingData[i], 10),
+          manual: true,
+          status: Status.Pass // TODO: Allow specification?
         };
         student.grades.push(grade);
       }
@@ -235,7 +246,7 @@ export function parseGradesFromCsv(
  * @returns {Promise<void>} - A Promise that resolves when the function has completed its execution.
  * @throws {ApiError} - If CSV file loading fails, parsing the header or body of the CSV fails, or
  * the CSV file contains attainments which don't belong to the specified course or course instance.
-*/
+ */
 export async function addGrades(req: Request, res: Response, next: NextFunction): Promise<void> {
   /*
    * TODO:
@@ -247,8 +258,10 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
   // Validation path parameters.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
-    await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
+  const [course, assessmentModel]: [course: Course, assessmentModel: AssessmentModel] =
+    await validateCourseAndAssessmentModel(
+      req.params.courseId, req.params.assessmentModelId
+    );
 
   if (!req?.file) {
     throw new ApiError(
@@ -278,14 +291,15 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
     .on('error', next) // Stream causes uncaught exception, pass error manually to the errorHandler.
     .on('end', async (): Promise<void> => {
       try {
-        // Header having colum information, e.g., "StudentNo,C3I9A1,C3I9A2,C3I9A3,C3I9A4,C3I9A5..."
+        // Header having colum information, e.g., "StudentNumber,exam,exercise,project,..."
         const header: Array<string> = studentGradingData.shift() as Array<string>;
 
         // Parse header and grades separately. Always first parse header before
         // parsing the grades as the grade parser needs the attainment id array.
         const attainmentIds: Array<number> = await parseHeaderFromCsv(
-          header, courseInstance.id
+          header, assessmentModel.id
         );
+
         let parsedStudentData: Array<StudentGrades> = parseGradesFromCsv(
           studentGradingData, attainmentIds
         );
@@ -304,66 +318,30 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
           }
         });
 
-        const foundStudents: Array<string> = students.map((student: User) => student.studentNumber);
+        const foundStudents: Array<string> = students.map(
+          (student: User) => student.studentNumber
+        );
         const nonExistingStudents: Array<string> = studentNumbers.filter(
           (id: string) => !foundStudents.includes(id)
         );
-
-        // Check that teacher id is not listed accidentally in the CSV/students list
-        // to prevent accidental role change from TEACHER or TEACHER_IN_CHARGE to STUDENT.
-        const teachers: Array<CourseInstanceRole> = await CourseInstanceRole.findAll({
-          attributes: ['userId'],
-          where: {
-            userId: {
-              [Op.in]: students.map((student: User) => student.id)
-            },
-            role: {
-              [Op.in]: [CourseInstanceRoleType.Teacher, CourseInstanceRoleType.TeacherInCharge]
-            },
-            courseInstanceId: courseInstance.id
-          }
-        });
-
-        if (teachers.length > 0) {
-          throw new ApiError(
-            'User(s) with role "TEACHER" or "TEACHER_IN_CHARGE" found from the CSV.',
-            HttpCode.Conflict
-          );
-        }
 
         await sequelize.transaction(async (t: Transaction) => {
           // Create new users (students) if any found from the CSV.
           if (nonExistingStudents.length > 0) {
             const newUsers: Array<User> = await User.bulkCreate(
-              nonExistingStudents.map((studentNo: string) => {
+              nonExistingStudents.map((studentNumber: string) => {
                 return {
-                  studentNumber: studentNo
+                  studentNumber: studentNumber
                 };
               }), { transaction: t }
             );
             students = students.concat(newUsers);
           }
-
-          // Check (and add if needed) that existing users have 'STUDENT' role on the instance.
-          // Add also newly created users to the course instance with role 'STUDENT'.
-          // Note. updateOnDuplicate works as an UPSERT operation in bulkCreate.
-          await CourseInstanceRole.bulkCreate(
-            students.map((user: User) => {
-              return {
-                userId: user.id,
-                courseInstanceId: courseInstance.id,
-                role: CourseInstanceRoleType.Student
-              };
-            }), {
-              transaction: t,
-              updateOnDuplicate: ['role']
-            }
-          );
         });
 
-        // After this point all students confirmed to exist and belong to the instance as STUDENTs.
+        // At this point all students confirmed to exist in the database.
 
-        // Add users db id to the parsedStudentData based on student number.
+        // Add users' database IDs to parsedStudentData based on student number.
         parsedStudentData = parsedStudentData.map(
           (student: StudentGrades): StudentGrades => {
             const matchingUser: User = students.find(
@@ -376,21 +354,15 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
             };
           });
 
-        interface GradeCreation extends UserAttainmentGradeData {
-          graderId: number,
-          manual: boolean
-        }
-
         // Use studentsWithId to update attainments by flatmapping each
         // students grades into a one array of all the grades.
-        const preparedBulkCreate: Array<GradeCreation> = parsedStudentData.flatMap(
-          (student: StudentGrades): Array<GradeCreation> => {
-            const studentGradingData: Array<GradeCreation> = student.grades.map(
-              (grade: UserAttainmentGradeData): GradeCreation => {
+        const preparedBulkCreate: Array<AttainmentGradeData> = parsedStudentData.flatMap(
+          (student: StudentGrades): Array<AttainmentGradeData> => {
+            const studentGradingData: Array<AttainmentGradeData> = student.grades.map(
+              (grade: AttainmentGradeData): AttainmentGradeData => {
                 return {
                   userId: student.id as number,
                   graderId: grader.id,
-                  manual: true,
                   ...grade
                 };
               });
@@ -398,7 +370,9 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
           });
 
         // TODO: Optimize if datasets are big.
-        await UserAttainmentGrade.bulkCreate(preparedBulkCreate, { updateOnDuplicate: ['grade'] });
+        await AttainmentGrade.bulkCreate(
+          preparedBulkCreate, { updateOnDuplicate: ['grade', 'graderId'] }
+        );
 
         // After this point all the students' attainment grades have been created or
         // updated in the database.
@@ -420,68 +394,34 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
   parser.end();
 }
 
-/**
- * Recursively calculates the grade for a particular attainment by its formula
- * node.
- *
- * TODO: Save calculated grades to the database.
- */
-async function calculateFormulaNode(
-  formulaNode: FormulaNode,
-  presetGrades: Map<FormulaNode, number>
-): Promise<GradingResult> {
-  /*
-   * If a teacher has manually specified a grade for this attainment,
-   * the manually specified grade will be used.
-   *
-   * A grade has to be manually specified when using the 'Manual' formula
-   * and a grade may be manually specified for overriding grade calculation
-   * functions in special cases.
-   */
-  const presetGrade: number | undefined = presetGrades.get(formulaNode);
-  if (presetGrade) {
-    return {
-      status: Status.Pass,
-      grade: presetGrade
-    };
-  }
-
-  /*
-   * A teacher has not manually specified a grade for this attainment, therefore
-   * the grade will be calculated based on the given formula and the grades
-   * from this attainment's subattainments.
-   */
-
-  // Inputs for the formula of this attainment.
-  const inputs: Array<GradingInput> = [];
-
-  // First, recursively calculate the grades the subattainments.
-  for (const subFormulaNode of formulaNode.subFormulaNodes) {
-    const input: GradingInput = {
-      subResult: await calculateFormulaNode(subFormulaNode, presetGrades),
-      params: subFormulaNode.parentFormulaParams
-    };
-
-    inputs.push(input);
-  }
-
-  // Then, calculate the grade of this attainment using the formula specified
-  // for this attainment and the grades of the subattainments.
-  return await formulaNode.formulaImplementation.formulaFunction(inputs);
-}
-
 export async function calculateGrades(
   req: Request,
   res: Response
 ): Promise<void> {
-  const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
-    await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
+  const requestSchema: yup.AnyObjectSchema = yup.object().shape({
+    studentNumbers: yup.array().of(yup.string()).required()
+  });
 
-  // TODO: check requester id has teacher role on instance.
+  await requestSchema.validate(req.body, { abortEarly: false });
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [course, assessmentModel]: [course: Course, assessmentModel: AssessmentModel] =
+    await validateCourseAndAssessmentModel(
+      req.params.courseId, req.params.assessmentModelId
+    );
+
+  // TODO: Check that requester is authorized to calculate grades.
   const grader: JwtClaims = req.user as JwtClaims;
 
   /*
-   * First we need to get all the attainments in this course instance.
+   * First ensure that all students to be included in the calculation exist in
+   * the database.
+   */
+  const studentNumbers: Array<string> = req.body.studentNumbers;
+  await studentNumbersExist(studentNumbers);
+
+  /*
+   * Get all the attainments in this assessment model.
    */
 
   interface AttainmentInfo {
@@ -494,8 +434,7 @@ export async function calculateGrades(
   const attainments: Array<AttainmentInfo> = await Attainment.findAll({
     raw: true,
     where: {
-      courseId: course.id,
-      courseInstanceId: courseInstance.id,
+      assessmentModelId: assessmentModel.id
     },
     attributes: [
       'id',
@@ -535,7 +474,8 @@ export async function calculateGrades(
     formulaNodesByAttainmentId.set(attainment.id, {
       formulaImplementation: await getFormulaImplementation(formula as Formula),
       subFormulaNodes: [],
-      parentFormulaParams: attainment.parentFormulaParams
+      parentFormulaParams: attainment.parentFormulaParams,
+      attainmentId: attainment.id
     });
   }
 
@@ -613,7 +553,7 @@ export async function calculateGrades(
    */
   if (!rootFormulaNode) {
     throw new ApiError(
-      'no root attainment found for this course instance; maybe there is a cycle',
+      'no root attainment found for this assessment model; maybe there is a cycle',
       HttpCode.Conflict
     );
   }
@@ -630,15 +570,24 @@ export async function calculateGrades(
    * Stores the grades of each student for each attainment which were manually
    * specified by a teacher.
    */
-  const unorganizedPresetGrades: Array<UserAttainmentGrade> = await UserAttainmentGrade.findAll({
+  const unorganizedPresetGrades: Array<AttainmentGrade> = await AttainmentGrade.findAll({
     include: [
       {
         model: Attainment,
         required: true,
         attributes: [],
         where: {
-          courseId: course.id,
-          courseInstanceId: courseInstance.id,
+          assessmentModelId: assessmentModel.id
+        },
+      },
+      {
+        model: User,
+        required: true,
+        attributes: [],
+        where: {
+          studentNumber: {
+            [Op.in]: studentNumbers
+          }
         }
       }
     ],
@@ -646,7 +595,7 @@ export async function calculateGrades(
   });
 
   /*
-   * Next we'll organize the preset grades by student number.
+   * Next we'll organize the preset grades by user ID.
    */
 
   /*
@@ -675,64 +624,148 @@ export async function calculateGrades(
    * Finally we're ready to calculate the grades of each student starting from
    * the root attainment.
    */
-  const finalGrades: Array<{
+
+  const calculatedGrades: Array<AttainmentGradeData> = [];
+
+  /*
+   * Recursively calculates the grade for a particular attainment by its formula
+   * node.
+   */
+  async function calculateFormulaNode(
     userId: number,
-    courseInstanceId: number,
-    graderId: number,
-    grade: string,
-    credits: number
-  }> = [];
+    formulaNode: FormulaNode,
+    presetGrades: Map<FormulaNode, number>
+  ): Promise<CalculationResult> {
+    /*
+     * If a teacher has manually specified a grade for this attainment,
+     * the manually specified grade will be used.
+     *
+     * A grade has to be manually specified when using the 'Manual' formula
+     * and a grade may be manually specified for overriding grade calculation
+     * functions in special cases.
+     */
+    const presetGrade: number | undefined = presetGrades.get(formulaNode);
+    if (presetGrade) {
+      return {
+        status: Status.Pass,
+        grade: presetGrade
+      };
+    }
 
-  for (const [userId, presetGrades] of organizedPresetGrades) {
-    const finalGrade: GradingResult =
-      await calculateFormulaNode(rootFormulaNode, presetGrades);
+    /*
+     * A teacher has not manually specified a grade for this attainment, therefore
+     * the grade will be calculated based on the given formula and the grades
+     * from this attainment's subattainments.
+     */
 
-    finalGrades.push(
+    // Inputs for the formula of this attainment.
+    const inputs: Array<CalculationInput> = [];
+
+    // First, recursively calculate the grades the subattainments.
+    for (const subFormulaNode of formulaNode.subFormulaNodes) {
+      const input: CalculationInput = {
+        subResult: await calculateFormulaNode(userId, subFormulaNode, presetGrades),
+        params: subFormulaNode.parentFormulaParams
+      };
+
+      inputs.push(input);
+    }
+
+    // Then, calculate the grade of this attainment using the formula specified
+    // for this attainment and the grades of the subattainments.
+    const calculated: CalculationResult =
+      await formulaNode.formulaImplementation.formulaFunction(inputs);
+
+    calculatedGrades.push(
       {
         userId: userId,
-        courseInstanceId: courseInstance.id,
+        attainmentId: formulaNode.attainmentId,
         graderId: grader.id,
-        grade:
-        // If grading scale numerical save numerical value, otherwise final grade status (PASS/FAIL)
-        courseInstance.gradingScale === GradingScale.Numerical ? finalGrade.status === Status.Pass ?
-          String(finalGrade.grade) : '0' : finalGrade.status,
-        credits: courseInstance.maxCredits
+        grade: calculated.grade,
+        status: calculated.status,
+        manual: false
       }
     );
+
+    return calculated;
   }
 
-  // TODO manual or auto calculation flag
+  for (const [userId, presetGrades] of organizedPresetGrades) {
+    await calculateFormulaNode(userId, rootFormulaNode, presetGrades);
+  }
 
   await sequelize.transaction(async (transaction: Transaction) => {
-    for (const finalGrade of finalGrades) {
-      await sequelize.query(
-        `INSERT INTO course_result (
-        user_id, course_instance_id, grader_id, grade,
-        credits, created_at, updated_at
-      )
-      VALUES
-        (:userId, :courseInstanceId, :graderId, :grade, :credits, NOW(), NOW())
-        ON CONFLICT (user_id, course_instance_id) DO UPDATE
-      SET
-        user_id = :userId,
-        course_instance_id = :courseInstanceId,
-        grader_id = :graderId,
-        grade = :grade,
-        credits = :credits,
-        updated_at = NOW();`,
-        {
-          replacements: finalGrade,
-          type: QueryTypes.INSERT,
-          transaction
-        }
-      );
-    }
+    await AttainmentGrade.bulkCreate(calculatedGrades, { transaction });
   });
 
   res.status(HttpCode.Ok).json({
     success: true,
     data: {}
   });
+}
+
+/**
+ * The final grade for a student in a form returned by a database query.
+ */
+interface FinalGradeRaw {
+  grade: number,
+  Attainment: {
+    AssessmentModel: {
+      Course: {
+        maxCredits: number
+      }
+    }
+  },
+  User: {
+    studentNumber: string
+  }
+}
+
+async function getFinalGradesFor(
+  assessmentModelId: number,
+  studentNumbers: Array<string>
+): Promise<Array<FinalGradeRaw>> {
+  const finalGrades: Array<FinalGradeRaw> = await AttainmentGrade.findAll({
+    attributes: ['grade'],
+    include: [
+      {
+        model: Attainment,
+        where: {
+          assessmentModelId: assessmentModelId,
+          parentId: null
+        },
+        include: [
+          {
+            model: AssessmentModel,
+            include: [
+              {
+                model: Course,
+                attributes: ['maxCredits']
+              }
+            ]
+          }
+        ]
+      },
+      {
+        model: User,
+        attributes: ['studentNumber'],
+        where: {
+          studentNumber: {
+            [Op.in]: studentNumbers
+          }
+        }
+      }
+    ]
+  }) as unknown as Array<FinalGradeRaw>;
+
+  if (finalGrades.length === 0) {
+    throw new ApiError(
+      'no grades found, make sure grades have been calculated before requesting course results',
+      HttpCode.NotFound
+    );
+  }
+
+  return finalGrades;
 }
 
 /**
@@ -757,15 +790,27 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
       })
       // All Sisu accepted language codes.
       .oneOf(['fi', 'sv', 'en', 'es', 'ja', 'zh', 'pt', 'fr', 'de', 'ru'])
+      .notRequired(),
+    studentNumbers: yup
+      .array()
+      .of(yup.string())
       .notRequired()
   });
 
-  const { assessmentDate, completionLanguage }:
-  { assessmentDate: Date | undefined, completionLanguage: string | undefined }
-  = await urlParams.validate(req.query, { abortEarly: false });
+  const { assessmentDate, completionLanguage, studentNumbers }: {
+    assessmentDate: Date | undefined,
+    completionLanguage: string | undefined,
+    studentNumbers: Array<string> | undefined
+  } = await urlParams.validate(req.query, { abortEarly: false });
 
-  const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
-    await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [course, assessmentModel]: [course: Course, assessmentModel: AssessmentModel] =
+    await validateCourseAndAssessmentModel(
+      req.params.courseId, req.params.assessmentModelId
+    );
+
+  if (studentNumbers)
+    studentNumbersExist(studentNumbers);
 
   /**
    * TODO:
@@ -775,23 +820,9 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
    *   Sisu allows teacher and responsible teacher of the implementation to save grades to Sisu.
    */
 
-  const gradingResults: Array<GradingResultsWithUser> = await CourseResult.findAll({
-    attributes: ['grade', 'credits'],
-    where: {
-      courseInstanceId: courseInstance.id
-    },
-    include: {
-      model: User,
-      attributes: ['studentNumber']
-    }
-  }) as Array<GradingResultsWithUser>;
-
-  if (gradingResults.length === 0) {
-    throw new ApiError(
-      'no grades found, make sure grades have been calculated before requesting course result CSV',
-      HttpCode.NotFound
-    );
-  }
+  const finalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
+    assessmentModel.id, studentNumbers ?? []
+  );
 
   const courseResults: Array<{
     studentNumber: string,
@@ -800,15 +831,16 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
     assessmentDate: string,
     completionLanguage: string,
     comment: string
-  }> = gradingResults.map(
-    (courseResult: GradingResultsWithUser) => {
+  }> = finalGrades.map(
+    (finalGrade: FinalGradeRaw) => {
       return {
-        studentNumber: courseResult.User.studentNumber,
-        grade: courseResult.grade,
-        credits: courseResult.credits,
+        studentNumber: finalGrade.User.studentNumber,
+        grade: String(finalGrade.grade),
+        credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits,
         // Assesment date must be in form dd.mm.yyyy.
-        assessmentDate:
-          (new Date(assessmentDate ?? courseInstance.endDate)).toLocaleDateString('fi-FI'),
+        assessmentDate: (
+          assessmentDate ? new Date(assessmentDate) : new Date()
+        ).toLocaleDateString('fi-FI'),
         completionLanguage: completionLanguage ?? 'en',
         // Comment column is required, but can be empty.
         comment: ''
@@ -843,40 +875,38 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
  * the course, or no course results found/calculated before calling the endpoint.
 */
 export async function getFinalGrades(req: Request, res: Response): Promise<void> {
+  const urlParams: yup.AnyObjectSchema = yup.object({
+    studentNumbers: yup
+      .array()
+      .of(yup.string())
+      .notRequired()
+  });
+
+  const { studentNumbers }: {
+    studentNumbers: Array<string> | undefined
+  } = await urlParams.validate(req.query, { abortEarly: false });
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
-    await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
-
-  const gradingResults: Array<GradingResultsWithUser> = await CourseResult.findAll({
-    attributes: ['id', 'grade', 'credits'],
-    where: {
-      courseInstanceId: courseInstance.id
-    },
-    include: {
-      model: User,
-      attributes: ['studentNumber']
-    }
-  }) as Array<GradingResultsWithUser>;
-
-  if (gradingResults.length === 0) {
-    throw new ApiError(
-      'no grades found, make sure grades have been calculated before requesting course results',
-      HttpCode.NotFound
+  const [course, assessmentModel]: [course: Course, assessmentModel: AssessmentModel] =
+    await validateCourseAndAssessmentModel(
+      req.params.courseId, req.params.assessmentModelId
     );
-  }
+
+  if (studentNumbers)
+    studentNumbersExist(studentNumbers);
 
   const finalGrades: Array<{
-    id: number,
     studentNumber: string,
     grade: string,
     credits: number
-  }> = gradingResults.map(
-    (courseResult: GradingResultsWithUser) => {
+  }> = (await getFinalGradesFor(
+    assessmentModel.id, studentNumbers ?? []
+  )).map(
+    (finalGrade: FinalGradeRaw) => {
       return {
-        id: courseResult.id,
-        studentNumber: courseResult.User.studentNumber,
-        grade: courseResult.grade,
-        credits: courseResult.credits
+        studentNumber: finalGrade.User.studentNumber,
+        grade: String(finalGrade.grade),
+        credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits
       };
     }
   );

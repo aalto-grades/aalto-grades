@@ -19,7 +19,7 @@ import { HttpCode } from '../../types/httpCode';
 export async function findAttainmentById(id: number, errorCode: HttpCode): Promise<Attainment> {
   const attainment: Attainment | null = await Attainment.findByPk(id);
   if (!attainment) {
-    throw new ApiError(`study attainment with ID ${id} not found`, errorCode);
+    throw new ApiError(`attainment with ID ${id} not found`, errorCode);
   }
   return attainment;
 }

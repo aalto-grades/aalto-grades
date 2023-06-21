@@ -37,18 +37,21 @@ describe('Tests for FrontPage component', () => {
     );
   };
 
-  test('FrontPage should render current courses and previous courses regardless of user role', async () => {
-    const auth = { role: null };
-    renderFrontPage(auth);
+  test(
+    'FrontPage should render current courses and previous courses regardless of user role',
+    async () => {
+      const auth = { role: null };
+      renderFrontPage(auth);
 
-    await waitFor(() => {
-      expect(screen.queryByText('Your Current Courses')).toBeInTheDocument();
-      expect(screen.queryByText('Inactive Courses')).toBeInTheDocument();
-      expect(screen.queryByText('See instances')).toBeInTheDocument();
-      expect(screen.queryByText('CS-A1150 – Databases')).toBeInTheDocument();
-      expect(screen.queryByText('Programming 1')).toBeInTheDocument();
-    });
+      await waitFor(() => {
+        expect(screen.queryByText('Your Current Courses')).toBeInTheDocument();
+        expect(screen.queryByText('Inactive Courses')).toBeInTheDocument();
+        expect(screen.queryByText('See instances')).toBeInTheDocument();
+        expect(screen.queryByText('CS-A1150 – Databases')).toBeInTheDocument();
+        expect(screen.queryByText('Programming 1')).toBeInTheDocument();
+      });
 
-  });
+    }
+  );
 
 });
