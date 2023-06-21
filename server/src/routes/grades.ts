@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Request, Router } from 'express';
+import express, { Request, Router } from 'express';
 import multer, { FileFilterCallback, memoryStorage, Multer } from 'multer';
 import passport from 'passport';
 import path from 'path';
@@ -10,6 +10,7 @@ import path from 'path';
 import {
   addGrades, calculateGrades, getCsvTemplate, getFinalGrades, getSisuFormattedGradingCSV
 } from '../controllers/grades';
+import { handleInvalidRequestJson } from '../middleware';
 import { controllerDispatcher } from '../middleware/errorHandler';
 import { ApiError } from '../types/error';
 import { HttpCode } from '../types/httpCode';
@@ -266,6 +267,8 @@ router.post(
 router.post(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/calculate',
   passport.authenticate('jwt', { session: false }),
+  express.json(),
+  handleInvalidRequestJson,
   controllerDispatcher(calculateGrades)
 );
 

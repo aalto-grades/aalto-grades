@@ -491,9 +491,7 @@ describe(
 describe(
   'Test POST /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/calculate',
   () => {
-    // TODO: Fix
-    /*
-    async function checkGraderId(result: CourseResult): Promise<void> {
+    async function checkGraderId(result: AttainmentGrade): Promise<void> {
       const selfInfo: supertest.Response = await request
         .get('/v1/auth/self-info')
         .set('Cookie', cookies.userCookie)
@@ -506,9 +504,13 @@ describe(
 
     it('should calculate correct grade, numeric grade', async () => {
       checkSuccessRes(await request
-        .post('/v1/courses/5/assessment-models/8/grades/calculate')
+        .post('/v1/courses/1/assessment-models/25/grades/calculate')
+        .send({
+          studentNumbers: ['238447']
+        })
         .set('Cookie', cookies.userCookie));
 
+      /*
       const result: CourseResult | null = await CourseResult.findOne({
         where: {
           courseInstanceId: 8,
@@ -519,41 +521,18 @@ describe(
       expect(result?.grade).toBe('1.24');
       expect(result?.credits).toBe(5);
       checkGraderId(result as CourseResult);
-    });
-
-    it('should calculate correct grade, PASS/FAIL grade', async () => {
-      checkSuccessRes(await request
-        .post('/v1/courses/1/assessment-models/10/grades/calculate')
-        .set('Cookie', cookies.userCookie));
-
-      let result: CourseResult | null = await CourseResult.findOne({
-        where: {
-          courseInstanceId: 10,
-          userId: 95
-        }
-      });
-      expect(result).not.toBe(null);
-      expect(result?.grade).toBe('PASS');
-      expect(result?.credits).toBe(5);
-      checkGraderId(result as CourseResult);
-
-      result = await CourseResult.findOne({
-        where: {
-          courseInstanceId: 10,
-          userId: 100
-        }
-      });
-      expect(result).not.toBe(null);
-      expect(result?.grade).toBe('FAIL');
-      expect(result?.credits).toBe(5);
-      checkGraderId(result as CourseResult);
+      */
     });
 
     it('should calculate multiple correct grades', async () => {
       checkSuccessRes(await request
-        .post('/v1/courses/4/assessment-models/6/grades/calculate')
+        .post('/v1/courses/1/assessment-models/26/grades/calculate')
+        .send({
+          studentNumbers: ['238447', '197232', '265136']
+        })
         .set('Cookie', cookies.userCookie));
 
+      /*
       let result: CourseResult | null = await CourseResult.findOne({
         where: {
           courseInstanceId: 6,
@@ -573,13 +552,18 @@ describe(
       expect(result).not.toBe(null);
       expect(result?.grade).toBe('4.75');
       expect(result?.credits).toBe(5);
+      */
     });
 
     it('should calculate correct grades in higher depths', async () => {
       checkSuccessRes(await request
-        .post('/v1/courses/4/assessment-models/7/grades/calculate')
+        .post('/v1/courses/1/assessment-models/27/grades/calculate')
+        .send({
+          studentNumbers: ['238447']
+        })
         .set('Cookie', cookies.userCookie));
 
+      /*
       const result: CourseResult | null = await CourseResult.findOne({
         where: {
           courseInstanceId: 7,
@@ -589,13 +573,18 @@ describe(
       expect(result).not.toBe(null);
       expect(result?.grade).toBe('3.12');
       expect(result?.credits).toBe(5);
+      */
     });
 
     it('should allow manually overriding a student\'s grade', async () => {
       checkSuccessRes(await request
-        .post('/v1/courses/3/assessment-models/4/grades/calculate')
+        .post('/v1/courses/1/assessment-models/28/grades/calculate')
+        .send({
+          studentNumbers: ['238447']
+        })
         .set('Cookie', cookies.userCookie));
 
+      /*
       const result: CourseResult | null = await CourseResult.findOne({
         where: {
           courseInstanceId: 4,
@@ -605,14 +594,17 @@ describe(
       expect(result).not.toBe(null);
       expect(result?.grade).toBe('5');
       expect(result?.credits).toBe(5);
+      */
     });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
       await request
         .post('/v1/courses/1/assessment-models/1/grades/calculate')
+        .send({
+          studentNumbers: ['238447']
+        })
         .expect(HttpCode.Unauthorized);
     });
-    */
   }
 );
 
