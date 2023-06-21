@@ -99,7 +99,7 @@ const InstanceSummaryView = () => {
         startDate: startDate,
         endDate: endDate
       };
-      const instanceResponse = await instancesService.createInstance(courseId, instanceObj);
+      const courseInstanceId = await instancesService.createInstance(courseId, instanceObj);
       setInstanceAlert((prev) => [...prev,
         addedAttainments.length === 0 ? successMsgWithoutAttainments : successMsgInstance]
       );
@@ -111,7 +111,7 @@ const InstanceSummaryView = () => {
           const formattedAttainments = attainmentServices.formatStringsToDates(addedAttainments);
           await Promise.all(formattedAttainments.map(async (attainment) => {
             await attainmentServices.addAttainment(
-              courseId, instanceResponse.courseInstance.id, attainment
+              courseId, courseInstanceId, attainment
             );
           }));
           setAttainmentAlert((prev) => [...prev, successMsgAttainments]);

@@ -18,9 +18,9 @@ const FrontPage = (): JSX.Element => {
 
   useEffect(() => {
     coursesService.getCoursesOfUser(auth.id)
-      .then((data) => {
-        setCurrentCourses(data.courses.current);
-        setPreviousCourses(data.courses.previous);
+      .then((courses) => {
+        setCurrentCourses(courses.current);
+        setPreviousCourses(courses.previous);
       })
       .catch((e) => console.log(e.message));
   }, []);

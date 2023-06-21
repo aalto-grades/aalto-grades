@@ -21,8 +21,8 @@ const AllCoursesView = (): JSX.Element => {
 
   useEffect(() => {
     coursesService.getAllCourses()
-      .then((data) => {
-        setCourses(data.courses);
+      .then((courses) => {
+        setCourses(courses);
       })
       .catch((e: Error) => console.log(e.message));
   }, []);

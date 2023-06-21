@@ -19,7 +19,7 @@ import sortingServices from '../services/sorting';
 import useAuth from '../hooks/useAuth';
 import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 import { SystemRole } from 'aalto-grades-common/types/auth';
-import { CourseInstanceData } from 'aalto-grades-common/types/course';
+import { CourseData, CourseInstanceData } from 'aalto-grades-common/types/course';
 
 // REPLACE SOME DAY? currently this info can't be fetched from database
 const mockInstitution = 'Aalto University';
@@ -29,23 +29,23 @@ const CourseView = (): JSX.Element => {
   const { courseId } = useParams();
   const { auth } = useAuth();
 
-  const [courseDetails, setCourseDetails] = useState(null);
-  const [currentInstance, setCurrentInstance] = useState(null);
-  const [instances, setInstances] = useState([]);
+  const [courseDetails, setCourseDetails] = useState<CourseData>(null);
+  const [currentInstance, setCurrentInstance] = useState<CourseInstanceData>(null);
+  const [instances, setInstances] = useState<Array<CourseInstanceData>>([]);
 
   const [animation, setAnimation] = useState(false);
   const [open, setOpen] = React.useState(false);
 
   useEffect(() => {
     courseService.getCourse(courseId)
-      .then((data) => {
-        setCourseDetails(data.course);
+      .then((course) => {
+        setCourseDetails(course);
       })
       .catch((e) => console.log(e.message));
 
     instancesService.getInstances(courseId)
-      .then((data) => {
-        const sortedInstances: Array<CourseInstanceData> = data.courseInstances.sort((a, b) => {
+      .then((courseInstances) => {
+        const sortedInstances: Array<CourseInstanceData> = courseInstances.sort((a, b) => {
           return sortingServices.sortByDate(a.startDate, b.startDate);
         });
         setInstances(sortedInstances);

@@ -11,15 +11,16 @@ import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
 import FetchedInstances from './fetch-instances-view/FetchedInstances';
 import instancesService from '../services/instances';
+import { CourseInstanceData } from 'aalto-grades-common/types/course';
 
 const FetchInstancesView = (): JSX.Element => {
   const navigate = useNavigate();
   const { courseId, courseCode } = useParams();
-  const [instances, setInstances] = useState([]);
+  const [instances, setInstances] = useState<Array<CourseInstanceData>>([]);
 
   useEffect(() => {
     instancesService.getSisuInstances(courseCode)
-      .then((data) => setInstances(data.courseInstances))
+      .then((courseInstances) => setInstances(courseInstances))
       .catch((e: Error) => console.log(e.message));
   }, []);
 

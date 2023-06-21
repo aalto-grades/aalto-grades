@@ -10,16 +10,11 @@ import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
-import { CourseData } from 'aalto-grades-common/types/course';
+import { CourseData, CoursesOfUser } from 'aalto-grades-common/types/course';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { parseCourseWithTranslation } from './utils/course';
 import { findUserById } from './utils/user';
-
-export interface CoursesOfUser {
-  current: Array<CourseData>,
-  previous: Array<CourseData>
-}
 
 export async function getCoursesOfUser(req: Request, res: Response): Promise<void> {
   const coursesOfUser: CoursesOfUser = { current: [], previous: [] };
