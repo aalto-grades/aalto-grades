@@ -235,7 +235,7 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, tag, days_v
 (25, 228, 'calculate correct', 'tag230', 365, NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.25 }'),
 (26, null, 'calculate multiple', 'tag231', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', NULL),
 (26, 231, 'calculate multiple', 'tag232', 365, NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.75 }'),
-(26, 232, 'calculate multiple', 'tag233', 365, NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.25 }'),
+(26, 231, 'calculate multiple', 'tag233', 365, NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.25 }'),
 (27, null, 'calculate depth', 'tag234', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', NULL),
 (27, 234, 'calculate depth', 'tag235', 365, NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.4 }'),
 (27, 234, 'calculate depth', 'tag236', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "min": 0, "max": 5, "weight": 0.6 }'),

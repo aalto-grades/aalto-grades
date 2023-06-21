@@ -502,6 +502,25 @@ describe(
       expect(result.userId).not.toBe(selfInfo.body.data.id);
     }
 
+    async function checkGrade(
+      attainmentId: number,
+      userId: number,
+      grade: number,
+      checkGrader: boolean = true
+    ): Promise<void> {
+      const result: AttainmentGrade | null = await AttainmentGrade.findOne({
+        where: {
+          attainmentId: attainmentId,
+          userId: userId
+        }
+      });
+
+      expect(result).not.toBe(null);
+      expect(result?.grade).toBe(grade);
+      if (checkGrader)
+        checkGraderId(result as AttainmentGrade);
+    }
+
     it('should calculate correct grade, numeric grade', async () => {
       checkSuccessRes(await request
         .post('/v1/courses/1/assessment-models/25/grades/calculate')
@@ -510,18 +529,7 @@ describe(
         })
         .set('Cookie', cookies.userCookie));
 
-      /*
-      const result: CourseResult | null = await CourseResult.findOne({
-        where: {
-          courseInstanceId: 8,
-          userId: 1
-        }
-      });
-      expect(result).not.toBe(null);
-      expect(result?.grade).toBe('1.24');
-      expect(result?.credits).toBe(5);
-      checkGraderId(result as CourseResult);
-      */
+      checkGrade(228, 391, 1.25);
     });
 
     it('should calculate multiple correct grades', async () => {
@@ -532,27 +540,9 @@ describe(
         })
         .set('Cookie', cookies.userCookie));
 
-      /*
-      let result: CourseResult | null = await CourseResult.findOne({
-        where: {
-          courseInstanceId: 6,
-          userId: 35
-        }
-      });
-      expect(result).not.toBe(null);
-      expect(result?.grade).toBe('1.5');
-      expect(result?.credits).toBe(5);
-
-      result = await CourseResult.findOne({
-        where: {
-          courseInstanceId: 6,
-          userId: 90
-        }
-      });
-      expect(result).not.toBe(null);
-      expect(result?.grade).toBe('4.75');
-      expect(result?.credits).toBe(5);
-      */
+      checkGrade(231, 391, 1.5);
+      checkGrade(231, 392, 4.75);
+      checkGrade(231, 393, 3.25);
     });
 
     it('should calculate correct grades in higher depths', async () => {
@@ -563,17 +553,7 @@ describe(
         })
         .set('Cookie', cookies.userCookie));
 
-      /*
-      const result: CourseResult | null = await CourseResult.findOne({
-        where: {
-          courseInstanceId: 7,
-          userId: 25
-        }
-      });
-      expect(result).not.toBe(null);
-      expect(result?.grade).toBe('3.12');
-      expect(result?.credits).toBe(5);
-      */
+      checkGrade(234, 391, 3.12);
     });
 
     it('should allow manually overriding a student\'s grade', async () => {
@@ -584,17 +564,7 @@ describe(
         })
         .set('Cookie', cookies.userCookie));
 
-      /*
-      const result: CourseResult | null = await CourseResult.findOne({
-        where: {
-          courseInstanceId: 4,
-          userId: 13
-        }
-      });
-      expect(result).not.toBe(null);
-      expect(result?.grade).toBe('5');
-      expect(result?.credits).toBe(5);
-      */
+      checkGrade(242, 391, 5, false);
     });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
