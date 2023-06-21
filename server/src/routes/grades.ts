@@ -18,10 +18,11 @@ import { HttpCode } from '../types/httpCode';
 export const router: Router = Router();
 
 /**
- * Multer middleware configuration for handling CSV file uploads. This configuration sets up
- * multer to use memory storage, allowing for temporary storage of uploaded files in memory.
- * It also sets a file size limit of 1 MB and enforces that the uploaded file is in the CSV
- * format by checking the files mimetype and file extension type.
+ * Multer middleware configuration for handling CSV file uploads.
+ * This configuration sets up multer to use memory storage, allowing for
+ * temporary storage of uploaded files in memory. It also sets a file size
+ * limit of 1 MB and enforces that the uploaded file is in the CSV format by
+ * checking the files mimetype and file extension type.
  */
 const upload: Multer = multer({
   storage: memoryStorage(),
@@ -127,7 +128,7 @@ router.get(
  *       Attainment grading data is provided in a CSV file. When sending data,
  *       set the **Content-Type** header as **multipart/form-data** and the
  *       file name as "csv_data". Example CSV files available
- *       [here](https://github.com/aalto-grades/base-repository/tree/main/server/test/mockData/csv)
+ *       [here](https://github.com/aalto-grades/base-repository/tree/main/server/test/mock-data/csv)
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
  *       - $ref: '#/components/parameters/assessmentModelId'
@@ -243,7 +244,6 @@ router.post(
  *       400:
  *         description: >
  *           Calculation failed, due to validation errors or missing parameters.
- *           This may also indicate a cycle in the hierarchy of attainments.
  *         content:
  *           application/json:
  *             schema:
@@ -282,6 +282,7 @@ router.post(
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
  *       - $ref: '#/components/parameters/assessmentModelId'
+ *       - $ref: '#/components/parameters/studentNumbers'
  *       - in: query
  *         name: assessmentDate
  *         schema:
@@ -354,6 +355,7 @@ router.get(
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
  *       - $ref: '#/components/parameters/assessmentModelId'
+ *       - $ref: '#/components/parameters/studentNumbers'
  *     responses:
  *       200:
  *         description: Grades fetched successfully.

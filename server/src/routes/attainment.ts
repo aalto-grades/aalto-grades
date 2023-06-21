@@ -25,19 +25,28 @@ export const router: Router = Router();
  *     format: int32
  *     minimum: 1
  *     example: 32
+ *   AssessmentModelId:
+ *     type: integer
+ *     description: Internal assessment model database ID.
+ *     format: int32
+ *     minimum: 1
+ *     example: 32
  *   AttainmentTag:
  *     type: string
  *     description: A unique user-facing identifier for an attainment.
  *     example: a-plus-exercise-1.2
  *   AddAndEditAttainment:
  *     type: object
- *     description: Information for adding a new study attainment and its subattainment(s).
+ *     description: >
+ *       Information for adding new study attainments and subattainment(s).
  *     properties:
  *       parentId:
  *         type: integer
  *         required: false
  *         nullable: true
- *         description: (Optional) Parent attainment ID to which the study attainment belongs to.
+ *         description: >
+ *           (Optional) Parent attainment ID to which the study attainment
+ *           belongs to.
  *         example: 1
  *       name:
  *         type: string
@@ -45,7 +54,7 @@ export const router: Router = Router();
  *         description: Study attainment name.
  *         example: Exam attainment 1.1
  *       tag:
- *         $ref '#/definitions/AttainmentTag'
+ *         $ref: '#/definitions/AttainmentTag'
  *       daysValid:
  *         type: integer
  *         required: true

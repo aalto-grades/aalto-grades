@@ -99,6 +99,15 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *         The type of the attainment tree fetched. Optional.
  *          * `children` - Fetch only the direct subattainments of the attainment.
  *          * `descendants` - Fetch the whole tree of subattainments.
+ *     studentNumbers:
+ *       in: query
+ *       name: studentNumbers
+ *       schema:
+ *         type: array
+ *         description: List of student numbers.
+ *         example: ['111111', '222222', '333333']
+ *         items:
+ *           type: string
  *   responses:
  *     AuthenticationError:
  *       description: Authentication credentials were missing or JWT expired.
