@@ -25,4 +25,5 @@ INSERT INTO public.assessment_model (course_id, name, created_at, updated_at) VA
 (5, 'model 20', NOW(), NOW()),
 (1, 'model 21', NOW(), NOW()),
 (6, 'model 22', NOW(), NOW()),
-(6, 'model 23', NOW(), NOW());
+(6, 'model 23', NOW(), NOW()),
+(6, 'model 24 - test final grades', NOW(), NOW());

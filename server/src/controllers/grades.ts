@@ -687,7 +687,7 @@ export async function calculateGrades(
       }
     );
 
-    return calculated
+    return calculated;
   }
 
   for (const [userId, presetGrades] of organizedPresetGrades) {
@@ -730,7 +730,6 @@ async function getFinalGradesFor(
     include: [
       {
         model: Attainment,
-        attributes: [],
         where: {
           assessmentModelId: assessmentModelId,
           parentId: null
@@ -738,7 +737,6 @@ async function getFinalGradesFor(
         include: [
           {
             model: AssessmentModel,
-            attributes: [],
             include: [
               {
                 model: Course,
@@ -756,7 +754,7 @@ async function getFinalGradesFor(
             [Op.in]: studentNumbers
           }
         }
-      },
+      }
     ]
   }) as unknown as Array<FinalGradeRaw>;
 
@@ -794,10 +792,8 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
       .oneOf(['fi', 'sv', 'en', 'es', 'ja', 'zh', 'pt', 'fr', 'de', 'ru'])
       .notRequired(),
     studentNumbers: yup
-      .string()
-      .transform((value: string) => {
-        return JSON.parse(value);
-      })
+      .array()
+      .of(yup.string())
       .notRequired()
   });
 
@@ -881,10 +877,8 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
 export async function getFinalGrades(req: Request, res: Response): Promise<void> {
   const urlParams: yup.AnyObjectSchema = yup.object({
     studentNumbers: yup
-      .string()
-      .transform((value: string) => {
-        return JSON.parse(value);
-      })
+      .array()
+      .of(yup.string())
       .notRequired()
   });
 
@@ -913,7 +907,7 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
         studentNumber: finalGrade.User.studentNumber,
         grade: String(finalGrade.grade),
         credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits
-      }
+      };
     }
   );
 

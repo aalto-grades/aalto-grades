@@ -23,6 +23,11 @@ let cookies: Cookies = {
   userCookie: []
 };
 
+const studentNumbers: Array<string> = [
+  '117486', '114732', '472886', '335462', '874623', '345752', '353418',
+  '986957', '611238', '691296', '271778', '344644', '954954'
+];
+
 beforeAll(async () => {
   cookies = await getCookies();
 });
@@ -79,7 +84,8 @@ describe(
 );
 
 describe(
-  'Test POST /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv - import grading data from CSV',
+  'Test POST /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv'
+  + ' - import grading data from CSV',
   () => {
 
     it('should process CSV succesfully when attainments and users exist', async () => {
@@ -482,130 +488,133 @@ describe(
   }
 );
 
-describe('Test POST /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/calculate', () => {
-  // TODO: Fix
-  /*
-  async function checkGraderId(result: CourseResult): Promise<void> {
-    const selfInfo: supertest.Response = await request
-      .get('/v1/auth/self-info')
-      .set('Cookie', cookies.userCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Ok);
+describe(
+  'Test POST /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/calculate',
+  () => {
+    // TODO: Fix
+    /*
+    async function checkGraderId(result: CourseResult): Promise<void> {
+      const selfInfo: supertest.Response = await request
+        .get('/v1/auth/self-info')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
 
-    expect(result.graderId).toBe(selfInfo.body.data.id);
-    expect(result.userId).not.toBe(selfInfo.body.data.id);
+      expect(result.graderId).toBe(selfInfo.body.data.id);
+      expect(result.userId).not.toBe(selfInfo.body.data.id);
+    }
+
+    it('should calculate correct grade, numeric grade', async () => {
+      checkSuccessRes(await request
+        .post('/v1/courses/5/assessment-models/8/grades/calculate')
+        .set('Cookie', cookies.userCookie));
+
+      const result: CourseResult | null = await CourseResult.findOne({
+        where: {
+          courseInstanceId: 8,
+          userId: 1
+        }
+      });
+      expect(result).not.toBe(null);
+      expect(result?.grade).toBe('1.24');
+      expect(result?.credits).toBe(5);
+      checkGraderId(result as CourseResult);
+    });
+
+    it('should calculate correct grade, PASS/FAIL grade', async () => {
+      checkSuccessRes(await request
+        .post('/v1/courses/1/assessment-models/10/grades/calculate')
+        .set('Cookie', cookies.userCookie));
+
+      let result: CourseResult | null = await CourseResult.findOne({
+        where: {
+          courseInstanceId: 10,
+          userId: 95
+        }
+      });
+      expect(result).not.toBe(null);
+      expect(result?.grade).toBe('PASS');
+      expect(result?.credits).toBe(5);
+      checkGraderId(result as CourseResult);
+
+      result = await CourseResult.findOne({
+        where: {
+          courseInstanceId: 10,
+          userId: 100
+        }
+      });
+      expect(result).not.toBe(null);
+      expect(result?.grade).toBe('FAIL');
+      expect(result?.credits).toBe(5);
+      checkGraderId(result as CourseResult);
+    });
+
+    it('should calculate multiple correct grades', async () => {
+      checkSuccessRes(await request
+        .post('/v1/courses/4/assessment-models/6/grades/calculate')
+        .set('Cookie', cookies.userCookie));
+
+      let result: CourseResult | null = await CourseResult.findOne({
+        where: {
+          courseInstanceId: 6,
+          userId: 35
+        }
+      });
+      expect(result).not.toBe(null);
+      expect(result?.grade).toBe('1.5');
+      expect(result?.credits).toBe(5);
+
+      result = await CourseResult.findOne({
+        where: {
+          courseInstanceId: 6,
+          userId: 90
+        }
+      });
+      expect(result).not.toBe(null);
+      expect(result?.grade).toBe('4.75');
+      expect(result?.credits).toBe(5);
+    });
+
+    it('should calculate correct grades in higher depths', async () => {
+      checkSuccessRes(await request
+        .post('/v1/courses/4/assessment-models/7/grades/calculate')
+        .set('Cookie', cookies.userCookie));
+
+      const result: CourseResult | null = await CourseResult.findOne({
+        where: {
+          courseInstanceId: 7,
+          userId: 25
+        }
+      });
+      expect(result).not.toBe(null);
+      expect(result?.grade).toBe('3.12');
+      expect(result?.credits).toBe(5);
+    });
+
+    it('should allow manually overriding a student\'s grade', async () => {
+      checkSuccessRes(await request
+        .post('/v1/courses/3/assessment-models/4/grades/calculate')
+        .set('Cookie', cookies.userCookie));
+
+      const result: CourseResult | null = await CourseResult.findOne({
+        where: {
+          courseInstanceId: 4,
+          userId: 13
+        }
+      });
+      expect(result).not.toBe(null);
+      expect(result?.grade).toBe('5');
+      expect(result?.credits).toBe(5);
+    });
+
+    it('should respond with 401 unauthorized, if not logged in', async () => {
+      await request
+        .post('/v1/courses/1/assessment-models/1/grades/calculate')
+        .expect(HttpCode.Unauthorized);
+    });
+    */
   }
-
-  it('should calculate correct grade, numeric grade', async () => {
-    checkSuccessRes(await request
-      .post('/v1/courses/5/assessment-models/8/grades/calculate')
-      .set('Cookie', cookies.userCookie));
-
-    const result: CourseResult | null = await CourseResult.findOne({
-      where: {
-        courseInstanceId: 8,
-        userId: 1
-      }
-    });
-    expect(result).not.toBe(null);
-    expect(result?.grade).toBe('1.24');
-    expect(result?.credits).toBe(5);
-    checkGraderId(result as CourseResult);
-  });
-
-  it('should calculate correct grade, PASS/FAIL grade', async () => {
-    checkSuccessRes(await request
-      .post('/v1/courses/1/assessment-models/10/grades/calculate')
-      .set('Cookie', cookies.userCookie));
-
-    let result: CourseResult | null = await CourseResult.findOne({
-      where: {
-        courseInstanceId: 10,
-        userId: 95
-      }
-    });
-    expect(result).not.toBe(null);
-    expect(result?.grade).toBe('PASS');
-    expect(result?.credits).toBe(5);
-    checkGraderId(result as CourseResult);
-
-    result = await CourseResult.findOne({
-      where: {
-        courseInstanceId: 10,
-        userId: 100
-      }
-    });
-    expect(result).not.toBe(null);
-    expect(result?.grade).toBe('FAIL');
-    expect(result?.credits).toBe(5);
-    checkGraderId(result as CourseResult);
-  });
-
-  it('should calculate multiple correct grades', async () => {
-    checkSuccessRes(await request
-      .post('/v1/courses/4/assessment-models/6/grades/calculate')
-      .set('Cookie', cookies.userCookie));
-
-    let result: CourseResult | null = await CourseResult.findOne({
-      where: {
-        courseInstanceId: 6,
-        userId: 35
-      }
-    });
-    expect(result).not.toBe(null);
-    expect(result?.grade).toBe('1.5');
-    expect(result?.credits).toBe(5);
-
-    result = await CourseResult.findOne({
-      where: {
-        courseInstanceId: 6,
-        userId: 90
-      }
-    });
-    expect(result).not.toBe(null);
-    expect(result?.grade).toBe('4.75');
-    expect(result?.credits).toBe(5);
-  });
-
-  it('should calculate correct grades in higher depths', async () => {
-    checkSuccessRes(await request
-      .post('/v1/courses/4/assessment-models/7/grades/calculate')
-      .set('Cookie', cookies.userCookie));
-
-    const result: CourseResult | null = await CourseResult.findOne({
-      where: {
-        courseInstanceId: 7,
-        userId: 25
-      }
-    });
-    expect(result).not.toBe(null);
-    expect(result?.grade).toBe('3.12');
-    expect(result?.credits).toBe(5);
-  });
-
-  it('should allow manually overriding a student\'s grade', async () => {
-    checkSuccessRes(await request
-      .post('/v1/courses/3/assessment-models/4/grades/calculate')
-      .set('Cookie', cookies.userCookie));
-
-    const result: CourseResult | null = await CourseResult.findOne({
-      where: {
-        courseInstanceId: 4,
-        userId: 13
-      }
-    });
-    expect(result).not.toBe(null);
-    expect(result?.grade).toBe('5');
-    expect(result?.credits).toBe(5);
-  });
-
-  it('should respond with 401 unauthorized, if not logged in', async () => {
-    await request
-      .post('/v1/courses/1/assessment-models/1/grades/calculate')
-      .expect(HttpCode.Unauthorized);
-  });
-  */
-});
+);
 
 describe(
   'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv/sisu' +
@@ -614,28 +623,29 @@ describe(
 
     it('should export CSV succesfully when course results are found', async () => {
       res = await request
-        .get('/v1/courses/1/assessment-models/1/grades/csv/sisu')
+        // eslint-disable-next-line max-len
+        .get(`/v1/courses/6/assessment-models/24/grades/csv/sisu?studentNumbers=${JSON.stringify(studentNumbers)}`)
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'text/csv')
         .expect(HttpCode.Ok);
 
       expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-117486,Pass,5,9.12.2022,en,
-114732,5,5,9.12.2022,en,
-472886,3,5,9.12.2022,en,
-335462,Pass,5,9.12.2022,en,
-874623,2,5,9.12.2022,en,
-345752,Pass,5,9.12.2022,en,
-353418,4,5,9.12.2022,en,
-986957,Fail,5,9.12.2022,en,
-611238,4,5,9.12.2022,en,
-691296,1,5,9.12.2022,en,
-271778,Fail,5,9.12.2022,en,
-344644,1,5,9.12.2022,en,
-954954,5,5,9.12.2022,en,
+117486,1,5,21.6.2023,en,
+114732,5,5,21.6.2023,en,
+472886,3,5,21.6.2023,en,
+335462,1,5,21.6.2023,en,
+874623,2,5,21.6.2023,en,
+345752,1,5,21.6.2023,en,
+353418,4,5,21.6.2023,en,
+986957,0,5,21.6.2023,en,
+611238,4,5,21.6.2023,en,
+691296,1,5,21.6.2023,en,
+271778,0,5,21.6.2023,en,
+344644,1,5,21.6.2023,en,
+954954,5,5,21.6.2023,en,
 `);
       expect(res.headers['content-disposition']).toBe(
-        'attachment; filename="final_grades_course_CS-A1110_' +
+        'attachment; filename="final_grades_course_MS-A0102_' +
         `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
       );
     });
@@ -643,29 +653,29 @@ describe(
     it('should export CSV succesfully with custom assessmentDate and completionLanguage',
       async () => {
         res = await request
-        // eslint-disable-next-line max-len
-          .get('/v1/courses/1/assessment-models/1/grades/csv/sisu?assessmentDate=2023-05-12&completionLanguage=sv')
+          // eslint-disable-next-line max-len
+          .get(`/v1/courses/6/assessment-models/24/grades/csv/sisu?assessmentDate=2023-05-12&completionLanguage=sv&studentNumbers=${JSON.stringify(studentNumbers)}`)
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'text/csv')
           .expect(HttpCode.Ok);
 
         expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-117486,Pass,5,12.5.2023,sv,
+117486,1,5,12.5.2023,sv,
 114732,5,5,12.5.2023,sv,
 472886,3,5,12.5.2023,sv,
-335462,Pass,5,12.5.2023,sv,
+335462,1,5,12.5.2023,sv,
 874623,2,5,12.5.2023,sv,
-345752,Pass,5,12.5.2023,sv,
+345752,1,5,12.5.2023,sv,
 353418,4,5,12.5.2023,sv,
-986957,Fail,5,12.5.2023,sv,
+986957,0,5,12.5.2023,sv,
 611238,4,5,12.5.2023,sv,
 691296,1,5,12.5.2023,sv,
-271778,Fail,5,12.5.2023,sv,
+271778,0,5,12.5.2023,sv,
 344644,1,5,12.5.2023,sv,
 954954,5,5,12.5.2023,sv,
 `);
         expect(res.headers['content-disposition']).toBe(
-          'attachment; filename="final_grades_course_CS-A1110_' +
+          'attachment; filename="final_grades_course_MS-A0102_' +
         `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
         );
       });
@@ -744,29 +754,31 @@ describe(
   });
 
 describe(
-  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades - get final grades in JSON', () => {
+  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades'
+  + ' - get final grades in JSON', () => {
 
     it('should get final grades succesfully when course results are found', async () => {
       res = await request
-        .get('/v1/courses/1/assessment-models/1/grades')
+        // eslint-disable-next-line max-len
+        .get(`/v1/courses/6/assessment-models/24/grades?studentNumbers=${JSON.stringify(studentNumbers)}`)
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json');
 
       checkSuccessRes(res);
       expect(res.body.data.finalGrades).toEqual([
-        { id: 1, studentNumber: '117486', grade: 'Pass', credits: 5 },
-        { id: 2, studentNumber: '114732', grade: '5', credits: 5 },
-        { id: 3, studentNumber: '472886', grade: '3', credits: 5 },
-        { id: 4, studentNumber: '335462', grade: 'Pass', credits: 5 },
-        { id: 5, studentNumber: '874623', grade: '2', credits: 5 },
-        { id: 6, studentNumber: '345752', grade: 'Pass', credits: 5 },
-        { id: 7, studentNumber: '353418', grade: '4', credits: 5 },
-        { id: 8, studentNumber: '986957', grade: 'Fail', credits: 5 },
-        { id: 9, studentNumber: '611238', grade: '4', credits: 5 },
-        { id: 10, studentNumber: '691296', grade: '1', credits: 5 },
-        { id: 11, studentNumber: '271778', grade: 'Fail', credits: 5 },
-        { id: 12, studentNumber: '344644', grade: '1', credits: 5 },
-        { id: 13, studentNumber: '954954', grade: '5', credits: 5 }
+        { studentNumber: '117486', grade: '1', credits: 5 },
+        { studentNumber: '114732', grade: '5', credits: 5 },
+        { studentNumber: '472886', grade: '3', credits: 5 },
+        { studentNumber: '335462', grade: '1', credits: 5 },
+        { studentNumber: '874623', grade: '2', credits: 5 },
+        { studentNumber: '345752', grade: '1', credits: 5 },
+        { studentNumber: '353418', grade: '4', credits: 5 },
+        { studentNumber: '986957', grade: '0', credits: 5 },
+        { studentNumber: '611238', grade: '4', credits: 5 },
+        { studentNumber: '691296', grade: '1', credits: 5 },
+        { studentNumber: '271778', grade: '0', credits: 5 },
+        { studentNumber: '344644', grade: '1', credits: 5 },
+        { studentNumber: '954954', grade: '5', credits: 5 }
       ]);
     });
 

@@ -44,10 +44,13 @@ function evaluateSubAttainment(attainment: AttainmentData): void {
 }
 
 describe(
-  'Test POST /v1/courses/:courseId/assessment-models/:assessmentModelId/attainments - create attainment(s)',
+  'Test POST /v1/courses/:courseId/assessment-models/:assessmentModelId/attainments'
+  + ' - create attainment(s)',
   () => {
 
-    it('should create a new attainment with no sub-attainments when course and assessment model exist',
+    it(
+      'should create a new attainment with no sub-attainments when course and'
+      + 'assessment model exist',
       async () => {
         const res: supertest.Response = await request
           .post('/v1/courses/1/assessment-models/1/attainments')
@@ -66,7 +69,8 @@ describe(
         expect(res.body.data.attainment.tag).toBeDefined();
         expect(res.body.data.attainment.daysValid).toBeDefined();
         expect(res.body.data.attainment.subAttainments).toBeDefined();
-      });
+      }
+    );
 
     it('should create a new attainment with sub-attainments when course and assessment model exist',
       async () => {
@@ -307,7 +311,9 @@ describe(
         );
       });
 
-    it('should respond with 409 conflict, if parent attainment does not belong to the assessment model',
+    it(
+      'should respond with 409 conflict, if parent attainment does not'
+      + ' belong to the assessment model',
       async () => {
         // Create parent attainment for assessment model 1.
         let res: supertest.Response = await request
@@ -333,7 +339,8 @@ describe(
         expect(res.body.errors[0]).toBe(
           `parent attainment ID ${id} does not belong to the assessment model ID 6`
         );
-      });
+      }
+    );
 
     it('should respond with 422 unprocessable entity, if parent attainment does not exist',
       async () => {
@@ -353,7 +360,8 @@ describe(
   });
 
 describe(
-  'Test DELETE /v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
+  'Test DELETE '
+  + '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
   () => {
     async function testAttainmentTreeDeletion(tree: object): Promise<void> {
       // Add an attainment tree.
@@ -610,7 +618,8 @@ describe(
     });
 
     it(
-      'should respond with 409 conflict, if parent attainment belongs to different assessment model',
+      'should respond with 409 conflict, if parent attainment belongs to'
+      + ' a different assessment model',
       async () => {
         // Create a new parent attainment on a different assessment model.
         let res: supertest.Response = await request

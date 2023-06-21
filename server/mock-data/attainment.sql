@@ -227,4 +227,6 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, tag, days_v
 (22, 221, 'test csv template no students', 'tag222', 365, NOW(), NOW(), 'MANUAL', NULL),
 (22, 221, 'test csv template no students', 'tag223', 365, NOW(), NOW(), 'MANUAL', NULL),
 (14, null, 'test csv upload manual', 'tag224', 365, NOW(), NOW(), 'MANUAL', NULL),
-(14, null, 'test csv upload grader', 'tag225', 365, NOW(), NOW(), 'MANUAL', NULL);
+(14, null, 'test csv upload grader', 'tag225', 365, NOW(), NOW(), 'MANUAL', NULL),
+(24, null, 'test final grades', 'tag226', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', NULL),
+(24, 226, 'test final grades', 'tag227', 365, NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.25 }');
