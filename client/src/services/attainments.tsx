@@ -3,45 +3,53 @@
 // SPDX-License-Identifier: MIT
 
 import axios from './axios';
-import { AxiosResponse } from 'axios';
 import textFormatServices from './textFormat';
 import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 import { AttainmentData } from 'aalto-grades-common/types/attainment';
-import { ApiResponse } from '../types/general';
+import { FullResponse, Numeric } from '../types/general';
 
 // Functions that are (or will be) connected to the server.
 
 async function addAttainment(
-  courseId: number | string, instanceId: number | string, attainment: AttainmentData
+  courseId: Numeric,
+  assessmentModelId: Numeric,
+  attainment: AttainmentData
 ): Promise<AttainmentData> {
-  const response: AxiosResponse<
-    ApiResponse<{ attainment: AttainmentData }>, unknown
-  > = await axios.post(
-    `/v1/courses/${courseId}/instances/${instanceId}/attainments`,
-    attainment
-  );
+
+  const response: FullResponse<{ attainment: AttainmentData }> =
+    await axios.post(
+      `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/attainments`,
+      attainment
+    );
 
   return response.data.data.attainment;
 }
 
 async function editAttainment(
-  courseId: number | string, instanceId: number | string, attainment: AttainmentData
+  courseId: Numeric,
+  assessmentModelId: Numeric,
+  attainment: AttainmentData
 ) {
-  const response: AxiosResponse<
-    ApiResponse<{ attainment: AttainmentData }>, unknown
-  > = await axios.put(
-    `/v1/courses/${courseId}/instances/${instanceId}/attainments/${attainment.id}`,
-    attainment
-  );
+
+  const response: FullResponse<{ attainment: AttainmentData }> =
+    await axios.put(
+      `/v1/courses/${courseId}/assessment-models/${assessmentModelId}`
+      + `/attainments/${attainment.id}`,
+      attainment
+    );
 
   return response.data.data.attainment;
 }
 
 async function deleteAttainment(
-  courseId: number | string, instanceId: number | string, attainmentId: number | string
+  courseId: Numeric,
+  assessmentModelId: Numeric,
+  attainmentId: Numeric
 ): Promise<void> {
+
   await axios.delete(
-    `/v1/courses/${courseId}/instances/${instanceId}/attainments/${attainmentId}`
+    `/v1/courses/${courseId}/assessment-models/${assessmentModelId}`
+    + `/attainments/${attainmentId}`
   );
 }
 
