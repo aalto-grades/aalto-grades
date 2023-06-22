@@ -23,13 +23,13 @@ const Signup = (): JSX.Element => {
       const response = await userService.signup(userObject);
       // if signup successfull, save user role to context
       setAuth({
-        id: response.data!.id,
-        role: response.data!.role,
-        name: response.data!.name
+        id: response.id,
+        role: response.role,
+        name: response.name
       });
 
-      console.log(`${response.data!.role}`);
-      if (response.data!.role === SystemRole.Admin) {
+      console.log(`${response.role}`);
+      if (response.role === SystemRole.Admin) {
         navigate('/course-view', { replace: true });
       } else {
         navigate('/', { replace: true });

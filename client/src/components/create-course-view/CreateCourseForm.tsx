@@ -42,7 +42,7 @@ const CreateCourseForm = ({ addCourse }) => {
 
   const id = -1;
 
-  const handleSubmit = (event) => {
+  function handleSubmit(event) {
     event.preventDefault();
     try {
       const courseObject: CourseData = ({
@@ -71,7 +71,7 @@ const CreateCourseForm = ({ addCourse }) => {
     } catch (exception) {
       console.log(exception);
     }
-  };
+  }
 
   return(
     <Container maxWidth="sm" sx={{ textAlign: 'right' }}>

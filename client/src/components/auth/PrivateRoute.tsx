@@ -25,11 +25,11 @@ const PrivateRoute = ({ children, roles }: {
     // loading set to true so page doesn't load until token has been retrieved
     setLoading(true);
     try {
-      const response = await userService.getRefreshToken();
+      const result = await userService.getRefreshToken();
       setAuth({
-        id: response.data!.id,
-        role: response.data!.role,
-        name: response.data!.name
+        id: result.id,
+        role: result.role,
+        name: result.name
       });
     } catch (exception) {
       console.error(exception);

@@ -5,10 +5,10 @@
 import { Request, Response } from 'express';
 import * as yup from 'yup';
 
-import models from '../database/models';
 import AssessmentModel from '../database/models/assessmentModel';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
+import CourseInstanceRole from '../database/models/courseInstanceRole';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
@@ -37,7 +37,7 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
   }
 
   const instance: CourseInstanceWithCourseAndTranslation | null =
-    await models.CourseInstance.findByPk(
+    await CourseInstance.findByPk(
       instanceId,
       {
         include: [
@@ -91,7 +91,7 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
   };
 
   for (const teacher of instance.Users) {
-    parsedInstanceData.teachersInCharge?.push(teacher.name);
+    (parsedInstanceData.teachersInCharge as Array<string>).push(teacher.name);
   }
 
   res.status(HttpCode.Ok).send({
@@ -163,7 +163,7 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
     };
 
     for (const teacher of instanceWithTeacher.Users) {
-      instanceData.teachersInCharge?.push(teacher.name);
+      (instanceData.teachersInCharge as Array<string>).push(teacher.name);
     }
 
     instancesData.push(instanceData);
@@ -221,31 +221,17 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
 
   await requestSchema.validate(req.body, { abortEarly: false });
 
-  interface CourseInstanceAddRequest {
-    assessmentModelId: number | undefined;
-    sisuCourseInstanceId: string | null;
-    gradingScale: GradingScale;
-    startingPeriod: Period;
-    endingPeriod: Period;
-    type: string;
-    startDate: Date;
-    endDate: Date;
-    teachersInCharge: Array<number>;
-  }
-
-  const request: CourseInstanceAddRequest = req.body;
-
   // Confirm that course exists.
   await findCourseById(courseId, HttpCode.NotFound);
 
   // Confirm that teachers exist.
-  for (const teacher of request.teachersInCharge) {
+  for (const teacher of req.body.teachersInCharge) {
     await findUserById(teacher, HttpCode.UnprocessableEntity);
   }
 
-  if (request.assessmentModelId) {
+  if (req.body.assessmentModelId) {
     const assessmentModel: AssessmentModel = await findAssessmentModelById(
-      request.assessmentModelId, HttpCode.UnprocessableEntity
+      req.body.assessmentModelId, HttpCode.UnprocessableEntity
     );
 
     if (assessmentModel.courseId !== courseId) {
@@ -257,20 +243,20 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
     }
   }
 
-  const newInstance: CourseInstance = await models.CourseInstance.create({
+  const newInstance: CourseInstance = await CourseInstance.create({
     courseId: courseId,
-    assessmentModelId: request.assessmentModelId,
-    sisuCourseInstanceId: request.sisuCourseInstanceId ?? null,
-    gradingScale: request.gradingScale,
-    startingPeriod: request.startingPeriod,
-    endingPeriod: request.endingPeriod,
-    type: request.type,
-    startDate: request.startDate,
-    endDate: request.endDate
+    assessmentModelId: req.body.assessmentModelId,
+    sisuCourseInstanceId: req.body.sisuCourseInstanceId,
+    gradingScale: req.body.gradingScale,
+    startingPeriod: req.body.startingPeriod,
+    endingPeriod: req.body.endingPeriod,
+    type: req.body.type,
+    startDate: req.body.startDate,
+    endDate: req.body.endDate
   });
 
-  for (const teacher of request.teachersInCharge) {
-    await models.CourseInstanceRole.create({
+  for (const teacher of req.body.teachersInCharge) {
+    await CourseInstanceRole.create({
       userId: teacher,
       courseInstanceId: newInstance.id,
       role: CourseInstanceRoleType.TeacherInCharge

@@ -15,21 +15,13 @@ import { JWT_SECRET, NODE_ENV } from '../configs/environment';
 
 import User from '../database/models/user';
 
-import { LoginResult, SystemRole } from 'aalto-grades-common/types/auth';
+import {
+  LoginResult, PlainPassword, SignupRequest, SystemRole
+} from 'aalto-grades-common/types/auth';
 import { ApiError } from '../types/error';
 import { JwtClaims } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { findUserById } from './utils/user';
-
-type PlainPassword = string;
-
-interface SignupRequest {
-  name: string,
-  password: PlainPassword,
-  email: string,
-  studentNumber?: string,
-  role?: SystemRole
-}
 
 export async function validateLogin(email: string, password: PlainPassword): Promise<LoginResult> {
   const user: User | null = await User.findByEmail(email);

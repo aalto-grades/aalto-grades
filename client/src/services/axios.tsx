@@ -4,8 +4,8 @@
 
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://back-end';
-const BACKEND_PORT = process.env.REACT_APP_BACKEND_PORT || '3000';
+const BACKEND_URL: string = process.env.REACT_APP_BACKEND_URL || 'http://back-end';
+const BACKEND_PORT: string = process.env.REACT_APP_BACKEND_PORT || '3000';
 
 export default axios.create({
   baseURL: `${BACKEND_URL}:${BACKEND_PORT}`,

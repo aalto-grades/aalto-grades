@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
@@ -12,22 +11,22 @@ import RemoveIcon from '@mui/icons-material/Remove';
 
 const DynamicTextFieldArray = ({ fieldData, values, setFunction }) => {
 
-  const addFields = () => {
+  function addFields() {
     setFunction([...values, '']);
-  };
+  }
 
-  const removeFields = (index) => {
+  function removeFields(index) {
     const fields = [...values];
     fields.splice(index, 1);
     setFunction(fields);
-  };
+  }
 
-  const handleChange = (index, event) => {
+  function handleChange(index, event) {
     const value = event.target.value;
     const fields = [...values];
     fields[index] = value;
     setFunction(fields);
-  };
+  }
 
   return(
     <Box sx={{ display: 'flex',  alignItems: 'flex-start', flexDirection: 'column' }}>

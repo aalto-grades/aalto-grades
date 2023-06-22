@@ -31,21 +31,21 @@ export interface CourseData {
 }
 
 export interface CourseInstanceData {
-  courseData: CourseData,
+  courseData?: CourseData,
   // Course instance and assessment model IDs can be null when representing
   // Sisu course instance data
-  id: number | null,
-  assessmentModelId?: number | null,
-  sisuCourseInstanceId: string | null,
-  startingPeriod: Period | null,
-  endingPeriod: Period | null,
+  id?: number,
+  assessmentModelId?: number,
+  sisuCourseInstanceId?: string,
+  startingPeriod?: Period,
+  endingPeriod?: Period,
   startDate: Date,
   endDate: Date,
   type: string,
   gradingScale: GradingScale,
   // TODO: There should maybe be a UserData interface if more data is needed,
   // for example ID of user.
-  teachersInCharge?: Array<string>
+  teachersInCharge?: Array<string> | Array<number>
 }
 
 export enum CourseInstanceRoleType {

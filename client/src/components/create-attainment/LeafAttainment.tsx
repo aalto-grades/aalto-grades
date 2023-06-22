@@ -79,7 +79,7 @@ const LeafAttainment = ({
   // Functions and varibales for handling the change of the value in the 'Name'
   // (category) textfield. If the value is 'Other', then the 'New Name' textfield
   // is displayed; otherwise the name is the same as the category
-  const handleChange = (event) => {
+  function handleChange(event) {
     const value = event.target.value;
     let updatedAttainments = attainmentServices.setProperty(
       indices, attainments, 'category', value
@@ -96,15 +96,15 @@ const LeafAttainment = ({
       );
     }
     setAttainments(updatedAttainments);
-  };
+  }
 
-  const getValue = (fieldData) => {
+  function getValue(fieldData) {
     if (fieldData.fieldId === 'category') {
       return attainmentServices.getProperty(indices, attainments, 'category');
     } else {
       console.log(fieldData.fieldId);
     }
-  };
+  }
 
   const [displayNewName, setDisplayNewName] = useState<any>(
     getValue(categoryData) === 'Other'
@@ -114,25 +114,25 @@ const LeafAttainment = ({
   // the number of sub-attainments
   const [openCountDialog, setOpenCountDialog] = useState<any>(false);
 
-  const handleCountDialogOpen = () => {
+  function handleCountDialogOpen() {
     setOpenCountDialog(true);
-  };
+  }
 
-  const handleCountDialogClose = () => {
+  function handleCountDialogClose() {
     setOpenCountDialog(false);
-  };
+  }
 
   // Functions and varibales for opening and closing the dialog for confirming
   // sub-attainment deletion
   const [openConfDialog, setOpenConfDialog] = useState<boolean>(false);
 
-  const handleConfDialogOpen = () => {
+  function handleConfDialogOpen() {
     setOpenConfDialog(true);
-  };
+  }
 
-  const handleConfDialogClose = () => {
+  function handleConfDialogClose() {
     setOpenConfDialog(false);
-  };
+  }
 
   // See if this attainment affects the parent attainment's grade
   const affectCalculation = attainmentServices.getProperty(

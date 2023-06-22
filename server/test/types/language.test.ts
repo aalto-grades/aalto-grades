@@ -8,13 +8,13 @@ import { localizedStringSchema } from '../../src/types/language';
 
 describe('Test localizedStringSchema', () => {
 
-  const runValidation = async (input: object): Promise<void> => {
+  async function runValidation(input: object): Promise<void> {
     const schema: yup.AnyObjectSchema = yup.object().shape({
       name: localizedStringSchema.required(),
       department: localizedStringSchema
     });
     await schema.validate(input, { abortEarly: false });
-  };
+  }
 
   it('should resolve with correct input', async () => {
     await expect(runValidation({

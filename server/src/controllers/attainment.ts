@@ -10,7 +10,7 @@ import AssessmentModel from '../database/models/assessmentModel';
 import Attainment from '../database/models/attainment';
 import Course from '../database/models/course';
 
-import { AttainmentData, AttainmentRequestData } from '../types/attainment';
+import { AttainmentData } from 'aalto-grades-common/types/attainment';
 import { ApiError } from '../types/error';
 import { Formula } from '../types/formulas';
 import { idSchema } from '../types/general';
@@ -51,7 +51,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
   const name: string = req.body.name;
   const tag: string = req.body.tag;
   const daysValid: number = req.body.daysValid;
-  const requestSubAttainments: Array<AttainmentRequestData> | undefined = req.body.subAttainments;
+  const requestSubAttainments: Array<AttainmentData> | undefined = req.body.subAttainments;
   let subAttainments: Array<AttainmentData> = [];
 
   // If linked to a parent id, check that it exists and belongs to the same assessment model.
@@ -79,7 +79,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
   });
 
   async function processSubAttainments(
-    unprocessedAttainments: Array<AttainmentRequestData>, parentId: number
+    unprocessedAttainments: Array<AttainmentData>, parentId: number
   ): Promise<Array<AttainmentData>> {
     const attainments: Array<AttainmentData> = [];
     let subAttainments: Array<AttainmentData> = [];
@@ -94,7 +94,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
         formula: Formula.Manual
       });
 
-      if (attainment.subAttainments.length > 0) {
+      if (attainment.subAttainments && attainment.subAttainments.length > 0) {
         subAttainments = await processSubAttainments(attainment.subAttainments, dbEntry.id);
       }
 

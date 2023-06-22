@@ -11,7 +11,7 @@ import attainmentServices from '../../services/attainments';
 const DateTextField = ({ fieldData, indices, attainments, setAttainments }) => {
 
   // Functions for handling the change of the values in the date textfields
-  const handleChange = (event) => {
+  function handleChange(event) {
     const value = event.target.value;
     if (fieldData.fieldId === 'attainmentDate') {
       const updatedAttainments = attainmentServices.setProperty(
@@ -28,9 +28,9 @@ const DateTextField = ({ fieldData, indices, attainments, setAttainments }) => {
     } else {
       console.log(fieldData.fieldId);
     }
-  };
+  }
 
-  const getValue = () => {
+  function getValue() {
     if (fieldData.fieldId === 'attainmentDate') {
       return attainmentServices.getProperty(indices, attainments, 'date');
     } else if (fieldData.fieldId === 'expiryDate') {
@@ -38,7 +38,7 @@ const DateTextField = ({ fieldData, indices, attainments, setAttainments }) => {
     } else {
       console.log(fieldData.fieldId);
     }
-  };
+  }
 
   return (
     <TextField

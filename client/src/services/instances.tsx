@@ -15,7 +15,9 @@ async function getInstances(courseId: number | string): Promise<Array<CourseInst
   return response.data.data.courseInstances;
 }
 
-async function createInstance(courseId: number | string, instance: object): Promise<number> {
+async function createInstance(
+  courseId: number | string, instance: CourseInstanceData
+): Promise<number> {
   const response: AxiosResponse<
     ApiResponse<{ courseInstance: { id: number } }>, unknown
   > = await axios.post(`/v1/courses/${courseId}/instances`, instance);

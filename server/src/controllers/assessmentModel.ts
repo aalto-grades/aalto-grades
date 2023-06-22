@@ -7,11 +7,10 @@ import { Request, Response } from 'express';
 import AssessmentModel from '../database/models/assessmentModel';
 import Course from '../database/models/course';
 
-import { AssessmentModelData } from '../types/attainment';
+import { AssessmentModelData } from 'aalto-grades-common/types/attainment';
 import { ApiError } from '../types/error';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
-
 import { findAssessmentModelById } from './utils/assessmentModel';
 import { findCourseById } from './utils/course';
 

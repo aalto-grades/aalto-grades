@@ -30,7 +30,7 @@ const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
     );
   }, [selectedAttainments, selectedFormula]);
 
-  const handleAttributeChange = (attainmentIndex, attributeIndex, event) => {
+  function handleAttributeChange(attainmentIndex, attributeIndex, event) {
     const newAttributeValues = attributeValues.map((a, index) => {
       if (attainmentIndex == index) {
         const newAttributes = a.map((attribute, i) => {
@@ -42,11 +42,13 @@ const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
       }
     });
     setAttributeValues(newAttributeValues);
-  };
+  }
 
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  async function sleep(ms) {
+    return new Promise(r => setTimeout(r, ms));
+  }
 
-  const handleSubmit = async (event) => {
+  async function handleSubmit(event) {
     event.preventDefault();
     try {
       const updatedAttainments = selectedAttainments.map((attainment, index) => {
@@ -85,7 +87,7 @@ const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
         }
       ]);
     }
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit} data-testid='attributeForm'>

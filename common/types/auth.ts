@@ -12,3 +12,13 @@ export interface LoginResult {
   name: string,
   role: SystemRole
 }
+
+export type PlainPassword = string;
+
+export interface SignupRequest {
+  name: string,
+  password: PlainPassword,
+  email: string,
+  studentNumber?: string,
+  role?: SystemRole
+}

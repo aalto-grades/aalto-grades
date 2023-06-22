@@ -28,10 +28,7 @@ function parseSisuGradingScale(gradingScale: string): GradingScale | undefined {
 
 function parseSisuCourseInstance(instance: SisuCourseInstance): CourseInstanceData {
   return {
-    id: null,
     sisuCourseInstanceId: instance.id,
-    startingPeriod: null,
-    endingPeriod: null,
     startDate: instance.startDate,
     endDate: instance.endDate,
     type: instance.type,

@@ -14,7 +14,7 @@ const StringTextField = ({ fieldData, indices, attainments, setAttainments }) =>
 
   // Functions for handling the change of the values in the 'New Name' textfield
   // and the textfields that represent formula attributes
-  const handleChange = (event) => {
+  function handleChange(event) {
     const value = event.target.value;
     if (fieldData.fieldId === 'attainmentName') {
       const updatedAttainments = attainmentServices.setProperty(
@@ -32,9 +32,9 @@ const StringTextField = ({ fieldData, indices, attainments, setAttainments }) =>
     } else {
       console.log(fieldData.fieldId);
     }
-  };
+  }
 
-  const getValue = () => {
+  function getValue() {
     if (fieldData.fieldId === 'attainmentName') {
       return attainmentServices.getProperty(indices, attainments, 'name');
     } else if (fieldData.fieldId.startsWith('attribute')) {
@@ -43,7 +43,7 @@ const StringTextField = ({ fieldData, indices, attainments, setAttainments }) =>
     } else {
       console.log(fieldData.fieldId);
     }
-  };
+  }
 
   return (
     <TextField

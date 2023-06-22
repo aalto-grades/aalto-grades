@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentRequestData } from '../../src/types/attainment';
+import { AttainmentData } from 'aalto-grades-common/types/attainment';
 
-export const mockAttainment: AttainmentRequestData = {
+export const mockAttainment: AttainmentData = {
   name: '2 optional exercises',
   tag: 'optional-exercises',
   daysValid: 365,
