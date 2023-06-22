@@ -63,9 +63,9 @@ const FileLoadDialog = ({ instanceId, handleClose, open }) => {
   const [showErrorDialog, setShowErrorDialog] = useState<boolean>(false);
   const [messageInfo, setMessageInfo] = useState<Message>(undefined);
 
-  const toggleErrorDialog = () => {
+  function toggleErrorDialog(): void {
     setShowErrorDialog(!showErrorDialog);
-  };
+  }
 
   // useEffect in charge of handling the back-to-back alerts
   // makes the previous disappear before showing the new one
@@ -83,7 +83,7 @@ const FileLoadDialog = ({ instanceId, handleClose, open }) => {
   const [validationError, setValidationError] = useState<any>('');
   const [fileErrors, setFileErrors] = useState<any>([]);
 
-  async function uploadFile() {
+  async function uploadFile(): Promise<void> {
     setSnackPack((prev) => [...prev, loadingMsg]);
     try {
       await gradesService.importCsv(courseId, instanceId, fileInput.current.files[0]);

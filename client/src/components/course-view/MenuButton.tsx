@@ -51,16 +51,17 @@ const StyledMenu = styled<any>((props) => (
 
 const MenuButton = ({ label, options }) => {
   const [anchorEl, setAnchorEl] = useState<any>(null);
-  const open = Boolean(anchorEl);
+  const open: boolean = Boolean(anchorEl);
 
-  const handleClick = (event) => {
+  function handleClick(event): void {
     setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  }
 
-  const renderOptions = (options) => {
+  function handleClose(): void {
+    setAnchorEl(null);
+  }
+
+  function renderOptions(options) {
     return (
       options.map(option => (
         <MenuItem
@@ -75,7 +76,7 @@ const MenuButton = ({ label, options }) => {
         </MenuItem>
       ))
     );
-  };
+  }
 
   return (
     <div>

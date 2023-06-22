@@ -125,7 +125,7 @@ const AppContainer = styled(Container)`
   text-align: center;
 `;
 
-const App = (): JSX.Element => {
+function App(): JSX.Element {
 
   return (
     <ThemeProvider theme={theme}>

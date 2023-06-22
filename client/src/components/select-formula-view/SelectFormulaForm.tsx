@@ -53,15 +53,15 @@ const SelectFormulaForm = ({
     }
   }, [attainments]);
 
-  const handleFormulaChange = (event) => {
+  function handleFormulaChange(event) {
     const newFormula = formulas.find(formula => formula.name == event.target.value);
     setCodeSnippet(newFormula.codeSnippet);
     setSelectedFormula(newFormula);
-  };
+  }
 
   // checks that user has selected a function and at least one attainment
   // if not, shows error message
-  const canBeSubmitted = () => {
+  function canBeSubmitted() {
     let noErrors = true;
     if(selectedAttainments.length === 0) {
       setCheckboxError('You must select at least one study attainment');
@@ -77,11 +77,13 @@ const SelectFormulaForm = ({
       setFormulaError('');
     }
     return noErrors;
-  };
+  }
 
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  async function sleep(ms) {
+    return new Promise(r => setTimeout(r, ms));
+  }
 
-  const handleSubmit = async (event) => {
+  async function handleSubmit(event) {
     event.preventDefault();
     if (canBeSubmitted()) {
       try {
@@ -115,18 +117,18 @@ const SelectFormulaForm = ({
         ]);
       }
     }
-  };
+  }
 
-  const handleCheckboxChange = (event) => {
+  function handleCheckboxChange(event) {
     const selectedAttainment = attainments.find(attainment => attainment.name == event.target.name);
     if(event.target.checked) {
       setSelectedAttainments(prev => [...prev, selectedAttainment]);
     } else {
       setSelectedAttainments(prev => prev.filter(attainment => attainment !== selectedAttainment));
     }
-  };
+  }
 
-  const isChecked = (attainment) => {
+  function isChecked(attainment) {
     // If user has returned from attribute selection
     // -> only assigments they previously selected are checked
     let i;
@@ -136,9 +138,9 @@ const SelectFormulaForm = ({
       }
     }
     return false;
-  };
+  }
 
-  const attainmentCheckboxes = () => {
+  function attainmentCheckboxes() {
     return (
       <>
         {attainments.map((attainment) => (
@@ -153,7 +155,7 @@ const SelectFormulaForm = ({
         }
       </>
     );
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit}>

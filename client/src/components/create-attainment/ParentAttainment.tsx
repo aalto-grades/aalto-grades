@@ -29,9 +29,9 @@ const ParentAttainment = ({
   // Functions and varibales for opening and closing the list of sub-attainments
   const [open, setOpen] = useState<any>(true);
 
-  const handleClick = () => {
+  function handleClick(): void {
     setOpen(!open);
-  };
+  }
 
   /* Functions to get the formula attributes.
 

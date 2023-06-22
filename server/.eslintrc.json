@@ -70,6 +70,10 @@
     "no-trailing-spaces": [
       "error"
     ],
+    "func-style": [
+      "error",
+      "declaration"
+    ],
     "@typescript-eslint/typedef": [
       "error",
       {

@@ -85,11 +85,11 @@ const EditInstanceForm = ({ instance }) => {
     }
   }, []);
 
-  const onCancel = (): void => {
+  function onCancel(): void {
     navigate('/course-view/' + courseId);
-  };
+  }
 
-  const handleSubmit = (event) => {
+  function handleSubmit(event) {
     event.preventDefault();
     try {
       const minCredits = Number(stringMinCredits);
@@ -108,7 +108,7 @@ const EditInstanceForm = ({ instance }) => {
     } catch (exception) {
       console.log(exception);
     }
-  };
+  }
 
   return(
     <form onSubmit={handleSubmit}>

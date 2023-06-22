@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import PropTypes from 'prop-types';
 import LeafAttainment from './LeafAttainment';
 import ParentAttainment from './ParentAttainment';
@@ -15,7 +14,7 @@ const Attainment = ({
   formulaAttributeNames, temporaryId, setIncrementId
 }) => {
 
-  const addSubAttainments = (numOfAttainments) => {
+  function addSubAttainments(numOfAttainments): void {
     const [updatedAttainments, newTemporaryId] = attainmentServices.addSubAttainments(
       indices, attainments, numOfAttainments, temporaryId
     );
@@ -23,7 +22,7 @@ const Attainment = ({
     setAttainments(updatedAttainments);
     if (setIncrementId)
       setIncrementId(newTemporaryId);
-  };
+  }
 
   return (
     <>
