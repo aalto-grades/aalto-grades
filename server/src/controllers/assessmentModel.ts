@@ -50,3 +50,35 @@ export async function getAssessmentModel(req: Request, res: Response): Promise<v
     }
   });
 }
+
+export async function getAllAssessmentModels(req: Request, res: Response): Promise<void> {
+  const courseId: number = Number(req.params.courseId);
+  await idSchema.validate({ id: courseId });
+
+  const course: Course = await findCourseById(
+    courseId, HttpCode.NotFound
+  );
+
+  const assessmentModels: Array<AssessmentModel> = await AssessmentModel.findAll({
+    where: {
+      courseId: course.id
+    }
+  });
+
+  const assessmentModelsData: Array<AssessmentModelData> = [];
+
+  for (const assessmentModel of assessmentModels) {
+    assessmentModelsData.push({
+      id: assessmentModel.id,
+      courseId: assessmentModel.courseId,
+      name: assessmentModel.name
+    });
+  }
+
+  res.status(HttpCode.Ok).json({
+    success: true,
+    data: {
+      assessmentModels: assessmentModelsData
+    }
+  });
+}

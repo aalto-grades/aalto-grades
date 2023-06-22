@@ -81,3 +81,51 @@ describe(
     );
   }
 );
+
+describe(
+  'Test GET /v1/courses/:courseId/assessment-models - get all assessment models',
+  () => {
+
+    it('should respond with correct data when assessment models exist', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/1/assessment-models')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+
+      expect(res.body.success).toBe(true);
+      expect(res.body.errors).not.toBeDefined();
+      expect(res.body.data.assessmentModels).toBeDefined();
+      expect(res.body.data.assessmentModels[0].id).toBeDefined();
+      expect(res.body.data.assessmentModels[0].courseId).toBeDefined();
+      expect(res.body.data.assessmentModels[0].name).toBeDefined();
+    });
+
+    it('should respond with correct data when no assessment models exist', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/7/assessment-models')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+
+      expect(res.body.success).toBe(true);
+      expect(res.body.errors).not.toBeDefined();
+      expect(res.body.data.assessmentModels).toBeDefined();
+      expect(res.body.data.assessmentModels.length).toBe(0);
+    });
+
+    it('should respond with 404 not found when course does not exist',
+      async () => {
+        const res: supertest.Response = await request
+          .get(`/v1/courses/${badId}/assessment-models`)
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.NotFound);
+
+        expect(res.body.success).toBe(false);
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.data).not.toBeDefined();
+      }
+    );
+  }
+);
