@@ -86,7 +86,7 @@ export async function getAllAssessmentModels(req: Request, res: Response): Promi
 
 export async function addAssessmentModel(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
-    name: yup.string().required()
+    name: yup.string().strict().required()
   });
 
   const courseId: number = Number(req.params.courseId);
@@ -96,7 +96,7 @@ export async function addAssessmentModel(req: Request, res: Response): Promise<v
     courseId, HttpCode.NotFound
   );
 
-  requestSchema.validate(req.body, { abortEarly: false });
+  await requestSchema.validate(req.body, { abortEarly: false });
 
   const newAssessmentModel: AssessmentModel = await AssessmentModel.create({
     courseId: course.id,
