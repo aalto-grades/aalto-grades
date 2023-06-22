@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography';
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 import textFormatServices from '../../services/textFormat';
 
-const InstanceDetails = ({ info }) => {
+function InstanceDetails({ info }) {
   const {
     minCredits, maxCredits,
     startDate, endDate,
@@ -80,7 +80,7 @@ const InstanceDetails = ({ info }) => {
       </Box>
     </Box>
   );
-};
+}
 
 InstanceDetails.propTypes = {
   info: PropTypes.object,

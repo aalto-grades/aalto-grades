@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Card from '@mui/material/Card';
@@ -12,7 +11,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 
-const CourseCard = ({ course }) => {
+function CourseCard({ course }) {
   const navigate = useNavigate();
   const { id, name, courseCode, department } = course;
 
@@ -34,7 +33,7 @@ const CourseCard = ({ course }) => {
       </CardActions>
     </Card>
   );
-};
+}
 
 CourseCard.propTypes = {
   course: PropTypes.object,

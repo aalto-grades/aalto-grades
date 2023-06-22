@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import FormulaAttributesForm from './formula-attributes-view/FormulaAttributesForm';
 
-const FormulaAttributesView = (): JSX.Element => {
+function FormulaAttributesView(): JSX.Element {
 
   const { courseId, instanceId } = useParams();
   const navigate = useNavigate();
@@ -39,6 +39,6 @@ const FormulaAttributesView = (): JSX.Element => {
     </Box>
 
   );
-};
+}
 
 export default FormulaAttributesView;

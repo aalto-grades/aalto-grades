@@ -11,7 +11,7 @@ import Box from '@mui/material/Box';
 import Attainment from './create-attainment/Attainment';
 import attainmentServices from '../services/attainments';
 
-const CreateAttainmentView = () => {
+function CreateAttainmentView() {
   const navigate = useNavigate();
   const { courseId, instanceId, sisuInstanceId } = useParams();
   let addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId;
@@ -130,6 +130,6 @@ const CreateAttainmentView = () => {
       </Container>
     </>
   );
-};
+}
 
 export default CreateAttainmentView;

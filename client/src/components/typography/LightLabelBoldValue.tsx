@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
-const LightLabelBoldValue = ({ label, value, small }): JSX.Element => {
+function LightLabelBoldValue({ label, value, small }): JSX.Element {
   const textSize = small ? 'body2' : 'body1';
 
   return (
@@ -22,7 +22,7 @@ const LightLabelBoldValue = ({ label, value, small }): JSX.Element => {
       </Typography>
     </Box>
   );
-};
+}
 
 LightLabelBoldValue.propTypes = {
   label: PropTypes.string,

@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import CreateCourseForm from './create-course-view/CreateCourseForm';
 import coursesService from '../services/courses';
 
-const CreateCourseView = () => {
+function CreateCourseView() {
   const navigate = useNavigate();
 
   async function addCourse(courseObject): Promise<void> {
@@ -27,6 +27,6 @@ const CreateCourseView = () => {
       <CreateCourseForm addCourse={addCourse}/>
     </>
   );
-};
+}
 
 export default CreateCourseView;

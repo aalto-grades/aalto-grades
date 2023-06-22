@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import * as React from 'react';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -17,7 +16,7 @@ const gridColumns = [{
   width: 500,
 }];
 
-const FileErrorDialog = ({ handleClose, open, errors }) => {
+function FileErrorDialog({ handleClose, open, errors }) {
   return (
     <Dialog
       open={open}
@@ -49,7 +48,7 @@ const FileErrorDialog = ({ handleClose, open, errors }) => {
       </DialogActions>
     </Dialog>
   );
-};
+}
 
 FileErrorDialog.propTypes = {
   handleClose: PropTypes.func,

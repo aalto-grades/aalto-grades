@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import TableSortLabel from '@mui/material/TableSortLabel';
@@ -22,7 +21,7 @@ const headCells = [{
 }
 ];
 
-const InstanceTableHead = () => {
+function InstanceTableHead() {
   return (
     <TableRow>
       {headCells.map((headCell) => (
@@ -43,6 +42,6 @@ const InstanceTableHead = () => {
       ))}
     </TableRow>
   );
-};
+}
 
 export default InstanceTableHead;

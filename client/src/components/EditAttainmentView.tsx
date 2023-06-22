@@ -13,7 +13,7 @@ import ConfirmationDialog from './create-attainment/ConfirmationDialog';
 import attainmentServices from '../services/attainments';
 import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 
-const EditAttainmentView = () => {
+function EditAttainmentView() {
   const navigate = useNavigate();
   const { courseId, instanceId, sisuInstanceId, attainmentId } = useParams();
   let addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId;
@@ -229,6 +229,6 @@ const EditAttainmentView = () => {
       </Container>
     </>
   );
-};
+}
 
 export default EditAttainmentView;

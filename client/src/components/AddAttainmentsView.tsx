@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import AttainmentCategory from './attainments/AttainmentCategory';
 import attainmentServices from '../services/attainments';
 
-const AddAttainmentsView = () => {
+function AddAttainmentsView() {
   const navigate = useNavigate();
   const { courseId, sisuInstanceId } = useParams();
 
@@ -188,6 +188,6 @@ const AddAttainmentsView = () => {
       </Box>
     </Box>
   );
-};
+}
 
 export default AddAttainmentsView;

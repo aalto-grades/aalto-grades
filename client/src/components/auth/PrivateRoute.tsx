@@ -13,10 +13,10 @@ import useAuth from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';
 import { SystemRole } from 'aalto-grades-common/types/auth';
 
-const PrivateRoute = ({ children, roles }: {
+function PrivateRoute({ children, roles }: {
   children?: JSX.Element,
   roles: Array<SystemRole>
-}): JSX.Element | null => {
+}): JSX.Element | null {
 
   const [loading, setLoading] = useState<any>(true);
   const { auth, setAuth } = useAuth();
@@ -66,7 +66,7 @@ const PrivateRoute = ({ children, roles }: {
   }
 
   return null;
-};
+}
 
 PrivateRoute.propTypes = {
   children: PropTypes.element,

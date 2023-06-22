@@ -19,7 +19,7 @@ afterEach(cleanup);
 
 describe('Tests for SelectFormulaView components', () => {
 
-  const renderSelectFormulaView = async () => {
+  async function renderSelectFormulaView() {
 
     (instancesService.getAttainments as jest.Mock).mockRejectedValue('Network error');
     (instancesService.getAttainments as jest.Mock).mockResolvedValue(mockAttainments);
@@ -34,7 +34,7 @@ describe('Tests for SelectFormulaView components', () => {
         </Routes>
       </MemoryRouter>
     );
-  };
+  }
 
   test(
     'SelectFormulaView should contain all of the appropriate components when'

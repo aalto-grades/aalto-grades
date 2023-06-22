@@ -10,7 +10,7 @@ import CourseTable from './front-page/CourseTable';
 import coursesService from '../services/courses';
 import useAuth from '../hooks/useAuth';
 
-const FrontPage = (): JSX.Element => {
+function FrontPage(): JSX.Element {
   const [currentCourses, setCurrentCourses] = useState([]);
   const [previousCourses, setPreviousCourses] = useState([]);
 
@@ -42,6 +42,6 @@ const FrontPage = (): JSX.Element => {
       <CourseTable data={previousCourses} />
     </>
   );
-};
+}
 
 export default FrontPage;

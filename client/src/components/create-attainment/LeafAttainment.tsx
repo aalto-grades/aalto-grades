@@ -45,9 +45,9 @@ const expiryData = {
    values of the 'formulaAttribute' property of an attainment. This is considered
    in the function of the nested component StringTextField.
 */
-const AttributeTextFields = ({
+function AttributeTextFields({
   formulaAttributeNames, indices, setAttainments, attainments
-}) => {
+}) {
   return (
     formulaAttributeNames.map((attribute) => {
       const attributeLabel = formulaService.getAttributeLabel(attribute);
@@ -61,7 +61,7 @@ const AttributeTextFields = ({
         />);
     })
   );
-};
+}
 
 AttributeTextFields.propTypes = {
   formulaAttributeNames: PropTypes.array,
@@ -71,10 +71,10 @@ AttributeTextFields.propTypes = {
   removeAttainment: PropTypes.func
 };
 
-const LeafAttainment = ({
+function LeafAttainment({
   indices, addSubAttainments, setAttainments,
   attainments, removeAttainment, formulaAttributeNames
-}) => {
+}) {
 
   // Functions and varibales for handling the change of the value in the 'Name'
   // (category) textfield. If the value is 'Other', then the 'New Name' textfield
@@ -241,7 +241,7 @@ const LeafAttainment = ({
       />
     </Box>
   );
-};
+}
 
 LeafAttainment.propTypes = {
   addSubAttainments: PropTypes.func,

@@ -13,7 +13,7 @@ import useAuth from '../hooks/useAuth';
 import { CourseData } from 'aalto-grades-common/types/course';
 import { SystemRole } from 'aalto-grades-common/types/auth';
 
-const AllCoursesView = (): JSX.Element => {
+function AllCoursesView(): JSX.Element {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<Array<CourseData>>([]);
 
@@ -48,6 +48,6 @@ const AllCoursesView = (): JSX.Element => {
       <CourseTable data={courses} />
     </>
   );
-};
+}
 
 export default AllCoursesView;

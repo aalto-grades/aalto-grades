@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { act, render, screen, waitFor } from '@testing-library/react';
@@ -11,13 +10,13 @@ import CourseResultsView from '../components/CourseResultsView';
 
 describe('Tests for CourseResultsView components', () => {
 
-  const renderCourseResultsView = async () => {
+  async function renderCourseResultsView() {
     return render(
       <BrowserRouter>
         <CourseResultsView />
       </BrowserRouter>
     );
-  };
+  }
 
   test('CourseResultsTable should render the correct number of rows', async () => {
 

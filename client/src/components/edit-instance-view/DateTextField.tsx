@@ -2,11 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@mui/material/TextField';
 
-const DateTextField = ({ fieldData, value, setFunction, minWidth }) => {
+function DateTextField({ fieldData, value, setFunction, minWidth }) {
   return (
     <TextField
       sx={{ minWidth: minWidth }}
@@ -20,7 +19,7 @@ const DateTextField = ({ fieldData, value, setFunction, minWidth }) => {
       onChange={({ target }) => setFunction(target.value)}
     />
   );
-};
+}
 
 DateTextField.propTypes = {
   fieldData: PropTypes.object,

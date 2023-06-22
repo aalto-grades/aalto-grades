@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import PropTypes from 'prop-types';
 import TableHead from '@mui/material/TableHead';
 import TableSortLabel from '@mui/material/TableSortLabel';
@@ -11,7 +10,7 @@ import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import Box from '@mui/material/Box';
 
-const CourseResultsTableHead = ({ order, orderBy, onRequestSort }) => {
+function CourseResultsTableHead({ order, orderBy, onRequestSort }) {
 
   const rows = [
     {
@@ -61,7 +60,7 @@ const CourseResultsTableHead = ({ order, orderBy, onRequestSort }) => {
       </TableRow>
     </TableHead>
   );
-};
+}
 
 CourseResultsTableHead.propTypes = {
   onRequestSort: PropTypes.func.isRequired,

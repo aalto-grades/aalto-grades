@@ -11,7 +11,7 @@ import useAuth from '../../hooks/useAuth';
 import { SystemRole } from 'aalto-grades-common/types/auth';
 import { SignupCredentials } from '../../types/auth';
 
-const Signup = (): JSX.Element => {
+function Signup(): JSX.Element {
 
   const navigate = useNavigate();
   const { setAuth } = useAuth();
@@ -47,6 +47,6 @@ const Signup = (): JSX.Element => {
       <SignupForm addUser={addUser} />
     </div>
   );
-};
+}
 
 export default Signup;

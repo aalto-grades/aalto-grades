@@ -9,7 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 
-const DynamicTextFieldArray = ({ fieldData, values, setFunction }) => {
+function DynamicTextFieldArray({ fieldData, values, setFunction }) {
 
   function addFields() {
     setFunction([...values, '']);
@@ -64,7 +64,7 @@ const DynamicTextFieldArray = ({ fieldData, values, setFunction }) => {
       ))}
     </Box>
   );
-};
+}
 
 DynamicTextFieldArray.propTypes = {
   values: PropTypes.array,

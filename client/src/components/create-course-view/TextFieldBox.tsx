@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
@@ -14,7 +13,7 @@ const inputProps = {
   }
 };
 
-const TextFieldBox = ({ fieldData, setFunction }) => {
+function TextFieldBox({ fieldData, setFunction }) {
   const { fieldId, fieldLabel, fieldHelperText } = fieldData;
   const theme = useTheme();
 
@@ -42,7 +41,7 @@ const TextFieldBox = ({ fieldData, setFunction }) => {
       </TextField>
     </Box>
   );
-};
+}
 
 TextFieldBox.propTypes = {
   fieldData: PropTypes.object,

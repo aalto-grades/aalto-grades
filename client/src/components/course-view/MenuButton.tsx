@@ -49,7 +49,7 @@ const StyledMenu = styled<any>((props) => (
   },
 }));
 
-const MenuButton = ({ label, options }) => {
+function MenuButton({ label, options }) {
   const [anchorEl, setAnchorEl] = useState<any>(null);
   const open: boolean = Boolean(anchorEl);
 
@@ -105,7 +105,7 @@ const MenuButton = ({ label, options }) => {
       </StyledMenu>
     </div>
   );
-};
+}
 
 MenuButton.propTypes = {
   label: PropTypes.string,

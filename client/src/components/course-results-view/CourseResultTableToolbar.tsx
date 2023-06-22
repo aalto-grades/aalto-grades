@@ -17,9 +17,9 @@ import MenuButton from '../course-view/MenuButton';
 import FileLoadDialog from '../course-view/FileLoadDialog';
 import SisuExportDialog from './SisuExportDialog';
 
-const CourseResultsTableToolbar = (
+function CourseResultsTableToolbar(
   { search, setSearch, calculateFinalGrades, updateGrades, downloadCsvTemplate }
-): JSX.Element => {
+): JSX.Element {
   const { instanceId } = useParams();
 
   const [showFileDialog, setShowFileDialog] = useState<boolean>(false);
@@ -102,7 +102,7 @@ const CourseResultsTableToolbar = (
       </Box>
     </Toolbar>
   );
-};
+}
 
 CourseResultsTableToolbar.propTypes = {
   search: PropTypes.string,

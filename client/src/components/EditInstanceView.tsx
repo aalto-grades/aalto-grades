@@ -13,7 +13,7 @@ import { CourseInstanceData } from 'aalto-grades-common/types/course';
 
 // TODO: update actual instance/save basic information
 
-const EditInstanceView = () => {
+function EditInstanceView() {
   const { sisuInstanceId } = useParams();
   const [instance, setInstance] = useState<CourseInstanceData>();
 
@@ -42,6 +42,6 @@ const EditInstanceView = () => {
       }
     </Container>
   );
-};
+}
 
 export default EditInstanceView;
