@@ -235,6 +235,6 @@ function App(): JSX.Element {
       </AppContainer>
     </ThemeProvider>
   );
-};
+}
 
 export default App;
