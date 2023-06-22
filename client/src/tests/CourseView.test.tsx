@@ -20,14 +20,14 @@ afterEach(cleanup);
 
 describe('Tests for CourseView component', () => {
 
-  const renderCourseView = (auth) => {
+  function renderCourseView(auth) {
 
-    const mockResponseInstances = { courseInstances: mockInstances };
+    const mockResponseInstances = mockInstances;
     (instancesService.getInstances as jest.Mock).mockRejectedValue('Network error');
     (instancesService.getInstances as jest.Mock).mockResolvedValue(mockResponseInstances);
 
 
-    const mockResponseCourse = { course: mockCourses[0] };
+    const mockResponseCourse = mockCourses[0];
     (coursesService.getCourse as jest.Mock).mockRejectedValue('Network error');
     (coursesService.getCourse as jest.Mock).mockResolvedValue(mockResponseCourse);
 
@@ -40,7 +40,7 @@ describe('Tests for CourseView component', () => {
         </AuthContext.Provider>
       </MemoryRouter>
     );
-  };
+  }
 
 
   test(

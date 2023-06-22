@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -36,13 +36,13 @@ const SelectFormulaView = () => {
     setFormulas(mockFormulas);
   }, []);
 
-  const navigateToCourseView = () => {
+  function navigateToCourseView() {
     navigate(`/course-view/${courseId}`, { replace: true });
-  };
+  }
 
-  const navigateToAttributeSelection = () => {
+  function navigateToAttributeSelection() {
     navigate(`/${courseId}/formula-attributes/${instanceId}`, { replace: true });
-  };
+  }
 
   // TODO: How to differentiate between course total grade and assigment grade?
 

@@ -53,3 +53,8 @@ export enum CourseInstanceRoleType {
   Teacher = 'TEACHER',
   TeacherInCharge = 'TEACHER_IN_CHARGE',
 }
+
+export interface CoursesOfUser {
+  current: Array<CourseData>,
+  previous: Array<CourseData>
+}

@@ -52,9 +52,9 @@ describe(
   'Test InstanceSummaryView components when no attainments and successfull instance creation',
   () => {
 
-    const renderInstanceSummaryView = () => {
+    function renderInstanceSummaryView() {
 
-      const mockResponseInstanceCreation = { courseInstance: { id: 22 } };
+      const mockResponseInstanceCreation = 22;
 
       (instancesService.createInstance as jest.Mock).mockResolvedValue(
         mockResponseInstanceCreation
@@ -76,7 +76,7 @@ describe(
           </Routes>
         </MemoryRouter>
       );
-    };
+    }
 
     test(
       'InstanceSummaryView should render the InstanceSummaryView and'

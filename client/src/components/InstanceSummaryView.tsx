@@ -73,14 +73,16 @@ const InstanceSummaryView = () => {
     alertOpen2, setAlertOpen2
   ] = useSnackPackAlerts();
 
-  const onGoBack = () => {
+  function onGoBack() {
     navigate('/' + courseId + '/add-attainments/' + sisuInstanceId);
-  };
+  }
 
   // Helper function
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  function sleep(ms) {
+    return new Promise(r => setTimeout(r, ms));
+  }
 
-  const onCreateInstance = async () => {
+  async function onCreateInstance() {
 
     // attempt to create instance
     try {
@@ -99,7 +101,7 @@ const InstanceSummaryView = () => {
         startDate: startDate,
         endDate: endDate
       };
-      const instanceResponse = await instancesService.createInstance(courseId, instanceObj);
+      const courseInstanceId = await instancesService.createInstance(courseId, instanceObj);
       setInstanceAlert((prev) => [...prev,
         addedAttainments.length === 0 ? successMsgWithoutAttainments : successMsgInstance]
       );
@@ -111,7 +113,7 @@ const InstanceSummaryView = () => {
           const formattedAttainments = attainmentServices.formatStringsToDates(addedAttainments);
           await Promise.all(formattedAttainments.map(async (attainment) => {
             await attainmentServices.addAttainment(
-              courseId, instanceResponse.courseInstance.id, attainment
+              courseId, courseInstanceId, attainment
             );
           }));
           setAttainmentAlert((prev) => [...prev, successMsgAttainments]);
@@ -126,7 +128,7 @@ const InstanceSummaryView = () => {
     } catch (err) {
       setInstanceAlert((prev) => [...prev, errorMsgInstance]);
     }
-  };
+  }
 
   return (
     <Box sx={{ display: 'grid', gap: 1.5, ml: '7.5vw', mr: '7.5vw' }}>

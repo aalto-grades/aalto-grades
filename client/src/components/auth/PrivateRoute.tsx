@@ -45,8 +45,8 @@ const PrivateRoute = ({ children, roles }: {
 
   // only load page after token has been retrieved
   if (!loading) {
-    // if role can be found -> token exists
-    if (auth.role) {
+    // If auth is not null -> token exists
+    if (auth) {
       // check if role is in the list of authorised roles
       if (roles.includes(auth.role)) {
         return (

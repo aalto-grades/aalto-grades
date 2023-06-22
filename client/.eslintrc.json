@@ -36,14 +36,8 @@
       "error",
       "always"
     ],
-    "react/react-in-jsx-scope": [
-      0,
-      "off"
-    ],
-    "no-undef": [
-      0,
-      "off"
-    ],
+    "react/jsx-uses-react": "off",
+    "react/react-in-jsx-scope": "off",
     "object-curly-spacing": [
       "error",
       "always"

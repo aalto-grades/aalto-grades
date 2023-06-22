@@ -582,6 +582,11 @@ describe(
   'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv/sisu' +
   ' - export Sisu compatible grading in CSV',
   () => {
+    jest
+      .spyOn(global.Date, 'now')
+      .mockImplementation((): number => {
+        return new Date('2023-06-21').valueOf();
+      });
 
     it('should export CSV succesfully when course results are found', async () => {
       res = await request

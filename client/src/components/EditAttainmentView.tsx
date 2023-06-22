@@ -28,7 +28,7 @@ const EditAttainmentView = () => {
       } = useOutletContext<any>());
   }
 
-  const getAttainment = () => {
+  function getAttainment() {
     // If this view is opened from the course view, get attainment from DB
     // Else the attainment is being edited during the creation of an instance so
     // gotten from the context
@@ -50,7 +50,7 @@ const EditAttainmentView = () => {
     } else {
       console.log('Attainment could not be found');
     }
-  };
+  }
 
   const [attainments, setAttainments] = useState(getAttainment());
   const [deletedAttainments, setDeletedAttainments] = useState([]);

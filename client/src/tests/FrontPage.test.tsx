@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
@@ -16,13 +15,11 @@ afterEach(cleanup);
 
 describe('Tests for FrontPage component', () => {
 
-  const renderFrontPage = async (auth) => {
+  async function renderFrontPage(auth) {
 
     const mockResponse = {
-      courses: {
-        current: [mockCourses[0]],
-        previous: [mockCourses[1]]
-      }
+      current: [mockCourses[0]],
+      previous: [mockCourses[1]]
     };
 
     (coursesService.getCoursesOfUser as jest.Mock).mockRejectedValue('Network error');
@@ -35,7 +32,7 @@ describe('Tests for FrontPage component', () => {
         </AuthContext.Provider>
       </BrowserRouter>
     );
-  };
+  }
 
   test(
     'FrontPage should render current courses and previous courses regardless of user role',
