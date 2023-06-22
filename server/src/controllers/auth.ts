@@ -214,7 +214,7 @@ passport.use(
     async (token: JwtClaims, done: VerifiedCallback): Promise<void> => {
       try {
         return done(null, token);
-      } catch(error: unknown) {
+      } catch (error: unknown) {
         return done(error, false);
       }
     }

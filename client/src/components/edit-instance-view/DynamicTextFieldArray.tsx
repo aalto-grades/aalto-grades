@@ -28,7 +28,7 @@ const DynamicTextFieldArray = ({ fieldData, values, setFunction }) => {
     setFunction(fields);
   }
 
-  return(
+  return (
     <Box sx={{ display: 'flex',  alignItems: 'flex-start', flexDirection: 'column' }}>
       {values.map((item, index) => (
         index === values.length - 1 ?

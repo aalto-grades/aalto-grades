@@ -9,10 +9,10 @@ import CourseCard from './CourseCard';
 
 
 const BasicGrid = ({ data }) => {
-  return(
+  return (
     <Grid2 container spacing={3} sx={{ my: 2 }}>
       {data.map(course => {
-        return(
+        return (
           <Grid2 xs={12} sm={6} md={6} lg={4} xl={3} key={course.id}>
             <CourseCard course={course}/>
           </Grid2>

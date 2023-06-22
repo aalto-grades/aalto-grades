@@ -51,7 +51,7 @@ const AttributeTextFields = ({
   return (
     formulaAttributeNames.map((attribute) => {
       const attributeLabel = formulaService.getAttributeLabel(attribute);
-      return(
+      return (
         <StringTextField
           key={attribute}
           fieldData={{ fieldId: 'attribute_' + attribute, fieldLabel: attributeLabel }}

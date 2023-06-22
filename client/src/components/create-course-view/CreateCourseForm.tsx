@@ -73,7 +73,7 @@ const CreateCourseForm = ({ addCourse }) => {
     }
   }
 
-  return(
+  return (
     <Container maxWidth="sm" sx={{ textAlign: 'right' }}>
       <form onSubmit={handleSubmit}>
         <TextFieldBox fieldData={codeData} setFunction={setCode}/>

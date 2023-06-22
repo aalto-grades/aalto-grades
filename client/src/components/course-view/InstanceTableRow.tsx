@@ -11,7 +11,7 @@ import textFormatServices from '../../services/textFormat';
 const InstanceTableRow = ({ instance, onClick, selected }) => {
   const { id, startDate, endDate, type } = instance;
 
-  return(
+  return (
     <TableRow
       key={id}
       hover={true}

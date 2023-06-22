@@ -110,7 +110,7 @@ const EditInstanceForm = ({ instance }) => {
     }
   }
 
-  return(
+  return (
     <form onSubmit={handleSubmit}>
       <Box sx={{
         display: 'flex',

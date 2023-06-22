@@ -11,7 +11,7 @@ import InstanceTableRow from './InstanceTableRow';
 import sortingServices from '../../services/sorting';
 
 const InstancesTable = ({ data, current, onClick }) => {
-  return(
+  return (
     <Table>
       <TableHead>
         <InstanceTableHead/>

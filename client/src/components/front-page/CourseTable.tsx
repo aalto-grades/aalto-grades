@@ -12,7 +12,7 @@ import CourseHeadTableRow from './CourseHeadTableRow';
 import sortingServices from '../../services/sorting';
 
 const CourseTable = ({ data }) => {
-  return(
+  return (
     <Table>
       <TableHead>
         <CourseHeadTableRow/>

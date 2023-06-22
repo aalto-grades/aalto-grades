@@ -25,7 +25,7 @@ const headCells = [{
 // for now the TableSortLabel element is static and displayd only for the code column
 // because the rows are sorted by the course code
 const CourseHeadTableRow = () => {
-  return(
+  return (
     <TableRow>
       {headCells.map((headCell) => (
         headCell.id === 'code' ?

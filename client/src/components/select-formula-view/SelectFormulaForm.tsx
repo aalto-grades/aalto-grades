@@ -63,14 +63,14 @@ const SelectFormulaForm = ({
   // if not, shows error message
   function canBeSubmitted() {
     let noErrors = true;
-    if(selectedAttainments.length === 0) {
+    if (selectedAttainments.length === 0) {
       setCheckboxError('You must select at least one study attainment');
       noErrors = false;
     } else {
       // if an error was previously present, clear it
       setCheckboxError('');
     }
-    if(selectedFormula.name === undefined) {
+    if (selectedFormula.name === undefined) {
       setFormulaError('You must select a formula');
       noErrors = false;
     } else {
@@ -121,7 +121,7 @@ const SelectFormulaForm = ({
 
   function handleCheckboxChange(event) {
     const selectedAttainment = attainments.find(attainment => attainment.name == event.target.name);
-    if(event.target.checked) {
+    if (event.target.checked) {
       setSelectedAttainments(prev => [...prev, selectedAttainment]);
     } else {
       setSelectedAttainments(prev => prev.filter(attainment => attainment !== selectedAttainment));

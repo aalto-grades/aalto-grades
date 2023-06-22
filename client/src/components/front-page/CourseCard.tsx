@@ -16,7 +16,7 @@ const CourseCard = ({ course }) => {
   const navigate = useNavigate();
   const { id, name, courseCode, department } = course;
 
-  return(
+  return (
     <Card>
       <CardContent>
         <Typography variant="h6" align="left" sx={{ flexGrow: 1 }}>

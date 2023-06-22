@@ -73,7 +73,7 @@ const CourseView = (): JSX.Element => {
     }
   }
 
-  return(
+  return (
     <Box sx={{ mx: -2.5 }}>
       {
         courseDetails &&

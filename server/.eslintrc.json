@@ -74,6 +74,13 @@
       "error",
       "declaration"
     ],
+    "keyword-spacing": [
+      "error",
+      {
+        "before": true,
+        "after": true
+      }
+    ],
     "@typescript-eslint/typedef": [
       "error",
       {

@@ -18,7 +18,7 @@ const TextFieldBox = ({ fieldData, setFunction }) => {
   const { fieldId, fieldLabel, fieldHelperText } = fieldData;
   const theme = useTheme();
 
-  return(
+  return (
     <Box sx={{
       display: 'flex',
       alignItems: 'flex-start',

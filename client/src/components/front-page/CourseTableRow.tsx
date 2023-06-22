@@ -13,7 +13,7 @@ const CourseTableRow = ({ course }) => {
   const navigate = useNavigate();
   const { id, name, courseCode, department } = course;
 
-  return(
+  return (
     <TableRow
       id={`ag_see_instances_tr_${id}`}
       key={id}
