@@ -13,9 +13,9 @@ import Grid from '@mui/material/Grid';
 import { SystemRole } from 'aalto-grades-common/types/auth';
 import { SignupCredentials } from '../../types/auth';
 
-const SignupForm = ({ addUser }: {
+function SignupForm({ addUser }: {
   addUser: (userObject: SignupCredentials) => Promise<void>
-}) => {
+}) {
 
   const [name, setName] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -105,7 +105,7 @@ const SignupForm = ({ addUser }: {
       </form>
     </>
   );
-};
+}
 
 SignupForm.propTypes = {
   addUser: PropTypes.func

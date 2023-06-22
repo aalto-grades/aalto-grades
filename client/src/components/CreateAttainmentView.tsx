@@ -11,7 +11,7 @@ import Box from '@mui/material/Box';
 import Attainment from './create-attainment/Attainment';
 import attainmentServices from '../services/attainments';
 
-const CreateAttainmentView = () => {
+function CreateAttainmentView() {
   const navigate = useNavigate();
   const { courseId, instanceId, sisuInstanceId } = useParams();
   let addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId;
@@ -82,7 +82,7 @@ const CreateAttainmentView = () => {
     setAttainments(updatedAttainments);
   }
 
-  return(
+  return (
     <>
       <Container maxWidth="md" sx={{ textAlign: 'right' }}>
         <Typography variant="h1" align='left' sx={{ flexGrow: 1, mb: 4 }}>
@@ -130,6 +130,6 @@ const CreateAttainmentView = () => {
       </Container>
     </>
   );
-};
+}
 
 export default CreateAttainmentView;

@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { act, render, screen, waitFor, cleanup } from '@testing-library/react';
@@ -16,7 +15,7 @@ afterEach(cleanup);
 
 describe('Tests for button component displaying user data and logout', () => {
 
-  const renderButton = async (auth) => {
+  async function renderButton(auth) {
     return render(
       <BrowserRouter>
         <AuthContext.Provider value={{ auth }}>
@@ -24,7 +23,7 @@ describe('Tests for button component displaying user data and logout', () => {
         </AuthContext.Provider>
       </BrowserRouter>
     );
-  };
+  }
 
   test('User button should display the currently logged in users name', async () => {
     const auth = { id: 1, role: SystemRole.User, name: 'John Doe' };

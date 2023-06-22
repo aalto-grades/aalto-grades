@@ -58,7 +58,7 @@ const AccordionSummary = styled<any>((props) => (
   },
 }));
 
-const AccordionDetails = ({ out, children }) => {
+function AccordionDetails({ out, children }) {
   const margin = out ? '21px' : '60px';
   return (
     <Box sx={{
@@ -78,14 +78,14 @@ const AccordionDetails = ({ out, children }) => {
       {children}
     </Box>
   );
-};
+}
 
 AccordionDetails.propTypes = {
   children: PropTypes.element,
   out: PropTypes.bool
 };
 
-const AttainmentText = ({ name, formulaId }) => {
+function AttainmentText({ name, formulaId }) {
   return (
     <Box sx={{ display: 'flex',
       flexDirection: 'row',
@@ -104,7 +104,7 @@ const AttainmentText = ({ name, formulaId }) => {
       }
     </Box>
   );
-};
+}
 
 AttainmentText.propTypes = {
   name: PropTypes.string,
@@ -113,7 +113,7 @@ AttainmentText.propTypes = {
 
 export { AccordionDetails, AttainmentText };
 
-const CustomAccordion = ({ attainments, attainmentKey }) => {
+function CustomAccordion({ attainments, attainmentKey }) {
 
   const [expanded, setExpanded] = useState<any>(new Set());
   const [selected, setSelected] = useState<any>('');
@@ -184,7 +184,7 @@ const CustomAccordion = ({ attainments, attainmentKey }) => {
         })}
     </>
   );
-};
+}
 
 CustomAccordion.propTypes = {
   attainments: PropTypes.array,

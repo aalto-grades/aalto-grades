@@ -17,7 +17,7 @@ describe('Tests for FormulaAttributesView components', () => {
     selectedFormula: mockFormulas[0]
   };
 
-  const renderFormulaAttributesView = async () => {
+  async function renderFormulaAttributesView() {
 
     return render(
       <MemoryRouter initialEntries={['/A-12345/formula-attributes/test']}>
@@ -31,7 +31,7 @@ describe('Tests for FormulaAttributesView components', () => {
         </Routes>
       </MemoryRouter>
     );
-  };
+  }
 
   test('FormulaAttributesView should contain all of the appropriate components', async () => {
 

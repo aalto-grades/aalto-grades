@@ -83,7 +83,7 @@ const languageOptions = [
   }
 ];
 
-const SisuExportDialog = ({ open, handleClose }): JSX.Element => {
+function SisuExportDialog({ open, handleClose }): JSX.Element {
   const { courseId, instanceId } = useParams();
 
   // state variables handling the alert messages.
@@ -217,7 +217,7 @@ const SisuExportDialog = ({ open, handleClose }): JSX.Element => {
       />
     </>
   );
-};
+}
 
 SisuExportDialog.propTypes = {
   open: PropTypes.bool,

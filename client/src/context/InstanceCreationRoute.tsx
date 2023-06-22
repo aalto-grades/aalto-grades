@@ -7,7 +7,7 @@ import { Outlet } from 'react-router-dom';
 
 // TODO ON INSTANCE CREATION END: EMPTY THIS CONTEXT?
 
-export const InstanceCreationRoute = () => {
+export function InstanceCreationRoute() {
   const [addedAttainments, setAddedAttainments] = useState([]);
   const [suggestedAttainments, setSuggestedAttainments] = useState([]);
   const [attainmentIncrementId, setIncrementId] = useState(0);
@@ -40,6 +40,6 @@ export const InstanceCreationRoute = () => {
   );
 
   return <Outlet context={value} />;
-};
+}
 
 export default InstanceCreationRoute;

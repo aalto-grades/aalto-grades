@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import PropTypes from 'prop-types';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -18,7 +17,7 @@ const HoverExpandMoreIcon = styled<any>(ExpandMoreIcon)(({ theme }) => ({
   }
 }));
 
-const ViewFormulaAccordion = ({ codeSnippet }) => {
+function ViewFormulaAccordion({ codeSnippet }) {
 
   return (
     <Container>
@@ -41,7 +40,7 @@ const ViewFormulaAccordion = ({ codeSnippet }) => {
       </Accordion>
     </Container>
   );
-};
+}
 
 ViewFormulaAccordion.propTypes = {
   codeSnippet: PropTypes.string,

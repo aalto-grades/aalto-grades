@@ -11,7 +11,7 @@ import useAuth from '../../hooks/useAuth';
 import { SystemRole } from 'aalto-grades-common/types/auth';
 import { LoginCredentials } from '../../types/auth';
 
-const Login = (): JSX.Element => {
+function Login(): JSX.Element {
 
   const { setAuth } = useAuth();
 
@@ -49,6 +49,6 @@ const Login = (): JSX.Element => {
       <LoginForm loginUser={loginUser}/>
     </div>
   );
-};
+}
 
 export default Login;

@@ -11,9 +11,9 @@ const AuthContext = createContext<{
   setAuth?: (auth: LoginResult) => void
     }>({});
 
-export const AuthProvider = ({ children }: {
+export function AuthProvider({ children }: {
   children: JSX.Element
-}): JSX.Element => {
+}): JSX.Element {
   const [auth, setAuth] = useState<LoginResult>(null);
 
   return (
@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }: {
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
 AuthProvider.propTypes = {
   children: PropTypes.element

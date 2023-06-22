@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import CreateCourseForm from './create-course-view/CreateCourseForm';
 import coursesService from '../services/courses';
 
-const CreateCourseView = () => {
+function CreateCourseView() {
   const navigate = useNavigate();
 
   async function addCourse(courseObject): Promise<void> {
@@ -19,7 +19,7 @@ const CreateCourseView = () => {
     }
   }
 
-  return(
+  return (
     <>
       <Typography variant="h1" sx={{ flexGrow: 1, mb: 4 }}>
         Create a New Course
@@ -27,6 +27,6 @@ const CreateCourseView = () => {
       <CreateCourseForm addCourse={addCourse}/>
     </>
   );
-};
+}
 
 export default CreateCourseView;

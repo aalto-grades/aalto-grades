@@ -13,7 +13,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import useAuth from '../../hooks/useAuth';
 import useLogout from '../../hooks/useLogout';
 
-const UserButton = (): JSX.Element => {
+function UserButton(): JSX.Element {
   const logout = useLogout();
   const navigate = useNavigate();
   const { auth } = useAuth();
@@ -67,6 +67,6 @@ const UserButton = (): JSX.Element => {
       </Menu>
     </>
   );
-};
+}
 
 export default UserButton;

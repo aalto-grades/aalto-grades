@@ -25,7 +25,7 @@ In render:
   />
 */
 
-const useSnackPackAlerts = () => {
+function useSnackPackAlerts() {
 
   // state variables for alert messages
   const [snackPack, setSnackPack] = useState([]);
@@ -46,6 +46,6 @@ const useSnackPackAlerts = () => {
   }, [snackPack, messageInfo, alertOpen]);
 
   return [setSnackPack, messageInfo, setMessageInfo, alertOpen, setAlertOpen];
-};
+}
 
 export default useSnackPackAlerts;

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
@@ -23,9 +23,9 @@ import AlertSnackbar from '../alerts/AlertSnackbar';
 import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
 
 
-const SelectFormulaForm = ({
+function SelectFormulaForm({
   attainments, formulas, navigateToCourseView, navigateToAttributeSelection
-}) => {
+}) {
 
   const [codeSnippet, setCodeSnippet] = useState<any>('');
   const [checkboxError, setCheckboxError] = useState<any>('');
@@ -63,14 +63,14 @@ const SelectFormulaForm = ({
   // if not, shows error message
   function canBeSubmitted() {
     let noErrors = true;
-    if(selectedAttainments.length === 0) {
+    if (selectedAttainments.length === 0) {
       setCheckboxError('You must select at least one study attainment');
       noErrors = false;
     } else {
       // if an error was previously present, clear it
       setCheckboxError('');
     }
-    if(selectedFormula.name === undefined) {
+    if (selectedFormula.name === undefined) {
       setFormulaError('You must select a formula');
       noErrors = false;
     } else {
@@ -121,7 +121,7 @@ const SelectFormulaForm = ({
 
   function handleCheckboxChange(event) {
     const selectedAttainment = attainments.find(attainment => attainment.name == event.target.name);
-    if(event.target.checked) {
+    if (event.target.checked) {
       setSelectedAttainments(prev => [...prev, selectedAttainment]);
     } else {
       setSelectedAttainments(prev => prev.filter(attainment => attainment !== selectedAttainment));
@@ -259,7 +259,7 @@ const SelectFormulaForm = ({
     </form>
   );
 
-};
+}
 
 SelectFormulaForm.propTypes = {
   attainments: PropTypes.array,

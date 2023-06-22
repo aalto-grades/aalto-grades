@@ -2,16 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import PropTypes from 'prop-types';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import textFormatServices from '../../services/textFormat';
 
-const InstanceTableRow = ({ instance, onClick, selected }) => {
+function InstanceTableRow({ instance, onClick, selected }) {
   const { id, startDate, endDate, type } = instance;
 
-  return(
+  return (
     <TableRow
       key={id}
       hover={true}
@@ -23,7 +22,7 @@ const InstanceTableRow = ({ instance, onClick, selected }) => {
       <TableCell>{textFormatServices.formatCourseType(type)}</TableCell>
     </TableRow>
   );
-};
+}
 
 InstanceTableRow.propTypes = {
   instance: PropTypes.object,

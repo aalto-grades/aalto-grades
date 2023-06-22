@@ -43,7 +43,7 @@ const errorMsgAttainments: Message = {
   severity: 'error'
 };
 
-const InstanceSummaryView = () => {
+function InstanceSummaryView() {
   const navigate = useNavigate();
   const { courseId, sisuInstanceId } = useParams();
 
@@ -252,6 +252,6 @@ const InstanceSummaryView = () => {
       }
     </Box>
   );
-};
+}
 
 export default InstanceSummaryView;

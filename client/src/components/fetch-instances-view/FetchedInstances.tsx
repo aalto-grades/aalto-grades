@@ -19,7 +19,7 @@ const HoverBox = styled<any>(Box)(({ theme }) => ({
   }
 }));
 
-const InstanceBox = ({ courseId, instance }) => {
+function InstanceBox({ courseId, instance }) {
   const navigate = useNavigate();
   const { sisuCourseInstanceId, startDate, endDate, type } = instance;
 
@@ -51,7 +51,7 @@ const InstanceBox = ({ courseId, instance }) => {
       />
     </HoverBox>
   );
-};
+}
 
 InstanceBox.propTypes = {
   // Once courseId is fixed to courseId from courseCode, change to number
@@ -62,7 +62,7 @@ InstanceBox.propTypes = {
   type: PropTypes.string,
 };
 
-const FetchedInstances = ({ courseId, info }) => {
+function FetchedInstances({ courseId, info }) {
   return (
     <Box>
       {info.sort((a, b) => sortingServices.sortByDate(a.startDate, b.startDate))
@@ -72,7 +72,7 @@ const FetchedInstances = ({ courseId, info }) => {
         ))}
     </Box>
   );
-};
+}
 
 FetchedInstances.propTypes = {
   // Once courseId is fixed to courseId from courseCode, change to number

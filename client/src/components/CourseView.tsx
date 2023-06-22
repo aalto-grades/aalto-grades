@@ -24,7 +24,7 @@ import { CourseData, CourseInstanceData } from 'aalto-grades-common/types/course
 // REPLACE SOME DAY? currently this info can't be fetched from database
 const mockInstitution = 'Aalto University';
 
-const CourseView = (): JSX.Element => {
+function CourseView(): JSX.Element {
   const navigate = useNavigate();
   const { courseId } = useParams();
   const { auth } = useAuth();
@@ -73,7 +73,7 @@ const CourseView = (): JSX.Element => {
     }
   }
 
-  return(
+  return (
     <Box sx={{ mx: -2.5 }}>
       {
         courseDetails &&
@@ -159,6 +159,6 @@ const CourseView = (): JSX.Element => {
       }
     </Box>
   );
-};
+}
 
 export default CourseView;

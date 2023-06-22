@@ -5,7 +5,7 @@
 import PropTypes from 'prop-types';
 import TextField from '@mui/material/TextField';
 
-const NumberTextField = ({ fieldData, value, setFunction }) => {
+function NumberTextField({ fieldData, value, setFunction }) {
 
   const error = !(
     value.length !== 0
@@ -28,7 +28,7 @@ const NumberTextField = ({ fieldData, value, setFunction }) => {
       onChange={({ target }) => setFunction(target.value)}
     />
   );
-};
+}
 
 NumberTextField.propTypes = {
   fieldData: PropTypes.object,

@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import formulaService from '../../services/formulas';
 
-const Attainment = ({ attainment, attributes, handleAttributeChange, attainmentIndex }) => {
+function Attainment({ attainment, attributes, handleAttributeChange, attainmentIndex }) {
 
   function attributeTextFields() {
     return (
@@ -62,7 +62,7 @@ const Attainment = ({ attainment, attributes, handleAttributeChange, attainmentI
       </Box>
     </Box>
   );
-};
+}
 
 Attainment.propTypes = {
   attainment: PropTypes.object,

@@ -55,7 +55,7 @@ const teacherData = {
 
 const textFieldMinWidth = 195;
 
-const EditInstanceForm = ({ instance }) => {
+function EditInstanceForm({ instance }) {
   const navigate = useNavigate();
   const { courseId, sisuInstanceId } = useParams();
 
@@ -110,7 +110,7 @@ const EditInstanceForm = ({ instance }) => {
     }
   }
 
-  return(
+  return (
     <form onSubmit={handleSubmit}>
       <Box sx={{
         display: 'flex',
@@ -184,7 +184,7 @@ const EditInstanceForm = ({ instance }) => {
       </Box>
     </form>
   );
-};
+}
 
 EditInstanceForm.propTypes = {
   instance: PropTypes.object,

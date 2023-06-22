@@ -129,3 +129,66 @@ describe(
     );
   }
 );
+
+describe(
+  'Test GET /v1/courses/:courseId/assessment-models - add assessment model',
+  () => {
+
+    it('should add an assessment model when course exists', async () => {
+      const res: supertest.Response = await request
+        .post('/v1/courses/1/assessment-models')
+        .send({
+          name: 'new-model'
+        })
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+
+      expect(res.body.success).toBe(true);
+      expect(res.body.errors).not.toBeDefined();
+      expect(res.body.data).toBeDefined();
+      expect(res.body.data.assessmentModel).toBeDefined();
+      expect(res.body.data.assessmentModel.id).toBeDefined();
+    });
+
+    it('should respond with 400 bad request if validation fails', async () => {
+      async function badInput(input: unknown): Promise<void> {
+        const res: supertest.Response = await request
+          .post('/v1/courses/1/assessment-models')
+          .send(input as object)
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.BadRequest);
+
+        expect(res.body.success).toBe(false);
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.data).not.toBeDefined();
+      }
+
+      await badInput({ name: 5 });
+      await badInput({ name: { name: 'string' } });
+      await badInput(10);
+      await badInput({ nam: 'a name' });
+    });
+
+    it('should respond with 404 not found when course does not exist',
+      async () => {
+        const res: supertest.Response = await request
+          .post(`/v1/courses/${badId}/assessment-models`)
+          .send({
+            name: 'new-model'
+          })
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.NotFound);
+
+        expect(res.body.success).toBe(false);
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.data).not.toBeDefined();
+      }
+    );
+  }
+);

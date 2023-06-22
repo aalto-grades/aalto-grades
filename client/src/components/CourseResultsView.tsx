@@ -10,7 +10,7 @@ import CourseResultsTable from './course-results-view/CourseResultsTable';
 import AlertSnackbar from './alerts/AlertSnackbar';
 import gradesService from '../services/grades';
 
-const CourseResultsView = (): JSX.Element => {
+function CourseResultsView(): JSX.Element {
   const { courseId, instanceId } = useParams();
 
   const [students, setStudents] = useState([]);
@@ -178,6 +178,6 @@ const CourseResultsView = (): JSX.Element => {
       />
     </Box>
   );
-};
+}
 
 export default CourseResultsView;

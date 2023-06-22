@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
@@ -12,7 +12,7 @@ import Attainment from './Attainment';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
 
-const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
+function FormulaAttributesForm({ navigateToCourseView, navigateBack }) {
 
   const [attributeValues, setAttributeValues] = useState<any>([]);
   const { selectedAttainments, selectedFormula } = useOutletContext<any>();
@@ -128,7 +128,7 @@ const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
 
     </form>
   );
-};
+}
 
 FormulaAttributesForm.propTypes = {
   navigateToCourseView: PropTypes.func,

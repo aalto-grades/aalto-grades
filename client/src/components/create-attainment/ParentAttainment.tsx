@@ -20,10 +20,10 @@ import formulasService from '../../services/formulas';
 
 // An Assignmnet component with subAttainments and a formula
 
-const ParentAttainment = ({
+function ParentAttainment({
   indices, addSubAttainments, setAttainments, attainments, removeAttainment,
   formulaAttributeNames, temporaryId, setIncrementId
-}) => {
+}) {
   const navigate = useNavigate();
 
   // Functions and varibales for opening and closing the list of sub-attainments
@@ -116,7 +116,7 @@ const ParentAttainment = ({
       </Box>
     </>
   );
-};
+}
 
 ParentAttainment.propTypes = {
   addSubAttainments: PropTypes.func,

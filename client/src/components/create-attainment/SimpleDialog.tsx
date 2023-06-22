@@ -30,7 +30,7 @@ function SimpleDialog({ handleClose, open, addSubAttainments, indices, attainmen
     && (Number(numOfAttainments) >= 1)
   );
 
-  const handleSubmit = (event) => {
+  function handleSubmit(event) {
     event.preventDefault();
     try {
       addSubAttainments(numOfAttainments);
@@ -38,7 +38,7 @@ function SimpleDialog({ handleClose, open, addSubAttainments, indices, attainmen
     } catch (exception) {
       console.log(exception);
     }
-  };
+  }
 
   return (
     <Dialog open={open} >

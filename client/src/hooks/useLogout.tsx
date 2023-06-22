@@ -7,19 +7,19 @@ import useAuth from './useAuth';
 
 // custom hook for logout, used since no individual logout page will be created
 
-const useLogout = () => {
+function useLogout() {
 
   const { setAuth } = useAuth();
 
-  const logout = async () => {
+  async function logout() {
     try {
       await userService.logout();
       setAuth(null);
     } catch (exception) {
       console.log(exception);
     }
-  };
+  }
   return logout;
-};
+}
 
 export default useLogout;

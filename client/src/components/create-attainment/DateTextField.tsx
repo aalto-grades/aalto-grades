@@ -8,7 +8,7 @@ import attainmentServices from '../../services/attainments';
 
 // A TextField component used for the 'date' of an attainment and the 'expiryDate'
 
-const DateTextField = ({ fieldData, indices, attainments, setAttainments }) => {
+function DateTextField({ fieldData, indices, attainments, setAttainments }) {
 
   // Functions for handling the change of the values in the date textfields
   function handleChange(event) {
@@ -56,7 +56,7 @@ const DateTextField = ({ fieldData, indices, attainments, setAttainments }) => {
       onChange={(event) => handleChange(event)}
     />
   );
-};
+}
 
 DateTextField.propTypes = {
   fieldData: PropTypes.object,

@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import AttainmentCategory from '../attainments/AttainmentCategory';
 import MenuButton from './MenuButton';
 
-const Attainments = ({ attainments, formula, courseId, instance, handleAddPoints }) => {
+function Attainments({ attainments, formula, courseId, instance, handleAddPoints }) {
   const navigate = useNavigate();
 
   const actionOptions = [
@@ -88,7 +88,7 @@ const Attainments = ({ attainments, formula, courseId, instance, handleAddPoints
       </Box>
     </Box>
   );
-};
+}
 
 Attainments.propTypes = {
   attainments: PropTypes.array,

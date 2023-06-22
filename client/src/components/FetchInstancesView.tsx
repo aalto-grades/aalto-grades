@@ -13,7 +13,7 @@ import FetchedInstances from './fetch-instances-view/FetchedInstances';
 import instancesService from '../services/instances';
 import { CourseInstanceData } from 'aalto-grades-common/types/course';
 
-const FetchInstancesView = (): JSX.Element => {
+function FetchInstancesView(): JSX.Element {
   const navigate = useNavigate();
   const { courseId, courseCode } = useParams();
   const [instances, setInstances] = useState<Array<CourseInstanceData>>([]);
@@ -55,6 +55,6 @@ const FetchInstancesView = (): JSX.Element => {
 
     </>
   );
-};
+}
 
 export default FetchInstancesView;

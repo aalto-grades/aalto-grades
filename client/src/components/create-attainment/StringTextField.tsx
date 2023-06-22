@@ -10,7 +10,7 @@ import attainmentServices from '../../services/attainments';
 // This component is also used for the formula attribute textfields that are
 // required after specifying a formula.
 
-const StringTextField = ({ fieldData, indices, attainments, setAttainments }) => {
+function StringTextField({ fieldData, indices, attainments, setAttainments }) {
 
   // Functions for handling the change of the values in the 'New Name' textfield
   // and the textfields that represent formula attributes
@@ -62,7 +62,7 @@ const StringTextField = ({ fieldData, indices, attainments, setAttainments }) =>
       onChange={(event) => handleChange(event)}
     />
   );
-};
+}
 
 StringTextField.propTypes = {
   fieldData: PropTypes.object,

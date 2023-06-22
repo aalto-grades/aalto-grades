@@ -53,7 +53,7 @@ const errorMsg: Message = {
 // How many errors are initially rendered visible in the dialog.
 export const maxErrorsToShow: number = 5;
 
-const FileLoadDialog = ({ instanceId, handleClose, open }) => {
+function FileLoadDialog({ instanceId, handleClose, open }) {
   const { courseId } = useParams();
   const fileInput = createRef<any>();
 
@@ -229,7 +229,7 @@ const FileLoadDialog = ({ instanceId, handleClose, open }) => {
       />
     </>
   );
-};
+}
 
 FileLoadDialog.propTypes = {
   instanceId: PropTypes.number,

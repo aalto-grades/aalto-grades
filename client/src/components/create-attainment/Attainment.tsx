@@ -9,10 +9,10 @@ import attainmentServices from '../../services/attainments';
 
 // Parent component for the components LeafAttainment and ParentAttainment
 
-const Attainment = ({
+function Attainment({
   indices, attainments, setAttainments, removeAttainment,
   formulaAttributeNames, temporaryId, setIncrementId
-}) => {
+}) {
 
   function addSubAttainments(numOfAttainments): void {
     const [updatedAttainments, newTemporaryId] = attainmentServices.addSubAttainments(
@@ -48,7 +48,7 @@ const Attainment = ({
         />}
     </>
   );
-};
+}
 
 Attainment.propTypes = {
   attainments: PropTypes.array,

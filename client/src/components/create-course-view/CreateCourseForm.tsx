@@ -33,7 +33,7 @@ const organizerData = {
   fieldHelperText: 'Give the emails of the responsible teachers of the new course.'
 };*/
 
-const CreateCourseForm = ({ addCourse }) => {
+function CreateCourseForm({ addCourse }) {
 
   const [courseCode, setCode] = useState<any>('');
   const [name, setName] = useState<any>('');
@@ -73,7 +73,7 @@ const CreateCourseForm = ({ addCourse }) => {
     }
   }
 
-  return(
+  return (
     <Container maxWidth="sm" sx={{ textAlign: 'right' }}>
       <form onSubmit={handleSubmit}>
         <TextFieldBox fieldData={codeData} setFunction={setCode}/>
@@ -85,7 +85,7 @@ const CreateCourseForm = ({ addCourse }) => {
       </form>
     </Container>
   );
-};
+}
 
 CreateCourseForm.propTypes = {
   addCourse: PropTypes.func

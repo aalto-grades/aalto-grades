@@ -134,7 +134,7 @@ describe(
   'Test InstanceSummaryView components when some attainments and successfull creations',
   () => {
 
-    const renderInstanceSummaryView = () => {
+    function renderInstanceSummaryView() {
 
       const mockResponseInstanceCreation = { courseInstance: { id: 22 } };
 
@@ -158,7 +158,7 @@ describe(
           </Routes>
         </MemoryRouter>
       );
-    };
+    }
 
     test(
       'InstanceSummaryView should render 2 success alerts after'
@@ -184,7 +184,7 @@ describe(
   'Test InstanceSummaryView components when some attainments and successfull instance creation',
   () => {
 
-    const renderInstanceSummaryView = () => {
+    function renderInstanceSummaryView() {
 
       const mockResponseInstanceCreation = { courseInstance: { id: 22 } };
       (instancesService.createInstance as jest.Mock).mockResolvedValue(
@@ -205,7 +205,7 @@ describe(
           </Routes>
         </MemoryRouter>
       );
-    };
+    }
 
     test(
       'InstanceSummaryView should render 2 alerts after "create instance"'
@@ -233,7 +233,7 @@ describe(
   'Test InstanceSummaryView components when some attainments and error in instance creation',
   () => {
 
-    const renderInstanceSummaryView = () => {
+    function renderInstanceSummaryView() {
 
       (instancesService.createInstance as jest.Mock).mockRejectedValue(
         new Error('Internal server error')
@@ -251,7 +251,7 @@ describe(
           </Routes>
         </MemoryRouter>
       );
-    };
+    }
 
     test(
       'InstanceSummaryView should render 1 alert after "create instance"'

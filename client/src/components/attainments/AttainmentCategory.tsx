@@ -10,7 +10,7 @@ import textFormatServices from '../../services/textFormat';
 import formulasService from '../../services/formulas';
 
 // This component renders a top attainment (only has the intance as its parent)
-const AttainmentCategory = ({ attainment, buttons, attainmentKey }): JSX.Element => {
+function AttainmentCategory({ attainment, buttons, attainmentKey }): JSX.Element {
 
   const { name, formulaId, expiryDate, subAttainments } = attainment;
   const titlepb: string = subAttainments.length !== 0 ? '16px' : '0px';  // title padding-bottom
@@ -63,7 +63,7 @@ const AttainmentCategory = ({ attainment, buttons, attainmentKey }): JSX.Element
       </Box>
     </Box>
   );
-};
+}
 
 AttainmentCategory.propTypes = {
   attainment: PropTypes.object,

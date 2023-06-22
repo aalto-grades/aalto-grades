@@ -10,8 +10,8 @@ import InstanceTableHead from './InstanceTableHead';
 import InstanceTableRow from './InstanceTableRow';
 import sortingServices from '../../services/sorting';
 
-const InstancesTable = ({ data, current, onClick }) => {
-  return(
+function InstancesTable({ data, current, onClick }) {
+  return (
     <Table>
       <TableHead>
         <InstanceTableHead/>
@@ -30,7 +30,7 @@ const InstancesTable = ({ data, current, onClick }) => {
       </TableBody>
     </Table>
   );
-};
+}
 
 InstancesTable.propTypes = {
   data: PropTypes.array,
