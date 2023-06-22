@@ -17,7 +17,7 @@ export default class CourseInstance extends Model<
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
   declare assessmentModelId: CreationOptional<ForeignKey<AssessmentModel['id']>>;
-  declare sisuCourseInstanceId: string | null;
+  declare sisuCourseInstanceId: CreationOptional<string>;
   declare gradingScale: string;
   declare startingPeriod: string;
   declare endingPeriod: string;

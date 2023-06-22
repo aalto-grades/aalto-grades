@@ -35,12 +35,12 @@ function checkRes(courseInstance: CourseInstanceData): void {
   expect(courseInstance.type).toBeDefined();
   expect(courseInstance.gradingScale).toBeDefined();
   expect(courseInstance.teachersInCharge).toBeDefined();
-  expect(courseInstance.courseData.courseCode).toBeDefined();
-  expect(courseInstance.courseData.minCredits).toBeDefined();
-  expect(courseInstance.courseData.maxCredits).toBeDefined();
-  expect(courseInstance.courseData.department).toBeDefined();
-  expect(courseInstance.courseData.name).toBeDefined();
-  expect(courseInstance.courseData.evaluationInformation).toBeDefined();
+  expect(courseInstance.courseData?.courseCode).toBeDefined();
+  expect(courseInstance.courseData?.minCredits).toBeDefined();
+  expect(courseInstance.courseData?.maxCredits).toBeDefined();
+  expect(courseInstance.courseData?.department).toBeDefined();
+  expect(courseInstance.courseData?.name).toBeDefined();
+  expect(courseInstance.courseData?.evaluationInformation).toBeDefined();
 }
 
 describe(

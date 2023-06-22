@@ -6,9 +6,9 @@ import supertest from 'supertest';
 
 import Attainment from '../../src/database/models/attainment';
 
+import { AttainmentData } from 'aalto-grades-common/types/attainment';
 import { mockAttainment } from '../mock-data/attainment';
 import { app } from '../../src/app';
-import { AttainmentData } from '../../src/types/attainment';
 import { HttpCode } from '../../src/types/httpCode';
 import { Cookies, getCookies } from '../util/getCookies';
 

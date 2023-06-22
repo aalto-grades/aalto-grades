@@ -4,7 +4,7 @@
 
 import Attainment from '../../database/models/attainment';
 
-import { AttainmentData } from '../../types/attainment';
+import { AttainmentData } from 'aalto-grades-common/types/attainment';
 import { ApiError } from '../../types/error';
 import { HttpCode } from '../../types/httpCode';
 

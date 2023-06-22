@@ -2,17 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-export interface AttainmentRequestData {
-  parentId?: number,
-  name: string,
-  tag: string,
-  daysValid: number,
-  subAttainments: Array<AttainmentRequestData>
-}
-
 export interface AttainmentData {
-  id: number,
-  assessmentModelId: number,
+  id?: number,
+  assessmentModelId?: number,
   parentId?: number,
   tag: string,
   name: string,
