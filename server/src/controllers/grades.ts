@@ -47,7 +47,6 @@ async function studentNumbersExist(studentNumbers: Array<string>): Promise<void>
 }
 
 export async function getCsvTemplate(req: Request, res: Response): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, assessmentModel]: [course: Course, assessmentModel: AssessmentModel] =
     await validateCourseAndAssessmentModel(
       req.params.courseId, req.params.assessmentModelId
@@ -839,7 +838,7 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
         credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits,
         // Assesment date must be in form dd.mm.yyyy.
         assessmentDate: (
-          assessmentDate ? new Date(assessmentDate) : new Date()
+          assessmentDate ? new Date(assessmentDate) : new Date(Date.now())
         ).toLocaleDateString('fi-FI'),
         completionLanguage: completionLanguage ?? 'en',
         // Comment column is required, but can be empty.
