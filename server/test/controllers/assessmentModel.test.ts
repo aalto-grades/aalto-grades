@@ -69,7 +69,7 @@ describe(
     it('should respond with 409 conflict when assessment model does not belong to course',
       async () => {
         const res: supertest.Response = await request
-          .get(`/v1/courses/1/assessment-models/2`)
+          .get('/v1/courses/1/assessment-models/2')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Conflict);
