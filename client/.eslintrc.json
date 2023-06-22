@@ -20,6 +20,8 @@
     "@typescript-eslint"
   ],
   "rules": {
+    "react/jsx-uses-react": "off",
+    "react/react-in-jsx-scope": "off",
     "indent": [
       "error",
       2
@@ -36,8 +38,6 @@
       "error",
       "always"
     ],
-    "react/jsx-uses-react": "off",
-    "react/react-in-jsx-scope": "off",
     "object-curly-spacing": [
       "error",
       "always"
@@ -77,9 +77,27 @@
       "warn",
       "declaration"
     ],
+    "@typescript-eslint/typedef": [
+      "warn",
+      {
+        "arrayDestructuring": true,
+        "arrowParameter": true,
+        "memberVariableDeclaration": true,
+        "objectDestructuring": true,
+        "parameter": true,
+        "propertyDeclaration": true,
+        "variableDeclaration": true,
+        "variableDeclarationIgnoreFunction": true
+      }
+    ],
+    "@typescript-eslint/explicit-function-return-type": "warn",
     "@typescript-eslint/no-inferrable-types": "off",
-    "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-empty-function": "off",
-    "@typescript-eslint/no-non-null-assertion": "off"
+    "@typescript-eslint/array-type": [
+      "warn",
+      {
+        "default": "generic"
+      }
+    ],
+    "@typescript-eslint/no-empty-function": "warn"
   }
 }
