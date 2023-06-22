@@ -3,29 +3,46 @@
 // SPDX-License-Identifier: MIT
 
 import axios from './axios';
+import { AxiosResponse } from 'axios';
 import textFormatServices from './textFormat';
 import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
+import { AttainmentData } from 'aalto-grades-common/types/attainment';
+import { ApiResponse } from '../types/general';
 
 // Functions that are (or will be) connected to the server.
 
-async function addAttainment(courseId, instanceId, attainment) {
-  const response = await axios.post(
+async function addAttainment(
+  courseId: number | string, instanceId: number | string, attainment: AttainmentData
+): Promise<AttainmentData> {
+  const response: AxiosResponse<
+    ApiResponse<{ attainment: AttainmentData }>, unknown
+  > = await axios.post(
     `/v1/courses/${courseId}/instances/${instanceId}/attainments`,
-    attainment);
-  return response.data.data;
+    attainment
+  );
+
+  return response.data.data.attainment;
 }
 
-async function editAttainment(courseId, instanceId, attainment) {
-  const response = await axios.put(
+async function editAttainment(
+  courseId: number | string, instanceId: number | string, attainment: AttainmentData
+) {
+  const response: AxiosResponse<
+    ApiResponse<{ attainment: AttainmentData }>, unknown
+  > = await axios.put(
     `/v1/courses/${courseId}/instances/${instanceId}/attainments/${attainment.id}`,
-    attainment);
-  return response.data.data;
+    attainment
+  );
+
+  return response.data.data.attainment;
 }
 
-async function deleteAttainment(courseId, instanceId, attainmentId) {
-  const response = await axios.delete(
-    `/v1/courses/${courseId}/instances/${instanceId}/attainments/${attainmentId}`);
-  return response.data.data;
+async function deleteAttainment(
+  courseId: number | string, instanceId: number | string, attainmentId: number | string
+): Promise<void> {
+  await axios.delete(
+    `/v1/courses/${courseId}/instances/${instanceId}/attainments/${attainmentId}`
+  );
 }
 
 // Function to get mock attainments.

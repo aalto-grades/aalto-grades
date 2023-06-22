@@ -15,6 +15,7 @@ import instancesService from '../services/instances';
 import attainmentServices from '../services/attainments';
 import useSnackPackAlerts from '../hooks/useSnackPackAlerts';
 import { Message } from '../types/general';
+import { CourseInstanceData, GradingScale } from 'aalto-grades-common/types/course';
 
 const successMsgInstance: Message = {
   msg: 'Instance created successfully.',
@@ -86,8 +87,8 @@ const InstanceSummaryView = () => {
 
     // attempt to create instance
     try {
-      const instanceObj = {
-        gradingScale: textFormatServices.convertToServerGradingScale(gradingScale),
+      const instanceData: CourseInstanceData = {
+        gradingScale: textFormatServices.convertToServerGradingScale(gradingScale) as GradingScale,
         sisuCourseInstanceId: sisuInstanceId,
         type: courseType,
         // fake ! TODO: replace with teachers when figured out how to fetch ids (currently strings)
@@ -96,12 +97,10 @@ const InstanceSummaryView = () => {
         startingPeriod: startingPeriod ?? 'I',
         // fake ! TODO: delete from context and here once not required by the server in validation
         endingPeriod: endingPeriod ?? 'III',
-        minCredits: stringMinCredits,
-        maxCredits: stringMaxCredits,
         startDate: startDate,
         endDate: endDate
       };
-      const courseInstanceId = await instancesService.createInstance(courseId, instanceObj);
+      const courseInstanceId = await instancesService.createInstance(courseId, instanceData);
       setInstanceAlert((prev) => [...prev,
         addedAttainments.length === 0 ? successMsgWithoutAttainments : successMsgInstance]
       );
