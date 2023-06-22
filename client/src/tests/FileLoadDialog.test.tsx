@@ -43,12 +43,12 @@ const mockErrorResponse = {
 
 describe('FileLoadDialog test with proper csv', () => {
 
-  const renderCourseView = (auth) => {
+  function renderCourseView(auth) {
 
-    const mockResponseInstances = { courseInstances: mockInstances };
+    const mockResponseInstances = mockInstances;
     (instancesService.getInstances as jest.Mock).mockResolvedValue(mockResponseInstances);
 
-    const mockResponseCourse = { course: mockCourses[0] };
+    const mockResponseCourse = mockCourses[0];
     (coursesService.getCourse as jest.Mock).mockResolvedValue(mockResponseCourse);
 
     // succeess, nothing to worry about
@@ -63,7 +63,7 @@ describe('FileLoadDialog test with proper csv', () => {
         </AuthContext.Provider>
       </MemoryRouter>
     );
-  };
+  }
 
   test('FileLoadDialog should render', async () => {
 
@@ -153,12 +153,12 @@ describe('FileLoadDialog test with proper csv', () => {
 
 describe('FileLoadDialog test where server does not accept the file', () => {
 
-  const renderCourseView = (auth) => {
+  function renderCourseView(auth) {
 
-    const mockResponseInstances = { courseInstances: mockInstances };
+    const mockResponseInstances = mockInstances;
     (instancesService.getInstances as jest.Mock).mockResolvedValue(mockResponseInstances);
 
-    const mockResponseCourse = { course: mockCourses[0] };
+    const mockResponseCourse = mockCourses[0];
     (coursesService.getCourse as jest.Mock).mockResolvedValue(mockResponseCourse);
 
     // Mock the error.
@@ -175,7 +175,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
         </AuthContext.Provider>
       </MemoryRouter>
     );
-  };
+  }
 
   test('FileLoadDialog should not close with bad csv', async () => {
 

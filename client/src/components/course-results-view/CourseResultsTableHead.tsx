@@ -28,9 +28,11 @@ const CourseResultsTableHead = ({ order, orderBy, onRequestSort }) => {
     }
   ];
 
-  const createSortHandler = (property) => (event) => {
-    onRequestSort(event, property);
-  };
+  function createSortHandler(property) {
+    return (event) => {
+      onRequestSort(event, property);
+    };
+  }
 
   return (
     <TableHead>

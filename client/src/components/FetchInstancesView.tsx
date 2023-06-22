@@ -24,9 +24,9 @@ const FetchInstancesView = (): JSX.Element => {
       .catch((e: Error) => console.log(e.message));
   }, []);
 
-  const onCancel = (): void => {
+  function onCancel(): void {
     navigate('/course-view/' + courseId);
-  };
+  }
 
   return (
     <>

@@ -12,7 +12,7 @@ import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 
 describe('Tests for AddAttainmentsView components', () => {
 
-  const renderAddAttainmentsView = async () => {
+  async function renderAddAttainmentsView() {
     return render(
       <MemoryRouter initialEntries={['/A-12345/add-attainments/test']}>
         <Routes>
@@ -25,7 +25,7 @@ describe('Tests for AddAttainmentsView components', () => {
         </Routes>
       </MemoryRouter>
     );
-  };
+  }
 
   test(
     'AddAttainmentsView should render the AddAttainmentsView and'

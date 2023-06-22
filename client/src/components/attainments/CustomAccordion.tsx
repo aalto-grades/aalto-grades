@@ -118,23 +118,25 @@ const CustomAccordion = ({ attainments, attainmentKey }) => {
   const [expanded, setExpanded] = useState<any>(new Set());
   const [selected, setSelected] = useState<any>('');
 
-  const addToSet = (item, set) => {
+  function addToSet(item, set) {
     const copySet = new Set([...set]);
     return copySet.add(item);
-  };
+  }
 
-  const deleteFromSet = (item, set) => {
+  function deleteFromSet(item, set) {
     const copySet = new Set([...set]);
     copySet.delete(item);
     return copySet;
-  };
+  }
 
   // curried function syntax, google for a good explanation
   // basically add the panel's id to the set of expanded panels if opened, else delete from set
-  const handleChange = (panel_id) => (e, newExpanded) => {
-    setExpanded(newExpanded ? addToSet(panel_id, expanded) : deleteFromSet(panel_id, expanded));
-    setSelected(newExpanded ? panel_id : false);
-  };
+  function handleChange(panel_id) {
+    return (e, newExpanded) => {
+      setExpanded(newExpanded ? addToSet(panel_id, expanded) : deleteFromSet(panel_id, expanded));
+      setSelected(newExpanded ? panel_id : false);
+    };
+  }
 
   return (
     <>

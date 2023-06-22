@@ -16,9 +16,9 @@ afterEach(cleanup);
 
 describe('Tests for FrontPage component', () => {
 
-  const renderAllCoursesView = async (auth) => {
+  async function renderAllCoursesView(auth) {
 
-    const mockResponse = { courses: mockCourses };
+    const mockResponse = mockCourses;
 
     (coursesService.getAllCourses as jest.Mock).mockRejectedValue('Network error');
     (coursesService.getAllCourses as jest.Mock).mockResolvedValue(mockResponse);
@@ -30,7 +30,7 @@ describe('Tests for FrontPage component', () => {
         </AuthContext.Provider>
       </BrowserRouter>
     );
-  };
+  }
 
   test('AllCoursesView should render all courses regardless of user role', async () => {
     const auth = { role: null };

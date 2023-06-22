@@ -61,7 +61,7 @@ const FileLoadDialog = ({ instanceId, handleClose, open }) => {
   const [snackPack, setSnackPack] = useState<any>([]);
   const [alertOpen, setAlertOpen] = useState<boolean>(false);
   const [showErrorDialog, setShowErrorDialog] = useState<boolean>(false);
-  const [messageInfo, setMessageInfo] = useState<any>(undefined);
+  const [messageInfo, setMessageInfo] = useState<Message>(undefined);
 
   const toggleErrorDialog = () => {
     setShowErrorDialog(!showErrorDialog);
@@ -83,7 +83,7 @@ const FileLoadDialog = ({ instanceId, handleClose, open }) => {
   const [validationError, setValidationError] = useState<any>('');
   const [fileErrors, setFileErrors] = useState<any>([]);
 
-  const uploadFile = async () => {
+  async function uploadFile() {
     setSnackPack((prev) => [...prev, loadingMsg]);
     try {
       await gradesService.importCsv(courseId, instanceId, fileInput.current.files[0]);
@@ -97,7 +97,7 @@ const FileLoadDialog = ({ instanceId, handleClose, open }) => {
       }
       setSnackPack((prev) => [...prev, errorMsg]);
     }
-  };
+  }
 
   return (
     <>

@@ -40,7 +40,7 @@ const AddAttainmentsView = () => {
     }
   }, []);
 
-  const onAddClick = (attainment) => () => {
+  function onAddClick(attainment) {
     setSuggestedAttainments(
       suggestedAttainments.filter(a => a.temporaryId !== attainment.temporaryId)
     );
@@ -48,9 +48,9 @@ const AddAttainmentsView = () => {
     setAddedAttainments(
       attainmentServices.addTemporaryAttainment(addedAttainments, attainment)
     );
-  };
+  }
 
-  const onRemoveClick = (attainment) => () => {
+  function onRemoveClick(attainment) {
     setSuggestedAttainments(
       attainmentServices.addTemporaryAttainment(suggestedAttainments, attainment)
     );
@@ -58,7 +58,7 @@ const AddAttainmentsView = () => {
     setAddedAttainments(
       addedAttainments.filter(a => a.temporaryId !== attainment.temporaryId)
     );
-  };
+  }
 
   function onGoBack(): void {
     navigate('/' + courseId + '/edit-instance/' + sisuInstanceId);
@@ -100,7 +100,7 @@ const AddAttainmentsView = () => {
                   attainmentKey={'temporaryId'}
                   buttons={
                     [
-                      <Button key='add' onClick={onAddClick(attainment)}>
+                      <Button key='add' onClick={() => onAddClick(attainment)}>
                         Add
                       </Button>
                     ]
@@ -149,7 +149,7 @@ const AddAttainmentsView = () => {
                       [
                         <Button
                           key='remove'
-                          onClick={onRemoveClick(attainment)}
+                          onClick={() => onRemoveClick(attainment)}
                         >
                           Remove
                         </Button>,

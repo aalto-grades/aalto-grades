@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
@@ -17,9 +16,9 @@ describe('Tests for FetchInstancesView components', () => {
 
   const instancesLength = mockSisuInstances.length;
 
-  const renderFetchInstancesView = async () => {
+  async function renderFetchInstancesView() {
 
-    const mockResponse = { courseInstances: mockSisuInstances };
+    const mockResponse = mockSisuInstances;
 
     (instancesService.getSisuInstances as jest.Mock).mockRejectedValue('Network error');
     (instancesService.getSisuInstances as jest.Mock).mockResolvedValue(mockResponse);
@@ -29,7 +28,7 @@ describe('Tests for FetchInstancesView components', () => {
         <FetchInstancesView />
       </BrowserRouter>
     );
-  };
+  }
 
   test('FetchInstancesView should contain all of the appropriate components', async () => {
 

@@ -15,9 +15,9 @@ afterEach(cleanup);
 
 describe('Tests for EditInstanceView components', () => {
 
-  const renderEditInstanceView = async () => {
+  async function renderEditInstanceView() {
 
-    const mockResponse = { courseInstance: mockSisuInstances[0] };
+    const mockResponse = mockSisuInstances[0];
 
     (instancesService.getSisuInstance as jest.Mock).mockRejectedValue('Network error');
     (instancesService.getSisuInstance as jest.Mock).mockResolvedValue(mockResponse);
@@ -31,7 +31,7 @@ describe('Tests for EditInstanceView components', () => {
         </Routes>
       </MemoryRouter>
     );
-  };
+  }
 
   test(
     'EditInstanceView should render the EditInstanceForm and contain all of'
