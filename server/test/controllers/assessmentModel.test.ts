@@ -153,7 +153,7 @@ describe(
     });
 
     it('should respond with 400 bad request if validation fails', async () => {
-      async function badInput(input: unknown) {
+      async function badInput(input: unknown): Promise<void> {
         const res: supertest.Response = await request
           .post('/v1/courses/1/assessment-models')
           .send(input as object)
@@ -168,9 +168,9 @@ describe(
       }
 
       await badInput({ name: 5 });
-      await badInput({ name: { name: "string" } });
+      await badInput({ name: { name: 'string' } });
       await badInput(10);
-      await badInput({ nam: "a name" });
+      await badInput({ nam: 'a name' });
     });
 
     it('should respond with 404 not found when course does not exist',
@@ -191,4 +191,4 @@ describe(
       }
     );
   }
-)
+);

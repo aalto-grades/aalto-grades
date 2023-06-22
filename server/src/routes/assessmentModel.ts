@@ -72,6 +72,8 @@ export const router: Router = Router();
  *               $ref: '#/definitions/Failure'
  *       401:
  *         $ref: '#/components/responses/AuthenticationError'
+ *       403:
+ *         $ref: '#/components/responses/AuthorizationError'
  *       404:
  *         description: >
  *           A course with the given course ID or an assessment model with the
@@ -105,7 +107,6 @@ router.get(
  *     description: Get information about all the assessment models of a course.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
- *       - $ref: '#/components/parameters/assessmentModelId'
  *     responses:
  *       200:
  *         description: >
@@ -136,6 +137,8 @@ router.get(
  *               $ref: '#/definitions/Failure'
  *       401:
  *         $ref: '#/components/responses/AuthenticationError'
+ *       403:
+ *         $ref: '#/components/responses/AuthorizationError'
  *       404:
  *         description: >
  *           A course with the given course ID was not found.
@@ -152,6 +155,64 @@ router.get(
   controllerDispatcher(getAllAssessmentModels)
 );
 
+/**
+ * @swagger
+ * /v1/courses/{courseId}/assessment-models:
+ *   post:
+ *     tags: [Assessment Model]
+ *     description: Add an attainment model to a course.
+ *     parameters:
+ *       - $ref: '#/components/parameters/courseId'
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Name of the assessment model.
+ *     responses:
+ *       200:
+ *         description: >
+ *           The attainment model was added successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   $ref: '#/definitions/Success'
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     assessmentModel:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           $ref: '#/definitions/AssessmentModelId'
+ *       400:
+ *         description: >
+ *           A validation error has occurred in the URL, the given course ID is
+ *           not a positive integer.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
+ *       403:
+ *         $ref: '#/components/responses/AuthorizationError'
+ *       404:
+ *         description: >
+ *           A course with the given course ID was not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *     security:
+ *       - cookieAuth: []
+ */
 router.post(
   '/v1/courses/:courseId/assessment-models',
   passport.authenticate('jwt', { session: false }),
