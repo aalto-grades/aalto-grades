@@ -20,9 +20,8 @@ export interface AttainmentData {
   subAttainments?: Array<AttainmentData>
 }
 
-export interface AssessmentMethodData {
+export interface AssessmentModelData {
   id: number,
   courseId: number,
   name: string
-  // TODO: Attainment tree?
 }
