@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Params, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Toolbar from '@mui/material/Toolbar';
 import TextField from '@mui/material/TextField';
@@ -20,7 +20,7 @@ import SisuExportDialog from './SisuExportDialog';
 function CourseResultsTableToolbar(
   { search, setSearch, calculateFinalGrades, updateGrades, downloadCsvTemplate }
 ): JSX.Element {
-  const { instanceId } = useParams();
+  const { instanceId }: Params = useParams();
 
   const [showFileDialog, setShowFileDialog] = useState<boolean>(false);
   const [showSisuDialog, setShowSisuDialog] = useState<boolean>(false);

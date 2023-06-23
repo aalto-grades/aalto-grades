@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Params, useParams } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -14,7 +14,7 @@ import { CourseInstanceData } from 'aalto-grades-common/types/course';
 // TODO: update actual instance/save basic information
 
 function EditInstanceView() {
-  const { sisuInstanceId } = useParams();
+  const { sisuInstanceId }: Params = useParams();
   const [instance, setInstance] = useState<CourseInstanceData>();
 
   useEffect(() => {

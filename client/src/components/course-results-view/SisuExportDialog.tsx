@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Params, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Dialog from '@mui/material/Dialog';
 import TextField from '@mui/material/TextField';
@@ -84,7 +84,7 @@ const languageOptions = [
 ];
 
 function SisuExportDialog({ open, handleClose }): JSX.Element {
-  const { courseId, instanceId } = useParams();
+  const { courseId, instanceId }: Params = useParams();
 
   // state variables handling the alert messages.
   const [snackPack, setSnackPack] = useState<any>([]);

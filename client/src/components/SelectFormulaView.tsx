@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { Params, useParams, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import SelectFormulaForm from './select-formula-view/SelectFormulaForm';
@@ -12,7 +12,7 @@ import mockAttainments from '../mock-data/mockAttainments';
 import mockFormulas from '../mock-data/mockFormulas';
 
 function SelectFormulaView() {
-  const { instanceId, courseId } = useParams();
+  const { instanceId, courseId }: Params = useParams();
   const [attainments, setAttainments] = useState([]);
   const [formulas, setFormulas] = useState([]);
   const navigate = useNavigate();

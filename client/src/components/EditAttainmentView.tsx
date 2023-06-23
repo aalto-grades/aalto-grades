@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useState }  from 'react';
-import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
+import { Params, useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
@@ -15,7 +15,7 @@ import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
 
 function EditAttainmentView() {
   const navigate = useNavigate();
-  const { courseId, instanceId, sisuInstanceId, attainmentId } = useParams();
+  const { courseId, instanceId, sisuInstanceId, attainmentId }: Params = useParams();
   let addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId;
 
   // If this view is opened during the creation of an instance, get the necessary

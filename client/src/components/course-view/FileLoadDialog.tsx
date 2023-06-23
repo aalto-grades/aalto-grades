@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useState, useEffect, createRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { Params, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -54,7 +54,7 @@ const errorMsg: Message = {
 export const maxErrorsToShow: number = 5;
 
 function FileLoadDialog({ instanceId, handleClose, open }) {
-  const { courseId } = useParams();
+  const { courseId }: Params = useParams();
   const fileInput = createRef<any>();
 
   // state variables handling the alert messages

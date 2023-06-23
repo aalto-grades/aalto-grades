@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useState } from 'react';
-import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
+import { Params, useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -45,7 +45,7 @@ const errorMsgAttainments: Message = {
 
 function InstanceSummaryView() {
   const navigate = useNavigate();
-  const { courseId, sisuInstanceId } = useParams();
+  const { courseId, sisuInstanceId }: Params = useParams();
 
   const {
     addedAttainments,

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useEffect } from 'react';
-import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
+import { Params, useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -57,7 +57,7 @@ const textFieldMinWidth = 195;
 
 function EditInstanceForm({ instance }) {
   const navigate = useNavigate();
-  const { courseId, sisuInstanceId } = useParams();
+  const { courseId, sisuInstanceId }: Params = useParams();
 
   const {
     courseType, setType,
