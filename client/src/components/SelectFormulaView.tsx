@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useState, useEffect } from 'react';
-import { Params, useParams, useNavigate } from 'react-router-dom';
+import { NavigateFunction, Params, useParams, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import SelectFormulaForm from './select-formula-view/SelectFormulaForm';
@@ -15,7 +15,7 @@ function SelectFormulaView() {
   const { instanceId, courseId }: Params = useParams();
   const [attainments, setAttainments] = useState([]);
   const [formulas, setFormulas] = useState([]);
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
 
   useEffect(() => {
     // TODO: fetch attainments for course based on the assessmentModelId

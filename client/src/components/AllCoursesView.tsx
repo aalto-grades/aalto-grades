@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -14,7 +14,7 @@ import { CourseData } from 'aalto-grades-common/types/course';
 import { SystemRole } from 'aalto-grades-common/types/auth';
 
 function AllCoursesView(): JSX.Element {
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
   const [courses, setCourses] = useState<Array<CourseData>>([]);
 
   const { auth } = useAuth();

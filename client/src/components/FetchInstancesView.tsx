@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useState, useEffect } from 'react';
-import { Params, useNavigate, useParams } from 'react-router-dom';
+import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
@@ -14,7 +14,7 @@ import instancesService from '../services/instances';
 import { CourseInstanceData } from 'aalto-grades-common/types/course';
 
 function FetchInstancesView(): JSX.Element {
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
   const { courseId, courseCode }: Params = useParams();
   const [instances, setInstances] = useState<Array<CourseInstanceData>>([]);
 

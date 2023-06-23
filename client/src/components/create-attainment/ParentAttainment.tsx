@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import List from '@mui/material/List';
 import Button from '@mui/material/Button';
@@ -24,7 +24,7 @@ function ParentAttainment({
   indices, addSubAttainments, setAttainments, attainments, removeAttainment,
   formulaAttributeNames, temporaryId, setIncrementId
 }) {
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
 
   // Functions and varibales for opening and closing the list of sub-attainments
   const [open, setOpen] = useState<any>(true);

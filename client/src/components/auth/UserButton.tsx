@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { SyntheticEvent, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
@@ -15,7 +15,7 @@ import useLogout from '../../hooks/useLogout';
 
 function UserButton(): JSX.Element {
   const logout = useLogout();
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
   const { auth } = useAuth();
   const [anchorEl, setAnchorEl] = useState<any>(null);
   const open: boolean = Boolean(anchorEl);
