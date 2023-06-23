@@ -4,17 +4,17 @@
 
 import { Request, Response } from 'express';
 
-import models from '../database/models';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
-import { CourseData, CoursesOfUser } from 'aalto-grades-common/types/course';
+import { CourseData, CoursesOfUser } from 'aalto-grades-common/types';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
-import { parseCourseWithTranslation } from './utils/course';
+import { parseCourseFull } from './utils/course';
 import { findUserById } from './utils/user';
+import { CourseFull } from '../types/model';
 
 export async function getCoursesOfUser(req: Request, res: Response): Promise<void> {
   const coursesOfUser: CoursesOfUser = { current: [], previous: [] };
@@ -29,12 +29,7 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
   // Confirm that user exists.
   await findUserById(userId, HttpCode.NotFound);
 
-  interface CourseWithTranslationAndInstance extends Course {
-    CourseTranslations: Array<CourseTranslation>
-    CourseInstances: Array<CourseInstance>
-  }
-
-  const courses: Array<CourseWithTranslationAndInstance> = await models.Course.findAll({
+  const courses: Array<CourseFull> = await Course.findAll({
     include: [
       {
         model: CourseInstance,
@@ -54,7 +49,7 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
       }
     ],
     order: [[CourseInstance, 'endDate', 'DESC']]
-  }) as Array<CourseWithTranslationAndInstance>;
+  }) as Array<CourseFull>;
 
   // Construct CourseData objects and determine whether the course is current or previous.
   const currentDate: Date = new Date(Date.now());
@@ -66,18 +61,18 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
      *
      * TODO: Don't include courses like this in the query result to begin with.
      */
-    if (course.CourseInstances.length == 0)
-      continue;
+    //if (course.CourseInstances.length == 0)
+    //  continue;
 
-    const courseData: CourseData = parseCourseWithTranslation(course);
+    const courseData: CourseData = parseCourseFull(course);
 
-    const latestEndDate: Date = new Date(String(course.CourseInstances[0].endDate));
+    //const latestEndDate: Date = new Date(String(course.CourseInstances[0].endDate));
 
-    if (currentDate <= latestEndDate) {
+    //if (currentDate <= latestEndDate) {
       coursesOfUser.current.push(courseData);
-    } else {
+    //} else {
       coursesOfUser.previous.push(courseData);
-    }
+    //}
   }
 
   res.status(HttpCode.Ok).send({

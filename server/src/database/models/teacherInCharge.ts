@@ -7,7 +7,7 @@ import {
 } from 'sequelize';
 
 import { sequelize } from '..';
-import Course from './courseInstance';
+import Course from './course';
 import User from './user';
 
 export default class TeacherInCharge extends Model<

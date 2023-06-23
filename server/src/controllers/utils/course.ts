@@ -4,12 +4,13 @@
 
 import Course from '../../database/models/course';
 import CourseTranslation from '../../database/models/courseTranslation';
+import User from '../../database/models/user';
 
 import { CourseData } from 'aalto-grades-common/types/course';
 import { Language } from 'aalto-grades-common/types/language';
 import { ApiError } from '../../types/error';
 import { HttpCode } from '../../types/httpCode';
-import { CourseWithTranslation } from '../../types/model';
+import { CourseFull } from '../../types/model';
 
 /**
  * Finds a course by its ID.
@@ -36,16 +37,21 @@ export async function findCourseById(courseId: number, errorCode: HttpCode): Pro
  * @throws {ApiError} - If the course is not found, it throws an error with a message
  * indicating the missing course with the specific ID.
  */
-export async function findCourseWithTranslationById(
+export async function findCourseFullById(
   courseId: number,
   errorCode: HttpCode
-): Promise<CourseWithTranslation> {
+): Promise<CourseFull> {
 
-  const course: CourseWithTranslation | null = await Course.findByPk(courseId, {
-    include: {
-      model: CourseTranslation,
-    }
-  }) as CourseWithTranslation;
+  const course: CourseFull | null = await Course.findByPk(courseId, {
+    include: [
+      {
+        model: CourseTranslation
+      },
+      {
+        model: User
+      }
+    ]
+  }) as CourseFull;
 
   if (!course) {
     throw new ApiError(`course with ID ${courseId} not found`, errorCode);
@@ -54,12 +60,13 @@ export async function findCourseWithTranslationById(
   return course;
 }
 
-export function parseCourseWithTranslation(course: CourseWithTranslation): CourseData {
+export function parseCourseFull(course: CourseFull): CourseData {
   const courseData: CourseData = {
     id: course.id,
     courseCode: course.courseCode,
     minCredits: course.minCredits,
     maxCredits: course.maxCredits,
+    teachersInCharge: [],
     department: {
       en: '',
       fi: '',
@@ -92,6 +99,13 @@ export function parseCourseWithTranslation(course: CourseWithTranslation): Cours
       courseData.name.sv = translation.courseName;
       break;
     }
+  });
+
+  course.Users.forEach((teacher: User) => {
+    courseData.teachersInCharge.push({
+      id: teacher.id,
+      name: teacher.name
+    });
   });
 
   return courseData;

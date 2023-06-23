@@ -9,44 +9,48 @@ import * as yup from 'yup';
 import { sequelize } from '../database';
 import Course from '../database/models/course';
 import CourseTranslation from '../database/models/courseTranslation';
+import User from '../database/models/user';
 
 import { CourseData } from 'aalto-grades-common/types/course';
 import { Language } from 'aalto-grades-common/types/language';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { localizedStringSchema } from '../types/language';
-import { CourseWithTranslation } from '../types/model';
-import {
-  findCourseWithTranslationById, parseCourseWithTranslation
-} from './utils/course';
+import { CourseFull } from '../types/model';
+import { findCourseFullById, parseCourseFull } from './utils/course';
 
 export async function getCourse(req: Request, res: Response): Promise<void> {
   const courseId: number = Number(req.params.courseId);
   await idSchema.validate({ id: courseId });
 
-  const course: CourseWithTranslation = await findCourseWithTranslationById(
+  const course: CourseFull = await findCourseFullById(
     courseId, HttpCode.NotFound
   );
 
   res.status(HttpCode.Ok).json({
     success: true,
     data: {
-      course: parseCourseWithTranslation(course)
+      course: parseCourseFull(course)
     }
   });
 }
 
 export async function getAllCourses(req: Request, res: Response): Promise<void> {
-  const courses: Array<CourseWithTranslation> = await Course.findAll({
-    include: {
-      model: CourseTranslation
-    }
-  }) as Array<CourseWithTranslation>;
+  const courses: Array<CourseFull> = await Course.findAll({
+    include: [
+      {
+        model: CourseTranslation
+      },
+      {
+        model: User
+      }
+    ]
+  }) as Array<CourseFull>;
 
   const coursesData: Array<CourseData> = [];
 
   for (const course of courses) {
-    coursesData.push(parseCourseWithTranslation(course));
+    coursesData.push(parseCourseFull(course));
   }
 
   res.status(HttpCode.Ok).json({

@@ -4,7 +4,7 @@
 
 import supertest from 'supertest';
 
-import { CoursesOfUser } from 'aalto-grades-common/types/course';
+import { CoursesOfUser } from 'aalto-grades-common/types';
 import { app } from '../../src/app';
 import { HttpCode } from '../../src/types/httpCode';
 import { Cookies, getCookies } from '../util/getCookies';
