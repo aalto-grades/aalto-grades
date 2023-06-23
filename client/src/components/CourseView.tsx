@@ -11,6 +11,7 @@ import Grow from '@mui/material/Grow';
 import FileLoadDialog from './course-view/FileLoadDialog';
 import InstanceDetails from './course-view/InstanceDetails';
 import Attainments from './course-view/Attainments';
+import AssessmentModelsTable from './course-view/AssessmentModelsTable';
 import InstancesTable from './course-view/InstancesTable';
 import assessmentModelsService from '../services/assessmentModels';
 import coursesService from '../services/courses';
@@ -81,7 +82,7 @@ function CourseView(): JSX.Element {
 
   useEffect(() => {
     setAnimation(true);
-  }, [currentInstance]);
+  }, [currentInstance, currentAssessmentModel]);
 
   function handleClickOpen(): void {
     setOpen(true);
@@ -89,6 +90,19 @@ function CourseView(): JSX.Element {
 
   function handleClose(): void {
     setOpen(false);
+  }
+
+  function onChangeAssessmentModel(assessmentModel: AssessmentModelData): void {
+    if (assessmentModel.id !== currentAssessmentModel.id) {
+      setAnimation(false);
+      setCurrentAssessmentModel(assessmentModel);
+
+      assessmentModelsService.getAllAttainments(courseId, assessmentModel.id)
+        .then((attainmentTree: AttainmentData) => {
+          setAttainmentTree(attainmentTree);
+        })
+        .catch((e: Error) => console.log(e.message));
+    }
   }
 
   function onChangeInstance(instance: CourseInstanceData): void {
@@ -109,20 +123,6 @@ function CourseView(): JSX.Element {
             justifyContent: 'space-between', mb: 4, columnGap: 6
           }}>
             <Typography variant='h2' align='left'>{course.name.en}</Typography>
-            {
-              /* Only admins and teachers are allowed to create a new instance */
-              auth.role == SystemRole.Admin &&
-              <Button
-                id='ag_new_instance_btn'
-                size='large'
-                variant='contained'
-                onClick={(): void => {
-                  navigate(`/${courseId}/fetch-instances/${course.courseCode}`);
-                }}
-              >  {/* TODO: Check path */}
-                New instance
-              </Button>
-            }
           </Box>
           {
             currentInstance && instances &&
@@ -162,8 +162,36 @@ function CourseView(): JSX.Element {
                 }
               </Box>
               <Typography variant='h2' align='left' sx={{ mt: 6, mb: 3 }}>
-                All Instances
+                Assessment Models
               </Typography>
+              <AssessmentModelsTable
+                data={assessmentModels}
+                current={currentAssessmentModel.id}
+                onClick={onChangeAssessmentModel}
+              />
+              <Box sx={{
+                display: 'flex', flexWrap: 'wrap',
+                justifyContent: 'space-between', columnGap: 6
+              }}>
+                <Typography variant='h2' align='left' sx={{ mt: 6, mb: 3 }}>
+                  Course Instances
+                </Typography>
+                {
+                  /* Only admins and teachers are allowed to create a new instance */
+                  auth.role == SystemRole.Admin &&
+                  <Button
+                    id='ag_new_instance_btn'
+                    size='large'
+                    variant='contained'
+                    sx={{ mt: 6, mb: 3 }}
+                    onClick={(): void => {
+                      navigate(`/${courseId}/fetch-instances/${course.courseCode}`);
+                    }}
+                  >  {/* TODO: Check path */}
+                    New instance
+                  </Button>
+                }
+              </Box>
               <InstancesTable
                 data={instances}
                 current={currentInstance.id}
