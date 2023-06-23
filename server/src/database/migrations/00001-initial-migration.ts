@@ -288,6 +288,31 @@ export default {
         updated_at: DataTypes.DATE
       }, { transaction });
 
+      await queryInterface.createTable('teacher_in_charge', {
+        user_id: {
+          type: DataTypes.INTEGER,
+          primaryKey: true,
+          references: {
+            model: 'user',
+            key: 'id'
+          },
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE'
+        },
+        course_id: {
+          type: DataTypes.INTEGER,
+          primaryKey: true,
+          references: {
+            model: 'course',
+            key: 'id'
+          },
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE'
+        },
+        created_at: DataTypes.DATE,
+        updated_at: DataTypes.DATE
+      }, { transaction });
+
       await queryInterface.createTable('course_translation', {
         id: {
           type: DataTypes.INTEGER,
@@ -379,6 +404,7 @@ export default {
     try {
       await queryInterface.dropTable('course_result', { transaction });
       await queryInterface.dropTable('course_translation', { transaction });
+      await queryInterface.dropTable('teacher_in_charge', { transaction });
       await queryInterface.dropTable('course_instance_role', { transaction });
       await queryInterface.dropTable('course_instance', { transaction });
       await queryInterface.dropTable('attainment_grade', { transaction });

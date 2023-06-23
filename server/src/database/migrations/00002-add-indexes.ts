@@ -28,6 +28,11 @@ export default {
         transaction
       });
 
+      await queryInterface.addIndex('teacher_in_charge', ['user_id', 'course_id'], {
+        unique: true,
+        transaction
+      });
+
       await queryInterface.addIndex('course_translation', ['course_id', 'language'], {
         unique: true,
         transaction
@@ -74,6 +79,11 @@ export default {
 
       await queryInterface.sequelize.query(
         'DROP INDEX IF EXISTS course_instance_role_user_id_course_instance_id',
+        { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP INDEX IF EXISTS teacher_in_charge_user_id_course_id',
         { transaction }
       );
 

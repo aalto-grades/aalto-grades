@@ -10,6 +10,7 @@ import CourseInstance from './courseInstance';
 import CourseInstanceRole from './courseInstanceRole';
 import CourseResult from './courseResult';
 import CourseTranslation from './courseTranslation';
+import TeacherInCharge from './teacherInCharge';
 import User from './user';
 
 export default {
@@ -21,5 +22,6 @@ export default {
   CourseInstanceRole,
   CourseResult,
   CourseTranslation,
+  TeacherInCharge,
   User
 };
