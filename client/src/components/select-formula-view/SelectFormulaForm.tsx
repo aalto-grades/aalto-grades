@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useState, useEffect } from 'react';
-import { useOutletContext, useNavigate } from 'react-router-dom';
+import { NavigateFunction, useOutletContext, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -32,7 +32,7 @@ function SelectFormulaForm({
   const [formulaError, setFormulaError] = useState<any>('');
   const [setSnackPack, messageInfo, setMessageInfo, alertOpen, setAlertOpen] = useSnackPackAlerts();
 
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
 
   const {
     selectedAttainments, setSelectedAttainments,

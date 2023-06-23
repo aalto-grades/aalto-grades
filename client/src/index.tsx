@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { createGlobalStyle } from 'styled-components';
-import { AuthProvider } from './context/authProvider';
+import { AuthProvider } from './context/AuthProvider';
 
 const GlobalStyles = createGlobalStyle`
   body {

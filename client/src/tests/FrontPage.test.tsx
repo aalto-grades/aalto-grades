@@ -7,7 +7,7 @@ import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import FrontPage from '../components/FrontPage';
 import coursesService from '../services/courses';
-import AuthContext from '../context/authProvider';
+import AuthContext from '../context/AuthProvider';
 import mockCourses from './mock-data/mockCourses';
 
 jest.mock('../services/courses');

@@ -2,15 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useParams, useNavigate } from 'react-router-dom';
+import { NavigateFunction, Params, useParams, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import FormulaAttributesForm from './formula-attributes-view/FormulaAttributesForm';
 
 function FormulaAttributesView(): JSX.Element {
 
-  const { courseId, instanceId } = useParams();
-  const navigate = useNavigate();
+  const { courseId, instanceId }: Params = useParams();
+  const navigate: NavigateFunction = useNavigate();
 
   function navigateToCourseView(): void {
     navigate(`/course-view/${courseId}`, { replace: true });

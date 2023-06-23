@@ -2,24 +2,22 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { JSX } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import CustomAccordion from './CustomAccordion';
-import textFormatServices from '../../services/textFormat';
-import formulasService from '../../services/formulas';
+import { AttainmentData } from 'aalto-grades-common/types';
 
-// This component renders a top attainment (only has the intance as its parent)
-function AttainmentCategory({ attainment, buttons, attainmentKey }): JSX.Element {
+// This component renders a top attainment (only has the root attainment as its parent)
+function AttainmentCategory(props: {
+  attainment: AttainmentData,
+  buttons?: Array<JSX.Element>,
+  attainmentKey: string
+}): JSX.Element {
 
-  const { name, formulaId, expiryDate, subAttainments } = attainment;
-  const titlepb: string = subAttainments.length !== 0 ? '16px' : '0px';  // title padding-bottom
-
-  // For some reason the Date type value is formated differently
-  // by the toLocaleString('en-GB') function depending on the view
-  const expiryDateString: string = attainmentKey === 'id' ?
-    textFormatServices.formatDateToString(expiryDate) :
-    textFormatServices.formatDateString(textFormatServices.formatDateToSlashString(expiryDate));
+  // title padding-bottom
+  const titlepb: string = props.attainment.subAttainments ? '16px' : '0px';
 
   return (
     <Box boxShadow={3} borderRadius={1} sx={{ pt: 2, pb: 0.5, bgcolor: 'white' }}>
@@ -28,17 +26,24 @@ function AttainmentCategory({ attainment, buttons, attainmentKey }): JSX.Element
         justifyContent: 'space-between', alignItems: 'center', pr: '21px',
         pb: titlepb, pl: '21px'
       }}>
-        <Typography sx={{ fontWeight: 'bold' }} align='left'>{name}</Typography>
+        <Typography sx={{ fontWeight: 'bold' }} align='left'>
+          {props.attainment.name}
+        </Typography>
         {
-          formulaId &&
-          <Typography align='left' variant='body2'>
-            {'Formula: ' + formulasService.getFormulaName(formulaId)}
-          </Typography>
+          /*
+            false && // TODO: Attainment formula
+            <Typography align='left' variant='body2'>
+              {'Formula: ' + formulasService.getFormulaName(formulaId)}
+            </Typography>
+          */
         }
       </Box>
       {
-        subAttainments.length !== 0 &&
-        <CustomAccordion attainments={subAttainments} attainmentKey={attainmentKey} />
+        props.attainment.subAttainments &&
+        <CustomAccordion
+          attainments={props.attainment.subAttainments}
+          attainmentKey={props.attainmentKey}
+        />
       }
       <Box sx={{
         display: 'flex', flexDirection: 'row', flexWrap: 'wrap',
@@ -46,16 +51,16 @@ function AttainmentCategory({ attainment, buttons, attainmentKey }): JSX.Element
         pr: '6px', pt: '8px'
       }}>
         <Typography align='left' variant='caption'>
-          {'Expiry date: ' + expiryDateString}
+          {'Days valid: ' + props.attainment.daysValid}
         </Typography>
         {
-          buttons ?
+          props.buttons ?
             <Box sx={{
               display: 'flex', flexDirection: 'row', flexWrap: 'wrap',
               justifyContent: 'space-between', alignItems: 'center', pl: '21px',
               pr: '6px', pt: '8px'
             }}>
-              {buttons}
+              {props.buttons}
             </Box>
             :
             <Box height='30.5px'></Box>

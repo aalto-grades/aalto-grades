@@ -8,7 +8,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Slide from '@mui/material/Slide';
 import MuiAlert from '@mui/material/Alert';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { Message } from '../../types/general';
+import { Message } from '../../types';
 
 const darkTheme = createTheme({
   palette: {

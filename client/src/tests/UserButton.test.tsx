@@ -6,7 +6,7 @@ import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { act, render, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import AuthContext from '../context/authProvider';
+import AuthContext from '../context/AuthProvider';
 import UserButton from '../components/auth/UserButton';
 import { SystemRole } from 'aalto-grades-common/types/auth';
 

@@ -2,13 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import CreateCourseForm from './create-course-view/CreateCourseForm';
 import coursesService from '../services/courses';
 
 function CreateCourseView() {
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
 
   async function addCourse(courseObject): Promise<void> {
     try {

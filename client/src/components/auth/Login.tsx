@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import LoginForm from './LoginForm';
 import userService from '../../services/user';
@@ -15,7 +15,7 @@ function Login(): JSX.Element {
 
   const { setAuth } = useAuth();
 
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
   const [errorMessage, setErrorMessage] = useState<string>('');
   const theme = useTheme();
 

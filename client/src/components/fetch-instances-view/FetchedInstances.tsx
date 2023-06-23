@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
@@ -20,7 +20,7 @@ const HoverBox = styled<any>(Box)(({ theme }) => ({
 }));
 
 function InstanceBox({ courseId, instance }) {
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
   const { sisuCourseInstanceId, startDate, endDate, type } = instance;
 
   return (

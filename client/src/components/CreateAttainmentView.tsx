@@ -3,7 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import { useState }  from 'react';
-import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
+import {
+  NavigateFunction, Params, useNavigate, useParams, useOutletContext
+} from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
@@ -12,8 +14,8 @@ import Attainment from './create-attainment/Attainment';
 import attainmentServices from '../services/attainments';
 
 function CreateAttainmentView() {
-  const navigate = useNavigate();
-  const { courseId, instanceId, sisuInstanceId } = useParams();
+  const navigate: NavigateFunction = useNavigate();
+  const { courseId, instanceId, sisuInstanceId }: Params = useParams();
   let addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId;
 
   // If this view is opened during the creation of an instance, get the necessary

@@ -4,8 +4,8 @@
 
 import axios from './axios';
 import { AxiosResponse } from 'axios';
-import { CourseData, CoursesOfUser } from 'aalto-grades-common/types/course';
-import { ApiResponse } from '../types/general';
+import { CourseData, CoursesOfUser } from 'aalto-grades-common/types';
+import { ApiResponse } from '../types';
 
 async function getCoursesOfUser(userId: number | string): Promise<CoursesOfUser> {
   const response: AxiosResponse<

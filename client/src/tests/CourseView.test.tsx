@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event';
 import CourseView from '../components/CourseView';
 import coursesService from '../services/courses';
 import instancesService from '../services/instances';
-import AuthContext from '../context/authProvider';
+import AuthContext from '../context/AuthProvider';
 import mockCourses from './mock-data/mockCourses';
 import mockInstances from './mock-data/mockInstancesWithStringDates';
 import { SystemRole } from 'aalto-grades-common/types/auth';

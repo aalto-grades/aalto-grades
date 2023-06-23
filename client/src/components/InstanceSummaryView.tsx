@@ -3,7 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import { useState } from 'react';
-import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
+import {
+  NavigateFunction, Params, useNavigate, useParams, useOutletContext
+} from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -14,8 +16,8 @@ import textFormatServices from '../services/textFormat';
 import instancesService from '../services/instances';
 import attainmentServices from '../services/attainments';
 import useSnackPackAlerts from '../hooks/useSnackPackAlerts';
-import { Message } from '../types/general';
-import { CourseInstanceData, GradingScale } from 'aalto-grades-common/types/course';
+import { Message } from '../types';
+import { CourseInstanceData, GradingScale } from 'aalto-grades-common/types';
 
 const successMsgInstance: Message = {
   msg: 'Instance created successfully.',
@@ -44,8 +46,8 @@ const errorMsgAttainments: Message = {
 };
 
 function InstanceSummaryView() {
-  const navigate = useNavigate();
-  const { courseId, sisuInstanceId } = useParams();
+  const navigate: NavigateFunction = useNavigate();
+  const { courseId, sisuInstanceId }: Params = useParams();
 
   const {
     addedAttainments,

@@ -2,14 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import Link from '@mui/material/Link';
 
 function CourseTableRow({ course }) {
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
   const { id, name, courseCode, department } = course;
 
   return (

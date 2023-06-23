@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Params, useParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import CourseResultsTable from './course-results-view/CourseResultsTable';
@@ -11,7 +11,7 @@ import AlertSnackbar from './alerts/AlertSnackbar';
 import gradesService from '../services/grades';
 
 function CourseResultsView(): JSX.Element {
-  const { courseId, instanceId } = useParams();
+  const { courseId, instanceId }: Params = useParams();
 
   const [students, setStudents] = useState([]);
   const [snackPack, setSnackPack] = useState([]);
