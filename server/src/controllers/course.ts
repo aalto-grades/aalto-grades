@@ -9,6 +9,7 @@ import * as yup from 'yup';
 import { sequelize } from '../database';
 import Course from '../database/models/course';
 import CourseTranslation from '../database/models/courseTranslation';
+import TeacherInCharge from '../database/models/teacherInCharge';
 import User from '../database/models/user';
 
 import { CourseData } from 'aalto-grades-common/types/course';
@@ -66,6 +67,9 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
     courseCode: yup.string().required(),
     minCredits: yup.number().min(0).required(),
     maxCredits: yup.number().min(yup.ref('minCredits')).required(),
+    teachersInCharge: yup.object().shape({
+      id: yup.number().required()
+    }).required(),
     department: localizedStringSchema.required(),
     name: localizedStringSchema.required()
   });
@@ -106,6 +110,17 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
           courseName: req.body.name.sv ?? ''
         }
       ], { transaction: t });
+
+      const teachersInCharge: Array<TeacherInCharge> = req.body.teachersInCharge.map(
+        (teacher: { id: number }) => {
+          return {
+            courseId: course.id,
+            userId: teacher.id
+          }
+        }
+      );
+
+      await TeacherInCharge.bulkCreate(teachersInCharge);
 
       return course;
     });

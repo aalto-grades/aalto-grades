@@ -45,6 +45,7 @@ describe(
       expect(res.body.data.courseInstance.courseData.minCredits).toBeDefined();
       expect(res.body.data.courseInstance.courseData.maxCredits).toBeDefined();
       expect(res.body.data.courseInstance.courseData.teachersInCharge).toBeDefined();
+      expect(res.body.data.courseInstance.courseData.teachersInCharge[0].name).toBeDefined();
       expect(res.body.data.courseInstance.courseData.department).toBeDefined();
       expect(res.body.data.courseInstance.courseData.name).toBeDefined();
       expect(res.body.data.courseInstance.courseData.evaluationInformation).toBeDefined();
