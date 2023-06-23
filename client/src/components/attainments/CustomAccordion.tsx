@@ -157,10 +157,11 @@ function CustomAccordion({ attainments, attainmentKey }) {
                 <AttainmentText name={attainment.name} formulaId={attainment.formulaId} />
               </AccordionSummary>
               {
+                attainment.subAttainments &&
                 attainment.subAttainments.map(subAttainment => {
                   return (
                     // is the attainment a leaf? If yes, render details, else another accordion
-                    subAttainment.subAttainments.length === 0 ?
+                    subAttainment.subAttainments ?
                       <AccordionDetails key={subAttainment[attainmentKey] + 'details'}>
                         <AttainmentText
                           name={subAttainment.name}

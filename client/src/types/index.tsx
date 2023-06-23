@@ -18,3 +18,5 @@ export interface Message {
   msg: string,
   severity?: 'error' | 'warning' | 'info' | 'success'
 }
+
+export type State<T> = [T, (value: T) => void];

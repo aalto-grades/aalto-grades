@@ -14,8 +14,8 @@ import textFormatServices from '../services/textFormat';
 import instancesService from '../services/instances';
 import attainmentServices from '../services/attainments';
 import useSnackPackAlerts from '../hooks/useSnackPackAlerts';
-import { Message } from '../types/general';
-import { CourseInstanceData, GradingScale } from 'aalto-grades-common/types/course';
+import { Message } from '../types';
+import { CourseInstanceData, GradingScale } from 'aalto-grades-common/types';
 
 const successMsgInstance: Message = {
   msg: 'Instance created successfully.',

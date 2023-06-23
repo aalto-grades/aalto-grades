@@ -17,7 +17,7 @@ import FormHelperText from '@mui/material/FormHelperText';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import gradesService from '../../services/grades';
 import FileErrorDialog from './FileErrorDialog';
-import { Message } from '../../types/general';
+import { Message } from '../../types';
 
 // A Dialog component for uploading a file
 

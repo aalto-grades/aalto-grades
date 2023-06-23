@@ -16,7 +16,7 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import gradesService from '../../services/grades';
-import { Message } from '../../types/general';
+import { Message } from '../../types';
 
 // A Dialog component for exporting Sisu grades CSV.
 const instructions =

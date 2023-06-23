@@ -2,23 +2,26 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { createContext, useState } from 'react';
+import { Context, createContext, useState } from 'react';
 import PropTypes from 'prop-types';
-import { LoginResult } from 'aalto-grades-common/types/auth';
+import { LoginResult } from 'aalto-grades-common/types';
+import { State } from '../types';
 
-const AuthContext = createContext<{
+export interface AuthContextType {
   auth?: LoginResult,
   setAuth?: (auth: LoginResult) => void
-    }>({});
+}
 
-export function AuthProvider({ children }: {
+const AuthContext: Context<AuthContextType> = createContext<AuthContextType>({});
+
+export function AuthProvider(params: {
   children: JSX.Element
 }): JSX.Element {
-  const [auth, setAuth] = useState<LoginResult>(null);
+  const [auth, setAuth]: State<LoginResult> = useState<LoginResult>(null);
 
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>
-      {children}
+      {params.children}
     </AuthContext.Provider>
   );
 }

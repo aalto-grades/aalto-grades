@@ -3,31 +3,30 @@
 // SPDX-License-Identifier: MIT
 
 import axios from './axios';
-import { AxiosResponse } from 'axios';
-import { LoginResult } from 'aalto-grades-common/types/auth';
+import { LoginResult } from 'aalto-grades-common/types';
 import { LoginCredentials, SignupCredentials } from '../types/auth';
-import { ApiResponse } from '../types/general';
+import { FullResponse } from '../types';
 
 async function login(credentials: LoginCredentials): Promise<LoginResult> {
-  const response: AxiosResponse<
-    ApiResponse<LoginResult>, unknown
-  > = await axios.post('/v1/auth/login', credentials);
+
+  const response: FullResponse<LoginResult> =
+    await axios.post('/v1/auth/login', credentials);
 
   return response.data.data;
 }
 
 async function signup(credentials: SignupCredentials): Promise<LoginResult> {
-  const response: AxiosResponse<
-    ApiResponse<LoginResult>, unknown
-  > = await axios.post('/v1/auth/signup', credentials);
+
+  const response: FullResponse<LoginResult> =
+    await axios.post('/v1/auth/signup', credentials);
 
   return response.data.data;
 }
 
 async function getRefreshToken(): Promise<LoginResult> {
-  const response: AxiosResponse<
-    ApiResponse<LoginResult>, unknown
-  > = await axios.get('/v1/auth/self-info');
+
+  const response: FullResponse<LoginResult> =
+    await axios.get('/v1/auth/self-info');
 
   return response.data.data;
 }
