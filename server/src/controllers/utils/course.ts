@@ -29,13 +29,15 @@ export async function findCourseById(courseId: number, errorCode: HttpCode): Pro
 }
 
 /**
- * Finds a course and its translation information by a course ID.
+ * Finds a course, its translations, and the teachers in charge of that course
+ * by a course ID.
  * @param {number} courseId - The ID of the course.
- * @param {HttpCode} errorCode - HTTP status code to return if the course was not found.
- * @returns {Promise<CourseWithTranslation>} - The found course model object with
- * course translation objects included.
- * @throws {ApiError} - If the course is not found, it throws an error with a message
- * indicating the missing course with the specific ID.
+ * @param {HttpCode} errorCode - HTTP status code to include in ApiError if the
+ * course was not found.
+ * @returns {Promise<CourseFull>} - The found course model object with
+ * course translation and user objects included.
+ * @throws {ApiError} - If the course is not found, it throws an error with a
+ * message indicating the missing course with the specific ID.
  */
 export async function findCourseFullById(
   courseId: number,

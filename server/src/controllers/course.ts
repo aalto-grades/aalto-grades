@@ -67,9 +67,11 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
     courseCode: yup.string().required(),
     minCredits: yup.number().min(0).required(),
     maxCredits: yup.number().min(yup.ref('minCredits')).required(),
-    teachersInCharge: yup.object().shape({
-      id: yup.number().required()
-    }).required(),
+    teachersInCharge: yup.array().of(
+      yup.object().shape({
+        id: yup.number().required()
+      })
+    ).required(),
     department: localizedStringSchema.required(),
     name: localizedStringSchema.required()
   });
@@ -120,7 +122,7 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
         }
       );
 
-      await TeacherInCharge.bulkCreate(teachersInCharge);
+      await TeacherInCharge.bulkCreate(teachersInCharge, { transaction: t });
 
       return course;
     });

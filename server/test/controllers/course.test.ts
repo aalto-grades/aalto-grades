@@ -145,6 +145,7 @@ describe('Test POST /v1/courses - create new course', () => {
 
     expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data.course).toBeDefined();
     expect(res.body.data.course.id).toBeDefined();
 
     input = {
@@ -176,6 +177,7 @@ describe('Test POST /v1/courses - create new course', () => {
 
     expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data.course).toBeDefined();
     expect(res.body.data.course.id).toBeDefined();
   });
 

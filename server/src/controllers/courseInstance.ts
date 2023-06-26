@@ -8,20 +8,16 @@ import * as yup from 'yup';
 import AssessmentModel from '../database/models/assessmentModel';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
-import CourseInstanceRole from '../database/models/courseInstanceRole';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
-import {
-  CourseInstanceData, CourseInstanceRoleType, GradingScale, Period
-} from 'aalto-grades-common/types/course';
+import { CourseInstanceData, GradingScale, Period } from 'aalto-grades-common/types';
 import { ApiError } from '../types/error';
 import { HttpCode } from '../types/httpCode';
 import { idSchema } from '../types/general';
 import { CourseFull } from '../types/model';
 import { findAssessmentModelById } from './utils/assessmentModel';
 import { findCourseById, parseCourseFull } from './utils/course';
-import { findUserById } from './utils/user';
 
 interface CourseInstanceWithCourseFull extends CourseInstance {
     Course: CourseFull
@@ -100,7 +96,8 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
   const courseId: number = Number(req.params.courseId);
   await idSchema.validate({ id: courseId });
 
-  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
+  // Ensure course exists
+  await findCourseById(courseId, HttpCode.NotFound);
 
   const instances: Array<CourseInstanceWithCourseFull> =
     await CourseInstance.findAll(
