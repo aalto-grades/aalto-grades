@@ -6,7 +6,9 @@
 
 import Course from '../database/models/course';
 import CourseTranslation from '../database/models/courseTranslation';
+import User from '../database/models/user';
 
-export interface CourseWithTranslation extends Course {
-  CourseTranslations: Array<CourseTranslation>
+export interface CourseFull extends Course {
+  CourseTranslations: Array<CourseTranslation>;
+  Users: Array<User>;
 }

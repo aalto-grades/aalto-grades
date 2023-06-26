@@ -22,6 +22,10 @@ const courseInstanceRoles: string = fs.readFileSync(
   path.resolve(__dirname, '../../../../mock-data/course_instance_roles.sql'), 'utf8'
 );
 
+const teachersInCharge: string = fs.readFileSync(
+  path.resolve(__dirname, '../../../../mock-data/teachers_in_charge.sql'), 'utf8'
+);
+
 const courseTranslation: string = fs.readFileSync(
   path.resolve(__dirname, '../../../../mock-data/course_translations.sql'), 'utf8'
 );
@@ -54,6 +58,7 @@ export default {
       await queryInterface.sequelize.query(courseTranslation, { transaction });
       await queryInterface.sequelize.query(courseInstances, { transaction });
       await queryInterface.sequelize.query(courseInstanceRoles, { transaction });
+      await queryInterface.sequelize.query(teachersInCharge, { transaction });
       await queryInterface.sequelize.query(courseResults, { transaction });
       await transaction.commit();
     } catch (error) {
@@ -65,6 +70,7 @@ export default {
     const transaction: Transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.bulkDelete('course_result', {}, { transaction });
+      await queryInterface.bulkDelete('teacher_in_charge', {}, { transaction });
       await queryInterface.bulkDelete('course_instance_role', {}, { transaction });
       await queryInterface.bulkDelete('course_instance', {}, { transaction });
       await queryInterface.bulkDelete('course_translation', {}, { transaction });

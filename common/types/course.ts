@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { LocalizedString } from './language';
+import { UserData } from './user';
 
 export enum GradingScale {
   PassFail = 'PASS_FAIL',
@@ -28,6 +29,7 @@ export interface CourseData {
   department: LocalizedString,
   name: LocalizedString,
   evaluationInformation: LocalizedString
+  teachersInCharge: Array<UserData>
 }
 
 export interface CourseInstanceData {
@@ -43,18 +45,9 @@ export interface CourseInstanceData {
   endDate: Date,
   type: string,
   gradingScale: GradingScale,
-  // TODO: There should maybe be a UserData interface if more data is needed,
-  // for example ID of user.
-  teachersInCharge?: Array<string> | Array<number>
 }
 
 export enum CourseInstanceRoleType {
   Student = 'STUDENT',
-  Teacher = 'TEACHER',
-  TeacherInCharge = 'TEACHER_IN_CHARGE',
-}
-
-export interface CoursesOfUser {
-  current: Array<CourseData>,
-  previous: Array<CourseData>
+  Teacher = 'TEACHER'
 }

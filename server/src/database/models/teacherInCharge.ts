@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -7,21 +7,20 @@ import {
 } from 'sequelize';
 
 import { sequelize } from '..';
-import CourseInstance from './courseInstance';
+import Course from './course';
 import User from './user';
 
-export default class CourseInstanceRole extends Model<
-  InferAttributes<CourseInstanceRole>,
-  InferCreationAttributes<CourseInstanceRole>
+export default class TeacherInCharge extends Model<
+  InferAttributes<TeacherInCharge>,
+  InferCreationAttributes<TeacherInCharge>
 > {
   declare userId: ForeignKey<User['id']>;
-  declare courseInstanceId: ForeignKey<CourseInstance['id']>;
-  declare role: string;
+  declare courseId: ForeignKey<Course['id']>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
 
-CourseInstanceRole.init(
+TeacherInCharge.init(
   {
     userId: {
       type: DataTypes.INTEGER,
@@ -31,35 +30,31 @@ CourseInstanceRole.init(
         key: 'id'
       }
     },
-    courseInstanceId: {
+    courseId: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       references: {
-        model: 'course_instance',
+        model: 'course',
         key: 'id'
       }
-    },
-    role: {
-      type: DataTypes.ENUM('STUDENT', 'TEACHER'),
-      allowNull: false
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },
   {
     sequelize,
-    tableName: 'course_instance_role'
+    tableName: 'teacher_in_charge'
   }
 );
 
-User.belongsToMany(CourseInstance, {
-  through: CourseInstanceRole,
+User.belongsToMany(Course, {
+  through: TeacherInCharge,
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
 });
 
-CourseInstance.belongsToMany(User, {
-  through: CourseInstanceRole,
+Course.belongsToMany(User, {
+  through: TeacherInCharge,
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE'
 });
