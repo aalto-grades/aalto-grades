@@ -64,8 +64,12 @@ function CreateCourseForm({ addCourse }) {
           fi: '',
           sv: '',
           en: '',
-        }
-        // teacher
+        },
+        teachersInCharge: [
+          {
+            id: 1 // TODO: Actual teacher
+          }
+        ]
       });
       addCourse(courseObject);
     } catch (exception) {

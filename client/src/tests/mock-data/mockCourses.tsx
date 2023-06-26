@@ -10,6 +10,12 @@ const mockCourses: Array<CourseData> = [
     courseCode: 'CS-A1150',
     minCredits: 5,
     maxCredits: 5,
+    teachersInCharge: [
+      {
+        id: 1,
+        name: 'Jane Doe'
+      }
+    ],
     department: {
       fi: 'Tietotekniikan laitos',
       sv: 'Institutionen för datateknik',
@@ -31,6 +37,12 @@ const mockCourses: Array<CourseData> = [
     courseCode: 'CS-A1110',
     minCredits: 5,
     maxCredits: 5,
+    teachersInCharge: [
+      {
+        id: 2,
+        name: 'John Doe'
+      }
+    ],
     department: {
       fi: 'Tietotekniikan laitos',
       sv: 'Institutionen för datateknik',

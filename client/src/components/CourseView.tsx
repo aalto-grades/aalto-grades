@@ -115,7 +115,7 @@ function CourseView(): JSX.Element {
           <Box sx={{ display: 'flex', gap: 3 }}>
             <div>
               <CourseDetails course={course} />
-              <Typography variant='h3' align='left' sx={{ mt: 6, mb: 3 }}>
+              <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>
                 Assessment Models
               </Typography>
               {

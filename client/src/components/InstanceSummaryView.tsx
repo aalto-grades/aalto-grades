@@ -93,8 +93,6 @@ function InstanceSummaryView() {
         gradingScale: textFormatServices.convertToServerGradingScale(gradingScale) as GradingScale,
         sisuCourseInstanceId: sisuInstanceId,
         type: courseType,
-        // fake ! TODO: replace with teachers when figured out how to fetch ids (currently strings)
-        teachersInCharge: [1],
         // fake ! TODO: delete from context and here once not required by the server in validation
         startingPeriod: startingPeriod ?? 'I',
         // fake ! TODO: delete from context and here once not required by the server in validation
@@ -181,22 +179,6 @@ function InstanceSummaryView() {
             value={gradingScale}
           />
         </Box>
-      </Box>
-      <Box borderRadius={1} sx={{
-        bgcolor: 'secondary.light', p: '16px 20px', mb: 5, display: 'inline-block'
-      }}>
-        <Typography variant='h3' align='left' sx={{ pb: 1 }}>
-          Teachers in Charge
-        </Typography>
-        {
-          teachers.map((teacher) => {
-            return (
-              <Typography align='left' key={teacher} >
-                {teacher}
-              </Typography>
-            );
-          })
-        }
       </Box>
       <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >
         Added study attainments

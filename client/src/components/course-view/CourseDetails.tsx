@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';
-import { CourseData } from 'aalto-grades-common/types';
+import { CourseData, UserData } from 'aalto-grades-common/types';
 
 function CourseDetails(params: {
   course: CourseData
@@ -42,11 +42,15 @@ function CourseDetails(params: {
         <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>
           Teachers in Charge
         </Typography>
-        {/*
-          params.course.teachersInCharge.map((teacher) => <Typography align='left' key={teacher} >
-            {teacher}
-          </Typography>)
-        */}
+        {
+          params.course.teachersInCharge.map((teacher: UserData) => {
+            return (
+              <Typography align='left' key={teacher.id} >
+                {teacher.name}
+              </Typography>
+            );
+          })
+        }
       </Box>
     </Box>
   );
