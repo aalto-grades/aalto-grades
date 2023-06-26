@@ -29,50 +29,72 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
   // Confirm that user exists.
   await findUserById(userId, HttpCode.NotFound);
 
-  const courses: Array<CourseFull> = await Course.findAll({
-    include: [
-      {
-        model: CourseInstance,
-        attributes: ['endDate'],
-        include: [
-          {
-            model: User,
-            where: {
-              id: userId
-            }
+  const inChargeCourses: Array<CourseFull> =
+    await Course.findAll({
+      include: [
+        {
+          model: CourseTranslation
+        },
+        {
+          model: User,
+          where: {
+            id: userId
           }
-        ]
-      },
-      {
-        model: CourseTranslation,
-        attributes: ['language', 'courseName', 'department'],
-      }
-    ],
-    order: [[CourseInstance, 'endDate', 'DESC']]
-  }) as Array<CourseFull>;
+        }
+      ]
+    }) as Array<CourseFull>;
+
+  interface CourseFullWithInstances extends CourseFull {
+    CourseInstances: Array<CourseInstance>;
+    CourseTranslations: Array<CourseTranslation>
+  }
+
+  const instanceRoleCourses: Array<CourseFullWithInstances> =
+    await Course.findAll({
+      include: [
+        {
+          model: CourseInstance,
+          attributes: ['endDate'],
+          include: [
+            {
+              model: User,
+              where: {
+                id: userId
+              }
+            }
+          ]
+        },
+        {
+          model: CourseTranslation
+        },
+        {
+          model: User
+        }
+      ],
+      order: [[CourseInstance, 'endDate', 'DESC']]
+    }) as Array<CourseFullWithInstances>;
+
+  for (const course of inChargeCourses) {
+    coursesOfUser.current.push(parseCourseFull(course));
+  }
 
   // Construct CourseData objects and determine whether the course is current or previous.
   const currentDate: Date = new Date(Date.now());
-  for (const course of courses) {
-    /*
-     * If the course instance array is empty, this user has no role in any
-     * instance of this course. Meaning the user has not taken any part in this
-     * course and it shouldn't be included in the result.
-     *
-     * TODO: Don't include courses like this in the query result to begin with.
-     */
-    //if (course.CourseInstances.length == 0)
-    //  continue;
+  for (const course of instanceRoleCourses) {
+    // Don't include courses that have already been included as courses the
+    // user is in charge of
+    if (coursesOfUser.current.find((course: CourseData) => course.id === course.id))
+      continue;
 
     const courseData: CourseData = parseCourseFull(course);
 
-    //const latestEndDate: Date = new Date(String(course.CourseInstances[0].endDate));
+    const latestEndDate: Date = new Date(String(course.CourseInstances[0].endDate));
 
-    //if (currentDate <= latestEndDate) {
+    if (currentDate <= latestEndDate) {
       coursesOfUser.current.push(courseData);
-    //} else {
+    } else {
       coursesOfUser.previous.push(courseData);
-    //}
+    }
   }
 
   res.status(HttpCode.Ok).send({

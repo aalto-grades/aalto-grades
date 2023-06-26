@@ -281,7 +281,7 @@ export default {
           onUpdate: 'CASCADE'
         },
         role: {
-          type: DataTypes.ENUM('STUDENT', 'TEACHER', 'TEACHER_IN_CHARGE'),
+          type: DataTypes.ENUM('STUDENT', 'TEACHER'),
           allowNull: false
         },
         created_at: DataTypes.DATE,
