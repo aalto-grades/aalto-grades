@@ -118,7 +118,7 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
           return {
             courseId: course.id,
             userId: teacher.id
-          }
+          };
         }
       );
 

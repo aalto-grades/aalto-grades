@@ -41,7 +41,7 @@ function parseSisuCourseInstance(instance: SisuCourseInstance): CourseInstanceDa
         (name: string) => {
           return {
             name: name
-          }
+          };
         }
       ),
       department: {
