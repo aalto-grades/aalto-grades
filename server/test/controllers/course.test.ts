@@ -121,6 +121,11 @@ describe('Test POST /v1/courses - create new course', () => {
       courseCode: 'ELEC-A7200',
       minCredits: 5,
       maxCredits: 5,
+      teachersInCharge: [
+        {
+          id: 10
+        }
+      ],
       department: {
         fi: 'Sähkötekniikan korkeakoulu',
         en: 'School of Electrical Engineering',
@@ -140,12 +145,21 @@ describe('Test POST /v1/courses - create new course', () => {
 
     expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data.course).toBeDefined();
     expect(res.body.data.course.id).toBeDefined();
 
     input = {
       courseCode: 'ELEC-A7200',
       minCredits: 5,
       maxCredits: 5,
+      teachersInCharge: [
+        {
+          id: 15
+        },
+        {
+          id: 20
+        }
+      ],
       department: {
         fi: 'Sähkötekniikan korkeakoulu',
         en: 'School of Electrical Engineering',
@@ -163,6 +177,7 @@ describe('Test POST /v1/courses - create new course', () => {
 
     expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data.course).toBeDefined();
     expect(res.body.data.course.id).toBeDefined();
   });
 
