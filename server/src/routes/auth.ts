@@ -239,5 +239,5 @@ router.get(
   '/v1/auth/self-info',
   passport.authenticate('jwt', { session: false }),
   express.json(),
-  authSelfInfo
+  controllerDispatcher(authSelfInfo)
 );
