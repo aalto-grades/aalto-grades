@@ -5,11 +5,11 @@
 import { getFormulaImplementation } from '../../src/formulas';
 import { Status } from '../../src/types/grades';
 import {
-  Formula,
   FormulaImplementation,
   CalculationInput,
   CalculationResult,
 } from '../../src/types/formulas';
+import { Formula } from 'aalto-grades-common/types';
 
 describe('Test weighted average calculation', () => {
   it('should accept parameters of the appropriate form', async () => {

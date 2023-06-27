@@ -4,7 +4,8 @@
 
 import * as yup from 'yup';
 
-import { Formula, FormulaFunction, FormulaImplementation } from '../types/formulas';
+import { FormulaFunction, FormulaImplementation } from '../types/formulas';
+import { Formula } from 'aalto-grades-common/types';
 
 // The registry of formula implementations corresponding to their names, along
 // with a schema specifying what form their user parameters should take.
