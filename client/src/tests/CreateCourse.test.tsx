@@ -22,11 +22,11 @@ describe('Tests for CreateCourseView components', () => {
         </BrowserRouter>
       );
 
-      const headingElement = screen.getByText('Create a New Course');
-      const codeField = screen.getByLabelText('Course Code');
-      const nameField = screen.getByLabelText('Course Name');
-      const organizerField = screen.getByLabelText('Organizer');
-      const creationButton = screen.getByText('Create Course');
+      const headingElement: HTMLElement = screen.getByText('Create a New Course');
+      const codeField: HTMLElement = screen.getByLabelText('Course Code');
+      const nameField: HTMLElement = screen.getByLabelText('Course Name');
+      const organizerField: HTMLElement = screen.getByLabelText('Organizer');
+      const creationButton: HTMLElement = screen.getByText('Create Course');
 
       expect(headingElement).toBeDefined();
       expect(codeField).toBeDefined();
@@ -38,18 +38,18 @@ describe('Tests for CreateCourseView components', () => {
 
   test('CreateCourseForm should allow an admin to create a course', () => {
 
-    const mockCourse = jest.fn();
+    const mockCourse: jest.Mock = jest.fn();
 
-    const testCode = 'Test code';
-    const testName = 'Test name';
-    const testDepartment = 'Test department';
+    const testCode: string = 'Test code';
+    const testName: string = 'Test name';
+    const testDepartment: string = 'Test department';
 
     render(<CreateCourseForm addCourse={mockCourse} />);
 
-    const codeField = screen.getByLabelText('Course Code');
-    const nameField = screen.getByLabelText('Course Name');
-    const organizerField = screen.getByLabelText('Organizer');
-    const creationButton = screen.getByText('Create Course');
+    const codeField: HTMLElement = screen.getByLabelText('Course Code');
+    const nameField: HTMLElement = screen.getByLabelText('Course Name');
+    const organizerField: HTMLElement = screen.getByLabelText('Organizer');
+    const creationButton: HTMLElement = screen.getByText('Create Course');
 
     act(() => userEvent.type(codeField, testCode));
     act(() => userEvent.type(nameField, testName));
@@ -76,7 +76,13 @@ describe('Tests for CreateCourseView components', () => {
         fi: '',
         sv: '',
         en: '',
-      }
+      },
+      teachersInCharge: [
+        {
+          id: 23,
+          name: 'Elon Musk',
+        },
+      ]
     });
   });
 

@@ -180,22 +180,6 @@ function InstanceSummaryView() {
           />
         </Box>
       </Box>
-      <Box borderRadius={1} sx={{
-        bgcolor: 'secondary.light', p: '16px 20px', mb: 5, display: 'inline-block'
-      }}>
-        <Typography variant='h3' align='left' sx={{ pb: 1 }}>
-          Teachers in Charge
-        </Typography>
-        {
-          teachers.map((teacher) => {
-            return (
-              <Typography align='left' key={teacher} >
-                {teacher}
-              </Typography>
-            );
-          })
-        }
-      </Box>
       <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >
         Added study attainments
       </Typography>

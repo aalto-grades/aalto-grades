@@ -7,10 +7,13 @@ import '@testing-library/jest-dom/extend-expect';
 import { act, render, waitFor, cleanup, fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CourseView from '../components/CourseView';
+import assessmentModelsService from '../services/assessmentModels';
 import coursesService from '../services/courses';
 import instancesService from '../services/instances';
 import gradesService from '../services/grades';
 import AuthContext from '../context/AuthProvider';
+import mockAssessmentModels from './mock-data/mockAssessmentModels';
+import mockAttainments from './mock-data/mockAttainmentsClient';
 import mockCourses from './mock-data/mockCourses';
 import mockInstances from './mock-data/mockInstancesWithStringDates';
 import { maxErrorsToShow } from '../components/course-view/FileLoadDialog';
@@ -18,6 +21,7 @@ import { SystemRole } from 'aalto-grades-common/types/auth';
 
 const file = new File(['idk'], 'grades_test.csv', { type: 'csv' });
 
+jest.mock('../services/assessmentModels');
 jest.mock('../services/courses');
 jest.mock('../services/instances');
 jest.mock('../services/grades');
@@ -45,11 +49,15 @@ describe('FileLoadDialog test with proper csv', () => {
 
   function renderCourseView(auth) {
 
-    const mockResponseInstances = mockInstances;
-    (instancesService.getInstances as jest.Mock).mockResolvedValue(mockResponseInstances);
+    (instancesService.getInstances as jest.Mock).mockResolvedValue(mockInstances);
 
-    const mockResponseCourse = mockCourses[0];
-    (coursesService.getCourse as jest.Mock).mockResolvedValue(mockResponseCourse);
+    (coursesService.getCourse as jest.Mock).mockResolvedValue(mockCourses[0]);
+
+    (assessmentModelsService.getAllAssessmentModels as jest.Mock)
+      .mockResolvedValue(mockAssessmentModels);
+
+    (assessmentModelsService.getAllAttainments as jest.Mock)
+      .mockResolvedValue(mockAttainments);
 
     // succeess, nothing to worry about
     (gradesService.importCsv as jest.Mock).mockResolvedValue({});
@@ -155,11 +163,15 @@ describe('FileLoadDialog test where server does not accept the file', () => {
 
   function renderCourseView(auth) {
 
-    const mockResponseInstances = mockInstances;
-    (instancesService.getInstances as jest.Mock).mockResolvedValue(mockResponseInstances);
+    (instancesService.getInstances as jest.Mock).mockResolvedValue(mockInstances);
 
-    const mockResponseCourse = mockCourses[0];
-    (coursesService.getCourse as jest.Mock).mockResolvedValue(mockResponseCourse);
+    (coursesService.getCourse as jest.Mock).mockResolvedValue(mockCourses[0]);
+
+    (assessmentModelsService.getAllAssessmentModels as jest.Mock)
+      .mockResolvedValue(mockAssessmentModels);
+
+    (assessmentModelsService.getAllAttainments as jest.Mock)
+      .mockResolvedValue(mockAttainments);
 
     // Mock the error.
     (gradesService.importCsv as jest.Mock).mockRejectedValue({

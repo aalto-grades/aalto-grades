@@ -2,47 +2,50 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState } from 'react';
+import { SyntheticEvent, useState } from 'react';
 import PropTypes from 'prop-types';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
-import TextFieldBox from './TextFieldBox';
+import TextFieldBox, { TextFieldData } from './TextFieldBox';
 import { CourseData } from 'aalto-grades-common/types';
+import { State } from '../../types';
 
-const codeData = {
+const codeData: TextFieldData = {
   fieldId: 'courseCode',
   fieldLabel: 'Course Code',
   fieldHelperText: 'Give the code that the new course is going to have.'
 };
 
-const nameData = {
+const nameData: TextFieldData = {
   fieldId: 'courseName',
   fieldLabel: 'Course Name',
   fieldHelperText: 'Give the name of the course the new course is going to have.'
 };
 
-const organizerData = {
+const organizerData: TextFieldData = {
   fieldId: 'organizer',
   fieldLabel: 'Organizer',
   fieldHelperText: 'Give the organizer of the new course.'
 };
 
-/*const teachersData = {
+/*const teachersData: TextFieldData = {
   fieldId: 'teachers',
-  fieldLabel: 'Responsibe Teachers',
-  fieldHelperText: 'Give the emails of the responsible teachers of the new course.'
+  fieldLabel: 'Teachers in Charge',
+  fieldHelperText: 'Give the emails of the teachers in charge of the new course.'
 };*/
 
-function CreateCourseForm({ addCourse }): JSX.Element {
+function CreateCourseForm(params: {
+  addCourse: (course: CourseData) => Promise<void>
+}): JSX.Element {
 
-  const [courseCode, setCode] = useState<string>('');
-  const [name, setName] = useState<string>('');
-  const [department, setOrganizer] = useState<string>('');
-  //const [teacher, setTeacher] = useState<any>('');
+  const [courseCode, setCode]: State<string> = useState('');
+  const [name, setName]: State<string> = useState('');
+  const [department, setOrganizer]: State<string> = useState('');
+  //const [teacher, setTeacher]: State<string> = useState('');
 
   const id: number = -1;
 
-  async function handleSubmit(event): Promise<void> {
+  async function handleSubmit(event: SyntheticEvent): Promise<void> {
     event.preventDefault();
     try {
       // TODO remove mock data
@@ -73,7 +76,7 @@ function CreateCourseForm({ addCourse }): JSX.Element {
           }
         ]
       });
-      addCourse(courseObject);
+      params.addCourse(courseObject);
     } catch (exception) {
       console.log(exception);
     }
