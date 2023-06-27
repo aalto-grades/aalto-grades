@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -13,6 +12,9 @@ import Container from '@mui/material/Container';
 import { styled } from '@mui/material/styles';
 import formulasService from '../../services/formulas';
 import { Box, CircularProgress } from '@mui/material';
+import { State } from '../../types';
+import { FormulaPreview } from 'aalto-grades-common/types';
+import PropTypes, { InferProps } from 'prop-types';
 
 const HoverExpandMoreIcon = styled<any>(ExpandMoreIcon)(({ theme }) => ({
   '&:hover': {
@@ -20,16 +22,19 @@ const HoverExpandMoreIcon = styled<any>(ExpandMoreIcon)(({ theme }) => ({
   }
 }));
 
-function ViewFormulaAccordion({ formulaId }) {
-  const [codeSnippet, setCodeSnippet] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(true);
+function ViewFormulaAccordion(
+  { formulaId }: InferProps<typeof ViewFormulaAccordion.propTypes>
+): JSX.Element {
+  const [codeSnippet, setCodeSnippet]: State<string | null> = useState(null);
 
   useEffect(() => {
-    formulasService.getFormulaDetails(formulaId)
-      .then((data: any) => {
-        setCodeSnippet(data.codeSnippet);
-        setLoading(false);
-      }).catch((exception: Error) => console.log(exception.message));
+    if (formulaId !== undefined) {
+      formulasService.getFormulaDetails(formulaId)
+        .then((data: FormulaPreview) => {
+          setCodeSnippet(data.codeSnippet);
+        })
+        .catch((exception: Error) => console.log(exception.message));
+    }
   }, [formulaId]);
 
   return (
@@ -48,8 +53,14 @@ function ViewFormulaAccordion({ formulaId }) {
             { formulaId === undefined ?
               <p>Select formula for previewing</p>
               :
-              loading ?
-                <Box sx={{ margin: 'auto', alignItems: 'center', justifyContent: 'center', display: 'flex' }}>
+              codeSnippet == null ?
+                <Box
+                  sx={{
+                    margin: 'auto',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    display: 'flex'
+                  }}>
                   <CircularProgress />
                 </Box>
                 :
@@ -65,7 +76,7 @@ function ViewFormulaAccordion({ formulaId }) {
 }
 
 ViewFormulaAccordion.propTypes = {
-  formulaId: PropTypes.string,
+  formulaId: PropTypes.string
 };
 
 export default ViewFormulaAccordion;

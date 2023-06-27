@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { NavigateFunction, useOutletContext, useNavigate } from 'react-router-dom';
-import PropTypes from 'prop-types';
+import PropTypes, { InferProps } from 'prop-types';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
@@ -23,15 +23,17 @@ import AlertSnackbar from '../alerts/AlertSnackbar';
 import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
 import { sleep } from '../../utils/util';
 import formulasService from '../../services/formulas';
+import { FormulaData, FormulaPreview } from 'aalto-grades-common/types';
+import CircularProgress from '@mui/material/CircularProgress';
+import { State } from '../../types';
 
 function SelectFormulaForm({
-  attainments, formulas, navigateToCourseView, navigateToAttributeSelection
-}) {
-  const [codeSnippet, setCodeSnippet] = useState<any>('');
-  const [checkboxError, setCheckboxError] = useState<any>('');
-  const [formulaError, setFormulaError] = useState<any>('');
+  attainments, navigateToCourseView, navigateToAttributeSelection
+}: InferProps<typeof SelectFormulaForm.propTypes>): JSX.Element {
+  const [checkboxError, setCheckboxError]: State<string>  = useState('');
+  const [formulaError, setFormulaError]: State<string> = useState('');
   const [setSnackPack, messageInfo, setMessageInfo, alertOpen, setAlertOpen] = useSnackPackAlerts();
-
+  const [formulas, setFormulas]: State<Array<FormulaData> | null> = useState(null);
   const navigate: NavigateFunction = useNavigate();
 
   const {
@@ -40,21 +42,33 @@ function SelectFormulaForm({
   } = useOutletContext<any>();
 
   useEffect(() => {
+    if (formulas == null) {
+      formulasService.getFormulas()
+        .then((data: Array<FormulaData>) => {
+          setFormulas(data);
+        })
+        .catch((exception: Error) => console.log(exception.message));
+    }
+  }, []);
+
+  useEffect(() => {
     // all attainments are checked at default -> add them to selected attainments
     if (selectedAttainments.length === 0) {
       setSelectedAttainments(attainments);
     }
   }, [attainments]);
 
-  function handleFormulaChange(event) {
-    const newFormula = formulas.find(formula => formula.name == event.target.value);
+  function handleFormulaChange(event): void {
+    const newFormula: FormulaData = formulas.find(
+      (formula: FormulaData) => formula.name == event.target.value
+    );
     setSelectedFormula(newFormula);
   }
 
   // checks that user has selected a function and at least one attainment
   // if not, shows error message
   function canBeSubmitted(): boolean {
-    let noErrors = true;
+    let noErrors: boolean = true;
     if (selectedAttainments.length === 0) {
       setCheckboxError('You must select at least one study attainment');
       noErrors = false;
@@ -72,16 +86,16 @@ function SelectFormulaForm({
     return noErrors;
   }
 
-  async function handleSubmit(event) {
+  async function handleSubmit(event): Promise<void> {
     event.preventDefault();
     if (canBeSubmitted()) {
       try {
-        const formula: any = await formulasService.getFormulaDetails(selectedFormula.id);
+        const formula: FormulaPreview = await formulasService.getFormulaDetails(selectedFormula.id);
         setSelectedFormula(formula);
 
-        const updatedAttainments = selectedAttainments.map((attainment) => {
-          const attributeObj = {};
-          formula.attributes.forEach((elem) => {
+        const updatedAttainments: any = selectedAttainments.map((attainment: any) => {
+          const attributeObj: object = {};
+          formula.attributes.forEach((elem: string) => {
             attributeObj[elem] = '';
           });
           return {
@@ -100,7 +114,6 @@ function SelectFormulaForm({
         ]);
         await sleep(4000);
         navigateToCourseView();
-
       } catch (exception) {
         console.log(exception);
         setSnackPack((prev) => [...prev,
@@ -110,7 +123,7 @@ function SelectFormulaForm({
     }
   }
 
-  function handleCheckboxChange(event) {
+  function handleCheckboxChange(event): void {
     const selectedAttainment = attainments.find(attainment => attainment.name == event.target.name);
     if (event.target.checked) {
       setSelectedAttainments(prev => [...prev, selectedAttainment]);
@@ -119,9 +132,10 @@ function SelectFormulaForm({
     }
   }
 
-  function isChecked(attainment) {
-    // If user has returned from attribute selection -> only assigments they previously selected are checked
-    for (let i = 0; i < selectedAttainments.length; i++) {
+  function isChecked(attainment): boolean {
+    // If user has returned from attribute selection
+    // -> only assigments they previously selected are checked
+    for (let i: number = 0; i < selectedAttainments.length; i++) {
       if (selectedAttainments[i] === attainment) {
         return true;
       }
@@ -129,7 +143,7 @@ function SelectFormulaForm({
     return false;
   }
 
-  function attainmentCheckboxes() {
+  function attainmentCheckboxes(): JSX.Element {
     return (
       <>
         {attainments.map((attainment) => (
@@ -183,15 +197,23 @@ function SelectFormulaForm({
           >
             Formula
           </InputLabel>
-          <Select
-            label='Formula'
-            labelId='formulaLabel'
-            value={selectedFormula.name ?? ''}
-            onChange={handleFormulaChange}
-            error={formulaError !== ''}
-          >
-            { formulas.map((formula) => <MenuItem key={formula.id} value={formula.name}>{formula.name}</MenuItem>) }
-          </Select>
+          { formulas !== null ?
+            <Select
+              label='Formula'
+              labelId='formulaSelector'
+              value={selectedFormula.name ?? ''}
+              onChange={handleFormulaChange}
+              error={formulaError !== ''}
+            >
+              { formulas.map((formula: FormulaData) => {
+                return (
+                  <MenuItem key={formula.id} value={formula.name}>{formula.name}</MenuItem>
+                );
+              })}
+            </Select>
+            :
+            <CircularProgress sx={{ mt: 2 }} />
+          }
           <FormHelperText error={formulaError !== ''}>{formulaError}</FormHelperText>
         </FormControl>
         <StyledBox>
@@ -222,7 +244,7 @@ function SelectFormulaForm({
             <Button
               size='medium'
               variant='contained'
-              onClick={() => canBeSubmitted() && navigateToAttributeSelection()}
+              onClick={(): void => canBeSubmitted() && navigateToAttributeSelection()}
             >
               Specify  attributes
             </Button>
@@ -232,7 +254,7 @@ function SelectFormulaForm({
           sx={{ mt: 0, mb: 1.5, ml: 2.2 }}
           size='medium'
           variant='text'
-          onClick={() => navigate(-1)}
+          onClick={(): void => navigate(-1)}
         >
           Cancel
         </Button>
@@ -244,7 +266,6 @@ function SelectFormulaForm({
 
 SelectFormulaForm.propTypes = {
   attainments: PropTypes.array,
-  formulas: PropTypes.array,
   navigateToCourseView: PropTypes.func,
   navigateToAttributeSelection: PropTypes.func,
 };
