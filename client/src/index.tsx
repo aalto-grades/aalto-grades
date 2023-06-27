@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOM, { Root } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle, GlobalStyleComponent } from 'styled-components';
 import { AuthProvider } from './context/AuthProvider';
 
-const GlobalStyles = createGlobalStyle`
+const GlobalStyles: GlobalStyleComponent<unknown, unknown> = createGlobalStyle`
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -25,7 +25,7 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root: Root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <GlobalStyles />

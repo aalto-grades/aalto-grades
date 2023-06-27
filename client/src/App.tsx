@@ -2,14 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { CSSProperties, JSX } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import styled from 'styled-components';
+import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
+import styled, { StyledComponent } from 'styled-components';
 import PrivateRoute from './components/auth/PrivateRoute';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
@@ -39,17 +40,12 @@ declare module '@mui/material/styles' {
     infoGrey?: string
   }
 
-  // TODO: This doesn't fix the type error below for some reason
-  interface TypographyOptions {
-    textInput?: {
-      fontSize?: string,
-      fontFamily?: string,
-      fontWeight?: string
-    }
+  interface TypographyVariantsOptions {
+    textInput?: CSSProperties;
   }
 }
 
-const theme = createTheme({
+const theme: Theme = createTheme({
   palette: {
     black: '#000000',
     primary: {
@@ -117,10 +113,10 @@ const theme = createTheme({
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
       fontWeight: '400'
     },
-  } as any // TODO: Remove
+  }
 });
 
-const AppContainer = styled(Container)`
+const AppContainer: StyledComponent<typeof Container, object> = styled(Container)`
   text-align: center;
 `;
 
