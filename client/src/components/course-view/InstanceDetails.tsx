@@ -8,13 +8,12 @@ import Typography from '@mui/material/Typography';
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 import textFormatServices from '../../services/textFormat';
 
-function InstanceDetails({ info }) {
+function InstanceDetails({ info }): JSX.Element {
   const {
     minCredits, maxCredits,
     startDate, endDate,
     type,
     gradingScale,
-    teachersInCharge,
     department,
     institution
   } = info;
@@ -67,16 +66,6 @@ function InstanceDetails({ info }) {
           label='Educational Institution'
           value={institution}
         />
-      </Box>
-      <Box sx={{ m: 1.5 }}>
-        <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>
-          Teachers in Charge
-        </Typography>
-        {
-          teachersInCharge.map((teacher) => <Typography align='left' key={teacher} >
-            {teacher}
-          </Typography>)
-        }
       </Box>
     </Box>
   );
