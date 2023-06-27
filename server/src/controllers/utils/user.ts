@@ -18,7 +18,6 @@ import { HttpCode } from '../../types/httpCode';
 export async function findUserById(userId: number, errorCode: HttpCode): Promise<User> {
   const user: User | null = await User.findByPk(userId);
   if (!user) {
-    // TODO: This may not be NotFound in all cases.
     throw new ApiError(`user with ID ${userId} not found`, errorCode);
   }
   return user;

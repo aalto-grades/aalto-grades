@@ -4,23 +4,20 @@
 
 import * as yup from 'yup';
 
+import { Status } from './grades';
+
 export enum Formula {
   Manual = 'MANUAL',
   WeightedAverage = 'WEIGHTED_AVERAGE',
 }
 
-export enum Status {
-  Pass = 'PASS',
-  Fail = 'FAIL',
-}
-
-export interface GradingResult {
+export interface CalculationResult {
   status: Status;
   grade: number;
 }
 
-export interface GradingInput {
-  subResult: GradingResult;
+export interface CalculationInput {
+  subResult: CalculationResult;
   params: object | null;
 }
 
@@ -34,7 +31,8 @@ export interface FormulaPreview {
 /**
  * Type of functions implementing grade calculation formulas.
  */
-export type FormulaFunction = (inputs: Array<GradingInput>) => Promise<GradingResult>;
+export type FormulaFunction =
+  (inputs: Array<CalculationInput>) => Promise<CalculationResult>;
 
 /**
  * Stores a formula function as well as the Yup schema for validating its
@@ -52,4 +50,5 @@ export interface FormulaNode {
   formulaImplementation: FormulaImplementation;
   subFormulaNodes: Array<FormulaNode>;
   parentFormulaParams: object | null;
+  attainmentId: number;
 }

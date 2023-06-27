@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState }  from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import SignupForm from './SignupForm';
 import userService from '../../services/user';
@@ -11,9 +11,9 @@ import useAuth from '../../hooks/useAuth';
 import { SystemRole } from 'aalto-grades-common/types/auth';
 import { SignupCredentials } from '../../types/auth';
 
-const Signup = (): JSX.Element => {
+function Signup(): JSX.Element {
 
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
   const { setAuth } = useAuth();
   const theme = useTheme();
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -23,13 +23,13 @@ const Signup = (): JSX.Element => {
       const response = await userService.signup(userObject);
       // if signup successfull, save user role to context
       setAuth({
-        id: response.data!.id,
-        role: response.data!.role,
-        name: response.data!.name
+        id: response.id,
+        role: response.role,
+        name: response.name
       });
 
-      console.log(`${response.data!.role}`);
-      if (response.data!.role === SystemRole.Admin) {
+      console.log(`${response.role}`);
+      if (response.role === SystemRole.Admin) {
         navigate('/course-view', { replace: true });
       } else {
         navigate('/', { replace: true });
@@ -47,6 +47,6 @@ const Signup = (): JSX.Element => {
       <SignupForm addUser={addUser} />
     </div>
   );
-};
+}
 
 export default Signup;

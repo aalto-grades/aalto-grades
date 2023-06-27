@@ -3,33 +3,40 @@
 // SPDX-License-Identifier: MIT
 
 import axios from './axios';
-import { CourseData } from 'aalto-grades-common/types/course';
+import { AxiosResponse } from 'axios';
+import { CourseData, CoursesOfUser } from 'aalto-grades-common/types';
+import { ApiResponse } from '../types';
 
-async function getCoursesOfUser(userId: number | string): Promise<{
-  courses: {
-    current: Array<CourseData>,
-    previous: Array<CourseData>
-  }
-}> {
-  const response = await axios.get(`/v1/user/${userId}/courses`);
-  console.log(response.data);
-  return response.data.data;
+async function getCoursesOfUser(userId: number | string): Promise<CoursesOfUser> {
+  const response: AxiosResponse<
+    ApiResponse<{ courses: CoursesOfUser }>, unknown
+  > = await axios.get(`/v1/user/${userId}/courses`);
+
+  return response.data.data.courses;
 }
 
-async function getCourse(courseId: number | string): Promise<{ course: CourseData }> {
-  const response = await axios.get(`/v1/courses/${courseId}`);
-  return response.data.data;
+async function getCourse(courseId: number | string): Promise<CourseData> {
+  const response: AxiosResponse<
+    ApiResponse<{ course: CourseData }>, unknown
+  > = await axios.get(`/v1/courses/${courseId}`);
+
+  return response.data.data.course;
 }
 
-async function getAllCourses(): Promise<{ courses: Array<CourseData> }> {
-  const response = await axios.get('/v1/courses');
-  return response.data.data;
+async function getAllCourses(): Promise<Array<CourseData>> {
+  const response: AxiosResponse<
+    ApiResponse<{ courses: Array<CourseData> }>, unknown
+  > = await axios.get('/v1/courses');
+
+  return response.data.data.courses;
 }
 
-// .data added here too, not tested though
-async function addCourse(course: CourseData): Promise<{ course: { id: number } }> {
-  const response = await axios.post('/v1/courses', course);
-  return response.data.data;
+async function addCourse(course: CourseData): Promise<number> {
+  const response: AxiosResponse<
+    ApiResponse<{ course: { id: number } }>, unknown
+  > = await axios.post('/v1/courses', course);
+
+  return response.data.data.course.id;
 }
 
 export default { getCoursesOfUser, getCourse, getAllCourses, addCourse };

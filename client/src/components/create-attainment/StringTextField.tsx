@@ -2,33 +2,39 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@mui/material/TextField';
 import attainmentServices from '../../services/attainments';
 
 // A TextField component used for the 'name' of an attainment.
-// This component is also used for the formula attribute textfields that are required after specifying a formula.
+// This component is also used for the formula attribute textfields that are
+// required after specifying a formula.
 
-const StringTextField = ({ fieldData, indices, attainments, setAttainments }) => {
+function StringTextField({ fieldData, indices, attainments, setAttainments }) {
 
   // Functions for handling the change of the values in the 'New Name' textfield
   // and the textfields that represent formula attributes
-  const handleChange = (event) => {
+  function handleChange(event) {
     const value = event.target.value;
     if (fieldData.fieldId === 'attainmentName') {
-      const updatedAttainments = attainmentServices.setProperty(indices, attainments, 'name', value);
+      const updatedAttainments = attainmentServices.setProperty(
+        indices, attainments, 'name', value
+      );
+
       setAttainments(updatedAttainments);
     } else if (fieldData.fieldId.startsWith('attribute')) {
       const attributeKey = fieldData.fieldId.split('_')[1];
-      const updatedAttainments = attainmentServices.setFormulaAttribute(indices, attainments, attributeKey, value);
+      const updatedAttainments = attainmentServices.setFormulaAttribute(
+        indices, attainments, attributeKey, value
+      );
+
       setAttainments(updatedAttainments);
     } else {
       console.log(fieldData.fieldId);
     }
-  };
+  }
 
-  const getValue = () => {
+  function getValue() {
     if (fieldData.fieldId === 'attainmentName') {
       return attainmentServices.getProperty(indices, attainments, 'name');
     } else if (fieldData.fieldId.startsWith('attribute')) {
@@ -37,7 +43,7 @@ const StringTextField = ({ fieldData, indices, attainments, setAttainments }) =>
     } else {
       console.log(fieldData.fieldId);
     }
-  };
+  }
 
   return (
     <TextField
@@ -56,7 +62,7 @@ const StringTextField = ({ fieldData, indices, attainments, setAttainments }) =>
       onChange={(event) => handleChange(event)}
     />
   );
-};
+}
 
 StringTextField.propTypes = {
   fieldData: PropTypes.object,

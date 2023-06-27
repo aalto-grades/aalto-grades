@@ -4,27 +4,17 @@
 
 import { Request, Response } from 'express';
 
-import models from '../database/models';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
-import { CourseData } from 'aalto-grades-common/types/course';
-import { Language } from 'aalto-grades-common/types/language';
-import { findUserById } from './utils/user';
+import { CourseData, CoursesOfUser } from 'aalto-grades-common/types';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
-
-interface CourseWithTranslationAndInstance extends Course {
-  CourseTranslations: Array<CourseTranslation>
-  CourseInstances: Array<CourseInstance>
-}
-
-export interface CoursesOfUser {
-  current: Array<CourseData>,
-  previous: Array<CourseData>
-}
+import { parseCourseFull } from './utils/course';
+import { findUserById } from './utils/user';
+import { CourseFull } from '../types/model';
 
 export async function getCoursesOfUser(req: Request, res: Response): Promise<void> {
   const coursesOfUser: CoursesOfUser = { current: [], previous: [] };
@@ -39,79 +29,64 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
   // Confirm that user exists.
   await findUserById(userId, HttpCode.NotFound);
 
-  // TODO: This query is likely not ideal.
-  const courses: Array<CourseWithTranslationAndInstance> = await models.Course.findAll({
-    attributes: ['id', 'courseCode'],
-    include: [
-      {
-        model: CourseInstance,
-        attributes: ['endDate'],
-        include: [
-          {
-            model: User,
-            where: {
-              id: userId
-            }
+  const inChargeCourses: Array<CourseFull> =
+    await Course.findAll({
+      include: [
+        {
+          model: CourseTranslation
+        },
+        {
+          model: User,
+          where: {
+            id: userId
           }
-        ]
-      },
-      {
-        model: CourseTranslation,
-        attributes: ['language', 'courseName', 'department'],
-      }
-    ],
-    order: [[CourseInstance, 'endDate', 'DESC']]
-  }) as Array<CourseWithTranslationAndInstance>;
+        }
+      ]
+    }) as Array<CourseFull>;
+
+  interface CourseFullWithInstances extends CourseFull {
+    CourseInstances: Array<CourseInstance>;
+    CourseTranslations: Array<CourseTranslation>
+  }
+
+  const instanceRoleCourses: Array<CourseFullWithInstances> =
+    await Course.findAll({
+      include: [
+        {
+          model: CourseInstance,
+          attributes: ['endDate'],
+          include: [
+            {
+              model: User,
+              where: {
+                id: userId
+              }
+            }
+          ]
+        },
+        {
+          model: CourseTranslation
+        },
+        {
+          model: User
+        }
+      ],
+      order: [[CourseInstance, 'endDate', 'DESC']]
+    }) as Array<CourseFullWithInstances>;
+
+  for (const course of inChargeCourses) {
+    coursesOfUser.current.push(parseCourseFull(course));
+  }
 
   // Construct CourseData objects and determine whether the course is current or previous.
   const currentDate: Date = new Date(Date.now());
-  for (const course of courses) {
-    /*
-     * If the course instance array is empty, this user has no role in any
-     * instance of this course. Meaning the user has not taken any part in this
-     * course and it shouldn't be included in the result.
-     *
-     * TODO: Don't include courses like this in the query result to begin with.
-     */
-    if (course.CourseInstances.length == 0)
+  for (const course of instanceRoleCourses) {
+    // Don't include courses that have already been included as courses the
+    // user is in charge of
+    if (coursesOfUser.current.find((course: CourseData) => course.id === course.id))
       continue;
 
-    const courseData: CourseData = {
-      id: course.id,
-      courseCode: course.courseCode,
-      department: {
-        fi: '',
-        sv: '',
-        en: ''
-      },
-      name: {
-        fi: '',
-        sv: '',
-        en: ''
-      },
-      evaluationInformation: {
-        fi: '',
-        sv: '',
-        en: ''
-      }
-    };
-
-    course.CourseTranslations.forEach((translation: CourseTranslation) => {
-      switch (translation.language) {
-      case Language.English:
-        courseData.department.en = translation.department;
-        courseData.name.en = translation.courseName;
-        break;
-      case Language.Finnish:
-        courseData.department.fi = translation.department;
-        courseData.name.fi = translation.courseName;
-        break;
-      case Language.Swedish:
-        courseData.department.sv = translation.department;
-        courseData.name.sv = translation.courseName;
-        break;
-      }
-    });
+    const courseData: CourseData = parseCourseFull(course);
 
     const latestEndDate: Date = new Date(String(course.CourseInstances[0].endDate));
 

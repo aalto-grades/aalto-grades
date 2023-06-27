@@ -7,7 +7,7 @@ import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import AllCoursesView from '../components/AllCoursesView';
 import coursesService from '../services/courses';
-import AuthContext from '../context/authProvider';
+import AuthContext from '../context/AuthProvider';
 import mockCourses from './mock-data/mockCourses';
 import { SystemRole } from 'aalto-grades-common/types/auth';
 
@@ -16,9 +16,9 @@ afterEach(cleanup);
 
 describe('Tests for FrontPage component', () => {
 
-  const renderAllCoursesView = async (auth) => {
+  async function renderAllCoursesView(auth) {
 
-    const mockResponse = { courses: mockCourses };
+    const mockResponse = mockCourses;
 
     (coursesService.getAllCourses as jest.Mock).mockRejectedValue('Network error');
     (coursesService.getAllCourses as jest.Mock).mockResolvedValue(mockResponse);
@@ -30,7 +30,7 @@ describe('Tests for FrontPage component', () => {
         </AuthContext.Provider>
       </BrowserRouter>
     );
-  };
+  }
 
   test('AllCoursesView should render all courses regardless of user role', async () => {
     const auth = { role: null };

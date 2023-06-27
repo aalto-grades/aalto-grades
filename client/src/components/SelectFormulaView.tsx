@@ -3,28 +3,29 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
+import { useParams, useNavigate, useOutletContext, Params, NavigateFunction } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import SelectFormulaForm from './select-formula-view/SelectFormulaForm';
-import instancesService from '../services/instances';
 import formulasService from '../services/formulas';
 import mockAttainments from '../mock-data/mockAttainments';
 
-const SelectFormulaView = () => {
+function SelectFormulaView() {
   const { setSelectedFormula, selectedFormula } = useOutletContext<any>();
-  const { instanceId, courseId } = useParams();
+  const { instanceId, courseId }: Params = useParams();
   const [attainments, setAttainments] = useState([]);
   const [formulas, setFormulas] = useState([]);
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
 
   useEffect(() => {
-    // TODO: fetch attainments for course based on the instanceId
-    instancesService.getAttainments(instanceId)
+    // TODO: fetch attainments for course based on the assessmentModelId
+    /*instancesService.getAttainments(instanceId)
       .then((data) => {
         setAttainments(data);
       })
       .catch((exception: Error) => console.log(exception.message));
+      .catch((e) => console.log(e.message));*/
+    // TODO: fetch formulas
     formulasService.getFormulas()
       .then((data: any) => {
         setFormulas(data);
@@ -66,6 +67,6 @@ const SelectFormulaView = () => {
     </Box>
 
   );
-};
+}
 
 export default SelectFormulaView;

@@ -7,6 +7,7 @@ import {
 } from 'sequelize';
 
 import { sequelize } from '..';
+import AssessmentModel from './assessmentModel';
 import Course from './course';
 
 export default class CourseInstance extends Model<
@@ -15,13 +16,12 @@ export default class CourseInstance extends Model<
 > {
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
-  declare sisuCourseInstanceId: string | null;
+  declare assessmentModelId: CreationOptional<ForeignKey<AssessmentModel['id']>>;
+  declare sisuCourseInstanceId: CreationOptional<string>;
   declare gradingScale: string;
   declare startingPeriod: string;
   declare endingPeriod: string;
   declare type: string;
-  declare minCredits: number;
-  declare maxCredits: number;
   declare startDate: Date;
   declare endDate: Date;
   declare createdAt: CreationOptional<Date>;
@@ -40,6 +40,14 @@ CourseInstance.init(
       allowNull: false,
       references: {
         model: 'course',
+        key: 'id'
+      }
+    },
+    assessmentModelId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'assessment_model',
         key: 'id'
       }
     },
@@ -64,14 +72,6 @@ CourseInstance.init(
       type: DataTypes.STRING,
       allowNull: false
     },
-    minCredits: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    maxCredits: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
     startDate: {
       type: new DataTypes.DATEONLY,
       allowNull: false
@@ -88,3 +88,23 @@ CourseInstance.init(
     tableName: 'course_instance'
   }
 );
+
+CourseInstance.belongsTo(Course, {
+  targetKey: 'id',
+  foreignKey: 'courseId'
+});
+
+Course.hasMany(CourseInstance, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+CourseInstance.belongsTo(AssessmentModel, {
+  targetKey: 'id',
+  foreignKey: 'assessmentModelId'
+});
+
+AssessmentModel.hasMany(CourseInstance, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});

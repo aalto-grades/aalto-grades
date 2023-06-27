@@ -13,10 +13,10 @@ import useAuth from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';
 import { SystemRole } from 'aalto-grades-common/types/auth';
 
-const PrivateRoute = ({ children, roles }: {
+function PrivateRoute({ children, roles }: {
   children?: JSX.Element,
   roles: Array<SystemRole>
-}): JSX.Element | null => {
+}): JSX.Element | null {
 
   const [loading, setLoading] = useState<any>(true);
   const { auth, setAuth } = useAuth();
@@ -25,11 +25,11 @@ const PrivateRoute = ({ children, roles }: {
     // loading set to true so page doesn't load until token has been retrieved
     setLoading(true);
     try {
-      const response = await userService.getRefreshToken();
+      const result = await userService.getRefreshToken();
       setAuth({
-        id: response.data!.id,
-        role: response.data!.role,
-        name: response.data!.name
+        id: result.id,
+        role: result.role,
+        name: result.name
       });
     } catch (exception) {
       console.error(exception);
@@ -45,8 +45,8 @@ const PrivateRoute = ({ children, roles }: {
 
   // only load page after token has been retrieved
   if (!loading) {
-    // if role can be found -> token exists
-    if (auth.role) {
+    // If auth is not null -> token exists
+    if (auth) {
       // check if role is in the list of authorised roles
       if (roles.includes(auth.role)) {
         return (
@@ -66,7 +66,7 @@ const PrivateRoute = ({ children, roles }: {
   }
 
   return null;
-};
+}
 
 PrivateRoute.propTypes = {
   children: PropTypes.element,

@@ -11,6 +11,7 @@ import swaggerUI from 'swagger-ui-express';
 import { FRONTEND_ORIGIN } from '../configs/environment';
 import { definition } from '../configs/swagger';
 
+import { router as assessmentModelRouter } from './assessmentModel';
 import { router as attainmentRouter } from './attainment';
 import { router as authRouter } from './auth';
 import { router as courseRouter } from './course';
@@ -30,6 +31,7 @@ const openapiSpecification: object = swaggerJsdoc(options);
 export const router: Router = Router();
 
 router.use(cookieParser());
+router.use(assessmentModelRouter);
 router.use(attainmentRouter);
 router.use(authRouter);
 router.use(courseRouter);
@@ -71,6 +73,16 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *       required: true
  *       example: 1
  *       description: The ID of the course instance.
+ *     assessmentModelId:
+ *       in: path
+ *       name: assessmentModelId
+ *       schema:
+ *         type: integer
+ *         format: int32
+ *         minimum: 1
+ *       required: true
+ *       example: 1
+ *       description: The ID of the assessment model.
  *     attainmentId:
  *       in: path
  *       name: attainmentId
@@ -91,6 +103,15 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *         The type of the attainment tree fetched. Optional.
  *          * `children` - Fetch only the direct subattainments of the attainment.
  *          * `descendants` - Fetch the whole tree of subattainments.
+ *     studentNumbers:
+ *       in: query
+ *       name: studentNumbers
+ *       schema:
+ *         type: array
+ *         description: List of student numbers.
+ *         example: ['111111', '222222', '333333']
+ *         items:
+ *           type: string
  *   responses:
  *     AuthenticationError:
  *       description: Authentication credentials were missing or JWT expired.

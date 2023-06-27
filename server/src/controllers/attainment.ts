@@ -6,18 +6,18 @@ import { Request, Response } from 'express';
 import * as yup from 'yup';
 
 import models from '../database/models';
+import AssessmentModel from '../database/models/assessmentModel';
 import Attainment from '../database/models/attainment';
 import Course from '../database/models/course';
-import CourseInstance from '../database/models/courseInstance';
 
-import { AttainmentData, AttainmentRequestData } from '../types/attainment';
+import { AttainmentData } from 'aalto-grades-common/types/attainment';
 import { ApiError } from '../types/error';
 import { Formula } from '../types/formulas';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 
 import { findAttainmentById, generateAttainmentTree } from './utils/attainment';
-import { validateCourseAndInstance } from './utils/courseInstance';
+import { validateCourseAndAssessmentModel } from './utils/assessmentModel';
 
 export async function addAttainment(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
@@ -30,11 +30,9 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     tag: yup
       .string()
       .required(),
-    date: yup
-      .date()
-      .required(),
-    expiryDate: yup
-      .date()
+    daysValid: yup
+      .number()
+      .min(0)
       .required(),
     subAttainments: yup
       .array()
@@ -43,45 +41,45 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
   });
 
   await requestSchema.validate(req.body, { abortEarly: false });
-  const [course, courseInstance]: [course: Course, courseInstance: CourseInstance] =
-  await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [course, assessmentModel]: [course: Course, assessmentModel: AssessmentModel] =
+    await validateCourseAndAssessmentModel(
+      req.params.courseId, req.params.assessmentModelId
+    );
 
   const parentId: number | undefined = req.body.parentId;
   const name: string = req.body.name;
   const tag: string = req.body.tag;
-  const date: Date = req.body.date;
-  const expiryDate: Date = req.body.expiryDate;
-  const requestSubAttainments: Array<AttainmentRequestData> | undefined = req.body.subAttainments;
+  const daysValid: number = req.body.daysValid;
+  const requestSubAttainments: Array<AttainmentData> | undefined = req.body.subAttainments;
   let subAttainments: Array<AttainmentData> = [];
 
-  // If linked to a parent id, check that it exists and belongs to the same course instance.
+  // If linked to a parent id, check that it exists and belongs to the same assessment model.
   if (parentId) {
     const parentAttainment: Attainment = await findAttainmentById(
       parentId, HttpCode.UnprocessableEntity
     );
 
-    if (parentAttainment.courseInstanceId !== courseInstance.id) {
+    if (parentAttainment.assessmentModelId !== assessmentModel.id) {
       throw new ApiError(
         `parent attainment ID ${parentId} does not belong ` +
-        `to the course instance ID ${courseInstance.id}`,
+        `to the assessment model ID ${assessmentModel.id}`,
         HttpCode.Conflict
       );
     }
   }
 
   const attainment: Attainment = await models.Attainment.create({
-    courseId: course.id,
+    assessmentModelId: assessmentModel.id,
     parentId,
-    courseInstanceId: courseInstance.id,
     name,
     tag,
-    date,
-    expiryDate,
-    formula: Formula.Manual,
+    daysValid,
+    formula: Formula.Manual
   });
 
   async function processSubAttainments(
-    unprocessedAttainments: Array<AttainmentRequestData>, parentId: number
+    unprocessedAttainments: Array<AttainmentData>, parentId: number
   ): Promise<Array<AttainmentData>> {
     const attainments: Array<AttainmentData> = [];
     let subAttainments: Array<AttainmentData> = [];
@@ -89,27 +87,23 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     for (const attainment of unprocessedAttainments) {
       const dbEntry: Attainment = await models.Attainment.create({
         parentId,
-        courseId: course.id,
-        courseInstanceId: courseInstance.id,
+        assessmentModelId: assessmentModel.id,
         name: attainment.name,
         tag: attainment.tag,
-        date: attainment.date,
-        expiryDate: attainment.expiryDate,
+        daysValid: attainment.daysValid,
         formula: Formula.Manual
       });
 
-      if (attainment.subAttainments.length > 0) {
+      if (attainment.subAttainments && attainment.subAttainments.length > 0) {
         subAttainments = await processSubAttainments(attainment.subAttainments, dbEntry.id);
       }
 
       attainments.push({
         id: dbEntry.id,
-        courseId: dbEntry.courseId,
-        courseInstanceId: dbEntry.courseInstanceId,
+        assessmentModelId: dbEntry.id,
         name: dbEntry.name,
         tag: dbEntry.tag,
-        date: dbEntry.date,
-        expiryDate: dbEntry.expiryDate,
+        daysValid: dbEntry.daysValid,
         parentId: dbEntry.parentId,
         subAttainments: subAttainments
       });
@@ -126,12 +120,10 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     data: {
       attainment: {
         id: attainment.id,
-        courseId: attainment.courseId,
-        courseInstanceId: attainment.courseInstanceId,
+        assessmentModelId: attainment.assessmentModelId,
         name: attainment.name,
         tag: attainment.tag,
-        date: attainment.date,
-        expiryDate: attainment.expiryDate,
+        daysValid: attainment.daysValid,
         parentId: attainment.parentId,
         subAttainments: subAttainments
       }
@@ -150,7 +142,9 @@ export async function deleteAttainment(req: Request, res: Response): Promise<voi
 
   // Validation.
   await idSchema.validate({ id: attainmentId }, { abortEarly: false });
-  await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
+  await validateCourseAndAssessmentModel(
+    req.params.courseId, req.params.assessmentModelId
+  );
 
   // Delete the attainment if found from db. This automatically
   // also deletes all of the subattainments of this attainment.
@@ -173,29 +167,28 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     tag: yup
       .string()
       .notRequired(),
-    date: yup
-      .date()
-      .notRequired(),
-    expiryDate: yup
-      .date()
+    daysValid: yup
+      .number()
+      .min(0)
       .notRequired()
   });
 
   const attainmentId: number = Number(req.params.attainmentId);
   await idSchema.validate({ id: attainmentId }, { abortEarly: false });
   await requestSchema.validate(req.body, { abortEarly: false });
-  await validateCourseAndInstance(req.params.courseId, req.params.instanceId);
+  await validateCourseAndAssessmentModel(
+    req.params.courseId, req.params.assessmentModelId
+  );
 
   const name: string | undefined = req.body.name;
   const tag: string | undefined = req.body.tag;
-  const date: Date | undefined = req.body.date;
-  const expiryDate: Date | undefined = req.body.expiryDate;
+  const daysValid: number | undefined = req.body.daysValid;
   const parentId: number| undefined = req.body.parentId;
 
   const attainment: Attainment = await findAttainmentById(attainmentId, HttpCode.NotFound);
 
   // If linked to a parent id, check that it exists and belongs
-  // to the same course instance as the attainment being edited.
+  // to the same assessment model as the attainment being edited.
   if (parentId) {
 
     // TODO: check that does not refer to itself transitionally through some other attainment.
@@ -211,10 +204,10 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
       HttpCode.UnprocessableEntity
     );
 
-    if (parentAttainment.courseInstanceId !== attainment.courseInstanceId) {
+    if (parentAttainment.assessmentModelId !== attainment.assessmentModelId) {
       throw new ApiError(
         `parent attainment ID ${parentId} does not belong to ` +
-        `the same instance as attainment ID ${attainmentId}`,
+        `the same assessment model as attainment ID ${attainmentId}`,
         HttpCode.Conflict
       );
     }
@@ -223,8 +216,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   await attainment.set({
     name: name ?? attainment.name,
     tag: tag ?? attainment.tag,
-    date: date ?? attainment.date,
-    expiryDate: expiryDate ?? attainment.expiryDate,
+    daysValid: daysValid ?? attainment.daysValid,
     parentId: parentId ?? attainment.parentId
   }).save();
 
@@ -233,12 +225,10 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     data: {
       attainment: {
         id: attainment.id,
-        courseId: attainment.courseId,
-        courseInstanceId: attainment.courseInstanceId,
+        assessmentModelId: attainment.assessmentModelId,
         name: attainment.name,
         tag: attainment.tag,
-        date: attainment.date,
-        expiryDate: attainment.expiryDate,
+        daysValid: attainment.daysValid,
         parentId: attainment.parentId
       }
     }
@@ -246,70 +236,64 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
 }
 
 export async function getAttainment(req: Request, res: Response): Promise<void> {
-  const courseId: number = Number(req.params.courseId);
-  const instanceId: number = Number(req.params.instanceId);
-  const attainmentId: number = Number(req.params.attainmentId);
-
   const querySchema: yup.AnyObjectSchema = yup.object().shape({
     tree: yup.string().oneOf(['children', 'descendants'])
   }).noUnknown(true).strict();
 
-  await idSchema.validate({ id: courseId }, { abortEarly: false });
-  await idSchema.validate({ id: instanceId }, { abortEarly: false });
-  await idSchema.validate({ id: attainmentId }, { abortEarly: false });
   await querySchema.validate(req.query, { abortEarly: false });
+  await idSchema.validate({ id: req.params.attainmentId }, { abortEarly: false });
+  const attainmentId: number = Number(req.params.attainmentId);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [course, assessmentModel]: [course: Course, assessmentModel: AssessmentModel] =
+    await validateCourseAndAssessmentModel(
+      req.params.courseId, req.params.assessmentModelId
+    );
 
   // Assert string type, as the query is validated above
   const tree: string = req.query.tree as string;
 
   const attainments: Array<Attainment> = await Attainment.findAll({
     where: {
-      courseId: courseId,
-      courseInstanceId: instanceId
+      assessmentModelId: assessmentModel.id,
     }
   });
 
-  const attainmentData: Array<AttainmentData> = attainments.map((el: Attainment) => {
-    return {
-      id: el.id,
-      courseId: el.courseId,
-      courseInstanceId: el.courseInstanceId,
-      parentId: el.parentId ?? undefined,
-      name: el.name,
-      tag: el.tag,
-      date: el.date,
-      expiryDate: el.expiryDate
-    };
-  });
-
-  const attainment: AttainmentData | undefined = attainmentData.find(
-    (el: AttainmentData) => el.id === attainmentId
+  const attainmentData: Array<AttainmentData> = attainments.map(
+    (attainment: Attainment) => {
+      return {
+        id: attainment.id,
+        assessmentModelId: attainment.assessmentModelId,
+        parentId: attainment.parentId ?? undefined,
+        name: attainment.name,
+        tag: attainment.tag,
+        daysValid: attainment.daysValid
+      };
+    }
   );
 
-  if (!attainment) {
+  const localRoot: AttainmentData | undefined = attainmentData.find(
+    (attainment: AttainmentData) => attainment.id === attainmentId
+  );
+
+  if (!localRoot) {
     throw new ApiError(
-      `Attainment with id ${attainmentId} was not found ` +
-        'for the specified course and instance', HttpCode.NotFound
+      `attainment with ID ${attainmentId} not found`, HttpCode.NotFound
     );
   }
 
   switch (tree) {
-
   case 'children':
-    generateAttainmentTree(attainment, attainmentData, true);
+    generateAttainmentTree(localRoot, attainmentData, true);
     break;
-
   case 'descendants':
-    generateAttainmentTree(attainment, attainmentData);
+    generateAttainmentTree(localRoot, attainmentData);
     break;
-
   default:
     break;
-
   }
 
   res.status(HttpCode.Ok).json({
     success: true,
-    data: attainment,
+    data: localRoot,
   });
 }

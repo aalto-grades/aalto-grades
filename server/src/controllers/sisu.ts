@@ -28,19 +28,22 @@ function parseSisuGradingScale(gradingScale: string): GradingScale | undefined {
 
 function parseSisuCourseInstance(instance: SisuCourseInstance): CourseInstanceData {
   return {
-    id: null,
     sisuCourseInstanceId: instance.id,
-    startingPeriod: null,
-    endingPeriod: null,
-    minCredits: instance.credits.min,
-    maxCredits: instance.credits.max,
     startDate: instance.startDate,
     endDate: instance.endDate,
     type: instance.type,
     gradingScale: parseSisuGradingScale(instance.summary.gradingScale.fi) as GradingScale,
-    teachersInCharge: instance.summary.teacherInCharge,
     courseData: {
       courseCode: instance.code,
+      minCredits: instance.credits.min,
+      maxCredits: instance.credits.max,
+      teachersInCharge: instance.summary.teacherInCharge.map(
+        (name: string) => {
+          return {
+            name: name
+          };
+        }
+      ),
       department: {
         en: instance.organizationName.en,
         fi: instance.organizationName.fi,

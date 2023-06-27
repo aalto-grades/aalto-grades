@@ -2,16 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import formulaService from '../../services/formulas';
 
-const Attainment = ({ attainment, attributes, handleAttributeChange, attainmentIndex }) => {
+function Attainment({ attainment, attributes, handleAttributeChange, attainmentIndex }) {
 
-  const attributeTextFields = () => {
+  function attributeTextFields() {
     return (
       attributes.map((attribute, attributeIndex) => {
         const attributeLabel = formulaService.getAttributeLabel(attribute);
@@ -32,7 +31,7 @@ const Attainment = ({ attainment, attributes, handleAttributeChange, attainmentI
         );
       })
     );
-  };
+  }
 
   return (
     <Box sx={{
@@ -63,7 +62,7 @@ const Attainment = ({ attainment, attributes, handleAttributeChange, attainmentI
       </Box>
     </Box>
   );
-};
+}
 
 Attainment.propTypes = {
   attainment: PropTypes.object,

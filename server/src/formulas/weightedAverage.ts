@@ -5,7 +5,10 @@
 import * as yup from 'yup';
 
 import { registerFormula } from '.';
-import { Formula, GradingInput, GradingResult, Status } from '../types/formulas';
+import {
+  Formula, CalculationInput, CalculationResult
+} from '../types/formulas';
+import { Status } from '../types/grades';
 
 interface WeightedAverageParams {
   min: number;
@@ -14,13 +17,13 @@ interface WeightedAverageParams {
 }
 
 async function calculateWeightedAverage(
-  inputs: Array<GradingInput>
-): Promise<GradingResult> {
+  inputs: Array<CalculationInput>
+): Promise<CalculationResult> {
   let grade: number = 0;
   let status: Status = Status.Pass;
 
   for (const input of inputs) {
-    const subResult: GradingResult = input.subResult;
+    const subResult: CalculationResult = input.subResult;
     const params: WeightedAverageParams = input.params as WeightedAverageParams;
 
     if (subResult.status !== Status.Pass)

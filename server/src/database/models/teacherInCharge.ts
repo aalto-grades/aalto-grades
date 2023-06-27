@@ -7,23 +7,20 @@ import {
 } from 'sequelize';
 
 import { sequelize } from '..';
-import Attainment from './attainment';
+import Course from './course';
 import User from './user';
 
-export default class UserAttainmentGrade extends Model<
-  InferAttributes<UserAttainmentGrade>,
-  InferCreationAttributes<UserAttainmentGrade>
+export default class TeacherInCharge extends Model<
+  InferAttributes<TeacherInCharge>,
+  InferCreationAttributes<TeacherInCharge>
 > {
   declare userId: ForeignKey<User['id']>;
-  declare attainmentId: ForeignKey<Attainment['id']>;
-  declare graderId: ForeignKey<User['id']>;
-  declare grade: number;
-  declare manual: boolean;
+  declare courseId: ForeignKey<Course['id']>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
 
-UserAttainmentGrade.init(
+TeacherInCharge.init(
   {
     userId: {
       type: DataTypes.INTEGER,
@@ -33,35 +30,31 @@ UserAttainmentGrade.init(
         key: 'id'
       }
     },
-    attainmentId: {
+    courseId: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       references: {
-        model: 'attainment',
+        model: 'course',
         key: 'id'
       }
-    },
-    graderId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'user',
-        key: 'id'
-      }
-    },
-    grade: {
-      type: DataTypes.FLOAT,
-      allowNull: false
-    },
-    manual: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },
   {
     sequelize,
-    tableName: 'user_attainment_grade'
+    tableName: 'teacher_in_charge'
   }
 );
+
+User.belongsToMany(Course, {
+  through: TeacherInCharge,
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+Course.belongsToMany(User, {
+  through: TeacherInCharge,
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});

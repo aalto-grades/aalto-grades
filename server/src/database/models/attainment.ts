@@ -7,24 +7,23 @@ import {
 } from 'sequelize';
 
 import { sequelize } from '..';
+import AssessmentModel from './assessmentModel';
+
 import { Formula } from '../../types/formulas';
-import Course from './course';
-import CourseInstance from './courseInstance';
 
 export default class Attainment extends Model<
   InferAttributes<Attainment>,
   InferCreationAttributes<Attainment>
 > {
   declare id: CreationOptional<number>;
-  declare courseId: ForeignKey<Course['id']>;
-  declare courseInstanceId: ForeignKey<CourseInstance['id']>;
+  declare assessmentModelId: ForeignKey<AssessmentModel['id']>;
   declare parentId: CreationOptional<ForeignKey<Attainment['id']>>;
   declare name: string;
   declare tag: string;
+  // Default value, expiry date in AttainmentGrade takes precedence
+  declare daysValid: number;
   declare formula: Formula;
   declare parentFormulaParams: CreationOptional<object>;
-  declare date: Date; // Date when assignment is done (e.g., deadline or exam date)
-  declare expiryDate: Date;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -36,19 +35,11 @@ Attainment.init(
       autoIncrement: true,
       primaryKey: true
     },
-    courseId: {
+    assessmentModelId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'course',
-        key: 'id'
-      }
-    },
-    courseInstanceId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'course_instance',
+        model: 'assessment_model',
         key: 'id'
       }
     },
@@ -68,6 +59,10 @@ Attainment.init(
       type: DataTypes.STRING,
       allowNull: false
     },
+    daysValid: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
     formula: {
       type: DataTypes.ENUM(Formula.Manual, Formula.WeightedAverage),
       allowNull: false,
@@ -77,14 +72,6 @@ Attainment.init(
       type: DataTypes.JSONB,
       allowNull: true,
     },
-    date: {
-      type: DataTypes.DATE,
-      allowNull: false
-    },
-    expiryDate: {
-      type: DataTypes.DATE,
-      allowNull: false
-    },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },
@@ -93,3 +80,24 @@ Attainment.init(
     tableName: 'attainment'
   }
 );
+
+Attainment.belongsTo(Attainment, {
+  targetKey: 'id',
+  foreignKey: 'parentId'
+});
+
+Attainment.hasMany(Attainment, {
+  foreignKey: 'parentId',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+Attainment.belongsTo(AssessmentModel, {
+  targetKey: 'id',
+  foreignKey: 'assessmentModelId'
+});
+
+AssessmentModel.hasMany(Attainment, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});

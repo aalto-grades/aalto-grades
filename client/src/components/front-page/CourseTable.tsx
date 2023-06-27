@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import PropTypes from 'prop-types';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -11,8 +10,8 @@ import CourseTableRow from './CourseTableRow';
 import CourseHeadTableRow from './CourseHeadTableRow';
 import sortingServices from '../../services/sorting';
 
-const CourseTable = ({ data }) => {
-  return(
+function CourseTable({ data }) {
+  return (
     <Table>
       <TableHead>
         <CourseHeadTableRow/>
@@ -26,7 +25,7 @@ const CourseTable = ({ data }) => {
       </TableBody>
     </Table>
   );
-};
+}
 
 CourseTable.propTypes = {
   data: PropTypes.array

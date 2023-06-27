@@ -2,34 +2,55 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { JSX } from 'react';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import AttainmentCategory from '../attainments/AttainmentCategory';
 import MenuButton from './MenuButton';
+import { AssessmentModelData, AttainmentData } from 'aalto-grades-common/types';
 
-const Attainments = ({ attainments, formula, courseId, instance, handleAddPoints }) => {
-  const navigate = useNavigate();
+function Attainments(props: {
+  attainmentTree: AttainmentData,
+  formula: string,
+  courseId: string,
+  assessmentModel: AssessmentModelData,
+  handleAddPoints: () => void
+}): JSX.Element {
+  const navigate: NavigateFunction = useNavigate();
 
   const actionOptions = [
-    { description: 'Import from file', handleClick: handleAddPoints },
+    { description: 'Import from file', handleClick: props.handleAddPoints },
     { description: 'Import from A+', handleClick: () => {} }
   ];
 
   return (
-    <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: 1.5, display: 'flex', flexDirection: 'column' }}>
-      <Typography variant='h3' align='left' sx={{ ml: 1.5, mt: 0.6, mb: 1.5 }} >Study Attainments</Typography>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
-        <Typography align='left' sx={{ ml: 1.5 }} >{'Grading Formula: ' + formula}</Typography>
-        <Button id='ag_edit_formula_btn' onClick={() => navigate(`/${courseId}/select-formula/${instance.id}`)}>Edit formula</Button>
+    <Box borderRadius={1} sx={{
+      bgcolor: 'primary.light', p: 1.5, display: 'flex', flexDirection: 'column'
+    }}>
+      <Typography variant='h3' align='left' sx={{ ml: 1.5, mt: 0.6, mb: 1.5 }} >
+        Study Attainments
+      </Typography>
+      <Box sx={{
+        display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
+        alignItems: 'center', pb: 1
+      }}>
+        <Typography align='left' sx={{ ml: 1.5 }} >
+          {'Grading Formula: ' + props.formula}
+        </Typography>
+        <Button id='ag_edit_formula_btn' onClick={() => {
+          return navigate(`/${props.courseId}/select-formula/${props.assessmentModel.id}`);
+        }}>
+          Edit formula
+        </Button>
         { /* The path above should be changes once courseId can be fetched from the path */}
       </Box>
       <Box sx={{ display: 'inline-grid', gap: 1 }}>
         {
-          attainments.map(attainment => {
+          props.attainmentTree.subAttainments &&
+          props.attainmentTree.subAttainments.map(attainment => {
             /* Since the attainments are displayed by the course view, they exist in the database
                and their actual ids can be used are keys of the attainment accoridon */
             return (
@@ -39,7 +60,12 @@ const Attainments = ({ attainments, formula, courseId, instance, handleAddPoints
                 attainmentKey={'id'}
                 buttons={
                   [
-                    <Button key='edit' onClick={() => navigate(`/${courseId}/edit-attainment/${instance.id}/${attainment.id}`)}>
+                    <Button key='edit' onClick={() => {
+                      return navigate(
+                        `/${props.courseId}/edit-attainment`
+                        + `/${props.assessmentModel.id}/${attainment.id}`
+                      );
+                    }}>
                       Edit
                     </Button>
                   ]
@@ -49,13 +75,25 @@ const Attainments = ({ attainments, formula, courseId, instance, handleAddPoints
           })
         }
       </Box>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 2, mb: 1 }}>
-        <Button onClick={() => navigate(`/${courseId}/create-attainment/${instance.id}`)}>Add attainment</Button>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}>
+      <Box sx={{
+        display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
+        alignItems: 'center', gap: 1, mt: 2, mb: 1
+      }}>
+        <Button onClick={() => {
+          navigate(`/${props.courseId}/create-attainment/${props.assessmentModel.id}`);
+        }}>
+          Add attainment
+        </Button>
+        <Box sx={{
+          display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start',
+          alignItems: 'center', gap: 1
+        }}>
           <Button
             id='ag_course_results_btn'
             variant='outlined'
-            onClick={() => navigate(`/${courseId}/course-results/${instance.id}`)}
+            onClick={() => {
+              navigate(`/${props.courseId}/course-results/${props.assessmentModel.id}`);
+            }}
           >
             See course results
           </Button>
@@ -64,11 +102,11 @@ const Attainments = ({ attainments, formula, courseId, instance, handleAddPoints
       </Box>
     </Box>
   );
-};
+}
 
 Attainments.propTypes = {
-  attainments: PropTypes.array,
-  instance: PropTypes.object,
+  attainmentTree: PropTypes.object,
+  assessmentModel: PropTypes.object,
   formula: PropTypes.string,
   handleAddPoints: PropTypes.func,
   courseId: PropTypes.string,

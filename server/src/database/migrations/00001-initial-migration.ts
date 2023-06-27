@@ -58,47 +58,6 @@ export default {
           type: new DataTypes.STRING,
           allowNull: false
         },
-        created_at: DataTypes.DATE,
-        updated_at: DataTypes.DATE
-      }, { transaction });
-
-      await queryInterface.createTable('course_instance', {
-        id: {
-          type: DataTypes.INTEGER,
-          autoIncrement: true,
-          primaryKey: true
-        },
-        course_id: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-          references: {
-            model: 'course',
-            key: 'id'
-          },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE'
-        },
-        sisu_course_instance_id: {
-          type: DataTypes.STRING,
-          allowNull: true,
-          unique: true
-        },
-        grading_scale: {
-          type: DataTypes.ENUM('PASS_FAIL', 'NUMERICAL', 'SECOND_NATIONAL_LANGUAGE'),
-          allowNull: false
-        },
-        starting_period: {
-          type: DataTypes.ENUM('I', 'II', 'III', 'IV', 'V'),
-          allowNull: false
-        },
-        ending_period: {
-          type: DataTypes.ENUM('I', 'II', 'III', 'IV', 'V'),
-          allowNull: false
-        },
-        type: {
-          type: new DataTypes.STRING,
-          allowNull: false
-        },
         min_credits: {
           type: DataTypes.INTEGER,
           allowNull: false
@@ -107,47 +66,11 @@ export default {
           type: DataTypes.INTEGER,
           allowNull: false
         },
-        start_date: {
-          type: new DataTypes.DATEONLY,
-          allowNull: false
-        },
-        end_date: {
-          type: new DataTypes.DATEONLY,
-          allowNull: false,
-        },
-        created_at: DataTypes.DATE,
-        updated_at: DataTypes.DATE,
-      }, { transaction });
-
-      await queryInterface.createTable('course_instance_role', {
-        user_id: {
-          type: DataTypes.INTEGER,
-          primaryKey: true,
-          references: {
-            model: 'user',
-            key: 'id'
-          },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE'
-        },
-        course_instance_id: {
-          type: DataTypes.INTEGER,
-          primaryKey: true,
-          references: {
-            model: 'course_instance',
-            key: 'id'
-          },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE'
-        },
-        role: {
-          type: DataTypes.ENUM('STUDENT', 'TEACHER', 'TEACHER_IN_CHARGE'),
-          allowNull: false
-        },
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
-      await queryInterface.createTable('course_translation', {
+
+      await queryInterface.createTable('assessment_model', {
         id: {
           type: DataTypes.INTEGER,
           autoIncrement: true,
@@ -163,15 +86,7 @@ export default {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE'
         },
-        language: {
-          type: new DataTypes.ENUM('EN', 'FI', 'SV'),
-          allowNull: false
-        },
-        department: {
-          type: new DataTypes.STRING,
-          allowNull: false,
-        },
-        course_name: {
+        name: {
           type: DataTypes.STRING,
           allowNull: false
         },
@@ -185,21 +100,11 @@ export default {
           autoIncrement: true,
           primaryKey: true
         },
-        course_id: {
+        assessment_model_id: {
           type: DataTypes.INTEGER,
           allowNull: false,
           references: {
-            model: 'course',
-            key: 'id'
-          },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE'
-        },
-        course_instance_id: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-          references: {
-            model: 'course_instance',
+            model: 'assessment_model',
             key: 'id'
           },
           onDelete: 'CASCADE',
@@ -223,6 +128,10 @@ export default {
           type: DataTypes.STRING,
           allowNull: false
         },
+        days_valid: {
+          type: DataTypes.INTEGER,
+          allowNull: true
+        },
         formula: {
           type: DataTypes.ENUM('MANUAL', 'WEIGHTED_AVERAGE'),
           allowNull: false,
@@ -232,19 +141,11 @@ export default {
           type: DataTypes.JSONB,
           allowNull: true,
         },
-        date: {
-          type: DataTypes.DATE,
-          allowNull: false
-        },
-        expiry_date: {
-          type: DataTypes.DATE,
-          allowNull: false
-        },
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
 
-      await queryInterface.createTable('user_attainment_grade', {
+      await queryInterface.createTable('attainment_grade', {
         user_id: {
           type: DataTypes.INTEGER,
           primaryKey: true,
@@ -281,6 +182,163 @@ export default {
         },
         manual: {
           type: DataTypes.BOOLEAN,
+          allowNull: false
+        },
+        status: {
+          type: DataTypes.ENUM('PASS', 'FAIL'),
+          allowNull: false
+        },
+        date: {
+          type: DataTypes.DATE,
+          allowNull: true
+        },
+        expiry_date: {
+          type: DataTypes.DATE,
+          allowNull: true
+        },
+        created_at: DataTypes.DATE,
+        updated_at: DataTypes.DATE
+      }, { transaction });
+
+      await queryInterface.createTable('course_instance', {
+        id: {
+          type: DataTypes.INTEGER,
+          autoIncrement: true,
+          primaryKey: true
+        },
+        course_id: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          references: {
+            model: 'course',
+            key: 'id'
+          },
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE'
+        },
+        assessment_model_id: {
+          type: DataTypes.INTEGER,
+          allowNull: true,
+          references: {
+            model: 'assessment_model',
+            key: 'id'
+          },
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE'
+        },
+        sisu_course_instance_id: {
+          type: DataTypes.STRING,
+          allowNull: true,
+          unique: true
+        },
+        grading_scale: {
+          type: DataTypes.ENUM('PASS_FAIL', 'NUMERICAL', 'SECOND_NATIONAL_LANGUAGE'),
+          allowNull: false
+        },
+        starting_period: {
+          type: DataTypes.ENUM('I', 'II', 'III', 'IV', 'V'),
+          allowNull: false
+        },
+        ending_period: {
+          type: DataTypes.ENUM('I', 'II', 'III', 'IV', 'V'),
+          allowNull: false
+        },
+        type: {
+          type: new DataTypes.STRING,
+          allowNull: false
+        },
+        start_date: {
+          type: new DataTypes.DATEONLY,
+          allowNull: false
+        },
+        end_date: {
+          type: new DataTypes.DATEONLY,
+          allowNull: false,
+        },
+        created_at: DataTypes.DATE,
+        updated_at: DataTypes.DATE,
+      }, { transaction });
+
+      await queryInterface.createTable('course_instance_role', {
+        user_id: {
+          type: DataTypes.INTEGER,
+          primaryKey: true,
+          references: {
+            model: 'user',
+            key: 'id'
+          },
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE'
+        },
+        course_instance_id: {
+          type: DataTypes.INTEGER,
+          primaryKey: true,
+          references: {
+            model: 'course_instance',
+            key: 'id'
+          },
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE'
+        },
+        role: {
+          type: DataTypes.ENUM('STUDENT', 'TEACHER'),
+          allowNull: false
+        },
+        created_at: DataTypes.DATE,
+        updated_at: DataTypes.DATE
+      }, { transaction });
+
+      await queryInterface.createTable('teacher_in_charge', {
+        user_id: {
+          type: DataTypes.INTEGER,
+          primaryKey: true,
+          references: {
+            model: 'user',
+            key: 'id'
+          },
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE'
+        },
+        course_id: {
+          type: DataTypes.INTEGER,
+          primaryKey: true,
+          references: {
+            model: 'course',
+            key: 'id'
+          },
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE'
+        },
+        created_at: DataTypes.DATE,
+        updated_at: DataTypes.DATE
+      }, { transaction });
+
+      await queryInterface.createTable('course_translation', {
+        id: {
+          type: DataTypes.INTEGER,
+          autoIncrement: true,
+          primaryKey: true
+        },
+        course_id: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          references: {
+            model: 'course',
+            key: 'id'
+          },
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE'
+        },
+        language: {
+          type: new DataTypes.ENUM('EN', 'FI', 'SV'),
+          allowNull: false
+        },
+        department: {
+          type: new DataTypes.STRING,
+          allowNull: false,
+        },
+        course_name: {
+          type: DataTypes.STRING,
           allowNull: false
         },
         created_at: DataTypes.DATE,
@@ -345,11 +403,13 @@ export default {
     const transaction: Transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.dropTable('course_result', { transaction });
-      await queryInterface.dropTable('user_attainment_grade', { transaction });
-      await queryInterface.dropTable('attainment', { transaction });
       await queryInterface.dropTable('course_translation', { transaction });
+      await queryInterface.dropTable('teacher_in_charge', { transaction });
       await queryInterface.dropTable('course_instance_role', { transaction });
       await queryInterface.dropTable('course_instance', { transaction });
+      await queryInterface.dropTable('attainment_grade', { transaction });
+      await queryInterface.dropTable('attainment', { transaction });
+      await queryInterface.dropTable('assessment_model', { transaction });
       await queryInterface.dropTable('course', { transaction });
       await queryInterface.dropTable('user', { transaction });
       await queryInterface.dropTable('migrations', { transaction });

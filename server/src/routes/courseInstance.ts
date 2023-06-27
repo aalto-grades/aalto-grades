@@ -47,14 +47,6 @@ export const router: Router = Router();
  *         $ref: '#/definitions/Period'
  *       endingPeriod:
  *         $ref: '#/definitions/Period'
- *       minCredits:
- *         type: integer
- *         description: Minimum amount credits student can receive from passing the course.
- *         example: 3
- *       maxCredits:
- *         type: integer
- *         description: Maximum amount credits student can receive from passing the course.
- *         example: 5
  *       startDate:
  *         type: string
  *         format: date
@@ -236,14 +228,6 @@ router.get(
  *                   this course instance.
  *                 items:
  *                   type: integer
- *               minCredits:
- *                 type: integer
- *                 description: Minimum amount credits student can receive from passing the course.
- *                 example: 3
- *               maxCredits:
- *                 type: integer
- *                 description: Maximum amount credits student can receive from passing the course.
- *                 example: 5
  *               startDate:
  *                 type: string
  *                 format: date

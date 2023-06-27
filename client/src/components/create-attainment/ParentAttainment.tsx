@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import List from '@mui/material/List';
 import Button from '@mui/material/Button';
@@ -20,18 +20,18 @@ import formulasService from '../../services/formulas';
 
 // An Assignmnet component with subAttainments and a formula
 
-const ParentAttainment = ({
+function ParentAttainment({
   indices, addSubAttainments, setAttainments, attainments, removeAttainment,
   formulaAttributeNames, temporaryId, setIncrementId
-}) => {
-  const navigate = useNavigate();
+}) {
+  const navigate: NavigateFunction = useNavigate();
 
   // Functions and varibales for opening and closing the list of sub-attainments
   const [open, setOpen] = useState<any>(true);
 
-  const handleClick = () => {
+  function handleClick(): void {
     setOpen(!open);
-  };
+  }
 
   /* Functions to get the formula attributes.
 
@@ -59,8 +59,11 @@ const ParentAttainment = ({
         <Typography variant="body1" sx={{ flexGrow: 1, textAlign: 'left', mb: 0.5 }}>
           {'Grading Formula: ' + formulaName}
         </Typography>
-        { /* Navigation below doesn't work because formula selection has only been implemented for course grade */ }
-        <Button size='small' sx={{ mb: 0.5 }} onClick={ () => navigate('/select-formula') }>
+        {
+          /* Navigation below doesn't work because formula selection has
+             only been implemented for course grade */
+        }
+        <Button size='small' sx={{ mb: 0.5 }} onClick={() => navigate('/select-formula')}>
           Edit formula
         </Button>
       </Box>
@@ -74,16 +77,22 @@ const ParentAttainment = ({
       />
       <Box sx={{ display: 'flex', flexDirection: 'row' }}>
         {open ?
-          <IconButton size='small' onClick={handleClick} sx={{ height: '32px', width: '32px', mr: 1  }}>
-            <ExpandLess sx={{ color: 'primary.main' }}/>
+          <IconButton size='small' onClick={handleClick} sx={{
+            height: '32px', width: '32px', mr: 1
+          }}>
+            <ExpandLess sx={{ color: 'primary.main' }} />
           </IconButton>
           :
-          <IconButton size='small' onClick={handleClick} sx={{ height: '32px', width: '32px', mr: 1 }}>
-            <ExpandMore sx={{ color: 'hoverGrey3' }}/>
+          <IconButton size='small' onClick={handleClick} sx={{
+            height: '32px', width: '32px', mr: 1
+          }}>
+            <ExpandMore sx={{ color: 'hoverGrey3' }} />
           </IconButton>}
-        <Box sx={{ display: 'flex', flexDirection: 'column',  width: '100%' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
           <Collapse in={!open} unmountOnExit >
-            <Typography variant="body2" align='left' sx={{ mt: 0.6, mb: 2, flexGrow: 1, color: 'hoverGrey3' }}>
+            <Typography variant="body2" align='left' sx={{
+              mt: 0.6, mb: 2, flexGrow: 1, color: 'hoverGrey3'
+            }}>
               See sub-attainments
             </Typography>
           </Collapse>
@@ -107,7 +116,7 @@ const ParentAttainment = ({
       </Box>
     </>
   );
-};
+}
 
 ParentAttainment.propTypes = {
   addSubAttainments: PropTypes.func,

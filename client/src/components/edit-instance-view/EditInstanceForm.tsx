@@ -2,8 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useEffect } from 'react';
-import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
+import { useEffect } from 'react';
+import {
+  NavigateFunction, Params, useNavigate, useParams, useOutletContext
+} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -55,9 +57,9 @@ const teacherData = {
 
 const textFieldMinWidth = 195;
 
-const EditInstanceForm = ({ instance }) => {
-  const navigate = useNavigate();
-  const { courseId, sisuInstanceId } = useParams();
+function EditInstanceForm({ instance }) {
+  const navigate: NavigateFunction = useNavigate();
+  const { courseId, sisuInstanceId }: Params = useParams();
 
   const {
     courseType, setType,
@@ -85,11 +87,11 @@ const EditInstanceForm = ({ instance }) => {
     }
   }, []);
 
-  const onCancel = (): void => {
+  function onCancel(): void {
     navigate('/course-view/' + courseId);
-  };
+  }
 
-  const handleSubmit = (event) => {
+  function handleSubmit(event) {
     event.preventDefault();
     try {
       const minCredits = Number(stringMinCredits);
@@ -108,9 +110,9 @@ const EditInstanceForm = ({ instance }) => {
     } catch (exception) {
       console.log(exception);
     }
-  };
+  }
 
-  return(
+  return (
     <form onSubmit={handleSubmit}>
       <Box sx={{
         display: 'flex',
@@ -122,27 +124,54 @@ const EditInstanceForm = ({ instance }) => {
         my: 2,
         p: 2
       }}>
-        <StringTextField fieldData={typeData} value={courseType} setFunction={setType} />
+        <StringTextField fieldData={typeData} value={courseType} setFunction={setType}
+        />
         <Grid2 container>
           <Grid2 sx={{ minWidth: textFieldMinWidth }}>
-            <DateTextField fieldData={startDateData} value={startDate} setFunction={setStartDate} minWidth={textFieldMinWidth} />
+            <DateTextField
+              fieldData={startDateData}
+              value={startDate}
+              setFunction={setStartDate}
+              minWidth={textFieldMinWidth}
+            />
           </Grid2>
           <Box sx={{ width: 15 }} />
           <Grid2 sx={{ minWidth: textFieldMinWidth }}>
-            <DateTextField fieldData={endDateData} value={endDate} setFunction={setEndDate} minWidth={textFieldMinWidth} />
+            <DateTextField
+              fieldData={endDateData}
+              value={endDate}
+              setFunction={setEndDate}
+              minWidth={textFieldMinWidth}
+            />
           </Grid2>
         </Grid2>
-        <DynamicTextFieldArray fieldData={teacherData} values={teachers} setFunction={setTeachers} />
+        <DynamicTextFieldArray
+          fieldData={teacherData}
+          values={teachers}
+          setFunction={setTeachers}
+        />
         <Grid2 container>
           <Grid2 sx={{ minWidth: textFieldMinWidth }}>
-            <NumberTextField fieldData={minCreditsData} value={stringMinCredits} setFunction={setMinCredits} />
+            <NumberTextField
+              fieldData={minCreditsData}
+              value={stringMinCredits}
+              setFunction={setMinCredits}
+            />
           </Grid2>
           <Box sx={{ width: 15 }} />
           <Grid2 sx={{ minWidth: textFieldMinWidth }}>
-            <NumberTextField fieldData={maxCreditsData} value={stringMaxCredits} setFunction={setMaxCredits} />
+            <NumberTextField
+              fieldData={maxCreditsData}
+              value={stringMaxCredits}
+              setFunction={setMaxCredits}
+            />
           </Grid2>
         </Grid2>
-        <StringTextField fieldData={gradingScaleData} value={gradingScale} setFunction={setGradingScale} />
+        <StringTextField
+          fieldData={gradingScaleData}
+          value={gradingScale}
+          setFunction={setGradingScale}
+        />
       </Box>
       <Box sx={{
         display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
@@ -157,7 +186,7 @@ const EditInstanceForm = ({ instance }) => {
       </Box>
     </form>
   );
-};
+}
 
 EditInstanceForm.propTypes = {
   instance: PropTypes.object,

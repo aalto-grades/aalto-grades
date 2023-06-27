@@ -2,38 +2,37 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { SyntheticEvent, useState } from 'react';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import PersonIcon from '@mui/icons-material/Person';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-
 import useAuth from '../../hooks/useAuth';
 import useLogout from '../../hooks/useLogout';
 
-function UserButton() {
+function UserButton(): JSX.Element {
   const logout = useLogout();
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
   const { auth } = useAuth();
-  const [anchorEl, setAnchorEl] = React.useState<any>(null);
-  const open = Boolean(anchorEl);
+  const [anchorEl, setAnchorEl] = useState<any>(null);
+  const open: boolean = Boolean(anchorEl);
 
   // temporary function for logging out, will be moved to a seperate file once toolbar is refined
-  const signOut = async () => {
+  async function signOut(): Promise<void> {
     await logout();
     navigate('/login', { replace: true });
-  };
+  }
 
-  const handleClick = (event) => {
+  function handleClick(event: SyntheticEvent): void {
     setAnchorEl(event.currentTarget);
-  };
+  }
 
-  const handleClose = () => {
+  function handleClose(): void {
     setAnchorEl(null);
-  };
+  }
 
   if (!auth?.name) {
     return (<div data-testid="not-logged-in"></div>);

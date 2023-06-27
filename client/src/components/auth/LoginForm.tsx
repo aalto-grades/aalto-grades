@@ -8,14 +8,14 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { LoginCredentials } from '../../types/auth';
 
-const LoginForm = ({ loginUser }: {
+function LoginForm({ loginUser }: {
   loginUser: (userObject: LoginCredentials) => Promise<void>
-}) => {
+}) {
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
-  function handleSubmit(event: React.SyntheticEvent) {
+  function handleSubmit(event: React.SyntheticEvent): void {
     event.preventDefault();
     try {
       const userObject: LoginCredentials = {
@@ -57,7 +57,7 @@ const LoginForm = ({ loginUser }: {
       </form>
     </>
   );
-};
+}
 
 LoginForm.propTypes = {
   loginUser: PropTypes.func

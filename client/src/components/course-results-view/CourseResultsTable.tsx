@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -21,9 +21,9 @@ import Typography from '@mui/material/Typography';
 import sortingServices from '../../services/sorting';
 import CircularProgress from '@mui/material/CircularProgress';
 
-const CourseResultsTable = (
+function CourseResultsTable(
   { students, calculateFinalGrades, updateGrades, downloadCsvTemplate, loading }
-): JSX.Element => {
+): JSX.Element {
 
   const [order, setOrder] = useState<any>('asc');
   const [orderBy, setOrderBy] = useState<any>('studentNumber');
@@ -34,7 +34,9 @@ const CourseResultsTable = (
   const [studentsToShow, setStudentsToShow] = useState<any>(students);
 
   useEffect(() => {
-    setStudentsToShow(search === '' ? students : students.filter(s => s.studentNumber.includes(search)));
+    setStudentsToShow(search === '' ? students : students.filter((s) => {
+      return s.studentNumber.includes(search);
+    }));
     setPage(0);
   }, [search, students]);
 
@@ -73,7 +75,10 @@ const CourseResultsTable = (
         />
         { loading
           ?
-          <Box sx={{ margin: 'auto', alignItems: 'center', justifyContent: 'center', display: 'flex', mt: 3 }}>
+          <Box sx={{
+            margin: 'auto', alignItems: 'center', justifyContent: 'center',
+            display: 'flex', mt: 3
+          }}>
             <CircularProgress />
           </Box>
           :
@@ -168,7 +173,7 @@ const CourseResultsTable = (
       />
     </Box>
   );
-};
+}
 
 CourseResultsTable.propTypes = {
   students: PropTypes.array,

@@ -3,16 +3,18 @@
 // SPDX-License-Identifier: MIT
 
 import { useEffect } from 'react';
-import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
+import {
+  NavigateFunction, Params, useNavigate, useParams, useOutletContext
+} from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import AttainmentCategory from './attainments/AttainmentCategory';
 import attainmentServices from '../services/attainments';
 
-const AddAttainmentsView = () => {
-  const navigate = useNavigate();
-  const { courseId, sisuInstanceId } = useParams();
+function AddAttainmentsView() {
+  const navigate: NavigateFunction = useNavigate();
+  const { courseId, sisuInstanceId }: Params = useParams();
 
   const {
     addedAttainments, setAddedAttainments,
@@ -23,12 +25,16 @@ const AddAttainmentsView = () => {
   useEffect(() => {  // Better if handling here
     if (addedAttainments.length === 0) {
       const allSuggestedAttainments = attainmentServices.getSuggestedAttainments();
-      const [updatedAttainments, newTemporaryId] = attainmentServices.addTemporaryIds(allSuggestedAttainments, attainmentIncrementId);
+      const [updatedAttainments, newTemporaryId] = attainmentServices.addTemporaryIds(
+        allSuggestedAttainments, attainmentIncrementId
+      );
+
       setIncrementId(newTemporaryId);
       setSuggestedAttainments(updatedAttainments);
     } else {
-      // if some attainments have been added, filter the suggestions to make sure there aren't duplicates
-      // another possibility is to save the suggestions in context too, will consider if the retrieval is slow
+      // If some attainments have been added, filter the suggestions to make
+      // sure there aren't duplicates. Another possibility is to save the
+      // suggestions in context too, will consider if the retrieval is slow.
       const nonAdded = suggestedAttainments.filter((suggested) => {
         return !addedAttainments.some(added => added.temporaryId === suggested.temporaryId);
       });
@@ -36,7 +42,7 @@ const AddAttainmentsView = () => {
     }
   }, []);
 
-  const onAddClick = (attainment) => () => {
+  function onAddClick(attainment) {
     setSuggestedAttainments(
       suggestedAttainments.filter(a => a.temporaryId !== attainment.temporaryId)
     );
@@ -44,9 +50,9 @@ const AddAttainmentsView = () => {
     setAddedAttainments(
       attainmentServices.addTemporaryAttainment(addedAttainments, attainment)
     );
-  };
+  }
 
-  const onRemoveClick = (attainment) => () => {
+  function onRemoveClick(attainment) {
     setSuggestedAttainments(
       attainmentServices.addTemporaryAttainment(suggestedAttainments, attainment)
     );
@@ -54,21 +60,35 @@ const AddAttainmentsView = () => {
     setAddedAttainments(
       addedAttainments.filter(a => a.temporaryId !== attainment.temporaryId)
     );
-  };
+  }
 
-  const onGoBack = () => {
+  function onGoBack(): void {
     navigate('/' + courseId + '/edit-instance/' + sisuInstanceId);
-  };
+  }
 
-  const onConfirmAttainments = () => {
+  function onConfirmAttainments(): void {
     navigate('/' + courseId + '/instance-summary/' + sisuInstanceId);
-  };
+  }
+
+  function onEditClick(attainment: any): void {
+    navigate(
+      '/' + courseId
+      + '/edit-temporary-attainment/' + sisuInstanceId
+      + '/' + attainment.temporaryId
+    );
+  }
 
   return (
     <Box sx={{ display: 'grid', gap: 1.5, ml: '7.5vw', mr: '7.5vw' }}>
-      <Typography variant='h1' align='left' sx={{ mb: 4 }}>Add Study Attainments</Typography>
-      <Typography variant='h3' align='left' sx={{ ml: 1.5 }}>Suggested study attainments from previous instances</Typography>
-      <Box borderRadius={1} sx={{ bgcolor: 'secondary.light', p: '16px 12px', display: 'inline-block' }}>
+      <Typography variant='h1' align='left' sx={{ mb: 4 }}>
+        Add Study Attainments
+      </Typography>
+      <Typography variant='h3' align='left' sx={{ ml: 1.5 }}>
+        Suggested study attainments from previous instances
+      </Typography>
+      <Box borderRadius={1} sx={{
+        bgcolor: 'secondary.light', p: '16px 12px', display: 'inline-block'
+      }}>
         <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch' }}>
           {
             suggestedAttainments.map(attainment => {
@@ -82,7 +102,7 @@ const AddAttainmentsView = () => {
                   attainmentKey={'temporaryId'}
                   buttons={
                     [
-                      <Button key='add' onClick={onAddClick(attainment)}>
+                      <Button key='add' onClick={() => onAddClick(attainment)}>
                         Add
                       </Button>
                     ]
@@ -93,17 +113,30 @@ const AddAttainmentsView = () => {
           }
         </Box>
       </Box>
-      <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', mb: 5, mt: 1, display: 'inline-block' }}>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography align='left' sx={{ ml: 1.5 }} >Create and add a new study attainment:</Typography>
-          <Button variant='outlined' onClick={ () =>
-            navigate(`/${courseId}/create-temporary-attainment/${sisuInstanceId}`) }>
-              Create attainment
+      <Box borderRadius={1} sx={{
+        bgcolor: 'primary.light', p: '16px 12px',
+        mb: 5, mt: 1, display: 'inline-block'
+      }}>
+        <Box sx={{
+          display: 'flex', flexWrap: 'wrap',
+          justifyContent: 'space-between', alignItems: 'center'
+        }}>
+          <Typography align='left' sx={{ ml: 1.5 }} >
+            Create and add a new study attainment:
+          </Typography>
+          <Button variant='outlined' onClick={() =>
+            navigate(`/${courseId}/create-temporary-attainment/${sisuInstanceId}`)
+          }>
+            Create attainment
           </Button>
         </Box>
       </Box>
-      <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >Added study attainments</Typography>
-      <Box borderRadius={1} sx={{ bgcolor: 'primary.light', p: '16px 12px', display: 'inline-block' }}>
+      <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >
+        Added study attainments
+      </Typography>
+      <Box borderRadius={1} sx={{
+        bgcolor: 'primary.light', p: '16px 12px', display: 'inline-block'
+      }}>
         {
           addedAttainments.length !== 0 &&
           <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch', pb: '8px' }}>
@@ -118,13 +151,13 @@ const AddAttainmentsView = () => {
                       [
                         <Button
                           key='remove'
-                          onClick={onRemoveClick(attainment)}
+                          onClick={() => onRemoveClick(attainment)}
                         >
                           Remove
                         </Button>,
                         <Button
                           key='edit'
-                          onClick={() => navigate(`/${courseId}/edit-temporary-attainment/${sisuInstanceId}/${attainment.temporaryId}`)}
+                          onClick={onEditClick}
                         >
                           Edit
                         </Button>
@@ -140,7 +173,10 @@ const AddAttainmentsView = () => {
           You can also add study attainments after creating the instance
         </Typography>
       </Box>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', pb: 6 }}>
+      <Box sx={{
+        display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
+        alignItems: 'center', pb: 6
+      }}>
         <Button variant='outlined' onClick={() => onGoBack()}>
           Go back
         </Button>
@@ -154,6 +190,6 @@ const AddAttainmentsView = () => {
       </Box>
     </Box>
   );
-};
+}
 
 export default AddAttainmentsView;

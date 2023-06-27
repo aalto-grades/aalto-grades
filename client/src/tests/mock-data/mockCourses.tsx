@@ -8,6 +8,8 @@ const mockCourses: Array<CourseData> = [
   {
     id: 5,
     courseCode: 'CS-A1150',
+    minCredits: 5,
+    maxCredits: 5,
     department: {
       fi: 'Tietotekniikan laitos',
       sv: 'Institutionen för datateknik',
@@ -22,11 +24,19 @@ const mockCourses: Array<CourseData> = [
       fi:'',
       sv:'',
       en:''
-    }
+    },
+    teachersInCharge: [
+      {
+        id: 45,
+        name: 'Scooby Doo'
+      }
+    ]
   },
   {
     id: 1,
     courseCode: 'CS-A1110',
+    minCredits: 5,
+    maxCredits: 5,
     department: {
       fi: 'Tietotekniikan laitos',
       sv: 'Institutionen för datateknik',
@@ -41,7 +51,13 @@ const mockCourses: Array<CourseData> = [
       fi:'',
       sv:'',
       en:''
-    }
+    },
+    teachersInCharge: [
+      {
+        id: 76,
+        name: 'Winnie the Pooh'
+      }
+    ]
   }
 ];
 

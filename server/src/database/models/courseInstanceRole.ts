@@ -40,7 +40,7 @@ CourseInstanceRole.init(
       }
     },
     role: {
-      type: DataTypes.ENUM('STUDENT', 'TEACHER', 'TEACHER_IN_CHARGE'),
+      type: DataTypes.ENUM('STUDENT', 'TEACHER'),
       allowNull: false
     },
     createdAt: DataTypes.DATE,
@@ -51,3 +51,15 @@ CourseInstanceRole.init(
     tableName: 'course_instance_role'
   }
 );
+
+User.belongsToMany(CourseInstance, {
+  through: CourseInstanceRole,
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+CourseInstance.belongsToMany(User, {
+  through: CourseInstanceRole,
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});

@@ -2,26 +2,25 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import CreateCourseForm from './create-course-view/CreateCourseForm';
 import coursesService from '../services/courses';
+import { CourseData } from 'aalto-grades-common/types';
 
-const CreateCourseView = () => {
-  const navigate = useNavigate();
+function CreateCourseView(): JSX.Element {
+  const navigate: NavigateFunction = useNavigate();
 
-  const addCourse = async (courseObject) => {
+  async function addCourse(courseObject: CourseData): Promise<void> {
     try {
-      const data = await coursesService.addCourse(courseObject);
-      console.log(data);
-      navigate(`/course-view/${data.course.id}`, { replace: true });
+      const courseId: number = await coursesService.addCourse(courseObject);
+      navigate(`/course-view/${courseId}`, { replace: true });
     } catch (exception) {
       console.log(exception.message);
     }
-  };
+  }
 
-  return(
+  return (
     <>
       <Typography variant="h1" sx={{ flexGrow: 1, mb: 4 }}>
         Create a New Course
@@ -29,6 +28,6 @@ const CreateCourseView = () => {
       <CreateCourseForm addCourse={addCourse}/>
     </>
   );
-};
+}
 
 export default CreateCourseView;

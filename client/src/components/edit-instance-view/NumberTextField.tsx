@@ -2,13 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@mui/material/TextField';
 
-const NumberTextField = ({ fieldData, value, setFunction }) => {
+function NumberTextField({ fieldData, value, setFunction }) {
 
-  const error = !(value.length !== 0 && !isNaN(value) && (Number.isInteger(Number(value))) && (Number(value) >= 0));
+  const error = !(
+    value.length !== 0
+    && !isNaN(value)
+    && (Number.isInteger(Number(value)))
+    && (Number(value) >= 0)
+  );
 
   return (
     <TextField
@@ -24,7 +28,7 @@ const NumberTextField = ({ fieldData, value, setFunction }) => {
       onChange={({ target }) => setFunction(target.value)}
     />
   );
-};
+}
 
 NumberTextField.propTypes = {
   fieldData: PropTypes.object,

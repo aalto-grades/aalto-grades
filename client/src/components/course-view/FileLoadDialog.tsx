@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useState, useEffect, createRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { Params, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -17,7 +17,7 @@ import FormHelperText from '@mui/material/FormHelperText';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import gradesService from '../../services/grades';
 import FileErrorDialog from './FileErrorDialog';
-import { Message } from '../../types/general';
+import { Message } from '../../types';
 
 // A Dialog component for uploading a file
 
@@ -40,7 +40,8 @@ const loadingMsg: Message = {
 };
 
 const successMsg: Message = {
-  msg: 'File processed successfully, grades imported. To refresh final grades, press "calculate final grades"',
+  msg: 'File processed successfully, grades imported.'
+    + ' To refresh final grades, press "calculate final grades"',
   severity: 'success'
 };
 
@@ -52,19 +53,19 @@ const errorMsg: Message = {
 // How many errors are initially rendered visible in the dialog.
 export const maxErrorsToShow: number = 5;
 
-const FileLoadDialog = ({ instanceId, handleClose, open }) => {
-  const { courseId } = useParams();
+function FileLoadDialog({ instanceId, handleClose, open }) {
+  const { courseId }: Params = useParams();
   const fileInput = createRef<any>();
 
   // state variables handling the alert messages
   const [snackPack, setSnackPack] = useState<any>([]);
   const [alertOpen, setAlertOpen] = useState<boolean>(false);
   const [showErrorDialog, setShowErrorDialog] = useState<boolean>(false);
-  const [messageInfo, setMessageInfo] = useState<any>(undefined);
+  const [messageInfo, setMessageInfo] = useState<Message>(undefined);
 
-  const toggleErrorDialog = () => {
+  function toggleErrorDialog(): void {
     setShowErrorDialog(!showErrorDialog);
-  };
+  }
 
   // useEffect in charge of handling the back-to-back alerts
   // makes the previous disappear before showing the new one
@@ -82,7 +83,7 @@ const FileLoadDialog = ({ instanceId, handleClose, open }) => {
   const [validationError, setValidationError] = useState<any>('');
   const [fileErrors, setFileErrors] = useState<any>([]);
 
-  const uploadFile = async () => {
+  async function uploadFile(): Promise<void> {
     setSnackPack((prev) => [...prev, loadingMsg]);
     try {
       await gradesService.importCsv(courseId, instanceId, fileInput.current.files[0]);
@@ -96,15 +97,20 @@ const FileLoadDialog = ({ instanceId, handleClose, open }) => {
       }
       setSnackPack((prev) => [...prev, errorMsg]);
     }
-  };
+  }
 
   return (
     <>
       <Dialog open={open} transitionDuration={{ exit: 800 }}>
         <DialogTitle >Add Grades from File</DialogTitle>
         <DialogContent sx={{ pb: 0 }}>
-          <DialogContentText sx={{ mb: 3, color: 'black' }}>{instructions}</DialogContentText>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', columnGap: 2, mb: 3 }}>
+          <DialogContentText sx={{ mb: 3, color: 'black' }}>
+            {instructions}
+          </DialogContentText>
+          <Box sx={{
+            display: 'flex', justifyContent: 'flex-start',
+            alignItems: 'center', columnGap: 2, mb: 3
+          }}>
             <Typography variant='body2' sx={{ color: 'infoGrey' }}>
               {exampleText}
             </Typography>
@@ -121,7 +127,10 @@ const FileLoadDialog = ({ instanceId, handleClose, open }) => {
               src="/Import-grades-file-example.jpg"
             />
           </Box>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'center', columnGap: 2 }}>
+          <Box sx={{
+            display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start',
+            alignItems: 'center', columnGap: 2
+          }}>
             <Button id='ag_select_file_btn' component='label'>
               Upload file
               <input
@@ -166,7 +175,17 @@ const FileLoadDialog = ({ instanceId, handleClose, open }) => {
                 </>
                 :
                 <ul>
-                  { fileErrors.map(err => <li key={err}><FormHelperText error={true}>{err}</FormHelperText></li>) }
+                  {
+                    fileErrors.map((err) => {
+                      return (
+                        <li key={err}>
+                          <FormHelperText error={true}>
+                            {err}
+                          </FormHelperText>
+                        </li>
+                      );
+                    })
+                  }
                 </ul>
               }
             </>
@@ -210,7 +229,7 @@ const FileLoadDialog = ({ instanceId, handleClose, open }) => {
       />
     </>
   );
-};
+}
 
 FileLoadDialog.propTypes = {
   instanceId: PropTypes.number,

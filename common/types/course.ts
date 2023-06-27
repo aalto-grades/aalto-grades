@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { LocalizedString } from './language';
+import { UserData } from './user';
 
 export enum GradingScale {
   PassFail = 'PASS_FAIL',
@@ -23,31 +24,30 @@ export interface CourseData {
   // undefined when representing parsed Sisu data.
   id?: number,
   courseCode: string,
+  minCredits: number,
+  maxCredits: number,
   department: LocalizedString,
   name: LocalizedString,
   evaluationInformation: LocalizedString
+  teachersInCharge: Array<UserData>
 }
 
 export interface CourseInstanceData {
-  courseData: CourseData,
-  // Course instance ID can be null when representing Sisu course instance data
-  id: number | null,
-  sisuCourseInstanceId: string | null,
-  startingPeriod: Period | null,
-  endingPeriod: Period | null,
-  minCredits: number,
-  maxCredits: number,
+  courseData?: CourseData,
+  // Course instance and assessment model IDs can be null when representing
+  // Sisu course instance data
+  id?: number,
+  assessmentModelId?: number,
+  sisuCourseInstanceId?: string,
+  startingPeriod?: Period,
+  endingPeriod?: Period,
   startDate: Date,
   endDate: Date,
   type: string,
   gradingScale: GradingScale,
-  // TODO: There should maybe be a UserData interface if more data is needed,
-  // for example ID of user.
-  teachersInCharge?: Array<string>
 }
 
 export enum CourseInstanceRoleType {
   Student = 'STUDENT',
-  Teacher = 'TEACHER',
-  TeacherInCharge = 'TEACHER_IN_CHARGE',
+  Teacher = 'TEACHER'
 }

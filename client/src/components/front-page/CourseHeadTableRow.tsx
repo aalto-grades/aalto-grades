@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import Typography from '@mui/material/Typography';
@@ -24,8 +23,8 @@ const headCells = [{
 
 // for now the TableSortLabel element is static and displayd only for the code column
 // because the rows are sorted by the course code
-const CourseHeadTableRow = () => {
-  return(
+function CourseHeadTableRow() {
+  return (
     <TableRow>
       {headCells.map((headCell) => (
         headCell.id === 'code' ?
@@ -45,6 +44,6 @@ const CourseHeadTableRow = () => {
       ))}
     </TableRow>
   );
-};
+}
 
 export default CourseHeadTableRow;

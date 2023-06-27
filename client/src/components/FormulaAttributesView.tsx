@@ -2,24 +2,23 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { NavigateFunction, Params, useParams, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import FormulaAttributesForm from './formula-attributes-view/FormulaAttributesForm';
 
-const FormulaAttributesView = () => {
+function FormulaAttributesView(): JSX.Element {
 
-  const { courseId, instanceId } = useParams();
-  const navigate = useNavigate();
+  const { courseId, instanceId }: Params = useParams();
+  const navigate: NavigateFunction = useNavigate();
 
-  const navigateToCourseView = () => {
+  function navigateToCourseView(): void {
     navigate(`/course-view/${courseId}`, { replace: true });
-  };
+  }
 
-  const navigateBack = () => {
+  function navigateBack(): void {
     navigate(`/${courseId}/select-formula/${instanceId}`, { replace: true });
-  };
+  }
 
   // TODO: How to differentiate between course total grade and assigment grade?
 
@@ -32,11 +31,14 @@ const FormulaAttributesView = () => {
         <Typography variant="h3" sx={{ flexGrow: 1, mb: 2 }}>
           Result: Course Total Grade
         </Typography>
-        <FormulaAttributesForm navigateToCourseView={navigateToCourseView} navigateBack={navigateBack}/>
+        <FormulaAttributesForm
+          navigateToCourseView={navigateToCourseView}
+          navigateBack={navigateBack}
+        />
       </Box>
     </Box>
 
   );
-};
+}
 
 export default FormulaAttributesView;

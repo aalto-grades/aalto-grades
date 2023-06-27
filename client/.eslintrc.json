@@ -20,6 +20,8 @@
     "@typescript-eslint"
   ],
   "rules": {
+    "react/jsx-uses-react": "off",
+    "react/react-in-jsx-scope": "off",
     "indent": [
       "error",
       2
@@ -36,14 +38,6 @@
       "error",
       "always"
     ],
-    "react/react-in-jsx-scope": [
-      0,
-      "off"
-    ],
-    "no-undef": [
-      0,
-      "off"
-    ],
     "object-curly-spacing": [
       "error",
       "always"
@@ -51,7 +45,7 @@
     "max-len": [
       "error",
       {
-        "code": 140
+        "code": 100
       }
     ],
     "brace-style": [
@@ -79,9 +73,38 @@
     "no-trailing-spaces": [
       "error"
     ],
+    "func-style": [
+      "error",
+      "declaration"
+    ],
+    "keyword-spacing": [
+      "error",
+      {
+        "before": true,
+        "after": true
+      }
+    ],
+    "@typescript-eslint/typedef": [
+      "warn",
+      {
+        "arrayDestructuring": true,
+        "arrowParameter": true,
+        "memberVariableDeclaration": true,
+        "objectDestructuring": true,
+        "parameter": true,
+        "propertyDeclaration": true,
+        "variableDeclaration": true,
+        "variableDeclarationIgnoreFunction": true
+      }
+    ],
+    "@typescript-eslint/explicit-function-return-type": "warn",
     "@typescript-eslint/no-inferrable-types": "off",
-    "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-empty-function": "off",
-    "@typescript-eslint/no-non-null-assertion": "off"
+    "@typescript-eslint/array-type": [
+      "warn",
+      {
+        "default": "generic"
+      }
+    ],
+    "@typescript-eslint/no-empty-function": "warn"
   }
 }

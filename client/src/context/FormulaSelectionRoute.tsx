@@ -5,7 +5,7 @@
 import { useState, useMemo } from 'react';
 import { Outlet } from 'react-router-dom';
 
-const FormulaSelectionRoute = () => {
+function FormulaSelectionRoute() {
   const [selectedAttainments, setSelectedAttainments] = useState([]);
   const [selectedFormula, setSelectedFormula] = useState({});
 
@@ -16,6 +16,6 @@ const FormulaSelectionRoute = () => {
   ), [selectedAttainments, selectedFormula]);
 
   return <Outlet context={value} />;
-};
+}
 
 export default FormulaSelectionRoute;

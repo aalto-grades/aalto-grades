@@ -2,12 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import TextFieldBox from './TextFieldBox';
-import { CourseData } from 'aalto-grades-common/types/course';
+import { CourseData } from 'aalto-grades-common/types';
 
 const codeData = {
   fieldId: 'courseCode',
@@ -33,21 +33,24 @@ const organizerData = {
   fieldHelperText: 'Give the emails of the responsible teachers of the new course.'
 };*/
 
-const CreateCourseForm = ({ addCourse }) => {
+function CreateCourseForm({ addCourse }): JSX.Element {
 
-  const [courseCode, setCode] = useState<any>('');
-  const [name, setName] = useState<any>('');
-  const [department, setOrganizer] = useState<any>('');
+  const [courseCode, setCode] = useState<string>('');
+  const [name, setName] = useState<string>('');
+  const [department, setOrganizer] = useState<string>('');
   //const [teacher, setTeacher] = useState<any>('');
 
-  const id = -1;
+  const id: number = -1;
 
-  const handleSubmit = (event) => {
+  async function handleSubmit(event): Promise<void> {
     event.preventDefault();
     try {
+      // TODO remove mock data
       const courseObject: CourseData = ({
         id,
         courseCode,
+        minCredits: 5,
+        maxCredits: 5,
         department: {
           fi: '',
           sv: '',
@@ -62,16 +65,21 @@ const CreateCourseForm = ({ addCourse }) => {
           fi: '',
           sv: '',
           en: '',
-        }
-        // teacher
+        },
+        teachersInCharge: [
+          {
+            id: 23,
+            name: 'Elon Musk'
+          }
+        ]
       });
       addCourse(courseObject);
     } catch (exception) {
       console.log(exception);
     }
-  };
+  }
 
-  return(
+  return (
     <Container maxWidth="sm" sx={{ textAlign: 'right' }}>
       <form onSubmit={handleSubmit}>
         <TextFieldBox fieldData={codeData} setFunction={setCode}/>
@@ -83,7 +91,7 @@ const CreateCourseForm = ({ addCourse }) => {
       </form>
     </Container>
   );
-};
+}
 
 CreateCourseForm.propTypes = {
   addCourse: PropTypes.func

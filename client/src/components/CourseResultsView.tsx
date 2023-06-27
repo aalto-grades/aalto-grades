@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Params, useParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import CourseResultsTable from './course-results-view/CourseResultsTable';
@@ -11,8 +11,8 @@ import AlertSnackbar from './alerts/AlertSnackbar';
 import gradesService from '../services/grades';
 import { sleep } from '../utils/util';
 
-const CourseResultsView = (): JSX.Element => {
-  const { courseId, instanceId } = useParams();
+function CourseResultsView(): JSX.Element {
+  const { courseId, instanceId }: Params = useParams();
 
   const [students, setStudents] = useState([]);
   const [snackPack, setSnackPack] = useState([]);
@@ -26,8 +26,12 @@ const CourseResultsView = (): JSX.Element => {
       setStudents(data.finalGrades);
     }).catch(exception => {
       console.log(exception);
-      setSnackPack((prev) => [...prev,
-        { msg: 'Fetching final grades failed, make sure grades are imported and calculated.', severity: 'error' }
+      setSnackPack((prev) => [
+        ...prev,
+        {
+          msg: 'Fetching final grades failed, make sure grades are imported and calculated.',
+          severity: 'error'
+        }
       ]);
     }).finally(() => {
       setLoading(false);
@@ -171,6 +175,6 @@ const CourseResultsView = (): JSX.Element => {
       />
     </Box>
   );
-};
+}
 
 export default CourseResultsView;

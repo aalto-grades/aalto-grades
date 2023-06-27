@@ -34,6 +34,8 @@ describe('Test GET /v1/courses/:courseId - get course by ID', () => {
     expect(res.body.data.error).not.toBeDefined();
     expect(res.body.data.course.id).toBe(1);
     expect(res.body.data.course.courseCode).toBeDefined();
+    expect(res.body.data.course.minCredits).toBeDefined();
+    expect(res.body.data.course.maxCredits).toBeDefined();
     expect(res.body.data.course.department).toBeDefined();
     expect(res.body.data.course.name).toBeDefined();
     expect(res.body.data.course.evaluationInformation).toBeDefined();
@@ -88,6 +90,8 @@ describe('Test GET /v1/courses - get all courses', () => {
     expect(res.body.data.courses).toBeDefined();
     expect(res.body.data.courses[0].id).toBeDefined();
     expect(res.body.data.courses[0].courseCode).toBeDefined();
+    expect(res.body.data.courses[0].minCredits).toBeDefined();
+    expect(res.body.data.courses[0].maxCredits).toBeDefined();
     expect(res.body.data.courses[0].department).toBeDefined();
     expect(res.body.data.courses[0].name).toBeDefined();
     expect(res.body.data.courses[0].evaluationInformation).toBeDefined();
@@ -115,6 +119,13 @@ describe('Test POST /v1/courses - create new course', () => {
   it('should respond with course data on correct input', async () => {
     let input: object = {
       courseCode: 'ELEC-A7200',
+      minCredits: 5,
+      maxCredits: 5,
+      teachersInCharge: [
+        {
+          id: 10
+        }
+      ],
       department: {
         fi: 'Sähkötekniikan korkeakoulu',
         en: 'School of Electrical Engineering',
@@ -134,10 +145,21 @@ describe('Test POST /v1/courses - create new course', () => {
 
     expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data.course).toBeDefined();
     expect(res.body.data.course.id).toBeDefined();
 
     input = {
       courseCode: 'ELEC-A7200',
+      minCredits: 5,
+      maxCredits: 5,
+      teachersInCharge: [
+        {
+          id: 15
+        },
+        {
+          id: 20
+        }
+      ],
       department: {
         fi: 'Sähkötekniikan korkeakoulu',
         en: 'School of Electrical Engineering',
@@ -155,6 +177,7 @@ describe('Test POST /v1/courses - create new course', () => {
 
     expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data.course).toBeDefined();
     expect(res.body.data.course.id).toBeDefined();
   });
 

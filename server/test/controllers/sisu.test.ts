@@ -26,21 +26,21 @@ beforeAll(async () => {
 });
 
 function checkRes(courseInstance: CourseInstanceData): void {
-  expect(courseInstance.id).toBeDefined();
+  expect(courseInstance.id).not.toBeDefined();
   expect(courseInstance.sisuCourseInstanceId).toBe(sisuInstance.id);
-  expect(courseInstance.startingPeriod).toBeDefined();
-  expect(courseInstance.endingPeriod).toBeDefined();
-  expect(courseInstance.minCredits).toBeDefined();
-  expect(courseInstance.maxCredits).toBeDefined();
+  expect(courseInstance.startingPeriod).not.toBeDefined();
+  expect(courseInstance.endingPeriod).not.toBeDefined();
   expect(courseInstance.startDate).toBeDefined();
   expect(courseInstance.endDate).toBeDefined();
   expect(courseInstance.type).toBeDefined();
   expect(courseInstance.gradingScale).toBeDefined();
-  expect(courseInstance.teachersInCharge).toBeDefined();
-  expect(courseInstance.courseData.courseCode).toBeDefined();
-  expect(courseInstance.courseData.department).toBeDefined();
-  expect(courseInstance.courseData.name).toBeDefined();
-  expect(courseInstance.courseData.evaluationInformation).toBeDefined();
+  expect(courseInstance.courseData?.courseCode).toBeDefined();
+  expect(courseInstance.courseData?.minCredits).toBeDefined();
+  expect(courseInstance.courseData?.maxCredits).toBeDefined();
+  expect(courseInstance.courseData?.teachersInCharge).toBeDefined();
+  expect(courseInstance.courseData?.department).toBeDefined();
+  expect(courseInstance.courseData?.name).toBeDefined();
+  expect(courseInstance.courseData?.evaluationInformation).toBeDefined();
 }
 
 describe(

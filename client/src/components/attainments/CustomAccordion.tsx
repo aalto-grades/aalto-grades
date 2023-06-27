@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -26,7 +26,11 @@ const Accordion = styled<any>((props) => (
 
 const AccordionSummary = styled<any>((props) => (
   <MuiAccordionSummary
-    expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.9rem', color: props.expanded === 'true' ? 'primary.main' : 'grey.600' }} />}
+    expandIcon={
+      <ArrowForwardIosSharpIcon sx={{
+        fontSize: '0.9rem', color: props.expanded === 'true' ? 'primary.main' : 'grey.600'
+      }} />
+    }
     {...props}
   />
 ))(({ theme, nowselected }) => ({
@@ -54,7 +58,7 @@ const AccordionSummary = styled<any>((props) => (
   },
 }));
 
-const AccordionDetails = ({ out, children }) => {
+function AccordionDetails({ out, children }) {
   const margin = out ? '21px' : '60px';
   return (
     <Box sx={{
@@ -68,18 +72,20 @@ const AccordionDetails = ({ out, children }) => {
       minHeight: '36px',
       maxHeight: '36px'
     }}>
-      <PanoramaFishEyeIcon sx={{ fontSize: '0.6rem', display: 'block', margin: '0px 0px 0px 2px' }} />
+      <PanoramaFishEyeIcon sx={{
+        fontSize: '0.6rem', display: 'block', margin: '0px 0px 0px 2px'
+      }} />
       {children}
     </Box>
   );
-};
+}
 
 AccordionDetails.propTypes = {
   children: PropTypes.element,
   out: PropTypes.bool
 };
 
-const AttainmentText = ({ name, formulaId }) => {
+function AttainmentText({ name, formulaId }) {
   return (
     <Box sx={{ display: 'flex',
       flexDirection: 'row',
@@ -90,12 +96,15 @@ const AttainmentText = ({ name, formulaId }) => {
       columnGap: 3
     }}>
       <Typography variant='body2'>{name}</Typography>
-      { formulaId
-        && <Typography variant='caption' align='left'>{'Formula: ' + formulasService.getFormulaName(formulaId)}</Typography>
+      {
+        formulaId &&
+        <Typography variant='caption' align='left'>
+          {'Formula: ' + formulasService.getFormulaName(formulaId)}
+        </Typography>
       }
     </Box>
   );
-};
+}
 
 AttainmentText.propTypes = {
   name: PropTypes.string,
@@ -104,28 +113,30 @@ AttainmentText.propTypes = {
 
 export { AccordionDetails, AttainmentText };
 
-const CustomAccordion = ({ attainments, attainmentKey }) => {
+function CustomAccordion({ attainments, attainmentKey }) {
 
   const [expanded, setExpanded] = useState<any>(new Set());
   const [selected, setSelected] = useState<any>('');
 
-  const addToSet = (item, set) => {
+  function addToSet(item, set) {
     const copySet = new Set([...set]);
     return copySet.add(item);
-  };
+  }
 
-  const deleteFromSet = (item, set) => {
+  function deleteFromSet(item, set) {
     const copySet = new Set([...set]);
     copySet.delete(item);
     return copySet;
-  };
+  }
 
   // curried function syntax, google for a good explanation
   // basically add the panel's id to the set of expanded panels if opened, else delete from set
-  const handleChange = (panel_id) => (e, newExpanded) => {
-    setExpanded(newExpanded ? addToSet(panel_id, expanded) : deleteFromSet(panel_id, expanded));
-    setSelected(newExpanded ? panel_id : false);
-  };
+  function handleChange(panel_id) {
+    return (e, newExpanded) => {
+      setExpanded(newExpanded ? addToSet(panel_id, expanded) : deleteFromSet(panel_id, expanded));
+      setSelected(newExpanded ? panel_id : false);
+    };
+  }
 
   return (
     <>
@@ -146,15 +157,25 @@ const CustomAccordion = ({ attainments, attainmentKey }) => {
                 <AttainmentText name={attainment.name} formulaId={attainment.formulaId} />
               </AccordionSummary>
               {
+                attainment.subAttainments &&
                 attainment.subAttainments.map(subAttainment => {
                   return (
-                    subAttainment.subAttainments.length === 0 ?  // is the attainment a leaf? If yes, render details, else another accordion
+                    // is the attainment a leaf? If yes, render details, else another accordion
+                    subAttainment.subAttainments ?
                       <AccordionDetails key={subAttainment[attainmentKey] + 'details'}>
-                        <AttainmentText name={subAttainment.name} formulaId={subAttainment.formulaId} />
+                        <AttainmentText
+                          name={subAttainment.name}
+                          formulaId={subAttainment.formulaId}
+                        />
                       </AccordionDetails>
                       :
                       <Box key={subAttainment[attainmentKey] + 'subAccordion'} sx={{ pl: '39px' }}>
-                        {<CustomAccordion attainments={[subAttainment]} attainmentKey={attainmentKey} />}
+                        {
+                          <CustomAccordion
+                            attainments={[subAttainment]}
+                            attainmentKey={attainmentKey}
+                          />
+                        }
                       </Box>
                   );
                 })
@@ -164,7 +185,7 @@ const CustomAccordion = ({ attainments, attainmentKey }) => {
         })}
     </>
   );
-};
+}
 
 CustomAccordion.propTypes = {
   attainments: PropTypes.array,

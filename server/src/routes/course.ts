@@ -43,6 +43,14 @@ export const router: Router = Router();
  *     type: string
  *     description: Aalto Course code.
  *     example: CS-A1110
+ *   MinCredits:
+ *     type: integer
+ *     description: Minimum amount credits student can receive from passing the course.
+ *     example: 3
+ *   MaxCredits:
+ *     type: integer
+ *     description: Maximum amount credits student can receive from passing the course.
+ *     example: 5
  *   CourseData:
  *     type: object
  *     description: Course general information with translations.
@@ -51,6 +59,10 @@ export const router: Router = Router();
  *         $ref: '#/definitions/CourseId'
  *       courseCode:
  *         $ref: '#/definitions/CourseCode'
+ *       minCredits:
+ *         $ref: '#/definitions/MinCredits'
+ *       maxCredits:
+ *         $ref: '#/definitions/MaxCredits'
  *       department:
  *         $ref: '#/definitions/LocalizedString'
  *       name:
@@ -159,6 +171,10 @@ router.get(
  *             properties:
  *               courseCode:
  *                 $ref: '#/definitions/CourseCode'
+ *               minCredits:
+ *                 $ref: '#/definitions/MinCredits'
+ *               maxCredits:
+ *                 $ref: '#/definitions/MaxCredits'
  *               department:
  *                 $ref: '#/definitions/LocalizedString'
  *               name:

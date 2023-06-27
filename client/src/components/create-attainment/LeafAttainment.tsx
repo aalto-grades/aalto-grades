@@ -39,16 +39,19 @@ const expiryData = {
   fieldLabel: 'Expiry Date'
 };
 
-/* String textfields for the formula attributes. These attributes affect the parent attainment's grade
-   The textfield IDs are of format 'attribute0', 'attribute1' and so on.
-   The numbers in the end are used to fill in the correct values of the 'formulaAttribute' property of an attainment.
-   This is considered in the function of the nested component StringTextField.
+/* String textfields for the formula attributes. These attributes affect the
+   parent attainment's grade. The textfield IDs are of format 'attribute0',
+   'attribute1' and so on. The numbers in the end are used to fill in the correct
+   values of the 'formulaAttribute' property of an attainment. This is considered
+   in the function of the nested component StringTextField.
 */
-const AttributeTextFields = ({ formulaAttributeNames, indices, setAttainments, attainments }) => {
+function AttributeTextFields({
+  formulaAttributeNames, indices, setAttainments, attainments
+}) {
   return (
     formulaAttributeNames.map((attribute) => {
       const attributeLabel = formulaService.getAttributeLabel(attribute);
-      return(
+      return (
         <StringTextField
           key={attribute}
           fieldData={{ fieldId: 'attribute_' + attribute, fieldLabel: attributeLabel }}
@@ -58,7 +61,7 @@ const AttributeTextFields = ({ formulaAttributeNames, indices, setAttainments, a
         />);
     })
   );
-};
+}
 
 AttributeTextFields.propTypes = {
   formulaAttributeNames: PropTypes.array,
@@ -68,58 +71,73 @@ AttributeTextFields.propTypes = {
   removeAttainment: PropTypes.func
 };
 
-const LeafAttainment = ({ indices, addSubAttainments, setAttainments, attainments, removeAttainment, formulaAttributeNames }) => {
+function LeafAttainment({
+  indices, addSubAttainments, setAttainments,
+  attainments, removeAttainment, formulaAttributeNames
+}) {
 
-  // Functions and varibales for handling the change of the value in the 'Name' (category) textfield.
-  // If the value is 'Other', then the 'New Name' textfield is displayed;
-  // otherwise the name is the same as the category
-  const handleChange = (event) => {
+  // Functions and varibales for handling the change of the value in the 'Name'
+  // (category) textfield. If the value is 'Other', then the 'New Name' textfield
+  // is displayed; otherwise the name is the same as the category
+  function handleChange(event) {
     const value = event.target.value;
-    let updatedAttainments = attainmentServices.setProperty(indices, attainments, 'category', value);
+    let updatedAttainments = attainmentServices.setProperty(
+      indices, attainments, 'category', value
+    );
     if (value === 'Other') {
       setDisplayNewName(true);
-      updatedAttainments = attainmentServices.setProperty(indices, updatedAttainments, 'name', '');
+      updatedAttainments = attainmentServices.setProperty(
+        indices, updatedAttainments, 'name', ''
+      );
     } else {
       setDisplayNewName(false);
-      updatedAttainments = attainmentServices.setProperty(indices, updatedAttainments, 'name', value);
+      updatedAttainments = attainmentServices.setProperty(
+        indices, updatedAttainments, 'name', value
+      );
     }
     setAttainments(updatedAttainments);
-  };
+  }
 
-  const getValue = (fieldData) => {
+  function getValue(fieldData) {
     if (fieldData.fieldId === 'category') {
       return attainmentServices.getProperty(indices, attainments, 'category');
     } else {
       console.log(fieldData.fieldId);
     }
-  };
+  }
 
-  const [displayNewName, setDisplayNewName] = useState<any>(getValue(categoryData) === 'Other');
+  const [displayNewName, setDisplayNewName] = useState<any>(
+    getValue(categoryData) === 'Other'
+  );
 
-  // Functions and varibales for opening and closing the dialog that asks for the number of sub-attainments
+  // Functions and varibales for opening and closing the dialog that asks for
+  // the number of sub-attainments
   const [openCountDialog, setOpenCountDialog] = useState<any>(false);
 
-  const handleCountDialogOpen = () => {
+  function handleCountDialogOpen() {
     setOpenCountDialog(true);
-  };
+  }
 
-  const handleCountDialogClose = () => {
+  function handleCountDialogClose() {
     setOpenCountDialog(false);
-  };
+  }
 
-  // Functions and varibales for opening and closing the dialog for confirming sub-attainment deletion
-  const [openConfDialog, setOpenConfDialog] = useState<any>(false);
+  // Functions and varibales for opening and closing the dialog for confirming
+  // sub-attainment deletion
+  const [openConfDialog, setOpenConfDialog] = useState<boolean>(false);
 
-  const handleConfDialogOpen = () => {
+  function handleConfDialogOpen() {
     setOpenConfDialog(true);
-  };
+  }
 
-  const handleConfDialogClose = () => {
+  function handleConfDialogClose() {
     setOpenConfDialog(false);
-  };
+  }
 
   // See if this attainment affects the parent attainment's grade
-  const affectCalculation = attainmentServices.getProperty(indices, attainments, 'affectCalculation');
+  const affectCalculation = attainmentServices.getProperty(
+    indices, attainments, 'affectCalculation'
+  );
 
   return (
     <Box sx={{
@@ -155,10 +173,25 @@ const LeafAttainment = ({ indices, addSubAttainments, setAttainments, attainment
           <MenuItem value='Other'>Other</MenuItem>
         </TextField>
         <Collapse in={displayNewName} timeout={0} unmountOnExit>
-          <StringTextField fieldData={nameData} indices={indices} setAttainments={setAttainments} attainments={attainments} />
+          <StringTextField
+            fieldData={nameData}
+            indices={indices}
+            setAttainments={setAttainments}
+            attainments={attainments}
+          />
         </Collapse>
-        <DateTextField fieldData={dateData} indices={indices} setAttainments={setAttainments} attainments={attainments} />
-        <DateTextField fieldData={expiryData} indices={indices} setAttainments={setAttainments} attainments={attainments} />
+        <DateTextField
+          fieldData={dateData}
+          indices={indices}
+          setAttainments={setAttainments}
+          attainments={attainments}
+        />
+        <DateTextField
+          fieldData={expiryData}
+          indices={indices}
+          setAttainments={setAttainments}
+          attainments={attainments}
+        />
         {
           (formulaAttributeNames && affectCalculation) &&
           <AttributeTextFields
@@ -208,7 +241,7 @@ const LeafAttainment = ({ indices, addSubAttainments, setAttainments, attainment
       />
     </Box>
   );
-};
+}
 
 LeafAttainment.propTypes = {
   addSubAttainments: PropTypes.func,

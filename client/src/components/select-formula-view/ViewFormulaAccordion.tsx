@@ -20,7 +20,7 @@ const HoverExpandMoreIcon = styled<any>(ExpandMoreIcon)(({ theme }) => ({
   }
 }));
 
-const ViewFormulaAccordion = ({ formulaId }) => {
+function ViewFormulaAccordion({ formulaId }) {
   const [codeSnippet, setCodeSnippet] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -62,7 +62,7 @@ const ViewFormulaAccordion = ({ formulaId }) => {
       </Accordion>
     </Container>
   );
-};
+}
 
 ViewFormulaAccordion.propTypes = {
   formulaId: PropTypes.string,

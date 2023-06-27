@@ -2,30 +2,35 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@mui/material/TextField';
 import attainmentServices from '../../services/attainments';
 
 // A TextField component used for the 'date' of an attainment and the 'expiryDate'
 
-const DateTextField = ({ fieldData, indices, attainments, setAttainments }) => {
+function DateTextField({ fieldData, indices, attainments, setAttainments }) {
 
   // Functions for handling the change of the values in the date textfields
-  const handleChange = (event) => {
+  function handleChange(event) {
     const value = event.target.value;
     if (fieldData.fieldId === 'attainmentDate') {
-      const updatedAttainments = attainmentServices.setProperty(indices, attainments, 'date', value);
+      const updatedAttainments = attainmentServices.setProperty(
+        indices, attainments, 'date', value
+      );
+
       setAttainments(updatedAttainments);
     } else if (fieldData.fieldId === 'expiryDate') {
-      const updatedAttainments = attainmentServices.setProperty(indices, attainments, 'expiryDate', value);
+      const updatedAttainments = attainmentServices.setProperty(
+        indices, attainments, 'expiryDate', value
+      );
+
       setAttainments(updatedAttainments);
     } else {
       console.log(fieldData.fieldId);
     }
-  };
+  }
 
-  const getValue = () => {
+  function getValue() {
     if (fieldData.fieldId === 'attainmentDate') {
       return attainmentServices.getProperty(indices, attainments, 'date');
     } else if (fieldData.fieldId === 'expiryDate') {
@@ -33,7 +38,7 @@ const DateTextField = ({ fieldData, indices, attainments, setAttainments }) => {
     } else {
       console.log(fieldData.fieldId);
     }
-  };
+  }
 
   return (
     <TextField
@@ -51,7 +56,7 @@ const DateTextField = ({ fieldData, indices, attainments, setAttainments }) => {
       onChange={(event) => handleChange(event)}
     />
   );
-};
+}
 
 DateTextField.propTypes = {
   fieldData: PropTypes.object,

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
@@ -13,17 +13,25 @@ import AlertSnackbar from '../alerts/AlertSnackbar';
 import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
 import { sleep } from '../../utils/util';
 
-const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
+function FormulaAttributesForm({ navigateToCourseView, navigateBack }) {
 
   const [attributeValues, setAttributeValues] = useState<any>([]);
   const { selectedAttainments, selectedFormula } = useOutletContext<any>();
-  const [setSnackPack, messageInfo, setMessageInfo, alertOpen, setAlertOpen] = useSnackPackAlerts();
+  const [
+    setSnackPack,
+    messageInfo, setMessageInfo,
+    alertOpen, setAlertOpen
+  ] = useSnackPackAlerts();
 
   useEffect(() => {
-    setAttributeValues(Array(selectedAttainments.length).fill(Array(selectedFormula.attributes.length).fill('')));
+    setAttributeValues(
+      Array(selectedAttainments.length).fill(
+        Array(selectedFormula.attributes.length).fill('')
+      )
+    );
   }, [selectedAttainments, selectedFormula]);
 
-  const handleAttributeChange = (attainmentIndex, attributeIndex, event) => {
+  function handleAttributeChange(attainmentIndex, attributeIndex, event) {
     const newAttributeValues = attributeValues.map((a, index) => {
       if (attainmentIndex == index) {
         const newAttributes = a.map((attribute, i) => {
@@ -35,9 +43,9 @@ const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
       }
     });
     setAttributeValues(newAttributeValues);
-  };
+  }
 
-  const handleSubmit = async (event) => {
+  async function handleSubmit(event) {
     event.preventDefault();
     try {
       const updatedAttainments = selectedAttainments.map((attainment, index) => {
@@ -56,23 +64,36 @@ const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
       // TODO: add formula and attributes to database
       // Depending on how long adding the formula and attributes to the database takes,
       // a loading messsage may need to be added
-      setSnackPack((prev) => [...prev,
-        { msg: 'Formula attributes saved, you will be redirected to the course page.', severity: 'success' }
+      setSnackPack((prev) => [
+        ...prev,
+        {
+          msg: 'Formula attributes saved, you will be redirected to the course page.',
+          severity: 'success'
+        }
       ]);
       await sleep(4000);
       navigateToCourseView();
 
     } catch (exception) {
       console.log(exception);
-      setSnackPack((prev) => [...prev,
-        { msg: 'Saving the formula attributes failed.', severity: 'error' }
+      setSnackPack((prev) => [
+        ...prev,
+        {
+          msg: 'Saving the formula attributes failed.',
+          severity: 'error'
+        }
       ]);
     }
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit} data-testid='attributeForm'>
-      <AlertSnackbar messageInfo={messageInfo} setMessageInfo={setMessageInfo} open={alertOpen} setOpen={setAlertOpen} />
+      <AlertSnackbar
+        messageInfo={messageInfo}
+        setMessageInfo={setMessageInfo}
+        open={alertOpen}
+        setOpen={setAlertOpen}
+      />
       <StyledBox sx={{
         display: 'flex',
         flexDirection: 'row',
@@ -104,7 +125,7 @@ const FormulaAttributesForm = ({ navigateToCourseView, navigateBack }) => {
 
     </form>
   );
-};
+}
 
 FormulaAttributesForm.propTypes = {
   navigateToCourseView: PropTypes.func,

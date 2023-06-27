@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { act, render, screen, waitFor } from '@testing-library/react';
@@ -11,13 +10,13 @@ import CourseResultsView from '../components/CourseResultsView';
 
 describe('Tests for CourseResultsView components', () => {
 
-  const renderCourseResultsView = async () => {
+  async function renderCourseResultsView() {
     return render(
       <BrowserRouter>
         <CourseResultsView />
       </BrowserRouter>
     );
-  };
+  }
 
   test('CourseResultsTable should render the correct number of rows', async () => {
 
@@ -41,51 +40,59 @@ describe('Tests for CourseResultsView components', () => {
 
   });
 
-  test('CourseResultsTable should show a dialog for uploading a file when clicking on a menu button and choosing that option', async () => {
+  test(
+    'CourseResultsTable should show a dialog for uploading a file when'
+    + ' clicking on a menu button and choosing that option',
+    async () => {
 
-    renderCourseResultsView();
+      renderCourseResultsView();
 
-    const importGradesMenuButton = await screen.findByText('Import grades');
-    expect(importGradesMenuButton).toBeDefined();
-    act(() => userEvent.click(importGradesMenuButton));
+      const importGradesMenuButton = await screen.findByText('Import grades');
+      expect(importGradesMenuButton).toBeDefined();
+      act(() => userEvent.click(importGradesMenuButton));
 
-    const uploadOption = screen.getByText('Import from file');
-    expect(uploadOption).toBeDefined();
-    act(() => userEvent.click(uploadOption));
+      const uploadOption = screen.getByText('Import from file');
+      expect(uploadOption).toBeDefined();
+      act(() => userEvent.click(uploadOption));
 
-    const dialogTitle = screen.getByText('Add Grades from File');
-    const uploadFileButton = screen.getByText('Upload file');
-    const cancelButton = screen.getByText('Cancel');
-    const confirmButton = screen.getByText('Confirm');
+      const dialogTitle = screen.getByText('Add Grades from File');
+      const uploadFileButton = screen.getByText('Upload file');
+      const cancelButton = screen.getByText('Cancel');
+      const confirmButton = screen.getByText('Confirm');
 
-    expect(dialogTitle).toBeVisible();
-    expect(uploadFileButton).toBeVisible();
-    expect(cancelButton).toBeVisible();
-    expect(confirmButton).toBeVisible();
+      expect(dialogTitle).toBeVisible();
+      expect(uploadFileButton).toBeVisible();
+      expect(cancelButton).toBeVisible();
+      expect(confirmButton).toBeVisible();
 
-    act(() => userEvent.click(cancelButton));
-    expect(dialogTitle).not.toBeVisible();
-  });
+      act(() => userEvent.click(cancelButton));
+      expect(dialogTitle).not.toBeVisible();
+    }
+  );
 
-  test('CourseResultsTable should show a dialog for exporting Sisu CSV when clicking on a export button', async () => {
+  test(
+    'CourseResultsTable should show a dialog for exporting Sisu CSV'
+    + ' when clicking on a export button',
+    async () => {
 
-    renderCourseResultsView();
+      renderCourseResultsView();
 
-    const exportGradesMenuButton = await screen.findByText('Export to Sisu CSV');
-    expect(exportGradesMenuButton).toBeDefined();
-    act(() => userEvent.click(exportGradesMenuButton));
+      const exportGradesMenuButton = await screen.findByText('Export to Sisu CSV');
+      expect(exportGradesMenuButton).toBeDefined();
+      act(() => userEvent.click(exportGradesMenuButton));
 
-    const dialogTitle = screen.getByText('Export final grades to Sisu CSV');
-    const exportButton = screen.getByText('Export');
-    const cancelButton = screen.getByText('Cancel');
+      const dialogTitle = screen.getByText('Export final grades to Sisu CSV');
+      const exportButton = screen.getByText('Export');
+      const cancelButton = screen.getByText('Cancel');
 
-    expect(dialogTitle).toBeVisible();
-    expect(exportButton).toBeVisible();
-    expect(cancelButton).toBeVisible();
+      expect(dialogTitle).toBeVisible();
+      expect(exportButton).toBeVisible();
+      expect(cancelButton).toBeVisible();
 
-    act(() => userEvent.click(cancelButton));
-    expect(dialogTitle).not.toBeVisible();
-  });
+      act(() => userEvent.click(cancelButton));
+      expect(dialogTitle).not.toBeVisible();
+    }
+  );
 
   test('CourseResultsTable should not render any rows before grades are imported', async () => {
 

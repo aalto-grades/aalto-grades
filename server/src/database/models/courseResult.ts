@@ -71,3 +71,44 @@ CourseResult.init(
     tableName: 'course_result'
   }
 );
+
+CourseResult.belongsTo(User, {
+  targetKey: 'id',
+  foreignKey: 'userId'
+});
+
+User.hasMany(CourseResult, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+CourseResult.belongsTo(User, {
+  as: 'grader',
+  targetKey: 'id',
+  foreignKey: 'graderId'
+});
+
+User.hasMany(CourseResult, {
+  foreignKey: 'graderId',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+CourseResult.belongsTo(CourseInstance, {
+  targetKey: 'id',
+  foreignKey: 'courseInstanceId'
+});
+
+CourseInstance.hasMany(CourseResult, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+/*
+Disabled since CourseResult does not have FK course id at the moment
+
+CourseResult.belongsTo(Course, {
+  targetKey: 'id',
+  foreignKey: 'courseId'
+});
+*/

@@ -8,7 +8,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Slide from '@mui/material/Slide';
 import MuiAlert from '@mui/material/Alert';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { Message } from '../../types/general';
+import { Message } from '../../types';
 
 const darkTheme = createTheme({
   palette: {
@@ -22,24 +22,24 @@ const Alert: any = React.forwardRef(function Alert(props, ref) {
 
 // TODO: Consider if the key attribute works properly of if something else should be used?
 // position allows "stacked look", starts from 1 but really needed only from 2 onwards
-const AlertSnackbar = ({ messageInfo, setMessageInfo, open, setOpen, position }: {
+function AlertSnackbar({ messageInfo, setMessageInfo, open, setOpen, position }: {
   messageInfo: Message | undefined,
   setMessageInfo: (messageInfo: Message | undefined) => void,
   open: boolean,
   setOpen: (open: boolean) => void,
   position?: number
-}) => {
+}): JSX.Element {
 
-  const margin = position ? (position - 1) * 7 : 0;
+  const margin: number = position ? (position - 1) * 7 : 0;
 
-  function handleClose(event: SyntheticEvent, reason: string) {
+  function handleClose(event: SyntheticEvent, reason: string): void {
     if (reason === 'clickaway') {
       return;
     }
     setOpen(false);
   }
 
-  function handleExited() {
+  function handleExited(): void {
     setMessageInfo(undefined);
   }
 
@@ -56,14 +56,18 @@ const AlertSnackbar = ({ messageInfo, setMessageInfo, open, setOpen, position }:
           TransitionProps={{ onExited: handleExited }}
           sx={{ mt: margin, maxWidth: '45vw', textAlign: 'left' }}
         >
-          <Alert onClose={handleClose} severity={messageInfo?.severity ?? 'info'} sx={{ width: '100%' }}>
+          <Alert
+            onClose={handleClose}
+            severity={messageInfo?.severity ?? 'info'}
+            sx={{ width: '100%' }}
+          >
             {messageInfo?.msg}
           </Alert>
         </Snackbar>
       </ThemeProvider>
     </div>
   );
-};
+}
 
 AlertSnackbar.propTypes = {
   messageInfo: PropTypes.object,

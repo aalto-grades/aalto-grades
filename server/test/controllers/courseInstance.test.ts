@@ -34,52 +34,21 @@ describe(
       expect(res.body.data.courseInstance).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
       expect(res.body.data.courseInstance.id).toBe(1);
+      expect(res.body.data.courseInstance.assessmentModelId).toBe(1);
       expect(res.body.data.courseInstance.startingPeriod).toBeDefined();
       expect(res.body.data.courseInstance.endingPeriod).toBeDefined();
-      expect(res.body.data.courseInstance.minCredits).toBeDefined();
-      expect(res.body.data.courseInstance.maxCredits).toBeDefined();
       expect(res.body.data.courseInstance.startDate).toBeDefined();
       expect(res.body.data.courseInstance.endDate).toBeDefined();
       expect(res.body.data.courseInstance.type).toBeDefined();
       expect(res.body.data.courseInstance.gradingScale).toBeDefined();
-      expect(res.body.data.courseInstance.teachersInCharge).toBeDefined();
       expect(res.body.data.courseInstance.courseData.courseCode).toBeDefined();
+      expect(res.body.data.courseInstance.courseData.minCredits).toBeDefined();
+      expect(res.body.data.courseInstance.courseData.maxCredits).toBeDefined();
+      expect(res.body.data.courseInstance.courseData.teachersInCharge).toBeDefined();
+      expect(res.body.data.courseInstance.courseData.teachersInCharge[0].name).toBeDefined();
       expect(res.body.data.courseInstance.courseData.department).toBeDefined();
       expect(res.body.data.courseInstance.courseData.name).toBeDefined();
       expect(res.body.data.courseInstance.courseData.evaluationInformation).toBeDefined();
-    });
-
-    it('should not count students as teachers in charge', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/5/instances/14')
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
-
-      expect(res.body.success).toBe(true);
-      expect(res.body.data.courseInstance.teachersInCharge.length).toBe(1);
-    });
-
-    it('should not count teachers as teachers in charge', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/6/instances/15')
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
-
-      expect(res.body.success).toBe(true);
-      expect(res.body.data.courseInstance.teachersInCharge.length).toBe(1);
-    });
-
-    it('should find multiple teachers in charge', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/4/instances/5')
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
-
-      expect(res.body.success).toBe(true);
-      expect(res.body.data.courseInstance.teachersInCharge.length).toBe(2);
     });
 
     it('should respond with 400 bad request, if validation fails (non-number instance id)',
@@ -141,19 +110,18 @@ describe(
         .expect(HttpCode.Ok);
 
       expect(res.body.success).toBe(true);
+      expect(res.body.data.courseInstances[0].assessmentModelId).toBeDefined();
       expect(res.body.data.courseInstances[0].courseData.id).toBeDefined();
       expect(res.body.data.courseInstances[0].courseData.courseCode).toBeDefined();
+      expect(res.body.data.courseInstances[0].courseData.teachersInCharge).toBeDefined();
       expect(res.body.data.courseInstances[0].id).toBeDefined();
       expect(res.body.data.courseInstances[0].sisuCourseInstanceId).toBeDefined();
       expect(res.body.data.courseInstances[0].startingPeriod).toBeDefined();
       expect(res.body.data.courseInstances[0].endingPeriod).toBeDefined();
-      expect(res.body.data.courseInstances[0].minCredits).toBeDefined();
-      expect(res.body.data.courseInstances[0].maxCredits).toBeDefined();
       expect(res.body.data.courseInstances[0].startDate).toBeDefined();
       expect(res.body.data.courseInstances[0].endDate).toBeDefined();
       expect(res.body.data.courseInstances[0].type).toBeDefined();
       expect(res.body.data.courseInstances[0].gradingScale).toBeDefined();
-      expect(res.body.data.courseInstances[0].teachersInCharge).toBeDefined();
     });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
@@ -211,9 +179,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       startingPeriod: 'I',
       endingPeriod: 'II',
       type: 'LECTURE',
-      teachersInCharge: [1],
-      minCredits: 5,
-      maxCredits: 5,
       startDate: '2022-7-10',
       endDate: '2022-11-10'
     });
@@ -223,21 +188,16 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       startingPeriod: 'III',
       endingPeriod: 'V',
       type: 'EXAM',
-      teachersInCharge: [2],
-      minCredits: 3,
-      maxCredits: 5,
       startDate: '2023-1-19',
       endDate: '2024-4-8'
     });
 
     await goodInput({
+      assessmentModelId: 1,
       gradingScale: 'PASS_FAIL',
       startingPeriod: 'III',
       endingPeriod: 'V',
       type: 'EXAM',
-      teachersInCharge: [2, 1],
-      minCredits: 0,
-      maxCredits: 1,
       startDate: '2023-1-19',
       endDate: '2024-4-8'
     });
@@ -274,9 +234,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       startingPeriod: 'I',
       endingPeriod: 'II',
       type: 'LECTURE',
-      teachersInCharge: 1,
-      minCredits: 5,
-      maxCredits: 5,
       startDate: '2022-7-10',
       endDate: '2022-11-10'
     });
@@ -288,21 +245,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       },
       endingPeriod: 'II',
       type: 'LECTURE',
-      teachersInCharge: [1],
-      minCredits: 5,
-      maxCredits: 5,
-      startDate: '2022-7-10',
-      endDate: '2022-11-10'
-    });
-
-    await badInput({
-      gradingScale: 'PASS_FAIL',
-      startingPeriod: 'I',
-      endingPeriod: 'II',
-      type: 42,
-      teachersInCharge: 1,
-      minCredits: 5,
-      maxCredits: 5,
       startDate: '2022-7-10',
       endDate: '2022-11-10'
     });
@@ -312,35 +254,8 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       startingPeriod: 'I',
       endingPeriod: 'II',
       type: 'LECTURE',
-      teachersInCharge: [1],
-      minCredits: 5,
-      maxCredits: 5,
       startDate: 'not a date',
       endDate: 'not a date either'
-    });
-
-    await badInput({
-      gradingScale: 'NUMERICAL',
-      startingPeriod: 'I',
-      endingPeriod: 'II',
-      type: 'LECTURE',
-      teachersInCharge: [1],
-      minCredits: 5,
-      maxCredits: 3,
-      startDate: '2022-7-10',
-      endDate: '2022-11-10'
-    });
-
-    await badInput({
-      gradingScale: 'NUMERICAL',
-      startingPeriod: 'I',
-      endingPeriod: 'II',
-      type: 'LECTURE',
-      teachersInCharge: [1],
-      minCredits: -1,
-      maxCredits: 3,
-      startDate: '2022-7-10',
-      endDate: '2022-11-10'
     });
 
   });
@@ -354,38 +269,12 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
         endingPeriod: 'II',
         type: 'LECTURE',
         teachersInCharge: [1],
-        minCredits: 5,
-        maxCredits: 5,
         startDate: '2022-7-10',
         endDate: '2022-11-10'
       })
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.NotFound);
-
-    expect(res.body.success).toBe(false);
-    expect(res.body.data).not.toBeDefined();
-    expect(res.body.errors).toBeDefined();
-  });
-
-  it('should respond with 422 unprocessable entity, if nonexistent teacher in charge', async () => {
-    const res: supertest.Response =
-      await request
-        .post('/v1/courses/1/instances')
-        .send({
-          gradingScale: 'NUMERICAL',
-          startingPeriod: 'I',
-          endingPeriod: 'II',
-          type: 'LECTURE',
-          teachersInCharge: [9999999],
-          minCredits: 5,
-          maxCredits: 5,
-          startDate: '2022-7-10',
-          endDate: '2022-11-10'
-        })
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.UnprocessableEntity);
 
     expect(res.body.success).toBe(false);
     expect(res.body.data).not.toBeDefined();
