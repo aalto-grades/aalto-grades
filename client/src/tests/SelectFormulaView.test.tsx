@@ -20,11 +20,10 @@ afterEach(cleanup);
 describe('Tests for SelectFormulaView components', () => {
 
   async function renderSelectFormulaView() {
-
-    (instancesService.getAttainments as jest.Mock).mockRejectedValue('Network error');
-    (instancesService.getAttainments as jest.Mock).mockResolvedValue(mockAttainments);
-    (formulasService.getFormulas as jest.Mock).mockRejectedValue('Network error'); // succeess, nothing to worry about
-    (formulasService.getFormulas as jest.Mock).mockRejectedValue(mockFormulas); // succeess, nothing to worry about
+    // succeess, nothing to worry about
+    (formulasService.getFormulas as jest.Mock).mockRejectedValue('Network error');
+    // succeess, nothing to worry about
+    (formulasService.getFormulas as jest.Mock).mockRejectedValue(mockFormulas);
 
     //(instancesService.getAttainments as jest.Mock).mockRejectedValue('Network error');
     //(instancesService.getAttainments as jest.Mock).mockResolvedValue(mockAttainments);
