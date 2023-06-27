@@ -73,7 +73,7 @@ describe('Tests for CourseView component', () => {
         const attainments: HTMLElement = getByText('Study Attainments');
         const exercises: HTMLElement = getByText('Exercises');
         const projects: HTMLElement = getByText('Project');
-        const exams = getAllByText('Exam');
+        const exams: HTMLElement = getAllByText('Exam');
         const instances: HTMLElement = getByText('Course Instances');
         const createInstanceButton: HTMLElement = getByText('New instance');
         const addAttainmentButton: HTMLElement = getByText('Add attainment');
@@ -105,7 +105,7 @@ describe('Tests for CourseView component', () => {
 
       const { getByText, findByText, queryByText }: RenderResult = renderCourseView(auth);
 
-      const courseInfo = await findByText('Course Details');
+      const courseInfo: HTMLElement = await findByText('Course Details');
       // since previous is in document, so are the rest
       const teachersInfo: HTMLElement = getByText('Teachers in Charge');
       const instances: HTMLElement = getByText('Course Instances');

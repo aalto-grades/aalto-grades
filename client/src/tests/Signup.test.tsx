@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { act, render, screen } from '@testing-library/react';
@@ -21,12 +20,12 @@ describe('Tests for Login component', () => {
       </BrowserRouter>
     );
 
-    const nameField = screen.getByLabelText('Name');
-    const passwordField = screen.getByLabelText('Password');
-    const emailField = screen.getByLabelText('Email');
-    const studentNumberField = screen.getByLabelText('Student Number (not required)');
-    const signupButton = screen.getByText('sign up');
-    const textElement = screen.getByText('Sign up');
+    const nameField: HTMLElement = screen.getByLabelText('Name');
+    const passwordField: HTMLElement = screen.getByLabelText('Password');
+    const emailField: HTMLElement = screen.getByLabelText('Email');
+    const studentNumberField: HTMLElement = screen.getByLabelText('Student Number (not required)');
+    const signupButton: HTMLElement = screen.getByText('sign up');
+    const textElement: HTMLElement = screen.getByText('Sign up');
 
     expect(nameField).toBeDefined();
     expect(passwordField).toBeDefined();
@@ -43,11 +42,11 @@ describe('Tests for Login component', () => {
 
     render(<SignupForm addUser={mockSignupUser}/>);
 
-    const nameField = screen.getByLabelText('Name');
-    const passwordField = screen.getByLabelText('Password');
-    const emailField = screen.getByLabelText('Email');
-    const studentNumberField = screen.getByLabelText('Student Number (not required)');
-    const signupButton = screen.getByText('sign up');
+    const nameField: HTMLElement = screen.getByLabelText('Name');
+    const passwordField: HTMLElement = screen.getByLabelText('Password');
+    const emailField: HTMLElement = screen.getByLabelText('Email');
+    const studentNumberField: HTMLElement = screen.getByLabelText('Student Number (not required)');
+    const signupButton: HTMLElement = screen.getByText('sign up');
 
     act(() => userEvent.type(nameField, 'Test User'));
     act(() => userEvent.type(passwordField, 'secret'));

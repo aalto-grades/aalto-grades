@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { act, render, screen } from '@testing-library/react';
@@ -20,10 +19,10 @@ describe('Tests for Login and LoginForm components', () => {
       </BrowserRouter>
     );
 
-    const emailField = screen.getByLabelText('Email');
-    const passwordField = screen.getByLabelText('Password');
-    const loginButton = screen.getByText('login');
-    const textElement = screen.getByText('Don\'t have an account yet?');
+    const emailField: HTMLElement = screen.getByLabelText('Email');
+    const passwordField: HTMLElement = screen.getByLabelText('Password');
+    const loginButton: HTMLElement = screen.getByText('login');
+    const textElement: HTMLElement = screen.getByText('Don\'t have an account yet?');
 
     expect(emailField).toBeDefined();
     expect(passwordField).toBeDefined();
@@ -37,9 +36,9 @@ describe('Tests for Login and LoginForm components', () => {
 
     render(<LoginForm loginUser={mockLoginUser}/>);
 
-    const emailField = screen.getByLabelText('Email');
-    const passwordField = screen.getByLabelText('Password');
-    const loginButton = screen.getByText('login');
+    const emailField: HTMLElement = screen.getByLabelText('Email');
+    const passwordField: HTMLElement = screen.getByLabelText('Password');
+    const loginButton: HTMLElement = screen.getByText('login');
 
     act(() => userEvent.type(emailField, 'test@email.com'));
     act(() => userEvent.type(passwordField, 'secret'));
