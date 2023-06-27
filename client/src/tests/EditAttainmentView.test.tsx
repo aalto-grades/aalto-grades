@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react-router-dom';
+import React from 'react';
 
 describe('Temp', () => {
   test('Temp', () => {

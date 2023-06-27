@@ -4,32 +4,42 @@
 
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { act, render, waitFor, cleanup } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, RenderResult, waitFor, cleanup } from '@testing-library/react';
 import CourseView from '../components/CourseView';
+import assessmentModelsService from '../services/assessmentModels';
 import coursesService from '../services/courses';
 import instancesService from '../services/instances';
 import AuthContext from '../context/AuthProvider';
+import mockAssessmentModels from './mock-data/mockAssessmentModels';
+import mockAttainments from './mock-data/mockAttainmentsClient';
 import mockCourses from './mock-data/mockCourses';
 import mockInstances from './mock-data/mockInstancesWithStringDates';
-import { SystemRole } from 'aalto-grades-common/types/auth';
+import { LoginResult, SystemRole } from 'aalto-grades-common/types';
 
+jest.mock('../services/assessmentModels');
 jest.mock('../services/courses');
 jest.mock('../services/instances');
 afterEach(cleanup);
 
 describe('Tests for CourseView component', () => {
 
-  function renderCourseView(auth) {
+  function renderCourseView(auth: LoginResult): RenderResult {
 
-    const mockResponseInstances = mockInstances;
     (instancesService.getInstances as jest.Mock).mockRejectedValue('Network error');
-    (instancesService.getInstances as jest.Mock).mockResolvedValue(mockResponseInstances);
+    (instancesService.getInstances as jest.Mock).mockResolvedValue(mockInstances);
 
-
-    const mockResponseCourse = mockCourses[0];
     (coursesService.getCourse as jest.Mock).mockRejectedValue('Network error');
-    (coursesService.getCourse as jest.Mock).mockResolvedValue(mockResponseCourse);
+    (coursesService.getCourse as jest.Mock).mockResolvedValue(mockCourses[0]);
+
+    (assessmentModelsService.getAllAssessmentModels as jest.Mock)
+      .mockRejectedValue('Network error');
+    (assessmentModelsService.getAllAssessmentModels as jest.Mock)
+      .mockResolvedValue(mockAssessmentModels);
+
+    (assessmentModelsService.getAllAttainments as jest.Mock)
+      .mockRejectedValue('Network error');
+    (assessmentModelsService.getAllAttainments as jest.Mock)
+      .mockResolvedValue(mockAttainments);
 
     return render(
       <MemoryRouter initialEntries={['/course-view/1']}>
@@ -42,28 +52,34 @@ describe('Tests for CourseView component', () => {
     );
   }
 
-
   test(
-    'CourseView should render InstanceDetails, Attainments and InstancesTable'
+    'CourseView should render CourseDetails, Attainments and InstancesTable'
     + ' components for teachers of the course',
     async () => {
 
       // TODO, role here must be checked here based on a course/instance level role.
-      const auth = { role: SystemRole.Admin };
-      const { getByText, getAllByText } = renderCourseView(auth);
+      const auth: LoginResult = {
+        id: 1,
+        name: 'Admin',
+        role: SystemRole.Admin
+      };
+
+      const { getByText, getAllByText }: RenderResult = renderCourseView(auth);
 
       await waitFor(() => {
-        const instanceInfo = getByText('Instance Details');
-        const teachersInfo = getByText('Teachers in Charge');
-        const attainments = getByText('Study Attainments');
-        const exercises = getByText('Exercises');
-        const projects = getByText('Project');
+        const courseInfo: HTMLElement = getByText('Course Details');
+        const teachersInfo: HTMLElement = getByText('Teachers in Charge');
+        const assessmentModelInfo: HTMLElement = getByText('Assessment Models');
+        const attainments: HTMLElement = getByText('Study Attainments');
+        const exercises: HTMLElement = getByText('Exercises');
+        const projects: HTMLElement = getByText('Project');
         const exams = getAllByText('Exam');
-        const instances = getByText('All Instances');
-        const createInstanceButton = getByText('New instance');
-        const addAttainmentButton = getByText('Add attainment');
-        expect(instanceInfo).toBeDefined();
+        const instances: HTMLElement = getByText('Course Instances');
+        const createInstanceButton: HTMLElement = getByText('New instance');
+        const addAttainmentButton: HTMLElement = getByText('Add attainment');
+        expect(courseInfo).toBeDefined();
         expect(teachersInfo).toBeDefined();
+        expect(assessmentModelInfo).toBeDefined();
         expect(attainments).toBeDefined();
         expect(exercises).toBeDefined();
         expect(projects).toBeDefined();
@@ -77,46 +93,32 @@ describe('Tests for CourseView component', () => {
   );
 
   test(
-    'CourseView should not render new instance button, see attendees or allow'
+    'CourseView should not render new instance button or allow'
     + ' editing attainments for students',
     async () => {
 
-      const auth = { role: SystemRole.User };
-      const { getByText, findByText, queryByText } = renderCourseView(auth);
+      const auth: LoginResult = {
+        id: 2,
+        name: 'User',
+        role: SystemRole.User
+      };
 
-      // with the new animation, wait is needed before components are rendered
-      const instanceInfo = await findByText('Instance Details');
+      const { getByText, findByText, queryByText }: RenderResult = renderCourseView(auth);
+
+      const courseInfo = await findByText('Course Details');
       // since previous is in document, so are the rest
-      const teachersInfo = getByText('Teachers in Charge');
-      const instances = getByText('All Instances');
+      const teachersInfo: HTMLElement = getByText('Teachers in Charge');
+      const instances: HTMLElement = getByText('Course Instances');
 
-      expect(instanceInfo).toBeDefined();
+      expect(courseInfo).toBeDefined();
       expect(teachersInfo).toBeDefined();
       expect(instances).toBeDefined();
 
       expect(queryByText('Study Attainments')).not.toBeInTheDocument();
       expect(queryByText('Add attainment')).not.toBeInTheDocument();
       expect(queryByText('Edit')).not.toBeInTheDocument();
-      expect(queryByText('See attendees')).not.toBeInTheDocument();
 
     }
   );
-
-  test('CourseView should allow changing the instance that is displayed in detail', async () => {
-
-    const auth = { role: SystemRole.User };
-    const { findByText, findAllByRole } = renderCourseView(auth);
-
-    const instanceRows = await findAllByRole('row');
-    expect(instanceRows.length - 1).toEqual(mockInstances.length);    // - 1 because heading row
-
-    const firstTeacherInCharge = await findByText('Elisa Mekler');
-    expect(firstTeacherInCharge).toBeInTheDocument();
-
-    // click a row that isn't the first, changes teacher
-    act(() => userEvent.click(instanceRows[5]));
-    expect(await findByText('Kerttu Maaria Pollari-Malmi')).toBeInTheDocument();
-    expect(firstTeacherInCharge).not.toBeInTheDocument();
-  });
 
 });

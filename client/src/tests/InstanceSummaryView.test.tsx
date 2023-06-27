@@ -4,12 +4,12 @@
 
 import { MemoryRouter, Routes, Route, Outlet } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { act, render, screen, waitFor, cleanup } from '@testing-library/react';
+import { act, render, RenderResult, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import InstanceSummaryView from '../components/InstanceSummaryView';
 import instancesService from '../services/instances';
 import attainmentServices from '../services/attainments';
-import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
+import mockAttainmentsClient from './mock-data/mockAttainmentsClient';
 
 jest.mock('../services/instances');
 jest.spyOn(attainmentServices, 'addAttainment');
@@ -49,12 +49,12 @@ const mockContextWithAttainments = {
 };
 
 describe(
-  'Test InstanceSummaryView components when no attainments and successfull instance creation',
+  'Test InstanceSummaryView components when no attainments and successful instance creation',
   () => {
 
-    function renderInstanceSummaryView() {
+    function renderInstanceSummaryView(): RenderResult {
 
-      const mockResponseInstanceCreation = 22;
+      const mockResponseInstanceCreation: number = 22;
 
       (instancesService.createInstance as jest.Mock).mockResolvedValue(
         mockResponseInstanceCreation
@@ -86,13 +86,12 @@ describe(
         renderInstanceSummaryView();
 
         await waitFor(() => {
-          const startingField = screen.getByText('Starting Date:');
-          const endingField = screen.getByText('Ending Date:');
-          const typeField = screen.getByText('Type:');
-          const minCreditsField = screen.getByText('Min Credits:');
-          const maxCreditsField = screen.getByText('Max Credits:');
-          const gradingField = screen.getByText('Grading Scale:');
-          const teacherField = screen.getByText('Teachers in Charge');
+          const startingField: HTMLElement = screen.getByText('Starting Date:');
+          const endingField: HTMLElement = screen.getByText('Ending Date:');
+          const typeField: HTMLElement = screen.getByText('Type:');
+          const minCreditsField: HTMLElement = screen.getByText('Min Credits:');
+          const maxCreditsField: HTMLElement = screen.getByText('Max Credits:');
+          const gradingField: HTMLElement = screen.getByText('Grading Scale:');
 
           expect(startingField).toBeInTheDocument();
           expect(endingField).toBeInTheDocument();
@@ -100,7 +99,6 @@ describe(
           expect(minCreditsField).toBeInTheDocument();
           expect(maxCreditsField).toBeInTheDocument();
           expect(gradingField).toBeInTheDocument();
-          expect(teacherField).toBeInTheDocument();
 
           const createButton = screen.getByText('Create instance');
           const goBackButton = screen.getByText('Go back');
@@ -116,7 +114,7 @@ describe(
       + ' "create instance" button is clicked if response okay',
       async () => {
 
-        const { getByText, findByText } = renderInstanceSummaryView();
+        const { getByText, findByText }: RenderResult = renderInstanceSummaryView();
 
         const createButton = getByText('Create instance');
         act(() => userEvent.click(createButton));
@@ -131,7 +129,7 @@ describe(
 );
 
 describe(
-  'Test InstanceSummaryView components when some attainments and successfull creations',
+  'Test InstanceSummaryView components when some attainments and successful creations',
   () => {
 
     function renderInstanceSummaryView() {
@@ -165,9 +163,9 @@ describe(
       + ' "create instance" button is clicked if responses okay',
       async () => {
 
-        const { getByText, findByText } = renderInstanceSummaryView();
+        const { getByText, findByText }: RenderResult = renderInstanceSummaryView();
 
-        const createButton = getByText('Create instance');
+        const createButton: HTMLElement = getByText('Create instance');
         act(() => userEvent.click(createButton));
 
         expect(await findByText('Instance created successfully.')).toBeInTheDocument();
@@ -212,9 +210,9 @@ describe(
       + ' button is clicked when instance creation ok but attainments not',
       async () => {
 
-        const { getByText, findByText } = renderInstanceSummaryView();
+        const { getByText, findByText }: RenderResult = renderInstanceSummaryView();
 
-        const createButton = getByText('Create instance');
+        const createButton: HTMLElement = getByText('Create instance');
         act(() => userEvent.click(createButton));
 
         expect(await findByText('Instance created successfully.')).toBeInTheDocument();
@@ -258,9 +256,9 @@ describe(
       + ' button is clicked when instance creation fails',
       async () => {
 
-        const { getByText, findByText } = renderInstanceSummaryView();
+        const { getByText, findByText }: RenderResult = renderInstanceSummaryView();
 
-        const createButton = getByText('Create instance');
+        const createButton: HTMLElement = getByText('Create instance');
         act(() => userEvent.click(createButton));
 
         expect(await findByText('Instance creation failed.')).toBeInTheDocument();

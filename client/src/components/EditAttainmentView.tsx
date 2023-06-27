@@ -13,7 +13,7 @@ import Box from '@mui/material/Box';
 import Attainment from './create-attainment/Attainment';
 import ConfirmationDialog from './create-attainment/ConfirmationDialog';
 import attainmentServices from '../services/attainments';
-import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
+import mockAttainmentsClient from '../tests/mock-data/mockAttainmentsClient';
 
 function EditAttainmentView() {
   const navigate: NavigateFunction = useNavigate();
