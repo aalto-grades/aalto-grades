@@ -7,10 +7,8 @@ import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SelectFormulaView from '../components/SelectFormulaView';
-import instancesService from '../services/instances';
 import formulasService from '../services/formulas';
 import FormulaSelectionRoute from '../context/FormulaSelectionRoute';
-import mockAttainments from '../mock-data/mockAttainments';
 import mockFormulas from '../mock-data/mockFormulas';
 
 jest.mock('../services/instances');
@@ -20,15 +18,12 @@ afterEach(cleanup);
 describe('Tests for SelectFormulaView components', () => {
 
   async function renderSelectFormulaView() {
-    // succeess, nothing to worry about
     (formulasService.getFormulas as jest.Mock).mockRejectedValue('Network error');
-    // succeess, nothing to worry about
     (formulasService.getFormulas as jest.Mock).mockRejectedValue(mockFormulas);
 
+    // TODO, include once get attainments work
     //(instancesService.getAttainments as jest.Mock).mockRejectedValue('Network error');
     //(instancesService.getAttainments as jest.Mock).mockResolvedValue(mockAttainments);
-    //(formulasService.getFormulas as jest.Mock).mockRejectedValue('Network error');
-    //(formulasService.getFormulas as jest.Mock).mockResolvedValue(mockFormulas);
 
     return render(
       <MemoryRouter initialEntries={['/A-12345/select-formula/test']}>

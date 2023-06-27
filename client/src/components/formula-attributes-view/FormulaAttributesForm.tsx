@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import PropTypes from 'prop-types';
+import PropTypes, { InferProps } from 'prop-types';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import StyledBox from '../select-formula-view/StyledBox';
@@ -12,10 +12,13 @@ import Attainment from './Attainment';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
 import { sleep } from '../../utils/util';
+import { State } from '../../types';
 
-function FormulaAttributesForm({ navigateToCourseView, navigateBack }) {
+function FormulaAttributesForm(
+  { navigateToCourseView, navigateBack }: InferProps<typeof FormulaAttributesForm.propTypes>
+): JSX.Element {
 
-  const [attributeValues, setAttributeValues] = useState<any>([]);
+  const [attributeValues, setAttributeValues]: State<Array<Array<string>>> = useState([]);
   const { selectedAttainments, selectedFormula } = useOutletContext<any>();
   const [
     setSnackPack,
@@ -31,10 +34,13 @@ function FormulaAttributesForm({ navigateToCourseView, navigateBack }) {
     );
   }, [selectedAttainments, selectedFormula]);
 
-  function handleAttributeChange(attainmentIndex, attributeIndex, event) {
-    const newAttributeValues = attributeValues.map((a, index) => {
+  function handleAttributeChange(
+    attainmentIndex: number, attributeIndex: number, event: any
+  ): void {
+    const newAttributeValues: Array<Array<string>> =
+    attributeValues.map((a: Array<string>, index: number): Array<string> => {
       if (attainmentIndex == index) {
-        const newAttributes = a.map((attribute, i) => {
+        const newAttributes: Array<string> = a.map((attribute: string, i: number): string => {
           return (attributeIndex == i) ? event.target.value : attribute;
         });
         return newAttributes;
@@ -45,13 +51,14 @@ function FormulaAttributesForm({ navigateToCourseView, navigateBack }) {
     setAttributeValues(newAttributeValues);
   }
 
-  async function handleSubmit(event) {
+  async function handleSubmit(event: any): Promise<void> {
     event.preventDefault();
     try {
-      const updatedAttainments = selectedAttainments.map((attainment, index) => {
-        const values = attributeValues[index];
-        const attributeObj = {};
-        selectedFormula.attributes.forEach((elem, i) => {
+      const updatedAttainments: any =
+      selectedAttainments.map((attainment: any, index: number): any => {
+        const values: Array<string> = attributeValues[index];
+        const attributeObj: object = {};
+        selectedFormula.attributes.forEach((elem: any, i: number) => {
           attributeObj[elem] = values[i];
         });
         return {
@@ -64,7 +71,7 @@ function FormulaAttributesForm({ navigateToCourseView, navigateBack }) {
       // TODO: add formula and attributes to database
       // Depending on how long adding the formula and attributes to the database takes,
       // a loading messsage may need to be added
-      setSnackPack((prev) => [
+      setSnackPack((prev: any) => [
         ...prev,
         {
           msg: 'Formula attributes saved, you will be redirected to the course page.',
@@ -76,7 +83,7 @@ function FormulaAttributesForm({ navigateToCourseView, navigateBack }) {
 
     } catch (exception) {
       console.log(exception);
-      setSnackPack((prev) => [
+      setSnackPack((prev: any) => [
         ...prev,
         {
           msg: 'Saving the formula attributes failed.',
@@ -103,7 +110,7 @@ function FormulaAttributesForm({ navigateToCourseView, navigateBack }) {
         borderRadius: 1,
         pt: 2
       }}>
-        { selectedAttainments.map((attainment, attainmentIndex) =>
+        { selectedAttainments.map((attainment: any, attainmentIndex: number) =>
           <Attainment
             attainment={attainment}
             key={attainment.id}
@@ -114,7 +121,12 @@ function FormulaAttributesForm({ navigateToCourseView, navigateBack }) {
       </StyledBox>
       <StyledBox sx={{ display: 'flex', flexDirection: 'column' }}>
         <Box sx={{ alignSelf: 'flex-end', m: '20px' }}>
-          <Button size='medium' variant='outlined' sx={{ mr: 2 }} onClick={() => navigateBack()}>
+          <Button
+            size='medium'
+            variant='outlined'
+            sx={{ mr: 2 }}
+            onClick={(): void => navigateBack()}
+          >
             Go back
           </Button>
           <Button size='medium' variant='contained' type='submit' name='confirm'>
