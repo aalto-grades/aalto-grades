@@ -23,22 +23,32 @@ interface Cell {
 const headCells: Array<Cell> = [
   {
     id: 'startDate',
-    label: 'Starting Date',
+    label: 'Starting Date'
   },
   {
     id: 'endingDate',
-    label: 'Ending Date',
+    label: 'Ending Date'
+  },
+  {
+    id: 'startingPeriod',
+    label: 'Starting Period'
+  },
+  {
+    id: 'endingPeriod',
+    label: 'Ending Period'
   },
   {
     id: 'type',
-    label: 'Type',
+    label: 'Type'
+  },
+  {
+    id: 'gradingScale',
+    label: 'Grading Scale'
   }
 ];
 
 function InstancesTable(props: {
-  data: Array<CourseInstanceData>,
-  current: number,
-  onClick: (instance: CourseInstanceData) => void
+  data: Array<CourseInstanceData>
 }): JSX.Element {
   return (
     <Table>
@@ -76,9 +86,6 @@ function InstancesTable(props: {
             .map((instance: CourseInstanceData) => (
               <TableRow
                 key={instance.id}
-                hover={true}
-                selected={props.current === instance.id}
-                onClick={(): void => props.onClick(instance)}
               >
                 <TableCell>
                   {textFormatServices.formatDateString(String(instance.startDate))}
@@ -87,7 +94,16 @@ function InstancesTable(props: {
                   {textFormatServices.formatDateString(String(instance.endDate))}
                 </TableCell>
                 <TableCell>
+                  {instance.startingPeriod}
+                </TableCell>
+                <TableCell>
+                  {instance.endingPeriod}
+                </TableCell>
+                <TableCell>
                   {textFormatServices.formatCourseType(instance.type)}
+                </TableCell>
+                <TableCell>
+                  {textFormatServices.convertToClientGradingScale(instance.gradingScale)}
                 </TableCell>
               </TableRow>
             ))
@@ -98,9 +114,7 @@ function InstancesTable(props: {
 }
 
 InstancesTable.propTypes = {
-  data: PropTypes.array,
-  current: PropTypes.number,
-  onClick: PropTypes.func
+  data: PropTypes.array
 };
 
 export default InstancesTable;

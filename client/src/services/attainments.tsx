@@ -4,7 +4,7 @@
 
 import axios from './axios';
 import textFormatServices from './textFormat';
-import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
+import mockAttainmentsClient from '../tests/mock-data/mockAttainmentsClient';
 import { AttainmentData } from 'aalto-grades-common/types/attainment';
 import { FullResponse, Numeric } from '../types';
 
