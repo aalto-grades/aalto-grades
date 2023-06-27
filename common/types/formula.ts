@@ -3,9 +3,12 @@ export enum Formula {
   WeightedAverage = 'WEIGHTED_AVERAGE',
 }
 
-export interface FormulaPreview {
+export interface FormulaData {
   id: Formula;
   name: string;
+}
+
+export interface FormulaPreview extends FormulaData {
   attributes: Array<string>;
   codeSnippet: string;
 }
