@@ -15,6 +15,6 @@ const mockAssessmentModels: Array<AssessmentModelData> = [
     courseId: 1,
     name: 'Exam model'
   }
-]
+];
 
 export default mockAssessmentModels;

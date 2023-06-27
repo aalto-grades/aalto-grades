@@ -80,7 +80,7 @@ describe('Tests for CreateCourseView components', () => {
       teachersInCharge: [
         {
           id: 23,
-          name: "Elon Musk",
+          name: 'Elon Musk',
         },
       ]
     });
