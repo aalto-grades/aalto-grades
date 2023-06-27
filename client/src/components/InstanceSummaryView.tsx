@@ -93,8 +93,6 @@ function InstanceSummaryView() {
         gradingScale: textFormatServices.convertToServerGradingScale(gradingScale) as GradingScale,
         sisuCourseInstanceId: sisuInstanceId,
         type: courseType,
-        // fake ! TODO: replace with teachers when figured out how to fetch ids (currently strings)
-        teachersInCharge: [1],
         // fake ! TODO: delete from context and here once not required by the server in validation
         startingPeriod: startingPeriod ?? 'I',
         // fake ! TODO: delete from context and here once not required by the server in validation

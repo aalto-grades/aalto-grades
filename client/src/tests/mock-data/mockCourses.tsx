@@ -24,7 +24,13 @@ const mockCourses: Array<CourseData> = [
       fi:'',
       sv:'',
       en:''
-    }
+    },
+    teachersInCharge: [
+      {
+        id: 45,
+        name: 'Scooby Doo'
+      }
+    ]
   },
   {
     id: 1,
@@ -45,7 +51,13 @@ const mockCourses: Array<CourseData> = [
       fi:'',
       sv:'',
       en:''
-    }
+    },
+    teachersInCharge: [
+      {
+        id: 76,
+        name: 'Winnie the Pooh'
+      }
+    ]
   }
 ];
 

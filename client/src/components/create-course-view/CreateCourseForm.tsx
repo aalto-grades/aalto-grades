@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import TextFieldBox from './TextFieldBox';
-import { CourseData } from 'aalto-grades-common/types/course';
+import { CourseData } from 'aalto-grades-common/types';
 
 const codeData = {
   fieldId: 'courseCode',
@@ -33,18 +33,19 @@ const organizerData = {
   fieldHelperText: 'Give the emails of the responsible teachers of the new course.'
 };*/
 
-function CreateCourseForm({ addCourse }) {
+function CreateCourseForm({ addCourse }): JSX.Element {
 
-  const [courseCode, setCode] = useState<any>('');
-  const [name, setName] = useState<any>('');
-  const [department, setOrganizer] = useState<any>('');
+  const [courseCode, setCode] = useState<string>('');
+  const [name, setName] = useState<string>('');
+  const [department, setOrganizer] = useState<string>('');
   //const [teacher, setTeacher] = useState<any>('');
 
-  const id = -1;
+  const id: number = -1;
 
-  function handleSubmit(event) {
+  async function handleSubmit(event): Promise<void> {
     event.preventDefault();
     try {
+      // TODO remove mock data
       const courseObject: CourseData = ({
         id,
         courseCode,
@@ -64,8 +65,13 @@ function CreateCourseForm({ addCourse }) {
           fi: '',
           sv: '',
           en: '',
-        }
-        // teacher
+        },
+        teachersInCharge: [
+          {
+            id: 23,
+            name: 'Elon Musk'
+          }
+        ]
       });
       addCourse(courseObject);
     } catch (exception) {
