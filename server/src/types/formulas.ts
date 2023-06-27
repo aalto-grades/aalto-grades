@@ -29,6 +29,9 @@ export type FormulaFunction =
 export interface FormulaImplementation {
   formulaFunction: FormulaFunction;
   paramSchema: yup.AnyObjectSchema;
+  codeSnippet: string;
+  name: string;
+  attributes: Array<string>;
 }
 
 /**

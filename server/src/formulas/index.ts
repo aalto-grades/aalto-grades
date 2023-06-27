@@ -9,7 +9,7 @@ import { Formula } from 'aalto-grades-common/types';
 
 // The registry of formula implementations corresponding to their names, along
 // with a schema specifying what form their user parameters should take.
-const formulaImplementations: Map<Formula, FormulaImplementation> = new Map();
+export const formulaImplementations: Map<Formula, FormulaImplementation> = new Map();
 
 // The caller should specify a schema for the user-configurable parameters
 // per-formula.
@@ -22,12 +22,18 @@ const formulaImplementations: Map<Formula, FormulaImplementation> = new Map();
 export function registerFormula(
   formula: Formula,
   formulaFunction: FormulaFunction,
+  codeSnippet: string,
+  name: string,
+  attributes: Array<string>,
   paramSchema: yup.AnyObjectSchema
 ): void {
   formulaImplementations.set(
     formula,
     {
       formulaFunction: formulaFunction,
+      codeSnippet,
+      name,
+      attributes,
       paramSchema: paramSchema
     }
   );

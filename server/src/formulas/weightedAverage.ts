@@ -39,9 +39,29 @@ async function calculateWeightedAverage(
   };
 }
 
+const codeSnippet: string =
+`const weightedAverage = (nums, weights) => {
+  const [sum, weightSum] = weights.reduce(
+    (acc, w, i) => {
+      acc[0] = acc[0] + nums[i] * w;
+      acc[1] = acc[1] + w;
+      return acc;
+    },
+    [0, 0]
+  );
+  return sum / weightSum;
+};`;
+
+const name: string = 'Weighted average';
+
+const attributes: Array<string> = ['maxPoints', 'minRequiredPoints', 'weight'];
+
 registerFormula(
   Formula.WeightedAverage,
   calculateWeightedAverage,
+  codeSnippet,
+  name,
+  attributes,
   yup.object({
     min: yup.number().required(),
     max: yup.number().min(yup.ref('min')).required(),

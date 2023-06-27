@@ -5,21 +5,26 @@
 import { Request, Response } from 'express';
 import * as yup from 'yup';
 
-import { Formula, FormulaPreview } from 'aalto-grades-common/types';
-import { formulas } from '../formulas/codeSnippets';
+import { Formula, FormulaData } from 'aalto-grades-common/types';
+import { formulaImplementations } from '../formulas';
 import { ApiError } from '../types/error';
 import { HttpCode } from '../types/httpCode';
+import { FormulaImplementation } from '../types/formulas';
 
 export function getFormulas(req: Request, res: Response): void {
+  const formulas: Array<FormulaData> = [];
+
+  for (const [key, value] of formulaImplementations) {
+    formulas.push({
+      id: key,
+      name: value.name
+    });
+  }
+
   res.status(HttpCode.Ok).json({
     success: true,
     data: {
-      formulas: formulas.map((formula: FormulaPreview) => {
-        return {
-          id: formula.id,
-          name: formula.name
-        };
-      })
+      formulas
     }
   });
 }
@@ -36,19 +41,22 @@ export async function getFormula(req: Request, res: Response): Promise<void> {
 
   const formulaId: string = req.params.formulaId;
   await requestSchema.validate({ formulaId });
+  const formula: FormulaImplementation | undefined =
+  formulaImplementations.get(formulaId as Formula);
 
-  const formula: Array<FormulaPreview> = formulas.filter(
-    (formula: FormulaPreview) => formulaId === formula.id
-  );
-
-  if (formula.length === 0) {
+  if (!formula) {
     throw new ApiError(`formula with id ${formulaId} not found`, HttpCode.NotFound);
   }
 
   res.status(HttpCode.Ok).json({
     success: true,
     data: {
-      formula: formula[0]
+      formula: {
+        id: formulaId,
+        name: formula.name,
+        attributes: formula.attributes,
+        codeSnippet: formula.codeSnippet
+      }
     }
   });
 }

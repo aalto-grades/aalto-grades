@@ -24,8 +24,17 @@ async function manualGradeUnspecified(): Promise<CalculationResult> {
   };
 }
 
+const codeSnippet: string = 'placeholder';
+
+const name: string = 'Manual';
+
+const attributes: Array<string> = ['maxPoints', 'minRequiredPoints'];
+
 registerFormula(
   Formula.Manual,
   manualGradeUnspecified,
+  codeSnippet,
+  name,
+  attributes,
   yup.object()
 );
