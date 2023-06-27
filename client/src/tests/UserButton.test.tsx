@@ -15,7 +15,7 @@ afterEach(cleanup);
 
 describe('Tests for button component displaying user data and logout', () => {
 
-  async function renderButton(auth: LoginResult): RenderResult {
+  function renderButton(auth: LoginResult): RenderResult {
     return render(
       <BrowserRouter>
         <AuthContext.Provider value={{ auth }}>
