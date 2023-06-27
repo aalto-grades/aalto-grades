@@ -15,7 +15,6 @@ import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
 import FrontPage from './components/FrontPage';
 import CourseView from './components/CourseView';
-import AllCoursesView from './components/AllCoursesView';
 import CreateCourseView from './components/CreateCourseView';
 import FetchInstancesView from './components/FetchInstancesView';
 import EditInstanceView from './components/EditInstanceView';
@@ -157,10 +156,6 @@ function App(): JSX.Element {
               <Route
                 path='/'
                 element={<FrontPage />}
-              />
-              <Route
-                path='/course-view'
-                element={<AllCoursesView />}
               />
               <Route
                 path='/course-view/:courseId'

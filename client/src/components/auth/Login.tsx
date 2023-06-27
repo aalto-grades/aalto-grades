@@ -8,7 +8,6 @@ import { useTheme } from '@mui/material/styles';
 import LoginForm from './LoginForm';
 import userService from '../../services/user';
 import useAuth from '../../hooks/useAuth';
-import { SystemRole } from 'aalto-grades-common/types/auth';
 import { LoginCredentials } from '../../types/auth';
 
 function Login(): JSX.Element {
@@ -29,12 +28,7 @@ function Login(): JSX.Element {
         name: response.name
       });
 
-      console.log(`${response.role}`);
-      if (response.role === SystemRole.Admin) {
-        navigate('/course-view', { replace: true });
-      } else {
-        navigate('/', { replace: true });
-      }
+      navigate('/', { replace: true });
     } catch (exception) {
       console.log(exception);
       setErrorMessage('Invalid email or password');
