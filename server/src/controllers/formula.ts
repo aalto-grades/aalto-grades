@@ -5,9 +5,9 @@
 import { Request, Response } from 'express';
 import * as yup from 'yup';
 
+import { Formula, FormulaPreview } from 'aalto-grades-common/types';
 import { formulas } from '../formulas/codeSnippets';
 import { ApiError } from '../types/error';
-import { Formula, FormulaPreview } from '../types/formulas';
 import { HttpCode } from '../types/httpCode';
 
 export function getFormulas(req: Request, res: Response): void {
@@ -31,7 +31,7 @@ export async function getFormula(req: Request, res: Response): Promise<void> {
         return originalValue ? originalValue.toUpperCase() : value;
       })
       .oneOf(Object.values(Formula))
-      .notRequired()
+      .required()
   });
 
   const formulaId: string = req.params.formulaId;

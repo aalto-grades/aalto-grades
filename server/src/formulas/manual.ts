@@ -4,8 +4,9 @@
 
 import * as yup from 'yup';
 
+import { Formula } from 'aalto-grades-common/types';
 import { registerFormula } from '.';
-import { Formula, CalculationResult } from '../types/formulas';
+import { CalculationResult } from '../types/formulas';
 import { Status } from '../types/grades';
 
 /**

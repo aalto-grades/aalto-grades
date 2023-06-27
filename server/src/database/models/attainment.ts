@@ -9,7 +9,7 @@ import {
 import { sequelize } from '..';
 import AssessmentModel from './assessmentModel';
 
-import { Formula } from '../../types/formulas';
+import { Formula } from 'aalto-grades-common/types';
 
 export default class Attainment extends Model<
   InferAttributes<Attainment>,

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Formula, FormulaPreview } from '../types/formulas';
+import { Formula, FormulaPreview } from 'aalto-grades-common/types';
 
 export const formulas: Array<FormulaPreview> = [
   {

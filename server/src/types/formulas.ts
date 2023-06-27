@@ -6,11 +6,6 @@ import * as yup from 'yup';
 
 import { Status } from './grades';
 
-export enum Formula {
-  Manual = 'MANUAL',
-  WeightedAverage = 'WEIGHTED_AVERAGE',
-}
-
 export interface CalculationResult {
   status: Status;
   grade: number;
@@ -19,13 +14,6 @@ export interface CalculationResult {
 export interface CalculationInput {
   subResult: CalculationResult;
   params: object | null;
-}
-
-export interface FormulaPreview {
-  id: Formula;
-  name: string;
-  attributes: Array<string>;
-  codeSnippet: string;
 }
 
 /**
