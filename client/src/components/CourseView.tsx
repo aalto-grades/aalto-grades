@@ -9,9 +9,8 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grow from '@mui/material/Grow';
 import FileLoadDialog from './course-view/FileLoadDialog';
-import InstanceDetails from './course-view/InstanceDetails';
+import CourseDetails from './course-view/CourseDetails';
 import Attainments from './course-view/Attainments';
-import AssessmentModelsTable from './course-view/AssessmentModelsTable';
 import InstancesTable from './course-view/InstancesTable';
 import assessmentModelsService from '../services/assessmentModels';
 import coursesService from '../services/courses';
@@ -22,9 +21,6 @@ import {
   AssessmentModelData, AttainmentData, CourseData, CourseInstanceData, SystemRole
 } from 'aalto-grades-common/types';
 import { State } from '../types';
-
-// REPLACE SOME DAY? currently this info can't be fetched from database
-const mockInstitution: string = 'Aalto University';
 
 function CourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
@@ -40,7 +36,6 @@ function CourseView(): JSX.Element {
   const [attainmentTree, setAttainmentTree]: State<AttainmentData> =
     useState(null);
 
-  const [currentInstance, setCurrentInstance]: State<CourseInstanceData> = useState(null);
   const [instances, setInstances]: State<Array<CourseInstanceData>> = useState([]);
 
   const [animation, setAnimation]: State<boolean> = useState(false);
@@ -75,14 +70,13 @@ function CourseView(): JSX.Element {
           }
         );
         setInstances(sortedInstances);
-        setCurrentInstance(sortedInstances[0]);
       })
       .catch((e: Error) => console.log(e.message));
   }, []);
 
   useEffect(() => {
     setAnimation(true);
-  }, [currentInstance, currentAssessmentModel]);
+  }, [currentAssessmentModel]);
 
   function handleClickOpen(): void {
     setOpen(true);
@@ -93,7 +87,7 @@ function CourseView(): JSX.Element {
   }
 
   function onChangeAssessmentModel(assessmentModel: AssessmentModelData): void {
-    if (assessmentModel.id !== currentAssessmentModel.id) {
+    if (assessmentModel.id !== currentAssessmentModel?.id) {
       setAnimation(false);
       setCurrentAssessmentModel(assessmentModel);
 
@@ -102,13 +96,6 @@ function CourseView(): JSX.Element {
           setAttainmentTree(attainmentTree);
         })
         .catch((e: Error) => console.log(e.message));
-    }
-  }
-
-  function onChangeInstance(instance: CourseInstanceData): void {
-    if (instance.id !== currentInstance.id) {
-      setAnimation(false);
-      setCurrentInstance(instance);
     }
   }
 
@@ -124,26 +111,21 @@ function CourseView(): JSX.Element {
           }}>
             <Typography variant='h2' align='left'>{course.name.en}</Typography>
           </Box>
-          {
-            currentInstance && instances &&
-            <>
-              <Box sx={{ display: 'flex', gap: 3 }}>
-                <Grow
-                  in={animation}
-                  style={{ transformOrigin: '50% 0 0' }}
-                  {...(animation ? { timeout: 500 } : { timeout: 0 })}
-                >
-                  <div>
-                    <InstanceDetails info={{
-                      ...currentInstance,
-                      department: course.department,
-                      institution: mockInstitution
-                    }} />
-                  </div>
-                </Grow>
+          <Box sx={{ display: 'flex', gap: 3 }}>
+            <div>
+              <CourseDetails
+                course={course}
+                assessmentModels={assessmentModels}
+                currentAssessmentModelId={currentAssessmentModel?.id}
+                onChangeAssessmentModel={onChangeAssessmentModel}
+              />
+            </div>
+            {
+              /* a different attainment component will be created for students */
+              auth.role == SystemRole.Admin && attainmentTree &&
+              <div style={{ width: '100%' }}>
                 {
-                  /* a different attainment component will be created for students */
-                  auth.role == SystemRole.Admin && attainmentTree &&
+                  currentAssessmentModel &&
                   <Grow
                     in={animation}
                     style={{ transformOrigin: '0 0 0' }}
@@ -153,65 +135,46 @@ function CourseView(): JSX.Element {
                       <Attainments
                         attainmentTree={attainmentTree}
                         courseId={courseId}
-                        formula={'Weighted Average'}
+                        formula={'Weighted Average'} /* TODO: Retrieve real formula */
                         assessmentModel={currentAssessmentModel}
                         handleAddPoints={handleClickOpen}
-                      /> {/* TODO: Retrieve real formula */}
+                      />
                     </div>
                   </Grow>
                 }
-              </Box>
-              <Typography variant='h2' align='left' sx={{ mt: 6, mb: 3 }}>
-                Assessment Models
-              </Typography>
-              <AssessmentModelsTable
-                data={assessmentModels}
-                current={currentAssessmentModel.id}
-                onClick={onChangeAssessmentModel}
-              />
-              <Box sx={{
-                display: 'flex', flexWrap: 'wrap',
-                justifyContent: 'space-between', columnGap: 6
-              }}>
-                <Typography variant='h2' align='left' sx={{ mt: 6, mb: 3 }}>
-                  Course Instances
-                </Typography>
-                {
-                  /* Only admins and teachers are allowed to create a new instance */
-                  auth.role == SystemRole.Admin &&
-                  <Button
-                    id='ag_new_instance_btn'
-                    size='large'
-                    variant='contained'
-                    sx={{ mt: 6, mb: 3 }}
-                    onClick={(): void => {
-                      navigate(`/${courseId}/fetch-instances/${course.courseCode}`);
-                    }}
-                  >  {/* TODO: Check path */}
-                    New instance
-                  </Button>
-                }
-              </Box>
-              <InstancesTable
-                data={instances}
-                current={currentInstance.id}
-                onClick={onChangeInstance}
-              />
-              <FileLoadDialog
-                instanceId={currentInstance.id}
-                open={open}
-                handleClose={handleClose}
-              />
-            </>
-            ||
-            <Typography variant='h3'>
-              This course has no instances. <a href={
-                `/${courseId}/fetch-instances/${course.courseCode}`
-              }>
-                Add a new instance.
-              </a>
+              </div>
+            }
+          </Box>
+          <Box sx={{
+            display: 'flex', flexWrap: 'wrap',
+            justifyContent: 'space-between', columnGap: 6
+          }}>
+            <Typography variant='h2' align='left' sx={{ mt: 6, mb: 3 }}>
+              Course Instances
             </Typography>
-          }
+            {
+              /* Only admins and teachers are allowed to create a new instance */
+              auth.role == SystemRole.Admin &&
+              <Button
+                id='ag_new_instance_btn'
+                size='large'
+                sx={{ mt: 6, mb: 3 }}
+                onClick={(): void => {
+                  navigate(`/${courseId}/fetch-instances/${course.courseCode}`);
+                }}
+              >  {/* TODO: Check path */}
+                New instance
+              </Button>
+            }
+          </Box>
+          <InstancesTable
+            data={instances}
+          />
+          <FileLoadDialog
+            //instanceId={currentInstance.id}
+            open={open}
+            handleClose={handleClose}
+          />
         </>
       }
     </Box>

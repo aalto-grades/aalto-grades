@@ -7,14 +7,22 @@ import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 
+export interface TextFieldData {
+  fieldId: string,
+  fieldLabel: string,
+  fieldHelperText: string
+}
+
 const inputProps = {
   style: {
     margin: '32px 0px 0px 0px'
   }
 };
 
-function TextFieldBox({ fieldData, setFunction }) {
-  const { fieldId, fieldLabel, fieldHelperText } = fieldData;
+function TextFieldBox(props: {
+  fieldData: TextFieldData,
+  setFunction: (value: string) => void
+}): JSX.Element {
   const theme = useTheme();
 
   return (
@@ -27,7 +35,12 @@ function TextFieldBox({ fieldData, setFunction }) {
       my: 2,
       p: 2
     }}>
-      <TextField id={fieldId} type={fieldId} label={fieldLabel} variant='standard' color='primary'
+      <TextField
+        id={props.fieldData.fieldId}
+        type={props.fieldData.fieldId}
+        label={props.fieldData.fieldLabel}
+        variant='standard'
+        color='primary'
         sx={{ my: 1 }}
         InputLabelProps={{
           shrink: true,
@@ -36,8 +49,8 @@ function TextFieldBox({ fieldData, setFunction }) {
           }
         }}
         InputProps={inputProps}
-        helperText={fieldHelperText}
-        onChange={({ target }) => setFunction(target.value)}>
+        helperText={props.fieldData.fieldHelperText}
+        onChange={({ target }) => props.setFunction(target.value)}>
       </TextField>
     </Box>
   );
