@@ -15,7 +15,7 @@ export const router: Router = Router();
  * definitions:
  *   FormulaData:
  *     type: object
- *     description: Students final grade d1ata.
+ *     description: List of available formulas.
  *     properties:
  *       id:
  *         type: string
@@ -25,9 +25,9 @@ export const router: Router = Router();
  *         type: string
  *         description: Name of the formula.
  *         example: Weighted average
- *   FormulaPreview:
+ *   FormulaDetails:
  *     type: object
- *     description: Students final grade data.
+ *     description: Detailed information of formula based on its ID.
  *     properties:
  *       id:
  *         type: string
@@ -43,7 +43,7 @@ export const router: Router = Router();
  *         example: ['maxPoints', 'minRequiredPoints', 'weight']
  *       codeSnippet:
  *         type: string
- *         description: String of the code.
+ *         description: Grading formula code in string format.
  */
 
 /**
@@ -51,7 +51,7 @@ export const router: Router = Router();
  * /v1/formulas:
  *   get:
  *     tags: [Formula]
- *     description: Returns name and enum of available formulas.
+ *     description: Returns name and enum of available formulas in an array.
  *     responses:
  *       200:
  *         description: All available formulas.
@@ -81,18 +81,15 @@ router.get(
 
 /**
  * @swagger
- * /v1/formulas/:formulaId:
+ * /v1/formulas/{formulaId}:
  *   get:
  *     tags: [Formula]
  *     description: Returns all data of a formula based on its ID.
  *     parameters:
- *       formulaId:
- *         type: string
- *         description: Enum value identifying the grading formula.
- *         example: WEIGHTED_AVERAGE
+ *       - $ref: '#/components/parameters/formulaId'
  *     responses:
  *       200:
- *         description: Data of the formula.
+ *         description: Detailed data of the formula.
  *         content:
  *           application/json:
  *             schema:
@@ -105,7 +102,7 @@ router.get(
  *                   type: object
  *                   properties:
  *                     formula:
- *                       $ref: '#/definitions/FormulaPreview'
+ *                       $ref: '#/definitions/FormulaDetails'
  *       401:
  *         $ref: '#/components/responses/AuthenticationError'
  *       404:

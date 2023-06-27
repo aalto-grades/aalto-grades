@@ -83,6 +83,14 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *       required: true
  *       example: 1
  *       description: The ID of the assessment model.
+ *     formulaId:
+ *       in: path
+ *       name: formulaId
+ *       schema:
+ *         type: string
+ *       required: true
+ *       example: WEIGHTED_AVERAGE
+ *       description: Enum value identifying the grading formula.
  *     attainmentId:
  *       in: path
  *       name: attainmentId
