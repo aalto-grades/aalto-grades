@@ -37,22 +37,14 @@ describe('Test GET /v1/user/:userId/courses - get all courses user has role in',
     expect(res.body.data.courses[0].department).toBeDefined();
     expect(res.body.data.courses[0].name).toBeDefined();
     expect(res.body.data.courses[0].evaluationInformation).toBeDefined();
-    expect(res.body.data.courses[0].teachresInCharge).toBeDefined();
+    expect(res.body.data.courses[0].teachersInCharge).toBeDefined();
     expect(res.body.data.courses[0].teachersInCharge[0].id).toBeDefined();
     expect(res.body.data.courses[0].teachersInCharge[0].name).toBeDefined();
   });
 
   it('should contain courses the user is in charge of', async () => {
-    // TODO
-  });
-
-  it('should contain courses where the user has an instance role', async () => {
-    // TODO
-  });
-
-  it('should not contain duplicate courses', async () => {
     const res: supertest.Response = await request
-      .get('/v1/user/2/courses')
+      .get('/v1/user/2502/courses')
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
@@ -61,8 +53,38 @@ describe('Test GET /v1/user/:userId/courses - get all courses user has role in',
     expect(res.body.errors).not.toBeDefined();
     expect(res.body.data).toBeDefined();
     expect(res.body.data.courses).toBeDefined();
+    expect(res.body.data.courses.length).toBe(1);
+    expect(res.body.data.courses[0].courseCode).toBe('TU-A1100');
+  });
 
-    // TODO
+  it('should contain courses where the user has an instance role', async () => {
+    const res: supertest.Response = await request
+      .get('/v1/user/2503/courses')
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    expect(res.body.success).toBe(true);
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data).toBeDefined();
+    expect(res.body.data.courses).toBeDefined();
+    expect(res.body.data.courses.length).toBe(1);
+    expect(res.body.data.courses[0].courseCode).toBe('CS-A1110');
+  });
+
+  it('should not contain duplicate courses', async () => {
+    const res: supertest.Response = await request
+      .get('/v1/user/2504/courses')
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    expect(res.body.success).toBe(true);
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data).toBeDefined();
+    expect(res.body.data.courses).toBeDefined();
+    expect(res.body.data.courses.length).toBe(1);
+    expect(res.body.data.courses[0].courseCode).toBe('CS-A1150');
   });
 
   it('should respond with 400 bad request, if validation fails (non-number user id)', async () => {

@@ -44,40 +44,42 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
       ]
     }) as Array<CourseFull>;
 
-  const instanceRoleCourses: Array<CourseFull> =
-    await Course.findAll({
+  interface CourseInstanceWithCourseFull extends CourseInstance {
+    Course: CourseFull
+  }
+
+  const instanceRoleCourses: Array<CourseInstanceWithCourseFull> =
+    await CourseInstance.findAll({
       include: [
         {
-          model: CourseInstance,
-          attributes: [],
+          model: User,
+          where: {
+            id: userId
+          }
+        },
+        {
+          model: Course,
           include: [
             {
-              model: User,
-              attributes: [],
-              where: {
-                id: userId
-              }
+              model: CourseTranslation
+            },
+            {
+              model: User
             }
           ]
-        },
-        {
-          model: CourseTranslation
-        },
-        {
-          model: User
         }
       ]
-    }) as Array<CourseFull>;
+    }) as Array<CourseInstanceWithCourseFull>;
 
   for (const course of inChargeCourses) {
     courses.push(parseCourseFull(course));
   }
 
-  for (const course of instanceRoleCourses) {
-    if (courses.find((added: CourseData) => added.id === course.id))
+  for (const instance of instanceRoleCourses) {
+    if (courses.find((course: CourseData) => course.id === instance.Course.id))
       continue;
 
-    courses.push(parseCourseFull(course));
+    courses.push(parseCourseFull(instance.Course));
   }
 
   res.status(HttpCode.Ok).send({
