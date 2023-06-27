@@ -14,7 +14,10 @@ function AssessmentModelsList(props: {
   onClick: (assessmentModel: AssessmentModelData) => void
 }): JSX.Element {
   return (
-    <List>
+    <List sx={{
+      maxHeight: 140,
+      overflow: 'auto'
+    }}>
       {
         props.data.map((assessmentModel: AssessmentModelData) => {
           return (

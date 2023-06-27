@@ -6,35 +6,29 @@ import { SyntheticEvent, useState } from 'react';
 import PropTypes from 'prop-types';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
-import TextFieldBox from './TextFieldBox';
+import TextFieldBox, { TextFieldData } from './TextFieldBox';
 import { CourseData } from 'aalto-grades-common/types';
 import { State } from '../../types';
 
-interface FieldData {
-  fieldId: string,
-  fieldLabel: string,
-  fieldHelperText: string
-}
-
-const codeData: FieldData = {
+const codeData: TextFieldData = {
   fieldId: 'courseCode',
   fieldLabel: 'Course Code',
   fieldHelperText: 'Give the code that the new course is going to have.'
 };
 
-const nameData: FieldData = {
+const nameData: TextFieldData = {
   fieldId: 'courseName',
   fieldLabel: 'Course Name',
   fieldHelperText: 'Give the name of the course the new course is going to have.'
 };
 
-const organizerData: FieldData = {
+const organizerData: TextFieldData = {
   fieldId: 'organizer',
   fieldLabel: 'Organizer',
   fieldHelperText: 'Give the organizer of the new course.'
 };
 
-/*const teachersData = {
+/*const teachersData: TextFieldData = {
   fieldId: 'teachers',
   fieldLabel: 'Teachers in Charge',
   fieldHelperText: 'Give the emails of the teachers in charge of the new course.'

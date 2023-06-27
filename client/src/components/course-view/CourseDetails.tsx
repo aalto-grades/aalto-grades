@@ -5,11 +5,15 @@
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import AssessmentModelsList from './AssessmentModelsList';
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';
-import { CourseData, UserData } from 'aalto-grades-common/types';
+import { AssessmentModelData, CourseData, UserData } from 'aalto-grades-common/types';
 
-function CourseDetails(params: {
-  course: CourseData
+function CourseDetails(props: {
+  course: CourseData,
+  assessmentModels: Array<AssessmentModelData>,
+  currentAssessmentModelId: number,
+  onChangeAssessmentModel: (assessmentModel: AssessmentModelData) => void
 }) {
   return (
     <Box sx={{ display: 'inline-block', pt: 1.5 }}>
@@ -26,11 +30,14 @@ function CourseDetails(params: {
       }}>
         <LightLabelBoldValue
           label='Credits'
-          value={`${params.course.minCredits}-${params.course.maxCredits}`}
+          value={props.course.minCredits === props.course.maxCredits
+            ? props.course.minCredits
+            : `${props.course.minCredits}-${props.course.maxCredits}`
+          }
         />
         <LightLabelBoldValue
           label='Organizer'
-          value={params.course.department.en}
+          value={props.course.department.en}
         />
         <LightLabelBoldValue
           label='Educational Institution'
@@ -43,7 +50,7 @@ function CourseDetails(params: {
           Teachers in Charge
         </Typography>
         {
-          params.course.teachersInCharge.map((teacher: UserData) => {
+          props.course.teachersInCharge.map((teacher: UserData) => {
             return (
               <Typography align='left' key={teacher.id} >
                 {teacher.name}
@@ -52,12 +59,25 @@ function CourseDetails(params: {
           })
         }
       </Box>
+      <Box sx={{ m: 1.5 }}>
+        <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>
+          Assessment Models
+        </Typography>
+        <AssessmentModelsList
+          data={props.assessmentModels}
+          current={props.currentAssessmentModelId}
+          onClick={props.onChangeAssessmentModel}
+        />
+      </Box>
     </Box>
   );
 }
 
 CourseDetails.propTypes = {
   course: PropTypes.object,
+  assessmentModels: PropTypes.array,
+  currentAssessmentModelId: PropTypes.number,
+  onChangeAssessmentModel: PropTypes.func
 };
 
 export default CourseDetails;

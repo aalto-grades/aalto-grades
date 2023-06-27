@@ -11,7 +11,6 @@ import Grow from '@mui/material/Grow';
 import FileLoadDialog from './course-view/FileLoadDialog';
 import CourseDetails from './course-view/CourseDetails';
 import Attainments from './course-view/Attainments';
-import AssessmentModelsList from './course-view/AssessmentModelsList';
 import InstancesTable from './course-view/InstancesTable';
 import assessmentModelsService from '../services/assessmentModels';
 import coursesService from '../services/courses';
@@ -114,18 +113,12 @@ function CourseView(): JSX.Element {
           </Box>
           <Box sx={{ display: 'flex', gap: 3 }}>
             <div>
-              <CourseDetails course={course} />
-              <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>
-                Assessment Models
-              </Typography>
-              {
-                assessmentModels && currentAssessmentModel &&
-                <AssessmentModelsList
-                  data={assessmentModels}
-                  current={currentAssessmentModel.id}
-                  onClick={onChangeAssessmentModel}
-                />
-              }
+              <CourseDetails
+                course={course}
+                assessmentModels={assessmentModels}
+                currentAssessmentModelId={currentAssessmentModel?.id}
+                onChangeAssessmentModel={onChangeAssessmentModel}
+              />
             </div>
             {
               /* a different attainment component will be created for students */
