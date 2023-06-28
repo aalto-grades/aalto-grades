@@ -14,9 +14,9 @@ function CourseDetails(props: {
   assessmentModels: Array<AssessmentModelData>,
   currentAssessmentModelId: number,
   onChangeAssessmentModel: (assessmentModel: AssessmentModelData) => void
-}) {
+}): JSX.Element {
   return (
-    <Box sx={{ display: 'inline-block', pt: 1.5 }}>
+    <Box sx={{ display: 'inline-block' }}>
       <Box sx={{
         display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
         alignItems: 'center', columnGap: 4, pb: 1
@@ -45,29 +45,37 @@ function CourseDetails(props: {
           value='Aalto University'
         />
       </Box>
-      <Box sx={{ m: 1.5 }}>
+      <Box sx={{ mt: 1.5 }}>
         <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>
           Teachers in Charge
         </Typography>
-        {
-          props.course.teachersInCharge.map((teacher: UserData) => {
-            return (
-              <Typography align='left' key={teacher.id} >
-                {teacher.name}
-              </Typography>
-            );
-          })
-        }
+        <Box textAlign='left' borderRadius={1} sx={{
+          bgcolor: 'secondary.light', p: 1.5, mt: 1, minWidth: '318px'
+        }}>
+          {
+            props.course.teachersInCharge.map((teacher: UserData) => {
+              return (
+                <Typography align='left' key={teacher.id} >
+                  {teacher.name}
+                </Typography>
+              );
+            })
+          }
+        </Box>
       </Box>
-      <Box sx={{ m: 1.5 }}>
+      <Box sx={{ mt: 1.5 }}>
         <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>
           Assessment Models
         </Typography>
-        <AssessmentModelsList
-          data={props.assessmentModels}
-          current={props.currentAssessmentModelId}
-          onClick={props.onChangeAssessmentModel}
-        />
+        <Box textAlign='left' borderRadius={1} sx={{
+          bgcolor: 'secondary.light', p: 1.5, mt: 1, minWidth: '318px'
+        }}>
+          <AssessmentModelsList
+            data={props.assessmentModels}
+            current={props.currentAssessmentModelId}
+            onClick={props.onChangeAssessmentModel}
+          />
+        </Box>
       </Box>
     </Box>
   );
