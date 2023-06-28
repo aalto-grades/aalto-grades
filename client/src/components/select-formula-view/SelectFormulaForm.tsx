@@ -33,7 +33,7 @@ function SelectFormulaForm({
   const [checkboxError, setCheckboxError]: State<string>  = useState('');
   const [formulaError, setFormulaError]: State<string> = useState('');
   const [setSnackPack, messageInfo, setMessageInfo, alertOpen, setAlertOpen] = useSnackPackAlerts();
-  const [formulas, setFormulas]: State<Array<FormulaData> | null> = useState(null);
+  const [formulas, setFormulas]: State<Array<FormulaData>> = useState([]);
   const navigate: NavigateFunction = useNavigate();
 
   const {
@@ -42,7 +42,7 @@ function SelectFormulaForm({
   } = useOutletContext<any>();
 
   useEffect(() => {
-    if (formulas == null) {
+    if (formulas.length == 0) {
       formulasService.getFormulas()
         .then((data: Array<FormulaData>) => {
           setFormulas(data);
@@ -197,7 +197,7 @@ function SelectFormulaForm({
           >
             Formula
           </InputLabel>
-          { formulas !== null ?
+          { formulas.length !== 0 ?
             <Select
               label='Formula'
               labelId='formulaSelector'
