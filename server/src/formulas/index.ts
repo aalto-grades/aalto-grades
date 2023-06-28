@@ -5,11 +5,11 @@
 import * as yup from 'yup';
 
 import { FormulaFunction, FormulaImplementation } from '../types/formulas';
-import { Formula } from 'aalto-grades-common/types';
+import { Formula, FormulaData } from 'aalto-grades-common/types';
 
 // The registry of formula implementations corresponding to their names, along
 // with a schema specifying what form their user parameters should take.
-export const formulaImplementations: Map<Formula, FormulaImplementation> = new Map();
+const formulaImplementations: Map<Formula, FormulaImplementation> = new Map();
 
 // The caller should specify a schema for the user-configurable parameters
 // per-formula.
@@ -50,6 +50,19 @@ export async function getFormulaImplementation(
   }
 
   return formulaImplementation;
+}
+
+export async function getAllFormulasBasicData(): Promise<Array<FormulaData>> {
+  const formulas: Array<FormulaData> = [];
+
+  for (const [key, value] of formulaImplementations) {
+    formulas.push({
+      id: key,
+      name: value.name
+    });
+  }
+
+  return formulas;
 }
 
 // Call registerFormula in all formula definition files.
