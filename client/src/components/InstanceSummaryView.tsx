@@ -16,7 +16,7 @@ import textFormatServices from '../services/textFormat';
 import instancesService from '../services/instances';
 import attainmentServices from '../services/attainments';
 import useSnackPackAlerts from '../hooks/useSnackPackAlerts';
-import { sleep } from '../utils/util';
+import { sleep } from '../utils';
 import { Message } from '../types';
 import { CourseInstanceData, GradingScale } from 'aalto-grades-common/types';
 

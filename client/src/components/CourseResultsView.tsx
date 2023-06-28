@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import CourseResultsTable from './course-results-view/CourseResultsTable';
 import AlertSnackbar from './alerts/AlertSnackbar';
 import gradesService from '../services/grades';
-import { sleep } from '../utils/util';
+import { sleep } from '../utils';
 
 function CourseResultsView(): JSX.Element {
   const { courseId, instanceId }: Params = useParams();

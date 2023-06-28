@@ -21,7 +21,7 @@ import StyledBox from './StyledBox';
 import ViewFormulaAccordion from './ViewFormulaAccordion';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
-import { sleep } from '../../utils/util';
+import { sleep } from '../../utils';
 import formulasService from '../../services/formulas';
 import { FormulaData, FormulaPreview } from 'aalto-grades-common/types';
 import CircularProgress from '@mui/material/CircularProgress';

@@ -11,7 +11,7 @@ import StyledBox from '../select-formula-view/StyledBox';
 import Attainment from './Attainment';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
-import { sleep } from '../../utils/util';
+import { sleep } from '../../utils';
 import { State } from '../../types';
 
 function FormulaAttributesForm(
