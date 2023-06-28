@@ -70,7 +70,7 @@ async function calculateWeightedAverage(
 
 const name: string = 'Weighted average';
 
-const attributes: Array<string> = ['maxPoints', 'minRequiredPoints', 'weight'];
+const attributes: Array<string> = ['weight'];
 
 registerFormula(
   Formula.WeightedAverage,
