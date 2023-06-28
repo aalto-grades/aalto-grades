@@ -110,6 +110,20 @@ function CourseView(): JSX.Element {
             justifyContent: 'space-between', mb: 4, columnGap: 6
           }}>
             <Typography variant='h2' align='left'>{course.name.en}</Typography>
+            {
+              /* Only admins and teachers are allowed to create assessment models */
+              auth.role == SystemRole.Admin &&
+              <Button
+                id='ag_new_assessment_model_btn'
+                size='large'
+                variant='contained'
+                onClick={(): void => {
+                  navigate(`/${courseId}/add-attainments`);
+                }}
+              >
+                New Assessment Model
+              </Button>
+            }
           </Box>
           <Box sx={{ display: 'flex', gap: 3 }}>
             <div>
