@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import SelectFormulaForm from './select-formula-view/SelectFormulaForm';
 import formulasService from '../services/formulas';
-import mockAttainments from '../mock-data/mockAttainments';
+import mockAttainments from '../tests/mock-data/mockAttainments';
 import { State } from '../types';
 import { FormulaPreview } from 'aalto-grades-common/types';
 import useSnackPackAlerts from '../hooks/useSnackPackAlerts';
@@ -31,7 +31,7 @@ function SelectFormulaView(): JSX.Element {
       })
       .catch((exception: Error) => console.log(exception.message));
     */
-    // TODO DELETE THIS AFTER ROUTES WORK!
+    // TODO remove mock attainments import after this route works.
     setAttainments(mockAttainments);
   }, []);
 
