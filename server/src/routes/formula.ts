@@ -15,7 +15,7 @@ export const router: Router = Router();
  * definitions:
  *   FormulaData:
  *     type: object
- *     description: List of available formulas.
+ *     description: Basic information about a formula.
  *     properties:
  *       id:
  *         type: string
