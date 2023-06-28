@@ -13,28 +13,30 @@ function Attainment(
   : InferProps<typeof Attainment.propTypes>
 ): JSX.Element {
 
-  function attributeTextFields(): any {
+  function attributeTextFields(): JSX.Element {
     return (
-      attributes.map((attribute: string, attributeIndex: number) => {
-        const attributeLabel: string = formulaService.getAttributeLabel(attribute);
-        return (
-          <TextField
-            type='text'
-            key={attribute}
-            variant='standard'
-            label={attributeLabel}
-            InputLabelProps={{ shrink: true }}
-            margin='normal'
-            sx={{
-              marginTop: 0,
-              width: '100%'
-            }}
-            onChange={
-              (event: any): void => handleAttributeChange(attainmentIndex, attributeIndex, event)
-            }
-          />
-        );
-      })
+      <>
+        { attributes.map((attribute: string, attributeIndex: number) => {
+          const attributeLabel: string = formulaService.getAttributeLabel(attribute);
+          return (
+            <TextField
+              type='text'
+              key={attribute}
+              variant='standard'
+              label={attributeLabel}
+              InputLabelProps={{ shrink: true }}
+              margin='normal'
+              sx={{
+                marginTop: 0,
+                width: '100%'
+              }}
+              onChange={
+                (event: any): void => handleAttributeChange(attainmentIndex, attributeIndex, event)
+              }
+            />
+          );
+        })}
+      </>
     );
   }
 
