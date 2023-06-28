@@ -29,7 +29,7 @@ if (JWT_SECRET === 'TOP_SECRET') {
   if (NODE_ENV === 'production') {
     // Don't allow running production with default secret!
     throw new Error(
-      'AALTO_GRADES_JWT_SECRET must be defined for production environment!'
+      'AALTO_GRADES_JWT_SECRET must be defined for the production environment!'
     );
   } else {
     console.warn(
