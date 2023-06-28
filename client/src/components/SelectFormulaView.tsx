@@ -13,12 +13,14 @@ import formulasService from '../services/formulas';
 import mockAttainments from '../mock-data/mockAttainments';
 import { State } from '../types';
 import { FormulaPreview } from 'aalto-grades-common/types';
+import useSnackPackAlerts from '../hooks/useSnackPackAlerts';
 
 function SelectFormulaView(): JSX.Element {
   const { setSelectedFormula, selectedFormula } = useOutletContext<any>();
   const { instanceId, courseId }: Params = useParams();
   const [attainments, setAttainments]: State<Array<any>> = useState([]);
   const navigate: NavigateFunction = useNavigate();
+  const [setSnackPack] = useSnackPackAlerts();
 
   useEffect(() => {
     // TODO: fetch attainments for course based on the assessmentModelId
@@ -41,6 +43,16 @@ function SelectFormulaView(): JSX.Element {
     formulasService.getFormulaDetails(selectedFormula.id).then((formula: FormulaPreview) => {
       setSelectedFormula(formula);
       navigate(`/${courseId}/formula-attributes/${instanceId}`, { replace: true });
+    }).catch((exception: Error) => {
+      console.log(exception.message);
+
+      setSnackPack((prev: any) => [
+        ...prev,
+        {
+          msg: exception.message,
+          severity: 'error'
+        }
+      ]);
     });
   }
 
