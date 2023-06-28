@@ -191,7 +191,7 @@ function App(): JSX.Element {
                   element={<EditInstanceView />}
                 />
                 <Route
-                  path=':courseId/add-attainments/:sisuInstanceId'
+                  path=':courseId/add-attainments'
                   element={<AddAttainmentsView />}
                 />
                 <Route

@@ -87,14 +87,16 @@ function getSuggestedAttainments() {
 // Function to assign temporary Ids to attainments.
 function addTemporaryIds(attainments, temporaryId) {
   let newTemporaryId = temporaryId;
-  function addTemporaryId(modifiabelAttainments) {
-    modifiabelAttainments.forEach((attainment) => {
-      attainment.temporaryId = newTemporaryId;
-      newTemporaryId += 1;
-      if (attainment.subAttainments.length !== 0) {
-        addTemporaryId(attainment.subAttainments);
-      }
-    });
+  function addTemporaryId(modifiableAttainments) {
+    if (modifiableAttainments.length) {
+      modifiableAttainments.forEach((attainment) => {
+        attainment.temporaryId = newTemporaryId;
+        newTemporaryId += 1;
+        if (attainment.subAttainments.length !== 0) {
+          addTemporaryId(attainment.subAttainments);
+        }
+      });
+    }
   }
 
   const updatedAttainments = JSON.parse(JSON.stringify(attainments));
@@ -172,10 +174,14 @@ function getAttainmentByIndices(indices, attainments) {
   const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const lastIndex = indices[indices.length - 1];
   const indicesWithoutLast = indices.slice(0, -1);
-  const array = indicesWithoutLast.reduce((acc, current_index) => {
-    return acc[current_index].subAttainments, updatedAttainments;
-  });
-  return array[lastIndex];
+
+  if (indicesWithoutLast.length > 0) {
+    const array = indicesWithoutLast.reduce((acc, current_index) => {
+      return acc[current_index].subAttainments, updatedAttainments;
+    });
+    return array[lastIndex];
+  }
+  return {};
 }
 
 // Get sub-attainments from the attainments array (of nested arrays) according to the indices
@@ -314,15 +320,15 @@ function constructTreeAssignmets(attainments) {
 // Recursive function to add the 'category' property for each attainment
 function addCategories(attainments) {
 
-  function addCategory(modifiabelAttainments) {
-    modifiabelAttainments.forEach((attainment) => {
+  function addCategory(modifiableAttainments) {
+    modifiableAttainments.forEach((attainment) => {
       const name = attainment.name;
       if (name === 'Exam' || name === 'Attainments' || name === 'Project') {
         attainment.category = name;
       } else {
         attainment.category = 'Other';
       }
-      if (attainment.subAttainments.length !== 0) {
+      if (attainment.subAttainments && attainment.subAttainments.length !== 0) {
         addCategory(attainment.subAttainments);
       }
     });
@@ -337,23 +343,8 @@ function addCategories(attainments) {
 // Recursive function to format Date type values of the attainments to strings
 // of the format '2023-01-01'
 function formatDates(attainments) {
-
-  function formatDate(modifiabelAttainments) {
-    modifiabelAttainments.forEach((attainment) => {
-      const date = attainment.date;
-      const expiryDate = attainment.expiryDate;
-      attainment.date = textFormatServices.formatDateToSlashString(date);
-      attainment.expiryDate = textFormatServices.formatDateToSlashString(expiryDate);
-      if (attainment.subAttainments.length !== 0) {
-        formatDate(attainment.subAttainments);
-      }
-    });
-  }
-
   const updatedAttainments = JSON.parse(JSON.stringify(attainments));
-  formatDate(updatedAttainments);
   return updatedAttainments;
-
 }
 
 // Recursive function to format strings of the format '2023-01-01' to Date type values
@@ -380,17 +371,19 @@ function formatStringsToDates(attainments) {
 function getAttainmentById(attainments, attainmentId) {
 
   let finalAttainment = {};
-  function findAttainment(modifiabelAttainments) {
-    modifiabelAttainments.forEach((attainment) => {
-      if (attainment.id === attainmentId) {
-        finalAttainment = attainment;
-        return;
-      } else if (attainment.subAttainments.length !== 0) {
-        findAttainment(attainment.subAttainments);
-      } else {
-        return;
-      }
-    });
+  function findAttainment(modifiableAttainments) {
+    if (modifiableAttainments.length) {
+      modifiableAttainments.forEach((attainment) => {
+        if (attainment.id === attainmentId) {
+          finalAttainment = attainment;
+          return;
+        } else if (attainment.subAttainments.length !== 0) {
+          findAttainment(attainment.subAttainments);
+        } else {
+          return;
+        }
+      });
+    }
   }
 
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
