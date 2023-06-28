@@ -9,7 +9,9 @@ import userEvent from '@testing-library/user-event';
 import SelectFormulaView from '../components/SelectFormulaView';
 import formulasService from '../services/formulas';
 import FormulaSelectionRoute from '../context/FormulaSelectionRoute';
-import mockFormulas from '../mock-data/mockFormulas';
+import mockFormulas from './mock-data/mockFormulas';
+// import mockAttainments from './mock-data/mockAttainments';
+// import instancesService from '../services/instances';
 
 jest.mock('../services/instances');
 jest.mock('../services/formulas');
