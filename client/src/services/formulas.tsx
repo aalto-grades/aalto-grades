@@ -2,22 +2,43 @@
 //
 // SPDX-License-Identifier: MIT
 
-import axios from './axios';
-import mockFormulas from '../mock-data/mockFormulas';
-import { FormulaData, FormulaPreview } from 'aalto-grades-common/types';
 import { AxiosResponse } from 'axios';
+import axios from './axios';
+import { Formula, FormulaData, FormulaPreview } from 'aalto-grades-common/types';
+
+const mockFormulas: Array<FormulaPreview> = [
+  {
+    id: Formula.WeightedAverage,
+    name: 'Weighted average',
+    attributes: ['weight'],
+    codeSnippet:
+    `
+    const weightedAverage = (nums, weights) => {
+      const [sum, weightSum] = weights.reduce(
+        (acc, w, i) => {
+          acc[0] = acc[0] + nums[i] * w;
+          acc[1] = acc[1] + w;
+          return acc;
+        },
+        [0, 0]
+      );
+      return sum / weightSum;
+    };
+    `,
+  },
+];
 
 async function getFormulas(): Promise<Array<FormulaData>> {
   const response: AxiosResponse = await axios.get('/v1/formulas');
   return response.data.data.formulas;
 }
 
-async function getFormulaDetails(formulaId: string): Promise<FormulaPreview> {
+async function getFormulaDetails(formulaId: Formula): Promise<FormulaPreview> {
   const response: AxiosResponse = await axios.get(`/v1/formulas/${formulaId}`);
   return response.data.data.formula;
 }
 
-async function setFormula(formulaInfo): Promise<any> {
+async function setFormula(formulaInfo: unknown): Promise<unknown> {
   // TODO: specify route
   const response: AxiosResponse = await axios.post('/??', formulaInfo);
   console.log(response.data);
@@ -25,16 +46,20 @@ async function setFormula(formulaInfo): Promise<any> {
 }
 
 // A temporary function to get a mock formula's name
-function getFormulaName(formulaId): any {
-  const formula = mockFormulas.find(formula => formula.id === formulaId);
-  const formulaName = formula ? formula.name : 'None';
+function getFormulaName(formulaId: Formula): string {
+  const formula: FormulaPreview = mockFormulas.find(
+    (formula: FormulaPreview) => formula.id === formulaId
+  );
+  const formulaName: string = formula ? formula.name : 'None';
   return formulaName;
 }
 
 // A temporary function to get a mock formula's attributes
-function getFormulaAttributes(formulaId): any {
-  const formula = mockFormulas.find(formula => formula.id === formulaId);
-  const formulaAttributes = formula ? formula.attributes : '';
+function getFormulaAttributes(formulaId: Formula): Array<string> {
+  const formula: FormulaPreview = mockFormulas.find(
+    (formula: FormulaPreview) => formula.id === formulaId
+  );
+  const formulaAttributes: Array<string> = formula ? formula.attributes : [''];
   return formulaAttributes;
 }
 
