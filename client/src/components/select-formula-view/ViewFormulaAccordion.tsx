@@ -13,7 +13,7 @@ import { styled } from '@mui/material/styles';
 import formulasService from '../../services/formulas';
 import { Box, CircularProgress } from '@mui/material';
 import { State } from '../../types';
-import { FormulaPreview } from 'aalto-grades-common/types';
+import { Formula, FormulaPreview } from 'aalto-grades-common/types';
 import PropTypes, { InferProps } from 'prop-types';
 
 const HoverExpandMoreIcon = styled<any>(ExpandMoreIcon)(({ theme }) => ({
@@ -76,7 +76,10 @@ function ViewFormulaAccordion(
 }
 
 ViewFormulaAccordion.propTypes = {
-  formulaId: PropTypes.string
+  formulaId: PropTypes.oneOfType([
+    PropTypes.oneOf(Object.values(Formula)),
+    undefined
+  ])
 };
 
 export default ViewFormulaAccordion;

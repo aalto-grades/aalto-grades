@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import PropTypes from 'prop-types';
+import PropTypes, { InferProps } from 'prop-types';
 import List from '@mui/material/List';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -17,17 +17,19 @@ import LeafAttainment from './LeafAttainment';
 import Attainment from './Attainment';
 import attainmentServices from '../../services/attainments';
 import formulasService from '../../services/formulas';
+import { Formula } from 'aalto-grades-common/types';
+import { State } from '../../types';
 
 // An Assignmnet component with subAttainments and a formula
 
 function ParentAttainment({
   indices, addSubAttainments, setAttainments, attainments, removeAttainment,
   formulaAttributeNames, temporaryId, setIncrementId
-}) {
+}: InferProps<typeof ParentAttainment.propTypes>): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
 
   // Functions and varibales for opening and closing the list of sub-attainments
-  const [open, setOpen] = useState<any>(true);
+  const [open, setOpen]: State<boolean> = useState(true);
 
   function handleClick(): void {
     setOpen(!open);
@@ -44,9 +46,9 @@ function ParentAttainment({
      component are the attributes that need to specified for this attainment,
      so that the grade of this attainment's parent attainment can be calculated.
   */
-  const formulaId = attainmentServices.getProperty(indices, attainments, 'formulaId');
-  const formulaName = formulasService.getFormulaName(formulaId);
-  const subFormulaAttributeNames = formulasService.getFormulaAttributes(formulaId);
+  const formulaId: Formula = attainmentServices.getProperty(indices, attainments, 'formulaId');
+  const formulaName: string = formulasService.getFormulaName(formulaId);
+  const subFormulaAttributeNames: Array<string> = formulasService.getFormulaAttributes(formulaId);
 
   return (
     <>
@@ -63,7 +65,7 @@ function ParentAttainment({
           /* Navigation below doesn't work because formula selection has
              only been implemented for course grade */
         }
-        <Button size='small' sx={{ mb: 0.5 }} onClick={() => navigate('/select-formula')}>
+        <Button size='small' sx={{ mb: 0.5 }} onClick={(): void => navigate('/select-formula')}>
           Edit formula
         </Button>
       </Box>
@@ -98,18 +100,19 @@ function ParentAttainment({
           </Collapse>
           <Collapse in={open} timeout='auto' unmountOnExit>
             <List disablePadding>
-              {attainmentServices.getSubAttainments(indices, attainments).map((item, i) => (
-                <Attainment
-                  indices={indices.concat(i)}
-                  key={i}
-                  attainments={attainments}
-                  setAttainments={setAttainments}
-                  removeAttainment={removeAttainment}
-                  formulaAttributeNames={subFormulaAttributeNames ? subFormulaAttributeNames : []}
-                  temporaryId={temporaryId}
-                  setIncrementId={setIncrementId}
-                />
-              ))}
+              {attainmentServices.getSubAttainments(indices, attainments).map(
+                (_item: unknown, i: number) => (
+                  <Attainment
+                    indices={indices.concat(i)}
+                    key={i}
+                    attainments={attainments}
+                    setAttainments={setAttainments}
+                    removeAttainment={removeAttainment}
+                    formulaAttributeNames={subFormulaAttributeNames ? subFormulaAttributeNames : []}
+                    temporaryId={temporaryId}
+                    setIncrementId={setIncrementId}
+                  />
+                ))}
             </List>
           </Collapse>
         </Box>
