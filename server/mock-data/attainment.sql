@@ -246,4 +246,11 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, tag, days_v
 (27, 239, 'calculate depth', 'tag241', 365, NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.5 }'),
 (28, null, 'calculate override', 'tag242', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', NULL),
 (28, 242, 'calculate override', 'tag243', 365, NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.5 }'),
-(28, 242, 'calculate override', 'tag244', 365, NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.5 }');
+(28, 242, 'calculate override', 'tag244', 365, NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.5 }'),
+(29, null, 'Grade', 'grade', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', NULL),
+(29, 245, 'Exercises', 'exercise', 365, NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.4 }'),
+(29, 245, 'Project', 'project', 365, NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.2 }'),
+(29, 245, 'Exam', 'exam', 365, NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.4 }'),
+(30, null, 'Grade', 'grade', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', NULL),
+(30, 249, 'Project', 'project', 365, NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.6 }'),
+(30, 249, 'Exam', 'exam', 365, NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.4 }');
