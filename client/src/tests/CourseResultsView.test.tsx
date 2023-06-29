@@ -4,13 +4,13 @@
 
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, RenderResult, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CourseResultsView from '../components/CourseResultsView';
 
 describe('Tests for CourseResultsView components', () => {
 
-  async function renderCourseResultsView() {
+  function renderCourseResultsView(): RenderResult {
     return render(
       <BrowserRouter>
         <CourseResultsView />
@@ -23,12 +23,14 @@ describe('Tests for CourseResultsView components', () => {
     renderCourseResultsView();
 
     await waitFor(() => {
-      const headingElement = screen.queryByText('Course Results');
-      const studentNumberHeader = screen.queryByText('Student Number');
-      const finalGradeHeader = screen.queryByText('Final Grade');
-      const viewValidGradesText = screen.queryByText('View valid grades from past instances:');
-      const viewAllGradesButton = screen.queryByText('View all grades');
-      const calculateGradesButton = screen.queryByText('Calculate final grades');
+      const headingElement: HTMLElement = screen.queryByText('Course Results');
+      const studentNumberHeader: HTMLElement = screen.queryByText('Student Number');
+      const finalGradeHeader: HTMLElement = screen.queryByText('Final Grade');
+      const viewValidGradesText: HTMLElement = screen.queryByText(
+        'View valid grades from past instances:'
+      );
+      const viewAllGradesButton: HTMLElement = screen.queryByText('View all grades');
+      const calculateGradesButton: HTMLElement = screen.queryByText('Calculate final grades');
 
       expect(headingElement).toBeInTheDocument();
       expect(studentNumberHeader).toBeInTheDocument();
@@ -47,18 +49,18 @@ describe('Tests for CourseResultsView components', () => {
 
       renderCourseResultsView();
 
-      const importGradesMenuButton = await screen.findByText('Import grades');
+      const importGradesMenuButton: HTMLElement = await screen.findByText('Import grades');
       expect(importGradesMenuButton).toBeDefined();
       act(() => userEvent.click(importGradesMenuButton));
 
-      const uploadOption = screen.getByText('Import from file');
+      const uploadOption: HTMLElement = screen.getByText('Import from file');
       expect(uploadOption).toBeDefined();
       act(() => userEvent.click(uploadOption));
 
-      const dialogTitle = screen.getByText('Add Grades from File');
-      const uploadFileButton = screen.getByText('Upload file');
-      const cancelButton = screen.getByText('Cancel');
-      const confirmButton = screen.getByText('Confirm');
+      const dialogTitle: HTMLElement = screen.getByText('Add Grades from File');
+      const uploadFileButton: HTMLElement = screen.getByText('Upload file');
+      const cancelButton: HTMLElement = screen.getByText('Cancel');
+      const confirmButton: HTMLElement = screen.getByText('Confirm');
 
       expect(dialogTitle).toBeVisible();
       expect(uploadFileButton).toBeVisible();
@@ -77,13 +79,13 @@ describe('Tests for CourseResultsView components', () => {
 
       renderCourseResultsView();
 
-      const exportGradesMenuButton = await screen.findByText('Export to Sisu CSV');
+      const exportGradesMenuButton: HTMLElement = await screen.findByText('Export to Sisu CSV');
       expect(exportGradesMenuButton).toBeDefined();
       act(() => userEvent.click(exportGradesMenuButton));
 
-      const dialogTitle = screen.getByText('Export final grades to Sisu CSV');
-      const exportButton = screen.getByText('Export');
-      const cancelButton = screen.getByText('Cancel');
+      const dialogTitle: HTMLElement = screen.getByText('Export final grades to Sisu CSV');
+      const exportButton: HTMLElement = screen.getByText('Export');
+      const cancelButton: HTMLElement = screen.getByText('Cancel');
 
       expect(dialogTitle).toBeVisible();
       expect(exportButton).toBeVisible();
@@ -98,7 +100,7 @@ describe('Tests for CourseResultsView components', () => {
 
     renderCourseResultsView();
 
-    const studentRows = await screen.findAllByRole('row');
+    const studentRows: Array<HTMLElement> = await screen.findAllByRole('row');
     expect(studentRows.length).toEqual(1); // 25 rows are displayed by default + 1 for header row
 
   });
@@ -110,7 +112,7 @@ describe('Tests for CourseResultsView components', () => {
     await waitFor( async () => {
       expect(await screen.queryByText('Calculating final grades...')).not.toBeInTheDocument();
 
-      const calculateGradesButton = screen.queryByText('Calculate final grades');
+      const calculateGradesButton: HTMLElement = screen.queryByText('Calculate final grades');
       act(() => userEvent.click(calculateGradesButton));
 
       expect(await screen.findByText('Calculating final grades...')).toBeInTheDocument();

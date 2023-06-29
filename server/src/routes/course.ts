@@ -153,7 +153,6 @@ router.get(
 router.get(
   '/v1/courses',
   passport.authenticate('jwt', { session: false }),
-  authorization([SystemRole.Admin]),
   controllerDispatcher(getAllCourses)
 );
 

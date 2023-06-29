@@ -3,9 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 import axios from './axios';
+import { Numeric } from '../types';
 
 async function exportSisuCsv(
-  courseId: number | string, instanceId: number | string, params: unknown
+  courseId: Numeric, instanceId: Numeric, params: unknown
 ): Promise<BlobPart> {
   const response = await axios.get(
     `/v1/courses/${courseId}/instances/${instanceId}/grades/csv/sisu`,
@@ -18,7 +19,7 @@ async function exportSisuCsv(
 }
 
 async function importCsv(
-  courseId: number | string, instanceId: number | string, csv: unknown
+  courseId: Numeric, instanceId: Numeric, csv: unknown
 ) {
   const response = await axios.postForm(
     `/v1/courses/${courseId}/instances/${instanceId}/grades/csv`,
@@ -30,7 +31,7 @@ async function importCsv(
 }
 
 async function downloadCsvTemplate(
-  courseId: number | string, instanceId: number | string
+  courseId: Numeric, instanceId: Numeric
 ) {
   const response = await axios.get(
     `/v1/courses/${courseId}/instances/${instanceId}/grades/csv`
@@ -39,7 +40,7 @@ async function downloadCsvTemplate(
 }
 
 export async function calculateFinalGrades(
-  courseId: number | string, instanceId: number | string
+  courseId: Numeric, instanceId: Numeric
 ) {
   const response = await axios.post(
     `/v1/courses/${courseId}/instances/${instanceId}/grades/calculate`
@@ -48,7 +49,7 @@ export async function calculateFinalGrades(
 }
 
 export async function getFinalGrades(
-  courseId: number | string, instanceId: number | string
+  courseId: Numeric, instanceId: Numeric
 ) {
   const response = await axios.get(
     `/v1/courses/${courseId}/instances/${instanceId}/grades`

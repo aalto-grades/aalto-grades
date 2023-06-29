@@ -3,7 +3,7 @@
 -- SPDX-License-Identifier: MIT
 
 -- DISCLAIMER
--- All names and student id's portrayed in this file are fictitious.
+-- All names and student numbers portrayed in this file are fictitious.
 -- Any resemblance to actual person or student id, living or dead, active or inactive, is purely coincidental.
 INSERT INTO public.user (email, student_number, password, name, created_at, updated_at, role) VALUES
 ('amanda.germain@aalto.fi', '352772', 'oybqmgvqaftydpssvufmdpiqyaknxqhpeoqavmcuryaaswntzovmeqadyunz', 'Amanda Germain', '2020-10-15', '2021-7-2', 'USER'),
@@ -2506,4 +2506,7 @@ INSERT INTO public.user (email, student_number, password, name, created_at, upda
 ('sade.claiborne@aalto.fi', '277498', 'tflcwmwwvryzkziikdzrdiafceatdwtqsrjrqdlcwaxgyedybhixavobxpmw', 'Sade Claiborne', '2022-10-17', '2020-4-13', 'USER'),
 ('pamela.davis@aalto.fi', '364119', 'bsinpleuiikngpohcfsfrsmvnejlyvkuvlmlavxqgcjptzqrclywezbggaoj', 'Pamela Davis', '2022-3-15', '2021-3-6', 'USER'),
 ('valerie.gill@aalto.fi', '968547', 'aaiupteyrvttxtfalwwjbuxvdxykiomndwndkwqpjdyfdwfofbxdecqtnyqm', 'Valerie Gill', '2020-11-14', '2020-1-6', 'USER'),
-('jolene.jenkins@aalto.fi', '497596', 'knsccbfyejkgahkkcjybqcasjmpwtmrdbihwsiuzgxlekkkfvwiaffzcogsy', 'Jolene Jenkins', '2022-3-8', '2021-8-3', 'USER');
+('jolene.jenkins@aalto.fi', '497596', 'knsccbfyejkgahkkcjybqcasjmpwtmrdbihwsiuzgxlekkkfvwiaffzcogsy', 'Jolene Jenkins', '2022-3-8', '2021-8-3', 'USER'),
+('jolene.jenkins@teacherincharge.fi', '4975961', 'knsccbfyejkgahkkcjybqcasjmpwtmrdbihwsiuzgxlekkkfvwiaffzcogsy', 'Jolene Jenkins', '2022-3-8', '2021-8-3', 'USER'),
+('jolene.jenkins@courseinstancerole.fi', '4975962', 'knsccbfyejkgahkkcjybqcasjmpwtmrdbihwsiuzgxlekkkfvwiaffzcogsy', 'Jolene Jenkins', '2022-3-8', '2021-8-3', 'USER'),
+('jolene.jenkins@both.fi', '4975963', 'knsccbfyejkgahkkcjybqcasjmpwtmrdbihwsiuzgxlekkkfvwiaffzcogsy', 'Jolene Jenkins', '2022-3-8', '2021-8-3', 'USER');

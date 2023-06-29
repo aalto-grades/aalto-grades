@@ -26,7 +26,7 @@ function sortByDate(a, b): number {
 // orders a and b in descending order
 // a and b = objects
 // orderBy = key of the values that determine the order
-function descendingComparator(a, b, orderBy: string): number {
+function descendingComparator(a: object, b: object, orderBy: string): number {
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
