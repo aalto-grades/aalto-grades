@@ -8,7 +8,6 @@ import { useTheme } from '@mui/material/styles';
 import SignupForm from './SignupForm';
 import userService from '../../services/user';
 import useAuth from '../../hooks/useAuth';
-import { SystemRole } from 'aalto-grades-common/types/auth';
 import { SignupCredentials } from '../../types/auth';
 
 function Signup(): JSX.Element {
@@ -28,12 +27,7 @@ function Signup(): JSX.Element {
         name: response.name
       });
 
-      console.log(`${response.role}`);
-      if (response.role === SystemRole.Admin) {
-        navigate('/course-view', { replace: true });
-      } else {
-        navigate('/', { replace: true });
-      }
+      navigate('/', { replace: true });
     } catch (exception) {
       console.log(exception);
       setErrorMessage('Error: signup failed');

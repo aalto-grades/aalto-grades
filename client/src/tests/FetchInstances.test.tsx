@@ -4,7 +4,7 @@
 
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, screen, waitFor, cleanup } from '@testing-library/react';
+import { render, RenderResult, screen, waitFor, cleanup } from '@testing-library/react';
 import FetchInstancesView from '../components/FetchInstancesView';
 import instancesService from '../services/instances';
 import mockSisuInstances from './mock-data/mockSisuInstances';
@@ -14,14 +14,12 @@ afterEach(cleanup);
 
 describe('Tests for FetchInstancesView components', () => {
 
-  const instancesLength = mockSisuInstances.length;
+  const instancesLength: number = mockSisuInstances.length;
 
-  async function renderFetchInstancesView() {
-
-    const mockResponse = mockSisuInstances;
+  function renderFetchInstancesView(): RenderResult {
 
     (instancesService.getSisuInstances as jest.Mock).mockRejectedValue('Network error');
-    (instancesService.getSisuInstances as jest.Mock).mockResolvedValue(mockResponse);
+    (instancesService.getSisuInstances as jest.Mock).mockResolvedValue(mockSisuInstances);
 
     return render(
       <BrowserRouter>
@@ -35,15 +33,15 @@ describe('Tests for FetchInstancesView components', () => {
     renderFetchInstancesView();
 
     await waitFor(() => {
-      const headingElement = screen.queryByText('Instances Found from Sisu');
-      const subHeading = screen.queryByText('Select the instance you wish to add');
-      const cancelButton = screen.queryByText('Cancel');
-      const scratchButton = screen.queryByText('Start from Scratch');
-      const type = screen.queryAllByText('Type:');
-      const startDate = screen.queryAllByText('Starting Date:');
-      const endDate = screen.queryAllByText('Ending Date:');
-      const mockType = screen.queryByText('Teaching');
-      const mockDate = screen.queryByText('06.02.2023');
+      const headingElement: HTMLElement = screen.queryByText('Instances Found from Sisu');
+      const subHeading: HTMLElement = screen.queryByText('Select the instance you wish to add');
+      const cancelButton: HTMLElement = screen.queryByText('Cancel');
+      const scratchButton: HTMLElement = screen.queryByText('Start from Scratch');
+      const type: Array<HTMLElement> = screen.queryAllByText('Type:');
+      const startDate: Array<HTMLElement> = screen.queryAllByText('Starting Date:');
+      const endDate: Array<HTMLElement> = screen.queryAllByText('Ending Date:');
+      const mockType: HTMLElement = screen.queryByText('Teaching');
+      const mockDate: HTMLElement = screen.queryByText('06.02.2023');
 
       expect(headingElement).toBeInTheDocument();
       expect(subHeading).toBeInTheDocument();

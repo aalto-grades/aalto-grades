@@ -4,7 +4,9 @@
 
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { act, render, waitFor, cleanup, fireEvent, screen } from '@testing-library/react';
+import {
+  act, render, RenderResult, waitFor, cleanup, fireEvent, screen
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CourseView from '../components/CourseView';
 import assessmentModelsService from '../services/assessmentModels';
@@ -17,9 +19,9 @@ import mockAttainments from './mock-data/mockAttainmentsClient';
 import mockCourses from './mock-data/mockCourses';
 import mockInstances from './mock-data/mockInstancesWithStringDates';
 import { maxErrorsToShow } from '../components/course-view/FileLoadDialog';
-import { SystemRole } from 'aalto-grades-common/types/auth';
+import { LoginResult, SystemRole } from 'aalto-grades-common/types';
 
-const file = new File(['idk'], 'grades_test.csv', { type: 'csv' });
+const file: File = new File(['idk'], 'grades_test.csv', { type: 'csv' });
 
 jest.mock('../services/assessmentModels');
 jest.mock('../services/courses');
@@ -47,7 +49,7 @@ const mockErrorResponse = {
 
 describe('FileLoadDialog test with proper csv', () => {
 
-  function renderCourseView(auth) {
+  function renderCourseView(auth: LoginResult): RenderResult {
 
     (instancesService.getInstances as jest.Mock).mockResolvedValue(mockInstances);
 
@@ -76,21 +78,26 @@ describe('FileLoadDialog test with proper csv', () => {
   test('FileLoadDialog should render', async () => {
 
     // TODO, role here must be checked here based on a course/instance level role.
-    const auth = { role: SystemRole.Admin };
-    const { getByText, findByText } = renderCourseView(auth);
+    const auth: LoginResult = {
+      id: 1,
+      name: 'Admin',
+      role: SystemRole.Admin
+    };
 
-    const importGradesMenuButton = await findByText('Import grades');
+    const { getByText, findByText }: RenderResult = renderCourseView(auth);
+
+    const importGradesMenuButton: HTMLElement = await findByText('Import grades');
     expect(importGradesMenuButton).toBeDefined();
     act(() => userEvent.click(importGradesMenuButton));
 
-    const uploadOption = getByText('Import from file');
+    const uploadOption: HTMLElement = getByText('Import from file');
     expect(uploadOption).toBeDefined();
     act(() => userEvent.click(uploadOption));
 
-    const dialogTitle = getByText('Add Grades from File');
-    const uploadFileButton = getByText('Upload file');
-    const cancelButton = getByText('Cancel');
-    const confirmButton = getByText('Confirm');
+    const dialogTitle: HTMLElement = getByText('Add Grades from File');
+    const uploadFileButton: HTMLElement = getByText('Upload file');
+    const cancelButton: HTMLElement = getByText('Cancel');
+    const confirmButton: HTMLElement = getByText('Confirm');
 
     expect(dialogTitle).toBeVisible();
     expect(uploadFileButton).toBeVisible();
@@ -107,24 +114,29 @@ describe('FileLoadDialog test with proper csv', () => {
     async () => {
 
       // TODO, role here must be checked here based on a course/instance level role.
-      const auth = { role: SystemRole.Admin };
-      const { getByText, findByText } = renderCourseView(auth);
+      const auth: LoginResult = {
+        id: 1,
+        name: 'Admin',
+        role: SystemRole.Admin
+      };
 
-      const importGradesMenuButton = await findByText('Import grades');
+      const { getByText, findByText }: RenderResult = renderCourseView(auth);
+
+      const importGradesMenuButton: HTMLElement = await findByText('Import grades');
       expect(importGradesMenuButton).toBeDefined();
       act(() => userEvent.click(importGradesMenuButton));
 
-      const uploadOption = getByText('Import from file');
+      const uploadOption: HTMLElement = getByText('Import from file');
       expect(uploadOption).toBeDefined();
       act(() => userEvent.click(uploadOption));
 
-      const dialogTitle = getByText('Add Grades from File');
-      const confirmButton = getByText('Confirm');
+      const dialogTitle: HTMLElement = getByText('Add Grades from File');
+      const confirmButton: HTMLElement = getByText('Confirm');
 
       act(() => userEvent.click(confirmButton));
       expect(dialogTitle).toBeVisible();
 
-      const validationError = await findByText('You must select a csv file to submit');
+      const validationError: HTMLElement = await findByText('You must select a csv file to submit');
       expect(validationError).toBeVisible();
     }
   );
@@ -132,18 +144,23 @@ describe('FileLoadDialog test with proper csv', () => {
   test('FileLoadDialog should close when submitted file is okay', async () => {
 
     // TODO, role here must be checked here based on a course/instance level role.
-    const auth = { role: SystemRole.Admin };
-    const { getByText, findByText } = renderCourseView(auth);
+    const auth: LoginResult = {
+      id: 1,
+      name: 'Admin',
+      role: SystemRole.Admin
+    };
 
-    const importGradesMenuButton = await findByText('Import grades');
+    const { getByText, findByText }: RenderResult = renderCourseView(auth);
+
+    const importGradesMenuButton: HTMLElement = await findByText('Import grades');
     expect(importGradesMenuButton).toBeDefined();
     act(() => userEvent.click(importGradesMenuButton));
 
-    const uploadOption = getByText('Import from file');
+    const uploadOption: HTMLElement = getByText('Import from file');
     expect(uploadOption).toBeDefined();
     act(() => userEvent.click(uploadOption));
 
-    const dialogTitle = getByText('Add Grades from File');
+    const dialogTitle: HTMLElement = getByText('Add Grades from File');
 
     await waitFor(() =>
       fireEvent.change(getByText('Upload file').querySelector('input[type="file"]'), {
@@ -151,7 +168,7 @@ describe('FileLoadDialog test with proper csv', () => {
       })
     );
 
-    const confirmButton = getByText('Confirm');
+    const confirmButton: HTMLElement = getByText('Confirm');
     await act(async () => await userEvent.click(confirmButton));
 
     expect(dialogTitle).not.toBeVisible();
@@ -161,7 +178,7 @@ describe('FileLoadDialog test with proper csv', () => {
 
 describe('FileLoadDialog test where server does not accept the file', () => {
 
-  function renderCourseView(auth) {
+  function renderCourseView(auth: LoginResult): RenderResult {
 
     (instancesService.getInstances as jest.Mock).mockResolvedValue(mockInstances);
 
@@ -192,18 +209,23 @@ describe('FileLoadDialog test where server does not accept the file', () => {
   test('FileLoadDialog should not close with bad csv', async () => {
 
     // TODO, role here must be checked here based on a course/instance level role.
-    const auth = { role: SystemRole.Admin };
-    const { getByText, findByText } = renderCourseView(auth);
+    const auth: LoginResult = {
+      id: 1,
+      name: 'Admin',
+      role: SystemRole.Admin
+    };
 
-    const importGradesMenuButton = await findByText('Import grades');
+    const { getByText, findByText }: RenderResult = renderCourseView(auth);
+
+    const importGradesMenuButton: HTMLElement = await findByText('Import grades');
     expect(importGradesMenuButton).toBeDefined();
     act(() => userEvent.click(importGradesMenuButton));
 
-    const uploadOption = getByText('Import from file');
+    const uploadOption: HTMLElement = getByText('Import from file');
     expect(uploadOption).toBeDefined();
     act(() => userEvent.click(uploadOption));
 
-    const dialogTitle = getByText('Add Grades from File');
+    const dialogTitle: HTMLElement = getByText('Add Grades from File');
 
     await waitFor(() =>
       fireEvent.change(getByText('Upload file').querySelector('input[type="file"]'), {
@@ -211,31 +233,31 @@ describe('FileLoadDialog test where server does not accept the file', () => {
       })
     );
 
-    const confirmButton = getByText('Confirm');
+    const confirmButton: HTMLElement = getByText('Confirm');
     act(() => userEvent.click(confirmButton));
 
     expect(dialogTitle).toBeVisible();
-    const errorInstructions = await findByText(
+    const errorInstructions: HTMLElement = await findByText(
       'The input file cannot be processed due to the following issues that'
       + ' must be addressed and fixed:'
     );
     expect(errorInstructions).toBeVisible();
 
     // First n errors should be rendered visible.
-    for (let i = 0; i < maxErrorsToShow; i++) {
-      const errorText = await findByText(mockErrorResponse.data.errors[i]);
+    for (let i: number = 0; i < maxErrorsToShow; i++) {
+      const errorText: HTMLElement = await findByText(mockErrorResponse.data.errors[i]);
       expect(errorText).toBeVisible();
     }
 
     // Rest of the errors indicated by total number of extra errors (not listed initially).
-    const additionalErrors = await findByText(
+    const additionalErrors: HTMLElement = await findByText(
       `And ${mockErrorResponse.data.errors.length - maxErrorsToShow} more errors found`,
       { exact: false }
     );
     expect(additionalErrors).toBeVisible();
 
     // Show all errors button should be visible.
-    const showErrorsButton = screen.queryByText('Show all');
+    const showErrorsButton: HTMLElement = screen.queryByText('Show all');
     expect(showErrorsButton).toBeDefined();
   });
 
@@ -245,18 +267,23 @@ describe('FileLoadDialog test where server does not accept the file', () => {
     async () => {
 
       // TODO, role here must be checked here based on a course/instance level role.
-      const auth = { role: SystemRole.Admin };
-      const { getByText, findByText } = renderCourseView(auth);
+      const auth: LoginResult = {
+        id: 1,
+        name: 'Admin',
+        role: SystemRole.Admin
+      };
 
-      const importGradesMenuButton = await findByText('Import grades');
+      const { getByText, findByText }: RenderResult = renderCourseView(auth);
+
+      const importGradesMenuButton: HTMLElement = await findByText('Import grades');
       expect(importGradesMenuButton).toBeDefined();
       act(() => userEvent.click(importGradesMenuButton));
 
-      const uploadOption = getByText('Import from file');
+      const uploadOption: HTMLElement = getByText('Import from file');
       expect(uploadOption).toBeDefined();
       act(() => userEvent.click(uploadOption));
 
-      const dialogTitle = getByText('Add Grades from File');
+      const dialogTitle: HTMLElement = getByText('Add Grades from File');
 
       await waitFor(() =>
         fireEvent.change(getByText('Upload file').querySelector('input[type="file"]'), {
@@ -275,26 +302,26 @@ describe('FileLoadDialog test where server does not accept the file', () => {
         }
       });
 
-      const confirmButton = getByText('Confirm');
+      const confirmButton: HTMLElement = getByText('Confirm');
       act(() => userEvent.click(confirmButton));
 
       expect(dialogTitle).toBeVisible();
-      const errorInstructions = await findByText(
+      const errorInstructions: HTMLElement = await findByText(
         'The input file cannot be processed due to the following issues'
         + ' that must be addressed and fixed:'
       );
       expect(errorInstructions).toBeVisible();
 
-      for (let i = 0; i < maxErrorsToShow; i++) {
-        const errorText = await findByText(mockErrorResponse.data.errors[i]);
+      for (let i: number = 0; i < maxErrorsToShow; i++) {
+        const errorText: HTMLElement = await findByText(mockErrorResponse.data.errors[i]);
         expect(errorText).toBeVisible();
       }
 
       // Additional errors text should not be rendered.
-      const additionalErrors = screen.queryByText('more errors found');
+      const additionalErrors: HTMLElement = screen.queryByText('more errors found');
       expect(additionalErrors).toBeNull();
 
-      const showErrorsButton = screen.queryByText('Show all');
+      const showErrorsButton: HTMLElement = screen.queryByText('Show all');
       expect(showErrorsButton).toBeNull();
     });
 });

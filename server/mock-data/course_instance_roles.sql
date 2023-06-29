@@ -2514,4 +2514,7 @@ INSERT INTO public.course_instance_role (user_id, course_instance_id, role, crea
 (2495, 6, 'STUDENT', NOW(), NOW()),
 (2496, 1, 'STUDENT', NOW(), NOW()),
 (2497, 16, 'STUDENT', NOW(), NOW()),
-(2498, 13, 'STUDENT', NOW(), NOW());
+(2498, 13, 'STUDENT', NOW(), NOW()),
+(2503, 1, 'STUDENT', NOW(), NOW()),
+(2504, 8, 'STUDENT', NOW(), NOW()),
+(2504, 14, 'STUDENT', NOW(), NOW());
