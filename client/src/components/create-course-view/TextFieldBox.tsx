@@ -5,7 +5,7 @@
 import PropTypes from 'prop-types';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
-import { useTheme } from '@mui/material/styles';
+import { Theme, useTheme } from '@mui/material/styles';
 
 export interface TextFieldData {
   fieldId: string,
@@ -23,7 +23,7 @@ function TextFieldBox(props: {
   fieldData: TextFieldData,
   setFunction: (value: string) => void
 }): JSX.Element {
-  const theme = useTheme();
+  const theme: Theme = useTheme();
 
   return (
     <Box sx={{
@@ -50,7 +50,9 @@ function TextFieldBox(props: {
         }}
         InputProps={inputProps}
         helperText={props.fieldData.fieldHelperText}
-        onChange={({ target }) => props.setFunction(target.value)}>
+        onChange={(
+          { target }: { target: EventTarget & (HTMLInputElement | HTMLTextAreaElement) }
+        ): void => props.setFunction(target.value)}>
       </TextField>
     </Box>
   );
