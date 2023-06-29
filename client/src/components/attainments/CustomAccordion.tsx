@@ -90,7 +90,7 @@ AccordionDetails.propTypes = {
 };
 
 function AttainmentText(
-  { name, formulaId }: InferProps<typeof AttainmentText.propTypes>
+  { name, formulaId, tag }: InferProps<typeof AttainmentText.propTypes>
 ): JSX.Element {
   return (
     <Box sx={{ display: 'flex',
@@ -101,7 +101,12 @@ function AttainmentText(
       width: '100%',
       columnGap: 3
     }}>
-      <Typography variant='body2'>{name}</Typography>
+      <Typography variant='body2'>
+        {name}
+      </Typography>
+      <Typography align='left' variant='body2'>
+        {tag}
+      </Typography>
       {
         formulaId &&
         <Typography variant='caption' align='left'>
@@ -115,6 +120,7 @@ function AttainmentText(
 AttainmentText.propTypes = {
   name: PropTypes.string,
   formulaId: Formula,
+  tag: PropTypes.string,
 };
 
 export { AccordionDetails, AttainmentText };
@@ -162,7 +168,11 @@ function CustomAccordion(
                 expanded={expanded.has(attainment[attainmentKey]).toString()}
                 nowselected={(selected === attainment[attainmentKey]).toString()}
               >
-                <AttainmentText name={attainment.name} formulaId={attainment.formulaId} />
+                <AttainmentText
+                  name={attainment.name}
+                  formulaId={attainment.formulaId}
+                  tag={attainment.tag}
+                />
               </AccordionSummary>
               {
                 attainment.subAttainments &&
@@ -174,6 +184,7 @@ function CustomAccordion(
                         <AttainmentText
                           name={subAttainment.name}
                           formulaId={subAttainment.formulaId}
+                          tag={subAttainment.tag}
                         />
                       </AccordionDetails>
                       :
@@ -197,7 +208,7 @@ function CustomAccordion(
 
 CustomAccordion.propTypes = {
   attainments: PropTypes.array,
-  attainmentKey: PropTypes.string,
+  attainmentKey: PropTypes.string
 };
 
 export default CustomAccordion;

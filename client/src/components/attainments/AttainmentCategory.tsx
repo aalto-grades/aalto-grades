@@ -29,6 +29,9 @@ function AttainmentCategory(props: {
         <Typography sx={{ fontWeight: 'bold' }} align='left'>
           {props.attainment.name}
         </Typography>
+        <Typography align='left'>
+          {props.attainment.tag}
+        </Typography>
         {
           /*
             false && // TODO: Attainment formula
