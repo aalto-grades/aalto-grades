@@ -190,7 +190,8 @@ function getSubAttainments(indices, attainments) {
   let subAttainments = [];
   for (let i = 0; i < indices.length; i++) {
     const index = indices[i];
-    subAttainments = updatedAttainments[index].subAttainments;
+    if (updatedAttainments[index].subAttainments)
+      subAttainments = updatedAttainments[index].subAttainments;
     updatedAttainments = subAttainments;
   }
   return subAttainments;
