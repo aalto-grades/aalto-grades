@@ -12,35 +12,6 @@ export const router: Router = Router();
 
 /**
  * @swagger
- * definitions:
- *   CoursesOfUser:
- *     type: object
- *     properties:
- *       success:
- *         $ref: '#/definitions/Success'
- *       courses:
- *         type: object
- *         description: >
- *           Users current and past course participations.
- *         properties:
- *           current:
- *             type: array
- *             description: >
- *               Courses which have a currently active instance the user is
- *               participating in.
- *             items:
- *               $ref: '#/definitions/CourseData'
- *           previous:
- *             type: array
- *             description: >
- *               Courses which do not have a currently active instance the user
- *               has previously participated in.
- *             items:
- *               $ref: '#/definitions/CourseData'
- */
-
-/**
- * @swagger
  * /v1/user/{userId}/courses:
  *   get:
  *     tags: [User]
@@ -59,7 +30,17 @@ export const router: Router = Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/definitions/CoursesOfUser'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   $ref: '#/definitions/Success'
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     courses:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/definitions/CourseData'
  *       400:
  *         description: User ID validation failed. Must be positive integer.
  *         content:

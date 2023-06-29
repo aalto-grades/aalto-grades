@@ -4,7 +4,7 @@
 
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, screen, waitFor, cleanup } from '@testing-library/react';
+import { render, RenderResult, screen, waitFor, cleanup } from '@testing-library/react';
 import InstanceCreationRoute from '../context/InstanceCreationRoute';
 import EditInstanceView from '../components/EditInstanceView';
 import instancesService from '../services/instances';
@@ -15,12 +15,10 @@ afterEach(cleanup);
 
 describe('Tests for EditInstanceView components', () => {
 
-  async function renderEditInstanceView() {
-
-    const mockResponse = mockSisuInstances[0];
+  function renderEditInstanceView(): RenderResult {
 
     (instancesService.getSisuInstance as jest.Mock).mockRejectedValue('Network error');
-    (instancesService.getSisuInstance as jest.Mock).mockResolvedValue(mockResponse);
+    (instancesService.getSisuInstance as jest.Mock).mockResolvedValue(mockSisuInstances[0]);
 
     return render(
       <MemoryRouter initialEntries={['/A-12345/edit-instance/test']}>
@@ -41,14 +39,14 @@ describe('Tests for EditInstanceView components', () => {
       renderEditInstanceView();
 
       await waitFor(() => {
-        const typeField = screen.getByLabelText('Type');
-        const startingField = screen.getByLabelText('Starting Date');
-        const endingField = screen.getByLabelText('Ending Date');
-        const teacherField = screen.getByLabelText('Teacher in Charge');
-        const minCreditsField = screen.getByLabelText('Min Credits');
-        const maxCreditsField = screen.getByLabelText('Max Credits');
-        const gradingField = screen.getByLabelText('Grading Scale');
-        const confirmButton = screen.queryByText('Confirm Details');
+        const typeField: HTMLElement = screen.getByLabelText('Type');
+        const startingField: HTMLElement = screen.getByLabelText('Starting Date');
+        const endingField: HTMLElement = screen.getByLabelText('Ending Date');
+        const teacherField: HTMLElement = screen.getByLabelText('Teacher in Charge');
+        const minCreditsField: HTMLElement = screen.getByLabelText('Min Credits');
+        const maxCreditsField: HTMLElement = screen.getByLabelText('Max Credits');
+        const gradingField: HTMLElement = screen.getByLabelText('Grading Scale');
+        const confirmButton: HTMLElement = screen.queryByText('Confirm Details');
 
         expect(typeField).toBeInTheDocument();
         expect(startingField).toBeInTheDocument();
