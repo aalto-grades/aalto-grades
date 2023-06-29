@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useState, useEffect } from 'react';
+import { State } from '../types';
 
 /* custom hook for using back-to-back alerts
    - use requires that AlertSnackbar is imported also
@@ -29,7 +30,7 @@ function useSnackPackAlerts() {
 
   // state variables for alert messages
   const [snackPack, setSnackPack] = useState([]);
-  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
   // format is { msg: 'Message here', severity: 'info/success/error' }
   const [messageInfo, setMessageInfo] = useState(undefined);
 

@@ -9,7 +9,9 @@ import userEvent from '@testing-library/user-event';
 import SelectFormulaView from '../components/SelectFormulaView';
 import formulasService from '../services/formulas';
 import FormulaSelectionRoute from '../context/FormulaSelectionRoute';
-import mockFormulas from '../mock-data/mockFormulas';
+import mockFormulas from './mock-data/mockFormulas';
+// import mockAttainments from './mock-data/mockAttainments';
+// import instancesService from '../services/instances';
 
 jest.mock('../services/instances');
 jest.mock('../services/formulas');
@@ -18,11 +20,13 @@ afterEach(cleanup);
 describe('Tests for SelectFormulaView components', () => {
 
   async function renderSelectFormulaView() {
+    (formulasService.getFormulas as jest.Mock).mockRejectedValue('Network error');
+    (formulasService.getFormulas as jest.Mock).mockRejectedValue(mockFormulas);
 
+    // TODO, include once get attainments work
     //(instancesService.getAttainments as jest.Mock).mockRejectedValue('Network error');
     //(instancesService.getAttainments as jest.Mock).mockResolvedValue(mockAttainments);
-    (formulasService.getFormulas as jest.Mock).mockRejectedValue('Network error');
-    (formulasService.getFormulas as jest.Mock).mockResolvedValue(mockFormulas);
+
     return render(
       <MemoryRouter initialEntries={['/A-12345/select-formula/test']}>
         <Routes>

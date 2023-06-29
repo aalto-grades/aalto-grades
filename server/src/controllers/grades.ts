@@ -15,9 +15,10 @@ import AttainmentGrade from '../database/models/attainmentGrade';
 import Course from '../database/models/course';
 import User from '../database/models/user';
 
+import { Formula } from 'aalto-grades-common/types';
 import { getFormulaImplementation } from '../formulas';
 import { ApiError } from '../types/error';
-import { Formula, FormulaNode, CalculationInput, CalculationResult } from '../types/formulas';
+import { FormulaNode, CalculationInput, CalculationResult } from '../types/formulas';
 import { JwtClaims } from '../types/general';
 import { AttainmentGradeData, Status, StudentGrades } from '../types/grades';
 import { HttpCode } from '../types/httpCode';

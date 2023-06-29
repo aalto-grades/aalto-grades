@@ -16,6 +16,7 @@ import textFormatServices from '../services/textFormat';
 import instancesService from '../services/instances';
 import attainmentServices from '../services/attainments';
 import useSnackPackAlerts from '../hooks/useSnackPackAlerts';
+import { sleep } from '../utils';
 import { Message } from '../types';
 import { CourseInstanceData, GradingScale } from 'aalto-grades-common/types';
 
@@ -80,13 +81,7 @@ function InstanceSummaryView() {
     navigate('/' + courseId + '/add-attainments/' + sisuInstanceId);
   }
 
-  // Helper function
-  function sleep(ms) {
-    return new Promise(r => setTimeout(r, ms));
-  }
-
   async function onCreateInstance() {
-
     // attempt to create instance
     try {
       const instanceData: CourseInstanceData = {
