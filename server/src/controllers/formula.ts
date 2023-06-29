@@ -5,7 +5,7 @@
 import { Request, Response } from 'express';
 import * as yup from 'yup';
 
-import { Formula } from 'aalto-grades-common/types';
+import { Formula, FormulaPreview } from 'aalto-grades-common/types';
 import { getAllFormulasBasicData, getFormulaImplementation } from '../formulas';
 import { HttpCode } from '../types/httpCode';
 import { FormulaImplementation } from '../types/formulas';
@@ -29,19 +29,22 @@ export async function getFormula(req: Request, res: Response): Promise<void> {
       .required()
   });
 
-  const formulaId: string = req.params.formulaId;
+  const formulaId: Formula = req.params.formulaId as Formula;
   await requestSchema.validate({ formulaId });
-  const formula: FormulaImplementation = await getFormulaImplementation(formulaId as Formula);
+  const formulaImplementation: FormulaImplementation =
+    await getFormulaImplementation(formulaId);
+
+  const formula: FormulaPreview = {
+    id: formulaId,
+    name: formulaImplementation.name,
+    attributes: formulaImplementation.attributes,
+    codeSnippet: formulaImplementation.codeSnippet,
+  };
 
   res.status(HttpCode.Ok).json({
     success: true,
     data: {
-      formula: {
-        id: formulaId,
-        name: formula.name,
-        attributes: formula.attributes,
-        codeSnippet: formula.codeSnippet
-      }
+      formula
     }
   });
 }
