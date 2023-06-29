@@ -99,7 +99,7 @@ function AttainmentText({ name, formulaId, tag }) {
         {name}
       </Typography>
       <Typography align='left' variant='body2'>
-        tag: {tag}
+        {tag}
       </Typography>
       {
         formulaId &&

@@ -30,7 +30,7 @@ function AttainmentCategory(props: {
           {props.attainment.name}
         </Typography>
         <Typography align='left'>
-          tag: {props.attainment.tag}
+          {props.attainment.tag}
         </Typography>
         {
           /*
