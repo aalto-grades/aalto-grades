@@ -102,14 +102,14 @@ function CreateAttainmentView() {
             px: 2,
           }}>
             {/* Create the root attainment */}
-            <Attainment
+            {/*<Attainment
               indices={[0]}
               attainments={attainments}
               setAttainments={setAttainments}
               removeAttainment={removeAttainment}
               temporaryId={attainmentIncrementId}
               setIncrementId={setIncrementId}
-            />
+            />*/}
           </Box>
           <Button
             size='medium'

@@ -10,12 +10,12 @@ import attainmentServices from '../../services/attainments';
 // This component is also used for the formula attribute textfields that are
 // required after specifying a formula.
 
-function StringTextField({ fieldData, indices, attainments, setAttainments }) {
+function StringTextField({ fieldData, indices, attainmentTree, setAttainmentTree }) {
 
   // Functions for handling the change of the values in the 'New Name' textfield
   // and the textfields that represent formula attributes
   function handleChange(event) {
-    const value = event.target.value;
+    /*const value = event.target.value;
     if (fieldData.fieldId === 'attainmentName') {
       const updatedAttainments = attainmentServices.setProperty(
         indices, attainments, 'name', value
@@ -31,18 +31,18 @@ function StringTextField({ fieldData, indices, attainments, setAttainments }) {
       setAttainments(updatedAttainments);
     } else {
       console.log(fieldData.fieldId);
-    }
+    }*/
   }
 
   function getValue() {
-    if (fieldData.fieldId === 'attainmentName') {
+    /*if (fieldData.fieldId === 'attainmentName') {
       return attainmentServices.getProperty(indices, attainments, 'name');
     } else if (fieldData.fieldId.startsWith('attribute')) {
       const attributeKey = fieldData.fieldId.split('_')[1];
       return attainmentServices.getFormulaAttribute(indices, attainments, attributeKey);
     } else {
       console.log(fieldData.fieldId);
-    }
+    }*/
   }
 
   return (
@@ -54,7 +54,7 @@ function StringTextField({ fieldData, indices, attainments, setAttainments }) {
       label={fieldData.fieldLabel}
       InputLabelProps={{ shrink: true }}
       margin='normal'
-      value={getValue()}
+      value={attainmentTree.name}
       sx={{
         marginTop: 0,
         width: '100%'
@@ -69,8 +69,8 @@ StringTextField.propTypes = {
   fieldId: PropTypes.string,
   fieldLabel: PropTypes.string,
   indices: PropTypes.array,
-  attainments: PropTypes.array,
-  setAttainments: PropTypes.func
+  attainmentTree: PropTypes.object,
+  setAttainmentTree: PropTypes.func
 };
 
 export default StringTextField;

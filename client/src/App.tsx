@@ -212,7 +212,7 @@ function App(): JSX.Element {
                 element={<CreateAttainmentView />}
               />
               <Route
-                path=':courseId/edit-attainment/:instanceId/:attainmentId'
+                path=':courseId/edit-attainment/:assessmentModelId/:attainmentId'
                 element={<EditAttainmentView />}
               />
               <Route element={<FormulaSelectionRoute />}>

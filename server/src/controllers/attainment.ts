@@ -294,6 +294,8 @@ export async function getAttainment(req: Request, res: Response): Promise<void> 
 
   res.status(HttpCode.Ok).json({
     success: true,
-    data: localRoot,
+    data: {
+      attainment: localRoot
+    },
   });
 }

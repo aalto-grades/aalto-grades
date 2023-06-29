@@ -60,16 +60,16 @@ async function getAttainment(
   tree?: 'children' | 'descendants'
 ): Promise<AttainmentData> {
 
-  const query: string = tree ?? `&ree=${tree}`;
+  const query: string = tree ? `?tree=${tree}` : '';
 
-  const response: FullResponse<{ attainments: AttainmentData }> =
+  const response: FullResponse<{ attainment: AttainmentData }> =
     await axios.get(
       `/v1/courses/${courseId}/assessment-models/${assessmentModelId}`
       + `/attainments/${attainmentId}${query}`
     );
 
 
-  return response.data.data.attainments;
+  return response.data.data.attainment;
 }
 
 // Function to get mock attainments.
@@ -186,15 +186,18 @@ function getAttainmentByIndices(indices, attainments) {
 
 // Get sub-attainments from the attainments array (of nested arrays) according to the indices
 function getSubAttainments(indices, attainments) {
+  return [];
+  /*
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
   let subAttainments = [];
   for (let i = 0; i < indices.length; i++) {
     const index = indices[i];
-    if (updatedAttainments[index].subAttainments)
+    if (updatedAttainments[index] && updatedAttainments[index].subAttainments)
       subAttainments = updatedAttainments[index].subAttainments;
     updatedAttainments = subAttainments;
   }
   return subAttainments;
+  */
 }
 
 // Set the proprety of the object that is in the location specified by the indices in the

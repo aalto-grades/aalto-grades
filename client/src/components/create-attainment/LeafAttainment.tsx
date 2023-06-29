@@ -6,7 +6,6 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Collapse from '@mui/material/Collapse';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import SimpleDialog from './SimpleDialog';
@@ -19,24 +18,14 @@ import formulaService from '../../services/formulas';
 // An Assignmnet component without subAttainments and hence without a formula as well.
 // If this isn't the root Attainment, this can be deleted
 
-const categoryData = {
-  fieldId: 'category',
-  fieldLabel: 'Name'
-};
-
 const nameData = {
   fieldId: 'attainmentName',
   fieldLabel: 'New Name'
 };
 
-const dateData = {
-  fieldId: 'attainmentDate',
-  fieldLabel: 'Date'
-};
-
-const expiryData = {
-  fieldId: 'expiryDate',
-  fieldLabel: 'Expiry Date'
+const daysValidData = {
+  fieldId: 'daysValid',
+  fieldLabel: 'Days Valid'
 };
 
 /* String textfields for the formula attributes. These attributes affect the
@@ -56,9 +45,10 @@ function AttributeTextFields({
           key={attribute}
           fieldData={{ fieldId: 'attribute_' + attribute, fieldLabel: attributeLabel }}
           indices={indices}
-          setAttainments={setAttainments}
-          attainments={attainments}
-        />);
+          setAttainmentTree={setAttainments}
+          attainmentTree={attainments}
+        />
+      );
     })
   );
 }
@@ -72,8 +62,8 @@ AttributeTextFields.propTypes = {
 };
 
 function LeafAttainment({
-  indices, addSubAttainments, setAttainments,
-  attainments, removeAttainment, formulaAttributeNames
+  indices, addSubAttainments, setAttainmentTree,
+  attainmentTree, removeAttainment, formulaAttributeNames
 }) {
 
   // Functions and varibales for handling the change of the value in the 'Name'
@@ -82,33 +72,15 @@ function LeafAttainment({
   function handleChange(event) {
     const value = event.target.value;
     let updatedAttainments = attainmentServices.setProperty(
-      indices, attainments, 'category', value
+      indices, attainmentTree, 'category', value
     );
-    if (value === 'Other') {
-      setDisplayNewName(true);
-      updatedAttainments = attainmentServices.setProperty(
-        indices, updatedAttainments, 'name', ''
-      );
-    } else {
-      setDisplayNewName(false);
-      updatedAttainments = attainmentServices.setProperty(
-        indices, updatedAttainments, 'name', value
-      );
-    }
-    setAttainments(updatedAttainments);
-  }
 
-  function getValue(fieldData) {
-    if (fieldData.fieldId === 'category') {
-      return attainmentServices.getProperty(indices, attainments, 'category');
-    } else {
-      console.log(fieldData.fieldId);
-    }
-  }
+    updatedAttainments = attainmentServices.setProperty(
+      indices, updatedAttainments, 'name', ''
+    );
 
-  const [displayNewName, setDisplayNewName] = useState<any>(
-    getValue(categoryData) === 'Other'
-  );
+    //setAttainmentTree(updatedAttainments);
+  }
 
   // Functions and varibales for opening and closing the dialog that asks for
   // the number of sub-attainments
@@ -134,11 +106,6 @@ function LeafAttainment({
     setOpenConfDialog(false);
   }
 
-  // See if this attainment affects the parent attainment's grade
-  const affectCalculation = attainmentServices.getProperty(
-    indices, attainments, 'affectCalculation'
-  );
-
   return (
     <Box sx={{
       bgcolor: '#FFFFFF',
@@ -158,47 +125,25 @@ function LeafAttainment({
         rowGap: 1,
         mt: 2,
       }}>
-        <TextField
-          id={categoryData.fieldId}
-          label={categoryData.fieldLabel}
-          variant='standard'
-          value={getValue(categoryData)}
-          onChange={(event) => handleChange(event)}
-          InputLabelProps={{ shrink: true }}
-          sx={{ textAlign: 'left' }}
-          select>
-          <MenuItem value='Attainments'>Attainments</MenuItem>
-          <MenuItem value='Exam'>Exam</MenuItem>
-          <MenuItem value='Project'>Project</MenuItem>
-          <MenuItem value='Other'>Other</MenuItem>
-        </TextField>
-        <Collapse in={displayNewName} timeout={0} unmountOnExit>
-          <StringTextField
-            fieldData={nameData}
-            indices={indices}
-            setAttainments={setAttainments}
-            attainments={attainments}
-          />
-        </Collapse>
-        <DateTextField
-          fieldData={dateData}
+        <StringTextField
+          fieldData={nameData}
           indices={indices}
-          setAttainments={setAttainments}
-          attainments={attainments}
+          setAttainmentTree={setAttainmentTree}
+          attainmentTree={attainmentTree}
         />
-        <DateTextField
-          fieldData={expiryData}
+        <StringTextField
+          fieldData={daysValidData}
           indices={indices}
-          setAttainments={setAttainments}
-          attainments={attainments}
+          setAttainmentTree={setAttainmentTree}
+          attainmentTree={attainmentTree}
         />
         {
-          (formulaAttributeNames && affectCalculation) &&
+          formulaAttributeNames &&
           <AttributeTextFields
             formulaAttributeNames={formulaAttributeNames}
             indices={indices}
-            setAttainments={setAttainments}
-            attainments={attainments}
+            setAttainments={() => {}}
+            attainments={[]}
           />
         }
       </Box>
@@ -208,12 +153,14 @@ function LeafAttainment({
         alignItems: 'center',
         justifyContent: 'space-between'
       }}>
-        { JSON.stringify(indices) !== '[0]' ?
-          <Button size='small' sx={{ my: 1 }} onClick={handleConfDialogOpen}>
-            Delete
-          </Button>
-          :
-          <Box sx={{ width: '1px' }}/> }
+        {
+          JSON.stringify(indices) !== '[0]' ?
+            <Button size='small' sx={{ my: 1 }} onClick={handleConfDialogOpen}>
+              Delete
+            </Button>
+            :
+            <Box sx={{ width: '1px' }} />
+        }
         <ConfirmationDialog
           title={'Sub Study Attainments'}
           subject={'sub study attainment'}
@@ -221,23 +168,18 @@ function LeafAttainment({
           handleClose={handleConfDialogClose}
           deleteAttainment={removeAttainment}
           indices={indices}
-          attainments={attainments}
+          attainments={[]}
         />
-        {attainmentServices.getSubAttainments(indices, attainments).length === 0 ?
-          <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
-            Create Sub-Attainments
-          </Button>
-          :
-          <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
-            Add Sub-Attainments
-          </Button>}
+        <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
+          Create Sub-Attainments
+        </Button>
       </Box>
       <SimpleDialog
         open={openCountDialog}
         handleClose={handleCountDialogClose}
         addSubAttainments={addSubAttainments}
         indices={indices}
-        attainments={attainments}
+        attainments={[]}
       />
     </Box>
   );
@@ -246,8 +188,8 @@ function LeafAttainment({
 LeafAttainment.propTypes = {
   addSubAttainments: PropTypes.func,
   indices: PropTypes.array,
-  attainments: PropTypes.array,
-  setAttainments: PropTypes.func,
+  attainmentTree: PropTypes.object,
+  setAttainmentTree: PropTypes.func,
   removeAttainment: PropTypes.func,
   formulaAttributeNames: PropTypes.array,
 };

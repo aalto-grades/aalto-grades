@@ -43,7 +43,7 @@ async function getAllAttainments(
   assessmentModelId: Numeric
 ): Promise<AttainmentData> {
 
-  let response: FullResponse<AttainmentData>;
+  let response: FullResponse<{ attainment: AttainmentData }>;
 
   // Brute force some return value until the route for getting all attainments
   // of an assessment model is merged
@@ -59,7 +59,7 @@ async function getAllAttainments(
     } catch {} // eslint-disable-line
   }
 
-  return response.data.data;
+  return response.data.data.attainment;
 }
 
 export default {
