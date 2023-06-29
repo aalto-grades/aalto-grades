@@ -12,7 +12,7 @@ import Typography from '@mui/material/Typography';
 import AttainmentCategory from './attainments/AttainmentCategory';
 import attainmentServices from '../services/attainments';
 
-function AddAttainmentsView() {
+function AddAttainmentsView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { courseId, sisuInstanceId }: Params = useParams();
 
@@ -151,7 +151,7 @@ function AddAttainmentsView() {
                       [
                         <Button
                           key='remove'
-                          onClick={() => onRemoveClick(attainment)}
+                          onClick={(): void => onRemoveClick(attainment)}
                         >
                           Remove
                         </Button>,
@@ -177,13 +177,13 @@ function AddAttainmentsView() {
         display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
         alignItems: 'center', pb: 6
       }}>
-        <Button variant='outlined' onClick={() => onGoBack()}>
+        <Button variant='outlined' onClick={(): void => onGoBack()}>
           Go back
         </Button>
         <Button
           id='ag_confirm_instance_attainments_btn'
           variant='contained'
-          onClick={() => onConfirmAttainments()}
+          onClick={(): void => onConfirmAttainments()}
         >
           Confirm attainments
         </Button>
