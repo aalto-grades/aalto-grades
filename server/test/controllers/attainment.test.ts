@@ -870,73 +870,8 @@ describe(
 
 describe(
   'Test GET /v1/courses/:courseId/instances/:instanceId/attainments'
-  + '- get root attainments of an instance (optionally with a tree of descendants)',
+  + '- get the root attainment of an instance (optionally with a tree of descendants)',
   () => {
-
-    it('should respond with an array of root attainments without subattainments, '
-      + 'if query string is not present', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/instances/2/attainments')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
-      expect(res.body.success).toBe(true);
-      expect(res.body.data).toBeDefined();
-      expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data[1], 2, 2, 2, false);
-      verifyAttainmentData(res.body.data[2], 216, 2, 2, false);
-      verifyAttainmentData(res.body.data[3], 217, 2, 2, false);
-    });
-
-    it('should respond with an array of root attainments with one level of subattainments, '
-      + 'if "tree" parameter in query equals "children"', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/instances/2/attainments?tree=children')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
-      expect(res.body.success).toBe(true);
-      expect(res.body.data).toBeDefined();
-      expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data[1], 2, 2, 2, true);
-      verifyAttainmentData(res.body.data[1].subAttainments[1], 6, 2, 2, false);
-      verifyAttainmentData(res.body.data[1].subAttainments[0], 10, 2, 2, false);
-      verifyAttainmentData(res.body.data[2], 216, 2, 2, false);
-      verifyAttainmentData(res.body.data[3], 217, 2, 2, true);
-      verifyAttainmentData(res.body.data[3].subAttainments[0], 218, 2, 2, false);
-    });
-
-    it('should respond with an array of root attainments with a full tree of subattainments, '
-      + 'if "tree" parameter in query equals "descendants"', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/instances/2/attainments?tree=descendants')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
-      expect(res.body.success).toBe(true);
-      expect(res.body.data).toBeDefined();
-      expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data[1], 2, 2, 2, true);
-      verifyAttainmentData(res.body.data[1].subAttainments[1], 6, 2, 2, true);
-      verifyAttainmentData(
-        res.body.data[1].subAttainments[1].subAttainments[0],
-        214,
-        2,
-        2,
-        true
-      );
-      verifyAttainmentData(
-        res.body.data[1].subAttainments[1].subAttainments[0].subAttainments[0],
-        215,
-        2,
-        2,
-        false
-      );
-      verifyAttainmentData(res.body.data[1].subAttainments[0], 10, 2, 2, false);
-      verifyAttainmentData(res.body.data[2], 216, 2, 2, false);
-      verifyAttainmentData(res.body.data[3], 217, 2, 2, true);
-      verifyAttainmentData(res.body.data[3].subAttainments[0], 218, 2, 2, false);
-    });
 
     it('should respond with 400 Bad Request, if "tree" parameter in query string '
       + 'is invalid', async () => {

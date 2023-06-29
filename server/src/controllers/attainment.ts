@@ -299,7 +299,7 @@ export async function getAttainment(req: Request, res: Response): Promise<void> 
   });
 }
 
-export async function getAllAttainments(req: Request, res: Response): Promise<void> {
+export async function getRootAttainment(req: Request, res: Response): Promise<void> {
   const courseId: number = Number(req.params.courseId);
   const instanceId: number = Number(req.params.instanceId);
 
@@ -319,16 +319,34 @@ export async function getAllAttainments(req: Request, res: Response): Promise<vo
     (el: AttainmentData) => !el.parentId
   );
 
-  if (tree) {
-    const onlyChildren: boolean = tree === 'children' ? true : false;
-    rootAttainments.forEach((el: AttainmentData) => {
-      generateAttainmentTree(el, allAttainmentData, onlyChildren);
-    });
+  if (rootAttainments.length === 0) {
+    throw new ApiError('Root attainment was not found for the specified course and instance',
+      HttpCode.NotFound
+    );
+  } else if (rootAttainments.length > 1) {
+    throw new ApiError('More than one attainments without parentId were found '
+      + 'for the specified course and instance. Attainment IDs: '
+      + rootAttainments.map((el: AttainmentData) => el.parentId).join(), HttpCode.Conflict
+    );
+  }
+
+  switch (tree) {
+
+  case 'children':
+    generateAttainmentTree(rootAttainments[0], allAttainmentData, true);
+    break;
+
+  case 'descendants':
+    generateAttainmentTree(rootAttainments[0], allAttainmentData);
+    break;
+
+  default:
+    break;
+
   }
 
   res.status(HttpCode.Ok).json({
     success: true,
-    data: rootAttainments,
+    data: rootAttainments[0],
   });
-
 }

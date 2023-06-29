@@ -217,7 +217,4 @@ INSERT INTO public.attainment (course_id, course_instance_id, attainment_id, nam
 (1, 10, 211, 'test assignment tree c:1 i:10, sub', 'tag222', '2023-05-08', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.75 }'),
 (1, 10, 211, 'test assignment tree c:1 i:10, sub', 'tag223', '2023-05-08', '2023-04-23', NOW(), NOW(), 'MANUAL', '{ "min": 0, "max": 5, "weight": 0.25 }'),
 (2, 2, 6, 'test assignment 2nd level child 1', 'tag224', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
-(2, 2, 214, 'test assignment 3rd level child 1', 'tag225', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
-(2, 2, null, 'test assignment tree root level 1', 'tag226', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
-(2, 2, null, 'test assignment tree root level 2', 'tag227', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL),
-(2, 2, 217, 'test assignment tree root level 2, child 1', 'tag228', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL);
+(2, 2, 214, 'test assignment 3rd level child 1', 'tag225', '2022-05-12', '2023-04-23', NOW(), NOW(), 'MANUAL', NULL);

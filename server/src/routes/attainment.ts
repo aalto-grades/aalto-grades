@@ -10,7 +10,7 @@ import {
   deleteAttainment,
   updateAttainment,
   getAttainment,
-  getAllAttainments
+  getRootAttainment
 } from '../controllers/attainment';
 import { handleInvalidRequestJson } from '../middleware';
 import { controllerDispatcher } from '../middleware/errorHandler';
@@ -283,7 +283,7 @@ router.put(
  * /v1/courses/{courseId}/instances/{instanceId}/attainments/{attainmentId}:
  *  get:
  *     tags: [Attainment]
- *     description: Get single attainment or subtree downwards.
+ *     description: Get a single attainment or subtree downwards.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
  *       - $ref: '#/components/parameters/instanceId'
@@ -291,19 +291,19 @@ router.put(
  *       - $ref: '#/components/parameters/tree'
  *     responses:
  *       200:
- *         description:
+ *         description: A single attainment or tree fetched successfully.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Attainment'
  *       400:
- *         description:
+ *         description: Malformed request due to validation errors or missing parameters.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       404:
- *         description:
+ *         description: Attainment was not found.
  *         content:
  *           application/json:
  *             schema:
@@ -321,26 +321,34 @@ router.get(
  * /v1/courses/{courseId}/instances/{instanceId}/attainments:
  *  get:
  *     tags: [Attainment]
- *     description: Get all root attainments of the course instance or subtree downwards.
+ *     description: Get the root attainment of the course instance or subtree downwards.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
  *       - $ref: '#/components/parameters/instanceId'
  *       - $ref: '#/components/parameters/tree'
  *     responses:
  *       200:
- *         description:
+ *         description: A single attainment or tree fetched successfully.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Attainment'
  *       400:
- *         description:
+ *         description: Malformed request due to validation errors or missing parameters.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
  *       404:
- *         description:
+ *         description: Root attainment for the course instance was not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: >
+ *           Conflict due to more than one attainments without parentId found for
+ *           the course instance.
  *         content:
  *           application/json:
  *             schema:
@@ -350,5 +358,5 @@ router.get(
 router.get(
   '/v1/courses/:courseId/instances/:instanceId/attainments',
   passport.authenticate('jwt', { session: false }),
-  controllerDispatcher(getAllAttainments)
+  controllerDispatcher(getRootAttainment)
 );
