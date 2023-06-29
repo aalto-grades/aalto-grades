@@ -20,4 +20,10 @@ INSERT INTO public.course_translation (course_id, language, department, course_n
 (5, 'SV', 'Institutionen för datateknik', 'Databaser', NOW(), NOW()),
 (6, 'EN', 'Department of Mathematics and Systems Analysis', 'Differential and Integral Calculus 1 (SCI)', NOW(), NOW()),
 (6, 'FI', 'Matematiikan ja systeemianalyysin laitos', 'Differentiaali- ja integraalilaskenta 1 (SCI)', NOW(), NOW()),
-(6, 'SV', 'Institutionen för matematik och systemanalys', 'Differential- och integralkalkyl 1 (SCI)', NOW(), NOW());
+(6, 'SV', 'Institutionen för matematik och systemanalys', 'Differential- och integralkalkyl 1 (SCI)', NOW(), NOW()),
+(7, 'EN', 'Department of Computer Science', 'Programming Parallel Computers D', NOW(), NOW()),
+(7, 'FI', 'Tietotekniikan laitos', 'Programming Parallel Computers D', NOW(), NOW()),
+(7, 'SV', 'Institutionen för datateknik', 'Programming Parallel Computers D', NOW(), NOW()),
+(8, 'EN', 'Department of Information and Communications Engineering', 'C Programming', NOW(), NOW()),
+(8, 'FI', 'Tietoliikenne- ja tietoverkkotekniikan laitos', 'C Programming', NOW(), NOW()),
+(8, 'SV', 'Institutionen för kommunikations- och nätverksteknik', 'C Programming', NOW(), NOW());

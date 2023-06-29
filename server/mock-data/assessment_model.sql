@@ -30,4 +30,6 @@ INSERT INTO public.assessment_model (course_id, name, created_at, updated_at) VA
 (1, 'model 25 - test calculate correct', NOW(), NOW()),
 (1, 'model 26 - test calculate multiple', NOW(), NOW()),
 (1, 'model 27 - test calculate depth', NOW(), NOW()),
-(1, 'model 28 - test calculate override', NOW(), NOW());
+(1, 'model 28 - test calculate override', NOW(), NOW()),
+(8, 'Year 2021 - 2023', NOW(), NOW()),
+(8, 'Special project', NOW(), NOW());
