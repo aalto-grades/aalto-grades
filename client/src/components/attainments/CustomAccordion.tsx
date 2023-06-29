@@ -90,7 +90,7 @@ AccordionDetails.propTypes = {
 };
 
 function AttainmentText(
-  { name, formulaId }: InferProps<typeof AttainmentText.propTypes>
+  { name, formulaId, tag }: InferProps<typeof AttainmentText.propTypes>
 ): JSX.Element {
   return (
     <Box sx={{ display: 'flex',
@@ -119,9 +119,8 @@ function AttainmentText(
 
 AttainmentText.propTypes = {
   name: PropTypes.string,
-  formulaId: PropTypes.number,
+  formulaId: Formula,
   tag: PropTypes.string,
-  formulaId: Formula
 };
 
 export { AccordionDetails, AttainmentText };
