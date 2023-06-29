@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useState } from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, { InferProps } from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
@@ -12,6 +12,8 @@ import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
 import MuiAccordion from '@mui/material/Accordion';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import formulasService from '../../services/formulas';
+import { Formula } from 'aalto-grades-common/types';
+import { State } from '../../types';
 
 const Accordion = styled<any>((props) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -58,8 +60,10 @@ const AccordionSummary = styled<any>((props) => (
   },
 }));
 
-function AccordionDetails({ out, children }) {
-  const margin = out ? '21px' : '60px';
+function AccordionDetails(
+  { out, children }: InferProps<typeof AccordionDetails.propTypes>
+): JSX.Element {
+  const margin: string = out ? '21px' : '60px';
   return (
     <Box sx={{
       display: 'flex',
@@ -85,7 +89,9 @@ AccordionDetails.propTypes = {
   out: PropTypes.bool
 };
 
-function AttainmentText({ name, formulaId, tag }) {
+function AttainmentText(
+  { name, formulaId }: InferProps<typeof AttainmentText.propTypes>
+): JSX.Element {
   return (
     <Box sx={{ display: 'flex',
       flexDirection: 'row',
@@ -115,14 +121,17 @@ AttainmentText.propTypes = {
   name: PropTypes.string,
   formulaId: PropTypes.number,
   tag: PropTypes.string
+  formulaId: Formula,
 };
 
 export { AccordionDetails, AttainmentText };
 
-function CustomAccordion({ attainments, attainmentKey }) {
+function CustomAccordion(
+  { attainments, attainmentKey }: InferProps<typeof CustomAccordion.propTypes>
+): JSX.Element {
 
-  const [expanded, setExpanded] = useState<any>(new Set());
-  const [selected, setSelected] = useState<any>('');
+  const [expanded, setExpanded]: State<Set<unknown>> = useState(new Set());
+  const [selected, setSelected]: State<string> = useState('');
 
   function addToSet(item, set) {
     const copySet = new Set([...set]);

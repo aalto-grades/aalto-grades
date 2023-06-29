@@ -2,45 +2,58 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState, useEffect } from 'react';
-import { NavigateFunction, Params, useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import {
+  useParams, useNavigate, useOutletContext, Params, NavigateFunction
+} from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import SelectFormulaForm from './select-formula-view/SelectFormulaForm';
 import formulasService from '../services/formulas';
-import mockAttainments from '../mock-data/mockAttainments';
-import mockFormulas from '../mock-data/mockFormulas';
+import mockAttainments from '../tests/mock-data/mockAttainments';
+import { State } from '../types';
+import { FormulaPreview } from 'aalto-grades-common/types';
+import useSnackPackAlerts from '../hooks/useSnackPackAlerts';
 
-function SelectFormulaView() {
+function SelectFormulaView(): JSX.Element {
+  const { setSelectedFormula, selectedFormula } = useOutletContext<any>();
   const { instanceId, courseId }: Params = useParams();
-  const [attainments, setAttainments] = useState([]);
-  const [formulas, setFormulas] = useState([]);
+  const [attainments, setAttainments]: State<Array<any>> = useState([]);
   const navigate: NavigateFunction = useNavigate();
+  const [setSnackPack] = useSnackPackAlerts();
 
   useEffect(() => {
     // TODO: fetch attainments for course based on the assessmentModelId
-    /*instancesService.getAttainments(instanceId)
-      .then((data) => {
+    /*
+    instancesService.getAttainments(instanceId)
+      .then((data: any) => {
         setAttainments(data);
       })
-      .catch((e) => console.log(e.message));*/
-    // TODO: fetch formulas
-    formulasService.getFormulas()
-      .then((data) => {
-        setFormulas(data);
-      })
-      .catch((e) => console.log(e.message));
-    // DELETE THIS AFTER ROUTES WORK!
+      .catch((exception: Error) => console.log(exception.message));
+    */
+    // TODO remove mock attainments import after this route works.
     setAttainments(mockAttainments);
-    setFormulas(mockFormulas);
   }, []);
 
-  function navigateToCourseView() {
+  function navigateToCourseView(): void {
     navigate(`/course-view/${courseId}`, { replace: true });
   }
 
-  function navigateToAttributeSelection() {
-    navigate(`/${courseId}/formula-attributes/${instanceId}`, { replace: true });
+  function navigateToAttributeSelection(): void {
+    formulasService.getFormulaDetails(selectedFormula.id).then((formula: FormulaPreview) => {
+      setSelectedFormula(formula);
+      navigate(`/${courseId}/formula-attributes/${instanceId}`, { replace: true });
+    }).catch((exception: Error) => {
+      console.log(exception.message);
+
+      setSnackPack((prev: any) => [
+        ...prev,
+        {
+          msg: exception.message,
+          severity: 'error'
+        }
+      ]);
+    });
   }
 
   // TODO: How to differentiate between course total grade and assigment grade?
@@ -56,7 +69,6 @@ function SelectFormulaView() {
         </Typography>
         <SelectFormulaForm
           attainments={attainments}
-          formulas={formulas}
           navigateToCourseView={navigateToCourseView}
           navigateToAttributeSelection={navigateToAttributeSelection}
         />

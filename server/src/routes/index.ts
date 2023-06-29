@@ -16,6 +16,7 @@ import { router as attainmentRouter } from './attainment';
 import { router as authRouter } from './auth';
 import { router as courseRouter } from './course';
 import { router as courseInstanceRouter } from './courseInstance';
+import { router as formulaRouter } from './formula';
 import { router as gradesRouter } from './grades';
 import { router as sisuRouter } from './sisu';
 import { router as userRouter } from './user';
@@ -35,6 +36,7 @@ router.use(attainmentRouter);
 router.use(authRouter);
 router.use(courseRouter);
 router.use(courseInstanceRouter);
+router.use(formulaRouter);
 router.use(gradesRouter);
 router.use(sisuRouter);
 router.use(userRouter);
@@ -81,6 +83,14 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *       required: true
  *       example: 1
  *       description: The ID of the assessment model.
+ *     formulaId:
+ *       in: path
+ *       name: formulaId
+ *       schema:
+ *         type: string
+ *       required: true
+ *       example: WEIGHTED_AVERAGE
+ *       description: Enum value identifying the grading formula.
  *     attainmentId:
  *       in: path
  *       name: attainmentId
