@@ -9,6 +9,7 @@ import Button from '@mui/material/Button';
 import TextFieldBox, { TextFieldData } from './TextFieldBox';
 import { CourseData } from 'aalto-grades-common/types';
 import { State } from '../../types';
+import TeacherList from './TeacherList';
 
 const codeData: TextFieldData = {
   fieldId: 'courseCode',
@@ -28,22 +29,35 @@ const organizerData: TextFieldData = {
   fieldHelperText: 'Give the organizer of the new course.'
 };
 
-/*const teachersData: TextFieldData = {
+const teachersData: TextFieldData = {
   fieldId: 'teachers',
   fieldLabel: 'Teachers in Charge',
   fieldHelperText: 'Give the emails of the teachers in charge of the new course.'
-};*/
+};
 
 function CreateCourseForm(params: {
   addCourse: (course: CourseData) => Promise<void>
 }): JSX.Element {
 
-  const [courseCode, setCode]: State<string> = useState('');
-  const [name, setName]: State<string> = useState('');
-  const [department, setOrganizer]: State<string> = useState('');
-  //const [teacher, setTeacher]: State<string> = useState('');
-
+  const [courseCode, setCode]: State<string | null> = useState(null);
+  const [name, setName]: State<string | null> = useState(null);
+  const [department, setOrganizer]: State<string | null> = useState(null);
+  const [teacherList, setTeacherList]: State<Array<string>> = useState([]);
   const id: number = -1;
+
+  /*
+    courseCode: yup.string().required(),
+    minCredits: yup.number().min(0).required(),
+    maxCredits: yup.number().min(yup.ref('minCredits')).required(),
+    teachersInCharge: yup.array().of(
+      yup.object().shape({
+        id: yup.number().required()
+      })
+    ).required(),
+    department: localizedStringSchema.required(),
+    name: localizedStringSchema.required()
+  });
+  */
 
   async function handleSubmit(event: SyntheticEvent): Promise<void> {
     event.preventDefault();
@@ -88,7 +102,17 @@ function CreateCourseForm(params: {
         <TextFieldBox fieldData={codeData} setFunction={setCode}/>
         <TextFieldBox fieldData={nameData} setFunction={setName}/>
         <TextFieldBox fieldData={organizerData} setFunction={setOrganizer}/>
-        <Button id='ag_create_course_btn' size='medium' variant='contained' type='submit'>
+        <TeacherList
+          fieldData={teachersData}
+          setTeacherList={setTeacherList}
+          teacherList={teacherList}
+        />
+        <Button
+          id='ag_create_course_btn'
+          size='medium'
+          variant='contained'
+          type='submit'
+          disabled={!courseCode || !name || !department || teacherList.length === 0 }>
           Create Course
         </Button>
       </form>
@@ -100,6 +124,100 @@ CreateCourseForm.propTypes = {
   addCourse: PropTypes.func
 };
 
-//<TextFieldBox fieldData={teachersData} setFunction={setTeacher}/>
-
 export default CreateCourseForm;
+
+/*
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          flexDirection: 'column',
+          boxShadow: 2,
+          borderRadius: 2,
+          my: 2,
+          p: 2
+        }}>
+          <TextField
+            id={teachersData.fieldId}
+            type={teachersData.fieldId}
+            label={teachersData.fieldLabel}
+            variant='standard'
+            color='primary'
+            sx={{ my: 1 }}
+            InputLabelProps={{
+              shrink: true,
+              style: {
+                fontSize: theme.typography.h2.fontSize
+              }
+            }}
+            value={teacher}
+            InputProps={inputProps}
+            helperText={teachersData.fieldHelperText}
+            onChange={(
+              { target }: { target: EventTarget & (HTMLInputElement | HTMLTextAreaElement) }
+            ): void => setTeacher(target.value)}>
+          </TextField>
+          <Button
+            variant="outlined"
+            startIcon={<PersonAddAlt1Icon />}
+            onClick={addTeacher}
+          >
+            Add
+          </Button>
+          <Box sx={{ mt: 3, mb: 2 }}>
+            {teacherList.length === 0 ?
+              'Add at least one teacher in charge to the course'
+              :
+              <List dense={true}>
+                {teacherList.map((teacherEmail: string) => {
+                  return (
+                    <ListItem
+                      key={teacherEmail}
+                      secondaryAction={
+                        <IconButton
+                          edge="end"
+                          aria-label="delete"
+                          onClick={(): void => {
+                            removeTeacher(teacherEmail);
+                          }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      }
+                    >
+                      <ListItemAvatar>
+                        <Avatar>
+                          <PersonIcon />
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={teacherEmail}
+                      />
+                    </ListItem>);
+                })}
+              </List>
+            }
+          </Box>
+        </Box>
+
+  const [courseCode, setCode]: State<string | null> = useState(null);
+  const [name, setName]: State<string | null> = useState(null);
+  const [department, setOrganizer]: State<string | null> = useState(null);
+  const [teacher, setTeacher]: State<string> = useState('');
+
+  const [teacherList, setTeacherList]: State<Array<string | null>> = useState(null);
+            <ul>
+              { teacherList.map((teacher: string) => {
+                return (
+                  <li key={teacher}>
+                    {teacher}
+                    <Button
+                      variant="outlined"
+                      startIcon={<ClearIcon />}
+                      onClick={(): void => {
+                        removeTeacher(teacher);
+                      }}
+                    />
+                  </li>);
+              })}
+            </ul>
+*/
