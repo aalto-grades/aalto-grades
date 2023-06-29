@@ -350,8 +350,8 @@ function formatDates(attainments) {
 // Recursive function to format strings of the format '2023-01-01' to Date type values
 function formatStringsToDates(attainments) {
 
-  function formatStringToDate(modifiabelAttainments) {
-    modifiabelAttainments.forEach((attainment) => {
+  function formatStringToDate(modifiableAttainments) {
+    modifiableAttainments.forEach((attainment) => {
       const dateString = attainment.date;
       const expiryDateString = attainment.expiryDate;
       attainment.date = textFormatServices.formatStringToDate(dateString);
@@ -409,8 +409,8 @@ function getFinalAttainmentById(allAttainments, attainmentId) {
 function getNumOfAttainments(attainments) {
 
   let sum = 0;
-  function countAttainment(modifiabelAttainments) {
-    modifiabelAttainments.forEach((attainment) => {
+  function countAttainment(modifiableAttainments) {
+    modifiableAttainments.forEach((attainment) => {
       sum += 1;
       if (attainment.subAttainments.length !== 0) {
         countAttainment(attainment.subAttainments);
@@ -430,8 +430,8 @@ function getNumOfAttainments(attainments) {
 function getExistingAttainments(attainments) {
 
   const existingAttainments = [];
-  function findExisting(modifiabelAttainments) {
-    modifiabelAttainments.forEach((attainment) => {
+  function findExisting(modifiableAttainments) {
+    modifiableAttainments.forEach((attainment) => {
       if (attainment.id) {
         existingAttainments.push(attainment);
       }
@@ -451,8 +451,8 @@ function getExistingAttainments(attainments) {
 function getNewAttainments(attainments) {
 
   const newAttainments = [];
-  function findNew(modifiabelAttainments) {
-    modifiabelAttainments.forEach((attainment) => {
+  function findNew(modifiableAttainments) {
+    modifiableAttainments.forEach((attainment) => {
       if (!attainment.id) {
         newAttainments.push(attainment);
       } else if (attainment.subAttainments && attainment.subAttainments.length !== 0) {
