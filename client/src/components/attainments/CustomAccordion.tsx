@@ -120,8 +120,8 @@ function AttainmentText(
 AttainmentText.propTypes = {
   name: PropTypes.string,
   formulaId: PropTypes.number,
-  tag: PropTypes.string
-  formulaId: Formula,
+  tag: PropTypes.string,
+  formulaId: Formula
 };
 
 export { AccordionDetails, AttainmentText };
@@ -209,7 +209,7 @@ function CustomAccordion(
 
 CustomAccordion.propTypes = {
   attainments: PropTypes.array,
-  attainmentKey: PropTypes.string,
+  attainmentKey: PropTypes.string
 };
 
 export default CustomAccordion;
