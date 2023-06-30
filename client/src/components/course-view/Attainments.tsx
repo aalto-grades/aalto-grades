@@ -40,8 +40,8 @@ function Attainments(props: {
         <Typography align='left' sx={{ ml: 1.5 }} >
           {'Grading Formula: ' + props.formula}
         </Typography>
-        <Button id='ag_edit_formula_btn' onClick={() => {
-          return navigate(`/${props.courseId}/select-formula/${props.assessmentModel.id}`);
+        <Button id='ag_edit_formula_btn' onClick={(): void => {
+          navigate(`/${props.courseId}/select-formula/${props.assessmentModel.id}`);
         }}>
           Edit formula
         </Button>
@@ -60,8 +60,8 @@ function Attainments(props: {
                 attainmentKey={'id'}
                 buttons={
                   [
-                    <Button key='edit' onClick={() => {
-                      return navigate(
+                    <Button key='edit' onClick={(): void => {
+                      navigate(
                         `/${props.courseId}/edit-attainment`
                         + `/${props.assessmentModel.id}/${attainment.id}`
                       );
@@ -79,7 +79,7 @@ function Attainments(props: {
         display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
         alignItems: 'center', gap: 1, mt: 2, mb: 1
       }}>
-        <Button onClick={() => {
+        <Button onClick={(): void => {
           navigate(`/${props.courseId}/create-attainment/${props.assessmentModel.id}`);
         }}>
           Add attainment
@@ -91,7 +91,7 @@ function Attainments(props: {
           <Button
             id='ag_course_results_btn'
             variant='outlined'
-            onClick={() => {
+            onClick={(): void => {
               navigate(`/${props.courseId}/course-results/${props.assessmentModel.id}`);
             }}
           >

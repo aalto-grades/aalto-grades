@@ -2,34 +2,41 @@
 //
 // SPDX-License-Identifier: MIT
 
-import PropTypes from 'prop-types';
+import PropTypes, { InferProps } from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import formulaService from '../../services/formulas';
 
-function Attainment({ attainment, attributes, handleAttributeChange, attainmentIndex }) {
+function Attainment(
+  { attainment, attributes, handleAttributeChange, attainmentIndex }
+  : InferProps<typeof Attainment.propTypes>
+): JSX.Element {
 
-  function attributeTextFields() {
+  function attributeTextFields(): JSX.Element {
     return (
-      attributes.map((attribute, attributeIndex) => {
-        const attributeLabel = formulaService.getAttributeLabel(attribute);
-        return (
-          <TextField
-            type='text'
-            key={attribute}
-            variant='standard'
-            label={attributeLabel}
-            InputLabelProps={{ shrink: true }}
-            margin='normal'
-            sx={{
-              marginTop: 0,
-              width: '100%'
-            }}
-            onChange={event => handleAttributeChange(attainmentIndex, attributeIndex, event)}
-          />
-        );
-      })
+      <>
+        { attributes.map((attribute: string, attributeIndex: number) => {
+          const attributeLabel: string = formulaService.getAttributeLabel(attribute);
+          return (
+            <TextField
+              type='text'
+              key={attribute}
+              variant='standard'
+              label={attributeLabel}
+              InputLabelProps={{ shrink: true }}
+              margin='normal'
+              sx={{
+                marginTop: 0,
+                width: '100%'
+              }}
+              onChange={
+                (event: any): void => handleAttributeChange(attainmentIndex, attributeIndex, event)
+              }
+            />
+          );
+        })}
+      </>
     );
   }
 
@@ -65,7 +72,7 @@ function Attainment({ attainment, attributes, handleAttributeChange, attainmentI
 }
 
 Attainment.propTypes = {
-  attainment: PropTypes.object,
+  attainment: PropTypes.any,
   attributes: PropTypes.array,
   handleAttributeChange: PropTypes.func,
   attainmentIndex: PropTypes.number

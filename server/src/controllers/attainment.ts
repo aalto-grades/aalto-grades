@@ -12,12 +12,12 @@ import Course from '../database/models/course';
 
 import { AttainmentData } from 'aalto-grades-common/types/attainment';
 import { ApiError } from '../types/error';
-import { Formula } from '../types/formulas';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 
 import { findAttainmentById, generateAttainmentTree } from './utils/attainment';
 import { validateCourseAndAssessmentModel } from './utils/assessmentModel';
+import { Formula } from 'aalto-grades-common/types';
 
 export async function addAttainment(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({

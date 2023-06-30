@@ -21,19 +21,20 @@ import {
   AssessmentModelData, AttainmentData, CourseData, CourseInstanceData, SystemRole
 } from 'aalto-grades-common/types';
 import { State } from '../types';
+import CircularProgress from '@mui/material/CircularProgress';
 
 function CourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { courseId }: Params = useParams();
   const { auth }: AuthContextType = useAuth();
 
-  const [course, setCourse]: State<CourseData> = useState(null);
+  const [course, setCourse]: State<CourseData | null> = useState(null);
 
-  const [currentAssessmentModel, setCurrentAssessmentModel]: State<AssessmentModelData> =
+  const [currentAssessmentModel, setCurrentAssessmentModel]: State<AssessmentModelData | null> =
     useState(null);
   const [assessmentModels, setAssessmentModels]: State<Array<AssessmentModelData>> =
     useState([]);
-  const [attainmentTree, setAttainmentTree]: State<AttainmentData> =
+  const [attainmentTree, setAttainmentTree]: State<AttainmentData | null> =
     useState(null);
 
   const [instances, setInstances]: State<Array<CourseInstanceData>> = useState([]);
@@ -89,6 +90,7 @@ function CourseView(): JSX.Element {
   function onChangeAssessmentModel(assessmentModel: AssessmentModelData): void {
     if (assessmentModel.id !== currentAssessmentModel?.id) {
       setAnimation(false);
+      setAttainmentTree(null);
       setCurrentAssessmentModel(assessmentModel);
 
       assessmentModelsService.getAllAttainments(courseId, assessmentModel.id)
@@ -136,10 +138,9 @@ function CourseView(): JSX.Element {
             </div>
             {
               /* a different attainment component will be created for students */
-              auth.role == SystemRole.Admin && attainmentTree &&
+              auth.role == SystemRole.Admin &&
               <div style={{ width: '100%' }}>
-                {
-                  currentAssessmentModel &&
+                { attainmentTree != null ?
                   <Grow
                     in={animation}
                     style={{ transformOrigin: '0 0 0' }}
@@ -155,6 +156,20 @@ function CourseView(): JSX.Element {
                       />
                     </div>
                   </Grow>
+                  :
+                  <div>
+                    <Box sx={{
+                      margin: 'auto',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      display: 'flex',
+                      mt: 25,
+                      mb: 5
+                    }}>
+                      <CircularProgress />
+                    </Box>
+                      Loading attainments...
+                  </div>
                 }
               </div>
             }

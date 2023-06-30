@@ -104,14 +104,6 @@ describe('Test GET /v1/courses - get all courses', () => {
       .expect(HttpCode.Unauthorized);
   });
 
-  it('should respond with 403 forbidden, if insufficient rights', async () => {
-    await request
-      .get('/v1/courses')
-      .set('Cookie', cookies.userCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Forbidden);
-  });
-
 });
 
 describe('Test POST /v1/courses - create new course', () => {

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import PropTypes from 'prop-types';
+import React, { useEffect, useState } from 'react';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -10,6 +10,11 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Container from '@mui/material/Container';
 import { styled } from '@mui/material/styles';
+import formulasService from '../../services/formulas';
+import { Box, CircularProgress } from '@mui/material';
+import { State } from '../../types';
+import { Formula, FormulaPreview } from 'aalto-grades-common/types';
+import PropTypes, { InferProps } from 'prop-types';
 
 const HoverExpandMoreIcon = styled<any>(ExpandMoreIcon)(({ theme }) => ({
   '&:hover': {
@@ -17,7 +22,20 @@ const HoverExpandMoreIcon = styled<any>(ExpandMoreIcon)(({ theme }) => ({
   }
 }));
 
-function ViewFormulaAccordion({ codeSnippet }) {
+function ViewFormulaAccordion(
+  { formulaId }: InferProps<typeof ViewFormulaAccordion.propTypes>
+): JSX.Element {
+  const [codeSnippet, setCodeSnippet]: State<string | null> = useState(null);
+
+  useEffect(() => {
+    if (formulaId !== undefined) {
+      formulasService.getFormulaDetails(formulaId)
+        .then((data: FormulaPreview) => {
+          setCodeSnippet(data.codeSnippet);
+        })
+        .catch((exception: Error) => console.log(exception.message));
+    }
+  }, [formulaId]);
 
   return (
     <Container>
@@ -32,9 +50,24 @@ function ViewFormulaAccordion({ codeSnippet }) {
         </AccordionSummary>
         <AccordionDetails sx={{ bgcolor: 'primary.light', p:'10px' }}>
           <Container disableGutters sx={{ overflowX: 'scroll' }}>
-            <pre>
-              <code>{codeSnippet}</code>
-            </pre>
+            { formulaId === undefined ?
+              <p>Select formula for previewing</p>
+              :
+              codeSnippet == null ?
+                <Box
+                  sx={{
+                    margin: 'auto',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    display: 'flex'
+                  }}>
+                  <CircularProgress />
+                </Box>
+                :
+                <pre>
+                  <code>{codeSnippet}</code>
+                </pre>
+            }
           </Container>
         </AccordionDetails>
       </Accordion>
@@ -43,7 +76,10 @@ function ViewFormulaAccordion({ codeSnippet }) {
 }
 
 ViewFormulaAccordion.propTypes = {
-  codeSnippet: PropTypes.string,
+  formulaId: PropTypes.oneOfType([
+    PropTypes.oneOf(Object.values(Formula)),
+    undefined
+  ])
 };
 
 export default ViewFormulaAccordion;

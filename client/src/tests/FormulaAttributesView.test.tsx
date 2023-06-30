@@ -7,8 +7,8 @@ import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import FormulaAttributesView from '../components/FormulaAttributesView';
-import mockAttainments from '../mock-data/mockAttainments';
-import mockFormulas from '../mock-data/mockFormulas';
+import mockAttainments from './mock-data/mockAttainments';
+import mockFormulas from './mock-data/mockFormulas';
 
 describe('Tests for FormulaAttributesView components', () => {
 
@@ -38,10 +38,10 @@ describe('Tests for FormulaAttributesView components', () => {
     renderFormulaAttributesView();
 
     await waitFor(() => {
-      const headingElement = screen.queryByText('Specify Formula Attributes');
-      const subHeadingElement = screen.queryByText('Result: Course Total Grade');
-      const goBackButton = screen.queryByText('Go back');
-      const confirmButton = screen.queryByText('Confirm');
+      const headingElement: HTMLElement = screen.queryByText('Specify Formula Attributes');
+      const subHeadingElement: HTMLElement = screen.queryByText('Result: Course Total Grade');
+      const goBackButton: HTMLElement = screen.queryByText('Go back');
+      const confirmButton: HTMLElement = screen.queryByText('Confirm');
 
       expect(headingElement).toBeInTheDocument();
       expect(subHeadingElement).toBeInTheDocument();
@@ -60,7 +60,7 @@ describe('Tests for FormulaAttributesView components', () => {
         'Formula attributes saved, you will be redirected to the course page.'
       )).not.toBeInTheDocument();
 
-      const confirmButton = screen.queryByText('Confirm');
+      const confirmButton: HTMLElement = screen.queryByText('Confirm');
       userEvent.click(confirmButton);
 
       expect(await screen

@@ -85,8 +85,8 @@ function getSuggestedAttainments() {
 // duing the creation of an instance.
 
 // Function to assign temporary Ids to attainments.
-function addTemporaryIds(attainments, temporaryId) {
-  let newTemporaryId = temporaryId;
+function addTemporaryIds(attainments, temporaryId: number) {
+  let newTemporaryId: number = temporaryId;
   function addTemporaryId(modifiableAttainments) {
     if (modifiableAttainments.length) {
       modifiableAttainments.forEach((attainment) => {
@@ -113,12 +113,12 @@ function addTemporaryAttainment(attainments, newAttainment) {
 }
 
 // Add an attainment to a temporary list of attainments and give it a temporary id.
-function createTemporaryAttainment(attainments, newAttainment, temporaryId) {
+function createTemporaryAttainment(attainments, newAttainment, temporaryId: number) {
   const updatedAttainments = JSON.parse(JSON.stringify(attainments));
   const updatedNewAttainment = JSON.parse(JSON.stringify(newAttainment));
   updatedNewAttainment.temporaryId = temporaryId;
   updatedAttainments.push(updatedNewAttainment);
-  const newTemporaryId = temporaryId + 1;
+  const newTemporaryId: number = temporaryId + 1;
   return [updatedAttainments, newTemporaryId];
 }
 
@@ -190,7 +190,7 @@ function getSubAttainments(indices, attainments) {
   /*
   let updatedAttainments = JSON.parse(JSON.stringify(attainments));
   let subAttainments = [];
-  for (let i = 0; i < indices.length; i++) {
+  for (let i: number = 0; i < indices.length; i++) {
     const index = indices[i];
     if (updatedAttainments[index] && updatedAttainments[index].subAttainments)
       subAttainments = updatedAttainments[index].subAttainments;

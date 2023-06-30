@@ -4,7 +4,8 @@
 
 import * as yup from 'yup';
 
-import { Formula, FormulaFunction, FormulaImplementation } from '../types/formulas';
+import { FormulaFunction, FormulaImplementation } from '../types/formulas';
+import { Formula, FormulaData } from 'aalto-grades-common/types';
 
 // The registry of formula implementations corresponding to their names, along
 // with a schema specifying what form their user parameters should take.
@@ -21,12 +22,18 @@ const formulaImplementations: Map<Formula, FormulaImplementation> = new Map();
 export function registerFormula(
   formula: Formula,
   formulaFunction: FormulaFunction,
+  codeSnippet: string,
+  name: string,
+  attributes: Array<string>,
   paramSchema: yup.AnyObjectSchema
 ): void {
   formulaImplementations.set(
     formula,
     {
       formulaFunction: formulaFunction,
+      codeSnippet,
+      name,
+      attributes,
       paramSchema: paramSchema
     }
   );
@@ -43,6 +50,19 @@ export async function getFormulaImplementation(
   }
 
   return formulaImplementation;
+}
+
+export async function getAllFormulasBasicData(): Promise<Array<FormulaData>> {
+  const formulas: Array<FormulaData> = [];
+
+  for (const [key, value] of formulaImplementations) {
+    formulas.push({
+      id: key,
+      name: value.name
+    });
+  }
+
+  return formulas;
 }
 
 // Call registerFormula in all formula definition files.
