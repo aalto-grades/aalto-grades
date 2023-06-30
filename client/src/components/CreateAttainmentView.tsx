@@ -2,93 +2,73 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState }  from 'react';
-import {
-  NavigateFunction, Params, useNavigate, useParams, useOutletContext
-} from 'react-router-dom';
+import { SyntheticEvent, useState }  from 'react';
+import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Attainment from './create-attainment/Attainment';
 import attainmentServices from '../services/attainments';
+import { AttainmentData } from 'aalto-grades-common/types';
+import { State } from '../types';
 
-function CreateAttainmentView() {
+function CreateAttainmentView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
-  const { courseId, instanceId, sisuInstanceId }: Params = useParams();
-  let addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId;
+  const { courseId, assessmentModelId }: Params = useParams();
 
-  // If this view is opened during the creation of an instance, get the necessary
-  // data from the context
-  if (sisuInstanceId) {
-    (
-      {
-        addedAttainments, setAddedAttainments,
-        attainmentIncrementId, setIncrementId
-      } = useOutletContext<any>()
-    );
-  }
-
-  // The property 'category' must be specified for each attainment in order to
-  // populate the textfields correctly
-  const [attainments, setAttainments] = useState([{
-    category: '',
+  // TODO: We need to know the root attainment's ID and include it in this
+  const attainment: AttainmentData = {
+    id: -1,
     name: '',
-    date: '',
-    expiryDate: '',
-    affectCalculation: false,
-    formulaAttributes: {},
-    subAttainments: [],
-  }]);
+    tag: '',
+    daysValid: 0,
+    subAttainments: []
+  };
 
-  // Function to add data to the database
-  async function addAttainment(attainmentObject): Promise<void> {
-    try {
-      const attainment = await attainmentServices.addAttainment(
-        courseId, instanceId, attainmentObject
-      );
+  const [attainmentTree, setAttainmentTree]: State<AttainmentData> = useState(attainment);
 
-      console.log(attainment);
-      //navigate('/' + courseId, { replace: true });
-    } catch (exception) {
-      console.log(exception.message);
-    }
+  const [temporaryId, setTemporaryId]: State<number> = useState(-2);
+
+  function getTemporaryId(): number {
+    const id: number = temporaryId;
+    setTemporaryId(temporaryId - 1);
+    return id;
   }
 
-  function handleSubmit(event): void {
+  function deleteAttainment(attainment: AttainmentData): void {
+    function inner(attainment: AttainmentData, tree: AttainmentData) {
+      for (const i in tree.subAttainments) {
+        const subAttainment: AttainmentData = tree.subAttainments[i];
+
+        if (subAttainment.id === attainment.id) {
+          tree.subAttainments.splice(Number(i), 1);
+          setAttainmentTree(structuredClone(attainmentTree));
+          return;
+        }
+
+        inner(attainment, subAttainment);
+      }
+    }
+
+    inner(attainment, attainmentTree);
+  }
+
+  function handleSubmit(event: SyntheticEvent): void {
     event.preventDefault();
     try {
-      // If this view is opened from the course view, add to DB
-      // Else the attainment is being created during the creation of an instance
-      // so only add to the context
-      if (instanceId) {
-        const updatedAttainments = attainmentServices.formatStringsToDates(attainments)[0];
-        addAttainment(updatedAttainments);
-        navigate(-1);
-      } else if (sisuInstanceId) {
-        const temporaryId = attainmentIncrementId;
-        const [updatedAttainments, newTemporaryId] = attainmentServices.createTemporaryAttainment(
-          addedAttainments, attainments[0], temporaryId
-        );
-        setAddedAttainments(updatedAttainments);
-        setIncrementId(newTemporaryId);
-        navigate(-1);
-      }
+      attainmentServices.addAttainment(courseId, assessmentModelId, attainmentTree);
+      navigate(-1);
     } catch (exception) {
       console.log(exception);
     }
-  }
-
-  function removeAttainment(indices): void {
-    const updatedAttainments = attainmentServices.removeAttainment(indices, attainments);
-    setAttainments(updatedAttainments);
   }
 
   return (
     <>
       <Container maxWidth="md" sx={{ textAlign: 'right' }}>
         <Typography variant="h1" align='left' sx={{ flexGrow: 1, mb: 4 }}>
-            Create Study Attainment
+          Create Study Attainment
         </Typography>
         <form>
           <Box sx={{
@@ -102,14 +82,14 @@ function CreateAttainmentView() {
             px: 2,
           }}>
             {/* Create the root attainment */}
-            {/*<Attainment
-              indices={[0]}
-              attainments={attainments}
-              setAttainments={setAttainments}
-              removeAttainment={removeAttainment}
-              temporaryId={attainmentIncrementId}
-              setIncrementId={setIncrementId}
-            />*/}
+            <Attainment
+              attainmentTree={attainmentTree}
+              setAttainmentTree={setAttainmentTree}
+              deleteAttainment={deleteAttainment}
+              getTemporaryId={getTemporaryId}
+              attainment={attainmentTree}
+              formulaAttributeNames={[]}
+            />
           </Box>
           <Button
             size='medium'

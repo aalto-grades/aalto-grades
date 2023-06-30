@@ -189,17 +189,9 @@ function App(): JSX.Element {
                   path=':courseId/instance-summary/:sisuInstanceId'
                   element={<InstanceSummaryView />}
                 />
-                <Route
-                  path=':courseId/create-temporary-attainment/:sisuInstanceId'
-                  element={<CreateAttainmentView />}
-                />
-                <Route
-                  path=':courseId/edit-temporary-attainment/:sisuInstanceId/:attainmentId'
-                  element={<EditAttainmentView />}
-                />
               </Route>
               <Route
-                path=':courseId/create-attainment/:instanceId'
+                path=':courseId/create-attainment/:assessmentModelId'
                 element={<CreateAttainmentView />}
               />
               <Route
