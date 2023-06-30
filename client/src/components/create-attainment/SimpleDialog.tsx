@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState } from 'react';
+import { ChangeEvent, SyntheticEvent, useState } from 'react';
 import PropTypes from 'prop-types';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
@@ -24,20 +24,20 @@ function SimpleDialog(props: {
   attainmentTree: AttainmentData,
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
   attainment: AttainmentData,
-  handleClose: any,
+  handleClose: () => void,
   open: boolean,
 }): JSX.Element {
 
-  const [numOfAttainments, setSubAttainments]: State<string> = useState('1');
+  const [numOfAttainments, setNumOfAttainments]: State<number> = useState(1);
 
   // The value given should be an integer of one or higher
-  const error = !(
-    !isNaN(Number(numOfAttainments))
-    && (Number.isInteger(Number(numOfAttainments)))
-    && (Number(numOfAttainments) >= 1)
+  const error: boolean = !(
+    !isNaN(numOfAttainments)
+    && (Number.isInteger(numOfAttainments))
+    && (numOfAttainments >= 1)
   );
 
-  function handleSubmit(event) {
+  function handleSubmit(event: SyntheticEvent): void {
     event.preventDefault();
     try {
       if (!props.attainment.subAttainments)
@@ -80,18 +80,22 @@ function SimpleDialog(props: {
             error={error}
             helperText={error ? 'Value needs to be a positive integer' : ''}
             sx={{ width: '100%' }}
-            onChange={({ target }) => setSubAttainments(target.value)}
+            onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+              setNumOfAttainments(Number(event.target.value));
+            }}
           />
         </DialogContent>
         <DialogActions>
           <Button size='medium' onClick={props.handleClose}>
             Cancel
           </Button>
-          <Button size='medium' variant='outlined' type='submit' onClick={(event) => {
-            if (!error) {
-              handleSubmit(event);
+          <Button size='medium' variant='outlined' type='submit' onClick={
+            (event: SyntheticEvent): void => {
+              if (!error) {
+                handleSubmit(event);
+              }
             }
-          }}>
+          }>
             Confirm
           </Button>
         </DialogActions>
