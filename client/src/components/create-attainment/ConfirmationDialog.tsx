@@ -20,7 +20,7 @@ function ConfirmationDialog(props: {
   subject: string,
   handleClose: () => void,
   open: boolean
-}) {
+}): JSX.Element {
   return (
     <Dialog open={props.open} >
       <DialogTitle >Delete {props.title}</DialogTitle>
@@ -33,7 +33,7 @@ function ConfirmationDialog(props: {
         <Button size='medium' variant='outlined' onClick={props.handleClose}>
           Cancel
         </Button>
-        <Button size='medium' onClick={() => {
+        <Button size='medium' onClick={(): void => {
           props.deleteAttainment(props.attainment);
           props.handleClose();
         }}>
