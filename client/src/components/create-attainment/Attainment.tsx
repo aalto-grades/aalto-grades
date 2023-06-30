@@ -23,6 +23,13 @@ function Attainment(props: {
    */
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
 
+  // Function to delete any attainment.
+  deleteAttainment: (attainment: AttainmentData) => void,
+
+  // Function to get a temporarily unique ID for attainments that haven't been
+  // added to the database yet.
+  getTemporaryId: () => number,
+
   // The attainment represented by this component. Reference to an attainment
   // in the attainmentTree variable above.
   attainment: AttainmentData,
@@ -38,6 +45,8 @@ function Attainment(props: {
           <ParentAttainment
             attainmentTree={props.attainmentTree}
             setAttainmentTree={props.setAttainmentTree}
+            deleteAttainment={props.deleteAttainment}
+            getTemporaryId={props.getTemporaryId}
             attainment={props.attainment}
             removeAttainment={props.removeAttainment}
             formulaAttributeNames={props.formulaAttributeNames}
@@ -46,6 +55,8 @@ function Attainment(props: {
           <LeafAttainment
             attainmentTree={props.attainmentTree}
             setAttainmentTree={props.setAttainmentTree}
+            deleteAttainment={props.deleteAttainment}
+            getTemporaryId={props.getTemporaryId}
             attainment={props.attainment}
             removeAttainment={props.removeAttainment}
             formulaAttributeNames={props.formulaAttributeNames}
@@ -58,7 +69,9 @@ function Attainment(props: {
 Attainment.propTypes = {
   attainmentTree: PropTypes.object,
   setAttainmentTree: PropTypes.func,
-  indices: PropTypes.array,
+  deleteAttainment: PropTypes.func,
+  getTemporaryId: PropTypes.func,
+  attainment: PropTypes.object,
   formulaAttributeNames: PropTypes.array,
   removeAttainment: PropTypes.func
 };

@@ -15,7 +15,6 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import LeafAttainment from './LeafAttainment';
 import Attainment from './Attainment';
-import attainmentServices from '../../services/attainments';
 import formulasService from '../../services/formulas';
 import { AttainmentData, Formula } from 'aalto-grades-common/types';
 import { State } from '../../types';
@@ -25,6 +24,8 @@ import { State } from '../../types';
 function ParentAttainment(props: {
   attainmentTree: AttainmentData,
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
+  deleteAttainment: (attainment: AttainmentData) => void,
+  getTemporaryId: () => number,
   attainment: AttainmentData,
   formulaAttributeNames: any,
   removeAttainment: any
@@ -76,6 +77,8 @@ function ParentAttainment(props: {
       <LeafAttainment
         attainmentTree={props.attainmentTree}
         setAttainmentTree={props.setAttainmentTree}
+        deleteAttainment={props.deleteAttainment}
+        getTemporaryId={props.getTemporaryId}
         attainment={props.attainment}
         formulaAttributeNames={props.formulaAttributeNames}
         removeAttainment={props.removeAttainment}
@@ -110,6 +113,8 @@ function ParentAttainment(props: {
                       key={i}
                       attainmentTree={props.attainmentTree}
                       setAttainmentTree={props.setAttainmentTree}
+                      deleteAttainment={props.deleteAttainment}
+                      getTemporaryId={props.getTemporaryId}
                       attainment={subAttainment}
                       formulaAttributeNames={
                         subFormulaAttributeNames ? subFormulaAttributeNames : []
@@ -130,6 +135,8 @@ function ParentAttainment(props: {
 ParentAttainment.propTypes = {
   attainmentTree: PropTypes.any,
   setAttainmentTree: PropTypes.func,
+  deleteAttainment: PropTypes.func,
+  getTemporaryId: PropTypes.func,
   attainment: PropTypes.any,
   formulaAttributeNames: PropTypes.array,
   removeAttainment: PropTypes.func

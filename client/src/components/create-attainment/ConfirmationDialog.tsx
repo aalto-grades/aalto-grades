@@ -9,17 +9,17 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import Button from '@mui/material/Button';
+import { AttainmentData } from 'aalto-grades-common/types';
 
 // A Dialog component for confirming deletion
 
 function ConfirmationDialog(props: {
-  title,
-  subject,
-  handleClose,
-  open,
-  deleteAttainment,
-  indices,
-  attainments
+  deleteAttainment: (attainment: AttainmentData) => void,
+  attainment: AttainmentData,
+  title: string,
+  subject: string,
+  handleClose: () => void,
+  open: boolean
 }) {
   return (
     <Dialog open={props.open} >
@@ -34,7 +34,7 @@ function ConfirmationDialog(props: {
           Cancel
         </Button>
         <Button size='medium' onClick={() => {
-          props.deleteAttainment(props.indices, JSON.parse(JSON.stringify(props.attainments)));
+          props.deleteAttainment(props.attainment);
           props.handleClose();
         }}>
           Delete
@@ -45,13 +45,12 @@ function ConfirmationDialog(props: {
 }
 
 ConfirmationDialog.propTypes = {
+  deleteAttainment: PropTypes.func,
+  attainment: PropTypes.object,
   title: PropTypes.string,
   subject: PropTypes.string,
   handleClose: PropTypes.func,
-  open: PropTypes.bool,
-  deleteAttainment: PropTypes.func,
-  attainments: PropTypes.array,
-  indices: PropTypes.array
+  open: PropTypes.bool
 };
 
 export default ConfirmationDialog;

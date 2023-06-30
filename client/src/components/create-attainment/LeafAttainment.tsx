@@ -71,6 +71,8 @@ AttributeTextFields.propTypes = {
 function LeafAttainment(props: {
   attainmentTree: AttainmentData,
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
+  deleteAttainment: (attainment: AttainmentData) => void,
+  getTemporaryId: () => number,
   attainment: AttainmentData,
   formulaAttributeNames: Array<string>,
   removeAttainment: any
@@ -165,13 +167,12 @@ function LeafAttainment(props: {
             <Box sx={{ width: '1px' }} />
         }
         <ConfirmationDialog
+          deleteAttainment={props.deleteAttainment}
+          attainment={props.attainment}
           title={'Sub Study Attainments'}
           subject={'sub study attainment'}
-          open={openConfDialog}
           handleClose={handleConfDialogClose}
-          deleteAttainment={props.removeAttainment}
-          indices={[]}
-          attainments={[]}
+          open={openConfDialog}
         />
         <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
           Create Sub-Attainments
@@ -180,6 +181,7 @@ function LeafAttainment(props: {
       <SimpleDialog
         attainmentTree={props.attainmentTree}
         setAttainmentTree={props.setAttainmentTree}
+        getTemporaryId={props.getTemporaryId}
         attainment={props.attainment}
         handleClose={handleCountDialogClose}
         open={openCountDialog}
@@ -191,6 +193,8 @@ function LeafAttainment(props: {
 LeafAttainment.propTypes = {
   attainmentTree: PropTypes.object,
   setAttainmentTree: PropTypes.func,
+  deleteAttainment: PropTypes.func,
+  getTemporaryId: PropTypes.func,
   attainment: PropTypes.object,
   formulaAttributeNames: PropTypes.array,
   removeAttainment: PropTypes.func

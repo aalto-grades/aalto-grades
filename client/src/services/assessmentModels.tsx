@@ -47,7 +47,7 @@ async function getAllAttainments(
 
   // Brute force some return value until the route for getting all attainments
   // of an assessment model is merged
-  for (let i: number = 0; i < 300; i++) {
+  for (let i: number = 1; i < 300; i++) {
     try {
       response =
         await axios.get(

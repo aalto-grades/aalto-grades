@@ -23,6 +23,7 @@ const numberData: TextFieldData = {
 function SimpleDialog(props: {
   attainmentTree: AttainmentData,
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
+  getTemporaryId: () => number,
   attainment: AttainmentData,
   handleClose: () => void,
   open: boolean,
@@ -43,8 +44,13 @@ function SimpleDialog(props: {
       if (!props.attainment.subAttainments)
         props.attainment.subAttainments = [];
 
+      const parentId: number | undefined =
+        props.attainment.id > 0 ? props.attainment.id : undefined;
+
       for (let n: number = 0; n < Number(numOfAttainments); n++) {
         props.attainment.subAttainments.push({
+          id: props.getTemporaryId(),
+          parentId: parentId,
           name: '',
           tag: '',
           daysValid: 0
@@ -107,6 +113,7 @@ function SimpleDialog(props: {
 SimpleDialog.propTypes = {
   attainmentTree: PropTypes.object,
   setAttainmentTree: PropTypes.func,
+  getTemporaryId: PropTypes.func,
   attainment: PropTypes.object,
   handleClose: PropTypes.func,
   open: PropTypes.bool
