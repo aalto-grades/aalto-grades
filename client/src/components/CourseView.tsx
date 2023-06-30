@@ -11,6 +11,7 @@ import Grow from '@mui/material/Grow';
 import FileLoadDialog from './course-view/FileLoadDialog';
 import CourseDetails from './course-view/CourseDetails';
 import Attainments from './course-view/Attainments';
+import CreateAssessmentModelDialog from './course-view/CreateAssessmentModelDialog';
 import InstancesTable from './course-view/InstancesTable';
 import assessmentModelsService from '../services/assessmentModels';
 import coursesService from '../services/courses';
@@ -40,7 +41,8 @@ function CourseView(): JSX.Element {
   const [instances, setInstances]: State<Array<CourseInstanceData>> = useState([]);
 
   const [animation, setAnimation]: State<boolean> = useState(false);
-  const [open, setOpen]: State<boolean> = useState(false);
+  const [fileLoadOpen, setFileLoadOpen]: State<boolean> = useState(false);
+  const [createAssessmentModelOpen, setCreateAssessmentModelOpen]: State<boolean> = useState(false);
 
   useEffect(() => {
     coursesService.getCourse(courseId)
@@ -79,14 +81,6 @@ function CourseView(): JSX.Element {
     setAnimation(true);
   }, [currentAssessmentModel]);
 
-  function handleClickOpen(): void {
-    setOpen(true);
-  }
-
-  function handleClose(): void {
-    setOpen(false);
-  }
-
   function onChangeAssessmentModel(assessmentModel: AssessmentModelData): void {
     if (assessmentModel.id !== currentAssessmentModel?.id) {
       setAnimation(false);
@@ -119,9 +113,7 @@ function CourseView(): JSX.Element {
                 id='ag_new_assessment_model_btn'
                 size='large'
                 variant='contained'
-                onClick={(): void => {
-                  navigate(`/${courseId}/add-attainments`);
-                }}
+                onClick={(): void => setCreateAssessmentModelOpen(true)}
               >
                 New Assessment Model
               </Button>
@@ -140,7 +132,7 @@ function CourseView(): JSX.Element {
               /* a different attainment component will be created for students */
               auth.role == SystemRole.Admin &&
               <div style={{ width: '100%' }}>
-                { attainmentTree != null ?
+                {attainmentTree != null ?
                   <Grow
                     in={animation}
                     style={{ transformOrigin: '0 0 0' }}
@@ -152,7 +144,7 @@ function CourseView(): JSX.Element {
                         courseId={courseId}
                         formula={'Weighted Average'} /* TODO: Retrieve real formula */
                         assessmentModel={currentAssessmentModel}
-                        handleAddPoints={handleClickOpen}
+                        handleAddPoints={(): void => setFileLoadOpen(true)}
                       />
                     </div>
                   </Grow>
@@ -168,7 +160,7 @@ function CourseView(): JSX.Element {
                     }}>
                       <CircularProgress />
                     </Box>
-                      Loading attainments...
+                    Loading attainments...
                   </div>
                 }
               </div>
@@ -201,8 +193,12 @@ function CourseView(): JSX.Element {
           />
           <FileLoadDialog
             //instanceId={currentInstance.id}
-            open={open}
-            handleClose={handleClose}
+            open={fileLoadOpen}
+            handleClose={(): void => setFileLoadOpen(false)}
+          />
+          <CreateAssessmentModelDialog
+            open={createAssessmentModelOpen}
+            handleClose={(): void => setCreateAssessmentModelOpen(false)}
           />
         </>
       }

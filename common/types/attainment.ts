@@ -13,7 +13,7 @@ export interface AttainmentData {
 }
 
 export interface AssessmentModelData {
-  id: number,
-  courseId: number,
+  id?: number,
+  courseId?: number,
   name: string
 }
