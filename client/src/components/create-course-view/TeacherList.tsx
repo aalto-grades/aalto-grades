@@ -1,50 +1,55 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import { useState } from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, { InferProps } from 'prop-types';
 import Button from '@mui/material/Button';
-import { TextFieldData } from './TextFieldBox';
 import { State } from '../../types';
 import TextField from '@mui/material/TextField';
 import {
-  Avatar, Box, IconButton, List, ListItem, ListItemAvatar, ListItemText
+  Avatar, Box, IconButton, List,
+  ListItem, ListItemAvatar, ListItemText
 } from '@mui/material';
 import { Theme, useTheme } from '@mui/material/styles';
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonIcon from '@mui/icons-material/Person';
 
-const inputProps = {
-  style: {
-    margin: '32px 0px 0px 0px'
-  }
-};
+/*
+        <TeacherList
+          setTeacherList={formik.handleChange}
+          teacherList={formik.values.teachersInCharge}
+        />
 
-function TeacherList(params: {
-  fieldData: TextFieldData,
-  setTeacherList: (value: Array<string>) => void,
-  teacherList: Array<string>
-}): JSX.Element {
+
+*/
+
+function TeacherList(
+  { setTeacherList, teacherList }: InferProps<typeof TeacherList.propTypes>
+): JSX.Element {
   const theme: Theme = useTheme();
   const [teacher, setTeacher]: State<string> = useState('');
+  const [error, setError]: State<string> = useState('');
 
   function addTeacher(): void {
-    if (
-      teacher.length !== 0 &&
-      params.teacherList.filter(
-        (teacherFromList: string) => teacherFromList === teacher).length === 0
-    ) {
-      params.setTeacherList([...params.teacherList, teacher]);
+    if (error.length === 0) {
+      setTeacherList([...teacherList, teacher]);
       setTeacher('');
-    } else {
-      console.log('already on list or empty string');
     }
   }
 
-  function removeTeacher(remove: string): void {
-    params.setTeacherList(params.teacherList.filter((teacher: string) => teacher !== remove));
+  function removeTeacher(value: string): void {
+    setTeacherList(teacherList.filter((teacher: string) => teacher !== value));
+  }
+
+  function changeValue(value: string): void {
+    setTeacher(value);
+    if (teacherList.filter((teacherFromList: string) => teacherFromList === teacher).length !== 0) {
+      setError('Email already on the list.');
+    } else {
+      setError('');
+    }
   }
 
   return (
@@ -58,38 +63,46 @@ function TeacherList(params: {
       p: 2
     }}>
       <TextField
-        id={params.fieldData.fieldId}
-        type={params.fieldData.fieldId}
-        label={params.fieldData.fieldLabel}
+        id='teachers'
+        type='teachers'
+        value={teacher}
+        error={error.length !== 0}
+        label='Teachers in Charge'
         variant='standard'
         color='primary'
-        sx={{ my: 1 }}
+        sx={{ my: 1, width: 330 }}
         InputLabelProps={{
           shrink: true,
           style: {
             fontSize: theme.typography.h2.fontSize
           }
         }}
-        value={teacher}
-        InputProps={inputProps}
-        helperText={params.fieldData.fieldHelperText}
+        InputProps={{
+          style: {
+            margin: '32px 0px 0px 0px'
+          }
+        }}
+        helperText={
+          error.length === 0 ? 'Give the emails of the teachers in charge of the course.' : error
+        }
         onChange={(
           { target }: { target: EventTarget & (HTMLInputElement | HTMLTextAreaElement) }
-        ): void => setTeacher(target.value)}>
+        ): void => changeValue(target.value)}>
       </TextField>
       <Button
         variant="outlined"
         startIcon={<PersonAddAlt1Icon />}
-        onClick={addTeacher}
+        disabled={teacher.length === 0 || error.length !== 0}
+        onClick={(addTeacher)}
       >
         Add
       </Button>
       <Box sx={{ mt: 3, mb: 2 }}>
-        {params.teacherList.length === 0 ?
+        {teacherList.length === 0 ?
           'Add at least one teacher in charge to the course'
           :
           <List dense={true}>
-            {params.teacherList.map((teacherEmail: string) => {
+            {teacherList.map((teacherEmail: string) => {
               return (
                 <ListItem
                   key={teacherEmail}
@@ -123,37 +136,8 @@ function TeacherList(params: {
 }
 
 TeacherList.propTypes = {
-  fieldData: PropTypes.object,
-  fieldId: PropTypes.string,
-  fieldLabel: PropTypes.string,
-  fieldHelperText: PropTypes.string,
-  setFunction: PropTypes.func,
+  setTeacherList: PropTypes.func,
+  teacherList: Array<string>
 };
 
 export default TeacherList;
-
-
-/*
-
-  const [courseCode, setCode]: State<string | null> = useState(null);
-  const [name, setName]: State<string | null> = useState(null);
-  const [department, setOrganizer]: State<string | null> = useState(null);
-  const [teacher, setTeacher]: State<string> = useState('');
-
-  const [teacherList, setTeacherList]: State<Array<string | null>> = useState(null);
-            <ul>
-              { teacherList.map((teacher: string) => {
-                return (
-                  <li key={teacher}>
-                    {teacher}
-                    <Button
-                      variant="outlined"
-                      startIcon={<ClearIcon />}
-                      onClick={(): void => {
-                        removeTeacher(teacher);
-                      }}
-                    />
-                  </li>);
-              })}
-            </ul>
-*/

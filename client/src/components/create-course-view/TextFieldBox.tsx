@@ -13,12 +13,6 @@ export interface TextFieldData {
   fieldHelperText: string
 }
 
-const inputProps = {
-  style: {
-    margin: '32px 0px 0px 0px'
-  }
-};
-
 function TextFieldBox(props: {
   fieldData: TextFieldData,
   setFunction: (value: string) => void
@@ -48,7 +42,11 @@ function TextFieldBox(props: {
             fontSize: theme.typography.h2.fontSize
           }
         }}
-        InputProps={inputProps}
+        InputProps={{
+          style: {
+            margin: '32px 0px 0px 0px'
+          }
+        }}
         helperText={props.fieldData.fieldHelperText}
         onChange={(
           { target }: { target: EventTarget & (HTMLInputElement | HTMLTextAreaElement) }

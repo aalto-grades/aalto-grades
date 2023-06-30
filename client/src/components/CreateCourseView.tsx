@@ -4,14 +4,14 @@
 
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
-import CreateCourseForm from './create-course-view/CreateCourseForm';
+import CreateCourseForm from './create-course-view/Form';
 import coursesService from '../services/courses';
-import { CourseData } from 'aalto-grades-common/types';
+import { NewCourseData } from './create-course-view/Form';
 
 function CreateCourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
 
-  async function addCourse(course: CourseData): Promise<void> {
+  async function addCourse(course: NewCourseData): Promise<void> {
     try {
       const courseId: number = await coursesService.addCourse(course);
       navigate(`/course-view/${courseId}`, { replace: true });

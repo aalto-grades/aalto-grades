@@ -5,6 +5,7 @@
 import axios from './axios';
 import { CourseData } from 'aalto-grades-common/types';
 import { FullResponse, Numeric } from '../types';
+import { NewCourseData } from '../components/create-course-view/Form';
 
 async function getCoursesOfUser(userId: Numeric): Promise<Array<CourseData>> {
 
@@ -30,7 +31,7 @@ async function getAllCourses(): Promise<Array<CourseData>> {
   return response.data.data.courses;
 }
 
-async function addCourse(course: CourseData): Promise<number> {
+async function addCourse(course: NewCourseData): Promise<number> {
 
   const response: FullResponse<{ course: { id: number } }> =
     await axios.post('/v1/courses', course);
