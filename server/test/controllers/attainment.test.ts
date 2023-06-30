@@ -738,7 +738,7 @@ describe(
       expect(res.body.success).toBe(true);
       expect(res.body.data).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data, 2, 2, true);
+      verifyAttainmentData(res.body.data.attainment, 2, 2, true);
       verifyAttainmentData(res.body.data.attainment.subAttainments[1], 6, 2, true);
       verifyAttainmentData(
         res.body.data.attainment.subAttainments[1].subAttainments[0],
