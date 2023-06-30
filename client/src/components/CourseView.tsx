@@ -95,6 +95,14 @@ function CourseView(): JSX.Element {
     }
   }
 
+  function onCreateAssessmentModel(): void {
+    assessmentModelsService.getAllAssessmentModels(courseId)
+      .then((assessmentModels: Array<AssessmentModelData>) => {
+        setAssessmentModels(assessmentModels);
+      })
+      .catch((e: Error) => console.log(e.message));
+  }
+
   return (
     <Box sx={{ mx: -2.5 }}>
       {
@@ -199,6 +207,7 @@ function CourseView(): JSX.Element {
           <CreateAssessmentModelDialog
             open={createAssessmentModelOpen}
             handleClose={(): void => setCreateAssessmentModelOpen(false)}
+            onSubmit={onCreateAssessmentModel}
           />
         </>
       }

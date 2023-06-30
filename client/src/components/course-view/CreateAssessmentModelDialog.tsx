@@ -17,7 +17,8 @@ import { State } from '../../types';
 
 function CreateAssessmentModelDialog(props: {
   handleClose: () => void,
-  open: boolean
+  open: boolean,
+  onSubmit: () => void
 }): JSX.Element {
   const { courseId }: Params = useParams();
 
@@ -37,6 +38,7 @@ function CreateAssessmentModelDialog(props: {
       });
 
       props.handleClose();
+      props.onSubmit();
       setName('');
     } catch (exception) {
       console.log(exception);
@@ -57,9 +59,7 @@ function CreateAssessmentModelDialog(props: {
               InputLabelProps={{ shrink: true }}
               margin='normal'
               value={name}
-              onChange={
-                (event: ChangeEvent<HTMLInputElement>): void => setName(event.target.value)
-              }
+              onChange={(event: ChangeEvent<HTMLInputElement>): void => setName(event.target.value)}
             />
             <Box sx={{
               display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
@@ -88,7 +88,8 @@ function CreateAssessmentModelDialog(props: {
 
 CreateAssessmentModelDialog.propTypes = {
   handleClose: PropTypes.func,
-  open: PropTypes.bool
+  open: PropTypes.bool,
+  onSubmit: PropTypes.func
 };
 
 export default CreateAssessmentModelDialog;
