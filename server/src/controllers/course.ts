@@ -14,6 +14,7 @@ import User from '../database/models/user';
 
 import { CourseData } from 'aalto-grades-common/types/course';
 import { Language } from 'aalto-grades-common/types/language';
+import { ApiError } from '../types/error';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { localizedStringSchema } from '../types/language';
@@ -67,21 +68,34 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
     courseCode: yup.string().required(),
     minCredits: yup.number().min(0).required(),
     maxCredits: yup.number().min(yup.ref('minCredits')).required(),
-    teachersInCharge: yup.array().of(
-      yup.object().shape({
-        id: yup.number().required()
-      })
+    teachersInCharge: yup.array().min(1).of(
+      yup.string().email().required()
     ).required(),
     department: localizedStringSchema.required(),
     name: localizedStringSchema.required()
   });
 
-  /*
-   * TODO: Check that the requester is authorized to add a course instance, 403
-   * Forbidden if not
-   */
-
   await requestSchema.validate(req.body, { abortEarly: false });
+
+  const teachers: Array<User> = await User.findAll({
+    attributes: ['id', 'email'],
+    where: {
+      email: req.body.teachersInCharge
+    }
+  });
+
+  // Check for non existent emails.
+  if (req.body.teachersInCharge.length !== teachers.length) {
+    const missingEmails: Array<string> =
+      req.body.teachersInCharge.filter(
+        (teacher: string) => teachers.map((user: User) => user.email).indexOf(teacher) === -1
+      );
+
+    throw new ApiError(
+      missingEmails.map((email: string) => `No user with email address ${email} found`),
+      HttpCode.NotFound
+    );
+  }
 
   const course: Course = await sequelize.transaction(
     async (t: Transaction): Promise<Course> => {
@@ -113,14 +127,14 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
         }
       ], { transaction: t });
 
-      const teachersInCharge: Array<TeacherInCharge> = req.body.teachersInCharge.map(
-        (teacher: { id: number }) => {
+      const teachersInCharge: Array<TeacherInCharge> = teachers.map(
+        (teacher: User) => {
           return {
             courseId: course.id,
             userId: teacher.id
           };
         }
-      );
+      ) as Array<TeacherInCharge>;
 
       await TeacherInCharge.bulkCreate(teachersInCharge, { transaction: t });
 
