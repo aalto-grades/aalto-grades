@@ -148,6 +148,7 @@ function EditAttainmentView(): JSX.Element {
                 deleteAttainment={deleteAttainment}
                 getTemporaryId={getTemporaryId}
                 attainment={attainmentTree}
+                formulaAttributeNames={[]}
               />
             }
           </Box>

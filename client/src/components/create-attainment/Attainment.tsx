@@ -34,9 +34,8 @@ function Attainment(props: {
   // in the attainmentTree variable above.
   attainment: AttainmentData,
 
-  formulaAttributeNames: any,
-  removeAttainment: any
-}) {
+  formulaAttributeNames: Array<string>,
+}): JSX.Element {
   return (
     <>
       {
@@ -48,7 +47,6 @@ function Attainment(props: {
             deleteAttainment={props.deleteAttainment}
             getTemporaryId={props.getTemporaryId}
             attainment={props.attainment}
-            removeAttainment={props.removeAttainment}
             formulaAttributeNames={props.formulaAttributeNames}
           />
           :
@@ -58,7 +56,6 @@ function Attainment(props: {
             deleteAttainment={props.deleteAttainment}
             getTemporaryId={props.getTemporaryId}
             attainment={props.attainment}
-            removeAttainment={props.removeAttainment}
             formulaAttributeNames={props.formulaAttributeNames}
           />
       }
@@ -72,8 +69,7 @@ Attainment.propTypes = {
   deleteAttainment: PropTypes.func,
   getTemporaryId: PropTypes.func,
   attainment: PropTypes.object,
-  formulaAttributeNames: PropTypes.array,
-  removeAttainment: PropTypes.func
+  formulaAttributeNames: PropTypes.array
 };
 
 export default Attainment;

@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import PropTypes, { InferProps } from 'prop-types';
+import PropTypes from 'prop-types';
 import List from '@mui/material/List';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -27,8 +27,7 @@ function ParentAttainment(props: {
   deleteAttainment: (attainment: AttainmentData) => void,
   getTemporaryId: () => number,
   attainment: AttainmentData,
-  formulaAttributeNames: any,
-  removeAttainment: any
+  formulaAttributeNames: Array<string>
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
 
@@ -81,7 +80,6 @@ function ParentAttainment(props: {
         getTemporaryId={props.getTemporaryId}
         attainment={props.attainment}
         formulaAttributeNames={props.formulaAttributeNames}
-        removeAttainment={props.removeAttainment}
       />
       <Box sx={{ display: 'flex', flexDirection: 'row' }}>
         {open ?
@@ -119,7 +117,6 @@ function ParentAttainment(props: {
                       formulaAttributeNames={
                         subFormulaAttributeNames ? subFormulaAttributeNames : []
                       }
-                      removeAttainment={props.removeAttainment}
                     />
                   )
                 )
@@ -138,8 +135,7 @@ ParentAttainment.propTypes = {
   deleteAttainment: PropTypes.func,
   getTemporaryId: PropTypes.func,
   attainment: PropTypes.any,
-  formulaAttributeNames: PropTypes.array,
-  removeAttainment: PropTypes.func
+  formulaAttributeNames: PropTypes.array
 };
 
 export default ParentAttainment;

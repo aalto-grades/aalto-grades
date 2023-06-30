@@ -74,8 +74,7 @@ function LeafAttainment(props: {
   deleteAttainment: (attainment: AttainmentData) => void,
   getTemporaryId: () => number,
   attainment: AttainmentData,
-  formulaAttributeNames: Array<string>,
-  removeAttainment: any
+  formulaAttributeNames: Array<string>
 }): JSX.Element {
 
   // Functions and variables for opening and closing the dialog that asks for
@@ -196,8 +195,7 @@ LeafAttainment.propTypes = {
   deleteAttainment: PropTypes.func,
   getTemporaryId: PropTypes.func,
   attainment: PropTypes.object,
-  formulaAttributeNames: PropTypes.array,
-  removeAttainment: PropTypes.func
+  formulaAttributeNames: PropTypes.array
 };
 
 export default LeafAttainment;
