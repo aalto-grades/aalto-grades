@@ -13,7 +13,7 @@ import ConfirmationDialog from './ConfirmationDialog';
 import StringTextField from './StringTextField';
 import attainmentServices from '../../services/attainments';
 import formulaService from '../../services/formulas';
-import { TextFieldData } from '../../types';
+import { State, TextFieldData } from '../../types';
 import { AttainmentData } from 'aalto-grades-common/types';
 
 // An Assignmnet component without subAttainments and hence without a formula as well.
@@ -72,47 +72,31 @@ function LeafAttainment(props: {
   attainmentTree: AttainmentData,
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
   attainment: AttainmentData,
-  formulaAttributeNames: any,
+  formulaAttributeNames: Array<string>,
   removeAttainment: any
 }): JSX.Element {
 
-  // Functions and varibales for handling the change of the value in the 'Name'
-  // (category) textfield. If the value is 'Other', then the 'New Name' textfield
-  // is displayed; otherwise the name is the same as the category
-  function handleChange(event) {
-    const value = event.target.value;
-    //let updatedAttainments = attainmentServices.setProperty(
-    //  indices, attainmentTree, 'category', value
-    //);
-
-    //updatedAttainments = attainmentServices.setProperty(
-    //  indices, updatedAttainments, 'name', ''
-    //);
-
-    //setAttainmentTree(updatedAttainments);
-  }
-
-  // Functions and varibales for opening and closing the dialog that asks for
+  // Functions and variables for opening and closing the dialog that asks for
   // the number of sub-attainments
-  const [openCountDialog, setOpenCountDialog] = useState<any>(false);
+  const [openCountDialog, setOpenCountDialog]: State<boolean> = useState(false);
 
-  function handleCountDialogOpen() {
+  function handleCountDialogOpen(): void {
     setOpenCountDialog(true);
   }
 
-  function handleCountDialogClose() {
+  function handleCountDialogClose(): void {
     setOpenCountDialog(false);
   }
 
   // Functions and varibales for opening and closing the dialog for confirming
   // sub-attainment deletion
-  const [openConfDialog, setOpenConfDialog] = useState<boolean>(false);
+  const [openConfDialog, setOpenConfDialog]: State<boolean> = useState(false);
 
-  function handleConfDialogOpen() {
+  function handleConfDialogOpen(): void {
     setOpenConfDialog(true);
   }
 
-  function handleConfDialogClose() {
+  function handleConfDialogClose(): void {
     setOpenConfDialog(false);
   }
 

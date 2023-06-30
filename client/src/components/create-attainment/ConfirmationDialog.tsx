@@ -12,24 +12,30 @@ import Button from '@mui/material/Button';
 
 // A Dialog component for confirming deletion
 
-function ConfirmationDialog({
-  title, subject, handleClose, open, deleteAttainment, indices, attainments
+function ConfirmationDialog(props: {
+  title,
+  subject,
+  handleClose,
+  open,
+  deleteAttainment,
+  indices,
+  attainments
 }) {
   return (
-    <Dialog open={open} >
-      <DialogTitle >Delete {title}</DialogTitle>
+    <Dialog open={props.open} >
+      <DialogTitle >Delete {props.title}</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Are you sure you want to delete this {subject} and all of the attainments below it?
+          Are you sure you want to delete this {props.subject} and all of the attainments below it?
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button size='medium' variant='outlined' onClick={handleClose}>
+        <Button size='medium' variant='outlined' onClick={props.handleClose}>
           Cancel
         </Button>
         <Button size='medium' onClick={() => {
-          deleteAttainment(indices, JSON.parse(JSON.stringify(attainments)));
-          handleClose();
+          props.deleteAttainment(props.indices, JSON.parse(JSON.stringify(props.attainments)));
+          props.handleClose();
         }}>
           Delete
         </Button>

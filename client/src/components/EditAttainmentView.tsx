@@ -3,9 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { JSX, useEffect, useState }  from 'react';
-import {
-  NavigateFunction, Params, useParams, useNavigate, useOutletContext
-} from 'react-router-dom';
+import { NavigateFunction, Params, useParams, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
@@ -19,12 +17,11 @@ import { State } from '../types';
 function EditAttainmentView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { courseId, assessmentModelId, attainmentId }: Params = useParams();
-  let attainmentIncrementId, setIncrementId;
 
   const [attainmentTree, setAttainmentTree]: State<AttainmentData> = useState(null);
-  const [deletedAttainments, setDeletedAttainments] = useState([]);
+  const [deletedAttainments, setDeletedAttainments]: State<Array<AttainmentData>> = useState([]);
 
-  const [openConfDialog, setOpenConfDialog] = useState(false);
+  const [openConfDialog, setOpenConfDialog]: State<boolean> = useState(false);
 
   useEffect(() => {
     attainmentServices.getAttainment(courseId, assessmentModelId, attainmentId, 'descendants')
@@ -95,19 +92,15 @@ function EditAttainmentView(): JSX.Element {
         //const newAttainments = attainmentServices.getNewAttainments(updatedAttainments);
         //existingAttainments.forEach((attainment) => editAttainment(attainment));
         //newAttainments.forEach((attainment) => addAttainment(attainment));
-        deletedAttainments.forEach((attainment) => {
-          if (attainment.id)
-            deleteAttainment(attainment.id);
-        });
-        navigate(-1);
-      }/* else if (sisuInstanceId) {
-        const updatedAttainments = attainmentServices.updateTemporaryAttainment(
-          addedAttainments, attainments[0]
+        //deletedAttainments.forEach((attainment) => {
+        //  if (attainment.id)
+        //    deleteAttainment(attainment.id);
+        //});
+        attainmentServices.editAttainment(
+          courseId, assessmentModelId, attainmentTree
         );
-
-        setAddedAttainments(updatedAttainments);
         navigate(-1);
-      }*/
+      }
     } catch (exception) {
       console.log(exception);
     }
@@ -164,15 +157,15 @@ function EditAttainmentView(): JSX.Element {
               />
             }
           </Box>
-          {/*<ConfirmationDialog
+          <ConfirmationDialog
             title={'Study Attainment'}
             subject={'study attainment'}
             open={openConfDialog}
             handleClose={handleConfDialogClose}
             deleteAttainment={removeAttainment}
             indices={[0]}
-            attainments={attainments}
-          />*/}
+            attainments={[attainmentTree]}
+          />
           <Box sx={{
             display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
             alignItems: 'center', gap: 1, mt: 2, mb: 1
