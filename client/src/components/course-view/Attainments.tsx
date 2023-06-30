@@ -80,7 +80,10 @@ function Attainments(props: {
         alignItems: 'center', gap: 1, mt: 2, mb: 1
       }}>
         <Button onClick={(): void => {
-          navigate(`/${props.courseId}/create-attainment/${props.assessmentModel.id}`);
+          navigate(
+            `/${props.courseId}/create-attainment`
+            + `/${props.assessmentModel.id}/${props.attainmentTree.id}`
+          );
         }}>
           Add attainment
         </Button>

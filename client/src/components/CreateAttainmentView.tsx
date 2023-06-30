@@ -15,11 +15,11 @@ import { State } from '../types';
 
 function CreateAttainmentView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
-  const { courseId, assessmentModelId }: Params = useParams();
+  const { courseId, assessmentModelId, rootAttainmentId }: Params = useParams();
 
-  // TODO: We need to know the root attainment's ID and include it in this
   const attainment: AttainmentData = {
     id: -1,
+    parentId: Number(rootAttainmentId),
     name: '',
     tag: '',
     daysValid: 0,
