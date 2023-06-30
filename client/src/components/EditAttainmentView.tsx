@@ -157,12 +157,10 @@ function EditAttainmentView(): JSX.Element {
             {
               attainmentTree &&
               <Attainment
-                indices={[0]}
                 attainmentTree={attainmentTree}
                 setAttainmentTree={setAttainmentTree}
+                attainment={attainmentTree}
                 removeAttainment={removeAttainment}
-                temporaryId={attainmentIncrementId}
-                setIncrementId={setIncrementId}
               />
             }
           </Box>

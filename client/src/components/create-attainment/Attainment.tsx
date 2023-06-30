@@ -5,53 +5,50 @@
 import PropTypes from 'prop-types';
 import LeafAttainment from './LeafAttainment';
 import ParentAttainment from './ParentAttainment';
-import attainmentServices from '../../services/attainments';
 import { AttainmentData } from 'aalto-grades-common/types';
 
 // Parent component for the components LeafAttainment and ParentAttainment
 
 function Attainment(props: {
+  // The full tree of attainments being considered
   attainmentTree: AttainmentData,
+
+  /*
+   * Setter for attainmentTree above. Whenever attainmentTree has been changed,
+   * call setAttainmentTree in the following way so React will re-render the
+   * view: setAttainmentTree(structuredClone(attainmentTree))
+   *
+   * structuredClone is necessary because objects are passed by reference and
+   * otherwise a re-render will not be triggered.
+   */
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
-  indices: Array<number>,
-  removeAttainment: any,
+
+  // The attainment represented by this component. Reference to an attainment
+  // in the attainmentTree variable above.
+  attainment: AttainmentData,
+
   formulaAttributeNames: any,
-  temporaryId: any,
-  setIncrementId: any
+  removeAttainment: any
 }) {
-
-  function addSubAttainments(numOfAttainments: number): void {
-    /*const [updatedAttainments, newTemporaryId] = attainmentServices.addSubAttainments(
-      indices, attainments, numOfAttainments, temporaryId
-    );
-
-    setAttainments(updatedAttainments);
-    if (setIncrementId)
-      setIncrementId(newTemporaryId);*/
-  }
-
   return (
     <>
       {
-        (!props.attainmentTree.subAttainments || props.attainmentTree.subAttainments.length === 0) ?
-          <LeafAttainment
-            indices={props.indices}
-            addSubAttainments={addSubAttainments}
+        (props.attainmentTree.subAttainments && props.attainmentTree.subAttainments.length > 0)
+          ?
+          <ParentAttainment
             attainmentTree={props.attainmentTree}
             setAttainmentTree={props.setAttainmentTree}
+            attainment={props.attainment}
             removeAttainment={props.removeAttainment}
             formulaAttributeNames={props.formulaAttributeNames}
           />
           :
-          <ParentAttainment
-            indices={props.indices}
-            addSubAttainments={addSubAttainments}
+          <LeafAttainment
             attainmentTree={props.attainmentTree}
             setAttainmentTree={props.setAttainmentTree}
+            attainment={props.attainment}
             removeAttainment={props.removeAttainment}
             formulaAttributeNames={props.formulaAttributeNames}
-            temporaryId={props.temporaryId}
-            setIncrementId={props.setIncrementId}
           />
       }
     </>
@@ -62,10 +59,8 @@ Attainment.propTypes = {
   attainmentTree: PropTypes.object,
   setAttainmentTree: PropTypes.func,
   indices: PropTypes.array,
-  removeAttainment: PropTypes.func,
   formulaAttributeNames: PropTypes.array,
-  temporaryId: PropTypes.number,
-  setIncrementId: PropTypes.func
+  removeAttainment: PropTypes.func
 };
 
 export default Attainment;

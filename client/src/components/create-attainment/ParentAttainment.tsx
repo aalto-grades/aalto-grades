@@ -22,13 +22,16 @@ import { State } from '../../types';
 
 // An Assignmnet component with subAttainments and a formula
 
-function ParentAttainment({
-  indices, addSubAttainments, setAttainmentTree, attainmentTree, removeAttainment,
-  formulaAttributeNames, temporaryId, setIncrementId
-}: InferProps<typeof ParentAttainment.propTypes>): JSX.Element {
+function ParentAttainment(props: {
+  attainmentTree: AttainmentData,
+  setAttainmentTree: (attainmentTree: AttainmentData) => void,
+  attainment: AttainmentData,
+  formulaAttributeNames: any,
+  removeAttainment: any
+}): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
 
-  // Functions and varibales for opening and closing the list of sub-attainments
+  // Functions and variables for opening and closing the list of sub-attainments
   const [open, setOpen]: State<boolean> = useState(true);
 
   function handleClick(): void {
@@ -71,12 +74,11 @@ function ParentAttainment({
         </Button>
       </Box>
       <LeafAttainment
-        indices={indices}
-        addSubAttainments={addSubAttainments}
-        attainmentTree={attainmentTree}
-        setAttainmentTree={setAttainmentTree}
-        removeAttainment={removeAttainment}
-        formulaAttributeNames={formulaAttributeNames}
+        attainmentTree={props.attainmentTree}
+        setAttainmentTree={props.setAttainmentTree}
+        attainment={props.attainment}
+        formulaAttributeNames={props.formulaAttributeNames}
+        removeAttainment={props.removeAttainment}
       />
       <Box sx={{ display: 'flex', flexDirection: 'row' }}>
         {open ?
@@ -102,18 +104,20 @@ function ParentAttainment({
           <Collapse in={open} timeout='auto' unmountOnExit>
             <List disablePadding>
               {
-                attainmentTree.subAttainments.map((item: AttainmentData, i: number) => (
-                  <Attainment
-                    indices={indices.concat(i)}
-                    key={i}
-                    attainmentTree={item}
-                    setAttainmentTree={setAttainmentTree}
-                    removeAttainment={removeAttainment}
-                    formulaAttributeNames={subFormulaAttributeNames ? subFormulaAttributeNames : []}
-                    temporaryId={temporaryId}
-                    setIncrementId={setIncrementId}
-                  />
-                ))
+                props.attainment.subAttainments && props.attainment.subAttainments.map(
+                  (subAttainment: AttainmentData, i: number) => (
+                    <Attainment
+                      key={i}
+                      attainmentTree={props.attainmentTree}
+                      setAttainmentTree={props.setAttainmentTree}
+                      attainment={subAttainment}
+                      formulaAttributeNames={
+                        subFormulaAttributeNames ? subFormulaAttributeNames : []
+                      }
+                      removeAttainment={props.removeAttainment}
+                    />
+                  )
+                )
               }
             </List>
           </Collapse>
@@ -124,14 +128,11 @@ function ParentAttainment({
 }
 
 ParentAttainment.propTypes = {
-  addSubAttainments: PropTypes.func,
-  indices: PropTypes.array,
   attainmentTree: PropTypes.any,
   setAttainmentTree: PropTypes.func,
-  removeAttainment: PropTypes.func,
+  attainment: PropTypes.any,
   formulaAttributeNames: PropTypes.array,
-  temporaryId: PropTypes.number,
-  setIncrementId: PropTypes.func
+  removeAttainment: PropTypes.func
 };
 
 export default ParentAttainment;

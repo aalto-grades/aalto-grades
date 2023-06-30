@@ -11,10 +11,10 @@ import MenuItem from '@mui/material/MenuItem';
 import SimpleDialog from './SimpleDialog';
 import ConfirmationDialog from './ConfirmationDialog';
 import StringTextField from './StringTextField';
-import DateTextField from './DateTextField';
 import attainmentServices from '../../services/attainments';
 import formulaService from '../../services/formulas';
 import { TextFieldData } from '../../types';
+import { AttainmentData } from 'aalto-grades-common/types';
 
 // An Assignmnet component without subAttainments and hence without a formula as well.
 // If this isn't the root Attainment, this can be deleted
@@ -67,23 +67,26 @@ AttributeTextFields.propTypes = {
   removeAttainment: PropTypes.func
 };
 
-function LeafAttainment({
-  indices, addSubAttainments, setAttainmentTree,
-  attainmentTree, removeAttainment, formulaAttributeNames
-}) {
+function LeafAttainment(props: {
+  attainmentTree: AttainmentData,
+  setAttainmentTree: (attainmentTree: AttainmentData) => void,
+  attainment: AttainmentData,
+  formulaAttributeNames: any,
+  removeAttainment: any
+}): JSX.Element {
 
   // Functions and varibales for handling the change of the value in the 'Name'
   // (category) textfield. If the value is 'Other', then the 'New Name' textfield
   // is displayed; otherwise the name is the same as the category
   function handleChange(event) {
     const value = event.target.value;
-    let updatedAttainments = attainmentServices.setProperty(
-      indices, attainmentTree, 'category', value
-    );
+    //let updatedAttainments = attainmentServices.setProperty(
+    //  indices, attainmentTree, 'category', value
+    //);
 
-    updatedAttainments = attainmentServices.setProperty(
-      indices, updatedAttainments, 'name', ''
-    );
+    //updatedAttainments = attainmentServices.setProperty(
+    //  indices, updatedAttainments, 'name', ''
+    //);
 
     //setAttainmentTree(updatedAttainments);
   }
@@ -133,30 +136,30 @@ function LeafAttainment({
       }}>
         <StringTextField
           fieldData={nameData}
-          indices={indices}
-          value={attainmentTree.name}
-          setAttainmentTree={setAttainmentTree}
-          attainmentTree={attainmentTree}
+          indices={[]}
+          value={props.attainment.name}
+          setAttainmentTree={props.setAttainmentTree}
+          attainmentTree={props.attainmentTree}
         />
         <StringTextField
           fieldData={tagData}
-          indices={indices}
-          value={attainmentTree.tag}
-          setAttainmentTree={setAttainmentTree}
-          attainmentTree={attainmentTree}
+          indices={[]}
+          value={props.attainment.tag}
+          setAttainmentTree={props.setAttainmentTree}
+          attainmentTree={props.attainmentTree}
         />
         <StringTextField
           fieldData={daysValidData}
-          indices={indices}
-          value={attainmentTree.daysValid}
-          setAttainmentTree={setAttainmentTree}
-          attainmentTree={attainmentTree}
+          indices={[]}
+          value={String(props.attainmentTree.daysValid)}
+          setAttainmentTree={props.setAttainmentTree}
+          attainmentTree={props.attainmentTree}
         />
         {
-          formulaAttributeNames &&
+          props.formulaAttributeNames &&
           <AttributeTextFields
-            formulaAttributeNames={formulaAttributeNames}
-            indices={indices}
+            formulaAttributeNames={props.formulaAttributeNames}
+            indices={[]}
             setAttainments={() => {}}
             attainments={[]}
           />
@@ -169,7 +172,7 @@ function LeafAttainment({
         justifyContent: 'space-between'
       }}>
         {
-          JSON.stringify(indices) !== '[0]' ?
+          props.attainment !== props.attainmentTree ?
             <Button size='small' sx={{ my: 1 }} onClick={handleConfDialogOpen}>
               Delete
             </Button>
@@ -181,8 +184,8 @@ function LeafAttainment({
           subject={'sub study attainment'}
           open={openConfDialog}
           handleClose={handleConfDialogClose}
-          deleteAttainment={removeAttainment}
-          indices={indices}
+          deleteAttainment={props.removeAttainment}
+          indices={[]}
           attainments={[]}
         />
         <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
@@ -190,23 +193,22 @@ function LeafAttainment({
         </Button>
       </Box>
       <SimpleDialog
-        open={openCountDialog}
+        attainmentTree={props.attainmentTree}
+        setAttainmentTree={props.setAttainmentTree}
+        attainment={props.attainment}
         handleClose={handleCountDialogClose}
-        addSubAttainments={addSubAttainments}
-        indices={indices}
-        attainments={[]}
+        open={openCountDialog}
       />
     </Box>
   );
 }
 
 LeafAttainment.propTypes = {
-  addSubAttainments: PropTypes.func,
-  indices: PropTypes.array,
   attainmentTree: PropTypes.object,
   setAttainmentTree: PropTypes.func,
-  removeAttainment: PropTypes.func,
+  attainment: PropTypes.object,
   formulaAttributeNames: PropTypes.array,
+  removeAttainment: PropTypes.func
 };
 
 export default LeafAttainment;
