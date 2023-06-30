@@ -20,12 +20,12 @@ import { AttainmentData } from 'aalto-grades-common/types';
 // If this isn't the root Attainment, this can be deleted
 
 const nameData: TextFieldData = {
-  fieldId: 'attainmentName',
+  fieldId: 'name',
   fieldLabel: 'Name'
 };
 
 const tagData: TextFieldData = {
-  fieldId: 'attainmentTag',
+  fieldId: 'tag',
   fieldLabel: 'Tag'
 };
 
@@ -50,9 +50,10 @@ function AttributeTextFields({
         <StringTextField
           key={attribute}
           fieldData={{ fieldId: 'attribute_' + attribute, fieldLabel: attributeLabel }}
-          indices={indices}
+          attainment={attainments}
           setAttainmentTree={setAttainments}
           attainmentTree={attainments}
+          value={''}
         />
       );
     })
@@ -135,25 +136,25 @@ function LeafAttainment(props: {
         mt: 2,
       }}>
         <StringTextField
-          fieldData={nameData}
-          indices={[]}
+          attainmentTree={props.attainmentTree}
+          setAttainmentTree={props.setAttainmentTree}
+          attainment={props.attainment}
           value={props.attainment.name}
-          setAttainmentTree={props.setAttainmentTree}
-          attainmentTree={props.attainmentTree}
+          fieldData={nameData}
         />
         <StringTextField
-          fieldData={tagData}
-          indices={[]}
+          attainmentTree={props.attainmentTree}
+          setAttainmentTree={props.setAttainmentTree}
+          attainment={props.attainment}
           value={props.attainment.tag}
-          setAttainmentTree={props.setAttainmentTree}
-          attainmentTree={props.attainmentTree}
+          fieldData={tagData}
         />
         <StringTextField
-          fieldData={daysValidData}
-          indices={[]}
-          value={String(props.attainmentTree.daysValid)}
-          setAttainmentTree={props.setAttainmentTree}
           attainmentTree={props.attainmentTree}
+          setAttainmentTree={props.setAttainmentTree}
+          attainment={props.attainment}
+          value={String(props.attainmentTree.daysValid)}
+          fieldData={daysValidData}
         />
         {
           props.formulaAttributeNames &&
