@@ -51,6 +51,14 @@ export const router: Router = Router();
  *     type: integer
  *     description: Maximum amount credits student can receive from passing the course.
  *     example: 5
+ *   teachersInCharge:
+ *     type: array
+ *     items:
+ *       description: Teachers email address.
+ *       example: john.doe@aalto.fi
+ *       type: string
+ *     description: Email address of each teacher in charge added to the course.
+ *     example: [john.doe@aalto.fi, jane.doe@aalto.fi]
  *   CourseData:
  *     type: object
  *     description: Course general information with translations.
@@ -178,6 +186,8 @@ router.get(
  *                 $ref: '#/definitions/LocalizedString'
  *               name:
  *                 $ref: '#/definitions/LocalizedString'
+ *               teachersInCharge:
+ *                 $ref: '#/definitions/teachersInCharge'
  *     responses:
  *       200:
  *         description: The course was successfully created.
@@ -206,6 +216,12 @@ router.get(
  *         $ref: '#/components/responses/AuthenticationError'
  *       403:
  *         $ref: '#/components/responses/AuthorizationError'
+ *       404:
+ *         description: Teacher(s) not found based on email.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
  *     security:
  *       - cookieAuth: []
  */
