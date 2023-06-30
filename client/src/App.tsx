@@ -19,7 +19,6 @@ import CourseView from './components/CourseView';
 import CreateCourseView from './components/CreateCourseView';
 import FetchInstancesView from './components/FetchInstancesView';
 import EditInstanceView from './components/EditInstanceView';
-import AddAttainmentsView from './components/AddAttainmentsView';
 import InstanceSummaryView from './components/InstanceSummaryView';
 import SelectFormulaView from './components/SelectFormulaView';
 import FormulaAttributesView from './components/FormulaAttributesView';
@@ -180,10 +179,6 @@ function App(): JSX.Element {
                 <Route
                   path=':courseId/edit-instance/:sisuInstanceId'
                   element={<EditInstanceView />}
-                />
-                <Route
-                  path=':courseId/add-attainments'
-                  element={<AddAttainmentsView />}
                 />
                 <Route
                   path=':courseId/instance-summary/:sisuInstanceId'
