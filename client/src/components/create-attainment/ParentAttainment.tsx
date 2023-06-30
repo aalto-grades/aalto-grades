@@ -46,7 +46,8 @@ function ParentAttainment({
      component are the attributes that need to specified for this attainment,
      so that the grade of this attainment's parent attainment can be calculated.
   */
-  const formulaId: Formula = Formula.WeightedAverage; //attainmentServices.getProperty(indices, attainments, 'formulaId');
+  //const formulaId: Formula = attainmentServices.getProperty(indices, attainments, 'formulaId');
+  const formulaId: Formula = Formula.WeightedAverage;
   const formulaName: string = formulasService.getFormulaName(formulaId);
   const subFormulaAttributeNames: Array<string> = formulasService.getFormulaAttributes(formulaId);
 
