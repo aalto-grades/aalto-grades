@@ -14,16 +14,22 @@ import StringTextField from './StringTextField';
 import DateTextField from './DateTextField';
 import attainmentServices from '../../services/attainments';
 import formulaService from '../../services/formulas';
+import { TextFieldData } from '../../types';
 
 // An Assignmnet component without subAttainments and hence without a formula as well.
 // If this isn't the root Attainment, this can be deleted
 
-const nameData = {
+const nameData: TextFieldData = {
   fieldId: 'attainmentName',
-  fieldLabel: 'New Name'
+  fieldLabel: 'Name'
 };
 
-const daysValidData = {
+const tagData: TextFieldData = {
+  fieldId: 'attainmentTag',
+  fieldLabel: 'Tag'
+};
+
+const daysValidData: TextFieldData = {
   fieldId: 'daysValid',
   fieldLabel: 'Days Valid'
 };
@@ -128,12 +134,21 @@ function LeafAttainment({
         <StringTextField
           fieldData={nameData}
           indices={indices}
+          value={attainmentTree.name}
+          setAttainmentTree={setAttainmentTree}
+          attainmentTree={attainmentTree}
+        />
+        <StringTextField
+          fieldData={tagData}
+          indices={indices}
+          value={attainmentTree.tag}
           setAttainmentTree={setAttainmentTree}
           attainmentTree={attainmentTree}
         />
         <StringTextField
           fieldData={daysValidData}
           indices={indices}
+          value={attainmentTree.daysValid}
           setAttainmentTree={setAttainmentTree}
           attainmentTree={attainmentTree}
         />

@@ -10,7 +10,7 @@ import attainmentServices from '../../services/attainments';
 // This component is also used for the formula attribute textfields that are
 // required after specifying a formula.
 
-function StringTextField({ fieldData, indices, attainmentTree, setAttainmentTree }) {
+function StringTextField({ fieldData, indices, value, attainmentTree, setAttainmentTree }) {
 
   // Functions for handling the change of the values in the 'New Name' textfield
   // and the textfields that represent formula attributes
@@ -54,7 +54,7 @@ function StringTextField({ fieldData, indices, attainmentTree, setAttainmentTree
       label={fieldData.fieldLabel}
       InputLabelProps={{ shrink: true }}
       margin='normal'
-      value={attainmentTree.name}
+      value={value}
       sx={{
         marginTop: 0,
         width: '100%'
@@ -66,9 +66,8 @@ function StringTextField({ fieldData, indices, attainmentTree, setAttainmentTree
 
 StringTextField.propTypes = {
   fieldData: PropTypes.object,
-  fieldId: PropTypes.string,
-  fieldLabel: PropTypes.string,
   indices: PropTypes.array,
+  value: PropTypes.string,
   attainmentTree: PropTypes.object,
   setAttainmentTree: PropTypes.func
 };
