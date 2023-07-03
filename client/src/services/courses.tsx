@@ -4,8 +4,7 @@
 
 import axios from './axios';
 import { CourseData } from 'aalto-grades-common/types';
-import { FullResponse, Numeric } from '../types';
-import { NewCourseData } from '../components/create-course-view/Form';
+import { FullResponse, NewCourseData, Numeric } from '../types';
 
 async function getCoursesOfUser(userId: Numeric): Promise<Array<CourseData>> {
 
