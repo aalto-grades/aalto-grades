@@ -819,14 +819,14 @@ describe(
 
     it('should respond with correct data', async () => {
       const res: supertest.Response = await request
-        .get('/v1/courses/1/assessment-models/1/attainments?tree=descendants')
+        .get('/v1/courses/1/assessment-models/1/attainments')
         .set('Cookie', cookies.userCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
       expect(res.body.success).toBe(true);
       expect(res.body.data).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data, 1, 1, true);
+      verifyAttainmentData(res.body.data.attainment, 1, 1, true);
     });
 
     it('should respond with 409 Conflict if there are multiple root attainments',
@@ -845,47 +845,6 @@ describe(
         );
       }
     );
-
-    it('should respond with 400 Bad Request, if "tree" parameter in query string '
-      + 'is invalid', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments?tree=fail')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.BadRequest);
-      expect(res.body.success).toBe(false);
-      expect(res.body.data).not.toBeDefined();
-      expect(res.body.errors).toBeDefined();
-      expect(res.body.errors[0]).toBe('tree must be one of the '
-        + 'following values: children, descendants');
-    });
-
-    it('should respond with 400 Bad Request, if "tree" parameter is given twice '
-      + '(array instead of string)', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments?tree=children&tree=descendants')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.BadRequest);
-      expect(res.body.success).toBe(false);
-      expect(res.body.data).not.toBeDefined();
-      expect(res.body.errors).toBeDefined();
-      expect(res.body.errors[0]).toBe('tree must be a `string` type, but the final value was: '
-        + '`[\n  "\\"children\\"",\n  "\\"descendants\\""\n]`.');
-    });
-
-    it('should respond with 400 Bad Request, if unknown parameters are present '
-      + 'in query string', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments?tree=children&foo=bar')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.BadRequest);
-      expect(res.body.success).toBe(false);
-      expect(res.body.data).not.toBeDefined();
-      expect(res.body.errors).toBeDefined();
-      expect(res.body.errors[0]).toBe('this field has unspecified keys: foo');
-    });
 
   }
 );

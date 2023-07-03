@@ -21,10 +21,6 @@ import {
 import { validateCourseAndAssessmentModel } from './utils/assessmentModel';
 import { Formula } from 'aalto-grades-common/types';
 
-const treeSchema: yup.AnyObjectSchema = yup.object().shape({
-  tree: yup.string().oneOf(['children', 'descendants'])
-}).noUnknown(true).strict();
-
 export async function addAttainment(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     parentId: yup
@@ -242,6 +238,10 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
 }
 
 export async function getAttainment(req: Request, res: Response): Promise<void> {
+  const treeSchema: yup.AnyObjectSchema = yup.object().shape({
+    tree: yup.string().oneOf(['children', 'descendants'])
+  }).noUnknown(true).strict();
+
   await treeSchema.validate(req.query, { abortEarly: false });
   await idSchema.validate({ id: req.params.attainmentId }, { abortEarly: false });
   const attainmentId: number = Number(req.params.attainmentId);
@@ -292,11 +292,6 @@ export async function getRootAttainment(req: Request, res: Response): Promise<vo
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateCourseAndAssessmentModel(req.params.courseId, req.params.assessmentModelId);
 
-  await treeSchema.validate(req.query, { abortEarly: false });
-
-  // Assert string type, as the query is validated above
-  const tree: string | undefined = req.query.tree as string | undefined;
-
   const allAttainmentData: Array<AttainmentData> =
     await findAttainmentsByAssessmentModel(assessmentModel.id);
 
@@ -318,21 +313,12 @@ export async function getRootAttainment(req: Request, res: Response): Promise<vo
     );
   }
 
-  switch (tree) {
-  case 'children':
-    generateAttainmentTree(rootAttainments[0], allAttainmentData, true);
-    break;
-
-  case 'descendants':
-    generateAttainmentTree(rootAttainments[0], allAttainmentData);
-    break;
-
-  default:
-    break;
-  }
+  generateAttainmentTree(rootAttainments[0], allAttainmentData);
 
   res.status(HttpCode.Ok).json({
     success: true,
-    data: rootAttainments[0],
+    data: {
+      attainment: rootAttainments[0]
+    },
   });
 }
