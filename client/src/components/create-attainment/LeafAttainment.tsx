@@ -173,9 +173,17 @@ function LeafAttainment(props: {
           handleClose={handleConfDialogClose}
           open={openConfDialog}
         />
-        <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
-          Create Sub-Attainments
-        </Button>
+        {
+          (props.attainment.subAttainments && props.attainment.subAttainments.length > 0)
+            ?
+            <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
+              Add Sub-Attainments
+            </Button>
+            :
+            <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
+              Create Sub-Attainments
+            </Button>
+        }
       </Box>
       <SimpleDialog
         attainmentTree={props.attainmentTree}

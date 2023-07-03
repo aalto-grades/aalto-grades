@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { MemoryRouter, Routes, Route, Outlet } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { act, render, RenderResult, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -97,29 +97,29 @@ describe('Tests for EditAttainmentView components', () => {
   });
 
   test(
-    'EditAttainmentView should edit and add attainments if also new attainments are created',
+    'EditAttainmentView should edit and add attainments if new attainments are created',
     async () => {
-
-      const newAttainment: AttainmentData = {
-        name: '',
-        tag: '',
-        daysValid: 0,
-        subAttainments: []
-      };
-
-      // Mock request from client,
-      // TODO: needs to be modified to match the final format used by the server.
-      // Now the format is different since data isn't gotten from the server yet.
-      const mockAttainment: AttainmentData = getMockAttainment();
-      mockAttainment.subAttainments = [newAttainment];
 
       renderEditAttainmentView();
 
-      // Create one sub-attainment:
-      const creationButton: HTMLElement = screen.getByText('Create Sub-Attainments');
-      expect(creationButton).toBeInTheDocument();
+      const newAttainment: AttainmentData = {
+        id: -1,
+        parentId: 2,
+        name: '',
+        tag: '',
+        daysValid: 0,
+      };
 
-      act(() => userEvent.click(creationButton));
+      const mockAttainment: AttainmentData = getMockAttainment();
+      mockAttainment.subAttainments = [newAttainment];
+
+      // Create one sub-attainment:
+      await waitFor(() => {
+        const creationButton: HTMLElement = screen.getByText('Create Sub-Attainments');
+        expect(creationButton).toBeInTheDocument();
+      });
+
+      act(() => userEvent.click(screen.getByText('Create Sub-Attainments')));
 
       const numberField: HTMLElement = screen.getByLabelText('Number of sub-attainments');
       expect(numberField).toBeInTheDocument();
@@ -132,11 +132,13 @@ describe('Tests for EditAttainmentView components', () => {
       act(() => userEvent.click(numConfirmButton));
 
       // Check that there is one sub-attainment so one 'Delete'-button
-      const deleteButtons: Array<HTMLElement> = await screen.findAllByText('Delete');
-      const addButton: HTMLElement = screen.getByText('Add Sub-Attainments');
+      await waitFor(async () => {
+        const deleteButtons: Array<HTMLElement> = await screen.findAllByText('Delete');
+        const addButton: HTMLElement = screen.getByText('Add Sub-Attainments');
 
-      expect(deleteButtons).toHaveLength(1);
-      expect(addButton).toBeInTheDocument();
+        expect(deleteButtons).toHaveLength(1);
+        expect(addButton).toBeInTheDocument();
+      });
 
       // Edit the original attainment and add one sub attainment to it
       act(() => userEvent.click(confirmButtons[0]));
