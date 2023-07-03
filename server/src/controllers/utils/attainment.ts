@@ -25,6 +25,44 @@ export async function findAttainmentById(id: number, errorCode: HttpCode): Promi
 }
 
 /**
+ * Finds all attainments of a specific assessment model.
+ * @param {number} assessmentModelId - The ID of the assessment model.
+ * @returns {Promise<Array<AttainmentData>>} - The resulting array of AttainmentData.
+ * @throws {ApiError} - If no attainments were found, it throws an error
+ * with a message indicating that attainments were not found for the assessment
+ * model.
+ */
+export async function findAttainmentsByAssessmentModel(
+  assessmentModelId: number
+): Promise<Array<AttainmentData>> {
+  const attainments: Array<Attainment> = await Attainment.findAll({
+    where: {
+      assessmentModelId: assessmentModelId
+    }
+  });
+
+  if (attainments.length === 0) {
+    throw new ApiError(
+      'Attainments were not found for the specified assessment model',
+      HttpCode.NotFound
+    );
+  }
+
+  const attainmentData: Array<AttainmentData> = attainments.map((attainment: Attainment) => {
+    return {
+      id: attainment.id,
+      assessmentModelId: attainment.assessmentModelId,
+      parentId: attainment.parentId,
+      tag: attainment.tag,
+      name: attainment.name,
+      daysValid: attainment.daysValid
+    };
+  });
+
+  return attainmentData;
+}
+
+/**
  * Recursive function for creating a tree of descendant attainments.
  * @param {AttainmentData} attainment - The root attainment, based on which the tree is built.
  * @param {Array<AttainmentData>} allAttainments - Array of attainments, containing the children.
