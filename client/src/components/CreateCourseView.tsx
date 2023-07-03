@@ -4,9 +4,9 @@
 
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
-import CreateCourseForm from './create-course-view/Form';
+import CreateCourseForm from './create-course-view/CreateCourseForm';
 import coursesService from '../services/courses';
-import { NewCourseData } from './create-course-view/Form';
+import { NewCourseData } from '../types';
 
 function CreateCourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
