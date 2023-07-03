@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { CourseData } from 'aalto-grades-common/types';
 import { AxiosResponse } from 'axios';
 
 export interface ApiResponse<T> {
@@ -20,3 +21,9 @@ export interface Message {
 }
 
 export type State<T> = [T, (value: T) => void];
+
+export interface NewCourseData extends Omit<
+CourseData, 'teachersInCharge' | 'id' | 'evaluationInformation'
+> {
+  teachersInCharge: Array<string>;
+}
