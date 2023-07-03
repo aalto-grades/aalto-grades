@@ -43,7 +43,9 @@ describe('Tests for EditAttainmentView components', () => {
     (attainmentServices.getAttainment as jest.Mock).mockResolvedValue(getMockAttainment());
 
     return render(
-      <MemoryRouter initialEntries={[`/${courseId}/edit-attainment/${assessmentModelId}/` + attainmentId]}>
+      <MemoryRouter initialEntries={
+        [`/${courseId}/edit-attainment/${assessmentModelId}/` + attainmentId]
+      }>
         <Routes>
           <Route
             path='/:courseId/edit-attainment/:assessmentModelId/:attainmentId'

@@ -33,7 +33,10 @@ describe('Tests for CreateAttainmentView components', () => {
     return render(
       <MemoryRouter initialEntries={[`/${courseId}/create-attainment/${assessmentModelId}`]}>
         <Routes>
-          <Route path='/:courseId/create-attainment/:assessmentModelId' element={<CreateAttainmentView/>}/>
+          <Route
+            path='/:courseId/create-attainment/:assessmentModelId'
+            element={<CreateAttainmentView />}
+          />
         </Routes>
       </MemoryRouter>
     );
