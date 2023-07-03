@@ -311,7 +311,7 @@ export async function getRootAttainment(req: Request, res: Response): Promise<vo
     );
   } else if (rootAttainments.length > 1) {
     throw new ApiError(
-      'More than one attainments without parentId were found '
+      'More than one attainment without parentId was found '
       + 'for the specified course and assessment model. Attainment IDs: '
       + rootAttainments.map((attainment: AttainmentData) => attainment.id).join(),
       HttpCode.Conflict

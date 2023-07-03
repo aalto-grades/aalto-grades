@@ -70,7 +70,7 @@ describe(
       + 'assessment model exist',
       async () => {
         const res: supertest.Response = await request
-          .post('/v1/courses/1/assessment-models/1/attainments')
+          .post('/v1/courses/1/assessment-models/31/attainments')
           .send({ ...mockAttainment, subAttainments: undefined })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -81,7 +81,7 @@ describe(
         expect(res.body.errors).not.toBeDefined();
         expect(res.body.data.attainment.id).toBeDefined();
         expect(res.body.data.attainment.name).toBe(mockAttainment.name);
-        expect(res.body.data.attainment.assessmentModelId).toBe(1);
+        expect(res.body.data.attainment.assessmentModelId).toBe(31);
         expect(res.body.data.attainment.parentId).toBe(null);
         expect(res.body.data.attainment.tag).toBeDefined();
         expect(res.body.data.attainment.daysValid).toBeDefined();
@@ -92,7 +92,7 @@ describe(
     it('should create a new attainment with sub-attainments when course and assessment model exist',
       async () => {
         const res: supertest.Response = await request
-          .post('/v1/courses/2/assessment-models/2/attainments')
+          .post('/v1/courses/1/assessment-models/32/attainments')
           .send(mockAttainment)
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -102,7 +102,7 @@ describe(
         expect(res.body.success).toBe(true);
         expect(res.body.errors).not.toBeDefined();
         expect(res.body.data.attainment.id).toBeDefined();
-        expect(res.body.data.attainment.assessmentModelId).toBe(2);
+        expect(res.body.data.attainment.assessmentModelId).toBe(32);
         expect(res.body.data.attainment.name).toBe(mockAttainment.name);
         expect(res.body.data.attainment.parentId).toBe(null);
         expect(res.body.data.attainment.tag).toBeDefined();
@@ -826,8 +826,25 @@ describe(
       expect(res.body.success).toBe(true);
       expect(res.body.data).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body, 1, 1, true);
+      verifyAttainmentData(res.body.data, 1, 1, true);
     });
+
+    it('should respond with 409 Conflict if there are multiple root attainments',
+      async () => {
+        const res: supertest.Response = await request
+          .get('/v1/courses/2/assessment-models/34/attainments')
+          .set('Cookie', cookies.userCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Conflict);
+        expect(res.body.success).toBe(false);
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors[0]).toBe(
+          'More than one attainment without parentId was found for the'
+          + ' specified course and assessment model. Attainment IDs: 252,253'
+        );
+      }
+    );
 
     it('should respond with 400 Bad Request, if "tree" parameter in query string '
       + 'is invalid', async () => {
