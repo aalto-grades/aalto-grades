@@ -57,8 +57,12 @@ describe('Tests for CreateCourseView components', () => {
     const mockCourse: jest.Mock = jest.fn();
 
     const testCode: string = 'Test code';
-    const testName: string = 'Test name';
-    const testDepartment: string = 'Test department';
+    const testNameEn: string = 'Test name';
+    const testNameFi: string = 'Testi nimi';
+    const testNameSv: string = 'Sama ruotsiksi';
+    const testDepartmentEn: string = 'Test department';
+    const testDepartmentFi: string = 'Laitos xxx';
+    const testDepartmentSv: string = 'samma på svenska';
     const testTeacher: string = 'Elon.Musk@twitter.com';
 
     render(<CreateCourseForm addCourse={mockCourse} />);
@@ -77,12 +81,12 @@ describe('Tests for CreateCourseView components', () => {
     const creationButton: HTMLElement = screen.getByText('Create Course');
 
     act(() => userEvent.type(codeField, testCode));
-    act(() => userEvent.type(nameFieldEn, testName));
-    act(() => userEvent.type(nameFieldFi, testName));
-    act(() => userEvent.type(nameFieldSv, testName));
-    act(() => userEvent.type(organizerFieldEn, testDepartment));
-    act(() => userEvent.type(organizerFieldFi, testDepartment));
-    act(() => userEvent.type(organizerFieldSv, testDepartment));
+    act(() => userEvent.type(nameFieldEn, testNameEn));
+    act(() => userEvent.type(nameFieldFi, testNameFi));
+    act(() => userEvent.type(nameFieldSv, testNameSv));
+    act(() => userEvent.type(organizerFieldEn, testDepartmentEn));
+    act(() => userEvent.type(organizerFieldFi, testDepartmentFi));
+    act(() => userEvent.type(organizerFieldSv, testDepartmentSv));
     act(() => userEvent.type(credsMin, '3'));
     act(() => userEvent.type(credsMax, '5'));
     act(() => userEvent.type(teachers, testTeacher));
@@ -97,14 +101,14 @@ describe('Tests for CreateCourseView components', () => {
         minCredits: 3,
         maxCredits: 5,
         department: {
-          fi: testDepartment,
-          sv: testDepartment,
-          en: testDepartment,
+          fi: testDepartmentFi,
+          sv: testDepartmentSv,
+          en: testDepartmentEn,
         },
         name: {
-          fi: testName,
-          sv: testName,
-          en: testName,
+          fi: testNameFi,
+          sv: testNameSv,
+          en: testNameEn,
         },
         teachersInCharge: [testTeacher]
       });
