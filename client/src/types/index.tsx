@@ -16,7 +16,7 @@ export type FullResponse<T> = AxiosResponse<ApiResponse<T>, unknown>;
 export type Numeric = number | string;
 
 export interface Message {
-  msg: string,
+  msg: string | Array<string>,
   severity?: 'error' | 'warning' | 'info' | 'success'
 }
 
