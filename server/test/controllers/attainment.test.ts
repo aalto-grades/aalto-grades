@@ -24,6 +24,23 @@ beforeAll(async () => {
   cookies = await getCookies();
 });
 
+function verifyAttainmentData(
+  data: AttainmentData,
+  id: number,
+  assessmentModelId: number,
+  subAttainments: boolean
+): void {
+  expect(data.id).toBe(id);
+  expect(data.assessmentModelId).toBe(assessmentModelId);
+  expect(data.tag).toBeDefined();
+  expect(data.name).toBeDefined();
+  expect(data.daysValid).toBeDefined();
+  if (subAttainments)
+    expect(data.subAttainments).toBeDefined();
+  else
+    expect(data.subAttainments).not.toBeDefined();
+}
+
 interface AttainmentNode {
   id: number,
   subAttainments: Array<AttainmentNode>
@@ -681,23 +698,6 @@ describe(
   + '- get attainment (tree)',
   () => {
 
-    function verifyAttainmentData(
-      data: AttainmentData,
-      id: number,
-      assessmentModelId: number,
-      subAttainments: boolean
-    ): void {
-      expect(data.id).toBe(id);
-      expect(data.assessmentModelId).toBe(assessmentModelId);
-      expect(data.tag).toBeDefined();
-      expect(data.name).toBeDefined();
-      expect(data.daysValid).toBeDefined();
-      if (subAttainments)
-        expect(data.subAttainments).toBeDefined();
-      else
-        expect(data.subAttainments).not.toBeDefined();
-    }
-
     it('should respond with a single attainment without subattainments, '
       + 'if query string is not present', async () => {
       const res: supertest.Response = await request
@@ -809,4 +809,66 @@ describe(
       expect(res.body.errors).toBeDefined();
       expect(res.body.errors[0]).toBe('attainment with ID 2 not found');
     });
-  });
+  }
+);
+
+describe(
+  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/attainments'
+  + '- get the root attainment of an assessment model (optionally with a tree of descendants)',
+  () => {
+
+    it('should respond with correct data', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/1/assessment-models/1/attainments?tree=descendants')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toBeDefined();
+      expect(res.body.errors).not.toBeDefined();
+      verifyAttainmentData(res.body, 1, 1, true);
+    });
+
+    it('should respond with 400 Bad Request, if "tree" parameter in query string '
+      + 'is invalid', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/2/assessment-models/2/attainments?tree=fail')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadRequest);
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors[0]).toBe('tree must be one of the '
+        + 'following values: children, descendants');
+    });
+
+    it('should respond with 400 Bad Request, if "tree" parameter is given twice '
+      + '(array instead of string)', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/2/assessment-models/2/attainments?tree=children&tree=descendants')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadRequest);
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors[0]).toBe('tree must be a `string` type, but the final value was: '
+        + '`[\n  "\\"children\\"",\n  "\\"descendants\\""\n]`.');
+    });
+
+    it('should respond with 400 Bad Request, if unknown parameters are present '
+      + 'in query string', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/2/assessment-models/2/attainments?tree=children&foo=bar')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadRequest);
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors[0]).toBe('this field has unspecified keys: foo');
+    });
+
+  }
+);

@@ -15,9 +15,15 @@ import { ApiError } from '../types/error';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 
-import { findAttainmentById, generateAttainmentTree } from './utils/attainment';
+import {
+  findAttainmentById, findAttainmentsByAssessmentModel, generateAttainmentTree
+} from './utils/attainment';
 import { validateCourseAndAssessmentModel } from './utils/assessmentModel';
 import { Formula } from 'aalto-grades-common/types';
+
+const treeSchema: yup.AnyObjectSchema = yup.object().shape({
+  tree: yup.string().oneOf(['children', 'descendants'])
+}).noUnknown(true).strict();
 
 export async function addAttainment(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
@@ -42,7 +48,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
 
   await requestSchema.validate(req.body, { abortEarly: false });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [course, assessmentModel]: [course: Course, assessmentModel: AssessmentModel] =
+  const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateCourseAndAssessmentModel(
       req.params.courseId, req.params.assessmentModelId
     );
@@ -236,15 +242,11 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
 }
 
 export async function getAttainment(req: Request, res: Response): Promise<void> {
-  const querySchema: yup.AnyObjectSchema = yup.object().shape({
-    tree: yup.string().oneOf(['children', 'descendants'])
-  }).noUnknown(true).strict();
-
-  await querySchema.validate(req.query, { abortEarly: false });
+  await treeSchema.validate(req.query, { abortEarly: false });
   await idSchema.validate({ id: req.params.attainmentId }, { abortEarly: false });
   const attainmentId: number = Number(req.params.attainmentId);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [course, assessmentModel]: [course: Course, assessmentModel: AssessmentModel] =
+  const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateCourseAndAssessmentModel(
       req.params.courseId, req.params.assessmentModelId
     );
@@ -252,24 +254,8 @@ export async function getAttainment(req: Request, res: Response): Promise<void> 
   // Assert string type, as the query is validated above
   const tree: string = req.query.tree as string;
 
-  const attainments: Array<Attainment> = await Attainment.findAll({
-    where: {
-      assessmentModelId: assessmentModel.id,
-    }
-  });
-
-  const attainmentData: Array<AttainmentData> = attainments.map(
-    (attainment: Attainment) => {
-      return {
-        id: attainment.id,
-        assessmentModelId: attainment.assessmentModelId,
-        parentId: attainment.parentId ?? undefined,
-        name: attainment.name,
-        tag: attainment.tag,
-        daysValid: attainment.daysValid
-      };
-    }
-  );
+  const attainmentData: Array<AttainmentData> =
+    await findAttainmentsByAssessmentModel(assessmentModel.id);
 
   const localRoot: AttainmentData | undefined = attainmentData.find(
     (attainment: AttainmentData) => attainment.id === attainmentId
@@ -285,9 +271,11 @@ export async function getAttainment(req: Request, res: Response): Promise<void> 
   case 'children':
     generateAttainmentTree(localRoot, attainmentData, true);
     break;
+
   case 'descendants':
     generateAttainmentTree(localRoot, attainmentData);
     break;
+
   default:
     break;
   }
@@ -295,5 +283,56 @@ export async function getAttainment(req: Request, res: Response): Promise<void> 
   res.status(HttpCode.Ok).json({
     success: true,
     data: localRoot,
+  });
+}
+
+export async function getRootAttainment(req: Request, res: Response): Promise<void> {
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [course, assessmentModel]: [Course, AssessmentModel] =
+    await validateCourseAndAssessmentModel(req.params.courseId, req.params.assessmentModelId);
+
+  await treeSchema.validate(req.query, { abortEarly: false });
+
+  // Assert string type, as the query is validated above
+  const tree: string | undefined = req.query.tree as string | undefined;
+
+  const allAttainmentData: Array<AttainmentData> =
+    await findAttainmentsByAssessmentModel(assessmentModel.id);
+
+  const rootAttainments: Array<AttainmentData> = allAttainmentData.filter(
+    (attainment: AttainmentData) => !attainment.parentId
+  );
+
+  if (rootAttainments.length === 0) {
+    throw new ApiError(
+      'Root attainment was not found for the specified course and assessment model.',
+      HttpCode.NotFound
+    );
+  } else if (rootAttainments.length > 1) {
+    throw new ApiError(
+      'More than one attainments without parentId were found '
+      + 'for the specified course and assessment model. Attainment IDs: '
+      + rootAttainments.map((attainment: AttainmentData) => attainment.id).join(),
+      HttpCode.Conflict
+    );
+  }
+
+  switch (tree) {
+  case 'children':
+    generateAttainmentTree(rootAttainments[0], allAttainmentData, true);
+    break;
+
+  case 'descendants':
+    generateAttainmentTree(rootAttainments[0], allAttainmentData);
+    break;
+
+  default:
+    break;
+  }
+
+  res.status(HttpCode.Ok).json({
+    success: true,
+    data: rootAttainments[0],
   });
 }
