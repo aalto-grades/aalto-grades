@@ -6,17 +6,27 @@ import { NavigateFunction, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import CreateCourseForm from './create-course-view/CreateCourseForm';
 import coursesService from '../services/courses';
-import { NewCourseData } from '../types';
+import { Message, NewCourseData, State } from '../types';
+import AlertSnackbar from './alerts/AlertSnackbar';
+import { useState } from 'react';
 
 function CreateCourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
+  const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
+  const [messageInfo, setMessageInfo]: State<Message | undefined> = useState(undefined);
 
   async function addCourse(course: NewCourseData): Promise<void> {
     try {
       const courseId: number = await coursesService.addCourse(course);
       navigate(`/course-view/${courseId}`, { replace: true });
-    } catch (exception) {
-      console.log(exception.message);
+    } catch (error) {
+      let msg: string | Array<string> = error?.message ?? 'Unknown error';
+
+      if (error?.response?.data?.errors) {
+        msg = error.response.data.errors;
+      }
+      setMessageInfo({ msg, severity: 'error' });
+      setAlertOpen(true);
     }
   }
 
@@ -26,6 +36,10 @@ function CreateCourseView(): JSX.Element {
         Create a New Course
       </Typography>
       <CreateCourseForm addCourse={addCourse}/>
+      <AlertSnackbar
+        messageInfo={messageInfo} setMessageInfo={setMessageInfo}
+        open={alertOpen} setOpen={setAlertOpen}
+      />
     </>
   );
 }

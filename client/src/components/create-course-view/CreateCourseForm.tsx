@@ -81,30 +81,24 @@ function CreateCourseForm(params: {
             .min(1)
             .required('Please input a valid course name in swedish')
         })}
-        onSubmit={async (values, { resetForm }) => {
-          try {
-            const courseObject: NewCourseData = ({
-              courseCode: values.courseCode,
-              minCredits: values.minCredits,
-              maxCredits: values.maxCredits,
-              department: {
-                fi: values.departmentFi,
-                sv: values.departmentSv,
-                en: values.departmentEn,
-              },
-              name: {
-                fi: values.nameFi,
-                sv: values.nameSv,
-                en: values.nameEn,
-              },
-              teachersInCharge
-            });
-            await params.addCourse(courseObject);
-            resetForm();
-            setTeachersInCharge([]);
-          } catch (exception) {
-            console.log(exception);
-          }
+        onSubmit={async function (values): Promise<void> {
+          const courseObject: NewCourseData = ({
+            courseCode: values.courseCode,
+            minCredits: values.minCredits,
+            maxCredits: values.maxCredits,
+            department: {
+              fi: values.departmentFi,
+              sv: values.departmentSv,
+              en: values.departmentEn,
+            },
+            name: {
+              fi: values.nameFi,
+              sv: values.nameSv,
+              en: values.nameEn,
+            },
+            teachersInCharge
+          });
+          await params.addCourse(courseObject);
         }}
       >
         {({ errors, handleChange, isSubmitting, isValid, touched, values }) => (
