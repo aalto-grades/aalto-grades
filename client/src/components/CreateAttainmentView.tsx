@@ -37,7 +37,7 @@ function CreateAttainmentView(): JSX.Element {
   }
 
   function deleteAttainment(attainment: AttainmentData): void {
-    function inner(attainment: AttainmentData, tree: AttainmentData) {
+    function inner(attainment: AttainmentData, tree: AttainmentData): void {
       for (const i in tree.subAttainments) {
         const subAttainment: AttainmentData = tree.subAttainments[i];
 

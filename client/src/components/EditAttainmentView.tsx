@@ -56,10 +56,12 @@ function EditAttainmentView(): JSX.Element {
 
   function deleteAttainment(attainment: AttainmentData): void {
     if (attainment.id === attainmentTree.id) {
-      if (attainment.id > 0)
-        setDeletedAttainments([...deletedAttainments, structuredClone(attainment)]);
+      if (attainment.id > 0) {
+        attainmentServices.deleteAttainment(courseId, assessmentModelId, attainment.id);
+      }
 
       setAttainmentTree(null);
+      navigate(-1);
       return;
     }
 
