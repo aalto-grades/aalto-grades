@@ -10,14 +10,18 @@ import {
 import userEvent from '@testing-library/user-event';
 import CreateAttainmentView from '../components/CreateAttainmentView';
 import attainmentServices from '../services/attainments';
-import mockAttainmentsServer from './mock-data/mockAttainmentsServer';
+import mockAttainments from './mock-data/mockAttainments';
+import { AttainmentData } from 'aalto-grades-common/types';
 
-const mockAttainment = mockAttainmentsServer[0];
-const courseId = mockAttainment.courseId;
-const instanceId = mockAttainment.courseInstanceId;
+const mockAttainment: AttainmentData = mockAttainments[0];
+const courseId: number = 1;
+const assessmentModelId: number = mockAttainment.assessmentModelId;
 
-const mockDate = '2023-04-25T00:00:00.000Z';  // again had some problems with dates,
-const mockExpiryDate = '2025-04-25T00:00:00.000Z';  // so I hardcoded them here
+// Not mocking structuredClone leads to errors about it being undefined.
+// Probably related: https://github.com/jsdom/jsdom/issues/3363
+global.structuredClone = <T,>(value: T): T => {
+  return JSON.parse(JSON.stringify(value));
+};
 
 attainmentServices.addAttainment = jest.fn();
 afterEach(cleanup);
@@ -27,32 +31,9 @@ describe('Tests for CreateAttainmentView components', () => {
   async function renderCreateAttainmentView(): Promise<RenderResult> {
 
     return render(
-      <MemoryRouter initialEntries={[`/${courseId}/create-attainment/${instanceId}`]}>
+      <MemoryRouter initialEntries={[`/${courseId}/create-attainment/${assessmentModelId}`]}>
         <Routes>
-          <Route path='/:courseId/create-attainment/:instanceId' element={<CreateAttainmentView/>}/>
-        </Routes>
-      </MemoryRouter>
-    );
-  }
-
-  const mockContext = {
-    addedAttainments: [],
-    setAddedAttainments: jest.fn(),
-    attainmentIncrementId: 0,
-    setIncrementId: jest.fn(),
-  };
-
-  async function renderTemporaryCreateAttainmentView(): Promise<RenderResult> {
-
-    return render(
-      <MemoryRouter initialEntries={[`/${courseId}/create-temporary-attainment/${instanceId}`]}>
-        <Routes>
-          <Route element={<Outlet context={mockContext} />}>
-            <Route
-              path='/:courseId/create-temporary-attainment/:sisuInstanceId'
-              element={<CreateAttainmentView />}
-            />
-          </Route>
+          <Route path='/:courseId/create-attainment/:assessmentModelId' element={<CreateAttainmentView/>}/>
         </Routes>
       </MemoryRouter>
     );
@@ -63,118 +44,62 @@ describe('Tests for CreateAttainmentView components', () => {
     renderCreateAttainmentView();
 
     const headingElement = screen.getByText('Create Study Attainment');
-    const selectLabel = 'Name';
-    const categoryField = await screen.findByLabelText(selectLabel);
-    const dateField = screen.getByLabelText('Date');
-    const expiryField = screen.getByLabelText('Expiry Date');
+    const nameField = screen.getByLabelText('Name');
+    const tagField = screen.getByLabelText('Tag');
+    const daysValidField = screen.getByLabelText('Days Valid');
     const creationButton = screen.getByText('Create Sub-Attainments');
     const confirmButton = screen.getByText('Confirm');
 
-    act(() => userEvent.click(categoryField));
-    const optionsPopup = await screen.findByRole('listbox', { name: selectLabel });
-    act(() => userEvent.click(within(optionsPopup).getByText('Other')));
-
-    expect(await screen.findByText('Other')).toBeInTheDocument();
-
-    const nameField = screen.getByLabelText('New Name');
-
     expect(headingElement).toBeInTheDocument();
-    expect(categoryField).toBeInTheDocument();
     expect(nameField).toBeInTheDocument();
-    expect(dateField).toBeInTheDocument();
-    expect(expiryField).toBeInTheDocument();
+    expect(tagField).toBeInTheDocument();
+    expect(daysValidField).toBeInTheDocument();
     expect(creationButton).toBeInTheDocument();
     expect(confirmButton).toBeInTheDocument();
   });
 
   test(
-    'CreateAttainmentView should allow a teacher to create an attainment with a ready category',
+    'CreateAttainmentView should allow a teacher to create an attainment',
     async () => {
 
-      const mockName = mockAttainment.name;
+      const mockName: string = 'THE name';
+      const mockTag: string = 'THE tag';
+      const mockDaysValid: string = '512';
 
       // Mock request from client
-      const request = {
+      const request: AttainmentData = {
+        id: -1,
+        parentId: null,
         name: mockName,
-        date: new Date(mockDate),
-        expiryDate: new Date(mockExpiryDate),
+        tag: mockTag,
+        // TODO: Update daysValid as a number in attainment creation. Probably by
+        // adding a number text field to also account for formula attributes.
+        daysValid: mockDaysValid, // ts-ignore
         subAttainments: [],
-        affectCalculation: false,
-        category: mockName,
-        formulaAttributes: {},
       };
 
       renderCreateAttainmentView();
 
-      await waitFor(async () => {
-
-        const selectLabel = 'Name';
-        const categoryField = await screen.findByLabelText(selectLabel);
-        const dateField = screen.getByLabelText('Date');
-        const expiryField = screen.getByLabelText('Expiry Date');
-        const confirmButton = screen.getByText('Confirm');
-
-        userEvent.click(categoryField);
-        const optionsPopup = await screen.findByRole('listbox', { name: selectLabel });
-        userEvent.click(within(optionsPopup).getByText(mockName));
-
-        expect(await screen.findByText(mockName)).toBeInTheDocument();
-
-        userEvent.type(dateField, mockDate);
-        userEvent.type(expiryField, mockExpiryDate);
-        userEvent.click(confirmButton);
-
-        expect(attainmentServices.addAttainment)
-          .toHaveBeenCalledWith(String(courseId), String(instanceId), request);
-
-      });
-    }
-  );
-
-  test(
-    'CreateAttainmentView should allow a teacher to create an attainment with a new category',
-    async () => {
-
-      const mockCategory = 'Other';
-      const mockName = 'Learning Diary';
-
-      // Mock request from client
-      const request = {
-        name: mockName,
-        date: new Date(mockDate),
-        expiryDate: new Date(mockExpiryDate),
-        category: mockCategory,
-        subAttainments: [],
-        affectCalculation: false,
-        formulaAttributes: {},
-      };
-
-      renderCreateAttainmentView();
+      let nameField: HTMLElement;
+      let tagField: HTMLElement;
+      let daysValidField: HTMLElement;
+      let confirmButton: HTMLElement;
 
       await waitFor(async () => {
-
-        const selectLabel = 'Name';
-        const categoryField = await screen.findByLabelText(selectLabel);
-        const dateField = screen.getByLabelText('Date');
-        const expiryField = screen.getByLabelText('Expiry Date');
-        const confirmButton = screen.getByText('Confirm');
-
-        userEvent.click(categoryField);
-        const optionsPopup = await screen.findByRole('listbox', { name: selectLabel });
-        userEvent.click(within(optionsPopup).getByText(mockCategory));
-
-        expect(await screen.findByText(mockCategory)).toBeInTheDocument();
-
-        const nameField = screen.getByLabelText('New Name');
-        userEvent.type(nameField, mockName);
-        userEvent.type(dateField, mockDate);
-        userEvent.type(expiryField, mockExpiryDate);
-        userEvent.click(confirmButton);
-
-        expect(attainmentServices.addAttainment)
-          .toHaveBeenCalledWith(String(courseId), String(instanceId), request);
-
+        nameField = screen.getByLabelText('Name');
+        tagField = screen.getByLabelText('Tag');
+        daysValidField = screen.getByLabelText('Days Valid');
+        confirmButton = screen.getByText('Confirm');
       });
+
+      act(() => userEvent.type(nameField, mockName));
+      act(() => userEvent.type(tagField, mockTag));
+      act(() => userEvent.clear(daysValidField));
+      act(() => userEvent.type(daysValidField, mockDaysValid));
+      act(() => userEvent.click(confirmButton));
+
+      expect(attainmentServices.addAttainment)
+        .toHaveBeenCalledWith(String(courseId), String(assessmentModelId), request);
     }
   );
 
@@ -205,86 +130,5 @@ describe('Tests for CreateAttainmentView components', () => {
     expect(deleteButtons).toHaveLength(1);
     expect(addButton).toBeInTheDocument();
   });
-
-  test(
-    'CreateAttainmentView should render all of the appropriate components during instance creation',
-    async () => {
-
-      renderTemporaryCreateAttainmentView();
-
-      const headingElement = screen.getByText('Create Study Attainment');
-      const selectLabel = 'Name';
-      const categoryField = await screen.findByLabelText(selectLabel);
-      const dateField = screen.getByLabelText('Date');
-      const expiryField = screen.getByLabelText('Expiry Date');
-      const creationButton = screen.getByText('Create Sub-Attainments');
-      const confirmButton = screen.getByText('Confirm');
-
-      act(() => userEvent.click(categoryField));
-      const optionsPopup = await screen.findByRole('listbox', { name: selectLabel });
-      act(() => userEvent.click(within(optionsPopup).getByText('Other')));
-
-      expect(await screen.findByText('Other')).toBeInTheDocument();
-
-      const nameField = screen.getByLabelText('New Name');
-
-      expect(headingElement).toBeInTheDocument();
-      expect(categoryField).toBeInTheDocument();
-      expect(nameField).toBeInTheDocument();
-      expect(dateField).toBeInTheDocument();
-      expect(expiryField).toBeInTheDocument();
-      expect(creationButton).toBeInTheDocument();
-      expect(confirmButton).toBeInTheDocument();
-    }
-  );
-
-  test(
-    'CreateAttainmentView should allow to add an attainment to context during instance creation',
-    async () => {
-
-      const mockName = mockAttainment.name;
-
-      // Mock request from client
-      const request = {
-        name: mockName,
-        date: mockDate.split('T')[0],
-        expiryDate: mockExpiryDate.split('T')[0],
-        subAttainments: [],
-        affectCalculation: false,
-        category: mockName,
-        formulaAttributes: {},
-      };
-
-      renderTemporaryCreateAttainmentView();
-
-      await waitFor(async () => {
-
-        const selectLabel = 'Name';
-        const categoryField = await screen.findByLabelText(selectLabel);
-        const dateField = screen.getByLabelText('Date');
-        const expiryField = screen.getByLabelText('Expiry Date');
-        const confirmButton = screen.getByText('Confirm');
-
-        userEvent.click(categoryField);
-        const optionsPopup = await screen.findByRole('listbox', { name: selectLabel });
-        userEvent.click(within(optionsPopup).getByText(mockName));
-
-        expect(await screen.findByText(mockName)).toBeInTheDocument();
-
-        userEvent.type(dateField, mockDate);
-        userEvent.type(expiryField, mockExpiryDate);
-        userEvent.click(confirmButton);
-
-        const temporaryId = mockContext.attainmentIncrementId;
-        const [updatedAttainments, newTemporaryId] = attainmentServices.createTemporaryAttainment(
-          mockContext.addedAttainments, request, temporaryId
-        );
-
-        expect(mockContext.setAddedAttainments).toHaveBeenCalledWith(updatedAttainments);
-        expect(mockContext.setIncrementId).toHaveBeenCalledWith(newTemporaryId);
-
-      });
-    }
-  );
 
 });
