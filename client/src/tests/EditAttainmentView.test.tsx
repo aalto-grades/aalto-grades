@@ -2,22 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
-
-describe('Temp', () => {
-  test('Temp', () => {
-    expect(true).toBe(true);
-  });
-});
-
-/*
 import { MemoryRouter, Routes, Route, Outlet } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { act, render, screen, waitFor, cleanup } from '@testing-library/react';
+import { act, render, RenderResult, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import EditAttainmentView from '../components/EditAttainmentView';
 import attainmentServices from '../services/attainments';
-import mockAttainmentsClient from '../mock-data/mockAttainmentsClient';
+import mockAttainmentsClient from './mock-data/mockAttainmentsClient';
 
 const courseId = 1;
 const instanceId = 1;
@@ -26,11 +17,11 @@ const attainmentId = 2;  // Project
 const mockDate = '2023-09-30T00:00:00.000Z';  // again had some problems with dates,
 const mockExpiryDate = '2024-09-13T00:00:00.000Z';  // so I hardcoded them here
 
-const getMockAttainment = () => {
+async function getMockAttainment() {
   return JSON.parse(JSON.stringify(
     [mockAttainmentsClient.find((attainment) => attainment.id === attainmentId)]
   ));
-};
+}
 
 attainmentServices.addAttainment = jest.fn();
 attainmentServices.editAttainment = jest.fn();
@@ -38,7 +29,7 @@ afterEach(cleanup);
 
 describe('Tests for EditAttainmentView components', () => {
 
-  const renderEditAttainmentView = async () => {
+  async function renderEditAttainmentView(): Promise<RenderResult> {
     return render(
       <MemoryRouter initialEntries={[`/${courseId}/edit-attainment/${instanceId}/` + attainmentId]}>
         <Routes>
@@ -49,7 +40,7 @@ describe('Tests for EditAttainmentView components', () => {
         </Routes>
       </MemoryRouter>
     );
-  };
+  }
 
   const mockAttainment = getMockAttainment()[0];  // object
   mockAttainment.temporaryId = mockAttainment.id;
@@ -61,7 +52,7 @@ describe('Tests for EditAttainmentView components', () => {
     setIncrementId: jest.fn(),
   };
 
-  const renderTemporaryEditAttainmentView = async () => {
+  async function renderTemporaryEditAttainmentView(): Promise<RenderResult> {
 
     return render(
       <MemoryRouter initialEntries={[
@@ -76,7 +67,7 @@ describe('Tests for EditAttainmentView components', () => {
         </Routes>
       </MemoryRouter>
     );
-  };
+  }
 
   test('EditAttainmentView should render the appropriate amount of components', async () => {
 
@@ -248,4 +239,3 @@ describe('Tests for EditAttainmentView components', () => {
   });
 
 });
-*/

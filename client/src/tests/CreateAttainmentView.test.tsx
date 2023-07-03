@@ -2,18 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react-router-dom';
-
-describe('Temp', () => {
-  test('Temp', () => {
-    expect(true).toBe(true);
-  });
-});
-
-/*
 import { MemoryRouter, Route, Routes, Outlet } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { act, render, screen, waitFor, within, cleanup } from '@testing-library/react';
+import {
+  act, render, RenderResult, screen, waitFor, within, cleanup
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CreateAttainmentView from '../components/CreateAttainmentView';
 import attainmentServices from '../services/attainments';
@@ -31,7 +24,7 @@ afterEach(cleanup);
 
 describe('Tests for CreateAttainmentView components', () => {
 
-  const renderCreateAttainmentView = async () => {
+  async function renderCreateAttainmentView(): Promise<RenderResult> {
 
     return render(
       <MemoryRouter initialEntries={[`/${courseId}/create-attainment/${instanceId}`]}>
@@ -40,7 +33,7 @@ describe('Tests for CreateAttainmentView components', () => {
         </Routes>
       </MemoryRouter>
     );
-  };
+  }
 
   const mockContext = {
     addedAttainments: [],
@@ -49,7 +42,7 @@ describe('Tests for CreateAttainmentView components', () => {
     setIncrementId: jest.fn(),
   };
 
-  const renderTemporaryCreateAttainmentView = async () => {
+  async function renderTemporaryCreateAttainmentView(): Promise<RenderResult> {
 
     return render(
       <MemoryRouter initialEntries={[`/${courseId}/create-temporary-attainment/${instanceId}`]}>
@@ -63,7 +56,7 @@ describe('Tests for CreateAttainmentView components', () => {
         </Routes>
       </MemoryRouter>
     );
-  };
+  }
 
   test('CreateAttainmentView should render all of the appropriate components', async () => {
 
@@ -295,4 +288,3 @@ describe('Tests for CreateAttainmentView components', () => {
   );
 
 });
-*/
