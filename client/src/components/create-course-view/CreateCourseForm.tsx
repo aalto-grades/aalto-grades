@@ -9,12 +9,13 @@ import * as yup from 'yup';
 import {
   Box, TextField, Container, Button,
   Avatar, IconButton, List, ListItem,
-  ListItemAvatar, ListItemText
+  ListItemAvatar, ListItemText, CircularProgress
 } from '@mui/material';
 import { Theme, useTheme } from '@mui/material/styles';
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonIcon from '@mui/icons-material/Person';
+import SendIcon from '@mui/icons-material/Send';
 import { NewCourseData, State } from '../../types';
 
 function CreateCourseForm(params: {
@@ -106,7 +107,7 @@ function CreateCourseForm(params: {
           }
         }}
       >
-        {({ errors, handleChange, isValid, touched, values }) => (
+        {({ errors, handleChange, isSubmitting, isValid, touched, values }) => (
           <Form>
             <Box sx={{
               display: 'flex',
@@ -122,6 +123,7 @@ function CreateCourseForm(params: {
                 type="text"
                 fullWidth
                 value={values.courseCode}
+                disabled={isSubmitting}
                 label="Course Code*"
                 variant='standard'
                 color='primary'
@@ -160,6 +162,7 @@ function CreateCourseForm(params: {
                 type="text"
                 fullWidth
                 value={values.nameEn}
+                disabled={isSubmitting}
                 label="Course Name in English*"
                 variant='standard'
                 color='primary'
@@ -188,6 +191,7 @@ function CreateCourseForm(params: {
                 type="text"
                 fullWidth
                 value={values.nameFi}
+                disabled={isSubmitting}
                 label="Course Name in Finnish*"
                 variant='standard'
                 color='primary'
@@ -216,6 +220,7 @@ function CreateCourseForm(params: {
                 type="text"
                 fullWidth
                 value={values.nameSv}
+                disabled={isSubmitting}
                 label="Course Name in Swedish*"
                 variant='standard'
                 color='primary'
@@ -254,6 +259,7 @@ function CreateCourseForm(params: {
                 type="text"
                 fullWidth
                 value={values.departmentEn}
+                disabled={isSubmitting}
                 label="Organizer in English*"
                 variant='standard'
                 color='primary'
@@ -282,6 +288,7 @@ function CreateCourseForm(params: {
                 type="text"
                 fullWidth
                 value={values.departmentFi}
+                disabled={isSubmitting}
                 label="Organizer in Finnish*"
                 variant='standard'
                 color='primary'
@@ -310,6 +317,7 @@ function CreateCourseForm(params: {
                 type="text"
                 fullWidth
                 value={values.departmentSv}
+                disabled={isSubmitting}
                 label="Organizer in Swedish*"
                 variant='standard'
                 color='primary'
@@ -347,6 +355,7 @@ function CreateCourseForm(params: {
                 type="number"
                 fullWidth
                 value={values.minCredits}
+                disabled={isSubmitting}
                 label="Minimum Course Credits (ECTS)*"
                 variant='standard'
                 color='primary'
@@ -384,6 +393,7 @@ function CreateCourseForm(params: {
                 type="number"
                 fullWidth
                 value={values.maxCredits}
+                disabled={isSubmitting}
                 label="Maximum Course Credits (ECTS)*"
                 variant='standard'
                 color='primary'
@@ -422,6 +432,7 @@ function CreateCourseForm(params: {
                 type="text"
                 fullWidth
                 value={values.teacherEmail}
+                disabled={isSubmitting}
                 label="Teachers In Charge*"
                 variant='standard'
                 color='primary'
@@ -459,7 +470,8 @@ function CreateCourseForm(params: {
                   // Allow submit of email only if validation passes and not on list.
                   Boolean(errors.teacherEmail) ||
                   values.teacherEmail.length === 0 ||
-                  teachersInCharge.includes(email)
+                  teachersInCharge.includes(email) ||
+                  isSubmitting
                 }
                 onClick={(): void => addTeacher()}
                 sx={{ mt: 1 }}
@@ -478,6 +490,7 @@ function CreateCourseForm(params: {
                           secondaryAction={
                             <IconButton
                               edge="end"
+                              disabled={isSubmitting}
                               aria-label="delete"
                               onClick={(): void => {
                                 removeTeacher(teacherEmail);
@@ -506,9 +519,22 @@ function CreateCourseForm(params: {
               size='medium'
               variant='contained'
               type='submit'
-              disabled={!isValid || teachersInCharge.length === 0}
+              disabled={!isValid || teachersInCharge.length === 0 || isSubmitting}
+              endIcon={<SendIcon />}
             >
               Create Course
+              {isSubmitting && (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    marginTop: '-12px',
+                    marginLeft: '-12px',
+                  }}
+                />
+              )}
             </Button>
           </Form>
         )}
