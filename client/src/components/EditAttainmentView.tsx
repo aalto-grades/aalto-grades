@@ -16,7 +16,10 @@ import { State } from '../types';
 
 function EditAttainmentView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
-  const { courseId, assessmentModelId, attainmentId }: Params = useParams();
+
+  // attainmentId is either the root attainment of an assessment model when
+  // creating a new attainment or the ID of an attainment being edited.
+  const { courseId, assessmentModelId, modification, attainmentId }: Params = useParams();
 
   /*
    * The current state of the tree of attainments being edited.
@@ -36,16 +39,35 @@ function EditAttainmentView(): JSX.Element {
    * and only exist in the client. Temporary IDs are negative to differentiate
    * them from database IDs and to avoid conflicts between them.
    */
-  const [temporaryId, setTemporaryId]: State<number> = useState(-1);
+  const [temporaryId, setTemporaryId]: State<number> = useState(-2);
 
   const [openConfDialog, setOpenConfDialog]: State<boolean> = useState(false);
 
   useEffect(() => {
-    attainmentServices.getAttainment(courseId, assessmentModelId, attainmentId, 'descendants')
-      .then((attainment: AttainmentData) => {
-        setAttainmentTree(attainment);
-      })
-      .catch((e: Error) => console.log(e.message));
+    switch (modification) {
+    case 'create':
+      setAttainmentTree({
+        id: -1,
+        parentId: Number(attainmentId),
+        name: '',
+        tag: '',
+        daysValid: 0,
+        subAttainments: []
+      });
+      break;
+
+    case 'edit':
+      attainmentServices.getAttainment(courseId, assessmentModelId, attainmentId, 'descendants')
+        .then((attainment: AttainmentData) => {
+          setAttainmentTree(attainment);
+        })
+        .catch((e: Error) => console.log(e.message));
+      break;
+
+    default:
+      break;
+    }
+
   }, []);
 
   function getTemporaryId(): number {
@@ -70,8 +92,12 @@ function EditAttainmentView(): JSX.Element {
         const subAttainment: AttainmentData = tree.subAttainments[i];
 
         if (subAttainment.id === attainment.id) {
-          if (attainment.id > 0)
+          // Attainments that aren't saved in the database don't need to be
+          // stored in deletedAttainments since there is no need to delete them
+          // from anywhere except the UI.
+          if (attainment.id > 0) {
             setDeletedAttainments([...deletedAttainments, structuredClone(attainment)]);
+          }
 
           tree.subAttainments.splice(Number(i), 1);
           setAttainmentTree(structuredClone(attainmentTree));
@@ -106,8 +132,19 @@ function EditAttainmentView(): JSX.Element {
       for (const attainment of deletedAttainments)
         attainmentServices.deleteAttainment(courseId, assessmentModelId, attainment.id);
 
-      attainmentServices.editAttainment(courseId, assessmentModelId, attainmentTree);
-      addAndEdit(attainmentTree);
+      switch (modification) {
+      case 'create':
+        attainmentServices.addAttainment(courseId, assessmentModelId, attainmentTree);
+        break;
+
+      case 'edit':
+        attainmentServices.editAttainment(courseId, assessmentModelId, attainmentTree);
+        addAndEdit(attainmentTree);
+        break;
+
+      default:
+        break;
+      }
 
       navigate(-1);
     } catch (exception) {
@@ -128,9 +165,17 @@ function EditAttainmentView(): JSX.Element {
   return (
     <>
       <Container maxWidth="md" sx={{ textAlign: 'right' }}>
-        <Typography variant="h1" align='left' sx={{ flexGrow: 1, mb: 4 }}>
-          Edit Study Attainment
-        </Typography>
+        {
+          modification === 'create'
+            ?
+            <Typography variant="h1" align='left' sx={{ flexGrow: 1, mb: 4 }}>
+              Create Study Attainment
+            </Typography>
+            :
+            <Typography variant="h1" align='left' sx={{ flexGrow: 1, mb: 4 }}>
+              Edit Study Attainment
+            </Typography>
+        }
         <form>
           <Box sx={{
             bgcolor: 'primary.light',
@@ -163,21 +208,32 @@ function EditAttainmentView(): JSX.Element {
             open={openConfDialog}
           />
           <Box sx={{
-            display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
-            alignItems: 'center', gap: 1, mt: 2, mb: 1
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: modification === 'edit' ? 'space-between' : 'right',
+            alignItems: 'center',
+            gap: 1,
+            mt: 2,
+            mb: 1
           }}>
-            <Button
-              size='medium'
-              variant='outlined'
-              color='error'
-              onClick={handleConfDialogOpen}
-              sx={{ ml: 2 }}
-            >
-              Delete Attainment
-            </Button>
+            {
+              modification === 'edit' &&
+              <Button
+                size='medium'
+                variant='outlined'
+                color='error'
+                onClick={handleConfDialogOpen}
+                sx={{ ml: 2 }}
+              >
+                Delete Attainment
+              </Button>
+            }
             <Box sx={{
-              display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start',
-              alignItems: 'center', gap: 1
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              gap: 1
             }}>
               <Button size='medium' variant='outlined' onClick={() => navigate(-1)}>
                 Cancel

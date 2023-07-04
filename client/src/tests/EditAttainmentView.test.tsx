@@ -78,7 +78,8 @@ describe('Tests for EditAttainmentView components', () => {
     const mockAttainment: AttainmentData = getMockAttainment();
     // TODO: Update daysValid as a number in attainment creation. Probably by
     // adding a number text field to also account for formula attributes.
-    mockAttainment.daysValid = '42'; // ts-ignore
+    // @ts-ignore
+    mockAttainment.daysValid = '42';
 
     let daysValidField: HTMLElement;
     await waitFor(async () => {

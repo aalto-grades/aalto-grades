@@ -62,7 +62,7 @@ function Attainments(props: {
                   [
                     <Button key='edit' onClick={(): void => {
                       navigate(
-                        `/${props.courseId}/edit-attainment`
+                        `/${props.courseId}/attainment/edit`
                         + `/${props.assessmentModel.id}/${attainment.id}`
                       );
                     }}>
@@ -81,7 +81,7 @@ function Attainments(props: {
       }}>
         <Button onClick={(): void => {
           navigate(
-            `/${props.courseId}/create-attainment`
+            `/${props.courseId}/attainment/create`
             + `/${props.assessmentModel.id}/${props.attainmentTree.id}`
           );
         }}>
