@@ -20,6 +20,7 @@ import { HttpCode } from '../types/httpCode';
 import { localizedStringSchema } from '../types/language';
 import { CourseFull } from '../types/model';
 import { findCourseFullById, parseCourseFull } from './utils/course';
+import { UserData } from 'aalto-grades-common/types';
 
 export async function getCourse(req: Request, res: Response): Promise<void> {
   const courseId: number = Number(req.params.courseId);
@@ -68,26 +69,32 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
     courseCode: yup.string().required(),
     minCredits: yup.number().min(0).required(),
     maxCredits: yup.number().min(yup.ref('minCredits')).required(),
-    teachersInCharge: yup.array().min(1).of(
-      yup.string().email().required()
-    ).required(),
+    teachersInCharge: yup.array().of(
+      yup.object().shape({
+        email: yup.string().email().required()
+      })
+    ),
     department: localizedStringSchema.required(),
     name: localizedStringSchema.required()
   });
 
   await requestSchema.validate(req.body, { abortEarly: false });
 
+  const emailList: Array<string> = req.body.teachersInCharge.map(
+    (teacher: UserData) => teacher.email
+  );
+
   const teachers: Array<User> = await User.findAll({
     attributes: ['id', 'email'],
     where: {
-      email: req.body.teachersInCharge
+      email: emailList
     }
   });
 
   // Check for non existent emails.
-  if (req.body.teachersInCharge.length !== teachers.length) {
+  if (emailList.length !== teachers.length) {
     const missingEmails: Array<string> =
-      req.body.teachersInCharge.filter(
+      emailList.filter(
         (teacher: string) => teachers.map((user: User) => user.email).indexOf(teacher) === -1
       );
 
