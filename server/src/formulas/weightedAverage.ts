@@ -12,8 +12,6 @@ import {
 import { Status } from '../types/grades';
 
 interface WeightedAverageParams {
-  min: number;
-  max: number;
   weight: number;
 }
 
@@ -41,8 +39,6 @@ async function calculateWeightedAverage(
 
 const codeSnippet: string =
 `interface WeightedAverageParams {
-  min: number;
-  max: number;
   weight: number;
 }
 
@@ -79,8 +75,6 @@ registerFormula(
   name,
   attributes,
   yup.object({
-    min: yup.number().required(),
-    max: yup.number().min(yup.ref('min')).required(),
     weight: yup.number().required()
   }).noUnknown().strict()
 );
