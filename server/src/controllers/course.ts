@@ -73,7 +73,7 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
       yup.object().shape({
         email: yup.string().email().required()
       })
-    ),
+    ).required(),
     department: localizedStringSchema.required(),
     name: localizedStringSchema.required()
   });

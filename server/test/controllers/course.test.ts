@@ -113,7 +113,11 @@ describe('Test POST /v1/courses - create new course', () => {
       courseCode: 'ELEC-A7200',
       minCredits: 5,
       maxCredits: 5,
-      teachersInCharge: ['thomas.siegel@aalto.fi'],
+      teachersInCharge: [
+        {
+          email: 'thomas.siegel@aalto.fi'
+        }
+      ],
       department: {
         fi: 'Sähkötekniikan korkeakoulu',
         en: 'School of Electrical Engineering',
@@ -141,8 +145,12 @@ describe('Test POST /v1/courses - create new course', () => {
       minCredits: 5,
       maxCredits: 5,
       teachersInCharge: [
-        'thomas.siegel@aalto.fi',
-        'arthur.james@aalto.fi'
+        {
+          email: 'thomas.siegel@aalto.fi'
+        },
+        {
+          email: 'arthur.james@aalto.fi'
+        }
       ],
       department: {
         fi: 'Sähkötekniikan korkeakoulu',
@@ -205,7 +213,11 @@ describe('Test POST /v1/courses - create new course', () => {
       courseCode: 'ELEC-A7200',
       minCredits: 5,
       maxCredits: 5,
-      teachersInCharge: ['not.found@aalto.fi'],
+      teachersInCharge: [
+        {
+          email: 'not.found@aalto.fi'
+        }
+      ],
       department: {
         fi: 'Sähkötekniikan korkeakoulu',
         en: 'School of Electrical Engineering',
