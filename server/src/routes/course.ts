@@ -51,7 +51,7 @@ export const router: Router = Router();
  *     type: integer
  *     description: Maximum amount credits student can receive from passing the course.
  *     example: 5
- *   teachersInCharge:
+ *   TeachersInCharge:
  *     type: array
  *     items:
  *       description: Teachers email address.
