@@ -12,6 +12,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { State, TextFieldData } from '../../types';
 import { AttainmentData } from 'aalto-grades-common/types';
+import Box from '@mui/material/Box';
 
 // A Dialog component for asking the number of sub-attainments
 
@@ -67,45 +68,48 @@ function SimpleDialog(props: {
 
   return (
     <Dialog open={props.open} >
-      {
-        (props.attainment.subAttainments && props.attainment.subAttainments.length > 0)
-          ? <DialogTitle>Add Sub Study Attainments</DialogTitle>
-          : <DialogTitle>Create Sub Study Attainments</DialogTitle>
-      }
-      <form>
-        <DialogContent sx={{ px: 3, py: 1 }}>
-          <TextField
-            key={numberData.fieldId}
-            id={numberData.fieldId}
-            type='text'
-            label={numberData.fieldLabel}
-            InputLabelProps={{ shrink: true }}
-            margin='normal'
-            inputProps={{ min: 1, maxLength: 2, inputMode: 'numeric', pattern: '[0-9]*' }}
-            value={numOfAttainments}
-            error={error}
-            helperText={error ? 'Value needs to be a positive integer' : ''}
-            sx={{ width: '100%' }}
-            onChange={(event: ChangeEvent<HTMLInputElement>): void => {
-              setNumOfAttainments(Number(event.target.value));
-            }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button size='medium' onClick={props.handleClose}>
-            Cancel
-          </Button>
-          <Button size='medium' variant='outlined' type='submit' onClick={
-            (event: SyntheticEvent): void => {
-              if (!error) {
-                handleSubmit(event);
-              }
-            }
-          }>
-            Confirm
-          </Button>
-        </DialogActions>
-      </form>
+      <Box sx={{ p: 2 }}>
+
+        {
+          (props.attainment.subAttainments && props.attainment.subAttainments.length > 0)
+            ? <DialogTitle>Add Sub Study Attainments</DialogTitle>
+            : <DialogTitle>Create Sub Study Attainments</DialogTitle>
+        }
+        <form>
+          <DialogContent sx={{ px: 3, py: 1 }}>
+            <TextField
+              key={numberData.fieldId}
+              id={numberData.fieldId}
+              type='text'
+              label={numberData.fieldLabel}
+              InputLabelProps={{ shrink: true }}
+              margin='normal'
+              inputProps={{ min: 1, maxLength: 2, inputMode: 'numeric', pattern: '[0-9]*' }}
+              value={numOfAttainments}
+              error={error}
+              helperText={error ? 'Value needs to be a positive integer' : ''}
+              sx={{ width: '100%' }}
+              onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+                setNumOfAttainments(Number(event.target.value));
+              }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button size='medium' onClick={props.handleClose}>
+              Cancel
+            </Button>
+            <Button
+              size='medium'
+              variant='contained'
+              type='submit'
+              disabled={error}
+              onClick={(event: SyntheticEvent): void => handleSubmit(event)}
+            >
+              Confirm
+            </Button>
+          </DialogActions>
+        </form>
+      </Box>
     </Dialog>
   );
 }
