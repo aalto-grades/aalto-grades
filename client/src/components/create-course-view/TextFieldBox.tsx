@@ -6,12 +6,7 @@ import PropTypes from 'prop-types';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
-
-export interface TextFieldData {
-  fieldId: string,
-  fieldLabel: string,
-  fieldHelperText: string
-}
+import { TextFieldData } from '../../types';
 
 const inputProps = {
   style: {

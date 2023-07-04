@@ -2,10 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState }  from 'react';
-import {
-  NavigateFunction, Params, useParams, useNavigate, useOutletContext
-} from 'react-router-dom';
+import { JSX, SyntheticEvent, useEffect, useState }  from 'react';
+import { NavigateFunction, Params, useParams, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
@@ -13,131 +11,148 @@ import Box from '@mui/material/Box';
 import Attainment from './create-attainment/Attainment';
 import ConfirmationDialog from './create-attainment/ConfirmationDialog';
 import attainmentServices from '../services/attainments';
-import mockAttainmentsClient from '../tests/mock-data/mockAttainmentsClient';
+import { AttainmentData } from 'aalto-grades-common/types';
+import { State } from '../types';
 
-function EditAttainmentView() {
+function EditAttainmentView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
-  const { courseId, instanceId, sisuInstanceId, attainmentId }: Params = useParams();
-  let addedAttainments, setAddedAttainments, attainmentIncrementId, setIncrementId;
 
-  // If this view is opened during the creation of an instance, get the necessary
-  // data from the context
-  if (sisuInstanceId) {
-    (
-      {
-        addedAttainments, setAddedAttainments,
-        attainmentIncrementId, setIncrementId
-      } = useOutletContext<any>());
-  }
+  // attainmentId is either the root attainment of an assessment model when
+  // creating a new attainment or the ID of an attainment being edited.
+  const { courseId, assessmentModelId, modification, attainmentId }: Params = useParams();
 
-  function getAttainment() {
-    // If this view is opened from the course view, get attainment from DB
-    // Else the attainment is being edited during the creation of an instance so
-    // gotten from the context
-    if (instanceId) {
-      // TODO: replace with a function that gets the actual data from the server
-      return attainmentServices.getFinalAttainmentById(
-        mockAttainmentsClient, Number(attainmentId)
-      );
-    } else if (sisuInstanceId && addedAttainments.length !== 0) {
-      let attainment = addedAttainments.find(attainment => {
-        return attainment.temporaryId === Number(attainmentId);
+  /*
+   * The current state of the tree of attainments being edited.
+   *
+   * In this tree, attainments which have a positive ID exist in the database
+   * and are to be updated. Attainments which have a negative ID do not exist
+   * in the database and are to be added. Attainments to be deleted are added
+   * to the deletedAttainments list and removed from this tree.
+   */
+  const [attainmentTree, setAttainmentTree]: State<AttainmentData> = useState(null);
+
+  // List of attainments that exist in the database which are to be deleted.
+  const [deletedAttainments, setDeletedAttainments]: State<Array<AttainmentData>> = useState([]);
+
+  /*
+   * Temporary IDs for attainments that have not been added to the database yet
+   * and only exist in the client. Temporary IDs are negative to differentiate
+   * them from database IDs and to avoid conflicts between them.
+   */
+  const [temporaryId, setTemporaryId]: State<number> = useState(-2);
+
+  const [openConfDialog, setOpenConfDialog]: State<boolean> = useState(false);
+
+  useEffect(() => {
+    switch (modification) {
+    case 'create':
+      setAttainmentTree({
+        id: -1,
+        parentId: Number(attainmentId),
+        name: '',
+        tag: '',
+        daysValid: 0,
+        subAttainments: []
       });
-      if (attainment) {
-        attainment = attainmentServices.formatDates([attainment]);
-        return attainment;
-      } else {
-        console.log('Attainment could not be found');
+      break;
+
+    case 'edit':
+      attainmentServices.getAttainment(courseId, assessmentModelId, attainmentId, 'descendants')
+        .then((attainment: AttainmentData) => {
+          setAttainmentTree(attainment);
+        })
+        .catch((e: Error) => console.log(e.message));
+      break;
+
+    default:
+      break;
+    }
+
+  }, []);
+
+  function getTemporaryId(): number {
+    const id: number = temporaryId;
+    setTemporaryId(temporaryId - 1);
+    return id;
+  }
+
+  function deleteAttainment(attainment: AttainmentData): void {
+    if (attainment.id === attainmentTree.id) {
+      if (attainment.id > 0) {
+        attainmentServices.deleteAttainment(courseId, assessmentModelId, attainment.id);
       }
-    } else {
-      console.log('Attainment could not be found');
+
+      setAttainmentTree(null);
+      navigate(-1);
+      return;
     }
-  }
 
-  const [attainments, setAttainments] = useState(getAttainment());
-  const [deletedAttainments, setDeletedAttainments] = useState([]);
+    function inner(attainment: AttainmentData, tree: AttainmentData) {
+      for (const i in tree.subAttainments) {
+        const subAttainment: AttainmentData = tree.subAttainments[i];
 
-  // Function to edit the data that is in the database
-  async function editAttainment(attainmentObject): Promise<void> {
-    try {
-      const attainment = await attainmentServices.editAttainment(
-        courseId, instanceId, attainmentObject
-      );
+        if (subAttainment.id === attainment.id) {
+          // Attainments that aren't saved in the database don't need to be
+          // stored in deletedAttainments since there is no need to delete them
+          // from anywhere except the UI.
+          if (attainment.id > 0) {
+            setDeletedAttainments([...deletedAttainments, structuredClone(attainment)]);
+          }
 
-      console.log(attainment);
-      //navigate('/' + courseId, { replace: true });
-    } catch (exception) {
-      console.log(exception.message);
-    }
-  }
+          tree.subAttainments.splice(Number(i), 1);
+          setAttainmentTree(structuredClone(attainmentTree));
+          return;
+        }
 
-  // Function to add data to the database
-  async function addAttainment(attainmentObject): Promise<void> {
-    try {
-      const attainment = await attainmentServices.addAttainment(
-        courseId, instanceId, attainmentObject
-      );
-
-      console.log(attainment);
-      //navigate('/' + courseId, { replace: true });
-    } catch (exception) {
-      console.log(exception.message);
-    }
-  }
-
-  // Function to delete data from the database or from the context
-  async function deleteAttainment(attainmentId): Promise<void> {
-    // If this view is opened from the course view, delete from DB
-    // Else the attainment is being edited during the creation of an instance
-    // so only delete from the context
-    if (instanceId) {
-      try {
-        await attainmentServices.deleteAttainment(courseId, instanceId, attainmentId);
-      } catch (exception) {
-        console.log(exception.message);
+        inner(attainment, subAttainment);
       }
-    } else if (sisuInstanceId) {
-      const updatedAttainments = attainmentServices.deleteTemporaryAttainment(
-        addedAttainments, attainments[0]
-      );
-
-      setAddedAttainments(updatedAttainments);
     }
-    navigate(-1);
+
+    inner(attainment, attainmentTree);
   }
 
-  function handleSubmit(event): void {
+  function handleSubmit(event: SyntheticEvent): void {
     event.preventDefault();
-    try {
-      // If this view is opened from the course view, update DB
-      // Else the attainment is being edited during the creation of an
-      // instance so only update the context
-      if (instanceId) {
-        const updatedAttainments = attainmentServices.formatStringsToDates(attainments);
-        const existingAttainments = attainmentServices.getExistingAttainments(updatedAttainments);
-        const newAttainments = attainmentServices.getNewAttainments(updatedAttainments);
-        existingAttainments.forEach((attainment) => editAttainment(attainment));
-        newAttainments.forEach((attainment) => addAttainment(attainment));
-        deletedAttainments.forEach((attainment) => {
-          if (attainment.id)
-            deleteAttainment(attainment.id);
-        });
-        navigate(-1);
-      } else if (sisuInstanceId) {
-        const updatedAttainments = attainmentServices.updateTemporaryAttainment(
-          addedAttainments, attainments[0]
-        );
 
-        setAddedAttainments(updatedAttainments);
-        navigate(-1);
+    function addAndEdit(tree: AttainmentData): void {
+      if (!tree.subAttainments)
+        return;
+
+      for (const subAttainment of tree.subAttainments) {
+        if (subAttainment.id > 0) {
+          attainmentServices.editAttainment(courseId, assessmentModelId, subAttainment);
+          addAndEdit(subAttainment);
+        } else {
+          attainmentServices.addAttainment(courseId, assessmentModelId, subAttainment);
+        }
       }
+    }
+
+    try {
+      for (const attainment of deletedAttainments)
+        attainmentServices.deleteAttainment(courseId, assessmentModelId, attainment.id);
+
+      switch (modification) {
+      case 'create':
+        attainmentServices.addAttainment(courseId, assessmentModelId, attainmentTree);
+        break;
+
+      case 'edit':
+        attainmentServices.editAttainment(courseId, assessmentModelId, attainmentTree);
+        addAndEdit(attainmentTree);
+        break;
+
+      default:
+        break;
+      }
+
+      navigate(-1);
     } catch (exception) {
       console.log(exception);
     }
   }
 
-  // Functions and varibales for opening and closing the dialog for confirming attainment deletion
-  const [openConfDialog, setOpenConfDialog] = useState(false);
+  // Functions for opening and closing the dialog for confirming attainment deletion
 
   function handleConfDialogOpen(): void {
     setOpenConfDialog(true);
@@ -147,26 +162,20 @@ function EditAttainmentView() {
     setOpenConfDialog(false);
   }
 
-  // A function that temporarily removes an attainment from the 'attainments',
-  // and then this attainment is deleted as are also the 'deletedAttainments'
-  // when the Confirm or Delete Attainment buttons are pressed
-  function removeAttainment(indices): void {
-    if (JSON.stringify(indices) === '[0]') {
-      deleteAttainment(attainmentId);
-    } else {
-      const deletedAttainment = attainmentServices.getAttainmentByIndices(indices, attainments);
-      const updatedAttainments = attainmentServices.removeAttainment(indices, attainments);
-      setDeletedAttainments([...deletedAttainments, deletedAttainment]);
-      setAttainments(updatedAttainments);
-    }
-  }
-
   return (
     <>
       <Container maxWidth="md" sx={{ textAlign: 'right' }}>
-        <Typography variant="h1" align='left' sx={{ flexGrow: 1, mb: 4 }}>
-            Edit Study Attainment
-        </Typography>
+        {
+          modification === 'create'
+            ?
+            <Typography variant="h1" align='left' sx={{ flexGrow: 1, mb: 4 }}>
+              Create Study Attainment
+            </Typography>
+            :
+            <Typography variant="h1" align='left' sx={{ flexGrow: 1, mb: 4 }}>
+              Edit Study Attainment
+            </Typography>
+        }
         <form>
           <Box sx={{
             bgcolor: 'primary.light',
@@ -178,40 +187,53 @@ function EditAttainmentView() {
             pb: 1,
             px: 2,
           }}>
-            <Attainment
-              indices={[0]}
-              attainments={attainments}
-              setAttainments={setAttainments}
-              removeAttainment={removeAttainment}
-              temporaryId={attainmentIncrementId}
-              setIncrementId={setIncrementId}
-            />
+            {
+              attainmentTree &&
+              <Attainment
+                attainmentTree={attainmentTree}
+                setAttainmentTree={setAttainmentTree}
+                deleteAttainment={deleteAttainment}
+                getTemporaryId={getTemporaryId}
+                attainment={attainmentTree}
+                formulaAttributeNames={[]}
+              />
+            }
           </Box>
           <ConfirmationDialog
+            deleteAttainment={deleteAttainment}
+            attainment={attainmentTree}
             title={'Study Attainment'}
             subject={'study attainment'}
-            open={openConfDialog}
             handleClose={handleConfDialogClose}
-            deleteAttainment={removeAttainment}
-            indices={[0]}
-            attainments={attainments}
+            open={openConfDialog}
           />
           <Box sx={{
-            display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
-            alignItems: 'center', gap: 1, mt: 2, mb: 1
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: modification === 'edit' ? 'space-between' : 'right',
+            alignItems: 'center',
+            gap: 1,
+            mt: 2,
+            mb: 1
           }}>
-            <Button
-              size='medium'
-              variant='outlined'
-              color='error'
-              onClick={handleConfDialogOpen}
-              sx={{ ml: 2 }}
-            >
-              Delete Attainment
-            </Button>
+            {
+              modification === 'edit' &&
+              <Button
+                size='medium'
+                variant='outlined'
+                color='error'
+                onClick={handleConfDialogOpen}
+                sx={{ ml: 2 }}
+              >
+                Delete Attainment
+              </Button>
+            }
             <Box sx={{
-              display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start',
-              alignItems: 'center', gap: 1
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              gap: 1
             }}>
               <Button size='medium' variant='outlined' onClick={() => navigate(-1)}>
                 Cancel

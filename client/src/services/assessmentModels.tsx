@@ -38,30 +38,6 @@ export async function addAssessmentModel(
   return response.data.data.assessmentModel.id;
 }
 
-async function getAllAttainments(
-  courseId: Numeric,
-  assessmentModelId: Numeric
-): Promise<AttainmentData> {
-
-  let response: FullResponse<AttainmentData>;
-
-  // Brute force some return value until the route for getting all attainments
-  // of an assessment model is merged
-  for (let i: number = 0; i < 300; i++) {
-    try {
-      response =
-        await axios.get(
-          `/v1/courses/${courseId}/assessment-models/${assessmentModelId}`
-          + `/attainments/${i}?tree=descendants` // TODO: Use proper route
-        );
-
-      break;
-    } catch {} // eslint-disable-line
-  }
-
-  return response.data.data;
-}
-
 export default {
-  getAllAssessmentModels, getAssessmentModel, addAssessmentModel, getAllAttainments
+  getAllAssessmentModels, getAssessmentModel, addAssessmentModel
 };

@@ -7,6 +7,7 @@ import '@testing-library/jest-dom/extend-expect';
 import { render, RenderResult, waitFor, cleanup } from '@testing-library/react';
 import CourseView from '../components/CourseView';
 import assessmentModelsService from '../services/assessmentModels';
+import attainmentService from '../services/attainments';
 import coursesService from '../services/courses';
 import instancesService from '../services/instances';
 import AuthContext from '../context/AuthProvider';
@@ -17,6 +18,7 @@ import mockInstances from './mock-data/mockInstancesWithStringDates';
 import { LoginResult, SystemRole } from 'aalto-grades-common/types';
 
 jest.mock('../services/assessmentModels');
+jest.mock('../services/attainments');
 jest.mock('../services/courses');
 jest.mock('../services/instances');
 afterEach(cleanup);
@@ -36,10 +38,8 @@ describe('Tests for CourseView component', () => {
     (assessmentModelsService.getAllAssessmentModels as jest.Mock)
       .mockResolvedValue(mockAssessmentModels);
 
-    (assessmentModelsService.getAllAttainments as jest.Mock)
-      .mockRejectedValue('Network error');
-    (assessmentModelsService.getAllAttainments as jest.Mock)
-      .mockResolvedValue(mockAttainments);
+    (attainmentService.getAllAttainments as jest.Mock).mockRejectedValue('Network error');
+    (attainmentService.getAllAttainments as jest.Mock).mockResolvedValue(mockAttainments);
 
     return render(
       <MemoryRouter initialEntries={['/course-view/1']}>
