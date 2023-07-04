@@ -10,6 +10,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import Button from '@mui/material/Button';
 import { AttainmentData } from 'aalto-grades-common/types';
+import Box from '@mui/material/Box';
 
 // A Dialog component for confirming deletion
 
@@ -22,24 +23,26 @@ function ConfirmationDialog(props: {
   open: boolean
 }): JSX.Element {
   return (
-    <Dialog open={props.open} >
-      <DialogTitle >Delete {props.title}</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
+    <Dialog open={props.open}>
+      <Box sx={{ p: 2 }}>
+        <DialogTitle >Delete {props.title}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
           Are you sure you want to delete this {props.subject} and all of the attainments below it?
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button size='medium' variant='outlined' onClick={props.handleClose}>
-          Cancel
-        </Button>
-        <Button size='medium' onClick={(): void => {
-          props.deleteAttainment(props.attainment);
-          props.handleClose();
-        }}>
-          Delete
-        </Button>
-      </DialogActions>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button size='medium' variant='outlined' onClick={props.handleClose}>
+            Cancel
+          </Button>
+          <Button size='medium' variant='contained' onClick={(): void => {
+            props.deleteAttainment(props.attainment);
+            props.handleClose();
+          }}>
+            Delete
+          </Button>
+        </DialogActions>
+      </Box>
     </Dialog>
   );
 }
