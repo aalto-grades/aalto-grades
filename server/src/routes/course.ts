@@ -54,11 +54,12 @@ export const router: Router = Router();
  *   TeachersInCharge:
  *     type: array
  *     items:
- *       description: Teachers email address.
- *       example: john.doe@aalto.fi
- *       type: string
- *     description: Email address of each teacher in charge added to the course.
- *     example: [john.doe@aalto.fi, jane.doe@aalto.fi]
+ *       type: object
+ *       properties:
+ *         email:
+ *           type: string
+ *           description: Teachers email address.
+ *           example: john.doe@aalto.fi
  *   CourseData:
  *     type: object
  *     description: Course general information with translations.
