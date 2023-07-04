@@ -110,7 +110,11 @@ describe('Tests for CreateCourseView components', () => {
           sv: testNameSv,
           en: testNameEn,
         },
-        teachersInCharge: [testTeacher]
+        teachersInCharge: [
+          {
+            email: testTeacher
+          }
+        ]
       });
     });
   });
