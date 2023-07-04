@@ -44,12 +44,7 @@ export default {
       });
 
       await queryInterface.addIndex('attainment_grade', ['user_id', 'attainment_id'], {
-        unique: true,
-        transaction
-      });
-
-      await queryInterface.addIndex('course_result', ['user_id', 'course_instance_id'], {
-        unique: true,
+        unique: false,
         transaction
       });
 
@@ -99,11 +94,6 @@ export default {
 
       await queryInterface.sequelize.query(
         'DROP INDEX IF EXISTS user_attainment_grade_user_id_attainment_id',
-        { transaction }
-      );
-
-      await queryInterface.sequelize.query(
-        'DROP INDEX IF EXISTS course_result_user_id_course_instance_id',
         { transaction }
       );
 
