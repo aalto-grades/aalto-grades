@@ -14,6 +14,8 @@ import TextField from '@mui/material/TextField';
 import assessmentModelsService from '../../services/assessmentModels';
 import attainmentServices from '../../services/attainments';
 import { State } from '../../types';
+import Stack from '@mui/material/Stack';
+import CircularProgress from '@mui/material/CircularProgress';
 
 function CreateAssessmentModelDialog(props: {
   handleClose: () => void,
@@ -23,15 +25,17 @@ function CreateAssessmentModelDialog(props: {
   const { courseId }: Params = useParams();
 
   const [name, setName]: State<string> = useState('');
+  const [isSubmitting, setIsSubmitting]: State<boolean> = useState(false);
 
   async function handleSubmit(event: SyntheticEvent): Promise<void> {
     event.preventDefault();
     try {
+      setIsSubmitting(true);
       const assessmentModelId: number = await assessmentModelsService.addAssessmentModel(
         courseId, { name: name }
       );
 
-      attainmentServices.addAttainment(courseId, assessmentModelId, {
+      await attainmentServices.addAttainment(courseId, assessmentModelId, {
         name: 'Root',
         tag: 'root',
         daysValid: 0
@@ -40,34 +44,41 @@ function CreateAssessmentModelDialog(props: {
       props.handleClose();
       props.onSubmit();
       setName('');
+      setIsSubmitting(false);
     } catch (exception) {
       console.log(exception);
     }
   }
 
   return (
-    <>
-      <Dialog open={props.open} transitionDuration={{ exit: 800 }}>
+    <Dialog open={props.open} transitionDuration={{ exit: 800 }}>
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        flexDirection: 'column',
+        p: 2
+      }}>
         <DialogTitle>Create Assessment Model</DialogTitle>
         <DialogContent>
           <form onSubmit={handleSubmit}>
             <TextField
-              key={'name'}
-              id={'name'}
+              key='name'
+              id='name'
               type='text'
-              label={'Name'}
+              label='Name'
+              fullWidth
               InputLabelProps={{ shrink: true }}
               margin='normal'
               value={name}
+              disabled={isSubmitting}
               onChange={(event: ChangeEvent<HTMLInputElement>): void => setName(event.target.value)}
             />
-            <Box sx={{
-              display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
-            }}>
+            <Stack spacing={2} direction="row" sx={{ mt: 2 }}>
               <Button
                 size='large'
                 variant='outlined'
                 onClick={props.handleClose}
+                disabled={isSubmitting}
               >
                 Cancel
               </Button>
@@ -75,14 +86,27 @@ function CreateAssessmentModelDialog(props: {
                 size='large'
                 variant='contained'
                 type='submit'
+                disabled={name.length === 0 || isSubmitting}
               >
                 Submit
+                {isSubmitting && (
+                  <CircularProgress
+                    size={24}
+                    sx={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      marginTop: '-12px',
+                      marginLeft: '-12px',
+                    }}
+                  />
+                )}
               </Button>
-            </Box>
+            </Stack>
           </form>
         </DialogContent>
-      </Dialog>
-    </>
+      </Box>
+    </Dialog>
   );
 }
 
