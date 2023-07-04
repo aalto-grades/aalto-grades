@@ -2,75 +2,52 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { ChangeEvent } from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@mui/material/TextField';
-import attainmentServices from '../../services/attainments';
+import { AttainmentData } from 'aalto-grades-common/types';
+import { TextFieldData } from '../../types';
 
-// A TextField component used for the 'name' of an attainment.
-// This component is also used for the formula attribute textfields that are
-// required after specifying a formula.
-
-function StringTextField({ fieldData, indices, attainments, setAttainments }) {
+function StringTextField(props: {
+  attainmentTree: AttainmentData,
+  setAttainmentTree: (attainmentTree: AttainmentData) => void,
+  attainment: AttainmentData,
+  value: string,
+  fieldData: TextFieldData,
+}): JSX.Element {
 
   // Functions for handling the change of the values in the 'New Name' textfield
   // and the textfields that represent formula attributes
-  function handleChange(event) {
-    const value = event.target.value;
-    if (fieldData.fieldId === 'attainmentName') {
-      const updatedAttainments = attainmentServices.setProperty(
-        indices, attainments, 'name', value
-      );
-
-      setAttainments(updatedAttainments);
-    } else if (fieldData.fieldId.startsWith('attribute')) {
-      const attributeKey = fieldData.fieldId.split('_')[1];
-      const updatedAttainments = attainmentServices.setFormulaAttribute(
-        indices, attainments, attributeKey, value
-      );
-
-      setAttainments(updatedAttainments);
-    } else {
-      console.log(fieldData.fieldId);
-    }
-  }
-
-  function getValue() {
-    if (fieldData.fieldId === 'attainmentName') {
-      return attainmentServices.getProperty(indices, attainments, 'name');
-    } else if (fieldData.fieldId.startsWith('attribute')) {
-      const attributeKey = fieldData.fieldId.split('_')[1];
-      return attainmentServices.getFormulaAttribute(indices, attainments, attributeKey);
-    } else {
-      console.log(fieldData.fieldId);
-    }
+  function handleChange(event: ChangeEvent<HTMLInputElement>): void {
+    props.attainment[props.fieldData.fieldId] = event.target.value;
+    props.setAttainmentTree(structuredClone(props.attainmentTree));
   }
 
   return (
     <TextField
       type='text'
-      key={fieldData.fieldId}
-      id={fieldData.fieldId}
+      key={props.fieldData.fieldId}
+      id={props.fieldData.fieldId}
       variant='standard'
-      label={fieldData.fieldLabel}
+      label={props.fieldData.fieldLabel}
       InputLabelProps={{ shrink: true }}
       margin='normal'
-      value={getValue()}
+      value={props.value}
       sx={{
         marginTop: 0,
         width: '100%'
       }}
-      onChange={(event) => handleChange(event)}
+      onChange={(event: ChangeEvent<HTMLInputElement>): void => handleChange(event)}
     />
   );
 }
 
 StringTextField.propTypes = {
-  fieldData: PropTypes.object,
-  fieldId: PropTypes.string,
-  fieldLabel: PropTypes.string,
-  indices: PropTypes.array,
-  attainments: PropTypes.array,
-  setAttainments: PropTypes.func
+  attainmentTree: PropTypes.object,
+  setAttainmentTree: PropTypes.func,
+  attainment: PropTypes.object,
+  value: PropTypes.string,
+  fieldData: PropTypes.object
 };
 
 export default StringTextField;

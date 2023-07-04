@@ -708,7 +708,7 @@ describe(
       expect(res.body.success).toBe(true);
       expect(res.body.data).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data, 2, 2, false);
+      verifyAttainmentData(res.body.data.attainment, 2, 2, false);
     });
 
     it('should respond with a single attainment with one level of subattainments, '
@@ -721,10 +721,10 @@ describe(
       expect(res.body.success).toBe(true);
       expect(res.body.data).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data, 2, 2, true);
+      verifyAttainmentData(res.body.data.attainment, 2, 2, true);
 
-      verifyAttainmentData(res.body.data.subAttainments[1], 6, 2, false);
-      verifyAttainmentData(res.body.data.subAttainments[0], 10, 2, false);
+      verifyAttainmentData(res.body.data.attainment.subAttainments[1], 6, 2, false);
+      verifyAttainmentData(res.body.data.attainment.subAttainments[0], 10, 2, false);
 
     });
 
@@ -738,21 +738,21 @@ describe(
       expect(res.body.success).toBe(true);
       expect(res.body.data).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data, 2, 2, true);
-      verifyAttainmentData(res.body.data.subAttainments[1], 6, 2, true);
+      verifyAttainmentData(res.body.data.attainment, 2, 2, true);
+      verifyAttainmentData(res.body.data.attainment.subAttainments[1], 6, 2, true);
       verifyAttainmentData(
-        res.body.data.subAttainments[1].subAttainments[0],
+        res.body.data.attainment.subAttainments[1].subAttainments[0],
         214,
         2,
         true
       );
       verifyAttainmentData(
-        res.body.data.subAttainments[1].subAttainments[0].subAttainments[0],
+        res.body.data.attainment.subAttainments[1].subAttainments[0].subAttainments[0],
         215,
         2,
         false
       );
-      verifyAttainmentData(res.body.data.subAttainments[0], 10, 2, false);
+      verifyAttainmentData(res.body.data.attainment.subAttainments[0], 10, 2, false);
 
     });
 

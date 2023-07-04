@@ -11,8 +11,10 @@ import Grow from '@mui/material/Grow';
 import FileLoadDialog from './course-view/FileLoadDialog';
 import CourseDetails from './course-view/CourseDetails';
 import Attainments from './course-view/Attainments';
+import CreateAssessmentModelDialog from './course-view/CreateAssessmentModelDialog';
 import InstancesTable from './course-view/InstancesTable';
 import assessmentModelsService from '../services/assessmentModels';
+import attainmentService from '../services/attainments';
 import coursesService from '../services/courses';
 import instancesService from '../services/instances';
 import sortingServices from '../services/sorting';
@@ -40,7 +42,8 @@ function CourseView(): JSX.Element {
   const [instances, setInstances]: State<Array<CourseInstanceData>> = useState([]);
 
   const [animation, setAnimation]: State<boolean> = useState(false);
-  const [open, setOpen]: State<boolean> = useState(false);
+  const [fileLoadOpen, setFileLoadOpen]: State<boolean> = useState(false);
+  const [createAssessmentModelOpen, setCreateAssessmentModelOpen]: State<boolean> = useState(false);
 
   useEffect(() => {
     coursesService.getCourse(courseId)
@@ -54,7 +57,7 @@ function CourseView(): JSX.Element {
         setAssessmentModels(assessmentModels);
         setCurrentAssessmentModel(assessmentModels[0]);
 
-        assessmentModelsService.getAllAttainments(courseId, assessmentModels[0].id)
+        attainmentService.getAllAttainments(courseId, assessmentModels[0].id)
           .then((attainmentTree: AttainmentData) => {
             setAttainmentTree(attainmentTree);
           })
@@ -79,26 +82,26 @@ function CourseView(): JSX.Element {
     setAnimation(true);
   }, [currentAssessmentModel]);
 
-  function handleClickOpen(): void {
-    setOpen(true);
-  }
-
-  function handleClose(): void {
-    setOpen(false);
-  }
-
   function onChangeAssessmentModel(assessmentModel: AssessmentModelData): void {
     if (assessmentModel.id !== currentAssessmentModel?.id) {
       setAnimation(false);
       setAttainmentTree(null);
       setCurrentAssessmentModel(assessmentModel);
 
-      assessmentModelsService.getAllAttainments(courseId, assessmentModel.id)
+      attainmentService.getAllAttainments(courseId, assessmentModel.id)
         .then((attainmentTree: AttainmentData) => {
           setAttainmentTree(attainmentTree);
         })
         .catch((e: Error) => console.log(e.message));
     }
+  }
+
+  function onCreateAssessmentModel(): void {
+    assessmentModelsService.getAllAssessmentModels(courseId)
+      .then((assessmentModels: Array<AssessmentModelData>) => {
+        setAssessmentModels(assessmentModels);
+      })
+      .catch((e: Error) => console.log(e.message));
   }
 
   return (
@@ -112,6 +115,18 @@ function CourseView(): JSX.Element {
             justifyContent: 'space-between', mb: 4, columnGap: 6
           }}>
             <Typography variant='h2' align='left'>{course.name.en}</Typography>
+            {
+              /* Only admins and teachers are allowed to create assessment models */
+              auth.role == SystemRole.Admin &&
+              <Button
+                id='ag_new_assessment_model_btn'
+                size='large'
+                variant='contained'
+                onClick={(): void => setCreateAssessmentModelOpen(true)}
+              >
+                New Assessment Model
+              </Button>
+            }
           </Box>
           <Box sx={{ display: 'flex', gap: 3 }}>
             <div>
@@ -126,7 +141,7 @@ function CourseView(): JSX.Element {
               /* a different attainment component will be created for students */
               auth.role == SystemRole.Admin &&
               <div style={{ width: '100%' }}>
-                { attainmentTree != null ?
+                {attainmentTree != null ?
                   <Grow
                     in={animation}
                     style={{ transformOrigin: '0 0 0' }}
@@ -138,7 +153,7 @@ function CourseView(): JSX.Element {
                         courseId={courseId}
                         formula={'Weighted Average'} /* TODO: Retrieve real formula */
                         assessmentModel={currentAssessmentModel}
-                        handleAddPoints={handleClickOpen}
+                        handleAddPoints={(): void => setFileLoadOpen(true)}
                       />
                     </div>
                   </Grow>
@@ -154,7 +169,7 @@ function CourseView(): JSX.Element {
                     }}>
                       <CircularProgress />
                     </Box>
-                      Loading attainments...
+                    Loading attainments...
                   </div>
                 }
               </div>
@@ -187,8 +202,13 @@ function CourseView(): JSX.Element {
           />
           <FileLoadDialog
             //instanceId={currentInstance.id}
-            open={open}
-            handleClose={handleClose}
+            open={fileLoadOpen}
+            handleClose={(): void => setFileLoadOpen(false)}
+          />
+          <CreateAssessmentModelDialog
+            open={createAssessmentModelOpen}
+            handleClose={(): void => setCreateAssessmentModelOpen(false)}
+            onSubmit={onCreateAssessmentModel}
           />
         </>
       }

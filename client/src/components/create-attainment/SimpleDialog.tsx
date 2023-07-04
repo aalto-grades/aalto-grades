@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState } from 'react';
+import { ChangeEvent, SyntheticEvent, useState } from 'react';
 import PropTypes from 'prop-types';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
@@ -10,82 +10,117 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import attainmentServices from '../../services/attainments';
+import { State, TextFieldData } from '../../types';
+import { AttainmentData } from 'aalto-grades-common/types';
+import Box from '@mui/material/Box';
 
 // A Dialog component for asking the number of sub-attainments
 
-const numberData = {
+const numberData: TextFieldData = {
   fieldId: 'numberData',
   fieldLabel: 'Number of sub-attainments'
 };
 
-function SimpleDialog({ handleClose, open, addSubAttainments, indices, attainments }) {
+function SimpleDialog(props: {
+  attainmentTree: AttainmentData,
+  setAttainmentTree: (attainmentTree: AttainmentData) => void,
+  getTemporaryId: () => number,
+  attainment: AttainmentData,
+  handleClose: () => void,
+  open: boolean,
+}): JSX.Element {
 
-  const [numOfAttainments, setSubAttainments] = useState<any>('1');
+  const [numOfAttainments, setNumOfAttainments]: State<number> = useState(1);
 
   // The value given should be an integer of one or higher
-  const error = !(
+  const error: boolean = !(
     !isNaN(numOfAttainments)
-    && (Number.isInteger(Number(numOfAttainments)))
-    && (Number(numOfAttainments) >= 1)
+    && (Number.isInteger(numOfAttainments))
+    && (numOfAttainments >= 1)
   );
 
-  function handleSubmit(event) {
+  function handleSubmit(event: SyntheticEvent): void {
     event.preventDefault();
     try {
-      addSubAttainments(numOfAttainments);
-      handleClose();
+      if (!props.attainment.subAttainments)
+        props.attainment.subAttainments = [];
+
+      const parentId: number | undefined =
+        props.attainment.id > 0 ? props.attainment.id : undefined;
+
+      for (let n: number = 0; n < Number(numOfAttainments); n++) {
+        props.attainment.subAttainments.push({
+          id: props.getTemporaryId(),
+          parentId: parentId,
+          name: '',
+          tag: '',
+          daysValid: 0
+        });
+      }
+
+      props.setAttainmentTree(structuredClone(props.attainmentTree));
+
+      props.handleClose();
     } catch (exception) {
       console.log(exception);
     }
   }
 
   return (
-    <Dialog open={open} >
-      {attainmentServices.getSubAttainments(indices, attainments).length === 0 ?
-        <DialogTitle>Create Sub Study Attainments</DialogTitle>
-        :
-        <DialogTitle>Add Sub Study Attainments</DialogTitle>}
-      <form>
-        <DialogContent sx={{ px: 3, py: 1 }}>
-          <TextField
-            key={numberData.fieldId}
-            id={numberData.fieldId}
-            type='text'
-            label={numberData.fieldLabel}
-            InputLabelProps={{ shrink: true }}
-            margin='normal'
-            inputProps={{ min: 1, maxLength: 2, inputMode: 'numeric', pattern: '[0-9]*' }}
-            value={numOfAttainments}
-            error={error}
-            helperText={error ? 'Value needs to be a positive integer' : ''}
-            sx={{ width: '100%' }}
-            onChange={({ target }) => setSubAttainments(target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button size='medium' onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button size='medium' variant='outlined' type='submit' onClick={(event) => {
-            if (!error) {
-              handleSubmit(event);
-            }
-          }}>
-            Confirm
-          </Button>
-        </DialogActions>
-      </form>
+    <Dialog open={props.open} >
+      <Box sx={{ p: 2 }}>
+
+        {
+          (props.attainment.subAttainments && props.attainment.subAttainments.length > 0)
+            ? <DialogTitle>Add Sub Study Attainments</DialogTitle>
+            : <DialogTitle>Create Sub Study Attainments</DialogTitle>
+        }
+        <form>
+          <DialogContent sx={{ px: 3, py: 1 }}>
+            <TextField
+              key={numberData.fieldId}
+              id={numberData.fieldId}
+              type='text'
+              label={numberData.fieldLabel}
+              InputLabelProps={{ shrink: true }}
+              margin='normal'
+              inputProps={{ min: 1, maxLength: 2, inputMode: 'numeric', pattern: '[0-9]*' }}
+              value={numOfAttainments}
+              error={error}
+              helperText={error ? 'Value needs to be a positive integer' : ''}
+              sx={{ width: '100%' }}
+              onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+                setNumOfAttainments(Number(event.target.value));
+              }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button size='medium' onClick={props.handleClose}>
+              Cancel
+            </Button>
+            <Button
+              size='medium'
+              variant='contained'
+              type='submit'
+              disabled={error}
+              onClick={(event: SyntheticEvent): void => handleSubmit(event)}
+            >
+              Confirm
+            </Button>
+          </DialogActions>
+        </form>
+      </Box>
     </Dialog>
   );
 }
 
 SimpleDialog.propTypes = {
+  attainmentTree: PropTypes.object,
+  setAttainmentTree: PropTypes.func,
+  getTemporaryId: PropTypes.func,
+  attainment: PropTypes.object,
   handleClose: PropTypes.func,
-  open: PropTypes.bool,
-  addSubAttainments: PropTypes.func,
-  attainments: PropTypes.array,
-  indices: PropTypes.array
+  open: PropTypes.bool
 };
 
 export default SimpleDialog;

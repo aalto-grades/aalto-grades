@@ -20,6 +20,12 @@ export interface Message {
   severity?: 'error' | 'warning' | 'info' | 'success'
 }
 
+export interface TextFieldData {
+  fieldId: string,
+  fieldLabel: string,
+  fieldHelperText?: string
+}
+
 export type State<T> = [T, (value: T) => void];
 
 export interface NewCourseData extends Omit<

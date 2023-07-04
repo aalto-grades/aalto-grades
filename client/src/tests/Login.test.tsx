@@ -32,7 +32,7 @@ describe('Tests for Login and LoginForm components', () => {
 
   test('LoginForm should allow a user to submit their credentials', () => {
 
-    const mockLoginUser = jest.fn();
+    const mockLoginUser: jest.Mock = jest.fn();
 
     render(<LoginForm loginUser={mockLoginUser}/>);
 
