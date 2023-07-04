@@ -11,8 +11,6 @@ import { Formula, FormulaData } from 'aalto-grades-common/types';
 // with a schema specifying what form their user parameters should take.
 const formulaImplementations: Map<Formula, FormulaImplementation> = new Map();
 
-// The caller should specify a schema for the user-configurable parameters
-// per-formula.
 /**
  * Adds a formula implementation to the formula registry.
  * @param {Formula} formula - The name and ID of the formula.
