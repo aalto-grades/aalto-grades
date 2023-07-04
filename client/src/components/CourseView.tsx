@@ -16,11 +16,9 @@ import InstancesTable from './course-view/InstancesTable';
 import assessmentModelsService from '../services/assessmentModels';
 import attainmentService from '../services/attainments';
 import coursesService from '../services/courses';
-import instancesService from '../services/instances';
-import sortingServices from '../services/sorting';
 import useAuth, { AuthContextType } from '../hooks/useAuth';
 import {
-  AssessmentModelData, AttainmentData, CourseData, CourseInstanceData, SystemRole
+  AssessmentModelData, AttainmentData, CourseData, SystemRole
 } from 'aalto-grades-common/types';
 import { State } from '../types';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -36,10 +34,8 @@ function CourseView(): JSX.Element {
     useState(null);
   const [assessmentModels, setAssessmentModels]: State<Array<AssessmentModelData>> =
     useState([]);
-  const [attainmentTree, setAttainmentTree]: State<AttainmentData | null> =
-    useState(null);
-
-  const [instances, setInstances]: State<Array<CourseInstanceData>> = useState([]);
+  const [attainmentTree, setAttainmentTree]: State<AttainmentData | null | undefined> =
+    useState(undefined);
 
   const [animation, setAnimation]: State<boolean> = useState(false);
   const [fileLoadOpen, setFileLoadOpen]: State<boolean> = useState(false);
@@ -55,25 +51,21 @@ function CourseView(): JSX.Element {
     assessmentModelsService.getAllAssessmentModels(courseId)
       .then((assessmentModels: Array<AssessmentModelData>) => {
         setAssessmentModels(assessmentModels);
-        setCurrentAssessmentModel(assessmentModels[0]);
 
-        attainmentService.getAllAttainments(courseId, assessmentModels[0].id)
-          .then((attainmentTree: AttainmentData) => {
-            setAttainmentTree(attainmentTree);
-          })
-          .catch((e: Error) => console.log(e.message));
-      })
-      .catch((e: Error) => console.log(e.message));
-
-
-    instancesService.getInstances(courseId)
-      .then((courseInstances: Array<CourseInstanceData>) => {
-        const sortedInstances: Array<CourseInstanceData> = courseInstances.sort(
-          (a: CourseInstanceData, b: CourseInstanceData) => {
-            return sortingServices.sortByDate(a.startDate, b.startDate);
-          }
-        );
-        setInstances(sortedInstances);
+        /**
+         * Newly created courses do not have assessment models assigned.
+         * Set tree to null so proper message can be displayed.
+        */
+        if (assessmentModels.length === 0) {
+          setAttainmentTree(null);
+        } else {
+          setCurrentAssessmentModel(assessmentModels[0]);
+          attainmentService.getAllAttainments(courseId, assessmentModels[0].id)
+            .then((attainmentTree: AttainmentData) => {
+              setAttainmentTree(attainmentTree);
+            })
+            .catch((e: Error) => console.log(e.message));
+        }
       })
       .catch((e: Error) => console.log(e.message));
   }, []);
@@ -85,7 +77,7 @@ function CourseView(): JSX.Element {
   function onChangeAssessmentModel(assessmentModel: AssessmentModelData): void {
     if (assessmentModel.id !== currentAssessmentModel?.id) {
       setAnimation(false);
-      setAttainmentTree(null);
+      setAttainmentTree(undefined);
       setCurrentAssessmentModel(assessmentModel);
 
       attainmentService.getAllAttainments(courseId, assessmentModel.id)
@@ -141,7 +133,7 @@ function CourseView(): JSX.Element {
               /* a different attainment component will be created for students */
               auth.role == SystemRole.Admin &&
               <div style={{ width: '100%' }}>
-                {attainmentTree != null ?
+                {attainmentTree ?
                   <Grow
                     in={animation}
                     style={{ transformOrigin: '0 0 0' }}
@@ -158,7 +150,7 @@ function CourseView(): JSX.Element {
                     </div>
                   </Grow>
                   :
-                  <div>
+                  attainmentTree === null ?
                     <Box sx={{
                       margin: 'auto',
                       alignItems: 'center',
@@ -167,10 +159,23 @@ function CourseView(): JSX.Element {
                       mt: 25,
                       mb: 5
                     }}>
-                      <CircularProgress />
+                      No attainments found, please select at least one assessment model or
+                      create a new one.
                     </Box>
-                    Loading attainments...
-                  </div>
+                    :
+                    <div>
+                      <Box sx={{
+                        margin: 'auto',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        display: 'flex',
+                        mt: 25,
+                        mb: 5
+                      }}>
+                        <CircularProgress />
+                      </Box>
+                      Loading attainments...
+                    </div>
                 }
               </div>
             }
@@ -188,18 +193,17 @@ function CourseView(): JSX.Element {
               <Button
                 id='ag_new_instance_btn'
                 size='large'
+                variant='contained'
                 sx={{ mt: 6, mb: 3 }}
                 onClick={(): void => {
                   navigate(`/${courseId}/fetch-instances/${course.courseCode}`);
                 }}
-              >  {/* TODO: Check path */}
+              >
                 New instance
               </Button>
             }
           </Box>
-          <InstancesTable
-            data={instances}
-          />
+          <InstancesTable courseId={courseId}/>
           <FileLoadDialog
             //instanceId={currentInstance.id}
             open={fileLoadOpen}
