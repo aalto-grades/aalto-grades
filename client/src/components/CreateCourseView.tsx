@@ -6,16 +6,17 @@ import { NavigateFunction, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import CreateCourseForm from './create-course-view/CreateCourseForm';
 import coursesService from '../services/courses';
-import { Message, NewCourseData, State } from '../types';
+import { Message, State } from '../types';
 import AlertSnackbar from './alerts/AlertSnackbar';
 import { useState } from 'react';
+import { CourseData } from 'aalto-grades-common/types';
 
 function CreateCourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
   const [messageInfo, setMessageInfo]: State<Message | undefined> = useState(undefined);
 
-  async function addCourse(course: NewCourseData): Promise<void> {
+  async function addCourse(course: CourseData): Promise<void> {
     try {
       const courseId: number = await coursesService.addCourse(course);
       navigate(`/course-view/${courseId}`, { replace: true });

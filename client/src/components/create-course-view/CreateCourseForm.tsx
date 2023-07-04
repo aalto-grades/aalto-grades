@@ -16,10 +16,11 @@ import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonIcon from '@mui/icons-material/Person';
 import SendIcon from '@mui/icons-material/Send';
-import { NewCourseData, State } from '../../types';
+import { State } from '../../types';
+import { CourseData } from 'aalto-grades-common/types';
 
 function CreateCourseForm(params: {
-  addCourse: (course: NewCourseData) => Promise<void>
+  addCourse: (course: CourseData) => Promise<void>
 }): JSX.Element {
 
   const theme: Theme = useTheme();
@@ -82,7 +83,7 @@ function CreateCourseForm(params: {
             .required('Please input a valid course name in swedish')
         })}
         onSubmit={async function (values): Promise<void> {
-          const courseObject: NewCourseData = ({
+          const courseObject: CourseData = ({
             courseCode: values.courseCode,
             minCredits: values.minCredits,
             maxCredits: values.maxCredits,
@@ -96,7 +97,11 @@ function CreateCourseForm(params: {
               sv: values.nameSv,
               en: values.nameEn,
             },
-            teachersInCharge
+            teachersInCharge: teachersInCharge.map((email: string) => {
+              return {
+                email
+              };
+            })
           });
           await params.addCourse(courseObject);
         }}
