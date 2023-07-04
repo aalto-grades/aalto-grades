@@ -44,11 +44,11 @@ describe('Tests for EditAttainmentView components', () => {
 
     return render(
       <MemoryRouter initialEntries={
-        [`/${courseId}/edit-attainment/${assessmentModelId}/` + attainmentId]
+        [`/${courseId}/attainment/edit/${assessmentModelId}/` + attainmentId]
       }>
         <Routes>
           <Route
-            path='/:courseId/edit-attainment/:assessmentModelId/:attainmentId'
+            path='/:courseId/attainment/:modification/:assessmentModelId/:attainmentId'
             element={<EditAttainmentView />}
           />
         </Routes>
@@ -106,7 +106,7 @@ describe('Tests for EditAttainmentView components', () => {
       renderEditAttainmentView();
 
       const newAttainment: AttainmentData = {
-        id: -1,
+        id: -2,
         parentId: 2,
         name: '',
         tag: '',

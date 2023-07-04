@@ -173,7 +173,7 @@ describe('FileLoadDialog test with proper csv', () => {
     const confirmButton: HTMLElement = getByText('Confirm');
     act(() => userEvent.click(confirmButton));
 
-    expect(dialogTitle).not.toBeVisible();
+    await waitFor(() => expect(dialogTitle).not.toBeVisible());
   });
 
 });
