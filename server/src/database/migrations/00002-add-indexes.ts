@@ -93,7 +93,7 @@ export default {
       );
 
       await queryInterface.sequelize.query(
-        'DROP INDEX IF EXISTS user_attainment_grade_user_id_attainment_id',
+        'DROP INDEX IF EXISTS attainment_grade_user_id_attainment_id',
         { transaction }
       );
 
