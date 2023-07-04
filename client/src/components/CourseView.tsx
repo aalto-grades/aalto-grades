@@ -14,6 +14,7 @@ import Attainments from './course-view/Attainments';
 import CreateAssessmentModelDialog from './course-view/CreateAssessmentModelDialog';
 import InstancesTable from './course-view/InstancesTable';
 import assessmentModelsService from '../services/assessmentModels';
+import attainmentService from '../services/attainments';
 import coursesService from '../services/courses';
 import instancesService from '../services/instances';
 import sortingServices from '../services/sorting';
@@ -56,7 +57,7 @@ function CourseView(): JSX.Element {
         setAssessmentModels(assessmentModels);
         setCurrentAssessmentModel(assessmentModels[0]);
 
-        assessmentModelsService.getAllAttainments(courseId, assessmentModels[0].id)
+        attainmentService.getAllAttainments(courseId, assessmentModels[0].id)
           .then((attainmentTree: AttainmentData) => {
             setAttainmentTree(attainmentTree);
           })
@@ -87,7 +88,7 @@ function CourseView(): JSX.Element {
       setAttainmentTree(null);
       setCurrentAssessmentModel(assessmentModel);
 
-      assessmentModelsService.getAllAttainments(courseId, assessmentModel.id)
+      attainmentService.getAllAttainments(courseId, assessmentModel.id)
         .then((attainmentTree: AttainmentData) => {
           setAttainmentTree(attainmentTree);
         })

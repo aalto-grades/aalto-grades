@@ -22,7 +22,6 @@ import EditInstanceView from './components/EditInstanceView';
 import InstanceSummaryView from './components/InstanceSummaryView';
 import SelectFormulaView from './components/SelectFormulaView';
 import FormulaAttributesView from './components/FormulaAttributesView';
-import CreateAttainmentView from './components/CreateAttainmentView';
 import EditAttainmentView from './components/EditAttainmentView';
 import CourseResultsView from './components/CourseResultsView';
 import InstanceCreationRoute from './context/InstanceCreationRoute';
@@ -186,11 +185,7 @@ function App(): JSX.Element {
                 />
               </Route>
               <Route
-                path=':courseId/create-attainment/:assessmentModelId/:rootAttainmentId'
-                element={<CreateAttainmentView />}
-              />
-              <Route
-                path=':courseId/edit-attainment/:assessmentModelId/:attainmentId'
+                path=':courseId/attainment/:modification/:assessmentModelId/:attainmentId'
                 element={<EditAttainmentView />}
               />
               <Route element={<FormulaSelectionRoute />}>
