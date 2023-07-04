@@ -15,7 +15,7 @@ describe('Test weighted average calculation', () => {
   it('should accept parameters of the appropriate form', async () => {
     const implementation: FormulaImplementation =
       await getFormulaImplementation(Formula.WeightedAverage);
-    await implementation.paramSchema.validate({ min: 0, max: 30, weight: 8 });
+    await implementation.paramSchema.validate({ weight: 8 });
   });
 
   it('should forbid parameters of invalid form', async () => {
@@ -25,14 +25,10 @@ describe('Test weighted average calculation', () => {
     for (
       const invalid of [
         {},
-        { min: 0, max: 30 },
-        { min: 0, max: 30, Weight: 8 },
-        { min: 0, max: 30, mix: 8 },
-        { min: 0, max: 30, mix: 999, weight: 8 },
-        { min: 'x', max: 30, weight: 8 },
-        { min: 0, max: 'x', weight: 8 },
-        { min: 0, max: 30, weight: 'x' },
-        { min: 31, max: 30, weight: 8 }
+        { Weight: 8 },
+        { mix: 8 },
+        { mix: 999, weight: 8 },
+        { weight: 'x' }
       ]
     ) {
       await expect(() => implementation.paramSchema.validate(invalid)).rejects.toThrow();
@@ -43,9 +39,9 @@ describe('Test weighted average calculation', () => {
     const implementation: FormulaImplementation =
       await getFormulaImplementation(Formula.WeightedAverage);
     const input: Array<CalculationInput> = [
-      { params: { min: 0, max: 20, weight: 0.3 }, subResult: { grade: 10, status: Status.Pass } },
-      { params: { min: 0, max: 20, weight: 0.7 }, subResult: { grade: 14, status: Status.Pass } },
-      { params: { min: 0, max: 3, weight: 1 }, subResult: { grade: 3, status: Status.Pass } },
+      { params: { weight: 0.3 }, subResult: { grade: 10, status: Status.Pass } },
+      { params: { weight: 0.7 }, subResult: { grade: 14, status: Status.Pass } },
+      { params: { weight: 1 }, subResult: { grade: 3, status: Status.Pass } },
     ];
     const computedGrade: CalculationResult = await implementation.formulaFunction(input);
     expect(computedGrade.grade).toBeCloseTo(15.8);
@@ -56,9 +52,9 @@ describe('Test weighted average calculation', () => {
     const implementation: FormulaImplementation =
       await getFormulaImplementation(Formula.WeightedAverage);
     const input: Array<CalculationInput> = [
-      { params: { min: 0, max: 20, weight: 0.3 }, subResult: { grade: 10, status: Status.Pass } },
-      { params: { min: 0, max: 20, weight: 0.7 }, subResult: { grade: 14, status: Status.Fail } },
-      { params: { min: 0, max: 3, weight: 1 }, subResult: { grade: 3, status: Status.Fail } },
+      { params: { weight: 0.3 }, subResult: { grade: 10, status: Status.Pass } },
+      { params: { weight: 0.7 }, subResult: { grade: 14, status: Status.Fail } },
+      { params: { weight: 1 }, subResult: { grade: 3, status: Status.Fail } },
     ];
     const computedGrade: CalculationResult = await implementation.formulaFunction(input);
     expect(computedGrade.grade).toBeCloseTo(15.8);
