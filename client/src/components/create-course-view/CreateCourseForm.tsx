@@ -6,9 +6,9 @@ import { SyntheticEvent, useState } from 'react';
 import PropTypes from 'prop-types';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
-import TextFieldBox, { TextFieldData } from './TextFieldBox';
+import TextFieldBox from './TextFieldBox';
 import { CourseData } from 'aalto-grades-common/types';
-import { State } from '../../types';
+import { State, TextFieldData } from '../../types';
 
 const codeData: TextFieldData = {
   fieldId: 'courseCode',

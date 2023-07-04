@@ -6,37 +6,32 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Collapse from '@mui/material/Collapse';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import SimpleDialog from './SimpleDialog';
 import ConfirmationDialog from './ConfirmationDialog';
 import StringTextField from './StringTextField';
-import DateTextField from './DateTextField';
 import attainmentServices from '../../services/attainments';
 import formulaService from '../../services/formulas';
+import { State, TextFieldData } from '../../types';
+import { AttainmentData } from 'aalto-grades-common/types';
 
 // An Assignmnet component without subAttainments and hence without a formula as well.
 // If this isn't the root Attainment, this can be deleted
 
-const categoryData = {
-  fieldId: 'category',
+const nameData: TextFieldData = {
+  fieldId: 'name',
   fieldLabel: 'Name'
 };
 
-const nameData = {
-  fieldId: 'attainmentName',
-  fieldLabel: 'New Name'
+const tagData: TextFieldData = {
+  fieldId: 'tag',
+  fieldLabel: 'Tag'
 };
 
-const dateData = {
-  fieldId: 'attainmentDate',
-  fieldLabel: 'Date'
-};
-
-const expiryData = {
-  fieldId: 'expiryDate',
-  fieldLabel: 'Expiry Date'
+const daysValidData: TextFieldData = {
+  fieldId: 'daysValid',
+  fieldLabel: 'Days Valid'
 };
 
 /* String textfields for the formula attributes. These attributes affect the
@@ -55,10 +50,12 @@ function AttributeTextFields({
         <StringTextField
           key={attribute}
           fieldData={{ fieldId: 'attribute_' + attribute, fieldLabel: attributeLabel }}
-          indices={indices}
-          setAttainments={setAttainments}
-          attainments={attainments}
-        />);
+          attainment={attainments}
+          setAttainmentTree={setAttainments}
+          attainmentTree={attainments}
+          value={''}
+        />
+      );
     })
   );
 }
@@ -71,73 +68,38 @@ AttributeTextFields.propTypes = {
   removeAttainment: PropTypes.func
 };
 
-function LeafAttainment({
-  indices, addSubAttainments, setAttainments,
-  attainments, removeAttainment, formulaAttributeNames
-}) {
+function LeafAttainment(props: {
+  attainmentTree: AttainmentData,
+  setAttainmentTree: (attainmentTree: AttainmentData) => void,
+  deleteAttainment: (attainment: AttainmentData) => void,
+  getTemporaryId: () => number,
+  attainment: AttainmentData,
+  formulaAttributeNames: Array<string>
+}): JSX.Element {
 
-  // Functions and varibales for handling the change of the value in the 'Name'
-  // (category) textfield. If the value is 'Other', then the 'New Name' textfield
-  // is displayed; otherwise the name is the same as the category
-  function handleChange(event) {
-    const value = event.target.value;
-    let updatedAttainments = attainmentServices.setProperty(
-      indices, attainments, 'category', value
-    );
-    if (value === 'Other') {
-      setDisplayNewName(true);
-      updatedAttainments = attainmentServices.setProperty(
-        indices, updatedAttainments, 'name', ''
-      );
-    } else {
-      setDisplayNewName(false);
-      updatedAttainments = attainmentServices.setProperty(
-        indices, updatedAttainments, 'name', value
-      );
-    }
-    setAttainments(updatedAttainments);
-  }
-
-  function getValue(fieldData) {
-    if (fieldData.fieldId === 'category') {
-      return attainmentServices.getProperty(indices, attainments, 'category');
-    } else {
-      console.log(fieldData.fieldId);
-    }
-  }
-
-  const [displayNewName, setDisplayNewName] = useState<any>(
-    getValue(categoryData) === 'Other'
-  );
-
-  // Functions and varibales for opening and closing the dialog that asks for
+  // Functions and variables for opening and closing the dialog that asks for
   // the number of sub-attainments
-  const [openCountDialog, setOpenCountDialog] = useState<any>(false);
+  const [openCountDialog, setOpenCountDialog]: State<boolean> = useState(false);
 
-  function handleCountDialogOpen() {
+  function handleCountDialogOpen(): void {
     setOpenCountDialog(true);
   }
 
-  function handleCountDialogClose() {
+  function handleCountDialogClose(): void {
     setOpenCountDialog(false);
   }
 
   // Functions and varibales for opening and closing the dialog for confirming
   // sub-attainment deletion
-  const [openConfDialog, setOpenConfDialog] = useState<boolean>(false);
+  const [openConfDialog, setOpenConfDialog]: State<boolean> = useState(false);
 
-  function handleConfDialogOpen() {
+  function handleConfDialogOpen(): void {
     setOpenConfDialog(true);
   }
 
-  function handleConfDialogClose() {
+  function handleConfDialogClose(): void {
     setOpenConfDialog(false);
   }
-
-  // See if this attainment affects the parent attainment's grade
-  const affectCalculation = attainmentServices.getProperty(
-    indices, attainments, 'affectCalculation'
-  );
 
   return (
     <Box sx={{
@@ -158,47 +120,34 @@ function LeafAttainment({
         rowGap: 1,
         mt: 2,
       }}>
-        <TextField
-          id={categoryData.fieldId}
-          label={categoryData.fieldLabel}
-          variant='standard'
-          value={getValue(categoryData)}
-          onChange={(event) => handleChange(event)}
-          InputLabelProps={{ shrink: true }}
-          sx={{ textAlign: 'left' }}
-          select>
-          <MenuItem value='Attainments'>Attainments</MenuItem>
-          <MenuItem value='Exam'>Exam</MenuItem>
-          <MenuItem value='Project'>Project</MenuItem>
-          <MenuItem value='Other'>Other</MenuItem>
-        </TextField>
-        <Collapse in={displayNewName} timeout={0} unmountOnExit>
-          <StringTextField
-            fieldData={nameData}
-            indices={indices}
-            setAttainments={setAttainments}
-            attainments={attainments}
-          />
-        </Collapse>
-        <DateTextField
-          fieldData={dateData}
-          indices={indices}
-          setAttainments={setAttainments}
-          attainments={attainments}
+        <StringTextField
+          attainmentTree={props.attainmentTree}
+          setAttainmentTree={props.setAttainmentTree}
+          attainment={props.attainment}
+          value={props.attainment.name}
+          fieldData={nameData}
         />
-        <DateTextField
-          fieldData={expiryData}
-          indices={indices}
-          setAttainments={setAttainments}
-          attainments={attainments}
+        <StringTextField
+          attainmentTree={props.attainmentTree}
+          setAttainmentTree={props.setAttainmentTree}
+          attainment={props.attainment}
+          value={props.attainment.tag}
+          fieldData={tagData}
+        />
+        <StringTextField
+          attainmentTree={props.attainmentTree}
+          setAttainmentTree={props.setAttainmentTree}
+          attainment={props.attainment}
+          value={String(props.attainmentTree.daysValid)}
+          fieldData={daysValidData}
         />
         {
-          (formulaAttributeNames && affectCalculation) &&
+          props.formulaAttributeNames &&
           <AttributeTextFields
-            formulaAttributeNames={formulaAttributeNames}
-            indices={indices}
-            setAttainments={setAttainments}
-            attainments={attainments}
+            formulaAttributeNames={props.formulaAttributeNames}
+            indices={[]}
+            setAttainments={() => {}}
+            attainments={[]}
           />
         }
       </Box>
@@ -208,48 +157,53 @@ function LeafAttainment({
         alignItems: 'center',
         justifyContent: 'space-between'
       }}>
-        { JSON.stringify(indices) !== '[0]' ?
-          <Button size='small' sx={{ my: 1 }} onClick={handleConfDialogOpen}>
-            Delete
-          </Button>
-          :
-          <Box sx={{ width: '1px' }}/> }
+        {
+          props.attainment !== props.attainmentTree ?
+            <Button size='small' sx={{ my: 1 }} onClick={handleConfDialogOpen}>
+              Delete
+            </Button>
+            :
+            <Box sx={{ width: '1px' }} />
+        }
         <ConfirmationDialog
+          deleteAttainment={props.deleteAttainment}
+          attainment={props.attainment}
           title={'Sub Study Attainments'}
           subject={'sub study attainment'}
-          open={openConfDialog}
           handleClose={handleConfDialogClose}
-          deleteAttainment={removeAttainment}
-          indices={indices}
-          attainments={attainments}
+          open={openConfDialog}
         />
-        {attainmentServices.getSubAttainments(indices, attainments).length === 0 ?
-          <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
-            Create Sub-Attainments
-          </Button>
-          :
-          <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
-            Add Sub-Attainments
-          </Button>}
+        {
+          (props.attainment.subAttainments && props.attainment.subAttainments.length > 0)
+            ?
+            <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
+              Add Sub-Attainments
+            </Button>
+            :
+            <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
+              Create Sub-Attainments
+            </Button>
+        }
       </Box>
       <SimpleDialog
-        open={openCountDialog}
+        attainmentTree={props.attainmentTree}
+        setAttainmentTree={props.setAttainmentTree}
+        getTemporaryId={props.getTemporaryId}
+        attainment={props.attainment}
         handleClose={handleCountDialogClose}
-        addSubAttainments={addSubAttainments}
-        indices={indices}
-        attainments={attainments}
+        open={openCountDialog}
       />
     </Box>
   );
 }
 
 LeafAttainment.propTypes = {
-  addSubAttainments: PropTypes.func,
-  indices: PropTypes.array,
-  attainments: PropTypes.array,
-  setAttainments: PropTypes.func,
-  removeAttainment: PropTypes.func,
-  formulaAttributeNames: PropTypes.array,
+  attainmentTree: PropTypes.object,
+  setAttainmentTree: PropTypes.func,
+  deleteAttainment: PropTypes.func,
+  getTemporaryId: PropTypes.func,
+  attainment: PropTypes.object,
+  formulaAttributeNames: PropTypes.array
 };
 
 export default LeafAttainment;

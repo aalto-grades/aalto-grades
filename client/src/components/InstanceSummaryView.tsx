@@ -101,21 +101,6 @@ function InstanceSummaryView() {
       );
       setCreated(true);
 
-      // attempt to add all attainments
-      if (addedAttainments.length > 0) {
-        try {
-          const formattedAttainments = attainmentServices.formatStringsToDates(addedAttainments);
-          await Promise.all(formattedAttainments.map(async (attainment) => {
-            await attainmentServices.addAttainment(
-              courseId, courseInstanceId, attainment
-            );
-          }));
-          setAttainmentAlert((prev) => [...prev, successMsgAttainments]);
-        } catch (attainmentErr) {
-          setAttainmentAlert((prev) => [...prev, errorMsgAttainments]);
-        }
-      }
-
       // return to the course page even if error in attainment creation
       await sleep(30000);
       navigate('/course-view/' + courseId);
@@ -174,31 +159,6 @@ function InstanceSummaryView() {
             value={gradingScale}
           />
         </Box>
-      </Box>
-      <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >
-        Added study attainments
-      </Typography>
-      <Box borderRadius={1} sx={{
-        bgcolor: 'primary.light', p: '16px 12px', display: 'inline-block'
-      }}>
-        {addedAttainments.length !== 0 &&
-          <Box sx={{ display: 'grid', gap: 1, justifyItems: 'stretch', pb: '8px' }}>
-            {
-              addedAttainments.map((attainment) => {
-                return (
-                  <AttainmentCategory
-                    key={attainment.temporaryId}
-                    attainment={attainment}
-                    attainmentKey={'temporaryId'}
-                  />
-                );
-              })
-            }
-          </Box>
-        }
-        <Typography variant='body1' color='primary.main' sx={{ m: '8px 0px' }} >
-          You can also add study attainments after creating the instance
-        </Typography>
       </Box>
       {created ?
         <Button
