@@ -72,9 +72,24 @@ async function getAttainment(
   return response.data.data.attainment;
 }
 
+async function getAllAttainments(
+  courseId: Numeric,
+  assessmentModelId: Numeric
+): Promise<AttainmentData> {
+
+  const response: FullResponse<{ attainment: AttainmentData }> =
+    await axios.get(
+      `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/attainments`
+    );
+
+  return response.data.data.attainment;
+}
+
+
 export default {
   addAttainment,
   editAttainment,
   deleteAttainment,
-  getAttainment
+  getAttainment,
+  getAllAttainments
 };

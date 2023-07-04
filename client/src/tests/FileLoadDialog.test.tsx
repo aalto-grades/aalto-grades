@@ -10,6 +10,7 @@ import {
 import userEvent from '@testing-library/user-event';
 import CourseView from '../components/CourseView';
 import assessmentModelsService from '../services/assessmentModels';
+import attainmentService from '../services/attainments';
 import coursesService from '../services/courses';
 import instancesService from '../services/instances';
 import gradesService from '../services/grades';
@@ -24,6 +25,7 @@ import { LoginResult, SystemRole } from 'aalto-grades-common/types';
 const file: File = new File(['idk'], 'grades_test.csv', { type: 'csv' });
 
 jest.mock('../services/assessmentModels');
+jest.mock('../services/attainments');
 jest.mock('../services/courses');
 jest.mock('../services/instances');
 jest.mock('../services/grades');
@@ -58,7 +60,7 @@ describe('FileLoadDialog test with proper csv', () => {
     (assessmentModelsService.getAllAssessmentModels as jest.Mock)
       .mockResolvedValue(mockAssessmentModels);
 
-    (assessmentModelsService.getAllAttainments as jest.Mock)
+    (attainmentService.getAllAttainments as jest.Mock)
       .mockResolvedValue(mockAttainments);
 
     // succeess, nothing to worry about
@@ -169,7 +171,7 @@ describe('FileLoadDialog test with proper csv', () => {
     );
 
     const confirmButton: HTMLElement = getByText('Confirm');
-    await act(async () => await userEvent.click(confirmButton));
+    act(() => userEvent.click(confirmButton));
 
     expect(dialogTitle).not.toBeVisible();
   });
@@ -187,7 +189,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
     (assessmentModelsService.getAllAssessmentModels as jest.Mock)
       .mockResolvedValue(mockAssessmentModels);
 
-    (assessmentModelsService.getAllAttainments as jest.Mock)
+    (attainmentService.getAllAttainments as jest.Mock)
       .mockResolvedValue(mockAttainments);
 
     // Mock the error.
