@@ -187,7 +187,7 @@ router.get(
  *               name:
  *                 $ref: '#/definitions/LocalizedString'
  *               teachersInCharge:
- *                 $ref: '#/definitions/teachersInCharge'
+ *                 $ref: '#/definitions/TeachersInCharge'
  *     responses:
  *       200:
  *         description: The course was successfully created.
