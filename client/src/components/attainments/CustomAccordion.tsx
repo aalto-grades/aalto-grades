@@ -89,9 +89,11 @@ AccordionDetails.propTypes = {
   out: PropTypes.bool
 };
 
-function AttainmentText(
-  { name, formulaId, tag }: InferProps<typeof AttainmentText.propTypes>
-): JSX.Element {
+function AttainmentText(params: {
+  name: string,
+  formulaId: Formula,
+  tag: string
+}): JSX.Element {
   return (
     <Box sx={{ display: 'flex',
       flexDirection: 'row',
@@ -102,15 +104,15 @@ function AttainmentText(
       columnGap: 3
     }}>
       <Typography variant='body2'>
-        {name}
+        {params.name}
       </Typography>
       <Typography align='left' variant='body2'>
-        {tag}
+        {params.tag}
       </Typography>
       {
-        formulaId &&
+        params.formulaId &&
         <Typography variant='caption' align='left'>
-          {'Formula: ' + formulasService.getFormulaName(formulaId)}
+          {'Formula: ' + formulasService.getFormulaName(params.formulaId)}
         </Typography>
       }
     </Box>
@@ -125,9 +127,10 @@ AttainmentText.propTypes = {
 
 export { AccordionDetails, AttainmentText };
 
-function CustomAccordion(
-  { attainments, attainmentKey }: InferProps<typeof CustomAccordion.propTypes>
-): JSX.Element {
+function CustomAccordion(params: {
+  attainments: Array<any>,
+  attainmentKey: string
+}): JSX.Element {
 
   const [expanded, setExpanded]: State<Set<unknown>> = useState(new Set());
   const [selected, setSelected]: State<string> = useState('');
@@ -155,18 +158,18 @@ function CustomAccordion(
   return (
     <>
       {
-        attainments.map(attainment => {
+        params.attainments.map(attainment => {
           return (
             <Accordion
-              key={attainment[attainmentKey] + 'accordion'}
-              expanded={expanded.has(attainment[attainmentKey])}
-              onChange={handleChange(attainment[attainmentKey])}
+              key={attainment[params.attainmentKey] + 'accordion'}
+              expanded={expanded.has(attainment[params.attainmentKey])}
+              onChange={handleChange(attainment[params.attainmentKey])}
             >
               <AccordionSummary
-                aria-controls={attainment[attainmentKey] + '-content'}
-                id={attainment[attainmentKey] + '-header'}
-                expanded={expanded.has(attainment[attainmentKey]).toString()}
-                nowselected={(selected === attainment[attainmentKey]).toString()}
+                aria-controls={attainment[params.attainmentKey] + '-content'}
+                id={attainment[params.attainmentKey] + '-header'}
+                expanded={expanded.has(attainment[params.attainmentKey]).toString()}
+                nowselected={(selected === attainment[params.attainmentKey]).toString()}
               >
                 <AttainmentText
                   name={attainment.name}
@@ -180,7 +183,7 @@ function CustomAccordion(
                   return (
                     // is the attainment a leaf? If yes, render details, else another accordion
                     subAttainment.subAttainments ?
-                      <AccordionDetails key={subAttainment[attainmentKey] + 'details'}>
+                      <AccordionDetails key={subAttainment[params.attainmentKey] + 'details'}>
                         <AttainmentText
                           name={subAttainment.name}
                           formulaId={subAttainment.formulaId}
@@ -188,11 +191,14 @@ function CustomAccordion(
                         />
                       </AccordionDetails>
                       :
-                      <Box key={subAttainment[attainmentKey] + 'subAccordion'} sx={{ pl: '39px' }}>
+                      <Box
+                        key={subAttainment[params.attainmentKey] + 'subAccordion'}
+                        sx={{ pl: '39px' }}
+                      >
                         {
                           <CustomAccordion
                             attainments={[subAttainment]}
-                            attainmentKey={attainmentKey}
+                            attainmentKey={params.attainmentKey}
                           />
                         }
                       </Box>

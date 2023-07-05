@@ -9,8 +9,9 @@ import Slide from '@mui/material/Slide';
 import MuiAlert from '@mui/material/Alert';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Message } from '../../types';
+import { Theme, Typography } from '@mui/material';
 
-const darkTheme = createTheme({
+const darkTheme: Theme = createTheme({
   palette: {
     mode: 'dark',
   },
@@ -47,7 +48,8 @@ function AlertSnackbar({ messageInfo, setMessageInfo, open, setOpen, position }:
     <div>
       <ThemeProvider theme={darkTheme}>
         <Snackbar
-          key={messageInfo?.msg}
+          key={messageInfo?.msg && !Array.isArray(messageInfo?.msg) ?
+            messageInfo?.msg : messageInfo?.msg[0]}
           open={open}
           autoHideDuration={4000}
           anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
@@ -61,7 +63,25 @@ function AlertSnackbar({ messageInfo, setMessageInfo, open, setOpen, position }:
             severity={messageInfo?.severity ?? 'info'}
             sx={{ width: '100%' }}
           >
-            {messageInfo?.msg}
+            {(messageInfo?.msg && !Array.isArray(messageInfo?.msg)) ?
+              <>
+                {messageInfo?.severity === 'error' &&
+                <Typography variant='h5'>Error occurred:</Typography>}
+                {messageInfo?.msg}
+              </> :
+              <>
+                {messageInfo?.severity === 'error' &&
+                <Typography variant='h5'>{messageInfo?.msg.length === 1 ?
+                  'Error occurred:' :
+                  'Multiple errors occurred:'}
+                </Typography>}
+                <ul>
+                  {Array.isArray(messageInfo?.msg) && messageInfo?.msg.map((msg: string) => (
+                    <li key={msg}>{msg}</li>
+                  ))}
+                </ul>
+              </>
+            }
           </Alert>
         </Snackbar>
       </ThemeProvider>

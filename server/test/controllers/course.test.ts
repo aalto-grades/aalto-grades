@@ -115,7 +115,7 @@ describe('Test POST /v1/courses - create new course', () => {
       maxCredits: 5,
       teachersInCharge: [
         {
-          id: 10
+          email: 'thomas.siegel@aalto.fi'
         }
       ],
       department: {
@@ -146,10 +146,10 @@ describe('Test POST /v1/courses - create new course', () => {
       maxCredits: 5,
       teachersInCharge: [
         {
-          id: 15
+          email: 'thomas.siegel@aalto.fi'
         },
         {
-          id: 20
+          email: 'arthur.james@aalto.fi'
         }
       ],
       department: {
@@ -186,6 +186,9 @@ describe('Test POST /v1/courses - create new course', () => {
     expect(res.body.errors).toContain('courseCode is a required field');
     expect(res.body.errors).toContain('department is a required field');
     expect(res.body.errors).toContain('name is a required field');
+    expect(res.body.errors).toContain('minCredits is a required field');
+    expect(res.body.errors).toContain('teachersInCharge is a required field');
+    expect(res.body.errors).toContain('name is a required field');
   });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
@@ -203,6 +206,40 @@ describe('Test POST /v1/courses - create new course', () => {
       .set('Cookie', cookies.userCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Forbidden);
+  });
+
+  it('should respond with 404 not found, if teacher email not found from database', async () => {
+    const input: object = {
+      courseCode: 'ELEC-A7200',
+      minCredits: 5,
+      maxCredits: 5,
+      teachersInCharge: [
+        {
+          email: 'not.found@aalto.fi'
+        }
+      ],
+      department: {
+        fi: 'Sähkötekniikan korkeakoulu',
+        en: 'School of Electrical Engineering',
+        sv: 'Högskolan för elektroteknik'
+      },
+      name: {
+        fi: 'Signaalit ja järjestelmät',
+        en: 'Signals and Systems',
+        sv: ''
+      }
+    };
+
+    const res: supertest.Response = await request
+      .post('/v1/courses').send(input)
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.NotFound);
+
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors).toBeDefined();
+    expect(res.body.errors[0]).toBe('No user with email address not.found@aalto.fi found');
+    expect(res.body.data).not.toBeDefined();
   });
 
   /* TODO: move next test case elsewhere in future, after refactoring commonly
