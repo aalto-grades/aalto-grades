@@ -17,7 +17,7 @@ function EditInstanceForm(props: {
   addInstance: (instance: CourseInstanceData) => Promise<void>
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
-  const { courseId, sisuInstanceId }: Params = useParams();
+  const { courseId }: Params = useParams();
 
   return (
     <Formik

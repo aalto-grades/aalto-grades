@@ -47,8 +47,13 @@ function FetchInstancesView(): JSX.Element {
           <Button size='medium' variant='outlined' onClick={onCancel}>
             Cancel
           </Button>
-          <Button size='medium' variant='outlined'>
-            { /* TODO: Implement */}
+          <Button
+            size='medium'
+            variant='outlined'
+            onClick={(): void => {
+              navigate('/' + courseId + '/edit-instance');
+            }}
+          >
             Start from Scratch
           </Button>
         </Box>

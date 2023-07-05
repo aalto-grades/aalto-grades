@@ -9,8 +9,11 @@ import Container from '@mui/material/Container';
 import LinearProgress from '@mui/material/LinearProgress';
 import EditInstanceForm from './edit-instance-view/EditInstanceForm';
 import AlertSnackbar from './alerts/AlertSnackbar';
+import coursesService from '../services/courses';
 import instancesService from '../services/instances';
-import { CourseInstanceData } from 'aalto-grades-common/types/course';
+import {
+  CourseData, CourseInstanceData, GradingScale, Period
+} from 'aalto-grades-common/types/course';
 import { Message, State } from '../types';
 
 function EditInstanceView(): JSX.Element {
@@ -23,11 +26,29 @@ function EditInstanceView(): JSX.Element {
   const [messageInfo, setMessageInfo]: State<Message | undefined> = useState(undefined);
 
   useEffect(() => {
-    instancesService.getSisuInstance(sisuInstanceId)
-      .then((courseInstance: CourseInstanceData) => {
-        setInstance(courseInstance);
-      })
-      .catch((e) => console.log(e.message));
+    if (sisuInstanceId) {
+      instancesService.getSisuInstance(sisuInstanceId)
+        .then((courseInstance: CourseInstanceData) => {
+          setInstance(courseInstance);
+        })
+        .catch((e: Error) => console.log(e.message));
+    } else {
+      coursesService.getCourse(courseId)
+        .then((course: CourseData) => {
+          const newInstance: CourseInstanceData = {
+            courseData: course,
+            type: '',
+            startDate: new Date(),
+            endDate: new Date(),
+            startingPeriod: Period.I,
+            endingPeriod: Period.I,
+            gradingScale: GradingScale.Numerical
+          };
+
+          setInstance(newInstance);
+        })
+        .catch((e: Error) => console.log(e.message));
+    }
   }, []);
 
   async function addInstance(instance: CourseInstanceData): Promise<void> {
@@ -51,7 +72,7 @@ function EditInstanceView(): JSX.Element {
         Create Course Instance
       </Typography>
       {
-        instance ?
+        instance && instance.courseData ?
           <>
             <Typography variant="h3" sx={{ flexGrow: 1, mb: 2, textAlign: 'left' }}>
               {instance.courseData.courseCode + ' - ' + instance.courseData.name.en}

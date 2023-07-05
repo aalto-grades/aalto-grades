@@ -180,6 +180,10 @@ function App(): JSX.Element {
                 element={<CourseResultsView />}
               />
               <Route
+                path=':courseId/edit-instance'
+                element={<EditInstanceView />}
+              />
+              <Route
                 path=':courseId/edit-instance/:sisuInstanceId'
                 element={<EditInstanceView />}
               />
