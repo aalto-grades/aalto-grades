@@ -2,9 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-const mockFormulas = [
+import { Formula, FormulaPreview } from 'aalto-grades-common/types';
+
+const mockFormulas: Array<FormulaPreview> = [
   {
-    id: 1,
+    id: Formula.WeightedAverage,
     name: 'Weighted average',
     attributes: ['maxPoints', 'minRequiredPoints', 'weight'],
     codeSnippet:

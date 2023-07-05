@@ -6,6 +6,7 @@ import { MemoryRouter, Routes, Route, Outlet } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import formulasService from '../services/formulas';
 import FormulaAttributesView from '../components/FormulaAttributesView';
 import mockAttainments from './mock-data/mockAttainments';
 import mockFormulas from './mock-data/mockFormulas';
@@ -18,6 +19,7 @@ describe('Tests for FormulaAttributesView components', () => {
   };
 
   async function renderFormulaAttributesView() {
+    jest.spyOn(formulasService, 'getFormulaDetails').mockResolvedValue(mockFormulas[0]);
 
     return render(
       <MemoryRouter initialEntries={['/A-12345/formula-attributes/test']}>

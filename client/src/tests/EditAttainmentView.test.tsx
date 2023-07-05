@@ -8,7 +8,7 @@ import { act, render, RenderResult, screen, waitFor, cleanup } from '@testing-li
 import userEvent from '@testing-library/user-event';
 import EditAttainmentView from '../components/EditAttainmentView';
 import attainmentServices from '../services/attainments';
-import formulaService from '../services/formulas';
+import formulasService from '../services/formulas';
 import mockAttainmentsClient from './mock-data/mockAttainmentsClient';
 import { AttainmentData } from 'aalto-grades-common/types';
 import mockFormulas from './mock-data/mockFormulas';
@@ -40,10 +40,9 @@ afterEach(cleanup);
 describe('Tests for EditAttainmentView components', () => {
 
   function renderEditAttainmentView(): RenderResult {
-
+    jest.spyOn(formulasService, 'getFormulaDetails').mockResolvedValue(mockFormulas[0]);
     (attainmentServices.getAttainment as jest.Mock).mockRejectedValue('Network error');
     (attainmentServices.getAttainment as jest.Mock).mockResolvedValue(getMockAttainment());
-    (formulaService.getFormulaDetails as jest.Mock).mockResolvedValueOnce(mockFormulas[0]);
 
     return render(
       <MemoryRouter initialEntries={
