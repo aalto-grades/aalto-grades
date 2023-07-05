@@ -92,7 +92,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
         name: attainment.name,
         tag: attainment.tag,
         daysValid: attainment.daysValid,
-        formula: Formula.Manual
+        formula: attainment.formula ?? Formula.Manual
       });
 
       if (attainment.subAttainments && attainment.subAttainments.length > 0) {
@@ -173,6 +173,12 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     daysValid: yup
       .number()
       .min(0)
+      .notRequired(),
+    formula: yup.string()
+      .transform((value: string, originalValue: string) => {
+        return originalValue ? originalValue.toUpperCase() : value;
+      })
+      .oneOf(Object.values(Formula))
       .notRequired()
   });
 
@@ -187,6 +193,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   const tag: string | undefined = req.body.tag;
   const daysValid: number | undefined = req.body.daysValid;
   const parentId: number| undefined = req.body.parentId;
+  const formula: Formula| undefined = req.body.formula;
 
   const attainment: Attainment = await findAttainmentById(attainmentId, HttpCode.NotFound);
 
@@ -220,7 +227,8 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     name: name ?? attainment.name,
     tag: tag ?? attainment.tag,
     daysValid: daysValid ?? attainment.daysValid,
-    parentId: parentId ?? attainment.parentId
+    parentId: parentId ?? attainment.parentId,
+    formula: formula ?? attainment.formula
   }).save();
 
   res.status(HttpCode.Ok).json({
@@ -231,6 +239,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
         assessmentModelId: attainment.assessmentModelId,
         name: attainment.name,
         tag: attainment.tag,
+        formula: attainment.formula,
         daysValid: attainment.daysValid,
         parentId: attainment.parentId
       }

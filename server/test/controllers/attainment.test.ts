@@ -538,7 +538,7 @@ describe(
       expect(res.body.data.attainment.parentId).toBe(null);
       expect(res.body.data.attainment.name).toBe('new name');
       expect(res.body.data.attainment.tag).toBe('new tag');
-      expect(res.body.data.attainment.formula).toBe(Formula.Manual);
+      expect(res.body.data.attainment.formula).toBe(Formula.WeightedAverage);
       expect(res.body.data.attainment.daysValid).toBe(50);
     });
 
