@@ -5,7 +5,6 @@
 import { Request, Response } from 'express';
 import * as yup from 'yup';
 
-import models from '../database/models';
 import AssessmentModel from '../database/models/assessmentModel';
 import Attainment from '../database/models/attainment';
 import Course from '../database/models/course';
@@ -71,7 +70,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     }
   }
 
-  const attainment: Attainment = await models.Attainment.create({
+  const attainment: Attainment = await Attainment.create({
     assessmentModelId: assessmentModel.id,
     parentId,
     name,
@@ -87,7 +86,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     let subAttainments: Array<AttainmentData> = [];
 
     for (const attainment of unprocessedAttainments) {
-      const dbEntry: Attainment = await models.Attainment.create({
+      const dbEntry: Attainment = await Attainment.create({
         parentId,
         assessmentModelId: assessmentModel.id,
         name: attainment.name,

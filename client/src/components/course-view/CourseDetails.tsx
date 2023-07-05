@@ -7,7 +7,11 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import AssessmentModelsList from './AssessmentModelsList';
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';
-import { AssessmentModelData, CourseData, UserData } from 'aalto-grades-common/types';
+import { AssessmentModelData, CourseData, SystemRole, UserData } from 'aalto-grades-common/types';
+import IconButton from '@mui/material/IconButton';
+import EditIcon from '@mui/icons-material/Edit';
+import useAuth, { AuthContextType } from '../../hooks/useAuth';
+import Tooltip from '@mui/material/Tooltip';
 
 function CourseDetails(props: {
   course: CourseData,
@@ -15,6 +19,8 @@ function CourseDetails(props: {
   currentAssessmentModelId: number,
   onChangeAssessmentModel: (assessmentModel: AssessmentModelData) => void
 }): JSX.Element {
+  const { auth }: AuthContextType = useAuth();
+
   return (
     <Box sx={{ display: 'inline-block' }}>
       <Box sx={{
@@ -23,6 +29,13 @@ function CourseDetails(props: {
       }}>
         <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >
           Course Details
+          { auth.role == SystemRole.Admin &&
+          <Tooltip title="Edit course details" placement="right">
+            <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit course details">
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+          }
         </Typography>
       </Box>
       <Box textAlign='left' borderRadius={1} sx={{
@@ -48,6 +61,13 @@ function CourseDetails(props: {
       <Box sx={{ mt: 1.5 }}>
         <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>
           Teachers in Charge
+          { auth.role == SystemRole.Admin &&
+          <Tooltip title="Edit teachers in charge" placement="right">
+            <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit teachers in charge">
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+          }
         </Typography>
         <Box textAlign='left' borderRadius={1} sx={{
           bgcolor: 'secondary.light', p: 1.5, mt: 1, minWidth: '318px'
@@ -66,15 +86,28 @@ function CourseDetails(props: {
       <Box sx={{ mt: 1.5 }}>
         <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>
           Assessment Models
+          { auth.role == SystemRole.Admin &&
+          <Tooltip title="Edit assessment models" placement="right">
+            <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit assessment models">
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+          }
         </Typography>
         <Box textAlign='left' borderRadius={1} sx={{
           bgcolor: 'secondary.light', p: 1.5, mt: 1, minWidth: '318px'
         }}>
-          <AssessmentModelsList
-            data={props.assessmentModels}
-            current={props.currentAssessmentModelId}
-            onClick={props.onChangeAssessmentModel}
-          />
+          { props.assessmentModels.length !== 0 ?
+            <AssessmentModelsList
+              data={props.assessmentModels}
+              current={props.currentAssessmentModelId}
+              onClick={props.onChangeAssessmentModel}
+            />
+            :
+            <Box sx={{ py: 2 }}>
+              No assesment models found. Please create a new assessment model.
+            </Box>
+          }
         </Box>
       </Box>
     </Box>

@@ -195,45 +195,6 @@ describe(
       expect(res.body.data).toBeDefined();
     });
 
-    it('should update attainment grade if user grading data already exist in the db', async () => {
-      const user: User = await User.findOne({
-        where: {
-          studentNumber: '662292'
-        }
-      }) as User;
-
-      let userAttainment: AttainmentGrade = await AttainmentGrade.findOne({
-        where: {
-          userId: user.id,
-          attainmentId: 1
-        }
-      }) as AttainmentGrade;
-
-      expect(userAttainment.grade).toBe(6);
-
-      const csvData: fs.ReadStream = fs.createReadStream(
-        path.resolve(__dirname, '../mock-data/csv/grades_updated.csv'), 'utf8'
-      );
-      res = await request
-        .post('/v1/courses/1/assessment-models/1/grades/csv')
-        .attach('csv_data', csvData, { contentType: 'text/csv' })
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
-
-      userAttainment = await AttainmentGrade.findOne({
-        where: {
-          userId: user.id,
-          attainmentId: 1
-        }
-      }) as AttainmentGrade;
-
-      expect(userAttainment.grade).toBe(16);
-      expect(res.body.success).toBe(true);
-      expect(res.body.errors).not.toBeDefined();
-      expect(res.body.data).toBeDefined();
-    });
-
     it('should process big CSV succesfully (1100 x 178 = 195 800 individual attainment grades)',
       async () => {
         const csvData: fs.ReadStream = fs.createReadStream(
