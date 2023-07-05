@@ -24,7 +24,7 @@ async function manualGradeUnspecified(): Promise<CalculationResult> {
   };
 }
 
-const codeSnippet: string = 'placeholder';
+const codeSnippet: string = 'no preview for manual grading';
 
 const name: string = 'Manual';
 
