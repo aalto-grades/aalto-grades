@@ -335,7 +335,7 @@ router.get(
 
 /**
  * @swagger
- * /v1/courses/{courseId}/instances/{instanceId}/attainments:
+ * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/attainments:
  *  get:
  *     tags: [Attainment]
  *     description: Get the root attainment of the assessment model or subtree downwards.
