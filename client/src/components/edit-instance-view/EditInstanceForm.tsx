@@ -125,6 +125,7 @@ function EditInstanceForm(props: {
               />
               <TextField
                 id="startingPeriod"
+                name="startingPeriod"
                 type="text"
                 fullWidth
                 value={values.startingPeriod}
@@ -143,13 +144,14 @@ function EditInstanceForm(props: {
                 {
                   Object.values(Period).map((value: Period) => {
                     return (
-                      <MenuItem id="startingPeriod" key={value} value={value}>{value}</MenuItem>
+                      <MenuItem key={value} value={value}>{value}</MenuItem>
                     );
                   })
                 }
               </TextField>
               <TextField
                 id="endingPeriod"
+                name="endingPeriod"
                 type="text"
                 fullWidth
                 value={values.endingPeriod}
@@ -175,6 +177,7 @@ function EditInstanceForm(props: {
               </TextField>
               <TextField
                 id="gradingScale"
+                name="gradingScale"
                 type="text"
                 fullWidth
                 value={values.gradingScale}
