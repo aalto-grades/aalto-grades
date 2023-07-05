@@ -100,25 +100,28 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
   await findCourseById(courseId, HttpCode.NotFound);
 
   const instances: Array<CourseInstanceWithCourseFull> =
-    await CourseInstance.findAll(
-      {
-        include: [
-          {
-            model: Course,
-            include: [
-              {
-                model: CourseTranslation
-              },
-              {
-                model: User
-              }
-            ]
-          }
-        ]
-      }
-    ) as Array<CourseInstanceWithCourseFull>;
+      await CourseInstance.findAll(
+        {
+          where: {
+            courseId
+          },
+          include: [
+            {
+              model: Course,
+              include: [
+                {
+                  model: CourseTranslation
+                },
+                {
+                  model: User
+                }
+              ]
+            }
+          ]
+        }
+      ) as Array<CourseInstanceWithCourseFull>;
 
-  const instancesData: Array<CourseInstanceData> = [];
+  const courseInstances: Array<CourseInstanceData> = [];
 
   instances.forEach((instance: CourseInstanceWithCourseFull) => {
     const instanceData: CourseInstanceData = {
@@ -134,13 +137,13 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
       gradingScale: instance.gradingScale as GradingScale,
     };
 
-    instancesData.push(instanceData);
+    courseInstances.push(instanceData);
   });
 
   res.status(HttpCode.Ok).send({
     success: true,
     data: {
-      courseInstances: instancesData
+      courseInstances
     }
   });
 }
