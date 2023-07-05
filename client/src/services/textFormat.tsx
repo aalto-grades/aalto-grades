@@ -32,20 +32,15 @@ function formatDateString(dateStr: string): string {
   return [day, month, year].join('.');
 }
 
-// Change course type from "LECTURE" to "Lecture" and from "EXAM" to "Exam".
-// Also, change course type gotten from Sisu to a more readable type
-function formatCourseType(courseType: string): string {
+// Format Sisu course types to a more readable form.
+function formatSisuCourseType(courseType: string): string {
   switch (courseType) {
-  case 'teaching-participation-lectures':  // Type from Sisu API
+  case 'teaching-participation-lectures':
     return 'Teaching';
-  case 'exam-exam':  // Type from Sisu API
+  case 'exam-exam':
     return 'Exam';
-  case 'teaching-participation-project':  // Type from Sisu API
+  case 'teaching-participation-project':
     return 'Project';
-  case 'LECTURE':
-    return 'Teaching';
-  case 'EXAM':
-    return 'Exam';
   default:
     return courseType;
   }
@@ -81,11 +76,11 @@ function convertToServerGradingScale(gradingScale: string): GradingScale | strin
 }
 
 export default {
-  convertToServerGradingScale,
   formatDateToString,
   formatStringToDate,
   formatDateToSlashString,
   formatDateString,
-  formatCourseType,
-  convertToClientGradingScale
+  formatSisuCourseType,
+  convertToClientGradingScale,
+  convertToServerGradingScale
 };

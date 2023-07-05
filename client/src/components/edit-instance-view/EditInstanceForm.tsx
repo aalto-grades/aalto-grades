@@ -2,189 +2,190 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useEffect } from 'react';
-import {
-  NavigateFunction, Params, useNavigate, useParams, useOutletContext
-} from 'react-router-dom';
+import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import { Form, Formik } from 'formik';
+import * as yup from 'yup';
 import Box from '@mui/material/Box';
-import Grid2 from '@mui/material/Unstable_Grid2';
-import DynamicTextFieldArray from './DynamicTextFieldArray';
-import StringTextField from './StringTextField';
-import NumberTextField from './NumberTextField';
-import DateTextField from './DateTextField';
 import textFormatServices from '../../services/textFormat';
+import { CourseInstanceData, GradingScale, Period } from 'aalto-grades-common/types';
 
-// Should the teachers be given as emails?
-// Now they are given as full names
-// TODO: check that no text field is left empty
-
-const typeData = {
-  fieldId: 'instanceType',
-  fieldLabel: 'Type'
-};
-
-const startDateData = {
-  fieldId: 'startDate',
-  fieldLabel: 'Starting Date'
-};
-
-const endDateData = {
-  fieldId: 'endDate',
-  fieldLabel: 'Ending Date'
-};
-
-const minCreditsData = {
-  fieldId: 'minCredits',
-  fieldLabel: 'Min Credits'
-};
-
-const maxCreditsData = {
-  fieldId: 'maxCredits',
-  fieldLabel: 'Max Credits'
-};
-
-const gradingScaleData = {
-  fieldId: 'gradingScale',
-  fieldLabel: 'Grading Scale'
-};
-
-const teacherData = {
-  fieldId: 'teacher',
-  fieldLabel: 'Teacher in Charge'
-};
-
-const textFieldMinWidth = 195;
-
-function EditInstanceForm({ instance }) {
+function EditInstanceForm(props: {
+  instance: CourseInstanceData
+}): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { courseId, sisuInstanceId }: Params = useParams();
 
-  const {
-    courseType, setType,
-    startDate, setStartDate,
-    endDate, setEndDate,
-    teachers, setTeachers,
-    stringMinCredits, setMinCredits,
-    stringMaxCredits, setMaxCredits,
-    gradingScale, setGradingScale,
-    setStartingPeriod,
-    setEndingPeriod
-  } = useOutletContext<any>();
-
-  useEffect(() => {
-    if (courseType === '') {
-      setType(textFormatServices.formatCourseType(instance.type));
-      setStartDate(instance.startDate);
-      setEndDate(instance.endDate);
-      setTeachers(instance.teachersInCharge);
-      setMinCredits(String(instance.minCredits));
-      setMaxCredits(String(instance.maxCredits));
-      setGradingScale(textFormatServices.convertToClientGradingScale(instance.gradingScale));
-      setStartingPeriod(instance.startingPeriod);
-      setEndingPeriod(instance.endingPeriod);
-    }
-  }, []);
-
-  function onCancel(): void {
-    navigate('/course-view/' + courseId);
-  }
-
-  function handleSubmit(event) {
-    event.preventDefault();
-    try {
-      const minCredits = Number(stringMinCredits);
-      const maxCredits = Number(stringMaxCredits);
-      const basicInfoObject = ({
-        courseType,
-        startDate,
-        endDate,
-        teachers,
-        minCredits,
-        maxCredits,
-        gradingScale,
-      });
-      console.log(basicInfoObject);
-      navigate('/' + courseId + '/add-attainments/' + sisuInstanceId);
-    } catch (exception) {
-      console.log(exception);
-    }
-  }
-
   return (
-    <form onSubmit={handleSubmit}>
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        flexDirection: 'column',
-        justifyContent: 'space-around',
-        boxShadow: 2,
-        borderRadius: 2,
-        my: 2,
-        p: 2
-      }}>
-        <StringTextField fieldData={typeData} value={courseType} setFunction={setType}
-        />
-        <Grid2 container>
-          <Grid2 sx={{ minWidth: textFieldMinWidth }}>
-            <DateTextField
-              fieldData={startDateData}
-              value={startDate}
-              setFunction={setStartDate}
-              minWidth={textFieldMinWidth}
-            />
-          </Grid2>
-          <Box sx={{ width: 15 }} />
-          <Grid2 sx={{ minWidth: textFieldMinWidth }}>
-            <DateTextField
-              fieldData={endDateData}
-              value={endDate}
-              setFunction={setEndDate}
-              minWidth={textFieldMinWidth}
-            />
-          </Grid2>
-        </Grid2>
-        <DynamicTextFieldArray
-          fieldData={teacherData}
-          values={teachers}
-          setFunction={setTeachers}
-        />
-        <Grid2 container>
-          <Grid2 sx={{ minWidth: textFieldMinWidth }}>
-            <NumberTextField
-              fieldData={minCreditsData}
-              value={stringMinCredits}
-              setFunction={setMinCredits}
-            />
-          </Grid2>
-          <Box sx={{ width: 15 }} />
-          <Grid2 sx={{ minWidth: textFieldMinWidth }}>
-            <NumberTextField
-              fieldData={maxCreditsData}
-              value={stringMaxCredits}
-              setFunction={setMaxCredits}
-            />
-          </Grid2>
-        </Grid2>
-        <StringTextField
-          fieldData={gradingScaleData}
-          value={gradingScale}
-          setFunction={setGradingScale}
-        />
-      </Box>
-      <Box sx={{
-        display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
-        alignItems: 'center', pb: 6
-      }}>
-        <Button size='medium' variant='outlined' onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button id='ag_confirm_instance_details_btn' variant='contained' type='submit'>
-          Confirm Details
-        </Button>
-      </Box>
-    </form>
+    <Formik
+      initialValues={{
+        type: textFormatServices.formatSisuCourseType(props.instance.type),
+        startDate: props.instance.startDate,
+        endDate: props.instance.endDate,
+        startingPeriod: props.instance.startingPeriod,
+        endingPeriod: props.instance.endingPeriod,
+        gradingScale: props.instance.gradingScale
+      }}
+      validationSchema={yup.object({
+        type: yup.string()
+          .required(),
+        startDate: yup.date()
+          .required(),
+        endDate: yup.date()
+          .min(yup.ref('startDate'))
+          .required(),
+        startingPeriod: yup.string()
+          .oneOf(Object.values(Period))
+          .required(),
+        endingPeriod: yup.string()
+          .oneOf(Object.values(Period))
+          .required(),
+        gradingScale: yup.string()
+          .oneOf(Object.values(GradingScale))
+          .required()
+      })}
+      onSubmit={async function () {
+
+      }}
+    >
+      {
+        ({ errors, handleChange, isSubmitting, isValid, touched, values }) => (
+          <Form>
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              flexDirection: 'column',
+              justifyContent: 'space-around',
+              boxShadow: 2,
+              borderRadius: 2,
+              my: 2,
+              p: 2
+            }}>
+              <TextField
+                id="type"
+                type="text"
+                fullWidth
+                value={values.type}
+                disabled={isSubmitting}
+                label="Type"
+                InputLabelProps={{ shrink: true }}
+                margin='normal'
+                helperText={
+                  errors.type
+                  ?? 'Type of the course instance, e.g., Teaching or Exam.'
+                }
+                error={touched.type && Boolean(errors.type)}
+                onChange={handleChange}
+              />
+              <TextField
+                id="startDate"
+                type="date"
+                fullWidth
+                value={values.startDate}
+                disabled={isSubmitting}
+                label="Starting Date"
+                InputLabelProps={{ shrink: true }}
+                margin='normal'
+                helperText={
+                  errors.startDate
+                    ? String(errors.startDate)
+                    : 'Starting date of the course instance.'
+                }
+                error={touched.startDate && Boolean(errors.startDate)}
+                onChange={handleChange}
+              />
+              <TextField
+                id="endDate"
+                type="date"
+                fullWidth
+                value={values.endDate}
+                disabled={isSubmitting}
+                label="Ending Date"
+                InputLabelProps={{ shrink: true }}
+                margin='normal'
+                helperText={
+                  errors.endDate
+                    ? String(errors.endDate)
+                    : 'Ending date of the course instance.'
+                }
+                error={touched.endDate && Boolean(errors.endDate)}
+                onChange={handleChange}
+              />
+              <TextField
+                id="startingPeriod"
+                type="text"
+                fullWidth
+                value={values.startingPeriod}
+                disabled={isSubmitting}
+                label="Starting Period"
+                InputLabelProps={{ shrink: true }}
+                margin='normal'
+                helperText={
+                  errors.startingPeriod
+                  ?? 'Starting period of the course instance.'
+                }
+                error={touched.startingPeriod && Boolean(errors.startingPeriod)}
+                onChange={handleChange}
+              />
+              <TextField
+                id="endingPeriod"
+                type="text"
+                fullWidth
+                value={values.endingPeriod}
+                disabled={isSubmitting}
+                label="Ending Period"
+                InputLabelProps={{ shrink: true }}
+                margin='normal'
+                helperText={
+                  errors.endingPeriod
+                  ?? 'Ending period of the course instance.'
+                }
+                error={touched.endingPeriod && Boolean(errors.endingPeriod)}
+                onChange={handleChange}
+              />
+              <TextField
+                id="gradingScale"
+                type="text"
+                fullWidth
+                value={values.gradingScale}
+                disabled={isSubmitting}
+                label="Grading Scale"
+                InputLabelProps={{ shrink: true }}
+                margin='normal'
+                helperText={
+                  errors.gradingScale
+                  ?? 'Grading scale of the course instance, e.g., 0-5 or pass/fail.'
+                }
+                error={touched.gradingScale && Boolean(errors.gradingScale)}
+                onChange={handleChange}
+              />
+            </Box>
+            <Box sx={{
+              display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
+              alignItems: 'center', pb: 6
+            }}>
+              <Button
+                size='medium'
+                variant='outlined'
+                onClick={(): void => navigate('/course-view/' + courseId)}
+              >
+                Cancel
+              </Button>
+              <Button
+                id='ag_confirm_instance_details_btn'
+                variant='contained'
+                type='submit'
+                disabled={!isValid || isSubmitting}
+              >
+                Confirm Details
+              </Button>
+            </Box>
+          </Form>
+        )
+      }
+    </Formik>
   );
 }
 

@@ -5,7 +5,6 @@
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, RenderResult, screen, waitFor, cleanup } from '@testing-library/react';
-import InstanceCreationRoute from '../context/InstanceCreationRoute';
 import EditInstanceView from '../components/EditInstanceView';
 import instancesService from '../services/instances';
 import mockSisuInstances from './mock-data/mockSisuInstances';
@@ -23,9 +22,7 @@ describe('Tests for EditInstanceView components', () => {
     return render(
       <MemoryRouter initialEntries={['/A-12345/edit-instance/test']}>
         <Routes>
-          <Route element={<InstanceCreationRoute/>}>
-            <Route path=':courseId/edit-instance/:instanceId' element={<EditInstanceView/>}/>
-          </Route>
+          <Route path=':courseId/edit-instance/:instanceId' element={<EditInstanceView />} />
         </Routes>
       </MemoryRouter>
     );

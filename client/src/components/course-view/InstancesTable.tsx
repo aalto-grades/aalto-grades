@@ -100,7 +100,7 @@ function InstancesTable(props: {
                   {instance.endingPeriod}
                 </TableCell>
                 <TableCell>
-                  {textFormatServices.formatCourseType(instance.type)}
+                  {instance.type}
                 </TableCell>
                 <TableCell>
                   {textFormatServices.convertToClientGradingScale(instance.gradingScale)}

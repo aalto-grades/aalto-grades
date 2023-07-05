@@ -12,15 +12,16 @@ import Button from '@mui/material/Button';
 import FetchedInstances from './fetch-instances-view/FetchedInstances';
 import instancesService from '../services/instances';
 import { CourseInstanceData } from 'aalto-grades-common/types/course';
+import { State } from '../types';
 
 function FetchInstancesView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { courseId, courseCode }: Params = useParams();
-  const [instances, setInstances] = useState<Array<CourseInstanceData>>([]);
+  const [instances, setInstances]: State<Array<CourseInstanceData>> = useState([]);
 
   useEffect(() => {
     instancesService.getSisuInstances(courseCode)
-      .then((courseInstances) => setInstances(courseInstances))
+      .then((courseInstances: Array<CourseInstanceData>) => setInstances(courseInstances))
       .catch((e: Error) => console.log(e.message));
   }, []);
 
@@ -37,7 +38,7 @@ function FetchInstancesView(): JSX.Element {
         <Typography variant="h3" sx={{ flexGrow: 1, mb: 4, textAlign: 'left' }}>
           Select the instance you wish to add
         </Typography>
-        <FetchedInstances courseId={courseId} info={instances} />
+        <FetchedInstances courseId={Number(courseId)} instances={instances} />
         <Divider sx={{ my: 5 }} />
         <Box sx={{
           display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',

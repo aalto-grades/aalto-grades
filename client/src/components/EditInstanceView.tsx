@@ -10,16 +10,15 @@ import LinearProgress from '@mui/material/LinearProgress';
 import EditInstanceForm from './edit-instance-view/EditInstanceForm';
 import instancesService from '../services/instances';
 import { CourseInstanceData } from 'aalto-grades-common/types/course';
+import { State } from '../types';
 
-// TODO: update actual instance/save basic information
-
-function EditInstanceView() {
+function EditInstanceView(): JSX.Element {
   const { sisuInstanceId }: Params = useParams();
-  const [instance, setInstance] = useState<CourseInstanceData>();
+  const [instance, setInstance]: State<CourseInstanceData> = useState();
 
   useEffect(() => {
     instancesService.getSisuInstance(sisuInstanceId)
-      .then((courseInstance) => {
+      .then((courseInstance: CourseInstanceData) => {
         setInstance(courseInstance);
       })
       .catch((e) => console.log(e.message));
@@ -28,7 +27,7 @@ function EditInstanceView() {
   return (
     <Container maxWidth="sm" sx={{ textAlign: 'right' }}>
       <Typography variant="h1" sx={{ flexGrow: 1, mb: 5, textAlign: 'left' }}>
-        Edit Basic Information
+        Create Course Instance
       </Typography>
       {
         instance ?

@@ -19,7 +19,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { State } from '../../types';
 import { CourseData } from 'aalto-grades-common/types';
 
-function CreateCourseForm(params: {
+function CreateCourseForm(props: {
   addCourse: (course: CourseData) => Promise<void>
 }): JSX.Element {
 
@@ -65,22 +65,22 @@ function CreateCourseForm(params: {
             .notRequired(),
           departmentEn: yup.string()
             .min(1)
-            .required('Please input the course organizer information in english'),
+            .required('Please input the course organizer information in English'),
           departmentFi: yup.string()
             .min(1)
-            .required('Please input the course organizer information in finnish'),
+            .required('Please input the course organizer information in Finnish'),
           departmentSv: yup.string()
             .min(1)
-            .required('Please input the course organizer information in swedish'),
+            .required('Please input the course organizer information in Swedish'),
           nameEn: yup.string()
             .min(1)
-            .required('Please input a valid course name in english'),
+            .required('Please input a valid course name in English'),
           nameFi: yup.string()
             .min(1)
-            .required('Please input a valid course name in finnish'),
+            .required('Please input a valid course name in Finnish'),
           nameSv: yup.string()
             .min(1)
-            .required('Please input a valid course name in swedish')
+            .required('Please input a valid course name in Swedish')
         })}
         onSubmit={async function (values): Promise<void> {
           const courseObject: CourseData = ({
@@ -103,7 +103,7 @@ function CreateCourseForm(params: {
               };
             })
           });
-          await params.addCourse(courseObject);
+          await props.addCourse(courseObject);
         }}
       >
         {({ errors, handleChange, isSubmitting, isValid, touched, values }) => (
