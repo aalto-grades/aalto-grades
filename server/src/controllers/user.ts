@@ -16,6 +16,10 @@ import { parseCourseFull } from './utils/course';
 import { findUserById } from './utils/user';
 import { CourseFull } from '../types/model';
 
+// Sequelize says User is not associated to CourseInstance unless this is here.
+// TODO: Remove if possible.
+require('../database/models/courseInstanceRole');
+
 export async function getCoursesOfUser(req: Request, res: Response): Promise<void> {
   const courses: Array<CourseData> = [];
   const userId: number = Number(req.params.userId);

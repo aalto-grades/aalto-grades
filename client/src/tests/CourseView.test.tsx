@@ -15,7 +15,9 @@ import mockAssessmentModels from './mock-data/mockAssessmentModels';
 import mockAttainments from './mock-data/mockAttainmentsClient';
 import mockCourses from './mock-data/mockCourses';
 import mockInstances from './mock-data/mockInstancesWithStringDates';
-import { LoginResult, SystemRole } from 'aalto-grades-common/types';
+import {
+  AssessmentModelData, AttainmentData, CourseInstanceData, LoginResult, SystemRole
+} from 'aalto-grades-common/types';
 
 jest.mock('../services/assessmentModels');
 jest.mock('../services/attainments');
@@ -25,7 +27,12 @@ afterEach(cleanup);
 
 describe('Tests for CourseView component', () => {
 
-  function renderCourseView(auth: LoginResult): RenderResult {
+  function renderCourseView(
+    auth: LoginResult,
+    mockInstances: Array<CourseInstanceData>,
+    mockAssessmentModels: Array<AssessmentModelData>,
+    mockAttainments: AttainmentData
+  ): RenderResult {
 
     (instancesService.getInstances as jest.Mock).mockRejectedValue('Network error');
     (instancesService.getInstances as jest.Mock).mockResolvedValue(mockInstances);
@@ -64,7 +71,9 @@ describe('Tests for CourseView component', () => {
         role: SystemRole.Admin
       };
 
-      const { getByText, getAllByText }: RenderResult = renderCourseView(auth);
+      const { getByText, getAllByText }: RenderResult = renderCourseView(
+        auth, mockInstances, mockAssessmentModels, mockAttainments
+      );
 
       await waitFor(() => {
         const courseInfo: HTMLElement = getByText('Course Details');
@@ -105,7 +114,8 @@ describe('Tests for CourseView component', () => {
         role: SystemRole.User
       };
 
-      const { getByText, findByText, queryByText }: RenderResult = renderCourseView(auth);
+      const { getByText, findByText, queryByText }: RenderResult =
+        renderCourseView(auth, mockInstances, mockAssessmentModels, mockAttainments);
 
       const courseInfo: HTMLElement = await findByText('Course Details');
       // since previous is in document, so are the rest
@@ -119,6 +129,81 @@ describe('Tests for CourseView component', () => {
       expect(queryByText('Study Attainments')).not.toBeInTheDocument();
       expect(queryByText('Add attainment')).not.toBeInTheDocument();
       expect(queryByText('Edit')).not.toBeInTheDocument();
+
+    }
+  );
+
+  test(
+    'CourseView InstancesTable should display correct message if no instances found for the course',
+    async () => {
+
+      // TODO, role here must be checked here based on a course/instance level role.
+      const auth: LoginResult = {
+        id: 1,
+        name: 'Admin',
+        role: SystemRole.Admin
+      };
+
+      const { getByText }: RenderResult = renderCourseView(
+        auth, [], mockAssessmentModels, mockAttainments
+      );
+
+      await waitFor(() => {
+        const noInstances: HTMLElement = getByText(
+          'No instances found for course, please create a new instance.'
+        );
+        expect(noInstances).toBeDefined();
+      });
+
+    }
+  );
+
+  test(
+    'CourseView assessment models should display correct message if no models found for the course',
+    async () => {
+
+      // TODO, role here must be checked here based on a course/instance level role.
+      const auth: LoginResult = {
+        id: 1,
+        name: 'Admin',
+        role: SystemRole.Admin
+      };
+
+      const { getByText }: RenderResult = renderCourseView(
+        auth, mockInstances, [], mockAttainments
+      );
+
+      await waitFor(() => {
+        const noAssessmentModels: HTMLElement = getByText(
+          'No assesment models found. Please create a new assessment model.'
+        );
+        expect(noAssessmentModels).toBeDefined();
+      });
+
+    }
+  );
+
+  test(
+    'CourseView should display correct message if no attainments found specific assessment model',
+    async () => {
+
+      // TODO, role here must be checked here based on a course/instance level role.
+      const auth: LoginResult = {
+        id: 1,
+        name: 'Admin',
+        role: SystemRole.Admin
+      };
+
+      const { getByText }: RenderResult = renderCourseView(
+        auth, mockInstances, [], mockAttainments
+      );
+
+      await waitFor(() => {
+        const noAttainments: HTMLElement = getByText(
+          'No attainments found, please select at least one assessment model or create a new one.'
+        );
+        expect(noAttainments).toBeDefined();
+      });
 
     }
   );

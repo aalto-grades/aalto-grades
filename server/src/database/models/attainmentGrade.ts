@@ -14,6 +14,7 @@ export default class AttainmentGrade extends Model<
   InferAttributes<AttainmentGrade>,
   InferCreationAttributes<AttainmentGrade>
 > {
+  declare id: CreationOptional<number>;
   declare userId: ForeignKey<User['id']>;
   declare attainmentId: ForeignKey<Attainment['id']>;
   declare graderId: ForeignKey<User['id']>;
@@ -23,15 +24,20 @@ export default class AttainmentGrade extends Model<
   // Date when attainment is completed (e.g., deadline or exam date)
   declare date: CreationOptional<Date>;
   declare expiryDate: CreationOptional<Date>;
+  declare comment: CreationOptional<string>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
 
 AttainmentGrade.init(
   {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true
+    },
     userId: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
       references: {
         model: 'user',
         key: 'id'
@@ -39,7 +45,6 @@ AttainmentGrade.init(
     },
     attainmentId: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
       references: {
         model: 'attainment',
         key: 'id'
@@ -71,6 +76,10 @@ AttainmentGrade.init(
     },
     expiryDate: {
       type: DataTypes.DATE,
+      allowNull: true
+    },
+    comment: {
+      type: DataTypes.STRING,
       allowNull: true
     },
     createdAt: DataTypes.DATE,

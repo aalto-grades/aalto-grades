@@ -146,9 +146,13 @@ export default {
       }, { transaction });
 
       await queryInterface.createTable('attainment_grade', {
+        id: {
+          type: DataTypes.INTEGER,
+          autoIncrement: true,
+          primaryKey: true
+        },
         user_id: {
           type: DataTypes.INTEGER,
-          primaryKey: true,
           references: {
             model: 'user',
             key: 'id'
@@ -158,7 +162,6 @@ export default {
         },
         attainment_id: {
           type: DataTypes.INTEGER,
-          primaryKey: true,
           references: {
             model: 'attainment',
             key: 'id'
@@ -194,6 +197,10 @@ export default {
         },
         expiry_date: {
           type: DataTypes.DATE,
+          allowNull: true
+        },
+        comment: {
+          type: DataTypes.STRING,
           allowNull: true
         },
         created_at: DataTypes.DATE,
@@ -345,54 +352,6 @@ export default {
         updated_at: DataTypes.DATE
       }, { transaction });
 
-      await queryInterface.createTable('course_result', {
-        id: {
-          type: DataTypes.INTEGER,
-          autoIncrement: true,
-          primaryKey: true
-        },
-        user_id: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-          references: {
-            model: 'user',
-            key: 'id'
-          },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE'
-        },
-        course_instance_id: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-          references: {
-            model: 'course_instance',
-            key: 'id'
-          },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE'
-        },
-        grader_id: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-          references: {
-            model: 'user',
-            key: 'id'
-          },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE'
-        },
-        grade: {
-          type: DataTypes.STRING,
-          allowNull: false
-        },
-        credits: {
-          type: DataTypes.INTEGER,
-          allowNull: false
-        },
-        created_at: DataTypes.DATE,
-        updated_at: DataTypes.DATE
-      }, { transaction });
-
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
@@ -402,7 +361,6 @@ export default {
   down: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction: Transaction = await queryInterface.sequelize.transaction();
     try {
-      await queryInterface.dropTable('course_result', { transaction });
       await queryInterface.dropTable('course_translation', { transaction });
       await queryInterface.dropTable('teacher_in_charge', { transaction });
       await queryInterface.dropTable('course_instance_role', { transaction });

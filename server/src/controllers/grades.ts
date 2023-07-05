@@ -707,8 +707,7 @@ export async function calculateGrades(
 /**
  * The final grade for a student in a form returned by a database query.
  */
-interface FinalGradeRaw {
-  grade: number,
+interface FinalGradeRaw extends AttainmentGrade {
   Attainment: {
     AssessmentModel: {
       Course: {
@@ -756,7 +755,7 @@ async function getFinalGradesFor(
         }
       }
     ]
-  }) as unknown as Array<FinalGradeRaw>;
+  }) as Array<FinalGradeRaw>;
 
   if (finalGrades.length === 0) {
     throw new ApiError(
