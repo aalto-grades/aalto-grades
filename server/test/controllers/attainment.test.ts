@@ -11,6 +11,7 @@ import { mockAttainment } from '../mock-data/attainment';
 import { app } from '../../src/app';
 import { HttpCode } from '../../src/types/httpCode';
 import { Cookies, getCookies } from '../util/getCookies';
+import { Formula } from 'aalto-grades-common/types';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
@@ -57,6 +58,7 @@ function evaluateSubAttainment(attainment: AttainmentData): void {
   expect(attainment.name).toBeDefined();
   expect(attainment.parentId).toBeDefined();
   expect(attainment.tag).toBeDefined();
+  expect(attainment.formula).toBeDefined();
   expect(attainment.daysValid).toBeDefined();
 }
 
@@ -84,6 +86,7 @@ describe(
         expect(res.body.data.attainment.assessmentModelId).toBe(31);
         expect(res.body.data.attainment.parentId).toBe(null);
         expect(res.body.data.attainment.tag).toBeDefined();
+        expect(res.body.data.attainment.formula).toBeDefined();
         expect(res.body.data.attainment.daysValid).toBeDefined();
         expect(res.body.data.attainment.subAttainments).toBeDefined();
       }
@@ -106,6 +109,7 @@ describe(
         expect(res.body.data.attainment.name).toBe(mockAttainment.name);
         expect(res.body.data.attainment.parentId).toBe(null);
         expect(res.body.data.attainment.tag).toBeDefined();
+        expect(res.body.data.attainment.formula).toBeDefined();
         expect(res.body.data.attainment.daysValid).toBeDefined();
         expect(res.body.data.attainment.subAttainments).toBeDefined();
 
@@ -534,6 +538,7 @@ describe(
       expect(res.body.data.attainment.parentId).toBe(null);
       expect(res.body.data.attainment.name).toBe('new name');
       expect(res.body.data.attainment.tag).toBe('new tag');
+      expect(res.body.data.attainment.formula).toBe(Formula.Manual);
       expect(res.body.data.attainment.daysValid).toBe(50);
     });
 
@@ -566,6 +571,7 @@ describe(
       expect(res.body.data.attainment.parentId).toBe(parentAttainment.id);
       expect(res.body.data.attainment.name).toBe('new name');
       expect(res.body.data.attainment.tag).toBe('new tag');
+      expect(res.body.data.attainment.formula).toBe(Formula.Manual);
       expect(res.body.data.attainment.daysValid).toBe(50);
     });
 

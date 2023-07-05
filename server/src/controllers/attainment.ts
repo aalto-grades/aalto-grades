@@ -105,6 +105,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
         assessmentModelId: dbEntry.id,
         name: dbEntry.name,
         tag: dbEntry.tag,
+        formula: dbEntry.formula,
         daysValid: dbEntry.daysValid,
         parentId: dbEntry.parentId,
         subAttainments: subAttainments
@@ -125,6 +126,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
         assessmentModelId: attainment.assessmentModelId,
         name: attainment.name,
         tag: attainment.tag,
+        formula: attainment.formula,
         daysValid: attainment.daysValid,
         parentId: attainment.parentId,
         subAttainments: subAttainments
