@@ -8,12 +8,14 @@ import { act, render, RenderResult, screen, waitFor, cleanup } from '@testing-li
 import userEvent from '@testing-library/user-event';
 import EditAttainmentView from '../components/EditAttainmentView';
 import attainmentServices from '../services/attainments';
+import formulaService from '../services/formulas';
 import mockAttainmentsClient from './mock-data/mockAttainmentsClient';
 import { AttainmentData } from 'aalto-grades-common/types';
+import mockFormulas from './mock-data/mockFormulas';
 
-const courseId = 1;
-const assessmentModelId = 1;
-const attainmentId = 2;  // Project
+const courseId: number = 1;
+const assessmentModelId: number = 1;
+const attainmentId: number = 2;  // Project
 
 // Not mocking structuredClone leads to errors about it being undefined.
 // Probably related: https://github.com/jsdom/jsdom/issues/3363
@@ -24,7 +26,7 @@ global.structuredClone = <T,>(value: T): T => {
 function getMockAttainment(): AttainmentData {
   return structuredClone(
     mockAttainmentsClient.subAttainments.find(
-      (attainment) => attainment.id === attainmentId
+      (attainment: AttainmentData) => attainment.id === attainmentId
     )
   );
 }
@@ -41,6 +43,7 @@ describe('Tests for EditAttainmentView components', () => {
 
     (attainmentServices.getAttainment as jest.Mock).mockRejectedValue('Network error');
     (attainmentServices.getAttainment as jest.Mock).mockResolvedValue(getMockAttainment());
+    (formulaService.getFormulaDetails as jest.Mock).mockResolvedValueOnce(mockFormulas[0]);
 
     return render(
       <MemoryRouter initialEntries={
@@ -78,6 +81,7 @@ describe('Tests for EditAttainmentView components', () => {
     const mockAttainment: AttainmentData = getMockAttainment();
     // TODO: Update daysValid as a number in attainment creation. Probably by
     // adding a number text field to also account for formula attributes.
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     mockAttainment.daysValid = '42';
 
@@ -128,7 +132,8 @@ describe('Tests for EditAttainmentView components', () => {
       expect(numberField).toBeInTheDocument();
 
       const confirmButtons: Array<HTMLElement> = await screen.findAllByText('Confirm');
-      const numConfirmButton = confirmButtons[1]; // the second one aka the one in the dialog
+      // the second one aka the one in the dialog
+      const numConfirmButton: HTMLElement = confirmButtons[1];
 
       // the default number of sub-attainments in the Dialog element is 1
       // so this call creates one sub-attainment
