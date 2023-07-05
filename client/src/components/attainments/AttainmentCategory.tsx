@@ -15,31 +15,19 @@ function AttainmentCategory(props: {
   buttons?: Array<JSX.Element>,
   attainmentKey: string
 }): JSX.Element {
-
-  // title padding-bottom
-  const titlepb: string = props.attainment.subAttainments ? '16px' : '0px';
-
   return (
     <Box boxShadow={3} borderRadius={1} sx={{ pt: 2, pb: 0.5, bgcolor: 'white' }}>
       <Box sx={{
         display: 'flex', flexDirection: 'row', flexWrap: 'wrap',
         justifyContent: 'space-between', alignItems: 'center', pr: '21px',
-        pb: titlepb, pl: '21px'
+        pb: props.attainment.subAttainments ? '16px' : '0px', pl: '21px'
       }}>
         <Typography sx={{ fontWeight: 'bold' }} align='left'>
-          {props.attainment.name}
+          {props.attainment.name} ({props.attainment.tag})
         </Typography>
-        <Typography align='left'>
-          {props.attainment.tag}
+        <Typography align='left' variant='body2'>
+          {'Formula: ' + props.attainment.formula}
         </Typography>
-        {
-          /*
-            false && // TODO: Attainment formula
-            <Typography align='left' variant='body2'>
-              {'Formula: ' + formulasService.getFormulaName(formulaId)}
-            </Typography>
-          */
-        }
       </Box>
       {
         props.attainment.subAttainments &&
