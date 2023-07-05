@@ -13,7 +13,8 @@ import textFormatServices from '../../services/textFormat';
 import { CourseInstanceData, GradingScale, Period } from 'aalto-grades-common/types';
 
 function EditInstanceForm(props: {
-  instance: CourseInstanceData
+  instance: CourseInstanceData,
+  addInstance: (instance: CourseInstanceData) => Promise<void>
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { courseId, sisuInstanceId }: Params = useParams();
@@ -46,8 +47,16 @@ function EditInstanceForm(props: {
           .oneOf(Object.values(GradingScale))
           .required()
       })}
-      onSubmit={async function () {
-
+      onSubmit={async function (values): Promise<void> {
+        const instanceObject: CourseInstanceData = {
+          type: values.type,
+          startDate: values.startDate,
+          endDate: values.endDate,
+          startingPeriod: values.startingPeriod,
+          endingPeriod: values.endingPeriod,
+          gradingScale: values.gradingScale
+        };
+        await props.addInstance(instanceObject);
       }}
     >
       {
@@ -191,6 +200,7 @@ function EditInstanceForm(props: {
 
 EditInstanceForm.propTypes = {
   instance: PropTypes.object,
+  addInstance: PropTypes.func
 };
 
 export default EditInstanceForm;
