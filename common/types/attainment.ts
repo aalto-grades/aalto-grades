@@ -10,7 +10,7 @@ export interface AttainmentData {
   parentId?: number,
   tag: string,
   name: string,
-  formula: Formula
+  formula?: Formula
   daysValid: number,
   subAttainments?: Array<AttainmentData>
 }
