@@ -114,7 +114,7 @@ function AttainmentText(props: {
 
 AttainmentText.propTypes = {
   name: PropTypes.string,
-  formulaId: Formula,
+  formulaId: PropTypes.string,
   tag: PropTypes.string,
 };
 
