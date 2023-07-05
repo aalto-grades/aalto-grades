@@ -55,7 +55,7 @@ function CourseView(): JSX.Element {
         /**
          * Newly created courses do not have assessment models assigned.
          * Set tree to null so proper message can be displayed.
-        */
+         */
         if (assessmentModels.length === 0) {
           setAttainmentTree(null);
         } else {
