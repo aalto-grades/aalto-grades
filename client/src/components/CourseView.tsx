@@ -34,6 +34,11 @@ function CourseView(): JSX.Element {
     useState(null);
   const [assessmentModels, setAssessmentModels]: State<Array<AssessmentModelData>> =
     useState([]);
+  /**
+   * Tree set to undefined when fetching the data from API, display loading. 
+   * If no assessment models exists, set to null to display "no attainments" message, 
+   * otherwise render attainmentTree.
+   */
   const [attainmentTree, setAttainmentTree]: State<AttainmentData | null | undefined> =
     useState(undefined);
 
