@@ -4,8 +4,7 @@
 
 import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
+import { Button, TextField, MenuItem } from '@mui/material';
 import { Form, Formik } from 'formik';
 import * as yup from 'yup';
 import Box from '@mui/material/Box';
@@ -25,10 +24,11 @@ function EditInstanceForm(props: {
         type: textFormatServices.formatSisuCourseType(props.instance.type),
         startDate: props.instance.startDate,
         endDate: props.instance.endDate,
-        startingPeriod: props.instance.startingPeriod,
-        endingPeriod: props.instance.endingPeriod,
+        startingPeriod: props.instance.startingPeriod ?? Period.I,
+        endingPeriod: props.instance.endingPeriod ?? Period.I,
         gradingScale: props.instance.gradingScale
       }}
+
       validationSchema={yup.object({
         type: yup.string()
           .required(),
@@ -47,6 +47,7 @@ function EditInstanceForm(props: {
           .oneOf(Object.values(GradingScale))
           .required()
       })}
+
       onSubmit={async function (values): Promise<void> {
         const instanceObject: CourseInstanceData = {
           type: values.type,
@@ -137,7 +138,16 @@ function EditInstanceForm(props: {
                 }
                 error={touched.startingPeriod && Boolean(errors.startingPeriod)}
                 onChange={handleChange}
-              />
+                select
+              >
+                {
+                  Object.values(Period).map((value: Period) => {
+                    return (
+                      <MenuItem id="startingPeriod" key={value} value={value}>{value}</MenuItem>
+                    );
+                  })
+                }
+              </TextField>
               <TextField
                 id="endingPeriod"
                 type="text"
@@ -153,7 +163,16 @@ function EditInstanceForm(props: {
                 }
                 error={touched.endingPeriod && Boolean(errors.endingPeriod)}
                 onChange={handleChange}
-              />
+                select
+              >
+                {
+                  Object.values(Period).map((value: Period) => {
+                    return (
+                      <MenuItem key={value} value={value}>{value}</MenuItem>
+                    );
+                  })
+                }
+              </TextField>
               <TextField
                 id="gradingScale"
                 type="text"
@@ -169,7 +188,18 @@ function EditInstanceForm(props: {
                 }
                 error={touched.gradingScale && Boolean(errors.gradingScale)}
                 onChange={handleChange}
-              />
+                select
+              >
+                {
+                  Object.values(GradingScale).map((value: GradingScale) => {
+                    return (
+                      <MenuItem key={value} value={value}>
+                        {textFormatServices.convertToClientGradingScale(value)}
+                      </MenuItem>
+                    );
+                  })
+                }
+              </TextField>
             </Box>
             <Box sx={{
               display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
