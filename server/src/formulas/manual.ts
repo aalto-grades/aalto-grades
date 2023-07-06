@@ -32,5 +32,5 @@ registerFormula(
   codeSnippet,
   'Manual',
   [],
-  yup.object()
+  yup.object().noUnknown().strict()
 );

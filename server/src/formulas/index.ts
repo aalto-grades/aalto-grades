@@ -37,9 +37,9 @@ export function registerFormula(
   );
 }
 
-export async function getFormulaImplementation(
+export function getFormulaImplementation(
   formulaId: Formula
-): Promise<FormulaImplementation> {
+): FormulaImplementation {
   const formulaImplementation: FormulaImplementation | undefined =
     formulaImplementations.get(formulaId);
 

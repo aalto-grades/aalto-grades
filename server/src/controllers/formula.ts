@@ -32,7 +32,7 @@ export async function getFormula(req: Request, res: Response): Promise<void> {
   const formulaId: Formula = req.params.formulaId as Formula;
   await requestSchema.validate({ formulaId });
   const formulaImplementation: FormulaImplementation =
-    await getFormulaImplementation(formulaId);
+    getFormulaImplementation(formulaId);
 
   const formula: FormulaPreview = {
     id: formulaId,

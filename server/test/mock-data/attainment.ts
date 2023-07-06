@@ -15,28 +15,48 @@ export const mockAttainment: AttainmentData = {
       name: 'Exercise 1',
       tag: 'ex-1',
       daysValid: 365,
+      formula: Formula.Manual,
+      parentFormulaParams: {
+        weight: 0.5
+      },
       subAttainments: [],
     },
     {
       name: 'Exercise 2',
       tag: 'ex-2',
       daysValid: 365,
+      formula: Formula.WeightedAverage,
+      parentFormulaParams: {
+        weight: 0.5
+      },
       subAttainments: [
         {
           name: 'Exercise 2.1',
           tag: 'ex-2.1',
           daysValid: 365,
+          formula: Formula.WeightedAverage,
+          parentFormulaParams: {
+            weight: 0.5
+          },
           subAttainments: [
             {
               name: 'Exercise 2.1.1',
               tag: 'ex-2.1.1',
               daysValid: 365,
+              formula: Formula.Manual,
+              parentFormulaParams: {
+                weight: 0.5
+              },
               subAttainments: [],
             },
             {
               name: 'Exercise 2.1.2',
               tag: 'ex-2.1.2',
               daysValid: 365,
+              formula: Formula.Manual,
+              parentFormulaParams: {
+                weight: 0.5
+              },
               subAttainments: [],
             }
           ],
@@ -45,39 +65,67 @@ export const mockAttainment: AttainmentData = {
           name: 'Exercise 2.2',
           tag: 'ex-2.2',
           daysValid: 365,
+          formula: Formula.WeightedAverage,
+          parentFormulaParams: {
+            weight: 0.5
+          },
           subAttainments: [
             {
               name: 'Exercise 2.2.1',
               tag: 'ex-2.2.1',
               daysValid: 365,
+              formula: Formula.WeightedAverage,
+              parentFormulaParams: {
+                weight: 0.5
+              },
               subAttainments: [],
             },
             {
               name: 'Exercise 2.2.2',
               tag: 'ex-2.2.2',
               daysValid: 365,
+              formula: Formula.WeightedAverage,
+              parentFormulaParams: {
+                weight: 0.5
+              },
               subAttainments: [
                 {
                   name: 'Exercise 2.2.2.1',
                   tag: 'ex-2.2.2.1',
                   daysValid: 365,
+                  formula: Formula.Manual,
+                  parentFormulaParams: {
+                    weight: 0.5
+                  },
                   subAttainments: [],
                 },
                 {
                   name: 'Exercise 2.2.2.2',
                   tag: 'ex-2.2.2.2',
                   daysValid: 365,
+                  formula: Formula.WeightedAverage,
+                  parentFormulaParams: {
+                    weight: 0.5
+                  },
                   subAttainments: [
                     {
                       name: 'Exercise 2.2.2.2.1',
                       tag: 'ex-2.2.2.2.1',
                       daysValid: 365,
+                      formula: Formula.Manual,
+                      parentFormulaParams: {
+                        weight: 0.5
+                      },
                       subAttainments: [],
                     },
                     {
                       name: 'Exercise 2.2.2.2.2',
                       tag: 'ex-2.2.2.2.2',
                       daysValid: 365,
+                      formula: Formula.Manual,
+                      parentFormulaParams: {
+                        weight: 0.5
+                      },
                       subAttainments: [],
                     }
                   ],

@@ -9,16 +9,16 @@ import AssessmentModel from '../database/models/assessmentModel';
 import Attainment from '../database/models/attainment';
 import Course from '../database/models/course';
 
-import { AttainmentData } from 'aalto-grades-common/types/attainment';
+import { AttainmentData, Formula } from 'aalto-grades-common/types';
+import { getFormulaImplementation } from '../formulas';
 import { ApiError } from '../types/error';
+import { FormulaImplementation } from '../types/formulas';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
-
 import {
   findAttainmentById, findAttainmentsByAssessmentModel, generateAttainmentTree
 } from './utils/attainment';
 import { validateCourseAndAssessmentModel } from './utils/assessmentModel';
-import { Formula } from 'aalto-grades-common/types';
 
 export async function addAttainment(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
@@ -35,6 +35,14 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       .number()
       .min(0)
       .required(),
+    formula: yup
+      .string()
+      .oneOf(Object.values(Formula))
+      .notRequired(),
+    parentFormulaParams: yup // More thorough validation is done later
+      .object()
+      .nullable()
+      .notRequired(),
     subAttainments: yup
       .array()
       .of(yup.lazy(() => requestSchema.default(undefined)) as never)
@@ -52,15 +60,19 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
   const name: string = req.body.name;
   const tag: string = req.body.tag;
   const daysValid: number = req.body.daysValid;
+  const formula: Formula | undefined = req.body.formula;
+  const parentFormulaParams: object | undefined = req.body.parentFormulaParams;
   const requestSubAttainments: Array<AttainmentData> | undefined = req.body.subAttainments;
   let subAttainments: Array<AttainmentData> = [];
 
-  // If linked to a parent id, check that it exists and belongs to the same assessment model.
+  // If linked to a parent ID...
   if (parentId) {
+    // 1. Ensure that it exists
     const parentAttainment: Attainment = await findAttainmentById(
       parentId, HttpCode.UnprocessableEntity
     );
 
+    // 2. Ensure that it belongs to the same assessment model
     if (parentAttainment.assessmentModelId !== assessmentModel.id) {
       throw new ApiError(
         `parent attainment ID ${parentId} does not belong ` +
@@ -68,15 +80,44 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
         HttpCode.Conflict
       );
     }
+
+    // 3. Ensure that the given parent formula params match the formula of the
+    // parent attainment
+    const parentFormula: FormulaImplementation =
+      getFormulaImplementation(parentAttainment.formula);
+    await parentFormula.paramSchema.validate(parentFormulaParams);
+  }
+
+  async function validateFormulaParams(
+    attainments: Array<AttainmentData>,
+    parentFormula: FormulaImplementation
+  ): Promise<void> {
+    for (const attainment of attainments) {
+      await parentFormula.paramSchema.validate(attainment.parentFormulaParams);
+      if (attainment.subAttainments) {
+        await validateFormulaParams(
+          attainment.subAttainments,
+          getFormulaImplementation(attainment.formula ?? Formula.Manual)
+        );
+      }
+    }
+  }
+
+  if (requestSubAttainments) {
+    await validateFormulaParams(
+      requestSubAttainments,
+      getFormulaImplementation(formula ?? Formula.Manual)
+    );
   }
 
   const attainment: Attainment = await Attainment.create({
     assessmentModelId: assessmentModel.id,
-    parentId,
-    name,
-    tag,
-    daysValid,
-    formula: Formula.Manual
+    parentId: parentId,
+    name: name,
+    tag: tag,
+    daysValid: daysValid,
+    formula: formula ?? Formula.Manual,
+    parentFormulaParams: parentFormulaParams
   });
 
   async function processSubAttainments(
@@ -92,7 +133,8 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
         name: attainment.name,
         tag: attainment.tag,
         daysValid: attainment.daysValid,
-        formula: attainment.formula ?? Formula.Manual
+        formula: attainment.formula ?? Formula.Manual,
+        parentFormulaParams: attainment.parentFormulaParams
       });
 
       if (attainment.subAttainments && attainment.subAttainments.length > 0) {
@@ -105,6 +147,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
         name: dbEntry.name,
         tag: dbEntry.tag,
         formula: dbEntry.formula,
+        parentFormulaParams: dbEntry.parentFormulaParams,
         daysValid: dbEntry.daysValid,
         parentId: dbEntry.parentId,
         subAttainments: subAttainments
@@ -117,19 +160,22 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     subAttainments = await processSubAttainments(requestSubAttainments, attainment.id);
   }
 
+  const attainmentTree: AttainmentData = {
+    id: attainment.id,
+    assessmentModelId: attainment.assessmentModelId,
+    name: attainment.name,
+    tag: attainment.tag,
+    formula: attainment.formula,
+    parentFormulaParams: attainment.parentFormulaParams,
+    daysValid: attainment.daysValid,
+    parentId: attainment.parentId,
+    subAttainments: subAttainments
+  };
+
   res.status(HttpCode.Ok).json({
     success: true,
     data: {
-      attainment: {
-        id: attainment.id,
-        assessmentModelId: attainment.assessmentModelId,
-        name: attainment.name,
-        tag: attainment.tag,
-        formula: attainment.formula,
-        daysValid: attainment.daysValid,
-        parentId: attainment.parentId,
-        subAttainments: subAttainments
-      }
+      attainment: attainmentTree
     }
   });
 }
@@ -179,7 +225,11 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
         return originalValue ? originalValue.toUpperCase() : value;
       })
       .oneOf(Object.values(Formula))
-      .notRequired()
+      .notRequired(),
+    parentFormulaParams: yup // More thorough validation is done later
+      .object()
+      .nullable()
+      .notRequired(),
   });
 
   const attainmentId: number = Number(req.params.attainmentId);
@@ -192,10 +242,12 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   const name: string | undefined = req.body.name;
   const tag: string | undefined = req.body.tag;
   const daysValid: number | undefined = req.body.daysValid;
-  const parentId: number| undefined = req.body.parentId;
-  const formula: Formula| undefined = req.body.formula;
+  const parentId: number | undefined = req.body.parentId;
+  const formula: Formula | undefined = req.body.formula;
+  const parentFormulaParams: object | undefined = req.body.parentFormulaParams;
 
   const attainment: Attainment = await findAttainmentById(attainmentId, HttpCode.NotFound);
+  let parentAttainment: Attainment | null = null;
 
   // If linked to a parent id, check that it exists and belongs
   // to the same assessment model as the attainment being edited.
@@ -209,7 +261,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
       );
     }
 
-    const parentAttainment: Attainment = await findAttainmentById(
+    parentAttainment = await findAttainmentById(
       parentId,
       HttpCode.UnprocessableEntity
     );
@@ -221,6 +273,22 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
         HttpCode.Conflict
       );
     }
+  } else if (attainment.parentId) {
+    parentAttainment = await findAttainmentById(
+      attainment.parentId,
+      HttpCode.UnprocessableEntity
+    );
+  }
+
+  if (parentAttainment) {
+    const parentFormula: FormulaImplementation =
+      getFormulaImplementation(parentAttainment.formula);
+    await parentFormula.paramSchema.validate(parentFormulaParams);
+  } else if (parentFormulaParams) {
+    throw new ApiError(
+      'root attainment can\'t have parent formula params',
+      HttpCode.Conflict
+    );
   }
 
   await attainment.set({
@@ -228,21 +296,25 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     tag: tag ?? attainment.tag,
     daysValid: daysValid ?? attainment.daysValid,
     parentId: parentId ?? attainment.parentId,
-    formula: formula ?? attainment.formula
+    formula: formula ?? attainment.formula,
+    parentFormulaParams: parentFormulaParams ?? attainment.parentFormulaParams
   }).save();
+
+  const attainmentTree: AttainmentData = {
+    id: attainment.id,
+    assessmentModelId: attainment.assessmentModelId,
+    name: attainment.name,
+    tag: attainment.tag,
+    formula: attainment.formula,
+    parentFormulaParams: attainment.parentFormulaParams,
+    daysValid: attainment.daysValid,
+    parentId: attainment.parentId
+  };
 
   res.status(HttpCode.Ok).json({
     success: true,
     data: {
-      attainment: {
-        id: attainment.id,
-        assessmentModelId: attainment.assessmentModelId,
-        name: attainment.name,
-        tag: attainment.tag,
-        formula: attainment.formula,
-        daysValid: attainment.daysValid,
-        parentId: attainment.parentId
-      }
+      attainment: attainmentTree
     }
   });
 }
