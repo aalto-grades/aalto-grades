@@ -54,6 +54,7 @@ export async function findAttainmentsByAssessmentModel(
       assessmentModelId: attainment.assessmentModelId,
       parentId: attainment.parentId,
       tag: attainment.tag,
+      formula: attainment.formula,
       name: attainment.name,
       daysValid: attainment.daysValid
     };

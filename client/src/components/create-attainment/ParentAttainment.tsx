@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import List from '@mui/material/List';
@@ -16,7 +16,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import LeafAttainment from './LeafAttainment';
 import Attainment from './Attainment';
 import formulasService from '../../services/formulas';
-import { AttainmentData, Formula } from 'aalto-grades-common/types';
+import { AttainmentData, FormulaPreview } from 'aalto-grades-common/types';
 import { State } from '../../types';
 
 // An Assignmnet component with subAttainments and a formula
@@ -31,28 +31,33 @@ function ParentAttainment(props: {
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
 
-  // Functions and variables for opening and closing the list of sub-attainments
+  // For opening and closing the list of sub-attainments
   const [open, setOpen]: State<boolean> = useState(true);
+  // Detailed information about the used formula, undefined when loading.
+  const [formulaDetails, setFormulaDetails]: State<FormulaPreview | undefined> =
+    useState(undefined);
 
   function handleClick(): void {
     setOpen(!open);
   }
 
   /* Functions to get the formula attributes.
-
-     formulaId specifies the formula that is used to calculate this
-     attainment's grade, subFormulaAttributeNames are the attributes that need
-     to be specified for the direct sub attainments of this attainments,
-     so that the grade for this attainment can be calculated.
-
-     Observe that formulaAttributeNames which is as a parameter for this
-     component are the attributes that need to specified for this attainment,
-     so that the grade of this attainment's parent attainment can be calculated.
-  */
-  //const formulaId: Formula = attainmentServices.getProperty(indices, attainments, 'formulaId');
-  const formulaId: Formula = Formula.WeightedAverage;
-  const formulaName: string = formulasService.getFormulaName(formulaId);
-  const subFormulaAttributeNames: Array<string> = formulasService.getFormulaAttributes(formulaId);
+   *
+   * formulaId specifies the formula that is used to calculate this
+   * attainment's grade, subFormulaAttributeNames are the attributes that need
+   * to be specified for the direct sub attainments of this attainments,
+   * so that the grade for this attainment can be calculated.
+   *
+   * Observe that formulaAttributeNames which is as a parameter for this
+   * component are the attributes that need to specified for this attainment,
+   * so that the grade of this attainment's parent attainment can be calculated.
+   */
+  useEffect(() => {
+    formulasService.getFormulaDetails(props.attainmentTree.formula)
+      .then((formula: FormulaPreview) => {
+        setFormulaDetails(formula);
+      });
+  }, []);
 
   return (
     <>
@@ -63,7 +68,7 @@ function ParentAttainment(props: {
         px: 1
       }}>
         <Typography variant="body1" sx={{ flexGrow: 1, textAlign: 'left', mb: 0.5 }}>
-          {'Grading Formula: ' + formulaName}
+          {'Grading Formula: ' + formulaDetails?.name ?? 'Loading...'}
         </Typography>
         {
           /* Navigation below doesn't work because formula selection has
@@ -115,7 +120,7 @@ function ParentAttainment(props: {
                       getTemporaryId={props.getTemporaryId}
                       attainment={subAttainment}
                       formulaAttributeNames={
-                        subFormulaAttributeNames ? subFormulaAttributeNames : []
+                        formulaDetails?.attributes ?? []
                       }
                     />
                   )

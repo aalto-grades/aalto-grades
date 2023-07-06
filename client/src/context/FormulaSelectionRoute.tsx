@@ -5,7 +5,7 @@
 import { useState, useMemo } from 'react';
 import { Outlet } from 'react-router-dom';
 
-function FormulaSelectionRoute() {
+function FormulaSelectionRoute(): JSX.Element {
   const [selectedAttainments, setSelectedAttainments] = useState([]);
   const [selectedFormula, setSelectedFormula] = useState({});
 

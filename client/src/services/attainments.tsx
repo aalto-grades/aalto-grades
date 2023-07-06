@@ -1,14 +1,10 @@
 // SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
-
+//
 // SPDX-License-Identifier: MIT
 
 import axios from './axios';
-import textFormatServices from './textFormat';
-import mockAttainmentsClient from '../tests/mock-data/mockAttainmentsClient';
 import { AttainmentData } from 'aalto-grades-common/types/attainment';
 import { FullResponse, Numeric } from '../types';
-
-// Functions that are (or will be) connected to the server.
 
 async function addAttainment(
   courseId: Numeric,
@@ -68,7 +64,6 @@ async function getAttainment(
       + `/attainments/${attainmentId}${query}`
     );
 
-
   return response.data.data.attainment;
 }
 
@@ -84,7 +79,6 @@ async function getAllAttainments(
 
   return response.data.data.attainment;
 }
-
 
 export default {
   addAttainment,
