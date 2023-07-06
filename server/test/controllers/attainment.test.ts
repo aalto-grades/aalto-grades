@@ -695,7 +695,7 @@ describe(
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
       });
 
-    it('should respond with 400 bad request, if validation fails (non-number attainment id)',
+    it('should respond with 400 bad request, if validation fails (non-number attainment ID)',
       async () => {
         const res: supertest.Response = await request
           .put(`/v1/courses/2/assessment-models/11/attainments/${badInput}`)
@@ -709,6 +709,25 @@ describe(
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
       });
+
+    it('should respond with 400 bad request, if changing to a wrong formula param type',
+      async () => {
+        const res: supertest.Response = await request
+          .put(`/v1/courses/1/assessment-models/1/attainments/5`)
+          .send({
+            parentFormulaParams: {}
+          })
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.adminCookie)
+          .expect(HttpCode.BadRequest);
+
+        expect(res.body.success).toBe(false);
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+        expect(res.body.errors).toContain('weight is a required field');
+      }
+    );
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
       await request
