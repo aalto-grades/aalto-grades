@@ -11,8 +11,7 @@ import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
 import MuiAccordion from '@mui/material/Accordion';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
-import formulasService from '../../services/formulas';
-import { Formula } from 'aalto-grades-common/types';
+import { AttainmentData, Formula } from 'aalto-grades-common/types';
 import { State } from '../../types';
 
 const Accordion = styled<any>((props) => (
@@ -89,7 +88,7 @@ AccordionDetails.propTypes = {
   out: PropTypes.bool
 };
 
-function AttainmentText(params: {
+function AttainmentText(props: {
   name: string,
   formulaId: Formula,
   tag: string
@@ -104,31 +103,25 @@ function AttainmentText(params: {
       columnGap: 3
     }}>
       <Typography variant='body2'>
-        {params.name}
+        {props.name} ({props.tag})
       </Typography>
       <Typography align='left' variant='body2'>
-        {params.tag}
+        {'Formula: ' + props.formulaId}
       </Typography>
-      {
-        params.formulaId &&
-        <Typography variant='caption' align='left'>
-          {'Formula: ' + formulasService.getFormulaName(params.formulaId)}
-        </Typography>
-      }
     </Box>
   );
 }
 
 AttainmentText.propTypes = {
   name: PropTypes.string,
-  formulaId: Formula,
+  formulaId: PropTypes.string,
   tag: PropTypes.string,
 };
 
 export { AccordionDetails, AttainmentText };
 
-function CustomAccordion(params: {
-  attainments: Array<any>,
+function CustomAccordion(props: {
+  attainments: Array<AttainmentData>,
   attainmentKey: string
 }): JSX.Element {
 
@@ -158,47 +151,47 @@ function CustomAccordion(params: {
   return (
     <>
       {
-        params.attainments.map(attainment => {
+        props.attainments.map((attainment: AttainmentData) => {
           return (
             <Accordion
-              key={attainment[params.attainmentKey] + 'accordion'}
-              expanded={expanded.has(attainment[params.attainmentKey])}
-              onChange={handleChange(attainment[params.attainmentKey])}
+              key={attainment[props.attainmentKey] + 'accordion'}
+              expanded={expanded.has(attainment[props.attainmentKey])}
+              onChange={handleChange(attainment[props.attainmentKey])}
             >
               <AccordionSummary
-                aria-controls={attainment[params.attainmentKey] + '-content'}
-                id={attainment[params.attainmentKey] + '-header'}
-                expanded={expanded.has(attainment[params.attainmentKey]).toString()}
-                nowselected={(selected === attainment[params.attainmentKey]).toString()}
+                aria-controls={attainment[props.attainmentKey] + '-content'}
+                id={attainment[props.attainmentKey] + '-header'}
+                expanded={expanded.has(attainment[props.attainmentKey]).toString()}
+                nowselected={(selected === attainment[props.attainmentKey]).toString()}
               >
                 <AttainmentText
                   name={attainment.name}
-                  formulaId={attainment.formulaId}
+                  formulaId={attainment.formula}
                   tag={attainment.tag}
                 />
               </AccordionSummary>
               {
                 attainment.subAttainments &&
-                attainment.subAttainments.map(subAttainment => {
+                attainment.subAttainments.map((subAttainment: AttainmentData) => {
                   return (
                     // is the attainment a leaf? If yes, render details, else another accordion
                     subAttainment.subAttainments ?
-                      <AccordionDetails key={subAttainment[params.attainmentKey] + 'details'}>
+                      <AccordionDetails key={subAttainment[props.attainmentKey] + 'details'}>
                         <AttainmentText
                           name={subAttainment.name}
-                          formulaId={subAttainment.formulaId}
+                          formulaId={subAttainment.formula}
                           tag={subAttainment.tag}
                         />
                       </AccordionDetails>
                       :
                       <Box
-                        key={subAttainment[params.attainmentKey] + 'subAccordion'}
+                        key={subAttainment[props.attainmentKey] + 'subAccordion'}
                         sx={{ pl: '39px' }}
                       >
                         {
                           <CustomAccordion
                             attainments={[subAttainment]}
-                            attainmentKey={params.attainmentKey}
+                            attainmentKey={props.attainmentKey}
                           />
                         }
                       </Box>

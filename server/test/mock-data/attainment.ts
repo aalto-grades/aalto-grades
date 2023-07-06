@@ -2,11 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { Formula } from 'aalto-grades-common/types';
 import { AttainmentData } from 'aalto-grades-common/types/attainment';
 
 export const mockAttainment: AttainmentData = {
   name: '2 optional exercises',
   tag: 'optional-exercises',
+  formula: Formula.WeightedAverage,
   daysValid: 365,
   subAttainments: [
     {

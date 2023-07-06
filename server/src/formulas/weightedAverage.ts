@@ -64,16 +64,12 @@ async function calculateWeightedAverage(
   };
 }`;
 
-const name: string = 'Weighted average';
-
-const attributes: Array<string> = ['weight'];
-
 registerFormula(
   Formula.WeightedAverage,
   calculateWeightedAverage,
   codeSnippet,
-  name,
-  attributes,
+  'Weighted average',
+  ['weight'],
   yup.object({
     weight: yup.number().required()
   }).noUnknown().strict()

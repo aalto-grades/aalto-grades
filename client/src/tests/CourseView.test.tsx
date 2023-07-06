@@ -76,28 +76,17 @@ describe('Tests for CourseView component', () => {
       );
 
       await waitFor(() => {
-        const courseInfo: HTMLElement = getByText('Course Details');
-        const teachersInfo: HTMLElement = getByText('Teachers in Charge');
-        const assessmentModelInfo: HTMLElement = getByText('Assessment Models');
-        const attainments: HTMLElement = getByText('Study Attainments');
-        const exercises: HTMLElement = getByText('Exercises');
-        const projects: HTMLElement = getByText('Project');
-        const exams: Array<HTMLElement> = getAllByText('Exam');
-        const instances: HTMLElement = getByText('Course Instances');
-        const createInstanceButton: HTMLElement = getByText('New instance');
-        const addAttainmentButton: HTMLElement = getByText('Add attainment');
-        const editButton: Array<HTMLElement> = getAllByText('Edit');
-        expect(courseInfo).toBeDefined();
-        expect(teachersInfo).toBeDefined();
-        expect(assessmentModelInfo).toBeDefined();
-        expect(attainments).toBeDefined();
-        expect(exercises).toBeDefined();
-        expect(projects).toBeDefined();
-        expect(exams).toBeDefined();
-        expect(instances).toBeDefined();
-        expect(createInstanceButton).toBeDefined();
-        expect(addAttainmentButton).toBeDefined();
-        expect(editButton).toBeDefined();
+        expect(getByText('Course Details')).toBeDefined();
+        expect(getByText('Teachers in Charge')).toBeDefined();
+        expect(getByText('Assessment Models')).toBeDefined();
+        expect(getByText('Study Attainments')).toBeDefined();
+        expect(getByText('Exercises (')).toBeDefined();
+        expect(getByText('Project (')).toBeDefined();
+        expect(getAllByText('Exam (')).toBeDefined();
+        expect(getByText('Course Instances')).toBeDefined();
+        expect(getByText('New instance')).toBeDefined();
+        expect(getByText('Add attainment')).toBeDefined();
+        expect(getAllByText('Edit')).toBeDefined();
       });
 
     }
