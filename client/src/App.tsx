@@ -19,12 +19,10 @@ import CourseView from './components/CourseView';
 import CreateCourseView from './components/CreateCourseView';
 import FetchInstancesView from './components/FetchInstancesView';
 import EditInstanceView from './components/EditInstanceView';
-import InstanceSummaryView from './components/InstanceSummaryView';
 import SelectFormulaView from './components/SelectFormulaView';
 import FormulaAttributesView from './components/FormulaAttributesView';
 import EditAttainmentView from './components/EditAttainmentView';
 import CourseResultsView from './components/CourseResultsView';
-import InstanceCreationRoute from './context/InstanceCreationRoute';
 import FormulaSelectionRoute from './context/FormulaSelectionRoute';
 import UserButton from './components/auth/UserButton';
 import { SystemRole } from 'aalto-grades-common/types/auth';
@@ -36,6 +34,14 @@ declare module '@mui/material/styles' {
     hoverGrey2?: string,
     hoverGrey3?: string
     infoGrey?: string
+  }
+
+  interface Palette {
+    black: string,
+    hoverGrey1: string,
+    hoverGrey2: string,
+    hoverGrey3: string
+    infoGrey: string
   }
 
   interface TypographyVariantsOptions {
@@ -173,17 +179,14 @@ function App(): JSX.Element {
                 path=':courseId/course-results/:instanceId'
                 element={<CourseResultsView />}
               />
-              { /* Pages under this route share instance creation context */}
-              <Route element={<InstanceCreationRoute />}>
-                <Route
-                  path=':courseId/edit-instance/:sisuInstanceId'
-                  element={<EditInstanceView />}
-                />
-                <Route
-                  path=':courseId/instance-summary/:sisuInstanceId'
-                  element={<InstanceSummaryView />}
-                />
-              </Route>
+              <Route
+                path=':courseId/edit-instance'
+                element={<EditInstanceView />}
+              />
+              <Route
+                path=':courseId/edit-instance/:sisuInstanceId'
+                element={<EditInstanceView />}
+              />
               <Route
                 path=':courseId/attainment/:modification/:assessmentModelId/:attainmentId'
                 element={<EditAttainmentView />}

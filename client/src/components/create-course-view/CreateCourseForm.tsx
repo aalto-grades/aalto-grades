@@ -11,21 +11,23 @@ import {
   Avatar, IconButton, List, ListItem,
   ListItemAvatar, ListItemText, CircularProgress
 } from '@mui/material';
-import { Theme, useTheme } from '@mui/material/styles';
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonIcon from '@mui/icons-material/Person';
 import SendIcon from '@mui/icons-material/Send';
 import { State } from '../../types';
 import { CourseData } from 'aalto-grades-common/types';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
+import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
-function CreateCourseForm(params: {
+function CreateCourseForm(props: {
   addCourse: (course: CourseData) => Promise<void>
 }): JSX.Element {
+  const navigate: NavigateFunction = useNavigate();
 
-  const theme: Theme = useTheme();
   const [teachersInCharge, setTeachersInCharge]: State<Array<string>> = useState([]);
   const [email, setEmail]: State<string> = useState('');
+  const [showDialog, setShowDialog]: State<boolean> = useState(false);
 
   function removeTeacher(value: string): void {
     setTeachersInCharge(teachersInCharge.filter((teacher: string) => teacher !== value));
@@ -65,22 +67,22 @@ function CreateCourseForm(params: {
             .notRequired(),
           departmentEn: yup.string()
             .min(1)
-            .required('Please input the course organizer information in english'),
+            .required('Please input the course organizer information in English'),
           departmentFi: yup.string()
             .min(1)
-            .required('Please input the course organizer information in finnish'),
+            .required('Please input the course organizer information in Finnish'),
           departmentSv: yup.string()
             .min(1)
-            .required('Please input the course organizer information in swedish'),
+            .required('Please input the course organizer information in Swedish'),
           nameEn: yup.string()
             .min(1)
-            .required('Please input a valid course name in english'),
+            .required('Please input a valid course name in English'),
           nameFi: yup.string()
             .min(1)
-            .required('Please input a valid course name in finnish'),
+            .required('Please input a valid course name in Finnish'),
           nameSv: yup.string()
             .min(1)
-            .required('Please input a valid course name in swedish')
+            .required('Please input a valid course name in Swedish')
         })}
         onSubmit={async function (values): Promise<void> {
           const courseObject: CourseData = ({
@@ -103,15 +105,16 @@ function CreateCourseForm(params: {
               };
             })
           });
-          await params.addCourse(courseObject);
+          await props.addCourse(courseObject);
         }}
       >
-        {({ errors, handleChange, isSubmitting, isValid, touched, values }) => (
+        {({ errors, handleChange, isSubmitting, isValid, touched, values, initialValues }) => (
           <Form>
             <Box sx={{
               display: 'flex',
               alignItems: 'flex-start',
               flexDirection: 'column',
+              justifyContent: 'space-around',
               boxShadow: 2,
               borderRadius: 2,
               my: 2,
@@ -124,38 +127,15 @@ function CreateCourseForm(params: {
                 value={values.courseCode}
                 disabled={isSubmitting}
                 label="Course Code*"
-                variant='standard'
-                color='primary'
-                sx={{ my: 1 }}
-                InputLabelProps={{
-                  shrink: true,
-                  style: {
-                    fontSize: theme.typography.h2.fontSize
-                  }
-                }}
-                InputProps={{
-                  style: {
-                    margin: '32px 0px 0px 0px'
-                  }
-                }}
+                InputLabelProps={{ shrink: true }}
+                margin='normal'
                 helperText={errors.courseCode ?
                   errors.courseCode :
                   'Give code for the new course.'
                 }
                 error={touched.courseCode && Boolean(errors.courseCode)}
                 onChange={handleChange}
-              >
-              </TextField>
-            </Box>
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              flexDirection: 'column',
-              boxShadow: 2,
-              borderRadius: 2,
-              my: 2,
-              p: 2
-            }}>
+              />
               <TextField
                 id="nameEn"
                 type="text"
@@ -163,28 +143,15 @@ function CreateCourseForm(params: {
                 value={values.nameEn}
                 disabled={isSubmitting}
                 label="Course Name in English*"
-                variant='standard'
-                color='primary'
-                sx={{ my: 1 }}
-                InputLabelProps={{
-                  shrink: true,
-                  style: {
-                    fontSize: theme.typography.h2.fontSize
-                  }
-                }}
-                InputProps={{
-                  style: {
-                    margin: '32px 0px 0px 0px'
-                  }
-                }}
+                margin='normal'
+                InputLabelProps={{ shrink: true }}
                 helperText={errors.nameEn ?
                   errors.nameEn :
                   'Give the name of the course in English.'
                 }
                 error={touched.nameEn && Boolean(errors.nameEn)}
                 onChange={handleChange}
-              >
-              </TextField>
+              />
               <TextField
                 id="nameFi"
                 type="text"
@@ -192,28 +159,15 @@ function CreateCourseForm(params: {
                 value={values.nameFi}
                 disabled={isSubmitting}
                 label="Course Name in Finnish*"
-                variant='standard'
-                color='primary'
-                sx={{ my: 1 }}
-                InputLabelProps={{
-                  shrink: true,
-                  style: {
-                    fontSize: theme.typography.h2.fontSize
-                  }
-                }}
-                InputProps={{
-                  style: {
-                    margin: '32px 0px 0px 0px'
-                  }
-                }}
+                margin='normal'
+                InputLabelProps={{ shrink: true }}
                 helperText={errors.nameFi ?
                   errors.nameFi :
                   'Give the name of the course in Finnish.'
                 }
                 error={touched.nameFi && Boolean(errors.nameFi)}
                 onChange={handleChange}
-              >
-              </TextField>
+              />
               <TextField
                 id="nameSv"
                 type="text"
@@ -221,38 +175,15 @@ function CreateCourseForm(params: {
                 value={values.nameSv}
                 disabled={isSubmitting}
                 label="Course Name in Swedish*"
-                variant='standard'
-                color='primary'
-                sx={{ my: 1 }}
-                InputLabelProps={{
-                  shrink: true,
-                  style: {
-                    fontSize: theme.typography.h2.fontSize
-                  }
-                }}
-                InputProps={{
-                  style: {
-                    margin: '32px 0px 0px 0px'
-                  }
-                }}
+                margin='normal'
+                InputLabelProps={{ shrink: true }}
                 helperText={errors.nameSv ?
                   errors.nameSv :
                   'Give the name of the course in Swedish.'
                 }
                 error={touched.nameSv && Boolean(errors.nameSv)}
                 onChange={handleChange}
-              >
-              </TextField>
-            </Box>
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              flexDirection: 'column',
-              boxShadow: 2,
-              borderRadius: 2,
-              my: 2,
-              p: 2
-            }}>
+              />
               <TextField
                 id="departmentEn"
                 type="text"
@@ -260,28 +191,15 @@ function CreateCourseForm(params: {
                 value={values.departmentEn}
                 disabled={isSubmitting}
                 label="Organizer in English*"
-                variant='standard'
-                color='primary'
-                sx={{ my: 1 }}
-                InputLabelProps={{
-                  shrink: true,
-                  style: {
-                    fontSize: theme.typography.h2.fontSize
-                  }
-                }}
-                InputProps={{
-                  style: {
-                    margin: '32px 0px 0px 0px'
-                  }
-                }}
+                margin='normal'
+                InputLabelProps={{ shrink: true }}
                 helperText={errors.departmentEn ?
                   errors.departmentEn :
                   'Give the organizer of the new course in English.'
                 }
                 error={touched.departmentEn && Boolean(errors.departmentEn)}
                 onChange={handleChange}
-              >
-              </TextField>
+              />
               <TextField
                 id="departmentFi"
                 type="text"
@@ -289,28 +207,15 @@ function CreateCourseForm(params: {
                 value={values.departmentFi}
                 disabled={isSubmitting}
                 label="Organizer in Finnish*"
-                variant='standard'
-                color='primary'
-                sx={{ my: 1 }}
-                InputLabelProps={{
-                  shrink: true,
-                  style: {
-                    fontSize: theme.typography.h2.fontSize
-                  }
-                }}
-                InputProps={{
-                  style: {
-                    margin: '32px 0px 0px 0px'
-                  }
-                }}
+                margin='normal'
+                InputLabelProps={{ shrink: true }}
                 helperText={errors.departmentFi ?
                   errors.departmentFi :
                   'Give the organizer of the new course in Finnish.'
                 }
                 error={touched.departmentFi && Boolean(errors.departmentFi)}
                 onChange={handleChange}
-              >
-              </TextField>
+              />
               <TextField
                 id="departmentSv"
                 type="text"
@@ -318,37 +223,15 @@ function CreateCourseForm(params: {
                 value={values.departmentSv}
                 disabled={isSubmitting}
                 label="Organizer in Swedish*"
-                variant='standard'
-                color='primary'
-                sx={{ my: 1 }}
-                InputLabelProps={{
-                  shrink: true,
-                  style: {
-                    fontSize: theme.typography.h2.fontSize
-                  }
-                }}
-                InputProps={{
-                  style: {
-                    margin: '32px 0px 0px 0px'
-                  }
-                }}
+                margin='normal'
+                InputLabelProps={{ shrink: true }}
                 helperText={errors.departmentSv ?
                   errors.departmentSv :
                   'Give the organizer of the new course in Swedish.'
                 }
                 error={touched.departmentSv && Boolean(errors.departmentSv)}
                 onChange={handleChange}
-              >
-              </TextField>
-            </Box>
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              boxShadow: 2,
-              borderRadius: 2,
-              my: 2,
-              p: 2
-            }}>
+              />
               <TextField
                 id="minCredits"
                 type="number"
@@ -356,37 +239,15 @@ function CreateCourseForm(params: {
                 value={values.minCredits}
                 disabled={isSubmitting}
                 label="Minimum Course Credits (ECTS)*"
-                variant='standard'
-                color='primary'
-                sx={{ my: 1 }}
-                InputLabelProps={{
-                  shrink: true,
-                  style: {
-                    fontSize: theme.typography.h2.fontSize
-                  }
-                }}
-                InputProps={{
-                  style: {
-                    margin: '32px 0px 0px 0px'
-                  }
-                }}
+                margin='normal'
+                InputLabelProps={{ shrink: true }}
                 helperText={errors.minCredits ?
                   errors.minCredits :
                   'Input minimum credits'
                 }
                 error={touched.minCredits && Boolean(errors.minCredits)}
                 onChange={handleChange}
-              >
-              </TextField>
-            </Box>
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              boxShadow: 2,
-              borderRadius: 2,
-              my: 2,
-              p: 2
-            }}>
+              />
               <TextField
                 id="maxCredits"
                 type="number"
@@ -394,38 +255,15 @@ function CreateCourseForm(params: {
                 value={values.maxCredits}
                 disabled={isSubmitting}
                 label="Maximum Course Credits (ECTS)*"
-                variant='standard'
-                color='primary'
-                sx={{ my: 1 }}
-                InputLabelProps={{
-                  shrink: true,
-                  style: {
-                    fontSize: theme.typography.h2.fontSize
-                  }
-                }}
-                InputProps={{
-                  style: {
-                    margin: '32px 0px 0px 0px'
-                  }
-                }}
+                margin='normal'
+                InputLabelProps={{ shrink: true }}
                 helperText={errors.maxCredits ?
                   errors.maxCredits :
                   'Input maximum credits'
                 }
                 error={touched.maxCredits && Boolean(errors.maxCredits)}
                 onChange={handleChange}
-              >
-              </TextField>
-            </Box>
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              flexDirection: 'column',
-              boxShadow: 2,
-              borderRadius: 2,
-              my: 2,
-              p: 2
-            }}>
+              />
               <TextField
                 id="teacherEmail"
                 type="text"
@@ -433,20 +271,8 @@ function CreateCourseForm(params: {
                 value={values.teacherEmail}
                 disabled={isSubmitting}
                 label="Teachers In Charge*"
-                variant='standard'
-                color='primary'
-                sx={{ my: 1 }}
-                InputLabelProps={{
-                  shrink: true,
-                  style: {
-                    fontSize: theme.typography.h2.fontSize
-                  }
-                }}
-                InputProps={{
-                  style: {
-                    margin: '32px 0px 0px 0px'
-                  }
-                }}
+                margin='normal'
+                InputLabelProps={{ shrink: true }}
                 helperText={errors.teacherEmail ?
                   errors.teacherEmail :
                   teachersInCharge.length === 0 ?
@@ -460,8 +286,7 @@ function CreateCourseForm(params: {
                   setEmail(e.currentTarget.value);
                   handleChange(e);
                 }}
-              >
-              </TextField>
+              />
               <Button
                 variant="outlined"
                 startIcon={<PersonAddAlt1Icon />}
@@ -513,31 +338,51 @@ function CreateCourseForm(params: {
                 }
               </Box>
             </Box>
-            <Button
-              id='ag_create_course_btn'
-              size='medium'
-              variant='contained'
-              type='submit'
-              disabled={!isValid || teachersInCharge.length === 0 || isSubmitting}
-              endIcon={<SendIcon />}
-            >
-              Create Course
-              {isSubmitting && (
-                <CircularProgress
-                  size={24}
-                  sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    marginTop: '-12px',
-                    marginLeft: '-12px',
-                  }}
-                />
-              )}
-            </Button>
+            <Box sx={{
+              display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
+              alignItems: 'center', pb: 6
+            }}>
+              <Button
+                size='medium'
+                variant='outlined'
+                disabled={isSubmitting}
+                onClick={(): void => {
+                  if (initialValues != values) {
+                    setShowDialog(true);
+                  } else {
+                    navigate(-1);
+                  }
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                id='ag_create_course_btn'
+                size='medium'
+                variant='contained'
+                type='submit'
+                disabled={!isValid || teachersInCharge.length === 0 || isSubmitting}
+                endIcon={<SendIcon />}
+              >
+                Create Course
+                {isSubmitting && (
+                  <CircularProgress
+                    size={24}
+                    sx={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      marginTop: '-12px',
+                      marginLeft: '-12px',
+                    }}
+                  />
+                )}
+              </Button>
+            </Box>
           </Form>
         )}
       </Formik>
+      <UnsavedChangesDialog setOpen={setShowDialog} open={showDialog} navigateDir='/' />
     </Container>
   );
 }

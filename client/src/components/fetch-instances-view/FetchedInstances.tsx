@@ -9,8 +9,9 @@ import { styled } from '@mui/material/styles';
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 import textFormatServices from '../../services/textFormat';
 import sortingServices from '../../services/sorting';
+import { CourseInstanceData } from 'aalto-grades-common/types';
 
-const HoverBox = styled<any>(Box)(({ theme }) => ({
+const HoverBox = styled(Box)(({ theme }) => ({
   '&:hover': {
     background: theme.palette.hoverGrey2
   },
@@ -19,9 +20,11 @@ const HoverBox = styled<any>(Box)(({ theme }) => ({
   }
 }));
 
-function InstanceBox({ courseId, instance }) {
+function InstanceBox(props: {
+  courseId: number,
+  instance: CourseInstanceData
+}): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
-  const { sisuCourseInstanceId, startDate, endDate, type } = instance;
 
   return (
     <HoverBox
@@ -36,48 +39,60 @@ function InstanceBox({ courseId, instance }) {
         my: 1,
         p: 3,
       }}
-      onClick={() => {
-        navigate('/' + courseId + '/edit-instance/' + sisuCourseInstanceId);
+      onClick={(): void => {
+        navigate('/' + props.courseId + '/edit-instance/' + props.instance.sisuCourseInstanceId);
       }}>
-      <LightLabelBoldValue label='Type' value={textFormatServices.formatCourseType(type)} />
+      <LightLabelBoldValue
+        label='Type'
+        value={textFormatServices.formatSisuCourseType(props.instance.type)}
+      />
       <Box sx={{ mx: 2 }} />
       <LightLabelBoldValue
         label='Starting Date'
-        value={textFormatServices.formatDateString(startDate)}
+        value={textFormatServices.formatDateString(String(props.instance.startDate))}
       />
       <LightLabelBoldValue
         label='Ending Date'
-        value={textFormatServices.formatDateString(endDate)}
+        value={textFormatServices.formatDateString(String(props.instance.endDate))}
       />
     </HoverBox>
   );
 }
 
 InstanceBox.propTypes = {
-  // Once courseId is fixed to courseId from courseCode, change to number
-  courseId: PropTypes.string,
+  courseId: PropTypes.number,
   instance: PropTypes.object,
-  startDate: PropTypes.instanceOf(Date),
-  endDate: PropTypes.instanceOf(Date),
-  type: PropTypes.string,
 };
 
-function FetchedInstances({ courseId, info }) {
+function FetchedInstances(props: {
+  courseId: number,
+  instances: Array<CourseInstanceData>
+}): JSX.Element {
   return (
     <Box>
-      {info.sort((a, b) => sortingServices.sortByDate(a.startDate, b.startDate))
-        .slice()
-        .map((instance) => (
-          <InstanceBox courseId={courseId} instance={instance} key={instance.sisuCourseInstanceId}/>
-        ))}
+      {
+        props.instances
+          .sort(
+            (a: CourseInstanceData, b: CourseInstanceData) => {
+              return sortingServices.sortByDate(a.startDate, b.startDate);
+            }
+          )
+          .slice()
+          .map((instance: CourseInstanceData) => (
+            <InstanceBox
+              courseId={props.courseId}
+              instance={instance}
+              key={instance.sisuCourseInstanceId}
+            />
+          ))
+      }
     </Box>
   );
 }
 
 FetchedInstances.propTypes = {
-  // Once courseId is fixed to courseId from courseCode, change to number
-  courseId: PropTypes.string,
-  info: PropTypes.array
+  courseId: PropTypes.number,
+  instances: PropTypes.array
 };
 
 export default FetchedInstances;

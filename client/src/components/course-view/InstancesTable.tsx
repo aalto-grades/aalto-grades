@@ -96,7 +96,8 @@ function InstancesTable(props: {
         </TableHead>
         <TableBody>
           {
-            instances && instances
+            instances &&
+            instances
               .sort(
                 (a: CourseInstanceData, b: CourseInstanceData): number => {
                   return sortingServices.sortByDate(a.startDate, b.startDate);
@@ -120,7 +121,7 @@ function InstancesTable(props: {
                     {instance.endingPeriod}
                   </TableCell>
                   <TableCell>
-                    {textFormatServices.formatCourseType(instance.type)}
+                    {instance.type}
                   </TableCell>
                   <TableCell>
                     {textFormatServices.convertToClientGradingScale(instance.gradingScale)}
@@ -131,12 +132,13 @@ function InstancesTable(props: {
         </TableBody>
       </Table>
       <Box sx={{ py: 5 }}>
-        { instances?.length === 0 &&
+        {
+          instances?.length === 0 &&
           <Typography variant='h3'>
             No instances found for course, please create a new instance.
           </Typography>
         }
-        { instances === null &&
+        {instances === null &&
           <>
             <CircularProgress />
             <Typography sx={{ mt: 2 }} variant='h3'>
