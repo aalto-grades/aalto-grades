@@ -713,7 +713,7 @@ describe(
     it('should respond with 400 bad request, if changing to a wrong formula param type',
       async () => {
         const res: supertest.Response = await request
-          .put(`/v1/courses/1/assessment-models/1/attainments/5`)
+          .put('/v1/courses/1/assessment-models/1/attainments/5')
           .send({
             parentFormulaParams: {}
           })
