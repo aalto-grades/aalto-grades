@@ -70,7 +70,7 @@ describe(
 
     it(
       'should create a new attainment with no sub-attainments when course and'
-      + 'assessment model exist',
+      + ' assessment model exist',
       async () => {
         const res: supertest.Response = await request
           .post('/v1/courses/1/assessment-models/31/attainments')
@@ -196,6 +196,82 @@ describe(
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
       });
+
+    it(
+      'should respond with 400 bad request, if parent formula params are'
+      + ' incorrect in the top level attainment',
+      async () => {
+        const res: supertest.Response = await request
+          .post('/v1/courses/3/assessment-models/3/attainments')
+          .send({
+            parentId: 3,
+            parentFormulaParams: {
+              wrong: 'yep',
+              somethingIncorrect: {
+                veryIncorrect: true
+              }
+            },
+            name: 'Failure',
+            tag: 'not success',
+            daysValid: 6000,
+            formula: Formula.Manual
+          })
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.BadRequest);
+
+        expect(res.body.success).toBe(false);
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+        expect(res.body.errors).toContain(
+          'this field has unspecified keys: wrong, somethingIncorrect'
+        );
+      }
+    );
+
+    it(
+      'should respond with 400 bad request, if parent formula params are'
+      + ' incorrect in subattainments',
+      async () => {
+        const res: supertest.Response = await request
+          .post('/v1/courses/3/assessment-models/3/attainments')
+          .send({
+            parentId: 3,
+            name: 'Failure',
+            tag: 'not success',
+            daysValid: 6000,
+            formula: Formula.WeightedAverage,
+            parentFormulaParams: {
+              weight: 1
+            },
+            subAttainments: [
+              {
+                name: 'Subfailure',
+                tag: 'sub not success',
+                daysValid: 6,
+                formula: Formula.Manual,
+                parentFormulaParams: {
+                  wrongAgain: 5
+                }
+              }
+            ]
+          })
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.BadRequest);
+
+        expect(res.body.success).toBe(false);
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+        expect(res.body.errors).toContain(
+          'this field has unspecified keys: wrongAgain'
+        );
+      }
+    );
 
     it('should respond with 400 bad request, if validation fails in the sub-attainment level',
       async () => {
