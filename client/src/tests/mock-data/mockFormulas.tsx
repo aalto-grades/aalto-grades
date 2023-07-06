@@ -8,7 +8,7 @@ const mockFormulas: Array<FormulaPreview> = [
   {
     id: Formula.WeightedAverage,
     name: 'Weighted average',
-    attributes: ['maxPoints', 'minRequiredPoints', 'weight'],
+    attributes: ['weight'],
     codeSnippet:
     `
     const weightedAverage = (nums, weights) => {
