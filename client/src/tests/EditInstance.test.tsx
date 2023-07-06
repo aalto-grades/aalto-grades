@@ -39,12 +39,12 @@ describe('Tests for EditInstanceView components without Sisu instance', () => {
       renderEditInstanceView();
 
       await waitFor(() => {
-        expect(screen.getByLabelText('Type')).toBeInTheDocument();
-        expect(screen.getByLabelText('Starting Date')).toBeInTheDocument();
-        expect(screen.getByLabelText('Ending Date')).toBeInTheDocument();
-        expect(screen.getByLabelText('Starting Period')).toBeInTheDocument();
-        expect(screen.getByLabelText('Ending Period')).toBeInTheDocument();
-        expect(screen.getByLabelText('Grading Scale')).toBeInTheDocument();
+        expect(screen.getByLabelText('Type*')).toBeInTheDocument();
+        expect(screen.getByLabelText('Starting Date*')).toBeInTheDocument();
+        expect(screen.getByLabelText('Ending Date*')).toBeInTheDocument();
+        expect(screen.getByLabelText('Starting Period*')).toBeInTheDocument();
+        expect(screen.getByLabelText('Ending Period*')).toBeInTheDocument();
+        expect(screen.getByLabelText('Grading Scale*')).toBeInTheDocument();
         expect(screen.queryByText('Confirm Details')).toBeInTheDocument();
       });
 
@@ -77,12 +77,12 @@ describe('Tests for EditInstanceView components with Sisu instance', () => {
       renderEditInstanceView();
 
       await waitFor(() => {
-        expect(screen.getByLabelText('Type')).toBeInTheDocument();
-        expect(screen.getByLabelText('Starting Date')).toBeInTheDocument();
-        expect(screen.getByLabelText('Ending Date')).toBeInTheDocument();
-        expect(screen.getByLabelText('Starting Period')).toBeInTheDocument();
-        expect(screen.getByLabelText('Ending Period')).toBeInTheDocument();
-        expect(screen.getByLabelText('Grading Scale')).toBeInTheDocument();
+        expect(screen.getByLabelText('Type*')).toBeInTheDocument();
+        expect(screen.getByLabelText('Starting Date*')).toBeInTheDocument();
+        expect(screen.getByLabelText('Ending Date*')).toBeInTheDocument();
+        expect(screen.getByLabelText('Starting Period*')).toBeInTheDocument();
+        expect(screen.getByLabelText('Ending Period*')).toBeInTheDocument();
+        expect(screen.getByLabelText('Grading Scale*')).toBeInTheDocument();
         expect(screen.queryByText('Confirm Details')).toBeInTheDocument();
       });
 

@@ -79,7 +79,7 @@ function EditInstanceForm(props: {
                 fullWidth
                 value={values.type}
                 disabled={isSubmitting}
-                label="Type"
+                label="Type*"
                 InputLabelProps={{ shrink: true }}
                 margin='normal'
                 helperText={
@@ -95,7 +95,7 @@ function EditInstanceForm(props: {
                 fullWidth
                 value={values.startDate}
                 disabled={isSubmitting}
-                label="Starting Date"
+                label="Starting Date*"
                 InputLabelProps={{ shrink: true }}
                 margin='normal'
                 helperText={
@@ -112,7 +112,7 @@ function EditInstanceForm(props: {
                 fullWidth
                 value={values.endDate}
                 disabled={isSubmitting}
-                label="Ending Date"
+                label="Ending Date*"
                 InputLabelProps={{ shrink: true }}
                 margin='normal'
                 helperText={
@@ -130,7 +130,7 @@ function EditInstanceForm(props: {
                 fullWidth
                 value={values.startingPeriod}
                 disabled={isSubmitting}
-                label="Starting Period"
+                label="Starting Period*"
                 InputLabelProps={{ shrink: true }}
                 margin='normal'
                 helperText={
@@ -156,7 +156,7 @@ function EditInstanceForm(props: {
                 fullWidth
                 value={values.endingPeriod}
                 disabled={isSubmitting}
-                label="Ending Period"
+                label="Ending Period*"
                 InputLabelProps={{ shrink: true }}
                 margin='normal'
                 helperText={
@@ -182,7 +182,7 @@ function EditInstanceForm(props: {
                 fullWidth
                 value={values.gradingScale}
                 disabled={isSubmitting}
-                label="Grading Scale"
+                label="Grading Scale*"
                 InputLabelProps={{ shrink: true }}
                 margin='normal'
                 helperText={
