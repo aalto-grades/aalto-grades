@@ -288,7 +288,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     throw new ApiError(
       'root attainment can\'t have parent formula params',
       HttpCode.Conflict
-    )
+    );
   }
 
   await attainment.set({
