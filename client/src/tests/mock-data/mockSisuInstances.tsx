@@ -2,23 +2,27 @@
 //
 // SPDX-License-Identifier: MIT
 
-const mockSisuInstances = [
+import { CourseInstanceData, GradingScale } from 'aalto-grades-common/types';
+
+const mockSisuInstances: Array<CourseInstanceData> = [
   {
     sisuCourseInstanceId: 'mock-id-1',
-    startingPeriod: '2021-2022 Autumn I-II',
-    endingPeriod: '2022-2023 Autumn I-II',
-    minCredits: 5,
-    maxCredits: 5,
     startDate: '2022-08-14',
     endDate: '2022-11-13',
     type: 'teaching-participation-lectures',
-    gradingScale: 'General Scale, 0-5',
-    teachersInCharge: [
-      'Elisa Mekler',
-      'David McGookin'
-    ],
+    gradingScale: GradingScale.Numerical,
     courseData: {
       courseCode: 'CS-C3120',
+      minCredits: 5,
+      maxCredits: 5,
+      teachersInCharge: [
+        {
+          name: 'Elisa Mekler'
+        },
+        {
+          name: 'David McGookin'
+        }
+      ],
       department: {
         en: 'Department of computer science',
         fi: 'Department of computer science',
@@ -33,19 +37,19 @@ const mockSisuInstances = [
   },
   {
     sisuCourseInstanceId: 'mock-id-2',
-    startingPeriod: '2021-2022 Autumn I-II',
-    endingPeriod: '2022-2023 Autumn I-II',
     startDate: '2021-08-14',
     endDate: '2021-11-13',
     type: 'exam-exam',
-    gradingScale: 'General Scale, 0-5',
-    teachersInCharge: [
-      'Elisa Mekler'
-    ],
+    gradingScale: GradingScale.Numerical,
     courseData: {
       courseCode: 'CS-C3120',
       minCredits: 5,
       maxCredits: 5,
+      teachersInCharge: [
+        {
+          name: 'Elisa Mekler'
+        }
+      ],
       department: {
         en: 'Department of computer science',
         fi: 'Department of computer science',
@@ -60,19 +64,19 @@ const mockSisuInstances = [
   },
   {
     sisuCourseInstanceId: 'mock-id-3',
-    startingPeriod: '-',
-    endingPeriod: '-',
     startDate: '2023-02-06',
     endDate: '2023-05-19',
     type: 'exam-exam',
-    gradingScale: 'NUMERICAL',
-    teachersInCharge: [
-      'Kerttu Maaria Pollari-Malmi'
-    ],
+    gradingScale: GradingScale.Numerical,
     courseData: {
       courseCode: 'CS-A1150',
       minCredits: 5,
       maxCredits: 5,
+      teachersInCharge: [
+        {
+          name: 'Kerttu Maaria Pollari-Malmi'
+        }
+      ],
       department: {
         en: 'Department of Computer Science',
         fi: 'Tietotekniikan laitos',
