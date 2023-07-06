@@ -48,7 +48,7 @@ async function studentNumbersExist(studentNumbers: Array<string>): Promise<void>
 }
 
 export async function getCsvTemplate(req: Request, res: Response): Promise<void> {
-  const [course, assessmentModel]: [course: Course, assessmentModel: AssessmentModel] =
+  const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateCourseAndAssessmentModel(
       req.params.courseId, req.params.assessmentModelId
     );
@@ -258,7 +258,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
   // Validation path parameters.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [course, assessmentModel]: [course: Course, assessmentModel: AssessmentModel] =
+  const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateCourseAndAssessmentModel(
       req.params.courseId, req.params.assessmentModelId
     );
@@ -405,7 +405,7 @@ export async function calculateGrades(
   await requestSchema.validate(req.body, { abortEarly: false });
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [course, assessmentModel]: [course: Course, assessmentModel: AssessmentModel] =
+  const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateCourseAndAssessmentModel(
       req.params.courseId, req.params.assessmentModelId
     );
@@ -472,7 +472,7 @@ export async function calculateGrades(
     const formula: Formula = attainment.formula;
 
     formulaNodesByAttainmentId.set(attainment.id, {
-      formulaImplementation: await getFormulaImplementation(formula as Formula),
+      formulaImplementation: getFormulaImplementation(formula as Formula),
       subFormulaNodes: [],
       parentFormulaParams: attainment.parentFormulaParams,
       attainmentId: attainment.id
@@ -803,7 +803,7 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
   } = await urlParams.validate(req.query, { abortEarly: false });
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [course, assessmentModel]: [course: Course, assessmentModel: AssessmentModel] =
+  const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateCourseAndAssessmentModel(
       req.params.courseId, req.params.assessmentModelId
     );
@@ -886,7 +886,7 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
   } = await urlParams.validate(req.query, { abortEarly: false });
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [course, assessmentModel]: [course: Course, assessmentModel: AssessmentModel] =
+  const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateCourseAndAssessmentModel(
       req.params.courseId, req.params.assessmentModelId
     );
