@@ -10,8 +10,8 @@ import SelectFormulaView from '../components/SelectFormulaView';
 import formulasService from '../services/formulas';
 import FormulaSelectionRoute from '../context/FormulaSelectionRoute';
 import mockFormulas from './mock-data/mockFormulas';
-// import mockAttainments from './mock-data/mockAttainments';
-// import instancesService from '../services/instances';
+import mockAttainmentsClient from './mock-data/mockAttainmentsClient';
+import attainmentServices from '../services/attainments';
 
 jest.mock('../services/instances');
 jest.mock('../services/formulas');
@@ -23,16 +23,16 @@ describe('Tests for SelectFormulaView components', () => {
     (formulasService.getFormulas as jest.Mock).mockRejectedValue('Network error');
     (formulasService.getFormulas as jest.Mock).mockRejectedValue(mockFormulas);
     jest.spyOn(formulasService, 'getFormulaDetails').mockResolvedValue(mockFormulas[0]);
-
-    // TODO, include once get attainments work
-    //(instancesService.getAttainments as jest.Mock).mockRejectedValue('Network error');
-    //(instancesService.getAttainments as jest.Mock).mockResolvedValue(mockAttainments);
+    jest.spyOn(attainmentServices, 'getAllAttainments').mockResolvedValue(mockAttainmentsClient);
 
     return render(
-      <MemoryRouter initialEntries={['/A-12345/select-formula/test']}>
+      <MemoryRouter initialEntries={['/1/select-formula/1']}>
         <Routes>
           <Route element={<FormulaSelectionRoute/>}>
-            <Route path=':courseId/select-formula/:instanceId' element={<SelectFormulaView />}/>
+            <Route
+              path=':courseId/select-formula/:assessmentModelId'
+              element={<SelectFormulaView />}
+            />
           </Route>
         </Routes>
       </MemoryRouter>
@@ -52,8 +52,9 @@ describe('Tests for SelectFormulaView components', () => {
         const attainmentSelection: HTMLElement = screen.queryByText(
           'Select the sub study attainments you want to include in the calculation'
         );
-        const projectsCheckbox: HTMLElement = screen.queryByText('Projects');
-        const examCheckbox: HTMLElement = screen.queryByText('Exams');
+        const projectsCheckbox: HTMLElement = screen.queryByText('Project');
+        const examCheckbox: HTMLElement = screen.queryByText('Exam');
+        const exercisesheckbox: HTMLElement = screen.queryByText('Exercises');
         const formulaSelector: HTMLElement = screen.queryByText('Formula');
         const formulaPreview: HTMLElement = screen.queryByText('Preview of the formula');
         const submitInstructions: HTMLElement = screen.queryByText(
@@ -67,6 +68,7 @@ describe('Tests for SelectFormulaView components', () => {
         expect(attainmentSelection).toBeInTheDocument();
         expect(projectsCheckbox).toBeInTheDocument();
         expect(examCheckbox).toBeInTheDocument();
+        expect(exercisesheckbox).toBeInTheDocument();
         expect(formulaSelector).toBeInTheDocument();
         expect(formulaPreview).toBeInTheDocument();
         expect(submitInstructions).toBeInTheDocument();
