@@ -18,6 +18,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { State } from '../../types';
 import { CourseData } from 'aalto-grades-common/types';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 function CreateCourseForm(props: {
   addCourse: (course: CourseData) => Promise<void>
@@ -26,6 +27,7 @@ function CreateCourseForm(props: {
 
   const [teachersInCharge, setTeachersInCharge]: State<Array<string>> = useState([]);
   const [email, setEmail]: State<string> = useState('');
+  const [showDialog, setShowDialog]: State<boolean> = useState(false);
 
   function removeTeacher(value: string): void {
     setTeachersInCharge(teachersInCharge.filter((teacher: string) => teacher !== value));
@@ -106,7 +108,7 @@ function CreateCourseForm(props: {
           await props.addCourse(courseObject);
         }}
       >
-        {({ errors, handleChange, isSubmitting, isValid, touched, values }) => (
+        {({ errors, handleChange, isSubmitting, isValid, touched, values, initialValues }) => (
           <Form>
             <Box sx={{
               display: 'flex',
@@ -343,7 +345,14 @@ function CreateCourseForm(props: {
               <Button
                 size='medium'
                 variant='outlined'
-                onClick={(): void => navigate(-1)}
+                disabled={isSubmitting}
+                onClick={(): void => {
+                  if (initialValues != values) {
+                    setShowDialog(true);
+                  } else {
+                    navigate(-1);
+                  }
+                }}
               >
                 Cancel
               </Button>
@@ -373,6 +382,7 @@ function CreateCourseForm(props: {
           </Form>
         )}
       </Formik>
+      <UnsavedChangesDialog setOpen={setShowDialog} open={showDialog} navigateDir='/' />
     </Container>
   );
 }
