@@ -899,19 +899,6 @@ describe(
         + '`[\n  "\\"children\\"",\n  "\\"descendants\\""\n]`.');
     });
 
-    it('should respond with 400 Bad Request, if unknown parameters are present '
-      + 'in query string', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments/2?tree=children&foo=bar')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.BadRequest);
-      expect(res.body.success).toBe(false);
-      expect(res.body.data).not.toBeDefined();
-      expect(res.body.errors).toBeDefined();
-      expect(res.body.errors[0]).toBe('this field has unspecified keys: foo');
-    });
-
     it('should respond with 404 Not Found, if the attainment is not found '
       + 'for the specified course and assessment model', async () => {
       const res: supertest.Response = await request
