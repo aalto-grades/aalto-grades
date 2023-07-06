@@ -41,8 +41,8 @@ export interface CourseInstanceData {
   sisuCourseInstanceId?: string,
   startingPeriod?: Period,
   endingPeriod?: Period,
-  startDate: Date,
-  endDate: Date,
+  startDate: Date | string,
+  endDate: Date | string,
   type: string,
   gradingScale: GradingScale,
 }
