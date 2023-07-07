@@ -946,10 +946,9 @@ describe(
       expect(res.body.success).toBe(true);
       expect(res.body.data).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
-
       verifyAttainmentData(res.body.data.attainment, 2, 2, true);
-      verifyAttainmentData(res.body.data.attainment.subAttainments[0], 6, 2, false);
-      verifyAttainmentData(res.body.data.attainment.subAttainments[1], 10, 2, false);
+      verifyAttainmentData(res.body.data.attainment.subAttainments[1], 6, 2, false);
+      verifyAttainmentData(res.body.data.attainment.subAttainments[0], 10, 2, false);
     });
 
     it('should respond with a single attainment with a full tree of subattainments, '
@@ -963,16 +962,16 @@ describe(
       expect(res.body.data).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
       verifyAttainmentData(res.body.data.attainment, 2, 2, true);
-      verifyAttainmentData(res.body.data.attainment.subAttainments[0], 6, 2, true);
-      verifyAttainmentData(res.body.data.attainment.subAttainments[1], 10, 2, false);
+      verifyAttainmentData(res.body.data.attainment.subAttainments[1], 6, 2, true);
+      verifyAttainmentData(res.body.data.attainment.subAttainments[0], 10, 2, false);
       verifyAttainmentData(
-        res.body.data.attainment.subAttainments[0].subAttainments[0],
+        res.body.data.attainment.subAttainments[1].subAttainments[0],
         214,
         2,
         true
       );
       verifyAttainmentData(
-        res.body.data.attainment.subAttainments[0].subAttainments[0].subAttainments[0],
+        res.body.data.attainment.subAttainments[1].subAttainments[0].subAttainments[0],
         215,
         2,
         false
