@@ -23,21 +23,12 @@ describe('Tests for CourseResultsView components', () => {
     renderCourseResultsView();
 
     await waitFor(() => {
-      const headingElement: HTMLElement = screen.queryByText('Course Results');
-      const studentNumberHeader: HTMLElement = screen.queryByText('Student Number');
-      const finalGradeHeader: HTMLElement = screen.queryByText('Final Grade');
-      const viewValidGradesText: HTMLElement = screen.queryByText(
-        'View valid grades from past instances:'
-      );
-      const viewAllGradesButton: HTMLElement = screen.queryByText('View all grades');
-      const calculateGradesButton: HTMLElement = screen.queryByText('Calculate final grades');
-
-      expect(headingElement).toBeInTheDocument();
-      expect(studentNumberHeader).toBeInTheDocument();
-      expect(finalGradeHeader).toBeInTheDocument();
-      expect(viewValidGradesText).toBeInTheDocument();
-      expect(viewAllGradesButton).toBeInTheDocument();
-      expect(calculateGradesButton).toBeInTheDocument();
+      expect(screen.getByText('Course Results')).toBeInTheDocument();
+      expect(screen.getByText('Student Number')).toBeInTheDocument();
+      expect(screen.getByText('Final Grade')).toBeInTheDocument();
+      expect(screen.getByText('View valid grades from past instances:')).toBeInTheDocument();
+      expect(screen.getByText('View all grades')).toBeInTheDocument();
+      expect(screen.getByText('Calculate final grades')).toBeInTheDocument();
     });
 
   });
@@ -110,9 +101,9 @@ describe('Tests for CourseResultsView components', () => {
     renderCourseResultsView();
 
     await waitFor( async () => {
-      expect(await screen.queryByText('Calculating final grades...')).not.toBeInTheDocument();
+      expect(screen.queryByText('Calculating final grades...')).not.toBeInTheDocument();
 
-      const calculateGradesButton: HTMLElement = screen.queryByText('Calculate final grades');
+      const calculateGradesButton: HTMLElement = screen.getByText('Calculate final grades');
       act(() => userEvent.click(calculateGradesButton));
 
       expect(await screen.findByText('Calculating final grades...')).toBeInTheDocument();

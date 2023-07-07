@@ -12,8 +12,7 @@ import { AttainmentData } from 'aalto-grades-common/types';
 // This component renders a top attainment (only has the root attainment as its parent)
 function AttainmentCategory(props: {
   attainment: AttainmentData,
-  buttons?: Array<JSX.Element>,
-  attainmentKey: string
+  buttons?: Array<JSX.Element>
 }): JSX.Element {
   return (
     <Box boxShadow={3} borderRadius={1} sx={{ pt: 2, pb: 0.5, bgcolor: 'white' }}>
@@ -39,7 +38,6 @@ function AttainmentCategory(props: {
         props.attainment.subAttainments &&
         <CustomAccordion
           attainments={props.attainment.subAttainments}
-          attainmentKey={props.attainmentKey}
         />
       }
       <Box sx={{
@@ -69,8 +67,7 @@ function AttainmentCategory(props: {
 
 AttainmentCategory.propTypes = {
   attainment: PropTypes.object,
-  buttons: PropTypes.array,
-  attainmentKey: PropTypes.string,
+  buttons: PropTypes.array
 };
 
 export default AttainmentCategory;

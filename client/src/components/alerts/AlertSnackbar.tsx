@@ -33,7 +33,7 @@ function AlertSnackbar({ messageInfo, setMessageInfo, open, setOpen, position }:
 
   const margin: number = position ? (position - 1) * 7 : 0;
 
-  function handleClose(event: SyntheticEvent, reason: string): void {
+  function handleClose(event: Event | SyntheticEvent, reason: string): void {
     if (reason === 'clickaway') {
       return;
     }

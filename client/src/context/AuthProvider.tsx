@@ -8,16 +8,16 @@ import { LoginResult } from 'aalto-grades-common/types';
 import { State } from '../types';
 
 export interface AuthContextType {
-  auth?: LoginResult,
-  setAuth?: (auth: LoginResult) => void
+  auth: LoginResult | null,
+  setAuth?: (auth: LoginResult | null) => void
 }
 
-const AuthContext: Context<AuthContextType> = createContext<AuthContextType>({});
+const AuthContext: Context<AuthContextType> = createContext<AuthContextType>({ auth: null });
 
 export function AuthProvider(params: {
   children: JSX.Element
 }): JSX.Element {
-  const [auth, setAuth]: State<LoginResult> = useState<LoginResult>(null);
+  const [auth, setAuth]: State<LoginResult | null> = useState<LoginResult | null>(null);
 
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>

@@ -21,9 +21,13 @@ function EditInstanceView(): JSX.Element {
 
   const navigate: NavigateFunction = useNavigate();
 
-  const [instance, setInstance]: State<CourseInstanceData> = useState();
+  const [instance, setInstance]: State<CourseInstanceData | null> =
+    useState<CourseInstanceData | null>(null);
+
   const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
-  const [messageInfo, setMessageInfo]: State<Message | undefined> = useState(undefined);
+
+  const [messageInfo, setMessageInfo]: State<Message | null> =
+    useState<Message | null>(null);
 
   useEffect(() => {
     if (sisuInstanceId) {
@@ -32,7 +36,7 @@ function EditInstanceView(): JSX.Element {
           setInstance(courseInstance);
         })
         .catch((e: Error) => console.log(e.message));
-    } else {
+    } else if (courseId) {
       coursesService.getCourse(courseId)
         .then((course: CourseData) => {
           const newInstance: CourseInstanceData = {

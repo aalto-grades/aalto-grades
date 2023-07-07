@@ -29,10 +29,12 @@ function EditAttainmentView(): JSX.Element {
    * in the database and are to be added. Attainments to be deleted are added
    * to the deletedAttainments list and removed from this tree.
    */
-  const [attainmentTree, setAttainmentTree]: State<AttainmentData> = useState(null);
+  const [attainmentTree, setAttainmentTree]: State<AttainmentData | null> =
+    useState<AttainmentData | null>(null);
 
   // List of attainments that exist in the database which are to be deleted.
-  const [deletedAttainments, setDeletedAttainments]: State<Array<AttainmentData>> = useState([]);
+  const [deletedAttainments, setDeletedAttainments]: State<Array<AttainmentData>> =
+    useState<Array<AttainmentData>>([]);
 
   /*
    * Temporary IDs for attainments that have not been added to the database yet
@@ -57,11 +59,13 @@ function EditAttainmentView(): JSX.Element {
       break;
 
     case 'edit':
-      attainmentServices.getAttainment(courseId, assessmentModelId, attainmentId, 'descendants')
-        .then((attainment: AttainmentData) => {
-          setAttainmentTree(attainment);
-        })
-        .catch((e: Error) => console.log(e.message));
+      if (courseId && assessmentModelId && attainmentId) {
+        attainmentServices.getAttainment(courseId, assessmentModelId, attainmentId, 'descendants')
+          .then((attainment: AttainmentData) => {
+            setAttainmentTree(attainment);
+          })
+          .catch((e: Error) => console.log(e.message));
+      }
       break;
 
     default:
@@ -77,8 +81,8 @@ function EditAttainmentView(): JSX.Element {
   }
 
   function deleteAttainment(attainment: AttainmentData): void {
-    if (attainment.id === attainmentTree.id) {
-      if (attainment.id > 0) {
+    if (attainment.id === attainmentTree?.id) {
+      if (attainment.id && attainment.id > 0 && (courseId && assessmentModelId && attainmentId)) {
         attainmentServices.deleteAttainment(courseId, assessmentModelId, attainment.id);
       }
 
@@ -89,13 +93,13 @@ function EditAttainmentView(): JSX.Element {
 
     function inner(attainment: AttainmentData, tree: AttainmentData) {
       for (const i in tree.subAttainments) {
-        const subAttainment: AttainmentData = tree.subAttainments[i];
+        const subAttainment: AttainmentData = tree.subAttainments[Number(i)];
 
         if (subAttainment.id === attainment.id) {
           // Attainments that aren't saved in the database don't need to be
           // stored in deletedAttainments since there is no need to delete them
           // from anywhere except the UI.
-          if (attainment.id > 0) {
+          if (attainment.id && attainment.id > 0) {
             setDeletedAttainments([...deletedAttainments, structuredClone(attainment)]);
           }
 
@@ -108,7 +112,8 @@ function EditAttainmentView(): JSX.Element {
       }
     }
 
-    inner(attainment, attainmentTree);
+    if (attainmentTree)
+      inner(attainment, attainmentTree)
   }
 
   function handleSubmit(event: SyntheticEvent): void {
@@ -119,31 +124,40 @@ function EditAttainmentView(): JSX.Element {
         return;
 
       for (const subAttainment of tree.subAttainments) {
-        if (subAttainment.id > 0) {
-          attainmentServices.editAttainment(courseId, assessmentModelId, subAttainment);
-          addAndEdit(subAttainment);
-        } else {
-          attainmentServices.addAttainment(courseId, assessmentModelId, subAttainment);
+        if (courseId && assessmentModelId && attainmentId) {
+          if (subAttainment.id && subAttainment.id > 0) {
+            attainmentServices.editAttainment(courseId, assessmentModelId, subAttainment);
+            addAndEdit(subAttainment);
+          } else {
+            attainmentServices.addAttainment(courseId, assessmentModelId, subAttainment);
+          }
         }
       }
     }
 
     try {
-      for (const attainment of deletedAttainments)
-        attainmentServices.deleteAttainment(courseId, assessmentModelId, attainment.id);
+      if (courseId && assessmentModelId) {
+        for (const attainment of deletedAttainments) {
+          if (attainment.id) {
+            attainmentServices.deleteAttainment(courseId, assessmentModelId, attainment.id);
+          }
+        }
 
-      switch (modification) {
-      case 'create':
-        attainmentServices.addAttainment(courseId, assessmentModelId, attainmentTree);
-        break;
+        if (attainmentTree) {
+          switch (modification) {
+          case 'create':
+            attainmentServices.addAttainment(courseId, assessmentModelId, attainmentTree);
+            break;
 
-      case 'edit':
-        attainmentServices.editAttainment(courseId, assessmentModelId, attainmentTree);
-        addAndEdit(attainmentTree);
-        break;
+          case 'edit':
+            attainmentServices.editAttainment(courseId, assessmentModelId, attainmentTree);
+            addAndEdit(attainmentTree);
+            break;
 
-      default:
-        break;
+          default:
+            break;
+          }
+        }
       }
 
       navigate(-1);
@@ -199,14 +213,17 @@ function EditAttainmentView(): JSX.Element {
               />
             }
           </Box>
-          <ConfirmationDialog
-            deleteAttainment={deleteAttainment}
-            attainment={attainmentTree}
-            title={'Study Attainment'}
-            subject={'study attainment'}
-            handleClose={handleConfDialogClose}
-            open={openConfDialog}
-          />
+          {
+            attainmentTree &&
+            <ConfirmationDialog
+              deleteAttainment={deleteAttainment}
+              attainment={attainmentTree}
+              title={'Study Attainment'}
+              subject={'study attainment'}
+              handleClose={handleConfDialogClose}
+              open={openConfDialog}
+            />
+          }
           <Box sx={{
             display: 'flex',
             flexWrap: 'wrap',

@@ -165,7 +165,8 @@ describe('FileLoadDialog test with proper csv', () => {
     const dialogTitle: HTMLElement = getByText('Add Grades from File');
 
     await waitFor(() =>
-      fireEvent.change(getByText('Upload file').querySelector('input[type="file"]'), {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      fireEvent.change(getByText('Upload file').querySelector('input[type="file"]')!, {
         target: { files: [file] },
       })
     );
@@ -230,7 +231,8 @@ describe('FileLoadDialog test where server does not accept the file', () => {
     const dialogTitle: HTMLElement = getByText('Add Grades from File');
 
     await waitFor(() =>
-      fireEvent.change(getByText('Upload file').querySelector('input[type="file"]'), {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      fireEvent.change(getByText('Upload file').querySelector('input[type="file"]')!, {
         target: { files: [file] },
       })
     );
@@ -259,8 +261,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
     expect(additionalErrors).toBeVisible();
 
     // Show all errors button should be visible.
-    const showErrorsButton: HTMLElement = screen.queryByText('Show all');
-    expect(showErrorsButton).toBeDefined();
+    expect(screen.getByText('Show all')).toBeDefined();
   });
 
   test(
@@ -288,7 +289,8 @@ describe('FileLoadDialog test where server does not accept the file', () => {
       const dialogTitle: HTMLElement = getByText('Add Grades from File');
 
       await waitFor(() =>
-        fireEvent.change(getByText('Upload file').querySelector('input[type="file"]'), {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        fireEvent.change(getByText('Upload file').querySelector('input[type="file"]')!, {
           target: { files: [file] },
         })
       );
@@ -320,10 +322,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
       }
 
       // Additional errors text should not be rendered.
-      const additionalErrors: HTMLElement = screen.queryByText('more errors found');
-      expect(additionalErrors).toBeNull();
-
-      const showErrorsButton: HTMLElement = screen.queryByText('Show all');
-      expect(showErrorsButton).toBeNull();
+      expect(screen.queryByText('more errors found')).toBeNull();
+      expect(screen.queryByText('Show all')).toBeNull();
     });
 });

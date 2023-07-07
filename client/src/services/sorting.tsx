@@ -2,23 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-// used to sort by course code, takes two codes (or strings) as parameters
-function sortByCode(a: string, b: string): number {
-  const codeA: string = a.toUpperCase();
-  const codeB: string = b.toUpperCase();
-  if (codeA < codeB) {
-    return -1;
-  }
-  if (codeA > codeB) {
-    return 1;
-  }
-  return 0;
-}
-
 // used sort dates in descending order
-function sortByDate(a, b): number {
-  const order = a - b;
-  return order < 0 ? 1 : (order > 0 ? -1 : 0);
+function compareDate(a: Date, b: Date): number {
+  if (a < b)
+    return 1;
+  else if (a > b)
+    return -1;
+
+  return 0;
 }
 
 // Three following functions are used by CourseResultsTable for sortin the table
@@ -60,4 +51,4 @@ function stableSort(array, comparator) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default { sortByCode, sortByDate, descendingComparator, getComparator, stableSort };
+export default { compareDate, descendingComparator, getComparator, stableSort };

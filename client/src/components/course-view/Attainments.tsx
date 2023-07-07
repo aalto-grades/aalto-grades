@@ -57,7 +57,6 @@ function Attainments(props: {
               <AttainmentCategory
                 key={attainment.id}
                 attainment={attainment}
-                attainmentKey={'id'}
                 buttons={
                   [
                     <Button key='edit' onClick={(): void => {

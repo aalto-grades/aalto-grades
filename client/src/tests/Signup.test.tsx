@@ -20,19 +20,12 @@ describe('Tests for Login component', () => {
       </BrowserRouter>
     );
 
-    const nameField: HTMLElement = screen.getByLabelText('Name');
-    const passwordField: HTMLElement = screen.getByLabelText('Password');
-    const emailField: HTMLElement = screen.getByLabelText('Email');
-    const studentNumberField: HTMLElement = screen.getByLabelText('Student Number (not required)');
-    const signupButton: HTMLElement = screen.getByText('sign up');
-    const textElement: HTMLElement = screen.getByText('Sign up');
-
-    expect(nameField).toBeDefined();
-    expect(passwordField).toBeDefined();
-    expect(emailField).toBeDefined();
-    expect(studentNumberField).toBeDefined();
-    expect(signupButton).toBeDefined();
-    expect(textElement).toBeDefined();
+    expect(screen.getByLabelText('Name')).toBeDefined();
+    expect(screen.getByLabelText('Password')).toBeDefined();
+    expect(screen.getByLabelText('Email')).toBeDefined();
+    expect(screen.getByLabelText('Student Number (not required)')).toBeDefined();
+    expect(screen.getByText('sign up')).toBeDefined();
+    expect(screen.getByText('Sign up')).toBeDefined();
 
   });
 
@@ -42,17 +35,11 @@ describe('Tests for Login component', () => {
 
     render(<SignupForm addUser={mockSignupUser}/>);
 
-    const nameField: HTMLElement = screen.getByLabelText('Name');
-    const passwordField: HTMLElement = screen.getByLabelText('Password');
-    const emailField: HTMLElement = screen.getByLabelText('Email');
-    const studentNumberField: HTMLElement = screen.getByLabelText('Student Number (not required)');
-    const signupButton: HTMLElement = screen.getByText('sign up');
-
-    act(() => userEvent.type(nameField, 'Test User'));
-    act(() => userEvent.type(passwordField, 'secret'));
-    act(() => userEvent.type(emailField, 'test@email.com'));
-    act(() => userEvent.type(studentNumberField, '010101'));
-    act(() => userEvent.click(signupButton));
+    act(() => userEvent.type(screen.getByLabelText('Name'), 'Test User'));
+    act(() => userEvent.type(screen.getByLabelText('Password'), 'secret'));
+    act(() => userEvent.type(screen.getByLabelText('Email'), 'test@email.com'));
+    act(() => userEvent.type(screen.getByLabelText('Student Number (not required)'), '010101'));
+    act(() => userEvent.click(screen.getByText('sign up')));
 
     // Role "User" should be the default role if no role has been specified.
 

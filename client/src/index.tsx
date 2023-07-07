@@ -6,10 +6,10 @@ import React from 'react';
 import ReactDOM, { Root } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
-import { createGlobalStyle, GlobalStyleComponent } from 'styled-components';
+import { createGlobalStyle, DefaultTheme, GlobalStyleComponent } from 'styled-components';
 import { AuthProvider } from './context/AuthProvider';
 
-const GlobalStyles: GlobalStyleComponent<unknown, unknown> = createGlobalStyle`
+const GlobalStyles: GlobalStyleComponent<any, DefaultTheme> = createGlobalStyle`
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -25,15 +25,18 @@ const GlobalStyles: GlobalStyleComponent<unknown, unknown> = createGlobalStyle`
   }
 `;
 
-const root: Root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <GlobalStyles />
-    <BrowserRouter>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
-    </BrowserRouter>
-  </React.StrictMode>
-);
+const rootElement: HTMLElement | null = document.getElementById('root');
 
+if (rootElement) {
+  const root: Root = ReactDOM.createRoot(rootElement);
+  root.render(
+    <React.StrictMode>
+      <GlobalStyles />
+      <BrowserRouter>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </BrowserRouter>
+    </React.StrictMode>
+  );
+}

@@ -19,15 +19,10 @@ describe('Tests for Login and LoginForm components', () => {
       </BrowserRouter>
     );
 
-    const emailField: HTMLElement = screen.getByLabelText('Email');
-    const passwordField: HTMLElement = screen.getByLabelText('Password');
-    const loginButton: HTMLElement = screen.getByText('login');
-    const textElement: HTMLElement = screen.getByText('Don\'t have an account yet?');
-
-    expect(emailField).toBeDefined();
-    expect(passwordField).toBeDefined();
-    expect(loginButton).toBeDefined();
-    expect(textElement).toBeDefined();
+    expect(screen.getByLabelText('Email')).toBeDefined();
+    expect(screen.getByLabelText('Password')).toBeDefined();
+    expect(screen.getByText('login')).toBeDefined();
+    expect(screen.getByText('Don\'t have an account yet?')).toBeDefined();
   });
 
   test('LoginForm should allow a user to submit their credentials', () => {
@@ -36,13 +31,9 @@ describe('Tests for Login and LoginForm components', () => {
 
     render(<LoginForm loginUser={mockLoginUser}/>);
 
-    const emailField: HTMLElement = screen.getByLabelText('Email');
-    const passwordField: HTMLElement = screen.getByLabelText('Password');
-    const loginButton: HTMLElement = screen.getByText('login');
-
-    act(() => userEvent.type(emailField, 'test@email.com'));
-    act(() => userEvent.type(passwordField, 'secret'));
-    act(() => userEvent.click(loginButton));
+    act(() => userEvent.type(screen.getByLabelText('Email'), 'test@email.com'));
+    act(() => userEvent.type(screen.getByLabelText('Password'), 'secret'));
+    act(() => userEvent.click(screen.getByText('login')));
 
     expect(mockLoginUser).toHaveBeenCalledTimes(1);
     expect(mockLoginUser).toHaveBeenCalledWith({

@@ -17,12 +17,15 @@ import { State } from '../types';
 function FetchInstancesView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { courseId, courseCode }: Params = useParams();
-  const [instances, setInstances]: State<Array<CourseInstanceData>> = useState([]);
+  const [instances, setInstances]: State<Array<CourseInstanceData>> =
+    useState<Array<CourseInstanceData>>([]);
 
   useEffect(() => {
-    instancesService.getSisuInstances(courseCode)
-      .then((courseInstances: Array<CourseInstanceData>) => setInstances(courseInstances))
-      .catch((e: Error) => console.log(e.message));
+    if (courseCode) {
+      instancesService.getSisuInstances(courseCode)
+        .then((courseInstances: Array<CourseInstanceData>) => setInstances(courseInstances))
+        .catch((e: Error) => console.log(e.message));
+    }
   }, []);
 
   function onCancel(): void {

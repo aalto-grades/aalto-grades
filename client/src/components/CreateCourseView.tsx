@@ -14,7 +14,8 @@ import { CourseData } from 'aalto-grades-common/types';
 function CreateCourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
-  const [messageInfo, setMessageInfo]: State<Message | undefined> = useState(undefined);
+  const [messageInfo, setMessageInfo]: State<Message | null> =
+    useState<Message | null>(null);
 
   async function addCourse(course: CourseData): Promise<void> {
     try {

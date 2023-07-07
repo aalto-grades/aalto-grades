@@ -16,8 +16,10 @@ import { State } from '../types';
 function FrontPage(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
 
-  const [coursesOfUser, setCoursesOfUser]: State<Array<CourseData>> = useState([]);
-  const [courses, setCourses]: State<Array<CourseData>> = useState([]);
+  const [coursesOfUser, setCoursesOfUser]: State<Array<CourseData>> =
+    useState<Array<CourseData>>([]);
+  const [courses, setCourses]: State<Array<CourseData>> =
+    useState<Array<CourseData>>([]);
 
   const { auth }: AuthContextType = useAuth();
 
@@ -48,7 +50,7 @@ function FrontPage(): JSX.Element {
       {
         coursesOfUser.length > 0
           ?
-          <CourseTable data={coursesOfUser} />
+          <CourseTable courses={coursesOfUser} />
           :
           <Box sx={{
             display: 'flex', alignItems: 'left',
@@ -76,7 +78,7 @@ function FrontPage(): JSX.Element {
           </Button>
         }
       </Box>
-      <CourseTable data={courses} />
+      <CourseTable courses={courses} />
     </>
   );
 }

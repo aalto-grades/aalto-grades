@@ -116,9 +116,9 @@ describe('Test FrontPage without courses of user', () => {
       renderFrontPage(auth);
 
       await waitFor(() => {
-        expect(screen.queryByText('Your Courses')).toBeInTheDocument();
-        expect(screen.queryByText('You have no courses.')).toBeInTheDocument();
-        expect(screen.queryByText('Courses')).toBeInTheDocument();
+        expect(screen.getByText('Your Courses')).toBeInTheDocument();
+        expect(screen.getByText('You have no courses.')).toBeInTheDocument();
+        expect(screen.getByText('Courses')).toBeInTheDocument();
       });
     }
   );

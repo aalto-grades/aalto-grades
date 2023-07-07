@@ -22,11 +22,13 @@ function Login(): JSX.Element {
     try {
       const response = await userService.login(userObject);
       // if login is successful, save user role to context
-      setAuth({
-        id: response.id,
-        role: response.role,
-        name: response.name
-      });
+      if (setAuth) {
+        setAuth({
+          id: response.id,
+          role: response.role,
+          name: response.name
+        });
+      }
 
       navigate('/', { replace: true });
     } catch (exception) {

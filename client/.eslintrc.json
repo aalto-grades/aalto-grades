@@ -104,7 +104,6 @@
       {
         "default": "generic"
       }
-    ],
-    "@typescript-eslint/no-empty-function": "warn"
+    ]
   }
 }
