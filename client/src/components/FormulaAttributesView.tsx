@@ -9,7 +9,7 @@ import FormulaAttributesForm from './formula-attributes-view/FormulaAttributesFo
 
 function FormulaAttributesView(): JSX.Element {
 
-  const { courseId, instanceId }: Params = useParams();
+  const { courseId, assessmentModelId }: Params = useParams();
   const navigate: NavigateFunction = useNavigate();
 
   function navigateToCourseView(): void {
@@ -17,7 +17,7 @@ function FormulaAttributesView(): JSX.Element {
   }
 
   function navigateBack(): void {
-    navigate(`/${courseId}/select-formula/${instanceId}`, { replace: true });
+    navigate(`/${courseId}/select-formula/${assessmentModelId}`, { replace: true });
   }
 
   // TODO: How to differentiate between course total grade and assigment grade?

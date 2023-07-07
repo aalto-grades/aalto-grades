@@ -4,7 +4,10 @@
 
 import PropTypes from 'prop-types';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import { Box, Button, Dialog, DialogActions, DialogContent, Stack } from '@mui/material';
+import {
+  Box, Button, Dialog, DialogActions,
+  DialogContent, Stack, Typography
+} from '@mui/material';
 
 function UnsavedChangesDialog(props: {
   setOpen: (open: boolean) => void,
@@ -23,7 +26,10 @@ function UnsavedChangesDialog(props: {
     >
       <Box sx={{ p: 2 }}>
         <DialogContent>
-          The form has unsaved changes. Data you have entered will not be saved.
+          <Typography variant='h2' sx={{ mb: 2 }}>
+            Unsaved Changes
+          </Typography>
+            The form has unsaved changes. Data you have entered will not be saved.
         </DialogContent>
         <DialogActions>
           <Stack spacing={2} direction="row" sx={{ mt: 2 }}>
@@ -32,7 +38,7 @@ function UnsavedChangesDialog(props: {
               variant='outlined'
               onClick={(): void => props.setOpen(false)}
             >
-              Cancel
+              Stay on this page
             </Button>
             <Button
               size='large'

@@ -69,12 +69,15 @@ async function getAttainment(
 
 async function getAllAttainments(
   courseId: Numeric,
-  assessmentModelId: Numeric
+  assessmentModelId: Numeric,
+  tree?: 'children' | 'descendants'
 ): Promise<AttainmentData> {
+
+  const query: string = tree ? `?tree=${tree}` : '';
 
   const response: FullResponse<{ attainment: AttainmentData }> =
     await axios.get(
-      `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/attainments`
+      `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/attainments${query}`
     );
 
   return response.data.data.attainment;

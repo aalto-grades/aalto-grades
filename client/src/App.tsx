@@ -193,11 +193,11 @@ function App(): JSX.Element {
               />
               <Route element={<FormulaSelectionRoute />}>
                 <Route
-                  path='/:courseId/select-formula/:instanceId/'
+                  path='/:courseId/select-formula/:assessmentModelId/'
                   element={<SelectFormulaView />}
                 />
                 <Route
-                  path='/:courseId/formula-attributes/:instanceId/'
+                  path='/:courseId/formula-attributes/:assessmentModelId/'
                   element={<FormulaAttributesView />}
                 />
                 {
