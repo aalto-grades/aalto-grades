@@ -12,14 +12,15 @@ import userService from '../../services/user';
 import useAuth from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';
 import { SystemRole } from 'aalto-grades-common/types/auth';
+import { State } from '../../types';
 
 function PrivateRoute({ children, roles }: {
   children?: JSX.Element,
   roles: Array<SystemRole>
 }): JSX.Element | null {
 
-  const [loading, setLoading] = useState<any>(true);
-  const { auth, setAuth } = useAuth();
+  const [loading, setLoading]: State<boolean> = useState(true);
+  const { auth, setAuth, isTeacherInCharge } = useAuth();
 
   async function getAuthStatus(): Promise<void> {
     // loading set to true so page doesn't load until token has been retrieved
@@ -47,8 +48,8 @@ function PrivateRoute({ children, roles }: {
   if (!loading) {
     // If auth is not null -> token exists
     if (auth) {
-      // check if role is in the list of authorised roles
-      if (roles.includes(auth.role)) {
+      // check if role is in the list of authorised roles or teacher in charge.
+      if (roles.includes(auth.role) || isTeacherInCharge) {
         return (
           <>
             {children}
