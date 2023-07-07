@@ -6,12 +6,9 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import MenuItem from '@mui/material/MenuItem';
 import SimpleDialog from './SimpleDialog';
 import ConfirmationDialog from './ConfirmationDialog';
 import StringTextField from './StringTextField';
-import attainmentServices from '../../services/attainments';
 import formulaService from '../../services/formulas';
 import { State, TextFieldData } from '../../types';
 import { AttainmentData } from 'aalto-grades-common/types';
@@ -42,9 +39,9 @@ const daysValidData: TextFieldData = {
 */
 function AttributeTextFields({
   formulaAttributeNames, indices, setAttainments, attainments
-}) {
+}: any) {
   return (
-    formulaAttributeNames.map((attribute) => {
+    formulaAttributeNames.map((attribute: any) => {
       const attributeLabel = formulaService.getAttributeLabel(attribute);
       return (
         <StringTextField

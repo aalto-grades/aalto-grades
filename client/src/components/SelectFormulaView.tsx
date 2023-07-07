@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   useParams, useNavigate, useOutletContext, Params, NavigateFunction
 } from 'react-router-dom';
@@ -14,6 +14,7 @@ import mockAttainments from '../tests/mock-data/mockAttainments';
 import { State } from '../types';
 import { FormulaPreview } from 'aalto-grades-common/types';
 import useSnackPackAlerts from '../hooks/useSnackPackAlerts';
+import { AttainmentData } from 'aalto-grades-common/types';
 
 function SelectFormulaView(): JSX.Element {
   const { setSelectedFormula, selectedFormula } = useOutletContext<any>();

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState } from 'react';
+import { useState, ReactNode, SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -14,12 +14,13 @@ import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import { AttainmentData, Formula } from 'aalto-grades-common/types';
 import { State } from '../../types';
 
-type AccordionOnChange = (e: unknown, newExpanded: Set<number>) => void;
+type AccordionOnChange = (event: SyntheticEvent, newExpanded: boolean) => void;
 
 const Accordion = styled((props: {
   key: string,
   expanded: boolean,
-  onChange: AccordionOnChange
+  onChange: AccordionOnChange,
+  children: any
 }) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
 ))(() => ({
@@ -35,7 +36,8 @@ const AccordionSummary = styled((props: {
   'aria-controls': string,
   id: string,
   expanded: boolean,
-  selected: boolean
+  selected: boolean,
+  children: ReactNode
 }) => (
   <MuiAccordionSummary
     expandIcon={
@@ -156,7 +158,7 @@ function CustomAccordion(props: {
   // curried function syntax, google for a good explanation
   // basically add the panel's id to the set of expanded panels if opened, else delete from set
   function handleChange(panelId: number): AccordionOnChange {
-    return (e: unknown, newExpanded: Set<number>): void => {
+    return (event: SyntheticEvent, newExpanded: boolean): void => {
       setExpanded(newExpanded ? addToSet(panelId, expanded) : deleteFromSet(panelId, expanded));
       setSelected(newExpanded ? panelId : 0);
     };

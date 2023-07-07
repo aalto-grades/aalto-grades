@@ -24,8 +24,8 @@ const Alert: any = React.forwardRef(function Alert(props, ref) {
 // TODO: Consider if the key attribute works properly of if something else should be used?
 // position allows "stacked look", starts from 1 but really needed only from 2 onwards
 function AlertSnackbar({ messageInfo, setMessageInfo, open, setOpen, position }: {
-  messageInfo: Message | undefined,
-  setMessageInfo: (messageInfo: Message | undefined) => void,
+  messageInfo: Message | null,
+  setMessageInfo: (messageInfo: Message | null) => void,
   open: boolean,
   setOpen: (open: boolean) => void,
   position?: number
@@ -41,7 +41,7 @@ function AlertSnackbar({ messageInfo, setMessageInfo, open, setOpen, position }:
   }
 
   function handleExited(): void {
-    setMessageInfo(undefined);
+    setMessageInfo(null);
   }
 
   return (

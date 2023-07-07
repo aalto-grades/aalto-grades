@@ -66,22 +66,24 @@ function CourseResultsView(): JSX.Element {
         severity: 'info'
       });
       await sleep(2000);
-      const success = await gradesService.calculateFinalGrades(courseId, instanceId);
+      if (courseId && instanceId) {
+        const success = await gradesService.calculateFinalGrades(courseId, instanceId);
 
-      if (success) {
-        snackPackAdd({
-          msg: 'Final grades calculated successfully.',
-          severity: 'success'
-        });
-        await sleep(2000);
+        if (success) {
+          snackPackAdd({
+            msg: 'Final grades calculated successfully.',
+            severity: 'success'
+          });
+          await sleep(2000);
 
-        setLoading(true);
-        snackPackAdd({
-          msg: 'Fetching final grades...',
-          severity: 'info'
-        });
-        const data = await gradesService.getFinalGrades(courseId, instanceId);
-        setStudents(data.finalGrades);
+          setLoading(true);
+          snackPackAdd({
+            msg: 'Fetching final grades...',
+            severity: 'info'
+          });
+          const data = await gradesService.getFinalGrades(courseId, instanceId);
+          setStudents(data.finalGrades);
+        }
       }
     } catch (exception) {
       console.log(exception);
@@ -126,19 +128,21 @@ function CourseResultsView(): JSX.Element {
     });
 
     try {
-      const res = await gradesService.downloadCsvTemplate(courseId, instanceId);
+      if (courseId && instanceId) {
+        const res = await gradesService.downloadCsvTemplate(courseId, instanceId);
 
-      const blob = new Blob([res.data], { type: 'text/csv' });
+        const blob = new Blob([res.data], { type: 'text/csv' });
 
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'template.csv'; // TODO: Get filename from Content-Disposition
-      link.click();
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'template.csv'; // TODO: Get filename from Content-Disposition
+        link.click();
 
-      snackPackAdd({
-        msg: 'CSV template downloaded successfully.',
-        severity: 'success'
-      });
+        snackPackAdd({
+          msg: 'CSV template downloaded successfully.',
+          severity: 'success'
+        });
+      }
     } catch (e) {
       console.log(e);
       snackPackAdd({

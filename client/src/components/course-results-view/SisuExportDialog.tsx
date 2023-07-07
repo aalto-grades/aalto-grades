@@ -19,7 +19,7 @@ import gradesService from '../../services/grades';
 import { Message } from '../../types';
 
 // A Dialog component for exporting Sisu grades CSV.
-const instructions =
+const instructions: string =
   'Set the completion language and assesment date for the grading, these values'
   + ' are optional. Click export to export the grades.';
 

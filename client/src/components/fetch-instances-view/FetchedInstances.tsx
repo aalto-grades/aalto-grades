@@ -74,7 +74,9 @@ function FetchedInstances(props: {
         props.instances
           .sort(
             (a: CourseInstanceData, b: CourseInstanceData) => {
-              return sortingServices.compareDate(a.startDate, b.startDate);
+              return sortingServices.compareDate(
+                a.startDate as Date, b.startDate as Date
+              );
             }
           )
           .slice()

@@ -34,8 +34,8 @@ function ParentAttainment(props: {
   // For opening and closing the list of sub-attainments
   const [open, setOpen]: State<boolean> = useState(true);
   // Detailed information about the used formula, undefined when loading.
-  const [formulaDetails, setFormulaDetails]: State<FormulaPreview | undefined> =
-    useState(undefined);
+  const [formulaDetails, setFormulaDetails]: State<FormulaPreview | null> =
+    useState<FormulaPreview | null>(null);
 
   function handleClick(): void {
     setOpen(!open);
@@ -53,10 +53,12 @@ function ParentAttainment(props: {
    * so that the grade of this attainment's parent attainment can be calculated.
    */
   useEffect(() => {
-    formulasService.getFormulaDetails(props.attainmentTree.formula)
-      .then((formula: FormulaPreview) => {
-        setFormulaDetails(formula);
-      });
+    if (props.attainmentTree.formula) {
+      formulasService.getFormulaDetails(props.attainmentTree.formula)
+        .then((formula: FormulaPreview) => {
+          setFormulaDetails(formula);
+        });
+    }
   }, []);
 
   return (

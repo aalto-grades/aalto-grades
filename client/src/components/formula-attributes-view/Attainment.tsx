@@ -2,40 +2,48 @@
 //
 // SPDX-License-Identifier: MIT
 
-import PropTypes, { InferProps } from 'prop-types';
+import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import formulaService from '../../services/formulas';
+import { AttainmentData } from 'aalto-grades-common/types';
 
-function Attainment(
-  { attainment, attributes, handleAttributeChange, attainmentIndex }
-  : InferProps<typeof Attainment.propTypes>
-): JSX.Element {
+function Attainment(props: {
+  attainment: AttainmentData,
+  attributes: Array<string>,
+  handleAttributeChange: Function, // TODO: Better type
+  attainmentIndex: number
+}): JSX.Element {
 
   function attributeTextFields(): JSX.Element {
     return (
       <>
-        { attributes.map((attribute: string, attributeIndex: number) => {
-          const attributeLabel: string = formulaService.getAttributeLabel(attribute);
-          return (
-            <TextField
-              type='text'
-              key={attribute}
-              variant='standard'
-              label={attributeLabel}
-              InputLabelProps={{ shrink: true }}
-              margin='normal'
-              sx={{
-                marginTop: 0,
-                width: '100%'
-              }}
-              onChange={
-                (event: any): void => handleAttributeChange(attainmentIndex, attributeIndex, event)
-              }
-            />
-          );
-        })}
+        {
+          props.attributes.map((attribute: string, attributeIndex: number) => {
+            const attributeLabel: string = formulaService.getAttributeLabel(attribute);
+            return (
+              <TextField
+                type='text'
+                key={attribute}
+                variant='standard'
+                label={attributeLabel}
+                InputLabelProps={{ shrink: true }}
+                margin='normal'
+                sx={{
+                  marginTop: 0,
+                  width: '100%'
+                }}
+                onChange={
+                  (event: any): void => {
+                    props.handleAttributeChange(
+                      props.attainmentIndex, attributeIndex, event
+                    );
+                  }
+                }
+              />
+            );
+          })}
       </>
     );
   }
@@ -55,7 +63,7 @@ function Attainment(
       mb: 2
     }}>
       <Typography sx={{ fontWeight: 'bold', my: 1 }} align='left'>
-        {attainment.name}
+        {props.attainment.name}
       </Typography>
       <Box sx={{
         display: 'grid',

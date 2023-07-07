@@ -21,9 +21,13 @@ import Typography from '@mui/material/Typography';
 import sortingServices from '../../services/sorting';
 import CircularProgress from '@mui/material/CircularProgress';
 
-function CourseResultsTable(
-  { students, calculateFinalGrades, updateGrades, downloadCsvTemplate, loading }
-): JSX.Element {
+function CourseResultsTable({
+  students,
+  calculateFinalGrades,
+  updateGrades,
+  downloadCsvTemplate,
+  loading
+}): JSX.Element {
 
   const [order, setOrder] = useState<any>('asc');
   const [orderBy, setOrderBy] = useState<any>('studentNumber');

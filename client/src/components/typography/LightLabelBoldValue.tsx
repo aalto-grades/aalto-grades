@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 function LightLabelBoldValue(props: {
   label: string,
   value: string | number,
-  small: boolean
+  small?: boolean
 }): JSX.Element {
   const textSize = props.small ? 'body2' : 'body1';
 

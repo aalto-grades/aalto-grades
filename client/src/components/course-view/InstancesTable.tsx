@@ -49,14 +49,17 @@ const headCells: Array<HeadCellData> = [
 function InstancesTable(props: {
   courseId: string
 }): JSX.Element {
-  const [instances, setInstances]: State<Array<CourseInstanceData> | null> = useState(null);
+  const [instances, setInstances]: State<Array<CourseInstanceData> | null> =
+    useState<Array<CourseInstanceData> | null>(null);
 
   useEffect(() => {
     instancesService.getInstances(props.courseId)
       .then((courseInstances: Array<CourseInstanceData>) => {
         const sortedInstances: Array<CourseInstanceData> = courseInstances.sort(
           (a: CourseInstanceData, b: CourseInstanceData) => {
-            return sortingServices.compareDate(a.startDate, b.startDate);
+            return sortingServices.compareDate(
+              a.startDate as Date, b.startDate as Date
+            );
           }
         );
         setInstances(sortedInstances);
@@ -95,7 +98,9 @@ function InstancesTable(props: {
             instances
               .sort(
                 (a: CourseInstanceData, b: CourseInstanceData): number => {
-                  return sortingServices.compareDate(a.startDate, b.startDate);
+                  return sortingServices.compareDate(
+                    a.startDate as Date, b.startDate as Date
+                  );
                 }
               )
               .slice()

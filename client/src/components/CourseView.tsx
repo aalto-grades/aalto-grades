@@ -28,51 +28,58 @@ function CourseView(): JSX.Element {
   const { courseId }: Params = useParams();
   const { auth }: AuthContextType = useAuth();
 
-  const [course, setCourse]: State<CourseData | null> = useState(null);
+  const [course, setCourse]: State<CourseData | null> =
+    useState<CourseData | null>(null);
 
   const [currentAssessmentModel, setCurrentAssessmentModel]: State<AssessmentModelData | null> =
-    useState(null);
+    useState<AssessmentModelData | null>(null);
   const [assessmentModels, setAssessmentModels]: State<Array<AssessmentModelData>> =
-    useState([]);
+    useState<Array<AssessmentModelData>>([]);
+
   /**
    * Tree set to undefined when fetching the data from API, display loading.
    * If no assessment models exists, set to null to display "no attainments" message,
    * otherwise render attainmentTree.
    */
   const [attainmentTree, setAttainmentTree]: State<AttainmentData | null | undefined> =
-    useState(undefined);
+    useState<AttainmentData | null | undefined>(undefined);
 
   const [animation, setAnimation]: State<boolean> = useState(false);
   const [fileLoadOpen, setFileLoadOpen]: State<boolean> = useState(false);
   const [createAssessmentModelOpen, setCreateAssessmentModelOpen]: State<boolean> = useState(false);
 
   useEffect(() => {
-    coursesService.getCourse(courseId)
-      .then((course: CourseData) => {
-        setCourse(course);
-      })
-      .catch((e: Error) => console.log(e.message));
+    if (courseId) {
+      coursesService.getCourse(courseId)
+        .then((course: CourseData) => {
+          setCourse(course);
+        })
+        .catch((e: Error) => console.log(e.message));
 
-    assessmentModelsService.getAllAssessmentModels(courseId)
-      .then((assessmentModels: Array<AssessmentModelData>) => {
-        setAssessmentModels(assessmentModels);
+      assessmentModelsService.getAllAssessmentModels(courseId)
+        .then((assessmentModels: Array<AssessmentModelData>) => {
+          setAssessmentModels(assessmentModels);
 
-        /**
-         * Newly created courses do not have assessment models assigned.
-         * Set tree to null so proper message can be displayed.
-         */
-        if (assessmentModels.length === 0) {
-          setAttainmentTree(null);
-        } else {
-          setCurrentAssessmentModel(assessmentModels[0]);
-          attainmentService.getAllAttainments(courseId, assessmentModels[0].id)
-            .then((attainmentTree: AttainmentData) => {
-              setAttainmentTree(attainmentTree);
-            })
-            .catch((e: Error) => console.log(e.message));
-        }
-      })
-      .catch((e: Error) => console.log(e.message));
+          /**
+           * Newly created courses do not have assessment models assigned.
+           * Set tree to null so proper message can be displayed.
+           */
+          if (assessmentModels.length === 0) {
+            setAttainmentTree(null);
+          } else {
+            setCurrentAssessmentModel(assessmentModels[0]);
+
+            if (assessmentModels[0].id) {
+              attainmentService.getAllAttainments(courseId, assessmentModels[0].id)
+                .then((attainmentTree: AttainmentData) => {
+                  setAttainmentTree(attainmentTree);
+                })
+                .catch((e: Error) => console.log(e.message));
+            }
+          }
+        })
+        .catch((e: Error) => console.log(e.message));
+    }
   }, []);
 
   useEffect(() => {
@@ -80,7 +87,7 @@ function CourseView(): JSX.Element {
   }, [currentAssessmentModel]);
 
   function onChangeAssessmentModel(assessmentModel: AssessmentModelData): void {
-    if (assessmentModel.id !== currentAssessmentModel?.id) {
+    if (courseId && assessmentModel.id && assessmentModel.id !== currentAssessmentModel?.id) {
       setAnimation(false);
       setAttainmentTree(undefined);
       setCurrentAssessmentModel(assessmentModel);
@@ -94,11 +101,13 @@ function CourseView(): JSX.Element {
   }
 
   function onCreateAssessmentModel(): void {
-    assessmentModelsService.getAllAssessmentModels(courseId)
-      .then((assessmentModels: Array<AssessmentModelData>) => {
-        setAssessmentModels(assessmentModels);
-      })
-      .catch((e: Error) => console.log(e.message));
+    if (courseId) {
+      assessmentModelsService.getAllAssessmentModels(courseId)
+        .then((assessmentModels: Array<AssessmentModelData>) => {
+          setAssessmentModels(assessmentModels);
+        })
+        .catch((e: Error) => console.log(e.message));
+    }
   }
 
   return (
@@ -114,7 +123,7 @@ function CourseView(): JSX.Element {
             <Typography variant='h2' align='left'>{course.name.en}</Typography>
             {
               /* Only admins and teachers are allowed to create assessment models */
-              auth.role == SystemRole.Admin &&
+              auth?.role == SystemRole.Admin &&
               <Button
                 id='ag_new_assessment_model_btn'
                 size='large'
@@ -127,16 +136,19 @@ function CourseView(): JSX.Element {
           </Box>
           <Box sx={{ display: 'flex', gap: 3 }}>
             <div>
-              <CourseDetails
-                course={course}
-                assessmentModels={assessmentModels}
-                currentAssessmentModelId={currentAssessmentModel?.id}
-                onChangeAssessmentModel={onChangeAssessmentModel}
-              />
+              {
+                (currentAssessmentModel && currentAssessmentModel.id) &&
+                <CourseDetails
+                  course={course}
+                  assessmentModels={assessmentModels}
+                  currentAssessmentModelId={currentAssessmentModel.id}
+                  onChangeAssessmentModel={onChangeAssessmentModel}
+                />
+              }
             </div>
             {
               /* a different attainment component will be created for students */
-              auth.role == SystemRole.Admin &&
+              auth?.role == SystemRole.Admin &&
               <div style={{ width: '100%' }}>
                 {attainmentTree ?
                   <Grow
@@ -145,13 +157,16 @@ function CourseView(): JSX.Element {
                     {...(animation ? { timeout: 1000 } : { timeout: 0 })}
                   >
                     <div style={{ width: '100%' }}>
-                      <Attainments
-                        attainmentTree={attainmentTree}
-                        courseId={courseId}
-                        formula={'Weighted Average'} /* TODO: Retrieve real formula */
-                        assessmentModel={currentAssessmentModel}
-                        handleAddPoints={(): void => setFileLoadOpen(true)}
-                      />
+                      {
+                        (courseId && currentAssessmentModel) &&
+                        <Attainments
+                          attainmentTree={attainmentTree}
+                          courseId={courseId}
+                          formula={'Weighted Average'} /* TODO: Retrieve real formula */
+                          assessmentModel={currentAssessmentModel}
+                          handleAddPoints={(): void => setFileLoadOpen(true)}
+                        />
+                      }
                     </div>
                   </Grow>
                   :
@@ -194,7 +209,7 @@ function CourseView(): JSX.Element {
             </Typography>
             {
               /* Only admins and teachers are allowed to create a new instance */
-              auth.role == SystemRole.Admin &&
+              auth?.role == SystemRole.Admin &&
               <Button
                 id='ag_new_instance_btn'
                 size='large'
@@ -208,9 +223,12 @@ function CourseView(): JSX.Element {
               </Button>
             }
           </Box>
-          <InstancesTable courseId={courseId}/>
+          {
+            courseId &&
+            <InstancesTable courseId={courseId} />
+          }
           <FileLoadDialog
-            //instanceId={currentInstance.id}
+            instanceId={0} // TODO: Should not be instance?
             open={fileLoadOpen}
             handleClose={(): void => setFileLoadOpen(false)}
           />

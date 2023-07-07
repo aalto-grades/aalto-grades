@@ -30,21 +30,23 @@ function CreateAssessmentModelDialog(props: {
   async function handleSubmit(event: SyntheticEvent): Promise<void> {
     event.preventDefault();
     try {
-      setIsSubmitting(true);
-      const assessmentModelId: number = await assessmentModelsService.addAssessmentModel(
-        courseId, { name: name }
-      );
+      if (courseId) {
+        setIsSubmitting(true);
+        const assessmentModelId: number = await assessmentModelsService.addAssessmentModel(
+          courseId, { name: name }
+        );
 
-      await attainmentServices.addAttainment(courseId, assessmentModelId, {
-        name: 'Root',
-        tag: 'root',
-        daysValid: 0
-      });
+        await attainmentServices.addAttainment(courseId, assessmentModelId, {
+          name: 'Root',
+          tag: 'root',
+          daysValid: 0
+        });
 
-      props.handleClose();
-      props.onSubmit();
-      setName('');
-      setIsSubmitting(false);
+        props.handleClose();
+        props.onSubmit();
+        setName('');
+        setIsSubmitting(false);
+      }
     } catch (exception) {
       console.log(exception);
     }
