@@ -8,13 +8,13 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import formulasService from '../services/formulas';
 import FormulaAttributesView from '../components/FormulaAttributesView';
-import mockAttainmentsClient from './mock-data/mockAttainmentsClient';
+import mockAttainments from './mock-data/mockAttainments';
 import mockFormulas from './mock-data/mockFormulas';
 
 describe('Tests for FormulaAttributesView components', () => {
 
   const mockData = {
-    selectedAttainments: mockAttainmentsClient.subAttainments,
+    selectedAttainments: mockAttainments.subAttainments,
     selectedFormula: mockFormulas[0]
   };
 

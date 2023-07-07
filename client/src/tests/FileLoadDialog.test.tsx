@@ -16,7 +16,7 @@ import instancesService from '../services/instances';
 import gradesService from '../services/grades';
 import AuthContext from '../context/AuthProvider';
 import mockAssessmentModels from './mock-data/mockAssessmentModels';
-import mockAttainments from './mock-data/mockAttainmentsClient';
+import mockAttainments from './mock-data/mockAttainments';
 import mockCourses from './mock-data/mockCourses';
 import mockInstances from './mock-data/mockInstancesWithStringDates';
 import { maxErrorsToShow } from '../components/course-view/FileLoadDialog';

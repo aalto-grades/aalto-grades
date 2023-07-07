@@ -10,7 +10,7 @@ import SelectFormulaView from '../components/SelectFormulaView';
 import formulasService from '../services/formulas';
 import FormulaSelectionRoute from '../context/FormulaSelectionRoute';
 import mockFormulas from './mock-data/mockFormulas';
-import mockAttainmentsClient from './mock-data/mockAttainmentsClient';
+import mockAttainments from './mock-data/mockAttainments';
 import attainmentServices from '../services/attainments';
 
 jest.mock('../services/instances');
@@ -23,7 +23,7 @@ describe('Tests for SelectFormulaView components', () => {
     (formulasService.getFormulas as jest.Mock).mockRejectedValue('Network error');
     (formulasService.getFormulas as jest.Mock).mockRejectedValue(mockFormulas);
     jest.spyOn(formulasService, 'getFormulaDetails').mockResolvedValue(mockFormulas[0]);
-    jest.spyOn(attainmentServices, 'getAllAttainments').mockResolvedValue(mockAttainmentsClient);
+    jest.spyOn(attainmentServices, 'getAllAttainments').mockResolvedValue(mockAttainments);
 
     return render(
       <MemoryRouter initialEntries={['/1/select-formula/1']}>

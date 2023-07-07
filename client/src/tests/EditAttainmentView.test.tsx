@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event';
 import EditAttainmentView from '../components/EditAttainmentView';
 import attainmentServices from '../services/attainments';
 import formulasService from '../services/formulas';
-import mockAttainmentsClient from './mock-data/mockAttainmentsClient';
+import mockAttainments from './mock-data/mockAttainments';
 import { AttainmentData } from 'aalto-grades-common/types';
 import mockFormulas from './mock-data/mockFormulas';
 
@@ -25,7 +25,7 @@ global.structuredClone = <T,>(value: T): T => {
 
 function getMockAttainment(): AttainmentData {
   return structuredClone(
-    mockAttainmentsClient.subAttainments.find(
+    mockAttainments.subAttainments.find(
       (attainment: AttainmentData) => attainment.id === attainmentId
     )
   );

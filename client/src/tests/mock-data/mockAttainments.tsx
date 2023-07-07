@@ -4,7 +4,7 @@
 
 import { AttainmentData, Formula } from 'aalto-grades-common/types';
 
-const mockAttainmentsClient: AttainmentData = {
+const mockAttainments: AttainmentData = {
   id: 10000,
   name: 'Root',
   tag: 'root',
@@ -130,4 +130,4 @@ const mockAttainmentsClient: AttainmentData = {
   ]
 };
 
-export default mockAttainmentsClient;
+export default mockAttainments;
