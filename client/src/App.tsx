@@ -169,7 +169,7 @@ function App(): JSX.Element {
                 element={<CreateCourseView />}
               />
             </Route>
-            { /* Pages that are authorised for admin and teachers */}
+            { /* Pages that are authorised for admin and teachers in charge */}
             <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
               <Route
                 path=':courseId/fetch-instances/:courseCode'
