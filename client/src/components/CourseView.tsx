@@ -18,7 +18,7 @@ import attainmentService from '../services/attainments';
 import coursesService from '../services/courses';
 import useAuth, { AuthContextType } from '../hooks/useAuth';
 import {
-  AssessmentModelData, AttainmentData, CourseData, SystemRole
+  AssessmentModelData, AttainmentData, CourseData, SystemRole, UserData
 } from 'aalto-grades-common/types';
 import { State } from '../types';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -26,8 +26,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 function CourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { courseId }: Params = useParams();
-  const { auth }: AuthContextType = useAuth();
-
+  const { auth, isTeacherInCharge, setIsTeacherInCharge }: AuthContextType = useAuth();
   const [course, setCourse]: State<CourseData | null> = useState(null);
 
   const [currentAssessmentModel, setCurrentAssessmentModel]: State<AssessmentModelData | null> =
@@ -50,6 +49,10 @@ function CourseView(): JSX.Element {
     coursesService.getCourse(courseId)
       .then((course: CourseData) => {
         setCourse(course);
+        const teacherInCharge: Array<UserData> = course.teachersInCharge.filter(
+          (teacher: UserData) => teacher.id == auth.id
+        );
+        setIsTeacherInCharge(teacherInCharge.length != 0);
       })
       .catch((e: Error) => console.log(e.message));
 
@@ -113,8 +116,8 @@ function CourseView(): JSX.Element {
           }}>
             <Typography variant='h2' align='left'>{course.name.en}</Typography>
             {
-              /* Only admins and teachers are allowed to create assessment models */
-              auth.role == SystemRole.Admin &&
+              /* Only admins and teachers in charge are allowed to create assessment models */
+              (auth.role == SystemRole.Admin || isTeacherInCharge) &&
               <Button
                 id='ag_new_assessment_model_btn'
                 size='large'
@@ -136,7 +139,7 @@ function CourseView(): JSX.Element {
             </div>
             {
               /* a different attainment component will be created for students */
-              auth.role == SystemRole.Admin &&
+              (auth.role == SystemRole.Admin || isTeacherInCharge) &&
               <div style={{ width: '100%' }}>
                 {attainmentTree ?
                   <Grow
@@ -194,7 +197,7 @@ function CourseView(): JSX.Element {
             </Typography>
             {
               /* Only admins and teachers are allowed to create a new instance */
-              auth.role == SystemRole.Admin &&
+              (auth.role == SystemRole.Admin || isTeacherInCharge) &&
               <Button
                 id='ag_new_instance_btn'
                 size='large'

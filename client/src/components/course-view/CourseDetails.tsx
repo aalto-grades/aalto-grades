@@ -19,7 +19,7 @@ function CourseDetails(props: {
   currentAssessmentModelId: number,
   onChangeAssessmentModel: (assessmentModel: AssessmentModelData) => void
 }): JSX.Element {
-  const { auth }: AuthContextType = useAuth();
+  const { auth, isTeacherInCharge }: AuthContextType = useAuth();
 
   return (
     <Box sx={{ display: 'inline-block' }}>
@@ -29,7 +29,7 @@ function CourseDetails(props: {
       }}>
         <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >
           Course Details
-          { auth.role == SystemRole.Admin &&
+          { (auth.role == SystemRole.Admin || isTeacherInCharge) &&
           <Tooltip title="Edit course details" placement="right">
             <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit course details">
               <EditIcon />
@@ -61,7 +61,7 @@ function CourseDetails(props: {
       <Box sx={{ mt: 1.5 }}>
         <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>
           Teachers in Charge
-          { auth.role == SystemRole.Admin &&
+          { (auth.role == SystemRole.Admin || isTeacherInCharge) &&
           <Tooltip title="Edit teachers in charge" placement="right">
             <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit teachers in charge">
               <EditIcon />
@@ -86,7 +86,7 @@ function CourseDetails(props: {
       <Box sx={{ mt: 1.5 }}>
         <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>
           Assessment Models
-          { auth.role == SystemRole.Admin &&
+          { (auth.role == SystemRole.Admin || isTeacherInCharge) &&
           <Tooltip title="Edit assessment models" placement="right">
             <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit assessment models">
               <EditIcon />
