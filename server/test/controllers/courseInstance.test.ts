@@ -10,8 +10,6 @@ import { app } from '../../src/app';
 import { HttpCode } from '../../src/types/httpCode';
 import { Cookies, getCookies } from '../util/getCookies';
 
-jest.mock('../../src/database/models/teacherInCharge');
-
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
 let cookies: Cookies = {
@@ -210,9 +208,16 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
   it(
     'should create new instance with correct input (teacher in charge of the course)',
     async () => {
-      (TeacherInCharge.findOne as jest.Mock).mockResolvedValueOnce({});
+      let res: supertest.Response = await request
+        .get('/v1/auth/self-info')
+        .set('Cookie', cookies.userCookie);
 
-      const res: supertest.Response = await request
+      const tempRole: TeacherInCharge = await TeacherInCharge.create({
+        courseId: 1,
+        userId: res.body.data.id
+      });
+
+      res = await request
         .post('/v1/courses/1/instances')
         .send({
           gradingScale: 'NUMERICAL',
@@ -229,6 +234,7 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
       expect(res.body.data.courseInstance.id).toBeDefined();
+      await tempRole.destroy();
     });
 
   it('should respond with 400 bad request, if incorrect input', async () => {
