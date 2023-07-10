@@ -16,6 +16,12 @@ let cookies: Cookies = {
   adminCookie: [],
   userCookie: []
 };
+const mockTeacher: TeacherInCharge = new TeacherInCharge({
+  userId: 1,
+  courseId: 1,
+  createdAt: new Date(),
+  updatedAt: new Date()
+}, { isNewRecord: false });
 
 beforeAll(async () => {
   cookies = await getCookies();
@@ -206,18 +212,11 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
   });
 
   it(
-    'should create new instance with correct input (teacher in charge of the course)',
+    'should create new instance with correct input (teacher in charge)',
     async () => {
-      let res: supertest.Response = await request
-        .get('/v1/auth/self-info')
-        .set('Cookie', cookies.userCookie);
+      jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
 
-      const tempRole: TeacherInCharge = await TeacherInCharge.create({
-        courseId: 1,
-        userId: res.body.data.id
-      });
-
-      res = await request
+      const res: supertest.Response = await request
         .post('/v1/courses/1/instances')
         .send({
           gradingScale: 'NUMERICAL',
@@ -234,7 +233,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
       expect(res.body.data.courseInstance.id).toBeDefined();
-      await tempRole.destroy();
     });
 
   it('should respond with 400 bad request, if incorrect input', async () => {

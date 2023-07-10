@@ -10,14 +10,18 @@ import { app } from '../../src/app';
 import { HttpCode } from '../../src/types/httpCode';
 import { Cookies, getCookies } from '../util/getCookies';
 
-jest.mock('../../src/database/models/teacherInCharge');
-
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
 let cookies: Cookies = {
   adminCookie: [],
   userCookie: []
 };
+const mockTeacher: TeacherInCharge = new TeacherInCharge({
+  userId: 1,
+  courseId: 1,
+  createdAt: new Date(),
+  updatedAt: new Date()
+}, { isNewRecord: false });
 
 beforeAll(async () => {
   cookies = await getCookies();
@@ -157,9 +161,9 @@ describe(
     });
 
     it(
-      'should add an assessment model when course exists (teacher in charge of the course)',
+      'should add an assessment model when course exists (teacher in charge)',
       async () => {
-        (TeacherInCharge.findOne as jest.Mock).mockResolvedValueOnce({});
+        jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
 
         const res: supertest.Response = await request
           .post('/v1/courses/1/assessment-models')
