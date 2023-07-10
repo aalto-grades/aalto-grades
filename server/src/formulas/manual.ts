@@ -5,22 +5,22 @@
 import * as yup from 'yup';
 
 import { registerFormula } from '.';
-import { AttainmentGradeData, Formula, Status } from 'aalto-grades-common/types';
+import { Formula, Status } from 'aalto-grades-common/types';
+import { CalculationResult } from '../types/formulas';
 
 /**
  * The 'Manual' formula requires a grade to be manually specified by a teacher.
  * The formula function of the 'Manual' formula is only called when a grade has
  * not been specified.
  */
-function manualGradeUnspecified(attainmentId: number): AttainmentGradeData {
+function manualGradeUnspecified(attainmentTag: string): CalculationResult {
   // If no grade has been input for a student, assume the attainment
   // has been failed.
   // TODO: This assumption should not be made.
   return {
-    attainmentId: attainmentId,
+    attainmentTag: attainmentTag,
     status: Status.Fail,
     grade: 0,
-    manual: false
   };
 }
 

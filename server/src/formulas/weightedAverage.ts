@@ -5,44 +5,44 @@
 import * as yup from 'yup';
 
 import { registerFormula } from '.';
-import { AttainmentGradeData, Formula, Status } from 'aalto-grades-common/types';
+import { Formula, Status } from 'aalto-grades-common/types';
 import { ApiError } from '../types/error';
+import { CalculationResult } from '../types/formulas';
 import { HttpCode } from '../types/httpCode';
 
 interface WeightedAverageParams {
-  weights: Array<[number, number]>;
+  weights: Array<[string, number]>;
 }
 
 function calculateWeightedAverage(
-  attainmentId: number, params: object | null, subGrades: Array<AttainmentGradeData>
-): AttainmentGradeData {
+  attainmentTag: string, params: object | null, subGrades: Array<CalculationResult>
+): CalculationResult {
 
   let grade: number = 0;
   let status: Status = Status.Pass;
 
   const formulaParams: WeightedAverageParams = params as WeightedAverageParams;
-  const weights: Map<number, number> = new Map(formulaParams.weights);
+  const weights: Map<string, number> = new Map(formulaParams.weights);
 
   for (const subGrade of subGrades) {
     if (subGrade.status !== Status.Pass)
       status = Status.Fail;
 
-    const weight: number | undefined = weights.get(subGrade.attainmentId);
+    const weight: number | undefined = weights.get(subGrade.attainmentTag);
     if (weight) {
       grade += subGrade.grade * weight;
     } else {
       throw new ApiError(
-        `weight unspecified for attainment with ID ${subGrade.attainmentId}`,
+        `weight unspecified for attainment with tag ${subGrade.attainmentTag}`,
         HttpCode.InternalServerError
       );
     }
   }
 
   return {
-    attainmentId: attainmentId,
+    attainmentTag: attainmentTag,
     grade: grade,
-    status: status,
-    manual: false
+    status: status
   };
 }
 

@@ -18,7 +18,7 @@ import User from '../database/models/user';
 import { AttainmentGradeData, Formula, Status } from 'aalto-grades-common/types';
 import { getFormulaImplementation } from '../formulas';
 import { ApiError } from '../types/error';
-import { FormulaNode } from '../types/formulas';
+import { CalculationResult, FormulaNode } from '../types/formulas';
 import { JwtClaims } from '../types/general';
 import { StudentGrades } from '../types/grades';
 import { HttpCode } from '../types/httpCode';
@@ -424,27 +424,12 @@ export async function calculateGrades(
    * Get all the attainments in this assessment model.
    */
 
-  interface AttainmentInfo {
-    id: number,
-    parentId: number,
-    formula: Formula,
-    formulaParams: object | null
-  }
-
-  const attainments: Array<AttainmentInfo> = await Attainment.findAll({
+  const attainments: Array<Attainment> = await Attainment.findAll({
     raw: true,
     where: {
       assessmentModelId: assessmentModel.id
-    },
-    attributes: [
-      'id',
-      'parentId',
-      'formula',
-      'parentFormulaParams',
-    ],
-    // Cast to unknown is required because AttainmentInfo does not extend the
-    // model type.
-  }) as unknown as Array<AttainmentInfo>;
+    }
+  });
 
   /*
    * Then we need to find the formulas used to calculate the grade of each
@@ -475,7 +460,8 @@ export async function calculateGrades(
       formulaImplementation: getFormulaImplementation(formula as Formula),
       subFormulaNodes: [],
       formulaParams: attainment.formulaParams,
-      attainmentId: attainment.id
+      attainmentId: attainment.id,
+      attainmentTag: attainment.tag
     });
   }
 
@@ -626,7 +612,7 @@ export async function calculateGrades(
     userId: number,
     formulaNode: FormulaNode,
     presetGrades: Map<FormulaNode, number>
-  ): AttainmentGradeData {
+  ): CalculationResult {
     /*
      * If a teacher has manually specified a grade for this attainment,
      * the manually specified grade will be used.
@@ -638,10 +624,9 @@ export async function calculateGrades(
     const presetGrade: number | undefined = presetGrades.get(formulaNode);
     if (presetGrade) {
       return {
-        attainmentId: formulaNode.attainmentId,
+        attainmentTag: formulaNode.attainmentTag,
         status: Status.Pass,
-        grade: presetGrade,
-        manual: true
+        grade: presetGrade
       };
     }
 
@@ -652,7 +637,7 @@ export async function calculateGrades(
      */
 
     // Inputs for the formula of this attainment.
-    const subGrades: Array<AttainmentGradeData> = [];
+    const subGrades: Array<CalculationResult> = [];
 
     // First, recursively calculate the grades the subattainments.
     for (const subFormulaNode of formulaNode.subFormulaNodes) {
@@ -661,9 +646,9 @@ export async function calculateGrades(
 
     // Then, calculate the grade of this attainment using the formula specified
     // for this attainment and the grades of the subattainments.
-    const calculated: AttainmentGradeData =
+    const calculated: CalculationResult =
       formulaNode.formulaImplementation.formulaFunction(
-        formulaNode.attainmentId, formulaNode.formulaParams, subGrades
+        formulaNode.attainmentTag, formulaNode.formulaParams, subGrades
       );
 
     calculatedGrades.push(
