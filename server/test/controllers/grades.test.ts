@@ -586,16 +586,17 @@ describe(
     });
 
     it('should calculate multiple correct grades', async () => {
+      jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
       checkSuccessRes(await request
         .post('/v1/courses/1/assessment-models/26/grades/calculate')
         .send({
           studentNumbers: ['238447', '197232', '265136']
         })
-        .set('Cookie', cookies.adminCookie));
+        .set('Cookie', cookies.userCookie));
 
-      checkGrade(231, 391, 1.5, cookies.adminCookie);
-      checkGrade(231, 392, 4.75, cookies.adminCookie);
-      checkGrade(231, 393, 3.25, cookies.adminCookie);
+      checkGrade(231, 391, 1.5, cookies.userCookie);
+      checkGrade(231, 392, 4.75, cookies.userCookie);
+      checkGrade(231, 393, 3.25, cookies.userCookie);
     });
 
     it('should calculate correct grades in higher depths', async () => {

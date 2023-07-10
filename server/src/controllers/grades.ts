@@ -864,32 +864,6 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
     });
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**
  * Get course instance final grading data in JSON format.
  * @param {Request} req - The HTTP request.
