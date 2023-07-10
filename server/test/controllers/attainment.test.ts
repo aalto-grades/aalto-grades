@@ -59,7 +59,7 @@ function evaluateSubAttainment(attainment: AttainmentData): void {
   expect(attainment.parentId).toBeDefined();
   expect(attainment.tag).toBeDefined();
   expect(attainment.formula).toBeDefined();
-  expect(attainment.parentFormulaParams).toBeDefined();
+  expect(attainment.formulaParams).toBeDefined();
   expect(attainment.daysValid).toBeDefined();
 }
 
@@ -93,7 +93,7 @@ describe(
         expect(res.body.data.attainment.parentId).toBe(null);
         expect(res.body.data.attainment.tag).toBe('tag of the new one');
         expect(res.body.data.attainment.formula).toBe(Formula.Manual);
-        expect(res.body.data.attainment.parentFormulaParams).toBe(null);
+        expect(res.body.data.attainment.formulaParams).toBe(null);
         expect(res.body.data.attainment.daysValid).toBeDefined();
         expect(res.body.data.attainment.subAttainments).toBeDefined();
       }
@@ -130,7 +130,7 @@ describe(
         .post('/v1/courses/3/assessment-models/3/attainments')
         .send({
           parentId: 3,
-          parentFormulaParams: {
+          formulaParams: {
             weight: 1
           },
           ...mockAttainment
@@ -205,7 +205,7 @@ describe(
           .post('/v1/courses/3/assessment-models/3/attainments')
           .send({
             parentId: 3,
-            parentFormulaParams: {
+            formulaParams: {
               wrong: 'yep',
               somethingIncorrect: {
                 veryIncorrect: true
@@ -243,7 +243,7 @@ describe(
             tag: 'not success',
             daysValid: 6000,
             formula: Formula.WeightedAverage,
-            parentFormulaParams: {
+            formulaParams: {
               weight: 1
             },
             subAttainments: [
@@ -252,7 +252,7 @@ describe(
                 tag: 'sub not success',
                 daysValid: 6,
                 formula: Formula.Manual,
-                parentFormulaParams: {
+                formulaParams: {
                   wrongAgain: 5
                 }
               }
@@ -715,7 +715,7 @@ describe(
         const res: supertest.Response = await request
           .put('/v1/courses/1/assessment-models/1/attainments/5')
           .send({
-            parentFormulaParams: {}
+            formulaParams: {}
           })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)

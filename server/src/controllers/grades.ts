@@ -15,12 +15,12 @@ import AttainmentGrade from '../database/models/attainmentGrade';
 import Course from '../database/models/course';
 import User from '../database/models/user';
 
-import { Formula } from 'aalto-grades-common/types';
+import { AttainmentGradeData, Formula, Status } from 'aalto-grades-common/types';
 import { getFormulaImplementation } from '../formulas';
 import { ApiError } from '../types/error';
-import { FormulaNode, CalculationInput, CalculationResult } from '../types/formulas';
+import { FormulaNode } from '../types/formulas';
 import { JwtClaims } from '../types/general';
-import { AttainmentGradeData, Status, StudentGrades } from '../types/grades';
+import { StudentGrades } from '../types/grades';
 import { HttpCode } from '../types/httpCode';
 import { validateCourseAndAssessmentModel } from './utils/assessmentModel';
 
@@ -428,7 +428,7 @@ export async function calculateGrades(
     id: number,
     parentId: number,
     formula: Formula,
-    parentFormulaParams: object | null
+    formulaParams: object | null
   }
 
   const attainments: Array<AttainmentInfo> = await Attainment.findAll({
@@ -474,7 +474,7 @@ export async function calculateGrades(
     formulaNodesByAttainmentId.set(attainment.id, {
       formulaImplementation: getFormulaImplementation(formula as Formula),
       subFormulaNodes: [],
-      parentFormulaParams: attainment.parentFormulaParams,
+      formulaParams: attainment.formulaParams,
       attainmentId: attainment.id
     });
   }
@@ -533,15 +533,6 @@ export async function calculateGrades(
        */
 
       const parentFormulaNode: FormulaNode = getFormulaNode(attainment.parentId);
-
-      /*
-       * Ensure that the parent formula parameters specified for this attainment
-       * match the schema of the parent attainment's formula.
-       */
-      await parentFormulaNode.formulaImplementation.paramSchema.validate(
-        formulaNode.parentFormulaParams
-      );
-
       parentFormulaNode.subFormulaNodes.push(formulaNode);
     }
   }
@@ -631,11 +622,11 @@ export async function calculateGrades(
    * Recursively calculates the grade for a particular attainment by its formula
    * node.
    */
-  async function calculateFormulaNode(
+  function calculateFormulaNode(
     userId: number,
     formulaNode: FormulaNode,
     presetGrades: Map<FormulaNode, number>
-  ): Promise<CalculationResult> {
+  ): AttainmentGradeData {
     /*
      * If a teacher has manually specified a grade for this attainment,
      * the manually specified grade will be used.
@@ -647,8 +638,10 @@ export async function calculateGrades(
     const presetGrade: number | undefined = presetGrades.get(formulaNode);
     if (presetGrade) {
       return {
+        attainmentId: formulaNode.attainmentId,
         status: Status.Pass,
-        grade: presetGrade
+        grade: presetGrade,
+        manual: true
       };
     }
 
@@ -659,22 +652,19 @@ export async function calculateGrades(
      */
 
     // Inputs for the formula of this attainment.
-    const inputs: Array<CalculationInput> = [];
+    const subGrades: Array<AttainmentGradeData> = [];
 
     // First, recursively calculate the grades the subattainments.
     for (const subFormulaNode of formulaNode.subFormulaNodes) {
-      const input: CalculationInput = {
-        subResult: await calculateFormulaNode(userId, subFormulaNode, presetGrades),
-        params: subFormulaNode.parentFormulaParams
-      };
-
-      inputs.push(input);
+      subGrades.push(calculateFormulaNode(userId, subFormulaNode, presetGrades));
     }
 
     // Then, calculate the grade of this attainment using the formula specified
     // for this attainment and the grades of the subattainments.
-    const calculated: CalculationResult =
-      await formulaNode.formulaImplementation.formulaFunction(inputs);
+    const calculated: AttainmentGradeData =
+      formulaNode.formulaImplementation.formulaFunction(
+        formulaNode.attainmentId, formulaNode.formulaParams, subGrades
+      );
 
     calculatedGrades.push(
       {
@@ -691,7 +681,7 @@ export async function calculateGrades(
   }
 
   for (const [userId, presetGrades] of organizedPresetGrades) {
-    await calculateFormulaNode(userId, rootFormulaNode, presetGrades);
+    calculateFormulaNode(userId, rootFormulaNode, presetGrades);
   }
 
   await sequelize.transaction(async (transaction: Transaction) => {

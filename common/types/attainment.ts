@@ -11,7 +11,7 @@ export interface AttainmentData {
   tag: string,
   name: string,
   formula?: Formula,
-  parentFormulaParams?: object,
+  formulaParams?: object,
   daysValid: number,
   subAttainments?: Array<AttainmentData>
 }

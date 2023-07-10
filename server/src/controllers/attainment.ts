@@ -39,7 +39,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       .string()
       .oneOf(Object.values(Formula))
       .notRequired(),
-    parentFormulaParams: yup // More thorough validation is done later
+    formulaParams: yup // More thorough validation is done later
       .object()
       .nullable()
       .notRequired(),
@@ -61,7 +61,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
   const tag: string = req.body.tag;
   const daysValid: number = req.body.daysValid;
   const formula: Formula | undefined = req.body.formula;
-  const parentFormulaParams: object | undefined = req.body.parentFormulaParams;
+  const formulaParams: object | undefined = req.body.formulaParams;
   const requestSubAttainments: Array<AttainmentData> | undefined = req.body.subAttainments;
   let subAttainments: Array<AttainmentData> = [];
 
@@ -85,7 +85,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     // parent attainment
     const parentFormula: FormulaImplementation =
       getFormulaImplementation(parentAttainment.formula);
-    await parentFormula.paramSchema.validate(parentFormulaParams);
+    await parentFormula.paramSchema.validate(formulaParams);
   }
 
   async function validateFormulaParams(
@@ -93,7 +93,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     parentFormula: FormulaImplementation
   ): Promise<void> {
     for (const attainment of attainments) {
-      await parentFormula.paramSchema.validate(attainment.parentFormulaParams);
+      await parentFormula.paramSchema.validate(attainment.formulaParams);
       if (attainment.subAttainments) {
         await validateFormulaParams(
           attainment.subAttainments,
@@ -117,7 +117,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     tag: tag,
     daysValid: daysValid,
     formula: formula ?? Formula.Manual,
-    parentFormulaParams: parentFormulaParams
+    formulaParams: formulaParams
   });
 
   async function processSubAttainments(
@@ -134,7 +134,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
         tag: attainment.tag,
         daysValid: attainment.daysValid,
         formula: attainment.formula ?? Formula.Manual,
-        parentFormulaParams: attainment.parentFormulaParams
+        formulaParams: attainment.formulaParams
       });
 
       if (attainment.subAttainments && attainment.subAttainments.length > 0) {
@@ -147,7 +147,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
         name: dbEntry.name,
         tag: dbEntry.tag,
         formula: dbEntry.formula,
-        parentFormulaParams: dbEntry.parentFormulaParams,
+        formulaParams: dbEntry.formulaParams,
         daysValid: dbEntry.daysValid,
         parentId: dbEntry.parentId,
         subAttainments: subAttainments
@@ -166,7 +166,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     name: attainment.name,
     tag: attainment.tag,
     formula: attainment.formula,
-    parentFormulaParams: attainment.parentFormulaParams,
+    formulaParams: attainment.formulaParams,
     daysValid: attainment.daysValid,
     parentId: attainment.parentId,
     subAttainments: subAttainments
@@ -226,7 +226,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
       })
       .oneOf(Object.values(Formula))
       .notRequired(),
-    parentFormulaParams: yup // More thorough validation is done later
+    formulaParams: yup // More thorough validation is done later
       .object()
       .nullable()
       .notRequired(),
@@ -244,7 +244,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   const daysValid: number | undefined = req.body.daysValid;
   const parentId: number | undefined = req.body.parentId;
   const formula: Formula | undefined = req.body.formula;
-  const parentFormulaParams: object | undefined = req.body.parentFormulaParams;
+  const formulaParams: object | undefined = req.body.formulaParams;
 
   const attainment: Attainment = await findAttainmentById(attainmentId, HttpCode.NotFound);
   let parentAttainment: Attainment | null = null;
@@ -283,8 +283,8 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   if (parentAttainment) {
     const parentFormula: FormulaImplementation =
       getFormulaImplementation(parentAttainment.formula);
-    await parentFormula.paramSchema.validate(parentFormulaParams);
-  } else if (parentFormulaParams) {
+    await parentFormula.paramSchema.validate(formulaParams);
+  } else if (formulaParams) {
     throw new ApiError(
       'root attainment can\'t have parent formula params',
       HttpCode.Conflict
@@ -297,7 +297,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     daysValid: daysValid ?? attainment.daysValid,
     parentId: parentId ?? attainment.parentId,
     formula: formula ?? attainment.formula,
-    parentFormulaParams: parentFormulaParams ?? attainment.parentFormulaParams
+    formulaParams: formulaParams ?? attainment.formulaParams
   }).save();
 
   const attainmentTree: AttainmentData = {
@@ -306,7 +306,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     name: attainment.name,
     tag: attainment.tag,
     formula: attainment.formula,
-    parentFormulaParams: attainment.parentFormulaParams,
+    formulaParams: attainment.formulaParams,
     daysValid: attainment.daysValid,
     parentId: attainment.parentId
   };
