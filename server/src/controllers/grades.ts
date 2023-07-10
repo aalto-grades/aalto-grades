@@ -15,7 +15,7 @@ import AttainmentGrade from '../database/models/attainmentGrade';
 import Course from '../database/models/course';
 import User from '../database/models/user';
 
-import { Formula, SystemRole } from 'aalto-grades-common/types';
+import { Formula } from 'aalto-grades-common/types';
 import { getFormulaImplementation } from '../formulas';
 import { ApiError } from '../types/error';
 import { FormulaNode, CalculationInput, CalculationResult } from '../types/formulas';
@@ -23,7 +23,7 @@ import { JwtClaims } from '../types/general';
 import { AttainmentGradeData, Status, StudentGrades } from '../types/grades';
 import { HttpCode } from '../types/httpCode';
 import { validateCourseAndAssessmentModel } from './utils/assessmentModel';
-import { isTeacherInCharge } from './utils/user';
+import { isTeacherInChargeOrAdmin } from './utils/user';
 
 async function studentNumbersExist(studentNumbers: Array<string>): Promise<void> {
   const foundStudentNumbers: Array<string> = (await User.findAll({
@@ -48,27 +48,13 @@ async function studentNumbersExist(studentNumbers: Array<string>): Promise<void>
   }
 }
 
-
-
-
-
-
-
-
-
 export async function getCsvTemplate(req: Request, res: Response): Promise<void> {
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateCourseAndAssessmentModel(
       req.params.courseId, req.params.assessmentModelId
     );
 
-  // Route is only available for admins and those who have teacher in charge role for the course.
-  const user: JwtClaims = req.user as JwtClaims;
-
-  if (user.role !== SystemRole.Admin) {
-    // Confirm that user is teacher in charge of the course.
-    await isTeacherInCharge(user.id, course.id, HttpCode.Forbidden);
-  }
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
   const attainmentTags: Array<string> = (await Attainment.findAll({
     attributes: ['tag'],
@@ -104,14 +90,6 @@ export async function getCsvTemplate(req: Request, res: Response): Promise<void>
     }
   );
 }
-
-
-
-
-
-
-
-
 
 /**
  * Parse and extract attainment IDs from the CSV file header.
@@ -263,17 +241,6 @@ export function parseGradesFromCsv(
   return students;
 }
 
-
-
-
-
-
-
-
-
-
-
-
 /**
  * Asynchronously adds grades from a CSV file to the database.
  * @param {Request} req - The HTTP request containing the CSV file.
@@ -294,11 +261,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
       req.params.courseId, req.params.assessmentModelId
     );
 
-  // Route is only available for admins and those who have teacher in charge role for the course.
-  if (grader.role !== SystemRole.Admin) {
-    // Confirm that user is teacher in charge of the course.
-    await isTeacherInCharge(grader.id, course.id, HttpCode.Forbidden);
-  }
+  await isTeacherInChargeOrAdmin(grader, course.id, HttpCode.Forbidden);
 
   if (!req?.file) {
     throw new ApiError(
@@ -431,26 +394,6 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
   parser.end();
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export async function calculateGrades(
   req: Request,
   res: Response
@@ -468,11 +411,7 @@ export async function calculateGrades(
 
   const grader: JwtClaims = req.user as JwtClaims;
 
-  // Route is only available for admins and those who have teacher in charge role for the course.
-  if (grader.role !== SystemRole.Admin) {
-    // Confirm that user is teacher in charge of the course.
-    await isTeacherInCharge(grader.id, course.id, HttpCode.Forbidden);
-  }
+  await isTeacherInChargeOrAdmin(grader, course.id, HttpCode.Forbidden);
 
   /*
    * First ensure that all students to be included in the calculation exist in
@@ -828,25 +767,6 @@ async function getFinalGradesFor(
   return finalGrades;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**
  * Get grading data formatted to Sisu compatible format for exporting grades to Sisu.
  * Documentation and requirements for Sisu CSV file structure available at
@@ -882,11 +802,12 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
     studentNumbers: Array<string> | undefined
   } = await urlParams.validate(req.query, { abortEarly: false });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateCourseAndAssessmentModel(
       req.params.courseId, req.params.assessmentModelId
     );
+
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
   if (studentNumbers)
     studentNumbersExist(studentNumbers);
@@ -895,8 +816,6 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
    * TODO:
    * - only one grade per user per instance is allowed,
    *   what if grades are recalculated, should we keep track of old grades?
-   * - Define and implement authorization on who has the access rights to trigger export,
-   *   Sisu allows teacher and responsible teacher of the implementation to save grades to Sisu.
    */
 
   const finalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
@@ -945,6 +864,32 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
     });
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * Get course instance final grading data in JSON format.
  * @param {Request} req - The HTTP request.
@@ -965,11 +910,12 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
     studentNumbers: Array<string> | undefined
   } = await urlParams.validate(req.query, { abortEarly: false });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateCourseAndAssessmentModel(
       req.params.courseId, req.params.assessmentModelId
     );
+
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
   if (studentNumbers)
     studentNumbersExist(studentNumbers);
