@@ -4,9 +4,13 @@
 
 import supertest from 'supertest';
 
+import TeacherInCharge from '../../src/database/models/teacherInCharge';
+
 import { app } from '../../src/app';
 import { HttpCode } from '../../src/types/httpCode';
 import { Cookies, getCookies } from '../util/getCookies';
+
+jest.mock('../../src/database/models/teacherInCharge');
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
@@ -131,7 +135,7 @@ describe(
 );
 
 describe(
-  'XXX Test POST /v1/courses/:courseId/assessment-models - add assessment model',
+  'Test POST /v1/courses/:courseId/assessment-models - add assessment model',
   () => {
 
     it('should add an assessment model when course exists (admin user)', async () => {
@@ -155,6 +159,8 @@ describe(
     it(
       'should add an assessment model when course exists (teacher in charge of the course)',
       async () => {
+        (TeacherInCharge.findOne as jest.Mock).mockResolvedValueOnce({});
+
         const res: supertest.Response = await request
           .post('/v1/courses/1/assessment-models')
           .send({

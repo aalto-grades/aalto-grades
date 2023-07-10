@@ -4,9 +4,13 @@
 
 import supertest from 'supertest';
 
+import TeacherInCharge from '../../src/database/models/teacherInCharge';
+
 import { app } from '../../src/app';
 import { HttpCode } from '../../src/types/httpCode';
 import { Cookies, getCookies } from '../util/getCookies';
+
+jest.mock('../../src/database/models/teacherInCharge');
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
@@ -158,7 +162,7 @@ describe(
 
   });
 
-describe('XXX Test POST /v1/courses/:courseId/instances - create new course instance', () => {
+describe('Test POST /v1/courses/:courseId/instances - create new course instance', () => {
 
   it('should create new instance with correct input (admin user)', async () => {
     async function goodInput(input: object): Promise<void> {
@@ -206,7 +210,7 @@ describe('XXX Test POST /v1/courses/:courseId/instances - create new course inst
   it(
     'should create new instance with correct input (teacher in charge of the course)',
     async () => {
-
+      (TeacherInCharge.findOne as jest.Mock).mockResolvedValueOnce({});
 
       const res: supertest.Response = await request
         .post('/v1/courses/1/instances')
