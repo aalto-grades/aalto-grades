@@ -695,7 +695,12 @@ export async function calculateGrades(
   }
 
   await sequelize.transaction(async (transaction: Transaction) => {
-    await AttainmentGrade.bulkCreate(calculatedGrades, { transaction });
+    await AttainmentGrade.bulkCreate(calculatedGrades,
+      {
+        updateOnDuplicate: ['grade', 'graderId', 'status'],
+        transaction
+      }
+    );
   });
 
   res.status(HttpCode.Ok).json({
