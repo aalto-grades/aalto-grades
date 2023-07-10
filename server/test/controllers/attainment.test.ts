@@ -90,7 +90,7 @@ describe(
         expect(res.body.data.attainment.id).toBeDefined();
         expect(res.body.data.attainment.name).toBe('New');
         expect(res.body.data.attainment.assessmentModelId).toBe(31);
-        expect(res.body.data.attainment.parentId).toBe(null);
+        expect(res.body.data.attainment.parentId).not.toBeDefined();
         expect(res.body.data.attainment.tag).toBe('tag of the new one');
         expect(res.body.data.attainment.formula).toBe(Formula.Manual);
         expect(res.body.data.attainment.formulaParams).toBe(null);
@@ -114,7 +114,7 @@ describe(
         expect(res.body.data.attainment.id).toBeDefined();
         expect(res.body.data.attainment.assessmentModelId).toBe(32);
         expect(res.body.data.attainment.name).toBe(mockAttainment.name);
-        expect(res.body.data.attainment.parentId).toBe(null);
+        expect(res.body.data.attainment.parentId).not.toBeDefined();
         expect(res.body.data.attainment.tag).toBeDefined();
         expect(res.body.data.attainment.formula).toBeDefined();
         expect(res.body.data.attainment.daysValid).toBeDefined();
@@ -130,9 +130,6 @@ describe(
         .post('/v1/courses/3/assessment-models/3/attainments')
         .send({
           parentId: 3,
-          formulaParams: {
-            weight: 1
-          },
           ...mockAttainment
         })
         .set('Content-Type', 'application/json')
@@ -214,7 +211,7 @@ describe(
             name: 'Failure',
             tag: 'not success',
             daysValid: 6000,
-            formula: Formula.Manual
+            formula: Formula.WeightedAverage
           })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)

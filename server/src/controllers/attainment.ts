@@ -39,7 +39,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       .string()
       .oneOf(Object.values(Formula))
       .notRequired(),
-    formulaParams: yup // More thorough validation is done later
+    formulaParams: yup // More thorough validation is done separately
       .object()
       .nullable()
       .notRequired(),
@@ -56,121 +56,82 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       req.params.courseId, req.params.assessmentModelId
     );
 
-  const parentId: number | undefined = req.body.parentId;
-  const name: string = req.body.name;
-  const tag: string = req.body.tag;
-  const daysValid: number = req.body.daysValid;
-  const formula: Formula | undefined = req.body.formula;
-  const formulaParams: object | undefined = req.body.formulaParams;
-  const requestSubAttainments: Array<AttainmentData> | undefined = req.body.subAttainments;
-  let subAttainments: Array<AttainmentData> = [];
+  const requestTree: AttainmentData = req.body;
 
-  // If linked to a parent ID...
-  if (parentId) {
-    // 1. Ensure that it exists
+  // If linked to a parent ID ensure that the parent attainment exists and
+  // belongs to the same assessment model
+  if (requestTree.parentId) {
     const parentAttainment: Attainment = await findAttainmentById(
-      parentId, HttpCode.UnprocessableEntity
+      requestTree.parentId, HttpCode.UnprocessableEntity
     );
 
-    // 2. Ensure that it belongs to the same assessment model
     if (parentAttainment.assessmentModelId !== assessmentModel.id) {
       throw new ApiError(
-        `parent attainment ID ${parentId} does not belong ` +
+        `parent attainment ID ${requestTree.parentId} does not belong ` +
         `to the assessment model ID ${assessmentModel.id}`,
         HttpCode.Conflict
       );
     }
-
-    // 3. Ensure that the given parent formula params match the formula of the
-    // parent attainment
-    const parentFormula: FormulaImplementation =
-      getFormulaImplementation(parentAttainment.formula);
-    await parentFormula.paramSchema.validate(formulaParams);
   }
 
   async function validateFormulaParams(
-    attainments: Array<AttainmentData>,
-    parentFormula: FormulaImplementation
+    attainmentTree: AttainmentData
   ): Promise<void> {
-    for (const attainment of attainments) {
-      await parentFormula.paramSchema.validate(attainment.formulaParams);
-      if (attainment.subAttainments) {
-        await validateFormulaParams(
-          attainment.subAttainments,
-          getFormulaImplementation(attainment.formula ?? Formula.Manual)
+    if (attainmentTree.formula) {
+      getFormulaImplementation(attainmentTree.formula).paramSchema.validate(
+        attainmentTree.formulaParams, { abortEarly: false }
+      );
+    }
+
+    if (attainmentTree.subAttainments) {
+      for (const subTree of attainmentTree.subAttainments) {
+        await validateFormulaParams(subTree);
+      }
+    }
+  }
+
+  await validateFormulaParams(req.body);
+
+  async function processAttainmentTree(
+    requestTree: AttainmentData, parentId: number | undefined
+  ): Promise<AttainmentData> {
+
+    const dbEntry: Attainment = await Attainment.create({
+      parentId: parentId,
+      assessmentModelId: assessmentModel.id,
+      name: requestTree.name,
+      tag: requestTree.tag,
+      daysValid: requestTree.daysValid,
+      formula: requestTree.formula ?? Formula.Manual,
+      formulaParams: requestTree.formulaParams
+    });
+
+    const attainmentTree: AttainmentData = {
+      id: dbEntry.id,
+      parentId: dbEntry.parentId ?? undefined,
+      assessmentModelId: dbEntry.assessmentModelId,
+      name: dbEntry.name,
+      tag: dbEntry.tag,
+      daysValid: dbEntry.daysValid,
+      formula: dbEntry.formula,
+      formulaParams: dbEntry.formulaParams,
+      subAttainments: []
+    };
+
+    if (requestTree.subAttainments) {
+      for (const requestSubTree of requestTree.subAttainments) {
+        attainmentTree.subAttainments?.push(
+          await processAttainmentTree(requestSubTree, dbEntry.id)
         );
       }
     }
+
+    return attainmentTree;
   }
 
-  if (requestSubAttainments) {
-    await validateFormulaParams(
-      requestSubAttainments,
-      getFormulaImplementation(formula ?? Formula.Manual)
-    );
-  }
-
-  const attainment: Attainment = await Attainment.create({
-    assessmentModelId: assessmentModel.id,
-    parentId: parentId,
-    name: name,
-    tag: tag,
-    daysValid: daysValid,
-    formula: formula ?? Formula.Manual,
-    formulaParams: formulaParams
-  });
-
-  async function processSubAttainments(
-    unprocessedAttainments: Array<AttainmentData>, parentId: number
-  ): Promise<Array<AttainmentData>> {
-    const attainments: Array<AttainmentData> = [];
-    let subAttainments: Array<AttainmentData> = [];
-
-    for (const attainment of unprocessedAttainments) {
-      const dbEntry: Attainment = await Attainment.create({
-        parentId,
-        assessmentModelId: assessmentModel.id,
-        name: attainment.name,
-        tag: attainment.tag,
-        daysValid: attainment.daysValid,
-        formula: attainment.formula ?? Formula.Manual,
-        formulaParams: attainment.formulaParams
-      });
-
-      if (attainment.subAttainments && attainment.subAttainments.length > 0) {
-        subAttainments = await processSubAttainments(attainment.subAttainments, dbEntry.id);
-      }
-
-      attainments.push({
-        id: dbEntry.id,
-        assessmentModelId: dbEntry.id,
-        name: dbEntry.name,
-        tag: dbEntry.tag,
-        formula: dbEntry.formula,
-        formulaParams: dbEntry.formulaParams,
-        daysValid: dbEntry.daysValid,
-        parentId: dbEntry.parentId,
-        subAttainments: subAttainments
-      });
-    }
-    return attainments;
-  }
-
-  if (requestSubAttainments) {
-    subAttainments = await processSubAttainments(requestSubAttainments, attainment.id);
-  }
-
-  const attainmentTree: AttainmentData = {
-    id: attainment.id,
-    assessmentModelId: attainment.assessmentModelId,
-    name: attainment.name,
-    tag: attainment.tag,
-    formula: attainment.formula,
-    formulaParams: attainment.formulaParams,
-    daysValid: attainment.daysValid,
-    parentId: attainment.parentId,
-    subAttainments: subAttainments
-  };
+  const attainmentTree: AttainmentData = await processAttainmentTree(
+    requestTree, requestTree.parentId
+  );
 
   res.status(HttpCode.Ok).json({
     success: true,
