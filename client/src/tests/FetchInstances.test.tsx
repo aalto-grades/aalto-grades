@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, RenderResult, screen, waitFor, cleanup } from '@testing-library/react';
 import FetchInstancesView from '../components/FetchInstancesView';
@@ -20,9 +20,14 @@ describe('Tests for FetchInstancesView components', () => {
     jest.spyOn(instanceServices, 'getSisuInstances').mockResolvedValue(mockSisuInstances);
 
     return render(
-      <BrowserRouter>
-        <FetchInstancesView />
-      </BrowserRouter>
+      <MemoryRouter initialEntries={['/1/fetch-instances/ABCDEFG']}>
+        <Routes>
+          <Route
+            path='/:courseId/fetch-instances/:courseCode'
+            element={<FetchInstancesView />}
+          />
+        </Routes>
+      </MemoryRouter>
     );
   }
 

@@ -16,7 +16,7 @@ import Tooltip from '@mui/material/Tooltip';
 function CourseDetails(props: {
   course: CourseData,
   assessmentModels: Array<AssessmentModelData>,
-  currentAssessmentModelId: number,
+  currentAssessmentModelId?: number,
   onChangeAssessmentModel: (assessmentModel: AssessmentModelData) => void
 }): JSX.Element {
   const { auth, isTeacherInCharge }: AuthContextType = useAuth();
@@ -100,7 +100,7 @@ function CourseDetails(props: {
           bgcolor: 'secondary.light', p: 1.5, mt: 1, minWidth: '318px'
         }}>
           {
-            props.assessmentModels.length > 0 ?
+            (props.assessmentModels.length > 0 && props.currentAssessmentModelId) ?
               <AssessmentModelsList
                 data={props.assessmentModels}
                 current={props.currentAssessmentModelId}
@@ -108,7 +108,7 @@ function CourseDetails(props: {
               />
               :
               <Box sx={{ py: 2 }}>
-                No assesment models found. Please create a new assessment model.
+                No assessment models found. Please create a new assessment model.
               </Box>
           }
         </Box>

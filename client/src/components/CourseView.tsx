@@ -143,15 +143,12 @@ function CourseView(): JSX.Element {
           </Box>
           <Box sx={{ display: 'flex', gap: 3 }}>
             <div>
-              {
-                (currentAssessmentModel && currentAssessmentModel.id) &&
-                <CourseDetails
-                  course={course}
-                  assessmentModels={assessmentModels}
-                  currentAssessmentModelId={currentAssessmentModel.id}
-                  onChangeAssessmentModel={onChangeAssessmentModel}
-                />
-              }
+              <CourseDetails
+                course={course}
+                assessmentModels={assessmentModels}
+                currentAssessmentModelId={currentAssessmentModel?.id}
+                onChangeAssessmentModel={onChangeAssessmentModel}
+              />
             </div>
             {
               /* a different attainment component will be created for students */
