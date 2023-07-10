@@ -9,7 +9,7 @@ import {
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import SelectFormulaForm from './select-formula-view/SelectFormulaForm';
-import formulasService from '../services/formulas';
+import formulaServices from '../services/formulas';
 import attainmentServices from '../services/attainments';
 import { State } from '../types';
 import { AttainmentData, FormulaPreview } from 'aalto-grades-common/types';
@@ -39,7 +39,7 @@ function SelectFormulaView(): JSX.Element {
   }
 
   function navigateToAttributeSelection(): void {
-    formulasService.getFormulaDetails(selectedFormula.id).then((formula: FormulaPreview) => {
+    formulaServices.getFormulaDetails(selectedFormula.id).then((formula: FormulaPreview) => {
       setSelectedFormula(formula);
       navigate(`/${courseId}/formula-attributes/${assessmentModelId}`, { replace: true });
     }).catch((exception: Error) => {

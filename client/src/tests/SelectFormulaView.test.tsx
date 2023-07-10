@@ -7,7 +7,7 @@ import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SelectFormulaView from '../components/SelectFormulaView';
-import formulasService from '../services/formulas';
+import formulaServices from '../services/formulas';
 import FormulaSelectionRoute from '../context/FormulaSelectionRoute';
 import mockFormulas from './mock-data/mockFormulas';
 import mockAttainments from './mock-data/mockAttainments';
@@ -20,9 +20,9 @@ afterEach(cleanup);
 describe('Tests for SelectFormulaView components', () => {
 
   async function renderSelectFormulaView() {
-    (formulasService.getFormulas as jest.Mock).mockRejectedValue('Network error');
-    (formulasService.getFormulas as jest.Mock).mockRejectedValue(mockFormulas);
-    jest.spyOn(formulasService, 'getFormulaDetails').mockResolvedValue(mockFormulas[0]);
+    (formulaServices.getFormulas as jest.Mock).mockRejectedValue('Network error');
+    (formulaServices.getFormulas as jest.Mock).mockRejectedValue(mockFormulas);
+    jest.spyOn(formulaServices, 'getFormulaDetails').mockResolvedValue(mockFormulas[0]);
     jest.spyOn(attainmentServices, 'getAllAttainments').mockResolvedValue(mockAttainments);
 
     return render(

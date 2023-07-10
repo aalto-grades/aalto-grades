@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 import SimpleDialog from './SimpleDialog';
 import ConfirmationDialog from './ConfirmationDialog';
 import StringTextField from './StringTextField';
-import formulaService from '../../services/formulas';
+import formulaServices from '../../services/formulas';
 import { State, TextFieldData } from '../../types';
 import { AttainmentData } from 'aalto-grades-common/types';
 
@@ -42,7 +42,7 @@ function AttributeTextFields({
 }: any) {
   return (
     formulaAttributeNames.map((attribute: any) => {
-      const attributeLabel = formulaService.getAttributeLabel(attribute);
+      const attributeLabel = formulaServices.getAttributeLabel(attribute);
       return (
         <StringTextField
           key={attribute}

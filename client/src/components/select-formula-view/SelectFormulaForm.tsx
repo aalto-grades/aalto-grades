@@ -25,7 +25,7 @@ import ViewFormulaAccordion from './ViewFormulaAccordion';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
 import { sleep } from '../../utils';
-import formulasService from '../../services/formulas';
+import formulaServices from '../../services/formulas';
 import { AttainmentData, FormulaData, FormulaPreview } from 'aalto-grades-common/types';
 import CircularProgress from '@mui/material/CircularProgress';
 import { State } from '../../types';
@@ -52,7 +52,7 @@ function SelectFormulaForm(props: {
 
   useEffect(() => {
     if (formulas.length == 0) {
-      formulasService.getFormulas()
+      formulaServices.getFormulas()
         .then((data: Array<FormulaData>) => {
           setFormulas(data);
         })
@@ -101,7 +101,8 @@ function SelectFormulaForm(props: {
     event.preventDefault();
     if (canBeSubmitted()) {
       try {
-        const formula: FormulaPreview = await formulasService.getFormulaDetails(selectedFormula.id);
+        const formula: FormulaPreview =
+          await formulaServices.getFormulaDetails(selectedFormula.id);
         setSelectedFormula(formula);
 
         const updatedAttainments: any = selectedAttainments.map((attainment: AttainmentData) => {

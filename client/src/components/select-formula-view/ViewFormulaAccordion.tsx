@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Container from '@mui/material/Container';
 import { styled } from '@mui/material/styles';
-import formulasService from '../../services/formulas';
+import formulaServices from '../../services/formulas';
 import { Box, CircularProgress } from '@mui/material';
 import { State } from '../../types';
 import { Formula, FormulaPreview } from 'aalto-grades-common/types';
@@ -29,7 +29,7 @@ function ViewFormulaAccordion(props: {
 
   useEffect(() => {
     if (props.formulaId) {
-      formulasService.getFormulaDetails(props.formulaId)
+      formulaServices.getFormulaDetails(props.formulaId)
         .then((data: FormulaPreview) => {
           setCodeSnippet(data.codeSnippet);
         })

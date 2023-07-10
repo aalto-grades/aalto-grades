@@ -8,7 +8,7 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import CourseTable from './front-page/CourseTable';
-import coursesService from '../services/courses';
+import courseServices from '../services/courses';
 import useAuth, { AuthContextType } from '../hooks/useAuth';
 import { CourseData, SystemRole } from 'aalto-grades-common/types';
 import { State } from '../types';
@@ -25,14 +25,14 @@ function FrontPage(): JSX.Element {
 
   useEffect(() => {
     if (auth) {
-      coursesService.getCoursesOfUser(auth.id)
+      courseServices.getCoursesOfUser(auth.id)
         .then((data: Array<CourseData>) => {
           setCoursesOfUser(data);
         })
         .catch((e) => console.log(e.message));
     }
 
-    coursesService.getAllCourses()
+    courseServices.getAllCourses()
       .then((data: Array<CourseData>) => {
         setCourses(data);
       })

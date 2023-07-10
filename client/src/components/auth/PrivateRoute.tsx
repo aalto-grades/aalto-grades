@@ -8,7 +8,7 @@
 import { Navigate } from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import userService from '../../services/user';
+import userServices from '../../services/user';
 import useAuth, { AuthContextType } from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';
 import { SystemRole } from 'aalto-grades-common/types';
@@ -26,7 +26,7 @@ function PrivateRoute(props: {
     // loading set to true so page doesn't load until token has been retrieved
     setLoading(true);
     try {
-      const result = await userService.getRefreshToken();
+      const result = await userServices.getRefreshToken();
       setAuth({
         id: result.id,
         role: result.role,

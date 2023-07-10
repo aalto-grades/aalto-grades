@@ -6,7 +6,7 @@ import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, RenderResult, screen, waitFor, cleanup } from '@testing-library/react';
 import FrontPage from '../components/FrontPage';
-import coursesService from '../services/courses';
+import courseServices from '../services/courses';
 import AuthContext from '../context/AuthProvider';
 import mockCourses from './mock-data/mockCourses';
 import { LoginResult, SystemRole } from 'aalto-grades-common/types';
@@ -18,11 +18,11 @@ describe('Test FrontPage with courses of user', () => {
 
   function renderFrontPage(auth: LoginResult): RenderResult {
 
-    (coursesService.getAllCourses as jest.Mock).mockRejectedValue('Network error');
-    (coursesService.getAllCourses as jest.Mock).mockResolvedValue(mockCourses);
+    (courseServices.getAllCourses as jest.Mock).mockRejectedValue('Network error');
+    (courseServices.getAllCourses as jest.Mock).mockResolvedValue(mockCourses);
 
-    (coursesService.getCoursesOfUser as jest.Mock).mockRejectedValue('Network error');
-    (coursesService.getCoursesOfUser as jest.Mock).mockResolvedValue(mockCourses);
+    (courseServices.getCoursesOfUser as jest.Mock).mockRejectedValue('Network error');
+    (courseServices.getCoursesOfUser as jest.Mock).mockResolvedValue(mockCourses);
 
     return render(
       <BrowserRouter>
@@ -93,11 +93,11 @@ describe('Test FrontPage without courses of user', () => {
 
   function renderFrontPage(auth: LoginResult): RenderResult {
 
-    (coursesService.getAllCourses as jest.Mock).mockRejectedValue('Network error');
-    (coursesService.getAllCourses as jest.Mock).mockResolvedValue(mockCourses);
+    (courseServices.getAllCourses as jest.Mock).mockRejectedValue('Network error');
+    (courseServices.getAllCourses as jest.Mock).mockResolvedValue(mockCourses);
 
-    (coursesService.getCoursesOfUser as jest.Mock).mockRejectedValue('Network error');
-    (coursesService.getCoursesOfUser as jest.Mock).mockResolvedValue([]);
+    (courseServices.getCoursesOfUser as jest.Mock).mockRejectedValue('Network error');
+    (courseServices.getCoursesOfUser as jest.Mock).mockResolvedValue([]);
 
     return render(
       <BrowserRouter>

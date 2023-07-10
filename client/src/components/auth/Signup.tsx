@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { useTheme, Theme } from '@mui/material/styles';
 import SignupForm from './SignupForm';
-import userService from '../../services/user';
+import userServices from '../../services/user';
 import useAuth, { AuthContextType } from '../../hooks/useAuth';
 import { State } from '../../types';
 import { SignupCredentials } from '../../types/auth';
@@ -21,7 +21,7 @@ function Signup(): JSX.Element {
   async function addUser(userObject: SignupCredentials): Promise<void> {
     try {
       // if signup successfull, save user role to context
-      setAuth(await userService.signup(userObject));
+      setAuth(await userServices.signup(userObject));
 
       navigate('/', { replace: true });
     } catch (exception) {

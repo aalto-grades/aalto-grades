@@ -6,10 +6,9 @@ import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, RenderResult, screen, waitFor, cleanup } from '@testing-library/react';
 import FetchInstancesView from '../components/FetchInstancesView';
-import instancesService from '../services/instances';
+import instanceServices from '../services/instances';
 import mockSisuInstances from './mock-data/mockSisuInstances';
 
-jest.mock('../services/instances');
 afterEach(cleanup);
 
 describe('Tests for FetchInstancesView components', () => {
@@ -18,8 +17,7 @@ describe('Tests for FetchInstancesView components', () => {
 
   function renderFetchInstancesView(): RenderResult {
 
-    (instancesService.getSisuInstances as jest.Mock).mockRejectedValue('Network error');
-    (instancesService.getSisuInstances as jest.Mock).mockResolvedValue(mockSisuInstances);
+    jest.spyOn(instanceServices, 'getSisuInstances').mockResolvedValue(mockSisuInstances);
 
     return render(
       <BrowserRouter>

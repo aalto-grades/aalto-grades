@@ -15,7 +15,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import FormHelperText from '@mui/material/FormHelperText';
 import AlertSnackbar from '../alerts/AlertSnackbar';
-import gradesService from '../../services/grades';
+import gradeServices from '../../services/grades';
 import FileErrorDialog from './FileErrorDialog';
 import { Message, State } from '../../types';
 
@@ -84,7 +84,7 @@ function FileLoadDialog(props: {
     });
     try {
       if (courseId) {
-        await gradesService.importCsv(courseId, props.instanceId, fileInput.current.files[0]);
+        await gradeServices.importCsv(courseId, props.instanceId, fileInput.current.files[0]);
         snackPackAdd({
           msg: 'File processed successfully, grades imported.'
             + ' To refresh final grades, press "calculate final grades"',

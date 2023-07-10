@@ -15,7 +15,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import LeafAttainment from './LeafAttainment';
 import Attainment from './Attainment';
-import formulasService from '../../services/formulas';
+import formulaServices from '../../services/formulas';
 import { AttainmentData, FormulaPreview } from 'aalto-grades-common/types';
 import { State } from '../../types';
 
@@ -54,7 +54,7 @@ function ParentAttainment(props: {
    */
   useEffect(() => {
     if (props.attainmentTree.formula) {
-      formulasService.getFormulaDetails(props.attainmentTree.formula)
+      formulaServices.getFormulaDetails(props.attainmentTree.formula)
         .then((formula: FormulaPreview) => {
           setFormulaDetails(formula);
         });

@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
-import formulaService from '../../services/formulas';
+import formulaServices from '../../services/formulas';
 import { AttainmentData } from 'aalto-grades-common/types';
 
 function Attainment(props: {
@@ -23,7 +23,7 @@ function Attainment(props: {
       <>
         {
           props.attributes.map((attribute: string, attributeIndex: number) => {
-            const attributeLabel: string = formulaService.getAttributeLabel(attribute);
+            const attributeLabel: string = formulaServices.getAttributeLabel(attribute);
             return (
               <TextField
                 type='text'

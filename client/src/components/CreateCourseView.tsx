@@ -5,7 +5,7 @@
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import CreateCourseForm from './create-course-view/CreateCourseForm';
-import coursesService from '../services/courses';
+import courseServices from '../services/courses';
 import { Message, State } from '../types';
 import AlertSnackbar from './alerts/AlertSnackbar';
 import { useState } from 'react';
@@ -19,7 +19,7 @@ function CreateCourseView(): JSX.Element {
 
   async function addCourse(course: CourseData): Promise<void> {
     try {
-      const courseId: number = await coursesService.addCourse(course);
+      const courseId: number = await courseServices.addCourse(course);
       navigate(`/course-view/${courseId}`, { replace: true });
     } catch (error: any) {
       let msg: string | Array<string> = error?.message ?? 'Unknown error';

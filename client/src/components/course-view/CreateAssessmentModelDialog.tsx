@@ -11,7 +11,7 @@ import DialogContent from '@mui/material/DialogContent';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import assessmentModelsService from '../../services/assessmentModels';
+import assessmentModelServices from '../../services/assessmentModels';
 import attainmentServices from '../../services/attainments';
 import { State } from '../../types';
 import Stack from '@mui/material/Stack';
@@ -32,7 +32,7 @@ function CreateAssessmentModelDialog(props: {
     try {
       if (courseId) {
         setIsSubmitting(true);
-        const assessmentModelId: number = await assessmentModelsService.addAssessmentModel(
+        const assessmentModelId: number = await assessmentModelServices.addAssessmentModel(
           courseId, { name: name }
         );
 

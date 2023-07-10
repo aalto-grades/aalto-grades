@@ -15,7 +15,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import AlertSnackbar from '../alerts/AlertSnackbar';
-import gradesService from '../../services/grades';
+import gradeServices from '../../services/grades';
 import { Message, State } from '../../types';
 
 // A Dialog component for exporting Sisu grades CSV.
@@ -122,7 +122,7 @@ function SisuExportDialog(props: {
         if (assessmentDate) {
           params.assessmentDate = assessmentDate;
         }
-        const data: BlobPart = await gradesService.exportSisuCsv(
+        const data: BlobPart = await gradeServices.exportSisuCsv(
           courseId, instanceId, params
         );
 

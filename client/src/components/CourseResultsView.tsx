@@ -8,7 +8,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import CourseResultsTable from './course-results-view/CourseResultsTable';
 import AlertSnackbar from './alerts/AlertSnackbar';
-import gradesService from '../services/grades';
+import gradeServices from '../services/grades';
 import { sleep } from '../utils';
 import { Message, State } from '../types';
 
@@ -25,7 +25,7 @@ function CourseResultsView(): JSX.Element {
   useEffect(() => {
     if (courseId && instanceId) {
       setLoading(true);
-      gradesService.getFinalGrades(courseId, instanceId)
+      gradeServices.getFinalGrades(courseId, instanceId)
         .then(data => {
           setStudents(data.finalGrades);
         })
@@ -67,7 +67,7 @@ function CourseResultsView(): JSX.Element {
       });
       await sleep(2000);
       if (courseId && instanceId) {
-        const success = await gradesService.calculateFinalGrades(courseId, instanceId);
+        const success = await gradeServices.calculateFinalGrades(courseId, instanceId);
 
         if (success) {
           snackPackAdd({
@@ -81,7 +81,7 @@ function CourseResultsView(): JSX.Element {
             msg: 'Fetching final grades...',
             severity: 'info'
           });
-          const data = await gradesService.getFinalGrades(courseId, instanceId);
+          const data = await gradeServices.getFinalGrades(courseId, instanceId);
           setStudents(data.finalGrades);
         }
       }
@@ -129,7 +129,7 @@ function CourseResultsView(): JSX.Element {
 
     try {
       if (courseId && instanceId) {
-        const res = await gradesService.downloadCsvTemplate(courseId, instanceId);
+        const res = await gradeServices.downloadCsvTemplate(courseId, instanceId);
 
         const blob = new Blob([res.data], { type: 'text/csv' });
 

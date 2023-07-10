@@ -6,10 +6,10 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, RenderResult, waitFor, cleanup } from '@testing-library/react';
 import CourseView from '../components/CourseView';
-import assessmentModelsService from '../services/assessmentModels';
-import attainmentService from '../services/attainments';
-import coursesService from '../services/courses';
-import instancesService from '../services/instances';
+import assessmentModelServices from '../services/assessmentModels';
+import attainmentServices from '../services/attainments';
+import courseServices from '../services/courses';
+import instanceServices from '../services/instances';
 import AuthContext from '../context/AuthProvider';
 import mockAssessmentModels from './mock-data/mockAssessmentModels';
 import mockAttainments from './mock-data/mockAttainments';
@@ -34,19 +34,19 @@ describe('Tests for CourseView component', () => {
     mockAttainments: AttainmentData
   ): RenderResult {
 
-    (instancesService.getInstances as jest.Mock).mockRejectedValue('Network error');
-    (instancesService.getInstances as jest.Mock).mockResolvedValue(mockInstances);
+    (instanceServices.getInstances as jest.Mock).mockRejectedValue('Network error');
+    (instanceServices.getInstances as jest.Mock).mockResolvedValue(mockInstances);
 
-    (coursesService.getCourse as jest.Mock).mockRejectedValue('Network error');
-    (coursesService.getCourse as jest.Mock).mockResolvedValue(mockCourses[0]);
+    (courseServices.getCourse as jest.Mock).mockRejectedValue('Network error');
+    (courseServices.getCourse as jest.Mock).mockResolvedValue(mockCourses[0]);
 
-    (assessmentModelsService.getAllAssessmentModels as jest.Mock)
+    (assessmentModelServices.getAllAssessmentModels as jest.Mock)
       .mockRejectedValue('Network error');
-    (assessmentModelsService.getAllAssessmentModels as jest.Mock)
+    (assessmentModelServices.getAllAssessmentModels as jest.Mock)
       .mockResolvedValue(mockAssessmentModels);
 
-    (attainmentService.getAllAttainments as jest.Mock).mockRejectedValue('Network error');
-    (attainmentService.getAllAttainments as jest.Mock).mockResolvedValue(mockAttainments);
+    (attainmentServices.getAllAttainments as jest.Mock).mockRejectedValue('Network error');
+    (attainmentServices.getAllAttainments as jest.Mock).mockResolvedValue(mockAttainments);
 
     return render(
       <MemoryRouter initialEntries={['/course-view/1']}>

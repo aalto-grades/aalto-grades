@@ -17,7 +17,7 @@ import { CourseInstanceData } from 'aalto-grades-common/types';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import { HeadCellData, State } from '../../types';
-import instancesService from '../../services/instances';
+import instanceServices from '../../services/instances';
 
 const headCells: Array<HeadCellData> = [
   {
@@ -53,7 +53,7 @@ function InstancesTable(props: {
     useState<Array<CourseInstanceData> | null>(null);
 
   useEffect(() => {
-    instancesService.getInstances(props.courseId)
+    instanceServices.getInstances(props.courseId)
       .then((courseInstances: Array<CourseInstanceData>) => {
         const sortedInstances: Array<CourseInstanceData> = courseInstances.sort(
           (a: CourseInstanceData, b: CourseInstanceData) => {

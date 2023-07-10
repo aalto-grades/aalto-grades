@@ -9,8 +9,8 @@ import Container from '@mui/material/Container';
 import LinearProgress from '@mui/material/LinearProgress';
 import EditInstanceForm from './edit-instance-view/EditInstanceForm';
 import AlertSnackbar from './alerts/AlertSnackbar';
-import coursesService from '../services/courses';
-import instancesService from '../services/instances';
+import courseServices from '../services/courses';
+import instanceServices from '../services/instances';
 import {
   CourseData, CourseInstanceData, GradingScale, Period
 } from 'aalto-grades-common/types/course';
@@ -31,13 +31,13 @@ function EditInstanceView(): JSX.Element {
 
   useEffect(() => {
     if (sisuInstanceId) {
-      instancesService.getSisuInstance(sisuInstanceId)
+      instanceServices.getSisuInstance(sisuInstanceId)
         .then((courseInstance: CourseInstanceData) => {
           setInstance(courseInstance);
         })
         .catch((e: Error) => console.log(e.message));
     } else if (courseId) {
-      coursesService.getCourse(courseId)
+      courseServices.getCourse(courseId)
         .then((course: CourseData) => {
           const newInstance: CourseInstanceData = {
             courseData: course,
@@ -58,7 +58,7 @@ function EditInstanceView(): JSX.Element {
   async function addInstance(instance: CourseInstanceData): Promise<void> {
     try {
       if (courseId) {
-        await instancesService.createInstance(courseId, instance);
+        await instanceServices.createInstance(courseId, instance);
         navigate(`/course-view/${courseId}`, { replace: true });
       }
     } catch (error: any) {

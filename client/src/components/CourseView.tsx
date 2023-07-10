@@ -13,9 +13,9 @@ import CourseDetails from './course-view/CourseDetails';
 import Attainments from './course-view/Attainments';
 import CreateAssessmentModelDialog from './course-view/CreateAssessmentModelDialog';
 import InstancesTable from './course-view/InstancesTable';
-import assessmentModelsService from '../services/assessmentModels';
-import attainmentService from '../services/attainments';
-import coursesService from '../services/courses';
+import assessmentModelServices from '../services/assessmentModels';
+import attainmentServices from '../services/attainments';
+import courseServices from '../services/courses';
 import useAuth, { AuthContextType } from '../hooks/useAuth';
 import {
   AssessmentModelData, AttainmentData, CourseData, SystemRole, UserData
@@ -50,7 +50,7 @@ function CourseView(): JSX.Element {
 
   useEffect(() => {
     if (courseId) {
-      coursesService.getCourse(courseId)
+      courseServices.getCourse(courseId)
         .then((course: CourseData) => {
           setCourse(course);
 
@@ -63,7 +63,7 @@ function CourseView(): JSX.Element {
         })
         .catch((e: Error) => console.log(e.message));
 
-      assessmentModelsService.getAllAssessmentModels(courseId)
+      assessmentModelServices.getAllAssessmentModels(courseId)
         .then((assessmentModels: Array<AssessmentModelData>) => {
           setAssessmentModels(assessmentModels);
 
@@ -77,7 +77,7 @@ function CourseView(): JSX.Element {
             setCurrentAssessmentModel(assessmentModels[0]);
 
             if (assessmentModels[0].id) {
-              attainmentService.getAllAttainments(courseId, assessmentModels[0].id)
+              attainmentServices.getAllAttainments(courseId, assessmentModels[0].id)
                 .then((attainmentTree: AttainmentData) => {
                   setAttainmentTree(attainmentTree);
                 })
@@ -99,7 +99,7 @@ function CourseView(): JSX.Element {
       setAttainmentTree(undefined);
       setCurrentAssessmentModel(assessmentModel);
 
-      attainmentService.getAllAttainments(courseId, assessmentModel.id)
+      attainmentServices.getAllAttainments(courseId, assessmentModel.id)
         .then((attainmentTree: AttainmentData) => {
           setAttainmentTree(attainmentTree);
         })
@@ -109,7 +109,7 @@ function CourseView(): JSX.Element {
 
   function onCreateAssessmentModel(): void {
     if (courseId) {
-      assessmentModelsService.getAllAssessmentModels(courseId)
+      assessmentModelServices.getAllAssessmentModels(courseId)
         .then((assessmentModels: Array<AssessmentModelData>) => {
           setAssessmentModels(assessmentModels);
         })
