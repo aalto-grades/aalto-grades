@@ -26,7 +26,7 @@ function FormulaAttributesForm(props: {
     setSnackPack,
     messageInfo, setMessageInfo,
     alertOpen, setAlertOpen
-  ]: any = useSnackPackAlerts();
+  ] = useSnackPackAlerts();
 
   useEffect(() => {
     setAttributeValues(
@@ -37,11 +37,7 @@ function FormulaAttributesForm(props: {
   }, [selectedAttainments, selectedFormula]);
 
   function snackPackAdd(msg: Message): void {
-    if (setSnackPack) {
-      (setSnackPack as Function)(
-        (prev: Array<Message>): Array<Message> => [...prev, msg]
-      );
-    }
+    setSnackPack((prev: Array<Message>): Array<Message> => [...prev, msg]);
   }
 
   function handleAttributeChange(

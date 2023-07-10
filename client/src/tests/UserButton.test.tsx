@@ -18,7 +18,12 @@ describe('Tests for button component displaying user data and logout', () => {
   function renderButton(auth: LoginResult | null): RenderResult {
     return render(
       <BrowserRouter>
-        <AuthContext.Provider value={{ auth }}>
+        <AuthContext.Provider value={{
+          auth: auth,
+          setAuth: jest.fn(),
+          isTeacherInCharge: false,
+          setIsTeacherInCharge: jest.fn()
+        }}>
           <UserButton />
         </AuthContext.Provider>
       </BrowserRouter>

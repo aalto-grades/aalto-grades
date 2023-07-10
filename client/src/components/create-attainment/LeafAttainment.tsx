@@ -143,7 +143,7 @@ function LeafAttainment(props: {
           <AttributeTextFields
             formulaAttributeNames={props.formulaAttributeNames}
             indices={[]}
-            setAttainments={() => {}}
+            setAttainments={() => console.error('Temporary')}
             attainments={[]}
           />
         }

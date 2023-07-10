@@ -24,11 +24,13 @@ function FrontPage(): JSX.Element {
   const { auth }: AuthContextType = useAuth();
 
   useEffect(() => {
-    coursesService.getCoursesOfUser(auth.id)
-      .then((data: Array<CourseData>) => {
-        setCoursesOfUser(data);
-      })
-      .catch((e) => console.log(e.message));
+    if (auth) {
+      coursesService.getCoursesOfUser(auth.id)
+        .then((data: Array<CourseData>) => {
+          setCoursesOfUser(data);
+        })
+        .catch((e) => console.log(e.message));
+    }
 
     coursesService.getAllCourses()
       .then((data: Array<CourseData>) => {
@@ -70,7 +72,7 @@ function FrontPage(): JSX.Element {
           Courses
         </Typography>
         { /* Admins are shown the button for creating a new course */
-          auth.role == SystemRole.Admin &&
+          auth?.role == SystemRole.Admin &&
           <Button id='ag_new_course_btn' size='large' variant='contained' onClick={() => {
             navigate('/create-course');
           }}>

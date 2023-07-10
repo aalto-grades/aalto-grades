@@ -27,13 +27,11 @@ function PrivateRoute(props: {
     setLoading(true);
     try {
       const result = await userService.getRefreshToken();
-      if (setAuth) {
-        setAuth({
-          id: result.id,
-          role: result.role,
-          name: result.name
-        });
-      }
+      setAuth({
+        id: result.id,
+        role: result.role,
+        name: result.name
+      });
     } catch (exception) {
       console.error(exception);
     } finally {

@@ -57,9 +57,11 @@ function EditInstanceView(): JSX.Element {
 
   async function addInstance(instance: CourseInstanceData): Promise<void> {
     try {
-      await instancesService.createInstance(courseId, instance);
-      navigate(`/course-view/${courseId}`, { replace: true });
-    } catch (error) {
+      if (courseId) {
+        await instancesService.createInstance(courseId, instance);
+        navigate(`/course-view/${courseId}`, { replace: true });
+      }
+    } catch (error: any) {
       let msg: string | Array<string> = error?.message ?? 'Unknown error';
 
       if (error?.response?.data?.errors) {

@@ -12,7 +12,9 @@ import { AttainmentData } from 'aalto-grades-common/types';
 function Attainment(props: {
   attainment: AttainmentData,
   attributes: Array<string>,
-  handleAttributeChange: Function, // TODO: Better type
+  handleAttributeChange: (
+    attainmentIndex: number, attributeIndex: number, event: any
+  ) => void,
   attainmentIndex: number
 }): JSX.Element {
 

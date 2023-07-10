@@ -24,11 +24,14 @@ function SelectFormulaView(): JSX.Element {
   const [setSnackPack] = useSnackPackAlerts();
 
   useEffect(() => {
-    attainmentServices.getAllAttainments(courseId, assessmentModelId, 'children')
-      .then((attainment: AttainmentData) => {
-        setAttainments(attainment.subAttainments);
-      })
-      .catch((exception: Error) => console.log(exception.message));
+    if (courseId && assessmentModelId) {
+      attainmentServices.getAllAttainments(courseId, assessmentModelId, 'children')
+        .then((attainment: AttainmentData) => {
+          if (attainment.subAttainments)
+            setAttainments(attainment.subAttainments);
+        })
+        .catch((exception: Error) => console.log(exception.message));
+    }
   }, []);
 
   function navigateToCourseView(): void {

@@ -96,7 +96,7 @@ function CourseResultsView(): JSX.Element {
     }
   }
 
-  async function updateGrades(newGrades): Promise<void> {
+  async function updateGrades(newGrades: any): Promise<void> {
     snackPackAdd({
       msg: 'Importing grades...',
       severity: 'info'
@@ -167,7 +167,6 @@ function CourseResultsView(): JSX.Element {
         students={students}
         loading={loading}
         calculateFinalGrades={calculateFinalGrades}
-        updateGrades={updateGrades}
         downloadCsvTemplate={downloadCsvTemplate}
       />
     </Box>

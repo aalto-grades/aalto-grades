@@ -68,7 +68,12 @@ describe('FileLoadDialog test with proper csv', () => {
 
     return render(
       <MemoryRouter initialEntries={['/course-view/1']}>
-        <AuthContext.Provider value={{ auth }}>
+        <AuthContext.Provider value={{
+          auth: auth,
+          setAuth: jest.fn(),
+          isTeacherInCharge: false,
+          setIsTeacherInCharge: jest.fn()
+        }}>
           <Routes>
             <Route path='/course-view/:courseId' element={<CourseView/>}/>
           </Routes>
@@ -200,9 +205,14 @@ describe('FileLoadDialog test where server does not accept the file', () => {
 
     return render(
       <MemoryRouter initialEntries={['/course-view/1']}>
-        <AuthContext.Provider value={{ auth }}>
+        <AuthContext.Provider value={{
+          auth: auth,
+          setAuth: jest.fn(),
+          isTeacherInCharge: false,
+          setIsTeacherInCharge: jest.fn()
+        }}>
           <Routes>
-            <Route path='/course-view/:courseId' element={<CourseView/>}/>
+            <Route path='/course-view/:courseId' element={<CourseView />} />
           </Routes>
         </AuthContext.Provider>
       </MemoryRouter>

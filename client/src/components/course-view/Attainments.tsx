@@ -22,8 +22,14 @@ function Attainments(props: {
   const navigate: NavigateFunction = useNavigate();
 
   const actionOptions: Array<MenuButtonOption> = [
-    { description: 'Import from file', handleClick: props.handleAddPoints },
-    { description: 'Import from A+', handleClick: () => {} }
+    {
+      description: 'Import from file',
+      handleClick: props.handleAddPoints
+    },
+    {
+      description: 'Import from A+',
+      handleClick: () => console.error('Importing from A+ is not implemented')
+    }
   ];
 
   return (

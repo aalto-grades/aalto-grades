@@ -21,9 +21,7 @@ function Signup(): JSX.Element {
   async function addUser(userObject: SignupCredentials): Promise<void> {
     try {
       // if signup successfull, save user role to context
-      if (setAuth) {
-        setAuth(await userService.signup(userObject));
-      }
+      setAuth(await userService.signup(userObject));
 
       navigate('/', { replace: true });
     } catch (exception) {

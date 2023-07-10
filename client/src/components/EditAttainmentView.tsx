@@ -113,7 +113,7 @@ function EditAttainmentView(): JSX.Element {
     }
 
     if (attainmentTree)
-      inner(attainment, attainmentTree)
+      inner(attainment, attainmentTree);
   }
 
   function handleSubmit(event: SyntheticEvent): void {

@@ -26,7 +26,12 @@ describe('Test FrontPage with courses of user', () => {
 
     return render(
       <BrowserRouter>
-        <AuthContext.Provider value={{ auth }}>
+        <AuthContext.Provider value={{
+          auth: auth,
+          setAuth: jest.fn(),
+          isTeacherInCharge: false,
+          setIsTeacherInCharge: jest.fn()
+        }}>
           <FrontPage />
         </AuthContext.Provider>
       </BrowserRouter>
@@ -96,7 +101,12 @@ describe('Test FrontPage without courses of user', () => {
 
     return render(
       <BrowserRouter>
-        <AuthContext.Provider value={{ auth }}>
+        <AuthContext.Provider value={{
+          auth: auth,
+          setAuth: jest.fn(),
+          isTeacherInCharge: false,
+          setIsTeacherInCharge: jest.fn()
+        }}>
           <FrontPage />
         </AuthContext.Provider>
       </BrowserRouter>

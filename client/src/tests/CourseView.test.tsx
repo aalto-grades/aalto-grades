@@ -50,7 +50,12 @@ describe('Tests for CourseView component', () => {
 
     return render(
       <MemoryRouter initialEntries={['/course-view/1']}>
-        <AuthContext.Provider value={{ auth }}>
+        <AuthContext.Provider value={{
+          auth: auth,
+          setAuth: jest.fn(),
+          isTeacherInCharge: false,
+          setIsTeacherInCharge: jest.fn()
+        }}>
           <Routes>
             <Route path='/course-view/:courseId' element={<CourseView/>}/>
           </Routes>

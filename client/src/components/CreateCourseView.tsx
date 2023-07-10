@@ -21,7 +21,7 @@ function CreateCourseView(): JSX.Element {
     try {
       const courseId: number = await coursesService.addCourse(course);
       navigate(`/course-view/${courseId}`, { replace: true });
-    } catch (error) {
+    } catch (error: any) {
       let msg: string | Array<string> = error?.message ?? 'Unknown error';
 
       if (error?.response?.data?.errors) {
