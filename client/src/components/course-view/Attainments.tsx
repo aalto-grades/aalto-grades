@@ -9,7 +9,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import AttainmentCategory from '../attainments/AttainmentCategory';
-import MenuButton from './MenuButton';
+import MenuButton, { MenuButtonOption } from './MenuButton';
 import { AssessmentModelData, AttainmentData } from 'aalto-grades-common/types';
 
 function Attainments(props: {
@@ -21,9 +21,15 @@ function Attainments(props: {
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
 
-  const actionOptions = [
-    { description: 'Import from file', handleClick: props.handleAddPoints },
-    { description: 'Import from A+', handleClick: () => {} }
+  const actionOptions: Array<MenuButtonOption> = [
+    {
+      description: 'Import from file',
+      handleClick: props.handleAddPoints
+    },
+    {
+      description: 'Import from A+',
+      handleClick: () => console.error('Importing from A+ is not implemented')
+    }
   ];
 
   return (
@@ -57,7 +63,6 @@ function Attainments(props: {
               <AttainmentCategory
                 key={attainment.id}
                 attainment={attainment}
-                attainmentKey={'id'}
                 buttons={
                   [
                     <Button key='edit' onClick={(): void => {

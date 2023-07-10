@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import userService from '../services/user';
+import userServices from '../services/user';
 import useAuth from './useAuth';
 
 // custom hook for logout, used since no individual logout page will be created
@@ -13,7 +13,7 @@ function useLogout() {
 
   async function logout() {
     try {
-      await userService.logout();
+      await userServices.logout();
       setAuth(null);
     } catch (exception) {
       console.log(exception);

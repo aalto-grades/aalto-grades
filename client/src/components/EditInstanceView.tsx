@@ -9,8 +9,8 @@ import Container from '@mui/material/Container';
 import LinearProgress from '@mui/material/LinearProgress';
 import EditInstanceForm from './edit-instance-view/EditInstanceForm';
 import AlertSnackbar from './alerts/AlertSnackbar';
-import coursesService from '../services/courses';
-import instancesService from '../services/instances';
+import courseServices from '../services/courses';
+import instanceServices from '../services/instances';
 import {
   CourseData, CourseInstanceData, GradingScale, Period
 } from 'aalto-grades-common/types/course';
@@ -21,19 +21,23 @@ function EditInstanceView(): JSX.Element {
 
   const navigate: NavigateFunction = useNavigate();
 
-  const [instance, setInstance]: State<CourseInstanceData> = useState();
+  const [instance, setInstance]: State<CourseInstanceData | null> =
+    useState<CourseInstanceData | null>(null);
+
   const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
-  const [messageInfo, setMessageInfo]: State<Message | undefined> = useState(undefined);
+
+  const [messageInfo, setMessageInfo]: State<Message | null> =
+    useState<Message | null>(null);
 
   useEffect(() => {
     if (sisuInstanceId) {
-      instancesService.getSisuInstance(sisuInstanceId)
+      instanceServices.getSisuInstance(sisuInstanceId)
         .then((courseInstance: CourseInstanceData) => {
           setInstance(courseInstance);
         })
         .catch((e: Error) => console.log(e.message));
-    } else {
-      coursesService.getCourse(courseId)
+    } else if (courseId) {
+      courseServices.getCourse(courseId)
         .then((course: CourseData) => {
           const newInstance: CourseInstanceData = {
             courseData: course,
@@ -53,9 +57,11 @@ function EditInstanceView(): JSX.Element {
 
   async function addInstance(instance: CourseInstanceData): Promise<void> {
     try {
-      await instancesService.createInstance(courseId, instance);
-      navigate(`/course-view/${courseId}`, { replace: true });
-    } catch (error) {
+      if (courseId) {
+        await instanceServices.createInstance(courseId, instance);
+        navigate(`/course-view/${courseId}`, { replace: true });
+      }
+    } catch (error: any) {
       let msg: string | Array<string> = error?.message ?? 'Unknown error';
 
       if (error?.response?.data?.errors) {

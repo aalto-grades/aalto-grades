@@ -40,11 +40,4 @@ async function getSisuInstance(sisuInstanceId: string): Promise<CourseInstanceDa
   return response.data.data.courseInstance;
 }
 
-// TODO: Remove from here
-async function getAttainments(instanceId: Numeric): Promise<any> {
-  const response = await axios.get('/v1/??' + instanceId);
-  console.log(response.data);
-  return response.data;
-}
-
 export default { createInstance, getInstances, getSisuInstances, getSisuInstance };

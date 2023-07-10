@@ -6,8 +6,8 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, RenderResult, screen, waitFor, cleanup } from '@testing-library/react';
 import EditInstanceView from '../components/EditInstanceView';
-import coursesService from '../services/courses';
-import instancesService from '../services/instances';
+import courseServices from '../services/courses';
+import instanceServices from '../services/instances';
 import mockCourses from './mock-data/mockCourses';
 import mockSisuInstances from './mock-data/mockSisuInstances';
 
@@ -19,8 +19,8 @@ describe('Tests for EditInstanceView components without Sisu instance', () => {
 
   function renderEditInstanceView(): RenderResult {
 
-    (coursesService.getCourse as jest.Mock).mockRejectedValue('Network error');
-    (coursesService.getCourse as jest.Mock).mockResolvedValue(mockCourses[0]);
+    (courseServices.getCourse as jest.Mock).mockRejectedValue('Network error');
+    (courseServices.getCourse as jest.Mock).mockResolvedValue(mockCourses[0]);
 
     return render(
       <MemoryRouter initialEntries={['/A-12345/edit-instance']}>
@@ -57,8 +57,8 @@ describe('Tests for EditInstanceView components with Sisu instance', () => {
 
   function renderEditInstanceView(): RenderResult {
 
-    (instancesService.getSisuInstance as jest.Mock).mockRejectedValue('Network error');
-    (instancesService.getSisuInstance as jest.Mock).mockResolvedValue(mockSisuInstances[0]);
+    (instanceServices.getSisuInstance as jest.Mock).mockRejectedValue('Network error');
+    (instanceServices.getSisuInstance as jest.Mock).mockResolvedValue(mockSisuInstances[0]);
 
     return render(
       <MemoryRouter initialEntries={['/A-12345/edit-instance/test']}>

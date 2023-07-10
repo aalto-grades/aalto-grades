@@ -16,7 +16,7 @@ import Tooltip from '@mui/material/Tooltip';
 function CourseDetails(props: {
   course: CourseData,
   assessmentModels: Array<AssessmentModelData>,
-  currentAssessmentModelId: number,
+  currentAssessmentModelId?: number,
   onChangeAssessmentModel: (assessmentModel: AssessmentModelData) => void
 }): JSX.Element {
   const { auth, isTeacherInCharge }: AuthContextType = useAuth();
@@ -29,7 +29,7 @@ function CourseDetails(props: {
       }}>
         <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >
           Course Details
-          { (auth.role == SystemRole.Admin || isTeacherInCharge) &&
+          { (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
           <Tooltip title="Edit course details" placement="right">
             <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit course details">
               <EditIcon />
@@ -61,12 +61,13 @@ function CourseDetails(props: {
       <Box sx={{ mt: 1.5 }}>
         <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>
           Teachers in Charge
-          { (auth.role == SystemRole.Admin || isTeacherInCharge) &&
-          <Tooltip title="Edit teachers in charge" placement="right">
-            <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit teachers in charge">
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
+          {
+            (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
+            <Tooltip title="Edit teachers in charge" placement="right">
+              <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit teachers in charge">
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
           }
         </Typography>
         <Box textAlign='left' borderRadius={1} sx={{
@@ -86,27 +87,29 @@ function CourseDetails(props: {
       <Box sx={{ mt: 1.5 }}>
         <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>
           Assessment Models
-          { (auth.role == SystemRole.Admin || isTeacherInCharge) &&
-          <Tooltip title="Edit assessment models" placement="right">
-            <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit assessment models">
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
+          {
+            (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
+            <Tooltip title="Edit assessment models" placement="right">
+              <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit assessment models">
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
           }
         </Typography>
         <Box textAlign='left' borderRadius={1} sx={{
           bgcolor: 'secondary.light', p: 1.5, mt: 1, minWidth: '318px'
         }}>
-          { props.assessmentModels.length !== 0 ?
-            <AssessmentModelsList
-              data={props.assessmentModels}
-              current={props.currentAssessmentModelId}
-              onClick={props.onChangeAssessmentModel}
-            />
-            :
-            <Box sx={{ py: 2 }}>
-              No assesment models found. Please create a new assessment model.
-            </Box>
+          {
+            (props.assessmentModels.length > 0 && props.currentAssessmentModelId) ?
+              <AssessmentModelsList
+                data={props.assessmentModels}
+                current={props.currentAssessmentModelId}
+                onClick={props.onChangeAssessmentModel}
+              />
+              :
+              <Box sx={{ py: 2 }}>
+                No assessment models found. Please create a new assessment model.
+              </Box>
           }
         </Box>
       </Box>

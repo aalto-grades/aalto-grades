@@ -46,7 +46,9 @@ function SimpleDialog(props: {
         props.attainment.subAttainments = [];
 
       const parentId: number | undefined =
-        props.attainment.id > 0 ? props.attainment.id : undefined;
+        (props.attainment.id && props.attainment.id > 0)
+          ? props.attainment.id
+          : undefined;
 
       for (let n: number = 0; n < Number(numOfAttainments); n++) {
         props.attainment.subAttainments.push({

@@ -8,7 +8,7 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import CourseTable from './front-page/CourseTable';
-import coursesService from '../services/courses';
+import courseServices from '../services/courses';
 import useAuth, { AuthContextType } from '../hooks/useAuth';
 import { CourseData, SystemRole } from 'aalto-grades-common/types';
 import { State } from '../types';
@@ -16,19 +16,23 @@ import { State } from '../types';
 function FrontPage(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
 
-  const [coursesOfUser, setCoursesOfUser]: State<Array<CourseData>> = useState([]);
-  const [courses, setCourses]: State<Array<CourseData>> = useState([]);
+  const [coursesOfUser, setCoursesOfUser]: State<Array<CourseData>> =
+    useState<Array<CourseData>>([]);
+  const [courses, setCourses]: State<Array<CourseData>> =
+    useState<Array<CourseData>>([]);
 
   const { auth }: AuthContextType = useAuth();
 
   useEffect(() => {
-    coursesService.getCoursesOfUser(auth.id)
-      .then((data: Array<CourseData>) => {
-        setCoursesOfUser(data);
-      })
-      .catch((e) => console.log(e.message));
+    if (auth) {
+      courseServices.getCoursesOfUser(auth.id)
+        .then((data: Array<CourseData>) => {
+          setCoursesOfUser(data);
+        })
+        .catch((e) => console.log(e.message));
+    }
 
-    coursesService.getAllCourses()
+    courseServices.getAllCourses()
       .then((data: Array<CourseData>) => {
         setCourses(data);
       })
@@ -48,7 +52,7 @@ function FrontPage(): JSX.Element {
       {
         coursesOfUser.length > 0
           ?
-          <CourseTable data={coursesOfUser} />
+          <CourseTable courses={coursesOfUser} />
           :
           <Box sx={{
             display: 'flex', alignItems: 'left',
@@ -68,7 +72,7 @@ function FrontPage(): JSX.Element {
           Courses
         </Typography>
         { /* Admins are shown the button for creating a new course */
-          auth.role == SystemRole.Admin &&
+          auth?.role == SystemRole.Admin &&
           <Button id='ag_new_course_btn' size='large' variant='contained' onClick={() => {
             navigate('/create-course');
           }}>
@@ -76,7 +80,7 @@ function FrontPage(): JSX.Element {
           </Button>
         }
       </Box>
-      <CourseTable data={courses} />
+      <CourseTable courses={courses} />
     </>
   );
 }

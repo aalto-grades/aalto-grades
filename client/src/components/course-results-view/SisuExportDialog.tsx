@@ -15,11 +15,11 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import AlertSnackbar from '../alerts/AlertSnackbar';
-import gradesService from '../../services/grades';
-import { Message } from '../../types';
+import gradeServices from '../../services/grades';
+import { Message, State } from '../../types';
 
 // A Dialog component for exporting Sisu grades CSV.
-const instructions =
+const instructions: string =
   'Set the completion language and assesment date for the grading, these values'
   + ' are optional. Click export to export the grades.';
 
@@ -83,13 +83,16 @@ const languageOptions = [
   }
 ];
 
-function SisuExportDialog({ open, handleClose }): JSX.Element {
+function SisuExportDialog(props: {
+  open: boolean,
+  handleClose: () => void
+}): JSX.Element {
   const { courseId, instanceId }: Params = useParams();
 
   // state variables handling the alert messages.
-  const [snackPack, setSnackPack] = useState<any>([]);
+  const [snackPack, setSnackPack]: State<Array<Message>> = useState<Array<Message>>([]);
   const [alertOpen, setAlertOpen] = useState<boolean>(false);
-  const [messageInfo, setMessageInfo] = useState<Message | undefined>(undefined);
+  const [messageInfo, setMessageInfo] = useState<Message | null>(null);
 
   // state variables handling the assessment date and completion language.
   const [assessmentDate, setAssessmentDate] = useState<any>(null);
@@ -111,28 +114,30 @@ function SisuExportDialog({ open, handleClose }): JSX.Element {
     setSnackPack((prev) => [...prev, loadingMsg]);
 
     try {
-      const params: any = {};
-      if (completionLanguage) {
-        params.completionLanguage = completionLanguage;
+      if (courseId && instanceId) {
+        const params: any = {};
+        if (completionLanguage) {
+          params.completionLanguage = completionLanguage;
+        }
+        if (assessmentDate) {
+          params.assessmentDate = assessmentDate;
+        }
+        const data: BlobPart = await gradeServices.exportSisuCsv(
+          courseId, instanceId, params
+        );
+
+        // Create a blob object from the response data
+        const blob = new Blob([data], { type: 'text/csv' });
+
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        // Set file name.
+        link.download = `grades_course_${courseId}_instance_${instanceId}.csv`;
+        // Download file automatically to the user's computer.
+        link.click();
+
+        setSnackPack((prev) => [...prev, successMsg]);
       }
-      if (assessmentDate) {
-        params.assessmentDate = assessmentDate;
-      }
-      const data: BlobPart = await gradesService.exportSisuCsv(
-        courseId, instanceId, params
-      );
-
-      // Create a blob object from the response data
-      const blob = new Blob([data], { type: 'text/csv' });
-
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      // Set file name.
-      link.download = `grades_course_${courseId}_instance_${instanceId}.csv`;
-      // Download file automatically to the user's computer.
-      link.click();
-
-      setSnackPack((prev) => [...prev, successMsg]);
     } catch (exception) {
       console.log(exception);
       setSnackPack((prev) => [...prev, errorMsg]);
@@ -143,7 +148,7 @@ function SisuExportDialog({ open, handleClose }): JSX.Element {
 
   return (
     <>
-      <Dialog open={open} transitionDuration={{ exit: 800 }}>
+      <Dialog open={props.open} transitionDuration={{ exit: 800 }}>
         <DialogTitle >Export final grades to Sisu CSV</DialogTitle>
         <DialogContent sx={{ pb: 0 }}>
           <DialogContentText sx={{ mb: 3, color: 'black' }}>
@@ -195,7 +200,7 @@ function SisuExportDialog({ open, handleClose }): JSX.Element {
         </DialogContent>
         <DialogActions sx={{ pr: 4, pb: 3 }}>
           <Button size='medium' onClick={() => {
-            handleClose();
+            props.handleClose();
           }}>
             Cancel
           </Button>

@@ -25,7 +25,8 @@ function CreateCourseForm(props: {
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
 
-  const [teachersInCharge, setTeachersInCharge]: State<Array<string>> = useState([]);
+  const [teachersInCharge, setTeachersInCharge]: State<Array<string>> =
+    useState<Array<string>>([]);
   const [email, setEmail]: State<string> = useState('');
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
 

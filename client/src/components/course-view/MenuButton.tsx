@@ -2,17 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState } from 'react';
+import { useState, SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { State } from '../../types';
 
 // A styled menu button. When clicked, a dropdown menu appears
 
-const StyledMenu = styled<any>((props) => (
+const StyledMenu = styled((props: any) => (
   <Menu
     elevation={0}
     anchorOrigin={{
@@ -49,11 +50,19 @@ const StyledMenu = styled<any>((props) => (
   },
 }));
 
-function MenuButton({ label, options }) {
-  const [anchorEl, setAnchorEl] = useState<any>(null);
+export interface MenuButtonOption {
+  description: string,
+  handleClick: () => void
+}
+
+function MenuButton(props: {
+  label: string,
+  options: Array<MenuButtonOption>
+}): JSX.Element {
+  const [anchorEl, setAnchorEl]: State<Element | null> = useState<Element | null>(null);
   const open: boolean = Boolean(anchorEl);
 
-  function handleClick(event): void {
+  function handleClick(event: SyntheticEvent): void {
     setAnchorEl(event.currentTarget);
   }
 
@@ -61,9 +70,9 @@ function MenuButton({ label, options }) {
     setAnchorEl(null);
   }
 
-  function renderOptions(options) {
+  function renderOptions(options: Array<MenuButtonOption>) {
     return (
-      options.map(option => (
+      options.map((option: MenuButtonOption) => (
         <MenuItem
           className='ag_menu_btn_option'
           key={option.description}
@@ -90,7 +99,7 @@ function MenuButton({ label, options }) {
         onClick={handleClick}
         endIcon={<KeyboardArrowDownIcon />}
       >
-        {label}
+        {props.label}
       </Button>
       <StyledMenu
         id="menu-button"
@@ -101,7 +110,7 @@ function MenuButton({ label, options }) {
         open={open}
         onClose={handleClose}
       >
-        { renderOptions(options) }
+        { renderOptions(props.options) }
       </StyledMenu>
     </div>
   );

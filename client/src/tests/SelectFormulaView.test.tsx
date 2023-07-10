@@ -7,7 +7,7 @@ import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SelectFormulaView from '../components/SelectFormulaView';
-import formulasService from '../services/formulas';
+import formulaServices from '../services/formulas';
 import FormulaSelectionRoute from '../context/FormulaSelectionRoute';
 import mockFormulas from './mock-data/mockFormulas';
 import mockAttainments from './mock-data/mockAttainments';
@@ -20,9 +20,9 @@ afterEach(cleanup);
 describe('Tests for SelectFormulaView components', () => {
 
   async function renderSelectFormulaView() {
-    (formulasService.getFormulas as jest.Mock).mockRejectedValue('Network error');
-    (formulasService.getFormulas as jest.Mock).mockRejectedValue(mockFormulas);
-    jest.spyOn(formulasService, 'getFormulaDetails').mockResolvedValue(mockFormulas[0]);
+    (formulaServices.getFormulas as jest.Mock).mockRejectedValue('Network error');
+    (formulaServices.getFormulas as jest.Mock).mockRejectedValue(mockFormulas);
+    jest.spyOn(formulaServices, 'getFormulaDetails').mockResolvedValue(mockFormulas[0]);
     jest.spyOn(attainmentServices, 'getAllAttainments').mockResolvedValue(mockAttainments);
 
     return render(
@@ -47,33 +47,21 @@ describe('Tests for SelectFormulaView components', () => {
       renderSelectFormulaView();
 
       await waitFor(() => {
-        const headingElement: HTMLElement = screen.queryByText('Select Grading Formula');
-        const subHeadingElement: HTMLElement = screen.queryByText('Result: Course Total Grade');
-        const attainmentSelection: HTMLElement = screen.queryByText(
+        expect(screen.getByText('Select Grading Formula')).toBeInTheDocument();
+        expect(screen.getByText('Result: Course Total Grade')).toBeInTheDocument();
+        expect(screen.getByText(
           'Select the sub study attainments you want to include in the calculation'
-        );
-        const projectsCheckbox: HTMLElement = screen.queryByText('Project');
-        const examCheckbox: HTMLElement = screen.queryByText('Exam');
-        const exercisesheckbox: HTMLElement = screen.queryByText('Exercises');
-        const formulaSelector: HTMLElement = screen.queryByText('Formula');
-        const formulaPreview: HTMLElement = screen.queryByText('Preview of the formula');
-        const submitInstructions: HTMLElement = screen.queryByText(
+        )).toBeInTheDocument();
+        expect(screen.getByText('Project')).toBeInTheDocument();
+        expect(screen.getByText('Exam')).toBeInTheDocument();
+        expect(screen.getByText('Exercises')).toBeInTheDocument();
+        expect(screen.getByText('Formula')).toBeInTheDocument();
+        expect(screen.getByText('Preview of the formula')).toBeInTheDocument();
+        expect(screen.getByText(
           'Specify attribute values for the sub study attainments'
-        );
-        const specifyAttributesButton: HTMLElement = screen.queryByText('Specify attributes');
-        const skipAttributesButton: HTMLElement = screen.queryByText('Skip for now');
-
-        expect(headingElement).toBeInTheDocument();
-        expect(subHeadingElement).toBeInTheDocument();
-        expect(attainmentSelection).toBeInTheDocument();
-        expect(projectsCheckbox).toBeInTheDocument();
-        expect(examCheckbox).toBeInTheDocument();
-        expect(exercisesheckbox).toBeInTheDocument();
-        expect(formulaSelector).toBeInTheDocument();
-        expect(formulaPreview).toBeInTheDocument();
-        expect(submitInstructions).toBeInTheDocument();
-        expect(specifyAttributesButton).toBeInTheDocument();
-        expect(skipAttributesButton).toBeInTheDocument();
+        )).toBeInTheDocument();
+        expect(screen.getByText('Specify attributes')).toBeInTheDocument();
+        expect(screen.getByText('Skip for now')).toBeInTheDocument();
       });
 
     }
@@ -87,14 +75,12 @@ describe('Tests for SelectFormulaView components', () => {
       renderSelectFormulaView();
 
       await waitFor(async () => {
-        const specifyAttributesButton: HTMLElement = screen.queryByText('Specify attributes');
-
-        expect(await screen.queryByText('You must select a formula'))
+        expect(screen.queryByText('You must select a formula'))
           .not.toBeInTheDocument();
-        expect(await screen.queryByText('You must select at least one study attainment'))
+        expect(screen.queryByText('You must select at least one study attainment'))
           .not.toBeInTheDocument();
 
-        userEvent.click(specifyAttributesButton);
+        userEvent.click(screen.getByText('Specify attributes'));
 
         expect(await screen.findByText('You must select a formula')).toBeInTheDocument();
       });

@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import LoginForm from './LoginForm';
-import userService from '../../services/user';
+import userServices from '../../services/user';
 import useAuth from '../../hooks/useAuth';
 import { LoginCredentials } from '../../types/auth';
 
@@ -20,7 +20,7 @@ function Login(): JSX.Element {
 
   async function loginUser(userObject: LoginCredentials): Promise<void> {
     try {
-      const response = await userService.login(userObject);
+      const response = await userServices.login(userObject);
       // if login is successful, save user role to context
       setAuth({
         id: response.id,

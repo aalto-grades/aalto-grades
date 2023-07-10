@@ -5,7 +5,7 @@
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import CreateCourseForm from './create-course-view/CreateCourseForm';
-import coursesService from '../services/courses';
+import courseServices from '../services/courses';
 import { Message, State } from '../types';
 import AlertSnackbar from './alerts/AlertSnackbar';
 import { useState } from 'react';
@@ -14,13 +14,14 @@ import { CourseData } from 'aalto-grades-common/types';
 function CreateCourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
-  const [messageInfo, setMessageInfo]: State<Message | undefined> = useState(undefined);
+  const [messageInfo, setMessageInfo]: State<Message | null> =
+    useState<Message | null>(null);
 
   async function addCourse(course: CourseData): Promise<void> {
     try {
-      const courseId: number = await coursesService.addCourse(course);
+      const courseId: number = await courseServices.addCourse(course);
       navigate(`/course-view/${courseId}`, { replace: true });
-    } catch (error) {
+    } catch (error: any) {
       let msg: string | Array<string> = error?.message ?? 'Unknown error';
 
       if (error?.response?.data?.errors) {

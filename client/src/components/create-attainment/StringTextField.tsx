@@ -13,13 +13,13 @@ function StringTextField(props: {
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
   attainment: AttainmentData,
   value: string,
-  fieldData: TextFieldData,
+  fieldData: TextFieldData
 }): JSX.Element {
 
   // Functions for handling the change of the values in the 'New Name' textfield
   // and the textfields that represent formula attributes
   function handleChange(event: ChangeEvent<HTMLInputElement>): void {
-    props.attainment[props.fieldData.fieldId] = event.target.value;
+    (props.attainment as any)[props.fieldData.fieldId] = event.target.value;
     props.setAttainmentTree(structuredClone(props.attainmentTree));
   }
 

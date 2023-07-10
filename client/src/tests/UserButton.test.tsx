@@ -15,10 +15,15 @@ afterEach(cleanup);
 
 describe('Tests for button component displaying user data and logout', () => {
 
-  function renderButton(auth: LoginResult): RenderResult {
+  function renderButton(auth: LoginResult | null): RenderResult {
     return render(
       <BrowserRouter>
-        <AuthContext.Provider value={{ auth }}>
+        <AuthContext.Provider value={{
+          auth: auth,
+          setAuth: jest.fn(),
+          isTeacherInCharge: false,
+          setIsTeacherInCharge: jest.fn()
+        }}>
           <UserButton />
         </AuthContext.Provider>
       </BrowserRouter>
@@ -32,8 +37,7 @@ describe('Tests for button component displaying user data and logout', () => {
   });
 
   test('User button should not display any name when not logged in', async () => {
-    const auth: LoginResult = { id: null, role: null, name: null };
-    renderButton(auth);
+    renderButton(null);
     await waitFor(() => expect(screen.getByTestId('not-logged-in')).toBeInTheDocument());
   });
 

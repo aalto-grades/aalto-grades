@@ -2,14 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, RenderResult, screen, waitFor, cleanup } from '@testing-library/react';
 import FetchInstancesView from '../components/FetchInstancesView';
-import instancesService from '../services/instances';
+import instanceServices from '../services/instances';
 import mockSisuInstances from './mock-data/mockSisuInstances';
 
-jest.mock('../services/instances');
 afterEach(cleanup);
 
 describe('Tests for FetchInstancesView components', () => {
@@ -18,13 +17,17 @@ describe('Tests for FetchInstancesView components', () => {
 
   function renderFetchInstancesView(): RenderResult {
 
-    (instancesService.getSisuInstances as jest.Mock).mockRejectedValue('Network error');
-    (instancesService.getSisuInstances as jest.Mock).mockResolvedValue(mockSisuInstances);
+    jest.spyOn(instanceServices, 'getSisuInstances').mockResolvedValue(mockSisuInstances);
 
     return render(
-      <BrowserRouter>
-        <FetchInstancesView />
-      </BrowserRouter>
+      <MemoryRouter initialEntries={['/1/fetch-instances/ABCDEFG']}>
+        <Routes>
+          <Route
+            path='/:courseId/fetch-instances/:courseCode'
+            element={<FetchInstancesView />}
+          />
+        </Routes>
+      </MemoryRouter>
     );
   }
 
@@ -33,25 +36,15 @@ describe('Tests for FetchInstancesView components', () => {
     renderFetchInstancesView();
 
     await waitFor(() => {
-      const headingElement: HTMLElement = screen.queryByText('Instances Found from Sisu');
-      const subHeading: HTMLElement = screen.queryByText('Select the instance you wish to add');
-      const cancelButton: HTMLElement = screen.queryByText('Cancel');
-      const scratchButton: HTMLElement = screen.queryByText('Start from Scratch');
-      const type: Array<HTMLElement> = screen.queryAllByText('Type:');
-      const startDate: Array<HTMLElement> = screen.queryAllByText('Starting Date:');
-      const endDate: Array<HTMLElement> = screen.queryAllByText('Ending Date:');
-      const mockType: HTMLElement = screen.queryByText('Teaching');
-      const mockDate: HTMLElement = screen.queryByText('06.02.2023');
-
-      expect(headingElement).toBeInTheDocument();
-      expect(subHeading).toBeInTheDocument();
-      expect(cancelButton).toBeInTheDocument();
-      expect(scratchButton).toBeInTheDocument();
-      expect(type).toHaveLength(instancesLength);
-      expect(startDate).toHaveLength(instancesLength);
-      expect(endDate).toHaveLength(instancesLength);
-      expect(mockType).toBeInTheDocument();
-      expect(mockDate).toBeInTheDocument();
+      expect(screen.getByText('Instances Found from Sisu')).toBeInTheDocument();
+      expect(screen.getByText('Select the instance you wish to add')).toBeInTheDocument();
+      expect(screen.getByText('Cancel')).toBeInTheDocument();
+      expect(screen.getByText('Start from Scratch')).toBeInTheDocument();
+      expect(screen.getAllByText('Type:')).toHaveLength(instancesLength);
+      expect(screen.getAllByText('Starting Date:')).toHaveLength(instancesLength);
+      expect(screen.getAllByText('Ending Date:')).toHaveLength(instancesLength);
+      expect(screen.getByText('Teaching')).toBeInTheDocument();
+      expect(screen.getByText('06.02.2023')).toBeInTheDocument();
     });
 
   });

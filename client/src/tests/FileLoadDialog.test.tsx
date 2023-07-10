@@ -9,11 +9,11 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CourseView from '../components/CourseView';
-import assessmentModelsService from '../services/assessmentModels';
-import attainmentService from '../services/attainments';
-import coursesService from '../services/courses';
-import instancesService from '../services/instances';
-import gradesService from '../services/grades';
+import assessmentModelServices from '../services/assessmentModels';
+import attainmentServices from '../services/attainments';
+import courseServices from '../services/courses';
+import instanceServices from '../services/instances';
+import gradeServices from '../services/grades';
 import AuthContext from '../context/AuthProvider';
 import mockAssessmentModels from './mock-data/mockAssessmentModels';
 import mockAttainments from './mock-data/mockAttainments';
@@ -53,22 +53,27 @@ describe('FileLoadDialog test with proper csv', () => {
 
   function renderCourseView(auth: LoginResult): RenderResult {
 
-    (instancesService.getInstances as jest.Mock).mockResolvedValue(mockInstances);
+    (instanceServices.getInstances as jest.Mock).mockResolvedValue(mockInstances);
 
-    (coursesService.getCourse as jest.Mock).mockResolvedValue(mockCourses[0]);
+    (courseServices.getCourse as jest.Mock).mockResolvedValue(mockCourses[0]);
 
-    (assessmentModelsService.getAllAssessmentModels as jest.Mock)
+    (assessmentModelServices.getAllAssessmentModels as jest.Mock)
       .mockResolvedValue(mockAssessmentModels);
 
-    (attainmentService.getAllAttainments as jest.Mock)
+    (attainmentServices.getAllAttainments as jest.Mock)
       .mockResolvedValue(mockAttainments);
 
     // succeess, nothing to worry about
-    (gradesService.importCsv as jest.Mock).mockResolvedValue({});
+    (gradeServices.importCsv as jest.Mock).mockResolvedValue({});
 
     return render(
       <MemoryRouter initialEntries={['/course-view/1']}>
-        <AuthContext.Provider value={{ auth }}>
+        <AuthContext.Provider value={{
+          auth: auth,
+          setAuth: jest.fn(),
+          isTeacherInCharge: false,
+          setIsTeacherInCharge: jest.fn()
+        }}>
           <Routes>
             <Route path='/course-view/:courseId' element={<CourseView/>}/>
           </Routes>
@@ -165,7 +170,8 @@ describe('FileLoadDialog test with proper csv', () => {
     const dialogTitle: HTMLElement = getByText('Add Grades from File');
 
     await waitFor(() =>
-      fireEvent.change(getByText('Upload file').querySelector('input[type="file"]'), {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      fireEvent.change(getByText('Upload file').querySelector('input[type="file"]')!, {
         target: { files: [file] },
       })
     );
@@ -182,26 +188,31 @@ describe('FileLoadDialog test where server does not accept the file', () => {
 
   function renderCourseView(auth: LoginResult): RenderResult {
 
-    (instancesService.getInstances as jest.Mock).mockResolvedValue(mockInstances);
+    (instanceServices.getInstances as jest.Mock).mockResolvedValue(mockInstances);
 
-    (coursesService.getCourse as jest.Mock).mockResolvedValue(mockCourses[0]);
+    (courseServices.getCourse as jest.Mock).mockResolvedValue(mockCourses[0]);
 
-    (assessmentModelsService.getAllAssessmentModels as jest.Mock)
+    (assessmentModelServices.getAllAssessmentModels as jest.Mock)
       .mockResolvedValue(mockAssessmentModels);
 
-    (attainmentService.getAllAttainments as jest.Mock)
+    (attainmentServices.getAllAttainments as jest.Mock)
       .mockResolvedValue(mockAttainments);
 
     // Mock the error.
-    (gradesService.importCsv as jest.Mock).mockRejectedValue({
+    (gradeServices.importCsv as jest.Mock).mockRejectedValue({
       response: mockErrorResponse
     });
 
     return render(
       <MemoryRouter initialEntries={['/course-view/1']}>
-        <AuthContext.Provider value={{ auth }}>
+        <AuthContext.Provider value={{
+          auth: auth,
+          setAuth: jest.fn(),
+          isTeacherInCharge: false,
+          setIsTeacherInCharge: jest.fn()
+        }}>
           <Routes>
-            <Route path='/course-view/:courseId' element={<CourseView/>}/>
+            <Route path='/course-view/:courseId' element={<CourseView />} />
           </Routes>
         </AuthContext.Provider>
       </MemoryRouter>
@@ -230,7 +241,8 @@ describe('FileLoadDialog test where server does not accept the file', () => {
     const dialogTitle: HTMLElement = getByText('Add Grades from File');
 
     await waitFor(() =>
-      fireEvent.change(getByText('Upload file').querySelector('input[type="file"]'), {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      fireEvent.change(getByText('Upload file').querySelector('input[type="file"]')!, {
         target: { files: [file] },
       })
     );
@@ -259,8 +271,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
     expect(additionalErrors).toBeVisible();
 
     // Show all errors button should be visible.
-    const showErrorsButton: HTMLElement = screen.queryByText('Show all');
-    expect(showErrorsButton).toBeDefined();
+    expect(screen.getByText('Show all')).toBeDefined();
   });
 
   test(
@@ -288,13 +299,14 @@ describe('FileLoadDialog test where server does not accept the file', () => {
       const dialogTitle: HTMLElement = getByText('Add Grades from File');
 
       await waitFor(() =>
-        fireEvent.change(getByText('Upload file').querySelector('input[type="file"]'), {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        fireEvent.change(getByText('Upload file').querySelector('input[type="file"]')!, {
           target: { files: [file] },
         })
       );
 
       // Include only maxErrorsToShow amount of error messages to test conditional rendering.
-      (gradesService.importCsv as jest.Mock).mockRejectedValue({
+      (gradeServices.importCsv as jest.Mock).mockRejectedValue({
         response: {
           status: mockErrorResponse.status,
           data: {
@@ -320,10 +332,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
       }
 
       // Additional errors text should not be rendered.
-      const additionalErrors: HTMLElement = screen.queryByText('more errors found');
-      expect(additionalErrors).toBeNull();
-
-      const showErrorsButton: HTMLElement = screen.queryByText('Show all');
-      expect(showErrorsButton).toBeNull();
+      expect(screen.queryByText('more errors found')).toBeNull();
+      expect(screen.queryByText('Show all')).toBeNull();
     });
 });

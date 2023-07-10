@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, SyntheticEvent } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import PropTypes, { InferProps } from 'prop-types';
+import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import StyledBox from '../select-formula-view/StyledBox';
@@ -12,13 +12,15 @@ import Attainment from './Attainment';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
 import { sleep } from '../../utils';
-import { State } from '../../types';
+import { Message, State } from '../../types';
 
-function FormulaAttributesForm(
-  { navigateToCourseView, navigateBack }: InferProps<typeof FormulaAttributesForm.propTypes>
-): JSX.Element {
+function FormulaAttributesForm(props: {
+  navigateToCourseView: () => void,
+  navigateBack: () => void
+}): JSX.Element {
 
-  const [attributeValues, setAttributeValues]: State<Array<Array<string>>> = useState([]);
+  const [attributeValues, setAttributeValues]: State<Array<Array<string>>> =
+    useState<Array<Array<string>>>([]);
   const { selectedAttainments, selectedFormula } = useOutletContext<any>();
   const [
     setSnackPack,
@@ -33,6 +35,10 @@ function FormulaAttributesForm(
       )
     );
   }, [selectedAttainments, selectedFormula]);
+
+  function snackPackAdd(msg: Message): void {
+    setSnackPack((prev: Array<Message>): Array<Message> => [...prev, msg]);
+  }
 
   function handleAttributeChange(
     attainmentIndex: number, attributeIndex: number, event: any
@@ -51,13 +57,13 @@ function FormulaAttributesForm(
     setAttributeValues(newAttributeValues);
   }
 
-  async function handleSubmit(event: any): Promise<void> {
+  async function handleSubmit(event: SyntheticEvent): Promise<void> {
     event.preventDefault();
     try {
       const updatedAttainments: any =
       selectedAttainments.map((attainment: any, index: number): any => {
         const values: Array<string> = attributeValues[index];
-        const attributeObj: object = {};
+        const attributeObj: any = {};
         selectedFormula.attributes.forEach((elem: any, i: number) => {
           attributeObj[elem] = values[i];
         });
@@ -71,25 +77,19 @@ function FormulaAttributesForm(
       // TODO: add formula and attributes to database
       // Depending on how long adding the formula and attributes to the database takes,
       // a loading messsage may need to be added
-      setSnackPack((prev: any) => [
-        ...prev,
-        {
-          msg: 'Formula attributes saved, you will be redirected to the course page.',
-          severity: 'success'
-        }
-      ]);
+      snackPackAdd({
+        msg: 'Formula attributes saved, you will be redirected to the course page.',
+        severity: 'success'
+      });
       await sleep(4000);
-      navigateToCourseView();
+      props.navigateToCourseView();
 
     } catch (exception) {
       console.log(exception);
-      setSnackPack((prev: any) => [
-        ...prev,
-        {
-          msg: 'Saving the formula attributes failed.',
-          severity: 'error'
-        }
-      ]);
+      snackPackAdd({
+        msg: 'Saving the formula attributes failed.',
+        severity: 'error'
+      });
     }
   }
 
@@ -125,7 +125,7 @@ function FormulaAttributesForm(
             size='medium'
             variant='outlined'
             sx={{ mr: 2 }}
-            onClick={(): void => navigateBack()}
+            onClick={(): void => props.navigateBack()}
           >
             Go back
           </Button>
