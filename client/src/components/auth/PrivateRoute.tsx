@@ -8,24 +8,25 @@
 import { Navigate } from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import userService from '../../services/user';
-import useAuth from '../../hooks/useAuth';
+import userServices from '../../services/user';
+import useAuth, { AuthContextType } from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';
-import { SystemRole } from 'aalto-grades-common/types/auth';
+import { SystemRole } from 'aalto-grades-common/types';
+import { State } from '../../types';
 
-function PrivateRoute({ children, roles }: {
+function PrivateRoute(props: {
   children?: JSX.Element,
   roles: Array<SystemRole>
 }): JSX.Element | null {
 
-  const [loading, setLoading] = useState<any>(true);
-  const { auth, setAuth } = useAuth();
+  const [loading, setLoading]: State<boolean> = useState(true);
+  const { auth, setAuth, isTeacherInCharge }: AuthContextType = useAuth();
 
   async function getAuthStatus(): Promise<void> {
     // loading set to true so page doesn't load until token has been retrieved
     setLoading(true);
     try {
-      const result = await userService.getRefreshToken();
+      const result = await userServices.getRefreshToken();
       setAuth({
         id: result.id,
         role: result.role,
@@ -47,11 +48,11 @@ function PrivateRoute({ children, roles }: {
   if (!loading) {
     // If auth is not null -> token exists
     if (auth) {
-      // check if role is in the list of authorised roles
-      if (roles.includes(auth.role)) {
+      // check if role is in the list of authorised roles or teacher in charge.
+      if (props.roles.includes(auth.role) || isTeacherInCharge) {
         return (
           <>
-            {children}
+            {props.children}
             <Outlet />
           </>
         );

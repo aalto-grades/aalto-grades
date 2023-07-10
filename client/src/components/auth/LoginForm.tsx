@@ -6,14 +6,15 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import { LoginCredentials } from '../../types/auth';
+import { State } from '../../types';
+import { LoginCredentials, } from '../../types/auth';
 
-function LoginForm({ loginUser }: {
+function LoginForm(props: {
   loginUser: (userObject: LoginCredentials) => Promise<void>
 }) {
 
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [email, setEmail]: State<string> = useState('');
+  const [password, setPassword]: State<string> = useState('');
 
   function handleSubmit(event: React.SyntheticEvent): void {
     event.preventDefault();
@@ -22,7 +23,7 @@ function LoginForm({ loginUser }: {
         email,
         password,
       };
-      loginUser(userObject);
+      props.loginUser(userObject);
     } catch (exception) {
       console.log(exception);
     }

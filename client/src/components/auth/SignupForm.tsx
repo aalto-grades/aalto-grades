@@ -11,17 +11,19 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio from '@mui/material/Radio';
 import Grid from '@mui/material/Grid';
 import { SystemRole } from 'aalto-grades-common/types/auth';
+import { State } from '../../types';
 import { SignupCredentials } from '../../types/auth';
 
-function SignupForm({ addUser }: {
+function SignupForm(props: {
   addUser: (userObject: SignupCredentials) => Promise<void>
 }) {
 
-  const [name, setName] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [studentNumber, setStudentNumber] = useState<string | undefined>(undefined);
-  const [role, setRole] = useState<SystemRole>(SystemRole.User);
+  const [name, setName]: State<string> = useState('');
+  const [password, setPassword]: State<string> = useState('');
+  const [email, setEmail]: State<string> = useState('');
+  const [studentNumber, setStudentNumber]: State<string | null> =
+    useState<string | null>(null);
+  const [role, setRole]: State<SystemRole> = useState<SystemRole>(SystemRole.User);
 
   function handleSubmit(event: React.SyntheticEvent) {
     event.preventDefault();
@@ -31,9 +33,9 @@ function SignupForm({ addUser }: {
         password,
         email,
         role,
-        studentNumber
+        studentNumber: studentNumber ?? undefined
       };
-      addUser(userObject);
+      props.addUser(userObject);
     } catch (exception) {
       console.log(exception);
     }

@@ -2,9 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent, MouseEvent, SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -19,43 +20,46 @@ import CourseResultsTableHead from './CourseResultsTableHead';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import sortingServices from '../../services/sorting';
-import CircularProgress from '@mui/material/CircularProgress';
+import { State } from '../../types';
 
-function CourseResultsTable(
-  { students, calculateFinalGrades, updateGrades, downloadCsvTemplate, loading }
-): JSX.Element {
+function CourseResultsTable(props: {
+  students: Array<any>,
+  calculateFinalGrades: () => Promise<void>,
+  downloadCsvTemplate: () => Promise<void>,
+  loading: boolean
+}): JSX.Element {
 
-  const [order, setOrder] = useState<any>('asc');
-  const [orderBy, setOrderBy] = useState<any>('studentNumber');
-  const [page, setPage] = useState<any>(0);
-  const [dense, setDense] = useState<any>(true);
-  const [rowsPerPage, setRowsPerPage] = useState<any>(25);
-  const [search, setSearch] = useState<any>('');
-  const [studentsToShow, setStudentsToShow] = useState<any>(students);
+  const [order, setOrder]: State<'asc' | 'desc'> = useState<'asc' | 'desc'> ('asc');
+  const [orderBy, setOrderBy]: State<string> = useState('studentNumber');
+  const [page, setPage]: State<number> = useState(0);
+  const [dense, setDense]: State<boolean> = useState(true);
+  const [rowsPerPage, setRowsPerPage]: State<number> = useState(25);
+  const [search, setSearch]: State<string> = useState('');
+  const [studentsToShow, setStudentsToShow]: State<Array<any>> = useState(props.students);
 
   useEffect(() => {
-    setStudentsToShow(search === '' ? students : students.filter((s) => {
+    setStudentsToShow(search === '' ? props.students : props.students.filter((s) => {
       return s.studentNumber.includes(search);
     }));
     setPage(0);
-  }, [search, students]);
+  }, [search, props.students]);
 
-  function handleRequestSort(event, property) {
+  function handleRequestSort(event: SyntheticEvent, property: string) {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   }
 
-  function handleChangePage(event, newPage) {
+  function handleChangePage(event: MouseEvent | null, newPage: number) {
     setPage(newPage);
   }
 
-  function handleChangeRowsPerPage(event) {
+  function handleChangeRowsPerPage(event: ChangeEvent<HTMLInputElement>) {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   }
 
-  function handleChangeDense(event) {
+  function handleChangeDense(event: ChangeEvent<HTMLInputElement>) {
     setDense(event.target.checked);
   }
 
@@ -69,81 +73,82 @@ function CourseResultsTable(
         <CourseResultsTableToolbar
           search={search}
           setSearch={setSearch}
-          calculateFinalGrades={calculateFinalGrades}
-          updateGrades={updateGrades}
-          downloadCsvTemplate={downloadCsvTemplate}
+          calculateFinalGrades={props.calculateFinalGrades}
+          downloadCsvTemplate={props.downloadCsvTemplate}
         />
-        { loading
-          ?
-          <Box sx={{
-            margin: 'auto', alignItems: 'center', justifyContent: 'center',
-            display: 'flex', mt: 3
-          }}>
-            <CircularProgress />
-          </Box>
-          :
-          <TableContainer>
-            <Table
-              sx={{ minWidth: 75, mx: 4 }}
-              aria-labelledby='courseResultsTable'
-              size={dense ? 'small' : 'medium'}
-            >
-              <CourseResultsTableHead
-                order={order}
-                orderBy={orderBy}
-                onRequestSort={handleRequestSort}
-              />
-              <TableBody>
-                { sortingServices.stableSort(studentsToShow,
-                  sortingServices.getComparator(order, orderBy))
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((student) => {
+        {
+          props.loading
+            ?
+            <Box sx={{
+              margin: 'auto', alignItems: 'center', justifyContent: 'center',
+              display: 'flex', mt: 3
+            }}>
+              <CircularProgress />
+            </Box>
+            :
+            <TableContainer>
+              <Table
+                sx={{ minWidth: 75, mx: 4 }}
+                aria-labelledby='courseResultsTable'
+                size={dense ? 'small' : 'medium'}
+              >
+                <CourseResultsTableHead
+                  order={order}
+                  orderBy={orderBy}
+                  onRequestSort={handleRequestSort}
+                />
+                <TableBody>
+                  {
+                    sortingServices.stableSort(studentsToShow,
+                      sortingServices.getComparator(order, orderBy))
+                      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                      .map((student: any) => {
 
-                    return (
-                      <TableRow
-                        hover
-                        tabIndex={-1}
-                        key={student.studentNumber}
-                      >
-                        <TableCell
-                          sx={{ width: '100px' }}
-                          component="th"
-                          id={student.studentNumber}
-                          scope="row"
-                          padding="normal"
-                        >
-                          {student.studentNumber}
-                        </TableCell>
-                        <TableCell
-                          sx={{ width: '100px' }}
-                          component="th"
-                          id={student.credits}
-                          scope="row"
-                          padding="normal"
-                        >
-                          {student.credits}
-                        </TableCell>
-                        <TableCell
-                          sx={{ width: '100px' }}
-                          align="left"
-                          key={`${student.studentNumber}_grade`}>
-                          {student.grade}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                {emptyRows > 0 && (
-                  <TableRow
-                    style={{
-                      height: (dense ? 33 : 53) * emptyRows,
-                    }}
-                  >
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                        return (
+                          <TableRow
+                            hover
+                            tabIndex={-1}
+                            key={student.studentNumber}
+                          >
+                            <TableCell
+                              sx={{ width: '100px' }}
+                              component="th"
+                              id={student.studentNumber}
+                              scope="row"
+                              padding="normal"
+                            >
+                              {student.studentNumber}
+                            </TableCell>
+                            <TableCell
+                              sx={{ width: '100px' }}
+                              component="th"
+                              id={student.credits}
+                              scope="row"
+                              padding="normal"
+                            >
+                              {student.credits}
+                            </TableCell>
+                            <TableCell
+                              sx={{ width: '100px' }}
+                              align="left"
+                              key={`${student.studentNumber}_grade`}>
+                              {student.grade}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                  {emptyRows > 0 && (
+                    <TableRow
+                      style={{
+                        height: (dense ? 33 : 53) * emptyRows,
+                      }}
+                    >
+                      <TableCell colSpan={6} />
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
         }
         <Box sx={{
           display: 'flex',
@@ -178,7 +183,6 @@ function CourseResultsTable(
 CourseResultsTable.propTypes = {
   students: PropTypes.array,
   calculateFinalGrades: PropTypes.func,
-  updateGrades: PropTypes.func,
   downloadCsvTemplate: PropTypes.func,
   loading: PropTypes.bool
 };

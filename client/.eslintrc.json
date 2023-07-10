@@ -100,11 +100,10 @@
     "@typescript-eslint/explicit-function-return-type": "warn",
     "@typescript-eslint/no-inferrable-types": "off",
     "@typescript-eslint/array-type": [
-      "warn",
+      "error",
       {
         "default": "generic"
       }
-    ],
-    "@typescript-eslint/no-empty-function": "warn"
+    ]
   }
 }

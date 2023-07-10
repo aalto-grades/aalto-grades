@@ -16,18 +16,22 @@ const gridColumns = [{
   width: 500,
 }];
 
-function FileErrorDialog({ handleClose, open, errors }) {
+function FileErrorDialog(props: {
+  handleClose: () => void,
+  open: boolean,
+  errors: Array<string>
+}): JSX.Element {
   return (
     <Dialog
-      open={open}
-      onClose={handleClose}
+      open={props.open}
+      onClose={props.handleClose}
       scroll='paper'
       aria-labelledby="csv-parsing-errors"
       aria-describedby="dialog-for-displaying-csv-parsing-errors"
     >
       <DialogContent dividers={true}>
         <DataGrid
-          rows={errors.map(error => ({
+          rows={props.errors.map(error => ({
             id: error,
             error
           }))}
@@ -44,7 +48,7 @@ function FileErrorDialog({ handleClose, open, errors }) {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Close</Button>
+        <Button onClick={props.handleClose}>Close</Button>
       </DialogActions>
     </Dialog>
   );

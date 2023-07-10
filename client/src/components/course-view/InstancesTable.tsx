@@ -16,15 +16,10 @@ import textFormatServices from '../../services/textFormat';
 import { CourseInstanceData } from 'aalto-grades-common/types';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
-import { State } from '../../types';
-import instancesService from '../../services/instances';
+import { HeadCellData, State } from '../../types';
+import instanceServices from '../../services/instances';
 
-interface Cell {
-  id: string,
-  label: string
-}
-
-const headCells: Array<Cell> = [
+const headCells: Array<HeadCellData> = [
   {
     id: 'startDate',
     label: 'Starting Date'
@@ -54,14 +49,17 @@ const headCells: Array<Cell> = [
 function InstancesTable(props: {
   courseId: string
 }): JSX.Element {
-  const [instances, setInstances]: State<Array<CourseInstanceData> | null> = useState(null);
+  const [instances, setInstances]: State<Array<CourseInstanceData> | null> =
+    useState<Array<CourseInstanceData> | null>(null);
 
   useEffect(() => {
-    instancesService.getInstances(props.courseId)
+    instanceServices.getInstances(props.courseId)
       .then((courseInstances: Array<CourseInstanceData>) => {
         const sortedInstances: Array<CourseInstanceData> = courseInstances.sort(
           (a: CourseInstanceData, b: CourseInstanceData) => {
-            return sortingServices.sortByDate(a.startDate, b.startDate);
+            return sortingServices.compareDate(
+              a.startDate as Date, b.startDate as Date
+            );
           }
         );
         setInstances(sortedInstances);
@@ -75,7 +73,7 @@ function InstancesTable(props: {
         <TableHead>
           <TableRow>
             {
-              headCells.map((headCell: Cell) => (
+              headCells.map((headCell: HeadCellData) => (
                 headCell.id === 'startDate' ?
                   <TableCell key={headCell.id}>
                     <TableSortLabel active={headCell.id === 'startDate'} direction='asc'>
@@ -100,7 +98,9 @@ function InstancesTable(props: {
             instances
               .sort(
                 (a: CourseInstanceData, b: CourseInstanceData): number => {
-                  return sortingServices.sortByDate(a.startDate, b.startDate);
+                  return sortingServices.compareDate(
+                    a.startDate as Date, b.startDate as Date
+                  );
                 }
               )
               .slice()

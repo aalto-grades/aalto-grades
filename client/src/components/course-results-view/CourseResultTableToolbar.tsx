@@ -13,21 +13,33 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import DownloadIcon from '@mui/icons-material/Download';
-import MenuButton from '../course-view/MenuButton';
+import MenuButton, { MenuButtonOption } from '../course-view/MenuButton';
 import FileLoadDialog from '../course-view/FileLoadDialog';
 import SisuExportDialog from './SisuExportDialog';
+import { State } from '../../types';
 
-function CourseResultsTableToolbar(
-  { search, setSearch, calculateFinalGrades, updateGrades, downloadCsvTemplate }
-): JSX.Element {
+function CourseResultsTableToolbar(props: {
+  search: string,
+  setSearch: (search: string) => void,
+  calculateFinalGrades: () => Promise<void>,
+  downloadCsvTemplate: () => Promise<void>
+}): JSX.Element {
   const { instanceId }: Params = useParams();
 
-  const [showFileDialog, setShowFileDialog] = useState<boolean>(false);
-  const [showSisuDialog, setShowSisuDialog] = useState<boolean>(false);
+  const [showFileDialog, setShowFileDialog]: State<boolean> = useState(false);
+  const [showSisuDialog, setShowSisuDialog]: State<boolean> = useState(false);
 
-  const actionOptions = [
-    { description: 'Import from file', handleClick: () => setShowFileDialog(true) },
-    { description: 'Import from A+', handleClick: () => {} }
+  const actionOptions: Array<MenuButtonOption> = [
+    {
+      description: 'Import from file',
+      handleClick: () => setShowFileDialog(true)
+    },
+    {
+      description: 'Import from A+',
+      handleClick: () => {
+        console.error('Importing from A+ is not implemented');
+      }
+    }
   ];
 
   function handleCloseFileDialog(): void {
@@ -56,10 +68,10 @@ function CourseResultsTableToolbar(
           <TextField
             size='small'
             type='strig'
-            value={search}
+            value={props.search}
             name='search'
             label='Search by Student Number'
-            onChange={({ target }) => setSearch(target.value)}
+            onChange={({ target }) => props.setSearch(target.value)}
             InputLabelProps={{ shrink: true }}
             margin='normal'
           />
@@ -81,10 +93,10 @@ function CourseResultsTableToolbar(
           <Button variant='outlined' onClick={() => setShowSisuDialog(true)}>
             Export to Sisu CSV
           </Button>
-          <Button variant='outlined' onClick={() => calculateFinalGrades()}>
+          <Button variant='outlined' onClick={() => props.calculateFinalGrades()}>
             Calculate final grades
           </Button>
-          <Button variant='outlined' onClick={() => downloadCsvTemplate()}>
+          <Button variant='outlined' onClick={() => props.downloadCsvTemplate()}>
             Download CSV template
           </Button>
           <MenuButton label='Import grades' options={actionOptions} />
@@ -96,7 +108,6 @@ function CourseResultsTableToolbar(
             instanceId={Number(instanceId)}
             open={showFileDialog}
             handleClose={handleCloseFileDialog}
-            returnImportedGrades={updateGrades}
           />
         </Box>
       </Box>
@@ -108,7 +119,6 @@ CourseResultsTableToolbar.propTypes = {
   search: PropTypes.string,
   setSearch: PropTypes.func,
   calculateFinalGrades: PropTypes.func,
-  updateGrades: PropTypes.func,
   downloadCsvTemplate: PropTypes.func
 };
 

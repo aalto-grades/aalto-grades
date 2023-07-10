@@ -15,9 +15,9 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import FormHelperText from '@mui/material/FormHelperText';
 import AlertSnackbar from '../alerts/AlertSnackbar';
-import gradesService from '../../services/grades';
+import gradeServices from '../../services/grades';
 import FileErrorDialog from './FileErrorDialog';
-import { Message } from '../../types';
+import { Message, State } from '../../types';
 
 // A Dialog component for uploading a file
 
@@ -34,37 +34,31 @@ const errorInstructions: string =
   'The input file cannot be processed due to the following issues that must be'
   + ' addressed and fixed:';
 
-const loadingMsg: Message = {
-  msg: 'Importing grades...',
-  severity: 'info'
-};
-
-const successMsg: Message = {
-  msg: 'File processed successfully, grades imported.'
-    + ' To refresh final grades, press "calculate final grades"',
-  severity: 'success'
-};
-
-const errorMsg: Message = {
-  msg: 'There was an issue progressing the file, the grades were not imported.',
-  severity: 'error'
-};
-
 // How many errors are initially rendered visible in the dialog.
 export const maxErrorsToShow: number = 5;
 
-function FileLoadDialog({ instanceId, handleClose, open }) {
+function FileLoadDialog(props: {
+  instanceId: number,
+  handleClose: () => void,
+  open: boolean
+}): JSX.Element {
   const { courseId }: Params = useParams();
   const fileInput = createRef<any>();
 
   // state variables handling the alert messages
-  const [snackPack, setSnackPack] = useState<any>([]);
-  const [alertOpen, setAlertOpen] = useState<boolean>(false);
-  const [showErrorDialog, setShowErrorDialog] = useState<boolean>(false);
-  const [messageInfo, setMessageInfo] = useState<Message>(undefined);
+  const [snackPack, setSnackPack]: State<Array<Message>> =
+    useState<Array<Message>>([]);
+  const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
+  const [showErrorDialog, setShowErrorDialog]: State<boolean> = useState(false);
+  const [messageInfo, setMessageInfo]: State<Message | null> =
+    useState<Message | null>(null);
 
   function toggleErrorDialog(): void {
     setShowErrorDialog(!showErrorDialog);
+  }
+
+  function snackPackAdd(msg: Message): void {
+    setSnackPack((prev: Array<Message>): Array<Message> => [...prev, msg]);
   }
 
   // useEffect in charge of handling the back-to-back alerts
@@ -80,28 +74,41 @@ function FileLoadDialog({ instanceId, handleClose, open }) {
   }, [snackPack, messageInfo, alertOpen]);
 
   const [fileName, setFileName] = useState<any>(null);
-  const [validationError, setValidationError] = useState<any>('');
-  const [fileErrors, setFileErrors] = useState<any>([]);
+  const [validationError, setValidationError] = useState('');
+  const [fileErrors, setFileErrors] = useState<Array<string>>([]);
 
   async function uploadFile(): Promise<void> {
-    setSnackPack((prev) => [...prev, loadingMsg]);
+    snackPackAdd({
+      msg: 'Importing grades...',
+      severity: 'info'
+    });
     try {
-      await gradesService.importCsv(courseId, instanceId, fileInput.current.files[0]);
-      setSnackPack((prev) => [...prev, successMsg]);
-      handleClose();
-      setFileName(null);
-    } catch (err) {
+      if (courseId) {
+        await gradeServices.importCsv(courseId, props.instanceId, fileInput.current.files[0]);
+        snackPackAdd({
+          msg: 'File processed successfully, grades imported.'
+            + ' To refresh final grades, press "calculate final grades"',
+          severity: 'success'
+        });
+        props.handleClose();
+        setFileName(null);
+      }
+    } catch (err: any) {
       // Possible CSV errors are returned with http codes 400, 409, 422
       if (err.response?.status && [400, 409, 422].includes(err.response.status)) {
         setFileErrors(err.response.data.errors);
       }
-      setSnackPack((prev) => [...prev, errorMsg]);
+
+      snackPackAdd({
+        msg: 'There was an issue progressing the file, the grades were not imported.',
+        severity: 'error'
+      });
     }
   }
 
   return (
     <>
-      <Dialog open={open} transitionDuration={{ exit: 800 }}>
+      <Dialog open={props.open} transitionDuration={{ exit: 800 }}>
         <DialogTitle >Add Grades from File</DialogTitle>
         <DialogContent sx={{ pb: 0 }}>
           <DialogContentText sx={{ mb: 3, color: 'black' }}>
@@ -193,7 +200,7 @@ function FileLoadDialog({ instanceId, handleClose, open }) {
         </DialogContent>
         <DialogActions sx={{ pr: 4, pb: 3 }}>
           <Button size='medium' onClick={() => {
-            handleClose();
+            props.handleClose();
             setFileName(null);
             setValidationError('');
             setFileErrors([]);
@@ -234,8 +241,7 @@ function FileLoadDialog({ instanceId, handleClose, open }) {
 FileLoadDialog.propTypes = {
   instanceId: PropTypes.number,
   handleClose: PropTypes.func,
-  open: PropTypes.bool,
-  returnImportedGrades: PropTypes.func
+  open: PropTypes.bool
 };
 
 export default FileLoadDialog;

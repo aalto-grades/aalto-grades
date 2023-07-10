@@ -13,12 +13,12 @@ import CourseDetails from './course-view/CourseDetails';
 import Attainments from './course-view/Attainments';
 import CreateAssessmentModelDialog from './course-view/CreateAssessmentModelDialog';
 import InstancesTable from './course-view/InstancesTable';
-import assessmentModelsService from '../services/assessmentModels';
-import attainmentService from '../services/attainments';
-import coursesService from '../services/courses';
+import assessmentModelServices from '../services/assessmentModels';
+import attainmentServices from '../services/attainments';
+import courseServices from '../services/courses';
 import useAuth, { AuthContextType } from '../hooks/useAuth';
 import {
-  AssessmentModelData, AttainmentData, CourseData, SystemRole
+  AssessmentModelData, AttainmentData, CourseData, SystemRole, UserData
 } from 'aalto-grades-common/types';
 import { State } from '../types';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -26,53 +26,67 @@ import CircularProgress from '@mui/material/CircularProgress';
 function CourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { courseId }: Params = useParams();
-  const { auth }: AuthContextType = useAuth();
+  const { auth, isTeacherInCharge, setIsTeacherInCharge }: AuthContextType = useAuth();
 
-  const [course, setCourse]: State<CourseData | null> = useState(null);
+  const [course, setCourse]: State<CourseData | null> =
+    useState<CourseData | null>(null);
 
   const [currentAssessmentModel, setCurrentAssessmentModel]: State<AssessmentModelData | null> =
-    useState(null);
+    useState<AssessmentModelData | null>(null);
   const [assessmentModels, setAssessmentModels]: State<Array<AssessmentModelData>> =
-    useState([]);
+    useState<Array<AssessmentModelData>>([]);
+
   /**
    * Tree set to undefined when fetching the data from API, display loading.
    * If no assessment models exists, set to null to display "no attainments" message,
    * otherwise render attainmentTree.
    */
   const [attainmentTree, setAttainmentTree]: State<AttainmentData | null | undefined> =
-    useState(undefined);
+    useState<AttainmentData | null | undefined>(undefined);
 
   const [animation, setAnimation]: State<boolean> = useState(false);
   const [fileLoadOpen, setFileLoadOpen]: State<boolean> = useState(false);
   const [createAssessmentModelOpen, setCreateAssessmentModelOpen]: State<boolean> = useState(false);
 
   useEffect(() => {
-    coursesService.getCourse(courseId)
-      .then((course: CourseData) => {
-        setCourse(course);
-      })
-      .catch((e: Error) => console.log(e.message));
+    if (courseId) {
+      courseServices.getCourse(courseId)
+        .then((course: CourseData) => {
+          setCourse(course);
 
-    assessmentModelsService.getAllAssessmentModels(courseId)
-      .then((assessmentModels: Array<AssessmentModelData>) => {
-        setAssessmentModels(assessmentModels);
+          if (auth) {
+            const teacherInCharge: Array<UserData> = course.teachersInCharge.filter(
+              (teacher: UserData) => teacher.id == auth.id
+            );
+            setIsTeacherInCharge(teacherInCharge.length != 0);
+          }
+        })
+        .catch((e: Error) => console.log(e.message));
 
-        /**
-         * Newly created courses do not have assessment models assigned.
-         * Set tree to null so proper message can be displayed.
-         */
-        if (assessmentModels.length === 0) {
-          setAttainmentTree(null);
-        } else {
-          setCurrentAssessmentModel(assessmentModels[0]);
-          attainmentService.getAllAttainments(courseId, assessmentModels[0].id)
-            .then((attainmentTree: AttainmentData) => {
-              setAttainmentTree(attainmentTree);
-            })
-            .catch((e: Error) => console.log(e.message));
-        }
-      })
-      .catch((e: Error) => console.log(e.message));
+      assessmentModelServices.getAllAssessmentModels(courseId)
+        .then((assessmentModels: Array<AssessmentModelData>) => {
+          setAssessmentModels(assessmentModels);
+
+          /**
+           * Newly created courses do not have assessment models assigned.
+           * Set tree to null so proper message can be displayed.
+           */
+          if (assessmentModels.length === 0) {
+            setAttainmentTree(null);
+          } else {
+            setCurrentAssessmentModel(assessmentModels[0]);
+
+            if (assessmentModels[0].id) {
+              attainmentServices.getAllAttainments(courseId, assessmentModels[0].id)
+                .then((attainmentTree: AttainmentData) => {
+                  setAttainmentTree(attainmentTree);
+                })
+                .catch((e: Error) => console.log(e.message));
+            }
+          }
+        })
+        .catch((e: Error) => console.log(e.message));
+    }
   }, []);
 
   useEffect(() => {
@@ -80,12 +94,12 @@ function CourseView(): JSX.Element {
   }, [currentAssessmentModel]);
 
   function onChangeAssessmentModel(assessmentModel: AssessmentModelData): void {
-    if (assessmentModel.id !== currentAssessmentModel?.id) {
+    if (courseId && assessmentModel.id && assessmentModel.id !== currentAssessmentModel?.id) {
       setAnimation(false);
       setAttainmentTree(undefined);
       setCurrentAssessmentModel(assessmentModel);
 
-      attainmentService.getAllAttainments(courseId, assessmentModel.id)
+      attainmentServices.getAllAttainments(courseId, assessmentModel.id)
         .then((attainmentTree: AttainmentData) => {
           setAttainmentTree(attainmentTree);
         })
@@ -94,11 +108,13 @@ function CourseView(): JSX.Element {
   }
 
   function onCreateAssessmentModel(): void {
-    assessmentModelsService.getAllAssessmentModels(courseId)
-      .then((assessmentModels: Array<AssessmentModelData>) => {
-        setAssessmentModels(assessmentModels);
-      })
-      .catch((e: Error) => console.log(e.message));
+    if (courseId) {
+      assessmentModelServices.getAllAssessmentModels(courseId)
+        .then((assessmentModels: Array<AssessmentModelData>) => {
+          setAssessmentModels(assessmentModels);
+        })
+        .catch((e: Error) => console.log(e.message));
+    }
   }
 
   return (
@@ -113,8 +129,8 @@ function CourseView(): JSX.Element {
           }}>
             <Typography variant='h2' align='left'>{course.name.en}</Typography>
             {
-              /* Only admins and teachers are allowed to create assessment models */
-              auth.role == SystemRole.Admin &&
+              /* Only admins and teachers in charge are allowed to create assessment models */
+              (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
               <Button
                 id='ag_new_assessment_model_btn'
                 size='large'
@@ -136,7 +152,7 @@ function CourseView(): JSX.Element {
             </div>
             {
               /* a different attainment component will be created for students */
-              auth.role == SystemRole.Admin &&
+              (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
               <div style={{ width: '100%' }}>
                 {attainmentTree ?
                   <Grow
@@ -145,13 +161,16 @@ function CourseView(): JSX.Element {
                     {...(animation ? { timeout: 1000 } : { timeout: 0 })}
                   >
                     <div style={{ width: '100%' }}>
-                      <Attainments
-                        attainmentTree={attainmentTree}
-                        courseId={courseId}
-                        formula={'Weighted Average'} /* TODO: Retrieve real formula */
-                        assessmentModel={currentAssessmentModel}
-                        handleAddPoints={(): void => setFileLoadOpen(true)}
-                      />
+                      {
+                        (courseId && currentAssessmentModel) &&
+                        <Attainments
+                          attainmentTree={attainmentTree}
+                          courseId={courseId}
+                          formula={'Weighted Average'} /* TODO: Retrieve real formula */
+                          assessmentModel={currentAssessmentModel}
+                          handleAddPoints={(): void => setFileLoadOpen(true)}
+                        />
+                      }
                     </div>
                   </Grow>
                   :
@@ -194,7 +213,7 @@ function CourseView(): JSX.Element {
             </Typography>
             {
               /* Only admins and teachers are allowed to create a new instance */
-              auth.role == SystemRole.Admin &&
+              (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
               <Button
                 id='ag_new_instance_btn'
                 size='large'
@@ -208,9 +227,12 @@ function CourseView(): JSX.Element {
               </Button>
             }
           </Box>
-          <InstancesTable courseId={courseId}/>
+          {
+            courseId &&
+            <InstancesTable courseId={courseId} />
+          }
           <FileLoadDialog
-            //instanceId={currentInstance.id}
+            instanceId={0} // TODO: Should not be instance?
             open={fileLoadOpen}
             handleClose={(): void => setFileLoadOpen(false)}
           />

@@ -9,7 +9,7 @@ import {
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import SelectFormulaForm from './select-formula-view/SelectFormulaForm';
-import formulasService from '../services/formulas';
+import formulaServices from '../services/formulas';
 import attainmentServices from '../services/attainments';
 import { State } from '../types';
 import { AttainmentData, FormulaPreview } from 'aalto-grades-common/types';
@@ -18,16 +18,20 @@ import useSnackPackAlerts from '../hooks/useSnackPackAlerts';
 function SelectFormulaView(): JSX.Element {
   const { setSelectedFormula, selectedFormula } = useOutletContext<any>();
   const { assessmentModelId, courseId }: Params = useParams();
-  const [attainments, setAttainments]: State<Array<AttainmentData>> = useState([]);
+  const [attainments, setAttainments]: State<Array<AttainmentData>> =
+    useState<Array<AttainmentData>>([]);
   const navigate: NavigateFunction = useNavigate();
   const [setSnackPack] = useSnackPackAlerts();
 
   useEffect(() => {
-    attainmentServices.getAllAttainments(courseId, assessmentModelId, 'children')
-      .then((attainment: AttainmentData) => {
-        setAttainments(attainment.subAttainments);
-      })
-      .catch((exception: Error) => console.log(exception.message));
+    if (courseId && assessmentModelId) {
+      attainmentServices.getAllAttainments(courseId, assessmentModelId, 'children')
+        .then((attainment: AttainmentData) => {
+          if (attainment.subAttainments)
+            setAttainments(attainment.subAttainments);
+        })
+        .catch((exception: Error) => console.log(exception.message));
+    }
   }, []);
 
   function navigateToCourseView(): void {
@@ -35,7 +39,7 @@ function SelectFormulaView(): JSX.Element {
   }
 
   function navigateToAttributeSelection(): void {
-    formulasService.getFormulaDetails(selectedFormula.id).then((formula: FormulaPreview) => {
+    formulaServices.getFormulaDetails(selectedFormula.id).then((formula: FormulaPreview) => {
       setSelectedFormula(formula);
       navigate(`/${courseId}/formula-attributes/${assessmentModelId}`, { replace: true });
     }).catch((exception: Error) => {

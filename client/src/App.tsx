@@ -169,26 +169,26 @@ function App(): JSX.Element {
                 element={<CreateCourseView />}
               />
             </Route>
-            { /* Pages that are authorised for admin and teachers */}
+            { /* Pages that are authorised for admin and teachers in charge */}
             <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
               <Route
-                path=':courseId/fetch-instances/:courseCode'
+                path='/:courseId/fetch-instances/:courseCode'
                 element={<FetchInstancesView />}
               />
               <Route
-                path=':courseId/course-results/:instanceId'
+                path='/:courseId/course-results/:instanceId'
                 element={<CourseResultsView />}
               />
               <Route
-                path=':courseId/edit-instance'
+                path='/:courseId/edit-instance'
                 element={<EditInstanceView />}
               />
               <Route
-                path=':courseId/edit-instance/:sisuInstanceId'
+                path='/:courseId/edit-instance/:sisuInstanceId'
                 element={<EditInstanceView />}
               />
               <Route
-                path=':courseId/attainment/:modification/:assessmentModelId/:attainmentId'
+                path='/:courseId/attainment/:modification/:assessmentModelId/:attainmentId'
                 element={<EditAttainmentView />}
               />
               <Route element={<FormulaSelectionRoute />}>

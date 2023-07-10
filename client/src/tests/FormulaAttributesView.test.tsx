@@ -6,7 +6,7 @@ import { MemoryRouter, Routes, Route, Outlet } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import formulasService from '../services/formulas';
+import formulaServices from '../services/formulas';
 import FormulaAttributesView from '../components/FormulaAttributesView';
 import mockAttainments from './mock-data/mockAttainments';
 import mockFormulas from './mock-data/mockFormulas';
@@ -19,7 +19,7 @@ describe('Tests for FormulaAttributesView components', () => {
   };
 
   async function renderFormulaAttributesView() {
-    jest.spyOn(formulasService, 'getFormulaDetails').mockResolvedValue(mockFormulas[0]);
+    jest.spyOn(formulaServices, 'getFormulaDetails').mockResolvedValue(mockFormulas[0]);
 
     return render(
       <MemoryRouter initialEntries={['/1/formula-attributes/1']}>
@@ -40,15 +40,10 @@ describe('Tests for FormulaAttributesView components', () => {
     renderFormulaAttributesView();
 
     await waitFor(() => {
-      const headingElement: HTMLElement = screen.queryByText('Specify Formula Attributes');
-      const subHeadingElement: HTMLElement = screen.queryByText('Result: Course Total Grade');
-      const goBackButton: HTMLElement = screen.queryByText('Go back');
-      const confirmButton: HTMLElement = screen.queryByText('Confirm');
-
-      expect(headingElement).toBeInTheDocument();
-      expect(subHeadingElement).toBeInTheDocument();
-      expect(goBackButton).toBeInTheDocument();
-      expect(confirmButton).toBeInTheDocument();
+      expect(screen.getByText('Specify Formula Attributes')).toBeInTheDocument();
+      expect(screen.getByText('Result: Course Total Grade')).toBeInTheDocument();
+      expect(screen.getByText('Go back')).toBeInTheDocument();
+      expect(screen.getByText('Confirm')).toBeInTheDocument();
     });
 
   });
@@ -62,8 +57,7 @@ describe('Tests for FormulaAttributesView components', () => {
         'Formula attributes saved, you will be redirected to the course page.'
       )).not.toBeInTheDocument();
 
-      const confirmButton: HTMLElement = screen.queryByText('Confirm');
-      userEvent.click(confirmButton);
+      userEvent.click(screen.getByText('Confirm'));
 
       expect(await screen
         .findByText(

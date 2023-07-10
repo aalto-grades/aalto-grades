@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState } from 'react';
-import PropTypes, { InferProps } from 'prop-types';
+import { useState, ReactNode, SyntheticEvent } from 'react';
+import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
@@ -14,7 +14,14 @@ import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import { AttainmentData, Formula } from 'aalto-grades-common/types';
 import { State } from '../../types';
 
-const Accordion = styled<any>((props) => (
+type AccordionOnChange = (event: SyntheticEvent, newExpanded: boolean) => void;
+
+const Accordion = styled((props: {
+  key: string,
+  expanded: boolean,
+  onChange: AccordionOnChange,
+  children: any
+}) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
 ))(() => ({
   '&:last-child': {
@@ -25,16 +32,25 @@ const Accordion = styled<any>((props) => (
   },
 }));
 
-const AccordionSummary = styled<any>((props) => (
+const AccordionSummary = styled((props: {
+  'aria-controls': string,
+  id: string,
+  expanded: boolean,
+  selected: boolean,
+  children: ReactNode
+}) => (
   <MuiAccordionSummary
     expandIcon={
-      <ArrowForwardIosSharpIcon sx={{
-        fontSize: '0.9rem', color: props.expanded === 'true' ? 'primary.main' : 'grey.600'
-      }} />
+      <ArrowForwardIosSharpIcon
+        sx={{
+          fontSize: '0.9rem',
+          color: props.expanded ? 'primary.main' : 'grey.600'
+        }}
+      />
     }
     {...props}
   />
-))(({ theme, nowselected }) => ({
+))(({ theme, selected }) => ({
   maxHeight: '36px',
   minHeight: '36px',
   paddingRight: '21px',
@@ -48,21 +64,22 @@ const AccordionSummary = styled<any>((props) => (
   },
   '&:focus': {
     background: theme.palette.hoverGrey2,
-    paddingLeft: nowselected === 'true' ? '16px' : '21px',
+    paddingLeft: selected ? '16px' : '21px',
     borderLeft:
-      nowselected === 'true'
-        ? `5px solid ${nowselected === 'true' ? theme.palette.primary.main : 'white'}`
-        : `0px solid ${nowselected === 'true' ? theme.palette.primary.main : 'white'}`,
+      selected
+        ? `5px solid ${selected ? theme.palette.primary.main : 'white'}`
+        : `0px solid ${selected ? theme.palette.primary.main : 'white'}`,
   },
   '&:hover': {
     background: theme.palette.hoverGrey1,
   },
 }));
 
-function AccordionDetails(
-  { out, children }: InferProps<typeof AccordionDetails.propTypes>
-): JSX.Element {
-  const margin: string = out ? '21px' : '60px';
+function AccordionDetails(props: {
+  out?: boolean,
+  children: JSX.Element
+}): JSX.Element {
+  const margin: string = props.out ? '21px' : '60px';
   return (
     <Box sx={{
       display: 'flex',
@@ -78,7 +95,7 @@ function AccordionDetails(
       <PanoramaFishEyeIcon sx={{
         fontSize: '0.6rem', display: 'block', margin: '0px 0px 0px 2px'
       }} />
-      {children}
+      {props.children}
     </Box>
   );
 }
@@ -121,30 +138,29 @@ AttainmentText.propTypes = {
 export { AccordionDetails, AttainmentText };
 
 function CustomAccordion(props: {
-  attainments: Array<AttainmentData>,
-  attainmentKey: string
+  attainments: Array<AttainmentData>
 }): JSX.Element {
 
-  const [expanded, setExpanded]: State<Set<unknown>> = useState(new Set());
-  const [selected, setSelected]: State<string> = useState('');
+  const [expanded, setExpanded]: State<Set<number>> = useState(new Set());
+  const [selected, setSelected]: State<number> = useState(0);
 
-  function addToSet(item, set) {
-    const copySet = new Set([...set]);
+  function addToSet(item: number, set: Set<number>): Set<number> {
+    const copySet: Set<number> = new Set(set);
     return copySet.add(item);
   }
 
-  function deleteFromSet(item, set) {
-    const copySet = new Set([...set]);
+  function deleteFromSet(item: number, set: Set<number>): Set<number> {
+    const copySet: Set<number> = new Set(set);
     copySet.delete(item);
     return copySet;
   }
 
   // curried function syntax, google for a good explanation
   // basically add the panel's id to the set of expanded panels if opened, else delete from set
-  function handleChange(panel_id) {
-    return (e, newExpanded) => {
-      setExpanded(newExpanded ? addToSet(panel_id, expanded) : deleteFromSet(panel_id, expanded));
-      setSelected(newExpanded ? panel_id : false);
+  function handleChange(panelId: number): AccordionOnChange {
+    return (event: SyntheticEvent, newExpanded: boolean): void => {
+      setExpanded(newExpanded ? addToSet(panelId, expanded) : deleteFromSet(panelId, expanded));
+      setSelected(newExpanded ? panelId : 0);
     };
   }
 
@@ -154,19 +170,19 @@ function CustomAccordion(props: {
         props.attainments.map((attainment: AttainmentData) => {
           return (
             <Accordion
-              key={attainment[props.attainmentKey] + 'accordion'}
-              expanded={expanded.has(attainment[props.attainmentKey])}
-              onChange={handleChange(attainment[props.attainmentKey])}
+              key={attainment.id + 'accordion'}
+              expanded={expanded.has(attainment.id ?? 0)}
+              onChange={handleChange(attainment.id ?? 0)}
             >
               <AccordionSummary
-                aria-controls={attainment[props.attainmentKey] + '-content'}
-                id={attainment[props.attainmentKey] + '-header'}
-                expanded={expanded.has(attainment[props.attainmentKey]).toString()}
-                nowselected={(selected === attainment[props.attainmentKey]).toString()}
+                aria-controls={attainment.id + '-content'}
+                id={attainment.id + '-header'}
+                expanded={expanded.has(attainment.id ?? 0)}
+                selected={(selected === attainment.id)}
               >
                 <AttainmentText
                   name={attainment.name}
-                  formulaId={attainment.formula}
+                  formulaId={attainment.formula ?? Formula.Manual}
                   tag={attainment.tag}
                 />
               </AccordionSummary>
@@ -176,22 +192,21 @@ function CustomAccordion(props: {
                   return (
                     // is the attainment a leaf? If yes, render details, else another accordion
                     subAttainment.subAttainments ?
-                      <AccordionDetails key={subAttainment[props.attainmentKey] + 'details'}>
+                      <AccordionDetails key={subAttainment.id + 'details'}>
                         <AttainmentText
                           name={subAttainment.name}
-                          formulaId={subAttainment.formula}
+                          formulaId={subAttainment.formula ?? Formula.Manual}
                           tag={subAttainment.tag}
                         />
                       </AccordionDetails>
                       :
                       <Box
-                        key={subAttainment[props.attainmentKey] + 'subAccordion'}
+                        key={subAttainment.id + 'subAccordion'}
                         sx={{ pl: '39px' }}
                       >
                         {
                           <CustomAccordion
                             attainments={[subAttainment]}
-                            attainmentKey={props.attainmentKey}
                           />
                         }
                       </Box>
@@ -206,8 +221,7 @@ function CustomAccordion(props: {
 }
 
 CustomAccordion.propTypes = {
-  attainments: PropTypes.array,
-  attainmentKey: PropTypes.string
+  attainments: PropTypes.array
 };
 
 export default CustomAccordion;

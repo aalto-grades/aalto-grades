@@ -2,11 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { Dispatch, SetStateAction } from 'react';
 import { AxiosResponse } from 'axios';
 
 export interface ApiResponse<T> {
   success: boolean,
-  data?: T,
+  data: T,
   errors?: Array<string>
 }
 
@@ -25,4 +26,9 @@ export interface TextFieldData {
   fieldHelperText?: string
 }
 
-export type State<T> = [T, (value: T) => void];
+export interface HeadCellData {
+  id: string,
+  label: string
+}
+
+export type State<T> = [T, Dispatch<SetStateAction<T>>];

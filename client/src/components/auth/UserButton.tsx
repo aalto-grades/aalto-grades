@@ -10,14 +10,15 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import PersonIcon from '@mui/icons-material/Person';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import useAuth from '../../hooks/useAuth';
+import useAuth, { AuthContextType } from '../../hooks/useAuth';
 import useLogout from '../../hooks/useLogout';
+import { State } from '../../types';
 
 function UserButton(): JSX.Element {
   const logout = useLogout();
   const navigate: NavigateFunction = useNavigate();
-  const { auth } = useAuth();
-  const [anchorEl, setAnchorEl] = useState<any>(null);
+  const { auth }: AuthContextType = useAuth();
+  const [anchorEl, setAnchorEl]: State<Element | null> = useState<Element | null>(null);
   const open: boolean = Boolean(anchorEl);
 
   // temporary function for logging out, will be moved to a seperate file once toolbar is refined
