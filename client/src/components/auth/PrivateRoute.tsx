@@ -20,7 +20,7 @@ function PrivateRoute(props: {
 }): JSX.Element | null {
 
   const [loading, setLoading]: State<boolean> = useState(true);
-  const { auth, setAuth }: AuthContextType = useAuth();
+  const { auth, setAuth, isTeacherInCharge }: AuthContextType = useAuth();
 
   async function getAuthStatus(): Promise<void> {
     // loading set to true so page doesn't load until token has been retrieved
@@ -50,8 +50,8 @@ function PrivateRoute(props: {
   if (!loading) {
     // If auth is not null -> token exists
     if (auth) {
-      // check if role is in the list of authorised roles
-      if (props.roles.includes(auth.role)) {
+      // check if role is in the list of authorised roles or teacher in charge.
+      if (props.roles.includes(auth.role) || isTeacherInCharge) {
         return (
           <>
             {props.children}

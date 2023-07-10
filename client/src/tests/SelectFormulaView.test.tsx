@@ -10,8 +10,8 @@ import SelectFormulaView from '../components/SelectFormulaView';
 import formulasService from '../services/formulas';
 import FormulaSelectionRoute from '../context/FormulaSelectionRoute';
 import mockFormulas from './mock-data/mockFormulas';
-// import mockAttainments from './mock-data/mockAttainments';
-// import instancesService from '../services/instances';
+import mockAttainments from './mock-data/mockAttainments';
+import attainmentServices from '../services/attainments';
 
 jest.mock('../services/instances');
 jest.mock('../services/formulas');
@@ -23,16 +23,16 @@ describe('Tests for SelectFormulaView components', () => {
     (formulasService.getFormulas as jest.Mock).mockRejectedValue('Network error');
     (formulasService.getFormulas as jest.Mock).mockRejectedValue(mockFormulas);
     jest.spyOn(formulasService, 'getFormulaDetails').mockResolvedValue(mockFormulas[0]);
-
-    // TODO, include once get attainments work
-    //(instancesService.getAttainments as jest.Mock).mockRejectedValue('Network error');
-    //(instancesService.getAttainments as jest.Mock).mockResolvedValue(mockAttainments);
+    jest.spyOn(attainmentServices, 'getAllAttainments').mockResolvedValue(mockAttainments);
 
     return render(
-      <MemoryRouter initialEntries={['/A-12345/select-formula/test']}>
+      <MemoryRouter initialEntries={['/1/select-formula/1']}>
         <Routes>
           <Route element={<FormulaSelectionRoute/>}>
-            <Route path=':courseId/select-formula/:instanceId' element={<SelectFormulaView />}/>
+            <Route
+              path=':courseId/select-formula/:assessmentModelId'
+              element={<SelectFormulaView />}
+            />
           </Route>
         </Routes>
       </MemoryRouter>
@@ -52,8 +52,9 @@ describe('Tests for SelectFormulaView components', () => {
         expect(screen.getByText(
           'Select the sub study attainments you want to include in the calculation'
         )).toBeInTheDocument();
-        expect(screen.getByText('Projects')).toBeInTheDocument();
-        expect(screen.getByText('Exams')).toBeInTheDocument();
+        expect(screen.getByText('Project')).toBeInTheDocument();
+        expect(screen.getByText('Exam')).toBeInTheDocument();
+        expect(screen.getByText('Exercises')).toBeInTheDocument();
         expect(screen.getByText('Formula')).toBeInTheDocument();
         expect(screen.getByText('Preview of the formula')).toBeInTheDocument();
         expect(screen.getByText(

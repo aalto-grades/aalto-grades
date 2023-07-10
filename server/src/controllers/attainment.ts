@@ -319,22 +319,25 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   });
 }
 
-export async function getAttainment(req: Request, res: Response): Promise<void> {
+async function validateTreeParam(treeParam: string): Promise<string> {
   const treeSchema: yup.AnyObjectSchema = yup.object().shape({
     tree: yup.string().oneOf(['children', 'descendants'])
   }).noUnknown(true).strict();
 
-  await treeSchema.validate(req.query, { abortEarly: false });
+  await treeSchema.validate({ tree: treeParam }, { abortEarly: false });
+  return treeParam;
+}
+
+export async function getAttainment(req: Request, res: Response): Promise<void> {
+  const tree: string = await validateTreeParam(req.query.tree as string);
   await idSchema.validate({ id: req.params.attainmentId }, { abortEarly: false });
   const attainmentId: number = Number(req.params.attainmentId);
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateCourseAndAssessmentModel(
       req.params.courseId, req.params.assessmentModelId
     );
-
-  // Assert string type, as the query is validated above
-  const tree: string = req.query.tree as string;
 
   const attainmentData: Array<AttainmentData> =
     await findAttainmentsByAssessmentModel(assessmentModel.id);
@@ -353,11 +356,9 @@ export async function getAttainment(req: Request, res: Response): Promise<void> 
   case 'children':
     generateAttainmentTree(localRoot, attainmentData, true);
     break;
-
   case 'descendants':
     generateAttainmentTree(localRoot, attainmentData);
     break;
-
   default:
     break;
   }
@@ -371,6 +372,7 @@ export async function getAttainment(req: Request, res: Response): Promise<void> 
 }
 
 export async function getRootAttainment(req: Request, res: Response): Promise<void> {
+  const tree: string = await validateTreeParam(req.query.tree as string);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, assessmentModel]: [Course, AssessmentModel] =
@@ -397,7 +399,17 @@ export async function getRootAttainment(req: Request, res: Response): Promise<vo
     );
   }
 
-  generateAttainmentTree(rootAttainments[0], allAttainmentData);
+  switch (tree) {
+  case 'children':
+    generateAttainmentTree(rootAttainments[0], allAttainmentData, true);
+    break;
+  case 'descendants':
+    generateAttainmentTree(rootAttainments[0], allAttainmentData);
+    break;
+  default:
+    generateAttainmentTree(rootAttainments[0], allAttainmentData);
+    break;
+  }
 
   res.status(HttpCode.Ok).json({
     success: true,

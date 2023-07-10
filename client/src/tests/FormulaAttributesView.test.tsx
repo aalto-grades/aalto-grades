@@ -14,7 +14,7 @@ import mockFormulas from './mock-data/mockFormulas';
 describe('Tests for FormulaAttributesView components', () => {
 
   const mockData = {
-    selectedAttainments: mockAttainments,
+    selectedAttainments: mockAttainments.subAttainments,
     selectedFormula: mockFormulas[0]
   };
 
@@ -22,11 +22,11 @@ describe('Tests for FormulaAttributesView components', () => {
     jest.spyOn(formulasService, 'getFormulaDetails').mockResolvedValue(mockFormulas[0]);
 
     return render(
-      <MemoryRouter initialEntries={['/A-12345/formula-attributes/test']}>
+      <MemoryRouter initialEntries={['/1/formula-attributes/1']}>
         <Routes>
           <Route element={<Outlet context={mockData} />}>
             <Route
-              path=':courseId/formula-attributes/:instanceId'
+              path=':courseId/formula-attributes/:assessmentModelId'
               element={<FormulaAttributesView />}
             />
           </Route>

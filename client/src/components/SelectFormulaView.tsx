@@ -10,30 +10,25 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import SelectFormulaForm from './select-formula-view/SelectFormulaForm';
 import formulasService from '../services/formulas';
-import mockAttainments from '../tests/mock-data/mockAttainments';
+import attainmentServices from '../services/attainments';
 import { State } from '../types';
-import { FormulaPreview } from 'aalto-grades-common/types';
+import { AttainmentData, FormulaPreview } from 'aalto-grades-common/types';
 import useSnackPackAlerts from '../hooks/useSnackPackAlerts';
-import { AttainmentData } from 'aalto-grades-common/types';
 
 function SelectFormulaView(): JSX.Element {
   const { setSelectedFormula, selectedFormula } = useOutletContext<any>();
-  const { instanceId, courseId }: Params = useParams();
-  const [attainments, setAttainments]: State<Array<any>> = useState([]);
+  const { assessmentModelId, courseId }: Params = useParams();
+  const [attainments, setAttainments]: State<Array<AttainmentData>> =
+    useState<Array<AttainmentData>>([]);
   const navigate: NavigateFunction = useNavigate();
   const [setSnackPack] = useSnackPackAlerts();
 
   useEffect(() => {
-    // TODO: fetch attainments for course based on the assessmentModelId
-    /*
-    instancesService.getAttainments(instanceId)
-      .then((data: any) => {
-        setAttainments(data);
+    attainmentServices.getAllAttainments(courseId, assessmentModelId, 'children')
+      .then((attainment: AttainmentData) => {
+        setAttainments(attainment.subAttainments);
       })
       .catch((exception: Error) => console.log(exception.message));
-    */
-    // TODO remove mock attainments import after this route works.
-    setAttainments(mockAttainments);
   }, []);
 
   function navigateToCourseView(): void {
@@ -43,7 +38,7 @@ function SelectFormulaView(): JSX.Element {
   function navigateToAttributeSelection(): void {
     formulasService.getFormulaDetails(selectedFormula.id).then((formula: FormulaPreview) => {
       setSelectedFormula(formula);
-      navigate(`/${courseId}/formula-attributes/${instanceId}`, { replace: true });
+      navigate(`/${courseId}/formula-attributes/${assessmentModelId}`, { replace: true });
     }).catch((exception: Error) => {
       console.log(exception.message);
 
@@ -75,7 +70,6 @@ function SelectFormulaView(): JSX.Element {
         />
       </Box>
     </Box>
-
   );
 }
 
