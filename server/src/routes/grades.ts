@@ -74,7 +74,7 @@ const upload: Multer = multer({
  *     tags: [Grades]
  *     description: >
  *       Returns a template CSV file for a particular assessment model for
- *       uploading grades.
+ *       uploading grades. Available only to admin users and teachers in charge of the course.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
  *       - $ref: '#/components/parameters/assessmentModelId'
@@ -96,6 +96,8 @@ const upload: Multer = multer({
  *               $ref: '#/definitions/Failure'
  *       401:
  *         $ref: '#/components/responses/AuthenticationError'
+ *       403:
+ *         $ref: '#/components/responses/AuthorizationError'
  *       404:
  *         description: >
  *           The given course or assessment model does not exist, or the
@@ -129,6 +131,7 @@ router.get(
  *       set the **Content-Type** header as **multipart/form-data** and the
  *       file name as "csv_data". Example CSV files available
  *       [here](https://github.com/aalto-grades/base-repository/tree/main/server/test/mock-data/csv)
+ *       Available only to admin users and teachers in charge of the course.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
  *       - $ref: '#/components/parameters/assessmentModelId'
@@ -250,6 +253,8 @@ router.post(
  *               $ref: '#/definitions/Failure'
  *       401:
  *         $ref: '#/components/responses/AuthenticationError'
+ *       403:
+ *         $ref: '#/components/responses/AuthorizationError'
  *       404:
  *         description: The given course or assessment model does not exist.
  *         content:
@@ -271,6 +276,13 @@ router.post(
   handleInvalidRequestJson,
   controllerDispatcher(calculateGrades)
 );
+
+
+
+
+
+
+
 
 /**
  * @swagger
@@ -323,6 +335,8 @@ router.post(
  *               $ref: '#/definitions/Failure'
  *       401:
  *         $ref: '#/components/responses/AuthenticationError'
+ *       403:
+ *         $ref: '#/components/responses/AuthorizationError'
  *       404:
  *         description: >
  *           The given course or assessment model does not exist

@@ -8,11 +8,14 @@ import { Op } from 'sequelize';
 import supertest from 'supertest';
 
 import AttainmentGrade from '../../src/database/models/attainmentGrade';
+import TeacherInCharge from '../../src/database/models/teacherInCharge';
 import User from '../../src/database/models/user';
 
 import { app } from '../../src/app';
 import { HttpCode } from '../../src/types/httpCode';
 import { getCookies, Cookies } from '../util/getCookies';
+
+jest.mock('../../src/database/models/teacherInCharge');
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
@@ -47,10 +50,11 @@ function checkSuccessRes(res: supertest.Response): void {
 }
 
 describe(
-  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv'
+  'XXX Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv'
   + ' - get grading CSV template',
   () => {
-    it('should get correct CSV template when attainments exist', async () => {
+
+    it('should get correct CSV template when attainments exist (admin user)', async () => {
       res = await request
         .get('/v1/courses/6/assessment-models/15/grades/csv')
         .set('Cookie', cookies.adminCookie)
@@ -64,6 +68,45 @@ describe(
       expect(res.headers['content-disposition']).toBe(
         'attachment; filename="course_MS-A0102_grading_template.csv"'
       );
+    });
+
+    it(
+      'should get correct CSV template when attainments exist (teacher in charge)',
+      async () => {
+        jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(null);
+
+        res = await request
+          .get('/v1/courses/6/assessment-models/15/grades/csv')
+          .set('Cookie', cookies.userCookie)
+          .set('Accept', 'text/csv')
+          .expect(HttpCode.Ok);
+
+        expect(res.text).toBe(
+          'StudentNo,tag216,tag217,tag218,tag219,tag220\n'
+        );
+
+        expect(res.headers['content-disposition']).toBe(
+          'attachment; filename="course_MS-A0102_grading_template.csv"'
+        );
+      });
+
+    it('should respond with 401 unauthorized, if not logged in', async () => {
+      await request
+        .get('/v1/courses/6/assessment-models/15/grades/csv')
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Unauthorized);
+    });
+
+    it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/6/assessment-models/15/grades/csv')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Forbidden);
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
     });
 
     it(
@@ -84,11 +127,11 @@ describe(
 );
 
 describe(
-  'Test POST /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv'
+  'XXX Test POST /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv'
   + ' - import grading data from CSV',
   () => {
 
-    it('should process CSV succesfully when attainments and users exist', async () => {
+    it('should process CSV succesfully when attainments and users exist (admin user)', async () => {
       const csvData: fs.ReadStream = fs.createReadStream(
         path.resolve(__dirname, '../mock-data/csv/grades.csv'), 'utf8'
       );
@@ -103,6 +146,26 @@ describe(
       expect(res.body.errors).not.toBeDefined();
       expect(res.body.data).toBeDefined();
     });
+
+    it(
+      'should process CSV succesfully when attainments and users exist (teacher in charge)',
+      async () => {
+        jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(null);
+
+        const csvData: fs.ReadStream = fs.createReadStream(
+          path.resolve(__dirname, '../mock-data/csv/grades.csv'), 'utf8'
+        );
+        res = await request
+          .post('/v1/courses/1/assessment-models/1/grades/csv')
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.userCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
+
+        expect(res.body.success).toBe(true);
+        expect(res.body.errors).not.toBeDefined();
+        expect(res.body.data).toBeDefined();
+      });
 
     it('should create users when a user does not exist in database', async () => {
       let users: Array<User> = await User.findAll({
@@ -405,6 +468,22 @@ describe(
         .expect(HttpCode.Unauthorized);
     });
 
+    it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
+      const csvData: fs.ReadStream = fs.createReadStream(
+        path.resolve(__dirname, '../mock-data/csv/grades.csv'), 'utf8'
+      );
+      res = await request
+        .post('/v1/courses/1/assessment-models/1/grades/csv')
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Forbidden);
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+    });
+
     it('should respond with 404 not found, if course does not exist', async () => {
       const csvData: fs.ReadStream = fs.createReadStream(
         path.resolve(__dirname, '../mock-data/csv/grades.csv'), 'utf8'
@@ -450,12 +529,12 @@ describe(
 );
 
 describe(
-  'Test POST /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/calculate',
+  'XXX Test POST /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/calculate',
   () => {
-    async function checkGraderId(result: AttainmentGrade): Promise<void> {
+    async function checkGraderId(result: AttainmentGrade, cookie: Array<string>): Promise<void> {
       const selfInfo: supertest.Response = await request
         .get('/v1/auth/self-info')
-        .set('Cookie', cookies.userCookie)
+        .set('Cookie', cookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -467,6 +546,7 @@ describe(
       attainmentId: number,
       userId: number,
       grade: number,
+      cookie: Array<string>,
       checkGrader: boolean = true
     ): Promise<void> {
       const result: AttainmentGrade | null = await AttainmentGrade.findOne({
@@ -479,10 +559,23 @@ describe(
       expect(result).not.toBe(null);
       expect(result?.grade).toBe(grade);
       if (checkGrader)
-        checkGraderId(result as AttainmentGrade);
+        checkGraderId(result as AttainmentGrade, cookie);
     }
 
-    it('should calculate correct grade, numeric grade', async () => {
+    it('should calculate correct grade, numeric grade (admin user)', async () => {
+      checkSuccessRes(await request
+        .post('/v1/courses/1/assessment-models/25/grades/calculate')
+        .send({
+          studentNumbers: ['238447']
+        })
+        .set('Cookie', cookies.adminCookie));
+
+      checkGrade(228, 391, 1.25, cookies.adminCookie);
+    });
+
+    it('should calculate correct grade, numeric grade (teacher in charge)', async () => {
+      jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(null);
+
       checkSuccessRes(await request
         .post('/v1/courses/1/assessment-models/25/grades/calculate')
         .send({
@@ -490,7 +583,7 @@ describe(
         })
         .set('Cookie', cookies.userCookie));
 
-      checkGrade(228, 391, 1.25);
+      checkGrade(228, 391, 1.25, cookies.userCookie);
     });
 
     it('should calculate multiple correct grades', async () => {
@@ -499,11 +592,11 @@ describe(
         .send({
           studentNumbers: ['238447', '197232', '265136']
         })
-        .set('Cookie', cookies.userCookie));
+        .set('Cookie', cookies.adminCookie));
 
-      checkGrade(231, 391, 1.5);
-      checkGrade(231, 392, 4.75);
-      checkGrade(231, 393, 3.25);
+      checkGrade(231, 391, 1.5, cookies.adminCookie);
+      checkGrade(231, 392, 4.75, cookies.adminCookie);
+      checkGrade(231, 393, 3.25, cookies.adminCookie);
     });
 
     it('should calculate correct grades in higher depths', async () => {
@@ -512,9 +605,9 @@ describe(
         .send({
           studentNumbers: ['238447']
         })
-        .set('Cookie', cookies.userCookie));
+        .set('Cookie', cookies.adminCookie));
 
-      checkGrade(234, 391, 3.12);
+      checkGrade(234, 391, 3.12, cookies.adminCookie);
     });
 
     it('should allow manually overriding a student\'s grade', async () => {
@@ -523,9 +616,9 @@ describe(
         .send({
           studentNumbers: ['238447']
         })
-        .set('Cookie', cookies.userCookie));
+        .set('Cookie', cookies.adminCookie));
 
-      checkGrade(242, 391, 5, false);
+      checkGrade(242, 391, 5, cookies.adminCookie, false);
     });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
@@ -536,8 +629,45 @@ describe(
         })
         .expect(HttpCode.Unauthorized);
     });
+
+    it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
+      res = await request
+        .post('/v1/courses/1/assessment-models/1/grades/calculate')
+        .send({
+          studentNumbers: ['238447']
+        })
+        .set('Cookie', cookies.userCookie)
+        .expect(HttpCode.Forbidden);
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+    });
   }
 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 describe(
   'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv/sisu' +
