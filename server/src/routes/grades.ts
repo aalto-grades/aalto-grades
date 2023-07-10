@@ -215,6 +215,7 @@ router.post(
  *     tags: [Grades]
  *     description: >
  *       Calculate the final grades of all students.
+ *       Available only to admin users and teachers in charge of the course.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
  *       - $ref: '#/components/parameters/assessmentModelId'
@@ -277,13 +278,6 @@ router.post(
   controllerDispatcher(calculateGrades)
 );
 
-
-
-
-
-
-
-
 /**
  * @swagger
  * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/csv/sisu:
@@ -291,6 +285,7 @@ router.post(
  *     tags: [Grades]
  *     description: >
  *       Get the final grades of all students in a Sisu compatible CSV format.
+ *       Available only to admin users and teachers in charge of the course.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
  *       - $ref: '#/components/parameters/assessmentModelId'
@@ -366,6 +361,7 @@ router.get(
  *     tags: [Grades]
  *     description: >
  *       Get the final grades of all students.
+ *       Available only to admin users and teachers in charge of the course.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
  *       - $ref: '#/components/parameters/assessmentModelId'
@@ -395,6 +391,8 @@ router.get(
  *               $ref: '#/definitions/Failure'
  *       401:
  *         $ref: '#/components/responses/AuthenticationError'
+ *       403:
+ *         $ref: '#/components/responses/AuthorizationError'
  *       404:
  *         description: >
  *           The given course or assessment model does not exist
