@@ -108,7 +108,7 @@ describe('Test GET /v1/courses - get all courses', () => {
 
 describe('Test POST /v1/courses - create new course', () => {
 
-  it('should respond with course data on correct input', async () => {
+  it('should respond with course data on correct input (admin user)', async () => {
     let input: object = {
       courseCode: 'ELEC-A7200',
       minCredits: 5,
@@ -199,7 +199,7 @@ describe('Test POST /v1/courses - create new course', () => {
       .expect(HttpCode.Unauthorized);
   });
 
-  it('should respond with 403 forbidden, if insufficient rights', async () => {
+  it('should respond with 403 forbidden, if not admin user', async () => {
     await request
       .post('/v1/courses')
       .send({})
