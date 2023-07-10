@@ -170,7 +170,7 @@ router.get(
  * /v1/courses:
  *   post:
  *     tags: [Course]
- *     description: Create a new course.
+ *     description: Create a new course. Only for users with admin rights.
  *     requestBody:
  *       content:
  *         application/json:
