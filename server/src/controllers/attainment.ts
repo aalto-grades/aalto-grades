@@ -80,7 +80,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     attainmentTree: AttainmentData
   ): Promise<void> {
     if (attainmentTree.formula) {
-      getFormulaImplementation(attainmentTree.formula).paramSchema.validate(
+      await getFormulaImplementation(attainmentTree.formula).paramSchema.validate(
         attainmentTree.formulaParams, { abortEarly: false }
       );
     }
@@ -243,21 +243,11 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
         HttpCode.Conflict
       );
     }
-  } else if (attainment.parentId) {
-    parentAttainment = await findAttainmentById(
-      attainment.parentId,
-      HttpCode.UnprocessableEntity
-    );
   }
 
-  if (parentAttainment) {
-    const parentFormula: FormulaImplementation =
-      getFormulaImplementation(parentAttainment.formula);
-    await parentFormula.paramSchema.validate(formulaParams);
-  } else if (formulaParams) {
-    throw new ApiError(
-      'root attainment can\'t have parent formula params',
-      HttpCode.Conflict
+  if (formula) {
+    await getFormulaImplementation(formula).paramSchema.validate(
+      formulaParams, { abortEarly: false }
     );
   }
 
