@@ -11,13 +11,18 @@ import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import Box from '@mui/material/Box';
 
+interface Colum {
+  id: string,
+  name: string
+}
+
 function CourseResultsTableHead(props: {
   order: 'asc' | 'desc',
   orderBy: string,
   onRequestSort: (event: SyntheticEvent, property: string) => void
 }): JSX.Element {
 
-  const rows = [
+  const rows: Array<Colum> = [
     {
       id: 'studentNumber',
       name: 'Student Number'
@@ -42,7 +47,7 @@ function CourseResultsTableHead(props: {
     <TableHead>
       <TableRow>
         {
-          rows.map((column) => (
+          rows.map((column: Colum) => (
             <TableCell
               key={column.id}
               align='left'
