@@ -551,8 +551,10 @@ describe(
 
     it('should export CSV succesfully when course results are found', async () => {
       res = await request
-        // eslint-disable-next-line max-len
-        .get(`/v1/courses/6/assessment-models/24/grades/csv/sisu?studentNumbers=${JSON.stringify(studentNumbers)}`)
+        .get(
+          `/v1/courses/6/assessment-models/24/grades/csv/sisu`
+          + `?studentNumbers=${JSON.stringify(studentNumbers)}`
+        )
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'text/csv')
         .expect(HttpCode.Ok);
@@ -581,8 +583,11 @@ describe(
     it('should export CSV succesfully with custom assessmentDate and completionLanguage',
       async () => {
         res = await request
-          // eslint-disable-next-line max-len
-          .get(`/v1/courses/6/assessment-models/24/grades/csv/sisu?assessmentDate=2023-05-12&completionLanguage=sv&studentNumbers=${JSON.stringify(studentNumbers)}`)
+          .get(
+            '/v1/courses/6/assessment-models/24/grades/csv/sisu'
+            + '?assessmentDate=2023-05-12&completionLanguage=sv'
+            + `&studentNumbers=${JSON.stringify(studentNumbers)}`
+          )
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'text/csv')
           .expect(HttpCode.Ok);
@@ -687,10 +692,13 @@ describe(
 
     it('should get final grades succesfully when course results are found', async () => {
       res = await request
-        // eslint-disable-next-line max-len
-        .get(`/v1/courses/6/assessment-models/24/grades?studentNumbers=${JSON.stringify(studentNumbers)}`)
+        .get(
+          '/v1/courses/6/assessment-models/24/grades'
+          + `?studentNumbers=${JSON.stringify(studentNumbers)}`
+        )
         .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'application/json');
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
 
       checkSuccessRes(res);
       expect(res.body.data.finalGrades).toEqual([

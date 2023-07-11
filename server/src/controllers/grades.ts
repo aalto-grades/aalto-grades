@@ -767,6 +767,7 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
       .notRequired(),
     studentNumbers: yup
       .array()
+      .json()
       .of(yup.string())
       .notRequired()
   });
@@ -852,12 +853,13 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
   const urlParams: yup.AnyObjectSchema = yup.object({
     studentNumbers: yup
       .array()
+      .json()
       .of(yup.string())
       .notRequired()
   });
 
   const { studentNumbers }: {
-    studentNumbers: Array<string> | undefined
+    studentNumbers?: Array<string>
   } = await urlParams.validate(req.query, { abortEarly: false });
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
