@@ -12,13 +12,14 @@ import Course from '../database/models/course';
 import { AttainmentData, Formula } from 'aalto-grades-common/types';
 import { getFormulaImplementation } from '../formulas';
 import { ApiError } from '../types/error';
-import { idSchema } from '../types/general';
+import { JwtClaims, idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import {
   findAttainmentById, findAttainmentsByAssessmentModel, generateAttainmentTree,
   validateAttainmentPath
 } from './utils/attainment';
+import { isTeacherInChargeOrAdmin } from './utils/user';
 
 export async function addAttainment(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
@@ -50,13 +51,15 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
   });
 
   await requestSchema.validate(req.body, { abortEarly: false });
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
     );
 
   const requestTree: AttainmentData = req.body;
+
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
   // If linked to a parent ID ensure that the parent attainment exists and
   // belongs to the same assessment model
@@ -145,11 +148,6 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
 }
 
 export async function deleteAttainment(req: Request, res: Response): Promise<void> {
-  /*
-   * TODO: Check that the requester is authorized to delete attainments, 403
-   * Forbidden if not
-   */
-
   // Get path parameters.
   const attainmentId: number = Number(req.params.attainmentId);
 
@@ -161,6 +159,8 @@ export async function deleteAttainment(req: Request, res: Response): Promise<voi
     await validateAttainmentPath(
       req.params.courseId, req.params.assessmentModelId, req.params.attainmentId
     );
+
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
   // Delete the attainment if found from db. This automatically
   // also deletes all of the subattainments of this attainment.
@@ -208,6 +208,8 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     await validateAttainmentPath(
       req.params.courseId, req.params.assessmentModelId, req.params.attainmentId
     );
+
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
   const name: string | undefined = req.body.name;
   const tag: string | undefined = req.body.tag;
