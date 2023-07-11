@@ -738,45 +738,7 @@ describe(
       expect(res.body.data.attainment.daysValid).toBe(50);
     });
 
-    it(
-      'should update field succesfully on an existing attainment (teacher in charge)',
-      async () => {
-        // Create a new attainments.
-        let res: supertest.Response = await request
-          .post('/v1/courses/1/assessment-models/12/attainments')
-          .send(mockAttainment)
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.Ok);
-
-        subAttainment = res.body.data.attainment;
-        jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
-
-        res = await request
-          .put(`/v1/courses/1/assessment-models/12/attainments/${subAttainment.id}`)
-          .send({
-            name: 'new name 2',
-            tag: 'new tag 2',
-            daysValid: 51
-          })
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.userCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.Ok);
-
-        expect(res.body.success).toBe(true);
-        expect(res.body.errors).not.toBeDefined();
-        expect(res.body.data.attainment.id).toBe(subAttainment.id);
-        expect(res.body.data.attainment.assessmentModelId).toBe(12);
-        expect(res.body.data.attainment.parentId).toBe(null);
-        expect(res.body.data.attainment.name).toBe('new name 2');
-        expect(res.body.data.attainment.tag).toBe('new tag 2');
-        expect(res.body.data.attainment.formula).toBe(Formula.WeightedAverage);
-        expect(res.body.data.attainment.daysValid).toBe(51);
-      });
-
-    it('should add parent succesfully on an existing attainment', async () => {
+    it('should add parent succesfully on an existing attainment (teacher in charge)', async () => {
       // Create a new parent attainment.
       let res: supertest.Response = await request
         .post('/v1/courses/1/assessment-models/12/attainments')
@@ -790,12 +752,13 @@ describe(
         .expect(HttpCode.Ok);
 
       parentAttainment = res.body.data.attainment;
+      jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
 
       res = await request
         .put(`/v1/courses/1/assessment-models/12/attainments/${subAttainment.id}`)
         .send({ parentId: parentAttainment.id })
         .set('Content-Type', 'application/json')
-        .set('Cookie', cookies.adminCookie)
+        .set('Cookie', cookies.userCookie)
         .expect(HttpCode.Ok);
 
       expect(res.body.success).toBe(true);
