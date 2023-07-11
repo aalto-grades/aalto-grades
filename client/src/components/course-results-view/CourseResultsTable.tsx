@@ -20,10 +20,10 @@ import CourseResultsTableHead from './CourseResultsTableHead';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import sortingServices from '../../services/sorting';
-import { State } from '../../types';
+import { FinalGrade, State } from '../../types';
 
 function CourseResultsTable(props: {
-  students: Array<any>,
+  students: Array<FinalGrade>,
   calculateFinalGrades: () => Promise<void>,
   downloadCsvTemplate: () => Promise<void>,
   loading: boolean
@@ -35,36 +35,36 @@ function CourseResultsTable(props: {
   const [dense, setDense]: State<boolean> = useState(true);
   const [rowsPerPage, setRowsPerPage]: State<number> = useState(25);
   const [search, setSearch]: State<string> = useState('');
-  const [studentsToShow, setStudentsToShow]: State<Array<any>> = useState(props.students);
+  const [studentsToShow, setStudentsToShow]: State<Array<FinalGrade>> = useState(props.students);
 
   useEffect(() => {
-    setStudentsToShow(search === '' ? props.students : props.students.filter((s) => {
+    setStudentsToShow(search === '' ? props.students : props.students.filter((s: FinalGrade) => {
       return s.studentNumber.includes(search);
     }));
     setPage(0);
   }, [search, props.students]);
 
-  function handleRequestSort(event: SyntheticEvent, property: string) {
-    const isAsc = orderBy === property && order === 'asc';
+  function handleRequestSort(event: SyntheticEvent, property: string): void {
+    const isAsc: boolean = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   }
 
-  function handleChangePage(event: MouseEvent | null, newPage: number) {
+  function handleChangePage(event: MouseEvent | null, newPage: number): void {
     setPage(newPage);
   }
 
-  function handleChangeRowsPerPage(event: ChangeEvent<HTMLInputElement>) {
+  function handleChangeRowsPerPage(event: ChangeEvent<HTMLInputElement>): void {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   }
 
-  function handleChangeDense(event: ChangeEvent<HTMLInputElement>) {
+  function handleChangeDense(event: ChangeEvent<HTMLInputElement>): void {
     setDense(event.target.checked);
   }
 
   // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
+  const emptyRows: number =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - studentsToShow.length) : 0;
 
   return (
@@ -102,8 +102,7 @@ function CourseResultsTable(props: {
                     sortingServices.stableSort(studentsToShow,
                       sortingServices.getComparator(order, orderBy))
                       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((student: any) => {
-
+                      .map((student: FinalGrade) => {
                         return (
                           <TableRow
                             hover
@@ -122,7 +121,7 @@ function CourseResultsTable(props: {
                             <TableCell
                               sx={{ width: '100px' }}
                               component="th"
-                              id={student.credits}
+                              id={`${student.studentNumber}_credits}`}
                               scope="row"
                               padding="normal"
                             >
@@ -173,7 +172,7 @@ function CourseResultsTable(props: {
         </Box>
       </Paper>
       <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
+        control={<Switch checked={dense} onChange={handleChangeDense} id='padding-switch'/>}
         label="Dense padding"
       />
     </Box>
