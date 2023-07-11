@@ -11,10 +11,6 @@ import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import FormLabel from '@mui/material/FormLabel';
 import InputLabel from '@mui/material/InputLabel';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
@@ -163,32 +159,6 @@ function SelectFormulaForm(props: {
     return false;
   }
 
-  function attainmentCheckboxes(): JSX.Element {
-    return (
-      <>
-        { props.attainments.length == 0 ?
-          <Box sx={{ my: 5 }}>
-            <CircularProgress sx={{ mr: 4 }}/>
-            Loading attainments...
-          </Box> :
-          props.attainments.map((attainment: AttainmentData) => (
-            <FormControlLabel
-              key={attainment.id}
-              label={attainment.name}
-              control={
-                <Checkbox
-                  name={attainment.name}
-                  onChange={handleCheckboxChange}
-                  checked={isChecked(attainment)}
-                />
-              }
-            />
-          ))
-        }
-      </>
-    );
-  }
-
   return (
     <form onSubmit={handleSubmit}>
       <AlertSnackbar
@@ -207,17 +177,6 @@ function SelectFormulaForm(props: {
         my: 3,
         textAlign: 'left'
       }}>
-        <FormControl sx={{ m: 3, mb: 0 }} component='fieldset' variant='standard'>
-          <FormLabel component='legend' focused={false} sx={{
-            color: 'secondary.contrastText', mb: 1.5
-          }}>
-            Select the sub study attainments you want to include in the calculation
-          </FormLabel>
-          <FormGroup>
-            {attainmentCheckboxes()}
-          </FormGroup>
-          <FormHelperText error={checkboxError !== ''}>{checkboxError}</FormHelperText>
-        </FormControl>
         <FormControl sx={{ m: 3, mt: 3, minWidth: 280 }} variant='standard'>
           <InputLabel
             id='formulaLabel'
