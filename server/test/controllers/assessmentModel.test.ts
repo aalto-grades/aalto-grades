@@ -6,6 +6,7 @@ import supertest from 'supertest';
 
 import TeacherInCharge from '../../src/database/models/teacherInCharge';
 
+import { mockTeacher } from '../mock-data/misc';
 import { app } from '../../src/app';
 import { HttpCode } from '../../src/types/httpCode';
 import { Cookies, getCookies } from '../util/getCookies';
@@ -16,12 +17,6 @@ let cookies: Cookies = {
   adminCookie: [],
   userCookie: []
 };
-const mockTeacher: TeacherInCharge = new TeacherInCharge({
-  userId: 1,
-  courseId: 1,
-  createdAt: new Date(),
-  updatedAt: new Date()
-}, { isNewRecord: false });
 
 beforeAll(async () => {
   cookies = await getCookies();
