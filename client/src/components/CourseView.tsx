@@ -231,11 +231,14 @@ function CourseView(): JSX.Element {
             courseId &&
             <InstancesTable courseId={courseId} />
           }
-          <FileLoadDialog
-            instanceId={0} // TODO: Should not be instance?
-            open={fileLoadOpen}
-            handleClose={(): void => setFileLoadOpen(false)}
-          />
+          {
+            currentAssessmentModel != null &&
+            <FileLoadDialog
+              assessmentModelId={currentAssessmentModel.id as number}
+              open={fileLoadOpen}
+              handleClose={(): void => setFileLoadOpen(false)}
+            />
+          }
           <CreateAssessmentModelDialog
             open={createAssessmentModelOpen}
             handleClose={(): void => setCreateAssessmentModelOpen(false)}
