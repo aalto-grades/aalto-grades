@@ -14,8 +14,7 @@ import { JwtClaims, idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { findAssessmentModelById } from './utils/assessmentModel';
 import { findCourseById } from './utils/course';
-import { SystemRole } from 'aalto-grades-common/types';
-import { isTeacherInCharge } from './utils/user';
+import { isTeacherInChargeOrAdmin } from './utils/user';
 
 export async function getAssessmentModel(req: Request, res: Response): Promise<void> {
   const courseId: number = Number(req.params.courseId);
@@ -91,8 +90,6 @@ export async function addAssessmentModel(req: Request, res: Response): Promise<v
     name: yup.string().strict().required()
   });
 
-  // Route is only available for admins and those who have teacher in charge role for the course.
-  const user: JwtClaims = req.user as JwtClaims;
   const courseId: number = Number(req.params.courseId);
   await idSchema.validate({ id: courseId });
   await requestSchema.validate(req.body, { abortEarly: false });
@@ -102,10 +99,8 @@ export async function addAssessmentModel(req: Request, res: Response): Promise<v
     courseId, HttpCode.NotFound
   );
 
-  if (user.role !== SystemRole.Admin) {
-    // Confirm that user is teacher in charge of the course.
-    await isTeacherInCharge(user.id, courseId, HttpCode.Forbidden);
-  }
+  // Route is only available for admins and those who have teacher in charge role for the course.
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, courseId, HttpCode.Forbidden);
 
   const newAssessmentModel: AssessmentModel = await AssessmentModel.create({
     courseId: course.id,
