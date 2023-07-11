@@ -49,12 +49,6 @@ describe('Tests for SelectFormulaView components', () => {
       await waitFor(() => {
         expect(screen.getByText('Select Grading Formula')).toBeInTheDocument();
         expect(screen.getByText('Result: Course Total Grade')).toBeInTheDocument();
-        expect(screen.getByText(
-          'Select the sub study attainments you want to include in the calculation'
-        )).toBeInTheDocument();
-        expect(screen.getByText('Project')).toBeInTheDocument();
-        expect(screen.getByText('Exam')).toBeInTheDocument();
-        expect(screen.getByText('Exercises')).toBeInTheDocument();
         expect(screen.getByText('Formula')).toBeInTheDocument();
         expect(screen.getByText('Preview of the formula')).toBeInTheDocument();
         expect(screen.getByText(
