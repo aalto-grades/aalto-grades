@@ -160,7 +160,9 @@ router.get(
  * /v1/courses/{courseId}/assessment-models:
  *   post:
  *     tags: [Assessment Model]
- *     description: Add an attainment model to a course.
+ *     description: >
+ *       Add an attainment model to a course.
+ *       Available only to admin users and teachers in charge of the course.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
  *     requestBody:

@@ -5,13 +5,14 @@
 import supertest from 'supertest';
 
 import Attainment from '../../src/database/models/attainment';
+import TeacherInCharge from '../../src/database/models/teacherInCharge';
 
-import { AttainmentData } from 'aalto-grades-common/types/attainment';
-import { mockAttainment } from '../mock-data/attainment';
+import { AttainmentData, Formula } from 'aalto-grades-common/types';
+import { mockAttainment, jestMockAttainment } from '../mock-data/attainment';
+import { mockTeacher } from '../mock-data/misc';
 import { app } from '../../src/app';
 import { HttpCode } from '../../src/types/httpCode';
 import { Cookies, getCookies } from '../util/getCookies';
-import { Formula } from 'aalto-grades-common/types';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
@@ -70,7 +71,7 @@ describe(
 
     it(
       'should create a new attainment with no sub-attainments when course and'
-      + ' assessment model exist',
+      + ' assessment model exist (admin user)',
       async () => {
         const res: supertest.Response = await request
           .post('/v1/courses/1/assessment-models/31/attainments')
@@ -92,6 +93,39 @@ describe(
         expect(res.body.data.attainment.assessmentModelId).toBe(31);
         expect(res.body.data.attainment.parentId).not.toBeDefined();
         expect(res.body.data.attainment.tag).toBe('tag of the new one');
+        expect(res.body.data.attainment.formula).toBe(Formula.Manual);
+        expect(res.body.data.attainment.formulaParams).toBe(null);
+        expect(res.body.data.attainment.daysValid).toBeDefined();
+        expect(res.body.data.attainment.subAttainments).toBeDefined();
+      }
+    );
+
+    it(
+      'should create a new attainment with no sub-attainments when course and'
+      + ' assessment model exist (teacher in charge)',
+      async () => {
+        jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
+
+        const res: supertest.Response = await request
+          .post('/v1/courses/1/assessment-models/31/attainments')
+          .send({
+            name: 'examination',
+            tag: 'tag123456',
+            daysValid: 365,
+            formula: Formula.Manual,
+          })
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.userCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
+
+        expect(res.body.success).toBe(true);
+        expect(res.body.errors).not.toBeDefined();
+        expect(res.body.data.attainment.id).toBeDefined();
+        expect(res.body.data.attainment.name).toBe('examination');
+        expect(res.body.data.attainment.assessmentModelId).toBe(31);
+        expect(res.body.data.attainment.parentId).not.toBeDefined();
+        expect(res.body.data.attainment.tag).toBe('tag123456');
         expect(res.body.data.attainment.formula).toBe(Formula.Manual);
         expect(res.body.data.attainment.formulaParams).toBe(null);
         expect(res.body.data.attainment.daysValid).toBeDefined();
@@ -382,6 +416,23 @@ describe(
         .expect(HttpCode.Unauthorized);
     });
 
+    it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
+      const res: supertest.Response = await request
+        .post('/v1/courses/3/assessment-models/3/attainments')
+        .send({
+          parentId: 3,
+          ...mockAttainment
+        })
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Forbidden);
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+    });
+
     it('should respond with 404 not found, if assessment model does not exist',
       async () => {
         const res: supertest.Response = await request
@@ -519,7 +570,7 @@ describe(
         expect(await Attainment.findByPk(addedAttainment)).toBeNull;
     }
 
-    it('should succesfully delete single attainment', async () => {
+    it('should succesfully delete single attainment (admin user)', async () => {
       // Add an attainment.
       const add: supertest.Response = await request
         .post('/v1/courses/4/assessment-models/7/attainments')
@@ -542,6 +593,39 @@ describe(
       const res: supertest.Response = await request
         .delete(`/v1/courses/4/assessment-models/7/attainments/${addedAttainment}`)
         .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+
+      // Verify that the attainment was deleted.
+      expect(res.body.success).toBe(true);
+      expect(await Attainment.findByPk(addedAttainment)).toBeNull;
+    });
+
+    it('should succesfully delete single attainment (teacher in charge)', async () => {
+      // Add an attainment.
+      const add: supertest.Response = await request
+        .post('/v1/courses/4/assessment-models/7/attainments')
+        .send(
+          {
+            name: 'Test exercise 2',
+            tag: 'delete-test-2',
+            daysValid: 30,
+            subAttainments: []
+          }
+        )
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json');
+
+      // Verify that the attainment was added.
+      const addedAttainment: number = add.body.data.attainment.id;
+      expect(await Attainment.findByPk(addedAttainment)).not.toBeNull;
+
+      jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
+
+      // Delete the added attainment.
+      const res: supertest.Response = await request
+        .delete(`/v1/courses/4/assessment-models/7/attainments/${addedAttainment}`)
+        .set('Cookie', cookies.userCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -585,6 +669,20 @@ describe(
         .expect(HttpCode.Unauthorized);
     });
 
+    it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
+      jest.spyOn(Attainment, 'findByPk').mockResolvedValueOnce(jestMockAttainment);
+
+      const res: supertest.Response = await request
+        .delete('/v1/courses/4/assessment-models/7/attainments/1')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Forbidden);
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+    });
+
     it('should respond with 404 not found for non-existent attainment ID', async () => {
       const res: supertest.Response = await request
         .delete(`/v1/courses/4/assessment-models/7/attainments/${badId}`)
@@ -605,8 +703,8 @@ describe(
     let subAttainment: AttainmentData;
     let parentAttainment: AttainmentData;
 
-    it('should update field succesfully on an existing attainment', async () => {
-    // Create a new attainments.
+    it('should update field succesfully on an existing attainment (admin user)', async () => {
+      // Create a new attainments.
       let res: supertest.Response = await request
         .post('/v1/courses/1/assessment-models/12/attainments')
         .send(mockAttainment)
@@ -640,7 +738,7 @@ describe(
       expect(res.body.data.attainment.daysValid).toBe(50);
     });
 
-    it('should add parent succesfully on an existing attainment', async () => {
+    it('should add parent succesfully on an existing attainment (teacher in charge)', async () => {
       // Create a new parent attainment.
       let res: supertest.Response = await request
         .post('/v1/courses/1/assessment-models/12/attainments')
@@ -654,12 +752,13 @@ describe(
         .expect(HttpCode.Ok);
 
       parentAttainment = res.body.data.attainment;
+      jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
 
       res = await request
         .put(`/v1/courses/1/assessment-models/12/attainments/${subAttainment.id}`)
         .send({ parentId: parentAttainment.id })
         .set('Content-Type', 'application/json')
-        .set('Cookie', cookies.adminCookie)
+        .set('Cookie', cookies.userCookie)
         .expect(HttpCode.Ok);
 
       expect(res.body.success).toBe(true);
@@ -743,6 +842,24 @@ describe(
         .put('/v1/courses/2/assessment-models/11/attainments/1')
         .set('Accept', 'application/json')
         .expect(HttpCode.Unauthorized);
+    });
+
+    it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
+      jest.spyOn(Attainment, 'findByPk').mockResolvedValueOnce(jestMockAttainment);
+
+      const res: supertest.Response = await request
+        .put('/v1/courses/4/assessment-models/7/attainments/1')
+        .send({
+          name: 'new name 2',
+          tag: 'new tag 2',
+          daysValid: 51
+        })
+        .set('Cookie', cookies.userCookie)
+        .expect(HttpCode.Forbidden);
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
     });
 
     it('should respond with 404 not found, if attainment does not exist', async () => {

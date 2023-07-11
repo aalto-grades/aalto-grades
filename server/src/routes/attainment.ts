@@ -89,6 +89,7 @@ export const router: Router = Router();
  *     description: >
  *       Add a new study attainment and its possible
  *       subattainment(s) to an existing assessment model.
+ *       Available only to admin users and teachers in charge of the course.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
  *       - $ref: '#/components/parameters/assessmentModelId'
@@ -159,7 +160,9 @@ router.post(
  * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/attainments/{attainmentId}:
  *   delete:
  *     tags: [Attainment]
- *     description: Delete a study attainment and all of its subattainments.
+ *     description: >
+ *       Delete a study attainment and all of its subattainments.
+ *       Available only to admin users and teachers in charge of the course.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
  *       - $ref: '#/components/parameters/assessmentModelId'
@@ -219,7 +222,9 @@ router.delete(
  * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/attainments/{attainmentId}:
  *   put:
  *     tags: [Attainment]
- *     description: Update existing study attainment.
+ *     description: >
+ *       Update existing study attainment.
+ *       Available only to admin users and teachers in charge of the course.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
  *       - $ref: '#/components/parameters/assessmentModelId'
@@ -307,6 +312,8 @@ router.put(
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
  *       404:
  *         description: Attainment was not found.
  *         content:
@@ -326,7 +333,6 @@ router.put(
  *             schema:
  *               $ref: '#/definitions/Failure'
  */
-
 router.get(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
   passport.authenticate('jwt', { session: false }),
@@ -356,6 +362,8 @@ router.get(
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
  *       404:
  *         description: Root attainment for the course instance was not found.
  *         content:
@@ -371,7 +379,6 @@ router.get(
  *             schema:
  *               $ref: '#/definitions/Failure'
  */
-
 router.get(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments',
   passport.authenticate('jwt', { session: false }),
