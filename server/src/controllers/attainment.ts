@@ -15,10 +15,11 @@ import { ApiError } from '../types/error';
 import { FormulaImplementation } from '../types/formulas';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
+import { validateAssessmentModelPath } from './utils/assessmentModel';
 import {
-  findAttainmentById, findAttainmentsByAssessmentModel, generateAttainmentTree
+  findAttainmentById, findAttainmentsByAssessmentModel, generateAttainmentTree,
+  validateAttainmentPath
 } from './utils/attainment';
-import { validateCourseAndAssessmentModel } from './utils/assessmentModel';
 
 export async function addAttainment(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
@@ -52,7 +53,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
   await requestSchema.validate(req.body, { abortEarly: false });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, assessmentModel]: [Course, AssessmentModel] =
-    await validateCourseAndAssessmentModel(
+    await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
     );
 
@@ -74,6 +75,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     }
   }
 
+  // Validate formula parameters for each attainment
   async function validateFormulaParams(
     attainmentTree: AttainmentData
   ): Promise<void> {
@@ -92,6 +94,8 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
 
   await validateFormulaParams(req.body);
 
+  // Add all attainments to the database and construct an attainment tree with
+  // IDs to return
   async function processAttainmentTree(
     requestTree: AttainmentData, parentId: number | undefined
   ): Promise<AttainmentData> {
@@ -152,13 +156,16 @@ export async function deleteAttainment(req: Request, res: Response): Promise<voi
 
   // Validation.
   await idSchema.validate({ id: attainmentId }, { abortEarly: false });
-  await validateCourseAndAssessmentModel(
-    req.params.courseId, req.params.assessmentModelId
-  );
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [course, assessmentModel, attainment]: [Course, AssessmentModel, Attainment] =
+    await validateAttainmentPath(
+      req.params.courseId, req.params.assessmentModelId, req.params.attainmentId
+    );
 
   // Delete the attainment if found from db. This automatically
   // also deletes all of the subattainments of this attainment.
-  (await findAttainmentById(attainmentId, HttpCode.NotFound)).destroy();
+  attainment.destroy();
 
   res.status(HttpCode.Ok).send({
     success: true,
@@ -196,9 +203,12 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   const attainmentId: number = Number(req.params.attainmentId);
   await idSchema.validate({ id: attainmentId }, { abortEarly: false });
   await requestSchema.validate(req.body, { abortEarly: false });
-  await validateCourseAndAssessmentModel(
-    req.params.courseId, req.params.assessmentModelId
-  );
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [course, assessmentModel, attainment]: [Course, AssessmentModel, Attainment] =
+    await validateAttainmentPath(
+      req.params.courseId, req.params.assessmentModelId, req.params.attainmentId
+    );
 
   const name: string | undefined = req.body.name;
   const tag: string | undefined = req.body.tag;
@@ -207,7 +217,6 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   const formula: Formula | undefined = req.body.formula;
   const formulaParams: object | undefined = req.body.formulaParams;
 
-  const attainment: Attainment = await findAttainmentById(attainmentId, HttpCode.NotFound);
   let parentAttainment: Attainment | null = null;
 
   // If linked to a parent id, check that it exists and belongs
@@ -295,9 +304,9 @@ export async function getAttainment(req: Request, res: Response): Promise<void> 
   const attainmentId: number = Number(req.params.attainmentId);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [course, assessmentModel]: [Course, AssessmentModel] =
-    await validateCourseAndAssessmentModel(
-      req.params.courseId, req.params.assessmentModelId
+  const [course, assessmentModel, attainment]: [Course, AssessmentModel, Attainment] =
+    await validateAttainmentPath(
+      req.params.courseId, req.params.assessmentModelId, req.params.attainmentId
     );
 
   const attainmentData: Array<AttainmentData> =
@@ -336,8 +345,10 @@ export async function getRootAttainment(req: Request, res: Response): Promise<vo
   const tree: string = await validateTreeParam(req.query.tree as string);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [course, assessmentModel]: [Course, AssessmentModel] =
-    await validateCourseAndAssessmentModel(req.params.courseId, req.params.assessmentModelId);
+  const [course, assessmentModel, attainment]: [Course, AssessmentModel, Attainment] =
+    await validateAttainmentPath(
+      req.params.courseId, req.params.assessmentModelId, req.params.attainmentId
+    );
 
   const allAttainmentData: Array<AttainmentData> =
     await findAttainmentsByAssessmentModel(assessmentModel.id);

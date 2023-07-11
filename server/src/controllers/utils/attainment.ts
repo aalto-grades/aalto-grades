@@ -2,10 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
+import AssessmentModel from '../../database/models/assessmentModel';
 import Attainment from '../../database/models/attainment';
+import Course from '../../database/models/course';
 
 import { AttainmentData } from 'aalto-grades-common/types/attainment';
+import { validateAssessmentModelPath } from './assessmentModel';
 import { ApiError } from '../../types/error';
+import { idSchema } from '../../types/general';
 import { HttpCode } from '../../types/httpCode';
 
 /**
@@ -86,4 +90,33 @@ export function generateAttainmentTree(
       });
     }
   }
+}
+
+export async function validateAttainmentPath(
+  courseId: unknown, assessmentModelId: unknown, attainmentId: unknown
+): Promise<[Course, AssessmentModel, Attainment]> {
+
+  // Validate course and assessment model
+  const [course, assessmentModel]: [Course, AssessmentModel] =
+    await validateAssessmentModelPath(courseId, assessmentModelId);
+
+  const attainmentIdValidated: number = (await idSchema.validate(
+    { id: attainmentId }, { abortEarly: false }
+  )).id;
+
+  // Ensure that attainment exists.
+  const attainment: Attainment = await findAttainmentById(
+    attainmentIdValidated, HttpCode.NotFound
+  );
+
+  // Check that attainment belongs to the assessment model.
+  if (attainment.assessmentModelId !== assessmentModel.id) {
+    throw new ApiError(
+      `attainment with ID ${attainmentId} ` +
+      `does not belong to the assessment model with ID ${assessmentModelId}`,
+      HttpCode.Conflict
+    );
+  }
+
+  return [course, assessmentModel, attainment];
 }

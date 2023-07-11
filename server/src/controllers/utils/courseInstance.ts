@@ -37,7 +37,7 @@ export async function findCourseInstanceById(
  * @throws {ApiError} - If the course or instance is not found, or the course instance does no
  * belong to the course, throws an error with a message indicating missing or conflicting resource.
  */
-export async function validateCourseAndInstance(
+export async function validateCourseInstancePath(
   courseId: unknown, courseInstanceId: unknown
 ): Promise<[Course, CourseInstance]> {
   // Validate id types.

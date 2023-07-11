@@ -23,7 +23,7 @@ export async function findAssessmentModelById(
   return assessmentModel;
 }
 
-export async function validateCourseAndAssessmentModel(
+export async function validateAssessmentModelPath(
   courseId: unknown, assessmentModelId: unknown
 ): Promise<[Course, AssessmentModel]> {
   const courseIdValidated: number = (await idSchema.validate(
