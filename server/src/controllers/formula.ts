@@ -14,7 +14,7 @@ export async function getFormulas(req: Request, res: Response): Promise<void> {
   res.status(HttpCode.Ok).json({
     success: true,
     data: {
-      formulas: await getAllFormulasBasicData()
+      formulas: getAllFormulasBasicData()
     }
   });
 }
@@ -37,8 +37,9 @@ export async function getFormula(req: Request, res: Response): Promise<void> {
   const formula: FormulaPreview = {
     id: formulaId,
     name: formulaImplementation.name,
-    attributes: formulaImplementation.attributes,
-    codeSnippet: formulaImplementation.codeSnippet,
+    params: formulaImplementation.params,
+    childParams: formulaImplementation.childParams,
+    codeSnippet: formulaImplementation.codeSnippet
   };
 
   res.status(HttpCode.Ok).json({

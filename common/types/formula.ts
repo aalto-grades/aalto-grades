@@ -13,6 +13,7 @@ export interface FormulaData {
 }
 
 export interface FormulaPreview extends FormulaData {
-  attributes: Array<string>;
+  params: Array<string>;
+  childParams: Array<string>;
   codeSnippet: string;
 }

@@ -4,8 +4,8 @@
 
 import * as yup from 'yup';
 
-import { FormulaFunction, FormulaImplementation } from '../types/formulas';
 import { Formula, FormulaData } from 'aalto-grades-common/types';
+import { FormulaFunction, FormulaImplementation } from '../types/formulas';
 
 // The registry of formula implementations corresponding to their names, along
 // with a schema specifying what form their user parameters should take.
@@ -13,8 +13,15 @@ const formulaImplementations: Map<Formula, FormulaImplementation> = new Map();
 
 /**
  * Adds a formula implementation to the formula registry.
- * @param {Formula} formula - The name and ID of the formula.
+ * @param {Formula} formula - The ID of the formula.
  * @param {FormulaFunction} formulaFunction - The function implementing the formula.
+ * @param {string} codeSnippet - A string containing the formula function and its
+ * parameters.
+ * @param {string} name - Human readable name of the formula.
+ * @param {Array<string>} params - The parameters of the formula which don't concern
+ * child attainments.
+ * @param {Array<string>} childParams - The parameters of the formula which relate
+ * to child attainments.
  * @param {yup.AnyObjectSchema} paramSchema - Schema for the parameters of this formula.
  */
 export function registerFormula(
@@ -22,17 +29,19 @@ export function registerFormula(
   formulaFunction: FormulaFunction,
   codeSnippet: string,
   name: string,
-  attributes: Array<string>,
+  params: Array<string>,
+  childParams: Array<string>,
   paramSchema: yup.AnyObjectSchema
 ): void {
   formulaImplementations.set(
     formula,
     {
-      formulaFunction: formulaFunction,
+      formulaFunction,
       codeSnippet,
       name,
-      attributes,
-      paramSchema: paramSchema
+      params,
+      childParams,
+      paramSchema
     }
   );
 }

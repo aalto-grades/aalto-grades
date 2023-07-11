@@ -10,32 +10,42 @@ import { ApiError } from '../types/error';
 import { CalculationResult } from '../types/formulas';
 import { HttpCode } from '../types/httpCode';
 
-interface WeightedAverageParams {
-  weights: Array<[string, number]>;
+interface ChildParams {
+  weight: number;
 }
 
+interface Params {
+  children: Array<[string, ChildParams]>;
+}
+
+const childParams: Array<string> = ['weight'];
+const params: Array<string> = [];
+
 function calculateWeightedAverage(
-  attainmentTag: string, params: object | null, subGrades: Array<CalculationResult>
+  attainmentTag: string,
+  params: Params | null,
+  subGrades: Array<CalculationResult>
 ): CalculationResult {
 
   let grade: number = 0;
   let status: Status = Status.Pass;
 
-  const formulaParams: WeightedAverageParams = params as WeightedAverageParams;
-  const weights: Map<string, number> = new Map(formulaParams.weights);
+  if (params) {
+    const weights: Map<string, ChildParams> = new Map(params.children);
 
-  for (const subGrade of subGrades) {
-    if (subGrade.status !== Status.Pass)
-      status = Status.Fail;
+    for (const subGrade of subGrades) {
+      if (subGrade.status !== Status.Pass)
+        status = Status.Fail;
 
-    const weight: number | undefined = weights.get(subGrade.attainmentTag);
-    if (weight) {
-      grade += subGrade.grade * weight;
-    } else {
-      throw new ApiError(
-        `weight unspecified for attainment with tag ${subGrade.attainmentTag}`,
-        HttpCode.InternalServerError
-      );
+      const weight: number | undefined = weights.get(subGrade.attainmentTag)?.weight;
+      if (weight) {
+        grade += subGrade.grade * weight;
+      } else {
+        throw new ApiError(
+          `weight unspecified for attainment with tag ${subGrade.attainmentTag}`,
+          HttpCode.InternalServerError
+        );
+      }
     }
   }
 
@@ -88,12 +98,15 @@ registerFormula(
   calculateWeightedAverage,
   codeSnippet,
   'Weighted average',
-  ['weight'],
+  params,
+  childParams,
   yup.object({
-    weights: yup.array().of(
+    children: yup.array().of(
       yup.tuple([
         yup.string(),
-        yup.number()
+        yup.object({
+          weight: yup.number().required()
+        }).noUnknown().strict()
       ])
     ).required()
   }).noUnknown().strict()

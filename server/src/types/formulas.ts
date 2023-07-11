@@ -7,9 +7,9 @@ import * as yup from 'yup';
 import { Status } from 'aalto-grades-common/types';
 
 export interface CalculationResult {
-  attainmentTag: string,
-  grade: number,
-  status: Status
+  attainmentTag: string;
+  grade: number;
+  status: Status;
 }
 
 /**
@@ -17,7 +17,7 @@ export interface CalculationResult {
  */
 export type FormulaFunction = (
   attainmentTag: string,
-  params: object | null,
+  params: any | null, // TODO: Remove any
   subGrades: Array<CalculationResult>
 ) => CalculationResult;
 
@@ -30,7 +30,8 @@ export interface FormulaImplementation {
   paramSchema: yup.AnyObjectSchema;
   codeSnippet: string;
   name: string;
-  attributes: Array<string>;
+  params: Array<string>;
+  childParams: Array<string>;
 }
 
 /**
@@ -39,7 +40,7 @@ export interface FormulaImplementation {
 export interface FormulaNode {
   formulaImplementation: FormulaImplementation;
   subFormulaNodes: Array<FormulaNode>;
-  formulaParams: object | null;
+  formulaParams: any | null; // TODO: Remove any
   attainmentId: number;
   attainmentTag: string;
 }
