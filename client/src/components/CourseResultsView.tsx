@@ -10,12 +10,12 @@ import CourseResultsTable from './course-results-view/CourseResultsTable';
 import AlertSnackbar from './alerts/AlertSnackbar';
 import gradeServices from '../services/grades';
 import { sleep } from '../utils';
-import { Message, State } from '../types';
+import { FinalGrade, Message, State } from '../types';
 
 function CourseResultsView(): JSX.Element {
-  const { courseId, instanceId }: Params = useParams();
+  const { courseId, assessmentModelId }: Params = useParams();
 
-  const [students, setStudents] = useState([]);
+  const [students, setStudents]: State<Array<FinalGrade>> = useState<Array<FinalGrade>>([]);
   const [snackPack, setSnackPack]: State<Array<Message>> = useState<Array<Message>>([]);
   const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
   const [loading, setLoading]: State<boolean> = useState(false);
@@ -23,14 +23,14 @@ function CourseResultsView(): JSX.Element {
     useState<Message | null>(null);
 
   useEffect(() => {
-    if (courseId && instanceId) {
+    if (courseId && assessmentModelId) {
       setLoading(true);
-      gradeServices.getFinalGrades(courseId, instanceId)
-        .then(data => {
-          setStudents(data.finalGrades);
+      gradeServices.getFinalGrades(courseId, assessmentModelId)
+        .then((data: Array<FinalGrade>) => {
+          setStudents(data);
         })
-        .catch(exception => {
-          console.log(exception);
+        .catch((error: unknown) => {
+          console.log(error);
           snackPackAdd({
             msg: 'Fetching final grades failed, make sure grades are imported and calculated.',
             severity: 'error'
@@ -51,7 +51,7 @@ function CourseResultsView(): JSX.Element {
   useEffect(() => {
     if (snackPack.length && !messageInfo) {
       setMessageInfo({ ...snackPack[0] });
-      setSnackPack((prev) => prev.slice(1));
+      setSnackPack((prev: Array<Message>) => prev.slice(1));
       setAlertOpen(true);
     } else if (snackPack.length && messageInfo && alertOpen) {
       setAlertOpen(false);
@@ -66,27 +66,27 @@ function CourseResultsView(): JSX.Element {
         severity: 'info'
       });
       await sleep(2000);
-      if (courseId && instanceId) {
-        const success = await gradeServices.calculateFinalGrades(courseId, instanceId);
+      if (courseId && assessmentModelId) {
+        await gradeServices.calculateFinalGrades(courseId, assessmentModelId);
 
-        if (success) {
-          snackPackAdd({
-            msg: 'Final grades calculated successfully.',
-            severity: 'success'
-          });
-          await sleep(2000);
+        snackPackAdd({
+          msg: 'Final grades calculated successfully.',
+          severity: 'success'
+        });
+        await sleep(2000);
 
-          setLoading(true);
-          snackPackAdd({
-            msg: 'Fetching final grades...',
-            severity: 'info'
-          });
-          const data = await gradeServices.getFinalGrades(courseId, instanceId);
-          setStudents(data.finalGrades);
-        }
+        setLoading(true);
+        snackPackAdd({
+          msg: 'Fetching final grades...',
+          severity: 'info'
+        });
+        const data: Array<FinalGrade> =
+          await gradeServices.getFinalGrades(courseId, assessmentModelId);
+        setStudents(data);
+
       }
-    } catch (exception) {
-      console.log(exception);
+    } catch (err: unknown) {
+      console.log(err);
       snackPackAdd({
         msg: 'Import student grades before calculating the final grade.',
         severity: 'error'
@@ -128,12 +128,11 @@ function CourseResultsView(): JSX.Element {
     });
 
     try {
-      if (courseId && instanceId) {
-        const res = await gradeServices.downloadCsvTemplate(courseId, instanceId);
+      if (courseId && assessmentModelId) {
+        const res: BlobPart = await gradeServices.downloadCsvTemplate(courseId, assessmentModelId);
+        const blob: Blob = new Blob([res], { type: 'text/csv' });
+        const link: HTMLAnchorElement = document.createElement('a');
 
-        const blob = new Blob([res.data], { type: 'text/csv' });
-
-        const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = 'template.csv'; // TODO: Get filename from Content-Disposition
         link.click();
@@ -143,8 +142,8 @@ function CourseResultsView(): JSX.Element {
           severity: 'success'
         });
       }
-    } catch (e) {
-      console.log(e);
+    } catch (err: unknown) {
+      console.log(err);
       snackPackAdd({
         msg: 'Downloading CSV template failed. Make sure there are attainments in the instance.',
         severity: 'error'
