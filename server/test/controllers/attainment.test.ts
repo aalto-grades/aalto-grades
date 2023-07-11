@@ -912,19 +912,6 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.Unauthorized);
     });
-
-    it('should respond with 404 Not Found, if the attainment is not found '
-      + 'for the specified course and assessment model', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/1/assessment-models/1/attainments/2')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.NotFound);
-      expect(res.body.success).toBe(false);
-      expect(res.body.data).not.toBeDefined();
-      expect(res.body.errors).toBeDefined();
-      expect(res.body.errors[0]).toBe('attainment with ID 2 not found');
-    });
   }
 );
 

@@ -12,7 +12,6 @@ import Course from '../database/models/course';
 import { AttainmentData, Formula } from 'aalto-grades-common/types';
 import { getFormulaImplementation } from '../formulas';
 import { ApiError } from '../types/error';
-import { FormulaImplementation } from '../types/formulas';
 import { idSchema } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
@@ -335,9 +334,9 @@ export async function getRootAttainment(req: Request, res: Response): Promise<vo
   const tree: string = await validateTreeParam(req.query.tree as string);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [course, assessmentModel, attainment]: [Course, AssessmentModel, Attainment] =
-    await validateAttainmentPath(
-      req.params.courseId, req.params.assessmentModelId, req.params.attainmentId
+  const [course, assessmentModel]: [Course, AssessmentModel] =
+    await validateAssessmentModelPath(
+      req.params.courseId, req.params.assessmentModelId
     );
 
   const allAttainmentData: Array<AttainmentData> =
