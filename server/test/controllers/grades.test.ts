@@ -552,7 +552,7 @@ describe(
     it('should export CSV succesfully when course results are found', async () => {
       res = await request
         .get(
-          `/v1/courses/6/assessment-models/24/grades/csv/sisu`
+          '/v1/courses/6/assessment-models/24/grades/csv/sisu'
           + `?studentNumbers=${JSON.stringify(studentNumbers)}`
         )
         .set('Cookie', cookies.adminCookie)

@@ -270,7 +270,7 @@ describe(
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
         expect(res.body.errors).toContain(
-          'weights[0] must be a `tuple` type, but the final value was: `\"wrong again\"`.'
+          'weights[0] must be a `tuple` type, but the final value was: `"wrong again"`.'
         );
         expect(res.body.errors).toContain(
           'weights[1] must be a `tuple` type, but the final value was: `5`.'
