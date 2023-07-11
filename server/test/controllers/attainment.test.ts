@@ -195,7 +195,7 @@ describe(
       });
 
     it(
-      'should respond with 400 bad request, if parent formula params are'
+      'should respond with 400 bad request, if formula params are'
       + ' incorrect in the top level attainment',
       async () => {
         const res: supertest.Response = await request
@@ -229,7 +229,7 @@ describe(
     );
 
     it(
-      'should respond with 400 bad request, if parent formula params are'
+      'should respond with 400 bad request, if formula params are'
       + ' incorrect in subattainments',
       async () => {
         const res: supertest.Response = await request
@@ -241,16 +241,21 @@ describe(
             daysValid: 6000,
             formula: Formula.WeightedAverage,
             formulaParams: {
-              weight: 1
+              weights: [
+                ['sub not success', 1]
+              ]
             },
             subAttainments: [
               {
                 name: 'Subfailure',
                 tag: 'sub not success',
                 daysValid: 6,
-                formula: Formula.Manual,
+                formula: Formula.WeightedAverage,
                 formulaParams: {
-                  wrongAgain: 5
+                  weights: [
+                    'wrong again', 5,
+                    [1, -1]
+                  ]
                 }
               }
             ]
@@ -265,7 +270,13 @@ describe(
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
         expect(res.body.errors).toContain(
-          'this field has unspecified keys: wrongAgain'
+          'weights[0] must be a `tuple` type, but the final value was: `\"wrong again\"`.'
+        );
+        expect(res.body.errors).toContain(
+          'weights[1] must be a `tuple` type, but the final value was: `5`.'
+        );
+        expect(res.body.errors).toContain(
+          'weights[2][0] must be a `string` type, but the final value was: `1`.'
         );
       }
     );
@@ -707,11 +718,12 @@ describe(
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
       });
 
-    it('should respond with 400 bad request, if changing to a wrong formula param type',
+    it('should respond with 400 bad request, if formula params are incorrect',
       async () => {
         const res: supertest.Response = await request
           .put('/v1/courses/1/assessment-models/1/attainments/5')
           .send({
+            formula: Formula.WeightedAverage,
             formulaParams: {}
           })
           .set('Content-Type', 'application/json')
@@ -722,7 +734,7 @@ describe(
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-        expect(res.body.errors).toContain('weight is a required field');
+        expect(res.body.errors).toContain('weights is a required field');
       }
     );
 
@@ -778,7 +790,7 @@ describe(
     it('should respond with 409 conflict, if attainment tries to refer itself in the parent ID',
       async () => {
         const res: supertest.Response = await request
-          .put(`/v1/courses/2/assessment-models/11/attainments/${subAttainment.id}`)
+          .put(`/v1/courses/1/assessment-models/12/attainments/${subAttainment.id}`)
           .send({ ...subAttainment, parentId: subAttainment.id })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -792,7 +804,7 @@ describe(
     it('should respond with 422 unprocessable entity, if parent attainment does not exist',
       async () => {
         const res: supertest.Response = await request
-          .put(`/v1/courses/2/assessment-models/11/attainments/${subAttainment.id}`)
+          .put(`/v1/courses/1/assessment-models/12/attainments/${subAttainment.id}`)
           .send({ parentId: badId })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)

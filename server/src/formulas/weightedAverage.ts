@@ -93,7 +93,7 @@ registerFormula(
   yup.object({
     weights: yup.array().of(
       yup.tuple([
-        yup.number(),
+        yup.string(),
         yup.number()
       ])
     ).required()

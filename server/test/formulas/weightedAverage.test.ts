@@ -11,7 +11,7 @@ describe('Test weighted average calculation', () => {
     getFormulaImplementation(Formula.WeightedAverage);
 
   it('should accept parameters of the appropriate form', async () => {
-    await implementation.paramSchema.validate({ weights: [[1, 8]] });
+    await implementation.paramSchema.validate({ weights: [['1', 8]] });
   });
 
   it('should forbid parameters of invalid form', async () => {

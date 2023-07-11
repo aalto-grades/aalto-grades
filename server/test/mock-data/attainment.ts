@@ -13,8 +13,8 @@ export const mockAttainment: AttainmentData = {
   formula: Formula.WeightedAverage,
   formulaParams: {
     weights: [
-      [2, 0.5],
-      [3, 0.5]
+      ['ex-1', 0.5],
+      ['ex-2', 0.5]
     ]
   },
   subAttainments: [
@@ -34,8 +34,8 @@ export const mockAttainment: AttainmentData = {
       formula: Formula.WeightedAverage,
       formulaParams: {
         weights: [
-          [4, 0.5],
-          [7, 0.5]
+          ['ex-2.1', 0.5],
+          ['ex-2.2', 0.5]
         ]
       },
       subAttainments: [
@@ -47,8 +47,8 @@ export const mockAttainment: AttainmentData = {
           formula: Formula.WeightedAverage,
           formulaParams: {
             weights: [
-              [5, 0.5],
-              [6, 0.5]
+              ['ex-2.1.1', 0.5],
+              ['ex-2.1.2', 0.5]
             ]
           },
           subAttainments: [
@@ -78,8 +78,8 @@ export const mockAttainment: AttainmentData = {
           formula: Formula.WeightedAverage,
           formulaParams: {
             weights: [
-              [8, 0.5],
-              [9, 0.5]
+              ['ex-2.2.1', 0.5],
+              ['ex-2.2.2', 0.5]
             ]
           },
           subAttainments: [
@@ -99,8 +99,8 @@ export const mockAttainment: AttainmentData = {
               formula: Formula.WeightedAverage,
               formulaParams: {
                 weights: [
-                  [10, 0.5],
-                  [11, 0.5]
+                  ['ex-2.2.2.1', 0.5],
+                  ['ex-2.2.2.2', 0.5]
                 ]
               },
               subAttainments: [
@@ -120,8 +120,8 @@ export const mockAttainment: AttainmentData = {
                   formula: Formula.WeightedAverage,
                   formulaParams: {
                     weights: [
-                      [12, 0.5],
-                      [13, 0.5]
+                      ['ex-2.2.2.2.1', 0.5],
+                      ['ex-2.2.2.2.2', 0.5]
                     ]
                   },
                   subAttainments: [
