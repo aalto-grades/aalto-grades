@@ -24,7 +24,7 @@ function CourseResultsTableToolbar(props: {
   calculateFinalGrades: () => Promise<void>,
   downloadCsvTemplate: () => Promise<void>
 }): JSX.Element {
-  const { instanceId }: Params = useParams();
+  const { assessmentModelId }: Params = useParams();
 
   const [showFileDialog, setShowFileDialog]: State<boolean> = useState(false);
   const [showSisuDialog, setShowSisuDialog]: State<boolean> = useState(false);
@@ -36,7 +36,7 @@ function CourseResultsTableToolbar(props: {
     },
     {
       description: 'Import from A+',
-      handleClick: () => {
+      handleClick: (): void => {
         console.error('Importing from A+ is not implemented');
       }
     }
@@ -54,7 +54,7 @@ function CourseResultsTableToolbar(props: {
     <Toolbar
       sx={{
         mx: 1,
-        pt: 2,
+        py: 2,
       }}
     >
       <Box sx={{
@@ -71,16 +71,18 @@ function CourseResultsTableToolbar(props: {
             value={props.search}
             name='search'
             label='Search by Student Number'
-            onChange={({ target }) => props.setSearch(target.value)}
+            onChange={(
+              { target }: { target: EventTarget & (HTMLInputElement | HTMLTextAreaElement) }
+            ): void => props.setSearch(target.value)} //
             InputLabelProps={{ shrink: true }}
             margin='normal'
           />
-          <Tooltip title="Filter" >
+          <Tooltip title="Filter" placement="top">
             <IconButton size='large' sx={{ m: 1.5, mb: 1, mr: 0 }}>
               <FilterListIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Download results" >
+          <Tooltip title="Download results" placement="top">
             <IconButton size='large' sx={{ m: 1, mt: 1.5, ml: 0 }}>
               <DownloadIcon />
             </IconButton>
@@ -90,22 +92,37 @@ function CourseResultsTableToolbar(props: {
           display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start',
           alignItems: 'center', gap: 2
         }}>
-          <Button variant='outlined' onClick={() => setShowSisuDialog(true)}>
-            Export to Sisu CSV
-          </Button>
-          <Button variant='outlined' onClick={() => props.calculateFinalGrades()}>
-            Calculate final grades
-          </Button>
-          <Button variant='outlined' onClick={() => props.downloadCsvTemplate()}>
-            Download CSV template
-          </Button>
+          <Tooltip
+            title="Export final course grades as Sisu compatible CSV file"
+            placement="top"
+          >
+            <Button variant='outlined' onClick={(): void => setShowSisuDialog(true)}>
+              Export to Sisu CSV
+            </Button>
+          </Tooltip>
+          <Tooltip
+            title="Calculate course final grades for students"
+            placement="top"
+          >
+            <Button variant='outlined' onClick={(): Promise<void> => props.calculateFinalGrades()}>
+              Calculate final grades
+            </Button>
+          </Tooltip>
+          <Tooltip
+            title="Download grading template with attainment tags and student numbers"
+            placement="top"
+          >
+            <Button variant='outlined' onClick={(): Promise<void> => props.downloadCsvTemplate()}>
+              Download CSV template
+            </Button>
+          </Tooltip>
           <MenuButton label='Import grades' options={actionOptions} />
           <SisuExportDialog
             open={showSisuDialog}
             handleClose={handleCloseSisuDialog}
           />
           <FileLoadDialog
-            instanceId={Number(instanceId)}
+            assessmentModelId={Number(assessmentModelId)}
             open={showFileDialog}
             handleClose={handleCloseFileDialog}
           />
