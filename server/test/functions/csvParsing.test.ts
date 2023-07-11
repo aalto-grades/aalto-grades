@@ -2,9 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { AttainmentGradeData } from 'aalto-grades-common/types';
 import { parseGradesFromCsv, parseHeaderFromCsv } from '../../src/controllers/grades';
 import { ApiError } from '../../src/types/error';
-import { AttainmentGradeData, StudentGrades } from '../../src/types/grades';
+import { StudentGrades } from '../../src/types/grades';
 import { HttpCode } from '../../src/types/httpCode';
 
 function checkError(error: unknown, httpCode: HttpCode, message: string | Array<string>): void {

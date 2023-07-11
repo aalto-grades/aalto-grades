@@ -50,7 +50,7 @@ export function getFormulaImplementation(
   return formulaImplementation;
 }
 
-export async function getAllFormulasBasicData(): Promise<Array<FormulaData>> {
+export function getAllFormulasBasicData(): Array<FormulaData> {
   const formulas: Array<FormulaData> = [];
 
   for (const [key, value] of formulaImplementations) {

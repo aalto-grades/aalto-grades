@@ -137,7 +137,7 @@ export default {
           allowNull: false,
           defaultValue: 'MANUAL',
         },
-        parent_formula_params: {
+        formula_params: {
           type: DataTypes.JSONB,
           allowNull: true,
         },

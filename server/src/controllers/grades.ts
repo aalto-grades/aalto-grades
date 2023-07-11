@@ -15,14 +15,16 @@ import AttainmentGrade from '../database/models/attainmentGrade';
 import Course from '../database/models/course';
 import User from '../database/models/user';
 
-import { Formula } from 'aalto-grades-common/types';
+import { AttainmentGradeData, Formula, Status } from 'aalto-grades-common/types';
 import { getFormulaImplementation } from '../formulas';
 import { ApiError } from '../types/error';
-import { FormulaNode, CalculationInput, CalculationResult } from '../types/formulas';
+import { CalculationResult, FormulaNode } from '../types/formulas';
 import { JwtClaims } from '../types/general';
-import { AttainmentGradeData, Status, StudentGrades } from '../types/grades';
+import { StudentGrades } from '../types/grades';
 import { HttpCode } from '../types/httpCode';
-import { validateCourseAndAssessmentModel } from './utils/assessmentModel';
+import { validateAssessmentModelPath } from './utils/assessmentModel';
+import { isTeacherInChargeOrAdmin } from './utils/user';
+
 
 async function studentNumbersExist(studentNumbers: Array<string>): Promise<void> {
   const foundStudentNumbers: Array<string> = (await User.findAll({
@@ -49,9 +51,11 @@ async function studentNumbersExist(studentNumbers: Array<string>): Promise<void>
 
 export async function getCsvTemplate(req: Request, res: Response): Promise<void> {
   const [course, assessmentModel]: [Course, AssessmentModel] =
-    await validateCourseAndAssessmentModel(
+    await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
     );
+
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
   const attainmentTags: Array<string> = (await Attainment.findAll({
     attributes: ['tag'],
@@ -248,20 +252,17 @@ export function parseGradesFromCsv(
  * the CSV file contains attainments which don't belong to the specified course or course instance.
  */
 export async function addGrades(req: Request, res: Response, next: NextFunction): Promise<void> {
-  /*
-   * TODO:
-   * - Check that the requester is authorized to add grades, 403 Forbidden if not.
-   * - Check grading points are not higher than max points of the attainment.
-   */
+  /** TODO: Check grading points are not higher than max points of the attainment. */
 
   const grader: JwtClaims = req.user as JwtClaims;
 
   // Validation path parameters.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, assessmentModel]: [Course, AssessmentModel] =
-    await validateCourseAndAssessmentModel(
+    await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
     );
+
+  await isTeacherInChargeOrAdmin(grader, course.id, HttpCode.Forbidden);
 
   if (!req?.file) {
     throw new ApiError(
@@ -404,14 +405,14 @@ export async function calculateGrades(
 
   await requestSchema.validate(req.body, { abortEarly: false });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, assessmentModel]: [Course, AssessmentModel] =
-    await validateCourseAndAssessmentModel(
+    await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
     );
 
-  // TODO: Check that requester is authorized to calculate grades.
   const grader: JwtClaims = req.user as JwtClaims;
+
+  await isTeacherInChargeOrAdmin(grader, course.id, HttpCode.Forbidden);
 
   /*
    * First ensure that all students to be included in the calculation exist in
@@ -424,27 +425,12 @@ export async function calculateGrades(
    * Get all the attainments in this assessment model.
    */
 
-  interface AttainmentInfo {
-    id: number,
-    parentId: number,
-    formula: Formula,
-    parentFormulaParams: object | null
-  }
-
-  const attainments: Array<AttainmentInfo> = await Attainment.findAll({
+  const attainments: Array<Attainment> = await Attainment.findAll({
     raw: true,
     where: {
       assessmentModelId: assessmentModel.id
-    },
-    attributes: [
-      'id',
-      'parentId',
-      'formula',
-      'parentFormulaParams',
-    ],
-    // Cast to unknown is required because AttainmentInfo does not extend the
-    // model type.
-  }) as unknown as Array<AttainmentInfo>;
+    }
+  });
 
   /*
    * Then we need to find the formulas used to calculate the grade of each
@@ -474,8 +460,9 @@ export async function calculateGrades(
     formulaNodesByAttainmentId.set(attainment.id, {
       formulaImplementation: getFormulaImplementation(formula as Formula),
       subFormulaNodes: [],
-      parentFormulaParams: attainment.parentFormulaParams,
-      attainmentId: attainment.id
+      formulaParams: attainment.formulaParams,
+      attainmentId: attainment.id,
+      attainmentTag: attainment.tag
     });
   }
 
@@ -533,15 +520,6 @@ export async function calculateGrades(
        */
 
       const parentFormulaNode: FormulaNode = getFormulaNode(attainment.parentId);
-
-      /*
-       * Ensure that the parent formula parameters specified for this attainment
-       * match the schema of the parent attainment's formula.
-       */
-      await parentFormulaNode.formulaImplementation.paramSchema.validate(
-        formulaNode.parentFormulaParams
-      );
-
       parentFormulaNode.subFormulaNodes.push(formulaNode);
     }
   }
@@ -631,11 +609,11 @@ export async function calculateGrades(
    * Recursively calculates the grade for a particular attainment by its formula
    * node.
    */
-  async function calculateFormulaNode(
+  function calculateFormulaNode(
     userId: number,
     formulaNode: FormulaNode,
     presetGrades: Map<FormulaNode, number>
-  ): Promise<CalculationResult> {
+  ): CalculationResult {
     /*
      * If a teacher has manually specified a grade for this attainment,
      * the manually specified grade will be used.
@@ -647,6 +625,7 @@ export async function calculateGrades(
     const presetGrade: number | undefined = presetGrades.get(formulaNode);
     if (presetGrade) {
       return {
+        attainmentTag: formulaNode.attainmentTag,
         status: Status.Pass,
         grade: presetGrade
       };
@@ -659,22 +638,19 @@ export async function calculateGrades(
      */
 
     // Inputs for the formula of this attainment.
-    const inputs: Array<CalculationInput> = [];
+    const subGrades: Array<CalculationResult> = [];
 
     // First, recursively calculate the grades the subattainments.
     for (const subFormulaNode of formulaNode.subFormulaNodes) {
-      const input: CalculationInput = {
-        subResult: await calculateFormulaNode(userId, subFormulaNode, presetGrades),
-        params: subFormulaNode.parentFormulaParams
-      };
-
-      inputs.push(input);
+      subGrades.push(calculateFormulaNode(userId, subFormulaNode, presetGrades));
     }
 
     // Then, calculate the grade of this attainment using the formula specified
     // for this attainment and the grades of the subattainments.
     const calculated: CalculationResult =
-      await formulaNode.formulaImplementation.formulaFunction(inputs);
+      formulaNode.formulaImplementation.formulaFunction(
+        formulaNode.attainmentTag, formulaNode.formulaParams, subGrades
+      );
 
     calculatedGrades.push(
       {
@@ -691,11 +667,16 @@ export async function calculateGrades(
   }
 
   for (const [userId, presetGrades] of organizedPresetGrades) {
-    await calculateFormulaNode(userId, rootFormulaNode, presetGrades);
+    calculateFormulaNode(userId, rootFormulaNode, presetGrades);
   }
 
   await sequelize.transaction(async (transaction: Transaction) => {
-    await AttainmentGrade.bulkCreate(calculatedGrades, { transaction });
+    await AttainmentGrade.bulkCreate(calculatedGrades,
+      {
+        updateOnDuplicate: ['grade', 'graderId', 'status'],
+        transaction
+      }
+    );
   });
 
   res.status(HttpCode.Ok).json({
@@ -792,6 +773,7 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
       .notRequired(),
     studentNumbers: yup
       .array()
+      .json()
       .of(yup.string())
       .notRequired()
   });
@@ -802,11 +784,12 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
     studentNumbers: Array<string> | undefined
   } = await urlParams.validate(req.query, { abortEarly: false });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, assessmentModel]: [Course, AssessmentModel] =
-    await validateCourseAndAssessmentModel(
+    await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
     );
+
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
   if (studentNumbers)
     studentNumbersExist(studentNumbers);
@@ -815,8 +798,6 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
    * TODO:
    * - only one grade per user per instance is allowed,
    *   what if grades are recalculated, should we keep track of old grades?
-   * - Define and implement authorization on who has the access rights to trigger export,
-   *   Sisu allows teacher and responsible teacher of the implementation to save grades to Sisu.
    */
 
   const finalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
@@ -877,19 +858,21 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
   const urlParams: yup.AnyObjectSchema = yup.object({
     studentNumbers: yup
       .array()
+      .json()
       .of(yup.string())
       .notRequired()
   });
 
   const { studentNumbers }: {
-    studentNumbers: Array<string> | undefined
+    studentNumbers?: Array<string>
   } = await urlParams.validate(req.query, { abortEarly: false });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, assessmentModel]: [Course, AssessmentModel] =
-    await validateCourseAndAssessmentModel(
+    await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
     );
+
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
   if (studentNumbers)
     studentNumbersExist(studentNumbers);
