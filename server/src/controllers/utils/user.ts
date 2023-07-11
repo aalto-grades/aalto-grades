@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import User from '../../database/models/user';
+import TeacherInCharge from '../../database/models/teacherInCharge';
 
 import { ApiError } from '../../types/error';
 import { HttpCode } from '../../types/httpCode';
@@ -21,4 +22,20 @@ export async function findUserById(userId: number, errorCode: HttpCode): Promise
     throw new ApiError(`user with ID ${userId} not found`, errorCode);
   }
   return user;
+}
+
+export async function isTeacherInCharge(
+  userId: number, courseId: number, errorCode: HttpCode
+): Promise<TeacherInCharge> {
+  const teacher: TeacherInCharge | null = await TeacherInCharge.findOne({
+    where: {
+      userId,
+      courseId
+    }
+  });
+
+  if (!teacher) {
+    throw new ApiError(`user with ID ${userId} is not allowed not execute the action`, errorCode);
+  }
+  return teacher;
 }

@@ -4,6 +4,8 @@
 
 import supertest from 'supertest';
 
+import TeacherInCharge from '../../src/database/models/teacherInCharge';
+
 import { app } from '../../src/app';
 import { HttpCode } from '../../src/types/httpCode';
 import { Cookies, getCookies } from '../util/getCookies';
@@ -14,6 +16,12 @@ let cookies: Cookies = {
   adminCookie: [],
   userCookie: []
 };
+const mockTeacher: TeacherInCharge = new TeacherInCharge({
+  userId: 1,
+  courseId: 1,
+  createdAt: new Date(),
+  updatedAt: new Date()
+}, { isNewRecord: false });
 
 beforeAll(async () => {
   cookies = await getCookies();
@@ -160,7 +168,7 @@ describe(
 
 describe('Test POST /v1/courses/:courseId/instances - create new course instance', () => {
 
-  it('should return success with correct input', async () => {
+  it('should create new instance with correct input (admin user)', async () => {
     async function goodInput(input: object): Promise<void> {
       const res: supertest.Response = await request
         .post('/v1/courses/1/instances')
@@ -203,13 +211,29 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
     });
   });
 
-  it('should respond with 401 unauthorized, if not logged in', async () => {
-    await request
-      .post('/v1/courses/1/instances')
-      .send({})
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Unauthorized);
-  });
+  it(
+    'should create new instance with correct input (teacher in charge)',
+    async () => {
+      jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
+
+      const res: supertest.Response = await request
+        .post('/v1/courses/1/instances')
+        .send({
+          gradingScale: 'NUMERICAL',
+          startingPeriod: 'I',
+          endingPeriod: 'II',
+          type: 'LECTURE',
+          startDate: '2022-7-10',
+          endDate: '2022-11-10'
+        })
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+
+      expect(res.body.success).toBe(true);
+      expect(res.body.errors).not.toBeDefined();
+      expect(res.body.data.courseInstance.id).toBeDefined();
+    });
 
   it('should respond with 400 bad request, if incorrect input', async () => {
     async function badInput(input: object): Promise<void> {
@@ -258,6 +282,34 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       endDate: 'not a date either'
     });
 
+  });
+
+  it('should respond with 401 unauthorized, if not logged in', async () => {
+    await request
+      .post('/v1/courses/1/instances')
+      .send({})
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Unauthorized);
+  });
+
+  it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
+    const res: supertest.Response = await request
+      .post('/v1/courses/1/instances')
+      .send({
+        gradingScale: 'NUMERICAL',
+        startingPeriod: 'I',
+        endingPeriod: 'II',
+        type: 'LECTURE',
+        startDate: '2022-7-10',
+        endDate: '2022-11-10'
+      })
+      .set('Cookie', cookies.userCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Forbidden);
+
+    expect(res.body.success).toBe(false);
+    expect(res.body.data).not.toBeDefined();
+    expect(res.body.errors).toBeDefined();
   });
 
   it('should respond with 404 not found, if nonexistent course ID', async () => {

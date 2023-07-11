@@ -4,6 +4,8 @@
 
 import supertest from 'supertest';
 
+import TeacherInCharge from '../../src/database/models/teacherInCharge';
+
 import { app } from '../../src/app';
 import { HttpCode } from '../../src/types/httpCode';
 import { Cookies, getCookies } from '../util/getCookies';
@@ -14,6 +16,12 @@ let cookies: Cookies = {
   adminCookie: [],
   userCookie: []
 };
+const mockTeacher: TeacherInCharge = new TeacherInCharge({
+  userId: 1,
+  courseId: 1,
+  createdAt: new Date(),
+  updatedAt: new Date()
+}, { isNewRecord: false });
 
 beforeAll(async () => {
   cookies = await getCookies();
@@ -131,14 +139,14 @@ describe(
 );
 
 describe(
-  'Test GET /v1/courses/:courseId/assessment-models - add assessment model',
+  'Test POST /v1/courses/:courseId/assessment-models - add assessment model',
   () => {
 
-    it('should add an assessment model when course exists', async () => {
+    it('should add an assessment model when course exists (admin user)', async () => {
       const res: supertest.Response = await request
         .post('/v1/courses/1/assessment-models')
         .send({
-          name: 'new-model'
+          name: 'new-model-1'
         })
         .set('Content-Type', 'application/json')
         .set('Cookie', cookies.adminCookie)
@@ -151,6 +159,28 @@ describe(
       expect(res.body.data.assessmentModel).toBeDefined();
       expect(res.body.data.assessmentModel.id).toBeDefined();
     });
+
+    it(
+      'should add an assessment model when course exists (teacher in charge)',
+      async () => {
+        jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
+
+        const res: supertest.Response = await request
+          .post('/v1/courses/1/assessment-models')
+          .send({
+            name: 'new-model-2'
+          })
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.userCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
+
+        expect(res.body.success).toBe(true);
+        expect(res.body.errors).not.toBeDefined();
+        expect(res.body.data).toBeDefined();
+        expect(res.body.data.assessmentModel).toBeDefined();
+        expect(res.body.data.assessmentModel.id).toBeDefined();
+      });
 
     it('should respond with 400 bad request if validation fails', async () => {
       async function badInput(input: unknown): Promise<void> {
@@ -171,6 +201,29 @@ describe(
       await badInput({ name: { name: 'string' } });
       await badInput(10);
       await badInput({ nam: 'a name' });
+    });
+
+    it('should respond with 401 unauthorized, if not logged in', async () => {
+      await request
+        .post('/v1/courses/1/assessment-models')
+        .send({})
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Unauthorized);
+    });
+
+    it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
+      const res: supertest.Response = await request
+        .post('/v1/courses/1/assessment-models')
+        .send({
+          name: 'new-model'
+        })
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Forbidden);
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
     });
 
     it('should respond with 404 not found when course does not exist',
