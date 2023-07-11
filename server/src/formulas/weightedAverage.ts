@@ -48,39 +48,38 @@ function calculateWeightedAverage(
 
 const codeSnippet: string =
 `interface WeightedAverageParams {
-  weights: Array<[number, number]>;
+  weights: Array<[string, number]>;
 }
 
 function calculateWeightedAverage(
-  attainment: AttainmentData, subGrades: Array<AttainmentGradeData>
-): AttainmentGradeData {
+  attainmentTag: string, params: object | null, subGrades: Array<CalculationResult>
+): CalculationResult {
 
   let grade: number = 0;
   let status: Status = Status.Pass;
 
-  const params: WeightedAverageParams = attainment.formulaParams as WeightedAverageParams;
-  const weights: Map<number, number> = new Map(params.weights);
+  const formulaParams: WeightedAverageParams = params as WeightedAverageParams;
+  const weights: Map<string, number> = new Map(formulaParams.weights);
 
   for (const subGrade of subGrades) {
     if (subGrade.status !== Status.Pass)
       status = Status.Fail;
 
-    const weight: number | undefined = weights.get(subGrade.attainmentId);
+    const weight: number | undefined = weights.get(subGrade.attainmentTag);
     if (weight) {
       grade += subGrade.grade * weight;
     } else {
       throw new ApiError(
-        \`weight unspecified for attainment with ID \${subGrade.attainmentId}\`,
+        \`weight unspecified for attainment with tag \${subGrade.attainmentTag}\`,
         HttpCode.InternalServerError
       );
     }
   }
 
   return {
-    attainmentId: attainment.id ?? -1,
+    attainmentTag: attainmentTag,
     grade: grade,
-    status: status,
-    manual: false
+    status: status
   };
 }`;
 
