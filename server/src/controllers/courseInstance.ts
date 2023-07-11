@@ -11,14 +11,14 @@ import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
-import { CourseInstanceData, GradingScale, Period, SystemRole } from 'aalto-grades-common/types';
+import { CourseInstanceData, GradingScale, Period } from 'aalto-grades-common/types';
 import { ApiError } from '../types/error';
 import { HttpCode } from '../types/httpCode';
 import { JwtClaims, idSchema } from '../types/general';
 import { CourseFull } from '../types/model';
 import { findAssessmentModelById } from './utils/assessmentModel';
 import { findCourseById, parseCourseFull } from './utils/course';
-import { isTeacherInCharge } from './utils/user';
+import { isTeacherInChargeOrAdmin } from './utils/user';
 
 interface CourseInstanceWithCourseFull extends CourseInstance {
     Course: CourseFull
@@ -180,18 +180,14 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
       .required()
   });
 
-  // Route is only available for admins and those who have teacher in charge role for the course.
-  const user: JwtClaims = req.user as JwtClaims;
   const courseId: number = Number(req.params.courseId);
   await requestSchema.validate(req.body, { abortEarly: false });
 
   // Confirm that course exists.
   await findCourseById(courseId, HttpCode.NotFound);
 
-  if (user.role !== SystemRole.Admin) {
-    // Confirm that user is teacher in charge of the course.
-    await isTeacherInCharge(user.id, courseId, HttpCode.Forbidden);
-  }
+  // Route is only available for admins and those who have teacher in charge role for the course.
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, courseId, HttpCode.Forbidden);
 
   if (req.body.assessmentModelId) {
     const assessmentModel: AssessmentModel = await findAssessmentModelById(

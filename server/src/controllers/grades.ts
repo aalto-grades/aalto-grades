@@ -23,6 +23,8 @@ import { JwtClaims } from '../types/general';
 import { StudentGrades } from '../types/grades';
 import { HttpCode } from '../types/httpCode';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
+import { isTeacherInChargeOrAdmin } from './utils/user';
+
 
 async function studentNumbersExist(studentNumbers: Array<string>): Promise<void> {
   const foundStudentNumbers: Array<string> = (await User.findAll({
@@ -52,6 +54,8 @@ export async function getCsvTemplate(req: Request, res: Response): Promise<void>
     await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
     );
+
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
   const attainmentTags: Array<string> = (await Attainment.findAll({
     attributes: ['tag'],
@@ -248,20 +252,17 @@ export function parseGradesFromCsv(
  * the CSV file contains attainments which don't belong to the specified course or course instance.
  */
 export async function addGrades(req: Request, res: Response, next: NextFunction): Promise<void> {
-  /*
-   * TODO:
-   * - Check that the requester is authorized to add grades, 403 Forbidden if not.
-   * - Check grading points are not higher than max points of the attainment.
-   */
+  /** TODO: Check grading points are not higher than max points of the attainment. */
 
   const grader: JwtClaims = req.user as JwtClaims;
 
   // Validation path parameters.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
     );
+
+  await isTeacherInChargeOrAdmin(grader, course.id, HttpCode.Forbidden);
 
   if (!req?.file) {
     throw new ApiError(
@@ -404,14 +405,14 @@ export async function calculateGrades(
 
   await requestSchema.validate(req.body, { abortEarly: false });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
     );
 
-  // TODO: Check that requester is authorized to calculate grades.
   const grader: JwtClaims = req.user as JwtClaims;
+
+  await isTeacherInChargeOrAdmin(grader, course.id, HttpCode.Forbidden);
 
   /*
    * First ensure that all students to be included in the calculation exist in
@@ -670,7 +671,12 @@ export async function calculateGrades(
   }
 
   await sequelize.transaction(async (transaction: Transaction) => {
-    await AttainmentGrade.bulkCreate(calculatedGrades, { transaction });
+    await AttainmentGrade.bulkCreate(calculatedGrades,
+      {
+        updateOnDuplicate: ['grade', 'graderId', 'status'],
+        transaction
+      }
+    );
   });
 
   res.status(HttpCode.Ok).json({
@@ -778,11 +784,12 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
     studentNumbers: Array<string> | undefined
   } = await urlParams.validate(req.query, { abortEarly: false });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
     );
+
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
   if (studentNumbers)
     studentNumbersExist(studentNumbers);
@@ -791,8 +798,6 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
    * TODO:
    * - only one grade per user per instance is allowed,
    *   what if grades are recalculated, should we keep track of old grades?
-   * - Define and implement authorization on who has the access rights to trigger export,
-   *   Sisu allows teacher and responsible teacher of the implementation to save grades to Sisu.
    */
 
   const finalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
@@ -862,11 +867,12 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
     studentNumbers?: Array<string>
   } = await urlParams.validate(req.query, { abortEarly: false });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
     );
+
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
   if (studentNumbers)
     studentNumbersExist(studentNumbers);
