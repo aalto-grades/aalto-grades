@@ -4,6 +4,7 @@
 
 import { Formula } from 'aalto-grades-common/types';
 import { AttainmentData } from 'aalto-grades-common/types/attainment';
+import Attainment from '../../src/database/models/attainment';
 
 export const mockAttainment: AttainmentData = {
   id: 1,
@@ -151,3 +152,15 @@ export const mockAttainment: AttainmentData = {
     }
   ]
 };
+
+export const jestMockAttainment: Attainment = new Attainment({
+  id: 1,
+  assessmentModelId: 7,
+  parentId: 1,
+  name: 'xxx',
+  tag: 'yyy',
+  daysValid: 365,
+  formula: Formula.Manual,
+  createdAt: new Date(),
+  updatedAt: new Date()
+}, { isNewRecord: false });

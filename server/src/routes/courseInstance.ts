@@ -198,7 +198,9 @@ router.get(
  * /v1/courses/{courseId}/instances:
  *   post:
  *     tags: [Course Instance]
- *     description: Add a course instance to a course.
+ *     description: >
+ *       Add a course instance to a course.
+ *       Available only to admin users and teachers in charge of the course.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
  *     requestBody:
