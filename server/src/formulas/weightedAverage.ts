@@ -5,62 +5,82 @@
 import * as yup from 'yup';
 
 import { registerFormula } from '.';
-import { Formula } from 'aalto-grades-common/types';
-import {
-  CalculationInput, CalculationResult
-} from '../types/formulas';
-import { Status } from '../types/grades';
+import { Formula, Status } from 'aalto-grades-common/types';
+import { ApiError } from '../types/error';
+import { CalculationResult } from '../types/formulas';
+import { HttpCode } from '../types/httpCode';
 
 interface WeightedAverageParams {
-  weight: number;
+  weights: Array<[string, number]>;
 }
 
-async function calculateWeightedAverage(
-  inputs: Array<CalculationInput>
-): Promise<CalculationResult> {
+function calculateWeightedAverage(
+  attainmentTag: string, params: object | null, subGrades: Array<CalculationResult>
+): CalculationResult {
+
   let grade: number = 0;
   let status: Status = Status.Pass;
 
-  for (const input of inputs) {
-    const subResult: CalculationResult = input.subResult;
-    const params: WeightedAverageParams = input.params as WeightedAverageParams;
+  const formulaParams: WeightedAverageParams = params as WeightedAverageParams;
+  const weights: Map<string, number> = new Map(formulaParams.weights);
 
-    if (subResult.status !== Status.Pass)
+  for (const subGrade of subGrades) {
+    if (subGrade.status !== Status.Pass)
       status = Status.Fail;
 
-    grade += subResult.grade * params.weight;
+    const weight: number | undefined = weights.get(subGrade.attainmentTag);
+    if (weight) {
+      grade += subGrade.grade * weight;
+    } else {
+      throw new ApiError(
+        `weight unspecified for attainment with tag ${subGrade.attainmentTag}`,
+        HttpCode.InternalServerError
+      );
+    }
   }
 
   return {
+    attainmentTag: attainmentTag,
     grade: grade,
-    status: status,
+    status: status
   };
 }
 
 const codeSnippet: string =
 `interface WeightedAverageParams {
-  weight: number;
+  weights: Array<[number, number]>;
 }
 
-async function calculateWeightedAverage(
-  inputs: Array<CalculationInput>
-): Promise<CalculationResult> {
+function calculateWeightedAverage(
+  attainment: AttainmentData, subGrades: Array<AttainmentGradeData>
+): AttainmentGradeData {
+
   let grade: number = 0;
   let status: Status = Status.Pass;
 
-  for (const input of inputs) {
-    const subResult: CalculationResult = input.subResult;
-    const params: WeightedAverageParams = input.params as WeightedAverageParams;
+  const params: WeightedAverageParams = attainment.formulaParams as WeightedAverageParams;
+  const weights: Map<number, number> = new Map(params.weights);
 
-    if (subResult.status !== Status.Pass)
+  for (const subGrade of subGrades) {
+    if (subGrade.status !== Status.Pass)
       status = Status.Fail;
 
-    grade += subResult.grade * params.weight;
+    const weight: number | undefined = weights.get(subGrade.attainmentId);
+    if (weight) {
+      grade += subGrade.grade * weight;
+    } else {
+      throw new ApiError(
+        \`weight unspecified for attainment with ID \${subGrade.attainmentId}\`,
+        HttpCode.InternalServerError
+      );
+    }
   }
 
   return {
+    attainmentId: attainment.id ?? -1,
     grade: grade,
     status: status,
+    manual: false
   };
 }`;
 
@@ -71,6 +91,11 @@ registerFormula(
   'Weighted average',
   ['weight'],
   yup.object({
-    weight: yup.number().required()
+    weights: yup.array().of(
+      yup.tuple([
+        yup.string(),
+        yup.number()
+      ])
+    ).required()
   }).noUnknown().strict()
 );

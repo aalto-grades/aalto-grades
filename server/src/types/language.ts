@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import * as yup from 'yup';
-import { MessageParams } from 'yup/lib/types';
 
 /**
  * Yup validation schema for validating localized strings in requests.
@@ -16,6 +15,7 @@ export const localizedStringSchema: yup.AnyObjectSchema = yup.object().shape({
   sv: yup.string()
 }).test(
   'localized-string-check-not-empty',
-  (params: MessageParams) => `${params.path} must contain at least one translation`,
+  // Used to be MessageParams
+  (params: { path: string }) => `${params.path} must contain at least one translation`,
   (obj: object) => (obj === undefined || obj === null) ? true : Object.keys(obj).length !== 0
 ).strict().noUnknown().default(undefined);

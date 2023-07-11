@@ -23,7 +23,7 @@ export default class Attainment extends Model<
   // Default value, expiry date in AttainmentGrade takes precedence
   declare daysValid: number;
   declare formula: Formula;
-  declare parentFormulaParams: CreationOptional<object>;
+  declare formulaParams: CreationOptional<object>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -68,7 +68,7 @@ Attainment.init(
       allowNull: false,
       defaultValue: Formula.Manual,
     },
-    parentFormulaParams: {
+    formulaParams: {
       type: DataTypes.JSONB,
       allowNull: true,
     },

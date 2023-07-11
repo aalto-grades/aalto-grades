@@ -4,23 +4,22 @@
 
 import * as yup from 'yup';
 
-import { Status } from './grades';
+import { Status } from 'aalto-grades-common/types';
 
 export interface CalculationResult {
-  status: Status;
-  grade: number;
-}
-
-export interface CalculationInput {
-  subResult: CalculationResult;
-  params: object | null;
+  attainmentTag: string,
+  grade: number,
+  status: Status
 }
 
 /**
  * Type of functions implementing grade calculation formulas.
  */
-export type FormulaFunction =
-  (inputs: Array<CalculationInput>) => Promise<CalculationResult>;
+export type FormulaFunction = (
+  attainmentTag: string,
+  params: object | null,
+  subGrades: Array<CalculationResult>
+) => CalculationResult;
 
 /**
  * Stores a formula function as well as the Yup schema for validating its
@@ -40,6 +39,7 @@ export interface FormulaImplementation {
 export interface FormulaNode {
   formulaImplementation: FormulaImplementation;
   subFormulaNodes: Array<FormulaNode>;
-  parentFormulaParams: object | null;
+  formulaParams: object | null;
   attainmentId: number;
+  attainmentTag: string;
 }

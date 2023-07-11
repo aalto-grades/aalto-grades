@@ -48,7 +48,7 @@
     "sequelize": "^6.25.8",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^4.6.0",
-    "yup": "^0.32.11"
+    "yup": "^1.2.0"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.3",

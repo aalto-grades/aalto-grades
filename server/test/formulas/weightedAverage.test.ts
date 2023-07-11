@@ -2,33 +2,28 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { Formula, Status } from 'aalto-grades-common/types';
 import { getFormulaImplementation } from '../../src/formulas';
-import { Status } from '../../src/types/grades';
-import {
-  FormulaImplementation,
-  CalculationInput,
-  CalculationResult,
-} from '../../src/types/formulas';
-import { Formula } from 'aalto-grades-common/types';
+import { CalculationResult, FormulaImplementation } from '../../src/types/formulas';
 
 describe('Test weighted average calculation', () => {
+  const implementation: FormulaImplementation =
+    getFormulaImplementation(Formula.WeightedAverage);
+
   it('should accept parameters of the appropriate form', async () => {
-    const implementation: FormulaImplementation =
-      await getFormulaImplementation(Formula.WeightedAverage);
-    await implementation.paramSchema.validate({ weight: 8 });
+    await implementation.paramSchema.validate({ weights: [['1', 8]] });
   });
 
   it('should forbid parameters of invalid form', async () => {
     // Test with both missing and extra inputs. Incorrect types should raise error also.
-    const implementation: FormulaImplementation =
-      await getFormulaImplementation(Formula.WeightedAverage);
     for (
       const invalid of [
         {},
-        { Weight: 8 },
+        { Weights: [[1, 8]] },
         { mix: 8 },
-        { mix: 999, weight: 8 },
-        { weight: 'x' }
+        { mix: 999, weights: [[1, 8]] },
+        { weights: [1, 8] },
+        { weights: [['1', '8']] }
       ]
     ) {
       await expect(() => implementation.paramSchema.validate(invalid)).rejects.toThrow();
@@ -36,27 +31,47 @@ describe('Test weighted average calculation', () => {
   });
 
   it('should calculate a passing grade when subgrades are passing', async () => {
-    const implementation: FormulaImplementation =
-      await getFormulaImplementation(Formula.WeightedAverage);
-    const input: Array<CalculationInput> = [
-      { params: { weight: 0.3 }, subResult: { grade: 10, status: Status.Pass } },
-      { params: { weight: 0.7 }, subResult: { grade: 14, status: Status.Pass } },
-      { params: { weight: 1 }, subResult: { grade: 3, status: Status.Pass } },
+    const subGrades: Array<CalculationResult> = [
+      { attainmentTag: 'one', grade: 10, status: Status.Pass },
+      { attainmentTag: 'two', grade: 14, status: Status.Pass },
+      { attainmentTag: 'three', grade: 3, status: Status.Pass }
     ];
-    const computedGrade: CalculationResult = await implementation.formulaFunction(input);
+
+    const computedGrade: CalculationResult = implementation.formulaFunction(
+      'current',
+      {
+        weights: [
+          ['one', 0.3],
+          ['two', 0.7],
+          ['three', 1]
+        ]
+      },
+      subGrades
+    );
+
     expect(computedGrade.grade).toBeCloseTo(15.8);
     expect(computedGrade.status).toBe(Status.Pass);
   });
 
   it('should calculate a failing grade when a subgrade is failing', async () => {
-    const implementation: FormulaImplementation =
-      await getFormulaImplementation(Formula.WeightedAverage);
-    const input: Array<CalculationInput> = [
-      { params: { weight: 0.3 }, subResult: { grade: 10, status: Status.Pass } },
-      { params: { weight: 0.7 }, subResult: { grade: 14, status: Status.Fail } },
-      { params: { weight: 1 }, subResult: { grade: 3, status: Status.Fail } },
+    const subGrades: Array<CalculationResult> = [
+      { attainmentTag: 'one', grade: 10, status: Status.Pass },
+      { attainmentTag: 'two', grade: 14, status: Status.Pass },
+      { attainmentTag: 'three', grade: 3, status: Status.Fail }
     ];
-    const computedGrade: CalculationResult = await implementation.formulaFunction(input);
+
+    const computedGrade: CalculationResult = implementation.formulaFunction(
+      'current',
+      {
+        weights: [
+          ['one', 0.3],
+          ['two', 0.7],
+          ['three', 1]
+        ]
+      },
+      subGrades
+    );
+
     expect(computedGrade.grade).toBeCloseTo(15.8);
     expect(computedGrade.status).toBe(Status.Fail);
   });

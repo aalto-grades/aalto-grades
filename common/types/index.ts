@@ -6,5 +6,6 @@ export * from './attainment';
 export * from './auth';
 export * from './course';
 export * from './formula';
+export * from './grades';
 export * from './language';
 export * from './user';
