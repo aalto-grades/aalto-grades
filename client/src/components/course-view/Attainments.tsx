@@ -40,7 +40,7 @@ function Attainments(props: {
       bgcolor: 'primary.light', p: 1.5, display: 'flex', flexDirection: 'column'
     }}>
       <EditFormulaDialog
-        handleClose={() => {}}
+        handleClose={() => console.log('Empty')}
         open={editFormulaOpen}
         attainment={props.attainmentTree}
       />
