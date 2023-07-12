@@ -3,16 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 import { useState, JSX } from 'react';
-import {
-  useParams, useNavigate, Params, NavigateFunction
-} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
-  Box, Button, Dialog, DialogTitle, DialogContent, Step, StepLabel, StepContent, Stepper
+  Box, Button, Dialog, DialogTitle, DialogContent, Step, StepLabel, Stepper
 } from '@mui/material';
 import SelectFormula from './SelectFormula';
 import SetFormulaParams from './SetFormulaParams';
-import formulaServices from '../../services/formulas';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
 import { State } from '../../types';
@@ -23,9 +19,6 @@ function EditFormulaDialog(props: {
   attainment: AttainmentData
 }): JSX.Element {
 
-  const navigate: NavigateFunction = useNavigate ();
-  const { courseId, assessmentModelId }: Params = useParams();
-
   const [activeStep, setActiveStep]: State<number> = useState(0);
 
   // Error message in selection step
@@ -34,27 +27,6 @@ function EditFormulaDialog(props: {
   const [formula, setFormula]: State<FormulaData | null> =
     useState<FormulaData | null>(null);
   const [setSnackPack]: SnackPackAlertState = useSnackPackAlerts();
-
-  /*
-  function navigateToAttributeSelection(): void {
-    if (formula) {
-      formulaServices.getFormulaDetails(formula.id).then((formula: FormulaData) => {
-        setFormula(formula);
-        navigate(`/${courseId}/formula-params/${assessmentModelId}`, { replace: true });
-      }).catch((exception: Error) => {
-        console.log(exception.message);
-
-        setSnackPack((prev: any) => [
-          ...prev,
-          {
-            msg: exception.message,
-            severity: 'error'
-          }
-        ]);
-      });
-    }
-  }
-  */
 
   function handleNext(): void {
     if (activeStep === 0) {
