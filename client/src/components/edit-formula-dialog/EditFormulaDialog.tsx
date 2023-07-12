@@ -60,11 +60,13 @@ function EditFormulaDialog(props: {
     if (activeStep === 0) {
       if (formula) {
         setFormulaError('');
-        setActiveStep(activeStep + 1);
       } else {
         setFormulaError('You must select a formula');
+        return;
       }
     }
+
+    setActiveStep(activeStep + 1);
   }
 
   return (
@@ -93,16 +95,13 @@ function EditFormulaDialog(props: {
           <Step>
             <StepLabel>Set Parameters</StepLabel>
             <StepContent>
-              <>
-                <p>Test</p>
-                {
-                  (props.attainment && formula) &&
-                  <SetFormulaParams
-                    attainment={props.attainment}
-                    formula={formula}
-                  />
-                }
-              </>
+              {
+                (props.attainment && formula) &&
+                <SetFormulaParams
+                  attainment={props.attainment}
+                  formula={formula}
+                />
+              }
             </StepContent>
           </Step>
         </Stepper>

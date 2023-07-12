@@ -22,15 +22,13 @@ function SetFormulaParams(props: {
   const [attributeValues, setAttributeValues]: State<Array<Array<string>>> =
     useState<Array<Array<string>>>([]);
 
-  const [selectedFormula, setSelectedFormula]: any = useState({});
-  const [selectedAttainments, setSelectedAttainments]: any = useState([]);
-
   const [
     setSnackPack,
     messageInfo, setMessageInfo,
     alertOpen, setAlertOpen
   ]: SnackPackAlertState = useSnackPackAlerts();
 
+  /*
   useEffect(() => {
     setAttributeValues(
       Array(selectedAttainments.length).fill(
@@ -94,9 +92,10 @@ function SetFormulaParams(props: {
       });
     }
   }
+  */
 
   return (
-    <form onSubmit={handleSubmit} data-testid='attributeForm'>
+    <>
       <AlertSnackbar
         messageInfo={messageInfo}
         setMessageInfo={setMessageInfo}
@@ -113,33 +112,22 @@ function SetFormulaParams(props: {
         pt: 2
       }}>
         {
-          selectedAttainments.map((attainment: any, attainmentIndex: number) =>
-            <Attainment
-              attainment={attainment}
-              key={attainment.id}
-              attainmentIndex={attainmentIndex}
-              childParams={selectedFormula.childParams}
-              handleAttributeChange={handleAttributeChange}
-            />)
+          props.attainment.subAttainments?.map(
+            (attainment: AttainmentData, attainmentIndex: number) => {
+              return (
+                <Attainment
+                  attainment={attainment}
+                  key={attainment.id}
+                  attainmentIndex={attainmentIndex}
+                  childParams={props.formula.childParams}
+                  handleAttributeChange={/*handleAttributeChange*/() => console.log('Empty')}
+                />
+              );
+            }
+          )
         }
       </StyledBox>
-      <StyledBox sx={{ display: 'flex', flexDirection: 'column' }}>
-        <Box sx={{ alignSelf: 'flex-end', m: '20px' }}>
-          <Button
-            size='medium'
-            variant='outlined'
-            sx={{ mr: 2 }}
-            onClick={(): void => /*props.navigateBack()*/ console.log('Empty')}
-          >
-            Go back
-          </Button>
-          <Button size='medium' variant='contained' type='submit' name='confirm'>
-            Confirm
-          </Button>
-        </Box>
-      </StyledBox>
-
-    </form>
+    </>
   );
 }
 
