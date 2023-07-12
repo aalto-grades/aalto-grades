@@ -10,7 +10,7 @@ import { State } from '../../types';
 import useAuth from '../../hooks/useAuth';
 import userServices from '../../services/user';
 
-function LoginForm():JSX.Element {
+function LoginForm(): JSX.Element {
 
   const { setAuth }: { setAuth: (auth: LoginResult | null) => void } = useAuth();
   const navigate: NavigateFunction = useNavigate();
