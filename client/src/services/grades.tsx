@@ -4,6 +4,7 @@
 
 import axios from './axios';
 import { FinalGrade, FullResponse, Numeric } from '../types';
+import { AxiosResponse } from 'axios';
 
 async function exportSisuCsv(
   courseId: Numeric, assessmentModelId: Numeric, params: unknown
@@ -32,8 +33,8 @@ async function importCsv(
 
 async function downloadCsvTemplate(
   courseId: Numeric, assessmentModelId: Numeric
-): Promise<BlobPart> {
-  const response = await axios.get(
+): Promise<string> {
+  const response: AxiosResponse = await axios.get(
     `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/csv`
   );
   return response.data;
