@@ -59,13 +59,16 @@ export function getFormulaImplementation(
   return formulaImplementation;
 }
 
-export function getAllFormulasBasicData(): Array<FormulaData> {
+export function getAllFormulasData(): Array<FormulaData> {
   const formulas: Array<FormulaData> = [];
 
   for (const [key, value] of formulaImplementations) {
     formulas.push({
       id: key,
-      name: value.name
+      name: value.name,
+      params: value.params,
+      childParams: value.childParams,
+      codeSnippet: value.codeSnippet
     });
   }
 

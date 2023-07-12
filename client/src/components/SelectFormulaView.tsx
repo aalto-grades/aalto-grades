@@ -55,8 +55,6 @@ function SelectFormulaView(): JSX.Element {
     });
   }
 
-  // TODO: How to differentiate between course total grade and assigment grade?
-
   return (
     <Box display="flex" justifyContent='center' alignItems='center' flexDirection='column'>
       <Box textAlign='left' alignItems='left'>

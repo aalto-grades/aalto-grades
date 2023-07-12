@@ -110,14 +110,16 @@ function FormulaParamsForm(props: {
         borderRadius: 1,
         pt: 2
       }}>
-        { selectedAttainments.map((attainment: any, attainmentIndex: number) =>
-          <Attainment
-            attainment={attainment}
-            key={attainment.id}
-            attainmentIndex={attainmentIndex}
-            attributes={selectedFormula.attributes}
-            handleAttributeChange={handleAttributeChange}
-          />) }
+        {
+          selectedAttainments.map((attainment: any, attainmentIndex: number) =>
+            <Attainment
+              attainment={attainment}
+              key={attainment.id}
+              attainmentIndex={attainmentIndex}
+              childParams={selectedFormula.childParams}
+              handleAttributeChange={handleAttributeChange}
+            />)
+        }
       </StyledBox>
       <StyledBox sx={{ display: 'flex', flexDirection: 'column' }}>
         <Box sx={{ alignSelf: 'flex-end', m: '20px' }}>

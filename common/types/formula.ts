@@ -10,9 +10,6 @@ export enum Formula {
 export interface FormulaData {
   id: Formula;
   name: string;
-}
-
-export interface FormulaPreview extends FormulaData {
   params: Array<string>;
   childParams: Array<string>;
   codeSnippet: string;
