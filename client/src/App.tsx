@@ -19,11 +19,8 @@ import CourseView from './components/CourseView';
 import CreateCourseView from './components/CreateCourseView';
 import FetchInstancesView from './components/FetchInstancesView';
 import EditInstanceView from './components/EditInstanceView';
-import SelectFormulaView from './components/SelectFormulaView';
-import FormulaParamsView from './components/FormulaParamsView';
 import EditAttainmentView from './components/EditAttainmentView';
 import CourseResultsView from './components/CourseResultsView';
-import FormulaSelectionRoute from './context/FormulaSelectionRoute';
 import UserButton from './components/auth/UserButton';
 import { SystemRole } from 'aalto-grades-common/types/auth';
 
@@ -191,20 +188,6 @@ function App(): JSX.Element {
                 path='/:courseId/attainment/:modification/:assessmentModelId/:attainmentId'
                 element={<EditAttainmentView />}
               />
-              <Route element={<FormulaSelectionRoute />}>
-                <Route
-                  path='/:courseId/select-formula/:assessmentModelId/'
-                  element={<SelectFormulaView />}
-                />
-                <Route
-                  path='/:courseId/formula-attributes/:assessmentModelId/'
-                  element={<FormulaParamsView />}
-                />
-                {
-                  /* '/:attainmentId' will be added to the paths above once
-                     they work for sub-attainments */
-                }
-              </Route>
             </Route>
           </Routes>
         </Box>

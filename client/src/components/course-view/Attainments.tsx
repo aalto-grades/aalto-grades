@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { JSX } from 'react';
+import { useState, JSX } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
@@ -10,7 +10,9 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import AttainmentCategory from '../attainments/AttainmentCategory';
 import MenuButton, { MenuButtonOption } from './MenuButton';
+import EditFormulaDialog from '../edit-formula-dialog/EditFormulaDialog';
 import { AssessmentModelData, AttainmentData } from 'aalto-grades-common/types';
+import { State } from '../../types';
 
 function Attainments(props: {
   attainmentTree: AttainmentData,
@@ -20,6 +22,7 @@ function Attainments(props: {
   handleAddPoints: () => void
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
+  const [editFormulaOpen, setEditFormulaOpen]: State<boolean> = useState(false);
 
   const actionOptions: Array<MenuButtonOption> = [
     {
@@ -36,6 +39,11 @@ function Attainments(props: {
     <Box borderRadius={1} sx={{
       bgcolor: 'primary.light', p: 1.5, display: 'flex', flexDirection: 'column'
     }}>
+      <EditFormulaDialog
+        handleClose={() => {}}
+        open={editFormulaOpen}
+        attainment={props.attainmentTree}
+      />
       <Typography variant='h3' align='left' sx={{ ml: 1.5, mt: 0.6, mb: 1.5 }} >
         Study Attainments
       </Typography>
@@ -46,9 +54,7 @@ function Attainments(props: {
         <Typography align='left' sx={{ ml: 1.5 }} >
           {'Grading Formula: ' + props.formula}
         </Typography>
-        <Button id='ag_edit_formula_btn' onClick={(): void => {
-          navigate(`/${props.courseId}/select-formula/${props.assessmentModel.id}`);
-        }}>
+        <Button id='ag_edit_formula_btn' onClick={(): void => setEditFormulaOpen(true)}>
           Edit formula
         </Button>
         { /* The path above should be changes once courseId can be fetched from the path */}

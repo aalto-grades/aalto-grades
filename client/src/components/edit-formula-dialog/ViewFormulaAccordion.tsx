@@ -14,7 +14,7 @@ import { styled } from '@mui/material/styles';
 import formulaServices from '../../services/formulas';
 import { Box, CircularProgress } from '@mui/material';
 import { State } from '../../types';
-import { Formula, FormulaPreview } from 'aalto-grades-common/types';
+import { Formula, FormulaData } from 'aalto-grades-common/types';
 
 const HoverExpandMoreIcon = styled<any>(ExpandMoreIcon)(({ theme }) => ({
   '&:hover': {
@@ -30,7 +30,7 @@ function ViewFormulaAccordion(props: {
   useEffect(() => {
     if (props.formulaId) {
       formulaServices.getFormulaDetails(props.formulaId)
-        .then((data: FormulaPreview) => {
+        .then((data: FormulaData) => {
           setCodeSnippet(data.codeSnippet);
         })
         .catch((exception: Error) => console.log(exception.message));

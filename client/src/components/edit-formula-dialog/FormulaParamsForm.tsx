@@ -3,25 +3,28 @@
 // SPDX-License-Identifier: MIT
 
 import { useState, useEffect, SyntheticEvent } from 'react';
-import { useOutletContext } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import StyledBox from '../select-formula-view/StyledBox';
+import StyledBox from '../edit-formula-dialog/StyledBox';
 import Attainment from './Attainment';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import { sleep } from '../../utils';
+import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
 import { Message, State } from '../../types';
 
 function FormulaParamsForm(props: {
-  navigateToCourseView: () => void,
-  navigateBack: () => void
+  attainment: AttainmentData,
+  formula: FormulaData
 }): JSX.Element {
 
   const [attributeValues, setAttributeValues]: State<Array<Array<string>>> =
     useState<Array<Array<string>>>([]);
-  const { selectedAttainments, selectedFormula } = useOutletContext<any>();
+
+  const [selectedFormula, setSelectedFormula]: any = useState({});
+  const [selectedAttainments, setSelectedAttainments]: any = useState([]);
+
   const [
     setSnackPack,
     messageInfo, setMessageInfo,
@@ -82,7 +85,6 @@ function FormulaParamsForm(props: {
         severity: 'success'
       });
       await sleep(4000);
-      props.navigateToCourseView();
 
     } catch (exception) {
       console.log(exception);
@@ -127,7 +129,7 @@ function FormulaParamsForm(props: {
             size='medium'
             variant='outlined'
             sx={{ mr: 2 }}
-            onClick={(): void => props.navigateBack()}
+            onClick={(): void => /*props.navigateBack()*/ console.log('Empty')}
           >
             Go back
           </Button>
@@ -142,8 +144,8 @@ function FormulaParamsForm(props: {
 }
 
 FormulaParamsForm.propTypes = {
-  navigateToCourseView: PropTypes.func,
-  navigateBack: PropTypes.func,
+  attainment: PropTypes.object,
+  formula: PropTypes.object
 };
 
 export default FormulaParamsForm;

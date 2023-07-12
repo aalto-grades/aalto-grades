@@ -16,7 +16,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import LeafAttainment from './LeafAttainment';
 import Attainment from './Attainment';
 import formulaServices from '../../services/formulas';
-import { AttainmentData, FormulaPreview } from 'aalto-grades-common/types';
+import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
 import { State } from '../../types';
 
 // An Assignmnet component with subAttainments and a formula
@@ -34,8 +34,8 @@ function ParentAttainment(props: {
   // For opening and closing the list of sub-attainments
   const [open, setOpen]: State<boolean> = useState(true);
   // Detailed information about the used formula, undefined when loading.
-  const [formulaDetails, setFormulaDetails]: State<FormulaPreview | null> =
-    useState<FormulaPreview | null>(null);
+  const [formulaDetails, setFormulaDetails]: State<FormulaData | null> =
+    useState<FormulaData | null>(null);
 
   function handleClick(): void {
     setOpen(!open);
@@ -55,7 +55,7 @@ function ParentAttainment(props: {
   useEffect(() => {
     if (props.attainmentTree.formula) {
       formulaServices.getFormulaDetails(props.attainmentTree.formula)
-        .then((formula: FormulaPreview) => {
+        .then((formula: FormulaData) => {
           setFormulaDetails(formula);
         });
     }
@@ -122,7 +122,7 @@ function ParentAttainment(props: {
                       getTemporaryId={props.getTemporaryId}
                       attainment={subAttainment}
                       formulaAttributeNames={
-                        formulaDetails?.attributes ?? []
+                        formulaDetails?.params ?? []
                       }
                     />
                   )

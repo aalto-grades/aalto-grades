@@ -2,49 +2,34 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState, useEffect, ChangeEvent, SyntheticEvent } from 'react';
-import {
-  NavigateFunction, useOutletContext,
-  useNavigate, Params, useParams
-} from 'react-router-dom';
+import { useState, useEffect, SyntheticEvent } from 'react';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import Typography from '@mui/material/Typography';
-import FormHelperText from '@mui/material/FormHelperText';
+import {
+  Button, Box, CircularProgress, FormControl, InputLabel, Select, MenuItem,
+  Typography, FormHelperText
+} from '@mui/material';
 import StyledBox from './StyledBox';
 import ViewFormulaAccordion from './ViewFormulaAccordion';
 import AlertSnackbar from '../alerts/AlertSnackbar';
-import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
-import { sleep } from '../../utils';
-import formulaServices from '../../services/formulas';
-import { AttainmentData, FormulaData, FormulaPreview } from 'aalto-grades-common/types';
-import CircularProgress from '@mui/material/CircularProgress';
-import { State } from '../../types';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
+import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
+import formulaServices from '../../services/formulas';
+import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
+import { State } from '../../types';
 
 function SelectFormulaForm(props: {
-  attainments: Array<AttainmentData>,
-  navigateToCourseView: () => void,
+  attainment: AttainmentData,
+  formula: FormulaData | null,
+  setFormula: (formula: FormulaData) => void,
   navigateToAttributeSelection: () => void
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
-  const { courseId }: Params = useParams();
 
-  const [checkboxError, setCheckboxError]: State<string>  = useState('');
   const [formulaError, setFormulaError]: State<string> = useState('');
   const [setSnackPack, messageInfo, setMessageInfo, alertOpen, setAlertOpen] = useSnackPackAlerts();
   const [formulas, setFormulas]: State<Array<FormulaData>> = useState<Array<FormulaData>>([]);
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
-
-  const {
-    selectedAttainments, setSelectedAttainments,
-    selectedFormula, setSelectedFormula
-  } = useOutletContext<any>();
 
   useEffect(() => {
     if (formulas.length == 0) {
@@ -56,72 +41,54 @@ function SelectFormulaForm(props: {
     }
   }, []);
 
-  useEffect(() => {
-    // all attainments are checked at default -> add them to selected attainments
-    if (selectedAttainments.length === 0) {
-      setSelectedAttainments(props.attainments);
-    }
-  }, [props.attainments]);
-
-  function handleFormulaChange(event: SelectChangeEvent): void {
+  function handleFormulaChange(event: /*SelectChangeEvent*/any): void {
     const newFormula: FormulaData | undefined = formulas.find(
       (formula: FormulaData) => formula.name == event.target.value
     );
 
     if (newFormula)
-      setSelectedFormula(newFormula);
+      props.setFormula(newFormula);
   }
 
   // checks that user has selected a function and at least one attainment
   // if not, shows error message
   function canBeSubmitted(): boolean {
-    let noErrors: boolean = true;
-    if (selectedAttainments.length === 0) {
-      setCheckboxError('You must select at least one study attainment');
-      noErrors = false;
-    } else {
-      // if an error was previously present, clear it
-      setCheckboxError('');
-    }
-
-    if (selectedFormula.name === undefined) {
+    if (props.formula?.name === undefined) {
       setFormulaError('You must select a formula');
-      noErrors = false;
+      return false;
     } else {
       setFormulaError('');
+      return true;
     }
-    return noErrors;
   }
 
   async function handleSubmit(event: SyntheticEvent): Promise<void> {
     event.preventDefault();
     if (canBeSubmitted()) {
       try {
-        const formula: FormulaPreview =
-          await formulaServices.getFormulaDetails(selectedFormula.id);
-        setSelectedFormula(formula);
+        if (props.formula?.id) {
+          const formula: FormulaData =
+            await formulaServices.getFormulaDetails(props.formula.id);
+          props.setFormula(formula);
 
-        const updatedAttainments: any = selectedAttainments.map((attainment: AttainmentData) => {
-          const attributeObj: object = {};
-          formula.attributes.forEach((elem: string) => {
-            (attributeObj as any)[elem] = '';
-          });
-          return {
-            ...attainment,
-            affectCalculation: true,
-            formulaAttributes: attributeObj
-          };
-        });
+          const updatedAttainments: any = props.attainment?.subAttainments?.map(
+            (attainment: AttainmentData) => {
+              const attributeObj: object = {};
+              formula.params.forEach((elem: string) => {
+                (attributeObj as any)[elem] = '';
+              });
+              return {
+                ...attainment,
+                affectCalculation: true,
+                formulaAttributes: attributeObj
+              };
+            }
+          );
 
-        // TODO: send formula to database
-        // TODO: add updated attainments to database
-        console.log(updatedAttainments);
-
-        setSnackPack((prev) => [...prev,
-          { msg: 'Formula saved, you will be redirected to the course page.', severity: 'success' }
-        ]);
-        await sleep(4000);
-        props.navigateToCourseView();
+          // TODO: send formula to database
+          // TODO: add updated attainments to database
+          console.log(updatedAttainments);
+        }
       } catch (exception) {
         console.log(exception);
         setSnackPack((prev) => [...prev,
@@ -129,34 +96,6 @@ function SelectFormulaForm(props: {
         ]);
       }
     }
-  }
-
-  function handleCheckboxChange(event: ChangeEvent<HTMLInputElement>): void {
-    const selectedAttainment: AttainmentData | undefined = props.attainments.find(
-      (attainment: AttainmentData) => attainment.name == event.target.name
-    );
-
-    if (!selectedAttainment)
-      return;
-
-    if (event.target.checked) {
-      setSelectedAttainments((prev: Array<AttainmentData>) => [...prev, selectedAttainment]);
-    } else {
-      setSelectedAttainments((prev: Array<AttainmentData>) => prev.filter(
-        (attainment: AttainmentData) => attainment.id !== selectedAttainment.id)
-      );
-    }
-  }
-
-  function isChecked(attainment: AttainmentData): boolean {
-    // If user has returned from attribute selection
-    // -> only assigments they previously selected are checked
-    for (let i: number = 0; i < selectedAttainments.length; i++) {
-      if (selectedAttainments[i].id === attainment.id) {
-        return true;
-      }
-    }
-    return false;
   }
 
   return (
@@ -171,8 +110,6 @@ function SelectFormulaForm(props: {
         display: 'flex',
         alignItems: 'flex-start',
         flexDirection: 'column',
-        boxShadow: 2,
-        borderRadius: 2,
         p: 1,
         my: 3,
         textAlign: 'left'
@@ -190,7 +127,7 @@ function SelectFormulaForm(props: {
               <Select
                 label='Formula'
                 labelId='formulaSelector'
-                value={selectedFormula.name ?? ''}
+                value={props.formula?.name ?? ''}
                 onChange={handleFormulaChange}
                 error={formulaError !== ''}
               >
@@ -206,7 +143,7 @@ function SelectFormulaForm(props: {
           <FormHelperText error={formulaError !== ''}>{formulaError}</FormHelperText>
         </FormControl>
         <StyledBox>
-          <ViewFormulaAccordion formulaId={selectedFormula.id} />
+          <ViewFormulaAccordion formulaId={props.formula?.id ?? null} />
         </StyledBox>
         <StyledBox sx={{
           display: 'flex',
@@ -226,7 +163,7 @@ function SelectFormulaForm(props: {
               size='medium'
               variant='outlined'
               onClick={(): void => {
-                if (selectedFormula?.id || selectedAttainments.length != props.attainments.length) {
+                if (props.formula?.id) {
                   setShowDialog(true);
                 } else {
                   navigate(-1);
@@ -234,15 +171,6 @@ function SelectFormulaForm(props: {
               }}
             >
               Cancel
-            </Button>
-            <Button
-              size='medium'
-              variant='outlined'
-              type='submit'
-              name='skipAttributes'
-              sx={{ mr: 2 }}
-            >
-              Skip for now
             </Button>
             <Button
               size='medium'
@@ -260,16 +188,17 @@ function SelectFormulaForm(props: {
       <UnsavedChangesDialog
         setOpen={setShowDialog}
         open={showDialog}
-        navigateDir={'/course-view/' + courseId}
+        navigateDir={'/course-view/'}
       />
     </form>
   );
 }
 
 SelectFormulaForm.propTypes = {
-  attainments: PropTypes.array,
-  navigateToCourseView: PropTypes.func,
-  navigateToAttributeSelection: PropTypes.func,
+  attainment: PropTypes.object,
+  formula: PropTypes.object,
+  formulaData: PropTypes.func,
+  navigateToAttributeSelection: PropTypes.func
 };
 
 export default SelectFormulaForm;
