@@ -2,12 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState, useEffect, SyntheticEvent } from 'react';
-import { NavigateFunction, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
-  CircularProgress, FormControl, FormHelperText, InputLabel,
-  MenuItem, Select, SelectChangeEvent, Typography
+  CircularProgress, FormControl, FormHelperText, InputLabel, MenuItem, Select, SelectChangeEvent
 } from '@mui/material';
 import StyledBox from './StyledBox';
 import ViewFormulaAccordion from './ViewFormulaAccordion';
@@ -22,11 +20,9 @@ function SelectFormula(props: {
   attainment: AttainmentData,
   formula: FormulaData | null,
   setFormula: (formula: FormulaData) => void,
-  navigateToAttributeSelection: () => void
+  error: string
 }): JSX.Element {
-  const navigate: NavigateFunction = useNavigate();
 
-  const [formulaError, setFormulaError]: State<string> = useState('');
   const [formulas, setFormulas]: State<Array<FormulaData>> = useState<Array<FormulaData>>([]);
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
   const [
@@ -52,18 +48,7 @@ function SelectFormula(props: {
       props.setFormula(newFormula);
   }
 
-  // checks that user has selected a function and at least one attainment
-  // if not, shows error message
-  function canBeSubmitted(): boolean {
-    if (props.formula?.name === undefined) {
-      setFormulaError('You must select a formula');
-      return false;
-    } else {
-      setFormulaError('');
-      return true;
-    }
-  }
-
+  /*
   async function handleSubmit(event: SyntheticEvent): Promise<void> {
     event.preventDefault();
     if (canBeSubmitted()) {
@@ -99,9 +84,10 @@ function SelectFormula(props: {
       }
     }
   }
+  */
 
   return (
-    <form onSubmit={handleSubmit}>
+    <>
       <AlertSnackbar
         messageInfo={messageInfo}
         setMessageInfo={setMessageInfo}
@@ -131,7 +117,7 @@ function SelectFormula(props: {
                 labelId='formulaSelector'
                 value={props.formula?.name ?? ''}
                 onChange={handleFormulaChange}
-                error={formulaError !== ''}
+                error={props.error !== ''}
               >
                 {formulas.map((formula: FormulaData) => {
                   return (
@@ -142,7 +128,7 @@ function SelectFormula(props: {
               :
               <CircularProgress sx={{ mt: 2 }} />
           }
-          <FormHelperText error={formulaError !== ''}>{formulaError}</FormHelperText>
+          <FormHelperText error={props.error !== ''}>{props.error}</FormHelperText>
         </FormControl>
         <StyledBox>
           <ViewFormulaAccordion formulaId={props.formula?.id ?? null} />
@@ -153,7 +139,7 @@ function SelectFormula(props: {
         open={showDialog}
         navigateDir={'/course-view/'}
       />
-    </form>
+    </>
   );
 }
 
@@ -161,7 +147,7 @@ SelectFormula.propTypes = {
   attainment: PropTypes.object,
   formula: PropTypes.object,
   formulaData: PropTypes.func,
-  navigateToAttributeSelection: PropTypes.func
+  error: PropTypes.string
 };
 
 export default SelectFormula;

@@ -28,10 +28,14 @@ function EditFormulaDialog(props: {
 
   const [activeStep, setActiveStep]: State<number> = useState(0);
 
+  // Error message in selection step
+  const [formulaError, setFormulaError]: State<string> = useState('');
+
   const [formula, setFormula]: State<FormulaData | null> =
     useState<FormulaData | null>(null);
   const [setSnackPack]: SnackPackAlertState = useSnackPackAlerts();
 
+  /*
   function navigateToAttributeSelection(): void {
     if (formula) {
       formulaServices.getFormulaDetails(formula.id).then((formula: FormulaData) => {
@@ -48,6 +52,18 @@ function EditFormulaDialog(props: {
           }
         ]);
       });
+    }
+  }
+  */
+
+  function handleNext(): void {
+    if (activeStep === 0) {
+      if (formula) {
+        setFormulaError('');
+        setActiveStep(activeStep + 1);
+      } else {
+        setFormulaError('You must select a formula');
+      }
     }
   }
 
@@ -69,7 +85,7 @@ function EditFormulaDialog(props: {
                   attainment={props.attainment}
                   formula={formula}
                   setFormula={setFormula}
-                  navigateToAttributeSelection={navigateToAttributeSelection}
+                  error={formulaError}
                 />
               }
             </StepContent>
@@ -104,7 +120,7 @@ function EditFormulaDialog(props: {
           <Button
             size='medium'
             variant='contained'
-            onClick={() => setActiveStep(activeStep + 1)}
+            onClick={handleNext}
           >
             Next
           </Button>
