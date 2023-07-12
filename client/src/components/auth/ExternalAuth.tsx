@@ -5,7 +5,7 @@
 import React from 'react';
 import { Box, Button, Typography } from '@mui/material';
 
-function ExternalAuth():JSX.Element {
+function ExternalAuth(): JSX.Element {
 
   function handleSubmit(event: React.SyntheticEvent): void {
     event.preventDefault();
