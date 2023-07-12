@@ -6,19 +6,19 @@ import { useState, useEffect, SyntheticEvent } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
-  Button, Box, CircularProgress, FormControl, InputLabel, Select, MenuItem,
-  Typography, FormHelperText
+  Button, Box, CircularProgress, FormControl, FormHelperText, InputLabel,
+  MenuItem, Select, SelectChangeEvent, Typography
 } from '@mui/material';
 import StyledBox from './StyledBox';
 import ViewFormulaAccordion from './ViewFormulaAccordion';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
-import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
+import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import formulaServices from '../../services/formulas';
 import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
 import { State } from '../../types';
 
-function SelectFormulaForm(props: {
+function SelectFormula(props: {
   attainment: AttainmentData,
   formula: FormulaData | null,
   setFormula: (formula: FormulaData) => void,
@@ -27,9 +27,11 @@ function SelectFormulaForm(props: {
   const navigate: NavigateFunction = useNavigate();
 
   const [formulaError, setFormulaError]: State<string> = useState('');
-  const [setSnackPack, messageInfo, setMessageInfo, alertOpen, setAlertOpen] = useSnackPackAlerts();
   const [formulas, setFormulas]: State<Array<FormulaData>> = useState<Array<FormulaData>>([]);
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
+  const [
+    setSnackPack, messageInfo, setMessageInfo, alertOpen, setAlertOpen
+  ]: SnackPackAlertState = useSnackPackAlerts();
 
   useEffect(() => {
     if (formulas.length == 0) {
@@ -41,7 +43,7 @@ function SelectFormulaForm(props: {
     }
   }, []);
 
-  function handleFormulaChange(event: /*SelectChangeEvent*/any): void {
+  function handleFormulaChange(event: SelectChangeEvent): void {
     const newFormula: FormulaData | undefined = formulas.find(
       (formula: FormulaData) => formula.name == event.target.value
     );
@@ -194,11 +196,11 @@ function SelectFormulaForm(props: {
   );
 }
 
-SelectFormulaForm.propTypes = {
+SelectFormula.propTypes = {
   attainment: PropTypes.object,
   formula: PropTypes.object,
   formulaData: PropTypes.func,
   navigateToAttributeSelection: PropTypes.func
 };
 
-export default SelectFormulaForm;
+export default SelectFormula;

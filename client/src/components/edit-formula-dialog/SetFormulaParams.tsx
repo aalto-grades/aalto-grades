@@ -14,7 +14,7 @@ import { sleep } from '../../utils';
 import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
 import { Message, State } from '../../types';
 
-function FormulaParamsForm(props: {
+function SetFormulaParams(props: {
   attainment: AttainmentData,
   formula: FormulaData
 }): JSX.Element {
@@ -143,9 +143,9 @@ function FormulaParamsForm(props: {
   );
 }
 
-FormulaParamsForm.propTypes = {
+SetFormulaParams.propTypes = {
   attainment: PropTypes.object,
   formula: PropTypes.object
 };
 
-export default FormulaParamsForm;
+export default SetFormulaParams;

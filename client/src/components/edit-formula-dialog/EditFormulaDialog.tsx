@@ -11,7 +11,7 @@ import {
   Dialog, DialogTitle, DialogContent, Step, StepLabel, StepContent, Stepper
 } from '@mui/material';
 import SelectFormula from './SelectFormula';
-import FormulaParamsForm from './FormulaParamsForm';
+import SetFormulaParams from './SetFormulaParams';
 import formulaServices from '../../services/formulas';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
@@ -23,7 +23,7 @@ function EditFormulaDialog(props: {
   attainment: AttainmentData
 }): JSX.Element {
 
-  const navigate: NavigateFunction = useNavigate();
+  const navigate: NavigateFunction = useNavigate ();
   const { courseId, assessmentModelId }: Params = useParams();
 
   const [activeStep, setActiveStep]: State<number> = useState(0);
@@ -67,6 +67,8 @@ function EditFormulaDialog(props: {
                 props.attainment &&
                 <SelectFormula
                   attainment={props.attainment}
+                  formula={formula}
+                  setFormula={setFormula}
                   navigateToAttributeSelection={navigateToAttributeSelection}
                 />
               }
@@ -77,7 +79,7 @@ function EditFormulaDialog(props: {
             <StepContent>
               {
                 (props.attainment && formula) &&
-                <FormulaParamsForm
+                <SetFormulaParams
                   attainment={props.attainment}
                   formula={formula}
                 />
