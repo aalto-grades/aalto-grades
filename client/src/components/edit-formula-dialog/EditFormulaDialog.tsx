@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
-  Dialog, DialogTitle, DialogContent, Step, StepLabel, StepContent, Stepper
+  Box, Button, Dialog, DialogTitle, DialogContent, Step, StepLabel, StepContent, Stepper
 } from '@mui/material';
 import SelectFormula from './SelectFormula';
 import SetFormulaParams from './SetFormulaParams';
@@ -77,16 +77,38 @@ function EditFormulaDialog(props: {
           <Step>
             <StepLabel>Set Parameters</StepLabel>
             <StepContent>
-              {
-                (props.attainment && formula) &&
-                <SetFormulaParams
-                  attainment={props.attainment}
-                  formula={formula}
-                />
-              }
+              <>
+                <p>Test</p>
+                {
+                  (props.attainment && formula) &&
+                  <SetFormulaParams
+                    attainment={props.attainment}
+                    formula={formula}
+                  />
+                }
+              </>
             </StepContent>
           </Step>
         </Stepper>
+        <Box sx={{
+          mx: 3, mt: 0, mb: 1.5, alignSelf: 'flex-end', display: 'flex',
+        }}>
+          <Button
+            sx={{ mr: 2 }}
+            size='medium'
+            variant='outlined'
+            onClick={() => setActiveStep(activeStep - 1)}
+          >
+            Back
+          </Button>
+          <Button
+            size='medium'
+            variant='contained'
+            onClick={() => setActiveStep(activeStep + 1)}
+          >
+            Next
+          </Button>
+        </Box>
       </DialogContent>
     </Dialog>
   );

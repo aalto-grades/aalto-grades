@@ -6,7 +6,7 @@ import { useState, useEffect, SyntheticEvent } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
-  Button, Box, CircularProgress, FormControl, FormHelperText, InputLabel,
+  CircularProgress, FormControl, FormHelperText, InputLabel,
   MenuItem, Select, SelectChangeEvent, Typography
 } from '@mui/material';
 import StyledBox from './StyledBox';
@@ -146,45 +146,6 @@ function SelectFormula(props: {
         </FormControl>
         <StyledBox>
           <ViewFormulaAccordion formulaId={props.formula?.id ?? null} />
-        </StyledBox>
-        <StyledBox sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          justifyContent: 'space-between',
-        }}>
-          <Typography width={320} sx={{ m: 3, mb: 1.5 }}>
-            Specify attribute values for the sub study attainments
-          </Typography>
-          <Box sx={{
-            mx: 3, mt: 0, mb: 1.5, alignSelf: 'flex-end',
-            display: 'flex', lexDirection: 'column',
-          }}>
-            <Button
-              sx={{ mr: 2 }}
-              size='medium'
-              variant='outlined'
-              onClick={(): void => {
-                if (props.formula?.id) {
-                  setShowDialog(true);
-                } else {
-                  navigate(-1);
-                }
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              size='medium'
-              variant='contained'
-              onClick={(): void => {
-                if (canBeSubmitted())
-                  props.navigateToAttributeSelection();
-              }}
-            >
-              Specify attributes
-            </Button>
-          </Box>
         </StyledBox>
       </StyledBox>
       <UnsavedChangesDialog
