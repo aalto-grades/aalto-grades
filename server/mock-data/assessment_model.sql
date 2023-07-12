@@ -36,4 +36,5 @@ INSERT INTO public.assessment_model (course_id, name, created_at, updated_at) VA
 (1, 'model 31', NOW(), NOW()),
 (1, 'model 32', NOW(), NOW()),
 (1, 'model 33', NOW(), NOW()),
-(2, 'multiple roots 34', NOW(), NOW());
+(2, 'multiple roots 34', NOW(), NOW()),
+(2, 'no root attainment assigned', NOW(), NOW()); -- id 35

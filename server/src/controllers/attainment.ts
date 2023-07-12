@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { Request, Response } from 'express';
+import { Op } from 'sequelize';
 import * as yup from 'yup';
 
 import AssessmentModel from '../database/models/assessmentModel';
@@ -72,6 +73,24 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       throw new ApiError(
         `parent attainment ID ${requestTree.parentId} does not belong ` +
         `to the assessment model ID ${assessmentModel.id}`,
+        HttpCode.Conflict
+      );
+    }
+  } else {
+    // Make sure that no other root attainments exist for the assessment model.
+    const attainment: Attainment | null = await Attainment.findOne({
+      where: {
+        assessmentModelId: assessmentModel.id,
+        parentId: {
+          [Op.is]: undefined
+        }
+      }
+    });
+
+    // Root attainment exists.
+    if (attainment) {
+      throw new ApiError(
+        `assessment model already has root attainment with ID ${attainment.id}`,
         HttpCode.Conflict
       );
     }
