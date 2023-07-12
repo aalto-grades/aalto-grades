@@ -7,16 +7,14 @@ import * as yup from 'yup';
 import { registerFormula } from '.';
 import { Formula, Status } from 'aalto-grades-common/types';
 import { ApiError } from '../types/error';
-import { CalculationResult } from '../types/formulas';
+import { CalculationResult, ParamsObject } from '../types/formulas';
 import { HttpCode } from '../types/httpCode';
 
 interface ChildParams {
   weight: number;
 }
 
-interface Params {
-  children: Array<[string, ChildParams]>;
-}
+interface Params extends ParamsObject<ChildParams> {}
 
 const childParams: Array<string> = ['weight'];
 const params: Array<string> = [];

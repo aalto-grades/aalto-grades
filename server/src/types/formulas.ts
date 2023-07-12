@@ -12,6 +12,10 @@ export interface CalculationResult {
   status: Status;
 }
 
+export interface ParamsObject<T> {
+  children: Array<[string, T]>;
+}
+
 /**
  * Type of functions implementing grade calculation formulas.
  */
@@ -40,7 +44,7 @@ export interface FormulaImplementation {
 export interface FormulaNode {
   formulaImplementation: FormulaImplementation;
   subFormulaNodes: Array<FormulaNode>;
-  formulaParams: any | null; // TODO: Remove any
+  formulaParams: object | null;
   attainmentId: number;
   attainmentTag: string;
 }
