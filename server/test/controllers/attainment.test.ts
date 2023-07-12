@@ -107,7 +107,7 @@ describe(
         jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
 
         const res: supertest.Response = await request
-          .post('/v1/courses/1/assessment-models/31/attainments')
+          .post('/v1/courses/2/assessment-models/35/attainments')
           .send({
             name: 'examination',
             tag: 'tag123456',
@@ -123,7 +123,7 @@ describe(
         expect(res.body.errors).not.toBeDefined();
         expect(res.body.data.attainment.id).toBeDefined();
         expect(res.body.data.attainment.name).toBe('examination');
-        expect(res.body.data.attainment.assessmentModelId).toBe(31);
+        expect(res.body.data.attainment.assessmentModelId).toBe(35);
         expect(res.body.data.attainment.parentId).not.toBeDefined();
         expect(res.body.data.attainment.tag).toBe('tag123456');
         expect(res.body.data.attainment.formula).toBe(Formula.Manual);
@@ -484,20 +484,10 @@ describe(
       'should respond with 409 conflict, if parent attainment does not'
       + ' belong to the assessment model',
       async () => {
-        // Create parent attainment for assessment model 1.
-        let res: supertest.Response = await request
-          .post('/v1/courses/4/assessment-models/5/attainments')
-          .send(mockAttainment)
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json');
-
-        const id: number = Number(res.body.data.attainment.id);
-
         // Try to add new attainment with previously created parent to assessment model 2.
-        res = await request
+        const res: supertest.Response = await request
           .post('/v1/courses/4/assessment-models/6/attainments')
-          .send({ parentId: id, ...mockAttainment })
+          .send({ parentId: 4, ...mockAttainment })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
@@ -506,7 +496,7 @@ describe(
         expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe(
-          `parent attainment ID ${id} does not belong to the assessment model ID 6`
+          `parent attainment ID ${4} does not belong to the assessment model ID 6`
         );
       }
     );
@@ -527,174 +517,6 @@ describe(
       });
 
   });
-
-describe(
-  'Test DELETE '
-  + '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
-  () => {
-    async function testAttainmentTreeDeletion(tree: object): Promise<void> {
-      // Add an attainment tree.
-      const add: supertest.Response = await request
-        .post('/v1/courses/4/assessment-models/7/attainments').send(tree)
-        .set('Cookie', cookies.adminCookie);
-
-      // Adds the IDs of all subattainemnts of the given tree to the given
-      // attainments array.
-      function findSubattainmentIds(tree: AttainmentNode, attainments: Array<number>): void {
-        for (const leaf of tree.subAttainments) {
-          attainments.push(leaf.id);
-          findSubattainmentIds(leaf, attainments);
-        }
-      }
-
-      // Find the IDs of all the added attainments.
-      const rootAttainment: number = add.body.data.attainment.id;
-      const addedAttainments: Array<number> = [rootAttainment];
-      findSubattainmentIds(add.body.data.attainment, addedAttainments);
-
-      // Verify that the attainments were added.
-      for (const addedAttainment of addedAttainments)
-        expect(await Attainment.findByPk(addedAttainment)).not.toBeNull;
-
-      // Delete the root attainment.
-      const res: supertest.Response = await request
-        .delete(`/v1/courses/4/assessment-models/7/attainments/${rootAttainment}`)
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
-
-      // Verify that the root attainment as well as all of its subattainments
-      // were deleted.
-      expect(res.body.success).toBe(true);
-      for (const addedAttainment of addedAttainments)
-        expect(await Attainment.findByPk(addedAttainment)).toBeNull;
-    }
-
-    it('should succesfully delete single attainment (admin user)', async () => {
-      // Add an attainment.
-      const add: supertest.Response = await request
-        .post('/v1/courses/4/assessment-models/7/attainments')
-        .send(
-          {
-            name: 'Test exercise',
-            tag: 'delete-test-1',
-            daysValid: 30,
-            subAttainments: []
-          }
-        )
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'application/json');
-
-      // Verify that the attainment was added.
-      const addedAttainment: number = add.body.data.attainment.id;
-      expect(await Attainment.findByPk(addedAttainment)).not.toBeNull;
-
-      // Delete the added attainment.
-      const res: supertest.Response = await request
-        .delete(`/v1/courses/4/assessment-models/7/attainments/${addedAttainment}`)
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
-
-      // Verify that the attainment was deleted.
-      expect(res.body.success).toBe(true);
-      expect(await Attainment.findByPk(addedAttainment)).toBeNull;
-    });
-
-    it('should succesfully delete single attainment (teacher in charge)', async () => {
-      // Add an attainment.
-      const add: supertest.Response = await request
-        .post('/v1/courses/4/assessment-models/7/attainments')
-        .send(
-          {
-            name: 'Test exercise 2',
-            tag: 'delete-test-2',
-            daysValid: 30,
-            subAttainments: []
-          }
-        )
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'application/json');
-
-      // Verify that the attainment was added.
-      const addedAttainment: number = add.body.data.attainment.id;
-      expect(await Attainment.findByPk(addedAttainment)).not.toBeNull;
-
-      jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
-
-      // Delete the added attainment.
-      const res: supertest.Response = await request
-        .delete(`/v1/courses/4/assessment-models/7/attainments/${addedAttainment}`)
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
-
-      // Verify that the attainment was deleted.
-      expect(res.body.success).toBe(true);
-      expect(await Attainment.findByPk(addedAttainment)).toBeNull;
-    });
-
-    it('should succesfully delete a tree of attainments with depth 1', async () => {
-      await testAttainmentTreeDeletion(
-        {
-          name: 'Test exercise',
-          tag: 'delete-test-2',
-          daysValid: 30,
-          subAttainments: [
-            {
-              name: 'Test exercise 1.1',
-              tag: 'delete-test-2-1.1',
-              daysValid: 60,
-              subAttainments: []
-            },
-            {
-              name: 'Test exercise 1.2',
-              tag: 'delete-test-2-1.2',
-              daysValid: 90,
-              subAttainments: []
-            }
-          ]
-        }
-      );
-    });
-
-    it('should succesfully delete a tree of attainments with depth greater than 1', async () => {
-      await testAttainmentTreeDeletion(mockAttainment);
-    });
-
-    it('should respond with 401 unauthorized, if not logged in', async () => {
-      await request
-        .delete('/v1/courses/4/assessment-models/7/attainments/1')
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Unauthorized);
-    });
-
-    it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
-      jest.spyOn(Attainment, 'findByPk').mockResolvedValueOnce(jestMockAttainment);
-
-      const res: supertest.Response = await request
-        .delete('/v1/courses/4/assessment-models/7/attainments/1')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Forbidden);
-
-      expect(res.body.success).toBe(false);
-      expect(res.body.data).not.toBeDefined();
-      expect(res.body.errors).toBeDefined();
-    });
-
-    it('should respond with 404 not found for non-existent attainment ID', async () => {
-      const res: supertest.Response = await request
-        .delete(`/v1/courses/4/assessment-models/7/attainments/${badId}`)
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.NotFound);
-
-      expect(res.body.success).toBe(false);
-    });
-
-  }
-);
 
 describe(
   'Test PUT /v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId'
@@ -739,37 +561,24 @@ describe(
     });
 
     it('should add parent succesfully on an existing attainment (teacher in charge)', async () => {
-      // Create a new parent attainment.
-      let res: supertest.Response = await request
-        .post('/v1/courses/1/assessment-models/12/attainments')
-        .send({
-          name: 'No parent',
-          tag: 'no-parent',
-          daysValid: 50
-        })
-        .set('Content-Type', 'application/json')
-        .set('Cookie', cookies.adminCookie)
-        .expect(HttpCode.Ok);
-
-      parentAttainment = res.body.data.attainment;
+      // Set the number 2 child of mockAttainment as the parent of number 1 child.
       jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
 
-      res = await request
-        .put(`/v1/courses/1/assessment-models/12/attainments/${subAttainment.id}`)
-        .send({ parentId: parentAttainment.id })
+      const subAttainments: Array<AttainmentData> =
+        subAttainment.subAttainments as Array<AttainmentData>;
+
+      const res: supertest.Response = await request
+        .put(`/v1/courses/1/assessment-models/12/attainments/${subAttainments[0].id}`)
+        .send({ parentId: subAttainments[1].id })
         .set('Content-Type', 'application/json')
         .set('Cookie', cookies.userCookie)
         .expect(HttpCode.Ok);
 
       expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
-      expect(res.body.data.attainment.id).toBe(subAttainment.id);
+      expect(res.body.data.attainment.id).toBe(subAttainments[0].id);
       expect(res.body.data.attainment.assessmentModelId).toBe(12);
-      expect(res.body.data.attainment.parentId).toBe(parentAttainment.id);
-      expect(res.body.data.attainment.name).toBe('new name');
-      expect(res.body.data.attainment.tag).toBe('new tag');
-      expect(res.body.data.attainment.formula).toBe(Formula.WeightedAverage);
-      expect(res.body.data.attainment.daysValid).toBe(50);
+      expect(res.body.data.attainment.parentId).toBe(subAttainments[1].id);
     });
 
     it('should respond with 400 bad request, if validation fails (non-number assessment model id)',
@@ -1128,6 +937,177 @@ describe(
         );
       }
     );
+
+  }
+);
+
+describe(
+  'Test DELETE '
+  + '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
+  () => {
+    async function testAttainmentTreeDeletion(tree: object): Promise<void> {
+      // Add an attainment tree.
+      const add: supertest.Response = await request
+        .post('/v1/courses/4/assessment-models/7/attainments').send(tree)
+        .set('Cookie', cookies.adminCookie);
+
+      // Adds the IDs of all subattainemnts of the given tree to the given
+      // attainments array.
+      function findSubattainmentIds(tree: AttainmentNode, attainments: Array<number>): void {
+        for (const leaf of tree.subAttainments) {
+          attainments.push(leaf.id);
+          findSubattainmentIds(leaf, attainments);
+        }
+      }
+
+      // Find the IDs of all the added attainments.
+      const rootAttainment: number = add.body.data.attainment.id;
+      const addedAttainments: Array<number> = [rootAttainment];
+      findSubattainmentIds(add.body.data.attainment, addedAttainments);
+
+      // Verify that the attainments were added.
+      for (const addedAttainment of addedAttainments)
+        expect(await Attainment.findByPk(addedAttainment)).not.toBeNull;
+
+      // Delete the root attainment.
+      const res: supertest.Response = await request
+        .delete(`/v1/courses/4/assessment-models/7/attainments/${rootAttainment}`)
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+
+      // Verify that the root attainment as well as all of its subattainments
+      // were deleted.
+      expect(res.body.success).toBe(true);
+      for (const addedAttainment of addedAttainments)
+        expect(await Attainment.findByPk(addedAttainment)).toBeNull;
+    }
+
+    it('should succesfully delete single attainment (admin user)', async () => {
+      // Add an attainment.
+      const add: supertest.Response = await request
+        .post('/v1/courses/4/assessment-models/7/attainments')
+        .send(
+          {
+            name: 'Test exercise',
+            tag: 'delete-test-1',
+            daysValid: 30,
+            subAttainments: []
+          }
+        )
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json');
+
+
+      console.log('DJFSJFK', add.body);
+
+      // Verify that the attainment was added.
+      const addedAttainment: number = add.body.data.attainment.id;
+      expect(await Attainment.findByPk(addedAttainment)).not.toBeNull;
+
+      // Delete the added attainment.
+      const res: supertest.Response = await request
+        .delete(`/v1/courses/4/assessment-models/7/attainments/${addedAttainment}`)
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+
+      // Verify that the attainment was deleted.
+      expect(res.body.success).toBe(true);
+      expect(await Attainment.findByPk(addedAttainment)).toBeNull;
+    });
+
+    it('should succesfully delete single attainment (teacher in charge)', async () => {
+      // Add an attainment.
+      const add: supertest.Response = await request
+        .post('/v1/courses/4/assessment-models/7/attainments')
+        .send(
+          {
+            name: 'Test exercise 2',
+            tag: 'delete-test-2',
+            daysValid: 30,
+            subAttainments: []
+          }
+        )
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json');
+
+      // Verify that the attainment was added.
+      const addedAttainment: number = add.body.data.attainment.id;
+      expect(await Attainment.findByPk(addedAttainment)).not.toBeNull;
+
+      jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
+
+      // Delete the added attainment.
+      const res: supertest.Response = await request
+        .delete(`/v1/courses/4/assessment-models/7/attainments/${addedAttainment}`)
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+
+      // Verify that the attainment was deleted.
+      expect(res.body.success).toBe(true);
+      expect(await Attainment.findByPk(addedAttainment)).toBeNull;
+    });
+
+    it('should succesfully delete a tree of attainments with depth 1', async () => {
+      await testAttainmentTreeDeletion(
+        {
+          name: 'Test exercise',
+          tag: 'delete-test-2',
+          daysValid: 30,
+          subAttainments: [
+            {
+              name: 'Test exercise 1.1',
+              tag: 'delete-test-2-1.1',
+              daysValid: 60,
+              subAttainments: []
+            },
+            {
+              name: 'Test exercise 1.2',
+              tag: 'delete-test-2-1.2',
+              daysValid: 90,
+              subAttainments: []
+            }
+          ]
+        }
+      );
+    });
+
+    it('should succesfully delete a tree of attainments with depth greater than 1', async () => {
+      await testAttainmentTreeDeletion(mockAttainment);
+    });
+
+    it('should respond with 401 unauthorized, if not logged in', async () => {
+      await request
+        .delete('/v1/courses/4/assessment-models/7/attainments/1')
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Unauthorized);
+    });
+
+    it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
+      jest.spyOn(Attainment, 'findByPk').mockResolvedValueOnce(jestMockAttainment);
+
+      const res: supertest.Response = await request
+        .delete('/v1/courses/4/assessment-models/7/attainments/1')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Forbidden);
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+    });
+
+    it('should respond with 404 not found for non-existent attainment ID', async () => {
+      const res: supertest.Response = await request
+        .delete(`/v1/courses/4/assessment-models/7/attainments/${badId}`)
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.NotFound);
+
+      expect(res.body.success).toBe(false);
+    });
 
   }
 );
