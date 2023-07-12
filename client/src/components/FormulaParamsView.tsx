@@ -5,9 +5,9 @@
 import { NavigateFunction, Params, useParams, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import FormulaAttributesForm from './formula-attributes-view/FormulaAttributesForm';
+import FormulaParamsForm from './formula-params-view/FormulaParamsForm';
 
-function FormulaAttributesView(): JSX.Element {
+function FormulaParamsView(): JSX.Element {
 
   const { courseId, assessmentModelId }: Params = useParams();
   const navigate: NavigateFunction = useNavigate();
@@ -20,18 +20,16 @@ function FormulaAttributesView(): JSX.Element {
     navigate(`/${courseId}/select-formula/${assessmentModelId}`, { replace: true });
   }
 
-  // TODO: How to differentiate between course total grade and assigment grade?
-
   return (
     <Box display="flex" justifyContent='center' alignItems='center' flexDirection='column'>
       <Box textAlign='left' alignItems='left'>
         <Typography variant="h1" sx={{ flexGrow: 1, my: 4 }}>
-          Specify Formula Attributes
+          Specify Formula Parameters
         </Typography>
         <Typography variant="h3" sx={{ flexGrow: 1, mb: 2 }}>
           Result: Course Total Grade
         </Typography>
-        <FormulaAttributesForm
+        <FormulaParamsForm
           navigateToCourseView={navigateToCourseView}
           navigateBack={navigateBack}
         />
@@ -41,4 +39,4 @@ function FormulaAttributesView(): JSX.Element {
   );
 }
 
-export default FormulaAttributesView;
+export default FormulaParamsView;

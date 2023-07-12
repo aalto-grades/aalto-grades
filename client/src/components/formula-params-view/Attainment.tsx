@@ -11,7 +11,7 @@ import { AttainmentData } from 'aalto-grades-common/types';
 
 function Attainment(props: {
   attainment: AttainmentData,
-  attributes: Array<string>,
+  childParams: Array<string>,
   handleAttributeChange: (
     attainmentIndex: number, attributeIndex: number, event: any
   ) => void,
@@ -22,7 +22,7 @@ function Attainment(props: {
     return (
       <>
         {
-          props.attributes.map((attribute: string, attributeIndex: number) => {
+          props.childParams.map((attribute: string, attributeIndex: number) => {
             const attributeLabel: string = formulaServices.getAttributeLabel(attribute);
             return (
               <TextField
@@ -83,7 +83,7 @@ function Attainment(props: {
 
 Attainment.propTypes = {
   attainment: PropTypes.any,
-  attributes: PropTypes.array,
+  childParams: PropTypes.array,
   handleAttributeChange: PropTypes.func,
   attainmentIndex: PropTypes.number
 };

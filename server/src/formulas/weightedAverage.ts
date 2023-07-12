@@ -55,32 +55,37 @@ function calculateWeightedAverage(
 }
 
 const codeSnippet: string =
-`interface WeightedAverageParams {
-  weights: Array<[string, number]>;
+`interface ChildParams {
+  weight: number;
 }
 
+interface Params extends ParamsObject<ChildParams> {}
+
 function calculateWeightedAverage(
-  attainmentTag: string, params: object | null, subGrades: Array<CalculationResult>
+  attainmentTag: string,
+  params: Params | null,
+  subGrades: Array<CalculationResult>
 ): CalculationResult {
 
   let grade: number = 0;
   let status: Status = Status.Pass;
 
-  const formulaParams: WeightedAverageParams = params as WeightedAverageParams;
-  const weights: Map<string, number> = new Map(formulaParams.weights);
+  if (params) {
+    const weights: Map<string, ChildParams> = new Map(params.children);
 
-  for (const subGrade of subGrades) {
-    if (subGrade.status !== Status.Pass)
-      status = Status.Fail;
+    for (const subGrade of subGrades) {
+      if (subGrade.status !== Status.Pass)
+        status = Status.Fail;
 
-    const weight: number | undefined = weights.get(subGrade.attainmentTag);
-    if (weight) {
-      grade += subGrade.grade * weight;
-    } else {
-      throw new ApiError(
-        \`weight unspecified for attainment with tag \${subGrade.attainmentTag}\`,
-        HttpCode.InternalServerError
-      );
+      const weight: number | undefined = weights.get(subGrade.attainmentTag)?.weight;
+      if (weight) {
+        grade += subGrade.grade * weight;
+      } else {
+        throw new ApiError(
+          \`weight unspecified for attainment with tag \${subGrade.attainmentTag}\`,
+          HttpCode.InternalServerError
+        );
+      }
     }
   }
 

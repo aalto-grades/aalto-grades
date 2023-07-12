@@ -20,7 +20,7 @@ import CreateCourseView from './components/CreateCourseView';
 import FetchInstancesView from './components/FetchInstancesView';
 import EditInstanceView from './components/EditInstanceView';
 import SelectFormulaView from './components/SelectFormulaView';
-import FormulaAttributesView from './components/FormulaAttributesView';
+import FormulaParamsView from './components/FormulaParamsView';
 import EditAttainmentView from './components/EditAttainmentView';
 import CourseResultsView from './components/CourseResultsView';
 import FormulaSelectionRoute from './context/FormulaSelectionRoute';
@@ -198,7 +198,7 @@ function App(): JSX.Element {
                 />
                 <Route
                   path='/:courseId/formula-attributes/:assessmentModelId/'
-                  element={<FormulaAttributesView />}
+                  element={<FormulaParamsView />}
                 />
                 {
                   /* '/:attainmentId' will be added to the paths above once

@@ -10,11 +10,11 @@ import Box from '@mui/material/Box';
 import StyledBox from '../select-formula-view/StyledBox';
 import Attainment from './Attainment';
 import AlertSnackbar from '../alerts/AlertSnackbar';
-import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
+import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import { sleep } from '../../utils';
 import { Message, State } from '../../types';
 
-function FormulaAttributesForm(props: {
+function FormulaParamsForm(props: {
   navigateToCourseView: () => void,
   navigateBack: () => void
 }): JSX.Element {
@@ -26,7 +26,7 @@ function FormulaAttributesForm(props: {
     setSnackPack,
     messageInfo, setMessageInfo,
     alertOpen, setAlertOpen
-  ] = useSnackPackAlerts();
+  ]: SnackPackAlertState = useSnackPackAlerts();
 
   useEffect(() => {
     setAttributeValues(
@@ -46,10 +46,10 @@ function FormulaAttributesForm(props: {
     const newAttributeValues: Array<Array<string>> =
     attributeValues.map((a: Array<string>, index: number): Array<string> => {
       if (attainmentIndex == index) {
-        const newAttributes: Array<string> = a.map((attribute: string, i: number): string => {
+        const newParams: Array<string> = a.map((attribute: string, i: number): string => {
           return (attributeIndex == i) ? event.target.value : attribute;
         });
-        return newAttributes;
+        return newParams;
       } else {
         return a;
       }
@@ -70,7 +70,7 @@ function FormulaAttributesForm(props: {
         return {
           ...attainment,
           affectCalculation: true,
-          formulaAttributes: attributeObj
+          formulaParams: attributeObj
         };
       });
       console.log(updatedAttainments);
@@ -139,9 +139,9 @@ function FormulaAttributesForm(props: {
   );
 }
 
-FormulaAttributesForm.propTypes = {
+FormulaParamsForm.propTypes = {
   navigateToCourseView: PropTypes.func,
   navigateBack: PropTypes.func,
 };
 
-export default FormulaAttributesForm;
+export default FormulaParamsForm;
