@@ -240,7 +240,7 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, tag, days_v
 (26, 231, 'calculate multiple', 'tag233', 365, NOW(), NOW(), 'MANUAL', NULL),
 (27, null, 'calculate depth', 'tag234', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["tag235", { "weight": 0.4 }], ["tag236", { "weight": 0.6 }]] }'),
 (27, 234, 'calculate depth', 'tag235', 365, NOW(), NOW(), 'MANUAL', NULL),
-(27, 234, 'calculate depth', 'tag236', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["tag237", { "weight": 0.1 }], ["tag238", { "weight": 0.1 }], ["tag239", 0.8]] }'),
+(27, 234, 'calculate depth', 'tag236', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["tag237", { "weight": 0.1 }], ["tag238", { "weight": 0.1 }], ["tag239", { "weight": 0.8 }]] }'),
 (27, 236, 'calculate depth', 'tag237', 365, NOW(), NOW(), 'MANUAL', NULL),
 (27, 236, 'calculate depth', 'tag238', 365, NOW(), NOW(), 'MANUAL', NULL),
 (27, 236, 'calculate depth', 'tag239', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["tag240", { "weight": 0.5 }], ["tag241", { "weight": 0.5 }]] }'),
