@@ -80,31 +80,27 @@ function EditFormulaDialog(props: {
         <Stepper activeStep={activeStep}>
           <Step>
             <StepLabel>Select Formula</StepLabel>
-            <StepContent>
-              {
-                props.attainment &&
-                <SelectFormula
-                  attainment={props.attainment}
-                  formula={formula}
-                  setFormula={setFormula}
-                  error={formulaError}
-                />
-              }
-            </StepContent>
           </Step>
           <Step>
             <StepLabel>Set Parameters</StepLabel>
-            <StepContent>
-              {
-                (props.attainment && formula) &&
-                <SetFormulaParams
-                  attainment={props.attainment}
-                  formula={formula}
-                />
-              }
-            </StepContent>
           </Step>
         </Stepper>
+        {
+          (activeStep === 0 && props.attainment) &&
+          <SelectFormula
+            attainment={props.attainment}
+            formula={formula}
+            setFormula={setFormula}
+            error={formulaError}
+          />
+        }
+        {
+          (activeStep === 1 && props.attainment && formula) &&
+          <SetFormulaParams
+            attainment={props.attainment}
+            formula={formula}
+          />
+        }
         <Box sx={{
           mx: 3, mt: 0, mb: 1.5, alignSelf: 'flex-end', display: 'flex',
         }}>
