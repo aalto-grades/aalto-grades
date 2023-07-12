@@ -129,13 +129,15 @@ function CourseResultsView(): JSX.Element {
 
     try {
       if (courseId && assessmentModelId) {
-        const res: BlobPart = await gradeServices.downloadCsvTemplate(courseId, assessmentModelId);
+        const res: string = await gradeServices.downloadCsvTemplate(courseId, assessmentModelId);
         const blob: Blob = new Blob([res], { type: 'text/csv' });
         const link: HTMLAnchorElement = document.createElement('a');
 
         link.href = URL.createObjectURL(blob);
         link.download = 'template.csv'; // TODO: Get filename from Content-Disposition
         link.click();
+        URL.revokeObjectURL(link.href);
+        link.remove();
 
         snackPackAdd({
           msg: 'CSV template downloaded successfully.',

@@ -142,6 +142,8 @@ function SisuExportDialog(props: {
         link.download = `grades_course_${courseId}_assessment_model_${assessmentModelId}.csv`;
         // Download file automatically to the user's computer.
         link.click();
+        URL.revokeObjectURL(link.href);
+        link.remove();
 
         setSnackPack((prev: Array<Message>) => [...prev, successMsg]);
       }
