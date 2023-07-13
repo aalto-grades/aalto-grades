@@ -16,9 +16,11 @@ import { State } from '../../types';
 function EditFormulaDialog(props: {
   handleClose: () => void,
   open: boolean,
-  courseId: number,
-  assessmentModelId: number,
-  attainment: AttainmentData
+  courseId?: number,
+  assessmentModelId?: number,
+  attainment: AttainmentData,
+  attainmentTree?: AttainmentData,
+  setAttainmentTree?: (attainmentTree: AttainmentData) => void
 }): JSX.Element {
 
   const [activeStep, setActiveStep]: State<number> = useState(0);
@@ -52,11 +54,16 @@ function EditFormulaDialog(props: {
       children: Array.from(childParams.entries())
     };
 
-    attainmentServices.editAttainment(
-      props.courseId, props.assessmentModelId, props.attainment
-    )
-      .then(() => props.handleClose())
-      .catch((e: Error) => console.log(e.message));
+    if (props.courseId && props.assessmentModelId) {
+      attainmentServices.editAttainment(
+        props.courseId, props.assessmentModelId, props.attainment
+      )
+        .then(() => props.handleClose())
+        .catch((e: Error) => console.log(e.message));
+    } else if (props.attainmentTree && props.setAttainmentTree) {
+      props.setAttainmentTree(structuredClone(props.attainmentTree));
+      props.handleClose();
+    }
   }
 
   return (
@@ -148,7 +155,9 @@ EditFormulaDialog.propTypes = {
   open: PropTypes.bool,
   courseId: PropTypes.number,
   assessmentModelId: PropTypes.number,
-  attainment: PropTypes.object
+  attainment: PropTypes.object,
+  attainmentTree: PropTypes.object,
+  setAttainmentTree: PropTypes.func
 };
 
 export default EditFormulaDialog;

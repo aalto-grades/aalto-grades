@@ -13,8 +13,9 @@ import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import LeafAttainment from './LeafAttainment';
 import Attainment from './Attainment';
+import EditFormulaDialog from '../edit-formula-dialog/EditFormulaDialog';
+import LeafAttainment from './LeafAttainment';
 import formulaServices from '../../services/formulas';
 import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
 import { State } from '../../types';
@@ -36,6 +37,8 @@ function ParentAttainment(props: {
   // Detailed information about the used formula, undefined when loading.
   const [formulaDetails, setFormulaDetails]: State<FormulaData | null> =
     useState<FormulaData | null>(null);
+
+  const [editFormulaOpen, setEditFormulaOpen]: State<boolean> = useState(false);
 
   function handleClick(): void {
     setOpen(!open);
@@ -69,6 +72,13 @@ function ParentAttainment(props: {
         alignItems: 'center',
         px: 1
       }}>
+        <EditFormulaDialog
+          handleClose={() => setEditFormulaOpen(false)}
+          open={editFormulaOpen}
+          attainment={props.attainment}
+          attainmentTree={props.attainmentTree}
+          setAttainmentTree={props.setAttainmentTree}
+        />
         <Typography variant="body1" sx={{ flexGrow: 1, textAlign: 'left', mb: 0.5 }}>
           {'Grading Formula: ' + formulaDetails?.name ?? 'Loading...'}
         </Typography>
@@ -76,7 +86,7 @@ function ParentAttainment(props: {
           /* Navigation below doesn't work because formula selection has
              only been implemented for course grade */
         }
-        <Button size='small' sx={{ mb: 0.5 }} onClick={(): void => navigate('/select-formula')}>
+        <Button size='small' sx={{ mb: 0.5 }} onClick={(): void => setEditFormulaOpen(true)}>
           Edit formula
         </Button>
       </Box>
