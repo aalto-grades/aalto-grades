@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { Op } from 'sequelize';
 import supertest from 'supertest';
 
 import Attainment from '../../src/database/models/attainment';
@@ -477,6 +478,32 @@ describe(
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe(
           'assessment model with ID 2 does not belong to the course with ID 1'
+        );
+      });
+
+    it('should respond with 409 conflict, if assessment model already has root attainment',
+      async () => {
+        const attainment: Attainment = await Attainment.findOne({
+          where: {
+            assessmentModelId: 31,
+            parentId: {
+              [Op.is]: undefined
+            }
+          }
+        }) as Attainment;
+
+        const res: supertest.Response = await request
+          .post('/v1/courses/1/assessment-models/31/attainments')
+          .send(mockAttainment)
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Conflict);
+
+        expect(res.body.success).toBe(false);
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors[0]).toBe(
+          `assessment model already has root attainment with ID ${attainment.id}`
         );
       });
 
