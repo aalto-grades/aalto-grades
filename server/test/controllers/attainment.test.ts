@@ -66,6 +66,204 @@ function evaluateSubAttainment(attainment: AttainmentData): void {
 }
 
 describe(
+  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId'
+  + ' - get attainment (tree)',
+  () => {
+
+    it('should respond with a single attainment without subattainments, '
+      + 'if query string is not present', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/2/assessment-models/2/attainments/2')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toBeDefined();
+      expect(res.body.errors).not.toBeDefined();
+      verifyAttainmentData(res.body.data.attainment, 2, 2, false);
+    });
+
+    it('should respond with a single attainment with one level of subattainments, '
+      + 'if "tree" parameter in query equals "children"', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/2/assessment-models/2/attainments/2?tree=children')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toBeDefined();
+      expect(res.body.errors).not.toBeDefined();
+      verifyAttainmentData(res.body.data.attainment, 2, 2, true);
+
+      verifyAttainmentData(res.body.data.attainment.subAttainments[1], 6, 2, false);
+      verifyAttainmentData(res.body.data.attainment.subAttainments[0], 10, 2, false);
+    });
+
+    it('should respond with a single attainment with a full tree of subattainments, '
+      + 'if "tree" parameter in query equals "descendants"', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/2/assessment-models/2/attainments/2?tree=descendants')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toBeDefined();
+      expect(res.body.errors).not.toBeDefined();
+      verifyAttainmentData(res.body.data.attainment, 2, 2, true);
+      verifyAttainmentData(res.body.data.attainment.subAttainments[1], 6, 2, true);
+      verifyAttainmentData(
+        res.body.data.attainment.subAttainments[1].subAttainments[0],
+        214,
+        2,
+        true
+      );
+      verifyAttainmentData(
+        res.body.data.attainment.subAttainments[1].subAttainments[0].subAttainments[0],
+        215,
+        2,
+        false
+      );
+      verifyAttainmentData(res.body.data.attainment.subAttainments[0], 10, 2, false);
+    });
+
+    it('should respond with 400 Bad Request, if "tree" parameter in query string '
+      + 'is invalid', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/2/assessment-models/2/attainments/2?tree=fail')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadRequest);
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors[0]).toBe('tree must be one of the '
+        + 'following values: children, descendants');
+    });
+
+    it('should respond with 400 Bad Request, if "tree" parameter is given twice '
+      + '(array instead of string)', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/2/assessment-models/2/attainments/2?tree=children&tree=descendants')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadRequest);
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors[0]).toBe('tree must be a `string` type, but the final value was: '
+        + '`[\n  "\\"children\\"",\n  "\\"descendants\\""\n]`.');
+    });
+
+    it('should respond with 401 unauthorized, if not logged in', async () => {
+      await request
+        .get('/v1/courses/2/assessment-models/2/attainments/2')
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Unauthorized);
+    });
+  }
+);
+
+describe(
+  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/attainments'
+  + ' - get the root attainment of an assessment model',
+  () => {
+
+    it('should respond with correct data', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/1/assessment-models/1/attainments')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toBeDefined();
+      expect(res.body.errors).not.toBeDefined();
+      verifyAttainmentData(res.body.data.attainment, 1, 1, true);
+    });
+
+    it('should respond with a single attainment with one level of subattainments, '
+    + 'if "tree" parameter in query equals "children"', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/2/assessment-models/2/attainments?tree=children')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toBeDefined();
+      expect(res.body.errors).not.toBeDefined();
+      verifyAttainmentData(res.body.data.attainment, 2, 2, true);
+      verifyAttainmentData(res.body.data.attainment.subAttainments[1], 6, 2, false);
+      verifyAttainmentData(res.body.data.attainment.subAttainments[0], 10, 2, false);
+    });
+
+    it('should respond with a single attainment with a full tree of subattainments, '
+    + 'if "tree" parameter in query equals "descendants"', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/2/assessment-models/2/attainments?tree=descendants')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toBeDefined();
+      expect(res.body.errors).not.toBeDefined();
+      verifyAttainmentData(res.body.data.attainment, 2, 2, true);
+      verifyAttainmentData(res.body.data.attainment.subAttainments[1], 6, 2, true);
+      verifyAttainmentData(res.body.data.attainment.subAttainments[0], 10, 2, false);
+      verifyAttainmentData(
+        res.body.data.attainment.subAttainments[1].subAttainments[0],
+        214,
+        2,
+        true
+      );
+      verifyAttainmentData(
+        res.body.data.attainment.subAttainments[1].subAttainments[0].subAttainments[0],
+        215,
+        2,
+        false
+      );
+    });
+
+    it('should respond with 400 Bad Request, if "tree" parameter in query string '
+    + 'is invalid', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/2/assessment-models/2/attainments?tree=fail')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadRequest);
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors[0]).toBe('tree must be one of the '
+      + 'following values: children, descendants');
+    });
+
+    it('should respond with 401 unauthorized, if not logged in', async () => {
+      await request
+        .get('/v1/courses/1/assessment-models/1/attainments')
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Unauthorized);
+    });
+
+    it('should respond with 409 Conflict if there are multiple root attainments',
+      async () => {
+        const res: supertest.Response = await request
+          .get('/v1/courses/2/assessment-models/34/attainments')
+          .set('Cookie', cookies.userCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Conflict);
+        expect(res.body.success).toBe(false);
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors[0]).toBe(
+          'More than one attainment without parentId was found for the'
+          + ' specified course and assessment model. Attainment IDs: 252,253'
+        );
+      }
+    );
+
+  }
+);
+
+describe(
   'Test POST /v1/courses/:courseId/assessment-models/:assessmentModelId/attainments'
   + ' - create attainment(s)',
   () => {
@@ -769,204 +967,6 @@ describe(
       });
 
   });
-
-describe(
-  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId'
-  + ' - get attainment (tree)',
-  () => {
-
-    it('should respond with a single attainment without subattainments, '
-      + 'if query string is not present', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments/2')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
-      expect(res.body.success).toBe(true);
-      expect(res.body.data).toBeDefined();
-      expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data.attainment, 2, 2, false);
-    });
-
-    it('should respond with a single attainment with one level of subattainments, '
-      + 'if "tree" parameter in query equals "children"', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments/2?tree=children')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
-      expect(res.body.success).toBe(true);
-      expect(res.body.data).toBeDefined();
-      expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data.attainment, 2, 2, true);
-
-      verifyAttainmentData(res.body.data.attainment.subAttainments[1], 6, 2, false);
-      verifyAttainmentData(res.body.data.attainment.subAttainments[0], 10, 2, false);
-    });
-
-    it('should respond with a single attainment with a full tree of subattainments, '
-      + 'if "tree" parameter in query equals "descendants"', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments/2?tree=descendants')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
-      expect(res.body.success).toBe(true);
-      expect(res.body.data).toBeDefined();
-      expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data.attainment, 2, 2, true);
-      verifyAttainmentData(res.body.data.attainment.subAttainments[1], 6, 2, true);
-      verifyAttainmentData(
-        res.body.data.attainment.subAttainments[1].subAttainments[0],
-        214,
-        2,
-        true
-      );
-      verifyAttainmentData(
-        res.body.data.attainment.subAttainments[1].subAttainments[0].subAttainments[0],
-        215,
-        2,
-        false
-      );
-      verifyAttainmentData(res.body.data.attainment.subAttainments[0], 10, 2, false);
-    });
-
-    it('should respond with 400 Bad Request, if "tree" parameter in query string '
-      + 'is invalid', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments/2?tree=fail')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.BadRequest);
-      expect(res.body.success).toBe(false);
-      expect(res.body.data).not.toBeDefined();
-      expect(res.body.errors).toBeDefined();
-      expect(res.body.errors[0]).toBe('tree must be one of the '
-        + 'following values: children, descendants');
-    });
-
-    it('should respond with 400 Bad Request, if "tree" parameter is given twice '
-      + '(array instead of string)', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments/2?tree=children&tree=descendants')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.BadRequest);
-      expect(res.body.success).toBe(false);
-      expect(res.body.data).not.toBeDefined();
-      expect(res.body.errors).toBeDefined();
-      expect(res.body.errors[0]).toBe('tree must be a `string` type, but the final value was: '
-        + '`[\n  "\\"children\\"",\n  "\\"descendants\\""\n]`.');
-    });
-
-    it('should respond with 401 unauthorized, if not logged in', async () => {
-      await request
-        .get('/v1/courses/2/assessment-models/2/attainments/2')
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Unauthorized);
-    });
-  }
-);
-
-describe(
-  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/attainments'
-  + ' - get the root attainment of an assessment model',
-  () => {
-
-    it('should respond with correct data', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/1/assessment-models/1/attainments')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
-      expect(res.body.success).toBe(true);
-      expect(res.body.data).toBeDefined();
-      expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data.attainment, 1, 1, true);
-    });
-
-    it('should respond with a single attainment with one level of subattainments, '
-    + 'if "tree" parameter in query equals "children"', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments?tree=children')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
-      expect(res.body.success).toBe(true);
-      expect(res.body.data).toBeDefined();
-      expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data.attainment, 2, 2, true);
-      verifyAttainmentData(res.body.data.attainment.subAttainments[1], 6, 2, false);
-      verifyAttainmentData(res.body.data.attainment.subAttainments[0], 10, 2, false);
-    });
-
-    it('should respond with a single attainment with a full tree of subattainments, '
-    + 'if "tree" parameter in query equals "descendants"', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments?tree=descendants')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
-      expect(res.body.success).toBe(true);
-      expect(res.body.data).toBeDefined();
-      expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data.attainment, 2, 2, true);
-      verifyAttainmentData(res.body.data.attainment.subAttainments[1], 6, 2, true);
-      verifyAttainmentData(res.body.data.attainment.subAttainments[0], 10, 2, false);
-      verifyAttainmentData(
-        res.body.data.attainment.subAttainments[1].subAttainments[0],
-        214,
-        2,
-        true
-      );
-      verifyAttainmentData(
-        res.body.data.attainment.subAttainments[1].subAttainments[0].subAttainments[0],
-        215,
-        2,
-        false
-      );
-    });
-
-    it('should respond with 400 Bad Request, if "tree" parameter in query string '
-    + 'is invalid', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments?tree=fail')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.BadRequest);
-      expect(res.body.success).toBe(false);
-      expect(res.body.data).not.toBeDefined();
-      expect(res.body.errors).toBeDefined();
-      expect(res.body.errors[0]).toBe('tree must be one of the '
-      + 'following values: children, descendants');
-    });
-
-    it('should respond with 401 unauthorized, if not logged in', async () => {
-      await request
-        .get('/v1/courses/1/assessment-models/1/attainments')
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Unauthorized);
-    });
-
-    it('should respond with 409 Conflict if there are multiple root attainments',
-      async () => {
-        const res: supertest.Response = await request
-          .get('/v1/courses/2/assessment-models/34/attainments')
-          .set('Cookie', cookies.userCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.Conflict);
-        expect(res.body.success).toBe(false);
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors).toBeDefined();
-        expect(res.body.errors[0]).toBe(
-          'More than one attainment without parentId was found for the'
-          + ' specified course and assessment model. Attainment IDs: 252,253'
-        );
-      }
-    );
-
-  }
-);
 
 describe(
   'Test DELETE '

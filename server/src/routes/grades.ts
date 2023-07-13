@@ -122,6 +122,143 @@ router.get(
 
 /**
  * @swagger
+ * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/csv/sisu:
+ *   get:
+ *     tags: [Grades]
+ *     description: >
+ *       Get the final grades of all students in a Sisu compatible CSV format.
+ *       Available only to admin users and teachers in charge of the course.
+ *     parameters:
+ *       - $ref: '#/components/parameters/courseId'
+ *       - $ref: '#/components/parameters/assessmentModelId'
+ *       - $ref: '#/components/parameters/studentNumbers'
+ *       - in: query
+ *         name: assessmentDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         required: false
+ *         description: >
+ *           Assessment date marked on the grade CSV.
+ *           Defaults to end date of the course instance.
+ *         example: 2022-9-22
+ *       - in: query
+ *         name: completionLanguage
+ *         schema:
+ *           type: string
+ *           enum: [fi, sv, en, es, ja, zh, pt, fr, de, ru]
+ *         required: false
+ *         description: Completion language marked on the grade CSV. Defaults to en.
+ *         example: en
+ *     responses:
+ *       200:
+ *         description: Grades calculated successfully.
+ *         content:
+ *           text/csv:
+ *             description: CSV file with course results.
+ *             schema:
+ *               type: string
+ *             example: |
+ *               studentNumber,grade,credits,assessmentDate,completionLanguage
+ *               352772,5,5,26.5.2023,fi
+ *               812472,4,5,26.5.2023,fi
+ *               545761,5,5,26.5.2023,fi
+ *               662292,2,5,26.5.2023,fi
+ *       400:
+ *         description: Fetching failed, due to validation errors in the query parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
+ *       403:
+ *         $ref: '#/components/responses/AuthorizationError'
+ *       404:
+ *         description: >
+ *           The given course or assessment model does not exist
+ *           or no course results found for the instance.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: >
+ *           The given assessment model does not belong to the given course.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ */
+router.get(
+  '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv/sisu',
+  passport.authenticate('jwt', { session: false }),
+  controllerDispatcher(getSisuFormattedGradingCSV)
+);
+
+/**
+ * @swagger
+ * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades:
+ *   get:
+ *     tags: [Grades]
+ *     description: >
+ *       Get the final grades of all students.
+ *       Available only to admin users and teachers in charge of the course.
+ *     parameters:
+ *       - $ref: '#/components/parameters/courseId'
+ *       - $ref: '#/components/parameters/assessmentModelId'
+ *       - $ref: '#/components/parameters/studentNumbers'
+ *     responses:
+ *       200:
+ *         description: Grades fetched successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   $ref: '#/definitions/Success'
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     finalGrades:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/definitions/GradingData'
+ *       400:
+ *         description: Fetching failed, due to validation errors in parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
+ *       403:
+ *         $ref: '#/components/responses/AuthorizationError'
+ *       404:
+ *         description: >
+ *           The given course or assessment model does not exist
+ *           or no course results found for the instance.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: >
+ *           The given assessment model does not belong to the given course.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ */
+router.get(
+  '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades',
+  passport.authenticate('jwt', { session: false }),
+  controllerDispatcher(getFinalGrades)
+);
+
+/**
+ * @swagger
  * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/csv:
  *   post:
  *     tags: [Grades]
@@ -276,141 +413,4 @@ router.post(
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(calculateGrades)
-);
-
-/**
- * @swagger
- * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/csv/sisu:
- *   get:
- *     tags: [Grades]
- *     description: >
- *       Get the final grades of all students in a Sisu compatible CSV format.
- *       Available only to admin users and teachers in charge of the course.
- *     parameters:
- *       - $ref: '#/components/parameters/courseId'
- *       - $ref: '#/components/parameters/assessmentModelId'
- *       - $ref: '#/components/parameters/studentNumbers'
- *       - in: query
- *         name: assessmentDate
- *         schema:
- *           type: string
- *           format: date
- *         required: false
- *         description: >
- *           Assessment date marked on the grade CSV.
- *           Defaults to end date of the course instance.
- *         example: 2022-9-22
- *       - in: query
- *         name: completionLanguage
- *         schema:
- *           type: string
- *           enum: [fi, sv, en, es, ja, zh, pt, fr, de, ru]
- *         required: false
- *         description: Completion language marked on the grade CSV. Defaults to en.
- *         example: en
- *     responses:
- *       200:
- *         description: Grades calculated successfully.
- *         content:
- *           text/csv:
- *             description: CSV file with course results.
- *             schema:
- *               type: string
- *             example: |
- *               studentNumber,grade,credits,assessmentDate,completionLanguage
- *               352772,5,5,26.5.2023,fi
- *               812472,4,5,26.5.2023,fi
- *               545761,5,5,26.5.2023,fi
- *               662292,2,5,26.5.2023,fi
- *       400:
- *         description: Fetching failed, due to validation errors in the query parameters.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *       401:
- *         $ref: '#/components/responses/AuthenticationError'
- *       403:
- *         $ref: '#/components/responses/AuthorizationError'
- *       404:
- *         description: >
- *           The given course or assessment model does not exist
- *           or no course results found for the instance.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *       409:
- *         description: >
- *           The given assessment model does not belong to the given course.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- */
-router.get(
-  '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv/sisu',
-  passport.authenticate('jwt', { session: false }),
-  controllerDispatcher(getSisuFormattedGradingCSV)
-);
-
-/**
- * @swagger
- * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades:
- *   get:
- *     tags: [Grades]
- *     description: >
- *       Get the final grades of all students.
- *       Available only to admin users and teachers in charge of the course.
- *     parameters:
- *       - $ref: '#/components/parameters/courseId'
- *       - $ref: '#/components/parameters/assessmentModelId'
- *       - $ref: '#/components/parameters/studentNumbers'
- *     responses:
- *       200:
- *         description: Grades fetched successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
- *                 data:
- *                   type: object
- *                   properties:
- *                     finalGrades:
- *                       type: array
- *                       items:
- *                         $ref: '#/definitions/GradingData'
- *       400:
- *         description: Fetching failed, due to validation errors in parameters.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *       401:
- *         $ref: '#/components/responses/AuthenticationError'
- *       403:
- *         $ref: '#/components/responses/AuthorizationError'
- *       404:
- *         description: >
- *           The given course or assessment model does not exist
- *           or no course results found for the instance.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *       409:
- *         description: >
- *           The given assessment model does not belong to the given course.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- */
-router.get(
-  '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades',
-  passport.authenticate('jwt', { session: false }),
-  controllerDispatcher(getFinalGrades)
 );

@@ -22,6 +22,108 @@ import {
 } from './utils/attainment';
 import { isTeacherInChargeOrAdmin } from './utils/user';
 
+async function validateTreeParam(treeParam: string): Promise<string> {
+  const treeSchema: yup.AnyObjectSchema = yup.object().shape({
+    tree: yup.string().oneOf(['children', 'descendants'])
+  }).noUnknown(true).strict();
+
+  await treeSchema.validate({ tree: treeParam }, { abortEarly: false });
+  return treeParam;
+}
+
+export async function getAttainment(req: Request, res: Response): Promise<void> {
+  const tree: string = await validateTreeParam(req.query.tree as string);
+  await idSchema.validate({ id: req.params.attainmentId }, { abortEarly: false });
+  const attainmentId: number = Number(req.params.attainmentId);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [course, assessmentModel, attainment]: [Course, AssessmentModel, Attainment] =
+    await validateAttainmentPath(
+      req.params.courseId, req.params.assessmentModelId, req.params.attainmentId
+    );
+
+  const attainmentData: Array<AttainmentData> =
+    await findAttainmentsByAssessmentModel(assessmentModel.id);
+
+  const localRoot: AttainmentData | undefined = attainmentData.find(
+    (attainment: AttainmentData) => attainment.id === attainmentId
+  );
+
+  if (!localRoot) {
+    throw new ApiError(
+      `attainment with ID ${attainmentId} not found`, HttpCode.NotFound
+    );
+  }
+
+  switch (tree) {
+  case 'children':
+    generateAttainmentTree(localRoot, attainmentData, true);
+    break;
+  case 'descendants':
+    generateAttainmentTree(localRoot, attainmentData);
+    break;
+  default:
+    break;
+  }
+
+  res.status(HttpCode.Ok).json({
+    success: true,
+    data: {
+      attainment: localRoot
+    },
+  });
+}
+
+export async function getRootAttainment(req: Request, res: Response): Promise<void> {
+  const tree: string = await validateTreeParam(req.query.tree as string);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [course, assessmentModel]: [Course, AssessmentModel] =
+    await validateAssessmentModelPath(
+      req.params.courseId, req.params.assessmentModelId
+    );
+
+  const allAttainmentData: Array<AttainmentData> =
+    await findAttainmentsByAssessmentModel(assessmentModel.id);
+
+  const rootAttainments: Array<AttainmentData> = allAttainmentData.filter(
+    (attainment: AttainmentData) => !attainment.parentId
+  );
+
+  if (rootAttainments.length === 0) {
+    throw new ApiError(
+      'Root attainment was not found for the specified course and assessment model.',
+      HttpCode.NotFound
+    );
+  } else if (rootAttainments.length > 1) {
+    throw new ApiError(
+      'More than one attainment without parentId was found '
+      + 'for the specified course and assessment model. Attainment IDs: '
+      + rootAttainments.map((attainment: AttainmentData) => attainment.id).join(),
+      HttpCode.Conflict
+    );
+  }
+
+  switch (tree) {
+  case 'children':
+    generateAttainmentTree(rootAttainments[0], allAttainmentData, true);
+    break;
+  case 'descendants':
+    generateAttainmentTree(rootAttainments[0], allAttainmentData);
+    break;
+  default:
+    generateAttainmentTree(rootAttainments[0], allAttainmentData);
+    break;
+  }
+
+  res.status(HttpCode.Ok).json({
+    success: true,
+    data: {
+      attainment: rootAttainments[0]
+    },
+  });
+}
+
 export async function addAttainment(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     parentId: yup
@@ -166,31 +268,6 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
   });
 }
 
-export async function deleteAttainment(req: Request, res: Response): Promise<void> {
-  // Get path parameters.
-  const attainmentId: number = Number(req.params.attainmentId);
-
-  // Validation.
-  await idSchema.validate({ id: attainmentId }, { abortEarly: false });
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [course, assessmentModel, attainment]: [Course, AssessmentModel, Attainment] =
-    await validateAttainmentPath(
-      req.params.courseId, req.params.assessmentModelId, req.params.attainmentId
-    );
-
-  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
-
-  // Delete the attainment if found from db. This automatically
-  // also deletes all of the subattainments of this attainment.
-  attainment.destroy();
-
-  res.status(HttpCode.Ok).send({
-    success: true,
-    data: {}
-  });
-}
-
 export async function updateAttainment(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     parentId: yup
@@ -299,19 +376,12 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   });
 }
 
-async function validateTreeParam(treeParam: string): Promise<string> {
-  const treeSchema: yup.AnyObjectSchema = yup.object().shape({
-    tree: yup.string().oneOf(['children', 'descendants'])
-  }).noUnknown(true).strict();
-
-  await treeSchema.validate({ tree: treeParam }, { abortEarly: false });
-  return treeParam;
-}
-
-export async function getAttainment(req: Request, res: Response): Promise<void> {
-  const tree: string = await validateTreeParam(req.query.tree as string);
-  await idSchema.validate({ id: req.params.attainmentId }, { abortEarly: false });
+export async function deleteAttainment(req: Request, res: Response): Promise<void> {
+  // Get path parameters.
   const attainmentId: number = Number(req.params.attainmentId);
+
+  // Validation.
+  await idSchema.validate({ id: attainmentId }, { abortEarly: false });
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, assessmentModel, attainment]: [Course, AssessmentModel, Attainment] =
@@ -319,84 +389,14 @@ export async function getAttainment(req: Request, res: Response): Promise<void> 
       req.params.courseId, req.params.assessmentModelId, req.params.attainmentId
     );
 
-  const attainmentData: Array<AttainmentData> =
-    await findAttainmentsByAssessmentModel(assessmentModel.id);
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
-  const localRoot: AttainmentData | undefined = attainmentData.find(
-    (attainment: AttainmentData) => attainment.id === attainmentId
-  );
+  // Delete the attainment if found from db. This automatically
+  // also deletes all of the subattainments of this attainment.
+  attainment.destroy();
 
-  if (!localRoot) {
-    throw new ApiError(
-      `attainment with ID ${attainmentId} not found`, HttpCode.NotFound
-    );
-  }
-
-  switch (tree) {
-  case 'children':
-    generateAttainmentTree(localRoot, attainmentData, true);
-    break;
-  case 'descendants':
-    generateAttainmentTree(localRoot, attainmentData);
-    break;
-  default:
-    break;
-  }
-
-  res.status(HttpCode.Ok).json({
+  res.status(HttpCode.Ok).send({
     success: true,
-    data: {
-      attainment: localRoot
-    },
-  });
-}
-
-export async function getRootAttainment(req: Request, res: Response): Promise<void> {
-  const tree: string = await validateTreeParam(req.query.tree as string);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [course, assessmentModel]: [Course, AssessmentModel] =
-    await validateAssessmentModelPath(
-      req.params.courseId, req.params.assessmentModelId
-    );
-
-  const allAttainmentData: Array<AttainmentData> =
-    await findAttainmentsByAssessmentModel(assessmentModel.id);
-
-  const rootAttainments: Array<AttainmentData> = allAttainmentData.filter(
-    (attainment: AttainmentData) => !attainment.parentId
-  );
-
-  if (rootAttainments.length === 0) {
-    throw new ApiError(
-      'Root attainment was not found for the specified course and assessment model.',
-      HttpCode.NotFound
-    );
-  } else if (rootAttainments.length > 1) {
-    throw new ApiError(
-      'More than one attainment without parentId was found '
-      + 'for the specified course and assessment model. Attainment IDs: '
-      + rootAttainments.map((attainment: AttainmentData) => attainment.id).join(),
-      HttpCode.Conflict
-    );
-  }
-
-  switch (tree) {
-  case 'children':
-    generateAttainmentTree(rootAttainments[0], allAttainmentData, true);
-    break;
-  case 'descendants':
-    generateAttainmentTree(rootAttainments[0], allAttainmentData);
-    break;
-  default:
-    generateAttainmentTree(rootAttainments[0], allAttainmentData);
-    break;
-  }
-
-  res.status(HttpCode.Ok).json({
-    success: true,
-    data: {
-      attainment: rootAttainments[0]
-    },
+    data: {}
   });
 }
