@@ -16,7 +16,9 @@ import { Message, State } from '../../types';
 
 function SetFormulaParams(props: {
   attainment: AttainmentData,
-  formula: FormulaData
+  formula: FormulaData,
+  formulaParams: object,
+  setFormulaParams: (formulaParams: object) => void
 }): JSX.Element {
 
   const [attributeValues, setAttributeValues]: State<Array<Array<string>>> =
@@ -133,7 +135,9 @@ function SetFormulaParams(props: {
 
 SetFormulaParams.propTypes = {
   attainment: PropTypes.object,
-  formula: PropTypes.object
+  formula: PropTypes.object,
+  formulaParams: PropTypes.object,
+  setFormulaParams: PropTypes.func
 };
 
 export default SetFormulaParams;

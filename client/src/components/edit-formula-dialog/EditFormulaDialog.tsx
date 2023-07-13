@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import SelectFormula from './SelectFormula';
 import SetFormulaParams from './SetFormulaParams';
+import attainmentServices from '../../services/attainments';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
 import { State } from '../../types';
@@ -16,6 +17,8 @@ import { State } from '../../types';
 function EditFormulaDialog(props: {
   handleClose: () => void,
   open: boolean,
+  courseId: number,
+  assessmentModelId: number,
   attainment: AttainmentData
 }): JSX.Element {
 
@@ -26,6 +29,8 @@ function EditFormulaDialog(props: {
 
   const [formula, setFormula]: State<FormulaData | null> =
     useState<FormulaData | null>(null);
+  const [formulaParams, setFormulaParams]: State<object> = useState({});
+
   const [setSnackPack]: SnackPackAlertState = useSnackPackAlerts();
 
   function handleNext(): void {
@@ -39,6 +44,17 @@ function EditFormulaDialog(props: {
     }
 
     setActiveStep(activeStep + 1);
+  }
+
+  function handleSubmit(): void {
+    props.attainment.formula = formula?.id;
+    props.attainment.formulaParams = formulaParams;
+
+    attainmentServices.editAttainment(
+      props.courseId, props.assessmentModelId, props.attainment
+    )
+      .then()
+      .catch((e: Error) => console.log(e.message));
   }
 
   return (
@@ -70,6 +86,8 @@ function EditFormulaDialog(props: {
           <SetFormulaParams
             attainment={props.attainment}
             formula={formula}
+            formulaParams={formulaParams}
+            setFormulaParams={setFormulaParams}
           />
         }
         <Box sx={{
@@ -110,7 +128,7 @@ function EditFormulaDialog(props: {
               <Button
                 size='medium'
                 variant='contained'
-                onClick={handleNext}
+                onClick={handleSubmit}
               >
                 Submit
               </Button>
@@ -124,6 +142,8 @@ function EditFormulaDialog(props: {
 EditFormulaDialog.propTypes = {
   handleClose: PropTypes.func,
   open: PropTypes.bool,
+  courseId: PropTypes.number,
+  assessmentModelId: PropTypes.number,
   attainment: PropTypes.object
 };
 

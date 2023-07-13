@@ -165,7 +165,7 @@ function CourseView(): JSX.Element {
                         (courseId && currentAssessmentModel) &&
                         <Attainments
                           attainmentTree={attainmentTree}
-                          courseId={courseId}
+                          courseId={Number(courseId)}
                           formula={'Weighted Average'} /* TODO: Retrieve real formula */
                           assessmentModel={currentAssessmentModel}
                           handleAddPoints={(): void => setFileLoadOpen(true)}

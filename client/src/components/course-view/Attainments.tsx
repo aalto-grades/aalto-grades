@@ -17,7 +17,7 @@ import { State } from '../../types';
 function Attainments(props: {
   attainmentTree: AttainmentData,
   formula: string,
-  courseId: string,
+  courseId: number,
   assessmentModel: AssessmentModelData,
   handleAddPoints: () => void
 }): JSX.Element {
@@ -39,11 +39,16 @@ function Attainments(props: {
     <Box borderRadius={1} sx={{
       bgcolor: 'primary.light', p: 1.5, display: 'flex', flexDirection: 'column'
     }}>
-      <EditFormulaDialog
-        handleClose={() => console.log('Empty')}
-        open={editFormulaOpen}
-        attainment={props.attainmentTree}
-      />
+      {
+        props.assessmentModel.id &&
+        <EditFormulaDialog
+          handleClose={() => console.log('Empty')}
+          open={editFormulaOpen}
+          courseId={props.courseId}
+          assessmentModelId={props.assessmentModel.id}
+          attainment={props.attainmentTree}
+        />
+      }
       <Typography variant='h3' align='left' sx={{ ml: 1.5, mt: 0.6, mb: 1.5 }} >
         Study Attainments
       </Typography>
@@ -123,7 +128,7 @@ Attainments.propTypes = {
   assessmentModel: PropTypes.object,
   formula: PropTypes.string,
   handleAddPoints: PropTypes.func,
-  courseId: PropTypes.string,
+  courseId: PropTypes.number,
 };
 
 export default Attainments;
