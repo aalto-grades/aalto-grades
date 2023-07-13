@@ -83,6 +83,10 @@ export default {
       );
 
       await queryInterface.sequelize.query(
+        'ALTER SEQUENCE attainment_grade_id_seq RESTART;', { transaction }
+      );
+
+      await queryInterface.sequelize.query(
         'ALTER SEQUENCE course_instance_id_seq RESTART;', { transaction }
       );
 
