@@ -26,6 +26,13 @@ function Footer(): JSX.Element {
       </Link>
       <Tooltip title="Source code opens in a new tab">
         <Link
+          /*
+           * TODO: Linking the repository directly is helpful, but not enough
+           * because the code in the main branch may not be the corresponding
+           * source to the actual software being ran.
+           *
+           * Include a direct download button or link a release tag?
+           */
           href="https://github.com/aalto-grades/base-repository"
           rel="noreferrer"
           target='_blank'
