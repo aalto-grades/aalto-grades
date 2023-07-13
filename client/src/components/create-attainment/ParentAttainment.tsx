@@ -27,10 +27,8 @@ function ParentAttainment(props: {
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
   deleteAttainment: (attainment: AttainmentData) => void,
   getTemporaryId: () => number,
-  attainment: AttainmentData,
-  formulaAttributeNames: Array<string>
+  attainment: AttainmentData
 }): JSX.Element {
-  const navigate: NavigateFunction = useNavigate();
 
   // For opening and closing the list of sub-attainments
   const [open, setOpen]: State<boolean> = useState(true);
@@ -44,17 +42,6 @@ function ParentAttainment(props: {
     setOpen(!open);
   }
 
-  /* Functions to get the formula attributes.
-   *
-   * formulaId specifies the formula that is used to calculate this
-   * attainment's grade, subFormulaAttributeNames are the attributes that need
-   * to be specified for the direct sub attainments of this attainments,
-   * so that the grade for this attainment can be calculated.
-   *
-   * Observe that formulaAttributeNames which is as a parameter for this
-   * component are the attributes that need to specified for this attainment,
-   * so that the grade of this attainment's parent attainment can be calculated.
-   */
   useEffect(() => {
     if (props.attainmentTree.formula) {
       formulaServices.getFormulaDetails(props.attainmentTree.formula)
@@ -96,7 +83,6 @@ function ParentAttainment(props: {
         deleteAttainment={props.deleteAttainment}
         getTemporaryId={props.getTemporaryId}
         attainment={props.attainment}
-        formulaAttributeNames={props.formulaAttributeNames}
       />
       <Box sx={{ display: 'flex', flexDirection: 'row' }}>
         {open ?
@@ -131,9 +117,6 @@ function ParentAttainment(props: {
                       deleteAttainment={props.deleteAttainment}
                       getTemporaryId={props.getTemporaryId}
                       attainment={subAttainment}
-                      formulaAttributeNames={
-                        formulaDetails?.params ?? []
-                      }
                     />
                   )
                 )
@@ -151,8 +134,7 @@ ParentAttainment.propTypes = {
   setAttainmentTree: PropTypes.func,
   deleteAttainment: PropTypes.func,
   getTemporaryId: PropTypes.func,
-  attainment: PropTypes.any,
-  formulaAttributeNames: PropTypes.array
+  attainment: PropTypes.any
 };
 
 export default ParentAttainment;

@@ -32,9 +32,7 @@ function Attainment(props: {
 
   // The attainment represented by this component. Reference to an attainment
   // in the attainmentTree variable above.
-  attainment: AttainmentData,
-
-  formulaAttributeNames: Array<string>,
+  attainment: AttainmentData
 }): JSX.Element {
   return (
     <>
@@ -47,7 +45,6 @@ function Attainment(props: {
             deleteAttainment={props.deleteAttainment}
             getTemporaryId={props.getTemporaryId}
             attainment={props.attainment}
-            formulaAttributeNames={props.formulaAttributeNames}
           />
           :
           <LeafAttainment
@@ -56,7 +53,6 @@ function Attainment(props: {
             deleteAttainment={props.deleteAttainment}
             getTemporaryId={props.getTemporaryId}
             attainment={props.attainment}
-            formulaAttributeNames={props.formulaAttributeNames}
           />
       }
     </>
@@ -68,8 +64,7 @@ Attainment.propTypes = {
   setAttainmentTree: PropTypes.func,
   deleteAttainment: PropTypes.func,
   getTemporaryId: PropTypes.func,
-  attainment: PropTypes.object,
-  formulaAttributeNames: PropTypes.array
+  attainment: PropTypes.object
 };
 
 export default Attainment;
