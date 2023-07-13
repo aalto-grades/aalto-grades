@@ -10,7 +10,6 @@ import Box from '@mui/material/Box';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
-import styled, { StyledComponent } from 'styled-components';
 import PrivateRoute from './components/auth/PrivateRoute';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
@@ -26,6 +25,7 @@ import CourseResultsView from './components/CourseResultsView';
 import FormulaSelectionRoute from './context/FormulaSelectionRoute';
 import UserButton from './components/auth/UserButton';
 import { SystemRole } from 'aalto-grades-common/types/auth';
+import Footer from './components/Footer';
 
 declare module '@mui/material/styles' {
   interface PaletteOptions {
@@ -120,95 +120,93 @@ const theme: Theme = createTheme({
   }
 });
 
-const AppContainer: StyledComponent<typeof Container, object> = styled(Container)`
-  text-align: center;
-`;
-
 function App(): JSX.Element {
-
   return (
     <ThemeProvider theme={theme}>
-      <AppBar position="static">
-        <Toolbar>
-          <Link
-            href="/"
-            underline="none"
-            color="white"
-            variant="h5"
-            align="left"
-            sx={{ mr: 2, flexGrow: 1 }}
-          >
-          Aalto Grades
-          </Link>
-          <UserButton/>
-        </Toolbar>
-      </AppBar>
-      <AppContainer maxWidth="lg">
-        <Box mx={5} my={5}>
-          <Routes> { /* Add nested routes when needed */}
-            <Route path='/login' element={<Login />} />
-            <Route path='/signup' element={<Signup />} />
-            {
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <AppBar position="static">
+          <Toolbar>
+            <Link
+              href="/"
+              underline="none"
+              color="white"
+              variant="h5"
+              align="left"
+              sx={{ mr: 2, flexGrow: 1 }}
+            >
+              Aalto Grades
+            </Link>
+            <UserButton/>
+          </Toolbar>
+        </AppBar>
+        <Container sx={{ textAlign: 'center' }} maxWidth="lg">
+          <Box mx={5} my={5}>
+            <Routes> { /* Add nested routes when needed */}
+              <Route path='/login' element={<Login />} />
+              <Route path='/signup' element={<Signup />} />
+              {
               /* All roles are authorised to access the front page, conditional
                  rendering is done inside the component */
-            }
-            <Route element={<PrivateRoute roles={Object.values(SystemRole)} />}>
-              <Route
-                path='/'
-                element={<FrontPage />}
-              />
-              <Route
-                path='/course-view/:courseId'
-                element={<CourseView />}
-              />
-            </Route>
-            { /* Pages that are only authorised for admin */}
-            <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
-              <Route
-                path='/create-course'
-                element={<CreateCourseView />}
-              />
-            </Route>
-            { /* Pages that are authorised for admin and teachers in charge */}
-            <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
-              <Route
-                path='/:courseId/fetch-instances/:courseCode'
-                element={<FetchInstancesView />}
-              />
-              <Route
-                path='/:courseId/course-results/:assessmentModelId'
-                element={<CourseResultsView />}
-              />
-              <Route
-                path='/:courseId/edit-instance'
-                element={<EditInstanceView />}
-              />
-              <Route
-                path='/:courseId/edit-instance/:sisuInstanceId'
-                element={<EditInstanceView />}
-              />
-              <Route
-                path='/:courseId/attainment/:modification/:assessmentModelId/:attainmentId'
-                element={<EditAttainmentView />}
-              />
-              <Route element={<FormulaSelectionRoute />}>
+              }
+              <Route element={<PrivateRoute roles={Object.values(SystemRole)} />}>
                 <Route
-                  path='/:courseId/select-formula/:assessmentModelId/'
-                  element={<SelectFormulaView />}
+                  path='/'
+                  element={<FrontPage />}
                 />
                 <Route
-                  path='/:courseId/formula-attributes/:assessmentModelId/'
-                  element={<FormulaAttributesView />}
+                  path='/course-view/:courseId'
+                  element={<CourseView />}
                 />
-                {
-                  /* '/:attainmentId' will be added to the paths above once
-                     they work for sub-attainments */
-                }
               </Route>
-            </Route>
-          </Routes>
-        </Box>
-      </AppContainer>
+              { /* Pages that are only authorised for admin */}
+              <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
+                <Route
+                  path='/create-course'
+                  element={<CreateCourseView />}
+                />
+              </Route>
+              { /* Pages that are authorised for admin and teachers in charge */}
+              <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
+                <Route
+                  path='/:courseId/fetch-instances/:courseCode'
+                  element={<FetchInstancesView />}
+                />
+                <Route
+                  path='/:courseId/course-results/:assessmentModelId'
+                  element={<CourseResultsView />}
+                />
+                <Route
+                  path='/:courseId/edit-instance'
+                  element={<EditInstanceView />}
+                />
+                <Route
+                  path='/:courseId/edit-instance/:sisuInstanceId'
+                  element={<EditInstanceView />}
+                />
+                <Route
+                  path='/:courseId/attainment/:modification/:assessmentModelId/:attainmentId'
+                  element={<EditAttainmentView />}
+                />
+                <Route element={<FormulaSelectionRoute />}>
+                  <Route
+                    path='/:courseId/select-formula/:assessmentModelId/'
+                    element={<SelectFormulaView />}
+                  />
+                  <Route
+                    path='/:courseId/formula-attributes/:assessmentModelId/'
+                    element={<FormulaAttributesView />}
+                  />
+                  {
+                    /* '/:attainmentId' will be added to the paths above once
+                      they work for sub-attainments */
+                  }
+                </Route>
+              </Route>
+            </Routes>
+          </Box>
+        </Container>
+        <Footer />
+      </div>
     </ThemeProvider>
   );
 }
