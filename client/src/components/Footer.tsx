@@ -24,6 +24,17 @@ function Footer(): JSX.Element {
       <Link href="/support" underline="none" sx={{ mr: 3 }}>
         Support
       </Link>
+      <Tooltip title="Source code opens in a new tab">
+        <Link
+          href="https://github.com/aalto-grades/base-repository"
+          rel="noreferrer"
+          target='_blank'
+          underline="none"
+          sx={{ mr: 3 }}
+        >
+          Source Code
+        </Link>
+      </Tooltip>
       <Tooltip title="Feedback form opens in a new tab">
         <Link
           href="https://link.webropolsurveys.com"
