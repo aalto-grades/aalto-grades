@@ -13,11 +13,10 @@ import AlertSnackbar from '../alerts/AlertSnackbar';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import formulaServices from '../../services/formulas';
-import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
+import { FormulaData } from 'aalto-grades-common/types';
 import { State } from '../../types';
 
 function SelectFormula(props: {
-  attainment: AttainmentData,
   formula: FormulaData | null,
   setFormula: (formula: FormulaData) => void,
   error: string
@@ -47,44 +46,6 @@ function SelectFormula(props: {
     if (newFormula)
       props.setFormula(newFormula);
   }
-
-  /*
-  async function handleSubmit(event: SyntheticEvent): Promise<void> {
-    event.preventDefault();
-    if (canBeSubmitted()) {
-      try {
-        if (props.formula?.id) {
-          const formula: FormulaData =
-            await formulaServices.getFormulaDetails(props.formula.id);
-          props.setFormula(formula);
-
-          const updatedAttainments: any = props.attainment?.subAttainments?.map(
-            (attainment: AttainmentData) => {
-              const attributeObj: object = {};
-              formula.params.forEach((elem: string) => {
-                (attributeObj as any)[elem] = '';
-              });
-              return {
-                ...attainment,
-                affectCalculation: true,
-                formulaAttributes: attributeObj
-              };
-            }
-          );
-
-          // TODO: send formula to database
-          // TODO: add updated attainments to database
-          console.log(updatedAttainments);
-        }
-      } catch (exception) {
-        console.log(exception);
-        setSnackPack((prev) => [...prev,
-          { msg: 'Saving the formula failed.', severity: 'error' }
-        ]);
-      }
-    }
-  }
-  */
 
   return (
     <>
@@ -144,7 +105,6 @@ function SelectFormula(props: {
 }
 
 SelectFormula.propTypes = {
-  attainment: PropTypes.object,
   formula: PropTypes.object,
   formulaData: PropTypes.func,
   error: PropTypes.string

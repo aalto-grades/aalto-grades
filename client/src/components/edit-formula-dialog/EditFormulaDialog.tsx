@@ -60,7 +60,6 @@ function EditFormulaDialog(props: {
         {
           (activeStep === 0 && props.attainment) &&
           <SelectFormula
-            attainment={props.attainment}
             formula={formula}
             setFormula={setFormula}
             error={formulaError}
