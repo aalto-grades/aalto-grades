@@ -42,7 +42,7 @@ function AttributeTextFields({
 }: any) {
   return (
     formulaAttributeNames.map((attribute: any) => {
-      const attributeLabel = formulaServices.getAttributeLabel(attribute);
+      const attributeLabel = formulaServices.getParamLabel(attribute);
       return (
         <StringTextField
           key={attribute}

@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { ChangeEvent } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -11,12 +12,23 @@ import { AttainmentData } from 'aalto-grades-common/types';
 
 function SubAttainment(props: {
   attainment: AttainmentData,
-  childParams: Array<string>,
-  handleAttributeChange: (
-    attainmentIndex: number, attributeIndex: number, event: any
-  ) => void,
-  attainmentIndex: number
+  childParamsList: Array<string>,
+  childParams: Map<string, object>,
+  setChildParams: (childParams: Map<string, object>) => void
 }): JSX.Element {
+
+  function handleParamChange(
+    event: ChangeEvent<HTMLInputElement>, param: string
+  ): void {
+    let params: object | undefined = props.childParams.get(props.attainment.tag);
+    if (!params)
+      params = {};
+
+    (params as { [key: string]: unknown })[param] = event.target.value;
+
+    props.childParams.set(props.attainment.tag, params);
+    props.setChildParams(new Map(props.childParams));
+  }
 
   return (
     <Box sx={{
@@ -44,14 +56,13 @@ function SubAttainment(props: {
         mt: 2,
       }}>
         {
-          props.childParams.map((attribute: string, attributeIndex: number) => {
-            const attributeLabel: string = formulaServices.getAttributeLabel(attribute);
+          props.childParamsList.map((param: string) => {
             return (
               <TextField
                 type='text'
-                key={attribute}
+                key={param}
                 variant='standard'
-                label={attributeLabel}
+                label={formulaServices.getParamLabel(param)}
                 InputLabelProps={{ shrink: true }}
                 margin='normal'
                 sx={{
@@ -59,10 +70,8 @@ function SubAttainment(props: {
                   width: '100%'
                 }}
                 onChange={
-                  (event: any): void => {
-                    props.handleAttributeChange(
-                      props.attainmentIndex, attributeIndex, event
-                    );
+                  (event: ChangeEvent<HTMLInputElement>): void => {
+                    handleParamChange(event, param);
                   }
                 }
               />
@@ -74,10 +83,10 @@ function SubAttainment(props: {
 }
 
 SubAttainment.propTypes = {
-  attainment: PropTypes.any,
-  childParams: PropTypes.array,
-  handleAttributeChange: PropTypes.func,
-  attainmentIndex: PropTypes.number
+  attainment: PropTypes.object,
+  childParamsList: PropTypes.array,
+  childParams: PropTypes.any,
+  setChildParams: PropTypes.func
 };
 
 export default SubAttainment;

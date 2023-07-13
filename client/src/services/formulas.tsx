@@ -22,7 +22,7 @@ async function getFormulaDetails(formulaId: Formula): Promise<FormulaData> {
 
 // A function for getting the displayable label from a label key
 // for example: the label key maxPoints would return Max Points
-function getAttributeLabel(labelKey: string): string {
+function getParamLabel(labelKey: string): string {
   const splitString: Array<string> = labelKey.split(/(?=[A-Z])/);
   const label: string = splitString.join(' ');
   const capitalizedLabel: string = label.charAt(0).toUpperCase() + label.slice(1);
@@ -30,5 +30,5 @@ function getAttributeLabel(labelKey: string): string {
 }
 
 export default {
-  getFormulas, getFormulaDetails, getAttributeLabel
+  getFormulas, getFormulaDetails, getParamLabel
 };

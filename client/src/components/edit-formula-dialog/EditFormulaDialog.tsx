@@ -10,7 +10,6 @@ import {
 import SelectFormula from './SelectFormula';
 import SetFormulaParams from './SetFormulaParams';
 import attainmentServices from '../../services/attainments';
-import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
 import { State } from '../../types';
 
@@ -29,9 +28,9 @@ function EditFormulaDialog(props: {
 
   const [formula, setFormula]: State<FormulaData | null> =
     useState<FormulaData | null>(null);
-  const [formulaParams, setFormulaParams]: State<object> = useState({});
-
-  const [setSnackPack]: SnackPackAlertState = useSnackPackAlerts();
+  const [params, setParams]: State<object> = useState({});
+  const [childParams, setChildParams]: State<Map<string, object>> =
+    useState<Map<string, object>>(new Map());
 
   function handleNext(): void {
     if (activeStep === 0) {
@@ -48,7 +47,10 @@ function EditFormulaDialog(props: {
 
   function handleSubmit(): void {
     props.attainment.formula = formula?.id;
-    props.attainment.formulaParams = formulaParams;
+    props.attainment.formulaParams = {
+      ...params,
+      children: Array.from(childParams.entries())
+    };
 
     attainmentServices.editAttainment(
       props.courseId, props.assessmentModelId, props.attainment
@@ -86,8 +88,10 @@ function EditFormulaDialog(props: {
           <SetFormulaParams
             attainment={props.attainment}
             formula={formula}
-            formulaParams={formulaParams}
-            setFormulaParams={setFormulaParams}
+            params={params}
+            setParams={setParams}
+            childParams={childParams}
+            setChildParams={setChildParams}
           />
         }
         <Box sx={{
@@ -109,7 +113,7 @@ function EditFormulaDialog(props: {
                 sx={{ mr: 2 }}
                 size='medium'
                 variant='outlined'
-                onClick={() => setActiveStep(activeStep - 1)}
+                onClick={props.handleClose}
               >
                 Cancel
               </Button>
