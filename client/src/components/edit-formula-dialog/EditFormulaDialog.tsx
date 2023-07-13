@@ -75,21 +75,46 @@ function EditFormulaDialog(props: {
         <Box sx={{
           mx: 3, mt: 0, mb: 1.5, alignSelf: 'flex-end', display: 'flex',
         }}>
-          <Button
-            sx={{ mr: 2 }}
-            size='medium'
-            variant='outlined'
-            onClick={() => setActiveStep(activeStep - 1)}
-          >
-            Back
-          </Button>
-          <Button
-            size='medium'
-            variant='contained'
-            onClick={handleNext}
-          >
-            Next
-          </Button>
+          {
+            (activeStep > 0)
+              ?
+              <Button
+                sx={{ mr: 2 }}
+                size='medium'
+                variant='outlined'
+                onClick={() => setActiveStep(activeStep - 1)}
+              >
+                Back
+              </Button>
+              :
+              <Button
+                sx={{ mr: 2 }}
+                size='medium'
+                variant='outlined'
+                onClick={() => setActiveStep(activeStep - 1)}
+              >
+                Cancel
+              </Button>
+          }
+          {
+            (activeStep < 2)
+              ?
+              <Button
+                size='medium'
+                variant='contained'
+                onClick={handleNext}
+              >
+                Next
+              </Button>
+              :
+              <Button
+                size='medium'
+                variant='contained'
+                onClick={handleNext}
+              >
+                Submit
+              </Button>
+          }
         </Box>
       </DialogContent>
     </Dialog>
