@@ -945,10 +945,13 @@ describe(
   'Test DELETE '
   + '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
   () => {
-    async function testAttainmentTreeDeletion(tree: object): Promise<void> {
+    async function testAttainmentTreeDeletion(
+      tree: object, courseId: number, assessmentModelId: number
+    ): Promise<void> {
       // Add an attainment tree.
       const add: supertest.Response = await request
-        .post('/v1/courses/4/assessment-models/7/attainments').send(tree)
+        .post(`/v1/courses/${courseId}/assessment-models/${assessmentModelId}/attainments`)
+        .send(tree)
         .set('Cookie', cookies.adminCookie);
 
       // Adds the IDs of all subattainemnts of the given tree to the given
@@ -971,7 +974,10 @@ describe(
 
       // Delete the root attainment.
       const res: supertest.Response = await request
-        .delete(`/v1/courses/4/assessment-models/7/attainments/${rootAttainment}`)
+        .delete(
+          `/v1/courses/${courseId}/assessment-models/` +
+          `${assessmentModelId}/attainments/${rootAttainment}`
+        )
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
@@ -986,7 +992,7 @@ describe(
     it('should succesfully delete single attainment (admin user)', async () => {
       // Add an attainment.
       const add: supertest.Response = await request
-        .post('/v1/courses/4/assessment-models/7/attainments')
+        .post('/v1/courses/8/assessment-models/37/attainments')
         .send(
           {
             name: 'Test exercise',
@@ -998,29 +1004,26 @@ describe(
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json');
 
-
-      console.log('DJFSJFK', add.body);
-
       // Verify that the attainment was added.
-      const addedAttainment: number = add.body.data.attainment.id;
-      expect(await Attainment.findByPk(addedAttainment)).not.toBeNull;
+      const addedAttainmenId: number = add.body.data.attainment.id;
+      expect(await Attainment.findByPk(addedAttainmenId)).not.toBeNull;
 
       // Delete the added attainment.
       const res: supertest.Response = await request
-        .delete(`/v1/courses/4/assessment-models/7/attainments/${addedAttainment}`)
+        .delete(`/v1/courses/8/assessment-models/37/attainments/${addedAttainmenId}`)
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
       // Verify that the attainment was deleted.
       expect(res.body.success).toBe(true);
-      expect(await Attainment.findByPk(addedAttainment)).toBeNull;
+      expect(await Attainment.findByPk(addedAttainmenId)).toBeNull;
     });
 
     it('should succesfully delete single attainment (teacher in charge)', async () => {
       // Add an attainment.
       const add: supertest.Response = await request
-        .post('/v1/courses/4/assessment-models/7/attainments')
+        .post('/v1/courses/8/assessment-models/38/attainments')
         .send(
           {
             name: 'Test exercise 2',
@@ -1033,21 +1036,21 @@ describe(
         .set('Accept', 'application/json');
 
       // Verify that the attainment was added.
-      const addedAttainment: number = add.body.data.attainment.id;
-      expect(await Attainment.findByPk(addedAttainment)).not.toBeNull;
+      const addedAttainmentid: number = add.body.data.attainment.id;
+      expect(await Attainment.findByPk(addedAttainmentid)).not.toBeNull;
 
       jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
 
       // Delete the added attainment.
       const res: supertest.Response = await request
-        .delete(`/v1/courses/4/assessment-models/7/attainments/${addedAttainment}`)
+        .delete(`/v1/courses/8/assessment-models/38/attainments/${addedAttainmentid}`)
         .set('Cookie', cookies.userCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
       // Verify that the attainment was deleted.
       expect(res.body.success).toBe(true);
-      expect(await Attainment.findByPk(addedAttainment)).toBeNull;
+      expect(await Attainment.findByPk(addedAttainmentid)).toBeNull;
     });
 
     it('should succesfully delete a tree of attainments with depth 1', async () => {
@@ -1070,12 +1073,12 @@ describe(
               subAttainments: []
             }
           ]
-        }
+        }, 8, 39
       );
     });
 
     it('should succesfully delete a tree of attainments with depth greater than 1', async () => {
-      await testAttainmentTreeDeletion(mockAttainment);
+      await testAttainmentTreeDeletion(mockAttainment, 8, 40);
     });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
