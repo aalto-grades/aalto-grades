@@ -117,7 +117,7 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *       schema:
  *         type: array
  *         description: List of student numbers.
- *         example: ['111111', '222222', '333333']
+ *         example: ['735333', '393518', '925163']
  *         items:
  *           type: string
  *   responses:
