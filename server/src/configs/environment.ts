@@ -25,7 +25,7 @@ export const JWT_SECRET: string = process.env.AALTO_GRADES_JWT_SECRET || 'TOP_SE
 export const FRONTEND_ORIGIN: string =
   process.env.AALTO_GRADES_FRONTEND_CORS_ORIGIN || 'http://localhost:3005';
 
-if (JWT_SECRET === 'TOP_SECRET') {
+if (JWT_SECRET === 'TOP_SECRET' && NODE_ENV !== 'test') {
   if (NODE_ENV === 'production') {
     // Don't allow running production with default secret!
     throw new Error(

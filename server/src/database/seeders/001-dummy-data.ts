@@ -75,15 +75,15 @@ export default {
       await queryInterface.bulkDelete('user', {}, { transaction });
 
       await queryInterface.sequelize.query(
-        'ALTER SEQUENCE course_result_id_seq RESTART;', { transaction }
-      );
-
-      await queryInterface.sequelize.query(
         'ALTER SEQUENCE assessment_model_id_seq RESTART;', { transaction }
       );
 
       await queryInterface.sequelize.query(
         'ALTER SEQUENCE attainment_id_seq RESTART;', { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'ALTER SEQUENCE attainment_grade_id_seq RESTART;', { transaction }
       );
 
       await queryInterface.sequelize.query(
