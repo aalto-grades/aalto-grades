@@ -42,7 +42,7 @@ function Attainments(props: {
       {
         props.assessmentModel.id &&
         <EditFormulaDialog
-          handleClose={() => console.log('Empty')}
+          handleClose={() => setEditFormulaOpen(false)}
           open={editFormulaOpen}
           courseId={props.courseId}
           assessmentModelId={props.assessmentModel.id}

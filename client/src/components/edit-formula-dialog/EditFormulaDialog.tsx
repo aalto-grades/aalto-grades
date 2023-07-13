@@ -55,7 +55,7 @@ function EditFormulaDialog(props: {
     attainmentServices.editAttainment(
       props.courseId, props.assessmentModelId, props.attainment
     )
-      .then()
+      .then(() => props.handleClose())
       .catch((e: Error) => console.log(e.message));
   }
 

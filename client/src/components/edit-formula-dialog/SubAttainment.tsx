@@ -24,7 +24,8 @@ function SubAttainment(props: {
     if (!params)
       params = {};
 
-    (params as { [key: string]: unknown })[param] = event.target.value;
+    // TODO: This will not always be a number
+    (params as { [key: string]: unknown })[param] = Number(event.target.value);
 
     props.childParams.set(props.attainment.tag, params);
     props.setChildParams(new Map(props.childParams));
