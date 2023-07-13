@@ -9,7 +9,7 @@ import TextField from '@mui/material/TextField';
 import formulaServices from '../../services/formulas';
 import { AttainmentData } from 'aalto-grades-common/types';
 
-function Attainment(props: {
+function SubAttainment(props: {
   attainment: AttainmentData,
   childParams: Array<string>,
   handleAttributeChange: (
@@ -17,38 +17,6 @@ function Attainment(props: {
   ) => void,
   attainmentIndex: number
 }): JSX.Element {
-
-  function attributeTextFields(): JSX.Element {
-    return (
-      <>
-        {
-          props.childParams.map((attribute: string, attributeIndex: number) => {
-            const attributeLabel: string = formulaServices.getAttributeLabel(attribute);
-            return (
-              <TextField
-                type='text'
-                key={attribute}
-                variant='standard'
-                label={attributeLabel}
-                InputLabelProps={{ shrink: true }}
-                margin='normal'
-                sx={{
-                  marginTop: 0,
-                  width: '100%'
-                }}
-                onChange={
-                  (event: any): void => {
-                    props.handleAttributeChange(
-                      props.attainmentIndex, attributeIndex, event
-                    );
-                  }
-                }
-              />
-            );
-          })}
-      </>
-    );
-  }
 
   return (
     <Box sx={{
@@ -75,17 +43,41 @@ function Attainment(props: {
         rowGap: 1,
         mt: 2,
       }}>
-        { attributeTextFields() }
+        {
+          props.childParams.map((attribute: string, attributeIndex: number) => {
+            const attributeLabel: string = formulaServices.getAttributeLabel(attribute);
+            return (
+              <TextField
+                type='text'
+                key={attribute}
+                variant='standard'
+                label={attributeLabel}
+                InputLabelProps={{ shrink: true }}
+                margin='normal'
+                sx={{
+                  marginTop: 0,
+                  width: '100%'
+                }}
+                onChange={
+                  (event: any): void => {
+                    props.handleAttributeChange(
+                      props.attainmentIndex, attributeIndex, event
+                    );
+                  }
+                }
+              />
+            );
+          })}
       </Box>
     </Box>
   );
 }
 
-Attainment.propTypes = {
+SubAttainment.propTypes = {
   attainment: PropTypes.any,
   childParams: PropTypes.array,
   handleAttributeChange: PropTypes.func,
   attainmentIndex: PropTypes.number
 };
 
-export default Attainment;
+export default SubAttainment;

@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import StyledBox from '../edit-formula-dialog/StyledBox';
-import Attainment from './Attainment';
+import SubAttainment from './SubAttainment';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import { sleep } from '../../utils';
@@ -115,7 +115,7 @@ function SetFormulaParams(props: {
           props.attainment.subAttainments?.map(
             (attainment: AttainmentData, attainmentIndex: number) => {
               return (
-                <Attainment
+                <SubAttainment
                   attainment={attainment}
                   key={attainment.id}
                   attainmentIndex={attainmentIndex}
