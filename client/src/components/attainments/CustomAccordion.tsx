@@ -79,7 +79,8 @@ function AccordionDetails(props: {
   out?: boolean,
   children: JSX.Element
 }): JSX.Element {
-  const margin: string = props.out ? '21px' : '60px';
+  const margin: string = '21px';
+  //const margin: string = props.out ? '21px' : '60px';
   return (
     <Box sx={{
       display: 'flex',
@@ -166,51 +167,51 @@ function CustomAccordion(props: {
 
   return (
     <>
-      <Accordion
-        key={props.attainment.id + 'accordion'}
-        expanded={expanded.has(props.attainment.id ?? 0)}
-        onChange={handleChange(props.attainment.id ?? 0)}
-      >
-        <AccordionSummary
-          aria-controls={props.attainment.id + '-content'}
-          id={props.attainment.id + '-header'}
-          expanded={expanded.has(props.attainment.id ?? 0)}
-          selected={(selected === props.attainment.id)}
-        >
-          <AttainmentText
-            name={props.attainment.name}
-            formulaId={props.attainment.formula ?? Formula.Manual}
-            tag={props.attainment.tag}
-          />
-        </AccordionSummary>
-        {
-          props.attainment.subAttainments?.map((subAttainment: AttainmentData) => {
-            return (
-              // is the attainment a leaf? If yes, render details, else another accordion
-              (subAttainment.subAttainments && subAttainment.subAttainments.length > 0)
-                ?
-                <Box
-                  key={subAttainment.id + 'subAccordion'}
-                  sx={{ pl: '39px' }}
-                >
-                  {
-                    <CustomAccordion
-                      attainment={subAttainment}
-                    />
-                  }
-                </Box>
-                :
-                <AccordionDetails key={subAttainment.id + 'details'}>
-                  <AttainmentText
-                    name={subAttainment.name}
-                    formulaId={subAttainment.formula ?? Formula.Manual}
-                    tag={subAttainment.tag}
-                  />
-                </AccordionDetails>
-            );
-          })
-        }
-      </Accordion>
+      {
+        (props.attainment.subAttainments && props.attainment.subAttainments.length > 0) ?
+          <Accordion
+            key={props.attainment.id + 'accordion'}
+            expanded={expanded.has(props.attainment.id ?? 0)}
+            onChange={handleChange(props.attainment.id ?? 0)}
+          >
+            <AccordionSummary
+              aria-controls={props.attainment.id + '-content'}
+              id={props.attainment.id + '-header'}
+              expanded={expanded.has(props.attainment.id ?? 0)}
+              selected={(selected === props.attainment.id)}
+            >
+              <AttainmentText
+                name={props.attainment.name}
+                formulaId={props.attainment.formula ?? Formula.Manual}
+                tag={props.attainment.tag}
+              />
+            </AccordionSummary>
+            {
+              props.attainment.subAttainments?.map((subAttainment: AttainmentData) => {
+                return (
+                  <Box
+                    key={subAttainment.id + 'subAccordion'}
+                    sx={{ pl: '39px' }}
+                  >
+                    {
+                      <CustomAccordion
+                        attainment={subAttainment}
+                      />
+                    }
+                  </Box>
+                );
+              })
+            }
+          </Accordion>
+          :
+          <AccordionDetails key={props.attainment.id + 'details'}>
+            <AttainmentText
+              name={props.attainment.name}
+              formulaId={props.attainment.formula ?? Formula.Manual}
+              tag={props.attainment.tag}
+            />
+          </AccordionDetails>
+      }
     </>
   );
 }
