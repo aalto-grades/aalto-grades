@@ -15,7 +15,7 @@ import AttainmentGrade from '../database/models/attainmentGrade';
 import Course from '../database/models/course';
 import User from '../database/models/user';
 
-import { AttainmentGradeData, Formula, Status } from 'aalto-grades-common/types';
+import { AttainmentGradeData, FinalGrade, Formula, Status } from 'aalto-grades-common/types';
 import { getFormulaImplementation } from '../formulas';
 import { ApiError } from '../types/error';
 import { CalculationResult, FormulaNode } from '../types/formulas';
@@ -136,11 +136,12 @@ async function getFinalGradesFor(
       {
         model: User,
         attributes: ['studentNumber'],
+        /*
         where: {
           studentNumber: {
             [Op.in]: studentNumbers
           }
-        }
+        }*/
       }
     ]
   }) as Array<FinalGradeRaw>;
@@ -285,21 +286,16 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
   if (studentNumbers)
     studentNumbersExist(studentNumbers);
 
-  const finalGrades: Array<{
-    studentNumber: string,
-    grade: string,
-    credits: number
-  }> = [];
+  let finalGrades: Array<FinalGrade> = [];
 
-  // Include also students do not have gradings calculated (grading shown as 'PENDING').
-  const studentsWithNoFinalGrades: Array<FinalGradeRaw> = await AttainmentGrade.findAll({
+  // Include also students do not have gradings calculated (grading will be shown as 'PENDING').
+  const assessmentModelStudents: Array<FinalGradeRaw> = await AttainmentGrade.findAll({
     attributes: ['grade'],
     include: [
       {
         model: Attainment,
         where: {
-          assessmentModelId: assessmentModel.id,
-          //parentId: !null
+          assessmentModelId: assessmentModel.id
         },
         include: [
           {
@@ -315,22 +311,30 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
       },
       {
         model: User,
-        attributes: ['studentNumber'],
-        where: {
-          studentNumber: {
-            [Op.notIn]: studentNumbers ?? []
-          }
-        }
+        attributes: ['studentNumber']
       }
     ]
   }) as Array<FinalGradeRaw>;
 
-  if (studentsWithNoFinalGrades.length !== 0) {
-    const studentNumbers: Array<string> = Array.from(
-      new Set(studentsWithNoFinalGrades.map((grade: FinalGradeRaw) => grade.User.studentNumber))
+  const studentsWithFinalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
+    assessmentModel.id, studentNumbers ?? [], assessmentModelStudents.length !== 0
+  );
+
+  if (assessmentModelStudents.length !== 0) {
+
+    const studentNumbersWithFinalGrades: Array<string> =
+      studentsWithFinalGrades.map((value: FinalGradeRaw) => value.User.studentNumber);
+
+    const studentNumbersNoGrade: Array<string> = Array.from(
+      new Set(assessmentModelStudents
+        .filter((grade: FinalGradeRaw) => {
+          return !studentNumbersWithFinalGrades.includes(grade.User.studentNumber);
+        })
+        .map((grade: FinalGradeRaw) => grade.User.studentNumber)
+      )
     );
 
-    studentNumbers.forEach((studentNumber: string) => {
+    studentNumbersNoGrade.forEach((studentNumber: string) => {
       finalGrades.push({
         studentNumber,
         grade: Status.Pending,
@@ -339,9 +343,7 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
     });
   }
 
-  (await getFinalGradesFor(
-    assessmentModel.id, studentNumbers ?? [], studentsWithNoFinalGrades.length !== 0
-  )).map(
+  studentsWithFinalGrades.map(
     (finalGrade: FinalGradeRaw) => {
       finalGrades.push({
         studentNumber: finalGrade.User.studentNumber,
@@ -350,6 +352,12 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
       });
     }
   );
+
+  if (studentNumbers) {
+    finalGrades = finalGrades.filter(
+      (value: FinalGrade) => studentNumbers.includes(value.studentNumber)
+    );
+  }
 
   res.status(HttpCode.Ok).json({
     success: true,
