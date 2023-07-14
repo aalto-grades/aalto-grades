@@ -31,11 +31,4 @@ export interface HeadCellData {
   label: string
 }
 
-export interface FinalGrade {
-  id: number,
-  studentNumber: string,
-  grade: string,
-  credits: number
-}
-
 export type State<T> = [T, Dispatch<SetStateAction<T>>];

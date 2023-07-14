@@ -9,11 +9,11 @@ import { Toolbar, Box, TextField, Tooltip, IconButton, Button } from '@mui/mater
 import FilterListIcon from '@mui/icons-material/FilterList';
 import DownloadIcon from '@mui/icons-material/Download';
 
+import { FinalGrade, Status } from 'aalto-grades-common/types';
 import MenuButton, { MenuButtonOption } from '../course-view/MenuButton';
 import FileLoadDialog from '../course-view/FileLoadDialog';
 import SisuExportDialog from './SisuExportDialog';
-import { FinalGrade, State } from '../../types';
-import { Status } from 'aalto-grades-common/types';
+import { State } from '../../types';
 
 function CourseResultsTableToolbar(props: {
   search: string,

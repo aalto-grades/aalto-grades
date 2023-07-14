@@ -6,11 +6,12 @@ import { useState, useEffect } from 'react';
 import { Params, useParams } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
 
+import { FinalGrade } from 'aalto-grades-common/types';
 import CourseResultsTable from './course-results-view/CourseResultsTable';
 import AlertSnackbar from './alerts/AlertSnackbar';
 import gradeServices from '../services/grades';
 import { sleep } from '../utils';
-import { FinalGrade, Message, State } from '../types';
+import { Message, State } from '../types';
 
 function CourseResultsView(): JSX.Element {
   const { courseId, assessmentModelId }: Params = useParams();

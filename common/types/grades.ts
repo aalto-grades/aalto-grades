@@ -18,3 +18,9 @@ export interface AttainmentGradeData {
   date?: Date,
   expiryDate?: Date
 }
+
+export interface FinalGrade {
+  studentNumber: string,
+  grade: string,
+  credits: number
+}

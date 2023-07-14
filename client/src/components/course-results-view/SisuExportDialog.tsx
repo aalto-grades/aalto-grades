@@ -11,9 +11,10 @@ import {
   ListItemText, MenuItem, Paper, TextField, Typography
 } from '@mui/material';
 
+import { FinalGrade } from 'aalto-grades-common/types';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import gradeServices from '../../services/grades';
-import { FinalGrade, Message, State } from '../../types';
+import { Message, State } from '../../types';
 
 // A Dialog component for exporting Sisu grades CSV.
 const instructions: string =

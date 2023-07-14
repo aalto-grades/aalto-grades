@@ -9,11 +9,11 @@ import {
   TableCell, TableContainer, TablePagination, TableRow
 } from '@mui/material';
 
-import { Status } from 'aalto-grades-common/types';
+import { FinalGrade, Status } from 'aalto-grades-common/types';
 import CourseResultsTableToolbar from './CourseResultTableToolbar';
 import CourseResultsTableHead from './CourseResultsTableHead';
 import sortingServices from '../../services/sorting';
-import { FinalGrade, State } from '../../types';
+import { State } from '../../types';
 
 function CourseResultsTable(props: {
   students: Array<FinalGrade>,
