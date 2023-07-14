@@ -3,21 +3,16 @@
 // SPDX-License-Identifier: MIT
 
 import { useEffect, useState } from 'react';
-import { NavigateFunction, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import List from '@mui/material/List';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import Collapse from '@mui/material/Collapse';
-import IconButton from '@mui/material/IconButton';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
+import { Box, Button, Collapse, IconButton, List, Typography } from '@mui/material';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
+
 import Attainment from './Attainment';
 import EditFormulaDialog from '../edit-formula-dialog/EditFormulaDialog';
 import LeafAttainment from './LeafAttainment';
+
 import formulaServices from '../../services/formulas';
-import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
 import { State } from '../../types';
 
 // An Assignmnet component with subAttainments and a formula
@@ -42,13 +37,17 @@ function ParentAttainment(props: {
     setOpen(!open);
   }
 
-  useEffect(() => {
+  function onChangeFormula(): void {
     if (props.attainment.formula) {
       formulaServices.getFormulaDetails(props.attainment.formula)
         .then((formula: FormulaData) => {
           setFormulaDetails(formula);
         });
     }
+  }
+
+  useEffect(() => {
+    onChangeFormula();
   }, []);
 
   return (
@@ -61,7 +60,7 @@ function ParentAttainment(props: {
       }}>
         <EditFormulaDialog
           handleClose={() => setEditFormulaOpen(false)}
-          onSubmit={() => console.log('Empty')}
+          onSubmit={onChangeFormula}
           open={editFormulaOpen}
           attainment={props.attainment}
           attainmentTree={props.attainmentTree}
