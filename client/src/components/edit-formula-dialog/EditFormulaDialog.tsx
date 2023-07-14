@@ -19,9 +19,12 @@ function EditFormulaDialog(props: {
   handleClose: () => void,
   onSubmit: () => void,
   open: boolean,
+  // courseId and assessmentModelId are needed when editing from CourseView
   courseId?: number,
   assessmentModelId?: number,
   attainment: AttainmentData,
+  // attainmentTree and setAttainmentTree are needed when editing from
+  // EditAttainmentView
   attainmentTree?: AttainmentData,
   setAttainmentTree?: (attainmentTree: AttainmentData) => void
 }): JSX.Element {
