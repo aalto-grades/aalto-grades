@@ -5,7 +5,8 @@
 import { useState, JSX } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Box, Button, Dialog, DialogTitle, DialogContent, Step, StepLabel, Stepper
+  Box, Button, Dialog, DialogTitle, DialogContent, Step, StepLabel, Stepper,
+  Typography
 } from '@mui/material';
 
 import SelectFormula from './SelectFormula';
@@ -85,7 +86,7 @@ function EditFormulaDialog(props: {
     >
       <DialogTitle>Formula</DialogTitle>
       <DialogContent>
-        <Stepper activeStep={activeStep}>
+        <Stepper activeStep={activeStep} sx={{ mb: 3 }}>
           <Step>
             <StepLabel>Select Formula</StepLabel>
           </Step>
@@ -112,49 +113,67 @@ function EditFormulaDialog(props: {
             setChildParams={setChildParams}
           />
         }
+        {
+          (activeStep === 2 && formula) &&
+          <Box sx={{ p: 1 }}>
+            <Box sx={{
+              display: 'flex'
+            }}>
+              <Typography sx={{ mr: 1 }}>
+                {formula.name}
+              </Typography>
+              <code>
+                {JSON.stringify(params)}
+              </code>
+            </Box>
+            {
+              Array.from(childParams.entries()).map(
+                (childParam: [string, object]) => {
+                  return (
+                    <Box key={childParam[0]} sx={{
+                      display: 'flex',
+                      mt: 1
+                    }}>
+                      <Typography sx={{ mr: 1 }}>
+                        {childParam[0]}
+                      </Typography>
+                      <code>
+                        {JSON.stringify(childParam[1])}
+                      </code>
+                    </Box>
+                  );
+                }
+              )
+            }
+          </Box>
+        }
         <Box sx={{
-          mx: 3, mt: 0, mb: 1.5, alignSelf: 'flex-end', display: 'flex',
+          mx: 3, my: 1.5, alignSelf: 'flex-end', display: 'flex',
         }}>
-          {
-            (activeStep > 0)
-              ?
-              <Button
-                sx={{ mr: 2 }}
-                size='medium'
-                variant='outlined'
-                onClick={() => setActiveStep(activeStep - 1)}
-              >
-                Back
-              </Button>
-              :
-              <Button
-                sx={{ mr: 2 }}
-                size='medium'
-                variant='outlined'
-                onClick={props.handleClose}
-              >
-                Cancel
-              </Button>
-          }
-          {
-            (activeStep < 2)
-              ?
-              <Button
-                size='medium'
-                variant='contained'
-                onClick={handleNext}
-              >
-                Next
-              </Button>
-              :
-              <Button
-                size='medium'
-                variant='contained'
-                onClick={handleSubmit}
-              >
-                Submit
-              </Button>
-          }
+          <Button
+            sx={{ mr: 2 }}
+            size='medium'
+            variant='outlined'
+            onClick={
+              (activeStep > 0)
+                ? () => setActiveStep(activeStep - 1)
+                : props.handleClose
+            }
+          >
+            {(activeStep > 0) ? 'Back' : 'Cancel'}
+          </Button>
+          <Button
+            sx={{ mr: 2 }}
+            size='medium'
+            variant='contained'
+            onClick={
+              (activeStep < 2)
+                ? handleNext
+                : handleSubmit
+            }
+          >
+            {(activeStep < 2) ? 'Next' : 'Submit'}
+          </Button>
         </Box>
       </DialogContent>
     </Dialog>
