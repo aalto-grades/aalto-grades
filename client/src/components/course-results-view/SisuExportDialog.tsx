@@ -121,10 +121,12 @@ function SisuExportDialog(props: {
       if (courseId && assessmentModelId) {
         const params: {
           completionLanguage?: string,
-          assessmentDate?: string
+          assessmentDate?: string,
+          studentNumbers: Array<string>
         } = {
           completionLanguage: completionLanguage ?? undefined,
-          assessmentDate: assessmentDate ?? undefined
+          assessmentDate: assessmentDate ?? undefined,
+          studentNumbers: props.selectedStudents.map((student: FinalGrade) => student.studentNumber)
         };
 
         const data: BlobPart = await gradeServices.exportSisuCsv(
@@ -152,8 +154,6 @@ function SisuExportDialog(props: {
       setAlertOpen(false);
     }
   }
-
-  console.log('selected for SISISISISISI', props.selectedStudents);
 
   return (
     <>
