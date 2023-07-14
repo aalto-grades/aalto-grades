@@ -14,6 +14,34 @@ import { HttpCode } from '../../src/types/httpCode';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 
+describe('Test GET /v1/auth/self-info - check users own info', () => {
+
+  it('should act differently when user is logged in or out', async () => {
+    // Use the agent for cookie persistence
+    const agent: SuperAgentTest = supertest.agent(app);
+    await agent.get('/v1/auth/self-info').withCredentials(true).expect(HttpCode.Unauthorized);
+    await agent.post('/v1/auth/login')
+      .withCredentials(true)
+      .send({ email: 'sysadmin@aalto.fi', password: 'grades' })
+      .expect('Content-Type', /json/)
+      .expect(HttpCode.Ok)
+      .expect('set-cookie', /jwt=/)
+      .expect('set-cookie', /httponly/i);
+    // eslint-disable-next-line max-len
+    await agent.get('/v1/auth/self-info').withCredentials(true)
+      .expect(HttpCode.Ok)
+      .then((res: supertest.Response) => {
+        expect(res.body.success).toBe(true);
+        expect(res.body.errors).not.toBeDefined();
+        expect(res.body.data.role).toBe(SystemRole.Admin);
+        expect(res.body.data.name).toBe('Aalto Sysadmin');
+      });
+    await agent.post('/v1/auth/logout').withCredentials(true).send({}).expect(HttpCode.Ok);
+    await agent.get('/v1/auth/self-info').withCredentials(true).expect(HttpCode.Unauthorized);
+  });
+
+});
+
 describe('Test POST /v1/auth/login - logging in with an existing user', () => {
 
   it('should respond with 401 unauthorized, if logging in with invalid credentials', async () => {
@@ -115,34 +143,6 @@ describe('Test POST /v1/auth/signup - create a new user', () => {
         expect(res.body.data.role).toBe(SystemRole.Admin);
         expect(res.body.data.name).toBe('aalto2');
       });
-  });
-
-});
-
-describe('Test GET /v1/auth/self-info - check users own info', () => {
-
-  it('should act differently when user is logged in or out', async () => {
-    // Use the agent for cookie persistence
-    const agent: SuperAgentTest = supertest.agent(app);
-    await agent.get('/v1/auth/self-info').withCredentials(true).expect(HttpCode.Unauthorized);
-    await agent.post('/v1/auth/login')
-      .withCredentials(true)
-      .send({ email: 'sysadmin@aalto.fi', password: 'grades' })
-      .expect('Content-Type', /json/)
-      .expect(HttpCode.Ok)
-      .expect('set-cookie', /jwt=/)
-      .expect('set-cookie', /httponly/i);
-    // eslint-disable-next-line max-len
-    await agent.get('/v1/auth/self-info').withCredentials(true)
-      .expect(HttpCode.Ok)
-      .then((res: supertest.Response) => {
-        expect(res.body.success).toBe(true);
-        expect(res.body.errors).not.toBeDefined();
-        expect(res.body.data.role).toBe(SystemRole.Admin);
-        expect(res.body.data.name).toBe('Aalto Sysadmin');
-      });
-    await agent.post('/v1/auth/logout').withCredentials(true).send({}).expect(HttpCode.Ok);
-    await agent.get('/v1/auth/self-info').withCredentials(true).expect(HttpCode.Unauthorized);
   });
 
 });

@@ -101,6 +101,33 @@ export const router: Router = Router();
 
 /**
  * @swagger
+ * /v1/auth/self-info:
+ *   get:
+ *     tags: [Auth]
+ *     description: >
+ *       Retrieves information about the user that is currently logged in.
+ *     responses:
+ *       200:
+ *         description: Information about the user who is logged in.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/SignupAndSelfInfo'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
+ *     security:
+ *       - cookieAuth: []
+ *
+ */
+router.get(
+  '/v1/auth/self-info',
+  passport.authenticate('jwt', { session: false }),
+  express.json(),
+  controllerDispatcher(authSelfInfo)
+);
+
+/**
+ * @swagger
  * /v1/auth/login:
  *   post:
  *     tags: [Auth]
@@ -213,31 +240,4 @@ router.post(
   '/v1/auth/signup',
   express.json(),
   controllerDispatcher(authSignup)
-);
-
-/**
- * @swagger
- * /v1/auth/self-info:
- *   get:
- *     tags: [Auth]
- *     description: >
- *       Retrieves information about the user that is currently logged in.
- *     responses:
- *       200:
- *         description: Information about the user who is logged in.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/SignupAndSelfInfo'
- *       401:
- *         $ref: '#/components/responses/AuthenticationError'
- *     security:
- *       - cookieAuth: []
- *
- */
-router.get(
-  '/v1/auth/self-info',
-  passport.authenticate('jwt', { session: false }),
-  express.json(),
-  controllerDispatcher(authSelfInfo)
 );

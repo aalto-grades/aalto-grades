@@ -23,6 +23,21 @@ import { JwtClaims } from '../types/general';
 import { HttpCode } from '../types/httpCode';
 import { findUserById } from './utils/user';
 
+export async function authSelfInfo(req: Request, res: Response): Promise<void> {
+  const user: JwtClaims = req.user as JwtClaims;
+
+  const userFromDb: User = await findUserById(user.id, HttpCode.NotFound);
+
+  res.send({
+    success: true,
+    data: {
+      id: userFromDb.id,
+      role: userFromDb.role,
+      name: userFromDb.name
+    }
+  });
+}
+
 export async function validateLogin(email: string, password: PlainPassword): Promise<LoginResult> {
   const user: User | null = await User.findByEmail(email);
 
@@ -158,21 +173,6 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
       id: newUser.id,
       role: newUser.role,
       name: newUser.name
-    }
-  });
-}
-
-export async function authSelfInfo(req: Request, res: Response): Promise<void> {
-  const user: JwtClaims = req.user as JwtClaims;
-
-  const userFromDb: User = await findUserById(user.id, HttpCode.NotFound);
-
-  res.send({
-    success: true,
-    data: {
-      id: userFromDb.id,
-      role: userFromDb.role,
-      name: userFromDb.name
     }
   });
 }

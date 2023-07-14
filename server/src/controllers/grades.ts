@@ -25,7 +25,6 @@ import { HttpCode } from '../types/httpCode';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import { isTeacherInChargeOrAdmin } from './utils/user';
 
-
 async function studentNumbersExist(studentNumbers: Array<string>): Promise<void> {
   const foundStudentNumbers: Array<string> = (await User.findAll({
     attributes: ['studentNumber'],
@@ -90,6 +89,222 @@ export async function getCsvTemplate(req: Request, res: Response): Promise<void>
       return;
     }
   );
+}
+
+/**
+ * The final grade for a student in a form returned by a database query.
+ */
+interface FinalGradeRaw extends AttainmentGrade {
+  Attainment: {
+    AssessmentModel: {
+      Course: {
+        maxCredits: number
+      }
+    }
+  },
+  User: {
+    studentNumber: string
+  }
+}
+
+async function getFinalGradesFor(
+  assessmentModelId: number,
+  studentNumbers: Array<string>
+): Promise<Array<FinalGradeRaw>> {
+  const finalGrades: Array<FinalGradeRaw> = await AttainmentGrade.findAll({
+    attributes: ['grade'],
+    include: [
+      {
+        model: Attainment,
+        where: {
+          assessmentModelId: assessmentModelId,
+          parentId: null
+        },
+        include: [
+          {
+            model: AssessmentModel,
+            include: [
+              {
+                model: Course,
+                attributes: ['maxCredits']
+              }
+            ]
+          }
+        ]
+      },
+      {
+        model: User,
+        attributes: ['studentNumber'],
+        where: {
+          studentNumber: {
+            [Op.in]: studentNumbers
+          }
+        }
+      }
+    ]
+  }) as Array<FinalGradeRaw>;
+
+  if (finalGrades.length === 0) {
+    throw new ApiError(
+      'no grades found, make sure grades have been calculated before requesting course results',
+      HttpCode.NotFound
+    );
+  }
+
+  return finalGrades;
+}
+
+/**
+ * Get grading data formatted to Sisu compatible format for exporting grades to Sisu.
+ * Documentation and requirements for Sisu CSV file structure available at
+ * https://wiki.aalto.fi/display/SISEN/Assessment+of+implementations
+ * @param {Request} req - The HTTP request.
+ * @param {Response} res - The HTTP response containing the CSV file.
+ * @returns {Promise<void>} - A Promise that resolves when the function has completed its execution.
+ * @throws {ApiError} - If course and/or course instance not found, instance does not belong to
+ * the course, or no course results found/calculated before calling the endpoint.
+*/
+export async function getSisuFormattedGradingCSV(req: Request, res: Response): Promise<void> {
+  const urlParams: yup.AnyObjectSchema = yup.object({
+    assessmentDate: yup
+      .date()
+      .notRequired(),
+    completionLanguage: yup
+      .string()
+      .transform((value: string, originalValue: string) => {
+        return originalValue ? originalValue.toLowerCase() : value;
+      })
+      // All Sisu accepted language codes.
+      .oneOf(['fi', 'sv', 'en', 'es', 'ja', 'zh', 'pt', 'fr', 'de', 'ru'])
+      .notRequired(),
+    studentNumbers: yup
+      .array()
+      .json()
+      .of(yup.string())
+      .notRequired()
+  });
+
+  const { assessmentDate, completionLanguage, studentNumbers }: {
+    assessmentDate: Date | undefined,
+    completionLanguage: string | undefined,
+    studentNumbers: Array<string> | undefined
+  } = await urlParams.validate(req.query, { abortEarly: false });
+
+  const [course, assessmentModel]: [Course, AssessmentModel] =
+    await validateAssessmentModelPath(
+      req.params.courseId, req.params.assessmentModelId
+    );
+
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
+
+  if (studentNumbers)
+    studentNumbersExist(studentNumbers);
+
+  /**
+   * TODO:
+   * - only one grade per user per instance is allowed,
+   *   what if grades are recalculated, should we keep track of old grades?
+   */
+
+  const finalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
+    assessmentModel.id, studentNumbers ?? []
+  );
+
+  const courseResults: Array<{
+    studentNumber: string,
+    grade: string,
+    credits: number,
+    assessmentDate: string,
+    completionLanguage: string,
+    comment: string
+  }> = finalGrades.map(
+    (finalGrade: FinalGradeRaw) => {
+      return {
+        studentNumber: finalGrade.User.studentNumber,
+        grade: String(finalGrade.grade),
+        credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits,
+        // Assesment date must be in form dd.mm.yyyy.
+        assessmentDate: (
+          assessmentDate ? new Date(assessmentDate) : new Date(Date.now())
+        ).toLocaleDateString('fi-FI'),
+        completionLanguage: completionLanguage ?? 'en',
+        // Comment column is required, but can be empty.
+        comment: ''
+      };
+    }
+  );
+
+  stringify(
+    courseResults,
+    {
+      header: true,
+      delimiter: ',' // NOTE, accepted delimiters in Sisu are semicolon ; and comma ,
+    },
+    (_err: unknown, data: string) => {
+      res
+        .status(HttpCode.Ok)
+        .setHeader('Content-Type', 'text/csv')
+        .attachment(
+          `final_grades_course_${course.courseCode}_${(new Date()).toLocaleDateString('fi-FI')}.csv`
+        )
+        .send(data);
+      return;
+    });
+}
+
+/**
+ * Get course instance final grading data in JSON format.
+ * @param {Request} req - The HTTP request.
+ * @param {Response} res - The HTTP response containing the CSV file.
+ * @returns {Promise<void>} - A Promise that resolves when the function has completed its execution.
+ * @throws {ApiError} - If course and/or course instance not found, instance does not belong to
+ * the course, or no course results found/calculated before calling the endpoint.
+*/
+export async function getFinalGrades(req: Request, res: Response): Promise<void> {
+  const urlParams: yup.AnyObjectSchema = yup.object({
+    studentNumbers: yup
+      .array()
+      .json()
+      .of(yup.string())
+      .notRequired()
+  });
+
+  const { studentNumbers }: {
+    studentNumbers?: Array<string>
+  } = await urlParams.validate(req.query, { abortEarly: false });
+
+  const [course, assessmentModel]: [Course, AssessmentModel] =
+    await validateAssessmentModelPath(
+      req.params.courseId, req.params.assessmentModelId
+    );
+
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
+
+  if (studentNumbers)
+    studentNumbersExist(studentNumbers);
+
+  const finalGrades: Array<{
+    studentNumber: string,
+    grade: string,
+    credits: number
+  }> = (await getFinalGradesFor(
+    assessmentModel.id, studentNumbers ?? []
+  )).map(
+    (finalGrade: FinalGradeRaw) => {
+      return {
+        studentNumber: finalGrade.User.studentNumber,
+        grade: String(finalGrade.grade),
+        credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits
+      };
+    }
+  );
+
+  res.status(HttpCode.Ok).json({
+    success: true,
+    data: {
+      finalGrades
+    }
+  });
 }
 
 /**
@@ -682,221 +897,5 @@ export async function calculateGrades(
   res.status(HttpCode.Ok).json({
     success: true,
     data: {}
-  });
-}
-
-/**
- * The final grade for a student in a form returned by a database query.
- */
-interface FinalGradeRaw extends AttainmentGrade {
-  Attainment: {
-    AssessmentModel: {
-      Course: {
-        maxCredits: number
-      }
-    }
-  },
-  User: {
-    studentNumber: string
-  }
-}
-
-async function getFinalGradesFor(
-  assessmentModelId: number,
-  studentNumbers: Array<string>
-): Promise<Array<FinalGradeRaw>> {
-  const finalGrades: Array<FinalGradeRaw> = await AttainmentGrade.findAll({
-    attributes: ['grade'],
-    include: [
-      {
-        model: Attainment,
-        where: {
-          assessmentModelId: assessmentModelId,
-          parentId: null
-        },
-        include: [
-          {
-            model: AssessmentModel,
-            include: [
-              {
-                model: Course,
-                attributes: ['maxCredits']
-              }
-            ]
-          }
-        ]
-      },
-      {
-        model: User,
-        attributes: ['studentNumber'],
-        where: {
-          studentNumber: {
-            [Op.in]: studentNumbers
-          }
-        }
-      }
-    ]
-  }) as Array<FinalGradeRaw>;
-
-  if (finalGrades.length === 0) {
-    throw new ApiError(
-      'no grades found, make sure grades have been calculated before requesting course results',
-      HttpCode.NotFound
-    );
-  }
-
-  return finalGrades;
-}
-
-/**
- * Get grading data formatted to Sisu compatible format for exporting grades to Sisu.
- * Documentation and requirements for Sisu CSV file structure available at
- * https://wiki.aalto.fi/display/SISEN/Assessment+of+implementations
- * @param {Request} req - The HTTP request.
- * @param {Response} res - The HTTP response containing the CSV file.
- * @returns {Promise<void>} - A Promise that resolves when the function has completed its execution.
- * @throws {ApiError} - If course and/or course instance not found, instance does not belong to
- * the course, or no course results found/calculated before calling the endpoint.
-*/
-export async function getSisuFormattedGradingCSV(req: Request, res: Response): Promise<void> {
-  const urlParams: yup.AnyObjectSchema = yup.object({
-    assessmentDate: yup
-      .date()
-      .notRequired(),
-    completionLanguage: yup
-      .string()
-      .transform((value: string, originalValue: string) => {
-        return originalValue ? originalValue.toLowerCase() : value;
-      })
-      // All Sisu accepted language codes.
-      .oneOf(['fi', 'sv', 'en', 'es', 'ja', 'zh', 'pt', 'fr', 'de', 'ru'])
-      .notRequired(),
-    studentNumbers: yup
-      .array()
-      .json()
-      .of(yup.string())
-      .notRequired()
-  });
-
-  const { assessmentDate, completionLanguage, studentNumbers }: {
-    assessmentDate: Date | undefined,
-    completionLanguage: string | undefined,
-    studentNumbers: Array<string> | undefined
-  } = await urlParams.validate(req.query, { abortEarly: false });
-
-  const [course, assessmentModel]: [Course, AssessmentModel] =
-    await validateAssessmentModelPath(
-      req.params.courseId, req.params.assessmentModelId
-    );
-
-  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
-
-  if (studentNumbers)
-    studentNumbersExist(studentNumbers);
-
-  /**
-   * TODO:
-   * - only one grade per user per instance is allowed,
-   *   what if grades are recalculated, should we keep track of old grades?
-   */
-
-  const finalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
-    assessmentModel.id, studentNumbers ?? []
-  );
-
-  const courseResults: Array<{
-    studentNumber: string,
-    grade: string,
-    credits: number,
-    assessmentDate: string,
-    completionLanguage: string,
-    comment: string
-  }> = finalGrades.map(
-    (finalGrade: FinalGradeRaw) => {
-      return {
-        studentNumber: finalGrade.User.studentNumber,
-        grade: String(finalGrade.grade),
-        credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits,
-        // Assesment date must be in form dd.mm.yyyy.
-        assessmentDate: (
-          assessmentDate ? new Date(assessmentDate) : new Date(Date.now())
-        ).toLocaleDateString('fi-FI'),
-        completionLanguage: completionLanguage ?? 'en',
-        // Comment column is required, but can be empty.
-        comment: ''
-      };
-    }
-  );
-
-  stringify(
-    courseResults,
-    {
-      header: true,
-      delimiter: ',' // NOTE, accepted delimiters in Sisu are semicolon ; and comma ,
-    },
-    (_err: unknown, data: string) => {
-      res
-        .status(HttpCode.Ok)
-        .setHeader('Content-Type', 'text/csv')
-        .attachment(
-          `final_grades_course_${course.courseCode}_${(new Date()).toLocaleDateString('fi-FI')}.csv`
-        )
-        .send(data);
-      return;
-    });
-}
-
-/**
- * Get course instance final grading data in JSON format.
- * @param {Request} req - The HTTP request.
- * @param {Response} res - The HTTP response containing the CSV file.
- * @returns {Promise<void>} - A Promise that resolves when the function has completed its execution.
- * @throws {ApiError} - If course and/or course instance not found, instance does not belong to
- * the course, or no course results found/calculated before calling the endpoint.
-*/
-export async function getFinalGrades(req: Request, res: Response): Promise<void> {
-  const urlParams: yup.AnyObjectSchema = yup.object({
-    studentNumbers: yup
-      .array()
-      .json()
-      .of(yup.string())
-      .notRequired()
-  });
-
-  const { studentNumbers }: {
-    studentNumbers?: Array<string>
-  } = await urlParams.validate(req.query, { abortEarly: false });
-
-  const [course, assessmentModel]: [Course, AssessmentModel] =
-    await validateAssessmentModelPath(
-      req.params.courseId, req.params.assessmentModelId
-    );
-
-  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
-
-  if (studentNumbers)
-    studentNumbersExist(studentNumbers);
-
-  const finalGrades: Array<{
-    studentNumber: string,
-    grade: string,
-    credits: number
-  }> = (await getFinalGradesFor(
-    assessmentModel.id, studentNumbers ?? []
-  )).map(
-    (finalGrade: FinalGradeRaw) => {
-      return {
-        studentNumber: finalGrade.User.studentNumber,
-        grade: String(finalGrade.grade),
-        credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits
-      };
-    }
-  );
-
-  res.status(HttpCode.Ok).json({
-    success: true,
-    data: {
-      finalGrades
-    }
   });
 }
