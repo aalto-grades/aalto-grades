@@ -5,24 +5,22 @@
 import { useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import Toolbar from '@mui/material/Toolbar';
-import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
+import { Toolbar, Box, TextField, Tooltip, IconButton, Button } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import DownloadIcon from '@mui/icons-material/Download';
+
 import MenuButton, { MenuButtonOption } from '../course-view/MenuButton';
 import FileLoadDialog from '../course-view/FileLoadDialog';
 import SisuExportDialog from './SisuExportDialog';
-import { State } from '../../types';
+import { FinalGrade, State } from '../../types';
+import { Status } from 'aalto-grades-common/types';
 
 function CourseResultsTableToolbar(props: {
   search: string,
   setSearch: (search: string) => void,
   calculateFinalGrades: () => Promise<void>,
-  downloadCsvTemplate: () => Promise<void>
+  downloadCsvTemplate: () => Promise<void>,
+  selectedStudents: Array<FinalGrade>
 }): JSX.Element {
   const { assessmentModelId }: Params = useParams();
 
@@ -37,7 +35,7 @@ function CourseResultsTableToolbar(props: {
     {
       description: 'Import from A+',
       handleClick: (): void => {
-        console.error('Importing from A+ is not implemented');
+        alert('Importing from A+ is not implemented');
       }
     }
   ];
@@ -48,6 +46,12 @@ function CourseResultsTableToolbar(props: {
 
   function handleCloseSisuDialog(): void {
     setShowSisuDialog(false);
+  }
+
+  function hasPendingStudents(): boolean {
+    return props.selectedStudents.filter((student: FinalGrade) => {
+      return student.grade === Status.Pending;
+    }).length !== 0;
   }
 
   return (
@@ -93,23 +97,50 @@ function CourseResultsTableToolbar(props: {
           alignItems: 'center', gap: 2
         }}>
           <Tooltip
-            title="Export final course grades as Sisu compatible CSV file"
+            title={props.selectedStudents.length === 0 ?
+              'Select at least one student number for exporting grades.' :
+              hasPendingStudents() ?
+                'Grades with status "PENDING" cannot be exported, ' +
+                'deselect or calculate grades for these.' :
+                'Export final course grades as Sisu compatible CSV file.'
+            }
             placement="top"
           >
-            <Button variant='outlined' onClick={(): void => setShowSisuDialog(true)}>
-              Export to Sisu CSV
-            </Button>
+            <span>
+              <Button
+                variant='outlined'
+                color={ hasPendingStudents() ? 'error' : 'success'}
+                onClick={(): void => {
+                  if (!hasPendingStudents()) {
+                    setShowSisuDialog(true);
+                  }
+                }}
+                disabled={props.selectedStudents.length === 0}
+              >
+                Export to Sisu CSV
+              </Button>
+            </span>
           </Tooltip>
           <Tooltip
-            title="Calculate course final grades for students"
+            title={props.selectedStudents.length === 0 ?
+              'Select at least one student number for grade calculation.' :
+              'Calculate course final grades for selected students.'
+            }
             placement="top"
           >
-            <Button variant='outlined' onClick={(): Promise<void> => props.calculateFinalGrades()}>
-              Calculate final grades
-            </Button>
+            <span>
+              <Button
+                variant='outlined'
+                color='success'
+                onClick={(): Promise<void> => props.calculateFinalGrades()}
+                disabled={props.selectedStudents.length === 0}
+              >
+                Calculate final grades
+              </Button>
+            </span>
           </Tooltip>
           <Tooltip
-            title="Download grading template with attainment tags and student numbers"
+            title="Download grading template with attainment tags and student numbers."
             placement="top"
           >
             <Button variant='outlined' onClick={(): Promise<void> => props.downloadCsvTemplate()}>
@@ -120,6 +151,7 @@ function CourseResultsTableToolbar(props: {
           <SisuExportDialog
             open={showSisuDialog}
             handleClose={handleCloseSisuDialog}
+            selectedStudents={props.selectedStudents}
           />
           <FileLoadDialog
             assessmentModelId={Number(assessmentModelId)}
@@ -136,7 +168,8 @@ CourseResultsTableToolbar.propTypes = {
   search: PropTypes.string,
   setSearch: PropTypes.func,
   calculateFinalGrades: PropTypes.func,
-  downloadCsvTemplate: PropTypes.func
+  downloadCsvTemplate: PropTypes.func,
+  selectedStudents: PropTypes.array
 };
 
 export default CourseResultsTableToolbar;
