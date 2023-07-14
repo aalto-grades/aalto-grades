@@ -16,7 +16,7 @@ import { State } from '../../types';
 
 function Attainments(props: {
   attainmentTree: AttainmentData,
-  formula: string,
+  formulaName: string,
   courseId: number,
   assessmentModel: AssessmentModelData,
   handleAddPoints: () => void
@@ -57,7 +57,7 @@ function Attainments(props: {
         alignItems: 'center', pb: 1
       }}>
         <Typography align='left' sx={{ ml: 1.5 }} >
-          {'Grading Formula: ' + props.formula}
+          {'Grading Formula: ' + props.formulaName}
         </Typography>
         <Button id='ag_edit_formula_btn' onClick={(): void => setEditFormulaOpen(true)}>
           Edit formula
@@ -126,7 +126,7 @@ function Attainments(props: {
 Attainments.propTypes = {
   attainmentTree: PropTypes.object,
   assessmentModel: PropTypes.object,
-  formula: PropTypes.string,
+  formulaName: PropTypes.string,
   handleAddPoints: PropTypes.func,
   courseId: PropTypes.number,
 };

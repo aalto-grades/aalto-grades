@@ -4,19 +4,18 @@
 
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Container from '@mui/material/Container';
+import { ExpandMore } from '@mui/icons-material';
+import {
+  Accordion, AccordionDetails, AccordionSummary, Box, CircularProgress,
+  Container, Typography
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
-import formulaServices from '../../services/formulas';
-import { Box, CircularProgress } from '@mui/material';
-import { State } from '../../types';
 import { Formula, FormulaData } from 'aalto-grades-common/types';
 
-const HoverExpandMoreIcon = styled<any>(ExpandMoreIcon)(({ theme }) => ({
+import formulaServices from '../../services/formulas';
+import { State } from '../../types';
+
+const HoverExpandMoreIcon = styled<any>(ExpandMore)(({ theme }) => ({
   '&:hover': {
     background: theme.palette.hoverGrey1
   }

@@ -4,24 +4,24 @@
 
 import { JSX, useState, useEffect } from 'react';
 import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Grow from '@mui/material/Grow';
+import { Box, Button, CircularProgress, Grow, Typography } from '@mui/material';
+import {
+  AssessmentModelData, AttainmentData, CourseData, Formula, FormulaData,
+  SystemRole, UserData
+} from 'aalto-grades-common/types';
+
 import FileLoadDialog from './course-view/FileLoadDialog';
 import CourseDetails from './course-view/CourseDetails';
 import Attainments from './course-view/Attainments';
 import CreateAssessmentModelDialog from './course-view/CreateAssessmentModelDialog';
 import InstancesTable from './course-view/InstancesTable';
+
 import assessmentModelServices from '../services/assessmentModels';
 import attainmentServices from '../services/attainments';
 import courseServices from '../services/courses';
+import formulaServices from '../services/formulas';
 import useAuth, { AuthContextType } from '../hooks/useAuth';
-import {
-  AssessmentModelData, AttainmentData, CourseData, SystemRole, UserData
-} from 'aalto-grades-common/types';
 import { State } from '../types';
-import CircularProgress from '@mui/material/CircularProgress';
 
 function CourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
@@ -43,6 +43,8 @@ function CourseView(): JSX.Element {
    */
   const [attainmentTree, setAttainmentTree]: State<AttainmentData | null | undefined> =
     useState<AttainmentData | null | undefined>(undefined);
+  const [rootFormula, setRootFormula]: State<FormulaData | null> =
+    useState<FormulaData | null>(null);
 
   const [animation, setAnimation]: State<boolean> = useState(false);
   const [fileLoadOpen, setFileLoadOpen]: State<boolean> = useState(false);
@@ -80,6 +82,10 @@ function CourseView(): JSX.Element {
               attainmentServices.getAllAttainments(courseId, assessmentModels[0].id)
                 .then((attainmentTree: AttainmentData) => {
                   setAttainmentTree(attainmentTree);
+
+                  formulaServices.getFormulaDetails(attainmentTree.formula ?? Formula.Manual)
+                    .then((formula: FormulaData) => setRootFormula(formula))
+                    .catch((e: Error) => console.log(e.message));
                 })
                 .catch((e: Error) => console.log(e.message));
             }
@@ -154,7 +160,7 @@ function CourseView(): JSX.Element {
               /* a different attainment component will be created for students */
               (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
               <div style={{ width: '100%' }}>
-                {attainmentTree ?
+                {(attainmentTree && rootFormula) ?
                   <Grow
                     in={animation}
                     style={{ transformOrigin: '0 0 0' }}
@@ -166,7 +172,7 @@ function CourseView(): JSX.Element {
                         <Attainments
                           attainmentTree={attainmentTree}
                           courseId={Number(courseId)}
-                          formula={'Weighted Average'} /* TODO: Retrieve real formula */
+                          formulaName={rootFormula.name}
                           assessmentModel={currentAssessmentModel}
                           handleAddPoints={(): void => setFileLoadOpen(true)}
                         />

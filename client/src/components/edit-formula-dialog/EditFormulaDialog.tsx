@@ -7,10 +7,11 @@ import PropTypes from 'prop-types';
 import {
   Box, Button, Dialog, DialogTitle, DialogContent, Step, StepLabel, Stepper
 } from '@mui/material';
+
 import SelectFormula from './SelectFormula';
 import SetFormulaParams from './SetFormulaParams';
 import attainmentServices from '../../services/attainments';
-import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
+import { AttainmentData, Formula, FormulaData } from 'aalto-grades-common/types';
 import { State } from '../../types';
 
 function EditFormulaDialog(props: {
@@ -48,8 +49,18 @@ function EditFormulaDialog(props: {
   }
 
   function handleSubmit(): void {
+    function reset(): void {
+      setActiveStep(0);
+      setFormulaError('');
+      setFormula(null);
+      setParams({});
+      setChildParams(new Map());
+      props.handleClose();
+    }
+
     props.attainment.formula = formula?.id;
-    props.attainment.formulaParams = {
+
+    props.attainment.formulaParams = (formula?.id === Formula.Manual) ? {} : {
       ...params,
       children: Array.from(childParams.entries())
     };
@@ -58,11 +69,11 @@ function EditFormulaDialog(props: {
       attainmentServices.editAttainment(
         props.courseId, props.assessmentModelId, props.attainment
       )
-        .then(() => props.handleClose())
+        .then(() => reset())
         .catch((e: Error) => console.log(e.message));
     } else if (props.attainmentTree && props.setAttainmentTree) {
       props.setAttainmentTree(structuredClone(props.attainmentTree));
-      props.handleClose();
+      reset();
     }
   }
 

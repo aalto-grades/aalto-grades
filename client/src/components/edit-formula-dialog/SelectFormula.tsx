@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import {
   CircularProgress, FormControl, FormHelperText, InputLabel, MenuItem, Select, SelectChangeEvent
 } from '@mui/material';
+
 import StyledBox from './StyledBox';
 import ViewFormulaAccordion from './ViewFormulaAccordion';
 import AlertSnackbar from '../alerts/AlertSnackbar';
