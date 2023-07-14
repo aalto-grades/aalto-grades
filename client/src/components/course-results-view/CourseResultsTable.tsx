@@ -4,21 +4,15 @@
 
 import { useState, useEffect, ChangeEvent, MouseEvent, SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import CircularProgress from '@mui/material/CircularProgress';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
+import {
+  Box, Button, Checkbox, CircularProgress,Typography,
+  FormControlLabel, Paper, Switch, Table, TableBody,
+  TableCell, TableContainer, TablePagination, TableRow
+} from '@mui/material';
+
+import { Status } from 'aalto-grades-common/types';
 import CourseResultsTableToolbar from './CourseResultTableToolbar';
 import CourseResultsTableHead from './CourseResultsTableHead';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import sortingServices from '../../services/sorting';
 import { FinalGrade, State } from '../../types';
 
@@ -36,6 +30,8 @@ function CourseResultsTable(props: {
   const [rowsPerPage, setRowsPerPage]: State<number> = useState(25);
   const [search, setSearch]: State<string> = useState('');
   const [studentsToShow, setStudentsToShow]: State<Array<FinalGrade>> = useState(props.students);
+  const [selectedStudents, setSelectedStudents]: State<Array<string>> = useState(['']);
+  const [allSelected, setAllSelected]: State<boolean> = useState(false);
 
   useEffect(() => {
     setStudentsToShow(search === '' ? props.students : props.students.filter((s: FinalGrade) => {
@@ -61,6 +57,23 @@ function CourseResultsTable(props: {
 
   function handleChangeDense(event: ChangeEvent<HTMLInputElement>): void {
     setDense(event.target.checked);
+  }
+
+  function handleSelectForGrading(studentNumber: string): void {
+    if (selectedStudents.includes(studentNumber)) {
+      setSelectedStudents(selectedStudents.filter((sN: string) => sN !== studentNumber));
+    } else {
+      setSelectedStudents([...selectedStudents, studentNumber]);
+    }
+  }
+
+  function handleSelectAll(): void {
+    if (allSelected) {
+      setSelectedStudents([]);
+    } else {
+      setSelectedStudents(studentsToShow.map((student: FinalGrade) => student.studentNumber));
+    }
+    setAllSelected(!allSelected);
   }
 
   // Avoid a layout jump when reaching the last page with empty rows.
@@ -96,6 +109,8 @@ function CourseResultsTable(props: {
                   order={order}
                   orderBy={orderBy}
                   onRequestSort={handleRequestSort}
+                  handleSelectAll={handleSelectAll}
+                  allSelected={allSelected}
                 />
                 <TableBody>
                   {
@@ -125,13 +140,25 @@ function CourseResultsTable(props: {
                               scope="row"
                               padding="normal"
                             >
-                              {student.credits}
+                              {student.grade === Status.Pending ? '-' : student.credits}
                             </TableCell>
                             <TableCell
                               sx={{ width: '100px' }}
                               align="left"
-                              key={`${student.studentNumber}_grade`}>
+                              key={`${student.studentNumber}_grade`}
+                            >
                               {student.grade}
+                            </TableCell>
+                            <TableCell
+                              sx={{ width: '100px' }}
+                              align="left"
+                              key={`${student.studentNumber}_grade_4`}
+                            >
+                              <Checkbox
+                                size="small"
+                                onClick={(): void => handleSelectForGrading(student.studentNumber)}
+                                checked={selectedStudents.includes(student.studentNumber)}
+                              />
                             </TableCell>
                           </TableRow>
                         );
