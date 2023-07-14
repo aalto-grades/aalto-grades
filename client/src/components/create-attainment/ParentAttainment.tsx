@@ -43,8 +43,8 @@ function ParentAttainment(props: {
   }
 
   useEffect(() => {
-    if (props.attainmentTree.formula) {
-      formulaServices.getFormulaDetails(props.attainmentTree.formula)
+    if (props.attainment.formula) {
+      formulaServices.getFormulaDetails(props.attainment.formula)
         .then((formula: FormulaData) => {
           setFormulaDetails(formula);
         });
