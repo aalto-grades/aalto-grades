@@ -4,12 +4,8 @@
 
 import { SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
-import TableHead from '@mui/material/TableHead';
-import TableSortLabel from '@mui/material/TableSortLabel';
 import { visuallyHidden } from '@mui/utils';
-import TableCell from '@mui/material/TableCell';
-import TableRow from '@mui/material/TableRow';
-import Box from '@mui/material/Box';
+import { Box, Checkbox, TableCell,TableHead, TableRow, TableSortLabel } from '@mui/material';
 
 interface Colum {
   id: string,
@@ -19,7 +15,8 @@ interface Colum {
 function CourseResultsTableHead(props: {
   order: 'asc' | 'desc',
   orderBy: string,
-  onRequestSort: (event: SyntheticEvent, property: string) => void
+  onRequestSort: (event: SyntheticEvent, property: string) => void,
+  selectAll: () => void
 }): JSX.Element {
 
   const rows: Array<Colum> = [
@@ -34,6 +31,10 @@ function CourseResultsTableHead(props: {
     {
       id: 'finalGrade',
       name: 'Final Grade'
+    },
+    {
+      id: 'select',
+      name: 'Select For Grading'
     }
   ];
 
@@ -60,6 +61,11 @@ function CourseResultsTableHead(props: {
                 onClick={createSortHandler(column.id)}
               >
                 {column.name}
+                {column.id === 'select' &&
+                  <Checkbox
+                    onClick={props.selectAll}
+                  />
+                }
                 {
                   props.orderBy === column.id ? (
                     <Box component="span" sx={visuallyHidden}>
@@ -79,7 +85,8 @@ function CourseResultsTableHead(props: {
 CourseResultsTableHead.propTypes = {
   onRequestSort: PropTypes.func.isRequired,
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-  orderBy: PropTypes.any.isRequired
+  orderBy: PropTypes.any.isRequired,
+  selectAll: PropTypes.func
 };
 
 export default CourseResultsTableHead;
