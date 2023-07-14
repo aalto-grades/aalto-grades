@@ -5,7 +5,7 @@
 import { SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
 import { visuallyHidden } from '@mui/utils';
-import { Box, Checkbox, TableCell,TableHead, TableRow, TableSortLabel } from '@mui/material';
+import { Box, Checkbox, TableCell, TableHead, TableRow, TableSortLabel } from '@mui/material';
 
 interface Colum {
   id: string,
@@ -16,7 +16,8 @@ function CourseResultsTableHead(props: {
   order: 'asc' | 'desc',
   orderBy: string,
   onRequestSort: (event: SyntheticEvent, property: string) => void,
-  selectAll: () => void
+  handleSelectAll: () => void,
+  allSelected: boolean
 }): JSX.Element {
 
   const rows: Array<Colum> = [
@@ -31,10 +32,6 @@ function CourseResultsTableHead(props: {
     {
       id: 'finalGrade',
       name: 'Final Grade'
-    },
-    {
-      id: 'select',
-      name: 'Select For Grading'
     }
   ];
 
@@ -61,11 +58,6 @@ function CourseResultsTableHead(props: {
                 onClick={createSortHandler(column.id)}
               >
                 {column.name}
-                {column.id === 'select' &&
-                  <Checkbox
-                    onClick={props.selectAll}
-                  />
-                }
                 {
                   props.orderBy === column.id ? (
                     <Box component="span" sx={visuallyHidden}>
@@ -77,6 +69,17 @@ function CourseResultsTableHead(props: {
             </TableCell>
           ))
         }
+        <TableCell
+          key='selectAll'
+          align='left'
+          padding='normal'
+        >
+          Select For Grading
+          <Checkbox
+            onClick={props.handleSelectAll}
+            checked={props.allSelected}
+          />
+        </TableCell>
       </TableRow>
     </TableHead>
   );
@@ -86,7 +89,8 @@ CourseResultsTableHead.propTypes = {
   onRequestSort: PropTypes.func.isRequired,
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
   orderBy: PropTypes.any.isRequired,
-  selectAll: PropTypes.func
+  handleSelectAll: PropTypes.func,
+  allSelected: PropTypes.bool
 };
 
 export default CourseResultsTableHead;
