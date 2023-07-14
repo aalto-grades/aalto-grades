@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import { Status } from 'aalto-grades-common/types';
 import { FinalGrade } from '../../types';
 
