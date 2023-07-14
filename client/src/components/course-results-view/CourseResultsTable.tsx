@@ -30,7 +30,8 @@ function CourseResultsTable(props: {
   const [rowsPerPage, setRowsPerPage]: State<number> = useState(25);
   const [search, setSearch]: State<string> = useState('');
   const [studentsToShow, setStudentsToShow]: State<Array<FinalGrade>> = useState(props.students);
-  const [selectedStudents, setSelectedStudents]: State<Array<string>> = useState(['']);
+  const [selectedStudents, setSelectedStudents]: State<Array<FinalGrade>> =
+    useState<Array<FinalGrade>>([]);
   const [allSelected, setAllSelected]: State<boolean> = useState(false);
 
   useEffect(() => {
@@ -60,10 +61,20 @@ function CourseResultsTable(props: {
   }
 
   function handleSelectForGrading(studentNumber: string): void {
-    if (selectedStudents.includes(studentNumber)) {
-      setSelectedStudents(selectedStudents.filter((sN: string) => sN !== studentNumber));
+    let found: Array<FinalGrade> = selectedStudents.filter((value: FinalGrade) => {
+      return value.studentNumber === studentNumber;
+    });
+
+    // Add to list of selected students.
+    if (found.length !== 0) {
+      setSelectedStudents(selectedStudents.filter((value: FinalGrade) => {
+        return value.studentNumber !== studentNumber;
+      }));
     } else {
-      setSelectedStudents([...selectedStudents, studentNumber]);
+      found = studentsToShow.filter((value: FinalGrade) => {
+        return value.studentNumber === studentNumber;
+      });
+      setSelectedStudents([...selectedStudents, found[0]]);
     }
   }
 
@@ -71,7 +82,7 @@ function CourseResultsTable(props: {
     if (allSelected) {
       setSelectedStudents([]);
     } else {
-      setSelectedStudents(studentsToShow.map((student: FinalGrade) => student.studentNumber));
+      setSelectedStudents(studentsToShow);
     }
     setAllSelected(!allSelected);
   }
@@ -88,6 +99,7 @@ function CourseResultsTable(props: {
           setSearch={setSearch}
           calculateFinalGrades={props.calculateFinalGrades}
           downloadCsvTemplate={props.downloadCsvTemplate}
+          selectedStudents={selectedStudents}
         />
         {
           props.loading
@@ -157,7 +169,9 @@ function CourseResultsTable(props: {
                               <Checkbox
                                 size="small"
                                 onClick={(): void => handleSelectForGrading(student.studentNumber)}
-                                checked={selectedStudents.includes(student.studentNumber)}
+                                checked={selectedStudents.filter((value: FinalGrade) => {
+                                  return value.studentNumber === student.studentNumber;
+                                }).length !== 0}
                               />
                             </TableCell>
                           </TableRow>
@@ -184,8 +198,15 @@ function CourseResultsTable(props: {
           py: '10px'
         }}>
           <Box sx={{ display: 'flex', flexDirection: 'row', ml: 3.5 }}>
-            <Typography sx={{ mt: '11px' }} >View valid grades from past instances:</Typography>
-            <Button sx={{ ml: 1, mt: '10px', height:'30px' }} size='small'>View all grades</Button>
+            <Typography sx={{ mt: '11px' }}>
+              View valid grades from past instances:
+            </Typography>
+            <Button
+              sx={{ ml: 1, mt: '10px', height:'30px' }}
+              size='small'
+            >
+              View all grades
+            </Button>
           </Box>
           <TablePagination
             rowsPerPageOptions={[25, 50, 100, 500]}
