@@ -14,7 +14,8 @@ interface ChildParams {
   weight: number;
 }
 
-interface Params extends ParamsObject<ChildParams> {}
+// TODO: Should extend ParamsObject instead with minRequiredPoints / threshold
+type Params = ParamsObject<ChildParams>;
 
 const childParams: Array<string> = ['weight'];
 const params: Array<string> = [];
