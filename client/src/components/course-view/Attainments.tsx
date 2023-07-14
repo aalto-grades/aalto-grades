@@ -2,24 +2,28 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { JSX } from 'react';
+import { useState, JSX } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import AttainmentCategory from '../attainments/AttainmentCategory';
-import MenuButton, { MenuButtonOption } from './MenuButton';
+import { Box, Button, Typography } from '@mui/material';
 import { AssessmentModelData, AttainmentData } from 'aalto-grades-common/types';
+
+import AttainmentCategory from '../attainments/AttainmentCategory';
+import EditFormulaDialog from '../edit-formula-dialog/EditFormulaDialog';
+import MenuButton, { MenuButtonOption } from './MenuButton';
+
+import { State } from '../../types';
 
 function Attainments(props: {
   attainmentTree: AttainmentData,
-  formula: string,
-  courseId: string,
+  formulaName: string,
+  courseId: number,
   assessmentModel: AssessmentModelData,
-  handleAddPoints: () => void
+  handleAddPoints: () => void,
+  onChangeFormula: () => void
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
+  const [editFormulaOpen, setEditFormulaOpen]: State<boolean> = useState(false);
 
   const actionOptions: Array<MenuButtonOption> = [
     {
@@ -36,6 +40,17 @@ function Attainments(props: {
     <Box borderRadius={1} sx={{
       bgcolor: 'primary.light', p: 1.5, display: 'flex', flexDirection: 'column'
     }}>
+      {
+        props.assessmentModel.id &&
+        <EditFormulaDialog
+          handleClose={() => setEditFormulaOpen(false)}
+          onSubmit={props.onChangeFormula}
+          open={editFormulaOpen}
+          courseId={props.courseId}
+          assessmentModelId={props.assessmentModel.id}
+          attainment={props.attainmentTree}
+        />
+      }
       <Typography variant='h3' align='left' sx={{ ml: 1.5, mt: 0.6, mb: 1.5 }} >
         Study Attainments
       </Typography>
@@ -44,11 +59,9 @@ function Attainments(props: {
         alignItems: 'center', pb: 1
       }}>
         <Typography align='left' sx={{ ml: 1.5 }} >
-          {'Grading Formula: ' + props.formula}
+          {'Grading Formula: ' + props.formulaName}
         </Typography>
-        <Button id='ag_edit_formula_btn' onClick={(): void => {
-          navigate(`/${props.courseId}/select-formula/${props.assessmentModel.id}`);
-        }}>
+        <Button id='ag_edit_formula_btn' onClick={(): void => setEditFormulaOpen(true)}>
           Edit formula
         </Button>
         { /* The path above should be changes once courseId can be fetched from the path */}
@@ -115,9 +128,10 @@ function Attainments(props: {
 Attainments.propTypes = {
   attainmentTree: PropTypes.object,
   assessmentModel: PropTypes.object,
-  formula: PropTypes.string,
+  formulaName: PropTypes.string,
+  courseId: PropTypes.number,
   handleAddPoints: PropTypes.func,
-  courseId: PropTypes.string,
+  onChangeFormula: PropTypes.func
 };
 
 export default Attainments;

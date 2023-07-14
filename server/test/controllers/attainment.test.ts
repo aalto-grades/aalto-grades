@@ -474,8 +474,8 @@ describe(
             daysValid: 6000,
             formula: Formula.WeightedAverage,
             formulaParams: {
-              weights: [
-                ['sub not success', 1]
+              children: [
+                ['sub not success', { weight: 1 }]
               ]
             },
             subAttainments: [
@@ -485,7 +485,7 @@ describe(
                 daysValid: 6,
                 formula: Formula.WeightedAverage,
                 formulaParams: {
-                  weights: [
+                  children: [
                     'wrong again', 5,
                     [1, -1]
                   ]
@@ -503,13 +503,16 @@ describe(
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
         expect(res.body.errors).toContain(
-          'weights[0] must be a `tuple` type, but the final value was: `"wrong again"`.'
+          'children[0] must be a `tuple` type, but the final value was: `"wrong again"`.'
         );
         expect(res.body.errors).toContain(
-          'weights[1] must be a `tuple` type, but the final value was: `5`.'
+          'children[1] must be a `tuple` type, but the final value was: `5`.'
         );
         expect(res.body.errors).toContain(
-          'weights[2][0] must be a `string` type, but the final value was: `1`.'
+          'children[2][0] must be a `string` type, but the final value was: `1`.'
+        );
+        expect(res.body.errors).toContain(
+          'children[2][1] must be a `object` type, but the final value was: `-1`.'
         );
       }
     );
@@ -867,7 +870,7 @@ describe(
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-        expect(res.body.errors).toContain('weights is a required field');
+        expect(res.body.errors).toContain('children is a required field');
       }
     );
 

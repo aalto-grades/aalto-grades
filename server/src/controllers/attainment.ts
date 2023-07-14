@@ -22,6 +22,26 @@ import {
 } from './utils/attainment';
 import { isTeacherInChargeOrAdmin } from './utils/user';
 
+async function validateFormulaParams(
+  formula: Formula | undefined, formulaParams: object | null | undefined
+): Promise<void> {
+  if (formula) {
+    if (formula === Formula.Manual) {
+      if (formulaParams) {
+        throw new ApiError(
+          'formula params of manual must be null or undefined, got '
+          + `${JSON.stringify(formulaParams)}`,
+          HttpCode.BadRequest
+        );
+      }
+    } else {
+      await getFormulaImplementation(formula).paramSchema.validate(
+        formulaParams, { abortEarly: false }
+      );
+    }
+  }
+}
+
 async function validateTreeParam(treeParam: string): Promise<string> {
   const treeSchema: yup.AnyObjectSchema = yup.object().shape({
     tree: yup.string().oneOf(['children', 'descendants'])
@@ -199,23 +219,21 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
   }
 
   // Validate formula parameters for each attainment
-  async function validateFormulaParams(
+  async function validateFormulaParamsTree(
     attainmentTree: AttainmentData
   ): Promise<void> {
-    if (attainmentTree.formula) {
-      await getFormulaImplementation(attainmentTree.formula).paramSchema.validate(
-        attainmentTree.formulaParams, { abortEarly: false }
-      );
-    }
+    await validateFormulaParams(
+      attainmentTree.formula, attainmentTree.formulaParams
+    );
 
     if (attainmentTree.subAttainments) {
       for (const subTree of attainmentTree.subAttainments) {
-        await validateFormulaParams(subTree);
+        await validateFormulaParamsTree(subTree);
       }
     }
   }
 
-  await validateFormulaParams(req.body);
+  await validateFormulaParamsTree(req.body);
 
   // Add all attainments to the database and construct an attainment tree with
   // IDs to return
@@ -342,11 +360,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     }
   }
 
-  if (formula) {
-    await getFormulaImplementation(formula).paramSchema.validate(
-      formulaParams, { abortEarly: false }
-    );
-  }
+  await validateFormulaParams(formula, formulaParams);
 
   await attainment.set({
     name: name ?? attainment.name,
@@ -354,7 +368,11 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     daysValid: daysValid ?? attainment.daysValid,
     parentId: parentId ?? attainment.parentId,
     formula: formula ?? attainment.formula,
-    formulaParams: formulaParams ?? attainment.formulaParams
+    formulaParams: (
+      formula === Formula.Manual
+        ? undefined
+        : formulaParams ?? attainment.formulaParams
+    )
   }).save();
 
   const attainmentTree: AttainmentData = {

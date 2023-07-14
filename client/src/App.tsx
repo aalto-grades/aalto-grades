@@ -18,11 +18,8 @@ import CourseView from './components/CourseView';
 import CreateCourseView from './components/CreateCourseView';
 import FetchInstancesView from './components/FetchInstancesView';
 import EditInstanceView from './components/EditInstanceView';
-import SelectFormulaView from './components/SelectFormulaView';
-import FormulaAttributesView from './components/FormulaAttributesView';
 import EditAttainmentView from './components/EditAttainmentView';
 import CourseResultsView from './components/CourseResultsView';
-import FormulaSelectionRoute from './context/FormulaSelectionRoute';
 import UserButton from './components/auth/UserButton';
 import { SystemRole } from 'aalto-grades-common/types/auth';
 import Footer from './components/Footer';
@@ -136,7 +133,7 @@ function App(): JSX.Element {
             >
               Aalto Grades
             </Link>
-            <UserButton/>
+            <UserButton />
           </Toolbar>
         </AppBar>
         <Container sx={{ textAlign: 'center' }} maxWidth="lg">
@@ -145,8 +142,8 @@ function App(): JSX.Element {
               <Route path='/login' element={<Login />} />
               <Route path='/signup' element={<Signup />} />
               {
-              /* All roles are authorised to access the front page, conditional
-                 rendering is done inside the component */
+                /* All roles are authorised to access the front page, conditional
+                   rendering is done inside the component */
               }
               <Route element={<PrivateRoute roles={Object.values(SystemRole)} />}>
                 <Route
@@ -187,20 +184,6 @@ function App(): JSX.Element {
                   path='/:courseId/attainment/:modification/:assessmentModelId/:attainmentId'
                   element={<EditAttainmentView />}
                 />
-                <Route element={<FormulaSelectionRoute />}>
-                  <Route
-                    path='/:courseId/select-formula/:assessmentModelId/'
-                    element={<SelectFormulaView />}
-                  />
-                  <Route
-                    path='/:courseId/formula-attributes/:assessmentModelId/'
-                    element={<FormulaAttributesView />}
-                  />
-                  {
-                    /* '/:attainmentId' will be added to the paths above once
-                      they work for sub-attainments */
-                  }
-                </Route>
               </Route>
             </Routes>
           </Box>

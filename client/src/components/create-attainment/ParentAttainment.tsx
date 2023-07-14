@@ -3,20 +3,16 @@
 // SPDX-License-Identifier: MIT
 
 import { useEffect, useState } from 'react';
-import { NavigateFunction, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import List from '@mui/material/List';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import Collapse from '@mui/material/Collapse';
-import IconButton from '@mui/material/IconButton';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import LeafAttainment from './LeafAttainment';
+import { Box, Button, Collapse, IconButton, List, Typography } from '@mui/material';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
+
 import Attainment from './Attainment';
+import EditFormulaDialog from '../edit-formula-dialog/EditFormulaDialog';
+import LeafAttainment from './LeafAttainment';
+
 import formulaServices from '../../services/formulas';
-import { AttainmentData, FormulaPreview } from 'aalto-grades-common/types';
 import { State } from '../../types';
 
 // An Assignmnet component with subAttainments and a formula
@@ -26,39 +22,32 @@ function ParentAttainment(props: {
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
   deleteAttainment: (attainment: AttainmentData) => void,
   getTemporaryId: () => number,
-  attainment: AttainmentData,
-  formulaAttributeNames: Array<string>
+  attainment: AttainmentData
 }): JSX.Element {
-  const navigate: NavigateFunction = useNavigate();
 
   // For opening and closing the list of sub-attainments
   const [open, setOpen]: State<boolean> = useState(true);
   // Detailed information about the used formula, undefined when loading.
-  const [formulaDetails, setFormulaDetails]: State<FormulaPreview | null> =
-    useState<FormulaPreview | null>(null);
+  const [formulaDetails, setFormulaDetails]: State<FormulaData | null> =
+    useState<FormulaData | null>(null);
+
+  const [editFormulaOpen, setEditFormulaOpen]: State<boolean> = useState(false);
 
   function handleClick(): void {
     setOpen(!open);
   }
 
-  /* Functions to get the formula attributes.
-   *
-   * formulaId specifies the formula that is used to calculate this
-   * attainment's grade, subFormulaAttributeNames are the attributes that need
-   * to be specified for the direct sub attainments of this attainments,
-   * so that the grade for this attainment can be calculated.
-   *
-   * Observe that formulaAttributeNames which is as a parameter for this
-   * component are the attributes that need to specified for this attainment,
-   * so that the grade of this attainment's parent attainment can be calculated.
-   */
-  useEffect(() => {
-    if (props.attainmentTree.formula) {
-      formulaServices.getFormulaDetails(props.attainmentTree.formula)
-        .then((formula: FormulaPreview) => {
+  function onChangeFormula(): void {
+    if (props.attainment.formula) {
+      formulaServices.getFormulaDetails(props.attainment.formula)
+        .then((formula: FormulaData) => {
           setFormulaDetails(formula);
         });
     }
+  }
+
+  useEffect(() => {
+    onChangeFormula();
   }, []);
 
   return (
@@ -69,6 +58,14 @@ function ParentAttainment(props: {
         alignItems: 'center',
         px: 1
       }}>
+        <EditFormulaDialog
+          handleClose={() => setEditFormulaOpen(false)}
+          onSubmit={onChangeFormula}
+          open={editFormulaOpen}
+          attainment={props.attainment}
+          attainmentTree={props.attainmentTree}
+          setAttainmentTree={props.setAttainmentTree}
+        />
         <Typography variant="body1" sx={{ flexGrow: 1, textAlign: 'left', mb: 0.5 }}>
           {'Grading Formula: ' + formulaDetails?.name ?? 'Loading...'}
         </Typography>
@@ -76,7 +73,7 @@ function ParentAttainment(props: {
           /* Navigation below doesn't work because formula selection has
              only been implemented for course grade */
         }
-        <Button size='small' sx={{ mb: 0.5 }} onClick={(): void => navigate('/select-formula')}>
+        <Button size='small' sx={{ mb: 0.5 }} onClick={(): void => setEditFormulaOpen(true)}>
           Edit formula
         </Button>
       </Box>
@@ -86,7 +83,6 @@ function ParentAttainment(props: {
         deleteAttainment={props.deleteAttainment}
         getTemporaryId={props.getTemporaryId}
         attainment={props.attainment}
-        formulaAttributeNames={props.formulaAttributeNames}
       />
       <Box sx={{ display: 'flex', flexDirection: 'row' }}>
         {open ?
@@ -121,9 +117,6 @@ function ParentAttainment(props: {
                       deleteAttainment={props.deleteAttainment}
                       getTemporaryId={props.getTemporaryId}
                       attainment={subAttainment}
-                      formulaAttributeNames={
-                        formulaDetails?.attributes ?? []
-                      }
                     />
                   )
                 )
@@ -141,8 +134,7 @@ ParentAttainment.propTypes = {
   setAttainmentTree: PropTypes.func,
   deleteAttainment: PropTypes.func,
   getTemporaryId: PropTypes.func,
-  attainment: PropTypes.any,
-  formulaAttributeNames: PropTypes.array
+  attainment: PropTypes.any
 };
 
 export default ParentAttainment;

@@ -12,12 +12,14 @@ import CourseView from '../components/CourseView';
 import assessmentModelServices from '../services/assessmentModels';
 import attainmentServices from '../services/attainments';
 import courseServices from '../services/courses';
+import formulaServices from '../services/formulas';
 import instanceServices from '../services/instances';
 import gradeServices from '../services/grades';
 import AuthContext from '../context/AuthProvider';
 import mockAssessmentModels from './mock-data/mockAssessmentModels';
 import mockAttainments from './mock-data/mockAttainments';
 import mockCourses from './mock-data/mockCourses';
+import mockFormulas from './mock-data/mockFormulas';
 import mockInstances from './mock-data/mockInstancesWithStringDates';
 import { maxErrorsToShow } from '../components/course-view/FileLoadDialog';
 import { LoginResult, SystemRole } from 'aalto-grades-common/types';
@@ -62,6 +64,8 @@ describe('FileLoadDialog test with proper csv', () => {
 
     (attainmentServices.getAllAttainments as jest.Mock)
       .mockResolvedValue(mockAttainments);
+
+    jest.spyOn(formulaServices, 'getFormulaDetails').mockResolvedValue(mockFormulas[0]);
 
     // succeess, nothing to worry about
     (gradeServices.importCsv as jest.Mock).mockResolvedValue({});
@@ -197,6 +201,8 @@ describe('FileLoadDialog test where server does not accept the file', () => {
 
     (attainmentServices.getAllAttainments as jest.Mock)
       .mockResolvedValue(mockAttainments);
+
+    jest.spyOn(formulaServices, 'getFormulaDetails').mockResolvedValue(mockFormulas[0]);
 
     // Mock the error.
     (gradeServices.importCsv as jest.Mock).mockRejectedValue({

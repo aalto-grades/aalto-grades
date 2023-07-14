@@ -58,7 +58,8 @@ describe('Test GET /v1/formulas/:formulaId - get detailed formula info', () => {
     expect(res.body.data.formula).toBeDefined();
     expect(res.body.data.formula.id).toBeDefined();
     expect(res.body.data.formula.name).toBeDefined();
-    expect(res.body.data.formula.attributes).toBeDefined();
+    expect(res.body.data.formula.params).toBeDefined();
+    expect(res.body.data.formula.childParams).toBeDefined();
     expect(res.body.data.formula.codeSnippet).toBeDefined();
   });
 
