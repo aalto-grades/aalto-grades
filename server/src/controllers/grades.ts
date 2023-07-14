@@ -25,7 +25,6 @@ import { HttpCode } from '../types/httpCode';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import { isTeacherInChargeOrAdmin } from './utils/user';
 
-
 async function studentNumbersExist(studentNumbers: Array<string>): Promise<void> {
   const foundStudentNumbers: Array<string> = (await User.findAll({
     attributes: ['studentNumber'],
@@ -703,7 +702,8 @@ interface FinalGradeRaw extends AttainmentGrade {
 
 async function getFinalGradesFor(
   assessmentModelId: number,
-  studentNumbers: Array<string>
+  studentNumbers: Array<string>,
+  skipErrorOnEmpty: boolean = false
 ): Promise<Array<FinalGradeRaw>> {
   const finalGrades: Array<FinalGradeRaw> = await AttainmentGrade.findAll({
     attributes: ['grade'],
@@ -738,9 +738,10 @@ async function getFinalGradesFor(
     ]
   }) as Array<FinalGradeRaw>;
 
-  if (finalGrades.length === 0) {
+  if (finalGrades.length === 0 && !skipErrorOnEmpty) {
     throw new ApiError(
-      'no grades found, make sure grades have been calculated before requesting course results',
+      'no grades found, make sure grades have been ' +
+      'imported/calculated before requesting course results',
       HttpCode.NotFound
     );
   }
@@ -881,15 +882,65 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
     studentNumber: string,
     grade: string,
     credits: number
-  }> = (await getFinalGradesFor(
-    assessmentModel.id, studentNumbers ?? []
+  }> = [];
+
+  // Include also students do not have gradings calculated (grading shown as 'PENDING').
+  const studentsWithNoFinalGrades: Array<FinalGradeRaw> = await AttainmentGrade.findAll({
+    attributes: ['grade'],
+    include: [
+      {
+        model: Attainment,
+        where: {
+          assessmentModelId: assessmentModel.id,
+          //parentId: !null
+        },
+        include: [
+          {
+            model: AssessmentModel,
+            include: [
+              {
+                model: Course,
+                attributes: ['maxCredits']
+              }
+            ]
+          }
+        ]
+      },
+      {
+        model: User,
+        attributes: ['studentNumber'],
+        where: {
+          studentNumber: {
+            [Op.notIn]: studentNumbers ?? []
+          }
+        }
+      }
+    ]
+  }) as Array<FinalGradeRaw>;
+
+  if (studentsWithNoFinalGrades.length !== 0) {
+    const studentNumbers: Array<string> = Array.from(
+      new Set(studentsWithNoFinalGrades.map((grade: FinalGradeRaw) => grade.User.studentNumber))
+    );
+
+    studentNumbers.forEach((studentNumber: string) => {
+      finalGrades.push({
+        studentNumber,
+        grade: Status.Pending,
+        credits: 0
+      });
+    });
+  }
+
+  (await getFinalGradesFor(
+    assessmentModel.id, studentNumbers ?? [], studentsWithNoFinalGrades.length !== 0
   )).map(
     (finalGrade: FinalGradeRaw) => {
-      return {
+      finalGrades.push({
         studentNumber: finalGrade.User.studentNumber,
         grade: String(finalGrade.grade),
         credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits
-      };
+      });
     }
   );
 
