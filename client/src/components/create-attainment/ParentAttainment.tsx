@@ -61,6 +61,7 @@ function ParentAttainment(props: {
       }}>
         <EditFormulaDialog
           handleClose={() => setEditFormulaOpen(false)}
+          onSubmit={() => console.log('Empty')}
           open={editFormulaOpen}
           attainment={props.attainment}
           attainmentTree={props.attainmentTree}

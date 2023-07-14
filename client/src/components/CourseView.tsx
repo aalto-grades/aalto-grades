@@ -123,6 +123,20 @@ function CourseView(): JSX.Element {
     }
   }
 
+  function onChangeFormula(): void {
+    if (courseId && currentAssessmentModel?.id) {
+      attainmentServices.getAllAttainments(courseId, currentAssessmentModel?.id)
+        .then((attainmentTree: AttainmentData) => {
+          setAttainmentTree(attainmentTree);
+
+          formulaServices.getFormulaDetails(attainmentTree.formula ?? Formula.Manual)
+            .then((formula: FormulaData) => setRootFormula(formula))
+            .catch((e: Error) => console.log(e.message));
+        })
+        .catch((e: Error) => console.log(e.message));
+    }
+  }
+
   return (
     <Box sx={{ mx: -2.5 }}>
       {
@@ -175,6 +189,7 @@ function CourseView(): JSX.Element {
                           formulaName={rootFormula.name}
                           assessmentModel={currentAssessmentModel}
                           handleAddPoints={(): void => setFileLoadOpen(true)}
+                          onChangeFormula={onChangeFormula}
                         />
                       }
                     </div>

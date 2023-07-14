@@ -17,6 +17,7 @@ import { State } from '../../types';
 
 function EditFormulaDialog(props: {
   handleClose: () => void,
+  onSubmit: () => void,
   open: boolean,
   courseId?: number,
   assessmentModelId?: number,
@@ -50,17 +51,18 @@ function EditFormulaDialog(props: {
   }
 
   function handleSubmit(): void {
-    function reset(): void {
+    function close(): void {
+      props.onSubmit();
+      props.handleClose();
+
       setActiveStep(0);
       setFormulaError('');
       setFormula(null);
       setParams({});
       setChildParams(new Map());
-      props.handleClose();
     }
 
     props.attainment.formula = formula?.id;
-
     props.attainment.formulaParams = (formula?.id === Formula.Manual) ? {} : {
       ...params,
       children: Array.from(childParams.entries())
@@ -70,11 +72,11 @@ function EditFormulaDialog(props: {
       attainmentServices.editAttainment(
         props.courseId, props.assessmentModelId, props.attainment
       )
-        .then(() => reset())
+        .then(() => close())
         .catch((e: Error) => console.log(e.message));
     } else if (props.attainmentTree && props.setAttainmentTree) {
       props.setAttainmentTree(structuredClone(props.attainmentTree));
-      reset();
+      close();
     }
   }
 
@@ -182,6 +184,7 @@ function EditFormulaDialog(props: {
 
 EditFormulaDialog.propTypes = {
   handleClose: PropTypes.func,
+  onSubmit: PropTypes.func,
   open: PropTypes.bool,
   courseId: PropTypes.number,
   assessmentModelId: PropTypes.number,

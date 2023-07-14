@@ -5,13 +5,13 @@
 import { useState, JSX } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import AttainmentCategory from '../attainments/AttainmentCategory';
-import MenuButton, { MenuButtonOption } from './MenuButton';
-import EditFormulaDialog from '../edit-formula-dialog/EditFormulaDialog';
+import { Box, Button, Typography } from '@mui/material';
 import { AssessmentModelData, AttainmentData } from 'aalto-grades-common/types';
+
+import AttainmentCategory from '../attainments/AttainmentCategory';
+import EditFormulaDialog from '../edit-formula-dialog/EditFormulaDialog';
+import MenuButton, { MenuButtonOption } from './MenuButton';
+
 import { State } from '../../types';
 
 function Attainments(props: {
@@ -19,7 +19,8 @@ function Attainments(props: {
   formulaName: string,
   courseId: number,
   assessmentModel: AssessmentModelData,
-  handleAddPoints: () => void
+  handleAddPoints: () => void,
+  onChangeFormula: () => void
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const [editFormulaOpen, setEditFormulaOpen]: State<boolean> = useState(false);
@@ -43,6 +44,7 @@ function Attainments(props: {
         props.assessmentModel.id &&
         <EditFormulaDialog
           handleClose={() => setEditFormulaOpen(false)}
+          onSubmit={props.onChangeFormula}
           open={editFormulaOpen}
           courseId={props.courseId}
           assessmentModelId={props.assessmentModel.id}
@@ -127,8 +129,9 @@ Attainments.propTypes = {
   attainmentTree: PropTypes.object,
   assessmentModel: PropTypes.object,
   formulaName: PropTypes.string,
-  handleAddPoints: PropTypes.func,
   courseId: PropTypes.number,
+  handleAddPoints: PropTypes.func,
+  onChangeFormula: PropTypes.func
 };
 
 export default Attainments;
