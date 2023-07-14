@@ -138,7 +138,7 @@ AttainmentText.propTypes = {
 export { AccordionDetails, AttainmentText };
 
 function CustomAccordion(props: {
-  attainments: Array<AttainmentData>
+  attainment: AttainmentData
 }): JSX.Element {
 
   const [expanded, setExpanded]: State<Set<number>> = useState(new Set());
@@ -166,62 +166,57 @@ function CustomAccordion(props: {
 
   return (
     <>
-      {
-        props.attainments.map((attainment: AttainmentData) => {
-          return (
-            <Accordion
-              key={attainment.id + 'accordion'}
-              expanded={expanded.has(attainment.id ?? 0)}
-              onChange={handleChange(attainment.id ?? 0)}
-            >
-              <AccordionSummary
-                aria-controls={attainment.id + '-content'}
-                id={attainment.id + '-header'}
-                expanded={expanded.has(attainment.id ?? 0)}
-                selected={(selected === attainment.id)}
-              >
-                <AttainmentText
-                  name={attainment.name}
-                  formulaId={attainment.formula ?? Formula.Manual}
-                  tag={attainment.tag}
-                />
-              </AccordionSummary>
-              {
-                attainment.subAttainments &&
-                attainment.subAttainments.map((subAttainment: AttainmentData) => {
-                  return (
-                    // is the attainment a leaf? If yes, render details, else another accordion
-                    subAttainment.subAttainments ?
-                      <AccordionDetails key={subAttainment.id + 'details'}>
-                        <AttainmentText
-                          name={subAttainment.name}
-                          formulaId={subAttainment.formula ?? Formula.Manual}
-                          tag={subAttainment.tag}
-                        />
-                      </AccordionDetails>
-                      :
-                      <Box
-                        key={subAttainment.id + 'subAccordion'}
-                        sx={{ pl: '39px' }}
-                      >
-                        {
-                          <CustomAccordion
-                            attainments={[subAttainment]}
-                          />
-                        }
-                      </Box>
-                  );
-                })
-              }
-            </Accordion>
-          );
-        })}
+      <Accordion
+        key={props.attainment.id + 'accordion'}
+        expanded={expanded.has(props.attainment.id ?? 0)}
+        onChange={handleChange(props.attainment.id ?? 0)}
+      >
+        <AccordionSummary
+          aria-controls={props.attainment.id + '-content'}
+          id={props.attainment.id + '-header'}
+          expanded={expanded.has(props.attainment.id ?? 0)}
+          selected={(selected === props.attainment.id)}
+        >
+          <AttainmentText
+            name={props.attainment.name}
+            formulaId={props.attainment.formula ?? Formula.Manual}
+            tag={props.attainment.tag}
+          />
+        </AccordionSummary>
+        {
+          props.attainment.subAttainments?.map((subAttainment: AttainmentData) => {
+            return (
+              // is the attainment a leaf? If yes, render details, else another accordion
+              (subAttainment.subAttainments && subAttainment.subAttainments.length > 0)
+                ?
+                <Box
+                  key={subAttainment.id + 'subAccordion'}
+                  sx={{ pl: '39px' }}
+                >
+                  {
+                    <CustomAccordion
+                      attainment={subAttainment}
+                    />
+                  }
+                </Box>
+                :
+                <AccordionDetails key={subAttainment.id + 'details'}>
+                  <AttainmentText
+                    name={subAttainment.name}
+                    formulaId={subAttainment.formula ?? Formula.Manual}
+                    tag={subAttainment.tag}
+                  />
+                </AccordionDetails>
+            );
+          })
+        }
+      </Accordion>
     </>
   );
 }
 
 CustomAccordion.propTypes = {
-  attainments: PropTypes.array
+  attainment: PropTypes.object
 };
 
 export default CustomAccordion;
