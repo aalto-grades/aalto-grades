@@ -5,18 +5,15 @@
 import { useState, useEffect } from 'react';
 import { Params, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import Dialog from '@mui/material/Dialog';
-import TextField from '@mui/material/TextField';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import MenuItem from '@mui/material/MenuItem';
+import {
+  Box, Button, Dialog, DialogActions, DialogContent,
+  DialogContentText, DialogTitle, List, ListItem,
+  ListItemText, MenuItem, Paper, TextField, Typography
+} from '@mui/material';
+
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import gradeServices from '../../services/grades';
-import { Message, State } from '../../types';
+import { FinalGrade, Message, State } from '../../types';
 
 // A Dialog component for exporting Sisu grades CSV.
 const instructions: string =
@@ -90,7 +87,8 @@ const languageOptions: Array<LanguageOption> = [
 
 function SisuExportDialog(props: {
   open: boolean,
-  handleClose: () => void
+  handleClose: () => void,
+  selectedStudents: Array<FinalGrade>
 }): JSX.Element {
   const { courseId, assessmentModelId }: Params = useParams();
 
@@ -155,6 +153,8 @@ function SisuExportDialog(props: {
     }
   }
 
+  console.log('selected for SISISISISISI', props.selectedStudents);
+
   return (
     <>
       <Dialog open={props.open} transitionDuration={{ exit: 800 }}>
@@ -206,17 +206,35 @@ function SisuExportDialog(props: {
               />
             </div>
           </Box>
+          <Typography variant='h6' sx={{ mt: 1 }}>
+            Selected students:
+          </Typography>
+          <Paper sx={{ maxHeight: 200, overflow: 'auto', my: 1 }}>
+            <List dense={true}>
+              { props.selectedStudents.map((studentGrade: FinalGrade) => (
+                <ListItem key={studentGrade.studentNumber}>
+                  <ListItemText
+                    primary={`Student number: ${studentGrade.studentNumber}`}
+                  />
+                </ListItem>
+              )) }
+            </List>
+          </Paper>
         </DialogContent>
         <DialogActions sx={{ pr: 4, pb: 3 }}>
-          <Button size='medium' onClick={(): void => {
-            props.handleClose();
-          }}>
+          <Button
+            size='medium'
+            variant='outlined'
+            onClick={(): void => {
+              props.handleClose();
+            }}
+          >
             Cancel
           </Button>
           <Button
             id='ag_confirm_file_upload_btn'
             size='medium'
-            variant='outlined'
+            variant='contained'
             onClick={(): void => {
               exportSisuCsvGrades();
             }}
@@ -235,7 +253,8 @@ function SisuExportDialog(props: {
 
 SisuExportDialog.propTypes = {
   open: PropTypes.bool,
-  handleClose: PropTypes.func
+  handleClose: PropTypes.func,
+  selectedStudents: PropTypes.array
 };
 
 export default SisuExportDialog;
