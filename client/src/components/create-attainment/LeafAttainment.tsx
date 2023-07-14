@@ -100,7 +100,7 @@ function LeafAttainment(props: {
           attainmentTree={props.attainmentTree}
           setAttainmentTree={props.setAttainmentTree}
           attainment={props.attainment}
-          value={String(props.attainmentTree.daysValid)}
+          value={String(props.attainment.daysValid)}
           fieldData={daysValidData}
         />
       </Box>
