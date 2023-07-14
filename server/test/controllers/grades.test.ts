@@ -282,7 +282,7 @@ describe(
       checkErrorRes(
         [
           'no grades found, make sure grades have been' +
-        ' calculated before requesting course results'
+        ' imported/calculated before requesting course results'
         ],
         HttpCode.NotFound);
     });
@@ -421,7 +421,7 @@ describe(
       checkErrorRes(
         [
           'no grades found, make sure grades have been' +
-          ' calculated before requesting course results'
+          ' imported/calculated before requesting course results'
         ],
         HttpCode.NotFound);
     });
