@@ -31,12 +31,13 @@ function descendingComparator(
 type Comparator = (a: object, b: object) => number;
 
 // Calculates the comparator for StableSort
-// order = 'desc' or 'asc'
 // order by = id of the table head that determines the order
-function getComparator(order: string, orderBy: keyof object): Comparator {
-  return order === 'desc'
-    ? (a: object, b: object): number => descendingComparator(a, b, orderBy)
-    : (a: object, b: object): number => -descendingComparator(a, b, orderBy);
+function getComparator(order: 'asc' | 'desc', orderBy: string): Comparator {
+  const sign: number = (order === 'desc') ? 1 : -1;
+
+  return (a: object, b: object): number => {
+    return sign * descendingComparator(a, b, orderBy as keyof object);
+  };
 }
 
 // Sorts the array by comparator (descending or ascending)
