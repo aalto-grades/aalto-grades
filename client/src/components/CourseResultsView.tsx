@@ -89,7 +89,6 @@ function CourseResultsView(): JSX.Element {
         const data: Array<FinalGrade> =
           await gradeServices.getFinalGrades(courseId, assessmentModelId);
         setStudents(data);
-
       }
     } catch (err: unknown) {
       console.log(err);
