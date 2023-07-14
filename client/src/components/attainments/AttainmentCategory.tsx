@@ -35,10 +35,14 @@ function AttainmentCategory(props: {
         </Typography>
       </Box>
       {
-        props.attainment.subAttainments &&
-        <CustomAccordion
-          attainments={props.attainment.subAttainments}
-        />
+        props.attainment.subAttainments?.map((subAttainment: AttainmentData) => {
+          return (
+            <CustomAccordion
+              key={subAttainment.id}
+              attainment={subAttainment}
+            />
+          );
+        })
       }
       <Box sx={{
         display: 'flex', flexDirection: 'row', flexWrap: 'wrap',
