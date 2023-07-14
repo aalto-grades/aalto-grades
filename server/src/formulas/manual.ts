@@ -33,5 +33,5 @@ registerFormula(
   'Manual',
   [],
   [],
-  yup.object().noUnknown().strict()
+  yup.object()
 );

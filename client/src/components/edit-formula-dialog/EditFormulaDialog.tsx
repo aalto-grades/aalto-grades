@@ -63,7 +63,7 @@ function EditFormulaDialog(props: {
     }
 
     props.attainment.formula = formula?.id;
-    props.attainment.formulaParams = (formula?.id === Formula.Manual) ? {} : {
+    props.attainment.formulaParams = (formula?.id === Formula.Manual) ? undefined : {
       ...params,
       children: Array.from(childParams.entries())
     };
