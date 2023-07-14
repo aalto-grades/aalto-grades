@@ -19,7 +19,9 @@ function CourseResultsTable(props: {
   students: Array<FinalGrade>,
   calculateFinalGrades: () => Promise<void>,
   downloadCsvTemplate: () => Promise<void>,
-  loading: boolean
+  loading: boolean,
+  selectedStudents: Array<FinalGrade>
+  setSelectedStudents: (students: Array<FinalGrade>) => void
 }): JSX.Element {
 
   const [order, setOrder]: State<'asc' | 'desc'> = useState<'asc' | 'desc'> ('asc');
@@ -28,8 +30,6 @@ function CourseResultsTable(props: {
   const [rowsPerPage, setRowsPerPage]: State<number> = useState(25);
   const [search, setSearch]: State<string> = useState('');
   const [studentsToShow, setStudentsToShow]: State<Array<FinalGrade>> = useState(props.students);
-  const [selectedStudents, setSelectedStudents]: State<Array<FinalGrade>> =
-    useState<Array<FinalGrade>>([]);
   const [allSelected, setAllSelected]: State<boolean> = useState(false);
 
   useEffect(() => {
@@ -55,28 +55,28 @@ function CourseResultsTable(props: {
   }
 
   function handleSelectForGrading(studentNumber: string): void {
-    let found: Array<FinalGrade> = selectedStudents.filter((value: FinalGrade) => {
+    let found: Array<FinalGrade> = props.selectedStudents.filter((value: FinalGrade) => {
       return value.studentNumber === studentNumber;
     });
 
     // Add to list of selected students.
     if (found.length !== 0) {
-      setSelectedStudents(selectedStudents.filter((value: FinalGrade) => {
+      props.setSelectedStudents(props.selectedStudents.filter((value: FinalGrade) => {
         return value.studentNumber !== studentNumber;
       }));
     } else {
       found = studentsToShow.filter((value: FinalGrade) => {
         return value.studentNumber === studentNumber;
       });
-      setSelectedStudents([...selectedStudents, found[0]]);
+      props.setSelectedStudents([...props.selectedStudents, found[0]]);
     }
   }
 
   function handleSelectAll(): void {
     if (allSelected) {
-      setSelectedStudents([]);
+      props.setSelectedStudents([]);
     } else {
-      setSelectedStudents(studentsToShow);
+      props.setSelectedStudents(studentsToShow);
     }
     setAllSelected(!allSelected);
   }
@@ -93,7 +93,7 @@ function CourseResultsTable(props: {
           setSearch={setSearch}
           calculateFinalGrades={props.calculateFinalGrades}
           downloadCsvTemplate={props.downloadCsvTemplate}
-          selectedStudents={selectedStudents}
+          selectedStudents={props.selectedStudents}
         />
         {
           props.loading
@@ -163,7 +163,7 @@ function CourseResultsTable(props: {
                               <Checkbox
                                 size="small"
                                 onClick={(): void => handleSelectForGrading(student.studentNumber)}
-                                checked={selectedStudents.filter((value: FinalGrade) => {
+                                checked={props.selectedStudents.filter((value: FinalGrade) => {
                                   return value.studentNumber === student.studentNumber;
                                 }).length !== 0}
                               />
@@ -210,7 +210,9 @@ CourseResultsTable.propTypes = {
   students: PropTypes.array,
   calculateFinalGrades: PropTypes.func,
   downloadCsvTemplate: PropTypes.func,
-  loading: PropTypes.bool
+  loading: PropTypes.bool,
+  selectedStudents: PropTypes.array,
+  setSelectedStudents: PropTypes.func
 };
 
 export default CourseResultsTable;

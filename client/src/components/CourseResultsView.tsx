@@ -21,6 +21,8 @@ function CourseResultsView(): JSX.Element {
   const [loading, setLoading]: State<boolean> = useState(false);
   const [messageInfo, setMessageInfo]: State<Message | null> =
     useState<Message | null>(null);
+  const [selectedStudents, setSelectedStudents]: State<Array<FinalGrade>> =
+    useState<Array<FinalGrade>>([]);
 
   useEffect(() => {
     if (courseId && assessmentModelId) {
@@ -66,8 +68,12 @@ function CourseResultsView(): JSX.Element {
         severity: 'info'
       });
       await sleep(2000);
-      if (courseId && assessmentModelId) {
-        await gradeServices.calculateFinalGrades(courseId, assessmentModelId);
+      if (courseId && assessmentModelId && selectedStudents.length !== 0) {
+        await gradeServices.calculateFinalGrades(
+          courseId,
+          assessmentModelId,
+          selectedStudents.map((student: FinalGrade) => student.studentNumber)
+        );
 
         snackPackAdd({
           msg: 'Final grades calculated successfully.',
@@ -169,6 +175,8 @@ function CourseResultsView(): JSX.Element {
         loading={loading}
         calculateFinalGrades={calculateFinalGrades}
         downloadCsvTemplate={downloadCsvTemplate}
+        selectedStudents={selectedStudents}
+        setSelectedStudents={setSelectedStudents}
       />
     </Box>
   );

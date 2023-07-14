@@ -41,10 +41,11 @@ async function downloadCsvTemplate(
 }
 
 export async function calculateFinalGrades(
-  courseId: Numeric, assessmentModelId: Numeric
+  courseId: Numeric, assessmentModelId: Numeric, studentNumbers: Array<string>
 ): Promise<boolean> {
   const response: FullResponse<unknown> = await axios.post(
-    `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/calculate`
+    `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/calculate`,
+    { studentNumbers }
   );
   return response.data.success;
 }
