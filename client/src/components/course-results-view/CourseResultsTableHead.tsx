@@ -74,8 +74,8 @@ function CourseResultsTableHead(props: {
           align='left'
           padding='normal'
         >
-          Select For Grading
           <Checkbox
+            size="small"
             onClick={props.handleSelectAll}
             checked={props.allSelected}
           />

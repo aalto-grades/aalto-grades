@@ -4,8 +4,8 @@
 
 import { useState, useEffect } from 'react';
 import { Params, useParams } from 'react-router-dom';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import { Box, Typography } from '@mui/material';
+
 import CourseResultsTable from './course-results-view/CourseResultsTable';
 import AlertSnackbar from './alerts/AlertSnackbar';
 import gradeServices from '../services/grades';
@@ -96,7 +96,7 @@ function CourseResultsView(): JSX.Element {
     }
   }
 
-  async function updateGrades(newGrades: any): Promise<void> {
+  async function updateGrades(newGrades: Array<FinalGrade>): Promise<void> {
     snackPackAdd({
       msg: 'Importing grades...',
       severity: 'info'
@@ -161,7 +161,7 @@ function CourseResultsView(): JSX.Element {
         messageInfo={messageInfo} setMessageInfo={setMessageInfo}
         open={alertOpen} setOpen={setAlertOpen}
       />
-      <Typography variant="h1" sx={{ flexGrow: 1, mt: 8, mb: 4 }}>
+      <Typography variant="h1" sx={{ flexGrow: 1, my: 4 }}>
         Course Results
       </Typography>
       <CourseResultsTable

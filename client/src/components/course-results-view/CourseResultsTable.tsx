@@ -5,8 +5,7 @@
 import { useState, useEffect, ChangeEvent, MouseEvent, SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Box, Button, Checkbox, CircularProgress,Typography,
-  FormControlLabel, Paper, Switch, Table, TableBody,
+  Box, Checkbox, CircularProgress, Paper, Table, TableBody,
   TableCell, TableContainer, TablePagination, TableRow
 } from '@mui/material';
 
@@ -26,7 +25,6 @@ function CourseResultsTable(props: {
   const [order, setOrder]: State<'asc' | 'desc'> = useState<'asc' | 'desc'> ('asc');
   const [orderBy, setOrderBy]: State<string> = useState('studentNumber');
   const [page, setPage]: State<number> = useState(0);
-  const [dense, setDense]: State<boolean> = useState(true);
   const [rowsPerPage, setRowsPerPage]: State<number> = useState(25);
   const [search, setSearch]: State<string> = useState('');
   const [studentsToShow, setStudentsToShow]: State<Array<FinalGrade>> = useState(props.students);
@@ -54,10 +52,6 @@ function CourseResultsTable(props: {
   function handleChangeRowsPerPage(event: ChangeEvent<HTMLInputElement>): void {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  }
-
-  function handleChangeDense(event: ChangeEvent<HTMLInputElement>): void {
-    setDense(event.target.checked);
   }
 
   function handleSelectForGrading(studentNumber: string): void {
@@ -115,7 +109,7 @@ function CourseResultsTable(props: {
               <Table
                 sx={{ minWidth: 75, mx: 4 }}
                 aria-labelledby='courseResultsTable'
-                size={dense ? 'small' : 'medium'}
+                size='small'
               >
                 <CourseResultsTableHead
                   order={order}
@@ -129,7 +123,7 @@ function CourseResultsTable(props: {
                     sortingServices.stableSort(studentsToShow,
                       sortingServices.getComparator(order, orderBy))
                       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((student: FinalGrade) => {
+                      .map((student: any) => {
                         return (
                           <TableRow
                             hover
@@ -164,7 +158,7 @@ function CourseResultsTable(props: {
                             <TableCell
                               sx={{ width: '100px' }}
                               align="left"
-                              key={`${student.studentNumber}_grade_4`}
+                              key={`${student.studentNumber}_checkbox`}
                             >
                               <Checkbox
                                 size="small"
@@ -180,7 +174,7 @@ function CourseResultsTable(props: {
                   {emptyRows > 0 && (
                     <TableRow
                       style={{
-                        height: (dense ? 33 : 53) * emptyRows,
+                        height: 33 * emptyRows
                       }}
                     >
                       <TableCell colSpan={6} />
@@ -197,17 +191,6 @@ function CourseResultsTable(props: {
           justifyContent: 'space-between',
           py: '10px'
         }}>
-          <Box sx={{ display: 'flex', flexDirection: 'row', ml: 3.5 }}>
-            <Typography sx={{ mt: '11px' }}>
-              View valid grades from past instances:
-            </Typography>
-            <Button
-              sx={{ ml: 1, mt: '10px', height:'30px' }}
-              size='small'
-            >
-              View all grades
-            </Button>
-          </Box>
           <TablePagination
             rowsPerPageOptions={[25, 50, 100, 500]}
             component="div"
@@ -219,10 +202,6 @@ function CourseResultsTable(props: {
           />
         </Box>
       </Paper>
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} id='padding-switch'/>}
-        label="Dense padding"
-      />
     </Box>
   );
 }

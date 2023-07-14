@@ -101,7 +101,7 @@ function CourseResultsTableToolbar(props: {
               'Select at least one student number for exporting grades.' :
               hasPendingStudents() ?
                 'Grades with status "PENDING" cannot be exported, ' +
-                'deselect or calculate grades for these.' :
+                'unselect or calculate grades for these.' :
                 'Export final course grades as Sisu compatible CSV file.'
             }
             placement="top"
