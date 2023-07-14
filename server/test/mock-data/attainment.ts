@@ -13,9 +13,9 @@ export const mockAttainment: AttainmentData = {
   daysValid: 365,
   formula: Formula.WeightedAverage,
   formulaParams: {
-    weights: [
-      ['ex-1', 0.5],
-      ['ex-2', 0.5]
+    children: [
+      ['ex-1', { weight: 0.5 }],
+      ['ex-2', { weight: 0.5 }]
     ]
   },
   subAttainments: [
@@ -34,9 +34,9 @@ export const mockAttainment: AttainmentData = {
       daysValid: 365,
       formula: Formula.WeightedAverage,
       formulaParams: {
-        weights: [
-          ['ex-2.1', 0.5],
-          ['ex-2.2', 0.5]
+        children: [
+          ['ex-2.1', { weight: 0.5 }],
+          ['ex-2.2', { weight: 0.5 }]
         ]
       },
       subAttainments: [
@@ -47,9 +47,9 @@ export const mockAttainment: AttainmentData = {
           daysValid: 365,
           formula: Formula.WeightedAverage,
           formulaParams: {
-            weights: [
-              ['ex-2.1.1', 0.5],
-              ['ex-2.1.2', 0.5]
+            children: [
+              ['ex-2.1.1', { weight: 0.5 }],
+              ['ex-2.1.2', { weight: 0.5 }]
             ]
           },
           subAttainments: [
@@ -78,9 +78,9 @@ export const mockAttainment: AttainmentData = {
           daysValid: 365,
           formula: Formula.WeightedAverage,
           formulaParams: {
-            weights: [
-              ['ex-2.2.1', 0.5],
-              ['ex-2.2.2', 0.5]
+            children: [
+              ['ex-2.2.1', { weight: 0.5 }],
+              ['ex-2.2.2', { weight: 0.5 }]
             ]
           },
           subAttainments: [
@@ -99,9 +99,9 @@ export const mockAttainment: AttainmentData = {
               daysValid: 365,
               formula: Formula.WeightedAverage,
               formulaParams: {
-                weights: [
-                  ['ex-2.2.2.1', 0.5],
-                  ['ex-2.2.2.2', 0.5]
+                children: [
+                  ['ex-2.2.2.1', { weight: 0.5 }],
+                  ['ex-2.2.2.2', { weight: 0.5 }]
                 ]
               },
               subAttainments: [
@@ -120,9 +120,9 @@ export const mockAttainment: AttainmentData = {
                   daysValid: 365,
                   formula: Formula.WeightedAverage,
                   formulaParams: {
-                    weights: [
-                      ['ex-2.2.2.2.1', 0.5],
-                      ['ex-2.2.2.2.2', 0.5]
+                    children: [
+                      ['ex-2.2.2.2.1', { weight: 0.5 }],
+                      ['ex-2.2.2.2.2', { weight: 0.5 }]
                     ]
                   },
                   subAttainments: [

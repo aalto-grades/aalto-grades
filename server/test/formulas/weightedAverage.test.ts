@@ -11,7 +11,7 @@ describe('Test weighted average calculation', () => {
     getFormulaImplementation(Formula.WeightedAverage);
 
   it('should accept parameters of the appropriate form', async () => {
-    await implementation.paramSchema.validate({ weights: [['1', 8]] });
+    await implementation.paramSchema.validate({ children: [['1', { weight: 8 }]] });
   });
 
   it('should forbid parameters of invalid form', async () => {
@@ -40,10 +40,10 @@ describe('Test weighted average calculation', () => {
     const computedGrade: CalculationResult = implementation.formulaFunction(
       'current',
       {
-        weights: [
-          ['one', 0.3],
-          ['two', 0.7],
-          ['three', 1]
+        children: [
+          ['one', { weight: 0.3 }],
+          ['two', { weight: 0.7 }],
+          ['three', { weight: 1 }]
         ]
       },
       subGrades
@@ -63,10 +63,10 @@ describe('Test weighted average calculation', () => {
     const computedGrade: CalculationResult = implementation.formulaFunction(
       'current',
       {
-        weights: [
-          ['one', 0.3],
-          ['two', 0.7],
-          ['three', 1]
+        children: [
+          ['one', { weight: 0.3 }],
+          ['two', { weight: 0.7 }],
+          ['three', { weight: 1 }]
         ]
       },
       subGrades

@@ -9,7 +9,6 @@ import Button from '@mui/material/Button';
 import SimpleDialog from './SimpleDialog';
 import ConfirmationDialog from './ConfirmationDialog';
 import StringTextField from './StringTextField';
-import formulaServices from '../../services/formulas';
 import { State, TextFieldData } from '../../types';
 import { AttainmentData } from 'aalto-grades-common/types';
 
@@ -31,47 +30,13 @@ const daysValidData: TextFieldData = {
   fieldLabel: 'Days Valid'
 };
 
-/* String textfields for the formula attributes. These attributes affect the
-   parent attainment's grade. The textfield IDs are of format 'attribute0',
-   'attribute1' and so on. The numbers in the end are used to fill in the correct
-   values of the 'formulaAttribute' property of an attainment. This is considered
-   in the function of the nested component StringTextField.
-*/
-function AttributeTextFields({
-  formulaAttributeNames, indices, setAttainments, attainments
-}: any) {
-  return (
-    formulaAttributeNames.map((attribute: any) => {
-      const attributeLabel = formulaServices.getAttributeLabel(attribute);
-      return (
-        <StringTextField
-          key={attribute}
-          fieldData={{ fieldId: 'attribute_' + attribute, fieldLabel: attributeLabel }}
-          attainment={attainments}
-          setAttainmentTree={setAttainments}
-          attainmentTree={attainments}
-          value={''}
-        />
-      );
-    })
-  );
-}
-
-AttributeTextFields.propTypes = {
-  formulaAttributeNames: PropTypes.array,
-  indices: PropTypes.array,
-  attainments: PropTypes.array,
-  setAttainments: PropTypes.func,
-  removeAttainment: PropTypes.func
-};
 
 function LeafAttainment(props: {
   attainmentTree: AttainmentData,
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
   deleteAttainment: (attainment: AttainmentData) => void,
   getTemporaryId: () => number,
-  attainment: AttainmentData,
-  formulaAttributeNames: Array<string>
+  attainment: AttainmentData
 }): JSX.Element {
 
   // Functions and variables for opening and closing the dialog that asks for
@@ -135,18 +100,9 @@ function LeafAttainment(props: {
           attainmentTree={props.attainmentTree}
           setAttainmentTree={props.setAttainmentTree}
           attainment={props.attainment}
-          value={String(props.attainmentTree.daysValid)}
+          value={String(props.attainment.daysValid)}
           fieldData={daysValidData}
         />
-        {
-          props.formulaAttributeNames &&
-          <AttributeTextFields
-            formulaAttributeNames={props.formulaAttributeNames}
-            indices={[]}
-            setAttainments={() => console.error('Temporary')}
-            attainments={[]}
-          />
-        }
       </Box>
       <Box sx={{
         display: 'flex',
@@ -155,7 +111,7 @@ function LeafAttainment(props: {
         justifyContent: 'space-between'
       }}>
         {
-          props.attainment !== props.attainmentTree ?
+          (props.attainment !== props.attainmentTree) ?
             <Button size='small' sx={{ my: 1 }} onClick={handleConfDialogOpen}>
               Delete
             </Button>
@@ -199,8 +155,7 @@ LeafAttainment.propTypes = {
   setAttainmentTree: PropTypes.func,
   deleteAttainment: PropTypes.func,
   getTemporaryId: PropTypes.func,
-  attainment: PropTypes.object,
-  formulaAttributeNames: PropTypes.array
+  attainment: PropTypes.object
 };
 
 export default LeafAttainment;
