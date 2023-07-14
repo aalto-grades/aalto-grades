@@ -111,7 +111,7 @@ function LeafAttainment(props: {
         justifyContent: 'space-between'
       }}>
         {
-          props.attainment !== props.attainmentTree ?
+          (props.attainment !== props.attainmentTree) ?
             <Button size='small' sx={{ my: 1 }} onClick={handleConfDialogOpen}>
               Delete
             </Button>

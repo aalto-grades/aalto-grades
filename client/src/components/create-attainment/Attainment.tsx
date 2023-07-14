@@ -37,7 +37,7 @@ function Attainment(props: {
   return (
     <>
       {
-        (props.attainmentTree.subAttainments && props.attainmentTree.subAttainments.length > 0)
+        (props.attainment.subAttainments && props.attainment.subAttainments.length > 0)
           ?
           <ParentAttainment
             attainmentTree={props.attainmentTree}
