@@ -126,6 +126,337 @@ describe(
 );
 
 describe(
+  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv/sisu' +
+  ' - export Sisu compatible grading in CSV',
+  () => {
+    jest
+      .spyOn(global.Date, 'now')
+      .mockImplementation((): number => {
+        return new Date('2023-06-21').valueOf();
+      });
+
+    it('should export CSV succesfully when course results are found (admin user)', async () => {
+      res = await request
+        .get(
+          '/v1/courses/6/assessment-models/24/grades/csv/sisu'
+          + `?studentNumbers=${JSON.stringify(studentNumbers)}`
+        )
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+
+      expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+117486,1,5,21.6.2023,en,
+114732,5,5,21.6.2023,en,
+472886,3,5,21.6.2023,en,
+335462,1,5,21.6.2023,en,
+874623,2,5,21.6.2023,en,
+345752,1,5,21.6.2023,en,
+353418,4,5,21.6.2023,en,
+986957,0,5,21.6.2023,en,
+611238,4,5,21.6.2023,en,
+691296,1,5,21.6.2023,en,
+271778,0,5,21.6.2023,en,
+344644,1,5,21.6.2023,en,
+954954,5,5,21.6.2023,en,
+`);
+      expect(res.headers['content-disposition']).toBe(
+        'attachment; filename="final_grades_course_MS-A0102_' +
+        `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
+      );
+    });
+
+    it(
+      'should export CSV succesfully when course results are found (teacher in charge)',
+      async () => {
+        jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
+
+        res = await request
+          .get('/v1/courses/6/assessment-models/24/grades/csv/sisu' +
+          `?studentNumbers=${JSON.stringify(studentNumbers)}`)
+          .set('Cookie', cookies.userCookie)
+          .set('Accept', 'text/csv')
+          .expect(HttpCode.Ok);
+
+        expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+117486,1,5,21.6.2023,en,
+114732,5,5,21.6.2023,en,
+472886,3,5,21.6.2023,en,
+335462,1,5,21.6.2023,en,
+874623,2,5,21.6.2023,en,
+345752,1,5,21.6.2023,en,
+353418,4,5,21.6.2023,en,
+986957,0,5,21.6.2023,en,
+611238,4,5,21.6.2023,en,
+691296,1,5,21.6.2023,en,
+271778,0,5,21.6.2023,en,
+344644,1,5,21.6.2023,en,
+954954,5,5,21.6.2023,en,
+`);
+        expect(res.headers['content-disposition']).toBe(
+          'attachment; filename="final_grades_course_MS-A0102_' +
+        `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
+        );
+      });
+
+    it('should export CSV succesfully with custom assessmentDate and completionLanguage',
+      async () => {
+        res = await request
+          .get(
+            '/v1/courses/6/assessment-models/24/grades/csv/sisu'
+            + '?assessmentDate=2023-05-12&completionLanguage=sv'
+            + `&studentNumbers=${JSON.stringify(studentNumbers)}`
+          )
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'text/csv')
+          .expect(HttpCode.Ok);
+
+        expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+117486,1,5,12.5.2023,sv,
+114732,5,5,12.5.2023,sv,
+472886,3,5,12.5.2023,sv,
+335462,1,5,12.5.2023,sv,
+874623,2,5,12.5.2023,sv,
+345752,1,5,12.5.2023,sv,
+353418,4,5,12.5.2023,sv,
+986957,0,5,12.5.2023,sv,
+611238,4,5,12.5.2023,sv,
+691296,1,5,12.5.2023,sv,
+271778,0,5,12.5.2023,sv,
+344644,1,5,12.5.2023,sv,
+954954,5,5,12.5.2023,sv,
+`);
+        expect(res.headers['content-disposition']).toBe(
+          'attachment; filename="final_grades_course_MS-A0102_' +
+        `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
+        );
+      });
+
+    it(
+      'should respond with 400 bad request, if (optional) completionLanguage param is not valid',
+      async () => {
+        res = await request
+          .get('/v1/courses/1/assessment-models/1/grades/csv/sisu?completionLanguage=xy')
+          .set('Cookie', cookies.adminCookie);
+
+        checkErrorRes([
+          'completionLanguage must be one of the following values:' +
+          ' fi, sv, en, es, ja, zh, pt, fr, de, ru'
+        ], HttpCode.BadRequest);
+      });
+
+    it(
+      'should respond with 400 bad request, if (optional) assessmentDate param is not valid date',
+      async () => {
+        res = await request
+          .get('/v1/courses/1/assessment-models/1/grades/csv/sisu?assessmentDate=notValidDate')
+          .set('Cookie', cookies.adminCookie);
+
+        checkErrorRes([
+          'assessmentDate must be a `date` type, but the final value was:' +
+          ' `Invalid Date` (cast from the value `"notValidDate"`).'
+        ], HttpCode.BadRequest);
+      });
+
+    it('should respond with 401 unauthorized, if not logged in', async () => {
+      await request.get('/v1/courses/1/assessment-models/1/grades/csv/sisu')
+        .expect(HttpCode.Unauthorized);
+    });
+
+    it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
+      res = await request
+        .get('/v1/courses/1/assessment-models/1/grades/csv/sisu')
+        .set('Cookie', cookies.userCookie)
+        .expect(HttpCode.Forbidden);
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+    });
+
+    it('should respond with 404 not found, if grades have not been calculated yet', async () => {
+      res = await request
+        .get('/v1/courses/2/assessment-models/2/grades/csv/sisu')
+        .set('Cookie', cookies.adminCookie);
+
+      checkErrorRes(
+        [
+          'no grades found, make sure grades have been' +
+        ' calculated before requesting course results'
+        ],
+        HttpCode.NotFound);
+    });
+
+    it('should respond with 404 not found, if course does not exist', async () => {
+      res = await request
+        .get(`/v1/courses/${badId}/assessment-models/1/grades/csv/sisu`)
+        .set('Cookie', cookies.adminCookie);
+
+      checkErrorRes([`course with ID ${badId} not found`], HttpCode.NotFound);
+    });
+
+    it('should respond with 404 not found, if assessment model does not exist', async () => {
+      res = await request
+        .get(`/v1/courses/1/assessment-models/${badId}/grades/csv/sisu`)
+        .set('Cookie', cookies.adminCookie);
+
+      checkErrorRes([`assessment model with ID ${badId} not found`], HttpCode.NotFound);
+    });
+
+    it('should respond with 409 conflict, if instance does not belong to the course', async () => {
+      res = await request
+        .get('/v1/courses/1/assessment-models/2/grades/csv/sisu')
+        .set('Cookie', cookies.adminCookie);
+
+      checkErrorRes(
+        ['assessment model with ID 2 does not belong to the course with ID 1'],
+        HttpCode.Conflict
+      );
+    });
+
+  });
+
+describe(
+  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades'
+  + ' - get final grades in JSON', () => {
+
+    it('should get final grades succesfully when course results are found', async () => {
+      res = await request
+        .get(
+          '/v1/courses/6/assessment-models/24/grades'
+          + `?studentNumbers=${JSON.stringify(studentNumbers)}`
+        )
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+
+      checkSuccessRes(res);
+      expect(res.body.data.finalGrades).toEqual([
+        { studentNumber: '117486', grade: '1', credits: 5 },
+        { studentNumber: '114732', grade: '5', credits: 5 },
+        { studentNumber: '472886', grade: '3', credits: 5 },
+        { studentNumber: '335462', grade: '1', credits: 5 },
+        { studentNumber: '874623', grade: '2', credits: 5 },
+        { studentNumber: '345752', grade: '1', credits: 5 },
+        { studentNumber: '353418', grade: '4', credits: 5 },
+        { studentNumber: '986957', grade: '0', credits: 5 },
+        { studentNumber: '611238', grade: '4', credits: 5 },
+        { studentNumber: '691296', grade: '1', credits: 5 },
+        { studentNumber: '271778', grade: '0', credits: 5 },
+        { studentNumber: '344644', grade: '1', credits: 5 },
+        { studentNumber: '954954', grade: '5', credits: 5 }
+      ]);
+    });
+
+    it(
+      'should get final grades succesfully when course results are found (teacher in charge)',
+      async () => {
+        jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
+
+        res = await request
+          .get('/v1/courses/6/assessment-models/24/grades' +
+          `?studentNumbers=${JSON.stringify(studentNumbers)}`)
+          .set('Cookie', cookies.userCookie)
+          .set('Accept', 'application/json');
+
+        checkSuccessRes(res);
+        expect(res.body.data.finalGrades).toEqual([
+          { studentNumber: '117486', grade: '1', credits: 5 },
+          { studentNumber: '114732', grade: '5', credits: 5 },
+          { studentNumber: '472886', grade: '3', credits: 5 },
+          { studentNumber: '335462', grade: '1', credits: 5 },
+          { studentNumber: '874623', grade: '2', credits: 5 },
+          { studentNumber: '345752', grade: '1', credits: 5 },
+          { studentNumber: '353418', grade: '4', credits: 5 },
+          { studentNumber: '986957', grade: '0', credits: 5 },
+          { studentNumber: '611238', grade: '4', credits: 5 },
+          { studentNumber: '691296', grade: '1', credits: 5 },
+          { studentNumber: '271778', grade: '0', credits: 5 },
+          { studentNumber: '344644', grade: '1', credits: 5 },
+          { studentNumber: '954954', grade: '5', credits: 5 }
+        ]);
+      });
+
+    it(
+      'should respond with 400 bad request, if course or instance ID not is valid', async () => {
+        res = await request
+          .get(`/v1/courses/${badInput}/assessment-models/1/grades`)
+          .set('Cookie', cookies.adminCookie);
+
+        checkErrorRes([
+          'id must be a `number` type, but the final value was:' +
+          ' `NaN` (cast from the value `"notValid"`).'], HttpCode.BadRequest);
+
+        res = await request
+          .get(`/v1/courses/1/assessment-models/${badInput}/grades`)
+          .set('Cookie', cookies.adminCookie);
+
+        checkErrorRes([
+          'id must be a `number` type, but the final value was:' +
+            ' `NaN` (cast from the value `"notValid"`).'], HttpCode.BadRequest);
+      });
+
+    it('should respond with 401 unauthorized, if not logged in', async () => {
+      await request.get('/v1/courses/1/assessment-models/1/grades')
+        .expect(HttpCode.Unauthorized);
+    });
+
+    it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
+      res = await request
+        .get('/v1/courses/6/assessment-models/24/grades')
+        .set('Cookie', cookies.userCookie)
+        .expect(HttpCode.Forbidden);
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+    });
+
+    it('should respond with 404 not found, if grades have not been calculated yet', async () => {
+      res = await request
+        .get('/v1/courses/2/assessment-models/2/grades')
+        .set('Cookie', cookies.adminCookie)
+        .expect(HttpCode.NotFound);
+
+      checkErrorRes(
+        [
+          'no grades found, make sure grades have been' +
+          ' calculated before requesting course results'
+        ],
+        HttpCode.NotFound);
+    });
+
+    it('should respond with 404 not found, if course does not exist', async () => {
+      res = await request
+        .get(`/v1/courses/${badId}/assessment-models/1/grades`)
+        .set('Cookie', cookies.adminCookie);
+
+      checkErrorRes([`course with ID ${badId} not found`], HttpCode.NotFound);
+    });
+
+    it('should respond with 404 not found, if assessment model does not exist', async () => {
+      res = await request
+        .get(`/v1/courses/1/assessment-models/${badId}/grades`)
+        .set('Cookie', cookies.adminCookie);
+
+      checkErrorRes([`assessment model with ID ${badId} not found`], HttpCode.NotFound);
+    });
+
+    it('should respond with 409 conflict, if instance does not belong to the course', async () => {
+      res = await request
+        .get('/v1/courses/1/assessment-models/2/grades')
+        .set('Cookie', cookies.adminCookie);
+
+      checkErrorRes(
+        ['assessment model with ID 2 does not belong to the course with ID 1'],
+        HttpCode.Conflict
+      );
+    });
+
+  }
+);
+
+describe(
   'Test POST /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv'
   + ' - import grading data from CSV',
   () => {
@@ -642,336 +973,5 @@ describe(
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
     });
-  }
-);
-
-describe(
-  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv/sisu' +
-  ' - export Sisu compatible grading in CSV',
-  () => {
-    jest
-      .spyOn(global.Date, 'now')
-      .mockImplementation((): number => {
-        return new Date('2023-06-21').valueOf();
-      });
-
-    it('should export CSV succesfully when course results are found (admin user)', async () => {
-      res = await request
-        .get(
-          '/v1/courses/6/assessment-models/24/grades/csv/sisu'
-          + `?studentNumbers=${JSON.stringify(studentNumbers)}`
-        )
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'text/csv')
-        .expect(HttpCode.Ok);
-
-      expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-117486,1,5,21.6.2023,en,
-114732,5,5,21.6.2023,en,
-472886,3,5,21.6.2023,en,
-335462,1,5,21.6.2023,en,
-874623,2,5,21.6.2023,en,
-345752,1,5,21.6.2023,en,
-353418,4,5,21.6.2023,en,
-986957,0,5,21.6.2023,en,
-611238,4,5,21.6.2023,en,
-691296,1,5,21.6.2023,en,
-271778,0,5,21.6.2023,en,
-344644,1,5,21.6.2023,en,
-954954,5,5,21.6.2023,en,
-`);
-      expect(res.headers['content-disposition']).toBe(
-        'attachment; filename="final_grades_course_MS-A0102_' +
-        `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
-      );
-    });
-
-    it(
-      'should export CSV succesfully when course results are found (teacher in charge)',
-      async () => {
-        jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
-
-        res = await request
-          .get('/v1/courses/6/assessment-models/24/grades/csv/sisu' +
-          `?studentNumbers=${JSON.stringify(studentNumbers)}`)
-          .set('Cookie', cookies.userCookie)
-          .set('Accept', 'text/csv')
-          .expect(HttpCode.Ok);
-
-        expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-117486,1,5,21.6.2023,en,
-114732,5,5,21.6.2023,en,
-472886,3,5,21.6.2023,en,
-335462,1,5,21.6.2023,en,
-874623,2,5,21.6.2023,en,
-345752,1,5,21.6.2023,en,
-353418,4,5,21.6.2023,en,
-986957,0,5,21.6.2023,en,
-611238,4,5,21.6.2023,en,
-691296,1,5,21.6.2023,en,
-271778,0,5,21.6.2023,en,
-344644,1,5,21.6.2023,en,
-954954,5,5,21.6.2023,en,
-`);
-        expect(res.headers['content-disposition']).toBe(
-          'attachment; filename="final_grades_course_MS-A0102_' +
-        `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
-        );
-      });
-
-    it('should export CSV succesfully with custom assessmentDate and completionLanguage',
-      async () => {
-        res = await request
-          .get(
-            '/v1/courses/6/assessment-models/24/grades/csv/sisu'
-            + '?assessmentDate=2023-05-12&completionLanguage=sv'
-            + `&studentNumbers=${JSON.stringify(studentNumbers)}`
-          )
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'text/csv')
-          .expect(HttpCode.Ok);
-
-        expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-117486,1,5,12.5.2023,sv,
-114732,5,5,12.5.2023,sv,
-472886,3,5,12.5.2023,sv,
-335462,1,5,12.5.2023,sv,
-874623,2,5,12.5.2023,sv,
-345752,1,5,12.5.2023,sv,
-353418,4,5,12.5.2023,sv,
-986957,0,5,12.5.2023,sv,
-611238,4,5,12.5.2023,sv,
-691296,1,5,12.5.2023,sv,
-271778,0,5,12.5.2023,sv,
-344644,1,5,12.5.2023,sv,
-954954,5,5,12.5.2023,sv,
-`);
-        expect(res.headers['content-disposition']).toBe(
-          'attachment; filename="final_grades_course_MS-A0102_' +
-        `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
-        );
-      });
-
-    it(
-      'should respond with 400 bad request, if (optional) completionLanguage param is not valid',
-      async () => {
-        res = await request
-          .get('/v1/courses/1/assessment-models/1/grades/csv/sisu?completionLanguage=xy')
-          .set('Cookie', cookies.adminCookie);
-
-        checkErrorRes([
-          'completionLanguage must be one of the following values:' +
-          ' fi, sv, en, es, ja, zh, pt, fr, de, ru'
-        ], HttpCode.BadRequest);
-      });
-
-    it(
-      'should respond with 400 bad request, if (optional) assessmentDate param is not valid date',
-      async () => {
-        res = await request
-          .get('/v1/courses/1/assessment-models/1/grades/csv/sisu?assessmentDate=notValidDate')
-          .set('Cookie', cookies.adminCookie);
-
-        checkErrorRes([
-          'assessmentDate must be a `date` type, but the final value was:' +
-          ' `Invalid Date` (cast from the value `"notValidDate"`).'
-        ], HttpCode.BadRequest);
-      });
-
-    it('should respond with 401 unauthorized, if not logged in', async () => {
-      await request.get('/v1/courses/1/assessment-models/1/grades/csv/sisu')
-        .expect(HttpCode.Unauthorized);
-    });
-
-    it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
-      res = await request
-        .get('/v1/courses/1/assessment-models/1/grades/csv/sisu')
-        .set('Cookie', cookies.userCookie)
-        .expect(HttpCode.Forbidden);
-
-      expect(res.body.success).toBe(false);
-      expect(res.body.data).not.toBeDefined();
-      expect(res.body.errors).toBeDefined();
-    });
-
-    it('should respond with 404 not found, if grades have not been calculated yet', async () => {
-      res = await request
-        .get('/v1/courses/2/assessment-models/2/grades/csv/sisu')
-        .set('Cookie', cookies.adminCookie);
-
-      checkErrorRes(
-        [
-          'no grades found, make sure grades have been' +
-        ' calculated before requesting course results'
-        ],
-        HttpCode.NotFound);
-    });
-
-    it('should respond with 404 not found, if course does not exist', async () => {
-      res = await request
-        .get(`/v1/courses/${badId}/assessment-models/1/grades/csv/sisu`)
-        .set('Cookie', cookies.adminCookie);
-
-      checkErrorRes([`course with ID ${badId} not found`], HttpCode.NotFound);
-    });
-
-    it('should respond with 404 not found, if assessment model does not exist', async () => {
-      res = await request
-        .get(`/v1/courses/1/assessment-models/${badId}/grades/csv/sisu`)
-        .set('Cookie', cookies.adminCookie);
-
-      checkErrorRes([`assessment model with ID ${badId} not found`], HttpCode.NotFound);
-    });
-
-    it('should respond with 409 conflict, if instance does not belong to the course', async () => {
-      res = await request
-        .get('/v1/courses/1/assessment-models/2/grades/csv/sisu')
-        .set('Cookie', cookies.adminCookie);
-
-      checkErrorRes(
-        ['assessment model with ID 2 does not belong to the course with ID 1'],
-        HttpCode.Conflict
-      );
-    });
-
-  });
-
-describe(
-  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades'
-  + ' - get final grades in JSON', () => {
-
-    it('should get final grades succesfully when course results are found', async () => {
-      res = await request
-        .get(
-          '/v1/courses/6/assessment-models/24/grades'
-          + `?studentNumbers=${JSON.stringify(studentNumbers)}`
-        )
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
-
-      checkSuccessRes(res);
-      expect(res.body.data.finalGrades).toEqual([
-        { studentNumber: '117486', grade: '1', credits: 5 },
-        { studentNumber: '114732', grade: '5', credits: 5 },
-        { studentNumber: '472886', grade: '3', credits: 5 },
-        { studentNumber: '335462', grade: '1', credits: 5 },
-        { studentNumber: '874623', grade: '2', credits: 5 },
-        { studentNumber: '345752', grade: '1', credits: 5 },
-        { studentNumber: '353418', grade: '4', credits: 5 },
-        { studentNumber: '986957', grade: '0', credits: 5 },
-        { studentNumber: '611238', grade: '4', credits: 5 },
-        { studentNumber: '691296', grade: '1', credits: 5 },
-        { studentNumber: '271778', grade: '0', credits: 5 },
-        { studentNumber: '344644', grade: '1', credits: 5 },
-        { studentNumber: '954954', grade: '5', credits: 5 }
-      ]);
-    });
-
-    it(
-      'should get final grades succesfully when course results are found (teacher in charge)',
-      async () => {
-        jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
-
-        res = await request
-          .get('/v1/courses/6/assessment-models/24/grades' +
-          `?studentNumbers=${JSON.stringify(studentNumbers)}`)
-          .set('Cookie', cookies.userCookie)
-          .set('Accept', 'application/json');
-
-        checkSuccessRes(res);
-        expect(res.body.data.finalGrades).toEqual([
-          { studentNumber: '117486', grade: '1', credits: 5 },
-          { studentNumber: '114732', grade: '5', credits: 5 },
-          { studentNumber: '472886', grade: '3', credits: 5 },
-          { studentNumber: '335462', grade: '1', credits: 5 },
-          { studentNumber: '874623', grade: '2', credits: 5 },
-          { studentNumber: '345752', grade: '1', credits: 5 },
-          { studentNumber: '353418', grade: '4', credits: 5 },
-          { studentNumber: '986957', grade: '0', credits: 5 },
-          { studentNumber: '611238', grade: '4', credits: 5 },
-          { studentNumber: '691296', grade: '1', credits: 5 },
-          { studentNumber: '271778', grade: '0', credits: 5 },
-          { studentNumber: '344644', grade: '1', credits: 5 },
-          { studentNumber: '954954', grade: '5', credits: 5 }
-        ]);
-      });
-
-    it(
-      'should respond with 400 bad request, if course or instance ID not is valid', async () => {
-        res = await request
-          .get(`/v1/courses/${badInput}/assessment-models/1/grades`)
-          .set('Cookie', cookies.adminCookie);
-
-        checkErrorRes([
-          'id must be a `number` type, but the final value was:' +
-          ' `NaN` (cast from the value `"notValid"`).'], HttpCode.BadRequest);
-
-        res = await request
-          .get(`/v1/courses/1/assessment-models/${badInput}/grades`)
-          .set('Cookie', cookies.adminCookie);
-
-        checkErrorRes([
-          'id must be a `number` type, but the final value was:' +
-            ' `NaN` (cast from the value `"notValid"`).'], HttpCode.BadRequest);
-      });
-
-    it('should respond with 401 unauthorized, if not logged in', async () => {
-      await request.get('/v1/courses/1/assessment-models/1/grades')
-        .expect(HttpCode.Unauthorized);
-    });
-
-    it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
-      res = await request
-        .get('/v1/courses/6/assessment-models/24/grades')
-        .set('Cookie', cookies.userCookie)
-        .expect(HttpCode.Forbidden);
-
-      expect(res.body.success).toBe(false);
-      expect(res.body.data).not.toBeDefined();
-      expect(res.body.errors).toBeDefined();
-    });
-
-    it('should respond with 404 not found, if grades have not been calculated yet', async () => {
-      res = await request
-        .get('/v1/courses/2/assessment-models/2/grades')
-        .set('Cookie', cookies.adminCookie)
-        .expect(HttpCode.NotFound);
-
-      checkErrorRes(
-        [
-          'no grades found, make sure grades have been' +
-          ' calculated before requesting course results'
-        ],
-        HttpCode.NotFound);
-    });
-
-    it('should respond with 404 not found, if course does not exist', async () => {
-      res = await request
-        .get(`/v1/courses/${badId}/assessment-models/1/grades`)
-        .set('Cookie', cookies.adminCookie);
-
-      checkErrorRes([`course with ID ${badId} not found`], HttpCode.NotFound);
-    });
-
-    it('should respond with 404 not found, if assessment model does not exist', async () => {
-      res = await request
-        .get(`/v1/courses/1/assessment-models/${badId}/grades`)
-        .set('Cookie', cookies.adminCookie);
-
-      checkErrorRes([`assessment model with ID ${badId} not found`], HttpCode.NotFound);
-    });
-
-    it('should respond with 409 conflict, if instance does not belong to the course', async () => {
-      res = await request
-        .get('/v1/courses/1/assessment-models/2/grades')
-        .set('Cookie', cookies.adminCookie);
-
-      checkErrorRes(
-        ['assessment model with ID 2 does not belong to the course with ID 1'],
-        HttpCode.Conflict
-      );
-    });
-
   }
 );

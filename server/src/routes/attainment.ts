@@ -83,213 +83,6 @@ export const router: Router = Router();
 
 /**
  * @swagger
- * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/attainments:
- *   post:
- *     tags: [Attainment]
- *     description: >
- *       Add a new study attainment and its possible
- *       subattainment(s) to an existing assessment model.
- *       Available only to admin users and teachers in charge of the course.
- *     parameters:
- *       - $ref: '#/components/parameters/courseId'
- *       - $ref: '#/components/parameters/assessmentModelId'
- *     requestBody:
- *       description: New study attainment data.
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/definitions/AddAndEditAttainment'
- *     responses:
- *       200:
- *         description: New study attainment added succesfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
- *                 data:
- *                   type: object
- *                   properties:
- *                     attainment:
- *                       $ref: '#/definitions/Attainment'
- *       400:
- *         description: Creation failed, due to validation errors or missing parameters.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *       401:
- *         $ref: '#/components/responses/AuthenticationError'
- *       403:
- *         $ref: '#/components/responses/AuthorizationError'
- *       404:
- *         description: Course or assessment model does not exist.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *       409:
- *         description: >
- *           Assessment model does not belong to the course or
- *           parent study attainment does not belong to the assessment model.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *       422:
- *         description: Parent study attainment does not exist.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *     security:
- *       - cookieAuth: []
- */
-router.post(
-  '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments',
-  passport.authenticate('jwt', { session: false }),
-  express.json(),
-  handleInvalidRequestJson,
-  controllerDispatcher(addAttainment)
-);
-
-/**
- * @swagger
- * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/attainments/{attainmentId}:
- *   delete:
- *     tags: [Attainment]
- *     description: >
- *       Delete a study attainment and all of its subattainments.
- *       Available only to admin users and teachers in charge of the course.
- *     parameters:
- *       - $ref: '#/components/parameters/courseId'
- *       - $ref: '#/components/parameters/assessmentModelId'
- *       - $ref: '#/components/parameters/attainmentId'
- *     responses:
- *       200:
- *         description: >
- *           Study attainment and its possible subattainments were successfully
- *           deleted.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
- *                 data:
- *                   description: Empty data object.
- *                   type: object
- *       400:
- *         description: >
- *           A validation error occurred in the URL. Either the course ID,
- *           assessment model ID, or attainment ID is not a positive integer.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *       401:
- *         $ref: '#/components/responses/AuthenticationError'
- *       403:
- *         $ref: '#/components/responses/AuthorizationError'
- *       404:
- *         description: >
- *           The given course, assessment model, or study attainment does not exist.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *       409:
- *         description: >
- *           The given assessment model does not belong to the given course.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *     security:
- *       - cookieAuth: []
- */
-router.delete(
-  '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
-  passport.authenticate('jwt', { session: false }),
-  controllerDispatcher(deleteAttainment)
-);
-
-/**
- * @swagger
- * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/attainments/{attainmentId}:
- *   put:
- *     tags: [Attainment]
- *     description: >
- *       Update existing study attainment.
- *       Available only to admin users and teachers in charge of the course.
- *     parameters:
- *       - $ref: '#/components/parameters/courseId'
- *       - $ref: '#/components/parameters/assessmentModelId'
- *       - $ref: '#/components/parameters/attainmentId'
- *     requestBody:
- *       description: Study attainment data to be updated.
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/definitions/AddAndEditAttainment'
- *     responses:
- *       200:
- *         description: Study attainment updated succesfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
- *                 data:
- *                   $ref: '#/definitions/Attainment'
- *       400:
- *         description: Creation failed, due to validation errors or missing parameters.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *       401:
- *         $ref: '#/components/responses/AuthenticationError'
- *       403:
- *         $ref: '#/components/responses/AuthorizationError'
- *       404:
- *         description: The given study attainment or the parent attainment does not exist.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *       409:
- *         description: >
- *           Parent study attainment does not belong to the assessment model or
- *           attainment tries to refer to itself as the parent.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *       422:
- *         description: Parent study attainment does not exist.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/definitions/Failure'
- *     security:
- *       - cookieAuth: []
- */
-router.put(
-  '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
-  passport.authenticate('jwt', { session: false }),
-  express.json(),
-  handleInvalidRequestJson,
-  controllerDispatcher(updateAttainment)
-);
-
-/**
- * @swagger
  * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/attainments/{attainmentId}:
  *  get:
  *     tags: [Attainment]
@@ -383,4 +176,211 @@ router.get(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments',
   passport.authenticate('jwt', { session: false }),
   controllerDispatcher(getRootAttainment)
+);
+
+/**
+ * @swagger
+ * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/attainments:
+ *   post:
+ *     tags: [Attainment]
+ *     description: >
+ *       Add a new study attainment and its possible
+ *       subattainment(s) to an existing assessment model.
+ *       Available only to admin users and teachers in charge of the course.
+ *     parameters:
+ *       - $ref: '#/components/parameters/courseId'
+ *       - $ref: '#/components/parameters/assessmentModelId'
+ *     requestBody:
+ *       description: New study attainment data.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/definitions/AddAndEditAttainment'
+ *     responses:
+ *       200:
+ *         description: New study attainment added succesfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   $ref: '#/definitions/Success'
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     attainment:
+ *                       $ref: '#/definitions/Attainment'
+ *       400:
+ *         description: Creation failed, due to validation errors or missing parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
+ *       403:
+ *         $ref: '#/components/responses/AuthorizationError'
+ *       404:
+ *         description: Course or assessment model does not exist.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: >
+ *           Assessment model does not belong to the course or
+ *           parent study attainment does not belong to the assessment model.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       422:
+ *         description: Parent study attainment does not exist.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *     security:
+ *       - cookieAuth: []
+ */
+router.post(
+  '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments',
+  passport.authenticate('jwt', { session: false }),
+  express.json(),
+  handleInvalidRequestJson,
+  controllerDispatcher(addAttainment)
+);
+
+/**
+ * @swagger
+ * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/attainments/{attainmentId}:
+ *   put:
+ *     tags: [Attainment]
+ *     description: >
+ *       Update existing study attainment.
+ *       Available only to admin users and teachers in charge of the course.
+ *     parameters:
+ *       - $ref: '#/components/parameters/courseId'
+ *       - $ref: '#/components/parameters/assessmentModelId'
+ *       - $ref: '#/components/parameters/attainmentId'
+ *     requestBody:
+ *       description: Study attainment data to be updated.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/definitions/AddAndEditAttainment'
+ *     responses:
+ *       200:
+ *         description: Study attainment updated succesfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   $ref: '#/definitions/Success'
+ *                 data:
+ *                   $ref: '#/definitions/Attainment'
+ *       400:
+ *         description: Creation failed, due to validation errors or missing parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
+ *       403:
+ *         $ref: '#/components/responses/AuthorizationError'
+ *       404:
+ *         description: The given study attainment or the parent attainment does not exist.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: >
+ *           Parent study attainment does not belong to the assessment model or
+ *           attainment tries to refer to itself as the parent.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       422:
+ *         description: Parent study attainment does not exist.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *     security:
+ *       - cookieAuth: []
+ */
+router.put(
+  '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
+  passport.authenticate('jwt', { session: false }),
+  express.json(),
+  handleInvalidRequestJson,
+  controllerDispatcher(updateAttainment)
+);
+
+/**
+ * @swagger
+ * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/attainments/{attainmentId}:
+ *   delete:
+ *     tags: [Attainment]
+ *     description: >
+ *       Delete a study attainment and all of its subattainments.
+ *       Available only to admin users and teachers in charge of the course.
+ *     parameters:
+ *       - $ref: '#/components/parameters/courseId'
+ *       - $ref: '#/components/parameters/assessmentModelId'
+ *       - $ref: '#/components/parameters/attainmentId'
+ *     responses:
+ *       200:
+ *         description: >
+ *           Study attainment and its possible subattainments were successfully
+ *           deleted.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   $ref: '#/definitions/Success'
+ *                 data:
+ *                   description: Empty data object.
+ *                   type: object
+ *       400:
+ *         description: >
+ *           A validation error occurred in the URL. Either the course ID,
+ *           assessment model ID, or attainment ID is not a positive integer.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
+ *       403:
+ *         $ref: '#/components/responses/AuthorizationError'
+ *       404:
+ *         description: >
+ *           The given course, assessment model, or study attainment does not exist.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: >
+ *           The given assessment model does not belong to the given course.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *     security:
+ *       - cookieAuth: []
+ */
+router.delete(
+  '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
+  passport.authenticate('jwt', { session: false }),
+  controllerDispatcher(deleteAttainment)
 );
