@@ -5,7 +5,10 @@
 import { SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
 import { visuallyHidden } from '@mui/utils';
-import { Box, Checkbox, TableCell, TableHead, TableRow, TableSortLabel } from '@mui/material';
+import {
+  Box, Checkbox, FormControlLabel, TableCell,
+  TableHead, TableRow, TableSortLabel
+} from '@mui/material';
 
 interface Colum {
   id: string,
@@ -74,10 +77,17 @@ function CourseResultsTableHead(props: {
           align='left'
           padding='normal'
         >
-          <Checkbox
-            size="small"
-            onClick={props.handleSelectAll}
-            checked={props.allSelected}
+          <FormControlLabel
+            htmlFor="select-all"
+            label="Select all"
+            control={
+              <Checkbox
+                id="select-all"
+                size="small"
+                onClick={props.handleSelectAll}
+                checked={props.allSelected}
+              />
+            }
           />
         </TableCell>
       </TableRow>
