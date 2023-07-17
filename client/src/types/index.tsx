@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Dispatch, SetStateAction } from 'react';
-import { AxiosResponse } from 'axios';
 import { SystemRole } from 'aalto-grades-common/types';
+import { AxiosResponse } from 'axios';
+import { Dispatch, SetStateAction } from 'react';
 
 export interface ApiResponse<T> {
   success: boolean,

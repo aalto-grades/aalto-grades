@@ -2,10 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { AttainmentData } from 'aalto-grades-common/types';
 import PropTypes from 'prop-types';
+
 import LeafAttainment from './LeafAttainment';
 import ParentAttainment from './ParentAttainment';
-import { AttainmentData } from 'aalto-grades-common/types';
 
 // Parent component for the components LeafAttainment and ParentAttainment
 

@@ -2,15 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-import PropTypes from 'prop-types';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import Button from '@mui/material/Button';
 import { AttainmentData } from 'aalto-grades-common/types';
-import Box from '@mui/material/Box';
+import {
+  Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
+} from '@mui/material';
+import PropTypes from 'prop-types';
 
 // A Dialog component for confirming deletion
 

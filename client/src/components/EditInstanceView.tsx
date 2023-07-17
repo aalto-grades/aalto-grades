@@ -2,18 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState, useEffect } from 'react';
-import { NavigateFunction, useNavigate, Params, useParams } from 'react-router-dom';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import LinearProgress from '@mui/material/LinearProgress';
-import EditInstanceForm from './edit-instance-view/EditInstanceForm';
-import AlertSnackbar from './alerts/AlertSnackbar';
-import courseServices from '../services/courses';
-import instanceServices from '../services/instances';
 import {
   CourseData, CourseInstanceData, GradingScale, Period
 } from 'aalto-grades-common/types';
+import { Container, LinearProgress, Typography } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { NavigateFunction, useNavigate, Params, useParams } from 'react-router-dom';
+
+import EditInstanceForm from './edit-instance-view/EditInstanceForm';
+import AlertSnackbar from './alerts/AlertSnackbar';
+
+import courseServices from '../services/courses';
+import instanceServices from '../services/instances';
 import { Message, State } from '../types';
 
 function EditInstanceView(): JSX.Element {

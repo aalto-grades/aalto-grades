@@ -2,15 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { CourseData, SystemRole } from 'aalto-grades-common/types';
+import { Box, Button, Typography } from '@mui/material';
 import { JSX, useState, useEffect } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+
 import CourseTable from './front-page/CourseTable';
-import courseServices from '../services/courses';
+
 import useAuth, { AuthContextType } from '../hooks/useAuth';
-import { CourseData, SystemRole } from 'aalto-grades-common/types';
+import courseServices from '../services/courses';
 import { State } from '../types';
 
 function FrontPage(): JSX.Element {

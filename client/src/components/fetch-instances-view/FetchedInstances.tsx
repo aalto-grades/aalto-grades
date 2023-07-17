@@ -2,14 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { NavigateFunction, useNavigate } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import { styled } from '@mui/material/styles';
-import LightLabelBoldValue from '../typography/LightLabelBoldValue';
-import textFormatServices from '../../services/textFormat';
-import sortingServices from '../../services/sorting';
 import { CourseInstanceData } from 'aalto-grades-common/types';
+import { Box } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import PropTypes from 'prop-types';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
+
+import sortingServices from '../../services/sorting';
+import textFormatServices from '../../services/textFormat';
+import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 
 const HoverBox = styled(Box)(({ theme }) => ({
   '&:hover': {

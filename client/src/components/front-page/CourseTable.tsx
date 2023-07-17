@@ -2,17 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { NavigateFunction, useNavigate } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import Link from '@mui/material/Link';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import Typography from '@mui/material/Typography';
 import { CourseData } from 'aalto-grades-common/types';
+import {
+  Link, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Typography
+} from '@mui/material';
+import PropTypes from 'prop-types';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
+
 import { HeadCellData } from '../../types';
 
 const headCells: Array<HeadCellData> = [

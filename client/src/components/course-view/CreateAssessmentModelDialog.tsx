@@ -2,20 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {
+  Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle, Stack, TextField
+} from '@mui/material';
+import PropTypes from 'prop-types';
 import { ChangeEvent, SyntheticEvent, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
+
 import assessmentModelServices from '../../services/assessmentModels';
 import attainmentServices from '../../services/attainments';
 import { State } from '../../types';
-import Stack from '@mui/material/Stack';
-import CircularProgress from '@mui/material/CircularProgress';
 
 function CreateAssessmentModelDialog(props: {
   handleClose: () => void,

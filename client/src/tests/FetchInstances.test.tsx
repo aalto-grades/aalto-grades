@@ -4,10 +4,12 @@
 
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, RenderResult, screen, waitFor, cleanup } from '@testing-library/react';
+import { cleanup, render, RenderResult, screen, waitFor } from '@testing-library/react';
+
 import FetchInstancesView from '../components/FetchInstancesView';
-import instanceServices from '../services/instances';
+
 import mockSisuInstances from './mock-data/mockSisuInstances';
+import instanceServices from '../services/instances';
 
 afterEach(cleanup);
 

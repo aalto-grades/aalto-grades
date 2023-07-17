@@ -2,8 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import axios from './axios';
 import { Formula, FormulaData } from 'aalto-grades-common/types';
+
+import axios from './axios';
 import { FullResponse } from '../types';
 
 async function getFormulas(): Promise<Array<FormulaData>> {

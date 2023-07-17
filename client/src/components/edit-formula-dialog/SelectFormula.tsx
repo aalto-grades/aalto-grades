@@ -2,19 +2,20 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { FormulaData } from 'aalto-grades-common/types';
 import {
   CircularProgress, FormControl, FormHelperText, InputLabel, MenuItem, Select, SelectChangeEvent
 } from '@mui/material';
+import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react';
 
-import StyledBox from './StyledBox';
-import ViewFormulaAccordion from './ViewFormulaAccordion';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
+import ViewFormulaAccordion from './ViewFormulaAccordion';
+
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import formulaServices from '../../services/formulas';
-import { FormulaData } from 'aalto-grades-common/types';
+import StyledBox from './StyledBox';
 import { State } from '../../types';
 
 function SelectFormula(props: {

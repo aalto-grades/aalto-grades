@@ -3,8 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import { Grid, Typography } from '@mui/material';
-import LoginForm from './LoginForm';
+
 import ExternalAuth from './ExternalAuth';
+import LoginForm from './LoginForm';
 
 function Login(): JSX.Element {
   return (

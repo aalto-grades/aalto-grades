@@ -2,13 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { SystemRole } from 'aalto-grades-common/types';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import SignupForm from '../components/auth/SignupForm';
 import Signup from '../components/auth/Signup';
-import { SystemRole } from 'aalto-grades-common/types';
 
 describe('Tests for Login component', () => {
 

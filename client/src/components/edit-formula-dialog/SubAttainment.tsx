@@ -2,14 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ChangeEvent } from 'react';
+import { AttainmentData } from 'aalto-grades-common/types';
+import { Box, TextField, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
+import { ChangeEvent } from 'react';
 
 import formulaServices from '../../services/formulas';
-import { AttainmentData } from 'aalto-grades-common/types';
 
 function SubAttainment(props: {
   attainment: AttainmentData,

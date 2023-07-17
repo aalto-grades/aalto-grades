@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { Box, Button, Collapse, IconButton, List, Typography } from '@mui/material';
-import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import { Box, Button, Collapse, IconButton, List, Typography } from '@mui/material';
+import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
 
 import Attainment from './Attainment';
 import EditFormulaDialog from '../edit-formula-dialog/EditFormulaDialog';

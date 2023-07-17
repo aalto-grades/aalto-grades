@@ -2,19 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {
+  Box, Button, Dialog, DialogActions, DialogContent,
+  DialogContentText, DialogTitle, MenuItem, TextField
+} from '@mui/material';
+import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
 import { Params, useParams } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import Dialog from '@mui/material/Dialog';
-import TextField from '@mui/material/TextField';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import MenuItem from '@mui/material/MenuItem';
+
 import AlertSnackbar from '../alerts/AlertSnackbar';
+
 import gradeServices from '../../services/grades';
 import { Message, State } from '../../types';
 

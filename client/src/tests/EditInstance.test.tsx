@@ -4,12 +4,14 @@
 
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, RenderResult, screen, waitFor, cleanup } from '@testing-library/react';
+import { cleanup, render, RenderResult, screen, waitFor } from '@testing-library/react';
+
 import EditInstanceView from '../components/EditInstanceView';
-import courseServices from '../services/courses';
-import instanceServices from '../services/instances';
+
 import mockCourses from './mock-data/mockCourses';
 import mockSisuInstances from './mock-data/mockSisuInstances';
+import courseServices from '../services/courses';
+import instanceServices from '../services/instances';
 
 jest.mock('../services/courses');
 jest.mock('../services/instances');

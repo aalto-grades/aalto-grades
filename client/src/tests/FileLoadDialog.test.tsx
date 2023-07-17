@@ -2,27 +2,29 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { LoginResult, SystemRole } from 'aalto-grades-common/types';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import {
-  act, render, RenderResult, waitFor, cleanup, fireEvent, screen
+  act, cleanup, fireEvent, render, RenderResult, screen, waitFor
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import CourseView from '../components/CourseView';
+
 import assessmentModelServices from '../services/assessmentModels';
 import attainmentServices from '../services/attainments';
 import courseServices from '../services/courses';
 import formulaServices from '../services/formulas';
-import instanceServices from '../services/instances';
 import gradeServices from '../services/grades';
+import instanceServices from '../services/instances';
 import AuthContext from '../context/AuthProvider';
+import { maxErrorsToShow } from '../components/course-view/FileLoadDialog';
 import mockAssessmentModels from './mock-data/mockAssessmentModels';
 import mockAttainments from './mock-data/mockAttainments';
 import mockCourses from './mock-data/mockCourses';
 import mockFormulas from './mock-data/mockFormulas';
 import mockInstances from './mock-data/mockInstancesWithStringDates';
-import { maxErrorsToShow } from '../components/course-view/FileLoadDialog';
-import { LoginResult, SystemRole } from 'aalto-grades-common/types';
 
 const file: File = new File(['idk'], 'grades_test.csv', { type: 'csv' });
 

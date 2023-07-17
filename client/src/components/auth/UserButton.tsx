@@ -2,20 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { SyntheticEvent, useState } from 'react';
-import { NavigateFunction, useNavigate } from 'react-router-dom';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import PersonIcon from '@mui/icons-material/Person';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { Button, Box, Menu, MenuItem } from '@mui/material';
+import { SyntheticEvent, useState } from 'react';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
+
 import useAuth, { AuthContextType } from '../../hooks/useAuth';
 import useLogout from '../../hooks/useLogout';
 import { State } from '../../types';
 
 function UserButton(): JSX.Element {
-  const logout = useLogout();
+  const logout: () => Promise<void> = useLogout();
   const navigate: NavigateFunction = useNavigate();
   const { auth }: AuthContextType = useAuth();
   const [anchorEl, setAnchorEl]: State<Element | null> = useState<Element | null>(null);

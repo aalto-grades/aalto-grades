@@ -2,23 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState, useEffect, ChangeEvent, MouseEvent, SyntheticEvent } from 'react';
+import {
+  Box, Button, CircularProgress, FormControlLabel, Paper,
+  Switch, Table, TableBody, TableCell, TableContainer,
+  TablePagination , TableRow, Typography
+} from '@mui/material';
+import { ChangeEvent, MouseEvent, SyntheticEvent, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import CircularProgress from '@mui/material/CircularProgress';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
-import CourseResultsTableToolbar from './CourseResultTableToolbar';
+
 import CourseResultsTableHead from './CourseResultsTableHead';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+import CourseResultsTableToolbar from './CourseResultTableToolbar';
+
 import sortingServices from '../../services/sorting';
 import { State } from '../../types';
 

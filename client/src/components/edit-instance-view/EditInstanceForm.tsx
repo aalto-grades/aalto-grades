@@ -2,16 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import { Button, Box, TextField, MenuItem } from '@mui/material';
-import { Form, Formik } from 'formik';
-import * as yup from 'yup';
-import textFormatServices from '../../services/textFormat';
 import { CourseInstanceData, GradingScale, Period } from 'aalto-grades-common/types';
-import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
-import { State } from '../../types';
+import { Form, Formik } from 'formik';
+import { Button, Box, MenuItem, TextField } from '@mui/material';
+import PropTypes from 'prop-types';
 import { useState } from 'react';
+import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
+import * as yup from 'yup';
+
+import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
+import textFormatServices from '../../services/textFormat';
+import { State } from '../../types';
 
 function EditInstanceForm(props: {
   instance: CourseInstanceData,

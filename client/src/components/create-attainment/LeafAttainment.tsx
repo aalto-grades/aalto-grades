@@ -2,15 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState } from 'react';
-import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import SimpleDialog from './SimpleDialog';
-import ConfirmationDialog from './ConfirmationDialog';
-import StringTextField from './StringTextField';
-import { State, TextFieldData } from '../../types';
 import { AttainmentData } from 'aalto-grades-common/types';
+import { Box, Button } from '@mui/material';
+import PropTypes from 'prop-types';
+import { useState } from 'react';
+
+import ConfirmationDialog from './ConfirmationDialog';
+import SimpleDialog from './SimpleDialog';
+import StringTextField from './StringTextField';
+
+import { State, TextFieldData } from '../../types';
 
 // An Assignmnet component without subAttainments and hence without a formula as well.
 // If this isn't the root Attainment, this can be deleted

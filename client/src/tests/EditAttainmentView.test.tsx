@@ -2,16 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { AttainmentData } from 'aalto-grades-common/types';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { act, render, RenderResult, screen, waitFor, cleanup } from '@testing-library/react';
+import { act, cleanup, render, RenderResult, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import EditAttainmentView from '../components/EditAttainmentView';
+
+import mockAttainments from './mock-data/mockAttainments';
+import mockFormulas from './mock-data/mockFormulas';
 import attainmentServices from '../services/attainments';
 import formulaServices from '../services/formulas';
-import mockAttainments from './mock-data/mockAttainments';
-import { AttainmentData } from 'aalto-grades-common/types';
-import mockFormulas from './mock-data/mockFormulas';
 
 const courseId: number = 1;
 const assessmentModelId: number = 1;

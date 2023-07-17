@@ -2,16 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { AttainmentData } from 'aalto-grades-common/types';
+import { Box, Button, Container, Typography } from '@mui/material';
 import { JSX, SyntheticEvent, useEffect, useState }  from 'react';
 import { NavigateFunction, Params, useParams, useNavigate } from 'react-router-dom';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
+
 import Attainment from './create-attainment/Attainment';
 import ConfirmationDialog from './create-attainment/ConfirmationDialog';
+
 import attainmentServices from '../services/attainments';
-import { AttainmentData } from 'aalto-grades-common/types';
 import { State } from '../types';
 
 function EditAttainmentView(): JSX.Element {

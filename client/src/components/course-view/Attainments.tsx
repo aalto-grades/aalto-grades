@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { AssessmentModelData, AttainmentData } from 'aalto-grades-common/types';
+import { Box, Button, Typography } from '@mui/material';
+import PropTypes from 'prop-types';
 import { useState, JSX } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import { Box, Button, Typography } from '@mui/material';
-import { AssessmentModelData, AttainmentData } from 'aalto-grades-common/types';
 
 import AttainmentCategory from '../attainments/AttainmentCategory';
 import EditFormulaDialog from '../edit-formula-dialog/EditFormulaDialog';

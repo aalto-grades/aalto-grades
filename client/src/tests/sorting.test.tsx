@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import '@testing-library/jest-dom/extend-expect';
+
 import sortingServices from '../services/sorting';
 
 describe('Tests for sorting functions', () => {

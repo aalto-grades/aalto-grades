@@ -2,16 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { Box, Typography } from '@mui/material';
+import { Variant } from '@mui/material/styles/createTypography';
 import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 
 function LightLabelBoldValue(props: {
   label: string,
   value: string | number,
   small?: boolean
 }): JSX.Element {
-  const textSize = props.small ? 'body2' : 'body1';
+  const textSize: Variant = props.small ? 'body2' : 'body1';
 
   return (
     <Box sx={{

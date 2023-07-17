@@ -2,21 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {
+  Box, Button, Dialog, DialogActions, DialogContent,
+  DialogContentText, DialogTitle, FormHelperText, Typography
+} from '@mui/material';
+import PropTypes from 'prop-types';
 import { useState, useEffect, createRef } from 'react';
 import { Params, useParams } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import FormHelperText from '@mui/material/FormHelperText';
+
 import AlertSnackbar from '../alerts/AlertSnackbar';
-import gradeServices from '../../services/grades';
 import FileErrorDialog from './FileErrorDialog';
+
+import gradeServices from '../../services/grades';
 import { Message, State } from '../../types';
 
 // A Dialog component for uploading a file

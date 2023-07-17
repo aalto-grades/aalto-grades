@@ -2,23 +2,24 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState } from 'react';
-import PropTypes from 'prop-types';
+import { CourseData } from 'aalto-grades-common/types';
 import { Form, Formik } from 'formik';
-import * as yup from 'yup';
-import {
-  Box, TextField, Container, Button,
-  Avatar, IconButton, List, ListItem,
-  ListItemAvatar, ListItemText, CircularProgress
-} from '@mui/material';
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonIcon from '@mui/icons-material/Person';
 import SendIcon from '@mui/icons-material/Send';
-import { State } from '../../types';
-import { CourseData } from 'aalto-grades-common/types';
+import {
+  Avatar, Box, Button, CircularProgress, Container, IconButton,
+  List, ListItem, ListItemAvatar, ListItemText, TextField
+} from '@mui/material';
+import PropTypes from 'prop-types';
+import { useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import * as yup from 'yup';
+
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
+
+import { State } from '../../types';
 
 function CreateCourseForm(props: {
   addCourse: (course: CourseData) => Promise<void>

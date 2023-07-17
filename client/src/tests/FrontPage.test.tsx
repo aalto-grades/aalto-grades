@@ -2,14 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { LoginResult, SystemRole } from 'aalto-grades-common/types';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
-import { render, RenderResult, screen, waitFor, cleanup } from '@testing-library/react';
+import { cleanup, render, RenderResult, screen, waitFor } from '@testing-library/react';
+
 import FrontPage from '../components/FrontPage';
-import courseServices from '../services/courses';
+
 import AuthContext from '../context/AuthProvider';
 import mockCourses from './mock-data/mockCourses';
-import { LoginResult, SystemRole } from 'aalto-grades-common/types';
+import courseServices from '../services/courses';
 
 jest.mock('../services/courses');
 afterEach(cleanup);

@@ -2,13 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState } from 'react';
-import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { LoginResult } from 'aalto-grades-common/types';
 import { Box, Button, TextField, Typography } from '@mui/material';
-import { State } from '../../types';
+import React, { useState } from 'react';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
+
 import useAuth from '../../hooks/useAuth';
 import userServices from '../../services/user';
+import { State } from '../../types';
 
 function LoginForm(): JSX.Element {
 

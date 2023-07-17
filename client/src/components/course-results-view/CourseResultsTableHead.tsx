@@ -2,14 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { SyntheticEvent } from 'react';
-import PropTypes from 'prop-types';
-import TableHead from '@mui/material/TableHead';
-import TableSortLabel from '@mui/material/TableSortLabel';
+import { Box, TableCell, TableHead, TableRow, TableSortLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
-import TableCell from '@mui/material/TableCell';
-import TableRow from '@mui/material/TableRow';
-import Box from '@mui/material/Box';
+import PropTypes from 'prop-types';
+import { SyntheticEvent } from 'react';
 
 function CourseResultsTableHead(props: {
   order: 'asc' | 'desc',

@@ -2,22 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { JSX, useEffect, useState } from 'react';
+import { CourseInstanceData } from 'aalto-grades-common/types';
+import {
+  Box, CircularProgress, Table, TableBody, TableCell,
+  TableHead, TableRow, TableSortLabel, Typography
+} from '@mui/material';
 import PropTypes from 'prop-types';
-import Table from '@mui/material/Table';
-import TableCell from '@mui/material/TableCell';
-import TableBody from '@mui/material/TableBody';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import Typography from '@mui/material/Typography';
+import { JSX, useEffect, useState } from 'react';
+
+import instanceServices from '../../services/instances';
 import sortingServices from '../../services/sorting';
 import textFormatServices from '../../services/textFormat';
-import { CourseInstanceData } from 'aalto-grades-common/types';
-import Box from '@mui/material/Box';
-import CircularProgress from '@mui/material/CircularProgress';
 import { HeadCellData, State } from '../../types';
-import instanceServices from '../../services/instances';
 
 const headCells: Array<HeadCellData> = [
   {

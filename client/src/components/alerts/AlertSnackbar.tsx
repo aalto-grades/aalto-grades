@@ -2,14 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { SyntheticEvent } from 'react';
-import PropTypes from 'prop-types';
-import Snackbar from '@mui/material/Snackbar';
-import Slide from '@mui/material/Slide';
-import MuiAlert from '@mui/material/Alert';
+import { Alert as MuiAlert, Slide, Snackbar, Theme, Typography } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import PropTypes from 'prop-types';
+import React, { SyntheticEvent } from 'react';
+
 import { Message } from '../../types';
-import { Theme, Typography } from '@mui/material';
 
 const darkTheme: Theme = createTheme({
   palette: {

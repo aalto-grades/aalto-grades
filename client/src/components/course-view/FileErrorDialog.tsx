@@ -2,12 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import PropTypes from 'prop-types';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
+import { Button, Dialog, DialogActions, DialogContent } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
+import PropTypes from 'prop-types';
 
 const gridColumns = [{
   field: 'error',

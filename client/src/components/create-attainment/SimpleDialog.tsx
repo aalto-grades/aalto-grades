@@ -2,17 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ChangeEvent, SyntheticEvent, useState } from 'react';
-import PropTypes from 'prop-types';
-import DialogTitle from '@mui/material/DialogTitle';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import { State, TextFieldData } from '../../types';
 import { AttainmentData } from 'aalto-grades-common/types';
-import Box from '@mui/material/Box';
+import {
+  Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField
+} from '@mui/material';
+import PropTypes from 'prop-types';
+import { ChangeEvent, SyntheticEvent, useState } from 'react';
+
+import { State, TextFieldData } from '../../types';
 
 // A Dialog component for asking the number of sub-attainments
 

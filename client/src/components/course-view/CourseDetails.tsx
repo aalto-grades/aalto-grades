@@ -2,16 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { AssessmentModelData, CourseData, SystemRole, UserData } from 'aalto-grades-common/types';
+import EditIcon from '@mui/icons-material/Edit';
+import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+
 import AssessmentModelsList from './AssessmentModelsList';
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';
-import { AssessmentModelData, CourseData, SystemRole, UserData } from 'aalto-grades-common/types';
-import IconButton from '@mui/material/IconButton';
-import EditIcon from '@mui/icons-material/Edit';
+
 import useAuth, { AuthContextType } from '../../hooks/useAuth';
-import Tooltip from '@mui/material/Tooltip';
 
 function CourseDetails(props: {
   course: CourseData,

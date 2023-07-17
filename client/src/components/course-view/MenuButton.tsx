@@ -2,13 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState, SyntheticEvent } from 'react';
-import PropTypes from 'prop-types';
-import { styled } from '@mui/material/styles';
-import Button from '@mui/material/Button';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { Button, Menu, MenuItem } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import PropTypes from 'prop-types';
+import { useState, SyntheticEvent } from 'react';
+
 import { State } from '../../types';
 
 // A styled menu button. When clicked, a dropdown menu appears

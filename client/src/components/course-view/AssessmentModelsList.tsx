@@ -2,11 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { JSX } from 'react';
-import PropTypes from 'prop-types';
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
 import { AssessmentModelData } from 'aalto-grades-common/types';
+import { List, ListItemButton } from '@mui/material';
+import PropTypes from 'prop-types';
+import { JSX } from 'react';
 
 function AssessmentModelsList(props: {
   data: Array<AssessmentModelData>,

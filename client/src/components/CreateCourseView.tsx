@@ -2,14 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { CourseData } from 'aalto-grades-common/types';
+import { Typography } from '@mui/material';
+import { useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import Typography from '@mui/material/Typography';
+
+import AlertSnackbar from './alerts/AlertSnackbar';
 import CreateCourseForm from './create-course-view/CreateCourseForm';
+
 import courseServices from '../services/courses';
 import { Message, State } from '../types';
-import AlertSnackbar from './alerts/AlertSnackbar';
-import { useState } from 'react';
-import { CourseData } from 'aalto-grades-common/types';
 
 function CreateCourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();

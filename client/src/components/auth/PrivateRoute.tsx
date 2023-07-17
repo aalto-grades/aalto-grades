@@ -5,13 +5,13 @@
 // Used to determine if a user is authenticated and if they are allowed to access a page
 // if not, the user is redirected to the login page
 
-import { Navigate } from 'react-router-dom';
-import { Outlet } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import userServices from '../../services/user';
-import useAuth, { AuthContextType } from '../../hooks/useAuth';
-import { useState, useEffect } from 'react';
 import { SystemRole } from 'aalto-grades-common/types';
+import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react';
+import { Navigate, Outlet } from 'react-router-dom';
+
+import useAuth, { AuthContextType } from '../../hooks/useAuth';
+import userServices from '../../services/user';
 import { State } from '../../types';
 
 function PrivateRoute(props: {

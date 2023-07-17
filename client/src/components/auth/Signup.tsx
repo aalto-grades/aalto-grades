@@ -2,14 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { useTheme, Theme } from '@mui/material/styles';
 import { useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import { useTheme, Theme } from '@mui/material/styles';
+
 import SignupForm from './SignupForm';
-import userServices from '../../services/user';
+
 import useAuth, { AuthContextType } from '../../hooks/useAuth';
-import { State } from '../../types';
-import { SignupCredentials } from '../../types';
+import userServices from '../../services/user';
+import { SignupCredentials, State } from '../../types';
 
 function Signup(): JSX.Element {
 

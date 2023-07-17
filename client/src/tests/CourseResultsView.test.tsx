@@ -6,6 +6,7 @@ import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { act, render, RenderResult, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import CourseResultsView from '../components/CourseResultsView';
 
 describe('Tests for CourseResultsView components', () => {

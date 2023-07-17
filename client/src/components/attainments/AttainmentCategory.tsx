@@ -2,12 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { JSX } from 'react';
-import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import CustomAccordion from './CustomAccordion';
 import { AttainmentData } from 'aalto-grades-common/types';
+import { Box, Typography } from '@mui/material';
+import PropTypes from 'prop-types';
+import { JSX } from 'react';
+
+import CustomAccordion from './CustomAccordion';
 
 // This component renders a top attainment (only has the root attainment as its parent)
 function AttainmentCategory(props: {

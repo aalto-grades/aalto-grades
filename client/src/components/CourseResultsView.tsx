@@ -2,15 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { Box, Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { Params, useParams } from 'react-router-dom';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import CourseResultsTable from './course-results-view/CourseResultsTable';
+
 import AlertSnackbar from './alerts/AlertSnackbar';
+import CourseResultsTable from './course-results-view/CourseResultsTable';
+
 import gradeServices from '../services/grades';
-import { sleep } from '../utils';
 import { Message, State } from '../types';
+import { sleep } from '../utils';
 
 function CourseResultsView(): JSX.Element {
   const { courseId, instanceId }: Params = useParams();

@@ -2,25 +2,25 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { JSX, useState, useEffect } from 'react';
-import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
-import { Box, Button, CircularProgress, Grow, Typography } from '@mui/material';
 import {
   AssessmentModelData, AttainmentData, CourseData, Formula, FormulaData,
   SystemRole, UserData
 } from 'aalto-grades-common/types';
+import { Box, Button, CircularProgress, Grow, Typography } from '@mui/material';
+import { JSX, useState, useEffect } from 'react';
+import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
 
-import FileLoadDialog from './course-view/FileLoadDialog';
-import CourseDetails from './course-view/CourseDetails';
 import Attainments from './course-view/Attainments';
 import CreateAssessmentModelDialog from './course-view/CreateAssessmentModelDialog';
+import CourseDetails from './course-view/CourseDetails';
+import FileLoadDialog from './course-view/FileLoadDialog';
 import InstancesTable from './course-view/InstancesTable';
 
-import assessmentModelServices from '../services/assessmentModels';
-import attainmentServices from '../services/attainments';
+import useAuth, { AuthContextType } from '../hooks/useAuth';
 import courseServices from '../services/courses';
 import formulaServices from '../services/formulas';
-import useAuth, { AuthContextType } from '../hooks/useAuth';
+import assessmentModelServices from '../services/assessmentModels';
+import attainmentServices from '../services/attainments';
 import { State } from '../types';
 
 function CourseView(): JSX.Element {

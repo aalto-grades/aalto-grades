@@ -2,10 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import axios from './axios';
 import { LoginResult } from 'aalto-grades-common/types';
-import { LoginCredentials, SignupCredentials } from '../types';
-import { FullResponse } from '../types';
+
+import axios from './axios';
+import { FullResponse, LoginCredentials, SignupCredentials } from '../types';
 
 async function login(credentials: LoginCredentials): Promise<LoginResult> {
 
