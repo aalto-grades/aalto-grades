@@ -11,7 +11,7 @@ import userEvent from '@testing-library/user-event';
 import LoginForm from '../components/auth/LoginForm';
 import Login from '../components/auth/Login';
 
-import userServices from '../services/user';
+import * as userServices from '../services/user';
 import { LoginCredentials } from '../types';
 
 describe('Tests for Login and LoginForm components', () => {
