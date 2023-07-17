@@ -12,8 +12,8 @@ import EditAttainmentView from '../components/EditAttainmentView';
 
 import { mockAttainments } from './mock-data/mockAttainments';
 import { mockFormulas } from './mock-data/mockFormulas';
-import attainmentServices from '../services/attainments';
-import formulaServices from '../services/formulas';
+import { addAttainment, editAttainment, getAttainment } from '../services/attainments';
+import * as formulaServices from '../services/formulas';
 
 const courseId: number = 1;
 const assessmentModelId: number = 1;
@@ -35,17 +35,17 @@ function getMockAttainment(): AttainmentData {
 }
 
 jest.mock('../services/attainments');
-attainmentServices.editAttainment = jest.fn();
-attainmentServices.addAttainment = jest.fn();
-attainmentServices.deleteAttainment = jest.fn();
+//editAttainment = jest.fn();
+//addAttainment = jest.fn();
+//deleteAttainment = jest.fn();
 afterEach(cleanup);
 
 describe('Tests for EditAttainmentView components', () => {
 
   function renderEditAttainmentView(): RenderResult {
     jest.spyOn(formulaServices, 'getFormulaDetails').mockResolvedValue(mockFormulas[0]);
-    (attainmentServices.getAttainment as jest.Mock).mockRejectedValue('Network error');
-    (attainmentServices.getAttainment as jest.Mock).mockResolvedValue(getMockAttainment());
+    (getAttainment as jest.Mock).mockRejectedValue('Network error');
+    (getAttainment as jest.Mock).mockResolvedValue(getMockAttainment());
 
     return render(
       <MemoryRouter initialEntries={
@@ -98,9 +98,9 @@ describe('Tests for EditAttainmentView components', () => {
     const confirmButton: HTMLElement = screen.getByText('Confirm');
     act(() => userEvent.click(confirmButton));
 
-    expect(attainmentServices.editAttainment)
+    expect(editAttainment)
       .toHaveBeenCalledWith(String(courseId), String(assessmentModelId), mockAttainment);
-    expect(attainmentServices.addAttainment)
+    expect(addAttainment)
       .not.toHaveBeenCalledWith(String(courseId), String(assessmentModelId), mockAttainment);
 
   });
@@ -153,9 +153,9 @@ describe('Tests for EditAttainmentView components', () => {
       // Edit the original attainment and add one sub attainment to it
       act(() => userEvent.click(confirmButtons[0]));
 
-      expect(attainmentServices.editAttainment)
+      expect(editAttainment)
         .toHaveBeenCalledWith(String(courseId), String(assessmentModelId), mockAttainment);
-      expect(attainmentServices.addAttainment)
+      expect(addAttainment)
         .toHaveBeenCalledWith(String(courseId), String(assessmentModelId), newAttainment);
 
     }
