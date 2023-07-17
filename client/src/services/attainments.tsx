@@ -7,7 +7,7 @@ import { AttainmentData } from 'aalto-grades-common/types';
 import axios from './axios';
 import { FullResponse, Numeric } from '../types';
 
-async function addAttainment(
+export async function addAttainment(
   courseId: Numeric,
   assessmentModelId: Numeric,
   attainment: AttainmentData
@@ -22,7 +22,7 @@ async function addAttainment(
   return response.data.data.attainment;
 }
 
-async function editAttainment(
+export async function editAttainment(
   courseId: Numeric,
   assessmentModelId: Numeric,
   attainment: AttainmentData
@@ -38,7 +38,7 @@ async function editAttainment(
   return response.data.data.attainment;
 }
 
-async function deleteAttainment(
+export async function deleteAttainment(
   courseId: Numeric,
   assessmentModelId: Numeric,
   attainmentId: Numeric
@@ -50,7 +50,7 @@ async function deleteAttainment(
   );
 }
 
-async function getAttainment(
+export async function getAttainment(
   courseId: Numeric,
   assessmentModelId: Numeric,
   attainmentId: Numeric,
@@ -68,7 +68,7 @@ async function getAttainment(
   return response.data.data.attainment;
 }
 
-async function getAllAttainments(
+export async function getAllAttainments(
   courseId: Numeric,
   assessmentModelId: Numeric,
   tree?: 'children' | 'descendants'
@@ -83,11 +83,3 @@ async function getAllAttainments(
 
   return response.data.data.attainment;
 }
-
-export default {
-  addAttainment,
-  editAttainment,
-  deleteAttainment,
-  getAttainment,
-  getAllAttainments
-};

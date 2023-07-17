@@ -38,7 +38,3 @@ export async function addAssessmentModel(
 
   return response.data.data.assessmentModel.id;
 }
-
-export default {
-  getAllAssessmentModels, getAssessmentModel, addAssessmentModel
-};

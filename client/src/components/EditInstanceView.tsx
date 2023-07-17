@@ -12,8 +12,8 @@ import { NavigateFunction, useNavigate, Params, useParams } from 'react-router-d
 import EditInstanceForm from './edit-instance-view/EditInstanceForm';
 import AlertSnackbar from './alerts/AlertSnackbar';
 
-import courseServices from '../services/courses';
-import instanceServices from '../services/instances';
+import { getCourse } from '../services/courses';
+import { createInstance, getSisuInstance } from '../services/instances';
 import { Message, State } from '../types';
 
 export default function EditInstanceView(): JSX.Element {
@@ -31,13 +31,13 @@ export default function EditInstanceView(): JSX.Element {
 
   useEffect(() => {
     if (sisuInstanceId) {
-      instanceServices.getSisuInstance(sisuInstanceId)
+      getSisuInstance(sisuInstanceId)
         .then((courseInstance: CourseInstanceData) => {
           setInstance(courseInstance);
         })
         .catch((e: Error) => console.log(e.message));
     } else if (courseId) {
-      courseServices.getCourse(courseId)
+      getCourse(courseId)
         .then((course: CourseData) => {
           const newInstance: CourseInstanceData = {
             courseData: course,
@@ -58,7 +58,7 @@ export default function EditInstanceView(): JSX.Element {
   async function addInstance(instance: CourseInstanceData): Promise<void> {
     try {
       if (courseId) {
-        await instanceServices.createInstance(courseId, instance);
+        await createInstance(courseId, instance);
         navigate(`/course-view/${courseId}`, { replace: true });
       }
     } catch (error: any) {

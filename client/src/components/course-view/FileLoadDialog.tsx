@@ -13,7 +13,7 @@ import { Params, useParams } from 'react-router-dom';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import FileErrorDialog from './FileErrorDialog';
 
-import gradeServices from '../../services/grades';
+import { importCsv } from '../../services/grades';
 import { Message, State } from '../../types';
 
 const instructions: string =
@@ -39,7 +39,7 @@ export default function FileLoadDialog(props: {
   open: boolean
 }): JSX.Element {
   const { courseId }: Params = useParams();
-  const fileInput = createRef<any>();
+  const fileInput: React.RefObject<any> = createRef<any>();
 
   // state variables handling the alert messages
   const [snackPack, setSnackPack]: State<Array<Message>> =
@@ -80,7 +80,7 @@ export default function FileLoadDialog(props: {
     });
     try {
       if (courseId) {
-        await gradeServices.importCsv(
+        await importCsv(
           courseId, props.assessmentModelId, fileInput.current.files[0]
         );
         snackPackAdd({

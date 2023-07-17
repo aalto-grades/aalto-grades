@@ -9,8 +9,8 @@ import PropTypes from 'prop-types';
 import { ChangeEvent, SyntheticEvent, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 
-import assessmentModelServices from '../../services/assessmentModels';
-import attainmentServices from '../../services/attainments';
+import { addAssessmentModel } from '../../services/assessmentModels';
+import { addAttainment } from '../../services/attainments';
 import { State } from '../../types';
 
 export default function CreateAssessmentModelDialog(props: {
@@ -28,11 +28,11 @@ export default function CreateAssessmentModelDialog(props: {
     try {
       if (courseId) {
         setIsSubmitting(true);
-        const assessmentModelId: number = await assessmentModelServices.addAssessmentModel(
+        const assessmentModelId: number = await addAssessmentModel(
           courseId, { name: name }
         );
 
-        await attainmentServices.addAttainment(courseId, assessmentModelId, {
+        await addAttainment(courseId, assessmentModelId, {
           name: 'Root',
           tag: 'root',
           daysValid: 0

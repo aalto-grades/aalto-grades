@@ -14,7 +14,7 @@ import { Params, useParams } from 'react-router-dom';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';
 
-import gradeServices from '../../services/grades';
+import { exportSisuCsv } from '../../services/grades';
 import { Message, State } from '../../types';
 
 // A Dialog component for exporting Sisu grades CSV.
@@ -131,7 +131,7 @@ export default function SisuExportDialog(props: {
           studentNumbers: props.selectedStudents.map((student: FinalGrade) => student.studentNumber)
         };
 
-        const data: BlobPart = await gradeServices.exportSisuCsv(
+        const data: BlobPart = await exportSisuCsv(
           courseId, assessmentModelId, params
         );
 

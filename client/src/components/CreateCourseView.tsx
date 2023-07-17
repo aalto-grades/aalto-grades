@@ -10,7 +10,7 @@ import { NavigateFunction, useNavigate } from 'react-router-dom';
 import AlertSnackbar from './alerts/AlertSnackbar';
 import CreateCourseForm from './create-course-view/CreateCourseForm';
 
-import courseServices from '../services/courses';
+import { addCourse as addCourseApi } from '../services/courses';
 import { Message, State } from '../types';
 
 export default function CreateCourseView(): JSX.Element {
@@ -21,7 +21,7 @@ export default function CreateCourseView(): JSX.Element {
 
   async function addCourse(course: CourseData): Promise<void> {
     try {
-      const courseId: number = await courseServices.addCourse(course);
+      const courseId: number = await addCourseApi(course);
       navigate(`/course-view/${courseId}`, { replace: true });
     } catch (error: any) {
       let msg: string | Array<string> = error?.message ?? 'Unknown error';

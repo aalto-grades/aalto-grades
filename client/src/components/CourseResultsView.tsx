@@ -10,7 +10,10 @@ import { Params, useParams } from 'react-router-dom';
 import AlertSnackbar from './alerts/AlertSnackbar';
 import CourseResultsTable from './course-results-view/CourseResultsTable';
 
-import gradeServices from '../services/grades';
+import {
+  calculateFinalGrades as calculateFinalGradesApi,
+  downloadCsvTemplate as downloadCsvTemplateApi, getFinalGrades
+} from '../services/grades';
 import { Message, State } from '../types';
 import { sleep } from '../utils';
 
@@ -29,7 +32,7 @@ export default function CourseResultsView(): JSX.Element {
   useEffect(() => {
     if (courseId && assessmentModelId) {
       setLoading(true);
-      gradeServices.getFinalGrades(courseId, assessmentModelId)
+      getFinalGrades(courseId, assessmentModelId)
         .then((data: Array<FinalGrade>) => {
           setStudents(data);
         })
@@ -71,7 +74,7 @@ export default function CourseResultsView(): JSX.Element {
       });
       await sleep(2000);
       if (courseId && assessmentModelId && selectedStudents.length !== 0) {
-        await gradeServices.calculateFinalGrades(
+        await calculateFinalGradesApi(
           courseId,
           assessmentModelId,
           selectedStudents.map((student: FinalGrade) => student.studentNumber)
@@ -89,7 +92,7 @@ export default function CourseResultsView(): JSX.Element {
           severity: 'info'
         });
         const data: Array<FinalGrade> =
-          await gradeServices.getFinalGrades(courseId, assessmentModelId);
+          await getFinalGrades(courseId, assessmentModelId);
         setSelectedStudents([]);
         setStudents(data);
       }
@@ -137,7 +140,7 @@ export default function CourseResultsView(): JSX.Element {
 
     try {
       if (courseId && assessmentModelId) {
-        const res: string = await gradeServices.downloadCsvTemplate(courseId, assessmentModelId);
+        const res: string = await downloadCsvTemplateApi(courseId, assessmentModelId);
         const blob: Blob = new Blob([res], { type: 'text/csv' });
         const link: HTMLAnchorElement = document.createElement('a');
 

@@ -8,8 +8,8 @@ import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 
-import sortingServices from '../../services/sorting';
-import textFormatServices from '../../services/textFormat';
+import { compareDate } from '../../services/sorting';
+import { formatDateString, formatSisuCourseType } from '../../services/textFormat';
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 
 const HoverBox = styled(Box)(({ theme }) => ({
@@ -45,16 +45,16 @@ function InstanceBox(props: {
       }}>
       <LightLabelBoldValue
         label='Type'
-        value={textFormatServices.formatSisuCourseType(props.instance.type)}
+        value={formatSisuCourseType(props.instance.type)}
       />
       <Box sx={{ mx: 2 }} />
       <LightLabelBoldValue
         label='Starting Date'
-        value={textFormatServices.formatDateString(String(props.instance.startDate))}
+        value={formatDateString(String(props.instance.startDate))}
       />
       <LightLabelBoldValue
         label='Ending Date'
-        value={textFormatServices.formatDateString(String(props.instance.endDate))}
+        value={formatDateString(String(props.instance.endDate))}
       />
     </HoverBox>
   );
@@ -75,7 +75,7 @@ export default function FetchedInstances(props: {
         props.instances
           .sort(
             (a: CourseInstanceData, b: CourseInstanceData) => {
-              return sortingServices.compareDate(
+              return compareDate(
                 a.startDate as Date, b.startDate as Date
               );
             }

@@ -9,7 +9,7 @@ import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-d
 
 import FetchedInstances from './fetch-instances-view/FetchedInstances';
 
-import instanceServices from '../services/instances';
+import { getSisuInstances } from '../services/instances';
 import { State } from '../types';
 
 export default function FetchInstancesView(): JSX.Element {
@@ -20,7 +20,7 @@ export default function FetchInstancesView(): JSX.Element {
 
   useEffect(() => {
     if (courseCode) {
-      instanceServices.getSisuInstances(courseCode)
+      getSisuInstances(courseCode)
         .then((courseInstances: Array<CourseInstanceData>) => setInstances(courseInstances))
         .catch((e: Error) => console.log(e.message));
     }
@@ -59,7 +59,6 @@ export default function FetchInstancesView(): JSX.Element {
           </Button>
         </Box>
       </Container>
-
     </>
   );
 }

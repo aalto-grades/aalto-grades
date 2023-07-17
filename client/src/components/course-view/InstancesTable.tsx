@@ -10,9 +10,9 @@ import {
 import PropTypes from 'prop-types';
 import { JSX, useEffect, useState } from 'react';
 
-import instanceServices from '../../services/instances';
-import sortingServices from '../../services/sorting';
-import textFormatServices from '../../services/textFormat';
+import { getInstances } from '../../services/instances';
+import { compareDate } from '../../services/sorting';
+import { convertToClientGradingScale, formatDateString } from '../../services/textFormat';
 import { HeadCellData, State } from '../../types';
 
 const headCells: Array<HeadCellData> = [
@@ -49,11 +49,11 @@ export default function InstancesTable(props: {
     useState<Array<CourseInstanceData> | null>(null);
 
   useEffect(() => {
-    instanceServices.getInstances(props.courseId)
+    getInstances(props.courseId)
       .then((courseInstances: Array<CourseInstanceData>) => {
         const sortedInstances: Array<CourseInstanceData> = courseInstances.sort(
           (a: CourseInstanceData, b: CourseInstanceData) => {
-            return sortingServices.compareDate(
+            return compareDate(
               a.startDate as Date, b.startDate as Date
             );
           }
@@ -94,7 +94,7 @@ export default function InstancesTable(props: {
             instances
               .sort(
                 (a: CourseInstanceData, b: CourseInstanceData): number => {
-                  return sortingServices.compareDate(
+                  return compareDate(
                     a.startDate as Date, b.startDate as Date
                   );
                 }
@@ -105,10 +105,10 @@ export default function InstancesTable(props: {
                   key={instance.id}
                 >
                   <TableCell>
-                    {textFormatServices.formatDateString(String(instance.startDate))}
+                    {formatDateString(String(instance.startDate))}
                   </TableCell>
                   <TableCell>
-                    {textFormatServices.formatDateString(String(instance.endDate))}
+                    {formatDateString(String(instance.endDate))}
                   </TableCell>
                   <TableCell>
                     {instance.startingPeriod}
@@ -120,7 +120,7 @@ export default function InstancesTable(props: {
                     {instance.type}
                   </TableCell>
                   <TableCell>
-                    {textFormatServices.convertToClientGradingScale(instance.gradingScale)}
+                    {convertToClientGradingScale(instance.gradingScale)}
                   </TableCell>
                 </TableRow>
               ))

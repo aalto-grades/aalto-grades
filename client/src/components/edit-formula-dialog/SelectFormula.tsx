@@ -14,7 +14,7 @@ import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import ViewFormulaAccordion from './ViewFormulaAccordion';
 
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
-import formulaServices from '../../services/formulas';
+import { getFormulas } from '../../services/formulas';
 import StyledBox from './StyledBox';
 import { State } from '../../types';
 
@@ -32,7 +32,7 @@ export default function SelectFormula(props: {
 
   useEffect(() => {
     if (formulas.length == 0) {
-      formulaServices.getFormulas()
+      getFormulas()
         .then((data: Array<FormulaData>) => {
           setFormulas(data);
         })

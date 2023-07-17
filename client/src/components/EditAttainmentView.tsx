@@ -10,7 +10,9 @@ import { NavigateFunction, Params, useParams, useNavigate } from 'react-router-d
 import Attainment from './create-attainment/Attainment';
 import ConfirmationDialog from './create-attainment/ConfirmationDialog';
 
-import attainmentServices from '../services/attainments';
+import {
+  addAttainment, deleteAttainment as deleteAttainmentApi, editAttainment, getAttainment
+} from '../services/attainments';
 import { State } from '../types';
 
 export default function EditAttainmentView(): JSX.Element {
@@ -59,7 +61,7 @@ export default function EditAttainmentView(): JSX.Element {
 
     case 'edit':
       if (courseId && assessmentModelId && attainmentId) {
-        attainmentServices.getAttainment(courseId, assessmentModelId, attainmentId, 'descendants')
+        getAttainment(courseId, assessmentModelId, attainmentId, 'descendants')
           .then((attainment: AttainmentData) => {
             setAttainmentTree(attainment);
           })
@@ -82,7 +84,7 @@ export default function EditAttainmentView(): JSX.Element {
   function deleteAttainment(attainment: AttainmentData): void {
     if (attainment.id === attainmentTree?.id) {
       if (attainment.id && attainment.id > 0 && (courseId && assessmentModelId && attainmentId)) {
-        attainmentServices.deleteAttainment(courseId, assessmentModelId, attainment.id);
+        deleteAttainmentApi(courseId, assessmentModelId, attainment.id);
       }
 
       setAttainmentTree(null);
@@ -90,7 +92,7 @@ export default function EditAttainmentView(): JSX.Element {
       return;
     }
 
-    function inner(attainment: AttainmentData, tree: AttainmentData) {
+    function inner(attainment: AttainmentData, tree: AttainmentData): void {
       for (const i in tree.subAttainments) {
         const subAttainment: AttainmentData = tree.subAttainments[Number(i)];
 
@@ -125,10 +127,10 @@ export default function EditAttainmentView(): JSX.Element {
       for (const subAttainment of tree.subAttainments) {
         if (courseId && assessmentModelId && attainmentId) {
           if (subAttainment.id && subAttainment.id > 0) {
-            attainmentServices.editAttainment(courseId, assessmentModelId, subAttainment);
+            editAttainment(courseId, assessmentModelId, subAttainment);
             addAndEdit(subAttainment);
           } else {
-            attainmentServices.addAttainment(courseId, assessmentModelId, subAttainment);
+            addAttainment(courseId, assessmentModelId, subAttainment);
           }
         }
       }
@@ -138,18 +140,18 @@ export default function EditAttainmentView(): JSX.Element {
       if (courseId && assessmentModelId) {
         for (const attainment of deletedAttainments) {
           if (attainment.id) {
-            attainmentServices.deleteAttainment(courseId, assessmentModelId, attainment.id);
+            deleteAttainmentApi(courseId, assessmentModelId, attainment.id);
           }
         }
 
         if (attainmentTree) {
           switch (modification) {
           case 'create':
-            attainmentServices.addAttainment(courseId, assessmentModelId, attainmentTree);
+            addAttainment(courseId, assessmentModelId, attainmentTree);
             break;
 
           case 'edit':
-            attainmentServices.editAttainment(courseId, assessmentModelId, attainmentTree);
+            editAttainment(courseId, assessmentModelId, attainmentTree);
             addAndEdit(attainmentTree);
             break;
 
@@ -250,7 +252,7 @@ export default function EditAttainmentView(): JSX.Element {
               alignItems: 'center',
               gap: 1
             }}>
-              <Button size='medium' variant='outlined' onClick={() => navigate(-1)}>
+              <Button size='medium' variant='outlined' onClick={(): void => navigate(-1)}>
                 Cancel
               </Button>
               <Button

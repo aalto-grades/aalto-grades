@@ -7,7 +7,7 @@ import { Box, TextField, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import { ChangeEvent } from 'react';
 
-import formulaServices from '../../services/formulas';
+import { getParamLabel } from '../../services/formulas';
 
 export default function SubAttainment(props: {
   attainment: AttainmentData,
@@ -62,7 +62,7 @@ export default function SubAttainment(props: {
                 type='text'
                 key={param}
                 variant='standard'
-                label={formulaServices.getParamLabel(param)}
+                label={getParamLabel(param)}
                 InputLabelProps={{ shrink: true }}
                 margin='normal'
                 sx={{

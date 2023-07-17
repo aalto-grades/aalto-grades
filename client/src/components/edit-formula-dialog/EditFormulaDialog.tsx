@@ -13,7 +13,7 @@ import { useState, JSX } from 'react';
 import SelectFormula from './SelectFormula';
 import SetFormulaParams from './SetFormulaParams';
 
-import attainmentServices from '../../services/attainments';
+import { editAttainment } from '../../services/attainments';
 import { State } from '../../types';
 
 export default function EditFormulaDialog(props: {
@@ -73,7 +73,7 @@ export default function EditFormulaDialog(props: {
     };
 
     if (props.courseId && props.assessmentModelId) {
-      attainmentServices.editAttainment(
+      editAttainment(
         props.courseId, props.assessmentModelId, props.attainment
       )
         .then(() => close())
@@ -162,7 +162,7 @@ export default function EditFormulaDialog(props: {
             variant='outlined'
             onClick={
               (activeStep > 0)
-                ? () => setActiveStep(activeStep - 1)
+                ? (): void => setActiveStep(activeStep - 1)
                 : props.handleClose
             }
           >

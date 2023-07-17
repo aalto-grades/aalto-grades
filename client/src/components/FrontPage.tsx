@@ -10,7 +10,7 @@ import { NavigateFunction, useNavigate } from 'react-router-dom';
 import CourseTable from './front-page/CourseTable';
 
 import useAuth, { AuthContextType } from '../hooks/useAuth';
-import courseServices from '../services/courses';
+import { getAllCourses, getCoursesOfUser } from '../services/courses';
 import { State } from '../types';
 
 export default function FrontPage(): JSX.Element {
@@ -25,18 +25,18 @@ export default function FrontPage(): JSX.Element {
 
   useEffect(() => {
     if (auth) {
-      courseServices.getCoursesOfUser(auth.id)
+      getCoursesOfUser(auth.id)
         .then((data: Array<CourseData>) => {
           setCoursesOfUser(data);
         })
-        .catch((e) => console.log(e.message));
+        .catch((e: unknown) => console.log(e));
     }
 
-    courseServices.getAllCourses()
+    getAllCourses()
       .then((data: Array<CourseData>) => {
         setCourses(data);
       })
-      .catch((e) => console.log(e.message));
+      .catch((e: unknown) => console.log(e));
   }, []);
 
   return (
@@ -73,7 +73,7 @@ export default function FrontPage(): JSX.Element {
         </Typography>
         { /* Admins are shown the button for creating a new course */
           auth?.role == SystemRole.Admin &&
-          <Button id='ag_new_course_btn' size='large' variant='contained' onClick={() => {
+          <Button id='ag_new_course_btn' size='large' variant='contained' onClick={(): void => {
             navigate('/create-course');
           }}>
             Create New Course

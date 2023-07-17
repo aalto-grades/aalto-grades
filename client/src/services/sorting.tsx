@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 // used sort dates in descending order
-function compareDate(a: Date, b: Date): number {
+export function compareDate(a: Date, b: Date): number {
   if (a < b)
     return 1;
 
@@ -16,7 +16,7 @@ function compareDate(a: Date, b: Date): number {
 // Three following functions are used by CourseResultsTable for sortin the table
 
 // orders a and b in descending order
-function descendingComparator(
+export function descendingComparator(
   a: object, b: object, orderBy: keyof object
 ): number {
   if (b[orderBy] < a[orderBy])
@@ -32,7 +32,7 @@ type Comparator = (a: object, b: object) => number;
 
 // Calculates the comparator for StableSort
 // order by = id of the table head that determines the order
-function getComparator(order: 'asc' | 'desc', orderBy: string): Comparator {
+export function getComparator(order: 'asc' | 'desc', orderBy: string): Comparator {
   const sign: number = (order === 'desc') ? 1 : -1;
 
   return (a: object, b: object): number => {
@@ -42,7 +42,7 @@ function getComparator(order: 'asc' | 'desc', orderBy: string): Comparator {
 
 // Sorts the array by comparator (descending or ascending)
 // comparator can be calculated with the getComparator function
-function stableSort(array: Array<object>, comparator: Comparator): Array<object> {
+export function stableSort(array: Array<object>, comparator: Comparator): Array<object> {
   const stabilizedThis: Array<[object, number]> = array.map(
     (el: object, index: number): [object, number] => [el, index]
   );
@@ -57,5 +57,3 @@ function stableSort(array: Array<object>, comparator: Comparator): Array<object>
 
   return stabilizedThis.map((el: [object, number]): object => el[0]);
 }
-
-export default { compareDate, descendingComparator, getComparator, stableSort };

@@ -7,7 +7,7 @@ import { LoginResult } from 'aalto-grades-common/types';
 import axios from './axios';
 import { FullResponse, LoginCredentials, SignupCredentials } from '../types';
 
-async function login(credentials: LoginCredentials): Promise<LoginResult> {
+export async function login(credentials: LoginCredentials): Promise<LoginResult> {
 
   const response: FullResponse<LoginResult> =
     await axios.post('/v1/auth/login', credentials);
@@ -15,7 +15,7 @@ async function login(credentials: LoginCredentials): Promise<LoginResult> {
   return response.data.data;
 }
 
-async function signup(credentials: SignupCredentials): Promise<LoginResult> {
+export async function signup(credentials: SignupCredentials): Promise<LoginResult> {
 
   const response: FullResponse<LoginResult> =
     await axios.post('/v1/auth/signup', credentials);
@@ -23,7 +23,7 @@ async function signup(credentials: SignupCredentials): Promise<LoginResult> {
   return response.data.data;
 }
 
-async function getRefreshToken(): Promise<LoginResult> {
+export async function getRefreshToken(): Promise<LoginResult> {
 
   const response: FullResponse<LoginResult> =
     await axios.get('/v1/auth/self-info');
@@ -31,8 +31,6 @@ async function getRefreshToken(): Promise<LoginResult> {
   return response.data.data;
 }
 
-async function logout(): Promise<void> {
+export async function logout(): Promise<void> {
   await axios.post('/v1/auth/logout');
 }
-
-export default { login, signup, getRefreshToken, logout };

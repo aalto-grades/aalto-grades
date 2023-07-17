@@ -11,7 +11,7 @@ import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-d
 import * as yup from 'yup';
 
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
-import textFormatServices from '../../services/textFormat';
+import { convertToClientGradingScale, formatSisuCourseType } from '../../services/textFormat';
 import { State } from '../../types';
 
 export default function EditInstanceForm(props: {
@@ -26,7 +26,7 @@ export default function EditInstanceForm(props: {
     <>
       <Formik
         initialValues={{
-          type: textFormatServices.formatSisuCourseType(props.instance.type),
+          type: formatSisuCourseType(props.instance.type),
           startDate: props.instance.startDate,
           endDate: props.instance.endDate,
           startingPeriod: props.instance.startingPeriod ?? Period.I,
@@ -200,7 +200,7 @@ export default function EditInstanceForm(props: {
                     Object.values(GradingScale).map((value: GradingScale) => {
                       return (
                         <MenuItem key={value} value={value}>
-                          {textFormatServices.convertToClientGradingScale(value)}
+                          {convertToClientGradingScale(value)}
                         </MenuItem>
                       );
                     })

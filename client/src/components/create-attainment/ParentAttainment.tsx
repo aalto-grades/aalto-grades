@@ -12,7 +12,7 @@ import Attainment from './Attainment';
 import EditFormulaDialog from '../edit-formula-dialog/EditFormulaDialog';
 import LeafAttainment from './LeafAttainment';
 
-import formulaServices from '../../services/formulas';
+import { getFormulaDetails } from '../../services/formulas';
 import { State } from '../../types';
 
 // An Assignmnet component with subAttainments and a formula
@@ -39,7 +39,7 @@ export default function ParentAttainment(props: {
 
   function onChangeFormula(): void {
     if (props.attainment.formula) {
-      formulaServices.getFormulaDetails(props.attainment.formula)
+      getFormulaDetails(props.attainment.formula)
         .then((formula: FormulaData) => {
           setFormulaDetails(formula);
         });

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import userServices from '../services/user';
+import { logout as logoutUser } from '../services/user';
 import useAuth, { AuthContextType } from './useAuth';
 
 // custom hook for logout, used since no individual logout page will be created
@@ -13,7 +13,7 @@ export default function useLogout(): () => Promise<void> {
 
   async function logout(): Promise<void> {
     try {
-      await userServices.logout();
+      await logoutUser();
       setAuth(null);
     } catch (exception) {
       console.log(exception);
