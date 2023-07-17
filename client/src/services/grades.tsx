@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import axios from './axios';
-import { FinalGrade, FullResponse, Numeric } from '../types';
+import { FinalGrade } from 'aalto-grades-common/types';
+import { FullResponse, Numeric } from '../types';
 import { AxiosResponse } from 'axios';
 
 async function exportSisuCsv(
