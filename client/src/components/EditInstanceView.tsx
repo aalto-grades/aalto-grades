@@ -13,7 +13,7 @@ import courseServices from '../services/courses';
 import instanceServices from '../services/instances';
 import {
   CourseData, CourseInstanceData, GradingScale, Period
-} from 'aalto-grades-common/types/course';
+} from 'aalto-grades-common/types';
 import { Message, State } from '../types';
 
 function EditInstanceView(): JSX.Element {

@@ -4,7 +4,7 @@
 
 import axios from './axios';
 import { LoginResult } from 'aalto-grades-common/types';
-import { LoginCredentials, SignupCredentials } from '../types/auth';
+import { LoginCredentials, SignupCredentials } from '../types';
 import { FullResponse } from '../types';
 
 async function login(credentials: LoginCredentials): Promise<LoginResult> {

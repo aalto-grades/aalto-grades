@@ -10,9 +10,9 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio from '@mui/material/Radio';
 import Grid from '@mui/material/Grid';
-import { SystemRole } from 'aalto-grades-common/types/auth';
+import { SystemRole } from 'aalto-grades-common/types';
 import { State } from '../../types';
-import { SignupCredentials } from '../../types/auth';
+import { SignupCredentials } from '../../types';
 
 function SignupForm(props: {
   addUser: (userObject: SignupCredentials) => Promise<void>

@@ -10,7 +10,7 @@ import LoginForm from '../components/auth/LoginForm';
 import Login from '../components/auth/Login';
 import userServices from '../services/user';
 import { LoginResult } from 'aalto-grades-common/types';
-import { LoginCredentials } from '../types/auth';
+import { LoginCredentials } from '../types';
 
 describe('Tests for Login and LoginForm components', () => {
 

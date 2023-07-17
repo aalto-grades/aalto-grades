@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import axios from './axios';
-import { CourseInstanceData } from 'aalto-grades-common/types/course';
+import { CourseInstanceData } from 'aalto-grades-common/types';
 import { FullResponse, Numeric } from '../types';
 
 async function getInstances(courseId: Numeric): Promise<Array<CourseInstanceData>> {

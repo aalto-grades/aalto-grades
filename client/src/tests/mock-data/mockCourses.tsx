@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseData } from 'aalto-grades-common/types/course';
+import { CourseData } from 'aalto-grades-common/types';
 
 const mockCourses: Array<CourseData> = [
   {

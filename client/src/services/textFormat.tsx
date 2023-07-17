@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { GradingScale } from 'aalto-grades-common/types/course';
+import { GradingScale } from 'aalto-grades-common/types';
 
 // use 'en-GB' to get "20.07.2012, 05:00:00"
 // (instead of 'fi-GB' which produces "20.7.2012 klo 5.00.00")

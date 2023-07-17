@@ -9,7 +9,7 @@ import SignupForm from './SignupForm';
 import userServices from '../../services/user';
 import useAuth, { AuthContextType } from '../../hooks/useAuth';
 import { State } from '../../types';
-import { SignupCredentials } from '../../types/auth';
+import { SignupCredentials } from '../../types';
 
 function Signup(): JSX.Element {
 

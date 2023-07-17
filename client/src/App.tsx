@@ -21,7 +21,7 @@ import EditInstanceView from './components/EditInstanceView';
 import EditAttainmentView from './components/EditAttainmentView';
 import CourseResultsView from './components/CourseResultsView';
 import UserButton from './components/auth/UserButton';
-import { SystemRole } from 'aalto-grades-common/types/auth';
+import { SystemRole } from 'aalto-grades-common/types';
 import Footer from './components/Footer';
 
 declare module '@mui/material/styles' {

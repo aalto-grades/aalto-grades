@@ -11,7 +11,7 @@ import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
 import FetchedInstances from './fetch-instances-view/FetchedInstances';
 import instanceServices from '../services/instances';
-import { CourseInstanceData } from 'aalto-grades-common/types/course';
+import { CourseInstanceData } from 'aalto-grades-common/types';
 import { State } from '../types';
 
 function FetchInstancesView(): JSX.Element {

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import axios from './axios';
-import { AttainmentData } from 'aalto-grades-common/types/attainment';
+import { AttainmentData } from 'aalto-grades-common/types';
 import { FullResponse, Numeric } from '../types';
 
 async function addAttainment(
