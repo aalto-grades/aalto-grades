@@ -4,7 +4,7 @@
 
 import { CSSProperties, JSX } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppBar, Box, Container, Link, Toolbar } from '@mui/material';
 import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
 import { SystemRole } from 'aalto-grades-common/types/auth';
@@ -115,9 +115,17 @@ const theme: Theme = createTheme({
   }
 });
 
-const queryClient: QueryClient = new QueryClient();
-
 function App(): JSX.Element {
+
+  const queryClient: QueryClient = new QueryClient({
+    queryCache: new QueryCache({
+      onError: (error: unknown) => {
+        // TODO: Set snackbar
+        console.log(`${(error as Error).message}`);
+      }
+    })
+  });
+
   return (
     <ThemeProvider theme={theme}>
       <QueryClientProvider client={queryClient}>

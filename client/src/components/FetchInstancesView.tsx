@@ -14,13 +14,12 @@ function FetchInstancesView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { courseId, courseCode }: Params = useParams();
 
+  if (!courseId || !courseCode)
+    return (<></>);
+
   const sisuInstances: UseQueryResult<Array<CourseInstanceData>> = useQuery({
-    queryKey: ['sisu-instances'],
-    queryFn: () => {
-      if (courseCode) {
-        return instanceServices.getSisuInstances(courseCode);
-      }
-    }
+    queryKey: ['sisu-instances', courseCode],
+    queryFn: () => instanceServices.getSisuInstances(courseCode)
   });
 
   function onCancel(): void {

@@ -16,13 +16,12 @@ function FrontPage(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { auth }: AuthContextType = useAuth();
 
+  if (!auth)
+    return (<></>);
+
   const coursesOfUser: UseQueryResult<Array<CourseData>> = useQuery({
-    queryKey: ['courses-of-user'],
-    queryFn: () => {
-      if (auth) {
-        return courseServices.getCoursesOfUser(auth.id);
-      }
-    }
+    queryKey: ['courses-of-user', auth.id],
+    queryFn: () => courseServices.getCoursesOfUser(auth.id)
   });
 
   const courses: UseQueryResult<Array<CourseData>> = useQuery({
