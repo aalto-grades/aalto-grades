@@ -8,7 +8,6 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 
-import formulaServices from '../../services/formulas';
 import { AttainmentData } from 'aalto-grades-common/types';
 
 function SubAttainment(props: {
@@ -17,6 +16,13 @@ function SubAttainment(props: {
   childParams: Map<string, object>,
   setChildParams: (childParams: Map<string, object>) => void
 }): JSX.Element {
+
+  function getParamLabel(labelKey: string): string {
+    const splitString: Array<string> = labelKey.split(/(?=[A-Z])/);
+    const label: string = splitString.join(' ');
+    const capitalizedLabel: string = label.charAt(0).toUpperCase() + label.slice(1);
+    return capitalizedLabel;
+  }
 
   function handleParamChange(
     event: ChangeEvent<HTMLInputElement>, param: string
@@ -64,7 +70,7 @@ function SubAttainment(props: {
                 type='text'
                 key={param}
                 variant='standard'
-                label={formulaServices.getParamLabel(param)}
+                label={getParamLabel(param)}
                 InputLabelProps={{ shrink: true }}
                 margin='normal'
                 sx={{

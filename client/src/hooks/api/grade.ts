@@ -3,11 +3,26 @@
 // SPDX-License-Identifier: MIT
 
 import axios from './axios';
-import { Numeric } from '../types';
+import {
+  useMutation, UseMutationResult, useQuery, UseQueryResult
+} from '@tanstack/react-query';
 
-async function exportSisuCsv(
+import { Numeric } from '../../types';
+
+// TODO
+
+export function useDownloadCsvTemplate(
+  courseId: Numeric, instanceId: Numeric
+): UseQueryResult {
+  const response = await axios.get(
+    `/v1/courses/${courseId}/instances/${instanceId}/grades/csv`
+  );
+  return response;
+}
+
+export function useExportSisuCsv(
   courseId: Numeric, instanceId: Numeric, params: unknown
-): Promise<BlobPart> {
+): UseQueryResult<BlobPart> {
   const response = await axios.get(
     `/v1/courses/${courseId}/instances/${instanceId}/grades/csv/sisu`,
     {
@@ -18,9 +33,18 @@ async function exportSisuCsv(
   return response.data;
 }
 
-async function importCsv(
+export function useGetFinalGrades(
+  courseId: Numeric, instanceId: Numeric
+): UseQueryResult {
+  const response = await axios.get(
+    `/v1/courses/${courseId}/instances/${instanceId}/grades`
+  );
+  return response.data.data;
+}
+
+export function useImportCsv(
   courseId: Numeric, instanceId: Numeric, csv: unknown
-) {
+): UseMutationResult {
   const response = await axios.postForm(
     `/v1/courses/${courseId}/instances/${instanceId}/grades/csv`,
     {
@@ -30,33 +54,13 @@ async function importCsv(
   return response.data.data;
 }
 
-async function downloadCsvTemplate(
+export function useCalculateFinalGrades(
   courseId: Numeric, instanceId: Numeric
-) {
-  const response = await axios.get(
-    `/v1/courses/${courseId}/instances/${instanceId}/grades/csv`
-  );
-  return response;
-}
-
-export async function calculateFinalGrades(
-  courseId: Numeric, instanceId: Numeric
-) {
+): UseMutationResult {
   const response = await axios.post(
     `/v1/courses/${courseId}/instances/${instanceId}/grades/calculate`
   );
   return response.data.success;
 }
 
-export async function getFinalGrades(
-  courseId: Numeric, instanceId: Numeric
-) {
-  const response = await axios.get(
-    `/v1/courses/${courseId}/instances/${instanceId}/grades`
-  );
-  return response.data.data;
-}
 
-export default {
-  calculateFinalGrades, exportSisuCsv, getFinalGrades, importCsv, downloadCsvTemplate
-};
