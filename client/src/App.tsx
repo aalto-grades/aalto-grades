@@ -9,6 +9,7 @@ import { AppBar, Box, Container, Link, Toolbar } from '@mui/material';
 import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
 import { SystemRole } from 'aalto-grades-common/types/auth';
 
+import AlertSnackbar from './components/alerts/AlertSnackbar';
 import PrivateRoute from './components/auth/PrivateRoute';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
@@ -21,6 +22,8 @@ import EditInstanceView from './components/EditInstanceView';
 import EditAttainmentView from './components/EditAttainmentView';
 import CourseResultsView from './components/CourseResultsView';
 import Footer from './components/Footer';
+
+import useSnackPackAlerts, { SnackPackAlertState } from './hooks/useSnackPackAlerts';
 
 declare module '@mui/material/styles' {
   interface PaletteOptions {
@@ -117,11 +120,16 @@ const theme: Theme = createTheme({
 
 function App(): JSX.Element {
 
+  const snackPack: SnackPackAlertState = useSnackPackAlerts();
   const queryClient: QueryClient = new QueryClient({
     queryCache: new QueryCache({
       onError: (error: unknown) => {
-        // TODO: Set snackbar
-        console.log(`${(error as Error).message}`);
+        snackPack.push(
+          {
+            msg: (error as Error).message,
+            severity: 'error'
+          }
+        );
       }
     })
   });
@@ -147,6 +155,7 @@ function App(): JSX.Element {
           </AppBar>
           <Container sx={{ textAlign: 'center' }} maxWidth="lg">
             <Box mx={5} my={5}>
+              <AlertSnackbar snackPack={snackPack} />
               <Routes> { /* Add nested routes when needed */}
                 <Route path='/login' element={<Login />} />
                 <Route path='/signup' element={<Signup />} />
