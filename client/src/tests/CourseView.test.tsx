@@ -17,11 +17,11 @@ import { mockAttainments } from './mock-data/mockAttainments';
 import { mockCourses } from './mock-data/mockCourses';
 import { mockFormulas } from './mock-data/mockFormulas';
 import { mockInstances } from './mock-data/mockInstancesWithStringDates';
-import assessmentModelServices from '../services/assessmentModels';
-import attainmentServices from '../services/attainments';
-import courseServices from '../services/courses';
-import formulaServices from '../services/formulas';
-import instanceServices from '../services/instances';
+import * as assessmentModelServices from '../services/assessmentModels';
+import * as attainmentServices from '../services/attainments';
+import * as courseServices from '../services/courses';
+import * as formulaServices from '../services/formulas';
+import * as instanceServices from '../services/instances';
 
 afterEach(cleanup);
 
