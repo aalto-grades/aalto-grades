@@ -75,7 +75,7 @@ export default function CourseTable(props: {
                 id={`ag_see_instances_tr_${course.id}`}
                 key={course.id}
                 hover={true}
-                onClick={() => {
+                onClick={(): void => {
                   navigate('/course-view/' + course.id);
                 }}
               >

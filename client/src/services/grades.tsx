@@ -10,7 +10,7 @@ import { AxiosResponse } from 'axios';
 export async function exportSisuCsv(
   courseId: Numeric, assessmentModelId: Numeric, params: unknown
 ): Promise<BlobPart> {
-  const response = await axios.get(
+  const response: AxiosResponse = await axios.get(
     `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/csv/sisu`,
     {
       responseType: 'blob',
