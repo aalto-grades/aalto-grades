@@ -2,31 +2,26 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState, useEffect } from 'react';
 import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import Divider from '@mui/material/Divider';
-import Button from '@mui/material/Button';
+import { useQuery, UseQueryResult } from '@tanstack/react-query';
+import { Box, Button, Container, Divider, Typography } from '@mui/material';
+import { CourseInstanceData } from 'aalto-grades-common/types/course';
+
 import FetchedInstances from './fetch-instances-view/FetchedInstances';
 import instanceServices from '../services/instances';
-import { CourseInstanceData } from 'aalto-grades-common/types/course';
-import { State } from '../types';
 
 function FetchInstancesView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { courseId, courseCode }: Params = useParams();
-  const [instances, setInstances]: State<Array<CourseInstanceData>> =
-    useState<Array<CourseInstanceData>>([]);
 
-  useEffect(() => {
-    if (courseCode) {
-      instanceServices.getSisuInstances(courseCode)
-        .then((courseInstances: Array<CourseInstanceData>) => setInstances(courseInstances))
-        .catch((e: Error) => console.log(e.message));
+  const sisuInstances: UseQueryResult<Array<CourseInstanceData>> = useQuery({
+    queryKey: ['sisu-instances'],
+    queryFn: () => {
+      if (courseCode) {
+        return instanceServices.getSisuInstances(courseCode);
+      }
     }
-  }, []);
+  });
 
   function onCancel(): void {
     navigate('/course-view/' + courseId);
@@ -41,7 +36,13 @@ function FetchInstancesView(): JSX.Element {
         <Typography variant="h3" sx={{ flexGrow: 1, mb: 4, textAlign: 'left' }}>
           Select the instance you wish to add
         </Typography>
-        <FetchedInstances courseId={Number(courseId)} instances={instances} />
+        {
+          sisuInstances.data &&
+          <FetchedInstances
+            courseId={Number(courseId)}
+            instances={sisuInstances.data}
+          />
+        }
         <Divider sx={{ my: 5 }} />
         <Box sx={{
           display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
