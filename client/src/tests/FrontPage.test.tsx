@@ -11,7 +11,7 @@ import FrontPage from '../components/FrontPage';
 
 import AuthContext from '../context/AuthProvider';
 import { mockCourses } from './mock-data/mockCourses';
-import courseServices from '../services/courses';
+import * as courseServices from '../services/courses';
 
 jest.mock('../services/courses');
 afterEach(cleanup);
