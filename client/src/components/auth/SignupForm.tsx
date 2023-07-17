@@ -16,8 +16,7 @@ export default function SignupForm(props: {
   const [name, setName]: State<string> = useState('');
   const [password, setPassword]: State<string> = useState('');
   const [email, setEmail]: State<string> = useState('');
-  const [studentNumber, setStudentNumber]: State<string | null> =
-    useState<string | null>(null);
+  const [studentNumber, setStudentNumber]: State<string> = useState<string>('');
   const [role, setRole]: State<SystemRole> = useState<SystemRole>(SystemRole.User);
 
   function handleSubmit(event: React.SyntheticEvent): void {
@@ -28,7 +27,7 @@ export default function SignupForm(props: {
         password,
         email,
         role,
-        studentNumber: studentNumber ?? undefined
+        studentNumber: studentNumber.length > 0 ? studentNumber : undefined
       };
       props.addUser(userObject);
     } catch (exception) {
