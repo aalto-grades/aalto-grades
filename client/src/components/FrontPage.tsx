@@ -4,12 +4,12 @@
 
 import { JSX } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import { useQuery, UseQueryResult } from '@tanstack/react-query';
+import { UseQueryResult } from '@tanstack/react-query';
 import { Box, Button, Typography } from '@mui/material';
 import { CourseData, SystemRole } from 'aalto-grades-common/types';
 
 import CourseTable from './front-page/CourseTable';
-import courseServices from '../services/courses';
+import { getAllCourses, getCoursesOfUser } from '../services/courses';
 import useAuth, { AuthContextType } from '../hooks/useAuth';
 
 function FrontPage(): JSX.Element {
@@ -19,15 +19,8 @@ function FrontPage(): JSX.Element {
   if (!auth)
     return (<></>);
 
-  const coursesOfUser: UseQueryResult<Array<CourseData>> = useQuery({
-    queryKey: ['courses-of-user', auth.id],
-    queryFn: () => courseServices.getCoursesOfUser(auth.id)
-  });
-
-  const courses: UseQueryResult<Array<CourseData>> = useQuery({
-    queryKey: ['all-courses'],
-    queryFn: courseServices.getAllCourses
-  });
+  const coursesOfUser: UseQueryResult<Array<CourseData>> = getCoursesOfUser(auth.id);
+  const courses: UseQueryResult<Array<CourseData>> = getAllCourses();
 
   return (
     <>

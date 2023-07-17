@@ -2,40 +2,52 @@
 //
 // SPDX-License-Identifier: MIT
 
-import axios from './axios';
 import { CourseData } from 'aalto-grades-common/types';
+import axios from './axios';
+import { useQuery, UseQueryResult } from '@tanstack/react-query';
+
 import { FullResponse, Numeric } from '../types';
 
-async function getCoursesOfUser(userId: Numeric): Promise<Array<CourseData>> {
+export function getCoursesOfUser(userId: Numeric): UseQueryResult<Array<CourseData>> {
 
-  const response: FullResponse<{ courses: Array<CourseData> }> =
-    await axios.get(`/v1/user/${userId}/courses`);
+  const query: UseQueryResult<Array<CourseData>> = useQuery({
+    queryKey: ['courses-of-user', userId],
+    queryFn: async () => (
+      await axios.get(`/v1/user/${userId}/courses`)
+    ).data.data.courses
+  });
 
-  return response.data.data.courses;
+  return query;
 }
 
-async function getCourse(courseId: Numeric): Promise<CourseData> {
+export function getCourse(courseId: Numeric): UseQueryResult<CourseData> {
 
-  const response: FullResponse<{ course: CourseData }> =
-    await axios.get(`/v1/courses/${courseId}`);
+  const query: UseQueryResult<CourseData> = useQuery({
+    queryKey: ['course', courseId],
+    queryFn: async () => (
+      await axios.get(`/v1/courses/${courseId}`)
+    ).data.data.course
+  });
 
-  return response.data.data.course;
+  return query;
 }
 
-async function getAllCourses(): Promise<Array<CourseData>> {
+export function getAllCourses(): UseQueryResult<Array<CourseData>> {
 
-  const response: FullResponse<{ courses: Array<CourseData> }> =
-    await axios.get('/v1/courses');
+  const query: UseQueryResult<Array<CourseData>> = useQuery({
+    queryKey: ['all-courses'],
+    queryFn: async () => (
+      await axios.get('/v1/courses')
+    ).data.data.courses
+  });
 
-  return response.data.data.courses;
+  return query;
 }
 
-async function addCourse(course: CourseData): Promise<number> {
+export async function addCourse(course: CourseData): Promise<number> {
 
   const response: FullResponse<{ course: { id: number } }> =
     await axios.post('/v1/courses', course);
 
   return response.data.data.course.id;
 }
-
-export default { getCoursesOfUser, getCourse, getAllCourses, addCourse };

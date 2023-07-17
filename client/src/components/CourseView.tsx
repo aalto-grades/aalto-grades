@@ -4,6 +4,7 @@
 
 import { JSX, useState, useEffect } from 'react';
 import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
+import { UseQueryResult } from '@tanstack/react-query';
 import { Box, Button, CircularProgress, Grow, Typography } from '@mui/material';
 import {
   AssessmentModelData, AttainmentData, CourseData, Formula, FormulaData,
@@ -18,7 +19,7 @@ import InstancesTable from './course-view/InstancesTable';
 
 import assessmentModelServices from '../services/assessmentModels';
 import attainmentServices from '../services/attainments';
-import courseServices from '../services/courses';
+import { getCourse } from '../services/courses';
 import formulaServices from '../services/formulas';
 import useAuth, { AuthContextType } from '../hooks/useAuth';
 import { State } from '../types';
@@ -28,8 +29,17 @@ function CourseView(): JSX.Element {
   const { courseId }: Params = useParams();
   const { auth, isTeacherInCharge, setIsTeacherInCharge }: AuthContextType = useAuth();
 
-  const [course, setCourse]: State<CourseData | null> =
-    useState<CourseData | null>(null);
+  if (!courseId)
+    return (<></>);
+
+  const course: UseQueryResult<CourseData> = getCourse(courseId);
+
+  if (auth && course.data) {
+    const teacherInCharge: Array<UserData> = course.data.teachersInCharge.filter(
+      (teacher: UserData) => teacher.id == auth.id
+    );
+    setIsTeacherInCharge(teacherInCharge.length != 0);
+  }
 
   const [currentAssessmentModel, setCurrentAssessmentModel]: State<AssessmentModelData | null> =
     useState<AssessmentModelData | null>(null);
@@ -51,48 +61,33 @@ function CourseView(): JSX.Element {
   const [createAssessmentModelOpen, setCreateAssessmentModelOpen]: State<boolean> = useState(false);
 
   useEffect(() => {
-    if (courseId) {
-      courseServices.getCourse(courseId)
-        .then((course: CourseData) => {
-          setCourse(course);
+    assessmentModelServices.getAllAssessmentModels(courseId)
+      .then((assessmentModels: Array<AssessmentModelData>) => {
+        setAssessmentModels(assessmentModels);
 
-          if (auth) {
-            const teacherInCharge: Array<UserData> = course.teachersInCharge.filter(
-              (teacher: UserData) => teacher.id == auth.id
-            );
-            setIsTeacherInCharge(teacherInCharge.length != 0);
+        /**
+         * Newly created courses do not have assessment models assigned.
+         * Set tree to null so proper message can be displayed.
+         */
+        if (assessmentModels.length === 0) {
+          setAttainmentTree(null);
+        } else {
+          setCurrentAssessmentModel(assessmentModels[0]);
+
+          if (assessmentModels[0].id) {
+            attainmentServices.getAllAttainments(courseId, assessmentModels[0].id)
+              .then((attainmentTree: AttainmentData) => {
+                setAttainmentTree(attainmentTree);
+
+                formulaServices.getFormulaDetails(attainmentTree.formula ?? Formula.Manual)
+                  .then((formula: FormulaData) => setRootFormula(formula))
+                  .catch((e: Error) => console.log(e.message));
+              })
+              .catch((e: Error) => console.log(e.message));
           }
-        })
-        .catch((e: Error) => console.log(e.message));
-
-      assessmentModelServices.getAllAssessmentModels(courseId)
-        .then((assessmentModels: Array<AssessmentModelData>) => {
-          setAssessmentModels(assessmentModels);
-
-          /**
-           * Newly created courses do not have assessment models assigned.
-           * Set tree to null so proper message can be displayed.
-           */
-          if (assessmentModels.length === 0) {
-            setAttainmentTree(null);
-          } else {
-            setCurrentAssessmentModel(assessmentModels[0]);
-
-            if (assessmentModels[0].id) {
-              attainmentServices.getAllAttainments(courseId, assessmentModels[0].id)
-                .then((attainmentTree: AttainmentData) => {
-                  setAttainmentTree(attainmentTree);
-
-                  formulaServices.getFormulaDetails(attainmentTree.formula ?? Formula.Manual)
-                    .then((formula: FormulaData) => setRootFormula(formula))
-                    .catch((e: Error) => console.log(e.message));
-                })
-                .catch((e: Error) => console.log(e.message));
-            }
-          }
-        })
-        .catch((e: Error) => console.log(e.message));
-    }
+        }
+      })
+      .catch((e: Error) => console.log(e.message));
   }, []);
 
   useEffect(() => {
@@ -140,14 +135,14 @@ function CourseView(): JSX.Element {
   return (
     <Box sx={{ mx: -2.5 }}>
       {
-        course &&
+        course.data &&
         <>
-          <Typography variant='h1' align='left'>{course.courseCode}</Typography>
+          <Typography variant='h1' align='left'>{course.data.courseCode}</Typography>
           <Box sx={{
             display: 'flex', flexWrap: 'wrap',
             justifyContent: 'space-between', mb: 4, columnGap: 6
           }}>
-            <Typography variant='h2' align='left'>{course.name.en}</Typography>
+            <Typography variant='h2' align='left'>{course.data.name.en}</Typography>
             {
               /* Only admins and teachers in charge are allowed to create assessment models */
               (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
@@ -241,7 +236,7 @@ function CourseView(): JSX.Element {
                 variant='contained'
                 sx={{ mt: 6, mb: 3 }}
                 onClick={(): void => {
-                  navigate(`/${courseId}/fetch-instances/${course.courseCode}`);
+                  navigate(`/${courseId}/fetch-instances/${course.data.courseCode}`);
                 }}
               >
                 New instance
