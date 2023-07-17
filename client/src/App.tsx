@@ -166,7 +166,7 @@ function App(): JSX.Element {
                   element={<FetchInstancesView />}
                 />
                 <Route
-                  path='/:courseId/course-results/:instanceId'
+                  path='/:courseId/course-results/:assessmentModelId'
                   element={<CourseResultsView />}
                 />
                 <Route

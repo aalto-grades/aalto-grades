@@ -5,6 +5,7 @@
 export enum Status {
   Pass = 'PASS',
   Fail = 'FAIL',
+  Pending = 'PENDING',
 }
 
 export interface AttainmentGradeData {
@@ -16,4 +17,10 @@ export interface AttainmentGradeData {
   manual: boolean,
   date?: Date,
   expiryDate?: Date
+}
+
+export interface FinalGrade {
+  studentNumber: string,
+  grade: string,
+  credits: number
 }

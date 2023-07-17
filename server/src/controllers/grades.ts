@@ -5,7 +5,7 @@
 import { parse, Parser } from 'csv-parse';
 import { stringify } from 'csv-stringify';
 import { NextFunction, Request, Response } from 'express';
-import { Op, Transaction } from 'sequelize';
+import { Includeable, Op, QueryTypes, Transaction } from 'sequelize';
 import * as yup from 'yup';
 
 import { sequelize } from '../database';
@@ -15,7 +15,7 @@ import AttainmentGrade from '../database/models/attainmentGrade';
 import Course from '../database/models/course';
 import User from '../database/models/user';
 
-import { AttainmentGradeData, Formula, Status } from 'aalto-grades-common/types';
+import { AttainmentGradeData, FinalGrade, Formula, Status } from 'aalto-grades-common/types';
 import { getFormulaImplementation } from '../formulas';
 import {
   ApiError, CalculationResult, FormulaNode,HttpCode, JwtClaims, StudentGrades
@@ -107,8 +107,25 @@ interface FinalGradeRaw extends AttainmentGrade {
 
 async function getFinalGradesFor(
   assessmentModelId: number,
-  studentNumbers: Array<string>
+  studentNumbers: Array<string>,
+  skipErrorOnEmpty: boolean = false
 ): Promise<Array<FinalGradeRaw>> {
+
+  // Prepare base query options for User.
+  const userQueryOptions: Includeable = {
+    model: User,
+    attributes: ['studentNumber']
+  };
+
+  // Conditionally add the where clause if student numbers included.
+  if (studentNumbers.length !== 0) {
+    userQueryOptions.where = {
+      studentNumber: {
+        [Op.in]: studentNumbers
+      }
+    };
+  }
+
   const finalGrades: Array<FinalGradeRaw> = await AttainmentGrade.findAll({
     attributes: ['grade'],
     include: [
@@ -130,21 +147,14 @@ async function getFinalGradesFor(
           }
         ]
       },
-      {
-        model: User,
-        attributes: ['studentNumber'],
-        where: {
-          studentNumber: {
-            [Op.in]: studentNumbers
-          }
-        }
-      }
+      userQueryOptions
     ]
   }) as Array<FinalGradeRaw>;
 
-  if (finalGrades.length === 0) {
+  if (finalGrades.length === 0 && !skipErrorOnEmpty) {
     throw new ApiError(
-      'no grades found, make sure grades have been calculated before requesting course results',
+      'no grades found, make sure grades have been ' +
+      'imported/calculated before requesting course results',
       HttpCode.NotFound
     );
   }
@@ -281,21 +291,62 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
   if (studentNumbers)
     studentNumbersExist(studentNumbers);
 
-  const finalGrades: Array<{
-    studentNumber: string,
-    grade: string,
-    credits: number
-  }> = (await getFinalGradesFor(
-    assessmentModel.id, studentNumbers ?? []
-  )).map(
+  let finalGrades: Array<FinalGrade> = [];
+
+  // User raw query to enable distinct selection of students who have
+  // at least one grade (final or not) for particular assessment model.
+  const allStudentsFromAssessmentModel: Array<string> = (await sequelize.query(
+    `SELECT DISTINCT student_number
+    FROM attainment_grade
+    INNER JOIN attainment ON attainment.id = attainment_grade.attainment_id
+    INNER JOIN "user" ON "user".id = attainment_grade.user_id
+    WHERE attainment.assessment_model_id = :assessmentModelId`,
+    {
+      replacements: { assessmentModelId: assessmentModel.id },
+      type: QueryTypes.SELECT
+    }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  )).map((value: any) => value.student_number);
+
+  const studentsWithFinalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
+    assessmentModel.id, studentNumbers ?? [], allStudentsFromAssessmentModel.length !== 0
+  );
+
+  // Add students with no final grade marked as pending to the results.
+  if (allStudentsFromAssessmentModel.length !== 0) {
+
+    const studentNumbersWithFinalGrades: Array<string> =
+      studentsWithFinalGrades.map((value: FinalGradeRaw) => value.User.studentNumber);
+
+    const studentNumbersNoGrade: Array<string> = allStudentsFromAssessmentModel
+      .filter((studentNumber: string) => {
+        return !studentNumbersWithFinalGrades.includes(studentNumber);
+      });
+
+    studentNumbersNoGrade.forEach((studentNumber: string) => {
+      finalGrades.push({
+        studentNumber,
+        grade: Status.Pending,
+        credits: 0
+      });
+    });
+  }
+
+  studentsWithFinalGrades.map(
     (finalGrade: FinalGradeRaw) => {
-      return {
+      finalGrades.push({
         studentNumber: finalGrade.User.studentNumber,
         grade: String(finalGrade.grade),
         credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits
-      };
+      });
     }
   );
+
+  if (studentNumbers) {
+    finalGrades = finalGrades.filter(
+      (value: FinalGrade) => studentNumbers.includes(value.studentNumber)
+    );
+  }
 
   res.status(HttpCode.Ok).json({
     success: true,

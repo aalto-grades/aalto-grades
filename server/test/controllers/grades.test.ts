@@ -282,7 +282,7 @@ describe(
       checkErrorRes(
         [
           'no grades found, make sure grades have been' +
-        ' calculated before requesting course results'
+        ' imported/calculated before requesting course results'
         ],
         HttpCode.NotFound);
     });
@@ -377,6 +377,68 @@ describe(
         ]);
       });
 
+    it('should show final grade as PENDING for students with no final grade calculated',
+      async () => {
+        res = await request
+          .get('/v1/courses/8/assessment-models/41/grades')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
+
+        checkSuccessRes(res);
+        expect(res.body.data.finalGrades).toEqual([
+          { studentNumber: '711199', grade: 'PENDING', credits: 0 },
+          { studentNumber: '869364', grade: 'PENDING', credits: 0 },
+          { studentNumber: '872942', grade: 'PENDING', credits: 0 },
+          { studentNumber: '369743', grade: '5', credits: 5 },
+          { studentNumber: '795451', grade: '0', credits: 5 },
+          { studentNumber: '716176', grade: '3', credits: 5 }
+        ]);
+      });
+
+    it('should filter returned grades if URL query included',
+      async () => {
+        res = await request
+          .get('/v1/courses/8/assessment-models/41/grades' +
+          '?studentNumbers=["869364","711199","795451"]')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
+
+        checkSuccessRes(res);
+        expect(res.body.data.finalGrades).toEqual([
+          { studentNumber: '711199', grade: 'PENDING', credits: 0 },
+          { studentNumber: '869364', grade: 'PENDING', credits: 0 },
+          { studentNumber: '795451', grade: '0', credits: 5 }
+        ]);
+      });
+
+    it('should show previously PENDING final grades as graded after final grade calculated',
+      async () => {
+        await request
+          .post('/v1/courses/8/assessment-models/41/grades/calculate')
+          .send({
+            studentNumbers: ['711199', '869364', '872942']
+          })
+          .set('Cookie', cookies.adminCookie);
+
+        res = await request
+          .get('/v1/courses/8/assessment-models/41/grades')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
+
+        checkSuccessRes(res);
+        expect(res.body.data.finalGrades).toEqual([
+          { studentNumber: '369743', grade: '5', credits: 5 },
+          { studentNumber: '795451', grade: '0', credits: 5 },
+          { studentNumber: '716176', grade: '3', credits: 5 },
+          { studentNumber: '869364', grade: '5', credits: 5 },
+          { studentNumber: '711199', grade: '0', credits: 5 },
+          { studentNumber: '872942', grade: '3', credits: 5 }
+        ]);
+      });
+
     it(
       'should respond with 400 bad request, if course or instance ID not is valid', async () => {
         res = await request
@@ -421,7 +483,7 @@ describe(
       checkErrorRes(
         [
           'no grades found, make sure grades have been' +
-          ' calculated before requesting course results'
+          ' imported/calculated before requesting course results'
         ],
         HttpCode.NotFound);
     });

@@ -3,13 +3,15 @@
 // SPDX-License-Identifier: MIT
 
 import axios from './axios';
-import { Numeric } from '../types';
+import { FinalGrade } from 'aalto-grades-common/types';
+import { FullResponse, Numeric } from '../types';
+import { AxiosResponse } from 'axios';
 
 async function exportSisuCsv(
-  courseId: Numeric, instanceId: Numeric, params: unknown
+  courseId: Numeric, assessmentModelId: Numeric, params: unknown
 ): Promise<BlobPart> {
   const response = await axios.get(
-    `/v1/courses/${courseId}/instances/${instanceId}/grades/csv/sisu`,
+    `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/csv/sisu`,
     {
       responseType: 'blob',
       params
@@ -19,10 +21,10 @@ async function exportSisuCsv(
 }
 
 async function importCsv(
-  courseId: Numeric, instanceId: Numeric, csv: unknown
-) {
-  const response = await axios.postForm(
-    `/v1/courses/${courseId}/instances/${instanceId}/grades/csv`,
+  courseId: Numeric, assessmentModelId: Numeric, csv: unknown
+): Promise<unknown> {
+  const response: FullResponse<unknown> = await axios.postForm(
+    `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/csv`,
     {
       csv_data: csv // FileList will be unwrapped as sepate fields
     }
@@ -31,30 +33,31 @@ async function importCsv(
 }
 
 async function downloadCsvTemplate(
-  courseId: Numeric, instanceId: Numeric
-) {
-  const response = await axios.get(
-    `/v1/courses/${courseId}/instances/${instanceId}/grades/csv`
+  courseId: Numeric, assessmentModelId: Numeric
+): Promise<string> {
+  const response: AxiosResponse = await axios.get(
+    `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/csv`
   );
-  return response;
+  return response.data;
 }
 
 export async function calculateFinalGrades(
-  courseId: Numeric, instanceId: Numeric
-) {
-  const response = await axios.post(
-    `/v1/courses/${courseId}/instances/${instanceId}/grades/calculate`
+  courseId: Numeric, assessmentModelId: Numeric, studentNumbers: Array<string>
+): Promise<boolean> {
+  const response: FullResponse<unknown> = await axios.post(
+    `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/calculate`,
+    { studentNumbers }
   );
   return response.data.success;
 }
 
 export async function getFinalGrades(
-  courseId: Numeric, instanceId: Numeric
-) {
-  const response = await axios.get(
-    `/v1/courses/${courseId}/instances/${instanceId}/grades`
+  courseId: Numeric, assessmentModelId: Numeric
+): Promise<Array<FinalGrade>> {
+  const response: FullResponse<{ finalGrades: Array<FinalGrade> }> = await axios.get(
+    `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades`
   );
-  return response.data.data;
+  return response.data.data.finalGrades;
 }
 
 export default {

@@ -16,8 +16,6 @@ import FileErrorDialog from './FileErrorDialog';
 import gradeServices from '../../services/grades';
 import { Message, State } from '../../types';
 
-// A Dialog component for uploading a file
-
 const instructions: string =
   'Upload a CSV file with the header "studentNo" and headers matching to the'
   + ' study attainment tags you wish to add grades for. You can see an example'
@@ -34,8 +32,9 @@ const errorInstructions: string =
 // How many errors are initially rendered visible in the dialog.
 export const maxErrorsToShow: number = 5;
 
+// A Dialog component for uploading a file
 function FileLoadDialog(props: {
-  instanceId: number,
+  assessmentModelId: number,
   handleClose: () => void,
   open: boolean
 }): JSX.Element {
@@ -63,16 +62,16 @@ function FileLoadDialog(props: {
   useEffect(() => {
     if (snackPack.length && !messageInfo) {
       setMessageInfo({ ...snackPack[0] });
-      setSnackPack((prev) => prev.slice(1));
+      setSnackPack((prev: Array<Message>) => prev.slice(1));
       setAlertOpen(true);
     } else if (snackPack.length && messageInfo && alertOpen) {
       setAlertOpen(false);
     }
   }, [snackPack, messageInfo, alertOpen]);
 
-  const [fileName, setFileName] = useState<any>(null);
-  const [validationError, setValidationError] = useState('');
-  const [fileErrors, setFileErrors] = useState<Array<string>>([]);
+  const [fileName, setFileName]: State<string | null> = useState<string | null>(null);
+  const [validationError, setValidationError]: State<string> = useState<string>('');
+  const [fileErrors, setFileErrors]: State<Array<string>> = useState<Array<string>>([]);
 
   async function uploadFile(): Promise<void> {
     snackPackAdd({
@@ -81,7 +80,9 @@ function FileLoadDialog(props: {
     });
     try {
       if (courseId) {
-        await gradeServices.importCsv(courseId, props.instanceId, fileInput.current.files[0]);
+        await gradeServices.importCsv(
+          courseId, props.assessmentModelId, fileInput.current.files[0]
+        );
         snackPackAdd({
           msg: 'File processed successfully, grades imported.'
             + ' To refresh final grades, press "calculate final grades"',
@@ -143,7 +144,7 @@ function FileLoadDialog(props: {
                 ref={fileInput}
                 type='file'
                 accept='.csv'
-                onChange={(event) => {
+                onChange={(event: React.ChangeEvent<HTMLInputElement>): void => {
                   event.preventDefault();
                   if (event.target.value) { // new input -> clear errors
                     setValidationError('');
@@ -163,7 +164,7 @@ function FileLoadDialog(props: {
                 <>
                   <ul>
                     {
-                      fileErrors.slice(0, maxErrorsToShow).map((err) => {
+                      fileErrors.slice(0, maxErrorsToShow).map((err: string) => {
                         return (
                           <li key={err}>
                             <FormHelperText error={true}>{err}</FormHelperText>
@@ -180,7 +181,7 @@ function FileLoadDialog(props: {
                 :
                 <ul>
                   {
-                    fileErrors.map((err) => {
+                    fileErrors.map((err: string) => {
                       return (
                         <li key={err}>
                           <FormHelperText error={true}>
@@ -196,7 +197,7 @@ function FileLoadDialog(props: {
           }
         </DialogContent>
         <DialogActions sx={{ pr: 4, pb: 3 }}>
-          <Button size='medium' onClick={() => {
+          <Button size='medium' onClick={(): void => {
             props.handleClose();
             setFileName(null);
             setValidationError('');
@@ -208,7 +209,7 @@ function FileLoadDialog(props: {
             id='ag_confirm_file_upload_btn'
             size='medium'
             variant='outlined'
-            onClick={() => {
+            onClick={(): void => {
               if (!fileName) {
                 setValidationError('You must select a csv file to submit');
                 return;

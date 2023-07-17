@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { FinalGrade } from 'aalto-grades-common/types';
 import { Box, Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { Params, useParams } from 'react-router-dom';
@@ -14,24 +15,26 @@ import { Message, State } from '../types';
 import { sleep } from '../utils';
 
 function CourseResultsView(): JSX.Element {
-  const { courseId, instanceId }: Params = useParams();
+  const { courseId, assessmentModelId }: Params = useParams();
 
-  const [students, setStudents] = useState([]);
+  const [students, setStudents]: State<Array<FinalGrade>> = useState<Array<FinalGrade>>([]);
   const [snackPack, setSnackPack]: State<Array<Message>> = useState<Array<Message>>([]);
   const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
   const [loading, setLoading]: State<boolean> = useState(false);
   const [messageInfo, setMessageInfo]: State<Message | null> =
     useState<Message | null>(null);
+  const [selectedStudents, setSelectedStudents]: State<Array<FinalGrade>> =
+    useState<Array<FinalGrade>>([]);
 
   useEffect(() => {
-    if (courseId && instanceId) {
+    if (courseId && assessmentModelId) {
       setLoading(true);
-      gradeServices.getFinalGrades(courseId, instanceId)
-        .then(data => {
-          setStudents(data.finalGrades);
+      gradeServices.getFinalGrades(courseId, assessmentModelId)
+        .then((data: Array<FinalGrade>) => {
+          setStudents(data);
         })
-        .catch(exception => {
-          console.log(exception);
+        .catch((error: unknown) => {
+          console.log(error);
           snackPackAdd({
             msg: 'Fetching final grades failed, make sure grades are imported and calculated.',
             severity: 'error'
@@ -52,7 +55,7 @@ function CourseResultsView(): JSX.Element {
   useEffect(() => {
     if (snackPack.length && !messageInfo) {
       setMessageInfo({ ...snackPack[0] });
-      setSnackPack((prev) => prev.slice(1));
+      setSnackPack((prev: Array<Message>) => prev.slice(1));
       setAlertOpen(true);
     } else if (snackPack.length && messageInfo && alertOpen) {
       setAlertOpen(false);
@@ -67,27 +70,31 @@ function CourseResultsView(): JSX.Element {
         severity: 'info'
       });
       await sleep(2000);
-      if (courseId && instanceId) {
-        const success = await gradeServices.calculateFinalGrades(courseId, instanceId);
+      if (courseId && assessmentModelId && selectedStudents.length !== 0) {
+        await gradeServices.calculateFinalGrades(
+          courseId,
+          assessmentModelId,
+          selectedStudents.map((student: FinalGrade) => student.studentNumber)
+        );
 
-        if (success) {
-          snackPackAdd({
-            msg: 'Final grades calculated successfully.',
-            severity: 'success'
-          });
-          await sleep(2000);
+        snackPackAdd({
+          msg: 'Final grades calculated successfully.',
+          severity: 'success'
+        });
+        await sleep(2000);
 
-          setLoading(true);
-          snackPackAdd({
-            msg: 'Fetching final grades...',
-            severity: 'info'
-          });
-          const data = await gradeServices.getFinalGrades(courseId, instanceId);
-          setStudents(data.finalGrades);
-        }
+        setLoading(true);
+        snackPackAdd({
+          msg: 'Fetching final grades...',
+          severity: 'info'
+        });
+        const data: Array<FinalGrade> =
+          await gradeServices.getFinalGrades(courseId, assessmentModelId);
+        setSelectedStudents([]);
+        setStudents(data);
       }
-    } catch (exception) {
-      console.log(exception);
+    } catch (err: unknown) {
+      console.log(err);
       snackPackAdd({
         msg: 'Import student grades before calculating the final grade.',
         severity: 'error'
@@ -97,7 +104,7 @@ function CourseResultsView(): JSX.Element {
     }
   }
 
-  async function updateGrades(newGrades: any): Promise<void> {
+  async function updateGrades(newGrades: Array<FinalGrade>): Promise<void> {
     snackPackAdd({
       msg: 'Importing grades...',
       severity: 'info'
@@ -129,23 +136,24 @@ function CourseResultsView(): JSX.Element {
     });
 
     try {
-      if (courseId && instanceId) {
-        const res = await gradeServices.downloadCsvTemplate(courseId, instanceId);
+      if (courseId && assessmentModelId) {
+        const res: string = await gradeServices.downloadCsvTemplate(courseId, assessmentModelId);
+        const blob: Blob = new Blob([res], { type: 'text/csv' });
+        const link: HTMLAnchorElement = document.createElement('a');
 
-        const blob = new Blob([res.data], { type: 'text/csv' });
-
-        const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = 'template.csv'; // TODO: Get filename from Content-Disposition
         link.click();
+        URL.revokeObjectURL(link.href);
+        link.remove();
 
         snackPackAdd({
           msg: 'CSV template downloaded successfully.',
           severity: 'success'
         });
       }
-    } catch (e) {
-      console.log(e);
+    } catch (err: unknown) {
+      console.log(err);
       snackPackAdd({
         msg: 'Downloading CSV template failed. Make sure there are attainments in the instance.',
         severity: 'error'
@@ -161,7 +169,7 @@ function CourseResultsView(): JSX.Element {
         messageInfo={messageInfo} setMessageInfo={setMessageInfo}
         open={alertOpen} setOpen={setAlertOpen}
       />
-      <Typography variant="h1" sx={{ flexGrow: 1, mt: 8, mb: 4 }}>
+      <Typography variant="h1" sx={{ flexGrow: 1, my: 4 }}>
         Course Results
       </Typography>
       <CourseResultsTable
@@ -169,6 +177,8 @@ function CourseResultsView(): JSX.Element {
         loading={loading}
         calculateFinalGrades={calculateFinalGrades}
         downloadCsvTemplate={downloadCsvTemplate}
+        selectedStudents={selectedStudents}
+        setSelectedStudents={setSelectedStudents}
       />
     </Box>
   );

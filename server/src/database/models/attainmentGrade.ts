@@ -67,8 +67,9 @@ AttainmentGrade.init(
       allowNull: false
     },
     status: {
-      type: DataTypes.ENUM('PASS', 'FAIL'),
-      allowNull: false
+      type: DataTypes.ENUM('PASS', 'FAIL', 'PENDING'),
+      allowNull: false,
+      defaultValue: 'PENDING'
     },
     date: {
       type: DataTypes.DATE,

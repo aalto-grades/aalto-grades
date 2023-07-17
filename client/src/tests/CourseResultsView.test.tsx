@@ -2,20 +2,27 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { act, render, RenderResult, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import CourseResultsView from '../components/CourseResultsView';
+import gradeServices from '../services/grades';
+import { finalGrades } from './mock-data/mockFinalGrades';
 
 describe('Tests for CourseResultsView components', () => {
 
   function renderCourseResultsView(): RenderResult {
+    jest.spyOn(gradeServices, 'getFinalGrades').mockResolvedValue(finalGrades);
+
     return render(
-      <BrowserRouter>
-        <CourseResultsView />
-      </BrowserRouter>
+      <MemoryRouter initialEntries={['/1/course-results/1']}>
+        <Routes>
+          <Route
+            path=':courseId/course-results/:assessmentModelId' element={<CourseResultsView />} />
+        </Routes>
+      </MemoryRouter>
     );
   }
 
@@ -27,8 +34,6 @@ describe('Tests for CourseResultsView components', () => {
       expect(screen.getByText('Course Results')).toBeInTheDocument();
       expect(screen.getByText('Student Number')).toBeInTheDocument();
       expect(screen.getByText('Final Grade')).toBeInTheDocument();
-      expect(screen.getByText('View valid grades from past instances:')).toBeInTheDocument();
-      expect(screen.getByText('View all grades')).toBeInTheDocument();
       expect(screen.getByText('Calculate final grades')).toBeInTheDocument();
     });
 
@@ -71,20 +76,27 @@ describe('Tests for CourseResultsView components', () => {
 
       renderCourseResultsView();
 
-      const exportGradesMenuButton: HTMLElement = await screen.findByText('Export to Sisu CSV');
-      expect(exportGradesMenuButton).toBeDefined();
-      act(() => userEvent.click(exportGradesMenuButton));
+      await waitFor( async () => {
+        const selectAllCheckBox: HTMLInputElement = screen.getByLabelText('Select all');
+        userEvent.click(selectAllCheckBox);
+        expect(selectAllCheckBox).toBeChecked();
 
-      const dialogTitle: HTMLElement = screen.getByText('Export final grades to Sisu CSV');
-      const exportButton: HTMLElement = screen.getByText('Export');
-      const cancelButton: HTMLElement = screen.getByText('Cancel');
+        const exportGradesMenuButton: HTMLElement = await screen.findByText('Export to Sisu CSV');
+        expect(exportGradesMenuButton).toBeDefined();
+        act(() => userEvent.click(exportGradesMenuButton));
 
-      expect(dialogTitle).toBeVisible();
-      expect(exportButton).toBeVisible();
-      expect(cancelButton).toBeVisible();
+        const dialogTitle: HTMLElement = screen.getByText('Export final grades to Sisu CSV');
+        const exportButton: HTMLElement = screen.getByText('Export');
+        const cancelButton: HTMLElement = screen.getByText('Cancel');
 
-      act(() => userEvent.click(cancelButton));
-      expect(dialogTitle).not.toBeVisible();
+        expect(dialogTitle).toBeVisible();
+        expect(exportButton).toBeVisible();
+        expect(cancelButton).toBeVisible();
+
+        act(() => userEvent.click(cancelButton));
+        expect(dialogTitle).not.toBeVisible();
+      });
+
     }
   );
 
@@ -102,6 +114,13 @@ describe('Tests for CourseResultsView components', () => {
     renderCourseResultsView();
 
     await waitFor( async () => {
+      const selectAllCheckBox: HTMLInputElement = screen.getByLabelText('Select all');
+      userEvent.click(selectAllCheckBox);
+      expect(selectAllCheckBox).toBeChecked();
+
+      expect(screen.getByText('12345A')).toBeInTheDocument();
+      expect(screen.getByText('98745A')).toBeInTheDocument();
+      expect(screen.getByText('12859A')).toBeInTheDocument();
       expect(screen.queryByText('Calculating final grades...')).not.toBeInTheDocument();
 
       const calculateGradesButton: HTMLElement = screen.getByText('Calculate final grades');
@@ -109,6 +128,7 @@ describe('Tests for CourseResultsView components', () => {
 
       expect(await screen.findByText('Calculating final grades...')).toBeInTheDocument();
     });
+
   });
 
 });
