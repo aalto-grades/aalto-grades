@@ -387,8 +387,8 @@ describe(
 
         checkSuccessRes(res);
         expect(res.body.data.finalGrades).toEqual([
-          { studentNumber: '869364', grade: 'PENDING', credits: 0 },
           { studentNumber: '711199', grade: 'PENDING', credits: 0 },
+          { studentNumber: '869364', grade: 'PENDING', credits: 0 },
           { studentNumber: '872942', grade: 'PENDING', credits: 0 },
           { studentNumber: '369743', grade: '5', credits: 5 },
           { studentNumber: '795451', grade: '0', credits: 5 },
@@ -407,9 +407,9 @@ describe(
 
         checkSuccessRes(res);
         expect(res.body.data.finalGrades).toEqual([
-          { studentNumber: '869364', grade: 'PENDING', credits: 0 },
           { studentNumber: '711199', grade: 'PENDING', credits: 0 },
-          { studentNumber: '795451', grade: '0', credits: 5 },
+          { studentNumber: '869364', grade: 'PENDING', credits: 0 },
+          { studentNumber: '795451', grade: '0', credits: 5 }
         ]);
       });
 

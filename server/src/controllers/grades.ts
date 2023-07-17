@@ -5,7 +5,7 @@
 import { parse, Parser } from 'csv-parse';
 import { stringify } from 'csv-stringify';
 import { NextFunction, Request, Response } from 'express';
-import { Op, Transaction } from 'sequelize';
+import { Includeable, Op, QueryTypes, Transaction } from 'sequelize';
 import * as yup from 'yup';
 
 import { sequelize } from '../database';
@@ -112,6 +112,22 @@ async function getFinalGradesFor(
   studentNumbers: Array<string>,
   skipErrorOnEmpty: boolean = false
 ): Promise<Array<FinalGradeRaw>> {
+
+  // Prepare base query options for User.
+  const userQueryOptions: Includeable = {
+    model: User,
+    attributes: ['studentNumber']
+  };
+
+  // Conditionally add the where clause if student numbers included.
+  if (studentNumbers.length !== 0) {
+    userQueryOptions.where = {
+      studentNumber: {
+        [Op.in]: studentNumbers
+      }
+    };
+  }
+
   const finalGrades: Array<FinalGradeRaw> = await AttainmentGrade.findAll({
     attributes: ['grade'],
     include: [
@@ -133,16 +149,7 @@ async function getFinalGradesFor(
           }
         ]
       },
-      {
-        model: User,
-        attributes: ['studentNumber'],
-        /*
-        where: {
-          studentNumber: {
-            [Op.in]: studentNumbers
-          }
-        }*/
-      }
+      userQueryOptions
     ]
   }) as Array<FinalGradeRaw>;
 
@@ -288,51 +295,34 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
 
   let finalGrades: Array<FinalGrade> = [];
 
-  // Include also students do not have gradings calculated (grading will be shown as 'PENDING').
-  const assessmentModelStudents: Array<FinalGradeRaw> = await AttainmentGrade.findAll({
-    attributes: ['grade'],
-    include: [
-      {
-        model: Attainment,
-        where: {
-          assessmentModelId: assessmentModel.id
-        },
-        include: [
-          {
-            model: AssessmentModel,
-            include: [
-              {
-                model: Course,
-                attributes: ['maxCredits']
-              }
-            ]
-          }
-        ]
-      },
-      {
-        model: User,
-        attributes: ['studentNumber']
-      }
-    ]
-  }) as Array<FinalGradeRaw>;
+  // Get distinct student numbers with grades for particular assessment model.
+  const allStudentsFromAssessmentModel: Array<string> = (await sequelize.query(
+    `SELECT DISTINCT student_number
+    FROM attainment_grade
+    INNER JOIN attainment ON attainment.id = attainment_grade.attainment_id
+    INNER JOIN "user" ON "user".id = attainment_grade.user_id
+    WHERE attainment.assessment_model_id = :assessmentModelId`,
+    {
+      replacements: { assessmentModelId: assessmentModel.id },
+      type: QueryTypes.SELECT
+    }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  )).map((value: any) => value.student_number);
 
   const studentsWithFinalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
-    assessmentModel.id, studentNumbers ?? [], assessmentModelStudents.length !== 0
+    assessmentModel.id, studentNumbers ?? [], allStudentsFromAssessmentModel.length !== 0
   );
 
-  if (assessmentModelStudents.length !== 0) {
+  // Add students with no final grade marked as pending to the results.
+  if (allStudentsFromAssessmentModel.length !== 0) {
 
     const studentNumbersWithFinalGrades: Array<string> =
       studentsWithFinalGrades.map((value: FinalGradeRaw) => value.User.studentNumber);
 
-    const studentNumbersNoGrade: Array<string> = Array.from(
-      new Set(assessmentModelStudents
-        .filter((grade: FinalGradeRaw) => {
-          return !studentNumbersWithFinalGrades.includes(grade.User.studentNumber);
-        })
-        .map((grade: FinalGradeRaw) => grade.User.studentNumber)
-      )
-    );
+    const studentNumbersNoGrade: Array<string> = allStudentsFromAssessmentModel
+      .filter((studentNumber: string) => {
+        return !studentNumbersWithFinalGrades.includes(studentNumber);
+      });
 
     studentNumbersNoGrade.forEach((studentNumber: string) => {
       finalGrades.push({
