@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { CourseInstanceData, GradingScale, Period } from 'aalto-grades-common/types';
-import { Form, Formik } from 'formik';
+import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
 import { Button, Box, MenuItem, TextField } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
@@ -51,7 +51,7 @@ export default function EditInstanceForm(props: {
             .oneOf(Object.values(GradingScale))
             .required()
         })}
-        onSubmit={async function (values): Promise<void> {
+        onSubmit={async function (values: CourseInstanceData): Promise<void> {
           const instanceObject: CourseInstanceData = {
             type: values.type,
             startDate: values.startDate,
@@ -64,7 +64,17 @@ export default function EditInstanceForm(props: {
         }}
       >
         {
-          ({ errors, handleChange, isSubmitting, isValid, touched, values, initialValues }) => (
+          ({ errors, handleChange, isSubmitting, isValid, touched, values, initialValues }:
+            {
+              errors: FormikErrors<CourseInstanceData>,
+              handleChange: (e: React.ChangeEvent<Element>) => void,
+              isSubmitting: boolean,
+              isValid: boolean,
+              touched: FormikTouched<CourseInstanceData>,
+              values: CourseInstanceData,
+              initialValues: CourseInstanceData
+            }
+          ): JSX.Element => (
             <Form>
               <Box sx={{
                 display: 'flex',

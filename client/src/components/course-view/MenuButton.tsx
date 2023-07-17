@@ -12,7 +12,7 @@ import { State } from '../../types';
 
 // A styled menu button. When clicked, a dropdown menu appears
 
-const StyledMenu = styled((props: any) => (
+const StyledMenu = styled((props: any): JSX.Element => (
   <Menu
     elevation={0}
     anchorOrigin={{
@@ -69,14 +69,14 @@ export default function MenuButton(props: {
     setAnchorEl(null);
   }
 
-  function renderOptions(options: Array<MenuButtonOption>) {
+  function renderOptions(options: Array<MenuButtonOption>): Array<JSX.Element> {
     return (
       options.map((option: MenuButtonOption) => (
         <MenuItem
           className='ag_menu_btn_option'
           key={option.description}
           disableRipple
-          onClick={() => {
+          onClick={(): void => {
             option.handleClick();
             handleClose();
           }}>

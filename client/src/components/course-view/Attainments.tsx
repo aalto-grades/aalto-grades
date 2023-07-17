@@ -43,7 +43,7 @@ export default function Attainments(props: {
       {
         props.assessmentModel.id &&
         <EditFormulaDialog
-          handleClose={() => setEditFormulaOpen(false)}
+          handleClose={(): void => setEditFormulaOpen(false)}
           onSubmit={props.onChangeFormula}
           open={editFormulaOpen}
           courseId={props.courseId}
@@ -69,7 +69,7 @@ export default function Attainments(props: {
       <Box sx={{ display: 'inline-grid', gap: 1 }}>
         {
           props.attainmentTree.subAttainments &&
-          props.attainmentTree.subAttainments.map(attainment => {
+          props.attainmentTree.subAttainments.map((attainment: AttainmentData) => {
             /* Since the attainments are displayed by the course view, they exist in the database
                and their actual ids can be used are keys of the attainment accoridon */
             return (

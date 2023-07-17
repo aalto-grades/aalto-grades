@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { CourseData } from 'aalto-grades-common/types';
-import { Form, Formik } from 'formik';
+import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonIcon from '@mui/icons-material/Person';
@@ -20,6 +20,19 @@ import * as yup from 'yup';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 import { State } from '../../types';
+
+interface FormData {
+  courseCode: string;
+  minCredits: number;
+  maxCredits: number;
+  teacherEmail: string;
+  departmentEn: string;
+  departmentFi: string;
+  departmentSv: string;
+  nameEn: string;
+  nameFi: string;
+  nameSv: string;
+}
 
 export default function CreateCourseForm(props: {
   addCourse: (course: CourseData) => Promise<void>
@@ -86,7 +99,7 @@ export default function CreateCourseForm(props: {
             .min(1)
             .required('Please input a valid course name in Swedish')
         })}
-        onSubmit={async function (values): Promise<void> {
+        onSubmit={async function (values: FormData): Promise<void> {
           const courseObject: CourseData = ({
             courseCode: values.courseCode,
             minCredits: values.minCredits,
@@ -110,7 +123,17 @@ export default function CreateCourseForm(props: {
           await props.addCourse(courseObject);
         }}
       >
-        {({ errors, handleChange, isSubmitting, isValid, touched, values, initialValues }) => (
+        {({ errors, handleChange, isSubmitting, isValid, touched, values, initialValues }:
+          {
+            errors: FormikErrors<FormData>,
+            handleChange: (e: React.ChangeEvent<Element>) => void,
+            isSubmitting: boolean,
+            isValid: boolean,
+            touched: FormikTouched<FormData>,
+            values: FormData,
+            initialValues: FormData
+          }
+        ): JSX.Element => (
           <Form>
             <Box sx={{
               display: 'flex',
