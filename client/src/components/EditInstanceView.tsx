@@ -4,16 +4,16 @@
 
 import { useState, useEffect } from 'react';
 import { NavigateFunction, useNavigate, Params, useParams } from 'react-router-dom';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import LinearProgress from '@mui/material/LinearProgress';
+import { Container, LinearProgress, Typography } from '@mui/material';
+import {
+  CourseData, CourseInstanceData, GradingScale, Period
+} from 'aalto-grades-common/types/course';
+
 import EditInstanceForm from './edit-instance-view/EditInstanceForm';
 import AlertSnackbar from './alerts/AlertSnackbar';
 import courseServices from '../services/courses';
 import instanceServices from '../services/instances';
-import {
-  CourseData, CourseInstanceData, GradingScale, Period
-} from 'aalto-grades-common/types/course';
+import useSnackPackAlerts, { SnackPackAlertState } from '../hooks/useSnackPackAlerts';
 import { Message, State } from '../types';
 
 function EditInstanceView(): JSX.Element {
@@ -24,10 +24,7 @@ function EditInstanceView(): JSX.Element {
   const [instance, setInstance]: State<CourseInstanceData | null> =
     useState<CourseInstanceData | null>(null);
 
-  const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
-
-  const [messageInfo, setMessageInfo]: State<Message | null> =
-    useState<Message | null>(null);
+  const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
   useEffect(() => {
     if (sisuInstanceId) {
@@ -67,8 +64,8 @@ function EditInstanceView(): JSX.Element {
       if (error?.response?.data?.errors) {
         msg = error.response.data.errors;
       }
-      setMessageInfo({ msg, severity: 'error' });
-      setAlertOpen(true);
+      snackPack.setMessageInfo({ msg, severity: 'error' });
+      snackPack.setAlertOpen(true);
     }
   }
 
@@ -87,10 +84,7 @@ function EditInstanceView(): JSX.Element {
           </>
           : <LinearProgress sx={{ margin: '200px 50px 0px 50px' }} />
       }
-      <AlertSnackbar
-        messageInfo={messageInfo} setMessageInfo={setMessageInfo}
-        open={alertOpen} setOpen={setAlertOpen}
-      />
+      <AlertSnackbar snackPack={snackPack} />
     </Container>
   );
 }

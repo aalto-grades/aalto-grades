@@ -5,19 +5,16 @@
 import { useState, useEffect, createRef } from 'react';
 import { Params, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import FormHelperText from '@mui/material/FormHelperText';
+import {
+  Box, Button, Dialog, DialogActions, DialogContent, DialogContentText,
+  DialogTitle, FormHelperText, Typography
+} from '@mui/material';
+
 import AlertSnackbar from '../alerts/AlertSnackbar';
-import gradeServices from '../../services/grades';
 import FileErrorDialog from './FileErrorDialog';
-import { Message, State } from '../../types';
+import gradeServices from '../../services/grades';
+import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
+import { State } from '../../types';
 
 // A Dialog component for uploading a file
 
@@ -46,46 +43,26 @@ function FileLoadDialog(props: {
   const fileInput = createRef<any>();
 
   // state variables handling the alert messages
-  const [snackPack, setSnackPack]: State<Array<Message>> =
-    useState<Array<Message>>([]);
-  const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
+  const snackPack: SnackPackAlertState = useSnackPackAlerts();
   const [showErrorDialog, setShowErrorDialog]: State<boolean> = useState(false);
-  const [messageInfo, setMessageInfo]: State<Message | null> =
-    useState<Message | null>(null);
 
   function toggleErrorDialog(): void {
     setShowErrorDialog(!showErrorDialog);
   }
-
-  function snackPackAdd(msg: Message): void {
-    setSnackPack((prev: Array<Message>): Array<Message> => [...prev, msg]);
-  }
-
-  // useEffect in charge of handling the back-to-back alerts
-  // makes the previous disappear before showing the new one
-  useEffect(() => {
-    if (snackPack.length && !messageInfo) {
-      setMessageInfo({ ...snackPack[0] });
-      setSnackPack((prev) => prev.slice(1));
-      setAlertOpen(true);
-    } else if (snackPack.length && messageInfo && alertOpen) {
-      setAlertOpen(false);
-    }
-  }, [snackPack, messageInfo, alertOpen]);
 
   const [fileName, setFileName] = useState<any>(null);
   const [validationError, setValidationError] = useState('');
   const [fileErrors, setFileErrors] = useState<Array<string>>([]);
 
   async function uploadFile(): Promise<void> {
-    snackPackAdd({
+    snackPack.push({
       msg: 'Importing grades...',
       severity: 'info'
     });
     try {
       if (courseId) {
         await gradeServices.importCsv(courseId, props.instanceId, fileInput.current.files[0]);
-        snackPackAdd({
+        snackPack.push({
           msg: 'File processed successfully, grades imported.'
             + ' To refresh final grades, press "calculate final grades"',
           severity: 'success'
@@ -99,7 +76,7 @@ function FileLoadDialog(props: {
         setFileErrors(err.response.data.errors);
       }
 
-      snackPackAdd({
+      snackPack.push({
         msg: 'There was an issue progressing the file, the grades were not imported.',
         severity: 'error'
       });
@@ -223,12 +200,7 @@ function FileLoadDialog(props: {
           </Button>
         </DialogActions>
       </Dialog>
-      <AlertSnackbar
-        messageInfo={messageInfo}
-        setMessageInfo={setMessageInfo}
-        open={alertOpen}
-        setOpen={setAlertOpen}
-      />
+      <AlertSnackbar snackPack={snackPack} />
       <FileErrorDialog
         handleClose={toggleErrorDialog}
         open={showErrorDialog}

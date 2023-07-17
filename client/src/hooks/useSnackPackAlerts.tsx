@@ -9,31 +9,16 @@ import { Message, State } from '../types';
  * custom hook for using back-to-back alerts
  * - use requires that AlertSnackbar is imported also
  *   (import AlertSnackbar from './alerts/AlertSnackbar')
- *
- * In component:
- *   const [
- *     setSnackPack, messageInfo, setMessageInfo, alertOpen, setAlertOpen
- *   ] = useSnackPackAlerts();
- *
- * To display an alert:
- *   setSnackPack((prev) => [...prev, errorMsgInstance]);
- *
- * In render:
- *   <AlertSnackbar
- *     messageInfo={messageInfo}
- *     setMessageInfo={setMessageInfo}
- *     open={alertOpen}
- *     setOpen={setAlertOpen}
- *   />
  */
 
-export type SnackPackAlertState = [
-  Dispatch<SetStateAction<Array<Message>>>,
-  Message | null,
-  Dispatch<SetStateAction<Message | null>>,
-  boolean,
-  Dispatch<SetStateAction<boolean>>
-];
+export interface SnackPackAlertState {
+  push: (message: Message) => void,
+  pop: () => void,
+  messageInfo: Message | null,
+  setMessageInfo: Dispatch<SetStateAction<Message | null>>,
+  alertOpen: boolean,
+  setAlertOpen: Dispatch<SetStateAction<boolean>>
+}
 
 function useSnackPackAlerts(): SnackPackAlertState {
 
@@ -46,19 +31,31 @@ function useSnackPackAlerts(): SnackPackAlertState {
   const [messageInfo, setMessageInfo]: State<Message | null> =
     useState<Message | null>(null);
 
+  function push(message: Message): void {
+    setSnackPack((prev: Array<Message>) => [...prev, message]);
+  }
+
+  function pop(): void {
+    setSnackPack((prev) => prev.slice(1));
+  }
+
   // useEffect in charge of handling the back-to-back alerts
   // the previous disappears before a new one is shown
   useEffect(() => {
     if (snackPack.length && !messageInfo) {
       setMessageInfo({ ...snackPack[0] });
-      setSnackPack((prev) => prev.slice(1));
+      pop();
       setAlertOpen(true);
     } else if (snackPack.length && messageInfo && alertOpen) {
       setAlertOpen(false);
     }
   }, [snackPack, messageInfo, alertOpen]);
 
-  return [setSnackPack, messageInfo, setMessageInfo, alertOpen, setAlertOpen];
+  return {
+    push, pop,
+    messageInfo, setMessageInfo,
+    alertOpen, setAlertOpen
+  };
 }
 
 export default useSnackPackAlerts;

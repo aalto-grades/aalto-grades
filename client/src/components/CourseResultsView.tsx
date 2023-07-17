@@ -4,23 +4,22 @@
 
 import { useState, useEffect } from 'react';
 import { Params, useParams } from 'react-router-dom';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import { Box, Typography } from '@mui/material';
+
 import CourseResultsTable from './course-results-view/CourseResultsTable';
 import AlertSnackbar from './alerts/AlertSnackbar';
 import gradeServices from '../services/grades';
+import useSnackPackAlerts, { SnackPackAlertState } from '../hooks/useSnackPackAlerts';
 import { sleep } from '../utils';
-import { Message, State } from '../types';
+import { State } from '../types';
 
 function CourseResultsView(): JSX.Element {
   const { courseId, instanceId }: Params = useParams();
 
   const [students, setStudents] = useState([]);
-  const [snackPack, setSnackPack]: State<Array<Message>> = useState<Array<Message>>([]);
-  const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
   const [loading, setLoading]: State<boolean> = useState(false);
-  const [messageInfo, setMessageInfo]: State<Message | null> =
-    useState<Message | null>(null);
+
+  const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
   useEffect(() => {
     if (courseId && instanceId) {
@@ -31,37 +30,21 @@ function CourseResultsView(): JSX.Element {
         })
         .catch(exception => {
           console.log(exception);
-          snackPackAdd({
+          snackPack.push({
             msg: 'Fetching final grades failed, make sure grades are imported and calculated.',
             severity: 'error'
           });
         }).finally(() => {
           setLoading(false);
-          setAlertOpen(false);
+          snackPack.setAlertOpen(false);
         });
     }
   }, []);
 
-  function snackPackAdd(msg: Message): void {
-    setSnackPack((prev: Array<Message>): Array<Message> => [...prev, msg]);
-  }
-
-  // useEffect in charge of handling the back-to-back alerts
-  // makes the previous disappear before showing the new one
-  useEffect(() => {
-    if (snackPack.length && !messageInfo) {
-      setMessageInfo({ ...snackPack[0] });
-      setSnackPack((prev) => prev.slice(1));
-      setAlertOpen(true);
-    } else if (snackPack.length && messageInfo && alertOpen) {
-      setAlertOpen(false);
-    }
-  }, [snackPack, messageInfo, alertOpen]);
-
   // Triggers the calculation of final grades
   async function calculateFinalGrades(): Promise<void> {
     try {
-      snackPackAdd({
+      snackPack.push({
         msg: 'Calculating final grades...',
         severity: 'info'
       });
@@ -70,14 +53,14 @@ function CourseResultsView(): JSX.Element {
         const success = await gradeServices.calculateFinalGrades(courseId, instanceId);
 
         if (success) {
-          snackPackAdd({
+          snackPack.push({
             msg: 'Final grades calculated successfully.',
             severity: 'success'
           });
           await sleep(2000);
 
           setLoading(true);
-          snackPackAdd({
+          snackPack.push({
             msg: 'Fetching final grades...',
             severity: 'info'
           });
@@ -87,7 +70,7 @@ function CourseResultsView(): JSX.Element {
       }
     } catch (exception) {
       console.log(exception);
-      snackPackAdd({
+      snackPack.push({
         msg: 'Import student grades before calculating the final grade.',
         severity: 'error'
       });
@@ -97,24 +80,24 @@ function CourseResultsView(): JSX.Element {
   }
 
   async function updateGrades(newGrades: any): Promise<void> {
-    snackPackAdd({
+    snackPack.push({
       msg: 'Importing grades...',
       severity: 'info'
     });
     await sleep(2000);
     try {
       // TODO: connect to backend
-      snackPackAdd({
+      snackPack.push({
         msg: 'Grades imported successfully.',
         severity: 'success'
       });
       setStudents(newGrades);
       await sleep(3000);
-      setAlertOpen(false);
+      snackPack.setAlertOpen(false);
 
     } catch (exception) {
       console.log(exception);
-      snackPackAdd({
+      snackPack.push({
         msg: 'Grade import failed.',
         severity: 'error'
       });
@@ -122,7 +105,7 @@ function CourseResultsView(): JSX.Element {
   }
 
   async function downloadCsvTemplate(): Promise<void> {
-    snackPackAdd({
+    snackPack.push({
       msg: 'Downloading CSV template',
       severity: 'info'
     });
@@ -138,28 +121,25 @@ function CourseResultsView(): JSX.Element {
         link.download = 'template.csv'; // TODO: Get filename from Content-Disposition
         link.click();
 
-        snackPackAdd({
+        snackPack.push({
           msg: 'CSV template downloaded successfully.',
           severity: 'success'
         });
       }
     } catch (e) {
       console.log(e);
-      snackPackAdd({
+      snackPack.push({
         msg: 'Downloading CSV template failed. Make sure there are attainments in the instance.',
         severity: 'error'
       });
     } finally {
-      setAlertOpen(false);
+      snackPack.setAlertOpen(false);
     }
   }
 
   return (
     <Box textAlign='left' alignItems='left'>
-      <AlertSnackbar
-        messageInfo={messageInfo} setMessageInfo={setMessageInfo}
-        open={alertOpen} setOpen={setAlertOpen}
-      />
+      <AlertSnackbar snackPack={snackPack} />
       <Typography variant="h1" sx={{ flexGrow: 1, mt: 8, mb: 4 }}>
         Course Results
       </Typography>

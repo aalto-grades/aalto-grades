@@ -3,19 +3,17 @@
 // SPDX-License-Identifier: MIT
 
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import Typography from '@mui/material/Typography';
+import { Typography } from '@mui/material';
+import { CourseData } from 'aalto-grades-common/types';
+
+import AlertSnackbar from './alerts/AlertSnackbar';
 import CreateCourseForm from './create-course-view/CreateCourseForm';
 import courseServices from '../services/courses';
-import { Message, State } from '../types';
-import AlertSnackbar from './alerts/AlertSnackbar';
-import { useState } from 'react';
-import { CourseData } from 'aalto-grades-common/types';
+import useSnackPackAlerts, { SnackPackAlertState } from '../hooks/useSnackPackAlerts';
 
 function CreateCourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
-  const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
-  const [messageInfo, setMessageInfo]: State<Message | null> =
-    useState<Message | null>(null);
+  const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
   async function addCourse(course: CourseData): Promise<void> {
     try {
@@ -27,8 +25,8 @@ function CreateCourseView(): JSX.Element {
       if (error?.response?.data?.errors) {
         msg = error.response.data.errors;
       }
-      setMessageInfo({ msg, severity: 'error' });
-      setAlertOpen(true);
+      snackPack.setMessageInfo({ msg, severity: 'error' });
+      snackPack.setAlertOpen(true);
     }
   }
 
@@ -38,10 +36,7 @@ function CreateCourseView(): JSX.Element {
         Create a New Course
       </Typography>
       <CreateCourseForm addCourse={addCourse}/>
-      <AlertSnackbar
-        messageInfo={messageInfo} setMessageInfo={setMessageInfo}
-        open={alertOpen} setOpen={setAlertOpen}
-      />
+      <AlertSnackbar snackPack={snackPack} />
     </>
   );
 }

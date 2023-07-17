@@ -25,9 +25,7 @@ function SelectFormula(props: {
 
   const [formulas, setFormulas]: State<Array<FormulaData>> = useState<Array<FormulaData>>([]);
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
-  const [
-    setSnackPack, messageInfo, setMessageInfo, alertOpen, setAlertOpen
-  ]: SnackPackAlertState = useSnackPackAlerts();
+  const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
   useEffect(() => {
     if (formulas.length == 0) {
@@ -50,12 +48,7 @@ function SelectFormula(props: {
 
   return (
     <>
-      <AlertSnackbar
-        messageInfo={messageInfo}
-        setMessageInfo={setMessageInfo}
-        open={alertOpen}
-        setOpen={setAlertOpen}
-      />
+      <AlertSnackbar snackPack={snackPack} />
       <StyledBox sx={{
         display: 'flex',
         alignItems: 'flex-start',
@@ -83,7 +76,9 @@ function SelectFormula(props: {
               >
                 {formulas.map((formula: FormulaData) => {
                   return (
-                    <MenuItem key={formula.id} value={formula.name}>{formula.name}</MenuItem>
+                    <MenuItem key={formula.id} value={formula.name}>
+                      {formula.name}
+                    </MenuItem>
                   );
                 })}
               </Select>

@@ -2,21 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import Dialog from '@mui/material/Dialog';
-import TextField from '@mui/material/TextField';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import MenuItem from '@mui/material/MenuItem';
+import {
+  Box, Button, Dialog, DialogActions, DialogContent, DialogContentText,
+  DialogTitle, MenuItem, TextField
+} from '@mui/material';
+
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import gradeServices from '../../services/grades';
-import { Message, State } from '../../types';
+import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
+import { Message } from '../../types';
 
 // A Dialog component for exporting Sisu grades CSV.
 const instructions: string =
@@ -90,28 +87,14 @@ function SisuExportDialog(props: {
   const { courseId, instanceId }: Params = useParams();
 
   // state variables handling the alert messages.
-  const [snackPack, setSnackPack]: State<Array<Message>> = useState<Array<Message>>([]);
-  const [alertOpen, setAlertOpen] = useState<boolean>(false);
-  const [messageInfo, setMessageInfo] = useState<Message | null>(null);
+  const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
   // state variables handling the assessment date and completion language.
   const [assessmentDate, setAssessmentDate] = useState<any>(null);
   const [completionLanguage, setCompletionLanguage] = useState<any>(null);
 
-  // useEffect in charge of handling the back-to-back alerts
-  // makes the previous disappear before showing the new one
-  useEffect(() => {
-    if (snackPack.length && !messageInfo) {
-      setMessageInfo({ ...snackPack[0] });
-      setSnackPack((prev) => prev.slice(1));
-      setAlertOpen(true);
-    } else if (snackPack.length && messageInfo && alertOpen) {
-      setAlertOpen(false);
-    }
-  }, [snackPack, messageInfo, alertOpen]);
-
   async function exportSisuCsvGrades(): Promise<void> {
-    setSnackPack((prev) => [...prev, loadingMsg]);
+    snackPack.push(loadingMsg);
 
     try {
       if (courseId && instanceId) {
@@ -136,13 +119,13 @@ function SisuExportDialog(props: {
         // Download file automatically to the user's computer.
         link.click();
 
-        setSnackPack((prev) => [...prev, successMsg]);
+        snackPack.push(successMsg);
       }
     } catch (exception) {
       console.log(exception);
-      setSnackPack((prev) => [...prev, errorMsg]);
+      snackPack.push(errorMsg);
     } finally {
-      setAlertOpen(false);
+      snackPack.setAlertOpen(false);
     }
   }
 
@@ -216,10 +199,7 @@ function SisuExportDialog(props: {
           </Button>
         </DialogActions>
       </Dialog>
-      <AlertSnackbar
-        messageInfo={messageInfo} setMessageInfo={setMessageInfo}
-        open={alertOpen} setOpen={setAlertOpen}
-      />
+      <AlertSnackbar snackPack={snackPack} />
     </>
   );
 }

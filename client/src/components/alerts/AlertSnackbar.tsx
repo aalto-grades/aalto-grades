@@ -4,12 +4,11 @@
 
 import React, { SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
-import Snackbar from '@mui/material/Snackbar';
-import Slide from '@mui/material/Slide';
+import { Slide, Snackbar, Theme, Typography } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { Message } from '../../types';
-import { Theme, Typography } from '@mui/material';
+
+import { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 
 const darkTheme: Theme = createTheme({
   palette: {
@@ -23,39 +22,40 @@ const Alert: any = React.forwardRef(function Alert(props, ref) {
 
 // TODO: Consider if the key attribute works properly of if something else should be used?
 // position allows "stacked look", starts from 1 but really needed only from 2 onwards
-function AlertSnackbar({ messageInfo, setMessageInfo, open, setOpen, position }: {
-  messageInfo: Message | null,
-  setMessageInfo: (messageInfo: Message | null) => void,
-  open: boolean,
-  setOpen: (open: boolean) => void,
+function AlertSnackbar(props: {
+  snackPack: SnackPackAlertState,
   position?: number
 }): JSX.Element {
 
-  const margin: number = position ? (position - 1) * 7 : 0;
+  const margin: number = props.position ? (props.position - 1) * 7 : 0;
+
+  const {
+    messageInfo, setMessageInfo,
+    alertOpen, setAlertOpen
+  }: SnackPackAlertState = props.snackPack;
 
   function handleClose(event: Event | SyntheticEvent, reason: string): void {
     if (reason === 'clickaway') {
       return;
     }
-    setOpen(false);
-  }
-
-  function handleExited(): void {
-    setMessageInfo(null);
+    setAlertOpen(false);
   }
 
   return (
     <div>
       <ThemeProvider theme={darkTheme}>
         <Snackbar
-          key={messageInfo?.msg && !Array.isArray(messageInfo?.msg) ?
-            messageInfo?.msg : messageInfo?.msg[0]}
-          open={open}
+          key={
+            (messageInfo?.msg && !Array.isArray(messageInfo?.msg))
+              ? messageInfo?.msg
+              : messageInfo?.msg[0]
+          }
+          open={alertOpen}
           autoHideDuration={4000}
           anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
           onClose={handleClose}
           TransitionComponent={Slide}
-          TransitionProps={{ onExited: handleExited }}
+          TransitionProps={{ onExited: () => setMessageInfo(null) }}
           sx={{ mt: margin, maxWidth: '45vw', textAlign: 'left' }}
         >
           <Alert
@@ -66,7 +66,7 @@ function AlertSnackbar({ messageInfo, setMessageInfo, open, setOpen, position }:
             {(messageInfo?.msg && !Array.isArray(messageInfo?.msg)) ?
               <>
                 {messageInfo?.severity === 'error' &&
-                <Typography variant='h5'>Error occurred:</Typography>}
+                  <Typography variant='h5'>Error occurred:</Typography>}
                 {messageInfo?.msg}
               </> :
               <>
@@ -90,10 +90,7 @@ function AlertSnackbar({ messageInfo, setMessageInfo, open, setOpen, position }:
 }
 
 AlertSnackbar.propTypes = {
-  messageInfo: PropTypes.object,
-  setMessageInfo: PropTypes.func,
-  open: PropTypes.bool,
-  setOpen: PropTypes.func,
+  snackPack: PropTypes.object,
   position: PropTypes.number
 };
 
