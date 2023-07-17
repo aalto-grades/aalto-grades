@@ -7,8 +7,7 @@ import * as yup from 'yup';
 
 import { Formula, FormulaData } from 'aalto-grades-common/types';
 import { getAllFormulasData, getFormulaImplementation } from '../formulas';
-import { HttpCode } from '../types/httpCode';
-import { FormulaImplementation } from '../types/formulas';
+import { FormulaImplementation, HttpCode } from '../types';
 
 export async function getFormulas(req: Request, res: Response): Promise<void> {
   res.status(HttpCode.Ok).json({

@@ -6,9 +6,7 @@ import * as yup from 'yup';
 
 import { registerFormula } from '.';
 import { Formula, Status } from 'aalto-grades-common/types';
-import { ApiError } from '../types/error';
-import { CalculationResult, ParamsObject } from '../types/formulas';
-import { HttpCode } from '../types/httpCode';
+import { ApiError, CalculationResult, HttpCode, ParamsObject } from '../types';
 
 interface ChildParams {
   weight: number;

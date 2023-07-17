@@ -6,9 +6,7 @@ import User from '../../database/models/user';
 import TeacherInCharge from '../../database/models/teacherInCharge';
 
 import { SystemRole } from 'aalto-grades-common/types';
-import { ApiError } from '../../types/error';
-import { JwtClaims } from '../../types/general';
-import { HttpCode } from '../../types/httpCode';
+import { ApiError, HttpCode, JwtClaims } from '../../types';
 
 /**
  * Finds a user by its ID.

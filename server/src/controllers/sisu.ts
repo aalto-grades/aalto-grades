@@ -8,10 +8,8 @@ import { Request, Response } from 'express';
 import { AXIOS_TIMEOUT } from '../configs/constants';
 import { SISU_API_KEY, SISU_API_URL } from '../configs/environment';
 
-import { CourseInstanceData, GradingScale } from 'aalto-grades-common/types/course';
-import { ApiError } from '../types/error';
-import { HttpCode } from '../types/httpCode';
-import { SisuCourseInstance } from '../types/sisu';
+import { CourseInstanceData, GradingScale } from 'aalto-grades-common/types';
+import { ApiError, HttpCode, SisuCourseInstance } from '../types';
 
 function parseSisuGradingScale(gradingScale: string): GradingScale | undefined {
   switch (gradingScale) {

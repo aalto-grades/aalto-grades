@@ -6,11 +6,9 @@ import AssessmentModel from '../../database/models/assessmentModel';
 import Attainment from '../../database/models/attainment';
 import Course from '../../database/models/course';
 
-import { AttainmentData } from 'aalto-grades-common/types/attainment';
+import { AttainmentData } from 'aalto-grades-common/types';
 import { validateAssessmentModelPath } from './assessmentModel';
-import { ApiError } from '../../types/error';
-import { idSchema } from '../../types/general';
-import { HttpCode } from '../../types/httpCode';
+import { ApiError, HttpCode, idSchema } from '../../types';
 
 /**
  * Finds an attainment by its ID.

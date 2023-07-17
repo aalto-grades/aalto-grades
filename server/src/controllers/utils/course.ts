@@ -6,11 +6,8 @@ import Course from '../../database/models/course';
 import CourseTranslation from '../../database/models/courseTranslation';
 import User from '../../database/models/user';
 
-import { CourseData } from 'aalto-grades-common/types/course';
-import { Language } from 'aalto-grades-common/types/language';
-import { ApiError } from '../../types/error';
-import { HttpCode } from '../../types/httpCode';
-import { CourseFull } from '../../types/model';
+import { CourseData, Language } from 'aalto-grades-common/types';
+import { ApiError, CourseFull, HttpCode } from '../../types';
 
 /**
  * Finds a course by its ID.

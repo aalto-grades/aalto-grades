@@ -4,7 +4,7 @@
 
 import * as yup from 'yup';
 
-import { localizedStringSchema } from '../../src/types/language';
+import { localizedStringSchema } from '../../src/types';
 
 describe('Test localizedStringSchema', () => {
 

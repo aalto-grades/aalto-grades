@@ -12,9 +12,7 @@ import Course from '../database/models/course';
 
 import { AttainmentData, Formula } from 'aalto-grades-common/types';
 import { getFormulaImplementation } from '../formulas';
-import { ApiError } from '../types/error';
-import { JwtClaims, idSchema } from '../types/general';
-import { HttpCode } from '../types/httpCode';
+import { ApiError, HttpCode, idSchema, JwtClaims } from '../types';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import {
   findAttainmentById, findAttainmentsByAssessmentModel, generateAttainmentTree,
