@@ -2,42 +2,33 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { JSX, useState, useEffect } from 'react';
+import { JSX } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import { useQuery, UseQueryResult } from '@tanstack/react-query';
+import { Box, Button, Typography } from '@mui/material';
+import { CourseData, SystemRole } from 'aalto-grades-common/types';
+
 import CourseTable from './front-page/CourseTable';
 import courseServices from '../services/courses';
 import useAuth, { AuthContextType } from '../hooks/useAuth';
-import { CourseData, SystemRole } from 'aalto-grades-common/types';
-import { State } from '../types';
 
 function FrontPage(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
-
-  const [coursesOfUser, setCoursesOfUser]: State<Array<CourseData>> =
-    useState<Array<CourseData>>([]);
-  const [courses, setCourses]: State<Array<CourseData>> =
-    useState<Array<CourseData>>([]);
-
   const { auth }: AuthContextType = useAuth();
 
-  useEffect(() => {
-    if (auth) {
-      courseServices.getCoursesOfUser(auth.id)
-        .then((data: Array<CourseData>) => {
-          setCoursesOfUser(data);
-        })
-        .catch((e) => console.log(e.message));
+  const coursesOfUser: UseQueryResult<Array<CourseData>> = useQuery({
+    queryKey: ['courses-of-user'],
+    queryFn: () => {
+      if (auth) {
+        return courseServices.getCoursesOfUser(auth.id);
+      }
     }
+  });
 
-    courseServices.getAllCourses()
-      .then((data: Array<CourseData>) => {
-        setCourses(data);
-      })
-      .catch((e) => console.log(e.message));
-  }, []);
+  const courses: UseQueryResult<Array<CourseData>> = useQuery({
+    queryKey: ['all-courses'],
+    queryFn: courseServices.getAllCourses
+  });
 
   return (
     <>
@@ -50,9 +41,9 @@ function FrontPage(): JSX.Element {
         </Typography>
       </Box>
       {
-        coursesOfUser.length > 0
+        (coursesOfUser.data && coursesOfUser.data.length > 0)
           ?
-          <CourseTable courses={coursesOfUser} />
+          <CourseTable courses={coursesOfUser.data} />
           :
           <Box sx={{
             display: 'flex', alignItems: 'left',
@@ -80,7 +71,10 @@ function FrontPage(): JSX.Element {
           </Button>
         }
       </Box>
-      <CourseTable courses={courses} />
+      {
+        courses.data &&
+        <CourseTable courses={courses.data} />
+      }
     </>
   );
 }

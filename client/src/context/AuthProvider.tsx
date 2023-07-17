@@ -14,7 +14,7 @@ import { State } from '../types';
 export interface AuthContextType {
   auth: LoginResult | null,
   setAuth: (auth: LoginResult | null) => void,
-  isTeacherInCharge: boolean
+  isTeacherInCharge: boolean,
   setIsTeacherInCharge: (isTeacherIncharge: boolean) => void
 }
 

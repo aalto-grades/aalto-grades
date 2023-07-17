@@ -4,15 +4,15 @@
 
 import { CSSProperties, JSX } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Link from '@mui/material/Link';
-import Container from '@mui/material/Container';
-import Box from '@mui/material/Box';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AppBar, Box, Container, Link, Toolbar } from '@mui/material';
 import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
+import { SystemRole } from 'aalto-grades-common/types/auth';
+
 import PrivateRoute from './components/auth/PrivateRoute';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
+import UserButton from './components/auth/UserButton';
 import FrontPage from './components/FrontPage';
 import CourseView from './components/CourseView';
 import CreateCourseView from './components/CreateCourseView';
@@ -20,8 +20,6 @@ import FetchInstancesView from './components/FetchInstancesView';
 import EditInstanceView from './components/EditInstanceView';
 import EditAttainmentView from './components/EditAttainmentView';
 import CourseResultsView from './components/CourseResultsView';
-import UserButton from './components/auth/UserButton';
-import { SystemRole } from 'aalto-grades-common/types/auth';
 import Footer from './components/Footer';
 
 declare module '@mui/material/styles' {
@@ -117,79 +115,83 @@ const theme: Theme = createTheme({
   }
 });
 
+const queryClient: QueryClient = new QueryClient();
+
 function App(): JSX.Element {
   return (
     <ThemeProvider theme={theme}>
-      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-        <AppBar position="static">
-          <Toolbar>
-            <Link
-              href="/"
-              underline="none"
-              color="white"
-              variant="h5"
-              align="left"
-              sx={{ mr: 2, flexGrow: 1 }}
-            >
-              Aalto Grades
-            </Link>
-            <UserButton />
-          </Toolbar>
-        </AppBar>
-        <Container sx={{ textAlign: 'center' }} maxWidth="lg">
-          <Box mx={5} my={5}>
-            <Routes> { /* Add nested routes when needed */}
-              <Route path='/login' element={<Login />} />
-              <Route path='/signup' element={<Signup />} />
-              {
-                /* All roles are authorised to access the front page, conditional
-                   rendering is done inside the component */
-              }
-              <Route element={<PrivateRoute roles={Object.values(SystemRole)} />}>
-                <Route
-                  path='/'
-                  element={<FrontPage />}
-                />
-                <Route
-                  path='/course-view/:courseId'
-                  element={<CourseView />}
-                />
-              </Route>
-              { /* Pages that are only authorised for admin */}
-              <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
-                <Route
-                  path='/create-course'
-                  element={<CreateCourseView />}
-                />
-              </Route>
-              { /* Pages that are authorised for admin and teachers in charge */}
-              <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
-                <Route
-                  path='/:courseId/fetch-instances/:courseCode'
-                  element={<FetchInstancesView />}
-                />
-                <Route
-                  path='/:courseId/course-results/:instanceId'
-                  element={<CourseResultsView />}
-                />
-                <Route
-                  path='/:courseId/edit-instance'
-                  element={<EditInstanceView />}
-                />
-                <Route
-                  path='/:courseId/edit-instance/:sisuInstanceId'
-                  element={<EditInstanceView />}
-                />
-                <Route
-                  path='/:courseId/attainment/:modification/:assessmentModelId/:attainmentId'
-                  element={<EditAttainmentView />}
-                />
-              </Route>
-            </Routes>
-          </Box>
-        </Container>
-        <Footer />
-      </div>
+      <QueryClientProvider client={queryClient}>
+        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+          <AppBar position="static">
+            <Toolbar>
+              <Link
+                href="/"
+                underline="none"
+                color="white"
+                variant="h5"
+                align="left"
+                sx={{ mr: 2, flexGrow: 1 }}
+              >
+                Aalto Grades
+              </Link>
+              <UserButton />
+            </Toolbar>
+          </AppBar>
+          <Container sx={{ textAlign: 'center' }} maxWidth="lg">
+            <Box mx={5} my={5}>
+              <Routes> { /* Add nested routes when needed */}
+                <Route path='/login' element={<Login />} />
+                <Route path='/signup' element={<Signup />} />
+                {
+                  /* All roles are authorised to access the front page, conditional
+                     rendering is done inside the component */
+                }
+                <Route element={<PrivateRoute roles={Object.values(SystemRole)} />}>
+                  <Route
+                    path='/'
+                    element={<FrontPage />}
+                  />
+                  <Route
+                    path='/course-view/:courseId'
+                    element={<CourseView />}
+                  />
+                </Route>
+                { /* Pages that are only authorised for admin */}
+                <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
+                  <Route
+                    path='/create-course'
+                    element={<CreateCourseView />}
+                  />
+                </Route>
+                { /* Pages that are authorised for admin and teachers in charge */}
+                <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
+                  <Route
+                    path='/:courseId/fetch-instances/:courseCode'
+                    element={<FetchInstancesView />}
+                  />
+                  <Route
+                    path='/:courseId/course-results/:instanceId'
+                    element={<CourseResultsView />}
+                  />
+                  <Route
+                    path='/:courseId/edit-instance'
+                    element={<EditInstanceView />}
+                  />
+                  <Route
+                    path='/:courseId/edit-instance/:sisuInstanceId'
+                    element={<EditInstanceView />}
+                  />
+                  <Route
+                    path='/:courseId/attainment/:modification/:assessmentModelId/:attainmentId'
+                    element={<EditAttainmentView />}
+                  />
+                </Route>
+              </Routes>
+            </Box>
+          </Container>
+          <Footer />
+        </div>
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }
