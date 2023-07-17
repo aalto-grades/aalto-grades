@@ -295,7 +295,8 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
 
   let finalGrades: Array<FinalGrade> = [];
 
-  // Get distinct student numbers with grades for particular assessment model.
+  // User raw query to enable distinct selection of students who have
+  // at least one grade (final or not) for particular assessment model.
   const allStudentsFromAssessmentModel: Array<string> = (await sequelize.query(
     `SELECT DISTINCT student_number
     FROM attainment_grade
