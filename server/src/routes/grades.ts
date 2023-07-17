@@ -58,6 +58,7 @@ const upload: Multer = multer({
  *         type: string
  *         description: >
  *           Final grade for the student. Either numeric (0, 1, 2, 3, 4, 5) or PASS/FAIL scale.
+ *           If grade is not yet calculated, grade will be 'PENDING'
  *         example: PASS
  *       credits:
  *         type: integer
