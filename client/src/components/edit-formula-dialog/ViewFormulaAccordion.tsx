@@ -21,7 +21,7 @@ const HoverExpandMoreIcon = styled<any>(ExpandMore)(({ theme }) => ({
   }
 }));
 
-function ViewFormulaAccordion(props: {
+export default function ViewFormulaAccordion(props: {
   formulaId: Formula | null
 }): JSX.Element {
   const [codeSnippet, setCodeSnippet]: State<string | null> = useState<string | null>(null);
@@ -80,5 +80,3 @@ ViewFormulaAccordion.propTypes = {
     PropTypes.oneOf(Object.values(Formula))
   ])
 };
-
-export default ViewFormulaAccordion;

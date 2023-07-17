@@ -16,7 +16,7 @@ import SisuExportDialog from './SisuExportDialog';
 
 import { State } from '../../types';
 
-function CourseResultsTableToolbar(props: {
+export default function CourseResultsTableToolbar(props: {
   search: string,
   setSearch: (search: string) => void,
   calculateFinalGrades: () => Promise<void>,
@@ -172,5 +172,3 @@ CourseResultsTableToolbar.propTypes = {
   downloadCsvTemplate: PropTypes.func,
   selectedStudents: PropTypes.array
 };
-
-export default CourseResultsTableToolbar;

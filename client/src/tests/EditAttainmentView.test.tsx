@@ -10,8 +10,8 @@ import userEvent from '@testing-library/user-event';
 
 import EditAttainmentView from '../components/EditAttainmentView';
 
-import mockAttainments from './mock-data/mockAttainments';
-import mockFormulas from './mock-data/mockFormulas';
+import { mockAttainments } from './mock-data/mockAttainments';
+import { mockFormulas } from './mock-data/mockFormulas';
 import attainmentServices from '../services/attainments';
 import formulaServices from '../services/formulas';
 

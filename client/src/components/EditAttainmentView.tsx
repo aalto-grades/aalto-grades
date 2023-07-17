@@ -13,7 +13,7 @@ import ConfirmationDialog from './create-attainment/ConfirmationDialog';
 import attainmentServices from '../services/attainments';
 import { State } from '../types';
 
-function EditAttainmentView(): JSX.Element {
+export default function EditAttainmentView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
 
   // attainmentId is either the root attainment of an assessment model when
@@ -269,5 +269,3 @@ function EditAttainmentView(): JSX.Element {
     </>
   );
 }
-
-export default EditAttainmentView;

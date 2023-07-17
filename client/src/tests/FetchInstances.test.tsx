@@ -8,7 +8,7 @@ import { cleanup, render, RenderResult, screen, waitFor } from '@testing-library
 
 import FetchInstancesView from '../components/FetchInstancesView';
 
-import mockSisuInstances from './mock-data/mockSisuInstances';
+import { mockSisuInstances } from './mock-data/mockSisuInstances';
 import instanceServices from '../services/instances';
 
 afterEach(cleanup);

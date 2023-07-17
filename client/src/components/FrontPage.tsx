@@ -13,7 +13,7 @@ import useAuth, { AuthContextType } from '../hooks/useAuth';
 import courseServices from '../services/courses';
 import { State } from '../types';
 
-function FrontPage(): JSX.Element {
+export default function FrontPage(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
 
   const [coursesOfUser, setCoursesOfUser]: State<Array<CourseData>> =
@@ -84,5 +84,3 @@ function FrontPage(): JSX.Element {
     </>
   );
 }
-
-export default FrontPage;

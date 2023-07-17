@@ -10,7 +10,7 @@ import { cleanup, render, RenderResult, screen, waitFor } from '@testing-library
 import FrontPage from '../components/FrontPage';
 
 import AuthContext from '../context/AuthProvider';
-import mockCourses from './mock-data/mockCourses';
+import { mockCourses } from './mock-data/mockCourses';
 import courseServices from '../services/courses';
 
 jest.mock('../services/courses');

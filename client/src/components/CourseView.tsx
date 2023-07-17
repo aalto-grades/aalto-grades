@@ -23,7 +23,7 @@ import assessmentModelServices from '../services/assessmentModels';
 import attainmentServices from '../services/attainments';
 import { State } from '../types';
 
-function CourseView(): JSX.Element {
+export default function CourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { courseId }: Params = useParams();
   const { auth, isTeacherInCharge, setIsTeacherInCharge }: AuthContextType = useAuth();
@@ -270,5 +270,3 @@ function CourseView(): JSX.Element {
     </Box>
   );
 }
-
-export default CourseView;

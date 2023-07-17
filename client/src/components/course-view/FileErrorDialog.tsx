@@ -13,7 +13,7 @@ const gridColumns = [{
   width: 500,
 }];
 
-function FileErrorDialog(props: {
+export default function FileErrorDialog(props: {
   handleClose: () => void,
   open: boolean,
   errors: Array<string>
@@ -56,5 +56,3 @@ FileErrorDialog.propTypes = {
   open: PropTypes.bool,
   errors: PropTypes.array
 };
-
-export default FileErrorDialog;

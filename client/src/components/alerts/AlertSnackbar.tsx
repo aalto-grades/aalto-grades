@@ -21,7 +21,7 @@ const Alert: any = React.forwardRef(function Alert(props, ref) {
 
 // TODO: Consider if the key attribute works properly of if something else should be used?
 // position allows "stacked look", starts from 1 but really needed only from 2 onwards
-function AlertSnackbar({ messageInfo, setMessageInfo, open, setOpen, position }: {
+export default function AlertSnackbar({ messageInfo, setMessageInfo, open, setOpen, position }: {
   messageInfo: Message | null,
   setMessageInfo: (messageInfo: Message | null) => void,
   open: boolean,
@@ -94,5 +94,3 @@ AlertSnackbar.propTypes = {
   setOpen: PropTypes.func,
   position: PropTypes.number
 };
-
-export default AlertSnackbar;

@@ -13,7 +13,7 @@ import assessmentModelServices from '../../services/assessmentModels';
 import attainmentServices from '../../services/attainments';
 import { State } from '../../types';
 
-function CreateAssessmentModelDialog(props: {
+export default function CreateAssessmentModelDialog(props: {
   handleClose: () => void,
   open: boolean,
   onSubmit: () => void
@@ -113,5 +113,3 @@ CreateAssessmentModelDialog.propTypes = {
   open: PropTypes.bool,
   onSubmit: PropTypes.func
 };
-
-export default CreateAssessmentModelDialog;

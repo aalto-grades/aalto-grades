@@ -14,7 +14,7 @@ import MenuButton, { MenuButtonOption } from './MenuButton';
 
 import { State } from '../../types';
 
-function Attainments(props: {
+export default function Attainments(props: {
   attainmentTree: AttainmentData,
   formulaName: string,
   courseId: number,
@@ -133,5 +133,3 @@ Attainments.propTypes = {
   handleAddPoints: PropTypes.func,
   onChangeFormula: PropTypes.func
 };
-
-export default Attainments;

@@ -17,7 +17,7 @@ import { State } from '../../types';
 
 // An Assignmnet component with subAttainments and a formula
 
-function ParentAttainment(props: {
+export default function ParentAttainment(props: {
   attainmentTree: AttainmentData,
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
   deleteAttainment: (attainment: AttainmentData) => void,
@@ -136,5 +136,3 @@ ParentAttainment.propTypes = {
   getTemporaryId: PropTypes.func,
   attainment: PropTypes.any
 };
-
-export default ParentAttainment;

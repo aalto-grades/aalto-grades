@@ -87,7 +87,7 @@ const languageOptions: Array<LanguageOption> = [
   }
 ];
 
-function SisuExportDialog(props: {
+export default function SisuExportDialog(props: {
   open: boolean,
   handleClose: () => void,
   selectedStudents: Array<FinalGrade>
@@ -258,5 +258,3 @@ SisuExportDialog.propTypes = {
   handleClose: PropTypes.func,
   selectedStudents: PropTypes.array
 };
-
-export default SisuExportDialog;

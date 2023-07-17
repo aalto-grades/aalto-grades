@@ -12,7 +12,7 @@ import useAuth, { AuthContextType } from '../../hooks/useAuth';
 import useLogout from '../../hooks/useLogout';
 import { State } from '../../types';
 
-function UserButton(): JSX.Element {
+export default function UserButton(): JSX.Element {
   const logout: () => Promise<void> = useLogout();
   const navigate: NavigateFunction = useNavigate();
   const { auth }: AuthContextType = useAuth();
@@ -67,5 +67,3 @@ function UserButton(): JSX.Element {
     </>
   );
 }
-
-export default UserButton;

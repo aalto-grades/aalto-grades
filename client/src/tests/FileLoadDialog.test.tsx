@@ -20,11 +20,11 @@ import gradeServices from '../services/grades';
 import instanceServices from '../services/instances';
 import AuthContext from '../context/AuthProvider';
 import { maxErrorsToShow } from '../components/course-view/FileLoadDialog';
-import mockAssessmentModels from './mock-data/mockAssessmentModels';
-import mockAttainments from './mock-data/mockAttainments';
-import mockCourses from './mock-data/mockCourses';
-import mockFormulas from './mock-data/mockFormulas';
-import mockInstances from './mock-data/mockInstancesWithStringDates';
+import { mockAssessmentModels } from './mock-data/mockAssessmentModels';
+import { mockAttainments } from './mock-data/mockAttainments';
+import { mockCourses } from './mock-data/mockCourses';
+import { mockFormulas } from './mock-data/mockFormulas';
+import { mockInstances } from './mock-data/mockInstancesWithStringDates';
 
 const file: File = new File(['idk'], 'grades_test.csv', { type: 'csv' });
 

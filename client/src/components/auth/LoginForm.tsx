@@ -11,7 +11,7 @@ import useAuth from '../../hooks/useAuth';
 import userServices from '../../services/user';
 import { State } from '../../types';
 
-function LoginForm(): JSX.Element {
+export default function LoginForm(): JSX.Element {
 
   const { setAuth }: { setAuth: (auth: LoginResult | null) => void } = useAuth();
   const navigate: NavigateFunction = useNavigate();
@@ -93,5 +93,3 @@ function LoginForm(): JSX.Element {
     </Box>
   );
 }
-
-export default LoginForm;

@@ -42,7 +42,7 @@ const headCells: Array<HeadCellData> = [
   }
 ];
 
-function InstancesTable(props: {
+export default function InstancesTable(props: {
   courseId: string
 }): JSX.Element {
   const [instances, setInstances]: State<Array<CourseInstanceData> | null> =
@@ -150,5 +150,3 @@ function InstancesTable(props: {
 InstancesTable.propTypes = {
   data: PropTypes.array
 };
-
-export default InstancesTable;

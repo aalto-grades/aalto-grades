@@ -10,7 +10,7 @@ import { JSX } from 'react';
 import CustomAccordion from './CustomAccordion';
 
 // This component renders a top attainment (only has the root attainment as its parent)
-function AttainmentCategory(props: {
+export default function AttainmentCategory(props: {
   attainment: AttainmentData,
   buttons?: Array<JSX.Element>
 }): JSX.Element {
@@ -73,5 +73,3 @@ AttainmentCategory.propTypes = {
   attainment: PropTypes.object,
   buttons: PropTypes.array
 };
-
-export default AttainmentCategory;

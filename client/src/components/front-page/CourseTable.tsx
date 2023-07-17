@@ -26,7 +26,7 @@ const headCells: Array<HeadCellData> = [
   },
 ];
 
-function CourseTable(props: {
+export default function CourseTable(props: {
   courses: Array<CourseData>
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
@@ -101,5 +101,3 @@ function CourseTable(props: {
 CourseTable.propTypes = {
   data: PropTypes.array
 };
-
-export default CourseTable;

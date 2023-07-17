@@ -36,7 +36,7 @@ export type SnackPackAlertState = [
   Dispatch<SetStateAction<boolean>>
 ];
 
-function useSnackPackAlerts(): SnackPackAlertState {
+export default function useSnackPackAlerts(): SnackPackAlertState {
 
   // state variables for alert messages
   const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
@@ -61,5 +61,3 @@ function useSnackPackAlerts(): SnackPackAlertState {
 
   return [setSnackPack, messageInfo, setMessageInfo, alertOpen, setAlertOpen];
 }
-
-export default useSnackPackAlerts;

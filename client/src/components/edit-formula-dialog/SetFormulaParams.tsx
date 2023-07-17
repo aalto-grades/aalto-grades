@@ -9,7 +9,7 @@ import SubAttainment from './SubAttainment';
 
 import StyledBox from '../edit-formula-dialog/StyledBox';
 
-function SetFormulaParams(props: {
+export default function SetFormulaParams(props: {
   attainment: AttainmentData,
   formula: FormulaData,
   params: object,
@@ -57,5 +57,3 @@ SetFormulaParams.propTypes = {
   childParams: PropTypes.any,
   setChildParams: PropTypes.func
 };
-
-export default SetFormulaParams;

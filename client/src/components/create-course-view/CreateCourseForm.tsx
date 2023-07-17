@@ -21,7 +21,7 @@ import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 import { State } from '../../types';
 
-function CreateCourseForm(props: {
+export default function CreateCourseForm(props: {
   addCourse: (course: CourseData) => Promise<void>
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
@@ -392,5 +392,3 @@ function CreateCourseForm(props: {
 CreateCourseForm.propTypes = {
   addCourse: PropTypes.func
 };
-
-export default CreateCourseForm;

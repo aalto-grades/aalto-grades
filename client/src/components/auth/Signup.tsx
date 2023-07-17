@@ -12,7 +12,7 @@ import useAuth, { AuthContextType } from '../../hooks/useAuth';
 import userServices from '../../services/user';
 import { SignupCredentials, State } from '../../types';
 
-function Signup(): JSX.Element {
+export default function Signup(): JSX.Element {
 
   const navigate: NavigateFunction = useNavigate();
   const { setAuth }: AuthContextType = useAuth();
@@ -39,5 +39,3 @@ function Signup(): JSX.Element {
     </div>
   );
 }
-
-export default Signup;

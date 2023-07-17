@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 
 // A Dialog component for confirming deletion
 
-function ConfirmationDialog(props: {
+export default function ConfirmationDialog(props: {
   deleteAttainment: (attainment: AttainmentData) => void,
   attainment: AttainmentData,
   title: string,
@@ -51,5 +51,3 @@ ConfirmationDialog.propTypes = {
   handleClose: PropTypes.func,
   open: PropTypes.bool
 };
-
-export default ConfirmationDialog;

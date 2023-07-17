@@ -65,7 +65,7 @@ InstanceBox.propTypes = {
   instance: PropTypes.object,
 };
 
-function FetchedInstances(props: {
+export default function FetchedInstances(props: {
   courseId: number,
   instances: Array<CourseInstanceData>
 }): JSX.Element {
@@ -97,5 +97,3 @@ FetchedInstances.propTypes = {
   courseId: PropTypes.number,
   instances: PropTypes.array
 };
-
-export default FetchedInstances;

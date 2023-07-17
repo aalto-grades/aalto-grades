@@ -6,7 +6,7 @@ import { Box, Typography } from '@mui/material';
 import { Variant } from '@mui/material/styles/createTypography';
 import PropTypes from 'prop-types';
 
-function LightLabelBoldValue(props: {
+export default function LightLabelBoldValue(props: {
   label: string,
   value: string | number,
   small?: boolean
@@ -36,5 +36,3 @@ LightLabelBoldValue.propTypes = {
   ]),
   small: PropTypes.bool
 };
-
-export default LightLabelBoldValue;

@@ -12,11 +12,11 @@ import { render, RenderResult, waitFor, cleanup } from '@testing-library/react';
 import CourseView from '../components/CourseView';
 
 import AuthContext from '../context/AuthProvider';
-import mockAssessmentModels from './mock-data/mockAssessmentModels';
-import mockAttainments from './mock-data/mockAttainments';
-import mockCourses from './mock-data/mockCourses';
-import mockFormulas from './mock-data/mockFormulas';
-import mockInstances from './mock-data/mockInstancesWithStringDates';
+import { mockAssessmentModels } from './mock-data/mockAssessmentModels';
+import { mockAttainments } from './mock-data/mockAttainments';
+import { mockCourses } from './mock-data/mockCourses';
+import { mockFormulas } from './mock-data/mockFormulas';
+import { mockInstances } from './mock-data/mockInstancesWithStringDates';
 import assessmentModelServices from '../services/assessmentModels';
 import attainmentServices from '../services/attainments';
 import courseServices from '../services/courses';

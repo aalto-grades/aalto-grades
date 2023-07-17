@@ -13,7 +13,7 @@ import CreateCourseForm from './create-course-view/CreateCourseForm';
 import courseServices from '../services/courses';
 import { Message, State } from '../types';
 
-function CreateCourseView(): JSX.Element {
+export default function CreateCourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
   const [messageInfo, setMessageInfo]: State<Message | null> =
@@ -47,5 +47,3 @@ function CreateCourseView(): JSX.Element {
     </>
   );
 }
-
-export default CreateCourseView;

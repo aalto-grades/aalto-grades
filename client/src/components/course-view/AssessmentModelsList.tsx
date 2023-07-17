@@ -7,7 +7,7 @@ import { List, ListItemButton } from '@mui/material';
 import PropTypes from 'prop-types';
 import { JSX } from 'react';
 
-function AssessmentModelsList(props: {
+export default function AssessmentModelsList(props: {
   data: Array<AssessmentModelData>,
   current: number,
   onClick: (assessmentModel: AssessmentModelData) => void
@@ -39,5 +39,3 @@ AssessmentModelsList.propTypes = {
   current: PropTypes.number,
   onClick: PropTypes.func
 };
-
-export default AssessmentModelsList;

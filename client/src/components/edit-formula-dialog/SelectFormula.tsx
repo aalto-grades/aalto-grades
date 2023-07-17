@@ -18,7 +18,7 @@ import formulaServices from '../../services/formulas';
 import StyledBox from './StyledBox';
 import { State } from '../../types';
 
-function SelectFormula(props: {
+export default function SelectFormula(props: {
   formula: FormulaData | null,
   setFormula: (formula: FormulaData) => void,
   error: string
@@ -111,5 +111,3 @@ SelectFormula.propTypes = {
   formulaData: PropTypes.func,
   error: PropTypes.string
 };
-
-export default SelectFormula;

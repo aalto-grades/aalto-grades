@@ -16,7 +16,7 @@ import SetFormulaParams from './SetFormulaParams';
 import attainmentServices from '../../services/attainments';
 import { State } from '../../types';
 
-function EditFormulaDialog(props: {
+export default function EditFormulaDialog(props: {
   handleClose: () => void,
   onSubmit: () => void,
   open: boolean,
@@ -196,5 +196,3 @@ EditFormulaDialog.propTypes = {
   attainmentTree: PropTypes.object,
   setAttainmentTree: PropTypes.func
 };
-
-export default EditFormulaDialog;

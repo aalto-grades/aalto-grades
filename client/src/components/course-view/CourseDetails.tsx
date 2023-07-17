@@ -12,7 +12,7 @@ import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 
 import useAuth, { AuthContextType } from '../../hooks/useAuth';
 
-function CourseDetails(props: {
+export default function CourseDetails(props: {
   course: CourseData,
   assessmentModels: Array<AssessmentModelData>,
   currentAssessmentModelId?: number,
@@ -122,5 +122,3 @@ CourseDetails.propTypes = {
   currentAssessmentModelId: PropTypes.number,
   onChangeAssessmentModel: PropTypes.func
 };
-
-export default CourseDetails;

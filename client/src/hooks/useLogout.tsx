@@ -7,7 +7,7 @@ import useAuth, { AuthContextType } from './useAuth';
 
 // custom hook for logout, used since no individual logout page will be created
 
-function useLogout(): () => Promise<void> {
+export default function useLogout(): () => Promise<void> {
 
   const { setAuth }: AuthContextType = useAuth();
 
@@ -21,5 +21,3 @@ function useLogout(): () => Promise<void> {
   }
   return logout;
 }
-
-export default useLogout;

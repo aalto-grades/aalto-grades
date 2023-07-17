@@ -14,7 +14,7 @@ import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import textFormatServices from '../../services/textFormat';
 import { State } from '../../types';
 
-function EditInstanceForm(props: {
+export default function EditInstanceForm(props: {
   instance: CourseInstanceData,
   addInstance: (instance: CourseInstanceData) => Promise<void>
 }): JSX.Element {
@@ -251,5 +251,3 @@ EditInstanceForm.propTypes = {
   instance: PropTypes.object,
   addInstance: PropTypes.func
 };
-
-export default EditInstanceForm;

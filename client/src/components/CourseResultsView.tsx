@@ -14,7 +14,7 @@ import gradeServices from '../services/grades';
 import { Message, State } from '../types';
 import { sleep } from '../utils';
 
-function CourseResultsView(): JSX.Element {
+export default function CourseResultsView(): JSX.Element {
   const { courseId, assessmentModelId }: Params = useParams();
 
   const [students, setStudents]: State<Array<FinalGrade>> = useState<Array<FinalGrade>>([]);
@@ -183,5 +183,3 @@ function CourseResultsView(): JSX.Element {
     </Box>
   );
 }
-
-export default CourseResultsView;

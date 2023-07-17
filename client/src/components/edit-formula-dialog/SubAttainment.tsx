@@ -9,7 +9,7 @@ import { ChangeEvent } from 'react';
 
 import formulaServices from '../../services/formulas';
 
-function SubAttainment(props: {
+export default function SubAttainment(props: {
   attainment: AttainmentData,
   childParamsList: Array<string>,
   childParams: Map<string, object>,
@@ -88,5 +88,3 @@ SubAttainment.propTypes = {
   childParams: PropTypes.any,
   setChildParams: PropTypes.func
 };
-
-export default SubAttainment;

@@ -16,7 +16,7 @@ import courseServices from '../services/courses';
 import instanceServices from '../services/instances';
 import { Message, State } from '../types';
 
-function EditInstanceView(): JSX.Element {
+export default function EditInstanceView(): JSX.Element {
   const { courseId, sisuInstanceId }: Params = useParams();
 
   const navigate: NavigateFunction = useNavigate();
@@ -94,5 +94,3 @@ function EditInstanceView(): JSX.Element {
     </Container>
   );
 }
-
-export default EditInstanceView;

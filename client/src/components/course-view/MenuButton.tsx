@@ -54,7 +54,7 @@ export interface MenuButtonOption {
   handleClick: () => void
 }
 
-function MenuButton(props: {
+export default function MenuButton(props: {
   label: string,
   options: Array<MenuButtonOption>
 }): JSX.Element {
@@ -119,5 +119,3 @@ MenuButton.propTypes = {
   label: PropTypes.string,
   options: PropTypes.array,
 };
-
-export default MenuButton;

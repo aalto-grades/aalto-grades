@@ -14,7 +14,7 @@ import useAuth, { AuthContextType } from '../../hooks/useAuth';
 import userServices from '../../services/user';
 import { State } from '../../types';
 
-function PrivateRoute(props: {
+export default function PrivateRoute(props: {
   children?: JSX.Element,
   roles: Array<SystemRole>
 }): JSX.Element | null {
@@ -73,5 +73,3 @@ PrivateRoute.propTypes = {
   children: PropTypes.element,
   roles: PropTypes.array
 };
-
-export default PrivateRoute;

@@ -32,7 +32,7 @@ const daysValidData: TextFieldData = {
 };
 
 
-function LeafAttainment(props: {
+export default function LeafAttainment(props: {
   attainmentTree: AttainmentData,
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
   deleteAttainment: (attainment: AttainmentData) => void,
@@ -158,5 +158,3 @@ LeafAttainment.propTypes = {
   getTemporaryId: PropTypes.func,
   attainment: PropTypes.object
 };
-
-export default LeafAttainment;

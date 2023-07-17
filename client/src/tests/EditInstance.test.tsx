@@ -8,8 +8,8 @@ import { cleanup, render, RenderResult, screen, waitFor } from '@testing-library
 
 import EditInstanceView from '../components/EditInstanceView';
 
-import mockCourses from './mock-data/mockCourses';
-import mockSisuInstances from './mock-data/mockSisuInstances';
+import { mockCourses } from './mock-data/mockCourses';
+import { mockSisuInstances } from './mock-data/mockSisuInstances';
 import courseServices from '../services/courses';
 import instanceServices from '../services/instances';
 

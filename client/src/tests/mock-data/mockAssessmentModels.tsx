@@ -4,7 +4,7 @@
 
 import { AssessmentModelData } from 'aalto-grades-common/types';
 
-const mockAssessmentModels: Array<AssessmentModelData> = [
+export const mockAssessmentModels: Array<AssessmentModelData> = [
   {
     id: 1,
     courseId: 1,
@@ -16,5 +16,3 @@ const mockAssessmentModels: Array<AssessmentModelData> = [
     name: 'Exam model'
   }
 ];
-
-export default mockAssessmentModels;

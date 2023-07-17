@@ -16,7 +16,7 @@ import CourseResultsTableToolbar from './CourseResultTableToolbar';
 import sortingServices from '../../services/sorting';
 import { State } from '../../types';
 
-function CourseResultsTable(props: {
+export default function CourseResultsTable(props: {
   students: Array<FinalGrade>,
   calculateFinalGrades: () => Promise<void>,
   downloadCsvTemplate: () => Promise<void>,
@@ -215,5 +215,3 @@ CourseResultsTable.propTypes = {
   selectedStudents: PropTypes.array,
   setSelectedStudents: PropTypes.func
 };
-
-export default CourseResultsTable;

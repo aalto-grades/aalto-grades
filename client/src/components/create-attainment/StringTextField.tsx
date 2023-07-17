@@ -9,7 +9,7 @@ import { ChangeEvent } from 'react';
 
 import { TextFieldData } from '../../types';
 
-function StringTextField(props: {
+export default function StringTextField(props: {
   attainmentTree: AttainmentData,
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
   attainment: AttainmentData,
@@ -50,5 +50,3 @@ StringTextField.propTypes = {
   value: PropTypes.string,
   fieldData: PropTypes.object
 };
-
-export default StringTextField;

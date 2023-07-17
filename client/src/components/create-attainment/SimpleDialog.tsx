@@ -18,7 +18,7 @@ const numberData: TextFieldData = {
   fieldLabel: 'Number of sub-attainments'
 };
 
-function SimpleDialog(props: {
+export default function SimpleDialog(props: {
   attainmentTree: AttainmentData,
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
   getTemporaryId: () => number,
@@ -121,5 +121,3 @@ SimpleDialog.propTypes = {
   handleClose: PropTypes.func,
   open: PropTypes.bool
 };
-
-export default SimpleDialog;

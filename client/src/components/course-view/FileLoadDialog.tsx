@@ -33,7 +33,7 @@ const errorInstructions: string =
 export const maxErrorsToShow: number = 5;
 
 // A Dialog component for uploading a file
-function FileLoadDialog(props: {
+export default function FileLoadDialog(props: {
   assessmentModelId: number,
   handleClose: () => void,
   open: boolean
@@ -241,5 +241,3 @@ FileLoadDialog.propTypes = {
   handleClose: PropTypes.func,
   open: PropTypes.bool
 };
-
-export default FileLoadDialog;

@@ -7,7 +7,7 @@ import { Grid, Typography } from '@mui/material';
 import ExternalAuth from './ExternalAuth';
 import LoginForm from './LoginForm';
 
-function Login(): JSX.Element {
+export default function Login(): JSX.Element {
   return (
     <Grid
       container
@@ -24,5 +24,3 @@ function Login(): JSX.Element {
     </Grid>
   );
 }
-
-export default Login;

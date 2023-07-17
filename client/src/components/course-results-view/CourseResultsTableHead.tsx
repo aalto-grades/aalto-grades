@@ -14,7 +14,7 @@ interface Colum {
   name: string
 }
 
-function CourseResultsTableHead(props: {
+export default function CourseResultsTableHead(props: {
   order: 'asc' | 'desc',
   orderBy: string,
   onRequestSort: (event: SyntheticEvent, property: string) => void,
@@ -101,5 +101,3 @@ CourseResultsTableHead.propTypes = {
   handleSelectAll: PropTypes.func,
   allSelected: PropTypes.bool
 };
-
-export default CourseResultsTableHead;

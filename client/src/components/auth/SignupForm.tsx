@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 
 import { SignupCredentials, State } from '../../types';
 
-function SignupForm(props: {
+export default function SignupForm(props: {
   addUser: (userObject: SignupCredentials) => Promise<void>
 }): JSX.Element {
 
@@ -117,5 +117,3 @@ function SignupForm(props: {
 SignupForm.propTypes = {
   addUser: PropTypes.func
 };
-
-export default SignupForm;

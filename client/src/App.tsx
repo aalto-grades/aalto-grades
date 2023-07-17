@@ -114,7 +114,7 @@ const theme: Theme = createTheme({
   }
 });
 
-function App(): JSX.Element {
+export default function App(): JSX.Element {
   return (
     <ThemeProvider theme={theme}>
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -190,5 +190,3 @@ function App(): JSX.Element {
     </ThemeProvider>
   );
 }
-
-export default App;

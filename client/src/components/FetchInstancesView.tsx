@@ -12,7 +12,7 @@ import FetchedInstances from './fetch-instances-view/FetchedInstances';
 import instanceServices from '../services/instances';
 import { State } from '../types';
 
-function FetchInstancesView(): JSX.Element {
+export default function FetchInstancesView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { courseId, courseCode }: Params = useParams();
   const [instances, setInstances]: State<Array<CourseInstanceData>> =
@@ -63,5 +63,3 @@ function FetchInstancesView(): JSX.Element {
     </>
   );
 }
-
-export default FetchInstancesView;
