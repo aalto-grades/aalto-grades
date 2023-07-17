@@ -13,7 +13,7 @@ import { ChangeEvent, MouseEvent, SyntheticEvent, useEffect, useState } from 're
 import CourseResultsTableHead from './CourseResultsTableHead';
 import CourseResultsTableToolbar from './CourseResultTableToolbar';
 
-import sortingServices from '../../services/sorting';
+import { getComparator, stableSort } from '../../services/sorting';
 import { State } from '../../types';
 
 export default function CourseResultsTable(props: {
@@ -121,8 +121,8 @@ export default function CourseResultsTable(props: {
                 />
                 <TableBody>
                   {
-                    sortingServices.stableSort(studentsToShow,
-                      sortingServices.getComparator(order, orderBy))
+                    stableSort(studentsToShow,
+                      getComparator(order, orderBy))
                       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                       .map((student: any) => {
                         return (
