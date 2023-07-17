@@ -35,7 +35,13 @@ jest.mock('../services/instances');
 jest.mock('../services/grades');
 afterEach(cleanup);
 
-const mockErrorResponse = {
+const mockErrorResponse: {
+  status: number,
+  data: {
+    success: boolean,
+    errors: Array<string>
+  }
+} = {
   status: 400,
   data: {
     success: false,
