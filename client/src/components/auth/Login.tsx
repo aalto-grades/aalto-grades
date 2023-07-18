@@ -4,7 +4,7 @@
 
 import { LoginResult } from 'aalto-grades-common/types';
 import { Box, Button, Grid, TextField, Typography } from '@mui/material';
-import { useState } from 'react';
+import { SyntheticEvent, useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 import ExternalAuth from './ExternalAuth';
@@ -28,7 +28,7 @@ export default function Login(): JSX.Element {
     }
   });
 
-  async function handleSubmit(event: React.SyntheticEvent): Promise<void> {
+  async function handleSubmit(event: SyntheticEvent): Promise<void> {
     event.preventDefault();
 
     logIn.mutate({

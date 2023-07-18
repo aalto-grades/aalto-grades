@@ -5,7 +5,7 @@
 import { CourseData } from 'aalto-grades-common/types';
 import axios from './axios';
 import {
-  useMutation, UseMutationResult, useQuery, UseQueryResult
+  useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryResult
 } from '@tanstack/react-query';
 
 import { Numeric } from '../../types';
@@ -28,10 +28,17 @@ export function useGetAllCourses(): UseQueryResult<Array<CourseData>> {
   });
 }
 
-export function useAddCourse(course: CourseData): UseMutationResult<number> {
+export type UseAddCourseResult = UseMutationResult<
+  number, unknown, CourseData
+>;
+
+export function useAddCourse(
+  options: UseMutationOptions<number, unknown, CourseData>
+): UseAddCourseResult {
   return useMutation({
-    mutationFn: async () => (
+    mutationFn: async (course: CourseData) => (
       await axios.post('/v1/courses', course)
-    ).data.data.course.id
+    ).data.data.course.id,
+    ...options
   });
 }
