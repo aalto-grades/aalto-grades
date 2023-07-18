@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { FinalGrade } from 'aalto-grades-common/types';
 import axios from './axios';
 import {
   useMutation, UseMutationResult, useQuery, UseQueryResult
@@ -9,56 +10,73 @@ import {
 
 import { Numeric } from '../../types';
 
-// TODO
-
 export function useDownloadCsvTemplate(
-  courseId: Numeric, instanceId: Numeric
-): UseQueryResult {
-  const response = await axios.get(
-    `/v1/courses/${courseId}/instances/${instanceId}/grades/csv`
-  );
-  return response;
+  courseId: Numeric, assessmentModelId: Numeric
+): UseQueryResult<string> {
+  return useQuery({
+    queryKey: ['download-csv-template', courseId, assessmentModelId],
+    queryFn: async () => (
+      await axios.get(
+        `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/csv`
+      )
+    ).data
+  });
 }
 
-export function useExportSisuCsv(
-  courseId: Numeric, instanceId: Numeric, params: unknown
+export function useExportSisuGradeCsv(
+  courseId: Numeric, assessmentModelId: Numeric, params: unknown
 ): UseQueryResult<BlobPart> {
-  const response = await axios.get(
-    `/v1/courses/${courseId}/instances/${instanceId}/grades/csv/sisu`,
-    {
-      responseType: 'blob',
-      params
-    }
-  );
-  return response.data;
+  return useQuery({
+    queryKey: ['export-sisu-grade-csv', courseId, assessmentModelId],
+    queryFn: async () => (
+      await axios.get(
+        `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/csv/sisu`,
+        {
+          responseType: 'blob',
+          params
+        }
+      )
+    ).data
+  });
 }
 
 export function useGetFinalGrades(
-  courseId: Numeric, instanceId: Numeric
-): UseQueryResult {
-  const response = await axios.get(
-    `/v1/courses/${courseId}/instances/${instanceId}/grades`
-  );
-  return response.data.data;
+  courseId: Numeric, assessmentModelId: Numeric
+): UseQueryResult<Array<FinalGrade>> {
+  return useQuery({
+    queryKey: ['final-grades', courseId, assessmentModelId],
+    queryFn: async () => (
+      await axios.get(
+        `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades`
+      )
+    ).data.data.finalGrades
+  });
 }
 
-export function useImportCsv(
-  courseId: Numeric, instanceId: Numeric, csv: unknown
+export function useUploadGradeCsv(
+  courseId: Numeric, assessmentModelId: Numeric, csv: unknown
 ): UseMutationResult {
-  const response = await axios.postForm(
-    `/v1/courses/${courseId}/instances/${instanceId}/grades/csv`,
-    {
-      csv_data: csv // FileList will be unwrapped as sepate fields
-    }
-  );
-  return response.data.data;
+  return useMutation({
+    mutationFn: async () => (
+      await axios.postForm(
+        `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/csv`,
+        {
+          csv_data: csv // FileList will be unwrapped as sepate fields
+        }
+      )
+    ).data.data
+  });
 }
 
 export function useCalculateFinalGrades(
-  courseId: Numeric, instanceId: Numeric
+  courseId: Numeric, assessmentModelId: Numeric, studentNumbers: Array<string>
 ): UseMutationResult {
-  const response = await axios.post(
-    `/v1/courses/${courseId}/instances/${instanceId}/grades/calculate`
-  );
-  return response.data.success;
+  return useMutation({
+    mutationFn: async () => (
+      await axios.post(
+        `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/calculate`,
+        { studentNumbers }
+      )
+    ).data.data.success
+  });
 }
