@@ -8,8 +8,8 @@ import { act, render, RenderResult, screen, waitFor } from '@testing-library/rea
 import userEvent from '@testing-library/user-event';
 
 import CourseResultsView from '../components/CourseResultsView';
-import gradeServices from '../services/grades';
 import { finalGrades } from './mock-data/mockFinalGrades';
+import * as gradeServices from '../services/grades';
 
 describe('Tests for CourseResultsView components', () => {
 

@@ -7,10 +7,10 @@ import { FinalGrade } from 'aalto-grades-common/types';
 import { FullResponse, Numeric } from '../types';
 import { AxiosResponse } from 'axios';
 
-async function exportSisuCsv(
+export async function exportSisuCsv(
   courseId: Numeric, assessmentModelId: Numeric, params: unknown
 ): Promise<BlobPart> {
-  const response = await axios.get(
+  const response: AxiosResponse = await axios.get(
     `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/csv/sisu`,
     {
       responseType: 'blob',
@@ -20,7 +20,7 @@ async function exportSisuCsv(
   return response.data;
 }
 
-async function importCsv(
+export async function importCsv(
   courseId: Numeric, assessmentModelId: Numeric, csv: unknown
 ): Promise<unknown> {
   const response: FullResponse<unknown> = await axios.postForm(
@@ -32,7 +32,7 @@ async function importCsv(
   return response.data.data;
 }
 
-async function downloadCsvTemplate(
+export async function downloadCsvTemplate(
   courseId: Numeric, assessmentModelId: Numeric
 ): Promise<string> {
   const response: AxiosResponse = await axios.get(
@@ -59,7 +59,3 @@ export async function getFinalGrades(
   );
   return response.data.data.finalGrades;
 }
-
-export default {
-  calculateFinalGrades, exportSisuCsv, getFinalGrades, importCsv, downloadCsvTemplate
-};

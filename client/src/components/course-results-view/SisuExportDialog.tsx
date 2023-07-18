@@ -2,18 +2,19 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState, useEffect } from 'react';
-import { Params, useParams } from 'react-router-dom';
-import PropTypes from 'prop-types';
+import { FinalGrade } from 'aalto-grades-common/types';
 import {
   Box, Button, Dialog, DialogActions, DialogContent,
   DialogContentText, DialogTitle, List, ListItem,
   ListItemText, MenuItem, Paper, TextField, Typography
 } from '@mui/material';
+import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react';
+import { Params, useParams } from 'react-router-dom';
 
-import { FinalGrade } from 'aalto-grades-common/types';
 import AlertSnackbar from '../alerts/AlertSnackbar';
-import gradeServices from '../../services/grades';
+
+import { exportSisuCsv } from '../../services/grades';
 import { Message, State } from '../../types';
 
 // A Dialog component for exporting Sisu grades CSV.
@@ -86,7 +87,7 @@ const languageOptions: Array<LanguageOption> = [
   }
 ];
 
-function SisuExportDialog(props: {
+export default function SisuExportDialog(props: {
   open: boolean,
   handleClose: () => void,
   selectedStudents: Array<FinalGrade>
@@ -130,7 +131,7 @@ function SisuExportDialog(props: {
           studentNumbers: props.selectedStudents.map((student: FinalGrade) => student.studentNumber)
         };
 
-        const data: BlobPart = await gradeServices.exportSisuCsv(
+        const data: BlobPart = await exportSisuCsv(
           courseId, assessmentModelId, params
         );
 
@@ -257,5 +258,3 @@ SisuExportDialog.propTypes = {
   handleClose: PropTypes.func,
   selectedStudents: PropTypes.array
 };
-
-export default SisuExportDialog;

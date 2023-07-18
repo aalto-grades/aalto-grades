@@ -17,11 +17,9 @@ import User from '../database/models/user';
 
 import { AttainmentGradeData, FinalGrade, Formula, Status } from 'aalto-grades-common/types';
 import { getFormulaImplementation } from '../formulas';
-import { ApiError } from '../types/error';
-import { CalculationResult, FormulaNode } from '../types/formulas';
-import { JwtClaims } from '../types/general';
-import { StudentGrades } from '../types/grades';
-import { HttpCode } from '../types/httpCode';
+import {
+  ApiError, CalculationResult, FormulaNode,HttpCode, JwtClaims, StudentGrades
+} from '../types';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import { isTeacherInChargeOrAdmin } from './utils/user';
 

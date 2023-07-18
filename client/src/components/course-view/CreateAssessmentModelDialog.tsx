@@ -2,22 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {
+  Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle, Stack, TextField
+} from '@mui/material';
+import PropTypes from 'prop-types';
 import { ChangeEvent, SyntheticEvent, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import assessmentModelServices from '../../services/assessmentModels';
-import attainmentServices from '../../services/attainments';
-import { State } from '../../types';
-import Stack from '@mui/material/Stack';
-import CircularProgress from '@mui/material/CircularProgress';
 
-function CreateAssessmentModelDialog(props: {
+import { addAssessmentModel } from '../../services/assessmentModels';
+import { addAttainment } from '../../services/attainments';
+import { State } from '../../types';
+
+export default function CreateAssessmentModelDialog(props: {
   handleClose: () => void,
   open: boolean,
   onSubmit: () => void
@@ -32,11 +28,11 @@ function CreateAssessmentModelDialog(props: {
     try {
       if (courseId) {
         setIsSubmitting(true);
-        const assessmentModelId: number = await assessmentModelServices.addAssessmentModel(
+        const assessmentModelId: number = await addAssessmentModel(
           courseId, { name: name }
         );
 
-        await attainmentServices.addAttainment(courseId, assessmentModelId, {
+        await addAttainment(courseId, assessmentModelId, {
           name: 'Root',
           tag: 'root',
           daysValid: 0
@@ -117,5 +113,3 @@ CreateAssessmentModelDialog.propTypes = {
   open: PropTypes.bool,
   onSubmit: PropTypes.func
 };
-
-export default CreateAssessmentModelDialog;

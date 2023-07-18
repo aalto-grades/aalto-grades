@@ -2,27 +2,24 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { SystemRole } from 'aalto-grades-common/types';
+import { AppBar, Box, Container, Link, Toolbar } from '@mui/material';
+import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
 import { CSSProperties, JSX } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Link from '@mui/material/Link';
-import Container from '@mui/material/Container';
-import Box from '@mui/material/Box';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
-import PrivateRoute from './components/auth/PrivateRoute';
+
 import Login from './components/auth/Login';
+import PrivateRoute from './components/auth/PrivateRoute';
 import Signup from './components/auth/Signup';
-import FrontPage from './components/FrontPage';
-import CourseView from './components/CourseView';
-import CreateCourseView from './components/CreateCourseView';
-import FetchInstancesView from './components/FetchInstancesView';
-import EditInstanceView from './components/EditInstanceView';
-import EditAttainmentView from './components/EditAttainmentView';
-import CourseResultsView from './components/CourseResultsView';
 import UserButton from './components/auth/UserButton';
-import { SystemRole } from 'aalto-grades-common/types/auth';
+import CourseView from './components/CourseView';
+import CourseResultsView from './components/CourseResultsView';
+import CreateCourseView from './components/CreateCourseView';
+import EditAttainmentView from './components/EditAttainmentView';
+import EditInstanceView from './components/EditInstanceView';
+import FetchInstancesView from './components/FetchInstancesView';
 import Footer from './components/Footer';
+import FrontPage from './components/FrontPage';
 
 declare module '@mui/material/styles' {
   interface PaletteOptions {
@@ -117,7 +114,7 @@ const theme: Theme = createTheme({
   }
 });
 
-function App(): JSX.Element {
+export default function App(): JSX.Element {
   return (
     <ThemeProvider theme={theme}>
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -193,5 +190,3 @@ function App(): JSX.Element {
     </ThemeProvider>
   );
 }
-
-export default App;

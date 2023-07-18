@@ -2,21 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {
+  Box, Button, Dialog, DialogActions, DialogContent,
+  DialogContentText, DialogTitle, FormHelperText, Typography
+} from '@mui/material';
+import PropTypes from 'prop-types';
 import { useState, useEffect, createRef } from 'react';
 import { Params, useParams } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import FormHelperText from '@mui/material/FormHelperText';
+
 import AlertSnackbar from '../alerts/AlertSnackbar';
-import gradeServices from '../../services/grades';
 import FileErrorDialog from './FileErrorDialog';
+
+import { importCsv } from '../../services/grades';
 import { Message, State } from '../../types';
 
 const instructions: string =
@@ -36,13 +33,13 @@ const errorInstructions: string =
 export const maxErrorsToShow: number = 5;
 
 // A Dialog component for uploading a file
-function FileLoadDialog(props: {
+export default function FileLoadDialog(props: {
   assessmentModelId: number,
   handleClose: () => void,
   open: boolean
 }): JSX.Element {
   const { courseId }: Params = useParams();
-  const fileInput = createRef<any>();
+  const fileInput: React.RefObject<any> = createRef<any>();
 
   // state variables handling the alert messages
   const [snackPack, setSnackPack]: State<Array<Message>> =
@@ -83,7 +80,7 @@ function FileLoadDialog(props: {
     });
     try {
       if (courseId) {
-        await gradeServices.importCsv(
+        await importCsv(
           courseId, props.assessmentModelId, fileInput.current.files[0]
         );
         snackPackAdd({
@@ -244,5 +241,3 @@ FileLoadDialog.propTypes = {
   handleClose: PropTypes.func,
   open: PropTypes.bool
 };
-
-export default FileLoadDialog;

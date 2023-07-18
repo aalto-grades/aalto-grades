@@ -17,10 +17,8 @@ import User from '../database/models/user';
 
 import {
   LoginResult, PlainPassword, SignupRequest, SystemRole
-} from 'aalto-grades-common/types/auth';
-import { ApiError } from '../types/error';
-import { JwtClaims } from '../types/general';
-import { HttpCode } from '../types/httpCode';
+} from 'aalto-grades-common/types';
+import { ApiError, HttpCode, JwtClaims } from '../types';
 import { findUserById } from './utils/user';
 
 export async function authSelfInfo(req: Request, res: Response): Promise<void> {

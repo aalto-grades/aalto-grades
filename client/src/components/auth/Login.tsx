@@ -3,10 +3,11 @@
 // SPDX-License-Identifier: MIT
 
 import { Grid, Typography } from '@mui/material';
-import LoginForm from './LoginForm';
-import ExternalAuth from './ExternalAuth';
 
-function Login(): JSX.Element {
+import ExternalAuth from './ExternalAuth';
+import LoginForm from './LoginForm';
+
+export default function Login(): JSX.Element {
   return (
     <Grid
       container
@@ -23,5 +24,3 @@ function Login(): JSX.Element {
     </Grid>
   );
 }
-
-export default Login;

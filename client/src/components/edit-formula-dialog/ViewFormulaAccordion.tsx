@@ -2,17 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import { Formula, FormulaData } from 'aalto-grades-common/types';
 import { ExpandMore } from '@mui/icons-material';
 import {
   Accordion, AccordionDetails, AccordionSummary, Box, CircularProgress,
   Container, Typography
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Formula, FormulaData } from 'aalto-grades-common/types';
+import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
 
-import formulaServices from '../../services/formulas';
+import { getFormulaDetails } from '../../services/formulas';
 import { State } from '../../types';
 
 const HoverExpandMoreIcon = styled<any>(ExpandMore)(({ theme }) => ({
@@ -21,14 +21,14 @@ const HoverExpandMoreIcon = styled<any>(ExpandMore)(({ theme }) => ({
   }
 }));
 
-function ViewFormulaAccordion(props: {
+export default function ViewFormulaAccordion(props: {
   formulaId: Formula | null
 }): JSX.Element {
   const [codeSnippet, setCodeSnippet]: State<string | null> = useState<string | null>(null);
 
   useEffect(() => {
     if (props.formulaId) {
-      formulaServices.getFormulaDetails(props.formulaId)
+      getFormulaDetails(props.formulaId)
         .then((data: FormulaData) => {
           setCodeSnippet(data.codeSnippet);
         })
@@ -80,5 +80,3 @@ ViewFormulaAccordion.propTypes = {
     PropTypes.oneOf(Object.values(Formula))
   ])
 };
-
-export default ViewFormulaAccordion;

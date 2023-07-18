@@ -2,14 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { AttainmentData } from 'aalto-grades-common/types';
 import PropTypes from 'prop-types';
+
 import LeafAttainment from './LeafAttainment';
 import ParentAttainment from './ParentAttainment';
-import { AttainmentData } from 'aalto-grades-common/types';
 
 // Parent component for the components LeafAttainment and ParentAttainment
 
-function Attainment(props: {
+export default function Attainment(props: {
   // The full tree of attainments being considered
   attainmentTree: AttainmentData,
 
@@ -66,5 +67,3 @@ Attainment.propTypes = {
   getTemporaryId: PropTypes.func,
   attainment: PropTypes.object
 };
-
-export default Attainment;

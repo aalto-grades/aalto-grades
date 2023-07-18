@@ -2,14 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { SyntheticEvent } from 'react';
-import PropTypes from 'prop-types';
-import Snackbar from '@mui/material/Snackbar';
-import Slide from '@mui/material/Slide';
-import MuiAlert from '@mui/material/Alert';
+import { Alert as MuiAlert, Slide, Snackbar, Theme, Typography } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import PropTypes from 'prop-types';
+import React, { SyntheticEvent } from 'react';
+
 import { Message } from '../../types';
-import { Theme, Typography } from '@mui/material';
 
 const darkTheme: Theme = createTheme({
   palette: {
@@ -17,13 +15,14 @@ const darkTheme: Theme = createTheme({
   },
 });
 
-const Alert: any = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref as any} variant='standard' {...props} />;
-});
+const Alert: any = React.forwardRef(
+  function Alert(props: object, ref: React.ForwardedRef<unknown>) {
+    return <MuiAlert elevation={6} ref={ref as any} variant='standard' {...props} />;
+  });
 
 // TODO: Consider if the key attribute works properly of if something else should be used?
 // position allows "stacked look", starts from 1 but really needed only from 2 onwards
-function AlertSnackbar({ messageInfo, setMessageInfo, open, setOpen, position }: {
+export default function AlertSnackbar({ messageInfo, setMessageInfo, open, setOpen, position }: {
   messageInfo: Message | null,
   setMessageInfo: (messageInfo: Message | null) => void,
   open: boolean,
@@ -96,5 +95,3 @@ AlertSnackbar.propTypes = {
   setOpen: PropTypes.func,
   position: PropTypes.number
 };
-
-export default AlertSnackbar;

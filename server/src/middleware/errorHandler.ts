@@ -8,8 +8,7 @@ import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { MulterError } from 'multer';
 import { ValidationError } from 'yup';
 
-import { ApiError } from '../types/error';
-import { HttpCode } from '../types/httpCode';
+import { ApiError, HttpCode } from '../types';
 
 export function controllerDispatcher(
   handler: (req: Request, res: Response, next: NextFunction) => Promise<unknown>

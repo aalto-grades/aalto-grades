@@ -6,6 +6,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import CreateCourseView from '../components/CreateCourseView';
 import CreateCourseForm from '../components/create-course-view/CreateCourseForm';
 

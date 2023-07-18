@@ -2,13 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import PropTypes from 'prop-types';
 import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
+import PropTypes from 'prop-types';
 
-import StyledBox from '../edit-formula-dialog/StyledBox';
 import SubAttainment from './SubAttainment';
 
-function SetFormulaParams(props: {
+import StyledBox from '../edit-formula-dialog/StyledBox';
+
+export default function SetFormulaParams(props: {
   attainment: AttainmentData,
   formula: FormulaData,
   params: object,
@@ -56,5 +57,3 @@ SetFormulaParams.propTypes = {
   childParams: PropTypes.any,
   setChildParams: PropTypes.func
 };
-
-export default SetFormulaParams;

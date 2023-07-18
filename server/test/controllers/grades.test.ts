@@ -13,7 +13,7 @@ import User from '../../src/database/models/user';
 
 import { mockTeacher } from '../mock-data/misc';
 import { app } from '../../src/app';
-import { HttpCode } from '../../src/types/httpCode';
+import { HttpCode } from '../../src/types';
 import { getCookies, Cookies } from '../util/getCookies';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);

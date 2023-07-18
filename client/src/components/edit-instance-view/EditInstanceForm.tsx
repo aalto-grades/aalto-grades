@@ -2,18 +2,19 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import { Button, Box, TextField, MenuItem } from '@mui/material';
-import { Form, Formik } from 'formik';
-import * as yup from 'yup';
-import textFormatServices from '../../services/textFormat';
 import { CourseInstanceData, GradingScale, Period } from 'aalto-grades-common/types';
-import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
-import { State } from '../../types';
+import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
+import { Button, Box, MenuItem, TextField } from '@mui/material';
+import PropTypes from 'prop-types';
 import { useState } from 'react';
+import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
+import * as yup from 'yup';
 
-function EditInstanceForm(props: {
+import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
+import { convertToClientGradingScale, formatSisuCourseType } from '../../services/textFormat';
+import { State } from '../../types';
+
+export default function EditInstanceForm(props: {
   instance: CourseInstanceData,
   addInstance: (instance: CourseInstanceData) => Promise<void>
 }): JSX.Element {
@@ -25,7 +26,7 @@ function EditInstanceForm(props: {
     <>
       <Formik
         initialValues={{
-          type: textFormatServices.formatSisuCourseType(props.instance.type),
+          type: formatSisuCourseType(props.instance.type),
           startDate: props.instance.startDate,
           endDate: props.instance.endDate,
           startingPeriod: props.instance.startingPeriod ?? Period.I,
@@ -50,7 +51,7 @@ function EditInstanceForm(props: {
             .oneOf(Object.values(GradingScale))
             .required()
         })}
-        onSubmit={async function (values): Promise<void> {
+        onSubmit={async function (values: CourseInstanceData): Promise<void> {
           const instanceObject: CourseInstanceData = {
             type: values.type,
             startDate: values.startDate,
@@ -63,7 +64,17 @@ function EditInstanceForm(props: {
         }}
       >
         {
-          ({ errors, handleChange, isSubmitting, isValid, touched, values, initialValues }) => (
+          ({ errors, handleChange, isSubmitting, isValid, touched, values, initialValues }:
+            {
+              errors: FormikErrors<CourseInstanceData>,
+              handleChange: (e: React.ChangeEvent<Element>) => void,
+              isSubmitting: boolean,
+              isValid: boolean,
+              touched: FormikTouched<CourseInstanceData>,
+              values: CourseInstanceData,
+              initialValues: CourseInstanceData
+            }
+          ): JSX.Element => (
             <Form>
               <Box sx={{
                 display: 'flex',
@@ -199,7 +210,7 @@ function EditInstanceForm(props: {
                     Object.values(GradingScale).map((value: GradingScale) => {
                       return (
                         <MenuItem key={value} value={value}>
-                          {textFormatServices.convertToClientGradingScale(value)}
+                          {convertToClientGradingScale(value)}
                         </MenuItem>
                       );
                     })
@@ -250,5 +261,3 @@ EditInstanceForm.propTypes = {
   instance: PropTypes.object,
   addInstance: PropTypes.func
 };
-
-export default EditInstanceForm;

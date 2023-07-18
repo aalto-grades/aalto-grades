@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import '@testing-library/jest-dom/extend-expect';
-import sortingServices from '../services/sorting';
+
+import { compareDate } from '../services/sorting';
 
 describe('Tests for sorting functions', () => {
 
@@ -19,7 +20,7 @@ describe('Tests for sorting functions', () => {
       new Date(2020, 8, 8), new Date(2019, 11, 8), new Date(2019, 8, 9)
     ];
 
-    dates.sort((a, b) => sortingServices.compareDate(a, b));
+    dates.sort((a: Date, b: Date) => compareDate(a, b));
 
     expect(dates).toStrictEqual(correctlyOrderedDates);
   });

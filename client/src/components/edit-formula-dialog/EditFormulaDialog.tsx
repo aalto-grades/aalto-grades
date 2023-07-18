@@ -2,20 +2,21 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState, JSX } from 'react';
-import PropTypes from 'prop-types';
+import { AttainmentData, Formula, FormulaData } from 'aalto-grades-common/types';
 import {
   Box, Button, Dialog, DialogTitle, DialogContent, Step, StepLabel, Stepper,
   Typography
 } from '@mui/material';
+import PropTypes from 'prop-types';
+import { useState, JSX } from 'react';
 
 import SelectFormula from './SelectFormula';
 import SetFormulaParams from './SetFormulaParams';
-import attainmentServices from '../../services/attainments';
-import { AttainmentData, Formula, FormulaData } from 'aalto-grades-common/types';
+
+import { editAttainment } from '../../services/attainments';
 import { State } from '../../types';
 
-function EditFormulaDialog(props: {
+export default function EditFormulaDialog(props: {
   handleClose: () => void,
   onSubmit: () => void,
   open: boolean,
@@ -72,7 +73,7 @@ function EditFormulaDialog(props: {
     };
 
     if (props.courseId && props.assessmentModelId) {
-      attainmentServices.editAttainment(
+      editAttainment(
         props.courseId, props.assessmentModelId, props.attainment
       )
         .then(() => close())
@@ -161,7 +162,7 @@ function EditFormulaDialog(props: {
             variant='outlined'
             onClick={
               (activeStep > 0)
-                ? () => setActiveStep(activeStep - 1)
+                ? (): void => setActiveStep(activeStep - 1)
                 : props.handleClose
             }
           >
@@ -195,5 +196,3 @@ EditFormulaDialog.propTypes = {
   attainmentTree: PropTypes.object,
   setAttainmentTree: PropTypes.func
 };
-
-export default EditFormulaDialog;

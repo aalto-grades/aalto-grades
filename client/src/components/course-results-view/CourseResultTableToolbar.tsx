@@ -2,20 +2,21 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { FinalGrade, Status } from 'aalto-grades-common/types';
+import DownloadIcon from '@mui/icons-material/Download';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import { Box, Button, IconButton, TextField, Toolbar, Tooltip } from '@mui/material';
+import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import { Toolbar, Box, TextField, Tooltip, IconButton, Button } from '@mui/material';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import DownloadIcon from '@mui/icons-material/Download';
 
-import { FinalGrade, Status } from 'aalto-grades-common/types';
-import MenuButton, { MenuButtonOption } from '../course-view/MenuButton';
 import FileLoadDialog from '../course-view/FileLoadDialog';
+import MenuButton, { MenuButtonOption } from '../course-view/MenuButton';
 import SisuExportDialog from './SisuExportDialog';
+
 import { State } from '../../types';
 
-function CourseResultsTableToolbar(props: {
+export default function CourseResultsTableToolbar(props: {
   search: string,
   setSearch: (search: string) => void,
   calculateFinalGrades: () => Promise<void>,
@@ -77,7 +78,7 @@ function CourseResultsTableToolbar(props: {
             label='Search by Student Number'
             onChange={(
               { target }: { target: EventTarget & (HTMLInputElement | HTMLTextAreaElement) }
-            ): void => props.setSearch(target.value)} //
+            ): void => props.setSearch(target.value)}
             InputLabelProps={{ shrink: true }}
             margin='normal'
           />
@@ -171,5 +172,3 @@ CourseResultsTableToolbar.propTypes = {
   downloadCsvTemplate: PropTypes.func,
   selectedStudents: PropTypes.array
 };
-
-export default CourseResultsTableToolbar;

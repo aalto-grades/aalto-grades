@@ -2,15 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { useState } from 'react';
-import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { LoginResult } from 'aalto-grades-common/types';
 import { Box, Button, TextField, Typography } from '@mui/material';
-import { State } from '../../types';
-import useAuth from '../../hooks/useAuth';
-import userServices from '../../services/user';
+import React, { useState } from 'react';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 
-function LoginForm(): JSX.Element {
+import useAuth from '../../hooks/useAuth';
+import { login } from '../../services/user';
+import { State } from '../../types';
+
+export default function LoginForm(): JSX.Element {
 
   const { setAuth }: { setAuth: (auth: LoginResult | null) => void } = useAuth();
   const navigate: NavigateFunction = useNavigate();
@@ -22,7 +23,7 @@ function LoginForm(): JSX.Element {
   async function handleSubmit(event: React.SyntheticEvent): Promise<void> {
     event.preventDefault();
     try {
-      const response: LoginResult = await userServices.login({
+      const response: LoginResult = await login({
         email,
         password
       });
@@ -92,5 +93,3 @@ function LoginForm(): JSX.Element {
     </Box>
   );
 }
-
-export default LoginForm;

@@ -4,7 +4,7 @@
 
 import * as yup from 'yup';
 
-import { SystemRole } from 'aalto-grades-common/types/auth';
+import { SystemRole } from 'aalto-grades-common/types';
 
 export const idSchema: yup.AnyObjectSchema = yup.object().shape({
   id: yup

@@ -2,24 +2,26 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import '@testing-library/jest-dom/extend-expect';
-import { render, RenderResult, waitFor, cleanup } from '@testing-library/react';
-import CourseView from '../components/CourseView';
-import assessmentModelServices from '../services/assessmentModels';
-import attainmentServices from '../services/attainments';
-import courseServices from '../services/courses';
-import formulaServices from '../services/formulas';
-import instanceServices from '../services/instances';
-import AuthContext from '../context/AuthProvider';
-import mockAssessmentModels from './mock-data/mockAssessmentModels';
-import mockAttainments from './mock-data/mockAttainments';
-import mockCourses from './mock-data/mockCourses';
-import mockFormulas from './mock-data/mockFormulas';
-import mockInstances from './mock-data/mockInstancesWithStringDates';
 import {
   AssessmentModelData, AttainmentData, CourseInstanceData, LoginResult, SystemRole
 } from 'aalto-grades-common/types';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import '@testing-library/jest-dom/extend-expect';
+import { render, RenderResult, waitFor, cleanup } from '@testing-library/react';
+
+import CourseView from '../components/CourseView';
+
+import AuthContext from '../context/AuthProvider';
+import { mockAssessmentModels } from './mock-data/mockAssessmentModels';
+import { mockAttainments } from './mock-data/mockAttainments';
+import { mockCourses } from './mock-data/mockCourses';
+import { mockFormulas } from './mock-data/mockFormulas';
+import { mockInstances } from './mock-data/mockInstancesWithStringDates';
+import * as assessmentModelServices from '../services/assessmentModels';
+import * as attainmentServices from '../services/attainments';
+import * as courseServices from '../services/courses';
+import * as formulaServices from '../services/formulas';
+import * as instanceServices from '../services/instances';
 
 afterEach(cleanup);
 

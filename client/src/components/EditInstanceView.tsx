@@ -2,21 +2,21 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState, useEffect } from 'react';
-import { NavigateFunction, useNavigate, Params, useParams } from 'react-router-dom';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import LinearProgress from '@mui/material/LinearProgress';
-import EditInstanceForm from './edit-instance-view/EditInstanceForm';
-import AlertSnackbar from './alerts/AlertSnackbar';
-import courseServices from '../services/courses';
-import instanceServices from '../services/instances';
 import {
   CourseData, CourseInstanceData, GradingScale, Period
-} from 'aalto-grades-common/types/course';
+} from 'aalto-grades-common/types';
+import { Container, LinearProgress, Typography } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { NavigateFunction, useNavigate, Params, useParams } from 'react-router-dom';
+
+import EditInstanceForm from './edit-instance-view/EditInstanceForm';
+import AlertSnackbar from './alerts/AlertSnackbar';
+
+import { getCourse } from '../services/courses';
+import { createInstance, getSisuInstance } from '../services/instances';
 import { Message, State } from '../types';
 
-function EditInstanceView(): JSX.Element {
+export default function EditInstanceView(): JSX.Element {
   const { courseId, sisuInstanceId }: Params = useParams();
 
   const navigate: NavigateFunction = useNavigate();
@@ -31,13 +31,13 @@ function EditInstanceView(): JSX.Element {
 
   useEffect(() => {
     if (sisuInstanceId) {
-      instanceServices.getSisuInstance(sisuInstanceId)
+      getSisuInstance(sisuInstanceId)
         .then((courseInstance: CourseInstanceData) => {
           setInstance(courseInstance);
         })
         .catch((e: Error) => console.log(e.message));
     } else if (courseId) {
-      courseServices.getCourse(courseId)
+      getCourse(courseId)
         .then((course: CourseData) => {
           const newInstance: CourseInstanceData = {
             courseData: course,
@@ -58,7 +58,7 @@ function EditInstanceView(): JSX.Element {
   async function addInstance(instance: CourseInstanceData): Promise<void> {
     try {
       if (courseId) {
-        await instanceServices.createInstance(courseId, instance);
+        await createInstance(courseId, instance);
         navigate(`/course-view/${courseId}`, { replace: true });
       }
     } catch (error: any) {
@@ -94,5 +94,3 @@ function EditInstanceView(): JSX.Element {
     </Container>
   );
 }
-
-export default EditInstanceView;

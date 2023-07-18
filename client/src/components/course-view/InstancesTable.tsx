@@ -2,22 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { JSX, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import Table from '@mui/material/Table';
-import TableCell from '@mui/material/TableCell';
-import TableBody from '@mui/material/TableBody';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import Typography from '@mui/material/Typography';
-import sortingServices from '../../services/sorting';
-import textFormatServices from '../../services/textFormat';
 import { CourseInstanceData } from 'aalto-grades-common/types';
-import Box from '@mui/material/Box';
-import CircularProgress from '@mui/material/CircularProgress';
+import {
+  Box, CircularProgress, Table, TableBody, TableCell,
+  TableHead, TableRow, TableSortLabel, Typography
+} from '@mui/material';
+import PropTypes from 'prop-types';
+import { JSX, useEffect, useState } from 'react';
+
+import { getInstances } from '../../services/instances';
+import { compareDate } from '../../services/sorting';
+import { convertToClientGradingScale, formatDateString } from '../../services/textFormat';
 import { HeadCellData, State } from '../../types';
-import instanceServices from '../../services/instances';
 
 const headCells: Array<HeadCellData> = [
   {
@@ -46,18 +42,18 @@ const headCells: Array<HeadCellData> = [
   }
 ];
 
-function InstancesTable(props: {
+export default function InstancesTable(props: {
   courseId: string
 }): JSX.Element {
   const [instances, setInstances]: State<Array<CourseInstanceData> | null> =
     useState<Array<CourseInstanceData> | null>(null);
 
   useEffect(() => {
-    instanceServices.getInstances(props.courseId)
+    getInstances(props.courseId)
       .then((courseInstances: Array<CourseInstanceData>) => {
         const sortedInstances: Array<CourseInstanceData> = courseInstances.sort(
           (a: CourseInstanceData, b: CourseInstanceData) => {
-            return sortingServices.compareDate(
+            return compareDate(
               a.startDate as Date, b.startDate as Date
             );
           }
@@ -98,7 +94,7 @@ function InstancesTable(props: {
             instances
               .sort(
                 (a: CourseInstanceData, b: CourseInstanceData): number => {
-                  return sortingServices.compareDate(
+                  return compareDate(
                     a.startDate as Date, b.startDate as Date
                   );
                 }
@@ -109,10 +105,10 @@ function InstancesTable(props: {
                   key={instance.id}
                 >
                   <TableCell>
-                    {textFormatServices.formatDateString(String(instance.startDate))}
+                    {formatDateString(String(instance.startDate))}
                   </TableCell>
                   <TableCell>
-                    {textFormatServices.formatDateString(String(instance.endDate))}
+                    {formatDateString(String(instance.endDate))}
                   </TableCell>
                   <TableCell>
                     {instance.startingPeriod}
@@ -124,7 +120,7 @@ function InstancesTable(props: {
                     {instance.type}
                   </TableCell>
                   <TableCell>
-                    {textFormatServices.convertToClientGradingScale(instance.gradingScale)}
+                    {convertToClientGradingScale(instance.gradingScale)}
                   </TableCell>
                 </TableRow>
               ))
@@ -154,5 +150,3 @@ function InstancesTable(props: {
 InstancesTable.propTypes = {
   data: PropTypes.array
 };
-
-export default InstancesTable;

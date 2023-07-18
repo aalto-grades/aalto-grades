@@ -5,16 +5,16 @@
 // Used to determine if a user is authenticated and if they are allowed to access a page
 // if not, the user is redirected to the login page
 
-import { Navigate } from 'react-router-dom';
-import { Outlet } from 'react-router-dom';
+import { LoginResult, SystemRole } from 'aalto-grades-common/types';
 import PropTypes from 'prop-types';
-import userServices from '../../services/user';
-import useAuth, { AuthContextType } from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';
-import { SystemRole } from 'aalto-grades-common/types';
+import { Navigate, Outlet } from 'react-router-dom';
+
+import useAuth, { AuthContextType } from '../../hooks/useAuth';
+import { getRefreshToken } from '../../services/user';
 import { State } from '../../types';
 
-function PrivateRoute(props: {
+export default function PrivateRoute(props: {
   children?: JSX.Element,
   roles: Array<SystemRole>
 }): JSX.Element | null {
@@ -26,7 +26,7 @@ function PrivateRoute(props: {
     // loading set to true so page doesn't load until token has been retrieved
     setLoading(true);
     try {
-      const result = await userServices.getRefreshToken();
+      const result: LoginResult = await getRefreshToken();
       setAuth({
         id: result.id,
         role: result.role,
@@ -73,5 +73,3 @@ PrivateRoute.propTypes = {
   children: PropTypes.element,
   roles: PropTypes.array
 };
-
-export default PrivateRoute;

@@ -4,9 +4,8 @@
 
 import { NextFunction, Request, Response } from 'express';
 
-import { SystemRole } from 'aalto-grades-common/types/auth';
-import { JwtClaims } from '../types/general';
-import { HttpCode } from '../types/httpCode';
+import { SystemRole } from 'aalto-grades-common/types';
+import { JwtClaims, HttpCode } from '../types';
 
 export function authorization(
   allowedRoles: Array<SystemRole>

@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { AssessmentModelData, AttainmentData } from 'aalto-grades-common/types';
+import { Box, Button, Typography } from '@mui/material';
+import PropTypes from 'prop-types';
 import { useState, JSX } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import { Box, Button, Typography } from '@mui/material';
-import { AssessmentModelData, AttainmentData } from 'aalto-grades-common/types';
 
 import AttainmentCategory from '../attainments/AttainmentCategory';
 import EditFormulaDialog from '../edit-formula-dialog/EditFormulaDialog';
@@ -14,7 +14,7 @@ import MenuButton, { MenuButtonOption } from './MenuButton';
 
 import { State } from '../../types';
 
-function Attainments(props: {
+export default function Attainments(props: {
   attainmentTree: AttainmentData,
   formulaName: string,
   courseId: number,
@@ -43,7 +43,7 @@ function Attainments(props: {
       {
         props.assessmentModel.id &&
         <EditFormulaDialog
-          handleClose={() => setEditFormulaOpen(false)}
+          handleClose={(): void => setEditFormulaOpen(false)}
           onSubmit={props.onChangeFormula}
           open={editFormulaOpen}
           courseId={props.courseId}
@@ -69,7 +69,7 @@ function Attainments(props: {
       <Box sx={{ display: 'inline-grid', gap: 1 }}>
         {
           props.attainmentTree.subAttainments &&
-          props.attainmentTree.subAttainments.map(attainment => {
+          props.attainmentTree.subAttainments.map((attainment: AttainmentData) => {
             /* Since the attainments are displayed by the course view, they exist in the database
                and their actual ids can be used are keys of the attainment accoridon */
             return (
@@ -133,5 +133,3 @@ Attainments.propTypes = {
   handleAddPoints: PropTypes.func,
   onChangeFormula: PropTypes.func
 };
-
-export default Attainments;

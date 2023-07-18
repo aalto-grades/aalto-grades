@@ -12,10 +12,7 @@ import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
 import { CourseInstanceData, GradingScale, Period } from 'aalto-grades-common/types';
-import { ApiError } from '../types/error';
-import { HttpCode } from '../types/httpCode';
-import { JwtClaims, idSchema } from '../types/general';
-import { CourseFull } from '../types/model';
+import { ApiError, CourseFull, HttpCode, idSchema, JwtClaims } from '../types';
 import { findAssessmentModelById } from './utils/assessmentModel';
 import { findCourseById, parseCourseFull } from './utils/course';
 import { isTeacherInChargeOrAdmin } from './utils/user';

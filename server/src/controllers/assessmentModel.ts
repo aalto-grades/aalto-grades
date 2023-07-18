@@ -8,10 +8,8 @@ import * as yup from 'yup';
 import AssessmentModel from '../database/models/assessmentModel';
 import Course from '../database/models/course';
 
-import { AssessmentModelData } from 'aalto-grades-common/types/attainment';
-import { ApiError } from '../types/error';
-import { JwtClaims, idSchema } from '../types/general';
-import { HttpCode } from '../types/httpCode';
+import { AssessmentModelData } from 'aalto-grades-common/types';
+import { ApiError, HttpCode, idSchema, JwtClaims } from '../types';
 import { findAssessmentModelById } from './utils/assessmentModel';
 import { findCourseById } from './utils/course';
 import { isTeacherInChargeOrAdmin } from './utils/user';

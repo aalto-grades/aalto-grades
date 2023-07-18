@@ -2,20 +2,19 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { SyntheticEvent } from 'react';
-import PropTypes from 'prop-types';
-import { visuallyHidden } from '@mui/utils';
 import {
   Box, Checkbox, FormControlLabel, TableCell,
   TableHead, TableRow, TableSortLabel
-} from '@mui/material';
+} from '@mui/material';import { visuallyHidden } from '@mui/utils';
+import PropTypes from 'prop-types';
+import { SyntheticEvent } from 'react';
 
 interface Colum {
   id: string,
   name: string
 }
 
-function CourseResultsTableHead(props: {
+export default function CourseResultsTableHead(props: {
   order: 'asc' | 'desc',
   orderBy: string,
   onRequestSort: (event: SyntheticEvent, property: string) => void,
@@ -102,5 +101,3 @@ CourseResultsTableHead.propTypes = {
   handleSelectAll: PropTypes.func,
   allSelected: PropTypes.bool
 };
-
-export default CourseResultsTableHead;

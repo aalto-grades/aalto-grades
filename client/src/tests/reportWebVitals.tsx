@@ -4,9 +4,18 @@
 
 import { ReportHandler } from 'web-vitals';
 
-function reportWebVitals(onPerfEntry: ReportHandler) {
+export default function reportWebVitals(onPerfEntry: ReportHandler): void {
   if (onPerfEntry && onPerfEntry instanceof Function) {
-    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
+    import('web-vitals').then((
+      { getCLS, getFID, getFCP, getLCP, getTTFB }:
+      {
+        getCLS: (onReport: ReportHandler, reportAllChanges?: boolean | undefined) => void,
+        getFID: (onReport: ReportHandler, reportAllChanges?: boolean | undefined) => void,
+        getFCP: (onReport: ReportHandler, reportAllChanges?: boolean | undefined) => void,
+        getLCP: (onReport: ReportHandler, reportAllChanges?: boolean | undefined) => void,
+        getTTFB: (onReport: ReportHandler) => void
+      }
+    ) => {
       getCLS(onPerfEntry);
       getFID(onPerfEntry);
       getFCP(onPerfEntry);
@@ -15,5 +24,3 @@ function reportWebVitals(onPerfEntry: ReportHandler) {
     });
   }
 }
-
-export default reportWebVitals;

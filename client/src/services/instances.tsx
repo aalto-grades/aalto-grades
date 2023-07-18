@@ -2,11 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { CourseInstanceData } from 'aalto-grades-common/types';
+
 import axios from './axios';
-import { CourseInstanceData } from 'aalto-grades-common/types/course';
 import { FullResponse, Numeric } from '../types';
 
-async function getInstances(courseId: Numeric): Promise<Array<CourseInstanceData>> {
+export async function getInstances(courseId: Numeric): Promise<Array<CourseInstanceData>> {
 
   const response: FullResponse<{ courseInstances: Array<CourseInstanceData> }> =
     await axios.get(`/v1/courses/${courseId}/instances`);
@@ -14,7 +15,7 @@ async function getInstances(courseId: Numeric): Promise<Array<CourseInstanceData
   return response.data.data.courseInstances;
 }
 
-async function createInstance(
+export async function createInstance(
   courseId: Numeric, instance: CourseInstanceData
 ): Promise<number> {
 
@@ -24,7 +25,7 @@ async function createInstance(
   return response.data.data.courseInstance.id;
 }
 
-async function getSisuInstances(courseCode: string): Promise<Array<CourseInstanceData>> {
+export async function getSisuInstances(courseCode: string): Promise<Array<CourseInstanceData>> {
 
   const response: FullResponse<{ courseInstances: Array<CourseInstanceData> }> =
     await axios.get('/v1/sisu/courses/' + courseCode);
@@ -32,12 +33,10 @@ async function getSisuInstances(courseCode: string): Promise<Array<CourseInstanc
   return response.data.data.courseInstances;
 }
 
-async function getSisuInstance(sisuInstanceId: string): Promise<CourseInstanceData> {
+export async function getSisuInstance(sisuInstanceId: string): Promise<CourseInstanceData> {
 
   const response: FullResponse<{ courseInstance: CourseInstanceData }> =
     await axios.get('/v1/sisu/instances/' + sisuInstanceId);
 
   return response.data.data.courseInstance;
 }
-
-export default { createInstance, getInstances, getSisuInstances, getSisuInstance };

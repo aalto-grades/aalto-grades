@@ -7,8 +7,8 @@ import supertest from 'supertest';
 
 import { app } from '../../src/app';
 
-import { CourseInstanceData } from 'aalto-grades-common/types/course';
-import { HttpCode } from '../../src/types/httpCode';
+import { CourseInstanceData } from 'aalto-grades-common/types';
+import { HttpCode } from '../../src/types';
 import { sisuInstance, sisuError } from '../mock-data/sisu';
 import { Cookies, getCookies } from '../util/getCookies';
 

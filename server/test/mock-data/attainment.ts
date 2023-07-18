@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Formula } from 'aalto-grades-common/types';
-import { AttainmentData } from 'aalto-grades-common/types/attainment';
+import { AttainmentData, Formula } from 'aalto-grades-common/types';
 import Attainment from '../../src/database/models/attainment';
 
 export const mockAttainment: AttainmentData = {

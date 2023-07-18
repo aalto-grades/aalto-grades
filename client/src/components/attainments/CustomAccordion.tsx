@@ -2,16 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState, ReactNode, SyntheticEvent } from 'react';
-import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import { styled } from '@mui/material/styles';
+import { AttainmentData, Formula } from 'aalto-grades-common/types';
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
-import MuiAccordion from '@mui/material/Accordion';
-import MuiAccordionSummary from '@mui/material/AccordionSummary';
-import { AttainmentData, Formula } from 'aalto-grades-common/types';
+import {
+  Accordion as MuiAccordion, AccordionSummary as MuiAccordionSummary, Box, Typography
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import PropTypes from 'prop-types';
+import { ReactNode, SyntheticEvent, useState } from 'react';
+
 import { State } from '../../types';
 
 type AccordionOnChange = (event: SyntheticEvent, newExpanded: boolean) => void;

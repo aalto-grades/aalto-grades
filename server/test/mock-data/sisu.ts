@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { SisuCourseInstance, SisuError } from '../../src/types/sisu';
+import { SisuCourseInstance, SisuError } from '../../src/types';
 
 export const sisuInstance: SisuCourseInstance = {
   id: 'aalto-CUR-163498-3084205',

@@ -2,13 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ChangeEvent } from 'react';
-import PropTypes from 'prop-types';
-import TextField from '@mui/material/TextField';
 import { AttainmentData } from 'aalto-grades-common/types';
+import TextField from '@mui/material/TextField';
+import PropTypes from 'prop-types';
+import { ChangeEvent } from 'react';
+
 import { TextFieldData } from '../../types';
 
-function StringTextField(props: {
+export default function StringTextField(props: {
   attainmentTree: AttainmentData,
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
   attainment: AttainmentData,
@@ -49,5 +50,3 @@ StringTextField.propTypes = {
   value: PropTypes.string,
   fieldData: PropTypes.object
 };
-
-export default StringTextField;

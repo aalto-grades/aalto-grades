@@ -12,8 +12,7 @@ import {
 } from '../controllers/grades';
 import { handleInvalidRequestJson } from '../middleware';
 import { controllerDispatcher } from '../middleware/errorHandler';
-import { ApiError } from '../types/error';
-import { HttpCode } from '../types/httpCode';
+import { ApiError, HttpCode } from '../types';
 
 export const router: Router = Router();
 

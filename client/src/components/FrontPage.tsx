@@ -2,18 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { CourseData, SystemRole } from 'aalto-grades-common/types';
+import { Box, Button, Typography } from '@mui/material';
 import { JSX, useState, useEffect } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+
 import CourseTable from './front-page/CourseTable';
-import courseServices from '../services/courses';
+
 import useAuth, { AuthContextType } from '../hooks/useAuth';
-import { CourseData, SystemRole } from 'aalto-grades-common/types';
+import { getAllCourses, getCoursesOfUser } from '../services/courses';
 import { State } from '../types';
 
-function FrontPage(): JSX.Element {
+export default function FrontPage(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
 
   const [coursesOfUser, setCoursesOfUser]: State<Array<CourseData>> =
@@ -25,18 +25,18 @@ function FrontPage(): JSX.Element {
 
   useEffect(() => {
     if (auth) {
-      courseServices.getCoursesOfUser(auth.id)
+      getCoursesOfUser(auth.id)
         .then((data: Array<CourseData>) => {
           setCoursesOfUser(data);
         })
-        .catch((e) => console.log(e.message));
+        .catch((e: unknown) => console.log(e));
     }
 
-    courseServices.getAllCourses()
+    getAllCourses()
       .then((data: Array<CourseData>) => {
         setCourses(data);
       })
-      .catch((e) => console.log(e.message));
+      .catch((e: unknown) => console.log(e));
   }, []);
 
   return (
@@ -73,7 +73,7 @@ function FrontPage(): JSX.Element {
         </Typography>
         { /* Admins are shown the button for creating a new course */
           auth?.role == SystemRole.Admin &&
-          <Button id='ag_new_course_btn' size='large' variant='contained' onClick={() => {
+          <Button id='ag_new_course_btn' size='large' variant='contained' onClick={(): void => {
             navigate('/create-course');
           }}>
             Create New Course
@@ -84,5 +84,3 @@ function FrontPage(): JSX.Element {
     </>
   );
 }
-
-export default FrontPage;

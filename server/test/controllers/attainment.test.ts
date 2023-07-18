@@ -12,7 +12,7 @@ import { AttainmentData, Formula } from 'aalto-grades-common/types';
 import { mockAttainment, jestMockAttainment } from '../mock-data/attainment';
 import { mockTeacher } from '../mock-data/misc';
 import { app } from '../../src/app';
-import { HttpCode } from '../../src/types/httpCode';
+import { HttpCode } from '../../src/types';
 import { Cookies, getCookies } from '../util/getCookies';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);

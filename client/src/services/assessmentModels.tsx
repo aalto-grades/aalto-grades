@@ -2,8 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { AssessmentModelData } from 'aalto-grades-common/types';
+
 import axios from './axios';
-import { AssessmentModelData } from 'aalto-grades-common/types/attainment';
 import { FullResponse, Numeric } from '../types';
 
 export async function getAllAssessmentModels(
@@ -37,7 +38,3 @@ export async function addAssessmentModel(
 
   return response.data.data.assessmentModel.id;
 }
-
-export default {
-  getAllAssessmentModels, getAssessmentModel, addAssessmentModel
-};

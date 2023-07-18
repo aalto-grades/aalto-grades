@@ -2,20 +2,21 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState, useEffect, ChangeEvent, MouseEvent, SyntheticEvent } from 'react';
-import PropTypes from 'prop-types';
+import { FinalGrade, Status } from 'aalto-grades-common/types';
 import {
   Box, Checkbox, CircularProgress, Paper, Table, TableBody,
   TableCell, TableContainer, TablePagination, TableRow
 } from '@mui/material';
+import PropTypes from 'prop-types';
+import { ChangeEvent, MouseEvent, SyntheticEvent, useEffect, useState } from 'react';
 
-import { FinalGrade, Status } from 'aalto-grades-common/types';
-import CourseResultsTableToolbar from './CourseResultTableToolbar';
 import CourseResultsTableHead from './CourseResultsTableHead';
-import sortingServices from '../../services/sorting';
+import CourseResultsTableToolbar from './CourseResultTableToolbar';
+
+import { getComparator, stableSort } from '../../services/sorting';
 import { State } from '../../types';
 
-function CourseResultsTable(props: {
+export default function CourseResultsTable(props: {
   students: Array<FinalGrade>,
   calculateFinalGrades: () => Promise<void>,
   downloadCsvTemplate: () => Promise<void>,
@@ -120,8 +121,8 @@ function CourseResultsTable(props: {
                 />
                 <TableBody>
                   {
-                    sortingServices.stableSort(studentsToShow,
-                      sortingServices.getComparator(order, orderBy))
+                    stableSort(studentsToShow,
+                      getComparator(order, orderBy))
                       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                       .map((student: any) => {
                         return (
@@ -214,5 +215,3 @@ CourseResultsTable.propTypes = {
   selectedStudents: PropTypes.array,
   setSelectedStudents: PropTypes.func
 };
-
-export default CourseResultsTable;

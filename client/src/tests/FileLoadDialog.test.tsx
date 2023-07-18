@@ -2,27 +2,29 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { LoginResult, SystemRole } from 'aalto-grades-common/types';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import {
-  act, render, RenderResult, waitFor, cleanup, fireEvent, screen
+  act, cleanup, fireEvent, render, RenderResult, screen, waitFor
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import CourseView from '../components/CourseView';
-import assessmentModelServices from '../services/assessmentModels';
-import attainmentServices from '../services/attainments';
-import courseServices from '../services/courses';
-import formulaServices from '../services/formulas';
-import instanceServices from '../services/instances';
-import gradeServices from '../services/grades';
+
+import * as assessmentModelServices from '../services/assessmentModels';
+import * as attainmentServices from '../services/attainments';
+import * as courseServices from '../services/courses';
+import * as formulaServices from '../services/formulas';
+import * as gradeServices from '../services/grades';
+import * as instanceServices from '../services/instances';
 import AuthContext from '../context/AuthProvider';
-import mockAssessmentModels from './mock-data/mockAssessmentModels';
-import mockAttainments from './mock-data/mockAttainments';
-import mockCourses from './mock-data/mockCourses';
-import mockFormulas from './mock-data/mockFormulas';
-import mockInstances from './mock-data/mockInstancesWithStringDates';
 import { maxErrorsToShow } from '../components/course-view/FileLoadDialog';
-import { LoginResult, SystemRole } from 'aalto-grades-common/types';
+import { mockAssessmentModels } from './mock-data/mockAssessmentModels';
+import { mockAttainments } from './mock-data/mockAttainments';
+import { mockCourses } from './mock-data/mockCourses';
+import { mockFormulas } from './mock-data/mockFormulas';
+import { mockInstances } from './mock-data/mockInstancesWithStringDates';
 
 const file: File = new File(['idk'], 'grades_test.csv', { type: 'csv' });
 
@@ -33,7 +35,13 @@ jest.mock('../services/instances');
 jest.mock('../services/grades');
 afterEach(cleanup);
 
-const mockErrorResponse = {
+const mockErrorResponse: {
+  status: number,
+  data: {
+    success: boolean,
+    errors: Array<string>
+  }
+} = {
   status: 400,
   data: {
     success: false,

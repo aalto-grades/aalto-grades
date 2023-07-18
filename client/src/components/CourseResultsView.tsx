@@ -2,18 +2,22 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { FinalGrade } from 'aalto-grades-common/types';
+import { Box, Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { Params, useParams } from 'react-router-dom';
-import { Box, Typography } from '@mui/material';
 
-import { FinalGrade } from 'aalto-grades-common/types';
-import CourseResultsTable from './course-results-view/CourseResultsTable';
 import AlertSnackbar from './alerts/AlertSnackbar';
-import gradeServices from '../services/grades';
-import { sleep } from '../utils';
-import { Message, State } from '../types';
+import CourseResultsTable from './course-results-view/CourseResultsTable';
 
-function CourseResultsView(): JSX.Element {
+import {
+  calculateFinalGrades as calculateFinalGradesApi,
+  downloadCsvTemplate as downloadCsvTemplateApi, getFinalGrades
+} from '../services/grades';
+import { Message, State } from '../types';
+import { sleep } from '../utils';
+
+export default function CourseResultsView(): JSX.Element {
   const { courseId, assessmentModelId }: Params = useParams();
 
   const [students, setStudents]: State<Array<FinalGrade>> = useState<Array<FinalGrade>>([]);
@@ -28,7 +32,7 @@ function CourseResultsView(): JSX.Element {
   useEffect(() => {
     if (courseId && assessmentModelId) {
       setLoading(true);
-      gradeServices.getFinalGrades(courseId, assessmentModelId)
+      getFinalGrades(courseId, assessmentModelId)
         .then((data: Array<FinalGrade>) => {
           setStudents(data);
         })
@@ -70,7 +74,7 @@ function CourseResultsView(): JSX.Element {
       });
       await sleep(2000);
       if (courseId && assessmentModelId && selectedStudents.length !== 0) {
-        await gradeServices.calculateFinalGrades(
+        await calculateFinalGradesApi(
           courseId,
           assessmentModelId,
           selectedStudents.map((student: FinalGrade) => student.studentNumber)
@@ -88,7 +92,7 @@ function CourseResultsView(): JSX.Element {
           severity: 'info'
         });
         const data: Array<FinalGrade> =
-          await gradeServices.getFinalGrades(courseId, assessmentModelId);
+          await getFinalGrades(courseId, assessmentModelId);
         setSelectedStudents([]);
         setStudents(data);
       }
@@ -136,7 +140,7 @@ function CourseResultsView(): JSX.Element {
 
     try {
       if (courseId && assessmentModelId) {
-        const res: string = await gradeServices.downloadCsvTemplate(courseId, assessmentModelId);
+        const res: string = await downloadCsvTemplateApi(courseId, assessmentModelId);
         const blob: Blob = new Blob([res], { type: 'text/csv' });
         const link: HTMLAnchorElement = document.createElement('a');
 
@@ -182,5 +186,3 @@ function CourseResultsView(): JSX.Element {
     </Box>
   );
 }
-
-export default CourseResultsView;

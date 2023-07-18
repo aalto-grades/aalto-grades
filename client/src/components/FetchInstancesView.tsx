@@ -2,19 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { CourseInstanceData } from 'aalto-grades-common/types';
+import { Box, Button , Container, Divider, Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import Divider from '@mui/material/Divider';
-import Button from '@mui/material/Button';
+
 import FetchedInstances from './fetch-instances-view/FetchedInstances';
-import instanceServices from '../services/instances';
-import { CourseInstanceData } from 'aalto-grades-common/types/course';
+
+import { getSisuInstances } from '../services/instances';
 import { State } from '../types';
 
-function FetchInstancesView(): JSX.Element {
+export default function FetchInstancesView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { courseId, courseCode }: Params = useParams();
   const [instances, setInstances]: State<Array<CourseInstanceData>> =
@@ -22,7 +20,7 @@ function FetchInstancesView(): JSX.Element {
 
   useEffect(() => {
     if (courseCode) {
-      instanceServices.getSisuInstances(courseCode)
+      getSisuInstances(courseCode)
         .then((courseInstances: Array<CourseInstanceData>) => setInstances(courseInstances))
         .catch((e: Error) => console.log(e.message));
     }
@@ -61,9 +59,6 @@ function FetchInstancesView(): JSX.Element {
           </Button>
         </Box>
       </Container>
-
     </>
   );
 }
-
-export default FetchInstancesView;
