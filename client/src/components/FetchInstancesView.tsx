@@ -4,25 +4,22 @@
 
 import { CourseInstanceData } from 'aalto-grades-common/types';
 import { Box, Button , Container, Divider, Typography } from '@mui/material';
-import { useState, useEffect } from 'react';
 import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
+import { UseQueryResult } from '@tanstack/react-query';
 
 import FetchedInstances from './fetch-instances-view/FetchedInstances';
 
-import { getSisuInstances } from '../services/instances';
-import { State } from '../types';
+import { useGetAllSisuInstances } from '../hooks/useApi';
 
 export default function FetchInstancesView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { courseId, courseCode }: Params = useParams();
 
-  useEffect(() => {
-    if (courseCode) {
-      getSisuInstances(courseCode)
-        .then((courseInstances: Array<CourseInstanceData>) => setInstances(courseInstances))
-        .catch((e: Error) => console.log(e.message));
-    }
-  }, []);
+  if (!courseId || !courseCode)
+    return (<></>);
+
+  const sisuInstances: UseQueryResult<Array<CourseInstanceData>> =
+    useGetAllSisuInstances(courseCode);
 
   function onCancel(): void {
     navigate('/course-view/' + courseId);

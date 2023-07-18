@@ -9,12 +9,12 @@ import { Container, LinearProgress, Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { NavigateFunction, useNavigate, Params, useParams } from 'react-router-dom';
 
-import EditInstanceForm from './edit-instance-view/EditInstanceForm';
 import AlertSnackbar from './alerts/AlertSnackbar';
+import EditInstanceForm from './edit-instance-view/EditInstanceForm';
 
-import { getCourse } from '../services/courses';
-import { createInstance, getSisuInstance } from '../services/instances';
-import { Message, State } from '../types';
+import { useAddInstance, useGetCourse, useGetSisuInstance } from '../hooks/useApi';
+import useSnackPackAlerts, { SnackPackAlertState } from '../hooks/useSnackPackAlerts';
+import { State } from '../types';
 
 export default function EditInstanceView(): JSX.Element {
   const { courseId, sisuInstanceId }: Params = useParams();

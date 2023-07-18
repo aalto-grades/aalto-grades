@@ -7,7 +7,9 @@ import { AppBar, Box, Container, Link, Toolbar } from '@mui/material';
 import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
 import { CSSProperties, JSX } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+import AlertSnackbar from './components/alerts/AlertSnackbar';
 import Login from './components/auth/Login';
 import PrivateRoute from './components/auth/PrivateRoute';
 import Signup from './components/auth/Signup';

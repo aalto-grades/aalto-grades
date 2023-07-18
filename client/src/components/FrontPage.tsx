@@ -4,34 +4,24 @@
 
 import { CourseData, SystemRole } from 'aalto-grades-common/types';
 import { Box, Button, Typography } from '@mui/material';
-import { JSX, useState, useEffect } from 'react';
+import { JSX } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import { UseQueryResult } from '@tanstack/react-query';
 
 import CourseTable from './front-page/CourseTable';
 
+import { useGetAllCourses, useGetCoursesOfUser } from '../hooks/useApi';
 import useAuth, { AuthContextType } from '../hooks/useAuth';
-import { getAllCourses, getCoursesOfUser } from '../services/courses';
-import { State } from '../types';
 
 export default function FrontPage(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { auth }: AuthContextType = useAuth();
 
-  useEffect(() => {
-    if (auth) {
-      getCoursesOfUser(auth.id)
-        .then((data: Array<CourseData>) => {
-          setCoursesOfUser(data);
-        })
-        .catch((e: unknown) => console.log(e));
-    }
+  if (!auth)
+    return (<></>);
 
-    getAllCourses()
-      .then((data: Array<CourseData>) => {
-        setCourses(data);
-      })
-      .catch((e: unknown) => console.log(e));
-  }, []);
+  const courses: UseQueryResult<Array<CourseData>> = useGetAllCourses();
+  const coursesOfUser: UseQueryResult<Array<CourseData>> = useGetCoursesOfUser(auth.id);
 
   return (
     <>

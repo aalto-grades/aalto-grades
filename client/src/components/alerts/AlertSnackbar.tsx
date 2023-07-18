@@ -22,7 +22,7 @@ const Alert: any = React.forwardRef(
 
 // TODO: Consider if the key attribute works properly of if something else should be used?
 // position allows "stacked look", starts from 1 but really needed only from 2 onwards
-function AlertSnackbar(props: {
+export default function AlertSnackbar(props: {
   snackPack: SnackPackAlertState,
   position?: number
 }): JSX.Element {
