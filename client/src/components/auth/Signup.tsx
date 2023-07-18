@@ -9,7 +9,7 @@ import { NavigateFunction, useNavigate } from 'react-router-dom';
 import SignupForm from './SignupForm';
 
 import useAuth, { AuthContextType } from '../../hooks/useAuth';
-import { signup } from '../../services/user';
+//import { signup } from '../../services/user';
 import { SignupCredentials, State } from '../../types';
 
 export default function Signup(): JSX.Element {
@@ -21,10 +21,10 @@ export default function Signup(): JSX.Element {
 
   async function addUser(userObject: SignupCredentials): Promise<void> {
     try {
-      // if signup successfull, save user role to context
-      setAuth(await signup(userObject));
+      // if signup successful, save user role to context
+      /*setAuth(await signup(userObject));
 
-      navigate('/', { replace: true });
+      navigate('/', { replace: true });*/
     } catch (exception) {
       console.log(exception);
       setErrorMessage('Error: signup failed');

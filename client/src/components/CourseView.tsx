@@ -9,6 +9,7 @@ import {
 import { Box, Button, CircularProgress, Grow, Typography } from '@mui/material';
 import { JSX, useState, useEffect } from 'react';
 import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
+import { UseQueryResult } from '@tanstack/react-query';
 
 import Attainments from './course-view/Attainments';
 import CreateAssessmentModelDialog from './course-view/CreateAssessmentModelDialog';
@@ -17,10 +18,10 @@ import FileLoadDialog from './course-view/FileLoadDialog';
 import InstancesTable from './course-view/InstancesTable';
 
 import useAuth, { AuthContextType } from '../hooks/useAuth';
-import { getCourse } from '../services/courses';
-import { getFormulaDetails } from '../services/formulas';
-import { getAllAssessmentModels } from '../services/assessmentModels';
-import { getAllAttainments,  } from '../services/attainments';
+//import { getCourse } from '../services/courses';
+//import { getFormulaDetails } from '../services/formulas';
+//import { getAllAssessmentModels } from '../services/assessmentModels';
+//import { getAllAttainments,  } from '../services/attainments';
 import { State } from '../types';
 
 export default function CourseView(): JSX.Element {
@@ -31,14 +32,14 @@ export default function CourseView(): JSX.Element {
   if (!courseId)
     return (<></>);
 
-  const course: UseQueryResult<CourseData> = getCourse(courseId);
+  //const course: UseQueryResult<CourseData> = getCourse(courseId);
 
-  if (auth && course.data) {
+  /*if (auth && course.data) {
     const teacherInCharge: Array<UserData> = course.data.teachersInCharge.filter(
       (teacher: UserData) => teacher.id == auth.id
     );
     setIsTeacherInCharge(teacherInCharge.length != 0);
-  }
+  }*/
 
   const [currentAssessmentModel, setCurrentAssessmentModel]: State<AssessmentModelData | null> =
     useState<AssessmentModelData | null>(null);
@@ -59,64 +60,64 @@ export default function CourseView(): JSX.Element {
   const [fileLoadOpen, setFileLoadOpen]: State<boolean> = useState(false);
   const [createAssessmentModelOpen, setCreateAssessmentModelOpen]: State<boolean> = useState(false);
 
-  useEffect(() => {
-    if (courseId) {
-      getCourse(courseId)
-        .then((course: CourseData) => {
-          setCourse(course);
+  // useEffect(() => {
+  //   if (courseId) {
+  //     getCourse(courseId)
+  //       .then((course: CourseData) => {
+  //         setCourse(course);
 
-        /**
-         * Newly created courses do not have assessment models assigned.
-         * Set tree to null so proper message can be displayed.
-         */
-        if (assessmentModels.length === 0) {
-          setAttainmentTree(null);
-        } else {
-          setCurrentAssessmentModel(assessmentModels[0]);
+  //       /**
+  //        * Newly created courses do not have assessment models assigned.
+  //        * Set tree to null so proper message can be displayed.
+  //        */
+  //       if (assessmentModels.length === 0) {
+  //         setAttainmentTree(null);
+  //       } else {
+  //         setCurrentAssessmentModel(assessmentModels[0]);
 
-          if (assessmentModels[0].id) {
-            attainmentServices.getAllAttainments(courseId, assessmentModels[0].id)
-              .then((attainmentTree: AttainmentData) => {
-                setAttainmentTree(attainmentTree);
+  //         if (assessmentModels[0].id) {
+  //           attainmentServices.getAllAttainments(courseId, assessmentModels[0].id)
+  //             .then((attainmentTree: AttainmentData) => {
+  //               setAttainmentTree(attainmentTree);
 
-                formulaServices.getFormulaDetails(attainmentTree.formula ?? Formula.Manual)
-                  .then((formula: FormulaData) => setRootFormula(formula))
-                  .catch((e: Error) => console.log(e.message));
-              })
-              .catch((e: Error) => console.log(e.message));
-          }
-        })
-        .catch((e: Error) => console.log(e.message));
+  //               formulaServices.getFormulaDetails(attainmentTree.formula ?? Formula.Manual)
+  //                 .then((formula: FormulaData) => setRootFormula(formula))
+  //                 .catch((e: Error) => console.log(e.message));
+  //             })
+  //             .catch((e: Error) => console.log(e.message));
+  //         }
+  //       })
+  //       .catch((e: Error) => console.log(e.message));
 
-      getAllAssessmentModels(courseId)
-        .then((assessmentModels: Array<AssessmentModelData>) => {
-          setAssessmentModels(assessmentModels);
+  //     getAllAssessmentModels(courseId)
+  //       .then((assessmentModels: Array<AssessmentModelData>) => {
+  //         setAssessmentModels(assessmentModels);
 
-          /**
-           * Newly created courses do not have assessment models assigned.
-           * Set tree to null so proper message can be displayed.
-           */
-          if (assessmentModels.length === 0) {
-            setAttainmentTree(null);
-          } else {
-            setCurrentAssessmentModel(assessmentModels[0]);
+  //         /**
+  //          * Newly created courses do not have assessment models assigned.
+  //          * Set tree to null so proper message can be displayed.
+  //          */
+  //         if (assessmentModels.length === 0) {
+  //           setAttainmentTree(null);
+  //         } else {
+  //           setCurrentAssessmentModel(assessmentModels[0]);
 
-            if (assessmentModels[0].id) {
-              getAllAttainments(courseId, assessmentModels[0].id)
-                .then((attainmentTree: AttainmentData) => {
-                  setAttainmentTree(attainmentTree);
+  //           if (assessmentModels[0].id) {
+  //             getAllAttainments(courseId, assessmentModels[0].id)
+  //               .then((attainmentTree: AttainmentData) => {
+  //                 setAttainmentTree(attainmentTree);
 
-                  getFormulaDetails(attainmentTree.formula ?? Formula.Manual)
-                    .then((formula: FormulaData) => setRootFormula(formula))
-                    .catch((e: Error) => console.log(e.message));
-                })
-                .catch((e: Error) => console.log(e.message));
-            }
-          }
-        })
-        .catch((e: Error) => console.log(e.message));
-    }
-  }, []);
+  //                 getFormulaDetails(attainmentTree.formula ?? Formula.Manual)
+  //                   .then((formula: FormulaData) => setRootFormula(formula))
+  //                   .catch((e: Error) => console.log(e.message));
+  //               })
+  //               .catch((e: Error) => console.log(e.message));
+  //           }
+  //         }
+  //       })
+  //       .catch((e: Error) => console.log(e.message));
+  //   }
+  // }, []);
 
   useEffect(() => {
     setAnimation(true);
@@ -128,27 +129,27 @@ export default function CourseView(): JSX.Element {
       setAttainmentTree(undefined);
       setCurrentAssessmentModel(assessmentModel);
 
-      getAllAttainments(courseId, assessmentModel.id)
+      /*getAllAttainments(courseId, assessmentModel.id)
         .then((attainmentTree: AttainmentData) => {
           setAttainmentTree(attainmentTree);
         })
-        .catch((e: Error) => console.log(e.message));
+        .catch((e: Error) => console.log(e.message));*/
     }
   }
 
   function onCreateAssessmentModel(): void {
     if (courseId) {
-      getAllAssessmentModels(courseId)
+      /*getAllAssessmentModels(courseId)
         .then((assessmentModels: Array<AssessmentModelData>) => {
           setAssessmentModels(assessmentModels);
         })
-        .catch((e: Error) => console.log(e.message));
+        .catch((e: Error) => console.log(e.message));*/
     }
   }
 
   function onChangeFormula(): void {
     if (courseId && currentAssessmentModel?.id) {
-      getAllAttainments(courseId, currentAssessmentModel?.id)
+      /*getAllAttainments(courseId, currentAssessmentModel?.id)
         .then((attainmentTree: AttainmentData) => {
           setAttainmentTree(attainmentTree);
 
@@ -156,139 +157,139 @@ export default function CourseView(): JSX.Element {
             .then((formula: FormulaData) => setRootFormula(formula))
             .catch((e: Error) => console.log(e.message));
         })
-        .catch((e: Error) => console.log(e.message));
+        .catch((e: Error) => console.log(e.message));*/
     }
   }
 
   return (
     <Box sx={{ mx: -2.5 }}>
       {
-        course.data &&
-        <>
-          <Typography variant='h1' align='left'>{course.data.courseCode}</Typography>
-          <Box sx={{
-            display: 'flex', flexWrap: 'wrap',
-            justifyContent: 'space-between', mb: 4, columnGap: 6
-          }}>
-            <Typography variant='h2' align='left'>{course.data.name.en}</Typography>
-            {
-              /* Only admins and teachers in charge are allowed to create assessment models */
-              (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
-              <Button
-                id='ag_new_assessment_model_btn'
-                size='large'
-                variant='contained'
-                onClick={(): void => setCreateAssessmentModelOpen(true)}
-              >
-                New Assessment Model
-              </Button>
-            }
-          </Box>
-          <Box sx={{ display: 'flex', gap: 3 }}>
-            <div>
-              <CourseDetails
-                course={course}
-                assessmentModels={assessmentModels}
-                currentAssessmentModelId={currentAssessmentModel?.id}
-                onChangeAssessmentModel={onChangeAssessmentModel}
-              />
-            </div>
-            {
-              /* a different attainment component will be created for students */
-              (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
-              <div style={{ width: '100%' }}>
-                {(attainmentTree && rootFormula) ?
-                  <Grow
-                    in={animation}
-                    style={{ transformOrigin: '0 0 0' }}
-                    {...(animation ? { timeout: 1000 } : { timeout: 0 })}
-                  >
-                    <div style={{ width: '100%' }}>
-                      {
-                        (courseId && currentAssessmentModel) &&
-                        <Attainments
-                          attainmentTree={attainmentTree}
-                          courseId={Number(courseId)}
-                          formulaName={rootFormula.name}
-                          assessmentModel={currentAssessmentModel}
-                          handleAddPoints={(): void => setFileLoadOpen(true)}
-                          onChangeFormula={onChangeFormula}
-                        />
-                      }
-                    </div>
-                  </Grow>
-                  :
-                  attainmentTree === null ?
-                    <Box sx={{
-                      margin: 'auto',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      display: 'flex',
-                      mt: 25,
-                      mb: 5
-                    }}>
-                      No attainments found, please select at least one assessment model or
-                      create a new one.
-                    </Box>
-                    :
-                    <div>
-                      <Box sx={{
-                        margin: 'auto',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        display: 'flex',
-                        mt: 25,
-                        mb: 5
-                      }}>
-                        <CircularProgress />
-                      </Box>
-                      Loading attainments...
-                    </div>
-                }
-              </div>
-            }
-          </Box>
-          <Box sx={{
-            display: 'flex', flexWrap: 'wrap',
-            justifyContent: 'space-between', columnGap: 6
-          }}>
-            <Typography variant='h2' align='left' sx={{ mt: 6, mb: 3 }}>
-              Course Instances
-            </Typography>
-            {
-              /* Only admins and teachers are allowed to create a new instance */
-              (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
-              <Button
-                id='ag_new_instance_btn'
-                size='large'
-                variant='contained'
-                sx={{ mt: 6, mb: 3 }}
-                onClick={(): void => {
-                  navigate(`/${courseId}/fetch-instances/${course.data.courseCode}`);
-                }}
-              >
-                New instance
-              </Button>
-            }
-          </Box>
-          {
-            courseId &&
-            <InstancesTable courseId={courseId} />
-          }
-          {
-            currentAssessmentModel != null &&
-            <FileLoadDialog
-              assessmentModelId={currentAssessmentModel.id as number}
-              open={fileLoadOpen}
-              handleClose={(): void => setFileLoadOpen(false)}
-            />
-          }
-          <CreateAssessmentModelDialog
-            open={createAssessmentModelOpen}
-            handleClose={(): void => setCreateAssessmentModelOpen(false)}
-            onSubmit={onCreateAssessmentModel}
-          />
-        </>
+        // course.data &&
+        // <>
+        //   <Typography variant='h1' align='left'>{course.data.courseCode}</Typography>
+        //   <Box sx={{
+        //     display: 'flex', flexWrap: 'wrap',
+        //     justifyContent: 'space-between', mb: 4, columnGap: 6
+        //   }}>
+        //     <Typography variant='h2' align='left'>{course.data.name.en}</Typography>
+        //     {
+        //       /* Only admins and teachers in charge are allowed to create assessment models */
+        //       (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
+        //       <Button
+        //         id='ag_new_assessment_model_btn'
+        //         size='large'
+        //         variant='contained'
+        //         onClick={(): void => setCreateAssessmentModelOpen(true)}
+        //       >
+        //         New Assessment Model
+        //       </Button>
+        //     }
+        //   </Box>
+        //   <Box sx={{ display: 'flex', gap: 3 }}>
+        //     <div>
+        //       <CourseDetails
+        //         course={course}
+        //         assessmentModels={assessmentModels}
+        //         currentAssessmentModelId={currentAssessmentModel?.id}
+        //         onChangeAssessmentModel={onChangeAssessmentModel}
+        //       />
+        //     </div>
+        //     {
+        //       /* a different attainment component will be created for students */
+        //       (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
+        //       <div style={{ width: '100%' }}>
+        //         {(attainmentTree && rootFormula) ?
+        //           <Grow
+        //             in={animation}
+        //             style={{ transformOrigin: '0 0 0' }}
+        //             {...(animation ? { timeout: 1000 } : { timeout: 0 })}
+        //           >
+        //             <div style={{ width: '100%' }}>
+        //               {
+        //                 (courseId && currentAssessmentModel) &&
+        //                 <Attainments
+        //                   attainmentTree={attainmentTree}
+        //                   courseId={Number(courseId)}
+        //                   formulaName={rootFormula.name}
+        //                   assessmentModel={currentAssessmentModel}
+        //                   handleAddPoints={(): void => setFileLoadOpen(true)}
+        //                   onChangeFormula={onChangeFormula}
+        //                 />
+        //               }
+        //             </div>
+        //           </Grow>
+        //           :
+        //           attainmentTree === null ?
+        //             <Box sx={{
+        //               margin: 'auto',
+        //               alignItems: 'center',
+        //               justifyContent: 'center',
+        //               display: 'flex',
+        //               mt: 25,
+        //               mb: 5
+        //             }}>
+        //               No attainments found, please select at least one assessment model or
+        //               create a new one.
+        //             </Box>
+        //             :
+        //             <div>
+        //               <Box sx={{
+        //                 margin: 'auto',
+        //                 alignItems: 'center',
+        //                 justifyContent: 'center',
+        //                 display: 'flex',
+        //                 mt: 25,
+        //                 mb: 5
+        //               }}>
+        //                 <CircularProgress />
+        //               </Box>
+        //               Loading attainments...
+        //             </div>
+        //         }
+        //       </div>
+        //     }
+        //   </Box>
+        //   <Box sx={{
+        //     display: 'flex', flexWrap: 'wrap',
+        //     justifyContent: 'space-between', columnGap: 6
+        //   }}>
+        //     <Typography variant='h2' align='left' sx={{ mt: 6, mb: 3 }}>
+        //       Course Instances
+        //     </Typography>
+        //     {
+        //       /* Only admins and teachers are allowed to create a new instance */
+        //       (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
+        //       <Button
+        //         id='ag_new_instance_btn'
+        //         size='large'
+        //         variant='contained'
+        //         sx={{ mt: 6, mb: 3 }}
+        //         onClick={(): void => {
+        //           navigate(`/${courseId}/fetch-instances/${course.data.courseCode}`);
+        //         }}
+        //       >
+        //         New instance
+        //       </Button>
+        //     }
+        //   </Box>
+        //   {
+        //     courseId &&
+        //     <InstancesTable courseId={courseId} />
+        //   }
+        //   {
+        //     currentAssessmentModel != null &&
+        //     <FileLoadDialog
+        //       assessmentModelId={currentAssessmentModel.id as number}
+        //       open={fileLoadOpen}
+        //       handleClose={(): void => setFileLoadOpen(false)}
+        //     />
+        //   }
+        //   <CreateAssessmentModelDialog
+        //     open={createAssessmentModelOpen}
+        //     handleClose={(): void => setCreateAssessmentModelOpen(false)}
+        //     onSubmit={onCreateAssessmentModel}
+        //   />
+        // </>
       }
     </Box>
   );

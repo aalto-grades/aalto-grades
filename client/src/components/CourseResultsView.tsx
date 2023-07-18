@@ -10,10 +10,10 @@ import { Params, useParams } from 'react-router-dom';
 import AlertSnackbar from './alerts/AlertSnackbar';
 import CourseResultsTable from './course-results-view/CourseResultsTable';
 
-import {
+/*import {
   calculateFinalGrades as calculateFinalGradesApi,
   downloadCsvTemplate as downloadCsvTemplateApi, getFinalGrades
-} from '../services/grades';
+} from '../services/grades';*/
 import { Message, State } from '../types';
 import { sleep } from '../utils';
 
@@ -29,7 +29,7 @@ export default function CourseResultsView(): JSX.Element {
   const [selectedStudents, setSelectedStudents]: State<Array<FinalGrade>> =
     useState<Array<FinalGrade>>([]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (courseId && assessmentModelId) {
       setLoading(true);
       getFinalGrades(courseId, assessmentModelId)
@@ -47,7 +47,7 @@ export default function CourseResultsView(): JSX.Element {
           snackPack.setAlertOpen(false);
         });
     }
-  }, []);
+  }, []);*/
 
   function snackPackAdd(msg: Message): void {
     setSnackPack((prev: Array<Message>): Array<Message> => [...prev, msg]);
@@ -74,7 +74,7 @@ export default function CourseResultsView(): JSX.Element {
       });
       await sleep(2000);
       if (courseId && assessmentModelId && selectedStudents.length !== 0) {
-        await calculateFinalGradesApi(
+        /*await calculateFinalGradesApi(
           courseId,
           assessmentModelId,
           selectedStudents.map((student: FinalGrade) => student.studentNumber)
@@ -94,7 +94,7 @@ export default function CourseResultsView(): JSX.Element {
         const data: Array<FinalGrade> =
           await getFinalGrades(courseId, assessmentModelId);
         setSelectedStudents([]);
-        setStudents(data);
+        setStudents(data);*/
       }
     } catch (err: unknown) {
       console.log(err);
@@ -115,13 +115,13 @@ export default function CourseResultsView(): JSX.Element {
     await sleep(2000);
     try {
       // TODO: connect to backend
-      snackPack.push({
+      /*snackPack.push({
         msg: 'Grades imported successfully.',
         severity: 'success'
       });
       setStudents(newGrades);
       await sleep(3000);
-      snackPack.setAlertOpen(false);
+      snackPack.setAlertOpen(false);*/
 
     } catch (exception) {
       console.log(exception);
@@ -140,7 +140,7 @@ export default function CourseResultsView(): JSX.Element {
 
     try {
       if (courseId && assessmentModelId) {
-        const res: string = await downloadCsvTemplateApi(courseId, assessmentModelId);
+        /*const res: string = await downloadCsvTemplateApi(courseId, assessmentModelId);
         const blob: Blob = new Blob([res], { type: 'text/csv' });
         const link: HTMLAnchorElement = document.createElement('a');
 
@@ -153,7 +153,7 @@ export default function CourseResultsView(): JSX.Element {
         snackPack.push({
           msg: 'CSV template downloaded successfully.',
           severity: 'success'
-        });
+        });*/
       }
     } catch (err: unknown) {
       console.log(err);
@@ -162,16 +162,13 @@ export default function CourseResultsView(): JSX.Element {
         severity: 'error'
       });
     } finally {
-      snackPack.setAlertOpen(false);
+      //snackPack.setAlertOpen(false);
     }
   }
 
   return (
     <Box textAlign='left' alignItems='left'>
-      <AlertSnackbar
-        messageInfo={messageInfo} setMessageInfo={setMessageInfo}
-        open={alertOpen} setOpen={setAlertOpen}
-      />
+      {/*<AlertSnackbar snackPack={snackPack} />*/}
       <Typography variant="h1" sx={{ flexGrow: 1, my: 4 }}>
         Course Results
       </Typography>

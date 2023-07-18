@@ -10,9 +10,9 @@ import { NavigateFunction, Params, useParams, useNavigate } from 'react-router-d
 import Attainment from './create-attainment/Attainment';
 import ConfirmationDialog from './create-attainment/ConfirmationDialog';
 
-import {
+/*import {
   addAttainment, deleteAttainment as deleteAttainmentApi, editAttainment, getAttainment
-} from '../services/attainments';
+} from '../services/attainments';'*/
 import { State } from '../types';
 
 export default function EditAttainmentView(): JSX.Element {
@@ -46,7 +46,7 @@ export default function EditAttainmentView(): JSX.Element {
 
   const [openConfDialog, setOpenConfDialog]: State<boolean> = useState(false);
 
-  useEffect(() => {
+  /*useEffect(() => {
     switch (modification) {
     case 'create':
       setAttainmentTree({
@@ -73,7 +73,7 @@ export default function EditAttainmentView(): JSX.Element {
       break;
     }
 
-  }, []);
+  }, []);*/
 
   function getTemporaryId(): number {
     const id: number = temporaryId;
@@ -82,7 +82,7 @@ export default function EditAttainmentView(): JSX.Element {
   }
 
   function deleteAttainment(attainment: AttainmentData): void {
-    if (attainment.id === attainmentTree?.id) {
+    /*if (attainment.id === attainmentTree?.id) {
       if (attainment.id && attainment.id > 0 && (courseId && assessmentModelId && attainmentId)) {
         deleteAttainmentApi(courseId, assessmentModelId, attainment.id);
       }
@@ -114,11 +114,11 @@ export default function EditAttainmentView(): JSX.Element {
     }
 
     if (attainmentTree)
-      inner(attainment, attainmentTree);
+      inner(attainment, attainmentTree);*/
   }
 
   function handleSubmit(event: SyntheticEvent): void {
-    event.preventDefault();
+    /*event.preventDefault();
 
     function addAndEdit(tree: AttainmentData): void {
       if (!tree.subAttainments)
@@ -164,7 +164,7 @@ export default function EditAttainmentView(): JSX.Element {
       navigate(-1);
     } catch (exception) {
       console.log(exception);
-    }
+    }*/
   }
 
   // Functions for opening and closing the dialog for confirming attainment deletion

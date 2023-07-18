@@ -9,11 +9,11 @@ import { SyntheticEvent, useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 import useAuth, { AuthContextType } from '../../hooks/useAuth';
-import useLogout from '../../hooks/useLogout';
+//import useLogout from '../../hooks/useLogout';
 import { State } from '../../types';
 
 export default function UserButton(): JSX.Element {
-  const logout: () => Promise<void> = useLogout();
+  //const logout: () => Promise<void> = useLogout();
   const navigate: NavigateFunction = useNavigate();
   const { auth }: AuthContextType = useAuth();
   const [anchorEl, setAnchorEl]: State<Element | null> = useState<Element | null>(null);
@@ -21,7 +21,7 @@ export default function UserButton(): JSX.Element {
 
   // temporary function for logging out, will be moved to a seperate file once toolbar is refined
   async function signOut(): Promise<void> {
-    await logout();
+    //await logout();
     navigate('/login', { replace: true });
   }
 

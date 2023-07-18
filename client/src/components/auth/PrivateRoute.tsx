@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 
 import useAuth, { AuthContextType } from '../../hooks/useAuth';
-import { getRefreshToken } from '../../services/user';
+//import { getRefreshToken } from '../../services/user';
 import { State } from '../../types';
 
 export default function PrivateRoute(props: {
@@ -26,12 +26,12 @@ export default function PrivateRoute(props: {
     // loading set to true so page doesn't load until token has been retrieved
     setLoading(true);
     try {
-      const result: LoginResult = await getRefreshToken();
+      /*const result: LoginResult = await getRefreshToken();
       setAuth({
         id: result.id,
         role: result.role,
         name: result.name
-      });
+      });*/
     } catch (exception) {
       console.error(exception);
     } finally {

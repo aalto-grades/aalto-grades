@@ -13,7 +13,7 @@ import { useState, JSX } from 'react';
 import SelectFormula from './SelectFormula';
 import SetFormulaParams from './SetFormulaParams';
 
-import { editAttainment } from '../../services/attainments';
+//import { editAttainment } from '../../services/attainments';
 import { State } from '../../types';
 
 export default function EditFormulaDialog(props: {
@@ -73,11 +73,11 @@ export default function EditFormulaDialog(props: {
     };
 
     if (props.courseId && props.assessmentModelId) {
-      editAttainment(
+      /*editAttainment(
         props.courseId, props.assessmentModelId, props.attainment
       )
         .then(() => close())
-        .catch((e: Error) => console.log(e.message));
+        .catch((e: Error) => console.log(e.message));*/
     } else if (props.attainmentTree && props.setAttainmentTree) {
       props.setAttainmentTree(structuredClone(props.attainmentTree));
       close();

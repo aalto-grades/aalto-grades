@@ -14,7 +14,7 @@ import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import ViewFormulaAccordion from './ViewFormulaAccordion';
 
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
-import { getFormulas } from '../../services/formulas';
+//import { getFormulas } from '../../services/formulas';
 import StyledBox from './StyledBox';
 import { State } from '../../types';
 
@@ -28,7 +28,7 @@ export default function SelectFormula(props: {
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (formulas.length == 0) {
       getFormulas()
         .then((data: Array<FormulaData>) => {
@@ -36,7 +36,7 @@ export default function SelectFormula(props: {
         })
         .catch((exception: Error) => console.log(exception.message));
     }
-  }, []);
+  }, []);*/
 
   function handleFormulaChange(event: SelectChangeEvent): void {
     const newFormula: FormulaData | undefined = formulas.find(

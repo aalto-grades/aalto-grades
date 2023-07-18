@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 import useAuth from '../../hooks/useAuth';
-import { login } from '../../services/user';
+//import { login } from '../../services/user';
 import { State } from '../../types';
 
 export default function LoginForm(): JSX.Element {
@@ -23,7 +23,7 @@ export default function LoginForm(): JSX.Element {
   async function handleSubmit(event: React.SyntheticEvent): Promise<void> {
     event.preventDefault();
     try {
-      const response: LoginResult = await login({
+      /*const response: LoginResult = await login({
         email,
         password
       });
@@ -34,7 +34,7 @@ export default function LoginForm(): JSX.Element {
         name: response.name
       });
 
-      navigate('/', { replace: true });
+      navigate('/', { replace: true });*/
     } catch (err: unknown) {
       console.log(err);
       setErrorMessage('Invalid email or password');

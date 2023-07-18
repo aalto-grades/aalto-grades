@@ -14,7 +14,7 @@ import { Params, useParams } from 'react-router-dom';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';
 
-import { exportSisuCsv } from '../../services/grades';
+//import { exportSisuCsv } from '../../services/grades';
 import { Message, State } from '../../types';
 
 // A Dialog component for exporting Sisu grades CSV.
@@ -121,7 +121,7 @@ export default function SisuExportDialog(props: {
 
     try {
       if (courseId && assessmentModelId) {
-        const params: {
+        /*const params: {
           completionLanguage?: string,
           assessmentDate?: string,
           studentNumbers: Array<string>
@@ -147,13 +147,13 @@ export default function SisuExportDialog(props: {
         URL.revokeObjectURL(link.href);
         link.remove();
 
-        setSnackPack((prev: Array<Message>) => [...prev, successMsg]);
+        setSnackPack((prev: Array<Message>) => [...prev, successMsg]);*/
       }
     } catch (error: unknown) {
       console.log(error);
       setSnackPack((prev: Array<Message>) => [...prev, errorMsg]);
     } finally {
-      snackPack.setAlertOpen(false);
+      //snackPack.setAlertOpen(false);
     }
   }
 
@@ -245,7 +245,7 @@ export default function SisuExportDialog(props: {
           </Button>
         </DialogActions>
       </Dialog>
-      <AlertSnackbar snackPack={snackPack} />
+      {/*<AlertSnackbar snackPack={snackPack} />*/}
     </>
   );
 }

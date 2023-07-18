@@ -10,7 +10,7 @@ import {
 import PropTypes from 'prop-types';
 import { JSX, useEffect, useState } from 'react';
 
-import { getInstances } from '../../services/instances';
+//import { getInstances } from '../../services/instances';
 import { compareDate } from '../../services/sorting';
 import { convertToClientGradingScale, formatDateString } from '../../services/textFormat';
 import { HeadCellData, State } from '../../types';
@@ -48,7 +48,7 @@ export default function InstancesTable(props: {
   const [instances, setInstances]: State<Array<CourseInstanceData> | null> =
     useState<Array<CourseInstanceData> | null>(null);
 
-  useEffect(() => {
+  /*useEffect(() => {
     getInstances(props.courseId)
       .then((courseInstances: Array<CourseInstanceData>) => {
         const sortedInstances: Array<CourseInstanceData> = courseInstances.sort(
@@ -61,7 +61,7 @@ export default function InstancesTable(props: {
         setInstances(sortedInstances);
       })
       .catch((e: Error) => console.log(e.message));
-  }, []);
+  }, []);*/
 
   return (
     <>

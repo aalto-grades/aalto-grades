@@ -26,6 +26,7 @@ export default function EditInstanceView(): JSX.Element {
 
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
+  /*
   useEffect(() => {
     if (sisuInstanceId) {
       getSisuInstance(sisuInstanceId)
@@ -51,9 +52,9 @@ export default function EditInstanceView(): JSX.Element {
         .catch((e: Error) => console.log(e.message));
     }
   }, []);
-
+  */
   async function addInstance(instance: CourseInstanceData): Promise<void> {
-    try {
+    /*try {
       if (courseId) {
         await createInstance(courseId, instance);
         navigate(`/course-view/${courseId}`, { replace: true });
@@ -66,7 +67,7 @@ export default function EditInstanceView(): JSX.Element {
       }
       snackPack.setMessageInfo({ msg, severity: 'error' });
       snackPack.setAlertOpen(true);
-    }
+    }*/
   }
 
   return (

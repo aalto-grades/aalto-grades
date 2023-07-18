@@ -12,7 +12,7 @@ import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 
-import { getFormulaDetails } from '../../services/formulas';
+//import { getFormulaDetails } from '../../services/formulas';
 import { State } from '../../types';
 
 const HoverExpandMoreIcon = styled<any>(ExpandMore)(({ theme }) => ({
@@ -26,7 +26,7 @@ export default function ViewFormulaAccordion(props: {
 }): JSX.Element {
   const [codeSnippet, setCodeSnippet]: State<string | null> = useState<string | null>(null);
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (props.formulaId) {
       getFormulaDetails(props.formulaId)
         .then((data: FormulaData) => {
@@ -34,7 +34,7 @@ export default function ViewFormulaAccordion(props: {
         })
         .catch((exception: Error) => console.log(exception.message));
     }
-  }, [props.formulaId]);
+  }, [props.formulaId]);*/
 
   return (
     <Container>

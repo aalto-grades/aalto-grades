@@ -13,7 +13,8 @@ import { Params, useParams } from 'react-router-dom';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import FileErrorDialog from './FileErrorDialog';
 
-import { importCsv } from '../../services/grades';
+//import { importCsv } from '../../services/grades';
+import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import { Message, State } from '../../types';
 
 const instructions: string =
@@ -49,22 +50,6 @@ export default function FileLoadDialog(props: {
     setShowErrorDialog(!showErrorDialog);
   }
 
-  function snackPackAdd(msg: Message): void {
-    setSnackPack((prev: Array<Message>): Array<Message> => [...prev, msg]);
-  }
-
-  // useEffect in charge of handling the back-to-back alerts
-  // makes the previous disappear before showing the new one
-  useEffect(() => {
-    if (snackPack.length && !messageInfo) {
-      setMessageInfo({ ...snackPack[0] });
-      setSnackPack((prev: Array<Message>) => prev.slice(1));
-      setAlertOpen(true);
-    } else if (snackPack.length && messageInfo && alertOpen) {
-      setAlertOpen(false);
-    }
-  }, [snackPack, messageInfo, alertOpen]);
-
   const [fileName, setFileName]: State<string | null> = useState<string | null>(null);
   const [validationError, setValidationError]: State<string> = useState<string>('');
   const [fileErrors, setFileErrors]: State<Array<string>> = useState<Array<string>>([]);
@@ -76,7 +61,7 @@ export default function FileLoadDialog(props: {
     });
     try {
       if (courseId) {
-        await importCsv(
+        /*await importCsv(
           courseId, props.assessmentModelId, fileInput.current.files[0]
         );
         snackPackAdd({
@@ -85,7 +70,7 @@ export default function FileLoadDialog(props: {
           severity: 'success'
         });
         props.handleClose();
-        setFileName(null);
+        setFileName(null);*/
       }
     } catch (err: any) {
       // Possible CSV errors are returned with http codes 400, 409, 422
