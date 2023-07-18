@@ -34,11 +34,14 @@ export function useLogIn(
   });
 }
 
-export function useLogOut(): UseMutationResult {
+export function useLogOut(
+  options: UseMutationOptions<unknown, unknown, unknown>
+): UseMutationResult {
   return useMutation({
     mutationFn: async () => (
       await axios.post('/v1/auth/logout')
-    )
+    ),
+    ...options
   });
 }
 
