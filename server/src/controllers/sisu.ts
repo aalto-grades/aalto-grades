@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { CourseInstanceData, GradingScale } from 'aalto-grades-common/types';
 import axios, { AxiosResponse } from 'axios';
 import { Request, Response } from 'express';
 import { Op } from 'sequelize';
@@ -11,7 +12,6 @@ import { SISU_API_KEY, SISU_API_URL } from '../configs/environment';
 
 import CourseInstance from '../database/models/courseInstance';
 
-import { CourseInstanceData, GradingScale } from 'aalto-grades-common/types';
 import { ApiError, HttpCode, SisuCourseInstance } from '../types';
 
 function parseSisuGradingScale(gradingScale: string): GradingScale | undefined {

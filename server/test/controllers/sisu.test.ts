@@ -2,14 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { CourseInstanceData } from 'aalto-grades-common/types';
 import axios, { AxiosStatic } from 'axios';
 import supertest from 'supertest';
 
-import { app } from '../../src/app';
-
-import { CourseInstanceData } from 'aalto-grades-common/types';
-import { HttpCode } from '../../src/types';
 import { sisuInstance, sisuError } from '../mock-data/sisu';
+import { app } from '../../src/app';
+import { HttpCode } from '../../src/types';
 import { Cookies, getCookies } from '../util/getCookies';
 
 jest.mock('axios');
@@ -25,9 +24,10 @@ beforeAll(async () => {
   cookies = await getCookies();
 });
 
-function checkRes(courseInstance: CourseInstanceData): void {
+function checkRes(courseInstance: CourseInstanceData, id: string, inUse: boolean): void {
   expect(courseInstance.id).not.toBeDefined();
-  expect(courseInstance.sisuCourseInstanceId).toBe(sisuInstance.id);
+  expect(courseInstance.sisuInstanceInUse).toBe(inUse);
+  expect(courseInstance.sisuCourseInstanceId).toBe(id);
   expect(courseInstance.startingPeriod).not.toBeDefined();
   expect(courseInstance.endingPeriod).not.toBeDefined();
   expect(courseInstance.startDate).toBeDefined();
@@ -60,8 +60,29 @@ describe(
       expect(res.body.success).toBe(true);
       expect(res.body.data.courseInstance).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
-      checkRes(res.body.data.courseInstance);
+      checkRes(res.body.data.courseInstance, sisuInstance.id, false);
     });
+
+    it(
+      'should show Sisu ID as taken when instance has existing course instance in DB',
+      async () => {
+        mockedAxios.get.mockResolvedValue({
+          data: {
+            ...sisuInstance,
+            id: 'aalto-CUR-169778-3874205'
+          }
+        });
+        const res: supertest.Response = await request
+          .get(`/v1/sisu/instances/${sisuInstance.id}`)
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
+
+        expect(res.body.success).toBe(true);
+        expect(res.body.data.courseInstance).toBeDefined();
+        expect(res.body.errors).not.toBeDefined();
+        checkRes(res.body.data.courseInstance, 'aalto-CUR-169778-3874205', true);
+      });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
       await request
@@ -82,13 +103,13 @@ describe(
 
       expect(res.body.success).toBe(false);
       expect(res.body.instance).not.toBeDefined();
-      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors[0]).toBe('external API error: 102');
     });
 
   });
 
 describe(
-  'Test GET /v1/sisu/courses/:courseCode - fetch all Sisu instance by aalto course code',
+  'Test GET /v1/sisu/courses/:courseCode - fetch all Sisu instance by Aalto course code',
   () => {
 
     it(
@@ -107,8 +128,35 @@ describe(
         expect(res.body.data.courseInstances).toBeDefined();
         expect(res.body.errors).not.toBeDefined();
         expect(res.body.data.courseInstances.length).toBe(5);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        res.body.data.courseInstances.forEach((courseInstance: any) => checkRes(courseInstance));
+        res.body.data.courseInstances.forEach(
+          (courseInstance: CourseInstanceData) => checkRes(courseInstance, sisuInstance.id, false)
+        );
+      });
+
+    it(
+      'should show Sisu ID as taken when instances has existing course instance in DB',
+      async () => {
+        mockedAxios.get.mockResolvedValue({
+          data: Array(5).fill({
+            ...sisuInstance,
+            id: 'aalto-CUR-169778-3874205'
+          })
+        });
+        const res: supertest.Response = await request
+          .get('/v1/sisu/courses/ELEC-A7100')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
+
+        expect(res.body.success).toBe(true);
+        expect(res.body.data.courseInstances).toBeDefined();
+        expect(res.body.errors).not.toBeDefined();
+        expect(res.body.data.courseInstances.length).toBe(5);
+        res.body.data.courseInstances.forEach(
+          (courseInstance: CourseInstanceData) => checkRes(
+            courseInstance, 'aalto-CUR-169778-3874205', true
+          )
+        );
       });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
@@ -118,23 +166,8 @@ describe(
         .expect(HttpCode.Unauthorized);
     });
 
-    it('should respond with 502 bad gateway, if course does not exist', async () => {
-      mockedAxios.get.mockResolvedValue({
-        data: sisuError
-      });
-      const res: supertest.Response = await request
-        .get('/v1/sisu/courses/abc')
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.BadGateway);
-
-      expect(res.body.success).toBe(false);
-      expect(res.body.data).not.toBeDefined();
-      expect(res.body.errors).toBeDefined();
-    });
-
     it(
-      'should respond with 502 bad gateway, if course does not have active instances',
+      'should respond with 502 bad gateway, if course has no active instances or does not exist',
       async () => {
         mockedAxios.get.mockResolvedValue({
           data: sisuError
@@ -147,7 +180,7 @@ describe(
 
         expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors[0]).toBe('external API error: 102');
       });
 
   });
