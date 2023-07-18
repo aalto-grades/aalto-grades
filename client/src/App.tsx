@@ -7,7 +7,9 @@ import { AppBar, Box, Container, Link, Toolbar } from '@mui/material';
 import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
 import { CSSProperties, JSX } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  QueryCache, QueryClient, QueryClientProvider, MutationCache
+} from '@tanstack/react-query';
 
 import AlertSnackbar from './components/alerts/AlertSnackbar';
 import Login from './components/auth/Login';
@@ -121,16 +123,22 @@ const theme: Theme = createTheme({
 export default function App(): JSX.Element {
 
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
+
+  function handleError(error: unknown) {
+    snackPack.push(
+      {
+        msg: (error as Error).message,
+        severity: 'error'
+      }
+    );
+  }
+
   const queryClient: QueryClient = new QueryClient({
     queryCache: new QueryCache({
-      onError: (error: unknown) => {
-        snackPack.push(
-          {
-            msg: (error as Error).message,
-            severity: 'error'
-          }
-        );
-      }
+      onError: handleError
+    }),
+    mutationCache: new MutationCache({
+      onError: handleError
     })
   });
 

@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 import { SignupCredentials, State } from '../../types';
 
 export default function SignupForm(props: {
-  addUser: (userObject: SignupCredentials) => Promise<void>
+  addUser: (userObject: SignupCredentials) => void
 }): JSX.Element {
 
   const [name, setName]: State<string> = useState('');

@@ -5,7 +5,7 @@
 import { LoginResult } from 'aalto-grades-common/types';
 import axios from './axios';
 import {
-  useMutation, UseMutationResult, useQuery, UseQueryResult
+  useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryResult
 } from '@tanstack/react-query';
 
 import { LoginCredentials, SignupCredentials } from '../../types';
@@ -35,10 +35,19 @@ export function useLogOut(): UseMutationResult {
   });
 }
 
-export function useSignUp(credentials: SignupCredentials): UseMutationResult<LoginResult> {
+export type UseSignUpResult = UseMutationResult<
+  LoginResult, unknown, SignupCredentials
+>;
+
+type UseSignUpOptions = UseMutationOptions<
+  LoginResult, unknown, SignupCredentials
+>;
+
+export function useSignUp(options: UseSignUpOptions): UseSignUpResult {
   return useMutation({
-    mutationFn: async () => (
+    mutationFn: async (credentials: SignupCredentials) => (
       await axios.post('/v1/auth/signup', credentials)
-    ).data.data
+    ).data.data,
+    ...options
   });
 }

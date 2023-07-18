@@ -2,14 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { LoginResult } from 'aalto-grades-common/types';
 import { useTheme, Theme } from '@mui/material/styles';
 import { useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 import SignupForm from './SignupForm';
 
+import { useSignUp, UseSignUpResult } from '../../hooks/useApi';
 import useAuth, { AuthContextType } from '../../hooks/useAuth';
-//import { signup } from '../../services/user';
 import { SignupCredentials, State } from '../../types';
 
 export default function Signup(): JSX.Element {
@@ -19,23 +20,21 @@ export default function Signup(): JSX.Element {
   const theme: Theme = useTheme();
   const [errorMessage, setErrorMessage]: State<string> = useState('');
 
-  async function addUser(userObject: SignupCredentials): Promise<void> {
-    try {
-      // if signup successful, save user role to context
-      /*setAuth(await signup(userObject));
-
-      navigate('/', { replace: true });*/
-    } catch (exception) {
-      console.log(exception);
-      setErrorMessage('Error: signup failed');
+  const signUp: UseSignUpResult = useSignUp({
+    onSuccess: (auth: LoginResult | null) => {
+      // If signup successful, save user role to context
+      setAuth(auth ?? null);
+      navigate('/', { replace: true });
     }
-  }
+  });
 
   return (
     <div>
       <h1>Sign up</h1>
       <p style={{ color: `${theme.palette.primary.dark}` }}>{errorMessage}</p>
-      <SignupForm addUser={addUser} />
+      <SignupForm
+        addUser={(credentials: SignupCredentials) => signUp.mutate(credentials)}
+      />
     </div>
   );
 }
