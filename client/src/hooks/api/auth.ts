@@ -19,11 +19,18 @@ export function useGetRefreshToken(): UseQueryResult<LoginResult> {
   });
 }
 
-export function useLogIn(credentials: LoginCredentials): UseMutationResult<LoginResult> {
+export type UseLogInResult = UseMutationResult<
+  LoginResult, unknown, LoginCredentials
+>;
+
+export function useLogIn(
+  options: UseMutationOptions<LoginResult, unknown, LoginCredentials>
+): UseLogInResult {
   return useMutation({
-    mutationFn: async () => (
+    mutationFn: async (credentials: LoginCredentials) => (
       await axios.post('/v1/auth/login', credentials)
-    ).data.data
+    ).data.data,
+    ...options
   });
 }
 
@@ -39,11 +46,9 @@ export type UseSignUpResult = UseMutationResult<
   LoginResult, unknown, SignupCredentials
 >;
 
-type UseSignUpOptions = UseMutationOptions<
-  LoginResult, unknown, SignupCredentials
->;
-
-export function useSignUp(options: UseSignUpOptions): UseSignUpResult {
+export function useSignUp(
+  options: UseMutationOptions<LoginResult, unknown, SignupCredentials>
+): UseSignUpResult {
   return useMutation({
     mutationFn: async (credentials: SignupCredentials) => (
       await axios.post('/v1/auth/signup', credentials)
