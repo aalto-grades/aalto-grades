@@ -2,25 +2,36 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { JSX } from 'react';
-import { NavigateFunction, useNavigate } from 'react-router-dom';
-import { UseQueryResult } from '@tanstack/react-query';
-import { Box, Button, Typography } from '@mui/material';
 import { CourseData, SystemRole } from 'aalto-grades-common/types';
+import { Box, Button, Typography } from '@mui/material';
+import { JSX, useState, useEffect } from 'react';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 import CourseTable from './front-page/CourseTable';
-import { getAllCourses, getCoursesOfUser } from '../services/courses';
-import useAuth, { AuthContextType } from '../hooks/useAuth';
 
-function FrontPage(): JSX.Element {
+import useAuth, { AuthContextType } from '../hooks/useAuth';
+import { getAllCourses, getCoursesOfUser } from '../services/courses';
+import { State } from '../types';
+
+export default function FrontPage(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { auth }: AuthContextType = useAuth();
 
-  if (!auth)
-    return (<></>);
+  useEffect(() => {
+    if (auth) {
+      getCoursesOfUser(auth.id)
+        .then((data: Array<CourseData>) => {
+          setCoursesOfUser(data);
+        })
+        .catch((e: unknown) => console.log(e));
+    }
 
-  const coursesOfUser: UseQueryResult<Array<CourseData>> = getCoursesOfUser(auth.id);
-  const courses: UseQueryResult<Array<CourseData>> = getAllCourses();
+    getAllCourses()
+      .then((data: Array<CourseData>) => {
+        setCourses(data);
+      })
+      .catch((e: unknown) => console.log(e));
+  }, []);
 
   return (
     <>
@@ -56,7 +67,7 @@ function FrontPage(): JSX.Element {
         </Typography>
         { /* Admins are shown the button for creating a new course */
           auth?.role == SystemRole.Admin &&
-          <Button id='ag_new_course_btn' size='large' variant='contained' onClick={() => {
+          <Button id='ag_new_course_btn' size='large' variant='contained' onClick={(): void => {
             navigate('/create-course');
           }}>
             Create New Course
@@ -70,5 +81,3 @@ function FrontPage(): JSX.Element {
     </>
   );
 }
-
-export default FrontPage;

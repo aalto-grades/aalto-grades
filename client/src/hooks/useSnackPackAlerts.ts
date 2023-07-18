@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState, useEffect, Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+
 import { Message, State } from '../types';
 
 /*
@@ -20,7 +21,7 @@ export interface SnackPackAlertState {
   setAlertOpen: Dispatch<SetStateAction<boolean>>
 }
 
-function useSnackPackAlerts(): SnackPackAlertState {
+export default function useSnackPackAlerts(): SnackPackAlertState {
 
   // state variables for alert messages
   const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
@@ -57,5 +58,3 @@ function useSnackPackAlerts(): SnackPackAlertState {
     alertOpen, setAlertOpen
   };
 }
-
-export default useSnackPackAlerts;

@@ -10,11 +10,9 @@ import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
 import { CourseData } from 'aalto-grades-common/types';
-import { idSchema } from '../types/general';
-import { HttpCode } from '../types/httpCode';
+import { CourseFull, HttpCode, idSchema } from '../types';
 import { parseCourseFull } from './utils/course';
 import { findUserById } from './utils/user';
-import { CourseFull } from '../types/model';
 
 // Sequelize says User is not associated to CourseInstance unless this is here.
 // TODO: Remove if possible.

@@ -2,22 +2,22 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { Box, Button, Collapse, IconButton, List, Typography } from '@mui/material';
-import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import { Box, Button, Collapse, IconButton, List, Typography } from '@mui/material';
+import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
 
 import Attainment from './Attainment';
 import EditFormulaDialog from '../edit-formula-dialog/EditFormulaDialog';
 import LeafAttainment from './LeafAttainment';
 
-import formulaServices from '../../services/formulas';
+import { getFormulaDetails } from '../../services/formulas';
 import { State } from '../../types';
 
 // An Assignmnet component with subAttainments and a formula
 
-function ParentAttainment(props: {
+export default function ParentAttainment(props: {
   attainmentTree: AttainmentData,
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
   deleteAttainment: (attainment: AttainmentData) => void,
@@ -39,7 +39,7 @@ function ParentAttainment(props: {
 
   function onChangeFormula(): void {
     if (props.attainment.formula) {
-      formulaServices.getFormulaDetails(props.attainment.formula)
+      getFormulaDetails(props.attainment.formula)
         .then((formula: FormulaData) => {
           setFormulaDetails(formula);
         });
@@ -136,5 +136,3 @@ ParentAttainment.propTypes = {
   getTemporaryId: PropTypes.func,
   attainment: PropTypes.any
 };
-
-export default ParentAttainment;

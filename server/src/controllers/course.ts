@@ -12,15 +12,9 @@ import CourseTranslation from '../database/models/courseTranslation';
 import TeacherInCharge from '../database/models/teacherInCharge';
 import User from '../database/models/user';
 
-import { CourseData } from 'aalto-grades-common/types/course';
-import { Language } from 'aalto-grades-common/types/language';
-import { ApiError } from '../types/error';
-import { idSchema } from '../types/general';
-import { HttpCode } from '../types/httpCode';
-import { localizedStringSchema } from '../types/language';
-import { CourseFull } from '../types/model';
+import { CourseData, Language, UserData } from 'aalto-grades-common/types';
+import { ApiError, CourseFull, HttpCode, idSchema, localizedStringSchema } from '../types';
 import { findCourseFullById, parseCourseFull } from './utils/course';
-import { UserData } from 'aalto-grades-common/types';
 
 export async function getCourse(req: Request, res: Response): Promise<void> {
   const courseId: number = Number(req.params.courseId);

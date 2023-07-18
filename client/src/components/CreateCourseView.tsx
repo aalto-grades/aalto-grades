@@ -2,22 +2,24 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { NavigateFunction, useNavigate } from 'react-router-dom';
-import { Typography } from '@mui/material';
 import { CourseData } from 'aalto-grades-common/types';
+import { Typography } from '@mui/material';
+import { useState } from 'react';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 import AlertSnackbar from './alerts/AlertSnackbar';
 import CreateCourseForm from './create-course-view/CreateCourseForm';
-import courseServices from '../services/courses';
-import useSnackPackAlerts, { SnackPackAlertState } from '../hooks/useSnackPackAlerts';
 
-function CreateCourseView(): JSX.Element {
+import { addCourse as addCourseApi } from '../services/courses';
+import { Message, State } from '../types';
+
+export default function CreateCourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
   async function addCourse(course: CourseData): Promise<void> {
     try {
-      const courseId: number = await courseServices.addCourse(course);
+      const courseId: number = await addCourseApi(course);
       navigate(`/course-view/${courseId}`, { replace: true });
     } catch (error: any) {
       let msg: string | Array<string> = error?.message ?? 'Unknown error';
@@ -40,5 +42,3 @@ function CreateCourseView(): JSX.Element {
     </>
   );
 }
-
-export default CreateCourseView;

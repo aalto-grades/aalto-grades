@@ -5,7 +5,7 @@
 import express, { Router } from 'express';
 import passport from 'passport';
 
-import { SystemRole } from 'aalto-grades-common/types/auth';
+import { SystemRole } from 'aalto-grades-common/types';
 import { addCourse, getAllCourses, getCourse } from '../controllers/course';
 import { handleInvalidRequestJson } from '../middleware';
 import { authorization } from '../middleware/authorization';

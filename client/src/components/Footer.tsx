@@ -4,7 +4,7 @@
 
 import { Box, Link, Tooltip } from '@mui/material';
 
-function Footer(): JSX.Element {
+export default function Footer(): JSX.Element {
   return (
     <Box
       component="footer"
@@ -55,5 +55,3 @@ function Footer(): JSX.Element {
     </Box>
   );
 }
-
-export default Footer;

@@ -4,7 +4,7 @@
 
 import { Formula, FormulaData } from 'aalto-grades-common/types';
 
-const mockFormulas: Array<FormulaData> = [
+export const mockFormulas: Array<FormulaData> = [
   {
     id: Formula.WeightedAverage,
     name: 'Weighted average',
@@ -26,5 +26,3 @@ const mockFormulas: Array<FormulaData> = [
     `,
   },
 ];
-
-export default mockFormulas;

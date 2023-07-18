@@ -2,18 +2,20 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { useState } from 'react';
-import { Params, useParams } from 'react-router-dom';
-import PropTypes from 'prop-types';
+import { FinalGrade } from 'aalto-grades-common/types';
 import {
-  Box, Button, Dialog, DialogActions, DialogContent, DialogContentText,
-  DialogTitle, MenuItem, TextField
+  Box, Button, Dialog, DialogActions, DialogContent,
+  DialogContentText, DialogTitle, List, ListItem,
+  ListItemText, MenuItem, Paper, TextField, Typography
 } from '@mui/material';
+import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react';
+import { Params, useParams } from 'react-router-dom';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';
-import gradeServices from '../../services/grades';
-import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
-import { Message } from '../../types';
+
+import { exportSisuCsv } from '../../services/grades';
+import { Message, State } from '../../types';
 
 // A Dialog component for exporting Sisu grades CSV.
 const instructions: string =
@@ -36,8 +38,13 @@ const errorMsg: Message = {
   severity: 'error'
 };
 
+interface LanguageOption {
+  id: string,
+  language: string
+}
+
 // Available completion languages used in Sisu.
-const languageOptions = [
+const languageOptions: Array<LanguageOption> = [
   {
     id: 'fi',
     language: 'Finnish'
@@ -80,50 +87,71 @@ const languageOptions = [
   }
 ];
 
-function SisuExportDialog(props: {
+export default function SisuExportDialog(props: {
   open: boolean,
-  handleClose: () => void
+  handleClose: () => void,
+  selectedStudents: Array<FinalGrade>
 }): JSX.Element {
-  const { courseId, instanceId }: Params = useParams();
+  const { courseId, assessmentModelId }: Params = useParams();
 
   // state variables handling the alert messages.
-  const snackPack: SnackPackAlertState = useSnackPackAlerts();
+  const [snackPack, setSnackPack]: State<Array<Message>> = useState<Array<Message>>([]);
+  const [alertOpen, setAlertOpen]: State<boolean> = useState<boolean>(false);
+  const [messageInfo, setMessageInfo]: State<Message | null> = useState<Message | null>(null);
 
   // state variables handling the assessment date and completion language.
-  const [assessmentDate, setAssessmentDate] = useState<any>(null);
-  const [completionLanguage, setCompletionLanguage] = useState<any>(null);
+  const [assessmentDate, setAssessmentDate]: State<string | null> = useState<string | null>(null);
+  const [completionLanguage, setCompletionLanguage]: State<string | null> =
+    useState<string | null>(null);
+
+  // useEffect in charge of handling the back-to-back alerts
+  // makes the previous disappear before showing the new one
+  useEffect(() => {
+    if (snackPack.length && !messageInfo) {
+      setMessageInfo({ ...snackPack[0] });
+      setSnackPack((prev: Array<Message>) => prev.slice(1));
+      setAlertOpen(true);
+    } else if (snackPack.length && messageInfo && alertOpen) {
+      setAlertOpen(false);
+    }
+  }, [snackPack, messageInfo, alertOpen]);
 
   async function exportSisuCsvGrades(): Promise<void> {
-    snackPack.push(loadingMsg);
+    setSnackPack((prev: Array<Message>) => [...prev, loadingMsg]);
 
     try {
-      if (courseId && instanceId) {
-        const params: any = {};
-        if (completionLanguage) {
-          params.completionLanguage = completionLanguage;
-        }
-        if (assessmentDate) {
-          params.assessmentDate = assessmentDate;
-        }
-        const data: BlobPart = await gradeServices.exportSisuCsv(
-          courseId, instanceId, params
+      if (courseId && assessmentModelId) {
+        const params: {
+          completionLanguage?: string,
+          assessmentDate?: string,
+          studentNumbers: Array<string>
+        } = {
+          completionLanguage: completionLanguage ?? undefined,
+          assessmentDate: assessmentDate ?? undefined,
+          studentNumbers: props.selectedStudents.map((student: FinalGrade) => student.studentNumber)
+        };
+
+        const data: BlobPart = await exportSisuCsv(
+          courseId, assessmentModelId, params
         );
 
         // Create a blob object from the response data
-        const blob = new Blob([data], { type: 'text/csv' });
+        const blob: Blob = new Blob([data], { type: 'text/csv' });
 
-        const link = document.createElement('a');
+        const link: HTMLAnchorElement = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         // Set file name.
-        link.download = `grades_course_${courseId}_instance_${instanceId}.csv`;
+        link.download = `grades_course_${courseId}_assessment_model_${assessmentModelId}.csv`;
         // Download file automatically to the user's computer.
         link.click();
+        URL.revokeObjectURL(link.href);
+        link.remove();
 
-        snackPack.push(successMsg);
+        setSnackPack((prev: Array<Message>) => [...prev, successMsg]);
       }
-    } catch (exception) {
-      console.log(exception);
-      snackPack.push(errorMsg);
+    } catch (error: unknown) {
+      console.log(error);
+      setSnackPack((prev: Array<Message>) => [...prev, errorMsg]);
     } finally {
       snackPack.setAlertOpen(false);
     }
@@ -152,12 +180,12 @@ function SisuExportDialog(props: {
                 label="Completion language"
                 defaultValue="en"
                 helperText="If not provided, the default will be English."
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
                   setCompletionLanguage(e.target.value);
                 }}
               >
                 {
-                  languageOptions.map((option) => (
+                  languageOptions.map((option: LanguageOption) => (
                     <MenuItem key={option.id} value={option.id}>
                       {option.language}
                     </MenuItem>
@@ -174,24 +202,42 @@ function SisuExportDialog(props: {
                 /* TODO: Fix TS */
                 //format="DD-MM-YYYY"
                 helperText="If not provided, the default will be course instance ending date."
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
                   setAssessmentDate(e.target.value);
                 }}
               />
             </div>
           </Box>
+          <Typography variant='h6' sx={{ mt: 1 }}>
+            Selected students:
+          </Typography>
+          <Paper sx={{ maxHeight: 200, overflow: 'auto', my: 1 }}>
+            <List dense={true}>
+              { props.selectedStudents.map((studentGrade: FinalGrade) => (
+                <ListItem key={studentGrade.studentNumber}>
+                  <ListItemText
+                    primary={`Student number: ${studentGrade.studentNumber}`}
+                  />
+                </ListItem>
+              )) }
+            </List>
+          </Paper>
         </DialogContent>
         <DialogActions sx={{ pr: 4, pb: 3 }}>
-          <Button size='medium' onClick={() => {
-            props.handleClose();
-          }}>
+          <Button
+            size='medium'
+            variant='outlined'
+            onClick={(): void => {
+              props.handleClose();
+            }}
+          >
             Cancel
           </Button>
           <Button
             id='ag_confirm_file_upload_btn'
             size='medium'
-            variant='outlined'
-            onClick={() => {
+            variant='contained'
+            onClick={(): void => {
               exportSisuCsvGrades();
             }}
           >
@@ -206,7 +252,6 @@ function SisuExportDialog(props: {
 
 SisuExportDialog.propTypes = {
   open: PropTypes.bool,
-  handleClose: PropTypes.func
+  handleClose: PropTypes.func,
+  selectedStudents: PropTypes.array
 };
-
-export default SisuExportDialog;

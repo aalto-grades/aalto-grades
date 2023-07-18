@@ -6,9 +6,7 @@ import Course from '../../database/models/course';
 import CourseInstance from '../../database/models/courseInstance';
 
 import { findCourseById } from './course';
-import { ApiError } from '../../types/error';
-import { idSchema } from '../../types/general';
-import { HttpCode } from '../../types/httpCode';
+import { ApiError, HttpCode, idSchema } from '../../types';
 
 /**
  * Finds a course instance by its ID.

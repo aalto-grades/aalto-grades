@@ -2,29 +2,29 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { GradingScale } from 'aalto-grades-common/types/course';
+import { GradingScale } from 'aalto-grades-common/types';
 
 // use 'en-GB' to get "20.07.2012, 05:00:00"
 // (instead of 'fi-GB' which produces "20.7.2012 klo 5.00.00")
-function formatDateToString(date: Date): string {
+export function formatDateToString(date: Date): string {
   const str: string = date.toLocaleString('en-GB').replaceAll('/', '.');
   return str.split(',')[0];
 }
 
 // Change date string of format "2012-07-20" to Date type
-function formatStringToDate(str: string): Date {
+export function formatStringToDate(str: string): Date {
   const date: Date = new Date(str);
   return date;
 }
 
 // Format Date type values to strings of the format "2023-01-01"
-function formatDateToSlashString(date: Date): string {
+export function formatDateToSlashString(date: Date): string {
   const str: string = date.toLocaleString('en-GB');
   return str.split('T')[0];
 }
 
 // Change date string from format "2012-07-20" to "20.07.2012"
-function formatDateString(dateStr: string): string {
+export function formatDateString(dateStr: string): string {
   const attributes: Array<string> = dateStr.split('-');
   const year: string = attributes[0];
   const month: string = attributes[1];
@@ -33,7 +33,7 @@ function formatDateString(dateStr: string): string {
 }
 
 // Format Sisu course types to a more readable form.
-function formatSisuCourseType(courseType: string): string {
+export function formatSisuCourseType(courseType: string): string {
   switch (courseType) {
   case 'teaching-participation-lectures':
     return 'Teaching';
@@ -49,7 +49,7 @@ function formatSisuCourseType(courseType: string): string {
 // Change course type from "NUMERICAL", "PASSFAIL" and from "SECOND_NATIONAL_LANGUAGE"
 // to a more readable types.
 // These are for the UI only. These need to be converted back when adding data to the server.
-function convertToClientGradingScale(gradingScale: GradingScale): string {
+export function convertToClientGradingScale(gradingScale: GradingScale): string {
   switch (gradingScale) {
   case GradingScale.Numerical:
     return 'General scale, 0-5';
@@ -62,7 +62,7 @@ function convertToClientGradingScale(gradingScale: GradingScale): string {
   }
 }
 
-function convertToServerGradingScale(gradingScale: string): GradingScale | string {
+export function convertToServerGradingScale(gradingScale: string): GradingScale | string {
   switch (gradingScale) {
   case 'General scale, 0-5':
     return GradingScale.Numerical;
@@ -74,13 +74,3 @@ function convertToServerGradingScale(gradingScale: string): GradingScale | strin
     return gradingScale;
   }
 }
-
-export default {
-  formatDateToString,
-  formatStringToDate,
-  formatDateToSlashString,
-  formatDateString,
-  formatSisuCourseType,
-  convertToClientGradingScale,
-  convertToServerGradingScale
-};

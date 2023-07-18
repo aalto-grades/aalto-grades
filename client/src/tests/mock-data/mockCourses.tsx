@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseData } from 'aalto-grades-common/types/course';
+import { CourseData } from 'aalto-grades-common/types';
 
-const mockCourses: Array<CourseData> = [
+export const mockCourses: Array<CourseData> = [
   {
     id: 5,
     courseCode: 'CS-A1150',
@@ -60,5 +60,3 @@ const mockCourses: Array<CourseData> = [
     ]
   }
 ];
-
-export default mockCourses;

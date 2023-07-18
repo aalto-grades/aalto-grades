@@ -2,25 +2,27 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { CourseInstanceData } from 'aalto-grades-common/types';
+import { Box, Button , Container, Divider, Typography } from '@mui/material';
+import { useState, useEffect } from 'react';
 import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
-import { useQuery, UseQueryResult } from '@tanstack/react-query';
-import { Box, Button, Container, Divider, Typography } from '@mui/material';
-import { CourseInstanceData } from 'aalto-grades-common/types/course';
 
 import FetchedInstances from './fetch-instances-view/FetchedInstances';
-import instanceServices from '../services/instances';
 
-function FetchInstancesView(): JSX.Element {
+import { getSisuInstances } from '../services/instances';
+import { State } from '../types';
+
+export default function FetchInstancesView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { courseId, courseCode }: Params = useParams();
 
-  if (!courseId || !courseCode)
-    return (<></>);
-
-  const sisuInstances: UseQueryResult<Array<CourseInstanceData>> = useQuery({
-    queryKey: ['sisu-instances', courseCode],
-    queryFn: () => instanceServices.getSisuInstances(courseCode)
-  });
+  useEffect(() => {
+    if (courseCode) {
+      getSisuInstances(courseCode)
+        .then((courseInstances: Array<CourseInstanceData>) => setInstances(courseInstances))
+        .catch((e: Error) => console.log(e.message));
+    }
+  }, []);
 
   function onCancel(): void {
     navigate('/course-view/' + courseId);
@@ -61,9 +63,6 @@ function FetchInstancesView(): JSX.Element {
           </Button>
         </Box>
       </Container>
-
     </>
   );
 }
-
-export default FetchInstancesView;

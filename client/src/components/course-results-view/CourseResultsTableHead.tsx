@@ -2,22 +2,27 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { SyntheticEvent } from 'react';
+import {
+  Box, Checkbox, FormControlLabel, TableCell,
+  TableHead, TableRow, TableSortLabel
+} from '@mui/material';import { visuallyHidden } from '@mui/utils';
 import PropTypes from 'prop-types';
-import TableHead from '@mui/material/TableHead';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import { visuallyHidden } from '@mui/utils';
-import TableCell from '@mui/material/TableCell';
-import TableRow from '@mui/material/TableRow';
-import Box from '@mui/material/Box';
+import { SyntheticEvent } from 'react';
 
-function CourseResultsTableHead(props: {
+interface Colum {
+  id: string,
+  name: string
+}
+
+export default function CourseResultsTableHead(props: {
   order: 'asc' | 'desc',
   orderBy: string,
-  onRequestSort: (event: SyntheticEvent, property: string) => void
+  onRequestSort: (event: SyntheticEvent, property: string) => void,
+  handleSelectAll: () => void,
+  allSelected: boolean
 }): JSX.Element {
 
-  const rows = [
+  const rows: Array<Colum> = [
     {
       id: 'studentNumber',
       name: 'Student Number'
@@ -42,7 +47,7 @@ function CourseResultsTableHead(props: {
     <TableHead>
       <TableRow>
         {
-          rows.map((column) => (
+          rows.map((column: Colum) => (
             <TableCell
               key={column.id}
               align='left'
@@ -66,6 +71,24 @@ function CourseResultsTableHead(props: {
             </TableCell>
           ))
         }
+        <TableCell
+          key='selectAll'
+          align='left'
+          padding='normal'
+        >
+          <FormControlLabel
+            htmlFor="select-all"
+            label="Select all"
+            control={
+              <Checkbox
+                id="select-all"
+                size="small"
+                onClick={props.handleSelectAll}
+                checked={props.allSelected}
+              />
+            }
+          />
+        </TableCell>
       </TableRow>
     </TableHead>
   );
@@ -74,7 +97,7 @@ function CourseResultsTableHead(props: {
 CourseResultsTableHead.propTypes = {
   onRequestSort: PropTypes.func.isRequired,
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-  orderBy: PropTypes.any.isRequired
+  orderBy: PropTypes.any.isRequired,
+  handleSelectAll: PropTypes.func,
+  allSelected: PropTypes.bool
 };
-
-export default CourseResultsTableHead;

@@ -2,16 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { useTheme, Theme } from '@mui/material/styles';
 import { useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import { useTheme, Theme } from '@mui/material/styles';
-import SignupForm from './SignupForm';
-import userServices from '../../services/user';
-import useAuth, { AuthContextType } from '../../hooks/useAuth';
-import { State } from '../../types';
-import { SignupCredentials } from '../../types/auth';
 
-function Signup(): JSX.Element {
+import SignupForm from './SignupForm';
+
+import useAuth, { AuthContextType } from '../../hooks/useAuth';
+import { signup } from '../../services/user';
+import { SignupCredentials, State } from '../../types';
+
+export default function Signup(): JSX.Element {
 
   const navigate: NavigateFunction = useNavigate();
   const { setAuth }: AuthContextType = useAuth();
@@ -21,7 +22,7 @@ function Signup(): JSX.Element {
   async function addUser(userObject: SignupCredentials): Promise<void> {
     try {
       // if signup successfull, save user role to context
-      setAuth(await userServices.signup(userObject));
+      setAuth(await signup(userObject));
 
       navigate('/', { replace: true });
     } catch (exception) {
@@ -38,5 +39,3 @@ function Signup(): JSX.Element {
     </div>
   );
 }
-
-export default Signup;

@@ -2,29 +2,28 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { JSX, useState, useEffect } from 'react';
-import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
-import { UseQueryResult } from '@tanstack/react-query';
-import { Box, Button, CircularProgress, Grow, Typography } from '@mui/material';
 import {
   AssessmentModelData, AttainmentData, CourseData, Formula, FormulaData,
   SystemRole, UserData
 } from 'aalto-grades-common/types';
+import { Box, Button, CircularProgress, Grow, Typography } from '@mui/material';
+import { JSX, useState, useEffect } from 'react';
+import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
 
-import FileLoadDialog from './course-view/FileLoadDialog';
-import CourseDetails from './course-view/CourseDetails';
 import Attainments from './course-view/Attainments';
 import CreateAssessmentModelDialog from './course-view/CreateAssessmentModelDialog';
+import CourseDetails from './course-view/CourseDetails';
+import FileLoadDialog from './course-view/FileLoadDialog';
 import InstancesTable from './course-view/InstancesTable';
 
-import assessmentModelServices from '../services/assessmentModels';
-import attainmentServices from '../services/attainments';
-import { getCourse } from '../services/courses';
-import formulaServices from '../services/formulas';
 import useAuth, { AuthContextType } from '../hooks/useAuth';
+import { getCourse } from '../services/courses';
+import { getFormulaDetails } from '../services/formulas';
+import { getAllAssessmentModels } from '../services/assessmentModels';
+import { getAllAttainments,  } from '../services/attainments';
 import { State } from '../types';
 
-function CourseView(): JSX.Element {
+export default function CourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { courseId }: Params = useParams();
   const { auth, isTeacherInCharge, setIsTeacherInCharge }: AuthContextType = useAuth();
@@ -61,9 +60,10 @@ function CourseView(): JSX.Element {
   const [createAssessmentModelOpen, setCreateAssessmentModelOpen]: State<boolean> = useState(false);
 
   useEffect(() => {
-    assessmentModelServices.getAllAssessmentModels(courseId)
-      .then((assessmentModels: Array<AssessmentModelData>) => {
-        setAssessmentModels(assessmentModels);
+    if (courseId) {
+      getCourse(courseId)
+        .then((course: CourseData) => {
+          setCourse(course);
 
         /**
          * Newly created courses do not have assessment models assigned.
@@ -85,9 +85,37 @@ function CourseView(): JSX.Element {
               })
               .catch((e: Error) => console.log(e.message));
           }
-        }
-      })
-      .catch((e: Error) => console.log(e.message));
+        })
+        .catch((e: Error) => console.log(e.message));
+
+      getAllAssessmentModels(courseId)
+        .then((assessmentModels: Array<AssessmentModelData>) => {
+          setAssessmentModels(assessmentModels);
+
+          /**
+           * Newly created courses do not have assessment models assigned.
+           * Set tree to null so proper message can be displayed.
+           */
+          if (assessmentModels.length === 0) {
+            setAttainmentTree(null);
+          } else {
+            setCurrentAssessmentModel(assessmentModels[0]);
+
+            if (assessmentModels[0].id) {
+              getAllAttainments(courseId, assessmentModels[0].id)
+                .then((attainmentTree: AttainmentData) => {
+                  setAttainmentTree(attainmentTree);
+
+                  getFormulaDetails(attainmentTree.formula ?? Formula.Manual)
+                    .then((formula: FormulaData) => setRootFormula(formula))
+                    .catch((e: Error) => console.log(e.message));
+                })
+                .catch((e: Error) => console.log(e.message));
+            }
+          }
+        })
+        .catch((e: Error) => console.log(e.message));
+    }
   }, []);
 
   useEffect(() => {
@@ -100,7 +128,7 @@ function CourseView(): JSX.Element {
       setAttainmentTree(undefined);
       setCurrentAssessmentModel(assessmentModel);
 
-      attainmentServices.getAllAttainments(courseId, assessmentModel.id)
+      getAllAttainments(courseId, assessmentModel.id)
         .then((attainmentTree: AttainmentData) => {
           setAttainmentTree(attainmentTree);
         })
@@ -110,7 +138,7 @@ function CourseView(): JSX.Element {
 
   function onCreateAssessmentModel(): void {
     if (courseId) {
-      assessmentModelServices.getAllAssessmentModels(courseId)
+      getAllAssessmentModels(courseId)
         .then((assessmentModels: Array<AssessmentModelData>) => {
           setAssessmentModels(assessmentModels);
         })
@@ -120,11 +148,11 @@ function CourseView(): JSX.Element {
 
   function onChangeFormula(): void {
     if (courseId && currentAssessmentModel?.id) {
-      attainmentServices.getAllAttainments(courseId, currentAssessmentModel?.id)
+      getAllAttainments(courseId, currentAssessmentModel?.id)
         .then((attainmentTree: AttainmentData) => {
           setAttainmentTree(attainmentTree);
 
-          formulaServices.getFormulaDetails(attainmentTree.formula ?? Formula.Manual)
+          getFormulaDetails(attainmentTree.formula ?? Formula.Manual)
             .then((formula: FormulaData) => setRootFormula(formula))
             .catch((e: Error) => console.log(e.message));
         })
@@ -247,11 +275,14 @@ function CourseView(): JSX.Element {
             courseId &&
             <InstancesTable courseId={courseId} />
           }
-          <FileLoadDialog
-            instanceId={0} // TODO: Should not be instance?
-            open={fileLoadOpen}
-            handleClose={(): void => setFileLoadOpen(false)}
-          />
+          {
+            currentAssessmentModel != null &&
+            <FileLoadDialog
+              assessmentModelId={currentAssessmentModel.id as number}
+              open={fileLoadOpen}
+              handleClose={(): void => setFileLoadOpen(false)}
+            />
+          }
           <CreateAssessmentModelDialog
             open={createAssessmentModelOpen}
             handleClose={(): void => setCreateAssessmentModelOpen(false)}
@@ -262,5 +293,3 @@ function CourseView(): JSX.Element {
     </Box>
   );
 }
-
-export default CourseView;

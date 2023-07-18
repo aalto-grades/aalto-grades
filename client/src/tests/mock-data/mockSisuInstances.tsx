@@ -4,7 +4,7 @@
 
 import { CourseInstanceData, GradingScale } from 'aalto-grades-common/types';
 
-const mockSisuInstances: Array<CourseInstanceData> = [
+export const mockSisuInstances: Array<CourseInstanceData> = [
   {
     sisuCourseInstanceId: 'mock-id-1',
     startDate: '2022-08-14',
@@ -98,5 +98,3 @@ const mockSisuInstances: Array<CourseInstanceData> = [
     }
   }
 ];
-
-export default mockSisuInstances;

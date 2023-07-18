@@ -2,13 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { SystemRole } from 'aalto-grades-common/types';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import SignupForm from '../components/auth/SignupForm';
 import Signup from '../components/auth/Signup';
-import { SystemRole } from 'aalto-grades-common/types/auth';
 
 describe('Tests for Login component', () => {
 
@@ -31,7 +32,7 @@ describe('Tests for Login component', () => {
 
   test('LoginForm should allow a user to submit their credentials', () => {
 
-    const mockSignupUser = jest.fn();
+    const mockSignupUser: jest.Mock = jest.fn();
 
     render(<SignupForm addUser={mockSignupUser}/>);
 

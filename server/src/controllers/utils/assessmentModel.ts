@@ -6,9 +6,7 @@ import AssessmentModel from '../../database/models/assessmentModel';
 import Course from '../../database/models/course';
 
 import { findCourseById } from './course';
-import { ApiError } from '../../types/error';
-import { idSchema } from '../../types/general';
-import { HttpCode } from '../../types/httpCode';
+import { ApiError, HttpCode, idSchema } from '../../types';
 
 export async function findAssessmentModelById(
   assessmentModelId: number, errorCode: HttpCode

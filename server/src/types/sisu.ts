@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { LocalizedString } from 'aalto-grades-common/types/language';
+import { LocalizedString } from 'aalto-grades-common/types';
 
 export interface Organizations {
   organisationId: string,

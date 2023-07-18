@@ -4,7 +4,7 @@
 
 import { CourseInstanceData, GradingScale, Period } from 'aalto-grades-common/types';
 
-const mockInstances: Array<CourseInstanceData> = [
+export const mockInstances: Array<CourseInstanceData> = [
   {
     id: 1,
     startingPeriod: Period.I,
@@ -190,5 +190,3 @@ const mockInstances: Array<CourseInstanceData> = [
     }
   }
 ];
-
-export default mockInstances;

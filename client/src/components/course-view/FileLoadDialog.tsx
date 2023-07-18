@@ -2,21 +2,19 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {
+  Box, Button, Dialog, DialogActions, DialogContent,
+  DialogContentText, DialogTitle, FormHelperText, Typography
+} from '@mui/material';
+import PropTypes from 'prop-types';
 import { useState, useEffect, createRef } from 'react';
 import { Params, useParams } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import {
-  Box, Button, Dialog, DialogActions, DialogContent, DialogContentText,
-  DialogTitle, FormHelperText, Typography
-} from '@mui/material';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import FileErrorDialog from './FileErrorDialog';
-import gradeServices from '../../services/grades';
-import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
-import { State } from '../../types';
 
-// A Dialog component for uploading a file
+import { importCsv } from '../../services/grades';
+import { Message, State } from '../../types';
 
 const instructions: string =
   'Upload a CSV file with the header "studentNo" and headers matching to the'
@@ -34,13 +32,14 @@ const errorInstructions: string =
 // How many errors are initially rendered visible in the dialog.
 export const maxErrorsToShow: number = 5;
 
-function FileLoadDialog(props: {
-  instanceId: number,
+// A Dialog component for uploading a file
+export default function FileLoadDialog(props: {
+  assessmentModelId: number,
   handleClose: () => void,
   open: boolean
 }): JSX.Element {
   const { courseId }: Params = useParams();
-  const fileInput = createRef<any>();
+  const fileInput: React.RefObject<any> = createRef<any>();
 
   // state variables handling the alert messages
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
@@ -50,9 +49,25 @@ function FileLoadDialog(props: {
     setShowErrorDialog(!showErrorDialog);
   }
 
-  const [fileName, setFileName] = useState<any>(null);
-  const [validationError, setValidationError] = useState('');
-  const [fileErrors, setFileErrors] = useState<Array<string>>([]);
+  function snackPackAdd(msg: Message): void {
+    setSnackPack((prev: Array<Message>): Array<Message> => [...prev, msg]);
+  }
+
+  // useEffect in charge of handling the back-to-back alerts
+  // makes the previous disappear before showing the new one
+  useEffect(() => {
+    if (snackPack.length && !messageInfo) {
+      setMessageInfo({ ...snackPack[0] });
+      setSnackPack((prev: Array<Message>) => prev.slice(1));
+      setAlertOpen(true);
+    } else if (snackPack.length && messageInfo && alertOpen) {
+      setAlertOpen(false);
+    }
+  }, [snackPack, messageInfo, alertOpen]);
+
+  const [fileName, setFileName]: State<string | null> = useState<string | null>(null);
+  const [validationError, setValidationError]: State<string> = useState<string>('');
+  const [fileErrors, setFileErrors]: State<Array<string>> = useState<Array<string>>([]);
 
   async function uploadFile(): Promise<void> {
     snackPack.push({
@@ -61,8 +76,10 @@ function FileLoadDialog(props: {
     });
     try {
       if (courseId) {
-        await gradeServices.importCsv(courseId, props.instanceId, fileInput.current.files[0]);
-        snackPack.push({
+        await importCsv(
+          courseId, props.assessmentModelId, fileInput.current.files[0]
+        );
+        snackPackAdd({
           msg: 'File processed successfully, grades imported.'
             + ' To refresh final grades, press "calculate final grades"',
           severity: 'success'
@@ -123,7 +140,7 @@ function FileLoadDialog(props: {
                 ref={fileInput}
                 type='file'
                 accept='.csv'
-                onChange={(event) => {
+                onChange={(event: React.ChangeEvent<HTMLInputElement>): void => {
                   event.preventDefault();
                   if (event.target.value) { // new input -> clear errors
                     setValidationError('');
@@ -143,7 +160,7 @@ function FileLoadDialog(props: {
                 <>
                   <ul>
                     {
-                      fileErrors.slice(0, maxErrorsToShow).map((err) => {
+                      fileErrors.slice(0, maxErrorsToShow).map((err: string) => {
                         return (
                           <li key={err}>
                             <FormHelperText error={true}>{err}</FormHelperText>
@@ -160,7 +177,7 @@ function FileLoadDialog(props: {
                 :
                 <ul>
                   {
-                    fileErrors.map((err) => {
+                    fileErrors.map((err: string) => {
                       return (
                         <li key={err}>
                           <FormHelperText error={true}>
@@ -176,7 +193,7 @@ function FileLoadDialog(props: {
           }
         </DialogContent>
         <DialogActions sx={{ pr: 4, pb: 3 }}>
-          <Button size='medium' onClick={() => {
+          <Button size='medium' onClick={(): void => {
             props.handleClose();
             setFileName(null);
             setValidationError('');
@@ -188,7 +205,7 @@ function FileLoadDialog(props: {
             id='ag_confirm_file_upload_btn'
             size='medium'
             variant='outlined'
-            onClick={() => {
+            onClick={(): void => {
               if (!fileName) {
                 setValidationError('You must select a csv file to submit');
                 return;
@@ -215,5 +232,3 @@ FileLoadDialog.propTypes = {
   handleClose: PropTypes.func,
   open: PropTypes.bool
 };
-
-export default FileLoadDialog;

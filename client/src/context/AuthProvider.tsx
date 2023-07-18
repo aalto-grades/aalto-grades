@@ -2,9 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Context, createContext, useState } from 'react';
-import PropTypes from 'prop-types';
 import { LoginResult } from 'aalto-grades-common/types';
+import PropTypes from 'prop-types';
+import { Context, createContext, useState } from 'react';
+
 import { State } from '../types';
 
 /**

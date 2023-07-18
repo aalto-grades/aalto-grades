@@ -62,5 +62,3 @@ export function useCalculateFinalGrades(
   );
   return response.data.success;
 }
-
-

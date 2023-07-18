@@ -2,26 +2,24 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CSSProperties, JSX } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SystemRole } from 'aalto-grades-common/types';
 import { AppBar, Box, Container, Link, Toolbar } from '@mui/material';
 import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
-import { SystemRole } from 'aalto-grades-common/types/auth';
+import { CSSProperties, JSX } from 'react';
+import { Routes, Route } from 'react-router-dom';
 
-import AlertSnackbar from './components/alerts/AlertSnackbar';
-import PrivateRoute from './components/auth/PrivateRoute';
 import Login from './components/auth/Login';
+import PrivateRoute from './components/auth/PrivateRoute';
 import Signup from './components/auth/Signup';
 import UserButton from './components/auth/UserButton';
-import FrontPage from './components/FrontPage';
 import CourseView from './components/CourseView';
-import CreateCourseView from './components/CreateCourseView';
-import FetchInstancesView from './components/FetchInstancesView';
-import EditInstanceView from './components/EditInstanceView';
-import EditAttainmentView from './components/EditAttainmentView';
 import CourseResultsView from './components/CourseResultsView';
+import CreateCourseView from './components/CreateCourseView';
+import EditAttainmentView from './components/EditAttainmentView';
+import EditInstanceView from './components/EditInstanceView';
+import FetchInstancesView from './components/FetchInstancesView';
 import Footer from './components/Footer';
+import FrontPage from './components/FrontPage';
 
 import useSnackPackAlerts, { SnackPackAlertState } from './hooks/useSnackPackAlerts';
 
@@ -118,7 +116,7 @@ const theme: Theme = createTheme({
   }
 });
 
-function App(): JSX.Element {
+export default function App(): JSX.Element {
 
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
   const queryClient: QueryClient = new QueryClient({
@@ -187,7 +185,7 @@ function App(): JSX.Element {
                     element={<FetchInstancesView />}
                   />
                   <Route
-                    path='/:courseId/course-results/:instanceId'
+                    path='/:courseId/course-results/:assessmentModelId'
                     element={<CourseResultsView />}
                   />
                   <Route
@@ -212,5 +210,3 @@ function App(): JSX.Element {
     </ThemeProvider>
   );
 }
-
-export default App;

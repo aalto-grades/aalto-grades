@@ -2,14 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import PropTypes from 'prop-types';
-import { NavigateFunction, useNavigate } from 'react-router-dom';
 import {
   Box, Button, Dialog, DialogActions,
   DialogContent, Stack, Typography
 } from '@mui/material';
+import PropTypes from 'prop-types';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 
-function UnsavedChangesDialog(props: {
+export default function UnsavedChangesDialog(props: {
   setOpen: (open: boolean) => void,
   open: boolean,
   navigateDir: string
@@ -60,5 +60,3 @@ UnsavedChangesDialog.propTypes = {
   open: PropTypes.bool,
   navigateDir: PropTypes.string
 };
-
-export default UnsavedChangesDialog;

@@ -6,7 +6,7 @@ import * as yup from 'yup';
 
 import { registerFormula } from '.';
 import { Formula, Status } from 'aalto-grades-common/types';
-import { CalculationResult } from '../types/formulas';
+import { CalculationResult } from '../types';
 
 /**
  * The 'Manual' formula requires a grade to be manually specified by a teacher.

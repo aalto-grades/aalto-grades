@@ -2,11 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React, { SyntheticEvent } from 'react';
-import PropTypes from 'prop-types';
-import { Slide, Snackbar, Theme, Typography } from '@mui/material';
-import MuiAlert from '@mui/material/Alert';
+import { Alert as MuiAlert, Slide, Snackbar, Theme, Typography } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import PropTypes from 'prop-types';
+import React, { SyntheticEvent } from 'react';
 
 import { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 
@@ -16,9 +15,10 @@ const darkTheme: Theme = createTheme({
   },
 });
 
-const Alert: any = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref as any} variant='standard' {...props} />;
-});
+const Alert: any = React.forwardRef(
+  function Alert(props: object, ref: React.ForwardedRef<unknown>) {
+    return <MuiAlert elevation={6} ref={ref as any} variant='standard' {...props} />;
+  });
 
 // TODO: Consider if the key attribute works properly of if something else should be used?
 // position allows "stacked look", starts from 1 but really needed only from 2 onwards
@@ -93,5 +93,3 @@ AlertSnackbar.propTypes = {
   snackPack: PropTypes.object,
   position: PropTypes.number
 };
-
-export default AlertSnackbar;

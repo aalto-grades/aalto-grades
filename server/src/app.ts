@@ -9,8 +9,7 @@ import { FRONTEND_ORIGIN } from './configs/environment';
 
 import { errorHandler } from './middleware/errorHandler';
 import { router } from './routes/index';
-import { ApiError } from './types/error';
-import { HttpCode } from './types/httpCode';
+import { ApiError, HttpCode } from './types';
 
 // Register formulas before starting Express.
 require('./formulas');

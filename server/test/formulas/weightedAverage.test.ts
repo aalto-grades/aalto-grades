@@ -4,7 +4,7 @@
 
 import { Formula, Status } from 'aalto-grades-common/types';
 import { getFormulaImplementation } from '../../src/formulas';
-import { CalculationResult, FormulaImplementation } from '../../src/types/formulas';
+import { CalculationResult, FormulaImplementation } from '../../src/types';
 
 describe('Test weighted average calculation', () => {
   const implementation: FormulaImplementation =
