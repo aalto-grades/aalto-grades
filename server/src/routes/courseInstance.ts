@@ -35,12 +35,20 @@ export const router: Router = Router();
  *     type: string
  *     description: ID of the corresponding course instance in Sisu.
  *     example: aalto-CUR-163498-3084205
+ *   SisuInstanceInUse:
+ *     type: boolean
+ *     description: >
+ *       Information on is the possible Sisu ID already being
+ *       used by one of the course instances in Aalto Grades.
+ *     example: true
  *   CourseInstanceData:
  *     type: object
  *     description: Course instance information.
  *     properties:
  *       id:
  *        $ref: '#/definitions/CourseInstanceId'
+ *       sisuInstanceInUse:
+ *        $ref: '#/definitions/SisuInstanceInUse'
  *       sisuCourseInstanceId:
  *        $ref: '#/definitions/SisuCourseInstanceId'
  *       startingPeriod:
