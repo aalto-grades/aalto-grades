@@ -284,6 +284,14 @@ router.get(
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: >
+ *           Assessment model does not belong to the course or
+ *           Sisu course instance ID has already been assigned to other instance.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
  *       422:
  *         description: >
  *           A user with the given responsible teacher ID was not found.
