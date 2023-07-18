@@ -50,7 +50,7 @@ export default function FetchInstancesView(): JSX.Element {
           </Button>
           <Button
             size='medium'
-            variant='outlined'
+            variant='contained'
             onClick={(): void => {
               navigate('/' + courseId + '/edit-instance');
             }}
