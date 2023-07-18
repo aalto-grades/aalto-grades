@@ -200,6 +200,22 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
     }
   }
 
+  // Check that sisu ID not in use.
+  if (req.body.sisuCourseInstanceId) {
+    const instance: CourseInstance | null = await CourseInstance.findOne({
+      where: {
+        sisuCourseInstanceId: req.body.sisuCourseInstanceId
+      }
+    });
+
+    if (instance) {
+      throw new ApiError(
+        `sisu ID ${instance.sisuCourseInstanceId} already in use on instance ID ${instance.id}`,
+        HttpCode.Conflict
+      );
+    }
+  }
+
   const newInstance: CourseInstance = await CourseInstance.create({
     courseId: courseId,
     assessmentModelId: req.body.assessmentModelId,
