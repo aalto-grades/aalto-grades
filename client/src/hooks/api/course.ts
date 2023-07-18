@@ -33,7 +33,7 @@ export type UseAddCourseResult = UseMutationResult<
 >;
 
 export function useAddCourse(
-  options: UseMutationOptions<number, unknown, CourseData>
+  options?: UseMutationOptions<number, unknown, CourseData>
 ): UseAddCourseResult {
   return useMutation({
     mutationFn: async (course: CourseData) => (

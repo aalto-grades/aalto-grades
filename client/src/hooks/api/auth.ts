@@ -24,7 +24,7 @@ export type UseLogInResult = UseMutationResult<
 >;
 
 export function useLogIn(
-  options: UseMutationOptions<LoginResult, unknown, LoginCredentials>
+  options?: UseMutationOptions<LoginResult, unknown, LoginCredentials>
 ): UseLogInResult {
   return useMutation({
     mutationFn: async (credentials: LoginCredentials) => (
@@ -35,7 +35,7 @@ export function useLogIn(
 }
 
 export function useLogOut(
-  options: UseMutationOptions<unknown, unknown, unknown>
+  options?: UseMutationOptions<unknown, unknown, unknown>
 ): UseMutationResult {
   return useMutation({
     mutationFn: async () => (
@@ -50,7 +50,7 @@ export type UseSignUpResult = UseMutationResult<
 >;
 
 export function useSignUp(
-  options: UseMutationOptions<LoginResult, unknown, SignupCredentials>
+  options?: UseMutationOptions<LoginResult, unknown, SignupCredentials>
 ): UseSignUpResult {
   return useMutation({
     mutationFn: async (credentials: SignupCredentials) => (

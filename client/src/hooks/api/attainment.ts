@@ -5,7 +5,7 @@
 import { AttainmentData } from 'aalto-grades-common/types/attainment';
 import axios from './axios';
 import {
-  useMutation, UseMutationResult, useQuery, UseQueryResult
+  useMutation, UseMutationResult, useQuery, UseQueryOptions, UseQueryResult
 } from '@tanstack/react-query';
 
 import { Numeric } from '../../types';
@@ -33,7 +33,8 @@ export function useGetAttainment(
 export function useGetRootAttainment(
   courseId: Numeric,
   assessmentModelId: Numeric,
-  tree?: 'children' | 'descendants'
+  tree?: 'children' | 'descendants',
+  options?: UseQueryOptions<AttainmentData>
 ): UseQueryResult<AttainmentData> {
 
   const query: string = tree ? `?tree=${tree}` : '';
@@ -42,9 +43,11 @@ export function useGetRootAttainment(
     queryKey: ['root-attainment', courseId, assessmentModelId, query],
     queryFn: async () => (
       await axios.get(
-        `/v1/courses/${courseId}/assessment-models/${assessmentModelId}${query}`
+        `/v1/courses/${courseId}/assessment-models/${assessmentModelId}`
+        + `/attainments${query}`
       )
-    ).data.data.attainment
+    ).data.data.attainment,
+    ...options
   });
 }
 

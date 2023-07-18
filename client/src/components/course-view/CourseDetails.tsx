@@ -14,7 +14,7 @@ import useAuth, { AuthContextType } from '../../hooks/useAuth';
 
 export default function CourseDetails(props: {
   course: CourseData,
-  assessmentModels: Array<AssessmentModelData>,
+  assessmentModels?: Array<AssessmentModelData>,
   currentAssessmentModelId?: number,
   onChangeAssessmentModel: (assessmentModel: AssessmentModelData) => void
 }): JSX.Element {
@@ -99,7 +99,10 @@ export default function CourseDetails(props: {
           bgcolor: 'secondary.light', p: 1.5, mt: 1, minWidth: '318px'
         }}>
           {
-            (props.assessmentModels.length > 0 && props.currentAssessmentModelId) ?
+            (props.assessmentModels
+              && props.assessmentModels.length > 0
+              && props.currentAssessmentModelId)
+              ?
               <AssessmentModelsList
                 data={props.assessmentModels}
                 current={props.currentAssessmentModelId}
