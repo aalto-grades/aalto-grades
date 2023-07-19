@@ -37,7 +37,7 @@ export default function useSnackPackAlerts(): SnackPackAlertState {
   }
 
   function pop(): void {
-    setSnackPack((prev) => prev.slice(1));
+    setSnackPack((prev: Array<Message>) => prev.slice(1));
   }
 
   // useEffect in charge of handling the back-to-back alerts

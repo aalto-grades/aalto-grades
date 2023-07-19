@@ -4,7 +4,7 @@
 
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Button, Menu, MenuItem } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { styled, Theme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { useState, SyntheticEvent } from 'react';
 
@@ -25,7 +25,7 @@ const StyledMenu = styled((props: any): JSX.Element => (
     }}
     {...props}
   />
-))(({ theme }) => ({
+))(({ theme }: { theme: Theme }) => ({
   '& .MuiPaper-root': {
     borderRadius: 6,
     marginTop: theme.spacing(1),

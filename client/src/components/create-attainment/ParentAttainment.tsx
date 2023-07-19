@@ -47,7 +47,7 @@ export default function ParentAttainment(props: {
         px: 1
       }}>
         <EditFormulaDialog
-          handleClose={() => setEditFormulaOpen(false)}
+          handleClose={(): void => setEditFormulaOpen(false)}
           open={editFormulaOpen}
           attainment={props.attainment}
           attainmentTree={props.attainmentTree}

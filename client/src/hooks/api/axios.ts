@@ -2,14 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
 
 import { ApiResponse } from '../../types';
 
 const BACKEND_URL: string = process.env.REACT_APP_BACKEND_URL || 'http://back-end';
 const BACKEND_PORT: string = process.env.REACT_APP_BACKEND_PORT || '3000';
 
-const axiosInstance = axios.create({
+const axiosInstance: AxiosInstance = axios.create({
   baseURL: `${BACKEND_URL}:${BACKEND_PORT}`,
   withCredentials: true,
   validateStatus: (status: number) => status < 600 && status >= 100

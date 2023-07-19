@@ -11,7 +11,7 @@ import App from './App';
 
 import { AuthProvider } from './context/AuthProvider';
 
-const GlobalStyles: GlobalStyleComponent<any, DefaultTheme> = createGlobalStyle`
+const GlobalStyles: GlobalStyleComponent<object, DefaultTheme> = createGlobalStyle`
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

@@ -26,7 +26,8 @@ export default function CourseResultsTable(props: {
 }): JSX.Element {
 
   const [order, setOrder]: State<'asc' | 'desc'> = useState<'asc' | 'desc'> ('asc');
-  const [orderBy, setOrderBy]: State<string> = useState('studentNumber');
+  const [orderBy, setOrderBy]: State<keyof FinalGrade> =
+    useState<keyof FinalGrade>('studentNumber');
   const [page, setPage]: State<number> = useState(0);
   const [rowsPerPage, setRowsPerPage]: State<number> = useState(25);
   const [search, setSearch]: State<string> = useState('');
@@ -40,7 +41,7 @@ export default function CourseResultsTable(props: {
     setPage(0);
   }, [search, props.students]);
 
-  function handleRequestSort(event: SyntheticEvent, property: string): void {
+  function handleRequestSort(event: SyntheticEvent, property: keyof FinalGrade): void {
     const isAsc: boolean = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
@@ -124,7 +125,7 @@ export default function CourseResultsTable(props: {
                     stableSort(studentsToShow,
                       getComparator(order, orderBy))
                       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((student: any) => {
+                      .map((student: FinalGrade) => {
                         return (
                           <TableRow
                             hover

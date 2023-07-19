@@ -124,7 +124,7 @@ export default function App(): JSX.Element {
 
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
-  function handleError(error: unknown) {
+  function handleError(error: unknown): void {
     snackPack.push({
       msg: (error as Error).message,
       severity: 'error'

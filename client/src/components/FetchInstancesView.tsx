@@ -44,7 +44,7 @@ export default function FetchInstancesView(): JSX.Element {
         }}>
           <Button size='medium'
             variant='outlined'
-            onClick={() => navigate('/course-view/' + courseId)}
+            onClick={(): void => navigate('/course-view/' + courseId)}
           >
             Cancel
           </Button>

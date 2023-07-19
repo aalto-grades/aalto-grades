@@ -4,7 +4,7 @@
 
 import { AttainmentData } from 'aalto-grades-common/types';
 import { Box, Button, Container, Typography } from '@mui/material';
-import { JSX, SyntheticEvent, useEffect, useState }  from 'react';
+import { JSX, SyntheticEvent, useState }  from 'react';
 import { NavigateFunction, Params, useParams, useNavigate } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 
@@ -224,7 +224,7 @@ export default function EditAttainmentView(): JSX.Element {
               attainment={attainmentTree}
               title={'Study Attainment'}
               subject={'study attainment'}
-              handleClose={() => setOpenConfDialog(false)}
+              handleClose={(): void => setOpenConfDialog(false)}
               open={openConfDialog}
             />
           }

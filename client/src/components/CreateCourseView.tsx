@@ -19,7 +19,7 @@ import * as yup from 'yup';
 
 import UnsavedChangesDialog from './alerts/UnsavedChangesDialog';
 
-import { useAddCourse } from '../hooks/useApi';
+import { useAddCourse, UseAddCourseResult } from '../hooks/useApi';
 import { State } from '../types';
 
 interface FormData {
@@ -44,7 +44,7 @@ export default function CreateCourseView(): JSX.Element {
   const [email, setEmail]: State<string> = useState('');
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
 
-  const addCourse = useAddCourse({
+  const addCourse: UseAddCourseResult = useAddCourse({
     onSuccess: (courseId: number) => {
       navigate(`/course-view/${courseId}`, { replace: true });
     }
