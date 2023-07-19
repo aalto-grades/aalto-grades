@@ -49,11 +49,14 @@ export default function CourseView(): JSX.Element {
     useGetAllAssessmentModels(courseId);
 
   const [currentAssessmentModel, setCurrentAssessmentModel]: State<AssessmentModelData | null> =
-    useState<AssessmentModelData | null>(
-      (assessmentModels.data && assessmentModels.data.length > 0)
-        ? assessmentModels.data[0]
-        : null
-    );
+    useState<AssessmentModelData | null>(null);
+
+  useEffect(() => {
+    if (assessmentModels.data && assessmentModels.data.length > 0)
+      setCurrentAssessmentModel(assessmentModels.data[0]);
+    else
+      setCurrentAssessmentModel(null);
+  }, [assessmentModels.data]);
 
   const attainmentTree: UseQueryResult<AttainmentData> = useGetRootAttainment(
     courseId,

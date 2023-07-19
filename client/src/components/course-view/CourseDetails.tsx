@@ -28,12 +28,13 @@ export default function CourseDetails(props: {
       }}>
         <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >
           Course Details
-          { (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
-          <Tooltip title="Edit course details" placement="right">
-            <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit course details">
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
+          {
+            (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
+            <Tooltip title="Edit course details" placement="right">
+              <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit course details">
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
           }
         </Typography>
       </Box>
