@@ -38,8 +38,8 @@ export const router: Router = Router();
  *   SisuInstanceInUse:
  *     type: boolean
  *     description: >
- *       Information on is the possible Sisu ID already being
- *       used by one of the course instances in Aalto Grades.
+ *       Information on whether a course instance with the corresponding Sisu
+ *       instance ID already exists in the Aalto Grades database.
  *     example: true
  *   CourseInstanceData:
  *     type: object
