@@ -74,9 +74,6 @@ export default function CourseView(): JSX.Element {
     }
   }
 
-  console.debug((auth?.role == SystemRole.Admin || isTeacherInCharge)
-    && Boolean(currentAssessmentModel));
-
   return (
     <Box sx={{ mx: -2.5 }}>
       {
