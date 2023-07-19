@@ -10,10 +10,9 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
+import { UseQueryResult } from '@tanstack/react-query';
 
-//import { getFormulaDetails } from '../../services/formulas';
-import { State } from '../../types';
+import { useGetFormula } from '../../hooks/useApi';
 
 const HoverExpandMoreIcon = styled<any>(ExpandMore)(({ theme }) => ({
   '&:hover': {
@@ -24,17 +23,10 @@ const HoverExpandMoreIcon = styled<any>(ExpandMore)(({ theme }) => ({
 export default function ViewFormulaAccordion(props: {
   formulaId: Formula | null
 }): JSX.Element {
-  const [codeSnippet, setCodeSnippet]: State<string | null> = useState<string | null>(null);
 
-  /*useEffect(() => {
-    if (props.formulaId) {
-      getFormulaDetails(props.formulaId)
-        .then((data: FormulaData) => {
-          setCodeSnippet(data.codeSnippet);
-        })
-        .catch((exception: Error) => console.log(exception.message));
-    }
-  }, [props.formulaId]);*/
+  const formula: UseQueryResult<FormulaData> = useGetFormula(
+    props.formulaId ?? Formula.Manual
+  );
 
   return (
     <Container>
@@ -50,10 +42,10 @@ export default function ViewFormulaAccordion(props: {
         <AccordionDetails sx={{ bgcolor: 'primary.light', p: '10px' }}>
           <Container disableGutters sx={{ overflowX: 'scroll' }}>
             {
-              !props.formulaId ?
-                <p>Select formula for previewing</p>
-                :
-                codeSnippet == null ?
+              !props.formulaId
+                ? <p>Select formula for previewing</p>
+                : ((!formula.data)
+                  ?
                   <Box
                     sx={{
                       margin: 'auto',
@@ -65,8 +57,9 @@ export default function ViewFormulaAccordion(props: {
                   </Box>
                   :
                   <pre>
-                    <code>{codeSnippet}</code>
+                    <code>{formula.data.codeSnippet}</code>
                   </pre>
+                )
             }
           </Container>
         </AccordionDetails>

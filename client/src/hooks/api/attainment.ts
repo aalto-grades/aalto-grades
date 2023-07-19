@@ -70,8 +70,9 @@ export function useAddAttainment(
   return useMutation({
     mutationFn: async (vars: AddAttainmentVars) => (
       await axios.post(
-        `/v1/courses/${vars.courseId}/`
-        + `assessment-models/${vars.assessmentModelId}/attainments`,
+        `/v1/courses/${vars.courseId}`
+        + `/assessment-models/${vars.assessmentModelId}`
+        + '/attainments',
         vars.attainment
       )
     ).data.data.attainment,
@@ -79,18 +80,26 @@ export function useAddAttainment(
   });
 }
 
-export function useEditAttainment(
+interface EditAttainmentVars {
   courseId: Numeric,
   assessmentModelId: Numeric,
-  attainment: AttainmentData,
+  attainment: AttainmentData
+}
+
+export type UseEditAttainmentResult = UseMutationResult<
+  AttainmentData, unknown, AddAttainmentVars
+>;
+
+export function useEditAttainment(
   options?: UseMutationOptions<AttainmentData, unknown, unknown>
-): UseMutationResult<AttainmentData> {
+): UseEditAttainmentResult {
   return useMutation({
-    mutationFn: async () => (
+    mutationFn: async (vars: EditAttainmentVars) => (
       await axios.put(
-        `/v1/courses/${courseId}/assessment-models/${assessmentModelId}`
-        + `/attainments/${attainment.id}`,
-        attainment
+        `/v1/courses/${vars.courseId}`
+        + `/assessment-models/${vars.assessmentModelId}`
+        + `/attainments/${vars.attainment.id}`,
+        vars.attainment
       )
     ).data.data.attainment,
     ...options

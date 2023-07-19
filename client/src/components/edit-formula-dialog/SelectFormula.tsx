@@ -7,14 +7,15 @@ import {
   CircularProgress, FormControl, FormHelperText, InputLabel, MenuItem, Select, SelectChangeEvent
 } from '@mui/material';
 import PropTypes from 'prop-types';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { UseQueryResult } from '@tanstack/react-query';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import ViewFormulaAccordion from './ViewFormulaAccordion';
 
+import { useGetAllFormulas } from '../../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
-//import { getFormulas } from '../../services/formulas';
 import StyledBox from './StyledBox';
 import { State } from '../../types';
 
@@ -24,22 +25,13 @@ export default function SelectFormula(props: {
   error: string
 }): JSX.Element {
 
-  const [formulas, setFormulas]: State<Array<FormulaData>> = useState<Array<FormulaData>>([]);
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
-  /*useEffect(() => {
-    if (formulas.length == 0) {
-      getFormulas()
-        .then((data: Array<FormulaData>) => {
-          setFormulas(data);
-        })
-        .catch((exception: Error) => console.log(exception.message));
-    }
-  }, []);*/
+  const formulas: UseQueryResult<Array<FormulaData>> = useGetAllFormulas();
 
   function handleFormulaChange(event: SelectChangeEvent): void {
-    const newFormula: FormulaData | undefined = formulas.find(
+    const newFormula: FormulaData | undefined = formulas.data?.find(
       (formula: FormulaData) => formula.name == event.target.value
     );
 
@@ -67,7 +59,7 @@ export default function SelectFormula(props: {
             Formula
           </InputLabel>
           {
-            formulas.length !== 0 ?
+            formulas.data?.length !== 0 ?
               <Select
                 label='Formula'
                 labelId='formulaSelector'
@@ -75,13 +67,15 @@ export default function SelectFormula(props: {
                 onChange={handleFormulaChange}
                 error={props.error !== ''}
               >
-                {formulas.map((formula: FormulaData) => {
-                  return (
-                    <MenuItem key={formula.id} value={formula.name}>
-                      {formula.name}
-                    </MenuItem>
-                  );
-                })}
+                {
+                  formulas.data?.map((formula: FormulaData) => {
+                    return (
+                      <MenuItem key={formula.id} value={formula.name}>
+                        {formula.name}
+                      </MenuItem>
+                    );
+                  })
+                }
               </Select>
               :
               <CircularProgress sx={{ mt: 2 }} />
