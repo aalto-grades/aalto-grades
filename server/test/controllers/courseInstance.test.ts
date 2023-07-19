@@ -179,6 +179,7 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
 
     await goodInput({
       gradingScale: 'NUMERICAL',
+      sisuCourseInstanceId: 'aalto-CUR-165388-3874872',
       startingPeriod: 'I',
       endingPeriod: 'II',
       type: 'LECTURE',
@@ -326,6 +327,30 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
     expect(res.body.success).toBe(false);
     expect(res.body.data).not.toBeDefined();
     expect(res.body.errors).toBeDefined();
+  });
+
+
+  it('should respond with 409 conflict, if sisu instance ID is already in use', async () => {
+    const res: supertest.Response = await request
+      .post('/v1/courses/1/instances')
+      .send({
+        gradingScale: 'NUMERICAL',
+        sisuCourseInstanceId: 'aalto-CUR-165388-3874205',
+        startingPeriod: 'I',
+        endingPeriod: 'II',
+        type: 'LECTURE',
+        startDate: '2022-7-10',
+        endDate: '2022-11-10'
+      })
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Conflict);
+
+    expect(res.body.success).toBe(false);
+    expect(res.body.data).not.toBeDefined();
+    expect(res.body.errors[0]).toBe(
+      'sisu ID aalto-CUR-165388-3874205 already in use on instance ID 1'
+    );
   });
 
 });

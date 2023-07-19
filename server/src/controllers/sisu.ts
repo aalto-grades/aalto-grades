@@ -2,13 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { CourseInstanceData, GradingScale } from 'aalto-grades-common/types';
 import axios, { AxiosResponse } from 'axios';
 import { Request, Response } from 'express';
+import { Op } from 'sequelize';
 
 import { AXIOS_TIMEOUT } from '../configs/constants';
 import { SISU_API_KEY, SISU_API_URL } from '../configs/environment';
 
-import { CourseInstanceData, GradingScale } from 'aalto-grades-common/types';
+import CourseInstance from '../database/models/courseInstance';
+
 import { ApiError, HttpCode, SisuCourseInstance } from '../types';
 
 function parseSisuGradingScale(gradingScale: string): GradingScale | undefined {
@@ -24,8 +27,11 @@ function parseSisuGradingScale(gradingScale: string): GradingScale | undefined {
   }
 }
 
-function parseSisuCourseInstance(instance: SisuCourseInstance): CourseInstanceData {
+function parseSisuCourseInstance(
+  instance: SisuCourseInstance, takenIds: Array<string>
+): CourseInstanceData {
   return {
+    sisuInstanceInUse: takenIds.includes(instance.id),
     sisuCourseInstanceId: instance.id,
     startDate: instance.startDate,
     endDate: instance.endDate,
@@ -69,6 +75,9 @@ export async function fetchCourseInstanceFromSisu(req: Request, res: Response): 
     `${SISU_API_URL}/courseunitrealisations/${sisuCourseInstanceId}`,
     {
       timeout: AXIOS_TIMEOUT,
+      validateStatus: (status: number) => {
+        return status >= 200 && status < 500;
+      },
       params: {
         USER_KEY: SISU_API_KEY
       }
@@ -82,7 +91,16 @@ export async function fetchCourseInstanceFromSisu(req: Request, res: Response): 
     );
   }
 
-  const instance: CourseInstanceData = parseSisuCourseInstance(courseInstanceFromSisu.data);
+  const isTaken: CourseInstance | null = await CourseInstance.findOne({
+    where: {
+      sisuCourseInstanceId: courseInstanceFromSisu.data.id
+    }
+  });
+
+  const instance: CourseInstanceData = parseSisuCourseInstance(
+    courseInstanceFromSisu.data,
+    isTaken ? [isTaken.sisuCourseInstanceId] : []
+  );
 
   res.status(HttpCode.Ok).send({
     success: true,
@@ -94,10 +112,14 @@ export async function fetchCourseInstanceFromSisu(req: Request, res: Response): 
 
 export async function fetchAllCourseInstancesFromSisu(req: Request, res: Response): Promise<void> {
   const courseCode: string = String(req.params.courseCode);
+  let takenIds: Array<string> = [];
   const courseInstancesFromSisu: AxiosResponse = await axios.get(
     `${SISU_API_URL}/courseunitrealisations`,
     {
       timeout: AXIOS_TIMEOUT,
+      validateStatus: (status: number) => {
+        return status >= 200 && status < 500;
+      },
       params: {
         code: courseCode,
         USER_KEY: SISU_API_KEY
@@ -112,8 +134,22 @@ export async function fetchAllCourseInstancesFromSisu(req: Request, res: Respons
     );
   }
 
+  const takenInstances: Array<CourseInstance> | null = await CourseInstance.findAll({
+    where: {
+      sisuCourseInstanceId: {
+        [Op.in]: courseInstancesFromSisu.data.map(
+          (instance: SisuCourseInstance) => instance.id
+        )
+      }
+    }
+  });
+
+  if (takenInstances) {
+    takenIds = takenInstances.map((instance: CourseInstance) => instance.sisuCourseInstanceId);
+  }
+
   const parsedInstances: Array<CourseInstanceData> = courseInstancesFromSisu.data.map(
-    (instance: SisuCourseInstance) => parseSisuCourseInstance(instance)
+    (instance: SisuCourseInstance) => parseSisuCourseInstance(instance, takenIds)
   );
 
   res.status(HttpCode.Ok).send({

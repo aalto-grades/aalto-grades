@@ -38,6 +38,7 @@ export interface CourseInstanceData {
   // Sisu course instance data
   id?: number,
   assessmentModelId?: number,
+  sisuInstanceInUse?: boolean,
   sisuCourseInstanceId?: string,
   startingPeriod?: Period,
   endingPeriod?: Period,

@@ -35,12 +35,20 @@ export const router: Router = Router();
  *     type: string
  *     description: ID of the corresponding course instance in Sisu.
  *     example: aalto-CUR-163498-3084205
+ *   SisuInstanceInUse:
+ *     type: boolean
+ *     description: >
+ *       Information on whether a course instance with the corresponding Sisu
+ *       instance ID already exists in the Aalto Grades database.
+ *     example: true
  *   CourseInstanceData:
  *     type: object
  *     description: Course instance information.
  *     properties:
  *       id:
  *        $ref: '#/definitions/CourseInstanceId'
+ *       sisuInstanceInUse:
+ *        $ref: '#/definitions/SisuInstanceInUse'
  *       sisuCourseInstanceId:
  *        $ref: '#/definitions/SisuCourseInstanceId'
  *       startingPeriod:
@@ -272,6 +280,14 @@ router.get(
  *         $ref: '#/components/responses/AuthorizationError'
  *       404:
  *         description: A course with the given ID was not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: >
+ *           Assessment model does not belong to the course or
+ *           Sisu course instance ID has already been assigned to other instance.
  *         content:
  *           application/json:
  *             schema:
