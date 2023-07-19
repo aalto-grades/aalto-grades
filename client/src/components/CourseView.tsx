@@ -3,8 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AssessmentModelData, AttainmentData, CourseData, Formula, FormulaData,
-  SystemRole, UserData
+  AssessmentModelData, AttainmentData, CourseData, SystemRole, UserData
 } from 'aalto-grades-common/types';
 import { Box, Button, CircularProgress, Grow, Typography } from '@mui/material';
 import { JSX, useState, useEffect } from 'react';
@@ -21,7 +20,6 @@ import {
   useGetAllAssessmentModels, useGetCourse, useGetRootAttainment
 } from '../hooks/useApi';
 import useAuth, { AuthContextType } from '../hooks/useAuth';
-//import { getFormulaDetails } from '../services/formulas';
 import { State } from '../types';
 
 export default function CourseView(): JSX.Element {
@@ -65,13 +63,6 @@ export default function CourseView(): JSX.Element {
     { enabled: Boolean(currentAssessmentModel && currentAssessmentModel.id) }
   );
 
-  const [rootFormula, setRootFormula]: State<FormulaData | null> =
-    useState<FormulaData | null>(null);
-
-  //                 getFormulaDetails(attainmentTree.formula ?? Formula.Manual)
-  //                   .then((formula: FormulaData) => setRootFormula(formula))
-  //                   .catch((e: Error) => console.log(e.message));
-
   useEffect(() => {
     setAnimation(true);
   }, [currentAssessmentModel]);
@@ -104,10 +95,13 @@ export default function CourseView(): JSX.Element {
     }
   }
 
+  console.debug((auth?.role == SystemRole.Admin || isTeacherInCharge)
+    && Boolean(currentAssessmentModel));
+
   return (
     <Box sx={{ mx: -2.5 }}>
       {
-        course.data &&
+        (course.data) &&
         <>
           <Typography variant='h1' align='left'>{course.data.courseCode}</Typography>
           <Box sx={{
@@ -141,7 +135,7 @@ export default function CourseView(): JSX.Element {
               /* a different attainment component will be created for students */
               (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
               <div style={{ width: '100%' }}>
-                {(attainmentTree.data && rootFormula) ?
+                {(attainmentTree.data) ?
                   <Grow
                     in={animation}
                     style={{ transformOrigin: '0 0 0' }}
@@ -153,7 +147,6 @@ export default function CourseView(): JSX.Element {
                         <Attainments
                           attainmentTree={attainmentTree.data}
                           courseId={Number(courseId)}
-                          formulaName={rootFormula.name}
                           assessmentModel={currentAssessmentModel}
                           handleAddPoints={(): void => setFileLoadOpen(true)}
                           onChangeFormula={onChangeFormula}

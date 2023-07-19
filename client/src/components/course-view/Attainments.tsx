@@ -2,21 +2,24 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AssessmentModelData, AttainmentData } from 'aalto-grades-common/types';
+import {
+  AssessmentModelData, AttainmentData, Formula, FormulaData
+} from 'aalto-grades-common/types';
 import { Box, Button, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useState, JSX } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import { UseQueryResult } from '@tanstack/react-query';
 
 import AttainmentCategory from '../attainments/AttainmentCategory';
 import EditFormulaDialog from '../edit-formula-dialog/EditFormulaDialog';
 import MenuButton, { MenuButtonOption } from './MenuButton';
 
+import { useGetFormula } from '../../hooks/useApi';
 import { State } from '../../types';
 
 export default function Attainments(props: {
   attainmentTree: AttainmentData,
-  formulaName: string,
   courseId: number,
   assessmentModel: AssessmentModelData,
   handleAddPoints: () => void,
@@ -24,6 +27,10 @@ export default function Attainments(props: {
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const [editFormulaOpen, setEditFormulaOpen]: State<boolean> = useState(false);
+
+  const rootFormula: UseQueryResult<FormulaData> = useGetFormula(
+    props.attainmentTree.formula ?? Formula.Manual
+  );
 
   const actionOptions: Array<MenuButtonOption> = [
     {
@@ -41,7 +48,7 @@ export default function Attainments(props: {
       bgcolor: 'primary.light', p: 1.5, display: 'flex', flexDirection: 'column'
     }}>
       {
-        props.assessmentModel.id &&
+        (props.assessmentModel.id) &&
         <EditFormulaDialog
           handleClose={(): void => setEditFormulaOpen(false)}
           onSubmit={props.onChangeFormula}
@@ -59,7 +66,7 @@ export default function Attainments(props: {
         alignItems: 'center', pb: 1
       }}>
         <Typography align='left' sx={{ ml: 1.5 }} >
-          {'Grading Formula: ' + props.formulaName}
+          {'Grading Formula: ' + rootFormula.data?.name}
         </Typography>
         <Button id='ag_edit_formula_btn' onClick={(): void => setEditFormulaOpen(true)}>
           Edit formula
@@ -128,7 +135,6 @@ export default function Attainments(props: {
 Attainments.propTypes = {
   attainmentTree: PropTypes.object,
   assessmentModel: PropTypes.object,
-  formulaName: PropTypes.string,
   courseId: PropTypes.number,
   handleAddPoints: PropTypes.func,
   onChangeFormula: PropTypes.func
