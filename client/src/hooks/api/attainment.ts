@@ -54,17 +54,25 @@ export function useGetRootAttainment(
   });
 }
 
-export function useAddAttainment(
+interface AddAttainmentVars {
   courseId: Numeric,
   assessmentModelId: Numeric,
-  attainment: AttainmentData,
+  attainment: AttainmentData
+}
+
+export type UseAddAttainmentResult = UseMutationResult<
+  AttainmentData, unknown, AddAttainmentVars
+>;
+
+export function useAddAttainment(
   options?: UseMutationOptions<AttainmentData, unknown, unknown>
-): UseMutationResult<AttainmentData> {
+): UseAddAttainmentResult {
   return useMutation({
-    mutationFn: async () => (
+    mutationFn: async (vars: AddAttainmentVars) => (
       await axios.post(
-        `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/attainments`,
-        attainment
+        `/v1/courses/${vars.courseId}/`
+        + `assessment-models/${vars.assessmentModelId}/attainments`,
+        vars.attainment
       )
     ).data.data.attainment,
     ...options

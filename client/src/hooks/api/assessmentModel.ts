@@ -38,14 +38,24 @@ export function useGetAssessmentModel(
   });
 }
 
-export function useAddAssessmentModel(
+interface AddAssessmentModelVars {
   courseId: Numeric,
-  assessmentModel: AssessmentModelData,
+  assessmentModel: AssessmentModelData
+}
+
+export type UseAddAssessmentModelResult = UseMutationResult<
+  number, unknown, AddAssessmentModelVars
+>;
+
+export function useAddAssessmentModel(
   options?: UseMutationOptions<number, unknown, unknown>
-): UseMutationResult<number> {
+): UseAddAssessmentModelResult {
   return useMutation({
-    mutationFn: async () => (
-      await axios.post(`/v1/courses/${courseId}/assessment-models`, assessmentModel)
+    mutationFn: async (vars: AddAssessmentModelVars) => (
+      await axios.post(
+        `/v1/courses/${vars.courseId}/assessment-models`,
+        vars.assessmentModel
+      )
     ).data.data.assessmentModel.id,
     ...options
   });
