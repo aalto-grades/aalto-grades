@@ -22,6 +22,7 @@ import {
 } from '../types';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import { isTeacherInChargeOrAdmin } from './utils/user';
+import CourseInstance from '../database/models/courseInstance';
 
 async function studentNumbersExist(studentNumbers: Array<string>): Promise<void> {
   const foundStudentNumbers: Array<string> = (await User.findAll({
@@ -162,6 +163,10 @@ async function getFinalGradesFor(
   return finalGrades;
 }
 
+interface instanceWithUsers extends CourseInstance {
+  Users: Array<User>
+}
+
 /**
  * Get grading data formatted to Sisu compatible format for exporting grades to Sisu.
  * Documentation and requirements for Sisu CSV file structure available at
@@ -189,14 +194,21 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
       .array()
       .json()
       .of(yup.string())
-      .notRequired()
+      .notRequired(),
+    instanceId: yup
+      .number()
+      .min(1)
+      .notRequired(),
   });
 
-  const { assessmentDate, completionLanguage, studentNumbers }: {
+  const { assessmentDate, completionLanguage, studentNumbers, instanceId }: {
     assessmentDate: Date | undefined,
     completionLanguage: string | undefined,
     studentNumbers: Array<string> | undefined
+    instanceId: number | undefined
   } = await urlParams.validate(req.query, { abortEarly: false });
+
+  let studentNumberFilter: Array<string> | undefined = studentNumbers;
 
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
@@ -204,6 +216,53 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
     );
 
   await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
+
+
+
+
+
+
+
+
+  // Include students from particular instance if the ID is provided.
+  if (instanceId) {
+    const studentsFromInstance: instanceWithUsers | null = await CourseInstance.findOne({
+      where: {
+        id: instanceId
+      },
+      include: [
+        {
+          model: User,
+          attributes: ['studentNumber']
+        }
+      ]
+    }) as instanceWithUsers;
+
+    if (studentsFromInstance) {
+      const studentNumbersFromInstance: Array<string> =
+        studentsFromInstance.Users.map((user: User) => user.studentNumber);
+
+      console.log('numbers from instance', studentNumbersFromInstance);
+      console.log('from params', studentNumberFilter);
+
+      if (studentNumberFilter) {
+        // Intersection of both student numbers from query params and on the course instance.
+        studentNumberFilter =
+          studentNumberFilter.filter((value: string) => studentNumbersFromInstance.includes(value));
+      } else {
+        studentNumberFilter = studentNumbersFromInstance;
+      }
+    }
+  }
+
+
+
+
+
+
+
+
+
 
   if (studentNumbers)
     studentNumbersExist(studentNumbers);
