@@ -132,6 +132,7 @@ router.get(
  *       - $ref: '#/components/parameters/courseId'
  *       - $ref: '#/components/parameters/assessmentModelId'
  *       - $ref: '#/components/parameters/studentNumbers'
+ *       - $ref: '#/components/parameters/instanceIdQuery'
  *       - in: query
  *         name: assessmentDate
  *         schema:
