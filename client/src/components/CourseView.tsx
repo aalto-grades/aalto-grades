@@ -68,16 +68,9 @@ export default function CourseView(): JSX.Element {
   }, [currentAssessmentModel]);
 
   function onChangeAssessmentModel(assessmentModel: AssessmentModelData): void {
-    if (courseId && assessmentModel.id && assessmentModel.id !== currentAssessmentModel?.id) {
+    if (assessmentModel.id && assessmentModel.id !== currentAssessmentModel?.id) {
       setAnimation(false);
-      //setAttainmentTree(undefined);
       setCurrentAssessmentModel(assessmentModel);
-
-      /*getAllAttainments(courseId, assessmentModel.id)
-        .then((attainmentTree: AttainmentData) => {
-          setAttainmentTree(attainmentTree);
-        })
-        .catch((e: Error) => console.log(e.message));*/
     }
   }
 

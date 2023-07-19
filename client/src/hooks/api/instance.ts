@@ -24,14 +24,21 @@ export function useGetAllInstances(
   });
 }
 
-export function useAddInstance(
+interface AddInstanceVars {
   courseId: Numeric,
-  instance: CourseInstanceData,
+  instance: CourseInstanceData
+}
+
+export type UseAddInstanceResult = UseMutationResult<
+  number, unknown, AddInstanceVars
+>;
+
+export function useAddInstance(
   options?: UseMutationOptions<number, unknown, unknown>
-): UseMutationResult<number> {
+): UseAddInstanceResult {
   return useMutation({
-    mutationFn: async () => (
-      await axios.post(`/v1/courses/${courseId}/instances`, instance)
+    mutationFn: async (vars: AddInstanceVars) => (
+      await axios.post(`/v1/courses/${vars.courseId}/instances`, vars.instance)
     ).data.data.courseInstance.id,
     ...options
   });

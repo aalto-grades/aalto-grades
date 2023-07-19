@@ -21,10 +21,6 @@ export default function FetchInstancesView(): JSX.Element {
   const sisuInstances: UseQueryResult<Array<CourseInstanceData>> =
     useGetAllSisuInstances(courseCode);
 
-  function onCancel(): void {
-    navigate('/course-view/' + courseId);
-  }
-
   return (
     <>
       <Container maxWidth="md" sx={{ textAlign: 'right' }}>
@@ -46,7 +42,10 @@ export default function FetchInstancesView(): JSX.Element {
           display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
           alignItems: 'center', pb: 6
         }}>
-          <Button size='medium' variant='outlined' onClick={onCancel}>
+          <Button size='medium'
+            variant='outlined'
+            onClick={() => navigate('/course-view/' + courseId)}
+          >
             Cancel
           </Button>
           <Button

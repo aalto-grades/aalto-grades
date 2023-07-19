@@ -79,7 +79,7 @@ export default function FileLoadDialog(props: {
       }
 
       snackPack.push({
-        msg: 'There was an issue progressing the file, the grades were not imported.',
+        msg: 'There was an issue processing the file, the grades were not imported.',
         severity: 'error'
       });
     }
