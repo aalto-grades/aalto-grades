@@ -125,6 +125,15 @@ describe(
   }
 );
 
+
+
+
+
+
+
+
+
+
 describe(
   'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv/sisu' +
   ' - export Sisu compatible grading in CSV',
@@ -232,6 +241,68 @@ describe(
         );
       });
 
+
+
+
+
+
+
+    it('should filter results in export CSV based on optional instance ID',
+      async () => {
+
+
+
+        res = await request
+          .get(
+            '/v1/courses/6/assessment-models/24/grades/csv/sisu'
+            + '?assessmentDate=2023-05-12&completionLanguage=sv'
+            + `&studentNumbers=${JSON.stringify(studentNumbers)}`
+          )
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'text/csv')
+          .expect(HttpCode.Ok);
+
+        expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+117486,1,5,12.5.2023,sv,
+114732,5,5,12.5.2023,sv,
+472886,3,5,12.5.2023,sv,
+335462,1,5,12.5.2023,sv,
+874623,2,5,12.5.2023,sv,
+345752,1,5,12.5.2023,sv,
+353418,4,5,12.5.2023,sv,
+986957,0,5,12.5.2023,sv,
+611238,4,5,12.5.2023,sv,
+691296,1,5,12.5.2023,sv,
+271778,0,5,12.5.2023,sv,
+344644,1,5,12.5.2023,sv,
+954954,5,5,12.5.2023,sv,
+`);
+        expect(res.headers['content-disposition']).toBe(
+          'attachment; filename="final_grades_course_MS-A0102_' +
+        `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
+        );
+      });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     it(
       'should respond with 400 bad request, if (optional) completionLanguage param is not valid',
       async () => {
@@ -315,6 +386,21 @@ describe(
     });
 
   });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 describe(
   'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades'
