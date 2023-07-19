@@ -75,7 +75,7 @@ export async function fetchCourseInstanceFromSisu(req: Request, res: Response): 
     `${SISU_API_URL}/courseunitrealisations/${sisuCourseInstanceId}`,
     {
       timeout: AXIOS_TIMEOUT,
-      validateStatus: function (status: number) {
+      validateStatus: (status: number) => {
         return status >= 200 && status < 500;
       },
       params: {
@@ -117,7 +117,7 @@ export async function fetchAllCourseInstancesFromSisu(req: Request, res: Respons
     `${SISU_API_URL}/courseunitrealisations`,
     {
       timeout: AXIOS_TIMEOUT,
-      validateStatus: function (status: number) {
+      validateStatus: (status: number) => {
         return status >= 200 && status < 500;
       },
       params: {
