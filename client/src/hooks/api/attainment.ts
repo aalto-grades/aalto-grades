@@ -106,17 +106,25 @@ export function useEditAttainment(
   });
 }
 
-export function useDeleteAttainment(
+interface DeleteAttainmentVars {
   courseId: Numeric,
   assessmentModelId: Numeric,
-  attainmentId: Numeric,
+  attainmentId: Numeric
+}
+
+export type UseDeleteAttainmentResult = UseMutationResult<
+  void, unknown, DeleteAttainmentVars
+>;
+
+export function useDeleteAttainment(
   options?: UseMutationOptions<void, unknown, unknown>
-): UseMutationResult {
+): UseDeleteAttainmentResult {
   return useMutation({
-    mutationFn: async () => (
+    mutationFn: async (vars: DeleteAttainmentVars) => (
       await axios.delete(
-        `/v1/courses/${courseId}/assessment-models/${assessmentModelId}`
-        + `/attainments/${attainmentId}`
+        `/v1/courses/${vars.courseId}/assessment-models`
+        + `/${vars.assessmentModelId}`
+        + `/attainments/${vars.attainmentId}`
       )
     ).data.data.attainment,
     ...options

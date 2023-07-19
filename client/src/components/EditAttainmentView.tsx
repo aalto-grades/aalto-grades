@@ -13,7 +13,7 @@ import ConfirmationDialog from './create-attainment/ConfirmationDialog';
 
 import {
   useAddAttainment, UseAddAttainmentResult,
-  useDeleteAttainment,
+  useDeleteAttainment, UseDeleteAttainmentResult,
   useEditAttainment, UseEditAttainmentResult,
   useGetAttainment
 } from '../hooks/useApi';
@@ -72,7 +72,7 @@ export default function EditAttainmentView(): JSX.Element {
   const [openConfDialog, setOpenConfDialog]: State<boolean> = useState(false);
 
   const addAttainment: UseAddAttainmentResult = useAddAttainment();
-  //const deleteAttainment: UseDeleteAttainmentResult = useDeleteAttainment();
+  const deleteAttainment: UseDeleteAttainmentResult = useDeleteAttainment();
   const editAttainment: UseEditAttainmentResult = useEditAttainment();
 
   function getTemporaryId(): number {
@@ -81,10 +81,14 @@ export default function EditAttainmentView(): JSX.Element {
     return id;
   }
 
-  function deleteAttainment(attainment: AttainmentData): void {
-    /*if (attainment.id === attainmentTree?.id) {
+  function deleteAttainmentEnqueue(attainment: AttainmentData): void {
+    if (attainment.id === attainmentTree?.id) {
       if (attainment.id && attainment.id > 0 && (courseId && assessmentModelId && attainmentId)) {
-        deleteAttainmentApi(courseId, assessmentModelId, attainment.id);
+        deleteAttainment.mutate({
+          courseId: courseId,
+          assessmentModelId: assessmentModelId,
+          attainmentId: attainment.id
+        });
       }
 
       setAttainmentTree(null);
@@ -114,55 +118,67 @@ export default function EditAttainmentView(): JSX.Element {
     }
 
     if (attainmentTree)
-      inner(attainment, attainmentTree);*/
+      inner(attainment, attainmentTree);
   }
 
   function handleSubmit(event: SyntheticEvent): void {
     event.preventDefault();
 
-    /*function addAndEdit(tree: AttainmentData): void {
+    function addAndEdit(tree: AttainmentData): void {
       if (!tree.subAttainments)
         return;
 
       for (const subAttainment of tree.subAttainments) {
         if (courseId && assessmentModelId && attainmentId) {
           if (subAttainment.id && subAttainment.id > 0) {
-            editAttainment(courseId, assessmentModelId, subAttainment);
+            editAttainment.mutate({
+              courseId: courseId,
+              assessmentModelId: assessmentModelId,
+              attainment: subAttainment
+            });
+
             addAndEdit(subAttainment);
           } else {
-            addAttainment(courseId, assessmentModelId, subAttainment);
+            addAttainment.mutate({
+              courseId: courseId,
+              assessmentModelId: assessmentModelId,
+              attainment: subAttainment
+            });
           }
         }
       }
     }
 
-    try {
-      if (courseId && assessmentModelId) {
-        for (const attainment of deletedAttainments) {
-          if (attainment.id) {
-            deleteAttainmentApi(courseId, assessmentModelId, attainment.id);
-          }
-        }
-
-        if (attainmentTree) {
-          switch (modification) {
-          case 'create':
-            addAttainment(courseId, assessmentModelId, attainmentTree);
-            break;
-
-          case 'edit':
-            editAttainment(courseId, assessmentModelId, attainmentTree);
-            addAndEdit(attainmentTree);
-            break;
-
-          default:
-            break;
-          }
+    if (courseId && assessmentModelId) {
+      for (const attainment of deletedAttainments) {
+        if (attainment.id) {
+          deleteAttainment.mutate({
+            courseId: courseId,
+            assessmentModelId: assessmentModelId,
+            attainmentId: attainment.id
+          });
         }
       }
 
-      navigate(-1);
-    }*/
+      if (attainmentTree) {
+        if (modification === 'create') {
+          addAttainment.mutate({
+            courseId: courseId,
+            assessmentModelId: assessmentModelId,
+            attainment: attainmentTree
+          });
+        } else if (modification === 'edit') {
+          editAttainment.mutate({
+            courseId: courseId,
+            assessmentModelId: assessmentModelId,
+            attainment: attainmentTree
+          });
+          addAndEdit(attainmentTree);
+        }
+      }
+    }
+
+    navigate(-1);
   }
 
   return (
@@ -195,7 +211,7 @@ export default function EditAttainmentView(): JSX.Element {
               <Attainment
                 attainmentTree={attainmentTree}
                 setAttainmentTree={setAttainmentTree}
-                deleteAttainment={deleteAttainment}
+                deleteAttainment={deleteAttainmentEnqueue}
                 getTemporaryId={getTemporaryId}
                 attainment={attainmentTree}
               />
@@ -204,7 +220,7 @@ export default function EditAttainmentView(): JSX.Element {
           {
             attainmentTree &&
             <ConfirmationDialog
-              deleteAttainment={deleteAttainment}
+              deleteAttainment={deleteAttainmentEnqueue}
               attainment={attainmentTree}
               title={'Study Attainment'}
               subject={'study attainment'}
