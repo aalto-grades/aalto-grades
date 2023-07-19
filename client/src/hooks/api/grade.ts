@@ -64,18 +64,27 @@ export function useGetFinalGrades(
   });
 }
 
-export function useUploadGradeCsv(
+interface UploadGradeCsvVars {
   courseId: Numeric,
   assessmentModelId: Numeric,
-  csv: unknown,
-  options?: UseMutationOptions<void, unknown, unknown>
-): UseMutationResult {
+  csv: unknown
+}
+
+export type UseUploadGradeCsvResult = UseMutationResult<
+  unknown, unknown, UploadGradeCsvVars
+>;
+
+export function useUploadGradeCsv(
+  options?: UseMutationOptions<unknown, unknown, unknown>
+): UseUploadGradeCsvResult {
   return useMutation({
-    mutationFn: async () => (
+    mutationFn: async (vars: UploadGradeCsvVars) => (
       await axios.postForm(
-        `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/csv`,
+        `/v1/courses/${vars.courseId}`
+        + `/assessment-models/${vars.assessmentModelId}`
+        + '/grades/csv',
         {
-          csv_data: csv // FileList will be unwrapped as sepate fields
+          csv_data: vars.csv // FileList will be unwrapped as sepate fields
         }
       )
     ).data.data,
@@ -83,17 +92,26 @@ export function useUploadGradeCsv(
   });
 }
 
-export function useCalculateFinalGrades(
+interface CalculateFinalGradesVars {
   courseId: Numeric,
   assessmentModelId: Numeric,
-  studentNumbers: Array<string>,
-  options?: UseMutationOptions<void, unknown, unknown>
-): UseMutationResult {
+  studentNumbers: Array<string>
+}
+
+export type UseCalculateFinalGradesResult = UseMutationResult<
+  boolean, unknown, CalculateFinalGradesVars
+>;
+
+export function useCalculateFinalGrades(
+  options?: UseMutationOptions<boolean, unknown, unknown>
+): UseCalculateFinalGradesResult {
   return useMutation({
-    mutationFn: async () => (
+    mutationFn: async (vars: CalculateFinalGradesVars) => (
       await axios.post(
-        `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/calculate`,
-        { studentNumbers }
+        `/v1/courses/${vars.courseId}`
+        + `/assessment-models/${vars.assessmentModelId}`
+        + '/grades/calculate',
+        { studentNumbers: vars.studentNumbers }
       )
     ).data.data.success,
     ...options

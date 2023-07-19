@@ -13,60 +13,34 @@ import CourseResultsTable from './course-results-view/CourseResultsTable';
 /*import {
   calculateFinalGrades as calculateFinalGradesApi,
   downloadCsvTemplate as downloadCsvTemplateApi, getFinalGrades
-} from '../services/grades';*/
-import { Message, State } from '../types';
+  } from '../services/grades';*/
+import {
+  useCalculateFinalGrades, UseCalculateFinalGradesResult,
+  useGetFinalGrades
+} from '../hooks/useApi';
+import useSnackPackAlerts, { SnackPackAlertState } from '../hooks/useSnackPackAlerts';
+import { State } from '../types';
 import { sleep } from '../utils';
+import { UseQueryResult } from '@tanstack/react-query';
 
 export default function CourseResultsView(): JSX.Element {
   const { courseId, assessmentModelId }: Params = useParams();
 
-  const [students, setStudents]: State<Array<FinalGrade>> = useState<Array<FinalGrade>>([]);
-  const [snackPack, setSnackPack]: State<Array<Message>> = useState<Array<Message>>([]);
-  const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
-  const [loading, setLoading]: State<boolean> = useState(false);
-  const [messageInfo, setMessageInfo]: State<Message | null> =
-    useState<Message | null>(null);
+  if (!courseId || !assessmentModelId)
+    return (<></>);
+
+  const snackPack: SnackPackAlertState = useSnackPackAlerts();
   const [selectedStudents, setSelectedStudents]: State<Array<FinalGrade>> =
     useState<Array<FinalGrade>>([]);
 
-  /*useEffect(() => {
-    if (courseId && assessmentModelId) {
-      setLoading(true);
-      getFinalGrades(courseId, assessmentModelId)
-        .then((data: Array<FinalGrade>) => {
-          setStudents(data);
-        })
-        .catch((error: unknown) => {
-          console.log(error);
-          snackPackAdd({
-            msg: 'Fetching final grades failed, make sure grades are imported and calculated.',
-            severity: 'error'
-          });
-        }).finally(() => {
-          setLoading(false);
-          snackPack.setAlertOpen(false);
-        });
-    }
-  }, []);*/
+  const students: UseQueryResult<Array<FinalGrade>> = useGetFinalGrades(
+    courseId, assessmentModelId
+  );
 
-  function snackPackAdd(msg: Message): void {
-    setSnackPack((prev: Array<Message>): Array<Message> => [...prev, msg]);
-  }
-
-  // useEffect in charge of handling the back-to-back alerts
-  // makes the previous disappear before showing the new one
-  useEffect(() => {
-    if (snackPack.length && !messageInfo) {
-      setMessageInfo({ ...snackPack[0] });
-      setSnackPack((prev: Array<Message>) => prev.slice(1));
-      setAlertOpen(true);
-    } else if (snackPack.length && messageInfo && alertOpen) {
-      setAlertOpen(false);
-    }
-  }, [snackPack, messageInfo, alertOpen]);
+  const calculateFinalGrades: UseCalculateFinalGradesResult = useCalculateFinalGrades();
 
   // Triggers the calculation of final grades
-  async function calculateFinalGrades(): Promise<void> {
+  async function handleCalculateFinalGrades(): Promise<void> {
     try {
       snackPack.push({
         msg: 'Calculating final grades...',
@@ -98,17 +72,15 @@ export default function CourseResultsView(): JSX.Element {
       }
     } catch (err: unknown) {
       console.log(err);
-      snackPackAdd({
+      snackPack.push({
         msg: 'Import student grades before calculating the final grade.',
         severity: 'error'
       });
-    } finally {
-      setLoading(false);
     }
   }
 
   async function updateGrades(newGrades: Array<FinalGrade>): Promise<void> {
-    snackPackAdd({
+    snackPack.push({
       msg: 'Importing grades...',
       severity: 'info'
     });
@@ -157,7 +129,7 @@ export default function CourseResultsView(): JSX.Element {
       }
     } catch (err: unknown) {
       console.log(err);
-      snackPackAdd({
+      snackPack.push({
         msg: 'Downloading CSV template failed. Make sure there are attainments in the instance.',
         severity: 'error'
       });
@@ -168,14 +140,14 @@ export default function CourseResultsView(): JSX.Element {
 
   return (
     <Box textAlign='left' alignItems='left'>
-      {/*<AlertSnackbar snackPack={snackPack} />*/}
+      <AlertSnackbar snackPack={snackPack} />
       <Typography variant="h1" sx={{ flexGrow: 1, my: 4 }}>
         Course Results
       </Typography>
       <CourseResultsTable
-        students={students}
-        loading={loading}
-        calculateFinalGrades={calculateFinalGrades}
+        students={students.data ?? []}
+        loading={students.isLoading}
+        calculateFinalGrades={handleCalculateFinalGrades}
         downloadCsvTemplate={downloadCsvTemplate}
         selectedStudents={selectedStudents}
         setSelectedStudents={setSelectedStudents}
