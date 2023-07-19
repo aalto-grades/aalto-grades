@@ -5,7 +5,8 @@
 import { AttainmentData } from 'aalto-grades-common/types/attainment';
 import axios from './axios';
 import {
-  useMutation, UseMutationResult, useQuery, UseQueryOptions, UseQueryResult
+  useMutation, UseMutationOptions, UseMutationResult,
+  useQuery, UseQueryOptions, UseQueryResult
 } from '@tanstack/react-query';
 
 import { Numeric } from '../../types';
@@ -14,7 +15,8 @@ export function useGetAttainment(
   courseId: Numeric,
   assessmentModelId: Numeric,
   attainmentId: Numeric,
-  tree?: 'children' | 'descendants'
+  tree?: 'children' | 'descendants',
+  options?: UseQueryOptions<AttainmentData>
 ): UseQueryResult<AttainmentData> {
 
   const query: string = tree ? `?tree=${tree}` : '';
@@ -26,7 +28,8 @@ export function useGetAttainment(
         `/v1/courses/${courseId}/assessment-models/${assessmentModelId}`
         + `/attainments/${attainmentId}${query}`
       )
-    ).data.data.attainment
+    ).data.data.attainment,
+    ...options
   });
 }
 
@@ -54,7 +57,8 @@ export function useGetRootAttainment(
 export function useAddAttainment(
   courseId: Numeric,
   assessmentModelId: Numeric,
-  attainment: AttainmentData
+  attainment: AttainmentData,
+  options?: UseMutationOptions<AttainmentData, unknown, unknown>
 ): UseMutationResult<AttainmentData> {
   return useMutation({
     mutationFn: async () => (
@@ -62,14 +66,16 @@ export function useAddAttainment(
         `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/attainments`,
         attainment
       )
-    ).data.data.attainment
+    ).data.data.attainment,
+    ...options
   });
 }
 
 export function useEditAttainment(
   courseId: Numeric,
   assessmentModelId: Numeric,
-  attainment: AttainmentData
+  attainment: AttainmentData,
+  options?: UseMutationOptions<AttainmentData, unknown, unknown>
 ): UseMutationResult<AttainmentData> {
   return useMutation({
     mutationFn: async () => (
@@ -78,14 +84,16 @@ export function useEditAttainment(
         + `/attainments/${attainment.id}`,
         attainment
       )
-    ).data.data.attainment
+    ).data.data.attainment,
+    ...options
   });
 }
 
 export function useDeleteAttainment(
   courseId: Numeric,
   assessmentModelId: Numeric,
-  attainmentId: Numeric
+  attainmentId: Numeric,
+  options?: UseMutationOptions<void, unknown, unknown>
 ): UseMutationResult {
   return useMutation({
     mutationFn: async () => (
@@ -93,6 +101,7 @@ export function useDeleteAttainment(
         `/v1/courses/${courseId}/assessment-models/${assessmentModelId}`
         + `/attainments/${attainmentId}`
       )
-    ).data.data.attainment
+    ).data.data.attainment,
+    ...options
   });
 }

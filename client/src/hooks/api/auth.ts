@@ -5,17 +5,21 @@
 import { LoginResult } from 'aalto-grades-common/types';
 import axios from './axios';
 import {
-  useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryResult
+  useMutation, UseMutationOptions, UseMutationResult,
+  useQuery, UseQueryOptions, UseQueryResult
 } from '@tanstack/react-query';
 
 import { LoginCredentials, SignupCredentials } from '../../types';
 
-export function useGetRefreshToken(): UseQueryResult<LoginResult> {
+export function useGetRefreshToken(
+  options?: UseQueryOptions<LoginResult>
+): UseQueryResult<LoginResult> {
   return useQuery({
     queryKey: ['refresh-token'],
     queryFn: async () => (
       await axios.get('/v1/auth/self-info')
-    ).data.data
+    ).data.data,
+    ...options
   });
 }
 

@@ -5,13 +5,16 @@
 import { FinalGrade } from 'aalto-grades-common/types';
 import axios from './axios';
 import {
-  useMutation, UseMutationResult, useQuery, UseQueryResult
+  useMutation, UseMutationOptions, UseMutationResult,
+  useQuery, UseQueryOptions, UseQueryResult
 } from '@tanstack/react-query';
 
 import { Numeric } from '../../types';
 
 export function useDownloadCsvTemplate(
-  courseId: Numeric, assessmentModelId: Numeric
+  courseId: Numeric,
+  assessmentModelId: Numeric,
+  options?: UseQueryOptions<string>
 ): UseQueryResult<string> {
   return useQuery({
     queryKey: ['download-csv-template', courseId, assessmentModelId],
@@ -19,12 +22,16 @@ export function useDownloadCsvTemplate(
       await axios.get(
         `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/csv`
       )
-    ).data
+    ).data,
+    ...options
   });
 }
 
 export function useExportSisuGradeCsv(
-  courseId: Numeric, assessmentModelId: Numeric, params: unknown
+  courseId: Numeric,
+  assessmentModelId: Numeric,
+  params: unknown,
+  options?: UseQueryOptions<BlobPart>
 ): UseQueryResult<BlobPart> {
   return useQuery({
     queryKey: ['export-sisu-grade-csv', courseId, assessmentModelId],
@@ -36,12 +43,15 @@ export function useExportSisuGradeCsv(
           params
         }
       )
-    ).data
+    ).data,
+    ...options
   });
 }
 
 export function useGetFinalGrades(
-  courseId: Numeric, assessmentModelId: Numeric
+  courseId: Numeric,
+  assessmentModelId: Numeric,
+  options?: UseQueryOptions<Array<FinalGrade>>
 ): UseQueryResult<Array<FinalGrade>> {
   return useQuery({
     queryKey: ['final-grades', courseId, assessmentModelId],
@@ -49,12 +59,16 @@ export function useGetFinalGrades(
       await axios.get(
         `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades`
       )
-    ).data.data.finalGrades
+    ).data.data.finalGrades,
+    ...options
   });
 }
 
 export function useUploadGradeCsv(
-  courseId: Numeric, assessmentModelId: Numeric, csv: unknown
+  courseId: Numeric,
+  assessmentModelId: Numeric,
+  csv: unknown,
+  options?: UseMutationOptions<void, unknown, unknown>
 ): UseMutationResult {
   return useMutation({
     mutationFn: async () => (
@@ -64,12 +78,16 @@ export function useUploadGradeCsv(
           csv_data: csv // FileList will be unwrapped as sepate fields
         }
       )
-    ).data.data
+    ).data.data,
+    ...options
   });
 }
 
 export function useCalculateFinalGrades(
-  courseId: Numeric, assessmentModelId: Numeric, studentNumbers: Array<string>
+  courseId: Numeric,
+  assessmentModelId: Numeric,
+  studentNumbers: Array<string>,
+  options?: UseMutationOptions<void, unknown, unknown>
 ): UseMutationResult {
   return useMutation({
     mutationFn: async () => (
@@ -77,6 +95,7 @@ export function useCalculateFinalGrades(
         `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/calculate`,
         { studentNumbers }
       )
-    ).data.data.success
+    ).data.data.success,
+    ...options
   });
 }

@@ -4,22 +4,29 @@
 
 import { Formula, FormulaData } from 'aalto-grades-common/types';
 import axios from './axios';
-import { useQuery, UseQueryResult } from '@tanstack/react-query';
+import { useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 
-export function useGetFormula(formulaId: Formula): UseQueryResult<FormulaData> {
+export function useGetFormula(
+  formulaId: Formula,
+  options?: UseQueryOptions<FormulaData>
+): UseQueryResult<FormulaData> {
   return useQuery({
     queryKey: ['formula', formulaId],
     queryFn: async () => (
       await axios.get(`/v1/formulas/${formulaId}`)
-    ).data.data.formula
+    ).data.data.formula,
+    ...options
   });
 }
 
-export function useGetAllFormulas(): UseQueryResult<Array<FormulaData>> {
+export function useGetAllFormulas(
+  options?: UseQueryOptions<Array<FormulaData>>
+): UseQueryResult<Array<FormulaData>> {
   return useQuery({
     queryKey: ['all-formulas'],
     queryFn: async () => (
       await axios.get('/v1/formulas')
-    ).data.data.formulas
+    ).data.data.formulas,
+    ...options
   });
 }

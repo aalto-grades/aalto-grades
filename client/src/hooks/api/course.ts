@@ -5,26 +5,34 @@
 import { CourseData } from 'aalto-grades-common/types';
 import axios from './axios';
 import {
-  useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryResult
+  useMutation, UseMutationOptions, UseMutationResult,
+  useQuery, UseQueryOptions, UseQueryResult
 } from '@tanstack/react-query';
 
 import { Numeric } from '../../types';
 
-export function useGetCourse(courseId: Numeric): UseQueryResult<CourseData> {
+export function useGetCourse(
+  courseId: Numeric,
+  options?: UseQueryOptions<CourseData>
+): UseQueryResult<CourseData> {
   return useQuery({
     queryKey: ['course', courseId],
     queryFn: async () => (
       await axios.get(`/v1/courses/${courseId}`)
-    ).data.data.course
+    ).data.data.course,
+    ...options
   });
 }
 
-export function useGetAllCourses(): UseQueryResult<Array<CourseData>> {
+export function useGetAllCourses(
+  options?: UseQueryOptions<Array<CourseData>>
+): UseQueryResult<Array<CourseData>> {
   return useQuery({
     queryKey: ['all-courses'],
     queryFn: async () => (
       await axios.get('/v1/courses')
-    ).data.data.courses
+    ).data.data.courses,
+    ...options
   });
 }
 
