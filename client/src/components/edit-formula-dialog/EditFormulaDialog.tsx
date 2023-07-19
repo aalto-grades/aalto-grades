@@ -18,7 +18,6 @@ import { State } from '../../types';
 
 export default function EditFormulaDialog(props: {
   handleClose: () => void,
-  onSubmit: () => void,
   open: boolean,
   // courseId and assessmentModelId are needed when editing from CourseView
   courseId?: number,
@@ -59,7 +58,6 @@ export default function EditFormulaDialog(props: {
   }
 
   function close(): void {
-    props.onSubmit();
     props.handleClose();
 
     setActiveStep(0);
@@ -192,7 +190,6 @@ export default function EditFormulaDialog(props: {
 
 EditFormulaDialog.propTypes = {
   handleClose: PropTypes.func,
-  onSubmit: PropTypes.func,
   open: PropTypes.bool,
   courseId: PropTypes.number,
   assessmentModelId: PropTypes.number,

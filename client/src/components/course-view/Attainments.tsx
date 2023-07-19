@@ -22,8 +22,7 @@ export default function Attainments(props: {
   attainmentTree: AttainmentData,
   courseId: number,
   assessmentModel: AssessmentModelData,
-  handleAddPoints: () => void,
-  onChangeFormula: () => void
+  handleAddPoints: () => void
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const [editFormulaOpen, setEditFormulaOpen]: State<boolean> = useState(false);
@@ -51,7 +50,6 @@ export default function Attainments(props: {
         (props.assessmentModel.id) &&
         <EditFormulaDialog
           handleClose={(): void => setEditFormulaOpen(false)}
-          onSubmit={props.onChangeFormula}
           open={editFormulaOpen}
           courseId={props.courseId}
           assessmentModelId={props.assessmentModel.id}

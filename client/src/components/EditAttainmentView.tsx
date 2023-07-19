@@ -6,13 +6,17 @@ import { AttainmentData } from 'aalto-grades-common/types';
 import { Box, Button, Container, Typography } from '@mui/material';
 import { JSX, SyntheticEvent, useEffect, useState }  from 'react';
 import { NavigateFunction, Params, useParams, useNavigate } from 'react-router-dom';
+import { UseQueryResult } from '@tanstack/react-query';
 
 import Attainment from './create-attainment/Attainment';
 import ConfirmationDialog from './create-attainment/ConfirmationDialog';
 
-/*import {
-  addAttainment, deleteAttainment as deleteAttainmentApi, editAttainment, getAttainment
-} from '../services/attainments';'*/
+import {
+  useAddAttainment, UseAddAttainmentResult,
+  useDeleteAttainment,
+  useEditAttainment, UseEditAttainmentResult,
+  useGetAttainment
+} from '../hooks/useApi';
 import { State } from '../types';
 
 export default function EditAttainmentView(): JSX.Element {
@@ -33,6 +37,27 @@ export default function EditAttainmentView(): JSX.Element {
   const [attainmentTree, setAttainmentTree]: State<AttainmentData | null> =
     useState<AttainmentData | null>(null);
 
+  // If an attainment is being edited, this query is enabled
+  const attainment: UseQueryResult<AttainmentData> = useGetAttainment(
+    courseId ?? -1, assessmentModelId ?? -1, attainmentId ?? -1, 'descendants',
+    { enabled: Boolean(courseId && assessmentModelId && attainmentId) }
+  );
+
+  if (!attainmentTree) {
+    if (modification === 'create') {
+      setAttainmentTree({
+        id: -1,
+        parentId: Number(attainmentId),
+        name: '',
+        tag: '',
+        daysValid: 0,
+        subAttainments: []
+      });
+    } else if (modification === 'edit' && attainment.data) {
+      setAttainmentTree(attainment.data);
+    }
+  }
+
   // List of attainments that exist in the database which are to be deleted.
   const [deletedAttainments, setDeletedAttainments]: State<Array<AttainmentData>> =
     useState<Array<AttainmentData>>([]);
@@ -46,34 +71,9 @@ export default function EditAttainmentView(): JSX.Element {
 
   const [openConfDialog, setOpenConfDialog]: State<boolean> = useState(false);
 
-  /*useEffect(() => {
-    switch (modification) {
-    case 'create':
-      setAttainmentTree({
-        id: -1,
-        parentId: Number(attainmentId),
-        name: '',
-        tag: '',
-        daysValid: 0,
-        subAttainments: []
-      });
-      break;
-
-    case 'edit':
-      if (courseId && assessmentModelId && attainmentId) {
-        getAttainment(courseId, assessmentModelId, attainmentId, 'descendants')
-          .then((attainment: AttainmentData) => {
-            setAttainmentTree(attainment);
-          })
-          .catch((e: Error) => console.log(e.message));
-      }
-      break;
-
-    default:
-      break;
-    }
-
-  }, []);*/
+  const addAttainment: UseAddAttainmentResult = useAddAttainment();
+  //const deleteAttainment: UseDeleteAttainmentResult = useDeleteAttainment();
+  const editAttainment: UseEditAttainmentResult = useEditAttainment();
 
   function getTemporaryId(): number {
     const id: number = temporaryId;
@@ -118,9 +118,9 @@ export default function EditAttainmentView(): JSX.Element {
   }
 
   function handleSubmit(event: SyntheticEvent): void {
-    /*event.preventDefault();
+    event.preventDefault();
 
-    function addAndEdit(tree: AttainmentData): void {
+    /*function addAndEdit(tree: AttainmentData): void {
       if (!tree.subAttainments)
         return;
 
@@ -162,19 +162,7 @@ export default function EditAttainmentView(): JSX.Element {
       }
 
       navigate(-1);
-    } catch (exception) {
-      console.log(exception);
     }*/
-  }
-
-  // Functions for opening and closing the dialog for confirming attainment deletion
-
-  function handleConfDialogOpen(): void {
-    setOpenConfDialog(true);
-  }
-
-  function handleConfDialogClose(): void {
-    setOpenConfDialog(false);
   }
 
   return (
@@ -220,7 +208,7 @@ export default function EditAttainmentView(): JSX.Element {
               attainment={attainmentTree}
               title={'Study Attainment'}
               subject={'study attainment'}
-              handleClose={handleConfDialogClose}
+              handleClose={() => setOpenConfDialog(false)}
               open={openConfDialog}
             />
           }
@@ -239,7 +227,7 @@ export default function EditAttainmentView(): JSX.Element {
                 size='medium'
                 variant='outlined'
                 color='error'
-                onClick={handleConfDialogOpen}
+                onClick={() => setOpenConfDialog(true)}
                 sx={{ ml: 2 }}
               >
                 Delete Attainment

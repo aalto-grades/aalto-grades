@@ -74,20 +74,6 @@ export default function CourseView(): JSX.Element {
     }
   }
 
-  function onChangeFormula(): void {
-    if (currentAssessmentModel?.id) {
-      /*getAllAttainments(courseId, currentAssessmentModel?.id)
-        .then((attainmentTree: AttainmentData) => {
-          setAttainmentTree(attainmentTree);
-
-          getFormulaDetails(attainmentTree.formula ?? Formula.Manual)
-            .then((formula: FormulaData) => setRootFormula(formula))
-            .catch((e: Error) => console.log(e.message));
-        })
-        .catch((e: Error) => console.log(e.message));*/
-    }
-  }
-
   console.debug((auth?.role == SystemRole.Admin || isTeacherInCharge)
     && Boolean(currentAssessmentModel));
 
@@ -142,7 +128,6 @@ export default function CourseView(): JSX.Element {
                           courseId={Number(courseId)}
                           assessmentModel={currentAssessmentModel}
                           handleAddPoints={(): void => setFileLoadOpen(true)}
-                          onChangeFormula={onChangeFormula}
                         />
                       }
                     </div>
