@@ -8,6 +8,8 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
+import logger from './winston';
+
 const parsedPort: number = Number(process.env.AALTO_GRADES_BACKEND_PORT);
 export const PORT: number = isNaN(parsedPort) ? 3000 : parsedPort;
 
@@ -32,7 +34,7 @@ if (JWT_SECRET === 'TOP_SECRET' && NODE_ENV !== 'test') {
       'AALTO_GRADES_JWT_SECRET must be defined for the production environment!'
     );
   } else {
-    console.warn(
+    logger.error(
       'No AALTO_GRADES_JWT_SECRET specified, using default value. Do not do this in production.'
     );
   }
