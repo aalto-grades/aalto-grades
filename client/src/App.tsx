@@ -125,12 +125,10 @@ export default function App(): JSX.Element {
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
   function handleError(error: unknown) {
-    snackPack.push(
-      {
-        msg: (error as Error).message,
-        severity: 'error'
-      }
-    );
+    snackPack.push({
+      msg: (error as Error).message,
+      severity: 'error'
+    });
   }
 
   const queryClient: QueryClient = new QueryClient({
