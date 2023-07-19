@@ -23,7 +23,6 @@ export default function CreateAssessmentModelDialog(props: {
   const { courseId }: Params = useParams();
 
   const [name, setName]: State<string> = useState('');
-  const [isSubmitting, setIsSubmitting]: State<boolean> = useState(false);
 
   const addAssessmentModel: UseAddAssessmentModelResult = useAddAssessmentModel({
     onSuccess: (assessmentModelId: number) => {
@@ -46,7 +45,6 @@ export default function CreateAssessmentModelDialog(props: {
       props.handleClose();
       props.onSubmit();
       setName('');
-      setIsSubmitting(false);
     }
   });
 
@@ -83,7 +81,7 @@ export default function CreateAssessmentModelDialog(props: {
               InputLabelProps={{ shrink: true }}
               margin='normal'
               value={name}
-              disabled={isSubmitting}
+              disabled={addAssessmentModel.isLoading || addAttainment.isLoading}
               onChange={(event: ChangeEvent<HTMLInputElement>): void => setName(event.target.value)}
             />
             <Stack spacing={2} direction="row" sx={{ mt: 2 }}>
@@ -91,7 +89,7 @@ export default function CreateAssessmentModelDialog(props: {
                 size='large'
                 variant='outlined'
                 onClick={props.handleClose}
-                disabled={isSubmitting}
+                disabled={addAssessmentModel.isLoading || addAttainment.isLoading}
               >
                 Cancel
               </Button>
@@ -99,21 +97,25 @@ export default function CreateAssessmentModelDialog(props: {
                 size='large'
                 variant='contained'
                 type='submit'
-                disabled={name.length === 0 || isSubmitting}
+                disabled={
+                  name.length === 0 || addAssessmentModel.isLoading || addAttainment.isLoading
+                }
               >
                 Submit
-                {isSubmitting && (
-                  <CircularProgress
-                    size={24}
-                    sx={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      marginTop: '-12px',
-                      marginLeft: '-12px',
-                    }}
-                  />
-                )}
+                {
+                  (addAssessmentModel.isLoading || addAttainment.isLoading) && (
+                    <CircularProgress
+                      size={24}
+                      sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        marginTop: '-12px',
+                        marginLeft: '-12px',
+                      }}
+                    />
+                  )
+                }
               </Button>
             </Stack>
           </form>
