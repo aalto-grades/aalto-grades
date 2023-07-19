@@ -39,7 +39,7 @@ export default function EditInstanceForm(props: {
           startDate: yup.date()
             .required(),
           endDate: yup.date()
-            .min(yup.ref('startDate'))
+            .min(yup.ref('startDate'), 'Ending date must be after starting date.')
             .required(),
           startingPeriod: yup.string()
             .oneOf(Object.values(Period))
@@ -54,6 +54,7 @@ export default function EditInstanceForm(props: {
         onSubmit={async function (values: CourseInstanceData): Promise<void> {
           const instanceObject: CourseInstanceData = {
             type: values.type,
+            sisuCourseInstanceId: props.instance.sisuCourseInstanceId,
             startDate: values.startDate,
             endDate: values.endDate,
             startingPeriod: values.startingPeriod,

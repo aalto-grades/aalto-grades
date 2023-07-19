@@ -83,6 +83,11 @@ export default function EditInstanceView(): JSX.Element {
             <Typography variant="h3" sx={{ flexGrow: 1, mb: 2, textAlign: 'left' }}>
               {instance.courseData.courseCode + ' - ' + instance.courseData.name.en}
             </Typography>
+            { sisuInstanceId &&
+              <Typography variant="body2" sx={{ flexGrow: 1, mb: 2, textAlign: 'left' }}>
+                {'Sisu instance ID: ' + sisuInstanceId}
+              </Typography>
+            }
             <EditInstanceForm instance={instance} addInstance={addInstance} />
           </>
           : <LinearProgress sx={{ margin: '200px 50px 0px 50px' }} />
