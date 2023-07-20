@@ -4,23 +4,19 @@
 
 import { FinalGrade } from 'aalto-grades-common/types';
 import { Box, Typography } from '@mui/material';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 
 import AlertSnackbar from './alerts/AlertSnackbar';
 import CourseResultsTable from './course-results-view/CourseResultsTable';
 
-/*import {
-  calculateFinalGrades as calculateFinalGradesApi,
-  downloadCsvTemplate as downloadCsvTemplateApi, getFinalGrades
-  } from '../services/grades';*/
 import {
   useCalculateFinalGrades, UseCalculateFinalGradesResult,
+  useDownloadCsvTemplate,
   useGetFinalGrades
 } from '../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../hooks/useSnackPackAlerts';
 import { State } from '../types';
-import { sleep } from '../utils';
 import { UseQueryResult } from '@tanstack/react-query';
 
 export default function CourseResultsView(): JSX.Element {
@@ -37,104 +33,57 @@ export default function CourseResultsView(): JSX.Element {
     courseId, assessmentModelId
   );
 
-  const calculateFinalGrades: UseCalculateFinalGradesResult = useCalculateFinalGrades();
+  const calculateFinalGrades: UseCalculateFinalGradesResult = useCalculateFinalGrades({
+    onSuccess: () => {
+      snackPack.push({
+        msg: 'Final grades calculated successfully.',
+        severity: 'success'
+      });
+
+      students.refetch();
+    }
+  });
 
   // Triggers the calculation of final grades
   async function handleCalculateFinalGrades(): Promise<void> {
-    try {
+    if (courseId && assessmentModelId && selectedStudents.length > 0) {
       snackPack.push({
         msg: 'Calculating final grades...',
         severity: 'info'
       });
-      await sleep(2000);
-      if (courseId && assessmentModelId && selectedStudents.length !== 0) {
-        /*await calculateFinalGradesApi(
-          courseId,
-          assessmentModelId,
-          selectedStudents.map((student: FinalGrade) => student.studentNumber)
-        );
 
-        snackPackAdd({
-          msg: 'Final grades calculated successfully.',
-          severity: 'success'
-        });
-        await sleep(2000);
-
-        setLoading(true);
-        snackPackAdd({
-          msg: 'Fetching final grades...',
-          severity: 'info'
-        });
-        const data: Array<FinalGrade> =
-          await getFinalGrades(courseId, assessmentModelId);
-        setSelectedStudents([]);
-        setStudents(data);*/
-      }
-    } catch (err: unknown) {
-      console.log(err);
-      snackPack.push({
-        msg: 'Import student grades before calculating the final grade.',
-        severity: 'error'
+      calculateFinalGrades.mutate({
+        courseId: courseId,
+        assessmentModelId: assessmentModelId,
+        studentNumbers: selectedStudents.map(
+          (student: FinalGrade) => student.studentNumber
+        )
       });
     }
   }
 
-  async function updateGrades(newGrades: Array<FinalGrade>): Promise<void> {
-    snackPack.push({
-      msg: 'Importing grades...',
-      severity: 'info'
-    });
-    await sleep(2000);
-    try {
-      // TODO: connect to backend
-      /*snackPack.push({
-        msg: 'Grades imported successfully.',
-        severity: 'success'
-      });
-      setStudents(newGrades);
-      await sleep(3000);
-      snackPack.setAlertOpen(false);*/
+  const downloadCsvTemplate: UseQueryResult<string> = useDownloadCsvTemplate(
+    courseId, assessmentModelId,
+    { enabled: false }
+  );
 
-    } catch (exception) {
-      console.log(exception);
-      snackPack.push({
-        msg: 'Grade import failed.',
-        severity: 'error'
-      });
-    }
-  }
-
-  async function downloadCsvTemplate(): Promise<void> {
+  async function handleDownloadCsvTemplate(): Promise<void> {
     snackPack.push({
       msg: 'Downloading CSV template',
       severity: 'info'
     });
 
-    try {
-      if (courseId && assessmentModelId) {
-        /*const res: string = await downloadCsvTemplateApi(courseId, assessmentModelId);
-        const blob: Blob = new Blob([res], { type: 'text/csv' });
-        const link: HTMLAnchorElement = document.createElement('a');
+    downloadCsvTemplate.refetch();
 
-        link.href = URL.createObjectURL(blob);
-        link.download = 'template.csv'; // TODO: Get filename from Content-Disposition
-        link.click();
-        URL.revokeObjectURL(link.href);
-        link.remove();
+    if (!downloadCsvTemplate.isLoading && downloadCsvTemplate.data) {
+      const blob: Blob = new Blob([downloadCsvTemplate.data], { type: 'text/csv' });
+      const link: HTMLAnchorElement = document.createElement('a');
 
-        snackPack.push({
-          msg: 'CSV template downloaded successfully.',
-          severity: 'success'
-        });*/
-      }
-    } catch (err: unknown) {
-      console.log(err);
-      snackPack.push({
-        msg: 'Downloading CSV template failed. Make sure there are attainments in the instance.',
-        severity: 'error'
-      });
-    } finally {
-      //snackPack.setAlertOpen(false);
+      link.href = URL.createObjectURL(blob);
+      link.download = 'template.csv'; // TODO: Get filename from Content-Disposition
+      link.click();
+      URL.revokeObjectURL(link.href);
+      link.remove();
     }
   }
 
@@ -148,7 +97,7 @@ export default function CourseResultsView(): JSX.Element {
         students={students.data ?? []}
         loading={students.isLoading}
         calculateFinalGrades={handleCalculateFinalGrades}
-        downloadCsvTemplate={downloadCsvTemplate}
+        downloadCsvTemplate={handleDownloadCsvTemplate}
         selectedStudents={selectedStudents}
         setSelectedStudents={setSelectedStudents}
       />
