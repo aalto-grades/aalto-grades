@@ -232,7 +232,7 @@ describe(
         );
       });
 
-    it('should filter results in export CSV based on optional instance ID',
+    it('should filter CSV grades based on instance ID if URL query included',
       async () => {
         res = await request
           .get(
@@ -255,7 +255,31 @@ describe(
         );
       });
 
-    it('should filter results in export CSV based on optional instance ID and student numbers',
+    it('should filter CSV grades based on student numbers if URL query included',
+      async () => {
+        res = await request
+          .get(
+            '/v1/courses/8/assessment-models/42/grades/csv/sisu'
+            + '?assessmentDate=2023-12-12&completionLanguage=fi' +
+            '&studentNumbers=["114732","472886","327976","139131"]'
+          )
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'text/csv')
+          .expect(HttpCode.Ok);
+
+        expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+114732,5,5,12.12.2023,fi,
+472886,5,5,12.12.2023,fi,
+327976,5,5,12.12.2023,fi,
+139131,5,5,12.12.2023,fi,
+`);
+        expect(res.headers['content-disposition']).toBe(
+          'attachment; filename="final_grades_course_ELEC-A7100_' +
+        `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
+        );
+      });
+
+    it('should filter CSV grades based on instance ID and student number if URL query included',
       async () => {
         res = await request
           .get(
@@ -277,7 +301,7 @@ describe(
         );
       });
 
-    it('should return all instaces results connected to the assessment model if no filters',
+    it('should return results for all instaces connected to the assessment model if no filters',
       async () => {
         res = await request
           .get(
@@ -384,16 +408,18 @@ describe(
       checkErrorRes([`assessment model with ID ${badId} not found`], HttpCode.NotFound);
     });
 
-    it('should respond with 409 conflict, if instance does not belong to the course', async () => {
-      res = await request
-        .get('/v1/courses/1/assessment-models/2/grades/csv/sisu')
-        .set('Cookie', cookies.adminCookie);
+    it(
+      'should respond with 409 conflict, if assessment model does not belong to the course',
+      async () => {
+        res = await request
+          .get('/v1/courses/1/assessment-models/2/grades/csv/sisu')
+          .set('Cookie', cookies.adminCookie);
 
-      checkErrorRes(
-        ['assessment model with ID 2 does not belong to the course with ID 1'],
-        HttpCode.Conflict
-      );
-    });
+        checkErrorRes(
+          ['assessment model with ID 2 does not belong to the course with ID 1'],
+          HttpCode.Conflict
+        );
+      });
 
   });
 
@@ -1127,7 +1153,7 @@ describe(
       checkGrade(228, 391, 1.25, cookies.userCookie, false);
     });
 
-    it('should calculate multiple correct grades', async () => {
+    it('should calculate multiple correct grades based on student numbers', async () => {
       checkSuccessRes(await request
         .post('/v1/courses/1/assessment-models/26/grades/calculate')
         .send({
@@ -1140,7 +1166,7 @@ describe(
       checkGrade(231, 393, 3.25, cookies.adminCookie);
     });
 
-    it('should calculate correct grades in higher depths', async () => {
+    it('should calculate correct grades in higher depths based on student numbers', async () => {
       checkSuccessRes(await request
         .post('/v1/courses/1/assessment-models/27/grades/calculate')
         .send({
@@ -1160,6 +1186,19 @@ describe(
         .set('Cookie', cookies.adminCookie));
 
       checkGrade(242, 391, 5, cookies.adminCookie, false);
+    });
+
+    it('should calculate multiple correct grades based on instance ID', async () => {
+      checkSuccessRes(await request
+        .post('/v1/courses/8/assessment-models/42/grades/calculate')
+        .send({
+          instanceId: 27
+        })
+        .set('Cookie', cookies.adminCookie));
+
+      checkGrade(256, 1241, 5, cookies.adminCookie);
+      checkGrade(256, 1242, 5, cookies.adminCookie);
+      checkGrade(256, 1243, 5, cookies.adminCookie);
     });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
@@ -1184,5 +1223,21 @@ describe(
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
     });
+
+    it(
+      'should respond with 404 not found if instance does not have any students assigned',
+      async () => {
+        res = await request
+          .post('/v1/courses/8/assessment-models/42/grades/calculate')
+          .send({
+            instanceId: 28
+          })
+          .set('Cookie', cookies.adminCookie)
+          .expect(HttpCode.NotFound);
+
+        expect(res.body.success).toBe(false);
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors[0]).toBe('No student numbers found from instance ID 28');
+      });
   }
 );
