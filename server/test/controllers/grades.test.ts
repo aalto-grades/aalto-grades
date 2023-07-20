@@ -397,52 +397,39 @@ describe(
 
   });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 describe(
   'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades'
   + ' - get final grades in JSON', () => {
 
-    it('should get final grades succesfully when course results are found', async () => {
-      res = await request
-        .get(
-          '/v1/courses/6/assessment-models/24/grades'
+    it(
+      'should get final grades succesfully when course results are found (admin user)',
+      async () => {
+        res = await request
+          .get(
+            '/v1/courses/6/assessment-models/24/grades'
           + `?studentNumbers=${JSON.stringify(studentNumbers)}`
-        )
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
+          )
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
 
-      checkSuccessRes(res);
-      expect(res.body.data.finalGrades).toEqual([
-        { studentNumber: '117486', grade: '1', credits: 5 },
-        { studentNumber: '114732', grade: '5', credits: 5 },
-        { studentNumber: '472886', grade: '3', credits: 5 },
-        { studentNumber: '335462', grade: '1', credits: 5 },
-        { studentNumber: '874623', grade: '2', credits: 5 },
-        { studentNumber: '345752', grade: '1', credits: 5 },
-        { studentNumber: '353418', grade: '4', credits: 5 },
-        { studentNumber: '986957', grade: '0', credits: 5 },
-        { studentNumber: '611238', grade: '4', credits: 5 },
-        { studentNumber: '691296', grade: '1', credits: 5 },
-        { studentNumber: '271778', grade: '0', credits: 5 },
-        { studentNumber: '344644', grade: '1', credits: 5 },
-        { studentNumber: '954954', grade: '5', credits: 5 }
-      ]);
-    });
+        checkSuccessRes(res);
+        expect(res.body.data.finalGrades).toEqual([
+          { studentNumber: '117486', grade: '1', credits: 5 },
+          { studentNumber: '114732', grade: '5', credits: 5 },
+          { studentNumber: '472886', grade: '3', credits: 5 },
+          { studentNumber: '335462', grade: '1', credits: 5 },
+          { studentNumber: '874623', grade: '2', credits: 5 },
+          { studentNumber: '345752', grade: '1', credits: 5 },
+          { studentNumber: '353418', grade: '4', credits: 5 },
+          { studentNumber: '986957', grade: '0', credits: 5 },
+          { studentNumber: '611238', grade: '4', credits: 5 },
+          { studentNumber: '691296', grade: '1', credits: 5 },
+          { studentNumber: '271778', grade: '0', credits: 5 },
+          { studentNumber: '344644', grade: '1', credits: 5 },
+          { studentNumber: '954954', grade: '5', credits: 5 }
+        ]);
+      });
 
     it(
       'should get final grades succesfully when course results are found (teacher in charge)',
@@ -492,7 +479,7 @@ describe(
         ]);
       });
 
-    it('should filter returned grades if URL query included',
+    it('should filter returned grades based on student number if URL query included',
       async () => {
         res = await request
           .get('/v1/courses/8/assessment-models/41/grades' +
@@ -506,6 +493,72 @@ describe(
           { studentNumber: '711199', grade: 'PENDING', credits: 0 },
           { studentNumber: '869364', grade: 'PENDING', credits: 0 },
           { studentNumber: '795451', grade: '0', credits: 5 }
+        ]);
+      });
+
+    it('should filter returned grades based on instance ID if URL query included',
+      async () => {
+        res = await request
+          .get('/v1/courses/8/assessment-models/42/grades?instanceId=26')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
+
+        checkSuccessRes(res);
+        console.log(res.body.data.finalGrades);
+        expect(res.body.data.finalGrades).toEqual([
+          { studentNumber: '327976', grade: '5', credits: 5 },
+          { studentNumber: '478988', grade: '5', credits: 5 },
+          { studentNumber: '139131', grade: '5', credits: 5 },
+          { studentNumber: '857119', grade: '5', credits: 5 }
+        ]);
+      });
+
+    it(
+      'should filter returned grades based on instance ID and student number if URL query included',
+      async () => {
+        res = await request
+          .get('/v1/courses/8/assessment-models/42/grades?instanceId=26' +
+          '&studentNumbers=["327976","139131"]')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
+
+        checkSuccessRes(res);
+        console.log(res.body.data.finalGrades);
+        expect(res.body.data.finalGrades).toEqual([
+          { studentNumber: '327976', grade: '5', credits: 5 },
+          { studentNumber: '139131', grade: '5', credits: 5 },
+        ]);
+      });
+
+    it('should not filter returned grades if no filters included in URL query',
+      async () => {
+        res = await request
+          .get('/v1/courses/8/assessment-models/42/grades')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
+
+        checkSuccessRes(res);
+        expect(res.body.data.finalGrades).toEqual([
+          { studentNumber: '117486', grade: '5', credits: 5 },
+          { studentNumber: '114732', grade: '5', credits: 5 },
+          { studentNumber: '472886', grade: '5', credits: 5 },
+          { studentNumber: '335462', grade: '5', credits: 5 },
+          { studentNumber: '874623', grade: '5', credits: 5 },
+          { studentNumber: '345752', grade: '5', credits: 5 },
+          { studentNumber: '353418', grade: '5', credits: 5 },
+          { studentNumber: '986957', grade: '5', credits: 5 },
+          { studentNumber: '611238', grade: '5', credits: 5 },
+          { studentNumber: '691296', grade: '5', credits: 5 },
+          { studentNumber: '271778', grade: '5', credits: 5 },
+          { studentNumber: '344644', grade: '5', credits: 5 },
+          { studentNumber: '954954', grade: '5', credits: 5 },
+          { studentNumber: '327976', grade: '5', credits: 5 },
+          { studentNumber: '478988', grade: '5', credits: 5 },
+          { studentNumber: '139131', grade: '5', credits: 5 },
+          { studentNumber: '857119', grade: '5', credits: 5 }
         ]);
       });
 
