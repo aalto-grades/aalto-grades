@@ -5,13 +5,14 @@
 import { PORT } from './configs/environment';
 
 import { app } from './app';
+import logger from './configs/winston';
 import { connectToDatabase } from './database/index';
 
 app.listen(PORT, async () => {
   try {
     await connectToDatabase();
   } catch (error) {
-    console.log(error);
+    logger.error(error);
   }
-  console.log(`Server running on port ${PORT}`);
+  logger.info(`Server running on port ${PORT}`);
 });

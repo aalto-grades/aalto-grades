@@ -5,6 +5,7 @@
 build
 node_modules
 coverage
+logs
 package-lock.json
 .DS_Store
 coverage

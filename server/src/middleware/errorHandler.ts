@@ -8,6 +8,7 @@ import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { MulterError } from 'multer';
 import { ValidationError } from 'yup';
 
+import logger from '../configs/winston';
 import { ApiError, HttpCode } from '../types';
 
 export function controllerDispatcher(
@@ -20,14 +21,11 @@ export function controllerDispatcher(
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function errorHandler(err: unknown, req: Request, res: Response, next: NextFunction): void {
-  // TODO: appropriate logging in case of errors
 
   if (err instanceof ApiError) {
-    console.log(`${err.name}: ${err.errors}`);
+    logger.error(`${err.name}: ${err.errors}`);
 
-    res.status(err.statusCode);
-
-    res.send({
+    res.status(err.statusCode).send({
       success: false,
       errors: err.errors
     });
@@ -35,7 +33,7 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
   }
 
   if (err instanceof ValidationError) {
-    console.log(`${err.name}: ${err.errors}`);
+    logger.error(`${err.name}: ${err.errors}`);
 
     res.status(HttpCode.BadRequest).send({
       success: false,
@@ -45,7 +43,7 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
   }
 
   if (err instanceof AxiosError) {
-    console.log(`${err.name}: ${err.message}`);
+    logger.error(`${err.name}: ${err.message}`);
 
     res.status(HttpCode.BadGateway).send({
       success: false,
@@ -64,7 +62,7 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
       'Unexpected field. To upload CSV file, set input field name as "csv_data"' :
       err.message;
 
-    console.log(`${err.name}: ${message}`);
+    logger.error(`${err.name}: ${message}`);
 
     res.status(HttpCode.BadRequest).send({
       success: false,
@@ -74,7 +72,7 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
   }
 
   if (err instanceof Error) {
-    console.log(`${err.name}: ${err.message}`);
+    logger.error(`${err.name}: ${err.message}`);
   }
 
   // Fallback if no other error matches

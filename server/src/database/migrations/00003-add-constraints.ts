@@ -5,6 +5,7 @@
 import { QueryInterface, Transaction, Op } from 'sequelize';
 
 import { sequelize } from '..';
+import logger from '../../configs/winston';
 
 export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
@@ -42,7 +43,7 @@ export default {
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
-      console.log(error);
+      logger.error(error);
     }
   },
   down: async (queryInterface: QueryInterface): Promise<void> => {
@@ -69,7 +70,7 @@ export default {
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
-      console.log(error);
+      logger.error(error);
     }
   },
 };
