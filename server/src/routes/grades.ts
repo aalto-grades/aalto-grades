@@ -356,6 +356,8 @@ router.post(
  *     tags: [Grades]
  *     description: >
  *       Calculate the final grades of all students.
+ *       Calculation can be executed to particular set of student numbers or particular instance ID.
+ *       At least one of these must be provided.
  *       Available only to admin users and teachers in charge of the course.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
@@ -368,10 +370,16 @@ router.post(
  *             properties:
  *               studentNumbers:
  *                 type: array
+ *                 required: false
  *                 description: List of students to include in the calculation.
  *                 example: ['111111', '222222', '333333']
  *                 items:
  *                   type: string
+ *               instanceId:
+ *                 type: number
+ *                 required: false
+ *                 description: Instance ID to which students the calculation is executed.
+ *                 example: 8
  *     responses:
  *       200:
  *         description: Grades calculated successfully.
