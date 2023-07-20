@@ -4,39 +4,32 @@
 
 import { LoginResult, SystemRole } from 'aalto-grades-common/types';
 import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom/extend-expect';
 import { cleanup, render, RenderResult, screen, waitFor } from '@testing-library/react';
 
 import FrontPage from '../components/FrontPage';
 
 import AuthContext from '../context/AuthProvider';
-import { mockCourses } from './mock-data/mockCourses';
-import * as courseServices from '../services/courses';
 
-jest.mock('../services/courses');
 afterEach(cleanup);
 
 describe('Test FrontPage with courses of user', () => {
 
   function renderFrontPage(auth: LoginResult): RenderResult {
-
-    (courseServices.getAllCourses as jest.Mock).mockRejectedValue('Network error');
-    (courseServices.getAllCourses as jest.Mock).mockResolvedValue(mockCourses);
-
-    (courseServices.getCoursesOfUser as jest.Mock).mockRejectedValue('Network error');
-    (courseServices.getCoursesOfUser as jest.Mock).mockResolvedValue(mockCourses);
-
     return render(
-      <BrowserRouter>
-        <AuthContext.Provider value={{
-          auth: auth,
-          setAuth: jest.fn(),
-          isTeacherInCharge: false,
-          setIsTeacherInCharge: jest.fn()
-        }}>
-          <FrontPage />
-        </AuthContext.Provider>
-      </BrowserRouter>
+      <QueryClientProvider client={new QueryClient()}>
+        <BrowserRouter>
+          <AuthContext.Provider value={{
+            auth: auth,
+            setAuth: jest.fn(),
+            isTeacherInCharge: false,
+            setIsTeacherInCharge: jest.fn()
+          }}>
+            <FrontPage />
+          </AuthContext.Provider>
+        </BrowserRouter>
+      </QueryClientProvider>
     );
   }
 
@@ -94,24 +87,19 @@ describe('Test FrontPage with courses of user', () => {
 describe('Test FrontPage without courses of user', () => {
 
   function renderFrontPage(auth: LoginResult): RenderResult {
-
-    (courseServices.getAllCourses as jest.Mock).mockRejectedValue('Network error');
-    (courseServices.getAllCourses as jest.Mock).mockResolvedValue(mockCourses);
-
-    (courseServices.getCoursesOfUser as jest.Mock).mockRejectedValue('Network error');
-    (courseServices.getCoursesOfUser as jest.Mock).mockResolvedValue([]);
-
     return render(
-      <BrowserRouter>
-        <AuthContext.Provider value={{
-          auth: auth,
-          setAuth: jest.fn(),
-          isTeacherInCharge: false,
-          setIsTeacherInCharge: jest.fn()
-        }}>
-          <FrontPage />
-        </AuthContext.Provider>
-      </BrowserRouter>
+      <QueryClientProvider client={new QueryClient()}>
+        <BrowserRouter>
+          <AuthContext.Provider value={{
+            auth: auth,
+            setAuth: jest.fn(),
+            isTeacherInCharge: false,
+            setIsTeacherInCharge: jest.fn()
+          }}>
+            <FrontPage />
+          </AuthContext.Provider>
+        </BrowserRouter>
+      </QueryClientProvider>
     );
   }
 
