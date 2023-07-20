@@ -7,15 +7,15 @@ import {
   DialogContentText, DialogTitle, FormHelperText, Typography
 } from '@mui/material';
 import PropTypes from 'prop-types';
-import { useState, useEffect, createRef } from 'react';
+import { createRef, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import FileErrorDialog from './FileErrorDialog';
 
-//import { importCsv } from '../../services/grades';
+import { useUploadGradeCsv, UseUploadGradeCsvResult } from '../../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
-import { Message, State } from '../../types';
+import { State } from '../../types';
 
 const instructions: string =
   'Upload a CSV file with the header "studentNo" and headers matching to the'
@@ -54,33 +54,29 @@ export default function FileLoadDialog(props: {
   const [validationError, setValidationError]: State<string> = useState<string>('');
   const [fileErrors, setFileErrors]: State<Array<string>> = useState<Array<string>>([]);
 
-  async function uploadFile(): Promise<void> {
-    snackPack.push({
-      msg: 'Importing grades...',
-      severity: 'info'
-    });
-    try {
-      if (courseId) {
-        /*await importCsv(
-          courseId, props.assessmentModelId, fileInput.current.files[0]
-        );
-        snackPackAdd({
-          msg: 'File processed successfully, grades imported.'
-            + ' To refresh final grades, press "calculate final grades"',
-          severity: 'success'
-        });
-        props.handleClose();
-        setFileName(null);*/
-      }
-    } catch (err: any) {
-      // Possible CSV errors are returned with http codes 400, 409, 422
-      if (err.response?.status && [400, 409, 422].includes(err.response.status)) {
-        setFileErrors(err.response.data.errors);
-      }
-
+  const uploadGradeCsv: UseUploadGradeCsvResult = useUploadGradeCsv({
+    onSuccess: () => {
       snackPack.push({
-        msg: 'There was an issue processing the file, the grades were not imported.',
-        severity: 'error'
+        msg: 'File processed successfully, grades imported.'
+          + ' To refresh final grades, press "calculate final grades"',
+        severity: 'success'
+      });
+      props.handleClose();
+      setFileName(null);
+    }
+  });
+
+  async function uploadFile(): Promise<void> {
+    if (courseId) {
+      snackPack.push({
+        msg: 'Importing grades...',
+        severity: 'info'
+      });
+
+      uploadGradeCsv.mutate({
+        courseId: courseId,
+        assessmentModelId: props.assessmentModelId,
+        csv: fileInput.current.files[0]
       });
     }
   }
