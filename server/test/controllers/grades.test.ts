@@ -1191,6 +1191,21 @@ describe(
       checkGrade(242, 391, 5, cookies.adminCookie, false);
     });
 
+    it(
+      'should calculate multiple correct grades based on instance ID and student numbers',
+      async () => {
+        checkSuccessRes(await request
+          .post('/v1/courses/8/assessment-models/42/grades/calculate')
+          .send({
+            instanceId: 27,
+            studentNumbers: ['658593', '451288']
+          })
+          .set('Cookie', cookies.adminCookie));
+
+        checkGrade(256, 1241, 5, cookies.adminCookie);
+        checkGrade(256, 1242, 5, cookies.adminCookie);
+      });
+
     it('should calculate multiple correct grades based on instance ID', async () => {
       checkSuccessRes(await request
         .post('/v1/courses/8/assessment-models/42/grades/calculate')
