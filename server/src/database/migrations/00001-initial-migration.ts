@@ -231,7 +231,7 @@ export default {
             model: 'assessment_model',
             key: 'id'
           },
-          onDelete: 'CASCADE',
+          onDelete: 'SET NULL',
           onUpdate: 'CASCADE'
         },
         sisu_course_instance_id: {

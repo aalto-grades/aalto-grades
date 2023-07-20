@@ -105,6 +105,6 @@ CourseInstance.belongsTo(AssessmentModel, {
 });
 
 AssessmentModel.hasMany(CourseInstance, {
-  onDelete: 'CASCADE',
+  onDelete: 'SET NULL',
   onUpdate: 'CASCADE'
 });
