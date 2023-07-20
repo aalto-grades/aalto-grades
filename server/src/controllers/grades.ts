@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { AttainmentGradeData, FinalGrade, Formula, Status } from 'aalto-grades-common/types';
 import { parse, Parser } from 'csv-parse';
 import { stringify } from 'csv-stringify';
 import { NextFunction, Request, Response } from 'express';
@@ -13,16 +14,15 @@ import AssessmentModel from '../database/models/assessmentModel';
 import Attainment from '../database/models/attainment';
 import AttainmentGrade from '../database/models/attainmentGrade';
 import Course from '../database/models/course';
+import CourseInstance from '../database/models/courseInstance';
 import User from '../database/models/user';
 
-import { AttainmentGradeData, FinalGrade, Formula, Status } from 'aalto-grades-common/types';
 import { getFormulaImplementation } from '../formulas';
 import {
   ApiError, CalculationResult, FormulaNode,HttpCode, JwtClaims, StudentGrades
 } from '../types';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import { isTeacherInChargeOrAdmin } from './utils/user';
-import CourseInstance from '../database/models/courseInstance';
 
 async function studentNumbersExist(studentNumbers: Array<string>): Promise<void> {
   const foundStudentNumbers: Array<string> = (await User.findAll({
@@ -198,14 +198,14 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
     instanceId: yup
       .number()
       .min(1)
-      .notRequired(),
+      .notRequired()
   });
 
   const { assessmentDate, completionLanguage, studentNumbers, instanceId }: {
-    assessmentDate: Date | undefined,
-    completionLanguage: string | undefined,
-    studentNumbers: Array<string> | undefined
-    instanceId: number | undefined
+    assessmentDate?: Date,
+    completionLanguage?: string,
+    studentNumbers?: Array<string>,
+    instanceId?: number
   } = await urlParams.validate(req.query, { abortEarly: false });
 
   let studentNumberFilter: Array<string> | undefined = studentNumbers;
@@ -216,6 +216,23 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
     );
 
   await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // Include students from particular instance (belonging to the assessment model) if ID provided.
   if (instanceId) {
@@ -246,6 +263,23 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
       }
     }
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   if (studentNumberFilter)
     studentNumbersExist(studentNumberFilter);
@@ -316,12 +350,19 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
       .array()
       .json()
       .of(yup.string())
+      .notRequired(),
+    instanceId: yup
+      .number()
+      .min(1)
       .notRequired()
   });
 
-  const { studentNumbers }: {
+  const { studentNumbers, instanceId }: {
     studentNumbers?: Array<string>
+    instanceId?: number
   } = await urlParams.validate(req.query, { abortEarly: false });
+
+  let studentNumberFilter: Array<string> | undefined = studentNumbers;
 
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
@@ -330,8 +371,79 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
 
   await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
-  if (studentNumbers)
-    studentNumbersExist(studentNumbers);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // Include students from particular instance (belonging to the assessment model) if ID provided.
+  if (instanceId) {
+    const studentsFromInstance: instanceWithUsers | null = await CourseInstance.findOne({
+      attributes: ['id'],
+      where: {
+        id: instanceId,
+        assessmentModelId: req.params.assessmentModelId
+      },
+      include: [
+        {
+          model: User,
+          attributes: ['studentNumber']
+        }
+      ]
+    }) as instanceWithUsers;
+
+    if (studentsFromInstance) {
+      const studentNumbersFromInstance: Array<string> =
+          studentsFromInstance.Users.map((user: User) => user.studentNumber);
+
+      if (studentNumberFilter) {
+        // Intersection of both student numbers from query params and on the course instance.
+        studentNumberFilter =
+          studentNumberFilter.filter((value: string) => studentNumbersFromInstance.includes(value));
+      } else {
+        studentNumberFilter = studentNumbersFromInstance;
+      }
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  if (studentNumberFilter)
+    studentNumbersExist(studentNumberFilter);
 
   let finalGrades: Array<FinalGrade> = [];
 
@@ -350,8 +462,14 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   )).map((value: any) => value.student_number);
 
+  if (studentNumberFilter && allStudentsFromAssessmentModel.length !== 0) {
+    studentNumberFilter = allStudentsFromAssessmentModel.filter(
+      (value: string) => (studentNumberFilter as Array<string>).includes(value)
+    );
+  }
+
   const studentsWithFinalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
-    assessmentModel.id, studentNumbers ?? [], allStudentsFromAssessmentModel.length !== 0
+    assessmentModel.id, studentNumberFilter ?? [], allStudentsFromAssessmentModel.length !== 0
   );
 
   // Add students with no final grade marked as pending to the results.
@@ -384,9 +502,9 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
     }
   );
 
-  if (studentNumbers) {
+  if (studentNumberFilter) {
     finalGrades = finalGrades.filter(
-      (value: FinalGrade) => studentNumbers.includes(value.studentNumber)
+      (value: FinalGrade) => (studentNumberFilter as Array<string>).includes(value.studentNumber)
     );
   }
 
