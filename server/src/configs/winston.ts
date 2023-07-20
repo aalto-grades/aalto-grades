@@ -17,8 +17,8 @@ const colors: winston.config.AbstractConfigSetColors = {
 winston.addColors(colors);
 
 /**
- * Levels as in lowest logging level included on the logs.
- * E.g., 'info' logs info level and anything above ('warn' and 'error').
+ * Lowest logging level included in the logs per environment. E.g., 'info' logs
+ * info level and anything above ('warn' and 'error').
  */
 const level: string = ((): string => {
   switch (NODE_ENV) {
@@ -32,11 +32,10 @@ const level: string = ((): string => {
 })();
 
 /**
- * Winston setup logs logger output to console and
- * error logs in separate log files in ./logs directory.
- * More information about logger transports (for streaming
- * logs automatically to database, log managers, etc.):
- * https://github.com/winstonjs/winston/blob/master/docs/transports.md
+ * Set up a Winston logger to log all output to the console and errors to
+ * separate log files in the ./logs directory. More information about logger
+ * transports (for streaming logs automatically to a database, log managers,
+ * etc.): https://github.com/winstonjs/winston/blob/master/docs/transports.md
  */
 const logger: winston.Logger = winston.createLogger({
   level,
