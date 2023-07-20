@@ -568,6 +568,9 @@ describe(
 
         checkSuccessRes(res);
         expect(res.body.data.finalGrades).toEqual([
+          { studentNumber: '167155', grade: 'PENDING', credits: 0 },
+          { studentNumber: '451288', grade: 'PENDING', credits: 0 },
+          { studentNumber: '658593', grade: 'PENDING', credits: 0 },
           { studentNumber: '117486', grade: '5', credits: 5 },
           { studentNumber: '114732', grade: '5', credits: 5 },
           { studentNumber: '472886', grade: '5', credits: 5 },
