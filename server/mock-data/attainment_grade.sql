@@ -123,4 +123,7 @@ INSERT INTO public.attainment_grade (user_id, attainment_id, grader_id, grade, m
 (824, 257, 1, 5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW()),
 (825, 257, 1, 5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW()),
 (826, 257, 1, 5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW()),
-(827, 257, 1, 5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW());
+(827, 257, 1, 5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW()),
+(1241, 257, 1, 5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW()), -- 658593 (no final grade)
+(1242, 257, 1, 5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW()), -- 451288 (no final grade)
+(1243, 257, 1, 5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW()); -- 167155 (no final grade)

@@ -44,4 +44,4 @@ INSERT INTO public.assessment_model (course_id, name, created_at, updated_at) VA
 (8, 'id 39 - no root attainment assigned 3', NOW(), NOW()),
 (8, 'id 40 - no root attainment assigned 3', NOW(), NOW()),
 (8, 'id 41 - has graded and not graded students', NOW(), NOW()),
-(8, 'id 42 - only graded students on 2 instances', NOW(), NOW());
+(8, 'id 42 - graded students on 2 instances, not graded on 1 instance', NOW(), NOW());

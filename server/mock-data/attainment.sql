@@ -259,6 +259,6 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, tag, days_v
 (34, null, 'multiple roots', 'root 252', 365, NOW(), NOW(), 'MANUAL', NULL),
 (34, null, 'multiple roots', 'root 253', 365, NOW(), NOW(), 'MANUAL', NULL),
 (41, null, 'for grading test', 'assesment model 41, root id 254', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["exam", { "weight": 1.0 }]] }'),
-(41, 254, 'for grading test - assesment model 41, id 255', 'exam', 365, NOW(), NOW(), 'MANUAL', NULL),
+(41, 254, 'for grading test - assesment model 41, child id 255', 'exam', 365, NOW(), NOW(), 'MANUAL', NULL),
 (42, null, 'for grading test', 'assesment model 42, root id 256', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["exam", { "weight": 1.0 }]] }'),
-(42, 256, 'for grading test - assesment model 41, id 257', 'exam', 365, NOW(), NOW(), 'MANUAL', NULL);
+(42, 256, 'for grading test - assesment model 42, child id 257', 'exam', 365, NOW(), NOW(), 'MANUAL', NULL);
