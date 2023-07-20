@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { Formula, FormulaData } from 'aalto-grades-common/types';
+import { StyledComponent } from '@emotion/styled';
 import { ExpandMore } from '@mui/icons-material';
 import {
   Accordion, AccordionDetails, AccordionSummary, Box, CircularProgress,
@@ -14,11 +15,13 @@ import { UseQueryResult } from '@tanstack/react-query';
 
 import { useGetFormula } from '../../hooks/useApi';
 
-const HoverExpandMoreIcon = styled(ExpandMore)(({ theme }: { theme: Theme }) => ({
-  '&:hover': {
-    background: theme.palette.hoverGrey1
-  }
-}));
+const HoverExpandMoreIcon: StyledComponent<object> = styled(ExpandMore)(
+  ({ theme }: { theme: Theme }) => ({
+    '&:hover': {
+      background: theme.palette.hoverGrey1
+    }
+  })
+);
 
 export default function ViewFormulaAccordion(props: {
   formulaId: Formula | null

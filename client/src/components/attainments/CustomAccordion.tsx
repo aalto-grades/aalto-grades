@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { AttainmentData, Formula } from 'aalto-grades-common/types';
+import { StyledComponent } from '@emotion/styled';
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
 import {
@@ -15,7 +16,7 @@ import { JSX, ReactNode, SyntheticEvent, useState } from 'react';
 
 import { State } from '../../types';
 
-const Accordion = styled((props: AccordionProps) => (
+const Accordion: StyledComponent<AccordionProps> = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
 ))(() => ({
   '&:last-child': {
@@ -26,25 +27,29 @@ const Accordion = styled((props: AccordionProps) => (
   },
 }));
 
-const AccordionSummary = styled((props: {
+interface AccordionSummaryProps {
   'aria-controls': string,
   id: string,
   expanded: boolean,
   selected: boolean,
   children: ReactNode
-}) => (
-  <MuiAccordionSummary
-    expandIcon={
-      <ArrowForwardIosSharpIcon
-        sx={{
-          fontSize: '0.9rem',
-          color: props.expanded ? 'primary.main' : 'grey.600'
-        }}
-      />
-    }
-    {...props}
-  />
-))(({ theme, selected }: { theme: Theme, selected: boolean }) => ({
+}
+
+const AccordionSummary: StyledComponent<AccordionSummaryProps> = styled(
+  (props: AccordionSummaryProps) => (
+    <MuiAccordionSummary
+      expandIcon={
+        <ArrowForwardIosSharpIcon
+          sx={{
+            fontSize: '0.9rem',
+            color: props.expanded ? 'primary.main' : 'grey.600'
+          }}
+        />
+      }
+      {...props}
+    />
+  )
+) (({ theme, selected }: { theme: Theme, selected: boolean }) => ({
   maxHeight: '36px',
   minHeight: '36px',
   paddingRight: '21px',

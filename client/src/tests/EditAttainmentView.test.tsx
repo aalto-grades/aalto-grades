@@ -27,8 +27,9 @@ global.structuredClone = <T,>(value: T): T => {
 
 function getMockAttainment(): AttainmentData {
   return structuredClone(
-    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-    mockAttainments.subAttainments?.find(
+    // Mock data, can be asserted as non-null safely.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    mockAttainments.subAttainments!.find(
       (attainment: AttainmentData) => attainment.id === attainmentId
     )!
   );
