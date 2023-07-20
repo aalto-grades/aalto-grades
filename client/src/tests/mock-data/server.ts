@@ -39,29 +39,54 @@ export const server: SetupServer = setupServer(
     '*/v1/courses/:courseId/assessment-models',
     success({ assessmentModels: mockAssessmentModels })
   ),
+  rest.get(
+    '*/v1/courses/:courseId/assessment-models:assessmentModelId',
+    success({ assessmentModel: mockAssessmentModels[0] })
+  ),
 
   rest.get(
     '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments',
     success({ attainment: mockAttainments })
+  ),
+  rest.get(
+    '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
+    success({ attainment: mockAttainments })
+  ),
+
+  rest.get(
+    '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades',
+    success({ finalGrades: mockFinalGrades })
   ),
 
   rest.get(
     '*/v1/courses/:courseId/instances',
     success({ courseInstances: mockInstances })
   ),
+  rest.get(
+    '*/v1/courses/:courseId/instances/:courseInstanceId',
+    success({ courseInstance: mockInstances[0] })
+  ),
 
+  rest.get(
+    '*/v1/formulas',
+    success({ formulas: mockFormulas })
+  ),
   rest.get(
     '*/v1/formulas/:formulaId',
     success({ formula: mockFormulas[0] })
   ),
 
   rest.get(
-    '*/v1/user/:userId/courses',
-    success({ courses: mockCourses })
+    '*/v1/sisu/courses/:courseCode',
+    success({ courseInstances: mockSisuInstances })
+  ),
+  rest.get(
+    '*/v1/sisu/instances/:sisuCourseInstanceId',
+    success({ courseInstance: mockSisuInstances[0] })
   ),
 
   rest.get(
-    '*/v1/sisu/courses/:courseCode',
-    success({ courseInstances: mockSisuInstances })
+    '*/v1/user/:userId/courses',
+    success({ courses: mockCourses })
   )
 );
