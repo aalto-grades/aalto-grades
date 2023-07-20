@@ -205,11 +205,13 @@ router.get(
  *     tags: [Grades]
  *     description: >
  *       Get the final grades of all students.
+ *       Results can be filtered by student numbers or particular instance ID.
  *       Available only to admin users and teachers in charge of the course.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
  *       - $ref: '#/components/parameters/assessmentModelId'
  *       - $ref: '#/components/parameters/studentNumbers'
+ *       - $ref: '#/components/parameters/instanceIdQuery'
  *     responses:
  *       200:
  *         description: Grades fetched successfully.
