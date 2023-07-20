@@ -4,6 +4,7 @@
 
 import { LoginResult, SystemRole } from 'aalto-grades-common/types';
 import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom/extend-expect';
 import { act, cleanup, render, RenderResult, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -12,23 +13,24 @@ import UserButton from '../components/auth/UserButton';
 
 import AuthContext from '../context/AuthProvider';
 
-jest.mock('../services/courses');
 afterEach(cleanup);
 
 describe('Tests for button component displaying user data and logout', () => {
 
   function renderButton(auth: LoginResult | null): RenderResult {
     return render(
-      <BrowserRouter>
-        <AuthContext.Provider value={{
-          auth: auth,
-          setAuth: jest.fn(),
-          isTeacherInCharge: false,
-          setIsTeacherInCharge: jest.fn()
-        }}>
-          <UserButton />
-        </AuthContext.Provider>
-      </BrowserRouter>
+      <QueryClientProvider client={new QueryClient()}>
+        <BrowserRouter>
+          <AuthContext.Provider value={{
+            auth: auth,
+            setAuth: jest.fn(),
+            isTeacherInCharge: false,
+            setIsTeacherInCharge: jest.fn()
+          }}>
+            <UserButton />
+          </AuthContext.Provider>
+        </BrowserRouter>
+      </QueryClientProvider>
     );
   }
 
