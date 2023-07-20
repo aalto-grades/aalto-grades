@@ -7,51 +7,42 @@
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
 
-import { rest } from 'msw';
-import { setupServer } from 'msw/node';
+import { ResponseComposition, ResponseResolver, rest, RestContext, RestRequest } from 'msw';
+import { setupServer, SetupServer } from 'msw/node';
 import '@testing-library/jest-dom';
 
 import { mockCourses } from './tests/mock-data/mockCourses';
 import { mockSisuInstances } from './tests/mock-data/mockSisuInstances';
 
-const server = setupServer(
-  rest.get('http://localhost:3000/v1/courses', async (_, res, ctx) => {
+function success(data: object): ResponseResolver<RestRequest, RestContext> {
+  return async (_req: RestRequest, res: ResponseComposition, ctx: RestContext) => {
     return res(
       ctx.status(200),
       ctx.json({
         success: true,
-        data: {
-          courses: mockCourses
-        }
+        data: data
       })
     );
-  }),
+  }
+}
 
-  rest.get('http://localhost:3000/v1/user/*/courses', async (_, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        success: true,
-        data: {
-          courses: mockCourses
-        }
-      })
-    );
-  }),
+const server: SetupServer = setupServer(
+  rest.get(
+    '*/v1/courses',
+    success({ courses: mockCourses })
+  ),
 
-  rest.get('http://localhost:3000/v1/sisu/courses/*', async (_, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        success: true,
-        data: {
-          courseInstances: mockSisuInstances
-        }
-      })
-    );
-  })
+  rest.get(
+    '*/v1/user/*/courses',
+    success({ courses: mockCourses })
+  ),
+
+  rest.get(
+    '*/v1/sisu/courses/*',
+    success({ courseInstances: mockSisuInstances })
+  )
 );
 
 beforeAll(() => server.listen());
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
