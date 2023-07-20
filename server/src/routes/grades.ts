@@ -127,6 +127,7 @@ router.get(
  *     tags: [Grades]
  *     description: >
  *       Get the final grades of all students in a Sisu compatible CSV format.
+ *       Results can be filtered by student numbers or particular instance ID.
  *       Available only to admin users and teachers in charge of the course.
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'

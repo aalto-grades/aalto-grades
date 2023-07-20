@@ -217,18 +217,13 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
 
   await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
-
-
-
-
-
-
-
-  // Include students from particular instance if the ID is provided.
+  // Include students from particular instance (belonging to the assessment model) if ID provided.
   if (instanceId) {
     const studentsFromInstance: instanceWithUsers | null = await CourseInstance.findOne({
+      attributes: ['id'],
       where: {
-        id: instanceId
+        id: instanceId,
+        assessmentModelId: req.params.assessmentModelId
       },
       include: [
         {
@@ -242,9 +237,6 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
       const studentNumbersFromInstance: Array<string> =
         studentsFromInstance.Users.map((user: User) => user.studentNumber);
 
-      console.log('numbers from instance', studentNumbersFromInstance);
-      console.log('from params', studentNumberFilter);
-
       if (studentNumberFilter) {
         // Intersection of both student numbers from query params and on the course instance.
         studentNumberFilter =
@@ -255,17 +247,8 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
     }
   }
 
-
-
-
-
-
-
-
-
-
-  if (studentNumbers)
-    studentNumbersExist(studentNumbers);
+  if (studentNumberFilter)
+    studentNumbersExist(studentNumberFilter);
 
   /**
    * TODO:
@@ -274,7 +257,7 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
    */
 
   const finalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
-    assessmentModel.id, studentNumbers ?? []
+    assessmentModel.id, studentNumberFilter ?? []
   );
 
   const courseResults: Array<{
