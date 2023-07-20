@@ -243,7 +243,7 @@ export default function EditAttainmentView(): JSX.Element {
                 size='medium'
                 variant='outlined'
                 color='error'
-                onClick={() => setOpenConfDialog(true)}
+                onClick={(): void => setOpenConfDialog(true)}
                 sx={{ ml: 2 }}
               >
                 Delete Attainment

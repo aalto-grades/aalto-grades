@@ -7,7 +7,7 @@ import {
   DialogContentText, DialogTitle, FormHelperText, Typography
 } from '@mui/material';
 import PropTypes from 'prop-types';
-import { createRef, useState } from 'react';
+import { ChangeEvent, createRef, RefObject, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';
@@ -40,7 +40,7 @@ export default function FileLoadDialog(props: {
   open: boolean
 }): JSX.Element {
   const { courseId }: Params = useParams();
-  const fileInput: React.RefObject<any> = createRef<any>();
+  const fileInput: RefObject<HTMLInputElement> = createRef();
 
   // state variables handling the alert messages
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
@@ -67,7 +67,7 @@ export default function FileLoadDialog(props: {
   });
 
   async function uploadFile(): Promise<void> {
-    if (courseId) {
+    if (courseId && fileInput.current?.files) {
       snackPack.push({
         msg: 'Importing grades...',
         severity: 'info'
@@ -121,13 +121,15 @@ export default function FileLoadDialog(props: {
                 ref={fileInput}
                 type='file'
                 accept='.csv'
-                onChange={(event: React.ChangeEvent<HTMLInputElement>): void => {
+                onChange={(event: ChangeEvent<HTMLInputElement>): void => {
                   event.preventDefault();
                   if (event.target.value) { // new input -> clear errors
                     setValidationError('');
                     setFileErrors([]);
                   }
-                  setFileName(fileInput.current.files[0].name);
+                  if (fileInput.current?.files) {
+                    setFileName(fileInput.current?.files[0].name);
+                  }
                 }}
               />  {/* accept multiple?? */}
             </Button>

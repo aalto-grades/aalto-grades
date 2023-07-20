@@ -8,20 +8,14 @@ import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
 import {
   Accordion as MuiAccordion, AccordionSummary as MuiAccordionSummary, Box, Typography
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { AccordionProps } from '@mui/material/Accordion';
+import { styled, Theme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
-import { ReactNode, SyntheticEvent, useState } from 'react';
+import { JSX, ReactNode, SyntheticEvent, useState } from 'react';
 
 import { State } from '../../types';
 
-type AccordionOnChange = (event: SyntheticEvent, newExpanded: boolean) => void;
-
-const Accordion = styled((props: {
-  key: string,
-  expanded: boolean,
-  onChange: AccordionOnChange,
-  children: any
-}) => (
+const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
 ))(() => ({
   '&:last-child': {
@@ -50,7 +44,7 @@ const AccordionSummary = styled((props: {
     }
     {...props}
   />
-))(({ theme, selected }) => ({
+))(({ theme, selected }: { theme: Theme, selected: boolean }) => ({
   maxHeight: '36px',
   minHeight: '36px',
   paddingRight: '21px',
@@ -123,8 +117,10 @@ export default function CustomAccordion(props: {
     return copySet;
   }
 
-  // curried function syntax, google for a good explanation
-  // basically add the panel's id to the set of expanded panels if opened, else delete from set
+  type AccordionOnChange = (event: SyntheticEvent, newExpanded: boolean) => void;
+
+  // Curried function syntax. Add the panel's ID to the set of expanded panels
+  // if opened, else delete from set
   function handleChange(panelId: number): AccordionOnChange {
     return (event: SyntheticEvent, newExpanded: boolean): void => {
       setExpanded(newExpanded ? addToSet(panelId, expanded) : deleteFromSet(panelId, expanded));

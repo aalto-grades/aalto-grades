@@ -3,9 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 import { Alert as MuiAlert, Slide, Snackbar, Theme, Typography } from '@mui/material';
+import { AlertProps } from '@mui/material/Alert';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
-import React, { SyntheticEvent } from 'react';
+import {
+  ForwardedRef, forwardRef, ForwardRefExoticComponent, RefAttributes, SyntheticEvent
+} from 'react';
 
 import { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 
@@ -15,10 +18,20 @@ const darkTheme: Theme = createTheme({
   },
 });
 
-const Alert: any = React.forwardRef(
-  function Alert(props: object, ref: React.ForwardedRef<unknown>) {
-    return <MuiAlert elevation={6} ref={ref as any} variant='standard' {...props} />;
-  });
+const Alert: ForwardRefExoticComponent<
+  Omit<AlertProps, 'ref'> & RefAttributes<HTMLDivElement>
+> = forwardRef(
+  function Alert(props: AlertProps, ref: ForwardedRef<HTMLDivElement>) {
+    return (
+      <MuiAlert
+        elevation={6}
+        ref={ref}
+        variant='standard'
+        {...props}
+      />
+    );
+  }
+);
 
 // TODO: Consider if the key attribute works properly of if something else should be used?
 // position allows "stacked look", starts from 1 but really needed only from 2 onwards
@@ -34,7 +47,7 @@ export default function AlertSnackbar(props: {
     alertOpen, setAlertOpen
   }: SnackPackAlertState = props.snackPack;
 
-  function handleClose(event: Event | SyntheticEvent, reason: string): void {
+  function handleClose(event: Event | SyntheticEvent, reason?: string): void {
     if (reason === 'clickaway') {
       return;
     }

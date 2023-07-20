@@ -8,13 +8,13 @@ import {
   Accordion, AccordionDetails, AccordionSummary, Box, CircularProgress,
   Container, Typography
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { styled, Theme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { UseQueryResult } from '@tanstack/react-query';
 
 import { useGetFormula } from '../../hooks/useApi';
 
-const HoverExpandMoreIcon = styled<any>(ExpandMore)(({ theme }) => ({
+const HoverExpandMoreIcon = styled(ExpandMore)(({ theme }: { theme: Theme }) => ({
   '&:hover': {
     background: theme.palette.hoverGrey1
   }

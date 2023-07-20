@@ -20,7 +20,8 @@ export default function StringTextField(props: {
   // Functions for handling the change of the values in the 'New Name' textfield
   // and the textfields that represent formula attributes
   function handleChange(event: ChangeEvent<HTMLInputElement>): void {
-    (props.attainment as any)[props.fieldData.fieldId] = event.target.value;
+    const key: keyof AttainmentData = props.fieldData.fieldId as keyof AttainmentData;
+    (props.attainment[key] as unknown) = event.target.value;
     props.setAttainmentTree(structuredClone(props.attainmentTree));
   }
 

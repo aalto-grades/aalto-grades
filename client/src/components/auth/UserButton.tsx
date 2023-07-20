@@ -39,7 +39,7 @@ export default function UserButton(): JSX.Element {
         aria-controls={open ? 'basic-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
-        onClick={(event: SyntheticEvent) => setAnchorEl(event.currentTarget)}
+        onClick={(event: SyntheticEvent): void => setAnchorEl(event.currentTarget)}
       >
         <Box sx={{ marginRight: 1, marginTop: 1 }}>
           <PersonIcon color="inherit" />
@@ -51,13 +51,13 @@ export default function UserButton(): JSX.Element {
         id="basic-menu"
         anchorEl={anchorEl}
         open={open}
-        onClose={() => setAnchorEl(null)}
+        onClose={(): void => setAnchorEl(null)}
         MenuListProps={{
           'aria-labelledby': 'basic-button',
         }}
       >
         <MenuItem
-          onClick={() => logOut.mutate(null)}
+          onClick={(): void => logOut.mutate(null)}
         >
           Logout
         </MenuItem>
