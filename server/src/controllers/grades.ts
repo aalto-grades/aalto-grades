@@ -824,26 +824,116 @@ export async function calculateGrades(
   res: Response
 ): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
-    studentNumbers: yup.array().of(yup.string()).required()
-  });
+    studentNumbers: yup
+      .array()
+      .of(yup.string())
+      .notRequired(),
+    instanceId: yup
+      .number()
+      .min(1)
+      .notRequired()
+  }).test(
+    function (value: {
+      studentNumbers?: yup.Maybe<Array<string | undefined> | undefined>,
+      instanceId?: yup.Maybe<number | undefined>
+    }) {
+      if (!value.instanceId && !value.studentNumbers) {
+        throw new ApiError(
+          'You must provide at least one of: instanceId or list of student numbers',
+          HttpCode.BadRequest
+        );
+      }
+      return true;
+    }
+  );
 
-  await requestSchema.validate(req.body, { abortEarly: false });
+  const { studentNumbers, instanceId }: {
+    studentNumbers?: Array<string>
+    instanceId?: number
+  } = await requestSchema.validate(req.body, { abortEarly: false });
+
+  let studentNumberFilter: Array<string> | undefined = studentNumbers;
+  const grader: JwtClaims = req.user as JwtClaims;
 
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
     );
 
-  const grader: JwtClaims = req.user as JwtClaims;
-
   await isTeacherInChargeOrAdmin(grader, course.id, HttpCode.Forbidden);
 
-  /*
-   * First ensure that all students to be included in the calculation exist in
-   * the database.
-   */
-  const studentNumbers: Array<string> = req.body.studentNumbers;
-  await studentNumbersExist(studentNumbers);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // Include students from particular instance (belonging to the assessment model) if ID provided.
+  if (instanceId) {
+    const studentsFromInstance: instanceWithUsers | null = await CourseInstance.findOne({
+      attributes: ['id'],
+      where: {
+        id: instanceId,
+        assessmentModelId: req.params.assessmentModelId
+      },
+      include: [
+        {
+          model: User,
+          attributes: ['studentNumber']
+        }
+      ]
+    }) as instanceWithUsers;
+
+    if (studentsFromInstance) {
+      const studentNumbersFromInstance: Array<string> =
+          studentsFromInstance.Users.map((user: User) => user.studentNumber);
+
+      if (studentNumberFilter) {
+        // Intersection of both student numbers from request and on the course instance.
+        studentNumberFilter =
+          studentNumberFilter.filter((value: string) => studentNumbersFromInstance.includes(value));
+      } else {
+        studentNumberFilter = studentNumbersFromInstance;
+      }
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  if (studentNumberFilter && studentNumberFilter.length !== 0) {
+    // Ensure that all students to be included in the calculation exist in the database.
+    studentNumbersExist(studentNumberFilter);
+  } else {
+    throw new ApiError(
+      `No student numbers found from instance ID ${instanceId}`, HttpCode.NotFound
+    );
+  }
 
   /*
    * Get all the attainments in this assessment model.
@@ -988,7 +1078,7 @@ export async function calculateGrades(
         attributes: [],
         where: {
           studentNumber: {
-            [Op.in]: studentNumbers
+            [Op.in]: studentNumberFilter
           }
         }
       }
