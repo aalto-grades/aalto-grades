@@ -6,6 +6,7 @@ import {
   AssessmentModelData, AttainmentData, CourseInstanceData, LoginResult, SystemRole
 } from 'aalto-grades-common/types';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom/extend-expect';
 import { render, RenderResult, waitFor, cleanup } from '@testing-library/react';
 
@@ -14,14 +15,7 @@ import CourseView from '../components/CourseView';
 import AuthContext from '../context/AuthProvider';
 import { mockAssessmentModels } from './mock-data/mockAssessmentModels';
 import { mockAttainments } from './mock-data/mockAttainments';
-import { mockCourses } from './mock-data/mockCourses';
-import { mockFormulas } from './mock-data/mockFormulas';
 import { mockInstances } from './mock-data/mockInstancesWithStringDates';
-import * as assessmentModelServices from '../services/assessmentModels';
-import * as attainmentServices from '../services/attainments';
-import * as courseServices from '../services/courses';
-import * as formulaServices from '../services/formulas';
-import * as instanceServices from '../services/instances';
 
 afterEach(cleanup);
 
@@ -34,36 +28,21 @@ describe('Tests for CourseView component', () => {
     mockAttainments: AttainmentData
   ): RenderResult {
 
-    jest.spyOn(instanceServices, 'getInstances').mockRejectedValue('Network error');
-    jest.spyOn(instanceServices, 'getInstances').mockResolvedValue(mockInstances);
-
-    jest.spyOn(courseServices, 'getCourse').mockRejectedValue('Network error');
-    jest.spyOn(courseServices, 'getCourse').mockResolvedValue(mockCourses[0]);
-
-    jest.spyOn(assessmentModelServices, 'getAllAssessmentModels')
-      .mockRejectedValue('Network error');
-    jest.spyOn(assessmentModelServices, 'getAllAssessmentModels')
-      .mockResolvedValue(mockAssessmentModels);
-
-    jest.spyOn(attainmentServices, 'getAllAttainments').mockRejectedValue('Network error');
-    jest.spyOn(attainmentServices, 'getAllAttainments').mockResolvedValue(mockAttainments);
-
-    jest.spyOn(formulaServices, 'getFormulaDetails').mockRejectedValue('Network error');
-    jest.spyOn(formulaServices, 'getFormulaDetails').mockResolvedValue(mockFormulas[0]);
-
     return render(
-      <MemoryRouter initialEntries={['/course-view/1']}>
-        <AuthContext.Provider value={{
-          auth: auth,
-          setAuth: jest.fn(),
-          isTeacherInCharge: false,
-          setIsTeacherInCharge: jest.fn()
-        }}>
-          <Routes>
-            <Route path='/course-view/:courseId' element={<CourseView/>}/>
-          </Routes>
-        </AuthContext.Provider>
-      </MemoryRouter>
+      <QueryClientProvider client={new QueryClient()}>
+        <MemoryRouter initialEntries={['/course-view/1']}>
+          <AuthContext.Provider value={{
+            auth: auth,
+            setAuth: jest.fn(),
+            isTeacherInCharge: false,
+            setIsTeacherInCharge: jest.fn()
+          }}>
+            <Routes>
+              <Route path='/course-view/:courseId' element={<CourseView />} />
+            </Routes>
+          </AuthContext.Provider>
+        </MemoryRouter>
+      </QueryClientProvider>
     );
   }
 

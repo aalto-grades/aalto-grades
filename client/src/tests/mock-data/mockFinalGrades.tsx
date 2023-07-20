@@ -4,7 +4,7 @@
 
 import { FinalGrade, Status } from 'aalto-grades-common/types';
 
-export const finalGrades: Array<FinalGrade> = [
+export const mockFinalGrades: Array<FinalGrade> = [
   {
     studentNumber: '12345A',
     grade: Status.Pass,
