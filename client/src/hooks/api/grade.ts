@@ -30,7 +30,11 @@ export function useDownloadCsvTemplate(
 export function useExportSisuGradeCsv(
   courseId: Numeric,
   assessmentModelId: Numeric,
-  params: unknown,
+  params: {
+    completionLanguage?: string,
+    assessmentDate?: string,
+    studentNumbers: Array<string>
+  },
   options?: UseQueryOptions<BlobPart>
 ): UseQueryResult<BlobPart> {
   return useQuery({
