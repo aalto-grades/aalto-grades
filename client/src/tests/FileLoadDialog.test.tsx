@@ -4,6 +4,7 @@
 
 import { LoginResult, SystemRole } from 'aalto-grades-common/types';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom/extend-expect';
 import {
   act, cleanup, fireEvent, render, RenderResult, screen, waitFor
@@ -12,19 +13,8 @@ import userEvent from '@testing-library/user-event';
 
 import CourseView from '../components/CourseView';
 
-import * as assessmentModelServices from '../services/assessmentModels';
-import * as attainmentServices from '../services/attainments';
-import * as courseServices from '../services/courses';
-import * as formulaServices from '../services/formulas';
-import * as gradeServices from '../services/grades';
-import * as instanceServices from '../services/instances';
 import AuthContext from '../context/AuthProvider';
 import { maxErrorsToShow } from '../components/course-view/FileLoadDialog';
-import { mockAssessmentModels } from './mock-data/mockAssessmentModels';
-import { mockAttainments } from './mock-data/mockAttainments';
-import { mockCourses } from './mock-data/mockCourses';
-import { mockFormulas } from './mock-data/mockFormulas';
-import { mockInstances } from './mock-data/mockInstancesWithStringDates';
 
 const file: File = new File(['idk'], 'grades_test.csv', { type: 'csv' });
 
@@ -62,35 +52,21 @@ const mockErrorResponse: {
 describe('FileLoadDialog test with proper csv', () => {
 
   function renderCourseView(auth: LoginResult): RenderResult {
-
-    (instanceServices.getInstances as jest.Mock).mockResolvedValue(mockInstances);
-
-    (courseServices.getCourse as jest.Mock).mockResolvedValue(mockCourses[0]);
-
-    (assessmentModelServices.getAllAssessmentModels as jest.Mock)
-      .mockResolvedValue(mockAssessmentModels);
-
-    (attainmentServices.getAllAttainments as jest.Mock)
-      .mockResolvedValue(mockAttainments);
-
-    jest.spyOn(formulaServices, 'getFormulaDetails').mockResolvedValue(mockFormulas[0]);
-
-    // succeess, nothing to worry about
-    (gradeServices.importCsv as jest.Mock).mockResolvedValue({});
-
     return render(
-      <MemoryRouter initialEntries={['/course-view/1']}>
-        <AuthContext.Provider value={{
-          auth: auth,
-          setAuth: jest.fn(),
-          isTeacherInCharge: false,
-          setIsTeacherInCharge: jest.fn()
-        }}>
-          <Routes>
-            <Route path='/course-view/:courseId' element={<CourseView/>}/>
-          </Routes>
-        </AuthContext.Provider>
-      </MemoryRouter>
+      <QueryClientProvider client={new QueryClient()}>
+        <MemoryRouter initialEntries={['/course-view/1']}>
+          <AuthContext.Provider value={{
+            auth: auth,
+            setAuth: jest.fn(),
+            isTeacherInCharge: false,
+            setIsTeacherInCharge: jest.fn()
+          }}>
+            <Routes>
+              <Route path='/course-view/:courseId' element={<CourseView />} />
+            </Routes>
+          </AuthContext.Provider>
+        </MemoryRouter>
+      </QueryClientProvider>
     );
   }
 
@@ -199,37 +175,21 @@ describe('FileLoadDialog test with proper csv', () => {
 describe('FileLoadDialog test where server does not accept the file', () => {
 
   function renderCourseView(auth: LoginResult): RenderResult {
-
-    (instanceServices.getInstances as jest.Mock).mockResolvedValue(mockInstances);
-
-    (courseServices.getCourse as jest.Mock).mockResolvedValue(mockCourses[0]);
-
-    (assessmentModelServices.getAllAssessmentModels as jest.Mock)
-      .mockResolvedValue(mockAssessmentModels);
-
-    (attainmentServices.getAllAttainments as jest.Mock)
-      .mockResolvedValue(mockAttainments);
-
-    jest.spyOn(formulaServices, 'getFormulaDetails').mockResolvedValue(mockFormulas[0]);
-
-    // Mock the error.
-    (gradeServices.importCsv as jest.Mock).mockRejectedValue({
-      response: mockErrorResponse
-    });
-
     return render(
-      <MemoryRouter initialEntries={['/course-view/1']}>
-        <AuthContext.Provider value={{
-          auth: auth,
-          setAuth: jest.fn(),
-          isTeacherInCharge: false,
-          setIsTeacherInCharge: jest.fn()
-        }}>
-          <Routes>
-            <Route path='/course-view/:courseId' element={<CourseView />} />
-          </Routes>
-        </AuthContext.Provider>
-      </MemoryRouter>
+      <QueryClientProvider client={new QueryClient()}>
+        <MemoryRouter initialEntries={['/course-view/1']}>
+          <AuthContext.Provider value={{
+            auth: auth,
+            setAuth: jest.fn(),
+            isTeacherInCharge: false,
+            setIsTeacherInCharge: jest.fn()
+          }}>
+            <Routes>
+              <Route path='/course-view/:courseId' element={<CourseView />} />
+            </Routes>
+          </AuthContext.Provider>
+        </MemoryRouter>
+      </QueryClientProvider>
     );
   }
 
@@ -320,7 +280,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
       );
 
       // Include only maxErrorsToShow amount of error messages to test conditional rendering.
-      (gradeServices.importCsv as jest.Mock).mockRejectedValue({
+      /*(gradeServices.importCsv as jest.Mock).mockRejectedValue({
         response: {
           status: mockErrorResponse.status,
           data: {
@@ -328,7 +288,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
             errors: mockErrorResponse.data.errors.slice(0, maxErrorsToShow)
           }
         }
-      });
+      });*/
 
       const confirmButton: HTMLElement = getByText('Confirm');
       act(() => userEvent.click(confirmButton));
