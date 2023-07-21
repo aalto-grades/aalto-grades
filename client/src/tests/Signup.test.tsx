@@ -3,24 +3,32 @@
 // SPDX-License-Identifier: MIT
 
 import { SystemRole } from 'aalto-grades-common/types';
+import { rest } from 'msw';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom/extend-expect';
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import SignupForm from '../components/auth/SignupForm';
 import Signup from '../components/auth/Signup';
 
-describe('Tests for Login component', () => {
+import { mockPostSuccess, server } from './mock-data/server';
 
-  test('Signup should render the SignupForm and contain all of the appropriate components', () => {
+describe('Tests for Signup component', () => {
 
+  function renderSignup(): void {
     render(
-      <BrowserRouter>
-        <Signup />
-      </BrowserRouter>
+      <QueryClientProvider client={new QueryClient()}>
+        <BrowserRouter>
+          <Signup />
+        </BrowserRouter>
+      </QueryClientProvider>
     );
+  }
+
+  test('Signup should render the appropriate components', () => {
+
+    renderSignup();
 
     expect(screen.getByLabelText('Name')).toBeDefined();
     expect(screen.getByLabelText('Password')).toBeDefined();
@@ -31,11 +39,12 @@ describe('Tests for Login component', () => {
 
   });
 
-  test('LoginForm should allow a user to submit their credentials', () => {
+  test('Signup should allow a user to submit their credentials', async () => {
 
-    const mockSignupUser: jest.Mock = jest.fn();
+    renderSignup();
 
-    render(<SignupForm addUser={mockSignupUser}/>);
+    const signUp: jest.Mock = jest.fn();
+    server.use(rest.post('*/v1/auth/signup', mockPostSuccess(signUp, null)));
 
     act(() => userEvent.type(screen.getByLabelText('Name'), 'Test User'));
     act(() => userEvent.type(screen.getByLabelText('Password'), 'secret'));
@@ -45,14 +54,16 @@ describe('Tests for Login component', () => {
 
     // Role "User" should be the default role if no role has been specified.
 
-    expect(mockSignupUser).toHaveBeenCalledTimes(1);
-    expect(mockSignupUser).toHaveBeenCalledWith({
-      name: 'Test User',
-      password: 'secret',
-      email: 'test@email.com',
-      studentNumber: '010101',
-      role: SystemRole.User
-    });
+    await waitFor(() => {
+      expect(signUp).toHaveBeenCalledTimes(1);
+      expect(signUp).toHaveBeenCalledWith({
+        name: 'Test User',
+        password: 'secret',
+        email: 'test@email.com',
+        studentNumber: '010101',
+        role: SystemRole.User
+      });
+    })
   });
 
 });

@@ -13,8 +13,23 @@ import { mockInstances } from './mockInstancesWithStringDates';
 import { mockSisuInstances } from './mockSisuInstances';
 import { mockFormulas } from './mockFormulas';
 
-function success(data: unknown): ResponseResolver<RestRequest, RestContext> {
+function mockSuccess(data: unknown): ResponseResolver<RestRequest, RestContext> {
   return async (_req: RestRequest, res: ResponseComposition, ctx: RestContext) => {
+    return res(
+      ctx.status(200),
+      ctx.json({
+        success: true,
+        data: data
+      })
+    );
+  }
+}
+
+export function mockPostSuccess(
+  func: jest.Mock, data: unknown
+): ResponseResolver<RestRequest, RestContext> {
+  return async (req: RestRequest, res: ResponseComposition, ctx: RestContext) => {
+    func(await req.json());
     return res(
       ctx.status(200),
       ctx.json({
@@ -28,69 +43,69 @@ function success(data: unknown): ResponseResolver<RestRequest, RestContext> {
 export const server: SetupServer = setupServer(
   rest.get(
     '*/v1/courses',
-    success({ courses: mockCourses })
+    mockSuccess({ courses: mockCourses })
   ),
   rest.get(
     '*/v1/courses/:courseId',
-    success({ course: mockCourses[0] })
+    mockSuccess({ course: mockCourses[0] })
   ),
 
   rest.get(
     '*/v1/courses/:courseId/assessment-models',
-    success({ assessmentModels: mockAssessmentModels })
+    mockSuccess({ assessmentModels: mockAssessmentModels })
   ),
   rest.get(
     '*/v1/courses/:courseId/assessment-models:assessmentModelId',
-    success({ assessmentModel: mockAssessmentModels[0] })
+    mockSuccess({ assessmentModel: mockAssessmentModels[0] })
   ),
 
   rest.get(
     '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments',
-    success({ attainment: mockAttainments })
+    mockSuccess({ attainment: mockAttainments })
   ),
   rest.get(
     '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
-    success({ attainment: mockAttainments })
+    mockSuccess({ attainment: mockAttainments })
   ),
 
   rest.get(
     '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades',
-    success({ finalGrades: mockFinalGrades })
+    mockSuccess({ finalGrades: mockFinalGrades })
   ),
   rest.post(
     '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/calculate',
-    success(true)
+    mockSuccess(true)
   ),
 
   rest.get(
     '*/v1/courses/:courseId/instances',
-    success({ courseInstances: mockInstances })
+    mockSuccess({ courseInstances: mockInstances })
   ),
   rest.get(
     '*/v1/courses/:courseId/instances/:courseInstanceId',
-    success({ courseInstance: mockInstances[0] })
+    mockSuccess({ courseInstance: mockInstances[0] })
   ),
 
   rest.get(
     '*/v1/formulas',
-    success({ formulas: mockFormulas })
+    mockSuccess({ formulas: mockFormulas })
   ),
   rest.get(
     '*/v1/formulas/:formulaId',
-    success({ formula: mockFormulas[0] })
+    mockSuccess({ formula: mockFormulas[0] })
   ),
 
   rest.get(
     '*/v1/sisu/courses/:courseCode',
-    success({ courseInstances: mockSisuInstances })
+    mockSuccess({ courseInstances: mockSisuInstances })
   ),
   rest.get(
     '*/v1/sisu/instances/:sisuCourseInstanceId',
-    success({ courseInstance: mockSisuInstances[0] })
+    mockSuccess({ courseInstance: mockSisuInstances[0] })
   ),
 
   rest.get(
     '*/v1/user/:userId/courses',
-    success({ courses: mockCourses })
+    mockSuccess({ courses: mockCourses })
   )
 );
