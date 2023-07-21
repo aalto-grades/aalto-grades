@@ -254,7 +254,7 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
 
   await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
-  // Include students from particular instance (belonging to the assessment model) if ID provided.
+  // Include students from a particular instance if an ID is provided.
   if (instanceId) {
     studentNumbersFiltered = await filterByInstanceAndStudentNumber(
       instanceId, assessmentModel.id, studentNumbersFiltered
