@@ -6,3 +6,6 @@
 robot-tests/output/*
 *.key
 *.crt
+
+# Emacs temporary files
+*.#*
