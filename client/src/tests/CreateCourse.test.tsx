@@ -10,7 +10,7 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import CreateCourseView from '../components/CreateCourseView';
-import { server } from './mock-data/server';
+import { mockPostSuccess, server } from './mock-data/server';
 
 describe('Tests for CreateCourseView components', () => {
 
@@ -54,7 +54,10 @@ describe('Tests for CreateCourseView components', () => {
     renderCreateCourseView();
 
     const addCourse: jest.Mock = jest.fn();
-    server.use(rest.post('*/v1/courses', addCourse));
+    server.use(rest.post(
+      '*/v1/courses',
+      mockPostSuccess(addCourse, { course: { id: 1 } })
+    ));
 
     const testCode: string = 'Test code';
     const testNameEn: string = 'Test name';
