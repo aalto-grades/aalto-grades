@@ -16,6 +16,10 @@ export default class CourseInstance extends Model<
 > {
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
+  // Course instances only have a default assessment model. Teachers may choose
+  // any assessment model when grading, regardless of whether it is the default
+  // model of any instance, but the default model may be of interest to students.
+  // TODO: Rename to defaultAssessmentModelId?
   declare assessmentModelId: CreationOptional<ForeignKey<AssessmentModel['id']>>;
   declare sisuCourseInstanceId: CreationOptional<string>;
   declare gradingScale: string;
