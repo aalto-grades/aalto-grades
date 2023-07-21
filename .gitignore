@@ -7,5 +7,6 @@ robot-tests/output/*
 *.key
 *.crt
 
-# Emacs temporary files
+# Emacs files
+.dir-locals.el
 *.#*
