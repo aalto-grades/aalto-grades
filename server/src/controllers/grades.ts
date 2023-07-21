@@ -163,7 +163,7 @@ async function getFinalGradesFor(
   return finalGrades;
 }
 
-interface instanceWithUsers extends CourseInstance {
+interface InstanceWithUsers extends CourseInstance {
   Users: Array<User>
 }
 
@@ -172,7 +172,7 @@ async function filterByInstanceAndStudentNumber(
   assessmentModelId: number,
   studentNumbersFiltered: Array<string> | undefined
 ): Promise<Array<string> | undefined> {
-  const studentsFromInstance: instanceWithUsers | null = await CourseInstance.findOne({
+  const studentsFromInstance: InstanceWithUsers | null = await CourseInstance.findOne({
     attributes: ['id'],
     where: {
       id: instanceId,
@@ -184,7 +184,7 @@ async function filterByInstanceAndStudentNumber(
         attributes: ['studentNumber']
       }
     ]
-  }) as instanceWithUsers;
+  }) as InstanceWithUsers;
 
   if (studentsFromInstance) {
     const studentNumbersFromInstance: Array<string> =
