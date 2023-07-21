@@ -232,6 +232,111 @@ describe(
         );
       });
 
+    it('should filter CSV grades based on instance ID if URL query included',
+      async () => {
+        res = await request
+          .get(
+            '/v1/courses/8/assessment-models/42/grades/csv/sisu'
+            + '?assessmentDate=2023-12-12&completionLanguage=sv&instanceId=26'
+          )
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'text/csv')
+          .expect(HttpCode.Ok);
+
+        expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+327976,5,5,12.12.2023,sv,
+478988,5,5,12.12.2023,sv,
+139131,5,5,12.12.2023,sv,
+857119,5,5,12.12.2023,sv,
+`);
+        expect(res.headers['content-disposition']).toBe(
+          'attachment; filename="final_grades_course_ELEC-A7100_' +
+        `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
+        );
+      });
+
+    it('should filter CSV grades based on student numbers if URL query included',
+      async () => {
+        res = await request
+          .get(
+            '/v1/courses/8/assessment-models/42/grades/csv/sisu'
+            + '?assessmentDate=2023-12-12&completionLanguage=fi' +
+            '&studentNumbers=["114732","472886","327976","139131"]'
+          )
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'text/csv')
+          .expect(HttpCode.Ok);
+
+        expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+114732,5,5,12.12.2023,fi,
+472886,5,5,12.12.2023,fi,
+327976,5,5,12.12.2023,fi,
+139131,5,5,12.12.2023,fi,
+`);
+        expect(res.headers['content-disposition']).toBe(
+          'attachment; filename="final_grades_course_ELEC-A7100_' +
+        `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
+        );
+      });
+
+    it('should filter CSV grades based on instance ID and student number if URL query included',
+      async () => {
+        res = await request
+          .get(
+            '/v1/courses/8/assessment-models/42/grades/csv/sisu'
+            + '?assessmentDate=2023-12-12&completionLanguage=sv&instanceId=26' +
+            '&studentNumbers=["327976","139131"]'
+          )
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'text/csv')
+          .expect(HttpCode.Ok);
+
+        expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+327976,5,5,12.12.2023,sv,
+139131,5,5,12.12.2023,sv,
+`);
+        expect(res.headers['content-disposition']).toBe(
+          'attachment; filename="final_grades_course_ELEC-A7100_' +
+        `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
+        );
+      });
+
+    it('should return results for all instaces connected to the assessment model if no filters',
+      async () => {
+        res = await request
+          .get(
+            '/v1/courses/8/assessment-models/42/grades/csv/sisu'
+            + '?assessmentDate=2023-12-12&completionLanguage=sv'
+          )
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'text/csv')
+          .expect(HttpCode.Ok);
+
+        expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+117486,5,5,12.12.2023,sv,
+114732,5,5,12.12.2023,sv,
+472886,5,5,12.12.2023,sv,
+335462,5,5,12.12.2023,sv,
+874623,5,5,12.12.2023,sv,
+345752,5,5,12.12.2023,sv,
+353418,5,5,12.12.2023,sv,
+986957,5,5,12.12.2023,sv,
+611238,5,5,12.12.2023,sv,
+691296,5,5,12.12.2023,sv,
+271778,5,5,12.12.2023,sv,
+344644,5,5,12.12.2023,sv,
+954954,5,5,12.12.2023,sv,
+327976,5,5,12.12.2023,sv,
+478988,5,5,12.12.2023,sv,
+139131,5,5,12.12.2023,sv,
+857119,5,5,12.12.2023,sv,
+`);
+        expect(res.headers['content-disposition']).toBe(
+          'attachment; filename="final_grades_course_ELEC-A7100_' +
+        `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
+        );
+      });
+
     it(
       'should respond with 400 bad request, if (optional) completionLanguage param is not valid',
       async () => {
@@ -303,16 +408,18 @@ describe(
       checkErrorRes([`assessment model with ID ${badId} not found`], HttpCode.NotFound);
     });
 
-    it('should respond with 409 conflict, if instance does not belong to the course', async () => {
-      res = await request
-        .get('/v1/courses/1/assessment-models/2/grades/csv/sisu')
-        .set('Cookie', cookies.adminCookie);
+    it(
+      'should respond with 409 conflict, if assessment model does not belong to the course',
+      async () => {
+        res = await request
+          .get('/v1/courses/1/assessment-models/2/grades/csv/sisu')
+          .set('Cookie', cookies.adminCookie);
 
-      checkErrorRes(
-        ['assessment model with ID 2 does not belong to the course with ID 1'],
-        HttpCode.Conflict
-      );
-    });
+        checkErrorRes(
+          ['assessment model with ID 2 does not belong to the course with ID 1'],
+          HttpCode.Conflict
+        );
+      });
 
   });
 
@@ -320,33 +427,35 @@ describe(
   'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades'
   + ' - get final grades in JSON', () => {
 
-    it('should get final grades succesfully when course results are found', async () => {
-      res = await request
-        .get(
-          '/v1/courses/6/assessment-models/24/grades'
+    it(
+      'should get final grades succesfully when course results are found (admin user)',
+      async () => {
+        res = await request
+          .get(
+            '/v1/courses/6/assessment-models/24/grades'
           + `?studentNumbers=${JSON.stringify(studentNumbers)}`
-        )
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
+          )
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
 
-      checkSuccessRes(res);
-      expect(res.body.data.finalGrades).toEqual([
-        { studentNumber: '117486', grade: '1', credits: 5 },
-        { studentNumber: '114732', grade: '5', credits: 5 },
-        { studentNumber: '472886', grade: '3', credits: 5 },
-        { studentNumber: '335462', grade: '1', credits: 5 },
-        { studentNumber: '874623', grade: '2', credits: 5 },
-        { studentNumber: '345752', grade: '1', credits: 5 },
-        { studentNumber: '353418', grade: '4', credits: 5 },
-        { studentNumber: '986957', grade: '0', credits: 5 },
-        { studentNumber: '611238', grade: '4', credits: 5 },
-        { studentNumber: '691296', grade: '1', credits: 5 },
-        { studentNumber: '271778', grade: '0', credits: 5 },
-        { studentNumber: '344644', grade: '1', credits: 5 },
-        { studentNumber: '954954', grade: '5', credits: 5 }
-      ]);
-    });
+        checkSuccessRes(res);
+        expect(res.body.data.finalGrades).toEqual([
+          { studentNumber: '117486', grade: '1', credits: 5 },
+          { studentNumber: '114732', grade: '5', credits: 5 },
+          { studentNumber: '472886', grade: '3', credits: 5 },
+          { studentNumber: '335462', grade: '1', credits: 5 },
+          { studentNumber: '874623', grade: '2', credits: 5 },
+          { studentNumber: '345752', grade: '1', credits: 5 },
+          { studentNumber: '353418', grade: '4', credits: 5 },
+          { studentNumber: '986957', grade: '0', credits: 5 },
+          { studentNumber: '611238', grade: '4', credits: 5 },
+          { studentNumber: '691296', grade: '1', credits: 5 },
+          { studentNumber: '271778', grade: '0', credits: 5 },
+          { studentNumber: '344644', grade: '1', credits: 5 },
+          { studentNumber: '954954', grade: '5', credits: 5 }
+        ]);
+      });
 
     it(
       'should get final grades succesfully when course results are found (teacher in charge)',
@@ -396,7 +505,7 @@ describe(
         ]);
       });
 
-    it('should filter returned grades if URL query included',
+    it('should filter returned grades based on student number if URL query included',
       async () => {
         res = await request
           .get('/v1/courses/8/assessment-models/41/grades' +
@@ -410,6 +519,75 @@ describe(
           { studentNumber: '711199', grade: 'PENDING', credits: 0 },
           { studentNumber: '869364', grade: 'PENDING', credits: 0 },
           { studentNumber: '795451', grade: '0', credits: 5 }
+        ]);
+      });
+
+    it('should filter returned grades based on instance ID if URL query included',
+      async () => {
+        res = await request
+          .get('/v1/courses/8/assessment-models/42/grades?instanceId=26')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
+
+        checkSuccessRes(res);
+        console.log(res.body.data.finalGrades);
+        expect(res.body.data.finalGrades).toEqual([
+          { studentNumber: '327976', grade: '5', credits: 5 },
+          { studentNumber: '478988', grade: '5', credits: 5 },
+          { studentNumber: '139131', grade: '5', credits: 5 },
+          { studentNumber: '857119', grade: '5', credits: 5 }
+        ]);
+      });
+
+    it(
+      'should filter returned grades based on instance ID and student number if URL query included',
+      async () => {
+        res = await request
+          .get('/v1/courses/8/assessment-models/42/grades?instanceId=26' +
+          '&studentNumbers=["327976","139131"]')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
+
+        checkSuccessRes(res);
+        console.log(res.body.data.finalGrades);
+        expect(res.body.data.finalGrades).toEqual([
+          { studentNumber: '327976', grade: '5', credits: 5 },
+          { studentNumber: '139131', grade: '5', credits: 5 },
+        ]);
+      });
+
+    it('should not filter returned grades if no filters included in URL query',
+      async () => {
+        res = await request
+          .get('/v1/courses/8/assessment-models/42/grades')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
+
+        checkSuccessRes(res);
+        expect(res.body.data.finalGrades).toEqual([
+          { studentNumber: '167155', grade: 'PENDING', credits: 0 },
+          { studentNumber: '451288', grade: 'PENDING', credits: 0 },
+          { studentNumber: '658593', grade: 'PENDING', credits: 0 },
+          { studentNumber: '117486', grade: '5', credits: 5 },
+          { studentNumber: '114732', grade: '5', credits: 5 },
+          { studentNumber: '472886', grade: '5', credits: 5 },
+          { studentNumber: '335462', grade: '5', credits: 5 },
+          { studentNumber: '874623', grade: '5', credits: 5 },
+          { studentNumber: '345752', grade: '5', credits: 5 },
+          { studentNumber: '353418', grade: '5', credits: 5 },
+          { studentNumber: '986957', grade: '5', credits: 5 },
+          { studentNumber: '611238', grade: '5', credits: 5 },
+          { studentNumber: '691296', grade: '5', credits: 5 },
+          { studentNumber: '271778', grade: '5', credits: 5 },
+          { studentNumber: '344644', grade: '5', credits: 5 },
+          { studentNumber: '954954', grade: '5', credits: 5 },
+          { studentNumber: '327976', grade: '5', credits: 5 },
+          { studentNumber: '478988', grade: '5', credits: 5 },
+          { studentNumber: '139131', grade: '5', credits: 5 },
+          { studentNumber: '857119', grade: '5', credits: 5 }
         ]);
       });
 
@@ -978,7 +1156,7 @@ describe(
       checkGrade(228, 391, 1.25, cookies.userCookie, false);
     });
 
-    it('should calculate multiple correct grades', async () => {
+    it('should calculate multiple correct grades based on student numbers', async () => {
       checkSuccessRes(await request
         .post('/v1/courses/1/assessment-models/26/grades/calculate')
         .send({
@@ -991,7 +1169,7 @@ describe(
       checkGrade(231, 393, 3.25, cookies.adminCookie);
     });
 
-    it('should calculate correct grades in higher depths', async () => {
+    it('should calculate correct grades in higher depths based on student numbers', async () => {
       checkSuccessRes(await request
         .post('/v1/courses/1/assessment-models/27/grades/calculate')
         .send({
@@ -1011,6 +1189,34 @@ describe(
         .set('Cookie', cookies.adminCookie));
 
       checkGrade(242, 391, 5, cookies.adminCookie, false);
+    });
+
+    it(
+      'should calculate multiple correct grades based on instance ID and student numbers',
+      async () => {
+        checkSuccessRes(await request
+          .post('/v1/courses/8/assessment-models/42/grades/calculate')
+          .send({
+            instanceId: 27,
+            studentNumbers: ['658593', '451288']
+          })
+          .set('Cookie', cookies.adminCookie));
+
+        checkGrade(256, 1241, 5, cookies.adminCookie);
+        checkGrade(256, 1242, 5, cookies.adminCookie);
+      });
+
+    it('should calculate multiple correct grades based on instance ID', async () => {
+      checkSuccessRes(await request
+        .post('/v1/courses/8/assessment-models/42/grades/calculate')
+        .send({
+          instanceId: 27
+        })
+        .set('Cookie', cookies.adminCookie));
+
+      checkGrade(256, 1241, 5, cookies.adminCookie);
+      checkGrade(256, 1242, 5, cookies.adminCookie);
+      checkGrade(256, 1243, 5, cookies.adminCookie);
     });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
@@ -1035,5 +1241,21 @@ describe(
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
     });
+
+    it(
+      'should respond with 404 not found if instance does not have any students assigned',
+      async () => {
+        res = await request
+          .post('/v1/courses/8/assessment-models/42/grades/calculate')
+          .send({
+            instanceId: 28
+          })
+          .set('Cookie', cookies.adminCookie)
+          .expect(HttpCode.NotFound);
+
+        expect(res.body.success).toBe(false);
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors[0]).toBe('No student numbers found from instance ID 28');
+      });
   }
 );

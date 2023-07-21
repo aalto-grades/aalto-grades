@@ -25,7 +25,7 @@ export const sequelize: Sequelize = new Sequelize(
       underscored: true,
       freezeTableName: true
     },
-    logging: (msg: string) => logger.debug(`Sequelize: ${msg}`)
+    logging: (msg: string) => NODE_ENV === 'test' ? undefined : logger.debug(`Sequelize: ${msg}`)
   }
 );
 

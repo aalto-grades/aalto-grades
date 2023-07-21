@@ -120,6 +120,17 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *         example: ['735333', '393518', '925163']
  *         items:
  *           type: string
+ *     instanceIdQuery:
+ *       in: query
+ *       name: instanceId
+ *       schema:
+ *         type: integer
+ *         format: int32
+ *         minimum: 1
+ *       required: false
+ *       example: 1
+ *       description: >
+ *         The ID of the course instance. For filtering results based on course instance ID.
  *   responses:
  *     AuthenticationError:
  *       description: Authentication credentials were missing or JWT expired.

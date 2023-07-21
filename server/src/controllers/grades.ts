@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { AttainmentGradeData, FinalGrade, Formula, Status } from 'aalto-grades-common/types';
 import { parse, Parser } from 'csv-parse';
 import { stringify } from 'csv-stringify';
 import { NextFunction, Request, Response } from 'express';
@@ -13,9 +14,9 @@ import AssessmentModel from '../database/models/assessmentModel';
 import Attainment from '../database/models/attainment';
 import AttainmentGrade from '../database/models/attainmentGrade';
 import Course from '../database/models/course';
+import CourseInstance from '../database/models/courseInstance';
 import User from '../database/models/user';
 
-import { AttainmentGradeData, FinalGrade, Formula, Status } from 'aalto-grades-common/types';
 import { getFormulaImplementation } from '../formulas';
 import {
   ApiError, CalculationResult, FormulaNode,HttpCode, JwtClaims, StudentGrades
@@ -162,6 +163,45 @@ async function getFinalGradesFor(
   return finalGrades;
 }
 
+interface InstanceWithUsers extends CourseInstance {
+  Users: Array<User>
+}
+
+async function filterByInstanceAndStudentNumber(
+  instanceId: number,
+  studentNumbersFiltered: Array<string> | undefined
+): Promise<Array<string> | undefined> {
+  const studentsFromInstance: InstanceWithUsers | null = await CourseInstance.findOne({
+    attributes: ['id'],
+    where: {
+      id: instanceId
+    },
+    include: [
+      {
+        model: User,
+        attributes: ['studentNumber']
+      }
+    ]
+  }) as InstanceWithUsers;
+
+  if (studentsFromInstance) {
+    const studentNumbersFromInstance: Array<string> =
+        studentsFromInstance.Users.map((user: User) => user.studentNumber);
+
+    if (studentNumbersFiltered) {
+      // Intersection of both student numbers from query params and on the course instance.
+      return studentNumbersFiltered.filter(
+        (value: string) => studentNumbersFromInstance.includes(value)
+      );
+    } else {
+      // Only student numbers from instance.
+      return studentNumbersFromInstance;
+    }
+  }
+
+  return studentNumbersFiltered;
+}
+
 /**
  * Get grading data formatted to Sisu compatible format for exporting grades to Sisu.
  * Documentation and requirements for Sisu CSV file structure available at
@@ -189,14 +229,21 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
       .array()
       .json()
       .of(yup.string())
+      .notRequired(),
+    instanceId: yup
+      .number()
+      .min(1)
       .notRequired()
   });
 
-  const { assessmentDate, completionLanguage, studentNumbers }: {
-    assessmentDate: Date | undefined,
-    completionLanguage: string | undefined,
-    studentNumbers: Array<string> | undefined
+  const { assessmentDate, completionLanguage, studentNumbers, instanceId }: {
+    assessmentDate?: Date,
+    completionLanguage?: string,
+    studentNumbers?: Array<string>,
+    instanceId?: number
   } = await urlParams.validate(req.query, { abortEarly: false });
+
+  let studentNumbersFiltered: Array<string> | undefined = studentNumbers;
 
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
@@ -205,8 +252,15 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
 
   await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
-  if (studentNumbers)
-    studentNumbersExist(studentNumbers);
+  // Include students from a particular instance if an ID is provided.
+  if (instanceId) {
+    studentNumbersFiltered = await filterByInstanceAndStudentNumber(
+      instanceId, studentNumbersFiltered
+    );
+  }
+
+  if (studentNumbersFiltered)
+    studentNumbersExist(studentNumbersFiltered);
 
   /**
    * TODO:
@@ -215,7 +269,7 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
    */
 
   const finalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
-    assessmentModel.id, studentNumbers ?? []
+    assessmentModel.id, studentNumbersFiltered ?? []
   );
 
   const courseResults: Array<{
@@ -274,12 +328,19 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
       .array()
       .json()
       .of(yup.string())
+      .notRequired(),
+    instanceId: yup
+      .number()
+      .min(1)
       .notRequired()
   });
 
-  const { studentNumbers }: {
+  const { studentNumbers, instanceId }: {
     studentNumbers?: Array<string>
+    instanceId?: number
   } = await urlParams.validate(req.query, { abortEarly: false });
+
+  let studentNumbersFiltered: Array<string> | undefined = studentNumbers;
 
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
@@ -288,8 +349,15 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
 
   await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
-  if (studentNumbers)
-    studentNumbersExist(studentNumbers);
+  // Include students from particular instance (belonging to the assessment model) if ID provided.
+  if (instanceId) {
+    studentNumbersFiltered = await filterByInstanceAndStudentNumber(
+      instanceId, studentNumbersFiltered
+    );
+  }
+
+  if (studentNumbersFiltered)
+    studentNumbersExist(studentNumbersFiltered);
 
   let finalGrades: Array<FinalGrade> = [];
 
@@ -308,8 +376,14 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   )).map((value: any) => value.student_number);
 
+  if (studentNumbersFiltered && allStudentsFromAssessmentModel.length !== 0) {
+    studentNumbersFiltered = allStudentsFromAssessmentModel.filter(
+      (value: string) => (studentNumbersFiltered as Array<string>).includes(value)
+    );
+  }
+
   const studentsWithFinalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
-    assessmentModel.id, studentNumbers ?? [], allStudentsFromAssessmentModel.length !== 0
+    assessmentModel.id, studentNumbersFiltered ?? [], allStudentsFromAssessmentModel.length !== 0
   );
 
   // Add students with no final grade marked as pending to the results.
@@ -342,9 +416,9 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
     }
   );
 
-  if (studentNumbers) {
+  if (studentNumbersFiltered) {
     finalGrades = finalGrades.filter(
-      (value: FinalGrade) => studentNumbers.includes(value.studentNumber)
+      (value: FinalGrade) => (studentNumbersFiltered as Array<string>).includes(value.studentNumber)
     );
   }
 
@@ -664,26 +738,59 @@ export async function calculateGrades(
   res: Response
 ): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
-    studentNumbers: yup.array().of(yup.string()).required()
-  });
+    studentNumbers: yup
+      .array()
+      .of(yup.string())
+      .notRequired(),
+    instanceId: yup
+      .number()
+      .min(1)
+      .notRequired()
+  }).test(
+    (value: {
+      studentNumbers?: yup.Maybe<Array<string | undefined> | undefined>,
+      instanceId?: yup.Maybe<number | undefined>
+    }) => {
+      if (!value.instanceId && !value.studentNumbers) {
+        throw new ApiError(
+          'You must provide at least one of: instanceId or list of student numbers',
+          HttpCode.BadRequest
+        );
+      }
+      return true;
+    }
+  );
 
-  await requestSchema.validate(req.body, { abortEarly: false });
+  const { studentNumbers, instanceId }: {
+    studentNumbers?: Array<string>
+    instanceId?: number
+  } = await requestSchema.validate(req.body, { abortEarly: false });
+
+  let studentNumbersFiltered: Array<string> | undefined = studentNumbers;
+  const grader: JwtClaims = req.user as JwtClaims;
 
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
     );
 
-  const grader: JwtClaims = req.user as JwtClaims;
-
   await isTeacherInChargeOrAdmin(grader, course.id, HttpCode.Forbidden);
 
-  /*
-   * First ensure that all students to be included in the calculation exist in
-   * the database.
-   */
-  const studentNumbers: Array<string> = req.body.studentNumbers;
-  await studentNumbersExist(studentNumbers);
+  // Include students from particular instance (belonging to the assessment model) if ID provided.
+  if (instanceId) {
+    studentNumbersFiltered = await filterByInstanceAndStudentNumber(
+      instanceId, studentNumbersFiltered
+    );
+  }
+
+  if (studentNumbersFiltered && studentNumbersFiltered.length !== 0) {
+    // Ensure that all students to be included in the calculation exist in the database.
+    studentNumbersExist(studentNumbersFiltered);
+  } else {
+    throw new ApiError(
+      `No student numbers found from instance ID ${instanceId}`, HttpCode.NotFound
+    );
+  }
 
   /*
    * Get all the attainments in this assessment model.
@@ -828,7 +935,7 @@ export async function calculateGrades(
         attributes: [],
         where: {
           studentNumber: {
-            [Op.in]: studentNumbers
+            [Op.in]: studentNumbersFiltered
           }
         }
       }

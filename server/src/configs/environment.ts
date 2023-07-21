@@ -34,7 +34,7 @@ if (JWT_SECRET === 'TOP_SECRET' && NODE_ENV !== 'test') {
       'AALTO_GRADES_JWT_SECRET must be defined for the production environment!'
     );
   } else {
-    logger.error(
+    logger.warn(
       'No AALTO_GRADES_JWT_SECRET specified, using default value. Do not do this in production.'
     );
   }
