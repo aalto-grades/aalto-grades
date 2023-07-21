@@ -12,6 +12,7 @@ import userEvent from '@testing-library/user-event';
 
 import Signup from '../components/auth/Signup';
 
+import AuthContext from '../context/AuthProvider';
 import { mockPostSuccess, server } from './mock-data/server';
 
 describe('Tests for Signup component', () => {
@@ -19,9 +20,16 @@ describe('Tests for Signup component', () => {
   function renderSignup(): void {
     render(
       <QueryClientProvider client={new QueryClient()}>
-        <BrowserRouter>
-          <Signup />
-        </BrowserRouter>
+        <AuthContext.Provider value={{
+          auth: null,
+          setAuth: jest.fn(),
+          isTeacherInCharge: false,
+          setIsTeacherInCharge: jest.fn()
+        }}>
+          <BrowserRouter>
+            <Signup />
+          </BrowserRouter>
+        </AuthContext.Provider>
       </QueryClientProvider>
     );
   }
