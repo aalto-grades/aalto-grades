@@ -749,10 +749,10 @@ export async function calculateGrades(
       .min(1)
       .notRequired()
   }).test(
-    function (value: {
+    (value: {
       studentNumbers?: yup.Maybe<Array<string | undefined> | undefined>,
       instanceId?: yup.Maybe<number | undefined>
-    }) {
+    }) => {
       if (!value.instanceId && !value.studentNumbers) {
         throw new ApiError(
           'You must provide at least one of: instanceId or list of student numbers',
