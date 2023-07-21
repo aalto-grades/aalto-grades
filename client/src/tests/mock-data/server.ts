@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { HttpCode } from 'aalto-grades-common/types';
 import { ResponseComposition, ResponseResolver, rest, RestContext, RestRequest } from 'msw';
 import { setupServer, SetupServer } from 'msw/node';
 
@@ -20,6 +21,20 @@ export function mockSuccess(data: unknown): ResponseResolver<RestRequest, RestCo
       ctx.json({
         success: true,
         data: data
+      })
+    );
+  }
+}
+
+export function mockFailure(
+  errors: Array<string>, status: HttpCode
+): ResponseResolver<RestRequest, RestContext> {
+  return async (_req: RestRequest, res: ResponseComposition, ctx: RestContext) => {
+    return res(
+      ctx.status(status),
+      ctx.json({
+        success: false,
+        errors: errors
       })
     );
   }
@@ -75,6 +90,10 @@ export const server: SetupServer = setupServer(
   rest.post(
     '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/calculate',
     mockSuccess(true)
+  ),
+  rest.post(
+    '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv',
+    mockSuccess({})
   ),
 
   rest.get(
