@@ -74,8 +74,6 @@ export default function CourseView(): JSX.Element {
     }
   }
 
-  console.debug(JSON.stringify(attainmentTree.data));
-
   return (
     <Box sx={{ mx: -2.5 }}>
       {
