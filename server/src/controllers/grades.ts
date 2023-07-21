@@ -169,14 +169,12 @@ interface InstanceWithUsers extends CourseInstance {
 
 async function filterByInstanceAndStudentNumber(
   instanceId: number,
-  assessmentModelId: number,
   studentNumbersFiltered: Array<string> | undefined
 ): Promise<Array<string> | undefined> {
   const studentsFromInstance: InstanceWithUsers | null = await CourseInstance.findOne({
     attributes: ['id'],
     where: {
-      id: instanceId,
-      assessmentModelId
+      id: instanceId
     },
     include: [
       {
@@ -257,7 +255,7 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
   // Include students from a particular instance if an ID is provided.
   if (instanceId) {
     studentNumbersFiltered = await filterByInstanceAndStudentNumber(
-      instanceId, assessmentModel.id, studentNumbersFiltered
+      instanceId, studentNumbersFiltered
     );
   }
 
@@ -354,7 +352,7 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
   // Include students from particular instance (belonging to the assessment model) if ID provided.
   if (instanceId) {
     studentNumbersFiltered = await filterByInstanceAndStudentNumber(
-      instanceId, assessmentModel.id, studentNumbersFiltered
+      instanceId, studentNumbersFiltered
     );
   }
 
@@ -781,7 +779,7 @@ export async function calculateGrades(
   // Include students from particular instance (belonging to the assessment model) if ID provided.
   if (instanceId) {
     studentNumbersFiltered = await filterByInstanceAndStudentNumber(
-      instanceId, assessmentModel.id, studentNumbersFiltered
+      instanceId, studentNumbersFiltered
     );
   }
 
