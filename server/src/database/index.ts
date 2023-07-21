@@ -6,6 +6,7 @@ import { Sequelize } from 'sequelize';
 
 import dbCreds from '../configs/database';
 import { NODE_ENV } from '../configs/environment';
+import logger from '../configs/winston';
 
 export const sequelize: Sequelize = new Sequelize(
   dbCreds.database,
@@ -24,16 +25,16 @@ export const sequelize: Sequelize = new Sequelize(
       underscored: true,
       freezeTableName: true
     },
-    logging: NODE_ENV === 'development' ? console.log : undefined
+    logging: (msg: string) => NODE_ENV === 'test' ? undefined : logger.debug(`Sequelize: ${msg}`)
   }
 );
 
 export async function connectToDatabase(): Promise<void> {
   try {
     await sequelize.authenticate();
-    console.log('database connected');
+    logger.info('database connected');
   } catch (error) {
-    console.log('database connection failed', error);
+    logger.error(`database connection failed: ${error}`);
     throw new Error('database connection failed');
   }
 }

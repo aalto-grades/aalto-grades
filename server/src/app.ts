@@ -9,6 +9,7 @@ import express, { Application, Request } from 'express';
 import { FRONTEND_ORIGIN } from './configs/environment';
 
 import { errorHandler } from './middleware/errorHandler';
+import { requestLogger } from './middleware/requestLogger';
 import { router } from './routes/index';
 import { ApiError } from './types';
 
@@ -16,6 +17,8 @@ import { ApiError } from './types';
 require('./formulas');
 
 export const app: Application = express();
+
+app.use(requestLogger);
 
 app.use(cors({
   origin: FRONTEND_ORIGIN,

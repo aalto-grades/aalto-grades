@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseData, HttpCode } from 'aalto-grades-common/types';
+import { CourseData, HttpCode, SystemRole } from 'aalto-grades-common/types';
 import { Request, Response } from 'express';
 
 import Course from '../database/models/course';
@@ -10,7 +10,7 @@ import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
-import { CourseFull, idSchema } from '../types';
+import { ApiError, CourseFull, idSchema, JwtClaims } from '../types';
 import { parseCourseFull } from './utils/course';
 import { findUserById } from './utils/user';
 
@@ -21,12 +21,14 @@ require('../database/models/courseInstanceRole');
 export async function getCoursesOfUser(req: Request, res: Response): Promise<void> {
   const courses: Array<CourseData> = [];
   const userId: number = Number(req.params.userId);
+  const user: JwtClaims = req.user as JwtClaims;
+
   await idSchema.validate({ id: userId });
 
-  /*
-   * TODO: Check that the requester is authorized to add a course instance, 403
-   * Forbidden if not
-   */
+  // Check user id matches queried and system rights.
+  if (userId !== user.id && user.role !== SystemRole.Admin) {
+    throw new ApiError('cannot access users courses', HttpCode.Forbidden);
+  }
 
   // Confirm that user exists.
   await findUserById(userId, HttpCode.NotFound);
