@@ -18,11 +18,6 @@ import { maxErrorsToShow } from '../components/course-view/FileLoadDialog';
 
 const file: File = new File(['idk'], 'grades_test.csv', { type: 'csv' });
 
-jest.mock('../services/assessmentModels');
-jest.mock('../services/attainments');
-jest.mock('../services/courses');
-jest.mock('../services/instances');
-jest.mock('../services/grades');
 afterEach(cleanup);
 
 const mockErrorResponse: {

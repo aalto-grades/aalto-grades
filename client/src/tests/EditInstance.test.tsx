@@ -9,8 +9,6 @@ import { cleanup, render, RenderResult, screen, waitFor } from '@testing-library
 
 import EditInstanceView from '../components/EditInstanceView';
 
-jest.mock('../services/courses');
-jest.mock('../services/instances');
 afterEach(cleanup);
 
 describe('Tests for EditInstanceView components without Sisu instance', () => {
