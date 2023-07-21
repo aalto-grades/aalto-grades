@@ -13,7 +13,7 @@ import { mockInstances } from './mockInstancesWithStringDates';
 import { mockSisuInstances } from './mockSisuInstances';
 import { mockFormulas } from './mockFormulas';
 
-function success(data: object): ResponseResolver<RestRequest, RestContext> {
+function success(data: unknown): ResponseResolver<RestRequest, RestContext> {
   return async (_req: RestRequest, res: ResponseComposition, ctx: RestContext) => {
     return res(
       ctx.status(200),
@@ -56,6 +56,10 @@ export const server: SetupServer = setupServer(
   rest.get(
     '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades',
     success({ finalGrades: mockFinalGrades })
+  ),
+  rest.post(
+    '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/calculate',
+    success(true)
   ),
 
   rest.get(

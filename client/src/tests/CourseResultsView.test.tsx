@@ -3,26 +3,25 @@
 // SPDX-License-Identifier: MIT
 
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom/extend-expect';
 import { act, render, RenderResult, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import CourseResultsView from '../components/CourseResultsView';
-import { finalGrades } from './mock-data/mockFinalGrades';
-import * as gradeServices from '../services/grades';
 
 describe('Tests for CourseResultsView components', () => {
 
   function renderCourseResultsView(): RenderResult {
-    jest.spyOn(gradeServices, 'getFinalGrades').mockResolvedValue(finalGrades);
-
     return render(
-      <MemoryRouter initialEntries={['/1/course-results/1']}>
-        <Routes>
-          <Route
-            path=':courseId/course-results/:assessmentModelId' element={<CourseResultsView />} />
-        </Routes>
-      </MemoryRouter>
+      <QueryClientProvider client={new QueryClient()}>
+        <MemoryRouter initialEntries={['/1/course-results/1']}>
+          <Routes>
+            <Route
+              path=':courseId/course-results/:assessmentModelId' element={<CourseResultsView />} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>
     );
   }
 
@@ -78,7 +77,7 @@ describe('Tests for CourseResultsView components', () => {
 
       await waitFor( async () => {
         const selectAllCheckBox: HTMLInputElement = screen.getByLabelText('Select all');
-        userEvent.click(selectAllCheckBox);
+        act(() => userEvent.click(selectAllCheckBox));
         expect(selectAllCheckBox).toBeChecked();
 
         const exportGradesMenuButton: HTMLElement = await screen.findByText('Export to Sisu CSV');
@@ -115,7 +114,7 @@ describe('Tests for CourseResultsView components', () => {
 
     await waitFor( async () => {
       const selectAllCheckBox: HTMLInputElement = screen.getByLabelText('Select all');
-      userEvent.click(selectAllCheckBox);
+      act(() => userEvent.click(selectAllCheckBox));
       expect(selectAllCheckBox).toBeChecked();
 
       expect(screen.getByText('12345A')).toBeInTheDocument();
