@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { AttainmentData } from 'aalto-grades-common/types';
+import { rest } from 'msw';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom/extend-expect';
@@ -12,10 +13,7 @@ import userEvent from '@testing-library/user-event';
 import EditAttainmentView from '../components/EditAttainmentView';
 
 import { mockAttainments } from './mock-data/mockAttainments';
-
-const courseId: number = 1;
-const assessmentModelId: number = 1;
-const attainmentId: number = 2;  // Project
+import { mockPostSuccess, mockSuccess, server } from './mock-data/server';
 
 // Not mocking structuredClone leads to errors about it being undefined.
 // Probably related: https://github.com/jsdom/jsdom/issues/3363
@@ -23,28 +21,28 @@ global.structuredClone = <T,>(value: T): T => {
   return JSON.parse(JSON.stringify(value));
 };
 
-function getMockAttainment(): AttainmentData {
-  return structuredClone(
-    // Mock data, can be asserted as non-null safely.
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    mockAttainments.subAttainments!.find(
-      (attainment: AttainmentData) => attainment.id === attainmentId
-    )!
-  );
-}
-
-//editAttainment = jest.fn();
-//addAttainment = jest.fn();
-//deleteAttainment = jest.fn();
+const editAttainment: jest.Mock = jest.fn();
+const addAttainment: jest.Mock = jest.fn();
 afterEach(cleanup);
 
 describe('Tests for EditAttainmentView components', () => {
 
   function renderEditAttainmentView(): RenderResult {
+
+    server.use(rest.post(
+      '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments',
+      mockPostSuccess(addAttainment, { attainment: mockAttainments })
+    ));
+
+    server.use(rest.put(
+      '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
+      mockPostSuccess(editAttainment, { attainment: mockAttainments })
+    ));
+
     return render(
       <QueryClientProvider client={new QueryClient()}>
         <MemoryRouter initialEntries={
-          [`/${courseId}/attainment/edit/${assessmentModelId}/` + attainmentId]
+          ['/1/attainment/edit/1/1']
         }>
           <Routes>
             <Route
@@ -76,13 +74,6 @@ describe('Tests for EditAttainmentView components', () => {
 
     renderEditAttainmentView();
 
-    const mockAttainment: AttainmentData = getMockAttainment();
-    // TODO: Update daysValid as a number in attainment creation. Probably by
-    // adding a number text field to also account for formula attributes.
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    mockAttainment.daysValid = '42';
-
     let daysValidField: HTMLElement;
     await waitFor(async () => {
       daysValidField = screen.getByLabelText('Days Valid');
@@ -94,10 +85,16 @@ describe('Tests for EditAttainmentView components', () => {
     const confirmButton: HTMLElement = screen.getByText('Confirm');
     act(() => userEvent.click(confirmButton));
 
-    /*expect(editAttainment)
-      .toHaveBeenCalledWith(String(courseId), String(assessmentModelId), mockAttainment);
-    expect(addAttainment)
-      .not.toHaveBeenCalledWith(String(courseId), String(assessmentModelId), mockAttainment);*/
+    await waitFor(() => {
+      expect(editAttainment).toHaveBeenCalledTimes(15);
+      expect(editAttainment).toHaveBeenCalledWith({
+        ...mockAttainments,
+        // TODO: Update daysValid as a number in attainment creation. Probably by
+        // adding a number text field to also account for formula attributes.
+        daysValid: '42'
+      });
+      expect(addAttainment).toHaveBeenCalledTimes(0);
+    });
 
   });
 
@@ -107,16 +104,24 @@ describe('Tests for EditAttainmentView components', () => {
 
       renderEditAttainmentView();
 
+      // Mock data, can be asserted as non-null safely.
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const mockAttainment: AttainmentData = mockAttainments.subAttainments![2];
+
+      server.use(
+        rest.get(
+          '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
+          mockSuccess({ attainment: mockAttainment })
+        )
+      );
+
       const newAttainment: AttainmentData = {
         id: -2,
-        parentId: 2,
+        parentId: 3,
         name: '',
         tag: '',
         daysValid: 0,
       };
-
-      const mockAttainment: AttainmentData = getMockAttainment();
-      mockAttainment.subAttainments = [newAttainment];
 
       // Create one sub-attainment:
       await waitFor(() => {
@@ -149,12 +154,15 @@ describe('Tests for EditAttainmentView components', () => {
       // Edit the original attainment and add one sub attainment to it
       act(() => userEvent.click(confirmButtons[0]));
 
-      /*expect(editAttainment)
-        .toHaveBeenCalledWith(String(courseId), String(assessmentModelId), mockAttainment);
-      expect(addAttainment)
-        .toHaveBeenCalledWith(String(courseId), String(assessmentModelId), newAttainment);*/
-
+      await waitFor(() => {
+        expect(editAttainment).toHaveBeenCalledTimes(1);
+        expect(editAttainment).toHaveBeenCalledWith({
+          ...mockAttainment,
+          subAttainments: [newAttainment]
+        });
+        expect(addAttainment).toHaveBeenCalledTimes(1);
+        expect(addAttainment).toHaveBeenCalledWith(newAttainment);
+      });
     }
   );
-
 });

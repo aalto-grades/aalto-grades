@@ -71,7 +71,7 @@ describe('Tests for Signup component', () => {
         studentNumber: '010101',
         role: SystemRole.User
       });
-    })
+    });
   });
 
 });

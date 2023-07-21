@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AssessmentModelData, AttainmentData, CourseInstanceData, LoginResult, SystemRole
+  AssessmentModelData, CourseInstanceData, LoginResult, SystemRole
 } from 'aalto-grades-common/types';
 import { rest } from 'msw';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
@@ -15,7 +15,6 @@ import CourseView from '../components/CourseView';
 
 import AuthContext from '../context/AuthProvider';
 import { mockAssessmentModels } from './mock-data/mockAssessmentModels';
-import { mockAttainments } from './mock-data/mockAttainments';
 import { mockInstances } from './mock-data/mockInstancesWithStringDates';
 import { mockSuccess, server } from './mock-data/server';
 
