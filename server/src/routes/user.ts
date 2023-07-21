@@ -15,7 +15,9 @@ export const router: Router = Router();
  * /v1/user/{userId}/courses:
  *   get:
  *     tags: [User]
- *     description: Get all courses the given user has or is currently participated in.
+ *     description: >
+ *       Get all courses the given user has or is currently participated in.
+ *       User can access only their own course list. Admin can access any users courses.
  *     parameters:
  *       - in: path
  *         name: userId
