@@ -18,10 +18,10 @@ beforeAll(async () => {
   cookies = await getCookies();
 });
 
-describe('Test GET /v1/user/:userId/courses - get all courses user has role in', () => {
-  it('should respond with correct data', async () => {
+async function testLoop(): Promise<void> {
+  for (let i: number = 1; i < 20; i++) {
     const res: supertest.Response = await request
-      .get('/v1/user/1/courses')
+      .get(`/v1/user/${i}/courses`)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
@@ -40,6 +40,51 @@ describe('Test GET /v1/user/:userId/courses - get all courses user has role in',
     expect(res.body.data.courses[0].teachersInCharge).toBeDefined();
     expect(res.body.data.courses[0].teachersInCharge[0].id).toBeDefined();
     expect(res.body.data.courses[0].teachersInCharge[0].name).toBeDefined();
+  }
+}
+
+describe('Test GET /v1/user/:userId/courses - get all courses user has role in', () => {
+
+  it('should respond with correct data of any user when admin user', async () => {
+    await testLoop();
+  });
+
+  it('should respond with correct data when user querying their own courses', async () => {
+    // Check for user.
+    let res: supertest.Response = await request
+      .get('/v1/auth/self-info')
+      .set('Cookie', cookies.userCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    res = await request
+      .get(`/v1/user/${res.body.data.id}/courses`)
+      .set('Cookie', cookies.userCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    expect(res.body.success).toBe(true);
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data).toBeDefined();
+    expect(res.body.data.courses).toBeDefined();
+
+    // Check for admin.
+    res = await request
+      .get('/v1/auth/self-info')
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    res = await request
+      .get(`/v1/user/${res.body.data.id}/courses`)
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    expect(res.body.success).toBe(true);
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data).toBeDefined();
+    expect(res.body.data.courses).toBeDefined();
   });
 
   it('should contain courses the user is in charge of', async () => {
@@ -105,6 +150,20 @@ describe('Test GET /v1/user/:userId/courses - get all courses user has role in',
       .set('Accept', 'application/json')
       .expect(HttpCode.Unauthorized);
   });
+
+  it(
+    'should respond with 403 forbidden, if trying to access other users courses (not admin)',
+    async () => {
+      const res: supertest.Response = await request
+        .get('/v1/user/1/courses')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Forbidden);
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.errors[0]).toBe('cannot access users courses');
+      expect(res.body.data).not.toBeDefined();
+    });
 
   it('should respond with 404 not found, if non-existing user id', async () => {
     const res: supertest.Response = await request
