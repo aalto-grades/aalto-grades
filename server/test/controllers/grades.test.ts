@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { HttpCode } from 'aalto-grades-common/types';
 import * as fs from 'fs';
 import path from 'path';
 import { Op } from 'sequelize';
@@ -13,7 +14,6 @@ import User from '../../src/database/models/user';
 
 import { mockTeacher } from '../mock-data/misc';
 import { app } from '../../src/app';
-import { HttpCode } from '../../src/types';
 import { getCookies, Cookies } from '../util/getCookies';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);

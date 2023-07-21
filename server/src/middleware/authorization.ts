@@ -2,10 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { HttpCode, SystemRole } from 'aalto-grades-common/types';
 import { NextFunction, Request, Response } from 'express';
 
-import { SystemRole } from 'aalto-grades-common/types';
-import { JwtClaims, HttpCode } from '../types';
+import { JwtClaims } from '../types';
 
 export function authorization(
   allowedRoles: Array<SystemRole>

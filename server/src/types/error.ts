@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpCode } from '../types';
+import { HttpCode } from 'aalto-grades-common/types';
 
 /**
  * ApiError class represents a custom API related error, extends the native Error class. Includes

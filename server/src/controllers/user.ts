@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { CourseData, HttpCode } from 'aalto-grades-common/types';
 import { Request, Response } from 'express';
 
 import Course from '../database/models/course';
@@ -9,8 +10,7 @@ import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
-import { CourseData } from 'aalto-grades-common/types';
-import { CourseFull, HttpCode, idSchema } from '../types';
+import { CourseFull, idSchema } from '../types';
 import { parseCourseFull } from './utils/course';
 import { findUserById } from './utils/user';
 
