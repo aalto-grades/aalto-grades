@@ -13,7 +13,7 @@ import { mockInstances } from './mockInstancesWithStringDates';
 import { mockSisuInstances } from './mockSisuInstances';
 import { mockFormulas } from './mockFormulas';
 
-function mockSuccess(data: unknown): ResponseResolver<RestRequest, RestContext> {
+export function mockSuccess(data: unknown): ResponseResolver<RestRequest, RestContext> {
   return async (_req: RestRequest, res: ResponseComposition, ctx: RestContext) => {
     return res(
       ctx.status(200),

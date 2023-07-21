@@ -74,6 +74,8 @@ export default function CourseView(): JSX.Element {
     }
   }
 
+  console.debug(JSON.stringify(attainmentTree.data));
+
   return (
     <Box sx={{ mx: -2.5 }}>
       {
@@ -111,7 +113,7 @@ export default function CourseView(): JSX.Element {
               /* a different attainment component will be created for students */
               (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
               <div style={{ width: '100%' }}>
-                {(attainmentTree.data) ?
+                {(attainmentTree.data) ? (
                   <Grow
                     in={animation}
                     style={{ transformOrigin: '0 0 0' }}
@@ -129,8 +131,9 @@ export default function CourseView(): JSX.Element {
                       }
                     </div>
                   </Grow>
-                  :
-                  attainmentTree === null ?
+                ) : (
+                  (attainmentTree.isLoading) &&
+                  <div>
                     <Box sx={{
                       margin: 'auto',
                       alignItems: 'center',
@@ -139,24 +142,11 @@ export default function CourseView(): JSX.Element {
                       mt: 25,
                       mb: 5
                     }}>
-                      No attainments found, please select at least one assessment model or
-                      create a new one.
+                      <CircularProgress />
                     </Box>
-                    :
-                    <div>
-                      <Box sx={{
-                        margin: 'auto',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        display: 'flex',
-                        mt: 25,
-                        mb: 5
-                      }}>
-                        <CircularProgress />
-                      </Box>
-                      Loading attainments...
-                    </div>
-                }
+                    Loading attainments...
+                  </div>
+                )}
               </div>
             }
           </Box>
