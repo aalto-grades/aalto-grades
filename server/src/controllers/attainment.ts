@@ -49,7 +49,7 @@ async function validateFormulaParams(
       // Ensure that all subattainments are included in children and that there
       // are no invalid subattainment tags in children
       const paramTags: Array<string> =
-        (formulaParams as ParamsObject<unknown>).children.map(
+        (formulaParams as ParamsObject).children.map(
           (value: [string, unknown]) => value[0]
         );
 
@@ -411,6 +411,37 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
       }
     })).map((attainment: Attainment): string => attainment.tag)
   );
+
+  if (parentId || (tag && tag !== attainment.tag)) {
+    if (attainment.parentId) {
+      const parent: Attainment = await findAttainmentById(
+        attainment.parentId, HttpCode.InternalServerError
+      );
+
+      const parentParams: ParamsObject = parent.formulaParams as ParamsObject;
+
+      for (const i in parentParams.children) {
+        if (parentParams.children[i][0] === attainment.tag) {
+          // Client is responsible for updating the params of a new parent attainment
+          if (parentId)
+            parentParams.children.splice(Number(i), 1);
+          else if (tag && tag !== attainment.tag)
+            parentParams.children[i][0] = tag;
+
+          break;
+        }
+      }
+
+      parent.set({
+        name: parent.name,
+        tag: parent.tag,
+        daysValid: parent.daysValid,
+        parentId: parent.parentId,
+        formula: parent.formula,
+        formulaParams: parentParams
+      });
+    }
+  }
 
   await attainment.set({
     name: name ?? attainment.name,
