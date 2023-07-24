@@ -75,7 +75,7 @@ async function validateFormulaParams(
         throw new ApiError(
           `invalid subattainment tags in formula params: ${paramTags}`,
           HttpCode.BadRequest
-        )
+        );
       }
     }
   }
