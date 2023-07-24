@@ -42,7 +42,10 @@ export async function findAttainmentsByAssessmentModel(
   const attainments: Array<Attainment> = await Attainment.findAll({
     where: {
       assessmentModelId: assessmentModelId
-    }
+    },
+    order: [
+      ['id', 'ASC']
+    ]
   });
 
   if (attainments.length === 0) {
