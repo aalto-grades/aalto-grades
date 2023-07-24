@@ -896,6 +896,22 @@ describe(
       expect(res.body.data.attainment.parentId).toBe(subAttainments[1].id);
     });
 
+    it(
+      'should update the formula params of a potential parent attainment with'
+      + ' a new attainment tag if it is changed in a child',
+      async () => {
+        // TODO
+      }
+    );
+
+    it(
+      'should remove an attainment tag from the formula params of a potential'
+      + ' parent attainment if the parent ID of a child is changed',
+      async () => {
+        // TODO
+      }
+    );
+
     it('should respond with 400 bad request, if validation fails (non-number assessment model id)',
       async () => {
         const res: supertest.Response = await request
