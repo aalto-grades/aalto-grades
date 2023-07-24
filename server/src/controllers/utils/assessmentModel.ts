@@ -2,11 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { HttpCode } from 'aalto-grades-common/types';
+
 import AssessmentModel from '../../database/models/assessmentModel';
 import Course from '../../database/models/course';
 
 import { findCourseById } from './course';
-import { ApiError, HttpCode, idSchema } from '../../types';
+import { ApiError, idSchema } from '../../types';
 
 export async function findAssessmentModelById(
   assessmentModelId: number, errorCode: HttpCode

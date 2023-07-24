@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AssessmentModelData, AttainmentData, CourseData, Formula, FormulaData,
-  SystemRole, UserData
+  AssessmentModelData, AttainmentData, CourseData, SystemRole, UserData
 } from 'aalto-grades-common/types';
 import { Box, Button, CircularProgress, Grow, Typography } from '@mui/material';
 import { JSX, useState, useEffect } from 'react';
 import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
+import { UseQueryResult } from '@tanstack/react-query';
 
 import Attainments from './course-view/Attainments';
 import CreateAssessmentModelDialog from './course-view/CreateAssessmentModelDialog';
@@ -16,11 +16,10 @@ import CourseDetails from './course-view/CourseDetails';
 import FileLoadDialog from './course-view/FileLoadDialog';
 import InstancesTable from './course-view/InstancesTable';
 
+import {
+  useGetAllAssessmentModels, useGetCourse, useGetRootAttainment
+} from '../hooks/useApi';
 import useAuth, { AuthContextType } from '../hooks/useAuth';
-import { getCourse } from '../services/courses';
-import { getFormulaDetails } from '../services/formulas';
-import { getAllAssessmentModels } from '../services/assessmentModels';
-import { getAllAttainments,  } from '../services/attainments';
 import { State } from '../types';
 
 export default function CourseView(): JSX.Element {
@@ -28,126 +27,64 @@ export default function CourseView(): JSX.Element {
   const { courseId }: Params = useParams();
   const { auth, isTeacherInCharge, setIsTeacherInCharge }: AuthContextType = useAuth();
 
-  const [course, setCourse]: State<CourseData | null> =
-    useState<CourseData | null>(null);
-
-  const [currentAssessmentModel, setCurrentAssessmentModel]: State<AssessmentModelData | null> =
-    useState<AssessmentModelData | null>(null);
-  const [assessmentModels, setAssessmentModels]: State<Array<AssessmentModelData>> =
-    useState<Array<AssessmentModelData>>([]);
-
-  /**
-   * Tree set to undefined when fetching the data from API, display loading.
-   * If no assessment models exists, set to null to display "no attainments" message,
-   * otherwise render attainmentTree.
-   */
-  const [attainmentTree, setAttainmentTree]: State<AttainmentData | null | undefined> =
-    useState<AttainmentData | null | undefined>(undefined);
-  const [rootFormula, setRootFormula]: State<FormulaData | null> =
-    useState<FormulaData | null>(null);
-
   const [animation, setAnimation]: State<boolean> = useState(false);
   const [fileLoadOpen, setFileLoadOpen]: State<boolean> = useState(false);
   const [createAssessmentModelOpen, setCreateAssessmentModelOpen]: State<boolean> = useState(false);
 
+  if (!courseId)
+    return (<></>);
+
+  const course: UseQueryResult<CourseData> = useGetCourse(courseId);
+
+  if (auth && course.data) {
+    const teacherInCharge: Array<UserData> = course.data.teachersInCharge.filter(
+      (teacher: UserData) => teacher.id == auth.id
+    );
+    setIsTeacherInCharge(teacherInCharge.length != 0);
+  }
+
+  const assessmentModels: UseQueryResult<Array<AssessmentModelData>> =
+    useGetAllAssessmentModels(courseId);
+
+  const [currentAssessmentModel, setCurrentAssessmentModel]: State<AssessmentModelData | null> =
+    useState<AssessmentModelData | null>(null);
+
   useEffect(() => {
-    if (courseId) {
-      getCourse(courseId)
-        .then((course: CourseData) => {
-          setCourse(course);
+    if (assessmentModels.data && assessmentModels.data.length > 0)
+      setCurrentAssessmentModel(assessmentModels.data[0]);
+    else
+      setCurrentAssessmentModel(null);
+  }, [assessmentModels.data]);
 
-          if (auth) {
-            const teacherInCharge: Array<UserData> = course.teachersInCharge.filter(
-              (teacher: UserData) => teacher.id == auth.id
-            );
-            setIsTeacherInCharge(teacherInCharge.length != 0);
-          }
-        })
-        .catch((e: Error) => console.log(e.message));
-
-      getAllAssessmentModels(courseId)
-        .then((assessmentModels: Array<AssessmentModelData>) => {
-          setAssessmentModels(assessmentModels);
-
-          /**
-           * Newly created courses do not have assessment models assigned.
-           * Set tree to null so proper message can be displayed.
-           */
-          if (assessmentModels.length === 0) {
-            setAttainmentTree(null);
-          } else {
-            setCurrentAssessmentModel(assessmentModels[0]);
-
-            if (assessmentModels[0].id) {
-              getAllAttainments(courseId, assessmentModels[0].id)
-                .then((attainmentTree: AttainmentData) => {
-                  setAttainmentTree(attainmentTree);
-
-                  getFormulaDetails(attainmentTree.formula ?? Formula.Manual)
-                    .then((formula: FormulaData) => setRootFormula(formula))
-                    .catch((e: Error) => console.log(e.message));
-                })
-                .catch((e: Error) => console.log(e.message));
-            }
-          }
-        })
-        .catch((e: Error) => console.log(e.message));
-    }
-  }, []);
+  const attainmentTree: UseQueryResult<AttainmentData> = useGetRootAttainment(
+    courseId,
+    currentAssessmentModel?.id ?? -1,
+    'descendants',
+    { enabled: Boolean(currentAssessmentModel && currentAssessmentModel.id) }
+  );
 
   useEffect(() => {
     setAnimation(true);
   }, [currentAssessmentModel]);
 
   function onChangeAssessmentModel(assessmentModel: AssessmentModelData): void {
-    if (courseId && assessmentModel.id && assessmentModel.id !== currentAssessmentModel?.id) {
+    if (assessmentModel.id && assessmentModel.id !== currentAssessmentModel?.id) {
       setAnimation(false);
-      setAttainmentTree(undefined);
       setCurrentAssessmentModel(assessmentModel);
-
-      getAllAttainments(courseId, assessmentModel.id)
-        .then((attainmentTree: AttainmentData) => {
-          setAttainmentTree(attainmentTree);
-        })
-        .catch((e: Error) => console.log(e.message));
-    }
-  }
-
-  function onCreateAssessmentModel(): void {
-    if (courseId) {
-      getAllAssessmentModels(courseId)
-        .then((assessmentModels: Array<AssessmentModelData>) => {
-          setAssessmentModels(assessmentModels);
-        })
-        .catch((e: Error) => console.log(e.message));
-    }
-  }
-
-  function onChangeFormula(): void {
-    if (courseId && currentAssessmentModel?.id) {
-      getAllAttainments(courseId, currentAssessmentModel?.id)
-        .then((attainmentTree: AttainmentData) => {
-          setAttainmentTree(attainmentTree);
-
-          getFormulaDetails(attainmentTree.formula ?? Formula.Manual)
-            .then((formula: FormulaData) => setRootFormula(formula))
-            .catch((e: Error) => console.log(e.message));
-        })
-        .catch((e: Error) => console.log(e.message));
     }
   }
 
   return (
     <Box sx={{ mx: -2.5 }}>
       {
-        course &&
+        (course.data) &&
         <>
-          <Typography variant='h1' align='left'>{course.courseCode}</Typography>
+          <Typography variant='h1' align='left'>{course.data.courseCode}</Typography>
           <Box sx={{
             display: 'flex', flexWrap: 'wrap',
             justifyContent: 'space-between', mb: 4, columnGap: 6
           }}>
-            <Typography variant='h2' align='left'>{course.name.en}</Typography>
+            <Typography variant='h2' align='left'>{course.data.name.en}</Typography>
             {
               /* Only admins and teachers in charge are allowed to create assessment models */
               (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
@@ -164,8 +101,8 @@ export default function CourseView(): JSX.Element {
           <Box sx={{ display: 'flex', gap: 3 }}>
             <div>
               <CourseDetails
-                course={course}
-                assessmentModels={assessmentModels}
+                course={course.data}
+                assessmentModels={assessmentModels.data}
                 currentAssessmentModelId={currentAssessmentModel?.id}
                 onChangeAssessmentModel={onChangeAssessmentModel}
               />
@@ -174,7 +111,7 @@ export default function CourseView(): JSX.Element {
               /* a different attainment component will be created for students */
               (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
               <div style={{ width: '100%' }}>
-                {(attainmentTree && rootFormula) ?
+                {(attainmentTree.data) ? (
                   <Grow
                     in={animation}
                     style={{ transformOrigin: '0 0 0' }}
@@ -182,20 +119,19 @@ export default function CourseView(): JSX.Element {
                   >
                     <div style={{ width: '100%' }}>
                       {
-                        (courseId && currentAssessmentModel) &&
+                        (currentAssessmentModel) &&
                         <Attainments
-                          attainmentTree={attainmentTree}
+                          attainmentTree={attainmentTree.data}
                           courseId={Number(courseId)}
-                          formulaName={rootFormula.name}
                           assessmentModel={currentAssessmentModel}
                           handleAddPoints={(): void => setFileLoadOpen(true)}
-                          onChangeFormula={onChangeFormula}
                         />
                       }
                     </div>
                   </Grow>
-                  :
-                  attainmentTree === null ?
+                ) : (
+                  (attainmentTree.isLoading) &&
+                  <div>
                     <Box sx={{
                       margin: 'auto',
                       alignItems: 'center',
@@ -204,24 +140,11 @@ export default function CourseView(): JSX.Element {
                       mt: 25,
                       mb: 5
                     }}>
-                      No attainments found, please select at least one assessment model or
-                      create a new one.
+                      <CircularProgress />
                     </Box>
-                    :
-                    <div>
-                      <Box sx={{
-                        margin: 'auto',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        display: 'flex',
-                        mt: 25,
-                        mb: 5
-                      }}>
-                        <CircularProgress />
-                      </Box>
-                      Loading attainments...
-                    </div>
-                }
+                    Loading attainments...
+                  </div>
+                )}
               </div>
             }
           </Box>
@@ -241,17 +164,14 @@ export default function CourseView(): JSX.Element {
                 variant='contained'
                 sx={{ mt: 6, mb: 3 }}
                 onClick={(): void => {
-                  navigate(`/${courseId}/fetch-instances/${course.courseCode}`);
+                  navigate(`/${courseId}/fetch-instances/${course.data.courseCode}`);
                 }}
               >
                 New instance
               </Button>
             }
           </Box>
-          {
-            courseId &&
-            <InstancesTable courseId={courseId} />
-          }
+          <InstancesTable courseId={courseId} />
           {
             currentAssessmentModel != null &&
             <FileLoadDialog
@@ -263,7 +183,7 @@ export default function CourseView(): JSX.Element {
           <CreateAssessmentModelDialog
             open={createAssessmentModelOpen}
             handleClose={(): void => setCreateAssessmentModelOpen(false)}
-            onSubmit={onCreateAssessmentModel}
+            onSubmit={assessmentModels.refetch}
           />
         </>
       }

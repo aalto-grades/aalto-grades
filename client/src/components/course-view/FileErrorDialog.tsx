@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 import { Button, Dialog, DialogActions, DialogContent } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import PropTypes from 'prop-types';
 
-const gridColumns = [{
+const gridColumns: Array<GridColDef> = [{
   field: 'error',
   headerName: 'Error description',
   type: 'string',
@@ -28,7 +28,7 @@ export default function FileErrorDialog(props: {
     >
       <DialogContent dividers={true}>
         <DataGrid
-          rows={props.errors.map(error => ({
+          rows={props.errors.map((error: string) => ({
             id: error,
             error
           }))}

@@ -2,28 +2,35 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { rest } from 'msw';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom/extend-expect';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import CreateCourseView from '../components/CreateCourseView';
-import CreateCourseForm from '../components/create-course-view/CreateCourseForm';
+import { mockPostSuccess, server } from './mock-data/server';
 
 describe('Tests for CreateCourseView components', () => {
 
-  test(
-    'CreateCourseView should render the CreateCourseForm and contain'
-    + ' all of the appropriate components',
-    () => {
-
-      render(
+  function renderCreateCourseView(): void {
+    render(
+      <QueryClientProvider client={new QueryClient()}>
         <MemoryRouter initialEntries={['/create-course']}>
           <Routes>
             <Route path='/create-course' element={<CreateCourseView />} />
           </Routes>
         </MemoryRouter>
-      );
+      </QueryClientProvider>
+    );
+  }
+
+  test(
+    'CreateCourseView should render all of the appropriate components',
+    () => {
+
+      renderCreateCourseView();
 
       expect(screen.getByText('Create a New Course')).toBeDefined();
       expect(screen.getByLabelText('Course Code*')).toBeDefined();
@@ -44,7 +51,13 @@ describe('Tests for CreateCourseView components', () => {
 
   test('CreateCourseForm should allow an admin to create a course', async () => {
 
-    const mockCourse: jest.Mock = jest.fn();
+    renderCreateCourseView();
+
+    const addCourse: jest.Mock = jest.fn();
+    server.use(rest.post(
+      '*/v1/courses',
+      mockPostSuccess(addCourse, { course: { id: 1 } })
+    ));
 
     const testCode: string = 'Test code';
     const testNameEn: string = 'Test name';
@@ -55,44 +68,23 @@ describe('Tests for CreateCourseView components', () => {
     const testDepartmentSv: string = 'samma på svenska';
     const testTeacher: string = 'Elon.Musk@twitter.com';
 
-    render(
-      <MemoryRouter initialEntries={['/create-course']}>
-        <Routes>
-          <Route path='/create-course' element={<CreateCourseForm addCourse={mockCourse} />} />
-        </Routes>
-      </MemoryRouter>
-    );
+    act(() => userEvent.type(screen.getByLabelText('Course Code*'), testCode));
+    act(() => userEvent.type(screen.getByLabelText('Course Name in English*'), testNameEn));
+    act(() => userEvent.type(screen.getByLabelText('Course Name in Finnish*'), testNameFi));
+    act(() => userEvent.type(screen.getByLabelText('Course Name in Swedish*'), testNameSv));
+    act(() => userEvent.type(screen.getByLabelText('Organizer in English*'), testDepartmentEn));
+    act(() => userEvent.type(screen.getByLabelText('Organizer in Finnish*'), testDepartmentFi));
+    act(() => userEvent.type(screen.getByLabelText('Organizer in Swedish*'), testDepartmentSv));
+    act(() => userEvent.type(screen.getByLabelText('Minimum Course Credits (ECTS)*'), '3'));
+    act(() => userEvent.type(screen.getByLabelText('Maximum Course Credits (ECTS)*'), '5'));
+    act(() => userEvent.type(screen.getByLabelText('Teachers In Charge*'), testTeacher));
 
-    const codeField: HTMLElement = screen.getByLabelText('Course Code*');
-    const nameFieldEn: HTMLElement = screen.getByLabelText('Course Name in English*');
-    const nameFieldFi: HTMLElement = screen.getByLabelText('Course Name in Finnish*');
-    const nameFieldSv: HTMLElement = screen.getByLabelText('Course Name in Swedish*');
-    const organizerFieldEn: HTMLElement = screen.getByLabelText('Organizer in English*');
-    const organizerFieldFi: HTMLElement = screen.getByLabelText('Organizer in Finnish*');
-    const organizerFieldSv: HTMLElement = screen.getByLabelText('Organizer in Swedish*');
-    const credsMin: HTMLElement = screen.getByLabelText('Minimum Course Credits (ECTS)*');
-    const credsMax: HTMLElement = screen.getByLabelText('Maximum Course Credits (ECTS)*');
-    const teachers: HTMLElement = screen.getByLabelText('Teachers In Charge*');
-    const addTeacherButton: HTMLElement = screen.getByText('Add');
-    const creationButton: HTMLElement = screen.getByText('Create Course');
-
-    act(() => userEvent.type(codeField, testCode));
-    act(() => userEvent.type(nameFieldEn, testNameEn));
-    act(() => userEvent.type(nameFieldFi, testNameFi));
-    act(() => userEvent.type(nameFieldSv, testNameSv));
-    act(() => userEvent.type(organizerFieldEn, testDepartmentEn));
-    act(() => userEvent.type(organizerFieldFi, testDepartmentFi));
-    act(() => userEvent.type(organizerFieldSv, testDepartmentSv));
-    act(() => userEvent.type(credsMin, '3'));
-    act(() => userEvent.type(credsMax, '5'));
-    act(() => userEvent.type(teachers, testTeacher));
-
-    act(() => userEvent.click(addTeacherButton));
-    act(() => userEvent.click(creationButton));
+    act(() => userEvent.click(screen.getByText('Add')));
+    act(() => userEvent.click(screen.getByText('Create Course')));
 
     await waitFor(() => {
-      expect(mockCourse).toHaveBeenCalledTimes(1);
-      expect(mockCourse).toHaveBeenCalledWith({
+      expect(addCourse).toHaveBeenCalledTimes(1);
+      expect(addCourse).toHaveBeenCalledWith({
         courseCode: testCode,
         minCredits: 3,
         maxCredits: 5,

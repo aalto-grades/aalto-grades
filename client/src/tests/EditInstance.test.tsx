@@ -3,33 +3,25 @@
 // SPDX-License-Identifier: MIT
 
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom/extend-expect';
 import { cleanup, render, RenderResult, screen, waitFor } from '@testing-library/react';
 
 import EditInstanceView from '../components/EditInstanceView';
 
-import { mockCourses } from './mock-data/mockCourses';
-import { mockSisuInstances } from './mock-data/mockSisuInstances';
-import { getCourse } from '../services/courses';
-import { getSisuInstance } from '../services/instances';
-
-jest.mock('../services/courses');
-jest.mock('../services/instances');
 afterEach(cleanup);
 
 describe('Tests for EditInstanceView components without Sisu instance', () => {
 
   function renderEditInstanceView(): RenderResult {
-
-    (getCourse as jest.Mock).mockRejectedValue('Network error');
-    (getCourse as jest.Mock).mockResolvedValue(mockCourses[0]);
-
     return render(
-      <MemoryRouter initialEntries={['/A-12345/edit-instance']}>
-        <Routes>
-          <Route path=':courseId/edit-instance' element={<EditInstanceView />} />
-        </Routes>
-      </MemoryRouter>
+      <QueryClientProvider client={new QueryClient()}>
+        <MemoryRouter initialEntries={['/A-12345/edit-instance']}>
+          <Routes>
+            <Route path=':courseId/edit-instance' element={<EditInstanceView />} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>
     );
   }
 
@@ -58,16 +50,14 @@ describe('Tests for EditInstanceView components without Sisu instance', () => {
 describe('Tests for EditInstanceView components with Sisu instance', () => {
 
   function renderEditInstanceView(): RenderResult {
-
-    (getSisuInstance as jest.Mock).mockRejectedValue('Network error');
-    (getSisuInstance as jest.Mock).mockResolvedValue(mockSisuInstances[0]);
-
     return render(
-      <MemoryRouter initialEntries={['/A-12345/edit-instance/test']}>
-        <Routes>
-          <Route path=':courseId/edit-instance/:sisuInstanceId' element={<EditInstanceView />} />
-        </Routes>
-      </MemoryRouter>
+      <QueryClientProvider client={new QueryClient()}>
+        <MemoryRouter initialEntries={['/A-12345/edit-instance/test']}>
+          <Routes>
+            <Route path=':courseId/edit-instance/:sisuInstanceId' element={<EditInstanceView />} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>
     );
   }
 

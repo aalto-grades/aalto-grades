@@ -7,31 +7,25 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { Button, Box, Menu, MenuItem } from '@mui/material';
 import { SyntheticEvent, useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import { UseMutationResult } from '@tanstack/react-query';
 
+import { useLogOut } from '../../hooks/useApi';
 import useAuth, { AuthContextType } from '../../hooks/useAuth';
-import useLogout from '../../hooks/useLogout';
 import { State } from '../../types';
 
 export default function UserButton(): JSX.Element {
-  const logout: () => Promise<void> = useLogout();
+
   const navigate: NavigateFunction = useNavigate();
-  const { auth }: AuthContextType = useAuth();
+  const { auth, setAuth }: AuthContextType = useAuth();
   const [anchorEl, setAnchorEl]: State<Element | null> = useState<Element | null>(null);
   const open: boolean = Boolean(anchorEl);
 
-  // temporary function for logging out, will be moved to a seperate file once toolbar is refined
-  async function signOut(): Promise<void> {
-    await logout();
-    navigate('/login', { replace: true });
-  }
-
-  function handleClick(event: SyntheticEvent): void {
-    setAnchorEl(event.currentTarget);
-  }
-
-  function handleClose(): void {
-    setAnchorEl(null);
-  }
+  const logOut: UseMutationResult = useLogOut({
+    onSuccess: () => {
+      setAuth(null);
+      navigate('/login', { replace: true });
+    }
+  });
 
   if (!auth?.name) {
     return (<div data-testid="not-logged-in"></div>);
@@ -45,7 +39,7 @@ export default function UserButton(): JSX.Element {
         aria-controls={open ? 'basic-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
-        onClick={handleClick}
+        onClick={(event: SyntheticEvent): void => setAnchorEl(event.currentTarget)}
       >
         <Box sx={{ marginRight: 1, marginTop: 1 }}>
           <PersonIcon color="inherit" />
@@ -57,12 +51,16 @@ export default function UserButton(): JSX.Element {
         id="basic-menu"
         anchorEl={anchorEl}
         open={open}
-        onClose={handleClose}
+        onClose={(): void => setAnchorEl(null)}
         MenuListProps={{
           'aria-labelledby': 'basic-button',
         }}
       >
-        <MenuItem onClick={signOut}>Logout</MenuItem>
+        <MenuItem
+          onClick={(): void => logOut.mutate(null)}
+        >
+          Logout
+        </MenuItem>
       </Menu>
     </>
   );

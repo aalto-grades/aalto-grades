@@ -7,11 +7,12 @@
 
 import { LoginResult, SystemRole } from 'aalto-grades-common/types';
 import PropTypes from 'prop-types';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
+import { UseQueryResult } from '@tanstack/react-query';
 
+import { useGetRefreshToken } from '../../hooks/useApi';
 import useAuth, { AuthContextType } from '../../hooks/useAuth';
-import { getRefreshToken } from '../../services/user';
 import { State } from '../../types';
 
 export default function PrivateRoute(props: {
@@ -19,36 +20,23 @@ export default function PrivateRoute(props: {
   roles: Array<SystemRole>
 }): JSX.Element | null {
 
-  const [loading, setLoading]: State<boolean> = useState(true);
   const { auth, setAuth, isTeacherInCharge }: AuthContextType = useAuth();
+  const [loading, setLoading]: State<boolean> = useState(true);
 
-  async function getAuthStatus(): Promise<void> {
-    // loading set to true so page doesn't load until token has been retrieved
-    setLoading(true);
-    try {
-      const result: LoginResult = await getRefreshToken();
-      setAuth({
-        id: result.id,
-        role: result.role,
-        name: result.name
-      });
-    } catch (exception) {
-      console.error(exception);
-    } finally {
-      // token has been retrieved, can load page
-      setLoading(false);
-    }
-  }
+  const refresh: UseQueryResult<LoginResult> = useGetRefreshToken();
 
   useEffect(() => {
-    getAuthStatus();
-  }, []);
+    if (!refresh.isLoading) {
+      setAuth(refresh.data ?? null);
+      setLoading(false);
+    }
+  }, [refresh.isLoading]);
 
-  // only load page after token has been retrieved
+  // Only load page after token has been retrieved
   if (!loading) {
     // If auth is not null -> token exists
     if (auth) {
-      // check if role is in the list of authorised roles or teacher in charge.
+      // Check if role is in the list of authorised roles or teacher in charge.
       if (props.roles.includes(auth.role) || isTeacherInCharge) {
         return (
           <>
@@ -56,11 +44,11 @@ export default function PrivateRoute(props: {
             <Outlet />
           </>
         );
-      // if user is not authorised to access page -> redirect to front page
+      // If the user is not authorized to access a page -> redirect to front page
       } else {
         return <Navigate to='/' />;
       }
-    // no role found -> no token -> redirect to login
+    // No role found -> no token -> redirect to login
     } else {
       return <Navigate to='/login' />;
     }

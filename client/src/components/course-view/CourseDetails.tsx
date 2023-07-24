@@ -14,7 +14,7 @@ import useAuth, { AuthContextType } from '../../hooks/useAuth';
 
 export default function CourseDetails(props: {
   course: CourseData,
-  assessmentModels: Array<AssessmentModelData>,
+  assessmentModels?: Array<AssessmentModelData>,
   currentAssessmentModelId?: number,
   onChangeAssessmentModel: (assessmentModel: AssessmentModelData) => void
 }): JSX.Element {
@@ -28,12 +28,13 @@ export default function CourseDetails(props: {
       }}>
         <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >
           Course Details
-          { (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
-          <Tooltip title="Edit course details" placement="right">
-            <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit course details">
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
+          {
+            (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
+            <Tooltip title="Edit course details" placement="right">
+              <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit course details">
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
           }
         </Typography>
       </Box>
@@ -99,7 +100,10 @@ export default function CourseDetails(props: {
           bgcolor: 'secondary.light', p: 1.5, mt: 1, minWidth: '318px'
         }}>
           {
-            (props.assessmentModels.length > 0 && props.currentAssessmentModelId) ?
+            (props.assessmentModels
+              && props.assessmentModels.length > 0
+              && props.currentAssessmentModelId)
+              ?
               <AssessmentModelsList
                 data={props.assessmentModels}
                 current={props.currentAssessmentModelId}

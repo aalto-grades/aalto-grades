@@ -8,12 +8,13 @@ import {
   TableHead, TableRow, TableSortLabel, Typography
 } from '@mui/material';
 import PropTypes from 'prop-types';
-import { JSX, useEffect, useState } from 'react';
+import { JSX } from 'react';
+import { UseQueryResult } from '@tanstack/react-query';
 
-import { getInstances } from '../../services/instances';
+import { useGetAllInstances } from '../../hooks/useApi';
 import { compareDate } from '../../services/sorting';
 import { convertToClientGradingScale, formatDateString } from '../../services/textFormat';
-import { HeadCellData, State } from '../../types';
+import { HeadCellData } from '../../types';
 
 const headCells: Array<HeadCellData> = [
   {
@@ -45,23 +46,9 @@ const headCells: Array<HeadCellData> = [
 export default function InstancesTable(props: {
   courseId: string
 }): JSX.Element {
-  const [instances, setInstances]: State<Array<CourseInstanceData> | null> =
-    useState<Array<CourseInstanceData> | null>(null);
 
-  useEffect(() => {
-    getInstances(props.courseId)
-      .then((courseInstances: Array<CourseInstanceData>) => {
-        const sortedInstances: Array<CourseInstanceData> = courseInstances.sort(
-          (a: CourseInstanceData, b: CourseInstanceData) => {
-            return compareDate(
-              a.startDate as Date, b.startDate as Date
-            );
-          }
-        );
-        setInstances(sortedInstances);
-      })
-      .catch((e: Error) => console.log(e.message));
-  }, []);
+  const instances: UseQueryResult<Array<CourseInstanceData>> =
+    useGetAllInstances(props.courseId);
 
   return (
     <>
@@ -90,8 +77,8 @@ export default function InstancesTable(props: {
         </TableHead>
         <TableBody>
           {
-            instances &&
-            instances
+            (instances.data) &&
+            instances.data
               .sort(
                 (a: CourseInstanceData, b: CourseInstanceData): number => {
                   return compareDate(
@@ -129,12 +116,13 @@ export default function InstancesTable(props: {
       </Table>
       <Box sx={{ py: 5 }}>
         {
-          instances?.length === 0 &&
+          (instances.data?.length === 0) &&
           <Typography variant='h3'>
             No instances found for course, please create a new instance.
           </Typography>
         }
-        {instances === null &&
+        {
+          (instances.isLoading) &&
           <>
             <CircularProgress />
             <Typography sx={{ mt: 2 }} variant='h3'>

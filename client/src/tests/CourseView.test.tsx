@@ -3,9 +3,11 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AssessmentModelData, AttainmentData, CourseInstanceData, LoginResult, SystemRole
+  AssessmentModelData, CourseInstanceData, LoginResult, SystemRole
 } from 'aalto-grades-common/types';
+import { rest } from 'msw';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom/extend-expect';
 import { render, RenderResult, waitFor, cleanup } from '@testing-library/react';
 
@@ -13,15 +15,8 @@ import CourseView from '../components/CourseView';
 
 import AuthContext from '../context/AuthProvider';
 import { mockAssessmentModels } from './mock-data/mockAssessmentModels';
-import { mockAttainments } from './mock-data/mockAttainments';
-import { mockCourses } from './mock-data/mockCourses';
-import { mockFormulas } from './mock-data/mockFormulas';
 import { mockInstances } from './mock-data/mockInstancesWithStringDates';
-import * as assessmentModelServices from '../services/assessmentModels';
-import * as attainmentServices from '../services/attainments';
-import * as courseServices from '../services/courses';
-import * as formulaServices from '../services/formulas';
-import * as instanceServices from '../services/instances';
+import { mockSuccess, server } from './mock-data/server';
 
 afterEach(cleanup);
 
@@ -29,41 +24,38 @@ describe('Tests for CourseView component', () => {
 
   function renderCourseView(
     auth: LoginResult,
-    mockInstances: Array<CourseInstanceData>,
-    mockAssessmentModels: Array<AssessmentModelData>,
-    mockAttainments: AttainmentData
+    mockInstances?: Array<CourseInstanceData>,
+    mockAssessmentModels?: Array<AssessmentModelData>
   ): RenderResult {
 
-    jest.spyOn(instanceServices, 'getInstances').mockRejectedValue('Network error');
-    jest.spyOn(instanceServices, 'getInstances').mockResolvedValue(mockInstances);
-
-    jest.spyOn(courseServices, 'getCourse').mockRejectedValue('Network error');
-    jest.spyOn(courseServices, 'getCourse').mockResolvedValue(mockCourses[0]);
-
-    jest.spyOn(assessmentModelServices, 'getAllAssessmentModels')
-      .mockRejectedValue('Network error');
-    jest.spyOn(assessmentModelServices, 'getAllAssessmentModels')
-      .mockResolvedValue(mockAssessmentModels);
-
-    jest.spyOn(attainmentServices, 'getAllAttainments').mockRejectedValue('Network error');
-    jest.spyOn(attainmentServices, 'getAllAttainments').mockResolvedValue(mockAttainments);
-
-    jest.spyOn(formulaServices, 'getFormulaDetails').mockRejectedValue('Network error');
-    jest.spyOn(formulaServices, 'getFormulaDetails').mockResolvedValue(mockFormulas[0]);
+    if (mockInstances && mockAssessmentModels) {
+      server.use(
+        rest.get(
+          '*/v1/courses/:courseId/assessment-models',
+          mockSuccess({ assessmentModels: mockAssessmentModels })
+        ),
+        rest.get(
+          '*/v1/courses/:courseId/instances',
+          mockSuccess({ courseInstances: mockInstances })
+        )
+      );
+    }
 
     return render(
-      <MemoryRouter initialEntries={['/course-view/1']}>
-        <AuthContext.Provider value={{
-          auth: auth,
-          setAuth: jest.fn(),
-          isTeacherInCharge: false,
-          setIsTeacherInCharge: jest.fn()
-        }}>
-          <Routes>
-            <Route path='/course-view/:courseId' element={<CourseView/>}/>
-          </Routes>
-        </AuthContext.Provider>
-      </MemoryRouter>
+      <QueryClientProvider client={new QueryClient()}>
+        <MemoryRouter initialEntries={['/course-view/1']}>
+          <AuthContext.Provider value={{
+            auth: auth,
+            setAuth: jest.fn(),
+            isTeacherInCharge: false,
+            setIsTeacherInCharge: jest.fn()
+          }}>
+            <Routes>
+              <Route path='/course-view/:courseId' element={<CourseView />} />
+            </Routes>
+          </AuthContext.Provider>
+        </MemoryRouter>
+      </QueryClientProvider>
     );
   }
 
@@ -79,9 +71,7 @@ describe('Tests for CourseView component', () => {
         role: SystemRole.Admin
       };
 
-      const { getByText, getAllByText }: RenderResult = renderCourseView(
-        auth, mockInstances, mockAssessmentModels, mockAttainments
-      );
+      const { getByText, getAllByText }: RenderResult = renderCourseView(auth);
 
       await waitFor(() => {
         expect(getByText('Course Details')).toBeDefined();
@@ -112,7 +102,7 @@ describe('Tests for CourseView component', () => {
       };
 
       const { getByText, findByText, queryByText }: RenderResult =
-        renderCourseView(auth, mockInstances, mockAssessmentModels, mockAttainments);
+        renderCourseView(auth);
 
       const courseInfo: HTMLElement = await findByText('Course Details');
       // since previous is in document, so are the rest
@@ -142,7 +132,7 @@ describe('Tests for CourseView component', () => {
       };
 
       const { getByText }: RenderResult = renderCourseView(
-        auth, [], mockAssessmentModels, mockAttainments
+        auth, [], mockAssessmentModels
       );
 
       await waitFor(() => {
@@ -167,7 +157,7 @@ describe('Tests for CourseView component', () => {
       };
 
       const { getByText }: RenderResult = renderCourseView(
-        auth, mockInstances, [], mockAttainments
+        auth, mockInstances, []
       );
 
       await waitFor(() => {
@@ -175,31 +165,6 @@ describe('Tests for CourseView component', () => {
           'No assessment models found. Please create a new assessment model.'
         );
         expect(noAssessmentModels).toBeDefined();
-      });
-
-    }
-  );
-
-  test(
-    'CourseView should display correct message if no attainments found specific assessment model',
-    async () => {
-
-      // TODO, role here must be checked here based on a course/instance level role.
-      const auth: LoginResult = {
-        id: 1,
-        name: 'Admin',
-        role: SystemRole.Admin
-      };
-
-      const { getByText }: RenderResult = renderCourseView(
-        auth, mockInstances, [], mockAttainments
-      );
-
-      await waitFor(() => {
-        const noAttainments: HTMLElement = getByText(
-          'No attainments found, please select at least one assessment model or create a new one.'
-        );
-        expect(noAttainments).toBeDefined();
       });
 
     }

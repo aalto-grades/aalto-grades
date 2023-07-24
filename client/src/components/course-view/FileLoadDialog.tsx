@@ -7,14 +7,15 @@ import {
   DialogContentText, DialogTitle, FormHelperText, Typography
 } from '@mui/material';
 import PropTypes from 'prop-types';
-import { useState, useEffect, createRef } from 'react';
+import { ChangeEvent, createRef, RefObject, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import FileErrorDialog from './FileErrorDialog';
 
-import { importCsv } from '../../services/grades';
-import { Message, State } from '../../types';
+import { useUploadGradeCsv, UseUploadGradeCsvResult } from '../../hooks/useApi';
+import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
+import { State } from '../../types';
 
 const instructions: string =
   'Upload a CSV file with the header "studentNo" and headers matching to the'
@@ -39,67 +40,43 @@ export default function FileLoadDialog(props: {
   open: boolean
 }): JSX.Element {
   const { courseId }: Params = useParams();
-  const fileInput: React.RefObject<any> = createRef<any>();
+  const fileInput: RefObject<HTMLInputElement> = createRef();
 
   // state variables handling the alert messages
-  const [snackPack, setSnackPack]: State<Array<Message>> =
-    useState<Array<Message>>([]);
-  const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
+  const snackPack: SnackPackAlertState = useSnackPackAlerts();
   const [showErrorDialog, setShowErrorDialog]: State<boolean> = useState(false);
-  const [messageInfo, setMessageInfo]: State<Message | null> =
-    useState<Message | null>(null);
 
   function toggleErrorDialog(): void {
     setShowErrorDialog(!showErrorDialog);
   }
 
-  function snackPackAdd(msg: Message): void {
-    setSnackPack((prev: Array<Message>): Array<Message> => [...prev, msg]);
-  }
-
-  // useEffect in charge of handling the back-to-back alerts
-  // makes the previous disappear before showing the new one
-  useEffect(() => {
-    if (snackPack.length && !messageInfo) {
-      setMessageInfo({ ...snackPack[0] });
-      setSnackPack((prev: Array<Message>) => prev.slice(1));
-      setAlertOpen(true);
-    } else if (snackPack.length && messageInfo && alertOpen) {
-      setAlertOpen(false);
-    }
-  }, [snackPack, messageInfo, alertOpen]);
-
   const [fileName, setFileName]: State<string | null> = useState<string | null>(null);
   const [validationError, setValidationError]: State<string> = useState<string>('');
   const [fileErrors, setFileErrors]: State<Array<string>> = useState<Array<string>>([]);
 
-  async function uploadFile(): Promise<void> {
-    snackPackAdd({
-      msg: 'Importing grades...',
-      severity: 'info'
-    });
-    try {
-      if (courseId) {
-        await importCsv(
-          courseId, props.assessmentModelId, fileInput.current.files[0]
-        );
-        snackPackAdd({
-          msg: 'File processed successfully, grades imported.'
-            + ' To refresh final grades, press "calculate final grades"',
-          severity: 'success'
-        });
-        props.handleClose();
-        setFileName(null);
-      }
-    } catch (err: any) {
-      // Possible CSV errors are returned with http codes 400, 409, 422
-      if (err.response?.status && [400, 409, 422].includes(err.response.status)) {
-        setFileErrors(err.response.data.errors);
-      }
+  const uploadGradeCsv: UseUploadGradeCsvResult = useUploadGradeCsv({
+    onSuccess: () => {
+      snackPack.push({
+        msg: 'File processed successfully, grades imported.'
+          + ' To refresh final grades, press "calculate final grades"',
+        severity: 'success'
+      });
+      props.handleClose();
+      setFileName(null);
+    }
+  });
 
-      snackPackAdd({
-        msg: 'There was an issue progressing the file, the grades were not imported.',
-        severity: 'error'
+  async function uploadFile(): Promise<void> {
+    if (courseId && fileInput.current?.files) {
+      snackPack.push({
+        msg: 'Importing grades...',
+        severity: 'info'
+      });
+
+      uploadGradeCsv.mutate({
+        courseId: courseId,
+        assessmentModelId: props.assessmentModelId,
+        csv: fileInput.current.files[0]
       });
     }
   }
@@ -144,13 +121,15 @@ export default function FileLoadDialog(props: {
                 ref={fileInput}
                 type='file'
                 accept='.csv'
-                onChange={(event: React.ChangeEvent<HTMLInputElement>): void => {
+                onChange={(event: ChangeEvent<HTMLInputElement>): void => {
                   event.preventDefault();
                   if (event.target.value) { // new input -> clear errors
                     setValidationError('');
                     setFileErrors([]);
                   }
-                  setFileName(fileInput.current.files[0].name);
+                  if (fileInput.current?.files) {
+                    setFileName(fileInput.current?.files[0].name);
+                  }
                 }}
               />  {/* accept multiple?? */}
             </Button>
@@ -221,12 +200,7 @@ export default function FileLoadDialog(props: {
           </Button>
         </DialogActions>
       </Dialog>
-      <AlertSnackbar
-        messageInfo={messageInfo}
-        setMessageInfo={setMessageInfo}
-        open={alertOpen}
-        setOpen={setAlertOpen}
-      />
+      <AlertSnackbar snackPack={snackPack} />
       <FileErrorDialog
         handleClose={toggleErrorDialog}
         open={showErrorDialog}

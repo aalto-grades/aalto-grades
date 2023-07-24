@@ -2,15 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { HttpCode, SystemRole } from 'aalto-grades-common/types';
 import { Cookie, CookieAccessInfo } from 'cookiejar';
 import mockdate from 'mockdate';
 import supertest, { SuperAgentTest } from 'supertest';
 
 import { JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS } from '../../src/configs/constants';
 
-import { SystemRole } from 'aalto-grades-common/types';
 import { app } from '../../src/app';
-import { HttpCode } from '../../src/types';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 

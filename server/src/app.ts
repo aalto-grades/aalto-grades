@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { HttpCode } from 'aalto-grades-common/types';
 import cors from 'cors';
 import express, { Application, Request } from 'express';
 
@@ -10,7 +11,7 @@ import { FRONTEND_ORIGIN } from './configs/environment';
 import { errorHandler } from './middleware/errorHandler';
 import { requestLogger } from './middleware/requestLogger';
 import { router } from './routes/index';
-import { ApiError, HttpCode } from './types';
+import { ApiError } from './types';
 
 // Register formulas before starting Express.
 require('./formulas');

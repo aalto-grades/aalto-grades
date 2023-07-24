@@ -2,20 +2,21 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
+import { AttainmentData, Formula, FormulaData } from 'aalto-grades-common/types';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { Box, Button, Collapse, IconButton, List, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { UseQueryResult } from '@tanstack/react-query';
 
 import Attainment from './Attainment';
 import EditFormulaDialog from '../edit-formula-dialog/EditFormulaDialog';
 import LeafAttainment from './LeafAttainment';
 
-import { getFormulaDetails } from '../../services/formulas';
+import { useGetFormula } from '../../hooks/useApi';
 import { State } from '../../types';
 
-// An Assignmnet component with subAttainments and a formula
+// An attainment component with subAttainments and a formula
 
 export default function ParentAttainment(props: {
   attainmentTree: AttainmentData,
@@ -27,28 +28,15 @@ export default function ParentAttainment(props: {
 
   // For opening and closing the list of sub-attainments
   const [open, setOpen]: State<boolean> = useState(true);
-  // Detailed information about the used formula, undefined when loading.
-  const [formulaDetails, setFormulaDetails]: State<FormulaData | null> =
-    useState<FormulaData | null>(null);
-
   const [editFormulaOpen, setEditFormulaOpen]: State<boolean> = useState(false);
+
+  const formula: UseQueryResult<FormulaData> = useGetFormula(
+    props.attainment.formula ?? Formula.Manual
+  );
 
   function handleClick(): void {
     setOpen(!open);
   }
-
-  function onChangeFormula(): void {
-    if (props.attainment.formula) {
-      getFormulaDetails(props.attainment.formula)
-        .then((formula: FormulaData) => {
-          setFormulaDetails(formula);
-        });
-    }
-  }
-
-  useEffect(() => {
-    onChangeFormula();
-  }, []);
 
   return (
     <>
@@ -59,15 +47,14 @@ export default function ParentAttainment(props: {
         px: 1
       }}>
         <EditFormulaDialog
-          handleClose={() => setEditFormulaOpen(false)}
-          onSubmit={onChangeFormula}
+          handleClose={(): void => setEditFormulaOpen(false)}
           open={editFormulaOpen}
           attainment={props.attainment}
           attainmentTree={props.attainmentTree}
           setAttainmentTree={props.setAttainmentTree}
         />
         <Typography variant="body1" sx={{ flexGrow: 1, textAlign: 'left', mb: 0.5 }}>
-          {'Grading Formula: ' + formulaDetails?.name ?? 'Loading...'}
+          {'Grading Formula: ' + formula.data?.name ?? 'Loading...'}
         </Typography>
         {
           /* Navigation below doesn't work because formula selection has

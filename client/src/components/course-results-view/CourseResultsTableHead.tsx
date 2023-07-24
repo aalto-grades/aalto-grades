@@ -2,10 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { FinalGrade } from 'aalto-grades-common/types';
 import {
   Box, Checkbox, FormControlLabel, TableCell,
   TableHead, TableRow, TableSortLabel
-} from '@mui/material';import { visuallyHidden } from '@mui/utils';
+} from '@mui/material';
+import { visuallyHidden } from '@mui/utils';
 import PropTypes from 'prop-types';
 import { SyntheticEvent } from 'react';
 
@@ -16,8 +18,8 @@ interface Colum {
 
 export default function CourseResultsTableHead(props: {
   order: 'asc' | 'desc',
-  orderBy: string,
-  onRequestSort: (event: SyntheticEvent, property: string) => void,
+  orderBy: keyof FinalGrade,
+  onRequestSort: (event: SyntheticEvent, property: keyof FinalGrade) => void,
   handleSelectAll: () => void,
   allSelected: boolean
 }): JSX.Element {
@@ -37,7 +39,7 @@ export default function CourseResultsTableHead(props: {
     }
   ];
 
-  function createSortHandler(property: string) {
+  function createSortHandler(property: keyof FinalGrade) {
     return (event: SyntheticEvent) => {
       props.onRequestSort(event, property);
     };
@@ -57,7 +59,7 @@ export default function CourseResultsTableHead(props: {
               <TableSortLabel
                 active={props.orderBy === column.id}
                 direction={props.orderBy === column.id ? props.order : 'asc'}
-                onClick={createSortHandler(column.id)}
+                onClick={createSortHandler(column.id as keyof FinalGrade)}
               >
                 {column.name}
                 {

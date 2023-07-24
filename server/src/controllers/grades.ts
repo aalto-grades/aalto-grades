@@ -2,7 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentGradeData, FinalGrade, Formula, Status } from 'aalto-grades-common/types';
+import {
+  AttainmentGradeData, FinalGrade, Formula, HttpCode, Status
+} from 'aalto-grades-common/types';
 import { parse, Parser } from 'csv-parse';
 import { stringify } from 'csv-stringify';
 import { NextFunction, Request, Response } from 'express';
@@ -19,7 +21,7 @@ import User from '../database/models/user';
 
 import { getFormulaImplementation } from '../formulas';
 import {
-  ApiError, CalculationResult, FormulaNode,HttpCode, JwtClaims, StudentGrades
+  ApiError, CalculationResult, FormulaNode, JwtClaims, StudentGrades
 } from '../types';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import { isTeacherInChargeOrAdmin } from './utils/user';

@@ -85,7 +85,7 @@
       }
     ],
     "@typescript-eslint/typedef": [
-      "warn",
+      "error",
       {
         "arrayDestructuring": true,
         "arrowParameter": true,
@@ -97,7 +97,7 @@
         "variableDeclarationIgnoreFunction": true
       }
     ],
-    "@typescript-eslint/explicit-function-return-type": "warn",
+    "@typescript-eslint/explicit-function-return-type": "error",
     "@typescript-eslint/no-inferrable-types": "off",
     "@typescript-eslint/array-type": [
       "error",

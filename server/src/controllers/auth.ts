@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {
+  HttpCode, LoginResult, PlainPassword, SignupRequest, SystemRole
+} from 'aalto-grades-common/types';
 import argon from 'argon2';
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
@@ -15,10 +18,7 @@ import { JWT_SECRET, NODE_ENV } from '../configs/environment';
 
 import User from '../database/models/user';
 
-import {
-  LoginResult, PlainPassword, SignupRequest, SystemRole
-} from 'aalto-grades-common/types';
-import { ApiError, HttpCode, JwtClaims } from '../types';
+import { ApiError, JwtClaims } from '../types';
 import { findUserById } from './utils/user';
 
 export async function authSelfInfo(req: Request, res: Response): Promise<void> {

@@ -2,27 +2,40 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { LoginResult } from 'aalto-grades-common/types';
+import { rest } from 'msw';
 import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom/extend-expect';
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import LoginForm from '../components/auth/LoginForm';
 import Login from '../components/auth/Login';
 
-import * as userServices from '../services/user';
-import { LoginCredentials } from '../types';
+import AuthContext from '../context/AuthProvider';
+import { mockPostSuccess, server } from './mock-data/server';
 
 describe('Tests for Login and LoginForm components', () => {
 
-  test('Login should render the LoginForm and contain all of the appropriate components', () => {
-
+  function renderLogin(): void {
     render(
-      <BrowserRouter>
-        <Login />
-      </BrowserRouter>
+      <QueryClientProvider client={new QueryClient()}>
+        <AuthContext.Provider value={{
+          auth: null,
+          setAuth: jest.fn(),
+          isTeacherInCharge: false,
+          setIsTeacherInCharge: jest.fn()
+        }}>
+          <BrowserRouter>
+            <Login />
+          </BrowserRouter>
+        </AuthContext.Provider>
+      </QueryClientProvider>
     );
+  }
+
+  test('Login should render the appropriate components', () => {
+
+    renderLogin();
 
     expect(screen.getByText('Log in to Aalto Grades')).toBeDefined();
     expect(screen.getByText('Aalto University users')).toBeDefined();
@@ -33,24 +46,23 @@ describe('Tests for Login and LoginForm components', () => {
     expect(screen.getByText('Don\'t have an account yet?')).toBeDefined();
   });
 
-  test('LoginForm should allow a user to submit their credentials', () => {
-    const mockLoginUser: jest.SpyInstance<Promise<LoginResult>, [credentials: LoginCredentials]> =
-      jest.spyOn(userServices, 'login');
+  test('Login should allow a user to submit their credentials', async () => {
 
-    render(
-      <BrowserRouter>
-        <LoginForm />
-      </BrowserRouter>
-    );
+    renderLogin();
+
+    const logIn: jest.Mock = jest.fn();
+    server.use(rest.post('*/v1/auth/login', mockPostSuccess(logIn, null)));
 
     act(() => userEvent.type(screen.getByLabelText('Email'), 'test@email.com'));
     act(() => userEvent.type(screen.getByLabelText('Password'), 'secret'));
     act(() => userEvent.click(screen.getByText('log in')));
 
-    expect(mockLoginUser).toHaveBeenCalledTimes(1);
-    expect(mockLoginUser).toHaveBeenCalledWith({
-      email: 'test@email.com',
-      password: 'secret'
+    await waitFor(() => {
+      expect(logIn).toHaveBeenCalledTimes(1);
+      expect(logIn).toHaveBeenCalledWith({
+        email: 'test@email.com',
+        password: 'secret'
+      });
     });
   });
 

@@ -6,3 +6,7 @@
 robot-tests/output/*
 *.key
 *.crt
+
+# Emacs files
+.dir-locals.el
+*.#*

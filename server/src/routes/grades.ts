@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { HttpCode } from 'aalto-grades-common/types';
 import express, { Request, Router } from 'express';
 import multer, { FileFilterCallback, memoryStorage, Multer } from 'multer';
 import passport from 'passport';
@@ -12,7 +13,7 @@ import {
 } from '../controllers/grades';
 import { handleInvalidRequestJson } from '../middleware';
 import { controllerDispatcher } from '../middleware/errorHandler';
-import { ApiError, HttpCode } from '../types';
+import { ApiError } from '../types';
 
 export const router: Router = Router();
 

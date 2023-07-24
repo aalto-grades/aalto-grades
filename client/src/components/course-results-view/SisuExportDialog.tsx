@@ -9,34 +9,20 @@ import {
   ListItemText, MenuItem, Paper, TextField, Typography
 } from '@mui/material';
 import PropTypes from 'prop-types';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
+import { UseQueryResult } from '@tanstack/react-query';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';
 
-import { exportSisuCsv } from '../../services/grades';
-import { Message, State } from '../../types';
+import { useExportSisuGradeCsv } from '../../hooks/useApi';
+import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
+import { State } from '../../types';
 
 // A Dialog component for exporting Sisu grades CSV.
 const instructions: string =
   'Set the completion language and assesment date for the grading, these values'
   + ' are optional. Click export to export the grades.';
-
-const loadingMsg: Message = {
-  msg: 'Fetching Sisu CSV...',
-  severity: 'info'
-};
-
-const successMsg: Message = {
-  msg: 'Final grades exported to Sisu CSV format succesfully.',
-  severity: 'success'
-};
-
-const errorMsg: Message = {
-  msg: 'Fetching CSV failed, please try again.'
-    + ' Make sure grades have been calculated before exporting.',
-  severity: 'error'
-};
 
 interface LanguageOption {
   id: string,
@@ -94,66 +80,53 @@ export default function SisuExportDialog(props: {
 }): JSX.Element {
   const { courseId, assessmentModelId }: Params = useParams();
 
+  if (!courseId || !assessmentModelId)
+    return (<></>);
+
   // state variables handling the alert messages.
-  const [snackPack, setSnackPack]: State<Array<Message>> = useState<Array<Message>>([]);
-  const [alertOpen, setAlertOpen]: State<boolean> = useState<boolean>(false);
-  const [messageInfo, setMessageInfo]: State<Message | null> = useState<Message | null>(null);
+  const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
   // state variables handling the assessment date and completion language.
-  const [assessmentDate, setAssessmentDate]: State<string | null> = useState<string | null>(null);
-  const [completionLanguage, setCompletionLanguage]: State<string | null> =
-    useState<string | null>(null);
+  const [assessmentDate, setAssessmentDate]: State<string | undefined> =
+    useState<string | undefined>(undefined);
+  const [completionLanguage, setCompletionLanguage]: State<string | undefined> =
+    useState<string | undefined>(undefined);
 
-  // useEffect in charge of handling the back-to-back alerts
-  // makes the previous disappear before showing the new one
-  useEffect(() => {
-    if (snackPack.length && !messageInfo) {
-      setMessageInfo({ ...snackPack[0] });
-      setSnackPack((prev: Array<Message>) => prev.slice(1));
-      setAlertOpen(true);
-    } else if (snackPack.length && messageInfo && alertOpen) {
-      setAlertOpen(false);
-    }
-  }, [snackPack, messageInfo, alertOpen]);
+  const exportSisuGradeCsv: UseQueryResult<BlobPart> = useExportSisuGradeCsv(
+    courseId, assessmentModelId,
+    {
+      completionLanguage: completionLanguage,
+      assessmentDate: assessmentDate,
+      studentNumbers: props.selectedStudents.map((student: FinalGrade) => student.studentNumber)
+    },
+    { enabled: false }
+  );
 
-  async function exportSisuCsvGrades(): Promise<void> {
-    setSnackPack((prev: Array<Message>) => [...prev, loadingMsg]);
+  async function handleExportSisuGradeCsv(): Promise<void> {
+    snackPack.push({
+      msg: 'Fetching Sisu CSV...',
+      severity: 'info'
+    });
 
-    try {
-      if (courseId && assessmentModelId) {
-        const params: {
-          completionLanguage?: string,
-          assessmentDate?: string,
-          studentNumbers: Array<string>
-        } = {
-          completionLanguage: completionLanguage ?? undefined,
-          assessmentDate: assessmentDate ?? undefined,
-          studentNumbers: props.selectedStudents.map((student: FinalGrade) => student.studentNumber)
-        };
+    exportSisuGradeCsv.refetch();
 
-        const data: BlobPart = await exportSisuCsv(
-          courseId, assessmentModelId, params
-        );
+    if (!exportSisuGradeCsv.isLoading && exportSisuGradeCsv.data) {
+      // Create a blob object from the response data
+      const blob: Blob = new Blob([exportSisuGradeCsv.data], { type: 'text/csv' });
 
-        // Create a blob object from the response data
-        const blob: Blob = new Blob([data], { type: 'text/csv' });
+      const link: HTMLAnchorElement = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      // Set file name.
+      link.download = `grades_course_${courseId}_assessment_model_${assessmentModelId}.csv`;
+      // Download file automatically to the user's computer.
+      link.click();
+      URL.revokeObjectURL(link.href);
+      link.remove();
 
-        const link: HTMLAnchorElement = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        // Set file name.
-        link.download = `grades_course_${courseId}_assessment_model_${assessmentModelId}.csv`;
-        // Download file automatically to the user's computer.
-        link.click();
-        URL.revokeObjectURL(link.href);
-        link.remove();
-
-        setSnackPack((prev: Array<Message>) => [...prev, successMsg]);
-      }
-    } catch (error: unknown) {
-      console.log(error);
-      setSnackPack((prev: Array<Message>) => [...prev, errorMsg]);
-    } finally {
-      setAlertOpen(false);
+      snackPack.push({
+        msg: 'Final grades exported to Sisu CSV format succesfully.',
+        severity: 'success'
+      });
     }
   }
 
@@ -227,9 +200,7 @@ export default function SisuExportDialog(props: {
           <Button
             size='medium'
             variant='outlined'
-            onClick={(): void => {
-              props.handleClose();
-            }}
+            onClick={props.handleClose}
           >
             Cancel
           </Button>
@@ -237,18 +208,13 @@ export default function SisuExportDialog(props: {
             id='ag_confirm_file_upload_btn'
             size='medium'
             variant='contained'
-            onClick={(): void => {
-              exportSisuCsvGrades();
-            }}
+            onClick={handleExportSisuGradeCsv}
           >
             Export
           </Button>
         </DialogActions>
       </Dialog>
-      <AlertSnackbar
-        messageInfo={messageInfo} setMessageInfo={setMessageInfo}
-        open={alertOpen} setOpen={setAlertOpen}
-      />
+      <AlertSnackbar snackPack={snackPack} />
     </>
   );
 }

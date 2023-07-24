@@ -2,17 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { StyledComponent } from '@emotion/styled';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Button, Menu, MenuItem } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { MenuProps } from '@mui/material/Menu';
+import { styled, Theme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { useState, SyntheticEvent } from 'react';
 
 import { State } from '../../types';
 
 // A styled menu button. When clicked, a dropdown menu appears
-
-const StyledMenu = styled((props: any): JSX.Element => (
+const StyledMenu: StyledComponent<MenuProps> = styled((props: MenuProps): JSX.Element => (
   <Menu
     elevation={0}
     anchorOrigin={{
@@ -25,7 +26,7 @@ const StyledMenu = styled((props: any): JSX.Element => (
     }}
     {...props}
   />
-))(({ theme }) => ({
+))(({ theme }: { theme: Theme }) => ({
   '& .MuiPaper-root': {
     borderRadius: 6,
     marginTop: theme.spacing(1),

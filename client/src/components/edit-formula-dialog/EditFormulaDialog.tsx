@@ -13,12 +13,11 @@ import { useState, JSX } from 'react';
 import SelectFormula from './SelectFormula';
 import SetFormulaParams from './SetFormulaParams';
 
-import { editAttainment } from '../../services/attainments';
+import { useEditAttainment, UseEditAttainmentResult } from '../../hooks/useApi';
 import { State } from '../../types';
 
 export default function EditFormulaDialog(props: {
   handleClose: () => void,
-  onSubmit: () => void,
   open: boolean,
   // courseId and assessmentModelId are needed when editing from CourseView
   courseId?: number,
@@ -41,6 +40,10 @@ export default function EditFormulaDialog(props: {
   const [childParams, setChildParams]: State<Map<string, object>> =
     useState<Map<string, object>>(new Map());
 
+  const editAttainment: UseEditAttainmentResult = useEditAttainment({
+    onSuccess: () => close()
+  });
+
   function handleNext(): void {
     if (activeStep === 0) {
       if (formula) {
@@ -54,18 +57,17 @@ export default function EditFormulaDialog(props: {
     setActiveStep(activeStep + 1);
   }
 
+  function close(): void {
+    props.handleClose();
+
+    setActiveStep(0);
+    setFormulaError('');
+    setFormula(null);
+    setParams({});
+    setChildParams(new Map());
+  }
+
   function handleSubmit(): void {
-    function close(): void {
-      props.onSubmit();
-      props.handleClose();
-
-      setActiveStep(0);
-      setFormulaError('');
-      setFormula(null);
-      setParams({});
-      setChildParams(new Map());
-    }
-
     props.attainment.formula = formula?.id;
     props.attainment.formulaParams = (formula?.id === Formula.Manual) ? undefined : {
       ...params,
@@ -73,11 +75,11 @@ export default function EditFormulaDialog(props: {
     };
 
     if (props.courseId && props.assessmentModelId) {
-      editAttainment(
-        props.courseId, props.assessmentModelId, props.attainment
-      )
-        .then(() => close())
-        .catch((e: Error) => console.log(e.message));
+      editAttainment.mutate({
+        courseId: props.courseId,
+        assessmentModelId: props.assessmentModelId,
+        attainment: props.attainment
+      });
     } else if (props.attainmentTree && props.setAttainmentTree) {
       props.setAttainmentTree(structuredClone(props.attainmentTree));
       close();
@@ -188,7 +190,6 @@ export default function EditFormulaDialog(props: {
 
 EditFormulaDialog.propTypes = {
   handleClose: PropTypes.func,
-  onSubmit: PropTypes.func,
   open: PropTypes.bool,
   courseId: PropTypes.number,
   assessmentModelId: PropTypes.number,

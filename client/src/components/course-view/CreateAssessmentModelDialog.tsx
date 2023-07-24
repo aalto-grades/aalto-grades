@@ -9,8 +9,10 @@ import PropTypes from 'prop-types';
 import { ChangeEvent, SyntheticEvent, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 
-import { addAssessmentModel } from '../../services/assessmentModels';
-import { addAttainment } from '../../services/attainments';
+import {
+  useAddAssessmentModel, UseAddAssessmentModelResult,
+  useAddAttainment, UseAddAttainmentResult
+} from '../../hooks/useApi';
 import { State } from '../../types';
 
 export default function CreateAssessmentModelDialog(props: {
@@ -21,30 +23,41 @@ export default function CreateAssessmentModelDialog(props: {
   const { courseId }: Params = useParams();
 
   const [name, setName]: State<string> = useState('');
-  const [isSubmitting, setIsSubmitting]: State<boolean> = useState(false);
+
+  const addAssessmentModel: UseAddAssessmentModelResult = useAddAssessmentModel({
+    onSuccess: (assessmentModelId: number) => {
+      if (courseId) {
+        addAttainment.mutate({
+          courseId: courseId,
+          assessmentModelId: assessmentModelId,
+          attainment: {
+            name: 'Root',
+            tag: 'root',
+            daysValid: 0
+          }
+        });
+      }
+    }
+  });
+
+  const addAttainment: UseAddAttainmentResult = useAddAttainment({
+    onSuccess: () => {
+      props.handleClose();
+      props.onSubmit();
+      setName('');
+    }
+  });
 
   async function handleSubmit(event: SyntheticEvent): Promise<void> {
     event.preventDefault();
-    try {
-      if (courseId) {
-        setIsSubmitting(true);
-        const assessmentModelId: number = await addAssessmentModel(
-          courseId, { name: name }
-        );
 
-        await addAttainment(courseId, assessmentModelId, {
-          name: 'Root',
-          tag: 'root',
-          daysValid: 0
-        });
-
-        props.handleClose();
-        props.onSubmit();
-        setName('');
-        setIsSubmitting(false);
-      }
-    } catch (exception) {
-      console.log(exception);
+    if (courseId) {
+      addAssessmentModel.mutate({
+        courseId: courseId,
+        assessmentModel: {
+          name: name
+        }
+      });
     }
   }
 
@@ -68,7 +81,7 @@ export default function CreateAssessmentModelDialog(props: {
               InputLabelProps={{ shrink: true }}
               margin='normal'
               value={name}
-              disabled={isSubmitting}
+              disabled={addAssessmentModel.isLoading || addAttainment.isLoading}
               onChange={(event: ChangeEvent<HTMLInputElement>): void => setName(event.target.value)}
             />
             <Stack spacing={2} direction="row" sx={{ mt: 2 }}>
@@ -76,7 +89,7 @@ export default function CreateAssessmentModelDialog(props: {
                 size='large'
                 variant='outlined'
                 onClick={props.handleClose}
-                disabled={isSubmitting}
+                disabled={addAssessmentModel.isLoading || addAttainment.isLoading}
               >
                 Cancel
               </Button>
@@ -84,21 +97,25 @@ export default function CreateAssessmentModelDialog(props: {
                 size='large'
                 variant='contained'
                 type='submit'
-                disabled={name.length === 0 || isSubmitting}
+                disabled={
+                  name.length === 0 || addAssessmentModel.isLoading || addAttainment.isLoading
+                }
               >
                 Submit
-                {isSubmitting && (
-                  <CircularProgress
-                    size={24}
-                    sx={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      marginTop: '-12px',
-                      marginLeft: '-12px',
-                    }}
-                  />
-                )}
+                {
+                  (addAssessmentModel.isLoading || addAttainment.isLoading) && (
+                    <CircularProgress
+                      size={24}
+                      sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        marginTop: '-12px',
+                        marginLeft: '-12px',
+                      }}
+                    />
+                  )
+                }
               </Button>
             </Stack>
           </form>

@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { HttpCode } from 'aalto-grades-common/types';
 import { AxiosError } from 'axios';
 import { CsvError } from 'csv-parse';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
@@ -9,7 +10,7 @@ import { MulterError } from 'multer';
 import { ValidationError } from 'yup';
 
 import logger from '../configs/winston';
-import { ApiError, HttpCode } from '../types';
+import { ApiError } from '../types';
 
 export function controllerDispatcher(
   handler: (req: Request, res: Response, next: NextFunction) => Promise<unknown>

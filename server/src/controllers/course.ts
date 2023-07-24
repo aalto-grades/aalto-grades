@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { CourseData, HttpCode, Language, UserData } from 'aalto-grades-common/types';
 import { Request, Response } from 'express';
 import { Transaction } from 'sequelize';
 import * as yup from 'yup';
@@ -12,8 +13,7 @@ import CourseTranslation from '../database/models/courseTranslation';
 import TeacherInCharge from '../database/models/teacherInCharge';
 import User from '../database/models/user';
 
-import { CourseData, Language, UserData } from 'aalto-grades-common/types';
-import { ApiError, CourseFull, HttpCode, idSchema, localizedStringSchema } from '../types';
+import { ApiError, CourseFull, idSchema, localizedStringSchema } from '../types';
 import { findCourseFullById, parseCourseFull } from './utils/course';
 
 export async function getCourse(req: Request, res: Response): Promise<void> {

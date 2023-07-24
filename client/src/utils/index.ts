@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+type Resolve = (value: void | PromiseLike<void>) => void;
+
 export function sleep(ms: number = 2000): Promise<void> {
-  return new Promise(r => setTimeout(r, ms));
+  return new Promise((resolve: Resolve) => setTimeout(resolve, ms));
 }

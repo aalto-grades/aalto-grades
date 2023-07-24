@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { AttainmentData, Formula, HttpCode } from 'aalto-grades-common/types';
 import { Request, Response } from 'express';
 import { Op } from 'sequelize';
 import * as yup from 'yup';
@@ -10,9 +11,8 @@ import AssessmentModel from '../database/models/assessmentModel';
 import Attainment from '../database/models/attainment';
 import Course from '../database/models/course';
 
-import { AttainmentData, Formula } from 'aalto-grades-common/types';
 import { getFormulaImplementation } from '../formulas';
-import { ApiError, HttpCode, idSchema, JwtClaims } from '../types';
+import { ApiError, idSchema, JwtClaims } from '../types';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import {
   findAttainmentById, findAttainmentsByAssessmentModel, generateAttainmentTree,

@@ -2,13 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseInstanceData } from 'aalto-grades-common/types';
+import { CourseInstanceData, HttpCode } from 'aalto-grades-common/types';
 import axios, { AxiosStatic } from 'axios';
 import supertest from 'supertest';
 
 import { sisuInstance, sisuError } from '../mock-data/sisu';
 import { app } from '../../src/app';
-import { HttpCode } from '../../src/types';
 import { Cookies, getCookies } from '../util/getCookies';
 
 jest.mock('axios');

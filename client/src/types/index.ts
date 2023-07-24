@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import { SystemRole } from 'aalto-grades-common/types';
-import { AxiosResponse } from 'axios';
 import { Dispatch, SetStateAction } from 'react';
 
 export interface ApiResponse<T> {
@@ -11,8 +10,6 @@ export interface ApiResponse<T> {
   data: T,
   errors?: Array<string>
 }
-
-export type FullResponse<T> = AxiosResponse<ApiResponse<T>, unknown>;
 
 export interface HeadCellData {
   id: string,
