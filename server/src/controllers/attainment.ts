@@ -12,7 +12,7 @@ import Attainment from '../database/models/attainment';
 import Course from '../database/models/course';
 
 import { getFormulaImplementation } from '../formulas';
-import { ApiError, idSchema, JwtClaims } from '../types';
+import { ApiError, idSchema, JwtClaims, ParamsObject } from '../types';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import {
   findAttainmentById, findAttainmentsByAssessmentModel, generateAttainmentTree,
@@ -21,21 +21,62 @@ import {
 import { isTeacherInChargeOrAdmin } from './utils/user';
 
 async function validateFormulaParams(
-  formula: Formula | undefined, formulaParams: object | null | undefined
+  formula?: Formula,
+  formulaParams?: object | null,
+  subTags?: Array<string>
 ): Promise<void> {
-  if (formula) {
+  if (formula && formulaParams) {
     if (formula === Formula.Manual) {
-      if (formulaParams) {
-        throw new ApiError(
-          'formula params of manual must be null or undefined, got '
-          + `${JSON.stringify(formulaParams)}`,
-          HttpCode.BadRequest
-        );
-      }
+      throw new ApiError(
+        'formula params of manual must be null or undefined, got '
+        + `${JSON.stringify(formulaParams)}`,
+        HttpCode.BadRequest
+      );
     } else {
+      // Validate params with the formula's param schema
       await getFormulaImplementation(formula).paramSchema.validate(
         formulaParams, { abortEarly: false }
       );
+
+      if (!subTags) {
+        throw new ApiError(
+          'tags of subattainments were not passed to validateFormulaParams with'
+          + `non-manual formula ${formula}`,
+          HttpCode.InternalServerError
+        );
+      }
+
+      // Ensure that all subattainments are included in children and that there
+      // are no invalid subattainment tags in children
+      const paramTags: Array<string> =
+        (formulaParams as ParamsObject<unknown>).children.map(
+          (value: [string, unknown]) => value[0]
+        );
+
+      const notFound: Array<string> = [];
+
+      for (const tag of subTags) {
+        const index: number = paramTags.indexOf(tag);
+        if (index < 0) {
+          notFound.push(tag);
+        } else {
+          paramTags.splice(index, 1);
+        }
+      }
+
+      if (notFound.length >  0) {
+        throw new ApiError(
+          `formula params do not include subattainments with tags ${notFound}`,
+          HttpCode.BadRequest
+        );
+      }
+
+      if (paramTags.length > 0) {
+        throw new ApiError(
+          `invalid subattainment tags in formula params: ${paramTags}`,
+          HttpCode.BadRequest
+        )
+      }
     }
   }
 }
@@ -221,7 +262,11 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     attainmentTree: AttainmentData
   ): Promise<void> {
     await validateFormulaParams(
-      attainmentTree.formula, attainmentTree.formulaParams
+      attainmentTree.formula,
+      attainmentTree.formulaParams,
+      attainmentTree.subAttainments?.map(
+        (subAttainment: AttainmentData) => subAttainment.tag
+      )
     );
 
     if (attainmentTree.subAttainments) {
@@ -311,8 +356,6 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
       .notRequired(),
   });
 
-  const attainmentId: number = Number(req.params.attainmentId);
-  await idSchema.validate({ id: attainmentId }, { abortEarly: false });
   await requestSchema.validate(req.body, { abortEarly: false });
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -352,13 +395,22 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     if (parentAttainment.assessmentModelId !== attainment.assessmentModelId) {
       throw new ApiError(
         `parent attainment ID ${parentId} does not belong to ` +
-        `the same assessment model as attainment ID ${attainmentId}`,
+        `the same assessment model as attainment ID ${attainment.id}`,
         HttpCode.Conflict
       );
     }
   }
 
-  await validateFormulaParams(formula, formulaParams);
+  await validateFormulaParams(
+    formula ?? attainment.formula,
+    formulaParams ?? attainment.formulaParams,
+    (await Attainment.findAll({
+      attributes: ['tag'],
+      where: {
+        parentId: attainment.id
+      }
+    })).map((attainment: Attainment): string => attainment.tag)
+  );
 
   await attainment.set({
     name: name ?? attainment.name,
