@@ -26,10 +26,8 @@ import { State } from '../types';
 
 export default function EditInstanceView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
-  const { courseId, sisuInstanceId }: Params = useParams();
-
-  if (!courseId)
-    return (<></>);
+  const { courseId, sisuInstanceId }: Params =
+    useParams() as { courseId: string, sisuInstanceId: string };
 
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
   const snackPack: SnackPackAlertState = useSnackPackAlerts();

@@ -24,15 +24,12 @@ import { State } from '../types';
 
 export default function CourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
-  const { courseId }: Params = useParams();
+  const { courseId }: Params = useParams() as { courseId: string };
   const { auth, isTeacherInCharge, setIsTeacherInCharge }: AuthContextType = useAuth();
 
   const [animation, setAnimation]: State<boolean> = useState(false);
   const [fileLoadOpen, setFileLoadOpen]: State<boolean> = useState(false);
   const [createAssessmentModelOpen, setCreateAssessmentModelOpen]: State<boolean> = useState(false);
-
-  if (!courseId)
-    return (<></>);
 
   const course: UseQueryResult<CourseData> = useGetCourse(courseId);
 
