@@ -24,6 +24,7 @@ import EditInstanceView from './components/EditInstanceView';
 import FetchInstancesView from './components/FetchInstancesView';
 import Footer from './components/Footer';
 import FrontPage from './components/FrontPage';
+import NotFound from './components/NotFound';
 
 import useSnackPackAlerts, { SnackPackAlertState } from './hooks/useSnackPackAlerts';
 
@@ -209,6 +210,8 @@ export default function App(): JSX.Element {
                     element={<EditAttainmentView />}
                   />
                 </Route>
+                {/* Not found route */}
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </Box>
           </Container>
