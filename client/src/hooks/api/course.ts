@@ -19,7 +19,7 @@ export function useGetCourse(
     queryKey: ['course', courseId],
     queryFn: async () => (
       await axios.get(`/v1/courses/${courseId}`)
-    ).data.data.course,
+    ).data.data,
     ...options
   });
 }
@@ -31,7 +31,7 @@ export function useGetAllCourses(
     queryKey: ['all-courses'],
     queryFn: async () => (
       await axios.get('/v1/courses')
-    ).data.data.courses,
+    ).data.data,
     ...options
   });
 }
@@ -46,7 +46,7 @@ export function useAddCourse(
   return useMutation({
     mutationFn: async (course: CourseData) => (
       await axios.post('/v1/courses', course)
-    ).data.data.course.id,
+    ).data.data,
     ...options
   });
 }

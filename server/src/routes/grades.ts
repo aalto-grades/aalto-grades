@@ -221,15 +221,10 @@ router.get(
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
  *                 data:
- *                   type: object
- *                   properties:
- *                     finalGrades:
- *                       type: array
- *                       items:
- *                         $ref: '#/definitions/GradingData'
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/definitions/GradingData'
  *       400:
  *         description: Fetching failed, due to validation errors in parameters.
  *         content:
@@ -294,8 +289,6 @@ router.get(
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
  *                 data:
  *                   description: Empty data object.
  *                   type: object
@@ -389,9 +382,6 @@ router.post(
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request.
  *                 data:
  *                   description: Empty data object.
  *                   type: object

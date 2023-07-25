@@ -31,12 +31,12 @@ describe('Tests for EditAttainmentView components', () => {
 
     server.use(rest.post(
       '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments',
-      mockPostSuccess(addAttainment, { attainment: mockAttainments })
+      mockPostSuccess(addAttainment, mockAttainments)
     ));
 
     server.use(rest.put(
       '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
-      mockPostSuccess(editAttainment, { attainment: mockAttainments })
+      mockPostSuccess(editAttainment, mockAttainments)
     ));
 
     return render(
@@ -111,7 +111,7 @@ describe('Tests for EditAttainmentView components', () => {
       server.use(
         rest.get(
           '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
-          mockSuccess({ attainment: mockAttainment })
+          mockSuccess(mockAttainment)
         )
       );
 

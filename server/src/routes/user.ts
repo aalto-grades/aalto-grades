@@ -34,15 +34,10 @@ export const router: Router = Router();
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
  *                 data:
- *                   type: object
- *                   properties:
- *                     courses:
- *                       type: array
- *                       items:
- *                         $ref: '#/definitions/CourseData'
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/definitions/CourseData'
  *       400:
  *         description: User ID validation failed. Must be positive integer.
  *         content:

@@ -52,6 +52,7 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *       type: apiKey
  *       in: cookie
  *       name: jwt
+ *
  *   parameters:
  *     courseId:
  *       in: path
@@ -131,6 +132,7 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *       example: 1
  *       description: >
  *         The ID of the course instance. For filtering results based on course instance ID.
+ *
  *   responses:
  *     AuthenticationError:
  *       description: Authentication credentials were missing or JWT expired.
@@ -144,25 +146,18 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *         application/json:
  *           schema:
  *             $ref: '#/definitions/Failure'
+ *
  * definitions:
  *   Failure:
  *     type: object
  *     description: A reason for a failure.
  *     properties:
- *       success:
- *         type: boolean
- *         description: '`false` to indicate failure.'
- *         example: false
  *       errors:
  *         type: array
  *         items:
  *           type: string
  *         description: Error message(s) explaining the error(s).
  *         example: ['course with ID 157 not found', 'course instance ID must be type of integer']
- *   Success:
- *     type: boolean
- *     description: Success of the request.
- *     example: true
  */
 
 router.use(cors({

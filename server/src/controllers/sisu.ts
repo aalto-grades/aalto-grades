@@ -103,10 +103,7 @@ export async function fetchCourseInstanceFromSisu(req: Request, res: Response): 
   );
 
   res.status(HttpCode.Ok).send({
-    success: true,
-    data: {
-      courseInstance: instance
-    }
+    data: instance
   });
 }
 
@@ -153,9 +150,6 @@ export async function fetchAllCourseInstancesFromSisu(req: Request, res: Respons
   );
 
   res.status(HttpCode.Ok).send({
-    success: true,
-    data: {
-      courseInstances: parsedInstances
-    }
+    data: parsedInstances
   });
 }

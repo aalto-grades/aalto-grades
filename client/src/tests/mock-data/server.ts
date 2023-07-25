@@ -19,7 +19,6 @@ export function mockSuccess(data: unknown): ResponseResolver<RestRequest, RestCo
     return res(
       ctx.status(200),
       ctx.json({
-        success: true,
         data: data
       })
     );
@@ -33,7 +32,6 @@ export function mockFailure(
     return res(
       ctx.status(status),
       ctx.json({
-        success: false,
         errors: errors
       })
     );
@@ -48,7 +46,6 @@ export function mockPostSuccess(
     return res(
       ctx.status(200),
       ctx.json({
-        success: true,
         data: data
       })
     );
@@ -58,38 +55,38 @@ export function mockPostSuccess(
 export const server: SetupServer = setupServer(
   rest.get(
     '*/v1/courses',
-    mockSuccess({ courses: mockCourses })
+    mockSuccess(mockCourses)
   ),
   rest.get(
     '*/v1/courses/:courseId',
-    mockSuccess({ course: mockCourses[0] })
+    mockSuccess(mockCourses[0])
   ),
 
   rest.get(
     '*/v1/courses/:courseId/assessment-models',
-    mockSuccess({ assessmentModels: mockAssessmentModels })
+    mockSuccess(mockAssessmentModels)
   ),
   rest.get(
     '*/v1/courses/:courseId/assessment-models:assessmentModelId',
-    mockSuccess({ assessmentModel: mockAssessmentModels[0] })
+    mockSuccess(mockAssessmentModels[0])
   ),
 
   rest.get(
     '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments',
-    mockSuccess({ attainment: mockAttainments })
+    mockSuccess(mockAttainments)
   ),
   rest.get(
     '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
-    mockSuccess({ attainment: mockAttainments })
+    mockSuccess(mockAttainments)
   ),
 
   rest.get(
     '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades',
-    mockSuccess({ finalGrades: mockFinalGrades })
+    mockSuccess(mockFinalGrades)
   ),
   rest.post(
     '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/calculate',
-    mockSuccess(true)
+    mockSuccess({})
   ),
   rest.post(
     '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv',
@@ -98,33 +95,33 @@ export const server: SetupServer = setupServer(
 
   rest.get(
     '*/v1/courses/:courseId/instances',
-    mockSuccess({ courseInstances: mockInstances })
+    mockSuccess(mockInstances)
   ),
   rest.get(
     '*/v1/courses/:courseId/instances/:courseInstanceId',
-    mockSuccess({ courseInstance: mockInstances[0] })
+    mockSuccess(mockInstances[0])
   ),
 
   rest.get(
     '*/v1/formulas',
-    mockSuccess({ formulas: mockFormulas })
+    mockSuccess(mockFormulas)
   ),
   rest.get(
     '*/v1/formulas/:formulaId',
-    mockSuccess({ formula: mockFormulas[0] })
+    mockSuccess(mockFormulas[0])
   ),
 
   rest.get(
     '*/v1/sisu/courses/:courseCode',
-    mockSuccess({ courseInstances: mockSisuInstances })
+    mockSuccess(mockSisuInstances)
   ),
   rest.get(
     '*/v1/sisu/instances/:sisuCourseInstanceId',
-    mockSuccess({ courseInstance: mockSisuInstances[0] })
+    mockSuccess(mockSisuInstances[0])
   ),
 
   rest.get(
     '*/v1/user/:userId/courses',
-    mockSuccess({ courses: mockCourses })
+    mockSuccess(mockCourses)
   )
 );

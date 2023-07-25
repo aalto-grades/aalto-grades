@@ -28,7 +28,7 @@ export function useGetAttainment(
         `/v1/courses/${courseId}/assessment-models/${assessmentModelId}`
         + `/attainments/${attainmentId}${query}`
       )
-    ).data.data.attainment,
+    ).data.data,
     ...options
   });
 }
@@ -49,7 +49,7 @@ export function useGetRootAttainment(
         `/v1/courses/${courseId}/assessment-models/${assessmentModelId}`
         + `/attainments${query}`
       )
-    ).data.data.attainment,
+    ).data.data,
     ...options
   });
 }
@@ -75,7 +75,7 @@ export function useAddAttainment(
         + '/attainments',
         vars.attainment
       )
-    ).data.data.attainment,
+    ).data.data,
     ...options
   });
 }
@@ -101,7 +101,7 @@ export function useEditAttainment(
         + `/attainments/${vars.attainment.id}`,
         vars.attainment
       )
-    ).data.data.attainment,
+    ).data.data,
     ...options
   });
 }
@@ -126,7 +126,7 @@ export function useDeleteAttainment(
         + `/${vars.assessmentModelId}`
         + `/attainments/${vars.attainmentId}`
       )
-    ).data.data.attainment,
+    ).data.data,
     ...options
   });
 }

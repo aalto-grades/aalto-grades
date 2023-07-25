@@ -60,16 +60,10 @@ export const router: Router = Router();
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request.
  *                 data:
- *                   type: object
- *                   properties:
- *                     formulas:
- *                       type: array
- *                       items:
- *                         $ref: '#/definitions/FormulaData'
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/definitions/FormulaData'
  *       401:
  *         $ref: '#/components/responses/AuthenticationError'
  */
@@ -95,14 +89,8 @@ router.get(
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   type: boolean
- *                   description: Success of the request.
  *                 data:
- *                   type: object
- *                   properties:
- *                     formula:
- *                       $ref: '#/definitions/FormulaDetails'
+ *                   $ref: '#/definitions/FormulaDetails'
  *       401:
  *         $ref: '#/components/responses/AuthenticationError'
  *       404:

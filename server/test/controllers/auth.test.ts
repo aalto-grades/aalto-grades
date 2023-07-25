@@ -30,7 +30,6 @@ describe('Test GET /v1/auth/self-info - check users own info', () => {
     await agent.get('/v1/auth/self-info').withCredentials(true)
       .expect(HttpCode.Ok)
       .then((res: supertest.Response) => {
-        expect(res.body.success).toBe(true);
         expect(res.body.errors).not.toBeDefined();
         expect(res.body.data.role).toBe(SystemRole.Admin);
         expect(res.body.data.name).toBe('Aalto Sysadmin');
@@ -51,7 +50,6 @@ describe('Test POST /v1/auth/login - logging in with an existing user', () => {
         .expect(HttpCode.Unauthorized)
         .expect('Content-Type', /json/)
         .then((res: supertest.Response) => {
-          expect(res.body.success).toBe(false);
           expect(res.body.data).not.toBeDefined();
           expect(res.body.errors[0]).toMatch(/incorrect email or password/);
         });
@@ -68,7 +66,6 @@ describe('Test POST /v1/auth/login - logging in with an existing user', () => {
       .expect('Content-Type', /json/)
       .expect(HttpCode.Ok)
       .then((res: supertest.Response) => {
-        expect(res.body.success).toBe(true);
         expect(res.body.errors).not.toBeDefined();
         expect(res.body.data.role).toBe(SystemRole.Admin);
         expect(res.body.data.name).toBe('Aalto Sysadmin');
@@ -92,7 +89,6 @@ describe('Test POST /v1/auth/signup - create a new user', () => {
       .expect(HttpCode.Conflict)
       .expect('Content-Type', /json/)
       .then((res: supertest.Response) => {
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toMatch('user account with the specified email already exists');
       });
@@ -105,7 +101,6 @@ describe('Test POST /v1/auth/signup - create a new user', () => {
       .expect(HttpCode.BadRequest)
       .expect('Content-Type', /json/)
       .then((res: supertest.Response) => {
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toMatch('name is a required field');
       });
@@ -128,7 +123,6 @@ describe('Test POST /v1/auth/signup - create a new user', () => {
       .expect(HttpCode.Ok)
       .expect('Content-Type', /json/)
       .then((res: supertest.Response) => {
-        expect(res.body.success).toBe(true);
         expect(res.body.errors).not.toBeDefined();
         expect(res.body.message);
       });
@@ -137,7 +131,6 @@ describe('Test POST /v1/auth/signup - create a new user', () => {
       .send({ email: 'sysadmin2@aalto.fi', password: 'grades2' })
       .expect(HttpCode.Ok)
       .then((res: supertest.Response) => {
-        expect(res.body.success).toBe(true);
         expect(res.body.errors).not.toBeDefined();
         expect(res.body.data.role).toBe(SystemRole.Admin);
         expect(res.body.data.name).toBe('aalto2');

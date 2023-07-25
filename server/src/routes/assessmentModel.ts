@@ -55,13 +55,8 @@ export const router: Router = Router();
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
  *                 data:
- *                   type: object
- *                   properties:
- *                     assessmentModel:
- *                       $ref: '#/definitions/AssessmentModelData'
+ *                   $ref: '#/definitions/AssessmentModelData'
  *       400:
  *         description: >
  *           A validation error has occurred in the URL, the given course
@@ -118,15 +113,10 @@ router.get(
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
  *                 data:
- *                   type: object
- *                   properties:
- *                     assessmentModels:
- *                       type: array
- *                       items:
- *                         $ref: '#/definitions/AssessmentModelData'
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/definitions/AssessmentModelData'
  *       400:
  *         description: >
  *           A validation error has occurred in the URL, the given course ID is
@@ -183,16 +173,8 @@ router.get(
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
  *                 data:
- *                   type: object
- *                   properties:
- *                     assessmentModel:
- *                       type: object
- *                       properties:
- *                         id:
- *                           $ref: '#/definitions/AssessmentModelId'
+ *                   $ref: '#/definitions/AssessmentModelId'
  *       400:
  *         description: >
  *           A validation error has occurred in the URL, the given course ID is

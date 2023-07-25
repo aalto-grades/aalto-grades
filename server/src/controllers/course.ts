@@ -25,10 +25,7 @@ export async function getCourse(req: Request, res: Response): Promise<void> {
   );
 
   res.status(HttpCode.Ok).json({
-    success: true,
-    data: {
-      course: parseCourseFull(course)
-    }
+    data: parseCourseFull(course)
   });
 }
 
@@ -51,10 +48,7 @@ export async function getAllCourses(req: Request, res: Response): Promise<void> 
   }
 
   res.status(HttpCode.Ok).json({
-    success: true,
-    data: {
-      courses: coursesData
-    }
+    data: coursesData
   });
 }
 
@@ -143,12 +137,7 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
     });
 
   res.status(HttpCode.Ok).json({
-    success: true,
-    data: {
-      course: {
-        id: course.id
-      }
-    }
+    data: course.id
   });
 }
 

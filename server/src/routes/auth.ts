@@ -54,8 +54,6 @@ export const router: Router = Router();
  *   LoginResult:
  *     type: object
  *     properties:
- *       success:
- *         $ref: '#/definitions/Success'
  *       data:
  *         type: object
  *         properties:
@@ -86,8 +84,6 @@ export const router: Router = Router();
  *   SignupAndSelfInfo:
  *     type: object
  *     properties:
- *       success:
- *         $ref: '#/definitions/Success'
  *       data:
  *         type: object
  *         properties:
@@ -185,8 +181,6 @@ router.post(
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
  *                 data:
  *                   description: Empty data object.
  *                   type: object

@@ -56,7 +56,7 @@ describe('Tests for CreateCourseView components', () => {
     const addCourse: jest.Mock = jest.fn();
     server.use(rest.post(
       '*/v1/courses',
-      mockPostSuccess(addCourse, { course: { id: 1 } })
+      mockPostSuccess(addCourse, 1)
     ));
 
     const testCode: string = 'Test code';

@@ -28,11 +28,10 @@ describe('Test GET /v1/formulas - get grading formula info', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    expect(res.body.success).toBeTruthy();
     expect(res.body.errors).not.toBeDefined();
-    expect(res.body.data.formulas).toBeDefined();
-    expect(res.body.data.formulas[0].id).toBeDefined();
-    expect(res.body.data.formulas[0].name).toBeDefined();
+    expect(res.body.data).toBeDefined();
+    expect(res.body.data[0].id).toBeDefined();
+    expect(res.body.data[0].name).toBeDefined();
   });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
@@ -53,14 +52,13 @@ describe('Test GET /v1/formulas/:formulaId - get detailed formula info', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    expect(res.body.success).toBeTruthy();
     expect(res.body.errors).not.toBeDefined();
-    expect(res.body.data.formula).toBeDefined();
-    expect(res.body.data.formula.id).toBeDefined();
-    expect(res.body.data.formula.name).toBeDefined();
-    expect(res.body.data.formula.params).toBeDefined();
-    expect(res.body.data.formula.childParams).toBeDefined();
-    expect(res.body.data.formula.codeSnippet).toBeDefined();
+    expect(res.body.data).toBeDefined();
+    expect(res.body.data.id).toBeDefined();
+    expect(res.body.data.name).toBeDefined();
+    expect(res.body.data.params).toBeDefined();
+    expect(res.body.data.childParams).toBeDefined();
+    expect(res.body.data.codeSnippet).toBeDefined();
   });
 
   it('should respond with 400 bad input if the formula enum incorrect', async () => {
@@ -70,7 +68,6 @@ describe('Test GET /v1/formulas/:formulaId - get detailed formula info', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.BadRequest);
 
-    expect(res.body.success).toBeFalsy();
     expect(res.body.errors).toBeDefined();
     expect(res.body.data).not.toBeDefined();
   });

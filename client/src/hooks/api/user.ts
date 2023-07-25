@@ -16,7 +16,7 @@ export function useGetCoursesOfUser(
     queryKey: ['courses-of-user', userId],
     queryFn: async () => (
       await axios.get(`/v1/user/${userId}/courses`)
-    ).data.data.courses,
+    ).data.data,
     ...options
   });
 }

@@ -58,7 +58,7 @@ export const router: Router = Router();
  *       properties:
  *         email:
  *           type: string
- *           description: Teachers email address.
+ *           description: Teacher's email address.
  *           example: john.doe@aalto.fi
  *   CourseData:
  *     type: object
@@ -78,6 +78,19 @@ export const router: Router = Router();
  *         $ref: '#/definitions/LocalizedString'
  *       evaluationInformation:
  *         $ref: '#/definitions/LocalizedString'
+ *       teachersInCharge:
+ *         type: array
+ *         items:
+ *           type: object
+ *           properties:
+ *             id:
+ *               type: integer
+ *               description: Database ID of the teacher.
+ *               example: 42
+ *             name:
+ *               type: string
+ *               description: Teacher's name.
+ *               example: John Doe
  */
 
 /**
@@ -98,13 +111,8 @@ export const router: Router = Router();
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
  *                 data:
- *                   type: object
- *                   properties:
- *                     course:
- *                       $ref: '#/definitions/CourseData'
+ *                   $ref: '#/definitions/CourseData'
  *       400:
  *         description: Course ID validation failed.
  *         content:
@@ -143,15 +151,10 @@ router.get(
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
  *                 data:
- *                   type: object
- *                   properties:
- *                     courses:
- *                       type: array
- *                       items:
- *                         $ref: '#/definitions/CourseData'
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/definitions/CourseData'
  *       401:
  *         $ref: '#/components/responses/AuthenticationError'
  *       403:
@@ -197,16 +200,8 @@ router.get(
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
  *                 data:
- *                   type: object
- *                   properties:
- *                     course:
- *                       type: object
- *                       properties:
- *                         id:
- *                           $ref: '#/definitions/CourseId'
+ *                   $ref: '#/definitions/CourseId'
  *       400:
  *         description: A validation error has occurred in the request body.
  *         content:

@@ -19,7 +19,7 @@ export function useGetAllAssessmentModels(
     queryKey: ['all-assessment-models', courseId],
     queryFn: async () => (
       await axios.get(`/v1/courses/${courseId}/assessment-models`)
-    ).data.data.assessmentModels,
+    ).data.data,
     ...options
   });
 }
@@ -33,7 +33,7 @@ export function useGetAssessmentModel(
     queryKey: ['assessment-model', courseId, assessmentModelId],
     queryFn: async () => (
       await axios.get(`/v1/courses/${courseId}/assessment-models/${assessmentModelId}`)
-    ).data.data.assessmentModel,
+    ).data.data,
     ...options
   });
 }
@@ -56,7 +56,7 @@ export function useAddAssessmentModel(
         `/v1/courses/${vars.courseId}/assessment-models`,
         vars.assessmentModel
       )
-    ).data.data.assessmentModel.id,
+    ).data.data,
     ...options
   });
 }

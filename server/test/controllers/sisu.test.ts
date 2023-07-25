@@ -56,10 +56,9 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      expect(res.body.success).toBe(true);
-      expect(res.body.data.courseInstance).toBeDefined();
+      expect(res.body.data).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
-      checkRes(res.body.data.courseInstance, sisuInstance.id, false);
+      checkRes(res.body.data, sisuInstance.id, false);
     });
 
     it(
@@ -77,10 +76,9 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
-        expect(res.body.success).toBe(true);
-        expect(res.body.data.courseInstance).toBeDefined();
+        expect(res.body.data).toBeDefined();
         expect(res.body.errors).not.toBeDefined();
-        checkRes(res.body.data.courseInstance, 'aalto-CUR-169778-3874205', true);
+        checkRes(res.body.data, 'aalto-CUR-169778-3874205', true);
       });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
@@ -123,11 +121,10 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
-        expect(res.body.success).toBe(true);
-        expect(res.body.data.courseInstances).toBeDefined();
+        expect(res.body.data).toBeDefined();
         expect(res.body.errors).not.toBeDefined();
-        expect(res.body.data.courseInstances.length).toBe(5);
-        res.body.data.courseInstances.forEach(
+        expect(res.body.data.length).toBe(5);
+        res.body.data.forEach(
           (courseInstance: CourseInstanceData) => checkRes(courseInstance, sisuInstance.id, false)
         );
       });
@@ -147,11 +144,10 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
-        expect(res.body.success).toBe(true);
-        expect(res.body.data.courseInstances).toBeDefined();
+        expect(res.body.data).toBeDefined();
         expect(res.body.errors).not.toBeDefined();
-        expect(res.body.data.courseInstances.length).toBe(5);
-        res.body.data.courseInstances.forEach(
+        expect(res.body.data.length).toBe(5);
+        res.body.data.forEach(
           (courseInstance: CourseInstanceData) => checkRes(
             courseInstance, 'aalto-CUR-169778-3874205', true
           )
@@ -177,7 +173,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.BadGateway);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe('external API error: 102');
       });

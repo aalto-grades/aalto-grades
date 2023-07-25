@@ -32,11 +32,11 @@ describe('Tests for CourseView component', () => {
       server.use(
         rest.get(
           '*/v1/courses/:courseId/assessment-models',
-          mockSuccess({ assessmentModels: mockAssessmentModels })
+          mockSuccess(mockAssessmentModels)
         ),
         rest.get(
           '*/v1/courses/:courseId/instances',
-          mockSuccess({ courseInstances: mockInstances })
+          mockSuccess(mockInstances)
         )
       );
     }

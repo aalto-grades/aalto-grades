@@ -77,10 +77,10 @@ describe(
         .set('Cookie', cookies.userCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
-      expect(res.body.success).toBe(true);
+
       expect(res.body.data).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data.attainment, 2, 2, false);
+      verifyAttainmentData(res.body.data, 2, 2, false);
     });
 
     it('should respond with a single attainment with one level of subattainments, '
@@ -90,12 +90,12 @@ describe(
         .set('Cookie', cookies.userCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
-      expect(res.body.success).toBe(true);
+
       expect(res.body.data).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data.attainment, 2, 2, true);
-      verifyAttainmentData(res.body.data.attainment.subAttainments[0], 6, 2, false);
-      verifyAttainmentData(res.body.data.attainment.subAttainments[1], 10, 2, false);
+      verifyAttainmentData(res.body.data, 2, 2, true);
+      verifyAttainmentData(res.body.data.subAttainments[0], 6, 2, false);
+      verifyAttainmentData(res.body.data.subAttainments[1], 10, 2, false);
     });
 
     it('should respond with a single attainment with a full tree of subattainments, '
@@ -105,24 +105,24 @@ describe(
         .set('Cookie', cookies.userCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
-      expect(res.body.success).toBe(true);
+
       expect(res.body.data).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data.attainment, 2, 2, true);
-      verifyAttainmentData(res.body.data.attainment.subAttainments[0], 6, 2, true);
+      verifyAttainmentData(res.body.data, 2, 2, true);
+      verifyAttainmentData(res.body.data.subAttainments[0], 6, 2, true);
       verifyAttainmentData(
-        res.body.data.attainment.subAttainments[0].subAttainments[0],
+        res.body.data.subAttainments[0].subAttainments[0],
         214,
         2,
         true
       );
       verifyAttainmentData(
-        res.body.data.attainment.subAttainments[0].subAttainments[0].subAttainments[0],
+        res.body.data.subAttainments[0].subAttainments[0].subAttainments[0],
         215,
         2,
         false
       );
-      verifyAttainmentData(res.body.data.attainment.subAttainments[1], 10, 2, false);
+      verifyAttainmentData(res.body.data.subAttainments[1], 10, 2, false);
     });
 
     it('should respond with 400 Bad Request, if "tree" parameter in query string '
@@ -132,7 +132,7 @@ describe(
         .set('Cookie', cookies.userCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.BadRequest);
-      expect(res.body.success).toBe(false);
+
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
       expect(res.body.errors[0]).toBe('tree must be one of the '
@@ -146,7 +146,7 @@ describe(
         .set('Cookie', cookies.userCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.BadRequest);
-      expect(res.body.success).toBe(false);
+
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
       expect(res.body.errors[0]).toBe('tree must be a `string` type, but the final value was: '
@@ -173,10 +173,10 @@ describe(
         .set('Cookie', cookies.userCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
-      expect(res.body.success).toBe(true);
+
       expect(res.body.data).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data.attainment, 1, 1, true);
+      verifyAttainmentData(res.body.data, 1, 1, true);
     });
 
     it('should respond with a single attainment with one level of subattainments, '
@@ -186,12 +186,12 @@ describe(
         .set('Cookie', cookies.userCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
-      expect(res.body.success).toBe(true);
+
       expect(res.body.data).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data.attainment, 2, 2, true);
-      verifyAttainmentData(res.body.data.attainment.subAttainments[0], 6, 2, false);
-      verifyAttainmentData(res.body.data.attainment.subAttainments[1], 10, 2, false);
+      verifyAttainmentData(res.body.data, 2, 2, true);
+      verifyAttainmentData(res.body.data.subAttainments[0], 6, 2, false);
+      verifyAttainmentData(res.body.data.subAttainments[1], 10, 2, false);
     });
 
     it('should respond with a single attainment with a full tree of subattainments, '
@@ -201,20 +201,20 @@ describe(
         .set('Cookie', cookies.userCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
-      expect(res.body.success).toBe(true);
+
       expect(res.body.data).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data.attainment, 2, 2, true);
-      verifyAttainmentData(res.body.data.attainment.subAttainments[0], 6, 2, true);
-      verifyAttainmentData(res.body.data.attainment.subAttainments[1], 10, 2, false);
+      verifyAttainmentData(res.body.data, 2, 2, true);
+      verifyAttainmentData(res.body.data.subAttainments[0], 6, 2, true);
+      verifyAttainmentData(res.body.data.subAttainments[1], 10, 2, false);
       verifyAttainmentData(
-        res.body.data.attainment.subAttainments[0].subAttainments[0],
+        res.body.data.subAttainments[0].subAttainments[0],
         214,
         2,
         true
       );
       verifyAttainmentData(
-        res.body.data.attainment.subAttainments[0].subAttainments[0].subAttainments[0],
+        res.body.data.subAttainments[0].subAttainments[0].subAttainments[0],
         215,
         2,
         false
@@ -228,7 +228,7 @@ describe(
         .set('Cookie', cookies.userCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.BadRequest);
-      expect(res.body.success).toBe(false);
+
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
       expect(res.body.errors[0]).toBe('tree must be one of the '
@@ -249,7 +249,7 @@ describe(
           .set('Cookie', cookies.userCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Conflict);
-        expect(res.body.success).toBe(false);
+
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors[0]).toBe(
@@ -284,17 +284,16 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
-        expect(res.body.success).toBe(true);
         expect(res.body.errors).not.toBeDefined();
-        expect(res.body.data.attainment.id).toBeDefined();
-        expect(res.body.data.attainment.name).toBe('New');
-        expect(res.body.data.attainment.assessmentModelId).toBe(31);
-        expect(res.body.data.attainment.parentId).not.toBeDefined();
-        expect(res.body.data.attainment.tag).toBe('tag of the new one');
-        expect(res.body.data.attainment.formula).toBe(Formula.Manual);
-        expect(res.body.data.attainment.formulaParams).toBe(null);
-        expect(res.body.data.attainment.daysValid).toBeDefined();
-        expect(res.body.data.attainment.subAttainments).toBeDefined();
+        expect(res.body.data.id).toBeDefined();
+        expect(res.body.data.name).toBe('New');
+        expect(res.body.data.assessmentModelId).toBe(31);
+        expect(res.body.data.parentId).not.toBeDefined();
+        expect(res.body.data.tag).toBe('tag of the new one');
+        expect(res.body.data.formula).toBe(Formula.Manual);
+        expect(res.body.data.formulaParams).toBe(null);
+        expect(res.body.data.daysValid).toBeDefined();
+        expect(res.body.data.subAttainments).toBeDefined();
       }
     );
 
@@ -317,17 +316,16 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
-        expect(res.body.success).toBe(true);
         expect(res.body.errors).not.toBeDefined();
-        expect(res.body.data.attainment.id).toBeDefined();
-        expect(res.body.data.attainment.name).toBe('examination');
-        expect(res.body.data.attainment.assessmentModelId).toBe(35);
-        expect(res.body.data.attainment.parentId).not.toBeDefined();
-        expect(res.body.data.attainment.tag).toBe('tag123456');
-        expect(res.body.data.attainment.formula).toBe(Formula.Manual);
-        expect(res.body.data.attainment.formulaParams).toBe(null);
-        expect(res.body.data.attainment.daysValid).toBeDefined();
-        expect(res.body.data.attainment.subAttainments).toBeDefined();
+        expect(res.body.data.id).toBeDefined();
+        expect(res.body.data.name).toBe('examination');
+        expect(res.body.data.assessmentModelId).toBe(35);
+        expect(res.body.data.parentId).not.toBeDefined();
+        expect(res.body.data.tag).toBe('tag123456');
+        expect(res.body.data.formula).toBe(Formula.Manual);
+        expect(res.body.data.formulaParams).toBe(null);
+        expect(res.body.data.daysValid).toBeDefined();
+        expect(res.body.data.subAttainments).toBeDefined();
       }
     );
 
@@ -341,18 +339,17 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
-        expect(res.body.success).toBe(true);
         expect(res.body.errors).not.toBeDefined();
-        expect(res.body.data.attainment.id).toBeDefined();
-        expect(res.body.data.attainment.assessmentModelId).toBe(32);
-        expect(res.body.data.attainment.name).toBe(mockAttainment.name);
-        expect(res.body.data.attainment.parentId).not.toBeDefined();
-        expect(res.body.data.attainment.tag).toBeDefined();
-        expect(res.body.data.attainment.formula).toBeDefined();
-        expect(res.body.data.attainment.daysValid).toBeDefined();
-        expect(res.body.data.attainment.subAttainments).toBeDefined();
+        expect(res.body.data.id).toBeDefined();
+        expect(res.body.data.assessmentModelId).toBe(32);
+        expect(res.body.data.name).toBe(mockAttainment.name);
+        expect(res.body.data.parentId).not.toBeDefined();
+        expect(res.body.data.tag).toBeDefined();
+        expect(res.body.data.formula).toBeDefined();
+        expect(res.body.data.daysValid).toBeDefined();
+        expect(res.body.data.subAttainments).toBeDefined();
 
-        for (const subAttainment of res.body.data.attainment.subAttainments) {
+        for (const subAttainment of res.body.data.subAttainments) {
           evaluateSubAttainment(subAttainment);
         }
       });
@@ -369,11 +366,10 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
-      expect(res.body.data.attainment.parentId).toBe(3);
+      expect(res.body.data.parentId).toBe(3);
 
-      for (const subAttainment of res.body.data.attainment.subAttainments) {
+      for (const subAttainment of res.body.data.subAttainments) {
         evaluateSubAttainment(subAttainment);
       }
     });
@@ -388,7 +384,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
@@ -404,7 +399,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
@@ -420,7 +414,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
@@ -450,7 +443,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
@@ -497,7 +489,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
@@ -552,7 +543,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
@@ -594,7 +584,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
@@ -624,7 +613,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toEqual(1);
@@ -654,7 +642,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toEqual(1);
@@ -691,7 +678,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toEqual(1);
@@ -717,7 +703,6 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.Forbidden);
 
-      expect(res.body.success).toBe(false);
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
     });
@@ -732,7 +717,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.NotFound);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe(`assessment model with ID ${badId} not found`);
       });
@@ -747,7 +731,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.NotFound);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe(`course with ID ${badId} not found`);
       });
@@ -762,7 +745,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.Conflict);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe(
           'assessment model with ID 2 does not belong to the course with ID 1'
@@ -788,7 +770,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.Conflict);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe(
           `assessment model already has root attainment with ID ${attainment.id}`
@@ -808,7 +789,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.Conflict);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe(
           `parent attainment ID ${4} does not belong to the assessment model ID 6`
@@ -826,7 +806,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.UnprocessableEntity);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe(`attainment with ID ${badId} not found`);
       });
@@ -850,7 +829,7 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      subAttainment = res.body.data.attainment;
+      subAttainment = res.body.data;
 
       res = await request
         .put(`/v1/courses/1/assessment-models/12/attainments/${subAttainment.id}`)
@@ -864,15 +843,14 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
-      expect(res.body.data.attainment.id).toBe(subAttainment.id);
-      expect(res.body.data.attainment.assessmentModelId).toBe(12);
-      expect(res.body.data.attainment.parentId).toBe(null);
-      expect(res.body.data.attainment.name).toBe('new name');
-      expect(res.body.data.attainment.tag).toBe('new tag');
-      expect(res.body.data.attainment.formula).toBe(Formula.WeightedAverage);
-      expect(res.body.data.attainment.daysValid).toBe(50);
+      expect(res.body.data.id).toBe(subAttainment.id);
+      expect(res.body.data.assessmentModelId).toBe(12);
+      expect(res.body.data.parentId).toBe(null);
+      expect(res.body.data.name).toBe('new name');
+      expect(res.body.data.tag).toBe('new tag');
+      expect(res.body.data.formula).toBe(Formula.WeightedAverage);
+      expect(res.body.data.daysValid).toBe(50);
     });
 
     it('should add parent succesfully on an existing attainment (teacher in charge)', async () => {
@@ -889,11 +867,10 @@ describe(
         .set('Cookie', cookies.userCookie)
         .expect(HttpCode.Ok);
 
-      expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
-      expect(res.body.data.attainment.id).toBe(subAttainments[0].id);
-      expect(res.body.data.attainment.assessmentModelId).toBe(12);
-      expect(res.body.data.attainment.parentId).toBe(subAttainments[1].id);
+      expect(res.body.data.id).toBe(subAttainments[0].id);
+      expect(res.body.data.assessmentModelId).toBe(12);
+      expect(res.body.data.parentId).toBe(subAttainments[1].id);
     });
 
     it(
@@ -913,7 +890,7 @@ describe(
           .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.Ok);
 
-        expect(res.body.success).toBe(true);
+        expect(res.body.data).toBeDefined();
         expect(res.body.errors).not.toBeDefined();
 
         attainment = await Attainment.findByPk(258);
@@ -942,7 +919,7 @@ describe(
           .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.Ok);
 
-        expect(res.body.success).toBe(true);
+        expect(res.body.data).toBeDefined();
         expect(res.body.errors).not.toBeDefined();
 
         attainment = await Attainment.findByPk(261);
@@ -962,7 +939,6 @@ describe(
           .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.BadRequest);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
@@ -977,7 +953,6 @@ describe(
           .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.BadRequest);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
@@ -992,7 +967,6 @@ describe(
           .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.BadRequest);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
@@ -1010,7 +984,6 @@ describe(
           .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.BadRequest);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
@@ -1036,7 +1009,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
@@ -1069,7 +1041,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
@@ -1099,7 +1070,6 @@ describe(
         .set('Cookie', cookies.userCookie)
         .expect(HttpCode.Forbidden);
 
-      expect(res.body.success).toBe(false);
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
     });
@@ -1112,7 +1082,6 @@ describe(
         .set('Cookie', cookies.adminCookie)
         .expect(HttpCode.NotFound);
 
-      expect(res.body.success).toBe(false);
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors[0]).toBe(`attainment with ID ${badId} not found`);
     });
@@ -1129,7 +1098,7 @@ describe(
           .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.Ok);
 
-        parentAttainment = res.body.data.attainment;
+        parentAttainment = res.body.data;
 
         res = await request
           .put(`/v1/courses/1/assessment-models/12/attainments/${subAttainment.id}`)
@@ -1138,7 +1107,6 @@ describe(
           .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.Conflict);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe(
           `parent attainment ID ${parentAttainment.id} does not belong ` +
@@ -1155,7 +1123,6 @@ describe(
           .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.Conflict);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe('attainment cannot refer to itself in the parent ID');
       });
@@ -1169,7 +1136,6 @@ describe(
           .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.UnprocessableEntity);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe(`attainment with ID ${badId} not found`);
       });
@@ -1199,16 +1165,16 @@ describe(
       }
 
       // Find the IDs of all the added attainments.
-      const rootAttainment: number = add.body.data.attainment.id;
+      const rootAttainment: number = add.body.data.id;
       const addedAttainments: Array<number> = [rootAttainment];
-      findSubattainmentIds(add.body.data.attainment, addedAttainments);
+      findSubattainmentIds(add.body.data, addedAttainments);
 
       // Verify that the attainments were added.
       for (const addedAttainment of addedAttainments)
         expect(await Attainment.findByPk(addedAttainment)).not.toBeNull;
 
       // Delete the root attainment.
-      const res: supertest.Response = await request
+      await request
         .delete(
           `/v1/courses/${courseId}/assessment-models/` +
           `${assessmentModelId}/attainments/${rootAttainment}`
@@ -1219,7 +1185,6 @@ describe(
 
       // Verify that the root attainment as well as all of its subattainments
       // were deleted.
-      expect(res.body.success).toBe(true);
       for (const addedAttainment of addedAttainments)
         expect(await Attainment.findByPk(addedAttainment)).toBeNull;
     }
@@ -1240,18 +1205,17 @@ describe(
         .set('Accept', 'application/json');
 
       // Verify that the attainment was added.
-      const addedAttainmenId: number = add.body.data.attainment.id;
+      const addedAttainmenId: number = add.body.data.id;
       expect(await Attainment.findByPk(addedAttainmenId)).not.toBeNull;
 
       // Delete the added attainment.
-      const res: supertest.Response = await request
+      await request
         .delete(`/v1/courses/8/assessment-models/37/attainments/${addedAttainmenId}`)
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
       // Verify that the attainment was deleted.
-      expect(res.body.success).toBe(true);
       expect(await Attainment.findByPk(addedAttainmenId)).toBeNull;
     });
 
@@ -1271,20 +1235,19 @@ describe(
         .set('Accept', 'application/json');
 
       // Verify that the attainment was added.
-      const addedAttainmentid: number = add.body.data.attainment.id;
+      const addedAttainmentid: number = add.body.data.id;
       expect(await Attainment.findByPk(addedAttainmentid)).not.toBeNull;
 
       jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
 
       // Delete the added attainment.
-      const res: supertest.Response = await request
+      await request
         .delete(`/v1/courses/8/assessment-models/38/attainments/${addedAttainmentid}`)
         .set('Cookie', cookies.userCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
       // Verify that the attainment was deleted.
-      expect(res.body.success).toBe(true);
       expect(await Attainment.findByPk(addedAttainmentid)).toBeNull;
     });
 
@@ -1332,19 +1295,16 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.Forbidden);
 
-      expect(res.body.success).toBe(false);
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
     });
 
     it('should respond with 404 not found for non-existent attainment ID', async () => {
-      const res: supertest.Response = await request
+      await request
         .delete(`/v1/courses/4/assessment-models/7/attainments/${badId}`)
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.NotFound);
-
-      expect(res.body.success).toBe(false);
     });
 
   }

@@ -87,9 +87,6 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
   }
 
   res.status(HttpCode.Ok).send({
-    success: true,
-    data: {
-      courses: courses
-    }
+    data: courses
   });
 }
