@@ -19,7 +19,7 @@ export function useGetAllInstances(
     queryKey: ['all-instances', courseId],
     queryFn: async () => (
       await axios.get(`/v1/courses/${courseId}/instances`)
-    ).data.data.courseInstances,
+    ).data.data,
     ...options
   });
 }
@@ -39,7 +39,7 @@ export function useAddInstance(
   return useMutation({
     mutationFn: async (vars: AddInstanceVars) => (
       await axios.post(`/v1/courses/${vars.courseId}/instances`, vars.instance)
-    ).data.data.courseInstance.id,
+    ).data.data,
     ...options
   });
 }
@@ -52,7 +52,7 @@ export function useGetSisuInstance(
     queryKey: ['sisu-instance', sisuInstanceId],
     queryFn: async () => (
       await axios.get(`/v1/sisu/instances/${sisuInstanceId}`)
-    ).data.data.courseInstance,
+    ).data.data,
     ...options
   });
 }
@@ -65,7 +65,7 @@ export function useGetAllSisuInstances(
     queryKey: ['all-sisu-instances', courseCode],
     queryFn: async () => (
       await axios.get(`/v1/sisu/courses/${courseCode}`)
-    ).data.data.courseInstances,
+    ).data.data,
     ...options
   });
 }

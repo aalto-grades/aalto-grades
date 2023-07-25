@@ -14,7 +14,7 @@ export function useGetFormula(
     queryKey: ['formula', formulaId],
     queryFn: async () => (
       await axios.get(`/v1/formulas/${formulaId}`)
-    ).data.data.formula,
+    ).data.data,
     ...options
   });
 }
@@ -26,7 +26,7 @@ export function useGetAllFormulas(
     queryKey: ['all-formulas'],
     queryFn: async () => (
       await axios.get('/v1/formulas')
-    ).data.data.formulas,
+    ).data.data,
     ...options
   });
 }

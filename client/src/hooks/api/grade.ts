@@ -63,7 +63,7 @@ export function useGetFinalGrades(
       await axios.get(
         `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades`
       )
-    ).data.data.finalGrades,
+    ).data.data,
     ...options
   });
 }
@@ -117,7 +117,7 @@ export function useCalculateFinalGrades(
         + '/grades/calculate',
         { studentNumbers: vars.studentNumbers }
       )
-    ).data.data.success,
+    ).data.data,
     ...options
   });
 }
