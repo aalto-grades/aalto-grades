@@ -71,12 +71,6 @@ export const router: Router = Router();
  *         example: Lecture
  *       gradingScale:
  *         $ref: '#/definitions/GradingScale'
- *       teachersInCharge:
- *         type: array
- *         description: Names of all teachers in charge of this course instance.
- *         example: ['John Doe', 'Jane Doe']
- *         items:
- *           type: string
  *       courseData:
  *         $ref: '#/definitions/CourseData'
  */
@@ -100,13 +94,8 @@ export const router: Router = Router();
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
  *                 data:
- *                   type: object
- *                   properties:
- *                     courseInstance:
- *                       $ref: '#/definitions/CourseInstanceData'
+ *                   $ref: '#/definitions/CourseInstanceData'
  *       400:
  *         description: >
  *           A validation error has occurred in the URL, the given course
@@ -166,16 +155,11 @@ router.get(
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
  *                 data:
- *                   type: object
- *                   properties:
- *                     courseInstances:
- *                       type: array
- *                       description: All instances of the course with the given ID.
- *                       items:
- *                         $ref: '#/definitions/CourseInstanceData'
+ *                   type: array
+ *                   description: All instances of the course with the given ID.
+ *                   items:
+ *                     $ref: '#/definitions/CourseInstanceData'
  *       400:
  *         description: >
  *           A validation error has occurred in the URL, the given course ID is
@@ -230,14 +214,6 @@ router.get(
  *                 type: string
  *                 description: Type of course instance, 'Lecture', 'Exam', etc.
  *                 example: Lecture
- *               teachersInCharge:
- *                 type: array
- *                 example: [1, 2, 3]
- *                 description: >
- *                   IDs of the users to be assigned as teachers in charge of
- *                   this course instance.
- *                 items:
- *                   type: integer
  *               startDate:
  *                 type: string
  *                 format: date
@@ -256,16 +232,8 @@ router.get(
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
  *                 data:
- *                   type: object
- *                   properties:
- *                     courseInstance:
- *                       type: object
- *                       properties:
- *                         id:
- *                           $ref: '#/definitions/CourseInstanceId'
+ *                   $ref: '#/definitions/CourseInstanceId'
  *       400:
  *         description: >
  *           A validation error has occurred either in the URL or the request

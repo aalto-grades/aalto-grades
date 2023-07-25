@@ -37,13 +37,8 @@ export const router: Router = Router();
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
  *                 data:
- *                   type: object
- *                   properties:
- *                     courseInstance:
- *                       $ref: '#/definitions/CourseInstanceData'
+ *                   $ref: '#/definitions/CourseInstanceData'
  *       401:
  *         $ref: '#/components/responses/AuthenticationError'
  *       403:
@@ -86,15 +81,10 @@ router.get(
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
  *                 data:
- *                   type: object
- *                   properties:
- *                     courseInstances:
- *                       type: array
- *                       items:
- *                         $ref: '#/definitions/CourseInstanceData'
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/definitions/CourseInstanceData'
  *       401:
  *         $ref: '#/components/responses/AuthenticationError'
  *       403:

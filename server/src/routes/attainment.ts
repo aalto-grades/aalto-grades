@@ -98,7 +98,10 @@ export const router: Router = Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/definitions/Attainment'
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   $ref: '#/definitions/Attainment'
  *       400:
  *         description: Malformed request due to validation errors or missing parameters.
  *         content:
@@ -148,7 +151,10 @@ router.get(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/definitions/Attainment'
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   $ref: '#/definitions/Attainment'
  *       400:
  *         description: Malformed request due to validation errors or missing parameters.
  *         content:
@@ -204,13 +210,8 @@ router.get(
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
  *                 data:
- *                   type: object
- *                   properties:
- *                     attainment:
- *                       $ref: '#/definitions/Attainment'
+ *                   $ref: '#/definitions/Attainment'
  *       400:
  *         description: Creation failed, due to validation errors or missing parameters.
  *         content:
@@ -278,8 +279,6 @@ router.post(
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
  *                 data:
  *                   $ref: '#/definitions/Attainment'
  *       400:
@@ -345,8 +344,6 @@ router.put(
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   $ref: '#/definitions/Success'
  *                 data:
  *                   description: Empty data object.
  *                   type: object
