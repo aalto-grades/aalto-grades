@@ -30,7 +30,7 @@ export async function authSelfInfo(req: Request, res: Response): Promise<void> {
     id: userFromDb.id,
     role: userFromDb.role as SystemRole,
     name: userFromDb.name
-  }
+  };
 
   res.send({
     data: auth
@@ -164,7 +164,7 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
     id: newUser.id,
     role: newUser.role as SystemRole,
     name: newUser.name
-  }
+  };
 
   res.send({
     data: auth
