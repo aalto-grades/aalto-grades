@@ -11,10 +11,7 @@ import { FormulaImplementation } from '../types';
 
 export async function getFormulas(req: Request, res: Response): Promise<void> {
   res.status(HttpCode.Ok).json({
-    success: true,
-    data: {
-      formulas: getAllFormulasData()
-    }
+    data: getAllFormulasData()
   });
 }
 
@@ -42,9 +39,6 @@ export async function getFormula(req: Request, res: Response): Promise<void> {
   };
 
   res.status(HttpCode.Ok).json({
-    success: true,
-    data: {
-      formula
-    }
+    data: formula
   });
 }

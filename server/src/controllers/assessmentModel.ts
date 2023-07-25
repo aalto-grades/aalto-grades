@@ -44,10 +44,7 @@ export async function getAssessmentModel(req: Request, res: Response): Promise<v
   };
 
   res.status(HttpCode.Ok).json({
-    success: true,
-    data: {
-      assessmentModel: assessmentModelData
-    }
+    data: assessmentModelData
   });
 }
 
@@ -76,10 +73,7 @@ export async function getAllAssessmentModels(req: Request, res: Response): Promi
   }
 
   res.status(HttpCode.Ok).json({
-    success: true,
-    data: {
-      assessmentModels: assessmentModelsData
-    }
+    data: assessmentModelsData
   });
 }
 
@@ -106,11 +100,6 @@ export async function addAssessmentModel(req: Request, res: Response): Promise<v
   });
 
   res.status(HttpCode.Ok).json({
-    success: true,
-    data: {
-      assessmentModel: {
-        id: newAssessmentModel.id
-      }
-    }
+    data: newAssessmentModel.id
   });
 }

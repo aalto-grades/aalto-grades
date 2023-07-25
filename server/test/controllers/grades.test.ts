@@ -35,14 +35,12 @@ beforeAll(async () => {
 });
 
 function checkErrorRes(errorMessages: Array<string>, errorCode: HttpCode): void {
-  expect(res.body.success).toBe(false);
   errorMessages.forEach((error: string) => expect(res.body.errors).toContain(error));
   expect(res.body.data).not.toBeDefined();
   expect(res.statusCode).toBe(errorCode);
 }
 
 function checkSuccessRes(res: supertest.Response): void {
-  expect(res.body.success).toBe(true);
   expect(res.body.data).toBeDefined();
   expect(res.body.errors).not.toBeDefined();
   expect(res.statusCode).toBe(HttpCode.Ok);
@@ -103,7 +101,6 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.Forbidden);
 
-      expect(res.body.success).toBe(false);
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
     });
@@ -440,7 +437,7 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        expect(res.body.data.finalGrades).toEqual([
+        expect(res.body.data).toEqual([
           { studentNumber: '117486', grade: '1', credits: 5 },
           { studentNumber: '114732', grade: '5', credits: 5 },
           { studentNumber: '472886', grade: '3', credits: 5 },
@@ -469,7 +466,7 @@ describe(
           .set('Accept', 'application/json');
 
         checkSuccessRes(res);
-        expect(res.body.data.finalGrades).toEqual([
+        expect(res.body.data).toEqual([
           { studentNumber: '117486', grade: '1', credits: 5 },
           { studentNumber: '114732', grade: '5', credits: 5 },
           { studentNumber: '472886', grade: '3', credits: 5 },
@@ -495,7 +492,7 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        expect(res.body.data.finalGrades).toEqual([
+        expect(res.body.data).toEqual([
           { studentNumber: '711199', grade: 'PENDING', credits: 0 },
           { studentNumber: '869364', grade: 'PENDING', credits: 0 },
           { studentNumber: '872942', grade: 'PENDING', credits: 0 },
@@ -515,7 +512,7 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        expect(res.body.data.finalGrades).toEqual([
+        expect(res.body.data).toEqual([
           { studentNumber: '711199', grade: 'PENDING', credits: 0 },
           { studentNumber: '869364', grade: 'PENDING', credits: 0 },
           { studentNumber: '795451', grade: '0', credits: 5 }
@@ -531,8 +528,7 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        console.log(res.body.data.finalGrades);
-        expect(res.body.data.finalGrades).toEqual([
+        expect(res.body.data).toEqual([
           { studentNumber: '327976', grade: '5', credits: 5 },
           { studentNumber: '478988', grade: '5', credits: 5 },
           { studentNumber: '139131', grade: '5', credits: 5 },
@@ -551,8 +547,7 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        console.log(res.body.data.finalGrades);
-        expect(res.body.data.finalGrades).toEqual([
+        expect(res.body.data).toEqual([
           { studentNumber: '327976', grade: '5', credits: 5 },
           { studentNumber: '139131', grade: '5', credits: 5 },
         ]);
@@ -567,7 +562,7 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        expect(res.body.data.finalGrades).toEqual([
+        expect(res.body.data).toEqual([
           { studentNumber: '167155', grade: 'PENDING', credits: 0 },
           { studentNumber: '451288', grade: 'PENDING', credits: 0 },
           { studentNumber: '658593', grade: 'PENDING', credits: 0 },
@@ -607,7 +602,7 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        expect(res.body.data.finalGrades).toEqual([
+        expect(res.body.data).toEqual([
           { studentNumber: '369743', grade: '5', credits: 5 },
           { studentNumber: '795451', grade: '0', credits: 5 },
           { studentNumber: '716176', grade: '3', credits: 5 },
@@ -647,7 +642,6 @@ describe(
         .set('Cookie', cookies.userCookie)
         .expect(HttpCode.Forbidden);
 
-      expect(res.body.success).toBe(false);
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
     });
@@ -712,7 +706,6 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
       expect(res.body.data).toBeDefined();
     });
@@ -732,7 +725,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
-        expect(res.body.success).toBe(true);
         expect(res.body.errors).not.toBeDefined();
         expect(res.body.data).toBeDefined();
       });
@@ -766,7 +758,6 @@ describe(
       });
 
       expect(users.length).toBe(2);
-      expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
       expect(res.body.data).toBeDefined();
     });
@@ -792,7 +783,6 @@ describe(
 
       expect(userAttainment).not.toBeNull;
       expect(userAttainment.manual).toBe(true);
-      expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
       expect(res.body.data).toBeDefined();
     });
@@ -823,7 +813,6 @@ describe(
         .expect(HttpCode.Ok);
 
       expect(userAttainment.graderId).toBe(selfInfo.body.data.id);
-      expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
       expect(res.body.data).toBeDefined();
     });
@@ -840,7 +829,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
-        expect(res.body.success).toBe(true);
         expect(res.body.errors).not.toBeDefined();
         expect(res.body.data).toBeDefined();
       }, 40000);
@@ -1049,7 +1037,6 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.Forbidden);
 
-      expect(res.body.success).toBe(false);
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
     });
@@ -1237,7 +1224,6 @@ describe(
         .set('Cookie', cookies.userCookie)
         .expect(HttpCode.Forbidden);
 
-      expect(res.body.success).toBe(false);
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
     });
@@ -1253,7 +1239,6 @@ describe(
           .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.NotFound);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe('No student numbers found from instance ID 28');
       });

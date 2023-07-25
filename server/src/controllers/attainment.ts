@@ -126,10 +126,7 @@ export async function getAttainment(req: Request, res: Response): Promise<void> 
   }
 
   res.status(HttpCode.Ok).json({
-    success: true,
-    data: {
-      attainment: localRoot
-    },
+    data: localRoot
   });
 }
 
@@ -176,10 +173,7 @@ export async function getRootAttainment(req: Request, res: Response): Promise<vo
   }
 
   res.status(HttpCode.Ok).json({
-    success: true,
-    data: {
-      attainment: rootAttainments[0]
-    },
+    data: rootAttainments[0]
   });
 }
 
@@ -322,10 +316,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
   );
 
   res.status(HttpCode.Ok).json({
-    success: true,
-    data: {
-      attainment: attainmentTree
-    }
+    data: attainmentTree
   });
 }
 
@@ -472,10 +463,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   };
 
   res.status(HttpCode.Ok).json({
-    success: true,
-    data: {
-      attainment: attainmentTree
-    }
+    data: attainmentTree
   });
 }
 
@@ -499,7 +487,6 @@ export async function deleteAttainment(req: Request, res: Response): Promise<voi
   attainment.destroy();
 
   res.status(HttpCode.Ok).send({
-    success: true,
     data: {}
   });
 }

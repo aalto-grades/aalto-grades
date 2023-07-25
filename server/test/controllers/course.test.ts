@@ -28,17 +28,15 @@ describe('Test GET /v1/courses/:courseId - get course by ID', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
-    expect(res.body.data.course).toBeDefined();
-    expect(res.body.data.error).not.toBeDefined();
-    expect(res.body.data.course.id).toBe(1);
-    expect(res.body.data.course.courseCode).toBeDefined();
-    expect(res.body.data.course.minCredits).toBeDefined();
-    expect(res.body.data.course.maxCredits).toBeDefined();
-    expect(res.body.data.course.department).toBeDefined();
-    expect(res.body.data.course.name).toBeDefined();
-    expect(res.body.data.course.evaluationInformation).toBeDefined();
+    expect(res.body.data).toBeDefined();
+    expect(res.body.data.id).toBe(1);
+    expect(res.body.data.courseCode).toBeDefined();
+    expect(res.body.data.minCredits).toBeDefined();
+    expect(res.body.data.maxCredits).toBeDefined();
+    expect(res.body.data.department).toBeDefined();
+    expect(res.body.data.name).toBeDefined();
+    expect(res.body.data.evaluationInformation).toBeDefined();
   });
 
   it('should respond with 400 bad request, if validation fails (non-number course id)',
@@ -49,7 +47,6 @@ describe('Test GET /v1/courses/:courseId - get course by ID', () => {
         .set('Accept', 'application/json')
         .expect(HttpCode.BadRequest);
 
-      expect(res.body.success).toBe(false);
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
     });
@@ -68,7 +65,6 @@ describe('Test GET /v1/courses/:courseId - get course by ID', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.NotFound);
 
-    expect(res.body.success).toBe(false);
     expect(res.body.data).not.toBeDefined();
     expect(res.body.errors).toBeDefined();
   });
@@ -85,16 +81,15 @@ describe('Test GET /v1/courses - get all courses', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
-    expect(res.body.data.courses).toBeDefined();
-    expect(res.body.data.courses[0].id).toBeDefined();
-    expect(res.body.data.courses[0].courseCode).toBeDefined();
-    expect(res.body.data.courses[0].minCredits).toBeDefined();
-    expect(res.body.data.courses[0].maxCredits).toBeDefined();
-    expect(res.body.data.courses[0].department).toBeDefined();
-    expect(res.body.data.courses[0].name).toBeDefined();
-    expect(res.body.data.courses[0].evaluationInformation).toBeDefined();
+    expect(res.body.data).toBeDefined();
+    expect(res.body.data[0].id).toBeDefined();
+    expect(res.body.data[0].courseCode).toBeDefined();
+    expect(res.body.data[0].minCredits).toBeDefined();
+    expect(res.body.data[0].maxCredits).toBeDefined();
+    expect(res.body.data[0].department).toBeDefined();
+    expect(res.body.data[0].name).toBeDefined();
+    expect(res.body.data[0].evaluationInformation).toBeDefined();
   });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
@@ -108,7 +103,7 @@ describe('Test GET /v1/courses - get all courses', () => {
 
 describe('Test POST /v1/courses - create new course', () => {
 
-  it('should respond with course data on correct input (admin user)', async () => {
+  it('should respond with course ID on correct input (admin user)', async () => {
     let input: object = {
       courseCode: 'ELEC-A7200',
       minCredits: 5,
@@ -135,10 +130,8 @@ describe('Test POST /v1/courses - create new course', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
-    expect(res.body.data.course).toBeDefined();
-    expect(res.body.data.course.id).toBeDefined();
+    expect(res.body.data).toBeDefined();
 
     input = {
       courseCode: 'ELEC-A7200',
@@ -167,10 +160,8 @@ describe('Test POST /v1/courses - create new course', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    expect(res.body.success).toBe(true);
     expect(res.body.errors).not.toBeDefined();
-    expect(res.body.data.course).toBeDefined();
-    expect(res.body.data.course.id).toBeDefined();
+    expect(res.body.data).toBeDefined();
   });
 
   it('should respond with 400 bad request, if required fields are undefined', async () => {
@@ -181,7 +172,6 @@ describe('Test POST /v1/courses - create new course', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.BadRequest);
 
-    expect(res.body.success).toBe(false);
     expect(res.body.data).not.toBeDefined();
     expect(res.body.errors).toContain('courseCode is a required field');
     expect(res.body.errors).toContain('department is a required field');
@@ -236,7 +226,6 @@ describe('Test POST /v1/courses - create new course', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.NotFound);
 
-    expect(res.body.success).toBe(false);
     expect(res.body.errors).toBeDefined();
     expect(res.body.errors[0]).toBe('No user with email address not.found@aalto.fi found');
     expect(res.body.data).not.toBeDefined();
@@ -256,7 +245,6 @@ describe('Test POST /v1/courses - create new course', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.BadRequest);
 
-    expect(res.body.success).toBe(false);
     expect(res.body.data).not.toBeDefined();
     expect(res.body.errors).toContain(
       'SyntaxError: Unexpected end of JSON input: {"courseCode": "ELEC-A7200"'

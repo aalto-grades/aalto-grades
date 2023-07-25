@@ -34,11 +34,10 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
-      expect(res.body.data.assessmentModel.id).toBeDefined();
-      expect(res.body.data.assessmentModel.courseId).toBeDefined();
-      expect(res.body.data.assessmentModel.name).toBeDefined();
+      expect(res.body.data.id).toBeDefined();
+      expect(res.body.data.courseId).toBeDefined();
+      expect(res.body.data.name).toBeDefined();
     });
 
     it('should respond with 404 not found when assessment model does not exist',
@@ -49,7 +48,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.NotFound);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.errors).toBeDefined();
         expect(res.body.data).not.toBeDefined();
       }
@@ -63,7 +61,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.NotFound);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.errors).toBeDefined();
         expect(res.body.data).not.toBeDefined();
       }
@@ -77,7 +74,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.Conflict);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.errors).toBeDefined();
         expect(res.body.data).not.toBeDefined();
       }
@@ -96,12 +92,11 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
-      expect(res.body.data.assessmentModels).toBeDefined();
-      expect(res.body.data.assessmentModels[0].id).toBeDefined();
-      expect(res.body.data.assessmentModels[0].courseId).toBeDefined();
-      expect(res.body.data.assessmentModels[0].name).toBeDefined();
+      expect(res.body.data).toBeDefined();
+      expect(res.body.data[0].id).toBeDefined();
+      expect(res.body.data[0].courseId).toBeDefined();
+      expect(res.body.data[0].name).toBeDefined();
     });
 
     it('should respond with correct data when no assessment models exist', async () => {
@@ -111,10 +106,9 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
-      expect(res.body.data.assessmentModels).toBeDefined();
-      expect(res.body.data.assessmentModels.length).toBe(0);
+      expect(res.body.data).toBeDefined();
+      expect(res.body.data.length).toBe(0);
     });
 
     it('should respond with 404 not found when course does not exist',
@@ -125,7 +119,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.NotFound);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.errors).toBeDefined();
         expect(res.body.data).not.toBeDefined();
       }
@@ -148,11 +141,8 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
       expect(res.body.data).toBeDefined();
-      expect(res.body.data.assessmentModel).toBeDefined();
-      expect(res.body.data.assessmentModel.id).toBeDefined();
     });
 
     it(
@@ -170,11 +160,8 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
-        expect(res.body.success).toBe(true);
         expect(res.body.errors).not.toBeDefined();
         expect(res.body.data).toBeDefined();
-        expect(res.body.data.assessmentModel).toBeDefined();
-        expect(res.body.data.assessmentModel.id).toBeDefined();
       });
 
     it('should respond with 400 bad request if validation fails', async () => {
@@ -187,7 +174,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.errors).toBeDefined();
         expect(res.body.data).not.toBeDefined();
       }
@@ -216,7 +202,6 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.Forbidden);
 
-      expect(res.body.success).toBe(false);
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
     });
@@ -233,7 +218,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.NotFound);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.errors).toBeDefined();
         expect(res.body.data).not.toBeDefined();
       }

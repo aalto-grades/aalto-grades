@@ -26,13 +26,14 @@ export async function authSelfInfo(req: Request, res: Response): Promise<void> {
 
   const userFromDb: User = await findUserById(user.id, HttpCode.NotFound);
 
+  const auth: LoginResult = {
+    id: userFromDb.id,
+    role: userFromDb.role as SystemRole,
+    name: userFromDb.name
+  }
+
   res.send({
-    success: true,
-    data: {
-      id: userFromDb.id,
-      role: userFromDb.role,
-      name: userFromDb.name
-    }
+    data: auth
   });
 }
 
@@ -95,12 +96,7 @@ export async function authLogin(req: Request, res: Response, next: NextFunction)
           });
 
           return res.send({
-            success: true,
-            data: {
-              id: loginResult.id,
-              role: loginResult.role as string,
-              name: loginResult.name
-            }
+            data: loginResult
           });
         }
       );
@@ -114,7 +110,6 @@ export async function authLogout(_req: Request, res: Response): Promise<void> {
   });
 
   res.send({
-    success: true,
     data: {}
   });
 }
@@ -165,13 +160,14 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
     maxAge: JWT_COOKIE_EXPIRY_MS
   });
 
+  const auth: LoginResult = {
+    id: newUser.id,
+    role: newUser.role as SystemRole,
+    name: newUser.name
+  }
+
   res.send({
-    success: true,
-    data: {
-      id: newUser.id,
-      role: newUser.role,
-      name: newUser.name
-    }
+    data: auth
   });
 }
 

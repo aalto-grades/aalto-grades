@@ -425,10 +425,7 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
   }
 
   res.status(HttpCode.Ok).json({
-    success: true,
-    data: {
-      finalGrades
-    }
+    data: finalGrades
   });
 }
 
@@ -719,7 +716,6 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         // updated in the database.
 
         res.status(HttpCode.Ok).json({
-          success: true,
           data: {}
         });
         return;
@@ -1053,7 +1049,6 @@ export async function calculateGrades(
   });
 
   res.status(HttpCode.Ok).json({
-    success: true,
     data: {}
   });
 }

@@ -33,25 +33,24 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      expect(res.body.success).toBe(true);
-      expect(res.body.data.courseInstance).toBeDefined();
+      expect(res.body.data).toBeDefined();
       expect(res.body.errors).not.toBeDefined();
-      expect(res.body.data.courseInstance.id).toBe(1);
-      expect(res.body.data.courseInstance.assessmentModelId).toBe(1);
-      expect(res.body.data.courseInstance.startingPeriod).toBeDefined();
-      expect(res.body.data.courseInstance.endingPeriod).toBeDefined();
-      expect(res.body.data.courseInstance.startDate).toBeDefined();
-      expect(res.body.data.courseInstance.endDate).toBeDefined();
-      expect(res.body.data.courseInstance.type).toBeDefined();
-      expect(res.body.data.courseInstance.gradingScale).toBeDefined();
-      expect(res.body.data.courseInstance.courseData.courseCode).toBeDefined();
-      expect(res.body.data.courseInstance.courseData.minCredits).toBeDefined();
-      expect(res.body.data.courseInstance.courseData.maxCredits).toBeDefined();
-      expect(res.body.data.courseInstance.courseData.teachersInCharge).toBeDefined();
-      expect(res.body.data.courseInstance.courseData.teachersInCharge[0].name).toBeDefined();
-      expect(res.body.data.courseInstance.courseData.department).toBeDefined();
-      expect(res.body.data.courseInstance.courseData.name).toBeDefined();
-      expect(res.body.data.courseInstance.courseData.evaluationInformation).toBeDefined();
+      expect(res.body.data.id).toBe(1);
+      expect(res.body.data.assessmentModelId).toBe(1);
+      expect(res.body.data.startingPeriod).toBeDefined();
+      expect(res.body.data.endingPeriod).toBeDefined();
+      expect(res.body.data.startDate).toBeDefined();
+      expect(res.body.data.endDate).toBeDefined();
+      expect(res.body.data.type).toBeDefined();
+      expect(res.body.data.gradingScale).toBeDefined();
+      expect(res.body.data.courseData.courseCode).toBeDefined();
+      expect(res.body.data.courseData.minCredits).toBeDefined();
+      expect(res.body.data.courseData.maxCredits).toBeDefined();
+      expect(res.body.data.courseData.teachersInCharge).toBeDefined();
+      expect(res.body.data.courseData.teachersInCharge[0].name).toBeDefined();
+      expect(res.body.data.courseData.department).toBeDefined();
+      expect(res.body.data.courseData.name).toBeDefined();
+      expect(res.body.data.courseData.evaluationInformation).toBeDefined();
     });
 
     it('should respond with 400 bad request, if validation fails (non-number instance id)',
@@ -62,7 +61,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.BadRequest);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
       });
@@ -81,7 +79,6 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.NotFound);
 
-      expect(res.body.success).toBe(false);
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
     });
@@ -94,7 +91,6 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.Conflict);
 
-        expect(res.body.success).toBe(false);
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
       });
@@ -112,19 +108,18 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      expect(res.body.success).toBe(true);
-      expect(res.body.data.courseInstances[0].assessmentModelId).toBeDefined();
-      expect(res.body.data.courseInstances[0].courseData.id).toBeDefined();
-      expect(res.body.data.courseInstances[0].courseData.courseCode).toBeDefined();
-      expect(res.body.data.courseInstances[0].courseData.teachersInCharge).toBeDefined();
-      expect(res.body.data.courseInstances[0].id).toBeDefined();
-      expect(res.body.data.courseInstances[0].sisuCourseInstanceId).toBeDefined();
-      expect(res.body.data.courseInstances[0].startingPeriod).toBeDefined();
-      expect(res.body.data.courseInstances[0].endingPeriod).toBeDefined();
-      expect(res.body.data.courseInstances[0].startDate).toBeDefined();
-      expect(res.body.data.courseInstances[0].endDate).toBeDefined();
-      expect(res.body.data.courseInstances[0].type).toBeDefined();
-      expect(res.body.data.courseInstances[0].gradingScale).toBeDefined();
+      expect(res.body.data[0].assessmentModelId).toBeDefined();
+      expect(res.body.data[0].courseData.id).toBeDefined();
+      expect(res.body.data[0].courseData.courseCode).toBeDefined();
+      expect(res.body.data[0].courseData.teachersInCharge).toBeDefined();
+      expect(res.body.data[0].id).toBeDefined();
+      expect(res.body.data[0].sisuCourseInstanceId).toBeDefined();
+      expect(res.body.data[0].startingPeriod).toBeDefined();
+      expect(res.body.data[0].endingPeriod).toBeDefined();
+      expect(res.body.data[0].startDate).toBeDefined();
+      expect(res.body.data[0].endDate).toBeDefined();
+      expect(res.body.data[0].type).toBeDefined();
+      expect(res.body.data[0].gradingScale).toBeDefined();
     });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
@@ -141,7 +136,6 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.BadRequest);
 
-      expect(res.body.success).toBe(false);
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
     });
@@ -153,8 +147,6 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.NotFound);
 
-      expect(res.statusCode).toBe(404);
-      expect(res.body.success).toBe(false);
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
     });
@@ -172,9 +164,8 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
-      expect(res.body.data.courseInstance.id).toBeDefined();
+      expect(res.body.data).toBeDefined();
     }
 
     await goodInput({
@@ -226,9 +217,8 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      expect(res.body.success).toBe(true);
       expect(res.body.errors).not.toBeDefined();
-      expect(res.body.data.courseInstance.id).toBeDefined();
+      expect(res.body.data).toBeDefined();
     });
 
   it('should respond with 400 bad request, if incorrect input', async () => {
@@ -240,7 +230,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
         .set('Accept', 'application/json')
         .expect(HttpCode.BadRequest);
 
-      expect(res.body.success).toBe(false);
       expect(res.body.data).not.toBeDefined();
       expect(res.body.errors).toBeDefined();
     }
@@ -303,7 +292,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       .set('Accept', 'application/json')
       .expect(HttpCode.Forbidden);
 
-    expect(res.body.success).toBe(false);
     expect(res.body.data).not.toBeDefined();
     expect(res.body.errors).toBeDefined();
   });
@@ -324,7 +312,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       .set('Accept', 'application/json')
       .expect(HttpCode.NotFound);
 
-    expect(res.body.success).toBe(false);
     expect(res.body.data).not.toBeDefined();
     expect(res.body.errors).toBeDefined();
   });
@@ -346,7 +333,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       .set('Accept', 'application/json')
       .expect(HttpCode.Conflict);
 
-    expect(res.body.success).toBe(false);
     expect(res.body.data).not.toBeDefined();
     expect(res.body.errors[0]).toBe(
       'sisu ID aalto-CUR-165388-3874205 already in use on instance ID 1'
