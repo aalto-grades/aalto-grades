@@ -11,11 +11,10 @@ import {
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
-import { UseQueryResult } from '@tanstack/react-query';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';
 
-import { useExportSisuGradeCsv } from '../../hooks/useApi';
+import { useDownloadSisuGradeCsv, UseDownloadSisuGradeCsvResult } from '../../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import { State } from '../../types';
 
@@ -90,27 +89,10 @@ export default function SisuExportDialog(props: {
   const [completionLanguage, setCompletionLanguage]: State<string | undefined> =
     useState<string | undefined>(undefined);
 
-  const exportSisuGradeCsv: UseQueryResult<BlobPart> = useExportSisuGradeCsv(
-    courseId, assessmentModelId,
-    {
-      completionLanguage: completionLanguage,
-      assessmentDate: assessmentDate,
-      studentNumbers: props.selectedStudents.map((student: FinalGrade) => student.studentNumber)
-    },
-    { enabled: false }
-  );
-
-  async function handleExportSisuGradeCsv(): Promise<void> {
-    snackPack.push({
-      msg: 'Fetching Sisu CSV...',
-      severity: 'info'
-    });
-
-    exportSisuGradeCsv.refetch();
-
-    if (!exportSisuGradeCsv.isLoading && exportSisuGradeCsv.data) {
+  const downloadSisuGradeCsv: UseDownloadSisuGradeCsvResult = useDownloadSisuGradeCsv({
+    onSuccess: (gradeCsv: BlobPart) => {
       // Create a blob object from the response data
-      const blob: Blob = new Blob([exportSisuGradeCsv.data], { type: 'text/csv' });
+      const blob: Blob = new Blob([gradeCsv], { type: 'text/csv' });
 
       const link: HTMLAnchorElement = document.createElement('a');
       link.href = URL.createObjectURL(blob);
@@ -124,6 +106,25 @@ export default function SisuExportDialog(props: {
       snackPack.push({
         msg: 'Final grades exported to Sisu CSV format succesfully.',
         severity: 'success'
+      });
+    }
+  });
+
+  async function handleExportSisuGradeCsv(): Promise<void> {
+    if (courseId && assessmentModelId) {
+      snackPack.push({
+        msg: 'Fetching Sisu CSV...',
+        severity: 'info'
+      });
+
+      downloadSisuGradeCsv.mutate({
+        courseId: courseId,
+        assessmentModelId: assessmentModelId,
+        params: {
+          completionLanguage: completionLanguage,
+          assessmentDate: assessmentDate,
+          studentNumbers: props.selectedStudents.map((student: FinalGrade) => student.studentNumber)
+        }
       });
     }
   }

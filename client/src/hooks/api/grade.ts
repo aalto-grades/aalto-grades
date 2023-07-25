@@ -11,40 +11,54 @@ import {
 
 import { Numeric } from '../../types';
 
-export function useDownloadCsvTemplate(
+interface DownloadCsvTemplateVars {
   courseId: Numeric,
-  assessmentModelId: Numeric,
-  options?: UseQueryOptions<string>
-): UseQueryResult<string> {
-  return useQuery({
-    queryKey: ['download-csv-template', courseId, assessmentModelId],
-    queryFn: async () => (
+  assessmentModelId: Numeric
+}
+
+export type UseDownloadCsvTemplateResult = UseMutationResult<
+  string, unknown, DownloadCsvTemplateVars
+>;
+
+export function useDownloadCsvTemplate(
+  options?: UseMutationOptions<string, unknown, DownloadCsvTemplateVars>
+): UseDownloadCsvTemplateResult {
+  return useMutation({
+    mutationFn: async (vars: DownloadCsvTemplateVars) => (
       await axios.get(
-        `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/csv`
+        `/v1/courses/${vars.courseId}`
+        + `/assessment-models/${vars.assessmentModelId}/grades/csv`
       )
     ).data,
     ...options
   });
 }
 
-export function useExportSisuGradeCsv(
+interface DownloadSisuGradeCsvVars {
   courseId: Numeric,
   assessmentModelId: Numeric,
   params: {
     completionLanguage?: string,
     assessmentDate?: string,
     studentNumbers: Array<string>
-  },
-  options?: UseQueryOptions<BlobPart>
-): UseQueryResult<BlobPart> {
-  return useQuery({
-    queryKey: ['export-sisu-grade-csv', courseId, assessmentModelId],
-    queryFn: async () => (
+  }
+}
+
+export type UseDownloadSisuGradeCsvResult = UseMutationResult<
+  BlobPart, unknown, DownloadSisuGradeCsvVars
+>;
+
+export function useDownloadSisuGradeCsv(
+  options?: UseMutationOptions<BlobPart, unknown, DownloadSisuGradeCsvVars>
+): UseDownloadSisuGradeCsvResult {
+  return useMutation({
+    mutationFn: async (vars: DownloadSisuGradeCsvVars): Promise<BlobPart> => (
       await axios.get(
-        `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/csv/sisu`,
+        `/v1/courses/${vars.courseId}`
+        + `/assessment-models/${vars.assessmentModelId}/grades/csv/sisu`,
         {
           responseType: 'blob',
-          params
+          params: vars.params
         }
       )
     ).data,
