@@ -12,7 +12,7 @@ export interface CalculationResult {
   status: Status;
 }
 
-export interface ParamsObject<T> {
+export interface ParamsObject<T = unknown> {
   children: Array<[string, T]>;
 }
 

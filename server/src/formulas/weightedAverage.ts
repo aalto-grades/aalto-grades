@@ -104,7 +104,7 @@ registerFormula(
   params,
   childParams,
   yup.object({
-    children: yup.array().of(
+    children: yup.array().min(1).of(
       yup.tuple([
         yup.string(),
         yup.object({

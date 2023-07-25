@@ -12,6 +12,7 @@ import TeacherInCharge from '../../src/database/models/teacherInCharge';
 import { mockAttainment, jestMockAttainment } from '../mock-data/attainment';
 import { mockTeacher } from '../mock-data/misc';
 import { app } from '../../src/app';
+import { ParamsObject } from '../../src/types';
 import { Cookies, getCookies } from '../util/getCookies';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
@@ -515,6 +516,94 @@ describe(
       }
     );
 
+    it(
+      'should respond with 400 bad request, if formula params are missing a child',
+      async () => {
+        const res: supertest.Response = await request
+          .post('/v1/courses/3/assessment-models/3/attainments')
+          .send({
+            parentId: 3,
+            name: 'Failure',
+            tag: 'missing child',
+            daysValid: 1,
+            formula: Formula.WeightedAverage,
+            formulaParams: {
+              children: [
+                ['i-am-present', { weight: 1 }]
+              ]
+            },
+            subAttainments: [
+              {
+                name: 'Present',
+                tag: 'i-am-present',
+                daysValid: 1,
+                formula: Formula.Manual
+              },
+              {
+                name: 'Absent',
+                tag: 'i-am-absent',
+                daysValid: 0,
+                formula: Formula.Manual
+              }
+            ]
+          })
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.BadRequest);
+
+        expect(res.body.success).toBe(false);
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+        expect(res.body.errors).toContain(
+          'formula params do not include subattainments with tags i-am-absent'
+        );
+      }
+    );
+
+    it(
+      'should respond with 400 bad request, if formula params include an invalid tag',
+      async () => {
+        const res: supertest.Response = await request
+          .post('/v1/courses/3/assessment-models/3/attainments')
+          .send({
+            parentId: 3,
+            name: 'Failure',
+            tag: 'invalid tag',
+            daysValid: 1,
+            formula: Formula.WeightedAverage,
+            formulaParams: {
+              children: [
+                ['the good', { weight: 1 }],
+                ['the bad', { weight: 2 }],
+                ['the ugly', { weight: 3 }]
+              ]
+            },
+            subAttainments: [
+              {
+                name: 'I exist',
+                tag: 'the good',
+                daysValid: 1,
+                formula: Formula.Manual
+              }
+            ]
+          })
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.BadRequest);
+
+        expect(res.body.success).toBe(false);
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+        expect(res.body.errors).toContain(
+          'invalid subattainment tags in formula params: the bad,the ugly'
+        );
+      }
+    );
+
     it('should respond with 400 bad request, if validation fails in the sub-attainment level',
       async () => {
         // Validate on level 1
@@ -807,6 +896,63 @@ describe(
       expect(res.body.data.attainment.parentId).toBe(subAttainments[1].id);
     });
 
+    it(
+      'should update the formula params of a potential parent attainment with'
+      + ' a new attainment tag if it is changed in a child',
+      async () => {
+        let attainment: Attainment | null = await Attainment.findByPk(258);
+        let parentParams: ParamsObject = attainment?.formulaParams as ParamsObject;
+
+        expect(parentParams.children).toContainEqual(['259', { weight: 1 }]);
+        expect(parentParams.children).toContainEqual(['260', { weight: 1 }]);
+
+        const res: supertest.Response = await request
+          .put('/v1/courses/2/assessment-models/43/attainments/259')
+          .send({ tag: 'changed tag' })
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.adminCookie)
+          .expect(HttpCode.Ok);
+
+        expect(res.body.success).toBe(true);
+        expect(res.body.errors).not.toBeDefined();
+
+        attainment = await Attainment.findByPk(258);
+        parentParams = attainment?.formulaParams as ParamsObject;
+
+        expect(parentParams.children).not.toContainEqual(['259', { weight: 1 }]);
+        expect(parentParams.children).toContainEqual(['changed tag', { weight: 1 }]);
+        expect(parentParams.children).toContainEqual(['260', { weight: 1 }]);
+      }
+    );
+
+    it(
+      'should remove an attainment tag from the formula params of a potential'
+      + ' parent attainment if the parent ID of a child is changed',
+      async () => {
+        let attainment: Attainment | null = await Attainment.findByPk(261);
+        let parentParams: ParamsObject = attainment?.formulaParams as ParamsObject;
+
+        expect(parentParams.children).toContainEqual(['262', { weight: 1 }]);
+        expect(parentParams.children).toContainEqual(['263', { weight: 1 }]);
+
+        const res: supertest.Response = await request
+          .put('/v1/courses/2/assessment-models/44/attainments/262')
+          .send({ parentId: 263 })
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.adminCookie)
+          .expect(HttpCode.Ok);
+
+        expect(res.body.success).toBe(true);
+        expect(res.body.errors).not.toBeDefined();
+
+        attainment = await Attainment.findByPk(261);
+        parentParams = attainment?.formulaParams as ParamsObject;
+
+        expect(parentParams.children).not.toContainEqual(['262', { weight: 1 }]);
+        expect(parentParams.children).toContainEqual(['263', { weight: 1 }]);
+      }
+    );
+
     it('should respond with 400 bad request, if validation fails (non-number assessment model id)',
       async () => {
         const res: supertest.Response = await request
@@ -855,7 +1001,7 @@ describe(
     it('should respond with 400 bad request, if formula params are incorrect',
       async () => {
         const res: supertest.Response = await request
-          .put('/v1/courses/1/assessment-models/1/attainments/5')
+          .put('/v1/courses/1/assessment-models/1/attainments/1')
           .send({
             formula: Formula.WeightedAverage,
             formulaParams: {}
@@ -869,6 +1015,67 @@ describe(
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
         expect(res.body.errors).toContain('children is a required field');
+      }
+    );
+
+    it(
+      'should respond with 400 bad request, if formula params are missing a child',
+      async () => {
+        const res: supertest.Response = await request
+          .put('/v1/courses/1/assessment-models/1/attainments/1')
+          .send({
+            formulaParams: {
+              children: [
+                ['tag5', { weight: 5 }],
+                ['tag16', { weight: 16 }]
+              ]
+            }
+          })
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.BadRequest);
+
+        expect(res.body.success).toBe(false);
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+        expect(res.body.errors).toContain(
+          'formula params do not include subattainments with tags tag9,tag17,tag18'
+        );
+      }
+    );
+
+    it(
+      'should respond with 400 bad request, if formula params include an invalid tag',
+      async () => {
+        const res: supertest.Response = await request
+          .put('/v1/courses/1/assessment-models/1/attainments/1')
+          .send({
+            formulaParams: {
+              children: [
+                ['tag5', { weight: 5 }],
+                ['tag9', { weight: 9 }],
+                ['tag16', { weight: 16 }],
+                ['tag17', { weight: 17 }],
+                ['tag18', { weight: 18 }],
+                ['invalid', { weight: 1 }],
+                ['invalid too', { weight: 2 }]
+              ]
+            }
+          })
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.BadRequest);
+
+        expect(res.body.success).toBe(false);
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+        expect(res.body.errors).toContain(
+          'invalid subattainment tags in formula params: invalid,invalid too'
+        );
       }
     );
 
