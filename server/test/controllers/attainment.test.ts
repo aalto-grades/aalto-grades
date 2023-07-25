@@ -12,7 +12,14 @@ import TeacherInCharge from '../../src/database/models/teacherInCharge';
 import { mockAttainment, jestMockAttainment } from '../mock-data/attainment';
 import { mockTeacher } from '../mock-data/misc';
 import { app } from '../../src/app';
+import { ParamsObject } from '../../src/types';
 import { Cookies, getCookies } from '../util/getCookies';
+
+// Not mocking structuredClone leads to errors about it being undefined.
+// Probably related: https://github.com/jsdom/jsdom/issues/3363
+global.structuredClone = <T,>(value: T): T => {
+  return JSON.parse(JSON.stringify(value));
+};
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
@@ -899,7 +906,28 @@ describe(
       'should update the formula params of a potential parent attainment with'
       + ' a new attainment tag if it is changed in a child',
       async () => {
-        // TODO
+        let attainment: Attainment | null = await Attainment.findByPk(258);
+        let parentParams: ParamsObject = attainment?.formulaParams as ParamsObject;
+
+        expect(parentParams.children).toContainEqual(['259', { weight: 1 }]);
+        expect(parentParams.children).toContainEqual(['260', { weight: 1 }]);
+
+        const res: supertest.Response = await request
+          .put('/v1/courses/2/assessment-models/43/attainments/259')
+          .send({ tag: 'changed tag' })
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.adminCookie)
+          .expect(HttpCode.Ok);
+
+        expect(res.body.success).toBe(true);
+        expect(res.body.errors).not.toBeDefined();
+
+        attainment = await Attainment.findByPk(258);
+        parentParams = attainment?.formulaParams as ParamsObject;
+
+        expect(parentParams.children).not.toContainEqual(['259', { weight: 1 }]);
+        expect(parentParams.children).toContainEqual(['changed tag', { weight: 1 }]);
+        expect(parentParams.children).toContainEqual(['260', { weight: 1 }]);
       }
     );
 
@@ -907,7 +935,27 @@ describe(
       'should remove an attainment tag from the formula params of a potential'
       + ' parent attainment if the parent ID of a child is changed',
       async () => {
-        // TODO
+        let attainment: Attainment | null = await Attainment.findByPk(261);
+        let parentParams: ParamsObject = attainment?.formulaParams as ParamsObject;
+
+        expect(parentParams.children).toContainEqual(['262', { weight: 1 }]);
+        expect(parentParams.children).toContainEqual(['263', { weight: 1 }]);
+
+        const res: supertest.Response = await request
+          .put('/v1/courses/2/assessment-models/44/attainments/262')
+          .send({ parentId: 263 })
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.adminCookie)
+          .expect(HttpCode.Ok);
+
+        expect(res.body.success).toBe(true);
+        expect(res.body.errors).not.toBeDefined();
+
+        attainment = await Attainment.findByPk(261);
+        parentParams = attainment?.formulaParams as ParamsObject;
+
+        expect(parentParams.children).not.toContainEqual(['262', { weight: 1 }]);
+        expect(parentParams.children).toContainEqual(['263', { weight: 1 }]);
       }
     );
 

@@ -261,4 +261,10 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, tag, days_v
 (41, null, 'for grading test', 'assesment model 41, root id 254', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["exam", { "weight": 1.0 }]] }'),
 (41, 254, 'for grading test - assesment model 41, child id 255', 'exam', 365, NOW(), NOW(), 'MANUAL', NULL),
 (42, null, 'for grading test', 'assesment model 42, root id 256', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["exam", { "weight": 1.0 }]] }'),
-(42, 256, 'for grading test - assesment model 42, child id 257', 'exam', 365, NOW(), NOW(), 'MANUAL', NULL);
+(42, 256, 'for grading test - assesment model 42, child id 257', 'exam', 365, NOW(), NOW(), 'MANUAL', NULL),
+(43, null, 'attainment test - update tag in parent', '258', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["259", { "weight": 1 }], ["260", { "weight": 1 }]] }'),
+(43, 258, 'attainment test - update tag in parent', '259', 365, NOW(), NOW(), 'MANUAL', NULL),
+(43, 258, 'attainment test - update tag in parent', '260', 365, NOW(), NOW(), 'MANUAL', NULL),
+(44, null, 'attainment test - remove tag from parent', '261', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["262", { "weight": 1 }], ["263", { "weight": 1 }]] }'),
+(44, 261, 'attainment test - remove tag from parent', '262', 365, NOW(), NOW(), 'MANUAL', NULL),
+(44, 261, 'attainment test - remove tag from parent', '263', 365, NOW(), NOW(), 'MANUAL', NULL);
