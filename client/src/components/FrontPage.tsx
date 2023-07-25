@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseData, SystemRole } from 'aalto-grades-common/types';
+import { CourseData, LoginResult, SystemRole } from 'aalto-grades-common/types';
 import { Box, Button, Typography } from '@mui/material';
 import { JSX } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
@@ -17,11 +17,9 @@ export default function FrontPage(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { auth }: AuthContextType = useAuth();
 
-  if (!auth)
-    return (<></>);
-
   const courses: UseQueryResult<Array<CourseData>> = useGetAllCourses();
-  const coursesOfUser: UseQueryResult<Array<CourseData>> = useGetCoursesOfUser(auth.id);
+  const coursesOfUser: UseQueryResult<Array<CourseData>> =
+    useGetCoursesOfUser((auth as LoginResult).id);
 
   return (
     <>
