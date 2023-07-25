@@ -12,7 +12,7 @@ import CourseResultsTable from './course-results-view/CourseResultsTable';
 
 import {
   useCalculateFinalGrades, UseCalculateFinalGradesResult,
-  useDownloadCsvTemplate,
+  useDownloadCsvTemplate, UseDownloadCsvTemplateResult,
   useGetFinalGrades
 } from '../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../hooks/useSnackPackAlerts';
@@ -60,21 +60,9 @@ export default function CourseResultsView(): JSX.Element {
     }
   }
 
-  const downloadCsvTemplate: UseQueryResult<string> = useDownloadCsvTemplate(
-    courseId, assessmentModelId,
-    { enabled: false }
-  );
-
-  async function handleDownloadCsvTemplate(): Promise<void> {
-    snackPack.push({
-      msg: 'Downloading CSV template',
-      severity: 'info'
-    });
-
-    downloadCsvTemplate.refetch();
-
-    if (!downloadCsvTemplate.isLoading && downloadCsvTemplate.data) {
-      const blob: Blob = new Blob([downloadCsvTemplate.data], { type: 'text/csv' });
+  const downloadCsvTemplate: UseDownloadCsvTemplateResult = useDownloadCsvTemplate({
+    onSuccess: (csvTemplate: string) => {
+      const blob: Blob = new Blob([csvTemplate], { type: 'text/csv' });
       const link: HTMLAnchorElement = document.createElement('a');
 
       link.href = URL.createObjectURL(blob);
@@ -82,6 +70,20 @@ export default function CourseResultsView(): JSX.Element {
       link.click();
       URL.revokeObjectURL(link.href);
       link.remove();
+    }
+  });
+
+  async function handleDownloadCsvTemplate(): Promise<void> {
+    if (courseId && assessmentModelId) {
+      snackPack.push({
+        msg: 'Downloading CSV template',
+        severity: 'info'
+      });
+
+      downloadCsvTemplate.mutate({
+        courseId: courseId,
+        assessmentModelId: assessmentModelId
+      });
     }
   }
 
