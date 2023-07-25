@@ -20,10 +20,8 @@ import { State } from '../types';
 import { UseQueryResult } from '@tanstack/react-query';
 
 export default function CourseResultsView(): JSX.Element {
-  const { courseId, assessmentModelId }: Params = useParams();
-
-  if (!courseId || !assessmentModelId)
-    return (<></>);
+  const { courseId, assessmentModelId }: Params =
+    useParams() as { courseId: string, assessmentModelId: string };
 
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
   const [selectedStudents, setSelectedStudents]: State<Array<FinalGrade>> =

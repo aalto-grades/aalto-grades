@@ -13,10 +13,7 @@ import { useGetAllSisuInstances } from '../hooks/useApi';
 
 export default function FetchInstancesView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
-  const { courseId, courseCode }: Params = useParams();
-
-  if (!courseId || !courseCode)
-    return (<></>);
+  const { courseId, courseCode }: Params = useParams() as { courseId: string, courseCode: string };
 
   const sisuInstances: UseQueryResult<Array<CourseInstanceData>> =
     useGetAllSisuInstances(courseCode);

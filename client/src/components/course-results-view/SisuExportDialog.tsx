@@ -78,10 +78,8 @@ export default function SisuExportDialog(props: {
   handleClose: () => void,
   selectedStudents: Array<FinalGrade>
 }): JSX.Element {
-  const { courseId, assessmentModelId }: Params = useParams();
-
-  if (!courseId || !assessmentModelId)
-    return (<></>);
+  const { courseId, assessmentModelId }: Params =
+    useParams() as { courseId: string, assessmentModelId: string };
 
   // state variables handling the alert messages.
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
