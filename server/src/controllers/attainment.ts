@@ -419,6 +419,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
       );
 
       if (parent.formulaParams) {
+        // TODO: Use structuredClone to copy the object
         const parentParams: ParamsObject =
           JSON.parse(JSON.stringify(parent.formulaParams)) as ParamsObject;
 
