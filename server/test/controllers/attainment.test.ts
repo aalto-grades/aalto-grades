@@ -15,12 +15,6 @@ import { app } from '../../src/app';
 import { ParamsObject } from '../../src/types';
 import { Cookies, getCookies } from '../util/getCookies';
 
-// Not mocking structuredClone leads to errors about it being undefined.
-// Probably related: https://github.com/jsdom/jsdom/issues/3363
-global.structuredClone = <T,>(value: T): T => {
-  return JSON.parse(JSON.stringify(value));
-};
-
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
 const badInput: string = 'notValid';

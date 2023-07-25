@@ -420,7 +420,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
 
       if (parent.formulaParams) {
         const parentParams: ParamsObject =
-          structuredClone(parent.formulaParams) as ParamsObject;
+          JSON.parse(JSON.stringify(parent.formulaParams)) as ParamsObject;
 
         for (const i in parentParams.children) {
           if (parentParams.children[i][0] === attainment.tag) {
