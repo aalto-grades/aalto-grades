@@ -13,7 +13,6 @@ import { UseQueryResult } from '@tanstack/react-query';
 
 import AttainmentCategory from '../attainments/AttainmentCategory';
 import EditFormulaDialog from '../edit-formula-dialog/EditFormulaDialog';
-import MenuButton, { MenuButtonOption } from './MenuButton';
 
 import { useGetFormula } from '../../hooks/useApi';
 import { State } from '../../types';
@@ -21,8 +20,7 @@ import { State } from '../../types';
 export default function Attainments(props: {
   attainmentTree: AttainmentData,
   courseId: number,
-  assessmentModel: AssessmentModelData,
-  handleAddPoints: () => void
+  assessmentModel: AssessmentModelData
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const [editFormulaOpen, setEditFormulaOpen]: State<boolean> = useState(false);
@@ -30,17 +28,6 @@ export default function Attainments(props: {
   const rootFormula: UseQueryResult<FormulaData> = useGetFormula(
     props.attainmentTree.formula ?? Formula.Manual
   );
-
-  const actionOptions: Array<MenuButtonOption> = [
-    {
-      description: 'Import from file',
-      handleClick: props.handleAddPoints
-    },
-    {
-      description: 'Import from A+',
-      handleClick: () => console.error('Importing from A+ is not implemented')
-    }
-  ];
 
   return (
     <Box borderRadius={1} sx={{
@@ -123,7 +110,6 @@ export default function Attainments(props: {
           >
             See course results
           </Button>
-          <MenuButton label='Import grades' options={actionOptions} />
         </Box>
       </Box>
     </Box>
@@ -133,7 +119,5 @@ export default function Attainments(props: {
 Attainments.propTypes = {
   attainmentTree: PropTypes.object,
   assessmentModel: PropTypes.object,
-  courseId: PropTypes.number,
-  handleAddPoints: PropTypes.func,
-  onChangeFormula: PropTypes.func
+  courseId: PropTypes.number
 };

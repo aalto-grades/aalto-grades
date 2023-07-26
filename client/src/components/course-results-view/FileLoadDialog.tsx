@@ -190,7 +190,7 @@ export default function FileLoadDialog(props: {
             variant='outlined'
             onClick={(): void => {
               if (!fileName) {
-                setValidationError('You must select a csv file to submit');
+                setValidationError('You must select a CSV file to submit');
                 return;
               }
               uploadFile();

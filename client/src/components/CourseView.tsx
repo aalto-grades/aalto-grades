@@ -13,7 +13,6 @@ import { UseQueryResult } from '@tanstack/react-query';
 import Attainments from './course-view/Attainments';
 import CreateAssessmentModelDialog from './course-view/CreateAssessmentModelDialog';
 import CourseDetails from './course-view/CourseDetails';
-import FileLoadDialog from './course-view/FileLoadDialog';
 import InstancesTable from './course-view/InstancesTable';
 
 import {
@@ -28,7 +27,6 @@ export default function CourseView(): JSX.Element {
   const { auth, isTeacherInCharge, setIsTeacherInCharge }: AuthContextType = useAuth();
 
   const [animation, setAnimation]: State<boolean> = useState(false);
-  const [fileLoadOpen, setFileLoadOpen]: State<boolean> = useState(false);
   const [createAssessmentModelOpen, setCreateAssessmentModelOpen]: State<boolean> = useState(false);
 
   const course: UseQueryResult<CourseData> = useGetCourse(courseId);
@@ -121,7 +119,6 @@ export default function CourseView(): JSX.Element {
                           attainmentTree={attainmentTree.data}
                           courseId={Number(courseId)}
                           assessmentModel={currentAssessmentModel}
-                          handleAddPoints={(): void => setFileLoadOpen(true)}
                         />
                       }
                     </div>
@@ -169,14 +166,6 @@ export default function CourseView(): JSX.Element {
             }
           </Box>
           <InstancesTable courseId={courseId} />
-          {
-            currentAssessmentModel != null &&
-            <FileLoadDialog
-              assessmentModelId={currentAssessmentModel.id as number}
-              open={fileLoadOpen}
-              handleClose={(): void => setFileLoadOpen(false)}
-            />
-          }
           <CreateAssessmentModelDialog
             open={createAssessmentModelOpen}
             handleClose={(): void => setCreateAssessmentModelOpen(false)}
