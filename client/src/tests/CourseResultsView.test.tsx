@@ -39,17 +39,13 @@ describe('Tests for CourseResultsView components', () => {
   });
 
   test(
-    'CourseResultsTable should show a dialog for uploading a file when'
-    + ' clicking on a menu button and choosing that option',
+    'CourseResultsTable should show a dialog for uploading a file after'
+    + ' clicking the upload button',
     async () => {
 
       renderCourseResultsView();
 
-      const importGradesMenuButton: HTMLElement = await screen.findByText('Import grades');
-      expect(importGradesMenuButton).toBeDefined();
-      act(() => userEvent.click(importGradesMenuButton));
-
-      const uploadOption: HTMLElement = screen.getByText('Import from file');
+      const uploadOption: HTMLElement = screen.getByText('Upload Grades');
       expect(uploadOption).toBeDefined();
       act(() => userEvent.click(uploadOption));
 
@@ -69,8 +65,8 @@ describe('Tests for CourseResultsView components', () => {
   );
 
   test(
-    'CourseResultsTable should show a dialog for exporting Sisu CSV'
-    + ' when clicking on a export button',
+    'CourseResultsTable should show a dialog for downloading a Sisu CSV'
+    + ' after clicking the download button',
     async () => {
 
       renderCourseResultsView();
@@ -80,12 +76,12 @@ describe('Tests for CourseResultsView components', () => {
         act(() => userEvent.click(selectAllCheckBox));
         expect(selectAllCheckBox).toBeChecked();
 
-        const exportGradesMenuButton: HTMLElement = await screen.findByText('Export to Sisu CSV');
-        expect(exportGradesMenuButton).toBeDefined();
-        act(() => userEvent.click(exportGradesMenuButton));
+        const downloadSisuCsvButton: HTMLElement = await screen.findByText('Download Sisu CSV');
+        expect(downloadSisuCsvButton).toBeDefined();
+        act(() => userEvent.click(downloadSisuCsvButton));
 
-        const dialogTitle: HTMLElement = screen.getByText('Export final grades to Sisu CSV');
-        const exportButton: HTMLElement = screen.getByText('Export');
+        const dialogTitle: HTMLElement = screen.getByText('Download final grades as Sisu CSV');
+        const exportButton: HTMLElement = screen.getByText('Download');
         const cancelButton: HTMLElement = screen.getByText('Cancel');
 
         expect(dialogTitle).toBeVisible();

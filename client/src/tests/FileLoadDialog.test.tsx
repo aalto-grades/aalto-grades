@@ -68,13 +68,9 @@ describe('FileLoadDialog test with proper csv', () => {
       role: SystemRole.Admin
     };
 
-    const { getByText, findByText }: RenderResult = renderCourseView(auth);
+    const { getByText }: RenderResult = renderCourseView(auth);
 
-    const importGradesMenuButton: HTMLElement = await findByText('Import grades');
-    expect(importGradesMenuButton).toBeDefined();
-    act(() => userEvent.click(importGradesMenuButton));
-
-    const uploadOption: HTMLElement = getByText('Import from file');
+    const uploadOption: HTMLElement = getByText('Upload Grades');
     expect(uploadOption).toBeDefined();
     act(() => userEvent.click(uploadOption));
 
@@ -106,11 +102,7 @@ describe('FileLoadDialog test with proper csv', () => {
 
       const { getByText, findByText }: RenderResult = renderCourseView(auth);
 
-      const importGradesMenuButton: HTMLElement = await findByText('Import grades');
-      expect(importGradesMenuButton).toBeDefined();
-      act(() => userEvent.click(importGradesMenuButton));
-
-      const uploadOption: HTMLElement = getByText('Import from file');
+      const uploadOption: HTMLElement = getByText('Upload Grades');
       expect(uploadOption).toBeDefined();
       act(() => userEvent.click(uploadOption));
 
@@ -134,13 +126,9 @@ describe('FileLoadDialog test with proper csv', () => {
       role: SystemRole.Admin
     };
 
-    const { getByText, findByText, queryByText }: RenderResult = renderCourseView(auth);
+    const { getByText, queryByText }: RenderResult = renderCourseView(auth);
 
-    const importGradesMenuButton: HTMLElement = await findByText('Import grades');
-    expect(importGradesMenuButton).toBeDefined();
-    act(() => userEvent.click(importGradesMenuButton));
-
-    const uploadOption: HTMLElement = getByText('Import from file');
+    const uploadOption: HTMLElement = getByText('Upload Grades');
     expect(uploadOption).toBeDefined();
     act(() => userEvent.click(uploadOption));
 
@@ -198,13 +186,9 @@ describe('FileLoadDialog test where server does not accept the file', () => {
       role: SystemRole.Admin
     };
 
-    const { getByText, findByText }: RenderResult = renderCourseView(auth);
+    const { getByText }: RenderResult = renderCourseView(auth);
 
-    const importGradesMenuButton: HTMLElement = await findByText('Import grades');
-    expect(importGradesMenuButton).toBeDefined();
-    act(() => userEvent.click(importGradesMenuButton));
-
-    const uploadOption: HTMLElement = getByText('Import from file');
+    const uploadOption: HTMLElement = getByText('Upload Grades');
     expect(uploadOption).toBeDefined();
     act(() => userEvent.click(uploadOption));
 
