@@ -465,6 +465,7 @@ describe(
             daysValid: 6000,
             formula: Formula.WeightedAverage,
             formulaParams: {
+              minRequiredGrade: 5,
               children: [
                 ['sub not success', { weight: 1 }]
               ]
@@ -519,6 +520,7 @@ describe(
             daysValid: 1,
             formula: Formula.WeightedAverage,
             formulaParams: {
+              minRequiredGrade: 10,
               children: [
                 ['i-am-present', { weight: 1 }]
               ]
@@ -564,6 +566,7 @@ describe(
             daysValid: 1,
             formula: Formula.WeightedAverage,
             formulaParams: {
+              minRequiredGrade: 15,
               children: [
                 ['the good', { weight: 1 }],
                 ['the bad', { weight: 2 }],
@@ -998,6 +1001,7 @@ describe(
           .put('/v1/courses/1/assessment-models/1/attainments/1')
           .send({
             formulaParams: {
+              minRequiredGrade: 15,
               children: [
                 ['tag5', { weight: 5 }],
                 ['tag16', { weight: 16 }]
@@ -1025,6 +1029,7 @@ describe(
           .put('/v1/courses/1/assessment-models/1/attainments/1')
           .send({
             formulaParams: {
+              minRequiredGrade: 15,
               children: [
                 ['tag5', { weight: 5 }],
                 ['tag9', { weight: 9 }],

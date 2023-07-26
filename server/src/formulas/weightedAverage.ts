@@ -13,11 +13,12 @@ interface ChildParams {
   weight: number;
 }
 
-// TODO: Should extend ParamsObject instead with minRequiredPoints / threshold
-type Params = ParamsObject<ChildParams>;
+interface Params extends ParamsObject<ChildParams> {
+  minRequiredGrade: number;
+}
 
 const childParams: Array<string> = ['weight'];
-const params: Array<string> = [];
+const params: Array<string> = ['minRequiredGrade'];
 
 function calculateWeightedAverage(
   attainmentTag: string,
@@ -45,6 +46,9 @@ function calculateWeightedAverage(
         );
       }
     }
+
+    if (grade < params.minRequiredGrade)
+      status = Status.Fail;
   }
 
   return {
@@ -59,7 +63,9 @@ const codeSnippet: string =
   weight: number;
 }
 
-interface Params extends ParamsObject<ChildParams> {}
+interface Params extends ParamsObject<ChildParams> {
+  minRequiredGrade: number;
+}
 
 function calculateWeightedAverage(
   attainmentTag: string,
@@ -82,11 +88,14 @@ function calculateWeightedAverage(
         grade += subGrade.grade * weight;
       } else {
         throw new ApiError(
-          \`weight unspecified for attainment with tag \${subGrade.attainmentTag}\`,
+          \`weight unspecified for attainment with tag \$\{subGrade.attainmentTag\}\`,
           HttpCode.InternalServerError
         );
       }
     }
+
+    if (grade < params.minRequiredGrade)
+      status = Status.Fail;
   }
 
   return {
@@ -104,6 +113,7 @@ registerFormula(
   params,
   childParams,
   yup.object({
+    minRequiredGrade: yup.number().required(),
     children: yup.array().min(1).of(
       yup.tuple([
         yup.string(),

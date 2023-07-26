@@ -11,7 +11,10 @@ describe('Test weighted average calculation', () => {
     getFormulaImplementation(Formula.WeightedAverage);
 
   it('should accept parameters of the appropriate form', async () => {
-    await implementation.paramSchema.validate({ children: [['1', { weight: 8 }]] });
+    await implementation.paramSchema.validate({
+      minRequiredGrade: 5,
+      children: [['1', { weight: 8 }]]
+    });
   });
 
   it('should forbid parameters of invalid form', async () => {
@@ -40,6 +43,7 @@ describe('Test weighted average calculation', () => {
     const computedGrade: CalculationResult = implementation.formulaFunction(
       'current',
       {
+        minRequiredGrade: 0,
         children: [
           ['one', { weight: 0.3 }],
           ['two', { weight: 0.7 }],
@@ -53,6 +57,32 @@ describe('Test weighted average calculation', () => {
     expect(computedGrade.status).toBe(Status.Pass);
   });
 
+  it(
+    'should calculate a failing grade when the grade is below the minimum required grade',
+     async () => {
+    const subGrades: Array<CalculationResult> = [
+      { attainmentTag: 'one', grade: 10, status: Status.Pass },
+      { attainmentTag: 'two', grade: 14, status: Status.Pass },
+      { attainmentTag: 'three', grade: 3, status: Status.Pass }
+    ];
+
+    const computedGrade: CalculationResult = implementation.formulaFunction(
+      'current',
+      {
+        minRequiredGrade: 16,
+        children: [
+          ['one', { weight: 0.3 }],
+          ['two', { weight: 0.7 }],
+          ['three', { weight: 1 }]
+        ]
+      },
+      subGrades
+    );
+
+    expect(computedGrade.grade).toBeCloseTo(15.8);
+    expect(computedGrade.status).toBe(Status.Fail);
+  });
+
   it('should calculate a failing grade when a subgrade is failing', async () => {
     const subGrades: Array<CalculationResult> = [
       { attainmentTag: 'one', grade: 10, status: Status.Pass },
@@ -63,6 +93,7 @@ describe('Test weighted average calculation', () => {
     const computedGrade: CalculationResult = implementation.formulaFunction(
       'current',
       {
+        minRequiredGrade: 0,
         children: [
           ['one', { weight: 0.3 }],
           ['two', { weight: 0.7 }],
