@@ -59,29 +59,30 @@ describe('Test weighted average calculation', () => {
 
   it(
     'should calculate a failing grade when the grade is below the minimum required grade',
-     async () => {
-    const subGrades: Array<CalculationResult> = [
-      { attainmentTag: 'one', grade: 10, status: Status.Pass },
-      { attainmentTag: 'two', grade: 14, status: Status.Pass },
-      { attainmentTag: 'three', grade: 3, status: Status.Pass }
-    ];
+    async () => {
+      const subGrades: Array<CalculationResult> = [
+        { attainmentTag: 'one', grade: 10, status: Status.Pass },
+        { attainmentTag: 'two', grade: 14, status: Status.Pass },
+        { attainmentTag: 'three', grade: 3, status: Status.Pass }
+      ];
 
-    const computedGrade: CalculationResult = implementation.formulaFunction(
-      'current',
-      {
-        minRequiredGrade: 16,
-        children: [
-          ['one', { weight: 0.3 }],
-          ['two', { weight: 0.7 }],
-          ['three', { weight: 1 }]
-        ]
-      },
-      subGrades
-    );
+      const computedGrade: CalculationResult = implementation.formulaFunction(
+        'current',
+        {
+          minRequiredGrade: 16,
+          children: [
+            ['one', { weight: 0.3 }],
+            ['two', { weight: 0.7 }],
+            ['three', { weight: 1 }]
+          ]
+        },
+        subGrades
+      );
 
-    expect(computedGrade.grade).toBeCloseTo(15.8);
-    expect(computedGrade.status).toBe(Status.Fail);
-  });
+      expect(computedGrade.grade).toBeCloseTo(15.8);
+      expect(computedGrade.status).toBe(Status.Fail);
+    }
+  );
 
   it('should calculate a failing grade when a subgrade is failing', async () => {
     const subGrades: Array<CalculationResult> = [

@@ -88,7 +88,7 @@ function calculateWeightedAverage(
         grade += subGrade.grade * weight;
       } else {
         throw new ApiError(
-          \`weight unspecified for attainment with tag \$\{subGrade.attainmentTag\}\`,
+          \`weight unspecified for attainment with tag $\{subGrade.attainmentTag}\`,
           HttpCode.InternalServerError
         );
       }
