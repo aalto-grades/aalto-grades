@@ -10,8 +10,8 @@ import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 
-import FileLoadDialog from '../course-view/FileLoadDialog';
-import MenuButton, { MenuButtonOption } from '../course-view/MenuButton';
+import FileLoadDialog from './FileLoadDialog';
+import MenuButton, { MenuButtonOption } from './MenuButton';
 import SisuExportDialog from './SisuExportDialog';
 
 import { State } from '../../types';
