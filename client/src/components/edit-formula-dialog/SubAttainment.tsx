@@ -7,19 +7,14 @@ import { Box, TextField, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import { ChangeEvent } from 'react';
 
+import { getParamLabel } from '../../utils';
+
 export default function SubAttainment(props: {
   attainment: AttainmentData,
   childParamsList: Array<string>,
   childParams: Map<string, object>,
   setChildParams: (childParams: Map<string, object>) => void
 }): JSX.Element {
-
-  function getParamLabel(labelKey: string): string {
-    const splitString: Array<string> = labelKey.split(/(?=[A-Z])/);
-    const label: string = splitString.join(' ');
-    const capitalizedLabel: string = label.charAt(0).toUpperCase() + label.slice(1);
-    return capitalizedLabel;
-  }
 
   function handleParamChange(
     event: ChangeEvent<HTMLInputElement>, param: string
@@ -81,7 +76,8 @@ export default function SubAttainment(props: {
                 }
               />
             );
-          })}
+          })
+        }
       </Box>
     </Box>
   );

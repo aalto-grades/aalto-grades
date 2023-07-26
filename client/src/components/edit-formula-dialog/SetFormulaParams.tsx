@@ -3,11 +3,14 @@
 // SPDX-License-Identifier: MIT
 
 import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
+import { TextField } from '@mui/material';
 import PropTypes from 'prop-types';
+import { ChangeEvent } from 'react';
 
 import SubAttainment from './SubAttainment';
-
 import StyledBox from '../edit-formula-dialog/StyledBox';
+
+import { getParamLabel } from '../../utils';
 
 export default function SetFormulaParams(props: {
   attainment: AttainmentData,
@@ -17,6 +20,13 @@ export default function SetFormulaParams(props: {
   childParams: Map<string, object>,
   setChildParams: (childParams: Map<string, object>) => void
 }): JSX.Element {
+
+  function handleParamChange(
+    event: ChangeEvent<HTMLInputElement>, param: string
+  ): void {
+    // TODO: This will not always be a number
+    (props.params[param as keyof object] as unknown) = Number(event.target.value);
+  }
 
   return (
     <>
@@ -29,6 +39,29 @@ export default function SetFormulaParams(props: {
         borderRadius: 1,
         pt: 2
       }}>
+        {
+          props.formula.params.map((param: string) => {
+            return (
+              <TextField
+                type='text'
+                key={param}
+                variant='standard'
+                label={getParamLabel(param)}
+                InputLabelProps={{ shrink: true }}
+                margin='normal'
+                sx={{
+                  marginTop: 0,
+                  width: '100%'
+                }}
+                onChange={
+                  (event: ChangeEvent<HTMLInputElement>): void => {
+                    handleParamChange(event, param);
+                  }
+                }
+              />
+            );
+          })
+        }
         {
           props.attainment.subAttainments?.map(
             (attainment: AttainmentData) => {
