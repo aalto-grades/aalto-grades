@@ -12,7 +12,7 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import CourseView from '../components/CourseView';
+import CourseResultsView from '../components/CourseResultsView';
 
 import AuthContext from '../context/AuthProvider';
 //import { maxErrorsToShow } from '../components/course-view/FileLoadDialog';
@@ -41,7 +41,7 @@ describe('FileLoadDialog test with proper csv', () => {
   function renderCourseView(auth: LoginResult): RenderResult {
     return render(
       <QueryClientProvider client={new QueryClient()}>
-        <MemoryRouter initialEntries={['/course-view/1']}>
+        <MemoryRouter initialEntries={['/1/course-results/1']}>
           <AuthContext.Provider value={{
             auth: auth,
             setAuth: jest.fn(),
@@ -49,7 +49,10 @@ describe('FileLoadDialog test with proper csv', () => {
             setIsTeacherInCharge: jest.fn()
           }}>
             <Routes>
-              <Route path='/course-view/:courseId' element={<CourseView />} />
+              <Route
+                path='/:courseId/course-results/:assessmentModelId'
+                element={<CourseResultsView />}
+              />
             </Routes>
           </AuthContext.Provider>
         </MemoryRouter>
@@ -169,7 +172,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
 
     return render(
       <QueryClientProvider client={new QueryClient()}>
-        <MemoryRouter initialEntries={['/course-view/1']}>
+        <MemoryRouter initialEntries={['/1/course-results/1']}>
           <AuthContext.Provider value={{
             auth: auth,
             setAuth: jest.fn(),
@@ -177,7 +180,10 @@ describe('FileLoadDialog test where server does not accept the file', () => {
             setIsTeacherInCharge: jest.fn()
           }}>
             <Routes>
-              <Route path='/course-view/:courseId' element={<CourseView />} />
+              <Route
+                path='/:courseId/course-results/:assessmentModelId'
+                element={<CourseResultsView />}
+              />
             </Routes>
           </AuthContext.Provider>
         </MemoryRouter>
