@@ -9,7 +9,7 @@ import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
 import {
   Box, Button, Container, LinearProgress, MenuItem, TextField, Typography
 } from '@mui/material';
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { NavigateFunction, useNavigate, Params, useParams } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 import * as yup from 'yup';
@@ -118,7 +118,7 @@ export default function EditInstanceView(): JSX.Element {
                 ({ errors, handleChange, isSubmitting, isValid, touched, values, initialValues }:
                   {
                     errors: FormikErrors<CourseInstanceData>,
-                    handleChange: (e: React.ChangeEvent<Element>) => void,
+                    handleChange: (e: ChangeEvent<Element>) => void,
                     isSubmitting: boolean,
                     isValid: boolean,
                     touched: FormikTouched<CourseInstanceData>,

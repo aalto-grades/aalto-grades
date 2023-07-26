@@ -4,8 +4,8 @@
 
 import { AttainmentData, Formula, FormulaData } from 'aalto-grades-common/types';
 import {
-  Box, Button, Dialog, DialogTitle, DialogContent, Step, StepLabel, Stepper,
-  Typography
+  Box, Button, Dialog, DialogTitle, DialogContent, Paper, Step, StepLabel, Stepper,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography
 } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useState, JSX } from 'react';
@@ -15,6 +15,7 @@ import SetFormulaParams from './SetFormulaParams';
 
 import { useEditAttainment, UseEditAttainmentResult } from '../../hooks/useApi';
 import { State } from '../../types';
+import { getParamLabel } from '../../utils';
 
 export default function EditFormulaDialog(props: {
   handleClose: () => void,
@@ -67,12 +68,16 @@ export default function EditFormulaDialog(props: {
     setChildParams(new Map());
   }
 
-  function handleSubmit(): void {
-    props.attainment.formula = formula?.id;
-    props.attainment.formulaParams = (formula?.id === Formula.Manual) ? undefined : {
+  function constructParamsObject(): object | undefined {
+    return (formula?.id === Formula.Manual) ? undefined : {
       ...params,
       children: Array.from(childParams.entries())
     };
+  }
+
+  function handleSubmit(): void {
+    props.attainment.formula = formula?.id;
+    props.attainment.formulaParams = constructParamsObject();
 
     if (props.courseId && props.assessmentModelId) {
       editAttainment.mutate({
@@ -124,35 +129,96 @@ export default function EditFormulaDialog(props: {
         {
           (activeStep === 2 && formula) &&
           <Box sx={{ p: 1 }}>
-            <Box sx={{
-              display: 'flex'
-            }}>
-              <Typography sx={{ mr: 1 }}>
-                {formula.name}
-              </Typography>
-              <code>
-                {JSON.stringify(params)}
-              </code>
-            </Box>
-            {
-              Array.from(childParams.entries()).map(
-                (childParam: [string, object]) => {
-                  return (
-                    <Box key={childParam[0]} sx={{
-                      display: 'flex',
-                      mt: 1
-                    }}>
-                      <Typography sx={{ mr: 1 }}>
-                        {childParam[0]}
+            <TableContainer component={Paper} sx={{ my: 2 }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <Typography sx={{ fontWeight: 'bold' }}>
+                        Formula
                       </Typography>
-                      <code>
-                        {JSON.stringify(childParam[1])}
-                      </code>
-                    </Box>
-                  );
-                }
-              )
-            }
+                    </TableCell>
+                    {
+                      formula.params.map((param: string) => {
+                        return (
+                          <TableCell key={param}>
+                            <Typography sx={{ fontWeight: 'bold' }}>
+                              {getParamLabel(param)}
+                            </Typography>
+                          </TableCell>
+                        );
+                      })
+                    }
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>{formula.name}</TableCell>
+                    {
+                      formula.params.map((param: string) => {
+                        return (
+                          <TableCell key={param}>
+                            {params[param as keyof object]}
+                          </TableCell>
+                        );
+                      })
+                    }
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TableContainer component={Paper} sx={{ my: 2 }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <Typography sx={{ fontWeight: 'bold' }}>
+                        Attainment
+                      </Typography>
+                    </TableCell>
+                    {
+                      formula.childParams.map((param: string) => {
+                        console.log(param);
+                        return (
+                          <TableCell key={param}>
+                            <Typography sx={{ fontWeight: 'bold' }}>
+                              {getParamLabel(param)}
+                            </Typography>
+                          </TableCell>
+                        );
+                      })
+                    }
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {
+                    Array.from(childParams.entries()).map(
+                      (childParam: [string, object]) => {
+                        return (
+                          <TableRow key={childParam[0]}>
+                            <TableCell>
+                              {childParam[0]}
+                            </TableCell>
+                            {
+                              formula.childParams.map((param: string) => {
+                                return (
+                                  <TableCell key={param}>
+                                    {childParam[1][param as keyof object]}
+                                  </TableCell>
+                                );
+                              })
+                            }
+                          </TableRow>
+                        );
+                      }
+                    )
+                  }
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <code>
+              {JSON.stringify(constructParamsObject())}
+            </code>
           </Box>
         }
         <Box sx={{
