@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
-import { TextField } from '@mui/material';
+import { Box, TextField } from '@mui/material';
 import PropTypes from 'prop-types';
 import { ChangeEvent } from 'react';
 
@@ -30,6 +30,29 @@ export default function SetFormulaParams(props: {
 
   return (
     <>
+      {
+        props.formula.params.map((param: string) => {
+          return (
+            <TextField
+              type='text'
+              key={param}
+              label={getParamLabel(param)}
+              InputLabelProps={{ shrink: true }}
+              margin='normal'
+              sx={{
+                marginTop: 0,
+                width: '100%',
+                my: 1
+              }}
+              onChange={
+                (event: ChangeEvent<HTMLInputElement>): void => {
+                  handleParamChange(event, param);
+                }
+              }
+            />
+          );
+        })
+      }
       <StyledBox sx={{
         display: 'flex',
         flexDirection: 'row',
@@ -39,29 +62,6 @@ export default function SetFormulaParams(props: {
         borderRadius: 1,
         pt: 2
       }}>
-        {
-          props.formula.params.map((param: string) => {
-            return (
-              <TextField
-                type='text'
-                key={param}
-                variant='standard'
-                label={getParamLabel(param)}
-                InputLabelProps={{ shrink: true }}
-                margin='normal'
-                sx={{
-                  marginTop: 0,
-                  width: '100%'
-                }}
-                onChange={
-                  (event: ChangeEvent<HTMLInputElement>): void => {
-                    handleParamChange(event, param);
-                  }
-                }
-              />
-            );
-          })
-        }
         {
           props.attainment.subAttainments?.map(
             (attainment: AttainmentData) => {

@@ -61,7 +61,6 @@ export default function SubAttainment(props: {
               <TextField
                 type='text'
                 key={param}
-                variant='standard'
                 label={getParamLabel(param)}
                 InputLabelProps={{ shrink: true }}
                 margin='normal'
