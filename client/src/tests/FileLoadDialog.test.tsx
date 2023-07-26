@@ -12,10 +12,9 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import CourseView from '../components/CourseView';
+import CourseResultsView from '../components/CourseResultsView';
 
 import AuthContext from '../context/AuthProvider';
-//import { maxErrorsToShow } from '../components/course-view/FileLoadDialog';
 import { mockFailure, server } from './mock-data/server';
 
 // TODO: Fix commented out tests in this file
@@ -41,7 +40,7 @@ describe('FileLoadDialog test with proper csv', () => {
   function renderCourseView(auth: LoginResult): RenderResult {
     return render(
       <QueryClientProvider client={new QueryClient()}>
-        <MemoryRouter initialEntries={['/course-view/1']}>
+        <MemoryRouter initialEntries={['/1/course-results/1']}>
           <AuthContext.Provider value={{
             auth: auth,
             setAuth: jest.fn(),
@@ -49,7 +48,10 @@ describe('FileLoadDialog test with proper csv', () => {
             setIsTeacherInCharge: jest.fn()
           }}>
             <Routes>
-              <Route path='/course-view/:courseId' element={<CourseView />} />
+              <Route
+                path='/:courseId/course-results/:assessmentModelId'
+                element={<CourseResultsView />}
+              />
             </Routes>
           </AuthContext.Provider>
         </MemoryRouter>
@@ -66,13 +68,9 @@ describe('FileLoadDialog test with proper csv', () => {
       role: SystemRole.Admin
     };
 
-    const { getByText, findByText }: RenderResult = renderCourseView(auth);
+    const { getByText }: RenderResult = renderCourseView(auth);
 
-    const importGradesMenuButton: HTMLElement = await findByText('Import grades');
-    expect(importGradesMenuButton).toBeDefined();
-    act(() => userEvent.click(importGradesMenuButton));
-
-    const uploadOption: HTMLElement = getByText('Import from file');
+    const uploadOption: HTMLElement = getByText('Upload Grades');
     expect(uploadOption).toBeDefined();
     act(() => userEvent.click(uploadOption));
 
@@ -104,11 +102,7 @@ describe('FileLoadDialog test with proper csv', () => {
 
       const { getByText, findByText }: RenderResult = renderCourseView(auth);
 
-      const importGradesMenuButton: HTMLElement = await findByText('Import grades');
-      expect(importGradesMenuButton).toBeDefined();
-      act(() => userEvent.click(importGradesMenuButton));
-
-      const uploadOption: HTMLElement = getByText('Import from file');
+      const uploadOption: HTMLElement = getByText('Upload Grades');
       expect(uploadOption).toBeDefined();
       act(() => userEvent.click(uploadOption));
 
@@ -118,11 +112,11 @@ describe('FileLoadDialog test with proper csv', () => {
       act(() => userEvent.click(confirmButton));
       expect(dialogTitle).toBeVisible();
 
-      const validationError: HTMLElement = await findByText('You must select a csv file to submit');
+      const validationError: HTMLElement = await findByText('You must select a CSV file to submit');
       expect(validationError).toBeVisible();
     }
   );
-  /*
+
   test('FileLoadDialog should close when submitted file is okay', async () => {
 
     // TODO, role here must be checked here based on a course/instance level role.
@@ -132,17 +126,13 @@ describe('FileLoadDialog test with proper csv', () => {
       role: SystemRole.Admin
     };
 
-    const { getByText, findByText }: RenderResult = renderCourseView(auth);
+    const { getByText, queryByText }: RenderResult = renderCourseView(auth);
 
-    const importGradesMenuButton: HTMLElement = await findByText('Import grades');
-    expect(importGradesMenuButton).toBeDefined();
-    act(() => userEvent.click(importGradesMenuButton));
-
-    const uploadOption: HTMLElement = getByText('Import from file');
+    const uploadOption: HTMLElement = getByText('Upload Grades');
     expect(uploadOption).toBeDefined();
     act(() => userEvent.click(uploadOption));
 
-    const dialogTitle: HTMLElement = getByText('Add Grades from File');
+    expect(getByText('Add Grades from File')).toBeVisible();
 
     await waitFor(() =>
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -154,9 +144,8 @@ describe('FileLoadDialog test with proper csv', () => {
     const confirmButton: HTMLElement = getByText('Confirm');
     act(() => userEvent.click(confirmButton));
 
-    await waitFor(() => expect(dialogTitle).not.toBeVisible());
+    waitFor(() => expect(queryByText('Add Grades from File')).not.toBeVisible());
   });
-  */
 });
 
 describe('FileLoadDialog test where server does not accept the file', () => {
@@ -169,7 +158,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
 
     return render(
       <QueryClientProvider client={new QueryClient()}>
-        <MemoryRouter initialEntries={['/course-view/1']}>
+        <MemoryRouter initialEntries={['/1/course-results/1']}>
           <AuthContext.Provider value={{
             auth: auth,
             setAuth: jest.fn(),
@@ -177,7 +166,10 @@ describe('FileLoadDialog test where server does not accept the file', () => {
             setIsTeacherInCharge: jest.fn()
           }}>
             <Routes>
-              <Route path='/course-view/:courseId' element={<CourseView />} />
+              <Route
+                path='/:courseId/course-results/:assessmentModelId'
+                element={<CourseResultsView />}
+              />
             </Routes>
           </AuthContext.Provider>
         </MemoryRouter>
@@ -194,13 +186,9 @@ describe('FileLoadDialog test where server does not accept the file', () => {
       role: SystemRole.Admin
     };
 
-    const { getByText, findByText }: RenderResult = renderCourseView(auth);
+    const { getByText }: RenderResult = renderCourseView(auth);
 
-    const importGradesMenuButton: HTMLElement = await findByText('Import grades');
-    expect(importGradesMenuButton).toBeDefined();
-    act(() => userEvent.click(importGradesMenuButton));
-
-    const uploadOption: HTMLElement = getByText('Import from file');
+    const uploadOption: HTMLElement = getByText('Upload Grades');
     expect(uploadOption).toBeDefined();
     act(() => userEvent.click(uploadOption));
 

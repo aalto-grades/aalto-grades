@@ -9,7 +9,7 @@ import {
   ListItemText, MenuItem, Paper, TextField, Typography
 } from '@mui/material';
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';
@@ -18,10 +18,10 @@ import { useDownloadSisuGradeCsv, UseDownloadSisuGradeCsvResult } from '../../ho
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import { State } from '../../types';
 
-// A Dialog component for exporting Sisu grades CSV.
+// A Dialog component for downloading a Sisu grade CSV.
 const instructions: string =
   'Set the completion language and assesment date for the grading, these values'
-  + ' are optional. Click export to export the grades.';
+  + ' are optional. Click download to download the grades.';
 
 interface LanguageOption {
   id: string,
@@ -72,7 +72,7 @@ const languageOptions: Array<LanguageOption> = [
   }
 ];
 
-export default function SisuExportDialog(props: {
+export default function SisuDownloadDialog(props: {
   open: boolean,
   handleClose: () => void,
   selectedStudents: Array<FinalGrade>
@@ -104,13 +104,13 @@ export default function SisuExportDialog(props: {
       link.remove();
 
       snackPack.push({
-        msg: 'Final grades exported to Sisu CSV format succesfully.',
+        msg: 'Final grades downloaded in the Sisu CSV format succesfully.',
         severity: 'success'
       });
     }
   });
 
-  async function handleExportSisuGradeCsv(): Promise<void> {
+  async function handleDownloadSisuGradeCsv(): Promise<void> {
     if (courseId && assessmentModelId) {
       snackPack.push({
         msg: 'Fetching Sisu CSV...',
@@ -132,7 +132,7 @@ export default function SisuExportDialog(props: {
   return (
     <>
       <Dialog open={props.open} transitionDuration={{ exit: 800 }}>
-        <DialogTitle >Export final grades to Sisu CSV</DialogTitle>
+        <DialogTitle >Download final grades as Sisu CSV</DialogTitle>
         <DialogContent sx={{ pb: 0 }}>
           <DialogContentText sx={{ mb: 3, color: 'black' }}>
             {instructions}
@@ -152,7 +152,7 @@ export default function SisuExportDialog(props: {
                 label="Completion language"
                 defaultValue="en"
                 helperText="If not provided, the default will be English."
-                onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+                onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
                   setCompletionLanguage(e.target.value);
                 }}
               >
@@ -174,7 +174,7 @@ export default function SisuExportDialog(props: {
                 /* TODO: Fix TS */
                 //format="DD-MM-YYYY"
                 helperText="If not provided, the default will be course instance ending date."
-                onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+                onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
                   setAssessmentDate(e.target.value);
                 }}
               />
@@ -207,9 +207,9 @@ export default function SisuExportDialog(props: {
             id='ag_confirm_file_upload_btn'
             size='medium'
             variant='contained'
-            onClick={handleExportSisuGradeCsv}
+            onClick={handleDownloadSisuGradeCsv}
           >
-            Export
+            Download
           </Button>
         </DialogActions>
       </Dialog>
@@ -218,7 +218,7 @@ export default function SisuExportDialog(props: {
   );
 }
 
-SisuExportDialog.propTypes = {
+SisuDownloadDialog.propTypes = {
   open: PropTypes.bool,
   handleClose: PropTypes.func,
   selectedStudents: PropTypes.array

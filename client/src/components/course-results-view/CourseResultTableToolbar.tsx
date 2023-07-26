@@ -10,9 +10,9 @@ import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 
-import FileLoadDialog from '../course-view/FileLoadDialog';
-import MenuButton, { MenuButtonOption } from '../course-view/MenuButton';
-import SisuExportDialog from './SisuExportDialog';
+import FileLoadDialog from './FileLoadDialog';
+import MenuButton, { MenuButtonOption } from './MenuButton';
+import SisuDownloadDialog from './SisuDownloadDialog';
 
 import { State } from '../../types';
 
@@ -30,13 +30,15 @@ export default function CourseResultsTableToolbar(props: {
 
   const actionOptions: Array<MenuButtonOption> = [
     {
-      description: 'Import from file',
-      handleClick: () => setShowFileDialog(true)
-    },
-    {
       description: 'Import from A+',
       handleClick: (): void => {
         alert('Importing from A+ is not implemented');
+      }
+    },
+    {
+      description: 'Import from MyCourses',
+      handleClick: (): void => {
+        alert('Importing from MyCourses is not implemented');
       }
     }
   ];
@@ -99,18 +101,18 @@ export default function CourseResultsTableToolbar(props: {
         }}>
           <Tooltip
             title={props.selectedStudents.length === 0 ?
-              'Select at least one student number for exporting grades.' :
+              'Select at least one student number for downloading grades.' :
               hasPendingStudents() ?
-                'Grades with status "PENDING" cannot be exported, ' +
+                'Grades with status "PENDING" cannot be downloaded, ' +
                 'unselect or calculate grades for these.' :
-                'Export final course grades as Sisu compatible CSV file.'
+                'Download final course grades as a Sisu compatible CSV file.'
             }
             placement="top"
           >
             <span>
               <Button
                 variant='outlined'
-                color={ hasPendingStudents() ? 'error' : 'success'}
+                color={hasPendingStudents() ? 'error' : 'primary'}
                 onClick={(): void => {
                   if (!hasPendingStudents()) {
                     setShowSisuDialog(true);
@@ -118,7 +120,7 @@ export default function CourseResultsTableToolbar(props: {
                 }}
                 disabled={props.selectedStudents.length === 0}
               >
-                Export to Sisu CSV
+                Download Sisu CSV
               </Button>
             </span>
           </Tooltip>
@@ -132,7 +134,6 @@ export default function CourseResultsTableToolbar(props: {
             <span>
               <Button
                 variant='outlined'
-                color='success'
                 onClick={(): Promise<void> => props.calculateFinalGrades()}
                 disabled={props.selectedStudents.length === 0}
               >
@@ -148,8 +149,16 @@ export default function CourseResultsTableToolbar(props: {
               Download CSV template
             </Button>
           </Tooltip>
+          <Tooltip
+            title="Upload grades from a CSV file."
+            placement="top"
+          >
+            <Button variant='outlined' onClick={(): void => setShowFileDialog(true)}>
+              Upload Grades
+            </Button>
+          </Tooltip>
           <MenuButton label='Import grades' options={actionOptions} />
-          <SisuExportDialog
+          <SisuDownloadDialog
             open={showSisuDialog}
             handleClose={handleCloseSisuDialog}
             selectedStudents={props.selectedStudents}
