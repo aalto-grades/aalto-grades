@@ -15,7 +15,6 @@ import userEvent from '@testing-library/user-event';
 import CourseResultsView from '../components/CourseResultsView';
 
 import AuthContext from '../context/AuthProvider';
-//import { maxErrorsToShow } from '../components/course-view/FileLoadDialog';
 import { mockFailure, server } from './mock-data/server';
 
 // TODO: Fix commented out tests in this file
@@ -125,7 +124,7 @@ describe('FileLoadDialog test with proper csv', () => {
       expect(validationError).toBeVisible();
     }
   );
-  /*
+
   test('FileLoadDialog should close when submitted file is okay', async () => {
 
     // TODO, role here must be checked here based on a course/instance level role.
@@ -135,7 +134,7 @@ describe('FileLoadDialog test with proper csv', () => {
       role: SystemRole.Admin
     };
 
-    const { getByText, findByText }: RenderResult = renderCourseView(auth);
+    const { getByText, findByText, queryByText }: RenderResult = renderCourseView(auth);
 
     const importGradesMenuButton: HTMLElement = await findByText('Import grades');
     expect(importGradesMenuButton).toBeDefined();
@@ -145,7 +144,7 @@ describe('FileLoadDialog test with proper csv', () => {
     expect(uploadOption).toBeDefined();
     act(() => userEvent.click(uploadOption));
 
-    const dialogTitle: HTMLElement = getByText('Add Grades from File');
+    expect(getByText('Add Grades from File')).toBeVisible();
 
     await waitFor(() =>
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -157,9 +156,8 @@ describe('FileLoadDialog test with proper csv', () => {
     const confirmButton: HTMLElement = getByText('Confirm');
     act(() => userEvent.click(confirmButton));
 
-    await waitFor(() => expect(dialogTitle).not.toBeVisible());
+    waitFor(() => expect(queryByText('Add Grades from File')).not.toBeVisible());
   });
-  */
 });
 
 describe('FileLoadDialog test where server does not accept the file', () => {
