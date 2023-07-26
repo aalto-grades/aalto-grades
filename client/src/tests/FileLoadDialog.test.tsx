@@ -120,7 +120,7 @@ describe('FileLoadDialog test with proper csv', () => {
       act(() => userEvent.click(confirmButton));
       expect(dialogTitle).toBeVisible();
 
-      const validationError: HTMLElement = await findByText('You must select a csv file to submit');
+      const validationError: HTMLElement = await findByText('You must select a CSV file to submit');
       expect(validationError).toBeVisible();
     }
   );
