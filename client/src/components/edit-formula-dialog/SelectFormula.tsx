@@ -34,6 +34,7 @@ const HoverExpandMoreIcon: StyledComponent<object> = styled(ExpandMore)(
 export default function SelectFormula(props: {
   formula: FormulaData | null,
   setFormula: (formula: FormulaData) => void,
+  clearParams: () => void,
   error: string
 }): JSX.Element {
 
@@ -50,6 +51,8 @@ export default function SelectFormula(props: {
     if (newFormula) {
       props.setFormula(newFormula);
     }
+
+    props.clearParams();
   }
 
   return (
@@ -148,5 +151,6 @@ export default function SelectFormula(props: {
 SelectFormula.propTypes = {
   formula: PropTypes.object,
   formulaData: PropTypes.func,
+  clearParams: PropTypes.func,
   error: PropTypes.string
 };

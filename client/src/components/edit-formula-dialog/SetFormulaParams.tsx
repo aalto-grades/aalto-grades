@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
-import { Box, TextField } from '@mui/material';
+import { TextField } from '@mui/material';
 import PropTypes from 'prop-types';
 import { ChangeEvent } from 'react';
 
@@ -49,6 +49,7 @@ export default function SetFormulaParams(props: {
                   handleParamChange(event, param);
                 }
               }
+              defaultValue={props.params[param as keyof object]}
             />
           );
         })

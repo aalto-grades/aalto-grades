@@ -45,6 +45,11 @@ export default function EditFormulaDialog(props: {
     onSuccess: () => close()
   });
 
+  function clearParams(): void {
+    setParams({});
+    setChildParams(new Map());
+  }
+
   function handleNext(): void {
     if (activeStep === 0) {
       if (formula) {
@@ -112,6 +117,7 @@ export default function EditFormulaDialog(props: {
           <SelectFormula
             formula={formula}
             setFormula={setFormula}
+            clearParams={clearParams}
             error={formulaError}
           />
         }

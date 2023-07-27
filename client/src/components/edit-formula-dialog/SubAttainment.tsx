@@ -16,13 +16,11 @@ export default function SubAttainment(props: {
   setChildParams: (childParams: Map<string, object>) => void
 }): JSX.Element {
 
+  const params: object = props.childParams.get(props.attainment.tag) ?? {};
+
   function handleParamChange(
     event: ChangeEvent<HTMLInputElement>, param: string
   ): void {
-    let params: object | undefined = props.childParams.get(props.attainment.tag);
-    if (!params)
-      params = {};
-
     // TODO: This will not always be a number
     (params[param as keyof object] as unknown) = Number(event.target.value);
 
@@ -73,6 +71,7 @@ export default function SubAttainment(props: {
                     handleParamChange(event, param);
                   }
                 }
+                defaultValue={params[param as keyof object]}
               />
             );
           })
