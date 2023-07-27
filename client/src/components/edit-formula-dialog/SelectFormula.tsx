@@ -3,21 +3,33 @@
 // SPDX-License-Identifier: MIT
 
 import { FormulaData } from 'aalto-grades-common/types';
+import { ExpandMore } from '@mui/icons-material';
 import {
-  CircularProgress, FormControl, FormHelperText, InputLabel, MenuItem, Select, SelectChangeEvent
+  Accordion, AccordionDetails, AccordionSummary, Box, CircularProgress,
+  Container, FormControl, FormHelperText, InputLabel, MenuItem, Select,
+  SelectChangeEvent, Typography
 } from '@mui/material';
+import { styled, Theme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
+import { StyledComponent } from '@emotion/styled';
 import { UseQueryResult } from '@tanstack/react-query';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
-import ViewFormulaAccordion from './ViewFormulaAccordion';
 
 import { useGetAllFormulas } from '../../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import StyledBox from './StyledBox';
 import { State } from '../../types';
+
+const HoverExpandMoreIcon: StyledComponent<object> = styled(ExpandMore)(
+  ({ theme }: { theme: Theme }) => ({
+    '&:hover': {
+      background: theme.palette.hoverGrey1
+    }
+  })
+);
 
 export default function SelectFormula(props: {
   formula: FormulaData | null,
@@ -35,8 +47,9 @@ export default function SelectFormula(props: {
       (formula: FormulaData) => formula.name == event.target.value
     );
 
-    if (newFormula)
+    if (newFormula) {
       props.setFormula(newFormula);
+    }
   }
 
   return (
@@ -59,7 +72,7 @@ export default function SelectFormula(props: {
             Formula
           </InputLabel>
           {
-            formulas.data?.length !== 0 ?
+            (formulas.data?.length !== 0) ? (
               <Select
                 label='Formula'
                 labelId='formulaSelector'
@@ -77,13 +90,50 @@ export default function SelectFormula(props: {
                   })
                 }
               </Select>
-              :
+            ) : (
               <CircularProgress sx={{ mt: 2 }} />
+            )
           }
           <FormHelperText error={props.error !== ''}>{props.error}</FormHelperText>
         </FormControl>
         <StyledBox>
-          <ViewFormulaAccordion formulaId={props.formula?.id ?? null} />
+          <Container>
+            <Accordion sx={{ boxShadow: 'none' }}>
+              <AccordionSummary
+                expandIcon={<HoverExpandMoreIcon />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+                sx={{ pl: 0 }}
+              >
+                <Typography>Preview of the formula</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ bgcolor: 'primary.light', p: '10px' }}>
+                <Container disableGutters sx={{ overflowX: 'scroll' }}>
+                  {
+                    (!props.formula) ? (
+                      <p>Select formula for previewing</p>
+                    ) : (
+                      (!props.formula) ? (
+                        <Box
+                          sx={{
+                            margin: 'auto',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            display: 'flex'
+                          }}>
+                          <CircularProgress />
+                        </Box>
+                      ) : (
+                        <pre>
+                          <code>{props.formula.codeSnippet}</code>
+                        </pre>
+                      )
+                    )
+                  }
+                </Container>
+              </AccordionDetails>
+            </Accordion>
+          </Container>
         </StyledBox>
       </StyledBox>
       <UnsavedChangesDialog
