@@ -9,6 +9,9 @@ import { registerFormula } from '.';
 import { Formula, Status } from 'aalto-grades-common/types';
 import { ApiError, CalculationResult } from '../types';
 
+const childParams: Array<string> = ['weight'];
+const params: Array<string> = ['minRequiredGrade'];
+
 interface ChildParams {
   weight: number;
 }
@@ -16,9 +19,6 @@ interface ChildParams {
 interface Params extends ParamsObject<ChildParams> {
   minRequiredGrade: number;
 }
-
-const childParams: Array<string> = ['weight'];
-const params: Array<string> = ['minRequiredGrade'];
 
 function calculateWeightedAverage(
   attainmentTag: string,

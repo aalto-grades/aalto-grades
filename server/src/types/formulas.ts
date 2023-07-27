@@ -2,9 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import * as yup from 'yup';
-
 import { Status } from 'aalto-grades-common/types';
+import * as yup from 'yup';
 
 export interface CalculationResult {
   attainmentTag: string;
