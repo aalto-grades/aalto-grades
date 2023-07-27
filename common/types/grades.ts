@@ -10,13 +10,17 @@ export enum Status {
 
 export interface AttainmentGradeData {
   userId?: number,
+  gradeId?: number,
   attainmentId: number,
   graderId?: number,
   grade: number,
   status: Status,
   manual: boolean,
+  name?: string,
+  tag?: string,
   date?: Date,
-  expiryDate?: Date
+  expiryDate?: Date,
+  subAttainments?: Array<AttainmentGradeData>
 }
 
 export interface FinalGrade {
