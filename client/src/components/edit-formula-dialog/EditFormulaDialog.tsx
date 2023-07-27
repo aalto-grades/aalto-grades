@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { AttainmentData, Formula, FormulaData } from 'aalto-grades-common/types';
+import deepEqual from 'deep-equal';
 import {
   Box, Button, Dialog, DialogTitle, DialogContent, Step, StepLabel, Stepper,
 } from '@mui/material';
@@ -69,8 +70,15 @@ export default function EditFormulaDialog(props: {
 
   function hasUnsavedChanges(): boolean {
     return Boolean(
-      formula?.id !== props.attainment.formula // Formula was changed
-      // Or params were changed
+      // Formula was changed
+      formula?.id !== props.attainment.formula
+      || (
+        // Or the parameters were changed
+        formula?.id !== Formula.Manual && params && childParams && !deepEqual(
+          props.attainment.formulaParams,
+          constructParamsObject()
+        )
+      )
     );
   }
 
