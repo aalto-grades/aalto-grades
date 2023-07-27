@@ -12,10 +12,6 @@ export interface CalculationResult {
   status: Status;
 }
 
-export interface ParamsObject<T = unknown> {
-  children: Array<[string, T]>;
-}
-
 /**
  * Type of functions implementing grade calculation formulas.
  */

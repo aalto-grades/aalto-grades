@@ -2,12 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpCode } from 'aalto-grades-common/types';
+import { HttpCode, ParamsObject } from 'aalto-grades-common/types';
 import * as yup from 'yup';
 
 import { registerFormula } from '.';
 import { Formula, Status } from 'aalto-grades-common/types';
-import { ApiError, CalculationResult, ParamsObject } from '../types';
+import { ApiError, CalculationResult } from '../types';
 
 interface ChildParams {
   weight: number;

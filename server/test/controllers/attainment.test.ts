@@ -2,7 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, Formula, HttpCode } from 'aalto-grades-common/types';
+import {
+  AttainmentData, Formula, HttpCode, ParamsObject
+} from 'aalto-grades-common/types';
 import { Op } from 'sequelize';
 import supertest from 'supertest';
 
@@ -12,7 +14,6 @@ import TeacherInCharge from '../../src/database/models/teacherInCharge';
 import { mockAttainment, jestMockAttainment } from '../mock-data/attainment';
 import { mockTeacher } from '../mock-data/misc';
 import { app } from '../../src/app';
-import { ParamsObject } from '../../src/types';
 import { Cookies, getCookies } from '../util/getCookies';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
