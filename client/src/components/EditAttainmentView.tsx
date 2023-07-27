@@ -8,8 +8,8 @@ import { JSX, SyntheticEvent, useState }  from 'react';
 import { NavigateFunction, Params, useParams, useNavigate } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 
-import Attainment from './create-attainment/Attainment';
-import ConfirmationDialog from './create-attainment/ConfirmationDialog';
+import Attainment from './edit-attainment-view/Attainment';
+import ConfirmationDialog from './edit-attainment-view/ConfirmationDialog';
 
 import {
   useAddAttainment, UseAddAttainmentResult,
