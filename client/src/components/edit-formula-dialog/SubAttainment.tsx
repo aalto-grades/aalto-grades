@@ -42,8 +42,14 @@ export default function SubAttainment(props: {
       mx: 1.5,
       mb: 2
     }}>
-      <Typography sx={{ fontWeight: 'bold', my: 1 }} align='left'>
-        {props.attainment.name}
+      <Typography sx={{ my: 1 }} align='left'>
+        <span style={{ fontWeight: 'bold' }}>
+          {props.attainment.name} (
+        </span>
+        {props.attainment.tag}
+        <span style={{ fontWeight: 'bold' }}>
+          )
+        </span>
       </Typography>
       <Box sx={{
         display: 'grid',
