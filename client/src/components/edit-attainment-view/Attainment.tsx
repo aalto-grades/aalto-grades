@@ -33,7 +33,9 @@ export default function Attainment(props: {
 
   // The attainment represented by this component. Reference to an attainment
   // in the attainmentTree variable above.
-  attainment: AttainmentData
+  attainment: AttainmentData,
+
+  paramsFromParent?: object
 }): JSX.Element {
   return (
     <>
@@ -46,6 +48,7 @@ export default function Attainment(props: {
             deleteAttainment={props.deleteAttainment}
             getTemporaryId={props.getTemporaryId}
             attainment={props.attainment}
+            paramsFromParent={props.paramsFromParent}
           />
           :
           <LeafAttainment
@@ -54,6 +57,7 @@ export default function Attainment(props: {
             deleteAttainment={props.deleteAttainment}
             getTemporaryId={props.getTemporaryId}
             attainment={props.attainment}
+            paramsFromParent={props.paramsFromParent}
           />
       }
     </>

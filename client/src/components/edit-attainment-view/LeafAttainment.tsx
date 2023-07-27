@@ -37,7 +37,8 @@ export default function LeafAttainment(props: {
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
   deleteAttainment: (attainment: AttainmentData) => void,
   getTemporaryId: () => number,
-  attainment: AttainmentData
+  attainment: AttainmentData,
+  paramsFromParent?: object
 }): JSX.Element {
 
   // Functions and variables for opening and closing the dialog that asks for
@@ -115,6 +116,7 @@ export default function LeafAttainment(props: {
           }}
         />
       </Box>
+      <code>{JSON.stringify(props.paramsFromParent)}</code>
       <Box sx={{
         display: 'flex',
         flexDirection: 'row',

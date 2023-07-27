@@ -23,12 +23,17 @@ export default function ParentAttainment(props: {
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
   deleteAttainment: (attainment: AttainmentData) => void,
   getTemporaryId: () => number,
-  attainment: AttainmentData
+  attainment: AttainmentData,
+  paramsFromParent?: object
 }): JSX.Element {
 
   // For opening and closing the list of sub-attainments
   const [open, setOpen]: State<boolean> = useState(true);
   const [editFormulaOpen, setEditFormulaOpen]: State<boolean> = useState(false);
+
+  const childParams: Map<string, object> = new Map(
+    (props.attainment.formulaParams as { children: Array<[string, object]> }).children
+  );
 
   const formula: UseQueryResult<FormulaData> = useGetFormula(
     props.attainment.formula ?? Formula.Manual
@@ -70,6 +75,7 @@ export default function ParentAttainment(props: {
         deleteAttainment={props.deleteAttainment}
         getTemporaryId={props.getTemporaryId}
         attainment={props.attainment}
+        paramsFromParent={props.paramsFromParent}
       />
       <Box sx={{ display: 'flex', flexDirection: 'row' }}>
         {open ?
@@ -104,6 +110,7 @@ export default function ParentAttainment(props: {
                       deleteAttainment={props.deleteAttainment}
                       getTemporaryId={props.getTemporaryId}
                       attainment={subAttainment}
+                      paramsFromParent={childParams.get(subAttainment.tag)}
                     />
                   )
                 )
