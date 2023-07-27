@@ -17,8 +17,6 @@ export default function StringTextField(props: {
   fieldData: TextFieldData
 }): JSX.Element {
 
-  // Functions for handling the change of the values in the 'New Name' textfield
-  // and the textfields that represent formula attributes
   function handleChange(event: ChangeEvent<HTMLInputElement>): void {
     const key: keyof AttainmentData = props.fieldData.fieldId as keyof AttainmentData;
     (props.attainment[key] as unknown) = event.target.value;
@@ -30,7 +28,6 @@ export default function StringTextField(props: {
       type='text'
       key={props.fieldData.fieldId}
       id={props.fieldData.fieldId}
-      variant='standard'
       label={props.fieldData.fieldLabel}
       InputLabelProps={{ shrink: true }}
       margin='normal'
@@ -39,7 +36,7 @@ export default function StringTextField(props: {
         marginTop: 0,
         width: '100%'
       }}
-      onChange={(event: ChangeEvent<HTMLInputElement>): void => handleChange(event)}
+      onChange={handleChange}
     />
   );
 }

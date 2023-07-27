@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import { AttainmentData } from 'aalto-grades-common/types';
-import { Box, Button } from '@mui/material';
+import { Box, Button, TextField } from '@mui/material';
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 
 import ConfirmationDialog from './ConfirmationDialog';
 import SimpleDialog from './SimpleDialog';
@@ -97,12 +97,22 @@ export default function LeafAttainment(props: {
           value={props.attainment.tag}
           fieldData={tagData}
         />
-        <StringTextField
-          attainmentTree={props.attainmentTree}
-          setAttainmentTree={props.setAttainmentTree}
-          attainment={props.attainment}
-          value={String(props.attainment.daysValid)}
-          fieldData={daysValidData}
+        <TextField
+          type='number'
+          key={daysValidData.fieldId}
+          id={daysValidData.fieldId}
+          label={daysValidData.fieldLabel}
+          InputLabelProps={{ shrink: true }}
+          margin='normal'
+          value={props.attainment.daysValid}
+          sx={{
+            marginTop: 0,
+            width: '100%'
+          }}
+          onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+            props.attainment.daysValid = Number(event.target.value);
+            props.setAttainmentTree(structuredClone(props.attainmentTree));
+          }}
         />
       </Box>
       <Box sx={{
