@@ -17,10 +17,10 @@ import { UseQueryResult } from '@tanstack/react-query';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
+import StyledBox from './StyledBox';
 
 import { useGetAllFormulas } from '../../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
-import StyledBox from './StyledBox';
 import { State } from '../../types';
 
 const HoverExpandMoreIcon: StyledComponent<object> = styled(ExpandMore)(
