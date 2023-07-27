@@ -204,6 +204,7 @@ export default function EditFormulaDialog(props: {
               sx={{ mr: 2 }}
               size='medium'
               variant='outlined'
+              color={(activeStep <= 0 && hasUnsavedChanges()) ? 'error' : 'primary'}
               onClick={handleBack}
             >
               {(activeStep > 0) ? 'Back' : 'Cancel'}

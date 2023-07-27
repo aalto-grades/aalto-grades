@@ -41,6 +41,7 @@ export default function UnsavedChangesDialog(props: {
               size='large'
               variant='contained'
               type='submit'
+              color='error'
               onClick={(): void => {
                 props.handleDiscard();
                 props.setOpen(false);
