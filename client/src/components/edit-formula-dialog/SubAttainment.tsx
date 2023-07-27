@@ -7,6 +7,8 @@ import { Box, TextField, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import { ChangeEvent } from 'react';
 
+import { getParamLabel } from '../../utils';
+
 export default function SubAttainment(props: {
   attainment: AttainmentData,
   childParamsList: Array<string>,
@@ -14,20 +16,11 @@ export default function SubAttainment(props: {
   setChildParams: (childParams: Map<string, object>) => void
 }): JSX.Element {
 
-  function getParamLabel(labelKey: string): string {
-    const splitString: Array<string> = labelKey.split(/(?=[A-Z])/);
-    const label: string = splitString.join(' ');
-    const capitalizedLabel: string = label.charAt(0).toUpperCase() + label.slice(1);
-    return capitalizedLabel;
-  }
+  const params: object = props.childParams.get(props.attainment.tag) ?? {};
 
   function handleParamChange(
     event: ChangeEvent<HTMLInputElement>, param: string
   ): void {
-    let params: object | undefined = props.childParams.get(props.attainment.tag);
-    if (!params)
-      params = {};
-
     // TODO: This will not always be a number
     (params[param as keyof object] as unknown) = Number(event.target.value);
 
@@ -49,8 +42,14 @@ export default function SubAttainment(props: {
       mx: 1.5,
       mb: 2
     }}>
-      <Typography sx={{ fontWeight: 'bold', my: 1 }} align='left'>
-        {props.attainment.name}
+      <Typography sx={{ my: 1 }} align='left'>
+        <span style={{ fontWeight: 'bold' }}>
+          {props.attainment.name} (
+        </span>
+        {props.attainment.tag}
+        <span style={{ fontWeight: 'bold' }}>
+          )
+        </span>
       </Typography>
       <Box sx={{
         display: 'grid',
@@ -66,7 +65,6 @@ export default function SubAttainment(props: {
               <TextField
                 type='text'
                 key={param}
-                variant='standard'
                 label={getParamLabel(param)}
                 InputLabelProps={{ shrink: true }}
                 margin='normal'
@@ -79,9 +77,11 @@ export default function SubAttainment(props: {
                     handleParamChange(event, param);
                   }
                 }
+                defaultValue={params[param as keyof object]}
               />
             );
-          })}
+          })
+        }
       </Box>
     </Box>
   );
