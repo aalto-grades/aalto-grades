@@ -14,3 +14,7 @@ export interface FormulaData {
   childParams: Array<string>;
   codeSnippet: string;
 }
+
+export interface ParamsObject<T = object> {
+  children: Array<[string, T]>;
+}

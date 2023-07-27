@@ -44,9 +44,12 @@ export default function EditFormulaDialog(props: {
 
   const [formula, setFormula]: State<FormulaData | null> =
     useState<FormulaData | null>(null);
-  const [params, setParams]: State<object> = useState({});
-  const [childParams, setChildParams]: State<Map<string, object>> =
-    useState<Map<string, object>>(new Map());
+
+  const [params, setParams]: State<object | null> =
+    useState<object | null>(null);
+
+  const [childParams, setChildParams]: State<Map<string, object> | null> =
+    useState<Map<string, object> | null>(null);
 
   const editAttainment: UseEditAttainmentResult = useEditAttainment({
     onSuccess: () => {
@@ -60,8 +63,8 @@ export default function EditFormulaDialog(props: {
   const closeDuration: number = 800;
 
   function clearParams(): void {
-    setParams({});
-    setChildParams(new Map());
+    setParams(null);
+    setChildParams(null);
   }
 
   function handleNext(): void {
@@ -87,14 +90,14 @@ export default function EditFormulaDialog(props: {
     setActiveStep(0);
     setFormulaError('');
     setFormula(null);
-    setParams({});
-    setChildParams(new Map());
+    setParams(null);
+    setChildParams(null);
   }
 
   function constructParamsObject(): object | undefined {
     return (formula?.id === Formula.Manual) ? undefined : {
       ...params,
-      children: Array.from(childParams.entries())
+      children: Array.from(childParams ? childParams.entries() : [])
     };
   }
 
@@ -155,7 +158,7 @@ export default function EditFormulaDialog(props: {
             />
           }
           {
-            (activeStep === 2 && formula) &&
+            (activeStep === 2 && formula && params && childParams) &&
             <FormulaSummary
               formula={formula}
               params={params}
