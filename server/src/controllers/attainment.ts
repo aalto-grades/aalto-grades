@@ -394,7 +394,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
 
   await validateFormulaParams(
     formula ?? attainment.formula,
-    formulaParams ?? attainment.formulaParams,
+    formulaParams,
     (await Attainment.findAll({
       attributes: ['tag'],
       where: {
