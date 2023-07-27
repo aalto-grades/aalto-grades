@@ -12,6 +12,7 @@ export const mockAttainment: AttainmentData = {
   daysValid: 365,
   formula: Formula.WeightedAverage,
   formulaParams: {
+    minRequiredGrade: 0,
     children: [
       ['ex-1', { weight: 0.5 }],
       ['ex-2', { weight: 0.5 }]
@@ -33,6 +34,7 @@ export const mockAttainment: AttainmentData = {
       daysValid: 365,
       formula: Formula.WeightedAverage,
       formulaParams: {
+        minRequiredGrade: 0,
         children: [
           ['ex-2.1', { weight: 0.5 }],
           ['ex-2.2', { weight: 0.5 }]
@@ -46,6 +48,7 @@ export const mockAttainment: AttainmentData = {
           daysValid: 365,
           formula: Formula.WeightedAverage,
           formulaParams: {
+            minRequiredGrade: 0,
             children: [
               ['ex-2.1.1', { weight: 0.5 }],
               ['ex-2.1.2', { weight: 0.5 }]
@@ -77,6 +80,7 @@ export const mockAttainment: AttainmentData = {
           daysValid: 365,
           formula: Formula.WeightedAverage,
           formulaParams: {
+            minRequiredGrade: 0,
             children: [
               ['ex-2.2.1', { weight: 0.5 }],
               ['ex-2.2.2', { weight: 0.5 }]
@@ -98,6 +102,7 @@ export const mockAttainment: AttainmentData = {
               daysValid: 365,
               formula: Formula.WeightedAverage,
               formulaParams: {
+                minRequiredGrade: 0,
                 children: [
                   ['ex-2.2.2.1', { weight: 0.5 }],
                   ['ex-2.2.2.2', { weight: 0.5 }]
@@ -119,6 +124,7 @@ export const mockAttainment: AttainmentData = {
                   daysValid: 365,
                   formula: Formula.WeightedAverage,
                   formulaParams: {
+                    minRequiredGrade: 0,
                     children: [
                       ['ex-2.2.2.2.1', { weight: 0.5 }],
                       ['ex-2.2.2.2.2', { weight: 0.5 }]

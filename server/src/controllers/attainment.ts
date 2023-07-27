@@ -2,7 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, Formula, HttpCode } from 'aalto-grades-common/types';
+import {
+  AttainmentData, Formula, HttpCode, ParamsObject
+} from 'aalto-grades-common/types';
 import { Request, Response } from 'express';
 import { Op } from 'sequelize';
 import * as yup from 'yup';
@@ -12,7 +14,7 @@ import Attainment from '../database/models/attainment';
 import Course from '../database/models/course';
 
 import { getFormulaImplementation } from '../formulas';
-import { ApiError, idSchema, JwtClaims, ParamsObject } from '../types';
+import { ApiError, idSchema, JwtClaims } from '../types';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import {
   findAttainmentById, findAttainmentsByAssessmentModel, generateAttainmentTree,
@@ -394,7 +396,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
 
   await validateFormulaParams(
     formula ?? attainment.formula,
-    formulaParams ?? attainment.formulaParams,
+    formulaParams,
     (await Attainment.findAll({
       attributes: ['tag'],
       where: {
