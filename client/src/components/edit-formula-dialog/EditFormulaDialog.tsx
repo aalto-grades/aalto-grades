@@ -16,8 +16,13 @@ import SetFormulaParams from './SetFormulaParams';
 
 import { useEditAttainment, UseEditAttainmentResult } from '../../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
-import { State } from '../../types';
+import { Message, State } from '../../types';
 import { sleep } from '../../utils';
+
+const successMessage: Message = {
+  msg: 'Formula and parameters set successfully.',
+  severity: 'success'
+};
 
 export default function EditFormulaDialog(props: {
   handleClose: () => void,
@@ -44,7 +49,10 @@ export default function EditFormulaDialog(props: {
     useState<Map<string, object>>(new Map());
 
   const editAttainment: UseEditAttainmentResult = useEditAttainment({
-    onSuccess: () => close()
+    onSuccess: () => {
+      snackPack.push(successMessage);
+      close();
+    }
   });
 
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
@@ -70,10 +78,6 @@ export default function EditFormulaDialog(props: {
   }
 
   async function close(): Promise<void> {
-    snackPack.push({
-      msg: 'Formula and parameters set successfully.',
-      severity: 'success'
-    });
     props.handleClose();
 
     // Wait until the dialog is no longer visible to reset its state for a
@@ -106,6 +110,7 @@ export default function EditFormulaDialog(props: {
       });
     } else if (props.attainmentTree && props.setAttainmentTree) {
       props.setAttainmentTree(structuredClone(props.attainmentTree));
+      snackPack.push(successMessage);
       close();
     }
   }
@@ -131,6 +136,7 @@ export default function EditFormulaDialog(props: {
           {
             (activeStep === 0 && props.attainment) &&
             <SelectFormula
+              attainment={props.attainment}
               formula={formula}
               setFormula={setFormula}
               clearParams={clearParams}
@@ -167,7 +173,7 @@ export default function EditFormulaDialog(props: {
               onClick={
                 (activeStep > 0)
                   ? (): void => setActiveStep(activeStep - 1)
-                  : props.handleClose
+                  : close
               }
             >
               {(activeStep > 0) ? 'Back' : 'Cancel'}

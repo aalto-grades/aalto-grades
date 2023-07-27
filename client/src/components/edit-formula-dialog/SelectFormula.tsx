@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { FormulaData } from 'aalto-grades-common/types';
+import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
 import { ExpandMore } from '@mui/icons-material';
 import {
   Accordion, AccordionDetails, AccordionSummary, Box, CircularProgress,
@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { styled, Theme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StyledComponent } from '@emotion/styled';
 import { UseQueryResult } from '@tanstack/react-query';
 
@@ -32,6 +32,7 @@ const HoverExpandMoreIcon: StyledComponent<object> = styled(ExpandMore)(
 );
 
 export default function SelectFormula(props: {
+  attainment: AttainmentData,
   formula: FormulaData | null,
   setFormula: (formula: FormulaData) => void,
   clearParams: () => void,
@@ -42,6 +43,16 @@ export default function SelectFormula(props: {
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
   const formulas: UseQueryResult<Array<FormulaData>> = useGetAllFormulas();
+
+  if (!props.formula && props.attainment.formula) {
+    const currentFormula: FormulaData | undefined = formulas.data?.find(
+      (formula: FormulaData) => formula.id == props.attainment.formula
+    );
+
+    if (currentFormula) {
+      props.setFormula(currentFormula);
+    }
+  }
 
   function handleFormulaChange(event: SelectChangeEvent): void {
     const newFormula: FormulaData | undefined = formulas.data?.find(
@@ -149,6 +160,7 @@ export default function SelectFormula(props: {
 }
 
 SelectFormula.propTypes = {
+  attainment: PropTypes.object,
   formula: PropTypes.object,
   formulaData: PropTypes.func,
   clearParams: PropTypes.func,
