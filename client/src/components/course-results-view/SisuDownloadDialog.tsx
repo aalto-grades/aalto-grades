@@ -185,13 +185,13 @@ export default function SisuDownloadDialog(props: {
           </Typography>
           <Paper sx={{ maxHeight: 200, overflow: 'auto', my: 1 }}>
             <List dense={true}>
-              { props.selectedStudents.map((studentGrade: FinalGrade) => (
+              {props.selectedStudents.map((studentGrade: FinalGrade) => (
                 <ListItem key={studentGrade.studentNumber}>
                   <ListItemText
                     primary={`Student number: ${studentGrade.studentNumber}`}
                   />
                 </ListItem>
-              )) }
+              ))}
             </List>
           </Paper>
         </DialogContent>

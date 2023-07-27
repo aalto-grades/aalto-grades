@@ -53,7 +53,7 @@ export default function FrontPage(): JSX.Element {
         <Typography variant="h2" align="left" sx={{ flexGrow: 1 }}>
           Courses
         </Typography>
-        { /* Admins are shown the button for creating a new course */
+        {/* Admins are shown the button for creating a new course */
           auth?.role == SystemRole.Admin &&
           <Button id='ag_new_course_btn' size='large' variant='contained' onClick={(): void => {
             navigate('/create-course');

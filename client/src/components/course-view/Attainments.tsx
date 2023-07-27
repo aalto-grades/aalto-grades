@@ -56,7 +56,7 @@ export default function Attainments(props: {
         <Button id='ag_edit_formula_btn' onClick={(): void => setEditFormulaOpen(true)}>
           Edit formula
         </Button>
-        { /* The path above should be changes once courseId can be fetched from the path */}
+        {/* The path above should be changes once courseId can be fetched from the path */}
       </Box>
       <Box sx={{ display: 'inline-grid', gap: 1 }}>
         {

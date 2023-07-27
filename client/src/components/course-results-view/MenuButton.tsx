@@ -110,7 +110,7 @@ export default function MenuButton(props: {
         open={open}
         onClose={handleClose}
       >
-        { renderOptions(props.options) }
+        {renderOptions(props.options)}
       </StyledMenu>
     </div>
   );

@@ -163,7 +163,7 @@ export default function App(): JSX.Element {
           <Container sx={{ textAlign: 'center' }} maxWidth="lg">
             <Box mx={5} my={5}>
               <AlertSnackbar snackPack={snackPack} />
-              <Routes> { /* Add nested routes when needed */}
+              <Routes> {/* Add nested routes when needed */}
                 <Route path='/login' element={<Login />} />
                 <Route path='/signup' element={<Signup />} />
                 {
@@ -180,14 +180,14 @@ export default function App(): JSX.Element {
                     element={<CourseView />}
                   />
                 </Route>
-                { /* Pages that are only authorised for admin */}
+                {/* Pages that are only authorised for admin */}
                 <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
                   <Route
                     path='/create-course'
                     element={<CreateCourseView />}
                   />
                 </Route>
-                { /* Pages that are authorised for admin and teachers in charge */}
+                {/* Pages that are authorised for admin and teachers in charge */}
                 <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
                   <Route
                     path='/:courseId/fetch-instances/:courseCode'

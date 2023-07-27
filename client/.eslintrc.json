@@ -22,6 +22,18 @@
   "rules": {
     "react/jsx-uses-react": "off",
     "react/react-in-jsx-scope": "off",
+    "react/jsx-pascal-case": "error",
+    "react/jsx-equals-spacing": [
+      "error",
+      "never"
+    ],
+    "react/jsx-curly-spacing": [
+      "error",
+      {
+        "when": "never",
+        "children": true
+      }
+    ],
     "indent": [
       "error",
       2
