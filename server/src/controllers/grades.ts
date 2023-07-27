@@ -21,10 +21,10 @@ import User from '../database/models/user';
 
 import { getFormulaImplementation } from '../formulas';
 import {
-  ApiError, CalculationResult, FormulaNode, JwtClaims, StudentGrades
+  ApiError, CalculationResult, FormulaNode, JwtClaims, StudentGrades, idSchema
 } from '../types';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
-import { isTeacherInChargeOrAdmin } from './utils/user';
+import { findUserById, isTeacherInChargeOrAdmin } from './utils/user';
 
 async function studentNumbersExist(studentNumbers: Array<string>): Promise<void> {
   const foundStudentNumbers: Array<string> = (await User.findAll({
@@ -1050,5 +1050,82 @@ export async function calculateGrades(
 
   res.status(HttpCode.Ok).json({
     data: {}
+  });
+}
+
+interface AttainmentWithUserGrade extends Attainment {
+  AttainmentGrades: Array<AttainmentGrade>
+}
+
+function generateAttainmentTreeWithUserGrades(
+  root: AttainmentGradeData,
+  allAttainments: Array<AttainmentWithUserGrade>
+): void {
+  const children: Array<AttainmentWithUserGrade> = allAttainments.filter(
+    (el: AttainmentWithUserGrade) => el.parentId === root.attainmentId);
+
+  if (children.length > 0) {
+    root.subAttainments = children.map((el: AttainmentWithUserGrade) => {
+      return {
+        attainmentId: el.id,
+        gradeId: el.AttainmentGrades[0]?.id ?? null,
+        name: el.name,
+        tag: el.tag,
+        grade: el.AttainmentGrades[0]?.grade ?? null,
+        manual: el.AttainmentGrades[0]?.manual ?? null,
+        status: el.AttainmentGrades[0]?.status as Status,
+        subAttainments: []
+      };
+    });
+
+    root.subAttainments.forEach((el: AttainmentGradeData) => {
+      generateAttainmentTreeWithUserGrades(el, allAttainments);
+    });
+  }
+}
+
+export async function getUserAttainmentModelGrades(req: Request, res: Response): Promise<void> {
+  const userId: number =
+  (await idSchema.validate({ id: req.params.userId }, { abortEarly: false })).id;
+
+  const [course, assessmentModel]: [Course, AssessmentModel] =
+    await validateAssessmentModelPath(
+      req.params.courseId, req.params.assessmentModelId
+    );
+
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
+  await findUserById(userId, HttpCode.NotFound);
+
+  const userGrades: Array<AttainmentWithUserGrade> = await Attainment.findAll({
+    where: {
+      assessmentModelId: assessmentModel.id
+    },
+    include: [{
+      model: AttainmentGrade,
+      required: false,
+      where: {
+        userId
+      }
+    }]
+  }) as Array<AttainmentWithUserGrade>;
+
+  const parent: Array<AttainmentWithUserGrade> =
+    userGrades.filter((attainment: AttainmentWithUserGrade) => !attainment.parentId);
+
+  const root: AttainmentGradeData = {
+    attainmentId: parent[0].id,
+    gradeId: parent[0].AttainmentGrades[0]?.id ?? null,
+    name: parent[0].name,
+    tag: parent[0].tag,
+    grade: parent[0].AttainmentGrades[0]?.grade ?? null,
+    manual: parent[0].AttainmentGrades[0]?.manual,
+    status: parent[0].AttainmentGrades[0]?.status as Status,
+    subAttainments: []
+  };
+
+  generateAttainmentTreeWithUserGrades(root, userGrades);
+
+  res.status(HttpCode.Ok).json({
+    data: root
   });
 }
