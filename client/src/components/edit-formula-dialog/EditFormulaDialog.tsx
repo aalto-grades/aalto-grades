@@ -15,6 +15,7 @@ import SetFormulaParams from './SetFormulaParams';
 
 import { useEditAttainment, UseEditAttainmentResult } from '../../hooks/useApi';
 import { State } from '../../types';
+import { sleep } from '../../utils';
 
 export default function EditFormulaDialog(props: {
   handleClose: () => void,
@@ -44,6 +45,8 @@ export default function EditFormulaDialog(props: {
     onSuccess: () => close()
   });
 
+  const closeDuration: number = 800;
+
   function clearParams(): void {
     setParams({});
     setChildParams(new Map());
@@ -62,8 +65,12 @@ export default function EditFormulaDialog(props: {
     setActiveStep(activeStep + 1);
   }
 
-  function close(): void {
+  async function close(): Promise<void> {
     props.handleClose();
+
+    // Wait until the dialog is no longer visible to reset its state for a
+    // smoother user experience
+    await sleep(closeDuration);
 
     setActiveStep(0);
     setFormulaError('');
@@ -98,7 +105,7 @@ export default function EditFormulaDialog(props: {
   return (
     <Dialog
       open={props.open}
-      transitionDuration={{ exit: 800 }}
+      transitionDuration={{ exit: closeDuration }}
       maxWidth={'xl'}
     >
       <DialogTitle>Formula</DialogTitle>
