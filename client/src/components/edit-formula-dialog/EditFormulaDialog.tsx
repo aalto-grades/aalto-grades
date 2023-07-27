@@ -9,11 +9,13 @@ import {
 import PropTypes from 'prop-types';
 import { useState, JSX } from 'react';
 
+import AlertSnackbar from '../alerts/AlertSnackbar';
 import FormulaSummary from './FormulaSummary';
 import SelectFormula from './SelectFormula';
 import SetFormulaParams from './SetFormulaParams';
 
 import { useEditAttainment, UseEditAttainmentResult } from '../../hooks/useApi';
+import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import { State } from '../../types';
 import { sleep } from '../../utils';
 
@@ -45,6 +47,8 @@ export default function EditFormulaDialog(props: {
     onSuccess: () => close()
   });
 
+  const snackPack: SnackPackAlertState = useSnackPackAlerts();
+
   const closeDuration: number = 800;
 
   function clearParams(): void {
@@ -66,6 +70,10 @@ export default function EditFormulaDialog(props: {
   }
 
   async function close(): Promise<void> {
+    snackPack.push({
+      msg: 'Formula and parameters set successfully.',
+      severity: 'success'
+    });
     props.handleClose();
 
     // Wait until the dialog is no longer visible to reset its state for a
@@ -103,80 +111,83 @@ export default function EditFormulaDialog(props: {
   }
 
   return (
-    <Dialog
-      open={props.open}
-      transitionDuration={{ exit: closeDuration }}
-      maxWidth={'xl'}
-    >
-      <DialogTitle>Formula</DialogTitle>
-      <DialogContent>
-        <Stepper activeStep={activeStep} sx={{ mb: 3 }}>
-          <Step>
-            <StepLabel>Select Formula</StepLabel>
-          </Step>
-          <Step>
-            <StepLabel>Set Parameters</StepLabel>
-          </Step>
-        </Stepper>
-        {
-          (activeStep === 0 && props.attainment) &&
-          <SelectFormula
-            formula={formula}
-            setFormula={setFormula}
-            clearParams={clearParams}
-            error={formulaError}
-          />
-        }
-        {
-          (activeStep === 1 && props.attainment && formula) &&
-          <SetFormulaParams
-            attainment={props.attainment}
-            formula={formula}
-            params={params}
-            setParams={setParams}
-            childParams={childParams}
-            setChildParams={setChildParams}
-          />
-        }
-        {
-          (activeStep === 2 && formula) &&
-          <FormulaSummary
-            formula={formula}
-            params={params}
-            childParams={childParams}
-            constructParamsObject={constructParamsObject}
-          />
-        }
-        <Box sx={{
-          mx: 3, my: 1.5, alignSelf: 'flex-end', display: 'flex',
-        }}>
-          <Button
-            sx={{ mr: 2 }}
-            size='medium'
-            variant='outlined'
-            onClick={
-              (activeStep > 0)
-                ? (): void => setActiveStep(activeStep - 1)
-                : props.handleClose
-            }
-          >
-            {(activeStep > 0) ? 'Back' : 'Cancel'}
-          </Button>
-          <Button
-            sx={{ mr: 2 }}
-            size='medium'
-            variant='contained'
-            onClick={
-              (activeStep < 2)
-                ? handleNext
-                : handleSubmit
-            }
-          >
-            {(activeStep < 2) ? 'Next' : 'Submit'}
-          </Button>
-        </Box>
-      </DialogContent>
-    </Dialog>
+    <>
+      <AlertSnackbar snackPack={snackPack} />
+      <Dialog
+        open={props.open}
+        transitionDuration={{ exit: closeDuration }}
+        maxWidth={'xl'}
+      >
+        <DialogTitle>Formula</DialogTitle>
+        <DialogContent>
+          <Stepper activeStep={activeStep} sx={{ mb: 3 }}>
+            <Step>
+              <StepLabel>Select Formula</StepLabel>
+            </Step>
+            <Step>
+              <StepLabel>Set Parameters</StepLabel>
+            </Step>
+          </Stepper>
+          {
+            (activeStep === 0 && props.attainment) &&
+            <SelectFormula
+              formula={formula}
+              setFormula={setFormula}
+              clearParams={clearParams}
+              error={formulaError}
+            />
+          }
+          {
+            (activeStep === 1 && props.attainment && formula) &&
+            <SetFormulaParams
+              attainment={props.attainment}
+              formula={formula}
+              params={params}
+              setParams={setParams}
+              childParams={childParams}
+              setChildParams={setChildParams}
+            />
+          }
+          {
+            (activeStep === 2 && formula) &&
+            <FormulaSummary
+              formula={formula}
+              params={params}
+              childParams={childParams}
+              constructParamsObject={constructParamsObject}
+            />
+          }
+          <Box sx={{
+            mx: 3, my: 1.5, alignSelf: 'flex-end', display: 'flex',
+          }}>
+            <Button
+              sx={{ mr: 2 }}
+              size='medium'
+              variant='outlined'
+              onClick={
+                (activeStep > 0)
+                  ? (): void => setActiveStep(activeStep - 1)
+                  : props.handleClose
+              }
+            >
+              {(activeStep > 0) ? 'Back' : 'Cancel'}
+            </Button>
+            <Button
+              sx={{ mr: 2 }}
+              size='medium'
+              variant='contained'
+              onClick={
+                (activeStep < 2)
+                  ? handleNext
+                  : handleSubmit
+              }
+            >
+              {(activeStep < 2) ? 'Next' : 'Submit'}
+            </Button>
+          </Box>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
