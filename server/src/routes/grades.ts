@@ -67,6 +67,28 @@ const upload: Multer = multer({
  *         format: int32
  *         minimum: 0
  *         example: 5
+ *   AssessmentModelGradingData:
+ *     type: object
+ *     description: Students grading data for assessment model.
+ *     properties:
+ *       attainmentId:
+ *         $ref: '#/definitions/AttainmentId'
+ *       gradeId:
+ *         type: integer
+ *         description: Internal attainment grade database ID.
+ *         format: int32
+ *         minimum: 0
+ *         example: 5
+ *       tag:
+ *         $ref: '#/definitions/AttainmentTag'
+ *       name:
+ *         $ref: '#/definitions/AttainmentName'
+ *       grade:
+ *         type: number
+ *         description: User attainment grade.
+ *         format: int32
+ *         minimum: 0
+ *         example: 5
  */
 
 /**
