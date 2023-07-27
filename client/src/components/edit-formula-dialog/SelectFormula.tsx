@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { styled, Theme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { StyledComponent } from '@emotion/styled';
 import { UseQueryResult } from '@tanstack/react-query';
 
