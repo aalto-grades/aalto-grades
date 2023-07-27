@@ -19,13 +19,7 @@ export const router: Router = Router();
  *       Get all courses the given user has or is currently participated in.
  *       User can access only their own course list. Admin can access any users courses.
  *     parameters:
- *       - in: path
- *         name: userId
- *         required: True
- *         schema:
- *           type: integer
- *         description: ID of the user whose list of courses are to be retrieved.
- *         example: 12345
+ *       - $ref: '#/components/parameters/userId'
  *     responses:
  *       200:
  *         description: Courses user has participated in.
