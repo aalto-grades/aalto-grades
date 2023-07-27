@@ -3,18 +3,29 @@
 // SPDX-License-Identifier: MIT
 
 import { AttainmentData, Formula, FormulaData } from 'aalto-grades-common/types';
+import deepEqual from 'deep-equal';
 import {
   Box, Button, Dialog, DialogTitle, DialogContent, Step, StepLabel, Stepper,
-  Typography
 } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useState, JSX } from 'react';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 
+import AlertSnackbar from '../alerts/AlertSnackbar';
+import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
+import FormulaSummary from './FormulaSummary';
 import SelectFormula from './SelectFormula';
 import SetFormulaParams from './SetFormulaParams';
 
 import { useEditAttainment, UseEditAttainmentResult } from '../../hooks/useApi';
-import { State } from '../../types';
+import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
+import { Message, State } from '../../types';
+import { sleep } from '../../utils';
+
+const successMessage: Message = {
+  msg: 'Formula and parameters set successfully.',
+  severity: 'success'
+};
 
 export default function EditFormulaDialog(props: {
   handleClose: () => void,
@@ -29,6 +40,9 @@ export default function EditFormulaDialog(props: {
   setAttainmentTree?: (attainmentTree: AttainmentData) => void
 }): JSX.Element {
 
+  const navigate: NavigateFunction = useNavigate();
+
+  const [showDialog, setShowDialog]: State<boolean> = useState(false);
   const [activeStep, setActiveStep]: State<number> = useState(0);
 
   // Error message in selection step
@@ -36,13 +50,52 @@ export default function EditFormulaDialog(props: {
 
   const [formula, setFormula]: State<FormulaData | null> =
     useState<FormulaData | null>(null);
-  const [params, setParams]: State<object> = useState({});
-  const [childParams, setChildParams]: State<Map<string, object>> =
-    useState<Map<string, object>>(new Map());
+
+  const [params, setParams]: State<object | null> =
+    useState<object | null>(null);
+
+  const [childParams, setChildParams]: State<Map<string, object> | null> =
+    useState<Map<string, object> | null>(null);
 
   const editAttainment: UseEditAttainmentResult = useEditAttainment({
-    onSuccess: () => close()
+    onSuccess: () => {
+      snackPack.push(successMessage);
+      close();
+    }
   });
+
+  const snackPack: SnackPackAlertState = useSnackPackAlerts();
+
+  const closeDuration: number = 800;
+
+  function hasUnsavedChanges(): boolean {
+    return Boolean(
+      // Formula was changed
+      formula?.id !== props.attainment.formula
+      || (
+        // Or the parameters were changed
+        formula?.id !== Formula.Manual && params && childParams && !deepEqual(
+          props.attainment.formulaParams,
+          constructParamsObject()
+        )
+      )
+    );
+  }
+
+  function clearParams(): void {
+    setParams(null);
+    setChildParams(null);
+  }
+
+  function handleBack(): void {
+    if (activeStep > 0) {
+      setActiveStep(activeStep - 1);
+    } else if (hasUnsavedChanges()) {
+      setShowDialog(true);
+    } else {
+      close();
+    }
+  }
 
   function handleNext(): void {
     if (activeStep === 0) {
@@ -57,22 +110,30 @@ export default function EditFormulaDialog(props: {
     setActiveStep(activeStep + 1);
   }
 
-  function close(): void {
+  async function close(): Promise<void> {
     props.handleClose();
+
+    // Wait until the dialog is no longer visible to reset its state for a
+    // smoother user experience
+    await sleep(closeDuration);
 
     setActiveStep(0);
     setFormulaError('');
     setFormula(null);
-    setParams({});
-    setChildParams(new Map());
+    setParams(null);
+    setChildParams(null);
+  }
+
+  function constructParamsObject(): object | undefined {
+    return (formula?.id === Formula.Manual) ? undefined : {
+      ...params,
+      children: Array.from(childParams ? childParams.entries() : [])
+    };
   }
 
   function handleSubmit(): void {
     props.attainment.formula = formula?.id;
-    props.attainment.formulaParams = (formula?.id === Formula.Manual) ? undefined : {
-      ...params,
-      children: Array.from(childParams.entries())
-    };
+    props.attainment.formulaParams = constructParamsObject();
 
     if (props.courseId && props.assessmentModelId) {
       editAttainment.mutate({
@@ -82,109 +143,96 @@ export default function EditFormulaDialog(props: {
       });
     } else if (props.attainmentTree && props.setAttainmentTree) {
       props.setAttainmentTree(structuredClone(props.attainmentTree));
+      snackPack.push(successMessage);
       close();
     }
   }
 
   return (
-    <Dialog
-      open={props.open}
-      transitionDuration={{ exit: 800 }}
-      maxWidth={'xl'}
-    >
-      <DialogTitle>Formula</DialogTitle>
-      <DialogContent>
-        <Stepper activeStep={activeStep} sx={{ mb: 3 }}>
-          <Step>
-            <StepLabel>Select Formula</StepLabel>
-          </Step>
-          <Step>
-            <StepLabel>Set Parameters</StepLabel>
-          </Step>
-        </Stepper>
-        {
-          (activeStep === 0 && props.attainment) &&
-          <SelectFormula
-            formula={formula}
-            setFormula={setFormula}
-            error={formulaError}
-          />
-        }
-        {
-          (activeStep === 1 && props.attainment && formula) &&
-          <SetFormulaParams
-            attainment={props.attainment}
-            formula={formula}
-            params={params}
-            setParams={setParams}
-            childParams={childParams}
-            setChildParams={setChildParams}
-          />
-        }
-        {
-          (activeStep === 2 && formula) &&
-          <Box sx={{ p: 1 }}>
-            <Box sx={{
-              display: 'flex'
-            }}>
-              <Typography sx={{ mr: 1 }}>
-                {formula.name}
-              </Typography>
-              <code>
-                {JSON.stringify(params)}
-              </code>
-            </Box>
-            {
-              Array.from(childParams.entries()).map(
-                (childParam: [string, object]) => {
-                  return (
-                    <Box key={childParam[0]} sx={{
-                      display: 'flex',
-                      mt: 1
-                    }}>
-                      <Typography sx={{ mr: 1 }}>
-                        {childParam[0]}
-                      </Typography>
-                      <code>
-                        {JSON.stringify(childParam[1])}
-                      </code>
-                    </Box>
-                  );
-                }
-              )
-            }
+    <>
+      <AlertSnackbar snackPack={snackPack} />
+      <UnsavedChangesDialog
+        setOpen={setShowDialog}
+        open={showDialog}
+        handleDiscard={(): void => {
+          if (props.courseId)
+            navigate(`/course-view/${props.courseId}`);
+          close();
+        }}
+      />
+      <Dialog
+        open={props.open}
+        transitionDuration={{ exit: closeDuration }}
+        maxWidth={'xl'}
+      >
+        <DialogTitle>Formula</DialogTitle>
+        <DialogContent>
+          <Stepper activeStep={activeStep} sx={{ mb: 3 }}>
+            <Step>
+              <StepLabel>Select Formula</StepLabel>
+            </Step>
+            <Step>
+              <StepLabel>Set Parameters</StepLabel>
+            </Step>
+          </Stepper>
+          {
+            (activeStep === 0 && props.attainment) &&
+            <SelectFormula
+              attainment={props.attainment}
+              formula={formula}
+              setFormula={setFormula}
+              clearParams={clearParams}
+              error={formulaError}
+            />
+          }
+          {
+            (activeStep === 1 && props.attainment && formula) &&
+            <SetFormulaParams
+              attainment={props.attainment}
+              formula={formula}
+              params={params}
+              setParams={setParams}
+              childParams={childParams}
+              setChildParams={setChildParams}
+            />
+          }
+          {
+            (activeStep === 2 && formula && params && childParams) &&
+            <FormulaSummary
+              formula={formula}
+              params={params}
+              childParams={childParams}
+              constructParamsObject={constructParamsObject}
+            />
+          }
+          <Box sx={{
+            mx: 3, my: 1.5, alignSelf: 'flex-end', display: 'flex',
+          }}>
+            <Button
+              sx={{ mr: 2 }}
+              size='medium'
+              variant='outlined'
+              color={(activeStep <= 0 && hasUnsavedChanges()) ? 'error' : 'primary'}
+              onClick={handleBack}
+            >
+              {(activeStep > 0) ? 'Back' : 'Cancel'}
+            </Button>
+            <Button
+              sx={{ mr: 2 }}
+              size='medium'
+              variant='contained'
+              onClick={
+                (activeStep < 2)
+                  ? handleNext
+                  : handleSubmit
+              }
+            >
+              {(activeStep < 2) ? 'Next' : 'Submit'}
+            </Button>
           </Box>
-        }
-        <Box sx={{
-          mx: 3, my: 1.5, alignSelf: 'flex-end', display: 'flex',
-        }}>
-          <Button
-            sx={{ mr: 2 }}
-            size='medium'
-            variant='outlined'
-            onClick={
-              (activeStep > 0)
-                ? (): void => setActiveStep(activeStep - 1)
-                : props.handleClose
-            }
-          >
-            {(activeStep > 0) ? 'Back' : 'Cancel'}
-          </Button>
-          <Button
-            sx={{ mr: 2 }}
-            size='medium'
-            variant='contained'
-            onClick={
-              (activeStep < 2)
-                ? handleNext
-                : handleSubmit
-            }
-          >
-            {(activeStep < 2) ? 'Next' : 'Submit'}
-          </Button>
-        </Box>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 

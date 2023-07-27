@@ -7,15 +7,12 @@ import {
   DialogContent, Stack, Typography
 } from '@mui/material';
 import PropTypes from 'prop-types';
-import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 export default function UnsavedChangesDialog(props: {
   setOpen: (open: boolean) => void,
   open: boolean,
-  navigateDir: string
+  handleDiscard: () => void
 }): JSX.Element {
-  const navigate: NavigateFunction = useNavigate();
-
   return (
     <Dialog
       open={props.open}
@@ -44,7 +41,11 @@ export default function UnsavedChangesDialog(props: {
               size='large'
               variant='contained'
               type='submit'
-              onClick={(): void => navigate(props.navigateDir)}
+              color='error'
+              onClick={(): void => {
+                props.handleDiscard();
+                props.setOpen(false);
+              }}
             >
               Discard changes
             </Button>
@@ -58,5 +59,5 @@ export default function UnsavedChangesDialog(props: {
 UnsavedChangesDialog.propTypes = {
   setOpen: PropTypes.func,
   open: PropTypes.bool,
-  navigateDir: PropTypes.string
+  handleDiscard: PropTypes.func
 };
