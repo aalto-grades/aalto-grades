@@ -8,8 +8,10 @@ import {
 } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useState, JSX } from 'react';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';
+import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import FormulaSummary from './FormulaSummary';
 import SelectFormula from './SelectFormula';
 import SetFormulaParams from './SetFormulaParams';
@@ -37,6 +39,9 @@ export default function EditFormulaDialog(props: {
   setAttainmentTree?: (attainmentTree: AttainmentData) => void
 }): JSX.Element {
 
+  const navigate: NavigateFunction = useNavigate();
+
+  const [showDialog, setShowDialog]: State<boolean> = useState(false);
   const [activeStep, setActiveStep]: State<number> = useState(0);
 
   // Error message in selection step
@@ -62,9 +67,26 @@ export default function EditFormulaDialog(props: {
 
   const closeDuration: number = 800;
 
+  function hasUnsavedChanges(): boolean {
+    return Boolean(
+      formula?.id !== props.attainment.formula // Formula was changed
+      // Or params were changed
+    );
+  }
+
   function clearParams(): void {
     setParams(null);
     setChildParams(null);
+  }
+
+  function handleBack(): void {
+    if (activeStep > 0) {
+      setActiveStep(activeStep - 1);
+    } else if (hasUnsavedChanges()) {
+      setShowDialog(true);
+    } else {
+      close();
+    }
   }
 
   function handleNext(): void {
@@ -121,6 +143,15 @@ export default function EditFormulaDialog(props: {
   return (
     <>
       <AlertSnackbar snackPack={snackPack} />
+      <UnsavedChangesDialog
+        setOpen={setShowDialog}
+        open={showDialog}
+        handleDiscard={(): void => {
+          if (props.courseId)
+            navigate(`/course-view/${props.courseId}`);
+          close();
+        }}
+      />
       <Dialog
         open={props.open}
         transitionDuration={{ exit: closeDuration }}
@@ -173,11 +204,7 @@ export default function EditFormulaDialog(props: {
               sx={{ mr: 2 }}
               size='medium'
               variant='outlined'
-              onClick={
-                (activeStep > 0)
-                  ? (): void => setActiveStep(activeStep - 1)
-                  : close
-              }
+              onClick={handleBack}
             >
               {(activeStep > 0) ? 'Back' : 'Cancel'}
             </Button>

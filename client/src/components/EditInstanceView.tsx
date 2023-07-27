@@ -302,7 +302,7 @@ export default function EditInstanceView(): JSX.Element {
             <UnsavedChangesDialog
               setOpen={setShowDialog}
               open={showDialog}
-              navigateDir={'/course-view/' + courseId}
+              handleDiscard={(): void => navigate(`/course-view/${courseId}`)}
             />
           </>
           : <LinearProgress sx={{ margin: '200px 50px 0px 50px' }} />

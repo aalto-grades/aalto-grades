@@ -418,7 +418,11 @@ export default function CreateCourseView(): JSX.Element {
             </Form>
           )}
         </Formik>
-        <UnsavedChangesDialog setOpen={setShowDialog} open={showDialog} navigateDir='/' />
+        <UnsavedChangesDialog
+          setOpen={setShowDialog}
+          open={showDialog}
+          handleDiscard={(): void => navigate('/')}
+        />
       </Container>
     </>
   );

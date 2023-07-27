@@ -11,17 +11,14 @@ import {
 } from '@mui/material';
 import { styled, Theme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
-import { useState } from 'react';
 import { StyledComponent } from '@emotion/styled';
 import { UseQueryResult } from '@tanstack/react-query';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';
-import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import StyledBox from './StyledBox';
 
 import { useGetAllFormulas } from '../../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
-import { State } from '../../types';
 
 const HoverExpandMoreIcon: StyledComponent<object> = styled(ExpandMore)(
   ({ theme }: { theme: Theme }) => ({
@@ -39,7 +36,6 @@ export default function SelectFormula(props: {
   error: string
 }): JSX.Element {
 
-  const [showDialog, setShowDialog]: State<boolean> = useState(false);
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
   const formulas: UseQueryResult<Array<FormulaData>> = useGetAllFormulas();
@@ -150,11 +146,6 @@ export default function SelectFormula(props: {
           </Container>
         </StyledBox>
       </StyledBox>
-      <UnsavedChangesDialog
-        setOpen={setShowDialog}
-        open={showDialog}
-        navigateDir={'/course-view/'}
-      />
     </>
   );
 }
