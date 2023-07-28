@@ -7,19 +7,21 @@ import TextField from '@mui/material/TextField';
 import PropTypes from 'prop-types';
 import { ChangeEvent } from 'react';
 
-import { TextFieldData } from '../../types';
+export interface AttainmentTextFieldData {
+  fieldId: keyof AttainmentData,
+  fieldLabel: string
+}
 
 export default function StringTextField(props: {
   attainmentTree: AttainmentData,
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
   attainment: AttainmentData,
   value: string,
-  fieldData: TextFieldData
+  fieldData: AttainmentTextFieldData
 }): JSX.Element {
 
   function handleChange(event: ChangeEvent<HTMLInputElement>): void {
-    const key: keyof AttainmentData = props.fieldData.fieldId as keyof AttainmentData;
-    (props.attainment[key] as unknown) = event.target.value;
+    (props.attainment[props.fieldData.fieldId] as unknown) = event.target.value;
     props.setAttainmentTree(structuredClone(props.attainmentTree));
   }
 

@@ -32,7 +32,7 @@ export default function ParentAttainment(props: {
   const [editFormulaOpen, setEditFormulaOpen]: State<boolean> = useState(false);
 
   const childParams: Map<string, object> = new Map(
-    (props.attainment.formulaParams as { children: Array<[string, object]> }).children
+    props.attainment.formulaParams?.children
   );
 
   const formula: UseQueryResult<FormulaData> = useGetFormula(
@@ -110,7 +110,7 @@ export default function ParentAttainment(props: {
                       deleteAttainment={props.deleteAttainment}
                       getTemporaryId={props.getTemporaryId}
                       attainment={subAttainment}
-                      paramsFromParent={childParams.get(subAttainment.tag)}
+                      paramsFromParent={childParams?.get(subAttainment.tag)}
                     />
                   )
                 )

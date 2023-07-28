@@ -2,7 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, Formula, FormulaData } from 'aalto-grades-common/types';
+import {
+  AttainmentData, Formula, FormulaData, ParamsObject
+} from 'aalto-grades-common/types';
 import deepEqual from 'deep-equal';
 import {
   Box, Button, Dialog, DialogTitle, DialogContent, Step, StepLabel, Stepper,
@@ -124,11 +126,11 @@ export default function EditFormulaDialog(props: {
     setChildParams(null);
   }
 
-  function constructParamsObject(): object | undefined {
+  function constructParamsObject(): ParamsObject | undefined {
     return (formula?.id === Formula.Manual) ? undefined : {
       ...params,
       children: Array.from(childParams ? childParams.entries() : [])
-    };
+    } as ParamsObject;
   }
 
   function handleSubmit(): void {

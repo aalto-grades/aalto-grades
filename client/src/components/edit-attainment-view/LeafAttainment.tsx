@@ -9,28 +9,27 @@ import { ChangeEvent, useState } from 'react';
 
 import ConfirmationDialog from './ConfirmationDialog';
 import SimpleDialog from './SimpleDialog';
-import StringTextField from './StringTextField';
+import StringTextField, { AttainmentTextFieldData } from './StringTextField';
 
-import { State, TextFieldData } from '../../types';
+import { State } from '../../types';
 
 // An Assignmnet component without subAttainments and hence without a formula as well.
 // If this isn't the root Attainment, this can be deleted
 
-const nameData: TextFieldData = {
+const nameData: AttainmentTextFieldData = {
   fieldId: 'name',
   fieldLabel: 'Name'
 };
 
-const tagData: TextFieldData = {
+const tagData: AttainmentTextFieldData = {
   fieldId: 'tag',
   fieldLabel: 'Tag'
 };
 
-const daysValidData: TextFieldData = {
+const daysValidData: AttainmentTextFieldData = {
   fieldId: 'daysValid',
   fieldLabel: 'Days Valid'
 };
-
 
 export default function LeafAttainment(props: {
   attainmentTree: AttainmentData,
@@ -116,6 +115,7 @@ export default function LeafAttainment(props: {
           }}
         />
       </Box>
+      <code>{JSON.stringify({ ...props.attainment.formulaParams, children: undefined })}</code>
       <code>{JSON.stringify(props.paramsFromParent)}</code>
       <Box sx={{
         display: 'flex',
