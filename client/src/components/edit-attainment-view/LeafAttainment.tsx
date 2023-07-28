@@ -12,6 +12,7 @@ import SimpleDialog from './SimpleDialog';
 import StringTextField, { AttainmentTextFieldData } from './StringTextField';
 
 import { State } from '../../types';
+import { getParamLabel } from '../../utils';
 
 // An Assignmnet component without subAttainments and hence without a formula as well.
 // If this isn't the root Attainment, this can be deleted
@@ -115,8 +116,34 @@ export default function LeafAttainment(props: {
           }}
         />
       </Box>
-      <code>{JSON.stringify({ ...props.attainment.formulaParams, children: undefined })}</code>
-      <code>{JSON.stringify(props.paramsFromParent)}</code>
+      <code>{JSON.stringify(props.attainment.formulaParams)}</code>
+      {
+        (props.attainment.formulaParams) && (
+          Object.keys(props.attainment.formulaParams).map((key: string) => {
+            if (props.attainment.formulaParams && key !== 'children') {
+              return (
+                <p key={key}>
+                  {`${getParamLabel(key)}: ${props.attainment.formulaParams[key]}`}
+                </p>
+              );
+            }
+          })
+        )
+      }
+      {
+        (props.paramsFromParent) && (
+          Object.keys(props.paramsFromParent).map((key: string) => {
+            if (props.paramsFromParent) {
+              console.log(`${key}, ${props.attainment.tag}`);
+              return (
+                <p key={key}>
+                  {`${getParamLabel(key)}: ${props.paramsFromParent[key as keyof object]}`}
+                </p>
+              );
+            }
+          })
+        )
+      }
       <Box sx={{
         display: 'flex',
         flexDirection: 'row',

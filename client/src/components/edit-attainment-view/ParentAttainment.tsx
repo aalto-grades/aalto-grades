@@ -78,18 +78,19 @@ export default function ParentAttainment(props: {
         paramsFromParent={props.paramsFromParent}
       />
       <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-        {open ?
+        {open ? (
           <IconButton size='small' onClick={handleClick} sx={{
             height: '32px', width: '32px', mr: 1
           }}>
             <ExpandLess sx={{ color: 'primary.main' }} />
           </IconButton>
-          :
+        ) : (
           <IconButton size='small' onClick={handleClick} sx={{
             height: '32px', width: '32px', mr: 1
           }}>
             <ExpandMore sx={{ color: 'hoverGrey3' }} />
-          </IconButton>}
+          </IconButton>
+        )}
         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
           <Collapse in={!open} unmountOnExit >
             <Typography variant="body2" align='left' sx={{
@@ -101,17 +102,19 @@ export default function ParentAttainment(props: {
           <Collapse in={open} timeout='auto' unmountOnExit>
             <List disablePadding>
               {
-                props.attainment.subAttainments && props.attainment.subAttainments.map(
-                  (subAttainment: AttainmentData, i: number) => (
-                    <Attainment
-                      key={i}
-                      attainmentTree={props.attainmentTree}
-                      setAttainmentTree={props.setAttainmentTree}
-                      deleteAttainment={props.deleteAttainment}
-                      getTemporaryId={props.getTemporaryId}
-                      attainment={subAttainment}
-                      paramsFromParent={childParams?.get(subAttainment.tag)}
-                    />
+                (props.attainment.subAttainments) && (
+                  props.attainment.subAttainments.map(
+                    (subAttainment: AttainmentData, i: number) => (
+                      <Attainment
+                        key={i}
+                        attainmentTree={props.attainmentTree}
+                        setAttainmentTree={props.setAttainmentTree}
+                        deleteAttainment={props.deleteAttainment}
+                        getTemporaryId={props.getTemporaryId}
+                        attainment={subAttainment}
+                        paramsFromParent={childParams?.get(subAttainment.tag)}
+                      />
+                    )
                   )
                 )
               }
