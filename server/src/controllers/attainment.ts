@@ -14,7 +14,7 @@ import Attainment from '../database/models/attainment';
 import Course from '../database/models/course';
 
 import { getFormulaImplementation } from '../formulas';
-import { ApiError, idSchema, JwtClaims } from '../types';
+import { ApiError, FormulaImplementation, idSchema, JwtClaims } from '../types';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import {
   findAttainmentById, findAttainmentsByAssessmentModel, generateAttainmentTree,
@@ -204,7 +204,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       .notRequired(),
     subAttainments: yup
       .array()
-      .of(yup.lazy(() => requestSchema.default(undefined)) as never)
+      .of(yup.lazy(() => requestSchema.default(undefined)))
       .notRequired()
   });
 
@@ -231,6 +231,36 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
         `parent attainment ID ${requestTree.parentId} does not belong ` +
         `to the assessment model ID ${assessmentModel.id}`,
         HttpCode.Conflict
+      );
+    }
+
+    /*
+     * If the parent attainment has formula params defined and the formula isn't
+     * manual, then this new attainment must be added to the children list of the
+     * parent attainment's params.
+     */
+    if (parentAttainment.formulaParams && parentAttainment.formula !== Formula.Manual) {
+      const parentParams: ParamsObject<object> = parentAttainment.formulaParams as ParamsObject;
+      const parentFormula: FormulaImplementation = getFormulaImplementation(
+        parentAttainment.formula
+      );
+
+      parentParams.children.push(
+        [requestTree.tag, parentFormula.defaultChildParams]
+      );
+
+      // Sanity check
+      await parentFormula.paramSchema.validate(parentParams);
+
+      await Attainment.update(
+        {
+          formulaParams: parentParams
+        },
+        {
+          where: {
+            id: requestTree.parentId
+          }
+        }
       );
     }
   } else {

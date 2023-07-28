@@ -375,6 +375,43 @@ describe(
       }
     });
 
+    it(
+      'should update the children array of a parent attainment\'s parameters'
+      + ' with the tag of a new attainment',
+      async () => {
+        let parent: Attainment = await Attainment.findByPk(264) as Attainment;
+        expect(parent.formulaParams).toBeDefined();
+        const oldParentParams: ParamsObject = parent.formulaParams as ParamsObject;
+        expect(oldParentParams.children).not.toContainEqual(['born', { weight: 0 }]);
+
+        await request
+          .post('/v1/courses/3/assessment-models/3/attainments')
+          .send({
+            parentId: 264,
+            tag: 'born',
+            name: 'Born again',
+            daysValid: 10
+          })
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
+
+        parent = await Attainment.findByPk(264) as Attainment;
+        expect(parent.formulaParams).toBeDefined();
+        const newParentParams: ParamsObject = parent.formulaParams as ParamsObject;
+        expect(newParentParams.children).toContainEqual(['born', { weight: 0 }]);
+
+        expect(oldParentParams).not.toStrictEqual(newParentParams);
+        expect(oldParentParams.children).not.toStrictEqual(newParentParams.children);
+
+        expect({ ...oldParentParams, children: undefined })
+          .toStrictEqual({ ...newParentParams, children: undefined });
+        expect([...oldParentParams.children, ['born', { weight: 0 }]])
+          .toStrictEqual(newParentParams.children);
+      }
+    );
+
     it('should respond with 400 bad request, if validation fails (non-number assessment model id)',
       async () => {
         const res: supertest.Response = await request

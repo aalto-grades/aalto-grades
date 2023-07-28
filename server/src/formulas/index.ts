@@ -31,6 +31,7 @@ export function registerFormula(
   name: string,
   params: Array<string>,
   childParams: Array<string>,
+  defaultChildParams: object,
   paramSchema: yup.AnyObjectSchema
 ): void {
   formulaImplementations.set(
@@ -41,6 +42,7 @@ export function registerFormula(
       name,
       params,
       childParams,
+      defaultChildParams,
       paramSchema
     }
   );

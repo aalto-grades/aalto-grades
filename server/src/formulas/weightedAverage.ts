@@ -12,6 +12,10 @@ import { ApiError, CalculationResult } from '../types';
 const childParams: Array<string> = ['weight'];
 const params: Array<string> = ['minRequiredGrade'];
 
+const defaultChildParams: ChildParams = {
+  weight: 0
+};
+
 interface ChildParams {
   weight: number;
 }
@@ -112,6 +116,7 @@ registerFormula(
   'Weighted average',
   params,
   childParams,
+  defaultChildParams,
   yup.object({
     minRequiredGrade: yup.number().required(),
     children: yup.array().min(1).of(
@@ -122,5 +127,5 @@ registerFormula(
         }).noUnknown().strict()
       ])
     ).required()
-  }).noUnknown().strict()
+  }).noUnknown().strict(),
 );

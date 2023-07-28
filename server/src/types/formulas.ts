@@ -31,6 +31,7 @@ export interface FormulaImplementation {
   name: string;
   params: Array<string>;
   childParams: Array<string>;
+  defaultChildParams: object;
 }
 
 /**

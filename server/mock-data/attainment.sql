@@ -5,7 +5,7 @@
 INSERT INTO public.attainment (assessment_model_id, parent_id, name, tag, days_valid, created_at, updated_at, formula, formula_params) VALUES
 (1, null, 'test assignment 1.1', 'tag1', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["tag5", { "weight": 2 }], ["tag9", { "weight": 2 }], ["tag16", { "weight": 2 }], ["tag17", { "weight": 2 }], ["tag18", { "weight": 2 }]] }'),
 (2, null, 'test assignment tree', 'tag2', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["tag6", { "weight": 2 }], ["tag10", { "weight": 2 }]] }'),
-(3, null, 'test assignment 3.1', 'tag3', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["tag7", { "weight": 2 }], ["tag11", { "weight": 2 }]] }'),
+(3, null, 'test assignment 3.1', 'tag3', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["tag7", { "weight": 2 }], ["tag11", { "weight": 2 }], ["264", { "weight": 0 }]] }'),
 (5, null, 'test assignment 4.1', 'tag4', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["tag8", { "weight": 2 }], ["tag12", { "weight": 2 }]] }'),
 (1, 1, 'test assignment 1.2', 'tag5', 365, NOW(), NOW(), 'MANUAL', NULL),
 (2, 2, 'test assignment 1st level child 1', 'tag6', 365, NOW(), NOW(), 'MANUAL', NULL),
@@ -267,4 +267,7 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, tag, days_v
 (43, 258, 'attainment test - update tag in parent', '260', 365, NOW(), NOW(), 'MANUAL', NULL),
 (44, null, 'attainment test - remove tag from parent', '261', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["262", { "weight": 1 }], ["263", { "weight": 1 }]] }'),
 (44, 261, 'attainment test - remove tag from parent', '262', 365, NOW(), NOW(), 'MANUAL', NULL),
-(44, 261, 'attainment test - remove tag from parent', '263', 365, NOW(), NOW(), 'MANUAL', NULL);
+(44, 261, 'attainment test - remove tag from parent', '263', 365, NOW(), NOW(), 'MANUAL', NULL),
+(3, 3, 'test children array update', '264', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["265", { "weight": 1 }], ["266", { "weight": 1 }]] }'),
+(3, 264, 'test children array update', '265', 365, NOW(), NOW(), 'MANUAL', NULL),
+(3, 264, 'test children array update', '266', 365, NOW(), NOW(), 'MANUAL', NULL);
