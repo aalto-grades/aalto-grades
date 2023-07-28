@@ -944,14 +944,17 @@ describe(
     );
 
     it(
-      'should remove an attainment tag from the formula params of a potential'
-      + ' parent attainment if the parent ID of a child is changed',
+      'should remove the edited attainment from the old parent attainment\'s and'
+      + ' add it to the new parent attainment\'s params',
       async () => {
-        let attainment: Attainment | null = await Attainment.findByPk(261);
-        let parentParams: ParamsObject = attainment?.formulaParams as ParamsObject;
+        let oldParent: Attainment | null = await Attainment.findByPk(261);
+        let oldParentParams: ParamsObject = oldParent?.formulaParams as ParamsObject;
+        let newParent: Attainment | null = await Attainment.findByPk(263);
+        let newParentParams: ParamsObject = newParent?.formulaParams as ParamsObject;
 
-        expect(parentParams.children).toContainEqual(['262', { weight: 1 }]);
-        expect(parentParams.children).toContainEqual(['263', { weight: 1 }]);
+        expect(oldParentParams.children).toContainEqual(['262', { weight: 1 }]);
+        expect(oldParentParams.children).toContainEqual(['263', { weight: 1 }]);
+        expect(newParentParams.children).not.toContainEqual(['262', { weight: 0 }]);
 
         const res: supertest.Response = await request
           .put('/v1/courses/2/assessment-models/44/attainments/262')
@@ -963,11 +966,14 @@ describe(
         expect(res.body.data).toBeDefined();
         expect(res.body.errors).not.toBeDefined();
 
-        attainment = await Attainment.findByPk(261);
-        parentParams = attainment?.formulaParams as ParamsObject;
+        oldParent = await Attainment.findByPk(261);
+        oldParentParams = oldParent?.formulaParams as ParamsObject;
+        newParent = await Attainment.findByPk(263);
+        newParentParams = newParent?.formulaParams as ParamsObject;
 
-        expect(parentParams.children).not.toContainEqual(['262', { weight: 1 }]);
-        expect(parentParams.children).toContainEqual(['263', { weight: 1 }]);
+        expect(oldParentParams.children).not.toContainEqual(['262', { weight: 1 }]);
+        expect(oldParentParams.children).toContainEqual(['263', { weight: 1 }]);
+        expect(newParentParams.children).toContainEqual(['262', { weight: 0 }]);
       }
     );
 
