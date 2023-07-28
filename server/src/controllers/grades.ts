@@ -104,6 +104,7 @@ interface FinalGradeRaw extends AttainmentGrade {
     }
   },
   User: {
+    id: number,
     studentNumber: string
   }
 }
@@ -117,7 +118,7 @@ async function getFinalGradesFor(
   // Prepare base query options for User.
   const userQueryOptions: Includeable = {
     model: User,
-    attributes: ['studentNumber']
+    attributes: ['id', 'studentNumber']
   };
 
   // Conditionally add the where clause if student numbers included.
@@ -365,8 +366,9 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
 
   // User raw query to enable distinct selection of students who have
   // at least one grade (final or not) for particular assessment model.
-  const allStudentsFromAssessmentModel: Array<string> = (await sequelize.query(
-    `SELECT DISTINCT student_number
+  const allStudentsFromAssessmentModel: Array<{ userId: number, studentNumber: string }> =
+  (await sequelize.query(
+    `SELECT DISTINCT "user".id AS id, student_number
     FROM attainment_grade
     INNER JOIN attainment ON attainment.id = attainment_grade.attainment_id
     INNER JOIN "user" ON "user".id = attainment_grade.user_id
@@ -376,12 +378,20 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
       type: QueryTypes.SELECT
     }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  )).map((value: any) => value.student_number);
+  )).map((value: any) => {
+    return {
+      userId: value.id,
+      studentNumber: value.student_number
+    };
+  });
 
   if (studentNumbersFiltered && allStudentsFromAssessmentModel.length !== 0) {
     studentNumbersFiltered = allStudentsFromAssessmentModel.filter(
-      (value: string) => (studentNumbersFiltered as Array<string>).includes(value)
-    );
+      (value: { userId: number, studentNumber: string }) =>
+        (studentNumbersFiltered as Array<string>).includes(value.studentNumber)
+    ).map((value: { userId: number, studentNumber: string }) => {
+      return value.studentNumber;
+    });
   }
 
   const studentsWithFinalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
@@ -394,14 +404,16 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
     const studentNumbersWithFinalGrades: Array<string> =
       studentsWithFinalGrades.map((value: FinalGradeRaw) => value.User.studentNumber);
 
-    const studentNumbersNoGrade: Array<string> = allStudentsFromAssessmentModel
-      .filter((studentNumber: string) => {
-        return !studentNumbersWithFinalGrades.includes(studentNumber);
-      });
+    const studentNumbersNoGrade: Array<{ userId: number, studentNumber: string }> =
+      allStudentsFromAssessmentModel
+        .filter((value: { userId: number, studentNumber: string }) => {
+          return !studentNumbersWithFinalGrades.includes(value.studentNumber);
+        });
 
-    studentNumbersNoGrade.forEach((studentNumber: string) => {
+    studentNumbersNoGrade.forEach((value: { userId: number, studentNumber: string }) => {
       finalGrades.push({
-        studentNumber,
+        userId: value.userId,
+        studentNumber: value.studentNumber,
         grade: Status.Pending,
         credits: 0
       });
@@ -411,6 +423,7 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
   studentsWithFinalGrades.map(
     (finalGrade: FinalGradeRaw) => {
       finalGrades.push({
+        userId: finalGrade.User.id,
         studentNumber: finalGrade.User.studentNumber,
         grade: String(finalGrade.grade),
         credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits

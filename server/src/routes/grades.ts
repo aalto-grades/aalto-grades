@@ -47,9 +47,9 @@ const upload: Multer = multer({
  *     type: object
  *     description: Students final grade data.
  *     properties:
- *       id:
+ *       userId:
  *         type: integer
- *         description: Student final grade database ID.
+ *         description: User ID.
  *         format: int32
  *         minimum: 1
  *         example: 1
