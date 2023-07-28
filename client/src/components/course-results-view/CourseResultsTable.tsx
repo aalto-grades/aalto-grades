@@ -35,7 +35,7 @@ export default function CourseResultsTable(props: {
   const [studentsToShow, setStudentsToShow]: State<Array<FinalGrade>> = useState(props.students);
   const [allSelected, setAllSelected]: State<boolean> = useState(false);
   const [showUserGrades, setShowUserGrades]: State<boolean> = useState(false);
-  const [userId, setUserId]: State<number> = useState(0);
+  const [user, setUser]: State<FinalGrade | null> = useState<FinalGrade | null>(null);
 
   useEffect(() => {
     setStudentsToShow(search === '' ? props.students : props.students.filter((s: FinalGrade) => {
@@ -150,7 +150,7 @@ export default function CourseResultsTable(props: {
                                   component="button"
                                   variant="body2"
                                   onClick={(): void => {
-                                    setUserId(student.userId);
+                                    setUser(student);
                                     setShowUserGrades(true);
                                   }}
                                 >
@@ -221,7 +221,11 @@ export default function CourseResultsTable(props: {
           />
         </Box>
       </Paper>
-      <StudentGradesDialog userId={userId} setOpen={setShowUserGrades} open={showUserGrades}/>
+      <StudentGradesDialog
+        user={user as FinalGrade}
+        setOpen={setShowUserGrades}
+        open={showUserGrades}
+      />
     </Box>
   );
 }

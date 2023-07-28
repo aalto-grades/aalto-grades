@@ -6,6 +6,7 @@ import { FinalGrade } from 'aalto-grades-common/types';
 import { Box, Typography } from '@mui/material';
 import { useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
+import { UseQueryResult } from '@tanstack/react-query';
 
 import AlertSnackbar from './alerts/AlertSnackbar';
 import CourseResultsTable from './course-results-view/CourseResultsTable';
@@ -17,7 +18,6 @@ import {
 } from '../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../hooks/useSnackPackAlerts';
 import { State } from '../types';
-import { UseQueryResult } from '@tanstack/react-query';
 
 export default function CourseResultsView(): JSX.Element {
   const { courseId, assessmentModelId }: Params =
