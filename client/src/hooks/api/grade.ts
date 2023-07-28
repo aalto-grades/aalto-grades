@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { FinalGrade } from 'aalto-grades-common/types';
+import { AttainmentGradeData, FinalGrade } from 'aalto-grades-common/types';
 import axios from './axios';
 import {
   useMutation, UseMutationOptions, UseMutationResult,
@@ -76,6 +76,23 @@ export function useGetFinalGrades(
     queryFn: async () => (
       await axios.get(
         `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades`
+      )
+    ).data.data,
+    ...options
+  });
+}
+
+export function useGetFinalGradesUser(
+  courseId: Numeric,
+  assessmentModelId: Numeric,
+  userId: Numeric,
+  options?: UseQueryOptions<Array<AttainmentGradeData>>
+): UseQueryResult<Array<AttainmentGradeData>> {
+  return useQuery({
+    queryKey: ['final-grades-user', courseId, assessmentModelId, userId],
+    queryFn: async () => (
+      await axios.get(
+        `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/user/${userId}`
       )
     ).data.data,
     ...options
