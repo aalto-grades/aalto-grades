@@ -563,9 +563,9 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        expect(res.body.data).toEqual([
-          { studentNumber: '327976', grade: '5', credits: 5 },
-          { studentNumber: '139131', grade: '5', credits: 5 },
+        expect(res.body.data).toEqual(   [
+          { userId: 824, studentNumber: '327976', grade: '5', credits: 5 },
+          { userId: 826, studentNumber: '139131', grade: '5', credits: 5 }
         ]);
       });
 
@@ -578,27 +578,27 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        expect(res.body.data).toEqual([
-          { studentNumber: '167155', grade: 'PENDING', credits: 0 },
-          { studentNumber: '451288', grade: 'PENDING', credits: 0 },
-          { studentNumber: '658593', grade: 'PENDING', credits: 0 },
-          { studentNumber: '117486', grade: '5', credits: 5 },
-          { studentNumber: '114732', grade: '5', credits: 5 },
-          { studentNumber: '472886', grade: '5', credits: 5 },
-          { studentNumber: '335462', grade: '5', credits: 5 },
-          { studentNumber: '874623', grade: '5', credits: 5 },
-          { studentNumber: '345752', grade: '5', credits: 5 },
-          { studentNumber: '353418', grade: '5', credits: 5 },
-          { studentNumber: '986957', grade: '5', credits: 5 },
-          { studentNumber: '611238', grade: '5', credits: 5 },
-          { studentNumber: '691296', grade: '5', credits: 5 },
-          { studentNumber: '271778', grade: '5', credits: 5 },
-          { studentNumber: '344644', grade: '5', credits: 5 },
-          { studentNumber: '954954', grade: '5', credits: 5 },
-          { studentNumber: '327976', grade: '5', credits: 5 },
-          { studentNumber: '478988', grade: '5', credits: 5 },
-          { studentNumber: '139131', grade: '5', credits: 5 },
-          { studentNumber: '857119', grade: '5', credits: 5 }
+        expect(res.body.data).toEqual(    [
+          { userId: 1241, studentNumber: '658593', grade: 'PENDING', credits: 0 },
+          { userId: 1242, studentNumber: '451288', grade: 'PENDING', credits: 0 },
+          { userId: 1243, studentNumber: '167155', grade: 'PENDING', credits: 0 },
+          { userId: 519, studentNumber: '117486', grade: '5', credits: 5 },
+          { userId: 521, studentNumber: '114732', grade: '5', credits: 5 },
+          { userId: 574, studentNumber: '472886', grade: '5', credits: 5 },
+          { userId: 581, studentNumber: '335462', grade: '5', credits: 5 },
+          { userId: 590, studentNumber: '874623', grade: '5', credits: 5 },
+          { userId: 601, studentNumber: '345752', grade: '5', credits: 5 },
+          { userId: 604, studentNumber: '353418', grade: '5', credits: 5 },
+          { userId: 609, studentNumber: '986957', grade: '5', credits: 5 },
+          { userId: 633, studentNumber: '611238', grade: '5', credits: 5 },
+          { userId: 651, studentNumber: '691296', grade: '5', credits: 5 },
+          { userId: 670, studentNumber: '271778', grade: '5', credits: 5 },
+          { userId: 739, studentNumber: '344644', grade: '5', credits: 5 },
+          { userId: 948, studentNumber: '954954', grade: '5', credits: 5 },
+          { userId: 824, studentNumber: '327976', grade: '5', credits: 5 },
+          { userId: 825, studentNumber: '478988', grade: '5', credits: 5 },
+          { userId: 826, studentNumber: '139131', grade: '5', credits: 5 },
+          { userId: 827, studentNumber: '857119', grade: '5', credits: 5 }
         ]);
       });
 
