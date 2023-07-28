@@ -53,7 +53,7 @@ export default function AttainmentCategory(props: {
           {'Days valid: ' + props.attainment.daysValid}
         </Typography>
         {
-          props.buttons ?
+          (props.buttons) ? (
             <Box sx={{
               display: 'flex', flexDirection: 'row', flexWrap: 'wrap',
               justifyContent: 'space-between', alignItems: 'center', pl: '21px',
@@ -61,8 +61,9 @@ export default function AttainmentCategory(props: {
             }}>
               {props.buttons}
             </Box>
-            :
+          ) : (
             <Box height='30.5px'></Box>
+          )
         }
       </Box>
     </Box>

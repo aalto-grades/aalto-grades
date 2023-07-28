@@ -185,15 +185,15 @@ export default function EditAttainmentView(): JSX.Element {
     <>
       <Container maxWidth="md" sx={{ textAlign: 'right' }}>
         {
-          modification === 'create'
-            ?
+          (modification === 'create') ? (
             <Typography variant="h1" align='left' sx={{ flexGrow: 1, mb: 4 }}>
               Create Study Attainment
             </Typography>
-            :
+          ) : (
             <Typography variant="h1" align='left' sx={{ flexGrow: 1, mb: 4 }}>
               Edit Study Attainment
             </Typography>
+          )
         }
         <form>
           <Box sx={{
@@ -207,26 +207,28 @@ export default function EditAttainmentView(): JSX.Element {
             px: 2,
           }}>
             {
-              attainmentTree &&
-              <Attainment
-                attainmentTree={attainmentTree}
-                setAttainmentTree={setAttainmentTree}
-                deleteAttainment={deleteAttainmentEnqueue}
-                getTemporaryId={getTemporaryId}
-                attainment={attainmentTree}
-              />
+              (attainmentTree) && (
+                <Attainment
+                  attainmentTree={attainmentTree}
+                  setAttainmentTree={setAttainmentTree}
+                  deleteAttainment={deleteAttainmentEnqueue}
+                  getTemporaryId={getTemporaryId}
+                  attainment={attainmentTree}
+                />
+              )
             }
           </Box>
           {
-            attainmentTree &&
-            <ConfirmationDialog
-              deleteAttainment={deleteAttainmentEnqueue}
-              attainment={attainmentTree}
-              title={'Study Attainment'}
-              subject={'study attainment'}
-              handleClose={(): void => setOpenConfDialog(false)}
-              open={openConfDialog}
-            />
+            (attainmentTree) && (
+              <ConfirmationDialog
+                deleteAttainment={deleteAttainmentEnqueue}
+                attainment={attainmentTree}
+                title={'Study Attainment'}
+                subject={'study attainment'}
+                handleClose={(): void => setOpenConfDialog(false)}
+                open={openConfDialog}
+              />
+            )
           }
           <Box sx={{
             display: 'flex',
@@ -238,16 +240,17 @@ export default function EditAttainmentView(): JSX.Element {
             mb: 1
           }}>
             {
-              modification === 'edit' &&
-              <Button
-                size='medium'
-                variant='outlined'
-                color='error'
-                onClick={(): void => setOpenConfDialog(true)}
-                sx={{ ml: 2 }}
-              >
-                Delete Attainment
-              </Button>
+              (modification === 'edit') && (
+                <Button
+                  size='medium'
+                  variant='outlined'
+                  color='error'
+                  onClick={(): void => setOpenConfDialog(true)}
+                  sx={{ ml: 2 }}
+                >
+                  Delete Attainment
+                </Button>
+              )
             }
             <Box sx={{
               display: 'flex',

@@ -40,8 +40,7 @@ export default function Attainment(props: {
   return (
     <>
       {
-        (props.attainment.subAttainments && props.attainment.subAttainments.length > 0)
-          ?
+        (props.attainment.subAttainments && props.attainment.subAttainments.length > 0) ? (
           <ParentAttainment
             attainmentTree={props.attainmentTree}
             setAttainmentTree={props.setAttainmentTree}
@@ -50,7 +49,7 @@ export default function Attainment(props: {
             attainment={props.attainment}
             paramsFromParent={props.paramsFromParent}
           />
-          :
+        ) : (
           <LeafAttainment
             attainmentTree={props.attainmentTree}
             setAttainmentTree={props.setAttainmentTree}
@@ -59,6 +58,7 @@ export default function Attainment(props: {
             attainment={props.attainment}
             paramsFromParent={props.paramsFromParent}
           />
+        )
       }
     </>
   );

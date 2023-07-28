@@ -34,14 +34,15 @@ export default function Attainments(props: {
       bgcolor: 'primary.light', p: 1.5, display: 'flex', flexDirection: 'column'
     }}>
       {
-        (props.assessmentModel.id) &&
-        <EditFormulaDialog
-          handleClose={(): void => setEditFormulaOpen(false)}
-          open={editFormulaOpen}
-          courseId={props.courseId}
-          assessmentModelId={props.assessmentModel.id}
-          attainment={props.attainmentTree}
-        />
+        (props.assessmentModel.id) && (
+          <EditFormulaDialog
+            handleClose={(): void => setEditFormulaOpen(false)}
+            open={editFormulaOpen}
+            courseId={props.courseId}
+            assessmentModelId={props.assessmentModel.id}
+            attainment={props.attainmentTree}
+          />
+        )
       }
       <Typography variant='h3' align='left' sx={{ ml: 1.5, mt: 0.6, mb: 1.5 }} >
         Study Attainments

@@ -21,7 +21,7 @@ export default function CourseResultsTable(props: {
   calculateFinalGrades: () => Promise<void>,
   downloadCsvTemplate: () => Promise<void>,
   loading: boolean,
-  selectedStudents: Array<FinalGrade>
+  selectedStudents: Array<FinalGrade>,
   setSelectedStudents: (students: Array<FinalGrade>) => void
 }): JSX.Element {
 
@@ -98,15 +98,14 @@ export default function CourseResultsTable(props: {
           selectedStudents={props.selectedStudents}
         />
         {
-          props.loading
-            ?
+          (props.loading) ? (
             <Box sx={{
               margin: 'auto', alignItems: 'center', justifyContent: 'center',
               display: 'flex', mt: 3
             }}>
               <CircularProgress />
             </Box>
-            :
+          ) : (
             <TableContainer>
               <Table
                 sx={{ minWidth: 75, mx: 4 }}
@@ -185,6 +184,7 @@ export default function CourseResultsTable(props: {
                 </TableBody>
               </Table>
             </TableContainer>
+          )
         }
         <Box sx={{
           display: 'flex',

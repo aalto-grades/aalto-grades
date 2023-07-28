@@ -57,7 +57,7 @@ export default function InstancesTable(props: {
           <TableRow>
             {
               headCells.map((headCell: HeadCellData) => (
-                headCell.id === 'startDate' ?
+                (headCell.id === 'startDate') ? (
                   <TableCell key={headCell.id}>
                     <TableSortLabel active={headCell.id === 'startDate'} direction='asc'>
                       <Typography sx={{ fontWeight: 'bold' }}>
@@ -65,12 +65,13 @@ export default function InstancesTable(props: {
                       </Typography>
                     </TableSortLabel>
                   </TableCell>
-                  :
+                ) : (
                   <TableCell key={headCell.id}>
                     <Typography sx={{ fontWeight: 'bold' }}>
                       {headCell.label}
                     </Typography>
                   </TableCell>
+                )
               ))
             }
           </TableRow>
@@ -116,19 +117,21 @@ export default function InstancesTable(props: {
       </Table>
       <Box sx={{ py: 5 }}>
         {
-          (instances.data?.length === 0) &&
-          <Typography variant='h3'>
-            No instances found for course, please create a new instance.
-          </Typography>
+          (instances.data?.length === 0) && (
+            <Typography variant='h3'>
+              No instances found for course, please create a new instance.
+            </Typography>
+          )
         }
         {
-          (instances.isLoading) &&
-          <>
-            <CircularProgress />
-            <Typography sx={{ mt: 2 }} variant='h3'>
-              Loading course instances...
-            </Typography>
-          </>
+          (instances.isLoading) && (
+            <>
+              <CircularProgress />
+              <Typography sx={{ mt: 2 }} variant='h3'>
+                Loading course instances...
+              </Typography>
+            </>
+          )
         }
       </Box>
     </>

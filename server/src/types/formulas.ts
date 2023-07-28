@@ -6,9 +6,9 @@ import { Status } from 'aalto-grades-common/types';
 import * as yup from 'yup';
 
 export interface CalculationResult {
-  attainmentTag: string;
-  grade: number;
-  status: Status;
+  attainmentTag: string,
+  grade: number,
+  status: Status
 }
 
 /**
@@ -25,22 +25,22 @@ export type FormulaFunction = (
  * parameters.
  */
 export interface FormulaImplementation {
-  formulaFunction: FormulaFunction;
-  paramSchema: yup.AnyObjectSchema;
-  codeSnippet: string;
-  name: string;
-  params: Array<string>;
-  childParams: Array<string>;
-  defaultChildParams: object;
+  formulaFunction: FormulaFunction,
+  paramSchema: yup.AnyObjectSchema,
+  codeSnippet: string,
+  name: string,
+  params: Array<string>,
+  childParams: Array<string>,
+  defaultChildParams: object
 }
 
 /**
  * Stores information needed for calculating the grade of an attainment.
  */
 export interface FormulaNode {
-  formulaImplementation: FormulaImplementation;
-  subFormulaNodes: Array<FormulaNode>;
-  formulaParams: object | null;
-  attainmentId: number;
-  attainmentTag: string;
+  formulaImplementation: FormulaImplementation,
+  subFormulaNodes: Array<FormulaNode>,
+  formulaParams: object | null,
+  attainmentId: number,
+  attainmentTag: string
 }

@@ -136,10 +136,10 @@ export default function FileLoadDialog(props: {
             <Typography>{fileName ?? 'Select a file'}</Typography>
           </Box>
           {validationError && <FormHelperText error={true}>{validationError}</FormHelperText>}
-          {fileErrors.length !== 0 &&
+          {fileErrors.length !== 0 && (
             <>
               <Typography id={'file_content_errors'} sx={{ mt: 2 }}>{errorInstructions}</Typography>
-              {fileErrors.length > maxErrorsToShow ?
+              {fileErrors.length > maxErrorsToShow ? (
                 <>
                   <ul>
                     {
@@ -157,7 +157,7 @@ export default function FileLoadDialog(props: {
                     <Button onClick={toggleErrorDialog}>Show all</Button>
                   </Typography>
                 </>
-                :
+              ) : (
                 <ul>
                   {
                     fileErrors.map((err: string) => {
@@ -171,9 +171,9 @@ export default function FileLoadDialog(props: {
                     })
                   }
                 </ul>
-              }
+              )}
             </>
-          }
+          )}
         </DialogContent>
         <DialogActions sx={{ pr: 4, pb: 3 }}>
           <Button size='medium' onClick={(): void => {

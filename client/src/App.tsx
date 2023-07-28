@@ -33,7 +33,7 @@ declare module '@mui/material/styles' {
     black?: string,
     hoverGrey1?: string,
     hoverGrey2?: string,
-    hoverGrey3?: string
+    hoverGrey3?: string,
     infoGrey?: string
   }
 
@@ -41,12 +41,12 @@ declare module '@mui/material/styles' {
     black: string,
     hoverGrey1: string,
     hoverGrey2: string,
-    hoverGrey3: string
+    hoverGrey3: string,
     infoGrey: string
   }
 
   interface TypographyVariantsOptions {
-    textInput?: CSSProperties;
+    textInput?: CSSProperties
   }
 }
 

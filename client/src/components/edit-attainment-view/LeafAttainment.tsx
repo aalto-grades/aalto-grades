@@ -151,12 +151,13 @@ export default function LeafAttainment(props: {
         justifyContent: 'space-between'
       }}>
         {
-          (props.attainment !== props.attainmentTree) ?
+          (props.attainment !== props.attainmentTree) ? (
             <Button size='small' sx={{ my: 1 }} onClick={handleConfDialogOpen}>
               Delete
             </Button>
-            :
+          ) : (
             <Box sx={{ width: '1px' }} />
+          )
         }
         <ConfirmationDialog
           deleteAttainment={props.deleteAttainment}
@@ -167,15 +168,15 @@ export default function LeafAttainment(props: {
           open={openConfDialog}
         />
         {
-          (props.attainment.subAttainments && props.attainment.subAttainments.length > 0)
-            ?
+          (props.attainment.subAttainments && props.attainment.subAttainments.length > 0) ? (
             <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
               Add Sub-Attainments
             </Button>
-            :
+          ) : (
             <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
               Create Sub-Attainments
             </Button>
+          )
         }
       </Box>
       <SimpleDialog

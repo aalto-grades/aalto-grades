@@ -5,7 +5,7 @@
 export enum Status {
   Pass = 'PASS',
   Fail = 'FAIL',
-  Pending = 'PENDING',
+  Pending = 'PENDING'
 }
 
 export interface AttainmentGradeData {

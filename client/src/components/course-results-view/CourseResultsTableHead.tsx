@@ -81,14 +81,14 @@ export default function CourseResultsTableHead(props: {
           <FormControlLabel
             htmlFor="select-all"
             label="Select all"
-            control={
+            control={(
               <Checkbox
                 id="select-all"
                 size="small"
                 onClick={props.handleSelectAll}
                 checked={props.allSelected}
               />
-            }
+            )}
           />
         </TableCell>
       </TableRow>

@@ -66,16 +66,16 @@ export default function EditInstanceView(): JSX.Element {
         Create Course Instance
       </Typography>
       {
-        (course.data && (sisuInstance === null || !sisuInstance.isLoading)) ?
+        (course.data && (sisuInstance === null || !sisuInstance.isLoading)) ? (
           <>
             <Typography variant="h3" sx={{ flexGrow: 1, mb: 2, textAlign: 'left' }}>
               {course.data.courseCode + ' - ' + course.data.name.en}
             </Typography>
-            {sisuInstanceId &&
+            {sisuInstanceId && (
               <Typography variant="body2" sx={{ flexGrow: 1, mb: 2, textAlign: 'left' }}>
                 {'Sisu instance ID: ' + sisuInstanceId}
               </Typography>
-            }
+            )}
             <Formik
               initialValues={
                 (sisuInstance !== null && sisuInstance.data) ? {
@@ -305,7 +305,9 @@ export default function EditInstanceView(): JSX.Element {
               handleDiscard={(): void => navigate(`/course-view/${courseId}`)}
             />
           </>
-          : <LinearProgress sx={{ margin: '200px 50px 0px 50px' }} />
+        ) : (
+          <LinearProgress sx={{ margin: '200px 50px 0px 50px' }} />
+        )
       }
       <AlertSnackbar snackPack={snackPack} />
     </Container>

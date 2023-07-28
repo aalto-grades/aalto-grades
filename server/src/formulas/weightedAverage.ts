@@ -17,11 +17,11 @@ const defaultChildParams: ChildParams = {
 };
 
 interface ChildParams {
-  weight: number;
+  weight: number
 }
 
 interface Params extends ParamsObject<ChildParams> {
-  minRequiredGrade: number;
+  minRequiredGrade: number
 }
 
 function calculateWeightedAverage(

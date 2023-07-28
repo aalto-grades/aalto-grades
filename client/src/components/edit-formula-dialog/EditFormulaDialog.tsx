@@ -178,34 +178,37 @@ export default function EditFormulaDialog(props: {
             </Step>
           </Stepper>
           {
-            (activeStep === 0 && props.attainment) &&
-            <SelectFormula
-              attainment={props.attainment}
-              formula={formula}
-              setFormula={setFormula}
-              clearParams={clearParams}
-              error={formulaError}
-            />
+            (activeStep === 0 && props.attainment) && (
+              <SelectFormula
+                attainment={props.attainment}
+                formula={formula}
+                setFormula={setFormula}
+                clearParams={clearParams}
+                error={formulaError}
+              />
+            )
           }
           {
-            (activeStep === 1 && props.attainment && formula) &&
-            <SetFormulaParams
-              attainment={props.attainment}
-              formula={formula}
-              params={params}
-              setParams={setParams}
-              childParams={childParams}
-              setChildParams={setChildParams}
-            />
+            (activeStep === 1 && props.attainment && formula) && (
+              <SetFormulaParams
+                attainment={props.attainment}
+                formula={formula}
+                params={params}
+                setParams={setParams}
+                childParams={childParams}
+                setChildParams={setChildParams}
+              />
+            )
           }
           {
-            (activeStep === 2 && formula && params && childParams) &&
-            <FormulaSummary
-              formula={formula}
-              params={params}
-              childParams={childParams}
-              constructParamsObject={constructParamsObject}
-            />
+            (activeStep === 2 && formula && params && childParams) && (
+              <FormulaSummary
+                formula={formula}
+                params={params}
+                childParams={childParams}
+                constructParamsObject={constructParamsObject}
+              />
+            )
           }
           <Box sx={{
             mx: 3, my: 1.5, alignSelf: 'flex-end', display: 'flex',
