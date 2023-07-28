@@ -4,14 +4,15 @@
 
 import { FinalGrade, Status } from 'aalto-grades-common/types';
 import {
-  Box, Checkbox, CircularProgress, Paper, Table, TableBody,
-  TableCell, TableContainer, TablePagination, TableRow
+  Box, Checkbox, CircularProgress, Link, Paper, Table, TableBody,
+  TableCell, TableContainer, TablePagination, TableRow, Tooltip
 } from '@mui/material';
 import PropTypes from 'prop-types';
 import { ChangeEvent, MouseEvent, SyntheticEvent, useEffect, useState } from 'react';
 
 import CourseResultsTableHead from './CourseResultsTableHead';
 import CourseResultsTableToolbar from './CourseResultTableToolbar';
+import StudentGradesDialog from './StudentGradesDialog';
 
 import { getComparator, stableSort } from '../../services/sorting';
 import { State } from '../../types';
@@ -33,6 +34,8 @@ export default function CourseResultsTable(props: {
   const [search, setSearch]: State<string> = useState('');
   const [studentsToShow, setStudentsToShow]: State<Array<FinalGrade>> = useState(props.students);
   const [allSelected, setAllSelected]: State<boolean> = useState(false);
+  const [showUserGrades, setShowUserGrades]: State<boolean> = useState(false);
+  const [userId, setUserId]: State<number> = useState(0);
 
   useEffect(() => {
     setStudentsToShow(search === '' ? props.students : props.students.filter((s: FinalGrade) => {
@@ -139,7 +142,21 @@ export default function CourseResultsTable(props: {
                               scope="row"
                               padding="normal"
                             >
-                              {student.studentNumber}
+                              <Tooltip
+                                placement="top"
+                                title="Click to show individual grades for student"
+                              >
+                                <Link
+                                  component="button"
+                                  variant="body2"
+                                  onClick={(): void => {
+                                    setUserId(student.userId);
+                                    setShowUserGrades(true);
+                                  }}
+                                >
+                                  {student.studentNumber}
+                                </Link>
+                              </Tooltip>
                             </TableCell>
                             <TableCell
                               sx={{ width: '100px' }}
@@ -204,6 +221,7 @@ export default function CourseResultsTable(props: {
           />
         </Box>
       </Paper>
+      <StudentGradesDialog userId={userId} setOpen={setShowUserGrades} open={showUserGrades}/>
     </Box>
   );
 }
