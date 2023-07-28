@@ -24,6 +24,7 @@ export interface AttainmentGradeData {
 }
 
 export interface FinalGrade {
+  userId: number,
   studentNumber: string,
   grade: string,
   credits: number
