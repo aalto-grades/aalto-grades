@@ -130,7 +130,7 @@ async function getFinalGradesFor(
     };
   }
 
-  const finalGrades: Array<FinalGradeRaw> = await AttainmentGrade.findAll({
+  let finalGrades: Array<FinalGradeRaw> = await AttainmentGrade.findAll({
     attributes: ['grade'],
     include: [
       {
@@ -162,6 +162,11 @@ async function getFinalGradesFor(
       HttpCode.NotFound
     );
   }
+
+  finalGrades = finalGrades.filter(
+    (obj: FinalGradeRaw, index: number) =>
+      finalGrades.findIndex((item: FinalGradeRaw) => item.User.id === obj.User.id) === index
+  );
 
   return finalGrades;
 }
