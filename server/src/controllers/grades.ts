@@ -1068,11 +1068,11 @@ function generateAttainmentTreeWithUserGrades(
     root.subAttainments = children.map((el: AttainmentWithUserGrade) => {
       return {
         attainmentId: el.id,
-        gradeId: el.AttainmentGrades[0]?.id ?? null,
+        gradeId: el.AttainmentGrades[0]?.id,
         name: el.name,
         tag: el.tag,
-        grade: el.AttainmentGrades[0]?.grade ?? null,
-        manual: el.AttainmentGrades[0]?.manual ?? null,
+        grade: el.AttainmentGrades[0]?.grade,
+        manual: el.AttainmentGrades[0]?.manual,
         status: el.AttainmentGrades[0]?.status as Status,
         subAttainments: []
       };
@@ -1114,10 +1114,10 @@ export async function getUserAttainmentModelGrades(req: Request, res: Response):
 
   const root: AttainmentGradeData = {
     attainmentId: parent[0].id,
-    gradeId: parent[0].AttainmentGrades[0]?.id ?? null,
+    gradeId: parent[0].AttainmentGrades[0]?.id,
     name: parent[0].name,
     tag: parent[0].tag,
-    grade: parent[0].AttainmentGrades[0]?.grade ?? null,
+    grade: parent[0].AttainmentGrades[0]?.grade,
     manual: parent[0].AttainmentGrades[0]?.manual,
     status: parent[0].AttainmentGrades[0]?.status as Status,
     subAttainments: []
