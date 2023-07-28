@@ -298,7 +298,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       tag: dbEntry.tag,
       daysValid: dbEntry.daysValid,
       formula: dbEntry.formula,
-      formulaParams: dbEntry.formulaParams,
+      formulaParams: dbEntry.formulaParams as ParamsObject,
       subAttainments: []
     };
 
@@ -459,7 +459,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     name: attainment.name,
     tag: attainment.tag,
     formula: attainment.formula,
-    formulaParams: attainment.formulaParams,
+    formulaParams: attainment.formulaParams as ParamsObject,
     daysValid: attainment.daysValid,
     parentId: attainment.parentId
   };
