@@ -89,6 +89,16 @@ const upload: Multer = multer({
  *         format: int32
  *         minimum: 0
  *         example: 5
+ *       manual:
+ *         type: boolean
+ *         example: true
+ *       status:
+ *         type: string
+ *         enum: [PASS, FAIL, PENDING]
+ *         example: PASS
+ *       subAttainments:
+ *         type: array
+ *         description: Sublevel attainment grades.
  */
 
 /**
