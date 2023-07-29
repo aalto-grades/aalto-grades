@@ -1132,12 +1132,12 @@ export async function getUserAttainmentModelGrades(req: Request, res: Response):
 
   const root: AttainmentGradeData = {
     attainmentId: parent[0].id,
-    gradeId: parent[0].AttainmentGrades[0]?.id,
+    gradeId: parent[0].AttainmentGrades[0]?.id ?? null,
     name: parent[0].name,
     tag: parent[0].tag,
-    grade: parent[0].AttainmentGrades[0]?.grade,
-    manual: parent[0].AttainmentGrades[0]?.manual,
-    status: parent[0].AttainmentGrades[0]?.status as Status,
+    grade: parent[0].AttainmentGrades[0]?.grade ?? null,
+    manual: parent[0].AttainmentGrades[0]?.manual ?? null,
+    status: parent[0].AttainmentGrades[0]?.status as Status ?? null,
     subAttainments: []
   };
 
