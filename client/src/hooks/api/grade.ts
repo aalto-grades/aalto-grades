@@ -86,8 +86,8 @@ export function useGetFinalGradesUser(
   courseId: Numeric,
   assessmentModelId: Numeric,
   userId: Numeric,
-  options?: UseQueryOptions<Array<AttainmentGradeData>>
-): UseQueryResult<Array<AttainmentGradeData>> {
+  options?: UseQueryOptions<AttainmentGradeData>
+): UseQueryResult<AttainmentGradeData> {
   return useQuery({
     queryKey: ['final-grades-user', courseId, assessmentModelId, userId],
     queryFn: async () => (
