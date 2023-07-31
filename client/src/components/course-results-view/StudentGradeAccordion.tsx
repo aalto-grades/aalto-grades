@@ -110,8 +110,7 @@ export default function StudentGradeAccordion(props: {
                 })
               }
             </Accordion>
-          )
-          : (
+          ) : (
             <Box sx={{
               display: 'flex',
               flexDirection: 'row',
@@ -133,7 +132,8 @@ export default function StudentGradeAccordion(props: {
                 status={props.attainmentGrade.status}
               />
             </Box>
-          )}
+          )
+      }
     </>
   );
 }

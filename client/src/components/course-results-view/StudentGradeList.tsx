@@ -13,7 +13,7 @@ export default function StudentGradeList(props: {
 }): JSX.Element {
 
   return (
-    <Box boxShadow={3} borderRadius={1} sx={{ py: 2, bgcolor: 'white' }}>
+    <Box sx={{ py: 2, bgcolor: 'white' }}>
       <Box sx={{
         display: 'flex', flexDirection: 'row', flexWrap: 'wrap',
         justifyContent: 'space-between', alignItems: 'center', pr: '21px',
