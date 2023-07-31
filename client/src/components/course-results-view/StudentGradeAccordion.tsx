@@ -100,11 +100,9 @@ export default function StudentGradeAccordion(props: {
                       key={subAttainment.attainmentId + 'subAccordion'}
                       sx={{ pl: '39px' }}
                     >
-                      {
-                        <StudentGradeAccordion
-                          attainmentGrade={subAttainment}
-                        />
-                      }
+                      <StudentGradeAccordion
+                        attainmentGrade={subAttainment}
+                      />
                     </Box>
                   );
                 })

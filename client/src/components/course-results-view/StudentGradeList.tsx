@@ -33,7 +33,6 @@ export default function StudentGradeList(props: {
         justifyContent: 'space-between', alignItems: 'center', pl: '21px',
         pr: '6px', pt: '8px'
       }}>
-        <Box height='30.5px'></Box>
         {
           props.grades.subAttainments?.map((subAttainment: AttainmentGradeData) => {
             return (
