@@ -89,9 +89,7 @@ describe('Tests for EditAttainmentView components', () => {
       expect(editAttainment).toHaveBeenCalledTimes(15);
       expect(editAttainment).toHaveBeenCalledWith({
         ...mockAttainments,
-        // TODO: Update daysValid as a number in attainment creation. Probably by
-        // adding a number text field to also account for formula attributes.
-        daysValid: '42'
+        daysValid: 42
       });
       expect(addAttainment).toHaveBeenCalledTimes(0);
     });
