@@ -247,7 +247,7 @@ describe(
 857119,5,5,12.12.2023,sv,
 `);
         expect(res.headers['content-disposition']).toBe(
-          'attachment; filename="final_grades_course_ELEC-A7100_' +
+          'attachment; filename="final_grades_course_PHYS-A1140_' +
         `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
         );
       });
@@ -271,7 +271,7 @@ describe(
 139131,5,5,12.12.2023,fi,
 `);
         expect(res.headers['content-disposition']).toBe(
-          'attachment; filename="final_grades_course_ELEC-A7100_' +
+          'attachment; filename="final_grades_course_PHYS-A1140_' +
         `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
         );
       });
@@ -293,7 +293,7 @@ describe(
 139131,5,5,12.12.2023,sv,
 `);
         expect(res.headers['content-disposition']).toBe(
-          'attachment; filename="final_grades_course_ELEC-A7100_' +
+          'attachment; filename="final_grades_course_PHYS-A1140_' +
         `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
         );
       });
@@ -329,7 +329,7 @@ describe(
 857119,5,5,12.12.2023,sv,
 `);
         expect(res.headers['content-disposition']).toBe(
-          'attachment; filename="final_grades_course_ELEC-A7100_' +
+          'attachment; filename="final_grades_course_PHYS-A1140_' +
         `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
         );
       });
