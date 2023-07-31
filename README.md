@@ -74,7 +74,7 @@ $ ssh -F ssh.config grades
   -	Adminer is at `localhost:8080`
 
 
-5. Frontend has 2 demo users, admin and regular user.
+5. Frontend has 2 demo users, admin and teacher user.
 
     Admin user credentials:
     ```
@@ -82,8 +82,8 @@ $ ssh -F ssh.config grades
     password: password
     ```
 
-    Regular user credentials:
+    Teacher user credentials:
     ```
-    username: student@aalto.fi
+    username: teacher@aalto.fi
     password: password
     ```
