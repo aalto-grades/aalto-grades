@@ -72,3 +72,18 @@ $ ssh -F ssh.config grades
   - Backend is at `localhost:3000`
   -	Frontend is at `localhost:3005`
   -	Adminer is at `localhost:8080`
+
+
+5. Frontend has 2 demo users, admin and regular user.
+
+    Admin user credentials:
+    ```
+    username: admin@aalto.fi
+    password: password
+    ```
+
+    Regular user credentials:
+    ```
+    username: student@aalto.fi
+    password: password
+    ```
