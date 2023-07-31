@@ -53,7 +53,7 @@ export interface SisuCourseInstance {
     gradingScale: LocalizedString,
     teachingPeriod: LocalizedString
   },
-  organizations: Array<Organizations>
+  organizations: Array<Organizations>,
   organizationId: string,
   organizationName: LocalizedString,
   credits: {

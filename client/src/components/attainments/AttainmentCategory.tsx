@@ -3,16 +3,19 @@
 // SPDX-License-Identifier: MIT
 
 import { AttainmentData } from 'aalto-grades-common/types';
-import { Box, Typography } from '@mui/material';
+import { Box, Paper, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import { JSX } from 'react';
 
 import CustomAccordion from './CustomAccordion';
 
+import { getParamLabel } from '../../utils';
+
 // This component renders a top attainment (only has the root attainment as its parent)
 export default function AttainmentCategory(props: {
   attainment: AttainmentData,
-  buttons?: Array<JSX.Element>
+  buttons?: Array<JSX.Element>,
+  paramsFromRoot?: object
 }): JSX.Element {
   return (
     <Box boxShadow={3} borderRadius={1} sx={{ pt: 2, pb: 0.5, bgcolor: 'white' }}>
@@ -49,11 +52,30 @@ export default function AttainmentCategory(props: {
         justifyContent: 'space-between', alignItems: 'center', pl: '21px',
         pr: '6px', pt: '8px'
       }}>
-        <Typography align='left' variant='caption'>
-          {'Days valid: ' + props.attainment.daysValid}
-        </Typography>
+        <Box sx={{ display: 'flex' }}>
+          <Paper variant='outlined' sx={{ mr: 1, px: 1, py: 0.5 }}>
+            <Typography align='left' variant='caption'>
+              {'Days valid: ' + props.attainment.daysValid}
+            </Typography>
+          </Paper>
+          {
+            (props.paramsFromRoot) && (
+              Object.keys(props.paramsFromRoot).map((key: string) => {
+                if (props.paramsFromRoot) {
+                  return (
+                    <Paper key={key} variant='outlined' sx={{ mr: 1, px: 1, py: 0.5 }}>
+                      <Typography align='left' variant='caption'>
+                        {`${getParamLabel(key)}: ${props.paramsFromRoot[key as keyof object]}`}
+                      </Typography>
+                    </Paper>
+                  );
+                }
+              })
+            )
+          }
+        </Box>
         {
-          props.buttons ?
+          (props.buttons) ? (
             <Box sx={{
               display: 'flex', flexDirection: 'row', flexWrap: 'wrap',
               justifyContent: 'space-between', alignItems: 'center', pl: '21px',
@@ -61,8 +83,9 @@ export default function AttainmentCategory(props: {
             }}>
               {props.buttons}
             </Box>
-            :
+          ) : (
             <Box height='30.5px'></Box>
+          )
         }
       </Box>
     </Box>
@@ -71,5 +94,6 @@ export default function AttainmentCategory(props: {
 
 AttainmentCategory.propTypes = {
   attainment: PropTypes.object,
-  buttons: PropTypes.array
+  buttons: PropTypes.array,
+  paramsFromRoot: PropTypes.object
 };

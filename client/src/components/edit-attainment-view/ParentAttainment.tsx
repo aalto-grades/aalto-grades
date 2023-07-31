@@ -23,12 +23,17 @@ export default function ParentAttainment(props: {
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
   deleteAttainment: (attainment: AttainmentData) => void,
   getTemporaryId: () => number,
-  attainment: AttainmentData
+  attainment: AttainmentData,
+  paramsFromParent?: object
 }): JSX.Element {
 
   // For opening and closing the list of sub-attainments
   const [open, setOpen]: State<boolean> = useState(true);
   const [editFormulaOpen, setEditFormulaOpen]: State<boolean> = useState(false);
+
+  const childParams: Map<string, object> = new Map(
+    props.attainment.formulaParams?.children
+  );
 
   const formula: UseQueryResult<FormulaData> = useGetFormula(
     props.attainment.formula ?? Formula.Manual
@@ -70,20 +75,22 @@ export default function ParentAttainment(props: {
         deleteAttainment={props.deleteAttainment}
         getTemporaryId={props.getTemporaryId}
         attainment={props.attainment}
+        paramsFromParent={props.paramsFromParent}
       />
       <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-        {open ?
+        {open ? (
           <IconButton size='small' onClick={handleClick} sx={{
             height: '32px', width: '32px', mr: 1
           }}>
             <ExpandLess sx={{ color: 'primary.main' }} />
           </IconButton>
-          :
+        ) : (
           <IconButton size='small' onClick={handleClick} sx={{
             height: '32px', width: '32px', mr: 1
           }}>
             <ExpandMore sx={{ color: 'hoverGrey3' }} />
-          </IconButton>}
+          </IconButton>
+        )}
         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
           <Collapse in={!open} unmountOnExit >
             <Typography variant="body2" align='left' sx={{
@@ -95,16 +102,19 @@ export default function ParentAttainment(props: {
           <Collapse in={open} timeout='auto' unmountOnExit>
             <List disablePadding>
               {
-                props.attainment.subAttainments && props.attainment.subAttainments.map(
-                  (subAttainment: AttainmentData, i: number) => (
-                    <Attainment
-                      key={i}
-                      attainmentTree={props.attainmentTree}
-                      setAttainmentTree={props.setAttainmentTree}
-                      deleteAttainment={props.deleteAttainment}
-                      getTemporaryId={props.getTemporaryId}
-                      attainment={subAttainment}
-                    />
+                (props.attainment.subAttainments) && (
+                  props.attainment.subAttainments.map(
+                    (subAttainment: AttainmentData, i: number) => (
+                      <Attainment
+                        key={i}
+                        attainmentTree={props.attainmentTree}
+                        setAttainmentTree={props.setAttainmentTree}
+                        deleteAttainment={props.deleteAttainment}
+                        getTemporaryId={props.getTemporaryId}
+                        attainment={subAttainment}
+                        paramsFromParent={childParams.get(subAttainment.tag)}
+                      />
+                    )
                   )
                 )
               }

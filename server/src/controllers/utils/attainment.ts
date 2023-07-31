@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpCode } from 'aalto-grades-common/types';
+import { HttpCode, ParamsObject } from 'aalto-grades-common/types';
 
 import AssessmentModel from '../../database/models/assessmentModel';
 import Attainment from '../../database/models/attainment';
@@ -62,7 +62,7 @@ export async function findAttainmentsByAssessmentModel(
       parentId: attainment.parentId,
       tag: attainment.tag,
       formula: attainment.formula,
-      formulaParams: attainment.formulaParams,
+      formulaParams: attainment.formulaParams as ParamsObject,
       name: attainment.name,
       daysValid: attainment.daysValid
     };

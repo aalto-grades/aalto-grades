@@ -10,7 +10,7 @@ import { SystemRole } from 'aalto-grades-common/types';
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 
 export interface Cookies {
-  adminCookie: Array<string>
+  adminCookie: Array<string>,
   userCookie: Array<string>
 }
 

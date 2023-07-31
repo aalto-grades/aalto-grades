@@ -3,41 +3,42 @@
 // SPDX-License-Identifier: MIT
 
 import { AttainmentData } from 'aalto-grades-common/types';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Paper, TextField, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 
 import ConfirmationDialog from './ConfirmationDialog';
 import SimpleDialog from './SimpleDialog';
-import StringTextField from './StringTextField';
+import StringTextField, { AttainmentTextFieldData } from './StringTextField';
 
-import { State, TextFieldData } from '../../types';
+import { State } from '../../types';
+import { getParamLabel } from '../../utils';
 
 // An Assignmnet component without subAttainments and hence without a formula as well.
 // If this isn't the root Attainment, this can be deleted
 
-const nameData: TextFieldData = {
+const nameData: AttainmentTextFieldData = {
   fieldId: 'name',
   fieldLabel: 'Name'
 };
 
-const tagData: TextFieldData = {
+const tagData: AttainmentTextFieldData = {
   fieldId: 'tag',
   fieldLabel: 'Tag'
 };
 
-const daysValidData: TextFieldData = {
+const daysValidData: AttainmentTextFieldData = {
   fieldId: 'daysValid',
   fieldLabel: 'Days Valid'
 };
-
 
 export default function LeafAttainment(props: {
   attainmentTree: AttainmentData,
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
   deleteAttainment: (attainment: AttainmentData) => void,
   getTemporaryId: () => number,
-  attainment: AttainmentData
+  attainment: AttainmentData,
+  paramsFromParent?: object
 }): JSX.Element {
 
   // Functions and variables for opening and closing the dialog that asks for
@@ -97,13 +98,55 @@ export default function LeafAttainment(props: {
           value={props.attainment.tag}
           fieldData={tagData}
         />
-        <StringTextField
-          attainmentTree={props.attainmentTree}
-          setAttainmentTree={props.setAttainmentTree}
-          attainment={props.attainment}
-          value={String(props.attainment.daysValid)}
-          fieldData={daysValidData}
+        <TextField
+          type='number'
+          key={daysValidData.fieldId}
+          id={daysValidData.fieldId}
+          label={daysValidData.fieldLabel}
+          InputLabelProps={{ shrink: true }}
+          margin='normal'
+          value={props.attainment.daysValid}
+          sx={{
+            marginTop: 0,
+            width: '100%'
+          }}
+          onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+            props.attainment.daysValid = Number(event.target.value);
+            props.setAttainmentTree(structuredClone(props.attainmentTree));
+          }}
         />
+      </Box>
+      <Box sx={{ display: 'flex' }}>
+        {
+          (props.attainment.formulaParams) && (
+            Object.keys(props.attainment.formulaParams).map((key: string) => {
+              if (props.attainment.formulaParams && key !== 'children') {
+                return (
+                  <Paper key={key} variant='outlined' sx={{ mr: 1, px: 1, py: 0.5 }}>
+                    <Typography align='left' variant='caption'>
+                      {`${getParamLabel(key)}: ${props.attainment.formulaParams[key]}`}
+                    </Typography>
+                  </Paper>
+                );
+              }
+            })
+          )
+        }
+        {
+          (props.paramsFromParent) && (
+            Object.keys(props.paramsFromParent).map((key: string) => {
+              if (props.paramsFromParent) {
+                return (
+                  <Paper key={key} variant='outlined' sx={{ mr: 1, px: 1, py: 0.5 }}>
+                    <Typography align='left' variant='caption'>
+                      {`${getParamLabel(key)}: ${props.paramsFromParent[key as keyof object]}`}
+                    </Typography>
+                  </Paper>
+                );
+              }
+            })
+          )
+        }
       </Box>
       <Box sx={{
         display: 'flex',
@@ -112,12 +155,13 @@ export default function LeafAttainment(props: {
         justifyContent: 'space-between'
       }}>
         {
-          (props.attainment !== props.attainmentTree) ?
+          (props.attainment !== props.attainmentTree) ? (
             <Button size='small' sx={{ my: 1 }} onClick={handleConfDialogOpen}>
               Delete
             </Button>
-            :
+          ) : (
             <Box sx={{ width: '1px' }} />
+          )
         }
         <ConfirmationDialog
           deleteAttainment={props.deleteAttainment}
@@ -128,15 +172,15 @@ export default function LeafAttainment(props: {
           open={openConfDialog}
         />
         {
-          (props.attainment.subAttainments && props.attainment.subAttainments.length > 0)
-            ?
+          (props.attainment.subAttainments && props.attainment.subAttainments.length > 0) ? (
             <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
               Add Sub-Attainments
             </Button>
-            :
+          ) : (
             <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
               Create Sub-Attainments
             </Button>
+          )
         }
       </Box>
       <SimpleDialog

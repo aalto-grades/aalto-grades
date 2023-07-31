@@ -23,16 +23,16 @@ import { useAddCourse, UseAddCourseResult } from '../hooks/useApi';
 import { State } from '../types';
 
 interface FormData {
-  courseCode: string;
-  minCredits: number;
-  maxCredits: number;
-  teacherEmail: string;
-  departmentEn: string;
-  departmentFi: string;
-  departmentSv: string;
-  nameEn: string;
-  nameFi: string;
-  nameSv: string;
+  courseCode: string,
+  minCredits: number,
+  maxCredits: number,
+  teacherEmail: string,
+  departmentEn: string,
+  departmentFi: string,
+  departmentSv: string,
+  nameEn: string,
+  nameFi: string,
+  nameSv: string
 }
 
 export default function CreateCourseView(): JSX.Element {
@@ -339,39 +339,38 @@ export default function CreateCourseView(): JSX.Element {
                   Add
                 </Button>
                 <Box sx={{ mt: 3, mb: 2 }}>
-                  {teachersInCharge.length === 0 ?
+                  {teachersInCharge.length === 0 ? (
                     'Add at least one teacher in charge to the course'
-                    :
+                  ) : (
                     <List dense={true}>
-                      {teachersInCharge.map((teacherEmail: string) => {
-                        return (
-                          <ListItem
-                            key={teacherEmail}
-                            secondaryAction={
-                              <IconButton
-                                edge="end"
-                                disabled={isSubmitting}
-                                aria-label="delete"
-                                onClick={(): void => {
-                                  removeTeacher(teacherEmail);
-                                }}
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            }
-                          >
-                            <ListItemAvatar>
-                              <Avatar>
-                                <PersonIcon />
-                              </Avatar>
-                            </ListItemAvatar>
-                            <ListItemText
-                              primary={teacherEmail}
-                            />
-                          </ListItem>);
-                      })}
+                      {teachersInCharge.map((teacherEmail: string) => (
+                        <ListItem
+                          key={teacherEmail}
+                          secondaryAction={(
+                            <IconButton
+                              edge="end"
+                              disabled={isSubmitting}
+                              aria-label="delete"
+                              onClick={(): void => {
+                                removeTeacher(teacherEmail);
+                              }}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          )}
+                        >
+                          <ListItemAvatar>
+                            <Avatar>
+                              <PersonIcon />
+                            </Avatar>
+                          </ListItemAvatar>
+                          <ListItemText
+                            primary={teacherEmail}
+                          />
+                        </ListItem>
+                      ))}
                     </List>
-                  }
+                  )}
                 </Box>
               </Box>
               <Box sx={{

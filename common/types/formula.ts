@@ -8,14 +8,14 @@ export enum Formula {
 }
 
 export interface FormulaData {
-  id: Formula;
-  name: string;
-  params: Array<string>;
-  childParams: Array<string>;
-  codeSnippet: string;
+  id: Formula,
+  name: string,
+  params: Array<string>,
+  childParams: Array<string>,
+  codeSnippet: string
 }
 
 export interface ParamsObject<T = { [key: string]: unknown }> {
-  children: Array<[string, T]>;
-  [key: string]: unknown;
+  children: Array<[string, T]>,
+  [key: string]: unknown
 }

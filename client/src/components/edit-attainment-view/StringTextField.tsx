@@ -7,21 +7,21 @@ import TextField from '@mui/material/TextField';
 import PropTypes from 'prop-types';
 import { ChangeEvent } from 'react';
 
-import { TextFieldData } from '../../types';
+export interface AttainmentTextFieldData {
+  fieldId: keyof AttainmentData,
+  fieldLabel: string
+}
 
 export default function StringTextField(props: {
   attainmentTree: AttainmentData,
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
   attainment: AttainmentData,
   value: string,
-  fieldData: TextFieldData
+  fieldData: AttainmentTextFieldData
 }): JSX.Element {
 
-  // Functions for handling the change of the values in the 'New Name' textfield
-  // and the textfields that represent formula attributes
   function handleChange(event: ChangeEvent<HTMLInputElement>): void {
-    const key: keyof AttainmentData = props.fieldData.fieldId as keyof AttainmentData;
-    (props.attainment[key] as unknown) = event.target.value;
+    (props.attainment[props.fieldData.fieldId] as unknown) = event.target.value;
     props.setAttainmentTree(structuredClone(props.attainmentTree));
   }
 
@@ -30,7 +30,6 @@ export default function StringTextField(props: {
       type='text'
       key={props.fieldData.fieldId}
       id={props.fieldData.fieldId}
-      variant='standard'
       label={props.fieldData.fieldLabel}
       InputLabelProps={{ shrink: true }}
       margin='normal'
@@ -39,7 +38,7 @@ export default function StringTextField(props: {
         marginTop: 0,
         width: '100%'
       }}
-      onChange={(event: ChangeEvent<HTMLInputElement>): void => handleChange(event)}
+      onChange={handleChange}
     />
   );
 }

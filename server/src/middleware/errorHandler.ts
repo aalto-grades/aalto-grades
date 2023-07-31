@@ -24,7 +24,7 @@ export function controllerDispatcher(
 export function errorHandler(err: unknown, req: Request, res: Response, next: NextFunction): void {
 
   if (err instanceof ApiError) {
-    logger.error(`${err.name}: ${err.errors}`);
+    logger.error(`${err.name}: ${err.statusCode} - ${err.errors}`);
 
     res.status(err.statusCode).send({
       success: false,
