@@ -73,65 +73,67 @@ export default function StudentGradeAccordion(props: {
   return (
     <>
       {
-        (props.attainmentGrade.subAttainments && props.attainmentGrade.subAttainments.length > 0) ?
-          <Accordion
-            key={props.attainmentGrade.attainmentId + 'accordion'}
-            expanded={expanded.has(props.attainmentGrade.attainmentId ?? 0)}
-            onChange={handleChange(props.attainmentGrade.attainmentId ?? 0)}
-          >
-            <AccordionSummary
-              aria-controls={props.attainmentGrade.attainmentId + '-content'}
-              id={props.attainmentGrade.attainmentId + '-header'}
+        (props.attainmentGrade.subAttainments && props.attainmentGrade.subAttainments.length > 0)
+          ? (
+            <Accordion
+              key={props.attainmentGrade.attainmentId + 'accordion'}
               expanded={expanded.has(props.attainmentGrade.attainmentId ?? 0)}
-              selected={(selected === props.attainmentGrade.attainmentId)}
+              onChange={handleChange(props.attainmentGrade.attainmentId ?? 0)}
             >
+              <AccordionSummary
+                aria-controls={props.attainmentGrade.attainmentId + '-content'}
+                id={props.attainmentGrade.attainmentId + '-header'}
+                expanded={expanded.has(props.attainmentGrade.attainmentId ?? 0)}
+                selected={(selected === props.attainmentGrade.attainmentId)}
+              >
+                <GradeText
+                  name={props.attainmentGrade.name as string}
+                  tag={props.attainmentGrade.tag as string}
+                  grade={props.attainmentGrade.grade}
+                  status={props.attainmentGrade.status}
+                />
+              </AccordionSummary>
+              {
+                props.attainmentGrade.subAttainments?.map((subAttainment: AttainmentGradeData) => {
+                  return (
+                    <Box
+                      key={subAttainment.attainmentId + 'subAccordion'}
+                      sx={{ pl: '39px' }}
+                    >
+                      {
+                        <StudentGradeAccordion
+                          attainmentGrade={subAttainment}
+                        />
+                      }
+                    </Box>
+                  );
+                })
+              }
+            </Accordion>
+          )
+          : (
+            <Box sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              marginLeft: '21px',
+              columnGap: '15px',
+              pr: '21px',
+              minHeight: '36px',
+              maxHeight: '36px'
+            }}>
+              <PanoramaFishEyeIcon sx={{
+                fontSize: '0.6rem', display: 'block', margin: '0px 0px 0px 2px'
+              }} />
               <GradeText
                 name={props.attainmentGrade.name as string}
                 tag={props.attainmentGrade.tag as string}
                 grade={props.attainmentGrade.grade}
                 status={props.attainmentGrade.status}
               />
-            </AccordionSummary>
-            {
-              props.attainmentGrade.subAttainments?.map((subAttainment: AttainmentGradeData) => {
-                return (
-                  <Box
-                    key={subAttainment.attainmentId + 'subAccordion'}
-                    sx={{ pl: '39px' }}
-                  >
-                    {
-                      <StudentGradeAccordion
-                        attainmentGrade={subAttainment}
-                      />
-                    }
-                  </Box>
-                );
-              })
-            }
-          </Accordion>
-          :
-          <Box sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            marginLeft: '21px',
-            columnGap: '15px',
-            pr: '21px',
-            minHeight: '36px',
-            maxHeight: '36px'
-          }}>
-            <PanoramaFishEyeIcon sx={{
-              fontSize: '0.6rem', display: 'block', margin: '0px 0px 0px 2px'
-            }} />
-            <GradeText
-              name={props.attainmentGrade.name as string}
-              tag={props.attainmentGrade.tag as string}
-              grade={props.attainmentGrade.grade}
-              status={props.attainmentGrade.status}
-            />
-          </Box>
-      }
+            </Box>
+          )}
     </>
   );
 }

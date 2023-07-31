@@ -41,28 +41,29 @@ export default function StudentGradesDialog(props: {
           {
             grades.data ?
               <StudentGradeList grades={grades.data} />
-              :
-              <Box sx={{
-                margin: 'auto',
-                alignItems: 'center',
-                justifyContent: 'center',
-                display: 'flex',
-                mt: 5,
-                mb: 5
-              }}>
-                {
-                  grades.isError ?
-                    <Typography variant='body2'>
+              : (
+                <Box sx={{
+                  margin: 'auto',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  display: 'flex',
+                  mt: 5,
+                  mb: 5
+                }}>
+                  {
+                    grades.isError ? (
+                      <Typography variant='body2'>
                       Error occured during operation. Please try again.
-                    </Typography>
-                    :
-                    <>
-                      <CircularProgress sx={{ mr: 3 }}/>
-                      {`Loading grades for ${props.user?.studentNumber}`}
-                    </>
-                }
-              </Box>
-          }
+                      </Typography>
+                    )
+                      : (
+                        <>
+                          <CircularProgress sx={{ mr: 3 }}/>
+                          {`Loading grades for ${props.user?.studentNumber}`}
+                        </>
+                      )}
+                </Box>
+              )}
         </DialogContent>
         <DialogActions sx={{ pr: 4, py: 3 }}>
           <Button
