@@ -27,7 +27,7 @@ INSERT INTO public.course_instance (course_id, assessment_model_id, sisu_course_
 (6, 22, null, 'PASS_FAIL', 'V', 'V', 'EXAM', '2023-06-03', '2023-06-03', NOW(), NOW()),
 (6, 23, null, 'PASS_FAIL', 'V', 'V', 'EXAM', '2023-06-03', '2023-06-03', NOW(), NOW()),
 (8, 29, null, 'NUMERICAL', 'III', 'V', 'LECTURE', '2023-01-07', '2023-05-05', NOW(), NOW()),
-(8, 42, null, 'NUMERICAL', 'I', 'II', 'LECTURE', '2023-01-07', '2023-05-05', NOW(), NOW()),
-(8, 42, null, 'NUMERICAL', 'III', 'IV', 'EXAM', '2023-01-07', '2023-05-05', NOW(), NOW()),
-(8, 42, null, 'NUMERICAL', 'IV', 'V', 'EXAM', '2023-01-07', '2023-05-05', NOW(), NOW()),
-(8, 42, null, 'NUMERICAL', 'IV', 'V', 'INSTANCE WITH NO STUDENTS', '2023-01-07', '2023-05-05', NOW(), NOW());
+(9, 42, null, 'NUMERICAL', 'I', 'II', 'LECTURE', '2023-01-07', '2023-05-05', NOW(), NOW()),
+(9, 42, null, 'NUMERICAL', 'III', 'IV', 'EXAM', '2023-01-07', '2023-05-05', NOW(), NOW()),
+(9, 42, null, 'NUMERICAL', 'IV', 'V', 'EXAM', '2023-01-07', '2023-05-05', NOW(), NOW()),
+(9, 42, null, 'NUMERICAL', 'IV', 'V', 'INSTANCE WITH NO STUDENTS', '2023-01-07', '2023-05-05', NOW(), NOW());
