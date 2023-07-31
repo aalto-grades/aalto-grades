@@ -33,5 +33,6 @@ registerFormula(
   'Manual',
   [],
   [],
+  {},
   yup.object()
 );

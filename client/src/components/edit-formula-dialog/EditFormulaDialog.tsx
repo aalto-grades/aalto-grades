@@ -2,7 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, Formula, FormulaData } from 'aalto-grades-common/types';
+import {
+  AttainmentData, Formula, FormulaData, ParamsObject
+} from 'aalto-grades-common/types';
 import deepEqual from 'deep-equal';
 import {
   Box, Button, Dialog, DialogTitle, DialogContent, Step, StepLabel, Stepper,
@@ -124,11 +126,11 @@ export default function EditFormulaDialog(props: {
     setChildParams(null);
   }
 
-  function constructParamsObject(): object | undefined {
+  function constructParamsObject(): ParamsObject | undefined {
     return (formula?.id === Formula.Manual) ? undefined : {
       ...params,
       children: Array.from(childParams ? childParams.entries() : [])
-    };
+    } as ParamsObject;
   }
 
   function handleSubmit(): void {
@@ -176,34 +178,37 @@ export default function EditFormulaDialog(props: {
             </Step>
           </Stepper>
           {
-            (activeStep === 0 && props.attainment) &&
-            <SelectFormula
-              attainment={props.attainment}
-              formula={formula}
-              setFormula={setFormula}
-              clearParams={clearParams}
-              error={formulaError}
-            />
+            (activeStep === 0 && props.attainment) && (
+              <SelectFormula
+                attainment={props.attainment}
+                formula={formula}
+                setFormula={setFormula}
+                clearParams={clearParams}
+                error={formulaError}
+              />
+            )
           }
           {
-            (activeStep === 1 && props.attainment && formula) &&
-            <SetFormulaParams
-              attainment={props.attainment}
-              formula={formula}
-              params={params}
-              setParams={setParams}
-              childParams={childParams}
-              setChildParams={setChildParams}
-            />
+            (activeStep === 1 && props.attainment && formula) && (
+              <SetFormulaParams
+                attainment={props.attainment}
+                formula={formula}
+                params={params}
+                setParams={setParams}
+                childParams={childParams}
+                setChildParams={setChildParams}
+              />
+            )
           }
           {
-            (activeStep === 2 && formula && params && childParams) &&
-            <FormulaSummary
-              formula={formula}
-              params={params}
-              childParams={childParams}
-              constructParamsObject={constructParamsObject}
-            />
+            (activeStep === 2 && formula && params && childParams) && (
+              <FormulaSummary
+                formula={formula}
+                params={params}
+                childParams={childParams}
+                constructParamsObject={constructParamsObject}
+              />
+            )
           }
           <Box sx={{
             mx: 3, my: 1.5, alignSelf: 'flex-end', display: 'flex',

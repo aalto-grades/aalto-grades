@@ -38,14 +38,14 @@ interface AccordionSummaryProps {
 export const AccordionSummary: StyledComponent<AccordionSummaryProps> = styled(
   (props: AccordionSummaryProps) => (
     <MuiAccordionSummary
-      expandIcon={
+      expandIcon={(
         <ArrowForwardIosSharpIcon
           sx={{
             fontSize: '0.9rem',
             color: props.expanded ? 'primary.main' : 'grey.600'
           }}
         />
-      }
+      )}
       {...props}
     />
   )
@@ -136,7 +136,7 @@ export default function CustomAccordion(props: {
   return (
     <>
       {
-        (props.attainment.subAttainments && props.attainment.subAttainments.length > 0) ?
+        (props.attainment.subAttainments && props.attainment.subAttainments.length > 0) ? (
           <Accordion
             key={props.attainment.id + 'accordion'}
             expanded={expanded.has(props.attainment.id ?? 0)}
@@ -171,7 +171,7 @@ export default function CustomAccordion(props: {
               })
             }
           </Accordion>
-          :
+        ) : (
           <Box sx={{
             display: 'flex',
             flexDirection: 'row',
@@ -192,6 +192,7 @@ export default function CustomAccordion(props: {
               tag={props.attainment.tag}
             />
           </Box>
+        )
       }
     </>
   );

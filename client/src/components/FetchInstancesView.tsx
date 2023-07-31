@@ -28,11 +28,12 @@ export default function FetchInstancesView(): JSX.Element {
           Select the instance you wish to add
         </Typography>
         {
-          sisuInstances.data &&
-          <FetchedInstances
-            courseId={Number(courseId)}
-            instances={sisuInstances.data}
-          />
+          (sisuInstances.data) && (
+            <FetchedInstances
+              courseId={Number(courseId)}
+              instances={sisuInstances.data}
+            />
+          )
         }
         <Divider sx={{ my: 5 }} />
         <Box sx={{

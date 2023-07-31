@@ -14,7 +14,7 @@ import Attainment from '../database/models/attainment';
 import Course from '../database/models/course';
 
 import { getFormulaImplementation } from '../formulas';
-import { ApiError, idSchema, JwtClaims } from '../types';
+import { ApiError, FormulaImplementation, idSchema, JwtClaims } from '../types';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import {
   findAttainmentById, findAttainmentsByAssessmentModel, generateAttainmentTree,
@@ -204,7 +204,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       .notRequired(),
     subAttainments: yup
       .array()
-      .of(yup.lazy(() => requestSchema.default(undefined)) as never)
+      .of(yup.lazy(() => requestSchema.default(undefined)))
       .notRequired()
   });
 
@@ -231,6 +231,36 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
         `parent attainment ID ${requestTree.parentId} does not belong ` +
         `to the assessment model ID ${assessmentModel.id}`,
         HttpCode.Conflict
+      );
+    }
+
+    /*
+     * If the parent attainment has formula params defined and the formula isn't
+     * manual, then this new attainment must be added to the children list of the
+     * parent attainment's params.
+     */
+    if (parentAttainment.formulaParams && parentAttainment.formula !== Formula.Manual) {
+      const parentParams: ParamsObject<object> = parentAttainment.formulaParams as ParamsObject;
+      const parentFormula: FormulaImplementation = getFormulaImplementation(
+        parentAttainment.formula
+      );
+
+      parentParams.children.push(
+        [requestTree.tag, parentFormula.defaultChildParams]
+      );
+
+      // Sanity check
+      await parentFormula.paramSchema.validate(parentParams);
+
+      await Attainment.update(
+        {
+          formulaParams: parentParams
+        },
+        {
+          where: {
+            id: requestTree.parentId
+          }
+        }
       );
     }
   } else {
@@ -298,7 +328,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       tag: dbEntry.tag,
       daysValid: dbEntry.daysValid,
       formula: dbEntry.formula,
-      formulaParams: dbEntry.formulaParams,
+      formulaParams: dbEntry.formulaParams as ParamsObject,
       subAttainments: []
     };
 
@@ -405,38 +435,88 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     })).map((attainment: Attainment): string => attainment.tag)
   );
 
-  if (parentId || (tag && tag !== attainment.tag)) {
+  if (parentId && parentId !== attainment.parentId) {
     if (attainment.parentId) {
-      const parent: Attainment = await findAttainmentById(
+      const oldParent: Attainment = await findAttainmentById(
         attainment.parentId, HttpCode.InternalServerError
       );
 
-      if (parent.formulaParams) {
-        // TODO: Use structuredClone to copy the object
-        const parentParams: ParamsObject =
-          JSON.parse(JSON.stringify(parent.formulaParams)) as ParamsObject;
+      if (oldParent.formulaParams) {
+        const parentParams: ParamsObject = oldParent.formulaParams as ParamsObject;
 
         for (const i in parentParams.children) {
           if (parentParams.children[i][0] === attainment.tag) {
-            // Client is responsible for updating the params of a new parent attainment
-            if (parentId)
-              parentParams.children.splice(Number(i), 1);
-            else if (tag && tag !== attainment.tag)
-              parentParams.children[i][0] = tag;
-
+            parentParams.children.splice(Number(i), 1);
             break;
           }
         }
 
-        await parent.set({
-          name: parent.name,
-          tag: parent.tag,
-          daysValid: parent.daysValid,
-          parentId: parent.parentId,
-          formula: parent.formula,
-          formulaParams: parentParams
-        }).save();
+        await Attainment.update(
+          {
+            formulaParams: parentParams
+          },
+          {
+            where: {
+              id: oldParent.id
+            }
+          }
+        );
       }
+    }
+
+    const newParent: Attainment = await findAttainmentById(
+      parentId, HttpCode.InternalServerError
+    );
+
+    if (newParent.formulaParams && newParent.formula !== Formula.Manual) {
+      const parentParams: ParamsObject<object> = newParent.formulaParams as ParamsObject;
+      const parentFormula: FormulaImplementation = getFormulaImplementation(
+        newParent.formula
+      );
+
+      parentParams.children.push(
+        [tag ?? attainment.tag, parentFormula.defaultChildParams]
+      );
+
+      // Sanity check
+      await parentFormula.paramSchema.validate(parentParams);
+
+      await Attainment.update(
+        {
+          formulaParams: parentParams
+        },
+        {
+          where: {
+            id: newParent.id
+          }
+        }
+      );
+    }
+  } else if (tag && tag !== attainment.tag && attainment.parentId) {
+    const parent: Attainment = await findAttainmentById(
+      attainment.parentId, HttpCode.InternalServerError
+    );
+
+    if (parent.formulaParams) {
+      const parentParams: ParamsObject = parent.formulaParams as ParamsObject;
+
+      for (const i in parentParams.children) {
+        if (parentParams.children[i][0] === attainment.tag) {
+          parentParams.children[i][0] = tag;
+          break;
+        }
+      }
+
+      await Attainment.update(
+        {
+          formulaParams: parentParams
+        },
+        {
+          where: {
+            id: parent.id
+          }
+        }
+      );
     }
   }
 
@@ -459,7 +539,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     name: attainment.name,
     tag: attainment.tag,
     formula: attainment.formula,
-    formulaParams: attainment.formulaParams,
+    formulaParams: attainment.formulaParams as ParamsObject,
     daysValid: attainment.daysValid,
     parentId: attainment.parentId
   };

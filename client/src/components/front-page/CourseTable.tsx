@@ -37,7 +37,7 @@ export default function CourseTable(props: {
         <TableRow>
           {
             headCells.map((headCell: HeadCellData) => (
-              headCell.id === 'code' ?
+              (headCell.id === 'code') ? (
                 <TableCell key={headCell.id}>
                   <TableSortLabel active={headCell.id === 'code'} direction='asc'>
                     <Typography sx={{ fontWeight: 'bold' }}>
@@ -45,12 +45,13 @@ export default function CourseTable(props: {
                     </Typography>
                   </TableSortLabel>
                 </TableCell>
-                :
+              ) : (
                 <TableCell key={headCell.id}>
                   <Typography sx={{ fontWeight: 'bold' }}>
                     {headCell.label}
                   </Typography>
                 </TableCell>
+              )
             ))
           }
         </TableRow>

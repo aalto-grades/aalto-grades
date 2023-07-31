@@ -72,106 +72,112 @@ export default function CourseView(): JSX.Element {
   return (
     <Box sx={{ mx: -2.5 }}>
       {
-        (course.data) &&
-        <>
-          <Typography variant='h1' align='left'>{course.data.courseCode}</Typography>
-          <Box sx={{
-            display: 'flex', flexWrap: 'wrap',
-            justifyContent: 'space-between', mb: 4, columnGap: 6
-          }}>
-            <Typography variant='h2' align='left'>{course.data.name.en}</Typography>
-            {
-              /* Only admins and teachers in charge are allowed to create assessment models */
-              (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
-              <Button
-                id='ag_new_assessment_model_btn'
-                size='large'
-                variant='contained'
-                onClick={(): void => setCreateAssessmentModelOpen(true)}
-              >
-                New Assessment Model
-              </Button>
-            }
-          </Box>
-          <Box sx={{ display: 'flex', gap: 3 }}>
-            <div>
-              <CourseDetails
-                course={course.data}
-                assessmentModels={assessmentModels.data}
-                currentAssessmentModelId={currentAssessmentModel?.id}
-                onChangeAssessmentModel={onChangeAssessmentModel}
-              />
-            </div>
-            {
-              /* a different attainment component will be created for students */
-              (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
-              <div style={{ width: '100%' }}>
-                {(attainmentTree.data) ? (
-                  <Grow
-                    in={animation}
-                    style={{ transformOrigin: '0 0 0' }}
-                    {...(animation ? { timeout: 1000 } : { timeout: 0 })}
+        (course.data) && (
+          <>
+            <Typography variant='h1' align='left'>{course.data.courseCode}</Typography>
+            <Box sx={{
+              display: 'flex', flexWrap: 'wrap',
+              justifyContent: 'space-between', mb: 4, columnGap: 6
+            }}>
+              <Typography variant='h2' align='left'>{course.data.name.en}</Typography>
+              {
+                /* Only admins and teachers in charge are allowed to create assessment models */
+                (auth?.role == SystemRole.Admin || isTeacherInCharge) && (
+                  <Button
+                    id='ag_new_assessment_model_btn'
+                    size='large'
+                    variant='contained'
+                    onClick={(): void => setCreateAssessmentModelOpen(true)}
                   >
-                    <div style={{ width: '100%' }}>
-                      {
-                        (currentAssessmentModel) &&
-                        <Attainments
-                          attainmentTree={attainmentTree.data}
-                          courseId={Number(courseId)}
-                          assessmentModel={currentAssessmentModel}
-                        />
-                      }
-                    </div>
-                  </Grow>
-                ) : (
-                  (attainmentTree.isLoading) &&
-                  <div>
-                    <Box sx={{
-                      margin: 'auto',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      display: 'flex',
-                      mt: 25,
-                      mb: 5
-                    }}>
-                      <CircularProgress />
-                    </Box>
-                    Loading attainments...
-                  </div>
-                )}
+                    New Assessment Model
+                  </Button>
+                )
+              }
+            </Box>
+            <Box sx={{ display: 'flex', gap: 3 }}>
+              <div>
+                <CourseDetails
+                  course={course.data}
+                  assessmentModels={assessmentModels.data}
+                  currentAssessmentModelId={currentAssessmentModel?.id}
+                  onChangeAssessmentModel={onChangeAssessmentModel}
+                />
               </div>
-            }
-          </Box>
-          <Box sx={{
-            display: 'flex', flexWrap: 'wrap',
-            justifyContent: 'space-between', columnGap: 6
-          }}>
-            <Typography variant='h2' align='left' sx={{ mt: 6, mb: 3 }}>
-              Course Instances
-            </Typography>
-            {
-              /* Only admins and teachers are allowed to create a new instance */
-              (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
-              <Button
-                id='ag_new_instance_btn'
-                size='large'
-                variant='contained'
-                sx={{ mt: 6, mb: 3 }}
-                onClick={(): void => {
-                  navigate(`/${courseId}/fetch-instances/${course.data.courseCode}`);
-                }}
-              >
-                New instance
-              </Button>
-            }
-          </Box>
-          <InstancesTable courseId={courseId} />
-          <CreateAssessmentModelDialog
-            open={createAssessmentModelOpen}
-            handleClose={(): void => setCreateAssessmentModelOpen(false)}
-            onSubmit={assessmentModels.refetch}
-          />
-        </>
+              {
+                /* a different attainment component will be created for students */
+                (auth?.role == SystemRole.Admin || isTeacherInCharge) && (
+                  <div style={{ width: '100%' }}>
+                    {(attainmentTree.data) ? (
+                      <Grow
+                        in={animation}
+                        style={{ transformOrigin: '0 0 0' }}
+                        {...(animation ? { timeout: 1000 } : { timeout: 0 })}
+                      >
+                        <div style={{ width: '100%' }}>
+                          {
+                            (currentAssessmentModel) && (
+                              <Attainments
+                                attainmentTree={attainmentTree.data}
+                                courseId={Number(courseId)}
+                                assessmentModel={currentAssessmentModel}
+                              />
+                            )
+                          }
+                        </div>
+                      </Grow>
+                    ) : (
+                      (attainmentTree.isLoading) && (
+                        <div>
+                          <Box sx={{
+                            margin: 'auto',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            display: 'flex',
+                            mt: 25,
+                            mb: 5
+                          }}>
+                            <CircularProgress />
+                          </Box>
+                          Loading attainments...
+                        </div>
+                      )
+                    )}
+                  </div>
+                )
+              }
+            </Box>
+            <Box sx={{
+              display: 'flex', flexWrap: 'wrap',
+              justifyContent: 'space-between', columnGap: 6
+            }}>
+              <Typography variant='h2' align='left' sx={{ mt: 6, mb: 3 }}>
+                Course Instances
+              </Typography>
+              {
+                /* Only admins and teachers are allowed to create a new instance */
+                (auth?.role == SystemRole.Admin || isTeacherInCharge) && (
+                  <Button
+                    id='ag_new_instance_btn'
+                    size='large'
+                    variant='contained'
+                    sx={{ mt: 6, mb: 3 }}
+                    onClick={(): void => {
+                      navigate(`/${courseId}/fetch-instances/${course.data.courseCode}`);
+                    }}
+                  >
+                    New instance
+                  </Button>
+                )
+              }
+            </Box>
+            <InstancesTable courseId={courseId} />
+            <CreateAssessmentModelDialog
+              open={createAssessmentModelOpen}
+              handleClose={(): void => setCreateAssessmentModelOpen(false)}
+              onSubmit={assessmentModels.refetch}
+            />
+          </>
+        )
       }
     </Box>
   );

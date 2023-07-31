@@ -29,12 +29,13 @@ export default function CourseDetails(props: {
         <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >
           Course Details
           {
-            (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
-            <Tooltip title="Edit course details" placement="right">
-              <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit course details">
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
+            (auth?.role == SystemRole.Admin || isTeacherInCharge) && (
+              <Tooltip title="Edit course details" placement="right">
+                <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit course details">
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+            )
           }
         </Typography>
       </Box>
@@ -62,12 +63,13 @@ export default function CourseDetails(props: {
         <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>
           Teachers in Charge
           {
-            (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
-            <Tooltip title="Edit teachers in charge" placement="right">
-              <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit teachers in charge">
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
+            (auth?.role == SystemRole.Admin || isTeacherInCharge) && (
+              <Tooltip title="Edit teachers in charge" placement="right">
+                <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit teachers in charge">
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+            )
           }
         </Typography>
         <Box textAlign='left' borderRadius={1} sx={{
@@ -88,12 +90,13 @@ export default function CourseDetails(props: {
         <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>
           Assessment Models
           {
-            (auth?.role == SystemRole.Admin || isTeacherInCharge) &&
-            <Tooltip title="Edit assessment models" placement="right">
-              <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit assessment models">
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
+            (auth?.role == SystemRole.Admin || isTeacherInCharge) && (
+              <Tooltip title="Edit assessment models" placement="right">
+                <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit assessment models">
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+            )
           }
         </Typography>
         <Box textAlign='left' borderRadius={1} sx={{
@@ -103,16 +106,17 @@ export default function CourseDetails(props: {
             (props.assessmentModels
               && props.assessmentModels.length > 0
               && props.currentAssessmentModelId)
-              ?
-              <AssessmentModelsList
-                data={props.assessmentModels}
-                current={props.currentAssessmentModelId}
-                onClick={props.onChangeAssessmentModel}
-              />
-              :
-              <Box sx={{ py: 2 }}>
-                No assessment models found. Please create a new assessment model.
-              </Box>
+              ? (
+                <AssessmentModelsList
+                  data={props.assessmentModels}
+                  current={props.currentAssessmentModelId}
+                  onClick={props.onChangeAssessmentModel}
+                />
+              ) : (
+                <Box sx={{ py: 2 }}>
+                  No assessment models found. Please create a new assessment model.
+                </Box>
+              )
           }
         </Box>
       </Box>

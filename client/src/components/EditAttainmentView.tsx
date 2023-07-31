@@ -8,8 +8,8 @@ import { JSX, SyntheticEvent, useState }  from 'react';
 import { NavigateFunction, Params, useParams, useNavigate } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 
-import Attainment from './create-attainment/Attainment';
-import ConfirmationDialog from './create-attainment/ConfirmationDialog';
+import Attainment from './edit-attainment-view/Attainment';
+import ConfirmationDialog from './edit-attainment-view/ConfirmationDialog';
 
 import {
   useAddAttainment, UseAddAttainmentResult,
@@ -18,6 +18,7 @@ import {
   useGetAttainment
 } from '../hooks/useApi';
 import { State } from '../types';
+import { sleep } from '../utils';
 
 export default function EditAttainmentView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
@@ -124,42 +125,58 @@ export default function EditAttainmentView(): JSX.Element {
   function handleSubmit(event: SyntheticEvent): void {
     event.preventDefault();
 
-    function addAndEdit(tree: AttainmentData): void {
-      if (!tree.subAttainments)
-        return;
+    const deleteQueue: Array<AttainmentData> = deletedAttainments;
+    const addQueue: Array<AttainmentData> = [];
+    const editQueue: Array<AttainmentData> = [];
+    function constructQueues(tree: AttainmentData): void {
+      if (tree.id && tree.id > 0) {
+        editQueue.push(tree);
 
-      for (const subAttainment of tree.subAttainments) {
-        if (courseId && assessmentModelId && attainmentId) {
-          if (subAttainment.id && subAttainment.id > 0) {
-            editAttainment.mutate({
-              courseId: courseId,
-              assessmentModelId: assessmentModelId,
-              attainment: subAttainment
-            });
-
-            addAndEdit(subAttainment);
-          } else {
-            addAttainment.mutate({
-              courseId: courseId,
-              assessmentModelId: assessmentModelId,
-              attainment: subAttainment
-            });
+        if (tree.subAttainments) {
+          for (const subAttainment of tree.subAttainments) {
+            constructQueues(subAttainment);
           }
         }
+      } else {
+        addQueue.push(tree);
+      }
+    }
+
+    function nextChange(): void {
+      function options(queue: Array<AttainmentData>): object {
+        return {
+          onSuccess: (): void => {
+            queue.splice(0, 1);
+            nextChange();
+          }
+        };
+      }
+
+      if (!courseId || !assessmentModelId)
+        return;
+
+      // Delete attainments -> Add new attainments -> Edit existing attainments
+      if (deleteQueue.length > 0) {
+        if (deleteQueue[0].id) {
+          deleteAttainment.mutate({
+            courseId, assessmentModelId,
+            attainmentId: deleteQueue[0].id
+          }, options(deleteQueue));
+        }
+      } else if (addQueue.length > 0) {
+        addAttainment.mutate({
+          courseId, assessmentModelId,
+          attainment: addQueue[0]
+        }, options(addQueue));
+      } else if (editQueue.length > 0) {
+        editAttainment.mutate({
+          courseId, assessmentModelId,
+          attainment: editQueue[0]
+        }, options(editQueue));
       }
     }
 
     if (courseId && assessmentModelId) {
-      for (const attainment of deletedAttainments) {
-        if (attainment.id) {
-          deleteAttainment.mutate({
-            courseId: courseId,
-            assessmentModelId: assessmentModelId,
-            attainmentId: attainment.id
-          });
-        }
-      }
-
       if (attainmentTree) {
         if (modification === 'create') {
           addAttainment.mutate({
@@ -168,12 +185,8 @@ export default function EditAttainmentView(): JSX.Element {
             attainment: attainmentTree
           });
         } else if (modification === 'edit') {
-          editAttainment.mutate({
-            courseId: courseId,
-            assessmentModelId: assessmentModelId,
-            attainment: attainmentTree
-          });
-          addAndEdit(attainmentTree);
+          constructQueues(attainmentTree);
+          nextChange();
         }
       }
     }
@@ -185,15 +198,15 @@ export default function EditAttainmentView(): JSX.Element {
     <>
       <Container maxWidth="md" sx={{ textAlign: 'right' }}>
         {
-          modification === 'create'
-            ?
+          (modification === 'create') ? (
             <Typography variant="h1" align='left' sx={{ flexGrow: 1, mb: 4 }}>
               Create Study Attainment
             </Typography>
-            :
+          ) : (
             <Typography variant="h1" align='left' sx={{ flexGrow: 1, mb: 4 }}>
               Edit Study Attainment
             </Typography>
+          )
         }
         <form>
           <Box sx={{
@@ -207,26 +220,28 @@ export default function EditAttainmentView(): JSX.Element {
             px: 2,
           }}>
             {
-              attainmentTree &&
-              <Attainment
-                attainmentTree={attainmentTree}
-                setAttainmentTree={setAttainmentTree}
-                deleteAttainment={deleteAttainmentEnqueue}
-                getTemporaryId={getTemporaryId}
-                attainment={attainmentTree}
-              />
+              (attainmentTree) && (
+                <Attainment
+                  attainmentTree={attainmentTree}
+                  setAttainmentTree={setAttainmentTree}
+                  deleteAttainment={deleteAttainmentEnqueue}
+                  getTemporaryId={getTemporaryId}
+                  attainment={attainmentTree}
+                />
+              )
             }
           </Box>
           {
-            attainmentTree &&
-            <ConfirmationDialog
-              deleteAttainment={deleteAttainmentEnqueue}
-              attainment={attainmentTree}
-              title={'Study Attainment'}
-              subject={'study attainment'}
-              handleClose={(): void => setOpenConfDialog(false)}
-              open={openConfDialog}
-            />
+            (attainmentTree) && (
+              <ConfirmationDialog
+                deleteAttainment={deleteAttainmentEnqueue}
+                attainment={attainmentTree}
+                title={'Study Attainment'}
+                subject={'study attainment'}
+                handleClose={(): void => setOpenConfDialog(false)}
+                open={openConfDialog}
+              />
+            )
           }
           <Box sx={{
             display: 'flex',
@@ -238,16 +253,17 @@ export default function EditAttainmentView(): JSX.Element {
             mb: 1
           }}>
             {
-              modification === 'edit' &&
-              <Button
-                size='medium'
-                variant='outlined'
-                color='error'
-                onClick={(): void => setOpenConfDialog(true)}
-                sx={{ ml: 2 }}
-              >
-                Delete Attainment
-              </Button>
+              (modification === 'edit') && (
+                <Button
+                  size='medium'
+                  variant='outlined'
+                  color='error'
+                  onClick={(): void => setOpenConfDialog(true)}
+                  sx={{ ml: 2 }}
+                >
+                  Delete Attainment
+                </Button>
+              )
             }
             <Box sx={{
               display: 'flex',

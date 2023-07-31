@@ -344,7 +344,7 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
   });
 
   const { studentNumbers, instanceId }: {
-    studentNumbers?: Array<string>
+    studentNumbers?: Array<string>,
     instanceId?: number
   } = await urlParams.validate(req.query, { abortEarly: false });
 
@@ -778,7 +778,7 @@ export async function calculateGrades(
   );
 
   const { studentNumbers, instanceId }: {
-    studentNumbers?: Array<string>
+    studentNumbers?: Array<string>,
     instanceId?: number
   } = await requestSchema.validate(req.body, { abortEarly: false });
 
