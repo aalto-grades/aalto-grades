@@ -1241,7 +1241,7 @@ describe(
     it('should succesfully delete single attainment (admin user)', async () => {
       // Add an attainment.
       const add: supertest.Response = await request
-        .post('/v1/courses/8/assessment-models/37/attainments')
+        .post('/v1/courses/9/assessment-models/37/attainments')
         .send(
           {
             name: 'Test exercise',
@@ -1259,7 +1259,7 @@ describe(
 
       // Delete the added attainment.
       await request
-        .delete(`/v1/courses/8/assessment-models/37/attainments/${addedAttainmenId}`)
+        .delete(`/v1/courses/9/assessment-models/37/attainments/${addedAttainmenId}`)
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
@@ -1271,7 +1271,7 @@ describe(
     it('should succesfully delete single attainment (teacher in charge)', async () => {
       // Add an attainment.
       const add: supertest.Response = await request
-        .post('/v1/courses/8/assessment-models/38/attainments')
+        .post('/v1/courses/9/assessment-models/38/attainments')
         .send(
           {
             name: 'Test exercise 2',
@@ -1291,7 +1291,7 @@ describe(
 
       // Delete the added attainment.
       await request
-        .delete(`/v1/courses/8/assessment-models/38/attainments/${addedAttainmentid}`)
+        .delete(`/v1/courses/9/assessment-models/38/attainments/${addedAttainmentid}`)
         .set('Cookie', cookies.userCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
@@ -1320,12 +1320,12 @@ describe(
               subAttainments: []
             }
           ]
-        }, 8, 39
+        }, 9, 39
       );
     });
 
     it('should succesfully delete a tree of attainments with depth greater than 1', async () => {
-      await testAttainmentTreeDeletion(mockAttainment, 8, 40);
+      await testAttainmentTreeDeletion(mockAttainment, 9, 40);
     });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
