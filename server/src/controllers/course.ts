@@ -14,7 +14,7 @@ import TeacherInCharge from '../database/models/teacherInCharge';
 import User from '../database/models/user';
 
 import { ApiError, CourseFull, idSchema, localizedStringSchema } from '../types';
-import { findCourseFullById, parseCourseFull } from './utils/course';
+import { findCourseById, findCourseFullById, parseCourseFull } from './utils/course';
 
 export async function getCourse(req: Request, res: Response): Promise<void> {
   const courseId: number = Number(req.params.courseId);
@@ -142,5 +142,23 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
 }
 
 export async function editCourse(req: Request, res: Response): Promise<void> {
+  const requestSchema: yup.AnyObjectSchema = yup.object().shape({
+    courseCode: yup.string().notRequired(),
+    minCredits: yup.number().min(0).notRequired(),
+    maxCredits: yup.number().min(yup.ref('minCredits')).notRequired(),
+    teachersInCharge: yup.array().of(
+      yup.object().shape({
+        email: yup.string().email().required()
+      })
+    ).notRequired(),
+    department: localizedStringSchema.notRequired(),
+    name: localizedStringSchema.notRequired()
+  });
+
+  await requestSchema.validate(req.body, { abortEarly: false });
+  const courseId: number = (await idSchema.validate({ id: req.params.courseId })).id;
+
+  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
+
   res.status(HttpCode.Ok);
 }
