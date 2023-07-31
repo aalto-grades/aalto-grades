@@ -6,17 +6,14 @@ import { AttainmentGradeData } from 'aalto-grades-common/types';
 import { Box, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import { JSX } from 'react';
-
-
+import StudentGradeAccordion from './StudentGradeAccordion';
 
 export default function StudentGradeList(props: {
   grades: AttainmentGradeData
 }): JSX.Element {
 
-  console.log(props.grades);
-
   return (
-    <Box boxShadow={3} borderRadius={1} sx={{ pt: 2, pb: 0.5, bgcolor: 'white' }}>
+    <Box boxShadow={3} borderRadius={1} sx={{ py: 2, bgcolor: 'white' }}>
       <Box sx={{
         display: 'flex', flexDirection: 'row', flexWrap: 'wrap',
         justifyContent: 'space-between', alignItems: 'center', pr: '21px',
@@ -24,15 +21,12 @@ export default function StudentGradeList(props: {
       }}>
         <Typography align='left'>
           <span style={{ fontWeight: 'bold' }}>
-            {props.grades.name} (
+            Root:
           </span>
-          {props.grades.tag}
-          <span style={{ fontWeight: 'bold' }}>
-            )
-          </span>
+          {` ${props.grades.name} (${props.grades.tag})`}
         </Typography>
         <Typography align='left' variant='body2'>
-          {'Manual: ' + props.grades.manual}
+          {`Grade: ${props.grades.grade} Status: ${props.grades.status}`}
         </Typography>
       </Box>
       <Box sx={{
@@ -40,10 +34,17 @@ export default function StudentGradeList(props: {
         justifyContent: 'space-between', alignItems: 'center', pl: '21px',
         pr: '6px', pt: '8px'
       }}>
-        <Typography align='left' variant='caption'>
-          {'Grading status: ' + props.grades.status}
-        </Typography>
         <Box height='30.5px'></Box>
+        {
+          props.grades.subAttainments?.map((subAttainment: AttainmentGradeData) => {
+            return (
+              <StudentGradeAccordion
+                key={subAttainment.attainmentId}
+                attainmentGrade={subAttainment}
+              />
+            );
+          })
+        }
       </Box>
     </Box>
   );
