@@ -21,9 +21,8 @@ export default function StudentGradeList(props: {
       }}>
         <Typography align='left'>
           <span style={{ fontWeight: 'bold' }}>
-            Root:
+            Final Grade:
           </span>
-          {` ${props.grades.name} (${props.grades.tag})`}
         </Typography>
         <Typography align='left' variant='body2'>
           {`Grade: ${props.grades.grade} Status: ${props.grades.status}`}
