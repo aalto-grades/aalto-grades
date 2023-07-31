@@ -596,7 +596,7 @@ describe(
           .set('Cookie', cookies.adminCookie);
 
         res = await request
-          .get('/v1/courses/8/assessment-models/41/grades')
+          .get('/v1/courses/9/assessment-models/41/grades')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
@@ -1182,7 +1182,7 @@ describe(
       'should calculate multiple correct grades based on instance ID and student numbers',
       async () => {
         checkSuccessRes(await request
-          .post('/v1/courses/8/assessment-models/42/grades/calculate')
+          .post('/v1/courses/9/assessment-models/42/grades/calculate')
           .send({
             instanceId: 27,
             studentNumbers: ['658593', '451288']
@@ -1195,7 +1195,7 @@ describe(
 
     it('should calculate multiple correct grades based on instance ID', async () => {
       checkSuccessRes(await request
-        .post('/v1/courses/8/assessment-models/42/grades/calculate')
+        .post('/v1/courses/9/assessment-models/42/grades/calculate')
         .send({
           instanceId: 27
         })
@@ -1232,7 +1232,7 @@ describe(
       'should respond with 404 not found if instance does not have any students assigned',
       async () => {
         res = await request
-          .post('/v1/courses/8/assessment-models/42/grades/calculate')
+          .post('/v1/courses/9/assessment-models/42/grades/calculate')
           .send({
             instanceId: 28
           })
