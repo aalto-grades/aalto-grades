@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { AttainmentData } from 'aalto-grades-common/types';
-import { Box, Button, TextField } from '@mui/material';
+import { Box, Button, Paper, TextField, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import { ChangeEvent, useState } from 'react';
 
@@ -116,34 +116,38 @@ export default function LeafAttainment(props: {
           }}
         />
       </Box>
-      <code>{JSON.stringify(props.attainment.formulaParams)}</code>
-      {
-        (props.attainment.formulaParams) && (
-          Object.keys(props.attainment.formulaParams).map((key: string) => {
-            if (props.attainment.formulaParams && key !== 'children') {
-              return (
-                <p key={key}>
-                  {`${getParamLabel(key)}: ${props.attainment.formulaParams[key]}`}
-                </p>
-              );
-            }
-          })
-        )
-      }
-      {
-        (props.paramsFromParent) && (
-          Object.keys(props.paramsFromParent).map((key: string) => {
-            if (props.paramsFromParent) {
-              console.log(`${key}, ${props.attainment.tag}`);
-              return (
-                <p key={key}>
-                  {`${getParamLabel(key)}: ${props.paramsFromParent[key as keyof object]}`}
-                </p>
-              );
-            }
-          })
-        )
-      }
+      <Box sx={{ display: 'flex' }}>
+        {
+          (props.attainment.formulaParams) && (
+            Object.keys(props.attainment.formulaParams).map((key: string) => {
+              if (props.attainment.formulaParams && key !== 'children') {
+                return (
+                  <Paper key={key} sx={{ mx: 0.5, px: 0.5, py: 0.25 }}>
+                    <Typography align='left' variant='caption'>
+                      {`${getParamLabel(key)}: ${props.attainment.formulaParams[key]}`}
+                    </Typography>
+                  </Paper>
+                );
+              }
+            })
+          )
+        }
+        {
+          (props.paramsFromParent) && (
+            Object.keys(props.paramsFromParent).map((key: string) => {
+              if (props.paramsFromParent) {
+                return (
+                  <Paper key={key} sx={{ mx: 0.5, px: 0.5, py: 0.25 }}>
+                    <Typography align='left' variant='caption'>
+                      {`${getParamLabel(key)}: ${props.paramsFromParent[key as keyof object]}`}
+                    </Typography>
+                  </Paper>
+                );
+              }
+            })
+          )
+        }
+      </Box>
       <Box sx={{
         display: 'flex',
         flexDirection: 'row',
