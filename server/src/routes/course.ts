@@ -6,7 +6,7 @@ import express, { Router } from 'express';
 import passport from 'passport';
 
 import { SystemRole } from 'aalto-grades-common/types';
-import { addCourse, getAllCourses, getCourse } from '../controllers/course';
+import { addCourse, editCourse, getAllCourses, getCourse } from '../controllers/course';
 import { handleInvalidRequestJson } from '../middleware';
 import { authorization } from '../middleware/authorization';
 import { controllerDispatcher } from '../middleware/errorHandler';
@@ -228,4 +228,20 @@ router.post(
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(addCourse)
+);
+
+/**
+ * @swagger
+ * /v1/courses:
+ *   put:
+ *     tags: [Course]
+ *     description: Edit an existing course. Only for users with admin rights.
+ */
+router.put(
+  '/v1/courses/:courseId',
+  passport.authenticate('jwt', { session: false }),
+  authorization([SystemRole.Admin]),
+  express.json(),
+  handleInvalidRequestJson,
+  controllerDispatcher(editCourse)
 );

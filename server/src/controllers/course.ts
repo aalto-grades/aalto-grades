@@ -141,3 +141,6 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
   });
 }
 
+export async function editCourse(req: Request, res: Response): Promise<void> {
+  res.status(HttpCode.Ok);
+}
