@@ -233,7 +233,7 @@ describe(
       async () => {
         res = await request
           .get(
-            '/v1/courses/8/assessment-models/42/grades/csv/sisu'
+            '/v1/courses/9/assessment-models/42/grades/csv/sisu'
             + '?assessmentDate=2023-12-12&completionLanguage=sv&instanceId=26'
           )
           .set('Cookie', cookies.adminCookie)
@@ -256,7 +256,7 @@ describe(
       async () => {
         res = await request
           .get(
-            '/v1/courses/8/assessment-models/42/grades/csv/sisu'
+            '/v1/courses/9/assessment-models/42/grades/csv/sisu'
             + '?assessmentDate=2023-12-12&completionLanguage=fi' +
             '&studentNumbers=["114732","472886","327976","139131"]'
           )
@@ -280,7 +280,7 @@ describe(
       async () => {
         res = await request
           .get(
-            '/v1/courses/8/assessment-models/42/grades/csv/sisu'
+            '/v1/courses/9/assessment-models/42/grades/csv/sisu'
             + '?assessmentDate=2023-12-12&completionLanguage=sv&instanceId=26' +
             '&studentNumbers=["327976","139131"]'
           )
@@ -302,7 +302,7 @@ describe(
       async () => {
         res = await request
           .get(
-            '/v1/courses/8/assessment-models/42/grades/csv/sisu'
+            '/v1/courses/9/assessment-models/42/grades/csv/sisu'
             + '?assessmentDate=2023-12-12&completionLanguage=sv'
           )
           .set('Cookie', cookies.adminCookie)
@@ -486,7 +486,7 @@ describe(
     it('should show final grade as PENDING for students with no final grade calculated',
       async () => {
         res = await request
-          .get('/v1/courses/8/assessment-models/41/grades')
+          .get('/v1/courses/9/assessment-models/41/grades')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
@@ -505,7 +505,7 @@ describe(
     it('should filter returned grades based on student number if URL query included',
       async () => {
         res = await request
-          .get('/v1/courses/8/assessment-models/41/grades' +
+          .get('/v1/courses/9/assessment-models/41/grades' +
           '?studentNumbers=["869364","711199","795451"]')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
@@ -522,7 +522,7 @@ describe(
     it('should filter returned grades based on instance ID if URL query included',
       async () => {
         res = await request
-          .get('/v1/courses/8/assessment-models/42/grades?instanceId=26')
+          .get('/v1/courses/9/assessment-models/42/grades?instanceId=26')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
@@ -540,7 +540,7 @@ describe(
       'should filter returned grades based on instance ID and student number if URL query included',
       async () => {
         res = await request
-          .get('/v1/courses/8/assessment-models/42/grades?instanceId=26' +
+          .get('/v1/courses/9/assessment-models/42/grades?instanceId=26' +
           '&studentNumbers=["327976","139131"]')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
@@ -556,7 +556,7 @@ describe(
     it('should not filter returned grades if no filters included in URL query',
       async () => {
         res = await request
-          .get('/v1/courses/8/assessment-models/42/grades')
+          .get('/v1/courses/9/assessment-models/42/grades')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
@@ -589,7 +589,7 @@ describe(
     it('should show previously PENDING final grades as graded after final grade calculated',
       async () => {
         await request
-          .post('/v1/courses/8/assessment-models/41/grades/calculate')
+          .post('/v1/courses/9/assessment-models/41/grades/calculate')
           .send({
             studentNumbers: ['711199', '869364', '872942']
           })
