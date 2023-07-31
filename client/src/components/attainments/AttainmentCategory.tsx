@@ -53,7 +53,7 @@ export default function AttainmentCategory(props: {
         pr: '6px', pt: '8px'
       }}>
         <Box sx={{ display: 'flex' }}>
-          <Paper sx={{ mx: 0.5, px: 0.5, py: 0.25 }}>
+          <Paper variant='outlined' sx={{ mr: 1, px: 1, py: 0.5 }}>
             <Typography align='left' variant='caption'>
               {'Days valid: ' + props.attainment.daysValid}
             </Typography>
@@ -63,7 +63,7 @@ export default function AttainmentCategory(props: {
               Object.keys(props.paramsFromRoot).map((key: string) => {
                 if (props.paramsFromRoot) {
                   return (
-                    <Paper key={key} sx={{ mx: 0.5, px: 0.5, py: 0.25 }}>
+                    <Paper key={key} variant='outlined' sx={{ mr: 1, px: 1, py: 0.5 }}>
                       <Typography align='left' variant='caption'>
                         {`${getParamLabel(key)}: ${props.paramsFromRoot[key as keyof object]}`}
                       </Typography>

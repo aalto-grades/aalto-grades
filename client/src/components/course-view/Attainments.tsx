@@ -100,7 +100,7 @@ export default function Attainments(props: {
             Object.keys(props.attainmentTree.formulaParams).map((key: string) => {
               if (props.attainmentTree.formulaParams && key !== 'children') {
                 return (
-                  <Paper key={key} sx={{ mx: 0.5, px: 1, py: 0.5 }}>
+                  <Paper key={key} sx={{ mr: 1, px: 1, py: 0.5 }}>
                     <Typography align='left' variant='caption'>
                       {`${getParamLabel(key)}: ${props.attainmentTree.formulaParams[key]}`}
                     </Typography>

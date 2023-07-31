@@ -122,7 +122,7 @@ export default function LeafAttainment(props: {
             Object.keys(props.attainment.formulaParams).map((key: string) => {
               if (props.attainment.formulaParams && key !== 'children') {
                 return (
-                  <Paper key={key} sx={{ mx: 0.5, px: 0.5, py: 0.25 }}>
+                  <Paper key={key} variant='outlined' sx={{ mr: 1, px: 1, py: 0.5 }}>
                     <Typography align='left' variant='caption'>
                       {`${getParamLabel(key)}: ${props.attainment.formulaParams[key]}`}
                     </Typography>
@@ -137,7 +137,7 @@ export default function LeafAttainment(props: {
             Object.keys(props.paramsFromParent).map((key: string) => {
               if (props.paramsFromParent) {
                 return (
-                  <Paper key={key} sx={{ mx: 0.5, px: 0.5, py: 0.25 }}>
+                  <Paper key={key} variant='outlined' sx={{ mr: 1, px: 1, py: 0.5 }}>
                     <Typography align='left' variant='caption'>
                       {`${getParamLabel(key)}: ${props.paramsFromParent[key as keyof object]}`}
                     </Typography>
