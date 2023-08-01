@@ -13,7 +13,7 @@ import { UseQueryResult } from '@tanstack/react-query';
 
 import StudentGradeList from './StudentGradeList';
 
-import { useGetFinalGradesUser } from '../../hooks/useApi';
+import { useGetGradeTreeOfUser } from '../../hooks/useApi';
 
 // A Dialog component for viewing the individual grades of a user.
 export default function StudentGradesDialog(props: {
@@ -24,7 +24,7 @@ export default function StudentGradesDialog(props: {
   const { courseId, assessmentModelId }: Params =
     useParams() as { courseId: string, assessmentModelId: string };
 
-  const grades: UseQueryResult<AttainmentGradeData> = useGetFinalGradesUser(
+  const grades: UseQueryResult<AttainmentGradeData> = useGetGradeTreeOfUser(
     courseId, assessmentModelId, props.user?.userId as number, { enabled: props.open }
   );
 
