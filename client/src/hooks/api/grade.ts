@@ -89,7 +89,7 @@ export function useGetGradeTreeOfUser(
   options?: UseQueryOptions<AttainmentGradeData>
 ): UseQueryResult<AttainmentGradeData> {
   return useQuery({
-    queryKey: ['final-grades-user', courseId, assessmentModelId, userId],
+    queryKey: ['grade-tree-of-user', courseId, assessmentModelId, userId],
     queryFn: async () => (
       await axios.get(
         `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/user/${userId}`
