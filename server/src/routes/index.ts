@@ -121,6 +121,16 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *         example: ['735333', '393518', '925163']
  *         items:
  *           type: string
+ *     userId:
+ *       in: path
+ *       name: userId
+ *       schema:
+ *         type: integer
+ *         format: int32
+ *         minimum: 1
+ *       required: true
+ *       example: 1
+ *       description: The ID of the user.
  *     instanceIdQuery:
  *       in: query
  *       name: instanceId

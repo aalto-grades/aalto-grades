@@ -21,10 +21,10 @@ import User from '../database/models/user';
 
 import { getFormulaImplementation } from '../formulas';
 import {
-  ApiError, CalculationResult, FormulaNode, JwtClaims, StudentGrades
+  ApiError, CalculationResult, FormulaNode, JwtClaims, StudentGrades, idSchema
 } from '../types';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
-import { isTeacherInChargeOrAdmin } from './utils/user';
+import { findUserById, isTeacherInChargeOrAdmin } from './utils/user';
 
 async function studentNumbersExist(studentNumbers: Array<string>): Promise<void> {
   const foundStudentNumbers: Array<string> = (await User.findAll({
@@ -104,6 +104,7 @@ interface FinalGradeRaw extends AttainmentGrade {
     }
   },
   User: {
+    id: number,
     studentNumber: string
   }
 }
@@ -117,7 +118,7 @@ async function getFinalGradesFor(
   // Prepare base query options for User.
   const userQueryOptions: Includeable = {
     model: User,
-    attributes: ['studentNumber']
+    attributes: ['id', 'studentNumber']
   };
 
   // Conditionally add the where clause if student numbers included.
@@ -129,7 +130,7 @@ async function getFinalGradesFor(
     };
   }
 
-  const finalGrades: Array<FinalGradeRaw> = await AttainmentGrade.findAll({
+  let finalGrades: Array<FinalGradeRaw> = await AttainmentGrade.findAll({
     attributes: ['grade'],
     include: [
       {
@@ -161,6 +162,12 @@ async function getFinalGradesFor(
       HttpCode.NotFound
     );
   }
+
+  // Filter duplicates.
+  finalGrades = finalGrades.filter(
+    (obj: FinalGradeRaw, index: number) =>
+      finalGrades.findIndex((item: FinalGradeRaw) => item.User.id === obj.User.id) === index
+  );
 
   return finalGrades;
 }
@@ -365,8 +372,9 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
 
   // User raw query to enable distinct selection of students who have
   // at least one grade (final or not) for particular assessment model.
-  const allStudentsFromAssessmentModel: Array<string> = (await sequelize.query(
-    `SELECT DISTINCT student_number
+  const allStudentsFromAssessmentModel: Array<{ userId: number, studentNumber: string }> =
+  (await sequelize.query(
+    `SELECT DISTINCT "user".id AS id, student_number
     FROM attainment_grade
     INNER JOIN attainment ON attainment.id = attainment_grade.attainment_id
     INNER JOIN "user" ON "user".id = attainment_grade.user_id
@@ -376,12 +384,20 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
       type: QueryTypes.SELECT
     }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  )).map((value: any) => value.student_number);
+  )).map((value: any) => {
+    return {
+      userId: value.id,
+      studentNumber: value.student_number
+    };
+  });
 
   if (studentNumbersFiltered && allStudentsFromAssessmentModel.length !== 0) {
     studentNumbersFiltered = allStudentsFromAssessmentModel.filter(
-      (value: string) => (studentNumbersFiltered as Array<string>).includes(value)
-    );
+      (value: { userId: number, studentNumber: string }) =>
+        (studentNumbersFiltered as Array<string>).includes(value.studentNumber)
+    ).map((value: { userId: number, studentNumber: string }) => {
+      return value.studentNumber;
+    });
   }
 
   const studentsWithFinalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
@@ -394,14 +410,16 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
     const studentNumbersWithFinalGrades: Array<string> =
       studentsWithFinalGrades.map((value: FinalGradeRaw) => value.User.studentNumber);
 
-    const studentNumbersNoGrade: Array<string> = allStudentsFromAssessmentModel
-      .filter((studentNumber: string) => {
-        return !studentNumbersWithFinalGrades.includes(studentNumber);
-      });
+    const studentNumbersNoGrade: Array<{ userId: number, studentNumber: string }> =
+      allStudentsFromAssessmentModel
+        .filter((value: { userId: number, studentNumber: string }) => {
+          return !studentNumbersWithFinalGrades.includes(value.studentNumber);
+        });
 
-    studentNumbersNoGrade.forEach((studentNumber: string) => {
+    studentNumbersNoGrade.forEach((value: { userId: number, studentNumber: string }) => {
       finalGrades.push({
-        studentNumber,
+        userId: value.userId,
+        studentNumber: value.studentNumber,
         grade: Status.Pending,
         credits: 0
       });
@@ -411,6 +429,7 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
   studentsWithFinalGrades.map(
     (finalGrade: FinalGradeRaw) => {
       finalGrades.push({
+        userId: finalGrade.User.id,
         studentNumber: finalGrade.User.studentNumber,
         grade: String(finalGrade.grade),
         credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits
@@ -1050,5 +1069,83 @@ export async function calculateGrades(
 
   res.status(HttpCode.Ok).json({
     data: {}
+  });
+}
+
+interface AttainmentWithUserGrade extends Attainment {
+  AttainmentGrades: Array<AttainmentGrade>
+}
+
+function generateAttainmentTreeWithUserGrades(
+  root: AttainmentGradeData,
+  allAttainments: Array<AttainmentWithUserGrade>
+): void {
+  const children: Array<AttainmentWithUserGrade> = allAttainments.filter(
+    (el: AttainmentWithUserGrade) => el.parentId === root.attainmentId
+  );
+
+  if (children.length > 0) {
+    root.subAttainments = children.map((el: AttainmentWithUserGrade) => {
+      return {
+        attainmentId: el.id,
+        gradeId: el.AttainmentGrades[0]?.id,
+        name: el.name,
+        tag: el.tag,
+        grade: el.AttainmentGrades[0]?.grade,
+        manual: el.AttainmentGrades[0]?.manual,
+        status: el.AttainmentGrades[0]?.status as Status,
+        subAttainments: []
+      };
+    });
+
+    root.subAttainments.forEach((el: AttainmentGradeData) => {
+      generateAttainmentTreeWithUserGrades(el, allAttainments);
+    });
+  }
+}
+
+export async function getGradeTreeOfUser(req: Request, res: Response): Promise<void> {
+  const userId: number =
+  (await idSchema.validate({ id: req.params.userId }, { abortEarly: false })).id;
+
+  const [course, assessmentModel]: [Course, AssessmentModel] =
+    await validateAssessmentModelPath(
+      req.params.courseId, req.params.assessmentModelId
+    );
+
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
+  await findUserById(userId, HttpCode.NotFound);
+
+  const userGrades: Array<AttainmentWithUserGrade> = await Attainment.findAll({
+    where: {
+      assessmentModelId: assessmentModel.id
+    },
+    include: [{
+      model: AttainmentGrade,
+      required: false,
+      where: {
+        userId
+      }
+    }]
+  }) as Array<AttainmentWithUserGrade>;
+
+  const parent: Array<AttainmentWithUserGrade> =
+    userGrades.filter((attainment: AttainmentWithUserGrade) => !attainment.parentId);
+
+  const root: AttainmentGradeData = {
+    attainmentId: parent[0].id,
+    gradeId: parent[0].AttainmentGrades[0]?.id ?? null,
+    name: parent[0].name,
+    tag: parent[0].tag,
+    grade: parent[0].AttainmentGrades[0]?.grade ?? null,
+    manual: parent[0].AttainmentGrades[0]?.manual ?? null,
+    status: parent[0].AttainmentGrades[0]?.status as Status ?? null,
+    subAttainments: []
+  };
+
+  generateAttainmentTreeWithUserGrades(root, userGrades);
+
+  res.status(HttpCode.Ok).json({
+    data: root
   });
 }

@@ -18,7 +18,6 @@ import {
   useGetAttainment
 } from '../hooks/useApi';
 import { State } from '../types';
-import { sleep } from '../utils';
 
 export default function EditAttainmentView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();

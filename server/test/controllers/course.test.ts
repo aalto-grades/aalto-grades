@@ -2,10 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpCode } from 'aalto-grades-common/types';
+import { CourseData, HttpCode, UserData } from 'aalto-grades-common/types';
 import supertest from 'supertest';
 
 import { app } from '../../src/app';
+import { findCourseFullById, parseCourseFull } from '../../src/controllers/utils/course';
 import { Cookies, getCookies } from '../util/getCookies';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
@@ -70,7 +71,6 @@ describe('Test GET /v1/courses/:courseId - get course by ID', () => {
   });
 
 });
-
 
 describe('Test GET /v1/courses - get all courses', () => {
 
@@ -198,38 +198,41 @@ describe('Test POST /v1/courses - create new course', () => {
       .expect(HttpCode.Forbidden);
   });
 
-  it('should respond with 404 not found, if teacher email not found from database', async () => {
-    const input: object = {
-      courseCode: 'ELEC-A7200',
-      minCredits: 5,
-      maxCredits: 5,
-      teachersInCharge: [
-        {
-          email: 'not.found@aalto.fi'
+  it(
+    'should respond with 422 unprocessable entity, if teacher email is not found from database',
+    async () => {
+      const input: object = {
+        courseCode: 'ELEC-A7200',
+        minCredits: 5,
+        maxCredits: 5,
+        teachersInCharge: [
+          {
+            email: 'not.found@aalto.fi'
+          }
+        ],
+        department: {
+          fi: 'Sähkötekniikan korkeakoulu',
+          en: 'School of Electrical Engineering',
+          sv: 'Högskolan för elektroteknik'
+        },
+        name: {
+          fi: 'Signaalit ja järjestelmät',
+          en: 'Signals and Systems',
+          sv: ''
         }
-      ],
-      department: {
-        fi: 'Sähkötekniikan korkeakoulu',
-        en: 'School of Electrical Engineering',
-        sv: 'Högskolan för elektroteknik'
-      },
-      name: {
-        fi: 'Signaalit ja järjestelmät',
-        en: 'Signals and Systems',
-        sv: ''
-      }
-    };
+      };
 
-    const res: supertest.Response = await request
-      .post('/v1/courses').send(input)
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.NotFound);
+      const res: supertest.Response = await request
+        .post('/v1/courses').send(input)
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.UnprocessableEntity);
 
-    expect(res.body.errors).toBeDefined();
-    expect(res.body.errors[0]).toBe('No user with email address not.found@aalto.fi found');
-    expect(res.body.data).not.toBeDefined();
-  });
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors[0]).toBe('No user with email address not.found@aalto.fi found');
+      expect(res.body.data).not.toBeDefined();
+    }
+  );
 
   /* TODO: move next test case elsewhere in future, after refactoring commonly
    * reusable functionality (e.g. middleware) to their own modules / functions
@@ -251,4 +254,190 @@ describe('Test POST /v1/courses - create new course', () => {
     );
   });
 
+});
+
+describe ('Test PUT /v1/courses/:courseId - edit course', () => {
+
+  async function checkCourseData(
+    courseId: number, expected: CourseData
+  ): Promise<void> {
+    expect(parseCourseFull(await findCourseFullById(
+      courseId, HttpCode.InternalServerError
+    ))).toStrictEqual(expected);
+  }
+
+  function uneditedCourseData(
+    courseId: number, courseCode: string, teachersInCharge: Array<UserData>
+  ): CourseData {
+    return {
+      id: courseId,
+      courseCode: courseCode,
+      minCredits: 5,
+      maxCredits: 5,
+      teachersInCharge: teachersInCharge,
+      department: {
+        fi: 'muokkaamaton laitos',
+        en: 'unedited department',
+        sv: 'oredigerad institutionen'
+      },
+      name: {
+        fi: 'muokkaamaton nimi',
+        en: 'unedited name',
+        sv: 'oredigerad namn'
+      },
+      evaluationInformation: {
+        fi: '',
+        en: '',
+        sv: ''
+      }
+    };
+  }
+
+  const courseDataEdits: object = {
+    courseCode: 'edited',
+    minCredits: 3,
+    maxCredits: 7,
+    department: {
+      fi: 'muokattu laitos',
+      en: 'edited department',
+      sv: 'redigerad institutionen'
+    },
+    name: {
+      fi: 'muokattu nimi',
+      en: 'edited name',
+      sv: 'redigerad namn'
+    }
+  };
+
+  it('should successfully update course information', async () => {
+    const course: CourseData = uneditedCourseData(10, 'Test edit course', [
+      { id: 50,  name: 'Everett Dennis' }
+    ]);
+
+    checkCourseData(10, course);
+
+    const res: supertest.Response = await request
+      .put('/v1/courses/10')
+      .send(courseDataEdits)
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data).toBeDefined();
+    expect(res.body.data).toStrictEqual({ ...course, ...courseDataEdits });
+    checkCourseData(10, { ...course, ...courseDataEdits });
+  });
+
+  it('should successfully update course information and teachers in charge', async () => {
+    const course: CourseData = uneditedCourseData(11, 'Test edit course and teachers', [
+      { id: 100, name: 'Larissa Poore' },
+      { id: 200, name: 'Harriet Maestas' },
+      { id: 300, name: 'Charles Morrissey' },
+    ]);
+
+    checkCourseData(11, course);
+
+    const res: supertest.Response = await request
+      .put('/v1/courses/11')
+      .send({
+        ...courseDataEdits,
+        teachersInCharge: [
+          { email: 'larissa.poore@aalto.fi' },
+          { email: 'donald.perez@aalto.fi' }
+        ]
+      })
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    course.teachersInCharge = [
+      { id: 100, name: 'Larissa Poore' },
+      { id: 101, name: 'Donald Perez' }
+    ];
+
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data).toBeDefined();
+    expect(res.body.data).toStrictEqual({ ...course, ...courseDataEdits });
+    checkCourseData(11, { ...course, ...courseDataEdits });
+  });
+
+  it('should respond with 400 bad request, if body validation fails', async () => {
+    async function badInput(input: object): Promise<void> {
+      const res: supertest.Response = await request
+        .put('/v1/courses/10')
+        .send(input)
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadRequest);
+
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.data).not.toBeDefined();
+    }
+
+    await badInput({
+      teachersInCharge: [
+        { id: 5 }, { email: 'user@email.com' }
+      ]
+    });
+    await badInput({
+      minCredits: 10,
+      maxCredits: 5
+    });
+    await badInput({
+      department: 'wrong',
+      name: false
+    });
+    await badInput({
+      minCredits: -10
+    });
+    await badInput({
+      maxCredits: 1
+    });
+    await badInput({
+      minCredits: 9
+    });
+  });
+
+  it('should respond with 401 unauthorized, if not logged in', async () => {
+    await request
+      .put('/v1/courses/10')
+      .send(courseDataEdits)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Unauthorized);
+  });
+
+  it('should respond with 403 forbidden, if not admin user', async () => {
+    await request
+      .put('/v1/courses/10')
+      .send(courseDataEdits)
+      .set('Cookie', cookies.userCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Forbidden);
+  });
+
+  it('should respond with 404 not found, if the course ID does not exist', async () => {
+    await request
+      .put(`/v1/courses/${badId}`)
+      .send(courseDataEdits)
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.NotFound);
+  });
+
+  it(
+    'should respond with 422 unprocessable entity, if teacher email is not found from database',
+    async () => {
+      await request
+        .put('/v1/courses/10')
+        .send({
+          teachersInCharge: [
+            { email: 'this.is.not@a.real.email' }
+          ]
+        })
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.UnprocessableEntity);
+    }
+  );
 });

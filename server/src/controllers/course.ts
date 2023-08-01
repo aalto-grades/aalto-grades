@@ -2,7 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseData, HttpCode, Language, UserData } from 'aalto-grades-common/types';
+import {
+  CourseData, HttpCode, Language, LocalizedString, UserData
+} from 'aalto-grades-common/types';
 import { Request, Response } from 'express';
 import { Transaction } from 'sequelize';
 import * as yup from 'yup';
@@ -14,18 +16,14 @@ import TeacherInCharge from '../database/models/teacherInCharge';
 import User from '../database/models/user';
 
 import { ApiError, CourseFull, idSchema, localizedStringSchema } from '../types';
-import { findCourseFullById, parseCourseFull } from './utils/course';
+import { findCourseById, findCourseFullById, parseCourseFull } from './utils/course';
 
 export async function getCourse(req: Request, res: Response): Promise<void> {
   const courseId: number = Number(req.params.courseId);
   await idSchema.validate({ id: courseId });
 
-  const course: CourseFull = await findCourseFullById(
-    courseId, HttpCode.NotFound
-  );
-
   res.status(HttpCode.Ok).json({
-    data: parseCourseFull(course)
+    data: parseCourseFull(await findCourseFullById(courseId, HttpCode.NotFound))
   });
 }
 
@@ -52,6 +50,33 @@ export async function getAllCourses(req: Request, res: Response): Promise<void> 
   });
 }
 
+async function validateEmailList(emailList: Array<string>): Promise<Array<User>> {
+  const teachers: Array<User> = await User.findAll({
+    attributes: ['id', 'email'],
+    where: {
+      email: emailList
+    }
+  });
+
+  // Check for non existent emails.
+  if (emailList.length !== teachers.length) {
+    const missingEmails: Array<string> = emailList.filter(
+      (teacher: string) => {
+        return teachers.map((user: User) => user.email).indexOf(teacher) === -1;
+      }
+    );
+
+    throw new ApiError(
+      missingEmails.map((email: string) => {
+        return `No user with email address ${email} found`;
+      }),
+      HttpCode.UnprocessableEntity
+    );
+  }
+
+  return teachers;
+}
+
 export async function addCourse(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     courseCode: yup.string().required(),
@@ -68,29 +93,11 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
 
   await requestSchema.validate(req.body, { abortEarly: false });
 
-  const emailList: Array<string> = req.body.teachersInCharge.map(
-    (teacher: UserData) => teacher.email
+  const teachers: Array<User> = await validateEmailList(
+    req.body.teachersInCharge.map(
+      (teacher: UserData) => teacher.email
+    )
   );
-
-  const teachers: Array<User> = await User.findAll({
-    attributes: ['id', 'email'],
-    where: {
-      email: emailList
-    }
-  });
-
-  // Check for non existent emails.
-  if (emailList.length !== teachers.length) {
-    const missingEmails: Array<string> =
-      emailList.filter(
-        (teacher: string) => teachers.map((user: User) => user.email).indexOf(teacher) === -1
-      );
-
-    throw new ApiError(
-      missingEmails.map((email: string) => `No user with email address ${email} found`),
-      HttpCode.NotFound
-    );
-  }
 
   const course: Course = await sequelize.transaction(
     async (t: Transaction): Promise<Course> => {
@@ -134,10 +141,137 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
       await TeacherInCharge.bulkCreate(teachersInCharge, { transaction: t });
 
       return course;
-    });
+    }
+  );
 
   res.status(HttpCode.Ok).json({
     data: course.id
   });
 }
 
+export async function editCourse(req: Request, res: Response): Promise<void> {
+  const requestSchema: yup.AnyObjectSchema = yup.object().shape({
+    courseCode: yup.string().notRequired(),
+    minCredits: yup.number().min(0).notRequired(),
+    maxCredits: yup.number().min(yup.ref('minCredits')).notRequired(),
+    teachersInCharge: yup.array().of(
+      yup.object().shape({
+        email: yup.string().email().required()
+      })
+    ).notRequired(),
+    department: localizedStringSchema.notRequired(),
+    name: localizedStringSchema.notRequired()
+  });
+
+  await requestSchema.validate(req.body, { abortEarly: false });
+  const courseId: number = (await idSchema.validate({ id: req.params.courseId })).id;
+  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
+
+  const courseCode: string | undefined = req.body.courseCode;
+  const minCredits: number | undefined = req.body.minCredits;
+  const maxCredits: number | undefined = req.body.maxCredits;
+  const teachersInCharge: Array<UserData> | undefined = req.body.teachersInCharge;
+  const department: LocalizedString | undefined = req.body.department;
+  const name: LocalizedString | undefined = req.body.name;
+
+  if (minCredits && !maxCredits && minCredits > course.maxCredits) {
+    throw new ApiError(
+      `without updating max credits, new min credits (${minCredits}) can't be`
+      + ` larger than existing max credits (${course.maxCredits})`,
+      HttpCode.BadRequest
+    );
+  } else if (maxCredits && !minCredits && maxCredits < course.minCredits) {
+    throw new ApiError(
+      `without updating min credits, new max credits (${maxCredits}) can't be`
+      + ` smaller than existing min credits (${course.minCredits})`,
+      HttpCode.BadRequest
+    );
+  }
+
+  const newTeachers: Array<User> | null = teachersInCharge ? await validateEmailList(
+    // teacher.email was alread validated to be defined by Yup.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    teachersInCharge.map((teacher: UserData) => teacher.email!)
+  ) : null;
+
+  await sequelize.transaction(
+    async (t: Transaction): Promise<void> => {
+      await Course.update(
+        {
+          courseCode: courseCode,
+          minCredits: minCredits,
+          maxCredits: maxCredits
+        },
+        {
+          where: {
+            id: courseId
+          },
+          transaction: t
+        }
+      );
+
+      async function updateTranslation(
+        language: Language, key: 'en' | 'fi' | 'sv'
+      ): Promise<void> {
+        await CourseTranslation.update(
+          {
+            department: department ? department[key] : undefined,
+            courseName: name ? name[key] : undefined
+          },
+          {
+            where: {
+              courseId: courseId,
+              language: language
+            },
+            transaction: t
+          }
+        );
+      }
+
+      await updateTranslation(Language.English, 'en');
+      await updateTranslation(Language.Finnish, 'fi');
+      await updateTranslation(Language.Swedish, 'sv');
+
+      if (newTeachers) {
+        const oldTeachers: Array<TeacherInCharge> = await TeacherInCharge.findAll({
+          where: {
+            courseId: courseId
+          }
+        });
+
+        // Delete teachers who are not in the newTeachers array.
+        for (const oldTeacher of oldTeachers) {
+          // Does oldTeacher exist in the newTeachers array?
+          const existingTeacherIndex: number =
+            newTeachers.findIndex((newTeacher: User) => {
+              return newTeacher.id === oldTeacher.userId;
+            });
+
+          if (existingTeacherIndex >= 0) {
+            // If yes, nothing needs to be done. Just remove oldTeacher from the
+            // newTeachers array because it doesn't need to be considered further.
+            newTeachers.splice(existingTeacherIndex, 1);
+          } else {
+            // If not, oldTeacher needs to be removed from the database.
+            oldTeacher.destroy({ transaction: t });
+          }
+        }
+
+        // Add teachers who are in the newTeachers array but not in the database.
+        await TeacherInCharge.bulkCreate(
+          newTeachers.map((user: User) => {
+            return {
+              userId: user.id,
+              courseId: courseId
+            };
+          }),
+          { transaction: t }
+        );
+      }
+    }
+  );
+
+  res.status(HttpCode.Ok).json({
+    data: parseCourseFull(await findCourseFullById(courseId, HttpCode.NotFound))
+  });
+}

@@ -16,7 +16,7 @@ import { JSX, ReactNode, SyntheticEvent, useState } from 'react';
 
 import { State } from '../../types';
 
-const Accordion: StyledComponent<AccordionProps> = styled((props: AccordionProps) => (
+export const Accordion: StyledComponent<AccordionProps> = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
 ))(() => ({
   '&:last-child': {
@@ -35,7 +35,7 @@ interface AccordionSummaryProps {
   children: ReactNode
 }
 
-const AccordionSummary: StyledComponent<AccordionSummaryProps> = styled(
+export const AccordionSummary: StyledComponent<AccordionSummaryProps> = styled(
   (props: AccordionSummaryProps) => (
     <MuiAccordionSummary
       expandIcon={(

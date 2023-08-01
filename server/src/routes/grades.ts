@@ -9,7 +9,8 @@ import passport from 'passport';
 import path from 'path';
 
 import {
-  addGrades, calculateGrades, getCsvTemplate, getFinalGrades, getSisuFormattedGradingCSV
+  addGrades, calculateGrades, getCsvTemplate,
+  getFinalGrades, getSisuFormattedGradingCSV, getGradeTreeOfUser
 } from '../controllers/grades';
 import { handleInvalidRequestJson } from '../middleware';
 import { controllerDispatcher } from '../middleware/errorHandler';
@@ -46,9 +47,9 @@ const upload: Multer = multer({
  *     type: object
  *     description: Students final grade data.
  *     properties:
- *       id:
+ *       userId:
  *         type: integer
- *         description: Student final grade database ID.
+ *         description: User ID.
  *         format: int32
  *         minimum: 1
  *         example: 1
@@ -66,6 +67,38 @@ const upload: Multer = multer({
  *         format: int32
  *         minimum: 0
  *         example: 5
+ *   AttainmentGradingData:
+ *     type: object
+ *     description: Students grading data for all attainments of the assessment model.
+ *     properties:
+ *       attainmentId:
+ *         $ref: '#/definitions/AttainmentId'
+ *       gradeId:
+ *         type: integer
+ *         description: Internal attainment grade database ID.
+ *         format: int32
+ *         minimum: 0
+ *         example: 5
+ *       tag:
+ *         $ref: '#/definitions/AttainmentTag'
+ *       name:
+ *         $ref: '#/definitions/AttainmentName'
+ *       grade:
+ *         type: number
+ *         description: User attainment grade.
+ *         format: int32
+ *         minimum: 0
+ *         example: 5
+ *       manual:
+ *         type: boolean
+ *         example: true
+ *       status:
+ *         type: string
+ *         enum: [PASS, FAIL, PENDING]
+ *         example: PASS
+ *       subAttainments:
+ *         type: array
+ *         description: Sublevel attainment grades.
  */
 
 /**
@@ -255,6 +288,61 @@ router.get(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades',
   passport.authenticate('jwt', { session: false }),
   controllerDispatcher(getFinalGrades)
+);
+
+/**
+ * @swagger
+ * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/user/{userId}:
+ *   get:
+ *     tags: [Grades]
+ *     description: >
+ *       Get all attainment grades for assessment model, using user ID.
+ *       Available only to admin users and teachers in charge of the course.
+ *     parameters:
+ *       - $ref: '#/components/parameters/courseId'
+ *       - $ref: '#/components/parameters/assessmentModelId'
+ *       - $ref: '#/components/parameters/userId'
+ *     responses:
+ *       200:
+ *         description: User grades fetched successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/definitions/AttainmentGradingData'
+ *       400:
+ *         description: Fetching failed, due to validation errors in parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
+ *       403:
+ *         $ref: '#/components/responses/AuthorizationError'
+ *       404:
+ *         description: >
+ *           The given course or assessment model does not exist.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: >
+ *           The given assessment model does not belong to the given course.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ */
+router.get(
+  '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/user/:userId',
+  passport.authenticate('jwt', { session: false }),
+  controllerDispatcher(getGradeTreeOfUser)
 );
 
 /**
