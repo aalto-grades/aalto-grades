@@ -399,7 +399,7 @@ export default function CreateCourseView(): JSX.Element {
                   disabled={!isValid || teachersInCharge.length === 0 || isSubmitting}
                   endIcon={<SendIcon />}
                 >
-                  Create Course
+                  Submit
                   {isSubmitting && (
                     <CircularProgress
                       size={24}
