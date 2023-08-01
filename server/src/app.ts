@@ -5,6 +5,7 @@
 import { HttpCode } from 'aalto-grades-common/types';
 import cors from 'cors';
 import express, { Application, Request } from 'express';
+import helmet from 'helmet';
 
 import { FRONTEND_ORIGIN } from './configs/environment';
 
@@ -24,6 +25,8 @@ app.use(cors({
   origin: FRONTEND_ORIGIN,
   credentials: true,
 }));
+
+app.use(helmet());
 
 app.use('/', router);
 
