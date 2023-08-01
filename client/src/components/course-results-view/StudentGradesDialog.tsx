@@ -15,9 +15,8 @@ import AlertSnackbar from '../alerts/AlertSnackbar';
 import StudentGradeList from './StudentGradeList';
 
 import { useGetFinalGradesUser } from '../../hooks/useApi';
-import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 
-// A Dialog component for viewing users individual grades.
+// A Dialog component for viewing the individual grades of a user.
 export default function StudentGradesDialog(props: {
   user: FinalGrade | null,
   setOpen: (open: boolean) => void,
@@ -29,9 +28,6 @@ export default function StudentGradesDialog(props: {
   const grades: UseQueryResult<AttainmentGradeData> = useGetFinalGradesUser(
     courseId, assessmentModelId, props.user?.userId as number, { enabled: props.open }
   );
-
-  // state variables handling the alert messages
-  const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
   return (
     <>
@@ -78,7 +74,6 @@ export default function StudentGradesDialog(props: {
           </Button>
         </DialogActions>
       </Dialog>
-      <AlertSnackbar snackPack={snackPack} />
     </>
   );
 }
