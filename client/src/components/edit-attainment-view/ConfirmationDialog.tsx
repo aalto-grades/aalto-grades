@@ -25,16 +25,26 @@ export default function ConfirmationDialog(props: {
         <DialogContent>
           <DialogContentText>
           Are you sure you want to delete this {props.subject} and all of the attainments below it?
+          This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button size='medium' variant='outlined' onClick={props.handleClose}>
+          <Button
+            size='medium'
+            variant='outlined'
+            onClick={props.handleClose}
+          >
             Cancel
           </Button>
-          <Button size='medium' variant='contained' onClick={(): void => {
-            props.deleteAttainment(props.attainment);
-            props.handleClose();
-          }}>
+          <Button
+            size='medium'
+            color='error'
+            variant='contained'
+            onClick={(): void => {
+              props.deleteAttainment(props.attainment);
+              props.handleClose();
+            }}
+          >
             Delete
           </Button>
         </DialogActions>
