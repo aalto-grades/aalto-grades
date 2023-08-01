@@ -1102,7 +1102,7 @@ function generateAttainmentTreeWithUserGrades(
   }
 }
 
-export async function getUserAttainmentModelGrades(req: Request, res: Response): Promise<void> {
+export async function getGradeTreeOfUser(req: Request, res: Response): Promise<void> {
   const userId: number =
   (await idSchema.validate({ id: req.params.userId }, { abortEarly: false })).id;
 
