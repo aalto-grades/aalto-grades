@@ -17,10 +17,10 @@ import { ChangeEvent, useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
 
-import UnsavedChangesDialog from './alerts/UnsavedChangesDialog';
+import UnsavedChangesDialog from '../../Documents/GitHub/base-repository/client/src/components/alerts/UnsavedChangesDialog';
 
-import { useAddCourse, UseAddCourseResult } from '../hooks/useApi';
-import { State } from '../types';
+import { useAddCourse, UseAddCourseResult } from '../../Documents/GitHub/base-repository/client/src/hooks/useApi';
+import { State } from '../../Documents/GitHub/base-repository/client/src/types';
 
 interface FormData {
   courseCode: string,
@@ -35,7 +35,7 @@ interface FormData {
   nameSv: string
 }
 
-export default function CreateCourseView(): JSX.Element {
+export default function EditCourseView(): JSX.Element {
 
   const navigate: NavigateFunction = useNavigate();
 
