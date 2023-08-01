@@ -1080,7 +1080,8 @@ function generateAttainmentTreeWithUserGrades(
   allAttainments: Array<AttainmentWithUserGrade>
 ): void {
   const children: Array<AttainmentWithUserGrade> = allAttainments.filter(
-    (el: AttainmentWithUserGrade) => el.parentId === root.attainmentId);
+    (el: AttainmentWithUserGrade) => el.parentId === root.attainmentId
+  );
 
   if (children.length > 0) {
     root.subAttainments = children.map((el: AttainmentWithUserGrade) => {
