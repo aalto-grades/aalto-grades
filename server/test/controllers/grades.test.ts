@@ -233,7 +233,7 @@ describe(
       async () => {
         res = await request
           .get(
-            '/v1/courses/8/assessment-models/42/grades/csv/sisu'
+            '/v1/courses/9/assessment-models/42/grades/csv/sisu'
             + '?assessmentDate=2023-12-12&completionLanguage=sv&instanceId=26'
           )
           .set('Cookie', cookies.adminCookie)
@@ -247,7 +247,7 @@ describe(
 857119,5,5,12.12.2023,sv,
 `);
         expect(res.headers['content-disposition']).toBe(
-          'attachment; filename="final_grades_course_ELEC-A7100_' +
+          'attachment; filename="final_grades_course_PHYS-A1140_' +
         `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
         );
       });
@@ -256,7 +256,7 @@ describe(
       async () => {
         res = await request
           .get(
-            '/v1/courses/8/assessment-models/42/grades/csv/sisu'
+            '/v1/courses/9/assessment-models/42/grades/csv/sisu'
             + '?assessmentDate=2023-12-12&completionLanguage=fi' +
             '&studentNumbers=["114732","472886","327976","139131"]'
           )
@@ -271,7 +271,7 @@ describe(
 139131,5,5,12.12.2023,fi,
 `);
         expect(res.headers['content-disposition']).toBe(
-          'attachment; filename="final_grades_course_ELEC-A7100_' +
+          'attachment; filename="final_grades_course_PHYS-A1140_' +
         `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
         );
       });
@@ -280,7 +280,7 @@ describe(
       async () => {
         res = await request
           .get(
-            '/v1/courses/8/assessment-models/42/grades/csv/sisu'
+            '/v1/courses/9/assessment-models/42/grades/csv/sisu'
             + '?assessmentDate=2023-12-12&completionLanguage=sv&instanceId=26' +
             '&studentNumbers=["327976","139131"]'
           )
@@ -293,7 +293,7 @@ describe(
 139131,5,5,12.12.2023,sv,
 `);
         expect(res.headers['content-disposition']).toBe(
-          'attachment; filename="final_grades_course_ELEC-A7100_' +
+          'attachment; filename="final_grades_course_PHYS-A1140_' +
         `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
         );
       });
@@ -302,7 +302,7 @@ describe(
       async () => {
         res = await request
           .get(
-            '/v1/courses/8/assessment-models/42/grades/csv/sisu'
+            '/v1/courses/9/assessment-models/42/grades/csv/sisu'
             + '?assessmentDate=2023-12-12&completionLanguage=sv'
           )
           .set('Cookie', cookies.adminCookie)
@@ -329,7 +329,7 @@ describe(
 857119,5,5,12.12.2023,sv,
 `);
         expect(res.headers['content-disposition']).toBe(
-          'attachment; filename="final_grades_course_ELEC-A7100_' +
+          'attachment; filename="final_grades_course_PHYS-A1140_' +
         `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
         );
       });
@@ -486,7 +486,7 @@ describe(
     it('should show final grade as PENDING for students with no final grade calculated',
       async () => {
         res = await request
-          .get('/v1/courses/8/assessment-models/41/grades')
+          .get('/v1/courses/9/assessment-models/41/grades')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
@@ -505,7 +505,7 @@ describe(
     it('should filter returned grades based on student number if URL query included',
       async () => {
         res = await request
-          .get('/v1/courses/8/assessment-models/41/grades' +
+          .get('/v1/courses/9/assessment-models/41/grades' +
           '?studentNumbers=["869364","711199","795451"]')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
@@ -522,7 +522,7 @@ describe(
     it('should filter returned grades based on instance ID if URL query included',
       async () => {
         res = await request
-          .get('/v1/courses/8/assessment-models/42/grades?instanceId=26')
+          .get('/v1/courses/9/assessment-models/42/grades?instanceId=26')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
@@ -540,7 +540,7 @@ describe(
       'should filter returned grades based on instance ID and student number if URL query included',
       async () => {
         res = await request
-          .get('/v1/courses/8/assessment-models/42/grades?instanceId=26' +
+          .get('/v1/courses/9/assessment-models/42/grades?instanceId=26' +
           '&studentNumbers=["327976","139131"]')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
@@ -556,7 +556,7 @@ describe(
     it('should not filter returned grades if no filters included in URL query',
       async () => {
         res = await request
-          .get('/v1/courses/8/assessment-models/42/grades')
+          .get('/v1/courses/9/assessment-models/42/grades')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
@@ -589,14 +589,14 @@ describe(
     it('should show previously PENDING final grades as graded after final grade calculated',
       async () => {
         await request
-          .post('/v1/courses/8/assessment-models/41/grades/calculate')
+          .post('/v1/courses/9/assessment-models/41/grades/calculate')
           .send({
             studentNumbers: ['711199', '869364', '872942']
           })
           .set('Cookie', cookies.adminCookie);
 
         res = await request
-          .get('/v1/courses/8/assessment-models/41/grades')
+          .get('/v1/courses/9/assessment-models/41/grades')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
@@ -1182,7 +1182,7 @@ describe(
       'should calculate multiple correct grades based on instance ID and student numbers',
       async () => {
         checkSuccessRes(await request
-          .post('/v1/courses/8/assessment-models/42/grades/calculate')
+          .post('/v1/courses/9/assessment-models/42/grades/calculate')
           .send({
             instanceId: 27,
             studentNumbers: ['658593', '451288']
@@ -1195,7 +1195,7 @@ describe(
 
     it('should calculate multiple correct grades based on instance ID', async () => {
       checkSuccessRes(await request
-        .post('/v1/courses/8/assessment-models/42/grades/calculate')
+        .post('/v1/courses/9/assessment-models/42/grades/calculate')
         .send({
           instanceId: 27
         })
@@ -1232,7 +1232,7 @@ describe(
       'should respond with 404 not found if instance does not have any students assigned',
       async () => {
         res = await request
-          .post('/v1/courses/8/assessment-models/42/grades/calculate')
+          .post('/v1/courses/9/assessment-models/42/grades/calculate')
           .send({
             instanceId: 28
           })
