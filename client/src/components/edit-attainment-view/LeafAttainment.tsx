@@ -38,7 +38,8 @@ export default function LeafAttainment(props: {
   deleteAttainment: (attainment: AttainmentData) => void,
   getTemporaryId: () => number,
   attainment: AttainmentData,
-  paramsFromParent?: object
+  paramsFromParent?: object,
+  setTouched: () => void
 }): JSX.Element {
 
   // Functions and variables for opening and closing the dialog that asks for
@@ -90,6 +91,7 @@ export default function LeafAttainment(props: {
           attainment={props.attainment}
           value={props.attainment.name}
           fieldData={nameData}
+          setTouched={props.setTouched}
         />
         <StringTextField
           attainmentTree={props.attainmentTree}
@@ -97,6 +99,7 @@ export default function LeafAttainment(props: {
           attainment={props.attainment}
           value={props.attainment.tag}
           fieldData={tagData}
+          setTouched={props.setTouched}
         />
         <TextField
           type='number'
@@ -111,6 +114,7 @@ export default function LeafAttainment(props: {
             width: '100%'
           }}
           onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+            props.setTouched();
             props.attainment.daysValid = Number(event.target.value);
             props.setAttainmentTree(structuredClone(props.attainmentTree));
           }}
@@ -156,7 +160,13 @@ export default function LeafAttainment(props: {
       }}>
         {
           (props.attainment !== props.attainmentTree) ? (
-            <Button size='small' sx={{ my: 1 }} onClick={handleConfDialogOpen}>
+            <Button
+              size='small'
+              variant='outlined'
+              color='error'
+              sx={{ my: 1 }}
+              onClick={handleConfDialogOpen}
+            >
               Delete
             </Button>
           ) : (
@@ -172,15 +182,20 @@ export default function LeafAttainment(props: {
           open={openConfDialog}
         />
         {
-          (props.attainment.subAttainments && props.attainment.subAttainments.length > 0) ? (
-            <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
-              Add Sub-Attainments
-            </Button>
-          ) : (
-            <Button size='small' sx={{ my: 1 }} onClick={handleCountDialogOpen}>
-              Create Sub-Attainments
-            </Button>
-          )
+          <Button
+            size='small'
+            variant='outlined'
+            sx={{ my: 1 }}
+            onClick={handleCountDialogOpen}
+          >
+            {
+              (props.attainment.subAttainments && props.attainment.subAttainments.length > 0) ? (
+                'Add Sub-Attainments'
+              ) : (
+                'Create Sub-Attainments'
+              )
+            }
+          </Button>
         }
       </Box>
       <SimpleDialog
@@ -200,5 +215,6 @@ LeafAttainment.propTypes = {
   setAttainmentTree: PropTypes.func,
   deleteAttainment: PropTypes.func,
   getTemporaryId: PropTypes.func,
-  attainment: PropTypes.object
+  attainment: PropTypes.object,
+  setTouched: PropTypes.func
 };

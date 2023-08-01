@@ -17,10 +17,12 @@ export default function StringTextField(props: {
   setAttainmentTree: (attainmentTree: AttainmentData) => void,
   attainment: AttainmentData,
   value: string,
-  fieldData: AttainmentTextFieldData
+  fieldData: AttainmentTextFieldData,
+  setTouched: () => void
 }): JSX.Element {
 
   function handleChange(event: ChangeEvent<HTMLInputElement>): void {
+    props.setTouched();
     (props.attainment[props.fieldData.fieldId] as unknown) = event.target.value;
     props.setAttainmentTree(structuredClone(props.attainmentTree));
   }
@@ -35,7 +37,7 @@ export default function StringTextField(props: {
       margin='normal'
       value={props.value}
       sx={{
-        marginTop: 0,
+        mt: 0,
         width: '100%'
       }}
       onChange={handleChange}
@@ -48,5 +50,6 @@ StringTextField.propTypes = {
   setAttainmentTree: PropTypes.func,
   attainment: PropTypes.object,
   value: PropTypes.string,
-  fieldData: PropTypes.object
+  fieldData: PropTypes.object,
+  setTouched: PropTypes.func
 };

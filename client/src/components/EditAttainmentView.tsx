@@ -18,6 +18,7 @@ import {
   useGetAttainment
 } from '../hooks/useApi';
 import { State } from '../types';
+import UnsavedChangesDialog from './alerts/UnsavedChangesDialog';
 
 export default function EditAttainmentView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
@@ -36,6 +37,9 @@ export default function EditAttainmentView(): JSX.Element {
    */
   const [attainmentTree, setAttainmentTree]: State<AttainmentData | null> =
     useState<AttainmentData | null>(null);
+
+  const [showDialog, setShowDialog]: State<boolean> = useState(false);
+  const [fieldTouched, setFieldTouched]: State<boolean> =useState<boolean>(false);
 
   // If an attainment is being edited, this query is enabled
   const attainment: UseQueryResult<AttainmentData> = useGetAttainment(
@@ -79,6 +83,10 @@ export default function EditAttainmentView(): JSX.Element {
     const id: number = temporaryId;
     setTemporaryId(temporaryId - 1);
     return id;
+  }
+
+  function setTouched(): void {
+    setFieldTouched(true);
   }
 
   function deleteAttainmentEnqueue(attainment: AttainmentData): void {
@@ -226,6 +234,7 @@ export default function EditAttainmentView(): JSX.Element {
                   deleteAttainment={deleteAttainmentEnqueue}
                   getTemporaryId={getTemporaryId}
                   attainment={attainmentTree}
+                  setTouched={setTouched}
                 />
               )
             }
@@ -255,7 +264,7 @@ export default function EditAttainmentView(): JSX.Element {
               (modification === 'edit') && (
                 <Button
                   size='medium'
-                  variant='outlined'
+                  variant='contained'
                   color='error'
                   onClick={(): void => setOpenConfDialog(true)}
                   sx={{ ml: 2 }}
@@ -271,7 +280,18 @@ export default function EditAttainmentView(): JSX.Element {
               alignItems: 'center',
               gap: 1
             }}>
-              <Button size='medium' variant='outlined' onClick={(): void => navigate(-1)}>
+              <Button
+                size='medium'
+                variant='outlined'
+                color={fieldTouched ? 'error' : 'primary'}
+                onClick={(): void => {
+                  if (fieldTouched) {
+                    setShowDialog(true);
+                  } else {
+                    navigate(-1);
+                  }
+                }}
+              >
                 Cancel
               </Button>
               <Button
@@ -286,6 +306,11 @@ export default function EditAttainmentView(): JSX.Element {
             </Box>
           </Box>
         </form>
+        <UnsavedChangesDialog
+          setOpen={setShowDialog}
+          open={showDialog}
+          handleDiscard={(): void => navigate(-1)}
+        />
       </Container>
     </>
   );
