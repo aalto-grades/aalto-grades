@@ -11,4 +11,6 @@ INSERT INTO public.course (course_code, min_credits, max_credits, created_at, up
 ('MS-A0102', 5, 5, NOW(), NOW()),
 ('CS-E4580', 5, 5, NOW(), NOW()),
 ('ELEC-A7100', 5, 5, NOW(), NOW()),
-('PHYS-A1140', 5, 5, NOW(), NOW());
+('PHYS-A1140', 5, 5, NOW(), NOW()),
+('Test edit course', 5, 5, NOW(), NOW()),
+('Test edit course and teachers', 5, 5, NOW(), NOW());

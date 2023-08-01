@@ -29,4 +29,10 @@ INSERT INTO public.course_translation (course_id, language, department, course_n
 (8, 'SV', 'Institutionen för kommunikations- och nätverksteknik', 'C Programming', NOW(), NOW()),
 (9, 'EN', 'Department of Applied Physics', 'Structure of Matter (SCI)', NOW(), NOW()),
 (9, 'FI', 'Teknillisen fysiikan laitos', 'Aineen rakenne (SCI)', NOW(), NOW()),
-(9, 'SV', 'Institutionen för teknisk fysikk', 'Materiens struktur (SCI)', NOW(), NOW());
+(9, 'SV', 'Institutionen för teknisk fysikk', 'Materiens struktur (SCI)', NOW(), NOW()),
+(10, 'EN', 'unedited department', 'unedited name', NOW(), NOW()),
+(10, 'FI', 'muokkaamaton laitos', 'muokkaamaton nimi', NOW(), NOW()),
+(10, 'SV', 'oredigerad institutionen', 'oredigerad namn', NOW(), NOW()),
+(11, 'EN', 'unedited department', 'unedited name', NOW(), NOW()),
+(11, 'FI', 'muokkaamaton laitos', 'muokkaamaton nimi', NOW(), NOW()),
+(11, 'SV', 'oredigerad institutionen', 'oredigerad namn', NOW(), NOW());

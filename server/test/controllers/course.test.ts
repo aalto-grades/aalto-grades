@@ -2,10 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpCode } from 'aalto-grades-common/types';
+import { CourseData, HttpCode } from 'aalto-grades-common/types';
 import supertest from 'supertest';
 
 import { app } from '../../src/app';
+import { findCourseFullById, parseCourseFull } from '../../src/controllers/utils/course';
 import { Cookies, getCookies } from '../util/getCookies';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
@@ -257,11 +258,91 @@ describe('Test POST /v1/courses - create new course', () => {
 
 describe ('Test PUT /v1/courses/:courseId - edit course', () => {
 
+  async function checkCourseData(
+    courseId: number, expected: CourseData
+  ): Promise<void> {
+    expect(parseCourseFull(await findCourseFullById(
+      courseId, HttpCode.InternalServerError
+    ))).toStrictEqual(expected);
+  }
+
   it('should successfully update course information', async () => {
-    // TODO
+    const course: CourseData = {
+      id: 10,
+      courseCode: 'Test edit course',
+      minCredits: 5,
+      maxCredits: 5,
+      teachersInCharge: [
+        {
+          id: 50,
+          name: 'Everett Dennis'
+        }
+      ],
+      department: {
+        fi: 'muokkaamaton laitos',
+        en: 'unedited department',
+        sv: 'oredigerad institutionen'
+      },
+      name: {
+        fi: 'muokkaamaton nimi',
+        en: 'unedited name',
+        sv: 'oredigerad namn'
+      },
+      evaluationInformation: {
+        fi: '',
+        en: '',
+        sv: ''
+      }
+    };
+
+    checkCourseData(10, course);
+
+    const res: supertest.Response = await request
+      .put('/v1/courses/10')
+      .send({
+        courseCode: 'edited',
+        minCredits: 1,
+        maxCredits: 10,
+        department: {
+          fi: 'muokattu laitos',
+          en: 'edited department',
+          sv: 'redigerad institutionen'
+        },
+        name: {
+          fi: 'muokattu nimi',
+          en: 'edited name',
+          sv: 'redigerad namn'
+        }
+      })
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    course.courseCode = 'edited';
+    course.minCredits = 1;
+    course.maxCredits = 10;
+    course.department = {
+      fi: 'muokattu laitos',
+      en: 'edited department',
+      sv: 'redigerad institutionen'
+    };
+    course.name = {
+      fi: 'muokattu nimi',
+      en: 'edited name',
+      sv: 'redigerad namn'
+    };
+
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data).toBeDefined();
+    expect(res.body.data).toStrictEqual(course);
+    checkCourseData(10, course);
   });
 
   it('should successfully update course information and teachers in charge', async () => {
+    // TODO
+  });
+
+  it('should successfully update individual parts of course information', async () => {
     // TODO
   });
 

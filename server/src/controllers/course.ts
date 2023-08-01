@@ -2,7 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseData, HttpCode, Language, UserData } from 'aalto-grades-common/types';
+import {
+  CourseData, HttpCode, Language, LocalizedString, UserData
+} from 'aalto-grades-common/types';
 import { Request, Response } from 'express';
 import { Transaction } from 'sequelize';
 import * as yup from 'yup';
@@ -165,19 +167,26 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
   const courseId: number = (await idSchema.validate({ id: req.params.courseId })).id;
   await findCourseById(courseId, HttpCode.NotFound);
 
-  const newTeachers: Array<User> = await validateEmailList(
-    req.body.teachersInCharge.map(
-      (teacher: UserData) => teacher.email
-    )
-  );
+  const courseCode: string | undefined = req.body.courseCode;
+  const minCredits: number | undefined = req.body.minCredits;
+  const maxCredits: number | undefined = req.body.maxCredits;
+  const teachersInCharge: Array<UserData> | undefined = req.body.teachersInCharge;
+  const department: LocalizedString | undefined = req.body.department;
+  const name: LocalizedString | undefined = req.body.name;
+
+  const newTeachers: Array<User> | null = teachersInCharge ? await validateEmailList(
+    // teacher.email was alread validated to be defined by Yup.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    teachersInCharge.map((teacher: UserData) => teacher.email!)
+  ) : null;
 
   await sequelize.transaction(
     async (t: Transaction): Promise<void> => {
       await Course.update(
         {
-          courseCode: req.body.courseCode,
-          minCredits: req.body.minCredits,
-          maxCredits: req.body.maxCredits
+          courseCode: courseCode,
+          minCredits: minCredits,
+          maxCredits: maxCredits
         },
         {
           where: {
@@ -192,8 +201,8 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
       ): Promise<void> {
         await CourseTranslation.update(
           {
-            department: req.body.department[key],
-            courseName: req.body.name[key]
+            department: department ? department[key] : undefined,
+            courseName: name ? name[key] : undefined
           },
           {
             where: {
@@ -209,40 +218,42 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
       await updateTranslation(Language.Finnish, 'fi');
       await updateTranslation(Language.Swedish, 'sv');
 
-      const oldTeachers: Array<TeacherInCharge> = await TeacherInCharge.findAll({
-        where: {
-          courseId: courseId
-        }
-      });
-
-      // Delete teachers who are not in the newTeachers array.
-      for (const oldTeacher of oldTeachers) {
-        // Does oldTeacher exist in the newTeachers array?
-        const existingTeacherIndex: number | undefined =
-          newTeachers.findIndex((newTeacher: User) => {
-            return newTeacher.id === oldTeacher.userId;
-          });
-
-        if (existingTeacherIndex) {
-          // If yes, nothing needs to be done. Just remove oldTeacher from the
-          // newTeachers array because it doesn't need to be considered further.
-          newTeachers.splice(existingTeacherIndex, 1);
-        } else {
-          // If not, oldTeacher needs to be removed from the database.
-          oldTeacher.destroy({ transaction: t });
-        }
-      }
-
-      // Add teachers who are in the newTeachers array but not in the database.
-      await TeacherInCharge.bulkCreate(
-        newTeachers.map((user: User) => {
-          return {
-            userId: user.id,
+      if (newTeachers) {
+        const oldTeachers: Array<TeacherInCharge> = await TeacherInCharge.findAll({
+          where: {
             courseId: courseId
-          };
-        }),
-        { transaction: t }
-      );
+          }
+        });
+
+        // Delete teachers who are not in the newTeachers array.
+        for (const oldTeacher of oldTeachers) {
+          // Does oldTeacher exist in the newTeachers array?
+          const existingTeacherIndex: number | undefined =
+            newTeachers.findIndex((newTeacher: User) => {
+              return newTeacher.id === oldTeacher.userId;
+            });
+
+          if (existingTeacherIndex) {
+            // If yes, nothing needs to be done. Just remove oldTeacher from the
+            // newTeachers array because it doesn't need to be considered further.
+            newTeachers.splice(existingTeacherIndex, 1);
+          } else {
+            // If not, oldTeacher needs to be removed from the database.
+            oldTeacher.destroy({ transaction: t });
+          }
+        }
+
+        // Add teachers who are in the newTeachers array but not in the database.
+        await TeacherInCharge.bulkCreate(
+          newTeachers.map((user: User) => {
+            return {
+              userId: user.id,
+              courseId: courseId
+            };
+          }),
+          { transaction: t }
+        );
+      }
     }
   );
 

@@ -21,4 +21,8 @@ INSERT INTO public.teacher_in_charge (user_id, course_id, created_at, updated_at
 (2504, 5, NOW(), NOW()),
 (80, 8, NOW(), NOW()),
 (81, 8, NOW(), NOW()),
-(82, 8, NOW(), NOW());
+(82, 8, NOW(), NOW()),
+(50, 10, NOW(), NOW()),
+(100, 11, NOW(), NOW()),
+(200, 11, NOW(), NOW()),
+(300, 11, NOW(), NOW());
