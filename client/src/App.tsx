@@ -183,7 +183,7 @@ export default function App(): JSX.Element {
                 {/* Pages that are only authorised for admin */}
                 <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
                   <Route
-                    path='/create-course'
+                    path='/course/:modification/:courseId'
                     element={<EditCourseView />}
                   />
                 </Route>
