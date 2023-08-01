@@ -82,7 +82,7 @@ export function useGetFinalGrades(
   });
 }
 
-export function useGetFinalGradesUser(
+export function useGetGradeTreeOfUser(
   courseId: Numeric,
   assessmentModelId: Numeric,
   userId: Numeric,
