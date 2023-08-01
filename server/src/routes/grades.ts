@@ -10,7 +10,7 @@ import path from 'path';
 
 import {
   addGrades, calculateGrades, getCsvTemplate,
-  getFinalGrades, getSisuFormattedGradingCSV, getUserAttainmentModelGrades
+  getFinalGrades, getSisuFormattedGradingCSV, getGradeTreeOfUser
 } from '../controllers/grades';
 import { handleInvalidRequestJson } from '../middleware';
 import { controllerDispatcher } from '../middleware/errorHandler';
@@ -342,7 +342,7 @@ router.get(
 router.get(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/user/:userId',
   passport.authenticate('jwt', { session: false }),
-  controllerDispatcher(getUserAttainmentModelGrades)
+  controllerDispatcher(getGradeTreeOfUser)
 );
 
 /**
