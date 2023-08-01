@@ -26,4 +26,7 @@ INSERT INTO public.course_translation (course_id, language, department, course_n
 (7, 'SV', 'Institutionen för datateknik', 'Programming Parallel Computers D', NOW(), NOW()),
 (8, 'EN', 'Department of Information and Communications Engineering', 'C Programming', NOW(), NOW()),
 (8, 'FI', 'Tietoliikenne- ja tietoverkkotekniikan laitos', 'C Programming', NOW(), NOW()),
-(8, 'SV', 'Institutionen för kommunikations- och nätverksteknik', 'C Programming', NOW(), NOW());
+(8, 'SV', 'Institutionen för kommunikations- och nätverksteknik', 'C Programming', NOW(), NOW()),
+(9, 'EN', 'Department of Applied Physics', 'Structure of Matter (SCI)', NOW(), NOW()),
+(9, 'FI', 'Teknillisen fysiikan laitos', 'Aineen rakenne (SCI)', NOW(), NOW()),
+(9, 'SV', 'Institutionen för teknisk fysikk', 'Materiens struktur (SCI)', NOW(), NOW());
