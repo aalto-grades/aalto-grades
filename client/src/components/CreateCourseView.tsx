@@ -133,12 +133,11 @@ export default function CreateCourseView(): JSX.Element {
           })}
           onSubmit={handleSubmit}
         >
-          {({ errors, handleChange, isSubmitting, isValid, touched, values, initialValues }:
+          {({ errors, handleChange, isSubmitting, touched, values, initialValues }:
             {
               errors: FormikErrors<FormData>,
               handleChange: (e: React.ChangeEvent<Element>) => void,
               isSubmitting: boolean,
-              isValid: boolean,
               touched: FormikTouched<FormData>,
               values: FormData,
               initialValues: FormData
@@ -379,6 +378,7 @@ export default function CreateCourseView(): JSX.Element {
                 <Button
                   size='medium'
                   variant='outlined'
+                  color={initialValues != values ? 'error': 'primary'}
                   disabled={isSubmitting}
                   onClick={(): void => {
                     if (initialValues != values) {
@@ -395,7 +395,7 @@ export default function CreateCourseView(): JSX.Element {
                   size='medium'
                   variant='contained'
                   type='submit'
-                  disabled={!isValid || teachersInCharge.length === 0 || isSubmitting}
+                  disabled={isSubmitting}
                 >
                   Submit
                   {isSubmitting && (
