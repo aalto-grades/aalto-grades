@@ -6,8 +6,7 @@ import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
 import {
   Delete as DeleteIcon,
   PersonAddAlt1 as PersonAddAlt1Icon,
-  Person as PersonIcon,
-  Send as SendIcon
+  Person as PersonIcon
 } from '@mui/icons-material';
 import {
   Avatar, Box, Button, CircularProgress, Container, IconButton,
@@ -397,7 +396,6 @@ export default function CreateCourseView(): JSX.Element {
                   variant='contained'
                   type='submit'
                   disabled={!isValid || teachersInCharge.length === 0 || isSubmitting}
-                  endIcon={<SendIcon />}
                 >
                   Submit
                   {isSubmitting && (
