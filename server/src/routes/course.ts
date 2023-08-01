@@ -6,7 +6,7 @@ import express, { Router } from 'express';
 import passport from 'passport';
 
 import { SystemRole } from 'aalto-grades-common/types';
-import { addCourse, getAllCourses, getCourse } from '../controllers/course';
+import { addCourse, editCourse, getAllCourses, getCourse } from '../controllers/course';
 import { handleInvalidRequestJson } from '../middleware';
 import { authorization } from '../middleware/authorization';
 import { controllerDispatcher } from '../middleware/errorHandler';
@@ -212,7 +212,7 @@ router.get(
  *         $ref: '#/components/responses/AuthenticationError'
  *       403:
  *         $ref: '#/components/responses/AuthorizationError'
- *       404:
+ *       422:
  *         description: Teacher(s) not found based on email.
  *         content:
  *           application/json:
@@ -228,4 +228,72 @@ router.post(
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(addCourse)
+);
+
+/**
+ * @swagger
+ * /v1/courses:
+ *   put:
+ *     tags: [Course]
+ *     description: Edit an existing course. Only for users with admin rights.
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               courseCode:
+ *                 $ref: '#/definitions/CourseCode'
+ *               minCredits:
+ *                 $ref: '#/definitions/MinCredits'
+ *               maxCredits:
+ *                 $ref: '#/definitions/MaxCredits'
+ *               department:
+ *                 $ref: '#/definitions/LocalizedString'
+ *               name:
+ *                 $ref: '#/definitions/LocalizedString'
+ *               teachersInCharge:
+ *                 $ref: '#/definitions/TeachersInCharge'
+ *     responses:
+ *       200:
+ *         description: The course was successfully edited.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   $ref: '#/definitions/CourseData'
+ *       400:
+ *         description: A validation error has occurred in the request body.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
+ *       403:
+ *         $ref: '#/components/responses/AuthorizationError'
+ *       404:
+ *         description: A course with the given ID was not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       422:
+ *         description: Teacher(s) not found based on email.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *     security:
+ *       - cookieAuth: []
+ */
+router.put(
+  '/v1/courses/:courseId',
+  passport.authenticate('jwt', { session: false }),
+  authorization([SystemRole.Admin]),
+  express.json(),
+  handleInvalidRequestJson,
+  controllerDispatcher(editCourse)
 );
