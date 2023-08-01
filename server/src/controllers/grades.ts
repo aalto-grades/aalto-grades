@@ -163,6 +163,7 @@ async function getFinalGradesFor(
     );
   }
 
+  // Filter duplicates.
   finalGrades = finalGrades.filter(
     (obj: FinalGradeRaw, index: number) =>
       finalGrades.findIndex((item: FinalGradeRaw) => item.User.id === obj.User.id) === index
