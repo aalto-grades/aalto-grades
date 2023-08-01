@@ -20,12 +20,8 @@ export async function getCourse(req: Request, res: Response): Promise<void> {
   const courseId: number = Number(req.params.courseId);
   await idSchema.validate({ id: courseId });
 
-  const course: CourseFull = await findCourseFullById(
-    courseId, HttpCode.NotFound
-  );
-
   res.status(HttpCode.Ok).json({
-    data: parseCourseFull(course)
+    data: parseCourseFull(await findCourseFullById(courseId, HttpCode.NotFound))
   });
 }
 
@@ -52,6 +48,33 @@ export async function getAllCourses(req: Request, res: Response): Promise<void> 
   });
 }
 
+async function validateEmailList(emailList: Array<string>): Promise<Array<User>> {
+  const teachers: Array<User> = await User.findAll({
+    attributes: ['id', 'email'],
+    where: {
+      email: emailList
+    }
+  });
+
+  // Check for non existent emails.
+  if (emailList.length !== teachers.length) {
+    const missingEmails: Array<string> = emailList.filter(
+      (teacher: string) => {
+        return teachers.map((user: User) => user.email).indexOf(teacher) === -1;
+      }
+    );
+
+    throw new ApiError(
+      missingEmails.map((email: string) => {
+        return `No user with email address ${email} found`;
+      }),
+      HttpCode.NotFound
+    );
+  }
+
+  return teachers;
+}
+
 export async function addCourse(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     courseCode: yup.string().required(),
@@ -68,29 +91,11 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
 
   await requestSchema.validate(req.body, { abortEarly: false });
 
-  const emailList: Array<string> = req.body.teachersInCharge.map(
-    (teacher: UserData) => teacher.email
+  const teachers: Array<User> = await validateEmailList(
+    req.body.teachersInCharge.map(
+      (teacher: UserData) => teacher.email
+    )
   );
-
-  const teachers: Array<User> = await User.findAll({
-    attributes: ['id', 'email'],
-    where: {
-      email: emailList
-    }
-  });
-
-  // Check for non existent emails.
-  if (emailList.length !== teachers.length) {
-    const missingEmails: Array<string> =
-      emailList.filter(
-        (teacher: string) => teachers.map((user: User) => user.email).indexOf(teacher) === -1
-      );
-
-    throw new ApiError(
-      missingEmails.map((email: string) => `No user with email address ${email} found`),
-      HttpCode.NotFound
-    );
-  }
 
   const course: Course = await sequelize.transaction(
     async (t: Transaction): Promise<Course> => {
@@ -134,7 +139,8 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
       await TeacherInCharge.bulkCreate(teachersInCharge, { transaction: t });
 
       return course;
-    });
+    }
+  );
 
   res.status(HttpCode.Ok).json({
     data: course.id
@@ -157,8 +163,90 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
 
   await requestSchema.validate(req.body, { abortEarly: false });
   const courseId: number = (await idSchema.validate({ id: req.params.courseId })).id;
+  await findCourseById(courseId, HttpCode.NotFound);
 
-  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
+  const newTeachers: Array<User> = await validateEmailList(
+    req.body.teachersInCharge.map(
+      (teacher: UserData) => teacher.email
+    )
+  );
 
-  res.status(HttpCode.Ok);
+  await sequelize.transaction(
+    async (t: Transaction): Promise<void> => {
+      await Course.update(
+        {
+          courseCode: req.body.courseCode,
+          minCredits: req.body.minCredits,
+          maxCredits: req.body.maxCredits
+        },
+        {
+          where: {
+            id: courseId
+          },
+          transaction: t
+        }
+      );
+
+      async function updateTranslation(
+        language: Language, key: 'en' | 'fi' | 'sv'
+      ): Promise<void> {
+        await CourseTranslation.update(
+          {
+            department: req.body.department[key],
+            courseName: req.body.name[key]
+          },
+          {
+            where: {
+              courseId: courseId,
+              language: language
+            },
+            transaction: t
+          }
+        );
+      }
+
+      await updateTranslation(Language.English, 'en');
+      await updateTranslation(Language.Finnish, 'fi');
+      await updateTranslation(Language.Swedish, 'sv');
+
+      const oldTeachers: Array<TeacherInCharge> = await TeacherInCharge.findAll({
+        where: {
+          courseId: courseId
+        }
+      });
+
+      // Delete teachers who are not in the newTeachers array.
+      for (const oldTeacher of oldTeachers) {
+        // Does oldTeacher exist in the newTeachers array?
+        const existingTeacherIndex: number | undefined =
+          newTeachers.findIndex((newTeacher: User) => {
+            return newTeacher.id === oldTeacher.userId
+          });
+
+        if (existingTeacherIndex) {
+          // If yes, nothing needs to be done. Just remove oldTeacher from the
+          // newTeachers array because it doesn't need to be considered further.
+          newTeachers.splice(existingTeacherIndex, 1);
+        } else {
+          // If not, oldTeacher needs to be removed from the database.
+          oldTeacher.destroy({ transaction: t });
+        }
+      }
+
+      // Add teachers who are in the newTeachers array but not in the database.
+      await TeacherInCharge.bulkCreate(
+        newTeachers.map((user: User) => {
+          return {
+            userId: user.id,
+            courseId: courseId
+          }
+        }),
+        { transaction: t }
+      );
+    }
+  );
+
+  res.status(HttpCode.Ok).json({
+    data: parseCourseFull(await findCourseFullById(courseId, HttpCode.NotFound))
+  });
 }
