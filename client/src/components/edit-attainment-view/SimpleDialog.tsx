@@ -94,7 +94,11 @@ export default function SimpleDialog(props: {
             />
           </DialogContent>
           <DialogActions>
-            <Button size='medium' onClick={props.handleClose}>
+            <Button
+              size='medium'
+              variant='outlined'
+              onClick={props.handleClose}
+            >
               Cancel
             </Button>
             <Button

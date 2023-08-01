@@ -292,7 +292,7 @@ export default function EditInstanceView(): JSX.Element {
                         type='submit'
                         disabled={!isValid || isSubmitting}
                       >
-                        Confirm Details
+                        Submit
                       </Button>
                     </Box>
                   </Form>
