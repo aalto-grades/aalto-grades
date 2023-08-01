@@ -165,7 +165,7 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
 
   await requestSchema.validate(req.body, { abortEarly: false });
   const courseId: number = (await idSchema.validate({ id: req.params.courseId })).id;
-  await findCourseById(courseId, HttpCode.NotFound);
+  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
 
   const courseCode: string | undefined = req.body.courseCode;
   const minCredits: number | undefined = req.body.minCredits;
@@ -173,6 +173,20 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
   const teachersInCharge: Array<UserData> | undefined = req.body.teachersInCharge;
   const department: LocalizedString | undefined = req.body.department;
   const name: LocalizedString | undefined = req.body.name;
+
+  if (minCredits && !maxCredits && minCredits > course.maxCredits) {
+    throw new ApiError(
+      `without updating max credits, new min credits (${minCredits}) can't be`
+      + ` larger than existing max credits (${course.maxCredits})`,
+      HttpCode.BadRequest
+    );
+  } else if (maxCredits && !minCredits && maxCredits < course.minCredits) {
+    throw new ApiError(
+      `without updating min credits, new max credits (${maxCredits}) can't be`
+      + ` smaller than existing min credits (${course.minCredits})`,
+      HttpCode.BadRequest
+    );
+  }
 
   const newTeachers: Array<User> | null = teachersInCharge ? await validateEmailList(
     // teacher.email was alread validated to be defined by Yup.
@@ -228,12 +242,12 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
         // Delete teachers who are not in the newTeachers array.
         for (const oldTeacher of oldTeachers) {
           // Does oldTeacher exist in the newTeachers array?
-          const existingTeacherIndex: number | undefined =
+          const existingTeacherIndex: number =
             newTeachers.findIndex((newTeacher: User) => {
               return newTeacher.id === oldTeacher.userId;
             });
 
-          if (existingTeacherIndex) {
+          if (existingTeacherIndex >= 0) {
             // If yes, nothing needs to be done. Just remove oldTeacher from the
             // newTeachers array because it doesn't need to be considered further.
             newTeachers.splice(existingTeacherIndex, 1);

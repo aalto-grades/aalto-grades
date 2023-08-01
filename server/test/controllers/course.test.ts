@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseData, HttpCode } from 'aalto-grades-common/types';
+import { CourseData, HttpCode, UserData } from 'aalto-grades-common/types';
 import supertest from 'supertest';
 
 import { app } from '../../src/app';
@@ -266,18 +266,15 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
     ))).toStrictEqual(expected);
   }
 
-  it('should successfully update course information', async () => {
-    const course: CourseData = {
-      id: 10,
-      courseCode: 'Test edit course',
+  function uneditedCourseData(
+    courseId: number, courseCode: string, teachersInCharge: Array<UserData>
+  ): CourseData {
+    return {
+      id: courseId,
+      courseCode: courseCode,
       minCredits: 5,
       maxCredits: 5,
-      teachersInCharge: [
-        {
-          id: 50,
-          name: 'Everett Dennis'
-        }
-      ],
+      teachersInCharge: teachersInCharge,
       department: {
         fi: 'muokkaamaton laitos',
         en: 'unedited department',
@@ -294,78 +291,153 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
         sv: ''
       }
     };
+  }
+
+  const courseDataEdits: object = {
+    courseCode: 'edited',
+    minCredits: 3,
+    maxCredits: 7,
+    department: {
+      fi: 'muokattu laitos',
+      en: 'edited department',
+      sv: 'redigerad institutionen'
+    },
+    name: {
+      fi: 'muokattu nimi',
+      en: 'edited name',
+      sv: 'redigerad namn'
+    }
+  };
+
+  it('should successfully update course information', async () => {
+    const course: CourseData = uneditedCourseData(10, 'Test edit course', [
+      { id: 50,  name: 'Everett Dennis' }
+    ]);
 
     checkCourseData(10, course);
 
     const res: supertest.Response = await request
       .put('/v1/courses/10')
+      .send(courseDataEdits)
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data).toBeDefined();
+    expect(res.body.data).toStrictEqual({ ...course, ...courseDataEdits });
+    checkCourseData(10, { ...course, ...courseDataEdits });
+  });
+
+  it('should successfully update course information and teachers in charge', async () => {
+    const course: CourseData = uneditedCourseData(11, 'Test edit course and teachers', [
+      { id: 100, name: 'Larissa Poore' },
+      { id: 200, name: 'Harriet Maestas' },
+      { id: 300, name: 'Charles Morrissey' },
+    ]);
+
+    checkCourseData(11, course);
+
+    const res: supertest.Response = await request
+      .put('/v1/courses/11')
       .send({
-        courseCode: 'edited',
-        minCredits: 1,
-        maxCredits: 10,
-        department: {
-          fi: 'muokattu laitos',
-          en: 'edited department',
-          sv: 'redigerad institutionen'
-        },
-        name: {
-          fi: 'muokattu nimi',
-          en: 'edited name',
-          sv: 'redigerad namn'
-        }
+        ...courseDataEdits,
+        teachersInCharge: [
+          { email: 'larissa.poore@aalto.fi' },
+          { email: 'donald.perez@aalto.fi' }
+        ]
       })
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    course.courseCode = 'edited';
-    course.minCredits = 1;
-    course.maxCredits = 10;
-    course.department = {
-      fi: 'muokattu laitos',
-      en: 'edited department',
-      sv: 'redigerad institutionen'
-    };
-    course.name = {
-      fi: 'muokattu nimi',
-      en: 'edited name',
-      sv: 'redigerad namn'
-    };
+    course.teachersInCharge = [
+      { id: 100, name: 'Larissa Poore' },
+      { id: 101, name: 'Donald Perez' }
+    ];
 
     expect(res.body.errors).not.toBeDefined();
     expect(res.body.data).toBeDefined();
-    expect(res.body.data).toStrictEqual(course);
-    checkCourseData(10, course);
-  });
-
-  it('should successfully update course information and teachers in charge', async () => {
-    // TODO
-  });
-
-  it('should successfully update individual parts of course information', async () => {
-    // TODO
+    expect(res.body.data).toStrictEqual({ ...course, ...courseDataEdits });
+    checkCourseData(11, { ...course, ...courseDataEdits });
   });
 
   it('should respond with 400 bad request, if body validation fails', async () => {
-    // TODO
+    async function badInput(input: object): Promise<void> {
+      const res: supertest.Response = await request
+        .put('/v1/courses/10')
+        .send(input)
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadRequest);
+
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.data).not.toBeDefined();
+    }
+
+    await badInput({
+      teachersInCharge: [
+        { id: 5 }, { email: 'user@email.com' }
+      ]
+    });
+    await badInput({
+      minCredits: 10,
+      maxCredits: 5
+    });
+    await badInput({
+      department: 'wrong',
+      name: false
+    });
+    await badInput({
+      minCredits: -10
+    });
+    await badInput({
+      maxCredits: 1
+    });
+    await badInput({
+      minCredits: 9
+    });
   });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
-    // TODO
+    await request
+      .put('/v1/courses/10')
+      .send(courseDataEdits)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Unauthorized);
   });
 
   it('should respond with 403 forbidden, if not admin user', async () => {
-    // TODO
+    await request
+      .put('/v1/courses/10')
+      .send(courseDataEdits)
+      .set('Cookie', cookies.userCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Forbidden);
   });
 
   it('should respond with 404 not found, if the course ID does not exist', async () => {
-    // TODO
+    await request
+      .put(`/v1/courses/${badId}`)
+      .send(courseDataEdits)
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.NotFound);
   });
 
   it(
     'should respond with 422 unprocessable entity, if teacher email is not found from database',
     async () => {
-      // TODO
+      await request
+        .put('/v1/courses/10')
+        .send({
+          teachersInCharge: [
+            { email: 'this.is.not@a.real.email' }
+          ]
+        })
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.UnprocessableEntity);
     }
   );
 });
