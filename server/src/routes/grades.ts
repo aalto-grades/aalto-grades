@@ -67,9 +67,9 @@ const upload: Multer = multer({
  *         format: int32
  *         minimum: 0
  *         example: 5
- *   AssessmentModelGradingData:
+ *   AttainmentGradingData:
  *     type: object
- *     description: Students grading data for assessment model.
+ *     description: Students grading data for all attainments of the assessment model.
  *     properties:
  *       attainmentId:
  *         $ref: '#/definitions/AttainmentId'
@@ -313,7 +313,7 @@ router.get(
  *                 data:
  *                   type: array
  *                   items:
- *                     $ref: '#/definitions/AssessmentModelGradingData'
+ *                     $ref: '#/definitions/AttainmentGradingData'
  *       400:
  *         description: Fetching failed, due to validation errors in parameters.
  *         content:
