@@ -2509,4 +2509,6 @@ INSERT INTO public.user (email, student_number, password, name, created_at, upda
 ('jolene.jenkins@aalto.fi', '497596', 'knsccbfyejkgahkkcjybqcasjmpwtmrdbihwsiuzgxlekkkfvwiaffzcogsy', 'Jolene Jenkins', '2022-3-8', '2021-8-3', 'USER'),
 ('jolene.jenkins@teacherincharge.fi', '4975961', 'knsccbfyejkgahkkcjybqcasjmpwtmrdbihwsiuzgxlekkkfvwiaffzcogsy', 'Jolene Jenkins', '2022-3-8', '2021-8-3', 'USER'),
 ('jolene.jenkins@courseinstancerole.fi', '4975962', 'knsccbfyejkgahkkcjybqcasjmpwtmrdbihwsiuzgxlekkkfvwiaffzcogsy', 'Jolene Jenkins', '2022-3-8', '2021-8-3', 'USER'),
-('jolene.jenkins@both.fi', '4975963', 'knsccbfyejkgahkkcjybqcasjmpwtmrdbihwsiuzgxlekkkfvwiaffzcogsy', 'Jolene Jenkins', '2022-3-8', '2021-8-3', 'USER');
+('jolene.jenkins@both.fi', '4975963', 'knsccbfyejkgahkkcjybqcasjmpwtmrdbihwsiuzgxlekkkfvwiaffzcogsy', 'Jolene Jenkins', '2022-3-8', '2021-8-3', 'USER'),
+('teacher@aalto.fi', '123456', '$argon2i$v=19$m=4096,t=3,p=1$8GviC+qQHFqBG1PJZd+PCg$jWayurCVLCvJPn//oNR+5UIiQWqMhpNRJbrLaqIk1gM', 'Timmy Teacher', '2023-1-23', '2023-1-24', 'USER'),
+('admin@aalto.fi', NULL, '$argon2i$v=19$m=4096,t=3,p=1$8GviC+qQHFqBG1PJZd+PCg$jWayurCVLCvJPn//oNR+5UIiQWqMhpNRJbrLaqIk1gM', 'Andy Admin', '2023-1-23', '2023-1-24', 'ADMIN');
