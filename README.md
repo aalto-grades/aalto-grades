@@ -36,6 +36,22 @@ $ export POSTGRES_PASSWORD=XXXX
 $ docker-compose up
 ```
 
+When developing or demonstrating the system, you may use one of the premade
+user accounts for this purpose. There are two such accounts, an admin account
+and a teacher account.
+
+Admin user credentials:
+```
+username: admin@aalto.fi
+password: password
+```
+
+Teacher user credentials:
+```
+username: teacher@aalto.fi
+password: password
+```
+
 ## Development environment
 
 As one of the developers: in order to access the development environment, you
@@ -72,18 +88,3 @@ $ ssh -F ssh.config grades
   - Backend is at `localhost:3000`
   -	Frontend is at `localhost:3005`
   -	Adminer is at `localhost:8080`
-
-
-5. Frontend has 2 demo users, admin and teacher user.
-
-    Admin user credentials:
-    ```
-    username: admin@aalto.fi
-    password: password
-    ```
-
-    Teacher user credentials:
-    ```
-    username: teacher@aalto.fi
-    password: password
-    ```
