@@ -47,7 +47,3 @@ export default function StudentGradeList(props: {
     </Box>
   );
 }
-
-StudentGradeList.propTypes = {
-  attainment: PropTypes.object
-};
