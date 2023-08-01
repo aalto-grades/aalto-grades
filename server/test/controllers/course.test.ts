@@ -71,7 +71,6 @@ describe('Test GET /v1/courses/:courseId - get course by ID', () => {
 
 });
 
-
 describe('Test GET /v1/courses - get all courses', () => {
 
   it('should respond with correct data', async () => {
@@ -198,38 +197,41 @@ describe('Test POST /v1/courses - create new course', () => {
       .expect(HttpCode.Forbidden);
   });
 
-  it('should respond with 404 not found, if teacher email not found from database', async () => {
-    const input: object = {
-      courseCode: 'ELEC-A7200',
-      minCredits: 5,
-      maxCredits: 5,
-      teachersInCharge: [
-        {
-          email: 'not.found@aalto.fi'
+  it(
+    'should respond with 422 unprocessable entity, if teacher email is not found from database',
+    async () => {
+      const input: object = {
+        courseCode: 'ELEC-A7200',
+        minCredits: 5,
+        maxCredits: 5,
+        teachersInCharge: [
+          {
+            email: 'not.found@aalto.fi'
+          }
+        ],
+        department: {
+          fi: 'Sähkötekniikan korkeakoulu',
+          en: 'School of Electrical Engineering',
+          sv: 'Högskolan för elektroteknik'
+        },
+        name: {
+          fi: 'Signaalit ja järjestelmät',
+          en: 'Signals and Systems',
+          sv: ''
         }
-      ],
-      department: {
-        fi: 'Sähkötekniikan korkeakoulu',
-        en: 'School of Electrical Engineering',
-        sv: 'Högskolan för elektroteknik'
-      },
-      name: {
-        fi: 'Signaalit ja järjestelmät',
-        en: 'Signals and Systems',
-        sv: ''
-      }
-    };
+      };
 
-    const res: supertest.Response = await request
-      .post('/v1/courses').send(input)
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.NotFound);
+      const res: supertest.Response = await request
+        .post('/v1/courses').send(input)
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.UnprocessableEntity);
 
-    expect(res.body.errors).toBeDefined();
-    expect(res.body.errors[0]).toBe('No user with email address not.found@aalto.fi found');
-    expect(res.body.data).not.toBeDefined();
-  });
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors[0]).toBe('No user with email address not.found@aalto.fi found');
+      expect(res.body.data).not.toBeDefined();
+    }
+  );
 
   /* TODO: move next test case elsewhere in future, after refactoring commonly
    * reusable functionality (e.g. middleware) to their own modules / functions
@@ -251,4 +253,38 @@ describe('Test POST /v1/courses - create new course', () => {
     );
   });
 
+});
+
+describe ('Test PUT /v1/courses/:courseId - edit course', () => {
+
+  it('should successfully update course information', async () => {
+    // TODO
+  });
+
+  it('should successfully update course information and teachers in charge', async () => {
+    // TODO
+  });
+
+  it('should respond with 400 bad request, if body validation fails', async () => {
+    // TODO
+  });
+
+  it('should respond with 401 unauthorized, if not logged in', async () => {
+    // TODO
+  });
+
+  it('should respond with 403 forbidden, if not admin user', async () => {
+    // TODO
+  });
+
+  it('should respond with 404 not found, if the course ID does not exist', async () => {
+    // TODO
+  });
+
+  it(
+    'should respond with 422 unprocessable entity, if teacher email is not found from database',
+    async () => {
+      // TODO
+    }
+  );
 });

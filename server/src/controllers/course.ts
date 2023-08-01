@@ -68,7 +68,7 @@ async function validateEmailList(emailList: Array<string>): Promise<Array<User>>
       missingEmails.map((email: string) => {
         return `No user with email address ${email} found`;
       }),
-      HttpCode.NotFound
+      HttpCode.UnprocessableEntity
     );
   }
 
@@ -220,7 +220,7 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
         // Does oldTeacher exist in the newTeachers array?
         const existingTeacherIndex: number | undefined =
           newTeachers.findIndex((newTeacher: User) => {
-            return newTeacher.id === oldTeacher.userId
+            return newTeacher.id === oldTeacher.userId;
           });
 
         if (existingTeacherIndex) {
@@ -239,7 +239,7 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
           return {
             userId: user.id,
             courseId: courseId
-          }
+          };
         }),
         { transaction: t }
       );
