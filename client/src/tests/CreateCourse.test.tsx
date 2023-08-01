@@ -45,7 +45,7 @@ describe('Tests for CreateCourseView components', () => {
       expect(screen.getByLabelText('Teachers In Charge*')).toBeDefined();
       expect(screen.getByText('Add')).toBeDefined();
       expect(screen.getByText('Cancel')).toBeDefined();
-      expect(screen.getByText('Create Course')).toBeDefined();
+      expect(screen.getByText('Submit')).toBeDefined();
     }
   );
 
@@ -80,7 +80,7 @@ describe('Tests for CreateCourseView components', () => {
     act(() => userEvent.type(screen.getByLabelText('Teachers In Charge*'), testTeacher));
 
     act(() => userEvent.click(screen.getByText('Add')));
-    act(() => userEvent.click(screen.getByText('Create Course')));
+    act(() => userEvent.click(screen.getByText('Submit')));
 
     await waitFor(() => {
       expect(addCourse).toHaveBeenCalledTimes(1);
