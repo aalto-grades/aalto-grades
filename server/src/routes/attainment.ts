@@ -36,6 +36,10 @@ export const router: Router = Router();
  *     type: string
  *     description: A unique user-facing identifier for an attainment.
  *     example: a-plus-exercise-1.2
+ *   AttainmentName:
+ *     type: string
+ *     description: Study attainment name.
+ *     example: Exam attainment 1.1
  *   AddAndEditAttainment:
  *     type: object
  *     description: >
@@ -50,10 +54,8 @@ export const router: Router = Router();
  *           belongs to.
  *         example: 1
  *       name:
- *         type: string
+ *         $ref: '#/definitions/AttainmentName'
  *         required: true
- *         description: Study attainment name.
- *         example: Exam attainment 1.1
  *       tag:
  *         $ref: '#/definitions/AttainmentTag'
  *       daysValid:
