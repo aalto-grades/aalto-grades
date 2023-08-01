@@ -11,7 +11,6 @@ import PropTypes from 'prop-types';
 import { Params, useParams } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 
-import AlertSnackbar from '../alerts/AlertSnackbar';
 import StudentGradeList from './StudentGradeList';
 
 import { useGetFinalGradesUser } from '../../hooks/useApi';

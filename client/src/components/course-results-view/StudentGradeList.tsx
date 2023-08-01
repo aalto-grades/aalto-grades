@@ -2,9 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentGradeData } from 'aalto-grades-common/types';
+import { AttainmentGradeData, Status } from 'aalto-grades-common/types';
 import { Box, Typography } from '@mui/material';
-import PropTypes from 'prop-types';
 import { JSX } from 'react';
 import StudentGradeAccordion from './StudentGradeAccordion';
 
@@ -25,25 +24,21 @@ export default function StudentGradeList(props: {
           </span>
         </Typography>
         <Typography align='left' variant='body2'>
-          {`Grade: ${props.grades.grade} Status: ${props.grades.status}`}
+          {'Grade: ' + (
+            props.grades.grade
+              ? `${props.grades.grade} - ${props.grades.status}`
+              : Status.Pending
+          )}
         </Typography>
       </Box>
-      <Box sx={{
-        display: 'flex', flexDirection: 'row', flexWrap: 'wrap',
-        justifyContent: 'space-between', alignItems: 'center', pl: '21px',
-        pr: '6px', pt: '8px'
-      }}>
-        {
-          props.grades.subAttainments?.map((subAttainment: AttainmentGradeData) => {
-            return (
-              <StudentGradeAccordion
-                key={subAttainment.attainmentId}
-                attainmentGrade={subAttainment}
-              />
-            );
-          })
-        }
-      </Box>
+      {
+        props.grades.subAttainments?.map((subAttainment: AttainmentGradeData) => (
+          <StudentGradeAccordion
+            key={subAttainment.attainmentId}
+            attainmentGrade={subAttainment}
+          />
+        ))
+      }
     </Box>
   );
 }
