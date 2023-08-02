@@ -10,6 +10,7 @@ import { UseQueryResult } from '@tanstack/react-query';
 
 import Attainment from './edit-attainment-view/Attainment';
 import ConfirmationDialog from './edit-attainment-view/ConfirmationDialog';
+import NotFound from './NotFound';
 
 import {
   useAddAttainment, UseAddAttainmentResult,
@@ -25,6 +26,17 @@ export default function EditAttainmentView(): JSX.Element {
   // attainmentId is either the root attainment of an assessment model when
   // creating a new attainment or the ID of an attainment being edited.
   const { courseId, assessmentModelId, modification, attainmentId }: Params = useParams();
+
+  // Check for invalid paths
+  if (
+    (modification === 'create' && attainmentId)
+      || (modification === 'edit' && !attainmentId)
+      || (modification !== 'create' && modification !== 'edit')
+  ) {
+    return (
+      <NotFound/>
+    );
+  }
 
   /*
    * The current state of the tree of attainments being edited.

@@ -20,6 +20,7 @@ import { UseQueryResult } from '@tanstack/react-query';
 import * as yup from 'yup';
 
 import UnsavedChangesDialog from './alerts/UnsavedChangesDialog';
+import NotFound from './NotFound';
 
 import { useAddCourse, UseAddCourseResult, useGetCourse } from '../hooks/useApi';
 import { State } from '../types';
@@ -106,6 +107,17 @@ export default function EditCourseView(): JSX.Element {
 
   const navigate: NavigateFunction = useNavigate();
   const { modification, courseId }: Params = useParams();
+
+  // Check for invalid paths
+  if (
+    (modification === 'create' && courseId)
+      || (modification === 'edit' && !courseId)
+      || (modification !== 'create' && modification !== 'edit')
+  ) {
+    return (
+      <NotFound/>
+    );
+  }
 
   const addCourse: UseAddCourseResult = useAddCourse({
     onSuccess: (courseId: number) => {

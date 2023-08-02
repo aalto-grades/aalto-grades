@@ -60,7 +60,7 @@ export default function FrontPage(): JSX.Element {
               size='large'
               variant='contained'
               onClick={(): void => {
-                navigate('/create-course');
+                navigate('/course/create');
               }}
             >
               Create New Course

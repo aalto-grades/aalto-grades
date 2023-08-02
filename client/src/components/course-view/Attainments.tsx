@@ -117,8 +117,7 @@ export default function Attainments(props: {
       }}>
         <Button onClick={(): void => {
           navigate(
-            `/${props.courseId}/attainment/create`
-            + `/${props.assessmentModel.id}/${props.attainmentTree.id}`
+            `/${props.courseId}/attainment/create/${props.assessmentModel.id}`
           );
         }}>
           Add attainment

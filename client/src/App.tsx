@@ -183,11 +183,11 @@ export default function App(): JSX.Element {
                 {/* Pages that are only authorised for admin */}
                 <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
                   <Route
-                    path='/course/:modification/:courseId'
+                    path='/course/:modification/:courseId?'
                     element={<EditCourseView />}
                   />
                 </Route>
-                {/* Pages that are authorised for admin and teachers in charge */}
+                {}
                 <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
                   <Route
                     path='/:courseId/fetch-instances/:courseCode'
@@ -206,7 +206,7 @@ export default function App(): JSX.Element {
                     element={<EditInstanceView />}
                   />
                   <Route
-                    path='/:courseId/attainment/:modification/:assessmentModelId/:attainmentId'
+                    path='/:courseId/attainment/:modification/:assessmentModelId/:attainmentId?'
                     element={<EditAttainmentView />}
                   />
                 </Route>
