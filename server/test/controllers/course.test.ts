@@ -311,7 +311,7 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
 
   it('should successfully update course information', async () => {
     const course: CourseData = uneditedCourseData(10, 'Test edit course', [
-      { id: 50,  name: 'Everett Dennis' }
+      { id: 50,  name: 'Everett Dennis', email: 'everett.dennis@aalto.fi' }
     ]);
 
     checkCourseData(10, course);
@@ -331,9 +331,9 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
 
   it('should successfully update course information and teachers in charge', async () => {
     const course: CourseData = uneditedCourseData(11, 'Test edit course and teachers', [
-      { id: 100, name: 'Larissa Poore' },
-      { id: 200, name: 'Harriet Maestas' },
-      { id: 300, name: 'Charles Morrissey' },
+      { id: 100, name: 'Larissa Poore', email: 'larissa.poore@aalto.fi' },
+      { id: 200, name: 'Harriet Maestas', email: 'harriet.maestas@aalto.fi' },
+      { id: 300, name: 'Charles Morrissey', email: 'charles.morrissey@aalto.fi' },
     ]);
 
     checkCourseData(11, course);
@@ -352,8 +352,8 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
       .expect(HttpCode.Ok);
 
     course.teachersInCharge = [
-      { id: 100, name: 'Larissa Poore' },
-      { id: 101, name: 'Donald Perez' }
+      { id: 100, name: 'Larissa Poore', email: 'larissa.poore@aalto.fi' },
+      { id: 101, name: 'Donald Perez', email: 'donald.perez@aalto.fi' }
     ];
 
     expect(res.body.errors).not.toBeDefined();
