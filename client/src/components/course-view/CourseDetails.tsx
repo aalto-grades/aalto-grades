@@ -3,8 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { AssessmentModelData, CourseData, SystemRole, UserData } from 'aalto-grades-common/types';
-import EditIcon from '@mui/icons-material/Edit';
-import { Box, Button, IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, Button, Tooltip, Typography } from '@mui/material';
 
 import AssessmentModelsList from './AssessmentModelsList';
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';
