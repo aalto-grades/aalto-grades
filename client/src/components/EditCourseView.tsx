@@ -7,8 +7,7 @@ import { Form, Formik, FormikProps } from 'formik';
 import {
   Delete as DeleteIcon,
   PersonAddAlt1 as PersonAddAlt1Icon,
-  Person as PersonIcon,
-  Send as SendIcon
+  Person as PersonIcon
 } from '@mui/icons-material';
 import {
   Avatar, Box, Button, CircularProgress, Container, IconButton,
@@ -397,6 +396,7 @@ export default function EditCourseView(): JSX.Element {
                     <Button
                       size='medium'
                       variant='outlined'
+                      color={initialValues != form.values ? 'error' : 'primary'}
                       disabled={form.isSubmitting}
                       onClick={(): void => {
                         if (initialValues != form.values) {
@@ -413,10 +413,9 @@ export default function EditCourseView(): JSX.Element {
                       size='medium'
                       variant='contained'
                       type='submit'
-                      disabled={!form.isValid || teachersInCharge.length === 0 || form.isSubmitting}
-                      endIcon={<SendIcon />}
+                      disabled={form.isSubmitting}
                     >
-                      Create Course
+                      Submit
                       {form.isSubmitting && (
                         <CircularProgress
                           size={24}
