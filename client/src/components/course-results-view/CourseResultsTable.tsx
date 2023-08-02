@@ -7,7 +7,6 @@ import {
   Box, Checkbox, CircularProgress, Link, Paper, Table, TableBody,
   TableCell, TableContainer, TablePagination, TableRow, Tooltip
 } from '@mui/material';
-import PropTypes from 'prop-types';
 import { ChangeEvent, MouseEvent, SyntheticEvent, useEffect, useState } from 'react';
 
 import CourseResultsTableHead from './CourseResultsTableHead';
@@ -229,12 +228,3 @@ export default function CourseResultsTable(props: {
     </Box>
   );
 }
-
-CourseResultsTable.propTypes = {
-  students: PropTypes.array,
-  calculateFinalGrades: PropTypes.func,
-  downloadCsvTemplate: PropTypes.func,
-  loading: PropTypes.bool,
-  selectedStudents: PropTypes.array,
-  setSelectedStudents: PropTypes.func
-};

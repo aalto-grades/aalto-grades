@@ -5,7 +5,6 @@
 import { Alert as MuiAlert, Slide, Snackbar, Theme, Typography } from '@mui/material';
 import { AlertProps } from '@mui/material/Alert';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import PropTypes from 'prop-types';
 import {
   ForwardedRef, forwardRef, ForwardRefExoticComponent, RefAttributes, SyntheticEvent
 } from 'react';
@@ -103,8 +102,3 @@ export default function AlertSnackbar(props: {
     </div>
   );
 }
-
-AlertSnackbar.propTypes = {
-  snackPack: PropTypes.object,
-  position: PropTypes.number
-};

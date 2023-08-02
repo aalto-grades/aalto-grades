@@ -4,7 +4,6 @@
 
 import { AttainmentData } from 'aalto-grades-common/types';
 import { Box, Button, Paper, TextField, Typography } from '@mui/material';
-import PropTypes from 'prop-types';
 import { ChangeEvent, useState } from 'react';
 
 import ConfirmationDialog from './ConfirmationDialog';
@@ -209,12 +208,3 @@ export default function LeafAttainment(props: {
     </Box>
   );
 }
-
-LeafAttainment.propTypes = {
-  attainmentTree: PropTypes.object,
-  setAttainmentTree: PropTypes.func,
-  deleteAttainment: PropTypes.func,
-  getTemporaryId: PropTypes.func,
-  attainment: PropTypes.object,
-  setTouched: PropTypes.func
-};

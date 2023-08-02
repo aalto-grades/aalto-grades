@@ -4,7 +4,6 @@
 
 import { Button, Dialog, DialogActions, DialogContent } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import PropTypes from 'prop-types';
 
 const gridColumns: Array<GridColDef> = [{
   field: 'error',
@@ -50,9 +49,3 @@ export default function FileErrorDialog(props: {
     </Dialog>
   );
 }
-
-FileErrorDialog.propTypes = {
-  handleClose: PropTypes.func,
-  open: PropTypes.bool,
-  errors: PropTypes.array
-};
