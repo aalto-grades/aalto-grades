@@ -6,7 +6,6 @@ import { AttainmentData } from 'aalto-grades-common/types';
 import {
   Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField
 } from '@mui/material';
-import PropTypes from 'prop-types';
 import { ChangeEvent, SyntheticEvent, useState } from 'react';
 
 import { State, TextFieldData } from '../../types';
@@ -112,12 +111,3 @@ export default function SimpleDialog(props: {
     </Dialog>
   );
 }
-
-SimpleDialog.propTypes = {
-  attainmentTree: PropTypes.object,
-  setAttainmentTree: PropTypes.func,
-  getTemporaryId: PropTypes.func,
-  attainment: PropTypes.object,
-  handleClose: PropTypes.func,
-  open: PropTypes.bool
-};

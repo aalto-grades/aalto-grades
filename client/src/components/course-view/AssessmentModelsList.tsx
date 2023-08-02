@@ -4,7 +4,6 @@
 
 import { AssessmentModelData } from 'aalto-grades-common/types';
 import { List, ListItemButton } from '@mui/material';
-import PropTypes from 'prop-types';
 import { JSX } from 'react';
 
 export default function AssessmentModelsList(props: {
@@ -33,9 +32,3 @@ export default function AssessmentModelsList(props: {
     </List>
   );
 }
-
-AssessmentModelsList.propTypes = {
-  data: PropTypes.array,
-  current: PropTypes.number,
-  onClick: PropTypes.func
-};

@@ -6,7 +6,6 @@ import { CourseData } from 'aalto-grades-common/types';
 import {
   Link, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Typography
 } from '@mui/material';
-import PropTypes from 'prop-types';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 import { HeadCellData } from '../../types';
@@ -98,7 +97,3 @@ export default function CourseTable(props: {
     </Table>
   );
 }
-
-CourseTable.propTypes = {
-  data: PropTypes.array
-};

@@ -5,7 +5,6 @@
 import { AttainmentData, Formula, FormulaData } from 'aalto-grades-common/types';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { Box, Button, Collapse, IconButton, List, Typography } from '@mui/material';
-import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { UseQueryResult } from '@tanstack/react-query';
 
@@ -125,11 +124,3 @@ export default function ParentAttainment(props: {
     </>
   );
 }
-
-ParentAttainment.propTypes = {
-  attainmentTree: PropTypes.any,
-  setAttainmentTree: PropTypes.func,
-  deleteAttainment: PropTypes.func,
-  getTemporaryId: PropTypes.func,
-  attainment: PropTypes.any
-};

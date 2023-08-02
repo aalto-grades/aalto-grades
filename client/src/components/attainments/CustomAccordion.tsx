@@ -11,7 +11,6 @@ import {
 } from '@mui/material';
 import { AccordionProps } from '@mui/material/Accordion';
 import { styled, Theme } from '@mui/material/styles';
-import PropTypes from 'prop-types';
 import { JSX, ReactNode, SyntheticEvent, useState } from 'react';
 
 import { State } from '../../types';
@@ -97,12 +96,6 @@ function AttainmentText(props: {
     </Box>
   );
 }
-
-AttainmentText.propTypes = {
-  name: PropTypes.string,
-  formulaId: PropTypes.string,
-  tag: PropTypes.string,
-};
 
 export default function CustomAccordion(props: {
   attainment: AttainmentData
@@ -197,7 +190,3 @@ export default function CustomAccordion(props: {
     </>
   );
 }
-
-CustomAccordion.propTypes = {
-  attainment: PropTypes.object
-};

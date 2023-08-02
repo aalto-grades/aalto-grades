@@ -6,7 +6,6 @@
 // if not, the user is redirected to the login page
 
 import { LoginResult, SystemRole } from 'aalto-grades-common/types';
-import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
@@ -56,8 +55,3 @@ export default function PrivateRoute(props: {
 
   return null;
 }
-
-PrivateRoute.propTypes = {
-  children: PropTypes.element,
-  roles: PropTypes.array
-};
