@@ -50,3 +50,23 @@ export function useAddCourse(
     ...options
   });
 }
+
+interface EditCourseVars {
+  courseId: Numeric,
+  course: CourseData
+}
+
+export type UseEditCourseResult = UseMutationResult<
+  CourseData, unknown, EditCourseVars
+>;
+
+export function useEditCourse(
+  options?: UseMutationOptions<CourseData, unknown, EditCourseVars>
+): UseEditCourseResult {
+  return useMutation({
+    mutationFn: async (vars: EditCourseVars) => (
+      await axios.put(`/v1/courses/${vars.courseId}`, vars.course)
+    ).data.data,
+    ...options
+  });
+}

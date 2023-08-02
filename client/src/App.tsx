@@ -187,7 +187,6 @@ export default function App(): JSX.Element {
                     element={<EditCourseView />}
                   />
                 </Route>
-                {}
                 <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
                   <Route
                     path='/:courseId/fetch-instances/:courseCode'

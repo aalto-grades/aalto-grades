@@ -22,7 +22,11 @@ import * as yup from 'yup';
 import UnsavedChangesDialog from './alerts/UnsavedChangesDialog';
 import NotFound from './NotFound';
 
-import { useAddCourse, UseAddCourseResult, useGetCourse } from '../hooks/useApi';
+import {
+  useAddCourse, UseAddCourseResult,
+  useEditCourse, UseEditCourseResult,
+  useGetCourse
+} from '../hooks/useApi';
 import { State } from '../types';
 
 interface FormData {
@@ -125,6 +129,12 @@ export default function EditCourseView(): JSX.Element {
     }
   });
 
+  const editCourse: UseEditCourseResult = useEditCourse({
+    onSuccess: () => {
+      navigate(`/course-view/${courseId}`, { replace: true });
+    }
+  });
+
   const course: UseQueryResult<CourseData> = useGetCourse(
     courseId ?? -1, { enabled: Boolean(modification === 'edit' && courseId) }
   );
@@ -181,7 +191,7 @@ export default function EditCourseView(): JSX.Element {
   }
 
   async function handleSubmit(values: FormData): Promise<void> {
-    addCourse.mutate({
+    const courseData: CourseData = {
       courseCode: values.courseCode,
       minCredits: values.minCredits,
       maxCredits: values.maxCredits,
@@ -200,13 +210,18 @@ export default function EditCourseView(): JSX.Element {
           email
         };
       })
-    });
+    };
+
+    if (modification === 'create')
+      addCourse.mutate(courseData);
+    else if (modification === 'edit' && courseId)
+      editCourse.mutate({ courseId: courseId, course: courseData });
   }
 
   return (
     <>
       <Typography variant="h1" sx={{ flexGrow: 1, mb: 4 }}>
-        Create a New Course
+        {(modification === 'create') ? 'Create a New Course' : 'Edit a Course'}
       </Typography>
       <Container maxWidth="sm" sx={{ textAlign: 'right' }}>
         {
