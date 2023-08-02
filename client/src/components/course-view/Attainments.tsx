@@ -133,7 +133,7 @@ export default function Attainments(props: {
               navigate(`/${props.courseId}/course-results/${props.assessmentModel.id}`);
             }}
           >
-            See course results
+            Course results
           </Button>
         </Box>
       </Box>
