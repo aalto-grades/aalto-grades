@@ -8,11 +8,10 @@ export interface AttainmentData {
   id?: number,
   assessmentModelId?: number,
   parentId?: number,
-  tag: string,
   name: string,
+  daysValid: number,
   formula?: Formula,
   formulaParams?: ParamsObject,
-  daysValid: number,
   subAttainments?: Array<AttainmentData>
 }
 
