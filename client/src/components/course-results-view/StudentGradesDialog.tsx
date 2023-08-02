@@ -7,7 +7,6 @@ import {
   Box, Button, CircularProgress, Dialog,
   DialogActions, DialogContent, DialogTitle, Typography
 } from '@mui/material';
-import PropTypes from 'prop-types';
 import { Params, useParams } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 
@@ -76,9 +75,3 @@ export default function StudentGradesDialog(props: {
     </>
   );
 }
-
-StudentGradesDialog.propTypes = {
-  user: PropTypes.object,
-  setOpen: PropTypes.func,
-  open: PropTypes.bool
-};

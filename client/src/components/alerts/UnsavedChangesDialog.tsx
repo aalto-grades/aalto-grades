@@ -6,7 +6,6 @@ import {
   Box, Button, Dialog, DialogActions,
   DialogContent, Stack, Typography
 } from '@mui/material';
-import PropTypes from 'prop-types';
 
 export default function UnsavedChangesDialog(props: {
   setOpen: (open: boolean) => void,
@@ -55,9 +54,3 @@ export default function UnsavedChangesDialog(props: {
     </Dialog>
   );
 }
-
-UnsavedChangesDialog.propTypes = {
-  setOpen: PropTypes.func,
-  open: PropTypes.bool,
-  handleDiscard: PropTypes.func
-};

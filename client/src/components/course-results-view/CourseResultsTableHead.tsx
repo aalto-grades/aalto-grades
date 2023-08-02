@@ -8,7 +8,6 @@ import {
   TableHead, TableRow, TableSortLabel
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
-import PropTypes from 'prop-types';
 import { SyntheticEvent } from 'react';
 
 interface Colum {
@@ -95,11 +94,3 @@ export default function CourseResultsTableHead(props: {
     </TableHead>
   );
 }
-
-CourseResultsTableHead.propTypes = {
-  onRequestSort: PropTypes.func.isRequired,
-  order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-  orderBy: PropTypes.any.isRequired,
-  handleSelectAll: PropTypes.func,
-  allSelected: PropTypes.bool
-};

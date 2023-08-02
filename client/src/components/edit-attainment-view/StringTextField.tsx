@@ -4,7 +4,6 @@
 
 import { AttainmentData } from 'aalto-grades-common/types';
 import TextField from '@mui/material/TextField';
-import PropTypes from 'prop-types';
 import { ChangeEvent } from 'react';
 
 export interface AttainmentTextFieldData {
@@ -42,11 +41,3 @@ export default function StringTextField(props: {
     />
   );
 }
-
-StringTextField.propTypes = {
-  attainmentTree: PropTypes.object,
-  setAttainmentTree: PropTypes.func,
-  attainment: PropTypes.object,
-  value: PropTypes.string,
-  fieldData: PropTypes.object
-};

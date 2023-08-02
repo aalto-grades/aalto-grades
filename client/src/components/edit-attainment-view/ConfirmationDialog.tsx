@@ -6,7 +6,6 @@ import { AttainmentData } from 'aalto-grades-common/types';
 import {
   Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
 } from '@mui/material';
-import PropTypes from 'prop-types';
 
 // A Dialog component for confirming deletion
 
@@ -42,12 +41,3 @@ export default function ConfirmationDialog(props: {
     </Dialog>
   );
 }
-
-ConfirmationDialog.propTypes = {
-  deleteAttainment: PropTypes.func,
-  attainment: PropTypes.object,
-  title: PropTypes.string,
-  subject: PropTypes.string,
-  handleClose: PropTypes.func,
-  open: PropTypes.bool
-};

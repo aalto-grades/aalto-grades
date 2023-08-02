@@ -7,7 +7,6 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Button, Menu, MenuItem } from '@mui/material';
 import { MenuProps } from '@mui/material/Menu';
 import { styled, Theme } from '@mui/material/styles';
-import PropTypes from 'prop-types';
 import { useState, SyntheticEvent } from 'react';
 
 import { State } from '../../types';
@@ -115,8 +114,3 @@ export default function MenuButton(props: {
     </div>
   );
 }
-
-MenuButton.propTypes = {
-  label: PropTypes.string,
-  options: PropTypes.array,
-};

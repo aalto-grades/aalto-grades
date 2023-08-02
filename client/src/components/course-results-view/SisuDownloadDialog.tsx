@@ -8,7 +8,6 @@ import {
   DialogContentText, DialogTitle, List, ListItem,
   ListItemText, MenuItem, Paper, TextField, Typography
 } from '@mui/material';
-import PropTypes from 'prop-types';
 import { ChangeEvent, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 
@@ -217,9 +216,3 @@ export default function SisuDownloadDialog(props: {
     </>
   );
 }
-
-SisuDownloadDialog.propTypes = {
-  open: PropTypes.bool,
-  handleClose: PropTypes.func,
-  selectedStudents: PropTypes.array
-};

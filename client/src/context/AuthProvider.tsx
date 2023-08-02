@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import { LoginResult } from 'aalto-grades-common/types';
-import PropTypes from 'prop-types';
 import { Context, createContext, useState } from 'react';
 
 import { State } from '../types';
@@ -38,9 +37,5 @@ export function AuthProvider(params: {
     </AuthContext.Provider>
   );
 }
-
-AuthProvider.propTypes = {
-  children: PropTypes.element
-};
 
 export default AuthContext;

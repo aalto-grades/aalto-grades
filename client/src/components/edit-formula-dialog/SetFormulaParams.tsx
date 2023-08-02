@@ -4,7 +4,6 @@
 
 import { AttainmentData, FormulaData, ParamsObject } from 'aalto-grades-common/types';
 import { TextField } from '@mui/material';
-import PropTypes from 'prop-types';
 import { ChangeEvent } from 'react';
 
 import SubAttainment from './SubAttainment';
@@ -103,12 +102,3 @@ export default function SetFormulaParams(props: {
     </>
   );
 }
-
-SetFormulaParams.propTypes = {
-  attainment: PropTypes.object,
-  formula: PropTypes.object,
-  params: PropTypes.object,
-  setParams: PropTypes.func,
-  childParams: PropTypes.any,
-  setChildParams: PropTypes.func
-};

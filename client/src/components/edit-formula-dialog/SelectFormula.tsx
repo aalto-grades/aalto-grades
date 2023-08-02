@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
+import { StyledComponent } from '@emotion/styled';
 import { ExpandMore } from '@mui/icons-material';
 import {
   Accordion, AccordionDetails, AccordionSummary, Box, CircularProgress,
@@ -10,8 +11,6 @@ import {
   SelectChangeEvent, Typography
 } from '@mui/material';
 import { styled, Theme } from '@mui/material/styles';
-import PropTypes from 'prop-types';
-import { StyledComponent } from '@emotion/styled';
 import { UseQueryResult } from '@tanstack/react-query';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';
@@ -149,11 +148,3 @@ export default function SelectFormula(props: {
     </>
   );
 }
-
-SelectFormula.propTypes = {
-  attainment: PropTypes.object,
-  formula: PropTypes.object,
-  formulaData: PropTypes.func,
-  clearParams: PropTypes.func,
-  error: PropTypes.string
-};

@@ -5,7 +5,6 @@
 import {
   Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle, Stack, TextField
 } from '@mui/material';
-import PropTypes from 'prop-types';
 import { ChangeEvent, SyntheticEvent, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 
@@ -124,9 +123,3 @@ export default function CreateAssessmentModelDialog(props: {
     </Dialog>
   );
 }
-
-CreateAssessmentModelDialog.propTypes = {
-  handleClose: PropTypes.func,
-  open: PropTypes.bool,
-  onSubmit: PropTypes.func
-};

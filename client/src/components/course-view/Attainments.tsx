@@ -6,7 +6,6 @@ import {
   AssessmentModelData, AttainmentData, Formula, FormulaData
 } from 'aalto-grades-common/types';
 import { Box, Button, Paper, Typography } from '@mui/material';
-import PropTypes from 'prop-types';
 import { useState, JSX } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
@@ -140,9 +139,3 @@ export default function Attainments(props: {
     </Box>
   );
 }
-
-Attainments.propTypes = {
-  attainmentTree: PropTypes.object,
-  assessmentModel: PropTypes.object,
-  courseId: PropTypes.number
-};

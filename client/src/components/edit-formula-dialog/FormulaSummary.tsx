@@ -10,7 +10,6 @@ import {
 } from '@mui/material';
 import { styled, Theme } from '@mui/material/styles';
 import { StyledComponent } from '@emotion/styled';
-import PropTypes from 'prop-types';
 import { JSX } from 'react';
 
 import StyledBox from './StyledBox';
@@ -136,10 +135,3 @@ export default function FormulaSummary(props: {
     </Box>
   );
 }
-
-FormulaSummary.propTypes = {
-  formula: PropTypes.object,
-  params: PropTypes.object,
-  childParams: PropTypes.object,
-  constructParamsObject: PropTypes.func
-};

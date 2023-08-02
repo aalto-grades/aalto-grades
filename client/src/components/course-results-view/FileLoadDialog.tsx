@@ -6,7 +6,6 @@ import {
   Box, Button, Dialog, DialogActions, DialogContent,
   DialogContentText, DialogTitle, FormHelperText, Typography
 } from '@mui/material';
-import PropTypes from 'prop-types';
 import { ChangeEvent, createRef, RefObject, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 
@@ -209,9 +208,3 @@ export default function FileLoadDialog(props: {
     </>
   );
 }
-
-FileLoadDialog.propTypes = {
-  instanceId: PropTypes.number,
-  handleClose: PropTypes.func,
-  open: PropTypes.bool
-};
