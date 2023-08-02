@@ -5,6 +5,7 @@
 import { AttainmentData } from 'aalto-grades-common/types';
 import { Box, Button, Paper, TextField, Typography } from '@mui/material';
 import { ChangeEvent, useState } from 'react';
+import { Params, useParams } from 'react-router-dom';
 
 import ConfirmationDialog from './ConfirmationDialog';
 import SimpleDialog from './SimpleDialog';
@@ -40,6 +41,8 @@ export default function LeafAttainment(props: {
   paramsFromParent?: object,
   setTouched: () => void
 }): JSX.Element {
+
+  const { modification }: Params = useParams();
 
   // Functions and variables for opening and closing the dialog that asks for
   // the number of sub-attainments
@@ -169,7 +172,19 @@ export default function LeafAttainment(props: {
               Delete
             </Button>
           ) : (
-            <Box sx={{ width: '1px' }} />
+            modification == 'edit' ? (
+              <Button
+                size='small'
+                variant='contained'
+                color='error'
+                onClick={(): void => setOpenConfDialog(true)}
+                sx={{ ml: 2 }}
+              >
+                Delete Attainment
+              </Button>
+            ) : (
+              <Box sx={{ width: '1px' }} />
+            )
           )
         }
         <ConfirmationDialog

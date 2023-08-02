@@ -8,6 +8,7 @@ import { JSX, SyntheticEvent, useState }  from 'react';
 import { NavigateFunction, Params, useParams, useNavigate } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 
+import UnsavedChangesDialog from './alerts/UnsavedChangesDialog';
 import Attainment from './edit-attainment-view/Attainment';
 import ConfirmationDialog from './edit-attainment-view/ConfirmationDialog';
 
@@ -18,7 +19,6 @@ import {
   useGetAttainment
 } from '../hooks/useApi';
 import { State } from '../types';
-import UnsavedChangesDialog from './alerts/UnsavedChangesDialog';
 
 export default function EditAttainmentView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
@@ -254,56 +254,35 @@ export default function EditAttainmentView(): JSX.Element {
           <Box sx={{
             display: 'flex',
             flexWrap: 'wrap',
-            justifyContent: modification === 'edit' ? 'space-between' : 'right',
+            justifyContent: 'right',
             alignItems: 'center',
             gap: 1,
             mt: 2,
             mb: 1
           }}>
-            {
-              (modification === 'edit') && (
-                <Button
-                  size='medium'
-                  variant='contained'
-                  color='error'
-                  onClick={(): void => setOpenConfDialog(true)}
-                  sx={{ ml: 2 }}
-                >
-                  Delete Attainment
-                </Button>
-              )
-            }
-            <Box sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              gap: 1
-            }}>
-              <Button
-                size='medium'
-                variant='outlined'
-                color={fieldTouched ? 'error' : 'primary'}
-                onClick={(): void => {
-                  if (fieldTouched) {
-                    setShowDialog(true);
-                  } else {
-                    navigate(-1);
-                  }
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                size='medium'
-                variant='contained'
-                type='submit'
-                onClick={handleSubmit}
-                sx={{ mr: 2 }}
-              >
-                Submit
-              </Button>
-            </Box>
+            <Button
+              size='medium'
+              variant='outlined'
+              color={fieldTouched ? 'error' : 'primary'}
+              onClick={(): void => {
+                if (fieldTouched) {
+                  setShowDialog(true);
+                } else {
+                  navigate(-1);
+                }
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              size='medium'
+              variant='contained'
+              type='submit'
+              onClick={handleSubmit}
+              sx={{ mr: 2 }}
+            >
+              Submit
+            </Button>
           </Box>
         </form>
         <UnsavedChangesDialog
