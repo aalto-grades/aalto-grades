@@ -39,10 +39,10 @@ interface FormData {
 
 function EditCourseTextField(props: {
   form: FormikProps<FormData>,
+  onChange: (e: React.ChangeEvent<Element>) => void,
   value: keyof FormData,
   label: string,
   helperText: string,
-  onChange: (e: React.ChangeEvent<Element>) => void,
   type?: HTMLInputTypeAttribute
 }): JSX.Element {
   return (
@@ -62,6 +62,43 @@ function EditCourseTextField(props: {
       error={props.form.touched[props.value] && Boolean(props.form.errors[props.value])}
       onChange={props.onChange}
     />
+  );
+}
+
+function EditCourseLanguageTextFields(props: {
+  form: FormikProps<FormData>,
+  onChange: (e: React.ChangeEvent<Element>) => void,
+  valueFormat: string,
+  labelFormat: string,
+  helperTextFormat: string
+}): JSX.Element {
+
+  interface TextFieldLanguage {
+    value: string,
+    name: string
+  }
+
+  const languages: Array<TextFieldLanguage> = [
+    { value: 'En', name: 'English' },
+    { value: 'Fi', name: 'Finnish' },
+    { value: 'Sv', name: 'Swedish' }
+  ];
+
+  return (
+    <>
+      {
+        languages.map((language: TextFieldLanguage) => (
+          <EditCourseTextField
+            key={language.value}
+            form={props.form}
+            onChange={props.form.handleChange}
+            value={props.valueFormat.replace('%', language.value) as keyof FormData}
+            label={props.labelFormat.replace('%', language.name)}
+            helperText={props.helperTextFormat.replace('%', language.name)}
+          />
+        ))
+      }
+    </>
   );
 }
 
@@ -220,47 +257,19 @@ export default function EditCourseView(): JSX.Element {
                       label='Course Code*'
                       helperText='Give code for the new course.'
                     />
-                    <EditCourseTextField
+                    <EditCourseLanguageTextFields
                       form={form}
                       onChange={form.handleChange}
-                      value='nameEn'
-                      label='Course Name in English*'
-                      helperText='Give the name of the course in English.'
+                      valueFormat='name%'
+                      labelFormat='Course Name in %*'
+                      helperTextFormat='Give the name of the course in %.'
                     />
-                    <EditCourseTextField
+                    <EditCourseLanguageTextFields
                       form={form}
                       onChange={form.handleChange}
-                      value='nameFi'
-                      label='Course Name in Finnish*'
-                      helperText='Give the name of the course in Finnish.'
-                    />
-                    <EditCourseTextField
-                      form={form}
-                      onChange={form.handleChange}
-                      value='nameSv'
-                      label='Course Name in Swedish*'
-                      helperText='Give the name of the course in Swedish.'
-                    />
-                    <EditCourseTextField
-                      form={form}
-                      onChange={form.handleChange}
-                      value='departmentEn'
-                      label='Course Name in English*'
-                      helperText='Give the name of the course in English.'
-                    />
-                    <EditCourseTextField
-                      form={form}
-                      onChange={form.handleChange}
-                      value='departmentFi'
-                      label='Course Name in Finnish*'
-                      helperText='Give the name of the course in Finnish.'
-                    />
-                    <EditCourseTextField
-                      form={form}
-                      onChange={form.handleChange}
-                      value='departmentSv'
-                      label='Course Name in Swedish*'
-                      helperText='Give the name of the course in Swedish.'
+                      valueFormat='department%'
+                      labelFormat='Organizer in %*'
+                      helperTextFormat='Give the organizer of the new course in %.'
                     />
                     <EditCourseTextField
                       form={form}
