@@ -37,9 +37,9 @@ describe('Tests for CreateCourseView components', () => {
       expect(screen.getByLabelText('Course Name in English*')).toBeDefined();
       expect(screen.getByLabelText('Course Name in Finnish*')).toBeDefined();
       expect(screen.getByLabelText('Course Name in Swedish*')).toBeDefined();
-      expect(screen.getByLabelText('Organizer in English*')).toBeDefined();
-      expect(screen.getByLabelText('Organizer in Finnish*')).toBeDefined();
-      expect(screen.getByLabelText('Organizer in Swedish*')).toBeDefined();
+      expect(screen.getByLabelText('Organizing department in English*')).toBeDefined();
+      expect(screen.getByLabelText('Organizing department in Finnish*')).toBeDefined();
+      expect(screen.getByLabelText('Organizing department in Swedish*')).toBeDefined();
       expect(screen.getByLabelText('Minimum Course Credits (ECTS)*')).toBeDefined();
       expect(screen.getByLabelText('Maximum Course Credits (ECTS)*')).toBeDefined();
       expect(screen.getByLabelText('Teachers In Charge*')).toBeDefined();
@@ -72,9 +72,12 @@ describe('Tests for CreateCourseView components', () => {
     act(() => userEvent.type(screen.getByLabelText('Course Name in English*'), testNameEn));
     act(() => userEvent.type(screen.getByLabelText('Course Name in Finnish*'), testNameFi));
     act(() => userEvent.type(screen.getByLabelText('Course Name in Swedish*'), testNameSv));
-    act(() => userEvent.type(screen.getByLabelText('Organizer in English*'), testDepartmentEn));
-    act(() => userEvent.type(screen.getByLabelText('Organizer in Finnish*'), testDepartmentFi));
-    act(() => userEvent.type(screen.getByLabelText('Organizer in Swedish*'), testDepartmentSv));
+    act(() => userEvent.type(screen.getByLabelText(
+      'Organizing department in English*'), testDepartmentEn));
+    act(() => userEvent.type(screen.getByLabelText(
+      'Organizing department in Finnish*'), testDepartmentFi));
+    act(() => userEvent.type(screen.getByLabelText(
+      'Organizing department in Swedish*'), testDepartmentSv));
     act(() => userEvent.type(screen.getByLabelText('Minimum Course Credits (ECTS)*'), '3'));
     act(() => userEvent.type(screen.getByLabelText('Maximum Course Credits (ECTS)*'), '5'));
     act(() => userEvent.type(screen.getByLabelText('Teachers In Charge*'), testTeacher));

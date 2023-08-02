@@ -114,13 +114,13 @@ export default function CreateCourseView(): JSX.Element {
               .notRequired(),
             departmentEn: yup.string()
               .min(1)
-              .required('Please input the course organizer information in English'),
+              .required('Please input the course organizing department information in English'),
             departmentFi: yup.string()
               .min(1)
-              .required('Please input the course organizer information in Finnish'),
+              .required('Please input the course organizing department information in Finnish'),
             departmentSv: yup.string()
               .min(1)
-              .required('Please input the course organizer information in Swedish'),
+              .required('Please input the course organizing department information in Swedish'),
             nameEn: yup.string()
               .min(1)
               .required('Please input a valid course name in English'),
@@ -224,12 +224,12 @@ export default function CreateCourseView(): JSX.Element {
                   fullWidth
                   value={values.departmentEn}
                   disabled={isSubmitting}
-                  label="Organizer in English*"
+                  label="Organizing department in English*"
                   margin='normal'
                   InputLabelProps={{ shrink: true }}
                   helperText={errors.departmentEn ?
                     errors.departmentEn :
-                    'Give the organizer of the new course in English.'
+                    'Give the organizing department of the new course in English.'
                   }
                   error={touched.departmentEn && Boolean(errors.departmentEn)}
                   onChange={handleChange}
@@ -240,12 +240,12 @@ export default function CreateCourseView(): JSX.Element {
                   fullWidth
                   value={values.departmentFi}
                   disabled={isSubmitting}
-                  label="Organizer in Finnish*"
+                  label="Organizing department in Finnish*"
                   margin='normal'
                   InputLabelProps={{ shrink: true }}
                   helperText={errors.departmentFi ?
                     errors.departmentFi :
-                    'Give the organizer of the new course in Finnish.'
+                    'Give the organizing department of the new course in Finnish.'
                   }
                   error={touched.departmentFi && Boolean(errors.departmentFi)}
                   onChange={handleChange}
@@ -256,12 +256,12 @@ export default function CreateCourseView(): JSX.Element {
                   fullWidth
                   value={values.departmentSv}
                   disabled={isSubmitting}
-                  label="Organizer in Swedish*"
+                  label="Organizing department in Swedish*"
                   margin='normal'
                   InputLabelProps={{ shrink: true }}
                   helperText={errors.departmentSv ?
                     errors.departmentSv :
-                    'Give the organizer of the new course in Swedish.'
+                    'Give the organizing department of the new course in Swedish.'
                   }
                   error={touched.departmentSv && Boolean(errors.departmentSv)}
                   onChange={handleChange}
