@@ -4,7 +4,6 @@
 
 import { AttainmentData } from 'aalto-grades-common/types';
 import { Box, Paper, Typography } from '@mui/material';
-import PropTypes from 'prop-types';
 import { JSX } from 'react';
 
 import CustomAccordion from './CustomAccordion';
@@ -91,9 +90,3 @@ export default function AttainmentCategory(props: {
     </Box>
   );
 }
-
-AttainmentCategory.propTypes = {
-  attainment: PropTypes.object,
-  buttons: PropTypes.array,
-  paramsFromRoot: PropTypes.object
-};

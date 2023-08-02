@@ -9,7 +9,6 @@ import deepEqual from 'deep-equal';
 import {
   Box, Button, Dialog, DialogTitle, DialogContent, Step, StepLabel, Stepper,
 } from '@mui/material';
-import PropTypes from 'prop-types';
 import { useState, JSX } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 
@@ -240,13 +239,3 @@ export default function EditFormulaDialog(props: {
     </>
   );
 }
-
-EditFormulaDialog.propTypes = {
-  handleClose: PropTypes.func,
-  open: PropTypes.bool,
-  courseId: PropTypes.number,
-  assessmentModelId: PropTypes.number,
-  attainment: PropTypes.object,
-  attainmentTree: PropTypes.object,
-  setAttainmentTree: PropTypes.func
-};

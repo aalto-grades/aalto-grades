@@ -5,7 +5,6 @@
 import { AssessmentModelData, CourseData, SystemRole, UserData } from 'aalto-grades-common/types';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, IconButton, Tooltip, Typography } from '@mui/material';
-import PropTypes from 'prop-types';
 
 import AssessmentModelsList from './AssessmentModelsList';
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';
@@ -123,10 +122,3 @@ export default function CourseDetails(props: {
     </Box>
   );
 }
-
-CourseDetails.propTypes = {
-  course: PropTypes.object,
-  assessmentModels: PropTypes.array,
-  currentAssessmentModelId: PropTypes.number,
-  onChangeAssessmentModel: PropTypes.func
-};

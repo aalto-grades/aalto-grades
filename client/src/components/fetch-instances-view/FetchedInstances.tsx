@@ -4,7 +4,6 @@
 
 import { CourseInstanceData } from 'aalto-grades-common/types';
 import { Box, Tooltip } from '@mui/material';
-import PropTypes from 'prop-types';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 import { compareDate } from '../../services/sorting';
@@ -71,11 +70,6 @@ function InstanceBox(props: {
   );
 }
 
-InstanceBox.propTypes = {
-  courseId: PropTypes.number,
-  instance: PropTypes.object,
-};
-
 export default function FetchedInstances(props: {
   courseId: number,
   instances: Array<CourseInstanceData>
@@ -103,8 +97,3 @@ export default function FetchedInstances(props: {
     </Box>
   );
 }
-
-FetchedInstances.propTypes = {
-  courseId: PropTypes.number,
-  instances: PropTypes.array
-};

@@ -6,7 +6,6 @@ import { FinalGrade, Status } from 'aalto-grades-common/types';
 import DownloadIcon from '@mui/icons-material/Download';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { Box, Button, IconButton, TextField, Toolbar, Tooltip } from '@mui/material';
-import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 
@@ -173,11 +172,3 @@ export default function CourseResultsTableToolbar(props: {
     </Toolbar>
   );
 }
-
-CourseResultsTableToolbar.propTypes = {
-  search: PropTypes.string,
-  setSearch: PropTypes.func,
-  calculateFinalGrades: PropTypes.func,
-  downloadCsvTemplate: PropTypes.func,
-  selectedStudents: PropTypes.array
-};

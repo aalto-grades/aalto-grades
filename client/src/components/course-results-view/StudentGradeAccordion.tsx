@@ -5,7 +5,6 @@
 import { AttainmentGradeData, Status } from 'aalto-grades-common/types';
 import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
 import { Box, Typography } from '@mui/material';
-import PropTypes from 'prop-types';
 import { JSX, SyntheticEvent, useState } from 'react';
 
 import { Accordion, AccordionSummary } from '../attainments/CustomAccordion';
@@ -36,13 +35,6 @@ function GradeText(props: {
     </Box>
   );
 }
-
-GradeText.propTypes = {
-  name: PropTypes.string,
-  tag: PropTypes.string,
-  grade: PropTypes.number,
-  status: PropTypes.string,
-};
 
 export default function StudentGradeAccordion(props: {
   attainmentGrade: AttainmentGradeData
@@ -140,7 +132,3 @@ export default function StudentGradeAccordion(props: {
     </>
   );
 }
-
-StudentGradeAccordion.propTypes = {
-  attainment: PropTypes.object
-};

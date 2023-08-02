@@ -7,7 +7,6 @@ import {
   Box, CircularProgress, Table, TableBody, TableCell,
   TableHead, TableRow, TableSortLabel, Typography
 } from '@mui/material';
-import PropTypes from 'prop-types';
 import { JSX } from 'react';
 import { UseQueryResult } from '@tanstack/react-query';
 
@@ -137,7 +136,3 @@ export default function InstancesTable(props: {
     </>
   );
 }
-
-InstancesTable.propTypes = {
-  data: PropTypes.array
-};

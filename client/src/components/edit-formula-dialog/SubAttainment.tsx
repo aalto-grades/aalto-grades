@@ -4,7 +4,6 @@
 
 import { AttainmentData } from 'aalto-grades-common/types';
 import { Box, TextField, Typography } from '@mui/material';
-import PropTypes from 'prop-types';
 import { ChangeEvent } from 'react';
 
 import { getParamLabel } from '../../utils';
@@ -86,10 +85,3 @@ export default function SubAttainment(props: {
     </Box>
   );
 }
-
-SubAttainment.propTypes = {
-  attainment: PropTypes.object,
-  childParamsList: PropTypes.array,
-  childParams: PropTypes.any,
-  setChildParams: PropTypes.func
-};
