@@ -112,7 +112,10 @@ export default function FileLoadDialog(props: {
             display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start',
             alignItems: 'center', columnGap: 2
           }}>
-            <Button id='ag_select_file_btn' component='label'>
+            <Button
+              id='ag_select_file_btn'
+              component='label'
+            >
               Upload file
               <input
                 hidden
@@ -199,7 +202,7 @@ export default function FileLoadDialog(props: {
               uploadFile();
             }}
           >
-            Confirm
+            Submit
           </Button>
         </DialogActions>
       </Dialog>

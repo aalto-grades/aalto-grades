@@ -58,7 +58,10 @@ export default function Attainments(props: {
         <Typography align='left' sx={{ ml: 1.5 }} >
           {'Grading Formula: ' + rootFormula.data?.name}
         </Typography>
-        <Button id='ag_edit_formula_btn' onClick={(): void => setEditFormulaOpen(true)}>
+        <Button
+          id='ag_edit_formula_btn'
+          onClick={(): void => setEditFormulaOpen(true)}
+        >
           Edit formula
         </Button>
         {/* The path above should be changes once courseId can be fetched from the path */}
@@ -76,12 +79,15 @@ export default function Attainments(props: {
                   attainment={attainment}
                   buttons={
                     [
-                      <Button key='edit' onClick={(): void => {
-                        navigate(
-                          `/${props.courseId}/attainment/edit`
+                      <Button
+                        key='edit'
+                        onClick={(): void => {
+                          navigate(
+                            `/${props.courseId}/attainment/edit`
                           + `/${props.assessmentModel.id}/${attainment.id}`
-                        );
-                      }}>
+                          );
+                        }}
+                      >
                         Edit
                       </Button>
                     ]
@@ -114,12 +120,14 @@ export default function Attainments(props: {
         display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
         alignItems: 'center', gap: 1, mt: 2, mb: 1
       }}>
-        <Button onClick={(): void => {
-          navigate(
-            `/${props.courseId}/attainment/create`
+        <Button
+          onClick={(): void => {
+            navigate(
+              `/${props.courseId}/attainment/create`
             + `/${props.assessmentModel.id}/${props.attainmentTree.id}`
-          );
-        }}>
+            );
+          }}
+        >
           Add attainment
         </Button>
         <Box sx={{

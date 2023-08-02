@@ -77,12 +77,12 @@ describe('FileLoadDialog test with proper csv', () => {
     const dialogTitle: HTMLElement = getByText('Add Grades from File');
     const uploadFileButton: HTMLElement = getByText('Upload file');
     const cancelButton: HTMLElement = getByText('Cancel');
-    const confirmButton: HTMLElement = getByText('Confirm');
+    const submitButton: HTMLElement = getByText('Submit');
 
     expect(dialogTitle).toBeVisible();
     expect(uploadFileButton).toBeVisible();
     expect(cancelButton).toBeVisible();
-    expect(confirmButton).toBeVisible();
+    expect(submitButton).toBeVisible();
 
     act(() => userEvent.click(cancelButton));
     expect(dialogTitle).not.toBeVisible();
@@ -107,9 +107,9 @@ describe('FileLoadDialog test with proper csv', () => {
       act(() => userEvent.click(uploadOption));
 
       const dialogTitle: HTMLElement = getByText('Add Grades from File');
-      const confirmButton: HTMLElement = getByText('Confirm');
+      const submitButton: HTMLElement = getByText('Submit');
 
-      act(() => userEvent.click(confirmButton));
+      act(() => userEvent.click(submitButton));
       expect(dialogTitle).toBeVisible();
 
       const validationError: HTMLElement = await findByText('You must select a CSV file to submit');
@@ -141,8 +141,8 @@ describe('FileLoadDialog test with proper csv', () => {
       })
     );
 
-    const confirmButton: HTMLElement = getByText('Confirm');
-    act(() => userEvent.click(confirmButton));
+    const submitButton: HTMLElement = getByText('Submit');
+    act(() => userEvent.click(submitButton));
 
     waitFor(() => expect(queryByText('Add Grades from File')).not.toBeVisible());
   });
@@ -201,8 +201,8 @@ describe('FileLoadDialog test where server does not accept the file', () => {
       })
     );
 
-    const confirmButton: HTMLElement = getByText('Confirm');
-    act(() => userEvent.click(confirmButton));
+    const submitButton: HTMLElement = getByText('Submit');
+    act(() => userEvent.click(submitButton));
 
     expect(dialogTitle).toBeVisible();
     /*const errorInstructions: HTMLElement = await findByText(

@@ -144,7 +144,10 @@ export default function CourseResultsTableToolbar(props: {
             title="Download grading template with attainment tags and student numbers."
             placement="top"
           >
-            <Button variant='outlined' onClick={(): Promise<void> => props.downloadCsvTemplate()}>
+            <Button
+              variant='outlined'
+              onClick={(): Promise<void> => props.downloadCsvTemplate()}
+            >
               Download CSV template
             </Button>
           </Tooltip>
@@ -152,7 +155,10 @@ export default function CourseResultsTableToolbar(props: {
             title="Upload grades from a CSV file."
             placement="top"
           >
-            <Button variant='outlined' onClick={(): void => setShowFileDialog(true)}>
+            <Button
+              variant='outlined'
+              onClick={(): void => setShowFileDialog(true)}
+            >
               Upload Grades CSV
             </Button>
           </Tooltip>

@@ -65,7 +65,11 @@ export default function ParentAttainment(props: {
           /* Navigation below doesn't work because formula selection has
              only been implemented for course grade */
         }
-        <Button size='small' sx={{ mb: 0.5 }} onClick={(): void => setEditFormulaOpen(true)}>
+        <Button
+          size='small'
+          sx={{ mb: 0.5 }}
+          onClick={(): void => setEditFormulaOpen(true)}
+        >
           Edit formula
         </Button>
       </Box>

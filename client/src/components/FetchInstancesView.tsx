@@ -40,7 +40,8 @@ export default function FetchInstancesView(): JSX.Element {
           display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
           alignItems: 'center', pb: 6
         }}>
-          <Button size='medium'
+          <Button
+            size='medium'
             variant='outlined'
             onClick={(): void => navigate('/course-view/' + courseId)}
           >

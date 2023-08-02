@@ -301,7 +301,7 @@ export default function EditAttainmentView(): JSX.Element {
                 onClick={handleSubmit}
                 sx={{ mr: 2 }}
               >
-                Confirm
+                Submit
               </Button>
             </Box>
           </Box>
