@@ -125,21 +125,28 @@ export default function CourseView(): JSX.Element {
                         </div>
                       </Grow>
                     ) : (
-                      (attainmentTree.isLoading) && (
-                        <div>
-                          <Box sx={{
-                            margin: 'auto',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            display: 'flex',
-                            mt: 25,
-                            mb: 5
-                          }}>
-                            <CircularProgress />
-                          </Box>
+                      (attainmentTree.isLoading &&
+                        assessmentModels.data &&
+                        assessmentModels.data.length != 0
+                      ) ? (
+                          <div>
+                            <Box sx={{
+                              margin: 'auto',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              display: 'flex',
+                              mt: 25,
+                              mb: 5
+                            }}>
+                              <CircularProgress />
+                            </Box>
                           Loading attainments...
-                        </div>
-                      )
+                          </div>
+                        ) : (
+                          <div>
+                            No assessment models found.
+                          </div>
+                        )
                     )}
                   </div>
                 )
