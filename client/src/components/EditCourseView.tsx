@@ -294,7 +294,7 @@ export default function EditCourseView(): JSX.Element {
                       form={form}
                       onChange={form.handleChange}
                       valueFormat='department%'
-                      labelFormat='Organizer in %*'
+                      labelFormat='Organizing department in %*'
                       helperTextFormat='Give the organizing department of the new course in %.'
                     />
                     <EditCourseTextField
