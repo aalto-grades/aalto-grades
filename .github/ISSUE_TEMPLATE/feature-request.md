@@ -1,12 +1,3 @@
-<!--
-SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
-
-SPDX-License-Identifier: MIT
-
-This file is based on the default GitHub feature request template, which
-appears to be in the public domain.
--->
-
 ---
 name: Feature request
 about: Suggest an idea for this project

@@ -3,9 +3,25 @@ Upstream-Name: Aalto Grades
 Upstream-Contact: The Aalto Grades Developers
 Source: https://github.com/aalto-grades
 
-Files: client/*.json client/.env server/*.json *.csv server/pgAdminpass common/*.json
+Files:
+ client/*.json
+ client/.env
+ server/*.json
+ *.csv
+ server/pgAdminpass
+ common/*.json
 Copyright: The Aalto Grades Developers
 License: MIT
+
+Files:
+ .github/ISSUE_TEMPLATE/bug-report.md
+ .github/ISSUE_TEMPLATE/feature-request.md
+Copyright: The Aalto Grades Developers
+License: MIT
+Comment:
+ These files are based on GitHub's default bug report and feature request issue
+ templates, which appear to be in the public domain. Any modifications are
+ licensed under the Expat (MIT) License.
 
 Files: robot-tests/seccomp_profile.json
 Copyright: Microsoft
