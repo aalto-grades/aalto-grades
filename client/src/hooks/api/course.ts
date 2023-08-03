@@ -5,7 +5,7 @@
 import { CourseData } from 'aalto-grades-common/types';
 import axios from './axios';
 import {
-  useMutation, UseMutationOptions, UseMutationResult,
+  QueryClient, useMutation, UseMutationOptions, UseMutationResult,
   useQuery, UseQueryOptions, UseQueryResult
 } from '@tanstack/react-query';
 
@@ -41,12 +41,16 @@ export type UseAddCourseResult = UseMutationResult<
 >;
 
 export function useAddCourse(
+  queryClient: QueryClient,
   options?: UseMutationOptions<number, unknown, CourseData>
 ): UseAddCourseResult {
   return useMutation({
     mutationFn: async (course: CourseData) => (
       await axios.post('/v1/courses', course)
     ).data.data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['all-courses'] });
+    },
     ...options
   });
 }

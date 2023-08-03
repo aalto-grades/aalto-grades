@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { ChangeEvent, HTMLInputTypeAttribute, useState } from 'react';
 import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
-import { UseQueryResult } from '@tanstack/react-query';
+import { useQueryClient, UseQueryResult } from '@tanstack/react-query';
 import * as yup from 'yup';
 
 import UnsavedChangesDialog from './alerts/UnsavedChangesDialog';
@@ -122,11 +122,7 @@ export default function EditCourseView(): JSX.Element {
     );
   }
 
-  const addCourse: UseAddCourseResult = useAddCourse({
-    onSuccess: (courseId: number) => {
-      navigate(`/course-view/${courseId}`, { replace: true });
-    }
-  });
+  const addCourse: UseAddCourseResult = useAddCourse(useQueryClient());
 
   const editCourse: UseEditCourseResult = useEditCourse({
     onSuccess: () => {
@@ -211,10 +207,15 @@ export default function EditCourseView(): JSX.Element {
       })
     };
 
-    if (modification === 'create')
-      addCourse.mutate(courseData);
-    else if (modification === 'edit' && courseId)
+    if (modification === 'create') {
+      addCourse.mutate(courseData, {
+        onSuccess: (courseId: number) => {
+          navigate(`/course-view/${courseId}`, { replace: true });
+        }
+      });
+    } else if (modification === 'edit' && courseId) {
       editCourse.mutate({ courseId: courseId, course: courseData });
+    }
   }
 
   return (
