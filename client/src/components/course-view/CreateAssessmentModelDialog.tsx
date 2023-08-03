@@ -2,8 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { AssessmentModelData } from 'aalto-grades-common/types';
 import {
-  Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle, Stack, TextField
+  Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle,
+  FormHelperText, InputLabel, MenuItem, Select, Stack, TextField
 } from '@mui/material';
 import { ChangeEvent, SyntheticEvent, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
@@ -17,7 +19,8 @@ import { State } from '../../types';
 export default function CreateAssessmentModelDialog(props: {
   handleClose: () => void,
   open: boolean,
-  onSubmit: () => void
+  onSubmit: () => void,
+  assessmentModels?: Array<AssessmentModelData>
 }): JSX.Element {
   const { courseId }: Params = useParams();
 
@@ -82,6 +85,25 @@ export default function CreateAssessmentModelDialog(props: {
               disabled={addAssessmentModel.isLoading || addAttainment.isLoading}
               onChange={(event: ChangeEvent<HTMLInputElement>): void => setName(event.target.value)}
             />
+            {props.assessmentModels && (
+              <Box sx={{ my: 2 }}>
+                <InputLabel id="demo-simple-select-helper-label">Assessment model</InputLabel>
+                <Select
+                  labelId="demo-simple-select-helper-label"
+                  id="demo-simple-select-helper"
+                  value={10}
+                  inputProps={{ shrink: true }}
+                  label="Assessment model"
+                  fullWidth
+                >
+                  <MenuItem value="">use empty</MenuItem>
+                  {props.assessmentModels.map((model: AssessmentModelData) => (
+                    <MenuItem key={model.id} value={model.id}>{model.name}</MenuItem>
+                  ))}
+                </Select>
+                <FormHelperText>Use existing assessment model as base</FormHelperText>
+              </Box>
+            )}
             <Stack spacing={2} direction="row" sx={{ mt: 2 }}>
               <Button
                 size='large'
