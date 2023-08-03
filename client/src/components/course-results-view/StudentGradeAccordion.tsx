@@ -12,7 +12,6 @@ import { State } from '../../types';
 
 function GradeText(props: {
   name: string,
-  tag: string,
   grade: number,
   status: Status
 }): JSX.Element {
@@ -27,7 +26,7 @@ function GradeText(props: {
       columnGap: 10
     }}>
       <Typography variant='body2'>
-        {`${props.name} (${props.tag})`}
+        {props.name}
       </Typography>
       <Typography variant='body2'>
         {'Grade: ' + (props.grade ? `${props.grade} - ${props.status}` : Status.Pending)}
@@ -85,7 +84,6 @@ export default function StudentGradeAccordion(props: {
             >
               <GradeText
                 name={props.attainmentGrade.name as string}
-                tag={props.attainmentGrade.tag as string}
                 grade={props.attainmentGrade.grade}
                 status={props.attainmentGrade.status}
               />
@@ -122,7 +120,6 @@ export default function StudentGradeAccordion(props: {
             }} />
             <GradeText
               name={props.attainmentGrade.name as string}
-              tag={props.attainmentGrade.tag as string}
               grade={props.attainmentGrade.grade}
               status={props.attainmentGrade.status}
             />

@@ -21,11 +21,6 @@ const nameData: AttainmentTextFieldData = {
   fieldLabel: 'Name'
 };
 
-const tagData: AttainmentTextFieldData = {
-  fieldId: 'tag',
-  fieldLabel: 'Tag'
-};
-
 const daysValidData: AttainmentTextFieldData = {
   fieldId: 'daysValid',
   fieldLabel: 'Days Valid'
@@ -89,13 +84,6 @@ export default function LeafAttainment(props: {
           attainment={props.attainment}
           value={props.attainment.name}
           fieldData={nameData}
-        />
-        <StringTextField
-          attainmentTree={props.attainmentTree}
-          setAttainmentTree={props.setAttainmentTree}
-          attainment={props.attainment}
-          value={props.attainment.tag}
-          fieldData={tagData}
         />
         <TextField
           type='number'

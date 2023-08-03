@@ -49,7 +49,6 @@ export default function EditAttainmentView(): JSX.Element {
         id: -1,
         parentId: Number(attainmentId),
         name: '',
-        tag: '',
         daysValid: 0,
         subAttainments: []
       });

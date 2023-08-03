@@ -31,7 +31,6 @@ export default function CreateAssessmentModelDialog(props: {
           assessmentModelId: assessmentModelId,
           attainment: {
             name: 'Root',
-            tag: 'root',
             daysValid: 0
           }
         });

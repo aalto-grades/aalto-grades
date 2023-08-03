@@ -117,7 +117,6 @@ describe('Tests for EditAttainmentView components', () => {
         id: -2,
         parentId: 3,
         name: '',
-        tag: '',
         daysValid: 0,
       };
 
