@@ -245,13 +245,13 @@ export default function EditCourseView(): JSX.Element {
                   .notRequired(),
                 departmentEn: yup.string()
                   .min(1)
-                  .required('Please input the course organizer information in English'),
+                  .required('Please input the organizing department of the course in English'),
                 departmentFi: yup.string()
                   .min(1)
-                  .required('Please input the course organizer information in Finnish'),
+                  .required('Please input the organizing department of the course in Finnish'),
                 departmentSv: yup.string()
                   .min(1)
-                  .required('Please input the course organizer information in Swedish'),
+                  .required('Please input the organizing department of the course in Swedish'),
                 nameEn: yup.string()
                   .min(1)
                   .required('Please input a valid course name in English'),
@@ -295,7 +295,7 @@ export default function EditCourseView(): JSX.Element {
                       onChange={form.handleChange}
                       valueFormat='department%'
                       labelFormat='Organizer in %*'
-                      helperTextFormat='Give the organizer of the new course in %.'
+                      helperTextFormat='Give the organizing department of the new course in %.'
                     />
                     <EditCourseTextField
                       form={form}

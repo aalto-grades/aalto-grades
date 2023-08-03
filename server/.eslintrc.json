@@ -81,6 +81,7 @@
         "after": true
       }
     ],
+    "space-infix-ops": "error",
     "@typescript-eslint/typedef": [
       "error",
       {

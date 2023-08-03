@@ -8,6 +8,7 @@ import { JSX, SyntheticEvent, useState }  from 'react';
 import { NavigateFunction, Params, useParams, useNavigate } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 
+import UnsavedChangesDialog from './alerts/UnsavedChangesDialog';
 import Attainment from './edit-attainment-view/Attainment';
 import ConfirmationDialog from './edit-attainment-view/ConfirmationDialog';
 import NotFound from './NotFound';
@@ -48,6 +49,9 @@ export default function EditAttainmentView(): JSX.Element {
    */
   const [attainmentTree, setAttainmentTree]: State<AttainmentData | null> =
     useState<AttainmentData | null>(null);
+
+  const [showDialog, setShowDialog]: State<boolean> = useState(false);
+  const [fieldTouched, setFieldTouched]: State<boolean> = useState<boolean>(false);
 
   // If an attainment is being edited, this query is enabled
   const attainment: UseQueryResult<AttainmentData> = useGetAttainment(
@@ -91,6 +95,10 @@ export default function EditAttainmentView(): JSX.Element {
     const id: number = temporaryId;
     setTemporaryId(temporaryId - 1);
     return id;
+  }
+
+  function setTouched(): void {
+    setFieldTouched(true);
   }
 
   function deleteAttainmentEnqueue(attainment: AttainmentData): void {
@@ -238,6 +246,7 @@ export default function EditAttainmentView(): JSX.Element {
                   deleteAttainment={deleteAttainmentEnqueue}
                   getTemporaryId={getTemporaryId}
                   attainment={attainmentTree}
+                  setTouched={setTouched}
                 />
               )
             }
@@ -257,47 +266,42 @@ export default function EditAttainmentView(): JSX.Element {
           <Box sx={{
             display: 'flex',
             flexWrap: 'wrap',
-            justifyContent: modification === 'edit' ? 'space-between' : 'right',
+            justifyContent: 'right',
             alignItems: 'center',
             gap: 1,
             mt: 2,
             mb: 1
           }}>
-            {
-              (modification === 'edit') && (
-                <Button
-                  size='medium'
-                  variant='outlined'
-                  color='error'
-                  onClick={(): void => setOpenConfDialog(true)}
-                  sx={{ ml: 2 }}
-                >
-                  Delete Attainment
-                </Button>
-              )
-            }
-            <Box sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              gap: 1
-            }}>
-              <Button size='medium' variant='outlined' onClick={(): void => navigate(-1)}>
-                Cancel
-              </Button>
-              <Button
-                size='medium'
-                variant='contained'
-                type='submit'
-                onClick={handleSubmit}
-                sx={{ mr: 2 }}
-              >
-                Confirm
-              </Button>
-            </Box>
+            <Button
+              size='medium'
+              variant='outlined'
+              color={fieldTouched ? 'error' : 'primary'}
+              onClick={(): void => {
+                if (fieldTouched) {
+                  setShowDialog(true);
+                } else {
+                  navigate(-1);
+                }
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              size='medium'
+              variant='contained'
+              type='submit'
+              onClick={handleSubmit}
+              sx={{ mr: 2 }}
+            >
+              Submit
+            </Button>
           </Box>
         </form>
+        <UnsavedChangesDialog
+          setOpen={setShowDialog}
+          open={showDialog}
+          handleDiscard={(): void => navigate(-1)}
+        />
       </Container>
     </>
   );
