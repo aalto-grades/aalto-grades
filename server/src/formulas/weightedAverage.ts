@@ -25,7 +25,7 @@ interface Params extends ParamsObject<ChildParams> {
 }
 
 function calculateWeightedAverage(
-  attainmentTag: string,
+  attainmentName: string,
   params: Params | null,
   subGrades: Array<CalculationResult>
 ): CalculationResult {
@@ -40,12 +40,12 @@ function calculateWeightedAverage(
       if (subGrade.status !== Status.Pass)
         status = Status.Fail;
 
-      const weight: number | undefined = weights.get(subGrade.attainmentTag)?.weight;
+      const weight: number | undefined = weights.get(subGrade.attainmentName)?.weight;
       if (weight) {
         grade += subGrade.grade * weight;
       } else {
         throw new ApiError(
-          `weight unspecified for attainment with tag ${subGrade.attainmentTag}`,
+          `weight unspecified for attainment ${subGrade.attainmentName}`,
           HttpCode.InternalServerError
         );
       }
@@ -56,7 +56,7 @@ function calculateWeightedAverage(
   }
 
   return {
-    attainmentTag: attainmentTag,
+    attainmentName: attainmentName,
     grade: grade,
     status: status
   };
@@ -64,15 +64,15 @@ function calculateWeightedAverage(
 
 const codeSnippet: string =
 `interface ChildParams {
-  weight: number;
+  weight: number
 }
 
 interface Params extends ParamsObject<ChildParams> {
-  minRequiredGrade: number;
+  minRequiredGrade: number
 }
 
 function calculateWeightedAverage(
-  attainmentTag: string,
+  attainmentName: string,
   params: Params | null,
   subGrades: Array<CalculationResult>
 ): CalculationResult {
@@ -87,12 +87,12 @@ function calculateWeightedAverage(
       if (subGrade.status !== Status.Pass)
         status = Status.Fail;
 
-      const weight: number | undefined = weights.get(subGrade.attainmentTag)?.weight;
+      const weight: number | undefined = weights.get(subGrade.attainmentName)?.weight;
       if (weight) {
         grade += subGrade.grade * weight;
       } else {
         throw new ApiError(
-          \`weight unspecified for attainment with tag $\{subGrade.attainmentTag}\`,
+          \`weight unspecified for attainment \${subGrade.attainmentName}\`,
           HttpCode.InternalServerError
         );
       }
@@ -103,7 +103,7 @@ function calculateWeightedAverage(
   }
 
   return {
-    attainmentTag: attainmentTag,
+    attainmentName: attainmentName,
     grade: grade,
     status: status
   };

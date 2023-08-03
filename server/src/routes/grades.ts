@@ -79,8 +79,6 @@ const upload: Multer = multer({
  *         format: int32
  *         minimum: 0
  *         example: 5
- *       tag:
- *         $ref: '#/definitions/AttainmentTag'
  *       name:
  *         $ref: '#/definitions/AttainmentName'
  *       grade:

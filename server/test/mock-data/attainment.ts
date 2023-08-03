@@ -7,8 +7,7 @@ import Attainment from '../../src/database/models/attainment';
 
 export const mockAttainment: AttainmentData = {
   id: 1,
-  name: '2 optional exercises',
-  tag: 'optional-exercises',
+  name: 'optional-exercises',
   daysValid: 365,
   formula: Formula.WeightedAverage,
   formulaParams: {
@@ -21,16 +20,14 @@ export const mockAttainment: AttainmentData = {
   subAttainments: [
     {
       id: 2,
-      name: 'Exercise 1',
-      tag: 'ex-1',
+      name: 'ex-1',
       daysValid: 365,
       formula: Formula.Manual,
       subAttainments: [],
     },
     {
       id: 3,
-      name: 'Exercise 2',
-      tag: 'ex-2',
+      name: 'ex-2',
       daysValid: 365,
       formula: Formula.WeightedAverage,
       formulaParams: {
@@ -43,8 +40,7 @@ export const mockAttainment: AttainmentData = {
       subAttainments: [
         {
           id: 4,
-          name: 'Exercise 2.1',
-          tag: 'ex-2.1',
+          name: 'ex-2.1',
           daysValid: 365,
           formula: Formula.WeightedAverage,
           formulaParams: {
@@ -57,16 +53,14 @@ export const mockAttainment: AttainmentData = {
           subAttainments: [
             {
               id: 5,
-              name: 'Exercise 2.1.1',
-              tag: 'ex-2.1.1',
+              name: 'ex-2.1.1',
               daysValid: 365,
               formula: Formula.Manual,
               subAttainments: [],
             },
             {
               id: 6,
-              name: 'Exercise 2.1.2',
-              tag: 'ex-2.1.2',
+              name: 'ex-2.1.2',
               daysValid: 365,
               formula: Formula.Manual,
               subAttainments: [],
@@ -75,8 +69,7 @@ export const mockAttainment: AttainmentData = {
         },
         {
           id: 7,
-          name: 'Exercise 2.2',
-          tag: 'ex-2.2',
+          name: 'ex-2.2',
           daysValid: 365,
           formula: Formula.WeightedAverage,
           formulaParams: {
@@ -89,16 +82,14 @@ export const mockAttainment: AttainmentData = {
           subAttainments: [
             {
               id: 8,
-              name: 'Exercise 2.2.1',
-              tag: 'ex-2.2.1',
+              name: 'ex-2.2.1',
               daysValid: 365,
               formula: Formula.Manual,
               subAttainments: [],
             },
             {
               id: 9,
-              name: 'Exercise 2.2.2',
-              tag: 'ex-2.2.2',
+              name: 'ex-2.2.2',
               daysValid: 365,
               formula: Formula.WeightedAverage,
               formulaParams: {
@@ -111,16 +102,14 @@ export const mockAttainment: AttainmentData = {
               subAttainments: [
                 {
                   id: 10,
-                  name: 'Exercise 2.2.2.1',
-                  tag: 'ex-2.2.2.1',
+                  name: 'ex-2.2.2.1',
                   daysValid: 365,
                   formula: Formula.Manual,
                   subAttainments: [],
                 },
                 {
                   id: 11,
-                  name: 'Exercise 2.2.2.2',
-                  tag: 'ex-2.2.2.2',
+                  name: 'ex-2.2.2.2',
                   daysValid: 365,
                   formula: Formula.WeightedAverage,
                   formulaParams: {
@@ -133,16 +122,14 @@ export const mockAttainment: AttainmentData = {
                   subAttainments: [
                     {
                       id: 12,
-                      name: 'Exercise 2.2.2.2.1',
-                      tag: 'ex-2.2.2.2.1',
+                      name: 'ex-2.2.2.2.1',
                       daysValid: 365,
                       formula: Formula.Manual,
                       subAttainments: [],
                     },
                     {
                       id: 13,
-                      name: 'Exercise 2.2.2.2.2',
-                      tag: 'ex-2.2.2.2.2',
+                      name: 'ex-2.2.2.2.2',
                       daysValid: 365,
                       formula: Formula.Manual,
                       subAttainments: [],
@@ -163,7 +150,6 @@ export const jestMockAttainment: Attainment = new Attainment({
   assessmentModelId: 7,
   parentId: 1,
   name: 'xxx',
-  tag: 'yyy',
   daysValid: 365,
   formula: Formula.Manual,
   createdAt: new Date(),

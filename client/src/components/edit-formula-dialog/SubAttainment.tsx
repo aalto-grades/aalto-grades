@@ -15,7 +15,7 @@ export default function SubAttainment(props: {
   setChildParams: (childParams: Map<string, object>) => void
 }): JSX.Element {
 
-  const params: object = props.childParams.get(props.attainment.tag) ?? {};
+  const params: object = props.childParams.get(props.attainment.name) ?? {};
 
   function handleParamChange(
     event: ChangeEvent<HTMLInputElement>, param: string
@@ -23,7 +23,7 @@ export default function SubAttainment(props: {
     // TODO: This will not always be a number
     (params[param as keyof object] as unknown) = Number(event.target.value);
 
-    props.childParams.set(props.attainment.tag, params);
+    props.childParams.set(props.attainment.name, params);
     props.setChildParams(new Map(props.childParams));
   }
 
@@ -41,14 +41,8 @@ export default function SubAttainment(props: {
       mx: 1.5,
       mb: 2
     }}>
-      <Typography sx={{ my: 1 }} align='left'>
-        <span style={{ fontWeight: 'bold' }}>
-          {props.attainment.name} (
-        </span>
-        {props.attainment.tag}
-        <span style={{ fontWeight: 'bold' }}>
-          )
-        </span>
+      <Typography align='left' style={{ fontWeight: 'bold' }} sx={{ my: 1 }}>
+        {props.attainment.name}
       </Typography>
       <Box sx={{
         display: 'grid',

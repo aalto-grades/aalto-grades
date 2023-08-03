@@ -23,14 +23,8 @@ export default function AttainmentCategory(props: {
         justifyContent: 'space-between', alignItems: 'center', pr: '21px',
         pb: props.attainment.subAttainments ? '16px' : '0px', pl: '21px'
       }}>
-        <Typography align='left'>
-          <span style={{ fontWeight: 'bold' }}>
-            {props.attainment.name} (
-          </span>
-          {props.attainment.tag}
-          <span style={{ fontWeight: 'bold' }}>
-            )
-          </span>
+        <Typography align='left' style={{ fontWeight: 'bold' }}>
+          {props.attainment.name}
         </Typography>
         <Typography align='left' variant='body2'>
           {'Formula: ' + props.attainment.formula}

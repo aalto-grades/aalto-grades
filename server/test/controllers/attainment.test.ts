@@ -36,7 +36,6 @@ function verifyAttainmentData(
 ): void {
   expect(data.id).toBe(id);
   expect(data.assessmentModelId).toBe(assessmentModelId);
-  expect(data.tag).toBeDefined();
   expect(data.name).toBeDefined();
   expect(data.daysValid).toBeDefined();
   if (subAttainments)
@@ -60,7 +59,6 @@ function evaluateSubAttainment(attainment: AttainmentData): void {
   expect(attainment.assessmentModelId).toBeDefined();
   expect(attainment.name).toBeDefined();
   expect(attainment.parentId).toBeDefined();
-  expect(attainment.tag).toBeDefined();
   expect(attainment.formula).toBeDefined();
   expect(attainment.formulaParams).toBeDefined();
   expect(attainment.daysValid).toBeDefined();
@@ -276,7 +274,6 @@ describe(
           .post('/v1/courses/1/assessment-models/31/attainments')
           .send({
             name: 'New',
-            tag: 'tag of the new one',
             daysValid: 365,
             formula: Formula.Manual,
           })
@@ -290,7 +287,6 @@ describe(
         expect(res.body.data.name).toBe('New');
         expect(res.body.data.assessmentModelId).toBe(31);
         expect(res.body.data.parentId).not.toBeDefined();
-        expect(res.body.data.tag).toBe('tag of the new one');
         expect(res.body.data.formula).toBe(Formula.Manual);
         expect(res.body.data.formulaParams).toBe(null);
         expect(res.body.data.daysValid).toBeDefined();
@@ -308,7 +304,6 @@ describe(
           .post('/v1/courses/2/assessment-models/35/attainments')
           .send({
             name: 'examination',
-            tag: 'tag123456',
             daysValid: 365,
             formula: Formula.Manual,
           })
@@ -322,7 +317,6 @@ describe(
         expect(res.body.data.name).toBe('examination');
         expect(res.body.data.assessmentModelId).toBe(35);
         expect(res.body.data.parentId).not.toBeDefined();
-        expect(res.body.data.tag).toBe('tag123456');
         expect(res.body.data.formula).toBe(Formula.Manual);
         expect(res.body.data.formulaParams).toBe(null);
         expect(res.body.data.daysValid).toBeDefined();
@@ -345,7 +339,6 @@ describe(
         expect(res.body.data.assessmentModelId).toBe(32);
         expect(res.body.data.name).toBe(mockAttainment.name);
         expect(res.body.data.parentId).not.toBeDefined();
-        expect(res.body.data.tag).toBeDefined();
         expect(res.body.data.formula).toBeDefined();
         expect(res.body.data.daysValid).toBeDefined();
         expect(res.body.data.subAttainments).toBeDefined();
@@ -377,7 +370,7 @@ describe(
 
     it(
       'should update the children array of a parent attainment\'s parameters'
-      + ' with the tag of a new attainment',
+      + ' with the name of a new attainment',
       async () => {
         let parent: Attainment = await Attainment.findByPk(264) as Attainment;
         expect(parent.formulaParams).toBeDefined();
@@ -388,8 +381,7 @@ describe(
           .post('/v1/courses/3/assessment-models/3/attainments')
           .send({
             parentId: 264,
-            tag: 'born',
-            name: 'Born again',
+            name: 'born',
             daysValid: 10
           })
           .set('Content-Type', 'application/json')
@@ -471,8 +463,7 @@ describe(
                 veryIncorrect: true
               }
             },
-            name: 'Failure',
-            tag: 'not success',
+            name: 'not success',
             daysValid: 6000,
             formula: Formula.WeightedAverage
           })
@@ -498,8 +489,7 @@ describe(
           .post('/v1/courses/3/assessment-models/3/attainments')
           .send({
             parentId: 3,
-            name: 'Failure',
-            tag: 'not success',
+            name: 'not success',
             daysValid: 6000,
             formula: Formula.WeightedAverage,
             formulaParams: {
@@ -510,8 +500,7 @@ describe(
             },
             subAttainments: [
               {
-                name: 'Subfailure',
-                tag: 'sub not success',
+                name: 'sub not success',
                 daysValid: 6,
                 formula: Formula.WeightedAverage,
                 formulaParams: {
@@ -553,8 +542,7 @@ describe(
           .post('/v1/courses/3/assessment-models/3/attainments')
           .send({
             parentId: 3,
-            name: 'Failure',
-            tag: 'missing child',
+            name: 'missing child',
             daysValid: 1,
             formula: Formula.WeightedAverage,
             formulaParams: {
@@ -565,14 +553,12 @@ describe(
             },
             subAttainments: [
               {
-                name: 'Present',
-                tag: 'i-am-present',
+                name: 'i-am-present',
                 daysValid: 1,
                 formula: Formula.Manual
               },
               {
-                name: 'Absent',
-                tag: 'i-am-absent',
+                name: 'i-am-absent',
                 daysValid: 0,
                 formula: Formula.Manual
               }
@@ -587,20 +573,20 @@ describe(
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
         expect(res.body.errors).toContain(
-          'formula params do not include subattainments with tags i-am-absent'
+          'formula params do not include subattainments with names i-am-absent'
         );
       }
     );
 
     it(
-      'should respond with 400 bad request, if formula params include an invalid tag',
+      'should respond with 400 bad request, if formula params include an'
+      + ' invalid attainment name',
       async () => {
         const res: supertest.Response = await request
           .post('/v1/courses/3/assessment-models/3/attainments')
           .send({
             parentId: 3,
-            name: 'Failure',
-            tag: 'invalid tag',
+            name: 'invalid name',
             daysValid: 1,
             formula: Formula.WeightedAverage,
             formulaParams: {
@@ -613,8 +599,7 @@ describe(
             },
             subAttainments: [
               {
-                name: 'I exist',
-                tag: 'the good',
+                name: 'the good',
                 daysValid: 1,
                 formula: Formula.Manual
               }
@@ -629,7 +614,7 @@ describe(
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
         expect(res.body.errors).toContain(
-          'invalid subattainment tags in formula params: the bad,the ugly'
+          'invalid subattainment names in formula params: the bad,the ugly'
         );
       }
     );
@@ -643,7 +628,6 @@ describe(
             ...mockAttainment, subAttainments: [
               {
                 name: 'Exercise 1',
-                tag: 'tag-for-bad-input',
                 daysValid: badInput,
                 subAttainments: [],
               }
@@ -665,12 +649,10 @@ describe(
             ...mockAttainment, subAttainments: [
               {
                 name: 'Exercise 1',
-                tag: 'test-ex-1-1',
                 daysValid: 30,
                 subAttainments: [
                   {
                     name: 'Exercise 1',
-                    tag: 'test-ex-1-2',
                     daysValid: 30,
                     subAttainments: badInput,
                   }
@@ -694,17 +676,14 @@ describe(
             ...mockAttainment, subAttainments: [
               {
                 name: 'Exercise 1',
-                tag: 'test-ex-1-3',
                 daysValid: 30,
                 subAttainments: [
                   {
                     name: 'Exercise 1',
-                    tag: 'test-ex-1-4',
                     daysValid: 30,
                     subAttainments: [
                       {
                         name: 'Exercise 1',
-                        tag: 'test-ex-1-5',
                         daysValid: badInput,
                         subAttainments: [],
                       }
@@ -876,7 +855,6 @@ describe(
         .put(`/v1/courses/1/assessment-models/12/attainments/${subAttainment.id}`)
         .send({
           name: 'new name',
-          tag: 'new tag',
           daysValid: 50
         })
         .set('Content-Type', 'application/json')
@@ -889,7 +867,6 @@ describe(
       expect(res.body.data.assessmentModelId).toBe(12);
       expect(res.body.data.parentId).toBe(null);
       expect(res.body.data.name).toBe('new name');
-      expect(res.body.data.tag).toBe('new tag');
       expect(res.body.data.formula).toBe(Formula.WeightedAverage);
       expect(res.body.data.daysValid).toBe(50);
     });
@@ -916,7 +893,7 @@ describe(
 
     it(
       'should update the formula params of a potential parent attainment with'
-      + ' a new attainment tag if it is changed in a child',
+      + ' a new attainment name if it is changed in a child',
       async () => {
         let attainment: Attainment | null = await Attainment.findByPk(258);
         let parentParams: ParamsObject = attainment?.formulaParams as ParamsObject;
@@ -926,7 +903,7 @@ describe(
 
         const res: supertest.Response = await request
           .put('/v1/courses/2/assessment-models/43/attainments/259')
-          .send({ tag: 'changed tag' })
+          .send({ name: 'changed name' })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.Ok);
@@ -938,7 +915,7 @@ describe(
         parentParams = attainment?.formulaParams as ParamsObject;
 
         expect(parentParams.children).not.toContainEqual(['259', { weight: 1 }]);
-        expect(parentParams.children).toContainEqual(['changed tag', { weight: 1 }]);
+        expect(parentParams.children).toContainEqual(['changed name', { weight: 1 }]);
         expect(parentParams.children).toContainEqual(['260', { weight: 1 }]);
       }
     );
@@ -1047,8 +1024,8 @@ describe(
             formulaParams: {
               minRequiredGrade: 15,
               children: [
-                ['tag5', { weight: 5 }],
-                ['tag16', { weight: 16 }]
+                ['name5', { weight: 5 }],
+                ['name16', { weight: 16 }]
               ]
             }
           })
@@ -1061,13 +1038,14 @@ describe(
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
         expect(res.body.errors).toContain(
-          'formula params do not include subattainments with tags tag9,tag17,tag18'
+          'formula params do not include subattainments with names name9,name17,name18'
         );
       }
     );
 
     it(
-      'should respond with 400 bad request, if formula params include an invalid tag',
+      'should respond with 400 bad request, if formula params include an'
+      + ' invalid attainment name',
       async () => {
         const res: supertest.Response = await request
           .put('/v1/courses/1/assessment-models/1/attainments/1')
@@ -1075,11 +1053,11 @@ describe(
             formulaParams: {
               minRequiredGrade: 15,
               children: [
-                ['tag5', { weight: 5 }],
-                ['tag9', { weight: 9 }],
-                ['tag16', { weight: 16 }],
-                ['tag17', { weight: 17 }],
-                ['tag18', { weight: 18 }],
+                ['name5', { weight: 5 }],
+                ['name9', { weight: 9 }],
+                ['name16', { weight: 16 }],
+                ['name17', { weight: 17 }],
+                ['name18', { weight: 18 }],
                 ['invalid', { weight: 1 }],
                 ['invalid too', { weight: 2 }]
               ]
@@ -1094,7 +1072,7 @@ describe(
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
         expect(res.body.errors).toContain(
-          'invalid subattainment tags in formula params: invalid,invalid too'
+          'invalid subattainment names in formula params: invalid,invalid too'
         );
       }
     );
@@ -1113,7 +1091,6 @@ describe(
         .put('/v1/courses/4/assessment-models/7/attainments/1')
         .send({
           name: 'new name 2',
-          tag: 'new tag 2',
           daysValid: 51
         })
         .set('Cookie', cookies.userCookie)
@@ -1245,7 +1222,6 @@ describe(
         .send(
           {
             name: 'Test exercise',
-            tag: 'delete-test-1',
             daysValid: 30,
             subAttainments: []
           }
@@ -1275,7 +1251,6 @@ describe(
         .send(
           {
             name: 'Test exercise 2',
-            tag: 'delete-test-2',
             daysValid: 30,
             subAttainments: []
           }
@@ -1304,18 +1279,15 @@ describe(
       await testAttainmentTreeDeletion(
         {
           name: 'Test exercise',
-          tag: 'delete-test-2',
           daysValid: 30,
           subAttainments: [
             {
               name: 'Test exercise 1.1',
-              tag: 'delete-test-2-1.1',
               daysValid: 60,
               subAttainments: []
             },
             {
               name: 'Test exercise 1.2',
-              tag: 'delete-test-2-1.2',
               daysValid: 90,
               subAttainments: []
             }
