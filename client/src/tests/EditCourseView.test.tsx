@@ -9,17 +9,17 @@ import '@testing-library/jest-dom/extend-expect';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import CreateCourseView from '../components/CreateCourseView';
+import EditCourseView from '../components/EditCourseView';
 import { mockPostSuccess, server } from './mock-data/server';
 
-describe('Tests for CreateCourseView components', () => {
+describe('Tests for EditCourseView components', () => {
 
-  function renderCreateCourseView(): void {
+  function renderEditCourseView(): void {
     render(
       <QueryClientProvider client={new QueryClient()}>
-        <MemoryRouter initialEntries={['/create-course']}>
+        <MemoryRouter initialEntries={['/course/create']}>
           <Routes>
-            <Route path='/create-course' element={<CreateCourseView />} />
+            <Route path='/course/:modification/:courseId?' element={<EditCourseView />} />
           </Routes>
         </MemoryRouter>
       </QueryClientProvider>
@@ -27,10 +27,10 @@ describe('Tests for CreateCourseView components', () => {
   }
 
   test(
-    'CreateCourseView should render all of the appropriate components',
+    'EditCourseView should render all of the appropriate components',
     () => {
 
-      renderCreateCourseView();
+      renderEditCourseView();
 
       expect(screen.getByText('Create a New Course')).toBeDefined();
       expect(screen.getByLabelText('Course Code*')).toBeDefined();
@@ -49,9 +49,9 @@ describe('Tests for CreateCourseView components', () => {
     }
   );
 
-  test('CreateCourseForm should allow an admin to create a course', async () => {
+  test('EditCourseView should allow an admin to create a course', async () => {
 
-    renderCreateCourseView();
+    renderEditCourseView();
 
     const addCourse: jest.Mock = jest.fn();
     server.use(rest.post(

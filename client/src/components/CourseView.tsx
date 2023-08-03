@@ -81,15 +81,13 @@ export default function CourseView(): JSX.Element {
             }}>
               <Typography variant='h2' align='left'>{course.data.name.en}</Typography>
               {
-                /* Only admins and teachers in charge are allowed to create assessment models */
-                (auth?.role == SystemRole.Admin || isTeacherInCharge) && (
+                (auth?.role == SystemRole.Admin) && (
                   <Button
-                    id='ag_new_assessment_model_btn'
                     size='large'
                     variant='contained'
-                    onClick={(): void => setCreateAssessmentModelOpen(true)}
+                    onClick={(): void => navigate(`/course/edit/${courseId}`)}
                   >
-                    New Assessment Model
+                    Edit Course
                   </Button>
                 )
               }
@@ -101,6 +99,7 @@ export default function CourseView(): JSX.Element {
                   assessmentModels={assessmentModels.data}
                   currentAssessmentModelId={currentAssessmentModel?.id}
                   onChangeAssessmentModel={onChangeAssessmentModel}
+                  onNewAssessmentModel={(): void => setCreateAssessmentModelOpen(true)}
                 />
               </div>
               {

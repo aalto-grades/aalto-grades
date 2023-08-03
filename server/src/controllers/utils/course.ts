@@ -105,7 +105,8 @@ export function parseCourseFull(course: CourseFull): CourseData {
   course.Users.forEach((teacher: User) => {
     courseData.teachersInCharge.push({
       id: teacher.id,
-      name: teacher.name
+      name: teacher.name,
+      email: teacher.email
     });
   });
 

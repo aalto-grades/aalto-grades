@@ -253,20 +253,22 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
             newTeachers.splice(existingTeacherIndex, 1);
           } else {
             // If not, oldTeacher needs to be removed from the database.
-            oldTeacher.destroy({ transaction: t });
+            await oldTeacher.destroy({ transaction: t });
           }
         }
 
         // Add teachers who are in the newTeachers array but not in the database.
-        await TeacherInCharge.bulkCreate(
-          newTeachers.map((user: User) => {
-            return {
-              userId: user.id,
-              courseId: courseId
-            };
-          }),
-          { transaction: t }
-        );
+        if (oldTeachers.length > 0) {
+          await TeacherInCharge.bulkCreate(
+            newTeachers.map((user: User) => {
+              return {
+                userId: user.id,
+                courseId: courseId
+              };
+            }),
+            { transaction: t }
+          );
+        }
       }
     }
   );

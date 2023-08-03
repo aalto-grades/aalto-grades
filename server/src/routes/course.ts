@@ -91,6 +91,10 @@ export const router: Router = Router();
  *               type: string
  *               description: Teacher's name.
  *               example: John Doe
+ *             email:
+ *               type: string
+ *               description: Teacher's email address.
+ *               example: john.doe@aalto.fi
  */
 
 /**
