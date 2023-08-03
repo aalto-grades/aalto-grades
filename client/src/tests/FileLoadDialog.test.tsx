@@ -70,7 +70,7 @@ describe('FileLoadDialog test with proper csv', () => {
 
     const { getByText }: RenderResult = renderCourseView(auth);
 
-    const uploadOption: HTMLElement = getByText('Upload Grades CSV');
+    const uploadOption: HTMLElement = getByText('Upload Grade CSV');
     expect(uploadOption).toBeDefined();
     act(() => userEvent.click(uploadOption));
 
@@ -102,7 +102,7 @@ describe('FileLoadDialog test with proper csv', () => {
 
       const { getByText, findByText }: RenderResult = renderCourseView(auth);
 
-      const uploadOption: HTMLElement = getByText('Upload Grades CSV');
+      const uploadOption: HTMLElement = getByText('Upload Grade CSV');
       expect(uploadOption).toBeDefined();
       act(() => userEvent.click(uploadOption));
 
@@ -128,7 +128,7 @@ describe('FileLoadDialog test with proper csv', () => {
 
     const { getByText, queryByText }: RenderResult = renderCourseView(auth);
 
-    const uploadOption: HTMLElement = getByText('Upload Grades CSV');
+    const uploadOption: HTMLElement = getByText('Upload Grade CSV');
     expect(uploadOption).toBeDefined();
     act(() => userEvent.click(uploadOption));
 
@@ -188,7 +188,7 @@ describe('FileLoadDialog test where server does not accept the file', () => {
 
     const { getByText }: RenderResult = renderCourseView(auth);
 
-    const uploadOption: HTMLElement = getByText('Upload Grades CSV');
+    const uploadOption: HTMLElement = getByText('Upload Grade CSV');
     expect(uploadOption).toBeDefined();
     act(() => userEvent.click(uploadOption));
 

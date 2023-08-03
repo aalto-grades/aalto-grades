@@ -144,7 +144,7 @@ describe('Tests for EditAttainmentView components', () => {
         const deleteButtons: Array<HTMLElement> = await screen.findAllByText('Delete');
         const addButton: HTMLElement = screen.getByText('Add Sub-Attainments');
 
-        expect(deleteButtons).toHaveLength(1);
+        expect(deleteButtons).toHaveLength(2);
         expect(addButton).toBeInTheDocument();
       });
 
