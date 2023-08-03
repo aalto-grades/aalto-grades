@@ -500,7 +500,7 @@ describe(
             },
             subAttainments: [
               {
-               name: 'sub not success',
+                name: 'sub not success',
                 daysValid: 6,
                 formula: Formula.WeightedAverage,
                 formulaParams: {
