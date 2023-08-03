@@ -49,7 +49,7 @@ export default function CourseDetails(props: {
           }
         />
         <LightLabelBoldValue
-          label='Organizer'
+          label='Organizing department'
           value={props.course.department.en}
         />
         <LightLabelBoldValue

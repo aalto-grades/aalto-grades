@@ -269,22 +269,26 @@ export default function EditInstanceView(): JSX.Element {
                       </TextField>
                     </Box>
                     <Box sx={{
-                      display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
-                      alignItems: 'center', pb: 6
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      pb: 6
                     }}>
                       <Button
                         size='medium'
                         variant='outlined'
+                        color={initialValues != values ? 'error' : 'primary'}
                         disabled={isSubmitting}
                         onClick={(): void => {
                           if (initialValues != values) {
                             setShowDialog(true);
                           } else {
-                            navigate('/course-view/' + courseId);
+                            navigate(-1);
                           }
                         }}
                       >
-                        Cancel
+                        Back
                       </Button>
                       <Button
                         id='ag_confirm_instance_details_btn'
@@ -292,7 +296,7 @@ export default function EditInstanceView(): JSX.Element {
                         type='submit'
                         disabled={!isValid || isSubmitting}
                       >
-                        Confirm Details
+                        Submit
                       </Button>
                     </Box>
                   </Form>
@@ -302,7 +306,7 @@ export default function EditInstanceView(): JSX.Element {
             <UnsavedChangesDialog
               setOpen={setShowDialog}
               open={showDialog}
-              handleDiscard={(): void => navigate(`/course-view/${courseId}`)}
+              handleDiscard={(): void => navigate(-1)}
             />
           </>
         ) : (

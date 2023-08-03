@@ -23,7 +23,8 @@ export default function SimpleDialog(props: {
   getTemporaryId: () => number,
   attainment: AttainmentData,
   handleClose: () => void,
-  open: boolean
+  open: boolean,
+  setTouched: () => void
 }): JSX.Element {
 
   const [numOfAttainments, setNumOfAttainments]: State<number> = useState(1);
@@ -56,8 +57,8 @@ export default function SimpleDialog(props: {
         });
       }
 
+      props.setTouched();
       props.setAttainmentTree(structuredClone(props.attainmentTree));
-
       props.handleClose();
     } catch (exception) {
       console.log(exception);
@@ -93,7 +94,11 @@ export default function SimpleDialog(props: {
             />
           </DialogContent>
           <DialogActions>
-            <Button size='medium' onClick={props.handleClose}>
+            <Button
+              size='medium'
+              variant='outlined'
+              onClick={props.handleClose}
+            >
               Cancel
             </Button>
             <Button

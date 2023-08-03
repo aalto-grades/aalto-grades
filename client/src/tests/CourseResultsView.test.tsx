@@ -45,19 +45,19 @@ describe('Tests for CourseResultsView components', () => {
 
       renderCourseResultsView();
 
-      const uploadOption: HTMLElement = screen.getByText('Upload Grades');
+      const uploadOption: HTMLElement = screen.getByText('Upload Grade CSV');
       expect(uploadOption).toBeDefined();
       act(() => userEvent.click(uploadOption));
 
       const dialogTitle: HTMLElement = screen.getByText('Add Grades from File');
       const uploadFileButton: HTMLElement = screen.getByText('Upload file');
       const cancelButton: HTMLElement = screen.getByText('Cancel');
-      const confirmButton: HTMLElement = screen.getByText('Confirm');
+      const submitButton: HTMLElement = screen.getByText('Submit');
 
       expect(dialogTitle).toBeVisible();
       expect(uploadFileButton).toBeVisible();
       expect(cancelButton).toBeVisible();
-      expect(confirmButton).toBeVisible();
+      expect(submitButton).toBeVisible();
 
       act(() => userEvent.click(cancelButton));
       expect(dialogTitle).not.toBeVisible();

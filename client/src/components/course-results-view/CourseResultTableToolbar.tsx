@@ -7,13 +7,14 @@ import DownloadIcon from '@mui/icons-material/Download';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { Box, Button, IconButton, TextField, Toolbar, Tooltip } from '@mui/material';
 import { useState } from 'react';
-import { Params, useParams } from 'react-router-dom';
+import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
 
 import FileLoadDialog from './FileLoadDialog';
 import MenuButton, { MenuButtonOption } from './MenuButton';
 import SisuDownloadDialog from './SisuDownloadDialog';
 
 import { State } from '../../types';
+import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 export default function CourseResultsTableToolbar(props: {
   search: string,
@@ -22,10 +23,12 @@ export default function CourseResultsTableToolbar(props: {
   downloadCsvTemplate: () => Promise<void>,
   selectedStudents: Array<FinalGrade>
 }): JSX.Element {
+  const navigate: NavigateFunction = useNavigate();
   const { assessmentModelId }: Params = useParams();
 
   const [showFileDialog, setShowFileDialog]: State<boolean> = useState(false);
   const [showSisuDialog, setShowSisuDialog]: State<boolean> = useState(false);
+  const [showDialog, setShowDialog]: State<boolean> = useState(false);
 
   const actionOptions: Array<MenuButtonOption> = [
     {
@@ -144,7 +147,10 @@ export default function CourseResultsTableToolbar(props: {
             title="Download grading template with attainment tags and student numbers."
             placement="top"
           >
-            <Button variant='outlined' onClick={(): Promise<void> => props.downloadCsvTemplate()}>
+            <Button
+              variant='outlined'
+              onClick={(): Promise<void> => props.downloadCsvTemplate()}
+            >
               Download CSV template
             </Button>
           </Tooltip>
@@ -152,11 +158,35 @@ export default function CourseResultsTableToolbar(props: {
             title="Upload grades from a CSV file."
             placement="top"
           >
-            <Button variant='outlined' onClick={(): void => setShowFileDialog(true)}>
-              Upload Grades
+            <Button
+              variant='outlined'
+              onClick={(): void => setShowFileDialog(true)}
+            >
+              Upload Grade CSV
             </Button>
           </Tooltip>
           <MenuButton label='Import grades' options={actionOptions} />
+          <Tooltip
+            title={props.selectedStudents.length != 0 ?
+              'You have selected students, these selections will be lost if not saved.' :
+              'Return to the course view page.'
+            }
+            placement="top"
+          >
+            <Button
+              variant='outlined'
+              color={props.selectedStudents.length != 0 ? 'error' : 'primary'}
+              onClick={(): void => {
+                if (props.selectedStudents.length != 0) {
+                  setShowDialog(true);
+                } else {
+                  navigate(-1);
+                }
+              }}
+            >
+              Return to course view
+            </Button>
+          </Tooltip>
           <SisuDownloadDialog
             open={showSisuDialog}
             handleClose={handleCloseSisuDialog}
@@ -169,6 +199,11 @@ export default function CourseResultsTableToolbar(props: {
           />
         </Box>
       </Box>
+      <UnsavedChangesDialog
+        setOpen={setShowDialog}
+        open={showDialog}
+        handleDiscard={(): void => navigate(-1)}
+      />
     </Toolbar>
   );
 }
