@@ -144,7 +144,7 @@ export default function CourseResultsTableToolbar(props: {
             </span>
           </Tooltip>
           <Tooltip
-            title="Download grading template with attainment tags and student numbers."
+            title="Download grading template with attainment names and student numbers."
             placement="top"
           >
             <Button

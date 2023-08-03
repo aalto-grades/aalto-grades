@@ -18,7 +18,7 @@ import { State } from '../../types';
 
 const instructions: string =
   'Upload a CSV file with the header "studentNo" and headers matching to the'
-  + ' study attainment tags you wish to add grades for. You can see an example'
+  + ' study attainment names you wish to add grades for. You can see an example'
   + ' of a CSV file of the correct format below.';
 
 const exampleText: string =
