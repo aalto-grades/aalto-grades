@@ -1,0 +1,33 @@
+<!--
+SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+
+SPDX-License-Identifier: MIT
+
+This file is based on the default GitHub bug report template, which appears to
+be in the public domain.
+-->
+
+---
+name: Bug report
+about: Create a report to help us improve
+title: ''
+labels: bug
+assignees: ''
+
+---
+
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
+4. See error
+
+**Expected behavior**
+A clear and concise description of what you expected to happen.
+
+**Actual behavior**
+A clear and concise description of what you actually observed happen.
+
+**Screenshots**
+If applicable, add screenshots to help explain your problem.
