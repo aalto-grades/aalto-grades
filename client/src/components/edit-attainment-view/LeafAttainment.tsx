@@ -58,14 +58,15 @@ export default function LeafAttainment(props: {
 
   // Functions and varibales for opening and closing the dialog for confirming
   // sub-attainment deletion
-  const [openConfDialog, setOpenConfDialog]: State<boolean> = useState(false);
+  const [openConfirmationDialog, setOpenConfirmationDialog]: State<boolean> =
+    useState(false);
 
-  function handleConfDialogOpen(): void {
-    setOpenConfDialog(true);
+  function handleConfirmationDialogOpen(): void {
+    setOpenConfirmationDialog(true);
   }
 
-  function handleConfDialogClose(): void {
-    setOpenConfDialog(false);
+  function handleConfirmationDialogClose(): void {
+    setOpenConfirmationDialog(false);
   }
 
   return (
@@ -167,7 +168,7 @@ export default function LeafAttainment(props: {
               variant='outlined'
               color='error'
               sx={{ my: 1 }}
-              onClick={handleConfDialogOpen}
+              onClick={handleConfirmationDialogOpen}
             >
               Delete
             </Button>
@@ -177,10 +178,10 @@ export default function LeafAttainment(props: {
                 size='small'
                 variant='contained'
                 color='error'
-                onClick={(): void => setOpenConfDialog(true)}
+                onClick={(): void => setOpenConfirmationDialog(true)}
                 sx={{ ml: 2 }}
               >
-                Delete Attainment
+                Delete
               </Button>
             ) : (
               <Box sx={{ width: '1px' }} />
@@ -192,8 +193,8 @@ export default function LeafAttainment(props: {
           attainment={props.attainment}
           title={'Sub Study Attainments'}
           subject={'sub study attainment'}
-          handleClose={handleConfDialogClose}
-          open={openConfDialog}
+          handleClose={handleConfirmationDialogClose}
+          open={openConfirmationDialog}
         />
         {
           <Button
@@ -219,6 +220,7 @@ export default function LeafAttainment(props: {
         attainment={props.attainment}
         handleClose={handleCountDialogClose}
         open={openCountDialog}
+        setTouched={props.setTouched}
       />
     </Box>
   );
