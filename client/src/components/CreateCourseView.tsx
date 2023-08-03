@@ -114,13 +114,13 @@ export default function CreateCourseView(): JSX.Element {
               .notRequired(),
             departmentEn: yup.string()
               .min(1)
-              .required('Please input the course organizing department information in English'),
+              .required('Please input the organizing department of the course in English'),
             departmentFi: yup.string()
               .min(1)
-              .required('Please input the course organizing department information in Finnish'),
+              .required('Please input the organizing department of the course in Finnish'),
             departmentSv: yup.string()
               .min(1)
-              .required('Please input the course organizing department information in Swedish'),
+              .required('Please input the organizing department of the course in Swedish'),
             nameEn: yup.string()
               .min(1)
               .required('Please input a valid course name in English'),
@@ -378,7 +378,7 @@ export default function CreateCourseView(): JSX.Element {
                 <Button
                   size='medium'
                   variant='outlined'
-                  color={initialValues != values ? 'error': 'primary'}
+                  color={initialValues != values ? 'error' : 'primary'}
                   disabled={isSubmitting}
                   onClick={(): void => {
                     if (initialValues != values) {

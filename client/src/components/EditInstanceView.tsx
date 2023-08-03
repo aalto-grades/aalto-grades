@@ -278,7 +278,7 @@ export default function EditInstanceView(): JSX.Element {
                       <Button
                         size='medium'
                         variant='outlined'
-                        color={initialValues != values ? 'error': 'primary'}
+                        color={initialValues != values ? 'error' : 'primary'}
                         disabled={isSubmitting}
                         onClick={(): void => {
                           if (initialValues != values) {

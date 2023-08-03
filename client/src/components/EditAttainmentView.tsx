@@ -39,7 +39,7 @@ export default function EditAttainmentView(): JSX.Element {
     useState<AttainmentData | null>(null);
 
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
-  const [fieldTouched, setFieldTouched]: State<boolean> =useState<boolean>(false);
+  const [fieldTouched, setFieldTouched]: State<boolean> = useState<boolean>(false);
 
   // If an attainment is being edited, this query is enabled
   const attainment: UseQueryResult<AttainmentData> = useGetAttainment(

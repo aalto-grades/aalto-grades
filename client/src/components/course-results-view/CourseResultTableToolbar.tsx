@@ -162,7 +162,7 @@ export default function CourseResultsTableToolbar(props: {
               variant='outlined'
               onClick={(): void => setShowFileDialog(true)}
             >
-              Upload Grades CSV
+              Upload Grade CSV
             </Button>
           </Tooltip>
           <MenuButton label='Import grades' options={actionOptions} />

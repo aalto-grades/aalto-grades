@@ -45,7 +45,7 @@ describe('Tests for CourseResultsView components', () => {
 
       renderCourseResultsView();
 
-      const uploadOption: HTMLElement = screen.getByText('Upload Grades CSV');
+      const uploadOption: HTMLElement = screen.getByText('Upload Grade CSV');
       expect(uploadOption).toBeDefined();
       act(() => userEvent.click(uploadOption));
 

@@ -62,11 +62,11 @@ describe('Tests for EditAttainmentView components', () => {
     await waitFor(async () => {
       const headingElement: HTMLElement = screen.getByText('Edit Study Attainment');
       const categoryField: Array<HTMLElement> = await screen.findAllByLabelText('Name');
-      const SubmitButton: HTMLElement = screen.getByText('Submit');
+      const submitButton: HTMLElement = screen.getByText('Submit');
 
       expect(headingElement).toBeInTheDocument();
       expect(categoryField).toHaveLength(1);
-      expect(SubmitButton).toBeInTheDocument();
+      expect(submitButton).toBeInTheDocument();
     });
   });
 
@@ -82,8 +82,8 @@ describe('Tests for EditAttainmentView components', () => {
     act(() => userEvent.clear(daysValidField));
     act(() => userEvent.type(daysValidField, '42'));
 
-    const SubmitButton: HTMLElement = screen.getByText('Submit');
-    act(() => userEvent.click(SubmitButton));
+    const submitButton: HTMLElement = screen.getByText('Submit');
+    act(() => userEvent.click(submitButton));
 
     await waitFor(() => {
       expect(editAttainment).toHaveBeenCalledTimes(15);
