@@ -3,8 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { AssessmentModelData, CourseData, SystemRole, UserData } from 'aalto-grades-common/types';
-import EditIcon from '@mui/icons-material/Edit';
-import { Box, IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, Button, Tooltip, Typography } from '@mui/material';
 
 import AssessmentModelsList from './AssessmentModelsList';
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';
@@ -15,7 +14,8 @@ export default function CourseDetails(props: {
   course: CourseData,
   assessmentModels?: Array<AssessmentModelData>,
   currentAssessmentModelId?: number,
-  onChangeAssessmentModel: (assessmentModel: AssessmentModelData) => void
+  onChangeAssessmentModel: (assessmentModel: AssessmentModelData) => void,
+  onNewAssessmentModel: () => void
 }): JSX.Element {
   const { auth, isTeacherInCharge }: AuthContextType = useAuth();
 
@@ -25,18 +25,15 @@ export default function CourseDetails(props: {
         display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
         alignItems: 'center', columnGap: 4, pb: 1
       }}>
-        <Typography variant='h3' align='left' sx={{ ml: 1.5 }} >
-          Course Details
-          {
-            (auth?.role == SystemRole.Admin || isTeacherInCharge) && (
-              <Tooltip title="Edit course details" placement="right">
-                <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit course details">
-                  <EditIcon />
-                </IconButton>
-              </Tooltip>
-            )
-          }
-        </Typography>
+        <Box sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between'
+        }}>
+          <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>
+            Course Details
+          </Typography>
+        </Box>
       </Box>
       <Box textAlign='left' borderRadius={1} sx={{
         bgcolor: 'secondary.light', p: 1.5, mt: 1, minWidth: '318px'
@@ -61,15 +58,6 @@ export default function CourseDetails(props: {
       <Box sx={{ mt: 1.5 }}>
         <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>
           Teachers in Charge
-          {
-            (auth?.role == SystemRole.Admin || isTeacherInCharge) && (
-              <Tooltip title="Edit teachers in charge" placement="right">
-                <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit teachers in charge">
-                  <EditIcon />
-                </IconButton>
-              </Tooltip>
-            )
-          }
         </Typography>
         <Box textAlign='left' borderRadius={1} sx={{
           bgcolor: 'secondary.light', p: 1.5, mt: 1, minWidth: '318px'
@@ -86,18 +74,24 @@ export default function CourseDetails(props: {
         </Box>
       </Box>
       <Box sx={{ mt: 1.5 }}>
-        <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>
-          Assessment Models
+        <Box sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between'
+        }}>
+          <Typography variant='h3' align='left' sx={{ pt: 1.5, pb: 1 }}>
+            Assessment Models
+          </Typography>
           {
             (auth?.role == SystemRole.Admin || isTeacherInCharge) && (
-              <Tooltip title="Edit assessment models" placement="right">
-                <IconButton sx={{ ml: 1 }} color="primary" aria-label="edit assessment models">
-                  <EditIcon />
-                </IconButton>
+              <Tooltip title="New assessment model" placement="right">
+                <Button onClick={props.onNewAssessmentModel}>
+                  New
+                </Button>
               </Tooltip>
             )
           }
-        </Typography>
+        </Box>
         <Box textAlign='left' borderRadius={1} sx={{
           bgcolor: 'secondary.light', p: 1.5, mt: 1, minWidth: '318px'
         }}>

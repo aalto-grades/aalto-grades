@@ -120,14 +120,11 @@ export default function Attainments(props: {
         display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
         alignItems: 'center', gap: 1, mt: 2, mb: 1
       }}>
-        <Button
-          onClick={(): void => {
-            navigate(
-              `/${props.courseId}/attainment/create`
-            + `/${props.assessmentModel.id}/${props.attainmentTree.id}`
-            );
-          }}
-        >
+        <Button onClick={(): void => {
+          navigate(
+            `/${props.courseId}/attainment/create/${props.assessmentModel.id}`
+          );
+        }}>
           Add attainment
         </Button>
         <Box sx={{

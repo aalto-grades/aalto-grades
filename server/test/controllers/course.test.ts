@@ -258,40 +258,25 @@ describe('Test POST /v1/courses - create new course', () => {
 
 describe ('Test PUT /v1/courses/:courseId - edit course', () => {
 
-  async function checkCourseData(
-    courseId: number, expected: CourseData
-  ): Promise<void> {
-    expect(parseCourseFull(await findCourseFullById(
-      courseId, HttpCode.InternalServerError
-    ))).toStrictEqual(expected);
-  }
-
-  function uneditedCourseData(
-    courseId: number, courseCode: string, teachersInCharge: Array<UserData>
-  ): CourseData {
-    return {
-      id: courseId,
-      courseCode: courseCode,
-      minCredits: 5,
-      maxCredits: 5,
-      teachersInCharge: teachersInCharge,
-      department: {
-        fi: 'muokkaamaton laitos',
-        en: 'unedited department',
-        sv: 'oredigerad institutionen'
-      },
-      name: {
-        fi: 'muokkaamaton nimi',
-        en: 'unedited name',
-        sv: 'oredigerad namn'
-      },
-      evaluationInformation: {
-        fi: '',
-        en: '',
-        sv: ''
-      }
-    };
-  }
+  const uneditedCourseDataBase: object = {
+    minCredits: 5,
+    maxCredits: 5,
+    department: {
+      fi: 'muokkaamaton laitos',
+      en: 'unedited department',
+      sv: 'oredigerad institutionen'
+    },
+    name: {
+      fi: 'muokkaamaton nimi',
+      en: 'unedited name',
+      sv: 'oredigerad namn'
+    },
+    evaluationInformation: {
+      fi: '',
+      en: '',
+      sv: ''
+    }
+  };
 
   const courseDataEdits: object = {
     courseCode: 'edited',
@@ -309,57 +294,128 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
     }
   };
 
-  it('should successfully update course information', async () => {
-    const course: CourseData = uneditedCourseData(10, 'Test edit course', [
-      { id: 50,  name: 'Everett Dennis' }
-    ]);
+  async function testCourseEditSuccess(
+    courseId: number,
+    uneditedCourseData: object,
+    edits: object,
+    editedTeachersInCharge?: Array<UserData>
+  ): Promise<void> {
 
-    checkCourseData(10, course);
+    async function checkCourseData(
+      courseId: number, expected: CourseData
+    ): Promise<void> {
+      expect(parseCourseFull(await findCourseFullById(
+        courseId, HttpCode.InternalServerError
+      ))).toStrictEqual(expected);
+    }
+
+    const course: CourseData = {
+      ...uneditedCourseData, id: courseId
+    } as unknown as CourseData;
+
+    checkCourseData(courseId, course);
 
     const res: supertest.Response = await request
-      .put('/v1/courses/10')
-      .send(courseDataEdits)
+      .put(`/v1/courses/${courseId}`)
+      .send(edits)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
     expect(res.body.errors).not.toBeDefined();
     expect(res.body.data).toBeDefined();
-    expect(res.body.data).toStrictEqual({ ...course, ...courseDataEdits });
-    checkCourseData(10, { ...course, ...courseDataEdits });
+
+    const editedCourseData: CourseData = { ...course, ...edits };
+    if (editedTeachersInCharge)
+      editedCourseData.teachersInCharge = editedTeachersInCharge;
+
+    expect(res.body.data).toStrictEqual(editedCourseData);
+    checkCourseData(courseId, editedCourseData);
+  }
+
+  it('should successfully update course information', async () => {
+    await testCourseEditSuccess(
+      10,
+      {
+        ...uneditedCourseDataBase,
+        courseCode: 'Test edit course',
+        teachersInCharge: [
+          { id: 50, name: 'Everett Dennis', email: 'everett.dennis@aalto.fi' }
+        ]
+      },
+      courseDataEdits
+    );
+  });
+
+  it('should successfully add a single teacher in charge', async () => {
+    await testCourseEditSuccess(
+      10,
+      {
+        ...uneditedCourseDataBase,
+        ...courseDataEdits,
+        teachersInCharge: [
+          { id: 50, name: 'Everett Dennis', email: 'everett.dennis@aalto.fi' }
+        ]
+      },
+      {
+        teachersInCharge: [
+          { email: 'everett.dennis@aalto.fi' },
+          { email: 'larissa.poore@aalto.fi' }
+        ]
+      },
+      [
+        { id: 50, name: 'Everett Dennis', email: 'everett.dennis@aalto.fi' },
+        { id: 100, name: 'Larissa Poore', email: 'larissa.poore@aalto.fi' }
+      ]
+    );
+  });
+
+  it('should successfully delete a single teacher in charge', async () => {
+    await testCourseEditSuccess(
+      10,
+      {
+        ...uneditedCourseDataBase,
+        ...courseDataEdits,
+        teachersInCharge: [
+          { id: 50, name: 'Everett Dennis', email: 'everett.dennis@aalto.fi' },
+          { id: 100, name: 'Larissa Poore', email: 'larissa.poore@aalto.fi' }
+        ]
+      },
+      {
+        teachersInCharge: [
+          { email: 'larissa.poore@aalto.fi' }
+        ]
+      },
+      [
+        { id: 100, name: 'Larissa Poore', email: 'larissa.poore@aalto.fi' }
+      ]
+    );
   });
 
   it('should successfully update course information and teachers in charge', async () => {
-    const course: CourseData = uneditedCourseData(11, 'Test edit course and teachers', [
-      { id: 100, name: 'Larissa Poore' },
-      { id: 200, name: 'Harriet Maestas' },
-      { id: 300, name: 'Charles Morrissey' },
-    ]);
-
-    checkCourseData(11, course);
-
-    const res: supertest.Response = await request
-      .put('/v1/courses/11')
-      .send({
+    await testCourseEditSuccess(
+      11,
+      {
+        ...uneditedCourseDataBase,
+        courseCode: 'Test edit course and teachers',
+        teachersInCharge: [
+          { id: 100, name: 'Larissa Poore', email: 'larissa.poore@aalto.fi' },
+          { id: 200, name: 'Harriet Maestas', email: 'harriet.maestas@aalto.fi' },
+          { id: 300, name: 'Charles Morrissey', email: 'charles.morrissey@aalto.fi' },
+        ]
+      },
+      {
         ...courseDataEdits,
         teachersInCharge: [
           { email: 'larissa.poore@aalto.fi' },
           { email: 'donald.perez@aalto.fi' }
         ]
-      })
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Ok);
-
-    course.teachersInCharge = [
-      { id: 100, name: 'Larissa Poore' },
-      { id: 101, name: 'Donald Perez' }
-    ];
-
-    expect(res.body.errors).not.toBeDefined();
-    expect(res.body.data).toBeDefined();
-    expect(res.body.data).toStrictEqual({ ...course, ...courseDataEdits });
-    checkCourseData(11, { ...course, ...courseDataEdits });
+      },
+      [
+        { id: 100, name: 'Larissa Poore', email: 'larissa.poore@aalto.fi' },
+        { id: 101, name: 'Donald Perez', email: 'donald.perez@aalto.fi' }
+      ]
+    );
   });
 
   it('should respond with 400 bad request, if body validation fails', async () => {

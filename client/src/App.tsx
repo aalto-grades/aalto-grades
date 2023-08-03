@@ -18,7 +18,7 @@ import Signup from './components/auth/Signup';
 import UserButton from './components/auth/UserButton';
 import CourseView from './components/CourseView';
 import CourseResultsView from './components/CourseResultsView';
-import CreateCourseView from './components/CreateCourseView';
+import EditCourseView from './components/EditCourseView';
 import EditAttainmentView from './components/EditAttainmentView';
 import EditInstanceView from './components/EditInstanceView';
 import FetchInstancesView from './components/FetchInstancesView';
@@ -183,11 +183,10 @@ export default function App(): JSX.Element {
                 {/* Pages that are only authorised for admin */}
                 <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
                   <Route
-                    path='/create-course'
-                    element={<CreateCourseView />}
+                    path='/course/:modification/:courseId?'
+                    element={<EditCourseView />}
                   />
                 </Route>
-                {/* Pages that are authorised for admin and teachers in charge */}
                 <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
                   <Route
                     path='/:courseId/fetch-instances/:courseCode'
@@ -206,7 +205,7 @@ export default function App(): JSX.Element {
                     element={<EditInstanceView />}
                   />
                   <Route
-                    path='/:courseId/attainment/:modification/:assessmentModelId/:attainmentId'
+                    path='/:courseId/attainment/:modification/:assessmentModelId/:attainmentId?'
                     element={<EditAttainmentView />}
                   />
                 </Route>
