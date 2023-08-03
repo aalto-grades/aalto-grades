@@ -1,3 +1,12 @@
+<!--
+SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+
+SPDX-License-Identifier: MIT
+
+This file is based on the default GitHub bug report template, which appears to
+be in the public domain.
+-->
+
 ---
 name: Bug report
 about: Create a report to help us improve
