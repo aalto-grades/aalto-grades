@@ -13,12 +13,12 @@ import { CalculationResult } from '../types';
  * The formula function of the 'Manual' formula is only called when a grade has
  * not been specified.
  */
-function manualGradeUnspecified(attainmentTag: string): CalculationResult {
+function manualGradeUnspecified(attainmentName: string): CalculationResult {
   // If no grade has been input for a student, assume the attainment
   // has been failed.
   // TODO: This assumption should not be made.
   return {
-    attainmentTag: attainmentTag,
+    attainmentName: attainmentName,
     status: Status.Fail,
     grade: 0,
   };

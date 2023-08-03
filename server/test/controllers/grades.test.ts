@@ -50,7 +50,6 @@ function checkBodyStructure(data: AttainmentData): void {
   expect(res.body.data.attainmentId).toBeDefined();
   expect(res.body.data.gradeId).toBeDefined();
   expect(res.body.data.name).toBeDefined();
-  expect(res.body.data.tag).toBeDefined();
   expect(res.body.data.grade).toBeDefined();
   expect(res.body.data.manual).toBeDefined();
   expect(res.body.data.status).toBeDefined();
@@ -75,7 +74,7 @@ describe(
         .expect(HttpCode.Ok);
 
       expect(res.text).toBe(
-        'StudentNo,tag216,tag217,tag218,tag219,tag220\n'
+        'StudentNumber,tag216,tag217,tag218,tag219,tag220\n'
       );
 
       expect(res.headers['content-disposition']).toBe(
@@ -95,7 +94,7 @@ describe(
           .expect(HttpCode.Ok);
 
         expect(res.text).toBe(
-          'StudentNo,tag216,tag217,tag218,tag219,tag220\n'
+          'StudentNumber,tag216,tag217,tag218,tag219,tag220\n'
         );
 
         expect(res.headers['content-disposition']).toBe(
@@ -877,9 +876,9 @@ describe(
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
-        function errorMessage(column: number, tag: string, instanceId: number): string {
+        function errorMessage(column: number, name: string, instanceId: number): string {
           return `Header attainment data parsing failed at column ${column}. `
-            + `Could not find an attainment with tag ${tag} in `
+            + `Could not find an attainment with name ${name} in `
             + `assessment model with ID ${instanceId}.`;
         }
 
@@ -890,7 +889,8 @@ describe(
           errorMessage(6, 'third-fake', 1)
         ];
         checkErrorRes(expectedErrors, HttpCode.BadRequest);
-      });
+      }
+    );
 
     it('should respond with 400 bad request, if the CSV file grading data parsing fails',
       async () => {
@@ -909,7 +909,8 @@ describe(
           'CSV file row 6 column 4 expected number, received "err"'
         ];
         checkErrorRes(expectedErrors, HttpCode.BadRequest);
-      });
+      }
+    );
 
     it(
       'should respond with 400 bad request, if the CSV file parsing fails (one row invalid length)',
@@ -924,7 +925,8 @@ describe(
           .set('Accept', 'application/json');
 
         checkErrorRes(['Invalid Record Length: expect 7, got 6 on line 4'], HttpCode.BadRequest);
-      });
+      }
+    );
 
     it(
       'should respond with 400 bad request, if the CSV file field name not "csv_data"',
@@ -942,7 +944,8 @@ describe(
           ['Unexpected field. To upload CSV file, set input field name as "csv_data"'],
           HttpCode.BadRequest
         );
-      });
+      }
+    );
 
     it('should respond with 400 bad request, if the file content-type not text/csv',
       async () => {
@@ -956,7 +959,8 @@ describe(
           .set('Accept', 'application/json');
 
         checkErrorRes(['incorrect file format, use the CSV format'], HttpCode.BadRequest);
-      });
+      }
+    );
 
     it('should respond with 400 bad request, if the file extension incorrect (.txt)',
       async () => {
@@ -970,7 +974,8 @@ describe(
           .set('Accept', 'application/json');
 
         checkErrorRes(['incorrect file format, use the CSV format'], HttpCode.BadRequest);
-      });
+      }
+    );
 
     it('should respond with 400 bad request, if the CSV file not found in the request.',
       async () => {

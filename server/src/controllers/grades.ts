@@ -57,23 +57,23 @@ export async function getCsvTemplate(req: Request, res: Response): Promise<void>
 
   await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
-  const attainmentTags: Array<string> = (await Attainment.findAll({
-    attributes: ['tag'],
+  const attainmentNames: Array<string> = (await Attainment.findAll({
+    attributes: ['name'],
     where: {
       assessmentModelId: assessmentModel.id
     }
-  })).map((attainment: { tag: string }) => attainment.tag);
+  })).map((attainment: { name: string }) => attainment.name);
 
-  if (attainmentTags.length === 0) {
+  if (attainmentNames.length === 0) {
     throw new ApiError(
       `no attainments found for assessment model with ID ${assessmentModel.id}, `
-        + 'add attainments to the assessment model to generate a template',
+      + 'add attainments to the assessment model to generate a template',
       HttpCode.NotFound
     );
   }
 
   const template: Array<Array<string>> = [
-    ['StudentNo', ...attainmentTags]
+    ['StudentNumber', ...attainmentNames]
   ];
 
   stringify(
@@ -456,7 +456,7 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
  * being added to.
  * @returns {Promise<Array<number>>} - Array containing the IDs of attainments.
  * @throws {ApiError} - If first column not "StudentNumber" (case-insensitive)
- * header array is empty or any of the attainment tags malformed or missing.
+ * header array is empty or any of the attainment names are malformed or missing.
  */
 export async function parseHeaderFromCsv(
   header: Array<string>, assessmentModelId: number
@@ -465,50 +465,50 @@ export async function parseHeaderFromCsv(
 
   // Remove first input "StudentNumber". Avoid using shift(), which will have
   // side-effects outside this function.
-  const attainmentTags: Array<string> = header.slice(1);
+  const attainmentNames: Array<string> = header.slice(1);
 
-  if (attainmentTags.length === 0) {
+  if (attainmentNames.length === 0) {
     throw new ApiError(
       'No attainments found from the header, please upload valid CSV.',
       HttpCode.BadRequest
     );
   }
 
-  interface IdAndTag {
+  interface IdAndName {
     id: number,
-    tag: string
+    name: string
   }
 
-  const attainments: Array<IdAndTag> = await Attainment.findAll({
-    attributes: ['id', 'tag'],
+  const attainments: Array<IdAndName> = await Attainment.findAll({
+    attributes: ['id', 'name'],
     where: {
       [Op.and]: [
         {
           assessmentModelId: assessmentModelId
         },
         {
-          tag: {
-            [Op.in]: attainmentTags
+          name: {
+            [Op.in]: attainmentNames
           }
         }
       ]
     }
   });
 
-  if (attainmentTags.length > attainments.length) {
-    for (const attainmentTag of attainmentTags) {
-      if (!attainments.find((attainment: IdAndTag) => attainment.tag === attainmentTag)) {
+  if (attainmentNames.length > attainments.length) {
+    for (const attainmentName of attainmentNames) {
+      if (!attainments.find((attainment: IdAndName) => attainment.name === attainmentName)) {
         errors.push(
           'Header attainment data parsing failed at column '
-            + `${attainmentTags.indexOf(attainmentTag) + 2}. `
-            + `Could not find an attainment with tag ${attainmentTag} in `
+            + `${attainmentNames.indexOf(attainmentName) + 2}. `
+            + `Could not find an attainment with name ${attainmentName} in `
             + `assessment model with ID ${assessmentModelId}.`
         );
       }
     }
   }
 
-  const attainmentIds: Array<number> = attainments.map((attainment: IdAndTag) => {
+  const attainmentIds: Array<number> = attainments.map((attainment: IdAndName) => {
     return attainment.id;
   });
 
@@ -850,7 +850,7 @@ export async function calculateGrades(
       subFormulaNodes: [],
       formulaParams: attainment.formulaParams,
       attainmentId: attainment.id,
-      attainmentTag: attainment.tag
+      attainmentName: attainment.name
     });
   }
 
@@ -1013,7 +1013,7 @@ export async function calculateGrades(
     const presetGrade: number | undefined = presetGrades.get(formulaNode);
     if (presetGrade) {
       return {
-        attainmentTag: formulaNode.attainmentTag,
+        attainmentName: formulaNode.attainmentName,
         status: Status.Pass,
         grade: presetGrade
       };
@@ -1037,7 +1037,7 @@ export async function calculateGrades(
     // for this attainment and the grades of the subattainments.
     const calculated: CalculationResult =
       formulaNode.formulaImplementation.formulaFunction(
-        formulaNode.attainmentTag, formulaNode.formulaParams, subGrades
+        formulaNode.attainmentName, formulaNode.formulaParams, subGrades
       );
 
     calculatedGrades.push(
@@ -1090,7 +1090,6 @@ function generateAttainmentTreeWithUserGrades(
         attainmentId: el.id,
         gradeId: el.AttainmentGrades[0]?.id,
         name: el.name,
-        tag: el.tag,
         grade: el.AttainmentGrades[0]?.grade,
         manual: el.AttainmentGrades[0]?.manual,
         status: el.AttainmentGrades[0]?.status as Status,
@@ -1136,7 +1135,6 @@ export async function getGradeTreeOfUser(req: Request, res: Response): Promise<v
     attainmentId: parent[0].id,
     gradeId: parent[0].AttainmentGrades[0]?.id ?? null,
     name: parent[0].name,
-    tag: parent[0].tag,
     grade: parent[0].AttainmentGrades[0]?.grade ?? null,
     manual: parent[0].AttainmentGrades[0]?.manual ?? null,
     status: parent[0].AttainmentGrades[0]?.status as Status ?? null,

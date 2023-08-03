@@ -22,21 +22,21 @@ describe('Test CSV header parser', () => {
 
   it('should parse correctly formatted header of attainment CSV file', async () => {
     let result: Array<number> = await parseHeaderFromCsv(
-      ['StudentNo', 'tag1', 'tag5', 'tag9', 'tag16'], 1
+      ['StudentNumber', 'tag1', 'tag5', 'tag9', 'tag16'], 1
     );
     expect(result.length).toBe(4);
     expect(result).toEqual(expect.arrayContaining([1, 5, 9, 16]));
     expect(result.every((value: number) => !isNaN(value))).toBeTruthy();
 
     result = await parseHeaderFromCsv(
-      ['STUDENTNO', 'tag2', 'tag6', 'tag10'], 2
+      ['STUDENTNUMBER', 'tag2', 'tag6', 'tag10'], 2
     );
     expect(result.length).toBe(3);
     expect(result).toEqual(expect.arrayContaining([2, 6, 10]));
     expect(result.every((value: number) => !isNaN(value))).toBeTruthy();
 
     result = await parseHeaderFromCsv(
-      ['studentno', 'tag1'], 1
+      ['studentnumber', 'tag1'], 1
     );
     expect(result.length).toBe(1);
     expect(result).toEqual(expect.arrayContaining([1]));
@@ -47,7 +47,7 @@ describe('Test CSV header parser', () => {
 
     function errorMessage(column: number, tag: string, instanceId: number): string {
       return `Header attainment data parsing failed at column ${column}. `
-        + `Could not find an attainment with tag ${tag} in `
+        + `Could not find an attainment with name ${tag} in `
         + `assessment model with ID ${instanceId}.`;
     }
 

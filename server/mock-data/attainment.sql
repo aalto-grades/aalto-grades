@@ -233,7 +233,7 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, days_valid,
 -- Test CSV upload manual
 (14, null, 'tag224', 365, NOW(), NOW(), 'MANUAL', NULL),
 -- Test CSV upload grader
-(14, null, 'test csv upload grader', 'tag225', 365, NOW(), NOW(), 'MANUAL', NULL),
+(14, null, 'tag225', 365, NOW(), NOW(), 'MANUAL', NULL),
 -- Test final grades
 (24, null, 'tag226', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["tag227", { "weight": 0.25 }]] }'),
 (24, 226, 'tag227', 365, NOW(), NOW(), 'MANUAL', NULL),
@@ -267,8 +267,8 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, days_valid,
 (30, 249, 'Project', 365, NOW(), NOW(), 'MANUAL', NULL),
 (30, 249, 'Exam', 365, NOW(), NOW(), 'MANUAL', NULL),
 -- Test multiple roots
-(34, null, 'multiple roots', 'root 252', 365, NOW(), NOW(), 'MANUAL', NULL),
-(34, null, 'multiple roots', 'root 253', 365, NOW(), NOW(), 'MANUAL', NULL),
+(34, null, 'root 252', 365, NOW(), NOW(), 'MANUAL', NULL),
+(34, null, 'root 253', 365, NOW(), NOW(), 'MANUAL', NULL),
 -- Grading test
 (41, null, 'assesment model 41, root id 254', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["exam", { "weight": 1.0 }]] }'),
 (41, 254, 'exam', 365, NOW(), NOW(), 'MANUAL', NULL),

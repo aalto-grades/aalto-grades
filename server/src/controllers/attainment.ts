@@ -25,7 +25,7 @@ import { isTeacherInChargeOrAdmin } from './utils/user';
 async function validateFormulaParams(
   formula?: Formula,
   formulaParams?: object | null,
-  subTags?: Array<string>
+  subAttainmentNames?: Array<string>
 ): Promise<void> {
   if (formula && formulaParams) {
     if (formula === Formula.Manual) {
@@ -40,42 +40,42 @@ async function validateFormulaParams(
         formulaParams, { abortEarly: false }
       );
 
-      if (!subTags) {
+      if (!subAttainmentNames) {
         throw new ApiError(
-          'tags of subattainments were not passed to validateFormulaParams with'
+          'names of subattainments were not passed to validateFormulaParams with'
           + `non-manual formula ${formula}`,
           HttpCode.InternalServerError
         );
       }
 
       // Ensure that all subattainments are included in children and that there
-      // are no invalid subattainment tags in children
-      const paramTags: Array<string> =
+      // are no invalid subattainment names in children
+      const uncheckedNamesInParams: Array<string> =
         (formulaParams as ParamsObject).children.map(
           (value: [string, unknown]) => value[0]
         );
 
       const notFound: Array<string> = [];
 
-      for (const tag of subTags) {
-        const index: number = paramTags.indexOf(tag);
+      for (const name of subAttainmentNames) {
+        const index: number = uncheckedNamesInParams.indexOf(name);
         if (index < 0) {
-          notFound.push(tag);
+          notFound.push(name);
         } else {
-          paramTags.splice(index, 1);
+          uncheckedNamesInParams.splice(index, 1);
         }
       }
 
       if (notFound.length >  0) {
         throw new ApiError(
-          `formula params do not include subattainments with tags ${notFound}`,
+          `formula params do not include subattainments with names ${notFound}`,
           HttpCode.BadRequest
         );
       }
 
-      if (paramTags.length > 0) {
+      if (uncheckedNamesInParams.length > 0) {
         throw new ApiError(
-          `invalid subattainment tags in formula params: ${paramTags}`,
+          `invalid subattainment names in formula params: ${uncheckedNamesInParams}`,
           HttpCode.BadRequest
         );
       }
@@ -187,9 +187,6 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     name: yup
       .string()
       .required(),
-    tag: yup
-      .string()
-      .required(),
     daysValid: yup
       .number()
       .min(0)
@@ -246,7 +243,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       );
 
       parentParams.children.push(
-        [requestTree.tag, parentFormula.defaultChildParams]
+        [requestTree.name, parentFormula.defaultChildParams]
       );
 
       // Sanity check
@@ -291,7 +288,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       attainmentTree.formula,
       attainmentTree.formulaParams,
       attainmentTree.subAttainments?.map(
-        (subAttainment: AttainmentData) => subAttainment.tag
+        (subAttainment: AttainmentData) => subAttainment.name
       )
     );
 
@@ -314,7 +311,6 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       parentId: parentId,
       assessmentModelId: assessmentModel.id,
       name: requestTree.name,
-      tag: requestTree.tag,
       daysValid: requestTree.daysValid,
       formula: requestTree.formula ?? Formula.Manual,
       formulaParams: requestTree.formulaParams
@@ -325,7 +321,6 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       parentId: dbEntry.parentId ?? undefined,
       assessmentModelId: dbEntry.assessmentModelId,
       name: dbEntry.name,
-      tag: dbEntry.tag,
       daysValid: dbEntry.daysValid,
       formula: dbEntry.formula,
       formulaParams: dbEntry.formulaParams as ParamsObject,
@@ -360,9 +355,6 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     name: yup
       .string()
       .notRequired(),
-    tag: yup
-      .string()
-      .notRequired(),
     daysValid: yup
       .number()
       .min(0)
@@ -390,7 +382,6 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
   const name: string | undefined = req.body.name;
-  const tag: string | undefined = req.body.tag;
   const daysValid: number | undefined = req.body.daysValid;
   const parentId: number | undefined = req.body.parentId;
   const formula: Formula | undefined = req.body.formula;
@@ -428,11 +419,11 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     formula ?? attainment.formula,
     formulaParams,
     (await Attainment.findAll({
-      attributes: ['tag'],
+      attributes: ['name'],
       where: {
         parentId: attainment.id
       }
-    })).map((attainment: Attainment): string => attainment.tag)
+    })).map((attainment: { name: string }): string => attainment.name)
   );
 
   if (parentId && parentId !== attainment.parentId) {
@@ -445,7 +436,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
         const parentParams: ParamsObject = oldParent.formulaParams as ParamsObject;
 
         for (const i in parentParams.children) {
-          if (parentParams.children[i][0] === attainment.tag) {
+          if (parentParams.children[i][0] === attainment.name) {
             parentParams.children.splice(Number(i), 1);
             break;
           }
@@ -475,7 +466,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
       );
 
       parentParams.children.push(
-        [tag ?? attainment.tag, parentFormula.defaultChildParams]
+        [name ?? attainment.name, parentFormula.defaultChildParams]
       );
 
       // Sanity check
@@ -492,7 +483,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
         }
       );
     }
-  } else if (tag && tag !== attainment.tag && attainment.parentId) {
+  } else if (name && name !== attainment.name && attainment.parentId) {
     const parent: Attainment = await findAttainmentById(
       attainment.parentId, HttpCode.InternalServerError
     );
@@ -501,8 +492,8 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
       const parentParams: ParamsObject = parent.formulaParams as ParamsObject;
 
       for (const i in parentParams.children) {
-        if (parentParams.children[i][0] === attainment.tag) {
-          parentParams.children[i][0] = tag;
+        if (parentParams.children[i][0] === attainment.name) {
+          parentParams.children[i][0] = name;
           break;
         }
       }
@@ -522,7 +513,6 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
 
   await attainment.set({
     name: name ?? attainment.name,
-    tag: tag ?? attainment.tag,
     daysValid: daysValid ?? attainment.daysValid,
     parentId: parentId ?? attainment.parentId,
     formula: formula ?? attainment.formula,
@@ -537,7 +527,6 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     id: attainment.id,
     assessmentModelId: attainment.assessmentModelId,
     name: attainment.name,
-    tag: attainment.tag,
     formula: attainment.formula,
     formulaParams: attainment.formulaParams as ParamsObject,
     daysValid: attainment.daysValid,
