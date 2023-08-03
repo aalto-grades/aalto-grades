@@ -126,10 +126,6 @@ export default {
           type: DataTypes.STRING,
           allowNull: false
         },
-        tag: {
-          type: DataTypes.STRING,
-          allowNull: false
-        },
         days_valid: {
           type: DataTypes.INTEGER,
           allowNull: true

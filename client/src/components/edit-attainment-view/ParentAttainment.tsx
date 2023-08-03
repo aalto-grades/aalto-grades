@@ -117,7 +117,7 @@ export default function ParentAttainment(props: {
                         deleteAttainment={props.deleteAttainment}
                         getTemporaryId={props.getTemporaryId}
                         attainment={subAttainment}
-                        paramsFromParent={childParams.get(subAttainment.tag)}
+                        paramsFromParent={childParams.get(subAttainment.name)}
                         setTouched={props.setTouched}
                       />
                     )

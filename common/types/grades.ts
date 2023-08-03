@@ -17,7 +17,6 @@ export interface AttainmentGradeData {
   status: Status,
   manual: boolean,
   name?: string,
-  tag?: string,
   date?: Date,
   expiryDate?: Date,
   subAttainments?: Array<AttainmentGradeData>

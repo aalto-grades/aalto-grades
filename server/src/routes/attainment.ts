@@ -32,10 +32,6 @@ export const router: Router = Router();
  *     format: int32
  *     minimum: 1
  *     example: 32
- *   AttainmentTag:
- *     type: string
- *     description: A unique user-facing identifier for an attainment.
- *     example: a-plus-exercise-1.2
  *   AttainmentName:
  *     type: string
  *     description: Study attainment name.
@@ -56,8 +52,6 @@ export const router: Router = Router();
  *       name:
  *         $ref: '#/definitions/AttainmentName'
  *         required: true
- *       tag:
- *         $ref: '#/definitions/AttainmentTag'
  *       daysValid:
  *         type: integer
  *         required: true

@@ -52,7 +52,6 @@ export default function SimpleDialog(props: {
           id: props.getTemporaryId(),
           parentId: parentId,
           name: '',
-          tag: '',
           daysValid: 0
         });
       }

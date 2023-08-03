@@ -35,9 +35,9 @@ describe('Test weighted average calculation', () => {
 
   it('should calculate a passing grade when subgrades are passing', async () => {
     const subGrades: Array<CalculationResult> = [
-      { attainmentTag: 'one', grade: 10, status: Status.Pass },
-      { attainmentTag: 'two', grade: 14, status: Status.Pass },
-      { attainmentTag: 'three', grade: 3, status: Status.Pass }
+      { attainmentName: 'one', grade: 10, status: Status.Pass },
+      { attainmentName: 'two', grade: 14, status: Status.Pass },
+      { attainmentName: 'three', grade: 3, status: Status.Pass }
     ];
 
     const computedGrade: CalculationResult = implementation.formulaFunction(
@@ -61,9 +61,9 @@ describe('Test weighted average calculation', () => {
     'should calculate a failing grade when the grade is below the minimum required grade',
     async () => {
       const subGrades: Array<CalculationResult> = [
-        { attainmentTag: 'one', grade: 10, status: Status.Pass },
-        { attainmentTag: 'two', grade: 14, status: Status.Pass },
-        { attainmentTag: 'three', grade: 3, status: Status.Pass }
+        { attainmentName: 'one', grade: 10, status: Status.Pass },
+        { attainmentName: 'two', grade: 14, status: Status.Pass },
+        { attainmentName: 'three', grade: 3, status: Status.Pass }
       ];
 
       const computedGrade: CalculationResult = implementation.formulaFunction(
@@ -86,9 +86,9 @@ describe('Test weighted average calculation', () => {
 
   it('should calculate a failing grade when a subgrade is failing', async () => {
     const subGrades: Array<CalculationResult> = [
-      { attainmentTag: 'one', grade: 10, status: Status.Pass },
-      { attainmentTag: 'two', grade: 14, status: Status.Pass },
-      { attainmentTag: 'three', grade: 3, status: Status.Fail }
+      { attainmentName: 'one', grade: 10, status: Status.Pass },
+      { attainmentName: 'two', grade: 14, status: Status.Pass },
+      { attainmentName: 'three', grade: 3, status: Status.Fail }
     ];
 
     const computedGrade: CalculationResult = implementation.formulaFunction(

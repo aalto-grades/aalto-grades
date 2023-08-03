@@ -75,8 +75,7 @@ export const AccordionSummary: StyledComponent<AccordionSummaryProps> = styled(
 
 function AttainmentText(props: {
   name: string,
-  formulaId: Formula,
-  tag: string
+  formulaId: Formula
 }): JSX.Element {
   return (
     <Box sx={{ display: 'flex',
@@ -88,7 +87,7 @@ function AttainmentText(props: {
       columnGap: 3
     }}>
       <Typography variant='body2'>
-        {props.name} ({props.tag})
+        {props.name}
       </Typography>
       <Typography align='left' variant='body2'>
         {'Formula: ' + props.formulaId}
@@ -144,7 +143,6 @@ export default function CustomAccordion(props: {
               <AttainmentText
                 name={props.attainment.name}
                 formulaId={props.attainment.formula ?? Formula.Manual}
-                tag={props.attainment.tag}
               />
             </AccordionSummary>
             {
@@ -182,7 +180,6 @@ export default function CustomAccordion(props: {
             <AttainmentText
               name={props.attainment.name}
               formulaId={props.attainment.formula ?? Formula.Manual}
-              tag={props.attainment.tag}
             />
           </Box>
         )
