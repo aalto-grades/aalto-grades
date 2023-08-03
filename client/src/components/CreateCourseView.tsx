@@ -6,8 +6,7 @@ import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
 import {
   Delete as DeleteIcon,
   PersonAddAlt1 as PersonAddAlt1Icon,
-  Person as PersonIcon,
-  Send as SendIcon
+  Person as PersonIcon
 } from '@mui/icons-material';
 import {
   Avatar, Box, Button, CircularProgress, Container, IconButton,
@@ -115,13 +114,13 @@ export default function CreateCourseView(): JSX.Element {
               .notRequired(),
             departmentEn: yup.string()
               .min(1)
-              .required('Please input the course organizer information in English'),
+              .required('Please input the organizing department of the course in English'),
             departmentFi: yup.string()
               .min(1)
-              .required('Please input the course organizer information in Finnish'),
+              .required('Please input the organizing department of the course in Finnish'),
             departmentSv: yup.string()
               .min(1)
-              .required('Please input the course organizer information in Swedish'),
+              .required('Please input the organizing department of the course in Swedish'),
             nameEn: yup.string()
               .min(1)
               .required('Please input a valid course name in English'),
@@ -134,12 +133,11 @@ export default function CreateCourseView(): JSX.Element {
           })}
           onSubmit={handleSubmit}
         >
-          {({ errors, handleChange, isSubmitting, isValid, touched, values, initialValues }:
+          {({ errors, handleChange, isSubmitting, touched, values, initialValues }:
             {
               errors: FormikErrors<FormData>,
               handleChange: (e: React.ChangeEvent<Element>) => void,
               isSubmitting: boolean,
-              isValid: boolean,
               touched: FormikTouched<FormData>,
               values: FormData,
               initialValues: FormData
@@ -226,12 +224,12 @@ export default function CreateCourseView(): JSX.Element {
                   fullWidth
                   value={values.departmentEn}
                   disabled={isSubmitting}
-                  label="Organizer in English*"
+                  label="Organizing department in English*"
                   margin='normal'
                   InputLabelProps={{ shrink: true }}
                   helperText={errors.departmentEn ?
                     errors.departmentEn :
-                    'Give the organizer of the new course in English.'
+                    'Give the organizing department of the new course in English.'
                   }
                   error={touched.departmentEn && Boolean(errors.departmentEn)}
                   onChange={handleChange}
@@ -242,12 +240,12 @@ export default function CreateCourseView(): JSX.Element {
                   fullWidth
                   value={values.departmentFi}
                   disabled={isSubmitting}
-                  label="Organizer in Finnish*"
+                  label="Organizing department in Finnish*"
                   margin='normal'
                   InputLabelProps={{ shrink: true }}
                   helperText={errors.departmentFi ?
                     errors.departmentFi :
-                    'Give the organizer of the new course in Finnish.'
+                    'Give the organizing department of the new course in Finnish.'
                   }
                   error={touched.departmentFi && Boolean(errors.departmentFi)}
                   onChange={handleChange}
@@ -258,12 +256,12 @@ export default function CreateCourseView(): JSX.Element {
                   fullWidth
                   value={values.departmentSv}
                   disabled={isSubmitting}
-                  label="Organizer in Swedish*"
+                  label="Organizing department in Swedish*"
                   margin='normal'
                   InputLabelProps={{ shrink: true }}
                   helperText={errors.departmentSv ?
                     errors.departmentSv :
-                    'Give the organizer of the new course in Swedish.'
+                    'Give the organizing department of the new course in Swedish.'
                   }
                   error={touched.departmentSv && Boolean(errors.departmentSv)}
                   onChange={handleChange}
@@ -380,6 +378,7 @@ export default function CreateCourseView(): JSX.Element {
                 <Button
                   size='medium'
                   variant='outlined'
+                  color={initialValues != values ? 'error' : 'primary'}
                   disabled={isSubmitting}
                   onClick={(): void => {
                     if (initialValues != values) {
@@ -396,10 +395,9 @@ export default function CreateCourseView(): JSX.Element {
                   size='medium'
                   variant='contained'
                   type='submit'
-                  disabled={!isValid || teachersInCharge.length === 0 || isSubmitting}
-                  endIcon={<SendIcon />}
+                  disabled={isSubmitting}
                 >
-                  Create Course
+                  Submit
                   {isSubmitting && (
                     <CircularProgress
                       size={24}

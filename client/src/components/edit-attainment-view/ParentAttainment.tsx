@@ -23,7 +23,8 @@ export default function ParentAttainment(props: {
   deleteAttainment: (attainment: AttainmentData) => void,
   getTemporaryId: () => number,
   attainment: AttainmentData,
-  paramsFromParent?: object
+  paramsFromParent?: object,
+  setTouched: () => void
 }): JSX.Element {
 
   // For opening and closing the list of sub-attainments
@@ -64,7 +65,11 @@ export default function ParentAttainment(props: {
           /* Navigation below doesn't work because formula selection has
              only been implemented for course grade */
         }
-        <Button size='small' sx={{ mb: 0.5 }} onClick={(): void => setEditFormulaOpen(true)}>
+        <Button
+          size='small'
+          sx={{ mb: 0.5 }}
+          onClick={(): void => setEditFormulaOpen(true)}
+        >
           Edit formula
         </Button>
       </Box>
@@ -75,6 +80,7 @@ export default function ParentAttainment(props: {
         getTemporaryId={props.getTemporaryId}
         attainment={props.attainment}
         paramsFromParent={props.paramsFromParent}
+        setTouched={props.setTouched}
       />
       <Box sx={{ display: 'flex', flexDirection: 'row' }}>
         {open ? (
@@ -112,6 +118,7 @@ export default function ParentAttainment(props: {
                         getTemporaryId={props.getTemporaryId}
                         attainment={subAttainment}
                         paramsFromParent={childParams.get(subAttainment.name)}
+                        setTouched={props.setTouched}
                       />
                     )
                   )

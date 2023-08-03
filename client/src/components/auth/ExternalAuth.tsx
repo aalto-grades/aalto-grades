@@ -13,7 +13,7 @@ export default function ExternalAuth(): JSX.Element {
   }
 
   return (
-    <Box sx={{ width: 1/2, border: 1, borderRadius: '8px', borderColor: 'gray', p: 2, my: 3 }}>
+    <Box sx={{ width: 1 / 2, border: 1, borderRadius: '8px', borderColor: 'gray', p: 2, my: 3 }}>
       <Typography variant='h3' sx={{ mb: 1 }}>
         Aalto University users
       </Typography>

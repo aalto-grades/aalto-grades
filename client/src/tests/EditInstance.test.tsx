@@ -39,7 +39,7 @@ describe('Tests for EditInstanceView components without Sisu instance', () => {
         expect(screen.getByLabelText('Starting Period*')).toBeInTheDocument();
         expect(screen.getByLabelText('Ending Period*')).toBeInTheDocument();
         expect(screen.getByLabelText('Grading Scale*')).toBeInTheDocument();
-        expect(screen.queryByText('Confirm Details')).toBeInTheDocument();
+        expect(screen.queryByText('Submit')).toBeInTheDocument();
       });
 
     }
@@ -75,7 +75,7 @@ describe('Tests for EditInstanceView components with Sisu instance', () => {
         expect(screen.getByLabelText('Starting Period*')).toBeInTheDocument();
         expect(screen.getByLabelText('Ending Period*')).toBeInTheDocument();
         expect(screen.getByLabelText('Grading Scale*')).toBeInTheDocument();
-        expect(screen.queryByText('Confirm Details')).toBeInTheDocument();
+        expect(screen.queryByText('Submit')).toBeInTheDocument();
       });
 
     }

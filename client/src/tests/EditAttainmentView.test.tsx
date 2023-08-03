@@ -62,11 +62,11 @@ describe('Tests for EditAttainmentView components', () => {
     await waitFor(async () => {
       const headingElement: HTMLElement = screen.getByText('Edit Study Attainment');
       const categoryField: Array<HTMLElement> = await screen.findAllByLabelText('Name');
-      const confirmButton: HTMLElement = screen.getByText('Confirm');
+      const submitButton: HTMLElement = screen.getByText('Submit');
 
       expect(headingElement).toBeInTheDocument();
       expect(categoryField).toHaveLength(1);
-      expect(confirmButton).toBeInTheDocument();
+      expect(submitButton).toBeInTheDocument();
     });
   });
 
@@ -82,8 +82,8 @@ describe('Tests for EditAttainmentView components', () => {
     act(() => userEvent.clear(daysValidField));
     act(() => userEvent.type(daysValidField, '42'));
 
-    const confirmButton: HTMLElement = screen.getByText('Confirm');
-    act(() => userEvent.click(confirmButton));
+    const submitButton: HTMLElement = screen.getByText('Submit');
+    act(() => userEvent.click(submitButton));
 
     await waitFor(() => {
       expect(editAttainment).toHaveBeenCalledTimes(15);
@@ -131,25 +131,26 @@ describe('Tests for EditAttainmentView components', () => {
       const numberField: HTMLElement = screen.getByLabelText('Number of sub-attainments');
       expect(numberField).toBeInTheDocument();
 
-      const confirmButtons: Array<HTMLElement> = await screen.findAllByText('Confirm');
-      // the second one aka the one in the dialog
-      const numConfirmButton: HTMLElement = confirmButtons[1];
+      // Dialog button to confirm the amount of new sub-attainments.
+      const confirmButton: HTMLElement = screen.getByText('Confirm');
 
-      // the default number of sub-attainments in the Dialog element is 1
-      // so this call creates one sub-attainment
-      act(() => userEvent.click(numConfirmButton));
+      // the default number of sub-attainments in the Dialog element is 1.
+      // This call creates one sub-attainment
+      act(() => userEvent.click(confirmButton));
 
       // Check that there is one sub-attainment so one 'Delete'-button
       await waitFor(async () => {
         const deleteButtons: Array<HTMLElement> = await screen.findAllByText('Delete');
         const addButton: HTMLElement = screen.getByText('Add Sub-Attainments');
 
-        expect(deleteButtons).toHaveLength(1);
+        expect(deleteButtons).toHaveLength(2);
         expect(addButton).toBeInTheDocument();
       });
 
+      const submitButton: HTMLElement = screen.getByText('Submit');
+
       // Edit the original attainment and add one sub attainment to it
-      act(() => userEvent.click(confirmButtons[0]));
+      act(() => userEvent.click(submitButton));
 
       await waitFor(() => {
         expect(editAttainment).toHaveBeenCalledTimes(1);

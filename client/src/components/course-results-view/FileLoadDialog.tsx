@@ -112,7 +112,10 @@ export default function FileLoadDialog(props: {
             display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start',
             alignItems: 'center', columnGap: 2
           }}>
-            <Button id='ag_select_file_btn' component='label'>
+            <Button
+              id='ag_select_file_btn'
+              component='label'
+            >
               Upload file
               <input
                 hidden
@@ -175,18 +178,22 @@ export default function FileLoadDialog(props: {
           )}
         </DialogContent>
         <DialogActions sx={{ pr: 4, pb: 3 }}>
-          <Button size='medium' onClick={(): void => {
-            props.handleClose();
-            setFileName(null);
-            setValidationError('');
-            setFileErrors([]);
-          }}>
+          <Button
+            size='medium'
+            variant='outlined'
+            onClick={(): void => {
+              props.handleClose();
+              setFileName(null);
+              setValidationError('');
+              setFileErrors([]);
+            }}
+          >
             Cancel
           </Button>
           <Button
             id='ag_confirm_file_upload_btn'
             size='medium'
-            variant='outlined'
+            variant='contained'
             onClick={(): void => {
               if (!fileName) {
                 setValidationError('You must select a CSV file to submit');
@@ -195,7 +202,7 @@ export default function FileLoadDialog(props: {
               uploadFile();
             }}
           >
-            Confirm
+            Submit
           </Button>
         </DialogActions>
       </Dialog>

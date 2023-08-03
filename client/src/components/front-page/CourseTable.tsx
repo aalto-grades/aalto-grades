@@ -21,7 +21,7 @@ const headCells: Array<HeadCellData> = [
   },
   {
     id: 'department',
-    label: 'Organizer',
+    label: 'Organizing department',
   },
 ];
 
