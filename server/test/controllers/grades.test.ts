@@ -74,7 +74,7 @@ describe(
         .expect(HttpCode.Ok);
 
       expect(res.text).toBe(
-        'StudentNumber,tag216,tag217,tag218,tag219,tag220\n'
+        'StudentNumber,name216,name217,name218,name219,name220\n'
       );
 
       expect(res.headers['content-disposition']).toBe(
@@ -94,7 +94,7 @@ describe(
           .expect(HttpCode.Ok);
 
         expect(res.text).toBe(
-          'StudentNumber,tag216,tag217,tag218,tag219,tag220\n'
+          'StudentNumber,name216,name217,name218,name219,name220\n'
         );
 
         expect(res.headers['content-disposition']).toBe(
@@ -884,7 +884,7 @@ describe(
 
         const expectedErrors: Array<string> = [
           errorMessage(2, 'first-fake', 1),
-          errorMessage(3, 'tag2', 1),
+          errorMessage(3, 'name2', 1),
           errorMessage(4, 'second-fake;', 1),
           errorMessage(6, 'third-fake', 1)
         ];

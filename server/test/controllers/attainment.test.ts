@@ -370,7 +370,7 @@ describe(
 
     it(
       'should update the children array of a parent attainment\'s parameters'
-      + ' with the tag of a new attainment',
+      + ' with the name of a new attainment',
       async () => {
         let parent: Attainment = await Attainment.findByPk(264) as Attainment;
         expect(parent.formulaParams).toBeDefined();
@@ -586,7 +586,7 @@ describe(
           .post('/v1/courses/3/assessment-models/3/attainments')
           .send({
             parentId: 3,
-            name: 'invalid tag',
+            name: 'invalid name',
             daysValid: 1,
             formula: Formula.WeightedAverage,
             formulaParams: {
@@ -1024,8 +1024,8 @@ describe(
             formulaParams: {
               minRequiredGrade: 15,
               children: [
-                ['tag5', { weight: 5 }],
-                ['tag16', { weight: 16 }]
+                ['name5', { weight: 5 }],
+                ['name16', { weight: 16 }]
               ]
             }
           })
@@ -1038,7 +1038,7 @@ describe(
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
         expect(res.body.errors).toContain(
-          'formula params do not include subattainments with names tag9,tag17,tag18'
+          'formula params do not include subattainments with names name9,name17,name18'
         );
       }
     );
@@ -1053,11 +1053,11 @@ describe(
             formulaParams: {
               minRequiredGrade: 15,
               children: [
-                ['tag5', { weight: 5 }],
-                ['tag9', { weight: 9 }],
-                ['tag16', { weight: 16 }],
-                ['tag17', { weight: 17 }],
-                ['tag18', { weight: 18 }],
+                ['name5', { weight: 5 }],
+                ['name9', { weight: 9 }],
+                ['name16', { weight: 16 }],
+                ['name17', { weight: 17 }],
+                ['name18', { weight: 18 }],
                 ['invalid', { weight: 1 }],
                 ['invalid too', { weight: 2 }]
               ]
