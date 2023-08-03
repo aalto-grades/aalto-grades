@@ -78,9 +78,9 @@ describe('Tests for CourseView component', () => {
         expect(getByText('Teachers in Charge')).toBeDefined();
         expect(getByText('Assessment Models')).toBeDefined();
         expect(getByText('Study Attainments')).toBeDefined();
-        expect(getByText('Exercises (')).toBeDefined();
-        expect(getByText('Project (')).toBeDefined();
-        expect(getAllByText('Exam (')).toBeDefined();
+        expect(getByText('Exercises')).toBeDefined();
+        expect(getByText('Project')).toBeDefined();
+        expect(getAllByText('Exam')).toBeDefined();
         expect(getByText('Course Instances')).toBeDefined();
         expect(getByText('New instance')).toBeDefined();
         expect(getByText('Add attainment')).toBeDefined();
