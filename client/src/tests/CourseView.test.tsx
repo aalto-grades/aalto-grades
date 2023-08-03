@@ -161,10 +161,14 @@ describe('Tests for CourseView component', () => {
       );
 
       await waitFor(() => {
-        const noAssessmentModels: HTMLElement = getByText(
+        const noAssessmentModelsSide: HTMLElement = getByText(
           'No assessment models found. Please create a new assessment model.'
         );
-        expect(noAssessmentModels).toBeDefined();
+        expect(noAssessmentModelsSide).toBeDefined();
+        const noAssessmentModelsMain: HTMLElement = getByText(
+          'No assessment models found.'
+        );
+        expect(noAssessmentModelsMain).toBeDefined();
       });
 
     }
