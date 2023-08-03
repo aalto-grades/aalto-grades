@@ -19,7 +19,6 @@ export default class Attainment extends Model<
   declare assessmentModelId: ForeignKey<AssessmentModel['id']>;
   declare parentId: CreationOptional<ForeignKey<Attainment['id']>>;
   declare name: string;
-  declare tag: string;
   // Default value, expiry date in AttainmentGrade takes precedence
   declare daysValid: number;
   declare formula: Formula;
@@ -52,10 +51,6 @@ Attainment.init(
       }
     },
     name: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    tag: {
       type: DataTypes.STRING,
       allowNull: false
     },

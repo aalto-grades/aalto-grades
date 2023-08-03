@@ -92,7 +92,7 @@ export default function Attainments(props: {
                       </Button>
                     ]
                   }
-                  paramsFromRoot={childParams.get(attainment.tag)}
+                  paramsFromRoot={childParams.get(attainment.name)}
                 />
               );
             })

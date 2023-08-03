@@ -6,7 +6,7 @@ import { Status } from 'aalto-grades-common/types';
 import * as yup from 'yup';
 
 export interface CalculationResult {
-  attainmentTag: string,
+  attainmentName: string,
   grade: number,
   status: Status
 }
@@ -15,7 +15,7 @@ export interface CalculationResult {
  * Type of functions implementing grade calculation formulas.
  */
 export type FormulaFunction = (
-  attainmentTag: string,
+  attainmenName: string,
   params: any | null, // TODO: Remove any
   subGrades: Array<CalculationResult>
 ) => CalculationResult;
@@ -42,5 +42,5 @@ export interface FormulaNode {
   subFormulaNodes: Array<FormulaNode>,
   formulaParams: object | null,
   attainmentId: number,
-  attainmentTag: string
+  attainmentName: string
 }

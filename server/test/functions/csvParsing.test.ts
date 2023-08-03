@@ -22,21 +22,21 @@ describe('Test CSV header parser', () => {
 
   it('should parse correctly formatted header of attainment CSV file', async () => {
     let result: Array<number> = await parseHeaderFromCsv(
-      ['StudentNo', 'tag1', 'tag5', 'tag9', 'tag16'], 1
+      ['StudentNumber', 'name1', 'name5', 'name9', 'name16'], 1
     );
     expect(result.length).toBe(4);
     expect(result).toEqual(expect.arrayContaining([1, 5, 9, 16]));
     expect(result.every((value: number) => !isNaN(value))).toBeTruthy();
 
     result = await parseHeaderFromCsv(
-      ['STUDENTNO', 'tag2', 'tag6', 'tag10'], 2
+      ['STUDENTNUMBER', 'name2', 'name6', 'name10'], 2
     );
     expect(result.length).toBe(3);
     expect(result).toEqual(expect.arrayContaining([2, 6, 10]));
     expect(result.every((value: number) => !isNaN(value))).toBeTruthy();
 
     result = await parseHeaderFromCsv(
-      ['studentno', 'tag1'], 1
+      ['studentnumber', 'name1'], 1
     );
     expect(result.length).toBe(1);
     expect(result).toEqual(expect.arrayContaining([1]));
@@ -45,50 +45,50 @@ describe('Test CSV header parser', () => {
 
   it('should throw error if parsing fails due to invalid header column', async () => {
 
-    function errorMessage(column: number, tag: string, instanceId: number): string {
+    function errorMessage(column: number, name: string, instanceId: number): string {
       return `Header attainment data parsing failed at column ${column}. `
-        + `Could not find an attainment with tag ${tag} in `
+        + `Could not find an attainment with name ${name} in `
         + `assessment model with ID ${instanceId}.`;
     }
 
     try {
       // Third column bad, wrong instance
-      await parseHeaderFromCsv(['StudentNo', 'tag1', 'tag2', 'tag5'], 1);
+      await parseHeaderFromCsv(['StudentNo', 'name1', 'name2', 'name5'], 1);
 
     } catch (error: unknown) {
       checkError(
         error,
         HttpCode.BadRequest,
         [
-          errorMessage(3, 'tag2', 1)
+          errorMessage(3, 'name2', 1)
         ]
       );
     }
 
     try {
-      // Last column bad, nonexistent tag
-      await parseHeaderFromCsv(['StudentNo', 'tag1', 'tag5', 'fake-tag'], 1);
+      // Last column bad, nonexistent name
+      await parseHeaderFromCsv(['StudentNo', 'name1', 'name5', 'fake-name'], 1);
     } catch (error: unknown) {
       checkError(
         error,
         HttpCode.BadRequest,
         [
-          errorMessage(4, 'fake-tag', 1)
+          errorMessage(4, 'fake-name', 1)
         ]
       );
     }
 
     try {
       // Multiple columns bad.
-      await parseHeaderFromCsv(['StudentNo', 'tag2', '', 'fake-tag'], 1);
+      await parseHeaderFromCsv(['StudentNo', 'name2', '', 'fake-name'], 1);
     } catch (error: unknown) {
       checkError(
         error,
         HttpCode.BadRequest,
         [
-          errorMessage(2, 'tag2', 1),
+          errorMessage(2, 'name2', 1),
           errorMessage(3, '', 1),
-          errorMessage(4, 'fake-tag', 1)
+          errorMessage(4, 'fake-name', 1)
         ]
       );
     }

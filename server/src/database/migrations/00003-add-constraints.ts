@@ -34,9 +34,9 @@ export default {
       });
 
       await queryInterface.addConstraint('attainment', {
-        fields: ['assessment_model_id', 'tag'],
+        fields: ['assessment_model_id', 'name'],
         type: 'unique',
-        name: 'attainment_assessment_model_id_tag_ck',
+        name: 'attainment_assessment_model_id_name_ck',
         transaction
       });
 
@@ -63,7 +63,7 @@ export default {
 
       await queryInterface.removeConstraint(
         'attainment',
-        'attainment_assessment_model_id_tag_ck',
+        'attainment_assessment_model_id_name_ck',
         { transaction }
       );
 

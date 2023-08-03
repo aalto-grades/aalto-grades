@@ -60,7 +60,6 @@ export async function findAttainmentsByAssessmentModel(
       id: attainment.id,
       assessmentModelId: attainment.assessmentModelId,
       parentId: attainment.parentId,
-      tag: attainment.tag,
       formula: attainment.formula,
       formulaParams: attainment.formulaParams as ParamsObject,
       name: attainment.name,

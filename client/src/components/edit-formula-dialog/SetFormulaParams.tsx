@@ -87,7 +87,7 @@ export default function SetFormulaParams(props: {
               if (props.childParams) {
                 return (
                   <SubAttainment
-                    key={attainment.tag}
+                    key={attainment.id}
                     attainment={attainment}
                     childParamsList={props.formula.childParams}
                     childParams={props.childParams}
