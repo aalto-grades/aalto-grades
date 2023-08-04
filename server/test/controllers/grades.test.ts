@@ -739,15 +739,39 @@ describe(
     });
 
     it('should get a single grade for an attainment if only one grade exists', async () => {
-      // TODO
+      res = await request
+        .get('/v1/courses/2/assessment-models/46/grades/user/1')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+      checkSuccessRes(res);
+      checkBodyStructure(res.body.data);
+
+      expect(res.body.data.grades.length).toEqual(1);
     });
 
-    it('should get multiple grades an attainment if multiple grades exist', async () => {
-      // TODO
+    it('should get multiple grades for an attainment if multiple grades exist', async () => {
+      res = await request
+        .get('/v1/courses/2/assessment-models/47/grades/user/1')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+      checkSuccessRes(res);
+      checkBodyStructure(res.body.data);
+
+      expect(res.body.data.grades.length).toEqual(3);
     });
 
     it('should get an empty grade array if no grades exist for an attainment', async () => {
-      // TODO
+      res = await request
+        .get('/v1/courses/2/assessment-models/48/grades/user/1')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+      checkSuccessRes(res);
+      checkBodyStructure(res.body.data);
+
+      expect(res.body.data.grades.length).toEqual(0);
     });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {

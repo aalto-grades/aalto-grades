@@ -293,4 +293,8 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, days_valid,
 -- Test calculating with multiple grades for the same attainment
 (45, null, '269', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 1, "children": [["270", { "weight": 0.5 }], ["271", { "weight": 0.5 }]] }'),
 (45, 269, '270', 365, NOW(), NOW(), 'MANUAL', NULL),
-(45, 269, '271', 365, NOW(), NOW(), 'MANUAL', NULL);
+(45, 269, '271', 365, NOW(), NOW(), 'MANUAL', NULL),
+-- Test getting differing numbers of grades
+(46, null, '272', 365, NOW(), NOW(), 'MANUAL', NULL),
+(47, null, '273', 365, NOW(), NOW(), 'MANUAL', NULL),
+(48, null, '274', 365, NOW(), NOW(), 'MANUAL', NULL);
