@@ -706,6 +706,53 @@ describe(
 );
 
 describe(
+  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/user/:userId'
+  + ' - get attainment grading for user based on ID',
+  () => {
+
+    it('should get correct user grades for assessment model (admin user)', async () => {
+      res = await request
+        .get('/v1/courses/4/assessment-models/7/grades/user/25')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+      checkSuccessRes(res);
+      checkBodyStructure(res.body.data);
+    });
+
+    it('should get correct user grades for assessment model (teacher in charge)', async () => {
+      jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
+
+      res = await request
+        .get('/v1/courses/4/assessment-models/7/grades/user/25')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+      checkSuccessRes(res);
+      checkBodyStructure(res.body.data);
+    });
+
+    it('should respond with 401 unauthorized, if not logged in', async () => {
+      await request
+        .get('/v1/courses/4/assessment-models/7/grades/user/25')
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Unauthorized);
+    });
+
+    it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/4/assessment-models/7/grades/user/25')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Forbidden);
+
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+    });
+  }
+);
+
+describe(
   'Test POST /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv'
   + ' - import grading data from CSV',
   () => {
@@ -1271,6 +1318,10 @@ describe(
       checkGrade(256, 1243, 5, cookies.adminCookie);
     });
 
+    it('should consider the best manual grades when multiple options exist', async () => {
+      // TODO
+    });
+
     it('should respond with 401 unauthorized, if not logged in', async () => {
       await request
         .post('/v1/courses/1/assessment-models/1/grades/calculate')
@@ -1307,52 +1358,5 @@ describe(
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe('No student numbers found from instance ID 28');
       });
-  }
-);
-
-describe(
-  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/user/:userId'
-  + ' - get attainment grading for user based on ID',
-  () => {
-
-    it('should get correct user grades for assessment model (admin user)', async () => {
-      res = await request
-        .get('/v1/courses/4/assessment-models/7/grades/user/25')
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'text/csv')
-        .expect(HttpCode.Ok);
-      checkSuccessRes(res);
-      checkBodyStructure(res.body.data);
-    });
-
-    it('should get correct user grades for assessment model (teacher in charge)', async () => {
-      jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
-
-      res = await request
-        .get('/v1/courses/4/assessment-models/7/grades/user/25')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'text/csv')
-        .expect(HttpCode.Ok);
-      checkSuccessRes(res);
-      checkBodyStructure(res.body.data);
-    });
-
-    it('should respond with 401 unauthorized, if not logged in', async () => {
-      await request
-        .get('/v1/courses/4/assessment-models/7/grades/user/25')
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Unauthorized);
-    });
-
-    it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/4/assessment-models/7/grades/user/25')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Forbidden);
-
-      expect(res.body.data).not.toBeDefined();
-      expect(res.body.errors).toBeDefined();
-    });
   }
 );

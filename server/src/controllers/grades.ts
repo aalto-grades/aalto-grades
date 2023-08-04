@@ -1013,7 +1013,10 @@ export async function calculateGrades(
    * Stores the grades of each student for each attainment which were manually
    * specified by a teacher.
    */
-  const unorganizedPresetGrades: Array<AttainmentGrade> = await AttainmentGrade.findAll({
+  const unorganizedManualGrades: Array<AttainmentGrade> = await AttainmentGrade.findAll({
+    where: {
+      manual: true
+    },
     include: [
       {
         model: Attainment,
@@ -1038,29 +1041,37 @@ export async function calculateGrades(
   });
 
   /*
-   * Next we'll organize the preset grades by user ID.
+   * Next we'll organize the manual grades by user ID.
    */
 
   /*
-   * Store the preset grades of all attainments per student. Stores all the
-   * same information as unorganizedPresetGrades.
-   * User ID -> Formula node -> Preset grade.
+   * Store the manul grades of all attainments per student. Stores all the
+   * same information as unorganizedManualGrades.
+   * User ID -> Formula node -> Manual grade.
    */
-  const organizedPresetGrades: Map<number, Map<FormulaNode, number>> = new Map();
+  const organizedManualGrades: Map<number, Map<FormulaNode, number>> = new Map();
 
-  for (const presetGrade of unorganizedPresetGrades) {
-    let userPresetGrades: Map<FormulaNode, number> | undefined =
-      organizedPresetGrades.get(presetGrade.userId);
+  for (const manualGrade of unorganizedManualGrades) {
+    let userManualGrades: Map<FormulaNode, number> | undefined =
+      organizedManualGrades.get(manualGrade.userId);
 
-    if (!userPresetGrades) {
-      userPresetGrades = new Map();
-      organizedPresetGrades.set(presetGrade.userId, userPresetGrades);
+    if (!userManualGrades) {
+      userManualGrades = new Map();
+      organizedManualGrades.set(manualGrade.userId, userManualGrades);
     }
 
-    userPresetGrades.set(
-      getFormulaNode(presetGrade.attainmentId),
-      presetGrade.grade
-    );
+    /*
+     * If a student has multiple manual grades for the same attainment, consider
+     * the best one.
+     * TODO: Should there be an option not to consider the best grade?
+     */
+    const key: FormulaNode = getFormulaNode(manualGrade.attainmentId);
+    const existingGrade: number | undefined = userManualGrades.get(key);
+
+    if (!existingGrade || manualGrade.grade > existingGrade) {
+      // No existing grade or the new grade is better.
+      userManualGrades.set(key, manualGrade.grade);
+    }
   }
 
   /*
@@ -1077,7 +1088,7 @@ export async function calculateGrades(
   function calculateFormulaNode(
     userId: number,
     formulaNode: FormulaNode,
-    presetGrades: Map<FormulaNode, number>
+    manualGrades: Map<FormulaNode, number>
   ): CalculationResult {
     /*
      * If a teacher has manually specified a grade for this attainment,
@@ -1087,12 +1098,12 @@ export async function calculateGrades(
      * and a grade may be manually specified for overriding grade calculation
      * functions in special cases.
      */
-    const presetGrade: number | undefined = presetGrades.get(formulaNode);
-    if (presetGrade) {
+    const manualGrade: number | undefined = manualGrades.get(formulaNode);
+    if (manualGrade) {
       return {
         attainmentName: formulaNode.attainmentName,
         status: Status.Pass,
-        grade: presetGrade
+        grade: manualGrade
       };
     }
 
@@ -1107,7 +1118,7 @@ export async function calculateGrades(
 
     // First, recursively calculate the grades the subattainments.
     for (const subFormulaNode of formulaNode.subFormulaNodes) {
-      subGrades.push(calculateFormulaNode(userId, subFormulaNode, presetGrades));
+      subGrades.push(calculateFormulaNode(userId, subFormulaNode, manualGrades));
     }
 
     // Then, calculate the grade of this attainment using the formula specified
@@ -1131,10 +1142,11 @@ export async function calculateGrades(
     return calculated;
   }
 
-  for (const [userId, presetGrades] of organizedPresetGrades) {
-    calculateFormulaNode(userId, rootFormulaNode, presetGrades);
+  for (const [userId, manualGrades] of organizedManualGrades) {
+    calculateFormulaNode(userId, rootFormulaNode, manualGrades);
   }
 
+  // TODO: Duplicates should not be updated, at least for final grades
   await sequelize.transaction(async (transaction: Transaction) => {
     await AttainmentGrade.bulkCreate(calculatedGrades,
       {

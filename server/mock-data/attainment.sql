@@ -259,11 +259,11 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, days_valid,
 (28, 242, 'name243', 365, NOW(), NOW(), 'MANUAL', NULL),
 (28, 242, 'name244', 365, NOW(), NOW(), 'MANUAL', NULL),
 -- Demo data
-(29, null, 'Grade', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["exercise", { "weight": 0.4 }], ["project", { "weight": 0.2 }], ["exam", { "weight": 0.4 }]] }'),
+(29, null, 'Grade', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["Exercises", { "weight": 0.4 }], ["Project", { "weight": 0.2 }], ["Exam", { "weight": 0.4 }]] }'),
 (29, 245, 'Exercises', 365, NOW(), NOW(), 'MANUAL', NULL),
 (29, 245, 'Project', 365, NOW(), NOW(), 'MANUAL', NULL),
 (29, 245, 'Exam', 365, NOW(), NOW(), 'MANUAL', NULL),
-(30, null, 'Grade', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["project", { "weight": 0.6 }], ["exam", { "weight": 0.4 }]] }'),
+(30, null, 'Grade', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["Project", { "weight": 0.6 }], ["Exam", { "weight": 0.4 }]] }'),
 (30, 249, 'Project', 365, NOW(), NOW(), 'MANUAL', NULL),
 (30, 249, 'Exam', 365, NOW(), NOW(), 'MANUAL', NULL),
 -- Test multiple roots
