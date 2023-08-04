@@ -2,10 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentGradeData, HttpCode } from 'aalto-grades-common/types';
+import { HttpCode } from 'aalto-grades-common/types';
 
 import { parseGradesFromCsv, parseHeaderFromCsv } from '../../src/controllers/grades';
-import { ApiError, StudentGrades } from '../../src/types';
+import { ApiError, AttainmentGradeModelData, StudentGrades } from '../../src/types';
 
 function checkError(error: unknown, httpCode: HttpCode, message: string | Array<string>): void {
   expect(error).toBeInstanceOf(ApiError);
@@ -126,7 +126,7 @@ describe('Test CSV student grades parser', () => {
       const rowData: Array<string> = studentGradingData[index];
       expect(student.studentNumber).toBe(rowData[0]);
 
-      student.grades.forEach((grade: AttainmentGradeData, index: number) => {
+      student.grades.forEach((grade: AttainmentGradeModelData, index: number) => {
         expect(grade.attainmentId).toBe(attainmentIds[index]);
         expect(grade.grade).toBe(Number(rowData[index + 1]));
       });

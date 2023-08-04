@@ -2,11 +2,20 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentGradeData } from 'aalto-grades-common/types';
+import { Status } from 'aalto-grades-common/types';
+
+export interface AttainmentGradeModelData {
+  userId?: number,
+  attainmentId: number,
+  graderId?: number,
+  grade: number,
+  status: Status,
+  manual: boolean
+}
 
 export interface StudentGrades {
   // User's ID (PK) in the database user table.
   id?: number,
   studentNumber: string,
-  grades: Array<AttainmentGradeData>
+  grades: Array<AttainmentGradeModelData>
 }

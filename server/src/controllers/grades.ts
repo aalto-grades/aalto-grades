@@ -21,7 +21,8 @@ import User from '../database/models/user';
 
 import { getFormulaImplementation } from '../formulas';
 import {
-  ApiError, CalculationResult, FormulaNode, JwtClaims, StudentGrades, idSchema
+  ApiError, AttainmentGradeModelData, CalculationResult, FormulaNode,
+  JwtClaims, StudentGrades, idSchema
 } from '../types';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import { findUserById, isTeacherInChargeOrAdmin } from './utils/user';
@@ -651,7 +652,7 @@ export function parseGradesFromCsv(
           ` expected number, received "${gradingData[i]}"`
         );
       } else {
-        const grade: AttainmentGradeData = {
+        const grade: AttainmentGradeModelData = {
           attainmentId: attainmentIds[i],
           grade: parseInt(gradingData[i], 10),
           manual: true,
@@ -789,10 +790,10 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
         // Use studentsWithId to update attainments by flatmapping each
         // students grades into a one array of all the grades.
-        const preparedBulkCreate: Array<AttainmentGradeData> = parsedStudentData.flatMap(
-          (student: StudentGrades): Array<AttainmentGradeData> => {
-            const studentGradingData: Array<AttainmentGradeData> = student.grades.map(
-              (grade: AttainmentGradeData): AttainmentGradeData => {
+        const preparedBulkCreate: Array<AttainmentGradeModelData> = parsedStudentData.flatMap(
+          (student: StudentGrades): Array<AttainmentGradeModelData> => {
+            const studentGradingData: Array<AttainmentGradeModelData> = student.grades.map(
+              (grade: AttainmentGradeModelData): AttainmentGradeModelData => {
                 return {
                   userId: student.id as number,
                   graderId: grader.id,
@@ -1078,7 +1079,7 @@ export async function calculateGrades(
    * the root attainment.
    */
 
-  const calculatedGrades: Array<AttainmentGradeData> = [];
+  const calculatedGrades: Array<AttainmentGradeModelData> = [];
 
   /*
    * Recursively calculates the grade for a particular attainment by its formula
