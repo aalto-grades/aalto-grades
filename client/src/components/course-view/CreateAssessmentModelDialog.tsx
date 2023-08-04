@@ -5,7 +5,7 @@
 import { AssessmentModelData } from 'aalto-grades-common/types';
 import {
   Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle,
-  FormHelperText, InputLabel, MenuItem, Select, Stack, TextField
+  FormHelperText, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField
 } from '@mui/material';
 import { ChangeEvent, SyntheticEvent, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
@@ -25,6 +25,7 @@ export default function CreateAssessmentModelDialog(props: {
   const { courseId }: Params = useParams();
 
   const [name, setName]: State<string> = useState('');
+  const [assessmentModel, setAssessmentModel]: State<string> = useState<string>('use empty');
 
   const addAssessmentModel: UseAddAssessmentModelResult = useAddAssessmentModel({
     onSuccess: (assessmentModelId: number) => {
@@ -77,7 +78,7 @@ export default function CreateAssessmentModelDialog(props: {
               key='name'
               id='name'
               type='text'
-              label='Name'
+              label='Name *'
               fullWidth
               InputLabelProps={{ shrink: true }}
               margin='normal'
@@ -87,21 +88,23 @@ export default function CreateAssessmentModelDialog(props: {
             />
             {props.assessmentModels && (
               <Box sx={{ my: 2 }}>
-                <InputLabel id="demo-simple-select-helper-label">Assessment model</InputLabel>
+                <InputLabel id="assessment-model-select-helper-label">Assessment model</InputLabel>
                 <Select
-                  labelId="demo-simple-select-helper-label"
-                  id="demo-simple-select-helper"
-                  value={10}
-                  inputProps={{ shrink: true }}
+                  labelId="assessmentModelSelect"
+                  id="assessmentModelSelectId"
+                  value={assessmentModel}
                   label="Assessment model"
                   fullWidth
+                  onChange={(event: SelectChangeEvent): void => {
+                    setAssessmentModel(event.target.value);
+                  }}
                 >
-                  <MenuItem value="">use empty</MenuItem>
+                  <MenuItem value="use empty">use empty</MenuItem>
                   {props.assessmentModels.map((model: AssessmentModelData) => (
                     <MenuItem key={model.id} value={model.id}>{model.name}</MenuItem>
                   ))}
                 </Select>
-                <FormHelperText>Use existing assessment model as base</FormHelperText>
+                <FormHelperText>Use existing assessment model as a base.</FormHelperText>
               </Box>
             )}
             <Stack spacing={2} direction="row" sx={{ mt: 2 }}>
