@@ -23,20 +23,7 @@ export default function CreateAssessmentModelDialog(props: {
 
   const [name, setName]: State<string> = useState('');
 
-  const addAssessmentModel: UseAddAssessmentModelResult = useAddAssessmentModel({
-    onSuccess: (assessmentModelId: number) => {
-      if (courseId) {
-        addAttainment.mutate({
-          courseId: courseId,
-          assessmentModelId: assessmentModelId,
-          attainment: {
-            name: 'Root',
-            daysValid: 0
-          }
-        });
-      }
-    }
-  });
+  const addAssessmentModel: UseAddAssessmentModelResult = useAddAssessmentModel();
 
   const addAttainment: UseAddAttainmentResult = useAddAttainment({
     onSuccess: () => {
@@ -50,12 +37,28 @@ export default function CreateAssessmentModelDialog(props: {
     event.preventDefault();
 
     if (courseId) {
-      addAssessmentModel.mutate({
-        courseId: courseId,
-        assessmentModel: {
-          name: name
+      addAssessmentModel.mutate(
+        {
+          courseId: courseId,
+          assessmentModel: {
+            name: name
+          }
+        },
+        {
+          onSuccess: (assessmentModelId: number) => {
+            if (courseId) {
+              addAttainment.mutate({
+                courseId: courseId,
+                assessmentModelId: assessmentModelId,
+                attainment: {
+                  name: 'Root',
+                  daysValid: 0
+                }
+              });
+            }
+          }
         }
-      });
+      );
     }
   }
 

@@ -5,8 +5,8 @@
 import { CourseInstanceData } from 'aalto-grades-common/types';
 import axios from './axios';
 import {
-  useMutation, UseMutationOptions, UseMutationResult,
-  useQuery, UseQueryOptions, UseQueryResult
+  QueryClient, useMutation, UseMutationOptions, UseMutationResult,
+  useQuery, useQueryClient, UseQueryOptions, UseQueryResult
 } from '@tanstack/react-query';
 
 import { Numeric } from '../../types';
@@ -36,10 +36,16 @@ export type UseAddInstanceResult = UseMutationResult<
 export function useAddInstance(
   options?: UseMutationOptions<number, unknown, unknown>
 ): UseAddInstanceResult {
+  const queryClient: QueryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (vars: AddInstanceVars) => (
       await axios.post(`/v1/courses/${vars.courseId}/instances`, vars.instance)
     ).data.data,
+
+    onSuccess: (_data: number, vars: AddInstanceVars) => {
+      queryClient.invalidateQueries({ queryKey: ['all-instances', vars.courseId] });
+    },
     ...options
   });
 }
