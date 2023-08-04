@@ -492,7 +492,8 @@ export async function getGradeTreeOfUser(req: Request, res: Response): Promise<v
 
     if (!attainment) {
       throw new ApiError(
-        ``, HttpCode.InternalServerError
+        `failed to find attainment with id ${id} in grade tree generation`,
+        HttpCode.InternalServerError
       );
     }
 
