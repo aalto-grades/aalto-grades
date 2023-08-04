@@ -9,13 +9,13 @@ import {
 } from '@mui/material';
 import { ChangeEvent, SyntheticEvent, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
+import { QueryObserverResult, UseQueryResult } from '@tanstack/react-query';
 
 import {
   useAddAssessmentModel, UseAddAssessmentModelResult,
   useAddAttainment, UseAddAttainmentResult, useGetRootAttainment
 } from '../../hooks/useApi';
 import { State } from '../../types';
-import { QueryObserverResult, UseQueryResult } from '@tanstack/react-query';
 
 export default function CreateAssessmentModelDialog(props: {
   handleClose: () => void,
@@ -35,12 +35,13 @@ export default function CreateAssessmentModelDialog(props: {
       props.handleClose();
       props.onSubmit();
       setName('');
+      setAssessmentModel(0);
     }
   });
 
   const attainment: UseQueryResult<AttainmentData> = useGetRootAttainment(
     Number(courseId), assessmentModel, 'descendants',
-    { enabled: false }
+    { enabled: false } // Disable this query from automatically running, only if needed.
   );
 
   async function handleSubmit(event: SyntheticEvent): Promise<void> {
@@ -105,7 +106,7 @@ export default function CreateAssessmentModelDialog(props: {
               key='name'
               id='name'
               type='text'
-              label='Name *'
+              label='Name*'
               fullWidth
               InputLabelProps={{ shrink: true }}
               margin='normal'
@@ -122,8 +123,8 @@ export default function CreateAssessmentModelDialog(props: {
                   value={String(assessmentModel)}
                   label="Assessment model"
                   fullWidth
+                  disabled={addAssessmentModel.isLoading || addAttainment.isLoading}
                   onChange={(event: SelectChangeEvent): void => {
-                    console.log('value is:', event.target.value);
                     setAssessmentModel(Number(event.target.value));
                   }}
                 >
