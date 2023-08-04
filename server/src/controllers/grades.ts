@@ -449,8 +449,40 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
 }
 
 export async function getGradeTreeOfUser(req: Request, res: Response): Promise<void> {
+
+  interface AttainmentWithUserGrade extends Attainment {
+    AttainmentGrades: Array<AttainmentGrade>
+  }
+
+  function generateAttainmentTreeWithUserGrades(
+    root: AttainmentGradeData,
+    allAttainments: Array<AttainmentWithUserGrade>
+  ): void {
+    const children: Array<AttainmentWithUserGrade> = allAttainments.filter(
+      (el: AttainmentWithUserGrade) => el.parentId === root.attainmentId
+    );
+
+    if (children.length > 0) {
+      root.subAttainments = children.map((el: AttainmentWithUserGrade) => {
+        return {
+          attainmentId: el.id,
+          gradeId: el.AttainmentGrades[0]?.id,
+          name: el.name,
+          grade: el.AttainmentGrades[0]?.grade,
+          manual: el.AttainmentGrades[0]?.manual,
+          status: el.AttainmentGrades[0]?.status as Status,
+          subAttainments: []
+        };
+      });
+
+      root.subAttainments.forEach((el: AttainmentGradeData) => {
+        generateAttainmentTreeWithUserGrades(el, allAttainments);
+      });
+    }
+  }
+
   const userId: number =
-  (await idSchema.validate({ id: req.params.userId }, { abortEarly: false })).id;
+    (await idSchema.validate({ id: req.params.userId }, { abortEarly: false })).id;
 
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
@@ -1115,35 +1147,4 @@ export async function calculateGrades(
   res.status(HttpCode.Ok).json({
     data: {}
   });
-}
-
-interface AttainmentWithUserGrade extends Attainment {
-  AttainmentGrades: Array<AttainmentGrade>
-}
-
-function generateAttainmentTreeWithUserGrades(
-  root: AttainmentGradeData,
-  allAttainments: Array<AttainmentWithUserGrade>
-): void {
-  const children: Array<AttainmentWithUserGrade> = allAttainments.filter(
-    (el: AttainmentWithUserGrade) => el.parentId === root.attainmentId
-  );
-
-  if (children.length > 0) {
-    root.subAttainments = children.map((el: AttainmentWithUserGrade) => {
-      return {
-        attainmentId: el.id,
-        gradeId: el.AttainmentGrades[0]?.id,
-        name: el.name,
-        grade: el.AttainmentGrades[0]?.grade,
-        manual: el.AttainmentGrades[0]?.manual,
-        status: el.AttainmentGrades[0]?.status as Status,
-        subAttainments: []
-      };
-    });
-
-    root.subAttainments.forEach((el: AttainmentGradeData) => {
-      generateAttainmentTreeWithUserGrades(el, allAttainments);
-    });
-  }
 }
