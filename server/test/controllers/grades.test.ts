@@ -1319,7 +1319,30 @@ describe(
     });
 
     it('should consider the best manual grades when multiple options exist', async () => {
-      // TODO
+      // Check that multiple grades exist as expected
+      expect((await AttainmentGrade.findAll({
+        where: {
+          userId: 1,
+          attainmentId: 270
+        }
+      })).length).toBe(2);
+
+      expect((await AttainmentGrade.findAll({
+        where: {
+          userId: 1,
+          attainmentId: 271
+        }
+      })).length).toBe(3);
+
+      checkSuccessRes(await request
+        .post('/v1/courses/2/assessment-models/45/grades/calculate')
+        .send({
+          studentNumbers: ['352772']
+        })
+        .set('Cookie', cookies.adminCookie)
+      );
+
+      checkGrade(269, 1, 5, cookies.adminCookie);
     });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
