@@ -481,27 +481,27 @@ export async function getGradeTreeOfUser(req: Request, res: Response): Promise<v
 
   function generateAttainmentTreeWithUserGrades(id?: number): AttainmentGradeData {
 
-    const attainment: AttainmentWithUserGrade | undefined = userGrades.find(
+    const root: AttainmentWithUserGrade | undefined = userGrades.find(
       (attainment: AttainmentWithUserGrade) => {
         return id ? (attainment.id === id) : (!attainment.parentId);
       }
     );
 
-    const children: Array<AttainmentWithUserGrade> = userGrades.filter(
-      (attainment: AttainmentWithUserGrade) => attainment.parentId === id
-    );
-
-    if (!attainment) {
+    if (!root) {
       throw new ApiError(
         `failed to find attainment with id ${id} in grade tree generation`,
         HttpCode.InternalServerError
       );
     }
 
+    const children: Array<AttainmentWithUserGrade> = userGrades.filter(
+      (attainment: AttainmentWithUserGrade) => attainment.parentId === root.id
+    );
+
     return {
-      attainmentId: attainment.id,
-      attainmentName: attainment.name,
-      grades: attainment.AttainmentGrades.map(
+      attainmentId: root.id,
+      attainmentName: root.name,
+      grades: root.AttainmentGrades.map(
         (option: AttainmentGrade): GradeOption => {
           return {
             gradeId: option.id,

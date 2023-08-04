@@ -701,23 +701,19 @@ describe(
       expect(data.grades).toBeDefined();
       expect(data.subAttainments).toBeDefined();
 
-      if (data.grades && data.grades?.length > 0){
-        data.grades.forEach((option: GradeOption) => {
-          expect(option.gradeId).toBeDefined();
-          expect(option.graderId).toBeDefined();
-          expect(option.grade).toBeDefined();
-          expect(option.status).toBeDefined();
-          expect(option.manual).toBeDefined();
-          expect(option.date).toBeDefined();
-          expect(option.expiryDate).toBeDefined();
-        });
-      }
+      data.grades.forEach((option: GradeOption) => {
+        expect(option.gradeId).toBeDefined();
+        expect(option.graderId).toBeDefined();
+        expect(option.grade).toBeDefined();
+        expect(option.status).toBeDefined();
+        expect(option.manual).toBeDefined();
+        expect(option.date).toBeDefined();
+        expect(option.expiryDate).toBeDefined();
+      });
 
-      if (data.subAttainments && data.subAttainments?.length > 0) {
-        data.subAttainments.forEach((sub: AttainmentGradeData) => {
-          checkBodyStructure(sub);
-        });
-      }
+      data.subAttainments?.forEach((sub: AttainmentGradeData) => {
+        checkBodyStructure(sub);
+      });
     }
 
     it('should get correct user grades for assessment model (admin user)', async () => {
@@ -740,6 +736,18 @@ describe(
         .expect(HttpCode.Ok);
       checkSuccessRes(res);
       checkBodyStructure(res.body.data);
+    });
+
+    it('should get a single grade for an attainment if only one grade exists', async () => {
+      // TODO
+    });
+
+    it('should get multiple grades an attainment if multiple grades exist', async () => {
+      // TODO
+    });
+
+    it('should get an empty grade array if no grades exist for an attainment', async () => {
+      // TODO
     });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
