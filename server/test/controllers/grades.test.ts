@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, HttpCode } from 'aalto-grades-common/types';
+import { AttainmentGradeData, GradeOption, HttpCode } from 'aalto-grades-common/types';
 import * as fs from 'fs';
 import path from 'path';
 import { Op } from 'sequelize';
@@ -44,21 +44,6 @@ function checkSuccessRes(res: supertest.Response): void {
   expect(res.body.data).toBeDefined();
   expect(res.body.errors).not.toBeDefined();
   expect(res.statusCode).toBe(HttpCode.Ok);
-}
-
-function checkBodyStructure(data: AttainmentData): void {
-  expect(res.body.data.attainmentId).toBeDefined();
-  expect(res.body.data.gradeId).toBeDefined();
-  expect(res.body.data.name).toBeDefined();
-  expect(res.body.data.grade).toBeDefined();
-  expect(res.body.data.manual).toBeDefined();
-  expect(res.body.data.status).toBeDefined();
-
-  if (data.subAttainments && data.subAttainments?.length > 0) {
-    data.subAttainments?.forEach((sub: AttainmentData) => {
-      checkBodyStructure(sub);
-    });
-  }
 }
 
 describe(
@@ -577,7 +562,7 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        expect(res.body.data).toEqual(    [
+        expect(res.body.data).toEqual([
           { userId: 1241, studentNumber: '658593', grade: 'PENDING', credits: 0 },
           { userId: 1242, studentNumber: '451288', grade: 'PENDING', credits: 0 },
           { userId: 1243, studentNumber: '167155', grade: 'PENDING', credits: 0 },
@@ -709,6 +694,31 @@ describe(
   'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/user/:userId'
   + ' - get attainment grading for user based on ID',
   () => {
+
+    function checkBodyStructure(data: AttainmentGradeData): void {
+      expect(data.attainmentId).toBeDefined();
+      expect(data.attainmentName).toBeDefined();
+      expect(data.grades).toBeDefined();
+      expect(data.subAttainments).toBeDefined();
+
+      if (data.grades && data.grades?.length > 0){
+        data.grades.forEach((option: GradeOption) => {
+          expect(option.gradeId).toBeDefined();
+          expect(option.graderId).toBeDefined();
+          expect(option.grade).toBeDefined();
+          expect(option.status).toBeDefined();
+          expect(option.manual).toBeDefined();
+          expect(option.date).toBeDefined();
+          expect(option.expiryDate).toBeDefined();
+        });
+      }
+
+      if (data.subAttainments && data.subAttainments?.length > 0) {
+        data.subAttainments.forEach((sub: AttainmentGradeData) => {
+          checkBodyStructure(sub);
+        });
+      }
+    }
 
     it('should get correct user grades for assessment model (admin user)', async () => {
       res = await request
