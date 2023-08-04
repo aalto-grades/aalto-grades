@@ -62,40 +62,59 @@ export default function CourseResultsTableToolbar(props: {
       }}
     >
       <Box sx={{
-        display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between',
-        alignItems: 'center', width: '100%'
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%'
       }}>
         <Box sx={{
-          display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start',
-          alignItems: 'center'
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          gap: 2
         }}>
-          <TextField
-            size='small'
-            type='strig'
-            value={props.search}
-            name='search'
-            label='Search by Student Number'
-            onChange={(
-              { target }: { target: EventTarget & (HTMLInputElement | HTMLTextAreaElement) }
-            ): void => props.setSearch(target.value)}
-            InputLabelProps={{ shrink: true }}
-            margin='normal'
-          />
-          <Tooltip title="Filter" placement="top">
-            <IconButton size='large' sx={{ m: 1.5, mb: 1, mr: 0 }}>
-              <FilterListIcon />
-            </IconButton>
+          <MenuButton label='Import grades' options={actionOptions} />
+          <Tooltip
+            title="Download grading template with attainment names and student numbers."
+            placement="top"
+          >
+            <Button
+              variant='outlined'
+              onClick={(): Promise<void> => props.downloadCsvTemplate()}
+            >
+              Download CSV template
+            </Button>
           </Tooltip>
-          <Tooltip title="Download results" placement="top">
-            <IconButton size='large' sx={{ m: 1, mt: 1.5, ml: 0 }}>
-              <DownloadIcon />
-            </IconButton>
+          <Tooltip
+            title="Upload grades from a CSV file."
+            placement="top"
+          >
+            <Button
+              variant='outlined'
+              onClick={(): void => setShowFileDialog(true)}
+            >
+              Upload Grade CSV
+            </Button>
           </Tooltip>
-        </Box>
-        <Box sx={{
-          display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start',
-          alignItems: 'center', gap: 2
-        }}>
+          <Tooltip
+            title={props.selectedStudents.length === 0 ?
+              'Select at least one student number for grade calculation.' :
+              'Calculate course final grades for selected students.'
+            }
+            placement="top"
+          >
+            <span>
+              <Button
+                variant='outlined'
+                onClick={(): Promise<void> => props.calculateFinalGrades()}
+                disabled={props.selectedStudents.length === 0}
+              >
+                Calculate final grades
+              </Button>
+            </span>
+          </Tooltip>
           <Tooltip
             title={props.selectedStudents.length === 0 ?
               'Select at least one student number for downloading grades.' :
@@ -121,46 +140,6 @@ export default function CourseResultsTableToolbar(props: {
               </Button>
             </span>
           </Tooltip>
-          <Tooltip
-            title={props.selectedStudents.length === 0 ?
-              'Select at least one student number for grade calculation.' :
-              'Calculate course final grades for selected students.'
-            }
-            placement="top"
-          >
-            <span>
-              <Button
-                variant='outlined'
-                onClick={(): Promise<void> => props.calculateFinalGrades()}
-                disabled={props.selectedStudents.length === 0}
-              >
-                Calculate final grades
-              </Button>
-            </span>
-          </Tooltip>
-          <Tooltip
-            title="Download grading template with attainment names and student numbers."
-            placement="top"
-          >
-            <Button
-              variant='outlined'
-              onClick={(): Promise<void> => props.downloadCsvTemplate()}
-            >
-              Download CSV template
-            </Button>
-          </Tooltip>
-          <Tooltip
-            title="Upload grades from a CSV file."
-            placement="top"
-          >
-            <Button
-              variant='outlined'
-              onClick={(): void => setShowFileDialog(true)}
-            >
-              Upload Grade CSV
-            </Button>
-          </Tooltip>
-          <MenuButton label='Import grades' options={actionOptions} />
           <Tooltip
             title={props.selectedStudents.length != 0 ?
               'You have selected students, these selections will be lost if not saved.' :
@@ -192,6 +171,35 @@ export default function CourseResultsTableToolbar(props: {
             open={showFileDialog}
             handleClose={handleCloseFileDialog}
           />
+        </Box>
+        <Box sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'flex-start',
+          alignItems: 'center'
+        }}>
+          <TextField
+            size='small'
+            type='strig'
+            value={props.search}
+            name='search'
+            label='Search by Student Number'
+            onChange={(
+              { target }: { target: EventTarget & (HTMLInputElement | HTMLTextAreaElement) }
+            ): void => props.setSearch(target.value)}
+            InputLabelProps={{ shrink: true }}
+            margin='normal'
+          />
+          <Tooltip title="Filter" placement="top">
+            <IconButton size='large' sx={{ m: 1.5, mb: 1, mr: 0 }}>
+              <FilterListIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Download results" placement="top">
+            <IconButton size='large' sx={{ m: 1, mt: 2, ml: 0 }}>
+              <DownloadIcon />
+            </IconButton>
+          </Tooltip>
         </Box>
       </Box>
       <UnsavedChangesDialog
