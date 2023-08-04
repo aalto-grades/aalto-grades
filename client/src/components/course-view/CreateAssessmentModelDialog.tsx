@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AssessmentModelData } from 'aalto-grades-common/types';
+import { AssessmentModelData, AttainmentData } from 'aalto-grades-common/types';
 import {
   Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle,
   FormHelperText, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField
@@ -12,9 +12,10 @@ import { Params, useParams } from 'react-router-dom';
 
 import {
   useAddAssessmentModel, UseAddAssessmentModelResult,
-  useAddAttainment, UseAddAttainmentResult
+  useAddAttainment, UseAddAttainmentResult, useGetRootAttainment
 } from '../../hooks/useApi';
 import { State } from '../../types';
+import { QueryObserverResult, UseQueryResult } from '@tanstack/react-query';
 
 export default function CreateAssessmentModelDialog(props: {
   handleClose: () => void,
@@ -24,8 +25,8 @@ export default function CreateAssessmentModelDialog(props: {
 }): JSX.Element {
   const { courseId }: Params = useParams();
 
+  const [assessmentModel, setAssessmentModel]: State<number> = useState(0);
   const [name, setName]: State<string> = useState('');
-  const [assessmentModel, setAssessmentModel]: State<string> = useState<string>('use empty');
 
   const addAssessmentModel: UseAddAssessmentModelResult = useAddAssessmentModel();
 
@@ -36,6 +37,11 @@ export default function CreateAssessmentModelDialog(props: {
       setName('');
     }
   });
+
+  const attainment: UseQueryResult<AttainmentData> = useGetRootAttainment(
+    Number(courseId), assessmentModel, 'descendants',
+    { enabled: false }
+  );
 
   async function handleSubmit(event: SyntheticEvent): Promise<void> {
     event.preventDefault();
@@ -49,16 +55,34 @@ export default function CreateAssessmentModelDialog(props: {
           }
         },
         {
-          onSuccess: (assessmentModelId: number) => {
+          onSuccess: async (assessmentModelId: number) => {
             if (courseId) {
-              addAttainment.mutate({
-                courseId: courseId,
-                assessmentModelId: assessmentModelId,
-                attainment: {
-                  name: 'Root',
-                  daysValid: 0
-                }
-              });
+              const modelTemplate: AssessmentModelData | undefined = props.assessmentModels?.find(
+                (model: AssessmentModelData) => model.id == assessmentModel
+              );
+
+              // If template is selected, get attainments and pass them to the new assessment model.
+              if (modelTemplate) {
+                attainment.refetch().then((data: QueryObserverResult<AttainmentData, unknown>) => {
+                  addAttainment.mutate({
+                    courseId: courseId,
+                    assessmentModelId: assessmentModelId,
+                    attainment: data.data ?? {
+                      name: 'Root',
+                      daysValid: 0
+                    }
+                  });
+                });
+              } else {
+                addAttainment.mutate({
+                  courseId: courseId,
+                  assessmentModelId: assessmentModelId,
+                  attainment: {
+                    name: 'Root',
+                    daysValid: 0
+                  }
+                });
+              }
             }
           }
         }
@@ -95,14 +119,15 @@ export default function CreateAssessmentModelDialog(props: {
                 <Select
                   labelId="assessmentModelSelect"
                   id="assessmentModelSelectId"
-                  value={assessmentModel}
+                  value={String(assessmentModel)}
                   label="Assessment model"
                   fullWidth
                   onChange={(event: SelectChangeEvent): void => {
-                    setAssessmentModel(event.target.value);
+                    console.log('value is:', event.target.value);
+                    setAssessmentModel(Number(event.target.value));
                   }}
                 >
-                  <MenuItem value="use empty">use empty</MenuItem>
+                  <MenuItem value={0}>use empty</MenuItem>
                   {props.assessmentModels.map((model: AssessmentModelData) => (
                     <MenuItem key={model.id} value={model.id}>{model.name}</MenuItem>
                   ))}
