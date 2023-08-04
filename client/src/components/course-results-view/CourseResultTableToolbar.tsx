@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { FinalGrade, Status } from 'aalto-grades-common/types';
+import { FinalGrade } from 'aalto-grades-common/types';
 import DownloadIcon from '@mui/icons-material/Download';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { Box, Button, IconButton, TextField, Toolbar, Tooltip } from '@mui/material';
@@ -21,7 +21,8 @@ export default function CourseResultsTableToolbar(props: {
   setSearch: (search: string) => void,
   calculateFinalGrades: () => Promise<void>,
   downloadCsvTemplate: () => Promise<void>,
-  selectedStudents: Array<FinalGrade>
+  selectedStudents: Array<FinalGrade>,
+  hasPendingStudents: boolean
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { assessmentModelId }: Params = useParams();
@@ -51,12 +52,6 @@ export default function CourseResultsTableToolbar(props: {
 
   function handleCloseSisuDialog(): void {
     setShowSisuDialog(false);
-  }
-
-  function hasPendingStudents(): boolean {
-    return props.selectedStudents.filter((student: FinalGrade) => {
-      return student.grade === Status.Pending;
-    }).length !== 0;
   }
 
   return (
@@ -104,7 +99,7 @@ export default function CourseResultsTableToolbar(props: {
           <Tooltip
             title={props.selectedStudents.length === 0 ?
               'Select at least one student number for downloading grades.' :
-              hasPendingStudents() ?
+              props.hasPendingStudents ?
                 'Grades with status "PENDING" cannot be downloaded, ' +
                 'unselect or calculate grades for these.' :
                 'Download final course grades as a Sisu compatible CSV file.'
@@ -114,9 +109,9 @@ export default function CourseResultsTableToolbar(props: {
             <span>
               <Button
                 variant='outlined'
-                color={hasPendingStudents() ? 'error' : 'primary'}
+                color={props.hasPendingStudents ? 'error' : 'primary'}
                 onClick={(): void => {
-                  if (!hasPendingStudents()) {
+                  if (!props.hasPendingStudents) {
                     setShowSisuDialog(true);
                   }
                 }}
