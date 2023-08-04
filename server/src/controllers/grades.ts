@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AttainmentGradeData, FinalGrade, Formula, HttpCode, Status
+  AttainmentGradeData, FinalGrade, Formula, GradeOption, HttpCode, Status
 } from 'aalto-grades-common/types';
 import { parse, Parser } from 'csv-parse';
 import { stringify } from 'csv-stringify';
@@ -450,37 +450,6 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
 
 export async function getGradeTreeOfUser(req: Request, res: Response): Promise<void> {
 
-  interface AttainmentWithUserGrade extends Attainment {
-    AttainmentGrades: Array<AttainmentGrade>
-  }
-
-  function generateAttainmentTreeWithUserGrades(
-    root: AttainmentGradeData,
-    allAttainments: Array<AttainmentWithUserGrade>
-  ): void {
-    const children: Array<AttainmentWithUserGrade> = allAttainments.filter(
-      (el: AttainmentWithUserGrade) => el.parentId === root.attainmentId
-    );
-
-    if (children.length > 0) {
-      root.subAttainments = children.map((el: AttainmentWithUserGrade) => {
-        return {
-          attainmentId: el.id,
-          gradeId: el.AttainmentGrades[0]?.id,
-          name: el.name,
-          grade: el.AttainmentGrades[0]?.grade,
-          manual: el.AttainmentGrades[0]?.manual,
-          status: el.AttainmentGrades[0]?.status as Status,
-          subAttainments: []
-        };
-      });
-
-      root.subAttainments.forEach((el: AttainmentGradeData) => {
-        generateAttainmentTreeWithUserGrades(el, allAttainments);
-      });
-    }
-  }
-
   const userId: number =
     (await idSchema.validate({ id: req.params.userId }, { abortEarly: false })).id;
 
@@ -491,6 +460,10 @@ export async function getGradeTreeOfUser(req: Request, res: Response): Promise<v
 
   await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
   await findUserById(userId, HttpCode.NotFound);
+
+  interface AttainmentWithUserGrade extends Attainment {
+    AttainmentGrades: Array<AttainmentGrade>
+  }
 
   const userGrades: Array<AttainmentWithUserGrade> = await Attainment.findAll({
     where: {
@@ -505,23 +478,48 @@ export async function getGradeTreeOfUser(req: Request, res: Response): Promise<v
     }]
   }) as Array<AttainmentWithUserGrade>;
 
-  const parent: Array<AttainmentWithUserGrade> =
-    userGrades.filter((attainment: AttainmentWithUserGrade) => !attainment.parentId);
+  function generateAttainmentTreeWithUserGrades(id?: number): AttainmentGradeData {
 
-  const root: AttainmentGradeData = {
-    attainmentId: parent[0].id,
-    gradeId: parent[0].AttainmentGrades[0]?.id ?? null,
-    name: parent[0].name,
-    grade: parent[0].AttainmentGrades[0]?.grade ?? null,
-    manual: parent[0].AttainmentGrades[0]?.manual ?? null,
-    status: parent[0].AttainmentGrades[0]?.status as Status ?? null,
-    subAttainments: []
-  };
+    const attainment: AttainmentWithUserGrade | undefined = userGrades.find(
+      (attainment: AttainmentWithUserGrade) => {
+        return id ? (attainment.id === id) : (!attainment.parentId);
+      }
+    );
 
-  generateAttainmentTreeWithUserGrades(root, userGrades);
+    const children: Array<AttainmentWithUserGrade> = userGrades.filter(
+      (attainment: AttainmentWithUserGrade) => attainment.parentId === id
+    );
+
+    if (!attainment) {
+      throw new ApiError(
+        ``, HttpCode.InternalServerError
+      );
+    }
+
+    return {
+      attainmentId: attainment.id,
+      attainmentName: attainment.name,
+      grades: attainment.AttainmentGrades.map(
+        (option: AttainmentGrade): GradeOption => {
+          return {
+            gradeId: option.id,
+            graderId: option.graderId,
+            grade: option.grade,
+            status: option.status as Status,
+            manual: option.manual,
+            date: option.date,
+            expiryDate: option.expiryDate
+          };
+        }
+      ),
+      subAttainments: children.map((attainment: AttainmentWithUserGrade) => {
+        return generateAttainmentTreeWithUserGrades(attainment.id);
+      })
+    };
+  }
 
   res.status(HttpCode.Ok).json({
-    data: root
+    data: generateAttainmentTreeWithUserGrades()
   });
 }
 
