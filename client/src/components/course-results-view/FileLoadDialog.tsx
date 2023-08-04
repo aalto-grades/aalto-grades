@@ -53,17 +53,7 @@ export default function FileLoadDialog(props: {
   const [validationError, setValidationError]: State<string> = useState<string>('');
   const [fileErrors, setFileErrors]: State<Array<string>> = useState<Array<string>>([]);
 
-  const uploadGradeCsv: UseUploadGradeCsvResult = useUploadGradeCsv({
-    onSuccess: () => {
-      snackPack.push({
-        msg: 'File processed successfully, grades imported.'
-          + ' To refresh final grades, press "calculate final grades"',
-        severity: 'success'
-      });
-      props.handleClose();
-      setFileName(null);
-    }
-  });
+  const uploadGradeCsv: UseUploadGradeCsvResult = useUploadGradeCsv();
 
   async function uploadFile(): Promise<void> {
     if (courseId && fileInput.current?.files) {
@@ -72,11 +62,24 @@ export default function FileLoadDialog(props: {
         severity: 'info'
       });
 
-      uploadGradeCsv.mutate({
-        courseId: courseId,
-        assessmentModelId: props.assessmentModelId,
-        csv: fileInput.current.files[0]
-      });
+      uploadGradeCsv.mutate(
+        {
+          courseId: courseId,
+          assessmentModelId: props.assessmentModelId,
+          csv: fileInput.current.files[0]
+        },
+        {
+          onSuccess: () => {
+            snackPack.push({
+              msg: 'File processed successfully, grades imported.'
+                + ' To refresh final grades, press "calculate final grades"',
+              severity: 'success'
+            });
+            props.handleClose();
+            setFileName(null);
+          }
+        }
+      );
     }
   }
 

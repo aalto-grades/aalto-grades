@@ -18,7 +18,7 @@ export function useGetRefreshToken(
     queryKey: ['refresh-token'],
     queryFn: async () => (
       await axios.get('/v1/auth/self-info')
-    ).data.data,
+    ).data?.data ?? null,
     ...options
   });
 }

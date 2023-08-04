@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { FinalGrade } from 'aalto-grades-common/types';
+import { FinalGrade, Status } from 'aalto-grades-common/types';
 import { Box, Typography } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 
@@ -24,23 +24,21 @@ export default function CourseResultsView(): JSX.Element {
     useParams() as { courseId: string, assessmentModelId: string };
 
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
+  const [hasPendingStudents, setHasPendingStudents]: State<boolean> = useState<boolean>(false);
   const [selectedStudents, setSelectedStudents]: State<Array<FinalGrade>> =
     useState<Array<FinalGrade>>([]);
+
+  useEffect(() => {
+    setHasPendingStudents(selectedStudents.filter((student: FinalGrade) => {
+      return student.grade === Status.Pending;
+    }).length !== 0);
+  }, [selectedStudents]);
 
   const students: UseQueryResult<Array<FinalGrade>> = useGetFinalGrades(
     courseId, assessmentModelId
   );
 
-  const calculateFinalGrades: UseCalculateFinalGradesResult = useCalculateFinalGrades({
-    onSuccess: () => {
-      snackPack.push({
-        msg: 'Final grades calculated successfully.',
-        severity: 'success'
-      });
-
-      students.refetch();
-    }
-  });
+  const calculateFinalGrades: UseCalculateFinalGradesResult = useCalculateFinalGrades();
 
   // Triggers the calculation of final grades
   async function handleCalculateFinalGrades(): Promise<void> {
@@ -50,13 +48,39 @@ export default function CourseResultsView(): JSX.Element {
         severity: 'info'
       });
 
-      calculateFinalGrades.mutate({
-        courseId: courseId,
-        assessmentModelId: assessmentModelId,
-        studentNumbers: selectedStudents.map(
-          (student: FinalGrade) => student.studentNumber
-        )
-      });
+      calculateFinalGrades.mutate(
+        {
+          courseId: courseId,
+          assessmentModelId: assessmentModelId,
+          studentNumbers: selectedStudents.map(
+            (student: FinalGrade) => student.studentNumber
+          )
+        },
+        {
+          onSuccess: () => {
+            snackPack.push({
+              msg: 'Final grades calculated successfully.',
+              severity: 'success'
+            });
+
+            students.refetch().then((students: UseQueryResult<Array<FinalGrade>>) => {
+              if (students.data) {
+                const newSelectedStudents: Array<FinalGrade> = [];
+
+                selectedStudents.forEach((student: FinalGrade) => {
+                  const found: FinalGrade | undefined =
+                    students.data.find((element: FinalGrade) => element.userId == student.userId);
+
+                  if (found) {
+                    newSelectedStudents.push(found);
+                  }
+                });
+                setSelectedStudents(newSelectedStudents);
+              }
+            });
+          }
+        }
+      );
     }
   }
 
@@ -100,6 +124,7 @@ export default function CourseResultsView(): JSX.Element {
         downloadCsvTemplate={handleDownloadCsvTemplate}
         selectedStudents={selectedStudents}
         setSelectedStudents={setSelectedStudents}
+        hasPendingStudents={hasPendingStudents}
       />
     </Box>
   );
