@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { ChangeEvent, HTMLInputTypeAttribute, useState } from 'react';
 import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
-import { useQueryClient, UseQueryResult } from '@tanstack/react-query';
+import { UseQueryResult } from '@tanstack/react-query';
 import * as yup from 'yup';
 
 import UnsavedChangesDialog from './alerts/UnsavedChangesDialog';
@@ -122,7 +122,7 @@ export default function EditCourseView(): JSX.Element {
     );
   }
 
-  const addCourse: UseAddCourseResult = useAddCourse(useQueryClient());
+  const addCourse: UseAddCourseResult = useAddCourse();
 
   const editCourse: UseEditCourseResult = useEditCourse({
     onSuccess: () => {
