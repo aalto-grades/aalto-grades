@@ -5,8 +5,8 @@
 import { AssessmentModelData } from 'aalto-grades-common/types';
 import axios from './axios';
 import {
-  useMutation, UseMutationOptions, UseMutationResult,
-  useQuery, UseQueryOptions, UseQueryResult
+  QueryClient, useMutation, UseMutationOptions, UseMutationResult,
+  useQuery, useQueryClient, UseQueryOptions, UseQueryResult
 } from '@tanstack/react-query';
 
 import { Numeric } from '../../types';
@@ -50,6 +50,8 @@ export type UseAddAssessmentModelResult = UseMutationResult<
 export function useAddAssessmentModel(
   options?: UseMutationOptions<number, unknown, unknown>
 ): UseAddAssessmentModelResult {
+  const queryClient: QueryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (vars: AddAssessmentModelVars) => (
       await axios.post(
@@ -57,6 +59,12 @@ export function useAddAssessmentModel(
         vars.assessmentModel
       )
     ).data.data,
+
+    onSuccess: (_data: number, vars: AddAssessmentModelVars) => {
+      queryClient.invalidateQueries({
+        queryKey: ['all-assessment-models', vars.courseId]
+      });
+    },
     ...options
   });
 }

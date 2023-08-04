@@ -49,6 +49,7 @@ export function useAddCourse(
     mutationFn: async (course: CourseData) => (
       await axios.post('/v1/courses', course)
     ).data.data,
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['all-courses'] });
     },
@@ -68,10 +69,16 @@ export type UseEditCourseResult = UseMutationResult<
 export function useEditCourse(
   options?: UseMutationOptions<CourseData, unknown, EditCourseVars>
 ): UseEditCourseResult {
+  const queryClient: QueryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (vars: EditCourseVars) => (
       await axios.put(`/v1/courses/${vars.courseId}`, vars.course)
     ).data.data,
+
+    onSuccess: (_data: CourseData, vars: EditCourseVars) => {
+      queryClient.invalidateQueries({ queryKey: ['course', vars.courseId] });
+    },
     ...options
   });
 }
