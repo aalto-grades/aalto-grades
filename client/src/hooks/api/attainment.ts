@@ -5,8 +5,8 @@
 import { AttainmentData } from 'aalto-grades-common/types/attainment';
 import axios from './axios';
 import {
-  useMutation, UseMutationOptions, UseMutationResult,
-  useQuery, UseQueryOptions, UseQueryResult
+  QueryClient, useMutation, UseMutationOptions, UseMutationResult,
+  useQuery, useQueryClient, UseQueryOptions, UseQueryResult
 } from '@tanstack/react-query';
 
 import { Numeric } from '../../types';
@@ -67,6 +67,8 @@ export type UseAddAttainmentResult = UseMutationResult<
 export function useAddAttainment(
   options?: UseMutationOptions<AttainmentData, unknown, unknown>
 ): UseAddAttainmentResult {
+  const queryClient: QueryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (vars: AddAttainmentVars) => (
       await axios.post(
@@ -76,6 +78,16 @@ export function useAddAttainment(
         vars.attainment
       )
     ).data.data,
+
+    onSuccess: (_data: AttainmentData, vars: AddAttainmentVars) => {
+      queryClient.invalidateQueries({
+        queryKey: ['attainment', vars.courseId, vars.assessmentModelId]
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['root-attainment', vars.courseId, vars.assessmentModelId]
+      });
+    },
     ...options
   });
 }
@@ -93,6 +105,8 @@ export type UseEditAttainmentResult = UseMutationResult<
 export function useEditAttainment(
   options?: UseMutationOptions<AttainmentData, unknown, unknown>
 ): UseEditAttainmentResult {
+  const queryClient: QueryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (vars: EditAttainmentVars) => (
       await axios.put(
@@ -102,6 +116,16 @@ export function useEditAttainment(
         vars.attainment
       )
     ).data.data,
+
+    onSuccess: (_data: AttainmentData, vars: EditAttainmentVars) => {
+      queryClient.invalidateQueries({
+        queryKey: ['attainment', vars.courseId, vars.assessmentModelId]
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['root-attainment', vars.courseId, vars.assessmentModelId]
+      });
+    },
     ...options
   });
 }
@@ -113,12 +137,14 @@ interface DeleteAttainmentVars {
 }
 
 export type UseDeleteAttainmentResult = UseMutationResult<
-  void, unknown, DeleteAttainmentVars
+  object, unknown, DeleteAttainmentVars
 >;
 
 export function useDeleteAttainment(
-  options?: UseMutationOptions<void, unknown, unknown>
+  options?: UseMutationOptions<object, unknown, unknown>
 ): UseDeleteAttainmentResult {
+  const queryClient: QueryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (vars: DeleteAttainmentVars) => (
       await axios.delete(
@@ -127,6 +153,16 @@ export function useDeleteAttainment(
         + `/attainments/${vars.attainmentId}`
       )
     ).data.data,
+
+    onSuccess: (_data: object, vars: DeleteAttainmentVars) => {
+      queryClient.invalidateQueries({
+        queryKey: ['attainment', vars.courseId, vars.assessmentModelId]
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['root-attainment', vars.courseId, vars.assessmentModelId]
+      });
+    },
     ...options
   });
 }

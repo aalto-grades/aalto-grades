@@ -32,11 +32,7 @@ export default function EditInstanceView(): JSX.Element {
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
-  const addInstance: UseAddInstanceResult = useAddInstance({
-    onSuccess: () => {
-      navigate(`/course-view/${courseId}`, { replace: true });
-    }
-  });
+  const addInstance: UseAddInstanceResult = useAddInstance();
 
   const course: UseQueryResult<CourseData> = useGetCourse(courseId);
   let sisuInstance: UseQueryResult<CourseInstanceData> | null = null;
@@ -46,17 +42,24 @@ export default function EditInstanceView(): JSX.Element {
 
   async function handleSubmit(values: CourseInstanceData): Promise<void> {
     if (courseId) {
-      addInstance.mutate({
-        courseId: courseId,
-        instance: {
-          ...values,
-          sisuCourseInstanceId: (
-            (sisuInstance && sisuInstance.data)
-              ? sisuInstance.data.sisuCourseInstanceId
-              : undefined
-          )
+      addInstance.mutate(
+        {
+          courseId: courseId,
+          instance: {
+            ...values,
+            sisuCourseInstanceId: (
+              (sisuInstance && sisuInstance.data)
+                ? sisuInstance.data.sisuCourseInstanceId
+                : undefined
+            )
+          }
+        },
+        {
+          onSuccess: () => {
+            navigate(`/course-view/${courseId}`, { replace: true });
+          }
         }
-      });
+      );
     }
   }
 

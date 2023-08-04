@@ -122,17 +122,8 @@ export default function EditCourseView(): JSX.Element {
     );
   }
 
-  const addCourse: UseAddCourseResult = useAddCourse({
-    onSuccess: (courseId: number) => {
-      navigate(`/course-view/${courseId}`, { replace: true });
-    }
-  });
-
-  const editCourse: UseEditCourseResult = useEditCourse({
-    onSuccess: () => {
-      navigate(`/course-view/${courseId}`, { replace: true });
-    }
-  });
+  const addCourse: UseAddCourseResult = useAddCourse();
+  const editCourse: UseEditCourseResult = useEditCourse();
 
   const course: UseQueryResult<CourseData> = useGetCourse(
     courseId ?? -1, { enabled: Boolean(modification === 'edit' && courseId) }
@@ -211,10 +202,19 @@ export default function EditCourseView(): JSX.Element {
       })
     };
 
-    if (modification === 'create')
-      addCourse.mutate(courseData);
-    else if (modification === 'edit' && courseId)
-      editCourse.mutate({ courseId: courseId, course: courseData });
+    if (modification === 'create') {
+      addCourse.mutate(courseData, {
+        onSuccess: (courseId: number) => {
+          navigate(`/course-view/${courseId}`, { replace: true });
+        }
+      });
+    } else if (modification === 'edit' && courseId) {
+      editCourse.mutate({ courseId: courseId, course: courseData }, {
+        onSuccess: () => {
+          navigate(`/course-view/${courseId}`, { replace: true });
+        }
+      });
+    }
   }
 
   return (

@@ -38,30 +38,7 @@ export default function CourseResultsView(): JSX.Element {
     courseId, assessmentModelId
   );
 
-  const calculateFinalGrades: UseCalculateFinalGradesResult = useCalculateFinalGrades({
-    onSuccess: () => {
-      snackPack.push({
-        msg: 'Final grades calculated successfully.',
-        severity: 'success'
-      });
-
-      students.refetch().then((students: UseQueryResult<Array<FinalGrade>>) => {
-        if (students.data) {
-          const newSelectedStudents: Array<FinalGrade> = [];
-
-          selectedStudents.forEach((student: FinalGrade) => {
-            const found: FinalGrade | undefined =
-              students.data.find((element: FinalGrade) => element.userId == student.userId);
-
-            if (found) {
-              newSelectedStudents.push(found);
-            }
-          });
-          setSelectedStudents(newSelectedStudents);
-        }
-      });
-    }
-  });
+  const calculateFinalGrades: UseCalculateFinalGradesResult = useCalculateFinalGrades();
 
   // Triggers the calculation of final grades
   async function handleCalculateFinalGrades(): Promise<void> {
@@ -71,13 +48,39 @@ export default function CourseResultsView(): JSX.Element {
         severity: 'info'
       });
 
-      calculateFinalGrades.mutate({
-        courseId: courseId,
-        assessmentModelId: assessmentModelId,
-        studentNumbers: selectedStudents.map(
-          (student: FinalGrade) => student.studentNumber
-        )
-      });
+      calculateFinalGrades.mutate(
+        {
+          courseId: courseId,
+          assessmentModelId: assessmentModelId,
+          studentNumbers: selectedStudents.map(
+            (student: FinalGrade) => student.studentNumber
+          )
+        },
+        {
+          onSuccess: () => {
+            snackPack.push({
+              msg: 'Final grades calculated successfully.',
+              severity: 'success'
+            });
+
+            students.refetch().then((students: UseQueryResult<Array<FinalGrade>>) => {
+              if (students.data) {
+                const newSelectedStudents: Array<FinalGrade> = [];
+
+                selectedStudents.forEach((student: FinalGrade) => {
+                  const found: FinalGrade | undefined =
+                    students.data.find((element: FinalGrade) => element.userId == student.userId);
+
+                  if (found) {
+                    newSelectedStudents.push(found);
+                  }
+                });
+                setSelectedStudents(newSelectedStudents);
+              }
+            });
+          }
+        }
+      );
     }
   }
 

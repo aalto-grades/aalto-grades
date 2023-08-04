@@ -5,8 +5,8 @@
 import { AttainmentGradeData, FinalGrade } from 'aalto-grades-common/types';
 import axios from './axios';
 import {
-  useMutation, UseMutationOptions, UseMutationResult,
-  useQuery, UseQueryOptions, UseQueryResult
+  QueryClient, useMutation, UseMutationOptions, UseMutationResult,
+  useQuery, useQueryClient, UseQueryOptions, UseQueryResult
 } from '@tanstack/react-query';
 
 import { Numeric } from '../../types';
@@ -112,6 +112,8 @@ export type UseUploadGradeCsvResult = UseMutationResult<
 export function useUploadGradeCsv(
   options?: UseMutationOptions<unknown, unknown, unknown>
 ): UseUploadGradeCsvResult {
+  const queryClient: QueryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (vars: UploadGradeCsvVars) => (
       await axios.postForm(
@@ -123,6 +125,16 @@ export function useUploadGradeCsv(
         }
       )
     ).data.data,
+
+    onSuccess: (_data: unknown, vars: UploadGradeCsvVars) => {
+      queryClient.invalidateQueries({
+        queryKey: ['final-grades', vars.courseId, vars.assessmentModelId]
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['grade-tree-of-user', vars.courseId, vars.assessmentModelId]
+      });
+    },
     ...options
   });
 }
@@ -140,6 +152,8 @@ export type UseCalculateFinalGradesResult = UseMutationResult<
 export function useCalculateFinalGrades(
   options?: UseMutationOptions<boolean, unknown, unknown>
 ): UseCalculateFinalGradesResult {
+  const queryClient: QueryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (vars: CalculateFinalGradesVars) => (
       await axios.post(
@@ -149,6 +163,16 @@ export function useCalculateFinalGrades(
         { studentNumbers: vars.studentNumbers }
       )
     ).data.data,
+
+    onSuccess: (_data: unknown, vars: CalculateFinalGradesVars) => {
+      queryClient.invalidateQueries({
+        queryKey: ['final-grades', vars.courseId, vars.assessmentModelId]
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['grade-tree-of-user', vars.courseId, vars.assessmentModelId]
+      });
+    },
     ...options
   });
 }

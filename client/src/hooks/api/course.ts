@@ -5,8 +5,8 @@
 import { CourseData } from 'aalto-grades-common/types';
 import axios from './axios';
 import {
-  useMutation, UseMutationOptions, UseMutationResult,
-  useQuery, UseQueryOptions, UseQueryResult
+  QueryClient, useMutation, UseMutationOptions, UseMutationResult,
+  useQuery, useQueryClient, UseQueryOptions, UseQueryResult
 } from '@tanstack/react-query';
 
 import { Numeric } from '../../types';
@@ -43,10 +43,16 @@ export type UseAddCourseResult = UseMutationResult<
 export function useAddCourse(
   options?: UseMutationOptions<number, unknown, CourseData>
 ): UseAddCourseResult {
+  const queryClient: QueryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (course: CourseData) => (
       await axios.post('/v1/courses', course)
     ).data.data,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['all-courses'] });
+    },
     ...options
   });
 }
@@ -63,10 +69,16 @@ export type UseEditCourseResult = UseMutationResult<
 export function useEditCourse(
   options?: UseMutationOptions<CourseData, unknown, EditCourseVars>
 ): UseEditCourseResult {
+  const queryClient: QueryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (vars: EditCourseVars) => (
       await axios.put(`/v1/courses/${vars.courseId}`, vars.course)
     ).data.data,
+
+    onSuccess: (_data: CourseData, vars: EditCourseVars) => {
+      queryClient.invalidateQueries({ queryKey: ['course', vars.courseId] });
+    },
     ...options
   });
 }
