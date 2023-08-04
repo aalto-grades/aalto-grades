@@ -6,8 +6,7 @@ import { SystemRole } from 'aalto-grades-common/types';
 import { Dispatch, SetStateAction } from 'react';
 
 export interface ApiResponse<T> {
-  success: boolean,
-  data: T,
+  data?: T,
   errors?: Array<string>
 }
 
