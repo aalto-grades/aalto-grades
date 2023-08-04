@@ -287,4 +287,6 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, days_valid,
 (3, 264, '265', 365, NOW(), NOW(), 'MANUAL', NULL),
 (3, 264, '266', 365, NOW(), NOW(), 'MANUAL', NULL),
 -- Test removing name from parent attainment formula params
-(3, 263, '267', 365, NOW(), NOW(), 'MANUAL', NULL);
+(3, 263, '267', 365, NOW(), NOW(), 'MANUAL', NULL),
+-- Test uploading multiple grades to the same attainment for a student
+(14, null, '268', 365, NOW(), NOW(), 'MANUAL', NULL);

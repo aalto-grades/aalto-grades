@@ -832,6 +832,50 @@ describe(
       expect(res.body.data).toBeDefined();
     });
 
+    it(
+      'should allow uploading multiple grades to the same attainment for a student',
+      async () => {
+        async function uploadGrade(n: 1 | 2): Promise<void> {
+          await request
+            .post('/v1/courses/5/assessment-models/14/grades/csv')
+            .attach(
+              'csv_data',
+              fs.createReadStream(
+                path.resolve(
+                  __dirname, `../mock-data/csv/grades_multiple_uploads_${n}.csv`
+                ),
+                'utf8'
+              ),
+              { contentType: 'text/csv' }
+            )
+            .set('Cookie', cookies.adminCookie)
+            .set('Accept', 'application/json')
+            .expect(HttpCode.Ok);
+        }
+
+        await uploadGrade(1);
+        let grades: Array<AttainmentGrade> = await AttainmentGrade.findAll({
+          where: {
+            userId: 28,
+            attainmentId: 268
+          }
+        });
+        expect(grades.length).toEqual(1);
+        expect(grades[0].grade).toEqual(1);
+
+        await uploadGrade(2);
+        grades = await AttainmentGrade.findAll({
+          where: {
+            userId: 28,
+            attainmentId: 268
+          }
+        });
+        expect(grades.length).toEqual(2);
+        expect(grades.find((val: AttainmentGrade) => val.grade === 1)).toBeDefined();
+        expect(grades.find((val: AttainmentGrade) => val.grade === 5)).toBeDefined();
+      }
+    );
+
     it('should process big CSV succesfully (1100 x 178 = 195 800 individual attainment grades)',
       async () => {
         const csvData: fs.ReadStream = fs.createReadStream(
