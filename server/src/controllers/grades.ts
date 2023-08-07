@@ -1146,13 +1146,9 @@ export async function calculateGrades(
     calculateFormulaNode(userId, rootFormulaNode, manualGrades);
   }
 
-  // TODO: Duplicates should not be updated, at least for final grades
   await sequelize.transaction(async (transaction: Transaction) => {
     await AttainmentGrade.bulkCreate(calculatedGrades,
-      {
-        updateOnDuplicate: ['grade', 'graderId', 'status'],
-        transaction
-      }
+      { transaction }
     );
   });
 

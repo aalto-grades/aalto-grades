@@ -2,7 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentGradeData, GradeOption, HttpCode } from 'aalto-grades-common/types';
+import {
+  AttainmentGradeData, GradeOption, HttpCode, Status
+} from 'aalto-grades-common/types';
 import * as fs from 'fs';
 import path from 'path';
 import { Op } from 'sequelize';
@@ -1319,6 +1321,56 @@ describe(
         .set('Cookie', cookies.adminCookie));
 
       checkGrade(234, 391, 3.12, cookies.adminCookie);
+    });
+
+    it('should calculate multiple grades for the same attainment on repeated runs', async () => {
+      async function checkGradeAmount(
+        attainmentId: number,
+        expectedAmount: number,
+        expectedGrades: Array<number>
+      ): Promise<void> {
+        const attainmentGrades: Array<AttainmentGrade> =
+          await AttainmentGrade.findAll({
+            where: {
+              attainmentId: attainmentId,
+              userId: 391
+            }
+          });
+
+        expect(attainmentGrades.length).toEqual(expectedAmount);
+
+        const grades: Array<number> = attainmentGrades.map(
+          (attainmentGrade: AttainmentGrade) => attainmentGrade.grade
+        );
+
+        for (const expectedGrade of expectedGrades) {
+          expect(grades).toContain(expectedGrade);
+        }
+      }
+
+      await checkGradeAmount(234, 1, [3.12]);
+      await checkGradeAmount(236, 1, [3.2]);
+      await checkGradeAmount(239, 1, [3]);
+
+      await AttainmentGrade.create({
+        userId: 391,
+        attainmentId: 237,
+        graderId: 1,
+        grade: 10,
+        manual: true,
+        status: Status.Pass
+      });
+
+      checkSuccessRes(await request
+        .post('/v1/courses/1/assessment-models/27/grades/calculate')
+        .send({
+          studentNumbers: ['238447']
+        })
+        .set('Cookie', cookies.adminCookie));
+
+      await checkGradeAmount(234, 2, [3.12, 3.4800000000000004]);
+      await checkGradeAmount(236, 2, [3.2, 3.8000000000000003]);
+      await checkGradeAmount(239, 2, [3, 3]);
     });
 
     it('should allow manually overriding a student\'s grade', async () => {
