@@ -181,6 +181,7 @@ export default function CourseView(): JSX.Element {
               open={createAssessmentModelOpen}
               handleClose={(): void => setCreateAssessmentModelOpen(false)}
               onSubmit={assessmentModels.refetch}
+              assessmentModels={assessmentModels.data}
             />
           </>
         )
