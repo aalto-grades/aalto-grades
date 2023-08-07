@@ -6,6 +6,7 @@ import { HttpCode, ParamsObject } from 'aalto-grades-common/types';
 
 import AssessmentModel from '../../database/models/assessmentModel';
 import Attainment from '../../database/models/attainment';
+import AttainmentGrade from '../../database/models/attainmentGrade';
 import Course from '../../database/models/course';
 
 import { AttainmentData } from 'aalto-grades-common/types';
@@ -24,6 +25,24 @@ export async function findAttainmentById(id: number, errorCode: HttpCode): Promi
   const attainment: Attainment | null = await Attainment.findByPk(id);
   if (!attainment) {
     throw new ApiError(`attainment with ID ${id} not found`, errorCode);
+  }
+  return attainment;
+}
+
+/**
+ * Finds an attainment grade by its ID.
+ * @param {number} id - The ID of the attainment grade.
+ * @param {HttpCode} errorCode - HTTP status code to return if the attainment grade was not found.
+ * @returns {Promise<Attainment>} - The found attainment grade model object.
+ * @throws {ApiError} - If the attainment grade is not found, it throws an error
+ * with a message indicating the missing attainment grade with the specific ID.
+ */
+export async function findAttainmentGradeById(
+  id: number, errorCode: HttpCode
+): Promise<AttainmentGrade> {
+  const attainment: AttainmentGrade | null = await AttainmentGrade.findByPk(id);
+  if (!attainment) {
+    throw new ApiError(`attainment grade with ID ${id} not found`, errorCode);
   }
   return attainment;
 }
