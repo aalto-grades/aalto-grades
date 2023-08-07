@@ -180,7 +180,6 @@ export default function CourseResultsTableToolbar(props: {
         }}>
           <TextField
             size='small'
-            type='strig'
             value={props.search}
             name='search'
             label='Search by Student Number'
