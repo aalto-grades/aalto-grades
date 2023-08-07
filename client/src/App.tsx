@@ -138,7 +138,12 @@ export default function App(): JSX.Element {
     }),
     mutationCache: new MutationCache({
       onError: handleError
-    })
+    }),
+    defaultOptions: {
+      queries: {
+        retry: false
+      }
+    }
   });
 
   return (
