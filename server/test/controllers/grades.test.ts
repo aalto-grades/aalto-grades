@@ -1348,29 +1348,44 @@ describe(
         }
       }
 
-      await checkGradeAmount(234, 1, [3.12]);
-      await checkGradeAmount(236, 1, [3.2]);
-      await checkGradeAmount(239, 1, [3]);
+      await checkGradeAmount(275, 0, []);
+      await checkGradeAmount(277, 0, []);
+      await checkGradeAmount(280, 0, []);
+
+      checkSuccessRes(
+        await request
+          .post('/v1/courses/2/assessment-models/49/grades/calculate')
+          .send({
+            studentNumbers: ['238447']
+          })
+          .set('Cookie', cookies.adminCookie)
+      );
+
+      await checkGradeAmount(275, 1, [3.12]);
+      await checkGradeAmount(277, 1, [3.2]);
+      await checkGradeAmount(280, 1, [3]);
 
       await AttainmentGrade.create({
         userId: 391,
-        attainmentId: 237,
+        attainmentId: 278,
         graderId: 1,
         grade: 10,
         manual: true,
         status: Status.Pass
       });
 
-      checkSuccessRes(await request
-        .post('/v1/courses/1/assessment-models/27/grades/calculate')
-        .send({
-          studentNumbers: ['238447']
-        })
-        .set('Cookie', cookies.adminCookie));
+      checkSuccessRes(
+        await request
+          .post('/v1/courses/2/assessment-models/49/grades/calculate')
+          .send({
+            studentNumbers: ['238447']
+          })
+          .set('Cookie', cookies.adminCookie)
+      );
 
-      await checkGradeAmount(234, 2, [3.12, 3.4800000000000004]);
-      await checkGradeAmount(236, 2, [3.2, 3.8000000000000003]);
-      await checkGradeAmount(239, 2, [3, 3]);
+      await checkGradeAmount(275, 2, [3.12, 3.4800000000000004]);
+      await checkGradeAmount(277, 2, [3.2, 3.8000000000000003]);
+      await checkGradeAmount(280, 2, [3, 3]);
     });
 
     it('should allow manually overriding a student\'s grade', async () => {

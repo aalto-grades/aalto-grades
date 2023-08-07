@@ -135,4 +135,10 @@ INSERT INTO public.attainment_grade (user_id, attainment_id, grader_id, grade, m
 (1, 272, 2, 5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW()),
 (1, 273, 2, 5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW()),
 (1, 273, 2, 1, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW()),
-(1, 273, 2, 3, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW());
+(1, 273, 2, 3, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW()),
+-- Test calculating new grades for a student
+(391, 276, 1, 3, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW()),
+(391, 278, 1, 4, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW()),
+(391, 279, 1, 4, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW()),
+(391, 281, 1, 1, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW()),
+(391, 282, 1, 5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW());

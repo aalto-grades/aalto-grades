@@ -50,4 +50,5 @@ INSERT INTO public.assessment_model (course_id, name, created_at, updated_at) VA
 (2, 'ID 45 - multiple grades for same attainment', NOW(), NOW()),
 (2, 'ID 46 - get one grade', NOW(), NOW()),
 (2, 'ID 47 - get multiple grades', NOW(), NOW()),
-(2, 'ID 48 - get zero grades', NOW(), NOW());
+(2, 'ID 48 - get zero grades', NOW(), NOW()),
+(2, 'ID 49 - calculate new grades for a student', NOW(), NOW());
