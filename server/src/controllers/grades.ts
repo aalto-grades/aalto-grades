@@ -164,12 +164,6 @@ async function getFinalGradesFor(
     );
   }
 
-  // Filter duplicates.
-  finalGrades = finalGrades.filter(
-    (obj: FinalGradeRaw, index: number) =>
-      finalGrades.findIndex((item: FinalGradeRaw) => item.User.id === obj.User.id) === index
-  );
-
   return finalGrades;
 }
 
@@ -196,7 +190,7 @@ async function filterByInstanceAndStudentNumber(
 
   if (studentsFromInstance) {
     const studentNumbersFromInstance: Array<string> =
-        studentsFromInstance.Users.map((user: User) => user.studentNumber);
+      studentsFromInstance.Users.map((user: User) => user.studentNumber);
 
     if (studentNumbersFiltered) {
       // Intersection of both student numbers from query params and on the course instance.
@@ -282,16 +276,28 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
     assessmentModel.id, studentNumbersFiltered ?? []
   );
 
-  const courseResults: Array<{
+  interface SisuCsvFormat {
     studentNumber: string,
     grade: string,
     credits: number,
     assessmentDate: string,
     completionLanguage: string,
     comment: string
-  }> = finalGrades.map(
-    (finalGrade: FinalGradeRaw) => {
-      return {
+  }
+
+  const courseResults: Array<SisuCsvFormat> = [];
+
+  for (const finalGrade of finalGrades) {
+    const existingResult: SisuCsvFormat | undefined = courseResults.find(
+      (value: SisuCsvFormat) => value.studentNumber === finalGrade.User.studentNumber
+    );
+
+    if (existingResult) {
+      if (finalGrade.grade > Number(existingResult.grade)) {
+        existingResult.grade = String(finalGrade.grade);
+      }
+    } else {
+      courseResults.push({
         studentNumber: finalGrade.User.studentNumber,
         grade: String(finalGrade.grade),
         credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits,
@@ -302,9 +308,9 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
         completionLanguage: completionLanguage ?? 'en',
         // Comment column is required, but can be empty.
         comment: ''
-      };
+      });
     }
-  );
+  }
 
   stringify(
     courseResults,

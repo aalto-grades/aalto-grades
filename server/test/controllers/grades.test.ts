@@ -48,6 +48,33 @@ function checkSuccessRes(res: supertest.Response): void {
   expect(res.statusCode).toBe(HttpCode.Ok);
 }
 
+// Function to check that the expected number of grades exist for a user for
+// a specific attainment, including checking the numeric values of those grades.
+async function checkGradeAmount(
+  userId: number,
+  attainmentId: number,
+  expectedAmount: number,
+  expectedGrades: Array<number>
+): Promise<void> {
+  const attainmentGrades: Array<AttainmentGrade> =
+    await AttainmentGrade.findAll({
+      where: {
+        userId: userId,
+        attainmentId: attainmentId
+      }
+    });
+
+  expect(attainmentGrades.length).toEqual(expectedAmount);
+
+  const grades: Array<number> = attainmentGrades.map(
+    (attainmentGrade: AttainmentGrade) => attainmentGrade.grade
+  );
+
+  for (const expectedGrade of expectedGrades) {
+    expect(grades).toContain(expectedGrade);
+  }
+}
+
 describe(
   'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv'
   + ' - get grading CSV template',
@@ -197,6 +224,32 @@ describe(
         `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
         );
       });
+
+    it('should export the best grade if multiple ones exist', async () => {
+      // Check that multiple grades exist as expected
+      await checkGradeAmount(1, 283, 3, [0, 3, 5]);
+      await checkGradeAmount(2, 283, 2, [1, 2]);
+      await checkGradeAmount(3, 283, 1, [4]);
+
+      res = await request
+        .get(
+          '/v1/courses/2/assessment-models/50/grades/csv/sisu'
+          + `?studentNumbers=${JSON.stringify(['352772', '476617', '344625'])}`
+        )
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+
+      expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+352772,5,5,21.6.2023,en,
+476617,2,5,21.6.2023,en,
+344625,4,5,21.6.2023,en,
+`);
+      expect(res.headers['content-disposition']).toBe(
+        'attachment; filename="final_grades_course_CS-A1120_' +
+        `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
+      );
+    });
 
     it('should export CSV succesfully with custom assessmentDate and completionLanguage',
       async () => {
@@ -1324,33 +1377,9 @@ describe(
     });
 
     it('should calculate multiple grades for the same attainment on repeated runs', async () => {
-      async function checkGradeAmount(
-        attainmentId: number,
-        expectedAmount: number,
-        expectedGrades: Array<number>
-      ): Promise<void> {
-        const attainmentGrades: Array<AttainmentGrade> =
-          await AttainmentGrade.findAll({
-            where: {
-              attainmentId: attainmentId,
-              userId: 391
-            }
-          });
-
-        expect(attainmentGrades.length).toEqual(expectedAmount);
-
-        const grades: Array<number> = attainmentGrades.map(
-          (attainmentGrade: AttainmentGrade) => attainmentGrade.grade
-        );
-
-        for (const expectedGrade of expectedGrades) {
-          expect(grades).toContain(expectedGrade);
-        }
-      }
-
-      await checkGradeAmount(275, 0, []);
-      await checkGradeAmount(277, 0, []);
-      await checkGradeAmount(280, 0, []);
+      await checkGradeAmount(391, 275, 0, []);
+      await checkGradeAmount(391, 277, 0, []);
+      await checkGradeAmount(391, 280, 0, []);
 
       checkSuccessRes(
         await request
@@ -1361,9 +1390,9 @@ describe(
           .set('Cookie', cookies.adminCookie)
       );
 
-      await checkGradeAmount(275, 1, [3.12]);
-      await checkGradeAmount(277, 1, [3.2]);
-      await checkGradeAmount(280, 1, [3]);
+      await checkGradeAmount(391, 275, 1, [3.12]);
+      await checkGradeAmount(391, 277, 1, [3.2]);
+      await checkGradeAmount(391, 280, 1, [3]);
 
       await AttainmentGrade.create({
         userId: 391,
@@ -1383,9 +1412,9 @@ describe(
           .set('Cookie', cookies.adminCookie)
       );
 
-      await checkGradeAmount(275, 2, [3.12, 3.4800000000000004]);
-      await checkGradeAmount(277, 2, [3.2, 3.8000000000000003]);
-      await checkGradeAmount(280, 2, [3, 3]);
+      await checkGradeAmount(391, 275, 2, [3.12, 3.4800000000000004]);
+      await checkGradeAmount(391, 277, 2, [3.2, 3.8000000000000003]);
+      await checkGradeAmount(391, 280, 2, [3, 3]);
     });
 
     it('should allow manually overriding a student\'s grade', async () => {
