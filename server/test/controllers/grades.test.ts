@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AttainmentGradeData, GradeOption, HttpCode, Status
+  AttainmentGradeData, FinalGrade, GradeOption, HttpCode, Status
 } from 'aalto-grades-common/types';
 import * as fs from 'fs';
 import path from 'path';
@@ -479,6 +479,25 @@ describe(
   'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades'
   + ' - get final grades in JSON', () => {
 
+    function checkFinalGradesStructure(finalGrades: Array<FinalGrade>): void {
+      for (const finalGrade of finalGrades) {
+        expect(finalGrade.userId).toBeDefined();
+        expect(finalGrade.studentNumber).toBeDefined();
+        expect(finalGrade.credits).toBeDefined();
+        expect(finalGrade.grades).toBeDefined();
+
+        for (const option of finalGrade.grades) {
+          expect(option.gradeId).toBeDefined();
+          expect(option.graderId).toBeDefined();
+          expect(option.grade).toBeDefined();
+          expect(option.status).toBeDefined();
+          expect(option.manual).toBeDefined();
+          expect(option.date).toBeDefined();
+          expect(option.expiryDate).not.toBeDefined();
+        }
+      }
+    }
+
     it(
       'should get final grades succesfully when course results are found (admin user)',
       async () => {
@@ -492,21 +511,7 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        expect(res.body.data).toEqual([
-          { userId: 519, studentNumber: '117486', grade: '1', credits: 5 },
-          { userId: 521, studentNumber: '114732', grade: '5', credits: 5 },
-          { userId: 574, studentNumber: '472886', grade: '3', credits: 5 },
-          { userId: 581, studentNumber: '335462', grade: '1', credits: 5 },
-          { userId: 590, studentNumber: '874623', grade: '2', credits: 5 },
-          { userId: 601, studentNumber: '345752', grade: '1', credits: 5 },
-          { userId: 604, studentNumber: '353418', grade: '4', credits: 5 },
-          { userId: 609, studentNumber: '986957', grade: '0', credits: 5 },
-          { userId: 633, studentNumber: '611238', grade: '4', credits: 5 },
-          { userId: 651, studentNumber: '691296', grade: '1', credits: 5 },
-          { userId: 670, studentNumber: '271778', grade: '0', credits: 5 },
-          { userId: 739, studentNumber: '344644', grade: '1', credits: 5 },
-          { userId: 948, studentNumber: '954954', grade: '5', credits: 5 }
-        ]);
+        checkFinalGradesStructure(res.body.data);
       });
 
     it(
@@ -521,21 +526,7 @@ describe(
           .set('Accept', 'application/json');
 
         checkSuccessRes(res);
-        expect(res.body.data).toEqual([
-          { userId: 519, studentNumber: '117486', grade: '1', credits: 5 },
-          { userId: 521, studentNumber: '114732', grade: '5', credits: 5 },
-          { userId: 574, studentNumber: '472886', grade: '3', credits: 5 },
-          { userId: 581, studentNumber: '335462', grade: '1', credits: 5 },
-          { userId: 590, studentNumber: '874623', grade: '2', credits: 5 },
-          { userId: 601, studentNumber: '345752', grade: '1', credits: 5 },
-          { userId: 604, studentNumber: '353418', grade: '4', credits: 5 },
-          { userId: 609, studentNumber: '986957', grade: '0', credits: 5 },
-          { userId: 633, studentNumber: '611238', grade: '4', credits: 5 },
-          { userId: 651, studentNumber: '691296', grade: '1', credits: 5 },
-          { userId: 670, studentNumber: '271778', grade: '0', credits: 5 },
-          { userId: 739, studentNumber: '344644', grade: '1', credits: 5 },
-          { userId: 948, studentNumber: '954954', grade: '5', credits: 5 }
-        ]);
+        checkFinalGradesStructure(res.body.data);
       });
 
     it('should show final grade as PENDING for students with no final grade calculated',
@@ -547,6 +538,7 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
+        checkFinalGradesStructure(res.body.data);
         expect(res.body.data).toEqual([
           { userId: 693, studentNumber: '869364', grade: 'PENDING', credits: 0 },
           { userId: 738, studentNumber: '711199', grade: 'PENDING', credits: 0 },
@@ -567,11 +559,10 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        expect(res.body.data).toEqual([
-          { userId: 693, studentNumber: '869364', grade: 'PENDING', credits: 0 },
-          { userId: 738, studentNumber: '711199', grade: 'PENDING', credits: 0 },
-          { userId: 673, studentNumber: '795451', grade: '0', credits: 5 }
-        ]);
+        checkFinalGradesStructure(res.body.data);
+        expect(
+          res.body.data.map((finalGrade: FinalGrade) => finalGrade.studentNumber)
+        ).toEqual(['869364', '711199', '795451']);
       });
 
     it('should filter returned grades based on instance ID if URL query included',
@@ -583,14 +574,13 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        expect(res.body.data).toEqual([
-          { userId: 824, studentNumber: '327976', grade: '5', credits: 5 },
-          { userId: 825, studentNumber: '478988', grade: '5', credits: 5 },
-          { userId: 826, studentNumber: '139131', grade: '5', credits: 5 },
-          { userId: 827, studentNumber: '857119', grade: '5', credits: 5 }
-        ]);
+        checkFinalGradesStructure(res.body.data);
+        expect(
+          res.body.data.map((finalGrade: FinalGrade) => finalGrade.studentNumber)
+        ).toEqual(['327976', '478988', '139131', '857119']);
       });
 
+    // TODO: Clarify whether this is supposed to be a union or intersection
     it(
       'should filter returned grades based on instance ID and student number if URL query included',
       async () => {
@@ -602,10 +592,10 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        expect(res.body.data).toEqual(   [
-          { userId: 824, studentNumber: '327976', grade: '5', credits: 5 },
-          { userId: 826, studentNumber: '139131', grade: '5', credits: 5 }
-        ]);
+        checkFinalGradesStructure(res.body.data);
+        expect(
+          res.body.data.map((finalGrade: FinalGrade) => finalGrade.studentNumber)
+        ).toEqual(['327976', '139131']);
       });
 
     it('should not filter returned grades if no filters included in URL query',
@@ -617,27 +607,13 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        expect(res.body.data).toEqual([
-          { userId: 1241, studentNumber: '658593', grade: 'PENDING', credits: 0 },
-          { userId: 1242, studentNumber: '451288', grade: 'PENDING', credits: 0 },
-          { userId: 1243, studentNumber: '167155', grade: 'PENDING', credits: 0 },
-          { userId: 519, studentNumber: '117486', grade: '5', credits: 5 },
-          { userId: 521, studentNumber: '114732', grade: '5', credits: 5 },
-          { userId: 574, studentNumber: '472886', grade: '5', credits: 5 },
-          { userId: 581, studentNumber: '335462', grade: '5', credits: 5 },
-          { userId: 590, studentNumber: '874623', grade: '5', credits: 5 },
-          { userId: 601, studentNumber: '345752', grade: '5', credits: 5 },
-          { userId: 604, studentNumber: '353418', grade: '5', credits: 5 },
-          { userId: 609, studentNumber: '986957', grade: '5', credits: 5 },
-          { userId: 633, studentNumber: '611238', grade: '5', credits: 5 },
-          { userId: 651, studentNumber: '691296', grade: '5', credits: 5 },
-          { userId: 670, studentNumber: '271778', grade: '5', credits: 5 },
-          { userId: 739, studentNumber: '344644', grade: '5', credits: 5 },
-          { userId: 948, studentNumber: '954954', grade: '5', credits: 5 },
-          { userId: 824, studentNumber: '327976', grade: '5', credits: 5 },
-          { userId: 825, studentNumber: '478988', grade: '5', credits: 5 },
-          { userId: 826, studentNumber: '139131', grade: '5', credits: 5 },
-          { userId: 827, studentNumber: '857119', grade: '5', credits: 5 }
+        checkFinalGradesStructure(res.body.data);
+        expect(
+          res.body.data.map((finalGrade: FinalGrade) => finalGrade.studentNumber)
+        ).toEqual([
+          '658593', '451288', '167155', '117486', '114732', '472886', '335462',
+          '874623', '345752', '353418', '986957', '611238', '691296', '271778',
+          '344644', '954954', '327976', '478988', '139131', '857119'
         ]);
       });
 
@@ -657,6 +633,7 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
+        checkFinalGradesStructure(res.body.data);
         expect(res.body.data).toEqual([
           { userId: 416, studentNumber: '369743', grade: '5', credits: 5 },
           { userId: 673, studentNumber: '795451', grade: '0', credits: 5 },

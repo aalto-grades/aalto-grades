@@ -132,7 +132,6 @@ async function getFinalGradesFor(
   }
 
   let finalGrades: Array<FinalGradeRaw> = await AttainmentGrade.findAll({
-    attributes: ['grade'],
     include: [
       {
         model: Attainment,
@@ -356,8 +355,6 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
     instanceId?: number
   } = await urlParams.validate(req.query, { abortEarly: false });
 
-  let studentNumbersFiltered: Array<string> | undefined = studentNumbers;
-
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
@@ -365,17 +362,13 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
 
   await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
-  // Include students from particular instance (belonging to the assessment model) if ID provided.
-  if (instanceId) {
-    studentNumbersFiltered = await filterByInstanceAndStudentNumber(
-      instanceId, studentNumbersFiltered
-    );
-  }
+  // Include students from particular instance if ID provided.
+  let studentNumbersFiltered: Array<string> | undefined = instanceId
+    ? await filterByInstanceAndStudentNumber(instanceId, studentNumbers)
+    : studentNumbers;
 
   if (studentNumbersFiltered)
     studentNumbersExist(studentNumbersFiltered);
-
-  let finalGrades: Array<FinalGrade> = [];
 
   // User raw query to enable distinct selection of students who have
   // at least one grade (final or not) for particular assessment model.
@@ -407,47 +400,48 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
     });
   }
 
-  const studentsWithFinalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
-    assessmentModel.id, studentNumbersFiltered ?? [], allStudentsFromAssessmentModel.length !== 0
+  const rawFinalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
+    assessmentModel.id,
+    studentNumbersFiltered ?? [],
+    allStudentsFromAssessmentModel.length !== 0
   );
+
+  const finalGrades: Array<FinalGrade> = [];
 
   // Add students with no final grade marked as pending to the results.
   if (allStudentsFromAssessmentModel.length !== 0) {
+    for (const grade of rawFinalGrades) {
+      const existingResult: FinalGrade | undefined = finalGrades.find(
+        (value: FinalGrade) => value.userId === grade.User.id
+      );
 
-    const studentNumbersWithFinalGrades: Array<string> =
-      studentsWithFinalGrades.map((value: FinalGradeRaw) => value.User.studentNumber);
-
-    const studentNumbersNoGrade: Array<{ userId: number, studentNumber: string }> =
-      allStudentsFromAssessmentModel
-        .filter((value: { userId: number, studentNumber: string }) => {
-          return !studentNumbersWithFinalGrades.includes(value.studentNumber);
+      if (existingResult) {
+        existingResult.grades.push({
+          gradeId: grade.id,
+          graderId: grade.graderId,
+          grade: grade.grade,
+          status: grade.status as Status,
+          manual: grade.manual,
+          date: grade.date
+        })
+      } else {
+        finalGrades.push({
+          userId: grade.User.id,
+          studentNumber: grade.User.studentNumber,
+          credits: grade.Attainment.AssessmentModel.Course.maxCredits,
+          grades: [
+            {
+              gradeId: grade.id,
+              graderId: grade.graderId,
+              grade: grade.grade,
+              status: grade.status as Status,
+              manual: grade.manual,
+              date: grade.date
+            }
+          ]
         });
-
-    studentNumbersNoGrade.forEach((value: { userId: number, studentNumber: string }) => {
-      finalGrades.push({
-        userId: value.userId,
-        studentNumber: value.studentNumber,
-        grade: Status.Pending,
-        credits: 0
-      });
-    });
-  }
-
-  studentsWithFinalGrades.map(
-    (finalGrade: FinalGradeRaw) => {
-      finalGrades.push({
-        userId: finalGrade.User.id,
-        studentNumber: finalGrade.User.studentNumber,
-        grade: String(finalGrade.grade),
-        credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits
-      });
+      }
     }
-  );
-
-  if (studentNumbersFiltered) {
-    finalGrades = finalGrades.filter(
-      (value: FinalGrade) => (studentNumbersFiltered as Array<string>).includes(value.studentNumber)
-    );
   }
 
   res.status(HttpCode.Ok).json({
