@@ -9,7 +9,7 @@ import passport from 'passport';
 import path from 'path';
 
 import {
-  addGrades, calculateGrades, getCsvTemplate,
+  addGrades, calculateGrades, editUserGrade, getCsvTemplate,
   getFinalGrades, getSisuFormattedGradingCSV, getGradeTreeOfUser
 } from '../controllers/grades';
 import { handleInvalidRequestJson } from '../middleware';
@@ -43,6 +43,19 @@ const upload: Multer = multer({
 /**
  * @swagger
  * definitions:
+ *   Status:
+ *     type: string
+ *     description: Grading status indicator.
+ *     enum: [PASS, FAIL, PENDING]
+ *     example: PASS
+ *     required: false
+ *   Grade:
+ *     type: number
+ *     description: User attainment grade.
+ *     format: int32
+ *     minimum: 0
+ *     example: 5
+ *     required: false
  *   GradingData:
  *     type: object
  *     description: Students final grade data.
@@ -82,21 +95,39 @@ const upload: Multer = multer({
  *       name:
  *         $ref: '#/definitions/AttainmentName'
  *       grade:
- *         type: number
- *         description: User attainment grade.
- *         format: int32
- *         minimum: 0
- *         example: 5
+ *         $ref: '#/definitions/Grade'
  *       manual:
  *         type: boolean
  *         example: true
  *       status:
- *         type: string
- *         enum: [PASS, FAIL, PENDING]
- *         example: PASS
+ *         $ref: '#/definitions/Status'
  *       subAttainments:
  *         type: array
  *         description: Sublevel attainment grades.
+ *   EditGrade:
+ *     type: object
+ *     properties:
+ *       status:
+ *         $ref: '#/definitions/Status'
+ *       grade:
+ *         $ref: '#/definitions/Grade'
+ *       date:
+ *         type: string
+ *         format: date
+ *         description: Date when attainment is completed (e.g., deadline or exam date)
+ *         example: 2022-9-22
+ *         required: false
+ *       expiryDate:
+ *         type: string
+ *         format: date
+ *         description: Date when the grade expires.
+ *         example: 2022-9-22
+ *         required: false
+ *       comment:
+ *         type: string
+ *         description: Comment for grade.
+ *         example: Good job!
+ *         required: false
  */
 
 /**
@@ -502,4 +533,65 @@ router.post(
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(calculateGrades)
+);
+
+/**
+ * @swagger
+ * /v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/{gradeId}:
+ *   put:
+ *     tags: [Grades]
+ *     description: >
+ *       Edit existing user grading data.
+ *       Available only to admin users and teachers in charge of the course.
+ *     parameters:
+ *       - $ref: '#/components/parameters/courseId'
+ *       - $ref: '#/components/parameters/assessmentModelId'
+ *       - $ref: '#/components/parameters/gradeId'
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/definitions/EditGrade'
+ *     responses:
+ *       200:
+ *         description: Grade editing executed successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   description: Empty data object.
+ *                   type: object
+ *       400:
+ *         description: >
+ *           Operation failed, due to validation errors or missing parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       401:
+ *         $ref: '#/components/responses/AuthenticationError'
+ *       403:
+ *         $ref: '#/components/responses/AuthorizationError'
+ *       404:
+ *         description: The given course, grade or assessment model does not exist.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: >
+ *           The given assessment model does not belong to the given course.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
+ */
+router.put(
+  '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/:gradeId',
+  passport.authenticate('jwt', { session: false }),
+  express.json(),
+  handleInvalidRequestJson,
+  controllerDispatcher(editUserGrade)
 );
