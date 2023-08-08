@@ -77,9 +77,15 @@ const upload: Multer = multer({
  *           is the result of grade calculation.
  *         example: true
  *       date:
- *         type: date
+ *         type: string
+ *         format: date
+ *         description: Date when attainment is completed (e.g., deadline or exam date)
+ *         example: 2022-9-22
  *       expiryDate:
- *         type: date
+ *         type: string
+ *         format: date
+ *         description: Date when the grade expires.
+ *         example: 2022-9-22
  *   FinalGradeData:
  *     type: object
  *     description: Students final grade data.
