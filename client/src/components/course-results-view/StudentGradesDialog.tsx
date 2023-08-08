@@ -7,12 +7,15 @@ import {
   Box, Button, CircularProgress, Dialog,
   DialogActions, DialogContent, DialogTitle, Typography
 } from '@mui/material';
+import { useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 
 import StudentGradeList from './StudentGradeList';
+import EditGradeDialog from './EditGradeDialog';
 
 import { useGetGradeTreeOfUser } from '../../hooks/useApi';
+import { State } from '../../types';
 
 // A Dialog component for viewing the individual grades of a user.
 export default function StudentGradesDialog(props: {
@@ -23,9 +26,18 @@ export default function StudentGradesDialog(props: {
   const { courseId, assessmentModelId }: Params =
     useParams() as { courseId: string, assessmentModelId: string };
 
+  const [showEditDialog, setShowEditDialog]: State<boolean> = useState<boolean>(false);
+  const [editGrade, setEditGrade]: State<AttainmentGradeData | undefined> =
+    useState<AttainmentGradeData | undefined>(undefined);
+
   const grades: UseQueryResult<AttainmentGradeData> = useGetGradeTreeOfUser(
     courseId, assessmentModelId, props.user?.userId as number, { enabled: props.open }
   );
+
+  function showEditGradeDialog(grade: AttainmentGradeData): void {
+    setEditGrade(grade);
+    setShowEditDialog(true);
+  }
 
   return (
     <>
@@ -34,7 +46,7 @@ export default function StudentGradesDialog(props: {
         <DialogContent sx={{ pb: 0 }}>
           {
             (grades.data) ? (
-              <StudentGradeList grades={grades.data} />
+              <StudentGradeList grades={grades.data} gradeToEdit={showEditGradeDialog}/>
             ) : (
               <Box sx={{
                 margin: 'auto',
@@ -72,6 +84,11 @@ export default function StudentGradesDialog(props: {
           </Button>
         </DialogActions>
       </Dialog>
+      <EditGradeDialog
+        grade={editGrade}
+        setOpen={setShowEditDialog}
+        open={showEditDialog}
+      />
     </>
   );
 }
