@@ -26,6 +26,7 @@ export interface AttainmentGradeData {
   subAttainments?: Array<AttainmentGradeData>
 }
 
+// TODO: Replace with a better name
 export interface FinalGrade {
   userId: number,
   studentNumber: string,

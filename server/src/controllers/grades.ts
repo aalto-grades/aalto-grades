@@ -132,7 +132,7 @@ async function getFinalGradesFor(
     };
   }
 
-  let finalGrades: Array<FinalGradeRaw> = await AttainmentGrade.findAll({
+  const finalGrades: Array<FinalGradeRaw> = await AttainmentGrade.findAll({
     include: [
       {
         model: Attainment,
@@ -255,7 +255,7 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
   await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
   // Include students from a particular instance if an ID is provided.
-  let studentNumbersFiltered: Array<string> | undefined =
+  const studentNumbersFiltered: Array<string> | undefined =
     instanceId
       ? await filterByInstanceAndStudentNumber(instanceId, studentNumbers)
       : studentNumbers;
@@ -424,7 +424,7 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
             status: grade.status as Status,
             manual: grade.manual,
             date: grade.date
-          }
+          };
         })
     });
   }

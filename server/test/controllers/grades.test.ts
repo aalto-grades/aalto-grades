@@ -559,12 +559,12 @@ describe(
 
           const gradesOfStudent: Array<{ grade: number, status: Status }> | undefined =
             res.body.data.find((finalGrade: FinalGrade) => {
-              return finalGrade.studentNumber === studentNumber
+              return finalGrade.studentNumber === studentNumber;
             })?.grades.map((option: GradeOption) => {
               return {
                 grade: option.grade,
                 status: option.status
-              }
+              };
             });
 
           expect(gradesOfStudent).toBeDefined();
@@ -602,7 +602,7 @@ describe(
 
         checkSuccessRes(res);
         checkFinalGradesStructure(res.body.data);
-        checkStudentNumbers(res.body.data, ['869364', '711199', '795451'])
+        checkStudentNumbers(res.body.data, ['869364', '711199', '795451']);
       });
 
     it('should filter returned grades based on instance ID if URL query included',
