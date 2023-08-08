@@ -137,7 +137,7 @@ export default {
         },
         formula_params: {
           type: DataTypes.JSONB,
-          allowNull: true,
+          allowNull: false,
         },
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE

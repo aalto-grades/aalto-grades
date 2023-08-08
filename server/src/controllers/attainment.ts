@@ -43,34 +43,36 @@ async function validateFormulaParams(
 
     // Ensure that all subattainments are included in children and that there
     // are no invalid subattainment names in children
-    const uncheckedNamesInParams: Array<string> =
-      (formulaParams as ParamsObject).children.map(
+    const uncheckedNamesInParams: Array<string> | undefined =
+      (formulaParams as ParamsObject).children?.map(
         (value: [string, unknown]) => value[0]
       );
 
-    const notFound: Array<string> = [];
+    if (uncheckedNamesInParams) {
+      const notFound: Array<string> = [];
 
-    for (const name of subAttainmentNames) {
-      const index: number = uncheckedNamesInParams.indexOf(name);
-      if (index < 0) {
-        notFound.push(name);
-      } else {
-        uncheckedNamesInParams.splice(index, 1);
+      for (const name of subAttainmentNames) {
+        const index: number = uncheckedNamesInParams.indexOf(name);
+        if (index < 0) {
+          notFound.push(name);
+        } else {
+          uncheckedNamesInParams.splice(index, 1);
+        }
       }
-    }
 
-    if (notFound.length > 0) {
-      throw new ApiError(
-        `formula params do not include subattainments with names ${notFound}`,
-        HttpCode.BadRequest
-      );
-    }
+      if (notFound.length > 0) {
+        throw new ApiError(
+          `formula params do not include subattainments with names ${notFound}`,
+          HttpCode.BadRequest
+        );
+      }
 
-    if (uncheckedNamesInParams.length > 0) {
-      throw new ApiError(
-        `invalid subattainment names in formula params: ${uncheckedNamesInParams}`,
-        HttpCode.BadRequest
-      );
+      if (uncheckedNamesInParams.length > 0) {
+        throw new ApiError(
+          `invalid subattainment names in formula params: ${uncheckedNamesInParams}`,
+          HttpCode.BadRequest
+        );
+      }
     }
   }
 }
@@ -187,7 +189,6 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       .notRequired(),
     formulaParams: yup // More thorough validation is done separately
       .object()
-      .nullable()
       .notRequired(),
     subAttainments: yup
       .array()
@@ -226,8 +227,8 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
      * manual, then this new attainment must be added to the children list of the
      * parent attainment's params.
      */
-    if (parentAttainment.formulaParams && parentAttainment.formula !== Formula.Manual) {
-      const parentParams: ParamsObject<object> = parentAttainment.formulaParams as ParamsObject;
+    const parentParams: ParamsObject<object> = parentAttainment.formulaParams;
+    if (parentParams.children) {
       const parentFormula: FormulaImplementation = getFormulaImplementation(
         parentAttainment.formula
       );
@@ -421,9 +422,8 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
         attainment.parentId, HttpCode.InternalServerError
       );
 
-      if (oldParent.formulaParams) {
-        const parentParams: ParamsObject = oldParent.formulaParams as ParamsObject;
-
+      const parentParams: ParamsObject = oldParent.formulaParams;
+      if (parentParams.children) {
         for (const i in parentParams.children) {
           if (parentParams.children[i][0] === attainment.name) {
             parentParams.children.splice(Number(i), 1);
@@ -448,8 +448,8 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
       parentId, HttpCode.InternalServerError
     );
 
-    if (newParent.formulaParams && newParent.formula !== Formula.Manual) {
-      const parentParams: ParamsObject<object> = newParent.formulaParams as ParamsObject;
+    const parentParams: ParamsObject<object> = newParent.formulaParams;
+    if (parentParams.children) {
       const parentFormula: FormulaImplementation = getFormulaImplementation(
         newParent.formula
       );
@@ -477,9 +477,9 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
       attainment.parentId, HttpCode.InternalServerError
     );
 
-    if (parent.formulaParams) {
-      const parentParams: ParamsObject = parent.formulaParams as ParamsObject;
 
+    const parentParams: ParamsObject = parent.formulaParams;
+    if (parentParams.children) {
       for (const i in parentParams.children) {
         if (parentParams.children[i][0] === attainment.name) {
           parentParams.children[i][0] = name;
@@ -505,11 +505,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     daysValid: daysValid ?? attainment.daysValid,
     parentId: parentId ?? attainment.parentId,
     formula: formula ?? attainment.formula,
-    formulaParams: (
-      formula === Formula.Manual
-        ? undefined
-        : formulaParams ?? attainment.formulaParams
-    )
+    formulaParams: formulaParams ?? attainment.formulaParams
   }).save();
 
   const attainmentTree: AttainmentData = {
