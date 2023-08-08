@@ -33,3 +33,11 @@ export interface FinalGrade {
   credits: number,
   grades: Array<GradeOption>
 }
+
+export interface EditGrade {
+  grade?: number,
+  status?: Status,
+  date?: Date,
+  expiryDate?: Date,
+  comment?: string
+}
