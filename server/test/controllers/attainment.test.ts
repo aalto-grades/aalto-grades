@@ -399,7 +399,9 @@ describe(
 
         expect({ ...oldParentParams, children: undefined })
           .toStrictEqual({ ...newParentParams, children: undefined });
-        expect([...oldParentParams.children, ['born', { weight: 0 }]])
+
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        expect([...oldParentParams.children!, ['born', { weight: 0 }]])
           .toStrictEqual(newParentParams.children);
       }
     );
