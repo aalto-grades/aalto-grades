@@ -1312,3 +1312,103 @@ describe(
     });
   }
 );
+
+describe(
+  'Test PUT /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/:gradeId'
+  + ' - edit user attainment grade data',
+  () => {
+
+    it('should edit user attainment grade data (admin user)', async () => {
+      res = await request
+        .put('/v1/courses/5/assessment-models/8/grades/1')
+        .send({
+          grade: 5,
+          status: 'PASS',
+          date: '2022-12-24',
+          expiryDate: '2023-12-24',
+          comment: 'testing'
+        })
+        .set('Cookie', cookies.adminCookie)
+        .expect(HttpCode.Ok);
+
+      checkSuccessRes(res);
+    });
+
+    it('should edit user attainment grade data (teacher in charge)', async () => {
+      jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
+
+      res = await request
+        .put('/v1/courses/5/assessment-models/8/grades/1')
+        .send({
+          grade: 5,
+          status: 'PASS',
+          date: '2022-12-24',
+          expiryDate: '2023-12-24',
+          comment: 'testing'
+        })
+        .set('Cookie', cookies.userCookie)
+        .expect(HttpCode.Ok);
+
+      checkSuccessRes(res);
+    });
+
+    it('should respond with 401 unauthorized, if not logged in', async () => {
+      await request
+        .put('/v1/courses/1/assessment-models/1/grades/1')
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Unauthorized);
+    });
+
+    it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
+      const res: supertest.Response = await request
+        .put('/v1/courses/1/assessment-models/1/grades/1')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Forbidden);
+
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+    });
+
+    it('should respond with 404 not found, if grade does not exist', async () => {
+      res = await request
+        .put(`/v1/courses/1/assessment-models/1/grades/${badId}`)
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json');
+
+      checkErrorRes([`attainment grade with ID ${badId} not found`], HttpCode.NotFound);
+    });
+
+    it('should respond with 404 not found, if course does not exist', async () => {
+      res = await request
+        .put(`/v1/courses/${badId}/assessment-models/1/grades/1`)
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json');
+
+      checkErrorRes([`course with ID ${badId} not found`], HttpCode.NotFound);
+    });
+
+    it('should respond with 404 not found, if assessment model does not exist', async () => {
+      res = await request
+        .put(`/v1/courses/1/assessment-models/${badId}/grades/1`)
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json');
+
+      checkErrorRes([`assessment model with ID ${badId} not found`], HttpCode.NotFound);
+    });
+
+    it(
+      'should respond with 409 conflict, if assessment model does not belong to the course',
+      async () => {
+        res = await request
+          .put('/v1/courses/1/assessment-models/2/grades/1')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json');
+
+        checkErrorRes(
+          ['assessment model with ID 2 does not belong to the course with ID 1'],
+          HttpCode.Conflict
+        );
+      });
+  }
+);
