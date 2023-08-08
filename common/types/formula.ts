@@ -16,6 +16,6 @@ export interface FormulaData {
 }
 
 export interface ParamsObject<T = { [key: string]: unknown }> {
-  children: Array<[string, T]>,
+  children?: Array<[string, T]>,
   [key: string]: unknown
 }
