@@ -33,14 +33,6 @@ async function validateFormulaParams(
       formulaParams, { abortEarly: false }
     );
 
-    if (!subAttainmentNames) {
-      throw new ApiError(
-        'names of subattainments were not passed to validateFormulaParams with'
-        + `non-manual formula ${formula}`,
-        HttpCode.InternalServerError
-      );
-    }
-
     // Ensure that all subattainments are included in children and that there
     // are no invalid subattainment names in children
     const uncheckedNamesInParams: Array<string> | undefined =
@@ -51,7 +43,8 @@ async function validateFormulaParams(
     if (uncheckedNamesInParams) {
       const notFound: Array<string> = [];
 
-      for (const name of subAttainmentNames) {
+      // TODO: Remove non-null assertion
+      for (const name of subAttainmentNames!) {
         const index: number = uncheckedNamesInParams.indexOf(name);
         if (index < 0) {
           notFound.push(name);
@@ -186,10 +179,10 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     formula: yup
       .string()
       .oneOf(Object.values(Formula))
-      .notRequired(),
+      .required(),
     formulaParams: yup // More thorough validation is done separately
       .object()
-      .notRequired(),
+      .required(),
     subAttainments: yup
       .array()
       .of(yup.lazy(() => requestSchema.default(undefined)))
