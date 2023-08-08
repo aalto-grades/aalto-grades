@@ -25,6 +25,7 @@ import {
   JwtClaims, StudentGrades, idSchema
 } from '../types';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
+import { findAttainmentGradeById } from './utils/attainment';
 import { findUserById, isTeacherInChargeOrAdmin } from './utils/user';
 
 async function studentNumbersExist(studentNumbers: Array<string>): Promise<void> {
@@ -1137,6 +1138,54 @@ export async function calculateGrades(
       { transaction }
     );
   });
+
+  res.status(HttpCode.Ok).json({
+    data: {}
+  });
+}
+
+export async function editUserGrade(req: Request, res: Response): Promise<void> {
+  const requestSchema: yup.AnyObjectSchema = yup.object().shape({
+    grade: yup.number().min(0).notRequired(),
+    status: yup.string()
+      .oneOf(Object.values(Status))
+      .notRequired(),
+    date: yup.date().notRequired(),
+    expiryDate: yup.date().notRequired(),
+    comment: yup.string().min(1).notRequired(),
+  });
+
+  await requestSchema.validate(req.body, { abortEarly: false });
+
+  const grade: number | undefined = req.body.grade;
+  const status: Status | undefined = req.body.status;
+  const date: Date | undefined = req.body.date;
+  const expiryDate: Date | undefined = req.body.expiryDate;
+  const comment: string | undefined = req.body.comment;
+
+  const gradeId: number =
+    (await idSchema.validate({ id: req.params.gradeId }, { abortEarly: false })).id;
+
+  const grader: JwtClaims = req.user as JwtClaims;
+
+  const [course]: [Course, AssessmentModel] =
+    await validateAssessmentModelPath(
+      req.params.courseId, req.params.assessmentModelId
+    );
+
+  await isTeacherInChargeOrAdmin(grader, course.id, HttpCode.Forbidden);
+
+  const gradeData: AttainmentGrade = await findAttainmentGradeById(gradeId, HttpCode.NotFound);
+
+  await gradeData.set({
+    grade: grade ?? gradeData.grade,
+    status: status ?? gradeData.status,
+    date: date ?? gradeData.date,
+    expiryDate: expiryDate ?? gradeData.expiryDate,
+    comment: comment ?? gradeData.comment,
+    manual: true,
+    graderId: grader.id
+  }).save();
 
   res.status(HttpCode.Ok).json({
     data: {}
