@@ -20,8 +20,9 @@ export function controllerDispatcher(
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function errorHandler(err: unknown, req: Request, res: Response, next: NextFunction): void {
+export function errorHandler(
+  err: unknown, _req: Request, res: Response, _next: NextFunction
+): void {
 
   if (err instanceof ApiError) {
     logger.error(`${err.name}: ${err.statusCode} - ${err.errors}`);
