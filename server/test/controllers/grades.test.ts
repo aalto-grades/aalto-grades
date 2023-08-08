@@ -439,7 +439,7 @@ describe(
       checkErrorRes(
         [
           'no grades found, make sure grades have been' +
-        ' imported/calculated before requesting course results'
+          ' uploaded/calculated before requesting course results'
         ],
         HttpCode.NotFound);
     });
@@ -498,6 +498,14 @@ describe(
       }
     }
 
+    function checkStudentNumbers(
+      finalGrades: Array<FinalGrade>, studentNumbers: Array<string>
+    ): void {
+      expect(
+        finalGrades.map((finalGrade: FinalGrade) => finalGrade.studentNumber).sort()
+      ).toEqual(studentNumbers.sort());
+    }
+
     it(
       'should get final grades succesfully when course results are found (admin user)',
       async () => {
@@ -512,7 +520,8 @@ describe(
 
         checkSuccessRes(res);
         checkFinalGradesStructure(res.body.data);
-      });
+      }
+    );
 
     it(
       'should get final grades succesfully when course results are found (teacher in charge)',
@@ -527,27 +536,60 @@ describe(
 
         checkSuccessRes(res);
         checkFinalGradesStructure(res.body.data);
-      });
+      }
+    );
 
-    it('should show final grade as PENDING for students with no final grade calculated',
+    it(
+      'should get the appropriate number of grade options depending on how many grades exist',
       async () => {
         res = await request
-          .get('/v1/courses/9/assessment-models/41/grades')
+          .get('/v1/courses/2/assessment-models/50/grades')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
+        function checkGradesOfStudent(
+          studentNumber: string,
+          expectedGrades: Array<{
+            grade: number,
+            status: Status
+          }>
+        ): void {
+          console.log(JSON.stringify(res.body.data, undefined, 2));
+          const gradesOfStudent: FinalGrade | undefined = res.body.data.find(
+            (finalGrade: FinalGrade) => finalGrade.studentNumber === studentNumber
+          );
+          console.log(JSON.stringify(gradesOfStudent, undefined, 2));
+
+          expect(gradesOfStudent).toBeDefined();
+
+          for (const expectedGrade of expectedGrades) {
+            expect(
+              (gradesOfStudent as FinalGrade).grades.find((option: GradeOption) => {
+                return option.grade === expectedGrade.grade
+                  && option.status === expectedGrade.status;
+              })
+            ).toBeDefined();
+          }
+        }
+
         checkSuccessRes(res);
         checkFinalGradesStructure(res.body.data);
-        expect(res.body.data).toEqual([
-          { userId: 693, studentNumber: '869364', grade: 'PENDING', credits: 0 },
-          { userId: 738, studentNumber: '711199', grade: 'PENDING', credits: 0 },
-          { userId: 779, studentNumber: '872942', grade: 'PENDING', credits: 0 },
-          { userId: 416, studentNumber: '369743', grade: '5', credits: 5 },
-          { userId: 673, studentNumber: '795451', grade: '0', credits: 5 },
-          { userId: 636, studentNumber: '716176', grade: '3', credits: 5 }
+        checkStudentNumbers(res.body.data, ['352772', '476617', '344625']);
+        checkGradesOfStudent('352772', [
+          { grade: 0, status: Status.Fail },
+          { grade: 3, status: Status.Fail },
+          { grade: 5, status: Status.Pass }
         ]);
-      });
+        checkGradesOfStudent('476617', [
+          { grade: 1, status: Status.Fail },
+          { grade: 2, status: Status.Fail }
+        ]);
+        checkGradesOfStudent('344625', [
+          { grade: 4, status: Status.Pass },
+        ]);
+      }
+    );
 
     it('should filter returned grades based on student number if URL query included',
       async () => {
@@ -560,9 +602,7 @@ describe(
 
         checkSuccessRes(res);
         checkFinalGradesStructure(res.body.data);
-        expect(
-          res.body.data.map((finalGrade: FinalGrade) => finalGrade.studentNumber)
-        ).toEqual(['869364', '711199', '795451']);
+        checkStudentNumbers(res.body.data, ['869364', '711199', '795451'])
       });
 
     it('should filter returned grades based on instance ID if URL query included',
@@ -575,9 +615,9 @@ describe(
 
         checkSuccessRes(res);
         checkFinalGradesStructure(res.body.data);
-        expect(
-          res.body.data.map((finalGrade: FinalGrade) => finalGrade.studentNumber)
-        ).toEqual(['327976', '478988', '139131', '857119']);
+        checkStudentNumbers(res.body.data, [
+          '327976', '478988', '139131', '857119'
+        ]);
       });
 
     // TODO: Clarify whether this is supposed to be a union or intersection
@@ -593,9 +633,7 @@ describe(
 
         checkSuccessRes(res);
         checkFinalGradesStructure(res.body.data);
-        expect(
-          res.body.data.map((finalGrade: FinalGrade) => finalGrade.studentNumber)
-        ).toEqual(['327976', '139131']);
+        checkStudentNumbers(res.body.data, ['327976', '139131']);
       });
 
     it('should not filter returned grades if no filters included in URL query',
@@ -608,15 +646,14 @@ describe(
 
         checkSuccessRes(res);
         checkFinalGradesStructure(res.body.data);
-        expect(
-          res.body.data.map((finalGrade: FinalGrade) => finalGrade.studentNumber)
-        ).toEqual([
+        checkStudentNumbers(res.body.data, [
           '658593', '451288', '167155', '117486', '114732', '472886', '335462',
           '874623', '345752', '353418', '986957', '611238', '691296', '271778',
           '344644', '954954', '327976', '478988', '139131', '857119'
         ]);
       });
 
+    // TODO: Update
     it('should show previously PENDING final grades as graded after final grade calculated',
       async () => {
         await request
@@ -687,7 +724,7 @@ describe(
       checkErrorRes(
         [
           'no grades found, make sure grades have been' +
-          ' imported/calculated before requesting course results'
+          ' uploaded/calculated before requesting course results'
         ],
         HttpCode.NotFound);
     });

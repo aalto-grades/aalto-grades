@@ -122,7 +122,8 @@ async function getFinalGradesFor(
     attributes: ['id', 'studentNumber']
   };
 
-  // Conditionally add the where clause if student numbers included.
+  // Conditionally add a where clause if student numbers are included in the
+  // function call
   if (studentNumbers.length !== 0) {
     userQueryOptions.where = {
       studentNumber: {
@@ -158,7 +159,7 @@ async function getFinalGradesFor(
   if (finalGrades.length === 0 && !skipErrorOnEmpty) {
     throw new ApiError(
       'no grades found, make sure grades have been ' +
-      'imported/calculated before requesting course results',
+      'uploaded/calculated before requesting course results',
       HttpCode.NotFound
     );
   }
@@ -246,8 +247,6 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
     instanceId?: number
   } = await urlParams.validate(req.query, { abortEarly: false });
 
-  let studentNumbersFiltered: Array<string> | undefined = studentNumbers;
-
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
@@ -256,19 +255,17 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
   await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
   // Include students from a particular instance if an ID is provided.
-  if (instanceId) {
-    studentNumbersFiltered = await filterByInstanceAndStudentNumber(
-      instanceId, studentNumbersFiltered
-    );
-  }
+  let studentNumbersFiltered: Array<string> | undefined =
+    instanceId
+      ? await filterByInstanceAndStudentNumber(instanceId, studentNumbers)
+      : studentNumbers;
 
   if (studentNumbersFiltered)
     studentNumbersExist(studentNumbersFiltered);
 
   /**
    * TODO:
-   * - only one grade per user per instance is allowed,
-   *   what if grades are recalculated, should we keep track of old grades?
+   * - only one grade per user per instance is allowed
    */
 
   const finalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
@@ -362,86 +359,74 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
 
   await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
-  // Include students from particular instance if ID provided.
-  let studentNumbersFiltered: Array<string> | undefined = instanceId
-    ? await filterByInstanceAndStudentNumber(instanceId, studentNumbers)
-    : studentNumbers;
-
-  if (studentNumbersFiltered)
-    studentNumbersExist(studentNumbersFiltered);
-
-  // User raw query to enable distinct selection of students who have
-  // at least one grade (final or not) for particular assessment model.
-  const allStudentsFromAssessmentModel: Array<{ userId: number, studentNumber: string }> =
-  (await sequelize.query(
-    `SELECT DISTINCT "user".id AS id, student_number
-    FROM attainment_grade
-    INNER JOIN attainment ON attainment.id = attainment_grade.attainment_id
-    INNER JOIN "user" ON "user".id = attainment_grade.user_id
-    WHERE attainment.assessment_model_id = :assessmentModelId`,
-    {
-      replacements: { assessmentModelId: assessmentModel.id },
-      type: QueryTypes.SELECT
-    }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  )).map((value: any) => {
-    return {
-      userId: value.id,
-      studentNumber: value.student_number
-    };
-  });
-
-  if (studentNumbersFiltered && allStudentsFromAssessmentModel.length !== 0) {
-    studentNumbersFiltered = allStudentsFromAssessmentModel.filter(
-      (value: { userId: number, studentNumber: string }) =>
-        (studentNumbersFiltered as Array<string>).includes(value.studentNumber)
-    ).map((value: { userId: number, studentNumber: string }) => {
-      return value.studentNumber;
-    });
+  interface IdAndStudentNumber {
+    userId: number,
+    studentNumber: string
   }
 
-  const rawFinalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
-    assessmentModel.id,
-    studentNumbersFiltered ?? [],
-    allStudentsFromAssessmentModel.length !== 0
-  );
+  // Raw query to enable distinct selection of students who have at least one
+  // grade for any attainment in an assessment model.
+  let students: Array<IdAndStudentNumber> =
+    (await sequelize.query(
+      `SELECT DISTINCT "user".id AS id, student_number
+       FROM attainment_grade
+       INNER JOIN attainment ON attainment.id = attainment_grade.attainment_id
+       INNER JOIN "user" ON "user".id = attainment_grade.user_id
+       WHERE attainment.assessment_model_id = :assessmentModelId`,
+      {
+        replacements: { assessmentModelId: assessmentModel.id },
+        type: QueryTypes.SELECT
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    )).map((value: any) => {
+      return {
+        userId: value.id,
+        studentNumber: value.student_number
+      };
+    });
+
+  // Include students from a particular instance if an ID provided.
+  const filter: Array<string> | undefined =
+    instanceId
+      ? await filterByInstanceAndStudentNumber(instanceId, studentNumbers)
+      : studentNumbers;
+
+  if (filter) {
+    await studentNumbersExist(filter);
+
+    students = students.filter(
+      (student: IdAndStudentNumber) => {
+        return (filter as Array<string>).includes(student.studentNumber);
+      }
+    );
+  }
 
   const finalGrades: Array<FinalGrade> = [];
 
-  // Add students with no final grade marked as pending to the results.
-  if (allStudentsFromAssessmentModel.length !== 0) {
-    for (const grade of rawFinalGrades) {
-      const existingResult: FinalGrade | undefined = finalGrades.find(
-        (value: FinalGrade) => value.userId === grade.User.id
-      );
+  const rawFinalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
+    assessmentModel.id,
+    students.map((student: IdAndStudentNumber) => student.studentNumber),
+    students.length > 0
+  );
 
-      if (existingResult) {
-        existingResult.grades.push({
-          gradeId: grade.id,
-          graderId: grade.graderId,
-          grade: grade.grade,
-          status: grade.status as Status,
-          manual: grade.manual,
-          date: grade.date
+  for (const student of students) {
+    finalGrades.push({
+      userId: student.userId,
+      studentNumber: student.studentNumber,
+      credits: course.maxCredits,
+      grades: rawFinalGrades
+        .filter((grade: FinalGradeRaw) => grade.User.id === student.userId)
+        .map((grade: FinalGradeRaw) => {
+          return {
+            gradeId: grade.id,
+            graderId: grade.graderId,
+            grade: grade.grade,
+            status: grade.status as Status,
+            manual: grade.manual,
+            date: grade.date
+          }
         })
-      } else {
-        finalGrades.push({
-          userId: grade.User.id,
-          studentNumber: grade.User.studentNumber,
-          credits: grade.Attainment.AssessmentModel.Course.maxCredits,
-          grades: [
-            {
-              gradeId: grade.id,
-              graderId: grade.graderId,
-              grade: grade.grade,
-              status: grade.status as Status,
-              manual: grade.manual,
-              date: grade.date
-            }
-          ]
-        });
-      }
-    }
+    });
   }
 
   res.status(HttpCode.Ok).json({
