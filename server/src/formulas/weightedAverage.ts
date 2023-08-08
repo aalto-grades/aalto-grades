@@ -127,5 +127,5 @@ registerFormula(
         }).noUnknown().strict()
       ])
     ).required()
-  }).noUnknown().strict(),
+  }).noUnknown().strict()
 );
