@@ -1154,7 +1154,7 @@ export async function editUserGrade(req: Request, res: Response): Promise<void> 
     grade: yup.number().min(0).notRequired(),
     status: yup.string()
       .oneOf(Object.values(Status))
-      .required(),
+      .notRequired(),
     date: yup.date().notRequired(),
     expiryDate: yup.date().notRequired(),
     comment: yup.string().min(1).notRequired(),
