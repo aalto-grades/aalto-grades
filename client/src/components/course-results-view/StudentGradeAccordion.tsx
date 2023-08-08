@@ -83,9 +83,17 @@ export default function StudentGradeAccordion(props: {
               selected={(selected === props.attainmentGrade.attainmentId)}
             >
               <GradeText
-                name={props.attainmentGrade.name as string}
-                grade={props.attainmentGrade.grade}
-                status={props.attainmentGrade.status}
+                name={props.attainmentGrade.attainmentName as string}
+                grade={
+                  props.attainmentGrade.grades.length > 0
+                    ? props.attainmentGrade.grades[0].grade
+                    : 0
+                }
+                status={
+                  props.attainmentGrade.grades.length > 0
+                    ? props.attainmentGrade.grades[0].status
+                    : Status.Pending
+                }
               />
             </AccordionSummary>
             {
@@ -119,9 +127,17 @@ export default function StudentGradeAccordion(props: {
               fontSize: '0.6rem', display: 'block', margin: '0px 0px 0px 2px'
             }} />
             <GradeText
-              name={props.attainmentGrade.name as string}
-              grade={props.attainmentGrade.grade}
-              status={props.attainmentGrade.status}
+              name={props.attainmentGrade.attainmentName as string}
+              grade={
+                props.attainmentGrade.grades.length > 0
+                  ? props.attainmentGrade.grades[0].grade
+                  : 0
+              }
+              status={
+                props.attainmentGrade.grades.length > 0
+                  ? props.attainmentGrade.grades[0].status
+                  : Status.Pending
+              }
             />
           </Box>
         )

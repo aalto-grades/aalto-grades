@@ -8,23 +8,28 @@ export enum Status {
   Pending = 'PENDING'
 }
 
-export interface AttainmentGradeData {
-  userId?: number,
+export interface GradeOption {
   gradeId?: number,
-  attainmentId: number,
   graderId?: number,
   grade: number,
   status: Status,
   manual: boolean,
-  name?: string,
   date?: Date,
-  expiryDate?: Date,
+  expiryDate?: Date
+}
+
+export interface AttainmentGradeData {
+  userId?: number,
+  attainmentId: number,
+  attainmentName?: string,
+  grades: Array<GradeOption>,
   subAttainments?: Array<AttainmentGradeData>
 }
 
+// TODO: Replace with a better name
 export interface FinalGrade {
   userId: number,
   studentNumber: string,
-  grade: string,
-  credits: number
+  credits: number,
+  grades: Array<GradeOption>
 }

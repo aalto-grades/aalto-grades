@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AttainmentGradeData, FinalGrade, Formula, HttpCode, Status
+  AttainmentGradeData, FinalGrade, Formula, GradeOption, HttpCode, Status
 } from 'aalto-grades-common/types';
 import { parse, Parser } from 'csv-parse';
 import { stringify } from 'csv-stringify';
@@ -21,7 +21,8 @@ import User from '../database/models/user';
 
 import { getFormulaImplementation } from '../formulas';
 import {
-  ApiError, CalculationResult, FormulaNode, JwtClaims, StudentGrades, idSchema
+  ApiError, AttainmentGradeModelData, CalculationResult, FormulaNode,
+  JwtClaims, StudentGrades, idSchema
 } from '../types';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import { findAttainmentGradeById } from './utils/attainment';
@@ -122,7 +123,8 @@ async function getFinalGradesFor(
     attributes: ['id', 'studentNumber']
   };
 
-  // Conditionally add the where clause if student numbers included.
+  // Conditionally add a where clause if student numbers are included in the
+  // function call
   if (studentNumbers.length !== 0) {
     userQueryOptions.where = {
       studentNumber: {
@@ -131,8 +133,7 @@ async function getFinalGradesFor(
     };
   }
 
-  let finalGrades: Array<FinalGradeRaw> = await AttainmentGrade.findAll({
-    attributes: ['grade'],
+  const finalGrades: Array<FinalGradeRaw> = await AttainmentGrade.findAll({
     include: [
       {
         model: Attainment,
@@ -159,16 +160,10 @@ async function getFinalGradesFor(
   if (finalGrades.length === 0 && !skipErrorOnEmpty) {
     throw new ApiError(
       'no grades found, make sure grades have been ' +
-      'imported/calculated before requesting course results',
+      'uploaded/calculated before requesting course results',
       HttpCode.NotFound
     );
   }
-
-  // Filter duplicates.
-  finalGrades = finalGrades.filter(
-    (obj: FinalGradeRaw, index: number) =>
-      finalGrades.findIndex((item: FinalGradeRaw) => item.User.id === obj.User.id) === index
-  );
 
   return finalGrades;
 }
@@ -196,7 +191,7 @@ async function filterByInstanceAndStudentNumber(
 
   if (studentsFromInstance) {
     const studentNumbersFromInstance: Array<string> =
-        studentsFromInstance.Users.map((user: User) => user.studentNumber);
+      studentsFromInstance.Users.map((user: User) => user.studentNumber);
 
     if (studentNumbersFiltered) {
       // Intersection of both student numbers from query params and on the course instance.
@@ -253,8 +248,6 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
     instanceId?: number
   } = await urlParams.validate(req.query, { abortEarly: false });
 
-  let studentNumbersFiltered: Array<string> | undefined = studentNumbers;
-
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
@@ -263,35 +256,45 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
   await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
   // Include students from a particular instance if an ID is provided.
-  if (instanceId) {
-    studentNumbersFiltered = await filterByInstanceAndStudentNumber(
-      instanceId, studentNumbersFiltered
-    );
-  }
+  const studentNumbersFiltered: Array<string> | undefined =
+    instanceId
+      ? await filterByInstanceAndStudentNumber(instanceId, studentNumbers)
+      : studentNumbers;
 
   if (studentNumbersFiltered)
     studentNumbersExist(studentNumbersFiltered);
 
   /**
    * TODO:
-   * - only one grade per user per instance is allowed,
-   *   what if grades are recalculated, should we keep track of old grades?
+   * - only one grade per user per instance is allowed
    */
 
   const finalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
     assessmentModel.id, studentNumbersFiltered ?? []
   );
 
-  const courseResults: Array<{
+  interface SisuCsvFormat {
     studentNumber: string,
     grade: string,
     credits: number,
     assessmentDate: string,
     completionLanguage: string,
     comment: string
-  }> = finalGrades.map(
-    (finalGrade: FinalGradeRaw) => {
-      return {
+  }
+
+  const courseResults: Array<SisuCsvFormat> = [];
+
+  for (const finalGrade of finalGrades) {
+    const existingResult: SisuCsvFormat | undefined = courseResults.find(
+      (value: SisuCsvFormat) => value.studentNumber === finalGrade.User.studentNumber
+    );
+
+    if (existingResult) {
+      if (finalGrade.grade > Number(existingResult.grade)) {
+        existingResult.grade = String(finalGrade.grade);
+      }
+    } else {
+      courseResults.push({
         studentNumber: finalGrade.User.studentNumber,
         grade: String(finalGrade.grade),
         credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits,
@@ -302,9 +305,9 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
         completionLanguage: completionLanguage ?? 'en',
         // Comment column is required, but can be empty.
         comment: ''
-      };
+      });
     }
-  );
+  }
 
   stringify(
     courseResults,
@@ -350,8 +353,6 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
     instanceId?: number
   } = await urlParams.validate(req.query, { abortEarly: false });
 
-  let studentNumbersFiltered: Array<string> | undefined = studentNumbers;
-
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
@@ -359,93 +360,154 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
 
   await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
-  // Include students from particular instance (belonging to the assessment model) if ID provided.
-  if (instanceId) {
-    studentNumbersFiltered = await filterByInstanceAndStudentNumber(
-      instanceId, studentNumbersFiltered
+  interface IdAndStudentNumber {
+    userId: number,
+    studentNumber: string
+  }
+
+  // Raw query to enable distinct selection of students who have at least one
+  // grade for any attainment in an assessment model.
+  let students: Array<IdAndStudentNumber> =
+    (await sequelize.query(
+      `SELECT DISTINCT "user".id AS id, student_number
+       FROM attainment_grade
+       INNER JOIN attainment ON attainment.id = attainment_grade.attainment_id
+       INNER JOIN "user" ON "user".id = attainment_grade.user_id
+       WHERE attainment.assessment_model_id = :assessmentModelId`,
+      {
+        replacements: { assessmentModelId: assessmentModel.id },
+        type: QueryTypes.SELECT
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    )).map((value: any) => {
+      return {
+        userId: value.id,
+        studentNumber: value.student_number
+      };
+    });
+
+  // Include students from a particular instance if an ID provided.
+  const filter: Array<string> | undefined =
+    instanceId
+      ? await filterByInstanceAndStudentNumber(instanceId, studentNumbers)
+      : studentNumbers;
+
+  if (filter) {
+    await studentNumbersExist(filter);
+
+    students = students.filter(
+      (student: IdAndStudentNumber) => {
+        return (filter as Array<string>).includes(student.studentNumber);
+      }
     );
   }
 
-  if (studentNumbersFiltered)
-    studentNumbersExist(studentNumbersFiltered);
+  const finalGrades: Array<FinalGrade> = [];
 
-  let finalGrades: Array<FinalGrade> = [];
-
-  // User raw query to enable distinct selection of students who have
-  // at least one grade (final or not) for particular assessment model.
-  const allStudentsFromAssessmentModel: Array<{ userId: number, studentNumber: string }> =
-  (await sequelize.query(
-    `SELECT DISTINCT "user".id AS id, student_number
-    FROM attainment_grade
-    INNER JOIN attainment ON attainment.id = attainment_grade.attainment_id
-    INNER JOIN "user" ON "user".id = attainment_grade.user_id
-    WHERE attainment.assessment_model_id = :assessmentModelId`,
-    {
-      replacements: { assessmentModelId: assessmentModel.id },
-      type: QueryTypes.SELECT
-    }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  )).map((value: any) => {
-    return {
-      userId: value.id,
-      studentNumber: value.student_number
-    };
-  });
-
-  if (studentNumbersFiltered && allStudentsFromAssessmentModel.length !== 0) {
-    studentNumbersFiltered = allStudentsFromAssessmentModel.filter(
-      (value: { userId: number, studentNumber: string }) =>
-        (studentNumbersFiltered as Array<string>).includes(value.studentNumber)
-    ).map((value: { userId: number, studentNumber: string }) => {
-      return value.studentNumber;
-    });
-  }
-
-  const studentsWithFinalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
-    assessmentModel.id, studentNumbersFiltered ?? [], allStudentsFromAssessmentModel.length !== 0
+  const rawFinalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
+    assessmentModel.id,
+    students.map((student: IdAndStudentNumber) => student.studentNumber),
+    students.length > 0
   );
 
-  // Add students with no final grade marked as pending to the results.
-  if (allStudentsFromAssessmentModel.length !== 0) {
-
-    const studentNumbersWithFinalGrades: Array<string> =
-      studentsWithFinalGrades.map((value: FinalGradeRaw) => value.User.studentNumber);
-
-    const studentNumbersNoGrade: Array<{ userId: number, studentNumber: string }> =
-      allStudentsFromAssessmentModel
-        .filter((value: { userId: number, studentNumber: string }) => {
-          return !studentNumbersWithFinalGrades.includes(value.studentNumber);
-        });
-
-    studentNumbersNoGrade.forEach((value: { userId: number, studentNumber: string }) => {
-      finalGrades.push({
-        userId: value.userId,
-        studentNumber: value.studentNumber,
-        grade: Status.Pending,
-        credits: 0
-      });
+  for (const student of students) {
+    finalGrades.push({
+      userId: student.userId,
+      studentNumber: student.studentNumber,
+      credits: course.maxCredits,
+      grades: rawFinalGrades
+        .filter((grade: FinalGradeRaw) => grade.User.id === student.userId)
+        .map((grade: FinalGradeRaw) => {
+          return {
+            gradeId: grade.id,
+            graderId: grade.graderId,
+            grade: grade.grade,
+            status: grade.status as Status,
+            manual: grade.manual,
+            date: grade.date
+          };
+        })
     });
-  }
-
-  studentsWithFinalGrades.map(
-    (finalGrade: FinalGradeRaw) => {
-      finalGrades.push({
-        userId: finalGrade.User.id,
-        studentNumber: finalGrade.User.studentNumber,
-        grade: String(finalGrade.grade),
-        credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits
-      });
-    }
-  );
-
-  if (studentNumbersFiltered) {
-    finalGrades = finalGrades.filter(
-      (value: FinalGrade) => (studentNumbersFiltered as Array<string>).includes(value.studentNumber)
-    );
   }
 
   res.status(HttpCode.Ok).json({
     data: finalGrades
+  });
+}
+
+export async function getGradeTreeOfUser(req: Request, res: Response): Promise<void> {
+
+  const userId: number =
+    (await idSchema.validate({ id: req.params.userId }, { abortEarly: false })).id;
+
+  const [course, assessmentModel]: [Course, AssessmentModel] =
+    await validateAssessmentModelPath(
+      req.params.courseId, req.params.assessmentModelId
+    );
+
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
+  await findUserById(userId, HttpCode.NotFound);
+
+  interface AttainmentWithUserGrade extends Attainment {
+    AttainmentGrades: Array<AttainmentGrade>
+  }
+
+  const userGrades: Array<AttainmentWithUserGrade> = await Attainment.findAll({
+    where: {
+      assessmentModelId: assessmentModel.id
+    },
+    include: [{
+      model: AttainmentGrade,
+      required: false,
+      where: {
+        userId
+      }
+    }]
+  }) as Array<AttainmentWithUserGrade>;
+
+  function generateAttainmentTreeWithUserGrades(id?: number): AttainmentGradeData {
+
+    const root: AttainmentWithUserGrade | undefined = userGrades.find(
+      (attainment: AttainmentWithUserGrade) => {
+        return id ? (attainment.id === id) : (!attainment.parentId);
+      }
+    );
+
+    if (!root) {
+      throw new ApiError(
+        `failed to find attainment with id ${id} in grade tree generation`,
+        HttpCode.InternalServerError
+      );
+    }
+
+    const children: Array<AttainmentWithUserGrade> = userGrades.filter(
+      (attainment: AttainmentWithUserGrade) => attainment.parentId === root.id
+    );
+
+    return {
+      attainmentId: root.id,
+      attainmentName: root.name,
+      grades: root.AttainmentGrades.map(
+        (option: AttainmentGrade): GradeOption => {
+          return {
+            gradeId: option.id,
+            graderId: option.graderId,
+            grade: option.grade,
+            status: option.status as Status,
+            manual: option.manual,
+            date: option.date,
+            expiryDate: option.expiryDate
+          };
+        }
+      ),
+      subAttainments: children.map((attainment: AttainmentWithUserGrade) => {
+        return generateAttainmentTreeWithUserGrades(attainment.id);
+      })
+    };
+  }
+
+  res.status(HttpCode.Ok).json({
+    data: generateAttainmentTreeWithUserGrades()
   });
 }
 
@@ -559,7 +621,6 @@ export function parseGradesFromCsv(
   let currentColumn: number = 2;
 
   for (const row of studentGradingData) {
-    // TODO: validate with regex that valid student number?
     const studentNumber: string = row[0];
     const gradingData: Array<string> = row.slice(1);
 
@@ -576,11 +637,13 @@ export function parseGradesFromCsv(
           ` expected number, received "${gradingData[i]}"`
         );
       } else {
-        const grade: AttainmentGradeData = {
+        const grade: AttainmentGradeModelData = {
           attainmentId: attainmentIds[i],
           grade: parseInt(gradingData[i], 10),
           manual: true,
-          status: Status.Pass // TODO: Allow specification?
+          // TODO: Determine status based on whether the uploaded grade is
+          // larger than min required
+          status: Status.Pass
         };
         student.grades.push(grade);
       }
@@ -714,10 +777,10 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
         // Use studentsWithId to update attainments by flatmapping each
         // students grades into a one array of all the grades.
-        const preparedBulkCreate: Array<AttainmentGradeData> = parsedStudentData.flatMap(
-          (student: StudentGrades): Array<AttainmentGradeData> => {
-            const studentGradingData: Array<AttainmentGradeData> = student.grades.map(
-              (grade: AttainmentGradeData): AttainmentGradeData => {
+        const preparedBulkCreate: Array<AttainmentGradeModelData> = parsedStudentData.flatMap(
+          (student: StudentGrades): Array<AttainmentGradeModelData> => {
+            const studentGradingData: Array<AttainmentGradeModelData> = student.grades.map(
+              (grade: AttainmentGradeModelData): AttainmentGradeModelData => {
                 return {
                   userId: student.id as number,
                   graderId: grader.id,
@@ -937,7 +1000,10 @@ export async function calculateGrades(
    * Stores the grades of each student for each attainment which were manually
    * specified by a teacher.
    */
-  const unorganizedPresetGrades: Array<AttainmentGrade> = await AttainmentGrade.findAll({
+  const unorganizedManualGrades: Array<AttainmentGrade> = await AttainmentGrade.findAll({
+    where: {
+      manual: true
+    },
     include: [
       {
         model: Attainment,
@@ -962,29 +1028,37 @@ export async function calculateGrades(
   });
 
   /*
-   * Next we'll organize the preset grades by user ID.
+   * Next we'll organize the manual grades by user ID.
    */
 
   /*
-   * Store the preset grades of all attainments per student. Stores all the
-   * same information as unorganizedPresetGrades.
-   * User ID -> Formula node -> Preset grade.
+   * Store the manul grades of all attainments per student. Stores all the
+   * same information as unorganizedManualGrades.
+   * User ID -> Formula node -> Manual grade.
    */
-  const organizedPresetGrades: Map<number, Map<FormulaNode, number>> = new Map();
+  const organizedManualGrades: Map<number, Map<FormulaNode, number>> = new Map();
 
-  for (const presetGrade of unorganizedPresetGrades) {
-    let userPresetGrades: Map<FormulaNode, number> | undefined =
-      organizedPresetGrades.get(presetGrade.userId);
+  for (const manualGrade of unorganizedManualGrades) {
+    let userManualGrades: Map<FormulaNode, number> | undefined =
+      organizedManualGrades.get(manualGrade.userId);
 
-    if (!userPresetGrades) {
-      userPresetGrades = new Map();
-      organizedPresetGrades.set(presetGrade.userId, userPresetGrades);
+    if (!userManualGrades) {
+      userManualGrades = new Map();
+      organizedManualGrades.set(manualGrade.userId, userManualGrades);
     }
 
-    userPresetGrades.set(
-      getFormulaNode(presetGrade.attainmentId),
-      presetGrade.grade
-    );
+    /*
+     * If a student has multiple manual grades for the same attainment, consider
+     * the best one.
+     * TODO: Should there be an option not to consider the best grade?
+     */
+    const key: FormulaNode = getFormulaNode(manualGrade.attainmentId);
+    const existingGrade: number | undefined = userManualGrades.get(key);
+
+    if (!existingGrade || manualGrade.grade > existingGrade) {
+      // No existing grade or the new grade is better.
+      userManualGrades.set(key, manualGrade.grade);
+    }
   }
 
   /*
@@ -992,7 +1066,7 @@ export async function calculateGrades(
    * the root attainment.
    */
 
-  const calculatedGrades: Array<AttainmentGradeData> = [];
+  const calculatedGrades: Array<AttainmentGradeModelData> = [];
 
   /*
    * Recursively calculates the grade for a particular attainment by its formula
@@ -1001,7 +1075,7 @@ export async function calculateGrades(
   function calculateFormulaNode(
     userId: number,
     formulaNode: FormulaNode,
-    presetGrades: Map<FormulaNode, number>
+    manualGrades: Map<FormulaNode, number>
   ): CalculationResult {
     /*
      * If a teacher has manually specified a grade for this attainment,
@@ -1011,12 +1085,12 @@ export async function calculateGrades(
      * and a grade may be manually specified for overriding grade calculation
      * functions in special cases.
      */
-    const presetGrade: number | undefined = presetGrades.get(formulaNode);
-    if (presetGrade) {
+    const manualGrade: number | undefined = manualGrades.get(formulaNode);
+    if (manualGrade) {
       return {
         attainmentName: formulaNode.attainmentName,
         status: Status.Pass,
-        grade: presetGrade
+        grade: manualGrade
       };
     }
 
@@ -1031,7 +1105,7 @@ export async function calculateGrades(
 
     // First, recursively calculate the grades the subattainments.
     for (const subFormulaNode of formulaNode.subFormulaNodes) {
-      subGrades.push(calculateFormulaNode(userId, subFormulaNode, presetGrades));
+      subGrades.push(calculateFormulaNode(userId, subFormulaNode, manualGrades));
     }
 
     // Then, calculate the grade of this attainment using the formula specified
@@ -1055,97 +1129,18 @@ export async function calculateGrades(
     return calculated;
   }
 
-  for (const [userId, presetGrades] of organizedPresetGrades) {
-    calculateFormulaNode(userId, rootFormulaNode, presetGrades);
+  for (const [userId, manualGrades] of organizedManualGrades) {
+    calculateFormulaNode(userId, rootFormulaNode, manualGrades);
   }
 
   await sequelize.transaction(async (transaction: Transaction) => {
     await AttainmentGrade.bulkCreate(calculatedGrades,
-      {
-        updateOnDuplicate: ['grade', 'graderId', 'status'],
-        transaction
-      }
+      { transaction }
     );
   });
 
   res.status(HttpCode.Ok).json({
     data: {}
-  });
-}
-
-interface AttainmentWithUserGrade extends Attainment {
-  AttainmentGrades: Array<AttainmentGrade>
-}
-
-function generateAttainmentTreeWithUserGrades(
-  root: AttainmentGradeData,
-  allAttainments: Array<AttainmentWithUserGrade>
-): void {
-  const children: Array<AttainmentWithUserGrade> = allAttainments.filter(
-    (el: AttainmentWithUserGrade) => el.parentId === root.attainmentId
-  );
-
-  if (children.length > 0) {
-    root.subAttainments = children.map((el: AttainmentWithUserGrade) => {
-      return {
-        attainmentId: el.id,
-        gradeId: el.AttainmentGrades[0]?.id,
-        name: el.name,
-        grade: el.AttainmentGrades[0]?.grade,
-        manual: el.AttainmentGrades[0]?.manual,
-        status: el.AttainmentGrades[0]?.status as Status,
-        subAttainments: []
-      };
-    });
-
-    root.subAttainments.forEach((el: AttainmentGradeData) => {
-      generateAttainmentTreeWithUserGrades(el, allAttainments);
-    });
-  }
-}
-
-export async function getGradeTreeOfUser(req: Request, res: Response): Promise<void> {
-  const userId: number =
-  (await idSchema.validate({ id: req.params.userId }, { abortEarly: false })).id;
-
-  const [course, assessmentModel]: [Course, AssessmentModel] =
-    await validateAssessmentModelPath(
-      req.params.courseId, req.params.assessmentModelId
-    );
-
-  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
-  await findUserById(userId, HttpCode.NotFound);
-
-  const userGrades: Array<AttainmentWithUserGrade> = await Attainment.findAll({
-    where: {
-      assessmentModelId: assessmentModel.id
-    },
-    include: [{
-      model: AttainmentGrade,
-      required: false,
-      where: {
-        userId
-      }
-    }]
-  }) as Array<AttainmentWithUserGrade>;
-
-  const parent: Array<AttainmentWithUserGrade> =
-    userGrades.filter((attainment: AttainmentWithUserGrade) => !attainment.parentId);
-
-  const root: AttainmentGradeData = {
-    attainmentId: parent[0].id,
-    gradeId: parent[0].AttainmentGrades[0]?.id ?? null,
-    name: parent[0].name,
-    grade: parent[0].AttainmentGrades[0]?.grade ?? null,
-    manual: parent[0].AttainmentGrades[0]?.manual ?? null,
-    status: parent[0].AttainmentGrades[0]?.status as Status ?? null,
-    subAttainments: []
-  };
-
-  generateAttainmentTreeWithUserGrades(root, userGrades);
-
-  res.status(HttpCode.Ok).json({
-    data: root
   });
 }
 

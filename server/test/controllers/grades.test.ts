@@ -2,7 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, HttpCode } from 'aalto-grades-common/types';
+import {
+  AttainmentGradeData, FinalGrade, GradeOption, HttpCode, Status
+} from 'aalto-grades-common/types';
 import * as fs from 'fs';
 import path from 'path';
 import { Op } from 'sequelize';
@@ -46,18 +48,30 @@ function checkSuccessRes(res: supertest.Response): void {
   expect(res.statusCode).toBe(HttpCode.Ok);
 }
 
-function checkBodyStructure(data: AttainmentData): void {
-  expect(res.body.data.attainmentId).toBeDefined();
-  expect(res.body.data.gradeId).toBeDefined();
-  expect(res.body.data.name).toBeDefined();
-  expect(res.body.data.grade).toBeDefined();
-  expect(res.body.data.manual).toBeDefined();
-  expect(res.body.data.status).toBeDefined();
-
-  if (data.subAttainments && data.subAttainments?.length > 0) {
-    data.subAttainments?.forEach((sub: AttainmentData) => {
-      checkBodyStructure(sub);
+// Function to check that the expected number of grades exist for a user for
+// a specific attainment, including checking the numeric values of those grades.
+async function checkGradeAmount(
+  userId: number,
+  attainmentId: number,
+  expectedAmount: number,
+  expectedGrades: Array<number>
+): Promise<void> {
+  const attainmentGrades: Array<AttainmentGrade> =
+    await AttainmentGrade.findAll({
+      where: {
+        userId: userId,
+        attainmentId: attainmentId
+      }
     });
+
+  expect(attainmentGrades.length).toEqual(expectedAmount);
+
+  const grades: Array<number> = attainmentGrades.map(
+    (attainmentGrade: AttainmentGrade) => attainmentGrade.grade
+  );
+
+  for (const expectedGrade of expectedGrades) {
+    expect(grades).toContain(expectedGrade);
   }
 }
 
@@ -210,6 +224,32 @@ describe(
         `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
         );
       });
+
+    it('should export the best grade if multiple ones exist', async () => {
+      // Check that multiple grades exist as expected
+      await checkGradeAmount(1, 283, 3, [0, 3, 5]);
+      await checkGradeAmount(2, 283, 2, [1, 2]);
+      await checkGradeAmount(3, 283, 1, [4]);
+
+      res = await request
+        .get(
+          '/v1/courses/2/assessment-models/50/grades/csv/sisu'
+          + `?studentNumbers=${JSON.stringify(['352772', '476617', '344625'])}`
+        )
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+
+      expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+352772,5,5,21.6.2023,en,
+476617,2,5,21.6.2023,en,
+344625,4,5,21.6.2023,en,
+`);
+      expect(res.headers['content-disposition']).toBe(
+        'attachment; filename="final_grades_course_CS-A1120_' +
+        `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
+      );
+    });
 
     it('should export CSV succesfully with custom assessmentDate and completionLanguage',
       async () => {
@@ -399,7 +439,7 @@ describe(
       checkErrorRes(
         [
           'no grades found, make sure grades have been' +
-        ' imported/calculated before requesting course results'
+          ' uploaded/calculated before requesting course results'
         ],
         HttpCode.NotFound);
     });
@@ -439,6 +479,34 @@ describe(
   'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades'
   + ' - get final grades in JSON', () => {
 
+    function checkFinalGradesStructure(finalGrades: Array<FinalGrade>): void {
+      for (const finalGrade of finalGrades) {
+        expect(finalGrade.userId).toBeDefined();
+        expect(finalGrade.studentNumber).toBeDefined();
+        expect(finalGrade.credits).toBeDefined();
+        expect(finalGrade.grades).toBeDefined();
+
+        for (const option of finalGrade.grades) {
+          expect(option.gradeId).toBeDefined();
+          expect(option.graderId).toBeDefined();
+          expect(option.grade).toBeDefined();
+          expect(option.status).toBeDefined();
+          expect(option.manual).toBeDefined();
+          expect(option.date).toBeDefined();
+          expect(option.expiryDate).not.toBeDefined();
+        }
+      }
+    }
+
+    function checkStudentNumbers(
+      finalGrades: Array<FinalGrade>, studentNumbers: Array<string>
+    ): void {
+      expect(
+        finalGrades.map((finalGrade: FinalGrade) => finalGrade.studentNumber).sort()
+      ).toEqual(studentNumbers.sort());
+    }
+
+
     it(
       'should get final grades succesfully when course results are found (admin user)',
       async () => {
@@ -452,22 +520,9 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        expect(res.body.data).toEqual([
-          { userId: 519, studentNumber: '117486', grade: '1', credits: 5 },
-          { userId: 521, studentNumber: '114732', grade: '5', credits: 5 },
-          { userId: 574, studentNumber: '472886', grade: '3', credits: 5 },
-          { userId: 581, studentNumber: '335462', grade: '1', credits: 5 },
-          { userId: 590, studentNumber: '874623', grade: '2', credits: 5 },
-          { userId: 601, studentNumber: '345752', grade: '1', credits: 5 },
-          { userId: 604, studentNumber: '353418', grade: '4', credits: 5 },
-          { userId: 609, studentNumber: '986957', grade: '0', credits: 5 },
-          { userId: 633, studentNumber: '611238', grade: '4', credits: 5 },
-          { userId: 651, studentNumber: '691296', grade: '1', credits: 5 },
-          { userId: 670, studentNumber: '271778', grade: '0', credits: 5 },
-          { userId: 739, studentNumber: '344644', grade: '1', credits: 5 },
-          { userId: 948, studentNumber: '954954', grade: '5', credits: 5 }
-        ]);
-      });
+        checkFinalGradesStructure(res.body.data);
+      }
+    );
 
     it(
       'should get final grades succesfully when course results are found (teacher in charge)',
@@ -481,41 +536,60 @@ describe(
           .set('Accept', 'application/json');
 
         checkSuccessRes(res);
-        expect(res.body.data).toEqual([
-          { userId: 519, studentNumber: '117486', grade: '1', credits: 5 },
-          { userId: 521, studentNumber: '114732', grade: '5', credits: 5 },
-          { userId: 574, studentNumber: '472886', grade: '3', credits: 5 },
-          { userId: 581, studentNumber: '335462', grade: '1', credits: 5 },
-          { userId: 590, studentNumber: '874623', grade: '2', credits: 5 },
-          { userId: 601, studentNumber: '345752', grade: '1', credits: 5 },
-          { userId: 604, studentNumber: '353418', grade: '4', credits: 5 },
-          { userId: 609, studentNumber: '986957', grade: '0', credits: 5 },
-          { userId: 633, studentNumber: '611238', grade: '4', credits: 5 },
-          { userId: 651, studentNumber: '691296', grade: '1', credits: 5 },
-          { userId: 670, studentNumber: '271778', grade: '0', credits: 5 },
-          { userId: 739, studentNumber: '344644', grade: '1', credits: 5 },
-          { userId: 948, studentNumber: '954954', grade: '5', credits: 5 }
-        ]);
-      });
+        checkFinalGradesStructure(res.body.data);
+      }
+    );
 
-    it('should show final grade as PENDING for students with no final grade calculated',
+    it(
+      'should get the appropriate number of grade options depending on how many grades exist',
       async () => {
         res = await request
-          .get('/v1/courses/9/assessment-models/41/grades')
+          .get('/v1/courses/2/assessment-models/50/grades')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
+        function checkGradesOfStudent(
+          studentNumber: string,
+          expectedGrades: Array<{
+            grade: number,
+            status: Status
+          }>
+        ): void {
+
+          const gradesOfStudent: Array<{ grade: number, status: Status }> | undefined =
+            res.body.data.find((finalGrade: FinalGrade) => {
+              return finalGrade.studentNumber === studentNumber;
+            })?.grades.map((option: GradeOption) => {
+              return {
+                grade: option.grade,
+                status: option.status
+              };
+            });
+
+          expect(gradesOfStudent).toBeDefined();
+          for (const expectedGrade of expectedGrades) {
+            expect(gradesOfStudent).toContainEqual(expectedGrade);
+          }
+        }
+
         checkSuccessRes(res);
-        expect(res.body.data).toEqual([
-          { userId: 693, studentNumber: '869364', grade: 'PENDING', credits: 0 },
-          { userId: 738, studentNumber: '711199', grade: 'PENDING', credits: 0 },
-          { userId: 779, studentNumber: '872942', grade: 'PENDING', credits: 0 },
-          { userId: 416, studentNumber: '369743', grade: '5', credits: 5 },
-          { userId: 673, studentNumber: '795451', grade: '0', credits: 5 },
-          { userId: 636, studentNumber: '716176', grade: '3', credits: 5 }
+        checkFinalGradesStructure(res.body.data);
+        checkStudentNumbers(res.body.data, ['352772', '476617', '344625']);
+        checkGradesOfStudent('352772', [
+          { grade: 0, status: Status.Fail },
+          { grade: 3, status: Status.Fail },
+          { grade: 5, status: Status.Pass }
         ]);
-      });
+        checkGradesOfStudent('476617', [
+          { grade: 1, status: Status.Fail },
+          { grade: 2, status: Status.Fail }
+        ]);
+        checkGradesOfStudent('344625', [
+          { grade: 4, status: Status.Pass },
+        ]);
+      }
+    );
 
     it('should filter returned grades based on student number if URL query included',
       async () => {
@@ -527,11 +601,8 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        expect(res.body.data).toEqual([
-          { userId: 693, studentNumber: '869364', grade: 'PENDING', credits: 0 },
-          { userId: 738, studentNumber: '711199', grade: 'PENDING', credits: 0 },
-          { userId: 673, studentNumber: '795451', grade: '0', credits: 5 }
-        ]);
+        checkFinalGradesStructure(res.body.data);
+        checkStudentNumbers(res.body.data, ['869364', '711199', '795451']);
       });
 
     it('should filter returned grades based on instance ID if URL query included',
@@ -543,14 +614,13 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        expect(res.body.data).toEqual([
-          { userId: 824, studentNumber: '327976', grade: '5', credits: 5 },
-          { userId: 825, studentNumber: '478988', grade: '5', credits: 5 },
-          { userId: 826, studentNumber: '139131', grade: '5', credits: 5 },
-          { userId: 827, studentNumber: '857119', grade: '5', credits: 5 }
+        checkFinalGradesStructure(res.body.data);
+        checkStudentNumbers(res.body.data, [
+          '327976', '478988', '139131', '857119'
         ]);
       });
 
+    // TODO: Clarify whether this is supposed to be a union or intersection
     it(
       'should filter returned grades based on instance ID and student number if URL query included',
       async () => {
@@ -562,10 +632,8 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        expect(res.body.data).toEqual(   [
-          { userId: 824, studentNumber: '327976', grade: '5', credits: 5 },
-          { userId: 826, studentNumber: '139131', grade: '5', credits: 5 }
-        ]);
+        checkFinalGradesStructure(res.body.data);
+        checkStudentNumbers(res.body.data, ['327976', '139131']);
       });
 
     it('should not filter returned grades if no filters included in URL query',
@@ -577,53 +645,11 @@ describe(
           .expect(HttpCode.Ok);
 
         checkSuccessRes(res);
-        expect(res.body.data).toEqual(    [
-          { userId: 1241, studentNumber: '658593', grade: 'PENDING', credits: 0 },
-          { userId: 1242, studentNumber: '451288', grade: 'PENDING', credits: 0 },
-          { userId: 1243, studentNumber: '167155', grade: 'PENDING', credits: 0 },
-          { userId: 519, studentNumber: '117486', grade: '5', credits: 5 },
-          { userId: 521, studentNumber: '114732', grade: '5', credits: 5 },
-          { userId: 574, studentNumber: '472886', grade: '5', credits: 5 },
-          { userId: 581, studentNumber: '335462', grade: '5', credits: 5 },
-          { userId: 590, studentNumber: '874623', grade: '5', credits: 5 },
-          { userId: 601, studentNumber: '345752', grade: '5', credits: 5 },
-          { userId: 604, studentNumber: '353418', grade: '5', credits: 5 },
-          { userId: 609, studentNumber: '986957', grade: '5', credits: 5 },
-          { userId: 633, studentNumber: '611238', grade: '5', credits: 5 },
-          { userId: 651, studentNumber: '691296', grade: '5', credits: 5 },
-          { userId: 670, studentNumber: '271778', grade: '5', credits: 5 },
-          { userId: 739, studentNumber: '344644', grade: '5', credits: 5 },
-          { userId: 948, studentNumber: '954954', grade: '5', credits: 5 },
-          { userId: 824, studentNumber: '327976', grade: '5', credits: 5 },
-          { userId: 825, studentNumber: '478988', grade: '5', credits: 5 },
-          { userId: 826, studentNumber: '139131', grade: '5', credits: 5 },
-          { userId: 827, studentNumber: '857119', grade: '5', credits: 5 }
-        ]);
-      });
-
-    it('should show previously PENDING final grades as graded after final grade calculated',
-      async () => {
-        await request
-          .post('/v1/courses/9/assessment-models/41/grades/calculate')
-          .send({
-            studentNumbers: ['711199', '869364', '872942']
-          })
-          .set('Cookie', cookies.adminCookie);
-
-        res = await request
-          .get('/v1/courses/9/assessment-models/41/grades')
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.Ok);
-
-        checkSuccessRes(res);
-        expect(res.body.data).toEqual([
-          { userId: 416, studentNumber: '369743', grade: '5', credits: 5 },
-          { userId: 673, studentNumber: '795451', grade: '0', credits: 5 },
-          { userId: 636, studentNumber: '716176', grade: '3', credits: 5 },
-          { userId: 693, studentNumber: '869364', grade: '5', credits: 5 },
-          { userId: 738, studentNumber: '711199', grade: '0', credits: 5 },
-          { userId: 779, studentNumber: '872942', grade: '3', credits: 5 }
+        checkFinalGradesStructure(res.body.data);
+        checkStudentNumbers(res.body.data, [
+          '658593', '451288', '167155', '117486', '114732', '472886', '335462',
+          '874623', '345752', '353418', '986957', '611238', '691296', '271778',
+          '344644', '954954', '327976', '478988', '139131', '857119'
         ]);
       });
 
@@ -670,7 +696,7 @@ describe(
       checkErrorRes(
         [
           'no grades found, make sure grades have been' +
-          ' imported/calculated before requesting course results'
+          ' uploaded/calculated before requesting course results'
         ],
         HttpCode.NotFound);
     });
@@ -702,6 +728,110 @@ describe(
       );
     });
 
+  }
+);
+
+describe(
+  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/user/:userId'
+  + ' - get attainment grading for user based on ID',
+  () => {
+
+    function checkBodyStructure(data: AttainmentGradeData): void {
+      expect(data.attainmentId).toBeDefined();
+      expect(data.attainmentName).toBeDefined();
+      expect(data.grades).toBeDefined();
+      expect(data.subAttainments).toBeDefined();
+
+      data.grades.forEach((option: GradeOption) => {
+        expect(option.gradeId).toBeDefined();
+        expect(option.graderId).toBeDefined();
+        expect(option.grade).toBeDefined();
+        expect(option.status).toBeDefined();
+        expect(option.manual).toBeDefined();
+        expect(option.date).toBeDefined();
+        expect(option.expiryDate).toBeDefined();
+      });
+
+      data.subAttainments?.forEach((sub: AttainmentGradeData) => {
+        checkBodyStructure(sub);
+      });
+    }
+
+    it('should get correct user grades for assessment model (admin user)', async () => {
+      res = await request
+        .get('/v1/courses/4/assessment-models/7/grades/user/25')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+      checkSuccessRes(res);
+      checkBodyStructure(res.body.data);
+    });
+
+    it('should get correct user grades for assessment model (teacher in charge)', async () => {
+      jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
+
+      res = await request
+        .get('/v1/courses/4/assessment-models/7/grades/user/25')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+      checkSuccessRes(res);
+      checkBodyStructure(res.body.data);
+    });
+
+    it('should get a single grade for an attainment if only one grade exists', async () => {
+      res = await request
+        .get('/v1/courses/2/assessment-models/46/grades/user/1')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+      checkSuccessRes(res);
+      checkBodyStructure(res.body.data);
+
+      expect(res.body.data.grades.length).toEqual(1);
+    });
+
+    it('should get multiple grades for an attainment if multiple grades exist', async () => {
+      res = await request
+        .get('/v1/courses/2/assessment-models/47/grades/user/1')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+      checkSuccessRes(res);
+      checkBodyStructure(res.body.data);
+
+      expect(res.body.data.grades.length).toEqual(3);
+    });
+
+    it('should get an empty grade array if no grades exist for an attainment', async () => {
+      res = await request
+        .get('/v1/courses/2/assessment-models/48/grades/user/1')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+      checkSuccessRes(res);
+      checkBodyStructure(res.body.data);
+
+      expect(res.body.data.grades.length).toEqual(0);
+    });
+
+    it('should respond with 401 unauthorized, if not logged in', async () => {
+      await request
+        .get('/v1/courses/4/assessment-models/7/grades/user/25')
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Unauthorized);
+    });
+
+    it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/4/assessment-models/7/grades/user/25')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Forbidden);
+
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+    });
   }
 );
 
@@ -831,6 +961,50 @@ describe(
       expect(res.body.errors).not.toBeDefined();
       expect(res.body.data).toBeDefined();
     });
+
+    it(
+      'should allow uploading multiple grades to the same attainment for a student',
+      async () => {
+        async function uploadGrade(n: 1 | 2): Promise<void> {
+          await request
+            .post('/v1/courses/5/assessment-models/14/grades/csv')
+            .attach(
+              'csv_data',
+              fs.createReadStream(
+                path.resolve(
+                  __dirname, `../mock-data/csv/grades_multiple_uploads_${n}.csv`
+                ),
+                'utf8'
+              ),
+              { contentType: 'text/csv' }
+            )
+            .set('Cookie', cookies.adminCookie)
+            .set('Accept', 'application/json')
+            .expect(HttpCode.Ok);
+        }
+
+        await uploadGrade(1);
+        let grades: Array<AttainmentGrade> = await AttainmentGrade.findAll({
+          where: {
+            userId: 28,
+            attainmentId: 268
+          }
+        });
+        expect(grades.length).toEqual(1);
+        expect(grades[0].grade).toEqual(1);
+
+        await uploadGrade(2);
+        grades = await AttainmentGrade.findAll({
+          where: {
+            userId: 28,
+            attainmentId: 268
+          }
+        });
+        expect(grades.length).toEqual(2);
+        expect(grades.find((val: AttainmentGrade) => val.grade === 1)).toBeDefined();
+        expect(grades.find((val: AttainmentGrade) => val.grade === 5)).toBeDefined();
+      }
+    );
 
     it('should process big CSV succesfully (1100 x 178 = 195 800 individual attainment grades)',
       async () => {
@@ -1188,6 +1362,47 @@ describe(
       checkGrade(234, 391, 3.12, cookies.adminCookie);
     });
 
+    it('should calculate multiple grades for the same attainment on repeated runs', async () => {
+      await checkGradeAmount(391, 275, 0, []);
+      await checkGradeAmount(391, 277, 0, []);
+      await checkGradeAmount(391, 280, 0, []);
+
+      checkSuccessRes(
+        await request
+          .post('/v1/courses/2/assessment-models/49/grades/calculate')
+          .send({
+            studentNumbers: ['238447']
+          })
+          .set('Cookie', cookies.adminCookie)
+      );
+
+      await checkGradeAmount(391, 275, 1, [3.12]);
+      await checkGradeAmount(391, 277, 1, [3.2]);
+      await checkGradeAmount(391, 280, 1, [3]);
+
+      await AttainmentGrade.create({
+        userId: 391,
+        attainmentId: 278,
+        graderId: 1,
+        grade: 10,
+        manual: true,
+        status: Status.Pass
+      });
+
+      checkSuccessRes(
+        await request
+          .post('/v1/courses/2/assessment-models/49/grades/calculate')
+          .send({
+            studentNumbers: ['238447']
+          })
+          .set('Cookie', cookies.adminCookie)
+      );
+
+      await checkGradeAmount(391, 275, 2, [3.12, 3.4800000000000004]);
+      await checkGradeAmount(391, 277, 2, [3.2, 3.8000000000000003]);
+      await checkGradeAmount(391, 280, 2, [3, 3]);
+    });
+
     it('should allow manually overriding a student\'s grade', async () => {
       checkSuccessRes(await request
         .post('/v1/courses/1/assessment-models/28/grades/calculate')
@@ -1227,6 +1442,33 @@ describe(
       checkGrade(256, 1243, 5, cookies.adminCookie);
     });
 
+    it('should consider the best manual grades when multiple options exist', async () => {
+      // Check that multiple grades exist as expected
+      expect((await AttainmentGrade.findAll({
+        where: {
+          userId: 1,
+          attainmentId: 270
+        }
+      })).length).toBe(2);
+
+      expect((await AttainmentGrade.findAll({
+        where: {
+          userId: 1,
+          attainmentId: 271
+        }
+      })).length).toBe(3);
+
+      checkSuccessRes(await request
+        .post('/v1/courses/2/assessment-models/45/grades/calculate')
+        .send({
+          studentNumbers: ['352772']
+        })
+        .set('Cookie', cookies.adminCookie)
+      );
+
+      checkGrade(269, 1, 5, cookies.adminCookie);
+    });
+
     it('should respond with 401 unauthorized, if not logged in', async () => {
       await request
         .post('/v1/courses/1/assessment-models/1/grades/calculate')
@@ -1263,53 +1505,6 @@ describe(
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe('No student numbers found from instance ID 28');
       });
-  }
-);
-
-describe(
-  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/user/:userId'
-  + ' - get attainment grading for user based on ID',
-  () => {
-
-    it('should get correct user grades for assessment model (admin user)', async () => {
-      res = await request
-        .get('/v1/courses/4/assessment-models/7/grades/user/25')
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'text/csv')
-        .expect(HttpCode.Ok);
-      checkSuccessRes(res);
-      checkBodyStructure(res.body.data);
-    });
-
-    it('should get correct user grades for assessment model (teacher in charge)', async () => {
-      jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
-
-      res = await request
-        .get('/v1/courses/4/assessment-models/7/grades/user/25')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'text/csv')
-        .expect(HttpCode.Ok);
-      checkSuccessRes(res);
-      checkBodyStructure(res.body.data);
-    });
-
-    it('should respond with 401 unauthorized, if not logged in', async () => {
-      await request
-        .get('/v1/courses/4/assessment-models/7/grades/user/25')
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Unauthorized);
-    });
-
-    it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/4/assessment-models/7/grades/user/25')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Forbidden);
-
-      expect(res.body.data).not.toBeDefined();
-      expect(res.body.errors).toBeDefined();
-    });
   }
 );
 

@@ -51,12 +51,49 @@ const upload: Multer = multer({
  *     required: false
  *   Grade:
  *     type: number
- *     description: User attainment grade.
+ *     description: The numerical grade of a student for an attainment.
  *     format: int32
  *     minimum: 0
  *     example: 5
  *     required: false
- *   GradingData:
+ *   GradeOption:
+ *     type: object
+ *     description:
+ *     properties:
+ *       gradeId:
+ *         type: integer
+ *         description: Internal attainment grade database ID.
+ *         format: int32
+ *         minimum: 0
+ *         example: 5
+ *       graderId:
+ *         type: integer
+ *         description: >
+ *           User ID of the teacher who uploaded or calculated this grade.
+ *         format: int32
+ *         minimum: 1
+ *         example: 1
+ *       grade:
+ *         $ref: '#/definitions/Grade'
+ *       status:
+ *         $ref: '#/definitions/Status'
+ *       manual:
+ *         type: boolean
+ *         description: >
+ *           True if this grade was manually inserted by a teacher, false if it
+ *           is the result of grade calculation.
+ *         example: true
+ *       date:
+ *         type: string
+ *         format: date
+ *         description: Date when attainment is completed (e.g., deadline or exam date)
+ *         example: 2022-9-22
+ *       expiryDate:
+ *         type: string
+ *         format: date
+ *         description: Date when the grade expires.
+ *         example: 2022-9-22
+ *   FinalGradeData:
  *     type: object
  *     description: Students final grade data.
  *     properties:
@@ -68,39 +105,36 @@ const upload: Multer = multer({
  *         example: 1
  *       studentNumber:
  *         $ref: '#/definitions/StudentNumber'
- *       grade:
- *         type: string
- *         description: >
- *           Final grade for the student. Either numeric (0, 1, 2, 3, 4, 5) or PASS/FAIL scale.
- *           If grade is not yet calculated, grade will be 'PENDING'
- *         example: PASS
  *       credits:
  *         type: integer
  *         description: How many course credits (ECTS) student receives from course.
  *         format: int32
  *         minimum: 0
  *         example: 5
- *   AttainmentGradingData:
+ *       grades:
+ *         type: array
+ *         description: All of the potential final grades the student has.
+ *         items:
+ *           $ref: '#/definitions/GradeOption'
+ *   AttainmentGradeData:
  *     type: object
  *     description: Students grading data for all attainments of the assessment model.
  *     properties:
+ *       userId:
+ *         type: integer
+ *         description: User ID.
+ *         format: int32
+ *         minimum: 1
+ *         example: 1
  *       attainmentId:
  *         $ref: '#/definitions/AttainmentId'
- *       gradeId:
- *         type: integer
- *         description: Internal attainment grade database ID.
- *         format: int32
- *         minimum: 0
- *         example: 5
- *       name:
+ *       attainmentName:
  *         $ref: '#/definitions/AttainmentName'
- *       grade:
- *         $ref: '#/definitions/Grade'
- *       manual:
- *         type: boolean
- *         example: true
- *       status:
- *         $ref: '#/definitions/Status'
+ *       grades:
+ *         type: array
+ *         description: All of the grades the student has for this attainment.
+ *         items:
+ *           $ref: '#/definitions/GradeOption'
  *       subAttainments:
  *         type: array
  *         description: Sublevel attainment grades.
@@ -286,7 +320,7 @@ router.get(
  *                 data:
  *                   type: array
  *                   items:
- *                     $ref: '#/definitions/GradingData'
+ *                     $ref: '#/definitions/FinalGradeData'
  *       400:
  *         description: Fetching failed, due to validation errors in parameters.
  *         content:
@@ -342,7 +376,7 @@ router.get(
  *                 data:
  *                   type: array
  *                   items:
- *                     $ref: '#/definitions/AttainmentGradingData'
+ *                     $ref: '#/definitions/AttainmentGradeData'
  *       400:
  *         description: Fetching failed, due to validation errors in parameters.
  *         content:

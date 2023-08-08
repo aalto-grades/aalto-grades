@@ -259,11 +259,11 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, days_valid,
 (28, 242, 'name243', 365, NOW(), NOW(), 'MANUAL', NULL),
 (28, 242, 'name244', 365, NOW(), NOW(), 'MANUAL', NULL),
 -- Demo data
-(29, null, 'Grade', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["exercise", { "weight": 0.4 }], ["project", { "weight": 0.2 }], ["exam", { "weight": 0.4 }]] }'),
+(29, null, 'Grade', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["Exercises", { "weight": 0.4 }], ["Project", { "weight": 0.2 }], ["Exam", { "weight": 0.4 }]] }'),
 (29, 245, 'Exercises', 365, NOW(), NOW(), 'MANUAL', NULL),
 (29, 245, 'Project', 365, NOW(), NOW(), 'MANUAL', NULL),
 (29, 245, 'Exam', 365, NOW(), NOW(), 'MANUAL', NULL),
-(30, null, 'Grade', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["project", { "weight": 0.6 }], ["exam", { "weight": 0.4 }]] }'),
+(30, null, 'Grade', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["Project", { "weight": 0.6 }], ["Exam", { "weight": 0.4 }]] }'),
 (30, 249, 'Project', 365, NOW(), NOW(), 'MANUAL', NULL),
 (30, 249, 'Exam', 365, NOW(), NOW(), 'MANUAL', NULL),
 -- Test multiple roots
@@ -287,4 +287,25 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, days_valid,
 (3, 264, '265', 365, NOW(), NOW(), 'MANUAL', NULL),
 (3, 264, '266', 365, NOW(), NOW(), 'MANUAL', NULL),
 -- Test removing name from parent attainment formula params
-(3, 263, '267', 365, NOW(), NOW(), 'MANUAL', NULL);
+(3, 263, '267', 365, NOW(), NOW(), 'MANUAL', NULL),
+-- Test uploading multiple grades to the same attainment for a student
+(14, null, '268', 365, NOW(), NOW(), 'MANUAL', NULL),
+-- Test calculating with multiple grades for the same attainment
+(45, null, '269', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 1, "children": [["270", { "weight": 0.5 }], ["271", { "weight": 0.5 }]] }'),
+(45, 269, '270', 365, NOW(), NOW(), 'MANUAL', NULL),
+(45, 269, '271', 365, NOW(), NOW(), 'MANUAL', NULL),
+-- Test getting differing numbers of grades
+(46, null, '272', 365, NOW(), NOW(), 'MANUAL', NULL),
+(47, null, '273', 365, NOW(), NOW(), 'MANUAL', NULL),
+(48, null, '274', 365, NOW(), NOW(), 'MANUAL', NULL),
+-- Test calculating new grades for a student
+(49, null, '275', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["276", { "weight": 0.4 }], ["277", { "weight": 0.6 }]] }'),
+(49, 275, '276', 365, NOW(), NOW(), 'MANUAL', NULL),
+(49, 275, '277', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["278", { "weight": 0.1 }], ["279", { "weight": 0.1 }], ["280", { "weight": 0.8 }]] }'),
+(49, 277, '278', 365, NOW(), NOW(), 'MANUAL', NULL),
+(49, 277, '279', 365, NOW(), NOW(), 'MANUAL', NULL),
+(49, 277, '280', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["281", { "weight": 0.5 }], ["282", { "weight": 0.5 }]] }'),
+(49, 280, '281', 365, NOW(), NOW(), 'MANUAL', NULL),
+(49, 280, '282', 365, NOW(), NOW(), 'MANUAL', NULL),
+-- Multiple final grade options
+(50, null, '283', 365, NOW(), NOW(), 'MANUAL', NULL);
