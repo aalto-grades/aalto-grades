@@ -102,6 +102,16 @@ router.get('/api-docs', swaggerUI.setup(openapiSpecification));
  *       required: true
  *       example: 1
  *       description: The ID of the study attainment.
+ *     gradeId:
+ *       in: path
+ *       name: gradeId
+ *       schema:
+ *         type: integer
+ *         format: int32
+ *         minimum: 1
+ *       required: true
+ *       example: 1
+ *       description: The ID of the user grade.
  *     tree:
  *       in: query
  *       name: tree
