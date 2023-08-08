@@ -25,8 +25,8 @@ export default function StudentGradeList(props: {
         </Typography>
         <Typography align='left' variant='body2'>
           {'Grade: ' + (
-            props.grades.grade
-              ? `${props.grades.grade} - ${props.grades.status}`
+            props.grades.grades.length > 0
+              ? `${props.grades.grades[0].grade} - ${props.grades.grades[0].status}`
               : Status.Pending
           )}
         </Typography>

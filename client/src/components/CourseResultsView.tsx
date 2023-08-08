@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { FinalGrade, Status } from 'aalto-grades-common/types';
+import { FinalGrade } from 'aalto-grades-common/types';
 import { Box, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
@@ -29,9 +29,9 @@ export default function CourseResultsView(): JSX.Element {
     useState<Array<FinalGrade>>([]);
 
   useEffect(() => {
-    setHasPendingStudents(selectedStudents.filter((student: FinalGrade) => {
-      return student.grade === Status.Pending;
-    }).length !== 0);
+    setHasPendingStudents(Boolean(
+      selectedStudents.find((student: FinalGrade) => student.grades.length === 0)
+    ));
   }, [selectedStudents]);
 
   const students: UseQueryResult<Array<FinalGrade>> = useGetFinalGrades(

@@ -8,19 +8,46 @@ export const mockFinalGrades: Array<FinalGrade> = [
   {
     userId: 1,
     studentNumber: '12345A',
-    grade: Status.Pass,
-    credits: 5
+    credits: 5,
+    grades: [
+      {
+        gradeId: 1,
+        graderId: 5,
+        grade: 5,
+        status: Status.Pass,
+        manual: true,
+        date: new Date('2023-01-01')
+      }
+    ]
   },
   {
     userId: 2,
     studentNumber: '98745A',
-    grade: Status.Pass,
-    credits: 5
+    credits: 5,
+    grades: [
+      {
+        gradeId: 1,
+        graderId: 5,
+        grade: 5,
+        status: Status.Pass,
+        manual: true,
+        date: new Date('2023-01-01')
+      }
+    ]
   },
   {
     userId: 3,
     studentNumber: '12859A',
-    grade: Status.Pass,
-    credits: 5
+    credits: 5,
+    grades: [
+      {
+        gradeId: 1,
+        graderId: 5,
+        grade: 5,
+        status: Status.Pass,
+        manual: true,
+        date: new Date('2023-01-01')
+      }
+    ]
   }
 ];

@@ -44,13 +44,13 @@ export default function CourseResultsTable(props: {
     setPage(0);
   }, [search, props.students]);
 
-  function handleRequestSort(event: SyntheticEvent, property: keyof FinalGrade): void {
+  function handleRequestSort(_event: SyntheticEvent, property: keyof FinalGrade): void {
     const isAsc: boolean = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   }
 
-  function handleChangePage(event: MouseEvent | null, newPage: number): void {
+  function handleChangePage(_event: MouseEvent | null, newPage: number): void {
     setPage(newPage);
   }
 
@@ -165,14 +165,14 @@ export default function CourseResultsTable(props: {
                               scope="row"
                               padding="normal"
                             >
-                              {student.grade === Status.Pending ? '-' : student.credits}
+                              {student.grades.length > 0 ? student.credits : '-'}
                             </TableCell>
                             <TableCell
                               sx={{ width: '100px' }}
                               align="left"
                               key={`${student.studentNumber}_grade`}
                             >
-                              {student.grade}
+                              {student.grades.length > 0 ? student.grades[0].grade : 0}
                             </TableCell>
                             <TableCell
                               sx={{ width: '100px' }}
