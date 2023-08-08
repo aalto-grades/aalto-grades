@@ -620,7 +620,6 @@ export function parseGradesFromCsv(
   let currentColumn: number = 2;
 
   for (const row of studentGradingData) {
-    // TODO: validate with regex that valid student number?
     const studentNumber: string = row[0];
     const gradingData: Array<string> = row.slice(1);
 
@@ -641,7 +640,9 @@ export function parseGradesFromCsv(
           attainmentId: attainmentIds[i],
           grade: parseInt(gradingData[i], 10),
           manual: true,
-          status: Status.Pass // TODO: Allow specification?
+          // TODO: Determine status based on whether the uploaded grade is
+          // larger than min required
+          status: Status.Pass
         };
         student.grades.push(grade);
       }

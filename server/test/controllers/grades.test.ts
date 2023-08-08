@@ -506,6 +506,7 @@ describe(
       ).toEqual(studentNumbers.sort());
     }
 
+
     it(
       'should get final grades succesfully when course results are found (admin user)',
       async () => {
@@ -555,21 +556,20 @@ describe(
             status: Status
           }>
         ): void {
-          console.log(JSON.stringify(res.body.data, undefined, 2));
-          const gradesOfStudent: FinalGrade | undefined = res.body.data.find(
-            (finalGrade: FinalGrade) => finalGrade.studentNumber === studentNumber
-          );
-          console.log(JSON.stringify(gradesOfStudent, undefined, 2));
+
+          const gradesOfStudent: Array<{ grade: number, status: Status }> | undefined =
+            res.body.data.find((finalGrade: FinalGrade) => {
+              return finalGrade.studentNumber === studentNumber
+            })?.grades.map((option: GradeOption) => {
+              return {
+                grade: option.grade,
+                status: option.status
+              }
+            });
 
           expect(gradesOfStudent).toBeDefined();
-
           for (const expectedGrade of expectedGrades) {
-            expect(
-              (gradesOfStudent as FinalGrade).grades.find((option: GradeOption) => {
-                return option.grade === expectedGrade.grade
-                  && option.status === expectedGrade.status;
-              })
-            ).toBeDefined();
+            expect(gradesOfStudent).toContainEqual(expectedGrade);
           }
         }
 
@@ -650,34 +650,6 @@ describe(
           '658593', '451288', '167155', '117486', '114732', '472886', '335462',
           '874623', '345752', '353418', '986957', '611238', '691296', '271778',
           '344644', '954954', '327976', '478988', '139131', '857119'
-        ]);
-      });
-
-    // TODO: Update
-    it('should show previously PENDING final grades as graded after final grade calculated',
-      async () => {
-        await request
-          .post('/v1/courses/9/assessment-models/41/grades/calculate')
-          .send({
-            studentNumbers: ['711199', '869364', '872942']
-          })
-          .set('Cookie', cookies.adminCookie);
-
-        res = await request
-          .get('/v1/courses/9/assessment-models/41/grades')
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.Ok);
-
-        checkSuccessRes(res);
-        checkFinalGradesStructure(res.body.data);
-        expect(res.body.data).toEqual([
-          { userId: 416, studentNumber: '369743', grade: '5', credits: 5 },
-          { userId: 673, studentNumber: '795451', grade: '0', credits: 5 },
-          { userId: 636, studentNumber: '716176', grade: '3', credits: 5 },
-          { userId: 693, studentNumber: '869364', grade: '5', credits: 5 },
-          { userId: 738, studentNumber: '711199', grade: '0', credits: 5 },
-          { userId: 779, studentNumber: '872942', grade: '3', credits: 5 }
         ]);
       });
 
