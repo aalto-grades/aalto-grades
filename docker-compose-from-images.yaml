@@ -46,7 +46,20 @@ services:
     extends:
       file: ./common-services.yaml
       service: database
-      
+
+  pgadmin:
+    extends:
+      file: ./common-services.yaml
+      service: pgadmin
+    depends_on:
+      - database
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "${PGADMIN_DEFAULT_EMAIL}"
+      PGADMIN_DEFAULT_PASSWORD: "${PGADMIN_DEFAULT_PASSWORD}"
+    volumes:
+     - ./server/pgAdminSetup.json:/pgadmin4/servers.json
+     - ${PGADMIN_PASSFILE}:/pgpass
+
 networks:
   local:
     driver: bridge
