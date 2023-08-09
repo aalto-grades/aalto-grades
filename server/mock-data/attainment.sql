@@ -308,4 +308,7 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, days_valid,
 (49, 280, '281', 365, NOW(), NOW(), 'MANUAL', '{ "minRequiredGrade": 0 }'),
 (49, 280, '282', 365, NOW(), NOW(), 'MANUAL', '{ "minRequiredGrade": 0 }'),
 -- Multiple final grade options
-(50, null, '283', 365, NOW(), NOW(), 'MANUAL', '{ "minRequiredGrade": 0 }');
+(50, null, '283', 365, NOW(), NOW(), 'MANUAL', '{ "minRequiredGrade": 0 }'),
+-- Test uploading failing grade
+(51, null, '284', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 3, "children": [["285", { "weight": 0 }]] }'),
+(51, 284, '285', 365, NOW(), NOW(), 'MANUAL', '{ "minRequiredGrade": 2 }');
