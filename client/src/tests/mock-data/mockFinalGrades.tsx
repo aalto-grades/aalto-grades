@@ -16,7 +16,8 @@ export const mockFinalGrades: Array<FinalGrade> = [
         grade: 5,
         status: Status.Pass,
         manual: true,
-        date: new Date('2023-01-01')
+        date: new Date('2023-01-01'),
+        comment: 'nice work'
       }
     ]
   },
@@ -31,7 +32,8 @@ export const mockFinalGrades: Array<FinalGrade> = [
         grade: 5,
         status: Status.Pass,
         manual: true,
-        date: new Date('2023-01-01')
+        date: new Date('2023-01-01'),
+        comment: 'bad work'
       }
     ]
   },
@@ -46,7 +48,8 @@ export const mockFinalGrades: Array<FinalGrade> = [
         grade: 5,
         status: Status.Pass,
         manual: true,
-        date: new Date('2023-01-01')
+        date: new Date('2023-01-01'),
+        comment: 'you shall pass'
       }
     ]
   }
