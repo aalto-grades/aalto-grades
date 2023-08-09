@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { FinalGrade } from 'aalto-grades-common/types';
+import { AttainmentData, FinalGrade } from 'aalto-grades-common/types';
 import {
   Box, Checkbox, FormControlLabel, TableCell,
   TableHead, TableRow, TableSortLabel
@@ -16,6 +16,7 @@ interface Colum {
 }
 
 export default function CourseResultsTableHead(props: {
+  attainmentList: Array<AttainmentData>,
   order: 'asc' | 'desc',
   orderBy: keyof FinalGrade,
   onRequestSort: (event: SyntheticEvent, property: keyof FinalGrade) => void,
@@ -37,6 +38,13 @@ export default function CourseResultsTableHead(props: {
       name: 'Final Grade'
     }
   ];
+
+  for (const attainment of props.attainmentList) {
+    rows.push({
+      id: String(attainment.id),
+      name: attainment.name
+    });
+  }
 
   function createSortHandler(property: keyof FinalGrade) {
     return (event: SyntheticEvent) => {
