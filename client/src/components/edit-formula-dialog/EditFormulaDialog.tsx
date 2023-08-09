@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AttainmentData, Formula, FormulaData, ParamsObject
+  AttainmentData, ChildParamsObject, Formula, FormulaData, ParamsObject
 } from 'aalto-grades-common/types';
 import deepEqual from 'deep-equal';
 import {
@@ -52,11 +52,11 @@ export default function EditFormulaDialog(props: {
   const [formula, setFormula]: State<FormulaData | null> =
     useState<FormulaData | null>(null);
 
-  const [params, setParams]: State<object | null> =
-    useState<object | null>(null);
+  const [params, setParams]: State<ParamsObject | null> =
+    useState<ParamsObject | null>(null);
 
-  const [childParams, setChildParams]: State<Map<string, object> | null> =
-    useState<Map<string, object> | null>(null);
+  const [childParams, setChildParams]: State<Map<string, ChildParamsObject> | null> =
+    useState<Map<string, ChildParamsObject> | null>(null);
 
   const editAttainment: UseEditAttainmentResult = useEditAttainment({
     onSuccess: () => {
@@ -72,8 +72,7 @@ export default function EditFormulaDialog(props: {
   function hasUnsavedChanges(): boolean {
     return Boolean(
       // Formula was changed
-      formula?.id !== props.attainment.formula
-      || (
+      (formula?.id !== props.attainment.formula) || (
         // Or the parameters were changed
         formula?.id !== Formula.Manual && params && childParams && !deepEqual(
           props.attainment.formulaParams,
@@ -125,27 +124,34 @@ export default function EditFormulaDialog(props: {
     setChildParams(null);
   }
 
-  function constructParamsObject(): ParamsObject | undefined {
-    return (formula?.id === Formula.Manual) ? undefined : {
+  function constructParamsObject(): ParamsObject {
+    const formulaHasChildParams: boolean =
+      Boolean((formula?.childParams.length ?? 0) > 0);
+
+    return {
       ...params,
-      children: Array.from(childParams ? childParams.entries() : [])
+      children: (formulaHasChildParams && childParams)
+        ? Array.from(childParams.entries())
+        : undefined
     } as ParamsObject;
   }
 
   function handleSubmit(): void {
-    props.attainment.formula = formula?.id;
-    props.attainment.formulaParams = constructParamsObject();
+    if (formula) {
+      props.attainment.formula = formula.id;
+      props.attainment.formulaParams = constructParamsObject();
 
-    if (props.courseId && props.assessmentModelId) {
-      editAttainment.mutate({
-        courseId: props.courseId,
-        assessmentModelId: props.assessmentModelId,
-        attainment: props.attainment
-      });
-    } else if (props.attainmentTree && props.setAttainmentTree) {
-      props.setAttainmentTree(structuredClone(props.attainmentTree));
-      snackPack.push(successMessage);
-      close();
+      if (props.courseId && props.assessmentModelId) {
+        editAttainment.mutate({
+          courseId: props.courseId,
+          assessmentModelId: props.assessmentModelId,
+          attainment: props.attainment
+        });
+      } else if (props.attainmentTree && props.setAttainmentTree) {
+        props.setAttainmentTree(structuredClone(props.attainmentTree));
+        snackPack.push(successMessage);
+        close();
+      }
     }
   }
 

@@ -2,15 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData } from 'aalto-grades-common/types';
+import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
 import { Box, Button, Paper, TextField, Typography } from '@mui/material';
 import { ChangeEvent, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
+import { UseQueryResult } from '@tanstack/react-query';
 
 import ConfirmationDialog from './ConfirmationDialog';
+import EditFormulaDialog from '../edit-formula-dialog/EditFormulaDialog';
 import SimpleDialog from './SimpleDialog';
 import StringTextField, { AttainmentTextFieldData } from './StringTextField';
 
+import { useGetFormula } from '../../hooks/useApi';
 import { State } from '../../types';
 import { getParamLabel } from '../../utils';
 
@@ -39,6 +42,10 @@ export default function LeafAttainment(props: {
 
   const { modification }: Params = useParams();
 
+  const [editFormulaOpen, setEditFormulaOpen]: State<boolean> = useState(false);
+
+  const formula: UseQueryResult<FormulaData> = useGetFormula(props.attainment.formula);
+
   // Functions and variables for opening and closing the dialog that asks for
   // the number of sub-attainments
   const [openCountDialog, setOpenCountDialog]: State<boolean> = useState(false);
@@ -51,7 +58,7 @@ export default function LeafAttainment(props: {
     setOpenCountDialog(false);
   }
 
-  // Functions and varibales for opening and closing the dialog for confirming
+  // Functions and variables for opening and closing the dialog for confirming
   // sub-attainment deletion
   const [openConfirmationDialog, setOpenConfirmationDialog]: State<boolean> =
     useState(false);
@@ -75,6 +82,34 @@ export default function LeafAttainment(props: {
       py: 1,
       mb: 1
     }}>
+      <Box sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        px: 1
+      }}>
+        <EditFormulaDialog
+          handleClose={(): void => setEditFormulaOpen(false)}
+          open={editFormulaOpen}
+          attainment={props.attainment}
+          attainmentTree={props.attainmentTree}
+          setAttainmentTree={props.setAttainmentTree}
+        />
+        <Typography variant="body1" sx={{ flexGrow: 1, textAlign: 'left', mb: 0.5 }}>
+          {'Grading Formula: ' + formula.data?.name ?? 'Loading...'}
+        </Typography>
+        {
+          /* Navigation below doesn't work because formula selection has
+             only been implemented for course grade */
+        }
+        <Button
+          size='small'
+          sx={{ mb: 0.5 }}
+          onClick={(): void => setEditFormulaOpen(true)}
+        >
+          Edit formula
+        </Button>
+      </Box>
       <Box sx={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',

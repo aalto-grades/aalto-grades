@@ -54,4 +54,9 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     networks:
       - local
-      
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: always
+    networks:
+      - local

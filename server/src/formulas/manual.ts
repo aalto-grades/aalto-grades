@@ -8,6 +8,9 @@ import { registerFormula } from '.';
 import { Formula, Status } from 'aalto-grades-common/types';
 import { CalculationResult } from '../types';
 
+const childParams: Array<string> = [];
+const params: Array<string> = ['minRequiredGrade'];
+
 /**
  * The 'Manual' formula requires a grade to be manually specified by a teacher.
  * The formula function of the 'Manual' formula is only called when a grade has
@@ -31,8 +34,10 @@ registerFormula(
   manualGradeUnspecified,
   codeSnippet,
   'Manual',
-  [],
-  [],
+  params,
+  childParams,
   {},
-  yup.object()
+  yup.object({
+    minRequiredGrade: yup.number().required()
+  }).noUnknown().strict()
 );

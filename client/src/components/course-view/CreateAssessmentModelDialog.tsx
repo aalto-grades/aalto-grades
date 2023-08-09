@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AssessmentModelData, AttainmentData } from 'aalto-grades-common/types';
+import { AssessmentModelData, AttainmentData, Formula } from 'aalto-grades-common/types';
 import {
   Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle,
   FormHelperText, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField
@@ -70,7 +70,11 @@ export default function CreateAssessmentModelDialog(props: {
                     assessmentModelId: assessmentModelId,
                     attainment: data.data ?? {
                       name: 'Root',
-                      daysValid: 0
+                      daysValid: 0,
+                      formula: Formula.Manual,
+                      formulaParams: {
+                        minRequiredGrade: 0
+                      }
                     }
                   });
                 });
@@ -80,7 +84,11 @@ export default function CreateAssessmentModelDialog(props: {
                   assessmentModelId: assessmentModelId,
                   attainment: {
                     name: 'Root',
-                    daysValid: 0
+                    daysValid: 0,
+                    formula: Formula.Manual,
+                    formulaParams: {
+                      minRequiredGrade: 0
+                    }
                   }
                 });
               }

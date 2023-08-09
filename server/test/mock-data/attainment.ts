@@ -23,6 +23,9 @@ export const mockAttainment: AttainmentData = {
       name: 'ex-1',
       daysValid: 365,
       formula: Formula.Manual,
+      formulaParams: {
+        minRequiredGrade: 0
+      },
       subAttainments: [],
     },
     {
@@ -56,6 +59,9 @@ export const mockAttainment: AttainmentData = {
               name: 'ex-2.1.1',
               daysValid: 365,
               formula: Formula.Manual,
+              formulaParams: {
+                minRequiredGrade: 0
+              },
               subAttainments: [],
             },
             {
@@ -63,6 +69,9 @@ export const mockAttainment: AttainmentData = {
               name: 'ex-2.1.2',
               daysValid: 365,
               formula: Formula.Manual,
+              formulaParams: {
+                minRequiredGrade: 0
+              },
               subAttainments: [],
             }
           ],
@@ -85,6 +94,9 @@ export const mockAttainment: AttainmentData = {
               name: 'ex-2.2.1',
               daysValid: 365,
               formula: Formula.Manual,
+              formulaParams: {
+                minRequiredGrade: 0
+              },
               subAttainments: [],
             },
             {
@@ -105,6 +117,9 @@ export const mockAttainment: AttainmentData = {
                   name: 'ex-2.2.2.1',
                   daysValid: 365,
                   formula: Formula.Manual,
+                  formulaParams: {
+                    minRequiredGrade: 0
+                  },
                   subAttainments: [],
                 },
                 {
@@ -125,6 +140,9 @@ export const mockAttainment: AttainmentData = {
                       name: 'ex-2.2.2.2.1',
                       daysValid: 365,
                       formula: Formula.Manual,
+                      formulaParams: {
+                        minRequiredGrade: 0
+                      },
                       subAttainments: [],
                     },
                     {
@@ -132,6 +150,9 @@ export const mockAttainment: AttainmentData = {
                       name: 'ex-2.2.2.2.2',
                       daysValid: 365,
                       formula: Formula.Manual,
+                      formulaParams: {
+                        minRequiredGrade: 0
+                      },
                       subAttainments: [],
                     }
                   ]
@@ -152,6 +173,9 @@ export const jestMockAttainment: Attainment = new Attainment({
   name: 'xxx',
   daysValid: 365,
   formula: Formula.Manual,
+  formulaParams: {
+    minRequiredGrade: 0
+  },
   createdAt: new Date(),
   updatedAt: new Date()
 }, { isNewRecord: false });
