@@ -23,28 +23,26 @@ import {
 import { isTeacherInChargeOrAdmin } from './utils/user';
 
 async function validateFormulaParams(
-  formula?: Formula,
-  formulaParams?: object | null,
+  formula: Formula,
+  formulaParams: ParamsObject,
   subAttainmentNames?: Array<string>
 ): Promise<void> {
-  if (formula && formulaParams) {
-    // Validate params with the formula's param schema
-    await getFormulaImplementation(formula).paramSchema.validate(
-      formulaParams, { abortEarly: false }
-    );
+  // Validate params with the formula's param schema
+  await getFormulaImplementation(formula).paramSchema.validate(
+    formulaParams, { abortEarly: false }
+  );
 
+  if (formulaParams.children || subAttainmentNames) {
     // Ensure that all subattainments are included in children and that there
     // are no invalid subattainment names in children
-    const uncheckedNamesInParams: Array<string> | undefined =
-      (formulaParams as ParamsObject).children?.map(
-        (value: [string, unknown]) => value[0]
-      );
+    const uncheckedNamesInParams: Array<string> = formulaParams.children?.map(
+      (value: [string, unknown]) => value[0]
+    ) ?? [];
 
-    if (uncheckedNamesInParams) {
-      const notFound: Array<string> = [];
+    const notFound: Array<string> = [];
 
-      // TODO: Remove non-null assertion
-      for (const name of subAttainmentNames!) {
+    if (subAttainmentNames) {
+      for (const name of subAttainmentNames) {
         const index: number = uncheckedNamesInParams.indexOf(name);
         if (index < 0) {
           notFound.push(name);
@@ -52,20 +50,20 @@ async function validateFormulaParams(
           uncheckedNamesInParams.splice(index, 1);
         }
       }
+    }
 
-      if (notFound.length > 0) {
-        throw new ApiError(
-          `formula params do not include subattainments with names ${notFound}`,
-          HttpCode.BadRequest
-        );
-      }
+    if (notFound.length > 0) {
+      throw new ApiError(
+        `formula params do not include subattainments with names ${notFound}`,
+        HttpCode.BadRequest
+      );
+    }
 
-      if (uncheckedNamesInParams.length > 0) {
-        throw new ApiError(
-          `invalid subattainment names in formula params: ${uncheckedNamesInParams}`,
-          HttpCode.BadRequest
-        );
-      }
+    if (uncheckedNamesInParams.length > 0) {
+      throw new ApiError(
+        `invalid subattainment names in formula params: ${uncheckedNamesInParams}`,
+        HttpCode.BadRequest
+      );
     }
   }
 }
@@ -220,7 +218,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
      * manual, then this new attainment must be added to the children list of the
      * parent attainment's params.
      */
-    const parentParams: ParamsObject<object> = parentAttainment.formulaParams;
+    const parentParams: ParamsObject = parentAttainment.formulaParams;
     if (parentParams.children) {
       const parentFormula: FormulaImplementation = getFormulaImplementation(
         parentAttainment.formula
@@ -296,7 +294,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       assessmentModelId: assessmentModel.id,
       name: requestTree.name,
       daysValid: requestTree.daysValid,
-      formula: requestTree.formula ?? Formula.Manual,
+      formula: requestTree.formula,
       formulaParams: requestTree.formulaParams
     });
 
@@ -307,7 +305,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       name: dbEntry.name,
       daysValid: dbEntry.daysValid,
       formula: dbEntry.formula,
-      formulaParams: dbEntry.formulaParams as ParamsObject,
+      formulaParams: dbEntry.formulaParams,
       subAttainments: []
     };
 
@@ -368,7 +366,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   const daysValid: number | undefined = req.body.daysValid;
   const parentId: number | undefined = req.body.parentId;
   const formula: Formula | undefined = req.body.formula;
-  const formulaParams: object | undefined = req.body.formulaParams;
+  const formulaParams: ParamsObject | undefined = req.body.formulaParams;
 
   let parentAttainment: Attainment | null = null;
 
@@ -400,7 +398,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
 
   await validateFormulaParams(
     formula ?? attainment.formula,
-    formulaParams,
+    formulaParams ?? attainment.formulaParams,
     (await Attainment.findAll({
       attributes: ['name'],
       where: {
@@ -441,7 +439,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
       parentId, HttpCode.InternalServerError
     );
 
-    const parentParams: ParamsObject<object> = newParent.formulaParams;
+    const parentParams: ParamsObject = newParent.formulaParams;
     if (parentParams.children) {
       const parentFormula: FormulaImplementation = getFormulaImplementation(
         newParent.formula

@@ -26,34 +26,32 @@ interface Params extends ParamsObject<ChildParams> {
 
 function calculateWeightedAverage(
   attainmentName: string,
-  params: Params | null,
+  paramsObject: ParamsObject,
   subGrades: Array<CalculationResult>
 ): CalculationResult {
 
   let grade: number = 0;
   let status: Status = Status.Pass;
+  const params: Params = paramsObject as Params;
+  const weights: Map<string, ChildParams> = new Map(params.children);
 
-  if (params) {
-    const weights: Map<string, ChildParams> = new Map(params.children);
-
-    for (const subGrade of subGrades) {
-      if (subGrade.status !== Status.Pass)
-        status = Status.Fail;
-
-      const weight: number | undefined = weights.get(subGrade.attainmentName)?.weight;
-      if (weight) {
-        grade += subGrade.grade * weight;
-      } else {
-        throw new ApiError(
-          `weight unspecified for attainment ${subGrade.attainmentName}`,
-          HttpCode.InternalServerError
-        );
-      }
-    }
-
-    if (grade < params.minRequiredGrade)
+  for (const subGrade of subGrades) {
+    if (subGrade.status !== Status.Pass)
       status = Status.Fail;
+
+    const weight: number | undefined = weights.get(subGrade.attainmentName)?.weight;
+    if (weight) {
+      grade += subGrade.grade * weight;
+    } else {
+      throw new ApiError(
+        `weight unspecified for attainment ${subGrade.attainmentName}`,
+        HttpCode.InternalServerError
+      );
+    }
   }
+
+  if (grade < params.minRequiredGrade)
+    status = Status.Fail;
 
   return {
     attainmentName: attainmentName,
@@ -73,34 +71,32 @@ interface Params extends ParamsObject<ChildParams> {
 
 function calculateWeightedAverage(
   attainmentName: string,
-  params: Params | null,
+  paramsObject: ParamsObject,
   subGrades: Array<CalculationResult>
 ): CalculationResult {
 
   let grade: number = 0;
   let status: Status = Status.Pass;
+  const params: Params = paramsObject as Params;
+  const weights: Map<string, ChildParams> = new Map(params.children);
 
-  if (params) {
-    const weights: Map<string, ChildParams> = new Map(params.children);
-
-    for (const subGrade of subGrades) {
-      if (subGrade.status !== Status.Pass)
-        status = Status.Fail;
-
-      const weight: number | undefined = weights.get(subGrade.attainmentName)?.weight;
-      if (weight) {
-        grade += subGrade.grade * weight;
-      } else {
-        throw new ApiError(
-          \`weight unspecified for attainment \${subGrade.attainmentName}\`,
-          HttpCode.InternalServerError
-        );
-      }
-    }
-
-    if (grade < params.minRequiredGrade)
+  for (const subGrade of subGrades) {
+    if (subGrade.status !== Status.Pass)
       status = Status.Fail;
+
+    const weight: number | undefined = weights.get(subGrade.attainmentName)?.weight;
+    if (weight) {
+      grade += subGrade.grade * weight;
+    } else {
+      throw new ApiError(
+        \`weight unspecified for attainment \${subGrade.attainmentName}\`,
+        HttpCode.InternalServerError
+      );
+    }
   }
+
+  if (grade < params.minRequiredGrade)
+    status = Status.Fail;
 
   return {
     attainmentName: attainmentName,

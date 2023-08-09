@@ -15,7 +15,9 @@ export interface FormulaData {
   codeSnippet: string
 }
 
-export interface ParamsObject<T = { [key: string]: unknown }> {
+export type ChildParamsObject = { [key: string]: any };
+
+export interface ParamsObject<T = ChildParamsObject> {
   children?: Array<[string, T]>,
-  [key: string]: unknown
+  [key: string]: any
 }

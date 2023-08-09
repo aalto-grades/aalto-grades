@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { ParamsObject } from 'aalto-grades-common/types';
 import {
   CreationOptional, DataTypes, ForeignKey, Model, InferAttributes, InferCreationAttributes
 } from 'sequelize';
@@ -22,7 +23,7 @@ export default class Attainment extends Model<
   // Default value, expiry date in AttainmentGrade takes precedence
   declare daysValid: number;
   declare formula: Formula;
-  declare formulaParams: CreationOptional<object>;
+  declare formulaParams: ParamsObject;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
