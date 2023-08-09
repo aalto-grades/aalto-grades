@@ -84,11 +84,13 @@ export default function StudentGradesDialog(props: {
           </Button>
         </DialogActions>
       </Dialog>
-      <EditGradeDialog
-        grade={editGrade}
-        setOpen={setShowEditDialog}
-        open={showEditDialog}
-      />
+      {(editGrade) && (
+        <EditGradeDialog
+          grade={editGrade}
+          setOpen={setShowEditDialog}
+          open={showEditDialog}
+        />
+      )}
     </>
   );
 }
