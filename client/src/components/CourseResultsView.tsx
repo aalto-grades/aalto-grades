@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { FinalGrade } from 'aalto-grades-common/types';
+import { AttainmentData, FinalGrade } from 'aalto-grades-common/types';
 import { Box, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
@@ -14,7 +14,7 @@ import CourseResultsTable from './course-results-view/CourseResultsTable';
 import {
   useCalculateFinalGrades, UseCalculateFinalGradesResult,
   useDownloadCsvTemplate, UseDownloadCsvTemplateResult,
-  useGetFinalGrades
+  useGetFinalGrades, useGetRootAttainment
 } from '../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../hooks/useSnackPackAlerts';
 import { State } from '../types';
@@ -33,6 +33,25 @@ export default function CourseResultsView(): JSX.Element {
       selectedStudents.find((student: FinalGrade) => student.grades.length === 0)
     ));
   }, [selectedStudents]);
+
+  const attainmentTree: UseQueryResult<AttainmentData> = useGetRootAttainment(
+    courseId, assessmentModelId, 'descendants'
+  );
+
+  // Does not contain root attainment
+  const attainmentList: Array<AttainmentData> = [];
+
+  function constructAttainmentList(attainment: AttainmentData): void {
+    if (attainment.subAttainments) {
+      for (const subAttainment of attainment.subAttainments) {
+        attainmentList.push(subAttainment);
+        constructAttainmentList(subAttainment);
+      }
+    }
+  }
+
+  if (attainmentTree.data)
+    constructAttainmentList(attainmentTree.data);
 
   const students: UseQueryResult<Array<FinalGrade>> = useGetFinalGrades(
     courseId, assessmentModelId
@@ -119,6 +138,7 @@ export default function CourseResultsView(): JSX.Element {
       </Typography>
       <CourseResultsTable
         students={students.data ?? []}
+        attainmentList={attainmentList}
         loading={students.isLoading}
         calculateFinalGrades={handleCalculateFinalGrades}
         downloadCsvTemplate={handleDownloadCsvTemplate}
