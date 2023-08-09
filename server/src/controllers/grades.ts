@@ -1148,7 +1148,7 @@ export async function editUserGrade(req: Request, res: Response): Promise<void> 
       .notRequired(),
     date: yup.date().notRequired(),
     expiryDate: yup.date().notRequired(),
-    comment: yup.string().min(1).notRequired()
+    comment: yup.string().notRequired()
   });
 
   const { grade, status, date, expiryDate, comment }: EditGrade =
@@ -1173,7 +1173,7 @@ export async function editUserGrade(req: Request, res: Response): Promise<void> 
     status: status ?? gradeData.status,
     date: date ?? gradeData.date,
     expiryDate: expiryDate ?? gradeData.expiryDate,
-    comment: comment ?? gradeData.comment,
+    comment: (comment && comment.length > 0) ? comment : gradeData.comment,
     manual: true,
     graderId: grader.id
   }).save();
