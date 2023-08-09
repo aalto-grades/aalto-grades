@@ -2,19 +2,55 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { FinalGrade } from 'aalto-grades-common/types';
+import { AttainmentData, AttainmentGradeData, FinalGrade } from 'aalto-grades-common/types';
 import {
   Checkbox, Link, TableCell, TableRow, Tooltip
 } from '@mui/material';
 import { JSX } from 'react';
+import { Params, useParams } from 'react-router-dom';
+import { UseQueryResult } from '@tanstack/react-query';
+
+import { useGetGradeTreeOfUser } from '../../hooks/useApi';
 
 export default function CourseResultsTableRow(props: {
   student: FinalGrade,
+  attainmentList: Array<AttainmentData>,
   selectedStudents: Array<FinalGrade>,
   handleSelectForGrading: (studentNumber: string) => void,
   setUser: (user: FinalGrade) => void,
   setShowUserGrades: (showUserGrades: boolean) => void
 }): JSX.Element {
+
+  const { courseId, assessmentModelId }: Params =
+    useParams() as { courseId: string, assessmentModelId: string };
+
+  const gradeTree: UseQueryResult<AttainmentGradeData> = useGetGradeTreeOfUser(
+    courseId, assessmentModelId, props.student.userId
+  );
+
+  function getGrade(attainmentId: number): number {
+    if (!gradeTree.data)
+      return -1;
+
+    function traverseTree(grade: AttainmentGradeData): number {
+      if (grade.attainmentId === attainmentId) {
+        return grade.grades[0].grade;
+      }
+
+      if (grade.subAttainments) {
+        for (const subGrade of grade.subAttainments) {
+          const gradeValue: number = traverseTree(subGrade);
+          if (gradeValue >= 0) {
+            return gradeValue;
+          }
+        }
+      }
+      return -1;
+    }
+
+    return traverseTree(gradeTree.data);
+  }
+
   return (
     <TableRow
       hover
@@ -57,8 +93,21 @@ export default function CourseResultsTableRow(props: {
         align="left"
         key={`${props.student.studentNumber}_grade`}
       >
-        {props.student.grades.length > 0 ? props.student.grades[0].grade : 0}
+        {props.student.grades.length > 0 ? props.student.grades[0].grade : '-'}
       </TableCell>
+      {
+        gradeTree.data && (
+          props.attainmentList.map((attainment: AttainmentData) => (
+            <TableCell
+              sx={{ width: '100px' }}
+              align="left"
+              key={`${props.student.studentNumber}_${attainment.name}_grade`}
+            >
+              {getGrade(attainment.id ?? -1)}
+            </TableCell>
+          ))
+        )
+      }
       <TableCell
         sx={{ width: '100px' }}
         align="left"

@@ -136,6 +136,7 @@ export default function CourseResultsTable(props: {
                           <CourseResultsTableRow
                             key={student.studentNumber}
                             student={student}
+                            attainmentList={props.attainmentList}
                             selectedStudents={props.selectedStudents}
                             handleSelectForGrading={handleSelectForGrading}
                             setUser={setUser}
