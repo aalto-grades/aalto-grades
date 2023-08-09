@@ -2,17 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, Formula, FormulaData } from 'aalto-grades-common/types';
+import { AttainmentData } from 'aalto-grades-common/types';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { Box, Button, Collapse, IconButton, List, Typography } from '@mui/material';
 import { useState } from 'react';
-import { UseQueryResult } from '@tanstack/react-query';
 
 import Attainment from './Attainment';
-import EditFormulaDialog from '../edit-formula-dialog/EditFormulaDialog';
 import LeafAttainment from './LeafAttainment';
 
-import { useGetFormula } from '../../hooks/useApi';
 import { State } from '../../types';
 
 // An attainment component with subAttainments and a formula
@@ -29,14 +26,9 @@ export default function ParentAttainment(props: {
 
   // For opening and closing the list of sub-attainments
   const [open, setOpen]: State<boolean> = useState(true);
-  const [editFormulaOpen, setEditFormulaOpen]: State<boolean> = useState(false);
 
   const childParams: Map<string, object> = new Map(
     props.attainment.formulaParams?.children
-  );
-
-  const formula: UseQueryResult<FormulaData> = useGetFormula(
-    props.attainment.formula ?? Formula.Manual
   );
 
   function handleClick(): void {
@@ -45,34 +37,6 @@ export default function ParentAttainment(props: {
 
   return (
     <>
-      <Box sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        px: 1
-      }}>
-        <EditFormulaDialog
-          handleClose={(): void => setEditFormulaOpen(false)}
-          open={editFormulaOpen}
-          attainment={props.attainment}
-          attainmentTree={props.attainmentTree}
-          setAttainmentTree={props.setAttainmentTree}
-        />
-        <Typography variant="body1" sx={{ flexGrow: 1, textAlign: 'left', mb: 0.5 }}>
-          {'Grading Formula: ' + formula.data?.name ?? 'Loading...'}
-        </Typography>
-        {
-          /* Navigation below doesn't work because formula selection has
-             only been implemented for course grade */
-        }
-        <Button
-          size='small'
-          sx={{ mb: 0.5 }}
-          onClick={(): void => setEditFormulaOpen(true)}
-        >
-          Edit formula
-        </Button>
-      </Box>
       <LeafAttainment
         attainmentTree={props.attainmentTree}
         setAttainmentTree={props.setAttainmentTree}

@@ -72,8 +72,7 @@ export default function EditFormulaDialog(props: {
   function hasUnsavedChanges(): boolean {
     return Boolean(
       // Formula was changed
-      formula?.id !== props.attainment.formula
-      || (
+      (formula?.id !== props.attainment.formula) || (
         // Or the parameters were changed
         formula?.id !== Formula.Manual && params && childParams && !deepEqual(
           props.attainment.formulaParams,
@@ -126,9 +125,14 @@ export default function EditFormulaDialog(props: {
   }
 
   function constructParamsObject(): ParamsObject {
+    const formulaHasChildParams: boolean =
+      Boolean((formula?.childParams.length ?? 0) > 0);
+
     return {
       ...params,
-      children: childParams ? Array.from(childParams.entries()) : undefined
+      children: (formulaHasChildParams && childParams)
+        ? Array.from(childParams.entries())
+        : undefined
     } as ParamsObject;
   }
 
