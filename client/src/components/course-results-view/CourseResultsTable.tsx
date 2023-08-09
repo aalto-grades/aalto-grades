@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { FinalGrade, Status } from 'aalto-grades-common/types';
+import { FinalGrade } from 'aalto-grades-common/types';
 import {
   Box, Checkbox, CircularProgress, Link, Paper, Table, TableBody,
   TableCell, TableContainer, TablePagination, TableRow, Tooltip

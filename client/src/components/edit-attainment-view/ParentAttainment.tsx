@@ -4,7 +4,7 @@
 
 import { AttainmentData } from 'aalto-grades-common/types';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import { Box, Button, Collapse, IconButton, List, Typography } from '@mui/material';
+import { Box, Collapse, IconButton, List, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import Attainment from './Attainment';
