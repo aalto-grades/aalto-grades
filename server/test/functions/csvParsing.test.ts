@@ -4,6 +4,8 @@
 
 import { HttpCode } from 'aalto-grades-common/types';
 
+import Attainment from '../../src/database/models/attainment';
+
 import { parseGradesFromCsv, parseHeaderFromCsv } from '../../src/controllers/grades';
 import { ApiError, AttainmentGradeModelData, StudentGrades } from '../../src/types';
 
@@ -21,26 +23,26 @@ function checkError(error: unknown, httpCode: HttpCode, message: string | Array<
 describe('Test CSV header parser', () => {
 
   it('should parse correctly formatted header of attainment CSV file', async () => {
-    let result: Array<number> = await parseHeaderFromCsv(
+    let result: Array<Attainment> = await parseHeaderFromCsv(
       ['StudentNumber', 'name1', 'name5', 'name9', 'name16'], 1
     );
     expect(result.length).toBe(4);
-    expect(result).toEqual(expect.arrayContaining([1, 5, 9, 16]));
-    expect(result.every((value: number) => !isNaN(value))).toBeTruthy();
+    expect(result.map((attainment: Attainment) => attainment.id))
+      .toEqual(expect.arrayContaining([1, 5, 9, 16]));
 
     result = await parseHeaderFromCsv(
       ['STUDENTNUMBER', 'name2', 'name6', 'name10'], 2
     );
     expect(result.length).toBe(3);
-    expect(result).toEqual(expect.arrayContaining([2, 6, 10]));
-    expect(result.every((value: number) => !isNaN(value))).toBeTruthy();
+    expect(result.map((attainment: Attainment) => attainment.id))
+      .toEqual(expect.arrayContaining([2, 6, 10]));
 
     result = await parseHeaderFromCsv(
       ['studentnumber', 'name1'], 1
     );
     expect(result.length).toBe(1);
-    expect(result).toEqual(expect.arrayContaining([1]));
-    expect(result.every((value: number) => !isNaN(value))).toBeTruthy();
+    expect(result.map((attainment: Attainment) => attainment.id))
+      .toEqual(expect.arrayContaining([1]));
   });
 
   it('should throw error if parsing fails due to invalid header column', async () => {
@@ -110,6 +112,18 @@ describe('Test CSV header parser', () => {
 
 describe('Test CSV student grades parser', () => {
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function attainmentIdsToAttainments(attainmentIds: Array<number>): Array<any> {
+    return attainmentIds.map((id: number) => {
+      return {
+        id: id,
+        formulaParams: {
+          minRequiredGrade: 0
+        }
+      };
+    });
+  }
+
   it('should parse correctly formatted grades in the CSV file', () => {
     const studentGradingData: Array<Array<string>> = [
       [ '111111', '12', '32', '3', '3', '7' ],
@@ -120,7 +134,9 @@ describe('Test CSV student grades parser', () => {
       [ '666666', '16', '4', '0', '15', '2' ]
     ];
     const attainmentIds: Array<number> = [1, 2, 3, 4, 5];
-    const result: Array<StudentGrades> = parseGradesFromCsv(studentGradingData, attainmentIds);
+    const result: Array<StudentGrades> = parseGradesFromCsv(
+      studentGradingData, attainmentIdsToAttainments(attainmentIds)
+    );
 
     result.forEach((student: StudentGrades, index: number) => {
       const rowData: Array<string> = studentGradingData[index];
@@ -146,7 +162,7 @@ describe('Test CSV student grades parser', () => {
     const attainmentIds: Array<number> = [1, 2, 3, 4, 5];
 
     try {
-      parseGradesFromCsv(studentGradingData, attainmentIds);
+      parseGradesFromCsv(studentGradingData, attainmentIdsToAttainments(attainmentIds));
     } catch (error: unknown) {
       checkError(
         error,
@@ -168,7 +184,7 @@ describe('Test CSV student grades parser', () => {
     const attainmentIds: Array<number> = [1, 2, 3, 4, 5];
 
     try {
-      parseGradesFromCsv(studentGradingData, attainmentIds);
+      parseGradesFromCsv(studentGradingData, attainmentIdsToAttainments(attainmentIds));
     } catch (error: unknown) {
       checkError(
         error,

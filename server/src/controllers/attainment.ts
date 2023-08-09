@@ -23,40 +23,25 @@ import {
 import { isTeacherInChargeOrAdmin } from './utils/user';
 
 async function validateFormulaParams(
-  formula?: Formula,
-  formulaParams?: object | null,
+  formula: Formula,
+  formulaParams: ParamsObject,
   subAttainmentNames?: Array<string>
 ): Promise<void> {
-  if (formula && formulaParams) {
-    if (formula === Formula.Manual) {
-      throw new ApiError(
-        'formula params of manual must be null or undefined, got '
-        + `${JSON.stringify(formulaParams)}`,
-        HttpCode.BadRequest
-      );
-    } else {
-      // Validate params with the formula's param schema
-      await getFormulaImplementation(formula).paramSchema.validate(
-        formulaParams, { abortEarly: false }
-      );
+  // Validate params with the formula's param schema
+  await getFormulaImplementation(formula).paramSchema.validate(
+    formulaParams, { abortEarly: false }
+  );
 
-      if (!subAttainmentNames) {
-        throw new ApiError(
-          'names of subattainments were not passed to validateFormulaParams with'
-          + `non-manual formula ${formula}`,
-          HttpCode.InternalServerError
-        );
-      }
+  if (formulaParams.children) {
+    // Ensure that all subattainments are included in children and that there
+    // are no invalid subattainment names in children
+    const uncheckedNamesInParams: Array<string> = formulaParams.children?.map(
+      (value: [string, unknown]) => value[0]
+    ) ?? [];
 
-      // Ensure that all subattainments are included in children and that there
-      // are no invalid subattainment names in children
-      const uncheckedNamesInParams: Array<string> =
-        (formulaParams as ParamsObject).children.map(
-          (value: [string, unknown]) => value[0]
-        );
+    const notFound: Array<string> = [];
 
-      const notFound: Array<string> = [];
-
+    if (subAttainmentNames) {
       for (const name of subAttainmentNames) {
         const index: number = uncheckedNamesInParams.indexOf(name);
         if (index < 0) {
@@ -65,20 +50,20 @@ async function validateFormulaParams(
           uncheckedNamesInParams.splice(index, 1);
         }
       }
+    }
 
-      if (notFound.length >  0) {
-        throw new ApiError(
-          `formula params do not include subattainments with names ${notFound}`,
-          HttpCode.BadRequest
-        );
-      }
+    if (notFound.length > 0) {
+      throw new ApiError(
+        `formula params do not include subattainments with names ${notFound}`,
+        HttpCode.BadRequest
+      );
+    }
 
-      if (uncheckedNamesInParams.length > 0) {
-        throw new ApiError(
-          `invalid subattainment names in formula params: ${uncheckedNamesInParams}`,
-          HttpCode.BadRequest
-        );
-      }
+    if (uncheckedNamesInParams.length > 0) {
+      throw new ApiError(
+        `invalid subattainment names in formula params: ${uncheckedNamesInParams}`,
+        HttpCode.BadRequest
+      );
     }
   }
 }
@@ -97,8 +82,7 @@ export async function getAttainment(req: Request, res: Response): Promise<void> 
   await idSchema.validate({ id: req.params.attainmentId }, { abortEarly: false });
   const attainmentId: number = Number(req.params.attainmentId);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [course, assessmentModel, attainment]: [Course, AssessmentModel, Attainment] =
+  const [_course, assessmentModel, _attainment]: [Course, AssessmentModel, Attainment] =
     await validateAttainmentPath(
       req.params.courseId, req.params.assessmentModelId, req.params.attainmentId
     );
@@ -135,8 +119,7 @@ export async function getAttainment(req: Request, res: Response): Promise<void> 
 export async function getRootAttainment(req: Request, res: Response): Promise<void> {
   const tree: string = await validateTreeParam(req.query.tree as string);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [course, assessmentModel]: [Course, AssessmentModel] =
+  const [_course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
     );
@@ -194,11 +177,10 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     formula: yup
       .string()
       .oneOf(Object.values(Formula))
-      .notRequired(),
+      .required(),
     formulaParams: yup // More thorough validation is done separately
       .object()
-      .nullable()
-      .notRequired(),
+      .required(),
     subAttainments: yup
       .array()
       .of(yup.lazy(() => requestSchema.default(undefined)))
@@ -236,8 +218,8 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
      * manual, then this new attainment must be added to the children list of the
      * parent attainment's params.
      */
-    if (parentAttainment.formulaParams && parentAttainment.formula !== Formula.Manual) {
-      const parentParams: ParamsObject<object> = parentAttainment.formulaParams as ParamsObject;
+    const parentParams: ParamsObject = parentAttainment.formulaParams;
+    if (parentParams.children) {
       const parentFormula: FormulaImplementation = getFormulaImplementation(
         parentAttainment.formula
       );
@@ -312,7 +294,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       assessmentModelId: assessmentModel.id,
       name: requestTree.name,
       daysValid: requestTree.daysValid,
-      formula: requestTree.formula ?? Formula.Manual,
+      formula: requestTree.formula,
       formulaParams: requestTree.formulaParams
     });
 
@@ -323,7 +305,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       name: dbEntry.name,
       daysValid: dbEntry.daysValid,
       formula: dbEntry.formula,
-      formulaParams: dbEntry.formulaParams as ParamsObject,
+      formulaParams: dbEntry.formulaParams,
       subAttainments: []
     };
 
@@ -373,8 +355,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
 
   await requestSchema.validate(req.body, { abortEarly: false });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [course, assessmentModel, attainment]: [Course, AssessmentModel, Attainment] =
+  const [course, _assessmentModel, attainment]: [Course, AssessmentModel, Attainment] =
     await validateAttainmentPath(
       req.params.courseId, req.params.assessmentModelId, req.params.attainmentId
     );
@@ -385,7 +366,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   const daysValid: number | undefined = req.body.daysValid;
   const parentId: number | undefined = req.body.parentId;
   const formula: Formula | undefined = req.body.formula;
-  const formulaParams: object | undefined = req.body.formulaParams;
+  const formulaParams: ParamsObject | undefined = req.body.formulaParams;
 
   let parentAttainment: Attainment | null = null;
 
@@ -417,7 +398,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
 
   await validateFormulaParams(
     formula ?? attainment.formula,
-    formulaParams,
+    formulaParams ?? attainment.formulaParams,
     (await Attainment.findAll({
       attributes: ['name'],
       where: {
@@ -432,9 +413,8 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
         attainment.parentId, HttpCode.InternalServerError
       );
 
-      if (oldParent.formulaParams) {
-        const parentParams: ParamsObject = oldParent.formulaParams as ParamsObject;
-
+      const parentParams: ParamsObject = oldParent.formulaParams;
+      if (parentParams.children) {
         for (const i in parentParams.children) {
           if (parentParams.children[i][0] === attainment.name) {
             parentParams.children.splice(Number(i), 1);
@@ -459,8 +439,8 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
       parentId, HttpCode.InternalServerError
     );
 
-    if (newParent.formulaParams && newParent.formula !== Formula.Manual) {
-      const parentParams: ParamsObject<object> = newParent.formulaParams as ParamsObject;
+    const parentParams: ParamsObject = newParent.formulaParams;
+    if (parentParams.children) {
       const parentFormula: FormulaImplementation = getFormulaImplementation(
         newParent.formula
       );
@@ -488,9 +468,9 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
       attainment.parentId, HttpCode.InternalServerError
     );
 
-    if (parent.formulaParams) {
-      const parentParams: ParamsObject = parent.formulaParams as ParamsObject;
 
+    const parentParams: ParamsObject = parent.formulaParams;
+    if (parentParams.children) {
       for (const i in parentParams.children) {
         if (parentParams.children[i][0] === attainment.name) {
           parentParams.children[i][0] = name;
@@ -516,11 +496,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     daysValid: daysValid ?? attainment.daysValid,
     parentId: parentId ?? attainment.parentId,
     formula: formula ?? attainment.formula,
-    formulaParams: (
-      formula === Formula.Manual
-        ? undefined
-        : formulaParams ?? attainment.formulaParams
-    )
+    formulaParams: formulaParams ?? attainment.formulaParams
   }).save();
 
   const attainmentTree: AttainmentData = {
@@ -545,8 +521,7 @@ export async function deleteAttainment(req: Request, res: Response): Promise<voi
   // Validation.
   await idSchema.validate({ id: attainmentId }, { abortEarly: false });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [course, assessmentModel, attainment]: [Course, AssessmentModel, Attainment] =
+  const [course, _assessmentModel, attainment]: [Course, AssessmentModel, Attainment] =
     await validateAttainmentPath(
       req.params.courseId, req.params.assessmentModelId, req.params.attainmentId
     );

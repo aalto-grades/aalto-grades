@@ -962,6 +962,65 @@ describe(
       expect(res.body.data).toBeDefined();
     });
 
+    async function checkStatusOfGrade(
+      userId: number,
+      attainmentId: number,
+      expectedGrade: number,
+      expectedStatus: Status
+    ): Promise<void> {
+      const attainmentGrade: AttainmentGrade = await AttainmentGrade.findOne({
+        where: {
+          userId: userId,
+          attainmentId: attainmentId
+        }
+      }) as AttainmentGrade;
+
+      expect(attainmentGrade.grade).toBe(expectedGrade);
+      expect(attainmentGrade.status).toBe(expectedStatus);
+    }
+
+    it(
+      'should determine whether manual attainment was passed based on min required grade',
+      async () => {
+        const csvData: fs.ReadStream = fs.createReadStream(
+          path.resolve(__dirname, '../mock-data/csv/grades_failing_manual.csv'), 'utf8'
+        );
+
+        res = await request
+          .post('/v1/courses/2/assessment-models/51/grades/csv')
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
+
+        await checkStatusOfGrade(5, 285, 1, Status.Fail);
+        await checkStatusOfGrade(6, 285, 1.9, Status.Fail);
+        await checkStatusOfGrade(7, 285, 2, Status.Pass);
+        await checkStatusOfGrade(8, 285, 3, Status.Pass);
+      }
+    );
+
+    it(
+      'should determine whether non-manual attainment was passed based on min required grade',
+      async () => {
+        const csvData: fs.ReadStream = fs.createReadStream(
+          path.resolve(__dirname, '../mock-data/csv/grades_failing_non_manual.csv'), 'utf8'
+        );
+
+        res = await request
+          .post('/v1/courses/2/assessment-models/51/grades/csv')
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
+
+        await checkStatusOfGrade(1, 284, 1, Status.Fail);
+        await checkStatusOfGrade(2, 284, 2, Status.Fail);
+        await checkStatusOfGrade(3, 284, 3, Status.Pass);
+        await checkStatusOfGrade(4, 284, 3.4, Status.Pass);
+      }
+    );
+
     it(
       'should allow uploading multiple grades to the same attainment for a student',
       async () => {
