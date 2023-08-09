@@ -18,6 +18,7 @@ import { State } from '../../types';
 
 export default function CourseResultsTable(props: {
   students: Array<FinalGrade>,
+  attainmentList: Array<AttainmentData>,
   calculateFinalGrades: () => Promise<void>,
   downloadCsvTemplate: () => Promise<void>,
   loading: boolean,
@@ -117,6 +118,7 @@ export default function CourseResultsTable(props: {
                 size='small'
               >
                 <CourseResultsTableHead
+                  attainmentList={props.attainmentList}
                   order={order}
                   orderBy={orderBy}
                   onRequestSort={handleRequestSort}
