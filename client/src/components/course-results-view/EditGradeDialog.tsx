@@ -34,7 +34,7 @@ export default function EditGradeDialog(props: {
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
   const [gradeId, setGradeId]: State<number> =
     useState<number>(props.grade.grades[0].gradeId as number);
-  const [initialValues, setInitialValues]: State<EditGrade> = useState<EditGrade>({
+  const [formInitialValues, setFormInitialValues]: State<EditGrade> = useState<EditGrade>({
     grade: props.grade.grades[0].grade,
     status: props.grade.grades[0].status,
     date: props.grade.grades[0].date,
@@ -47,7 +47,7 @@ export default function EditGradeDialog(props: {
       props.grade.grades.find((grade: GradeOption) => grade.gradeId == id);
 
     if (toForm) {
-      setInitialValues({
+      setFormInitialValues({
         grade: toForm.grade,
         status: toForm.status,
         date: toForm.date,
@@ -80,6 +80,10 @@ export default function EditGradeDialog(props: {
         }
       );
     }
+  }
+
+  function closeDialog(): void {
+    props.setOpen(false);
   }
 
   return (
@@ -117,30 +121,30 @@ export default function EditGradeDialog(props: {
               (props.grade && props.grade.grades.length > 1) &&
               <Typography variant='h3'>Edit Form</Typography>
             }
-            {(initialValues) ? (
+            {(formInitialValues) ? (
               <Formik
                 enableReinitialize
-                initialValues={initialValues}
+                initialValues={formInitialValues}
                 validationSchema={yup.object({
                   grade: yup.number().min(0).notRequired(),
                   status: yup.string().oneOf(Object.values(Status)).notRequired(),
                   date: yup.date().notRequired(),
                   expiryDate: yup.date().notRequired(),
-                  comment: yup.string().min(1).notRequired()
+                  comment: yup.string().notRequired()
                 })}
                 onSubmit={handleSubmit}
               >
                 {
-                  ({ errors, handleChange, isSubmitting, isValid, touched, values, initialValues }:
-                  {
-                    errors: FormikErrors<EditGrade>,
-                    handleChange: (e: ChangeEvent<Element>) => void,
-                    isSubmitting: boolean,
-                    isValid: boolean,
-                    touched: FormikTouched<EditGrade>,
-                    values: EditGrade,
-                    initialValues: EditGrade
-                  }
+                  ({ errors, handleChange, isSubmitting, isValid, values, initialValues }:
+                {
+                  errors: FormikErrors<EditGrade>,
+                  handleChange: (e: ChangeEvent<Element>) => void,
+                  isSubmitting: boolean,
+                  isValid: boolean,
+                  touched: FormikTouched<EditGrade>,
+                  values: EditGrade,
+                  initialValues: EditGrade
+                }
                   ): JSX.Element => (
                     <Form>
                       <TextField
@@ -154,9 +158,9 @@ export default function EditGradeDialog(props: {
                         margin='normal'
                         helperText={
                           errors.grade
-                          ?? 'The numerical grade of a student for an attainment.'
+                        ?? 'The numerical grade of a student for an attainment.'
                         }
-                        error={touched.grade && Boolean(errors.grade)}
+                        error={Boolean(errors.grade)}
                         onChange={handleChange}
                       />
                       <TextField
@@ -173,7 +177,7 @@ export default function EditGradeDialog(props: {
                             ? String(errors.status)
                             : 'Grading status indicator.'
                         }
-                        error={touched.status && Boolean(errors.status)}
+                        error={Boolean(errors.status)}
                         onChange={handleChange}
                         select
                       >
@@ -189,7 +193,7 @@ export default function EditGradeDialog(props: {
                         id="date"
                         type="date"
                         fullWidth
-                        value={values.date}
+                        value={new Date(values.date as Date).toISOString().split('T')[0]}
                         disabled={isSubmitting}
                         label="Grade Date"
                         InputLabelProps={{ shrink: true }}
@@ -199,14 +203,14 @@ export default function EditGradeDialog(props: {
                             ? String(errors.date)
                             : 'Date when attainment is completed (e.g., deadline or exam date)'
                         }
-                        error={touched.date && Boolean(errors.date)}
+                        error={Boolean(errors.date)}
                         onChange={handleChange}
                       />
                       <TextField
                         id="expiryDate"
                         type="date"
                         fullWidth
-                        value={values.expiryDate}
+                        value={new Date(values.expiryDate as Date).toISOString().split('T')[0]}
                         disabled={isSubmitting}
                         label="Grade Expiry date"
                         InputLabelProps={{ shrink: true }}
@@ -216,7 +220,7 @@ export default function EditGradeDialog(props: {
                             ? String(errors.expiryDate)
                             : 'Date when the grade expires.'
                         }
-                        error={touched.expiryDate && Boolean(errors.expiryDate)}
+                        error={Boolean(errors.expiryDate)}
                         onChange={handleChange}
                       />
                       <TextField
@@ -233,7 +237,7 @@ export default function EditGradeDialog(props: {
                             ? String(errors.comment)
                             : 'Comment for grade.'
                         }
-                        error={touched.comment && Boolean(errors.comment)}
+                        error={Boolean(errors.comment)}
                         onChange={handleChange}
                       />
                       <Box sx={{
@@ -253,17 +257,17 @@ export default function EditGradeDialog(props: {
                             if (initialValues != values) {
                               setShowDialog(true);
                             } else {
-                              props.setOpen(false);
+                              closeDialog();
                             }
                           }}
                         >
-                          Cancel
+                          Close
                         </Button>
                         <Button
                           id='ag_confirm_instance_details_btn'
                           variant='contained'
                           type='submit'
-                          disabled={!isValid || isSubmitting}
+                          disabled={!isValid || isSubmitting || initialValues == values}
                         >
                           Submit
                         </Button>
@@ -281,7 +285,7 @@ export default function EditGradeDialog(props: {
       <UnsavedChangesDialog
         setOpen={setShowDialog}
         open={showDialog}
-        handleDiscard={(): void => props.setOpen(false)}
+        handleDiscard={(): void => closeDialog()}
       />
       <AlertSnackbar snackPack={snackPack} />
     </>
