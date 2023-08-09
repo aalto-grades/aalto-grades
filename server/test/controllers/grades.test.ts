@@ -750,6 +750,7 @@ describe(
         expect(option.manual).toBeDefined();
         expect(option.date).toBeDefined();
         expect(option.expiryDate).toBeDefined();
+        expect(option.comment).toBeDefined();
       });
 
       data.subAttainments?.forEach((sub: AttainmentGradeData) => {
