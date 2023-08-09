@@ -19,5 +19,6 @@ export type ChildParamsObject = { [key: string]: any };
 
 export interface ParamsObject<T = ChildParamsObject> {
   children?: Array<[string, T]>,
+  minRequiredGrade: number,
   [key: string]: any
 }

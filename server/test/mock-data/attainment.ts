@@ -175,7 +175,7 @@ export const jestMockAttainment: Attainment = new Attainment({
   formula: Formula.Manual,
   formulaParams: {
     minRequiredGrade: 0
-  } as object,
+  },
   createdAt: new Date(),
   updatedAt: new Date()
 }, { isNewRecord: false });

@@ -963,6 +963,20 @@ describe(
     });
 
     it(
+      'should determine whether manual attainment was passed based on min required grade',
+      async () => {
+        // TODO
+      }
+    );
+
+    it(
+      'should determine whether non-manual attainment was passed based on min required grade',
+      async () => {
+        // TODO
+      }
+    );
+
+    it(
       'should allow uploading multiple grades to the same attainment for a student',
       async () => {
         async function uploadGrade(n: 1 | 2): Promise<void> {
