@@ -2,15 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { FinalGrade } from 'aalto-grades-common/types';
+import { AttainmentData, FinalGrade } from 'aalto-grades-common/types';
 import {
-  Box, Checkbox, CircularProgress, Link, Paper, Table, TableBody,
-  TableCell, TableContainer, TablePagination, TableRow, Tooltip
+  Box, CircularProgress, Paper, Table, TableBody, TableCell, TableContainer,
+  TablePagination, TableRow
 } from '@mui/material';
-import { ChangeEvent, MouseEvent, SyntheticEvent, useEffect, useState } from 'react';
+import { ChangeEvent, JSX, MouseEvent, SyntheticEvent, useEffect, useState } from 'react';
 
 import CourseResultsTableHead from './CourseResultsTableHead';
-import CourseResultsTableToolbar from './CourseResultTableToolbar';
+import CourseResultsTableRow from './CourseResultsTableRow';
+import CourseResultsTableToolbar from './CourseResultsTableToolbar';
 import StudentGradesDialog from './StudentGradesDialog';
 
 import { getComparator, stableSort } from '../../services/sorting';
@@ -132,66 +133,17 @@ export default function CourseResultsTable(props: {
                       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                       .map((student: FinalGrade) => {
                         return (
-                          <TableRow
-                            hover
-                            tabIndex={-1}
+                          <CourseResultsTableRow
                             key={student.studentNumber}
-                          >
-                            <TableCell
-                              sx={{ width: '100px' }}
-                              component="th"
-                              id={student.studentNumber}
-                              scope="row"
-                              padding="normal"
-                            >
-                              <Tooltip
-                                placement="top"
-                                title="Click to show individual grades for student"
-                              >
-                                <Link
-                                  component="button"
-                                  variant="body2"
-                                  onClick={(): void => {
-                                    setUser(student);
-                                    setShowUserGrades(true);
-                                  }}
-                                >
-                                  {student.studentNumber}
-                                </Link>
-                              </Tooltip>
-                            </TableCell>
-                            <TableCell
-                              sx={{ width: '100px' }}
-                              component="th"
-                              id={`${student.studentNumber}_credits}`}
-                              scope="row"
-                              padding="normal"
-                            >
-                              {student.grades.length > 0 ? student.credits : '-'}
-                            </TableCell>
-                            <TableCell
-                              sx={{ width: '100px' }}
-                              align="left"
-                              key={`${student.studentNumber}_grade`}
-                            >
-                              {student.grades.length > 0 ? student.grades[0].grade : 0}
-                            </TableCell>
-                            <TableCell
-                              sx={{ width: '100px' }}
-                              align="left"
-                              key={`${student.studentNumber}_checkbox`}
-                            >
-                              <Checkbox
-                                size="small"
-                                onClick={(): void => handleSelectForGrading(student.studentNumber)}
-                                checked={props.selectedStudents.filter((value: FinalGrade) => {
-                                  return value.studentNumber === student.studentNumber;
-                                }).length !== 0}
-                              />
-                            </TableCell>
-                          </TableRow>
+                            student={student}
+                            selectedStudents={props.selectedStudents}
+                            handleSelectForGrading={handleSelectForGrading}
+                            setUser={setUser}
+                            setShowUserGrades={setShowUserGrades}
+                          />
                         );
-                      })}
+                      })
+                  }
                   {emptyRows > 0 && (
                     <TableRow
                       style={{
