@@ -276,6 +276,9 @@ describe(
             name: 'New',
             daysValid: 365,
             formula: Formula.Manual,
+            formulaParams: {
+              minRequiredGrade: 0
+            }
           })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -288,7 +291,7 @@ describe(
         expect(res.body.data.assessmentModelId).toBe(31);
         expect(res.body.data.parentId).not.toBeDefined();
         expect(res.body.data.formula).toBe(Formula.Manual);
-        expect(res.body.data.formulaParams).toBe(null);
+        expect(res.body.data.formulaParams).toEqual({ minRequiredGrade: 0 });
         expect(res.body.data.daysValid).toBeDefined();
         expect(res.body.data.subAttainments).toBeDefined();
       }
@@ -306,6 +309,9 @@ describe(
             name: 'examination',
             daysValid: 365,
             formula: Formula.Manual,
+            formulaParams: {
+              minRequiredGrade: 0
+            }
           })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.userCookie)
@@ -318,7 +324,7 @@ describe(
         expect(res.body.data.assessmentModelId).toBe(35);
         expect(res.body.data.parentId).not.toBeDefined();
         expect(res.body.data.formula).toBe(Formula.Manual);
-        expect(res.body.data.formulaParams).toBe(null);
+        expect(res.body.data.formulaParams).toEqual({ minRequiredGrade: 0 });
         expect(res.body.data.daysValid).toBeDefined();
         expect(res.body.data.subAttainments).toBeDefined();
       }
@@ -382,7 +388,11 @@ describe(
           .send({
             parentId: 264,
             name: 'born',
-            daysValid: 10
+            daysValid: 10,
+            formula: Formula.Manual,
+            formulaParams: {
+              minRequiredGrade: 0
+            }
           })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -399,7 +409,9 @@ describe(
 
         expect({ ...oldParentParams, children: undefined })
           .toStrictEqual({ ...newParentParams, children: undefined });
-        expect([...oldParentParams.children, ['born', { weight: 0 }]])
+
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        expect([...oldParentParams.children!, ['born', { weight: 0 }]])
           .toStrictEqual(newParentParams.children);
       }
     );
@@ -555,12 +567,18 @@ describe(
               {
                 name: 'i-am-present',
                 daysValid: 1,
-                formula: Formula.Manual
+                formula: Formula.Manual,
+                formulaParams: {
+                  minRequiredGrade: 0
+                }
               },
               {
                 name: 'i-am-absent',
                 daysValid: 0,
-                formula: Formula.Manual
+                formula: Formula.Manual,
+                formulaParams: {
+                  minRequiredGrade: 0
+                }
               }
             ]
           })
@@ -601,7 +619,10 @@ describe(
               {
                 name: 'the good',
                 daysValid: 1,
-                formula: Formula.Manual
+                formula: Formula.Manual,
+                formulaParams: {
+                  minRequiredGrade: 0
+                }
               }
             ]
           })
@@ -629,6 +650,10 @@ describe(
               {
                 name: 'Exercise 1',
                 daysValid: badInput,
+                formula: Formula.Manual,
+                formulaParams: {
+                  minRequiredGrade: 0
+                },
                 subAttainments: [],
               }
             ]
@@ -650,10 +675,18 @@ describe(
               {
                 name: 'Exercise 1',
                 daysValid: 30,
+                formula: Formula.Manual,
+                formulaParams: {
+                  minRequiredGrade: 0
+                },
                 subAttainments: [
                   {
                     name: 'Exercise 1',
                     daysValid: 30,
+                    formula: Formula.Manual,
+                    formulaParams: {
+                      minRequiredGrade: 0
+                    },
                     subAttainments: badInput,
                   }
                 ],
@@ -677,14 +710,26 @@ describe(
               {
                 name: 'Exercise 1',
                 daysValid: 30,
+                formula: Formula.Manual,
+                formulaParams: {
+                  minRequiredGrade: 0
+                },
                 subAttainments: [
                   {
                     name: 'Exercise 1',
                     daysValid: 30,
+                    formula: Formula.Manual,
+                    formulaParams: {
+                      minRequiredGrade: 0
+                    },
                     subAttainments: [
                       {
                         name: 'Exercise 1',
                         daysValid: badInput,
+                        formula: Formula.Manual,
+                        formulaParams: {
+                          minRequiredGrade: 0
+                        },
                         subAttainments: [],
                       }
                     ],
@@ -1223,6 +1268,10 @@ describe(
           {
             name: 'Test exercise',
             daysValid: 30,
+            formula: Formula.Manual,
+            formulaParams: {
+              minRequiredGrade: 0
+            },
             subAttainments: []
           }
         )
@@ -1252,6 +1301,10 @@ describe(
           {
             name: 'Test exercise 2',
             daysValid: 30,
+            formula: Formula.Manual,
+            formulaParams: {
+              minRequiredGrade: 0
+            },
             subAttainments: []
           }
         )
@@ -1280,15 +1333,27 @@ describe(
         {
           name: 'Test exercise',
           daysValid: 30,
+          formula: Formula.Manual,
+          formulaParams: {
+            minRequiredGrade: 0
+          },
           subAttainments: [
             {
               name: 'Test exercise 1.1',
               daysValid: 60,
+              formula: Formula.Manual,
+              formulaParams: {
+                minRequiredGrade: 0
+              },
               subAttainments: []
             },
             {
               name: 'Test exercise 1.2',
               daysValid: 90,
+              formula: Formula.Manual,
+              formulaParams: {
+                minRequiredGrade: 0
+              },
               subAttainments: []
             }
           ]

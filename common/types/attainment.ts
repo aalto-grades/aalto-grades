@@ -10,8 +10,8 @@ export interface AttainmentData {
   parentId?: number,
   name: string,
   daysValid: number,
-  formula?: Formula,
-  formulaParams?: ParamsObject,
+  formula: Formula,
+  formulaParams: ParamsObject,
   subAttainments?: Array<AttainmentData>
 }
 

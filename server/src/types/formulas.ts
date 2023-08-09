@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Status } from 'aalto-grades-common/types';
+import { ChildParamsObject, ParamsObject, Status } from 'aalto-grades-common/types';
 import * as yup from 'yup';
 
 export interface CalculationResult {
@@ -16,7 +16,7 @@ export interface CalculationResult {
  */
 export type FormulaFunction = (
   attainmenName: string,
-  params: any | null, // TODO: Remove any
+  paramsObject: ParamsObject,
   subGrades: Array<CalculationResult>
 ) => CalculationResult;
 
@@ -31,7 +31,7 @@ export interface FormulaImplementation {
   name: string,
   params: Array<string>,
   childParams: Array<string>,
-  defaultChildParams: object
+  defaultChildParams: ChildParamsObject
 }
 
 /**
@@ -40,7 +40,7 @@ export interface FormulaImplementation {
 export interface FormulaNode {
   formulaImplementation: FormulaImplementation,
   subFormulaNodes: Array<FormulaNode>,
-  formulaParams: object | null,
+  formulaParams: ParamsObject,
   attainmentId: number,
   attainmentName: string
 }
