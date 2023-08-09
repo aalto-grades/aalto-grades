@@ -517,13 +517,14 @@ export async function getGradeTreeOfUser(req: Request, res: Response): Promise<v
  * @param {Array<string>} header - Header part of the CSV file.
  * @param {number} assessmentModelId - ID of the assessment model grades are
  * being added to.
- * @returns {Promise<Array<number>>} - Array containing the IDs of attainments.
+ * @returns {Promise<Array<Attainment>>} - Array containing the attainments
+ * from the header.
  * @throws {ApiError} - If first column not "StudentNumber" (case-insensitive)
  * header array is empty or any of the attainment names are malformed or missing.
  */
 export async function parseHeaderFromCsv(
   header: Array<string>, assessmentModelId: number
-): Promise<Array<number>> {
+): Promise<Array<Attainment>> {
   const errors: Array<string> = [];
 
   // Remove first input "StudentNumber". Avoid using shift(), which will have
@@ -537,13 +538,7 @@ export async function parseHeaderFromCsv(
     );
   }
 
-  interface IdAndName {
-    id: number,
-    name: string
-  }
-
-  const attainments: Array<IdAndName> = await Attainment.findAll({
-    attributes: ['id', 'name'],
+  const attainments: Array<Attainment> = await Attainment.findAll({
     where: {
       [Op.and]: [
         {
@@ -560,7 +555,7 @@ export async function parseHeaderFromCsv(
 
   if (attainmentNames.length > attainments.length) {
     for (const attainmentName of attainmentNames) {
-      if (!attainments.find((attainment: IdAndName) => attainment.name === attainmentName)) {
+      if (!attainments.find((attainment: Attainment) => attainment.name === attainmentName)) {
         errors.push(
           'Header attainment data parsing failed at column '
             + `${attainmentNames.indexOf(attainmentName) + 2}. `
@@ -571,28 +566,24 @@ export async function parseHeaderFromCsv(
     }
   }
 
-  const attainmentIds: Array<number> = attainments.map((attainment: IdAndName) => {
-    return attainment.id;
-  });
-
   // If any column parsing fails, throw error with invalid column info.
   if (errors.length > 0) {
     throw new ApiError(errors, HttpCode.BadRequest);
   }
-  return attainmentIds;
+  return attainments;
 }
 
 /**
  * Parses student grading data from a CSV file and creates an array of Student objects.
  * @param {Array<Array<string>>} studentGradingData - Body part of the CSV file.
- * @param {Array<number>} attainmentIds - Array of attainment ID corresponding to each grade column.
+ * @param {Array<Attainment>} attainments - Array of attainments corresponding to each grade column.
  * @returns {Array<Student>} - Array of Student objects containing their student number and
  * an array of their grades.
  * @throws {ApiError} - If there is an error in the CSV file (e.g. incorrect data type in a cell).
  * Collects all errors found to an array, does not throw error immediately on first incorrect value.
 */
 export function parseGradesFromCsv(
-  studentGradingData: Array<Array<string>>, attainmentIds: Array<number>
+  studentGradingData: Array<Array<string>>, attainments: Array<Attainment>
 ): Array<StudentGrades> {
   const students: Array<StudentGrades> = [];
   const errors: Array<string> = [];
@@ -629,7 +620,7 @@ export function parseGradesFromCsv(
       grades: [],
     };
 
-    for (let i: number = 0; i < attainmentIds.length; i++) {
+    for (let i: number = 0; i < attainments.length; i++) {
 
       if (isNaN(Number(gradingData[i]))) {
         errors.push(
@@ -637,13 +628,16 @@ export function parseGradesFromCsv(
           ` expected number, received "${gradingData[i]}"`
         );
       } else {
+        const gradeValue: number = parseFloat(gradingData[i]);
+        const statusValue: Status =
+          gradeValue >= attainments[i].formulaParams.minRequiredGrade
+            ? Status.Pass : Status.Fail;
+
         const grade: AttainmentGradeModelData = {
-          attainmentId: attainmentIds[i],
-          grade: parseInt(gradingData[i], 10),
+          attainmentId: attainments[i].id,
+          grade: gradeValue,
           manual: true,
-          // TODO: Determine status based on whether the uploaded grade is
-          // larger than min required
-          status: Status.Pass
+          status: statusValue
         };
         student.grades.push(grade);
       }
@@ -717,12 +711,12 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
         // Parse header and grades separately. Always first parse header before
         // parsing the grades as the grade parser needs the attainment id array.
-        const attainmentIds: Array<number> = await parseHeaderFromCsv(
+        const attainments: Array<Attainment> = await parseHeaderFromCsv(
           header, assessmentModel.id
         );
 
         let parsedStudentData: Array<StudentGrades> = parseGradesFromCsv(
-          studentGradingData, attainmentIds
+          studentGradingData, attainments
         );
 
         // Check all users (students) exists in db, create new users if needed.
