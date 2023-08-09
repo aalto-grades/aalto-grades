@@ -32,7 +32,7 @@ async function validateFormulaParams(
     formulaParams, { abortEarly: false }
   );
 
-  if (formulaParams.children || subAttainmentNames) {
+  if (formulaParams.children) {
     // Ensure that all subattainments are included in children and that there
     // are no invalid subattainment names in children
     const uncheckedNamesInParams: Array<string> = formulaParams.children?.map(
