@@ -12,96 +12,82 @@ import { ChangeEvent, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 import * as yup from 'yup';
 
+import AlertSnackbar from '../alerts/AlertSnackbar';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
+import { UseEditGradeResult, useEditGrade } from '../../hooks/useApi';
+import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import { State } from '../../types';
 
-// A Dialog component for viewing the individual grades of a user.
+// A Dialog component for editing individual grade of a user.
 export default function EditGradeDialog(props: {
-  grade?: AttainmentGradeData,
+  grade: AttainmentGradeData,
   setOpen: (open: boolean) => void,
   open: boolean
 }): JSX.Element {
   const { courseId, assessmentModelId }: Params =
     useParams() as { courseId: string, assessmentModelId: string };
 
-  /*
-  const [gradeToEdit, setGradeToEdit]: State<GradeOption> =
-    useState<GradeOption>(props.grade?.grades[0] as GradeOption);
-  */
+  const editGrade: UseEditGradeResult = useEditGrade();
+  const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
+  const [gradeId, setGradeId]: State<number> =
+    useState<number>(props.grade.grades[0].gradeId as number);
+  const [initialValues, setInitialValues]: State<EditGrade> = useState<EditGrade>({
+    grade: props.grade.grades[0].grade,
+    status: props.grade.grades[0].status,
+    date: props.grade.grades[0].date,
+    expiryDate: props.grade.grades[0].expiryDate,
+    comment: props.grade.grades[0].comment
+  });
 
-  const [initialValues, setInitialValues]: State<EditGrade | null> =
-    useState<EditGrade | null>(null);
+  function setToForm(id: number): void {
+    const toForm: GradeOption | undefined =
+      props.grade.grades.find((grade: GradeOption) => grade.gradeId == id);
 
-  if (!initialValues && props.grade?.grades.length !== 0) {
-    setInitialValues({
-      grade: props.grade?.grades[0].grade,
-      status: props.grade?.grades[0].status,
-      date: props.grade?.grades[0].date,
-      expiryDate: props.grade?.grades[0].expiryDate,
-      comment: '-'
-    });
-  }
-
-  /*
-export interface EditGrade {
-  grade?: number,
-  status?: Status,
-  date?: Date,
-  expiryDate?: Date,
-  comment?: string
-}
-                  grade: props.grade?.grades[0].grade,
-                  status: props.grade?.grades[0].status,
-                  date: props.grade?.grades[0].date,
-                  expiryDate: props.grade?.grades[0].expiryDate,
-                  comment: -
-    */
-
-
-  function testing(id: number): void {
-    console.log(props.grade);
-    console.log('selected is id', id);
+    if (toForm) {
+      setInitialValues({
+        grade: toForm.grade,
+        status: toForm.status,
+        date: toForm.date,
+        expiryDate: toForm.expiryDate,
+        comment: toForm.comment
+      });
+      setGradeId(toForm.gradeId as number);
+    }
   }
 
   async function handleSubmit(values: EditGrade): Promise<void> {
-    if (courseId && assessmentModelId) {
-
-      console.log('submitted', values);
-      /*
-      addInstance.mutate(
+    if (courseId && assessmentModelId && gradeId) {
+      editGrade.mutate(
         {
-          courseId: courseId,
-          instance: {
-            ...values,
-            sisuCourseInstanceId: (
-              (sisuInstance && sisuInstance.data)
-                ? sisuInstance.data.sisuCourseInstanceId
-                : undefined
-            )
+          courseId,
+          assessmentModelId,
+          gradeId,
+          userId: props.grade.userId as number,
+          data: {
+            ...values
           }
         },
         {
           onSuccess: () => {
-            console.log('jeejeeee');
+            snackPack.push({
+              msg: 'Grade updated successfully.',
+              severity: 'success'
+            });
           }
         }
       );
-      */
     }
   }
-
-  //{grade.expiryDate && `- expiry date: ${grade.expiryDate.toISOString()}`}
-
 
   return (
     <>
       <Dialog open={props.open} transitionDuration={{ exit: 800 }}>
-        <DialogTitle>Edit grade data for {props.grade?.attainmentName}:</DialogTitle>
+        <DialogTitle>Edit grade data for {props.grade.attainmentName}:</DialogTitle>
         <DialogContent sx={{ pb: 0 }}>
-          {(props.grade && props.grade?.grades.length > 1) && (
+          {(props.grade && props.grade.grades.length > 1) && (
             <Box sx={{ mb: 2.5 }}>
               <Box sx={{ mb: 1 }}>
                 Attainment has multiple grades, select grade for editing.
@@ -110,11 +96,11 @@ export interface EditGrade {
               <Select
                 labelId="assessmentModelSelect"
                 id="assessmentModelSelectId"
-                value={String(props.grade.grades[0].gradeId)}
+                value={String(gradeId)}
                 label="Assessment model"
                 fullWidth
                 onChange={(event: SelectChangeEvent): void => {
-                  testing(Number(event.target.value));
+                  setToForm(Number(event.target.value));
                 }}
               >
                 {props.grade.grades.map((grade: GradeOption) => (
@@ -128,11 +114,12 @@ export interface EditGrade {
           )}
           <Box>
             {
-              (props.grade && props.grade?.grades.length > 1) &&
+              (props.grade && props.grade.grades.length > 1) &&
               <Typography variant='h3'>Edit Form</Typography>
             }
             {(initialValues) ? (
               <Formik
+                enableReinitialize
                 initialValues={initialValues}
                 validationSchema={yup.object({
                   grade: yup.number().min(0).notRequired(),
@@ -296,6 +283,7 @@ export interface EditGrade {
         open={showDialog}
         handleDiscard={(): void => props.setOpen(false)}
       />
+      <AlertSnackbar snackPack={snackPack} />
     </>
   );
 }
