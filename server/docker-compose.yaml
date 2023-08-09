@@ -23,17 +23,16 @@ services:
       service: database
 
   pgadmin:
-    image: dpage/pgadmin4:latest
+    extends:
+      file: ../common-services.yaml
+      service: pgadmin
     depends_on:
       - database
-    restart: always
     ports:
       - "5050:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: root
-    networks:
-      - local
     profiles:
       - development
     volumes:
