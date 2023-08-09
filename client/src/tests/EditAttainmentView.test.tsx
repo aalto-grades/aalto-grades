@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData } from 'aalto-grades-common/types';
+import { AttainmentData, Formula } from 'aalto-grades-common/types';
 import { rest } from 'msw';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -118,6 +118,10 @@ describe('Tests for EditAttainmentView components', () => {
         parentId: 3,
         name: '',
         daysValid: 0,
+        formula: Formula.Manual,
+        formulaParams: {
+          minRequiredGrade: 0
+        }
       };
 
       // Create one sub-attainment:

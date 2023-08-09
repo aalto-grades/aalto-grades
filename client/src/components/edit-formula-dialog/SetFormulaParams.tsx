@@ -2,7 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, FormulaData, ParamsObject } from 'aalto-grades-common/types';
+import {
+  AttainmentData, ChildParamsObject, FormulaData, ParamsObject
+} from 'aalto-grades-common/types';
 import { TextField } from '@mui/material';
 import { ChangeEvent } from 'react';
 
@@ -14,9 +16,9 @@ import { getParamLabel } from '../../utils';
 export default function SetFormulaParams(props: {
   attainment: AttainmentData,
   formula: FormulaData,
-  params: object | null,
-  setParams: (formulaParams: object) => void,
-  childParams: Map<string, object> | null,
+  params: ParamsObject | null,
+  setParams: (formulaParams: ParamsObject) => void,
+  childParams: Map<string, ChildParamsObject> | null,
   setChildParams: (childParams: Map<string, object>) => void
 }): JSX.Element {
 
@@ -31,7 +33,7 @@ export default function SetFormulaParams(props: {
       });
       props.setChildParams(new Map(oldParams.children));
     } else {
-      props.setParams({});
+      props.setParams({ minRequiredGrade: 0 });
       props.setChildParams(new Map());
     }
   }
@@ -41,7 +43,7 @@ export default function SetFormulaParams(props: {
   ): void {
     // TODO: This will not always be a number
     if (props.params)
-      (props.params[param as keyof object] as unknown) = Number(event.target.value);
+      props.params[param] = Number(event.target.value);
   }
 
   return (
@@ -66,7 +68,7 @@ export default function SetFormulaParams(props: {
                     handleParamChange(event, param);
                   }
                 }
-                defaultValue={props.params[param as keyof object]}
+                defaultValue={props.params[param]}
               />
             );
           }
