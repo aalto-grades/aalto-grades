@@ -40,11 +40,12 @@
   },
   "scripts": {
     "start": "npm --prefix ../common run build && react-scripts start",
-    "build": "npm --prefix ../common run build && react-scripts build && node set-web-labels.js",
+    "build": "npm --prefix ../common run build && react-scripts build && node set-web-labels.js && npx license-checker-rseidelsohn --excludePrivatePackages --production --plainVertical > build/licenses.txt",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "npx eslint `find . -name '*.tsx' -not -path './node_modules/*'`",
-    "lint:fix": "npx eslint `find . -name '*.tsx' -not -path './node_modules/*'` --fix"
+    "lint:fix": "npx eslint `find . -name '*.tsx' -not -path './node_modules/*'` --fix",
+    "prod-licenses": "npx license-checker-rseidelsohn --excludePrivatePackages --production --summary"
   },
   "eslintConfig": {
     "extends": [
@@ -68,7 +69,7 @@
     "@typescript-eslint/parser": "^5.59.8",
     "eslint": "^8.27.0",
     "eslint-plugin-react": "^7.31.10",
-    "license-checker": "^25.0.1",
+    "license-checker-rseidelsohn": "^4.2.6",
     "typescript-eslint": "^0.0.1-alpha.0"
   },
   "jest": {
