@@ -39,7 +39,9 @@ function GradeCell(props: {
         sx={{ width: '100px' }}
         align="left"
       >
-        {props.grade && bestGradeOption(props.grade.grades)}
+        {(props.grade) && (
+          props.grade.grades.length > 0 ? bestGradeOption(props.grade.grades) : '-'
+        )}
         {(props.grade && props.grade.grades.length > 1) && (
           <IconButton size='small' color='primary' sx={{ ml: 1 }}>
             <MoreHorizIcon
