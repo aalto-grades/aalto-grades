@@ -57,11 +57,6 @@ function parseSisuCourseInstance(
         en: instance.name.en,
         fi: instance.name.fi,
         sv: instance.name.sv
-      },
-      evaluationInformation: {
-        en: instance.summary.assesmentMethods.en,
-        fi: instance.summary.assesmentMethods.fi,
-        sv: instance.summary.assesmentMethods.sv
       }
     }
   };

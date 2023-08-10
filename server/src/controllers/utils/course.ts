@@ -77,11 +77,6 @@ export function parseCourseFull(course: CourseFull): CourseData {
       en: '',
       fi: '',
       sv: ''
-    },
-    evaluationInformation: {
-      en: '',
-      fi: '',
-      sv: ''
     }
   };
 

@@ -86,14 +86,6 @@ export const mockSisuInstances: Array<CourseInstanceData> = [
         en: 'Databases, Lecture',
         fi: 'Tietokannat, Luento-opetus',
         sv: 'Databaser, Föreläsning'
-      },
-      evaluationInformation: {
-        en: 'Final examination and an compulsory assignment.'
-          + ' Possibility to get extra credits from exercises.',
-        fi: 'Tentti ja pakollinen harjoitustyö.'
-          + ' Mahdollisuus saada lisäpisteitä harjoitustehtävistä. ',
-        sv: 'Tentamen samt ett obligatoriskt övningsarbete.'
-          + ' Räkneövningarna ger möjlighet till tilläggspoäng.'
       }
     }
   }

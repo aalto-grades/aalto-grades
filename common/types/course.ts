@@ -28,7 +28,6 @@ export interface CourseData {
   maxCredits: number,
   department: LocalizedString,
   name: LocalizedString,
-  evaluationInformation?: LocalizedString
   teachersInCharge: Array<UserData>
 }
 

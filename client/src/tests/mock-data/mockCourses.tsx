@@ -20,11 +20,6 @@ export const mockCourses: Array<CourseData> = [
       sv: 'Databaser',
       en: 'Databases'
     },
-    evaluationInformation: {
-      fi:'',
-      sv:'',
-      en:''
-    },
     teachersInCharge: [
       {
         id: 45,
@@ -46,11 +41,6 @@ export const mockCourses: Array<CourseData> = [
       fi: 'Ohjelmointi 1',
       sv: 'Programmering 1',
       en: 'Programming 1'
-    },
-    evaluationInformation: {
-      fi:'',
-      sv:'',
-      en:''
     },
     teachersInCharge: [
       {
