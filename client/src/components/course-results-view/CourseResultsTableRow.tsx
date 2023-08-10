@@ -6,8 +6,9 @@ import {
   AttainmentData, AttainmentGradeData, FinalGrade, GradeOption
 } from 'aalto-grades-common/types';
 import {
-  Checkbox, Link, TableCell, TableRow, Tooltip
+  Checkbox, IconButton, Link, TableCell, TableRow, Tooltip
 } from '@mui/material';
+import { MoreHoriz as MenuIcon } from '@mui/icons-material';
 import { JSX } from 'react';
 import { Params, useParams } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
@@ -39,24 +40,23 @@ export default function CourseResultsTableRow(props: {
     return bestSoFar;
   }
 
-  function getGrade(attainmentId: number): number {
+  function getAttainmentGrade(attainmentId: number): AttainmentGradeData | null {
     if (!gradeTree.data)
-      return -1;
+      return null;
 
-    function traverseTree(grade: AttainmentGradeData): number {
+    function traverseTree(grade: AttainmentGradeData): AttainmentGradeData | null {
       if (grade.attainmentId === attainmentId) {
-        return bestGradeOption(grade.grades);
+        return grade;
       }
 
       if (grade.subAttainments) {
         for (const subGrade of grade.subAttainments) {
-          const gradeValue: number = traverseTree(subGrade);
-          if (gradeValue >= 0) {
-            return gradeValue;
-          }
+          const maybeFound: AttainmentGradeData | null = traverseTree(subGrade);
+          if (maybeFound)
+            return maybeFound;
         }
       }
-      return -1;
+      return null;
     }
 
     return traverseTree(gradeTree.data);
@@ -105,18 +105,32 @@ export default function CourseResultsTableRow(props: {
         key={`${props.student.studentNumber}_grade`}
       >
         {props.student.grades.length > 0 ? bestGradeOption(props.student.grades) : '-'}
+        {(props.student.grades.length  > 1) && (
+          <IconButton size='small' color='primary' sx={{ ml: 1 }}>
+            <MenuIcon />
+          </IconButton>
+        )}
       </TableCell>
       {
         gradeTree.data && (
-          props.attainmentList.map((attainment: AttainmentData) => (
-            <TableCell
-              sx={{ width: '100px' }}
-              align="left"
-              key={`${props.student.studentNumber}_${attainment.name}_grade`}
-            >
-              {getGrade(attainment.id ?? -1)}
-            </TableCell>
-          ))
+          props.attainmentList.map((attainment: AttainmentData) => {
+            const grade: AttainmentGradeData | null = getAttainmentGrade(attainment.id ?? -1);
+
+            return (
+              <TableCell
+                sx={{ width: '100px' }}
+                align="left"
+                key={`${props.student.studentNumber}_${attainment.name}_grade`}
+              >
+                {grade && bestGradeOption(grade.grades)}
+                {(grade && grade.grades.length > 1) && (
+                  <IconButton size='small' color='primary' sx={{ ml: 1 }}>
+                    <MenuIcon />
+                  </IconButton>
+                )}
+              </TableCell>
+            );
+          })
         )
       }
       <TableCell
