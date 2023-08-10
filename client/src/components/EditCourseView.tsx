@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseData, UserData } from 'aalto-grades-common/types';
+import { CourseData, GradingScale, UserData } from 'aalto-grades-common/types';
 import { Form, Formik, FormikProps } from 'formik';
 import {
   Delete as DeleteIcon,
@@ -11,7 +11,7 @@ import {
 } from '@mui/icons-material';
 import {
   Avatar, Box, Button, CircularProgress, Container, IconButton,
-  List, ListItem, ListItemAvatar, ListItemText, TextField, Typography
+  List, ListItem, ListItemAvatar, ListItemText, MenuItem, TextField, Typography
 } from '@mui/material';
 import { ChangeEvent, HTMLInputTypeAttribute, useState } from 'react';
 import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
@@ -26,12 +26,14 @@ import {
   useEditCourse, UseEditCourseResult,
   useGetCourse
 } from '../hooks/useApi';
+import { convertToClientGradingScale } from '../services/textFormat';
 import { State } from '../types';
 
 interface FormData {
   courseCode: string,
   minCredits: number,
   maxCredits: number,
+  gradingScale: GradingScale,
   teacherEmail: string,
   departmentEn: string,
   departmentFi: string,
@@ -47,11 +49,14 @@ function EditCourseTextField(props: {
   value: keyof FormData,
   label: string,
   helperText: string,
-  type?: HTMLInputTypeAttribute
+  select?: boolean,
+  type?: HTMLInputTypeAttribute,
+  children?: Array<JSX.Element>
 }): JSX.Element {
   return (
     <TextField
       id={props.value}
+      name={props.value}
       type={props.type ?? 'text'}
       fullWidth
       value={props.form.values[props.value]}
@@ -65,7 +70,10 @@ function EditCourseTextField(props: {
       }
       error={props.form.touched[props.value] && Boolean(props.form.errors[props.value])}
       onChange={props.onChange}
-    />
+      select={props.select}
+    >
+      {props.children}
+    </TextField>
   );
 }
 
@@ -142,6 +150,7 @@ export default function EditCourseView(): JSX.Element {
         courseCode: course.data.courseCode,
         minCredits: course.data.minCredits,
         maxCredits: course.data.maxCredits,
+        gradingScale: course.data.gradingScale,
         teacherEmail: '',
         departmentEn: course.data.department.en,
         departmentFi: course.data.department.fi,
@@ -161,6 +170,7 @@ export default function EditCourseView(): JSX.Element {
         courseCode: '',
         minCredits: 0,
         maxCredits: 0,
+        gradingScale: GradingScale.Numerical,
         teacherEmail: '',
         departmentEn: '',
         departmentFi: '',
@@ -185,6 +195,7 @@ export default function EditCourseView(): JSX.Element {
       courseCode: values.courseCode,
       minCredits: values.minCredits,
       maxCredits: values.maxCredits,
+      gradingScale: GradingScale.Numerical,
       department: {
         fi: values.departmentFi,
         sv: values.departmentSv,
@@ -240,6 +251,9 @@ export default function EditCourseView(): JSX.Element {
                     'Maximum credits cannot be lower than minimum credits'
                   )
                   .required('Maximum credits is required'),
+                gradingScale: yup.string()
+                  .oneOf(Object.values(GradingScale))
+                  .required(),
                 teacherEmail: yup.string()
                   .email('Please input valid email address')
                   .notRequired(),
@@ -313,6 +327,24 @@ export default function EditCourseView(): JSX.Element {
                       helperText='Input maximum credits.'
                       type='number'
                     />
+                    <EditCourseTextField
+                      onChange={form.handleChange}
+                      form={form}
+                      value='gradingScale'
+                      label='Grading Scale*'
+                      helperText='Grading scale of the course, e.g., 0-5 or pass/fail.'
+                      select={true}
+                    >
+                      {
+                        Object.values(GradingScale).map((value: GradingScale) => {
+                          return (
+                            <MenuItem key={value} value={value}>
+                              {convertToClientGradingScale(value)}
+                            </MenuItem>
+                          );
+                        })
+                      }
+                    </EditCourseTextField>
                     <TextField
                       id="teacherEmail"
                       type="text"

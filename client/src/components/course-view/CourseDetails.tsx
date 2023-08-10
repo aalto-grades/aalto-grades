@@ -9,6 +9,7 @@ import AssessmentModelsList from './AssessmentModelsList';
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 
 import useAuth, { AuthContextType } from '../../hooks/useAuth';
+import { convertToClientGradingScale } from '../../services/textFormat';
 
 export default function CourseDetails(props: {
   course: CourseData,
@@ -46,7 +47,11 @@ export default function CourseDetails(props: {
           }
         />
         <LightLabelBoldValue
-          label='Organizing department'
+          label='Grading Scale'
+          value={convertToClientGradingScale(props.course.gradingScale)}
+        />
+        <LightLabelBoldValue
+          label='Organizing Department'
           value={props.course.department.en}
         />
         <LightLabelBoldValue

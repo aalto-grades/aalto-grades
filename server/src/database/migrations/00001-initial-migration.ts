@@ -68,6 +68,10 @@ export default {
           type: DataTypes.INTEGER,
           allowNull: false
         },
+        grading_scale: {
+          type: DataTypes.ENUM('PASS_FAIL', 'NUMERICAL', 'SECOND_NATIONAL_LANGUAGE'),
+          allowNull: false
+        },
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE
       }, { transaction });
@@ -236,10 +240,6 @@ export default {
           type: DataTypes.STRING,
           allowNull: true,
           unique: true
-        },
-        grading_scale: {
-          type: DataTypes.ENUM('PASS_FAIL', 'NUMERICAL', 'SECOND_NATIONAL_LANGUAGE'),
-          allowNull: false
         },
         starting_period: {
           type: DataTypes.ENUM('I', 'II', 'III', 'IV', 'V'),

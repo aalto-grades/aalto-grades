@@ -10,11 +10,11 @@ export const mockSisuInstances: Array<CourseInstanceData> = [
     startDate: '2022-08-14',
     endDate: '2022-11-13',
     type: 'teaching-participation-lectures',
-    gradingScale: GradingScale.Numerical,
     courseData: {
       courseCode: 'CS-C3120',
       minCredits: 5,
       maxCredits: 5,
+      gradingScale: GradingScale.Numerical,
       teachersInCharge: [
         {
           name: 'Elisa Mekler'
@@ -40,11 +40,11 @@ export const mockSisuInstances: Array<CourseInstanceData> = [
     startDate: '2021-08-14',
     endDate: '2021-11-13',
     type: 'exam-exam',
-    gradingScale: GradingScale.Numerical,
     courseData: {
       courseCode: 'CS-C3120',
       minCredits: 5,
       maxCredits: 5,
+      gradingScale: GradingScale.Numerical,
       teachersInCharge: [
         {
           name: 'Elisa Mekler'
@@ -67,11 +67,11 @@ export const mockSisuInstances: Array<CourseInstanceData> = [
     startDate: '2023-02-06',
     endDate: '2023-05-19',
     type: 'exam-exam',
-    gradingScale: GradingScale.Numerical,
     courseData: {
       courseCode: 'CS-A1150',
       minCredits: 5,
       maxCredits: 5,
+      gradingScale: GradingScale.Numerical,
       teachersInCharge: [
         {
           name: 'Kerttu Maaria Pollari-Malmi'
@@ -86,14 +86,6 @@ export const mockSisuInstances: Array<CourseInstanceData> = [
         en: 'Databases, Lecture',
         fi: 'Tietokannat, Luento-opetus',
         sv: 'Databaser, Föreläsning'
-      },
-      evaluationInformation: {
-        en: 'Final examination and an compulsory assignment.'
-          + ' Possibility to get extra credits from exercises.',
-        fi: 'Tentti ja pakollinen harjoitustyö.'
-          + ' Mahdollisuus saada lisäpisteitä harjoitustehtävistä. ',
-        sv: 'Tentamen samt ett obligatoriskt övningsarbete.'
-          + ' Räkneövningarna ger möjlighet till tilläggspoäng.'
       }
     }
   }

@@ -2,9 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {
-  CourseInstanceData, GradingScale, HttpCode, Period
-} from 'aalto-grades-common/types';
+import { CourseInstanceData, HttpCode, Period } from 'aalto-grades-common/types';
 import { Request, Response } from 'express';
 import * as yup from 'yup';
 
@@ -20,8 +18,8 @@ import { findCourseById, parseCourseFull } from './utils/course';
 import { isTeacherInChargeOrAdmin } from './utils/user';
 
 interface CourseInstanceWithCourseFull extends CourseInstance {
-    Course: CourseFull
-  }
+  Course: CourseFull
+}
 
 export async function getCourseInstance(req: Request, res: Response): Promise<void> {
   // Validate IDs.
@@ -76,7 +74,6 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
     startDate: instance.startDate,
     endDate: instance.endDate,
     type: instance.type,
-    gradingScale: instance.gradingScale as GradingScale,
     courseData: parseCourseFull(instance.Course)
   };
 
@@ -130,8 +127,7 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
       endingPeriod: instance.endingPeriod as Period,
       startDate: instance.startDate,
       endDate: instance.endDate,
-      type: instance.type,
-      gradingScale: instance.gradingScale as GradingScale,
+      type: instance.type
     };
 
     courseInstances.push(instanceData);
@@ -144,33 +140,13 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
 
 export async function addCourseInstance(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
-    assessmentModelId: yup
-      .number()
-      .notRequired(),
-    gradingScale: yup
-      .string()
-      .oneOf(Object.values(GradingScale))
-      .required(),
-    sisuCourseInstanceId: yup
-      .string()
-      .notRequired(),
-    startingPeriod: yup
-      .string()
-      .oneOf(Object.values(Period))
-      .required(),
-    endingPeriod: yup
-      .string()
-      .oneOf(Object.values(Period))
-      .required(),
-    type: yup
-      .string()
-      .required(),
-    startDate: yup
-      .date()
-      .required(),
-    endDate: yup
-      .date()
-      .required()
+    assessmentModelId: yup.number().notRequired(),
+    sisuCourseInstanceId: yup.string().notRequired(),
+    startingPeriod: yup.string().oneOf(Object.values(Period)).required(),
+    endingPeriod: yup.string().oneOf(Object.values(Period)).required(),
+    type: yup.string().required(),
+    startDate: yup.date().required(),
+    endDate: yup.date().required()
   });
 
   const courseId: number = Number(req.params.courseId);
@@ -216,7 +192,6 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
     courseId: courseId,
     assessmentModelId: req.body.assessmentModelId,
     sisuCourseInstanceId: req.body.sisuCourseInstanceId,
-    gradingScale: req.body.gradingScale,
     startingPeriod: req.body.startingPeriod,
     endingPeriod: req.body.endingPeriod,
     type: req.body.type,

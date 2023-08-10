@@ -12,7 +12,7 @@ import { UseQueryResult } from '@tanstack/react-query';
 
 import { useGetAllInstances } from '../../hooks/useApi';
 import { compareDate } from '../../services/sorting';
-import { convertToClientGradingScale, formatDateString } from '../../services/textFormat';
+import { formatDateString } from '../../services/textFormat';
 import { HeadCellData } from '../../types';
 
 const headCells: Array<HeadCellData> = [
@@ -35,10 +35,6 @@ const headCells: Array<HeadCellData> = [
   {
     id: 'type',
     label: 'Type'
-  },
-  {
-    id: 'gradingScale',
-    label: 'Grading Scale'
   }
 ];
 
@@ -105,9 +101,6 @@ export default function InstancesTable(props: {
                   </TableCell>
                   <TableCell>
                     {instance.type}
-                  </TableCell>
-                  <TableCell>
-                    {convertToClientGradingScale(instance.gradingScale)}
                   </TableCell>
                 </TableRow>
               ))
