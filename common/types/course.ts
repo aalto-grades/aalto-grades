@@ -28,7 +28,8 @@ export interface CourseData {
   maxCredits: number,
   department: LocalizedString,
   name: LocalizedString,
-  evaluationInformation?: LocalizedString
+  gradingScale: GradingScale,
+  evaluationInformation?: LocalizedString,
   teachersInCharge: Array<UserData>
 }
 
@@ -44,8 +45,7 @@ export interface CourseInstanceData {
   endingPeriod?: Period,
   startDate: Date | string,
   endDate: Date | string,
-  type: string,
-  gradingScale: GradingScale,
+  type: string
 }
 
 export enum CourseInstanceRoleType {
