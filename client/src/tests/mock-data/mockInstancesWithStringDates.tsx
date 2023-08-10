@@ -12,12 +12,12 @@ export const mockInstances: Array<CourseInstanceData> = [
     startDate: new Date('2023-02-06'),
     endDate: new Date('2023-05-06'),
     type: 'Lecture',
-    gradingScale: GradingScale.Numerical,
     courseData: {
       id: 1,
       courseCode: 'CS-C3120',
       minCredits: 5,
       maxCredits: 5,
+      gradingScale: GradingScale.Numerical,
       teachersInCharge: [
         {
           id: 10,
@@ -37,11 +37,6 @@ export const mockInstances: Array<CourseInstanceData> = [
         en: 'Human-Computer Interaction',
         fi: 'Human-Computer Interaction',
         sv: 'Human-Computer Interaction',
-      },
-      evaluationInformation: {
-        en: '',
-        fi: '',
-        sv: ''
       }
     }
   },
@@ -52,12 +47,12 @@ export const mockInstances: Array<CourseInstanceData> = [
     startDate: new Date('2023-06-06'),
     endDate: new Date('2023-06-06'),
     type: 'Exam',
-    gradingScale: GradingScale.Numerical,
     courseData: {
       id: 1,
       courseCode: 'CS-C3120',
       minCredits: 5,
       maxCredits: 5,
+      gradingScale: GradingScale.Numerical,
       teachersInCharge: [
         {
           id: 10,
@@ -73,11 +68,6 @@ export const mockInstances: Array<CourseInstanceData> = [
         en: 'Human-Computer Interaction',
         fi: 'Human-Computer Interaction',
         sv: 'Human-Computer Interaction',
-      },
-      evaluationInformation: {
-        en: '',
-        fi: '',
-        sv: ''
       }
     }
   },
@@ -88,12 +78,12 @@ export const mockInstances: Array<CourseInstanceData> = [
     startDate: new Date('2022-09-06'),
     endDate: new Date('2023-09-06'),
     type: 'Lecture',
-    gradingScale: GradingScale.Numerical,
     courseData: {
       id: 1,
       courseCode: 'CS-C3120',
       minCredits: 5,
       maxCredits: 5,
+      gradingScale: GradingScale.Numerical,
       teachersInCharge: [
         {
           id: 10,
@@ -109,11 +99,6 @@ export const mockInstances: Array<CourseInstanceData> = [
         en: 'Human-Computer Interaction',
         fi: 'Human-Computer Interaction',
         sv: 'Human-Computer Interaction',
-      },
-      evaluationInformation: {
-        en: '',
-        fi: '',
-        sv: ''
       }
     }
   },
@@ -124,12 +109,12 @@ export const mockInstances: Array<CourseInstanceData> = [
     startDate: new Date('2021-09-06'),
     endDate: new Date('2021-011-06'),
     type: 'Lecture',
-    gradingScale: GradingScale.Numerical,
     courseData: {
       id: 1,
       courseCode: 'CS-C3120',
       minCredits: 5,
       maxCredits: 5,
+      gradingScale: GradingScale.Numerical,
       teachersInCharge: [
         {
           id: 10,
@@ -145,11 +130,6 @@ export const mockInstances: Array<CourseInstanceData> = [
         en: 'Human-Computer Interaction',
         fi: 'Human-Computer Interaction',
         sv: 'Human-Computer Interaction',
-      },
-      evaluationInformation: {
-        en: '',
-        fi: '',
-        sv: ''
       }
     }
   },
@@ -160,12 +140,12 @@ export const mockInstances: Array<CourseInstanceData> = [
     startDate: new Date('2018-09-06'),
     endDate: new Date('2018-011-06'),
     type: 'Lecture',
-    gradingScale: GradingScale.Numerical,
     courseData: {
       id: 2,
       courseCode: 'CS-A1150',
       minCredits: 5,
       maxCredits: 5,
+      gradingScale: GradingScale.Numerical,
       teachersInCharge: [
         {
           id: 12,
@@ -181,11 +161,6 @@ export const mockInstances: Array<CourseInstanceData> = [
         en: 'Databases, Lecture',
         fi: 'Tietokannat, Luento-opetus',
         sv: 'Databaser, Föreläsning'
-      },
-      evaluationInformation: {
-        en: '',
-        fi: '',
-        sv: ''
       }
     }
   }

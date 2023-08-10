@@ -42,15 +42,14 @@ describe(
       expect(res.body.data.startDate).toBeDefined();
       expect(res.body.data.endDate).toBeDefined();
       expect(res.body.data.type).toBeDefined();
-      expect(res.body.data.gradingScale).toBeDefined();
       expect(res.body.data.courseData.courseCode).toBeDefined();
       expect(res.body.data.courseData.minCredits).toBeDefined();
       expect(res.body.data.courseData.maxCredits).toBeDefined();
+      expect(res.body.data.courseData.gradingScale).toBeDefined();
       expect(res.body.data.courseData.teachersInCharge).toBeDefined();
       expect(res.body.data.courseData.teachersInCharge[0].name).toBeDefined();
       expect(res.body.data.courseData.department).toBeDefined();
       expect(res.body.data.courseData.name).toBeDefined();
-      expect(res.body.data.courseData.evaluationInformation).toBeDefined();
     });
 
     it('should respond with 400 bad request, if validation fails (non-number instance id)',
@@ -119,7 +118,6 @@ describe(
       expect(res.body.data[0].startDate).toBeDefined();
       expect(res.body.data[0].endDate).toBeDefined();
       expect(res.body.data[0].type).toBeDefined();
-      expect(res.body.data[0].gradingScale).toBeDefined();
     });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
@@ -169,7 +167,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
     }
 
     await goodInput({
-      gradingScale: 'NUMERICAL',
       sisuCourseInstanceId: 'aalto-CUR-165388-3874872',
       startingPeriod: 'I',
       endingPeriod: 'II',
@@ -179,7 +176,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
     });
 
     await goodInput({
-      gradingScale: 'PASS_FAIL',
       startingPeriod: 'III',
       endingPeriod: 'V',
       type: 'EXAM',
@@ -189,7 +185,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
 
     await goodInput({
       assessmentModelId: 1,
-      gradingScale: 'PASS_FAIL',
       startingPeriod: 'III',
       endingPeriod: 'V',
       type: 'EXAM',
@@ -206,7 +201,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
       const res: supertest.Response = await request
         .post('/v1/courses/1/instances')
         .send({
-          gradingScale: 'NUMERICAL',
           startingPeriod: 'I',
           endingPeriod: 'II',
           type: 'LECTURE',
@@ -239,16 +233,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
     });
 
     await badInput({
-      gradingScale: 'Wrong enum',
-      startingPeriod: 'I',
-      endingPeriod: 'II',
-      type: 'LECTURE',
-      startDate: '2022-7-10',
-      endDate: '2022-11-10'
-    });
-
-    await badInput({
-      gradingScale: 'PASS_FAIL',
       startingPeriod: {
         junk: 'data'
       },
@@ -259,7 +243,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
     });
 
     await badInput({
-      gradingScale: 'NUMERICAL',
       startingPeriod: 'I',
       endingPeriod: 'II',
       type: 'LECTURE',
@@ -281,7 +264,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
     const res: supertest.Response = await request
       .post('/v1/courses/1/instances')
       .send({
-        gradingScale: 'NUMERICAL',
         startingPeriod: 'I',
         endingPeriod: 'II',
         type: 'LECTURE',
@@ -300,7 +282,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
     const res: supertest.Response = await request
       .post('/v1/courses/9999999/instances')
       .send({
-        gradingScale: 'NUMERICAL',
         startingPeriod: 'I',
         endingPeriod: 'II',
         type: 'LECTURE',
@@ -321,7 +302,6 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
     const res: supertest.Response = await request
       .post('/v1/courses/1/instances')
       .send({
-        gradingScale: 'NUMERICAL',
         sisuCourseInstanceId: 'aalto-CUR-165388-3874205',
         startingPeriod: 'I',
         endingPeriod: 'II',

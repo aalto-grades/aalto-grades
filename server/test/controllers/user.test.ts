@@ -32,9 +32,9 @@ async function testLoop(): Promise<void> {
     expect(res.body.data[0].courseCode).toBeDefined();
     expect(res.body.data[0].minCredits).toBeDefined();
     expect(res.body.data[0].maxCredits).toBeDefined();
+    expect(res.body.data[0].gradingScale).toBeDefined();
     expect(res.body.data[0].department).toBeDefined();
     expect(res.body.data[0].name).toBeDefined();
-    expect(res.body.data[0].evaluationInformation).toBeDefined();
     expect(res.body.data[0].teachersInCharge).toBeDefined();
     expect(res.body.data[0].teachersInCharge[0].id).toBeDefined();
     expect(res.body.data[0].teachersInCharge[0].name).toBeDefined();

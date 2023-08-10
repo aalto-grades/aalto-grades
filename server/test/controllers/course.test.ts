@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseData, HttpCode, UserData } from 'aalto-grades-common/types';
+import { CourseData, GradingScale, HttpCode, UserData } from 'aalto-grades-common/types';
 import supertest from 'supertest';
 
 import { app } from '../../src/app';
@@ -35,9 +35,9 @@ describe('Test GET /v1/courses/:courseId - get course by ID', () => {
     expect(res.body.data.courseCode).toBeDefined();
     expect(res.body.data.minCredits).toBeDefined();
     expect(res.body.data.maxCredits).toBeDefined();
+    expect(res.body.data.gradingScale).toBeDefined();
     expect(res.body.data.department).toBeDefined();
     expect(res.body.data.name).toBeDefined();
-    expect(res.body.data.evaluationInformation).toBeDefined();
   });
 
   it('should respond with 400 bad request, if validation fails (non-number course id)',
@@ -87,9 +87,9 @@ describe('Test GET /v1/courses - get all courses', () => {
     expect(res.body.data[0].courseCode).toBeDefined();
     expect(res.body.data[0].minCredits).toBeDefined();
     expect(res.body.data[0].maxCredits).toBeDefined();
+    expect(res.body.data[0].gradingScale).toBeDefined();
     expect(res.body.data[0].department).toBeDefined();
     expect(res.body.data[0].name).toBeDefined();
-    expect(res.body.data[0].evaluationInformation).toBeDefined();
   });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
@@ -108,6 +108,7 @@ describe('Test POST /v1/courses - create new course', () => {
       courseCode: 'ELEC-A7200',
       minCredits: 5,
       maxCredits: 5,
+      gradingScale: GradingScale.Numerical,
       teachersInCharge: [
         {
           email: 'thomas.siegel@aalto.fi'
@@ -137,6 +138,7 @@ describe('Test POST /v1/courses - create new course', () => {
       courseCode: 'ELEC-A7200',
       minCredits: 5,
       maxCredits: 5,
+      gradingScale: GradingScale.PassFail,
       teachersInCharge: [
         {
           email: 'thomas.siegel@aalto.fi'
@@ -205,6 +207,7 @@ describe('Test POST /v1/courses - create new course', () => {
         courseCode: 'ELEC-A7200',
         minCredits: 5,
         maxCredits: 5,
+        gradingScale: GradingScale.Numerical,
         teachersInCharge: [
           {
             email: 'not.found@aalto.fi'
@@ -261,6 +264,7 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
   const uneditedCourseDataBase: object = {
     minCredits: 5,
     maxCredits: 5,
+    gradingScale: GradingScale.PassFail,
     department: {
       fi: 'muokkaamaton laitos',
       en: 'unedited department',
@@ -270,11 +274,6 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
       fi: 'muokkaamaton nimi',
       en: 'unedited name',
       sv: 'oredigerad namn'
-    },
-    evaluationInformation: {
-      fi: '',
-      en: '',
-      sv: ''
     }
   };
 
@@ -282,6 +281,7 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
     courseCode: 'edited',
     minCredits: 3,
     maxCredits: 7,
+    gradingScale: GradingScale.SecondNationalLanguage,
     department: {
       fi: 'muokattu laitos',
       en: 'edited department',

@@ -36,11 +36,11 @@ function parseSisuCourseInstance(
     startDate: instance.startDate,
     endDate: instance.endDate,
     type: instance.type,
-    gradingScale: parseSisuGradingScale(instance.summary.gradingScale.fi) as GradingScale,
     courseData: {
       courseCode: instance.code,
       minCredits: instance.credits.min,
       maxCredits: instance.credits.max,
+      gradingScale: parseSisuGradingScale(instance.summary.gradingScale.fi) as GradingScale,
       teachersInCharge: instance.summary.teacherInCharge.map(
         (name: string) => {
           return {
@@ -57,11 +57,6 @@ function parseSisuCourseInstance(
         en: instance.name.en,
         fi: instance.name.fi,
         sv: instance.name.sv
-      },
-      evaluationInformation: {
-        en: instance.summary.assesmentMethods.en,
-        fi: instance.summary.assesmentMethods.fi,
-        sv: instance.summary.assesmentMethods.sv
       }
     }
   };
