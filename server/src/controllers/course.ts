@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  CourseData, HttpCode, Language, LocalizedString, UserData
+  CourseData, GradingScale, HttpCode, Language, LocalizedString, UserData
 } from 'aalto-grades-common/types';
 import { Request, Response } from 'express';
 import { Transaction } from 'sequelize';
@@ -27,7 +27,7 @@ export async function getCourse(req: Request, res: Response): Promise<void> {
   });
 }
 
-export async function getAllCourses(req: Request, res: Response): Promise<void> {
+export async function getAllCourses(_req: Request, res: Response): Promise<void> {
   const courses: Array<CourseFull> = await Course.findAll({
     include: [
       {
@@ -82,6 +82,7 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
     courseCode: yup.string().required(),
     minCredits: yup.number().min(0).required(),
     maxCredits: yup.number().min(yup.ref('minCredits')).required(),
+    gradingScale: yup.string().oneOf(Object.values(GradingScale)).required(),
     teachersInCharge: yup.array().of(
       yup.object().shape({
         email: yup.string().email().required()
@@ -105,7 +106,8 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
       const course: Course = await Course.create({
         courseCode: req.body.courseCode,
         minCredits: req.body.minCredits,
-        maxCredits: req.body.maxCredits
+        maxCredits: req.body.maxCredits,
+        gradingScale: req.body.gradingScale
       }, { transaction: t });
 
       await CourseTranslation.bulkCreate([
@@ -154,6 +156,7 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
     courseCode: yup.string().notRequired(),
     minCredits: yup.number().min(0).notRequired(),
     maxCredits: yup.number().min(yup.ref('minCredits')).notRequired(),
+    gradingScale: yup.string().oneOf(Object.values(GradingScale)).notRequired(),
     teachersInCharge: yup.array().of(
       yup.object().shape({
         email: yup.string().email().required()
@@ -170,6 +173,7 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
   const courseCode: string | undefined = req.body.courseCode;
   const minCredits: number | undefined = req.body.minCredits;
   const maxCredits: number | undefined = req.body.maxCredits;
+  const gradingScale: GradingScale | undefined = req.body.gradingScale;
   const teachersInCharge: Array<UserData> | undefined = req.body.teachersInCharge;
   const department: LocalizedString | undefined = req.body.department;
   const name: LocalizedString | undefined = req.body.name;
@@ -200,7 +204,8 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
         {
           courseCode: courseCode,
           minCredits: minCredits,
-          maxCredits: maxCredits
+          maxCredits: maxCredits,
+          gradingScale: gradingScale
         },
         {
           where: {
