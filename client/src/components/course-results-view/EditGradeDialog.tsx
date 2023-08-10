@@ -37,9 +37,9 @@ export default function EditGradeDialog(props: {
   const [formInitialValues, setFormInitialValues]: State<EditGrade> = useState<EditGrade>({
     grade: props.grade.grades[0].grade,
     status: props.grade.grades[0].status,
-    date: props.grade.grades[0].date,
-    expiryDate: props.grade.grades[0].expiryDate,
-    comment: props.grade.grades[0].comment
+    date: props.grade.grades[0].date ?? new Date(),
+    expiryDate: props.grade.grades[0].expiryDate ?? new Date(),
+    comment: props.grade.grades[0].comment ?? ''
   });
 
   function setToForm(id: number): void {
@@ -76,6 +76,7 @@ export default function EditGradeDialog(props: {
               msg: 'Grade updated successfully.',
               severity: 'success'
             });
+            setFormInitialValues(values);
           }
         }
       );
@@ -149,6 +150,7 @@ export default function EditGradeDialog(props: {
                     <Form>
                       <TextField
                         id="grade"
+                        name="grade"
                         type="text"
                         fullWidth
                         value={values.grade}
@@ -165,6 +167,7 @@ export default function EditGradeDialog(props: {
                       />
                       <TextField
                         id="status"
+                        name="status"
                         type="text"
                         fullWidth
                         value={values.status}
@@ -191,6 +194,7 @@ export default function EditGradeDialog(props: {
                       </TextField>
                       <TextField
                         id="date"
+                        name="date"
                         type="date"
                         fullWidth
                         value={new Date(values.date as Date).toISOString().split('T')[0]}
@@ -208,6 +212,7 @@ export default function EditGradeDialog(props: {
                       />
                       <TextField
                         id="expiryDate"
+                        name="expiryDate"
                         type="date"
                         fullWidth
                         value={new Date(values.expiryDate as Date).toISOString().split('T')[0]}
@@ -225,6 +230,7 @@ export default function EditGradeDialog(props: {
                       />
                       <TextField
                         id="comment"
+                        name="comment"
                         type="text"
                         fullWidth
                         value={values.comment}
