@@ -319,10 +319,10 @@ describe(
           .expect(HttpCode.Ok);
 
         expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-114732,5,5,12.12.2023,fi,
-472886,5,5,12.12.2023,fi,
-327976,5,5,12.12.2023,fi,
-139131,5,5,12.12.2023,fi,
+114732,5,5,12.12.2023,en,
+472886,5,5,12.12.2023,en,
+327976,5,5,12.12.2023,en,
+139131,5,5,12.12.2023,en,
 `);
         expect(res.headers['content-disposition']).toBe(
           'attachment; filename="final_grades_course_PHYS-A1140_' +
