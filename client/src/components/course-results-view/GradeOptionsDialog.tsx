@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  Dialog, DialogContent, DialogTitle
+  Button, Dialog, DialogActions, DialogContent, DialogTitle
 } from '@mui/material';
 import { JSX } from 'react';
 
@@ -18,6 +18,15 @@ export default function GradeOptionsDialog(props: {
       <DialogContent>
 
       </DialogContent>
+      <DialogActions sx={{ pr: 4, pb: 3 }}>
+        <Button
+          size='medium'
+          variant='outlined'
+          onClick={props.handleClose}
+        >
+          Close
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }
