@@ -2,7 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, AttainmentGradeData, FinalGrade } from 'aalto-grades-common/types';
+import {
+  AttainmentData, AttainmentGradeData, FinalGrade, GradeOption
+} from 'aalto-grades-common/types';
 import {
   Checkbox, Link, TableCell, TableRow, Tooltip
 } from '@mui/material';
@@ -28,13 +30,22 @@ export default function CourseResultsTableRow(props: {
     courseId, assessmentModelId, props.student.userId
   );
 
+  function bestGradeOption(options: Array<GradeOption>): number {
+    let bestSoFar: number = -1;
+    for (const option of options) {
+      if (option.grade > bestSoFar)
+        bestSoFar = option.grade;
+    }
+    return bestSoFar;
+  }
+
   function getGrade(attainmentId: number): number {
     if (!gradeTree.data)
       return -1;
 
     function traverseTree(grade: AttainmentGradeData): number {
       if (grade.attainmentId === attainmentId) {
-        return grade.grades[0].grade;
+        return bestGradeOption(grade.grades);
       }
 
       if (grade.subAttainments) {
@@ -93,7 +104,7 @@ export default function CourseResultsTableRow(props: {
         align="left"
         key={`${props.student.studentNumber}_grade`}
       >
-        {props.student.grades.length > 0 ? props.student.grades[0].grade : '-'}
+        {props.student.grades.length > 0 ? bestGradeOption(props.student.grades) : '-'}
       </TableCell>
       {
         gradeTree.data && (
