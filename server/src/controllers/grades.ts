@@ -293,7 +293,7 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
         assessmentDate: (
           assessmentDate ? new Date(assessmentDate) : new Date(Date.now())
         ).toLocaleDateString('fi-FI'),
-        completionLanguage: course.languageOfInstruction,
+        completionLanguage: course.languageOfInstruction.toLowerCase(),
         // Comment column is required, but can be empty.
         comment: ''
       });
