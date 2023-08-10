@@ -107,7 +107,8 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
         courseCode: req.body.courseCode,
         minCredits: req.body.minCredits,
         maxCredits: req.body.maxCredits,
-        gradingScale: req.body.gradingScale
+        gradingScale: req.body.gradingScale,
+        languageOfInstruction: 'EN'
       }, { transaction: t });
 
       await CourseTranslation.bulkCreate([
