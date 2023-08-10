@@ -38,7 +38,6 @@ describe('Test GET /v1/courses/:courseId - get course by ID', () => {
     expect(res.body.data.gradingScale).toBeDefined();
     expect(res.body.data.department).toBeDefined();
     expect(res.body.data.name).toBeDefined();
-    expect(res.body.data.evaluationInformation).toBeDefined();
   });
 
   it('should respond with 400 bad request, if validation fails (non-number course id)',
@@ -91,7 +90,6 @@ describe('Test GET /v1/courses - get all courses', () => {
     expect(res.body.data[0].gradingScale).toBeDefined();
     expect(res.body.data[0].department).toBeDefined();
     expect(res.body.data[0].name).toBeDefined();
-    expect(res.body.data[0].evaluationInformation).toBeDefined();
   });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
@@ -276,11 +274,6 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
       fi: 'muokkaamaton nimi',
       en: 'unedited name',
       sv: 'oredigerad namn'
-    },
-    evaluationInformation: {
-      fi: '',
-      en: '',
-      sv: ''
     }
   };
 

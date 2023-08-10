@@ -76,8 +76,6 @@ export const router: Router = Router();
  *         $ref: '#/definitions/LocalizedString'
  *       name:
  *         $ref: '#/definitions/LocalizedString'
- *       evaluationInformation:
- *         $ref: '#/definitions/LocalizedString'
  *       teachersInCharge:
  *         type: array
  *         items:

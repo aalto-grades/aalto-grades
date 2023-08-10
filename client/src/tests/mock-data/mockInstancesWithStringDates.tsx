@@ -37,11 +37,6 @@ export const mockInstances: Array<CourseInstanceData> = [
         en: 'Human-Computer Interaction',
         fi: 'Human-Computer Interaction',
         sv: 'Human-Computer Interaction',
-      },
-      evaluationInformation: {
-        en: '',
-        fi: '',
-        sv: ''
       }
     }
   },
@@ -73,11 +68,6 @@ export const mockInstances: Array<CourseInstanceData> = [
         en: 'Human-Computer Interaction',
         fi: 'Human-Computer Interaction',
         sv: 'Human-Computer Interaction',
-      },
-      evaluationInformation: {
-        en: '',
-        fi: '',
-        sv: ''
       }
     }
   },
@@ -109,11 +99,6 @@ export const mockInstances: Array<CourseInstanceData> = [
         en: 'Human-Computer Interaction',
         fi: 'Human-Computer Interaction',
         sv: 'Human-Computer Interaction',
-      },
-      evaluationInformation: {
-        en: '',
-        fi: '',
-        sv: ''
       }
     }
   },
@@ -145,11 +130,6 @@ export const mockInstances: Array<CourseInstanceData> = [
         en: 'Human-Computer Interaction',
         fi: 'Human-Computer Interaction',
         sv: 'Human-Computer Interaction',
-      },
-      evaluationInformation: {
-        en: '',
-        fi: '',
-        sv: ''
       }
     }
   },
@@ -181,11 +161,6 @@ export const mockInstances: Array<CourseInstanceData> = [
         en: 'Databases, Lecture',
         fi: 'Tietokannat, Luento-opetus',
         sv: 'Databaser, Föreläsning'
-      },
-      evaluationInformation: {
-        en: '',
-        fi: '',
-        sv: ''
       }
     }
   }

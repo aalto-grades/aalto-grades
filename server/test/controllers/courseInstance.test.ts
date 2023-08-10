@@ -50,7 +50,6 @@ describe(
       expect(res.body.data.courseData.teachersInCharge[0].name).toBeDefined();
       expect(res.body.data.courseData.department).toBeDefined();
       expect(res.body.data.courseData.name).toBeDefined();
-      expect(res.body.data.courseData.evaluationInformation).toBeDefined();
     });
 
     it('should respond with 400 bad request, if validation fails (non-number instance id)',

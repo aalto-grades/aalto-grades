@@ -29,7 +29,6 @@ export interface CourseData {
   department: LocalizedString,
   name: LocalizedString,
   gradingScale: GradingScale,
-  evaluationInformation?: LocalizedString,
   teachersInCharge: Array<UserData>
 }
 
