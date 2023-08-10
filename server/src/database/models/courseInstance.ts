@@ -22,7 +22,6 @@ export default class CourseInstance extends Model<
   // TODO: Rename to defaultAssessmentModelId?
   declare assessmentModelId: CreationOptional<ForeignKey<AssessmentModel['id']>>;
   declare sisuCourseInstanceId: CreationOptional<string>;
-  declare gradingScale: string;
   declare startingPeriod: string;
   declare endingPeriod: string;
   declare type: string;
@@ -59,10 +58,6 @@ CourseInstance.init(
       type: DataTypes.STRING,
       allowNull: true,
       unique: true
-    },
-    gradingScale: {
-      type: DataTypes.ENUM('PASS_FAIL', 'NUMERICAL', 'SECOND_NATIONAL_LANGUAGE'),
-      allowNull: false
     },
     startingPeriod: {
       type: DataTypes.ENUM('I', 'II', 'III', 'IV', 'V'),

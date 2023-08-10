@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { GradingScale } from 'aalto-grades-common/types';
 import {
   CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model
 } from 'sequelize';
@@ -15,6 +16,7 @@ export default class Course extends Model<
   declare courseCode: string;
   declare minCredits: number;
   declare maxCredits: number;
+  declare gradingScale: GradingScale;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -36,6 +38,10 @@ Course.init(
     },
     maxCredits: {
       type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    gradingScale: {
+      type: DataTypes.ENUM('PASS_FAIL', 'NUMERICAL', 'SECOND_NATIONAL_LANGUAGE'),
       allowNull: false
     },
     createdAt: DataTypes.DATE,
