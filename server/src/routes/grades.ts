@@ -241,14 +241,6 @@ router.get(
  *           Assessment date marked on the grade CSV.
  *           Defaults to end date of the course instance.
  *         example: 2022-9-22
- *       - in: query
- *         name: completionLanguage
- *         schema:
- *           type: string
- *           enum: [fi, sv, en, es, ja, zh, pt, fr, de, ru]
- *         required: false
- *         description: Completion language marked on the grade CSV. Defaults to en.
- *         example: en
  *     responses:
  *       200:
  *         description: Grades calculated successfully.
