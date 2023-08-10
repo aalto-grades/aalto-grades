@@ -8,7 +8,7 @@ import {
   DialogContentText, DialogTitle, List, ListItem,
   ListItemText, MenuItem, Paper, TextField, Typography
 } from '@mui/material';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, JSX, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';

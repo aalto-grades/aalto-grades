@@ -8,12 +8,53 @@ import {
 import {
   Checkbox, IconButton, Link, TableCell, TableRow, Tooltip
 } from '@mui/material';
-import { MoreHoriz as MenuIcon } from '@mui/icons-material';
-import { JSX } from 'react';
+import { MoreHoriz as MoreHorizIcon } from '@mui/icons-material';
+import { JSX, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 
+import GradeOptionsDialog from './GradeOptionsDialog';
+
 import { useGetGradeTreeOfUser } from '../../hooks/useApi';
+import { State } from '../../types';
+
+function bestGradeOption(options: Array<GradeOption>): number {
+  let bestSoFar: number = -1;
+  for (const option of options) {
+    if (option.grade > bestSoFar)
+      bestSoFar = option.grade;
+  }
+  return bestSoFar;
+}
+
+function GradeCell(props: {
+  attainment: AttainmentData,
+  grade: AttainmentGradeData | null
+}): JSX.Element {
+  const [optionsOpen, setOptionsOpen]: State<boolean> = useState(false);
+
+  return (
+    <>
+      <TableCell
+        sx={{ width: '100px' }}
+        align="left"
+      >
+        {props.grade && bestGradeOption(props.grade.grades)}
+        {(props.grade && props.grade.grades.length > 1) && (
+          <IconButton size='small' color='primary' sx={{ ml: 1 }}>
+            <MoreHorizIcon
+              onClick={(): void => setOptionsOpen(true)}
+            />
+          </IconButton>
+        )}
+      </TableCell>
+      <GradeOptionsDialog
+        open={optionsOpen}
+        handleClose={(): void => setOptionsOpen(false)}
+      />
+    </>
+  );
+}
 
 export default function CourseResultsTableRow(props: {
   student: FinalGrade,
@@ -30,15 +71,6 @@ export default function CourseResultsTableRow(props: {
   const gradeTree: UseQueryResult<AttainmentGradeData> = useGetGradeTreeOfUser(
     courseId, assessmentModelId, props.student.userId
   );
-
-  function bestGradeOption(options: Array<GradeOption>): number {
-    let bestSoFar: number = -1;
-    for (const option of options) {
-      if (option.grade > bestSoFar)
-        bestSoFar = option.grade;
-    }
-    return bestSoFar;
-  }
 
   function getAttainmentGrade(attainmentId: number): AttainmentGradeData | null {
     if (!gradeTree.data)
@@ -107,32 +139,19 @@ export default function CourseResultsTableRow(props: {
         {props.student.grades.length > 0 ? bestGradeOption(props.student.grades) : '-'}
         {(props.student.grades.length  > 1) && (
           <IconButton size='small' color='primary' sx={{ ml: 1 }}>
-            <MenuIcon />
+            <MoreHorizIcon />
           </IconButton>
         )}
       </TableCell>
-      {
-        gradeTree.data && (
-          props.attainmentList.map((attainment: AttainmentData) => {
-            const grade: AttainmentGradeData | null = getAttainmentGrade(attainment.id ?? -1);
-
-            return (
-              <TableCell
-                sx={{ width: '100px' }}
-                align="left"
-                key={`${props.student.studentNumber}_${attainment.name}_grade`}
-              >
-                {grade && bestGradeOption(grade.grades)}
-                {(grade && grade.grades.length > 1) && (
-                  <IconButton size='small' color='primary' sx={{ ml: 1 }}>
-                    <MenuIcon />
-                  </IconButton>
-                )}
-              </TableCell>
-            );
-          })
-        )
-      }
+      {(gradeTree.data) && (
+        props.attainmentList.map((attainment: AttainmentData) => (
+          <GradeCell
+            key={`${props.student.studentNumber}_${attainment.name}_grade`}
+            attainment={attainment}
+            grade={getAttainmentGrade(attainment.id ?? -1)}
+          />
+        ))
+      )}
       <TableCell
         sx={{ width: '100px' }}
         align="left"
