@@ -311,7 +311,7 @@ describe(
       async () => {
         res = await request
           .get(
-            '/v1/courses/10/assessment-models/42/grades/csv/sisu'
+            '/v1/courses/9/assessment-models/42/grades/csv/sisu'
             + '?assessmentDate=2023-12-12&studentNumbers=["114732","472886","327976","139131"]'
           )
           .set('Cookie', cookies.adminCookie)
@@ -319,10 +319,10 @@ describe(
           .expect(HttpCode.Ok);
 
         expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-114732,5,5,12.12.2023,en,
-472886,5,5,12.12.2023,en,
-327976,5,5,12.12.2023,en,
-139131,5,5,12.12.2023,en,
+114732,5,5,12.12.2023,sv,
+472886,5,5,12.12.2023,sv,
+327976,5,5,12.12.2023,sv,
+139131,5,5,12.12.2023,sv,
 `);
         expect(res.headers['content-disposition']).toBe(
           'attachment; filename="final_grades_course_PHYS-A1140_' +
