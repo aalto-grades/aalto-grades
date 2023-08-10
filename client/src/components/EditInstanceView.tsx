@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  CourseData, CourseInstanceData, GradingScale, Period
+  CourseData, CourseInstanceData, Period
 } from 'aalto-grades-common/types';
 import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
 import {
@@ -21,7 +21,7 @@ import {
   useAddInstance, UseAddInstanceResult, useGetCourse, useGetSisuInstance
 } from '../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../hooks/useSnackPackAlerts';
-import { convertToClientGradingScale, formatSisuCourseType } from '../services/textFormat';
+import { formatSisuCourseType } from '../services/textFormat';
 import { State } from '../types';
 
 export default function EditInstanceView(): JSX.Element {
@@ -86,15 +86,13 @@ export default function EditInstanceView(): JSX.Element {
                   startDate: sisuInstance.data.startDate,
                   endDate: sisuInstance.data.endDate,
                   startingPeriod: sisuInstance.data.startingPeriod ?? Period.I,
-                  endingPeriod: sisuInstance.data.endingPeriod ?? Period.I,
-                  gradingScale: sisuInstance.data.gradingScale
+                  endingPeriod: sisuInstance.data.endingPeriod ?? Period.I
                 } : {
                   type: '',
                   startDate: new Date(),
                   endDate: new Date(),
                   startingPeriod: Period.I,
-                  endingPeriod: Period.I,
-                  gradingScale: GradingScale.Numerical
+                  endingPeriod: Period.I
                 }
               }
               validationSchema={yup.object({
@@ -110,9 +108,6 @@ export default function EditInstanceView(): JSX.Element {
                   .required(),
                 endingPeriod: yup.string()
                   .oneOf(Object.values(Period))
-                  .required(),
-                gradingScale: yup.string()
-                  .oneOf(Object.values(GradingScale))
                   .required()
               })}
               onSubmit={handleSubmit}
@@ -238,34 +233,6 @@ export default function EditInstanceView(): JSX.Element {
                           Object.values(Period).map((value: Period) => {
                             return (
                               <MenuItem key={value} value={value}>{value}</MenuItem>
-                            );
-                          })
-                        }
-                      </TextField>
-                      <TextField
-                        id="gradingScale"
-                        name="gradingScale"
-                        type="text"
-                        fullWidth
-                        value={values.gradingScale}
-                        disabled={isSubmitting}
-                        label="Grading Scale*"
-                        InputLabelProps={{ shrink: true }}
-                        margin='normal'
-                        helperText={
-                          errors.gradingScale
-                          ?? 'Grading scale of the course instance, e.g., 0-5 or pass/fail.'
-                        }
-                        error={touched.gradingScale && Boolean(errors.gradingScale)}
-                        onChange={handleChange}
-                        select
-                      >
-                        {
-                          Object.values(GradingScale).map((value: GradingScale) => {
-                            return (
-                              <MenuItem key={value} value={value}>
-                                {convertToClientGradingScale(value)}
-                              </MenuItem>
                             );
                           })
                         }

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseData } from 'aalto-grades-common/types';
+import { CourseData, GradingScale } from 'aalto-grades-common/types';
 
 export const mockCourses: Array<CourseData> = [
   {
@@ -10,6 +10,7 @@ export const mockCourses: Array<CourseData> = [
     courseCode: 'CS-A1150',
     minCredits: 5,
     maxCredits: 5,
+    gradingScale: GradingScale.Numerical,
     department: {
       fi: 'Tietotekniikan laitos',
       sv: 'Institutionen för datateknik',
@@ -32,6 +33,7 @@ export const mockCourses: Array<CourseData> = [
     courseCode: 'CS-A1110',
     minCredits: 5,
     maxCredits: 5,
+    gradingScale: GradingScale.Numerical,
     department: {
       fi: 'Tietotekniikan laitos',
       sv: 'Institutionen för datateknik',

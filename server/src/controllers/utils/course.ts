@@ -67,6 +67,7 @@ export function parseCourseFull(course: CourseFull): CourseData {
     courseCode: course.courseCode,
     minCredits: course.minCredits,
     maxCredits: course.maxCredits,
+    gradingScale: course.gradingScale,
     teachersInCharge: [],
     department: {
       en: '',
