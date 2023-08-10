@@ -50,10 +50,13 @@ function GradeCell(props: {
           </IconButton>
         )}
       </TableCell>
-      <GradeOptionsDialog
-        open={optionsOpen}
-        handleClose={(): void => setOptionsOpen(false)}
-      />
+      {(props.grade) && (
+        <GradeOptionsDialog
+          grade={props.grade}
+          open={optionsOpen}
+          handleClose={(): void => setOptionsOpen(false)}
+        />
+      )}
     </>
   );
 }
