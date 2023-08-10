@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseInstanceData, GradingScale, HttpCode } from 'aalto-grades-common/types';
+import { CourseInstanceData, GradingScale, HttpCode, Language } from 'aalto-grades-common/types';
 import axios, { AxiosResponse } from 'axios';
 import { Request, Response } from 'express';
 import { Op } from 'sequelize';
@@ -41,6 +41,7 @@ function parseSisuCourseInstance(
       minCredits: instance.credits.min,
       maxCredits: instance.credits.max,
       gradingScale: parseSisuGradingScale(instance.summary.gradingScale.fi) as GradingScale,
+      languageOfInstruction: instance.summary.languageOfInstruction.fi.toUpperCase() as Language,
       teachersInCharge: instance.summary.teacherInCharge.map(
         (name: string) => {
           return {

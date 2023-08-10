@@ -37,6 +37,7 @@ function checkRes(courseInstance: CourseInstanceData, id: string, inUse: boolean
   expect(courseInstance.courseData?.maxCredits).toBeDefined();
   expect(courseInstance.courseData?.gradingScale).toBeDefined();
   expect(courseInstance.courseData?.teachersInCharge).toBeDefined();
+  expect(courseInstance.courseData?.languageOfInstruction).toBeDefined();
   expect(courseInstance.courseData?.department).toBeDefined();
   expect(courseInstance.courseData?.name).toBeDefined();
 }
