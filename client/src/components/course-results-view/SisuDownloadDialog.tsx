@@ -139,17 +139,23 @@ export default function SisuDownloadDialog(props: {
             noValidate
             autoComplete="off"
           >
-            <div>
+            <Box sx={{ mb: 1 }}>
               <TextField
                 id="select-grading-completion-language"
                 select
                 label="Completion language"
-                defaultValue="EN"
-                helperText="If not provided, the default will be English."
+                defaultValue="default"
                 onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
-                  setCompletionLanguage(e.target.value);
+                  if (e.target.value == 'default') {
+                    setCompletionLanguage(undefined);
+                  } else {
+                    setCompletionLanguage(e.target.value);
+                  }
                 }}
               >
+                <MenuItem value="default">
+                  Use course language
+                </MenuItem>
                 {
                   languageOptions.map((option: LanguageOption) => (
                     <MenuItem key={option.id} value={option.id}>
@@ -158,8 +164,8 @@ export default function SisuDownloadDialog(props: {
                   ))
                 }
               </TextField>
-            </div>
-            <div>
+            </Box>
+            <Box>
               <TextField
                 id="select-grading-assessment-date"
                 InputLabelProps={{ shrink: true }}
@@ -172,7 +178,7 @@ export default function SisuDownloadDialog(props: {
                   setAssessmentDate(e.target.value);
                 }}
               />
-            </div>
+            </Box>
           </Box>
           <Typography variant='h6' sx={{ mt: 1 }}>
             Selected students:
