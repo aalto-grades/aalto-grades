@@ -34,12 +34,10 @@ export default function EditGradeDialog(props: {
 
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
 
-  const [gradeId, setGradeId]: State<number> = useState<number>(
-    props.grade.grades[0].gradeId as number
-  );
+  const [gradeId, setGradeId]: State<number | null> = useState<number | null>(null);
 
-  if (!props.grade.grades.find((option: GradeOption) => option.gradeId === gradeId)) {
-    setGradeId(props.grade.grades[0].gradeId as number);
+  if (!gradeId && props.open) {
+    setGradeId(props.grade.grades[0].gradeId ?? null);
   }
 
   const [formInitialValues, setFormInitialValues]: State<EditGrade> = useState<EditGrade>({
@@ -68,6 +66,7 @@ export default function EditGradeDialog(props: {
             });
             props.handleClose();
             props.refetchGrades();
+            setGradeId(null);
           }
         }
       );
@@ -102,7 +101,7 @@ export default function EditGradeDialog(props: {
             <Select
               labelId="assessmentModelSelect"
               id="assessmentModelSelectId"
-              value={String(gradeId)}
+              value={gradeId ? String(gradeId) : ''}
               label="Assessment model"
               fullWidth
               onChange={(event: SelectChangeEvent): void => {
@@ -259,6 +258,7 @@ export default function EditGradeDialog(props: {
                             setShowDialog(true);
                           } else {
                             props.handleClose();
+                            setGradeId(null);
                           }
                         }}
                       >
@@ -283,7 +283,10 @@ export default function EditGradeDialog(props: {
       <UnsavedChangesDialog
         setOpen={setShowDialog}
         open={showDialog}
-        handleDiscard={(): void => props.handleClose()}
+        handleDiscard={(): void => {
+          props.handleClose();
+          setGradeId(null);
+        }}
       />
       <AlertSnackbar snackPack={snackPack} />
     </>
