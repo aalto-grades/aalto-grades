@@ -57,7 +57,11 @@ export default {
           primaryKey: true
         },
         course_code: {
-          type: new DataTypes.STRING,
+          type: DataTypes.STRING,
+          allowNull: false
+        },
+        language_of_instruction: {
+          type: DataTypes.ENUM('FI', 'SV', 'EN', 'ES', 'JA', 'ZH', 'PT', 'FR', 'DE', 'RU'),
           allowNull: false
         },
         min_credits: {
@@ -398,6 +402,18 @@ export default {
 
       await queryInterface.sequelize.query(
         'DROP TYPE IF EXISTS enum_attainment_formula;', { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS enum_attainment_grade_status;', { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS enum_course_grading_scale;', { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS enum_course_language_of_instruction;', { transaction }
       );
 
       await queryInterface.sequelize.query(

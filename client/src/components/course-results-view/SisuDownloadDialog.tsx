@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { FinalGrade } from 'aalto-grades-common/types';
+import { FinalGrade, Language } from 'aalto-grades-common/types';
 import {
   Box, Button, Dialog, DialogActions, DialogContent,
   DialogContentText, DialogTitle, List, ListItem,
@@ -15,58 +15,53 @@ import AlertSnackbar from '../alerts/AlertSnackbar';
 
 import { useDownloadSisuGradeCsv, UseDownloadSisuGradeCsvResult } from '../../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
-import { State } from '../../types';
+import { LanguageOption, State } from '../../types';
 
 // A Dialog component for downloading a Sisu grade CSV.
 const instructions: string =
   'Set the completion language and assesment date for the grading, these values'
   + ' are optional. Click download to download the grades.';
 
-interface LanguageOption {
-  id: string,
-  language: string
-}
-
 // Available completion languages used in Sisu.
-const languageOptions: Array<LanguageOption> = [
+export const languageOptions: Array<LanguageOption> = [
   {
-    id: 'fi',
+    id: Language.Finnish,
     language: 'Finnish'
   },
   {
-    id: 'sv',
+    id: Language.Swedish,
     language: 'Swedish'
   },
   {
-    id: 'en',
+    id: Language.English,
     language: 'English'
   },
   {
-    id: 'es',
+    id: Language.Spanish,
     language: 'Spanish'
   },
   {
-    id: 'ja',
+    id: Language.Japanese,
     language: 'Japanese'
   },
   {
-    id: 'zh',
+    id: Language.Chinese,
     language: 'Chinese'
   },
   {
-    id: 'pt',
+    id: Language.Portuguese,
     language: 'Portuguese'
   },
   {
-    id: 'fr',
+    id: Language.French,
     language: 'French'
   },
   {
-    id: 'de',
+    id: Language.German,
     language: 'German'
   },
   {
-    id: 'ru',
+    id: Language.Russian,
     language: 'Russian'
   }
 ];
@@ -144,17 +139,23 @@ export default function SisuDownloadDialog(props: {
             noValidate
             autoComplete="off"
           >
-            <div>
+            <Box sx={{ mb: 1 }}>
               <TextField
                 id="select-grading-completion-language"
                 select
                 label="Completion language"
-                defaultValue="en"
-                helperText="If not provided, the default will be English."
+                defaultValue="default"
                 onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
-                  setCompletionLanguage(e.target.value);
+                  if (e.target.value == 'default') {
+                    setCompletionLanguage(undefined);
+                  } else {
+                    setCompletionLanguage(e.target.value);
+                  }
                 }}
               >
+                <MenuItem value="default">
+                  Use course language
+                </MenuItem>
                 {
                   languageOptions.map((option: LanguageOption) => (
                     <MenuItem key={option.id} value={option.id}>
@@ -163,8 +164,8 @@ export default function SisuDownloadDialog(props: {
                   ))
                 }
               </TextField>
-            </div>
-            <div>
+            </Box>
+            <Box>
               <TextField
                 id="select-grading-assessment-date"
                 InputLabelProps={{ shrink: true }}
@@ -177,7 +178,7 @@ export default function SisuDownloadDialog(props: {
                   setAssessmentDate(e.target.value);
                 }}
               />
-            </div>
+            </Box>
           </Box>
           <Typography variant='h6' sx={{ mt: 1 }}>
             Selected students:

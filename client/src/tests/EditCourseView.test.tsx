@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { GradingScale } from 'aalto-grades-common/types';
+import { GradingScale, Language } from 'aalto-grades-common/types';
 import { rest } from 'msw';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -44,6 +44,7 @@ describe('Tests for EditCourseView components', () => {
       expect(screen.getByLabelText('Minimum Course Credits (ECTS)*')).toBeDefined();
       expect(screen.getByLabelText('Maximum Course Credits (ECTS)*')).toBeDefined();
       expect(screen.getByLabelText('Grading Scale*')).toBeInTheDocument();
+      expect(screen.getByLabelText('Course language*')).toBeInTheDocument();
       expect(screen.getByLabelText('Teachers In Charge*')).toBeDefined();
       expect(screen.getByText('Add')).toBeDefined();
       expect(screen.getByText('Cancel')).toBeDefined();
@@ -94,6 +95,7 @@ describe('Tests for EditCourseView components', () => {
         minCredits: 3,
         maxCredits: 5,
         gradingScale: GradingScale.Numerical,
+        languageOfInstruction: Language.English,
         department: {
           fi: testDepartmentFi,
           sv: testDepartmentSv,

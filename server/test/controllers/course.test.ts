@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseData, GradingScale, HttpCode, UserData } from 'aalto-grades-common/types';
+import { CourseData, GradingScale, HttpCode, Language, UserData } from 'aalto-grades-common/types';
 import supertest from 'supertest';
 
 import { app } from '../../src/app';
@@ -37,6 +37,7 @@ describe('Test GET /v1/courses/:courseId - get course by ID', () => {
     expect(res.body.data.maxCredits).toBeDefined();
     expect(res.body.data.gradingScale).toBeDefined();
     expect(res.body.data.department).toBeDefined();
+    expect(res.body.data.languageOfInstruction).toBeDefined();
     expect(res.body.data.name).toBeDefined();
   });
 
@@ -89,6 +90,7 @@ describe('Test GET /v1/courses - get all courses', () => {
     expect(res.body.data[0].maxCredits).toBeDefined();
     expect(res.body.data[0].gradingScale).toBeDefined();
     expect(res.body.data[0].department).toBeDefined();
+    expect(res.body.data[0].languageOfInstruction).toBeDefined();
     expect(res.body.data[0].name).toBeDefined();
   });
 
@@ -109,6 +111,7 @@ describe('Test POST /v1/courses - create new course', () => {
       minCredits: 5,
       maxCredits: 5,
       gradingScale: GradingScale.Numerical,
+      languageOfInstruction: Language.English,
       teachersInCharge: [
         {
           email: 'thomas.siegel@aalto.fi'
@@ -139,6 +142,7 @@ describe('Test POST /v1/courses - create new course', () => {
       minCredits: 5,
       maxCredits: 5,
       gradingScale: GradingScale.PassFail,
+      languageOfInstruction: 'en',
       teachersInCharge: [
         {
           email: 'thomas.siegel@aalto.fi'
@@ -181,6 +185,7 @@ describe('Test POST /v1/courses - create new course', () => {
     expect(res.body.errors).toContain('minCredits is a required field');
     expect(res.body.errors).toContain('teachersInCharge is a required field');
     expect(res.body.errors).toContain('name is a required field');
+    expect(res.body.errors).toContain('languageOfInstruction is a required field');
   });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
@@ -208,6 +213,7 @@ describe('Test POST /v1/courses - create new course', () => {
         minCredits: 5,
         maxCredits: 5,
         gradingScale: GradingScale.Numerical,
+        languageOfInstruction: Language.English,
         teachersInCharge: [
           {
             email: 'not.found@aalto.fi'
@@ -265,6 +271,7 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
     minCredits: 5,
     maxCredits: 5,
     gradingScale: GradingScale.PassFail,
+    languageOfInstruction: Language.English,
     department: {
       fi: 'muokkaamaton laitos',
       en: 'unedited department',
@@ -282,6 +289,7 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
     minCredits: 3,
     maxCredits: 7,
     gradingScale: GradingScale.SecondNationalLanguage,
+    languageOfInstruction: Language.English,
     department: {
       fi: 'muokattu laitos',
       en: 'edited department',

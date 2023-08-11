@@ -43,6 +43,11 @@ export const router: Router = Router();
  *     type: string
  *     description: Aalto Course code.
  *     example: CS-A1110
+ *   LanguageOfInstruction:
+ *     type: string
+ *     enum: [FI, SV, EN, ES, JA, ZH, PT, FR, DE, RU]
+ *     description: Course language.
+ *     example: EN
  *   MinCredits:
  *     type: integer
  *     description: Minimum amount credits student can receive from passing the course.
@@ -76,6 +81,8 @@ export const router: Router = Router();
  *         $ref: '#/definitions/LocalizedString'
  *       name:
  *         $ref: '#/definitions/LocalizedString'
+ *       languageOfInstruction:
+ *         $ref: '#/definitions/LanguageOfInstruction'
  *       teachersInCharge:
  *         type: array
  *         items:
@@ -194,6 +201,8 @@ router.get(
  *                 $ref: '#/definitions/LocalizedString'
  *               teachersInCharge:
  *                 $ref: '#/definitions/TeachersInCharge'
+ *               languageOfInstruction:
+ *                 $ref: '#/definitions/LanguageOfInstruction'
  *     responses:
  *       200:
  *         description: The course was successfully created.
@@ -256,6 +265,8 @@ router.post(
  *                 $ref: '#/definitions/LocalizedString'
  *               teachersInCharge:
  *                 $ref: '#/definitions/TeachersInCharge'
+ *               languageOfInstruction:
+ *                 $ref: '#/definitions/LanguageOfInstruction'
  *     responses:
  *       200:
  *         description: The course was successfully edited.

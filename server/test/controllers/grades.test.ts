@@ -172,19 +172,19 @@ describe(
         .expect(HttpCode.Ok);
 
       expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-117486,1,5,21.6.2023,en,
-114732,5,5,21.6.2023,en,
-472886,3,5,21.6.2023,en,
-335462,1,5,21.6.2023,en,
-874623,2,5,21.6.2023,en,
-345752,1,5,21.6.2023,en,
-353418,4,5,21.6.2023,en,
-986957,0,5,21.6.2023,en,
-611238,4,5,21.6.2023,en,
-691296,1,5,21.6.2023,en,
-271778,0,5,21.6.2023,en,
-344644,1,5,21.6.2023,en,
-954954,5,5,21.6.2023,en,
+117486,1,5,21.6.2023,sv,
+114732,5,5,21.6.2023,sv,
+472886,3,5,21.6.2023,sv,
+335462,1,5,21.6.2023,sv,
+874623,2,5,21.6.2023,sv,
+345752,1,5,21.6.2023,sv,
+353418,4,5,21.6.2023,sv,
+986957,0,5,21.6.2023,sv,
+611238,4,5,21.6.2023,sv,
+691296,1,5,21.6.2023,sv,
+271778,0,5,21.6.2023,sv,
+344644,1,5,21.6.2023,sv,
+954954,5,5,21.6.2023,sv,
 `);
       expect(res.headers['content-disposition']).toBe(
         'attachment; filename="final_grades_course_MS-A0102_' +
@@ -205,19 +205,19 @@ describe(
           .expect(HttpCode.Ok);
 
         expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-117486,1,5,21.6.2023,en,
-114732,5,5,21.6.2023,en,
-472886,3,5,21.6.2023,en,
-335462,1,5,21.6.2023,en,
-874623,2,5,21.6.2023,en,
-345752,1,5,21.6.2023,en,
-353418,4,5,21.6.2023,en,
-986957,0,5,21.6.2023,en,
-611238,4,5,21.6.2023,en,
-691296,1,5,21.6.2023,en,
-271778,0,5,21.6.2023,en,
-344644,1,5,21.6.2023,en,
-954954,5,5,21.6.2023,en,
+117486,1,5,21.6.2023,sv,
+114732,5,5,21.6.2023,sv,
+472886,3,5,21.6.2023,sv,
+335462,1,5,21.6.2023,sv,
+874623,2,5,21.6.2023,sv,
+345752,1,5,21.6.2023,sv,
+353418,4,5,21.6.2023,sv,
+986957,0,5,21.6.2023,sv,
+611238,4,5,21.6.2023,sv,
+691296,1,5,21.6.2023,sv,
+271778,0,5,21.6.2023,sv,
+344644,1,5,21.6.2023,sv,
+954954,5,5,21.6.2023,sv,
 `);
         expect(res.headers['content-disposition']).toBe(
           'attachment; filename="final_grades_course_MS-A0102_' +
@@ -256,7 +256,7 @@ describe(
         res = await request
           .get(
             '/v1/courses/6/assessment-models/24/grades/csv/sisu'
-            + '?assessmentDate=2023-05-12&completionLanguage=sv'
+            + '?assessmentDate=2023-05-12&completionLanguage=ja'
             + `&studentNumbers=${JSON.stringify(studentNumbers)}`
           )
           .set('Cookie', cookies.adminCookie)
@@ -264,19 +264,19 @@ describe(
           .expect(HttpCode.Ok);
 
         expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-117486,1,5,12.5.2023,sv,
-114732,5,5,12.5.2023,sv,
-472886,3,5,12.5.2023,sv,
-335462,1,5,12.5.2023,sv,
-874623,2,5,12.5.2023,sv,
-345752,1,5,12.5.2023,sv,
-353418,4,5,12.5.2023,sv,
-986957,0,5,12.5.2023,sv,
-611238,4,5,12.5.2023,sv,
-691296,1,5,12.5.2023,sv,
-271778,0,5,12.5.2023,sv,
-344644,1,5,12.5.2023,sv,
-954954,5,5,12.5.2023,sv,
+117486,1,5,12.5.2023,ja,
+114732,5,5,12.5.2023,ja,
+472886,3,5,12.5.2023,ja,
+335462,1,5,12.5.2023,ja,
+874623,2,5,12.5.2023,ja,
+345752,1,5,12.5.2023,ja,
+353418,4,5,12.5.2023,ja,
+986957,0,5,12.5.2023,ja,
+611238,4,5,12.5.2023,ja,
+691296,1,5,12.5.2023,ja,
+271778,0,5,12.5.2023,ja,
+344644,1,5,12.5.2023,ja,
+954954,5,5,12.5.2023,ja,
 `);
         expect(res.headers['content-disposition']).toBe(
           'attachment; filename="final_grades_course_MS-A0102_' +
@@ -289,7 +289,7 @@ describe(
         res = await request
           .get(
             '/v1/courses/9/assessment-models/42/grades/csv/sisu'
-            + '?assessmentDate=2023-12-12&completionLanguage=sv&instanceId=26'
+            + '?assessmentDate=2023-12-12&instanceId=26'
           )
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'text/csv')
@@ -312,18 +312,17 @@ describe(
         res = await request
           .get(
             '/v1/courses/9/assessment-models/42/grades/csv/sisu'
-            + '?assessmentDate=2023-12-12&completionLanguage=fi' +
-            '&studentNumbers=["114732","472886","327976","139131"]'
+            + '?assessmentDate=2023-12-12&studentNumbers=["114732","472886","327976","139131"]'
           )
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'text/csv')
           .expect(HttpCode.Ok);
 
         expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-114732,5,5,12.12.2023,fi,
-472886,5,5,12.12.2023,fi,
-327976,5,5,12.12.2023,fi,
-139131,5,5,12.12.2023,fi,
+114732,5,5,12.12.2023,sv,
+472886,5,5,12.12.2023,sv,
+327976,5,5,12.12.2023,sv,
+139131,5,5,12.12.2023,sv,
 `);
         expect(res.headers['content-disposition']).toBe(
           'attachment; filename="final_grades_course_PHYS-A1140_' +
@@ -336,7 +335,7 @@ describe(
         res = await request
           .get(
             '/v1/courses/9/assessment-models/42/grades/csv/sisu'
-            + '?assessmentDate=2023-12-12&completionLanguage=sv&instanceId=26' +
+            + '?assessmentDate=2023-12-12&instanceId=26' +
             '&studentNumbers=["327976","139131"]'
           )
           .set('Cookie', cookies.adminCookie)
@@ -357,8 +356,7 @@ describe(
       async () => {
         res = await request
           .get(
-            '/v1/courses/9/assessment-models/42/grades/csv/sisu'
-            + '?assessmentDate=2023-12-12&completionLanguage=sv'
+            '/v1/courses/9/assessment-models/42/grades/csv/sisu?assessmentDate=2023-12-12'
           )
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'text/csv')
@@ -398,7 +396,7 @@ describe(
 
         checkErrorRes([
           'completionLanguage must be one of the following values:' +
-          ' fi, sv, en, es, ja, zh, pt, fr, de, ru'
+            ' FI, SV, EN, ES, JA, ZH, PT, FR, DE, RU'
         ], HttpCode.BadRequest);
       });
 

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { SystemRole } from 'aalto-grades-common/types';
+import { Language, SystemRole } from 'aalto-grades-common/types';
 import { Dispatch, SetStateAction } from 'react';
 
 export interface ApiResponse<T> {
@@ -41,4 +41,9 @@ export interface TextFieldData {
   fieldId: string,
   fieldLabel: string,
   fieldHelperText?: string
+}
+
+export interface LanguageOption {
+  id: Language,
+  language: string
 }

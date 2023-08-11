@@ -249,10 +249,10 @@ router.get(
  *         name: completionLanguage
  *         schema:
  *           type: string
- *           enum: [fi, sv, en, es, ja, zh, pt, fr, de, ru]
+ *           enum: [FI, SV, EN, ES, JA, ZH, PT, FR, DE, RU]
  *         required: false
- *         description: Completion language marked on the grade CSV. Defaults to en.
- *         example: en
+ *         description: Completion language marked on the grade CSV. Defaults to course language.
+ *         example: EN
  *     responses:
  *       200:
  *         description: Grades calculated successfully.

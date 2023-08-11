@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { LocalizedString } from './language';
+import { Language, LocalizedString } from './language';
 import { UserData } from './user';
 
 export enum GradingScale {
@@ -29,6 +29,7 @@ export interface CourseData {
   department: LocalizedString,
   name: LocalizedString,
   gradingScale: GradingScale,
+  languageOfInstruction: Language,
   teachersInCharge: Array<UserData>
 }
 
