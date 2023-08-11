@@ -23,7 +23,7 @@ export default function StudentGradeList(props: {
         }}>
           <Typography align='left'>
             <span style={{ fontWeight: 'bold' }}>
-            Final Grade:
+              Final Grade:
             </span>
           </Typography>
           <Typography align='left' variant='body2'>
@@ -35,9 +35,10 @@ export default function StudentGradeList(props: {
           </Typography>
           <Tooltip
             placement="top"
-            title={props.grades.grades.length == 0 ?
-              'To edit final grade, first calculate it.' :
-              ''}
+            title={props.grades.grades.length == 0
+              ? 'To edit final grade, first calculate it.'
+              : ''
+            }
           >
             <Box>
               <Button

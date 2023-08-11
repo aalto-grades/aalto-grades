@@ -2,15 +2,58 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, AttainmentGradeData, FinalGrade } from 'aalto-grades-common/types';
 import {
-  Checkbox, Link, TableCell, TableRow, Tooltip
+  AttainmentData, AttainmentGradeData, FinalGrade
+} from 'aalto-grades-common/types';
+import {
+  Checkbox, IconButton, Link, TableCell, TableRow, Tooltip
 } from '@mui/material';
-import { JSX } from 'react';
+import { MoreHoriz as MoreHorizIcon } from '@mui/icons-material';
+import { JSX, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 
+import GradeOptionsDialog from './GradeOptionsDialog';
+
 import { useGetGradeTreeOfUser } from '../../hooks/useApi';
+import { State } from '../../types';
+import { findBestGradeOption } from '../../utils';
+
+function GradeCell(props: {
+  studentNumber: string,
+  attainment: AttainmentData,
+  grade: AttainmentGradeData | null
+}): JSX.Element {
+  const [gradeOptionsOpen, setGradeOptionsOpen]: State<boolean> = useState(false);
+
+  return (
+    <>
+      <TableCell
+        sx={{ width: '100px' }}
+        align="left"
+      >
+        {(props.grade) && (
+          findBestGradeOption(props.grade.grades)?.grade ?? '-'
+        )}
+        {(props.grade && props.grade.grades.length > 1) && (
+          <>
+            <IconButton size='small' color='primary' sx={{ ml: 1 }}>
+              <MoreHorizIcon
+                onClick={(): void => setGradeOptionsOpen(true)}
+              />
+            </IconButton>
+            <GradeOptionsDialog
+              title={`Grades of ${props.studentNumber} for ${props.attainment.name}`}
+              options={props.grade.grades}
+              open={gradeOptionsOpen}
+              handleClose={(): void => setGradeOptionsOpen(false)}
+            />
+          </>
+        )}
+      </TableCell>
+    </>
+  );
+}
 
 export default function CourseResultsTableRow(props: {
   student: FinalGrade,
@@ -24,28 +67,29 @@ export default function CourseResultsTableRow(props: {
   const { courseId, assessmentModelId }: Params =
     useParams() as { courseId: string, assessmentModelId: string };
 
+  const [finalGradeOptionsOpen, setFinalGradeOptionsOpen]: State<boolean> = useState(false);
+
   const gradeTree: UseQueryResult<AttainmentGradeData> = useGetGradeTreeOfUser(
     courseId, assessmentModelId, props.student.userId
   );
 
-  function getGrade(attainmentId: number): number {
+  function getAttainmentGrade(attainmentId: number): AttainmentGradeData | null {
     if (!gradeTree.data)
-      return -1;
+      return null;
 
-    function traverseTree(grade: AttainmentGradeData): number {
+    function traverseTree(grade: AttainmentGradeData): AttainmentGradeData | null {
       if (grade.attainmentId === attainmentId) {
-        return grade.grades[0].grade;
+        return grade;
       }
 
       if (grade.subAttainments) {
         for (const subGrade of grade.subAttainments) {
-          const gradeValue: number = traverseTree(subGrade);
-          if (gradeValue >= 0) {
-            return gradeValue;
-          }
+          const maybeFound: AttainmentGradeData | null = traverseTree(subGrade);
+          if (maybeFound)
+            return maybeFound;
         }
       }
-      return -1;
+      return null;
     }
 
     return traverseTree(gradeTree.data);
@@ -93,21 +137,33 @@ export default function CourseResultsTableRow(props: {
         align="left"
         key={`${props.student.studentNumber}_grade`}
       >
-        {props.student.grades.length > 0 ? props.student.grades[0].grade : '-'}
+        {findBestGradeOption(props.student.grades)?.grade ?? '-'}
+        {(props.student.grades.length > 1) && (
+          <>
+            <IconButton size='small' color='primary' sx={{ ml: 1 }}>
+              <MoreHorizIcon
+                onClick={(): void => setFinalGradeOptionsOpen(true)}
+              />
+            </IconButton>
+            <GradeOptionsDialog
+              title={`Final grades of ${props.student.studentNumber}`}
+              options={props.student.grades}
+              open={finalGradeOptionsOpen}
+              handleClose={(): void => setFinalGradeOptionsOpen(false)}
+            />
+          </>
+        )}
       </TableCell>
-      {
-        gradeTree.data && (
-          props.attainmentList.map((attainment: AttainmentData) => (
-            <TableCell
-              sx={{ width: '100px' }}
-              align="left"
-              key={`${props.student.studentNumber}_${attainment.name}_grade`}
-            >
-              {getGrade(attainment.id ?? -1)}
-            </TableCell>
-          ))
-        )
-      }
+      {(gradeTree.data) && (
+        props.attainmentList.map((attainment: AttainmentData) => (
+          <GradeCell
+            key={`${props.student.studentNumber}_${attainment.name}_grade`}
+            studentNumber={props.student.studentNumber}
+            attainment={attainment}
+            grade={getAttainmentGrade(attainment.id ?? -1)}
+          />
+        ))
+      )}
       <TableCell
         sx={{ width: '100px' }}
         align="left"

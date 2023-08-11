@@ -87,7 +87,12 @@ export default function StudentGradesDialog(props: {
       {(editGrade) && (
         <EditGradeDialog
           grade={editGrade}
-          setOpen={setShowEditDialog}
+          handleClose={(): void => {
+            setShowEditDialog(false);
+          }}
+          refetchGrades={(): void => {
+            grades.refetch();
+          }}
           open={showEditDialog}
         />
       )}

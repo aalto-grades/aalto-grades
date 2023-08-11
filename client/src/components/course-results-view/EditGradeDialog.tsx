@@ -18,11 +18,13 @@ import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import { UseEditGradeResult, useEditGrade } from '../../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import { State } from '../../types';
+import { findBestGradeOption } from '../../utils';
 
 // A Dialog component for editing individual grade of a user.
 export default function EditGradeDialog(props: {
   grade: AttainmentGradeData,
-  setOpen: (open: boolean) => void,
+  handleClose: () => void,
+  refetchGrades: () => void,
   open: boolean
 }): JSX.Element {
   const { courseId, assessmentModelId }: Params =
@@ -32,14 +34,19 @@ export default function EditGradeDialog(props: {
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
-  const [gradeId, setGradeId]: State<number> =
-    useState<number>(props.grade.grades[0].gradeId as number);
+
+  const [gradeId, setGradeId]: State<number | null> = useState<number | null>(null);
+
+  if (!gradeId && props.open) {
+    setGradeId(findBestGradeOption(props.grade.grades)?.gradeId ?? null);
+  }
+
   const [formInitialValues, setFormInitialValues]: State<EditGrade> = useState<EditGrade>({
-    grade: props.grade.grades[0].grade,
-    status: props.grade.grades[0].status,
-    date: props.grade.grades[0].date ?? new Date(),
-    expiryDate: props.grade.grades[0].expiryDate ?? new Date(),
-    comment: props.grade.grades[0].comment ?? ''
+    grade: 0,
+    status: Status.Pending,
+    date: new Date(),
+    expiryDate: new Date(),
+    comment: ''
   });
 
   async function handleSubmit(values: EditGrade): Promise<void> {
@@ -50,9 +57,7 @@ export default function EditGradeDialog(props: {
           assessmentModelId,
           gradeId,
           userId: props.grade.userId as number,
-          data: {
-            ...values
-          }
+          data: values
         },
         {
           onSuccess: () => {
@@ -60,7 +65,9 @@ export default function EditGradeDialog(props: {
               msg: 'Grade updated successfully.',
               severity: 'success'
             });
-            setFormInitialValues(values);
+            props.handleClose();
+            props.refetchGrades();
+            setGradeId(null);
           }
         }
       );
@@ -95,7 +102,7 @@ export default function EditGradeDialog(props: {
             <Select
               labelId="assessmentModelSelect"
               id="assessmentModelSelectId"
-              value={String(gradeId)}
+              value={gradeId ? String(gradeId) : ''}
               label="Assessment model"
               fullWidth
               onChange={(event: SelectChangeEvent): void => {
@@ -251,7 +258,8 @@ export default function EditGradeDialog(props: {
                           if (initialValues != values) {
                             setShowDialog(true);
                           } else {
-                            props.setOpen(false);
+                            props.handleClose();
+                            setGradeId(null);
                           }
                         }}
                       >
@@ -276,7 +284,10 @@ export default function EditGradeDialog(props: {
       <UnsavedChangesDialog
         setOpen={setShowDialog}
         open={showDialog}
-        handleDiscard={(): void => props.setOpen(false)}
+        handleDiscard={(): void => {
+          props.handleClose();
+          setGradeId(null);
+        }}
       />
       <AlertSnackbar snackPack={snackPack} />
     </>
