@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentGradeData, FinalGrade } from 'aalto-grades-common/types';
+import { AttainmentGradeData, EditGrade, FinalGrade } from 'aalto-grades-common/types';
 import axios from './axios';
 import {
   QueryClient, useMutation, UseMutationOptions, UseMutationResult,
@@ -171,6 +171,41 @@ export function useCalculateFinalGrades(
 
       queryClient.invalidateQueries({
         queryKey: ['grade-tree-of-user', vars.courseId, vars.assessmentModelId]
+      });
+    },
+    ...options
+  });
+}
+
+interface EditGradeVars {
+  courseId: Numeric,
+  assessmentModelId: Numeric,
+  gradeId: Numeric,
+  userId: Numeric,
+  data: EditGrade
+}
+
+export type UseEditGradeResult = UseMutationResult<
+  boolean, unknown, EditGradeVars
+>;
+
+export function useEditGrade(
+  options?: UseMutationOptions<boolean, unknown, unknown>
+): UseEditGradeResult {
+  const queryClient: QueryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (vars: EditGradeVars) => (
+      await axios.put(
+        `/v1/courses/${vars.courseId}/assessment-models/`
+        + `${vars.assessmentModelId}/grades/${vars.gradeId}`,
+        vars.data
+      )
+    ).data.data,
+
+    onSuccess: (_data: unknown, vars: EditGradeVars) => {
+      queryClient.invalidateQueries({
+        queryKey: ['grade-tree-of-user', vars.courseId, vars.assessmentModelId, vars.userId],
       });
     },
     ...options

@@ -4,7 +4,7 @@
 
 import { AttainmentGradeData, Status } from 'aalto-grades-common/types';
 import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { JSX, SyntheticEvent, useState } from 'react';
 
 import { Accordion, AccordionSummary } from '../attainments/CustomAccordion';
@@ -36,7 +36,8 @@ function GradeText(props: {
 }
 
 export default function StudentGradeAccordion(props: {
-  attainmentGrade: AttainmentGradeData
+  attainmentGrade: AttainmentGradeData,
+  gradeToEdit: (grade: AttainmentGradeData) => void
 }): JSX.Element {
 
   const [expanded, setExpanded]: State<Set<number>> = useState(new Set());
@@ -105,6 +106,7 @@ export default function StudentGradeAccordion(props: {
                   >
                     <StudentGradeAccordion
                       attainmentGrade={subAttainment}
+                      gradeToEdit={props.gradeToEdit}
                     />
                   </Box>
                 );
@@ -139,6 +141,13 @@ export default function StudentGradeAccordion(props: {
                   : Status.Pending
               }
             />
+            <Button
+              onClick={(): void => {
+                props.gradeToEdit(props.attainmentGrade);
+              }}
+            >
+              Edit
+            </Button>
           </Box>
         )
       }

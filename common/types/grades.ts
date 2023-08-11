@@ -15,7 +15,8 @@ export interface GradeOption {
   status: Status,
   manual: boolean,
   date?: Date,
-  expiryDate?: Date
+  expiryDate?: Date,
+  comment: string
 }
 
 export interface AttainmentGradeData {
@@ -32,4 +33,12 @@ export interface FinalGrade {
   studentNumber: string,
   credits: number,
   grades: Array<GradeOption>
+}
+
+export interface EditGrade {
+  grade?: number,
+  status?: Status,
+  date?: Date,
+  expiryDate?: Date,
+  comment?: string
 }
