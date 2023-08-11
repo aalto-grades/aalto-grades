@@ -425,7 +425,7 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
             status: grade.status as Status,
             manual: grade.manual,
             date: grade.date,
-            comment: grade.comment
+            comment: grade.comment ?? ''
           };
         })
     });
@@ -498,7 +498,7 @@ export async function getGradeTreeOfUser(req: Request, res: Response): Promise<v
             manual: option.manual,
             date: option.date,
             expiryDate: option.expiryDate,
-            comment: option.comment
+            comment: option.comment ?? ''
           };
         }
       ),
