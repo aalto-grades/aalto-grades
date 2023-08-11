@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { FinalGrade } from 'aalto-grades-common/types';
+import { FinalGrade, Language } from 'aalto-grades-common/types';
 import {
   Box, Button, Dialog, DialogActions, DialogContent,
   DialogContentText, DialogTitle, List, ListItem,
@@ -15,58 +15,53 @@ import AlertSnackbar from '../alerts/AlertSnackbar';
 
 import { useDownloadSisuGradeCsv, UseDownloadSisuGradeCsvResult } from '../../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
-import { State } from '../../types';
+import { LanguageOption, State } from '../../types';
 
 // A Dialog component for downloading a Sisu grade CSV.
 const instructions: string =
   'Set the completion language and assesment date for the grading, these values'
   + ' are optional. Click download to download the grades.';
 
-interface LanguageOption {
-  id: string,
-  language: string
-}
-
 // Available completion languages used in Sisu.
-const languageOptions: Array<LanguageOption> = [
+export const languageOptions: Array<LanguageOption> = [
   {
-    id: 'fi',
+    id: Language.Finnish,
     language: 'Finnish'
   },
   {
-    id: 'sv',
+    id: Language.Swedish,
     language: 'Swedish'
   },
   {
-    id: 'en',
+    id: Language.English,
     language: 'English'
   },
   {
-    id: 'es',
+    id: Language.Spanish,
     language: 'Spanish'
   },
   {
-    id: 'ja',
+    id: Language.Japanese,
     language: 'Japanese'
   },
   {
-    id: 'zh',
+    id: Language.Chinese,
     language: 'Chinese'
   },
   {
-    id: 'pt',
+    id: Language.Portuguese,
     language: 'Portuguese'
   },
   {
-    id: 'fr',
+    id: Language.French,
     language: 'French'
   },
   {
-    id: 'de',
+    id: Language.German,
     language: 'German'
   },
   {
-    id: 'ru',
+    id: Language.Russian,
     language: 'Russian'
   }
 ];
@@ -149,7 +144,7 @@ export default function SisuDownloadDialog(props: {
                 id="select-grading-completion-language"
                 select
                 label="Completion language"
-                defaultValue="en"
+                defaultValue="EN"
                 helperText="If not provided, the default will be English."
                 onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
                   setCompletionLanguage(e.target.value);
