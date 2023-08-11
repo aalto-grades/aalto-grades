@@ -9,6 +9,30 @@ import { getCoursesOfUser, getUserInfo } from '../controllers/user';
 import { controllerDispatcher } from '../middleware/errorHandler';
 
 export const router: Router = Router();
+/**
+ * @swagger
+ * definitions:
+ *   UserData:
+ *     type: object
+ *     description: Users personal information.
+ *     properties:
+ *       id:
+ *         type: integer
+ *         description: Internal user database ID.
+ *         format: int32
+ *         minimum: 1
+ *         example: 1
+ *       studentNumber:
+ *         $ref: '#/definitions/StudentNumber'
+ *       name:
+ *         type: string
+ *         description: User's name.
+ *         example: Eddy Engineer
+ *       email:
+ *         type: string
+ *         description: User's email address.
+ *         example: Eddy.Engineer@aalto.fi
+ */
 
 /**
  * @swagger
@@ -63,13 +87,13 @@ router.get(
  *   get:
  *     tags: [User]
  *     description: >
- *       Get all courses the given user has or is currently participated in.
- *       User can access only their own course list. Admin can access any users courses.
+ *       Get information of the user based on ID.
+ *       User can access only their own information. Admin can access any users information.
  *     parameters:
  *       - $ref: '#/components/parameters/userId'
  *     responses:
  *       200:
- *         description: Courses user has participated in.
+ *         description: User information.
  *         content:
  *           application/json:
  *             schema:
@@ -78,7 +102,7 @@ router.get(
  *                 data:
  *                   type: array
  *                   items:
- *                     $ref: '#/definitions/CourseData'
+ *                     $ref: '#/definitions/UserData'
  *       400:
  *         description: User ID validation failed. Must be positive integer.
  *         content:
