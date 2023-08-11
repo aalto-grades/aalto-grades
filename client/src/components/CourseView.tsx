@@ -140,12 +140,12 @@ export default function CourseView(): JSX.Element {
                             }}>
                               <CircularProgress />
                             </Box>
-                          Loading attainments...
+                            Loading attainments...
                           </div>
                         ) : (
-                          <div>
+                          <Box sx={{ mt: 9 }}>
                             No assessment models found.
-                          </div>
+                          </Box>
                         )
                     )}
                   </div>
