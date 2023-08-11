@@ -222,6 +222,14 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
     assessmentDate: yup
       .date()
       .notRequired(),
+    completionLanguage: yup
+      .string()
+      .transform((value: string, originalValue: string) => {
+        return originalValue ? originalValue.toLowerCase() : value;
+      })
+      // All Sisu accepted language codes.
+      .oneOf(['FI', 'SV', 'EN', 'ES', 'JA', 'ZH', 'PT', 'FR', 'DE', 'RU'])
+      .notRequired(),
     studentNumbers: yup
       .array()
       .json()
@@ -233,8 +241,9 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
       .notRequired()
   });
 
-  const { assessmentDate, studentNumbers, instanceId }: {
+  const { assessmentDate, completionLanguage, studentNumbers, instanceId }: {
     assessmentDate?: Date,
+    completionLanguage?: string,
     studentNumbers?: Array<string>,
     instanceId?: number
   } = await urlParams.validate(req.query, { abortEarly: false });
@@ -293,7 +302,7 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
         assessmentDate: (
           assessmentDate ? new Date(assessmentDate) : new Date(Date.now())
         ).toLocaleDateString('fi-FI'),
-        completionLanguage: course.languageOfInstruction.toLowerCase(),
+        completionLanguage: completionLanguage ?? course.languageOfInstruction.toLowerCase(),
         // Comment column is required, but can be empty.
         comment: ''
       });

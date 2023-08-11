@@ -251,12 +251,12 @@ describe(
       );
     });
 
-    it('should export CSV succesfully with custom assessmentDate',
+    it('should export CSV succesfully with custom assessmentDate and completionLanguage',
       async () => {
         res = await request
           .get(
             '/v1/courses/6/assessment-models/24/grades/csv/sisu'
-            + '?assessmentDate=2023-05-12'
+            + '?assessmentDate=2023-05-12&completionLanguage=ja'
             + `&studentNumbers=${JSON.stringify(studentNumbers)}`
           )
           .set('Cookie', cookies.adminCookie)
@@ -264,19 +264,19 @@ describe(
           .expect(HttpCode.Ok);
 
         expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-117486,1,5,12.5.2023,sv,
-114732,5,5,12.5.2023,sv,
-472886,3,5,12.5.2023,sv,
-335462,1,5,12.5.2023,sv,
-874623,2,5,12.5.2023,sv,
-345752,1,5,12.5.2023,sv,
-353418,4,5,12.5.2023,sv,
-986957,0,5,12.5.2023,sv,
-611238,4,5,12.5.2023,sv,
-691296,1,5,12.5.2023,sv,
-271778,0,5,12.5.2023,sv,
-344644,1,5,12.5.2023,sv,
-954954,5,5,12.5.2023,sv,
+117486,1,5,12.5.2023,ja,
+114732,5,5,12.5.2023,ja,
+472886,3,5,12.5.2023,ja,
+335462,1,5,12.5.2023,ja,
+874623,2,5,12.5.2023,ja,
+345752,1,5,12.5.2023,ja,
+353418,4,5,12.5.2023,ja,
+986957,0,5,12.5.2023,ja,
+611238,4,5,12.5.2023,ja,
+691296,1,5,12.5.2023,ja,
+271778,0,5,12.5.2023,ja,
+344644,1,5,12.5.2023,ja,
+954954,5,5,12.5.2023,ja,
 `);
         expect(res.headers['content-disposition']).toBe(
           'attachment; filename="final_grades_course_MS-A0102_' +
@@ -385,6 +385,19 @@ describe(
           'attachment; filename="final_grades_course_PHYS-A1140_' +
         `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
         );
+      });
+
+    it(
+      'should respond with 400 bad request, if (optional) completionLanguage param is not valid',
+      async () => {
+        res = await request
+          .get('/v1/courses/1/assessment-models/1/grades/csv/sisu?completionLanguage=xy')
+          .set('Cookie', cookies.adminCookie);
+
+        checkErrorRes([
+          'completionLanguage must be one of the following values:' +
+            ' FI, SV, EN, ES, JA, ZH, PT, FR, DE, RU'
+        ], HttpCode.BadRequest);
       });
 
     it(
