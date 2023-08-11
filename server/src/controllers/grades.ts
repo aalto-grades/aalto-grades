@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AttainmentGradeData, FinalGrade, Formula, GradeOption, HttpCode, Status
+  AttainmentGradeData, EditGrade, FinalGrade, Formula, GradeOption, HttpCode, Status
 } from 'aalto-grades-common/types';
 import { parse, Parser } from 'csv-parse';
 import { stringify } from 'csv-stringify';
@@ -415,7 +415,8 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
             grade: grade.grade,
             status: grade.status as Status,
             manual: grade.manual,
-            date: grade.date
+            date: grade.date,
+            comment: grade.comment
           };
         })
     });
@@ -487,7 +488,8 @@ export async function getGradeTreeOfUser(req: Request, res: Response): Promise<v
             status: option.status as Status,
             manual: option.manual,
             date: option.date,
-            expiryDate: option.expiryDate
+            expiryDate: option.expiryDate,
+            comment: option.comment
           };
         }
       ),
@@ -1137,16 +1139,11 @@ export async function editUserGrade(req: Request, res: Response): Promise<void> 
       .notRequired(),
     date: yup.date().notRequired(),
     expiryDate: yup.date().notRequired(),
-    comment: yup.string().min(1).notRequired(),
+    comment: yup.string().notRequired()
   });
 
-  await requestSchema.validate(req.body, { abortEarly: false });
-
-  const grade: number | undefined = req.body.grade;
-  const status: Status | undefined = req.body.status;
-  const date: Date | undefined = req.body.date;
-  const expiryDate: Date | undefined = req.body.expiryDate;
-  const comment: string | undefined = req.body.comment;
+  const { grade, status, date, expiryDate, comment }: EditGrade =
+    await requestSchema.validate(req.body, { abortEarly: false });
 
   const gradeId: number =
     (await idSchema.validate({ id: req.params.gradeId }, { abortEarly: false })).id;
@@ -1167,7 +1164,7 @@ export async function editUserGrade(req: Request, res: Response): Promise<void> 
     status: status ?? gradeData.status,
     date: date ?? gradeData.date,
     expiryDate: expiryDate ?? gradeData.expiryDate,
-    comment: comment ?? gradeData.comment,
+    comment: (comment && comment.length > 0) ? comment : gradeData.comment,
     manual: true,
     graderId: grader.id
   }).save();
