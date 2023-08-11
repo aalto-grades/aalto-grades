@@ -14,6 +14,7 @@ export default class Course extends Model<
 > {
   declare id: CreationOptional<number>;
   declare courseCode: string;
+  declare languageOfInstruction: string;
   declare minCredits: number;
   declare maxCredits: number;
   declare gradingScale: GradingScale;
@@ -29,7 +30,11 @@ Course.init(
       primaryKey: true
     },
     courseCode: {
-      type: new DataTypes.STRING,
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    languageOfInstruction: {
+      type: DataTypes.ENUM('FI', 'SV', 'EN', 'ES', 'JA', 'ZH', 'PT', 'FR', 'DE', 'RU'),
       allowNull: false
     },
     minCredits: {

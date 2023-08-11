@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseInstanceData, GradingScale, Period } from 'aalto-grades-common/types';
+import { CourseInstanceData, GradingScale, Language, Period } from 'aalto-grades-common/types';
 
 export const mockInstances: Array<CourseInstanceData> = [
   {
@@ -18,6 +18,7 @@ export const mockInstances: Array<CourseInstanceData> = [
       minCredits: 5,
       maxCredits: 5,
       gradingScale: GradingScale.Numerical,
+      languageOfInstruction: Language.English,
       teachersInCharge: [
         {
           id: 10,
@@ -53,6 +54,7 @@ export const mockInstances: Array<CourseInstanceData> = [
       minCredits: 5,
       maxCredits: 5,
       gradingScale: GradingScale.Numerical,
+      languageOfInstruction: Language.English,
       teachersInCharge: [
         {
           id: 10,
@@ -84,6 +86,7 @@ export const mockInstances: Array<CourseInstanceData> = [
       minCredits: 5,
       maxCredits: 5,
       gradingScale: GradingScale.Numerical,
+      languageOfInstruction: Language.English,
       teachersInCharge: [
         {
           id: 10,
@@ -115,6 +118,7 @@ export const mockInstances: Array<CourseInstanceData> = [
       minCredits: 5,
       maxCredits: 5,
       gradingScale: GradingScale.Numerical,
+      languageOfInstruction: Language.English,
       teachersInCharge: [
         {
           id: 10,
@@ -146,6 +150,7 @@ export const mockInstances: Array<CourseInstanceData> = [
       minCredits: 5,
       maxCredits: 5,
       gradingScale: GradingScale.Numerical,
+      languageOfInstruction: Language.English,
       teachersInCharge: [
         {
           id: 12,

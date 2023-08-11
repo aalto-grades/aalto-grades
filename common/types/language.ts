@@ -5,7 +5,14 @@
 export enum Language {
   English = 'EN',
   Finnish = 'FI',
-  Swedish = 'SV'
+  Swedish = 'SV',
+  Spanish = 'ES',
+  Japanese = 'JA',
+  Chinese = 'ZH',
+  Portuguese = 'PT',
+  French = 'FR',
+  German = 'DE',
+  Russian = 'RU',
 }
 
 export interface LocalizedString {

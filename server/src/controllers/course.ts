@@ -81,8 +81,18 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     courseCode: yup.string().required(),
     minCredits: yup.number().min(0).required(),
-    maxCredits: yup.number().min(yup.ref('minCredits')).required(),
-    gradingScale: yup.string().oneOf(Object.values(GradingScale)).required(),
+    maxCredits: yup.number()
+      .min(yup.ref('minCredits'))
+      .required(),
+    gradingScale: yup.string()
+      .oneOf(Object.values(GradingScale))
+      .required(),
+    languageOfInstruction: yup.string()
+      .transform((value: string, originalValue: string) => {
+        return originalValue ? originalValue.toUpperCase() : value;
+      })
+      .oneOf(Object.values(Language))
+      .required(),
     teachersInCharge: yup.array().of(
       yup.object().shape({
         email: yup.string().email().required()
@@ -107,7 +117,8 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
         courseCode: req.body.courseCode,
         minCredits: req.body.minCredits,
         maxCredits: req.body.maxCredits,
-        gradingScale: req.body.gradingScale
+        gradingScale: req.body.gradingScale,
+        languageOfInstruction: req.body.languageOfInstruction.toUpperCase()
       }, { transaction: t });
 
       await CourseTranslation.bulkCreate([
@@ -155,8 +166,18 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     courseCode: yup.string().notRequired(),
     minCredits: yup.number().min(0).notRequired(),
-    maxCredits: yup.number().min(yup.ref('minCredits')).notRequired(),
-    gradingScale: yup.string().oneOf(Object.values(GradingScale)).notRequired(),
+    maxCredits: yup.number()
+      .min(yup.ref('minCredits'))
+      .notRequired(),
+    gradingScale: yup.string()
+      .oneOf(Object.values(GradingScale))
+      .notRequired(),
+    languageOfInstruction: yup.string()
+      .transform((value: string, originalValue: string) => {
+        return originalValue ? originalValue.toUpperCase() : value;
+      })
+      .oneOf(Object.values(Language))
+      .notRequired(),
     teachersInCharge: yup.array().of(
       yup.object().shape({
         email: yup.string().email().required()
@@ -177,6 +198,8 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
   const teachersInCharge: Array<UserData> | undefined = req.body.teachersInCharge;
   const department: LocalizedString | undefined = req.body.department;
   const name: LocalizedString | undefined = req.body.name;
+  const languageOfInstruction: Language | undefined =
+    req.body.languageOfInstruction ? req.body.languageOfInstruction.toUpperCase() : undefined;
 
   if (minCredits && !maxCredits && minCredits > course.maxCredits) {
     throw new ApiError(
@@ -205,7 +228,8 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
           courseCode: courseCode,
           minCredits: minCredits,
           maxCredits: maxCredits,
-          gradingScale: gradingScale
+          gradingScale: gradingScale,
+          languageOfInstruction: languageOfInstruction
         },
         {
           where: {

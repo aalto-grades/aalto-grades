@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseData, GradingScale, UserData } from 'aalto-grades-common/types';
+import { CourseData, GradingScale, Language, UserData } from 'aalto-grades-common/types';
 import { Form, Formik, FormikProps } from 'formik';
 import {
   Delete as DeleteIcon,
@@ -21,13 +21,14 @@ import * as yup from 'yup';
 import UnsavedChangesDialog from './alerts/UnsavedChangesDialog';
 import NotFound from './NotFound';
 
+import { languageOptions } from './course-results-view/SisuDownloadDialog';
 import {
   useAddCourse, UseAddCourseResult,
   useEditCourse, UseEditCourseResult,
   useGetCourse
 } from '../hooks/useApi';
 import { convertToClientGradingScale } from '../services/textFormat';
-import { State } from '../types';
+import { LanguageOption, State } from '../types';
 
 interface FormData {
   courseCode: string,
@@ -38,6 +39,7 @@ interface FormData {
   departmentEn: string,
   departmentFi: string,
   departmentSv: string,
+  languageOfInstruction: Language,
   nameEn: string,
   nameFi: string,
   nameSv: string
@@ -151,6 +153,7 @@ export default function EditCourseView(): JSX.Element {
         minCredits: course.data.minCredits,
         maxCredits: course.data.maxCredits,
         gradingScale: course.data.gradingScale,
+        languageOfInstruction: course.data.languageOfInstruction,
         teacherEmail: '',
         departmentEn: course.data.department.en,
         departmentFi: course.data.department.fi,
@@ -171,6 +174,7 @@ export default function EditCourseView(): JSX.Element {
         minCredits: 0,
         maxCredits: 0,
         gradingScale: GradingScale.Numerical,
+        languageOfInstruction: Language.English,
         teacherEmail: '',
         departmentEn: '',
         departmentFi: '',
@@ -196,6 +200,7 @@ export default function EditCourseView(): JSX.Element {
       minCredits: values.minCredits,
       maxCredits: values.maxCredits,
       gradingScale: GradingScale.Numerical,
+      languageOfInstruction: values.languageOfInstruction,
       department: {
         fi: values.departmentFi,
         sv: values.departmentSv,
@@ -253,6 +258,9 @@ export default function EditCourseView(): JSX.Element {
                   .required('Maximum credits is required'),
                 gradingScale: yup.string()
                   .oneOf(Object.values(GradingScale))
+                  .required(),
+                languageOfInstruction: yup.string()
+                  .oneOf(Object.values(Language))
                   .required(),
                 teacherEmail: yup.string()
                   .email('Please input valid email address')
@@ -343,6 +351,22 @@ export default function EditCourseView(): JSX.Element {
                             </MenuItem>
                           );
                         })
+                      }
+                    </EditCourseTextField>
+                    <EditCourseTextField
+                      onChange={form.handleChange}
+                      form={form}
+                      value='languageOfInstruction'
+                      label='Course language*'
+                      helperText='Language in which the course will be conducted.'
+                      select={true}
+                    >
+                      {
+                        languageOptions.map((option: LanguageOption) => (
+                          <MenuItem key={option.id} value={option.id}>
+                            {option.language}
+                          </MenuItem>
+                        ))
                       }
                     </EditCourseTextField>
                     <TextField

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseInstanceData, GradingScale } from 'aalto-grades-common/types';
+import { CourseInstanceData, GradingScale, Language } from 'aalto-grades-common/types';
 
 export const mockSisuInstances: Array<CourseInstanceData> = [
   {
@@ -15,6 +15,7 @@ export const mockSisuInstances: Array<CourseInstanceData> = [
       minCredits: 5,
       maxCredits: 5,
       gradingScale: GradingScale.Numerical,
+      languageOfInstruction: Language.English,
       teachersInCharge: [
         {
           name: 'Elisa Mekler'
@@ -45,6 +46,7 @@ export const mockSisuInstances: Array<CourseInstanceData> = [
       minCredits: 5,
       maxCredits: 5,
       gradingScale: GradingScale.Numerical,
+      languageOfInstruction: Language.English,
       teachersInCharge: [
         {
           name: 'Elisa Mekler'
@@ -72,6 +74,7 @@ export const mockSisuInstances: Array<CourseInstanceData> = [
       minCredits: 5,
       maxCredits: 5,
       gradingScale: GradingScale.Numerical,
+      languageOfInstruction: Language.English,
       teachersInCharge: [
         {
           name: 'Kerttu Maaria Pollari-Malmi'
