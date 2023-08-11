@@ -2,14 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AssessmentModelData, CourseData, SystemRole, UserData } from 'aalto-grades-common/types';
+import {
+  AssessmentModelData, CourseData, Language, SystemRole, UserData
+} from 'aalto-grades-common/types';
 import { Box, Button, Tooltip, Typography } from '@mui/material';
 
 import AssessmentModelsList from './AssessmentModelsList';
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 
+import { languageOptions } from '../course-results-view/SisuDownloadDialog';
 import useAuth, { AuthContextType } from '../../hooks/useAuth';
 import { convertToClientGradingScale } from '../../services/textFormat';
+import { LanguageOption } from '../../types';
 
 export default function CourseDetails(props: {
   course: CourseData,
@@ -19,6 +23,13 @@ export default function CourseDetails(props: {
   onNewAssessmentModel: () => void
 }): JSX.Element {
   const { auth, isTeacherInCharge }: AuthContextType = useAuth();
+
+  function getLanguageById(id: Language): string {
+    const languageOption: LanguageOption = languageOptions.find(
+      (option: LanguageOption) => option.id === id
+    ) as LanguageOption;
+    return languageOption.language;
+  }
 
   return (
     <Box sx={{ display: 'inline-block' }}>
@@ -58,6 +69,10 @@ export default function CourseDetails(props: {
           label='Educational Institution'
           // REPLACE SOME DAY? currently this info can't be fetched from database
           value='Aalto University'
+        />
+        <LightLabelBoldValue
+          label='Course language'
+          value={getLanguageById(props.course.languageOfInstruction)}
         />
       </Box>
       <Box sx={{ mt: 1.5 }}>
