@@ -5,7 +5,7 @@
 import { AttainmentGradeData, GradeOption } from 'aalto-grades-common/types';
 import {
   Button, Dialog, DialogActions, DialogContent, DialogTitle,
-  Table, TableBody, TableCell, TableHead, TableRow
+  Table, TableBody, TableCell, TableHead, TableRow, Typography
 } from '@mui/material';
 import { JSX } from 'react';
 
@@ -56,7 +56,11 @@ export default function GradeOptionsDialog(props: {
   ];
 
   return (
-    <Dialog open={props.open} transitionDuration={{ exit: 800 }}>
+    <Dialog
+      open={props.open}
+      transitionDuration={{ exit: 800 }}
+      maxWidth='md'
+    >
       <DialogTitle>Grade Options</DialogTitle>
       <DialogContent>
         <Table>
@@ -73,8 +77,13 @@ export default function GradeOptionsDialog(props: {
             {props.grade.grades.map((option: GradeOption) => (
               <TableRow key={option.gradeId}>
                 {headCells.map((cell: Cell) => (
-                  <TableCell key={cell.id}>
-                    {(option[cell.id] as string) ?? '-'}
+                  <TableCell key={cell.id} style={{
+                    whiteSpace: 'normal',
+                    wordWrap: 'break-word'
+                  }}>
+                    <Typography variant='body2' sx={{ maxWidth: 100 }}>
+                      {(option[cell.id] as string) ?? '-'}
+                    </Typography>
                   </TableCell>
                 ))}
               </TableRow>
