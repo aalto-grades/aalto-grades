@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AttainmentData, AttainmentGradeData, FinalGrade, GradeOption
+  AttainmentData, AttainmentGradeData, FinalGrade
 } from 'aalto-grades-common/types';
 import {
   Checkbox, IconButton, Link, TableCell, TableRow, Tooltip
@@ -17,15 +17,7 @@ import GradeOptionsDialog from './GradeOptionsDialog';
 
 import { useGetGradeTreeOfUser } from '../../hooks/useApi';
 import { State } from '../../types';
-
-function bestGradeOption(options: Array<GradeOption>): number {
-  let bestSoFar: number = -1;
-  for (const option of options) {
-    if (option.grade > bestSoFar)
-      bestSoFar = option.grade;
-  }
-  return bestSoFar;
-}
+import { findBestGradeOption } from '../../utils';
 
 function GradeCell(props: {
   attainment: AttainmentData,
@@ -40,7 +32,7 @@ function GradeCell(props: {
         align="left"
       >
         {(props.grade) && (
-          props.grade.grades.length > 0 ? bestGradeOption(props.grade.grades) : '-'
+          findBestGradeOption(props.grade.grades)?.grade ?? '-'
         )}
         {(props.grade && props.grade.grades.length > 1) && (
           <IconButton size='small' color='primary' sx={{ ml: 1 }}>
@@ -141,7 +133,7 @@ export default function CourseResultsTableRow(props: {
         align="left"
         key={`${props.student.studentNumber}_grade`}
       >
-        {props.student.grades.length > 0 ? bestGradeOption(props.student.grades) : '-'}
+        {findBestGradeOption(props.student.grades)?.grade ?? '-'}
         {(props.student.grades.length  > 1) && (
           <IconButton size='small' color='primary' sx={{ ml: 1 }}>
             <MoreHorizIcon />

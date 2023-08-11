@@ -18,6 +18,7 @@ import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import { UseEditGradeResult, useEditGrade } from '../../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import { State } from '../../types';
+import { findBestGradeOption } from '../../utils';
 
 // A Dialog component for editing individual grade of a user.
 export default function EditGradeDialog(props: {
@@ -37,7 +38,7 @@ export default function EditGradeDialog(props: {
   const [gradeId, setGradeId]: State<number | null> = useState<number | null>(null);
 
   if (!gradeId && props.open) {
-    setGradeId(props.grade.grades[0].gradeId ?? null);
+    setGradeId(findBestGradeOption(props.grade.grades)?.gradeId ?? null);
   }
 
   const [formInitialValues, setFormInitialValues]: State<EditGrade> = useState<EditGrade>({

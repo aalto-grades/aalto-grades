@@ -9,6 +9,7 @@ import { JSX, SyntheticEvent, useState } from 'react';
 
 import { Accordion, AccordionSummary } from '../attainments/CustomAccordion';
 import { State } from '../../types';
+import { findBestGradeOption } from '../../utils';
 
 function GradeText(props: {
   name: string,
@@ -59,7 +60,7 @@ export default function StudentGradeAccordion(props: {
   // Curried function syntax. Add the panel's ID to the set of expanded panels
   // if opened, else delete from set
   function handleChange(panelId: number): AccordionOnChange {
-    return (event: SyntheticEvent, newExpanded: boolean): void => {
+    return (_event: SyntheticEvent, newExpanded: boolean): void => {
       setExpanded(newExpanded ? addToSet(panelId, expanded) : deleteFromSet(panelId, expanded));
       setSelected(newExpanded ? panelId : 0);
     };
@@ -86,14 +87,12 @@ export default function StudentGradeAccordion(props: {
               <GradeText
                 name={props.attainmentGrade.attainmentName as string}
                 grade={
-                  props.attainmentGrade.grades.length > 0
-                    ? props.attainmentGrade.grades[0].grade
-                    : 0
+                  findBestGradeOption(props.attainmentGrade.grades)?.grade
+                    ?? 0
                 }
                 status={
-                  props.attainmentGrade.grades.length > 0
-                    ? props.attainmentGrade.grades[0].status
-                    : Status.Pending
+                  findBestGradeOption(props.attainmentGrade.grades)?.status
+                    ?? Status.Pending
                 }
               />
             </AccordionSummary>

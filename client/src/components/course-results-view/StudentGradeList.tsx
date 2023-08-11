@@ -35,9 +35,9 @@ export default function StudentGradeList(props: {
           </Typography>
           <Tooltip
             placement="top"
-            title={props.grades.grades.length == 0 ?
-              'To edit final grade, first calculate it.' :
-              ''
+            title={props.grades.grades.length == 0
+              ? 'To edit final grade, first calculate it.'
+              : ''
             }
           >
             <Box>
