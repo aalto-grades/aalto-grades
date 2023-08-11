@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentGradeData, GradeOption } from 'aalto-grades-common/types';
+import { GradeOption } from 'aalto-grades-common/types';
 import {
   Button, Dialog, DialogActions, DialogContent, DialogTitle,
   Table, TableBody, TableCell, TableHead, TableRow, Typography
@@ -10,8 +10,8 @@ import {
 import { JSX } from 'react';
 
 export default function GradeOptionsDialog(props: {
-  studentNumber: string,
-  grade: AttainmentGradeData,
+  title: string,
+  options: Array<GradeOption>,
   open: boolean,
   handleClose: () => void
 }): JSX.Element {
@@ -63,7 +63,7 @@ export default function GradeOptionsDialog(props: {
       maxWidth='md'
     >
       <DialogTitle>
-        {`Grades of ${props.studentNumber} for ${props.grade.attainmentName}`}
+        {props.title}
       </DialogTitle>
       <DialogContent>
         <Table>
@@ -77,7 +77,7 @@ export default function GradeOptionsDialog(props: {
             </TableRow>
           </TableHead>
           <TableBody>
-            {props.grade.grades.map((option: GradeOption) => (
+            {props.options.map((option: GradeOption) => (
               <TableRow key={option.gradeId}>
                 {headCells.map((cell: Cell) => (
                   <TableCell key={cell.id} style={{
@@ -85,7 +85,8 @@ export default function GradeOptionsDialog(props: {
                     wordWrap: 'break-word'
                   }}>
                     <Typography variant='body2' sx={{ maxWidth: 100 }}>
-                      {(option[cell.id] as string) ?? '-'}
+                      {(option[cell.id] === null || option[cell.id] === undefined)
+                        ? '-' : String(option[cell.id])}
                     </Typography>
                   </TableCell>
                 ))}

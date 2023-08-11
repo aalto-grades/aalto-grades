@@ -24,7 +24,7 @@ function GradeCell(props: {
   attainment: AttainmentData,
   grade: AttainmentGradeData | null
 }): JSX.Element {
-  const [optionsOpen, setOptionsOpen]: State<boolean> = useState(false);
+  const [gradeOptionsOpen, setGradeOptionsOpen]: State<boolean> = useState(false);
 
   return (
     <>
@@ -36,21 +36,21 @@ function GradeCell(props: {
           findBestGradeOption(props.grade.grades)?.grade ?? '-'
         )}
         {(props.grade && props.grade.grades.length > 1) && (
-          <IconButton size='small' color='primary' sx={{ ml: 1 }}>
-            <MoreHorizIcon
-              onClick={(): void => setOptionsOpen(true)}
+          <>
+            <IconButton size='small' color='primary' sx={{ ml: 1 }}>
+              <MoreHorizIcon
+                onClick={(): void => setGradeOptionsOpen(true)}
+              />
+            </IconButton>
+            <GradeOptionsDialog
+              title={`Grades of ${props.studentNumber} for ${props.attainment.name}`}
+              options={props.grade.grades}
+              open={gradeOptionsOpen}
+              handleClose={(): void => setGradeOptionsOpen(false)}
             />
-          </IconButton>
+          </>
         )}
       </TableCell>
-      {(props.grade) && (
-        <GradeOptionsDialog
-          studentNumber={props.studentNumber}
-          grade={props.grade}
-          open={optionsOpen}
-          handleClose={(): void => setOptionsOpen(false)}
-        />
-      )}
     </>
   );
 }
@@ -66,6 +66,8 @@ export default function CourseResultsTableRow(props: {
 
   const { courseId, assessmentModelId }: Params =
     useParams() as { courseId: string, assessmentModelId: string };
+
+  const [finalGradeOptionsOpen, setFinalGradeOptionsOpen]: State<boolean> = useState(false);
 
   const gradeTree: UseQueryResult<AttainmentGradeData> = useGetGradeTreeOfUser(
     courseId, assessmentModelId, props.student.userId
@@ -136,10 +138,20 @@ export default function CourseResultsTableRow(props: {
         key={`${props.student.studentNumber}_grade`}
       >
         {findBestGradeOption(props.student.grades)?.grade ?? '-'}
-        {(props.student.grades.length  > 1) && (
-          <IconButton size='small' color='primary' sx={{ ml: 1 }}>
-            <MoreHorizIcon />
-          </IconButton>
+        {(props.student.grades.length > 1) && (
+          <>
+            <IconButton size='small' color='primary' sx={{ ml: 1 }}>
+              <MoreHorizIcon
+                onClick={(): void => setFinalGradeOptionsOpen(true)}
+              />
+            </IconButton>
+            <GradeOptionsDialog
+              title={`Final grades of ${props.student.studentNumber}`}
+              options={props.student.grades}
+              open={finalGradeOptionsOpen}
+              handleClose={(): void => setFinalGradeOptionsOpen(false)}
+            />
+          </>
         )}
       </TableCell>
       {(gradeTree.data) && (
