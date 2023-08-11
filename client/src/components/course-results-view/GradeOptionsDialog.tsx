@@ -27,6 +27,7 @@ export default function GradeOptionsDialog(props: {
       label: 'Grade ID'
     },
     {
+      // TODO: Show the name or email of the grader
       id: 'graderId',
       label: 'Grader ID'
     },
