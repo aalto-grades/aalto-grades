@@ -10,6 +10,7 @@ import {
 import { JSX } from 'react';
 
 export default function GradeOptionsDialog(props: {
+  studentNumber: string,
   grade: AttainmentGradeData,
   open: boolean,
   handleClose: () => void
@@ -52,7 +53,7 @@ export default function GradeOptionsDialog(props: {
     {
       id: 'comment',
       label: 'Comment'
-    },
+    }
   ];
 
   return (
@@ -61,7 +62,9 @@ export default function GradeOptionsDialog(props: {
       transitionDuration={{ exit: 800 }}
       maxWidth='md'
     >
-      <DialogTitle>Grade Options</DialogTitle>
+      <DialogTitle>
+        {`Grades of ${props.studentNumber} for ${props.grade.attainmentName}`}
+      </DialogTitle>
       <DialogContent>
         <Table>
           <TableHead>

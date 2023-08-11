@@ -20,6 +20,7 @@ import { State } from '../../types';
 import { findBestGradeOption } from '../../utils';
 
 function GradeCell(props: {
+  studentNumber: string,
   attainment: AttainmentData,
   grade: AttainmentGradeData | null
 }): JSX.Element {
@@ -44,6 +45,7 @@ function GradeCell(props: {
       </TableCell>
       {(props.grade) && (
         <GradeOptionsDialog
+          studentNumber={props.studentNumber}
           grade={props.grade}
           open={optionsOpen}
           handleClose={(): void => setOptionsOpen(false)}
@@ -144,6 +146,7 @@ export default function CourseResultsTableRow(props: {
         props.attainmentList.map((attainment: AttainmentData) => (
           <GradeCell
             key={`${props.student.studentNumber}_${attainment.name}_grade`}
+            studentNumber={props.student.studentNumber}
             attainment={attainment}
             grade={getAttainmentGrade(attainment.id ?? -1)}
           />
