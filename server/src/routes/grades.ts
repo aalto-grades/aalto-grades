@@ -93,6 +93,10 @@ const upload: Multer = multer({
  *         format: date
  *         description: Date when the grade expires.
  *         example: 2022-9-22
+ *       comment:
+ *         type: string
+ *         description: Comment for grade.
+ *         example: Good job!
  *   FinalGradeData:
  *     type: object
  *     description: Students final grade data.
