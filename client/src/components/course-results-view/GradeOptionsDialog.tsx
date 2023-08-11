@@ -4,7 +4,8 @@
 
 import { AttainmentGradeData, GradeOption } from 'aalto-grades-common/types';
 import {
-  Button, Dialog, DialogActions, DialogContent, DialogTitle
+  Button, Dialog, DialogActions, DialogContent, DialogTitle,
+  Table, TableBody, TableCell, TableHead, TableRow
 } from '@mui/material';
 import { JSX } from 'react';
 
@@ -14,17 +15,72 @@ export default function GradeOptionsDialog(props: {
   handleClose: () => void
 }): JSX.Element {
 
+  interface Cell {
+    id: keyof GradeOption,
+    label: string
+  }
+
+  const headCells: Array<Cell> = [
+    {
+      id: 'gradeId',
+      label: 'Grade ID'
+    },
+    {
+      id: 'graderId',
+      label: 'Grader ID'
+    },
+    {
+      id: 'grade',
+      label: 'Grade'
+    },
+    {
+      id: 'status',
+      label: 'Status'
+    },
+    {
+      id: 'manual',
+      label: 'Manual'
+    },
+    {
+      id: 'date',
+      label: 'Date'
+    },
+    {
+      id: 'expiryDate',
+      label: 'Expiry Date'
+    },
+    {
+      id: 'comment',
+      label: 'Comment'
+    },
+  ];
+
   return (
     <Dialog open={props.open} transitionDuration={{ exit: 800 }}>
       <DialogTitle>Grade Options</DialogTitle>
       <DialogContent>
-        {props.grade.grades.map((option: GradeOption) => (
-          <pre key={option.gradeId}>
-            <code>
-              {JSON.stringify(option, undefined, 2)}
-            </code>
-          </pre>
-        ))}
+        <Table>
+          <TableHead>
+            <TableRow>
+              {headCells.map((cell: Cell) => (
+                <TableCell key={cell.id}>
+                  {cell.label}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {props.grade.grades.map((option: GradeOption) => (
+              <TableRow key={option.gradeId}>
+                {headCells.map((cell: Cell) => (
+                  <TableCell key={cell.id}>
+                    {(option[cell.id] as string) ?? '-'}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </DialogContent>
       <DialogActions sx={{ pr: 4, pb: 3 }}>
         <Button
