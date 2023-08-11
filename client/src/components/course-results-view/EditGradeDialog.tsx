@@ -22,7 +22,8 @@ import { State } from '../../types';
 // A Dialog component for editing individual grade of a user.
 export default function EditGradeDialog(props: {
   grade: AttainmentGradeData,
-  setOpen: (open: boolean) => void,
+  handleClose: () => void,
+  refetchGrades: () => void,
   open: boolean
 }): JSX.Element {
   const { courseId, assessmentModelId }: Params =
@@ -65,6 +66,8 @@ export default function EditGradeDialog(props: {
               msg: 'Grade updated successfully.',
               severity: 'success'
             });
+            props.handleClose();
+            props.refetchGrades();
           }
         }
       );
@@ -255,7 +258,7 @@ export default function EditGradeDialog(props: {
                           if (initialValues != values) {
                             setShowDialog(true);
                           } else {
-                            props.setOpen(false);
+                            props.handleClose();
                           }
                         }}
                       >
@@ -280,7 +283,7 @@ export default function EditGradeDialog(props: {
       <UnsavedChangesDialog
         setOpen={setShowDialog}
         open={showDialog}
-        handleDiscard={(): void => props.setOpen(false)}
+        handleDiscard={(): void => props.handleClose()}
       />
       <AlertSnackbar snackPack={snackPack} />
     </>
