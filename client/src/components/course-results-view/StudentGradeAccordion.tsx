@@ -142,6 +142,7 @@ export default function StudentGradeAccordion(props: {
               }
             />
             <Button
+              disabled={props.attainmentGrade.grades.length == 0}
               onClick={(): void => {
                 props.gradeToEdit(props.attainmentGrade);
               }}
