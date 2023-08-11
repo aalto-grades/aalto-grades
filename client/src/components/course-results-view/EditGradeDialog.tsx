@@ -32,14 +32,21 @@ export default function EditGradeDialog(props: {
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
-  const [gradeId, setGradeId]: State<number> =
-    useState<number>(props.grade.grades[0].gradeId as number);
+
+  const [gradeId, setGradeId]: State<number> = useState<number>(
+    props.grade.grades[0].gradeId as number
+  );
+
+  if (!props.grade.grades.find((option: GradeOption) => option.gradeId === gradeId)) {
+    setGradeId(props.grade.grades[0].gradeId as number);
+  }
+
   const [formInitialValues, setFormInitialValues]: State<EditGrade> = useState<EditGrade>({
-    grade: props.grade.grades[0].grade,
-    status: props.grade.grades[0].status,
-    date: props.grade.grades[0].date ?? new Date(),
-    expiryDate: props.grade.grades[0].expiryDate ?? new Date(),
-    comment: props.grade.grades[0].comment ?? ''
+    grade: 0,
+    status: Status.Pending,
+    date: new Date(),
+    expiryDate: new Date(),
+    comment: ''
   });
 
   async function handleSubmit(values: EditGrade): Promise<void> {
@@ -50,9 +57,7 @@ export default function EditGradeDialog(props: {
           assessmentModelId,
           gradeId,
           userId: props.grade.userId as number,
-          data: {
-            ...values
-          }
+          data: values
         },
         {
           onSuccess: () => {
@@ -60,7 +65,6 @@ export default function EditGradeDialog(props: {
               msg: 'Grade updated successfully.',
               severity: 'success'
             });
-            setFormInitialValues(values);
           }
         }
       );
