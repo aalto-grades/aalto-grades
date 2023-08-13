@@ -140,11 +140,19 @@ export default function CourseResultsTableRow(props: {
         {findBestGradeOption(props.student.grades)?.grade ?? '-'}
         {(props.student.grades.length > 1) && (
           <>
-            <IconButton size='small' color='primary' sx={{ ml: 1 }}>
-              <MoreHorizIcon
+            <Tooltip
+              placement="top"
+              title="Multiple final grades, click to show."
+            >
+              <IconButton
+                size='small'
+                color='primary'
+                sx={{ ml: 1 }}
                 onClick={(): void => setFinalGradeOptionsOpen(true)}
-              />
-            </IconButton>
+              >
+                <MoreHorizIcon/>
+              </IconButton>
+            </Tooltip>
             <GradeOptionsDialog
               title={`Final grades of ${props.student.studentNumber}`}
               options={props.student.grades}
