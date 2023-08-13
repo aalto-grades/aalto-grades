@@ -487,6 +487,7 @@ describe(
         for (const option of finalGrade.grades) {
           expect(option.gradeId).toBeDefined();
           expect(option.graderId).toBeDefined();
+          expect(option.grader).toBeDefined();
           expect(option.grade).toBeDefined();
           expect(option.status).toBeDefined();
           expect(option.manual).toBeDefined();
@@ -743,6 +744,7 @@ describe(
       data.grades.forEach((option: GradeOption) => {
         expect(option.gradeId).toBeDefined();
         expect(option.graderId).toBeDefined();
+        expect(option.grader).toBeDefined();
         expect(option.grade).toBeDefined();
         expect(option.status).toBeDefined();
         expect(option.manual).toBeDefined();
