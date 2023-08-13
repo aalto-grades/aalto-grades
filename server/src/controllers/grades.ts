@@ -108,7 +108,8 @@ interface FinalGradeRaw extends AttainmentGrade {
   User: {
     id: number,
     studentNumber: string
-  }
+  },
+  grader: User
 }
 
 async function getFinalGradesFor(
@@ -152,6 +153,12 @@ async function getFinalGradesFor(
             ]
           }
         ]
+      },
+      {
+        model: User,
+        required: true,
+        as: 'grader',
+        attributes: ['name']
       },
       userQueryOptions
     ]
@@ -422,6 +429,7 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
           return {
             gradeId: grade.id,
             graderId: grade.graderId,
+            grader: grade.grader.name,
             grade: grade.grade,
             status: grade.status as Status,
             manual: grade.manual,
