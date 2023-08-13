@@ -11,6 +11,7 @@ export enum Status {
 export interface GradeOption {
   gradeId?: number,
   graderId?: number,
+  grader?: string,
   grade: number,
   status: Status,
   manual: boolean,
