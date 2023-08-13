@@ -463,7 +463,13 @@ export async function getGradeTreeOfUser(req: Request, res: Response): Promise<v
       required: false,
       where: {
         userId
-      }
+      },
+      include: [{
+        model: User,
+        required: true,
+        as: 'grader',
+        attributes: ['name']
+      }]
     }]
   }) as Array<AttainmentWithUserGrade>;
 
@@ -494,6 +500,7 @@ export async function getGradeTreeOfUser(req: Request, res: Response): Promise<v
           return {
             gradeId: option.id,
             graderId: option.graderId,
+            grader: option.grader?.name,
             grade: option.grade,
             status: option.status as Status,
             manual: option.manual,
