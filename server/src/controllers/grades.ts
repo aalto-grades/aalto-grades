@@ -158,7 +158,7 @@ async function getFinalGradesFor(
         model: User,
         required: true,
         as: 'grader',
-        attributes: ['name']
+        attributes: ['id', 'name']
       },
       userQueryOptions
     ]
@@ -478,7 +478,7 @@ export async function getGradeTreeOfUser(req: Request, res: Response): Promise<v
         model: User,
         required: true,
         as: 'grader',
-        attributes: ['name']
+        attributes: ['id', 'name']
       }]
     }]
   }) as Array<AttainmentWithUserGrade>;

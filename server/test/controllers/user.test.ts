@@ -164,7 +164,7 @@ describe('Test GET /v1/user/:userId/courses - get all courses user has role in',
         .set('Accept', 'application/json')
         .expect(HttpCode.Forbidden);
 
-      expect(res.body.errors[0]).toBe('cannot access users courses');
+      expect(res.body.errors[0]).toBe('cannot access user\'s courses');
       expect(res.body.data).not.toBeDefined();
     });
 
@@ -248,7 +248,7 @@ describe('Test GET /v1/user/:userId - get user information', () => {
         .set('Accept', 'application/json')
         .expect(HttpCode.Forbidden);
 
-      expect(res.body.errors[0]).toBe('cannot access users courses');
+      expect(res.body.errors[0]).toBe('cannot access user\'s courses');
       expect(res.body.data).not.toBeDefined();
     });
 
