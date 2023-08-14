@@ -255,6 +255,8 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
     instanceId?: number
   } = await urlParams.validate(req.query, { abortEarly: false });
 
+  const sisuExportDate: Date = new Date;
+
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
       req.params.courseId, req.params.assessmentModelId
@@ -289,7 +291,13 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
     comment: string
   }
 
+  interface MarkSisuExport {
+    id: number,
+    userId: number
+  }
+
   const courseResults: Array<SisuCsvFormat> = [];
+  const exportedToSisu: Array<MarkSisuExport> = [];
 
   for (const finalGrade of finalGrades) {
     const existingResult: SisuCsvFormat | undefined = courseResults.find(
@@ -299,8 +307,21 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
     if (existingResult) {
       if (finalGrade.grade > Number(existingResult.grade)) {
         existingResult.grade = String(finalGrade.grade);
+
+        // There can be multiple grades, make sure only the exported grade is marked with timestamp.
+        const userData: MarkSisuExport | undefined = exportedToSisu.find(
+          (value: MarkSisuExport) => value.userId === finalGrade.User.id
+        );
+
+        if (userData) {
+          userData.id = finalGrade.id;
+        }
       }
     } else {
+      exportedToSisu.push({
+        id: finalGrade.id,
+        userId: finalGrade.userId
+      });
       courseResults.push({
         studentNumber: finalGrade.User.studentNumber,
         grade: String(finalGrade.grade),
@@ -312,10 +333,18 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
         completionLanguage: completionLanguage ?
           completionLanguage.toLowerCase() : course.languageOfInstruction.toLowerCase(),
         // Comment column is required, but can be empty.
-        comment: ''
+        comment: finalGrade.comment
       });
     }
   }
+
+  await AttainmentGrade.update({ sisuExportDate }, {
+    where: {
+      id: {
+        [Op.or]: exportedToSisu.map((value: MarkSisuExport) => value.id)
+      }
+    }
+  });
 
   stringify(
     courseResults,
