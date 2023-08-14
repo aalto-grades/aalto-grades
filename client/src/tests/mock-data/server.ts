@@ -10,6 +10,7 @@ import { mockAssessmentModels } from './mockAssessmentModels';
 import { mockAttainments } from './mockAttainments';
 import { mockCourses } from './mockCourses';
 import { mockFinalGrades } from './mockFinalGrades';
+import { mockGradeTree } from './mockGradeTree';
 import { mockInstances } from './mockInstancesWithStringDates';
 import { mockSisuInstances } from './mockSisuInstances';
 import { mockFormulas } from './mockFormulas';
@@ -83,6 +84,10 @@ export const server: SetupServer = setupServer(
   rest.get(
     '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades',
     mockSuccess(mockFinalGrades)
+  ),
+  rest.get(
+    '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/user/:userId',
+    mockSuccess(mockGradeTree)
   ),
   rest.post(
     '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/calculate',
