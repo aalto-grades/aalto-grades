@@ -161,6 +161,9 @@ async function getFinalGradesFor(
         attributes: ['id', 'name']
       },
       userQueryOptions
+    ],
+    order: [
+      ['id', 'ASC']
     ]
   }) as Array<FinalGradeRaw>;
 
