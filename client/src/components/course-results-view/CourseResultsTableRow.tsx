@@ -37,11 +37,19 @@ function GradeCell(props: {
         )}
         {(props.grade && props.grade.grades.length > 1) && (
           <>
-            <IconButton size='small' color='primary' sx={{ ml: 1 }}>
-              <MoreHorizIcon
+            <Tooltip
+              placement='top'
+              title='Multiple grades, click to show'
+            >
+              <IconButton
+                size='small'
+                color='primary'
+                sx={{ ml: 1 }}
                 onClick={(): void => setGradeOptionsOpen(true)}
-              />
-            </IconButton>
+              >
+                <MoreHorizIcon />
+              </IconButton>
+            </Tooltip>
             <GradeOptionsDialog
               title={`Grades of ${props.studentNumber} for ${props.attainment.name}`}
               options={props.grade.grades}
@@ -102,18 +110,18 @@ export default function CourseResultsTableRow(props: {
     >
       <TableCell
         sx={{ width: '100px' }}
-        component="th"
+        component='th'
         id={props.student.studentNumber}
-        scope="row"
-        padding="normal"
+        scope='row'
+        padding='normal'
       >
         <Tooltip
-          placement="top"
-          title="Click to show individual grades for student"
+          placement='top'
+          title='Click to show individual grades for student'
         >
           <Link
-            component="button"
-            variant="body2"
+            component='button'
+            variant='body2'
             onClick={(): void => {
               props.setUser(props.student);
               props.setShowUserGrades(true);
@@ -125,24 +133,24 @@ export default function CourseResultsTableRow(props: {
       </TableCell>
       <TableCell
         sx={{ width: '100px' }}
-        component="th"
+        component='th'
         id={`${props.student.studentNumber}_credits}`}
-        scope="row"
-        padding="normal"
+        scope='row'
+        padding='normal'
       >
         {props.student.grades.length > 0 ? props.student.credits : '-'}
       </TableCell>
       <TableCell
         sx={{ width: '100px' }}
-        align="left"
+        align='left'
         key={`${props.student.studentNumber}_grade`}
       >
         {findBestGradeOption(props.student.grades)?.grade ?? '-'}
         {(props.student.grades.length > 1) && (
           <>
             <Tooltip
-              placement="top"
-              title="Multiple final grades, click to show."
+              placement='top'
+              title='Multiple final grades, click to show.'
             >
               <IconButton
                 size='small'
@@ -174,11 +182,11 @@ export default function CourseResultsTableRow(props: {
       )}
       <TableCell
         sx={{ width: '100px' }}
-        align="left"
+        align='left'
         key={`${props.student.studentNumber}_checkbox`}
       >
         <Checkbox
-          size="small"
+          size='small'
           onClick={(): void => props.handleSelectForGrading(props.student.studentNumber)}
           checked={props.selectedStudents.filter((value: FinalGrade) => {
             return value.studentNumber === props.student.studentNumber;
