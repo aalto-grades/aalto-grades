@@ -73,11 +73,11 @@ AttainmentGrade.init(
       defaultValue: 'PENDING'
     },
     date: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: true
     },
     expiryDate: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: true
     },
     comment: {

@@ -72,11 +72,11 @@ CourseInstance.init(
       allowNull: false
     },
     startDate: {
-      type: new DataTypes.DATEONLY,
+      type: DataTypes.DATEONLY,
       allowNull: false
     },
     endDate: {
-      type: new DataTypes.DATEONLY,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     createdAt: DataTypes.DATE,
