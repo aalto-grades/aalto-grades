@@ -241,9 +241,9 @@ describe(
         .expect(HttpCode.Ok);
 
       expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-352772,5,5,21.6.2023,en,
-476617,2,5,21.6.2023,en,
-344625,4,5,21.6.2023,en,
+352772,5,5,21.6.2023,en,Better luck next time
+476617,2,5,21.6.2023,en,You shall not pass
+344625,4,5,21.6.2023,en,well done!
 `);
       expect(res.headers['content-disposition']).toBe(
         'attachment; filename="final_grades_course_CS-A1120_' +
@@ -352,7 +352,8 @@ describe(
         );
       });
 
-    it('should return results for all instaces connected to the assessment model if no filters',
+    it(
+      'should return results for all instaces connected to the assessment model if no filters',
       async () => {
         res = await request
           .get(
