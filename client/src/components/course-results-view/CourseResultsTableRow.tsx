@@ -110,6 +110,19 @@ export default function CourseResultsTableRow(props: {
     >
       <TableCell
         sx={{ width: '100px' }}
+        align='left'
+        key={`${props.student.studentNumber}_checkbox`}
+      >
+        <Checkbox
+          size='small'
+          onClick={(): void => props.handleSelectForGrading(props.student.studentNumber)}
+          checked={props.selectedStudents.filter((value: FinalGrade) => {
+            return value.studentNumber === props.student.studentNumber;
+          }).length !== 0}
+        />
+      </TableCell>
+      <TableCell
+        sx={{ width: '100px' }}
         component='th'
         id={props.student.studentNumber}
         scope='row'
@@ -180,19 +193,6 @@ export default function CourseResultsTableRow(props: {
           />
         ))
       )}
-      <TableCell
-        sx={{ width: '100px' }}
-        align='left'
-        key={`${props.student.studentNumber}_checkbox`}
-      >
-        <Checkbox
-          size='small'
-          onClick={(): void => props.handleSelectForGrading(props.student.studentNumber)}
-          checked={props.selectedStudents.filter((value: FinalGrade) => {
-            return value.studentNumber === props.student.studentNumber;
-          }).length !== 0}
-        />
-      </TableCell>
     </TableRow>
   );
 }

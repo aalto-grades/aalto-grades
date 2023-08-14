@@ -55,6 +55,24 @@ export default function CourseResultsTableHead(props: {
   return (
     <TableHead>
       <TableRow>
+        <TableCell
+          key='selectAll'
+          align='left'
+          padding='normal'
+        >
+          <FormControlLabel
+            htmlFor="select-all"
+            label="Select all"
+            control={(
+              <Checkbox
+                id="select-all"
+                size="small"
+                onClick={props.handleSelectAll}
+                checked={props.allSelected}
+              />
+            )}
+          />
+        </TableCell>
         {
           rows.map((column: Colum) => (
             <TableCell
@@ -80,24 +98,6 @@ export default function CourseResultsTableHead(props: {
             </TableCell>
           ))
         }
-        <TableCell
-          key='selectAll'
-          align='left'
-          padding='normal'
-        >
-          <FormControlLabel
-            htmlFor="select-all"
-            label="Select all"
-            control={(
-              <Checkbox
-                id="select-all"
-                size="small"
-                onClick={props.handleSelectAll}
-                checked={props.allSelected}
-              />
-            )}
-          />
-        </TableCell>
       </TableRow>
     </TableHead>
   );
