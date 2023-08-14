@@ -506,7 +506,6 @@ describe(
       ).toEqual(studentNumbers.sort());
     }
 
-
     it(
       'should get final grades succesfully when course results are found (admin user)',
       async () => {
@@ -531,7 +530,7 @@ describe(
 
         res = await request
           .get('/v1/courses/6/assessment-models/24/grades' +
-          `?studentNumbers=${JSON.stringify(studentNumbers)}`)
+            `?studentNumbers=${JSON.stringify(studentNumbers)}`)
           .set('Cookie', cookies.userCookie)
           .set('Accept', 'application/json');
 
@@ -539,6 +538,24 @@ describe(
         checkFinalGradesStructure(res.body.data);
       }
     );
+
+    it('should return dates in the correct format', async () => {
+      res = await request
+        .get(
+          '/v1/courses/6/assessment-models/24/grades'
+          + `?studentNumbers=${JSON.stringify(studentNumbers)}`
+        )
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+
+      for (const user of res.body.data) {
+        for (const option of user.grades) {
+          expect(option.date.length).toEqual(10);
+          expect(option.date).not.toContain('T');
+        }
+      }
+    });
 
     it(
       'should get the appropriate number of grade options depending on how many grades exist',
@@ -780,6 +797,29 @@ describe(
         .expect(HttpCode.Ok);
       checkSuccessRes(res);
       checkBodyStructure(res.body.data);
+    });
+
+    it('should return dates in the correct format', async () => {
+      res = await request
+        .get('/v1/courses/4/assessment-models/7/grades/user/25')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+
+      function checkDateFormat(data: AttainmentGradeData): void {
+        for (const option of data.grades) {
+          expect((option.date as unknown as string).length).toEqual(10);
+          expect(option.date).not.toContain('T');
+        }
+
+        if (data.subAttainments) {
+          for (const sub of data.subAttainments) {
+            checkDateFormat(sub);
+          }
+        }
+      }
+
+      checkDateFormat(res.body.data);
     });
 
     it('should get a single grade for an attainment if only one grade exists', async () => {
