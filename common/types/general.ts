@@ -14,3 +14,9 @@ export enum HttpCode {
   InternalServerError = 500,
   BadGateway = 502
 }
+
+export class DateOnly extends Date {
+  toJSON() {
+    return this.toISOString().split('T')[0];
+  };
+}
