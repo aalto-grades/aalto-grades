@@ -71,7 +71,7 @@ describe('Tests for CourseResultsView components', () => {
 
       renderCourseResultsView();
 
-      await waitFor( async () => {
+      await waitFor(async () => {
         const selectAllCheckBox: HTMLInputElement = screen.getByLabelText('Select all');
         act(() => userEvent.click(selectAllCheckBox));
         expect(selectAllCheckBox).toBeChecked();
