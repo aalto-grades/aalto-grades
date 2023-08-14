@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseData, HttpCode, SystemRole } from 'aalto-grades-common/types';
+import { CourseData, HttpCode, SystemRole, UserData } from 'aalto-grades-common/types';
 import { Request, Response } from 'express';
 
 import Course from '../database/models/course';
@@ -18,20 +18,23 @@ import { findUserById } from './utils/user';
 // TODO: Remove if possible.
 require('../database/models/courseInstanceRole');
 
-export async function getCoursesOfUser(req: Request, res: Response): Promise<void> {
-  const courses: Array<CourseData> = [];
+// Check user id matches queried and system rights and exists.
+async function adminOrOwner(req: Request): Promise<User> {
   const userId: number = Number(req.params.userId);
-  const user: JwtClaims = req.user as JwtClaims;
-
+  const userToken: JwtClaims = req.user as JwtClaims;
   await idSchema.validate({ id: userId });
 
-  // Check user id matches queried and system rights.
-  if (userId !== user.id && user.role !== SystemRole.Admin) {
-    throw new ApiError('cannot access users courses', HttpCode.Forbidden);
+  if (userId !== userToken.id && userToken.role !== SystemRole.Admin) {
+    throw new ApiError('cannot access user\'s courses', HttpCode.Forbidden);
   }
 
-  // Confirm that user exists.
-  await findUserById(userId, HttpCode.NotFound);
+  // Confirm that user exists and return.
+  return await findUserById(userId, HttpCode.NotFound);
+}
+
+export async function getCoursesOfUser(req: Request, res: Response): Promise<void> {
+  const courses: Array<CourseData> = [];
+  const user: User = await adminOrOwner(req);
 
   const inChargeCourses: Array<CourseFull> =
     await Course.findAll({
@@ -42,7 +45,7 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
         {
           model: User,
           where: {
-            id: userId
+            id: user.id
           }
         }
       ]
@@ -58,7 +61,7 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
         {
           model: User,
           where: {
-            id: userId
+            id: user.id
           }
         },
         {
@@ -88,5 +91,20 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
 
   res.status(HttpCode.Ok).send({
     data: courses
+  });
+}
+
+export async function getUserInfo(req: Request, res: Response): Promise<void> {
+  const user: User = await adminOrOwner(req);
+
+  const userData: UserData = {
+    id: user.id,
+    studentNumber: user.studentNumber,
+    name: user.name,
+    email: user.email
+  };
+
+  res.status(HttpCode.Ok).send({
+    data: userData
   });
 }

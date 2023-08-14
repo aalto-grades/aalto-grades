@@ -66,13 +66,8 @@ const upload: Multer = multer({
  *         format: int32
  *         minimum: 0
  *         example: 5
- *       graderId:
- *         type: integer
- *         description: >
- *           User ID of the teacher who uploaded or calculated this grade.
- *         format: int32
- *         minimum: 1
- *         example: 1
+ *       grader:
+ *         $ref: '#/definitions/UserData'
  *       grade:
  *         $ref: '#/definitions/Grade'
  *       status:
