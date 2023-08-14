@@ -9,12 +9,13 @@ import { getCoursesOfUser, getUserInfo } from '../controllers/user';
 import { controllerDispatcher } from '../middleware/errorHandler';
 
 export const router: Router = Router();
+
 /**
  * @swagger
  * definitions:
  *   UserData:
  *     type: object
- *     description: Users personal information.
+ *     description: User's personal information.
  *     properties:
  *       id:
  *         type: integer
@@ -40,13 +41,14 @@ export const router: Router = Router();
  *   get:
  *     tags: [User]
  *     description: >
- *       Get all courses the given user has or is currently participated in.
- *       User can access only their own course list. Admin can access any users courses.
+ *       Get all courses the given user has or is currently participating in.
+ *       Regular users can only access their own course list. Admin users can
+ *       access the courses of any user.
  *     parameters:
  *       - $ref: '#/components/parameters/userId'
  *     responses:
  *       200:
- *         description: Courses user has participated in.
+ *         description: Courses the user has participated in.
  *         content:
  *           application/json:
  *             schema:
@@ -87,8 +89,8 @@ router.get(
  *   get:
  *     tags: [User]
  *     description: >
- *       Get information of the user based on ID.
- *       User can access only their own information. Admin can access any users information.
+ *       Get information of the user based on ID. Regular users can only access
+ *       their own information. Admin users can access the information of any user.
  *     parameters:
  *       - $ref: '#/components/parameters/userId'
  *     responses:

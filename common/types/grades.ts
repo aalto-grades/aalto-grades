@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { UserData } from './user';
+
 export enum Status {
   Pass = 'PASS',
   Fail = 'FAIL',
@@ -10,8 +12,7 @@ export enum Status {
 
 export interface GradeOption {
   gradeId?: number,
-  graderId?: number,
-  grader?: string,
+  grader: UserData,
   grade: number,
   status: Status,
   manual: boolean,

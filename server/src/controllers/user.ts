@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseData, HttpCode, SystemRole } from 'aalto-grades-common/types';
+import { CourseData, HttpCode, SystemRole, UserData } from 'aalto-grades-common/types';
 import { Request, Response } from 'express';
 
 import Course from '../database/models/course';
@@ -25,7 +25,7 @@ async function adminOrOwner(req: Request): Promise<User> {
   await idSchema.validate({ id: userId });
 
   if (userId !== userToken.id && userToken.role !== SystemRole.Admin) {
-    throw new ApiError('cannot access users courses', HttpCode.Forbidden);
+    throw new ApiError('cannot access user\'s courses', HttpCode.Forbidden);
   }
 
   // Confirm that user exists and return.
@@ -97,12 +97,14 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
 export async function getUserInfo(req: Request, res: Response): Promise<void> {
   const user: User = await adminOrOwner(req);
 
+  const userData: UserData = {
+    id: user.id,
+    studentNumber: user.studentNumber,
+    name: user.name,
+    email: user.email
+  };
+
   res.status(HttpCode.Ok).send({
-    data: {
-      id: user.id,
-      studentNumber: user.studentNumber,
-      name: user.name,
-      email: user.email
-    }
+    data: userData
   });
 }

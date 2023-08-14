@@ -425,11 +425,13 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
       credits: course.maxCredits,
       grades: rawFinalGrades
         .filter((grade: FinalGradeRaw) => grade.User.id === student.userId)
-        .map((grade: FinalGradeRaw) => {
+        .map((grade: FinalGradeRaw): GradeOption => {
           return {
             gradeId: grade.id,
-            graderId: grade.graderId,
-            grader: grade.grader.name,
+            grader: {
+              id: grade.grader.id,
+              name: grade.grader.name
+            },
             grade: grade.grade,
             status: grade.status as Status,
             manual: grade.manual,
@@ -507,8 +509,10 @@ export async function getGradeTreeOfUser(req: Request, res: Response): Promise<v
         (option: AttainmentGrade): GradeOption => {
           return {
             gradeId: option.id,
-            graderId: option.graderId,
-            grader: option.grader?.name,
+            grader: {
+              id: option.grader?.id,
+              name: option.grader?.name
+            },
             grade: option.grade,
             status: option.status as Status,
             manual: option.manual,

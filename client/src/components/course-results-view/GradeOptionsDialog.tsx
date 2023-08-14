@@ -85,8 +85,12 @@ export default function GradeOptionsDialog(props: {
                     wordWrap: 'break-word'
                   }}>
                     <Typography variant='body2' sx={{ maxWidth: 100 }}>
-                      {(option[cell.id] === null || option[cell.id] === undefined)
-                        ? '-' : String(option[cell.id])}
+                      {(cell.id === 'grader') ? (
+                        option.grader.name
+                      ) : (
+                        (option[cell.id] === null || option[cell.id] === undefined)
+                          ? '-' : String(option[cell.id])
+                      )}
                     </Typography>
                   </TableCell>
                 ))}

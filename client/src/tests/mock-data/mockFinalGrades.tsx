@@ -12,7 +12,10 @@ export const mockFinalGrades: Array<FinalGrade> = [
     grades: [
       {
         gradeId: 1,
-        graderId: 5,
+        grader: {
+          id: 5,
+          name: 'Good teacher'
+        },
         grade: 5,
         status: Status.Pass,
         manual: true,
@@ -28,7 +31,10 @@ export const mockFinalGrades: Array<FinalGrade> = [
     grades: [
       {
         gradeId: 1,
-        graderId: 5,
+        grader: {
+          id: 5,
+          name: 'Evil teacher'
+        },
         grade: 5,
         status: Status.Pass,
         manual: true,
@@ -44,7 +50,10 @@ export const mockFinalGrades: Array<FinalGrade> = [
     grades: [
       {
         gradeId: 1,
-        graderId: 5,
+        grader: {
+          id: 5,
+          name: 'Declarative teacher'
+        },
         grade: 5,
         status: Status.Pass,
         manual: true,
