@@ -441,7 +441,8 @@ describe(
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      });
+      }
+    );
 
     it('should respond with 400 bad request, if validation fails (non-number course id)',
       async () => {
@@ -456,9 +457,12 @@ describe(
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      });
+      }
+    );
 
-    it('should respond with 400 bad request, if validation fails (non-number parent attainment id)',
+    it(
+      'should respond with 400 bad request, if validation fails'
+      + ' (non-number parent attainment id)',
       async () => {
         const res: supertest.Response = await request
           .post('/v1/courses/3/assessment-models/4/attainments')
@@ -471,7 +475,26 @@ describe(
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      });
+      }
+    );
+
+    it(
+      'should respond with 400 bad request, if validation fails'
+      + ' (minRequiredGrade larger than maxGrade)',
+      async () => {
+        const res: supertest.Response = await request
+          .post('/v1/courses/3/assessment-models/4/attainments')
+          .send({ ...mockAttainment, minRequiredGrade: 10, maxGrade: 2 })
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.BadRequest);
+
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+      }
+    );
 
     it(
       'should respond with 400 bad request, if formula params are'
@@ -1036,7 +1059,8 @@ describe(
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      });
+      }
+    );
 
     it('should respond with 400 bad request, if validation fails (non-number course id)',
       async () => {
@@ -1050,7 +1074,8 @@ describe(
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      });
+      }
+    );
 
     it('should respond with 400 bad request, if validation fails (non-number attainment ID)',
       async () => {
@@ -1064,7 +1089,33 @@ describe(
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      });
+      }
+    );
+
+    it('should respond with 400 bad request, if validation fails (invalid minRequiredGrade or maxGrade)',
+      async () => {
+        async function badInput(input: {
+          minRequiredGrade?: number,
+          maxGrade?: number
+        }): Promise<void> {
+          const res: supertest.Response = await request
+            .put('/v1/courses/1/assessment-models/1/attainments/5')
+            .send(input)
+            .set('Content-Type', 'application/json')
+            .set('Cookie', cookies.adminCookie)
+            .set('Accept', 'application/json')
+            .expect(HttpCode.BadRequest);
+
+          expect(res.body.data).not.toBeDefined();
+          expect(res.body.errors).toBeDefined();
+          expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+        }
+
+        badInput({ minRequiredGrade: 5, maxGrade: 1 });
+        badInput({ minRequiredGrade: 10000 });
+        badInput({ maxGrade: 0 });
+      }
+    );
 
     it('should respond with 400 bad request, if formula params are incorrect',
       async () => {
