@@ -249,14 +249,18 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
     instanceId: yup
       .number()
       .min(1)
+      .notRequired(),
+    override: yup
+      .boolean()
       .notRequired()
   });
 
-  const { assessmentDate, completionLanguage, studentNumbers, instanceId }: {
+  const { assessmentDate, completionLanguage, studentNumbers, instanceId, override }: {
     assessmentDate?: Date,
     completionLanguage?: string,
     studentNumbers?: Array<string>,
-    instanceId?: number
+    instanceId?: number,
+    override?: boolean
   } = await urlParams.validate(req.query, { abortEarly: false });
 
   const sisuExportDate: Date = new Date;
@@ -282,9 +286,14 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
    * - only one grade per user per instance is allowed
    */
 
-  const finalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
+  let finalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
     assessmentModel.id, studentNumbersFiltered ?? []
   );
+
+  if (!override) {
+    // If not overrided, clean already exported grades from results.
+    finalGrades = finalGrades.filter((grade: FinalGradeRaw) => grade.sisuExportDate == null);
+  }
 
   interface SisuCsvFormat {
     studentNumber: string,
