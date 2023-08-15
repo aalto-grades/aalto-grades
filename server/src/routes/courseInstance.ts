@@ -59,12 +59,12 @@ export const router: Router = Router();
  *         type: string
  *         format: date
  *         description: Starting date in format year-month-day.
- *         example: 2022-9-22
+ *         example: 2022-09-22
  *       endDate:
  *         type: string
  *         format: date
  *         description: Ending date in format year-month-day.
- *         example: 2022-12-6
+ *         example: 2022-12-06
  *       type:
  *         type: string
  *         description: Type of course instance, 'Lecture', 'Exam', etc.

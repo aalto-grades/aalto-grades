@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { DateOnlyString } from './general';
 import { UserData } from './user';
 
 export enum Status {
@@ -16,8 +17,8 @@ export interface GradeOption {
   grade: number,
   status: Status,
   manual: boolean,
-  date?: Date,
-  expiryDate?: Date,
+  date?: Date | DateOnlyString,
+  expiryDate?: Date | DateOnlyString,
   comment: string
 }
 
@@ -40,7 +41,7 @@ export interface FinalGrade {
 export interface EditGrade {
   grade?: number,
   status?: Status,
-  date?: Date,
-  expiryDate?: Date,
+  date?: Date | DateOnlyString,
+  expiryDate?: Date | DateOnlyString,
   comment?: string
 }

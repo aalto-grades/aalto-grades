@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { DateOnlyString } from 'aalto-grades-common/types';
 import {
   CreationOptional, DataTypes, ForeignKey, Model, InferAttributes, InferCreationAttributes
 } from 'sequelize';
@@ -22,8 +23,8 @@ export default class AttainmentGrade extends Model<
   declare manual: boolean;
   declare status: string;
   // Date when attainment is completed (e.g., deadline or exam date)
-  declare date: CreationOptional<Date>;
-  declare expiryDate: CreationOptional<Date>;
+  declare date: CreationOptional<Date | DateOnlyString>;
+  declare expiryDate: CreationOptional<Date | DateOnlyString>;
   declare comment: CreationOptional<string>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -73,11 +74,11 @@ AttainmentGrade.init(
       defaultValue: 'PENDING'
     },
     date: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: true
     },
     expiryDate: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: true
     },
     comment: {
