@@ -21,6 +21,8 @@ import { getCookies, Cookies } from '../util/getCookies';
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
 const badInput: string = 'notValid';
+const dateOnlyRegExp: RegExp =
+  /^\d{4}[\/\-](0?[1-9]|1[012])[\/\-](0?[1-9]|[12][0-9]|3[01])$/;
 let res: supertest.Response;
 let cookies: Cookies = {
   adminCookie: [],
@@ -551,8 +553,9 @@ describe(
 
       for (const user of res.body.data) {
         for (const option of user.grades) {
-          expect(option.date.length).toEqual(10);
-          expect(option.date).not.toContain('T');
+          expect(option.date).toMatch(dateOnlyRegExp);
+          if (option.expiryDate)
+            expect(option.expiryDate).toMatch(dateOnlyRegExp);
         }
       }
     });
@@ -808,8 +811,9 @@ describe(
 
       function checkDateFormat(data: AttainmentGradeData): void {
         for (const option of data.grades) {
-          expect((option.date as unknown as string).length).toEqual(10);
-          expect(option.date).not.toContain('T');
+          expect(option.date).toMatch(dateOnlyRegExp);
+          if (option.expiryDate)
+            expect(option.expiryDate).toMatch(dateOnlyRegExp);
         }
 
         if (data.subAttainments) {

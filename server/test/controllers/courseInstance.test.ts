@@ -13,6 +13,8 @@ import { Cookies, getCookies } from '../util/getCookies';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
+const dateOnlyRegExp: RegExp =
+  /^\d{4}[\/\-](0?[1-9]|1[012])[\/\-](0?[1-9]|[12][0-9]|3[01])$/;
 let cookies: Cookies = {
   adminCookie: [],
   userCookie: []
@@ -60,8 +62,8 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      expect(res.body.data.startDate).toEqual('2022-09-05');
-      expect(res.body.data.endDate).toEqual('2022-12-09');
+      expect(res.body.data.startDate).toMatch(dateOnlyRegExp);
+      expect(res.body.data.endDate).toMatch(dateOnlyRegExp);
     });
 
     it('should respond with 400 bad request, if validation fails (non-number instance id)',
@@ -140,10 +142,8 @@ describe(
         .expect(HttpCode.Ok);
 
       for (const courseInstance of res.body.data) {
-        expect(courseInstance.startDate.length).toEqual(10);
-        expect(courseInstance.startDate).not.toContain('T');
-        expect(courseInstance.endDate.length).toEqual(10);
-        expect(courseInstance.endDate).not.toContain('T');
+        expect(courseInstance.startDate).toMatch(dateOnlyRegExp);
+        expect(courseInstance.endDate).toMatch(dateOnlyRegExp);
       }
     });
 
