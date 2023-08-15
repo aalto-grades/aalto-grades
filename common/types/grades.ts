@@ -18,7 +18,8 @@ export interface GradeOption {
   manual: boolean,
   date?: Date,
   expiryDate?: Date,
-  comment: string
+  comment: string,
+  exportedToSisu: Date
 }
 
 export interface AttainmentGradeData {
