@@ -71,10 +71,10 @@ export default function CreateAssessmentModelDialog(props: {
                     attainment: data.data ?? {
                       name: 'Root',
                       daysValid: 0,
+                      minRequiredGrade: 1,
+                      maxGrade: 5,
                       formula: Formula.Manual,
-                      formulaParams: {
-                        minRequiredGrade: 0
-                      }
+                      formulaParams: {}
                     }
                   });
                 });
@@ -85,10 +85,10 @@ export default function CreateAssessmentModelDialog(props: {
                   attainment: {
                     name: 'Root',
                     daysValid: 0,
+                    minRequiredGrade: 1,
+                    maxGrade: 5,
                     formula: Formula.Manual,
-                    formulaParams: {
-                      minRequiredGrade: 0
-                    }
+                    formulaParams: {}
                   }
                 });
               }
