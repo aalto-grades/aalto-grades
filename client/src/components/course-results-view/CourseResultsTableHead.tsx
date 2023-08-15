@@ -36,6 +36,10 @@ export default function CourseResultsTableHead(props: {
     {
       id: 'finalGrade',
       name: 'Final Grade'
+    },
+    {
+      id: 'exportedToSisu',
+      name: 'Exported to Sisu'
     }
   ];
 
