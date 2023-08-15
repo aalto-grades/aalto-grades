@@ -49,7 +49,7 @@ services:
     environment:
       PGDATA: "/var/lib/postgresql/data/pgdata"
     volumes:
-     - ${POSTGRES_MOUNTDIR}:/var/lib/postgresql/data
+      - ${POSTGRES_MOUNTDIR}:/var/lib/postgresql/data
 
   pgadmin:
     extends:
