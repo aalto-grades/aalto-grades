@@ -148,4 +148,7 @@ INSERT INTO public.attainment_grade (user_id, attainment_id, grader_id, grade, m
 (1, 283, 1, 5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), 'you passed with flying colors'),
 (2, 283, 1, 2, true, 'FAIL', '2022-01-05', '2023-04-23', NOW(), NOW(), 'You shall not pass'),
 (2, 283, 1, 1, true, 'FAIL', '2022-01-05', '2023-04-23', NOW(), NOW(), 'this one you failed'),
-(3, 283, 1, 4, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), 'well done!');
+(3, 283, 1, 4, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), 'well done!'),
+-- Calculate failing grade
+(5, 229, 1, 0.5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL),
+(5, 230, 1, 0.5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL);

@@ -237,8 +237,8 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, days_valid,
 -- Test final grades
 (24, null, 'name226', 365, 0, 100, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["name227", { "weight": 0.25 }]] }'),
 (24, 226, 'name227', 365, 0, 100, NOW(), NOW(), 'MANUAL', '{}'),
--- Test calculating one correct grade
-(25, null, 'name228', 365, 0, 100, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["name229", { "weight": 0.75 }], ["name230", { "weight": 0.25 }]] }'),
+-- Test calculating one correct grade and failing grade
+(25, null, 'name228', 365, 1, 100, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["name229", { "weight": 0.75 }], ["name230", { "weight": 0.25 }]] }'),
 (25, 228, 'name229', 365, 0, 100, NOW(), NOW(), 'MANUAL', '{}'),
 (25, 228, 'name230', 365, 0, 100, NOW(), NOW(), 'MANUAL', '{}'),
 -- Test calculating multiple correct grades

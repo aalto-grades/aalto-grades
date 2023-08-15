@@ -1409,7 +1409,8 @@ describe(
       userId: number,
       grade: number,
       cookie: Array<string>,
-      checkGrader: boolean = true
+      checkGrader: boolean = true,
+      status: Status = Status.Pass
     ): Promise<void> {
       const result: AttainmentGrade | null = await AttainmentGrade.findOne({
         where: {
@@ -1420,6 +1421,7 @@ describe(
 
       expect(result).not.toBe(null);
       expect(result?.grade).toBe(grade);
+      expect(result?.status).toBe(status);
       if (checkGrader)
         checkGraderId(result as AttainmentGrade, cookie);
     }
@@ -1579,6 +1581,22 @@ describe(
       checkGrade(269, 1, 5, cookies.adminCookie);
     });
 
+    it(
+      'should save a failing grade when the calculated grade is less than the'
+      + ' min required grade',
+      async () => {
+        checkSuccessRes(await request
+          .post('/v1/courses/1/assessment-models/25/grades/calculate')
+          .send({
+            studentNumbers: ['826139']
+          })
+          .set('Cookie', cookies.adminCookie)
+        );
+
+        checkGrade(228, 5, 0.5, cookies.adminCookie, false, Status.Fail);
+      }
+    );
+
     it('should respond with 401 unauthorized, if not logged in', async () => {
       await request
         .post('/v1/courses/1/assessment-models/1/grades/calculate')
@@ -1614,7 +1632,8 @@ describe(
 
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe('No student numbers found from instance ID 28');
-      });
+      }
+    );
   }
 );
 
