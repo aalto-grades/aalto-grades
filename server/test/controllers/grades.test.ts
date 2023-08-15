@@ -1138,13 +1138,13 @@ describe(
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
-        function error(grade: number): string {
-          return `CSV file row 3 column 2 uploaded grade "${grade}" is larger`
+        function error(row: number, grade: number): string {
+          return `CSV file row ${row} column 2 uploaded grade "${grade}" is larger`
             + ' than maximum allowed grade "5"';
         }
 
         checkErrorRes(
-          [error(5.01), error(6), error(1000000)], HttpCode.BadRequest
+          [error(3, 5.01), error(4, 6), error(5, 1000000)], HttpCode.BadRequest
         );
       }
     );
