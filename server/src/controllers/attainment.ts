@@ -294,6 +294,8 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       assessmentModelId: assessmentModel.id,
       name: requestTree.name,
       daysValid: requestTree.daysValid,
+      minRequiredGrade: 1,
+      maxGrade: 5,
       formula: requestTree.formula,
       formulaParams: requestTree.formulaParams
     });

@@ -15,7 +15,7 @@ export interface CalculationResult {
  * Type of functions implementing grade calculation formulas.
  */
 export type FormulaFunction = (
-  attainmenName: string,
+  attainmentName: string,
   paramsObject: ParamsObject,
   subGrades: Array<CalculationResult>
 ) => CalculationResult;
