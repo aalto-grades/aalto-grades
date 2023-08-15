@@ -206,8 +206,8 @@ export default function SisuDownloadDialog(props: {
                     checked={override} />
                 )} label={(
                   <Typography variant='body2' sx={{ color: 'red' }}>
-                    List includes grades that have been already exported to Sisu.
-                    Please check the box if you want to include the previously exported grades.
+                    The list includes grades already exported to Sisu.
+                    Please check the box if you want to include these previously exported grades.
                   </Typography>
                 )
                 } />
@@ -224,7 +224,7 @@ export default function SisuDownloadDialog(props: {
                   <ListItemText
                     primary={`Student number: ${studentGrade.studentNumber}`}
                     secondary={userGradeAlreadyExported(studentGrade.grades) ?
-                      'User has been exported to Sisu already.' : ''}
+                      'User grade has been exported to Sisu already.' : ''}
                   />
                 </ListItem>
               ))}
