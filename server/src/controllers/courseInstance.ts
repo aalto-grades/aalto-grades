@@ -15,6 +15,7 @@ import User from '../database/models/user';
 import { ApiError, CourseFull, idSchema, JwtClaims } from '../types';
 import { findAssessmentModelById } from './utils/assessmentModel';
 import { findCourseById, parseCourseFull } from './utils/course';
+import { toDateOnlyString } from './utils/date';
 import { isTeacherInChargeOrAdmin } from './utils/user';
 
 interface CourseInstanceWithCourseFull extends CourseInstance {
@@ -71,8 +72,8 @@ export async function getCourseInstance(req: Request, res: Response): Promise<vo
     sisuCourseInstanceId: instance.sisuCourseInstanceId,
     startingPeriod: instance.startingPeriod as Period,
     endingPeriod: instance.endingPeriod as Period,
-    startDate: instance.startDate,
-    endDate: instance.endDate,
+    startDate: toDateOnlyString(instance.startDate),
+    endDate: toDateOnlyString(instance.endDate),
     type: instance.type,
     courseData: parseCourseFull(instance.Course)
   };
@@ -94,26 +95,26 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
   await findCourseById(courseId, HttpCode.NotFound);
 
   const instances: Array<CourseInstanceWithCourseFull> =
-      await CourseInstance.findAll(
-        {
-          where: {
-            courseId
-          },
-          include: [
-            {
-              model: Course,
-              include: [
-                {
-                  model: CourseTranslation
-                },
-                {
-                  model: User
-                }
-              ]
-            }
-          ]
-        }
-      ) as Array<CourseInstanceWithCourseFull>;
+    await CourseInstance.findAll(
+      {
+        where: {
+          courseId
+        },
+        include: [
+          {
+            model: Course,
+            include: [
+              {
+                model: CourseTranslation
+              },
+              {
+                model: User
+              }
+            ]
+          }
+        ]
+      }
+    ) as Array<CourseInstanceWithCourseFull>;
 
   const courseInstances: Array<CourseInstanceData> = [];
 
@@ -125,8 +126,8 @@ export async function getAllCourseInstances(req: Request, res: Response): Promis
       id: instance.id,
       startingPeriod: instance.startingPeriod as Period,
       endingPeriod: instance.endingPeriod as Period,
-      startDate: instance.startDate,
-      endDate: instance.endDate,
+      startDate: toDateOnlyString(instance.startDate),
+      endDate: toDateOnlyString(instance.endDate),
       type: instance.type
     };
 
@@ -195,8 +196,8 @@ export async function addCourseInstance(req: Request, res: Response): Promise<vo
     startingPeriod: req.body.startingPeriod,
     endingPeriod: req.body.endingPeriod,
     type: req.body.type,
-    startDate: req.body.startDate,
-    endDate: req.body.endDate
+    startDate: toDateOnlyString(req.body.startDate),
+    endDate: toDateOnlyString(req.body.endDate)
   });
 
   res.status(HttpCode.Ok).send({

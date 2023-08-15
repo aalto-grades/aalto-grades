@@ -21,6 +21,8 @@ import { getCookies, Cookies } from '../util/getCookies';
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
 const badInput: string = 'notValid';
+const dateOnlyRegExp: RegExp =
+  /^\d{4}[/-](0?[1-9]|1[012])[/-](0?[1-9]|[12][0-9]|3[01])$/;
 let res: supertest.Response;
 let cookies: Cookies = {
   adminCookie: [],
@@ -506,7 +508,6 @@ describe(
       ).toEqual(studentNumbers.sort());
     }
 
-
     it(
       'should get final grades succesfully when course results are found (admin user)',
       async () => {
@@ -531,7 +532,7 @@ describe(
 
         res = await request
           .get('/v1/courses/6/assessment-models/24/grades' +
-          `?studentNumbers=${JSON.stringify(studentNumbers)}`)
+            `?studentNumbers=${JSON.stringify(studentNumbers)}`)
           .set('Cookie', cookies.userCookie)
           .set('Accept', 'application/json');
 
@@ -539,6 +540,25 @@ describe(
         checkFinalGradesStructure(res.body.data);
       }
     );
+
+    it('should return dates in the correct format', async () => {
+      res = await request
+        .get(
+          '/v1/courses/6/assessment-models/24/grades'
+          + `?studentNumbers=${JSON.stringify(studentNumbers)}`
+        )
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+
+      for (const user of res.body.data) {
+        for (const option of user.grades) {
+          expect(option.date).toMatch(dateOnlyRegExp);
+          if (option.expiryDate)
+            expect(option.expiryDate).toMatch(dateOnlyRegExp);
+        }
+      }
+    });
 
     it(
       'should get the appropriate number of grade options depending on how many grades exist',
@@ -780,6 +800,30 @@ describe(
         .expect(HttpCode.Ok);
       checkSuccessRes(res);
       checkBodyStructure(res.body.data);
+    });
+
+    it('should return dates in the correct format', async () => {
+      res = await request
+        .get('/v1/courses/4/assessment-models/7/grades/user/25')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+
+      function checkDateFormat(data: AttainmentGradeData): void {
+        for (const option of data.grades) {
+          expect(option.date).toMatch(dateOnlyRegExp);
+          if (option.expiryDate)
+            expect(option.expiryDate).toMatch(dateOnlyRegExp);
+        }
+
+        if (data.subAttainments) {
+          for (const sub of data.subAttainments) {
+            checkDateFormat(sub);
+          }
+        }
+      }
+
+      checkDateFormat(res.body.data);
     });
 
     it('should get a single grade for an attainment if only one grade exists', async () => {
