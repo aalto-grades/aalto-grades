@@ -929,9 +929,15 @@ export async function calculateGrades(
     formulaNodesByAttainmentId.set(attainment.id, {
       formulaImplementation: getFormulaImplementation(formula as Formula),
       subFormulaNodes: [],
-      formulaParams: attainment.formulaParams,
-      attainmentId: attainment.id,
-      attainmentName: attainment.name
+      attainment: {
+        id: attainment.id,
+        name: attainment.name,
+        daysValid: attainment.daysValid,
+        minRequiredGrade: attainment.minRequiredGrade,
+        maxGrade: attainment.maxGrade,
+        formula: attainment.formula,
+        formulaParams: attainment.formulaParams
+      }
     });
   }
 
@@ -1105,7 +1111,7 @@ export async function calculateGrades(
     const manualGrade: number | undefined = manualGrades.get(formulaNode);
     if (manualGrade) {
       return {
-        attainmentName: formulaNode.attainmentName,
+        attainment: formulaNode.attainment,
         status: Status.Pass,
         grade: manualGrade
       };
@@ -1129,13 +1135,16 @@ export async function calculateGrades(
     // for this attainment and the grades of the subattainments.
     const calculated: CalculationResult =
       formulaNode.formulaImplementation.formulaFunction(
-        formulaNode.attainmentName, formulaNode.formulaParams, subGrades
+        formulaNode.attainment, subGrades
       );
 
     calculatedGrades.push(
       {
         userId: userId,
-        attainmentId: formulaNode.attainmentId,
+        // The formula nodes were constructed with attainments IDs defined, so
+        // this can be asserted to be non-null.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        attainmentId: formulaNode.attainment.id!,
         graderId: grader.id,
         grade: calculated.grade,
         status: calculated.status,

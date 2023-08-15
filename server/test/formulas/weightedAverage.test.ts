@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import { Formula, Status } from 'aalto-grades-common/types';
+
+import { mockAttainment } from '../mock-data/attainment';
 import { getFormulaImplementation } from '../../src/formulas';
 import { CalculationResult, FormulaImplementation } from '../../src/types';
 
@@ -35,20 +37,24 @@ describe('Test weighted average calculation', () => {
 
   it('should calculate a passing grade when subgrades are passing', async () => {
     const subGrades: Array<CalculationResult> = [
-      { attainmentName: 'one', grade: 10, status: Status.Pass },
-      { attainmentName: 'two', grade: 14, status: Status.Pass },
-      { attainmentName: 'three', grade: 3, status: Status.Pass }
+      { attainment: { ...mockAttainment, name: 'one' }, grade: 10, status: Status.Pass },
+      { attainment: { ...mockAttainment, name: 'two' }, grade: 14, status: Status.Pass },
+      { attainment: { ...mockAttainment, name: 'three' }, grade: 3, status: Status.Pass }
     ];
 
     const computedGrade: CalculationResult = implementation.formulaFunction(
-      'current',
       {
+        ...mockAttainment,
         minRequiredGrade: 0,
-        children: [
-          ['one', { weight: 0.3 }],
-          ['two', { weight: 0.7 }],
-          ['three', { weight: 1 }]
-        ]
+        maxGrade: 20,
+        formula: Formula.WeightedAverage,
+        formulaParams: {
+          children: [
+            ['one', { weight: 0.3 }],
+            ['two', { weight: 0.7 }],
+            ['three', { weight: 1 }]
+          ]
+        }
       },
       subGrades
     );
@@ -61,20 +67,24 @@ describe('Test weighted average calculation', () => {
     'should calculate a failing grade when the grade is below the minimum required grade',
     async () => {
       const subGrades: Array<CalculationResult> = [
-        { attainmentName: 'one', grade: 10, status: Status.Pass },
-        { attainmentName: 'two', grade: 14, status: Status.Pass },
-        { attainmentName: 'three', grade: 3, status: Status.Pass }
+        { attainment: { ...mockAttainment, name: 'one' }, grade: 10, status: Status.Pass },
+        { attainment: { ...mockAttainment, name: 'two' }, grade: 14, status: Status.Pass },
+        { attainment: { ...mockAttainment, name: 'three' }, grade: 3, status: Status.Pass }
       ];
 
       const computedGrade: CalculationResult = implementation.formulaFunction(
-        'current',
         {
+          ...mockAttainment,
           minRequiredGrade: 16,
-          children: [
-            ['one', { weight: 0.3 }],
-            ['two', { weight: 0.7 }],
-            ['three', { weight: 1 }]
-          ]
+          maxGrade: 20,
+          formula: Formula.WeightedAverage,
+          formulaParams: {
+            children: [
+              ['one', { weight: 0.3 }],
+              ['two', { weight: 0.7 }],
+              ['three', { weight: 1 }]
+            ]
+          }
         },
         subGrades
       );
@@ -86,20 +96,24 @@ describe('Test weighted average calculation', () => {
 
   it('should calculate a failing grade when a subgrade is failing', async () => {
     const subGrades: Array<CalculationResult> = [
-      { attainmentName: 'one', grade: 10, status: Status.Pass },
-      { attainmentName: 'two', grade: 14, status: Status.Pass },
-      { attainmentName: 'three', grade: 3, status: Status.Fail }
+      { attainment: { ...mockAttainment, name: 'one' }, grade: 10, status: Status.Pass },
+      { attainment: { ...mockAttainment, name: 'two' }, grade: 14, status: Status.Pass },
+      { attainment: { ...mockAttainment, name: 'three' }, grade: 3, status: Status.Fail }
     ];
 
     const computedGrade: CalculationResult = implementation.formulaFunction(
-      'current',
       {
+        ...mockAttainment,
         minRequiredGrade: 0,
-        children: [
-          ['one', { weight: 0.3 }],
-          ['two', { weight: 0.7 }],
-          ['three', { weight: 1 }]
-        ]
+        maxGrade: 20,
+        formula: Formula.WeightedAverage,
+        formulaParams: {
+          children: [
+            ['one', { weight: 0.3 }],
+            ['two', { weight: 0.7 }],
+            ['three', { weight: 1 }]
+          ]
+        }
       },
       subGrades
     );
