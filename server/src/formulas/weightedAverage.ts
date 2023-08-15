@@ -47,7 +47,7 @@ function calculateWeightedAverage(
     }
   }
 
-  if (grade < params.minRequiredGrade)
+  if (grade < attainment.minRequiredGrade)
     status = Status.Fail;
 
   return {

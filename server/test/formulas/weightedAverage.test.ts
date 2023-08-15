@@ -14,7 +14,6 @@ describe('Test weighted average calculation', () => {
 
   it('should accept parameters of the appropriate form', async () => {
     await implementation.paramSchema.validate({
-      minRequiredGrade: 5,
       children: [['1', { weight: 8 }]]
     });
   });
