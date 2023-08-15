@@ -17,7 +17,6 @@ import Attainment from '../database/models/attainment';
 import AttainmentGrade from '../database/models/attainmentGrade';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
-import { toDateOnlyString } from './utils/date';
 import User from '../database/models/user';
 
 import { getFormulaImplementation } from '../formulas';
@@ -27,6 +26,7 @@ import {
 } from '../types';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import { findAttainmentGradeById } from './utils/attainment';
+import { toDateOnlyString } from './utils/date';
 import { findUserById, isTeacherInChargeOrAdmin } from './utils/user';
 
 async function studentNumbersExist(studentNumbers: Array<string>): Promise<void> {
@@ -644,31 +644,51 @@ export function parseGradesFromCsv(
     };
 
     for (let i: number = 0; i < attainments.length; i++) {
+      const gradeValue: number = parseFloat(gradingData[i]);
 
-      if (isNaN(Number(gradingData[i]))) {
+      if (isNaN(gradeValue)) {
         errors.push(
           `CSV file row ${currentRow} column ${currentColumn}` +
           ` expected number, received "${gradingData[i]}"`
         );
-      } else {
-        const gradeValue: number = parseFloat(gradingData[i]);
-        const statusValue: Status =
-          gradeValue >= attainments[i].formulaParams.minRequiredGrade
-            ? Status.Pass : Status.Fail;
-
-        const grade: AttainmentGradeModelData = {
-          attainmentId: attainments[i].id,
-          grade: gradeValue,
-          manual: true,
-          status: statusValue
-        };
-        student.grades.push(grade);
+        currentColumn++;
+        continue;
       }
-      ++currentColumn;
+
+      if (gradeValue > attainments[i].maxGrade) {
+        errors.push(
+          `CSV file row ${currentRow} column ${currentColumn}` +
+          ` uploaded grade "${gradeValue}" is larger than maximum` +
+          ` allowed grade "${attainments[i].maxGrade}"`
+        );
+        currentColumn++;
+        continue;
+      }
+
+      if (gradeValue < 0) {
+        errors.push(
+          `CSV file row ${currentRow} column ${currentColumn}` +
+          ` uploaded grade "${gradeValue}" can't be negative`
+        );
+        currentColumn++;
+        continue;
+      }
+
+      student.grades.push({
+        attainmentId: attainments[i].id,
+        grade: gradeValue,
+        manual: true,
+        status: (
+          (gradeValue >= attainments[i].minRequiredGrade) ? Status.Pass : Status.Fail
+        )
+      });
+
+      currentColumn++;
     }
+
     // Reset column number to 2 for parsing the next row.
     currentColumn = 2;
-    ++currentRow;
+    currentRow++;
     students.push(student);
   }
 
@@ -809,7 +829,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
         // TODO: Optimize if datasets are big.
         await AttainmentGrade.bulkCreate(
-          preparedBulkCreate, { updateOnDuplicate: ['grade', 'graderId'] }
+          preparedBulkCreate
         );
 
         // After this point all the students' attainment grades have been created or
