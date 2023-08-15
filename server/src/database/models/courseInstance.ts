@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { DateOnly } from 'aalto-grades-common/types';
+import { DateOnlyString } from 'aalto-grades-common/types';
 import {
   CreationOptional, DataTypes, ForeignKey, Model, InferAttributes, InferCreationAttributes
 } from 'sequelize';
@@ -26,8 +26,8 @@ export default class CourseInstance extends Model<
   declare startingPeriod: string;
   declare endingPeriod: string;
   declare type: string;
-  declare startDate: DateOnly;
-  declare endDate: DateOnly;
+  declare startDate: Date | DateOnlyString;
+  declare endDate: Date | DateOnlyString;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
