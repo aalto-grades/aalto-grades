@@ -1092,7 +1092,9 @@ describe(
       }
     );
 
-    it('should respond with 400 bad request, if validation fails (invalid minRequiredGrade or maxGrade)',
+    it(
+      'should respond with 400 bad request, if validation fails'
+      + ' (invalid minRequiredGrade or maxGrade)',
       async () => {
         async function badInput(input: {
           minRequiredGrade?: number,
