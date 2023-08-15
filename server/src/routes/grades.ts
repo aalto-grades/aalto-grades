@@ -82,12 +82,12 @@ const upload: Multer = multer({
  *         type: string
  *         format: date
  *         description: Date when attainment is completed (e.g., deadline or exam date)
- *         example: 2022-9-22
+ *         example: 2022-09-22
  *       expiryDate:
  *         type: string
  *         format: date
  *         description: Date when the grade expires.
- *         example: 2022-9-22
+ *         example: 2022-09-22
  *       comment:
  *         type: string
  *         description: Comment for grade.
@@ -148,13 +148,13 @@ const upload: Multer = multer({
  *         type: string
  *         format: date
  *         description: Date when attainment is completed (e.g., deadline or exam date)
- *         example: 2022-9-22
+ *         example: 2022-09-22
  *         required: false
  *       expiryDate:
  *         type: string
  *         format: date
  *         description: Date when the grade expires.
- *         example: 2022-9-22
+ *         example: 2022-09-22
  *         required: false
  *       comment:
  *         type: string

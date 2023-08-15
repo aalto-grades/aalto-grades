@@ -17,6 +17,7 @@ import Attainment from '../database/models/attainment';
 import AttainmentGrade from '../database/models/attainmentGrade';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
+import { toDateOnlyString } from './utils/date';
 import User from '../database/models/user';
 
 import { getFormulaImplementation } from '../formulas';
@@ -467,9 +468,9 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
             grade: grade.grade,
             status: grade.status as Status,
             manual: grade.manual,
-            date: grade.date,
-            comment: grade.comment ?? '',
             exportedToSisu: grade.sisuExportDate
+            date: toDateOnlyString(grade.date),
+            comment: grade.comment ?? ''
           };
         })
     });
@@ -549,10 +550,10 @@ export async function getGradeTreeOfUser(req: Request, res: Response): Promise<v
             grade: option.grade,
             status: option.status as Status,
             manual: option.manual,
-            date: option.date,
-            expiryDate: option.expiryDate,
-            comment: option.comment ?? '',
             exportedToSisu: option.sisuExportDate
+            date: toDateOnlyString(option.date),
+            expiryDate: toDateOnlyString(option.expiryDate),
+            comment: option.comment ?? ''
           };
         }
       ),

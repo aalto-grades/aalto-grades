@@ -13,6 +13,8 @@ import { Cookies, getCookies } from '../util/getCookies';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
+const dateOnlyRegExp: RegExp =
+  /^\d{4}[/-](0?[1-9]|1[012])[/-](0?[1-9]|[12][0-9]|3[01])$/;
 let cookies: Cookies = {
   adminCookie: [],
   userCookie: []
@@ -51,6 +53,17 @@ describe(
       expect(res.body.data.courseData.teachersInCharge[0].name).toBeDefined();
       expect(res.body.data.courseData.department).toBeDefined();
       expect(res.body.data.courseData.name).toBeDefined();
+    });
+
+    it('should return dates in the correct format', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/1/instances/1')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+
+      expect(res.body.data.startDate).toMatch(dateOnlyRegExp);
+      expect(res.body.data.endDate).toMatch(dateOnlyRegExp);
     });
 
     it('should respond with 400 bad request, if validation fails (non-number instance id)',
@@ -119,6 +132,19 @@ describe(
       expect(res.body.data[0].startDate).toBeDefined();
       expect(res.body.data[0].endDate).toBeDefined();
       expect(res.body.data[0].type).toBeDefined();
+    });
+
+    it('should return dates in the correct format', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/1/instances')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+
+      for (const courseInstance of res.body.data) {
+        expect(courseInstance.startDate).toMatch(dateOnlyRegExp);
+        expect(courseInstance.endDate).toMatch(dateOnlyRegExp);
+      }
     });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
