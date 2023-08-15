@@ -2,10 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { FinalGrade, Language } from 'aalto-grades-common/types';
+import { FinalGrade, GradeOption, Language } from 'aalto-grades-common/types';
 import {
-  Box, Button, Dialog, DialogActions, DialogContent,
-  DialogContentText, DialogTitle, List, ListItem,
+  Box, Button, Checkbox, Dialog, DialogActions, DialogContent,
+  DialogContentText, DialogTitle, FormControlLabel, List, ListItem,
   ListItemText, MenuItem, Paper, TextField, Typography
 } from '@mui/material';
 import { ChangeEvent, JSX, useState } from 'react';
@@ -82,6 +82,8 @@ export default function SisuDownloadDialog(props: {
     useState<string | undefined>(undefined);
   const [completionLanguage, setCompletionLanguage]: State<string | undefined> =
     useState<string | undefined>(undefined);
+  const [override, setOverride]: State<boolean> =
+    useState<boolean>(false);
 
   const downloadSisuGradeCsv: UseDownloadSisuGradeCsvResult = useDownloadSisuGradeCsv({
     onSuccess: (gradeCsv: BlobPart) => {
@@ -117,10 +119,25 @@ export default function SisuDownloadDialog(props: {
         params: {
           completionLanguage: completionLanguage,
           assessmentDate: assessmentDate,
-          studentNumbers: props.selectedStudents.map((student: FinalGrade) => student.studentNumber)
+          studentNumbers:
+            props.selectedStudents.map((student: FinalGrade) => student.studentNumber),
+          override
         }
       });
     }
+  }
+
+  function userGradeAlreadyExported(grades: Array<GradeOption>): boolean {
+    return Boolean(grades.find((option: GradeOption) => option.exportedToSisu != null));
+  }
+
+  function exportedValuesInList(): boolean {
+    for (const value of props.selectedStudents) {
+      if (userGradeAlreadyExported(value.grades)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   return (
@@ -179,6 +196,23 @@ export default function SisuDownloadDialog(props: {
                 }}
               />
             </Box>
+            {(exportedValuesInList()) && (
+              <Box sx={{ ml: 1, my: 2 }}>
+                <FormControlLabel control={(
+                  <Checkbox
+                    id="select-all"
+                    size="small"
+                    onClick={(): void => setOverride(!override)}
+                    checked={override} />
+                )} label={(
+                  <Typography variant='body2' sx={{ color: 'red' }}>
+                    List includes grades that have been already exported to Sisu.
+                    Please check the box if you want to include the previously exported grades.
+                  </Typography>
+                )
+                } />
+              </Box>
+            )}
           </Box>
           <Typography variant='h6' sx={{ mt: 1 }}>
             Selected students:
@@ -189,6 +223,8 @@ export default function SisuDownloadDialog(props: {
                 <ListItem key={studentGrade.studentNumber}>
                   <ListItemText
                     primary={`Student number: ${studentGrade.studentNumber}`}
+                    secondary={userGradeAlreadyExported(studentGrade.grades) ?
+                      'User has been exported to Sisu already.' : ''}
                   />
                 </ListItem>
               ))}
