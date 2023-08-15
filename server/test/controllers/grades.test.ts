@@ -495,6 +495,7 @@ describe(
           expect(option.grade).toBeDefined();
           expect(option.status).toBeDefined();
           expect(option.manual).toBeDefined();
+          expect(option.exportedToSisu).toBeDefined();
           expect(option.date).toBeDefined();
           expect(option.expiryDate).not.toBeDefined();
         }
@@ -771,6 +772,7 @@ describe(
         expect(option.grade).toBeDefined();
         expect(option.status).toBeDefined();
         expect(option.manual).toBeDefined();
+        expect(option.exportedToSisu).toBeDefined();
         expect(option.date).toBeDefined();
         expect(option.expiryDate).toBeDefined();
         expect(option.comment).toBeDefined();
