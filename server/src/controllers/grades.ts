@@ -644,9 +644,7 @@ export function parseGradesFromCsv(
     };
 
     for (let i: number = 0; i < attainments.length; i++) {
-      const gradeValue: number = parseFloat(gradingData[i]);
-
-      if (isNaN(gradeValue)) {
+      if (isNaN(Number(gradingData[i]))) {
         errors.push(
           `CSV file row ${currentRow} column ${currentColumn}` +
           ` expected number, received "${gradingData[i]}"`
@@ -654,6 +652,8 @@ export function parseGradesFromCsv(
         currentColumn++;
         continue;
       }
+
+      const gradeValue: number = parseFloat(gradingData[i]);
 
       if (gradeValue > attainments[i].maxGrade) {
         errors.push(

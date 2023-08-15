@@ -1027,10 +1027,10 @@ describe(
     }
 
     it(
-      'should determine whether manual attainment was passed based on min required grade',
+      'should determine whether an attainment was passed based on min required grade',
       async () => {
         const csvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mock-data/csv/grades_failing_manual.csv'), 'utf8'
+          path.resolve(__dirname, '../mock-data/csv/grades_failing.csv'), 'utf8'
         );
 
         res = await request
@@ -1040,31 +1040,10 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
-        await checkStatusOfGrade(5, 285, 1, Status.Fail);
-        await checkStatusOfGrade(6, 285, 1.9, Status.Fail);
-        await checkStatusOfGrade(7, 285, 2, Status.Pass);
-        await checkStatusOfGrade(8, 285, 3, Status.Pass);
-      }
-    );
-
-    it(
-      'should determine whether non-manual attainment was passed based on min required grade',
-      async () => {
-        const csvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mock-data/csv/grades_failing_non_manual.csv'), 'utf8'
-        );
-
-        res = await request
-          .post('/v1/courses/2/assessment-models/51/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'text/csv' })
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.Ok);
-
-        await checkStatusOfGrade(1, 284, 1, Status.Fail);
-        await checkStatusOfGrade(2, 284, 2, Status.Fail);
-        await checkStatusOfGrade(3, 284, 3, Status.Pass);
-        await checkStatusOfGrade(4, 284, 3.4, Status.Pass);
+        await checkStatusOfGrade(5, 284, 1, Status.Fail);
+        await checkStatusOfGrade(6, 284, 1.9, Status.Fail);
+        await checkStatusOfGrade(7, 284, 2, Status.Pass);
+        await checkStatusOfGrade(8, 284, 3, Status.Pass);
       }
     );
 
@@ -1144,6 +1123,31 @@ describe(
           ['No attainments found from the header, please upload valid CSV.'], HttpCode.BadRequest
         );
       });
+
+    it(
+      'should respond with 400 bad request, if an uploaded grade is larger than'
+      + ' the max grade of an attainment',
+      async () => {
+        const invalidCsvData: fs.ReadStream = fs.createReadStream(
+          path.resolve(__dirname, '../mock-data/csv/grades_over_max.csv'), 'utf8'
+        );
+
+        res = await request
+          .post('/v1/courses/2/assessment-models/51/grades/csv')
+          .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json');
+
+        checkErrorRes(
+          [
+            'CSV file row 3 column 2 uploaded grade "5.01" is larger than maximum allowed grade "5"',
+            'CSV file row 4 column 2 uploaded grade "6" is larger than maximum allowed grade "5"',
+            'CSV file row 5 column 2 uploaded grade "1000000" is larger than maximum allowed grade "5"'
+          ],
+          HttpCode.BadRequest
+        );
+      }
+    );
 
     it('should respond with 400 bad request, if the CSV file header parsing fails',
       async () => {
