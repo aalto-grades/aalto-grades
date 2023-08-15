@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpCode, ParamsObject } from 'aalto-grades-common/types';
+import { AttainmentData, HttpCode, ParamsObject } from 'aalto-grades-common/types';
 import * as yup from 'yup';
 
 import { registerFormula } from '.';
@@ -10,7 +10,7 @@ import { Formula, Status } from 'aalto-grades-common/types';
 import { ApiError, CalculationResult } from '../types';
 
 const childParams: Array<string> = ['weight'];
-const params: Array<string> = ['minRequiredGrade'];
+const params: Array<string> = [];
 
 const defaultChildParams: ChildParams = {
   weight: 0
@@ -20,31 +20,28 @@ interface ChildParams {
   weight: number
 }
 
-interface Params extends ParamsObject<ChildParams> {
-  minRequiredGrade: number
-}
+type Params = ParamsObject<ChildParams>;
 
 function calculateWeightedAverage(
-  attainmentName: string,
-  paramsObject: ParamsObject,
+  attainment: AttainmentData,
   subGrades: Array<CalculationResult>
 ): CalculationResult {
 
   let grade: number = 0;
   let status: Status = Status.Pass;
-  const params: Params = paramsObject as Params;
+  const params: Params = attainment.formulaParams as Params;
   const weights: Map<string, ChildParams> = new Map(params.children);
 
   for (const subGrade of subGrades) {
     if (subGrade.status !== Status.Pass)
       status = Status.Fail;
 
-    const weight: number | undefined = weights.get(subGrade.attainmentName)?.weight;
+    const weight: number | undefined = weights.get(subGrade.attainment.name)?.weight;
     if (weight) {
       grade += subGrade.grade * weight;
     } else {
       throw new ApiError(
-        `weight unspecified for attainment ${subGrade.attainmentName}`,
+        `weight unspecified for attainment ${subGrade.attainment.name}`,
         HttpCode.InternalServerError
       );
     }
@@ -54,7 +51,7 @@ function calculateWeightedAverage(
     status = Status.Fail;
 
   return {
-    attainmentName: attainmentName,
+    attainment: attainment,
     grade: grade,
     status: status
   };
@@ -65,31 +62,28 @@ const codeSnippet: string =
   weight: number
 }
 
-interface Params extends ParamsObject<ChildParams> {
-  minRequiredGrade: number
-}
+type Params = ParamsObject<ChildParams>;
 
 function calculateWeightedAverage(
-  attainmentName: string,
-  paramsObject: ParamsObject,
+  attainment: AttainmentData,
   subGrades: Array<CalculationResult>
 ): CalculationResult {
 
   let grade: number = 0;
   let status: Status = Status.Pass;
-  const params: Params = paramsObject as Params;
+  const params: Params = attainment.formulaParams as Params;
   const weights: Map<string, ChildParams> = new Map(params.children);
 
   for (const subGrade of subGrades) {
     if (subGrade.status !== Status.Pass)
       status = Status.Fail;
 
-    const weight: number | undefined = weights.get(subGrade.attainmentName)?.weight;
+    const weight: number | undefined = weights.get(subGrade.attainment.name)?.weight;
     if (weight) {
       grade += subGrade.grade * weight;
     } else {
       throw new ApiError(
-        \`weight unspecified for attainment \${subGrade.attainmentName}\`,
+        \`weight unspecified for attainment \${subGrade.attainment.name}\`,
         HttpCode.InternalServerError
       );
     }
@@ -99,7 +93,7 @@ function calculateWeightedAverage(
     status = Status.Fail;
 
   return {
-    attainmentName: attainmentName,
+    attainment: attainment,
     grade: grade,
     status: status
   };
@@ -114,7 +108,6 @@ registerFormula(
   childParams,
   defaultChildParams,
   yup.object({
-    minRequiredGrade: yup.number().required(),
     children: yup.array().min(1).of(
       yup.tuple([
         yup.string(),

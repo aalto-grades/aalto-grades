@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { AttainmentData } from 'aalto-grades-common/types';
 import * as yup from 'yup';
 
 import { registerFormula } from '.';
@@ -9,19 +10,19 @@ import { Formula, Status } from 'aalto-grades-common/types';
 import { CalculationResult } from '../types';
 
 const childParams: Array<string> = [];
-const params: Array<string> = ['minRequiredGrade'];
+const params: Array<string> = [];
 
 /**
  * The 'Manual' formula requires a grade to be manually specified by a teacher.
  * The formula function of the 'Manual' formula is only called when a grade has
  * not been specified.
  */
-function manualGradeUnspecified(attainmentName: string): CalculationResult {
+function manualGradeUnspecified(attainment: AttainmentData): CalculationResult {
   // If no grade has been input for a student, assume the attainment
   // has been failed.
   // TODO: This assumption should not be made.
   return {
-    attainmentName: attainmentName,
+    attainment: attainment,
     status: Status.Fail,
     grade: 0,
   };
@@ -37,7 +38,5 @@ registerFormula(
   params,
   childParams,
   {},
-  yup.object({
-    minRequiredGrade: yup.number().required()
-  }).noUnknown().strict()
+  yup.object().noUnknown().strict()
 );
