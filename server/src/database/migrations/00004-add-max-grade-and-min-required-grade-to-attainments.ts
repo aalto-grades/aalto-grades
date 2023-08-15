@@ -10,13 +10,13 @@ export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction: Transaction = await queryInterface.sequelize.transaction();
     try {
-      await queryInterface.changeColumn(
+      await queryInterface.addColumn(
         'attainment', 'max_grade',
         { type: DataTypes.INTEGER, allowNull: false, defaultValue: 5 },
         { transaction }
       );
 
-      await queryInterface.changeColumn(
+      await queryInterface.addColumn(
         'attainment', 'min_required_grade',
         { type: DataTypes.INTEGER, allowNull: false, defaultValue: 1 },
         { transaction }
