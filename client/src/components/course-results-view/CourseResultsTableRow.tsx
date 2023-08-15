@@ -8,7 +8,9 @@ import {
 import {
   Checkbox, IconButton, Link, TableCell, TableRow, Tooltip
 } from '@mui/material';
-import { MoreHoriz as MoreHorizIcon } from '@mui/icons-material';
+import {
+  Close as CloseIcon, Done as DoneIcon, MoreHoriz as MoreHorizIcon
+} from '@mui/icons-material';
 import { JSX, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
@@ -27,39 +29,37 @@ function GradeCell(props: {
   const [gradeOptionsOpen, setGradeOptionsOpen]: State<boolean> = useState(false);
 
   return (
-    <>
-      <TableCell
-        sx={{ width: '100px' }}
-        align="left"
-      >
-        {(props.grade) && (
-          findBestGradeOption(props.grade.grades)?.grade ?? '-'
-        )}
-        {(props.grade && props.grade.grades.length > 1) && (
-          <>
-            <Tooltip
-              placement='top'
-              title='Multiple grades, click to show'
+    <TableCell
+      sx={{ width: '100px' }}
+      align="left"
+    >
+      {(props.grade) && (
+        findBestGradeOption(props.grade.grades)?.grade ?? '-'
+      )}
+      {(props.grade && props.grade.grades.length > 1) && (
+        <>
+          <Tooltip
+            placement='top'
+            title='Multiple grades, click to show'
+          >
+            <IconButton
+              size='small'
+              color='primary'
+              sx={{ ml: 1 }}
+              onClick={(): void => setGradeOptionsOpen(true)}
             >
-              <IconButton
-                size='small'
-                color='primary'
-                sx={{ ml: 1 }}
-                onClick={(): void => setGradeOptionsOpen(true)}
-              >
-                <MoreHorizIcon />
-              </IconButton>
-            </Tooltip>
-            <GradeOptionsDialog
-              title={`Grades of ${props.studentNumber} for ${props.attainment.name}`}
-              options={props.grade.grades}
-              open={gradeOptionsOpen}
-              handleClose={(): void => setGradeOptionsOpen(false)}
-            />
-          </>
-        )}
-      </TableCell>
-    </>
+              <MoreHorizIcon />
+            </IconButton>
+          </Tooltip>
+          <GradeOptionsDialog
+            title={`Grades of ${props.studentNumber} for ${props.attainment.name}`}
+            options={props.grade.grades}
+            open={gradeOptionsOpen}
+            handleClose={(): void => setGradeOptionsOpen(false)}
+          />
+        </>
+      )}
+    </TableCell>
   );
 }
 
@@ -181,6 +181,29 @@ export default function CourseResultsTableRow(props: {
               handleClose={(): void => setFinalGradeOptionsOpen(false)}
             />
           </>
+        )}
+      </TableCell>
+      <TableCell
+        sx={{ width: '100px' }}
+        align='left'
+        key={`${props.student.studentNumber}_exported_info`}
+      >
+        {(findBestGradeOption(props.student.grades)?.exportedToSisu) ? (
+          <Tooltip
+            placement='top'
+            title={
+              `Exported to Sisu at ${findBestGradeOption(props.student.grades)?.exportedToSisu}.`
+            }
+          >
+            <DoneIcon color="success" />
+          </Tooltip>
+        ) : (
+          <Tooltip
+            placement='top'
+            title='This grade has not been exported to Sisu.'
+          >
+            <CloseIcon color="action" />
+          </Tooltip>
         )}
       </TableCell>
       {(gradeTree.data) && (
