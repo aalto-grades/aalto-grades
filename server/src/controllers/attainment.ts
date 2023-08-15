@@ -306,6 +306,8 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       assessmentModelId: dbEntry.assessmentModelId,
       name: dbEntry.name,
       daysValid: dbEntry.daysValid,
+      minRequiredGrade: dbEntry.minRequiredGrade,
+      maxGrade: dbEntry.maxGrade,
       formula: dbEntry.formula,
       formulaParams: dbEntry.formulaParams,
       subAttainments: []
@@ -508,6 +510,8 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     formula: attainment.formula,
     formulaParams: attainment.formulaParams as ParamsObject,
     daysValid: attainment.daysValid,
+    minRequiredGrade: attainment.minRequiredGrade,
+    maxGrade: attainment.maxGrade,
     parentId: attainment.parentId
   };
 
