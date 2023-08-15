@@ -14,7 +14,7 @@ import { Cookies, getCookies } from '../util/getCookies';
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
 const dateOnlyRegExp: RegExp =
-  /^\d{4}[\/\-](0?[1-9]|1[012])[\/\-](0?[1-9]|[12][0-9]|3[01])$/;
+  /^\d{4}[/-](0?[1-9]|1[012])[/-](0?[1-9]|[12][0-9]|3[01])$/;
 let cookies: Cookies = {
   adminCookie: [],
   userCookie: []
