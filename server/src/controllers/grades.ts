@@ -1138,6 +1138,9 @@ export async function calculateGrades(
         formulaNode.attainment, subGrades
       );
 
+    if (calculated.grade < formulaNode.attainment.minRequiredGrade)
+      calculated.status = Status.Fail;
+
     calculatedGrades.push(
       {
         userId: userId,
