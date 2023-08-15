@@ -201,7 +201,7 @@ describe(
 
         res = await request
           .get('/v1/courses/6/assessment-models/24/grades/csv/sisu' +
-          `?studentNumbers=${JSON.stringify(studentNumbers)}`)
+          `?studentNumbers=${JSON.stringify(studentNumbers)}&override=true`)
           .set('Cookie', cookies.userCookie)
           .set('Accept', 'text/csv')
           .expect(HttpCode.Ok);
@@ -227,6 +227,28 @@ describe(
         );
       });
 
+    it(
+      'should export only unexported grades if override is false',
+      async () => {
+        res = await request
+          .get('/v1/courses/6/assessment-models/52/grades/csv/sisu' +
+            `?studentNumbers=${JSON.stringify(studentNumbers)}&override=false`)
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'text/csv')
+          .expect(HttpCode.Ok);
+
+        console.log(res.text);
+        expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+114732,5,5,21.6.2023,sv,
+335462,1,5,21.6.2023,sv,
+345752,1,5,21.6.2023,sv,
+`);
+        expect(res.headers['content-disposition']).toBe(
+          'attachment; filename="final_grades_course_MS-A0102_' +
+          `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
+        );
+      });
+
     it('should export the best grade if multiple ones exist', async () => {
       // Check that multiple grades exist as expected
       await checkGradeAmount(1, 283, 3, [0, 3, 5]);
@@ -236,7 +258,7 @@ describe(
       res = await request
         .get(
           '/v1/courses/2/assessment-models/50/grades/csv/sisu'
-          + `?studentNumbers=${JSON.stringify(['352772', '476617', '344625'])}`
+          + `?studentNumbers=${JSON.stringify(['352772', '476617', '344625'])}&override=true`
         )
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'text/csv')
@@ -258,7 +280,7 @@ describe(
         res = await request
           .get(
             '/v1/courses/6/assessment-models/24/grades/csv/sisu'
-            + '?assessmentDate=2023-05-12&completionLanguage=ja'
+            + '?assessmentDate=2023-05-12&completionLanguage=ja&override=true'
             + `&studentNumbers=${JSON.stringify(studentNumbers)}`
           )
           .set('Cookie', cookies.adminCookie)
@@ -291,7 +313,7 @@ describe(
         res = await request
           .get(
             '/v1/courses/9/assessment-models/42/grades/csv/sisu'
-            + '?assessmentDate=2023-12-12&instanceId=26'
+            + '?assessmentDate=2023-12-12&instanceId=26&override=true'
           )
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'text/csv')
@@ -314,7 +336,8 @@ describe(
         res = await request
           .get(
             '/v1/courses/9/assessment-models/42/grades/csv/sisu'
-            + '?assessmentDate=2023-12-12&studentNumbers=["114732","472886","327976","139131"]'
+            + '?assessmentDate=2023-12-12&studentNumbers=["114732","472886","327976","139131"]' +
+            '&override=true'
           )
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'text/csv')
@@ -338,7 +361,7 @@ describe(
           .get(
             '/v1/courses/9/assessment-models/42/grades/csv/sisu'
             + '?assessmentDate=2023-12-12&instanceId=26' +
-            '&studentNumbers=["327976","139131"]'
+            '&studentNumbers=["327976","139131"]&override=true'
           )
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'text/csv')
@@ -359,7 +382,8 @@ describe(
       async () => {
         res = await request
           .get(
-            '/v1/courses/9/assessment-models/42/grades/csv/sisu?assessmentDate=2023-12-12'
+            '/v1/courses/9/assessment-models/42/grades/csv/sisu?' +
+            'assessmentDate=2023-12-12&override=true'
           )
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'text/csv')
