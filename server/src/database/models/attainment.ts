@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ParamsObject } from 'aalto-grades-common/types';
+import { GradeType, ParamsObject } from 'aalto-grades-common/types';
 import {
   CreationOptional, DataTypes, ForeignKey, Model, InferAttributes, InferCreationAttributes
 } from 'sequelize';
@@ -24,6 +24,7 @@ export default class Attainment extends Model<
   declare daysValid: number;
   declare formula: Formula;
   declare formulaParams: ParamsObject;
+  declare gradeType: GradeType;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -67,6 +68,10 @@ Attainment.init(
     formulaParams: {
       type: DataTypes.JSONB,
       allowNull: false,
+    },
+    gradeType: {
+      type: DataTypes.ENUM(GradeType.Integer, GradeType.Float),
+      allowNull: false
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,

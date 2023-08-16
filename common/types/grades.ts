@@ -11,6 +11,11 @@ export enum Status {
   Pending = 'PENDING'
 }
 
+export enum GradeType {
+  Integer = 'INTEGER',
+  Float = 'FLOAT'
+}
+
 export interface GradeOption {
   gradeId?: number,
   grader: UserData,
