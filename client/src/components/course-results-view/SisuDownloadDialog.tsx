@@ -265,14 +265,14 @@ export default function SisuDownloadDialog(props: {
           >
             Cancel
           </Button>
-            <Button
-              id='ag_confirm_file_upload_btn'
-              size='medium'
-              variant='contained'
-              onClick={handleDownloadSisuGradeCsv}
-            >
-              Download
-            </Button>
+          <Button
+            id='ag_confirm_file_upload_btn'
+            size='medium'
+            variant='contained'
+            onClick={handleDownloadSisuGradeCsv}
+          >
+            Download
+          </Button>
         </DialogActions>
       </Dialog>
       <AlertSnackbar snackPack={snackPack} />
