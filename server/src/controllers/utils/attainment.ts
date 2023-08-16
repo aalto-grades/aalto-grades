@@ -79,10 +79,11 @@ export async function findAttainmentsByAssessmentModel(
       id: attainment.id,
       assessmentModelId: attainment.assessmentModelId,
       parentId: attainment.parentId,
-      formula: attainment.formula,
-      formulaParams: attainment.formulaParams as ParamsObject,
       name: attainment.name,
-      daysValid: attainment.daysValid
+      daysValid: attainment.daysValid,
+      formula: attainment.formula,
+      formulaParams: attainment.formulaParams,
+      gradeType: attainment.gradeType
     };
   });
 

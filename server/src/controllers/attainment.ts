@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AttainmentData, Formula, HttpCode, ParamsObject
+  AttainmentData, Formula, GradeType, HttpCode, ParamsObject
 } from 'aalto-grades-common/types';
 import { Request, Response } from 'express';
 import { Op } from 'sequelize';
@@ -181,6 +181,10 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
     formulaParams: yup // More thorough validation is done separately
       .object()
       .required(),
+    gradeType: yup
+      .string()
+      .oneOf(Object.values(GradeType))
+      .required(),
     subAttainments: yup
       .array()
       .of(yup.lazy(() => requestSchema.default(undefined)))
@@ -295,7 +299,8 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       name: requestTree.name,
       daysValid: requestTree.daysValid,
       formula: requestTree.formula,
-      formulaParams: requestTree.formulaParams
+      formulaParams: requestTree.formulaParams,
+      gradeType: requestTree.gradeType
     });
 
     const attainmentTree: AttainmentData = {
@@ -306,6 +311,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       daysValid: dbEntry.daysValid,
       formula: dbEntry.formula,
       formulaParams: dbEntry.formulaParams,
+      gradeType: dbEntry.gradeType,
       subAttainments: []
     };
 
@@ -351,6 +357,10 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
       .object()
       .nullable()
       .notRequired(),
+    gradeType: yup
+      .string()
+      .oneOf(Object.values(GradeType))
+      .notRequired()
   });
 
   await requestSchema.validate(req.body, { abortEarly: false });
@@ -367,6 +377,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   const parentId: number | undefined = req.body.parentId;
   const formula: Formula | undefined = req.body.formula;
   const formulaParams: ParamsObject | undefined = req.body.formulaParams;
+  const gradeType: GradeType | undefined = req.body.gradeType;
 
   let parentAttainment: Attainment | null = null;
 
@@ -496,7 +507,8 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     daysValid: daysValid ?? attainment.daysValid,
     parentId: parentId ?? attainment.parentId,
     formula: formula ?? attainment.formula,
-    formulaParams: formulaParams ?? attainment.formulaParams
+    formulaParams: formulaParams ?? attainment.formulaParams,
+    gradeType: gradeType ?? attainment.gradeType
   }).save();
 
   const attainmentTree: AttainmentData = {
@@ -504,8 +516,9 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     assessmentModelId: attainment.assessmentModelId,
     name: attainment.name,
     formula: attainment.formula,
-    formulaParams: attainment.formulaParams as ParamsObject,
+    formulaParams: attainment.formulaParams,
     daysValid: attainment.daysValid,
+    gradeType: attainment.gradeType,
     parentId: attainment.parentId
   };
 
