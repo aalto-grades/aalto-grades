@@ -6,7 +6,7 @@ import { FinalGrade, GradeOption, Language } from 'aalto-grades-common/types';
 import {
   Box, Button, Checkbox, Dialog, DialogActions, DialogContent,
   DialogContentText, DialogTitle, FormControlLabel, List, ListItem,
-  ListItemText, MenuItem, Paper, TextField, Typography
+  ListItemText, MenuItem, Paper, TextField, Tooltip, Typography
 } from '@mui/material';
 import { ChangeEvent, JSX, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
@@ -106,12 +106,33 @@ export default function SisuDownloadDialog(props: {
     }
   });
 
-  async function handleDownloadSisuGradeCsv(): Promise<void> {
+  async function handleDownloadSisuGradeCsv(
+    param: 'all' | 'exported' | 'unexported'
+  ): Promise<void> {
     if (courseId && assessmentModelId) {
       snackPack.push({
         msg: 'Fetching Sisu CSV...',
         severity: 'info'
       });
+
+      let studentNumbers: Array<string> = [];
+
+      switch (param) {
+      case 'exported':
+        studentNumbers = props.selectedStudents
+          .filter((student: FinalGrade) => userGradeAlreadyExported(student.grades))
+          .map((student: FinalGrade) => student.studentNumber);
+        break;
+      case 'unexported':
+        studentNumbers = props.selectedStudents
+          .filter((student: FinalGrade) => !userGradeAlreadyExported(student.grades))
+          .map((student: FinalGrade) => student.studentNumber);
+        break;
+      case 'all':
+        studentNumbers = props.selectedStudents.map(
+          (student: FinalGrade) => student.studentNumber);
+        break;
+      }
 
       downloadSisuGradeCsv.mutate({
         courseId: courseId,
@@ -119,9 +140,8 @@ export default function SisuDownloadDialog(props: {
         params: {
           completionLanguage: completionLanguage,
           assessmentDate: assessmentDate,
-          studentNumbers:
-            props.selectedStudents.map((student: FinalGrade) => student.studentNumber),
-          override
+          studentNumbers: studentNumbers,
+          override: (param === 'exported' || param === 'all')
         }
       });
     }
@@ -233,20 +253,49 @@ export default function SisuDownloadDialog(props: {
         </DialogContent>
         <DialogActions sx={{ pr: 4, pb: 3 }}>
           <Button
-            size='medium'
+            size='small'
             variant='outlined'
             onClick={props.handleClose}
           >
             Cancel
           </Button>
-          <Button
-            id='ag_confirm_file_upload_btn'
-            size='medium'
-            variant='contained'
-            onClick={handleDownloadSisuGradeCsv}
+          {(exportedValuesInList() && !override) && (
+            <Tooltip
+              title='Download CSV with grades that have been exported at least once to Sisu.'
+              placement="top"
+            >
+              <Button
+                id='ag_confirm_file_upload_btn_only_exported'
+                size='small'
+                variant='contained'
+                onClick={(): Promise<void> => handleDownloadSisuGradeCsv('exported')}
+              >
+                Download exported only
+              </Button>
+            </Tooltip>
+          )}
+          <Tooltip
+            title={(exportedValuesInList() && !override) ?
+              'Download CSV with grades that have not been previously exported to Sisu.' :
+              'Download CSV with all grades selected.'
+            }
+            placement="top"
           >
-            Download
-          </Button>
+            <Button
+              id='ag_confirm_file_upload_btn'
+              size='small'
+              variant='contained'
+              onClick={(): Promise<void> => {
+                return handleDownloadSisuGradeCsv(
+                  exportedValuesInList() && !override ? 'unexported' : 'all'
+                );
+              }}
+            >
+              {(exportedValuesInList() && !override) ? 'Download unexported only' :
+                exportedValuesInList() ? 'Download all' : 'Download'
+              }
+            </Button>
+          </Tooltip>
         </DialogActions>
       </Dialog>
       <AlertSnackbar snackPack={snackPack} />
