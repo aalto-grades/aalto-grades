@@ -20,6 +20,7 @@ export default class AttainmentGrade extends Model<
   declare attainmentId: ForeignKey<Attainment['id']>;
   declare graderId: ForeignKey<User['id']>;
   declare grade: number;
+  declare sisuExportDate: CreationOptional<Date>;
   declare manual: boolean;
   declare status: string;
   // Date when attainment is completed (e.g., deadline or exam date)
@@ -63,6 +64,10 @@ AttainmentGrade.init(
     grade: {
       type: DataTypes.FLOAT,
       allowNull: false
+    },
+    sisuExportDate: {
+      type: DataTypes.DATE,
+      allowNull: true
     },
     manual: {
       type: DataTypes.BOOLEAN,
