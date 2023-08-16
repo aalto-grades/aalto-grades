@@ -15,9 +15,11 @@ export interface FormulaData {
   codeSnippet: string
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ChildParamsObject = { [key: string]: any };
 
 export interface ParamsObject<T = ChildParamsObject> {
   children?: Array<[string, T]>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any
 }
