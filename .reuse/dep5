@@ -4,13 +4,16 @@ Upstream-Contact: The Aalto Grades Developers
 Source: https://github.com/aalto-grades
 
 Files:
- *.csv
  .github/PULL_REQUEST_TEMPLATE.md
+ .eslintrc.json
+ package.json
+ package-lock.json
  client/*.json
  client/.env
  common/*.json
  server/*.json
  server/pgAdminpass
+ server/test/mock-data/csv/*.csv
 Copyright: The Aalto Grades Developers
 License: MIT
 
