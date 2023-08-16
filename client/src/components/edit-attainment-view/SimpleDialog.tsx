@@ -53,10 +53,10 @@ export default function SimpleDialog(props: {
           parentId: parentId,
           name: '',
           daysValid: 0,
+          minRequiredGrade: 1,
+          maxGrade: 5,
           formula: Formula.Manual,
-          formulaParams: {
-            minRequiredGrade: 0
-          },
+          formulaParams: {}
         });
       }
 

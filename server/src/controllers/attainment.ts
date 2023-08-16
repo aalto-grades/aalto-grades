@@ -174,6 +174,14 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       .number()
       .min(0)
       .required(),
+    minRequiredGrade: yup
+      .number()
+      .min(0)
+      .required(),
+    maxGrade: yup
+      .number()
+      .min(yup.ref('minRequiredGrade'))
+      .required(),
     formula: yup
       .string()
       .oneOf(Object.values(Formula))
@@ -294,6 +302,8 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       assessmentModelId: assessmentModel.id,
       name: requestTree.name,
       daysValid: requestTree.daysValid,
+      minRequiredGrade: requestTree.minRequiredGrade,
+      maxGrade: requestTree.maxGrade,
       formula: requestTree.formula,
       formulaParams: requestTree.formulaParams
     });
@@ -304,6 +314,8 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       assessmentModelId: dbEntry.assessmentModelId,
       name: dbEntry.name,
       daysValid: dbEntry.daysValid,
+      minRequiredGrade: dbEntry.minRequiredGrade,
+      maxGrade: dbEntry.maxGrade,
       formula: dbEntry.formula,
       formulaParams: dbEntry.formulaParams,
       subAttainments: []
@@ -341,6 +353,14 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
       .number()
       .min(0)
       .notRequired(),
+    minRequiredGrade: yup
+      .number()
+      .min(0)
+      .notRequired(),
+    maxGrade: yup
+      .number()
+      .min(yup.ref('minRequiredGrade'))
+      .notRequired(),
     formula: yup.string()
       .transform((value: string, originalValue: string) => {
         return originalValue ? originalValue.toUpperCase() : value;
@@ -364,9 +384,25 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
 
   const name: string | undefined = req.body.name;
   const daysValid: number | undefined = req.body.daysValid;
+  const minRequiredGrade: number | undefined = req.body.minRequiredGrade;
+  const maxGrade: number | undefined = req.body.maxGrade;
   const parentId: number | undefined = req.body.parentId;
   const formula: Formula | undefined = req.body.formula;
   const formulaParams: ParamsObject | undefined = req.body.formulaParams;
+
+  if (minRequiredGrade && !maxGrade && minRequiredGrade > attainment.maxGrade) {
+    throw new ApiError(
+      `without updating max grade, new min required grade (${minRequiredGrade}) can't be`
+      + ` larger than existing max grade (${attainment.maxGrade})`,
+      HttpCode.BadRequest
+    );
+  } else if (maxGrade && !minRequiredGrade && maxGrade < attainment.minRequiredGrade) {
+    throw new ApiError(
+      `without updating min required grade, new max grade (${maxGrade}) can't be`
+      + ` smaller than existing min required grade (${attainment.minRequiredGrade})`,
+      HttpCode.BadRequest
+    );
+  }
 
   let parentAttainment: Attainment | null = null;
 
@@ -492,9 +528,11 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   }
 
   await attainment.set({
+    parentId: parentId ?? attainment.parentId,
     name: name ?? attainment.name,
     daysValid: daysValid ?? attainment.daysValid,
-    parentId: parentId ?? attainment.parentId,
+    minRequiredGrade: minRequiredGrade ?? attainment.minRequiredGrade,
+    maxGrade: maxGrade ?? attainment.maxGrade,
     formula: formula ?? attainment.formula,
     formulaParams: formulaParams ?? attainment.formulaParams
   }).save();
@@ -506,6 +544,8 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     formula: attainment.formula,
     formulaParams: attainment.formulaParams as ParamsObject,
     daysValid: attainment.daysValid,
+    minRequiredGrade: attainment.minRequiredGrade,
+    maxGrade: attainment.maxGrade,
     parentId: attainment.parentId
   };
 

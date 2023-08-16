@@ -66,10 +66,10 @@ export default function EditAttainmentView(): JSX.Element {
         parentId: Number(attainmentId),
         name: '',
         daysValid: 0,
+        minRequiredGrade: 1,
+        maxGrade: 5,
         formula: Formula.Manual,
-        formulaParams: {
-          minRequiredGrade: 0
-        },
+        formulaParams: {},
         subAttainments: []
       });
     } else if (modification === 'edit' && attainment.data) {

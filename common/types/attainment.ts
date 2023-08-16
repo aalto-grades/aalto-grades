@@ -10,6 +10,8 @@ export interface AttainmentData {
   parentId?: number,
   name: string,
   daysValid: number,
+  minRequiredGrade: number,
+  maxGrade: number,
   formula: Formula,
   formulaParams: ParamsObject,
   subAttainments?: Array<AttainmentData>
