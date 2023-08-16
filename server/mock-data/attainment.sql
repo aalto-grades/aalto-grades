@@ -311,4 +311,7 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, days_valid,
 (50, null, '283', 365, NOW(), NOW(), 'MANUAL', '{ "minRequiredGrade": 0 }'),
 -- Test uploading failing grade
 (51, null, '284', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 3, "children": [["285", { "weight": 0 }]] }'),
-(51, 284, '285', 365, NOW(), NOW(), 'MANUAL', '{ "minRequiredGrade": 2 }');
+(51, 284, '285', 365, NOW(), NOW(), 'MANUAL', '{ "minRequiredGrade": 2 }'),
+-- Test exporting only grades not already exported
+(52, null, '286', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["287", { "weight": 0.25 }]] }'),
+(52, 286, '287', 365, NOW(), NOW(), 'MANUAL', '{ "minRequiredGrade": 0 }');

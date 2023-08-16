@@ -40,7 +40,8 @@ interface DownloadSisuGradeCsvVars {
   params: {
     completionLanguage?: string,
     assessmentDate?: string,
-    studentNumbers: Array<string>
+    studentNumbers: Array<string>,
+    override: boolean
   }
 }
 

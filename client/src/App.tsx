@@ -165,7 +165,7 @@ export default function App(): JSX.Element {
               <UserButton />
             </Toolbar>
           </AppBar>
-          <Container sx={{ textAlign: 'center' }} maxWidth="lg">
+          <Container sx={{ textAlign: 'center' }} maxWidth="xl">
             <Box mx={5} my={5}>
               <AlertSnackbar snackPack={snackPack} />
               <Routes> {/* Add nested routes when needed */}
