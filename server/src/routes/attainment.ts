@@ -60,6 +60,19 @@ export const router: Router = Router();
  *           a grade has expired, it is no longer eligible to count as
  *           completion for future course instances.
  *         example: 365
+ *       minRequiredGrade:
+ *         type: integer
+ *         required: true
+ *         description: >
+ *           The minimum required grade for an attainment to be considered
+ *           passed. Grades greater than or equal to this value are considered
+ *           passing grades.
+ *         example: 1
+ *       maxGrade:
+ *         type: integer
+ *         required: true
+ *         description: The maximum possible grade (or points) for an attainment.
+ *         example: 5
  *       subAttainments:
  *         type: array
  *         required: false

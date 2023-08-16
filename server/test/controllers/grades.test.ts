@@ -1054,10 +1054,10 @@ describe(
     }
 
     it(
-      'should determine whether manual attainment was passed based on min required grade',
+      'should determine whether an attainment was passed based on min required grade',
       async () => {
         const csvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mock-data/csv/grades_failing_manual.csv'), 'utf8'
+          path.resolve(__dirname, '../mock-data/csv/grades_failing.csv'), 'utf8'
         );
 
         res = await request
@@ -1067,31 +1067,10 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
-        await checkStatusOfGrade(5, 285, 1, Status.Fail);
-        await checkStatusOfGrade(6, 285, 1.9, Status.Fail);
-        await checkStatusOfGrade(7, 285, 2, Status.Pass);
-        await checkStatusOfGrade(8, 285, 3, Status.Pass);
-      }
-    );
-
-    it(
-      'should determine whether non-manual attainment was passed based on min required grade',
-      async () => {
-        const csvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mock-data/csv/grades_failing_non_manual.csv'), 'utf8'
-        );
-
-        res = await request
-          .post('/v1/courses/2/assessment-models/51/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'text/csv' })
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.Ok);
-
-        await checkStatusOfGrade(1, 284, 1, Status.Fail);
-        await checkStatusOfGrade(2, 284, 2, Status.Fail);
-        await checkStatusOfGrade(3, 284, 3, Status.Pass);
-        await checkStatusOfGrade(4, 284, 3.4, Status.Pass);
+        await checkStatusOfGrade(5, 284, 1, Status.Fail);
+        await checkStatusOfGrade(6, 284, 1.9, Status.Fail);
+        await checkStatusOfGrade(7, 284, 2, Status.Pass);
+        await checkStatusOfGrade(8, 284, 3, Status.Pass);
       }
     );
 
@@ -1171,6 +1150,31 @@ describe(
           ['No attainments found from the header, please upload valid CSV.'], HttpCode.BadRequest
         );
       });
+
+    it(
+      'should respond with 400 bad request, if an uploaded grade is larger than'
+      + ' the max grade of an attainment',
+      async () => {
+        const invalidCsvData: fs.ReadStream = fs.createReadStream(
+          path.resolve(__dirname, '../mock-data/csv/grades_over_max.csv'), 'utf8'
+        );
+
+        res = await request
+          .post('/v1/courses/2/assessment-models/51/grades/csv')
+          .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json');
+
+        function error(row: number, grade: number): string {
+          return `CSV file row ${row} column 2 uploaded grade "${grade}" is larger`
+            + ' than maximum allowed grade "5"';
+        }
+
+        checkErrorRes(
+          [error(3, 5.01), error(4, 6), error(5, 1000000)], HttpCode.BadRequest
+        );
+      }
+    );
 
     it('should respond with 400 bad request, if the CSV file header parsing fails',
       async () => {
@@ -1432,7 +1436,8 @@ describe(
       userId: number,
       grade: number,
       cookie: Array<string>,
-      checkGrader: boolean = true
+      checkGrader: boolean = true,
+      status: Status = Status.Pass
     ): Promise<void> {
       const result: AttainmentGrade | null = await AttainmentGrade.findOne({
         where: {
@@ -1443,6 +1448,7 @@ describe(
 
       expect(result).not.toBe(null);
       expect(result?.grade).toBe(grade);
+      expect(result?.status).toBe(status);
       if (checkGrader)
         checkGraderId(result as AttainmentGrade, cookie);
     }
@@ -1602,6 +1608,22 @@ describe(
       checkGrade(269, 1, 5, cookies.adminCookie);
     });
 
+    it(
+      'should save a failing grade when the calculated grade is less than the'
+      + ' min required grade',
+      async () => {
+        checkSuccessRes(await request
+          .post('/v1/courses/1/assessment-models/25/grades/calculate')
+          .send({
+            studentNumbers: ['826139']
+          })
+          .set('Cookie', cookies.adminCookie)
+        );
+
+        checkGrade(228, 5, 0.5, cookies.adminCookie, false, Status.Fail);
+      }
+    );
+
     it('should respond with 401 unauthorized, if not logged in', async () => {
       await request
         .post('/v1/courses/1/assessment-models/1/grades/calculate')
@@ -1637,7 +1659,8 @@ describe(
 
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe('No student numbers found from instance ID 28');
-      });
+      }
+    );
   }
 );
 

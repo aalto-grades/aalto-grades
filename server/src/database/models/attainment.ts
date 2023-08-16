@@ -22,6 +22,8 @@ export default class Attainment extends Model<
   declare name: string;
   // Default value, expiry date in AttainmentGrade takes precedence
   declare daysValid: number;
+  declare minRequiredGrade: number;
+  declare maxGrade: number;
   declare formula: Formula;
   declare formulaParams: ParamsObject;
   declare createdAt: CreationOptional<Date>;
@@ -58,6 +60,14 @@ Attainment.init(
     daysValid: {
       type: DataTypes.INTEGER,
       allowNull: true
+    },
+    minRequiredGrade: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    maxGrade: {
+      type: DataTypes.INTEGER,
+      allowNull: false
     },
     formula: {
       type: DataTypes.ENUM(Formula.Manual, Formula.WeightedAverage),

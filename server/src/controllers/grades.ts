@@ -17,7 +17,6 @@ import Attainment from '../database/models/attainment';
 import AttainmentGrade from '../database/models/attainmentGrade';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
-import { toDateOnlyString } from './utils/date';
 import User from '../database/models/user';
 
 import { getFormulaImplementation } from '../formulas';
@@ -27,6 +26,7 @@ import {
 } from '../types';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import { findAttainmentGradeById } from './utils/attainment';
+import { toDateOnlyString } from './utils/date';
 import { findUserById, isTeacherInChargeOrAdmin } from './utils/user';
 
 async function studentNumbersExist(studentNumbers: Array<string>): Promise<void> {
@@ -687,31 +687,51 @@ export function parseGradesFromCsv(
     };
 
     for (let i: number = 0; i < attainments.length; i++) {
-
       if (isNaN(Number(gradingData[i]))) {
         errors.push(
           `CSV file row ${currentRow} column ${currentColumn}` +
           ` expected number, received "${gradingData[i]}"`
         );
-      } else {
-        const gradeValue: number = parseFloat(gradingData[i]);
-        const statusValue: Status =
-          gradeValue >= attainments[i].formulaParams.minRequiredGrade
-            ? Status.Pass : Status.Fail;
-
-        const grade: AttainmentGradeModelData = {
-          attainmentId: attainments[i].id,
-          grade: gradeValue,
-          manual: true,
-          status: statusValue
-        };
-        student.grades.push(grade);
+        currentColumn++;
+        continue;
       }
-      ++currentColumn;
+
+      const gradeValue: number = parseFloat(gradingData[i]);
+
+      if (gradeValue > attainments[i].maxGrade) {
+        errors.push(
+          `CSV file row ${currentRow} column ${currentColumn}` +
+          ` uploaded grade "${gradeValue}" is larger than maximum` +
+          ` allowed grade "${attainments[i].maxGrade}"`
+        );
+        currentColumn++;
+        continue;
+      }
+
+      if (gradeValue < 0) {
+        errors.push(
+          `CSV file row ${currentRow} column ${currentColumn}` +
+          ` uploaded grade "${gradeValue}" can't be negative`
+        );
+        currentColumn++;
+        continue;
+      }
+
+      student.grades.push({
+        attainmentId: attainments[i].id,
+        grade: gradeValue,
+        manual: true,
+        status: (
+          (gradeValue >= attainments[i].minRequiredGrade) ? Status.Pass : Status.Fail
+        )
+      });
+
+      currentColumn++;
     }
+
     // Reset column number to 2 for parsing the next row.
     currentColumn = 2;
-    ++currentRow;
+    currentRow++;
     students.push(student);
   }
 
@@ -852,7 +872,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
 
         // TODO: Optimize if datasets are big.
         await AttainmentGrade.bulkCreate(
-          preparedBulkCreate, { updateOnDuplicate: ['grade', 'graderId'] }
+          preparedBulkCreate
         );
 
         // After this point all the students' attainment grades have been created or
@@ -972,9 +992,15 @@ export async function calculateGrades(
     formulaNodesByAttainmentId.set(attainment.id, {
       formulaImplementation: getFormulaImplementation(formula as Formula),
       subFormulaNodes: [],
-      formulaParams: attainment.formulaParams,
-      attainmentId: attainment.id,
-      attainmentName: attainment.name
+      attainment: {
+        id: attainment.id,
+        name: attainment.name,
+        daysValid: attainment.daysValid,
+        minRequiredGrade: attainment.minRequiredGrade,
+        maxGrade: attainment.maxGrade,
+        formula: attainment.formula,
+        formulaParams: attainment.formulaParams
+      }
     });
   }
 
@@ -1148,7 +1174,7 @@ export async function calculateGrades(
     const manualGrade: number | undefined = manualGrades.get(formulaNode);
     if (manualGrade) {
       return {
-        attainmentName: formulaNode.attainmentName,
+        attainment: formulaNode.attainment,
         status: Status.Pass,
         grade: manualGrade
       };
@@ -1172,13 +1198,19 @@ export async function calculateGrades(
     // for this attainment and the grades of the subattainments.
     const calculated: CalculationResult =
       formulaNode.formulaImplementation.formulaFunction(
-        formulaNode.attainmentName, formulaNode.formulaParams, subGrades
+        formulaNode.attainment, subGrades
       );
+
+    if (calculated.grade < formulaNode.attainment.minRequiredGrade)
+      calculated.status = Status.Fail;
 
     calculatedGrades.push(
       {
         userId: userId,
-        attainmentId: formulaNode.attainmentId,
+        // The formula nodes were constructed with attainments IDs defined, so
+        // this can be asserted to be non-null.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        attainmentId: formulaNode.attainment.id!,
         graderId: grader.id,
         grade: calculated.grade,
         status: calculated.status,

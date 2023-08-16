@@ -38,6 +38,10 @@ function verifyAttainmentData(
   expect(data.assessmentModelId).toBe(assessmentModelId);
   expect(data.name).toBeDefined();
   expect(data.daysValid).toBeDefined();
+  expect(data.minRequiredGrade).toBeDefined();
+  expect(data.maxGrade).toBeDefined();
+  expect(data.formula).toBeDefined();
+  expect(data.formulaParams).toBeDefined();
   if (subAttainments)
     expect(data.subAttainments).toBeDefined();
   else
@@ -62,6 +66,8 @@ function evaluateSubAttainment(attainment: AttainmentData): void {
   expect(attainment.formula).toBeDefined();
   expect(attainment.formulaParams).toBeDefined();
   expect(attainment.daysValid).toBeDefined();
+  expect(attainment.minRequiredGrade).toBeDefined();
+  expect(attainment.maxGrade).toBeDefined();
 }
 
 describe(
@@ -275,10 +281,10 @@ describe(
           .send({
             name: 'New',
             daysValid: 365,
+            minRequiredGrade: 1,
+            maxGrade: 5,
             formula: Formula.Manual,
-            formulaParams: {
-              minRequiredGrade: 0
-            }
+            formulaParams: {}
           })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -291,8 +297,10 @@ describe(
         expect(res.body.data.assessmentModelId).toBe(31);
         expect(res.body.data.parentId).not.toBeDefined();
         expect(res.body.data.formula).toBe(Formula.Manual);
-        expect(res.body.data.formulaParams).toEqual({ minRequiredGrade: 0 });
+        expect(res.body.data.formulaParams).toEqual({});
         expect(res.body.data.daysValid).toBeDefined();
+        expect(res.body.data.minRequiredGrade).toBeDefined();
+        expect(res.body.data.maxGrade).toBeDefined();
         expect(res.body.data.subAttainments).toBeDefined();
       }
     );
@@ -309,9 +317,9 @@ describe(
             name: 'examination',
             daysValid: 365,
             formula: Formula.Manual,
-            formulaParams: {
-              minRequiredGrade: 0
-            }
+            minRequiredGrade: 1,
+            maxGrade: 5,
+            formulaParams: {}
           })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.userCookie)
@@ -324,8 +332,10 @@ describe(
         expect(res.body.data.assessmentModelId).toBe(35);
         expect(res.body.data.parentId).not.toBeDefined();
         expect(res.body.data.formula).toBe(Formula.Manual);
-        expect(res.body.data.formulaParams).toEqual({ minRequiredGrade: 0 });
+        expect(res.body.data.formulaParams).toEqual({});
         expect(res.body.data.daysValid).toBeDefined();
+        expect(res.body.data.minRequiredGrade).toBeDefined();
+        expect(res.body.data.maxGrade).toBeDefined();
         expect(res.body.data.subAttainments).toBeDefined();
       }
     );
@@ -347,6 +357,8 @@ describe(
         expect(res.body.data.parentId).not.toBeDefined();
         expect(res.body.data.formula).toBeDefined();
         expect(res.body.data.daysValid).toBeDefined();
+        expect(res.body.data.minRequiredGrade).toBeDefined();
+        expect(res.body.data.maxGrade).toBeDefined();
         expect(res.body.data.subAttainments).toBeDefined();
 
         for (const subAttainment of res.body.data.subAttainments) {
@@ -389,10 +401,10 @@ describe(
             parentId: 264,
             name: 'born',
             daysValid: 10,
+            minRequiredGrade: 1,
+            maxGrade: 5,
             formula: Formula.Manual,
-            formulaParams: {
-              minRequiredGrade: 0
-            }
+            formulaParams: {}
           })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -429,7 +441,8 @@ describe(
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      });
+      }
+    );
 
     it('should respond with 400 bad request, if validation fails (non-number course id)',
       async () => {
@@ -444,9 +457,12 @@ describe(
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      });
+      }
+    );
 
-    it('should respond with 400 bad request, if validation fails (non-number parent attainment id)',
+    it(
+      'should respond with 400 bad request, if validation fails'
+      + ' (non-number parent attainment id)',
       async () => {
         const res: supertest.Response = await request
           .post('/v1/courses/3/assessment-models/4/attainments')
@@ -459,7 +475,26 @@ describe(
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      });
+      }
+    );
+
+    it(
+      'should respond with 400 bad request, if validation fails'
+      + ' (minRequiredGrade larger than maxGrade)',
+      async () => {
+        const res: supertest.Response = await request
+          .post('/v1/courses/3/assessment-models/4/attainments')
+          .send({ ...mockAttainment, minRequiredGrade: 10, maxGrade: 2 })
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.BadRequest);
+
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+      }
+    );
 
     it(
       'should respond with 400 bad request, if formula params are'
@@ -477,6 +512,8 @@ describe(
             },
             name: 'not success',
             daysValid: 6000,
+            minRequiredGrade: 1,
+            maxGrade: 5,
             formula: Formula.WeightedAverage
           })
           .set('Content-Type', 'application/json')
@@ -503,9 +540,10 @@ describe(
             parentId: 3,
             name: 'not success',
             daysValid: 6000,
+            minRequiredGrade: 1,
+            maxGrade: 5,
             formula: Formula.WeightedAverage,
             formulaParams: {
-              minRequiredGrade: 5,
               children: [
                 ['sub not success', { weight: 1 }]
               ]
@@ -514,6 +552,8 @@ describe(
               {
                 name: 'sub not success',
                 daysValid: 6,
+                minRequiredGrade: 1,
+                maxGrade: 5,
                 formula: Formula.WeightedAverage,
                 formulaParams: {
                   children: [
@@ -556,9 +596,10 @@ describe(
             parentId: 3,
             name: 'missing child',
             daysValid: 1,
+            minRequiredGrade: 1,
+            maxGrade: 5,
             formula: Formula.WeightedAverage,
             formulaParams: {
-              minRequiredGrade: 10,
               children: [
                 ['i-am-present', { weight: 1 }]
               ]
@@ -567,18 +608,18 @@ describe(
               {
                 name: 'i-am-present',
                 daysValid: 1,
+                minRequiredGrade: 1,
+                maxGrade: 5,
                 formula: Formula.Manual,
-                formulaParams: {
-                  minRequiredGrade: 0
-                }
+                formulaParams: {}
               },
               {
                 name: 'i-am-absent',
                 daysValid: 0,
+                minRequiredGrade: 1,
+                maxGrade: 5,
                 formula: Formula.Manual,
-                formulaParams: {
-                  minRequiredGrade: 0
-                }
+                formulaParams: {}
               }
             ]
           })
@@ -606,9 +647,10 @@ describe(
             parentId: 3,
             name: 'invalid name',
             daysValid: 1,
+            minRequiredGrade: 1,
+            maxGrade: 5,
             formula: Formula.WeightedAverage,
             formulaParams: {
-              minRequiredGrade: 15,
               children: [
                 ['the good', { weight: 1 }],
                 ['the bad', { weight: 2 }],
@@ -619,10 +661,10 @@ describe(
               {
                 name: 'the good',
                 daysValid: 1,
+                minRequiredGrade: 1,
+                maxGrade: 5,
                 formula: Formula.Manual,
-                formulaParams: {
-                  minRequiredGrade: 0
-                }
+                formulaParams: {}
               }
             ]
           })
@@ -650,10 +692,10 @@ describe(
               {
                 name: 'Exercise 1',
                 daysValid: badInput,
+                minRequiredGrade: 1,
+                maxGrade: 5,
                 formula: Formula.Manual,
-                formulaParams: {
-                  minRequiredGrade: 0
-                },
+                formulaParams: {},
                 subAttainments: [],
               }
             ]
@@ -675,18 +717,18 @@ describe(
               {
                 name: 'Exercise 1',
                 daysValid: 30,
+                minRequiredGrade: 1,
+                maxGrade: 5,
                 formula: Formula.Manual,
-                formulaParams: {
-                  minRequiredGrade: 0
-                },
+                formulaParams: {},
                 subAttainments: [
                   {
                     name: 'Exercise 1',
                     daysValid: 30,
+                    minRequiredGrade: 1,
+                    maxGrade: 5,
                     formula: Formula.Manual,
-                    formulaParams: {
-                      minRequiredGrade: 0
-                    },
+                    formulaParams: {},
                     subAttainments: badInput,
                   }
                 ],
@@ -710,6 +752,8 @@ describe(
               {
                 name: 'Exercise 1',
                 daysValid: 30,
+                minRequiredGrade: 1,
+                maxGrade: 5,
                 formula: Formula.Manual,
                 formulaParams: {
                   minRequiredGrade: 0
@@ -718,6 +762,8 @@ describe(
                   {
                     name: 'Exercise 1',
                     daysValid: 30,
+                    minRequiredGrade: 1,
+                    maxGrade: 5,
                     formula: Formula.Manual,
                     formulaParams: {
                       minRequiredGrade: 0
@@ -726,6 +772,8 @@ describe(
                       {
                         name: 'Exercise 1',
                         daysValid: badInput,
+                        minRequiredGrade: 1,
+                        maxGrade: 5,
                         formula: Formula.Manual,
                         formulaParams: {
                           minRequiredGrade: 0
@@ -1011,7 +1059,8 @@ describe(
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      });
+      }
+    );
 
     it('should respond with 400 bad request, if validation fails (non-number course id)',
       async () => {
@@ -1025,7 +1074,8 @@ describe(
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      });
+      }
+    );
 
     it('should respond with 400 bad request, if validation fails (non-number attainment ID)',
       async () => {
@@ -1039,7 +1089,35 @@ describe(
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors).toBeDefined();
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      });
+      }
+    );
+
+    it(
+      'should respond with 400 bad request, if validation fails'
+      + ' (invalid minRequiredGrade or maxGrade)',
+      async () => {
+        async function badInput(input: {
+          minRequiredGrade?: number,
+          maxGrade?: number
+        }): Promise<void> {
+          const res: supertest.Response = await request
+            .put('/v1/courses/1/assessment-models/1/attainments/5')
+            .send(input)
+            .set('Content-Type', 'application/json')
+            .set('Cookie', cookies.adminCookie)
+            .set('Accept', 'application/json')
+            .expect(HttpCode.BadRequest);
+
+          expect(res.body.data).not.toBeDefined();
+          expect(res.body.errors).toBeDefined();
+          expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+        }
+
+        badInput({ minRequiredGrade: 5, maxGrade: 1 });
+        badInput({ minRequiredGrade: 10000 });
+        badInput({ maxGrade: 0 });
+      }
+    );
 
     it('should respond with 400 bad request, if formula params are incorrect',
       async () => {
@@ -1067,7 +1145,6 @@ describe(
           .put('/v1/courses/1/assessment-models/1/attainments/1')
           .send({
             formulaParams: {
-              minRequiredGrade: 15,
               children: [
                 ['name5', { weight: 5 }],
                 ['name16', { weight: 16 }]
@@ -1096,7 +1173,6 @@ describe(
           .put('/v1/courses/1/assessment-models/1/attainments/1')
           .send({
             formulaParams: {
-              minRequiredGrade: 15,
               children: [
                 ['name5', { weight: 5 }],
                 ['name9', { weight: 9 }],
@@ -1268,10 +1344,10 @@ describe(
           {
             name: 'Test exercise',
             daysValid: 30,
+            minRequiredGrade: 1,
+            maxGrade: 5,
             formula: Formula.Manual,
-            formulaParams: {
-              minRequiredGrade: 0
-            },
+            formulaParams: {},
             subAttainments: []
           }
         )
@@ -1301,10 +1377,10 @@ describe(
           {
             name: 'Test exercise 2',
             daysValid: 30,
+            minRequiredGrade: 1,
+            maxGrade: 5,
             formula: Formula.Manual,
-            formulaParams: {
-              minRequiredGrade: 0
-            },
+            formulaParams: {},
             subAttainments: []
           }
         )
@@ -1333,27 +1409,27 @@ describe(
         {
           name: 'Test exercise',
           daysValid: 30,
+          minRequiredGrade: 1,
+          maxGrade: 5,
           formula: Formula.Manual,
-          formulaParams: {
-            minRequiredGrade: 0
-          },
+          formulaParams: {},
           subAttainments: [
             {
               name: 'Test exercise 1.1',
               daysValid: 60,
+              minRequiredGrade: 1,
+              maxGrade: 5,
               formula: Formula.Manual,
-              formulaParams: {
-                minRequiredGrade: 0
-              },
+              formulaParams: {},
               subAttainments: []
             },
             {
               name: 'Test exercise 1.2',
               daysValid: 90,
+              minRequiredGrade: 1,
+              maxGrade: 5,
               formula: Formula.Manual,
-              formulaParams: {
-                minRequiredGrade: 0
-              },
+              formulaParams: {},
               subAttainments: []
             }
           ]
