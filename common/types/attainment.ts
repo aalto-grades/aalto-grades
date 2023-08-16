@@ -4,6 +4,11 @@
 
 import { Formula, ParamsObject } from "./formula"
 
+export enum GradeType {
+  Integer = 'INTEGER',
+  Float = 'FLOAT'
+}
+
 export interface AttainmentData {
   id?: number,
   assessmentModelId?: number,
@@ -12,6 +17,7 @@ export interface AttainmentData {
   daysValid: number,
   formula: Formula,
   formulaParams: ParamsObject,
+  gradeType: GradeType,
   subAttainments?: Array<AttainmentData>
 }
 
