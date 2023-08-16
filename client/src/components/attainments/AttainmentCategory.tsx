@@ -51,6 +51,16 @@ export default function AttainmentCategory(props: {
               {'Days valid: ' + props.attainment.daysValid}
             </Typography>
           </Paper>
+          <Paper variant='outlined' sx={{ mr: 1, px: 1, py: 0.5 }}>
+            <Typography align='left' variant='caption'>
+              {'Min required grade: ' + props.attainment.minRequiredGrade}
+            </Typography>
+          </Paper>
+          <Paper variant='outlined' sx={{ mr: 1, px: 1, py: 0.5 }}>
+            <Typography align='left' variant='caption'>
+              {'Max grade: ' + props.attainment.maxGrade}
+            </Typography>
+          </Paper>
           {
             (props.paramsFromRoot) && (
               Object.keys(props.paramsFromRoot).map((key: string) => {
