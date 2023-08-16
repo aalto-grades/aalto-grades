@@ -82,8 +82,7 @@ export default function SisuDownloadDialog(props: {
     useState<string | undefined>(undefined);
   const [completionLanguage, setCompletionLanguage]: State<string | undefined> =
     useState<string | undefined>(undefined);
-  const [override, setOverride]: State<boolean> =
-    useState<boolean>(false);
+  const [override, setOverride]: State<string> = useState<string>('all');
 
   const downloadSisuGradeCsv: UseDownloadSisuGradeCsvResult = useDownloadSisuGradeCsv({
     onSuccess: (gradeCsv: BlobPart) => {
@@ -106,9 +105,7 @@ export default function SisuDownloadDialog(props: {
     }
   });
 
-  async function handleDownloadSisuGradeCsv(
-    param: 'all' | 'exported' | 'unexported'
-  ): Promise<void> {
+  async function handleDownloadSisuGradeCsv(): Promise<void> {
     if (courseId && assessmentModelId) {
       snackPack.push({
         msg: 'Fetching Sisu CSV...',
@@ -117,7 +114,7 @@ export default function SisuDownloadDialog(props: {
 
       let studentNumbers: Array<string> = [];
 
-      switch (param) {
+      switch (override) {
       case 'exported':
         studentNumbers = props.selectedStudents
           .filter((student: FinalGrade) => userGradeAlreadyExported(student.grades))
@@ -141,7 +138,7 @@ export default function SisuDownloadDialog(props: {
           completionLanguage: completionLanguage,
           assessmentDate: assessmentDate,
           studentNumbers: studentNumbers,
-          override: (param === 'exported' || param === 'all')
+          override: (override === 'exported' || override === 'all')
         }
       });
     }
@@ -217,20 +214,29 @@ export default function SisuDownloadDialog(props: {
               />
             </Box>
             {(exportedValuesInList()) && (
-              <Box sx={{ ml: 1, my: 2 }}>
-                <FormControlLabel control={(
-                  <Checkbox
-                    id="select-all"
-                    size="small"
-                    onClick={(): void => setOverride(!override)}
-                    checked={override} />
-                )} label={(
-                  <Typography variant='body2' sx={{ color: 'red' }}>
-                    The list includes grades already exported to Sisu.
-                    Please check the box if you want to include these previously exported grades.
-                  </Typography>
-                )
-                } />
+              <Box sx={{ ml: 1, my: 2, mr: 10 }}>
+                <Typography variant='body2' sx={{ color: 'red' }}>
+                  The list includes grades already exported to Sisu.
+                  Please select export option from drop down menu.
+                </Typography>
+                <TextField
+                  id="export-option"
+                  select
+                  defaultValue="all"
+                  onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+                    setOverride(e.target.value);
+                  }}
+                >
+                  <MenuItem value="all">
+                    Export all selected grades
+                  </MenuItem>
+                  <MenuItem value="unexported">
+                    Export only unexported grades
+                  </MenuItem>
+                  <MenuItem value="exported">
+                    Export once exported grades
+                  </MenuItem>
+                </TextField>
               </Box>
             )}
           </Box>
@@ -253,49 +259,20 @@ export default function SisuDownloadDialog(props: {
         </DialogContent>
         <DialogActions sx={{ pr: 4, pb: 3 }}>
           <Button
-            size='small'
+            size='medium'
             variant='outlined'
             onClick={props.handleClose}
           >
             Cancel
           </Button>
-          {(exportedValuesInList() && !override) && (
-            <Tooltip
-              title='Download CSV with grades that have been exported at least once to Sisu.'
-              placement="top"
-            >
-              <Button
-                id='ag_confirm_file_upload_btn_only_exported'
-                size='small'
-                variant='contained'
-                onClick={(): Promise<void> => handleDownloadSisuGradeCsv('exported')}
-              >
-                Download exported only
-              </Button>
-            </Tooltip>
-          )}
-          <Tooltip
-            title={(exportedValuesInList() && !override) ?
-              'Download CSV with grades that have not been previously exported to Sisu.' :
-              'Download CSV with all grades selected.'
-            }
-            placement="top"
-          >
             <Button
               id='ag_confirm_file_upload_btn'
-              size='small'
+              size='medium'
               variant='contained'
-              onClick={(): Promise<void> => {
-                return handleDownloadSisuGradeCsv(
-                  exportedValuesInList() && !override ? 'unexported' : 'all'
-                );
-              }}
+              onClick={handleDownloadSisuGradeCsv}
             >
-              {(exportedValuesInList() && !override) ? 'Download unexported only' :
-                exportedValuesInList() ? 'Download all' : 'Download'
-              }
+              Download
             </Button>
-          </Tooltip>
         </DialogActions>
       </Dialog>
       <AlertSnackbar snackPack={snackPack} />
