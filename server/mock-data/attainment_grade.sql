@@ -153,9 +153,9 @@ INSERT INTO public.attainment_grade (user_id, attainment_id, grader_id, grade, m
 (5, 229, 1, 0.5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL),
 (5, 230, 1, 0.5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL),
 -- Filter already exported grades
-(519, 286, 1, 1, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NOW()), -- Pass
-(521, 286, 1, 5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL),
-(574, 286, 1, 3, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NOW()),
-(581, 286, 1, 1, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL), -- Pass
-(590, 286, 1, 2, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NOW()),
-(601, 286, 1, 1, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL); -- Pass
+(519, 285, 1, 1, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NOW()), -- Pass
+(521, 285, 1, 5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL),
+(574, 285, 1, 3, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NOW()),
+(581, 285, 1, 1, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL), -- Pass
+(590, 285, 1, 2, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NOW()),
+(601, 285, 1, 1, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL); -- Pass

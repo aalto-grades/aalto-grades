@@ -310,7 +310,7 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, days_valid,
 -- Multiple final grade options
 (50, null, '283', 365, 0, 100, NOW(), NOW(), 'MANUAL', '{}'),
 -- Test uploading failing grade and too large grade
-(51, null, '284', 365, 2, 5, NOW(), NOW(), 'MANUAL', '{}');
+(51, null, '284', 365, 2, 5, NOW(), NOW(), 'MANUAL', '{}'),
 -- Test exporting only grades not already exported
-(52, null, '285', 365, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "minRequiredGrade": 0, "children": [["287", { "weight": 0.25 }]] }'),
-(52, 286, '286', 365, NOW(), NOW(), 'MANUAL', '{ "minRequiredGrade": 0 }');
+(52, null, '285', 365, 0, 100, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["286", { "weight": 0.25 }]] }'),
+(52, 285, '286', 365, 0, 100, NOW(), NOW(), 'MANUAL', '{ "minRequiredGrade": 0 }');
