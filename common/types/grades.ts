@@ -17,7 +17,7 @@ export interface GradeOption {
   grade: number,
   status: Status,
   manual: boolean,
-  exportedToSisu?: Date
+  exportedToSisu?: Date,
   date?: Date | DateOnlyString,
   expiryDate?: Date | DateOnlyString,
   comment: string

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 .DS_Store
+node_modules
 robot-tests/output/*
 *.key
 *.crt
