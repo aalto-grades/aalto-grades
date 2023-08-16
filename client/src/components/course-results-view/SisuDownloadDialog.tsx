@@ -4,9 +4,9 @@
 
 import { FinalGrade, GradeOption, Language } from 'aalto-grades-common/types';
 import {
-  Box, Button, Checkbox, Dialog, DialogActions, DialogContent,
-  DialogContentText, DialogTitle, FormControlLabel, List, ListItem,
-  ListItemText, MenuItem, Paper, TextField, Tooltip, Typography
+  Box, Button, Dialog, DialogActions, DialogContent,
+  DialogContentText, DialogTitle, List, ListItem,
+  ListItemText, MenuItem, Paper, TextField, Typography
 } from '@mui/material';
 import { ChangeEvent, JSX, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
