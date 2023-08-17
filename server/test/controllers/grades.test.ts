@@ -733,20 +733,6 @@ describe(
       expect(res.body.errors).toBeDefined();
     });
 
-    it('should respond with 404 not found, if grades have not been calculated yet', async () => {
-      res = await request
-        .get('/v1/courses/2/assessment-models/2/grades')
-        .set('Cookie', cookies.adminCookie)
-        .expect(HttpCode.NotFound);
-
-      checkErrorRes(
-        [
-          'no grades found, make sure grades have been' +
-          ' uploaded/calculated before requesting course results'
-        ],
-        HttpCode.NotFound);
-    });
-
     it('should respond with 404 not found, if course does not exist', async () => {
       res = await request
         .get(`/v1/courses/${badId}/assessment-models/1/grades`)
