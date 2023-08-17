@@ -277,7 +277,10 @@ export default function LeafAttainment(props: {
           subject={'sub study attainment'}
           handleClose={handleConfirmationDialogClose}
           open={openConfirmationDialog}
-          cannotBeUndone={modification === 'edit' && props.attainment === props.attainmentTree}
+          cannotBeUndone={
+            (modification === 'edit' && props.attainment === props.attainmentTree) ||
+            (modification === 'create' && props.attainment !== props.attainmentTree)
+          }
         />
         {
           <Button
