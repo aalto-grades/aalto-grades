@@ -1616,6 +1616,24 @@ describe(
     );
 
     it('should not consider expired grades', async () => {
+      async function checkGradeAmountByGradeValue(
+        attainmentId: number, grade: number, expectedAmount: number
+      ): Promise<void> {
+        expect((await AttainmentGrade.findAll({
+          where: {
+            attainmentId: attainmentId,
+            userId: 1,
+            grade: grade
+          }
+        })).length).toBe(expectedAmount);
+      };
+
+      // Ensure that the expected grades exist
+      await checkGradeAmountByGradeValue(288, 0, 3);
+      await checkGradeAmountByGradeValue(288, 5, 3);
+      await checkGradeAmountByGradeValue(289, 0, 3);
+      await checkGradeAmountByGradeValue(289, 5, 2);
+
       checkSuccessRes(await request
         .post('/v1/courses/2/assessment-models/53/grades/calculate')
         .send({
