@@ -28,6 +28,7 @@ import {
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import { findAttainmentGradeById } from './utils/attainment';
 import { toDateOnlyString } from './utils/date';
+import { gradeIsExpired } from './utils/grades';
 import { findUserById, isTeacherInChargeOrAdmin } from './utils/user';
 
 async function studentNumbersExist(studentNumbers: Array<string>): Promise<void> {
@@ -462,7 +463,7 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
   const rawFinalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
     assessmentModel.id,
     students.map((student: IdAndStudentNumber) => student.studentNumber),
-    students.length > 0
+    true
   );
 
   for (const student of students) {
@@ -1087,11 +1088,16 @@ export async function calculateGrades(
    * use as a basis to calculate grades.
    */
 
+  interface ManualGrade extends AttainmentGrade {
+    Attainment: Attainment,
+    User: User
+  }
+
   /*
    * Stores the grades of each student for each attainment which were manually
    * specified by a teacher.
    */
-  const unorganizedManualGrades: Array<AttainmentGrade> = await AttainmentGrade.findAll({
+  const unorganizedManualGrades: Array<ManualGrade> = await AttainmentGrade.findAll({
     where: {
       manual: true
     },
@@ -1115,16 +1121,15 @@ export async function calculateGrades(
         }
       }
     ],
-    attributes: ['grade', 'attainmentId', 'userId'],
-  });
+    attributes: ['id', 'grade', 'attainmentId', 'userId'],
+  }) as Array<ManualGrade>;
 
   /*
-   * Next we'll organize the manual grades by user ID.
+   * Next we'll organize the manual grades by user ID and filter out expired ones.
    */
 
   /*
-   * Store the manul grades of all attainments per student. Stores all the
-   * same information as unorganizedManualGrades.
+   * Find and store all unexpired manual grades of all attainments per student.
    * User ID -> Formula node -> Manual grade.
    */
   const organizedManualGrades: Map<number, Map<FormulaNode, number>> = new Map();
@@ -1146,8 +1151,12 @@ export async function calculateGrades(
     const key: FormulaNode = getFormulaNode(manualGrade.attainmentId);
     const existingGrade: number | undefined = userManualGrades.get(key);
 
-    if (!existingGrade || manualGrade.grade > existingGrade) {
-      // No existing grade or the new grade is better.
+    if (
+      !(await gradeIsExpired(manualGrade.id))
+      && (!existingGrade || manualGrade.grade > existingGrade)
+    ) {
+      // Grade has not expired and there is no existing grade or the new grade
+      // is better.
       userManualGrades.set(key, manualGrade.grade);
     }
   }

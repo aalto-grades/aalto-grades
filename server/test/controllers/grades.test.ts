@@ -736,20 +736,6 @@ describe(
       expect(res.body.errors).toBeDefined();
     });
 
-    it('should respond with 404 not found, if grades have not been calculated yet', async () => {
-      res = await request
-        .get('/v1/courses/2/assessment-models/2/grades')
-        .set('Cookie', cookies.adminCookie)
-        .expect(HttpCode.NotFound);
-
-      checkErrorRes(
-        [
-          'no grades found, make sure grades have been' +
-          ' uploaded/calculated before requesting course results'
-        ],
-        HttpCode.NotFound);
-    });
-
     it('should respond with 404 not found, if course does not exist', async () => {
       res = await request
         .get(`/v1/courses/${badId}/assessment-models/1/grades`)
@@ -1528,7 +1514,9 @@ describe(
         graderId: 1,
         grade: 10,
         manual: true,
-        status: Status.Pass
+        status: Status.Pass,
+        date: new Date('2022-04-04'),
+        expiryDate: new Date('2023-10-10')
       });
 
       checkSuccessRes(
@@ -1626,6 +1614,36 @@ describe(
         checkGrade(228, 5, 0.5, cookies.adminCookie, false, Status.Fail);
       }
     );
+
+    it('should not consider expired grades', async () => {
+      async function checkGradeAmountByGradeValue(
+        attainmentId: number, grade: number, expectedAmount: number
+      ): Promise<void> {
+        expect((await AttainmentGrade.findAll({
+          where: {
+            attainmentId: attainmentId,
+            userId: 1,
+            grade: grade
+          }
+        })).length).toBe(expectedAmount);
+      }
+
+      // Ensure that the expected grades exist
+      await checkGradeAmountByGradeValue(288, 0, 3);
+      await checkGradeAmountByGradeValue(288, 5, 3);
+      await checkGradeAmountByGradeValue(289, 0, 3);
+      await checkGradeAmountByGradeValue(289, 5, 2);
+
+      checkSuccessRes(await request
+        .post('/v1/courses/2/assessment-models/53/grades/calculate')
+        .send({
+          studentNumbers: ['352772']
+        })
+        .set('Cookie', cookies.adminCookie)
+      );
+
+      checkGrade(287, 1, 0, cookies.adminCookie, false, Status.Fail);
+    });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
       await request
