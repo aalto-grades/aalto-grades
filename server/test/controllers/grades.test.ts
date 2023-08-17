@@ -1626,7 +1626,7 @@ describe(
             grade: grade
           }
         })).length).toBe(expectedAmount);
-      };
+      }
 
       // Ensure that the expected grades exist
       await checkGradeAmountByGradeValue(288, 0, 3);

@@ -40,7 +40,7 @@ export async function getDateOfLatestGrade(
     throw new Error(
       `failed to find the date of the latest grade, user ${userId} has`
       + ` no grades for assessment model ${assessmentModelId}`
-    )
+    );
   }
 }
 
