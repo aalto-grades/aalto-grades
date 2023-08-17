@@ -8,6 +8,7 @@ import {
 import { parse, Parser } from 'csv-parse';
 import { stringify } from 'csv-stringify';
 import { NextFunction, Request, Response } from 'express';
+import _ from 'lodash';
 import { Includeable, Op, QueryTypes, Transaction } from 'sequelize';
 import * as yup from 'yup';
 
@@ -183,9 +184,14 @@ interface InstanceWithUsers extends CourseInstance {
   Users: Array<User>
 }
 
+/**
+ * @param {number} instanceId - ID of the instance included in the query
+ * @param {Array<string> | undefined} studentNumbers - Students numbers included in the query
+ * @returns Union of studentNumbers array and student numbers enrolled in course instance.
+ */
 async function filterByInstanceAndStudentNumber(
   instanceId: number,
-  studentNumbersFiltered: Array<string> | undefined
+  studentNumbers: Array<string> | undefined
 ): Promise<Array<string> | undefined> {
   const studentsFromInstance: InstanceWithUsers | null = await CourseInstance.findOne({
     attributes: ['id'],
@@ -195,27 +201,26 @@ async function filterByInstanceAndStudentNumber(
     include: [
       {
         model: User,
-        attributes: ['studentNumber']
+        attributes: ['studentNumber'],
+        order: [
+          ['id', 'ASC']
+        ]
       }
     ]
   }) as InstanceWithUsers;
 
   if (studentsFromInstance) {
-    const studentNumbersFromInstance: Array<string> =
-      studentsFromInstance.Users.map((user: User) => user.studentNumber);
+    const studentNumbersFromInstance: Array<string> = studentsFromInstance.Users.map((us: User) => {
+      return us.studentNumber;
+    });
 
-    if (studentNumbersFiltered) {
-      // Intersection of both student numbers from query params and on the course instance.
-      return studentNumbersFiltered.filter(
-        (value: string) => studentNumbersFromInstance.includes(value)
-      );
-    } else {
-      // Only student numbers from instance.
-      return studentNumbersFromInstance;
+    if (studentNumbers) {
+      return _.union(studentNumbers, studentNumbersFromInstance);
     }
+    return studentNumbersFromInstance;
   }
 
-  return studentNumbersFiltered;
+  return studentNumbers;
 }
 
 /**

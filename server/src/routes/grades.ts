@@ -241,6 +241,14 @@ router.get(
  *           Defaults to end date of the course instance.
  *         example: 2022-9-22
  *       - in: query
+ *         name: override
+ *         schema:
+ *           type: boolean
+ *         required: false
+ *         description: >
+ *           Flag to override the export to include previously exported grades.
+ *         example: true
+ *       - in: query
  *         name: completionLanguage
  *         schema:
  *           type: string
