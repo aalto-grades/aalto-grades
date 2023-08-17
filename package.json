@@ -1,0 +1,8 @@
+{
+  "name": "aalto-grades",
+  "author": "The Aalto Grades Developers",
+  "license": "Expat (MIT)",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.4.0"
+  }
+}

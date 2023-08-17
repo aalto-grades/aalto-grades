@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Formula, ParamsObject } from "./formula"
+import { Formula, ParamsObject } from './formula';
 
 export interface AttainmentData {
   id?: number,
@@ -10,6 +10,8 @@ export interface AttainmentData {
   parentId?: number,
   name: string,
   daysValid: number,
+  minRequiredGrade: number,
+  maxGrade: number,
   formula: Formula,
   formulaParams: ParamsObject,
   subAttainments?: Array<AttainmentData>

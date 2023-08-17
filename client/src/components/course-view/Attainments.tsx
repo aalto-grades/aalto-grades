@@ -100,6 +100,16 @@ export default function Attainments(props: {
         }
       </Box>
       <Box sx={{ display: 'flex', pt: 1 }}>
+        <Paper sx={{ mr: 1, px: 1, py: 0.5 }}>
+          <Typography align='left' variant='caption'>
+            {'Min required grade: ' + props.attainmentTree.minRequiredGrade}
+          </Typography>
+        </Paper>
+        <Paper sx={{ mr: 1, px: 1, py: 0.5 }}>
+          <Typography align='left' variant='caption'>
+            {'Max grade: ' + props.attainmentTree.maxGrade}
+          </Typography>
+        </Paper>
         {
           (props.attainmentTree.formulaParams) && (
             Object.keys(props.attainmentTree.formulaParams).map((key: string) => {

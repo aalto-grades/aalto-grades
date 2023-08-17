@@ -11,7 +11,6 @@ import { UseQueryResult } from '@tanstack/react-query';
 import ConfirmationDialog from './ConfirmationDialog';
 import EditFormulaDialog from '../edit-formula-dialog/EditFormulaDialog';
 import SimpleDialog from './SimpleDialog';
-import StringTextField, { AttainmentTextFieldData } from './StringTextField';
 
 import { useGetFormula } from '../../hooks/useApi';
 import { State } from '../../types';
@@ -19,6 +18,11 @@ import { getParamLabel } from '../../utils';
 
 // An Assignmnet component without subAttainments and hence without a formula as well.
 // If this isn't the root Attainment, this can be deleted
+
+interface AttainmentTextFieldData {
+  fieldId: keyof AttainmentData,
+  fieldLabel: string
+}
 
 const nameData: AttainmentTextFieldData = {
   fieldId: 'name',
@@ -28,6 +32,16 @@ const nameData: AttainmentTextFieldData = {
 const daysValidData: AttainmentTextFieldData = {
   fieldId: 'daysValid',
   fieldLabel: 'Days Valid'
+};
+
+const minRequiredGradeData: AttainmentTextFieldData = {
+  fieldId: 'minRequiredGrade',
+  fieldLabel: 'Min Required Grade'
+};
+
+const maxGradeData: AttainmentTextFieldData = {
+  fieldId: 'maxGrade',
+  fieldLabel: 'Max Grade'
 };
 
 export default function LeafAttainment(props: {
@@ -118,13 +132,23 @@ export default function LeafAttainment(props: {
         rowGap: 1,
         mt: 2,
       }}>
-        <StringTextField
-          attainmentTree={props.attainmentTree}
-          setAttainmentTree={props.setAttainmentTree}
-          attainment={props.attainment}
+        <TextField
+          type='text'
+          key={nameData.fieldId}
+          id={nameData.fieldId}
+          label={nameData.fieldLabel}
+          InputLabelProps={{ shrink: true }}
+          margin='normal'
           value={props.attainment.name}
-          fieldData={nameData}
-          setTouched={props.setTouched}
+          sx={{
+            marginTop: 0,
+            width: '100%'
+          }}
+          onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+            props.setTouched();
+            props.attainment.name = event.target.value;
+            props.setAttainmentTree(structuredClone(props.attainmentTree));
+          }}
         />
         <TextField
           type='number'
@@ -141,6 +165,42 @@ export default function LeafAttainment(props: {
           onChange={(event: ChangeEvent<HTMLInputElement>): void => {
             props.setTouched();
             props.attainment.daysValid = Number(event.target.value);
+            props.setAttainmentTree(structuredClone(props.attainmentTree));
+          }}
+        />
+        <TextField
+          type='number'
+          key={minRequiredGradeData.fieldId}
+          id={minRequiredGradeData.fieldId}
+          label={minRequiredGradeData.fieldLabel}
+          InputLabelProps={{ shrink: true }}
+          margin='normal'
+          value={props.attainment.minRequiredGrade}
+          sx={{
+            marginTop: 0,
+            width: '100%'
+          }}
+          onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+            props.setTouched();
+            props.attainment.minRequiredGrade = Number(event.target.value);
+            props.setAttainmentTree(structuredClone(props.attainmentTree));
+          }}
+        />
+        <TextField
+          type='number'
+          key={maxGradeData.fieldId}
+          id={maxGradeData.fieldId}
+          label={maxGradeData.fieldLabel}
+          InputLabelProps={{ shrink: true }}
+          margin='normal'
+          value={props.attainment.maxGrade}
+          sx={{
+            marginTop: 0,
+            width: '100%'
+          }}
+          onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+            props.setTouched();
+            props.attainment.maxGrade = Number(event.target.value);
             props.setAttainmentTree(structuredClone(props.attainmentTree));
           }}
         />
