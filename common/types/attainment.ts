@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Formula, ParamsObject } from "./formula"
+import { Formula, ParamsObject } from './formula';
 
 export enum GradeType {
   Integer = 'INTEGER',
@@ -15,6 +15,8 @@ export interface AttainmentData {
   parentId?: number,
   name: string,
   daysValid: number,
+  minRequiredGrade: number,
+  maxGrade: number,
   formula: Formula,
   formulaParams: ParamsObject,
   gradeType: GradeType,

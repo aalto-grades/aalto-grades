@@ -10,9 +10,10 @@ export const mockAttainment: AttainmentData = {
   id: 1,
   name: 'optional-exercises',
   daysValid: 365,
+  minRequiredGrade: 0,
+  maxGrade: 5,
   formula: Formula.WeightedAverage,
   formulaParams: {
-    minRequiredGrade: 0,
     children: [
       ['ex-1', { weight: 0.5 }],
       ['ex-2', { weight: 0.5 }]
@@ -24,10 +25,10 @@ export const mockAttainment: AttainmentData = {
       id: 2,
       name: 'ex-1',
       daysValid: 365,
+      minRequiredGrade: 0,
+      maxGrade: 5,
       formula: Formula.Manual,
-      formulaParams: {
-        minRequiredGrade: 0
-      },
+      formulaParams: {},
       gradeType: GradeType.Float,
       subAttainments: [],
     },
@@ -35,9 +36,10 @@ export const mockAttainment: AttainmentData = {
       id: 3,
       name: 'ex-2',
       daysValid: 365,
+      minRequiredGrade: 0,
+      maxGrade: 5,
       formula: Formula.WeightedAverage,
       formulaParams: {
-        minRequiredGrade: 0,
         children: [
           ['ex-2.1', { weight: 0.5 }],
           ['ex-2.2', { weight: 0.5 }]
@@ -49,9 +51,10 @@ export const mockAttainment: AttainmentData = {
           id: 4,
           name: 'ex-2.1',
           daysValid: 365,
+          minRequiredGrade: 0,
+          maxGrade: 5,
           formula: Formula.WeightedAverage,
           formulaParams: {
-            minRequiredGrade: 0,
             children: [
               ['ex-2.1.1', { weight: 0.5 }],
               ['ex-2.1.2', { weight: 0.5 }]
@@ -63,10 +66,10 @@ export const mockAttainment: AttainmentData = {
               id: 5,
               name: 'ex-2.1.1',
               daysValid: 365,
+              minRequiredGrade: 0,
+              maxGrade: 5,
               formula: Formula.Manual,
-              formulaParams: {
-                minRequiredGrade: 0
-              },
+              formulaParams: {},
               gradeType: GradeType.Float,
               subAttainments: [],
             },
@@ -74,10 +77,10 @@ export const mockAttainment: AttainmentData = {
               id: 6,
               name: 'ex-2.1.2',
               daysValid: 365,
+              minRequiredGrade: 0,
+              maxGrade: 5,
               formula: Formula.Manual,
-              formulaParams: {
-                minRequiredGrade: 0
-              },
+              formulaParams: {},
               gradeType: GradeType.Float,
               subAttainments: [],
             }
@@ -87,9 +90,10 @@ export const mockAttainment: AttainmentData = {
           id: 7,
           name: 'ex-2.2',
           daysValid: 365,
+          minRequiredGrade: 0,
+          maxGrade: 5,
           formula: Formula.WeightedAverage,
           formulaParams: {
-            minRequiredGrade: 0,
             children: [
               ['ex-2.2.1', { weight: 0.5 }],
               ['ex-2.2.2', { weight: 0.5 }]
@@ -101,10 +105,10 @@ export const mockAttainment: AttainmentData = {
               id: 8,
               name: 'ex-2.2.1',
               daysValid: 365,
+              minRequiredGrade: 0,
+              maxGrade: 5,
               formula: Formula.Manual,
-              formulaParams: {
-                minRequiredGrade: 0
-              },
+              formulaParams: {},
               gradeType: GradeType.Float,
               subAttainments: [],
             },
@@ -112,9 +116,10 @@ export const mockAttainment: AttainmentData = {
               id: 9,
               name: 'ex-2.2.2',
               daysValid: 365,
+              minRequiredGrade: 0,
+              maxGrade: 5,
               formula: Formula.WeightedAverage,
               formulaParams: {
-                minRequiredGrade: 0,
                 children: [
                   ['ex-2.2.2.1', { weight: 0.5 }],
                   ['ex-2.2.2.2', { weight: 0.5 }]
@@ -126,10 +131,10 @@ export const mockAttainment: AttainmentData = {
                   id: 10,
                   name: 'ex-2.2.2.1',
                   daysValid: 365,
+                  minRequiredGrade: 0,
+                  maxGrade: 5,
                   formula: Formula.Manual,
-                  formulaParams: {
-                    minRequiredGrade: 0
-                  },
+                  formulaParams: {},
                   gradeType: GradeType.Float,
                   subAttainments: [],
                 },
@@ -137,9 +142,10 @@ export const mockAttainment: AttainmentData = {
                   id: 11,
                   name: 'ex-2.2.2.2',
                   daysValid: 365,
+                  minRequiredGrade: 0,
+                  maxGrade: 5,
                   formula: Formula.WeightedAverage,
                   formulaParams: {
-                    minRequiredGrade: 0,
                     children: [
                       ['ex-2.2.2.2.1', { weight: 0.5 }],
                       ['ex-2.2.2.2.2', { weight: 0.5 }]
@@ -151,10 +157,10 @@ export const mockAttainment: AttainmentData = {
                       id: 12,
                       name: 'ex-2.2.2.2.1',
                       daysValid: 365,
+                      minRequiredGrade: 0,
+                      maxGrade: 5,
                       formula: Formula.Manual,
-                      formulaParams: {
-                        minRequiredGrade: 0
-                      },
+                      formulaParams: {},
                       gradeType: GradeType.Float,
                       subAttainments: [],
                     },
@@ -162,10 +168,10 @@ export const mockAttainment: AttainmentData = {
                       id: 13,
                       name: 'ex-2.2.2.2.2',
                       daysValid: 365,
+                      minRequiredGrade: 0,
+                      maxGrade: 5,
                       formula: Formula.Manual,
-                      formulaParams: {
-                        minRequiredGrade: 0
-                      },
+                      formulaParams: {},
                       gradeType: GradeType.Float,
                       subAttainments: [],
                     }
@@ -186,10 +192,10 @@ export const jestMockAttainment: Attainment = new Attainment({
   parentId: 1,
   name: 'xxx',
   daysValid: 365,
+  minRequiredGrade: 1,
+  maxGrade: 5,
   formula: Formula.Manual,
-  formulaParams: {
-    minRequiredGrade: 0
-  },
+  formulaParams: {},
   gradeType: GradeType.Float,
   createdAt: new Date(),
   updatedAt: new Date()

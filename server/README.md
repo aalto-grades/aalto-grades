@@ -111,6 +111,11 @@ Run one migration down:
 $ npm run migration:down
 ```
 
+Run all migrations down:
+```
+$ npm run migration:down:all
+```
+
 ## Seeds
 
 To manage data migrations to the database, you can use seeders.

@@ -81,6 +81,8 @@ export async function findAttainmentsByAssessmentModel(
       parentId: attainment.parentId,
       name: attainment.name,
       daysValid: attainment.daysValid,
+      minRequiredGrade: attainment.minRequiredGrade,
+      maxGrade: attainment.maxGrade,
       formula: attainment.formula,
       formulaParams: attainment.formulaParams,
       gradeType: attainment.gradeType

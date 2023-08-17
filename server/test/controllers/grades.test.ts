@@ -201,7 +201,7 @@ describe(
 
         res = await request
           .get('/v1/courses/6/assessment-models/24/grades/csv/sisu' +
-          `?studentNumbers=${JSON.stringify(studentNumbers)}`)
+          `?studentNumbers=${JSON.stringify(studentNumbers)}&override=true`)
           .set('Cookie', cookies.userCookie)
           .set('Accept', 'text/csv')
           .expect(HttpCode.Ok);
@@ -227,6 +227,28 @@ describe(
         );
       });
 
+    it(
+      'should export only unexported grades if override is false',
+      async () => {
+        res = await request
+          .get('/v1/courses/6/assessment-models/52/grades/csv/sisu' +
+            `?studentNumbers=${JSON.stringify(studentNumbers)}&override=false`)
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'text/csv')
+          .expect(HttpCode.Ok);
+
+        console.log(res.text);
+        expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+114732,5,5,21.6.2023,sv,
+335462,1,5,21.6.2023,sv,
+345752,1,5,21.6.2023,sv,
+`);
+        expect(res.headers['content-disposition']).toBe(
+          'attachment; filename="final_grades_course_MS-A0102_' +
+          `${(new Date()).toLocaleDateString('fi-FI')}.csv"`
+        );
+      });
+
     it('should export the best grade if multiple ones exist', async () => {
       // Check that multiple grades exist as expected
       await checkGradeAmount(1, 283, 3, [0, 3, 5]);
@@ -236,16 +258,16 @@ describe(
       res = await request
         .get(
           '/v1/courses/2/assessment-models/50/grades/csv/sisu'
-          + `?studentNumbers=${JSON.stringify(['352772', '476617', '344625'])}`
+          + `?studentNumbers=${JSON.stringify(['352772', '476617', '344625'])}&override=true`
         )
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'text/csv')
         .expect(HttpCode.Ok);
 
       expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-352772,5,5,21.6.2023,en,
-476617,2,5,21.6.2023,en,
-344625,4,5,21.6.2023,en,
+352772,5,5,21.6.2023,en,Better luck next time
+476617,2,5,21.6.2023,en,You shall not pass
+344625,4,5,21.6.2023,en,well done!
 `);
       expect(res.headers['content-disposition']).toBe(
         'attachment; filename="final_grades_course_CS-A1120_' +
@@ -258,7 +280,7 @@ describe(
         res = await request
           .get(
             '/v1/courses/6/assessment-models/24/grades/csv/sisu'
-            + '?assessmentDate=2023-05-12&completionLanguage=ja'
+            + '?assessmentDate=2023-05-12&completionLanguage=ja&override=true'
             + `&studentNumbers=${JSON.stringify(studentNumbers)}`
           )
           .set('Cookie', cookies.adminCookie)
@@ -291,7 +313,7 @@ describe(
         res = await request
           .get(
             '/v1/courses/9/assessment-models/42/grades/csv/sisu'
-            + '?assessmentDate=2023-12-12&instanceId=26'
+            + '?assessmentDate=2023-12-12&instanceId=26&override=true'
           )
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'text/csv')
@@ -314,7 +336,8 @@ describe(
         res = await request
           .get(
             '/v1/courses/9/assessment-models/42/grades/csv/sisu'
-            + '?assessmentDate=2023-12-12&studentNumbers=["114732","472886","327976","139131"]'
+            + '?assessmentDate=2023-12-12&studentNumbers=["114732","472886","327976","139131"]' +
+            '&override=true'
           )
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'text/csv')
@@ -338,7 +361,7 @@ describe(
           .get(
             '/v1/courses/9/assessment-models/42/grades/csv/sisu'
             + '?assessmentDate=2023-12-12&instanceId=26' +
-            '&studentNumbers=["327976","139131"]'
+            '&studentNumbers=["327976","139131"]&override=true'
           )
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'text/csv')
@@ -354,11 +377,13 @@ describe(
         );
       });
 
-    it('should return results for all instaces connected to the assessment model if no filters',
+    it(
+      'should return results for all instaces connected to the assessment model if no filters',
       async () => {
         res = await request
           .get(
-            '/v1/courses/9/assessment-models/42/grades/csv/sisu?assessmentDate=2023-12-12'
+            '/v1/courses/9/assessment-models/42/grades/csv/sisu?' +
+            'assessmentDate=2023-12-12&override=true'
           )
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'text/csv')
@@ -494,6 +519,7 @@ describe(
           expect(option.grade).toBeDefined();
           expect(option.status).toBeDefined();
           expect(option.manual).toBeDefined();
+          expect(option.exportedToSisu).toBeDefined();
           expect(option.date).toBeDefined();
           expect(option.expiryDate).not.toBeDefined();
         }
@@ -770,6 +796,7 @@ describe(
         expect(option.grade).toBeDefined();
         expect(option.status).toBeDefined();
         expect(option.manual).toBeDefined();
+        expect(option.exportedToSisu).toBeDefined();
         expect(option.date).toBeDefined();
         expect(option.expiryDate).toBeDefined();
         expect(option.comment).toBeDefined();
@@ -1027,10 +1054,10 @@ describe(
     }
 
     it(
-      'should determine whether manual attainment was passed based on min required grade',
+      'should determine whether an attainment was passed based on min required grade',
       async () => {
         const csvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mock-data/csv/grades_failing_manual.csv'), 'utf8'
+          path.resolve(__dirname, '../mock-data/csv/grades_failing.csv'), 'utf8'
         );
 
         res = await request
@@ -1040,31 +1067,10 @@ describe(
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
-        await checkStatusOfGrade(5, 285, 1, Status.Fail);
-        await checkStatusOfGrade(6, 285, 1.9, Status.Fail);
-        await checkStatusOfGrade(7, 285, 2, Status.Pass);
-        await checkStatusOfGrade(8, 285, 3, Status.Pass);
-      }
-    );
-
-    it(
-      'should determine whether non-manual attainment was passed based on min required grade',
-      async () => {
-        const csvData: fs.ReadStream = fs.createReadStream(
-          path.resolve(__dirname, '../mock-data/csv/grades_failing_non_manual.csv'), 'utf8'
-        );
-
-        res = await request
-          .post('/v1/courses/2/assessment-models/51/grades/csv')
-          .attach('csv_data', csvData, { contentType: 'text/csv' })
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.Ok);
-
-        await checkStatusOfGrade(1, 284, 1, Status.Fail);
-        await checkStatusOfGrade(2, 284, 2, Status.Fail);
-        await checkStatusOfGrade(3, 284, 3, Status.Pass);
-        await checkStatusOfGrade(4, 284, 3.4, Status.Pass);
+        await checkStatusOfGrade(5, 284, 1, Status.Fail);
+        await checkStatusOfGrade(6, 284, 1.9, Status.Fail);
+        await checkStatusOfGrade(7, 284, 2, Status.Pass);
+        await checkStatusOfGrade(8, 284, 3, Status.Pass);
       }
     );
 
@@ -1144,6 +1150,31 @@ describe(
           ['No attainments found from the header, please upload valid CSV.'], HttpCode.BadRequest
         );
       });
+
+    it(
+      'should respond with 400 bad request, if an uploaded grade is larger than'
+      + ' the max grade of an attainment',
+      async () => {
+        const invalidCsvData: fs.ReadStream = fs.createReadStream(
+          path.resolve(__dirname, '../mock-data/csv/grades_over_max.csv'), 'utf8'
+        );
+
+        res = await request
+          .post('/v1/courses/2/assessment-models/51/grades/csv')
+          .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json');
+
+        function error(row: number, grade: number): string {
+          return `CSV file row ${row} column 2 uploaded grade "${grade}" is larger`
+            + ' than maximum allowed grade "5"';
+        }
+
+        checkErrorRes(
+          [error(3, 5.01), error(4, 6), error(5, 1000000)], HttpCode.BadRequest
+        );
+      }
+    );
 
     it('should respond with 400 bad request, if the CSV file header parsing fails',
       async () => {
@@ -1405,7 +1436,8 @@ describe(
       userId: number,
       grade: number,
       cookie: Array<string>,
-      checkGrader: boolean = true
+      checkGrader: boolean = true,
+      status: Status = Status.Pass
     ): Promise<void> {
       const result: AttainmentGrade | null = await AttainmentGrade.findOne({
         where: {
@@ -1416,6 +1448,7 @@ describe(
 
       expect(result).not.toBe(null);
       expect(result?.grade).toBe(grade);
+      expect(result?.status).toBe(status);
       if (checkGrader)
         checkGraderId(result as AttainmentGrade, cookie);
     }
@@ -1575,6 +1608,22 @@ describe(
       checkGrade(269, 1, 5, cookies.adminCookie);
     });
 
+    it(
+      'should save a failing grade when the calculated grade is less than the'
+      + ' min required grade',
+      async () => {
+        checkSuccessRes(await request
+          .post('/v1/courses/1/assessment-models/25/grades/calculate')
+          .send({
+            studentNumbers: ['826139']
+          })
+          .set('Cookie', cookies.adminCookie)
+        );
+
+        checkGrade(228, 5, 0.5, cookies.adminCookie, false, Status.Fail);
+      }
+    );
+
     it('should respond with 401 unauthorized, if not logged in', async () => {
       await request
         .post('/v1/courses/1/assessment-models/1/grades/calculate')
@@ -1610,7 +1659,8 @@ describe(
 
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe('No student numbers found from instance ID 28');
-      });
+      }
+    );
   }
 );
 

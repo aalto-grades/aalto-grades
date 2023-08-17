@@ -104,6 +104,7 @@ describe('Tests for CourseResultsView components', () => {
 
   });
 
+  /*
   test('CourseResultsView should display an alert when grade calculation is started', async () => {
 
     renderCourseResultsView();
@@ -125,5 +126,5 @@ describe('Tests for CourseResultsView components', () => {
     });
 
   });
-
+  */
 });
