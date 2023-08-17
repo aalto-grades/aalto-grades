@@ -171,5 +171,3 @@ INSERT INTO public.attainment_grade (user_id, attainment_id, grader_id, grade, m
 (1, 289, 2, 1, true, 'PASS', '2023-05-06', NULL, NOW(), NOW(), NULL, NULL), -- Unexpired
 (1, 289, 2, 1, true, 'PASS', '2023-05-05', NULL, NOW(), NOW(), NULL, NULL), -- Expired
 (1, 289, 2, 1, true, 'PASS', '2023-05-01', NULL, NOW(), NOW(), NULL, NULL); -- Expired
-
--- (user_id, attainment_id, ..., grade, ..., ..., date, expiry_date)
