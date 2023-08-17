@@ -210,9 +210,9 @@ async function filterByInstanceAndStudentNumber(
   }) as InstanceWithUsers;
 
   if (studentsFromInstance) {
-    const studentNumbersFromInstance: Array<string> = studentsFromInstance.Users.map((value: User) => {
-      return value.studentNumber;
-    })
+    const studentNumbersFromInstance: Array<string> = studentsFromInstance.Users.map((us: User) => {
+      return us.studentNumber;
+    });
 
     if (studentNumbers) {
       return _.union(studentNumbers, studentNumbersFromInstance);

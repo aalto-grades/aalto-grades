@@ -354,7 +354,9 @@ describe(
         );
       });
 
-    it('should filter CSV grades based on instance ID and student number if URL query included (union of query values)',
+    it(
+      'should filter CSV grades based on instance ID and student ' +
+      'number if URL query included (union of query values)',
       async () => {
         res = await request
           .get(
@@ -668,7 +670,8 @@ describe(
       });
 
     it(
-      'should filter returned grades based on instance ID and student number if URL query included (union of query values)',
+      'should filter returned grades based on instance ID and ' +
+      'student number if URL query included (union of query values)',
       async () => {
         res = await request
           .get('/v1/courses/9/assessment-models/42/grades?instanceId=26' +
