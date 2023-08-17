@@ -145,6 +145,7 @@ export default function CourseResultsView(): JSX.Element {
         selectedStudents={selectedStudents}
         setSelectedStudents={setSelectedStudents}
         hasPendingStudents={hasPendingStudents}
+        refetch={students.refetch}
       />
     </Box>
   );

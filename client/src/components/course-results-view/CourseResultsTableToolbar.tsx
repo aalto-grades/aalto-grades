@@ -22,7 +22,8 @@ export default function CourseResultsTableToolbar(props: {
   calculateFinalGrades: () => Promise<void>,
   downloadCsvTemplate: () => Promise<void>,
   selectedStudents: Array<FinalGrade>,
-  hasPendingStudents: boolean
+  hasPendingStudents: boolean,
+  refetch: () => void
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { assessmentModelId }: Params = useParams();
@@ -48,6 +49,7 @@ export default function CourseResultsTableToolbar(props: {
 
   function handleCloseFileDialog(): void {
     setShowFileDialog(false);
+    props.refetch();
   }
 
   function handleCloseSisuDialog(): void {
