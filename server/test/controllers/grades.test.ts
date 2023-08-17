@@ -237,7 +237,6 @@ describe(
           .set('Accept', 'text/csv')
           .expect(HttpCode.Ok);
 
-        console.log(res.text);
         expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
 114732,5,5,21.6.2023,sv,
 335462,1,5,21.6.2023,sv,
@@ -355,7 +354,9 @@ describe(
         );
       });
 
-    it('should filter CSV grades based on instance ID and student number if URL query included',
+    it(
+      'should filter CSV grades based on instance ID and student ' +
+      'number if URL query included (union of query values)',
       async () => {
         res = await request
           .get(
@@ -369,7 +370,9 @@ describe(
 
         expect(res.text).toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
 327976,5,5,12.12.2023,sv,
+478988,5,5,12.12.2023,sv,
 139131,5,5,12.12.2023,sv,
+857119,5,5,12.12.2023,sv,
 `);
         expect(res.headers['content-disposition']).toBe(
           'attachment; filename="final_grades_course_PHYS-A1140_' +
@@ -666,9 +669,9 @@ describe(
         ]);
       });
 
-    // TODO: Clarify whether this is supposed to be a union or intersection
     it(
-      'should filter returned grades based on instance ID and student number if URL query included',
+      'should filter returned grades based on instance ID and ' +
+      'student number if URL query included (union of query values)',
       async () => {
         res = await request
           .get('/v1/courses/9/assessment-models/42/grades?instanceId=26' +
@@ -679,7 +682,7 @@ describe(
 
         checkSuccessRes(res);
         checkFinalGradesStructure(res.body.data);
-        checkStudentNumbers(res.body.data, ['327976', '139131']);
+        checkStudentNumbers(res.body.data, ['327976', '478988', '139131', '857119']);
       });
 
     it('should not filter returned grades if no filters included in URL query',
