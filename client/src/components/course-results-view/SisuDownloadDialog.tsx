@@ -205,8 +205,6 @@ export default function SisuDownloadDialog(props: {
                 InputLabelProps={{ shrink: true }}
                 type='date'
                 label='Assessment Date'
-                /* TODO: Fix TS */
-                //format='DD-MM-YYYY'
                 helperText='If not provided, the default will be course instance ending date.'
                 onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
                   setAssessmentDate(e.target.value);
@@ -216,8 +214,13 @@ export default function SisuDownloadDialog(props: {
             {(exportedValuesInList()) && (
               <Box sx={{ ml: 1, my: 2, mr: 10 }}>
                 <Typography variant='body2' sx={{ color: 'red' }}>
-                  The list includes grades already exported to Sisu.
-                  Please select export option from drop down menu.
+                  The list of students includes students who have already been
+                  included in a Sisu CSV previously. Please select a download
+                  option from the drop-down menu.
+                </Typography>
+                <Typography variant='body2' sx={{ mt: 1, color: 'red' }}>
+                  This dialog will NOT close after downloading a CSV file.
+                  You may download multiple CSV files with different options
                 </Typography>
                 <TextField
                   id='export-option'
@@ -228,13 +231,13 @@ export default function SisuDownloadDialog(props: {
                   }}
                 >
                   <MenuItem value='all'>
-                    Export all selected grades
+                    Download all selected grades in a single CSV
                   </MenuItem>
                   <MenuItem value='unexported'>
-                    Export only unexported grades
+                    Only download unexported grades
                   </MenuItem>
                   <MenuItem value='exported'>
-                    Export once exported grades
+                    Only download previously exported grades
                   </MenuItem>
                 </TextField>
               </Box>
