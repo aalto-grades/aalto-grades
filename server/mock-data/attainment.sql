@@ -315,6 +315,6 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, days_valid,
 (52, null, '285', 365, 0, 100, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["286", { "weight": 0.25 }]] }'),
 (52, 285, '286', 365, 0, 100, NOW(), NOW(), 'MANUAL', '{}'),
 -- Test grade expiry
-(53, null, '287', 365, 0, 5, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [] }'),
+(53, null, '287', 365, 0, 5, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["288", { "weight": 0.5 }], ["289", { "weight": 0.5 }]] }'),
 (53, 287, '288', 999, 0, 5, NOW(), NOW(), 'MANUAL', '{}'),
 (53, 287, '289', 5, 0, 5, NOW(), NOW(), 'MANUAL', '{}');

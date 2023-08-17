@@ -1613,6 +1613,18 @@ describe(
       }
     );
 
+    it('should not consider expired grades', async () => {
+      checkSuccessRes(await request
+        .post('/v1/courses/1/assessment-models/53/grades/calculate')
+        .send({
+          studentNumbers: ['352772']
+        })
+        .set('Cookie', cookies.adminCookie)
+      );
+
+      checkGrade(287, 1, 0, cookies.adminCookie, false, Status.Fail);
+    });
+
     it('should respond with 401 unauthorized, if not logged in', async () => {
       await request
         .post('/v1/courses/1/assessment-models/1/grades/calculate')

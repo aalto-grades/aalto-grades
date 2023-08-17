@@ -28,6 +28,7 @@ import {
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import { findAttainmentGradeById } from './utils/attainment';
 import { toDateOnlyString } from './utils/date';
+import { gradeIsExpired } from './utils/grades';
 import { findUserById, isTeacherInChargeOrAdmin } from './utils/user';
 
 async function studentNumbersExist(studentNumbers: Array<string>): Promise<void> {
@@ -1120,7 +1121,7 @@ export async function calculateGrades(
         }
       }
     ],
-    attributes: ['grade', 'attainmentId', 'userId'],
+    attributes: ['id', 'grade', 'attainmentId', 'userId'],
   }) as Array<ManualGrade>;
 
   /*
@@ -1150,8 +1151,12 @@ export async function calculateGrades(
     const key: FormulaNode = getFormulaNode(manualGrade.attainmentId);
     const existingGrade: number | undefined = userManualGrades.get(key);
 
-    if (!existingGrade || manualGrade.grade > existingGrade) {
-      // No existing grade or the new grade is better.
+    if (
+      !(await gradeIsExpired(manualGrade.id))
+      && (!existingGrade || manualGrade.grade > existingGrade)
+    ) {
+      // Grade has not expired and there is no existing grade or the new grade
+      // is better.
       userManualGrades.set(key, manualGrade.grade);
     }
   }
