@@ -4,7 +4,7 @@
 
 import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
 import { Box, Button, Paper, TextField, Typography } from '@mui/material';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, JSX, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 

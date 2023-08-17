@@ -6,7 +6,7 @@ import { FinalGrade } from 'aalto-grades-common/types';
 import DownloadIcon from '@mui/icons-material/Download';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { Box, Button, IconButton, TextField, Toolbar, Tooltip } from '@mui/material';
-import { useState } from 'react';
+import { JSX,useState } from 'react';
 import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
 
 import FileLoadDialog from './FileLoadDialog';

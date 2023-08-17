@@ -7,6 +7,7 @@ import {
   Box, Button, Dialog, DialogActions,
   DialogContent, DialogContentText, DialogTitle, Typography
 } from '@mui/material';
+import { JSX } from 'react';
 
 // A Dialog component for confirming deletion
 

@@ -4,7 +4,7 @@
 
 import { AttainmentData } from 'aalto-grades-common/types';
 import { Box, TextField, Typography } from '@mui/material';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, JSX } from 'react';
 
 import { getParamLabel } from '../../utils';
 

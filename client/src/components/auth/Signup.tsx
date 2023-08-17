@@ -4,7 +4,7 @@
 
 import { LoginResult, SystemRole } from 'aalto-grades-common/types';
 import { Button, FormControlLabel, Grid, Radio, RadioGroup, TextField } from '@mui/material';
-import { SyntheticEvent, useState } from 'react';
+import { JSX, SyntheticEvent, useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 import { useSignUp, UseSignUpResult } from '../../hooks/useApi';

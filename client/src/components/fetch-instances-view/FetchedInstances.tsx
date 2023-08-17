@@ -4,6 +4,7 @@
 
 import { CourseInstanceData } from 'aalto-grades-common/types';
 import { Box, Tooltip } from '@mui/material';
+import { JSX } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 import { compareDate } from '../../services/sorting';

@@ -6,7 +6,7 @@ import { AttainmentData, Formula } from 'aalto-grades-common/types';
 import {
   Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField
 } from '@mui/material';
-import { ChangeEvent, SyntheticEvent, useState } from 'react';
+import { ChangeEvent, JSX, SyntheticEvent, useState } from 'react';
 
 import { State, TextFieldData } from '../../types';
 

@@ -8,7 +8,7 @@ import {
   TableHead, TableRow, TableSortLabel
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
-import { SyntheticEvent } from 'react';
+import { JSX, SyntheticEvent } from 'react';
 
 interface Colum {
   id: string,

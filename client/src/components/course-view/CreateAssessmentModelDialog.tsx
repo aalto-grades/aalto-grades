@@ -7,7 +7,7 @@ import {
   Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle,
   FormHelperText, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField
 } from '@mui/material';
-import { ChangeEvent, SyntheticEvent, useState } from 'react';
+import { ChangeEvent, JSX, SyntheticEvent, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 import { QueryObserverResult, UseQueryResult } from '@tanstack/react-query';
 

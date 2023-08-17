@@ -4,7 +4,7 @@
 
 import { LoginResult } from 'aalto-grades-common/types';
 import { Box, Button, Grid, TextField, Typography } from '@mui/material';
-import { SyntheticEvent, useState } from 'react';
+import { JSX, SyntheticEvent, useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 import ExternalAuth from './ExternalAuth';
