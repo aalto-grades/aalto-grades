@@ -1514,7 +1514,9 @@ describe(
         graderId: 1,
         grade: 10,
         manual: true,
-        status: Status.Pass
+        status: Status.Pass,
+        date: new Date('2022-04-04'),
+        expiryDate: new Date('2023-10-10')
       });
 
       checkSuccessRes(
@@ -1615,7 +1617,7 @@ describe(
 
     it('should not consider expired grades', async () => {
       checkSuccessRes(await request
-        .post('/v1/courses/1/assessment-models/53/grades/calculate')
+        .post('/v1/courses/2/assessment-models/53/grades/calculate')
         .send({
           studentNumbers: ['352772']
         })
