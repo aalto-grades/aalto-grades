@@ -140,27 +140,19 @@ export default function CourseResultsTableToolbar(props: {
               </Button>
             </span>
           </Tooltip>
-          <Tooltip
-            title={props.selectedStudents.length != 0 ?
-              'You have selected students, these selections will be lost if not saved.' :
-              'Return to the course view page.'
-            }
-            placement="top"
+          <Button
+            variant='outlined'
+            color={props.selectedStudents.length != 0 ? 'error' : 'primary'}
+            onClick={(): void => {
+              if (props.selectedStudents.length != 0) {
+                setShowDialog(true);
+              } else {
+                navigate(-1);
+              }
+            }}
           >
-            <Button
-              variant='outlined'
-              color={props.selectedStudents.length != 0 ? 'error' : 'primary'}
-              onClick={(): void => {
-                if (props.selectedStudents.length != 0) {
-                  setShowDialog(true);
-                } else {
-                  navigate(-1);
-                }
-              }}
-            >
-              Return to course view
-            </Button>
-          </Tooltip>
+            Return to course view
+          </Button>
           <SisuDownloadDialog
             open={showSisuDialog}
             handleClose={handleCloseSisuDialog}
