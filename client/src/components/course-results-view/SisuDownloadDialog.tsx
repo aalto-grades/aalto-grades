@@ -166,19 +166,19 @@ export default function SisuDownloadDialog(props: {
             {instructions}
           </DialogContentText>
           <Box
-            component="form"
+            component='form'
             sx={{
               '& .MuiTextField-root': { m: 1, width: '25ch' },
             }}
             noValidate
-            autoComplete="off"
+            autoComplete='off'
           >
             <Box sx={{ mb: 1 }}>
               <TextField
-                id="select-grading-completion-language"
+                id='select-grading-completion-language'
                 select
-                label="Completion language"
-                defaultValue="default"
+                label='Completion language'
+                defaultValue='default'
                 onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
                   if (e.target.value == 'default') {
                     setCompletionLanguage(undefined);
@@ -187,7 +187,7 @@ export default function SisuDownloadDialog(props: {
                   }
                 }}
               >
-                <MenuItem value="default">
+                <MenuItem value='default'>
                   Use course language
                 </MenuItem>
                 {
@@ -201,13 +201,13 @@ export default function SisuDownloadDialog(props: {
             </Box>
             <Box>
               <TextField
-                id="select-grading-assessment-date"
+                id='select-grading-assessment-date'
                 InputLabelProps={{ shrink: true }}
-                type="date"
-                label="Assessment Date"
+                type='date'
+                label='Assessment Date'
                 /* TODO: Fix TS */
-                //format="DD-MM-YYYY"
-                helperText="If not provided, the default will be course instance ending date."
+                //format='DD-MM-YYYY'
+                helperText='If not provided, the default will be course instance ending date.'
                 onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
                   setAssessmentDate(e.target.value);
                 }}
@@ -220,20 +220,20 @@ export default function SisuDownloadDialog(props: {
                   Please select export option from drop down menu.
                 </Typography>
                 <TextField
-                  id="export-option"
+                  id='export-option'
                   select
-                  defaultValue="all"
+                  defaultValue='all'
                   onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
                     setOverride(e.target.value);
                   }}
                 >
-                  <MenuItem value="all">
+                  <MenuItem value='all'>
                     Export all selected grades
                   </MenuItem>
-                  <MenuItem value="unexported">
+                  <MenuItem value='unexported'>
                     Export only unexported grades
                   </MenuItem>
-                  <MenuItem value="exported">
+                  <MenuItem value='exported'>
                     Export once exported grades
                   </MenuItem>
                 </TextField>
