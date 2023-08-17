@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { getDateOfLatestGrade } from '../../src/controllers/utils/grades';
+import { getDateOfLatestGrade } from '../../src/controllers/utils/date';
 
 describe('Test latest date finder', () => {
 
