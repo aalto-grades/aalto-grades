@@ -67,9 +67,17 @@ export async function gradeIsExpired(gradeId: number): Promise<boolean> {
     grade.userId, grade.Attainment.assessmentModelId
   );
 
-  if (grade.expiryDate) {
-    return date >= grade.expiryDate;
-  } else {
-    return date >= new Date((grade.date as Date).getDate() + grade.Attainment.daysValid);
-  }
+  const expiryDate: Date = grade.expiryDate
+    ? new Date(grade.expiryDate)
+    : new Date(grade.date);
+
+  if (!grade.expiryDate)
+    expiryDate.setDate(expiryDate.getDate() + grade.Attainment.daysValid);
+
+  console.debug(JSON.stringify(grade, null, 2));
+  console.debug(new Date(grade.date).getDate());
+  console.debug(JSON.stringify(date));
+  console.debug(JSON.stringify(expiryDate));
+
+  return date >= expiryDate;
 }

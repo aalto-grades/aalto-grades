@@ -158,4 +158,18 @@ INSERT INTO public.attainment_grade (user_id, attainment_id, grader_id, grade, m
 (574, 285, 1, 3, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NOW()),
 (581, 285, 1, 1, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL), -- Pass
 (590, 285, 1, 2, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NOW()),
-(601, 285, 1, 1, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL); -- Pass
+(601, 285, 1, 1, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL), -- Pass
+-- Test grade expiry, the ID of the next row is 153
+(1, 288, 2, 1, true, 'PASS', '2023-05-10', '2023-08-23', NOW(), NOW(), NULL, NULL), -- Latest grade
+(1, 288, 2, 1, true, 'PASS', '2022-01-05', '2024-04-23', NOW(), NOW(), NULL, NULL), -- Unexpired
+(1, 288, 2, 1, true, 'PASS', '2022-01-05', '2023-05-11', NOW(), NOW(), NULL, NULL), -- Unexpired
+(1, 288, 2, 1, true, 'PASS', '2022-01-05', '2023-05-10', NOW(), NOW(), NULL, NULL), -- Expired
+(1, 288, 2, 1, true, 'PASS', '2022-01-05', '2023-05-09', NOW(), NOW(), NULL, NULL), -- Expired
+(1, 288, 2, 1, true, 'PASS', '2022-01-05', '2022-04-23', NOW(), NOW(), NULL, NULL), -- Expired
+(1, 289, 2, 1, true, 'PASS', '2023-05-10', NULL, NOW(), NOW(), NULL, NULL), -- Unexpired
+(1, 289, 2, 1, true, 'PASS', '2023-05-09', NULL, NOW(), NOW(), NULL, NULL), -- Unexpired
+(1, 289, 2, 1, true, 'PASS', '2023-05-06', NULL, NOW(), NOW(), NULL, NULL), -- Unexpired
+(1, 289, 2, 1, true, 'PASS', '2023-05-05', NULL, NOW(), NOW(), NULL, NULL), -- Expired
+(1, 289, 2, 1, true, 'PASS', '2023-05-01', NULL, NOW(), NOW(), NULL, NULL); -- Expired
+
+-- (user_id, attainment_id, ..., grade, ..., ..., date, expiry_date)

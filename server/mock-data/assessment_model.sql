@@ -54,4 +54,5 @@ INSERT INTO public.assessment_model (course_id, name, created_at, updated_at) VA
 (2, 'ID 49 - calculate new grades for a student', NOW(), NOW()),
 (2, 'ID 50 - multiple final grade options', NOW(), NOW()),
 (2, 'ID 51 - upload failing grade', NOW(), NOW()),
-(6, 'model 52 - test final grades, filter exported', NOW(), NOW());
+(6, 'model 52 - test final grades, filter exported', NOW(), NOW()),
+(2, 'ID 53 - test grade expiry', NOW(), NOW());
