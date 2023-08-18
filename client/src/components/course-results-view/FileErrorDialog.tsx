@@ -4,6 +4,7 @@
 
 import { Button, Dialog, DialogActions, DialogContent } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { JSX } from 'react';
 
 const gridColumns: Array<GridColDef> = [{
   field: 'error',

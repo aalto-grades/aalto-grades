@@ -4,7 +4,7 @@
 
 import { AttainmentData, FormulaData } from 'aalto-grades-common/types';
 import { Box, Button, Paper, TextField, Typography } from '@mui/material';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, JSX, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 
@@ -277,6 +277,16 @@ export default function LeafAttainment(props: {
           subject={'sub study attainment'}
           handleClose={handleConfirmationDialogClose}
           open={openConfirmationDialog}
+          cannotBeUndone={
+            Boolean(
+              (modification === 'create') || (modification === 'edit' && (
+                // This is the root attainment
+                (props.attainment === props.attainmentTree) ||
+                // Or this attainment is not in the database
+                (props.attainment.id && props.attainment.id < 0)
+              ))
+            )
+          }
         />
         {
           <Button

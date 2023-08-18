@@ -6,7 +6,7 @@ import { Alert as MuiAlert, Slide, Snackbar, Theme, Typography } from '@mui/mate
 import { AlertProps } from '@mui/material/Alert';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import {
-  ForwardedRef, forwardRef, ForwardRefExoticComponent, RefAttributes, SyntheticEvent
+  ForwardedRef, forwardRef, ForwardRefExoticComponent, JSX, RefAttributes, SyntheticEvent
 } from 'react';
 
 import { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';

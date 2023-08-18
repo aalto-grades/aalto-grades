@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { Box, Typography } from '@mui/material';
+import { JSX } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function NotFound(): JSX.Element {

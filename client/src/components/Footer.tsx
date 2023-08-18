@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { Box, Link, Tooltip } from '@mui/material';
+import { JSX } from 'react';
 
 export default function Footer(): JSX.Element {
   return (

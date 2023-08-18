@@ -13,7 +13,7 @@ import {
   Avatar, Box, Button, CircularProgress, Container, IconButton,
   List, ListItem, ListItemAvatar, ListItemText, MenuItem, TextField, Typography
 } from '@mui/material';
-import { ChangeEvent, HTMLInputTypeAttribute, useState } from 'react';
+import { JSX, ChangeEvent, HTMLInputTypeAttribute, useState } from 'react';
 import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 import * as yup from 'yup';
