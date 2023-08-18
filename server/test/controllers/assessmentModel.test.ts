@@ -222,5 +222,24 @@ describe(
         expect(res.body.data).not.toBeDefined();
       }
     );
+
+    it('should respond with 409 Conflict, if course already has assessment model with same name',
+      async () => {
+        const res: supertest.Response = await request
+          .post('/v1/courses/1/assessment-models')
+          .send({
+            name: 'new-model-1'
+          })
+          .set('Content-Type', 'application/json')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Conflict);
+
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors[0]).toBe(
+          'Assessment model with name \'new-model-1\' already exists in course ID 1');
+        expect(res.body.data).not.toBeDefined();
+      }
+    );
   }
 );
