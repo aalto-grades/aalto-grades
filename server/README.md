@@ -85,22 +85,6 @@ Those state transitions are saved in migration files, which describe
 how to get to the new state and how to revert the changes in order
 to get back to the old state.
 
-Migration files are placed in `/src/database/migrations`.
-Migration files are named with ascending numbering and name describing
-the actions migration does to the database state. For an example:
-```
-001-initial-migration.ts
-002-add-indexes.ts
-```
-
-Migrations utilize the Sequelize [Command Line Interface](https://github.com/sequelize/cli).
-The database which CLI will connect is defined in `/src/configs/database.ts`,
-more information on options [here](https://github.com/sequelize/cli/blob/main/docs/README.md).
-Detailed information about migrations in the Sequelize
-[documentation](https://sequelize.org/docs/v6/other-topics/migrations/).
-
-Migration, seeder, config and model paths are defined in `.sequelizerc`.
-
 Run database migrations all the way to latest one:
 ```
 $ npm run migration:up
@@ -114,6 +98,68 @@ $ npm run migration:down
 Run all migrations down:
 ```
 $ npm run migration:down:all
+```
+
+Migrations utilize the Sequelize [Command Line Interface](https://github.com/sequelize/cli).
+The database which CLI will connect is defined in `/src/configs/database.ts`,
+more information on options [here](https://github.com/sequelize/cli/blob/main/docs/README.md).
+Detailed information about migrations in the Sequelize
+[documentation](https://sequelize.org/docs/v6/other-topics/migrations/).
+
+Migration, seeder, config and model paths are defined in `.sequelizerc`.
+
+Migration files are placed in `/src/database/migrations`.
+Migration files are named with ascending numbering and name describing
+the actions migration does to the database state. For an example:
+```
+00001-initial-migration.ts
+00002-add-indexes.ts
+```
+
+Use the example below as a template for creating new migration.
+`up` property should run the new migration to the database, `down` property
+should undo the changes `up` creates.
+
+```typescript
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
+import { QueryInterface, Transaction } from 'sequelize';
+
+import logger from '../../configs/winston';
+
+export default {
+  up: async (queryInterface: QueryInterface): Promise<void> => {
+    // Use transactions if running multiple changes to the database in one migration.
+    const transaction: Transaction = await queryInterface.sequelize.transaction();
+    try {
+      await queryInterface.addColumn(
+        'table_name', 'column_name',
+        { type: DataTypes.INTEGER, allowNull: false },
+        { transaction }
+      );
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      logger.error(error);
+    }
+  },
+  down: async (queryInterface: QueryInterface): Promise<void> => {
+    const transaction: Transaction = await queryInterface.sequelize.transaction();
+    try {
+      await queryInterface.removeColumn(
+        'table_name', 'column_name', { transaction }
+      );
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      logger.error(error);
+    }
+  },
+};
 ```
 
 ## Seeds
