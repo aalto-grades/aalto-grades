@@ -114,6 +114,8 @@ async function addLicenses() {
         };
 
         function addLicenseData(id, url) {
+          // MIT can be ignored because it is already listed manually since it
+          // is the license of Aalto Grades itself
           if (id !== 'MIT' && !licenseData.idSet.has(id)) {
             licenseData.idSet.add(id);
             licenseData.urlMap.set(id, url);
