@@ -1,0 +1,16 @@
+{
+  "//": [
+    "This file contains a list of known free licenses as defined by the FSF",
+    "which are not recognized by LibreJS and not listed as FSF approved in",
+    "the SPDX license list despite being free.",
+
+    "IMPORTANT: being open source as defined by the OSI is NOT ENOUGH to",
+    "qualify as being free."
+  ],
+  "licenses": [
+    {
+      "id": "0BSD",
+      "url": "https://spdx.org/licenses/0BSD.html"
+    }
+  ]
+}
