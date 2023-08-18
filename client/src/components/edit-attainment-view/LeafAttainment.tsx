@@ -278,8 +278,14 @@ export default function LeafAttainment(props: {
           handleClose={handleConfirmationDialogClose}
           open={openConfirmationDialog}
           cannotBeUndone={
-            (modification === 'edit' && props.attainment === props.attainmentTree) ||
-            (modification === 'create' && props.attainment !== props.attainmentTree)
+            Boolean(
+              (modification === 'create') || (modification === 'edit' && (
+                // This is the root attainment
+                (props.attainment === props.attainmentTree) ||
+                // Or this attainment is not in the database
+                (props.attainment.id && props.attainment.id < 0)
+              ))
+            )
           }
         />
         {
