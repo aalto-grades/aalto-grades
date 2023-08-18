@@ -8,7 +8,7 @@ import {
   Box, Button, Dialog, DialogContent, DialogTitle, InputLabel,
   MenuItem, Select, SelectChangeEvent, TextField, Typography
 } from '@mui/material';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, JSX, useEffect, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 import * as yup from 'yup';
 

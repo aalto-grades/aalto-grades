@@ -5,7 +5,7 @@
 import PersonIcon from '@mui/icons-material/Person';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { Button, Box, Menu, MenuItem } from '@mui/material';
-import { SyntheticEvent, useState } from 'react';
+import { JSX, SyntheticEvent, useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { UseMutationResult } from '@tanstack/react-query';
 

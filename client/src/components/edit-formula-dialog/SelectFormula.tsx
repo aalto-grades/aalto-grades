@@ -11,6 +11,7 @@ import {
   SelectChangeEvent, Typography
 } from '@mui/material';
 import { styled, Theme } from '@mui/material/styles';
+import { JSX } from 'react';
 import { UseQueryResult } from '@tanstack/react-query';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';

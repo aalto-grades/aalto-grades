@@ -4,7 +4,7 @@
 
 import { AttainmentData, FinalGrade } from 'aalto-grades-common/types';
 import { Box, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 
@@ -145,6 +145,7 @@ export default function CourseResultsView(): JSX.Element {
         selectedStudents={selectedStudents}
         setSelectedStudents={setSelectedStudents}
         hasPendingStudents={hasPendingStudents}
+        refetch={students.refetch}
       />
     </Box>
   );

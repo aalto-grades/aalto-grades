@@ -4,6 +4,7 @@
 
 import { CourseInstanceData } from 'aalto-grades-common/types';
 import { Box, Button , Container, Divider, Typography } from '@mui/material';
+import { JSX } from 'react';
 import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 

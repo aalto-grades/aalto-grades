@@ -7,7 +7,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Button, Menu, MenuItem } from '@mui/material';
 import { MenuProps } from '@mui/material/Menu';
 import { styled, Theme } from '@mui/material/styles';
-import { useState, SyntheticEvent } from 'react';
+import { JSX, useState, SyntheticEvent } from 'react';
 
 import { State } from '../../types';
 
