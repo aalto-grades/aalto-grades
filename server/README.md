@@ -116,12 +116,12 @@ the actions migration does to the database state. For an example:
 00002-add-indexes.ts
 ```
 
-Use the example below as a template for creating new migration.
-`up` property should run the new migration to the database, `down` property
+Use the example below as a template for creating new migrations.
+The `up` property should run the new migration to the database, the `down` property
 should undo the changes `up` creates.
 
 ```typescript
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: YYYY_REPLACE_WITH_CURRENT_YEAR The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
