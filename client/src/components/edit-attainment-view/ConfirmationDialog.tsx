@@ -27,8 +27,8 @@ export default function ConfirmationDialog(props: {
         <DialogContent>
           <DialogContentText>
             <Typography>
-              Are you sure you want to delete this {props.subject}
-              and all of the attainments below it?
+              Are you sure you want to delete this {props.subject} and all of
+              the attainments below it?
             </Typography>
             {(props.cannotBeUndone) && (
               <Typography sx={{ mt: 2 }}>
