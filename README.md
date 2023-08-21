@@ -32,8 +32,8 @@ https://nodejs.org/en/download/
 
 ### Docker
 
-You may also wish to run the system using [Docker](https://www.docker.com)/,
-in which case you must install Docker itself and Docker Compose.
+You may also wish to run the system using [Docker](https://www.docker.com), in
+which case you must install Docker itself and Docker Compose.
 
 Many GNU/Linux and BSD distributions contain packages for `docker` and
 `docker-compose`. You may need to configure Docker to use the remote registry
@@ -45,7 +45,7 @@ Windows and macOS users may install Docker and Docker Compose from:
 - https://www.docker.com/
 - https://docs.docker.com/compose/install/
 
-## Development build
+## Building and running
 
 You can run the development build of the whole Aalto Grades system, including
 the frontend, backend, and database, by running `docker-compose up` at the root
@@ -80,7 +80,7 @@ For instructions on running tests or individual parts of the system, see
 
 ## Demo virtual machine
 
-As one of the developers, in order to access the virtual machine for
+As a developers, in order to access the virtual machine for
 https://aalto-grades.cs.aalto.fi, you may do the following:
 
 1. Set up configuration for your Aalto access (only required when logging in
@@ -97,6 +97,10 @@ Host grades
 2. Log in using the provided configuration file (which uses your own SSH
    config as a base):
 
-```sh
+```
 $ ssh -F ssh.config grades
 ```
+
+## License
+
+Aalto Grades is free software released under the Expat (or "MIT") License.
