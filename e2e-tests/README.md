@@ -39,5 +39,5 @@ modified. In other words, you can omit the `--build` flag in subsequent runs onc
 the images have been built for the first time, unless you have modified the
 configuration outside the directory.
 
-Currently, the output of the test cases is only printed to stdout, i.e. no report
+Currently, the output of the test cases is only printed to stdout, i.e., no report
 files are generated.

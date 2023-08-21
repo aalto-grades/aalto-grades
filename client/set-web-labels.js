@@ -63,7 +63,7 @@ async function addLicenses() {
       addLicenseData(free.id, free.url);
     } else if (isUnknown) {
       console.error(
-        `${bold}Encountered unrecognized license: ${expr.license}`
+        `${bold}Encountered unrecognized license: ${license}`
         + `${reset}${helper}`
       );
     } else {
