@@ -10,7 +10,9 @@ export interface AttainmentGradeModelData {
   graderId?: number,
   grade: number,
   status: Status,
-  manual: boolean
+  manual: boolean,
+  date?: Date,
+  expiryDate?: Date
 }
 
 export interface StudentGrades {
