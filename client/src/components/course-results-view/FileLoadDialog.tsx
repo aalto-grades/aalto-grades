@@ -4,7 +4,7 @@
 
 import {
   Box, Button, Dialog, DialogActions, DialogContent,
-  DialogContentText, DialogTitle, FormHelperText, Typography
+  DialogContentText, DialogTitle, FormHelperText, TextField, Typography
 } from '@mui/material';
 import { ChangeEvent, createRef, JSX, RefObject, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
@@ -44,6 +44,11 @@ export default function FileLoadDialog(props: {
   // state variables handling the alert messages
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
   const [showErrorDialog, setShowErrorDialog]: State<boolean> = useState(false);
+  // state variables handling the completion and expiry date.
+  const [completionDate, setCompletionDate]: State<string | undefined> =
+    useState<string | undefined>(undefined);
+  const [expiryDate, setExpiryDate]: State<string | undefined> =
+    useState<string | undefined>(undefined);
 
   function toggleErrorDialog(): void {
     setShowErrorDialog(!showErrorDialog);
@@ -66,7 +71,11 @@ export default function FileLoadDialog(props: {
         {
           courseId: courseId,
           assessmentModelId: props.assessmentModelId,
-          csv: fileInput.current.files[0]
+          csv: fileInput.current.files[0],
+          params: {
+            completionDate,
+            expiryDate
+          }
         },
         {
           onSuccess: () => {
@@ -93,7 +102,7 @@ export default function FileLoadDialog(props: {
           </DialogContentText>
           <Box sx={{
             display: 'flex', justifyContent: 'flex-start',
-            alignItems: 'center', columnGap: 2, mb: 3
+            alignItems: 'center', columnGap: 2, mb: 5
           }}>
             <Typography variant='body2' sx={{ color: 'infoGrey' }}>
               {exampleText}
@@ -110,6 +119,34 @@ export default function FileLoadDialog(props: {
                 + 'and the third column is points from attainment C3I9A2.'}
               src="/Import-grades-file-example.jpg"
             />
+          </Box>
+          <Box sx={{ mr: 20 }}>
+            <Box sx={{ mb: 2 }}>
+              <TextField
+                id='select-grading-completion-date'
+                InputLabelProps={{ shrink: true }}
+                type='date'
+                fullWidth
+                label='Completion Date'
+                helperText='Completion date of the grade.'
+                onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+                  setCompletionDate(e.target.value);
+                }}
+              />
+            </Box>
+            <Box sx={{ mb: 2 }}>
+              <TextField
+                id='select-grading-expiry-date'
+                InputLabelProps={{ shrink: true }}
+                type='date'
+                fullWidth
+                label='Expiry Date'
+                helperText='Expiry date of the grade.'
+                onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+                  setExpiryDate(e.target.value);
+                }}
+              />
+            </Box>
           </Box>
           <Box sx={{
             display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start',

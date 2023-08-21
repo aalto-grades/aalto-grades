@@ -19,7 +19,7 @@ import { LanguageOption, State } from '../../types';
 
 // A Dialog component for downloading a Sisu grade CSV.
 const instructions: string =
-  'Set the completion language and assesment date for the grading, these values'
+  'Set the completion language and assessment date for the grading, these values'
   + ' are optional. Click download to download the grades.';
 
 // Available completion languages used in Sisu.
