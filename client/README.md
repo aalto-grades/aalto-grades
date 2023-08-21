@@ -6,9 +6,9 @@ SPDX-License-Identifier: MIT
 
 # Aalto Grades frontend
 
-## Running the Program
+## Running
 
-Install node modules:
+Install Node modules:
 ```
 $ npm ci
 ```
