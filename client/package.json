@@ -40,7 +40,7 @@
   },
   "scripts": {
     "start": "npm --prefix ../common run build && DISABLE_ESLINT_PLUGIN=true react-scripts start",
-    "build": "npm --prefix ../common run build && DISABLE_ESLINT_PLUGIN=true react-scripts build && node set-web-labels.js && npx license-checker-rseidelsohn --excludePrivatePackages --production --plainVertical > build/licenses.txt",
+    "build": "./build.sh",
     "test": "DISABLE_ESLINT_PLUGIN=true react-scripts test",
     "eject": "react-scripts eject",
     "lint": "npx eslint `find . -name '*.tsx' -not -path './node_modules/*'`",
