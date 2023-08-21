@@ -90,7 +90,5 @@ jobs:
         working-directory: ./e2e-tests
     steps:
       - uses: actions/checkout@v3
-      # - name: Set permissions
-        # run: chmod -R 777 .
       - name: Run tests
         run: docker-compose up --build --abort-on-container-exit --exit-code-from cypress
