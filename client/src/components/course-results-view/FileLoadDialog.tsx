@@ -6,7 +6,7 @@ import {
   Box, Button, Dialog, DialogActions, DialogContent,
   DialogContentText, DialogTitle, FormHelperText, Typography
 } from '@mui/material';
-import { ChangeEvent, createRef, RefObject, useState } from 'react';
+import { ChangeEvent, createRef, JSX, RefObject, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';

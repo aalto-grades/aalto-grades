@@ -6,6 +6,7 @@ import { CourseData } from 'aalto-grades-common/types';
 import {
   Link, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Typography
 } from '@mui/material';
+import { JSX } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 import { HeadCellData } from '../../types';

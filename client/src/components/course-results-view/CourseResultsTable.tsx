@@ -25,7 +25,8 @@ export default function CourseResultsTable(props: {
   loading: boolean,
   selectedStudents: Array<FinalGrade>,
   setSelectedStudents: (students: Array<FinalGrade>) => void,
-  hasPendingStudents: boolean
+  hasPendingStudents: boolean,
+  refetch: () => void
 }): JSX.Element {
 
   const [order, setOrder]: State<'asc' | 'desc'> = useState<'asc' | 'desc'> ('asc');
@@ -102,6 +103,7 @@ export default function CourseResultsTable(props: {
           downloadCsvTemplate={props.downloadCsvTemplate}
           selectedStudents={props.selectedStudents}
           hasPendingStudents={props.hasPendingStudents}
+          refetch={props.refetch}
         />
         {
           (props.loading) ? (

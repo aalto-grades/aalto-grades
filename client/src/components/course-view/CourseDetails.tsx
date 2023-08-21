@@ -6,6 +6,7 @@ import {
   AssessmentModelData, CourseData, Language, SystemRole, UserData
 } from 'aalto-grades-common/types';
 import { Box, Button, Tooltip, Typography } from '@mui/material';
+import { JSX } from 'react';
 
 import AssessmentModelsList from './AssessmentModelsList';
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';

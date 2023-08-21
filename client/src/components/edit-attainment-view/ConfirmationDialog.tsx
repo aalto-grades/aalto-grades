@@ -4,8 +4,10 @@
 
 import { AttainmentData } from 'aalto-grades-common/types';
 import {
-  Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
+  Box, Button, Dialog, DialogActions,
+  DialogContent, DialogContentText, DialogTitle, Typography
 } from '@mui/material';
+import { JSX } from 'react';
 
 // A Dialog component for confirming deletion
 
@@ -15,7 +17,8 @@ export default function ConfirmationDialog(props: {
   title: string,
   subject: string,
   handleClose: () => void,
-  open: boolean
+  open: boolean,
+  cannotBeUndone?: boolean
 }): JSX.Element {
   return (
     <Dialog open={props.open}>
@@ -23,8 +26,15 @@ export default function ConfirmationDialog(props: {
         <DialogTitle >Delete {props.title}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-          Are you sure you want to delete this {props.subject} and all of the attainments below it?
-          This action cannot be undone.
+            <Typography>
+              Are you sure you want to delete this {props.subject} and all of
+              the attainments below it?
+            </Typography>
+            {(props.cannotBeUndone) && (
+              <Typography sx={{ mt: 2 }}>
+                This action cannot be undone.
+              </Typography>
+            )}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

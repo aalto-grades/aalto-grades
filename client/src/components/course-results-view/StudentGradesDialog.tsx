@@ -7,7 +7,7 @@ import {
   Box, Button, CircularProgress, Dialog,
   DialogActions, DialogContent, DialogTitle, Typography
 } from '@mui/material';
-import { useState } from 'react';
+import { JSX, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 
