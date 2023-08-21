@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+
+*.log
+cypress/screenshots
+cypress/videos
+cypress/logs
+cypress/downloads
+cypress/results
