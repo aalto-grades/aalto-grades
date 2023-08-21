@@ -430,6 +430,22 @@ router.get(
  *     parameters:
  *       - $ref: '#/components/parameters/courseId'
  *       - $ref: '#/components/parameters/assessmentModelId'
+ *       - in: query
+ *         name: completionDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         required: false
+ *         description: Completion date for the grades.
+ *         example: 2022-9-22
+ *       - in: query
+ *         name: expiryDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         required: false
+ *         description: Expiry date for the grades.
+ *         example: 2022-9-25
  *     requestBody:
  *       content:
  *         multipart/form-data:
