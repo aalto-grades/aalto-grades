@@ -10,6 +10,7 @@ Files:
  client/license-exceptions.json
  client/.env
  common/package.json
+ e2e-tests/package*.json
  server/package*.json
  server/pgAdminpass
  server/pgAdminSetup.json
@@ -26,7 +27,3 @@ Comment:
  These files are based on GitHub's default bug report and feature request issue
  templates, which appear to be in the public domain. Any modifications are
  licensed under the Expat (MIT) License.
-
-Files: robot-tests/seccomp_profile.json
-Copyright: Microsoft
-License: Apache-2.0
