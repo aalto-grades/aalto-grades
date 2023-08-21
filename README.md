@@ -6,7 +6,17 @@ SPDX-License-Identifier: MIT
 
 # Aalto Grades
 
-Repository for the Aalto Grades program.
+Aalto Grades is a grade/point management system for storing the grades of
+students to assigned tasks (attainments) during courses and using these grades
+to calculate their final course grades which can be exported to an external
+system.
+
+Attainments can be arbitrarily defined by a teacher and may typically include,
+for example, an exam, a set of exercises, or a course project. Attainments are
+stored in a tree structure, so each attainment may contain any number of
+children. For example, an attainment called "A+ exercises" may include the
+subattainment "Round 1," which in turn may have the subattainments
+"Round 1 exercise 1" and "Round 1 exercise 2."
 
 ## Getting started
 
@@ -17,10 +27,23 @@ Most major GNU/Linux and BSD distributions contain packages for Node.js and
 npm. You can find a list of some common distributions and their Node.js and npm
 packages at: https://nodejs.org/en/download/package-manager/
 
-Windows and macOS users can install Node.js from:
+Windows and macOS users can install Node.js and npm from:
 https://nodejs.org/en/download/
 
-For more instructions, see `client/README.md` and `server/README.md`.
+### Docker
+
+You may also wish to run the system using [Docker](https://www.docker.com)/,
+in which case you must install Docker itself and Docker Compose.
+
+Many GNU/Linux and BSD distributions contain packages for `docker` and
+`docker-compose`. You may need to configure Docker to use the remote registry
+`https://registry.hub.docker.com` before being able to run Aalto Grades, if it
+is not already preconfigured. Note that the registry and its containers can
+include *proprietary software*, so use it at your own discretion.
+
+Windows and macOS users may install Docker and Docker Compose from:
+- https://www.docker.com/
+- https://docs.docker.com/compose/install/
 
 ## Development build
 
@@ -52,13 +75,16 @@ username: teacher@aalto.fi
 password: password
 ```
 
-## Development environment
+For instructions on running tests or individual parts of the system, see
+`client/README.md`, `server/README.md`, and `e2e-tests/REAMDE.md`.
 
-As one of the developers: in order to access the development environment, you
-may do the following.
+## Demo virtual machine
+
+As one of the developers, in order to access the virtual machine for
+https://aalto-grades.cs.aalto.fi, you may do the following:
 
 1. Set up configuration for your Aalto access (only required when logging in
-for the first time):
+   for the first time):
 
 ```ssh
 # ~/.ssh/config
@@ -69,22 +95,8 @@ Host grades
 ```
 
 2. Log in using the provided configuration file (which uses your own SSH
-config as a base):
+   config as a base):
 
 ```sh
 $ ssh -F ssh.config grades
 ```
-
-3. Ensure that the Docker model is running:
-
-```
-@aalto-grades$ cd /srv/aalto-grades
-@aalto-grades$ sudo docker-compose top
-# if not running:
-@aalto-grades$ sudo docker-compose up
-```
-
-4. Now, the dev environment services can be accessed from your local computer:
-  - Backend is at `localhost:3000`
-  -	Frontend is at `localhost:3005`
-  -	Adminer is at `localhost:8080`
