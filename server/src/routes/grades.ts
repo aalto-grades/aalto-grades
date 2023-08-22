@@ -435,7 +435,7 @@ router.get(
  *         schema:
  *           type: string
  *           format: date
- *         required: false
+ *         required: true
  *         description: Completion date for the grades.
  *         example: 2022-9-22
  *       - in: query

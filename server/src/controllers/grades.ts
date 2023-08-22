@@ -761,14 +761,14 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     completionDate: yup
       .date()
-      .notRequired(),
+      .required(),
     expiryDate: yup
       .date()
       .notRequired()
   });
 
   const { completionDate, expiryDate }: {
-    completionDate?: Date,
+    completionDate: Date,
     expiryDate?: Date
   } = await requestSchema.validate(req.body, { abortEarly: false });
 
