@@ -84,12 +84,20 @@ export default function FileLoadDialog(props: {
                 + ' To refresh final grades, press "calculate final grades"',
               severity: 'success'
             });
-            props.handleClose();
-            setFileName(null);
+            reset();
           }
         }
       );
     }
+  }
+
+  function reset(): void {
+    props.handleClose();
+    setFileName(null);
+    setValidationError('');
+    setFileErrors([]);
+    setCompletionDate(undefined);
+    setExpiryDate(undefined);
   }
 
   return (
@@ -127,7 +135,7 @@ export default function FileLoadDialog(props: {
                 InputLabelProps={{ shrink: true }}
                 type='date'
                 fullWidth
-                label='Completion Date'
+                label='Completion Date*'
                 helperText='Completion date of the grade.'
                 onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
                   setCompletionDate(e.target.value);
@@ -222,10 +230,7 @@ export default function FileLoadDialog(props: {
             size='medium'
             variant='outlined'
             onClick={(): void => {
-              props.handleClose();
-              setFileName(null);
-              setValidationError('');
-              setFileErrors([]);
+              reset();
             }}
           >
             Cancel
@@ -237,6 +242,9 @@ export default function FileLoadDialog(props: {
             onClick={(): void => {
               if (!fileName) {
                 setValidationError('You must select a CSV file to submit');
+                return;
+              } else if (!completionDate) {
+                setValidationError('Completion date is required');
                 return;
               }
               uploadFile();
