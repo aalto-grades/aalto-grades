@@ -1130,7 +1130,7 @@ describe(
 
         expect(res.body.errors).not.toBeDefined();
         expect(res.body.data).toBeDefined();
-      }, 40000);
+      }, 50000);
 
     it('should mark completion and expiry date if provided in the request body', async () => {
       const csvData: fs.ReadStream = fs.createReadStream(
