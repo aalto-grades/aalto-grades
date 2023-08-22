@@ -765,7 +765,23 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
     expiryDate: yup
       .date()
       .notRequired()
-  });
+  }).test(
+    (value: {
+      completionDate: yup.Maybe<Date>,
+      expiryDate?: yup.Maybe<Date | undefined>
+    }) => {
+      if (
+        value.completionDate && value.expiryDate &&
+        value.completionDate.getTime() > value.expiryDate.getTime()
+      ) {
+        throw new ApiError(
+          'Expiry date cannot be before completion date',
+          HttpCode.BadRequest
+        );
+      }
+      return true;
+    }
+  );
 
   const { completionDate, expiryDate }: {
     completionDate: Date,

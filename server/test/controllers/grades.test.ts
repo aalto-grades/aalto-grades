@@ -1123,6 +1123,7 @@ describe(
           .post('/v1/courses/6/assessment-models/9/grades/csv')
           .attach('csv_data', csvData, { contentType: 'text/csv' })
           .field('completionDate', '2023-12-24')
+          .field('expiryDate', '2023-12-24')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
@@ -1176,6 +1177,25 @@ describe(
 
         checkErrorRes(
           ['No attainments found from the header, please upload valid CSV.'], HttpCode.BadRequest
+        );
+      });
+
+    it(
+      'should respond with 400 bad request, if the expiry date is before completion date',
+      async () => {
+        const csvData: fs.ReadStream = fs.createReadStream(
+          path.resolve(__dirname, '../mock-data/csv/grades.csv'), 'utf8'
+        );
+        res = await request
+          .post('/v1/courses/1/assessment-models/1/grades/csv')
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .field('completionDate', '2023-12-24')
+          .field('expiryDate', '2023-12-23')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json');
+
+        checkErrorRes(
+          ['Expiry date cannot be before completion date.'], HttpCode.BadRequest
         );
       });
 
