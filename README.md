@@ -85,7 +85,7 @@ Teacher user credentials:
 - Password: `password`
 
 For instructions on running tests or individual parts of the system, see the
-REAMDE file of the corresponding directory, such as `client/README.md` and
+README file of the corresponding directory, such as `client/README.md` and
 `server/README.md`.
 
 ## License
