@@ -194,6 +194,12 @@ router.get(
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/Failure'
+ *       409:
+ *         description: Assessment model with same name already exists on the Course.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/Failure'
  *     security:
  *       - cookieAuth: []
  */
