@@ -775,7 +775,7 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         value.completionDate.getTime() > value.expiryDate.getTime()
       ) {
         throw new ApiError(
-          'Expiry date cannot be before completion date',
+          'Expiry date cannot be before completion date.',
           HttpCode.BadRequest
         );
       }

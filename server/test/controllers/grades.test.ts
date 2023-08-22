@@ -1192,11 +1192,11 @@ describe(
           .field('completionDate', '2023-12-24')
           .field('expiryDate', '2023-12-23')
           .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json');
+          .set('Accept', 'application/json')
+          .expect(HttpCode.BadRequest);
 
-        checkErrorRes(
-          ['Expiry date cannot be before completion date.'], HttpCode.BadRequest
-        );
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors[0]).toBe('Expiry date cannot be before completion date.');
       });
 
     it(
