@@ -136,7 +136,7 @@ export default function FileLoadDialog(props: {
                 type='date'
                 fullWidth
                 label='Completion Date*'
-                helperText='Completion date of the grade.'
+                helperText='Completion date of the grades.'
                 onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
                   setCompletionDate(e.target.value);
                 }}
@@ -149,7 +149,7 @@ export default function FileLoadDialog(props: {
                 type='date'
                 fullWidth
                 label='Expiry Date'
-                helperText='Expiry date of the grade.'
+                helperText='Expiry date of the grades.'
                 onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
                   setExpiryDate(e.target.value);
                 }}
