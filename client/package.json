@@ -39,9 +39,9 @@
     "yup": "^1.2.0"
   },
   "scripts": {
-    "start": "npm --prefix ../common run build && react-scripts start",
-    "build": "npm --prefix ../common run build && react-scripts build && node set-web-labels.js && npx license-checker-rseidelsohn --excludePrivatePackages --production --plainVertical > build/licenses.txt",
-    "test": "react-scripts test",
+    "start": "npm --prefix ../common run build && DISABLE_ESLINT_PLUGIN=true react-scripts start",
+    "build": "./build.sh",
+    "test": "DISABLE_ESLINT_PLUGIN=true react-scripts test",
     "eject": "react-scripts eject",
     "lint": "npx eslint `find . -name '*.tsx' -not -path './node_modules/*'`",
     "lint:fix": "npx eslint `find . -name '*.tsx' -not -path './node_modules/*'` --fix",

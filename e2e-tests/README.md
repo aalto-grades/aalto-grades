@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 SPDX-License-Identifier: MIT
 -->
 
-## Cypress end-to-end testing
+# Cypress end-to-end tests
 
 This end-to-end testing is implemented utilizing the Cypress framework.
 
