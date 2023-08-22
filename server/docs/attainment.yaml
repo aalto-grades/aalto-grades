@@ -73,7 +73,7 @@ definitions:
       - $ref: '#/definitions/AddAndEditAttainment'
 
 /v1/courses/{courseId}/assessment-models/{assessmentModelId}/attainments:
- get:
+  get:
     tags: [Attainment]
     description: Get the root attainment of the assessment model or subtree downwards.
     parameters:
@@ -171,7 +171,7 @@ definitions:
       - cookieAuth: []
 
 /v1/courses/{courseId}/assessment-models/{assessmentModelId}/attainments/{attainmentId}:
- get:
+  get:
     tags: [Attainment]
     description: Get a single attainment or subtree downwards.
     parameters:

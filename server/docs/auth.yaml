@@ -138,7 +138,7 @@ definitions:
     description: >
       Log out of a session, requesting the browser to remove
       its session JWT token.
- *
+
       Note that this does not explicitly invalidate any existing JWT tokens
       for that user, at the moment.
     responses:

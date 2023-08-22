@@ -166,6 +166,81 @@ definitions:
           application/json:
             schema:
               $ref: '#/definitions/Failure'
+  post:
+    tags: [Grades]
+    description: >
+      Add attainment grades for users in a particular assessment model.
+      Attainment grading data is provided in a CSV file. When sending data,
+      set the **Content-Type** header as **multipart/form-data** and the
+      file name as "csv_data". Example CSV files available
+      [here](https://github.com/aalto-grades/base-repository/tree/main/server/test/mock-data/csv)
+      Available only to admin users and teachers in charge of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+      - $ref: '#/components/parameters/assessmentModelId'
+    requestBody:
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              csv_data:
+                type: string
+                format: binary
+    responses:
+      200:
+        description: Grading CSV uploaded and parsed succesfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  description: Empty data object.
+                  type: object
+      400:
+        description: A validation or parsing error with the CSV has occurred.
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/Failure'
+      401:
+        $ref: '#/components/responses/AuthenticationError'
+      403:
+        description: >
+          The requester is not authorized to add grading data
+          to the course instance (not teacher in the course).
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/Failure'
+      404:
+        description: >
+          A course or assessment model with the given ID was not found.
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/Failure'
+      409:
+        description: >
+          Assessment model does not belong to the course or attainment does
+          not belong to the assessment model. User with course role
+          'TEACHER' or 'TEACHER_IN_CHARGE' listed in the grading data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/Failure'
+      422:
+        description: >
+          At least one of the attainments listed in the CSV file was not
+          found with the given ID or does not belong to the assessment model
+          to which the grading data is being imported.
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/Failure'
+    security:
+      - cookieAuth: []
 
 /v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/csv/sisu:
   get:
@@ -341,83 +416,6 @@ definitions:
           application/json:
             schema:
               $ref: '#/definitions/Failure'
-
-/v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/csv:
-  post:
-    tags: [Grades]
-    description: >
-      Add attainment grades for users in a particular assessment model.
-      Attainment grading data is provided in a CSV file. When sending data,
-      set the **Content-Type** header as **multipart/form-data** and the
-      file name as "csv_data". Example CSV files available
-      [here](https://github.com/aalto-grades/base-repository/tree/main/server/test/mock-data/csv)
-      Available only to admin users and teachers in charge of the course.
-    parameters:
-      - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/assessmentModelId'
-    requestBody:
-      content:
-        multipart/form-data:
-          schema:
-            type: object
-            properties:
-              csv_data:
-                type: string
-                format: binary
-    responses:
-      200:
-        description: Grading CSV uploaded and parsed succesfully.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                data:
-                  description: Empty data object.
-                  type: object
-      400:
-        description: A validation or parsing error with the CSV has occurred.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-      401:
-        $ref: '#/components/responses/AuthenticationError'
-      403:
-        description: >
-          The requester is not authorized to add grading data
-          to the course instance (not teacher in the course).
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-      404:
-        description: >
-          A course or assessment model with the given ID was not found.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-      409:
-        description: >
-          Assessment model does not belong to the course or attainment does
-          not belong to the assessment model. User with course role
-          'TEACHER' or 'TEACHER_IN_CHARGE' listed in the grading data.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-      422:
-        description: >
-          At least one of the attainments listed in the CSV file was not
-          found with the given ID or does not belong to the assessment model
-          to which the grading data is being imported.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-    security:
-      - cookieAuth: []
 
 /v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/calculate:
   post:
