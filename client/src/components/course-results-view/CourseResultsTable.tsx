@@ -14,8 +14,8 @@ import CourseResultsTableRow from './CourseResultsTableRow';
 import CourseResultsTableToolbar from './CourseResultsTableToolbar';
 import StudentGradesDialog from './StudentGradesDialog';
 
-import { getComparator, stableSort } from '../../services/sorting';
 import { State } from '../../types';
+import { getComparator, stableSort } from '../../utils/sorting';
 
 export default function CourseResultsTable(props: {
   students: Array<FinalGrade>,
