@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 Aalto Grades is a grade/point management system for storing the grades of
 students to assigned tasks (attainments) during courses and using these grades
 to calculate their final course grades which can be exported to an external
-system.
+system for tracking course completion.
 
 Attainments can be arbitrarily defined by a teacher and may typically include,
 for example, an exam, a set of exercises, or a course project. Attainments are
@@ -29,6 +29,9 @@ packages at: https://nodejs.org/en/download/package-manager/
 
 Windows and macOS users can install Node.js and npm from:
 https://nodejs.org/en/download/
+
+For more documentation, please see the
+[wiki](https://github.com/aalto-grades/base-repository/wiki).
 
 ### Docker
 
@@ -77,29 +80,6 @@ password: password
 
 For instructions on running tests or individual parts of the system, see
 `client/README.md`, `server/README.md`, and `e2e-tests/REAMDE.md`.
-
-## Demo virtual machine
-
-As a developers, in order to access the virtual machine for
-https://aalto-grades.cs.aalto.fi, you may do the following:
-
-1. Set up configuration for your Aalto access (only required when logging in
-   for the first time):
-
-```ssh
-# ~/.ssh/config
-Host kosh
-  User myaaltousername # REPLACE
-Host grades
-  User myaaltousername # REPLACE
-```
-
-2. Log in using the provided configuration file (which uses your own SSH
-   config as a base):
-
-```
-$ ssh -F ssh.config grades
-```
 
 ## License
 
