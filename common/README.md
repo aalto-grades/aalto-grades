@@ -16,7 +16,7 @@ will be symlinked to `client/node_modules` or `server/node_modules` as
 Building this module is included as a step in the frontend and backend build
 commands.
 
-The build command for this module is:
+To build this module on its own, simply run:
 ```
 $ npm run build
 ```

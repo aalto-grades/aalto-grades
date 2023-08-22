@@ -30,7 +30,8 @@ packages at: https://nodejs.org/en/download/package-manager/
 Windows and macOS users can install Node.js and npm from:
 https://nodejs.org/en/download/
 
-For more documentation, please see the
+The README files of this repository primarily contain instructions for running
+Aalto Grades and its tests. For more documentation, please see the
 [wiki](https://github.com/aalto-grades/base-repository/wiki).
 
 ### Docker
@@ -76,16 +77,12 @@ user accounts for this purpose. There are two such accounts, an admin account
 and a teacher account.
 
 Admin user credentials:
-```
-username: admin@aalto.fi
-password: password
-```
+- Email: `admin@aalto.fi`
+- Password: `password`
 
 Teacher user credentials:
-```
-username: teacher@aalto.fi
-password: password
-```
+- Email: `teacher@aalto.fi`
+- Password: `password`
 
 For instructions on running tests or individual parts of the system, see the
 REAMDE file of the corresponding directory, such as `client/README.md` and
