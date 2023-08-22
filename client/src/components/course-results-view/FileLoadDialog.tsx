@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  Box, Button, Dialog, DialogActions, DialogContent,
+  Accordion, AccordionDetails, AccordionSummary, Box,
+  Button, Container, Dialog, DialogActions, DialogContent,
   DialogContentText, DialogTitle, FormHelperText, TextField, Typography
 } from '@mui/material';
 import { ChangeEvent, createRef, JSX, RefObject, useState } from 'react';
@@ -12,6 +13,7 @@ import { Params, useParams } from 'react-router-dom';
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import FileErrorDialog from './FileErrorDialog';
 
+import { HoverExpandMoreIcon } from '../edit-formula-dialog/SelectFormula';
 import { useUploadGradeCsv, UseUploadGradeCsvResult } from '../../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import { State } from '../../types';
@@ -128,7 +130,7 @@ export default function FileLoadDialog(props: {
               src="/Import-grades-file-example.jpg"
             />
           </Box>
-          <Box sx={{ mr: 20 }}>
+          <Box sx={{ mr: 25 }}>
             <Box sx={{ mb: 2 }}>
               <TextField
                 id='select-grading-completion-date'
@@ -142,19 +144,37 @@ export default function FileLoadDialog(props: {
                 }}
               />
             </Box>
-            <Box sx={{ mb: 2 }}>
-              <TextField
-                id='select-grading-expiry-date'
-                InputLabelProps={{ shrink: true }}
-                type='date'
-                fullWidth
-                label='Expiry Date'
-                helperText='Expiry date of the grades.'
-                onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
-                  setExpiryDate(e.target.value);
-                }}
-              />
-            </Box>
+            <Accordion sx={{ boxShadow: 'none', mb: 2 }}>
+              <AccordionSummary
+                expandIcon={<HoverExpandMoreIcon />}
+                aria-controls="expiry-panel-content"
+                id="expiry-panel-header"
+                sx={{ pl: 1 }}
+              >
+                <Typography>Set grade expiry date (optional)</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ p: '10px' }}>
+                <Container sx={{ overflowX: 'scroll' }}>
+                  <Box sx={{ my: 1 }}>
+                    <Typography variant='body2' sx={{ mb: 3 }}>
+                      Note. Manually setting an expiry date for the grades
+                      will override the &apos;days valid&apos; value of the grades.
+                    </Typography>
+                    <TextField
+                      id='select-grading-expiry-date'
+                      InputLabelProps={{ shrink: true }}
+                      type='date'
+                      fullWidth
+                      label='Expiry Date'
+                      helperText='Expiry date of the grades.'
+                      onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+                        setExpiryDate(e.target.value);
+                      }}
+                    />
+                  </Box>
+                </Container>
+              </AccordionDetails>
+            </Accordion>
           </Box>
           <Box sx={{
             display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start',
