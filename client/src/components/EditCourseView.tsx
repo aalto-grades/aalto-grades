@@ -27,8 +27,8 @@ import {
   useEditCourse, UseEditCourseResult,
   useGetCourse
 } from '../hooks/useApi';
-import { convertToClientGradingScale } from '../services/textFormat';
 import { LanguageOption, State } from '../types';
+import { convertToClientGradingScale } from '../utils/textFormat';
 
 interface FormData {
   courseCode: string,

@@ -13,8 +13,8 @@ import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 
 import { languageOptions } from '../course-results-view/SisuDownloadDialog';
 import useAuth, { AuthContextType } from '../../hooks/useAuth';
-import { convertToClientGradingScale } from '../../services/textFormat';
 import { LanguageOption } from '../../types';
+import { convertToClientGradingScale } from '../../utils/textFormat';
 
 export default function CourseDetails(props: {
   course: CourseData,
