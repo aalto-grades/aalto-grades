@@ -48,6 +48,15 @@ Windows and macOS users may install Docker and Docker Compose from:
 - https://www.docker.com/
 - https://docs.docker.com/compose/install/
 
+When using Docker to run the system, in order to speed up repeated startups of
+the system, you may define the environment variables `CLIENT_SKIP_NPM_CI` and
+`SERVER_SKIP_NPM_CI` to skip running `npm ci` each time in the build process
+of the frontend and backend respectively. You will need to manually run
+`npm ci` once in the corresponding directory, and then after setting the
+environment variables, the `node_modules` you already fetched will be copied to
+the containers. Setting the value of the variables to `1` is treated as
+enabling the functionality.
+
 ## Building and running
 
 You can run the development build of the whole Aalto Grades system, including
@@ -78,8 +87,9 @@ username: teacher@aalto.fi
 password: password
 ```
 
-For instructions on running tests or individual parts of the system, see
-`client/README.md`, `server/README.md`, and `e2e-tests/REAMDE.md`.
+For instructions on running tests or individual parts of the system, see the
+REAMDE file of the corresponding directory, such as `client/README.md` and
+`server/README.md`.
 
 ## License
 
