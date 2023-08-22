@@ -21,8 +21,8 @@ import {
   useAddInstance, UseAddInstanceResult, useGetCourse, useGetSisuInstance
 } from '../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../hooks/useSnackPackAlerts';
-import { formatSisuCourseType } from '../services/textFormat';
 import { State } from '../types';
+import { formatSisuCourseType } from '../utils/textFormat';
 
 export default function EditInstanceView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
