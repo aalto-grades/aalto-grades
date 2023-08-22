@@ -758,8 +758,37 @@ export function parseGradesFromCsv(
  * the CSV file contains attainments which don't belong to the specified course or course instance.
  */
 export async function addGrades(req: Request, res: Response, next: NextFunction): Promise<void> {
-  /** TODO: Check grading points are not higher than max points of the attainment. */
+  const requestSchema: yup.AnyObjectSchema = yup.object().shape({
+    completionDate: yup
+      .date()
+      .required(),
+    expiryDate: yup
+      .date()
+      .notRequired()
+  }).test(
+    (value: {
+      completionDate: yup.Maybe<Date>,
+      expiryDate?: yup.Maybe<Date | undefined>
+    }) => {
+      if (
+        value.completionDate && value.expiryDate &&
+        value.completionDate.getTime() > value.expiryDate.getTime()
+      ) {
+        throw new ApiError(
+          'Expiry date cannot be before completion date.',
+          HttpCode.BadRequest
+        );
+      }
+      return true;
+    }
+  );
 
+  const { completionDate, expiryDate }: {
+    completionDate: Date,
+    expiryDate?: Date
+  } = await requestSchema.validate(req.body, { abortEarly: false });
+
+  /** TODO: Check grading points are not higher than max points of the attainment. */
   const grader: JwtClaims = req.user as JwtClaims;
 
   // Validation path parameters.
@@ -870,6 +899,8 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
                 return {
                   userId: student.id as number,
                   graderId: grader.id,
+                  date: completionDate,
+                  expiryDate: expiryDate,
                   ...grade
                 };
               });

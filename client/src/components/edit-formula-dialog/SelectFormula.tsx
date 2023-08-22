@@ -20,7 +20,7 @@ import StyledBox from './StyledBox';
 import { useGetAllFormulas } from '../../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 
-const HoverExpandMoreIcon: StyledComponent<object> = styled(ExpandMore)(
+export const HoverExpandMoreIcon: StyledComponent<object> = styled(ExpandMore)(
   ({ theme }: { theme: Theme }) => ({
     '&:hover': {
       background: theme.palette.hoverGrey1

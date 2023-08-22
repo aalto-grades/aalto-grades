@@ -910,6 +910,7 @@ describe(
       res = await request
         .post('/v1/courses/1/assessment-models/1/grades/csv')
         .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .field('completionDate', '2023-12-24')
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
@@ -929,6 +930,7 @@ describe(
         res = await request
           .post('/v1/courses/1/assessment-models/1/grades/csv')
           .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .field('completionDate', '2023-12-24')
           .set('Cookie', cookies.userCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
@@ -953,6 +955,7 @@ describe(
       res = await request
         .post('/v1/courses/1/assessment-models/1/grades/csv')
         .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .field('completionDate', '2023-12-24')
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
@@ -978,6 +981,7 @@ describe(
       res = await request
         .post('/v1/courses/5/assessment-models/14/grades/csv')
         .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .field('completionDate', '2023-12-24')
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
@@ -1003,6 +1007,7 @@ describe(
       res = await request
         .post('/v1/courses/5/assessment-models/14/grades/csv')
         .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .field('completionDate', '2023-12-24')
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
@@ -1052,6 +1057,7 @@ describe(
         res = await request
           .post('/v1/courses/2/assessment-models/51/grades/csv')
           .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .field('completionDate', '2023-12-24')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
@@ -1079,6 +1085,7 @@ describe(
               ),
               { contentType: 'text/csv' }
             )
+            .field('completionDate', '2023-12-24')
             .set('Cookie', cookies.adminCookie)
             .set('Accept', 'application/json')
             .expect(HttpCode.Ok);
@@ -1115,13 +1122,45 @@ describe(
         res = await request
           .post('/v1/courses/6/assessment-models/9/grades/csv')
           .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .field('completionDate', '2023-12-24')
+          .field('expiryDate', '2023-12-24')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
         expect(res.body.errors).not.toBeDefined();
         expect(res.body.data).toBeDefined();
-      }, 40000);
+      }, 50000);
+
+    it('should mark completion and expiry date if provided in the request body', async () => {
+      const csvData: fs.ReadStream = fs.createReadStream(
+        path.resolve(__dirname, '../mock-data/csv/grades.csv'), 'utf8'
+      );
+      res = await request
+        .post('/v1/courses/1/assessment-models/1/grades/csv')
+        .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .field('completionDate', '2023-12-24')
+        .field('expiryDate', '2024-12-24')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+
+      await Promise.all([28, 47, 86, 127, 138, 172].map(async (id: number): Promise<void> => {
+        const result: AttainmentGrade = await AttainmentGrade.findOne({
+          where: {
+            attainmentId: 1,
+            userId: id
+          },
+          order: [[ 'created_at', 'DESC' ]],
+        }) as AttainmentGrade;
+
+        expect(result.date).toBe('2023-12-24');
+        expect(result.expiryDate).toBe('2024-12-24');
+      }));
+
+      expect(res.body.errors).not.toBeDefined();
+      expect(res.body.data).toBeDefined();
+    });
 
     it(
       'should respond with 400 bad request, if the CSV has only student numbers, no grading data',
@@ -1132,12 +1171,32 @@ describe(
         res = await request
           .post('/v1/courses/1/assessment-models/1/grades/csv')
           .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
+          .field('completionDate', '2023-12-24')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
         checkErrorRes(
           ['No attainments found from the header, please upload valid CSV.'], HttpCode.BadRequest
         );
+      });
+
+    it(
+      'should respond with 400 bad request, if the expiry date is before completion date',
+      async () => {
+        const csvData: fs.ReadStream = fs.createReadStream(
+          path.resolve(__dirname, '../mock-data/csv/grades.csv'), 'utf8'
+        );
+        res = await request
+          .post('/v1/courses/1/assessment-models/1/grades/csv')
+          .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .field('completionDate', '2023-12-24')
+          .field('expiryDate', '2023-12-23')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.BadRequest);
+
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors[0]).toBe('Expiry date cannot be before completion date.');
       });
 
     it(
@@ -1151,6 +1210,7 @@ describe(
         res = await request
           .post('/v1/courses/2/assessment-models/51/grades/csv')
           .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
+          .field('completionDate', '2023-12-24')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
@@ -1173,6 +1233,7 @@ describe(
         res = await request
           .post('/v1/courses/1/assessment-models/1/grades/csv')
           .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
+          .field('completionDate', '2023-12-24')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
@@ -1200,6 +1261,7 @@ describe(
         res = await request
           .post('/v1/courses/1/assessment-models/1/grades/csv')
           .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
+          .field('completionDate', '2023-12-24')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
@@ -1221,6 +1283,7 @@ describe(
         res = await request
           .post('/v1/courses/1/assessment-models/1/grades/csv')
           .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
+          .field('completionDate', '2023-12-24')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
@@ -1237,6 +1300,7 @@ describe(
         res = await request
           .post('/v1/courses/1/assessment-models/1/grades/csv')
           .attach(badInput, csvData, { contentType: 'text/csv' })
+          .field('completionDate', '2023-12-24')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
@@ -1255,6 +1319,7 @@ describe(
         res = await request
           .post('/v1/courses/1/assessment-models/1/grades/csv')
           .attach('csv_data', csvData, { contentType: 'application/json' })
+          .field('completionDate', '2023-12-24')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
@@ -1270,6 +1335,7 @@ describe(
         res = await request
           .post('/v1/courses/1/assessment-models/1/grades/csv')
           .attach('csv_data', txtFile, { contentType: 'text/csv' })
+          .field('completionDate', '2023-12-24')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
@@ -1282,6 +1348,7 @@ describe(
         res = await request
           .post('/v1/courses/1/assessment-models/1/grades/csv')
           .attach('csv_data', false, { contentType: 'text/csv' })
+          .field('completionDate', '2023-12-24')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
@@ -1302,6 +1369,7 @@ describe(
         res = await request
           .post(`/v1/courses/${badInput}/assessment-models/1/grades/csv`)
           .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .field('completionDate', '2023-12-24')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
@@ -1323,6 +1391,7 @@ describe(
         res = await request
           .post(`/v1/courses/1/assessment-models/${badInput}/grades/csv`)
           .attach('csv_data', csvData, { contentType: 'text/csv' })
+          .field('completionDate', '2023-12-24')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json');
 
@@ -1343,6 +1412,7 @@ describe(
       await request
         .post('/v1/courses/1/assessment-models/1/grades/csv')
         .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .field('completionDate', '2023-12-24')
         .set('Accept', 'application/json')
         .expect(HttpCode.Unauthorized);
     });
@@ -1354,6 +1424,7 @@ describe(
       res = await request
         .post('/v1/courses/1/assessment-models/1/grades/csv')
         .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .field('completionDate', '2023-12-24')
         .set('Cookie', cookies.userCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Forbidden);
@@ -1369,6 +1440,7 @@ describe(
       res = await request
         .post(`/v1/courses/${badId}/assessment-models/1/grades/csv`)
         .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .field('completionDate', '2023-12-24')
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json');
 
@@ -1382,6 +1454,7 @@ describe(
       res = await request
         .post(`/v1/courses/1/assessment-models/${badId}/grades/csv`)
         .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .field('completionDate', '2023-12-24')
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json');
 
@@ -1395,6 +1468,7 @@ describe(
       res = await request
         .post('/v1/courses/1/assessment-models/2/grades/csv')
         .attach('csv_data', csvData, { contentType: 'text/csv' })
+        .field('completionDate', '2023-12-24')
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json');
 
