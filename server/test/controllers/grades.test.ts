@@ -1194,7 +1194,8 @@ describe(
           .set('Accept', 'application/json');
 
         checkErrorRes(
-          ['Expected grade type integer but received float for student 812472 grade ID name1.'],
+          ['Expected grade type integer but received float ' +
+          'for student 812472 grade name \'name1\'.'],
           HttpCode.BadRequest
         );
       });
@@ -1816,6 +1817,23 @@ describe(
 
       checkSuccessRes(res);
     });
+
+    it(
+      'should respond with 400 bad request, if float grade send when attainment expects integer',
+      async () => {
+        res = await request
+          .put('/v1/courses/1/assessment-models/1/grades/1')
+          .send({
+            grade: 4.6,
+            status: 'PASS',
+            date: '2022-12-24',
+            expiryDate: '2023-12-24',
+            comment: 'testing'
+          })
+          .set('Cookie', cookies.adminCookie);
+
+        checkErrorRes(['Expected grade type integer but received float.'], HttpCode.BadRequest);
+      });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
       await request
