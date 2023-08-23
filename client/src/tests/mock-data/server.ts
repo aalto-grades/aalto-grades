@@ -23,7 +23,7 @@ export function mockSuccess(data: unknown): ResponseResolver<RestRequest, RestCo
         data: data
       })
     );
-  }
+  };
 }
 
 export function mockFailure(
@@ -36,7 +36,7 @@ export function mockFailure(
         errors: errors
       })
     );
-  }
+  };
 }
 
 export function mockPostSuccess(
@@ -50,7 +50,7 @@ export function mockPostSuccess(
         data: data
       })
     );
-  }
+  };
 }
 
 export const server: SetupServer = setupServer(

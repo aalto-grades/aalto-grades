@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AttainmentGradeData, EditGrade, FinalGrade, Formula, GradeOption, HttpCode, Status
+  AttainmentGradeData, EditGrade, FinalGrade, Formula,
+  GradeOption, GradeType, HttpCode, Status
 } from 'aalto-grades-common/types';
 import { parse, Parser } from 'csv-parse';
 import { stringify } from 'csv-stringify';
@@ -26,7 +27,7 @@ import {
   JwtClaims, StudentGrades, idSchema
 } from '../types';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
-import { findAttainmentGradeById } from './utils/attainment';
+import { findAttainmentById, findAttainmentGradeById } from './utils/attainment';
 import { toDateOnlyString } from './utils/date';
 import { gradeIsExpired } from './utils/grades';
 import { findUserById, isTeacherInChargeOrAdmin } from './utils/user';
@@ -343,7 +344,8 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
       });
       courseResults.push({
         studentNumber: finalGrade.User.studentNumber,
-        grade: String(finalGrade.grade),
+        // Round to get final grades as an integer.
+        grade: String(Math.round(finalGrade.grade)),
         credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits,
         // Assesment date must be in form dd.mm.yyyy.
         assessmentDate: (
@@ -480,7 +482,7 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
               id: grade.grader.id,
               name: grade.grader.name
             },
-            grade: grade.grade,
+            grade: Math.round(grade.grade),
             status: grade.status as Status,
             manual: grade.manual,
             exportedToSisu: grade.sisuExportDate,
@@ -562,7 +564,7 @@ export async function getGradeTreeOfUser(req: Request, res: Response): Promise<v
               id: option.grader?.id,
               name: option.grader?.name
             },
-            grade: option.grade,
+            grade: root.gradeType === GradeType.Integer ? Math.round(option.grade) : option.grade,
             status: option.status as Status,
             manual: option.manual,
             exportedToSisu: option.sisuExportDate,
@@ -725,6 +727,8 @@ export function parseGradesFromCsv(
 
       student.grades.push({
         attainmentId: attainments[i].id,
+        gradeType: attainments[i].gradeType,
+        attainmentName: attainments[i].name,
         grade: gradeValue,
         manual: true,
         status: (
@@ -746,6 +750,19 @@ export function parseGradesFromCsv(
     throw new ApiError(errors, HttpCode.BadRequest);
   }
   return students;
+}
+
+const gradeTypeErrors: Array<string> = [];
+
+function correctType(grade: AttainmentGradeModelData, studentNumber: string): number {
+  // Grade is supposed to be integer but received float.
+  if (grade.gradeType === GradeType.Integer && !Number.isInteger(grade.grade)) {
+    gradeTypeErrors.push(
+      'Expected grade type integer but received float ' +
+      `for student ${studentNumber} grade name '${grade.attainmentName}'.`
+    );
+  }
+  return (grade.gradeType === GradeType.Integer ? Math.round(grade.grade) : grade.grade);
 }
 
 /**
@@ -894,18 +911,24 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         // students grades into a one array of all the grades.
         const preparedBulkCreate: Array<AttainmentGradeModelData> = parsedStudentData.flatMap(
           (student: StudentGrades): Array<AttainmentGradeModelData> => {
+            const studentNumber: string = student.studentNumber;
             const studentGradingData: Array<AttainmentGradeModelData> = student.grades.map(
               (grade: AttainmentGradeModelData): AttainmentGradeModelData => {
                 return {
+                  ...grade,
                   userId: student.id as number,
                   graderId: grader.id,
                   date: completionDate,
                   expiryDate: expiryDate,
-                  ...grade
+                  grade: correctType(grade, studentNumber)
                 };
               });
             return studentGradingData;
           });
+
+        if (gradeTypeErrors.length !== 0) {
+          throw new ApiError(gradeTypeErrors, HttpCode.BadRequest);
+        }
 
         // TODO: Optimize if datasets are big.
         await AttainmentGrade.bulkCreate(
@@ -1036,7 +1059,8 @@ export async function calculateGrades(
         minRequiredGrade: attainment.minRequiredGrade,
         maxGrade: attainment.maxGrade,
         formula: attainment.formula,
-        formulaParams: attainment.formulaParams
+        formulaParams: attainment.formulaParams,
+        gradeType: attainment.gradeType
       }
     });
   }
@@ -1254,12 +1278,14 @@ export async function calculateGrades(
         userId: userId,
         // The formula nodes were constructed with attainments IDs defined, so
         // this can be asserted to be non-null.
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         attainmentId: formulaNode.attainment.id!,
         graderId: grader.id,
-        grade: calculated.grade,
+        // Round grade to closest integer if attainment is graded as integer.
+        grade: formulaNode.attainment.gradeType === GradeType.Integer ?
+          Math.round(calculated.grade) : calculated.grade,
         status: calculated.status,
-        manual: false
+        manual: false,
+        gradeType: formulaNode.attainment.gradeType
       }
     );
 
@@ -1308,6 +1334,14 @@ export async function editUserGrade(req: Request, res: Response): Promise<void> 
   await isTeacherInChargeOrAdmin(grader, course.id, HttpCode.Forbidden);
 
   const gradeData: AttainmentGrade = await findAttainmentGradeById(gradeId, HttpCode.NotFound);
+
+  if (grade) {
+    const attainment: Attainment =
+      await findAttainmentById(gradeData.attainmentId, HttpCode.NotFound);
+    if (attainment.gradeType === GradeType.Integer && !Number.isInteger(grade)) {
+      throw new ApiError('Expected grade type integer but received float.', HttpCode.BadRequest);
+    }
+  }
 
   await gradeData.set({
     grade: grade ?? gradeData.grade,

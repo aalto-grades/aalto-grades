@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AssessmentModelData, AttainmentData, Formula } from 'aalto-grades-common/types';
+import { AssessmentModelData, AttainmentData, Formula, GradeType } from 'aalto-grades-common/types';
 import {
   Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle,
   FormHelperText, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField
@@ -16,6 +16,16 @@ import {
   useAddAttainment, UseAddAttainmentResult, useGetRootAttainment
 } from '../../hooks/useApi';
 import { State } from '../../types';
+
+const defaultRoot: AttainmentData = {
+  name: 'Root',
+  daysValid: 0,
+  minRequiredGrade: 1,
+  maxGrade: 5,
+  formula: Formula.Manual,
+  formulaParams: {},
+  gradeType: GradeType.Integer
+};
 
 export default function CreateAssessmentModelDialog(props: {
   handleClose: () => void,
@@ -68,28 +78,14 @@ export default function CreateAssessmentModelDialog(props: {
                   addAttainment.mutate({
                     courseId: courseId,
                     assessmentModelId: assessmentModelId,
-                    attainment: data.data ?? {
-                      name: 'Root',
-                      daysValid: 0,
-                      minRequiredGrade: 1,
-                      maxGrade: 5,
-                      formula: Formula.Manual,
-                      formulaParams: {}
-                    }
+                    attainment: data.data ?? defaultRoot
                   });
                 });
               } else {
                 addAttainment.mutate({
                   courseId: courseId,
                   assessmentModelId: assessmentModelId,
-                  attainment: {
-                    name: 'Root',
-                    daysValid: 0,
-                    minRequiredGrade: 1,
-                    maxGrade: 5,
-                    formula: Formula.Manual,
-                    formulaParams: {}
-                  }
+                  attainment: defaultRoot
                 });
               }
             }

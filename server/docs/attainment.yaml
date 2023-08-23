@@ -56,6 +56,12 @@ definitions:
         required: true
         description: The maximum possible grade (or points) for an attainment.
         example: 5
+      gradeType:
+        type: string
+        required: true
+        enum: [INTEGER, FLOAT]
+        description: Data type of the grade.
+        example: INTEGER
       subAttainments:
         type: array
         required: false

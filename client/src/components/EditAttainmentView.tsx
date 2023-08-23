@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, Formula } from 'aalto-grades-common/types';
+import { AttainmentData, Formula, GradeType } from 'aalto-grades-common/types';
 import { Box, Button, Container, Typography } from '@mui/material';
 import { JSX, SyntheticEvent, useState }  from 'react';
 import { NavigateFunction, Params, useParams, useNavigate } from 'react-router-dom';
@@ -70,7 +70,8 @@ export default function EditAttainmentView(): JSX.Element {
         maxGrade: 5,
         formula: Formula.Manual,
         formulaParams: {},
-        subAttainments: []
+        subAttainments: [],
+        gradeType: GradeType.Float
       });
     } else if (modification === 'edit' && attainment.data) {
       setAttainmentTree(attainment.data);

@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, Formula } from 'aalto-grades-common/types';
+import { AttainmentData, Formula, GradeType } from 'aalto-grades-common/types';
+
 import Attainment from '../../src/database/models/attainment';
 
 export const mockAttainment: AttainmentData = {
@@ -18,6 +19,7 @@ export const mockAttainment: AttainmentData = {
       ['ex-2', { weight: 0.5 }]
     ]
   },
+  gradeType: GradeType.Float,
   subAttainments: [
     {
       id: 2,
@@ -27,6 +29,7 @@ export const mockAttainment: AttainmentData = {
       maxGrade: 5,
       formula: Formula.Manual,
       formulaParams: {},
+      gradeType: GradeType.Float,
       subAttainments: [],
     },
     {
@@ -42,6 +45,7 @@ export const mockAttainment: AttainmentData = {
           ['ex-2.2', { weight: 0.5 }]
         ]
       },
+      gradeType: GradeType.Float,
       subAttainments: [
         {
           id: 4,
@@ -56,6 +60,7 @@ export const mockAttainment: AttainmentData = {
               ['ex-2.1.2', { weight: 0.5 }]
             ]
           },
+          gradeType: GradeType.Float,
           subAttainments: [
             {
               id: 5,
@@ -65,6 +70,7 @@ export const mockAttainment: AttainmentData = {
               maxGrade: 5,
               formula: Formula.Manual,
               formulaParams: {},
+              gradeType: GradeType.Float,
               subAttainments: [],
             },
             {
@@ -75,6 +81,7 @@ export const mockAttainment: AttainmentData = {
               maxGrade: 5,
               formula: Formula.Manual,
               formulaParams: {},
+              gradeType: GradeType.Float,
               subAttainments: [],
             }
           ],
@@ -92,6 +99,7 @@ export const mockAttainment: AttainmentData = {
               ['ex-2.2.2', { weight: 0.5 }]
             ]
           },
+          gradeType: GradeType.Float,
           subAttainments: [
             {
               id: 8,
@@ -101,6 +109,7 @@ export const mockAttainment: AttainmentData = {
               maxGrade: 5,
               formula: Formula.Manual,
               formulaParams: {},
+              gradeType: GradeType.Float,
               subAttainments: [],
             },
             {
@@ -116,6 +125,7 @@ export const mockAttainment: AttainmentData = {
                   ['ex-2.2.2.2', { weight: 0.5 }]
                 ]
               },
+              gradeType: GradeType.Float,
               subAttainments: [
                 {
                   id: 10,
@@ -125,6 +135,7 @@ export const mockAttainment: AttainmentData = {
                   maxGrade: 5,
                   formula: Formula.Manual,
                   formulaParams: {},
+                  gradeType: GradeType.Float,
                   subAttainments: [],
                 },
                 {
@@ -140,6 +151,7 @@ export const mockAttainment: AttainmentData = {
                       ['ex-2.2.2.2.2', { weight: 0.5 }]
                     ]
                   },
+                  gradeType: GradeType.Float,
                   subAttainments: [
                     {
                       id: 12,
@@ -149,6 +161,7 @@ export const mockAttainment: AttainmentData = {
                       maxGrade: 5,
                       formula: Formula.Manual,
                       formulaParams: {},
+                      gradeType: GradeType.Float,
                       subAttainments: [],
                     },
                     {
@@ -159,6 +172,7 @@ export const mockAttainment: AttainmentData = {
                       maxGrade: 5,
                       formula: Formula.Manual,
                       formulaParams: {},
+                      gradeType: GradeType.Float,
                       subAttainments: [],
                     }
                   ]
@@ -181,9 +195,8 @@ export const jestMockAttainment: Attainment = new Attainment({
   minRequiredGrade: 1,
   maxGrade: 5,
   formula: Formula.Manual,
-  formulaParams: {
-    minRequiredGrade: 0
-  },
+  formulaParams: {},
+  gradeType: GradeType.Float,
   createdAt: new Date(),
   updatedAt: new Date()
 }, { isNewRecord: false });

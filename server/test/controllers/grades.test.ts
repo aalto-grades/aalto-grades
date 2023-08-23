@@ -520,6 +520,8 @@ describe(
           expect(option.grader.id).toBeDefined();
           expect(option.grader.name).toBeDefined();
           expect(option.grade).toBeDefined();
+          // Final grades must be integers.
+          expect(Number.isInteger(option.grade)).toBeTruthy();
           expect(option.status).toBeDefined();
           expect(option.manual).toBeDefined();
           expect(option.exportedToSisu).toBeDefined();
@@ -1181,6 +1183,26 @@ describe(
       });
 
     it(
+      'should respond with 400 bad request, if the CSV has grades with incorrect type',
+      async () => {
+        const invalidCsvData: fs.ReadStream = fs.createReadStream(
+          path.resolve(__dirname, '../mock-data/csv/grades_incorrect_type.csv'), 'utf8'
+        );
+        res = await request
+          .post('/v1/courses/1/assessment-models/1/grades/csv')
+          .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
+          .field('completionDate', '2023-12-24')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json');
+
+        checkErrorRes(
+          ['Expected grade type integer but received float ' +
+          'for student 812472 grade name \'name1\'.'],
+          HttpCode.BadRequest
+        );
+      });
+
+    it(
       'should respond with 400 bad request, if the expiry date is before completion date',
       async () => {
         const csvData: fs.ReadStream = fs.createReadStream(
@@ -1797,6 +1819,23 @@ describe(
 
       checkSuccessRes(res);
     });
+
+    it(
+      'should respond with 400 bad request, if float grade send when attainment expects integer',
+      async () => {
+        res = await request
+          .put('/v1/courses/1/assessment-models/1/grades/1')
+          .send({
+            grade: 4.6,
+            status: 'PASS',
+            date: '2022-12-24',
+            expiryDate: '2023-12-24',
+            comment: 'testing'
+          })
+          .set('Cookie', cookies.adminCookie);
+
+        checkErrorRes(['Expected grade type integer but received float.'], HttpCode.BadRequest);
+      });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
       await request
