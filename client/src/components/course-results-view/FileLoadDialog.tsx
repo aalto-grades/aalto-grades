@@ -3,15 +3,17 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  Box, Button, Dialog, DialogActions, DialogContent,
-  DialogContentText, DialogTitle, FormHelperText, Typography
+  Accordion, AccordionDetails, AccordionSummary, Box,
+  Button, Container, Dialog, DialogActions, DialogContent,
+  DialogContentText, DialogTitle, FormHelperText, TextField, Typography
 } from '@mui/material';
-import { ChangeEvent, createRef, RefObject, useState } from 'react';
+import { ChangeEvent, createRef, JSX, RefObject, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';
 import FileErrorDialog from './FileErrorDialog';
 
+import { HoverExpandMoreIcon } from '../edit-formula-dialog/SelectFormula';
 import { useUploadGradeCsv, UseUploadGradeCsvResult } from '../../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 import { State } from '../../types';
@@ -44,6 +46,11 @@ export default function FileLoadDialog(props: {
   // state variables handling the alert messages
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
   const [showErrorDialog, setShowErrorDialog]: State<boolean> = useState(false);
+  // state variables handling the completion and expiry date.
+  const [completionDate, setCompletionDate]: State<string | undefined> =
+    useState<string | undefined>(undefined);
+  const [expiryDate, setExpiryDate]: State<string | undefined> =
+    useState<string | undefined>(undefined);
 
   function toggleErrorDialog(): void {
     setShowErrorDialog(!showErrorDialog);
@@ -66,7 +73,11 @@ export default function FileLoadDialog(props: {
         {
           courseId: courseId,
           assessmentModelId: props.assessmentModelId,
-          csv: fileInput.current.files[0]
+          csv: fileInput.current.files[0],
+          params: {
+            completionDate,
+            expiryDate
+          }
         },
         {
           onSuccess: () => {
@@ -75,12 +86,20 @@ export default function FileLoadDialog(props: {
                 + ' To refresh final grades, press "calculate final grades"',
               severity: 'success'
             });
-            props.handleClose();
-            setFileName(null);
+            reset();
           }
         }
       );
     }
+  }
+
+  function reset(): void {
+    props.handleClose();
+    setFileName(null);
+    setValidationError('');
+    setFileErrors([]);
+    setCompletionDate(undefined);
+    setExpiryDate(undefined);
   }
 
   return (
@@ -93,7 +112,7 @@ export default function FileLoadDialog(props: {
           </DialogContentText>
           <Box sx={{
             display: 'flex', justifyContent: 'flex-start',
-            alignItems: 'center', columnGap: 2, mb: 3
+            alignItems: 'center', columnGap: 2, mb: 5
           }}>
             <Typography variant='body2' sx={{ color: 'infoGrey' }}>
               {exampleText}
@@ -110,6 +129,52 @@ export default function FileLoadDialog(props: {
                 + 'and the third column is points from attainment C3I9A2.'}
               src="/Import-grades-file-example.jpg"
             />
+          </Box>
+          <Box sx={{ mr: 25 }}>
+            <Box sx={{ mb: 2 }}>
+              <TextField
+                id='select-grading-completion-date'
+                InputLabelProps={{ shrink: true }}
+                type='date'
+                fullWidth
+                label='Completion Date*'
+                helperText='Completion date of the grades.'
+                onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+                  setCompletionDate(e.target.value);
+                }}
+              />
+            </Box>
+            <Accordion sx={{ boxShadow: 'none', mb: 2 }}>
+              <AccordionSummary
+                expandIcon={<HoverExpandMoreIcon />}
+                aria-controls="expiry-panel-content"
+                id="expiry-panel-header"
+                sx={{ pl: 1 }}
+              >
+                <Typography>Set grade expiry date (optional)</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ p: '10px' }}>
+                <Container sx={{ overflowX: 'scroll' }}>
+                  <Box sx={{ my: 1 }}>
+                    <Typography variant='body2' sx={{ mb: 3 }}>
+                      Note. Manually setting an expiry date for the grades
+                      will override the &apos;days valid&apos; value of the grades.
+                    </Typography>
+                    <TextField
+                      id='select-grading-expiry-date'
+                      InputLabelProps={{ shrink: true }}
+                      type='date'
+                      fullWidth
+                      label='Expiry Date'
+                      helperText='Expiry date of the grades.'
+                      onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+                        setExpiryDate(e.target.value);
+                      }}
+                    />
+                  </Box>
+                </Container>
+              </AccordionDetails>
+            </Accordion>
           </Box>
           <Box sx={{
             display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start',
@@ -185,10 +250,7 @@ export default function FileLoadDialog(props: {
             size='medium'
             variant='outlined'
             onClick={(): void => {
-              props.handleClose();
-              setFileName(null);
-              setValidationError('');
-              setFileErrors([]);
+              reset();
             }}
           >
             Cancel
@@ -200,6 +262,9 @@ export default function FileLoadDialog(props: {
             onClick={(): void => {
               if (!fileName) {
                 setValidationError('You must select a CSV file to submit');
+                return;
+              } else if (!completionDate) {
+                setValidationError('Completion date is required');
                 return;
               }
               uploadFile();

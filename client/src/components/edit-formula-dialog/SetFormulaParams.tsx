@@ -6,7 +6,7 @@ import {
   AttainmentData, ChildParamsObject, FormulaData, ParamsObject
 } from 'aalto-grades-common/types';
 import { TextField } from '@mui/material';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, JSX } from 'react';
 
 import SubAttainment from './SubAttainment';
 import StyledBox from '../edit-formula-dialog/StyledBox';

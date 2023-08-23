@@ -1,0 +1,13 @@
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "es6",
+    "lib": ["es6", "dom"],
+    "types": ["cypress", "node"]
+  },
+  "include": ["**/*.ts"]
+}

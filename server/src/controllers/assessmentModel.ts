@@ -84,7 +84,7 @@ export async function addAssessmentModel(req: Request, res: Response): Promise<v
 
   const courseId: number = Number(req.params.courseId);
   await idSchema.validate({ id: courseId });
-  await requestSchema.validate(req.body, { abortEarly: false });
+  const name: string = (await requestSchema.validate(req.body, { abortEarly: false })).name;
 
   // Confirm that course exists.
   const course: Course = await findCourseById(
@@ -94,12 +94,26 @@ export async function addAssessmentModel(req: Request, res: Response): Promise<v
   // Route is only available for admins and those who have teacher in charge role for the course.
   await isTeacherInChargeOrAdmin(req.user as JwtClaims, courseId, HttpCode.Forbidden);
 
-  const newAssessmentModel: AssessmentModel = await AssessmentModel.create({
-    courseId: course.id,
-    name: req.body.name
-  });
+  // Find or create new assessment model based on name and course ID.
+  const [assessmentModel, created]: [AssessmentModel, boolean] =
+    await AssessmentModel.findOrCreate({
+      where: {
+        name: name,
+        courseId: course.id
+      },
+      defaults: {
+        name: name
+      }
+    });
+
+  if (!created) {
+    throw new ApiError(
+      `Assessment model with name '${name}' already exists in course ID ${course.id}`,
+      HttpCode.Conflict
+    );
+  }
 
   res.status(HttpCode.Ok).json({
-    data: newAssessmentModel.id
+    data: assessmentModel.id
   });
 }

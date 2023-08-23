@@ -3,8 +3,8 @@
 -- SPDX-License-Identifier: MIT
 
 INSERT INTO public.attainment_grade (user_id, attainment_id, grader_id, grade, manual, status, date, expiry_date, created_at, updated_at, comment, sisu_export_date) VALUES
-(1, 14, 1, 0.37, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL),
-(1, 15, 1, 0.5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL),
+(1, 14, 1, 0.37, true, 'PASS', '2022-12-20', '2023-04-23', NOW(), NOW(), NULL, NULL),
+(1, 15, 1, 0.5, true, 'PASS', '2023-01-01', '2023-04-23', NOW(), NOW(), NULL, NULL),
 (519, 5, 1, 1.5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL),
 (519, 9, 1, 2.2, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL),
 (519, 16, 1, 0.1, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL),
@@ -137,11 +137,11 @@ INSERT INTO public.attainment_grade (user_id, attainment_id, grader_id, grade, m
 (1, 273, 2, 1, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL),
 (1, 273, 2, 3, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL),
 -- Test calculating new grades for a student
-(391, 276, 1, 3, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL),
-(391, 278, 1, 4, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL),
-(391, 279, 1, 4, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL),
-(391, 281, 1, 1, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL),
-(391, 282, 1, 5, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL),
+(391, 276, 1, 3, true, 'PASS', '2022-04-23', '2023-04-23', NOW(), NOW(), NULL, NULL),
+(391, 278, 1, 4, true, 'PASS', '2022-01-24', '2023-01-24', NOW(), NOW(), NULL, NULL),
+(391, 279, 1, 4, true, 'PASS', '2022-04-25', '2023-04-25', NOW(), NOW(), NULL, NULL),
+(391, 281, 1, 1, true, 'PASS', '2022-04-26', '2023-04-26', NOW(), NOW(), NULL, NULL),
+(391, 282, 1, 5, true, 'PASS', '2022-07-01', '2023-07-01', NOW(), NOW(), NULL, NULL),
 -- Multiple final grade options
 (1, 283, 1, 0, true, 'FAIL', '2022-01-05', '2023-04-23', NOW(), NOW(), 'Better luck next time', NULL),
 (1, 283, 1, 3, true, 'FAIL', '2022-01-05', '2023-04-23', NOW(), NOW(), 'Still not enough', NULL),
@@ -158,4 +158,16 @@ INSERT INTO public.attainment_grade (user_id, attainment_id, grader_id, grade, m
 (574, 285, 1, 3, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NOW()),
 (581, 285, 1, 1, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL), -- Pass
 (590, 285, 1, 2, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NOW()),
-(601, 285, 1, 1, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL); -- Pass
+(601, 285, 1, 1, true, 'PASS', '2022-01-05', '2023-04-23', NOW(), NOW(), NULL, NULL), -- Pass
+-- Test grade expiry, the ID of the next row is 153
+(1, 288, 2, 0, true, 'FAIL', '2023-05-10', '2023-08-23', NOW(), NOW(), NULL, NULL), -- Latest grade
+(1, 288, 2, 0, true, 'FAIL', '2022-01-05', '2024-04-23', NOW(), NOW(), NULL, NULL), -- Unexpired
+(1, 288, 2, 0, true, 'FAIL', '2022-01-05', '2023-05-11', NOW(), NOW(), NULL, NULL), -- Unexpired
+(1, 288, 2, 5, true, 'PASS', '2022-01-05', '2023-05-10', NOW(), NOW(), NULL, NULL), -- Expired
+(1, 288, 2, 5, true, 'PASS', '2022-01-05', '2023-05-09', NOW(), NOW(), NULL, NULL), -- Expired
+(1, 288, 2, 5, true, 'PASS', '2022-01-05', '2022-04-23', NOW(), NOW(), NULL, NULL), -- Expired
+(1, 289, 2, 0, true, 'FAIL', '2023-05-10', NULL, NOW(), NOW(), NULL, NULL), -- Unexpired
+(1, 289, 2, 0, true, 'FAIL', '2023-05-09', NULL, NOW(), NOW(), NULL, NULL), -- Unexpired
+(1, 289, 2, 0, true, 'FAIL', '2023-05-06', NULL, NOW(), NOW(), NULL, NULL), -- Unexpired
+(1, 289, 2, 5, true, 'PASS', '2023-05-05', NULL, NOW(), NOW(), NULL, NULL), -- Expired
+(1, 289, 2, 5, true, 'PASS', '2023-05-01', NULL, NOW(), NOW(), NULL, NULL); -- Expired

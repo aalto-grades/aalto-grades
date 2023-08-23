@@ -9,7 +9,7 @@ import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
 import {
   Box, Button, Container, LinearProgress, MenuItem, TextField, Typography
 } from '@mui/material';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, JSX, useState } from 'react';
 import { NavigateFunction, useNavigate, Params, useParams } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 import * as yup from 'yup';
@@ -21,8 +21,8 @@ import {
   useAddInstance, UseAddInstanceResult, useGetCourse, useGetSisuInstance
 } from '../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../hooks/useSnackPackAlerts';
-import { formatSisuCourseType } from '../services/textFormat';
 import { State } from '../types';
+import { formatSisuCourseType } from '../utils/textFormat';
 
 export default function EditInstanceView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();

@@ -103,7 +103,11 @@ export function useGetGradeTreeOfUser(
 interface UploadGradeCsvVars {
   courseId: Numeric,
   assessmentModelId: Numeric,
-  csv: unknown
+  csv: unknown,
+  params: {
+    completionDate?: string,
+    expiryDate?: string
+  }
 }
 
 export type UseUploadGradeCsvResult = UseMutationResult<
@@ -122,7 +126,9 @@ export function useUploadGradeCsv(
         + `/assessment-models/${vars.assessmentModelId}`
         + '/grades/csv',
         {
-          csv_data: vars.csv // FileList will be unwrapped as sepate fields
+          csv_data: vars.csv, // FileList will be unwrapped as sepate fields
+          completionDate: vars.params.completionDate,
+          expiryDate: vars.params.expiryDate
         }
       )
     ).data.data,

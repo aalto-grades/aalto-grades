@@ -6,7 +6,7 @@ import { FinalGrade } from 'aalto-grades-common/types';
 import DownloadIcon from '@mui/icons-material/Download';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { Box, Button, IconButton, TextField, Toolbar, Tooltip } from '@mui/material';
-import { useState } from 'react';
+import { JSX,useState } from 'react';
 import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
 
 import FileLoadDialog from './FileLoadDialog';
@@ -22,7 +22,8 @@ export default function CourseResultsTableToolbar(props: {
   calculateFinalGrades: () => Promise<void>,
   downloadCsvTemplate: () => Promise<void>,
   selectedStudents: Array<FinalGrade>,
-  hasPendingStudents: boolean
+  hasPendingStudents: boolean,
+  refetch: () => void
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { assessmentModelId }: Params = useParams();
@@ -48,6 +49,7 @@ export default function CourseResultsTableToolbar(props: {
 
   function handleCloseFileDialog(): void {
     setShowFileDialog(false);
+    props.refetch();
   }
 
   function handleCloseSisuDialog(): void {
@@ -140,27 +142,19 @@ export default function CourseResultsTableToolbar(props: {
               </Button>
             </span>
           </Tooltip>
-          <Tooltip
-            title={props.selectedStudents.length != 0 ?
-              'You have selected students, these selections will be lost if not saved.' :
-              'Return to the course view page.'
-            }
-            placement="top"
+          <Button
+            variant='outlined'
+            color={props.selectedStudents.length != 0 ? 'error' : 'primary'}
+            onClick={(): void => {
+              if (props.selectedStudents.length != 0) {
+                setShowDialog(true);
+              } else {
+                navigate(-1);
+              }
+            }}
           >
-            <Button
-              variant='outlined'
-              color={props.selectedStudents.length != 0 ? 'error' : 'primary'}
-              onClick={(): void => {
-                if (props.selectedStudents.length != 0) {
-                  setShowDialog(true);
-                } else {
-                  navigate(-1);
-                }
-              }}
-            >
-              Return to course view
-            </Button>
-          </Tooltip>
+            Return to course view
+          </Button>
           <SisuDownloadDialog
             open={showSisuDialog}
             handleClose={handleCloseSisuDialog}

@@ -4,7 +4,7 @@
 
 import '@testing-library/jest-dom/extend-expect';
 
-import { compareDate } from '../services/sorting';
+import { compareDate } from '../utils/sorting';
 
 describe('Tests for sorting functions', () => {
 

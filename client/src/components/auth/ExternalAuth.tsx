@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { Box, Button, Typography } from '@mui/material';
-import React from 'react';
+import React, { JSX } from 'react';
 
 export default function ExternalAuth(): JSX.Element {
 

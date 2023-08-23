@@ -6,7 +6,7 @@
 // if not, the user is redirected to the login page
 
 import { LoginResult, SystemRole } from 'aalto-grades-common/types';
-import { useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
 

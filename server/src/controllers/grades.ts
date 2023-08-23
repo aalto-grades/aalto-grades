@@ -8,6 +8,7 @@ import {
 import { parse, Parser } from 'csv-parse';
 import { stringify } from 'csv-stringify';
 import { NextFunction, Request, Response } from 'express';
+import _ from 'lodash';
 import { Includeable, Op, QueryTypes, Transaction } from 'sequelize';
 import * as yup from 'yup';
 
@@ -27,6 +28,7 @@ import {
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import { findAttainmentGradeById } from './utils/attainment';
 import { toDateOnlyString } from './utils/date';
+import { gradeIsExpired } from './utils/grades';
 import { findUserById, isTeacherInChargeOrAdmin } from './utils/user';
 
 async function studentNumbersExist(studentNumbers: Array<string>): Promise<void> {
@@ -183,9 +185,14 @@ interface InstanceWithUsers extends CourseInstance {
   Users: Array<User>
 }
 
+/**
+ * @param {number} instanceId - ID of the instance included in the query
+ * @param {Array<string> | undefined} studentNumbers - Students numbers included in the query
+ * @returns Union of studentNumbers array and student numbers enrolled in course instance.
+ */
 async function filterByInstanceAndStudentNumber(
   instanceId: number,
-  studentNumbersFiltered: Array<string> | undefined
+  studentNumbers: Array<string> | undefined
 ): Promise<Array<string> | undefined> {
   const studentsFromInstance: InstanceWithUsers | null = await CourseInstance.findOne({
     attributes: ['id'],
@@ -195,27 +202,26 @@ async function filterByInstanceAndStudentNumber(
     include: [
       {
         model: User,
-        attributes: ['studentNumber']
+        attributes: ['studentNumber'],
+        order: [
+          ['id', 'ASC']
+        ]
       }
     ]
   }) as InstanceWithUsers;
 
   if (studentsFromInstance) {
-    const studentNumbersFromInstance: Array<string> =
-      studentsFromInstance.Users.map((user: User) => user.studentNumber);
+    const studentNumbersFromInstance: Array<string> = studentsFromInstance.Users.map((us: User) => {
+      return us.studentNumber;
+    });
 
-    if (studentNumbersFiltered) {
-      // Intersection of both student numbers from query params and on the course instance.
-      return studentNumbersFiltered.filter(
-        (value: string) => studentNumbersFromInstance.includes(value)
-      );
-    } else {
-      // Only student numbers from instance.
-      return studentNumbersFromInstance;
+    if (studentNumbers) {
+      return _.union(studentNumbers, studentNumbersFromInstance);
     }
+    return studentNumbersFromInstance;
   }
 
-  return studentNumbersFiltered;
+  return studentNumbers;
 }
 
 /**
@@ -457,7 +463,7 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
   const rawFinalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
     assessmentModel.id,
     students.map((student: IdAndStudentNumber) => student.studentNumber),
-    students.length > 0
+    true
   );
 
   for (const student of students) {
@@ -752,8 +758,37 @@ export function parseGradesFromCsv(
  * the CSV file contains attainments which don't belong to the specified course or course instance.
  */
 export async function addGrades(req: Request, res: Response, next: NextFunction): Promise<void> {
-  /** TODO: Check grading points are not higher than max points of the attainment. */
+  const requestSchema: yup.AnyObjectSchema = yup.object().shape({
+    completionDate: yup
+      .date()
+      .required(),
+    expiryDate: yup
+      .date()
+      .notRequired()
+  }).test(
+    (value: {
+      completionDate: yup.Maybe<Date>,
+      expiryDate?: yup.Maybe<Date | undefined>
+    }) => {
+      if (
+        value.completionDate && value.expiryDate &&
+        value.completionDate.getTime() > value.expiryDate.getTime()
+      ) {
+        throw new ApiError(
+          'Expiry date cannot be before completion date.',
+          HttpCode.BadRequest
+        );
+      }
+      return true;
+    }
+  );
 
+  const { completionDate, expiryDate }: {
+    completionDate: Date,
+    expiryDate?: Date
+  } = await requestSchema.validate(req.body, { abortEarly: false });
+
+  /** TODO: Check grading points are not higher than max points of the attainment. */
   const grader: JwtClaims = req.user as JwtClaims;
 
   // Validation path parameters.
@@ -864,6 +899,8 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
                 return {
                   userId: student.id as number,
                   graderId: grader.id,
+                  date: completionDate,
+                  expiryDate: expiryDate,
                   ...grade
                 };
               });
@@ -1082,11 +1119,16 @@ export async function calculateGrades(
    * use as a basis to calculate grades.
    */
 
+  interface ManualGrade extends AttainmentGrade {
+    Attainment: Attainment,
+    User: User
+  }
+
   /*
    * Stores the grades of each student for each attainment which were manually
    * specified by a teacher.
    */
-  const unorganizedManualGrades: Array<AttainmentGrade> = await AttainmentGrade.findAll({
+  const unorganizedManualGrades: Array<ManualGrade> = await AttainmentGrade.findAll({
     where: {
       manual: true
     },
@@ -1110,16 +1152,15 @@ export async function calculateGrades(
         }
       }
     ],
-    attributes: ['grade', 'attainmentId', 'userId'],
-  });
+    attributes: ['id', 'grade', 'attainmentId', 'userId'],
+  }) as Array<ManualGrade>;
 
   /*
-   * Next we'll organize the manual grades by user ID.
+   * Next we'll organize the manual grades by user ID and filter out expired ones.
    */
 
   /*
-   * Store the manul grades of all attainments per student. Stores all the
-   * same information as unorganizedManualGrades.
+   * Find and store all unexpired manual grades of all attainments per student.
    * User ID -> Formula node -> Manual grade.
    */
   const organizedManualGrades: Map<number, Map<FormulaNode, number>> = new Map();
@@ -1141,8 +1182,12 @@ export async function calculateGrades(
     const key: FormulaNode = getFormulaNode(manualGrade.attainmentId);
     const existingGrade: number | undefined = userManualGrades.get(key);
 
-    if (!existingGrade || manualGrade.grade > existingGrade) {
-      // No existing grade or the new grade is better.
+    if (
+      !(await gradeIsExpired(manualGrade.id))
+      && (!existingGrade || manualGrade.grade > existingGrade)
+    ) {
+      // Grade has not expired and there is no existing grade or the new grade
+      // is better.
       userManualGrades.set(key, manualGrade.grade);
     }
   }

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { AttainmentData } from 'aalto-grades-common/types';
+import { JSX } from 'react';
 
 import LeafAttainment from './LeafAttainment';
 import ParentAttainment from './ParentAttainment';

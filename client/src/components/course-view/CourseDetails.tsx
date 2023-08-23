@@ -6,14 +6,15 @@ import {
   AssessmentModelData, CourseData, Language, SystemRole, UserData
 } from 'aalto-grades-common/types';
 import { Box, Button, Tooltip, Typography } from '@mui/material';
+import { JSX } from 'react';
 
 import AssessmentModelsList from './AssessmentModelsList';
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 
 import { languageOptions } from '../course-results-view/SisuDownloadDialog';
 import useAuth, { AuthContextType } from '../../hooks/useAuth';
-import { convertToClientGradingScale } from '../../services/textFormat';
 import { LanguageOption } from '../../types';
+import { convertToClientGradingScale } from '../../utils/textFormat';
 
 export default function CourseDetails(props: {
   course: CourseData,

@@ -4,11 +4,13 @@
 
 import { CourseInstanceData } from 'aalto-grades-common/types';
 import { Box, Tooltip } from '@mui/material';
+import { JSX } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 
-import { compareDate } from '../../services/sorting';
-import { formatDateString, formatSisuCourseType } from '../../services/textFormat';
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';
+
+import { compareDate } from '../../utils/sorting';
+import { formatDateString, formatSisuCourseType } from '../../utils/textFormat';
 
 function InstanceBox(props: {
   courseId: number,

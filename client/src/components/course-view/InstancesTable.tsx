@@ -11,9 +11,9 @@ import { JSX } from 'react';
 import { UseQueryResult } from '@tanstack/react-query';
 
 import { useGetAllInstances } from '../../hooks/useApi';
-import { compareDate } from '../../services/sorting';
-import { formatDateString } from '../../services/textFormat';
 import { HeadCellData } from '../../types';
+import { compareDate } from '../../utils/sorting';
+import { formatDateString } from '../../utils/textFormat';
 
 const headCells: Array<HeadCellData> = [
   {

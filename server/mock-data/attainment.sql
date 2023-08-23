@@ -313,4 +313,8 @@ INSERT INTO public.attainment (assessment_model_id, parent_id, name, days_valid,
 (51, null, '284', 365, 2, 5, NOW(), NOW(), 'MANUAL', '{}', 'FLOAT'),
 -- Test exporting only grades not already exported
 (52, null, '285', 365, 0, 100, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["286", { "weight": 0.25 }]] }', 'FLOAT'),
-(52, 285, '286', 365, 0, 100, NOW(), NOW(), 'MANUAL', '{}', 'FLOAT');
+(52, 285, '286', 365, 0, 100, NOW(), NOW(), 'MANUAL', '{}', 'FLOAT'),
+-- Test grade expiry
+(53, null, '287', 365, 0, 5, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["288", { "weight": 0.5 }], ["289", { "weight": 0.5 }]] }', 'FLOAT'),
+(53, 287, '288', 999, 0, 5, NOW(), NOW(), 'MANUAL', '{}', 'FLOAT'),
+(53, 287, '289', 5, 0, 5, NOW(), NOW(), 'MANUAL', '{}', 'FLOAT');

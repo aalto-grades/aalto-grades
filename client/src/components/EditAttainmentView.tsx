@@ -56,7 +56,7 @@ export default function EditAttainmentView(): JSX.Element {
   // If an attainment is being edited, this query is enabled
   const attainment: UseQueryResult<AttainmentData> = useGetAttainment(
     courseId ?? -1, assessmentModelId ?? -1, attainmentId ?? -1, 'descendants',
-    { enabled: Boolean(courseId && assessmentModelId && attainmentId) }
+    { enabled: Boolean(courseId && assessmentModelId && attainmentId), cacheTime: 0 }
   );
 
   if (!attainmentTree) {

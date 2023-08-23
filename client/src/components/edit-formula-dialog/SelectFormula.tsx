@@ -11,6 +11,7 @@ import {
   SelectChangeEvent, Typography
 } from '@mui/material';
 import { styled, Theme } from '@mui/material/styles';
+import { JSX } from 'react';
 import { UseQueryResult } from '@tanstack/react-query';
 
 import AlertSnackbar from '../alerts/AlertSnackbar';
@@ -19,7 +20,7 @@ import StyledBox from './StyledBox';
 import { useGetAllFormulas } from '../../hooks/useApi';
 import useSnackPackAlerts, { SnackPackAlertState } from '../../hooks/useSnackPackAlerts';
 
-const HoverExpandMoreIcon: StyledComponent<object> = styled(ExpandMore)(
+export const HoverExpandMoreIcon: StyledComponent<object> = styled(ExpandMore)(
   ({ theme }: { theme: Theme }) => ({
     '&:hover': {
       background: theme.palette.hoverGrey1

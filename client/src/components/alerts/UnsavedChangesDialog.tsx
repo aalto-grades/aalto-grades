@@ -6,6 +6,7 @@ import {
   Box, Button, Dialog, DialogActions,
   DialogContent, Stack, Typography
 } from '@mui/material';
+import { JSX } from 'react';
 
 export default function UnsavedChangesDialog(props: {
   setOpen: (open: boolean) => void,

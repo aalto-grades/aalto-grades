@@ -4,8 +4,8 @@
 
 import { FinalGrade, GradeOption, Language } from 'aalto-grades-common/types';
 import {
-  Box, Button, Checkbox, Dialog, DialogActions, DialogContent,
-  DialogContentText, DialogTitle, FormControlLabel, List, ListItem,
+  Box, Button, Dialog, DialogActions, DialogContent,
+  DialogContentText, DialogTitle, List, ListItem,
   ListItemText, MenuItem, Paper, TextField, Typography
 } from '@mui/material';
 import { ChangeEvent, JSX, useState } from 'react';
@@ -19,7 +19,7 @@ import { LanguageOption, State } from '../../types';
 
 // A Dialog component for downloading a Sisu grade CSV.
 const instructions: string =
-  'Set the completion language and assesment date for the grading, these values'
+  'Set the completion language and assessment date for the grading, these values'
   + ' are optional. Click download to download the grades.';
 
 // Available completion languages used in Sisu.
@@ -82,8 +82,7 @@ export default function SisuDownloadDialog(props: {
     useState<string | undefined>(undefined);
   const [completionLanguage, setCompletionLanguage]: State<string | undefined> =
     useState<string | undefined>(undefined);
-  const [override, setOverride]: State<boolean> =
-    useState<boolean>(false);
+  const [override, setOverride]: State<string> = useState<string>('all');
 
   const downloadSisuGradeCsv: UseDownloadSisuGradeCsvResult = useDownloadSisuGradeCsv({
     onSuccess: (gradeCsv: BlobPart) => {
@@ -113,15 +112,33 @@ export default function SisuDownloadDialog(props: {
         severity: 'info'
       });
 
+      let studentNumbers: Array<string> = [];
+
+      switch (override) {
+      case 'exported':
+        studentNumbers = props.selectedStudents
+          .filter((student: FinalGrade) => userGradeAlreadyExported(student.grades))
+          .map((student: FinalGrade) => student.studentNumber);
+        break;
+      case 'unexported':
+        studentNumbers = props.selectedStudents
+          .filter((student: FinalGrade) => !userGradeAlreadyExported(student.grades))
+          .map((student: FinalGrade) => student.studentNumber);
+        break;
+      case 'all':
+        studentNumbers = props.selectedStudents.map(
+          (student: FinalGrade) => student.studentNumber);
+        break;
+      }
+
       downloadSisuGradeCsv.mutate({
         courseId: courseId,
         assessmentModelId: assessmentModelId,
         params: {
           completionLanguage: completionLanguage,
           assessmentDate: assessmentDate,
-          studentNumbers:
-            props.selectedStudents.map((student: FinalGrade) => student.studentNumber),
-          override
+          studentNumbers: studentNumbers,
+          override: (override === 'exported' || override === 'all')
         }
       });
     }
@@ -149,19 +166,19 @@ export default function SisuDownloadDialog(props: {
             {instructions}
           </DialogContentText>
           <Box
-            component="form"
+            component='form'
             sx={{
               '& .MuiTextField-root': { m: 1, width: '25ch' },
             }}
             noValidate
-            autoComplete="off"
+            autoComplete='off'
           >
             <Box sx={{ mb: 1 }}>
               <TextField
-                id="select-grading-completion-language"
+                id='select-grading-completion-language'
                 select
-                label="Completion language"
-                defaultValue="default"
+                label='Completion language'
+                defaultValue='default'
                 onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
                   if (e.target.value == 'default') {
                     setCompletionLanguage(undefined);
@@ -170,7 +187,7 @@ export default function SisuDownloadDialog(props: {
                   }
                 }}
               >
-                <MenuItem value="default">
+                <MenuItem value='default'>
                   Use course language
                 </MenuItem>
                 {
@@ -184,33 +201,45 @@ export default function SisuDownloadDialog(props: {
             </Box>
             <Box>
               <TextField
-                id="select-grading-assessment-date"
+                id='select-grading-assessment-date'
                 InputLabelProps={{ shrink: true }}
-                type="date"
-                label="Assessment Date"
-                /* TODO: Fix TS */
-                //format="DD-MM-YYYY"
-                helperText="If not provided, the default will be course instance ending date."
+                type='date'
+                label='Assessment Date'
+                helperText='If not provided, the default will be course instance ending date.'
                 onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
                   setAssessmentDate(e.target.value);
                 }}
               />
             </Box>
             {(exportedValuesInList()) && (
-              <Box sx={{ ml: 1, my: 2 }}>
-                <FormControlLabel control={(
-                  <Checkbox
-                    id="select-all"
-                    size="small"
-                    onClick={(): void => setOverride(!override)}
-                    checked={override} />
-                )} label={(
-                  <Typography variant='body2' sx={{ color: 'red' }}>
-                    The list includes grades already exported to Sisu.
-                    Please check the box if you want to include these previously exported grades.
-                  </Typography>
-                )
-                } />
+              <Box sx={{ ml: 1, my: 2, mr: 10 }}>
+                <Typography variant='body2' sx={{ color: 'red' }}>
+                  The list of students includes students who have already been
+                  included in a Sisu CSV previously. Please select a download
+                  option from the drop-down menu.
+                </Typography>
+                <Typography variant='body2' sx={{ mt: 1, color: 'red' }}>
+                  This dialog will NOT close after downloading a CSV file.
+                  You may download multiple CSV files with different options
+                </Typography>
+                <TextField
+                  id='export-option'
+                  select
+                  defaultValue='all'
+                  onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+                    setOverride(e.target.value);
+                  }}
+                >
+                  <MenuItem value='all'>
+                    Download all selected grades in a single CSV
+                  </MenuItem>
+                  <MenuItem value='unexported'>
+                    Only download unexported grades
+                  </MenuItem>
+                  <MenuItem value='exported'>
+                    Only download previously exported grades
+                  </MenuItem>
+                </TextField>
               </Box>
             )}
           </Box>
