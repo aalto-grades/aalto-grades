@@ -1036,7 +1036,8 @@ export async function calculateGrades(
         minRequiredGrade: attainment.minRequiredGrade,
         maxGrade: attainment.maxGrade,
         formula: attainment.formula,
-        formulaParams: attainment.formulaParams
+        formulaParams: attainment.formulaParams,
+        gradeType: attainment.gradeType
       }
     });
   }
