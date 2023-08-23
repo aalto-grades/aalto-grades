@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AttainmentGradeData, EditGrade, FinalGrade, Formula, GradeOption, HttpCode, Status
+  AttainmentGradeData, EditGrade, FinalGrade, Formula,
+  GradeOption, GradeType, HttpCode, Status
 } from 'aalto-grades-common/types';
 import { parse, Parser } from 'csv-parse';
 import { stringify } from 'csv-stringify';
@@ -725,6 +726,8 @@ export function parseGradesFromCsv(
 
       student.grades.push({
         attainmentId: attainments[i].id,
+        gradeType: attainments[i].gradeType,
+        attainmentName: attainments[i].name,
         grade: gradeValue,
         manual: true,
         status: (
@@ -746,6 +749,19 @@ export function parseGradesFromCsv(
     throw new ApiError(errors, HttpCode.BadRequest);
   }
   return students;
+}
+
+const gradeTypeErrors: Array<string> = [];
+
+function correctType(grade: AttainmentGradeModelData, studentNumber: string): number {
+  // Grade is supposed to be integer but received float.
+  if (grade.gradeType === GradeType.Integer && !Number.isInteger(grade.grade)) {
+    gradeTypeErrors.push(
+      'Expected grade type integer but received float ' +
+      `for student ${studentNumber} grade ID ${grade.attainmentName}.`
+    );
+  }
+  return (grade.gradeType === GradeType.Integer ? Math.round(grade.grade) : grade.grade);
 }
 
 /**
@@ -894,18 +910,24 @@ export async function addGrades(req: Request, res: Response, next: NextFunction)
         // students grades into a one array of all the grades.
         const preparedBulkCreate: Array<AttainmentGradeModelData> = parsedStudentData.flatMap(
           (student: StudentGrades): Array<AttainmentGradeModelData> => {
+            const studentNumber: string = student.studentNumber;
             const studentGradingData: Array<AttainmentGradeModelData> = student.grades.map(
               (grade: AttainmentGradeModelData): AttainmentGradeModelData => {
                 return {
+                  ...grade,
                   userId: student.id as number,
                   graderId: grader.id,
                   date: completionDate,
                   expiryDate: expiryDate,
-                  ...grade
+                  grade: correctType(grade, studentNumber)
                 };
               });
             return studentGradingData;
           });
+
+        if (gradeTypeErrors.length !== 0) {
+          throw new ApiError(gradeTypeErrors, HttpCode.BadRequest);
+        }
 
         // TODO: Optimize if datasets are big.
         await AttainmentGrade.bulkCreate(
@@ -1260,7 +1282,8 @@ export async function calculateGrades(
         graderId: grader.id,
         grade: calculated.grade,
         status: calculated.status,
-        manual: false
+        manual: false,
+        gradeType: formulaNode.attainment.gradeType
       }
     );
 
