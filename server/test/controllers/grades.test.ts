@@ -1181,6 +1181,25 @@ describe(
       });
 
     it(
+      'should respond with 400 bad request, if the CSV has grades with incorrect type',
+      async () => {
+        const invalidCsvData: fs.ReadStream = fs.createReadStream(
+          path.resolve(__dirname, '../mock-data/csv/grades_incorrect_type.csv'), 'utf8'
+        );
+        res = await request
+          .post('/v1/courses/1/assessment-models/1/grades/csv')
+          .attach('csv_data', invalidCsvData, { contentType: 'text/csv' })
+          .field('completionDate', '2023-12-24')
+          .set('Cookie', cookies.adminCookie)
+          .set('Accept', 'application/json');
+
+        checkErrorRes(
+          ['Expected grade type integer but received float for student 812472 grade ID name1.'],
+          HttpCode.BadRequest
+        );
+      });
+
+    it(
       'should respond with 400 bad request, if the expiry date is before completion date',
       async () => {
         const csvData: fs.ReadStream = fs.createReadStream(
