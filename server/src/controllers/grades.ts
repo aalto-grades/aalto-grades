@@ -343,7 +343,7 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
       });
       courseResults.push({
         studentNumber: finalGrade.User.studentNumber,
-        grade: String(finalGrade.grade),
+        grade: String(Math.round(finalGrade.grade)),
         credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits,
         // Assesment date must be in form dd.mm.yyyy.
         assessmentDate: (
@@ -480,7 +480,7 @@ export async function getFinalGrades(req: Request, res: Response): Promise<void>
               id: grade.grader.id,
               name: grade.grader.name
             },
-            grade: grade.grade,
+            grade: Math.round(grade.grade),
             status: grade.status as Status,
             manual: grade.manual,
             exportedToSisu: grade.sisuExportDate,
