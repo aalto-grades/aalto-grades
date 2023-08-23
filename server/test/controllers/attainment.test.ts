@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AttainmentData, Formula, HttpCode, ParamsObject
+  AttainmentData, Formula, GradeType, HttpCode, ParamsObject
 } from 'aalto-grades-common/types';
 import { Op } from 'sequelize';
 import supertest from 'supertest';
@@ -41,6 +41,7 @@ function verifyAttainmentData(
   expect(data.minRequiredGrade).toBeDefined();
   expect(data.maxGrade).toBeDefined();
   expect(data.formula).toBeDefined();
+  expect(data.gradeType).toBeDefined();
   expect(data.formulaParams).toBeDefined();
   if (subAttainments)
     expect(data.subAttainments).toBeDefined();
@@ -284,7 +285,8 @@ describe(
             minRequiredGrade: 1,
             maxGrade: 5,
             formula: Formula.Manual,
-            formulaParams: {}
+            formulaParams: {},
+            gradeType: GradeType.Float
           })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -319,7 +321,8 @@ describe(
             formula: Formula.Manual,
             minRequiredGrade: 1,
             maxGrade: 5,
-            formulaParams: {}
+            formulaParams: {},
+            gradeType: GradeType.Float
           })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.userCookie)
@@ -404,7 +407,8 @@ describe(
             minRequiredGrade: 1,
             maxGrade: 5,
             formula: Formula.Manual,
-            formulaParams: {}
+            formulaParams: {},
+            gradeType: GradeType.Float
           })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -514,7 +518,8 @@ describe(
             daysValid: 6000,
             minRequiredGrade: 1,
             maxGrade: 5,
-            formula: Formula.WeightedAverage
+            formula: Formula.WeightedAverage,
+            gradeType: GradeType.Float
           })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -543,6 +548,7 @@ describe(
             minRequiredGrade: 1,
             maxGrade: 5,
             formula: Formula.WeightedAverage,
+            gradeType: GradeType.Float,
             formulaParams: {
               children: [
                 ['sub not success', { weight: 1 }]
@@ -555,6 +561,7 @@ describe(
                 minRequiredGrade: 1,
                 maxGrade: 5,
                 formula: Formula.WeightedAverage,
+                gradeType: GradeType.Float,
                 formulaParams: {
                   children: [
                     'wrong again', 5,
@@ -599,6 +606,7 @@ describe(
             minRequiredGrade: 1,
             maxGrade: 5,
             formula: Formula.WeightedAverage,
+            gradeType: GradeType.Float,
             formulaParams: {
               children: [
                 ['i-am-present', { weight: 1 }]
@@ -611,6 +619,7 @@ describe(
                 minRequiredGrade: 1,
                 maxGrade: 5,
                 formula: Formula.Manual,
+                gradeType: GradeType.Float,
                 formulaParams: {}
               },
               {
@@ -619,6 +628,7 @@ describe(
                 minRequiredGrade: 1,
                 maxGrade: 5,
                 formula: Formula.Manual,
+                gradeType: GradeType.Float,
                 formulaParams: {}
               }
             ]
@@ -650,6 +660,7 @@ describe(
             minRequiredGrade: 1,
             maxGrade: 5,
             formula: Formula.WeightedAverage,
+            gradeType: GradeType.Float,
             formulaParams: {
               children: [
                 ['the good', { weight: 1 }],
@@ -664,6 +675,7 @@ describe(
                 minRequiredGrade: 1,
                 maxGrade: 5,
                 formula: Formula.Manual,
+                gradeType: GradeType.Float,
                 formulaParams: {}
               }
             ]
@@ -695,6 +707,7 @@ describe(
                 minRequiredGrade: 1,
                 maxGrade: 5,
                 formula: Formula.Manual,
+                gradeType: GradeType.Float,
                 formulaParams: {},
                 subAttainments: [],
               }
@@ -720,6 +733,7 @@ describe(
                 minRequiredGrade: 1,
                 maxGrade: 5,
                 formula: Formula.Manual,
+                gradeType: GradeType.Float,
                 formulaParams: {},
                 subAttainments: [
                   {
@@ -728,6 +742,7 @@ describe(
                     minRequiredGrade: 1,
                     maxGrade: 5,
                     formula: Formula.Manual,
+                    gradeType: GradeType.Float,
                     formulaParams: {},
                     subAttainments: badInput,
                   }
@@ -755,6 +770,7 @@ describe(
                 minRequiredGrade: 1,
                 maxGrade: 5,
                 formula: Formula.Manual,
+                gradeType: GradeType.Float,
                 formulaParams: {
                   minRequiredGrade: 0
                 },
@@ -765,6 +781,7 @@ describe(
                     minRequiredGrade: 1,
                     maxGrade: 5,
                     formula: Formula.Manual,
+                    gradeType: GradeType.Float,
                     formulaParams: {
                       minRequiredGrade: 0
                     },
@@ -775,6 +792,7 @@ describe(
                         minRequiredGrade: 1,
                         maxGrade: 5,
                         formula: Formula.Manual,
+                        gradeType: GradeType.Float,
                         formulaParams: {
                           minRequiredGrade: 0
                         },
@@ -1347,6 +1365,7 @@ describe(
             minRequiredGrade: 1,
             maxGrade: 5,
             formula: Formula.Manual,
+            gradeType: GradeType.Float,
             formulaParams: {},
             subAttainments: []
           }
@@ -1380,6 +1399,7 @@ describe(
             minRequiredGrade: 1,
             maxGrade: 5,
             formula: Formula.Manual,
+            gradeType: GradeType.Float,
             formulaParams: {},
             subAttainments: []
           }
@@ -1412,6 +1432,7 @@ describe(
           minRequiredGrade: 1,
           maxGrade: 5,
           formula: Formula.Manual,
+          gradeType: GradeType.Float,
           formulaParams: {},
           subAttainments: [
             {
@@ -1420,6 +1441,7 @@ describe(
               minRequiredGrade: 1,
               maxGrade: 5,
               formula: Formula.Manual,
+              gradeType: GradeType.Float,
               formulaParams: {},
               subAttainments: []
             },
@@ -1429,6 +1451,7 @@ describe(
               minRequiredGrade: 1,
               maxGrade: 5,
               formula: Formula.Manual,
+              gradeType: GradeType.Float,
               formulaParams: {},
               subAttainments: []
             }
