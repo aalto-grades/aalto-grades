@@ -564,7 +564,7 @@ export async function getGradeTreeOfUser(req: Request, res: Response): Promise<v
               id: option.grader?.id,
               name: option.grader?.name
             },
-            grade: option.grade,
+            grade: root.gradeType === GradeType.Integer ? Math.round(option.grade) : option.grade,
             status: option.status as Status,
             manual: option.manual,
             exportedToSisu: option.sisuExportDate,
