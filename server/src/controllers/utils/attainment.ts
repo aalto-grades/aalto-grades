@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpCode, ParamsObject } from 'aalto-grades-common/types';
+import { HttpCode } from 'aalto-grades-common/types';
 
 import AssessmentModel from '../../database/models/assessmentModel';
 import Attainment from '../../database/models/attainment';
