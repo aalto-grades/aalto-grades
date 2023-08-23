@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, Formula } from 'aalto-grades-common/types';
+import { AttainmentData, Formula, GradeType } from 'aalto-grades-common/types';
 import {
   Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField
 } from '@mui/material';
@@ -56,7 +56,8 @@ export default function SimpleDialog(props: {
           minRequiredGrade: 1,
           maxGrade: 5,
           formula: Formula.Manual,
-          formulaParams: {}
+          formulaParams: {},
+          gradeType: GradeType.Float
         });
       }
 
