@@ -27,7 +27,7 @@ import {
   JwtClaims, StudentGrades, idSchema
 } from '../types';
 import { validateAssessmentModelPath } from './utils/assessmentModel';
-import { findAttainmentGradeById } from './utils/attainment';
+import { findAttainmentById, findAttainmentGradeById } from './utils/attainment';
 import { toDateOnlyString } from './utils/date';
 import { gradeIsExpired } from './utils/grades';
 import { findUserById, isTeacherInChargeOrAdmin } from './utils/user';
@@ -758,7 +758,7 @@ function correctType(grade: AttainmentGradeModelData, studentNumber: string): nu
   if (grade.gradeType === GradeType.Integer && !Number.isInteger(grade.grade)) {
     gradeTypeErrors.push(
       'Expected grade type integer but received float ' +
-      `for student ${studentNumber} grade ID ${grade.attainmentName}.`
+      `for student ${studentNumber} grade name '${grade.attainmentName}'.`
     );
   }
   return (grade.gradeType === GradeType.Integer ? Math.round(grade.grade) : grade.grade);
@@ -1332,6 +1332,14 @@ export async function editUserGrade(req: Request, res: Response): Promise<void> 
   await isTeacherInChargeOrAdmin(grader, course.id, HttpCode.Forbidden);
 
   const gradeData: AttainmentGrade = await findAttainmentGradeById(gradeId, HttpCode.NotFound);
+
+  if (grade) {
+    const attainment: Attainment =
+      await findAttainmentById(gradeData.attainmentId, HttpCode.NotFound);
+    if (attainment.gradeType === GradeType.Integer && !Number.isInteger(grade)) {
+      throw new ApiError('Expected grade type integer but received float.', HttpCode.BadRequest);
+    }
+  }
 
   await gradeData.set({
     grade: grade ?? gradeData.grade,
