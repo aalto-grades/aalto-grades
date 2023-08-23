@@ -3,7 +3,7 @@
 -- SPDX-License-Identifier: MIT
 
 INSERT INTO public.attainment (assessment_model_id, parent_id, name, days_valid, min_required_grade, max_grade, created_at, updated_at, formula, formula_params, grade_type) VALUES
-(1, null, 'name1', 365, 0, 100, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["name5", { "weight": 2 }], ["name9", { "weight": 2 }], ["name16", { "weight": 2 }], ["name17", { "weight": 2 }], ["name18", { "weight": 2 }]] }', 'FLOAT'),
+(1, null, 'name1', 365, 0, 100, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["name5", { "weight": 2 }], ["name9", { "weight": 2 }], ["name16", { "weight": 2 }], ["name17", { "weight": 2 }], ["name18", { "weight": 2 }]] }', 'INTEGER'),
 (2, null, 'name2', 365, 0, 100, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["name6", { "weight": 2 }], ["name10", { "weight": 2 }]] }', 'FLOAT'),
 (3, null, 'name3', 365, 0, 100, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["name7", { "weight": 2 }], ["name11", { "weight": 2 }], ["264", { "weight": 0 }]] }', 'FLOAT'),
 (5, null, 'name4', 365, 0, 100, NOW(), NOW(), 'WEIGHTED_AVERAGE', '{ "children": [["name8", { "weight": 2 }], ["name12", { "weight": 2 }]] }', 'FLOAT'),
