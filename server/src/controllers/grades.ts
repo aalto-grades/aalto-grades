@@ -1277,10 +1277,11 @@ export async function calculateGrades(
         userId: userId,
         // The formula nodes were constructed with attainments IDs defined, so
         // this can be asserted to be non-null.
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         attainmentId: formulaNode.attainment.id!,
         graderId: grader.id,
-        grade: calculated.grade,
+        // Round grade to closest integer if attainment is graded as integer.
+        grade: formulaNode.attainment.gradeType === GradeType.Integer ?
+          Math.round(calculated.grade) : calculated.grade,
         status: calculated.status,
         manual: false,
         gradeType: formulaNode.attainment.gradeType
