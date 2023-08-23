@@ -520,6 +520,8 @@ describe(
           expect(option.grader.id).toBeDefined();
           expect(option.grader.name).toBeDefined();
           expect(option.grade).toBeDefined();
+          // Final grades must be integers.
+          expect(Number.isInteger(option.grade)).toBeTruthy();
           expect(option.status).toBeDefined();
           expect(option.manual).toBeDefined();
           expect(option.exportedToSisu).toBeDefined();

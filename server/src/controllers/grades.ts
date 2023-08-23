@@ -344,6 +344,7 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
       });
       courseResults.push({
         studentNumber: finalGrade.User.studentNumber,
+        // Round to get final grades as an integer.
         grade: String(Math.round(finalGrade.grade)),
         credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits,
         // Assesment date must be in form dd.mm.yyyy.
