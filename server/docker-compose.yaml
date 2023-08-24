@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 # This is a Docker Compose configuration for running backend unit tests or development
+---
 
 version: "3.7"
 
@@ -16,7 +17,7 @@ services:
       - 3000:3000
     environment:
       NODE_ENV: "${NODE_ENV}"
-      
+
   database:
     extends:
       file: ../common-services.yaml

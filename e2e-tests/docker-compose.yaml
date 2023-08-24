@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 # This is a Docker Compose configuration for executing Cypress end-to-end tests
+---
 
 version: "3.7"
 
