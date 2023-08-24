@@ -76,7 +76,6 @@ export default function EditAttainmentView(): JSX.Element {
       });
     } else if (modification === 'edit' && attainment.data) {
       setInitialValues(JSON.parse(JSON.stringify(attainment.data)));
-      console.log(initialValues)
     }
   }
 
@@ -297,8 +296,6 @@ export default function EditAttainmentView(): JSX.Element {
               variant='outlined'
               color={JSON.stringify(attainmentTree) !== JSON.stringify(initialValues) ? 'error' : 'primary'}
               onClick={(): void => {
-                console.log(JSON.stringify(attainmentTree));
-                console.log(JSON.stringify(initialValues));
                 if (JSON.stringify(attainmentTree) !== JSON.stringify(initialValues)) {
                   setShowDialog(true);
                 } else {
