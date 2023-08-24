@@ -294,7 +294,8 @@ export default function EditAttainmentView(): JSX.Element {
             <Button
               size='medium'
               variant='outlined'
-              color={JSON.stringify(attainmentTree) !== JSON.stringify(initialValues) ? 'error' : 'primary'}
+              color={JSON.stringify(attainmentTree) !== JSON.stringify(initialValues) ?
+                'error' : 'primary'}
               onClick={(): void => {
                 if (JSON.stringify(attainmentTree) !== JSON.stringify(initialValues)) {
                   setShowDialog(true);

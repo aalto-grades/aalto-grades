@@ -20,7 +20,7 @@ export default function ParentAttainment(props: {
   deleteAttainment: (attainment: AttainmentData) => void,
   getTemporaryId: () => number,
   attainment: AttainmentData,
-  paramsFromParent?: object,
+  paramsFromParent?: object
 }): JSX.Element {
 
   // For opening and closing the list of sub-attainments

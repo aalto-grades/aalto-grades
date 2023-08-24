@@ -23,7 +23,7 @@ export default function SimpleDialog(props: {
   getTemporaryId: () => number,
   attainment: AttainmentData,
   handleClose: () => void,
-  open: boolean,
+  open: boolean
 }): JSX.Element {
 
   const [numOfAttainments, setNumOfAttainments]: State<number> = useState(1);
