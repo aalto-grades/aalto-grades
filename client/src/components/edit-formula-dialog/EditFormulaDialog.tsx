@@ -181,6 +181,9 @@ export default function EditFormulaDialog(props: {
             <Step>
               <StepLabel>Set Parameters</StepLabel>
             </Step>
+            <Step>
+              <StepLabel>Summary</StepLabel>
+            </Step>
           </Stepper>
           {
             (activeStep === 0 && props.attainment) && (

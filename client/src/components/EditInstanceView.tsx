@@ -280,7 +280,14 @@ export default function EditInstanceView(): JSX.Element {
             />
           </>
         ) : (
-          <LinearProgress sx={{ margin: '200px 50px 0px 50px' }} />
+          <Box sx={{ margin: '200px 50px 0px 50px' }}>
+            {(sisuInstanceId) && (
+              <Typography sx={{ mb: 3, textAlign: 'center' }}>
+                Loading instance information from Sisu...
+              </Typography>
+            )}
+            <LinearProgress/>
+          </Box>
         )
       }
       <AlertSnackbar snackPack={snackPack} />
