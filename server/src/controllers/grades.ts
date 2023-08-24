@@ -326,7 +326,7 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
 
     if (existingResult) {
       if (finalGrade.grade > Number(existingResult.grade)) {
-        existingResult.grade = String(finalGrade.grade);
+        existingResult.grade = String(Math.round(finalGrade.grade));
 
         // There can be multiple grades, make sure only the exported grade is marked with timestamp.
         const userData: MarkSisuExport | undefined = exportedToSisu.find(
