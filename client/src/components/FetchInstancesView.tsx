@@ -35,11 +35,13 @@ export default function FetchInstancesView(): JSX.Element {
               instances={sisuInstances.data}
             />
           ) : (
-            <Box>
-              <Typography sx={{ my: 3, textAlign: 'center' }}>
-                Loading instances from Sisu...
+            <Box sx={{ my: 3, textAlign: 'center' }}>
+              <Typography sx={{ mb: 2 }}>
+                {sisuInstances.isLoading ?
+                  'Loading instances from Sisu...' : 'Something went wrong.'
+                }
               </Typography>
-              <LinearProgress/>
+              {(sisuInstances.isLoading) && <LinearProgress/>}
             </Box>
           )
         }
