@@ -1,0 +1,16 @@
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
+{
+  "admin": {
+    "name": "Andy Admin",
+    "email": "admin@aalto.fi",
+    "password": "password"
+  },
+  "teacher": {
+    "name": "Timmy Teacher",
+    "email": "teacher@aalto.fi",
+    "password": "password"
+  }
+}

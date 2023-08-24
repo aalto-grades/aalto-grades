@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-/// <reference types="cypress" />
 // ***********************************************
 // This example commands.ts shows you how to
 // create various custom commands and overwrite
@@ -29,13 +28,23 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 //
-// declare global {
-//   namespace Cypress {
-//     interface Chainable {
-//       login(email: string, password: string): Chainable<void>
-//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
-//     }
-//   }
-// }
+
+Cypress.Commands.add('login', (email: string, password: string) => {
+  cy.session(
+    [email, password],
+    () => {
+      cy.visit('/login');
+      cy.get('input[type=email]').type(email);
+      cy.get('input[type=password]').type(password);
+      cy.contains('button[type=submit]', 'log in').click();
+      cy.url().should('eq', Cypress.config().baseUrl + '/');
+    },
+    {
+      validate() {
+        cy.visit('/');
+        cy.wait(1000);
+        cy.url().should('not.include', '/login');
+      },
+    }
+  )
+});
