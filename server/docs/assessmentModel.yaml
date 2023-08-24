@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 #
 # SPDX-License-Identifier: MIT
+---
 
 definitions:
   AssessmentModelId:
@@ -14,9 +15,9 @@ definitions:
     description: Assessment model information.
     properties:
       id:
-       $ref: '#/definitions/AssessmentModelId'
+        $ref: '#/definitions/AssessmentModelId'
       courseId:
-       $ref: '#/definitions/CourseId'
+        $ref: '#/definitions/CourseId'
       name:
         type: string
         decription: Name of the assessment model.

@@ -4,6 +4,7 @@
 
 # This is a Docker Compose configuration for executing Aalto Grades normally,
 # optionally without the frontend
+---
 
 version: "3.7"
 

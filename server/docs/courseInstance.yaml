@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 #
 # SPDX-License-Identifier: MIT
+---
 
 definitions:
   Period:
@@ -34,11 +35,11 @@ definitions:
     description: Course instance information.
     properties:
       id:
-       $ref: '#/definitions/CourseInstanceId'
+        $ref: '#/definitions/CourseInstanceId'
       sisuInstanceInUse:
-       $ref: '#/definitions/SisuInstanceInUse'
+        $ref: '#/definitions/SisuInstanceInUse'
       sisuCourseInstanceId:
-       $ref: '#/definitions/SisuCourseInstanceId'
+        $ref: '#/definitions/SisuCourseInstanceId'
       startingPeriod:
         $ref: '#/definitions/Period'
       endingPeriod:

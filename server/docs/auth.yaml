@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 #
 # SPDX-License-Identifier: MIT
+---
 
 definitions:
   UserId:
@@ -119,11 +120,11 @@ definitions:
             schema:
               $ref: '#/definitions/LoginResult'
         headers:
-           Set-Cookie:
-             description: JWT token, storing an access token to allow using the API.
-             schema:
-               type: string
-               example: jwt=wliuerhlwieurh; Secure; HttpOnly; SameSite=None
+          Set-Cookie:
+            description: JWT token, storing an access token to allow using the API.
+            schema:
+              type: string
+              example: jwt=wliuerhlwieurh; Secure; HttpOnly; SameSite=None
       401:
         description: >
           The login has failed, due to invalid credentials or an invalid request format.
@@ -177,11 +178,11 @@ definitions:
             schema:
               $ref: '#/definitions/SignupAndSelfInfo'
         headers:
-           Set-Cookie:
-             description: JWT token, storing an access token to allow using the API.
-             schema:
-               type: string
-               example: jwt=wliuerhlwieurh; Secure; HttpOnly; SameSite=None
+          Set-Cookie:
+            description: JWT token, storing an access token to allow using the API.
+            schema:
+              type: string
+              example: jwt=wliuerhlwieurh; Secure; HttpOnly; SameSite=None
       409:
         description: A user with the specified email already exists.
         content:

@@ -4,6 +4,7 @@
 
 # This Docker Compose file defines common configuration for use in all other
 # Docker Compose files
+---
 
 version: "3.7"
 
