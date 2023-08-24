@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { CourseInstanceData } from 'aalto-grades-common/types';
-import { Box, Button , Container, Divider, Typography } from '@mui/material';
+import { Box, Button , Container, Divider, LinearProgress, Typography } from '@mui/material';
 import { JSX } from 'react';
 import { NavigateFunction, Params, useNavigate, useParams } from 'react-router-dom';
 import { UseQueryResult } from '@tanstack/react-query';
@@ -29,11 +29,18 @@ export default function FetchInstancesView(): JSX.Element {
           Select the instance you wish to add
         </Typography>
         {
-          (sisuInstances.data) && (
+          (sisuInstances.data) ? (
             <FetchedInstances
               courseId={Number(courseId)}
               instances={sisuInstances.data}
             />
+          ) : (
+            <Box>
+              <Typography sx={{ my: 3, textAlign: 'center' }}>
+                Loading instances from Sisu...
+              </Typography>
+              <LinearProgress/>
+            </Box>
           )
         }
         <Divider sx={{ my: 5 }} />
