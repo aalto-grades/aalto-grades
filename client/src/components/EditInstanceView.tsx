@@ -248,10 +248,10 @@ export default function EditInstanceView(): JSX.Element {
                       <Button
                         size='medium'
                         variant='outlined'
-                        color={initialValues != values ? 'error' : 'primary'}
+                        color={JSON.stringify(initialValues) != JSON.stringify(values) ? 'error' : 'primary'}
                         disabled={isSubmitting}
                         onClick={(): void => {
-                          if (initialValues != values) {
+                          if (JSON.stringify(initialValues) != JSON.stringify(values)) {
                             setShowDialog(true);
                           } else {
                             navigate(-1);
