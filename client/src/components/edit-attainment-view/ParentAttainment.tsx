@@ -20,8 +20,7 @@ export default function ParentAttainment(props: {
   deleteAttainment: (attainment: AttainmentData) => void,
   getTemporaryId: () => number,
   attainment: AttainmentData,
-  paramsFromParent?: object,
-  setTouched: () => void
+  paramsFromParent?: object
 }): JSX.Element {
 
   // For opening and closing the list of sub-attainments
@@ -44,7 +43,6 @@ export default function ParentAttainment(props: {
         getTemporaryId={props.getTemporaryId}
         attainment={props.attainment}
         paramsFromParent={props.paramsFromParent}
-        setTouched={props.setTouched}
       />
       <Box sx={{ display: 'flex', flexDirection: 'row' }}>
         {open ? (
@@ -82,7 +80,6 @@ export default function ParentAttainment(props: {
                         getTemporaryId={props.getTemporaryId}
                         attainment={subAttainment}
                         paramsFromParent={childParams.get(subAttainment.name)}
-                        setTouched={props.setTouched}
                       />
                     )
                   )
