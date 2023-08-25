@@ -452,10 +452,11 @@ export default function EditCourseView(): JSX.Element {
                     <Button
                       size='medium'
                       variant='outlined'
-                      color={initialValues != form.values ? 'error' : 'primary'}
+                      color={JSON.stringify(initialValues) != JSON.stringify(form.values) ?
+                        'error' : 'primary'}
                       disabled={form.isSubmitting}
                       onClick={(): void => {
-                        if (initialValues != form.values) {
+                        if (JSON.stringify(initialValues) != JSON.stringify(form.values)) {
                           setShowDialog(true);
                         } else {
                           navigate(-1);

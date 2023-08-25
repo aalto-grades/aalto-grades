@@ -50,8 +50,7 @@ export default function LeafAttainment(props: {
   deleteAttainment: (attainment: AttainmentData) => void,
   getTemporaryId: () => number,
   attainment: AttainmentData,
-  paramsFromParent?: object,
-  setTouched: () => void
+  paramsFromParent?: object
 }): JSX.Element {
 
   const { modification }: Params = useParams();
@@ -145,7 +144,6 @@ export default function LeafAttainment(props: {
             width: '100%'
           }}
           onChange={(event: ChangeEvent<HTMLInputElement>): void => {
-            props.setTouched();
             props.attainment.name = event.target.value;
             props.setAttainmentTree(structuredClone(props.attainmentTree));
           }}
@@ -163,7 +161,6 @@ export default function LeafAttainment(props: {
             width: '100%'
           }}
           onChange={(event: ChangeEvent<HTMLInputElement>): void => {
-            props.setTouched();
             props.attainment.daysValid = Number(event.target.value);
             props.setAttainmentTree(structuredClone(props.attainmentTree));
           }}
@@ -181,7 +178,6 @@ export default function LeafAttainment(props: {
             width: '100%'
           }}
           onChange={(event: ChangeEvent<HTMLInputElement>): void => {
-            props.setTouched();
             props.attainment.minRequiredGrade = Number(event.target.value);
             props.setAttainmentTree(structuredClone(props.attainmentTree));
           }}
@@ -199,7 +195,6 @@ export default function LeafAttainment(props: {
             width: '100%'
           }}
           onChange={(event: ChangeEvent<HTMLInputElement>): void => {
-            props.setTouched();
             props.attainment.maxGrade = Number(event.target.value);
             props.setAttainmentTree(structuredClone(props.attainmentTree));
           }}
@@ -312,7 +307,6 @@ export default function LeafAttainment(props: {
         attainment={props.attainment}
         handleClose={handleCountDialogClose}
         open={openCountDialog}
-        setTouched={props.setTouched}
       />
     </Box>
   );
