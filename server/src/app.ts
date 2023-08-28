@@ -30,6 +30,7 @@ app.use(helmet());
 
 app.use('/', router);
 
+// Handle unmatched routes and throw an API error.
 app.use((req: Request): void => {
   throw new ApiError(
     `Cannot ${req.method} ${req.path}. Please refer to the API documentation at `

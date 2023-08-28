@@ -7,6 +7,17 @@ import { NextFunction, Request, Response } from 'express';
 
 import { JwtClaims } from '../types';
 
+/**
+ * Middleware function to ensure that the user has the necessary role to proceed.
+ * @param {Array<SystemRole>} allowedRoles - List of roles that are permitted to access
+ * the resource.
+ * @returns {Function} Returns a middleware function that checks the user's role against
+ * the allowed roles.
+ *
+ * @example
+ * // Protect an endpoint so only admins can access it.
+ * app.post('/v1/courses', authorization([SystemRole.Admin]), (req, res) => { ... });
+ */
 export function authorization(
   allowedRoles: Array<SystemRole>
 ): (req: Request, res: Response, next: NextFunction) => void {

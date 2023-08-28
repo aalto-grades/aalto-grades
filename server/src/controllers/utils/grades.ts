@@ -5,6 +5,13 @@
 import Attainment from '../../database/models/attainment';
 import AttainmentGrade from '../../database/models/attainmentGrade';
 
+/**
+ * Retrieves the date of the latest grade for a user based on an assessment model ID.
+ * @param {number} userId - The ID of the user.
+ * @param {number} assessmentModelId - The ID of the assessment model.
+ * @returns {Promise<Date>} Returns the date of the latest grade.
+ * @throws {Error} Throws an error if there are no grades for the user.
+ */
 export async function getDateOfLatestGrade(
   userId: number, assessmentModelId: number
 ): Promise<Date> {
@@ -44,6 +51,12 @@ export async function getDateOfLatestGrade(
   }
 }
 
+/**
+ * Determines if a grade has expired based on its ID.
+ * @param {number} gradeId - The ID of the grade.
+ * @returns {Promise<boolean>} Returns true if the grade has expired, otherwise returns false.
+ * @throws {Error} Throws an error if the grade ID is invalid.
+ */
 export async function gradeIsExpired(gradeId: number): Promise<boolean> {
   interface GradeWithAttainment extends AttainmentGrade {
     Attainment: Attainment

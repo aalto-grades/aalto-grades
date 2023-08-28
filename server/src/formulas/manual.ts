@@ -24,7 +24,7 @@ function manualGradeUnspecified(attainment: AttainmentData): CalculationResult {
   return {
     attainment: attainment,
     status: Status.Fail,
-    grade: 0,
+    grade: 0
   };
 }
 

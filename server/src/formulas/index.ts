@@ -48,9 +48,7 @@ export function registerFormula(
   );
 }
 
-export function getFormulaImplementation(
-  formulaId: Formula
-): FormulaImplementation {
+export function getFormulaImplementation(formulaId: Formula): FormulaImplementation {
   const formulaImplementation: FormulaImplementation | undefined =
     formulaImplementations.get(formulaId);
 
