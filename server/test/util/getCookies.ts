@@ -14,6 +14,12 @@ export interface Cookies {
   userCookie: Array<string>
 }
 
+/**
+ * Utility function to generate and retrieve cookies for an admin and user account.
+ * The function simulates sign up requests for both roles and extracts cookies from the response.
+ * These cookies can be used to simulate authenticated requests in testing scenarios.
+ * @returns {Promise<Cookies>} Generated cookies.
+ */
 export async function getCookies(): Promise<Cookies> {
   const adminEmail: string = `admin${new Date().getTime()}@aalto.fi`;
   const userEmail: string = `user${new Date().getTime()}@aalto.fi`;

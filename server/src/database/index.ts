@@ -8,6 +8,7 @@ import dbCreds from '../configs/database';
 import { NODE_ENV } from '../configs/environment';
 import logger from '../configs/winston';
 
+// Configure and initialize Sequelize instance with database details and options.
 export const sequelize: Sequelize = new Sequelize(
   dbCreds.database,
   dbCreds.username,
@@ -29,6 +30,7 @@ export const sequelize: Sequelize = new Sequelize(
   }
 );
 
+// Function to establish connection to the database and log the status.
 export async function connectToDatabase(): Promise<void> {
   try {
     await sequelize.authenticate();

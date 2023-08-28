@@ -4,6 +4,15 @@
 
 import { DateOnlyString } from 'aalto-grades-common/types';
 
+/**
+ * Converts a Date object or a date string to a DateOnlyString format (YYYY-MM-DD).
+ * @param {Date | string} date - The date to be converted.
+ * @returns {DateOnlyString} Returns the date in YYYY-MM-DD format.
+ * @throws {Error} Throws an error if the provided date string is invalid.
+ *
+ * @example
+ * toDateOnlyString(new Date('2023-08-28T14:00:00Z')); // Outputs: "2023-08-28"
+ */
 export function toDateOnlyString(date: Date | string): DateOnlyString {
   const dateOnlyRegExp: RegExp =
     /^\d{4}[/-](0?[1-9]|1[012])[/-](0?[1-9]|[12][0-9]|3[01])$/;

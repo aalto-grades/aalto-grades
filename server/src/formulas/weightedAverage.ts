@@ -22,6 +22,13 @@ interface ChildParams {
 
 type Params = ParamsObject<ChildParams>;
 
+/**
+ * Calculates the weighted average grade based on sub-grades.
+ * @param {AttainmentData} attainment - Data of the main attainment.
+ * @param {Array<CalculationResult>} subGrades - An array of calculation results for sub-grades.
+ * @returns {CalculationResult} Returns the weighted average calculation result.
+ * @throws {ApiError} Throws an error if a weight is unspecified for any sub-grade attainment.
+ */
 function calculateWeightedAverage(
   attainment: AttainmentData,
   subGrades: Array<CalculationResult>

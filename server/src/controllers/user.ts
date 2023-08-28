@@ -18,7 +18,12 @@ import { findUserById } from './utils/user';
 // TODO: Remove if possible.
 require('../database/models/courseInstanceRole');
 
-// Check user id matches queried and system rights and exists.
+/**
+ * Checks if the user making the request is an admin or the owner of the data being accessed.
+ * @param {Request} req - Express request object containing user info and the userId parameter.
+ * @returns {Promise<User>} Returns the User object if the user exists and has correct permissions.
+ * @throws {ApiError} If the user does not have correct permissions or if the userId is invalid.
+ */
 async function adminOrOwner(req: Request): Promise<User> {
   const userId: number = Number(req.params.userId);
   const userToken: JwtClaims = req.user as JwtClaims;
