@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AttainmentData, Formula, GradeType, HttpCode, ParamsObject
+  AttainmentData, ChildParamsObject, Formula, GradeType, HttpCode, ParamsObject
 } from 'aalto-grades-common/types';
 import { Request, Response } from 'express';
-import { Op } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import * as yup from 'yup';
 
 import AssessmentModel from '../database/models/assessmentModel';
@@ -21,6 +21,7 @@ import {
   validateAttainmentPath
 } from './utils/attainment';
 import { isTeacherInChargeOrAdmin } from './utils/user';
+import { sequelize } from '../database';
 
 async function validateFormulaParams(
   formula: Formula,
@@ -568,12 +569,6 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
 }
 
 export async function deleteAttainment(req: Request, res: Response): Promise<void> {
-  // Get path parameters.
-  const attainmentId: number = Number(req.params.attainmentId);
-
-  // Validation.
-  await idSchema.validate({ id: attainmentId }, { abortEarly: false });
-
   const [course, _assessmentModel, attainment]: [Course, AssessmentModel, Attainment] =
     await validateAttainmentPath(
       req.params.courseId, req.params.assessmentModelId, req.params.attainmentId
@@ -581,9 +576,25 @@ export async function deleteAttainment(req: Request, res: Response): Promise<voi
 
   await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
 
-  // Delete the attainment if found from db. This automatically
-  // also deletes all of the subattainments of this attainment.
-  attainment.destroy();
+  await sequelize.transaction(async (transaction: Transaction) => {
+    // If parent exists, remove attainment from formulaParams children.
+    if (attainment.parentId) {
+      const parent: Attainment = await findAttainmentById(attainment.parentId, HttpCode.NotFound);
+
+      const filteredChildren: Array<[string, ChildParamsObject]> =
+        parent.formulaParams.children!.filter((item: ParamsObject) => item[0] !== attainment.name);
+
+      await parent.set({
+        formulaParams: {
+          children: filteredChildren
+        }
+      }).save({ transaction });
+    }
+
+    // Delete the attainment if found from db. This automatically
+    // also deletes all of the subattainments of this attainment.
+    await attainment.destroy({ transaction });
+  });
 
   res.status(HttpCode.Ok).send({
     data: {}
