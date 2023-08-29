@@ -3,7 +3,11 @@
 // SPDX-License-Identifier: MIT
 
 import { LoginResult } from 'aalto-grades-common/types';
-import { Box, Button, Grid, TextField, Typography } from '@mui/material';
+import { VisibilityOff, Visibility } from '@mui/icons-material';
+import {
+  Box, Button, Grid, IconButton,
+  InputAdornment, TextField, Tooltip, Typography
+} from '@mui/material';
 import { JSX, SyntheticEvent, useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 
@@ -17,6 +21,15 @@ export default function Login(): JSX.Element {
 
   const navigate: NavigateFunction = useNavigate();
   const { setAuth }: { setAuth: (auth: LoginResult | null) => void } = useAuth();
+  const [showPassword, setShowPassword]: State<boolean> = useState(false);
+
+  function handleClickShowPassword(): void {
+    setShowPassword(!showPassword);
+  }
+
+  function handleMouseDownPassword(event: React.MouseEvent<HTMLButtonElement>): void {
+    event.preventDefault();
+  }
 
   const [email, setEmail]: State<string> = useState('');
   const [password, setPassword]: State<string> = useState('');
@@ -56,34 +69,47 @@ export default function Login(): JSX.Element {
           If you have been provided with credentials specifically for Aalto Grades, use this login.
         </Typography>
         <form onSubmit={handleSubmit}>
-          <div>
-            <TextField
-              type='email'
-              value={email}
-              name='email'
-              label='Email'
-              fullWidth
-              onChange={(
-                { target }: { target: EventTarget & (HTMLInputElement | HTMLTextAreaElement) }
-              ): void => setEmail(target.value)}
-              InputLabelProps={{ shrink: true }}
-              margin='normal'
-            />
-          </div>
-          <div>
-            <TextField
-              type='password'
-              value={password}
-              name='password'
-              label='Password'
-              fullWidth
-              onChange={(
-                { target }: { target: EventTarget & (HTMLInputElement | HTMLTextAreaElement) }
-              ): void => setPassword(target.value)}
-              InputLabelProps={{ shrink: true }}
-              margin='normal'
-            />
-          </div>
+          <TextField
+            type='email'
+            value={email}
+            name='email'
+            label='Email'
+            fullWidth
+            onChange={(
+              { target }: { target: EventTarget & (HTMLInputElement | HTMLTextAreaElement) }
+            ): void => setEmail(target.value)}
+            InputLabelProps={{ shrink: true }}
+            margin='normal'
+          />
+          <TextField
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            name='password'
+            label='Password'
+            fullWidth
+            onChange={(
+              { target }: { target: EventTarget & (HTMLInputElement | HTMLTextAreaElement) }
+            ): void => setPassword(target.value)}
+            InputLabelProps={{ shrink: true }}
+            InputProps={{
+              endAdornment:
+              <InputAdornment position="start">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleClickShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  edge="end"
+                >
+                  <Tooltip placement='top' title={
+                    showPassword ? 'Click to hide password from view' : 'Click to show password'
+                  }>
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </Tooltip>
+                </IconButton>
+              </InputAdornment>,
+            }}
+            margin='normal'
+          />
           <Button
             id='ag_login_btn'
             variant='contained'
