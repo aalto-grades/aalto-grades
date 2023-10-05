@@ -8,21 +8,49 @@ SPDX-License-Identifier: MIT
 
 ## Running
 
+### Running on local environment
 <!-- TODO: Setting up a database needs a more detailed explanation -->
+
 You will first need to start a PostgreSQL database and run migrations and
 seeders on it.
+
+
+Once postgreSQL is installed make sure it is running.
+
+
+set the following environment variables:
 ```
-$ npm run migration:up
-$ npm run seed:up
+$ export POSTGRES_PASSWORD=123      # any password
+$ export POSTGRES_USER=postgres
+$ export POSTGRES_DATABASE=postgres     # different user and db can be used if needed
+$ export POSTGRES_URL=localhost
 ```
+
+
+PostgreSQL creates a user "postgres", give password as in variable POSTGRES_PASSWORD to the user.
+The command depends on the platform. E.g. On linux run:
+```
+$ sudo -u $POSTGRES_USER psql -c "\password"
+```
+then enter the password.
+
 
 Install the necessary Node modules:
 ```
 $ npm ci
 ```
-Compile and start the server:
+Build the server:
 ```
 $ npm run build
+```
+Run migrations and seeder:
+```
+$ npm run migration:up
+$ npm run seed:up
+```
+
+Start the server:
+```
 $ npm run start
 ```
 
