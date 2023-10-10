@@ -59,6 +59,25 @@ export default function CourseResultsView(): JSX.Element {
 
   const calculateFinalGrades: UseCalculateFinalGradesResult = useCalculateFinalGrades();
 
+  // If asking for a refetch then it also update the selectedStudents
+  async function studentsRefetch():Promise<void> {
+    students.refetch().then((students: UseQueryResult<Array<FinalGrade>>) => {
+      if (students.data) {
+        const newSelectedStudents: Array<FinalGrade> = [];
+        // Refresh selectedStudents for updating childrens state
+        selectedStudents.forEach((student: FinalGrade) => {
+          const found: FinalGrade | undefined =
+            students.data.find((element: FinalGrade) => element.userId == student.userId);
+
+          if (found) {
+            newSelectedStudents.push(found);
+          }
+        });
+        setSelectedStudents(newSelectedStudents);
+      }
+    });
+  }
+
   // Triggers the calculation of final grades
   async function handleCalculateFinalGrades(): Promise<void> {
     if (courseId && assessmentModelId && selectedStudents.length > 0) {
@@ -81,11 +100,11 @@ export default function CourseResultsView(): JSX.Element {
               msg: 'Final grades calculated successfully.',
               severity: 'success'
             });
-
+            // We need to refetch the students to get the new grades
             students.refetch().then((students: UseQueryResult<Array<FinalGrade>>) => {
               if (students.data) {
                 const newSelectedStudents: Array<FinalGrade> = [];
-
+                // Refresh selectedStudents for updating childrens state
                 selectedStudents.forEach((student: FinalGrade) => {
                   const found: FinalGrade | undefined =
                     students.data.find((element: FinalGrade) => element.userId == student.userId);
@@ -145,7 +164,7 @@ export default function CourseResultsView(): JSX.Element {
         selectedStudents={selectedStudents}
         setSelectedStudents={setSelectedStudents}
         hasPendingStudents={hasPendingStudents}
-        refetch={students.refetch}
+        refetch={studentsRefetch}
       />
     </Box>
   );
