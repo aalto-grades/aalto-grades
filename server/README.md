@@ -27,7 +27,7 @@ $ export POSTGRES_URL=localhost
 ```
 
 
-PostgreSQL creates a user "postgres", give password as in variable POSTGRES_PASSWORD to the user.
+PostgreSQL creates a user "postgres", give it a password as in variable POSTGRES_PASSWORD.
 The command depends on the platform. E.g. On linux run:
 ```
 $ sudo -u $POSTGRES_USER psql -c "\password"
