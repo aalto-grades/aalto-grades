@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
-
 import {
   AttainmentGradeData, EditGrade, FinalGrade, Formula,
   GradeOption, GradeType, HttpCode, Status
@@ -225,6 +224,42 @@ async function filterByInstanceAndStudentNumber(
   return studentNumbers;
 }
 
+async function getLatestAttainmentDate(
+  assessmentModel: AssessmentModel,
+  finalGrade: FinalGradeRaw
+): Promise<Date> {
+  interface AttainmentWithUserGrade extends Attainment {
+    AttainmentGrades: Array<AttainmentGrade>
+  }
+
+  const userGrades: Array<AttainmentWithUserGrade> = await Attainment.findAll({
+    where: {
+      assessmentModelId: assessmentModel.id
+    },
+    include: [{
+      model: AttainmentGrade,
+      required: false,
+      where: {
+        userId: finalGrade.userId
+      },
+      include: [{
+        model: User,
+        required: true,
+        as: 'grader',
+        attributes: ['id', 'name']
+      }]
+    }]
+  }) as Array<AttainmentWithUserGrade>;
+
+  const latestAttainmentDate: Date = userGrades
+    .flatMap((attainment: AttainmentWithUserGrade) => attainment.AttainmentGrades
+      .filter((attainmentGrade: AttainmentGrade) => attainmentGrade.date !== null)
+      .map((attainmentGrade: AttainmentGrade) => new Date(attainmentGrade.date)))
+    .sort((a: Date, b: Date) => a < b ? 1 : -1)[0];
+  return latestAttainmentDate;
+}
+
+
 /**
  * Get grading data formatted to Sisu compatible format for exporting grades to Sisu.
  * Documentation and requirements for Sisu CSV file structure available at
@@ -342,14 +377,17 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
         id: finalGrade.id,
         userId: finalGrade.userId
       });
+      const latestAttainmentDate: Date = await getLatestAttainmentDate(assessmentModel, finalGrade);
+
       courseResults.push({
         studentNumber: finalGrade.User.studentNumber,
         // Round to get final grades as an integer.
         grade: String(Math.round(finalGrade.grade)),
         credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits,
         // Assesment date must be in form dd.mm.yyyy.
+        // HERE we want to find the latest completed attainment grade for student
         assessmentDate: (
-          assessmentDate ? new Date(assessmentDate) : new Date(Date.now())
+          assessmentDate ? new Date(assessmentDate) : latestAttainmentDate
         ).toLocaleDateString('fi-FI'),
         completionLanguage: completionLanguage ?
           completionLanguage.toLowerCase() : course.languageOfInstruction.toLowerCase(),
