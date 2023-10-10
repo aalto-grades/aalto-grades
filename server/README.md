@@ -18,7 +18,7 @@ seeders on it.
 Once postgreSQL is installed make sure it is running.
 
 
-set the following environment variables:
+set the following environment variables- like in .env.example or locally:
 ```
 $ export POSTGRES_PASSWORD=123      # any password
 $ export POSTGRES_USER=postgres
