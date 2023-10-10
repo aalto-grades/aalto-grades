@@ -11,12 +11,12 @@ SPDX-License-Identifier: MIT
 ### Running on local environment
 <!-- TODO: Setting up a database needs a more detailed explanation -->
 
+#### Setting up PostgreSQL locally
 You will first need to start a PostgreSQL database and run migrations and
 seeders on it.
 
 
 Once postgreSQL is installed make sure it is running.
-
 
 set the following environment variables like in .env.example or locally:
 ```
@@ -34,7 +34,7 @@ $ sudo -u $POSTGRES_USER psql -c "\password"
 ```
 then enter the password.
 
-
+#### Setting up local node environment
 Install the necessary Node modules:
 ```
 $ npm ci
