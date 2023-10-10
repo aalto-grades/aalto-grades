@@ -54,6 +54,7 @@ export default function CourseResultsTableToolbar(props: {
 
   function handleCloseSisuDialog(): void {
     setShowSisuDialog(false);
+    props.refetch(); // Should not be necessary, but selectedStudent is not updated otherwise
   }
 
   return (

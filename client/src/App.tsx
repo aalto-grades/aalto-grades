@@ -10,6 +10,7 @@ import { Routes, Route } from 'react-router-dom';
 import {
   QueryCache, QueryClient, QueryClientProvider, MutationCache
 } from '@tanstack/react-query';
+// import { ReactQueryDevtools } from '@tanstack/react-query-devtools'; // For debugging
 
 import AlertSnackbar from './components/alerts/AlertSnackbar';
 import Login from './components/auth/Login';
@@ -221,6 +222,7 @@ export default function App(): JSX.Element {
           </Container>
           <Footer />
         </div>
+        {/* <ReactQueryDevtools initialIsOpen={false} /> */}
       </QueryClientProvider>
     </ThemeProvider>
   );
