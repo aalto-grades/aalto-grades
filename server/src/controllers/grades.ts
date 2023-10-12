@@ -28,7 +28,7 @@ import {
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import { findAttainmentById, findAttainmentGradeById } from './utils/attainment';
 import { toDateOnlyString } from './utils/date';
-import { gradeIsExpired } from './utils/grades';
+import { gradeIsExpired, getDateOfLatestGrade } from './utils/grades';
 import { findUserById, isTeacherInChargeOrAdmin } from './utils/user';
 
 async function studentNumbersExist(studentNumbers: Array<string>): Promise<void> {
@@ -224,41 +224,6 @@ async function filterByInstanceAndStudentNumber(
   return studentNumbers;
 }
 
-async function getLatestAttainmentDate(
-  assessmentModel: AssessmentModel,
-  finalGrade: FinalGradeRaw
-): Promise<Date> {
-  interface AttainmentWithUserGrade extends Attainment {
-    AttainmentGrades: Array<AttainmentGrade>
-  }
-
-  const userGrades: Array<AttainmentWithUserGrade> = await Attainment.findAll({
-    where: {
-      assessmentModelId: assessmentModel.id
-    },
-    include: [{
-      model: AttainmentGrade,
-      required: false,
-      where: {
-        userId: finalGrade.userId
-      },
-      include: [{
-        model: User,
-        required: true,
-        as: 'grader',
-        attributes: ['id', 'name']
-      }]
-    }]
-  }) as Array<AttainmentWithUserGrade>;
-
-  const latestAttainmentDate: Date = userGrades
-    .flatMap((attainment: AttainmentWithUserGrade) => attainment.AttainmentGrades
-      .filter((attainmentGrade: AttainmentGrade) => attainmentGrade.date !== null)
-      .map((attainmentGrade: AttainmentGrade) => new Date(attainmentGrade.date)))
-    .sort((a: Date, b: Date) => a < b ? 1 : -1)[0];
-  return latestAttainmentDate;
-}
-
 
 /**
  * Get grading data formatted to Sisu compatible format for exporting grades to Sisu.
@@ -377,7 +342,6 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
         id: finalGrade.id,
         userId: finalGrade.userId
       });
-      const latestAttainmentDate: Date = await getLatestAttainmentDate(assessmentModel, finalGrade);
 
       courseResults.push({
         studentNumber: finalGrade.User.studentNumber,
@@ -387,7 +351,9 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
         // Assesment date must be in form dd.mm.yyyy.
         // HERE we want to find the latest completed attainment grade for student
         assessmentDate: (
-          assessmentDate ? new Date(assessmentDate) : latestAttainmentDate
+          assessmentDate ? new Date(assessmentDate) : await getDateOfLatestGrade(
+            finalGrade.userId, assessmentModel.id
+          )
         ).toLocaleDateString('fi-FI'),
         completionLanguage: completionLanguage ?
           completionLanguage.toLowerCase() : course.languageOfInstruction.toLowerCase(),
