@@ -69,6 +69,7 @@ export const languageOptions: Array<LanguageOption> = [
 export default function SisuDownloadDialog(props: {
   open: boolean,
   handleClose: () => void,
+  handleExited: () => void,
   selectedStudents: Array<FinalGrade>
 }): JSX.Element {
   const { courseId, assessmentModelId }: Params =
@@ -159,7 +160,8 @@ export default function SisuDownloadDialog(props: {
 
   return (
     <>
-      <Dialog open={props.open} transitionDuration={{ exit: 800 }}>
+      <Dialog open={props.open} transitionDuration={{ exit: 800 }}
+        TransitionProps={{ onExited:props.handleExited }}>
         <DialogTitle >Download final grades as Sisu CSV</DialogTitle>
         <DialogContent sx={{ pb: 0 }}>
           <DialogContentText sx={{ mb: 3, color: 'black' }}>

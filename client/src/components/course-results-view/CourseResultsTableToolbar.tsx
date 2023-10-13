@@ -54,6 +54,10 @@ export default function CourseResultsTableToolbar(props: {
 
   function handleCloseSisuDialog(): void {
     setShowSisuDialog(false);
+  }
+  // Firing the refetch after the transition for closingis finished
+  // to avoid abrupt layout changes in the dialog
+  function handleExitedSisuDialog(): void {
     props.refetch(); // Should not be necessary, but selectedStudent is not updated otherwise
   }
 
@@ -159,6 +163,7 @@ export default function CourseResultsTableToolbar(props: {
           <SisuDownloadDialog
             open={showSisuDialog}
             handleClose={handleCloseSisuDialog}
+            handleExited={handleExitedSisuDialog}
             selectedStudents={props.selectedStudents}
           />
           <FileLoadDialog
