@@ -11,30 +11,44 @@ SPDX-License-Identifier: MIT
 ### Running on local environment
 <!-- TODO: Setting up a database needs a more detailed explanation -->
 
-#### Setting up PostgreSQL locally
-You will first need to start a PostgreSQL database and run migrations and
-seeders on it.
+#### Running postgreSQL and pgAdmin with docker
+For development purposes, you can easily run the database and pgadmin in docker 
+and then start node server locally in development mode.
 
 
-Once postgreSQL is installed make sure it is running.
 
-set the following environment variables like in .env.example or locally:
+Set the following environment variables:
 ```
-$ export POSTGRES_PASSWORD=123      # any password
-$ export POSTGRES_USER=postgres
-$ export POSTGRES_DATABASE=postgres     # different user and db can be used if needed
-$ export POSTGRES_URL=localhost
+$ export POSTGRES_PASSWORD=postgres
+
 ```
+Start the postgreSQL and pgadmin:
+```
+$ docker compose up database pgadmin
+```
+pgAdmin will be
+available at http://localhost:5050.
 
 
-PostgreSQL creates a user "postgres", give it a password as in variable POSTGRES_PASSWORD.
-The command depends on the platform. E.g. On linux run:
+You can now setup the node environment by following the instructions and to start e.g.
+the development server to start developing.
+
+
+When you are done with these stop the container and run:
 ```
-$ sudo -u $POSTGRES_USER psql -c "\password"
+$ docker compose down --remove-orphans
 ```
-then enter the password.
+to remove containers and network
 
 #### Setting up local node environment
+In a `.env` file setup the node env variables (.env.example included as an example)
+```
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DATABASE=postgres
+POSTGRES_URL=localhost
+```
+
 Install the necessary Node modules:
 ```
 $ npm ci
@@ -48,6 +62,8 @@ Run migrations and seeder:
 $ npm run migration:up
 $ npm run seed:up
 ```
+
+### Running the server
 
 Start the server:
 ```
@@ -74,7 +90,7 @@ define the `POSTGRES_PASSWORD` with a password of your choice, and then execute
 Docker Compose:
 ```
 $ export POSTGRES_PASSWORD=XXXX
-$ docker-compose up
+$ docker compose up
 ```
 
 This Docker Compose configuration will also start
@@ -117,5 +133,5 @@ $ export NODE_ENV="test"
 ```
 Then execute Docker Compose to run the tests:
 ```
-$ docker-compose up --abort-on-container-exit --exit-code-from backend
+$ docker compose up --abort-on-container-exit --exit-code-from backend
 ```
