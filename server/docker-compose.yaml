@@ -22,6 +22,8 @@ services:
     extends:
       file: ../common-services.yaml
       service: database
+    ports:
+      - 5432:5432
 
   pgadmin:
     extends:
