@@ -13,6 +13,7 @@ import supertest from 'supertest';
 import AttainmentGrade from '../../src/database/models/attainmentGrade';
 import TeacherInCharge from '../../src/database/models/teacherInCharge';
 import User from '../../src/database/models/user';
+import * as Grades from '../../src/controllers/utils/grades';
 
 import { mockTeacher } from '../mock-data/misc';
 import { app } from '../../src/app';
@@ -161,6 +162,12 @@ describe(
       .spyOn(global.Date, 'now')
       .mockImplementation((): number => {
         return new Date('2023-06-21').valueOf();
+      });
+
+    jest
+      .spyOn(Grades, 'getDateOfLatestGrade')
+      .mockImplementation((_userId: number, _assessmentmodelId: number): Promise<Date> => {
+        return Promise.resolve(new Date('2023-06-21'));
       });
 
     it('should export CSV succesfully when course results are found (admin user)', async () => {

@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
-
 import {
   AttainmentGradeData, EditGrade, FinalGrade, Formula,
   GradeOption, GradeType, HttpCode, Status
@@ -29,7 +28,7 @@ import {
 import { validateAssessmentModelPath } from './utils/assessmentModel';
 import { findAttainmentById, findAttainmentGradeById } from './utils/attainment';
 import { toDateOnlyString } from './utils/date';
-import { gradeIsExpired } from './utils/grades';
+import { gradeIsExpired, getDateOfLatestGrade } from './utils/grades';
 import { findUserById, isTeacherInChargeOrAdmin } from './utils/user';
 
 async function studentNumbersExist(studentNumbers: Array<string>): Promise<void> {
@@ -225,6 +224,7 @@ async function filterByInstanceAndStudentNumber(
   return studentNumbers;
 }
 
+
 /**
  * Get grading data formatted to Sisu compatible format for exporting grades to Sisu.
  * Documentation and requirements for Sisu CSV file structure available at
@@ -342,14 +342,18 @@ export async function getSisuFormattedGradingCSV(req: Request, res: Response): P
         id: finalGrade.id,
         userId: finalGrade.userId
       });
+
       courseResults.push({
         studentNumber: finalGrade.User.studentNumber,
         // Round to get final grades as an integer.
         grade: String(Math.round(finalGrade.grade)),
         credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits,
         // Assesment date must be in form dd.mm.yyyy.
+        // HERE we want to find the latest completed attainment grade for student
         assessmentDate: (
-          assessmentDate ? new Date(assessmentDate) : new Date(Date.now())
+          assessmentDate ? new Date(assessmentDate) : await getDateOfLatestGrade(
+            finalGrade.userId, assessmentModel.id
+          )
         ).toLocaleDateString('fi-FI'),
         completionLanguage: completionLanguage ?
           completionLanguage.toLowerCase() : course.languageOfInstruction.toLowerCase(),

@@ -2,29 +2,32 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { SystemRole } from 'aalto-grades-common/types';
 import { AppBar, Box, Container, Link, Toolbar } from '@mui/material';
-import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
-import { CSSProperties, JSX } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Experimental_CssVarsProvider as CssVarsProvider, CssVarsTheme,
+  experimental_extendTheme as extendTheme } from '@mui/material/styles';
 import {
-  QueryCache, QueryClient, QueryClientProvider, MutationCache
+  MutationCache,
+  QueryCache, QueryClient, QueryClientProvider
 } from '@tanstack/react-query';
+import { SystemRole } from 'aalto-grades-common/types';
+import { CSSProperties, JSX } from 'react';
+import { Route, Routes } from 'react-router-dom';
+// import { ReactQueryDevtools } from '@tanstack/react-query-devtools'; // For debugging
 
-import AlertSnackbar from './components/alerts/AlertSnackbar';
-import Login from './components/auth/Login';
-import PrivateRoute from './components/auth/PrivateRoute';
-import Signup from './components/auth/Signup';
-import UserButton from './components/auth/UserButton';
-import CourseView from './components/CourseView';
 import CourseResultsView from './components/CourseResultsView';
-import EditCourseView from './components/EditCourseView';
+import CourseView from './components/CourseView';
 import EditAttainmentView from './components/EditAttainmentView';
+import EditCourseView from './components/EditCourseView';
 import EditInstanceView from './components/EditInstanceView';
 import FetchInstancesView from './components/FetchInstancesView';
 import Footer from './components/Footer';
 import FrontPage from './components/FrontPage';
 import NotFound from './components/NotFound';
+import AlertSnackbar from './components/alerts/AlertSnackbar';
+import Login from './components/auth/Login';
+import PrivateRoute from './components/auth/PrivateRoute';
+import Signup from './components/auth/Signup';
+import UserButton from './components/auth/UserButton';
 
 import useSnackPackAlerts, { SnackPackAlertState } from './hooks/useSnackPackAlerts';
 
@@ -50,33 +53,36 @@ declare module '@mui/material/styles' {
   }
 }
 
-const theme: Theme = createTheme({
-  palette: {
-    black: '#000000',
-    primary: {
-      light: '#EFF3FB',
-      main: '#3D5AFE',
-      dark: '#0031CA',
-      contrastText: '#FFF',
+const theme:CssVarsTheme = extendTheme({
+  colorSchemes:
+  { light:{
+    palette: {
+      black: '#000000',
+      primary: {
+        light: '#EFF3FB',
+        main: '#3D5AFE',
+        dark: '#0031CA',
+        contrastText: '#FFF',
+      },
+      secondary: {
+        light: '#F1F8F0',
+        main: '#96CF99',
+        dark: '#519657',
+        contrastText: '#000',
+      },
+      info: {
+        light: '#FFC046',
+        main: '#FF8F00',
+        dark: '#C56000',
+        contrastText: '#000',
+      },
+      hoverGrey1: '#EAEAEA',
+      hoverGrey2: '#F4F4F4',
+      hoverGrey3: '#6E6E6E',
+      infoGrey: '#545454',
+      contrastThreshold: 4.5
     },
-    secondary: {
-      light: '#F1F8F0',
-      main: '#96CF99',
-      dark: '#519657',
-      contrastText: '#000',
-    },
-    info: {
-      light: '#FFC046',
-      main: '#FF8F00',
-      dark: '#C56000',
-      contrastText: '#000',
-    },
-    hoverGrey1: '#EAEAEA',
-    hoverGrey2: '#F4F4F4',
-    hoverGrey3: '#6E6E6E',
-    infoGrey: '#545454',
-    contrastThreshold: 4.5
-  },
+  } },
   typography: {
     h1: {
       fontSize: '48px',
@@ -147,7 +153,7 @@ export default function App(): JSX.Element {
   });
 
   return (
-    <ThemeProvider theme={theme}>
+    <CssVarsProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
           <AppBar position="static">
@@ -221,7 +227,9 @@ export default function App(): JSX.Element {
           </Container>
           <Footer />
         </div>
+        {/* Query Debug Tool */}
+        {/* <ReactQueryDevtools initialIsOpen={false} /> */}
       </QueryClientProvider>
-    </ThemeProvider>
+    </CssVarsProvider>
   );
 }

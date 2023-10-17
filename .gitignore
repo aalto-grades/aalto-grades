@@ -11,3 +11,6 @@ robot-tests/output/*
 # Emacs files
 .dir-locals.el
 *.#*
+
+# IDE Settings
+.vscode
