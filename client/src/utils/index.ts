@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { GradeOption } from 'aalto-grades-common/types';
+import { DateOnlyString, GradeOption } from 'aalto-grades-common/types';
 
 type Resolve = (value: void | PromiseLike<void>) => void;
 
@@ -24,4 +24,18 @@ export function findBestGradeOption(options: Array<GradeOption>): GradeOption | 
       bestSoFar = option;
   }
   return bestSoFar;
+}
+
+
+/**
+ * Determines whether a given grade date has expired.
+ * @param date - The grade date to check.
+ * @returns True if the grade date has expired, false otherwise.
+ */
+export function isGradeDateExpired(date: Date | DateOnlyString | undefined): boolean {
+  if (!date)
+    return false;
+  const now: Date = new Date();
+  const gradeDate: Date = new Date(date);
+  return now > gradeDate;
 }
