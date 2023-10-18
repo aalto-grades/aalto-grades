@@ -5,9 +5,11 @@
 import { GradeOption } from 'aalto-grades-common/types';
 import {
   Button, Dialog, DialogActions, DialogContent, DialogTitle,
-  Table, TableBody, TableCell, TableHead, TableRow, Typography
+  Table, TableBody, TableCell, TableHead, TableRow, Theme, Typography, useTheme
 } from '@mui/material';
 import { JSX } from 'react';
+
+import { isGradeDateExpired } from '../../utils';
 
 export default function GradeOptionsDialog(props: {
   title: string,
@@ -15,7 +17,7 @@ export default function GradeOptionsDialog(props: {
   open: boolean,
   handleClose: () => void
 }): JSX.Element {
-
+  const theme:Theme = useTheme();
   interface Cell {
     id: keyof GradeOption,
     label: string
@@ -78,13 +80,22 @@ export default function GradeOptionsDialog(props: {
           </TableHead>
           <TableBody>
             {props.options.map((option: GradeOption) => (
-              <TableRow key={option.gradeId}>
+              <TableRow key={option.gradeId} style={{
+                backgroundColor: isGradeDateExpired(option.expiryDate) ?
+                  `rgba(${theme.vars.palette.error.mainChannel} / 0.1)` : 'inherit'
+              }}>
                 {headCells.map((cell: Cell) => (
                   <TableCell key={cell.id} style={{
                     whiteSpace: 'normal',
                     wordWrap: 'break-word'
                   }}>
-                    <Typography variant='body2' sx={{ maxWidth: 100 }}>
+                    <Typography variant='body2' sx={{ maxWidth: 100,
+                      color:
+                      (cell.id === 'expiryDate' && isGradeDateExpired(option.expiryDate))
+                        ? 'error.main' : 'inherit',
+                      fontWeight:
+                      (cell.id === 'expiryDate' && isGradeDateExpired(option.expiryDate))
+                        ? 'bold' : 'inherit' }}>
                       {(cell.id === 'grader') ? (
                         option.grader.name
                       ) : (

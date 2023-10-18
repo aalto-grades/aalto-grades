@@ -3,23 +3,25 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AttainmentData, AttainmentGradeData, FinalGrade
-} from 'aalto-grades-common/types';
-import {
-  Checkbox, IconButton, Link, TableCell, TableRow, Tooltip
-} from '@mui/material';
-import {
-  Close as CloseIcon, Done as DoneIcon, MoreHoriz as MoreHorizIcon
+  Close as CloseIcon,
+  Done as DoneIcon, EventBusyOutlined, MoreHoriz as MoreHorizIcon
 } from '@mui/icons-material';
+import {
+  Checkbox, IconButton, Link, TableCell, TableRow, Theme, Tooltip, useTheme
+} from '@mui/material';
+import type { } from '@mui/material/themeCssVarsAugmentation';
+import { UseQueryResult } from '@tanstack/react-query';
+import {
+  AttainmentData, AttainmentGradeData, FinalGrade, GradeOption
+} from 'aalto-grades-common/types';
 import { JSX, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
-import { UseQueryResult } from '@tanstack/react-query';
 
 import GradeOptionsDialog from './GradeOptionsDialog';
 
 import { useGetGradeTreeOfUser } from '../../hooks/useApi';
 import { State } from '../../types';
-import { findBestGradeOption } from '../../utils';
+import { findBestGradeOption, isGradeDateExpired } from '../../utils';
 
 function GradeCell(props: {
   studentNumber: string,
@@ -27,15 +29,29 @@ function GradeCell(props: {
   grade: AttainmentGradeData | null
 }): JSX.Element {
   const [gradeOptionsOpen, setGradeOptionsOpen]: State<boolean> = useState(false);
-
+  const theme:Theme = useTheme();
+  const bestGrade: GradeOption|null = findBestGradeOption(props.grade?.grades ?? []);
+  const isGradeExpired:boolean = isGradeDateExpired(bestGrade?.expiryDate);
+  // console.log(bestGrade?.expiryDate, new Date(),bestGrade?.expiryDate < new Date());
   return (
     <TableCell
-      sx={{ width: '100px' }}
-      align="left"
+      sx={{
+        position: 'relative',
+        width: '100px',
+        color : isGradeExpired ? 'error.main' : 'inherit',
+        bgcolor : isGradeExpired ?
+          `rgba(${theme.vars.palette.error.mainChannel} / 0.1)` : 'inherit',
+        borderLeft: isGradeExpired ?
+          `1px solid rgba(${theme.vars.palette.error.mainChannel} / 0.3)` : 'inherit',
+        borderRight: isGradeExpired ?
+          `1px solid rgba(${theme.vars.palette.error.mainChannel} / 0.3)` : 'inherit'
+      }}
+      align="center"
     >
-      {(props.grade) && (
-        findBestGradeOption(props.grade.grades)?.grade ?? '-'
-      )}
+      <span>
+        {( bestGrade?.grade ?? '-'
+        )}</span>
+      {/* If there are multiple grades "show more" icon*/}
       {(props.grade && props.grade.grades.length > 1) && (
         <>
           <Tooltip
@@ -59,6 +75,38 @@ function GradeCell(props: {
           />
         </>
       )}
+      {/* If grade is expired, show warning icon */}
+      {(isGradeExpired) && (
+        <>
+          <Tooltip
+            placement='top'
+            title={`Grade expired on ${bestGrade?.expiryDate}`}
+          >
+            {/* <IconButton
+                size='small'
+                color='error'
+                style={{
+                  position: 'relative',
+                }}
+              > */}
+            <EventBusyOutlined sx={{
+              position: 'absolute',
+              float:'left',
+              top: '-5%',
+              left: '1%',
+              width: '15px',
+              // transform: 'translate(-50%, -50%)',
+              color: `rgba(${theme.vars.palette.error.mainChannel} / 0.7)`,
+              // When over color is 100%
+              '&:hover': {
+                color: `rgba(${theme.vars.palette.error.mainChannel} / 1)`,
+              }
+            }}/>
+            {/* </IconButton> */}
+          </Tooltip>
+        </>
+      )}
+
     </TableCell>
   );
 }
