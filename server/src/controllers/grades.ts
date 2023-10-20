@@ -1273,7 +1273,12 @@ export async function calculateGrades(
       formulaNode.formulaImplementation.formulaFunction(
         formulaNode.attainment, subGrades
       );
-
+    
+    if (calculated.grade > formulaNode.attainment.maxGrade)
+        throw new ApiError(
+          'A calculated grade exceeds the max grade of attainment',
+          HttpCode.Conflict
+        )
     if (calculated.grade < formulaNode.attainment.minRequiredGrade)
       calculated.status = Status.Fail;
 
