@@ -478,14 +478,15 @@ export async function getFinalGrades(
         replacements: {assessmentModelId: assessmentModel.id},
         type: QueryTypes.SELECT,
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     )
-  ).map((value: {id?: number; student_number?: string}) => {
-    return {
-      userId: value?.id ?? 0,
-      studentNumber: value?.student_number ?? '',
-    };
-  });
+  )
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .map((value: any) => {
+      return {
+        userId: value.id,
+        studentNumber: value.student_number,
+      };
+    });
 
   // Include students from a particular instance if an ID provided.
   const filter: Array<string> | undefined = instanceId
