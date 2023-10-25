@@ -13,4 +13,6 @@ robot-tests/output/*
 *.#*
 
 # IDE Settings
-.vscode
+# get only example.settings.jsonc from .vscode, ignore the rest
+.vscode/*
+!.vscode/example.settings.jsonc
