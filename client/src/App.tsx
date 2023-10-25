@@ -163,11 +163,7 @@ export default function App(): JSX.Element {
     <CssVarsProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
         <div
-          style={{
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
+          style={{minHeight: '100vh', display: 'flex', flexDirection: 'column'}}
         >
           <AppBar position="static">
             <Toolbar>
