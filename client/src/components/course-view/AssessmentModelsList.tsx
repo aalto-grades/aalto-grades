@@ -2,33 +2,33 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AssessmentModelData } from 'aalto-grades-common/types';
-import { List, ListItemButton } from '@mui/material';
-import { JSX } from 'react';
+import {AssessmentModelData} from 'aalto-grades-common/types';
+import {List, ListItemButton} from '@mui/material';
+import {JSX} from 'react';
 
 export default function AssessmentModelsList(props: {
-  data: Array<AssessmentModelData>,
-  current: number,
-  onClick: (assessmentModel: AssessmentModelData) => void
+  data: Array<AssessmentModelData>;
+  current: number;
+  onClick: (assessmentModel: AssessmentModelData) => void;
 }): JSX.Element {
   return (
-    <List sx={{
-      maxHeight: 140,
-      overflow: 'auto'
-    }}>
-      {
-        props.data.map((assessmentModel: AssessmentModelData) => {
-          return (
-            <ListItemButton
-              key={assessmentModel.id}
-              selected={props.current === assessmentModel.id}
-              onClick={(): void => props.onClick(assessmentModel)}
-            >
-              {assessmentModel.name}
-            </ListItemButton>
-          );
-        })
-      }
+    <List
+      sx={{
+        maxHeight: 140,
+        overflow: 'auto',
+      }}
+    >
+      {props.data.map((assessmentModel: AssessmentModelData) => {
+        return (
+          <ListItemButton
+            key={assessmentModel.id}
+            selected={props.current === assessmentModel.id}
+            onClick={(): void => props.onClick(assessmentModel)}
+          >
+            {assessmentModel.name}
+          </ListItemButton>
+        );
+      })}
     </List>
   );
 }

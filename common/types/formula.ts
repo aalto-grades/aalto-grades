@@ -8,18 +8,18 @@ export enum Formula {
 }
 
 export interface FormulaData {
-  id: Formula,
-  name: string,
-  params: Array<string>,
-  childParams: Array<string>,
-  codeSnippet: string
+  id: Formula;
+  name: string;
+  params: Array<string>;
+  childParams: Array<string>;
+  codeSnippet: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ChildParamsObject = { [key: string]: any };
+export type ChildParamsObject = {[key: string]: any};
 
 export interface ParamsObject<T = ChildParamsObject> {
-  children?: Array<[string, T]>,
+  children?: Array<[string, T]>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any
+  [key: string]: any;
 }

@@ -2,15 +2,20 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { GradeType, ParamsObject } from 'aalto-grades-common/types';
+import {GradeType, ParamsObject} from 'aalto-grades-common/types';
 import {
-  CreationOptional, DataTypes, ForeignKey, Model, InferAttributes, InferCreationAttributes
+  CreationOptional,
+  DataTypes,
+  ForeignKey,
+  Model,
+  InferAttributes,
+  InferCreationAttributes,
 } from 'sequelize';
 
-import { sequelize } from '..';
+import {sequelize} from '..';
 import AssessmentModel from './assessmentModel';
 
-import { Formula } from 'aalto-grades-common/types';
+import {Formula} from 'aalto-grades-common/types';
 
 export default class Attainment extends Model<
   InferAttributes<Attainment>,
@@ -36,39 +41,39 @@ Attainment.init(
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
-      primaryKey: true
+      primaryKey: true,
     },
     assessmentModelId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: 'assessment_model',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     parentId: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
         model: 'attainment',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     name: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     daysValid: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: true,
     },
     minRequiredGrade: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
     maxGrade: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
     formula: {
       type: DataTypes.ENUM(Formula.Manual, Formula.WeightedAverage),
@@ -81,34 +86,34 @@ Attainment.init(
     },
     gradeType: {
       type: DataTypes.ENUM(GradeType.Integer, GradeType.Float),
-      allowNull: false
+      allowNull: false,
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },
   {
     sequelize,
-    tableName: 'attainment'
+    tableName: 'attainment',
   }
 );
 
 Attainment.belongsTo(Attainment, {
   targetKey: 'id',
-  foreignKey: 'parentId'
+  foreignKey: 'parentId',
 });
 
 Attainment.hasMany(Attainment, {
   foreignKey: 'parentId',
   onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
+  onUpdate: 'CASCADE',
 });
 
 Attainment.belongsTo(AssessmentModel, {
   targetKey: 'id',
-  foreignKey: 'assessmentModelId'
+  foreignKey: 'assessmentModelId',
 });
 
 AssessmentModel.hasMany(Attainment, {
   onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
+  onUpdate: 'CASCADE',
 });

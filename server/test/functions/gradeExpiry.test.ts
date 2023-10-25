@@ -2,13 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { gradeIsExpired } from '../../src/controllers/utils/grades';
+import {gradeIsExpired} from '../../src/controllers/utils/grades';
 
 describe('Test grade expiry', () => {
-
   it(
-    'should correctly determine whether a grade has expired based on the grade\'s'
-    + ' expiry date, if one is defined for the grade',
+    "should correctly determine whether a grade has expired based on the grade's" +
+      ' expiry date, if one is defined for the grade',
     async () => {
       // Comparison date is 2023-05-10
       expect(await gradeIsExpired(154)).toBeFalsy(); // Expiry date: 2024-04-23
@@ -20,8 +19,8 @@ describe('Test grade expiry', () => {
   );
 
   it(
-    'should correctly determine whether a grade has expired based on the'
-    + ' attainment\'s daysValid value, if no expiry date is defined for the grade',
+    'should correctly determine whether a grade has expired based on the' +
+      " attainment's daysValid value, if no expiry date is defined for the grade",
     async () => {
       // Comparison date is 2023-05-10, days valid is 5
       expect(await gradeIsExpired(159)).toBeFalsy(); // Date: 2023-05-10

@@ -2,15 +2,20 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { GradingScale } from 'aalto-grades-common/types';
+import {GradingScale} from 'aalto-grades-common/types';
 import {
-  CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model
+  CreationOptional,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
 } from 'sequelize';
 
-import { sequelize } from '..';
+import {sequelize} from '..';
 
 export default class Course extends Model<
-  InferAttributes<Course>, InferCreationAttributes<Course>
+  InferAttributes<Course>,
+  InferCreationAttributes<Course>
 > {
   declare id: CreationOptional<number>;
   declare courseCode: string;
@@ -27,33 +32,48 @@ Course.init(
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
-      primaryKey: true
+      primaryKey: true,
     },
     courseCode: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     languageOfInstruction: {
-      type: DataTypes.ENUM('FI', 'SV', 'EN', 'ES', 'JA', 'ZH', 'PT', 'FR', 'DE', 'RU'),
-      allowNull: false
+      type: DataTypes.ENUM(
+        'FI',
+        'SV',
+        'EN',
+        'ES',
+        'JA',
+        'ZH',
+        'PT',
+        'FR',
+        'DE',
+        'RU'
+      ),
+      allowNull: false,
     },
     minCredits: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
     maxCredits: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
     gradingScale: {
-      type: DataTypes.ENUM('PASS_FAIL', 'NUMERICAL', 'SECOND_NATIONAL_LANGUAGE'),
-      allowNull: false
+      type: DataTypes.ENUM(
+        'PASS_FAIL',
+        'NUMERICAL',
+        'SECOND_NATIONAL_LANGUAGE'
+      ),
+      allowNull: false,
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },
   {
     sequelize,
-    tableName: 'course'
+    tableName: 'course',
   }
 );

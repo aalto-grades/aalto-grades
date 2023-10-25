@@ -2,18 +2,27 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseData, GradingScale, HttpCode, Language, UserData } from 'aalto-grades-common/types';
+import {
+  CourseData,
+  GradingScale,
+  HttpCode,
+  Language,
+  UserData,
+} from 'aalto-grades-common/types';
 import supertest from 'supertest';
 
-import { app } from '../../src/app';
-import { findCourseFullById, parseCourseFull } from '../../src/controllers/utils/course';
-import { Cookies, getCookies } from '../util/getCookies';
+import {app} from '../../src/app';
+import {
+  findCourseFullById,
+  parseCourseFull,
+} from '../../src/controllers/utils/course';
+import {Cookies, getCookies} from '../util/getCookies';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
 let cookies: Cookies = {
   adminCookie: [],
-  userCookie: []
+  userCookie: [],
 };
 
 beforeAll(async () => {
@@ -21,7 +30,6 @@ beforeAll(async () => {
 });
 
 describe('Test GET /v1/courses/:courseId - get course by ID', () => {
-
   it('should respond with correct data when course exists', async () => {
     const res: supertest.Response = await request
       .get('/v1/courses/1')
@@ -41,17 +49,16 @@ describe('Test GET /v1/courses/:courseId - get course by ID', () => {
     expect(res.body.data.name).toBeDefined();
   });
 
-  it('should respond with 400 bad request, if validation fails (non-number course id)',
-    async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/abc')
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.BadRequest);
+  it('should respond with 400 bad request, if validation fails (non-number course id)', async () => {
+    const res: supertest.Response = await request
+      .get('/v1/courses/abc')
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.BadRequest);
 
-      expect(res.body.data).not.toBeDefined();
-      expect(res.body.errors).toBeDefined();
-    });
+    expect(res.body.data).not.toBeDefined();
+    expect(res.body.errors).toBeDefined();
+  });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
     await request
@@ -70,11 +77,9 @@ describe('Test GET /v1/courses/:courseId - get course by ID', () => {
     expect(res.body.data).not.toBeDefined();
     expect(res.body.errors).toBeDefined();
   });
-
 });
 
 describe('Test GET /v1/courses - get all courses', () => {
-
   it('should respond with correct data', async () => {
     const res: supertest.Response = await request
       .get('/v1/courses')
@@ -100,11 +105,9 @@ describe('Test GET /v1/courses - get all courses', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.Unauthorized);
   });
-
 });
 
 describe('Test POST /v1/courses - create new course', () => {
-
   it('should respond with course ID on correct input (admin user)', async () => {
     let input: object = {
       courseCode: 'ELEC-A7200',
@@ -114,22 +117,23 @@ describe('Test POST /v1/courses - create new course', () => {
       languageOfInstruction: Language.English,
       teachersInCharge: [
         {
-          email: 'thomas.siegel@aalto.fi'
-        }
+          email: 'thomas.siegel@aalto.fi',
+        },
       ],
       department: {
         fi: 'Sähkötekniikan korkeakoulu',
         en: 'School of Electrical Engineering',
-        sv: 'Högskolan för elektroteknik'
+        sv: 'Högskolan för elektroteknik',
       },
       name: {
         fi: 'Signaalit ja järjestelmät',
         en: 'Signals and Systems',
-        sv: ''
-      }
+        sv: '',
+      },
     };
     let res: supertest.Response = await request
-      .post('/v1/courses').send(input)
+      .post('/v1/courses')
+      .send(input)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
@@ -145,11 +149,11 @@ describe('Test POST /v1/courses - create new course', () => {
       languageOfInstruction: 'en',
       teachersInCharge: [
         {
-          email: 'thomas.siegel@aalto.fi'
+          email: 'thomas.siegel@aalto.fi',
         },
         {
-          email: 'arthur.james@aalto.fi'
-        }
+          email: 'arthur.james@aalto.fi',
+        },
       ],
       department: {
         fi: 'Sähkötekniikan korkeakoulu',
@@ -158,9 +162,10 @@ describe('Test POST /v1/courses - create new course', () => {
       name: {
         fi: 'Signaalit ja järjestelmät',
         en: 'Signals and Systems',
-      }
+      },
     };
-    res = await request.post('/v1/courses')
+    res = await request
+      .post('/v1/courses')
       .send(input)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
@@ -185,7 +190,9 @@ describe('Test POST /v1/courses - create new course', () => {
     expect(res.body.errors).toContain('minCredits is a required field');
     expect(res.body.errors).toContain('teachersInCharge is a required field');
     expect(res.body.errors).toContain('name is a required field');
-    expect(res.body.errors).toContain('languageOfInstruction is a required field');
+    expect(res.body.errors).toContain(
+      'languageOfInstruction is a required field'
+    );
   });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
@@ -205,43 +212,43 @@ describe('Test POST /v1/courses - create new course', () => {
       .expect(HttpCode.Forbidden);
   });
 
-  it(
-    'should respond with 422 unprocessable entity, if teacher email is not found from database',
-    async () => {
-      const input: object = {
-        courseCode: 'ELEC-A7200',
-        minCredits: 5,
-        maxCredits: 5,
-        gradingScale: GradingScale.Numerical,
-        languageOfInstruction: Language.English,
-        teachersInCharge: [
-          {
-            email: 'not.found@aalto.fi'
-          }
-        ],
-        department: {
-          fi: 'Sähkötekniikan korkeakoulu',
-          en: 'School of Electrical Engineering',
-          sv: 'Högskolan för elektroteknik'
+  it('should respond with 422 unprocessable entity, if teacher email is not found from database', async () => {
+    const input: object = {
+      courseCode: 'ELEC-A7200',
+      minCredits: 5,
+      maxCredits: 5,
+      gradingScale: GradingScale.Numerical,
+      languageOfInstruction: Language.English,
+      teachersInCharge: [
+        {
+          email: 'not.found@aalto.fi',
         },
-        name: {
-          fi: 'Signaalit ja järjestelmät',
-          en: 'Signals and Systems',
-          sv: ''
-        }
-      };
+      ],
+      department: {
+        fi: 'Sähkötekniikan korkeakoulu',
+        en: 'School of Electrical Engineering',
+        sv: 'Högskolan för elektroteknik',
+      },
+      name: {
+        fi: 'Signaalit ja järjestelmät',
+        en: 'Signals and Systems',
+        sv: '',
+      },
+    };
 
-      const res: supertest.Response = await request
-        .post('/v1/courses').send(input)
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.UnprocessableEntity);
+    const res: supertest.Response = await request
+      .post('/v1/courses')
+      .send(input)
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.UnprocessableEntity);
 
-      expect(res.body.errors).toBeDefined();
-      expect(res.body.errors[0]).toBe('No user with email address not.found@aalto.fi found');
-      expect(res.body.data).not.toBeDefined();
-    }
-  );
+    expect(res.body.errors).toBeDefined();
+    expect(res.body.errors[0]).toBe(
+      'No user with email address not.found@aalto.fi found'
+    );
+    expect(res.body.data).not.toBeDefined();
+  });
 
   /* TODO: move next test case elsewhere in future, after refactoring commonly
    * reusable functionality (e.g. middleware) to their own modules / functions
@@ -262,11 +269,9 @@ describe('Test POST /v1/courses - create new course', () => {
       'SyntaxError: Unexpected end of JSON input: {"courseCode": "ELEC-A7200"'
     );
   });
-
 });
 
-describe ('Test PUT /v1/courses/:courseId - edit course', () => {
-
+describe('Test PUT /v1/courses/:courseId - edit course', () => {
   const uneditedCourseDataBase: object = {
     minCredits: 5,
     maxCredits: 5,
@@ -275,13 +280,13 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
     department: {
       fi: 'muokkaamaton laitos',
       en: 'unedited department',
-      sv: 'oredigerad institutionen'
+      sv: 'oredigerad institutionen',
     },
     name: {
       fi: 'muokkaamaton nimi',
       en: 'unedited name',
-      sv: 'oredigerad namn'
-    }
+      sv: 'oredigerad namn',
+    },
   };
 
   const courseDataEdits: object = {
@@ -293,13 +298,13 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
     department: {
       fi: 'muokattu laitos',
       en: 'edited department',
-      sv: 'redigerad institutionen'
+      sv: 'redigerad institutionen',
     },
     name: {
       fi: 'muokattu nimi',
       en: 'edited name',
-      sv: 'redigerad namn'
-    }
+      sv: 'redigerad namn',
+    },
   };
 
   async function testCourseEditSuccess(
@@ -308,17 +313,20 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
     edits: object,
     editedTeachersInCharge?: Array<UserData>
   ): Promise<void> {
-
     async function checkCourseData(
-      courseId: number, expected: CourseData
+      courseId: number,
+      expected: CourseData
     ): Promise<void> {
-      expect(parseCourseFull(await findCourseFullById(
-        courseId, HttpCode.InternalServerError
-      ))).toStrictEqual(expected);
+      expect(
+        parseCourseFull(
+          await findCourseFullById(courseId, HttpCode.InternalServerError)
+        )
+      ).toStrictEqual(expected);
     }
 
     const course: CourseData = {
-      ...uneditedCourseData, id: courseId
+      ...uneditedCourseData,
+      id: courseId,
     } as unknown as CourseData;
 
     checkCourseData(courseId, course);
@@ -333,7 +341,7 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
     expect(res.body.errors).not.toBeDefined();
     expect(res.body.data).toBeDefined();
 
-    const editedCourseData: CourseData = { ...course, ...edits };
+    const editedCourseData: CourseData = {...course, ...edits};
     if (editedTeachersInCharge)
       editedCourseData.teachersInCharge = editedTeachersInCharge;
 
@@ -348,8 +356,8 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
         ...uneditedCourseDataBase,
         courseCode: 'Test edit course',
         teachersInCharge: [
-          { id: 50, name: 'Everett Dennis', email: 'everett.dennis@aalto.fi' }
-        ]
+          {id: 50, name: 'Everett Dennis', email: 'everett.dennis@aalto.fi'},
+        ],
       },
       courseDataEdits
     );
@@ -362,18 +370,18 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
         ...uneditedCourseDataBase,
         ...courseDataEdits,
         teachersInCharge: [
-          { id: 50, name: 'Everett Dennis', email: 'everett.dennis@aalto.fi' }
-        ]
+          {id: 50, name: 'Everett Dennis', email: 'everett.dennis@aalto.fi'},
+        ],
       },
       {
         teachersInCharge: [
-          { email: 'everett.dennis@aalto.fi' },
-          { email: 'larissa.poore@aalto.fi' }
-        ]
+          {email: 'everett.dennis@aalto.fi'},
+          {email: 'larissa.poore@aalto.fi'},
+        ],
       },
       [
-        { id: 50, name: 'Everett Dennis', email: 'everett.dennis@aalto.fi' },
-        { id: 100, name: 'Larissa Poore', email: 'larissa.poore@aalto.fi' }
+        {id: 50, name: 'Everett Dennis', email: 'everett.dennis@aalto.fi'},
+        {id: 100, name: 'Larissa Poore', email: 'larissa.poore@aalto.fi'},
       ]
     );
   });
@@ -385,18 +393,14 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
         ...uneditedCourseDataBase,
         ...courseDataEdits,
         teachersInCharge: [
-          { id: 50, name: 'Everett Dennis', email: 'everett.dennis@aalto.fi' },
-          { id: 100, name: 'Larissa Poore', email: 'larissa.poore@aalto.fi' }
-        ]
+          {id: 50, name: 'Everett Dennis', email: 'everett.dennis@aalto.fi'},
+          {id: 100, name: 'Larissa Poore', email: 'larissa.poore@aalto.fi'},
+        ],
       },
       {
-        teachersInCharge: [
-          { email: 'larissa.poore@aalto.fi' }
-        ]
+        teachersInCharge: [{email: 'larissa.poore@aalto.fi'}],
       },
-      [
-        { id: 100, name: 'Larissa Poore', email: 'larissa.poore@aalto.fi' }
-      ]
+      [{id: 100, name: 'Larissa Poore', email: 'larissa.poore@aalto.fi'}]
     );
   });
 
@@ -407,21 +411,25 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
         ...uneditedCourseDataBase,
         courseCode: 'Test edit course and teachers',
         teachersInCharge: [
-          { id: 100, name: 'Larissa Poore', email: 'larissa.poore@aalto.fi' },
-          { id: 200, name: 'Harriet Maestas', email: 'harriet.maestas@aalto.fi' },
-          { id: 300, name: 'Charles Morrissey', email: 'charles.morrissey@aalto.fi' },
-        ]
+          {id: 100, name: 'Larissa Poore', email: 'larissa.poore@aalto.fi'},
+          {id: 200, name: 'Harriet Maestas', email: 'harriet.maestas@aalto.fi'},
+          {
+            id: 300,
+            name: 'Charles Morrissey',
+            email: 'charles.morrissey@aalto.fi',
+          },
+        ],
       },
       {
         ...courseDataEdits,
         teachersInCharge: [
-          { email: 'larissa.poore@aalto.fi' },
-          { email: 'donald.perez@aalto.fi' }
-        ]
+          {email: 'larissa.poore@aalto.fi'},
+          {email: 'donald.perez@aalto.fi'},
+        ],
       },
       [
-        { id: 100, name: 'Larissa Poore', email: 'larissa.poore@aalto.fi' },
-        { id: 101, name: 'Donald Perez', email: 'donald.perez@aalto.fi' }
+        {id: 100, name: 'Larissa Poore', email: 'larissa.poore@aalto.fi'},
+        {id: 101, name: 'Donald Perez', email: 'donald.perez@aalto.fi'},
       ]
     );
   });
@@ -440,26 +448,24 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
     }
 
     await badInput({
-      teachersInCharge: [
-        { id: 5 }, { email: 'user@email.com' }
-      ]
+      teachersInCharge: [{id: 5}, {email: 'user@email.com'}],
     });
     await badInput({
       minCredits: 10,
-      maxCredits: 5
+      maxCredits: 5,
     });
     await badInput({
       department: 'wrong',
-      name: false
+      name: false,
     });
     await badInput({
-      minCredits: -10
+      minCredits: -10,
     });
     await badInput({
-      maxCredits: 1
+      maxCredits: 1,
     });
     await badInput({
-      minCredits: 9
+      minCredits: 9,
     });
   });
 
@@ -489,19 +495,14 @@ describe ('Test PUT /v1/courses/:courseId - edit course', () => {
       .expect(HttpCode.NotFound);
   });
 
-  it(
-    'should respond with 422 unprocessable entity, if teacher email is not found from database',
-    async () => {
-      await request
-        .put('/v1/courses/10')
-        .send({
-          teachersInCharge: [
-            { email: 'this.is.not@a.real.email' }
-          ]
-        })
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.UnprocessableEntity);
-    }
-  );
+  it('should respond with 422 unprocessable entity, if teacher email is not found from database', async () => {
+    await request
+      .put('/v1/courses/10')
+      .send({
+        teachersInCharge: [{email: 'this.is.not@a.real.email'}],
+      })
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.UnprocessableEntity);
+  });
 });

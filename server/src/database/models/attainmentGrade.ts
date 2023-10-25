@@ -2,12 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { DateOnlyString } from 'aalto-grades-common/types';
+import {DateOnlyString} from 'aalto-grades-common/types';
 import {
-  CreationOptional, DataTypes, ForeignKey, Model, InferAttributes, InferCreationAttributes
+  CreationOptional,
+  DataTypes,
+  ForeignKey,
+  Model,
+  InferAttributes,
+  InferCreationAttributes,
 } from 'sequelize';
 
-import { sequelize } from '..';
+import {sequelize} from '..';
 import Attainment from './attainment';
 import User from './user';
 
@@ -37,96 +42,96 @@ AttainmentGrade.init(
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
-      primaryKey: true
+      primaryKey: true,
     },
     userId: {
       type: DataTypes.INTEGER,
       references: {
         model: 'user',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     attainmentId: {
       type: DataTypes.INTEGER,
       references: {
         model: 'attainment',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     graderId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: 'user',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     grade: {
       type: DataTypes.FLOAT,
-      allowNull: false
+      allowNull: false,
     },
     sisuExportDate: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: true,
     },
     manual: {
       type: DataTypes.BOOLEAN,
-      allowNull: false
+      allowNull: false,
     },
     status: {
       type: DataTypes.ENUM('PASS', 'FAIL', 'PENDING'),
       allowNull: false,
-      defaultValue: 'PENDING'
+      defaultValue: 'PENDING',
     },
     date: {
       type: DataTypes.DATEONLY,
-      allowNull: false
+      allowNull: false,
     },
     expiryDate: {
       type: DataTypes.DATEONLY,
-      allowNull: true
+      allowNull: true,
     },
     comment: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: true,
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },
   {
     sequelize,
-    tableName: 'attainment_grade'
+    tableName: 'attainment_grade',
   }
 );
 
 AttainmentGrade.belongsTo(User, {
   targetKey: 'id',
-  foreignKey: 'userId'
+  foreignKey: 'userId',
 });
 
 User.hasMany(AttainmentGrade, {
   onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
+  onUpdate: 'CASCADE',
 });
 
 AttainmentGrade.belongsTo(User, {
   as: 'grader',
   targetKey: 'id',
-  foreignKey: 'graderId'
+  foreignKey: 'graderId',
 });
 
 User.hasMany(AttainmentGrade, {
   foreignKey: 'graderId',
   onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
+  onUpdate: 'CASCADE',
 });
 
 AttainmentGrade.belongsTo(Attainment, {
   targetKey: 'id',
-  foreignKey: 'attainmentId'
+  foreignKey: 'attainmentId',
 });
 
 Attainment.hasMany(AttainmentGrade, {
   onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
+  onUpdate: 'CASCADE',
 });

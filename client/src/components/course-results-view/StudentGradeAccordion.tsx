@@ -2,45 +2,45 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentGradeData, Status } from 'aalto-grades-common/types';
+import {AttainmentGradeData, Status} from 'aalto-grades-common/types';
 import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
-import { Box, Button, Typography } from '@mui/material';
-import { JSX, SyntheticEvent, useState } from 'react';
+import {Box, Button, Typography} from '@mui/material';
+import {JSX, SyntheticEvent, useState} from 'react';
 
-import { Accordion, AccordionSummary } from '../attainments/CustomAccordion';
-import { State } from '../../types';
-import { findBestGradeOption } from '../../utils';
+import {Accordion, AccordionSummary} from '../attainments/CustomAccordion';
+import {State} from '../../types';
+import {findBestGradeOption} from '../../utils';
 
 function GradeText(props: {
-  name: string,
-  grade: number,
-  status: Status
+  name: string;
+  grade: number;
+  status: Status;
 }): JSX.Element {
   return (
-    <Box sx={{
-      display: 'flex',
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      width: '100%',
-      columnGap: 10
-    }}>
-      <Typography variant='body2'>
-        {props.name}
-      </Typography>
-      <Typography variant='body2'>
-        {'Grade: ' + (props.grade ? `${props.grade} - ${props.status}` : Status.Pending)}
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        columnGap: 10,
+      }}
+    >
+      <Typography variant="body2">{props.name}</Typography>
+      <Typography variant="body2">
+        {'Grade: ' +
+          (props.grade ? `${props.grade} - ${props.status}` : Status.Pending)}
       </Typography>
     </Box>
   );
 }
 
 export default function StudentGradeAccordion(props: {
-  attainmentGrade: AttainmentGradeData,
-  gradeToEdit: (grade: AttainmentGradeData) => void
+  attainmentGrade: AttainmentGradeData;
+  gradeToEdit: (grade: AttainmentGradeData) => void;
 }): JSX.Element {
-
   const [expanded, setExpanded]: State<Set<number>> = useState(new Set());
   const [selected, setSelected]: State<number> = useState(0);
 
@@ -55,13 +55,20 @@ export default function StudentGradeAccordion(props: {
     return copySet;
   }
 
-  type AccordionOnChange = (event: SyntheticEvent, newExpanded: boolean) => void;
+  type AccordionOnChange = (
+    event: SyntheticEvent,
+    newExpanded: boolean
+  ) => void;
 
   // Curried function syntax. Add the panel's ID to the set of expanded panels
   // if opened, else delete from set
   function handleChange(panelId: number): AccordionOnChange {
     return (_event: SyntheticEvent, newExpanded: boolean): void => {
-      setExpanded(newExpanded ? addToSet(panelId, expanded) : deleteFromSet(panelId, expanded));
+      setExpanded(
+        newExpanded
+          ? addToSet(panelId, expanded)
+          : deleteFromSet(panelId, expanded)
+      );
       setSelected(newExpanded ? panelId : 0);
     };
   }
@@ -71,49 +78,46 @@ export default function StudentGradeAccordion(props: {
 
   return (
     <>
-      {
-        (subAttainments && subAttainments.length > 0) ? (
-          <Accordion
-            key={props.attainmentGrade.attainmentId + 'accordion'}
+      {subAttainments && subAttainments.length > 0 ? (
+        <Accordion
+          key={props.attainmentGrade.attainmentId + 'accordion'}
+          expanded={expanded.has(props.attainmentGrade.attainmentId ?? 0)}
+          onChange={handleChange(props.attainmentGrade.attainmentId ?? 0)}
+        >
+          <AccordionSummary
+            aria-controls={props.attainmentGrade.attainmentId + '-content'}
+            id={props.attainmentGrade.attainmentId + '-header'}
             expanded={expanded.has(props.attainmentGrade.attainmentId ?? 0)}
-            onChange={handleChange(props.attainmentGrade.attainmentId ?? 0)}
+            selected={selected === props.attainmentGrade.attainmentId}
           >
-            <AccordionSummary
-              aria-controls={props.attainmentGrade.attainmentId + '-content'}
-              id={props.attainmentGrade.attainmentId + '-header'}
-              expanded={expanded.has(props.attainmentGrade.attainmentId ?? 0)}
-              selected={(selected === props.attainmentGrade.attainmentId)}
-            >
-              <GradeText
-                name={props.attainmentGrade.attainmentName as string}
-                grade={
-                  findBestGradeOption(props.attainmentGrade.grades)?.grade
-                    ?? 0
-                }
-                status={
-                  findBestGradeOption(props.attainmentGrade.grades)?.status
-                    ?? Status.Pending
-                }
-              />
-            </AccordionSummary>
-            {
-              subAttainments?.map((subAttainment: AttainmentGradeData) => {
-                return (
-                  <Box
-                    key={subAttainment.attainmentId + 'subAccordion'}
-                    sx={{ pl: '39px' }}
-                  >
-                    <StudentGradeAccordion
-                      attainmentGrade={subAttainment}
-                      gradeToEdit={props.gradeToEdit}
-                    />
-                  </Box>
-                );
-              })
-            }
-          </Accordion>
-        ) : (
-          <Box sx={{
+            <GradeText
+              name={props.attainmentGrade.attainmentName as string}
+              grade={
+                findBestGradeOption(props.attainmentGrade.grades)?.grade ?? 0
+              }
+              status={
+                findBestGradeOption(props.attainmentGrade.grades)?.status ??
+                Status.Pending
+              }
+            />
+          </AccordionSummary>
+          {subAttainments?.map((subAttainment: AttainmentGradeData) => {
+            return (
+              <Box
+                key={subAttainment.attainmentId + 'subAccordion'}
+                sx={{pl: '39px'}}
+              >
+                <StudentGradeAccordion
+                  attainmentGrade={subAttainment}
+                  gradeToEdit={props.gradeToEdit}
+                />
+              </Box>
+            );
+          })}
+        </Accordion>
+      ) : (
+        <Box
+          sx={{
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'flex-start',
@@ -122,35 +126,39 @@ export default function StudentGradeAccordion(props: {
             columnGap: '15px',
             pr: '21px',
             minHeight: '36px',
-            maxHeight: '36px'
-          }}>
-            <PanoramaFishEyeIcon sx={{
-              fontSize: '0.6rem', display: 'block', margin: '0px 0px 0px 2px'
-            }} />
-            <GradeText
-              name={props.attainmentGrade.attainmentName as string}
-              grade={
-                props.attainmentGrade.grades.length > 0
-                  ? props.attainmentGrade.grades[0].grade
-                  : 0
-              }
-              status={
-                props.attainmentGrade.grades.length > 0
-                  ? props.attainmentGrade.grades[0].status
-                  : Status.Pending
-              }
-            />
-            <Button
-              disabled={props.attainmentGrade.grades.length == 0}
-              onClick={(): void => {
-                props.gradeToEdit(props.attainmentGrade);
-              }}
-            >
-              Edit
-            </Button>
-          </Box>
-        )
-      }
+            maxHeight: '36px',
+          }}
+        >
+          <PanoramaFishEyeIcon
+            sx={{
+              fontSize: '0.6rem',
+              display: 'block',
+              margin: '0px 0px 0px 2px',
+            }}
+          />
+          <GradeText
+            name={props.attainmentGrade.attainmentName as string}
+            grade={
+              props.attainmentGrade.grades.length > 0
+                ? props.attainmentGrade.grades[0].grade
+                : 0
+            }
+            status={
+              props.attainmentGrade.grades.length > 0
+                ? props.attainmentGrade.grades[0].status
+                : Status.Pending
+            }
+          />
+          <Button
+            disabled={props.attainmentGrade.grades.length == 0}
+            onClick={(): void => {
+              props.gradeToEdit(props.attainmentGrade);
+            }}
+          >
+            Edit
+          </Button>
+        </Box>
+      )}
     </>
   );
 }

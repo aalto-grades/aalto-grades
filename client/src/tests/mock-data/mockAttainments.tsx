@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, Formula, GradeType } from 'aalto-grades-common/types';
+import {AttainmentData, Formula, GradeType} from 'aalto-grades-common/types';
 
 export const mockAttainments: AttainmentData = {
   id: 10000,
@@ -10,10 +10,10 @@ export const mockAttainments: AttainmentData = {
   formula: Formula.WeightedAverage,
   formulaParams: {
     children: [
-      ['Exercises', { weight: 0.5 }],
-      ['Project', { weight: 0.3 }],
-      ['Exam', { weight: 0.2 }]
-    ]
+      ['Exercises', {weight: 0.5}],
+      ['Project', {weight: 0.3}],
+      ['Exam', {weight: 0.2}],
+    ],
   },
   daysValid: 0,
   minRequiredGrade: 1,
@@ -49,7 +49,7 @@ export const mockAttainments: AttainmentData = {
               minRequiredGrade: 1,
               maxGrade: 5,
               subAttainments: [],
-              gradeType: GradeType.Float
+              gradeType: GradeType.Float,
             },
             {
               id: 112,
@@ -60,7 +60,7 @@ export const mockAttainments: AttainmentData = {
               minRequiredGrade: 1,
               maxGrade: 5,
               subAttainments: [],
-              gradeType: GradeType.Float
+              gradeType: GradeType.Float,
             },
             {
               id: 113,
@@ -81,7 +81,7 @@ export const mockAttainments: AttainmentData = {
                   minRequiredGrade: 1,
                   maxGrade: 5,
                   subAttainments: [],
-                  gradeType: GradeType.Float
+                  gradeType: GradeType.Float,
                 },
                 {
                   id: 1132,
@@ -92,9 +92,9 @@ export const mockAttainments: AttainmentData = {
                   minRequiredGrade: 1,
                   maxGrade: 5,
                   subAttainments: [],
-                  gradeType: GradeType.Float
-                }
-              ]
+                  gradeType: GradeType.Float,
+                },
+              ],
             },
             {
               id: 114,
@@ -105,9 +105,9 @@ export const mockAttainments: AttainmentData = {
               minRequiredGrade: 1,
               maxGrade: 5,
               subAttainments: [],
-              gradeType: GradeType.Float
-            }
-          ]
+              gradeType: GradeType.Float,
+            },
+          ],
         },
         {
           id: 12,
@@ -128,7 +128,7 @@ export const mockAttainments: AttainmentData = {
               minRequiredGrade: 1,
               maxGrade: 5,
               subAttainments: [],
-              gradeType: GradeType.Float
+              gradeType: GradeType.Float,
             },
             {
               id: 122,
@@ -139,7 +139,7 @@ export const mockAttainments: AttainmentData = {
               minRequiredGrade: 1,
               maxGrade: 5,
               subAttainments: [],
-              gradeType: GradeType.Float
+              gradeType: GradeType.Float,
             },
             {
               id: 123,
@@ -150,11 +150,11 @@ export const mockAttainments: AttainmentData = {
               minRequiredGrade: 1,
               maxGrade: 5,
               subAttainments: [],
-              gradeType: GradeType.Float
+              gradeType: GradeType.Float,
             },
-          ]
-        }
-      ]
+          ],
+        },
+      ],
     },
     {
       id: 2,
@@ -165,7 +165,7 @@ export const mockAttainments: AttainmentData = {
       minRequiredGrade: 1,
       maxGrade: 5,
       subAttainments: [],
-      gradeType: GradeType.Float
+      gradeType: GradeType.Float,
     },
     {
       id: 3,
@@ -176,7 +176,7 @@ export const mockAttainments: AttainmentData = {
       minRequiredGrade: 1,
       maxGrade: 5,
       subAttainments: [],
-      gradeType: GradeType.Float
-    }
-  ]
+      gradeType: GradeType.Float,
+    },
+  ],
 };

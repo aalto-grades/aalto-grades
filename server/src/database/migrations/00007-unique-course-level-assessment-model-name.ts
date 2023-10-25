@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { QueryInterface } from 'sequelize';
+import {QueryInterface} from 'sequelize';
 
 import logger from '../../configs/winston';
 
@@ -12,7 +12,7 @@ export default {
       await queryInterface.addConstraint('assessment_model', {
         fields: ['course_id', 'name'],
         type: 'unique',
-        name: 'course_assessment_model_name_ck'
+        name: 'course_assessment_model_name_ck',
       });
     } catch (error) {
       logger.error(error);

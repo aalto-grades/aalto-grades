@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { FinalGrade, Status } from 'aalto-grades-common/types';
+import {FinalGrade, Status} from 'aalto-grades-common/types';
 
 export const mockFinalGrades: Array<FinalGrade> = [
   {
@@ -14,15 +14,15 @@ export const mockFinalGrades: Array<FinalGrade> = [
         gradeId: 1,
         grader: {
           id: 5,
-          name: 'Good teacher'
+          name: 'Good teacher',
         },
         grade: 5,
         status: Status.Pass,
         manual: true,
         date: new Date('2023-01-01'),
-        comment: 'nice work'
-      }
-    ]
+        comment: 'nice work',
+      },
+    ],
   },
   {
     userId: 2,
@@ -33,15 +33,15 @@ export const mockFinalGrades: Array<FinalGrade> = [
         gradeId: 1,
         grader: {
           id: 5,
-          name: 'Evil teacher'
+          name: 'Evil teacher',
         },
         grade: 5,
         status: Status.Pass,
         manual: true,
         date: new Date('2023-01-01'),
-        comment: 'bad work'
-      }
-    ]
+        comment: 'bad work',
+      },
+    ],
   },
   {
     userId: 3,
@@ -52,14 +52,14 @@ export const mockFinalGrades: Array<FinalGrade> = [
         gradeId: 1,
         grader: {
           id: 5,
-          name: 'Declarative teacher'
+          name: 'Declarative teacher',
         },
         grade: 5,
         status: Status.Pass,
         manual: true,
         date: new Date('2023-01-01'),
-        comment: 'you shall pass'
-      }
-    ]
-  }
+        comment: 'you shall pass',
+      },
+    ],
+  },
 ];

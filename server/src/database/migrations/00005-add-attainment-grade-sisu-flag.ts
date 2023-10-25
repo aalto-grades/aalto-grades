@@ -2,17 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { DataTypes, QueryInterface } from 'sequelize';
+import {DataTypes, QueryInterface} from 'sequelize';
 
 import logger from '../../configs/winston';
 
 export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
     try {
-      await queryInterface.addColumn(
-        'attainment_grade', 'sisu_export_date',
-        { type: DataTypes.DATE, allowNull: true, defaultValue: null }
-      );
+      await queryInterface.addColumn('attainment_grade', 'sisu_export_date', {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: null,
+      });
     } catch (error) {
       logger.error(error);
     }
@@ -23,5 +24,5 @@ export default {
     } catch (error) {
       logger.error(error);
     }
-  }
+  },
 };

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpCode } from 'aalto-grades-common/types';
+import {HttpCode} from 'aalto-grades-common/types';
 
 /**
  * ApiError class represents a custom API related error, extends the native Error class. Includes
@@ -10,7 +10,7 @@ import { HttpCode } from 'aalto-grades-common/types';
  * code represents HTTP status code associated with the error. Useful for providing more context
  * about an API-related error that occurred during the execution of an operation.
  * @extends {Error}
-*/
+ */
 export class ApiError extends Error {
   public readonly statusCode: number;
   public readonly multipleErrors: Array<string> | undefined;
@@ -19,7 +19,7 @@ export class ApiError extends Error {
    * Creates an instance of ApiError.
    * @param {string | Array<string>} message - The error message(s).
    * @param {HttpCode} statusCode - The HTTP status code associated with the error.
-  */
+   */
   constructor(message: string | Array<string>, statusCode: HttpCode) {
     if (Array.isArray(message)) {
       super('');

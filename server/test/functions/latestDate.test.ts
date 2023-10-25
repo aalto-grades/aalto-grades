@@ -2,10 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { getDateOfLatestGrade } from '../../src/controllers/utils/grades';
+import {getDateOfLatestGrade} from '../../src/controllers/utils/grades';
 
 describe('Test latest date finder', () => {
-
   it('should return the correct date', async () => {
     expect(await getDateOfLatestGrade(391, 49)).toEqual(new Date('2022-07-01'));
     expect(await getDateOfLatestGrade(1, 8)).toEqual(new Date('2023-01-01'));

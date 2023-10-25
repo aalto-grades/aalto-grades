@@ -3,10 +3,15 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  CreationOptional, DataTypes, ForeignKey, Model, InferAttributes, InferCreationAttributes
+  CreationOptional,
+  DataTypes,
+  ForeignKey,
+  Model,
+  InferAttributes,
+  InferCreationAttributes,
 } from 'sequelize';
 
-import { sequelize } from '..';
+import {sequelize} from '..';
 import CourseInstance from './courseInstance';
 import User from './user';
 
@@ -28,27 +33,27 @@ CourseInstanceRole.init(
       primaryKey: true,
       references: {
         model: 'user',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     courseInstanceId: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       references: {
         model: 'course_instance',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     role: {
       type: DataTypes.ENUM('STUDENT', 'TEACHER'),
-      allowNull: false
+      allowNull: false,
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },
   {
     sequelize,
-    tableName: 'course_instance_role'
+    tableName: 'course_instance_role',
   }
 );
 
@@ -61,5 +66,5 @@ User.belongsToMany(CourseInstance, {
 CourseInstance.belongsToMany(User, {
   through: CourseInstanceRole,
   onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
+  onUpdate: 'CASCADE',
 });

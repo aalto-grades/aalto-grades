@@ -3,10 +3,15 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  CreationOptional, DataTypes, ForeignKey, Model, InferAttributes, InferCreationAttributes
+  CreationOptional,
+  DataTypes,
+  ForeignKey,
+  Model,
+  InferAttributes,
+  InferCreationAttributes,
 } from 'sequelize';
 
-import { sequelize } from '..';
+import {sequelize} from '..';
 import Course from './course';
 
 export default class AssessmentModel extends Model<
@@ -25,35 +30,35 @@ AssessmentModel.init(
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
-      primaryKey: true
+      primaryKey: true,
     },
     courseId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: 'course',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     name: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },
   {
     sequelize,
-    tableName: 'assessment_model'
+    tableName: 'assessment_model',
   }
 );
 
 AssessmentModel.belongsTo(Course, {
   targetKey: 'id',
-  foreignKey: 'courseId'
+  foreignKey: 'courseId',
 });
 
 Course.hasMany(AssessmentModel, {
   onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
+  onUpdate: 'CASCADE',
 });

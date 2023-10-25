@@ -5,10 +5,8 @@
 // An example of a test
 
 describe('Example test suite', () => {
-
   it('should redirect to the login page, if the user is not logged in', () => {
     cy.visit('/');
     cy.url().should('include', '/login');
   });
-
 });

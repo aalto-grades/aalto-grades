@@ -3,55 +3,55 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AssessmentModelData, CourseInstanceData, LoginResult, SystemRole
+  AssessmentModelData,
+  CourseInstanceData,
+  LoginResult,
+  SystemRole,
 } from 'aalto-grades-common/types';
-import { rest } from 'msw';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {rest} from 'msw';
+import {MemoryRouter, Routes, Route} from 'react-router-dom';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import '@testing-library/jest-dom/extend-expect';
-import { render, RenderResult, waitFor, cleanup } from '@testing-library/react';
+import {render, RenderResult, waitFor, cleanup} from '@testing-library/react';
 
 import CourseView from '../components/CourseView';
 
 import AuthContext from '../context/AuthProvider';
-import { mockAssessmentModels } from './mock-data/mockAssessmentModels';
-import { mockInstances } from './mock-data/mockInstancesWithStringDates';
-import { mockSuccess, server } from './mock-data/server';
+import {mockAssessmentModels} from './mock-data/mockAssessmentModels';
+import {mockInstances} from './mock-data/mockInstancesWithStringDates';
+import {mockSuccess, server} from './mock-data/server';
 
 afterEach(cleanup);
 
 describe('Tests for CourseView component', () => {
-
   function renderCourseView(
     auth: LoginResult,
     mockInstances?: Array<CourseInstanceData>,
     mockAssessmentModels?: Array<AssessmentModelData>
   ): RenderResult {
-
     if (mockInstances && mockAssessmentModels) {
       server.use(
         rest.get(
           '*/v1/courses/:courseId/assessment-models',
           mockSuccess(mockAssessmentModels)
         ),
-        rest.get(
-          '*/v1/courses/:courseId/instances',
-          mockSuccess(mockInstances)
-        )
+        rest.get('*/v1/courses/:courseId/instances', mockSuccess(mockInstances))
       );
     }
 
     return render(
       <QueryClientProvider client={new QueryClient()}>
         <MemoryRouter initialEntries={['/course-view/1']}>
-          <AuthContext.Provider value={{
-            auth: auth,
-            setAuth: jest.fn(),
-            isTeacherInCharge: false,
-            setIsTeacherInCharge: jest.fn()
-          }}>
+          <AuthContext.Provider
+            value={{
+              auth: auth,
+              setAuth: jest.fn(),
+              isTeacherInCharge: false,
+              setIsTeacherInCharge: jest.fn(),
+            }}
+          >
             <Routes>
-              <Route path='/course-view/:courseId' element={<CourseView />} />
+              <Route path="/course-view/:courseId" element={<CourseView />} />
             </Routes>
           </AuthContext.Provider>
         </MemoryRouter>
@@ -93,17 +93,16 @@ describe('Tests for CourseView component', () => {
   */
 
   test(
-    'CourseView should not render new instance button or allow'
-    + ' editing attainments for students',
+    'CourseView should not render new instance button or allow' +
+      ' editing attainments for students',
     async () => {
-
       const auth: LoginResult = {
         id: 2,
         name: 'User',
-        role: SystemRole.User
+        role: SystemRole.User,
       };
 
-      const { getByText, findByText, queryByText }: RenderResult =
+      const {getByText, findByText, queryByText}: RenderResult =
         renderCourseView(auth);
 
       const courseInfo: HTMLElement = await findByText('Course Details');
@@ -118,62 +117,50 @@ describe('Tests for CourseView component', () => {
       expect(queryByText('Study Attainments')).not.toBeInTheDocument();
       expect(queryByText('Add attainment')).not.toBeInTheDocument();
       expect(queryByText('Edit')).not.toBeInTheDocument();
-
     }
   );
 
-  test(
-    'CourseView InstancesTable should display correct message if no instances found for the course',
-    async () => {
+  test('CourseView InstancesTable should display correct message if no instances found for the course', async () => {
+    // TODO, role here must be checked here based on a course/instance level role.
+    const auth: LoginResult = {
+      id: 1,
+      name: 'Admin',
+      role: SystemRole.Admin,
+    };
 
-      // TODO, role here must be checked here based on a course/instance level role.
-      const auth: LoginResult = {
-        id: 1,
-        name: 'Admin',
-        role: SystemRole.Admin
-      };
+    const {getByText}: RenderResult = renderCourseView(
+      auth,
+      [],
+      mockAssessmentModels
+    );
 
-      const { getByText }: RenderResult = renderCourseView(
-        auth, [], mockAssessmentModels
+    await waitFor(() => {
+      const noInstances: HTMLElement = getByText(
+        'No instances found for course, please create a new instance.'
       );
+      expect(noInstances).toBeDefined();
+    });
+  });
 
-      await waitFor(() => {
-        const noInstances: HTMLElement = getByText(
-          'No instances found for course, please create a new instance.'
-        );
-        expect(noInstances).toBeDefined();
-      });
+  test('CourseView assessment models should display correct message if no models found for the course', async () => {
+    // TODO, role here must be checked here based on a course/instance level role.
+    const auth: LoginResult = {
+      id: 1,
+      name: 'Admin',
+      role: SystemRole.Admin,
+    };
 
-    }
-  );
+    const {getByText}: RenderResult = renderCourseView(auth, mockInstances, []);
 
-  test(
-    'CourseView assessment models should display correct message if no models found for the course',
-    async () => {
-
-      // TODO, role here must be checked here based on a course/instance level role.
-      const auth: LoginResult = {
-        id: 1,
-        name: 'Admin',
-        role: SystemRole.Admin
-      };
-
-      const { getByText }: RenderResult = renderCourseView(
-        auth, mockInstances, []
+    await waitFor(() => {
+      const noAssessmentModelsSide: HTMLElement = getByText(
+        'No assessment models found. Please create a new assessment model.'
       );
-
-      await waitFor(() => {
-        const noAssessmentModelsSide: HTMLElement = getByText(
-          'No assessment models found. Please create a new assessment model.'
-        );
-        expect(noAssessmentModelsSide).toBeDefined();
-        const noAssessmentModelsMain: HTMLElement = getByText(
-          'No assessment models found.'
-        );
-        expect(noAssessmentModelsMain).toBeDefined();
-      });
-
-    }
-  );
-
+      expect(noAssessmentModelsSide).toBeDefined();
+      const noAssessmentModelsMain: HTMLElement = getByText(
+        'No assessment models found.'
+      );
+      expect(noAssessmentModelsMain).toBeDefined();
+    });
+  });
 });
