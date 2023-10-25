@@ -112,7 +112,10 @@ describe('Test CSV header parser', () => {
 
 describe('Test CSV student grades parser', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function attainmentIdsToAttainments(attainmentIds: Array<number>): unknown[] {
+  function attainmentIdsToAttainments(
+    attainmentIds: Array<number>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Array<any> {
     return attainmentIds.map((id: number) => {
       return {
         id: id,
@@ -135,7 +138,7 @@ describe('Test CSV student grades parser', () => {
     const attainmentIds: Array<number> = [1, 2, 3, 4, 5];
     const result: Array<StudentGrades> = parseGradesFromCsv(
       studentGradingData,
-      attainmentIdsToAttainments(attainmentIds) as Attainment[] // Casting is added because the fake data lacks properties
+      attainmentIdsToAttainments(attainmentIds)
     );
 
     result.forEach((student: StudentGrades, index: number) => {
@@ -166,7 +169,7 @@ describe('Test CSV student grades parser', () => {
     try {
       parseGradesFromCsv(
         studentGradingData,
-        attainmentIdsToAttainments(attainmentIds) as Attainment[] // Casting is added because the fake data lacks properties
+        attainmentIdsToAttainments(attainmentIds)
       );
     } catch (error: unknown) {
       checkError(error, HttpCode.BadRequest, [
@@ -189,7 +192,7 @@ describe('Test CSV student grades parser', () => {
     try {
       parseGradesFromCsv(
         studentGradingData,
-        attainmentIdsToAttainments(attainmentIds) as Attainment[] // Casting is added because the fake data lacks properties
+        attainmentIdsToAttainments(attainmentIds)
       );
     } catch (error: unknown) {
       checkError(error, HttpCode.BadRequest, [
