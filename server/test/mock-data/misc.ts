@@ -4,9 +4,12 @@
 
 import TeacherInCharge from '../../src/database/models/teacherInCharge';
 
-export const mockTeacher: TeacherInCharge = new TeacherInCharge({
-  userId: 1,
-  courseId: 1,
-  createdAt: new Date(),
-  updatedAt: new Date()
-}, { isNewRecord: false });
+export const mockTeacher: TeacherInCharge = new TeacherInCharge(
+  {
+    userId: 1,
+    courseId: 1,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {isNewRecord: false}
+);

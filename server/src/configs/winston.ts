@@ -4,7 +4,7 @@
 
 import winston from 'winston';
 
-import { NODE_ENV } from './environment';
+import {NODE_ENV} from './environment';
 
 const colors: winston.config.AbstractConfigSetColors = {
   error: 'red',
@@ -22,12 +22,12 @@ winston.addColors(colors);
  */
 const level: string = ((): string => {
   switch (NODE_ENV) {
-  case 'production':
-    return 'http';
-  case 'test':
-    return 'error';
-  default:
-    return 'debug';
+    case 'production':
+      return 'http';
+    case 'test':
+      return 'error';
+    default:
+      return 'debug';
   }
 })();
 
@@ -47,8 +47,8 @@ const logger: winston.Logger = winston.createLogger({
     debug: 4,
   },
   format: winston.format.combine(
-    winston.format.timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
-    winston.format.colorize({ all: true }),
+    winston.format.timestamp({format: 'DD-MM-YYYY HH:mm:ss'}),
+    winston.format.colorize({all: true}),
     winston.format.printf(
       (http: winston.Logform.TransformableInfo) =>
         `${http.timestamp} ${http.level}: ${http.message}`
@@ -62,8 +62,8 @@ const logger: winston.Logger = winston.createLogger({
       handleExceptions: true,
       maxsize: 5242880, // 5MB
       maxFiles: 5,
-    })
-  ]
+    }),
+  ],
 });
 
 export default logger;

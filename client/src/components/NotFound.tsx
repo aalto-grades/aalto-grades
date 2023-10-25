@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Box, Typography } from '@mui/material';
-import { JSX } from 'react';
-import { Link } from 'react-router-dom';
+import {Box, Typography} from '@mui/material';
+import {JSX} from 'react';
+import {Link} from 'react-router-dom';
 
 export default function NotFound(): JSX.Element {
   return (
@@ -13,18 +13,16 @@ export default function NotFound(): JSX.Element {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
       }}
     >
-      <Typography variant='h4' sx={{ my: 4 }}>
+      <Typography variant="h4" sx={{my: 4}}>
         404 - Not Found
       </Typography>
-      <Typography variant='body1' sx={{ mb: 5 }}>
+      <Typography variant="body1" sx={{mb: 5}}>
         The page you’re looking for doesn’t exist.
       </Typography>
-      <Link to='/'>
-        Go back to main page
-      </Link>
+      <Link to="/">Go back to main page</Link>
     </Box>
   );
 }

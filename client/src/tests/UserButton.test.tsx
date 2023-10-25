@@ -2,11 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { LoginResult, SystemRole } from 'aalto-grades-common/types';
-import { BrowserRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {LoginResult, SystemRole} from 'aalto-grades-common/types';
+import {BrowserRouter} from 'react-router-dom';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import '@testing-library/jest-dom/extend-expect';
-import { act, cleanup, render, RenderResult, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  render,
+  RenderResult,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import UserButton from '../components/auth/UserButton';
@@ -16,17 +23,18 @@ import AuthContext from '../context/AuthProvider';
 afterEach(cleanup);
 
 describe('Tests for button component displaying user data and logout', () => {
-
   function renderButton(auth: LoginResult | null): RenderResult {
     return render(
       <QueryClientProvider client={new QueryClient()}>
         <BrowserRouter>
-          <AuthContext.Provider value={{
-            auth: auth,
-            setAuth: jest.fn(),
-            isTeacherInCharge: false,
-            setIsTeacherInCharge: jest.fn()
-          }}>
+          <AuthContext.Provider
+            value={{
+              auth: auth,
+              setAuth: jest.fn(),
+              isTeacherInCharge: false,
+              setIsTeacherInCharge: jest.fn(),
+            }}
+          >
             <UserButton />
           </AuthContext.Provider>
         </BrowserRouter>
@@ -35,18 +43,22 @@ describe('Tests for button component displaying user data and logout', () => {
   }
 
   test('User button should display the currently logged in users name', async () => {
-    const auth: LoginResult = { id: 1, role: SystemRole.User, name: 'John Doe' };
+    const auth: LoginResult = {id: 1, role: SystemRole.User, name: 'John Doe'};
     renderButton(auth);
-    await waitFor(() => expect(screen.queryByText('John Doe')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.queryByText('John Doe')).toBeInTheDocument()
+    );
   });
 
   test('User button should not display any name when not logged in', async () => {
     renderButton(null);
-    await waitFor(() => expect(screen.getByTestId('not-logged-in')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByTestId('not-logged-in')).toBeInTheDocument()
+    );
   });
 
   test('Clicking user button should display logout option', async () => {
-    const auth: LoginResult = { id: 1, role: SystemRole.User, name: 'John Doe' };
+    const auth: LoginResult = {id: 1, role: SystemRole.User, name: 'John Doe'};
     renderButton(auth);
 
     const button: HTMLElement = screen.getByText('John Doe');

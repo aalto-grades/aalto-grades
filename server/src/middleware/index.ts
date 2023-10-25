@@ -2,14 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { NextFunction, Request, Response } from 'express';
+import {NextFunction, Request, Response} from 'express';
 
 interface JsonError extends Error {
-  expose?: boolean,
-  status?: number,
-  statusCode?: number,
-  body?: string,
-  type?: string
+  expose?: boolean;
+  status?: number;
+  statusCode?: number;
+  body?: string;
+  type?: string;
 }
 
 /**
@@ -28,12 +28,19 @@ interface JsonError extends Error {
  * app.use(handleInvalidRequestJson);
  */
 export function handleInvalidRequestJson(
-  err: JsonError, req: Request, res: Response, next: NextFunction
+  err: JsonError,
+  req: Request,
+  res: Response,
+  next: NextFunction
 ): void {
-  if (err instanceof SyntaxError && err.status === 400 && err.body !== undefined) {
+  if (
+    err instanceof SyntaxError &&
+    err.status === 400 &&
+    err.body !== undefined
+  ) {
     res.status(400).send({
       success: false,
-      errors: [ `SyntaxError: ${err.message}: ${err.body}` ]
+      errors: [`SyntaxError: ${err.message}: ${err.body}`],
     });
   } else {
     next();

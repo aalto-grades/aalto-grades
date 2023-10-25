@@ -2,17 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AssessmentModelData } from 'aalto-grades-common/types';
+import {AssessmentModelData} from 'aalto-grades-common/types';
 
 export const mockAssessmentModels: Array<AssessmentModelData> = [
   {
     id: 1,
     courseId: 1,
-    name: 'Course model'
+    name: 'Course model',
   },
   {
     id: 2,
     courseId: 1,
-    name: 'Exam model'
-  }
+    name: 'Exam model',
+  },
 ];

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { GradingScale } from 'aalto-grades-common/types';
+import {GradingScale} from 'aalto-grades-common/types';
 
 // use 'en-GB' to get "20.07.2012, 05:00:00"
 // (instead of 'fi-GB' which produces "20.7.2012 klo 5.00.00")
@@ -35,42 +35,46 @@ export function formatDateString(dateStr: string): string {
 // Format Sisu course types to a more readable form.
 export function formatSisuCourseType(courseType: string): string {
   switch (courseType) {
-  case 'teaching-participation-lectures':
-    return 'Teaching';
-  case 'exam-exam':
-    return 'Exam';
-  case 'teaching-participation-project':
-    return 'Project';
-  default:
-    return courseType;
+    case 'teaching-participation-lectures':
+      return 'Teaching';
+    case 'exam-exam':
+      return 'Exam';
+    case 'teaching-participation-project':
+      return 'Project';
+    default:
+      return courseType;
   }
 }
 
 // Change course type from "NUMERICAL", "PASSFAIL" and from "SECOND_NATIONAL_LANGUAGE"
 // to a more readable types.
 // These are for the UI only. These need to be converted back when adding data to the server.
-export function convertToClientGradingScale(gradingScale: GradingScale): string {
+export function convertToClientGradingScale(
+  gradingScale: GradingScale
+): string {
   switch (gradingScale) {
-  case GradingScale.Numerical:
-    return 'General scale, 0-5';
-  case GradingScale.PassFail:
-    return 'Pass-Fail';
-  case GradingScale.SecondNationalLanguage:
-    return 'Second national language';
-  default:
-    return gradingScale;
+    case GradingScale.Numerical:
+      return 'General scale, 0-5';
+    case GradingScale.PassFail:
+      return 'Pass-Fail';
+    case GradingScale.SecondNationalLanguage:
+      return 'Second national language';
+    default:
+      return gradingScale;
   }
 }
 
-export function convertToServerGradingScale(gradingScale: string): GradingScale | string {
+export function convertToServerGradingScale(
+  gradingScale: string
+): GradingScale | string {
   switch (gradingScale) {
-  case 'General scale, 0-5':
-    return GradingScale.Numerical;
-  case 'Pass-Fail':
-    return GradingScale.PassFail;
-  case 'Second national language':
-    return GradingScale.SecondNationalLanguage;
-  default:
-    return gradingScale;
+    case 'General scale, 0-5':
+      return GradingScale.Numerical;
+    case 'Pass-Fail':
+      return GradingScale.PassFail;
+    case 'Second national language':
+      return GradingScale.SecondNationalLanguage;
+    default:
+      return gradingScale;
   }
 }

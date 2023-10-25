@@ -3,25 +3,32 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AttainmentData, ChildParamsObject, Formula, GradeType, HttpCode, ParamsObject
+  AttainmentData,
+  ChildParamsObject,
+  Formula,
+  GradeType,
+  HttpCode,
+  ParamsObject,
 } from 'aalto-grades-common/types';
-import { Request, Response } from 'express';
-import { Op, Transaction } from 'sequelize';
+import {Request, Response} from 'express';
+import {Op, Transaction} from 'sequelize';
 import * as yup from 'yup';
 
 import AssessmentModel from '../database/models/assessmentModel';
 import Attainment from '../database/models/attainment';
 import Course from '../database/models/course';
 
-import { getFormulaImplementation } from '../formulas';
-import { ApiError, FormulaImplementation, idSchema, JwtClaims } from '../types';
-import { validateAssessmentModelPath } from './utils/assessmentModel';
+import {getFormulaImplementation} from '../formulas';
+import {ApiError, FormulaImplementation, idSchema, JwtClaims} from '../types';
+import {validateAssessmentModelPath} from './utils/assessmentModel';
 import {
-  findAttainmentById, findAttainmentsByAssessmentModel, generateAttainmentTree,
-  validateAttainmentPath
+  findAttainmentById,
+  findAttainmentsByAssessmentModel,
+  generateAttainmentTree,
+  validateAttainmentPath,
 } from './utils/attainment';
-import { isTeacherInChargeOrAdmin } from './utils/user';
-import { sequelize } from '../database';
+import {isTeacherInChargeOrAdmin} from './utils/user';
+import {sequelize} from '../database';
 
 async function validateFormulaParams(
   formula: Formula,
@@ -29,16 +36,15 @@ async function validateFormulaParams(
   subAttainmentNames?: Array<string>
 ): Promise<void> {
   // Validate params with the formula's param schema
-  await getFormulaImplementation(formula).paramSchema.validate(
-    formulaParams, { abortEarly: false }
-  );
+  await getFormulaImplementation(formula).paramSchema.validate(formulaParams, {
+    abortEarly: false,
+  });
 
   if (formulaParams.children) {
     // Ensure that all subattainments are included in children and that there
     // are no invalid subattainment names in children
-    const uncheckedNamesInParams: Array<string> = formulaParams.children?.map(
-      (value: [string, unknown]) => value[0]
-    ) ?? [];
+    const uncheckedNamesInParams: Array<string> =
+      formulaParams.children?.map((value: [string, unknown]) => value[0]) ?? [];
 
     const notFound: Array<string> = [];
 
@@ -70,23 +76,35 @@ async function validateFormulaParams(
 }
 
 async function validateTreeParam(treeParam: string): Promise<string> {
-  const treeSchema: yup.AnyObjectSchema = yup.object().shape({
-    tree: yup.string().oneOf(['children', 'descendants'])
-  }).noUnknown(true).strict();
+  const treeSchema: yup.AnyObjectSchema = yup
+    .object()
+    .shape({
+      tree: yup.string().oneOf(['children', 'descendants']),
+    })
+    .noUnknown(true)
+    .strict();
 
-  await treeSchema.validate({ tree: treeParam }, { abortEarly: false });
+  await treeSchema.validate({tree: treeParam}, {abortEarly: false});
   return treeParam;
 }
 
-export async function getAttainment(req: Request, res: Response): Promise<void> {
+export async function getAttainment(
+  req: Request,
+  res: Response
+): Promise<void> {
   const tree: string = await validateTreeParam(req.query.tree as string);
-  await idSchema.validate({ id: req.params.attainmentId }, { abortEarly: false });
+  await idSchema.validate({id: req.params.attainmentId}, {abortEarly: false});
   const attainmentId: number = Number(req.params.attainmentId);
 
-  const [_course, assessmentModel, _attainment]: [Course, AssessmentModel, Attainment] =
-    await validateAttainmentPath(
-      req.params.courseId, req.params.assessmentModelId, req.params.attainmentId
-    );
+  const [_course, assessmentModel, _attainment]: [
+    Course,
+    AssessmentModel,
+    Attainment,
+  ] = await validateAttainmentPath(
+    req.params.courseId,
+    req.params.assessmentModelId,
+    req.params.attainmentId
+  );
 
   const attainmentData: Array<AttainmentData> =
     await findAttainmentsByAssessmentModel(assessmentModel.id);
@@ -97,32 +115,37 @@ export async function getAttainment(req: Request, res: Response): Promise<void> 
 
   if (!localRoot) {
     throw new ApiError(
-      `attainment with ID ${attainmentId} not found`, HttpCode.NotFound
+      `attainment with ID ${attainmentId} not found`,
+      HttpCode.NotFound
     );
   }
 
   switch (tree) {
-  case 'children':
-    generateAttainmentTree(localRoot, attainmentData, true);
-    break;
-  case 'descendants':
-    generateAttainmentTree(localRoot, attainmentData);
-    break;
-  default:
-    break;
+    case 'children':
+      generateAttainmentTree(localRoot, attainmentData, true);
+      break;
+    case 'descendants':
+      generateAttainmentTree(localRoot, attainmentData);
+      break;
+    default:
+      break;
   }
 
   res.status(HttpCode.Ok).json({
-    data: localRoot
+    data: localRoot,
   });
 }
 
-export async function getRootAttainment(req: Request, res: Response): Promise<void> {
+export async function getRootAttainment(
+  req: Request,
+  res: Response
+): Promise<void> {
   const tree: string = await validateTreeParam(req.query.tree as string);
 
   const [_course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
-      req.params.courseId, req.params.assessmentModelId
+      req.params.courseId,
+      req.params.assessmentModelId
     );
 
   const allAttainmentData: Array<AttainmentData> =
@@ -139,89 +162,81 @@ export async function getRootAttainment(req: Request, res: Response): Promise<vo
     );
   } else if (rootAttainments.length > 1) {
     throw new ApiError(
-      'More than one attainment without parentId was found '
-      + 'for the specified course and assessment model. Attainment IDs: '
-      + rootAttainments.map((attainment: AttainmentData) => attainment.id).join(),
+      'More than one attainment without parentId was found ' +
+        'for the specified course and assessment model. Attainment IDs: ' +
+        rootAttainments
+          .map((attainment: AttainmentData) => attainment.id)
+          .join(),
       HttpCode.Conflict
     );
   }
 
   switch (tree) {
-  case 'children':
-    generateAttainmentTree(rootAttainments[0], allAttainmentData, true);
-    break;
-  case 'descendants':
-    generateAttainmentTree(rootAttainments[0], allAttainmentData);
-    break;
-  default:
-    generateAttainmentTree(rootAttainments[0], allAttainmentData);
-    break;
+    case 'children':
+      generateAttainmentTree(rootAttainments[0], allAttainmentData, true);
+      break;
+    case 'descendants':
+      generateAttainmentTree(rootAttainments[0], allAttainmentData);
+      break;
+    default:
+      generateAttainmentTree(rootAttainments[0], allAttainmentData);
+      break;
   }
 
   res.status(HttpCode.Ok).json({
-    data: rootAttainments[0]
+    data: rootAttainments[0],
   });
 }
 
-export async function addAttainment(req: Request, res: Response): Promise<void> {
+export async function addAttainment(
+  req: Request,
+  res: Response
+): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
-    parentId: yup
-      .number()
-      .notRequired(),
-    name: yup
-      .string()
-      .required(),
-    daysValid: yup
-      .number()
-      .min(0)
-      .required(),
-    minRequiredGrade: yup
-      .number()
-      .min(0)
-      .required(),
-    maxGrade: yup
-      .number()
-      .min(yup.ref('minRequiredGrade'))
-      .required(),
-    formula: yup
-      .string()
-      .oneOf(Object.values(Formula))
-      .required(),
+    parentId: yup.number().notRequired(),
+    name: yup.string().required(),
+    daysValid: yup.number().min(0).required(),
+    minRequiredGrade: yup.number().min(0).required(),
+    maxGrade: yup.number().min(yup.ref('minRequiredGrade')).required(),
+    formula: yup.string().oneOf(Object.values(Formula)).required(),
     formulaParams: yup // More thorough validation is done separately
       .object()
       .required(),
-    gradeType: yup
-      .string()
-      .oneOf(Object.values(GradeType))
-      .required(),
+    gradeType: yup.string().oneOf(Object.values(GradeType)).required(),
     subAttainments: yup
       .array()
       .of(yup.lazy(() => requestSchema.default(undefined)))
-      .notRequired()
+      .notRequired(),
   });
 
-  await requestSchema.validate(req.body, { abortEarly: false });
+  await requestSchema.validate(req.body, {abortEarly: false});
 
   const [course, assessmentModel]: [Course, AssessmentModel] =
     await validateAssessmentModelPath(
-      req.params.courseId, req.params.assessmentModelId
+      req.params.courseId,
+      req.params.assessmentModelId
     );
 
   const requestTree: AttainmentData = req.body;
 
-  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
+  await isTeacherInChargeOrAdmin(
+    req.user as JwtClaims,
+    course.id,
+    HttpCode.Forbidden
+  );
 
   // If linked to a parent ID ensure that the parent attainment exists and
   // belongs to the same assessment model
   if (requestTree.parentId) {
     const parentAttainment: Attainment = await findAttainmentById(
-      requestTree.parentId, HttpCode.UnprocessableEntity
+      requestTree.parentId,
+      HttpCode.UnprocessableEntity
     );
 
     if (parentAttainment.assessmentModelId !== assessmentModel.id) {
       throw new ApiError(
         `parent attainment ID ${requestTree.parentId} does not belong ` +
-        `to the assessment model ID ${assessmentModel.id}`,
+          `to the assessment model ID ${assessmentModel.id}`,
         HttpCode.Conflict
       );
     }
@@ -237,21 +252,22 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
         parentAttainment.formula
       );
 
-      parentParams.children.push(
-        [requestTree.name, parentFormula.defaultChildParams]
-      );
+      parentParams.children.push([
+        requestTree.name,
+        parentFormula.defaultChildParams,
+      ]);
 
       // Sanity check
       await parentFormula.paramSchema.validate(parentParams);
 
       await Attainment.update(
         {
-          formulaParams: parentParams
+          formulaParams: parentParams,
         },
         {
           where: {
-            id: requestTree.parentId
-          }
+            id: requestTree.parentId,
+          },
         }
       );
     }
@@ -261,9 +277,9 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       where: {
         assessmentModelId: assessmentModel.id,
         parentId: {
-          [Op.is]: undefined
-        }
-      }
+          [Op.is]: undefined,
+        },
+      },
     });
 
     // Root attainment exists.
@@ -299,9 +315,9 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
   // Add all attainments to the database and construct an attainment tree with
   // IDs to return
   async function processAttainmentTree(
-    requestTree: AttainmentData, parentId: number | undefined
+    requestTree: AttainmentData,
+    parentId: number | undefined
   ): Promise<AttainmentData> {
-
     const dbEntry: Attainment = await Attainment.create({
       parentId: parentId,
       assessmentModelId: assessmentModel.id,
@@ -311,7 +327,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       maxGrade: requestTree.maxGrade,
       formula: requestTree.formula,
       formulaParams: requestTree.formulaParams,
-      gradeType: requestTree.gradeType
+      gradeType: requestTree.gradeType,
     });
 
     const attainmentTree: AttainmentData = {
@@ -325,7 +341,7 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
       formula: dbEntry.formula,
       formulaParams: dbEntry.formulaParams,
       gradeType: dbEntry.gradeType,
-      subAttainments: []
+      subAttainments: [],
     };
 
     if (requestTree.subAttainments) {
@@ -340,35 +356,27 @@ export async function addAttainment(req: Request, res: Response): Promise<void> 
   }
 
   const attainmentTree: AttainmentData = await processAttainmentTree(
-    requestTree, requestTree.parentId
+    requestTree,
+    requestTree.parentId
   );
 
   res.status(HttpCode.Ok).json({
-    data: attainmentTree
+    data: attainmentTree,
   });
 }
 
-export async function updateAttainment(req: Request, res: Response): Promise<void> {
+export async function updateAttainment(
+  req: Request,
+  res: Response
+): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
-    parentId: yup
-      .number()
-      .notRequired(),
-    name: yup
+    parentId: yup.number().notRequired(),
+    name: yup.string().notRequired(),
+    daysValid: yup.number().min(0).notRequired(),
+    minRequiredGrade: yup.number().min(0).notRequired(),
+    maxGrade: yup.number().min(yup.ref('minRequiredGrade')).notRequired(),
+    formula: yup
       .string()
-      .notRequired(),
-    daysValid: yup
-      .number()
-      .min(0)
-      .notRequired(),
-    minRequiredGrade: yup
-      .number()
-      .min(0)
-      .notRequired(),
-    maxGrade: yup
-      .number()
-      .min(yup.ref('minRequiredGrade'))
-      .notRequired(),
-    formula: yup.string()
       .transform((value: string, originalValue: string) => {
         return originalValue ? originalValue.toUpperCase() : value;
       })
@@ -378,20 +386,26 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
       .object()
       .nullable()
       .notRequired(),
-    gradeType: yup
-      .string()
-      .oneOf(Object.values(GradeType))
-      .notRequired()
+    gradeType: yup.string().oneOf(Object.values(GradeType)).notRequired(),
   });
 
-  await requestSchema.validate(req.body, { abortEarly: false });
+  await requestSchema.validate(req.body, {abortEarly: false});
 
-  const [course, _assessmentModel, attainment]: [Course, AssessmentModel, Attainment] =
-    await validateAttainmentPath(
-      req.params.courseId, req.params.assessmentModelId, req.params.attainmentId
-    );
+  const [course, _assessmentModel, attainment]: [
+    Course,
+    AssessmentModel,
+    Attainment,
+  ] = await validateAttainmentPath(
+    req.params.courseId,
+    req.params.assessmentModelId,
+    req.params.attainmentId
+  );
 
-  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
+  await isTeacherInChargeOrAdmin(
+    req.user as JwtClaims,
+    course.id,
+    HttpCode.Forbidden
+  );
 
   const name: string | undefined = req.body.name;
   const daysValid: number | undefined = req.body.daysValid;
@@ -404,14 +418,18 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
 
   if (minRequiredGrade && !maxGrade && minRequiredGrade > attainment.maxGrade) {
     throw new ApiError(
-      `without updating max grade, new min required grade (${minRequiredGrade}) can't be`
-      + ` larger than existing max grade (${attainment.maxGrade})`,
+      `without updating max grade, new min required grade (${minRequiredGrade}) can't be` +
+        ` larger than existing max grade (${attainment.maxGrade})`,
       HttpCode.BadRequest
     );
-  } else if (maxGrade && !minRequiredGrade && maxGrade < attainment.minRequiredGrade) {
+  } else if (
+    maxGrade &&
+    !minRequiredGrade &&
+    maxGrade < attainment.minRequiredGrade
+  ) {
     throw new ApiError(
-      `without updating min required grade, new max grade (${maxGrade}) can't be`
-      + ` smaller than existing min required grade (${attainment.minRequiredGrade})`,
+      `without updating min required grade, new max grade (${maxGrade}) can't be` +
+        ` smaller than existing min required grade (${attainment.minRequiredGrade})`,
       HttpCode.BadRequest
     );
   }
@@ -421,7 +439,6 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   // If linked to a parent id, check that it exists and belongs
   // to the same assessment model as the attainment being edited.
   if (parentId) {
-
     // TODO: check that does not refer to itself transitionally through some other attainment.
     if (parentId === attainment.id) {
       throw new ApiError(
@@ -438,7 +455,7 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     if (parentAttainment.assessmentModelId !== attainment.assessmentModelId) {
       throw new ApiError(
         `parent attainment ID ${parentId} does not belong to ` +
-        `the same assessment model as attainment ID ${attainment.id}`,
+          `the same assessment model as attainment ID ${attainment.id}`,
         HttpCode.Conflict
       );
     }
@@ -447,18 +464,21 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
   await validateFormulaParams(
     formula ?? attainment.formula,
     formulaParams ?? attainment.formulaParams,
-    (await Attainment.findAll({
-      attributes: ['name'],
-      where: {
-        parentId: attainment.id
-      }
-    })).map((attainment: { name: string }): string => attainment.name)
+    (
+      await Attainment.findAll({
+        attributes: ['name'],
+        where: {
+          parentId: attainment.id,
+        },
+      })
+    ).map((attainment: {name: string}): string => attainment.name)
   );
 
   if (parentId && parentId !== attainment.parentId) {
     if (attainment.parentId) {
       const oldParent: Attainment = await findAttainmentById(
-        attainment.parentId, HttpCode.InternalServerError
+        attainment.parentId,
+        HttpCode.InternalServerError
       );
 
       const parentParams: ParamsObject = oldParent.formulaParams;
@@ -472,19 +492,20 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
 
         await Attainment.update(
           {
-            formulaParams: parentParams
+            formulaParams: parentParams,
           },
           {
             where: {
-              id: oldParent.id
-            }
+              id: oldParent.id,
+            },
           }
         );
       }
     }
 
     const newParent: Attainment = await findAttainmentById(
-      parentId, HttpCode.InternalServerError
+      parentId,
+      HttpCode.InternalServerError
     );
 
     const parentParams: ParamsObject = newParent.formulaParams;
@@ -493,29 +514,30 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
         newParent.formula
       );
 
-      parentParams.children.push(
-        [name ?? attainment.name, parentFormula.defaultChildParams]
-      );
+      parentParams.children.push([
+        name ?? attainment.name,
+        parentFormula.defaultChildParams,
+      ]);
 
       // Sanity check
       await parentFormula.paramSchema.validate(parentParams);
 
       await Attainment.update(
         {
-          formulaParams: parentParams
+          formulaParams: parentParams,
         },
         {
           where: {
-            id: newParent.id
-          }
+            id: newParent.id,
+          },
         }
       );
     }
   } else if (name && name !== attainment.name && attainment.parentId) {
     const parent: Attainment = await findAttainmentById(
-      attainment.parentId, HttpCode.InternalServerError
+      attainment.parentId,
+      HttpCode.InternalServerError
     );
-
 
     const parentParams: ParamsObject = parent.formulaParams;
     if (parentParams.children) {
@@ -528,27 +550,29 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
 
       await Attainment.update(
         {
-          formulaParams: parentParams
+          formulaParams: parentParams,
         },
         {
           where: {
-            id: parent.id
-          }
+            id: parent.id,
+          },
         }
       );
     }
   }
 
-  await attainment.set({
-    parentId: parentId ?? attainment.parentId,
-    name: name ?? attainment.name,
-    daysValid: daysValid ?? attainment.daysValid,
-    minRequiredGrade: minRequiredGrade ?? attainment.minRequiredGrade,
-    maxGrade: maxGrade ?? attainment.maxGrade,
-    formula: formula ?? attainment.formula,
-    formulaParams: formulaParams ?? attainment.formulaParams,
-    gradeType: gradeType ?? attainment.gradeType
-  }).save();
+  await attainment
+    .set({
+      parentId: parentId ?? attainment.parentId,
+      name: name ?? attainment.name,
+      daysValid: daysValid ?? attainment.daysValid,
+      minRequiredGrade: minRequiredGrade ?? attainment.minRequiredGrade,
+      maxGrade: maxGrade ?? attainment.maxGrade,
+      formula: formula ?? attainment.formula,
+      formulaParams: formulaParams ?? attainment.formulaParams,
+      gradeType: gradeType ?? attainment.gradeType,
+    })
+    .save();
 
   const attainmentTree: AttainmentData = {
     id: attainment.id,
@@ -560,43 +584,62 @@ export async function updateAttainment(req: Request, res: Response): Promise<voi
     maxGrade: attainment.maxGrade,
     formula: attainment.formula,
     formulaParams: attainment.formulaParams,
-    gradeType: attainment.gradeType
+    gradeType: attainment.gradeType,
   };
 
   res.status(HttpCode.Ok).json({
-    data: attainmentTree
+    data: attainmentTree,
   });
 }
 
-export async function deleteAttainment(req: Request, res: Response): Promise<void> {
-  const [course, _assessmentModel, attainment]: [Course, AssessmentModel, Attainment] =
-    await validateAttainmentPath(
-      req.params.courseId, req.params.assessmentModelId, req.params.attainmentId
-    );
+export async function deleteAttainment(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const [course, _assessmentModel, attainment]: [
+    Course,
+    AssessmentModel,
+    Attainment,
+  ] = await validateAttainmentPath(
+    req.params.courseId,
+    req.params.assessmentModelId,
+    req.params.attainmentId
+  );
 
-  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id, HttpCode.Forbidden);
+  await isTeacherInChargeOrAdmin(
+    req.user as JwtClaims,
+    course.id,
+    HttpCode.Forbidden
+  );
 
   await sequelize.transaction(async (transaction: Transaction) => {
     // If parent exists, remove attainment from formulaParams children.
     if (attainment.parentId) {
-      const parent: Attainment = await findAttainmentById(attainment.parentId, HttpCode.NotFound);
+      const parent: Attainment = await findAttainmentById(
+        attainment.parentId,
+        HttpCode.NotFound
+      );
 
       const filteredChildren: Array<[string, ChildParamsObject]> =
-        parent.formulaParams.children!.filter((item: ParamsObject) => item[0] !== attainment.name);
+        parent.formulaParams.children!.filter(
+          (item: ParamsObject) => item[0] !== attainment.name
+        );
 
-      await parent.set({
-        formulaParams: {
-          children: filteredChildren
-        }
-      }).save({ transaction });
+      await parent
+        .set({
+          formulaParams: {
+            children: filteredChildren,
+          },
+        })
+        .save({transaction});
     }
 
     // Delete the attainment if found from db. This automatically
     // also deletes all of the subattainments of this attainment.
-    await attainment.destroy({ transaction });
+    await attainment.destroy({transaction});
   });
 
   res.status(HttpCode.Ok).send({
-    data: {}
+    data: {},
   });
 }

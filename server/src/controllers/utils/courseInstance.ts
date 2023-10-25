@@ -2,13 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpCode } from 'aalto-grades-common/types';
+import {HttpCode} from 'aalto-grades-common/types';
 
 import Course from '../../database/models/course';
 import CourseInstance from '../../database/models/courseInstance';
 
-import { findCourseById } from './course';
-import { ApiError, idSchema } from '../../types';
+import {findCourseById} from './course';
+import {ApiError, idSchema} from '../../types';
 
 /**
  * Finds a course instance by its ID.
@@ -19,9 +19,11 @@ import { ApiError, idSchema } from '../../types';
  * indicating the missing course instance with the specific ID.
  */
 export async function findCourseInstanceById(
-  id: number, errorCode: HttpCode
+  id: number,
+  errorCode: HttpCode
 ): Promise<CourseInstance> {
-  const courseInstance: CourseInstance | null = await CourseInstance.findByPk(id);
+  const courseInstance: CourseInstance | null =
+    await CourseInstance.findByPk(id);
   if (!courseInstance) {
     throw new ApiError(`course instance with ID ${id} not found`, errorCode);
   }
@@ -38,27 +40,34 @@ export async function findCourseInstanceById(
  * belong to the course, throws an error with a message indicating missing or conflicting resource.
  */
 export async function validateCourseInstancePath(
-  courseId: unknown, courseInstanceId: unknown
+  courseId: unknown,
+  courseInstanceId: unknown
 ): Promise<[Course, CourseInstance]> {
   // Validate id types.
-  const courseIdValidated: number =
-  (await idSchema.validate({ id: courseId }, { abortEarly: false })).id;
-  const instanceIdValidated: number =
-  (await idSchema.validate({ id: courseInstanceId }, { abortEarly: false })).id;
+  const courseIdValidated: number = (
+    await idSchema.validate({id: courseId}, {abortEarly: false})
+  ).id;
+  const instanceIdValidated: number = (
+    await idSchema.validate({id: courseInstanceId}, {abortEarly: false})
+  ).id;
 
   // Ensure that course exists.
-  const course: Course = await findCourseById(courseIdValidated, HttpCode.NotFound);
+  const course: Course = await findCourseById(
+    courseIdValidated,
+    HttpCode.NotFound
+  );
 
   // Ensure that course instance exists.
   const instance: CourseInstance = await findCourseInstanceById(
-    instanceIdValidated, HttpCode.NotFound
+    instanceIdValidated,
+    HttpCode.NotFound
   );
 
   // Check that instance belongs to the course.
   if (instance.courseId !== course.id) {
     throw new ApiError(
       `course instance with ID ${courseInstanceId} ` +
-      `does not belong to the course with ID ${courseId}`,
+        `does not belong to the course with ID ${courseId}`,
       HttpCode.Conflict
     );
   }

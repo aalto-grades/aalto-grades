@@ -2,32 +2,37 @@
 //
 // SPDX-License-Identifier: MIT
 
-import express, { Router } from 'express';
+import express, {Router} from 'express';
 import passport from 'passport';
 
-import { SystemRole } from 'aalto-grades-common/types';
-import { addCourse, editCourse, getAllCourses, getCourse } from '../controllers/course';
-import { handleInvalidRequestJson } from '../middleware';
-import { authorization } from '../middleware/authorization';
-import { controllerDispatcher } from '../middleware/errorHandler';
+import {SystemRole} from 'aalto-grades-common/types';
+import {
+  addCourse,
+  editCourse,
+  getAllCourses,
+  getCourse,
+} from '../controllers/course';
+import {handleInvalidRequestJson} from '../middleware';
+import {authorization} from '../middleware/authorization';
+import {controllerDispatcher} from '../middleware/errorHandler';
 
 export const router: Router = Router();
 
 router.get(
   '/v1/courses/:courseId',
-  passport.authenticate('jwt', { session: false }),
+  passport.authenticate('jwt', {session: false}),
   controllerDispatcher(getCourse)
 );
 
 router.get(
   '/v1/courses',
-  passport.authenticate('jwt', { session: false }),
+  passport.authenticate('jwt', {session: false}),
   controllerDispatcher(getAllCourses)
 );
 
 router.post(
   '/v1/courses',
-  passport.authenticate('jwt', { session: false }),
+  passport.authenticate('jwt', {session: false}),
   authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
@@ -36,7 +41,7 @@ router.post(
 
 router.put(
   '/v1/courses/:courseId',
-  passport.authenticate('jwt', { session: false }),
+  passport.authenticate('jwt', {session: false}),
   authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,

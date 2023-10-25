@@ -2,29 +2,29 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Formula, ParamsObject } from './formula';
+import {Formula, ParamsObject} from './formula';
 
 export enum GradeType {
   Integer = 'INTEGER',
-  Float = 'FLOAT'
+  Float = 'FLOAT',
 }
 
 export interface AttainmentData {
-  id?: number,
-  assessmentModelId?: number,
-  parentId?: number,
-  name: string,
-  daysValid: number,
-  minRequiredGrade: number,
-  maxGrade: number,
-  formula: Formula,
-  formulaParams: ParamsObject,
-  gradeType: GradeType,
-  subAttainments?: Array<AttainmentData>
+  id?: number;
+  assessmentModelId?: number;
+  parentId?: number;
+  name: string;
+  daysValid: number;
+  minRequiredGrade: number;
+  maxGrade: number;
+  formula: Formula;
+  formulaParams: ParamsObject;
+  gradeType: GradeType;
+  subAttainments?: Array<AttainmentData>;
 }
 
 export interface AssessmentModelData {
-  id?: number,
-  courseId?: number,
-  name: string
+  id?: number;
+  courseId?: number;
+  name: string;
 }

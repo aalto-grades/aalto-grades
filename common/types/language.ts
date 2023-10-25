@@ -16,7 +16,7 @@ export enum Language {
 }
 
 export interface LocalizedString {
-  fi: string,
-  sv: string,
-  en: string
+  fi: string;
+  sv: string;
+  en: string;
 }

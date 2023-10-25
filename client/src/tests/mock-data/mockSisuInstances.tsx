@@ -2,7 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseInstanceData, GradingScale, Language } from 'aalto-grades-common/types';
+import {
+  CourseInstanceData,
+  GradingScale,
+  Language,
+} from 'aalto-grades-common/types';
 
 export const mockSisuInstances: Array<CourseInstanceData> = [
   {
@@ -18,11 +22,11 @@ export const mockSisuInstances: Array<CourseInstanceData> = [
       languageOfInstruction: Language.English,
       teachersInCharge: [
         {
-          name: 'Elisa Mekler'
+          name: 'Elisa Mekler',
         },
         {
-          name: 'David McGookin'
-        }
+          name: 'David McGookin',
+        },
       ],
       department: {
         en: 'Department of computer science',
@@ -33,8 +37,8 @@ export const mockSisuInstances: Array<CourseInstanceData> = [
         en: 'Human-Computer Interaction',
         fi: 'Human-Computer Interaction',
         sv: 'Human-Computer Interaction',
-      }
-    }
+      },
+    },
   },
   {
     sisuCourseInstanceId: 'mock-id-2',
@@ -49,8 +53,8 @@ export const mockSisuInstances: Array<CourseInstanceData> = [
       languageOfInstruction: Language.English,
       teachersInCharge: [
         {
-          name: 'Elisa Mekler'
-        }
+          name: 'Elisa Mekler',
+        },
       ],
       department: {
         en: 'Department of computer science',
@@ -61,8 +65,8 @@ export const mockSisuInstances: Array<CourseInstanceData> = [
         en: 'Human-Computer Interaction',
         fi: 'Human-Computer Interaction',
         sv: 'Human-Computer Interaction',
-      }
-    }
+      },
+    },
   },
   {
     sisuCourseInstanceId: 'mock-id-3',
@@ -77,19 +81,19 @@ export const mockSisuInstances: Array<CourseInstanceData> = [
       languageOfInstruction: Language.English,
       teachersInCharge: [
         {
-          name: 'Kerttu Maaria Pollari-Malmi'
-        }
+          name: 'Kerttu Maaria Pollari-Malmi',
+        },
       ],
       department: {
         en: 'Department of Computer Science',
         fi: 'Tietotekniikan laitos',
-        sv: 'Institutionen för datateknik'
+        sv: 'Institutionen för datateknik',
       },
       name: {
         en: 'Databases, Lecture',
         fi: 'Tietokannat, Luento-opetus',
-        sv: 'Databaser, Föreläsning'
-      }
-    }
-  }
+        sv: 'Databaser, Föreläsning',
+      },
+    },
+  },
 ];

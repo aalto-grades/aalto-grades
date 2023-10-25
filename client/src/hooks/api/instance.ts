@@ -2,14 +2,20 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseInstanceData } from 'aalto-grades-common/types';
+import {CourseInstanceData} from 'aalto-grades-common/types';
 import axios from './axios';
 import {
-  QueryClient, useMutation, UseMutationOptions, UseMutationResult,
-  useQuery, useQueryClient, UseQueryOptions, UseQueryResult
+  QueryClient,
+  useMutation,
+  UseMutationOptions,
+  UseMutationResult,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+  UseQueryResult,
 } from '@tanstack/react-query';
 
-import { Numeric } from '../../types';
+import {Numeric} from '../../types';
 
 export function useGetAllInstances(
   courseId: Numeric,
@@ -17,20 +23,21 @@ export function useGetAllInstances(
 ): UseQueryResult<Array<CourseInstanceData>> {
   return useQuery({
     queryKey: ['all-instances', courseId],
-    queryFn: async () => (
-      await axios.get(`/v1/courses/${courseId}/instances`)
-    ).data.data,
-    ...options
+    queryFn: async () =>
+      (await axios.get(`/v1/courses/${courseId}/instances`)).data.data,
+    ...options,
   });
 }
 
 interface AddInstanceVars {
-  courseId: Numeric,
-  instance: CourseInstanceData
+  courseId: Numeric;
+  instance: CourseInstanceData;
 }
 
 export type UseAddInstanceResult = UseMutationResult<
-  number, unknown, AddInstanceVars
+  number,
+  unknown,
+  AddInstanceVars
 >;
 
 export function useAddInstance(
@@ -39,14 +46,20 @@ export function useAddInstance(
   const queryClient: QueryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: AddInstanceVars) => (
-      await axios.post(`/v1/courses/${vars.courseId}/instances`, vars.instance)
-    ).data.data,
+    mutationFn: async (vars: AddInstanceVars) =>
+      (
+        await axios.post(
+          `/v1/courses/${vars.courseId}/instances`,
+          vars.instance
+        )
+      ).data.data,
 
     onSuccess: (_data: number, vars: AddInstanceVars) => {
-      queryClient.invalidateQueries({ queryKey: ['all-instances', vars.courseId] });
+      queryClient.invalidateQueries({
+        queryKey: ['all-instances', vars.courseId],
+      });
     },
-    ...options
+    ...options,
   });
 }
 
@@ -56,10 +69,9 @@ export function useGetSisuInstance(
 ): UseQueryResult<CourseInstanceData> {
   return useQuery({
     queryKey: ['sisu-instance', sisuInstanceId],
-    queryFn: async () => (
-      await axios.get(`/v1/sisu/instances/${sisuInstanceId}`)
-    ).data.data,
-    ...options
+    queryFn: async () =>
+      (await axios.get(`/v1/sisu/instances/${sisuInstanceId}`)).data.data,
+    ...options,
   });
 }
 
@@ -69,9 +81,8 @@ export function useGetAllSisuInstances(
 ): UseQueryResult<Array<CourseInstanceData>> {
   return useQuery({
     queryKey: ['all-sisu-instances', courseCode],
-    queryFn: async () => (
-      await axios.get(`/v1/sisu/courses/${courseCode}`)
-    ).data.data,
-    ...options
+    queryFn: async () =>
+      (await axios.get(`/v1/sisu/courses/${courseCode}`)).data.data,
+    ...options,
   });
 }

@@ -5,21 +5,20 @@
 // Used to determine if a user is authenticated and if they are allowed to access a page
 // if not, the user is redirected to the login page
 
-import { LoginResult, SystemRole } from 'aalto-grades-common/types';
-import { JSX, useEffect, useState } from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
-import { UseQueryResult } from '@tanstack/react-query';
+import {LoginResult, SystemRole} from 'aalto-grades-common/types';
+import {JSX, useEffect, useState} from 'react';
+import {Navigate, Outlet} from 'react-router-dom';
+import {UseQueryResult} from '@tanstack/react-query';
 
-import { useGetRefreshToken } from '../../hooks/useApi';
-import useAuth, { AuthContextType } from '../../hooks/useAuth';
-import { State } from '../../types';
+import {useGetRefreshToken} from '../../hooks/useApi';
+import useAuth, {AuthContextType} from '../../hooks/useAuth';
+import {State} from '../../types';
 
 export default function PrivateRoute(props: {
-  children?: JSX.Element,
-  roles: Array<SystemRole>
+  children?: JSX.Element;
+  roles: Array<SystemRole>;
 }): JSX.Element | null {
-
-  const { auth, setAuth, isTeacherInCharge }: AuthContextType = useAuth();
+  const {auth, setAuth, isTeacherInCharge}: AuthContextType = useAuth();
   const [loading, setLoading]: State<boolean> = useState(true);
 
   const refresh: UseQueryResult<LoginResult> = useGetRefreshToken();
@@ -43,13 +42,13 @@ export default function PrivateRoute(props: {
             <Outlet />
           </>
         );
-      // If the user is not authorized to access a page -> redirect to front page
+        // If the user is not authorized to access a page -> redirect to front page
       } else {
-        return <Navigate to='/' />;
+        return <Navigate to="/" />;
       }
-    // No role found -> no token -> redirect to login
+      // No role found -> no token -> redirect to login
     } else {
-      return <Navigate to='/login' />;
+      return <Navigate to="/login" />;
     }
   }
 
