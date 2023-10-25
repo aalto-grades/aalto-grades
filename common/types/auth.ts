@@ -4,21 +4,21 @@
 
 export enum SystemRole {
   User = 'USER',
-  Admin = 'ADMIN'
+  Admin = 'ADMIN',
 }
 
 export interface LoginResult {
-  id: number,
-  name: string,
-  role: SystemRole
+  id: number;
+  name: string;
+  role: SystemRole;
 }
 
 export type PlainPassword = string;
 
 export interface SignupRequest {
-  name: string,
-  password: PlainPassword,
-  email: string,
-  studentNumber?: string,
-  role?: SystemRole
+  name: string;
+  password: PlainPassword;
+  email: string;
+  studentNumber?: string;
+  role?: SystemRole;
 }

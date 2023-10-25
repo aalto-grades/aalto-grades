@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Formula, FormulaData } from 'aalto-grades-common/types';
+import {Formula, FormulaData} from 'aalto-grades-common/types';
 
 export const mockFormulas: Array<FormulaData> = [
   {
@@ -10,8 +10,7 @@ export const mockFormulas: Array<FormulaData> = [
     name: 'Weighted average',
     params: [],
     childParams: ['weight'],
-    codeSnippet:
-    `
+    codeSnippet: `
     const weightedAverage = (nums, weights) => {
       const [sum, weightSum] = weights.reduce(
         (acc, w, i) => {

@@ -3,25 +3,29 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AttainmentData, Formula, GradeType, HttpCode, ParamsObject
+  AttainmentData,
+  Formula,
+  GradeType,
+  HttpCode,
+  ParamsObject,
 } from 'aalto-grades-common/types';
-import { Op } from 'sequelize';
+import {Op} from 'sequelize';
 import supertest from 'supertest';
 
 import Attainment from '../../src/database/models/attainment';
 import TeacherInCharge from '../../src/database/models/teacherInCharge';
 
-import { mockAttainment, jestMockAttainment } from '../mock-data/attainment';
-import { mockTeacher } from '../mock-data/misc';
-import { app } from '../../src/app';
-import { Cookies, getCookies } from '../util/getCookies';
+import {mockAttainment, jestMockAttainment} from '../mock-data/attainment';
+import {mockTeacher} from '../mock-data/misc';
+import {app} from '../../src/app';
+import {Cookies, getCookies} from '../util/getCookies';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 const badId: number = 1000000;
 const badInput: string = 'notValid';
 let cookies: Cookies = {
   adminCookie: [],
-  userCookie: []
+  userCookie: [],
 };
 
 beforeAll(async () => {
@@ -43,15 +47,13 @@ function verifyAttainmentData(
   expect(data.formula).toBeDefined();
   expect(data.gradeType).toBeDefined();
   expect(data.formulaParams).toBeDefined();
-  if (subAttainments)
-    expect(data.subAttainments).toBeDefined();
-  else
-    expect(data.subAttainments).not.toBeDefined();
+  if (subAttainments) expect(data.subAttainments).toBeDefined();
+  else expect(data.subAttainments).not.toBeDefined();
 }
 
 interface AttainmentNode {
-  id: number,
-  subAttainments: Array<AttainmentNode>
+  id: number;
+  subAttainments: Array<AttainmentNode>;
 }
 
 function evaluateSubAttainment(attainment: AttainmentData): void {
@@ -72,92 +74,113 @@ function evaluateSubAttainment(attainment: AttainmentData): void {
 }
 
 describe(
-  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId'
-  + ' - get attainment (tree)',
+  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId' +
+    ' - get attainment (tree)',
   () => {
+    it(
+      'should respond with a single attainment without subattainments, ' +
+        'if query string is not present',
+      async () => {
+        const res: supertest.Response = await request
+          .get('/v1/courses/2/assessment-models/2/attainments/2')
+          .set('Cookie', cookies.userCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
 
-    it('should respond with a single attainment without subattainments, '
-      + 'if query string is not present', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments/2')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
+        expect(res.body.data).toBeDefined();
+        expect(res.body.errors).not.toBeDefined();
+        verifyAttainmentData(res.body.data, 2, 2, false);
+      }
+    );
 
-      expect(res.body.data).toBeDefined();
-      expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data, 2, 2, false);
-    });
+    it(
+      'should respond with a single attainment with one level of subattainments, ' +
+        'if "tree" parameter in query equals "children"',
+      async () => {
+        const res: supertest.Response = await request
+          .get('/v1/courses/2/assessment-models/2/attainments/2?tree=children')
+          .set('Cookie', cookies.userCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
 
-    it('should respond with a single attainment with one level of subattainments, '
-      + 'if "tree" parameter in query equals "children"', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments/2?tree=children')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
+        expect(res.body.data).toBeDefined();
+        expect(res.body.errors).not.toBeDefined();
+        verifyAttainmentData(res.body.data, 2, 2, true);
+        verifyAttainmentData(res.body.data.subAttainments[0], 6, 2, false);
+        verifyAttainmentData(res.body.data.subAttainments[1], 10, 2, false);
+      }
+    );
 
-      expect(res.body.data).toBeDefined();
-      expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data, 2, 2, true);
-      verifyAttainmentData(res.body.data.subAttainments[0], 6, 2, false);
-      verifyAttainmentData(res.body.data.subAttainments[1], 10, 2, false);
-    });
+    it(
+      'should respond with a single attainment with a full tree of subattainments, ' +
+        'if "tree" parameter in query equals "descendants"',
+      async () => {
+        const res: supertest.Response = await request
+          .get(
+            '/v1/courses/2/assessment-models/2/attainments/2?tree=descendants'
+          )
+          .set('Cookie', cookies.userCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
 
-    it('should respond with a single attainment with a full tree of subattainments, '
-      + 'if "tree" parameter in query equals "descendants"', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments/2?tree=descendants')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
+        expect(res.body.data).toBeDefined();
+        expect(res.body.errors).not.toBeDefined();
+        verifyAttainmentData(res.body.data, 2, 2, true);
+        verifyAttainmentData(res.body.data.subAttainments[0], 6, 2, true);
+        verifyAttainmentData(
+          res.body.data.subAttainments[0].subAttainments[0],
+          214,
+          2,
+          true
+        );
+        verifyAttainmentData(
+          res.body.data.subAttainments[0].subAttainments[0].subAttainments[0],
+          215,
+          2,
+          false
+        );
+        verifyAttainmentData(res.body.data.subAttainments[1], 10, 2, false);
+      }
+    );
 
-      expect(res.body.data).toBeDefined();
-      expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data, 2, 2, true);
-      verifyAttainmentData(res.body.data.subAttainments[0], 6, 2, true);
-      verifyAttainmentData(
-        res.body.data.subAttainments[0].subAttainments[0],
-        214,
-        2,
-        true
-      );
-      verifyAttainmentData(
-        res.body.data.subAttainments[0].subAttainments[0].subAttainments[0],
-        215,
-        2,
-        false
-      );
-      verifyAttainmentData(res.body.data.subAttainments[1], 10, 2, false);
-    });
+    it(
+      'should respond with 400 Bad Request, if "tree" parameter in query string ' +
+        'is invalid',
+      async () => {
+        const res: supertest.Response = await request
+          .get('/v1/courses/2/assessment-models/2/attainments/2?tree=fail')
+          .set('Cookie', cookies.userCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.BadRequest);
 
-    it('should respond with 400 Bad Request, if "tree" parameter in query string '
-      + 'is invalid', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments/2?tree=fail')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.BadRequest);
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors[0]).toBe(
+          'tree must be one of the ' + 'following values: children, descendants'
+        );
+      }
+    );
 
-      expect(res.body.data).not.toBeDefined();
-      expect(res.body.errors).toBeDefined();
-      expect(res.body.errors[0]).toBe('tree must be one of the '
-        + 'following values: children, descendants');
-    });
+    it(
+      'should respond with 400 Bad Request, if "tree" parameter is given twice ' +
+        '(array instead of string)',
+      async () => {
+        const res: supertest.Response = await request
+          .get(
+            '/v1/courses/2/assessment-models/2/attainments/2?tree=children&tree=descendants'
+          )
+          .set('Cookie', cookies.userCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.BadRequest);
 
-    it('should respond with 400 Bad Request, if "tree" parameter is given twice '
-      + '(array instead of string)', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments/2?tree=children&tree=descendants')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.BadRequest);
-
-      expect(res.body.data).not.toBeDefined();
-      expect(res.body.errors).toBeDefined();
-      expect(res.body.errors[0]).toBe('tree must be a `string` type, but the final value was: '
-        + '`[\n  "\\"children\\"",\n  "\\"descendants\\""\n]`.');
-    });
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors[0]).toBe(
+          'tree must be a `string` type, but the final value was: ' +
+            '`[\n  "\\"children\\"",\n  "\\"descendants\\""\n]`.'
+        );
+      }
+    );
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
       await request
@@ -169,10 +192,9 @@ describe(
 );
 
 describe(
-  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/attainments'
-  + ' - get the root attainment of an assessment model',
+  'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/attainments' +
+    ' - get the root attainment of an assessment model',
   () => {
-
     it('should respond with correct data', async () => {
       const res: supertest.Response = await request
         .get('/v1/courses/1/assessment-models/1/attainments')
@@ -185,61 +207,71 @@ describe(
       verifyAttainmentData(res.body.data, 1, 1, true);
     });
 
-    it('should respond with a single attainment with one level of subattainments, '
-    + 'if "tree" parameter in query equals "children"', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments?tree=children')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
+    it(
+      'should respond with a single attainment with one level of subattainments, ' +
+        'if "tree" parameter in query equals "children"',
+      async () => {
+        const res: supertest.Response = await request
+          .get('/v1/courses/2/assessment-models/2/attainments?tree=children')
+          .set('Cookie', cookies.userCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
 
-      expect(res.body.data).toBeDefined();
-      expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data, 2, 2, true);
-      verifyAttainmentData(res.body.data.subAttainments[0], 6, 2, false);
-      verifyAttainmentData(res.body.data.subAttainments[1], 10, 2, false);
-    });
+        expect(res.body.data).toBeDefined();
+        expect(res.body.errors).not.toBeDefined();
+        verifyAttainmentData(res.body.data, 2, 2, true);
+        verifyAttainmentData(res.body.data.subAttainments[0], 6, 2, false);
+        verifyAttainmentData(res.body.data.subAttainments[1], 10, 2, false);
+      }
+    );
 
-    it('should respond with a single attainment with a full tree of subattainments, '
-    + 'if "tree" parameter in query equals "descendants"', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments?tree=descendants')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
+    it(
+      'should respond with a single attainment with a full tree of subattainments, ' +
+        'if "tree" parameter in query equals "descendants"',
+      async () => {
+        const res: supertest.Response = await request
+          .get('/v1/courses/2/assessment-models/2/attainments?tree=descendants')
+          .set('Cookie', cookies.userCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.Ok);
 
-      expect(res.body.data).toBeDefined();
-      expect(res.body.errors).not.toBeDefined();
-      verifyAttainmentData(res.body.data, 2, 2, true);
-      verifyAttainmentData(res.body.data.subAttainments[0], 6, 2, true);
-      verifyAttainmentData(res.body.data.subAttainments[1], 10, 2, false);
-      verifyAttainmentData(
-        res.body.data.subAttainments[0].subAttainments[0],
-        214,
-        2,
-        true
-      );
-      verifyAttainmentData(
-        res.body.data.subAttainments[0].subAttainments[0].subAttainments[0],
-        215,
-        2,
-        false
-      );
-    });
+        expect(res.body.data).toBeDefined();
+        expect(res.body.errors).not.toBeDefined();
+        verifyAttainmentData(res.body.data, 2, 2, true);
+        verifyAttainmentData(res.body.data.subAttainments[0], 6, 2, true);
+        verifyAttainmentData(res.body.data.subAttainments[1], 10, 2, false);
+        verifyAttainmentData(
+          res.body.data.subAttainments[0].subAttainments[0],
+          214,
+          2,
+          true
+        );
+        verifyAttainmentData(
+          res.body.data.subAttainments[0].subAttainments[0].subAttainments[0],
+          215,
+          2,
+          false
+        );
+      }
+    );
 
-    it('should respond with 400 Bad Request, if "tree" parameter in query string '
-    + 'is invalid', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/2/assessment-models/2/attainments?tree=fail')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.BadRequest);
+    it(
+      'should respond with 400 Bad Request, if "tree" parameter in query string ' +
+        'is invalid',
+      async () => {
+        const res: supertest.Response = await request
+          .get('/v1/courses/2/assessment-models/2/attainments?tree=fail')
+          .set('Cookie', cookies.userCookie)
+          .set('Accept', 'application/json')
+          .expect(HttpCode.BadRequest);
 
-      expect(res.body.data).not.toBeDefined();
-      expect(res.body.errors).toBeDefined();
-      expect(res.body.errors[0]).toBe('tree must be one of the '
-      + 'following values: children, descendants');
-    });
+        expect(res.body.data).not.toBeDefined();
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors[0]).toBe(
+          'tree must be one of the ' + 'following values: children, descendants'
+        );
+      }
+    );
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
       await request
@@ -248,34 +280,30 @@ describe(
         .expect(HttpCode.Unauthorized);
     });
 
-    it('should respond with 409 Conflict if there are multiple root attainments',
-      async () => {
-        const res: supertest.Response = await request
-          .get('/v1/courses/2/assessment-models/34/attainments')
-          .set('Cookie', cookies.userCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.Conflict);
+    it('should respond with 409 Conflict if there are multiple root attainments', async () => {
+      const res: supertest.Response = await request
+        .get('/v1/courses/2/assessment-models/34/attainments')
+        .set('Cookie', cookies.userCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Conflict);
 
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors).toBeDefined();
-        expect(res.body.errors[0]).toBe(
-          'More than one attainment without parentId was found for the'
-          + ' specified course and assessment model. Attainment IDs: 252,253'
-        );
-      }
-    );
-
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors[0]).toBe(
+        'More than one attainment without parentId was found for the' +
+          ' specified course and assessment model. Attainment IDs: 252,253'
+      );
+    });
   }
 );
 
 describe(
-  'Test POST /v1/courses/:courseId/assessment-models/:assessmentModelId/attainments'
-  + ' - create attainment(s)',
+  'Test POST /v1/courses/:courseId/assessment-models/:assessmentModelId/attainments' +
+    ' - create attainment(s)',
   () => {
-
     it(
-      'should create a new attainment with no sub-attainments when course and'
-      + ' assessment model exist (admin user)',
+      'should create a new attainment with no sub-attainments when course and' +
+        ' assessment model exist (admin user)',
       async () => {
         const res: supertest.Response = await request
           .post('/v1/courses/1/assessment-models/31/attainments')
@@ -286,7 +314,7 @@ describe(
             maxGrade: 5,
             formula: Formula.Manual,
             formulaParams: {},
-            gradeType: GradeType.Float
+            gradeType: GradeType.Float,
           })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -308,10 +336,12 @@ describe(
     );
 
     it(
-      'should create a new attainment with no sub-attainments when course and'
-      + ' assessment model exist (teacher in charge)',
+      'should create a new attainment with no sub-attainments when course and' +
+        ' assessment model exist (teacher in charge)',
       async () => {
-        jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
+        jest
+          .spyOn(TeacherInCharge, 'findOne')
+          .mockResolvedValueOnce(mockTeacher);
 
         const res: supertest.Response = await request
           .post('/v1/courses/2/assessment-models/35/attainments')
@@ -322,7 +352,7 @@ describe(
             minRequiredGrade: 1,
             maxGrade: 5,
             formulaParams: {},
-            gradeType: GradeType.Float
+            gradeType: GradeType.Float,
           })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.userCookie)
@@ -343,38 +373,37 @@ describe(
       }
     );
 
-    it('should create a new attainment with sub-attainments when course and assessment model exist',
-      async () => {
-        const res: supertest.Response = await request
-          .post('/v1/courses/1/assessment-models/32/attainments')
-          .send(mockAttainment)
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.Ok);
+    it('should create a new attainment with sub-attainments when course and assessment model exist', async () => {
+      const res: supertest.Response = await request
+        .post('/v1/courses/1/assessment-models/32/attainments')
+        .send(mockAttainment)
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
 
-        expect(res.body.errors).not.toBeDefined();
-        expect(res.body.data.id).toBeDefined();
-        expect(res.body.data.assessmentModelId).toBe(32);
-        expect(res.body.data.name).toBe(mockAttainment.name);
-        expect(res.body.data.parentId).not.toBeDefined();
-        expect(res.body.data.formula).toBeDefined();
-        expect(res.body.data.daysValid).toBeDefined();
-        expect(res.body.data.minRequiredGrade).toBeDefined();
-        expect(res.body.data.maxGrade).toBeDefined();
-        expect(res.body.data.subAttainments).toBeDefined();
+      expect(res.body.errors).not.toBeDefined();
+      expect(res.body.data.id).toBeDefined();
+      expect(res.body.data.assessmentModelId).toBe(32);
+      expect(res.body.data.name).toBe(mockAttainment.name);
+      expect(res.body.data.parentId).not.toBeDefined();
+      expect(res.body.data.formula).toBeDefined();
+      expect(res.body.data.daysValid).toBeDefined();
+      expect(res.body.data.minRequiredGrade).toBeDefined();
+      expect(res.body.data.maxGrade).toBeDefined();
+      expect(res.body.data.subAttainments).toBeDefined();
 
-        for (const subAttainment of res.body.data.subAttainments) {
-          evaluateSubAttainment(subAttainment);
-        }
-      });
+      for (const subAttainment of res.body.data.subAttainments) {
+        evaluateSubAttainment(subAttainment);
+      }
+    });
 
     it('should create a new attainment with parent attainment', async () => {
       const res: supertest.Response = await request
         .post('/v1/courses/3/assessment-models/3/attainments')
         .send({
           parentId: 3,
-          ...mockAttainment
+          ...mockAttainment,
         })
         .set('Content-Type', 'application/json')
         .set('Cookie', cookies.adminCookie)
@@ -390,13 +419,17 @@ describe(
     });
 
     it(
-      'should update the children array of a parent attainment\'s parameters'
-      + ' with the name of a new attainment',
+      "should update the children array of a parent attainment's parameters" +
+        ' with the name of a new attainment',
       async () => {
-        let parent: Attainment = await Attainment.findByPk(264) as Attainment;
+        let parent: Attainment = (await Attainment.findByPk(264)) as Attainment;
         expect(parent.formulaParams).toBeDefined();
-        const oldParentParams: ParamsObject = parent.formulaParams as ParamsObject;
-        expect(oldParentParams.children).not.toContainEqual(['born', { weight: 0 }]);
+        const oldParentParams: ParamsObject =
+          parent.formulaParams as ParamsObject;
+        expect(oldParentParams.children).not.toContainEqual([
+          'born',
+          {weight: 0},
+        ]);
 
         await request
           .post('/v1/courses/3/assessment-models/3/attainments')
@@ -408,69 +441,72 @@ describe(
             maxGrade: 5,
             formula: Formula.Manual,
             formulaParams: {},
-            gradeType: GradeType.Float
+            gradeType: GradeType.Float,
           })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
           .expect(HttpCode.Ok);
 
-        parent = await Attainment.findByPk(264) as Attainment;
+        parent = (await Attainment.findByPk(264)) as Attainment;
         expect(parent.formulaParams).toBeDefined();
-        const newParentParams: ParamsObject = parent.formulaParams as ParamsObject;
-        expect(newParentParams.children).toContainEqual(['born', { weight: 0 }]);
+        const newParentParams: ParamsObject =
+          parent.formulaParams as ParamsObject;
+        expect(newParentParams.children).toContainEqual(['born', {weight: 0}]);
 
         expect(oldParentParams).not.toStrictEqual(newParentParams);
-        expect(oldParentParams.children).not.toStrictEqual(newParentParams.children);
+        expect(oldParentParams.children).not.toStrictEqual(
+          newParentParams.children
+        );
 
-        expect({ ...oldParentParams, children: undefined })
-          .toStrictEqual({ ...newParentParams, children: undefined });
+        expect({...oldParentParams, children: undefined}).toStrictEqual({
+          ...newParentParams,
+          children: undefined,
+        });
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        expect([...oldParentParams.children!, ['born', { weight: 0 }]])
-          .toStrictEqual(newParentParams.children);
+        expect([
+          ...oldParentParams.children!,
+          ['born', {weight: 0}],
+        ]).toStrictEqual(newParentParams.children);
       }
     );
 
-    it('should respond with 400 bad request, if validation fails (non-number assessment model id)',
-      async () => {
-        const res: supertest.Response = await request
-          .post(`/v1/courses/1/assessment-models/${badInput}/attainments`)
-          .send(mockAttainment)
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.BadRequest);
+    it('should respond with 400 bad request, if validation fails (non-number assessment model id)', async () => {
+      const res: supertest.Response = await request
+        .post(`/v1/courses/1/assessment-models/${badInput}/attainments`)
+        .send(mockAttainment)
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadRequest);
 
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors).toBeDefined();
-        expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      }
-    );
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+    });
 
-    it('should respond with 400 bad request, if validation fails (non-number course id)',
-      async () => {
-        const res: supertest.Response = await request
-          .post(`/v1/courses/${badInput}/assessment-models/1/attainments`)
-          .send(mockAttainment)
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.BadRequest);
+    it('should respond with 400 bad request, if validation fails (non-number course id)', async () => {
+      const res: supertest.Response = await request
+        .post(`/v1/courses/${badInput}/assessment-models/1/attainments`)
+        .send(mockAttainment)
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadRequest);
 
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors).toBeDefined();
-        expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      }
-    );
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+    });
 
     it(
-      'should respond with 400 bad request, if validation fails'
-      + ' (non-number parent attainment id)',
+      'should respond with 400 bad request, if validation fails' +
+        ' (non-number parent attainment id)',
       async () => {
         const res: supertest.Response = await request
           .post('/v1/courses/3/assessment-models/4/attainments')
-          .send({ parentId: badInput, ...mockAttainment })
+          .send({parentId: badInput, ...mockAttainment})
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
@@ -483,12 +519,12 @@ describe(
     );
 
     it(
-      'should respond with 400 bad request, if validation fails'
-      + ' (minRequiredGrade larger than maxGrade)',
+      'should respond with 400 bad request, if validation fails' +
+        ' (minRequiredGrade larger than maxGrade)',
       async () => {
         const res: supertest.Response = await request
           .post('/v1/courses/3/assessment-models/4/attainments')
-          .send({ ...mockAttainment, minRequiredGrade: 10, maxGrade: 2 })
+          .send({...mockAttainment, minRequiredGrade: 10, maxGrade: 2})
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
@@ -501,8 +537,8 @@ describe(
     );
 
     it(
-      'should respond with 400 bad request, if formula params are'
-      + ' incorrect in the top level attainment',
+      'should respond with 400 bad request, if formula params are' +
+        ' incorrect in the top level attainment',
       async () => {
         const res: supertest.Response = await request
           .post('/v1/courses/3/assessment-models/3/attainments')
@@ -511,15 +547,15 @@ describe(
             formulaParams: {
               wrong: 'yep',
               somethingIncorrect: {
-                veryIncorrect: true
-              }
+                veryIncorrect: true,
+              },
             },
             name: 'not success',
             daysValid: 6000,
             minRequiredGrade: 1,
             maxGrade: 5,
             formula: Formula.WeightedAverage,
-            gradeType: GradeType.Float
+            gradeType: GradeType.Float,
           })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -536,8 +572,8 @@ describe(
     );
 
     it(
-      'should respond with 400 bad request, if formula params are'
-      + ' incorrect in subattainments',
+      'should respond with 400 bad request, if formula params are' +
+        ' incorrect in subattainments',
       async () => {
         const res: supertest.Response = await request
           .post('/v1/courses/3/assessment-models/3/attainments')
@@ -550,9 +586,7 @@ describe(
             formula: Formula.WeightedAverage,
             gradeType: GradeType.Float,
             formulaParams: {
-              children: [
-                ['sub not success', { weight: 1 }]
-              ]
+              children: [['sub not success', {weight: 1}]],
             },
             subAttainments: [
               {
@@ -563,13 +597,10 @@ describe(
                 formula: Formula.WeightedAverage,
                 gradeType: GradeType.Float,
                 formulaParams: {
-                  children: [
-                    'wrong again', 5,
-                    [1, -1]
-                  ]
-                }
-              }
-            ]
+                  children: ['wrong again', 5, [1, -1]],
+                },
+              },
+            ],
           })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -594,62 +625,57 @@ describe(
       }
     );
 
-    it(
-      'should respond with 400 bad request, if formula params are missing a child',
-      async () => {
-        const res: supertest.Response = await request
-          .post('/v1/courses/3/assessment-models/3/attainments')
-          .send({
-            parentId: 3,
-            name: 'missing child',
-            daysValid: 1,
-            minRequiredGrade: 1,
-            maxGrade: 5,
-            formula: Formula.WeightedAverage,
-            gradeType: GradeType.Float,
-            formulaParams: {
-              children: [
-                ['i-am-present', { weight: 1 }]
-              ]
+    it('should respond with 400 bad request, if formula params are missing a child', async () => {
+      const res: supertest.Response = await request
+        .post('/v1/courses/3/assessment-models/3/attainments')
+        .send({
+          parentId: 3,
+          name: 'missing child',
+          daysValid: 1,
+          minRequiredGrade: 1,
+          maxGrade: 5,
+          formula: Formula.WeightedAverage,
+          gradeType: GradeType.Float,
+          formulaParams: {
+            children: [['i-am-present', {weight: 1}]],
+          },
+          subAttainments: [
+            {
+              name: 'i-am-present',
+              daysValid: 1,
+              minRequiredGrade: 1,
+              maxGrade: 5,
+              formula: Formula.Manual,
+              gradeType: GradeType.Float,
+              formulaParams: {},
             },
-            subAttainments: [
-              {
-                name: 'i-am-present',
-                daysValid: 1,
-                minRequiredGrade: 1,
-                maxGrade: 5,
-                formula: Formula.Manual,
-                gradeType: GradeType.Float,
-                formulaParams: {}
-              },
-              {
-                name: 'i-am-absent',
-                daysValid: 0,
-                minRequiredGrade: 1,
-                maxGrade: 5,
-                formula: Formula.Manual,
-                gradeType: GradeType.Float,
-                formulaParams: {}
-              }
-            ]
-          })
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.BadRequest);
+            {
+              name: 'i-am-absent',
+              daysValid: 0,
+              minRequiredGrade: 1,
+              maxGrade: 5,
+              formula: Formula.Manual,
+              gradeType: GradeType.Float,
+              formulaParams: {},
+            },
+          ],
+        })
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadRequest);
 
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors).toBeDefined();
-        expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-        expect(res.body.errors).toContain(
-          'formula params do not include subattainments with names i-am-absent'
-        );
-      }
-    );
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+      expect(res.body.errors).toContain(
+        'formula params do not include subattainments with names i-am-absent'
+      );
+    });
 
     it(
-      'should respond with 400 bad request, if formula params include an'
-      + ' invalid attainment name',
+      'should respond with 400 bad request, if formula params include an' +
+        ' invalid attainment name',
       async () => {
         const res: supertest.Response = await request
           .post('/v1/courses/3/assessment-models/3/attainments')
@@ -663,10 +689,10 @@ describe(
             gradeType: GradeType.Float,
             formulaParams: {
               children: [
-                ['the good', { weight: 1 }],
-                ['the bad', { weight: 2 }],
-                ['the ugly', { weight: 3 }]
-              ]
+                ['the good', {weight: 1}],
+                ['the bad', {weight: 2}],
+                ['the ugly', {weight: 3}],
+              ],
             },
             subAttainments: [
               {
@@ -676,9 +702,9 @@ describe(
                 maxGrade: 5,
                 formula: Formula.Manual,
                 gradeType: GradeType.Float,
-                formulaParams: {}
-              }
-            ]
+                formulaParams: {},
+              },
+            ],
           })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -694,125 +720,127 @@ describe(
       }
     );
 
-    it('should respond with 400 bad request, if validation fails in the sub-attainment level',
-      async () => {
-        // Validate on level 1
-        let res: supertest.Response = await request
-          .post('/v1/courses/3/assessment-models/4/attainments')
-          .send({
-            ...mockAttainment, subAttainments: [
-              {
-                name: 'Exercise 1',
-                daysValid: badInput,
-                minRequiredGrade: 1,
-                maxGrade: 5,
-                formula: Formula.Manual,
-                gradeType: GradeType.Float,
-                formulaParams: {},
-                subAttainments: [],
-              }
-            ]
-          })
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.BadRequest);
+    it('should respond with 400 bad request, if validation fails in the sub-attainment level', async () => {
+      // Validate on level 1
+      let res: supertest.Response = await request
+        .post('/v1/courses/3/assessment-models/4/attainments')
+        .send({
+          ...mockAttainment,
+          subAttainments: [
+            {
+              name: 'Exercise 1',
+              daysValid: badInput,
+              minRequiredGrade: 1,
+              maxGrade: 5,
+              formula: Formula.Manual,
+              gradeType: GradeType.Float,
+              formulaParams: {},
+              subAttainments: [],
+            },
+          ],
+        })
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadRequest);
 
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors).toBeDefined();
-        expect(res.body.errors.length).toEqual(1);
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors.length).toEqual(1);
 
-        // Validate on level 2
-        res = await request
-          .post('/v1/courses/3/assessment-models/4/attainments')
-          .send({
-            ...mockAttainment, subAttainments: [
-              {
-                name: 'Exercise 1',
-                daysValid: 30,
-                minRequiredGrade: 1,
-                maxGrade: 5,
-                formula: Formula.Manual,
-                gradeType: GradeType.Float,
-                formulaParams: {},
-                subAttainments: [
-                  {
-                    name: 'Exercise 1',
-                    daysValid: 30,
-                    minRequiredGrade: 1,
-                    maxGrade: 5,
-                    formula: Formula.Manual,
-                    gradeType: GradeType.Float,
-                    formulaParams: {},
-                    subAttainments: badInput,
-                  }
-                ],
-              }
-            ]
-          })
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.BadRequest);
-
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors).toBeDefined();
-        expect(res.body.errors.length).toEqual(1);
-
-        // Validate on level 3
-        res = await request
-          .post('/v1/courses/1/assessment-models/1/attainments')
-          .send({
-            ...mockAttainment, subAttainments: [
-              {
-                name: 'Exercise 1',
-                daysValid: 30,
-                minRequiredGrade: 1,
-                maxGrade: 5,
-                formula: Formula.Manual,
-                gradeType: GradeType.Float,
-                formulaParams: {
-                  minRequiredGrade: 0
+      // Validate on level 2
+      res = await request
+        .post('/v1/courses/3/assessment-models/4/attainments')
+        .send({
+          ...mockAttainment,
+          subAttainments: [
+            {
+              name: 'Exercise 1',
+              daysValid: 30,
+              minRequiredGrade: 1,
+              maxGrade: 5,
+              formula: Formula.Manual,
+              gradeType: GradeType.Float,
+              formulaParams: {},
+              subAttainments: [
+                {
+                  name: 'Exercise 1',
+                  daysValid: 30,
+                  minRequiredGrade: 1,
+                  maxGrade: 5,
+                  formula: Formula.Manual,
+                  gradeType: GradeType.Float,
+                  formulaParams: {},
+                  subAttainments: badInput,
                 },
-                subAttainments: [
-                  {
-                    name: 'Exercise 1',
-                    daysValid: 30,
-                    minRequiredGrade: 1,
-                    maxGrade: 5,
-                    formula: Formula.Manual,
-                    gradeType: GradeType.Float,
-                    formulaParams: {
-                      minRequiredGrade: 0
-                    },
-                    subAttainments: [
-                      {
-                        name: 'Exercise 1',
-                        daysValid: badInput,
-                        minRequiredGrade: 1,
-                        maxGrade: 5,
-                        formula: Formula.Manual,
-                        gradeType: GradeType.Float,
-                        formulaParams: {
-                          minRequiredGrade: 0
-                        },
-                        subAttainments: [],
-                      }
-                    ],
-                  }
-                ],
-              }
-            ]
-          })
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.BadRequest);
+              ],
+            },
+          ],
+        })
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadRequest);
 
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors).toBeDefined();
-        expect(res.body.errors.length).toEqual(1);
-      });
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors.length).toEqual(1);
+
+      // Validate on level 3
+      res = await request
+        .post('/v1/courses/1/assessment-models/1/attainments')
+        .send({
+          ...mockAttainment,
+          subAttainments: [
+            {
+              name: 'Exercise 1',
+              daysValid: 30,
+              minRequiredGrade: 1,
+              maxGrade: 5,
+              formula: Formula.Manual,
+              gradeType: GradeType.Float,
+              formulaParams: {
+                minRequiredGrade: 0,
+              },
+              subAttainments: [
+                {
+                  name: 'Exercise 1',
+                  daysValid: 30,
+                  minRequiredGrade: 1,
+                  maxGrade: 5,
+                  formula: Formula.Manual,
+                  gradeType: GradeType.Float,
+                  formulaParams: {
+                    minRequiredGrade: 0,
+                  },
+                  subAttainments: [
+                    {
+                      name: 'Exercise 1',
+                      daysValid: badInput,
+                      minRequiredGrade: 1,
+                      maxGrade: 5,
+                      formula: Formula.Manual,
+                      gradeType: GradeType.Float,
+                      formulaParams: {
+                        minRequiredGrade: 0,
+                      },
+                      subAttainments: [],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        })
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadRequest);
+
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors.length).toEqual(1);
+    });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
       await request
@@ -827,7 +855,7 @@ describe(
         .post('/v1/courses/3/assessment-models/3/attainments')
         .send({
           parentId: 3,
-          ...mockAttainment
+          ...mockAttainment,
         })
         .set('Content-Type', 'application/json')
         .set('Cookie', cookies.userCookie)
@@ -838,83 +866,81 @@ describe(
       expect(res.body.errors).toBeDefined();
     });
 
-    it('should respond with 404 not found, if assessment model does not exist',
-      async () => {
-        const res: supertest.Response = await request
-          .post(`/v1/courses/1/assessment-models/${badId}/attainments`)
-          .send(mockAttainment)
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.NotFound);
+    it('should respond with 404 not found, if assessment model does not exist', async () => {
+      const res: supertest.Response = await request
+        .post(`/v1/courses/1/assessment-models/${badId}/attainments`)
+        .send(mockAttainment)
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.NotFound);
 
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors[0]).toBe(`assessment model with ID ${badId} not found`);
-      });
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors[0]).toBe(
+        `assessment model with ID ${badId} not found`
+      );
+    });
 
-    it('should respond with 404 not found, if course does not exist',
-      async () => {
-        const res: supertest.Response = await request
-          .post(`/v1/courses/${badId}/assessment-models/1/attainments`)
-          .send(mockAttainment)
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.NotFound);
+    it('should respond with 404 not found, if course does not exist', async () => {
+      const res: supertest.Response = await request
+        .post(`/v1/courses/${badId}/assessment-models/1/attainments`)
+        .send(mockAttainment)
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.NotFound);
 
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors[0]).toBe(`course with ID ${badId} not found`);
-      });
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors[0]).toBe(`course with ID ${badId} not found`);
+    });
 
-    it('should respond with 409 conflict, if assessment model does not belong to the course',
-      async () => {
-        const res: supertest.Response = await request
-          .post('/v1/courses/1/assessment-models/2/attainments')
-          .send(mockAttainment)
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.Conflict);
+    it('should respond with 409 conflict, if assessment model does not belong to the course', async () => {
+      const res: supertest.Response = await request
+        .post('/v1/courses/1/assessment-models/2/attainments')
+        .send(mockAttainment)
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Conflict);
 
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors[0]).toBe(
-          'assessment model with ID 2 does not belong to the course with ID 1'
-        );
-      });
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors[0]).toBe(
+        'assessment model with ID 2 does not belong to the course with ID 1'
+      );
+    });
 
-    it('should respond with 409 conflict, if assessment model already has root attainment',
-      async () => {
-        const attainment: Attainment = await Attainment.findOne({
-          where: {
-            assessmentModelId: 31,
-            parentId: {
-              [Op.is]: undefined
-            }
-          }
-        }) as Attainment;
+    it('should respond with 409 conflict, if assessment model already has root attainment', async () => {
+      const attainment: Attainment = (await Attainment.findOne({
+        where: {
+          assessmentModelId: 31,
+          parentId: {
+            [Op.is]: undefined,
+          },
+        },
+      })) as Attainment;
 
-        const res: supertest.Response = await request
-          .post('/v1/courses/1/assessment-models/31/attainments')
-          .send(mockAttainment)
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.Conflict);
+      const res: supertest.Response = await request
+        .post('/v1/courses/1/assessment-models/31/attainments')
+        .send(mockAttainment)
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Conflict);
 
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors[0]).toBe(
-          `assessment model already has root attainment with ID ${attainment.id}`
-        );
-      });
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors[0]).toBe(
+        `assessment model already has root attainment with ID ${attainment.id}`
+      );
+    });
 
     it(
-      'should respond with 409 conflict, if parent attainment does not'
-      + ' belong to the assessment model',
+      'should respond with 409 conflict, if parent attainment does not' +
+        ' belong to the assessment model',
       async () => {
         // Try to add new attainment with previously created parent to assessment model 2.
         const res: supertest.Response = await request
           .post('/v1/courses/4/assessment-models/6/attainments')
-          .send({ parentId: 4, ...mockAttainment })
+          .send({parentId: 4, ...mockAttainment})
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
           .set('Accept', 'application/json')
@@ -927,25 +953,24 @@ describe(
       }
     );
 
-    it('should respond with 422 unprocessable entity, if parent attainment does not exist',
-      async () => {
-        const res: supertest.Response = await request
-          .post('/v1/courses/1/assessment-models/1/attainments')
-          .send({ parentId: badId, ...mockAttainment })
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.UnprocessableEntity);
+    it('should respond with 422 unprocessable entity, if parent attainment does not exist', async () => {
+      const res: supertest.Response = await request
+        .post('/v1/courses/1/assessment-models/1/attainments')
+        .send({parentId: badId, ...mockAttainment})
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.UnprocessableEntity);
 
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors[0]).toBe(`attainment with ID ${badId} not found`);
-      });
-
-  });
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors[0]).toBe(`attainment with ID ${badId} not found`);
+    });
+  }
+);
 
 describe(
-  'Test PUT /v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId'
-  + ' - update attainment information',
+  'Test PUT /v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId' +
+    ' - update attainment information',
   () => {
     let subAttainment: AttainmentData;
     let parentAttainment: AttainmentData;
@@ -963,10 +988,12 @@ describe(
       subAttainment = res.body.data;
 
       res = await request
-        .put(`/v1/courses/1/assessment-models/12/attainments/${subAttainment.id}`)
+        .put(
+          `/v1/courses/1/assessment-models/12/attainments/${subAttainment.id}`
+        )
         .send({
           name: 'new name',
-          daysValid: 50
+          daysValid: 50,
         })
         .set('Content-Type', 'application/json')
         .set('Cookie', cookies.adminCookie)
@@ -990,8 +1017,10 @@ describe(
         subAttainment.subAttainments as Array<AttainmentData>;
 
       const res: supertest.Response = await request
-        .put(`/v1/courses/1/assessment-models/12/attainments/${subAttainments[0].id}`)
-        .send({ parentId: subAttainments[1].id })
+        .put(
+          `/v1/courses/1/assessment-models/12/attainments/${subAttainments[0].id}`
+        )
+        .send({parentId: subAttainments[1].id})
         .set('Content-Type', 'application/json')
         .set('Cookie', cookies.userCookie)
         .expect(HttpCode.Ok);
@@ -1003,18 +1032,19 @@ describe(
     });
 
     it(
-      'should update the formula params of a potential parent attainment with'
-      + ' a new attainment name if it is changed in a child',
+      'should update the formula params of a potential parent attainment with' +
+        ' a new attainment name if it is changed in a child',
       async () => {
         let attainment: Attainment | null = await Attainment.findByPk(258);
-        let parentParams: ParamsObject = attainment?.formulaParams as ParamsObject;
+        let parentParams: ParamsObject =
+          attainment?.formulaParams as ParamsObject;
 
-        expect(parentParams.children).toContainEqual(['259', { weight: 1 }]);
-        expect(parentParams.children).toContainEqual(['260', { weight: 1 }]);
+        expect(parentParams.children).toContainEqual(['259', {weight: 1}]);
+        expect(parentParams.children).toContainEqual(['260', {weight: 1}]);
 
         const res: supertest.Response = await request
           .put('/v1/courses/2/assessment-models/43/attainments/259')
-          .send({ name: 'changed name' })
+          .send({name: 'changed name'})
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.Ok);
@@ -1025,28 +1055,36 @@ describe(
         attainment = await Attainment.findByPk(258);
         parentParams = attainment?.formulaParams as ParamsObject;
 
-        expect(parentParams.children).not.toContainEqual(['259', { weight: 1 }]);
-        expect(parentParams.children).toContainEqual(['changed name', { weight: 1 }]);
-        expect(parentParams.children).toContainEqual(['260', { weight: 1 }]);
+        expect(parentParams.children).not.toContainEqual(['259', {weight: 1}]);
+        expect(parentParams.children).toContainEqual([
+          'changed name',
+          {weight: 1},
+        ]);
+        expect(parentParams.children).toContainEqual(['260', {weight: 1}]);
       }
     );
 
     it(
-      'should remove the edited attainment from the old parent attainment\'s and'
-      + ' add it to the new parent attainment\'s params',
+      "should remove the edited attainment from the old parent attainment's and" +
+        " add it to the new parent attainment's params",
       async () => {
         let oldParent: Attainment | null = await Attainment.findByPk(261);
-        let oldParentParams: ParamsObject = oldParent?.formulaParams as ParamsObject;
+        let oldParentParams: ParamsObject =
+          oldParent?.formulaParams as ParamsObject;
         let newParent: Attainment | null = await Attainment.findByPk(263);
-        let newParentParams: ParamsObject = newParent?.formulaParams as ParamsObject;
+        let newParentParams: ParamsObject =
+          newParent?.formulaParams as ParamsObject;
 
-        expect(oldParentParams.children).toContainEqual(['262', { weight: 1 }]);
-        expect(oldParentParams.children).toContainEqual(['263', { weight: 1 }]);
-        expect(newParentParams.children).not.toContainEqual(['262', { weight: 0 }]);
+        expect(oldParentParams.children).toContainEqual(['262', {weight: 1}]);
+        expect(oldParentParams.children).toContainEqual(['263', {weight: 1}]);
+        expect(newParentParams.children).not.toContainEqual([
+          '262',
+          {weight: 0},
+        ]);
 
         const res: supertest.Response = await request
           .put('/v1/courses/2/assessment-models/44/attainments/262')
-          .send({ parentId: 263 })
+          .send({parentId: 263})
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.Ok);
@@ -1059,64 +1097,65 @@ describe(
         newParent = await Attainment.findByPk(263);
         newParentParams = newParent?.formulaParams as ParamsObject;
 
-        expect(oldParentParams.children).not.toContainEqual(['262', { weight: 1 }]);
-        expect(oldParentParams.children).toContainEqual(['263', { weight: 1 }]);
-        expect(newParentParams.children).toContainEqual(['262', { weight: 0 }]);
+        expect(oldParentParams.children).not.toContainEqual([
+          '262',
+          {weight: 1},
+        ]);
+        expect(oldParentParams.children).toContainEqual(['263', {weight: 1}]);
+        expect(newParentParams.children).toContainEqual(['262', {weight: 0}]);
       }
     );
 
-    it('should respond with 400 bad request, if validation fails (non-number assessment model id)',
-      async () => {
-        const res: supertest.Response = await request
-          .put(`/v1/courses/1/assessment-models/${badInput}/attainments/${subAttainment.id}`)
-          .send(mockAttainment)
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .expect(HttpCode.BadRequest);
+    it('should respond with 400 bad request, if validation fails (non-number assessment model id)', async () => {
+      const res: supertest.Response = await request
+        .put(
+          `/v1/courses/1/assessment-models/${badInput}/attainments/${subAttainment.id}`
+        )
+        .send(mockAttainment)
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .expect(HttpCode.BadRequest);
 
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors).toBeDefined();
-        expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      }
-    );
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+    });
 
-    it('should respond with 400 bad request, if validation fails (non-number course id)',
-      async () => {
-        const res: supertest.Response = await request
-          .put(`/v1/courses/${badInput}/assessment-models/1/attainments/${subAttainment.id}`)
-          .send(mockAttainment)
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .expect(HttpCode.BadRequest);
+    it('should respond with 400 bad request, if validation fails (non-number course id)', async () => {
+      const res: supertest.Response = await request
+        .put(
+          `/v1/courses/${badInput}/assessment-models/1/attainments/${subAttainment.id}`
+        )
+        .send(mockAttainment)
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .expect(HttpCode.BadRequest);
 
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors).toBeDefined();
-        expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      }
-    );
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+    });
 
-    it('should respond with 400 bad request, if validation fails (non-number attainment ID)',
-      async () => {
-        const res: supertest.Response = await request
-          .put(`/v1/courses/2/assessment-models/11/attainments/${badInput}`)
-          .send(mockAttainment)
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .expect(HttpCode.BadRequest);
+    it('should respond with 400 bad request, if validation fails (non-number attainment ID)', async () => {
+      const res: supertest.Response = await request
+        .put(`/v1/courses/2/assessment-models/11/attainments/${badInput}`)
+        .send(mockAttainment)
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .expect(HttpCode.BadRequest);
 
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors).toBeDefined();
-        expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-      }
-    );
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+    });
 
     it(
-      'should respond with 400 bad request, if validation fails'
-      + ' (invalid minRequiredGrade or maxGrade)',
+      'should respond with 400 bad request, if validation fails' +
+        ' (invalid minRequiredGrade or maxGrade)',
       async () => {
         async function badInput(input: {
-          minRequiredGrade?: number,
-          maxGrade?: number
+          minRequiredGrade?: number;
+          maxGrade?: number;
         }): Promise<void> {
           const res: supertest.Response = await request
             .put('/v1/courses/1/assessment-models/1/attainments/5')
@@ -1131,76 +1170,71 @@ describe(
           expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
         }
 
-        badInput({ minRequiredGrade: 5, maxGrade: 1 });
-        badInput({ minRequiredGrade: 10000 });
-        badInput({ maxGrade: 0 });
+        badInput({minRequiredGrade: 5, maxGrade: 1});
+        badInput({minRequiredGrade: 10000});
+        badInput({maxGrade: 0});
       }
     );
 
-    it('should respond with 400 bad request, if formula params are incorrect',
-      async () => {
-        const res: supertest.Response = await request
-          .put('/v1/courses/1/assessment-models/1/attainments/1')
-          .send({
-            formula: Formula.WeightedAverage,
-            formulaParams: {}
-          })
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .expect(HttpCode.BadRequest);
+    it('should respond with 400 bad request, if formula params are incorrect', async () => {
+      const res: supertest.Response = await request
+        .put('/v1/courses/1/assessment-models/1/attainments/1')
+        .send({
+          formula: Formula.WeightedAverage,
+          formulaParams: {},
+        })
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .expect(HttpCode.BadRequest);
 
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors).toBeDefined();
-        expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-        expect(res.body.errors).toContain('children is a required field');
-      }
-    );
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+      expect(res.body.errors).toContain('children is a required field');
+    });
+
+    it('should respond with 400 bad request, if formula params are missing a child', async () => {
+      const res: supertest.Response = await request
+        .put('/v1/courses/1/assessment-models/1/attainments/1')
+        .send({
+          formulaParams: {
+            children: [
+              ['name5', {weight: 5}],
+              ['name16', {weight: 16}],
+            ],
+          },
+        })
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadRequest);
+
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+      expect(res.body.errors).toContain(
+        'formula params do not include subattainments with names name9,name17,name18'
+      );
+    });
 
     it(
-      'should respond with 400 bad request, if formula params are missing a child',
+      'should respond with 400 bad request, if formula params include an' +
+        ' invalid attainment name',
       async () => {
         const res: supertest.Response = await request
           .put('/v1/courses/1/assessment-models/1/attainments/1')
           .send({
             formulaParams: {
               children: [
-                ['name5', { weight: 5 }],
-                ['name16', { weight: 16 }]
-              ]
-            }
-          })
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .set('Accept', 'application/json')
-          .expect(HttpCode.BadRequest);
-
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors).toBeDefined();
-        expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
-        expect(res.body.errors).toContain(
-          'formula params do not include subattainments with names name9,name17,name18'
-        );
-      }
-    );
-
-    it(
-      'should respond with 400 bad request, if formula params include an'
-      + ' invalid attainment name',
-      async () => {
-        const res: supertest.Response = await request
-          .put('/v1/courses/1/assessment-models/1/attainments/1')
-          .send({
-            formulaParams: {
-              children: [
-                ['name5', { weight: 5 }],
-                ['name9', { weight: 9 }],
-                ['name16', { weight: 16 }],
-                ['name17', { weight: 17 }],
-                ['name18', { weight: 18 }],
-                ['invalid', { weight: 1 }],
-                ['invalid too', { weight: 2 }]
-              ]
-            }
+                ['name5', {weight: 5}],
+                ['name9', {weight: 9}],
+                ['name16', {weight: 16}],
+                ['name17', {weight: 17}],
+                ['name18', {weight: 18}],
+                ['invalid', {weight: 1}],
+                ['invalid too', {weight: 2}],
+              ],
+            },
           })
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
@@ -1224,13 +1258,15 @@ describe(
     });
 
     it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
-      jest.spyOn(Attainment, 'findByPk').mockResolvedValueOnce(jestMockAttainment);
+      jest
+        .spyOn(Attainment, 'findByPk')
+        .mockResolvedValueOnce(jestMockAttainment);
 
       const res: supertest.Response = await request
         .put('/v1/courses/4/assessment-models/7/attainments/1')
         .send({
           name: 'new name 2',
-          daysValid: 51
+          daysValid: 51,
         })
         .set('Cookie', cookies.userCookie)
         .expect(HttpCode.Forbidden);
@@ -1252,8 +1288,8 @@ describe(
     });
 
     it(
-      'should respond with 409 conflict, if parent attainment belongs to'
-      + ' a different assessment model',
+      'should respond with 409 conflict, if parent attainment belongs to' +
+        ' a different assessment model',
       async () => {
         // Create a new parent attainment on a different assessment model.
         let res: supertest.Response = await request
@@ -1266,8 +1302,10 @@ describe(
         parentAttainment = res.body.data;
 
         res = await request
-          .put(`/v1/courses/1/assessment-models/12/attainments/${subAttainment.id}`)
-          .send({ parentId: parentAttainment.id })
+          .put(
+            `/v1/courses/1/assessment-models/12/attainments/${subAttainment.id}`
+          )
+          .send({parentId: parentAttainment.id})
           .set('Content-Type', 'application/json')
           .set('Cookie', cookies.adminCookie)
           .expect(HttpCode.Conflict);
@@ -1275,54 +1313,66 @@ describe(
         expect(res.body.data).not.toBeDefined();
         expect(res.body.errors[0]).toBe(
           `parent attainment ID ${parentAttainment.id} does not belong ` +
-        `to the same assessment model as attainment ID ${subAttainment.id}`
+            `to the same assessment model as attainment ID ${subAttainment.id}`
         );
-      });
+      }
+    );
 
-    it('should respond with 409 conflict, if attainment tries to refer itself in the parent ID',
-      async () => {
-        const res: supertest.Response = await request
-          .put(`/v1/courses/1/assessment-models/12/attainments/${subAttainment.id}`)
-          .send({ ...subAttainment, parentId: subAttainment.id })
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .expect(HttpCode.Conflict);
+    it('should respond with 409 conflict, if attainment tries to refer itself in the parent ID', async () => {
+      const res: supertest.Response = await request
+        .put(
+          `/v1/courses/1/assessment-models/12/attainments/${subAttainment.id}`
+        )
+        .send({...subAttainment, parentId: subAttainment.id})
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .expect(HttpCode.Conflict);
 
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors[0]).toBe('attainment cannot refer to itself in the parent ID');
-      });
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors[0]).toBe(
+        'attainment cannot refer to itself in the parent ID'
+      );
+    });
 
-    it('should respond with 422 unprocessable entity, if parent attainment does not exist',
-      async () => {
-        const res: supertest.Response = await request
-          .put(`/v1/courses/1/assessment-models/12/attainments/${subAttainment.id}`)
-          .send({ parentId: badId })
-          .set('Content-Type', 'application/json')
-          .set('Cookie', cookies.adminCookie)
-          .expect(HttpCode.UnprocessableEntity);
+    it('should respond with 422 unprocessable entity, if parent attainment does not exist', async () => {
+      const res: supertest.Response = await request
+        .put(
+          `/v1/courses/1/assessment-models/12/attainments/${subAttainment.id}`
+        )
+        .send({parentId: badId})
+        .set('Content-Type', 'application/json')
+        .set('Cookie', cookies.adminCookie)
+        .expect(HttpCode.UnprocessableEntity);
 
-        expect(res.body.data).not.toBeDefined();
-        expect(res.body.errors[0]).toBe(`attainment with ID ${badId} not found`);
-      });
-
-  });
+      expect(res.body.data).not.toBeDefined();
+      expect(res.body.errors[0]).toBe(`attainment with ID ${badId} not found`);
+    });
+  }
+);
 
 describe(
-  'Test DELETE '
-  + '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
+  'Test DELETE ' +
+    '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
   () => {
     async function testAttainmentTreeDeletion(
-      tree: object, courseId: number, assessmentModelId: number
+      tree: object,
+      courseId: number,
+      assessmentModelId: number
     ): Promise<void> {
       // Add an attainment tree.
       const add: supertest.Response = await request
-        .post(`/v1/courses/${courseId}/assessment-models/${assessmentModelId}/attainments`)
+        .post(
+          `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/attainments`
+        )
         .send(tree)
         .set('Cookie', cookies.adminCookie);
 
       // Adds the IDs of all subattainemnts of the given tree to the given
       // attainments array.
-      function findSubattainmentIds(tree: AttainmentNode, attainments: Array<number>): void {
+      function findSubattainmentIds(
+        tree: AttainmentNode,
+        attainments: Array<number>
+      ): void {
         for (const leaf of tree.subAttainments) {
           attainments.push(leaf.id);
           findSubattainmentIds(leaf, attainments);
@@ -1342,7 +1392,7 @@ describe(
       await request
         .delete(
           `/v1/courses/${courseId}/assessment-models/` +
-          `${assessmentModelId}/attainments/${rootAttainment}`
+            `${assessmentModelId}/attainments/${rootAttainment}`
         )
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
@@ -1358,18 +1408,16 @@ describe(
       // Add an attainment.
       const add: supertest.Response = await request
         .post('/v1/courses/9/assessment-models/37/attainments')
-        .send(
-          {
-            name: 'Test exercise',
-            daysValid: 30,
-            minRequiredGrade: 1,
-            maxGrade: 5,
-            formula: Formula.Manual,
-            gradeType: GradeType.Float,
-            formulaParams: {},
-            subAttainments: []
-          }
-        )
+        .send({
+          name: 'Test exercise',
+          daysValid: 30,
+          minRequiredGrade: 1,
+          maxGrade: 5,
+          formula: Formula.Manual,
+          gradeType: GradeType.Float,
+          formulaParams: {},
+          subAttainments: [],
+        })
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json');
 
@@ -1379,7 +1427,9 @@ describe(
 
       // Delete the added attainment.
       await request
-        .delete(`/v1/courses/9/assessment-models/37/attainments/${addedAttainmenId}`)
+        .delete(
+          `/v1/courses/9/assessment-models/37/attainments/${addedAttainmenId}`
+        )
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
@@ -1392,18 +1442,16 @@ describe(
       // Add an attainment.
       const add: supertest.Response = await request
         .post('/v1/courses/9/assessment-models/38/attainments')
-        .send(
-          {
-            name: 'Test exercise 2',
-            daysValid: 30,
-            minRequiredGrade: 1,
-            maxGrade: 5,
-            formula: Formula.Manual,
-            gradeType: GradeType.Float,
-            formulaParams: {},
-            subAttainments: []
-          }
-        )
+        .send({
+          name: 'Test exercise 2',
+          daysValid: 30,
+          minRequiredGrade: 1,
+          maxGrade: 5,
+          formula: Formula.Manual,
+          gradeType: GradeType.Float,
+          formulaParams: {},
+          subAttainments: [],
+        })
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json');
 
@@ -1415,7 +1463,9 @@ describe(
 
       // Delete the added attainment.
       await request
-        .delete(`/v1/courses/9/assessment-models/38/attainments/${addedAttainmentid}`)
+        .delete(
+          `/v1/courses/9/assessment-models/38/attainments/${addedAttainmentid}`
+        )
         .set('Cookie', cookies.userCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
@@ -1443,7 +1493,7 @@ describe(
               formula: Formula.Manual,
               gradeType: GradeType.Float,
               formulaParams: {},
-              subAttainments: []
+              subAttainments: [],
             },
             {
               name: 'Test exercise 1.2',
@@ -1453,10 +1503,12 @@ describe(
               formula: Formula.Manual,
               gradeType: GradeType.Float,
               formulaParams: {},
-              subAttainments: []
-            }
-          ]
-        }, 9, 39
+              subAttainments: [],
+            },
+          ],
+        },
+        9,
+        39
       );
     });
 
@@ -1472,7 +1524,9 @@ describe(
     });
 
     it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
-      jest.spyOn(Attainment, 'findByPk').mockResolvedValueOnce(jestMockAttainment);
+      jest
+        .spyOn(Attainment, 'findByPk')
+        .mockResolvedValueOnce(jestMockAttainment);
 
       const res: supertest.Response = await request
         .delete('/v1/courses/4/assessment-models/7/attainments/1')
@@ -1491,6 +1545,5 @@ describe(
         .set('Accept', 'application/json')
         .expect(HttpCode.NotFound);
     });
-
   }
 );

@@ -2,17 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpCode } from 'aalto-grades-common/types';
+import {HttpCode} from 'aalto-grades-common/types';
 import supertest from 'supertest';
 
-import { app } from '../../src/app';
-import { getCookies, Cookies } from '../util/getCookies';
+import {app} from '../../src/app';
+import {getCookies, Cookies} from '../util/getCookies';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 let res: supertest.Response;
 let cookies: Cookies = {
   adminCookie: [],
-  userCookie: []
+  userCookie: [],
 };
 
 beforeAll(async () => {
@@ -20,7 +20,6 @@ beforeAll(async () => {
 });
 
 describe('Test GET /v1/formulas - get grading formula info', () => {
-
   it('should get all available grading formulas', async () => {
     res = await request
       .get('/v1/formulas')
@@ -40,11 +39,9 @@ describe('Test GET /v1/formulas - get grading formula info', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.Unauthorized);
   });
-
 });
 
 describe('Test GET /v1/formulas/:formulaId - get detailed formula info', () => {
-
   it('should get detailed info on WEIGHTED_AVERAGE formula', async () => {
     res = await request
       .get('/v1/formulas/WEIGHTED_AVERAGE')
@@ -78,5 +75,4 @@ describe('Test GET /v1/formulas/:formulaId - get detailed formula info', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.Unauthorized);
   });
-
 });

@@ -2,15 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpCode } from 'aalto-grades-common/types';
-import { AxiosError } from 'axios';
-import { CsvError } from 'csv-parse';
-import { NextFunction, Request, RequestHandler, Response } from 'express';
-import { MulterError } from 'multer';
-import { ValidationError } from 'yup';
+import {HttpCode} from 'aalto-grades-common/types';
+import {AxiosError} from 'axios';
+import {CsvError} from 'csv-parse';
+import {NextFunction, Request, RequestHandler, Response} from 'express';
+import {MulterError} from 'multer';
+import {ValidationError} from 'yup';
 
 import logger from '../configs/winston';
-import { ApiError } from '../types';
+import {ApiError} from '../types';
 
 /**
  * Creates a RequestHandler wrapper function that executes a given handler and
@@ -48,15 +48,17 @@ export function controllerDispatcher(
  * @param {NextFunction} _next - The next function in the middleware chain.
  */
 export function errorHandler(
-  err: unknown, _req: Request, res: Response, _next: NextFunction
+  err: unknown,
+  _req: Request,
+  res: Response,
+  _next: NextFunction
 ): void {
-
   if (err instanceof ApiError) {
     logger.error(`${err.name}: ${err.statusCode} - ${err.errors}`);
 
     res.status(err.statusCode).send({
       success: false,
-      errors: err.errors
+      errors: err.errors,
     });
     return;
   }
@@ -66,7 +68,7 @@ export function errorHandler(
 
     res.status(HttpCode.BadRequest).send({
       success: false,
-      errors: err.errors
+      errors: err.errors,
     });
     return;
   }
@@ -79,23 +81,24 @@ export function errorHandler(
       errors: [
         err.response
           ? `external API error: ${err.response?.status}`
-          : err.message
-      ]
+          : err.message,
+      ],
     });
     return;
   }
 
   if (err instanceof CsvError || err instanceof MulterError) {
     // If field name is incorrect, change the error message to more informative.
-    const message: string = err.message === 'Unexpected field' ?
-      'Unexpected field. To upload CSV file, set input field name as "csv_data"' :
-      err.message;
+    const message: string =
+      err.message === 'Unexpected field'
+        ? 'Unexpected field. To upload CSV file, set input field name as "csv_data"'
+        : err.message;
 
     logger.error(`${err.name}: ${message}`);
 
     res.status(HttpCode.BadRequest).send({
       success: false,
-      errors: [message]
+      errors: [message],
     });
     return;
   }
@@ -107,7 +110,7 @@ export function errorHandler(
   // Fallback if no other error matches
   res.status(HttpCode.InternalServerError).send({
     success: false,
-    errors: ['internal server error']
+    errors: ['internal server error'],
   });
   return;
 }

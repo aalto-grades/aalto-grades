@@ -3,6 +3,11 @@
   "author": "The Aalto Grades Developers",
   "license": "Expat (MIT)",
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^6.4.0"
+    "@typescript-eslint/eslint-plugin": "^6.4.0",
+    "gts": "^5.2.0"
+  },
+  "scripts": {
+    "lint": "eslint --ext .ts,.tsx .",
+    "lint:fix": "eslint --fix --ext .ts,.tsx ."
   }
 }

@@ -2,10 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpCode, SystemRole } from 'aalto-grades-common/types';
-import { NextFunction, Request, Response } from 'express';
+import {HttpCode, SystemRole} from 'aalto-grades-common/types';
+import {NextFunction, Request, Response} from 'express';
 
-import { JwtClaims } from '../types';
+import {JwtClaims} from '../types';
 
 /**
  * Middleware function to ensure that the user has the necessary role to proceed.
@@ -21,14 +21,13 @@ import { JwtClaims } from '../types';
 export function authorization(
   allowedRoles: Array<SystemRole>
 ): (req: Request, res: Response, next: NextFunction) => void {
-
   return async function (req: Request, res: Response, next: NextFunction) {
     const user: JwtClaims = req.user as JwtClaims;
 
     if (!allowedRoles.includes(user.role)) {
       res.status(HttpCode.Forbidden).send({
         success: false,
-        errors: ['forbidden']
+        errors: ['forbidden'],
       });
       return;
     }

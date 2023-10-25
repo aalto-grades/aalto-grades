@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import {Dispatch, SetStateAction, useEffect, useState} from 'react';
 
-import { Message, State } from '../types';
+import {Message, State} from '../types';
 
 /*
  * custom hook for using back-to-back alerts
@@ -13,21 +13,21 @@ import { Message, State } from '../types';
  */
 
 export interface SnackPackAlertState {
-  push: (message: Message) => void,
-  pop: () => void,
-  messageInfo: Message | null,
-  setMessageInfo: Dispatch<SetStateAction<Message | null>>,
-  alertOpen: boolean,
-  setAlertOpen: Dispatch<SetStateAction<boolean>>
+  push: (message: Message) => void;
+  pop: () => void;
+  messageInfo: Message | null;
+  setMessageInfo: Dispatch<SetStateAction<Message | null>>;
+  alertOpen: boolean;
+  setAlertOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function useSnackPackAlerts(): SnackPackAlertState {
-
   // state variables for alert messages
   const [alertOpen, setAlertOpen]: State<boolean> = useState(false);
 
-  const [snackPack, setSnackPack]: State<Array<Message>> =
-    useState<Array<Message>>([]);
+  const [snackPack, setSnackPack]: State<Array<Message>> = useState<
+    Array<Message>
+  >([]);
 
   const [messageInfo, setMessageInfo]: State<Message | null> =
     useState<Message | null>(null);
@@ -44,7 +44,7 @@ export default function useSnackPackAlerts(): SnackPackAlertState {
   // the previous disappears before a new one is shown
   useEffect(() => {
     if (snackPack.length && !messageInfo) {
-      setMessageInfo({ ...snackPack[0] });
+      setMessageInfo({...snackPack[0]});
       pop();
       setAlertOpen(true);
     } else if (snackPack.length && messageInfo && alertOpen) {
@@ -53,8 +53,11 @@ export default function useSnackPackAlerts(): SnackPackAlertState {
   }, [snackPack, messageInfo, alertOpen]);
 
   return {
-    push, pop,
-    messageInfo, setMessageInfo,
-    alertOpen, setAlertOpen
+    push,
+    pop,
+    messageInfo,
+    setMessageInfo,
+    alertOpen,
+    setAlertOpen,
   };
 }

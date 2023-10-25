@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { DateOnlyString } from 'aalto-grades-common/types';
+import {DateOnlyString} from 'aalto-grades-common/types';
 
 /**
  * Converts a Date object or a date string to a DateOnlyString format (YYYY-MM-DD).
@@ -25,8 +25,7 @@ export function toDateOnlyString(date: Date | string): DateOnlyString {
     }
   }
 
-  if (date instanceof Date)
-    return validate(date.toISOString().split('T')[0]);
+  if (date instanceof Date) return validate(date.toISOString().split('T')[0]);
 
   return toDateOnlyString(new Date(date));
 }

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import express, { Router } from 'express';
+import express, {Router} from 'express';
 import passport from 'passport';
 
 import {
@@ -10,28 +10,28 @@ import {
   deleteAttainment,
   updateAttainment,
   getRootAttainment,
-  getAttainment
+  getAttainment,
 } from '../controllers/attainment';
-import { handleInvalidRequestJson } from '../middleware';
-import { controllerDispatcher } from '../middleware/errorHandler';
+import {handleInvalidRequestJson} from '../middleware';
+import {controllerDispatcher} from '../middleware/errorHandler';
 
 export const router: Router = Router();
 
 router.get(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
-  passport.authenticate('jwt', { session: false }),
+  passport.authenticate('jwt', {session: false}),
   controllerDispatcher(getAttainment)
 );
 
 router.get(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments',
-  passport.authenticate('jwt', { session: false }),
+  passport.authenticate('jwt', {session: false}),
   controllerDispatcher(getRootAttainment)
 );
 
 router.post(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments',
-  passport.authenticate('jwt', { session: false }),
+  passport.authenticate('jwt', {session: false}),
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(addAttainment)
@@ -39,7 +39,7 @@ router.post(
 
 router.put(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
-  passport.authenticate('jwt', { session: false }),
+  passport.authenticate('jwt', {session: false}),
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(updateAttainment)
@@ -47,6 +47,6 @@ router.put(
 
 router.delete(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
-  passport.authenticate('jwt', { session: false }),
+  passport.authenticate('jwt', {session: false}),
   controllerDispatcher(deleteAttainment)
 );

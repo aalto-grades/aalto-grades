@@ -2,14 +2,20 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AssessmentModelData } from 'aalto-grades-common/types';
+import {AssessmentModelData} from 'aalto-grades-common/types';
 import axios from './axios';
 import {
-  QueryClient, useMutation, UseMutationOptions, UseMutationResult,
-  useQuery, useQueryClient, UseQueryOptions, UseQueryResult
+  QueryClient,
+  useMutation,
+  UseMutationOptions,
+  UseMutationResult,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+  UseQueryResult,
 } from '@tanstack/react-query';
 
-import { Numeric } from '../../types';
+import {Numeric} from '../../types';
 
 export function useGetAllAssessmentModels(
   courseId: Numeric,
@@ -17,10 +23,9 @@ export function useGetAllAssessmentModels(
 ): UseQueryResult<Array<AssessmentModelData>> {
   return useQuery({
     queryKey: ['all-assessment-models', courseId],
-    queryFn: async () => (
-      await axios.get(`/v1/courses/${courseId}/assessment-models`)
-    ).data.data,
-    ...options
+    queryFn: async () =>
+      (await axios.get(`/v1/courses/${courseId}/assessment-models`)).data.data,
+    ...options,
   });
 }
 
@@ -31,20 +36,25 @@ export function useGetAssessmentModel(
 ): UseQueryResult<AssessmentModelData> {
   return useQuery({
     queryKey: ['assessment-model', courseId, assessmentModelId],
-    queryFn: async () => (
-      await axios.get(`/v1/courses/${courseId}/assessment-models/${assessmentModelId}`)
-    ).data.data,
-    ...options
+    queryFn: async () =>
+      (
+        await axios.get(
+          `/v1/courses/${courseId}/assessment-models/${assessmentModelId}`
+        )
+      ).data.data,
+    ...options,
   });
 }
 
 interface AddAssessmentModelVars {
-  courseId: Numeric,
-  assessmentModel: AssessmentModelData
+  courseId: Numeric;
+  assessmentModel: AssessmentModelData;
 }
 
 export type UseAddAssessmentModelResult = UseMutationResult<
-  number, unknown, AddAssessmentModelVars
+  number,
+  unknown,
+  AddAssessmentModelVars
 >;
 
 export function useAddAssessmentModel(
@@ -53,18 +63,19 @@ export function useAddAssessmentModel(
   const queryClient: QueryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: AddAssessmentModelVars) => (
-      await axios.post(
-        `/v1/courses/${vars.courseId}/assessment-models`,
-        vars.assessmentModel
-      )
-    ).data.data,
+    mutationFn: async (vars: AddAssessmentModelVars) =>
+      (
+        await axios.post(
+          `/v1/courses/${vars.courseId}/assessment-models`,
+          vars.assessmentModel
+        )
+      ).data.data,
 
     onSuccess: (_data: number, vars: AddAssessmentModelVars) => {
       queryClient.invalidateQueries({
-        queryKey: ['all-assessment-models', vars.courseId]
+        queryKey: ['all-assessment-models', vars.courseId],
       });
     },
-    ...options
+    ...options,
   });
 }

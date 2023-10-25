@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseData } from 'aalto-grades-common/types';
+import {CourseData} from 'aalto-grades-common/types';
 import axios from './axios';
-import { useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
+import {useQuery, UseQueryOptions, UseQueryResult} from '@tanstack/react-query';
 
-import { Numeric } from '../../types';
+import {Numeric} from '../../types';
 
 export function useGetCoursesOfUser(
   userId: Numeric,
@@ -14,9 +14,8 @@ export function useGetCoursesOfUser(
 ): UseQueryResult<Array<CourseData>> {
   return useQuery({
     queryKey: ['courses-of-user', userId],
-    queryFn: async () => (
-      await axios.get(`/v1/user/${userId}/courses`)
-    ).data.data,
-    ...options
+    queryFn: async () =>
+      (await axios.get(`/v1/user/${userId}/courses`)).data.data,
+    ...options,
   });
 }

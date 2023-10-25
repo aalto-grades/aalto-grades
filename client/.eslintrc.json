@@ -18,28 +18,8 @@
     "react/jsx-uses-react": "off",
     "react/react-in-jsx-scope": "off",
     "react/jsx-pascal-case": "error",
-    "react/jsx-equals-spacing": [
-      "error",
-      "never"
-    ],
-    "react/jsx-curly-spacing": [
-      "error",
-      {
-        "when": "never",
-        "children": true
-      }
-    ],
-    "react/jsx-wrap-multilines": [
-      "error",
-      {
-        "declaration": "parens-new-line",
-        "assignment": "parens-new-line",
-        "return": "parens-new-line",
-        "arrow": "parens-new-line",
-        "condition": "parens-new-line",
-        "logical": "parens-new-line",
-        "prop": "parens-new-line"
-      }
-    ]
+    // From previous team
+    "camelcase": "warn",
+    "func-style": "warn"
   }
 }

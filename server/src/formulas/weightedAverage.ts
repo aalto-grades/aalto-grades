@@ -2,22 +2,26 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, HttpCode, ParamsObject } from 'aalto-grades-common/types';
+import {
+  AttainmentData,
+  HttpCode,
+  ParamsObject,
+} from 'aalto-grades-common/types';
 import * as yup from 'yup';
 
-import { registerFormula } from '.';
-import { Formula, Status } from 'aalto-grades-common/types';
-import { ApiError, CalculationResult } from '../types';
+import {registerFormula} from '.';
+import {Formula, Status} from 'aalto-grades-common/types';
+import {ApiError, CalculationResult} from '../types';
 
 const childParams: Array<string> = ['weight'];
 const params: Array<string> = [];
 
 const defaultChildParams: ChildParams = {
-  weight: 0
+  weight: 0,
 };
 
 interface ChildParams {
-  weight: number
+  weight: number;
 }
 
 type Params = ParamsObject<ChildParams>;
@@ -33,17 +37,16 @@ function calculateWeightedAverage(
   attainment: AttainmentData,
   subGrades: Array<CalculationResult>
 ): CalculationResult {
-
   let grade: number = 0;
   let status: Status = Status.Pass;
   const params: Params = attainment.formulaParams as Params;
   const weights: Map<string, ChildParams> = new Map(params.children);
 
   for (const subGrade of subGrades) {
-    if (subGrade.status !== Status.Pass)
-      status = Status.Fail;
+    if (subGrade.status !== Status.Pass) status = Status.Fail;
 
-    const weight: number | undefined = weights.get(subGrade.attainment.name)?.weight;
+    const weight: number | undefined = weights.get(subGrade.attainment.name)
+      ?.weight;
     if (weight) {
       grade += subGrade.grade * weight;
     } else {
@@ -57,12 +60,11 @@ function calculateWeightedAverage(
   return {
     attainment: attainment,
     grade: grade,
-    status: status
+    status: status,
   };
 }
 
-const codeSnippet: string =
-`interface ChildParams {
+const codeSnippet: string = `interface ChildParams {
   weight: number
 }
 
@@ -111,14 +113,24 @@ registerFormula(
   params,
   childParams,
   defaultChildParams,
-  yup.object({
-    children: yup.array().min(1).of(
-      yup.tuple([
-        yup.string(),
-        yup.object({
-          weight: yup.number().required()
-        }).noUnknown().strict()
-      ])
-    ).required()
-  }).noUnknown().strict()
+  yup
+    .object({
+      children: yup
+        .array()
+        .min(1)
+        .of(
+          yup.tuple([
+            yup.string(),
+            yup
+              .object({
+                weight: yup.number().required(),
+              })
+              .noUnknown()
+              .strict(),
+          ])
+        )
+        .required(),
+    })
+    .noUnknown()
+    .strict()
 );

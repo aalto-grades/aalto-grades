@@ -2,10 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Sequelize } from 'sequelize';
+import {Sequelize} from 'sequelize';
 
 import dbCreds from '../configs/database';
-import { NODE_ENV } from '../configs/environment';
+import {NODE_ENV} from '../configs/environment';
 import logger from '../configs/winston';
 
 // Configure and initialize Sequelize instance with database details and options.
@@ -16,17 +16,21 @@ export const sequelize: Sequelize = new Sequelize(
   {
     host: dbCreds.host,
     dialect: 'postgres',
-    dialectOptions: NODE_ENV === 'production' ? {
-      ssl: {
-        require: true
-      }
-    } : undefined,
+    dialectOptions:
+      NODE_ENV === 'production'
+        ? {
+            ssl: {
+              require: true,
+            },
+          }
+        : undefined,
     define: {
       timestamps: true,
       underscored: true,
-      freezeTableName: true
+      freezeTableName: true,
     },
-    logging: (msg: string) => NODE_ENV === 'test' ? undefined : logger.debug(`Sequelize: ${msg}`)
+    logging: (msg: string) =>
+      NODE_ENV === 'test' ? undefined : logger.debug(`Sequelize: ${msg}`),
   }
 );
 

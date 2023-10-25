@@ -2,65 +2,69 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { GradingScale, Language } from 'aalto-grades-common/types';
-import { rest } from 'msw';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {GradingScale, Language} from 'aalto-grades-common/types';
+import {rest} from 'msw';
+import {MemoryRouter, Route, Routes} from 'react-router-dom';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import '@testing-library/jest-dom/extend-expect';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import {act, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import EditCourseView from '../components/EditCourseView';
-import { mockPostSuccess, server } from './mock-data/server';
+import {mockPostSuccess, server} from './mock-data/server';
 
 describe('Tests for EditCourseView components', () => {
-
   function renderEditCourseView(): void {
     render(
       <QueryClientProvider client={new QueryClient()}>
         <MemoryRouter initialEntries={['/course/create']}>
           <Routes>
-            <Route path='/course/:modification/:courseId?' element={<EditCourseView />} />
+            <Route
+              path="/course/:modification/:courseId?"
+              element={<EditCourseView />}
+            />
           </Routes>
         </MemoryRouter>
       </QueryClientProvider>
     );
   }
 
-  test(
-    'EditCourseView should render all of the appropriate components',
-    () => {
+  test('EditCourseView should render all of the appropriate components', () => {
+    renderEditCourseView();
 
-      renderEditCourseView();
-
-      expect(screen.getByText('Create a New Course')).toBeDefined();
-      expect(screen.getByLabelText('Course Code*')).toBeDefined();
-      expect(screen.getByLabelText('Course Name in English*')).toBeDefined();
-      expect(screen.getByLabelText('Course Name in Finnish*')).toBeDefined();
-      expect(screen.getByLabelText('Course Name in Swedish*')).toBeDefined();
-      expect(screen.getByLabelText('Organizing department in English*')).toBeDefined();
-      expect(screen.getByLabelText('Organizing department in Finnish*')).toBeDefined();
-      expect(screen.getByLabelText('Organizing department in Swedish*')).toBeDefined();
-      expect(screen.getByLabelText('Minimum Course Credits (ECTS)*')).toBeDefined();
-      expect(screen.getByLabelText('Maximum Course Credits (ECTS)*')).toBeDefined();
-      expect(screen.getByLabelText('Grading Scale*')).toBeInTheDocument();
-      expect(screen.getByLabelText('Course language*')).toBeInTheDocument();
-      expect(screen.getByLabelText('Teachers In Charge*')).toBeDefined();
-      expect(screen.getByText('Add')).toBeDefined();
-      expect(screen.getByText('Cancel')).toBeDefined();
-      expect(screen.getByText('Submit')).toBeDefined();
-    }
-  );
+    expect(screen.getByText('Create a New Course')).toBeDefined();
+    expect(screen.getByLabelText('Course Code*')).toBeDefined();
+    expect(screen.getByLabelText('Course Name in English*')).toBeDefined();
+    expect(screen.getByLabelText('Course Name in Finnish*')).toBeDefined();
+    expect(screen.getByLabelText('Course Name in Swedish*')).toBeDefined();
+    expect(
+      screen.getByLabelText('Organizing department in English*')
+    ).toBeDefined();
+    expect(
+      screen.getByLabelText('Organizing department in Finnish*')
+    ).toBeDefined();
+    expect(
+      screen.getByLabelText('Organizing department in Swedish*')
+    ).toBeDefined();
+    expect(
+      screen.getByLabelText('Minimum Course Credits (ECTS)*')
+    ).toBeDefined();
+    expect(
+      screen.getByLabelText('Maximum Course Credits (ECTS)*')
+    ).toBeDefined();
+    expect(screen.getByLabelText('Grading Scale*')).toBeInTheDocument();
+    expect(screen.getByLabelText('Course language*')).toBeInTheDocument();
+    expect(screen.getByLabelText('Teachers In Charge*')).toBeDefined();
+    expect(screen.getByText('Add')).toBeDefined();
+    expect(screen.getByText('Cancel')).toBeDefined();
+    expect(screen.getByText('Submit')).toBeDefined();
+  });
 
   test('EditCourseView should allow an admin to create a course', async () => {
-
     renderEditCourseView();
 
     const addCourse: jest.Mock = jest.fn();
-    server.use(rest.post(
-      '*/v1/courses',
-      mockPostSuccess(addCourse, 1)
-    ));
+    server.use(rest.post('*/v1/courses', mockPostSuccess(addCourse, 1)));
 
     const testCode: string = 'Test code';
     const testNameEn: string = 'Test name';
@@ -72,18 +76,57 @@ describe('Tests for EditCourseView components', () => {
     const testTeacher: string = 'Elon.Musk@twitter.com';
 
     act(() => userEvent.type(screen.getByLabelText('Course Code*'), testCode));
-    act(() => userEvent.type(screen.getByLabelText('Course Name in English*'), testNameEn));
-    act(() => userEvent.type(screen.getByLabelText('Course Name in Finnish*'), testNameFi));
-    act(() => userEvent.type(screen.getByLabelText('Course Name in Swedish*'), testNameSv));
-    act(() => userEvent.type(screen.getByLabelText(
-      'Organizing department in English*'), testDepartmentEn));
-    act(() => userEvent.type(screen.getByLabelText(
-      'Organizing department in Finnish*'), testDepartmentFi));
-    act(() => userEvent.type(screen.getByLabelText(
-      'Organizing department in Swedish*'), testDepartmentSv));
-    act(() => userEvent.type(screen.getByLabelText('Minimum Course Credits (ECTS)*'), '3'));
-    act(() => userEvent.type(screen.getByLabelText('Maximum Course Credits (ECTS)*'), '5'));
-    act(() => userEvent.type(screen.getByLabelText('Teachers In Charge*'), testTeacher));
+    act(() =>
+      userEvent.type(
+        screen.getByLabelText('Course Name in English*'),
+        testNameEn
+      )
+    );
+    act(() =>
+      userEvent.type(
+        screen.getByLabelText('Course Name in Finnish*'),
+        testNameFi
+      )
+    );
+    act(() =>
+      userEvent.type(
+        screen.getByLabelText('Course Name in Swedish*'),
+        testNameSv
+      )
+    );
+    act(() =>
+      userEvent.type(
+        screen.getByLabelText('Organizing department in English*'),
+        testDepartmentEn
+      )
+    );
+    act(() =>
+      userEvent.type(
+        screen.getByLabelText('Organizing department in Finnish*'),
+        testDepartmentFi
+      )
+    );
+    act(() =>
+      userEvent.type(
+        screen.getByLabelText('Organizing department in Swedish*'),
+        testDepartmentSv
+      )
+    );
+    act(() =>
+      userEvent.type(
+        screen.getByLabelText('Minimum Course Credits (ECTS)*'),
+        '3'
+      )
+    );
+    act(() =>
+      userEvent.type(
+        screen.getByLabelText('Maximum Course Credits (ECTS)*'),
+        '5'
+      )
+    );
+    act(() =>
+      userEvent.type(screen.getByLabelText('Teachers In Charge*'), testTeacher)
+    );
 
     act(() => userEvent.click(screen.getByText('Add')));
     act(() => userEvent.click(screen.getByText('Submit')));
@@ -108,11 +151,10 @@ describe('Tests for EditCourseView components', () => {
         },
         teachersInCharge: [
           {
-            email: testTeacher
-          }
-        ]
+            email: testTeacher,
+          },
+        ],
       });
     });
   });
-
 });

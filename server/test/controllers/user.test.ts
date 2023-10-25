@@ -2,16 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpCode } from 'aalto-grades-common/types';
+import {HttpCode} from 'aalto-grades-common/types';
 import supertest from 'supertest';
 
-import { app } from '../../src/app';
-import { Cookies, getCookies } from '../util/getCookies';
+import {app} from '../../src/app';
+import {Cookies, getCookies} from '../util/getCookies';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 let cookies: Cookies = {
   adminCookie: [],
-  userCookie: []
+  userCookie: [],
 };
 
 beforeAll(async () => {
@@ -59,7 +59,6 @@ async function testInformation(): Promise<void> {
 }
 
 describe('Test GET /v1/user/:userId/courses - get all courses user has role in', () => {
-
   it('should respond with correct data of any user when admin user', async () => {
     await testCourses();
   });
@@ -155,18 +154,16 @@ describe('Test GET /v1/user/:userId/courses - get all courses user has role in',
       .expect(HttpCode.Unauthorized);
   });
 
-  it(
-    'should respond with 403 forbidden, if trying to access other users courses (not admin)',
-    async () => {
-      const res: supertest.Response = await request
-        .get('/v1/user/1/courses')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Forbidden);
+  it('should respond with 403 forbidden, if trying to access other users courses (not admin)', async () => {
+    const res: supertest.Response = await request
+      .get('/v1/user/1/courses')
+      .set('Cookie', cookies.userCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Forbidden);
 
-      expect(res.body.errors[0]).toBe('cannot access user\'s courses');
-      expect(res.body.data).not.toBeDefined();
-    });
+    expect(res.body.errors[0]).toBe("cannot access user's courses");
+    expect(res.body.data).not.toBeDefined();
+  });
 
   it('should respond with 404 not found, if non-existing user id', async () => {
     const res: supertest.Response = await request
@@ -178,11 +175,9 @@ describe('Test GET /v1/user/:userId/courses - get all courses user has role in',
     expect(res.body.errors).toBeDefined();
     expect(res.body.data).not.toBeDefined();
   });
-
 });
 
 describe('Test GET /v1/user/:userId - get user information', () => {
-
   it('should respond with correct data of any user when admin user', async () => {
     await testInformation();
   });
@@ -239,18 +234,16 @@ describe('Test GET /v1/user/:userId - get user information', () => {
       .expect(HttpCode.Unauthorized);
   });
 
-  it(
-    'should respond with 403 forbidden, if trying to access other users information (not admin)',
-    async () => {
-      const res: supertest.Response = await request
-        .get('/v1/user/1')
-        .set('Cookie', cookies.userCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Forbidden);
+  it('should respond with 403 forbidden, if trying to access other users information (not admin)', async () => {
+    const res: supertest.Response = await request
+      .get('/v1/user/1')
+      .set('Cookie', cookies.userCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Forbidden);
 
-      expect(res.body.errors[0]).toBe('cannot access user\'s courses');
-      expect(res.body.data).not.toBeDefined();
-    });
+    expect(res.body.errors[0]).toBe("cannot access user's courses");
+    expect(res.body.data).not.toBeDefined();
+  });
 
   it('should respond with 404 not found, if non-existing user id', async () => {
     const res: supertest.Response = await request
@@ -262,5 +255,4 @@ describe('Test GET /v1/user/:userId - get user information', () => {
     expect(res.body.errors).toBeDefined();
     expect(res.body.data).not.toBeDefined();
   });
-
 });

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { OAS3Definition } from 'swagger-jsdoc';
+import {OAS3Definition} from 'swagger-jsdoc';
 
 /*
  * This file is used as a base definition for the Swagger compilation in
@@ -18,7 +18,7 @@ export const definition: OAS3Definition = {
     termsOfService: '',
     license: {
       name: 'Expat (MIT)',
-      url: 'https://github.com/aalto-grades/base-repository/blob/main/LICENSE'
-    }
-  }
+      url: 'https://github.com/aalto-grades/base-repository/blob/main/LICENSE',
+    },
+  },
 };

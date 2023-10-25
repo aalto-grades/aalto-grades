@@ -2,33 +2,39 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseInstanceData, GradingScale, HttpCode, Language } from 'aalto-grades-common/types';
-import axios, { AxiosResponse } from 'axios';
-import { Request, Response } from 'express';
-import { Op } from 'sequelize';
+import {
+  CourseInstanceData,
+  GradingScale,
+  HttpCode,
+  Language,
+} from 'aalto-grades-common/types';
+import axios, {AxiosResponse} from 'axios';
+import {Request, Response} from 'express';
+import {Op} from 'sequelize';
 
-import { AXIOS_TIMEOUT } from '../configs/constants';
-import { SISU_API_KEY, SISU_API_URL } from '../configs/environment';
+import {AXIOS_TIMEOUT} from '../configs/constants';
+import {SISU_API_KEY, SISU_API_URL} from '../configs/environment';
 
 import CourseInstance from '../database/models/courseInstance';
 
-import { ApiError, SisuCourseInstance } from '../types';
+import {ApiError, SisuCourseInstance} from '../types';
 
 function parseSisuGradingScale(gradingScale: string): GradingScale | undefined {
   switch (gradingScale) {
-  case '0-5':
-    return GradingScale.Numerical;
-  case 'sis-hyl-hyv': // TODO: Is this correct?
-    return GradingScale.PassFail;
-  case 'toinen-kotim':
-    return GradingScale.SecondNationalLanguage;
-  default:
-    throw new Error(`unknown grading scale from Sisu: ${gradingScale}`);
+    case '0-5':
+      return GradingScale.Numerical;
+    case 'sis-hyl-hyv': // TODO: Is this correct?
+      return GradingScale.PassFail;
+    case 'toinen-kotim':
+      return GradingScale.SecondNationalLanguage;
+    default:
+      throw new Error(`unknown grading scale from Sisu: ${gradingScale}`);
   }
 }
 
 function parseSisuCourseInstance(
-  instance: SisuCourseInstance, takenIds: Array<string>
+  instance: SisuCourseInstance,
+  takenIds: Array<string>
 ): CourseInstanceData {
   return {
     sisuInstanceInUse: takenIds.includes(instance.id),
@@ -40,30 +46,34 @@ function parseSisuCourseInstance(
       courseCode: instance.code,
       minCredits: instance.credits.min,
       maxCredits: instance.credits.max,
-      gradingScale: parseSisuGradingScale(instance.summary.gradingScale.fi) as GradingScale,
-      languageOfInstruction: instance.summary.languageOfInstruction.fi.toUpperCase() as Language,
-      teachersInCharge: instance.summary.teacherInCharge.map(
-        (name: string) => {
-          return {
-            name: name
-          };
-        }
-      ),
+      gradingScale: parseSisuGradingScale(
+        instance.summary.gradingScale.fi
+      ) as GradingScale,
+      languageOfInstruction:
+        instance.summary.languageOfInstruction.fi.toUpperCase() as Language,
+      teachersInCharge: instance.summary.teacherInCharge.map((name: string) => {
+        return {
+          name: name,
+        };
+      }),
       department: {
         en: instance.organizationName.en,
         fi: instance.organizationName.fi,
-        sv: instance.organizationName.sv
+        sv: instance.organizationName.sv,
       },
       name: {
         en: instance.name.en,
         fi: instance.name.fi,
-        sv: instance.name.sv
-      }
-    }
+        sv: instance.name.sv,
+      },
+    },
   };
 }
 
-export async function fetchCourseInstanceFromSisu(req: Request, res: Response): Promise<void> {
+export async function fetchCourseInstanceFromSisu(
+  req: Request,
+  res: Response
+): Promise<void> {
   // Instance ID here is a Sisu course instance ID (e.g., 'aalto-CUR-163498-3084205'),
   // not a course code.
   const sisuCourseInstanceId: string = String(req.params.sisuCourseInstanceId);
@@ -75,8 +85,8 @@ export async function fetchCourseInstanceFromSisu(req: Request, res: Response): 
         return status >= 200 && status < 500;
       },
       params: {
-        USER_KEY: SISU_API_KEY
-      }
+        USER_KEY: SISU_API_KEY,
+      },
     }
   );
 
@@ -89,8 +99,8 @@ export async function fetchCourseInstanceFromSisu(req: Request, res: Response): 
 
   const isTaken: CourseInstance | null = await CourseInstance.findOne({
     where: {
-      sisuCourseInstanceId: courseInstanceFromSisu.data.id
-    }
+      sisuCourseInstanceId: courseInstanceFromSisu.data.id,
+    },
   });
 
   const instance: CourseInstanceData = parseSisuCourseInstance(
@@ -99,11 +109,14 @@ export async function fetchCourseInstanceFromSisu(req: Request, res: Response): 
   );
 
   res.status(HttpCode.Ok).send({
-    data: instance
+    data: instance,
   });
 }
 
-export async function fetchAllCourseInstancesFromSisu(req: Request, res: Response): Promise<void> {
+export async function fetchAllCourseInstancesFromSisu(
+  req: Request,
+  res: Response
+): Promise<void> {
   const courseCode: string = String(req.params.courseCode);
   let takenIds: Array<string> = [];
   const courseInstancesFromSisu: AxiosResponse = await axios.get(
@@ -115,8 +128,8 @@ export async function fetchAllCourseInstancesFromSisu(req: Request, res: Respons
       },
       params: {
         code: courseCode,
-        USER_KEY: SISU_API_KEY
-      }
+        USER_KEY: SISU_API_KEY,
+      },
     }
   );
 
@@ -127,25 +140,29 @@ export async function fetchAllCourseInstancesFromSisu(req: Request, res: Respons
     );
   }
 
-  const takenInstances: Array<CourseInstance> | null = await CourseInstance.findAll({
-    where: {
-      sisuCourseInstanceId: {
-        [Op.in]: courseInstancesFromSisu.data.map(
-          (instance: SisuCourseInstance) => instance.id
-        )
-      }
-    }
-  });
+  const takenInstances: Array<CourseInstance> | null =
+    await CourseInstance.findAll({
+      where: {
+        sisuCourseInstanceId: {
+          [Op.in]: courseInstancesFromSisu.data.map(
+            (instance: SisuCourseInstance) => instance.id
+          ),
+        },
+      },
+    });
 
   if (takenInstances) {
-    takenIds = takenInstances.map((instance: CourseInstance) => instance.sisuCourseInstanceId);
+    takenIds = takenInstances.map(
+      (instance: CourseInstance) => instance.sisuCourseInstanceId
+    );
   }
 
-  const parsedInstances: Array<CourseInstanceData> = courseInstancesFromSisu.data.map(
-    (instance: SisuCourseInstance) => parseSisuCourseInstance(instance, takenIds)
-  );
+  const parsedInstances: Array<CourseInstanceData> =
+    courseInstancesFromSisu.data.map((instance: SisuCourseInstance) =>
+      parseSisuCourseInstance(instance, takenIds)
+    );
 
   res.status(HttpCode.Ok).send({
-    data: parsedInstances
+    data: parsedInstances,
   });
 }

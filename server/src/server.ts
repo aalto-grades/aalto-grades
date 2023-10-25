@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { PORT } from './configs/environment';
+import {PORT} from './configs/environment';
 
-import { app } from './app';
+import {app} from './app';
 import logger from './configs/winston';
-import { connectToDatabase } from './database/index';
+import {connectToDatabase} from './database/index';
 
 app.listen(PORT, async () => {
   try {

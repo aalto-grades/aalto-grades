@@ -2,14 +2,20 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseData } from 'aalto-grades-common/types';
+import {CourseData} from 'aalto-grades-common/types';
 import axios from './axios';
 import {
-  QueryClient, useMutation, UseMutationOptions, UseMutationResult,
-  useQuery, useQueryClient, UseQueryOptions, UseQueryResult
+  QueryClient,
+  useMutation,
+  UseMutationOptions,
+  UseMutationResult,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+  UseQueryResult,
 } from '@tanstack/react-query';
 
-import { Numeric } from '../../types';
+import {Numeric} from '../../types';
 
 export function useGetCourse(
   courseId: Numeric,
@@ -17,10 +23,8 @@ export function useGetCourse(
 ): UseQueryResult<CourseData> {
   return useQuery({
     queryKey: ['course', courseId],
-    queryFn: async () => (
-      await axios.get(`/v1/courses/${courseId}`)
-    ).data.data,
-    ...options
+    queryFn: async () => (await axios.get(`/v1/courses/${courseId}`)).data.data,
+    ...options,
   });
 }
 
@@ -29,16 +33,12 @@ export function useGetAllCourses(
 ): UseQueryResult<Array<CourseData>> {
   return useQuery({
     queryKey: ['all-courses'],
-    queryFn: async () => (
-      await axios.get('/v1/courses')
-    ).data.data,
-    ...options
+    queryFn: async () => (await axios.get('/v1/courses')).data.data,
+    ...options,
   });
 }
 
-export type UseAddCourseResult = UseMutationResult<
-  number, unknown, CourseData
->;
+export type UseAddCourseResult = UseMutationResult<number, unknown, CourseData>;
 
 export function useAddCourse(
   options?: UseMutationOptions<number, unknown, CourseData>
@@ -46,24 +46,25 @@ export function useAddCourse(
   const queryClient: QueryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (course: CourseData) => (
-      await axios.post('/v1/courses', course)
-    ).data.data,
+    mutationFn: async (course: CourseData) =>
+      (await axios.post('/v1/courses', course)).data.data,
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['all-courses'] });
+      queryClient.invalidateQueries({queryKey: ['all-courses']});
     },
-    ...options
+    ...options,
   });
 }
 
 interface EditCourseVars {
-  courseId: Numeric,
-  course: CourseData
+  courseId: Numeric;
+  course: CourseData;
 }
 
 export type UseEditCourseResult = UseMutationResult<
-  CourseData, unknown, EditCourseVars
+  CourseData,
+  unknown,
+  EditCourseVars
 >;
 
 export function useEditCourse(
@@ -72,13 +73,12 @@ export function useEditCourse(
   const queryClient: QueryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: EditCourseVars) => (
-      await axios.put(`/v1/courses/${vars.courseId}`, vars.course)
-    ).data.data,
+    mutationFn: async (vars: EditCourseVars) =>
+      (await axios.put(`/v1/courses/${vars.courseId}`, vars.course)).data.data,
 
     onSuccess: (_data: CourseData, vars: EditCourseVars) => {
-      queryClient.invalidateQueries({ queryKey: ['course', vars.courseId] });
+      queryClient.invalidateQueries({queryKey: ['course', vars.courseId]});
     },
-    ...options
+    ...options,
   });
 }

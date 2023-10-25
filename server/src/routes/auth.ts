@@ -2,30 +2,31 @@
 //
 // SPDX-License-Identifier: MIT
 
-import express, { Router } from 'express';
+import express, {Router} from 'express';
 import passport from 'passport';
 
-import { authLogin, authLogout, authSelfInfo, authSignup } from '../controllers/auth';
-import { controllerDispatcher } from '../middleware/errorHandler';
+import {
+  authLogin,
+  authLogout,
+  authSelfInfo,
+  authSignup,
+} from '../controllers/auth';
+import {controllerDispatcher} from '../middleware/errorHandler';
 
 export const router: Router = Router();
 
 router.get(
   '/v1/auth/self-info',
-  passport.authenticate('jwt', { session: false }),
+  passport.authenticate('jwt', {session: false}),
   express.json(),
   controllerDispatcher(authSelfInfo)
 );
 
-router.post(
-  '/v1/auth/login',
-  express.json(),
-  controllerDispatcher(authLogin)
-);
+router.post('/v1/auth/login', express.json(), controllerDispatcher(authLogin));
 
 router.post(
   '/v1/auth/logout',
-  passport.authenticate('jwt', { session: false }),
+  passport.authenticate('jwt', {session: false}),
   express.json(),
   controllerDispatcher(authLogout)
 );

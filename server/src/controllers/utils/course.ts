@@ -2,14 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpCode } from 'aalto-grades-common/types';
+import {HttpCode} from 'aalto-grades-common/types';
 
 import Course from '../../database/models/course';
 import CourseTranslation from '../../database/models/courseTranslation';
 import User from '../../database/models/user';
 
-import { CourseData, Language } from 'aalto-grades-common/types';
-import { ApiError, CourseFull } from '../../types';
+import {CourseData, Language} from 'aalto-grades-common/types';
+import {ApiError, CourseFull} from '../../types';
 
 /**
  * Finds a course by its ID.
@@ -19,7 +19,10 @@ import { ApiError, CourseFull } from '../../types';
  * @throws {ApiError} - If the course is not found, it throws an error with a message
  * indicating the missing course with the specific ID.
  */
-export async function findCourseById(courseId: number, errorCode: HttpCode): Promise<Course> {
+export async function findCourseById(
+  courseId: number,
+  errorCode: HttpCode
+): Promise<Course> {
   const course: Course | null = await Course.findByPk(courseId);
   if (!course) {
     throw new ApiError(`course with ID ${courseId} not found`, errorCode);
@@ -42,17 +45,16 @@ export async function findCourseFullById(
   courseId: number,
   errorCode: HttpCode
 ): Promise<CourseFull> {
-
-  const course: CourseFull | null = await Course.findByPk(courseId, {
+  const course: CourseFull | null = (await Course.findByPk(courseId, {
     include: [
       {
-        model: CourseTranslation
+        model: CourseTranslation,
       },
       {
-        model: User
-      }
-    ]
-  }) as CourseFull;
+        model: User,
+      },
+    ],
+  })) as CourseFull;
 
   if (!course) {
     throw new ApiError(`course with ID ${courseId} not found`, errorCode);
@@ -73,29 +75,29 @@ export function parseCourseFull(course: CourseFull): CourseData {
     department: {
       en: '',
       fi: '',
-      sv: ''
+      sv: '',
     },
     name: {
       en: '',
       fi: '',
-      sv: ''
-    }
+      sv: '',
+    },
   };
 
   course.CourseTranslations.forEach((translation: CourseTranslation) => {
     switch (translation.language) {
-    case Language.English:
-      courseData.department.en = translation.department;
-      courseData.name.en = translation.courseName;
-      break;
-    case Language.Finnish:
-      courseData.department.fi = translation.department;
-      courseData.name.fi = translation.courseName;
-      break;
-    case Language.Swedish:
-      courseData.department.sv = translation.department;
-      courseData.name.sv = translation.courseName;
-      break;
+      case Language.English:
+        courseData.department.en = translation.department;
+        courseData.name.en = translation.courseName;
+        break;
+      case Language.Finnish:
+        courseData.department.fi = translation.department;
+        courseData.name.fi = translation.courseName;
+        break;
+      case Language.Swedish:
+        courseData.department.sv = translation.department;
+        courseData.name.sv = translation.courseName;
+        break;
     }
   });
 
@@ -103,7 +105,7 @@ export function parseCourseFull(course: CourseFull): CourseData {
     courseData.teachersInCharge.push({
       id: teacher.id,
       name: teacher.name,
-      email: teacher.email
+      email: teacher.email,
     });
   });
 

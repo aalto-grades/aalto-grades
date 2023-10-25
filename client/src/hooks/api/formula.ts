@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Formula, FormulaData } from 'aalto-grades-common/types';
+import {Formula, FormulaData} from 'aalto-grades-common/types';
 import axios from './axios';
-import { useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
+import {useQuery, UseQueryOptions, UseQueryResult} from '@tanstack/react-query';
 
 export function useGetFormula(
   formulaId: Formula,
@@ -12,10 +12,9 @@ export function useGetFormula(
 ): UseQueryResult<FormulaData> {
   return useQuery({
     queryKey: ['formula', formulaId],
-    queryFn: async () => (
-      await axios.get(`/v1/formulas/${formulaId}`)
-    ).data.data,
-    ...options
+    queryFn: async () =>
+      (await axios.get(`/v1/formulas/${formulaId}`)).data.data,
+    ...options,
   });
 }
 
@@ -24,9 +23,7 @@ export function useGetAllFormulas(
 ): UseQueryResult<Array<FormulaData>> {
   return useQuery({
     queryKey: ['all-formulas'],
-    queryFn: async () => (
-      await axios.get('/v1/formulas')
-    ).data.data,
-    ...options
+    queryFn: async () => (await axios.get('/v1/formulas')).data.data,
+    ...options,
   });
 }
