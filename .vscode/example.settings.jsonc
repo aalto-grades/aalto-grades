@@ -14,7 +14,7 @@
             // Turning off the squiggles for prettier since is AutoFixed anyway
             // Rules is still enforced, if you need to debug a prettier error you can turn it on
             "rule": "prettier/prettier",
-            "severity": "off" //You can change it to warn or info 
+            "severity": "off" //You can change it to warn or info
         }
     ]
 }
