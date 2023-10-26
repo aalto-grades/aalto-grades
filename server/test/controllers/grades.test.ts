@@ -1718,6 +1718,20 @@ describe(
       }
     );
 
+    it(
+      'should throw error when grade calulation exceeds max grade',
+      async () => {
+        res = await request
+          .post('/v1/courses/1/assessment-models/1/grades/calculate')
+          .send({
+            studentNumbers: ['352772']
+          })
+          .set('Cookie', cookies.adminCookie);
+
+        checkErrorRes(['A calculated grade exceeds the max grade of attainment.'], HttpCode.Conflict)
+      }
+    );
+
     it('should not consider expired grades', async () => {
       async function checkGradeAmountByGradeValue(
         attainmentId: number, grade: number, expectedAmount: number
@@ -1843,6 +1857,23 @@ describe(
 
         checkErrorRes(['Expected grade type integer but received float.'], HttpCode.BadRequest);
       });
+
+    it(
+      'should respond with 400 bad request, if grade is larger than max grade',
+      async () => {
+        res = await request
+          .put('/v1/courses/1/assessment-models/1/grades/2')
+          .send({
+            grade: 9999,
+            status: 'PASS',
+            date: '2022-12-24',
+            expiryDate: '2023-12-24',
+            comment: 'testing'
+          })
+          .set('Cookie', cookies.adminCookie);
+
+        checkErrorRes(['Grade exceeds max grade of attainment.'], HttpCode.BadRequest);
+    });
 
     it('should respond with 401 unauthorized, if not logged in', async () => {
       await request
