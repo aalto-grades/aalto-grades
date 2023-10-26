@@ -1350,6 +1350,9 @@ export async function editUserGrade(req: Request, res: Response): Promise<void> 
     if (attainment.gradeType === GradeType.Integer && !Number.isInteger(grade)) {
       throw new ApiError('Expected grade type integer but received float.', HttpCode.BadRequest);
     }
+    if (attainment.maxGrade < grade) {
+      throw new ApiError(`Grade exceeds max grade of ${attainment.maxGrade}`, HttpCode.BadRequest);
+    }
   }
 
   await gradeData.set({
