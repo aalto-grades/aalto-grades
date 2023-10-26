@@ -1369,12 +1369,12 @@ export async function calculateGrades(
         formulaNode.attainment,
         subGrades
       );
-    
+
     if (calculated.grade > formulaNode.attainment.maxGrade)
-        throw new ApiError(
-          'A calculated grade exceeds the max grade of attainment.',
-          HttpCode.Conflict
-        )
+      throw new ApiError(
+        'A calculated grade exceeds the max grade of attainment.',
+        HttpCode.Conflict
+      );
     if (calculated.grade < formulaNode.attainment.minRequiredGrade)
       calculated.status = Status.Fail;
 
@@ -1458,7 +1458,10 @@ export async function editUserGrade(
       );
     }
     if (attainment.maxGrade < grade) {
-      throw new ApiError('Grade exceeds max grade of attainment.', HttpCode.BadRequest);
+      throw new ApiError(
+        'Grade exceeds max grade of attainment.',
+        HttpCode.BadRequest
+      );
     }
   }
 
