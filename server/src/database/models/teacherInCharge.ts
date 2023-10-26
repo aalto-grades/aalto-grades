@@ -3,10 +3,15 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  CreationOptional, DataTypes, ForeignKey, Model, InferAttributes, InferCreationAttributes
+  CreationOptional,
+  DataTypes,
+  ForeignKey,
+  Model,
+  InferAttributes,
+  InferCreationAttributes,
 } from 'sequelize';
 
-import { sequelize } from '..';
+import {sequelize} from '..';
 import Course from './course';
 import User from './user';
 
@@ -27,23 +32,23 @@ TeacherInCharge.init(
       primaryKey: true,
       references: {
         model: 'user',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     courseId: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       references: {
         model: 'course',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },
   {
     sequelize,
-    tableName: 'teacher_in_charge'
+    tableName: 'teacher_in_charge',
   }
 );
 
@@ -56,5 +61,5 @@ User.belongsToMany(Course, {
 Course.belongsToMany(User, {
   through: TeacherInCharge,
   onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
+  onUpdate: 'CASCADE',
 });

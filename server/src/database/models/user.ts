@@ -3,10 +3,14 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  CreationOptional, DataTypes, Model, InferAttributes, InferCreationAttributes
+  CreationOptional,
+  DataTypes,
+  Model,
+  InferAttributes,
+  InferCreationAttributes,
 } from 'sequelize';
 
-import { sequelize } from '..';
+import {sequelize} from '..';
 
 export default class User extends Model<
   InferAttributes<User>,
@@ -28,23 +32,23 @@ User.init(
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
-      primaryKey: true
+      primaryKey: true,
     },
     studentNumber: {
-      type: new DataTypes.STRING,
+      type: new DataTypes.STRING(),
       unique: true,
       allowNull: true,
-      defaultValue: null
+      defaultValue: null,
     },
     name: {
-      type: new DataTypes.STRING,
+      type: new DataTypes.STRING(),
       allowNull: true,
-      defaultValue: null
+      defaultValue: null,
     },
     role: {
       type: DataTypes.ENUM('USER', 'ADMIN'),
       allowNull: false,
-      defaultValue: 'USER'
+      defaultValue: 'USER',
     },
     email: {
       type: new DataTypes.STRING(255),
@@ -58,21 +62,21 @@ User.init(
     password: {
       type: new DataTypes.CHAR(255),
       allowNull: true,
-      defaultValue: null
+      defaultValue: null,
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },
   {
     sequelize,
-    tableName: 'user'
+    tableName: 'user',
   }
 );
 
 User.findByEmail = async function (email: string): Promise<User | null> {
   return await User.findOne({
     where: {
-      email
-    }
+      email,
+    },
   });
 };

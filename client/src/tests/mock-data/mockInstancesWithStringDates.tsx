@@ -2,7 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseInstanceData, GradingScale, Language, Period } from 'aalto-grades-common/types';
+import {
+  CourseInstanceData,
+  GradingScale,
+  Language,
+  Period,
+} from 'aalto-grades-common/types';
 
 export const mockInstances: Array<CourseInstanceData> = [
   {
@@ -22,12 +27,12 @@ export const mockInstances: Array<CourseInstanceData> = [
       teachersInCharge: [
         {
           id: 10,
-          name: 'Elisa Mekler'
+          name: 'Elisa Mekler',
         },
         {
           id: 11,
-          name: 'David McGookin'
-        }
+          name: 'David McGookin',
+        },
       ],
       department: {
         en: 'Department of computer science',
@@ -38,8 +43,8 @@ export const mockInstances: Array<CourseInstanceData> = [
         en: 'Human-Computer Interaction',
         fi: 'Human-Computer Interaction',
         sv: 'Human-Computer Interaction',
-      }
-    }
+      },
+    },
   },
   {
     id: 2,
@@ -58,8 +63,8 @@ export const mockInstances: Array<CourseInstanceData> = [
       teachersInCharge: [
         {
           id: 10,
-          name: 'Elisa Mekler'
-        }
+          name: 'Elisa Mekler',
+        },
       ],
       department: {
         en: 'Department of computer science',
@@ -70,8 +75,8 @@ export const mockInstances: Array<CourseInstanceData> = [
         en: 'Human-Computer Interaction',
         fi: 'Human-Computer Interaction',
         sv: 'Human-Computer Interaction',
-      }
-    }
+      },
+    },
   },
   {
     id: 3,
@@ -90,8 +95,8 @@ export const mockInstances: Array<CourseInstanceData> = [
       teachersInCharge: [
         {
           id: 10,
-          name: 'Elisa Mekler'
-        }
+          name: 'Elisa Mekler',
+        },
       ],
       department: {
         en: 'Department of computer science',
@@ -102,8 +107,8 @@ export const mockInstances: Array<CourseInstanceData> = [
         en: 'Human-Computer Interaction',
         fi: 'Human-Computer Interaction',
         sv: 'Human-Computer Interaction',
-      }
-    }
+      },
+    },
   },
   {
     id: 4,
@@ -122,8 +127,8 @@ export const mockInstances: Array<CourseInstanceData> = [
       teachersInCharge: [
         {
           id: 10,
-          name: 'Elisa Mekler'
-        }
+          name: 'Elisa Mekler',
+        },
       ],
       department: {
         en: 'Department of computer science',
@@ -134,8 +139,8 @@ export const mockInstances: Array<CourseInstanceData> = [
         en: 'Human-Computer Interaction',
         fi: 'Human-Computer Interaction',
         sv: 'Human-Computer Interaction',
-      }
-    }
+      },
+    },
   },
   {
     id: 5,
@@ -154,19 +159,19 @@ export const mockInstances: Array<CourseInstanceData> = [
       teachersInCharge: [
         {
           id: 12,
-          name: 'Kerttu Maaria Pollari-Malmi'
-        }
+          name: 'Kerttu Maaria Pollari-Malmi',
+        },
       ],
       department: {
         en: 'Department of Computer Science',
         fi: 'Tietotekniikan laitos',
-        sv: 'Institutionen för datateknik'
+        sv: 'Institutionen för datateknik',
       },
       name: {
         en: 'Databases, Lecture',
         fi: 'Tietokannat, Luento-opetus',
-        sv: 'Databaser, Föreläsning'
-      }
-    }
-  }
+        sv: 'Databaser, Föreläsning',
+      },
+    },
+  },
 ];

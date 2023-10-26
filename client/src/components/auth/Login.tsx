@@ -2,32 +2,39 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { LoginResult } from 'aalto-grades-common/types';
-import { VisibilityOff, Visibility } from '@mui/icons-material';
+import {LoginResult} from 'aalto-grades-common/types';
+import {VisibilityOff, Visibility} from '@mui/icons-material';
 import {
-  Box, Button, Grid, IconButton,
-  InputAdornment, TextField, Tooltip, Typography
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  InputAdornment,
+  TextField,
+  Tooltip,
+  Typography,
 } from '@mui/material';
-import { JSX, SyntheticEvent, useState } from 'react';
-import { NavigateFunction, useNavigate } from 'react-router-dom';
+import {JSX, SyntheticEvent, useState} from 'react';
+import {NavigateFunction, useNavigate} from 'react-router-dom';
 
 import ExternalAuth from './ExternalAuth';
 
-import { useLogIn, UseLogInResult } from '../../hooks/useApi';
+import {useLogIn, UseLogInResult} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import { State } from '../../types';
+import {State} from '../../types';
 
 export default function Login(): JSX.Element {
-
   const navigate: NavigateFunction = useNavigate();
-  const { setAuth }: { setAuth: (auth: LoginResult | null) => void } = useAuth();
+  const {setAuth}: {setAuth: (auth: LoginResult | null) => void} = useAuth();
   const [showPassword, setShowPassword]: State<boolean> = useState(false);
 
   function handleClickShowPassword(): void {
     setShowPassword(!showPassword);
   }
 
-  function handleMouseDownPassword(event: React.MouseEvent<HTMLButtonElement>): void {
+  function handleMouseDownPassword(
+    event: React.MouseEvent<HTMLButtonElement>
+  ): void {
     event.preventDefault();
   }
 
@@ -37,8 +44,8 @@ export default function Login(): JSX.Element {
   const logIn: UseLogInResult = useLogIn({
     onSuccess: (auth: LoginResult | null) => {
       setAuth(auth ?? null);
-      navigate('/', { replace: true });
-    }
+      navigate('/', {replace: true});
+    },
   });
 
   async function handleSubmit(event: SyntheticEvent): Promise<void> {
@@ -46,7 +53,7 @@ export default function Login(): JSX.Element {
 
     logIn.mutate({
       email: email,
-      password: password
+      password: password,
     });
   }
 
@@ -57,72 +64,91 @@ export default function Login(): JSX.Element {
       alignItems="center"
       justifyContent="center"
     >
-      <Typography variant='h2'>
-        Log in to Aalto Grades
-      </Typography>
+      <Typography variant="h2">Log in to Aalto Grades</Typography>
       <ExternalAuth />
-      <Box sx={{ width: 1 / 2, border: 1, borderRadius: '8px', borderColor: 'gray', p: 2 }}>
-        <Typography variant='h3' sx={{ mb: 1 }}>
+      <Box
+        sx={{
+          width: 1 / 2,
+          border: 1,
+          borderRadius: '8px',
+          borderColor: 'gray',
+          p: 2,
+        }}
+      >
+        <Typography variant="h3" sx={{mb: 1}}>
           Local users
         </Typography>
-        <Typography variant='body2' sx={{ mb: 1 }}>
-          If you have been provided with credentials specifically for Aalto Grades, use this login.
+        <Typography variant="body2" sx={{mb: 1}}>
+          If you have been provided with credentials specifically for Aalto
+          Grades, use this login.
         </Typography>
         <form onSubmit={handleSubmit}>
           <TextField
-            type='email'
+            type="email"
             value={email}
-            name='email'
-            label='Email'
+            name="email"
+            label="Email"
             fullWidth
-            onChange={(
-              { target }: { target: EventTarget & (HTMLInputElement | HTMLTextAreaElement) }
-            ): void => setEmail(target.value)}
-            InputLabelProps={{ shrink: true }}
-            margin='normal'
+            onChange={({
+              target,
+            }: {
+              target: EventTarget & (HTMLInputElement | HTMLTextAreaElement);
+            }): void => setEmail(target.value)}
+            InputLabelProps={{shrink: true}}
+            margin="normal"
           />
           <TextField
             type={showPassword ? 'text' : 'password'}
             value={password}
-            name='password'
-            label='Password'
+            name="password"
+            label="Password"
             fullWidth
-            onChange={(
-              { target }: { target: EventTarget & (HTMLInputElement | HTMLTextAreaElement) }
-            ): void => setPassword(target.value)}
-            InputLabelProps={{ shrink: true }}
+            onChange={({
+              target,
+            }: {
+              target: EventTarget & (HTMLInputElement | HTMLTextAreaElement);
+            }): void => setPassword(target.value)}
+            InputLabelProps={{shrink: true}}
             InputProps={{
-              endAdornment:
-              <InputAdornment position="start">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                  edge="end"
-                >
-                  <Tooltip placement='top' title={
-                    showPassword ? 'Click to hide password from view' : 'Click to show password'
-                  }>
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </Tooltip>
-                </IconButton>
-              </InputAdornment>,
+              endAdornment: (
+                <InputAdornment position="start">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end"
+                  >
+                    <Tooltip
+                      placement="top"
+                      title={
+                        showPassword
+                          ? 'Click to hide password from view'
+                          : 'Click to show password'
+                      }
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </Tooltip>
+                  </IconButton>
+                </InputAdornment>
+              ),
             }}
-            margin='normal'
+            margin="normal"
           />
           <Button
-            id='ag_login_btn'
-            variant='contained'
-            type='submit'
+            id="ag_login_btn"
+            variant="contained"
+            type="submit"
             fullWidth
-            sx={{ mt: 1 }}
+            sx={{mt: 1}}
             disabled={email == '' || password == ''}
           >
             log in
           </Button>
         </form>
       </Box>
-      <p>{'Don\'t have an account yet?'} <a href={'/Signup'}>Sign up</a></p>
+      <p>
+        {"Don't have an account yet?"} <a href={'/Signup'}>Sign up</a>
+      </p>
     </Grid>
   );
 }

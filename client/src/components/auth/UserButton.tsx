@@ -4,31 +4,31 @@
 
 import PersonIcon from '@mui/icons-material/Person';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { Button, Box, Menu, MenuItem } from '@mui/material';
-import { JSX, SyntheticEvent, useState } from 'react';
-import { NavigateFunction, useNavigate } from 'react-router-dom';
-import { UseMutationResult } from '@tanstack/react-query';
+import {Button, Box, Menu, MenuItem} from '@mui/material';
+import {JSX, SyntheticEvent, useState} from 'react';
+import {NavigateFunction, useNavigate} from 'react-router-dom';
+import {UseMutationResult} from '@tanstack/react-query';
 
-import { useLogOut } from '../../hooks/useApi';
-import useAuth, { AuthContextType } from '../../hooks/useAuth';
-import { State } from '../../types';
+import {useLogOut} from '../../hooks/useApi';
+import useAuth, {AuthContextType} from '../../hooks/useAuth';
+import {State} from '../../types';
 
 export default function UserButton(): JSX.Element {
-
   const navigate: NavigateFunction = useNavigate();
-  const { auth, setAuth }: AuthContextType = useAuth();
-  const [anchorEl, setAnchorEl]: State<Element | null> = useState<Element | null>(null);
+  const {auth, setAuth}: AuthContextType = useAuth();
+  const [anchorEl, setAnchorEl]: State<Element | null> =
+    useState<Element | null>(null);
   const open: boolean = Boolean(anchorEl);
 
   const logOut: UseMutationResult = useLogOut({
     onSuccess: () => {
       setAuth(null);
-      navigate('/login', { replace: true });
-    }
+      navigate('/login', {replace: true});
+    },
   });
 
   if (!auth?.name) {
-    return (<div data-testid="not-logged-in"></div>);
+    return <div data-testid="not-logged-in"></div>;
   }
 
   return (
@@ -39,9 +39,11 @@ export default function UserButton(): JSX.Element {
         aria-controls={open ? 'basic-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
-        onClick={(event: SyntheticEvent): void => setAnchorEl(event.currentTarget)}
+        onClick={(event: SyntheticEvent): void =>
+          setAnchorEl(event.currentTarget)
+        }
       >
-        <Box sx={{ marginRight: 1, marginTop: 1 }}>
+        <Box sx={{marginRight: 1, marginTop: 1}}>
           <PersonIcon color="inherit" />
         </Box>
         {auth.name}
@@ -56,11 +58,7 @@ export default function UserButton(): JSX.Element {
           'aria-labelledby': 'basic-button',
         }}
       >
-        <MenuItem
-          onClick={(): void => logOut.mutate(null)}
-        >
-          Logout
-        </MenuItem>
+        <MenuItem onClick={(): void => logOut.mutate(null)}>Logout</MenuItem>
       </Menu>
     </>
   );

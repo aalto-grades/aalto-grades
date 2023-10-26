@@ -2,38 +2,43 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { StyledComponent } from '@emotion/styled';
+import {StyledComponent} from '@emotion/styled';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Button, Menu, MenuItem } from '@mui/material';
-import { MenuProps } from '@mui/material/Menu';
-import { styled, Theme } from '@mui/material/styles';
-import { JSX, useState, SyntheticEvent } from 'react';
+import {Button, Menu, MenuItem} from '@mui/material';
+import {MenuProps} from '@mui/material/Menu';
+import {styled, Theme} from '@mui/material/styles';
+import {JSX, useState, SyntheticEvent} from 'react';
 
-import { State } from '../../types';
+import {State} from '../../types';
 
 // A styled menu button. When clicked, a dropdown menu appears
-const StyledMenu: StyledComponent<MenuProps> = styled((props: MenuProps): JSX.Element => (
-  <Menu
-    elevation={0}
-    anchorOrigin={{
-      vertical: 'bottom',
-      horizontal: 'right',
-    }}
-    transformOrigin={{
-      vertical: 'top',
-      horizontal: 'right',
-    }}
-    {...props}
-  />
-))(({ theme }: { theme: Theme }) => ({
+const StyledMenu: StyledComponent<MenuProps> = styled(
+  (props: MenuProps): JSX.Element => (
+    <Menu
+      elevation={0}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'right',
+      }}
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      {...props}
+    />
+  )
+)(({theme}: {theme: Theme}) => ({
   '& .MuiPaper-root': {
     borderRadius: 6,
     marginTop: theme.spacing(1),
     minWidth: 180,
     color:
-      theme.palette.mode === 'light' ? 'rgb(55, 65, 81)' : theme.palette.grey[300],
-    boxShadow: 'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px,'
-      + ' rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
+      theme.palette.mode === 'light'
+        ? 'rgb(55, 65, 81)'
+        : theme.palette.grey[300],
+    boxShadow:
+      'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px,' +
+      ' rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
     '& .MuiMenu-list': {
       padding: '4px 0',
     },
@@ -43,22 +48,23 @@ const StyledMenu: StyledComponent<MenuProps> = styled((props: MenuProps): JSX.El
         marginRight: theme.spacing(1.5),
       },
       '&:active': {
-        backgroundColor: theme.palette.primary.main
+        backgroundColor: theme.palette.primary.main,
       },
     },
   },
 }));
 
 export interface MenuButtonOption {
-  description: string,
-  handleClick: () => void
+  description: string;
+  handleClick: () => void;
 }
 
 export default function MenuButton(props: {
-  label: string,
-  options: Array<MenuButtonOption>
+  label: string;
+  options: Array<MenuButtonOption>;
 }): JSX.Element {
-  const [anchorEl, setAnchorEl]: State<Element | null> = useState<Element | null>(null);
+  const [anchorEl, setAnchorEl]: State<Element | null> =
+    useState<Element | null>(null);
   const open: boolean = Boolean(anchorEl);
 
   function handleClick(event: SyntheticEvent): void {
@@ -70,20 +76,19 @@ export default function MenuButton(props: {
   }
 
   function renderOptions(options: Array<MenuButtonOption>): Array<JSX.Element> {
-    return (
-      options.map((option: MenuButtonOption) => (
-        <MenuItem
-          className='ag_menu_btn_option'
-          key={option.description}
-          disableRipple
-          onClick={(): void => {
-            option.handleClick();
-            handleClose();
-          }}>
-          {option.description}
-        </MenuItem>
-      ))
-    );
+    return options.map((option: MenuButtonOption) => (
+      <MenuItem
+        className="ag_menu_btn_option"
+        key={option.description}
+        disableRipple
+        onClick={(): void => {
+          option.handleClick();
+          handleClose();
+        }}
+      >
+        {option.description}
+      </MenuItem>
+    ));
   }
 
   return (

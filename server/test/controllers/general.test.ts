@@ -2,10 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpCode } from 'aalto-grades-common/types';
+import {HttpCode} from 'aalto-grades-common/types';
 import supertest from 'supertest';
 
-import { app } from '../../src/app';
+import {app} from '../../src/app';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 
@@ -18,31 +18,37 @@ function evaluateResponse(res: supertest.Response, errorMessage: string): void {
 }
 
 describe('Test behavior to unknown endpoints', () => {
-
-  it('should respond with 404 not found, if endpoint does not exists or HTTP method not available',
-    async () => {
-      evaluateResponse(await request
+  it('should respond with 404 not found, if endpoint does not exists or HTTP method not available', async () => {
+    evaluateResponse(
+      await request
         .put('/v1/auth/login')
         .set('Content-Type', 'application/json'),
-      'Cannot PUT /v1/auth/login. Please refer to the API documentation at '
-      + 'https://aalto-grades.cs.aalto.fi/api-docs/ for a list of available endpoints.');
+      'Cannot PUT /v1/auth/login. Please refer to the API documentation at ' +
+        'https://aalto-grades.cs.aalto.fi/api-docs/ for a list of available endpoints.'
+    );
 
-      evaluateResponse(await request
+    evaluateResponse(
+      await request
         .get('/v1/course/all')
         .set('Content-Type', 'application/json'),
-      'Cannot GET /v1/course/all. Please refer to the API documentation at '
-      + 'https://aalto-grades.cs.aalto.fi/api-docs/ for a list of available endpoints.');
+      'Cannot GET /v1/course/all. Please refer to the API documentation at ' +
+        'https://aalto-grades.cs.aalto.fi/api-docs/ for a list of available endpoints.'
+    );
 
-      evaluateResponse(await request
+    evaluateResponse(
+      await request
         .post('/v1/sisu/courses/CS-A1110')
         .set('Content-Type', 'application/json'),
-      'Cannot POST /v1/sisu/courses/CS-A1110. Please refer to the API documentation at '
-      + 'https://aalto-grades.cs.aalto.fi/api-docs/ for a list of available endpoints.');
+      'Cannot POST /v1/sisu/courses/CS-A1110. Please refer to the API documentation at ' +
+        'https://aalto-grades.cs.aalto.fi/api-docs/ for a list of available endpoints.'
+    );
 
-      evaluateResponse(await request
+    evaluateResponse(
+      await request
         .delete('/v1/user/1')
         .set('Content-Type', 'application/json'),
-      'Cannot DELETE /v1/user/1. Please refer to the API documentation at '
-      + 'https://aalto-grades.cs.aalto.fi/api-docs/ for a list of available endpoints.');
-    });
+      'Cannot DELETE /v1/user/1. Please refer to the API documentation at ' +
+        'https://aalto-grades.cs.aalto.fi/api-docs/ for a list of available endpoints.'
+    );
+  });
 });

@@ -2,17 +2,22 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseData, HttpCode, SystemRole, UserData } from 'aalto-grades-common/types';
-import { Request, Response } from 'express';
+import {
+  CourseData,
+  HttpCode,
+  SystemRole,
+  UserData,
+} from 'aalto-grades-common/types';
+import {Request, Response} from 'express';
 
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
-import { ApiError, CourseFull, idSchema, JwtClaims } from '../types';
-import { parseCourseFull } from './utils/course';
-import { findUserById } from './utils/user';
+import {ApiError, CourseFull, idSchema, JwtClaims} from '../types';
+import {parseCourseFull} from './utils/course';
+import {findUserById} from './utils/user';
 
 // Sequelize says User is not associated to CourseInstance unless this is here.
 // TODO: Remove if possible.
@@ -27,61 +32,63 @@ require('../database/models/courseInstanceRole');
 async function adminOrOwner(req: Request): Promise<User> {
   const userId: number = Number(req.params.userId);
   const userToken: JwtClaims = req.user as JwtClaims;
-  await idSchema.validate({ id: userId });
+  await idSchema.validate({id: userId});
 
   if (userId !== userToken.id && userToken.role !== SystemRole.Admin) {
-    throw new ApiError('cannot access user\'s courses', HttpCode.Forbidden);
+    throw new ApiError("cannot access user's courses", HttpCode.Forbidden);
   }
 
   // Confirm that user exists and return.
   return await findUserById(userId, HttpCode.NotFound);
 }
 
-export async function getCoursesOfUser(req: Request, res: Response): Promise<void> {
+export async function getCoursesOfUser(
+  req: Request,
+  res: Response
+): Promise<void> {
   const courses: Array<CourseData> = [];
   const user: User = await adminOrOwner(req);
 
-  const inChargeCourses: Array<CourseFull> =
-    await Course.findAll({
-      include: [
-        {
-          model: CourseTranslation
+  const inChargeCourses: Array<CourseFull> = (await Course.findAll({
+    include: [
+      {
+        model: CourseTranslation,
+      },
+      {
+        model: User,
+        where: {
+          id: user.id,
         },
-        {
-          model: User,
-          where: {
-            id: user.id
-          }
-        }
-      ]
-    }) as Array<CourseFull>;
+      },
+    ],
+  })) as Array<CourseFull>;
 
   interface CourseInstanceWithCourseFull extends CourseInstance {
-    Course: CourseFull
+    Course: CourseFull;
   }
 
   const instanceRoleCourses: Array<CourseInstanceWithCourseFull> =
-    await CourseInstance.findAll({
+    (await CourseInstance.findAll({
       include: [
         {
           model: User,
           where: {
-            id: user.id
-          }
+            id: user.id,
+          },
         },
         {
           model: Course,
           include: [
             {
-              model: CourseTranslation
+              model: CourseTranslation,
             },
             {
-              model: User
-            }
-          ]
-        }
-      ]
-    }) as Array<CourseInstanceWithCourseFull>;
+              model: User,
+            },
+          ],
+        },
+      ],
+    })) as Array<CourseInstanceWithCourseFull>;
 
   for (const course of inChargeCourses) {
     courses.push(parseCourseFull(course));
@@ -95,7 +102,7 @@ export async function getCoursesOfUser(req: Request, res: Response): Promise<voi
   }
 
   res.status(HttpCode.Ok).send({
-    data: courses
+    data: courses,
   });
 }
 
@@ -106,10 +113,10 @@ export async function getUserInfo(req: Request, res: Response): Promise<void> {
     id: user.id,
     studentNumber: user.studentNumber,
     name: user.name,
-    email: user.email
+    email: user.email,
   };
 
   res.status(HttpCode.Ok).send({
-    data: userData
+    data: userData,
   });
 }

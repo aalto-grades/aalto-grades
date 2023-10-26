@@ -23,7 +23,8 @@ if ((!SISU_API_KEY || !SISU_API_URL) && NODE_ENV === 'production') {
   );
 }
 
-export const JWT_SECRET: string = process.env.AALTO_GRADES_JWT_SECRET || 'TOP_SECRET';
+export const JWT_SECRET: string =
+  process.env.AALTO_GRADES_JWT_SECRET || 'TOP_SECRET';
 export const FRONTEND_ORIGIN: string =
   process.env.AALTO_GRADES_FRONTEND_CORS_ORIGIN || 'http://localhost:3005';
 

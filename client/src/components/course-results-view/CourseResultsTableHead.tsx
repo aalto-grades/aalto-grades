@@ -2,51 +2,55 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, FinalGrade } from 'aalto-grades-common/types';
+import {AttainmentData, FinalGrade} from 'aalto-grades-common/types';
 import {
-  Box, Checkbox, FormControlLabel, TableCell,
-  TableHead, TableRow, TableSortLabel
+  Box,
+  Checkbox,
+  FormControlLabel,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableSortLabel,
 } from '@mui/material';
-import { visuallyHidden } from '@mui/utils';
-import { JSX, SyntheticEvent } from 'react';
+import {visuallyHidden} from '@mui/utils';
+import {JSX, SyntheticEvent} from 'react';
 
 interface Colum {
-  id: string,
-  name: string
+  id: string;
+  name: string;
 }
 
 export default function CourseResultsTableHead(props: {
-  attainmentList: Array<AttainmentData>,
-  order: 'asc' | 'desc',
-  orderBy: keyof FinalGrade,
-  onRequestSort: (event: SyntheticEvent, property: keyof FinalGrade) => void,
-  handleSelectAll: () => void,
-  allSelected: boolean
+  attainmentList: Array<AttainmentData>;
+  order: 'asc' | 'desc';
+  orderBy: keyof FinalGrade;
+  onRequestSort: (event: SyntheticEvent, property: keyof FinalGrade) => void;
+  handleSelectAll: () => void;
+  allSelected: boolean;
 }): JSX.Element {
-
   const rows: Array<Colum> = [
     {
       id: 'studentNumber',
-      name: 'Student Number'
+      name: 'Student Number',
     },
     {
       id: 'credits',
-      name: 'Credits (ECTS)'
+      name: 'Credits (ECTS)',
     },
     {
       id: 'finalGrade',
-      name: 'Final Grade'
+      name: 'Final Grade',
     },
     {
       id: 'exportedToSisu',
-      name: 'Exported to Sisu'
-    }
+      name: 'Exported to Sisu',
+    },
   ];
 
   for (const attainment of props.attainmentList) {
     rows.push({
       id: String(attainment.id),
-      name: attainment.name
+      name: attainment.name,
     });
   }
 
@@ -59,49 +63,43 @@ export default function CourseResultsTableHead(props: {
   return (
     <TableHead>
       <TableRow>
-        <TableCell
-          key='selectAll'
-          align='left'
-          padding='normal'
-        >
+        <TableCell key="selectAll" align="left" padding="normal">
           <FormControlLabel
             htmlFor="select-all"
             label="Select all"
-            control={(
+            control={
               <Checkbox
                 id="select-all"
                 size="small"
                 onClick={props.handleSelectAll}
                 checked={props.allSelected}
               />
-            )}
+            }
           />
         </TableCell>
-        {
-          rows.map((column: Colum) => (
-            <TableCell
-              key={column.id}
-              align='left'
-              padding='normal'
-              sortDirection={props.orderBy === column.id ? props.order : false}
+        {rows.map((column: Colum) => (
+          <TableCell
+            key={column.id}
+            align="left"
+            padding="normal"
+            sortDirection={props.orderBy === column.id ? props.order : false}
+          >
+            <TableSortLabel
+              active={props.orderBy === column.id}
+              direction={props.orderBy === column.id ? props.order : 'asc'}
+              onClick={createSortHandler(column.id as keyof FinalGrade)}
             >
-              <TableSortLabel
-                active={props.orderBy === column.id}
-                direction={props.orderBy === column.id ? props.order : 'asc'}
-                onClick={createSortHandler(column.id as keyof FinalGrade)}
-              >
-                {column.name}
-                {
-                  props.orderBy === column.id ? (
-                    <Box component="span" sx={visuallyHidden}>
-                      {props.order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                    </Box>
-                  ) : null
-                }
-              </TableSortLabel>
-            </TableCell>
-          ))
-        }
+              {column.name}
+              {props.orderBy === column.id ? (
+                <Box component="span" sx={visuallyHidden}>
+                  {props.order === 'desc'
+                    ? 'sorted descending'
+                    : 'sorted ascending'}
+                </Box>
+              ) : null}
+            </TableSortLabel>
+          </TableCell>
+        ))}
       </TableRow>
     </TableHead>
   );

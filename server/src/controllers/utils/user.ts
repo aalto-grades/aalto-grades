@@ -2,13 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpCode } from 'aalto-grades-common/types';
+import {HttpCode} from 'aalto-grades-common/types';
 
 import User from '../../database/models/user';
 import TeacherInCharge from '../../database/models/teacherInCharge';
 
-import { SystemRole } from 'aalto-grades-common/types';
-import { ApiError, JwtClaims } from '../../types';
+import {SystemRole} from 'aalto-grades-common/types';
+import {ApiError, JwtClaims} from '../../types';
 
 /**
  * Finds a user by its ID.
@@ -18,7 +18,10 @@ import { ApiError, JwtClaims } from '../../types';
  * @throws {ApiError} - If the user is not found, it throws an error with a message
  * indicating the missing user with the specific ID.
  */
-export async function findUserById(userId: number, errorCode: HttpCode): Promise<User> {
+export async function findUserById(
+  userId: number,
+  errorCode: HttpCode
+): Promise<User> {
   const user: User | null = await User.findByPk(userId);
   if (!user) {
     throw new ApiError(`user with ID ${userId} not found`, errorCode);
@@ -36,9 +39,10 @@ export async function findUserById(userId: number, errorCode: HttpCode): Promise
  * @throws {ApiError} - If the user is either admin or teacher in charge.
  */
 export async function isTeacherInChargeOrAdmin(
-  user: JwtClaims, courseId: number, errorCode: HttpCode
+  user: JwtClaims,
+  courseId: number,
+  errorCode: HttpCode
 ): Promise<void> {
-
   if (user.role === SystemRole.Admin) {
     return;
   }
@@ -46,11 +50,14 @@ export async function isTeacherInChargeOrAdmin(
   const teacher: TeacherInCharge | null = await TeacherInCharge.findOne({
     where: {
       userId: user.id,
-      courseId
-    }
+      courseId,
+    },
   });
 
   if (!teacher) {
-    throw new ApiError(`user with ID ${user.id} is not allowed not execute the action`, errorCode);
+    throw new ApiError(
+      `user with ID ${user.id} is not allowed not execute the action`,
+      errorCode
+    );
   }
 }

@@ -9,7 +9,7 @@
 
 import '@testing-library/jest-dom';
 
-import { server } from './tests/mock-data/server';
+import {server} from './tests/mock-data/server';
 
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());

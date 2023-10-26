@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { QueryInterface, Op } from 'sequelize';
+import {QueryInterface, Op} from 'sequelize';
 
-import { sequelize } from '..';
+import {sequelize} from '..';
 import logger from '../../configs/winston';
 
 export default {
@@ -15,9 +15,9 @@ export default {
         type: 'check',
         where: {
           date: {
-            [Op.lte]: sequelize.col('expiry_date')
-          }
-        }
+            [Op.lte]: sequelize.col('expiry_date'),
+          },
+        },
       });
     } catch (error) {
       logger.error(error);
