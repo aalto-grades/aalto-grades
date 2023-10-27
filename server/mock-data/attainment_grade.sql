@@ -170,4 +170,6 @@ INSERT INTO public.attainment_grade (user_id, attainment_id, grader_id, grade, m
 (1, 289, 2, 0, true, 'FAIL', '2023-05-09', NULL, NOW(), NOW(), NULL, NULL), -- Unexpired
 (1, 289, 2, 0, true, 'FAIL', '2023-05-06', NULL, NOW(), NOW(), NULL, NULL), -- Unexpired
 (1, 289, 2, 5, true, 'PASS', '2023-05-05', NULL, NOW(), NOW(), NULL, NULL), -- Expired
-(1, 289, 2, 5, true, 'PASS', '2023-05-01', NULL, NOW(), NOW(), NULL, NULL); -- Expired
+(1, 289, 2, 5, true, 'PASS', '2023-05-01', NULL, NOW(), NOW(), NULL, NULL), -- Expired
+-- Test exceeding max grade
+(1, 5, 1, 100, true, 'PASS', '2022-12-20', '2023-04-23', NOW(), NOW(), NULL, NULL);
