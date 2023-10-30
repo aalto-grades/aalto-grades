@@ -36,7 +36,7 @@ jobs:
 
   test_and_lint_server:
     name: Test and lint server
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     env:
       POSTGRES_PASSWORD: postgres
       NODE_ENV: test
