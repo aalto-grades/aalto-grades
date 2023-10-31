@@ -81,3 +81,4 @@ export function getAllFormulasData(): Array<FormulaData> {
 // Call registerFormula in all formula definition files.
 require('./manual');
 require('./weightedAverage');
+require('./riseBonus')
