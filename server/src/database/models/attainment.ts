@@ -76,7 +76,7 @@ Attainment.init(
       allowNull: false,
     },
     formula: {
-      type: DataTypes.ENUM(Formula.Manual, Formula.WeightedAverage),
+      type: DataTypes.ENUM(...Object.values(Formula)),
       allowNull: false,
       defaultValue: Formula.Manual,
     },

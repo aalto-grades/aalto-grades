@@ -5,6 +5,7 @@
 export enum Formula {
   Manual = 'MANUAL',
   WeightedAverage = 'WEIGHTED_AVERAGE',
+  RiseBonus = 'RISE_BONUS'
 }
 
 export interface FormulaData {
