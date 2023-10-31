@@ -115,6 +115,7 @@ registerFormula(
   defaultChildParams,
   yup
     .object({
+      minRequiredGrade: yup.number().min(0).notRequired(),
       children: yup
         .array()
         .min(1)
