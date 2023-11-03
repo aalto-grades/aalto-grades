@@ -6,6 +6,8 @@ import {
   AttainmentData,
   HttpCode,
   ParamsObject,
+  Param,
+  InputField,
 } from 'aalto-grades-common/types';
 import * as yup from 'yup';
 
@@ -13,7 +15,9 @@ import {registerFormula} from '.';
 import {Formula, Status} from 'aalto-grades-common/types';
 import {ApiError, CalculationResult} from '../types';
 
-const childParams: Array<string> = ['weight'];
+const childParams: Array<Param> = [
+  {name: 'weight', inputField: InputField.Text},
+];
 const params: Array<string> = [];
 
 const defaultChildParams: ChildParams = {

@@ -8,6 +8,7 @@ import {
   ChildParamsObject,
   Formula,
   FormulaData,
+  Param
 } from 'aalto-grades-common/types';
 import {FormulaFunction, FormulaImplementation} from '../types';
 
@@ -34,7 +35,7 @@ export function registerFormula(
   codeSnippet: string,
   name: string,
   params: Array<string>,
-  childParams: Array<string>,
+  childParams: Array<Param>,
   defaultChildParams: ChildParamsObject,
   paramSchema: yup.AnyObjectSchema
 ): void {

@@ -5,7 +5,10 @@
 import {
   AttainmentData,
   HttpCode,
+  Param,
   ParamsObject,
+  InputField,
+  ListParam,
 } from 'aalto-grades-common/types';
 import * as yup from 'yup';
 
@@ -13,22 +16,26 @@ import {registerFormula} from '.';
 import {Formula, Status} from 'aalto-grades-common/types';
 import {ApiError, CalculationResult} from '../types';
 
-const childParams: Array<string> = ['grading', 'riseGrade'];
-const params: Array<string> = [];
-
 enum Grading {
-  Main = 1,
-  Rise = 2,
+  Base = 'BASE',
+  Bonus = 'BONUS',
 }
 
+const childParams: Array<Param | ListParam> = [
+  {name: 'gradingType', inputField: InputField.List, options: ['Base', 'Bonus'], optionsMap: {Base: 'BASE', Bonus: 'BONUS'}},
+  {name: 'minBonusGrade', inputField: InputField.Text, requires: {param: 'gradingType', toBe: 'BONUS'}},
+];
+const params: Array<string> = [];
+
+
 const defaultChildParams: ChildParams = {
-  grading: Grading.Rise,
-  riseGrade: 2,
+  gradingType: Grading.Base,
+  minBonusGrade: 2,
 };
 
 interface ChildParams {
-  grading: Grading;
-  riseGrade?: number;
+  gradingType: Grading;
+  minBonusGrade?: number;
 }
 
 type Params = ParamsObject<ChildParams>;
@@ -53,16 +60,15 @@ function calculateRiseBonus(
 
   for (const subGrade of subGrades) {
     if (subGrade.status !== Status.Pass) status = Status.Fail;
-
     const gradingType: Grading | undefined = nameToChildParams.get(
       subGrade.attainment.name
-    )?.grading;
-    const riseGrade: number | undefined = nameToChildParams.get(
+    )?.gradingType;
+    const bonusGrade: number | undefined = nameToChildParams.get(
       subGrade.attainment.name
-    )?.riseGrade;
-    if (gradingType && riseGrade && gradingType === Grading.Rise) {
-      bonus = subGrade.grade > riseGrade ? bonus + 1 : bonus;
-    } else if (gradingType && gradingType === Grading.Main) {
+    )?.minBonusGrade;
+    if (gradingType && bonusGrade && gradingType === Grading.Bonus) {
+      bonus = subGrade.grade >= bonusGrade ? bonus + 1 : bonus;
+    } else if (gradingType && gradingType === Grading.Base) {
       if (mainFound) {
         throw new ApiError(
           `Multiple main grades for attainment ${subGrade.attainment.name}`,
@@ -78,7 +84,9 @@ function calculateRiseBonus(
       );
     }
   }
-
+  if (status === Status.Pass) {
+    grade = Math.min(attainment.maxGrade, grade + bonus);
+  }
   return {
     attainment: attainment,
     grade: grade,
@@ -107,11 +115,11 @@ registerFormula(
             yup.string(),
             yup
               .object({
-                grading: yup
+                gradingType: yup
                   .mixed<Grading>()
-                  .oneOf(Object.values(Grading) as number[])
+                  .oneOf(Object.values(Grading))
                   .required(),
-                riseGrade: yup.number(),
+                minBonusGrade: yup.number(),
               })
               .noUnknown()
               .strict(),

@@ -12,7 +12,7 @@ export interface FormulaData {
   id: Formula;
   name: string;
   params: Array<string>;
-  childParams: Array<string>;
+  childParams: Array<Param>;
   codeSnippet: string;
 }
 
@@ -23,4 +23,22 @@ export interface ParamsObject<T = ChildParamsObject> {
   children?: Array<[string, T]>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
+}
+
+export enum InputField {
+  Text = 'TEXT',
+  List = 'LIST'
+}
+
+export interface Param {
+  name: string;
+  inputField?: InputField;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  requires?: {param: string, toBe: any}
+}
+
+export interface ListParam extends Param {
+  options: Array<string>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  optionsMap: {[key: string]: any}
 }
