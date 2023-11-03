@@ -2,15 +2,20 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentData} from 'aalto-grades-common/types';
-import {Box, TextField, Typography} from '@mui/material';
+import {
+  AttainmentData,
+  InputField,
+  ListParam,
+  Param,
+} from 'aalto-grades-common/types';
+import {Box, TextField, Typography, MenuItem} from '@mui/material';
 import {ChangeEvent, JSX} from 'react';
 
 import {getParamLabel} from '../../utils';
 
 export default function SubAttainment(props: {
   attainment: AttainmentData;
-  childParamsList: Array<string>;
+  childParamsList: Array<Param>;
   childParams: Map<string, object>;
   setChildParams: (childParams: Map<string, object>) => void;
 }): JSX.Element {
@@ -21,8 +26,12 @@ export default function SubAttainment(props: {
     param: string
   ): void {
     // TODO: This will not always be a number
-    (params[param as keyof object] as unknown) = Number(event.target.value);
-
+    // for the childparam, we want to also identify its input type eg. textfield or radio
+    (params[param as keyof object] as unknown) = isNaN(
+      Number(event.target.value)
+    )
+      ? event.target.value
+      : Number(event.target.value);
     props.childParams.set(props.attainment.name, params);
     props.setChildParams(new Map(props.childParams));
   }
@@ -56,24 +65,59 @@ export default function SubAttainment(props: {
           mt: 2,
         }}
       >
-        {props.childParamsList.map((param: string) => {
-          return (
-            <TextField
-              type="text"
-              key={param}
-              label={getParamLabel(param)}
-              InputLabelProps={{shrink: true}}
-              margin="normal"
-              sx={{
-                marginTop: 0,
-                width: '100%',
-              }}
-              onChange={(event: ChangeEvent<HTMLInputElement>): void => {
-                handleParamChange(event, param);
-              }}
-              defaultValue={params[param as keyof object]}
-            />
-          );
+        {props.childParamsList.map((param: Param) => {
+          if (
+            param.requires &&
+            params[param.requires.param as keyof object] !== param.requires.toBe
+          )
+            return null;
+          if (param.inputField === InputField.Text) {
+            return (
+              <TextField
+                type="text"
+                key={param.name}
+                label={getParamLabel(param.name)}
+                InputLabelProps={{shrink: true}}
+                margin="normal"
+                sx={{
+                  marginTop: 0,
+                  width: '100%',
+                }}
+                onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+                  handleParamChange(event, param.name);
+                }}
+                defaultValue={params[param.name as keyof object]}
+              />
+            );
+          } else if (param.inputField === InputField.List) {
+            const listParam: ListParam = param as ListParam;
+            return (
+              <TextField
+                key={listParam.name}
+                select
+                label={getParamLabel(listParam.name)}
+                sx={{
+                  marginTop: 0,
+                  width: '100%',
+                }}
+                onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+                  handleParamChange(event, listParam.name);
+                }}
+                defaultValue={params[listParam.name as keyof object]}
+              >
+                {listParam.options.map((optionName: string) => {
+                  return (
+                    <MenuItem
+                      key={optionName}
+                      value={listParam.optionsMap[optionName]}
+                    >
+                      {optionName}
+                    </MenuItem>
+                  );
+                })}
+              </TextField>
+            );
+          }
         })}
       </Box>
     </Box>

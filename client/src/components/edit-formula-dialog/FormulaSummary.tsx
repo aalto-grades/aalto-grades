@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {FormulaData} from 'aalto-grades-common/types';
+import {FormulaData, Param} from 'aalto-grades-common/types';
 import {ExpandMore} from '@mui/icons-material';
 import {
   Accordion,
@@ -78,10 +78,10 @@ export default function FormulaSummary(props: {
               <TableCell>
                 <Typography sx={{fontWeight: 'bold'}}>Attainment</Typography>
               </TableCell>
-              {props.formula.childParams.map((param: string) => (
-                <TableCell key={param}>
+              {props.formula.childParams.map((param: Param) => (
+                <TableCell key={param.name}>
                   <Typography sx={{fontWeight: 'bold'}}>
-                    {getParamLabel(param)}
+                    {getParamLabel(param.name)}
                   </Typography>
                 </TableCell>
               ))}
@@ -92,9 +92,9 @@ export default function FormulaSummary(props: {
               (childParam: [string, object]) => (
                 <TableRow key={childParam[0]}>
                   <TableCell>{childParam[0]}</TableCell>
-                  {props.formula.childParams.map((param: string) => (
-                    <TableCell key={param}>
-                      {childParam[1][param as keyof object]}
+                  {props.formula.childParams.map((param: Param) => (
+                    <TableCell key={param.name}>
+                      {childParam[1][param.name as keyof object]}
                     </TableCell>
                   ))}
                 </TableRow>

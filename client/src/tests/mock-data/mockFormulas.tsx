@@ -9,7 +9,7 @@ export const mockFormulas: Array<FormulaData> = [
     id: Formula.WeightedAverage,
     name: 'Weighted average',
     params: [],
-    childParams: ['weight'],
+    childParams: [{name: 'weight'}],
     codeSnippet: `
     const weightedAverage = (nums, weights) => {
       const [sum, weightSum] = weights.reduce(
