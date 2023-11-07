@@ -71,7 +71,7 @@ function calculateRiseBonus(
     } else if (gradingType && gradingType === Grading.Base) {
       if (mainFound) {
         throw new ApiError(
-          `Multiple main grades for attainment ${subGrade.attainment.name}`,
+          'Multiple base grades for formula',
           HttpCode.InternalServerError
         );
       }
