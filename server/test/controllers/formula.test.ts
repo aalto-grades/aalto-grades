@@ -58,6 +58,22 @@ describe('Test GET /v1/formulas/:formulaId - get detailed formula info', () => {
     expect(res.body.data.codeSnippet).toBeDefined();
   });
 
+  it('should get detailed info on RISE_BONUS formula', async () => {
+    res = await request
+      .get('/v1/formulas/RISE_BONUS')
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data).toBeDefined();
+    expect(res.body.data.id).toBeDefined();
+    expect(res.body.data.name).toBeDefined();
+    expect(res.body.data.params).toBeDefined();
+    expect(res.body.data.childParams).toBeDefined();
+    expect(res.body.data.codeSnippet).toBeDefined();
+  });
+
   it('should respond with 400 bad input if the formula enum incorrect', async () => {
     res = await request
       .get('/v1/formulas/abc')
