@@ -22,11 +22,19 @@ enum Grading {
 }
 
 const childParams: Array<Param | ListParam> = [
-  {name: 'gradingType', inputField: InputField.List, options: ['Base', 'Bonus'], optionsMap: {Base: 'BASE', Bonus: 'BONUS'}},
-  {name: 'minBonusGrade', inputField: InputField.Text, requires: {param: 'gradingType', toBe: 'BONUS'}},
+  {
+    name: 'gradingType',
+    inputField: InputField.List,
+    options: ['Base', 'Bonus'],
+    optionsMap: {Base: 'BASE', Bonus: 'BONUS'},
+  },
+  {
+    name: 'minBonusGrade',
+    inputField: InputField.Text,
+    requires: {param: 'gradingType', toBe: 'BONUS'},
+  },
 ];
 const params: Array<string> = [];
-
 
 const defaultChildParams: ChildParams = {
   gradingType: Grading.Base,
@@ -84,9 +92,7 @@ function calculateRiseBonus(
       );
     }
   }
-  if (status === Status.Pass) {
-    grade = Math.min(attainment.maxGrade, grade + bonus);
-  }
+  grade = Math.min(attainment.maxGrade, grade + bonus);
   return {
     attainment: attainment,
     grade: grade,
@@ -124,6 +130,17 @@ registerFormula(
               .noUnknown()
               .strict(),
           ])
+        )
+        .test(
+          'atmost-one-BASE',
+          'Number of BASE Grading Types not equal to one',
+          (tuples, _ctx) => {
+            return (
+              tuples?.filter(
+                tpl => tpl && tpl[1] && tpl[1].gradingType === Grading.Base
+              ).length === 1
+            );
+          }
         )
         .required(),
     })
