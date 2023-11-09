@@ -8,7 +8,7 @@ import {
   ChildParamsObject,
   Formula,
   FormulaData,
-  Param
+  Param,
 } from 'aalto-grades-common/types';
 import {FormulaFunction, FormulaImplementation} from '../types';
 
@@ -82,4 +82,4 @@ export function getAllFormulasData(): Array<FormulaData> {
 // Call registerFormula in all formula definition files.
 require('./manual');
 require('./weightedAverage');
-require('./riseBonus')
+require('./riseBonus');
