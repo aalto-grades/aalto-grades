@@ -1370,6 +1370,11 @@ export async function calculateGrades(
         subGrades
       );
 
+    if (calculated.grade > formulaNode.attainment.maxGrade)
+      throw new ApiError(
+        'A calculated grade exceeds the max grade of attainment.',
+        HttpCode.Conflict
+      );
     if (calculated.grade < formulaNode.attainment.minRequiredGrade)
       calculated.status = Status.Fail;
 
@@ -1449,6 +1454,12 @@ export async function editUserGrade(
     ) {
       throw new ApiError(
         'Expected grade type integer but received float.',
+        HttpCode.BadRequest
+      );
+    }
+    if (attainment.maxGrade < grade) {
+      throw new ApiError(
+        'Grade exceeds max grade of attainment.',
         HttpCode.BadRequest
       );
     }
