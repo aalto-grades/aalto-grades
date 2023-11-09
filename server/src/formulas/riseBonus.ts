@@ -50,6 +50,8 @@ type Params = ParamsObject<ChildParams>;
 
 /**
  * Calculates the rise bonus grade based on sub-grades.
+ * Given a 'Base' grade and 'Bonus' grades, if a Bonus grade
+ * exceeds a minimum requirement, add +1 to Base grade.
  * @param {AttainmentData} attainment - Data of the main attainment.
  * @param {Array<CalculationResult>} subGrades - An array of calculation results for sub-grades.
  * @returns {CalculationResult}
