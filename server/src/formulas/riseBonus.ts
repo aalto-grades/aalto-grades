@@ -87,7 +87,7 @@ function calculateRiseBonus(
       mainFound = true;
     } else {
       throw new ApiError(
-        `Grading type unspecified for attainment ${subGrade.attainment.name}`,
+        `Formula parameters unspecified for attainment ${subGrade.attainment.name}`,
         HttpCode.InternalServerError
       );
     }
