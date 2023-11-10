@@ -53,6 +53,8 @@ jobs:
         run: npm ci
       - name: Docker compose down
         run: docker-compose down --volumes --remove-orphans
+      - name: Docker compose build
+        run: docker-compose build --no-cache
       - name: Run tests
         run: docker-compose up --abort-on-container-exit --exit-code-from backend
       - name: Install linter dependencies
