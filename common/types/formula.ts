@@ -30,15 +30,15 @@ export enum InputField {
   List = 'LIST',
 }
 
+type ParamValue = string | number
+
 export interface Param {
   name: string;
   inputField?: InputField;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  requires?: {param: string; toBe: any};
+  requires?: {param: string; toBe: ParamValue};
 }
 
 export interface ListParam extends Param {
   options: Array<string>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  optionsMap: {[key: string]: any};
+  optionsMap: {[key: string]: ParamValue};
 }
