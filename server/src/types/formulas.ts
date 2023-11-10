@@ -5,6 +5,7 @@
 import {
   AttainmentData,
   ChildParamsObject,
+  Param,
   Status,
 } from 'aalto-grades-common/types';
 import * as yup from 'yup';
@@ -33,7 +34,7 @@ export interface FormulaImplementation {
   codeSnippet: string;
   name: string;
   params: Array<string>;
-  childParams: Array<string>;
+  childParams: Array<Param>;
   defaultChildParams: ChildParamsObject;
 }
 

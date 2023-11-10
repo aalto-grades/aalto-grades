@@ -169,7 +169,7 @@ export default {
             allowNull: true,
           },
           formula: {
-            type: DataTypes.ENUM('MANUAL', 'WEIGHTED_AVERAGE'),
+            type: DataTypes.ENUM('MANUAL', 'WEIGHTED_AVERAGE', 'RISE_BONUS'),
             allowNull: false,
             defaultValue: 'MANUAL',
           },

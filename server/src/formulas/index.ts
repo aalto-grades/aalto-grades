@@ -8,6 +8,7 @@ import {
   ChildParamsObject,
   Formula,
   FormulaData,
+  Param,
 } from 'aalto-grades-common/types';
 import {FormulaFunction, FormulaImplementation} from '../types';
 
@@ -34,7 +35,7 @@ export function registerFormula(
   codeSnippet: string,
   name: string,
   params: Array<string>,
-  childParams: Array<string>,
+  childParams: Array<Param>,
   defaultChildParams: ChildParamsObject,
   paramSchema: yup.AnyObjectSchema
 ): void {
@@ -81,3 +82,4 @@ export function getAllFormulasData(): Array<FormulaData> {
 // Call registerFormula in all formula definition files.
 require('./manual');
 require('./weightedAverage');
+require('./riseBonus');
