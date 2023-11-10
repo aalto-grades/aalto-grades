@@ -30,7 +30,7 @@ export enum InputField {
   List = 'LIST',
 }
 
-type ParamValue = string | number
+type ParamValue = string | number;
 
 export interface Param {
   name: string;
