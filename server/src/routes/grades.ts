@@ -16,6 +16,7 @@ import {
   getFinalGrades,
   getSisuFormattedGradingCSV,
   getGradeTreeOfUser,
+  getGradeTreeOfAllUsers,
 } from '../controllers/grades';
 import {handleInvalidRequestJson} from '../middleware';
 import {controllerDispatcher} from '../middleware/errorHandler';
@@ -70,6 +71,12 @@ router.get(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades',
   passport.authenticate('jwt', {session: false}),
   controllerDispatcher(getFinalGrades)
+);
+
+router.get(
+  '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/fullTree',
+  passport.authenticate('jwt', {session: false}),
+  controllerDispatcher(getGradeTreeOfAllUsers)
 );
 
 router.get(

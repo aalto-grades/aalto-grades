@@ -10,6 +10,7 @@ import {
   GradeType,
   HttpCode,
   Status,
+  StudentGradesTree,
 } from 'aalto-grades-common/types';
 import {parse, Parser} from 'csv-parse';
 import {stringify} from 'csv-stringify';
@@ -536,6 +537,183 @@ export async function getFinalGrades(
 
   res.status(HttpCode.Ok).json({
     data: finalGrades,
+  });
+}
+
+/**
+ * Get course instance final grading data in JSON format.
+ * @param {Request} req - The HTTP request.
+ * @param {Response} res - The HTTP response containing the CSV file.
+ * @returns {Promise<void>} - A Promise that resolves when the function has completed its execution.
+ * @throws {ApiError} - If course and/or course instance not found, instance does not belong to
+ * the course, or no course results found/calculated before calling the endpoint.
+ */
+export async function getGradeTreeOfAllUsers(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const urlParams: yup.AnyObjectSchema = yup.object({
+    studentNumbers: yup.array().json().of(yup.string()).notRequired(),
+    instanceId: yup.number().min(1).notRequired(),
+  });
+
+  const {
+    studentNumbers,
+    instanceId,
+  }: {
+    studentNumbers?: Array<string>;
+    instanceId?: number;
+  } = await urlParams.validate(req.query, {abortEarly: false});
+
+  const [course, assessmentModel]: [Course, AssessmentModel] =
+    await validateAssessmentModelPath(
+      req.params.courseId,
+      req.params.assessmentModelId
+    );
+
+  await isTeacherInChargeOrAdmin(
+    req.user as JwtClaims,
+    course.id,
+    HttpCode.Forbidden
+  );
+
+  interface IdAndStudentNumber {
+    userId: number;
+    studentNumber: string;
+  }
+
+  // Raw query to enable distinct selection of students who have at least one
+  // grade for any attainment in an assessment model.
+  let students: Array<IdAndStudentNumber> = (
+    await sequelize.query(
+      `SELECT DISTINCT "user".id AS id, student_number
+       FROM attainment_grade
+       INNER JOIN attainment ON attainment.id = attainment_grade.attainment_id
+       INNER JOIN "user" ON "user".id = attainment_grade.user_id
+       WHERE attainment.assessment_model_id = :assessmentModelId`,
+      {
+        replacements: {assessmentModelId: assessmentModel.id},
+        type: QueryTypes.SELECT,
+      }
+    )
+  )
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .map((value: any) => {
+      return {
+        userId: value.id,
+        studentNumber: value.student_number,
+      };
+    });
+
+  // Include students from a particular instance if an ID provided.
+  const filter: Array<string> | undefined = instanceId
+    ? await filterByInstanceAndStudentNumber(instanceId, studentNumbers)
+    : studentNumbers;
+
+  if (filter) {
+    await studentNumbersExist(filter);
+
+    students = students.filter((student: IdAndStudentNumber) => {
+      return (filter as Array<string>).includes(student.studentNumber);
+    });
+  }
+
+  //// Calculating attainments for all students ////
+  // Types & Init
+  type AttainmentWithUserGrade = Attainment & {
+    AttainmentGrades: Array<AttainmentGrade>;
+  };
+  const finalData: StudentGradesTree[] = [];
+
+  // Function for generating the attainment tree for a student
+  function generateAttainmentTreeWithUserGrades(
+    userGrades: AttainmentWithUserGrade[],
+    id?: number
+  ): AttainmentGradeData {
+    const root: AttainmentWithUserGrade | undefined = userGrades.find(
+      (attainment: AttainmentWithUserGrade) => {
+        return id ? attainment.id === id : !attainment.parentId;
+      }
+    );
+
+    if (!root) {
+      throw new ApiError(
+        `failed to find attainment with id ${id} in grade tree generation`,
+        HttpCode.InternalServerError
+      );
+    }
+
+    const children = userGrades.filter(
+      (attainment: AttainmentWithUserGrade) => attainment.parentId === root.id
+    );
+
+    return {
+      attainmentId: root.id,
+      attainmentName: root.name,
+      grades: root.AttainmentGrades.map(
+        (option: AttainmentGrade): GradeOption => {
+          return {
+            gradeId: option.id,
+            grader: {
+              id: option.grader?.id,
+              name: option.grader?.name,
+            },
+            grade:
+              root.gradeType === GradeType.Integer
+                ? Math.round(option.grade)
+                : option.grade,
+            status: option.status as Status,
+            manual: option.manual,
+            exportedToSisu: option.sisuExportDate,
+            date: toDateOnlyString(option.date),
+            expiryDate: toDateOnlyString(option.expiryDate),
+            comment: option.comment ?? '',
+          };
+        }
+      ),
+      subAttainments: children.map((attainment: AttainmentWithUserGrade) => {
+        return generateAttainmentTreeWithUserGrades(userGrades, attainment.id);
+      }),
+    };
+  }
+
+  for (const student of students) {
+    // Get the list of grades
+    const userGrades: Array<AttainmentWithUserGrade> =
+      (await Attainment.findAll({
+        where: {
+          assessmentModelId: assessmentModel.id,
+        },
+        include: [
+          {
+            model: AttainmentGrade,
+            required: false,
+            where: {
+              userId: student.userId,
+            },
+            include: [
+              {
+                model: User,
+                required: true,
+                as: 'grader',
+                attributes: ['id', 'name'],
+              },
+            ],
+          },
+        ],
+      })) as Array<AttainmentWithUserGrade>;
+
+    // Calculate Tree and create student object
+    finalData.push({
+      userId: student.userId,
+      studentNumber: student.studentNumber,
+      credits: course.maxCredits,
+      ...generateAttainmentTreeWithUserGrades(userGrades), // Unpacking so that the we have a first level grades and subAttainments
+    });
+  }
+
+  res.status(HttpCode.Ok).json({
+    data: finalData,
   });
 }
 

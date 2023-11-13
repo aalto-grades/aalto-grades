@@ -8,6 +8,7 @@ import {
   GradeOption,
   HttpCode,
   Status,
+  StudentGradesTree,
 } from 'aalto-grades-common/types';
 import * as fs from 'fs';
 import path from 'path';
@@ -841,6 +842,69 @@ describe(
     });
   }
 );
+
+describe('Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/fullTree', () => {
+  function checkBodyStructure(data: Array<StudentGradesTree>): void {
+    for (const student of data) {
+      expect(student.userId).toBeDefined();
+      expect(student.studentNumber).toBeDefined();
+      expect(student.grades).toBeDefined();
+
+      for (const option of student.grades) {
+        expect(option.gradeId).toBeDefined();
+        expect(option.grader).toBeDefined();
+        expect(option.grader.id).toBeDefined();
+        expect(option.grader.name).toBeDefined();
+        expect(option.grade).toBeDefined();
+        expect(option.status).toBeDefined();
+        expect(option.manual).toBeDefined();
+        expect(option.exportedToSisu).toBeDefined();
+        expect(option.date).toBeDefined();
+        expect(option.expiryDate).toBeDefined();
+        expect(option.comment).toBeDefined();
+      }
+    }
+  }
+
+  it('should get final grades succesfully when course results are found (admin user)', async () => {
+    res = await request
+      .get('/v1/courses/6/assessment-models/24/grades/fullTree')
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    checkSuccessRes(res);
+    checkBodyStructure(res.body.data);
+  });
+
+  it('should get final grades succesfully when course results are found (teacher in charge)', async () => {
+    jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
+
+    res = await request
+      .get('/v1/courses/6/assessment-models/24/grades/fullTree')
+      .set('Cookie', cookies.userCookie)
+      .set('Accept', 'application/json');
+
+    checkSuccessRes(res);
+    checkBodyStructure(res.body.data);
+  });
+
+  it('should return dates in the correct format', async () => {
+    res = await request
+      .get('/v1/courses/6/assessment-models/24/grades/fullTree')
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    for (const student of res.body.data) {
+      for (const option of student.grades) {
+        expect(option.date).toMatch(dateOnlyRegExp);
+        if (option.expiryDate)
+          expect(option.expiryDate).toMatch(dateOnlyRegExp);
+      }
+    }
+  });
+});
 
 describe(
   'Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/user/:userId' +
