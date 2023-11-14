@@ -31,6 +31,17 @@ export interface AttainmentGradeData {
   subAttainments?: Array<AttainmentGradeData>;
 }
 
+//This is one element of what we receive from the backend API
+export interface StudentGradesTree {
+  userId: number;
+  studentNumber: string;
+  attainmentId: number;
+  attainmentName?: string;
+  credits: number;
+  grades: Array<GradeOption>;
+  subAttainments?: Array<AttainmentGradeData>;
+}
+
 // TODO: Replace with a better name
 export interface FinalGrade {
   userId: number;

@@ -98,6 +98,52 @@ definitions:
       subAttainments:
         type: array
         description: Sublevel attainment grades.
+  AttainmentFullTreeData:
+    type: array
+    description: Students grading data for all attainments of the assessment model.
+    properties:
+    items:
+      type: object
+      description: Attainment grading data.
+      properties:
+        userId:
+          type: integer
+          description: User ID.
+          format: int32
+          minimum: 1
+          example: 1
+        attainmentId:
+          $ref: '#/definitions/AttainmentId'
+        attainmentName:
+          $ref: '#/definitions/AttainmentName'
+        grades:
+          type: array
+          description: All of the grades the student has for this attainment.
+          items:
+            $ref: '#/definitions/GradeOption'
+        subAttainments:
+          type: array
+          description: Sublevel attainment grades.
+          items:
+            type: object
+            description: Sublevel attainment grading data.
+            properties:
+              attainmentId:
+                $ref: '#/definitions/AttainmentId'
+              attainmentName:
+                $ref: '#/definitions/AttainmentName'
+              grades:
+                type: array
+                description: All of the grades the student has for this attainment.
+                items:
+                  $ref: '#/definitions/GradeOption'
+              subAttainments:
+                type: array
+                description: Sublevel attainment grades.
+                items:
+                  type: object
+                  description: Sublevel attainment grading data.
+
   EditGrade:
     type: object
     properties:
@@ -386,6 +432,31 @@ definitions:
           application/json:
             schema:
               $ref: '#/definitions/Failure'
+
+/v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/fullTree:
+  get:
+    tags: [Grades]
+    description: >
+      Get the all grades of all studens for assessment model.
+      Results can be filtered by student numbers or particular instance ID.
+      Available only to admin users and teachers in charge of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+      - $ref: '#/components/parameters/assessmentModelId'
+      - $ref: '#/components/parameters/instanceIdQuery'
+    responses:
+      '200':
+        description: Grades fetched successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '#/definitions/AttainmentFullTreeData'
+
 
 /v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/user/{userId}:
   get:
