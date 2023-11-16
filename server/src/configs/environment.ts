@@ -42,7 +42,8 @@ if (JWT_SECRET === 'TOP_SECRET' && NODE_ENV !== 'test') {
 }
 
 export const SAML_CALLBACK: string = '/login-idp/callback';
-export const SAML_ENTRYPOINT: string = 'https://idp.webapplication.com/idp/profile/SAML2/Redirect/SSO';
+export const SAML_ENTRYPOINT: string =
+  'https://idp.webapplication.com/idp/profile/SAML2/Redirect/SSO';
 export const SAML_ENTITY: string = 'aalto-grades';
 export const SAML_IDP_CERT: string = ''; // need to get cert from file or ..
 export const SAML_ENCRYPT_PVK: string = '';

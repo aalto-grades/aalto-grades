@@ -13,13 +13,26 @@ import argon from 'argon2';
 import {NextFunction, Request, Response} from 'express';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
-import {Strategy as SamlStrategy} from '@node-saml/passport-saml'
+import {
+  Profile,
+  Strategy as SamlStrategy,
+  VerifiedCallback as SamlVerifiedCallback,
+} from '@node-saml/passport-saml';
 import {Strategy as JWTStrategy, VerifiedCallback} from 'passport-jwt';
 import {IVerifyOptions, Strategy as LocalStrategy} from 'passport-local';
 import * as yup from 'yup';
 
 import {JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS} from '../configs/constants';
-import {JWT_SECRET, NODE_ENV, SAML_CALLBACK, SAML_ENCRYPT_PVK, SAML_ENTITY, SAML_ENTRYPOINT, SAML_IDP_CERT, SAML_PRIVATE_KEY} from '../configs/environment';
+import {
+  JWT_SECRET,
+  NODE_ENV,
+  SAML_CALLBACK,
+  SAML_ENCRYPT_PVK,
+  SAML_ENTITY,
+  SAML_ENTRYPOINT,
+  SAML_IDP_CERT,
+  SAML_PRIVATE_KEY,
+} from '../configs/environment';
 
 import User from '../database/models/user';
 
@@ -236,24 +249,40 @@ passport.use(
 passport.use(
   'saml',
   new SamlStrategy(
-  {
+    {
       callbackUrl: SAML_CALLBACK,
       entryPoint: SAML_ENTRYPOINT,
       issuer: SAML_ENTITY,
-      cert: SAML_IDP_CERT,
+      cert: SAML_IDP_CERT, //IdP public key in .pem format
       decryptionPvk: SAML_ENCRYPT_PVK,
-      privateKey: SAML_PRIVATE_KEY
+      privateKey: SAML_PRIVATE_KEY, //SP private key in .pem format
       // more settings might be needed by the Identity Provider
-  },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ((profile: any, done: any) => {
-    // for signon
-    return done(null, profile);
-  }),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ((profile: any, done: any) => {
-    // for logout
-    return done(null, profile);
-  })
-)
-)
+    },
+
+    async (
+      req: Request,
+      profile: Profile | null,
+      done: SamlVerifiedCallback
+    ) => {
+      // for signon
+      try {
+        if (!profile || !profile.email)
+          throw new ApiError('No email in profile', HttpCode.Unauthorized);
+        const user: User | null = await User.findByEmail(profile.email);
+        if (!user)
+          throw new ApiError('User email not found', HttpCode.Unauthorized);
+        return done(null, {user});
+      } catch (err: unknown) {
+        return done(err as Error);
+      }
+    },
+    (req: Request, profile: Profile | null, done: SamlVerifiedCallback) => {
+      // for logout
+      try {
+        return done(null, {profile});
+      } catch (err: unknown) {
+        return done(err as Error);
+      }
+    }
+  )
+);
