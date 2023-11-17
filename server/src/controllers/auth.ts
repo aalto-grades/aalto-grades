@@ -198,6 +198,53 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
   });
 }
 
+export async function authSamlLogin(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  passport.authenticate(
+    'saml',
+    async (error: Error | null, loginResult: LoginResult | undefined) => {
+      if (error) {
+        return next(error);
+      }
+      if (loginResult === undefined) {
+        return res.status(HttpCode.Unauthorized).send({
+          success: false,
+          errors: ['Authentication failed'],
+        });
+      }
+
+      req.login(loginResult, {session: false}, async (error: unknown) => {
+        if (error) {
+          return next(error);
+        }
+
+        const body: JwtClaims = {
+          id: loginResult.id,
+          role: loginResult.role,
+        };
+
+        const token: string = jwt.sign(body, JWT_SECRET, {
+          expiresIn: JWT_EXPIRY_SECONDS,
+        });
+
+        res.cookie('jwt', token, {
+          httpOnly: true,
+          secure: NODE_ENV !== 'test',
+          sameSite: 'none',
+          maxAge: JWT_COOKIE_EXPIRY_MS,
+        });
+
+        return res.send({
+          data: loginResult,
+        });
+      });
+    }
+  )(req, res, next);
+}
+
 passport.use(
   'login',
   new LocalStrategy(
@@ -258,7 +305,7 @@ passport.use(
       privateKey: SAML_PRIVATE_KEY, //SP private key in .pem format
       // more settings might be needed by the Identity Provider
     },
-
+    // should work with users that have email registered
     async (
       req: Request,
       profile: Profile | null,
@@ -271,7 +318,11 @@ passport.use(
         const user: User | null = await User.findByEmail(profile.email);
         if (!user)
           throw new ApiError('User email not found', HttpCode.Unauthorized);
-        return done(null, {user});
+        return done(null, {
+          id: user.id,
+          role: user.role as SystemRole,
+          name: user.name ?? '-',
+        });
       } catch (err: unknown) {
         return done(err as Error);
       }
