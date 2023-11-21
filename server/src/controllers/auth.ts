@@ -307,7 +307,7 @@ passport.use(
     },
     // should work with users that have email registered
     async (
-      req: Request,
+      request: Request,
       profile: Profile | null,
       done: SamlVerifiedCallback
     ) => {
@@ -315,9 +315,17 @@ passport.use(
       try {
         if (!profile || !profile.email)
           throw new ApiError('No email in profile', HttpCode.Unauthorized);
-        const user: User | null = await User.findByEmail(profile.email);
-        if (!user)
-          throw new ApiError('User email not found', HttpCode.Unauthorized);
+        let user: User | null = await User.findByEmail(profile.email);
+        // need to modify user or create new model so that we can create users based on shibboleth
+        if (!user) {
+          user = await User.create({
+            name: profile.nameID, // need to figure out the actual attributes in assertion
+            email: profile.email,
+            password: await argon.hash('123test123'),
+            studentNumber: profile.ID,
+            role: SystemRole.User,
+          });
+        }
         return done(null, {
           id: user.id,
           role: user.role as SystemRole,
