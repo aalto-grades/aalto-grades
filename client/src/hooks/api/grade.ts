@@ -6,6 +6,7 @@ import {
   AttainmentGradeData,
   EditGrade,
   FinalGrade,
+  StudentGradesTree,
 } from 'aalto-grades-common/types';
 import axios from './axios';
 import {
@@ -94,6 +95,23 @@ export function useGetFinalGrades(
       (
         await axios.get(
           `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades`
+        )
+      ).data.data,
+    ...options,
+  });
+}
+
+export function useGetGradeTreeOfAllUsers(
+  courseId: Numeric,
+  assessmentModelId: Numeric,
+  options?: UseQueryOptions<Array<StudentGradesTree>>
+): UseQueryResult<Array<StudentGradesTree>> {
+  return useQuery({
+    queryKey: ['grade-tree-of-all-users', courseId, assessmentModelId],
+    queryFn: async () =>
+      (
+        await axios.get(
+          `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/fullTree`
         )
       ).data.data,
     ...options,
