@@ -6,21 +6,10 @@ import {
   EventBusyOutlined,
   MoreHoriz as MoreHorizIcon,
 } from '@mui/icons-material';
-import {
-  Box,
-  IconButton,
-  TableCell,
-  Theme,
-  Tooltip,
-  useTheme,
-} from '@mui/material';
+import {Box, IconButton, Theme, Tooltip, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import {
-  AttainmentData,
-  AttainmentGradeData,
-  GradeOption,
-} from 'aalto-grades-common/types';
-import {FC, JSX, useState} from 'react';
+import {AttainmentGradeData, GradeOption} from 'aalto-grades-common/types';
+import {FC, useState} from 'react';
 
 import GradeOptionsDialog from './GradeOptionsDialog';
 

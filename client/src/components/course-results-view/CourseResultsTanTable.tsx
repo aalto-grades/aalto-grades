@@ -167,7 +167,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
   const [expanded, setExpanded] = React.useState<ExpandedState>({});
   const [grouping, setGrouping] = React.useState<GroupingState>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = React.useState('');
+  // const [globalFilter, setGlobalFilter] = React.useState('');
   //Need to move it in a better place needed for the dialog
   const [user, setUser] = React.useState<FinalGrade | null>(null);
   const [showUserGrades, setShowUserGrades] = React.useState<boolean>(false);

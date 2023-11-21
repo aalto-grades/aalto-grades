@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentGradeData, FinalGrade} from 'aalto-grades-common/types';
 import {
   Box,
   Button,
@@ -13,18 +12,18 @@ import {
   DialogTitle,
   Typography,
 } from '@mui/material';
+import {UseQueryResult} from '@tanstack/react-query';
+import {AttainmentGradeData, FinalGrade} from 'aalto-grades-common/types';
 import {JSX, useState} from 'react';
 import {Params, useParams} from 'react-router-dom';
-import {UseQueryResult} from '@tanstack/react-query';
 
-import StudentGradeList from './StudentGradeList';
 import EditGradeDialog from './EditGradeDialog';
+import StudentGradeList from './StudentGradeList';
 
 import {
   useGetGradeTreeOfAllUsers,
   useGetGradeTreeOfUser,
 } from '../../hooks/useApi';
-import {State} from '../../types';
 
 // A Dialog component for viewing the individual grades of a user.
 export default function StudentGradesDialog(props: {
