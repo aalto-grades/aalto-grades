@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentGradeData, FinalGrade} from 'aalto-grades-common/types';
 import {
   Box,
   Button,
@@ -13,15 +12,18 @@ import {
   DialogTitle,
   Typography,
 } from '@mui/material';
+import {UseQueryResult} from '@tanstack/react-query';
+import {AttainmentGradeData, FinalGrade} from 'aalto-grades-common/types';
 import {JSX, useState} from 'react';
 import {Params, useParams} from 'react-router-dom';
-import {UseQueryResult} from '@tanstack/react-query';
 
-import StudentGradeList from './StudentGradeList';
 import EditGradeDialog from './EditGradeDialog';
+import StudentGradeList from './StudentGradeList';
 
-import {useGetGradeTreeOfUser} from '../../hooks/useApi';
-import {State} from '../../types';
+import {
+  useGetGradeTreeOfAllUsers,
+  useGetGradeTreeOfUser,
+} from '../../hooks/useApi';
 
 // A Dialog component for viewing the individual grades of a user.
 export default function StudentGradesDialog(props: {
@@ -34,10 +36,10 @@ export default function StudentGradesDialog(props: {
     assessmentModelId: string;
   };
 
-  const [showEditDialog, setShowEditDialog]: State<boolean> =
-    useState<boolean>(false);
-  const [editGrade, setEditGrade]: State<AttainmentGradeData | undefined> =
-    useState<AttainmentGradeData | undefined>(undefined);
+  const [showEditDialog, setShowEditDialog] = useState<boolean>(false);
+  const [editGrade, setEditGrade] = useState<AttainmentGradeData | undefined>(
+    undefined
+  );
 
   const grades: UseQueryResult<AttainmentGradeData> = useGetGradeTreeOfUser(
     courseId,
@@ -45,6 +47,11 @@ export default function StudentGradesDialog(props: {
     props.user?.userId as number,
     {enabled: props.open}
   );
+
+  // This call is needed only to force the refetch also in the main table
+  const _ = useGetGradeTreeOfAllUsers(courseId, assessmentModelId, {
+    enabled: props.open,
+  });
 
   function showEditGradeDialog(grade: AttainmentGradeData): void {
     setEditGrade(grade);
@@ -107,6 +114,7 @@ export default function StudentGradesDialog(props: {
           }}
           refetchGrades={(): void => {
             grades.refetch();
+            _.refetch(); // Update table data
           }}
           open={showEditDialog}
         />

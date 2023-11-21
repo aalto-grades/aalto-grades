@@ -16,3 +16,6 @@ robot-tests/output/*
 # get only example.settings.jsonc from .vscode, ignore the rest
 .vscode/*
 !.vscode/example.settings.jsonc
+
+# Local GitHub workflow
+.actrc
