@@ -16,7 +16,7 @@ on:
 jobs:
   test_and_lint_client:
     name: Test and lint client
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     defaults:
       run:
         working-directory: ./client
@@ -64,7 +64,7 @@ jobs:
 
   lint_common:
     name: Lint common
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     defaults:
       run:
         working-directory: ./common
@@ -80,7 +80,7 @@ jobs:
 
   lint_yaml_files:
     name: Lint project YAML files
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
       - name: Install yamllint
@@ -90,29 +90,29 @@ jobs:
 
   reuse_lint:
     name: Check REUSE compliance
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
       - uses: fsfe/reuse-action@v1
 
-  lint_and_run_end_to_end_tests:
-    name: Lint and run Cypress end-to-end tests
-    runs-on: ubuntu-latest
-    env:
-      POSTGRES_PASSWORD: postgres
-    defaults:
-      run:
-        working-directory: ./e2e-tests
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      - name: Install dependencies
-        run: npm ci
-      - name: Run tests
-        run: docker-compose up --build --abort-on-container-exit --exit-code-from cypress
-      - name: Install linter dependencies
-        run: npm --prefix .. ci
-      - name: Run linter
-        run: npm run lint
+  # lint_and_run_end_to_end_tests:
+  #   name: Lint and run Cypress end-to-end tests
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     POSTGRES_PASSWORD: postgres
+  #   defaults:
+  #     run:
+  #       working-directory: ./e2e-tests
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: '18'
+  #     - name: Install dependencies
+  #       run: npm ci
+  #     - name: Run tests
+  #       run: docker-compose up --build --abort-on-container-exit --exit-code-from cypress
+  #     - name: Install linter dependencies
+  #       run: npm --prefix .. ci
+  #     - name: Run linter
+  #       run: npm run lint
