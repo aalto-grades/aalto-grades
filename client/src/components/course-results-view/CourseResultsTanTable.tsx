@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import {ExpandLess, ExpandMore} from '@mui/icons-material';
 import {Badge, Box, Checkbox, IconButton, Link, Tooltip} from '@mui/material';
 import {

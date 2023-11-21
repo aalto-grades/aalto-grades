@@ -1,6 +1,8 @@
-import {Dangerous} from '@mui/icons-material';
-import {Box, Checkbox, Badge, Button, ButtonProps} from '@mui/material';
-import {table} from 'console';
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
+import {Box, Button, ButtonProps} from '@mui/material';
 import {FC} from 'react';
 
 type PropsType = {
