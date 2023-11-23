@@ -43,6 +43,7 @@ router.get(
   passport.authenticate('saml', {
     failureRedirect: '/',
     failureFlash: true,
+    session: false
   }),
   (req, res) => {
     res.redirect('/');
