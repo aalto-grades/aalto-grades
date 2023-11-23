@@ -7,7 +7,7 @@
 // Config dotenv so environment variables are also accessible from .env file.
 import * as dotenv from 'dotenv';
 dotenv.config();
-
+import {readFileSync} from 'fs';
 import logger from './winston';
 
 const parsedPort: number = Number(process.env.AALTO_GRADES_BACKEND_PORT);
@@ -41,10 +41,21 @@ if (JWT_SECRET === 'TOP_SECRET' && NODE_ENV !== 'test') {
   }
 }
 
-export const SAML_CALLBACK: string = '/login-idp/callback';
+export const SAML_CALLBACK: string = '/v1/auth/login-idp/callback';
 export const SAML_ENTRYPOINT: string =
-  'https://idp.webapplication.com/idp/profile/SAML2/Redirect/SSO';
+  'https://devel.idp.aalto.fi/idp/profile/SAML2/Redirect/SSO';
 export const SAML_ENTITY: string = 'aalto-grades';
-export const SAML_IDP_CERT: string = ''; // need to get cert from file or ..
-export const SAML_ENCRYPT_PVK: string = '';
-export const SAML_PRIVATE_KEY: string = '';
+
+export const SAML_ENCRYPT_PVK: string = readFileSync(
+  process.env.ENCRYPT_PVK_FILE ||
+    './reverse-proxy/aalto-grades.cs.aalto.fi.pem',
+  'utf8'
+);
+export const SAML_PRIVATE_KEY: string = readFileSync(
+  process.env.PRIVATE_KEY_FILE ||
+    './reverse-proxy/aalto-grades.cs.aalto.fi.pem',
+  'utf8'
+);
+
+export const SAML_IDP_CERT: string =
+  'MIIFGzCCAwOgAwIBAgIUCH/Md10XaJNOMEHEpbnvdjn0ABEwDQYJKoZIhvcNAQEL BQAwHTEbMBkGA1UEAwwSZGV2ZWwuaWRwLmFhbHRvLmZpMB4XDTE4MTEyODA3NTEz MFoXDTI4MTEyNTA3NTEzMFowHTEbMBkGA1UEAwwSZGV2ZWwuaWRwLmFhbHRvLmZp MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAx6UGxma5RNicPZ78CzQs 2lXsxj9YblGHJkT7vPQzEJvrLvkL7h6mvwhib64d+/z9rkamU4FzosKn95Ac60rM 3X/GOYgqaNw1i2lmxYuvPtzKxD1QT4aQxPoj9OzHDOfj8WqI5Y3v+5sr0N91TQGE +kFy670wwP8UgYx2knw4AEBGi8Eo3W/gUvFk8adIbtgTDIko1bc8Ktal6j487tTC NrZC/yZulmeNJQKtFA2HxQLvLOdK6NwmS1saTYvBl5i6bQGut9+sme1ZGm6DmOae 4KhoD++0fft7KFISrJJHWsYcR+kzrbKXlNf9uEqmu4bicN97mnzoz7Xf4VkvikJR FvftrJA/DDfsBrTLMdgI9sI2o7R47W4CjjiJTgs71xSMt2gMLtP7pWwjRMAQKXR8 UpecJiBi7f7mxOMrQkG8aHHk6E0kohnvn9cbPtiCCyPTUHWZvb7YKnEHFHAJfWTh P2w7RjnfxNYtfZZ4sIXCCigaOLIA+2xYL+IUW3nJMhruifoQQxe8ZDIkhKfYujqk m6aboRkRmj7dtfruv8xMzACrorIOmxwDCSfKut6hE7BhGRqyxmS3J4HN4v43HGxO kZ6gnrpZADfZsuCdnu6RzXgxMHr5HrHNm0irZn6j8juZZ83QlAkDdSXeiF/uM7Ci S3d8mmPhEEsRr0dHuL8spoMCAwEAAaNTMFEwHQYDVR0OBBYEFAJI4SEtrKp90RN3 4Cspn2e4KfgnMB8GA1UdIwQYMBaAFAJI4SEtrKp90RN34Cspn2e4KfgnMA8GA1Ud EwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggIBAJQdKMAaEhjUAqmakVYqzX/w RXaQhhchsPwFwPW/+gv3VzYC1giS63RGipHZKmlJQmXN/FNaRxbpAXbRs6/HoM+h NTqvqONxd62+pZidE9hRfPaYhqoN/G7xv9VGzYZd52s6leSewKr8nhE4feQqtM2h sboCvzp5qjbrRrtZw/4l1c5VpK7XhkCPcLLTrX2xcrVExe2D3ZJAiuhv9ppg8Mza Fe+l3chYo9oO1+5bYODYWQEV8HlE4ihpP76SyD/egy7uqBcA8448fioWflxIAfG4 xqWnPdUMbTnkMptvrKtT+8cr/+9GoSUZMwP+A1rZaxfz0umtEybDfOlSAv4aWZ9+ lJ+U1/eBEa/a4RgutF+Lb8YPn38suNvX54h1tM/vy95VW1sb+4i6P6so8pdpGty6 uTlhYFChcj9gzrl5p8cVqIhkbuTxpSetKPKI3G1sP7h503yrR/t2KubhDtdbHrhM /bkVJutFeQylksvfbKkNJNyjGeSBiw37PXbWeKH71ZtXPG6uM2teuMhHFhoy6/SK c5Ko3acY1076SK6oGEmhi7Ht53Ae7KUo5dTxPfTXz1nyWpWzsifkS/hd7gdzVGXQ anvYDUMe6iKr6Pbk/soyepefLqHrTqSxWgMtDf4ZhBEHwuRxSkjgSSo1XcTuKULA 2zkmEe3gyHpefW3suPwQ'; // need to get cert from file or ..

@@ -49,4 +49,4 @@ router.get(
   }
 );
 
-router.post('/login/callback', controllerDispatcher(authSamlLogin));
+router.post('/v1/auth/login-idp/callback', controllerDispatcher(authSamlLogin));
