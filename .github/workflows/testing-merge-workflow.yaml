@@ -8,7 +8,7 @@ run-name: ${{ github.actor }} test merge
 on:
   push:
     branches:
-      - shibboleth-setup
+      - test
 env:
   REGISTRY: ghcr.io
   FRONTEND_IMAGE_NAME: aalto-grades/aalto-grades-frontend-test
