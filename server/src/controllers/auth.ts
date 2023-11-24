@@ -313,10 +313,13 @@ passport.use(
     ) => {
       // for signon
       try {
-        if (!profile || !profile.email)
+        // profile.eduPersonPrincipalName
+        if (!profile || !profile.mail)
           throw new ApiError('No email in profile', HttpCode.Unauthorized);
-        let user: User | null = await User.findByEmail(profile.email);
-        // need to modify user or create new model so that we can create users based on shibboleth
+        // TODO: Change checking email to something like edu username
+        let user: User | null = await User.findByEmail(profile.mail);
+        // TODO: need to modify user or create new model so that we can create users based on shibboleth
+        // password null?
         if (!user) {
           user = await User.create({
             name: profile.nameID, // need to figure out the actual attributes in assertion
@@ -326,6 +329,7 @@ passport.use(
             role: SystemRole.User,
           });
         }
+        // TODO: how to assign roles to user?
         return done(null, {
           id: user.id,
           role: user.role as SystemRole,
