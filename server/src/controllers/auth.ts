@@ -13,12 +13,26 @@ import argon from 'argon2';
 import {NextFunction, Request, Response} from 'express';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
+import {
+  Profile,
+  Strategy as SamlStrategy,
+  VerifiedCallback as SamlVerifiedCallback,
+} from '@node-saml/passport-saml';
 import {Strategy as JWTStrategy, VerifiedCallback} from 'passport-jwt';
 import {IVerifyOptions, Strategy as LocalStrategy} from 'passport-local';
 import * as yup from 'yup';
 
 import {JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS} from '../configs/constants';
-import {JWT_SECRET, NODE_ENV} from '../configs/environment';
+import {
+  JWT_SECRET,
+  NODE_ENV,
+  SAML_CALLBACK,
+  SAML_ENCRYPT_PVK,
+  SAML_ENTITY,
+  SAML_ENTRYPOINT,
+  SAML_IDP_CERT,
+  SAML_PRIVATE_KEY,
+} from '../configs/environment';
 
 import User from '../database/models/user';
 
@@ -184,6 +198,53 @@ export async function authSignup(req: Request, res: Response): Promise<void> {
   });
 }
 
+export async function authSamlLogin(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  passport.authenticate(
+    'saml',
+    async (error: Error | null, loginResult: LoginResult | undefined) => {
+      if (error) {
+        return next(error);
+      }
+      if (loginResult === undefined) {
+        return res.status(HttpCode.Unauthorized).send({
+          success: false,
+          errors: ['Authentication failed'],
+        });
+      }
+
+      req.login(loginResult, {session: false}, async (error: unknown) => {
+        if (error) {
+          return next(error);
+        }
+
+        const body: JwtClaims = {
+          id: loginResult.id,
+          role: loginResult.role,
+        };
+
+        const token: string = jwt.sign(body, JWT_SECRET, {
+          expiresIn: JWT_EXPIRY_SECONDS,
+        });
+
+        res.cookie('jwt', token, {
+          httpOnly: true,
+          secure: NODE_ENV !== 'test',
+          sameSite: 'none',
+          maxAge: JWT_COOKIE_EXPIRY_MS,
+        });
+
+        return res.send({
+          data: loginResult,
+        });
+      });
+    }
+  )(req, res, next);
+}
+
 passport.use(
   'login',
   new LocalStrategy(
@@ -227,6 +288,59 @@ passport.use(
         return done(null, token);
       } catch (error: unknown) {
         return done(error, false);
+      }
+    }
+  )
+);
+
+passport.use(
+  'saml',
+  new SamlStrategy(
+    {
+      callbackUrl: SAML_CALLBACK,
+      entryPoint: SAML_ENTRYPOINT,
+      issuer: SAML_ENTITY,
+      cert: SAML_IDP_CERT, //IdP public key in .pem format
+      decryptionPvk: SAML_ENCRYPT_PVK,
+      privateKey: SAML_PRIVATE_KEY, //SP private key in .pem format
+      // more settings might be needed by the Identity Provider
+    },
+    // should work with users that have email registered
+    async (
+      request: Request,
+      profile: Profile | null,
+      done: SamlVerifiedCallback
+    ) => {
+      // for signon
+      try {
+        if (!profile || !profile.email)
+          throw new ApiError('No email in profile', HttpCode.Unauthorized);
+        let user: User | null = await User.findByEmail(profile.email);
+        // need to modify user or create new model so that we can create users based on shibboleth
+        if (!user) {
+          user = await User.create({
+            name: profile.nameID, // need to figure out the actual attributes in assertion
+            email: profile.email,
+            password: await argon.hash('123test123'),
+            studentNumber: profile.ID,
+            role: SystemRole.User,
+          });
+        }
+        return done(null, {
+          id: user.id,
+          role: user.role as SystemRole,
+          name: user.name ?? '-',
+        });
+      } catch (err: unknown) {
+        return done(err as Error);
+      }
+    },
+    (req: Request, profile: Profile | null, done: SamlVerifiedCallback) => {
+      // for logout
+      try {
+        return done(null, {profile});
+      } catch (err: unknown) {
+        return done(err as Error);
       }
     }
   )

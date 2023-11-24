@@ -8,6 +8,7 @@ import passport from 'passport';
 import {
   authLogin,
   authLogout,
+  authSamlLogin,
   authSelfInfo,
   authSignup,
 } from '../controllers/auth';
@@ -36,3 +37,17 @@ router.post(
   express.json(),
   controllerDispatcher(authSignup)
 );
+
+router.get(
+  '/v1/auth/login-idp',
+  passport.authenticate('saml', {
+    failureRedirect: '/',
+    failureFlash: true,
+    session: false
+  }),
+  (req, res) => {
+    res.redirect('/');
+  }
+);
+
+router.post('/v1/auth/login-idp/callback', controllerDispatcher(authSamlLogin));
