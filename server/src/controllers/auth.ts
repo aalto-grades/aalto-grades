@@ -314,18 +314,17 @@ passport.use(
       // for signon
       try {
         // profile.eduPersonPrincipalName
-        if (!profile || !profile.mail)
-          throw new ApiError('No email in profile', HttpCode.Unauthorized);
+        if (!profile || !profile.eduPersonPrincipalName)
+          throw new ApiError('No username in profile', HttpCode.Unauthorized);
+        const eduUser = profile.eduPersonPrincipalName as string
         // TODO: Change checking email to something like edu username
-        let user: User | null = await User.findByEmail(profile.mail);
-        // TODO: need to modify user or create new model so that we can create users based on shibboleth
-        // password null?
+        let user: User | null = await User.findByEduUser(eduUser);
         if (!user) {
           user = await User.create({
-            name: profile.nameID, // need to figure out the actual attributes in assertion
-            email: profile.email,
-            password: await argon.hash('123test123'),
+            name: profile.nameID, // TODO: need to figure out the actual attributes in assertion
+            email: profile.mail,
             studentNumber: profile.ID,
+            eduUser: profile.nameID,
             role: SystemRole.User,
           });
         }
