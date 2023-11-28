@@ -11,6 +11,7 @@ import {
   authSamlLogin,
   authSelfInfo,
   authSignup,
+  samlMetadata,
 } from '../controllers/auth';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
@@ -51,3 +52,5 @@ router.get(
 );
 
 router.post('/v1/auth/login-idp/callback', controllerDispatcher(authSamlLogin));
+
+router.get('/v1/auth/saml/metadata', controllerDispatcher(samlMetadata));

@@ -18,6 +18,7 @@ export default class User extends Model<
 > {
   declare id: CreationOptional<number>;
   declare studentNumber: CreationOptional<string>;
+  declare eduUser: CreationOptional<string>;
   declare name: CreationOptional<string>;
   declare role: CreationOptional<string>;
   declare email: CreationOptional<string>;
@@ -25,6 +26,7 @@ export default class User extends Model<
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   static findByEmail: (email: string) => Promise<User | null>;
+  static findByEduUser: (eduUser: string) => Promise<User | null>;
 }
 
 User.init(
@@ -33,6 +35,12 @@ User.init(
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
+    },
+    eduUser: {
+      type: new DataTypes.STRING(),
+      unique: true,
+      allowNull: true,
+      defaultValue: null,
     },
     studentNumber: {
       type: new DataTypes.STRING(),
@@ -77,6 +85,14 @@ User.findByEmail = async function (email: string): Promise<User | null> {
   return await User.findOne({
     where: {
       email,
+    },
+  });
+};
+
+User.findByEduUser = async function (eduUser: string): Promise<User | null> {
+  return await User.findOne({
+    where: {
+      eduUser,
     },
   });
 };

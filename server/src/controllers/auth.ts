@@ -21,6 +21,7 @@ import {
 import {Strategy as JWTStrategy, VerifiedCallback} from 'passport-jwt';
 import {IVerifyOptions, Strategy as LocalStrategy} from 'passport-local';
 import * as yup from 'yup';
+import {readFileSync} from 'fs';
 
 import {JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS} from '../configs/constants';
 import {
@@ -32,6 +33,7 @@ import {
   SAML_ENTRYPOINT,
   SAML_IDP_CERT,
   SAML_PRIVATE_KEY,
+  SAML_SP_CERT_PATH
 } from '../configs/environment';
 
 import User from '../database/models/user';
@@ -245,6 +247,72 @@ export async function authSamlLogin(
   )(req, res, next);
 }
 
+// should be put to a seperate file
+const samlStrategy = new SamlStrategy(
+  {
+    callbackUrl: SAML_CALLBACK,
+    entryPoint: SAML_ENTRYPOINT,
+    issuer: SAML_ENTITY,
+    cert: SAML_IDP_CERT, //IdP public key in .pem format
+    decryptionPvk: SAML_ENCRYPT_PVK,
+    privateKey: SAML_PRIVATE_KEY, //SP private key in .pem format
+    // more settings might be needed by the Identity Provider
+  },
+  // should work with users that have email registered
+  async (
+    request: Request,
+    profile: Profile | null,
+    done: SamlVerifiedCallback
+  ) => {
+    // for signon
+    try {
+      // profile.eduPersonPrincipalName
+      if (!profile || !profile.eduPersonPrincipalName)
+        throw new ApiError('No username in profile', HttpCode.Unauthorized);
+      const eduUser = profile.eduPersonPrincipalName as string
+      // TODO: Change checking email to something like edu username
+      let user: User | null = await User.findByEduUser(eduUser);
+      if (!user) {
+        user = await User.create({
+          name: profile.nameID, // TODO: need to figure out the actual attributes in assertion
+          email: profile.mail,
+          studentNumber: profile.ID,
+          eduUser: profile.nameID,
+          role: SystemRole.User,
+        });
+      }
+      // TODO: how to assign roles to user?
+      return done(null, {
+        id: user.id,
+        role: user.role as SystemRole,
+        name: user.name ?? '-',
+      });
+    } catch (err: unknown) {
+      return done(err as Error);
+    }
+  },
+  (req: Request, profile: Profile | null, done: SamlVerifiedCallback) => {
+    // for logout
+    try {
+      return done(null, {profile});
+    } catch (err: unknown) {
+      return done(err as Error);
+    }
+  }
+)
+
+export async function samlMetadata(req: Request, res: Response): Promise<void> {
+  console.log(process.cwd())
+  res.type('application/xml');
+  res.status(200);
+  res.send(
+  samlStrategy.generateServiceProviderMetadata(
+      readFileSync(SAML_SP_CERT_PATH, 'utf8'),
+      readFileSync(SAML_SP_CERT_PATH, 'utf8')
+  )
+  );
+}
+
 passport.use(
   'login',
   new LocalStrategy(
@@ -295,53 +363,5 @@ passport.use(
 
 passport.use(
   'saml',
-  new SamlStrategy(
-    {
-      callbackUrl: SAML_CALLBACK,
-      entryPoint: SAML_ENTRYPOINT,
-      issuer: SAML_ENTITY,
-      cert: SAML_IDP_CERT, //IdP public key in .pem format
-      decryptionPvk: SAML_ENCRYPT_PVK,
-      privateKey: SAML_PRIVATE_KEY, //SP private key in .pem format
-      // more settings might be needed by the Identity Provider
-    },
-    // should work with users that have email registered
-    async (
-      request: Request,
-      profile: Profile | null,
-      done: SamlVerifiedCallback
-    ) => {
-      // for signon
-      try {
-        if (!profile || !profile.email)
-          throw new ApiError('No email in profile', HttpCode.Unauthorized);
-        let user: User | null = await User.findByEmail(profile.email);
-        // need to modify user or create new model so that we can create users based on shibboleth
-        if (!user) {
-          user = await User.create({
-            name: profile.nameID, // need to figure out the actual attributes in assertion
-            email: profile.email,
-            password: await argon.hash('123test123'),
-            studentNumber: profile.ID,
-            role: SystemRole.User,
-          });
-        }
-        return done(null, {
-          id: user.id,
-          role: user.role as SystemRole,
-          name: user.name ?? '-',
-        });
-      } catch (err: unknown) {
-        return done(err as Error);
-      }
-    },
-    (req: Request, profile: Profile | null, done: SamlVerifiedCallback) => {
-      // for logout
-      try {
-        return done(null, {profile});
-      } catch (err: unknown) {
-        return done(err as Error);
-      }
-    }
-  )
+  samlStrategy
 );
