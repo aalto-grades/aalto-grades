@@ -302,6 +302,7 @@ const samlStrategy = new SamlStrategy(
 )
 
 export async function samlMetadata(req: Request, res: Response): Promise<void> {
+  console.log(process.cwd())
   res.type('application/xml');
   res.status(200);
   res.send(

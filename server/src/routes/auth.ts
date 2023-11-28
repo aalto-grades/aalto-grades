@@ -53,4 +53,4 @@ router.get(
 
 router.post('/v1/auth/login-idp/callback', controllerDispatcher(authSamlLogin));
 
-router.get('v1/auth/metadata', controllerDispatcher(samlMetadata));
+router.get('/v1/auth/saml/metadata', controllerDispatcher(samlMetadata));
