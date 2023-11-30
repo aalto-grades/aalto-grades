@@ -38,7 +38,8 @@ services:
       file: ./common-services.yaml
       service: backend-minimum
     build:
-      context: ./server/prod
+      context: .
+      dockerfile: ./server/prod/Dockerfile
     container_name: backend-server
     environment:
       AALTO_GRADES_JWT_SECRET: "${AALTO_GRADES_JWT_SECRET}"

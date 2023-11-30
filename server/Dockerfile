@@ -8,7 +8,6 @@ WORKDIR /app
 
 COPY --chown=node:node common common
 COPY --chown=node:node server server
-COPY --chown=node:node reverse-proxy /keys
 RUN mkdir -p /app/coverage && chown -R node:node /app/coverage
 
 WORKDIR /app/server
