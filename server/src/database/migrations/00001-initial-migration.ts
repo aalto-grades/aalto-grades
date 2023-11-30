@@ -19,6 +19,12 @@ export default {
             autoIncrement: true,
             primaryKey: true,
           },
+          edu_user: {
+            type: new DataTypes.STRING(),
+            unique: true,
+            allowNull: true,
+            defaultValue: null,
+          },
           student_number: {
             type: new DataTypes.STRING(),
             unique: true,
