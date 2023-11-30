@@ -37,7 +37,8 @@ services:
     extends:
       file: ./common-services.yaml
       service: backend-minimum
-    image: ghcr.io/aalto-grades/aalto-grades-backend-test:test
+    build:
+      context: ./server/prod
     container_name: backend-server
     environment:
       AALTO_GRADES_JWT_SECRET: "${AALTO_GRADES_JWT_SECRET}"
