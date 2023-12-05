@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { RequestHandler } from 'express';
+import {RequestHandler} from 'express';
 import morgan from 'morgan';
 
 import logger from '../configs/winston';
@@ -22,10 +22,10 @@ import logger from '../configs/winston';
  */
 export const requestLogger: RequestHandler = morgan(
   ':remote-addr :remote-user ":method :url HTTP/:http-version"' +
-  ' :status :res[content-length] ":referrer" ":user-agent"',
+    ' :status :res[content-length] ":referrer" ":user-agent"',
   {
     stream: {
-      write: (message: string) => logger.http(message.trim())
-    }
+      write: (message: string) => logger.http(message.trim()),
+    },
   }
 );

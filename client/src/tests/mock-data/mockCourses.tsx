@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { CourseData, GradingScale, Language } from 'aalto-grades-common/types';
+import {CourseData, GradingScale, Language} from 'aalto-grades-common/types';
 
 export const mockCourses: Array<CourseData> = [
   {
@@ -15,19 +15,19 @@ export const mockCourses: Array<CourseData> = [
     department: {
       fi: 'Tietotekniikan laitos',
       sv: 'Institutionen för datateknik',
-      en: 'Department of Computer Science'
+      en: 'Department of Computer Science',
     },
     name: {
       fi: 'Tietokannat',
       sv: 'Databaser',
-      en: 'Databases'
+      en: 'Databases',
     },
     teachersInCharge: [
       {
         id: 45,
-        name: 'Scooby Doo'
-      }
-    ]
+        name: 'Scooby Doo',
+      },
+    ],
   },
   {
     id: 1,
@@ -39,18 +39,18 @@ export const mockCourses: Array<CourseData> = [
     department: {
       fi: 'Tietotekniikan laitos',
       sv: 'Institutionen för datateknik',
-      en: 'Department of Computer Science'
+      en: 'Department of Computer Science',
     },
     name: {
       fi: 'Ohjelmointi 1',
       sv: 'Programmering 1',
-      en: 'Programming 1'
+      en: 'Programming 1',
     },
     teachersInCharge: [
       {
         id: 76,
-        name: 'Winnie the Pooh'
-      }
-    ]
-  }
+        name: 'Winnie the Pooh',
+      },
+    ],
+  },
 ];

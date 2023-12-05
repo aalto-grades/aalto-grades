@@ -2,11 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, Formula, GradeType } from 'aalto-grades-common/types';
-import { Box, Button, Container, Typography } from '@mui/material';
-import { JSX, SyntheticEvent, useState }  from 'react';
-import { NavigateFunction, Params, useParams, useNavigate } from 'react-router-dom';
-import { UseQueryResult } from '@tanstack/react-query';
+import {AttainmentData, Formula, GradeType} from 'aalto-grades-common/types';
+import {Box, Button, Container, Typography} from '@mui/material';
+import {JSX, SyntheticEvent, useState} from 'react';
+import {
+  NavigateFunction,
+  Params,
+  useParams,
+  useNavigate,
+} from 'react-router-dom';
+import {UseQueryResult} from '@tanstack/react-query';
 
 import UnsavedChangesDialog from './alerts/UnsavedChangesDialog';
 import Attainment from './edit-attainment-view/Attainment';
@@ -14,29 +19,31 @@ import ConfirmationDialog from './edit-attainment-view/ConfirmationDialog';
 import NotFound from './NotFound';
 
 import {
-  useAddAttainment, UseAddAttainmentResult,
-  useDeleteAttainment, UseDeleteAttainmentResult,
-  useEditAttainment, UseEditAttainmentResult,
-  useGetAttainment
+  useAddAttainment,
+  UseAddAttainmentResult,
+  useDeleteAttainment,
+  UseDeleteAttainmentResult,
+  useEditAttainment,
+  UseEditAttainmentResult,
+  useGetAttainment,
 } from '../hooks/useApi';
-import { State } from '../types';
+import {State} from '../types';
 
 export default function EditAttainmentView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
 
   // attainmentId is either the root attainment of an assessment model when
   // creating a new attainment or the ID of an attainment being edited.
-  const { courseId, assessmentModelId, modification, attainmentId }: Params = useParams();
+  const {courseId, assessmentModelId, modification, attainmentId}: Params =
+    useParams();
 
   // Check for invalid paths
   if (
-    (modification === 'create' && attainmentId)
-      || (modification === 'edit' && !attainmentId)
-      || (modification !== 'create' && modification !== 'edit')
+    (modification === 'create' && attainmentId) ||
+    (modification === 'edit' && !attainmentId) ||
+    (modification !== 'create' && modification !== 'edit')
   ) {
-    return (
-      <NotFound/>
-    );
+    return <NotFound />;
   }
 
   /*
@@ -56,8 +63,14 @@ export default function EditAttainmentView(): JSX.Element {
 
   // If an attainment is being edited, this query is enabled
   const attainment: UseQueryResult<AttainmentData> = useGetAttainment(
-    courseId ?? -1, assessmentModelId ?? -1, attainmentId ?? -1, 'descendants',
-    { enabled: Boolean(courseId && assessmentModelId && attainmentId), cacheTime: 0 }
+    courseId ?? -1,
+    assessmentModelId ?? -1,
+    attainmentId ?? -1,
+    'descendants',
+    {
+      enabled: Boolean(courseId && assessmentModelId && attainmentId),
+      cacheTime: 0,
+    }
   );
 
   if (!initialValues) {
@@ -72,7 +85,7 @@ export default function EditAttainmentView(): JSX.Element {
         formula: Formula.Manual,
         formulaParams: {},
         subAttainments: [],
-        gradeType: GradeType.Float
+        gradeType: GradeType.Float,
       });
     } else if (modification === 'edit' && attainment.data) {
       setInitialValues(JSON.parse(JSON.stringify(attainment.data)));
@@ -91,7 +104,7 @@ export default function EditAttainmentView(): JSX.Element {
         formula: Formula.Manual,
         formulaParams: {},
         subAttainments: [],
-        gradeType: GradeType.Float
+        gradeType: GradeType.Float,
       });
     } else if (modification === 'edit' && attainment.data) {
       setAttainmentTree(attainment.data);
@@ -99,8 +112,9 @@ export default function EditAttainmentView(): JSX.Element {
   }
 
   // List of attainments that exist in the database which are to be deleted.
-  const [deletedAttainments, setDeletedAttainments]: State<Array<AttainmentData>> =
-    useState<Array<AttainmentData>>([]);
+  const [deletedAttainments, setDeletedAttainments]: State<
+    Array<AttainmentData>
+  > = useState<Array<AttainmentData>>([]);
 
   /*
    * Temporary IDs for attainments that have not been added to the database yet
@@ -123,11 +137,17 @@ export default function EditAttainmentView(): JSX.Element {
 
   function deleteAttainmentEnqueue(attainment: AttainmentData): void {
     if (attainment.id === attainmentTree?.id) {
-      if (attainment.id && attainment.id > 0 && (courseId && assessmentModelId && attainmentId)) {
+      if (
+        attainment.id &&
+        attainment.id > 0 &&
+        courseId &&
+        assessmentModelId &&
+        attainmentId
+      ) {
         deleteAttainment.mutate({
           courseId: courseId,
           assessmentModelId: assessmentModelId,
-          attainmentId: attainment.id
+          attainmentId: attainment.id,
         });
       }
 
@@ -145,7 +165,10 @@ export default function EditAttainmentView(): JSX.Element {
           // stored in deletedAttainments since there is no need to delete them
           // from anywhere except the UI.
           if (attainment.id && attainment.id > 0) {
-            setDeletedAttainments([...deletedAttainments, structuredClone(attainment)]);
+            setDeletedAttainments([
+              ...deletedAttainments,
+              structuredClone(attainment),
+            ]);
           }
 
           tree.subAttainments.splice(Number(i), 1);
@@ -157,8 +180,7 @@ export default function EditAttainmentView(): JSX.Element {
       }
     }
 
-    if (attainmentTree)
-      inner(attainment, attainmentTree);
+    if (attainmentTree) inner(attainment, attainmentTree);
   }
 
   function handleSubmit(event: SyntheticEvent): void {
@@ -187,31 +209,42 @@ export default function EditAttainmentView(): JSX.Element {
           onSuccess: (): void => {
             queue.splice(0, 1);
             nextChange();
-          }
+          },
         };
       }
 
-      if (!courseId || !assessmentModelId)
-        return;
+      if (!courseId || !assessmentModelId) return;
 
       // Delete attainments -> Add new attainments -> Edit existing attainments
       if (deleteQueue.length > 0) {
         if (deleteQueue[0].id) {
-          deleteAttainment.mutate({
-            courseId, assessmentModelId,
-            attainmentId: deleteQueue[0].id
-          }, options(deleteQueue));
+          deleteAttainment.mutate(
+            {
+              courseId,
+              assessmentModelId,
+              attainmentId: deleteQueue[0].id,
+            },
+            options(deleteQueue)
+          );
         }
       } else if (addQueue.length > 0) {
-        addAttainment.mutate({
-          courseId, assessmentModelId,
-          attainment: addQueue[0]
-        }, options(addQueue));
+        addAttainment.mutate(
+          {
+            courseId,
+            assessmentModelId,
+            attainment: addQueue[0],
+          },
+          options(addQueue)
+        );
       } else if (editQueue.length > 0) {
-        editAttainment.mutate({
-          courseId, assessmentModelId,
-          attainment: editQueue[0]
-        }, options(editQueue));
+        editAttainment.mutate(
+          {
+            courseId,
+            assessmentModelId,
+            attainment: editQueue[0],
+          },
+          options(editQueue)
+        );
       }
     }
 
@@ -221,7 +254,7 @@ export default function EditAttainmentView(): JSX.Element {
           addAttainment.mutate({
             courseId: courseId,
             assessmentModelId: assessmentModelId,
-            attainment: attainmentTree
+            attainment: attainmentTree,
           });
         } else if (modification === 'edit') {
           constructQueues(attainmentTree);
@@ -235,69 +268,73 @@ export default function EditAttainmentView(): JSX.Element {
 
   return (
     <>
-      <Container maxWidth="md" sx={{ textAlign: 'right' }}>
-        {
-          (modification === 'create') ? (
-            <Typography variant="h1" align='left' sx={{ flexGrow: 1, mb: 4 }}>
-              Create Study Attainment
-            </Typography>
-          ) : (
-            <Typography variant="h1" align='left' sx={{ flexGrow: 1, mb: 4 }}>
-              Edit Study Attainment
-            </Typography>
-          )
-        }
+      <Container maxWidth="md" sx={{textAlign: 'right'}}>
+        {modification === 'create' ? (
+          <Typography variant="h1" align="left" sx={{flexGrow: 1, mb: 4}}>
+            Create Study Attainment
+          </Typography>
+        ) : (
+          <Typography variant="h1" align="left" sx={{flexGrow: 1, mb: 4}}>
+            Edit Study Attainment
+          </Typography>
+        )}
         <form>
-          <Box sx={{
-            bgcolor: 'primary.light',
-            display: 'flex',
-            flexDirection: 'column',
-            borderRadius: 2,
-            my: 2,
-            pt: 3,
-            pb: 1,
-            px: 2,
-          }}>
-            {
-              (attainmentTree) && (
-                <Attainment
-                  attainmentTree={attainmentTree}
-                  setAttainmentTree={setAttainmentTree}
-                  deleteAttainment={deleteAttainmentEnqueue}
-                  getTemporaryId={getTemporaryId}
-                  attainment={attainmentTree}
-                />
-              )
-            }
-          </Box>
-          {
-            (attainmentTree) && (
-              <ConfirmationDialog
+          <Box
+            sx={{
+              bgcolor: 'primary.light',
+              display: 'flex',
+              flexDirection: 'column',
+              borderRadius: 2,
+              my: 2,
+              pt: 3,
+              pb: 1,
+              px: 2,
+            }}
+          >
+            {attainmentTree && (
+              <Attainment
+                attainmentTree={attainmentTree}
+                setAttainmentTree={setAttainmentTree}
                 deleteAttainment={deleteAttainmentEnqueue}
+                getTemporaryId={getTemporaryId}
                 attainment={attainmentTree}
-                title={'Study Attainment'}
-                subject={'study attainment'}
-                handleClose={(): void => setOpenConfDialog(false)}
-                open={openConfDialog}
               />
-            )
-          }
-          <Box sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'right',
-            alignItems: 'center',
-            gap: 1,
-            mt: 2,
-            mb: 1
-          }}>
+            )}
+          </Box>
+          {attainmentTree && (
+            <ConfirmationDialog
+              deleteAttainment={deleteAttainmentEnqueue}
+              attainment={attainmentTree}
+              title={'Study Attainment'}
+              subject={'study attainment'}
+              handleClose={(): void => setOpenConfDialog(false)}
+              open={openConfDialog}
+            />
+          )}
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'right',
+              alignItems: 'center',
+              gap: 1,
+              mt: 2,
+              mb: 1,
+            }}
+          >
             <Button
-              size='medium'
-              variant='outlined'
-              color={JSON.stringify(attainmentTree) !== JSON.stringify(initialValues) ?
-                'error' : 'primary'}
+              size="medium"
+              variant="outlined"
+              color={
+                JSON.stringify(attainmentTree) !== JSON.stringify(initialValues)
+                  ? 'error'
+                  : 'primary'
+              }
               onClick={(): void => {
-                if (JSON.stringify(attainmentTree) !== JSON.stringify(initialValues)) {
+                if (
+                  JSON.stringify(attainmentTree) !==
+                  JSON.stringify(initialValues)
+                ) {
                   setShowDialog(true);
                 } else {
                   navigate(-1);
@@ -307,11 +344,11 @@ export default function EditAttainmentView(): JSX.Element {
               Cancel
             </Button>
             <Button
-              size='medium'
-              variant='contained'
-              type='submit'
+              size="medium"
+              variant="contained"
+              type="submit"
               onClick={handleSubmit}
-              sx={{ mr: 2 }}
+              sx={{mr: 2}}
             >
               Submit
             </Button>

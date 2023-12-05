@@ -2,95 +2,125 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { GradeOption } from 'aalto-grades-common/types';
+import {GradeOption} from 'aalto-grades-common/types';
 import {
-  Button, Dialog, DialogActions, DialogContent, DialogTitle,
-  Table, TableBody, TableCell, TableHead, TableRow, Typography
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Theme,
+  Typography,
+  useTheme,
 } from '@mui/material';
-import { JSX } from 'react';
+import {JSX} from 'react';
+
+import {isGradeDateExpired} from '../../utils';
 
 export default function GradeOptionsDialog(props: {
-  title: string,
-  options: Array<GradeOption>,
-  open: boolean,
-  handleClose: () => void
+  title: string;
+  options: Array<GradeOption>;
+  open: boolean;
+  handleClose: () => void;
 }): JSX.Element {
-
+  const theme: Theme = useTheme();
   interface Cell {
-    id: keyof GradeOption,
-    label: string
+    id: keyof GradeOption;
+    label: string;
   }
 
   const headCells: Array<Cell> = [
     {
       id: 'gradeId',
-      label: 'Grade ID'
+      label: 'Grade ID',
     },
     {
       id: 'grader',
-      label: 'Grader'
+      label: 'Grader',
     },
     {
       id: 'grade',
-      label: 'Grade'
+      label: 'Grade',
     },
     {
       id: 'status',
-      label: 'Status'
+      label: 'Status',
     },
     {
       id: 'manual',
-      label: 'Manual'
+      label: 'Manual',
     },
     {
       id: 'date',
-      label: 'Date'
+      label: 'Date',
     },
     {
       id: 'expiryDate',
-      label: 'Expiry Date'
+      label: 'Expiry Date',
     },
     {
       id: 'comment',
-      label: 'Comment'
-    }
+      label: 'Comment',
+    },
   ];
 
   return (
-    <Dialog
-      open={props.open}
-      transitionDuration={{ exit: 800 }}
-      maxWidth='md'
-    >
-      <DialogTitle>
-        {props.title}
-      </DialogTitle>
+    <Dialog open={props.open} transitionDuration={{exit: 800}} maxWidth="md">
+      <DialogTitle>{props.title}</DialogTitle>
       <DialogContent>
         <Table>
           <TableHead>
             <TableRow>
               {headCells.map((cell: Cell) => (
-                <TableCell key={cell.id}>
-                  {cell.label}
-                </TableCell>
+                <TableCell key={cell.id}>{cell.label}</TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
             {props.options.map((option: GradeOption) => (
-              <TableRow key={option.gradeId}>
+              <TableRow
+                key={option.gradeId}
+                style={{
+                  backgroundColor: isGradeDateExpired(option.expiryDate)
+                    ? `rgba(${theme.vars.palette.error.mainChannel} / 0.1)`
+                    : 'inherit',
+                }}
+              >
                 {headCells.map((cell: Cell) => (
-                  <TableCell key={cell.id} style={{
-                    whiteSpace: 'normal',
-                    wordWrap: 'break-word'
-                  }}>
-                    <Typography variant='body2' sx={{ maxWidth: 100 }}>
-                      {(cell.id === 'grader') ? (
-                        option.grader.name
-                      ) : (
-                        (option[cell.id] === null || option[cell.id] === undefined)
-                          ? '-' : String(option[cell.id])
-                      )}
+                  <TableCell
+                    key={cell.id}
+                    style={{
+                      whiteSpace: 'normal',
+                      wordWrap: 'break-word',
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        maxWidth: 100,
+                        color:
+                          cell.id === 'expiryDate' &&
+                          isGradeDateExpired(option.expiryDate)
+                            ? 'error.main'
+                            : 'inherit',
+                        fontWeight:
+                          cell.id === 'expiryDate' &&
+                          isGradeDateExpired(option.expiryDate)
+                            ? 'bold'
+                            : 'inherit',
+                      }}
+                    >
+                      {cell.id === 'grader'
+                        ? option.grader.name
+                        : option[cell.id] === null ||
+                          option[cell.id] === undefined
+                        ? '-'
+                        : String(option[cell.id])}
                     </Typography>
                   </TableCell>
                 ))}
@@ -99,12 +129,8 @@ export default function GradeOptionsDialog(props: {
           </TableBody>
         </Table>
       </DialogContent>
-      <DialogActions sx={{ pr: 4, pb: 3 }}>
-        <Button
-          size='medium'
-          variant='outlined'
-          onClick={props.handleClose}
-        >
+      <DialogActions sx={{pr: 4, pb: 3}}>
+        <Button size="medium" variant="outlined" onClick={props.handleClose}>
           Close
         </Button>
       </DialogActions>

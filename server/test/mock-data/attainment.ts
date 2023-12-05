@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, Formula, GradeType } from 'aalto-grades-common/types';
+import {AttainmentData, Formula, GradeType} from 'aalto-grades-common/types';
 
 import Attainment from '../../src/database/models/attainment';
 
@@ -15,9 +15,9 @@ export const mockAttainment: AttainmentData = {
   formula: Formula.WeightedAverage,
   formulaParams: {
     children: [
-      ['ex-1', { weight: 0.5 }],
-      ['ex-2', { weight: 0.5 }]
-    ]
+      ['ex-1', {weight: 0.5}],
+      ['ex-2', {weight: 0.5}],
+    ],
   },
   gradeType: GradeType.Float,
   subAttainments: [
@@ -41,9 +41,9 @@ export const mockAttainment: AttainmentData = {
       formula: Formula.WeightedAverage,
       formulaParams: {
         children: [
-          ['ex-2.1', { weight: 0.5 }],
-          ['ex-2.2', { weight: 0.5 }]
-        ]
+          ['ex-2.1', {weight: 0.5}],
+          ['ex-2.2', {weight: 0.5}],
+        ],
       },
       gradeType: GradeType.Float,
       subAttainments: [
@@ -56,9 +56,9 @@ export const mockAttainment: AttainmentData = {
           formula: Formula.WeightedAverage,
           formulaParams: {
             children: [
-              ['ex-2.1.1', { weight: 0.5 }],
-              ['ex-2.1.2', { weight: 0.5 }]
-            ]
+              ['ex-2.1.1', {weight: 0.5}],
+              ['ex-2.1.2', {weight: 0.5}],
+            ],
           },
           gradeType: GradeType.Float,
           subAttainments: [
@@ -83,7 +83,7 @@ export const mockAttainment: AttainmentData = {
               formulaParams: {},
               gradeType: GradeType.Float,
               subAttainments: [],
-            }
+            },
           ],
         },
         {
@@ -95,9 +95,9 @@ export const mockAttainment: AttainmentData = {
           formula: Formula.WeightedAverage,
           formulaParams: {
             children: [
-              ['ex-2.2.1', { weight: 0.5 }],
-              ['ex-2.2.2', { weight: 0.5 }]
-            ]
+              ['ex-2.2.1', {weight: 0.5}],
+              ['ex-2.2.2', {weight: 0.5}],
+            ],
           },
           gradeType: GradeType.Float,
           subAttainments: [
@@ -121,9 +121,9 @@ export const mockAttainment: AttainmentData = {
               formula: Formula.WeightedAverage,
               formulaParams: {
                 children: [
-                  ['ex-2.2.2.1', { weight: 0.5 }],
-                  ['ex-2.2.2.2', { weight: 0.5 }]
-                ]
+                  ['ex-2.2.2.1', {weight: 0.5}],
+                  ['ex-2.2.2.2', {weight: 0.5}],
+                ],
               },
               gradeType: GradeType.Float,
               subAttainments: [
@@ -147,9 +147,9 @@ export const mockAttainment: AttainmentData = {
                   formula: Formula.WeightedAverage,
                   formulaParams: {
                     children: [
-                      ['ex-2.2.2.2.1', { weight: 0.5 }],
-                      ['ex-2.2.2.2.2', { weight: 0.5 }]
-                    ]
+                      ['ex-2.2.2.2.1', {weight: 0.5}],
+                      ['ex-2.2.2.2.2', {weight: 0.5}],
+                    ],
                   },
                   gradeType: GradeType.Float,
                   subAttainments: [
@@ -174,29 +174,32 @@ export const mockAttainment: AttainmentData = {
                       formulaParams: {},
                       gradeType: GradeType.Float,
                       subAttainments: [],
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ]
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
 };
 
-export const jestMockAttainment: Attainment = new Attainment({
-  id: 1,
-  assessmentModelId: 7,
-  parentId: 1,
-  name: 'xxx',
-  daysValid: 365,
-  minRequiredGrade: 1,
-  maxGrade: 5,
-  formula: Formula.Manual,
-  formulaParams: {},
-  gradeType: GradeType.Float,
-  createdAt: new Date(),
-  updatedAt: new Date()
-}, { isNewRecord: false });
+export const jestMockAttainment: Attainment = new Attainment(
+  {
+    id: 1,
+    assessmentModelId: 7,
+    parentId: 1,
+    name: 'xxx',
+    daysValid: 365,
+    minRequiredGrade: 1,
+    maxGrade: 5,
+    formula: Formula.Manual,
+    formulaParams: {},
+    gradeType: GradeType.Float,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {isNewRecord: false}
+);

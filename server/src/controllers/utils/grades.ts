@@ -13,21 +13,22 @@ import AttainmentGrade from '../../database/models/attainmentGrade';
  * @throws {Error} Throws an error if there are no grades for the user.
  */
 export async function getDateOfLatestGrade(
-  userId: number, assessmentModelId: number
+  userId: number,
+  assessmentModelId: number
 ): Promise<Date> {
   const grades: Array<AttainmentGrade> = await AttainmentGrade.findAll({
     where: {
       userId: userId,
-      manual: true
+      manual: true,
     },
     include: [
       {
         model: Attainment,
         where: {
-          assessmentModelId: assessmentModelId
-        }
-      }
-    ]
+          assessmentModelId: assessmentModelId,
+        },
+      },
+    ],
   });
 
   const dates: Array<Date> = grades.map(
@@ -45,8 +46,8 @@ export async function getDateOfLatestGrade(
     return maxSoFar;
   } else {
     throw new Error(
-      `failed to find the date of the latest grade, user ${userId} has`
-      + ` no grades for assessment model ${assessmentModelId}`
+      `failed to find the date of the latest grade, user ${userId} has` +
+        ` no grades for assessment model ${assessmentModelId}`
     );
   }
 }
@@ -59,16 +60,19 @@ export async function getDateOfLatestGrade(
  */
 export async function gradeIsExpired(gradeId: number): Promise<boolean> {
   interface GradeWithAttainment extends AttainmentGrade {
-    Attainment: Attainment
+    Attainment: Attainment;
   }
 
-  const grade: GradeWithAttainment | null = await AttainmentGrade.findByPk(gradeId, {
-    include: [
-      {
-        model: Attainment
-      }
-    ]
-  }) as GradeWithAttainment | null;
+  const grade: GradeWithAttainment | null = (await AttainmentGrade.findByPk(
+    gradeId,
+    {
+      include: [
+        {
+          model: Attainment,
+        },
+      ],
+    }
+  )) as GradeWithAttainment | null;
 
   if (!grade) {
     throw new Error(
@@ -77,7 +81,8 @@ export async function gradeIsExpired(gradeId: number): Promise<boolean> {
   }
 
   const date: Date = await getDateOfLatestGrade(
-    grade.userId, grade.Attainment.assessmentModelId
+    grade.userId,
+    grade.Attainment.assessmentModelId
   );
 
   const expiryDate: Date = grade.expiryDate

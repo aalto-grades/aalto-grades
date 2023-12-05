@@ -2,68 +2,85 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentGradeData, EditGrade, FinalGrade } from 'aalto-grades-common/types';
+import {
+  AttainmentGradeData,
+  EditGrade,
+  FinalGrade,
+  StudentGradesTree,
+} from 'aalto-grades-common/types';
 import axios from './axios';
 import {
-  QueryClient, useMutation, UseMutationOptions, UseMutationResult,
-  useQuery, useQueryClient, UseQueryOptions, UseQueryResult
+  QueryClient,
+  useMutation,
+  UseMutationOptions,
+  UseMutationResult,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+  UseQueryResult,
 } from '@tanstack/react-query';
 
-import { Numeric } from '../../types';
+import {Numeric} from '../../types';
 
 interface DownloadCsvTemplateVars {
-  courseId: Numeric,
-  assessmentModelId: Numeric
+  courseId: Numeric;
+  assessmentModelId: Numeric;
 }
 
 export type UseDownloadCsvTemplateResult = UseMutationResult<
-  string, unknown, DownloadCsvTemplateVars
+  string,
+  unknown,
+  DownloadCsvTemplateVars
 >;
 
 export function useDownloadCsvTemplate(
   options?: UseMutationOptions<string, unknown, DownloadCsvTemplateVars>
 ): UseDownloadCsvTemplateResult {
   return useMutation({
-    mutationFn: async (vars: DownloadCsvTemplateVars) => (
-      await axios.get(
-        `/v1/courses/${vars.courseId}`
-        + `/assessment-models/${vars.assessmentModelId}/grades/csv`
-      )
-    ).data,
-    ...options
+    mutationFn: async (vars: DownloadCsvTemplateVars) =>
+      (
+        await axios.get(
+          `/v1/courses/${vars.courseId}` +
+            `/assessment-models/${vars.assessmentModelId}/grades/csv`
+        )
+      ).data,
+    ...options,
   });
 }
 
 interface DownloadSisuGradeCsvVars {
-  courseId: Numeric,
-  assessmentModelId: Numeric,
+  courseId: Numeric;
+  assessmentModelId: Numeric;
   params: {
-    completionLanguage?: string,
-    assessmentDate?: string,
-    studentNumbers: Array<string>,
-    override: boolean
-  }
+    completionLanguage?: string;
+    assessmentDate?: string;
+    studentNumbers: Array<string>;
+    override: boolean;
+  };
 }
 
 export type UseDownloadSisuGradeCsvResult = UseMutationResult<
-  BlobPart, unknown, DownloadSisuGradeCsvVars
+  BlobPart,
+  unknown,
+  DownloadSisuGradeCsvVars
 >;
 
 export function useDownloadSisuGradeCsv(
   options?: UseMutationOptions<BlobPart, unknown, DownloadSisuGradeCsvVars>
 ): UseDownloadSisuGradeCsvResult {
   return useMutation({
-    mutationFn: async (vars: DownloadSisuGradeCsvVars): Promise<BlobPart> => (
-      await axios.get(
-        `/v1/courses/${vars.courseId}`
-        + `/assessment-models/${vars.assessmentModelId}/grades/csv/sisu`,
-        {
-          responseType: 'blob',
-          params: vars.params
-        }
-      )
-    ).data,
-    ...options
+    mutationFn: async (vars: DownloadSisuGradeCsvVars): Promise<BlobPart> =>
+      (
+        await axios.get(
+          `/v1/courses/${vars.courseId}` +
+            `/assessment-models/${vars.assessmentModelId}/grades/csv/sisu`,
+          {
+            responseType: 'blob',
+            params: vars.params,
+          }
+        )
+      ).data,
+    ...options,
   });
 }
 
@@ -74,12 +91,30 @@ export function useGetFinalGrades(
 ): UseQueryResult<Array<FinalGrade>> {
   return useQuery({
     queryKey: ['final-grades', courseId, assessmentModelId],
-    queryFn: async () => (
-      await axios.get(
-        `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades`
-      )
-    ).data.data,
-    ...options
+    queryFn: async () =>
+      (
+        await axios.get(
+          `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades`
+        )
+      ).data.data,
+    ...options,
+  });
+}
+
+export function useGetGradeTreeOfAllUsers(
+  courseId: Numeric,
+  assessmentModelId: Numeric,
+  options?: UseQueryOptions<Array<StudentGradesTree>>
+): UseQueryResult<Array<StudentGradesTree>> {
+  return useQuery({
+    queryKey: ['grade-tree-of-all-users', courseId, assessmentModelId],
+    queryFn: async () =>
+      (
+        await axios.get(
+          `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/fullTree`
+        )
+      ).data.data,
+    ...options,
   });
 }
 
@@ -91,27 +126,30 @@ export function useGetGradeTreeOfUser(
 ): UseQueryResult<AttainmentGradeData> {
   return useQuery({
     queryKey: ['grade-tree-of-user', courseId, assessmentModelId, userId],
-    queryFn: async () => (
-      await axios.get(
-        `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/user/${userId}`
-      )
-    ).data.data,
-    ...options
+    queryFn: async () =>
+      (
+        await axios.get(
+          `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades/user/${userId}`
+        )
+      ).data.data,
+    ...options,
   });
 }
 
 interface UploadGradeCsvVars {
-  courseId: Numeric,
-  assessmentModelId: Numeric,
-  csv: unknown,
+  courseId: Numeric;
+  assessmentModelId: Numeric;
+  csv: unknown;
   params: {
-    completionDate?: string,
-    expiryDate?: string
-  }
+    completionDate?: string;
+    expiryDate?: string;
+  };
 }
 
 export type UseUploadGradeCsvResult = UseMutationResult<
-  unknown, unknown, UploadGradeCsvVars
+  unknown,
+  unknown,
+  UploadGradeCsvVars
 >;
 
 export function useUploadGradeCsv(
@@ -120,40 +158,43 @@ export function useUploadGradeCsv(
   const queryClient: QueryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: UploadGradeCsvVars) => (
-      await axios.postForm(
-        `/v1/courses/${vars.courseId}`
-        + `/assessment-models/${vars.assessmentModelId}`
-        + '/grades/csv',
-        {
-          csv_data: vars.csv, // FileList will be unwrapped as sepate fields
-          completionDate: vars.params.completionDate,
-          expiryDate: vars.params.expiryDate
-        }
-      )
-    ).data.data,
+    mutationFn: async (vars: UploadGradeCsvVars) =>
+      (
+        await axios.postForm(
+          `/v1/courses/${vars.courseId}` +
+            `/assessment-models/${vars.assessmentModelId}` +
+            '/grades/csv',
+          {
+            csv_data: vars.csv, // FileList will be unwrapped as sepate fields
+            completionDate: vars.params.completionDate,
+            expiryDate: vars.params.expiryDate,
+          }
+        )
+      ).data.data,
 
     onSuccess: (_data: unknown, vars: UploadGradeCsvVars) => {
       queryClient.invalidateQueries({
-        queryKey: ['final-grades', vars.courseId, vars.assessmentModelId]
+        queryKey: ['final-grades', vars.courseId, vars.assessmentModelId],
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['grade-tree-of-user', vars.courseId, vars.assessmentModelId]
+        queryKey: ['grade-tree-of-user', vars.courseId, vars.assessmentModelId],
       });
     },
-    ...options
+    ...options,
   });
 }
 
 interface CalculateFinalGradesVars {
-  courseId: Numeric,
-  assessmentModelId: Numeric,
-  studentNumbers: Array<string>
+  courseId: Numeric;
+  assessmentModelId: Numeric;
+  studentNumbers: Array<string>;
 }
 
 export type UseCalculateFinalGradesResult = UseMutationResult<
-  boolean, unknown, CalculateFinalGradesVars
+  boolean,
+  unknown,
+  CalculateFinalGradesVars
 >;
 
 export function useCalculateFinalGrades(
@@ -162,38 +203,41 @@ export function useCalculateFinalGrades(
   const queryClient: QueryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: CalculateFinalGradesVars) => (
-      await axios.post(
-        `/v1/courses/${vars.courseId}`
-        + `/assessment-models/${vars.assessmentModelId}`
-        + '/grades/calculate',
-        { studentNumbers: vars.studentNumbers }
-      )
-    ).data.data,
+    mutationFn: async (vars: CalculateFinalGradesVars) =>
+      (
+        await axios.post(
+          `/v1/courses/${vars.courseId}` +
+            `/assessment-models/${vars.assessmentModelId}` +
+            '/grades/calculate',
+          {studentNumbers: vars.studentNumbers}
+        )
+      ).data.data,
 
     onSuccess: (_data: unknown, vars: CalculateFinalGradesVars) => {
       queryClient.invalidateQueries({
-        queryKey: ['final-grades', vars.courseId, vars.assessmentModelId]
+        queryKey: ['final-grades', vars.courseId, vars.assessmentModelId],
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['grade-tree-of-user', vars.courseId, vars.assessmentModelId]
+        queryKey: ['grade-tree-of-user', vars.courseId, vars.assessmentModelId],
       });
     },
-    ...options
+    ...options,
   });
 }
 
 interface EditGradeVars {
-  courseId: Numeric,
-  assessmentModelId: Numeric,
-  gradeId: Numeric,
-  userId: Numeric,
-  data: EditGrade
+  courseId: Numeric;
+  assessmentModelId: Numeric;
+  gradeId: Numeric;
+  userId: Numeric;
+  data: EditGrade;
 }
 
 export type UseEditGradeResult = UseMutationResult<
-  boolean, unknown, EditGradeVars
+  boolean,
+  unknown,
+  EditGradeVars
 >;
 
 export function useEditGrade(
@@ -202,19 +246,25 @@ export function useEditGrade(
   const queryClient: QueryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: EditGradeVars) => (
-      await axios.put(
-        `/v1/courses/${vars.courseId}/assessment-models/`
-        + `${vars.assessmentModelId}/grades/${vars.gradeId}`,
-        vars.data
-      )
-    ).data.data,
+    mutationFn: async (vars: EditGradeVars) =>
+      (
+        await axios.put(
+          `/v1/courses/${vars.courseId}/assessment-models/` +
+            `${vars.assessmentModelId}/grades/${vars.gradeId}`,
+          vars.data
+        )
+      ).data.data,
 
     onSuccess: (_data: unknown, vars: EditGradeVars) => {
       queryClient.invalidateQueries({
-        queryKey: ['grade-tree-of-user', vars.courseId, vars.assessmentModelId, vars.userId],
+        queryKey: [
+          'grade-tree-of-user',
+          vars.courseId,
+          vars.assessmentModelId,
+          vars.userId,
+        ],
       });
     },
-    ...options
+    ...options,
   });
 }

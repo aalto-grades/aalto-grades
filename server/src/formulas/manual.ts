@@ -2,14 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData } from 'aalto-grades-common/types';
+import {AttainmentData, Param} from 'aalto-grades-common/types';
 import * as yup from 'yup';
 
-import { registerFormula } from '.';
-import { Formula, Status } from 'aalto-grades-common/types';
-import { CalculationResult } from '../types';
+import {registerFormula} from '.';
+import {Formula, Status} from 'aalto-grades-common/types';
+import {CalculationResult} from '../types';
 
-const childParams: Array<string> = [];
+const childParams: Array<Param> = [];
 const params: Array<string> = [];
 
 /**
@@ -24,7 +24,7 @@ function manualGradeUnspecified(attainment: AttainmentData): CalculationResult {
   return {
     attainment: attainment,
     status: Status.Fail,
-    grade: 0
+    grade: 0,
   };
 }
 

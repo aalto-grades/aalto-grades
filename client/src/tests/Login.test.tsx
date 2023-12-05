@@ -2,29 +2,30 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { rest } from 'msw';
-import { BrowserRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {rest} from 'msw';
+import {BrowserRouter} from 'react-router-dom';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import '@testing-library/jest-dom/extend-expect';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import {act, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import Login from '../components/auth/Login';
 
 import AuthContext from '../context/AuthProvider';
-import { mockPostSuccess, server } from './mock-data/server';
+import {mockPostSuccess, server} from './mock-data/server';
 
 describe('Tests for Login and LoginForm components', () => {
-
   function renderLogin(): void {
     render(
       <QueryClientProvider client={new QueryClient()}>
-        <AuthContext.Provider value={{
-          auth: null,
-          setAuth: jest.fn(),
-          isTeacherInCharge: false,
-          setIsTeacherInCharge: jest.fn()
-        }}>
+        <AuthContext.Provider
+          value={{
+            auth: null,
+            setAuth: jest.fn(),
+            isTeacherInCharge: false,
+            setIsTeacherInCharge: jest.fn(),
+          }}
+        >
           <BrowserRouter>
             <Login />
           </BrowserRouter>
@@ -34,7 +35,6 @@ describe('Tests for Login and LoginForm components', () => {
   }
 
   test('Login should render the appropriate components', () => {
-
     renderLogin();
 
     expect(screen.getByText('Log in to Aalto Grades')).toBeDefined();
@@ -43,11 +43,10 @@ describe('Tests for Login and LoginForm components', () => {
     expect(screen.getByLabelText('Email')).toBeDefined();
     expect(screen.getByLabelText('Password')).toBeDefined();
     expect(screen.getByText('log in')).toBeDefined();
-    expect(screen.getByText('Don\'t have an account yet?')).toBeDefined();
+    expect(screen.getByText("Don't have an account yet?")).toBeDefined();
   });
 
   test('Login should allow a user to submit their credentials', async () => {
-
     renderLogin();
 
     const logIn: jest.Mock = jest.fn();
@@ -61,9 +60,8 @@ describe('Tests for Login and LoginForm components', () => {
       expect(logIn).toHaveBeenCalledTimes(1);
       expect(logIn).toHaveBeenCalledWith({
         email: 'test@email.com',
-        password: 'secret'
+        password: 'secret',
       });
     });
   });
-
 });

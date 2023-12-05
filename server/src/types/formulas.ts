@@ -2,13 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { AttainmentData, ChildParamsObject, Status } from 'aalto-grades-common/types';
+import {
+  AttainmentData,
+  ChildParamsObject,
+  Param,
+  Status,
+} from 'aalto-grades-common/types';
 import * as yup from 'yup';
 
 export interface CalculationResult {
-  attainment: AttainmentData,
-  grade: number,
-  status: Status
+  attainment: AttainmentData;
+  grade: number;
+  status: Status;
 }
 
 /**
@@ -24,20 +29,20 @@ export type FormulaFunction = (
  * parameters.
  */
 export interface FormulaImplementation {
-  formulaFunction: FormulaFunction,
-  paramSchema: yup.AnyObjectSchema,
-  codeSnippet: string,
-  name: string,
-  params: Array<string>,
-  childParams: Array<string>,
-  defaultChildParams: ChildParamsObject
+  formulaFunction: FormulaFunction;
+  paramSchema: yup.AnyObjectSchema;
+  codeSnippet: string;
+  name: string;
+  params: Array<string>;
+  childParams: Array<Param>;
+  defaultChildParams: ChildParamsObject;
 }
 
 /**
  * Stores information needed for calculating the grade of an attainment.
  */
 export interface FormulaNode {
-  formulaImplementation: FormulaImplementation,
-  subFormulaNodes: Array<FormulaNode>,
-  attainment: AttainmentData
+  formulaImplementation: FormulaImplementation;
+  subFormulaNodes: Array<FormulaNode>;
+  attainment: AttainmentData;
 }
