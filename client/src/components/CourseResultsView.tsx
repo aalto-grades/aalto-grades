@@ -17,12 +17,15 @@ import {
   useDownloadCsvTemplate,
   UseDownloadCsvTemplateResult,
   useGetFinalGrades,
+  useGetGradeTreeOfAllUsers,
   useGetRootAttainment,
 } from '../hooks/useApi';
 import useSnackPackAlerts, {
   SnackPackAlertState,
 } from '../hooks/useSnackPackAlerts';
-import {State} from '../types';
+import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
+// import CourseResultsGrid from './course-results-view/CourseResultsGrid';
+// import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
 
 export default function CourseResultsView(): JSX.Element {
   const {courseId, assessmentModelId}: Params = useParams() as {
@@ -31,10 +34,13 @@ export default function CourseResultsView(): JSX.Element {
   };
 
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
-  const [hasPendingStudents, setHasPendingStudents]: State<boolean> =
-    useState<boolean>(false);
-  const [selectedStudents, setSelectedStudents]: State<Array<FinalGrade>> =
-    useState<Array<FinalGrade>>([]);
+  const [hasPendingStudents, setHasPendingStudents] = useState<boolean>(false);
+  const [selectedStudents, setSelectedStudents] = useState<Array<FinalGrade>>(
+    []
+  );
+  useEffect(() => {
+    console.log(selectedStudents);
+  }, [selectedStudents]);
 
   useEffect(() => {
     setHasPendingStudents(
@@ -73,6 +79,8 @@ export default function CourseResultsView(): JSX.Element {
 
   const calculateFinalGrades: UseCalculateFinalGradesResult =
     useCalculateFinalGrades();
+
+  const gradesQuery = useGetGradeTreeOfAllUsers(courseId, assessmentModelId);
 
   // If asking for a refetch then it also update the selectedStudents
   async function studentsRefetch(): Promise<void> {
@@ -175,6 +183,15 @@ export default function CourseResultsView(): JSX.Element {
       <Typography variant="h1" sx={{flexGrow: 1, my: 4}}>
         Course Results
       </Typography>
+      {/* <CourseResultsGrid /> */}
+      {gradesQuery.data && (
+        <CourseResultsTanTable
+          data={gradesQuery.data}
+          attainmentList={attainmentList}
+          selectedStudents={selectedStudents}
+          setSelectedStudents={setSelectedStudents}
+        />
+      )}
       <CourseResultsTable
         students={students.data ?? []}
         attainmentList={attainmentList}

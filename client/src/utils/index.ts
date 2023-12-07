@@ -19,13 +19,26 @@ export function getParamLabel(labelKey: string): string {
 }
 
 export function findBestGradeOption(
-  options: Array<GradeOption>
+  options: Array<GradeOption>,
+  searchOptions: {avoidExpired: boolean; preferExpiredToNull: boolean} = {
+    avoidExpired: false, // Will not count expired grades as best
+    preferExpiredToNull: true, // Will return expired grades if no non-expired grades are found
+  }
 ): GradeOption | null {
   let bestSoFar: GradeOption | null = null;
+  let bestSoFarExpired: GradeOption | null = null;
+
   for (const option of options) {
-    if (!bestSoFar || option.grade > bestSoFar.grade) bestSoFar = option;
+    if (searchOptions.avoidExpired && isGradeDateExpired(option.expiryDate)) {
+      if (!bestSoFarExpired || option.grade > bestSoFarExpired.grade)
+        bestSoFarExpired = option;
+    } else {
+      if (!bestSoFar || option.grade > bestSoFar.grade) bestSoFar = option;
+    }
   }
-  return bestSoFar;
+  return !bestSoFar && searchOptions.preferExpiredToNull
+    ? bestSoFarExpired
+    : bestSoFar;
 }
 
 /**

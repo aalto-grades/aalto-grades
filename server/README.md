@@ -8,21 +8,65 @@ SPDX-License-Identifier: MIT
 
 ## Running
 
+### Running on local environment
 <!-- TODO: Setting up a database needs a more detailed explanation -->
-You will first need to start a PostgreSQL database and run migrations and
-seeders on it.
+
+#### Running postgreSQL and pgAdmin with docker
+For development purposes, you can easily run the database and pgadmin in docker 
+and then start node server locally in development mode.
+
+
+
+Set the following environment variables:
 ```
-$ npm run migration:up
-$ npm run seed:up
+$ export POSTGRES_PASSWORD=postgres
+
+```
+Start the postgreSQL and pgadmin:
+```
+$ docker compose up database pgadmin
+```
+pgAdmin will be
+available at http://localhost:5050.
+
+
+You can now setup the node environment by following the instructions and to start e.g.
+the development server to start developing.
+
+
+When you are done with these stop the container and run:
+```
+$ docker compose down --remove-orphans
+```
+to remove containers and network
+
+#### Setting up local node environment
+In a `.env` file setup the node env variables (.env.example included as an example)
+```
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DATABASE=postgres
+POSTGRES_URL=localhost
 ```
 
 Install the necessary Node modules:
 ```
 $ npm ci
 ```
-Compile and start the server:
+Build the server:
 ```
 $ npm run build
+```
+Run migrations and seeder:
+```
+$ npm run migration:up
+$ npm run seed:up
+```
+
+### Running the server
+
+Start the server:
+```
 $ npm run start
 ```
 
@@ -46,7 +90,7 @@ define the `POSTGRES_PASSWORD` with a password of your choice, and then execute
 Docker Compose:
 ```
 $ export POSTGRES_PASSWORD=XXXX
-$ docker-compose up
+$ docker compose up
 ```
 
 This Docker Compose configuration will also start
@@ -89,5 +133,5 @@ $ export NODE_ENV="test"
 ```
 Then execute Docker Compose to run the tests:
 ```
-$ docker-compose up --abort-on-container-exit --exit-code-from backend
+$ docker compose up --abort-on-container-exit --exit-code-from backend
 ```
