@@ -66,3 +66,18 @@ export function useSignUp(
     ...options,
   });
 }
+
+export function useLogInIdp(
+): UseQueryResult<unknown> {
+
+  return useQuery({
+    queryKey: ['login-idp'],
+    queryFn: async () =>
+      (
+        await axios.get(
+          '/v1/auth/login-idp'
+        )
+      ).data.data,
+    enabled: false
+  });
+}
