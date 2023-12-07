@@ -10,7 +10,7 @@ export default function ExternalAuth(): JSX.Element {
   const logInIdp = useLogInIdp();
   function handleSubmit(event: React.SyntheticEvent): void {
     event.preventDefault();
-    logInIdp.refetch()
+    logInIdp.refetch();
   }
 
   return (

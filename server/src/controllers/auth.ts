@@ -33,7 +33,7 @@ import {
   SAML_ENTRYPOINT,
   SAML_IDP_CERT,
   SAML_PRIVATE_KEY,
-  SAML_SP_CERT_PATH
+  SAML_SP_CERT_PATH,
 } from '../configs/environment';
 
 import User from '../database/models/user';
@@ -256,7 +256,7 @@ const samlStrategy = new SamlStrategy(
     cert: SAML_IDP_CERT, //IdP public key in .pem format
     decryptionPvk: SAML_ENCRYPT_PVK,
     privateKey: SAML_PRIVATE_KEY, //SP private key in .pem format
-    signatureAlgorithm: 'sha256'
+    signatureAlgorithm: 'sha256',
     // more settings might be needed by the Identity Provider
   },
   // should work with users that have email registered
@@ -270,7 +270,7 @@ const samlStrategy = new SamlStrategy(
       // profile.eduPersonPrincipalName
       if (!profile || !profile.eduPersonPrincipalName)
         throw new ApiError('No username in profile', HttpCode.Unauthorized);
-      const eduUser = profile.eduPersonPrincipalName as string
+      const eduUser = profile.eduPersonPrincipalName as string;
       // TODO: Change checking email to something like edu username
       let user: User | null = await User.findByEduUser(eduUser);
       if (!user) {
@@ -300,17 +300,17 @@ const samlStrategy = new SamlStrategy(
       return done(err as Error);
     }
   }
-)
+);
 
 export async function samlMetadata(req: Request, res: Response): Promise<void> {
-  console.log(process.cwd())
+  console.log(process.cwd());
   res.type('application/xml');
   res.status(200);
   res.send(
-  samlStrategy.generateServiceProviderMetadata(
+    samlStrategy.generateServiceProviderMetadata(
       readFileSync(SAML_SP_CERT_PATH, 'utf8'),
       readFileSync(SAML_SP_CERT_PATH, 'utf8')
-  )
+    )
   );
 }
 
@@ -362,7 +362,4 @@ passport.use(
   )
 );
 
-passport.use(
-  'saml',
-  samlStrategy
-);
+passport.use('saml', samlStrategy);
