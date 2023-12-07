@@ -4,11 +4,13 @@
 
 import {Box, Button, Typography} from '@mui/material';
 import React, {JSX} from 'react';
+import {useLogInIdp} from '../../hooks/useApi';
 
 export default function ExternalAuth(): JSX.Element {
+  const logInIdp = useLogInIdp();
   function handleSubmit(event: React.SyntheticEvent): void {
     event.preventDefault();
-    alert('functionality not implemented');
+    logInIdp.refetch()
   }
 
   return (
