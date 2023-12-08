@@ -189,3 +189,47 @@ definitions:
           application/json:
             schema:
               $ref: '#/definitions/Failure'
+
+/v1/auth/saml/metadata:
+  get:
+    tags: [Auth]
+    description: >
+      A xml metadata file describing Service Provider SAML attributes 
+    responses:
+      200:
+        description: Xml read successfully
+
+/v1/auth/login-idp:
+  get:
+    tags: [Auth]
+    description: >
+      redirect to idp login page
+    responses:
+      303:
+        description: User redirected to idp login page
+  
+/v1/auth/login-idp/callback:
+  post:
+    tags: [Auth]
+    description: >
+      Login or create a new user and login with given SAML assertion
+    responses:
+      200:
+        description: The login has succeeded, and an access token is return in a cookie.
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/LoginResult'
+        headers:
+          Set-Cookie:
+            description: JWT token, storing an access token to allow using the API.
+            schema:
+              type: string
+              example: jwt=wliuerhlwieurh; Secure; HttpOnly; SameSite=None
+      401:
+        description: >
+          The login has failed, due to invalid credentials or an invalid request format.
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/Failure'
