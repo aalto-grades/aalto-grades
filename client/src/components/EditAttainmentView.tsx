@@ -26,6 +26,7 @@ import {
   useEditAttainment,
   UseEditAttainmentResult,
   useGetAttainment,
+  useGetRootAttainment,
 } from '../hooks/useApi';
 import {State} from '../types';
 
@@ -61,6 +62,15 @@ export default function EditAttainmentView(): JSX.Element {
 
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
 
+  const rootAttainment: UseQueryResult<AttainmentData> = useGetRootAttainment(
+    courseId ?? -1,
+    assessmentModelId ?? -1,
+    'children',
+    {
+      enabled: Boolean(courseId && assessmentModelId),
+      cacheTime: 0,
+    }
+  );
   // If an attainment is being edited, this query is enabled
   const attainment: UseQueryResult<AttainmentData> = useGetAttainment(
     courseId ?? -1,
@@ -74,10 +84,10 @@ export default function EditAttainmentView(): JSX.Element {
   );
 
   if (!initialValues) {
-    if (modification === 'create') {
+    if (modification === 'create' && rootAttainment.isFetched) {
       setInitialValues({
         id: -1,
-        parentId: Number(attainmentId),
+        parentId: Number(rootAttainment.data?.id),
         name: '',
         daysValid: 0,
         minRequiredGrade: 1,
@@ -93,10 +103,10 @@ export default function EditAttainmentView(): JSX.Element {
   }
 
   if (!attainmentTree) {
-    if (modification === 'create') {
+    if (modification === 'create' && rootAttainment.isFetched) {
       setAttainmentTree({
         id: -1,
-        parentId: Number(attainmentId),
+        parentId: Number(rootAttainment.data?.id),
         name: '',
         daysValid: 0,
         minRequiredGrade: 1,
@@ -251,6 +261,7 @@ export default function EditAttainmentView(): JSX.Element {
     if (courseId && assessmentModelId) {
       if (attainmentTree) {
         if (modification === 'create') {
+          console.log(attainmentTree.parentId);
           addAttainment.mutate({
             courseId: courseId,
             assessmentModelId: assessmentModelId,
