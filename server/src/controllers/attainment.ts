@@ -216,7 +216,7 @@ export async function addAttainment(
       req.params.courseId,
       req.params.assessmentModelId
     );
-
+  console.log(req.body.parentId);
   const requestTree: AttainmentData = req.body;
 
   await isTeacherInChargeOrAdmin(
@@ -224,6 +224,41 @@ export async function addAttainment(
     course.id,
     HttpCode.Forbidden
   );
+
+  // Validate formula parameters for each attainment
+  async function validateFormulaParamsTree(
+    attainmentTree: AttainmentData
+  ): Promise<void> {
+    const attainmentNameExists: Attainment | null = await Attainment.findOne({
+      where: {
+        assessmentModelId: assessmentModel.id,
+        name: attainmentTree.name,
+      },
+    });
+
+    // assessment model has an attainment with the same name.
+    if (attainmentNameExists) {
+      throw new ApiError(
+        `assessment model already has attainment with name ${attainmentTree.name}`,
+        HttpCode.Conflict
+      );
+    }
+    await validateFormulaParams(
+      attainmentTree.formula,
+      attainmentTree.formulaParams,
+      attainmentTree.subAttainments?.map(
+        (subAttainment: AttainmentData) => subAttainment.name
+      )
+    );
+
+    if (attainmentTree.subAttainments) {
+      for (const subTree of attainmentTree.subAttainments) {
+        await validateFormulaParamsTree(subTree);
+      }
+    }
+  }
+
+  await validateFormulaParamsTree(req.body);
 
   // If linked to a parent ID ensure that the parent attainment exists and
   // belongs to the same assessment model
@@ -290,27 +325,6 @@ export async function addAttainment(
       );
     }
   }
-
-  // Validate formula parameters for each attainment
-  async function validateFormulaParamsTree(
-    attainmentTree: AttainmentData
-  ): Promise<void> {
-    await validateFormulaParams(
-      attainmentTree.formula,
-      attainmentTree.formulaParams,
-      attainmentTree.subAttainments?.map(
-        (subAttainment: AttainmentData) => subAttainment.name
-      )
-    );
-
-    if (attainmentTree.subAttainments) {
-      for (const subTree of attainmentTree.subAttainments) {
-        await validateFormulaParamsTree(subTree);
-      }
-    }
-  }
-
-  await validateFormulaParamsTree(req.body);
 
   // Add all attainments to the database and construct an attainment tree with
   // IDs to return
