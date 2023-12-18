@@ -43,7 +43,7 @@ if (JWT_SECRET === 'TOP_SECRET' && NODE_ENV !== 'test') {
 
 export const SAML_CALLBACK: string =
   process.env.SAML_CALLBACK ||
-  '/v1/auth/login-idp/callback';
+  'https://aalto-grades.cs.aalto.fi/v1/auth/login-idp/callback';
 export const SAML_ENTRYPOINT: string =
   process.env.SAML_ENTRYPOINT ||
   'https://devel.idp.aalto.fi/idp/profile/SAML2/Redirect/SSO';
