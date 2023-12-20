@@ -326,7 +326,7 @@ export async function getSisuFormattedGradingCSV(
   if (!override) {
     // If not overridden, clean already exported grades from results.
     finalGrades = finalGrades.filter(
-      (grade: FinalGradeRaw) => grade.sisuExportDate == null
+      (grade: FinalGradeRaw) => grade.sisuExportDate === null
     );
   }
 
