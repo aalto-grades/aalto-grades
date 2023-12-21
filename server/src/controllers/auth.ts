@@ -261,6 +261,7 @@ const samlStrategy = new SamlStrategy(
     privateKey: SAML_PRIVATE_KEY, //SP private key in .pem format
     signatureAlgorithm: 'sha256',
     identifierFormat: null,
+    passReqToCallback: true
     // more settings might be needed by the Identity Provider
   },
   // should work with users that have email registered
@@ -274,6 +275,7 @@ const samlStrategy = new SamlStrategy(
       // profile.eduPersonPrincipalName
       console.log(req);
       console.log(typeof done)
+      console.log(profile)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const eduUser = (req as any)?.['urn:oid:1.3.6.1.4.1.5923.1.1.1.6'] as string;
       const email = profile?.['urn:oid:0.9.2342.19200300.100.1.3'] as string;

@@ -55,7 +55,7 @@ router.get(
 router.post(
   '/v1/auth/login-idp/callback',
   bodyParser.urlencoded({extended: false}),
-  authSamlLogin,
+  controllerDispatcher(authSamlLogin),
   (req, res) => {
     res.redirect('/');
   }
