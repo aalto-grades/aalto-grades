@@ -210,6 +210,7 @@ export async function authSamlLogin(
     async (error: Error | null, loginResult: LoginResult | undefined) => {
       console.log(loginResult);
       console.log(error);
+      console.log('login')
       if (error) {
         return next(error);
       }
@@ -272,8 +273,9 @@ const samlStrategy = new SamlStrategy(
     try {
       // profile.eduPersonPrincipalName
       console.log(req);
-      console.log(typeof profile)
-      const eduUser = profile?.['urn:oid:1.3.6.1.4.1.5923.1.1.1.6'] as string;
+      console.log(typeof done)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const eduUser = (req as any)?.['urn:oid:1.3.6.1.4.1.5923.1.1.1.6'] as string;
       const email = profile?.['urn:oid:0.9.2342.19200300.100.1.3'] as string;
       const name = profile?.['urn:oid:2.16.840.1.113730.3.1.241'] as string;
       console.log(eduUser);
@@ -297,7 +299,9 @@ const samlStrategy = new SamlStrategy(
         name: user.name ?? '-',
       });
     } catch (err: unknown) {
-      console.log(err);
+      console.log('error');
+      console.log(done)
+      console.log(typeof done)
       return done(err as Error);
     }
   },
