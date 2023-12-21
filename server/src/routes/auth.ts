@@ -4,6 +4,7 @@
 
 import express, {Router} from 'express';
 import passport from 'passport';
+import bodyParser from 'body-parser';
 
 import {
   authLogin,
@@ -51,6 +52,25 @@ router.get(
   }
 );
 
-router.post('/v1/auth/login-idp/callback', controllerDispatcher(authSamlLogin));
+router.post(
+  '/login/callback',
+  bodyParser.urlencoded({extended: false}),
+  passport.authenticate('saml', {
+    failureRedirect: '/',
+    failureFlash: true,
+  }),
+  (req, res) => {
+    res.redirect('/');
+  }
+);
+
+router.post(
+  '/v1/auth/login-idp/callback',
+  bodyParser.urlencoded({extended: false}),
+  controllerDispatcher(authSamlLogin),
+  (req, res) => {
+    res.redirect('/');
+  }
+);
 
 router.get('/v1/auth/saml/metadata', controllerDispatcher(samlMetadata));
