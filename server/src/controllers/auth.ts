@@ -266,7 +266,7 @@ const samlStrategy = new SamlStrategy(
   // should work with users that have email registered
   async (
     request: Request,
-    profile: Profile | null,
+    profile: Record<string, unknown> | null,
     done: SamlVerifiedCallback
   ) => {
     // for signon
