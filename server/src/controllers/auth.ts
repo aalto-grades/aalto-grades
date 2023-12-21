@@ -205,7 +205,6 @@ export async function authSamlLogin(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  console.log(req);
   passport.authenticate(
     'saml',
     async (error: Error | null, loginResult: LoginResult | undefined) => {
@@ -272,9 +271,7 @@ const samlStrategy = new SamlStrategy(
     // for signon
     try {
       // profile.eduPersonPrincipalName
-      console.log(profile);
-      console.log(JSON.stringify(profile))
-      console.log(JSON.parse(JSON.stringify(profile)))
+      console.log(req.body);
       console.log(typeof profile)
       const eduUser = profile?.['urn:oid:1.3.6.1.4.1.5923.1.1.1.6'] as string;
       const email = profile?.['urn:oid:0.9.2342.19200300.100.1.3'] as string;
