@@ -277,6 +277,9 @@ const samlStrategy = new SamlStrategy(
       const eduUser = profile?.['urn:oid:1.3.6.1.4.1.5923.1.1.1.6'] as string;
       const email = profile?.['urn:oid:0.9.2342.19200300.100.1.3'] as string;
       const name = profile?.['urn:oid:2.16.840.1.113730.3.1.241'] as string;
+      console.log(eduUser);
+      console.log(profile?.['urn:oid:1.3.6.1.4.1.5923.1.1.1.6']);
+      console.log(profile?.issuer);
       if (!eduUser)
         throw new ApiError('No username in profile', HttpCode.Unauthorized);
       let user: User | null = await User.findByEduUser(eduUser);
