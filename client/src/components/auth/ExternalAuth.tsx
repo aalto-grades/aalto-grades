@@ -4,14 +4,9 @@
 
 import {Box, Button, Typography} from '@mui/material';
 import React, {JSX} from 'react';
-import {useLogInIdp} from '../../hooks/useApi';
+
 
 export default function ExternalAuth(): JSX.Element {
-  const logInIdp = useLogInIdp();
-  function handleSubmit(event: React.SyntheticEvent): void {
-    event.preventDefault();
-    logInIdp.refetch();
-  }
 
   return (
     <Box
@@ -37,7 +32,7 @@ export default function ExternalAuth(): JSX.Element {
         type="submit"
         fullWidth
         sx={{mt: 1}}
-        onClick={handleSubmit}
+        href="/v1/auth/login-idp"
       >
         Log in with Aalto account
       </Button>
