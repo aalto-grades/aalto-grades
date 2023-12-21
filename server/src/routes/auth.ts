@@ -53,18 +53,6 @@ router.get(
 );
 
 router.post(
-  '/login/callback',
-  bodyParser.urlencoded({extended: false}),
-  passport.authenticate('saml', {
-    failureRedirect: '/',
-    failureFlash: true,
-  }),
-  (req, res) => {
-    res.redirect('/');
-  }
-);
-
-router.post(
   '/v1/auth/login-idp/callback',
   bodyParser.urlencoded({extended: false}),
   controllerDispatcher(authSamlLogin),
