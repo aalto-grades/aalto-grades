@@ -239,9 +239,7 @@ export async function authSamlLogin(
           maxAge: JWT_COOKIE_EXPIRY_MS,
         });
 
-        return res.send({
-          data: loginResult,
-        });
+        return res.redirect('/')
       });
     }
   )(req, res, next);
