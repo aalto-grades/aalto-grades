@@ -260,6 +260,7 @@ const samlStrategy = new SamlStrategy(
     decryptionPvk: SAML_ENCRYPT_PVK,
     privateKey: SAML_PRIVATE_KEY, //SP private key in .pem format
     signatureAlgorithm: 'sha256',
+    identifierFormat: null,
     // more settings might be needed by the Identity Provider
   },
   // should work with users that have email registered
