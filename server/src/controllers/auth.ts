@@ -266,7 +266,8 @@ const samlStrategy = new SamlStrategy(
   // should work with users that have email registered
   async (
     request: Request,
-    profile: Record<string, unknown> | null,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    profile: any,
     done: SamlVerifiedCallback
   ) => {
     // for signon
@@ -274,6 +275,7 @@ const samlStrategy = new SamlStrategy(
       // profile.eduPersonPrincipalName
       console.log(request);
       console.log(profile);
+      console.log(typeof profile)
       const eduUser = profile?.['urn:oid:1.3.6.1.4.1.5923.1.1.1.6'] as string;
       const email = profile?.['urn:oid:0.9.2342.19200300.100.1.3'] as string;
       const name = profile?.['urn:oid:2.16.840.1.113730.3.1.241'] as string;
