@@ -205,9 +205,12 @@ export async function authSamlLogin(
   res: Response,
   next: NextFunction
 ): Promise<void> {
+  console.log(req);
   passport.authenticate(
     'saml',
     async (error: Error | null, loginResult: LoginResult | undefined) => {
+      console.log(loginResult);
+      console.log(error);
       if (error) {
         return next(error);
       }
@@ -268,6 +271,8 @@ const samlStrategy = new SamlStrategy(
     // for signon
     try {
       // profile.eduPersonPrincipalName
+      console.log(request);
+      console.log(profile);
       if (!profile || !profile.eduPersonPrincipalName)
         throw new ApiError('No username in profile', HttpCode.Unauthorized);
       const eduUser = profile.eduPersonPrincipalName as string;
@@ -289,6 +294,7 @@ const samlStrategy = new SamlStrategy(
         name: user.name ?? '-',
       });
     } catch (err: unknown) {
+      console.log(err);
       return done(err as Error);
     }
   },
