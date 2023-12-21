@@ -239,7 +239,7 @@ export async function authSamlLogin(
           maxAge: JWT_COOKIE_EXPIRY_MS,
         });
 
-        return res.redirect('/')
+        return res.redirect('/');
       });
     }
   )(req, res, next);
@@ -256,12 +256,12 @@ const samlStrategy = new SamlStrategy(
     privateKey: SAML_PRIVATE_KEY, //SP private key in .pem format
     signatureAlgorithm: 'sha256',
     identifierFormat: null,
-    passReqToCallback: true // This is required when using typescript apparently...
+    passReqToCallback: true, // This is required when using typescript apparently...
   },
   async (
     _req: Request,
     profile: Profile | null,
-    done: SamlVerifiedCallback,
+    done: SamlVerifiedCallback
   ) => {
     // for signon
     try {

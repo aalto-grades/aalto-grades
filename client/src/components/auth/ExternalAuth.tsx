@@ -5,9 +5,7 @@
 import {Box, Button, Typography} from '@mui/material';
 import React, {JSX} from 'react';
 
-
 export default function ExternalAuth(): JSX.Element {
-
   return (
     <Box
       sx={{
