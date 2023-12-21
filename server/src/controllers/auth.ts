@@ -208,9 +208,6 @@ export async function authSamlLogin(
   passport.authenticate(
     'saml',
     async (error: Error | null, loginResult: LoginResult | undefined) => {
-      console.log(loginResult);
-      console.log(error);
-      console.log('login')
       if (error) {
         return next(error);
       }
@@ -261,28 +258,18 @@ const samlStrategy = new SamlStrategy(
     privateKey: SAML_PRIVATE_KEY, //SP private key in .pem format
     signatureAlgorithm: 'sha256',
     identifierFormat: null,
-    passReqToCallback: true
-    // more settings might be needed by the Identity Provider
+    passReqToCallback: true // This is required when using typescript apparently...
   },
-  // should work with users that have email registered
   async (
-    req: Request,
+    _req: Request,
     profile: Profile | null,
     done: SamlVerifiedCallback,
   ) => {
     // for signon
     try {
-      // profile.eduPersonPrincipalName
-      console.log(req);
-      console.log(typeof done)
-      console.log(profile)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const eduUser = (req as any)?.['urn:oid:1.3.6.1.4.1.5923.1.1.1.6'] as string;
+      const eduUser = profile?.['urn:oid:1.3.6.1.4.1.5923.1.1.1.6'] as string;
       const email = profile?.['urn:oid:0.9.2342.19200300.100.1.3'] as string;
       const name = profile?.['urn:oid:2.16.840.1.113730.3.1.241'] as string;
-      console.log(eduUser);
-      console.log(profile?.['urn:oid:1.3.6.1.4.1.5923.1.1.1.6']);
-      console.log(profile?.issuer);
       if (!eduUser)
         throw new ApiError('No username in profile', HttpCode.Unauthorized);
       let user: User | null = await User.findByEduUser(eduUser);
@@ -301,9 +288,6 @@ const samlStrategy = new SamlStrategy(
         name: user.name ?? '-',
       });
     } catch (err: unknown) {
-      console.log('error');
-      console.log(done)
-      console.log(typeof done)
       return done(err as Error);
     }
   },
