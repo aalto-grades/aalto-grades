@@ -5,17 +5,15 @@
 import {DateOnlyString} from 'aalto-grades-common/types';
 
 /**
- * Converts a Date object or a date string to a DateOnlyString format (YYYY-MM-DD).
- * @param {Date | string} date - The date to be converted.
- * @returns {DateOnlyString | undefined} Returns the date in YYYY-MM-DD format, if date is undefined/null returns undefined.
- * @throws {Error} Throws an error if the provided date string is invalid.
- *
- * @example
- * toDateOnlyString(new Date('2023-08-28T14:00:00Z')); // Outputs: "2023-08-28"
+ * Converts a Date object or a string to a date-only string format (YYYY-MM-DD).
+ * Throws an error if the input date is undefined, null, or an invalid date string.
+ * @param date - The Date object or string to be converted.
+ * @returns The date-only string representation of the input date.
+ * @throws Error if the input date is undefined, null, or an invalid date string.
  */
 export function toDateOnlyString(date: Date | string) {
   if (!date) {
-    return undefined;
+    throw new Error(`date is undefined or null: ${date}`);
   }
   const dateOnlyRegExp: RegExp =
     /^\d{4}[/-](0?[1-9]|1[012])[/-](0?[1-9]|[12][0-9]|3[01])$/;
