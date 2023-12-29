@@ -24,6 +24,7 @@ import useSnackPackAlerts, {
   SnackPackAlertState,
 } from '../hooks/useSnackPackAlerts';
 import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
+import CourseResultsTableToolbar from './course-results-view/CourseResultsTableToolbar';
 // import CourseResultsGrid from './course-results-view/CourseResultsGrid';
 // import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
 
@@ -184,15 +185,23 @@ export default function CourseResultsView(): JSX.Element {
         Course Results
       </Typography>
       {/* <CourseResultsGrid /> */}
+      <CourseResultsTableToolbar
+        calculateFinalGrades={handleCalculateFinalGrades}
+        downloadCsvTemplate={handleDownloadCsvTemplate}
+        selectedStudents={selectedStudents}
+        hasPendingStudents={hasPendingStudents}
+        refetch={studentsRefetch}
+      />
       {gradesQuery.data && (
         <CourseResultsTanTable
           data={gradesQuery.data}
           attainmentList={attainmentList}
+          attainmentTree={attainmentTree.data}
           selectedStudents={selectedStudents}
           setSelectedStudents={setSelectedStudents}
         />
       )}
-      <CourseResultsTable
+      {/* <CourseResultsTable
         students={students.data ?? []}
         attainmentList={attainmentList}
         loading={students.isLoading}
@@ -202,7 +211,7 @@ export default function CourseResultsView(): JSX.Element {
         setSelectedStudents={setSelectedStudents}
         hasPendingStudents={hasPendingStudents}
         refetch={studentsRefetch}
-      />
+      /> */}
     </Box>
   );
 }

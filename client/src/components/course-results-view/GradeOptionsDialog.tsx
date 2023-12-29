@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 import {JSX} from 'react';
 
-import {isGradeDateExpired} from '../../utils';
+import {findBestGradeOption, isGradeDateExpired} from '../../utils';
 
 export default function GradeOptionsDialog(props: {
   title: string;
@@ -64,10 +64,19 @@ export default function GradeOptionsDialog(props: {
       label: 'Expiry Date',
     },
     {
+      id: 'exportedToSisu',
+      label: 'Exported',
+    },
+    {
       id: 'comment',
       label: 'Comment',
     },
   ];
+
+  const bestGrade = findBestGradeOption(props.options, {
+    avoidExpired: true,
+    preferExpiredToNull: true,
+  });
 
   return (
     <Dialog open={props.open} transitionDuration={{exit: 800}} maxWidth="md">
@@ -86,6 +95,10 @@ export default function GradeOptionsDialog(props: {
               <TableRow
                 key={option.gradeId}
                 style={{
+                  border:
+                    bestGrade?.gradeId === option.gradeId
+                      ? `3px solid ${theme.palette.primary.main}`
+                      : 'inherit',
                   backgroundColor: isGradeDateExpired(option.expiryDate)
                     ? `rgba(${theme.vars.palette.error.mainChannel} / 0.1)`
                     : 'inherit',

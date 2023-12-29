@@ -128,8 +128,8 @@ export default function CourseResultsTable(props: {
     <Box sx={{width: '100%', minWidth: '600px'}}>
       <Paper sx={{width: '100%', mb: 2}}>
         <CourseResultsTableToolbar
-          search={search}
-          setSearch={setSearch}
+          // search={search}
+          // setSearch={setSearch}
           calculateFinalGrades={props.calculateFinalGrades}
           downloadCsvTemplate={props.downloadCsvTemplate}
           selectedStudents={props.selectedStudents}

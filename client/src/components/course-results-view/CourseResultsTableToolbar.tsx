@@ -29,8 +29,8 @@ import {State} from '../../types';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 export default function CourseResultsTableToolbar(props: {
-  search: string;
-  setSearch: (search: string) => void;
+  // search: string;
+  // setSearch: (search: string) => void;
   calculateFinalGrades: () => Promise<void>;
   downloadCsvTemplate: () => Promise<void>;
   selectedStudents: Array<FinalGrade>;
@@ -187,7 +187,7 @@ export default function CourseResultsTableToolbar(props: {
             handleClose={handleCloseFileDialog}
           />
         </Box>
-        <Box
+        {/* <Box
           sx={{
             display: 'flex',
             flexWrap: 'wrap',
@@ -218,7 +218,7 @@ export default function CourseResultsTableToolbar(props: {
               <DownloadIcon />
             </IconButton>
           </Tooltip>
-        </Box>
+        </Box> */}
       </Box>
       <UnsavedChangesDialog
         setOpen={setShowDialog}
