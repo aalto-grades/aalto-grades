@@ -49,6 +49,8 @@ export const SAML_ENTRYPOINT: string =
   'https://devel.idp.aalto.fi/idp/profile/SAML2/Redirect/SSO';
 export const SAML_ENTITY: string =
   process.env.SAML_ENTITY || 'https://aalto-grades.cs.aalto.fi';
+export const SAML_METADATA_URL: string =
+  process.env.SAML_METADATA_URL || 'https://devel.idp.aalto.fi/idp/shibboleth';
 
 let SAML_ENCRYPT_PVK: string = '';
 let SAML_PRIVATE_KEY: string = '';

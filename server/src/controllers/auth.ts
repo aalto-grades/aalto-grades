@@ -34,12 +34,14 @@ import {
   SAML_IDP_CERT,
   SAML_PRIVATE_KEY,
   SAML_SP_CERT_PATH,
+  SAML_METADATA_URL,
 } from '../configs/environment';
 
 import User from '../database/models/user';
 
 import {ApiError, JwtClaims} from '../types';
 import {findUserById} from './utils/user';
+import {getIdpSignCert} from './utils/saml';
 
 export async function authSelfInfo(req: Request, res: Response): Promise<void> {
   const user: JwtClaims = req.user as JwtClaims;
@@ -246,65 +248,67 @@ export async function authSamlLogin(
 }
 
 // should be put to a seperate file
-const samlStrategy = new SamlStrategy(
-  {
-    callbackUrl: SAML_CALLBACK,
-    entryPoint: SAML_ENTRYPOINT,
-    issuer: SAML_ENTITY,
-    cert: SAML_IDP_CERT, //IdP public key in .pem format
-    decryptionPvk: SAML_ENCRYPT_PVK,
-    privateKey: SAML_PRIVATE_KEY, //SP private key in .pem format
-    signatureAlgorithm: 'sha256',
-    identifierFormat: null,
-    passReqToCallback: true, // This is required when using typescript apparently...
-  },
-  async (
-    _req: Request,
-    profile: Profile | null,
-    done: SamlVerifiedCallback
-  ) => {
-    // for signon
-    try {
-      const eduUser = profile?.['urn:oid:1.3.6.1.4.1.5923.1.1.1.6'] as string;
-      const email = profile?.['urn:oid:0.9.2342.19200300.100.1.3'] as string;
-      const name = profile?.['urn:oid:2.16.840.1.113730.3.1.241'] as string;
-      if (!eduUser)
-        throw new ApiError('No username in profile', HttpCode.Unauthorized);
-      let user: User | null = await User.findByEduUser(eduUser);
-      if (!user) {
-        user = await User.create({
-          name: name,
-          email: email,
-          eduUser: eduUser,
-          role: SystemRole.User,
+async function getSamlStrategy(): Promise<SamlStrategy> {
+  return new SamlStrategy(
+    {
+      callbackUrl: SAML_CALLBACK,
+      entryPoint: SAML_ENTRYPOINT,
+      issuer: SAML_ENTITY,
+      cert: (await getIdpSignCert(SAML_METADATA_URL)) || SAML_IDP_CERT, //IdP public key in .pem format
+      decryptionPvk: SAML_ENCRYPT_PVK,
+      privateKey: SAML_PRIVATE_KEY, //SP private key in .pem format
+      signatureAlgorithm: 'sha256',
+      identifierFormat: null,
+      passReqToCallback: true, // This is required when using typescript apparently...
+    },
+    async (
+      _req: Request,
+      profile: Profile | null,
+      done: SamlVerifiedCallback
+    ) => {
+      // for signon
+      try {
+        const eduUser = profile?.['urn:oid:1.3.6.1.4.1.5923.1.1.1.6'] as string;
+        const email = profile?.['urn:oid:0.9.2342.19200300.100.1.3'] as string;
+        const name = profile?.['urn:oid:2.16.840.1.113730.3.1.241'] as string;
+        if (!eduUser)
+          throw new ApiError('No username in profile', HttpCode.Unauthorized);
+        let user: User | null = await User.findByEduUser(eduUser);
+        if (!user) {
+          user = await User.create({
+            name: name,
+            email: email,
+            eduUser: eduUser,
+            role: SystemRole.User,
+          });
+        }
+        // TODO: how to assign roles to user?
+        return done(null, {
+          id: user.id,
+          role: user.role as SystemRole,
+          name: user.name ?? '-',
         });
+      } catch (err: unknown) {
+        return done(err as Error);
       }
-      // TODO: how to assign roles to user?
-      return done(null, {
-        id: user.id,
-        role: user.role as SystemRole,
-        name: user.name ?? '-',
-      });
-    } catch (err: unknown) {
-      return done(err as Error);
+    },
+    (_req: Request, profile: Profile | null, done: SamlVerifiedCallback) => {
+      // for logout
+      try {
+        return done(null, {profile});
+      } catch (err: unknown) {
+        return done(err as Error);
+      }
     }
-  },
-  (_req: Request, profile: Profile | null, done: SamlVerifiedCallback) => {
-    // for logout
-    try {
-      return done(null, {profile});
-    } catch (err: unknown) {
-      return done(err as Error);
-    }
-  }
-);
+  );
+}
 
 export async function samlMetadata(req: Request, res: Response): Promise<void> {
   console.log(process.cwd());
   res.type('application/xml');
   res.status(200);
   res.send(
-    samlStrategy.generateServiceProviderMetadata(
+    (await getSamlStrategy()).generateServiceProviderMetadata(
       readFileSync(SAML_SP_CERT_PATH, 'utf8'),
       readFileSync(SAML_SP_CERT_PATH, 'utf8')
     )
@@ -359,4 +363,8 @@ passport.use(
   )
 );
 
-passport.use('saml', samlStrategy);
+async function useSamlStrategy(): Promise<void> {
+  passport.use('saml', await getSamlStrategy());
+}
+
+useSamlStrategy();
