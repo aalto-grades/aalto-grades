@@ -31,7 +31,9 @@ import {findBestGradeOption} from '../../utils';
 import PrettyChip from '../shared/PrettyChip';
 import GradeCell from './GradeCell';
 import StudentGradesDialog from './StudentGradesDialog';
+// This module is used to create meta data for colums cells
 declare module '@tanstack/table-core' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ColumnMeta<TData extends RowData, TValue> {
     PrettyChipPosition: 'first' | 'middle' | 'last' | 'alone';
   }
@@ -275,7 +277,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
           columnHelper.accessor(row => row.grouping, {
             id: 'grouping',
             meta: {PrettyChipPosition: 'first'},
-            header: prop => {
+            header: () => {
               return 'Latest Attainment';
             },
             cell: prop => prop.getValue(),

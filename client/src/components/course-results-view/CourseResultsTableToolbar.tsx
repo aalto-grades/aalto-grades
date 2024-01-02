@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: MIT
 
 import {FinalGrade} from 'aalto-grades-common/types';
-import DownloadIcon from '@mui/icons-material/Download';
-import FilterListIcon from '@mui/icons-material/FilterList';
+// import DownloadIcon from '@mui/icons-material/Download';
+// import FilterListIcon from '@mui/icons-material/FilterList';
 import {
   Box,
   Button,
-  IconButton,
-  TextField,
+  // IconButton,
+  // TextField,
   Toolbar,
   Tooltip,
 } from '@mui/material';

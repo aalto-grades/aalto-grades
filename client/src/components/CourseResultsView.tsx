@@ -9,7 +9,6 @@ import {Params, useParams} from 'react-router-dom';
 import {UseQueryResult} from '@tanstack/react-query';
 
 import AlertSnackbar from './alerts/AlertSnackbar';
-import CourseResultsTable from './course-results-view/CourseResultsTable';
 
 import {
   useCalculateFinalGrades,
