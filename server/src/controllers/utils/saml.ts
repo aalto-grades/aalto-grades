@@ -4,6 +4,7 @@
 
 import {useNamespaces, SelectReturnType, isArrayOfNodes} from 'xpath';
 import {DOMParser} from 'xmldom';
+import axios from 'axios';
 
 type selectFun = (query: string) => SelectReturnType;
 
@@ -11,8 +12,8 @@ export async function fetchIdpMetadata(
   metadataUrl: string
 ): Promise<selectFun | null> {
   try {
-    const res = await fetch(metadataUrl);
-    const data = await res.text();
+    const res = await axios.get(metadataUrl);
+    const data = await res.data;
     const parser = new DOMParser();
     const xml = parser.parseFromString(data, 'application/xml');
     const select = useNamespaces({
