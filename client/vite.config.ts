@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 // import * as path from 'path';
 /// <reference types="vitest" />
 import react from '@vitejs/plugin-react';
