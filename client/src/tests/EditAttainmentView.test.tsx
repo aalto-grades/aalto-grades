@@ -6,7 +6,7 @@ import {AttainmentData, Formula, GradeType} from 'aalto-grades-common/types';
 import {rest} from 'msw';
 import {MemoryRouter, Routes, Route} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
- 
+
 import {
   act,
   cleanup,
