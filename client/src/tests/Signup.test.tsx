@@ -6,7 +6,7 @@ import {SystemRole} from 'aalto-grades-common/types';
 import {rest} from 'msw';
 import {BrowserRouter} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import '@testing-library/jest-dom/extend-expect';
+
 import {act, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -22,9 +22,9 @@ describe('Tests for Signup component', () => {
         <AuthContext.Provider
           value={{
             auth: null,
-            setAuth: jest.fn(),
+            setAuth: vi.fn(),
             isTeacherInCharge: false,
-            setIsTeacherInCharge: jest.fn(),
+            setIsTeacherInCharge: vi.fn(),
           }}
         >
           <BrowserRouter>
@@ -51,7 +51,7 @@ describe('Tests for Signup component', () => {
   test('Signup should allow a user to submit their credentials', async () => {
     renderSignup();
 
-    const signUp: jest.Mock = jest.fn();
+    const signUp: vi.Mock = vi.fn();
     server.use(rest.post('*/v1/auth/signup', mockPostSuccess(signUp, null)));
 
     act(() => userEvent.type(screen.getByLabelText('Name'), 'Test User'));

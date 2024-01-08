@@ -57,7 +57,7 @@ export function mockFailure(
 }
 
 export function mockPostSuccess(
-  func: jest.Mock,
+  func: vi.Mock,
   data: unknown
 ): ResponseResolver<RestRequest, RestContext> {
   return async (

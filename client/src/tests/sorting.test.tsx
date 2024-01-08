@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import '@testing-library/jest-dom/extend-expect';
-
 import {compareDate} from '../utils/sorting';
 
 describe('Tests for sorting functions', () => {

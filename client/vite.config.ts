@@ -1,8 +1,9 @@
 // import * as path from 'path';
-
+/// <reference types="vitest" />
 import react from '@vitejs/plugin-react';
 // import license from 'rollup-plugin-license';
-import {defineConfig} from 'vitest/config';
+// import {defineConfig} from 'vitest/config';
+import {defineConfig} from 'vite';
 
 // import viteTsconfigPaths from 'vite-tsconfig-paths';
 
@@ -49,12 +50,15 @@ export default defineConfig({
   //   },
   esbuild: {
     loader: 'tsx', // Or 'jsx' if you're not using TypeScript
-    // include: ['../common/types/*.ts'],
   },
   optimizeDeps: {
     include: ['common'],
   },
   test: {
+    environment: 'jsdom',
+    setupFiles: './src/tests/setup.ts',
+    // setupFiles: './src/setupTests.tsx',
+    include: ['./**/*.test.ts', './**/*.test.tsx'],
     globals: true,
   },
   build: {

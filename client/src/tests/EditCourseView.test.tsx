@@ -6,7 +6,7 @@ import {GradingScale, Language} from 'aalto-grades-common/types';
 import {rest} from 'msw';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import '@testing-library/jest-dom/extend-expect';
+ 
 import {act, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -63,7 +63,7 @@ describe('Tests for EditCourseView components', () => {
   test('EditCourseView should allow an admin to create a course', async () => {
     renderEditCourseView();
 
-    const addCourse: jest.Mock = jest.fn();
+    const addCourse: vi.Mock = vi.fn();
     server.use(rest.post('*/v1/courses', mockPostSuccess(addCourse, 1)));
 
     const testCode: string = 'Test code';

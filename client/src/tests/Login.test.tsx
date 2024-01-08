@@ -5,7 +5,7 @@
 import {rest} from 'msw';
 import {BrowserRouter} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import '@testing-library/jest-dom/extend-expect';
+ 
 import {act, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -21,9 +21,9 @@ describe('Tests for Login and LoginForm components', () => {
         <AuthContext.Provider
           value={{
             auth: null,
-            setAuth: jest.fn(),
+            setAuth: vi.fn(),
             isTeacherInCharge: false,
-            setIsTeacherInCharge: jest.fn(),
+            setIsTeacherInCharge: vi.fn(),
           }}
         >
           <BrowserRouter>
@@ -49,7 +49,7 @@ describe('Tests for Login and LoginForm components', () => {
   test('Login should allow a user to submit their credentials', async () => {
     renderLogin();
 
-    const logIn: jest.Mock = jest.fn();
+    const logIn: vi.Mock = vi.fn();
     server.use(rest.post('*/v1/auth/login', mockPostSuccess(logIn, null)));
 
     act(() => userEvent.type(screen.getByLabelText('Email'), 'test@email.com'));

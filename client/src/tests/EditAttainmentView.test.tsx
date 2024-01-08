@@ -6,7 +6,7 @@ import {AttainmentData, Formula, GradeType} from 'aalto-grades-common/types';
 import {rest} from 'msw';
 import {MemoryRouter, Routes, Route} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import '@testing-library/jest-dom/extend-expect';
+ 
 import {
   act,
   cleanup,
@@ -29,8 +29,8 @@ import {mockPostSuccess, mockSuccess, server} from './mock-data/server';
 //   return JSON.parse(JSON.stringify(value));
 // };
 
-const editAttainment: jest.Mock = jest.fn();
-const addAttainment: jest.Mock = jest.fn();
+const editAttainment: vi.Mock = vi.fn();
+const addAttainment: vi.Mock = vi.fn();
 afterEach(cleanup);
 
 describe('Tests for EditAttainmentView components', () => {
