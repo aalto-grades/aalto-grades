@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 
 ### Running on local environment
 <!-- TODO: Setting up a database needs a more detailed explanation -->
+> If the command `npm install` fails on Apple Silicon, check that there are NO spaces in the folder path
 
 #### Running postgreSQL and pgAdmin with docker
 For development purposes, you can easily run the database and pgadmin in docker 
