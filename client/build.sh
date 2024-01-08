@@ -5,7 +5,8 @@
 # SPDX-License-Identifier: MIT
 
 # Build common
-npm --prefix ../common run build
+# Shouldn't be needed anymore
+# npm --prefix ../common run build
 
 # Build client
 DISABLE_ESLINT_PLUGIN=true react-scripts build

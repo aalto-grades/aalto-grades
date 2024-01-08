@@ -24,9 +24,10 @@ import {mockPostSuccess, mockSuccess, server} from './mock-data/server';
 
 // Not mocking structuredClone leads to errors about it being undefined.
 // Probably related: https://github.com/jsdom/jsdom/issues/3363
-global.structuredClone = <T,>(value: T): T => {
-  return JSON.parse(JSON.stringify(value));
-};
+// 🐛
+// global.structuredClone = <T,>(value: T): T => {
+//   return JSON.parse(JSON.stringify(value));
+// };
 
 const editAttainment: jest.Mock = jest.fn();
 const addAttainment: jest.Mock = jest.fn();
