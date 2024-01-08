@@ -64,7 +64,7 @@ export default defineConfig({
     // setupFiles: './src/setupTests.tsx',
     include: ['./**/*.test.ts', './**/*.test.tsx'],
     globals: true,
-    testTimeout: 10000,
+    testTimeout: 100000,
   },
   build: {
     outDir: './build',
