@@ -8,6 +8,7 @@ import {
   Model,
   InferAttributes,
   InferCreationAttributes,
+  Op,
 } from 'sequelize';
 
 import {sequelize} from '..';
@@ -102,7 +103,9 @@ User.findIdpUserByEmail = async function (email: string): Promise<User | null> {
   return await User.findOne({
     where: {
       email,
-      password: undefined,
+      password: {
+        [Op.is]: undefined,
+      },
     },
   });
 };
