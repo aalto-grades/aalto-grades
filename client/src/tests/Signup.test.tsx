@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {SystemRole} from 'aalto-grades-common/types';
-import {rest} from 'msw';
+import {http} from 'msw';
 import {BrowserRouter} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 
@@ -51,8 +51,8 @@ describe('Tests for Signup component', () => {
   test('Signup should allow a user to submit their credentials', async () => {
     renderSignup();
 
-    const signUp: vi.Mock = vi.fn();
-    server.use(rest.post('*/v1/auth/signup', mockPostSuccess(signUp, null)));
+    const signUp = vi.fn();
+    server.use(http.post('*/v1/auth/signup', mockPostSuccess(signUp, null)));
 
     act(() => userEvent.type(screen.getByLabelText('Name'), 'Test User'));
     act(() => userEvent.type(screen.getByLabelText('Password'), 'secret'));

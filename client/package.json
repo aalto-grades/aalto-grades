@@ -28,25 +28,25 @@
     "axios": "^1.4.0",
     "cheerio": "^1.0.0-rc.12",
     "formik": "^2.4.2",
-    "msw": "^1.2.2",
+    "msw": "^2.0.13",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.11.2",
     "rollup-plugin-license": "^3.2.0",
     "styled-components": "^5.3.6",
-    "typescript": "^4.9.5",
+    "typescript": "^5.3.3",
     "vite": "^5.0.11",
     "web-vitals": "^2.1.4",
     "yup": "^1.2.0"
   },
   "scripts": {
     "start": "vite",
-    "build": "tsc && vite build",
+    "test": "vitest run",
+    "build": "./build.sh",
+    "build:vite": "tsc && vite build",
     "preview": "vite preview",
     "old-start": "npm --prefix ../common run build && DISABLE_ESLINT_PLUGIN=true react-scripts start",
-    "old-build": "./build.sh",
     "old-test": "DISABLE_ESLINT_PLUGIN=true react-scripts test",
-    "test": "vitest run",
     "eject": "react-scripts eject",
     "lint": "npx eslint `find . -name '*.tsx' -not -path './node_modules/*'`",
     "lint:fix": "npx eslint `find . -name '*.tsx' -not -path './node_modules/*'` --fix",
@@ -59,7 +59,7 @@
     ]
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=18.0.0"
   },
   "browserslist": {
     "production": [
@@ -74,16 +74,16 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.2.0",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^29.5.11",
     "@typescript-eslint/parser": "^5.59.8",
     "eslint": "^8.27.0",
     "eslint-plugin-react": "^7.31.10",
-    "@testing-library/user-event": "^13.5.0",
-    "@testing-library/jest-dom": "^6.2.0",
-    "@testing-library/react": "^14.1.2",
     "jsdom": "^23.2.0",
     "license-checker-rseidelsohn": "^4.2.6",
-    "spdx-expression-parse": "^3.0.1",
+    "spdx-expression-parse": "^4.0.0",
     "typescript-eslint": "^0.0.1-alpha.0",
     "vitest": "^1.1.3"
   }

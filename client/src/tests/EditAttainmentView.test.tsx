@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {AttainmentData, Formula, GradeType} from 'aalto-grades-common/types';
-import {rest} from 'msw';
+import {http} from 'msw';
 import {MemoryRouter, Routes, Route} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 
@@ -29,21 +29,21 @@ import {mockPostSuccess, mockSuccess, server} from './mock-data/server';
 //   return JSON.parse(JSON.stringify(value));
 // };
 
-const editAttainment: vi.Mock = vi.fn();
-const addAttainment: vi.Mock = vi.fn();
+const editAttainment = vi.fn();
+const addAttainment = vi.fn();
 afterEach(cleanup);
 
 describe('Tests for EditAttainmentView components', () => {
   function renderEditAttainmentView(): RenderResult {
     server.use(
-      rest.post(
+      http.post(
         '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments',
         mockPostSuccess(addAttainment, mockAttainments)
       )
     );
 
     server.use(
-      rest.put(
+      http.put(
         '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
         mockPostSuccess(editAttainment, mockAttainments)
       )
@@ -112,7 +112,7 @@ describe('Tests for EditAttainmentView components', () => {
     const mockAttainment: AttainmentData = mockAttainments.subAttainments![2];
 
     server.use(
-      rest.get(
+      http.get(
         '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
         mockSuccess(mockAttainment)
       )

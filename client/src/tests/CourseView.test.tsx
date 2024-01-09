@@ -8,7 +8,7 @@ import {
   LoginResult,
   SystemRole,
 } from 'aalto-grades-common/types';
-import {rest} from 'msw';
+import {http} from 'msw';
 import {MemoryRouter, Routes, Route} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 
@@ -31,11 +31,11 @@ describe('Tests for CourseView component', () => {
   ): RenderResult {
     if (mockInstances && mockAssessmentModels) {
       server.use(
-        rest.get(
+        http.get(
           '*/v1/courses/:courseId/assessment-models',
           mockSuccess(mockAssessmentModels)
         ),
-        rest.get('*/v1/courses/:courseId/instances', mockSuccess(mockInstances))
+        http.get('*/v1/courses/:courseId/instances', mockSuccess(mockInstances))
       );
     }
 

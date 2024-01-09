@@ -22,24 +22,30 @@ const parse = require('spdx-expression-parse');
 const jsFilename = `${process.cwd()}/build/javascript.html`;
 const $ = cheerio.load(fs.readFileSync(jsFilename));
 
-// Load the manifest file containing the hash of the generated main.js file
-const manifestBuffer = fs.readFileSync(`${process.cwd()}/build/asset-manifest.json`);
-const main = JSON.parse(manifestBuffer).files['main.js'].split('/').at(-1);
+// // Load the manifest file containing the hash of the generated main.js file
+// const manifestBuffer = fs.readFileSync(
+//   `${process.cwd()}/build/asset-manifest.json`
+// );
+// const main = JSON.parse(manifestBuffer).files['main.js'].split('/').at(-1);
 
-// Set the proper name of main.js
-$('#main').attr('href', `/static/js/${main}`);
-$('#main').text(main);
+// // Set the proper name of main.js
+// $('#main').attr('href', `/static/js/${main}`);
+// $('#main').text(main);
 
 async function addLicenses() {
   // Licenses recognized as free by LibreJS
-  const libreJsLicenseList = (await axios.get(
-    'https://git.savannah.gnu.org/cgit/librejs.git/plain/common/license_definitions.json'
-  )).data;
+  const libreJsLicenseList = (
+    await axios.get(
+      'https://git.savannah.gnu.org/cgit/librejs.git/plain/common/license_definitions.json'
+    )
+  ).data;
 
   // Full SPDX license list, contains both free and non-free licenses
-  const spdxLicenseList = (await axios.get(
-    'https://raw.githubusercontent.com/spdx/license-list-data/main/json/licenses.json'
-  )).data.licenses;
+  const spdxLicenseList = (
+    await axios.get(
+      'https://raw.githubusercontent.com/spdx/license-list-data/main/json/licenses.json'
+    )
+  ).data.licenses;
 
   // Licenses manually identified as free, but not recognized by LibreJS nor
   // listed in the SPDX license list as free
@@ -49,34 +55,34 @@ async function addLicenses() {
 
   function checkExceptions(addLicenseData, license, isUnknown) {
     const helper =
-      '\nPlease verify whether this is a free software license as defined by the'
-      + ' Free Software Foundation (https://www.gnu.org/licenses/license-list.html).'
-      + '\nIf so, please add its identifier and URL to the list of exceptions in'
-      + ' license-exceptions.json.\nIf not, the dependency MUST be removed.\n';
+      '\nPlease verify whether this is a free software license as defined by the' +
+      ' Free Software Foundation (https://www.gnu.org/licenses/license-list.html).' +
+      '\nIf so, please add its identifier and URL to the list of exceptions in' +
+      ' license-exceptions.json.\nIf not, the dependency MUST be removed.\n';
 
-    const reset = "\x1b[0m";
-    const bold = "\x1b[1m";
-    const red = "\x1b[31m";
+    const reset = '\x1b[0m';
+    const bold = '\x1b[1m';
+    const red = '\x1b[31m';
 
-    const free = exceptionsList.find((val) => val.id === license);
+    const free = exceptionsList.find(val => val.id === license);
     if (free) {
       addLicenseData(free.id, free.url);
     } else if (isUnknown) {
       console.error(
-        `${bold}Encountered unrecognized license: ${license}`
-        + `${reset}${helper}`
+        `${bold}Encountered unrecognized license: ${license}` +
+          `${reset}${helper}`
       );
     } else {
       console.error(
-        `${bold}Encountered ${red}NON-FREE${reset}${bold} license: ${license}`
-        + `${reset}${helper}`
+        `${bold}Encountered ${red}NON-FREE${reset}${bold} license: ${license}` +
+          `${reset}${helper}`
       );
     }
   }
 
   function traverseSpdxExpr(addLicenseData, expr) {
     if (expr.license) {
-      const spdx = spdxLicenseList.find((val) => val.licenseId === expr.license);
+      const spdx = spdxLicenseList.find(val => val.licenseId === expr.license);
 
       if (spdx) {
         if (spdx.isFsfLibre) {
@@ -102,7 +108,7 @@ async function addLicenses() {
     {
       start: '.',
       excludePrivatePackages: true,
-      production: true
+      production: true,
     },
     (error, packages) => {
       if (error) {
@@ -110,7 +116,7 @@ async function addLicenses() {
       } else {
         const licenseData = {
           idSet: new Set(),
-          urlMap: new Map()
+          urlMap: new Map(),
         };
 
         function addLicenseData(id, url) {
@@ -144,7 +150,7 @@ async function addLicenses() {
 
       fs.writeFileSync(jsFilename, $.html());
     }
-  )
+  );
 }
 
 addLicenses();

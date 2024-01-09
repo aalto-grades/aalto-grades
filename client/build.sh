@@ -9,10 +9,11 @@
 # npm --prefix ../common run build
 
 # Build client
-DISABLE_ESLINT_PLUGIN=true react-scripts build
+# DISABLE_ESLINT_PLUGIN=true react-scripts build # Old version
+npm run build:vite
 
 # Generate the JavaScript License Web Labels form
-node set-web-labels.js
+node set-web-labels.cjs
 
 # Generate a list of the licenses of all dependencies
 npx license-checker-rseidelsohn --excludePrivatePackages \

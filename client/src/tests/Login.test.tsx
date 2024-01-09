@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {rest} from 'msw';
+import {http} from 'msw';
 import {BrowserRouter} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 
@@ -49,8 +49,8 @@ describe('Tests for Login and LoginForm components', () => {
   test('Login should allow a user to submit their credentials', async () => {
     renderLogin();
 
-    const logIn: vi.Mock = vi.fn();
-    server.use(rest.post('*/v1/auth/login', mockPostSuccess(logIn, null)));
+    const logIn = vi.fn();
+    server.use(http.post('*/v1/auth/login', mockPostSuccess(logIn, null)));
 
     act(() => userEvent.type(screen.getByLabelText('Email'), 'test@email.com'));
     act(() => userEvent.type(screen.getByLabelText('Password'), 'secret'));

@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-// import * as path from 'path';
 /// <reference types="vitest" />
+// import * as path from 'path';
 import react from '@vitejs/plugin-react';
 // import license from 'rollup-plugin-license';
 // import {defineConfig} from 'vitest/config';
@@ -61,7 +61,6 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: './src/tests/setup.ts',
-    // setupFiles: './src/setupTests.tsx',
     include: ['./**/*.test.ts', './**/*.test.tsx'],
     globals: true,
     testTimeout: 100000,

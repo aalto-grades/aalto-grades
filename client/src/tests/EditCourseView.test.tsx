@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {GradingScale, Language} from 'aalto-grades-common/types';
-import {rest} from 'msw';
+import {http} from 'msw';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 
@@ -63,8 +63,8 @@ describe('Tests for EditCourseView components', () => {
   test('EditCourseView should allow an admin to create a course', async () => {
     renderEditCourseView();
 
-    const addCourse: vi.Mock = vi.fn();
-    server.use(rest.post('*/v1/courses', mockPostSuccess(addCourse, 1)));
+    const addCourse = vi.fn();
+    server.use(http.post('*/v1/courses', mockPostSuccess(addCourse, 1)));
 
     const testCode: string = 'Test code';
     const testNameEn: string = 'Test name';

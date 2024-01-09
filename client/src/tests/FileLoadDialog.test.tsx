@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {HttpCode, LoginResult, SystemRole} from 'aalto-grades-common/types';
-import {rest} from 'msw';
+import {http} from 'msw';
 import {MemoryRouter, Routes, Route} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 
@@ -157,7 +157,7 @@ describe('FileLoadDialog test with proper csv', () => {
 describe('FileLoadDialog test where server does not accept the file', () => {
   function renderCourseView(auth: LoginResult): RenderResult {
     server.use(
-      rest.post(
+      http.post(
         '*/v1/courses/:courseId/assessment-models',
         mockFailure(mockErrors, HttpCode.BadRequest)
       )
