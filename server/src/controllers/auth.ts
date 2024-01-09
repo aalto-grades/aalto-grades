@@ -271,22 +271,25 @@ async function getSamlStrategy(): Promise<SamlStrategy> {
         const eduUser = profile?.['urn:oid:1.3.6.1.4.1.5923.1.1.1.6'] as string;
         const email = profile?.['urn:oid:0.9.2342.19200300.100.1.3'] as string;
         const name = profile?.['urn:oid:2.16.840.1.113730.3.1.241'] as string;
-        if (!eduUser)
-          throw new ApiError('No username in profile', HttpCode.Unauthorized);
-        let user: User | null = await User.findByEduUser(eduUser);
+        if (!email)
+          throw new ApiError('No email in assertion', HttpCode.Unauthorized);
+        const user: User | null = await User.findIdpUserByEmail(email);
         if (!user) {
-          user = await User.create({
-            name: name,
-            email: email,
+          throw new ApiError(
+            'User not authorized, please ask admin for permissions',
+            HttpCode.Unauthorized
+          );
+        }
+        if (!user.eduUser) {
+          user.update({
             eduUser: eduUser,
-            role: SystemRole.User,
           });
         }
-        // TODO: how to assign roles to user?
+        // for now if teacher email is added by admin we allow the teacher to signin
         return done(null, {
           id: user.id,
           role: user.role as SystemRole,
-          name: user.name ?? '-',
+          name: user.name ?? name ?? '-',
         });
       } catch (err: unknown) {
         return done(err as Error);
@@ -304,7 +307,6 @@ async function getSamlStrategy(): Promise<SamlStrategy> {
 }
 
 export async function samlMetadata(req: Request, res: Response): Promise<void> {
-  console.log(process.cwd());
   res.type('application/xml');
   res.status(200);
   res.send(
