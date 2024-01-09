@@ -104,7 +104,7 @@ User.findIdpUserByEmail = async function (email: string): Promise<User | null> {
     where: {
       email,
       password: {
-        [Op.is]: undefined,
+        [Op.eq]: undefined,
       },
     },
   });
