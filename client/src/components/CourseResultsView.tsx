@@ -38,9 +38,6 @@ export default function CourseResultsView(): JSX.Element {
   const [selectedStudents, setSelectedStudents] = useState<Array<FinalGrade>>(
     []
   );
-  useEffect(() => {
-    console.log(selectedStudents);
-  }, [selectedStudents]);
 
   useEffect(() => {
     setHasPendingStudents(

@@ -64,6 +64,7 @@ export default defineConfig({
     include: ['./**/*.test.ts', './**/*.test.tsx'],
     globals: true,
     testTimeout: 100000,
+    css: true,
   },
   build: {
     outDir: './build',

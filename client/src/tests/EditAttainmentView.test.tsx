@@ -105,10 +105,7 @@ describe('Tests for EditAttainmentView components', () => {
   });
 
   test('EditAttainmentView should edit and add attainments if new attainments are created', async () => {
-    renderEditAttainmentView();
-
     // Mock data, can be asserted as non-null safely.
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const mockAttainment: AttainmentData = mockAttainments.subAttainments![2];
 
     server.use(
@@ -117,6 +114,8 @@ describe('Tests for EditAttainmentView components', () => {
         mockSuccess(mockAttainment)
       )
     );
+
+    renderEditAttainmentView();
 
     const newAttainment: AttainmentData = {
       id: -2,

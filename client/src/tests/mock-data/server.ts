@@ -15,6 +15,7 @@ import {mockSisuInstances} from './mockSisuInstances';
 import {mockFormulas} from './mockFormulas';
 import {type HttpRequestResolverExtras} from 'msw/lib/core/handlers/HttpHandler';
 import {Mock} from 'vitest';
+import {mockGradeFullTree} from './mockGradeFullTree';
 
 export function mockSuccess(data: unknown) {
   return async () => {
@@ -76,12 +77,17 @@ export const server: SetupServer = setupServer(
   ),
   http.get(
     '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
+    // mockSuccess(mockAttainments.subAttainments![2])
     mockSuccess(mockAttainments)
   ),
 
   http.get(
     '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades',
     mockSuccess(mockFinalGrades)
+  ),
+  http.get(
+    '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/fullTree',
+    mockSuccess(mockGradeFullTree)
   ),
   http.get(
     '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/user/:userId',
