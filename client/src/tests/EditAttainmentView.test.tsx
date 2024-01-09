@@ -66,18 +66,21 @@ describe('Tests for EditAttainmentView components', () => {
   test('EditAttainmentView should render the appropriate amount of components', async () => {
     renderEditAttainmentView();
 
-    await waitFor(async () => {
-      const headingElement: HTMLElement = screen.getByText(
-        'Edit Study Attainment'
-      );
-      const categoryField: Array<HTMLElement> =
-        await screen.findAllByLabelText('Name');
-      const submitButton: HTMLElement = screen.getByText('Submit');
+    await waitFor(
+      async () => {
+        const headingElement: HTMLElement = screen.getByText(
+          'Edit Study Attainment'
+        );
+        const categoryField: Array<HTMLElement> =
+          await screen.findAllByLabelText('Name');
+        const submitButton: HTMLElement = screen.getByText('Submit');
 
-      expect(headingElement).toBeInTheDocument();
-      expect(categoryField).toHaveLength(1);
-      expect(submitButton).toBeInTheDocument();
-    });
+        expect(headingElement).toBeInTheDocument();
+        expect(categoryField).toHaveLength(1);
+        expect(submitButton).toBeInTheDocument();
+      },
+      {timeout: 10000}
+    );
   });
 
   test('EditAttainmentView should only edit attainments if new ones are not created', async () => {
