@@ -6,6 +6,7 @@ import {HttpCode, SystemRole} from 'aalto-grades-common/types';
 import {Cookie, CookieAccessInfo} from 'cookiejar';
 import mockdate from 'mockdate';
 import supertest, {SuperAgentTest} from 'supertest';
+import * as fs from 'fs';
 
 import {
   JWT_COOKIE_EXPIRY_MS,
@@ -15,6 +16,13 @@ import {
 import {app} from '../../src/app';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
+
+jest.mock('fs', () => {
+  return {
+    __esModule: true,
+    ...jest.requireActual('fs'),
+  };
+});
 
 describe('Test GET /v1/auth/self-info - check users own info', () => {
   it('should act differently when user is logged in or out', async () => {
@@ -216,8 +224,8 @@ describe('Test GET /v1/auth/login-idp - check redirect', () => {
 });
 
 describe('Test GET /v1/auth/saml/metadata - check metadata file exists', () => {
-  jest.mock('fs', () => ({readFileSync: jest.fn(() => 'mock cert')}));
   it('should get a metadata file', async () => {
+    jest.spyOn(fs, 'readFileSync').mockImplementationOnce(() => 'mock');
     await request
       .get('/v1/auth/saml/metadata')
       .then((res: supertest.Response) => {
