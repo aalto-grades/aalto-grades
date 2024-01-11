@@ -11,6 +11,10 @@
     {
       "id": "0BSD",
       "url": "https://spdx.org/licenses/0BSD.html"
+    },
+    {
+      "id": "CC-BY-3.0",
+      "url": "https://spdx.org/licenses/CC-BY-3.0.html"
     }
   ]
 }
