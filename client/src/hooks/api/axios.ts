@@ -7,8 +7,8 @@ import axios, {AxiosInstance, AxiosResponse} from 'axios';
 import {ApiResponse} from '../../types';
 
 const BACKEND_URL: string =
-  process.env.REACT_APP_BACKEND_URL || 'http://back-end';
-const BACKEND_PORT: string = process.env.REACT_APP_BACKEND_PORT || '3000';
+  import.meta.env.VITE_APP_BACKEND_URL || 'http://back-end';
+const BACKEND_PORT: string = import.meta.env.VITE_APP_BACKEND_PORT || '3000';
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: `${BACKEND_URL}:${BACKEND_PORT}`,

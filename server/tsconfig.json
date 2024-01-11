@@ -5,6 +5,7 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    // "module": "ESNext",
     "outDir": "build",
     "types": ["node", "jest"],
     "esModuleInterop": true,

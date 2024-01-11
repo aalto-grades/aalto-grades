@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 import {HttpCode, LoginResult, SystemRole} from 'aalto-grades-common/types';
-import {rest} from 'msw';
+import {http} from 'msw';
 import {MemoryRouter, Routes, Route} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import '@testing-library/jest-dom/extend-expect';
+
 import {
   act,
   cleanup,
@@ -48,9 +48,9 @@ describe('FileLoadDialog test with proper csv', () => {
           <AuthContext.Provider
             value={{
               auth: auth,
-              setAuth: jest.fn(),
+              setAuth: vi.fn(),
               isTeacherInCharge: false,
-              setIsTeacherInCharge: jest.fn(),
+              setIsTeacherInCharge: vi.fn(),
             }}
           >
             <Routes>
@@ -157,7 +157,7 @@ describe('FileLoadDialog test with proper csv', () => {
 describe('FileLoadDialog test where server does not accept the file', () => {
   function renderCourseView(auth: LoginResult): RenderResult {
     server.use(
-      rest.post(
+      http.post(
         '*/v1/courses/:courseId/assessment-models',
         mockFailure(mockErrors, HttpCode.BadRequest)
       )
@@ -169,9 +169,9 @@ describe('FileLoadDialog test where server does not accept the file', () => {
           <AuthContext.Provider
             value={{
               auth: auth,
-              setAuth: jest.fn(),
+              setAuth: vi.fn(),
               isTeacherInCharge: false,
-              setIsTeacherInCharge: jest.fn(),
+              setIsTeacherInCharge: vi.fn(),
             }}
           >
             <Routes>

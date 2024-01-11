@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 import {AttainmentData, Formula, GradeType} from 'aalto-grades-common/types';
-import {rest} from 'msw';
+import {http} from 'msw';
 import {MemoryRouter, Routes, Route} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import '@testing-library/jest-dom/extend-expect';
+
 import {
   act,
   cleanup,
@@ -24,25 +24,26 @@ import {mockPostSuccess, mockSuccess, server} from './mock-data/server';
 
 // Not mocking structuredClone leads to errors about it being undefined.
 // Probably related: https://github.com/jsdom/jsdom/issues/3363
-global.structuredClone = <T,>(value: T): T => {
-  return JSON.parse(JSON.stringify(value));
-};
+// 🐛
+// global.structuredClone = <T,>(value: T): T => {
+//   return JSON.parse(JSON.stringify(value));
+// };
 
-const editAttainment: jest.Mock = jest.fn();
-const addAttainment: jest.Mock = jest.fn();
+const editAttainment = vi.fn();
+const addAttainment = vi.fn();
 afterEach(cleanup);
 
 describe('Tests for EditAttainmentView components', () => {
   function renderEditAttainmentView(): RenderResult {
     server.use(
-      rest.post(
+      http.post(
         '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments',
         mockPostSuccess(addAttainment, mockAttainments)
       )
     );
 
     server.use(
-      rest.put(
+      http.put(
         '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
         mockPostSuccess(editAttainment, mockAttainments)
       )
@@ -65,18 +66,21 @@ describe('Tests for EditAttainmentView components', () => {
   test('EditAttainmentView should render the appropriate amount of components', async () => {
     renderEditAttainmentView();
 
-    await waitFor(async () => {
-      const headingElement: HTMLElement = screen.getByText(
-        'Edit Study Attainment'
-      );
-      const categoryField: Array<HTMLElement> =
-        await screen.findAllByLabelText('Name');
-      const submitButton: HTMLElement = screen.getByText('Submit');
+    await waitFor(
+      async () => {
+        const headingElement: HTMLElement = screen.getByText(
+          'Edit Study Attainment'
+        );
+        const categoryField: Array<HTMLElement> =
+          await screen.findAllByLabelText('Name');
+        const submitButton: HTMLElement = screen.getByText('Submit');
 
-      expect(headingElement).toBeInTheDocument();
-      expect(categoryField).toHaveLength(1);
-      expect(submitButton).toBeInTheDocument();
-    });
+        expect(headingElement).toBeInTheDocument();
+        expect(categoryField).toHaveLength(1);
+        expect(submitButton).toBeInTheDocument();
+      },
+      {timeout: 10000}
+    );
   });
 
   test('EditAttainmentView should only edit attainments if new ones are not created', async () => {
@@ -104,18 +108,17 @@ describe('Tests for EditAttainmentView components', () => {
   });
 
   test('EditAttainmentView should edit and add attainments if new attainments are created', async () => {
-    renderEditAttainmentView();
-
     // Mock data, can be asserted as non-null safely.
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const mockAttainment: AttainmentData = mockAttainments.subAttainments![2];
 
     server.use(
-      rest.get(
+      http.get(
         '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
         mockSuccess(mockAttainment)
       )
     );
+
+    renderEditAttainmentView();
 
     const newAttainment: AttainmentData = {
       id: -2,
