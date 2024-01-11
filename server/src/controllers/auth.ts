@@ -309,11 +309,9 @@ async function getSamlStrategy(): Promise<SamlStrategy> {
 export async function samlMetadata(req: Request, res: Response): Promise<void> {
   res.type('application/xml');
   res.status(200);
+  const cert = readFileSync(SAML_SP_CERT_PATH, 'utf8');
   res.send(
-    (await getSamlStrategy()).generateServiceProviderMetadata(
-      readFileSync(SAML_SP_CERT_PATH, 'utf8'),
-      readFileSync(SAML_SP_CERT_PATH, 'utf8')
-    )
+    (await getSamlStrategy()).generateServiceProviderMetadata(cert, cert)
   );
 }
 
