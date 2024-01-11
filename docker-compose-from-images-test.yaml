@@ -38,11 +38,18 @@ services:
       file: ./common-services.yaml
       service: backend-minimum
     build:
-      context: ./server/prod
+      context: .
+      dockerfile: ./server/prod/Dockerfile
     container_name: backend-server
     environment:
       AALTO_GRADES_JWT_SECRET: "${AALTO_GRADES_JWT_SECRET}"
       AALTO_GRADES_FRONTEND_CORS_ORIGIN: "https://aalto-grades.cs.aalto.fi"
+      SAML_CALLBACK: "${SAML_CALLBACK}"
+      SAML_ENTRYPOINT: "${SAML_ENTRYPOINT}"
+      SAML_ENTITY: "${SAML_ENTITY}"
+      ENCRYPT_PVK_FILE: "${ENCRYPT_PVK_FILE}"
+      PRIVATE_KEY_FILE: "${PRIVATE_KEY_FILE}"
+      SAML_SP_CERT_PATH: "${SAML_SP_CERT_PATH}"
 
   database:
     extends:

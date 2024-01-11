@@ -2,11 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {ExpandLess, ExpandMore} from '@mui/icons-material';
-import {Badge, Box, Checkbox, IconButton, Link, Tooltip} from '@mui/material';
+import {ArrowUpward, ExpandLess, ExpandMore, Sort} from '@mui/icons-material';
+import {Badge, Checkbox, IconButton, Link, Tooltip} from '@mui/material';
+import '@tanstack/react-table';
 import {
   ExpandedState,
   GroupingState,
+  RowData,
   SortingState,
   createColumnHelper,
   flexRender,
@@ -26,9 +28,16 @@ import {
 } from 'aalto-grades-common/types';
 import * as React from 'react';
 import {findBestGradeOption} from '../../utils';
+import PrettyChip from '../shared/PrettyChip';
 import GradeCell from './GradeCell';
 import StudentGradesDialog from './StudentGradesDialog';
-import PrettyChip from '../shared/PrettyChip';
+// This module is used to create meta data for colums cells
+declare module '@tanstack/table-core' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface ColumnMeta<TData extends RowData, TValue> {
+    PrettyChipPosition: 'first' | 'middle' | 'last' | 'alone';
+  }
+}
 
 type StudentRow = {
   attainmentId: number;
@@ -46,6 +55,7 @@ type GroupedStudentRow = {
 type PropsType = {
   data: StudentGradesTree[];
   attainmentList: Array<AttainmentData>;
+  attainmentTree?: AttainmentData;
   selectedStudents: FinalGrade[];
   setSelectedStudents: React.Dispatch<React.SetStateAction<FinalGrade[]>>;
 };
@@ -123,21 +133,6 @@ function groupByLastAttainmentDate(gradesList: StudentRow[]) {
     return newestDate.toISOString().split('T')[0];
   }
 
-  //Dict implementation
-  // const result: {[date: string]: StudentRow[]} = {};
-  // for (const row of gradesList) {
-  //   const date = findNewestDate(row);
-  //   if (!result[date]) {
-  //     result[date] = [];
-  //   }
-  //   result[date].push(row);
-  // }
-  // let finalRes: {date: string; rows: StudentRow[]}[] = [];
-  // for (const d of Object.keys(result)) {
-  //   finalRes = finalRes.concat([{date: d, rows: result[d]}]);
-  // }
-  // return finalRes;
-
   //Array implementation
   const result: Array<GroupedStudentRow> = [];
   for (const row of gradesList) {
@@ -147,11 +142,34 @@ function groupByLastAttainmentDate(gradesList: StudentRow[]) {
   return result;
 }
 
+/**
+ * Finds the previous grade that has been exported to Sisu, excluding the best grade.
+ * @param bestGrade - The best grade option.
+ * @param row - The student row.
+ * @returns The previous grade that has been exported to Sisu, or null if none is found.
+ */
+function findPreviouslyExportedToSisu(bestGrade: GradeOption, row: StudentRow) {
+  for (const gr of row.grades) {
+    if (bestGrade?.gradeId === gr.gradeId) continue; //Skip the best grade (we need to check for previous ones)
+    if (gr.exportedToSisu) {
+      //We found one!
+      if (bestGrade.exportedToSisu) {
+        //If the best grade is also exported, we need to check which one is newer
+        if (bestGrade.exportedToSisu < gr.exportedToSisu) return gr;
+      } else {
+        return gr;
+      }
+    }
+  }
+  return null;
+}
+
 const columnHelper = createColumnHelper<GroupedStudentRow>();
 
 //TODO: Better column definitions
 //TODO: Better typing and freeze how to access data
 const CourseResultsTanTable: React.FC<PropsType> = props => {
+  console.log(props.attainmentList);
   const flattenData = React.useMemo(
     () => props.data.map(flattenTree),
     [props.data]
@@ -182,19 +200,75 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
       });
     });
   }, [rowSelection]);
-  console.log(expanded);
-  console.log(rowSelection);
+  // console.log(expanded);
+  // console.log(rowSelection);
 
   // Creating Grades columns
-  const dynamicColumns = props.attainmentList.map(att => {
-    return columnHelper.accessor(row => getAttainmentGrade(row, att.id ?? 0), {
-      header: att.name,
-      cell: ({getValue}) => (
-        <GradeCell studentNumber={'123'} attainemntResults={getValue()} />
-      ),
-      footer: att.name,
-    });
-  });
+  // const dynamicColumns = props.attainmentList.map(att => {
+  //   return columnHelper.accessor(row => getAttainmentGrade(row, att.id ?? 0), {
+  //     header: att.name,
+  //     meta: {PrettyChipPosition: 'alone'},
+  //     enableSorting: false,
+  //     cell: ({getValue}) => (
+  //       <GradeCell studentNumber={'123'} attainemntResults={getValue()} />
+  //     ),
+  //     footer: att.name,
+  //   });
+  // });
+  // Dynamic columns but instead of using the flat array of attainments, use the tree
+  function createAssignmentRow(
+    subAssignment: AttainmentData[] // : (ColumnDef<GroupedStudentRow, any>)[]
+  ): (
+    | ReturnType<typeof columnHelper.accessor>
+    | ReturnType<typeof columnHelper.group>
+  )[] {
+    return subAssignment.map(att => {
+      if ((att.subAttainments?.length ?? 0 > 0) && att.subAttainments) {
+        return columnHelper.group({
+          header: att.name,
+          meta: {PrettyChipPosition: 'alone'},
+          columns: [
+            columnHelper.accessor(row => getAttainmentGrade(row, att.id ?? 0), {
+              header: att.name,
+              meta: {PrettyChipPosition: 'alone'},
+              enableSorting: false,
+              cell: ({getValue}) => (
+                <GradeCell
+                  studentNumber={'123'}
+                  attainemntResults={getValue()}
+                  finalGrade={false}
+                />
+              ),
+            }),
+            ...createAssignmentRow(att.subAttainments),
+          ],
+        });
+      }
+
+      return columnHelper.accessor(
+        row => getAttainmentGrade(row, att.id ?? 0),
+        {
+          header: att.name,
+          meta: {PrettyChipPosition: 'alone'},
+          enableSorting: false,
+          cell: ({getValue}) => (
+            <GradeCell
+              studentNumber={'123'}
+              attainemntResults={getValue()}
+              finalGrade={false}
+            />
+          ),
+        }
+      );
+    }) as (
+      | ReturnType<typeof columnHelper.accessor>
+      | ReturnType<typeof columnHelper.group>
+    )[];
+  }
+
+  const dynamicColumns = createAssignmentRow(
+    props.attainmentTree?.subAttainments ?? []
+  );
 
   // Creating grouping column
   const groupingColumns =
@@ -202,9 +276,11 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
       ? [
           columnHelper.accessor(row => row.grouping, {
             id: 'grouping',
-            header: 'Latest attainment',
+            meta: {PrettyChipPosition: 'first'},
+            header: () => {
+              return 'Latest Attainment';
+            },
             cell: prop => prop.getValue(),
-            aggregatedCell: () => null,
           }),
         ]
       : [];
@@ -214,42 +290,26 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
     ...groupingColumns,
     columnHelper.display({
       id: 'select',
+      meta: {PrettyChipPosition: grouping.length > 0 ? 'last' : 'alone'},
       header: ({table}) => {
         return (
-          <Box
-            sx={{
-              width: '100%',
-              height: '100%',
-              // borderRight: '1px black solid',
-              // borderLeft: '1px black solid',
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
-            <span
-              style={{
-                backgroundColor: 'white',
-                border: '1px solid lightgray',
-                borderRadius: '50px',
+          <>
+            <Checkbox
+              {...{
+                checked: table.getIsAllRowsSelected(),
+                indeterminate: table.getIsSomeRowsSelected(),
+                onChange: table.getToggleAllRowsSelectedHandler(),
               }}
-            >
-              <Checkbox
-                {...{
-                  checked: table.getIsAllRowsSelected(),
-                  indeterminate: table.getIsSomeRowsSelected(),
-                  onChange: table.getToggleAllRowsSelectedHandler(),
-                }}
+            />
+            <span style={{marginLeft: '4px', marginRight: '15px'}}>
+              <Badge
+                badgeContent={table.getSelectedRowModel().rows.length || '0'}
+                // color="secondary"
+                color="primary"
+                max={999}
               />
-              <span style={{marginLeft: '4px', marginRight: '15px'}}>
-                <Badge
-                  badgeContent={table.getSelectedRowModel().rows.length || '0'}
-                  // color="secondary"
-                  color="primary"
-                  max={999}
-                />
-              </span>
             </span>
-          </Box>
+          </>
         );
       },
       aggregatedCell: ({row}) => (
@@ -311,6 +371,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
     }),
     columnHelper.accessor('studentNumber', {
       header: 'Student Number',
+      meta: {PrettyChipPosition: 'first'},
       cell: ({row, getValue}) => {
         return (
           <Tooltip
@@ -333,11 +394,13 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
     }),
     columnHelper.accessor('credits', {
       header: 'Credits',
+      enableSorting: false,
       cell: info => info.getValue(),
       aggregatedCell: () => null,
     }),
     columnHelper.accessor(row => row, {
       header: 'Final Grade',
+      enableSorting: false,
       // cell: info => info.getValue(),
       cell: ({getValue}) => (
         <GradeCell
@@ -349,20 +412,32 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
       aggregatedCell: () => null,
     }),
     columnHelper.accessor(
-      row =>
+      row => {
         // ATTENTION this function needs to have the same parameters of the one inside the grade cell
-        // Clearly can be done in abetter way
-        findBestGradeOption(row?.grades ?? [], {
+        // Clearly can be done in a better way
+        const bestGrade = findBestGradeOption(row?.grades ?? [], {
           avoidExpired: true,
           preferExpiredToNull: true,
-        })?.exportedToSisu ?? false,
+        });
+        if (!bestGrade) return '-';
+        console.log(bestGrade);
+        if (bestGrade?.exportedToSisu) return '✅';
+        console.log(findPreviouslyExportedToSisu(bestGrade, row));
+        if (findPreviouslyExportedToSisu(bestGrade, row)) return '⚠️';
+        return '❌';
+      },
       {
         header: 'Exported to Sisu',
-        cell: info => (info.getValue() ? '✅' : '❌'),
+        meta: {PrettyChipPosition: 'last'},
+        cell: info => info.getValue(),
         aggregatedCell: () => null,
       }
     ),
-    columnHelper.group({header: 'Assignments', columns: dynamicColumns}),
+    columnHelper.group({
+      header: 'Attainments',
+      meta: {PrettyChipPosition: 'alone'},
+      columns: dynamicColumns,
+    }),
   ];
 
   const table = useReactTable({
@@ -436,24 +511,51 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
                 <th
                   style={{
                     // border: '1px solid lightgray',
-                    padding: '5px',
+                    padding: '0px',
+                    height: '50px',
                   }}
                   key={header.id}
                   colSpan={header.colSpan}
-                  onClick={header.column.getToggleSortingHandler()}
                 >
                   {header.isPlaceholder ? null : (
-                    <>
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                      {
-                        {asc: ' 🔼', desc: ' 🔽'}[
-                          header.column.getIsSorted() as string
-                        ]
+                    <PrettyChip
+                      position={
+                        header.column.columnDef.meta?.PrettyChipPosition ===
+                        'alone'
+                          ? undefined
+                          : header.column.columnDef.meta?.PrettyChipPosition ??
+                            'middle'
                       }
-                    </>
+                      style={{
+                        fontWeight: 'bold',
+                      }}
+                      onClick={
+                        header.column.getCanSort()
+                          ? header.column.getToggleSortingHandler()
+                          : undefined
+                      }
+                    >
+                      <>
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                        {!header.column.getCanSort() ? null : (
+                          <IconButton>
+                            <>
+                              {{
+                                asc: <ArrowUpward />,
+                                desc: (
+                                  <ArrowUpward style={{rotate: '180deg'}} />
+                                ),
+                              }[header.column.getIsSorted() as string] ?? (
+                                <Sort></Sort>
+                              )}
+                            </>
+                          </IconButton>
+                        )}
+                      </>
+                    </PrettyChip>
                   )}
                 </th>
               ))}
@@ -472,15 +574,9 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
                     key={cell.id}
                     {...{
                       style: {
-                        // background: cell.getIsGrouped()
-                        //   ? '#0aff0082'
-                        //   : cell.getIsAggregated()
-                        //   ? '#ffa50078'
-                        //   : cell.getIsPlaceholder()
-                        //   ? '#ff000042'
-                        //   : 'white',
                         padding: '0px',
                         height: '50px',
+                        textAlign: 'center',
                       },
                     }}
                   >
@@ -552,7 +648,29 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
                       )
                     ) : cell.getIsPlaceholder() ? null : ( // For cells with repeated values, render null
                       // Otherwise, just render the regular cell
-                      flexRender(cell.column.columnDef.cell, cell.getContext())
+                      <>
+                        {cell.getValue() === undefined ? (
+                          flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )
+                        ) : (
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              borderBottom: '1px solid lightgray',
+                              height: '100%',
+                            }}
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </div>
+                        )}
+                      </>
                     )}
                   </td>
                 );

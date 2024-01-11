@@ -49,7 +49,7 @@ export default function CourseResultsTable(props: {
     useState<keyof FinalGrade>('studentNumber');
   const [page, setPage]: State<number> = useState(0);
   const [rowsPerPage, setRowsPerPage]: State<number> = useState(25);
-  const [search, setSearch]: State<string> = useState('');
+  const [search, _]: State<string> = useState('');
   const [studentsToShow, setStudentsToShow]: State<Array<FinalGrade>> =
     useState(props.students);
   const [allSelected, setAllSelected]: State<boolean> = useState(false);
@@ -128,8 +128,8 @@ export default function CourseResultsTable(props: {
     <Box sx={{width: '100%', minWidth: '600px'}}>
       <Paper sx={{width: '100%', mb: 2}}>
         <CourseResultsTableToolbar
-          search={search}
-          setSearch={setSearch}
+          // search={search}
+          // setSearch={setSearch}
           calculateFinalGrades={props.calculateFinalGrades}
           downloadCsvTemplate={props.downloadCsvTemplate}
           selectedStudents={props.selectedStudents}

@@ -8,6 +8,7 @@ import {
   Model,
   InferAttributes,
   InferCreationAttributes,
+  Op,
 } from 'sequelize';
 
 import {sequelize} from '..';
@@ -27,6 +28,7 @@ export default class User extends Model<
   declare updatedAt: CreationOptional<Date>;
   static findByEmail: (email: string) => Promise<User | null>;
   static findByEduUser: (eduUser: string) => Promise<User | null>;
+  static findIdpUserByEmail: (email: string) => Promise<User | null>;
 }
 
 User.init(
@@ -93,6 +95,17 @@ User.findByEduUser = async function (eduUser: string): Promise<User | null> {
   return await User.findOne({
     where: {
       eduUser,
+    },
+  });
+};
+
+User.findIdpUserByEmail = async function (email: string): Promise<User | null> {
+  return await User.findOne({
+    where: {
+      email,
+      password: {
+        [Op.eq]: undefined,
+      },
     },
   });
 };

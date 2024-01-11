@@ -326,7 +326,7 @@ export async function getSisuFormattedGradingCSV(
   if (!override) {
     // If not overridden, clean already exported grades from results.
     finalGrades = finalGrades.filter(
-      (grade: FinalGradeRaw) => grade.sisuExportDate == null
+      (grade: FinalGradeRaw) => grade.sisuExportDate === null
     );
   }
 
@@ -528,7 +528,7 @@ export async function getFinalGrades(
             status: grade.status as Status,
             manual: grade.manual,
             exportedToSisu: grade.sisuExportDate,
-            date: toDateOnlyString(grade.date),
+            date: grade.date ? toDateOnlyString(grade.date) : undefined,
             comment: grade.comment ?? '',
           };
         }),
@@ -665,8 +665,10 @@ export async function getGradeTreeOfAllUsers(
             status: option.status as Status,
             manual: option.manual,
             exportedToSisu: option.sisuExportDate,
-            date: toDateOnlyString(option.date),
-            expiryDate: toDateOnlyString(option.expiryDate),
+            date: option.date ? toDateOnlyString(option.date) : undefined,
+            expiryDate: option.expiryDate
+              ? toDateOnlyString(option.expiryDate)
+              : undefined,
             comment: option.comment ?? '',
           };
         }
@@ -803,8 +805,10 @@ export async function getGradeTreeOfUser(
             status: option.status as Status,
             manual: option.manual,
             exportedToSisu: option.sisuExportDate,
-            date: toDateOnlyString(option.date),
-            expiryDate: toDateOnlyString(option.expiryDate),
+            date: option.date ? toDateOnlyString(option.date) : undefined,
+            expiryDate: option.expiryDate
+              ? toDateOnlyString(option.expiryDate)
+              : undefined,
             comment: option.comment ?? '',
           };
         }
