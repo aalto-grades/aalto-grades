@@ -216,7 +216,7 @@ describe('Test GET /v1/auth/login-idp - check redirect', () => {
 });
 
 describe('Test GET /v1/auth/saml/metadata - check metadata file exists', () => {
-  jest.mock('fs', () => ({readFileSync: jest.fn(() => 'mock cert')}))
+  jest.mock('fs', () => ({readFileSync: jest.fn(() => 'mock cert')}));
   it('should get a metadata file', async () => {
     await request
       .get('/v1/auth/saml/metadata')
