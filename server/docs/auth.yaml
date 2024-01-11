@@ -194,7 +194,7 @@ definitions:
   get:
     tags: [Auth]
     description: >
-      A xml metadata file describing Service Provider SAML attributes 
+      A xml metadata file describing Service Provider SAML attributes
     responses:
       200:
         description: Xml read successfully
@@ -207,7 +207,7 @@ definitions:
     responses:
       303:
         description: User redirected to idp login page
-  
+
 /v1/auth/login-idp/callback:
   post:
     tags: [Auth]
