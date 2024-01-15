@@ -117,7 +117,7 @@ export default function LeafAttainment(props: {
           variant="body1"
           sx={{flexGrow: 1, textAlign: 'left', mb: 0.5}}
         >
-          {'Grading Formula: ' + formula.data?.name ?? 'Loading...'}
+          {'Grading Formula: ' + (formula.data?.name ?? 'Loading...')}
         </Typography>
         {/* Navigation below doesn't work because formula selection has
              only been implemented for course grade */}
