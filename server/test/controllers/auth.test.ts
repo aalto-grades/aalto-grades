@@ -6,6 +6,7 @@ import {HttpCode, SystemRole} from 'aalto-grades-common/types';
 import {Cookie, CookieAccessInfo} from 'cookiejar';
 import mockdate from 'mockdate';
 import supertest, {SuperAgentTest} from 'supertest';
+import * as fs from 'fs';
 
 import {
   JWT_COOKIE_EXPIRY_MS,
@@ -15,6 +16,13 @@ import {
 import {app} from '../../src/app';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
+
+jest.mock('fs', () => {
+  return {
+    __esModule: true,
+    ...jest.requireActual('fs'),
+  };
+});
 
 describe('Test GET /v1/auth/self-info - check users own info', () => {
   it('should act differently when user is logged in or out', async () => {
@@ -204,5 +212,25 @@ describe('Test POST /v1/auth/login and expiry', () => {
       .get('/v1/auth/self-info')
       .withCredentials(true)
       .expect(HttpCode.Unauthorized);
+  });
+});
+
+describe('Test GET /v1/auth/login-idp - check redirect', () => {
+  it('should redirect to idp', async () => {
+    await request.get('/v1/auth/login-idp').then((res: supertest.Response) => {
+      expect(res.headers.location).toContain('idp.aalto');
+    });
+  });
+});
+
+describe('Test GET /v1/auth/saml/metadata - check metadata file exists', () => {
+  it('should get a metadata file', async () => {
+    jest.spyOn(fs, 'readFileSync').mockImplementationOnce(() => 'mock');
+    await request
+      .get('/v1/auth/saml/metadata')
+      .then((res: supertest.Response) => {
+        expect(res.headers['content-type']).toContain('application/xml');
+        expect(res.text).toContain('X509Certificate');
+      });
   });
 });
