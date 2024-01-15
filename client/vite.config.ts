@@ -14,7 +14,7 @@ import {defineConfig} from 'vite';
 // export default defineConfig(({mode}) => {
 export default defineConfig({
   // depending on your application, base can also be "/"
-  base: '',
+  base: '/',
   plugins: [
     react(),
     // viteTsconfigPaths()
