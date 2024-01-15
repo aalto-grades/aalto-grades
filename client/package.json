@@ -44,7 +44,7 @@
     "test": "vitest run",
     "build": "./build.sh",
     "build:vite": "tsc && vite build",
-    "preview": "vite preview",
+    "preview": "vite preview --port 3005",
     "vitest-preview": "vitest-preview",
     "old-start": "npm --prefix ../common run build && DISABLE_ESLINT_PLUGIN=true react-scripts start",
     "old-test": "DISABLE_ESLINT_PLUGIN=true react-scripts test",
