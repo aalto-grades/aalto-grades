@@ -9,7 +9,7 @@
     "../common"
   ],
   "scripts": {
-    "build": "npm --prefix ../common run build && npx tsc",
+    "build": "npx tsc",
     "start": "node build/src/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "test": "jest --verbose --detectOpenHandles --coverage",
@@ -19,7 +19,8 @@
     "migration:down": "npx sequelize-cli db:migrate:undo",
     "migration:down:all": "npx sequelize-cli db:migrate:undo:all",
     "seed:up": "npx sequelize-cli db:seed:all",
-    "seed:down": "npx sequelize-cli db:seed:undo"
+    "seed:down": "npx sequelize-cli db:seed:undo",
+    "old-build": "npm --prefix ../common run build && npx tsc"
   },
   "dependencies": {
     "@node-saml/passport-saml": "^4.0.4",
