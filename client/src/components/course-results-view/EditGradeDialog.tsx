@@ -72,6 +72,16 @@ export default function EditGradeDialog(props: {
 
   async function handleSubmit(values: EditGrade): Promise<void> {
     if (courseId && assessmentModelId && gradeId) {
+      // This very orrible solution eliminates empty values from the payload to avoid validation errors on the server
+      Object.keys(values).forEach(key => {
+        if (
+          values[key as keyof EditGrade] === '' ||
+          values[key as keyof EditGrade] === null
+        ) {
+          delete values[key as keyof EditGrade];
+        }
+      });
+
       editGrade.mutate(
         {
           courseId,
@@ -240,9 +250,11 @@ export default function EditGradeDialog(props: {
                     type="date"
                     fullWidth
                     value={
-                      new Date(values.expiryDate as Date)
-                        .toISOString()
-                        .split('T')[0]
+                      values.expiryDate
+                        ? new Date(values.expiryDate as Date)
+                            .toISOString()
+                            .split('T')[0]
+                        : undefined
                     }
                     disabled={isSubmitting}
                     label="Grade Expiry date"
