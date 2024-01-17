@@ -120,3 +120,20 @@ export async function getUserInfo(req: Request, res: Response): Promise<void> {
     data: userData,
   });
 }
+
+export async function addIdpUser(req: Request, res: Response): Promise<void> {
+  const email: string | undefined = req.body.email;
+  if (!email) {
+    throw new ApiError('Bad request', HttpCode.BadRequest);
+  }
+  const userAlreadyExists = await User.findIdpUserByEmail(email);
+  console.log(userAlreadyExists);
+  if (userAlreadyExists) {
+    throw new ApiError('User already exists', HttpCode.Conflict);
+  }
+  await User.create({
+    email: email,
+    role: SystemRole.User,
+  });
+  res.status(HttpCode.Created).send();
+}

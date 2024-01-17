@@ -2,11 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Router} from 'express';
+import express, {Router} from 'express';
 import passport from 'passport';
 
-import {getCoursesOfUser, getUserInfo} from '../controllers/user';
+import {getCoursesOfUser, getUserInfo, addIdpUser} from '../controllers/user';
 import {controllerDispatcher} from '../middleware/errorHandler';
+import {authorization} from '../middleware/authorization';
+import {SystemRole} from 'aalto-grades-common/types';
+import {handleInvalidRequestJson} from '../middleware';
 
 export const router: Router = Router();
 
@@ -20,4 +23,13 @@ router.get(
   '/v1/user/:userId',
   passport.authenticate('jwt', {session: false}),
   controllerDispatcher(getUserInfo)
+);
+
+router.post(
+  '/v1/users/add/idp-user',
+  passport.authenticate('jwt', {session: false}),
+  authorization([SystemRole.Admin]),
+  express.json(),
+  handleInvalidRequestJson,
+  controllerDispatcher(addIdpUser)
 );

@@ -9,6 +9,7 @@ import {NavigateFunction, useNavigate} from 'react-router-dom';
 import {UseQueryResult} from '@tanstack/react-query';
 
 import CourseTable from './front-page/CourseTable';
+import UsersView from './users-view/UsersView';
 
 import {useGetAllCourses, useGetCoursesOfUser} from '../hooks/useApi';
 import useAuth, {AuthContextType} from '../hooks/useAuth';
@@ -81,6 +82,7 @@ export default function FrontPage(): JSX.Element {
         }
       </Box>
       {courses.data && <CourseTable courses={courses.data} />}
+      {auth?.role === SystemRole.Admin && <UsersView />}
     </>
   );
 }

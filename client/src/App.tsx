@@ -33,6 +33,7 @@ import Login from './components/auth/Login';
 import PrivateRoute from './components/auth/PrivateRoute';
 import Signup from './components/auth/Signup';
 import UserButton from './components/auth/UserButton';
+import AddUserView from './components/users-view/AddUserView';
 
 import useSnackPackAlerts, {
   SnackPackAlertState,
@@ -205,6 +206,7 @@ export default function App(): JSX.Element {
                     path="/course/:modification/:courseId?"
                     element={<EditCourseView />}
                   />
+                  <Route path="/user/add/" element={<AddUserView />} />
                 </Route>
                 <Route
                   element={
