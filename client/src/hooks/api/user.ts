@@ -33,3 +33,14 @@ export function useAddUser(
     ...options,
   });
 }
+
+export function useGetIdpUsers(
+  options?: UseQueryOptions<Array<{email: string}>>
+): UseQueryResult<Array<{email: string}>> {
+  return useQuery({
+    queryKey: ['idp-users'],
+    queryFn: async () =>
+      (await axios.get('/v1/users/idp')).data.data,
+    ...options,
+  });
+}

@@ -5,7 +5,12 @@
 import express, {Router} from 'express';
 import passport from 'passport';
 
-import {getCoursesOfUser, getUserInfo, addIdpUser} from '../controllers/user';
+import {
+  getCoursesOfUser,
+  getUserInfo,
+  addIdpUser,
+  getIdpUsers,
+} from '../controllers/user';
 import {controllerDispatcher} from '../middleware/errorHandler';
 import {authorization} from '../middleware/authorization';
 import {SystemRole} from 'aalto-grades-common/types';
@@ -32,4 +37,10 @@ router.post(
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(addIdpUser)
+);
+
+router.get(
+  '/v1/users/idp',
+  passport.authenticate('jwt', {session: false}),
+  controllerDispatcher(getIdpUsers)
 );

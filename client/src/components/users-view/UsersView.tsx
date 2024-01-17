@@ -7,6 +7,7 @@ import {Box, Button, Typography} from '@mui/material';
 import {NavigateFunction, useNavigate} from 'react-router-dom';
 
 import useAuth, {AuthContextType} from '../../hooks/useAuth';
+import UsersTable from './usersTable';
 
 export default function UsersView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
@@ -42,6 +43,7 @@ export default function UsersView(): JSX.Element {
           )
         }
       </Box>
+      <UsersTable />
     </>
   );
 }
