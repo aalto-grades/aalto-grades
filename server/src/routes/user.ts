@@ -10,6 +10,7 @@ import {
   getUserInfo,
   addIdpUser,
   getIdpUsers,
+  deleteIdpUser,
 } from '../controllers/user';
 import {controllerDispatcher} from '../middleware/errorHandler';
 import {authorization} from '../middleware/authorization';
@@ -31,7 +32,7 @@ router.get(
 );
 
 router.post(
-  '/v1/users/add/idp-user',
+  '/v1/idp-users',
   passport.authenticate('jwt', {session: false}),
   authorization([SystemRole.Admin]),
   express.json(),
@@ -40,7 +41,16 @@ router.post(
 );
 
 router.get(
-  '/v1/users/idp',
+  '/v1/idp-users',
   passport.authenticate('jwt', {session: false}),
+  authorization([SystemRole.Admin]),
   controllerDispatcher(getIdpUsers)
+);
+
+router.delete(
+  '/v1/idp-users/:userId',
+  passport.authenticate('jwt', {session: false}),
+  authorization([SystemRole.Admin]),
+  express.json(),
+  controllerDispatcher(deleteIdpUser)
 );

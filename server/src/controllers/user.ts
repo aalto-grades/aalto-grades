@@ -147,8 +147,24 @@ export async function getIdpUsers(req: Request, res: Response): Promise<void> {
         },
       },
     })
-  ).map(user => ({email: user.email}));
+  ).map(user => ({email: user.email, id: user.id}));
   res.status(HttpCode.Ok).json({
     data: users,
   });
+}
+
+export async function deleteIdpUser(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const userId: string | undefined = req.params.userId;
+  if (!userId) {
+    throw new ApiError('Bad request', HttpCode.BadRequest);
+  }
+  const user = await User.findByPk(userId);
+  if (!user || user?.password) {
+    throw new ApiError('User not found', HttpCode.NotFound);
+  }
+  await user.destroy();
+  res.status(HttpCode.Ok).send();
 }

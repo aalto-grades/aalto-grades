@@ -7,7 +7,7 @@ import {Box, Button, Typography} from '@mui/material';
 import {NavigateFunction, useNavigate} from 'react-router-dom';
 
 import useAuth, {AuthContextType} from '../../hooks/useAuth';
-import UsersTable from './usersTable';
+import UsersTable from './UsersTable';
 
 export default function UsersView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
