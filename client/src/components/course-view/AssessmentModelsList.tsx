@@ -24,6 +24,7 @@ export default function AssessmentModelsList(props: {
             key={assessmentModel.id}
             selected={props.current === assessmentModel.id}
             onClick={(): void => props.onClick(assessmentModel)}
+            sx={{borderRadius: 100}}
           >
             {assessmentModel.name}
           </ListItemButton>

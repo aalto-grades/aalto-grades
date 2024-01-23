@@ -37,64 +37,47 @@ export default function CourseDetails(props: {
   }
 
   return (
-    <Box sx={{display: 'inline-block'}}>
-      <Box
-        sx={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          columnGap: 4,
-          pb: 1,
-        }}
-      >
+    <Box sx={{display: 'flex', gap: 3}}>
+      <Box sx={{mt: 1.5}}>
+        <Typography variant="h3" align="left" sx={{pt: 1.5, pb: 1}}>
+          Course Details
+        </Typography>
         <Box
+          textAlign="left"
+          borderRadius={1}
           sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
+            bgcolor: 'secondary.light',
+            p: 1.5,
+            mt: 1,
+            minWidth: '318px',
           }}
         >
-          <Typography variant="h3" align="left" sx={{pt: 1.5, pb: 1}}>
-            Course Details
-          </Typography>
+          <LightLabelBoldValue
+            label="Credits"
+            value={
+              props.course.minCredits === props.course.maxCredits
+                ? props.course.minCredits
+                : `${props.course.minCredits}-${props.course.maxCredits}`
+            }
+          />
+          <LightLabelBoldValue
+            label="Grading Scale"
+            value={convertToClientGradingScale(props.course.gradingScale)}
+          />
+          <LightLabelBoldValue
+            label="Organizing Department"
+            value={props.course.department.en}
+          />
+          <LightLabelBoldValue
+            label="Educational Institution"
+            // REPLACE SOME DAY? currently this info can't be fetched from database
+            value="Aalto University"
+          />
+          <LightLabelBoldValue
+            label="Course language"
+            value={getLanguageById(props.course.languageOfInstruction)}
+          />
         </Box>
-      </Box>
-      <Box
-        textAlign="left"
-        borderRadius={1}
-        sx={{
-          bgcolor: 'secondary.light',
-          p: 1.5,
-          mt: 1,
-          minWidth: '318px',
-        }}
-      >
-        <LightLabelBoldValue
-          label="Credits"
-          value={
-            props.course.minCredits === props.course.maxCredits
-              ? props.course.minCredits
-              : `${props.course.minCredits}-${props.course.maxCredits}`
-          }
-        />
-        <LightLabelBoldValue
-          label="Grading Scale"
-          value={convertToClientGradingScale(props.course.gradingScale)}
-        />
-        <LightLabelBoldValue
-          label="Organizing Department"
-          value={props.course.department.en}
-        />
-        <LightLabelBoldValue
-          label="Educational Institution"
-          // REPLACE SOME DAY? currently this info can't be fetched from database
-          value="Aalto University"
-        />
-        <LightLabelBoldValue
-          label="Course language"
-          value={getLanguageById(props.course.languageOfInstruction)}
-        />
       </Box>
       <Box sx={{mt: 1.5}}>
         <Typography variant="h3" align="left" sx={{pt: 1.5, pb: 1}}>
@@ -119,7 +102,7 @@ export default function CourseDetails(props: {
           })}
         </Box>
       </Box>
-      <Box sx={{mt: 1.5}}>
+      {/* <Box sx={{mt: 1.5}}>
         <Box
           sx={{
             display: 'flex',
@@ -130,7 +113,7 @@ export default function CourseDetails(props: {
           <Typography variant="h3" align="left" sx={{pt: 1.5, pb: 1}}>
             Assessment Models
           </Typography>
-          {(auth?.role == SystemRole.Admin || isTeacherInCharge) && (
+          {(auth?.role === SystemRole.Admin || isTeacherInCharge) && (
             <Tooltip title="New assessment model" placement="right">
               <Button onClick={props.onNewAssessmentModel}>New</Button>
             </Tooltip>
@@ -160,7 +143,7 @@ export default function CourseDetails(props: {
             </Box>
           )}
         </Box>
-      </Box>
+      </Box> */}
     </Box>
   );
 }
