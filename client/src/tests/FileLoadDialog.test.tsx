@@ -136,7 +136,6 @@ describe('FileLoadDialog test with proper csv', () => {
     expect(getByText('Add Grades from File')).toBeVisible();
 
     await waitFor(() =>
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       fireEvent.change(
         getByText('Upload file').querySelector('input[type="file"]')!,
         {
@@ -203,7 +202,6 @@ describe('FileLoadDialog test where server does not accept the file', () => {
     const dialogTitle: HTMLElement = getByText('Add Grades from File');
 
     await waitFor(() =>
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       fireEvent.change(
         getByText('Upload file').querySelector('input[type="file"]')!,
         {

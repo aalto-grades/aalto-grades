@@ -38,15 +38,6 @@ export default function EditAttainmentView(): JSX.Element {
   const {courseId, assessmentModelId, modification, attainmentId}: Params =
     useParams();
 
-  // Check for invalid paths
-  if (
-    (modification === 'create' && attainmentId) ||
-    (modification === 'edit' && !attainmentId) ||
-    (modification !== 'create' && modification !== 'edit')
-  ) {
-    return <NotFound />;
-  }
-
   /*
    * The current state of the tree of attainments being edited.
    *
@@ -82,6 +73,33 @@ export default function EditAttainmentView(): JSX.Element {
       cacheTime: 0,
     }
   );
+
+  // List of attainments that exist in the database which are to be deleted.
+  const [deletedAttainments, setDeletedAttainments]: State<
+    Array<AttainmentData>
+  > = useState<Array<AttainmentData>>([]);
+
+  /*
+   * Temporary IDs for attainments that have not been added to the database yet
+   * and only exist in the client. Temporary IDs are negative to differentiate
+   * them from database IDs and to avoid conflicts between them.
+   */
+  const [temporaryId, setTemporaryId]: State<number> = useState(-2);
+
+  const [openConfDialog, setOpenConfDialog]: State<boolean> = useState(false);
+
+  const addAttainment: UseAddAttainmentResult = useAddAttainment();
+  const deleteAttainment: UseDeleteAttainmentResult = useDeleteAttainment();
+  const editAttainment: UseEditAttainmentResult = useEditAttainment();
+
+  // Check for invalid paths
+  if (
+    (modification === 'create' && attainmentId) ||
+    (modification === 'edit' && !attainmentId) ||
+    (modification !== 'create' && modification !== 'edit')
+  ) {
+    return <NotFound />;
+  }
 
   if (!initialValues) {
     if (modification === 'create' && rootAttainment.isFetched) {
@@ -120,24 +138,6 @@ export default function EditAttainmentView(): JSX.Element {
       setAttainmentTree(attainment.data);
     }
   }
-
-  // List of attainments that exist in the database which are to be deleted.
-  const [deletedAttainments, setDeletedAttainments]: State<
-    Array<AttainmentData>
-  > = useState<Array<AttainmentData>>([]);
-
-  /*
-   * Temporary IDs for attainments that have not been added to the database yet
-   * and only exist in the client. Temporary IDs are negative to differentiate
-   * them from database IDs and to avoid conflicts between them.
-   */
-  const [temporaryId, setTemporaryId]: State<number> = useState(-2);
-
-  const [openConfDialog, setOpenConfDialog]: State<boolean> = useState(false);
-
-  const addAttainment: UseAddAttainmentResult = useAddAttainment();
-  const deleteAttainment: UseDeleteAttainmentResult = useDeleteAttainment();
-  const editAttainment: UseEditAttainmentResult = useEditAttainment();
 
   function getTemporaryId(): number {
     const id: number = temporaryId;
