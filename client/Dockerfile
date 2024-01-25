@@ -5,19 +5,26 @@
 FROM node:16-alpine
 
 WORKDIR /app
+RUN mkdir common client && chown node:node client
 
-COPY --chown=node:node common common
-COPY --chown=node:node client client
-
+# Install packages first to make following builds faster
 WORKDIR /app/client
+COPY client/package.json client/package-lock.json ./
+RUN npm ci
+
+# Copy common first
+WORKDIR /app
+COPY common/types common/types
+
+# Copy only necessary client files
+WORKDIR /app/client
+COPY client/.env client/tsconfig.json client/index.html client/vite.config.ts client/build.sh ./
+COPY client/public ./public
+COPY client/src ./src
+
+# Build and run
 USER node
-
-ARG CLIENT_SKIP_NPM_CI
-RUN if [ -z "$CLIENT_SKIP_NPM_CI" ] || [ $CLIENT_SKIP_NPM_CI != 1 ]; \
-    then npm ci; fi
-
 RUN npm run build
 
-CMD ["npm", "start"]
-
 EXPOSE 3005
+CMD [ "npm", "run", "dev-docker-preview" ]
