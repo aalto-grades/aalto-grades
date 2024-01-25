@@ -9,7 +9,7 @@ import {
   GradeType,
   HttpCode,
   ParamsObject,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import {Request, Response} from 'express';
 import {Op, Transaction} from 'sequelize';
 import * as yup from 'yup';

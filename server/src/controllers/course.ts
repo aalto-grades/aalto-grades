@@ -9,7 +9,7 @@ import {
   Language,
   LocalizedString,
   UserData,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import {Request, Response} from 'express';
 import {Transaction} from 'sequelize';
 import * as yup from 'yup';

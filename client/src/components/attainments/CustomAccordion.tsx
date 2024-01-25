@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentData, Formula} from 'aalto-grades-common/types';
+import {AttainmentData, Formula} from '@common/types';
 import {StyledComponent} from '@emotion/styled';
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';

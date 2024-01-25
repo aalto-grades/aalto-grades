@@ -9,7 +9,7 @@ import {
   HttpCode,
   Status,
   StudentGradesTree,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import * as fs from 'fs';
 import path from 'path';
 import {Op} from 'sequelize';

@@ -7,7 +7,7 @@ import {
   GradingScale,
   Language,
   Period,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 
 export const mockInstances: Array<CourseInstanceData> = [
   {

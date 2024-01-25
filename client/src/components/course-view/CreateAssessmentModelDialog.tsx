@@ -7,7 +7,7 @@ import {
   AttainmentData,
   Formula,
   GradeType,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import {
   Box,
   Button,

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {DateOnlyString} from 'aalto-grades-common/types';
+import {DateOnlyString} from '@common/types';
 
 /**
  * Converts a Date object or a string to a date-only string format (YYYY-MM-DD).

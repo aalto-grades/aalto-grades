@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Formula, Status} from 'aalto-grades-common/types';
+import {Formula, Status} from '@common/types';
 
 import {mockAttainment} from '../mock-data/attainment';
 import {getFormulaImplementation} from '../../src/formulas';

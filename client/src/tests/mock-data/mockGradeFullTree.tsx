@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {StudentGradesTree} from 'aalto-grades-common/types/grades';
-import {Status} from 'aalto-grades-common/types';
+import {StudentGradesTree} from '@common/types/grades';
+import {Status} from '@common/types';
 
 export const mockGradeFullTree: StudentGradesTree[] = [
   {

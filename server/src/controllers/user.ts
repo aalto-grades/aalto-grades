@@ -2,12 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {
-  CourseData,
-  HttpCode,
-  SystemRole,
-  UserData,
-} from 'aalto-grades-common/types';
+import {CourseData, HttpCode, SystemRole, UserData} from '@common/types';
 import {Request, Response} from 'express';
 
 import Course from '../database/models/course';

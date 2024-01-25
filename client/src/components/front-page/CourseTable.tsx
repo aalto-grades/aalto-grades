@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {CourseData} from 'aalto-grades-common/types';
+import {CourseData} from '@common/types';
 import {
   Link,
   Table,

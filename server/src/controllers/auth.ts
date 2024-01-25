@@ -8,7 +8,7 @@ import {
   PlainPassword,
   SignupRequest,
   SystemRole,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import argon from 'argon2';
 import {NextFunction, Request, Response} from 'express';
 import jwt from 'jsonwebtoken';

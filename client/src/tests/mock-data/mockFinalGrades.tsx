@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {FinalGrade, Status} from 'aalto-grades-common/types';
+import {FinalGrade, Status} from '@common/types';
 
 export const mockFinalGrades: Array<FinalGrade> = [
   {

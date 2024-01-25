@@ -2,12 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from 'aalto-grades-common/types';
+import {HttpCode} from '@common/types';
 
 import User from '../../database/models/user';
 import TeacherInCharge from '../../database/models/teacherInCharge';
 
-import {SystemRole} from 'aalto-grades-common/types';
+import {SystemRole} from '@common/types';
 import {ApiError, JwtClaims} from '../../types';
 
 /**

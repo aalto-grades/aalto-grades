@@ -2,11 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {
-  CourseInstanceData,
-  GradingScale,
-  Language,
-} from 'aalto-grades-common/types';
+import {CourseInstanceData, GradingScale, Language} from '@common/types';
 
 export const mockSisuInstances: Array<CourseInstanceData> = [
   {

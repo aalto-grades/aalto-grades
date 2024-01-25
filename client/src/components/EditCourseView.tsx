@@ -2,12 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {
-  CourseData,
-  GradingScale,
-  Language,
-  UserData,
-} from 'aalto-grades-common/types';
+import {CourseData, GradingScale, Language, UserData} from '@common/types';
 import {Form, Formik, FormikProps} from 'formik';
 import {
   Delete as DeleteIcon,

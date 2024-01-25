@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Formula, FormulaData} from 'aalto-grades-common/types';
+import {Formula, FormulaData} from '@common/types';
 import axios from './axios';
 import {useQuery, UseQueryOptions, UseQueryResult} from '@tanstack/react-query';
 

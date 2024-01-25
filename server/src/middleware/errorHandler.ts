@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from 'aalto-grades-common/types';
+import {HttpCode} from '@common/types';
 import {AxiosError} from 'axios';
 import {CsvError} from 'csv-parse';
 import {NextFunction, Request, RequestHandler, Response} from 'express';

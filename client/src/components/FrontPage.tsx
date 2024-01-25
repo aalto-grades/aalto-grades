@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {CourseData, LoginResult, SystemRole} from 'aalto-grades-common/types';
+import {CourseData, LoginResult, SystemRole} from '@common/types';
 import {Box, Button, Theme, Typography, useTheme} from '@mui/material';
 import {JSX} from 'react';
 import {NavigateFunction, useNavigate} from 'react-router-dom';

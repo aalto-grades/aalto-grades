@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {LoginResult} from 'aalto-grades-common/types';
+import {LoginResult} from '@common/types';
 import {VisibilityOff, Visibility} from '@mui/icons-material';
 import {
   Box,

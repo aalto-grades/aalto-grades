@@ -8,7 +8,7 @@ import {
   CourseData,
   Language,
   UserData,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import {JSX} from 'react';
 
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';

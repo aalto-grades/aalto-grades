@@ -2,11 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {
-  CourseData,
-  CourseInstanceData,
-  Period,
-} from 'aalto-grades-common/types';
+import {CourseData, CourseInstanceData, Period} from '@common/types';
 import {Form, Formik, FormikErrors, FormikTouched} from 'formik';
 import {
   Box,

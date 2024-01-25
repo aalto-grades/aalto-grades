@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode, SystemRole} from 'aalto-grades-common/types';
+import {HttpCode, SystemRole} from '@common/types';
 import {NextFunction, Request, Response} from 'express';
 
 import {JwtClaims} from '../types';

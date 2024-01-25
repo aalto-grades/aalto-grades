@@ -7,7 +7,7 @@ import {
   EditGrade,
   FinalGrade,
   StudentGradesTree,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import axios from './axios';
 import {
   QueryClient,

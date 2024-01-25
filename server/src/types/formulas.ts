@@ -2,12 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {
-  AttainmentData,
-  ChildParamsObject,
-  Param,
-  Status,
-} from 'aalto-grades-common/types';
+import {AttainmentData, ChildParamsObject, Param, Status} from '@common/types';
 import * as yup from 'yup';
 
 export interface CalculationResult {
