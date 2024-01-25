@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import {Box, Typography, Button} from '@mui/material';
 import {
   AssessmentModelData,
@@ -50,7 +54,7 @@ const InstancesWidget: React.FC<Props> = props => {
                 size="large"
                 onClick={(): void => {
                   navigate(
-                    `/${courseId}/fetch-instances/${course.data.courseCode}`
+                    `/${courseId}/fetch-instances/${course.data?.courseCode}`
                   );
                 }}
               >
@@ -66,18 +70,12 @@ const InstancesWidget: React.FC<Props> = props => {
             bgcolor: 'secondary.light',
             p: 1.5,
             mt: 1,
-            minWidth: '318px',
+            // minWidth: '318px',
             maxHeight: '200px',
             overflowY: 'auto',
           }}
         >
           <InstancesTable courseId={courseId} />
-          <CreateAssessmentModelDialog
-            open={createAssessmentModelOpen}
-            handleClose={(): void => setCreateAssessmentModelOpen(false)}
-            onSubmit={assessmentModels.refetch}
-            assessmentModels={assessmentModels.data}
-          />
         </Box>
       </Box>
     </div>

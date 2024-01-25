@@ -73,7 +73,7 @@ export default function Attainments(props: {
           justifyContent: 'space-between',
         }}
       >
-        <Typography variant="h2" align="left" sx={{ml: 1.5, mt: 0.6}}>
+        <Typography variant="h2" align="left" sx={{ml: 1.5, mt: 0.6, mb: 2}}>
           {props.assessmentModel.name}
         </Typography>
         <Button

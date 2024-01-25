@@ -1,4 +1,8 @@
-import {Box} from '@mui/material';
+// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
+import {Box, useTheme} from '@mui/material';
 import {FC} from 'react';
 import AssessmentModelsList from './AssessmentModelsList';
 import {CourseData, AssessmentModelData} from 'aalto-grades-common/types';
@@ -12,6 +16,7 @@ type AssessmentModelsPickerProps = {
 };
 
 const AssessmentModelsPicker: FC<AssessmentModelsPickerProps> = props => {
+  const theme = useTheme();
   return (
     <Box
       textAlign="left"
@@ -24,8 +29,21 @@ const AssessmentModelsPicker: FC<AssessmentModelsPickerProps> = props => {
         p: 1.5,
         // mt: 1,
         minWidth: '218px',
-        maxHeight: '200px',
+        maxHeight: '300px',
         height: '100%',
+        position: 'relative',
+        '::before': {
+          content: '""',
+          position: 'absolute',
+          bottom: '-40px',
+          transform: 'rotate(180deg)',
+          right: '0px',
+          height: '40px',
+          width: '40px',
+          borderBottomLeftRadius: '50%',
+          // backgroundColor: theme.vars.palette.primary.dark,
+          boxShadow: `0 20px 0 0 ${theme.vars.palette.primary.light}`,
+        },
       }}
     >
       {props.assessmentModels &&
@@ -37,9 +55,7 @@ const AssessmentModelsPicker: FC<AssessmentModelsPickerProps> = props => {
           onClick={props.onChangeAssessmentModel}
         />
       ) : (
-        <Box sx={{py: 2}}>
-          No assessment models found. Please create a new assessment model.
-        </Box>
+        <Box sx={{py: 2}}>Create a new model using the button.</Box>
       )}
     </Box>
   );

@@ -37,7 +37,7 @@ export default function CourseDetails(props: {
   }
 
   return (
-    <Box sx={{display: 'flex', gap: 3}}>
+    <Box sx={{display: 'flex', flexDirection: 'column', gap: 3}}>
       <Box sx={{mt: 1.5}}>
         <Typography variant="h3" align="left" sx={{pt: 1.5, pb: 1}}>
           Course Details
@@ -49,7 +49,7 @@ export default function CourseDetails(props: {
             bgcolor: 'secondary.light',
             p: 1.5,
             mt: 1,
-            minWidth: '318px',
+            // minWidth: '318px',
           }}
         >
           <LightLabelBoldValue
@@ -90,7 +90,7 @@ export default function CourseDetails(props: {
             bgcolor: 'secondary.light',
             p: 1.5,
             mt: 1,
-            minWidth: '318px',
+            // minWidth: '318px',
           }}
         >
           {props.course.teachersInCharge.map((teacher: UserData) => {

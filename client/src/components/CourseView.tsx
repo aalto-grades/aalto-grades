@@ -131,18 +131,6 @@ export default function CourseView(): JSX.Element {
             )}
           </Box>
           <Box>
-            <Box sx={{display: 'flex', gap: 3}}>
-              <CourseDetails
-                course={course.data}
-                assessmentModels={assessmentModels.data}
-                currentAssessmentModelId={currentAssessmentModel?.id}
-                onChangeAssessmentModel={onChangeAssessmentModel}
-                onNewAssessmentModel={(): void =>
-                  setCreateAssessmentModelOpen(true)
-                }
-              />
-              <InstancesWidget />
-            </Box>
             {
               /* a different attainment component will be created for students */
               (auth?.role == SystemRole.Admin || isTeacherInCharge) && (
@@ -163,15 +151,41 @@ export default function CourseView(): JSX.Element {
                   </Typography>
 
                   <div style={{display: 'flex', gap: 0}}>
-                    <AssessmentModelsPicker
-                      course={course.data}
-                      assessmentModels={assessmentModels.data}
-                      currentAssessmentModelId={currentAssessmentModel?.id}
-                      onChangeAssessmentModel={onChangeAssessmentModel}
-                      onNewAssessmentModel={(): void =>
-                        setCreateAssessmentModelOpen(true)
-                      }
-                    />
+                    <div
+                      style={{display: 'flex', flexDirection: 'column', gap: 0}}
+                    >
+                      <AssessmentModelsPicker
+                        course={course.data}
+                        assessmentModels={assessmentModels.data}
+                        currentAssessmentModelId={currentAssessmentModel?.id}
+                        onChangeAssessmentModel={onChangeAssessmentModel}
+                        onNewAssessmentModel={(): void =>
+                          setCreateAssessmentModelOpen(true)
+                        }
+                      />
+                      <div style={{marginRight: '20px', maxWidth: '300px'}}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 3,
+                          }}
+                        >
+                          <CourseDetails
+                            course={course.data}
+                            assessmentModels={assessmentModels.data}
+                            currentAssessmentModelId={
+                              currentAssessmentModel?.id
+                            }
+                            onChangeAssessmentModel={onChangeAssessmentModel}
+                            onNewAssessmentModel={(): void =>
+                              setCreateAssessmentModelOpen(true)
+                            }
+                          />
+                          <InstancesWidget />
+                        </Box>
+                      </div>
+                    </div>
                     <div style={{width: '100%'}}>
                       {attainmentTree.data ? (
                         <Fade
@@ -216,7 +230,12 @@ export default function CourseView(): JSX.Element {
               )
             }
           </Box>
-          {/* Need to rework this part v */}
+          <CreateAssessmentModelDialog
+            open={createAssessmentModelOpen}
+            handleClose={(): void => setCreateAssessmentModelOpen(false)}
+            onSubmit={assessmentModels.refetch}
+            assessmentModels={assessmentModels.data}
+          />
         </>
       )}
     </Box>
