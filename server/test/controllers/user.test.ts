@@ -359,10 +359,10 @@ describe('Test DELETE /v1/idp-users/:userId - get idp users information', () => 
       .expect(HttpCode.Unauthorized);
   });
 
-  it('should respond 403 forbidden if not admin', async () => {
+  it('should respond 401 unauthorized if not admin', async () => {
     await request
       .delete('/v1/idp-users/123')
       .set('Accept', 'application/json')
-      .expect(HttpCode.Forbidden);
+      .expect(HttpCode.Unauthorized);
   });
 });
