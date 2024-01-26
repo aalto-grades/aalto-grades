@@ -9,7 +9,6 @@ import {
   UserData,
 } from 'aalto-grades-common/types';
 import {Request, Response} from 'express';
-import {Op} from 'sequelize';
 
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
@@ -139,15 +138,9 @@ export async function addIdpUser(req: Request, res: Response): Promise<void> {
 }
 
 export async function getIdpUsers(req: Request, res: Response): Promise<void> {
-  const users: Array<{email: string}> = (
-    await User.findAll({
-      where: {
-        password: {
-          [Op.is]: undefined,
-        },
-      },
-    })
-  ).map(user => ({email: user.email, id: user.id}));
+  const users: Array<{email: string}> = (await User.findIdpUsers()).map(
+    user => ({email: user.email, id: user.id})
+  );
   res.status(HttpCode.Ok).json({
     data: users,
   });

@@ -29,6 +29,7 @@ export default class User extends Model<
   static findByEmail: (email: string) => Promise<User | null>;
   static findByEduUser: (eduUser: string) => Promise<User | null>;
   static findIdpUserByEmail: (email: string) => Promise<User | null>;
+  static findIdpUsers: () => Promise<Array<User>>;
 }
 
 User.init(
@@ -103,6 +104,16 @@ User.findIdpUserByEmail = async function (email: string): Promise<User | null> {
   return await User.findOne({
     where: {
       email,
+      password: {
+        [Op.is]: undefined,
+      },
+    },
+  });
+};
+
+User.findIdpUsers = async function (): Promise<Array<User>> {
+  return await User.findAll({
+    where: {
       password: {
         [Op.is]: undefined,
       },
