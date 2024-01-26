@@ -34,7 +34,6 @@
     "react-router-dom": "^6.11.2",
     "rollup-plugin-license": "^3.2.0",
     "styled-components": "^5.3.6",
-    "typescript": "^5.3.3",
     "vite": "^5.0.11",
     "web-vitals": "^2.1.4",
     "yup": "^1.2.0"
@@ -86,6 +85,7 @@
     "license-checker-rseidelsohn": "^4.2.6",
     "spdx-expression-parse": "^4.0.0",
     "typescript-eslint": "^0.0.1-alpha.0",
+    "typescript": "^5.3.3",
     "vitest": "^1.1.3",
     "vitest-preview": "^0.0.1"
   }
