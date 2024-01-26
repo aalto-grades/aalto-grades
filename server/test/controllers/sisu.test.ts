@@ -15,7 +15,7 @@ const mockedAxios: jest.Mocked<AxiosStatic> = axios as jest.Mocked<
   typeof axios
 >;
 
-const request: supertest.SuperTest<supertest.Test> = supertest(app);
+const request = supertest(app);
 let cookies: Cookies = {
   adminCookie: [],
   userCookie: [],

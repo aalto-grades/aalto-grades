@@ -8,7 +8,7 @@ import supertest from 'supertest';
 import {app} from '../../src/app';
 import {Cookies, getCookies} from '../util/getCookies';
 
-const request: supertest.SuperTest<supertest.Test> = supertest(app);
+const request = supertest(app);
 let cookies: Cookies = {
   adminCookie: [],
   userCookie: [],

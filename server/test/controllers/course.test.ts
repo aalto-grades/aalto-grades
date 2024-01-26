@@ -18,7 +18,7 @@ import {
 } from '../../src/controllers/utils/course';
 import {Cookies, getCookies} from '../util/getCookies';
 
-const request: supertest.SuperTest<supertest.Test> = supertest(app);
+const request = supertest(app);
 const badId: number = 1000000;
 let cookies: Cookies = {
   adminCookie: [],
