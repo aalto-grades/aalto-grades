@@ -14,7 +14,6 @@ import {
   Button,
   CircularProgress,
   Fade,
-  Grow,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -30,7 +29,6 @@ import {UseQueryResult} from '@tanstack/react-query';
 import Attainments from './course-view/Attainments';
 import CreateAssessmentModelDialog from './course-view/CreateAssessmentModelDialog';
 import CourseDetails from './course-view/CourseDetails';
-import InstancesTable from './course-view/InstancesTable';
 
 import {
   useGetAllAssessmentModels,
