@@ -44,6 +44,8 @@ export default function Attainments(props: {
         p: 1.5,
         display: 'flex',
         flexDirection: 'column',
+        borderRadius: 4,
+        borderTopLeftRadius: 0,
       }}
     >
       {props.assessmentModel.id && (
@@ -55,6 +57,37 @@ export default function Attainments(props: {
           attainment={props.attainmentTree}
         />
       )}
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          gap: 1,
+        }}
+      ></Box>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <Typography variant="h2" align="left" sx={{ml: 1.5, mt: 0.6, mb: 2}}>
+          {props.assessmentModel.name}
+        </Typography>
+        <Button
+          id="ag_course_results_btn"
+          variant="contained"
+          onClick={(): void => {
+            navigate(
+              `/${props.courseId}/course-results/${props.assessmentModel.id}`
+            );
+          }}
+        >
+          Course results
+        </Button>
+      </Box>
       <Typography variant="h3" align="left" sx={{ml: 1.5, mt: 0.6, mb: 1.5}}>
         Study Attainments
       </Typography>
@@ -154,27 +187,6 @@ export default function Attainments(props: {
         >
           Add attainment
         </Button>
-        <Box
-          sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            gap: 1,
-          }}
-        >
-          <Button
-            id="ag_course_results_btn"
-            variant="outlined"
-            onClick={(): void => {
-              navigate(
-                `/${props.courseId}/course-results/${props.assessmentModel.id}`
-              );
-            }}
-          >
-            Course results
-          </Button>
-        </Box>
       </Box>
     </Box>
   );
