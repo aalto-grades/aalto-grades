@@ -35,16 +35,17 @@ export default function UsersTable(): JSX.Element {
   const deleteUser = useDeleteUser();
   const users: UseQueryResult<Array<{email: string; id: number}>> =
     useGetIdpUsers();
-  const [open, setOpen] = React.useState(false);
-  function handleOpen() {
-    setOpen(true);
+  const [toBeDeleted, setToBeDeleted] = React.useState<number | null>(null);
+  function handleOpen(userId: number) {
+    setToBeDeleted(userId);
   }
 
   function handleClose() {
-    setOpen(false);
+    setToBeDeleted(null);
   }
   function handleDelete(event: SyntheticEvent, id: number): void {
     event.preventDefault();
+    setToBeDeleted(null);
     deleteUser.mutate(id);
   }
   if (users.data?.length === 0 && users.isFetched) {
@@ -70,15 +71,12 @@ export default function UsersTable(): JSX.Element {
               <TableRow key={user.email} hover={true}>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>
-                  <DeleteUserDialog
-                    title="Delete User"
-                    handleAccept={handleDelete}
-                    handleClose={handleClose}
-                    userId={user.id}
-                    open={open}
-                    description="Do you want to delete this user?"
-                  />
-                  <IconButton aria-label="delete" onClick={handleOpen}>
+                  <IconButton
+                    aria-label="delete"
+                    onClick={() => {
+                      handleOpen(user.id);
+                    }}
+                  >
                     <DeleteIcon />
                   </IconButton>
                 </TableCell>
@@ -86,6 +84,16 @@ export default function UsersTable(): JSX.Element {
             ))}
         </TableBody>
       </Table>
+      {toBeDeleted !== null && (
+        <DeleteUserDialog
+          title="Delete User"
+          handleAccept={handleDelete}
+          handleClose={handleClose}
+          open={toBeDeleted !== null}
+          userId={toBeDeleted}
+          description="Do you want to delete this user?"
+        />
+      )}
     </>
   );
 }

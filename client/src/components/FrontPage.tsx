@@ -58,7 +58,7 @@ export default function FrontPage(): JSX.Element {
           </p>
         </Box>
       )}
-      {auth?.role == SystemRole.Admin && (
+      {auth?.role === SystemRole.Admin && (
         <>
           <Box
             component="span"
@@ -90,9 +90,9 @@ export default function FrontPage(): JSX.Element {
             }
           </Box>
           {courses.data && <CourseTable courses={courses.data} />}
+          <UsersView />
         </>
       )}
-      {auth?.role === SystemRole.Admin && <UsersView />}
     </>
   );
 }

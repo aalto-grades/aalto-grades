@@ -67,6 +67,7 @@ export default function AddUserView(): JSX.Element {
                   onClick={(): void => {
                     navigate(-1);
                   }}
+                  disabled={form.isSubmitting}
                 >
                   Cancel
                 </Button>
@@ -75,6 +76,7 @@ export default function AddUserView(): JSX.Element {
                   size="medium"
                   variant="contained"
                   type="submit"
+                  disabled={form.isSubmitting}
                 >
                   Add User
                 </Button>
