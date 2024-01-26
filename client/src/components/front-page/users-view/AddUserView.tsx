@@ -5,7 +5,7 @@ import {TextField, Box, Button, Typography, Container} from '@mui/material';
 import {NavigateFunction, useNavigate} from 'react-router-dom';
 
 import {Form, Formik, FormikProps} from 'formik';
-import {useAddUser} from '../../hooks/useApi';
+import {useAddUser} from '../../../hooks/useApi';
 
 export default function AddUserView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();

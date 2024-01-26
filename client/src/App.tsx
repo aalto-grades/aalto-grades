@@ -33,7 +33,7 @@ import Login from './components/auth/Login';
 import PrivateRoute from './components/auth/PrivateRoute';
 import Signup from './components/auth/Signup';
 import UserButton from './components/auth/UserButton';
-import AddUserView from './components/users-view/AddUserView';
+import AddUserView from './components/front-page/users-view/AddUserView';
 
 import useSnackPackAlerts, {
   SnackPackAlertState,

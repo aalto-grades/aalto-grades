@@ -15,8 +15,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import {JSX, SyntheticEvent} from 'react';
 import {UseQueryResult} from '@tanstack/react-query';
 
-import {HeadCellData} from '../../types';
-import {useDeleteUser, useGetIdpUsers} from '../../hooks/useApi';
+import {HeadCellData} from '../../../types';
+import {useDeleteUser, useGetIdpUsers} from '../../../hooks/useApi';
 import React from 'react';
 import DeleteUserDialog from './DeleteUserDialog';
 
