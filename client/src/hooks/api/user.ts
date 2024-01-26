@@ -4,7 +4,16 @@
 
 import {CourseData} from '@common/types';
 import axios from './axios';
-import {UseMutationOptions, UseMutationResult, useQuery, UseQueryOptions, UseQueryResult, useMutation, useQueryClient, QueryClient} from '@tanstack/react-query';
+import {
+  UseMutationOptions,
+  UseMutationResult,
+  useQuery,
+  UseQueryOptions,
+  UseQueryResult,
+  useMutation,
+  useQueryClient,
+  QueryClient,
+} from '@tanstack/react-query';
 
 import {Numeric} from '../../types';
 
@@ -26,19 +35,17 @@ export function useAddUser(
   return useMutation({
     mutationFn: async (email: string) =>
       (await axios.post('/v1/idp-users', {email: email})).data.data,
-    onSuccess: () => {
-    },
+    onSuccess: () => {},
     ...options,
   });
 }
 
 export function useGetIdpUsers(
-  options?: UseQueryOptions<Array<{email: string, id: number}>>
-): UseQueryResult<Array<{email: string, id: number}>> {
+  options?: UseQueryOptions<Array<{email: string; id: number}>>
+): UseQueryResult<Array<{email: string; id: number}>> {
   return useQuery({
     queryKey: ['idp-users'],
-    queryFn: async () =>
-      (await axios.get('/v1/idp-users')).data.data,
+    queryFn: async () => (await axios.get('/v1/idp-users')).data.data,
     ...options,
   });
 }
@@ -49,14 +56,10 @@ export function useDeleteUser(
   const queryClient: QueryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: number) =>
-      (
-        await axios.delete(
-          `/v1/idp-users/${id}`
-        )
-      ).data.data,
-      onSuccess: () => {
-        queryClient.invalidateQueries({queryKey: ['idp-users']});
-      },
-      ...options,
+      (await axios.delete(`/v1/idp-users/${id}`)).data.data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['idp-users']});
+    },
+    ...options,
   });
 }
