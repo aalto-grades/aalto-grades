@@ -14,7 +14,7 @@ import {
 } from '../controllers/user';
 import {controllerDispatcher} from '../middleware/errorHandler';
 import {authorization} from '../middleware/authorization';
-import {SystemRole} from 'aalto-grades-common/types';
+import { SystemRole } from '@common/types';
 import {handleInvalidRequestJson} from '../middleware';
 
 export const router: Router = Router();
