@@ -4,9 +4,9 @@
 
 import {HttpCode, SystemRole} from '@common/types';
 import {Cookie, CookieAccessInfo} from 'cookiejar';
-import mockdate from 'mockdate';
-import supertest, {SuperAgentTest} from 'supertest';
 import * as fs from 'fs';
+import mockdate from 'mockdate';
+import supertest from 'supertest';
 
 import {
   JWT_COOKIE_EXPIRY_MS,
