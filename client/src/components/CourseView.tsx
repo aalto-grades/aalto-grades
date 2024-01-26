@@ -8,7 +8,7 @@ import {
   CourseData,
   SystemRole,
   UserData,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import {
   Box,
   Button,

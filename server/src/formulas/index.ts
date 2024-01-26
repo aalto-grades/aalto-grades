@@ -4,12 +4,7 @@
 
 import * as yup from 'yup';
 
-import {
-  ChildParamsObject,
-  Formula,
-  FormulaData,
-  Param,
-} from 'aalto-grades-common/types';
+import {ChildParamsObject, Formula, FormulaData, Param} from '@common/types';
 import {FormulaFunction, FormulaImplementation} from '../types';
 
 // The registry of formula implementations corresponding to their names, along

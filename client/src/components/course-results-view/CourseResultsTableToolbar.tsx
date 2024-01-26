@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {FinalGrade} from 'aalto-grades-common/types';
+import {FinalGrade} from '@common/types';
 // import DownloadIcon from '@mui/icons-material/Download';
 // import FilterListIcon from '@mui/icons-material/FilterList';
 import {

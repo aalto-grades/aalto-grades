@@ -4,8 +4,6 @@
   "license": "Expat (MIT)",
   "type": "commonjs",
   "scripts": {
-    "old-build": "tsc **/*.ts",
-    "build": "",
     "lint": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'`",
     "lint:fix": "npx eslint `find . -name '*.ts' -not -path './node_modules/*'` --fix"
   }

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {CourseInstanceData, HttpCode, Period} from 'aalto-grades-common/types';
+import {CourseInstanceData, HttpCode, Period} from '@common/types';
 import {Request, Response} from 'express';
 import * as yup from 'yup';
 

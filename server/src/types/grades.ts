@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {GradeType, Status} from 'aalto-grades-common/types';
+import {GradeType, Status} from '@common/types';
 
 export interface AttainmentGradeModelData {
   userId?: number;

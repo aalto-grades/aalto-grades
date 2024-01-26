@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentData, FinalGrade} from 'aalto-grades-common/types';
+import {AttainmentData, FinalGrade} from '@common/types';
 import {
   Box,
   CircularProgress,

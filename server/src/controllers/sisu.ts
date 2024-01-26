@@ -7,7 +7,7 @@ import {
   GradingScale,
   HttpCode,
   Language,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import axios, {AxiosResponse} from 'axios';
 import {Request, Response} from 'express';
 import {Op} from 'sequelize';

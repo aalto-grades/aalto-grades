@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {LoginResult, SystemRole} from 'aalto-grades-common/types';
+import {LoginResult, SystemRole} from '@common/types';
 import {
   Button,
   FormControlLabel,

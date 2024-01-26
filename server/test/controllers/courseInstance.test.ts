@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from 'aalto-grades-common/types';
+import {HttpCode} from '@common/types';
 import supertest from 'supertest';
 
 import TeacherInCharge from '../../src/database/models/teacherInCharge';

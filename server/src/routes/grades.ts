@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from 'aalto-grades-common/types';
+import {HttpCode} from '@common/types';
 import express, {Request, Router} from 'express';
 import multer, {FileFilterCallback, memoryStorage, Multer} from 'multer';
 import passport from 'passport';

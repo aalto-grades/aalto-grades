@@ -9,11 +9,11 @@ import {
   ParamsObject,
   InputField,
   ListParam,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import * as yup from 'yup';
 
 import {registerFormula} from '.';
-import {Formula, Status} from 'aalto-grades-common/types';
+import {Formula, Status} from '@common/types';
 import {ApiError, CalculationResult} from '../types';
 
 enum Grading {

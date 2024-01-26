@@ -5,7 +5,7 @@
 import supertest from 'supertest';
 
 import {app} from '../../src/app';
-import {SystemRole} from 'aalto-grades-common/types';
+import {SystemRole} from '@common/types';
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 

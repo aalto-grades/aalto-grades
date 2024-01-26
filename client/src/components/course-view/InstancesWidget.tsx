@@ -4,7 +4,7 @@
 
 import {Box, Button, Typography} from '@mui/material';
 import {UseQueryResult} from '@tanstack/react-query';
-import {CourseData, SystemRole} from 'aalto-grades-common/types';
+import {CourseData, SystemRole} from '@common/types';
 import React from 'react';
 import {
   NavigateFunction,

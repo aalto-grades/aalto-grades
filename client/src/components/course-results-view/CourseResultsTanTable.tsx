@@ -25,7 +25,7 @@ import {
   FinalGrade,
   GradeOption,
   StudentGradesTree,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import * as React from 'react';
 import {findBestGradeOption} from '../../utils';
 import PrettyChip from '../shared/PrettyChip';

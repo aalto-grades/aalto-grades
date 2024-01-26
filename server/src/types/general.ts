@@ -4,7 +4,7 @@
 
 import * as yup from 'yup';
 
-import {SystemRole} from 'aalto-grades-common/types';
+import {SystemRole} from '@common/types';
 
 export const idSchema: yup.AnyObjectSchema = yup.object().shape({
   id: yup.number().integer().min(1).required(),

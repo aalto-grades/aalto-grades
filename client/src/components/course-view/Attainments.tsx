@@ -7,7 +7,7 @@ import {
   AttainmentData,
   Formula,
   FormulaData,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import {Box, Button, Paper, Typography} from '@mui/material';
 import {useState, JSX} from 'react';
 import {NavigateFunction, useNavigate} from 'react-router-dom';

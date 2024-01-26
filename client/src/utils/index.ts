@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {DateOnlyString, GradeOption} from 'aalto-grades-common/types';
+import {DateOnlyString, GradeOption} from '@common/types';
 
 type Resolve = (value: void | PromiseLike<void>) => void;
 

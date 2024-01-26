@@ -9,47 +9,47 @@ import {QueryInterface, Transaction} from 'sequelize';
 import logger from '../../configs/winston';
 
 const users: string = fs.readFileSync(
-  path.resolve(__dirname, '../../../../mock-data/users.sql'),
+  path.resolve(__dirname, '../../../../../mock-data/users.sql'),
   'utf8'
 );
 
 const courses: string = fs.readFileSync(
-  path.resolve(__dirname, '../../../../mock-data/courses.sql'),
+  path.resolve(__dirname, '../../../../../mock-data/courses.sql'),
   'utf8'
 );
 
 const courseInstances: string = fs.readFileSync(
-  path.resolve(__dirname, '../../../../mock-data/course_instances.sql'),
+  path.resolve(__dirname, '../../../../../mock-data/course_instances.sql'),
   'utf8'
 );
 
 const courseInstanceRoles: string = fs.readFileSync(
-  path.resolve(__dirname, '../../../../mock-data/course_instance_roles.sql'),
+  path.resolve(__dirname, '../../../../../mock-data/course_instance_roles.sql'),
   'utf8'
 );
 
 const teachersInCharge: string = fs.readFileSync(
-  path.resolve(__dirname, '../../../../mock-data/teachers_in_charge.sql'),
+  path.resolve(__dirname, '../../../../../mock-data/teachers_in_charge.sql'),
   'utf8'
 );
 
 const courseTranslation: string = fs.readFileSync(
-  path.resolve(__dirname, '../../../../mock-data/course_translations.sql'),
+  path.resolve(__dirname, '../../../../../mock-data/course_translations.sql'),
   'utf8'
 );
 
 const assessmentModel: string = fs.readFileSync(
-  path.resolve(__dirname, '../../../../mock-data/assessment_model.sql'),
+  path.resolve(__dirname, '../../../../../mock-data/assessment_model.sql'),
   'utf8'
 );
 
 const attainment: string = fs.readFileSync(
-  path.resolve(__dirname, '../../../../mock-data/attainment.sql'),
+  path.resolve(__dirname, '../../../../../mock-data/attainment.sql'),
   'utf8'
 );
 
 const attainmentGrade: string = fs.readFileSync(
-  path.resolve(__dirname, '../../../../mock-data/attainment_grade.sql'),
+  path.resolve(__dirname, '../../../../../mock-data/attainment_grade.sql'),
   'utf8'
 );
 

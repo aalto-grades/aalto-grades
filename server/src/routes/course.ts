@@ -5,7 +5,7 @@
 import express, {Router} from 'express';
 import passport from 'passport';
 
-import {SystemRole} from 'aalto-grades-common/types';
+import {SystemRole} from '@common/types';
 import {
   addCourse,
   editCourse,

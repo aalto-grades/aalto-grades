@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {SystemRole} from 'aalto-grades-common/types';
+import {SystemRole} from '@common/types';
 import {http} from 'msw';
 import {BrowserRouter} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';

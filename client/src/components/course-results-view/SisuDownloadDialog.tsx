@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {FinalGrade, GradeOption, Language} from 'aalto-grades-common/types';
+import {FinalGrade, GradeOption, Language} from '@common/types';
 import {
   Box,
   Button,

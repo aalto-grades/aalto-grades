@@ -5,7 +5,7 @@
 import {Box, useTheme} from '@mui/material';
 import {FC} from 'react';
 import AssessmentModelsList from './AssessmentModelsList';
-import {CourseData, AssessmentModelData} from 'aalto-grades-common/types';
+import {CourseData, AssessmentModelData} from '@common/types';
 
 type AssessmentModelsPickerProps = {
   course: CourseData;

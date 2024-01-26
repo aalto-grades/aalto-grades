@@ -8,7 +8,7 @@ import {
   GradeType,
   HttpCode,
   ParamsObject,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import {Op} from 'sequelize';
 import supertest from 'supertest';
 

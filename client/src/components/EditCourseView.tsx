@@ -2,12 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {
-  CourseData,
-  GradingScale,
-  Language,
-  UserData,
-} from 'aalto-grades-common/types';
+import {CourseData, GradingScale, Language, UserData} from '@common/types';
 import {Form, Formik, FormikProps} from 'formik';
 import {
   Delete as DeleteIcon,
@@ -146,15 +141,6 @@ export default function EditCourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const {modification, courseId}: Params = useParams();
 
-  // Check for invalid paths
-  if (
-    (modification === 'create' && courseId) ||
-    (modification === 'edit' && !courseId) ||
-    (modification !== 'create' && modification !== 'edit')
-  ) {
-    return <NotFound />;
-  }
-
   const addCourse: UseAddCourseResult = useAddCourse();
   const editCourse: UseEditCourseResult = useEditCourse();
 
@@ -168,6 +154,15 @@ export default function EditCourseView(): JSX.Element {
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
   const [initialValues, setInitialValues]: State<FormData | null> =
     useState<FormData | null>(null);
+
+  // Check for invalid paths
+  if (
+    (modification === 'create' && courseId) ||
+    (modification === 'edit' && !courseId) ||
+    (modification !== 'create' && modification !== 'edit')
+  ) {
+    return <NotFound />;
+  }
 
   if (!initialValues) {
     if (modification === 'edit' && course.data) {

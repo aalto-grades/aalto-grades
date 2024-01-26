@@ -7,5 +7,8 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['test'],
-  testTimeout: 5000
+  testTimeout: 5000,
+  moduleNameMapper: {
+    '^@common/(.*)$': '<rootDir>/build/common/$1',
+  },
 };

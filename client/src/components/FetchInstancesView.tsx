@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {CourseInstanceData} from 'aalto-grades-common/types';
+import {CourseInstanceData} from '@common/types';
 import {
   Box,
   Button,

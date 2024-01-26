@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from 'aalto-grades-common/types';
+import {HttpCode} from '@common/types';
 import cors from 'cors';
 import express, {Application, Request} from 'express';
 import helmet from 'helmet';

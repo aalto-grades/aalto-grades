@@ -7,7 +7,7 @@ import {
   EditGrade,
   GradeOption,
   Status,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import {Form, Formik, FormikErrors, FormikTouched} from 'formik';
 import {
   Box,

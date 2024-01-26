@@ -8,7 +8,7 @@ import {
   HttpCode,
   Language,
   UserData,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import supertest from 'supertest';
 
 import {app} from '../../src/app';
