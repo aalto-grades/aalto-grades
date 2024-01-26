@@ -24,7 +24,7 @@ import {mockTeacher} from '../mock-data/misc';
 import {app} from '../../src/app';
 import {getCookies, Cookies} from '../util/getCookies';
 
-const request: supertest.SuperTest<supertest.Test> = supertest(app);
+const request = supertest(app);
 const badId: number = 1000000;
 const badInput: string = 'notValid';
 const dateOnlyRegExp: RegExp =
