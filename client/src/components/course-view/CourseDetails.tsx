@@ -13,7 +13,6 @@ import {JSX} from 'react';
 
 import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 
-import useAuth, {AuthContextType} from '../../hooks/useAuth';
 import {LanguageOption} from '../../types';
 import {convertToClientGradingScale} from '../../utils/textFormat';
 import {languageOptions} from '../course-results-view/SisuDownloadDialog';
@@ -25,8 +24,6 @@ export default function CourseDetails(props: {
   onChangeAssessmentModel: (assessmentModel: AssessmentModelData) => void;
   onNewAssessmentModel: () => void;
 }): JSX.Element {
-  const {auth, isTeacherInCharge}: AuthContextType = useAuth();
-
   function getLanguageById(id: Language): string {
     const languageOption: LanguageOption = languageOptions.find(
       (option: LanguageOption) => option.id === id
@@ -100,48 +97,6 @@ export default function CourseDetails(props: {
           })}
         </Box>
       </Box>
-      {/* <Box sx={{mt: 1.5}}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Typography variant="h3" align="left" sx={{pt: 1.5, pb: 1}}>
-            Assessment Models
-          </Typography>
-          {(auth?.role === SystemRole.Admin || isTeacherInCharge) && (
-            <Tooltip title="New assessment model" placement="right">
-              <Button onClick={props.onNewAssessmentModel}>New</Button>
-            </Tooltip>
-          )}
-        </Box>
-        <Box
-          textAlign="left"
-          borderRadius={1}
-          sx={{
-            bgcolor: 'secondary.light',
-            p: 1.5,
-            mt: 1,
-            minWidth: '318px',
-          }}
-        >
-          {props.assessmentModels &&
-          props.assessmentModels.length > 0 &&
-          props.currentAssessmentModelId ? (
-            <AssessmentModelsList
-              data={props.assessmentModels}
-              current={props.currentAssessmentModelId}
-              onClick={props.onChangeAssessmentModel}
-            />
-          ) : (
-            <Box sx={{py: 2}}>
-              No assessment models found. Please create a new assessment model.
-            </Box>
-          )}
-        </Box>
-      </Box> */}
     </Box>
   );
 }

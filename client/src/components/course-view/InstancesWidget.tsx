@@ -4,12 +4,8 @@
 
 import {Box, Button, Typography} from '@mui/material';
 import {UseQueryResult} from '@tanstack/react-query';
-import {
-  AssessmentModelData,
-  CourseData,
-  SystemRole,
-} from 'aalto-grades-common/types';
-import React, {useState} from 'react';
+import {CourseData, SystemRole} from 'aalto-grades-common/types';
+import React from 'react';
 import {
   NavigateFunction,
   Params,
@@ -17,26 +13,16 @@ import {
   useParams,
 } from 'react-router-dom';
 import {AuthContextType} from '../../context/AuthProvider';
-import {useGetAllAssessmentModels, useGetCourse} from '../../hooks/useApi';
+import {useGetCourse} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import {State} from '../../types';
+
 import InstancesTable from './InstancesTable';
 
-interface Props {
-  // Define the props for your component here
-}
-
-const InstancesWidget: React.FC<Props> = props => {
+const InstancesWidget: React.FC = _ => {
   const navigate: NavigateFunction = useNavigate();
   const {courseId}: Params = useParams() as {courseId: string};
   const {auth, isTeacherInCharge}: AuthContextType = useAuth();
-  const [
-    createAssessmentModelOpen,
-    setCreateAssessmentModelOpen,
-  ]: State<boolean> = useState(false);
   const course: UseQueryResult<CourseData> = useGetCourse(courseId);
-  const assessmentModels: UseQueryResult<Array<AssessmentModelData>> =
-    useGetAllAssessmentModels(courseId);
 
   return (
     <div>
