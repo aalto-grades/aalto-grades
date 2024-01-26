@@ -115,3 +115,44 @@ export async function getUserInfo(req: Request, res: Response): Promise<void> {
     data: userData,
   });
 }
+
+export async function addIdpUser(req: Request, res: Response): Promise<void> {
+  const email: string | undefined = req.body.email;
+  if (!email) {
+    throw new ApiError('Bad request', HttpCode.BadRequest);
+  }
+  const userAlreadyExists = await User.findIdpUserByEmail(email);
+  if (userAlreadyExists) {
+    throw new ApiError('User already exists', HttpCode.Conflict);
+  }
+  await User.create({
+    email: email,
+    role: SystemRole.User,
+  });
+  res.status(HttpCode.Created).send();
+}
+
+export async function getIdpUsers(req: Request, res: Response): Promise<void> {
+  const users: Array<{email: string}> = (await User.findIdpUsers()).map(
+    user => ({email: user.email, id: user.id})
+  );
+  res.status(HttpCode.Ok).json({
+    data: users,
+  });
+}
+
+export async function deleteIdpUser(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const userId: string | undefined = req.params.userId;
+  if (!userId) {
+    throw new ApiError('Bad request', HttpCode.BadRequest);
+  }
+  const user = await User.findByPk(userId);
+  if (!user || user?.password) {
+    throw new ApiError('User not found', HttpCode.NotFound);
+  }
+  await user.destroy();
+  res.status(HttpCode.Ok).send();
+}

@@ -7,6 +7,7 @@ import supertest from 'supertest';
 
 import {app} from '../../src/app';
 import {Cookies, getCookies} from '../util/getCookies';
+import User from '../../src/database/models/user';
 
 const request = supertest(app);
 let cookies: Cookies = {
@@ -254,5 +255,114 @@ describe('Test GET /v1/user/:userId - get user information', () => {
 
     expect(res.body.errors).toBeDefined();
     expect(res.body.data).not.toBeDefined();
+  });
+});
+
+describe('Test GET /v1/idp-users/ - get idp users information', () => {
+  it('should respond with idp users data when querying as admin', async () => {
+    let res: supertest.Response = await request
+      .get('/v1/auth/self-info')
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    res = await request
+      .get('/v1/idp-users')
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    expect(res.body.errors).not.toBeDefined();
+    expect(res.body.data).toBeDefined();
+    expect(res.body.data.length).toBeGreaterThan(0);
+  });
+
+  it('should respond with 401 unauthorized, if not logged in', async () => {
+    await request
+      .get('/v1/idp-users')
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Unauthorized);
+  });
+
+  it('should respond with 403 forbidden, if not admin', async () => {
+    await request
+      .get('/v1/auth/self-info')
+      .set('Cookie', cookies.userCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    await request
+      .get('/v1/idp-users')
+      .set('Cookie', cookies.userCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Forbidden);
+  });
+});
+
+describe('Test POST /v1/idp-users/ - get idp users information', () => {
+  it('should create idp user when admin', async () => {
+    const res: supertest.Response = await request
+      .post('/v1/idp-users')
+      .send({email: 'idp@user.com'})
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Created);
+
+    expect(res.body.errors).not.toBeDefined();
+    const user = await User.findByEmail('idp@user.com');
+    expect(user).not.toBe(null);
+  });
+
+  it('should respond 401 unauthorized if not logged in', async () => {
+    await request
+      .post('/v1/idp-users')
+      .send({email: 'idp@user.com'})
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Unauthorized);
+  });
+
+  it('should respond 403 forbidden if not admin', async () => {
+    await request
+      .post('/v1/idp-users')
+      .send({email: 'idp@user.com'})
+      .set('Cookie', cookies.userCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Forbidden);
+  });
+});
+
+describe('Test DELETE /v1/idp-users/:userId - get idp users information', () => {
+  it('should delete idp user when admin', async () => {
+    const users: Array<User> = await User.findIdpUsers();
+    const deleteUserWithId = users[0].id;
+    await request
+      .delete(`/v1/idp-users/${deleteUserWithId}`)
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+    const deletedUser = await User.findByPk(deleteUserWithId);
+    expect(deletedUser).toBe(null);
+  });
+
+  it('should respond 404 if idp user with id not found', async () => {
+    await request
+      .delete('/v1/idp-users/1')
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.NotFound);
+  });
+
+  it('should respond 401 unauthorized if not logged in', async () => {
+    await request
+      .delete('/v1/idp-users/123')
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Unauthorized);
+  });
+
+  it('should respond 401 unauthorized if not admin', async () => {
+    await request
+      .delete('/v1/idp-users/123')
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Unauthorized);
   });
 });

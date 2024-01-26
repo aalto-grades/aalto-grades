@@ -9,6 +9,7 @@ import {NavigateFunction, useNavigate} from 'react-router-dom';
 import {UseQueryResult} from '@tanstack/react-query';
 
 import CourseTable from './front-page/CourseTable';
+import UsersView from './front-page/users-view/UsersView';
 
 import {useGetAllCourses, useGetCoursesOfUser} from '../hooks/useApi';
 import useAuth, {AuthContextType} from '../hooks/useAuth';
@@ -57,7 +58,7 @@ export default function FrontPage(): JSX.Element {
           </p>
         </Box>
       )}
-      {auth?.role == SystemRole.Admin && (
+      {auth?.role === SystemRole.Admin && (
         <>
           <Box
             component="span"
@@ -89,6 +90,7 @@ export default function FrontPage(): JSX.Element {
             }
           </Box>
           {courses.data && <CourseTable courses={courses.data} />}
+          <UsersView />
         </>
       )}
     </>
