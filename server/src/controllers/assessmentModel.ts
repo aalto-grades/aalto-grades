@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AssessmentModelData, HttpCode} from 'aalto-grades-common/types';
+import {AssessmentModelData, HttpCode} from '@common/types';
 import {Request, Response} from 'express';
 import * as yup from 'yup';
 

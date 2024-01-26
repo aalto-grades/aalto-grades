@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {GradingScale} from 'aalto-grades-common/types';
+import {GradingScale} from '@common/types';
 import {
   CreationOptional,
   DataTypes,

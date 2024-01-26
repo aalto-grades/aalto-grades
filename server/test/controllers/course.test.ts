@@ -8,7 +8,7 @@ import {
   HttpCode,
   Language,
   UserData,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import supertest from 'supertest';
 
 import {app} from '../../src/app';
@@ -18,7 +18,7 @@ import {
 } from '../../src/controllers/utils/course';
 import {Cookies, getCookies} from '../util/getCookies';
 
-const request: supertest.SuperTest<supertest.Test> = supertest(app);
+const request = supertest(app);
 const badId: number = 1000000;
 let cookies: Cookies = {
   adminCookie: [],

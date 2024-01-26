@@ -2,13 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from 'aalto-grades-common/types';
+import {HttpCode} from '@common/types';
 import supertest from 'supertest';
 
 import {app} from '../../src/app';
 import {getCookies, Cookies} from '../util/getCookies';
 
-const request: supertest.SuperTest<supertest.Test> = supertest(app);
+const request = supertest(app);
 let res: supertest.Response;
 let cookies: Cookies = {
   adminCookie: [],

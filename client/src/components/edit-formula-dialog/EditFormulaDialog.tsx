@@ -8,7 +8,7 @@ import {
   Formula,
   FormulaData,
   ParamsObject,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import deepEqual from 'deep-equal';
 import {
   Box,

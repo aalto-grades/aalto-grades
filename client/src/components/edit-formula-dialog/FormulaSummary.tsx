@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {FormulaData, Param} from 'aalto-grades-common/types';
+import {FormulaData, Param} from '@common/types';
 import {ExpandMore} from '@mui/icons-material';
 import {
   Accordion,

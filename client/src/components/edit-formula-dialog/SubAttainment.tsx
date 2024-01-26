@@ -2,12 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {
-  AttainmentData,
-  InputField,
-  ListParam,
-  Param,
-} from 'aalto-grades-common/types';
+import {AttainmentData, InputField, ListParam, Param} from '@common/types';
 import {Box, TextField, Typography, MenuItem} from '@mui/material';
 import {ChangeEvent, JSX} from 'react';
 

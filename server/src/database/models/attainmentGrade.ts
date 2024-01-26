@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {DateOnlyString} from 'aalto-grades-common/types';
+import {DateOnlyString} from '@common/types';
 import {
   CreationOptional,
   DataTypes,

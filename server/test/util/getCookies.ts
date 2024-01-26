@@ -5,13 +5,13 @@
 import supertest from 'supertest';
 
 import {app} from '../../src/app';
-import {SystemRole} from 'aalto-grades-common/types';
+import {SystemRole} from '@common/types';
 
-const request: supertest.SuperTest<supertest.Test> = supertest(app);
+const request = supertest(app);
 
 export interface Cookies {
-  adminCookie: Array<string>;
-  userCookie: Array<string>;
+  adminCookie: string[];
+  userCookie: string[];
 }
 
 /**
@@ -47,7 +47,7 @@ export async function getCookies(): Promise<Cookies> {
     });
 
   return {
-    adminCookie: adminRes.headers['set-cookie'],
-    userCookie: userRes.headers['set-cookie'],
+    adminCookie: [adminRes.headers['set-cookie']],
+    userCookie: [userRes.headers['set-cookie']],
   };
 }

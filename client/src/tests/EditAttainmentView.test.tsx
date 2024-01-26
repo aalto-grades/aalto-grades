@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentData, Formula, GradeType} from 'aalto-grades-common/types';
+import {AttainmentData, Formula, GradeType} from '@common/types';
 import {http} from 'msw';
 import {MemoryRouter, Routes, Route} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from 'aalto-grades-common/types';
+import {HttpCode} from '@common/types';
 import supertest from 'supertest';
 
 import TeacherInCharge from '../../src/database/models/teacherInCharge';
@@ -11,7 +11,7 @@ import {mockTeacher} from '../mock-data/misc';
 import {app} from '../../src/app';
 import {Cookies, getCookies} from '../util/getCookies';
 
-const request: supertest.SuperTest<supertest.Test> = supertest(app);
+const request = supertest(app);
 const badId: number = 1000000;
 let cookies: Cookies = {
   adminCookie: [],

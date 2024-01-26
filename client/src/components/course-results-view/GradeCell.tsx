@@ -8,7 +8,7 @@ import {
 } from '@mui/icons-material';
 import {Box, IconButton, Theme, Tooltip, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import {AttainmentGradeData, GradeOption} from 'aalto-grades-common/types';
+import {AttainmentGradeData, GradeOption} from '@common/types';
 import {FC, useState} from 'react';
 
 import GradeOptionsDialog from './GradeOptionsDialog';

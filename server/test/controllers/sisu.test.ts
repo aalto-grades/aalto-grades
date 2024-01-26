@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {CourseInstanceData, HttpCode} from 'aalto-grades-common/types';
+import {CourseInstanceData, HttpCode} from '@common/types';
 import axios, {AxiosStatic} from 'axios';
 import supertest from 'supertest';
 
@@ -15,7 +15,7 @@ const mockedAxios: jest.Mocked<AxiosStatic> = axios as jest.Mocked<
   typeof axios
 >;
 
-const request: supertest.SuperTest<supertest.Test> = supertest(app);
+const request = supertest(app);
 let cookies: Cookies = {
   adminCookie: [],
   userCookie: [],

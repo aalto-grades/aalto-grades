@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import {UseQueryResult} from '@tanstack/react-query';
-import {AttainmentGradeData, FinalGrade} from 'aalto-grades-common/types';
+import {AttainmentGradeData, FinalGrade} from '@common/types';
 import {JSX, useState} from 'react';
 import {Params, useParams} from 'react-router-dom';
 

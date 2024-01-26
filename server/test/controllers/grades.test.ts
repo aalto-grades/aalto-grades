@@ -9,7 +9,7 @@ import {
   HttpCode,
   Status,
   StudentGradesTree,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import * as fs from 'fs';
 import path from 'path';
 import {Op} from 'sequelize';
@@ -24,7 +24,7 @@ import {mockTeacher} from '../mock-data/misc';
 import {app} from '../../src/app';
 import {getCookies, Cookies} from '../util/getCookies';
 
-const request: supertest.SuperTest<supertest.Test> = supertest(app);
+const request = supertest(app);
 const badId: number = 1000000;
 const badInput: string = 'notValid';
 const dateOnlyRegExp: RegExp =

@@ -8,7 +8,7 @@ import {
   GradeType,
   HttpCode,
   ParamsObject,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import {Op} from 'sequelize';
 import supertest from 'supertest';
 
@@ -20,7 +20,7 @@ import {mockTeacher} from '../mock-data/misc';
 import {app} from '../../src/app';
 import {Cookies, getCookies} from '../util/getCookies';
 
-const request: supertest.SuperTest<supertest.Test> = supertest(app);
+const request = supertest(app);
 const badId: number = 1000000;
 const badInput: string = 'notValid';
 let cookies: Cookies = {

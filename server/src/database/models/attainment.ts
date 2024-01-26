@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {GradeType, ParamsObject} from 'aalto-grades-common/types';
+import {GradeType, ParamsObject} from '@common/types';
 import {
   CreationOptional,
   DataTypes,
@@ -15,7 +15,7 @@ import {
 import {sequelize} from '..';
 import AssessmentModel from './assessmentModel';
 
-import {Formula} from 'aalto-grades-common/types';
+import {Formula} from '@common/types';
 
 export default class Attainment extends Model<
   InferAttributes<Attainment>,

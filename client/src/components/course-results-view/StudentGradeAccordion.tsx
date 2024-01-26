@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentGradeData, Status} from 'aalto-grades-common/types';
+import {AttainmentGradeData, Status} from '@common/types';
 import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
 import {Box, Button, Typography} from '@mui/material';
 import {JSX, SyntheticEvent, useState} from 'react';

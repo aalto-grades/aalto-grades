@@ -14,7 +14,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
-import {SystemRole} from 'aalto-grades-common/types';
+import {SystemRole} from '@common/types';
 import {CSSProperties, JSX} from 'react';
 import {Route, Routes} from 'react-router-dom';
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools'; // For debugging

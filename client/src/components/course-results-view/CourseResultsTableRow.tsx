@@ -25,7 +25,7 @@ import {
   AttainmentGradeData,
   FinalGrade,
   GradeOption,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import {JSX, useState} from 'react';
 import {Params, useParams} from 'react-router-dom';
 

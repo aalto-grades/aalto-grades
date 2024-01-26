@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Language, SystemRole} from 'aalto-grades-common/types';
+import {Language, SystemRole} from '@common/types';
 import {Dispatch, SetStateAction} from 'react';
 
 export interface ApiResponse<T> {

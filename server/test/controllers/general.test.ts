@@ -2,12 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from 'aalto-grades-common/types';
+import {HttpCode} from '@common/types';
 import supertest from 'supertest';
 
 import {app} from '../../src/app';
 
-const request: supertest.SuperTest<supertest.Test> = supertest(app);
+const request = supertest(app);
 
 function evaluateResponse(res: supertest.Response, errorMessage: string): void {
   expect(res.body.success).toBeFalsy();

@@ -11,7 +11,7 @@ import {
   HttpCode,
   Status,
   StudentGradesTree,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import {parse, Parser} from 'csv-parse';
 import {stringify} from 'csv-stringify';
 import {NextFunction, Request, Response} from 'express';

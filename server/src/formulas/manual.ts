@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentData, Param} from 'aalto-grades-common/types';
+import {AttainmentData, Param} from '@common/types';
 import * as yup from 'yup';
 
 import {registerFormula} from '.';
-import {Formula, Status} from 'aalto-grades-common/types';
+import {Formula, Status} from '@common/types';
 import {CalculationResult} from '../types';
 
 const childParams: Array<Param> = [];

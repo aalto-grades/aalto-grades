@@ -13,8 +13,6 @@ services:
     build:
       context: .
       dockerfile: ./client/Dockerfile
-      args:
-        CLIENT_SKIP_NPM_CI: ${CLIENT_SKIP_NPM_CI}
     extends:
       service: frontend-minimum
 

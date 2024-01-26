@@ -5,7 +5,7 @@
 // Used to determine if a user is authenticated and if they are allowed to access a page
 // if not, the user is redirected to the login page
 
-import {LoginResult, SystemRole} from 'aalto-grades-common/types';
+import {LoginResult, SystemRole} from '@common/types';
 import {JSX, useEffect, useState} from 'react';
 import {Navigate, Outlet} from 'react-router-dom';
 import {UseQueryResult} from '@tanstack/react-query';

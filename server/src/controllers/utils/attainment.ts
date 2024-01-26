@@ -2,14 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from 'aalto-grades-common/types';
+import {HttpCode} from '@common/types';
 
 import AssessmentModel from '../../database/models/assessmentModel';
 import Attainment from '../../database/models/attainment';
 import AttainmentGrade from '../../database/models/attainmentGrade';
 import Course from '../../database/models/course';
 
-import {AttainmentData} from 'aalto-grades-common/types';
+import {AttainmentData} from '@common/types';
 import {validateAssessmentModelPath} from './assessmentModel';
 import {ApiError, idSchema} from '../../types';
 

@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode, SystemRole} from 'aalto-grades-common/types';
+import {HttpCode, SystemRole} from '@common/types';
 import {Cookie, CookieAccessInfo} from 'cookiejar';
-import mockdate from 'mockdate';
-import supertest, {SuperAgentTest} from 'supertest';
 import * as fs from 'fs';
+import mockdate from 'mockdate';
+import supertest from 'supertest';
 
 import {
   JWT_COOKIE_EXPIRY_MS,
@@ -15,7 +15,7 @@ import {
 
 import {app} from '../../src/app';
 
-const request: supertest.SuperTest<supertest.Test> = supertest(app);
+const request = supertest(app);
 
 jest.mock('fs', () => {
   return {
@@ -27,7 +27,7 @@ jest.mock('fs', () => {
 describe('Test GET /v1/auth/self-info - check users own info', () => {
   it('should act differently when user is logged in or out', async () => {
     // Use the agent for cookie persistence
-    const agent: SuperAgentTest = supertest.agent(app);
+    const agent = supertest.agent(app);
     await agent
       .get('/v1/auth/self-info')
       .withCredentials(true)
@@ -172,7 +172,7 @@ describe('Test POST /v1/auth/signup - create a new user', () => {
 describe('Test POST /v1/auth/login and expiry', () => {
   it('should expire the session after a set time', async () => {
     // Use the agent for cookie persistence
-    const agent: SuperAgentTest = supertest.agent(app);
+    const agent = supertest.agent(app);
     const realDate: Date = new Date();
     await agent
       .post('/v1/auth/login')

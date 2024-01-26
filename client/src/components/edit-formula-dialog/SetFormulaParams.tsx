@@ -7,7 +7,7 @@ import {
   ChildParamsObject,
   FormulaData,
   ParamsObject,
-} from 'aalto-grades-common/types';
+} from '@common/types';
 import {TextField} from '@mui/material';
 import {ChangeEvent, JSX} from 'react';
 

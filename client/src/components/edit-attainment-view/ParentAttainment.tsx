@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentData} from 'aalto-grades-common/types';
+import {AttainmentData} from '@common/types';
 import {ExpandLess, ExpandMore} from '@mui/icons-material';
 import {Box, Collapse, IconButton, List, Typography} from '@mui/material';
 import {JSX, useState} from 'react';
