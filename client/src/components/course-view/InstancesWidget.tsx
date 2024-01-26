@@ -2,15 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Box, Typography, Button} from '@mui/material';
+import {Box, Button, Typography} from '@mui/material';
+import {UseQueryResult} from '@tanstack/react-query';
 import {
   AssessmentModelData,
   CourseData,
   SystemRole,
 } from 'aalto-grades-common/types';
 import React, {useState} from 'react';
-import CreateAssessmentModelDialog from './CreateAssessmentModelDialog';
-import InstancesTable from './InstancesTable';
 import {
   NavigateFunction,
   Params,
@@ -18,10 +17,10 @@ import {
   useParams,
 } from 'react-router-dom';
 import {AuthContextType} from '../../context/AuthProvider';
+import {useGetAllAssessmentModels, useGetCourse} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import {State} from '../../types';
-import {UseQueryResult} from '@tanstack/react-query';
-import {useGetAllAssessmentModels, useGetCourse} from '../../hooks/useApi';
+import InstancesTable from './InstancesTable';
 
 interface Props {
   // Define the props for your component here
