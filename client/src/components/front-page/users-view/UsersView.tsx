@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
-import {SystemRole} from 'aalto-grades-common/types';
+import {SystemRole} from '@common/types';
 import {JSX} from 'react';
 import {Box, Button, Typography} from '@mui/material';
 import {NavigateFunction, useNavigate} from 'react-router-dom';
