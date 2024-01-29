@@ -180,6 +180,10 @@ export function useUploadGradeCsv(
       queryClient.invalidateQueries({
         queryKey: ['grade-tree-of-user', vars.courseId, vars.assessmentModelId],
       });
+
+      queryClient.invalidateQueries({
+        queryKey: ['grade-tree-of-all-users', vars.courseId, vars.assessmentModelId],
+      });
     },
     ...options,
   });
