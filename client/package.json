@@ -34,7 +34,6 @@
     "build": "./build.sh",
     "build:vite": "tsc && vite build",
     "preview": "vite preview --port 3005",
-    "dev-docker-preview": "vite preview --port 3005 --host --no-open",
     "vitest-preview": "vitest-preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
     "lint:fix": "eslint . --ext ts,tsx --report-unused-disable-directives --fix",

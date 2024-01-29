@@ -13,9 +13,6 @@ services:
       file: ../common-services.yaml
       service: frontend
     container_name: frontend-server-cypress
-    environment:
-      REACT_APP_BACKEND_URL: "http://backend"
-      REACT_APP_BACKEND_PORT: "3000"
 
   backend:
     extends:
@@ -23,7 +20,7 @@ services:
       service: backend
     container_name: backend-server-cypress
     environment:
-      AALTO_GRADES_FRONTEND_CORS_ORIGIN: "http://frontend:3005"
+      AALTO_GRADES_FRONTEND_CORS_ORIGIN: "http://frontend:80"
 
   database:
     extends:
@@ -35,7 +32,7 @@ services:
       context: .
       dockerfile: ./Dockerfile
     environment:
-      LOCALHOST_URL: "http://frontend:3005"
+      LOCALHOST_URL: "http://frontend:80"
     volumes:
       - ./cypress:/app/cypress
     depends_on:

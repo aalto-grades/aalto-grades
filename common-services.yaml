@@ -29,8 +29,13 @@ services:
     build:
       context: .
       dockerfile: ./server/Dockerfile
-      args:
-        SERVER_SKIP_NPM_CI: ${SERVER_SKIP_NPM_CI}
+    extends:
+      service: backend-minimum
+
+  backendtest:
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile.test
     extends:
       service: backend-minimum
 
