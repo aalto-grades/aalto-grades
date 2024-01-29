@@ -6,6 +6,9 @@
     "lint": "eslint . --ext ts --report-unused-disable-directives",
     "lint:fix": "eslint . --ext ts --report-unused-disable-directives --fix"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "author": "The Aalto Grades Developers",
   "license": "Expat (MIT)",
   "devDependencies": {

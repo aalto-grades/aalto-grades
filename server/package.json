@@ -18,6 +18,9 @@
     "seed:up": "npx sequelize-cli db:seed:all",
     "seed:down": "npx sequelize-cli db:seed:undo"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "@node-saml/passport-saml": "^4.0.4",
     "argon2": "=0.31.2",
