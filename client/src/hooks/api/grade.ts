@@ -182,7 +182,11 @@ export function useUploadGradeCsv(
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['grade-tree-of-all-users', vars.courseId, vars.assessmentModelId],
+        queryKey: [
+          'grade-tree-of-all-users',
+          vars.courseId,
+          vars.assessmentModelId,
+        ],
       });
     },
     ...options,
