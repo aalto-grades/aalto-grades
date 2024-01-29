@@ -464,7 +464,6 @@ describe(
           children: undefined,
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         expect([
           ...oldParentParams.children!,
           ['born', {weight: 0}],

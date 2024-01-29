@@ -1566,7 +1566,6 @@ describe(
       checkErrorRes(
         [
           'id must be a `number` type, but the final value was:' +
-            // eslint-disable-next-line no-useless-escape
             ' `NaN` (cast from the value `"notValid"`).',
         ],
         HttpCode.BadRequest
@@ -1588,7 +1587,6 @@ describe(
       checkErrorRes(
         [
           'id must be a `number` type, but the final value was:' +
-            // eslint-disable-next-line no-useless-escape
             ' `NaN` (cast from the value `"notValid"`).',
         ],
         HttpCode.BadRequest

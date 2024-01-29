@@ -40,7 +40,7 @@ describe('Test GET /v1/auth/self-info - check users own info', () => {
       .expect(HttpCode.Ok)
       .expect('set-cookie', /jwt=/)
       .expect('set-cookie', /httponly/i);
-    // eslint-disable-next-line max-len
+
     await agent
       .get('/v1/auth/self-info')
       .withCredentials(true)
