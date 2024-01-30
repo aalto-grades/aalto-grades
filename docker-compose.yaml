@@ -15,7 +15,7 @@ services:
       service: frontend
     container_name: frontend-server
     ports:
-      - 3005:3005
+      - 3005:80
     restart: always
 
   backend:

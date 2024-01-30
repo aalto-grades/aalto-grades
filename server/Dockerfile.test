@@ -2,11 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-# Build stage
-FROM node:18-alpine AS build
+FROM node:18-alpine
 
 WORKDIR /app
-RUN mkdir common server
+RUN mkdir common server && chown node:node server
 
 # Install packages first to make following builds faster
 WORKDIR /app/server
@@ -19,27 +18,16 @@ COPY common/types common/types
 
 # Copy only necessary server files
 WORKDIR /app/server
-COPY server/tsconfig.json ./
+COPY server/tsconfig.json server/.sequelizerc server/jest.config.js ./
+COPY server/mock-data ./mock-data
+COPY server/test ./test
 COPY server/src ./src
 
+USER node
 RUN npm run build
 
-# Run stage
-FROM node:18-alpine AS run
-
-WORKDIR /app
-RUN mkdir logs && chown node:node logs
-
-COPY server/package.json server/package-lock.json ./
-RUN npm ci --omit=dev && npm cache clean --force
-
-COPY server/.sequelizerc ./
-COPY server/mock-data ./mock-data
-COPY --from=build /app/server/build ./build
-
-USER node
 EXPOSE 3000
 CMD ["/bin/sh", "-c", "\
     npm run migration:up && \
     npm run seed:up && \
-    npm run start"]
+    npm test"]

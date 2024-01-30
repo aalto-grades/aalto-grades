@@ -1,11 +1,12 @@
-# SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+# SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 #
 # SPDX-License-Identifier: MIT
 
-FROM node:16-alpine
+# Build stage
+FROM node:18-alpine as build
 
 WORKDIR /app
-RUN mkdir common client && chown node:node client
+RUN mkdir common client
 
 # Install packages first to make following builds faster
 WORKDIR /app/client
@@ -18,13 +19,17 @@ COPY common/types common/types
 
 # Copy only necessary client files
 WORKDIR /app/client
-COPY client/.env client/tsconfig.json client/index.html client/vite.config.ts client/build.sh ./
+COPY client/tsconfig.json client/.env client/index.html client/vite.config.ts client/build.sh ./
 COPY client/public ./public
 COPY client/src ./src
 
 # Build and run
-USER node
 RUN npm run build
 
-EXPOSE 3005
-CMD [ "npm", "run", "dev-docker-preview" ]
+# Run stage
+FROM nginx:1.23.3-alpine as run
+
+COPY --from=build /app/client/build /user/share/nginx/html
+COPY client/nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80

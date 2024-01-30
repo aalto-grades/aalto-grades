@@ -239,7 +239,7 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
   const newTeachers: Array<User> | null = teachersInCharge
     ? await validateEmailList(
         // teacher.email was alread validated to be defined by Yup.
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         teachersInCharge.map((teacher: UserData) => teacher.email!)
       )
     : null;
