@@ -76,7 +76,7 @@ jobs:
       - name: Install linter dependencies
         run: npm --prefix .. ci
       - name: Run linter
-        run: npm run lint
+        run: npm run lint-common
 
   lint_yaml_files:
     name: Lint project YAML files

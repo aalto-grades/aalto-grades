@@ -11,6 +11,8 @@
   },
   "scripts": {
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
-    "lint:fix": "eslint . --ext ts,tsx --report-unused-disable-directives --fix"
+    "lint:fix": "eslint . --ext ts,tsx --report-unused-disable-directives --fix",
+    "lint-common": "eslint common --ext ts --report-unused-disable-directives",
+    "lint-common:fix": "eslint common --ext ts --report-unused-disable-directives --fix"
   }
 }
