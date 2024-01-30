@@ -39,7 +39,7 @@ services:
       service: backend-minimum
     build:
       context: .
-      dockerfile: ./server/prod/Dockerfile
+      dockerfile: ./server/Dockerfile.prod.test
     container_name: backend-server
     environment:
       AALTO_GRADES_JWT_SECRET: "${AALTO_GRADES_JWT_SECRET}"
@@ -50,6 +50,8 @@ services:
       ENCRYPT_PVK_FILE: "${ENCRYPT_PVK_FILE}"
       PRIVATE_KEY_FILE: "${PRIVATE_KEY_FILE}"
       SAML_SP_CERT_PATH: "${SAML_SP_CERT_PATH}"
+    volumes:
+      - ./reverse-proxy:/keys:ro
 
   database:
     extends:

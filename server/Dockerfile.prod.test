@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
+# For testing new configurations
 FROM ghcr.io/aalto-grades/aalto-grades-backend-test:test
 
 WORKDIR /app
-COPY --chown=node:node reverse-proxy /keys
 
 USER node
 EXPOSE 3000
