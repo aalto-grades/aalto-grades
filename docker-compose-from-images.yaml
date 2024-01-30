@@ -48,6 +48,8 @@ services:
       ENCRYPT_PVK_FILE: "${ENCRYPT_PVK_FILE}"
       PRIVATE_KEY_FILE: "${PRIVATE_KEY_FILE}"
       SAML_SP_CERT_PATH: "${SAML_SP_CERT_PATH}"
+    volumes:
+      - ./reverse-proxy:/keys:ro
 
   database:
     extends:
