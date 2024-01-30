@@ -15,6 +15,9 @@ USER node
 ARG REACT_APP_BACKEND_URL="https://aalto-grades.cs.aalto.fi"
 ARG REACT_APP_BACKEND_PORT="443"
 
+ARG VITE_APP_BACKEND_URL="https://aalto-grades.cs.aalto.fi"
+ARG VITE_APP_BACKEND_PORT="443"
+
 RUN npm ci
 RUN npm run build
 
