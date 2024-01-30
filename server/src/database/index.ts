@@ -19,9 +19,8 @@ export const sequelize: Sequelize = new Sequelize(
     dialectOptions:
       NODE_ENV === 'production'
         ? {
-            ssl: {
-              require: true,
-            },
+            ssl: true,
+            native: true,
           }
         : undefined,
     define: {
