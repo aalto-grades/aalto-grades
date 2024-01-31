@@ -19,7 +19,7 @@ import {Numeric} from '../../types';
 
 export function useGetAllInstances(
   courseId: Numeric,
-  options?: UseQueryOptions<Array<CourseInstanceData>>
+  options?: Partial<UseQueryOptions<Array<CourseInstanceData>>>
 ): UseQueryResult<Array<CourseInstanceData>> {
   return useQuery({
     queryKey: ['all-instances', courseId],
@@ -65,7 +65,7 @@ export function useAddInstance(
 
 export function useGetSisuInstance(
   sisuInstanceId: string,
-  options?: UseQueryOptions<CourseInstanceData>
+  options?: Partial<UseQueryOptions<CourseInstanceData>>
 ): UseQueryResult<CourseInstanceData> {
   return useQuery({
     queryKey: ['sisu-instance', sisuInstanceId],
@@ -77,7 +77,7 @@ export function useGetSisuInstance(
 
 export function useGetAllSisuInstances(
   courseCode: string,
-  options?: UseQueryOptions<Array<CourseInstanceData>>
+  options?: Partial<UseQueryOptions<Array<CourseInstanceData>>>
 ): UseQueryResult<Array<CourseInstanceData>> {
   return useQuery({
     queryKey: ['all-sisu-instances', courseCode],

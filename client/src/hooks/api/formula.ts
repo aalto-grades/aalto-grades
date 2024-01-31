@@ -8,7 +8,7 @@ import {useQuery, UseQueryOptions, UseQueryResult} from '@tanstack/react-query';
 
 export function useGetFormula(
   formulaId: Formula,
-  options?: UseQueryOptions<FormulaData>
+  options?: Partial<UseQueryOptions<FormulaData>>
 ): UseQueryResult<FormulaData> {
   return useQuery({
     queryKey: ['formula', formulaId],
@@ -19,7 +19,7 @@ export function useGetFormula(
 }
 
 export function useGetAllFormulas(
-  options?: UseQueryOptions<Array<FormulaData>>
+  options?: Partial<UseQueryOptions<Array<FormulaData>>>
 ): UseQueryResult<Array<FormulaData>> {
   return useQuery({
     queryKey: ['all-formulas'],

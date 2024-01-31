@@ -59,7 +59,7 @@ export default function EditAttainmentView(): JSX.Element {
     'children',
     {
       enabled: Boolean(courseId && assessmentModelId),
-      cacheTime: 0,
+      gcTime: 0,
     }
   );
   // If an attainment is being edited, this query is enabled
@@ -70,7 +70,7 @@ export default function EditAttainmentView(): JSX.Element {
     'descendants',
     {
       enabled: Boolean(courseId && assessmentModelId && attainmentId),
-      cacheTime: 0,
+      gcTime: 0,
     }
   );
 

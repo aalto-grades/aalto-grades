@@ -19,7 +19,7 @@ import {Numeric} from '../../types';
 
 export function useGetCourse(
   courseId: Numeric,
-  options?: UseQueryOptions<CourseData>
+  options?: Partial<UseQueryOptions<CourseData>>
 ): UseQueryResult<CourseData> {
   return useQuery({
     queryKey: ['course', courseId],
@@ -29,7 +29,7 @@ export function useGetCourse(
 }
 
 export function useGetAllCourses(
-  options?: UseQueryOptions<Array<CourseData>>
+  options?: Partial<UseQueryOptions<Array<CourseData>>>
 ): UseQueryResult<Array<CourseData>> {
   return useQuery({
     queryKey: ['all-courses'],

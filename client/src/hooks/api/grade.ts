@@ -87,7 +87,7 @@ export function useDownloadSisuGradeCsv(
 export function useGetFinalGrades(
   courseId: Numeric,
   assessmentModelId: Numeric,
-  options?: UseQueryOptions<Array<FinalGrade>>
+  options?: Partial<UseQueryOptions<Array<FinalGrade>>>
 ): UseQueryResult<Array<FinalGrade>> {
   return useQuery({
     queryKey: ['final-grades', courseId, assessmentModelId],
@@ -104,7 +104,7 @@ export function useGetFinalGrades(
 export function useGetGradeTreeOfAllUsers(
   courseId: Numeric,
   assessmentModelId: Numeric,
-  options?: UseQueryOptions<Array<StudentGradesTree>>
+  options?: Partial<UseQueryOptions<Array<StudentGradesTree>>>
 ): UseQueryResult<Array<StudentGradesTree>> {
   return useQuery({
     queryKey: ['grade-tree-of-all-users', courseId, assessmentModelId],
@@ -122,7 +122,7 @@ export function useGetGradeTreeOfUser(
   courseId: Numeric,
   assessmentModelId: Numeric,
   userId: Numeric,
-  options?: UseQueryOptions<AttainmentGradeData>
+  options?: Partial<UseQueryOptions<AttainmentGradeData>>
 ): UseQueryResult<AttainmentGradeData> {
   return useQuery({
     queryKey: ['grade-tree-of-user', courseId, assessmentModelId, userId],
