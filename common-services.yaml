@@ -28,14 +28,14 @@ services:
   backend:
     build:
       context: .
-      dockerfile: ./server/Dockerfile
+      dockerfile: ./server/dockerfiles/Dockerfile
     extends:
       service: backend-minimum
 
   backendtest:
     build:
       context: .
-      dockerfile: ./server/Dockerfile.test
+      dockerfile: ./server/dockerfiles/Dockerfile.test
     extends:
       service: backend-minimum
 

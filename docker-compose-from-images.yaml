@@ -37,7 +37,9 @@ services:
     extends:
       file: ./common-services.yaml
       service: backend-minimum
-    image: ghcr.io/aalto-grades/aalto-grades-backend:main
+    build:
+      context: .
+      dockerfile: ./server/dockerfiles/Dockerfile.prod.run
     container_name: backend-server
     environment:
       AALTO_GRADES_JWT_SECRET: "${AALTO_GRADES_JWT_SECRET}"
@@ -48,8 +50,6 @@ services:
       ENCRYPT_PVK_FILE: "${ENCRYPT_PVK_FILE}"
       PRIVATE_KEY_FILE: "${PRIVATE_KEY_FILE}"
       SAML_SP_CERT_PATH: "${SAML_SP_CERT_PATH}"
-    volumes:
-      - ./reverse-proxy:/keys:ro
 
   database:
     extends:
