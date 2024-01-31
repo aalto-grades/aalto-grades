@@ -27,7 +27,7 @@ RUN npm run build
 # Run stage
 FROM node:18-alpine AS run
 
-ENV NODE_ENV=production
+# ENV NODE_ENV=production
 WORKDIR /app
 RUN mkdir logs && chown node:node logs
 
