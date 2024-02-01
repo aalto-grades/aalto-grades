@@ -5,20 +5,13 @@
 import React from 'react';
 import ReactDOM, {Root} from 'react-dom/client';
 import {BrowserRouter} from 'react-router-dom';
-import {
-  createGlobalStyle,
-  DefaultTheme,
-  GlobalStyleComponent,
-} from 'styled-components';
+import {createGlobalStyle} from 'styled-components';
 
 import App from './App';
 
 import {AuthProvider} from './context/AuthProvider';
 
-const GlobalStyles: GlobalStyleComponent<
-  object,
-  DefaultTheme
-> = createGlobalStyle`
+const GlobalStyles = createGlobalStyle`
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
