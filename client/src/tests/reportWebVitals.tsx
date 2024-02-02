@@ -2,42 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {ReportHandler} from 'web-vitals';
+import {ReportCallback} from 'web-vitals';
 
-export default function reportWebVitals(onPerfEntry: ReportHandler): void {
+export default function reportWebVitals(onPerfEntry: ReportCallback): void {
   if (onPerfEntry && onPerfEntry instanceof Function) {
-    import('web-vitals').then(
-      ({
-        getCLS,
-        getFID,
-        getFCP,
-        getLCP,
-        getTTFB,
-      }: {
-        getCLS: (
-          onReport: ReportHandler,
-          reportAllChanges?: boolean | undefined
-        ) => void;
-        getFID: (
-          onReport: ReportHandler,
-          reportAllChanges?: boolean | undefined
-        ) => void;
-        getFCP: (
-          onReport: ReportHandler,
-          reportAllChanges?: boolean | undefined
-        ) => void;
-        getLCP: (
-          onReport: ReportHandler,
-          reportAllChanges?: boolean | undefined
-        ) => void;
-        getTTFB: (onReport: ReportHandler) => void;
-      }) => {
-        getCLS(onPerfEntry);
-        getFID(onPerfEntry);
-        getFCP(onPerfEntry);
-        getLCP(onPerfEntry);
-        getTTFB(onPerfEntry);
-      }
-    );
+    import('web-vitals').then(({onCLS, onFID, onFCP, onLCP, onTTFB}) => {
+      onCLS(onPerfEntry);
+      onFID(onPerfEntry);
+      onFCP(onPerfEntry);
+      onLCP(onPerfEntry);
+      onTTFB(onPerfEntry);
+    });
   }
 }

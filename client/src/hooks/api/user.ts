@@ -19,7 +19,7 @@ import {Numeric} from '../../types';
 
 export function useGetCoursesOfUser(
   userId: Numeric,
-  options?: UseQueryOptions<Array<CourseData>>
+  options?: Partial<UseQueryOptions<Array<CourseData>>>
 ): UseQueryResult<Array<CourseData>> {
   return useQuery({
     queryKey: ['courses-of-user', userId],
@@ -41,7 +41,7 @@ export function useAddUser(
 }
 
 export function useGetIdpUsers(
-  options?: UseQueryOptions<Array<{email: string; id: number}>>
+  options?: Partial<UseQueryOptions<Array<{email: string; id: number}>>>
 ): UseQueryResult<Array<{email: string; id: number}>> {
   return useQuery({
     queryKey: ['idp-users'],

@@ -20,7 +20,7 @@ export default function UserButton(): JSX.Element {
     useState<Element | null>(null);
   const open: boolean = Boolean(anchorEl);
 
-  const logOut: UseMutationResult = useLogOut({
+  const logOut: UseMutationResult<unknown, unknown, unknown> = useLogOut({
     onSuccess: () => {
       setAuth(null);
       navigate('/login', {replace: true});

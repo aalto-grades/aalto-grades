@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import Box from '@mui/material/Box';
-import styled, {StyledComponent} from 'styled-components';
+import styled from 'styled-components';
 
-const StyledBox: StyledComponent<typeof Box, object> = styled(Box)`
+const StyledBox = styled(Box)`
   width: 53vw;
   min-width: 400px;
   max-width: 1000px;

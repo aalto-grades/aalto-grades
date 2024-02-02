@@ -144,7 +144,7 @@ export default function CreateAssessmentModelDialog(props: {
               InputLabelProps={{shrink: true}}
               margin="normal"
               value={name}
-              disabled={addAssessmentModel.isLoading || addAttainment.isLoading}
+              disabled={addAssessmentModel.isPending || addAttainment.isPending}
               onChange={(event: ChangeEvent<HTMLInputElement>): void =>
                 setName(event.target.value)
               }
@@ -161,7 +161,7 @@ export default function CreateAssessmentModelDialog(props: {
                   label="Assessment model"
                   fullWidth
                   disabled={
-                    addAssessmentModel.isLoading || addAttainment.isLoading
+                    addAssessmentModel.isPending || addAttainment.isPending
                   }
                   onChange={(event: SelectChangeEvent): void => {
                     setAssessmentModel(Number(event.target.value));
@@ -185,7 +185,7 @@ export default function CreateAssessmentModelDialog(props: {
                 variant="outlined"
                 onClick={props.handleClose}
                 disabled={
-                  addAssessmentModel.isLoading || addAttainment.isLoading
+                  addAssessmentModel.isPending || addAttainment.isPending
                 }
               >
                 Cancel
@@ -196,12 +196,12 @@ export default function CreateAssessmentModelDialog(props: {
                 type="submit"
                 disabled={
                   name.length === 0 ||
-                  addAssessmentModel.isLoading ||
-                  addAttainment.isLoading
+                  addAssessmentModel.isPending ||
+                  addAttainment.isPending
                 }
               >
                 Submit
-                {(addAssessmentModel.isLoading || addAttainment.isLoading) && (
+                {(addAssessmentModel.isPending || addAttainment.isPending) && (
                   <CircularProgress
                     size={24}
                     sx={{
