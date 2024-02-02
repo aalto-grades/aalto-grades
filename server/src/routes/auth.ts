@@ -15,8 +15,11 @@ import {
   samlMetadata,
 } from '../controllers/auth';
 import {controllerDispatcher} from '../middleware/errorHandler';
+import {requestSyslogger} from '../middleware/requestLogger';
 
 export const router: Router = Router();
+
+router.use(requestSyslogger);
 
 router.get(
   '/v1/auth/self-info',
