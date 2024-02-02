@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import winston from 'winston';
+import { Syslog } from 'winston-syslog';
 
 import {NODE_ENV} from './environment';
 
@@ -63,6 +64,13 @@ const logger: winston.Logger = winston.createLogger({
       maxsize: 5242880, // 5MB
       maxFiles: 5,
     }),
+    new Syslog({
+      host: 'localhost',
+      port: 601,
+      protocol: 'tcp4',
+      type: '5424',
+      eol: '\n'
+    })
   ],
 });
 
