@@ -3,8 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import winston from 'winston';
+import {Syslog} from 'winston-syslog';
 
-import {NODE_ENV} from './environment';
+import {NODE_ENV, RSYSLOG_HOST, RSYSLOG_TCP_PORT} from './environment';
 
 const colors: winston.config.AbstractConfigSetColors = {
   error: 'red',
@@ -62,6 +63,30 @@ const logger: winston.Logger = winston.createLogger({
       handleExceptions: true,
       maxsize: 5242880, // 5MB
       maxFiles: 5,
+    }),
+  ],
+});
+
+export const syslogger: winston.Logger = winston.createLogger({
+  level:
+    NODE_ENV === 'production'
+      ? 'info'
+      : NODE_ENV === 'test'
+      ? 'error'
+      : 'debug',
+  levels: winston.config.syslog.levels,
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  transports: [
+    new Syslog({
+      host: RSYSLOG_HOST,
+      port: RSYSLOG_TCP_PORT,
+      protocol: 'tcp4',
+      type: 'RFC5424',
+      eol: '\n',
+      app_name: 'aalto-grades',
     }),
   ],
 });
