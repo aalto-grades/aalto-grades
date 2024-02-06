@@ -68,7 +68,12 @@ const logger: winston.Logger = winston.createLogger({
 });
 
 export const syslogger: winston.Logger = winston.createLogger({
-  level: NODE_ENV === 'production' ? 'info' : 'debug',
+  level:
+    NODE_ENV === 'production'
+      ? 'info'
+      : NODE_ENV === 'test'
+      ? 'error'
+      : 'debug',
   levels: winston.config.syslog.levels,
   format: winston.format.combine(
     winston.format.timestamp(),
