@@ -15,11 +15,6 @@ services:
     container_name: "backend-server-${NODE_ENV}"
     ports:
       - 3000:3000
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "tcp://localhost:601"
-        tag: "aalto-grades"
 
   database:
     extends:
