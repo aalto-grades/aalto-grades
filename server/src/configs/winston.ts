@@ -3,9 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import winston from 'winston';
-import {Syslog} from 'winston-syslog';
 
-import {NODE_ENV, RSYSLOG_HOST, RSYSLOG_TCP_PORT} from './environment';
+import {NODE_ENV} from './environment';
 
 const colors: winston.config.AbstractConfigSetColors = {
   error: 'red',
@@ -79,16 +78,7 @@ export const syslogger: winston.Logger = winston.createLogger({
     winston.format.timestamp(),
     winston.format.json()
   ),
-  transports: [
-    new Syslog({
-      host: RSYSLOG_HOST,
-      port: RSYSLOG_TCP_PORT,
-      protocol: 'tcp4',
-      type: 'RFC5424',
-      eol: '\n',
-      app_name: 'aalto-grades',
-    }),
-  ],
+  transports: [new winston.transports.Console()],
 });
 
 export default logger;
