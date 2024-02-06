@@ -16,7 +16,7 @@ import {
 import {LoginCredentials, SignupCredentials} from '../../types';
 
 export function useGetRefreshToken(
-  options?: UseQueryOptions<LoginResult>
+  options?: Partial<UseQueryOptions<LoginResult>>
 ): UseQueryResult<LoginResult> {
   return useQuery({
     queryKey: ['refresh-token'],
@@ -44,7 +44,7 @@ export function useLogIn(
 
 export function useLogOut(
   options?: UseMutationOptions<unknown, unknown, unknown>
-): UseMutationResult {
+): UseMutationResult<unknown, unknown, unknown> {
   return useMutation({
     mutationFn: async () => await axios.post('/v1/auth/logout'),
     ...options,

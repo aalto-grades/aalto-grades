@@ -19,7 +19,7 @@ import {Numeric} from '../../types';
 
 export function useGetAllAssessmentModels(
   courseId: Numeric,
-  options?: UseQueryOptions<Array<AssessmentModelData>>
+  options?: Partial<UseQueryOptions<Array<AssessmentModelData>>>
 ): UseQueryResult<Array<AssessmentModelData>> {
   return useQuery({
     queryKey: ['all-assessment-models', courseId],
@@ -32,7 +32,7 @@ export function useGetAllAssessmentModels(
 export function useGetAssessmentModel(
   courseId: Numeric,
   assessmentModelId: Numeric,
-  options?: UseQueryOptions<AssessmentModelData>
+  options?: Partial<UseQueryOptions<AssessmentModelData>>
 ): UseQueryResult<AssessmentModelData> {
   return useQuery({
     queryKey: ['assessment-model', courseId, assessmentModelId],

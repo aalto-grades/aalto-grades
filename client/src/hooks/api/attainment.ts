@@ -22,7 +22,7 @@ export function useGetAttainment(
   assessmentModelId: Numeric,
   attainmentId: Numeric,
   tree?: 'children' | 'descendants',
-  options?: UseQueryOptions<AttainmentData>
+  options?: Partial<UseQueryOptions<AttainmentData>>
 ): UseQueryResult<AttainmentData> {
   const query: string = tree ? `?tree=${tree}` : '';
 
@@ -43,7 +43,7 @@ export function useGetRootAttainment(
   courseId: Numeric,
   assessmentModelId: Numeric,
   tree?: 'children' | 'descendants',
-  options?: UseQueryOptions<AttainmentData>
+  options?: Partial<UseQueryOptions<AttainmentData>>
 ): UseQueryResult<AttainmentData> {
   const query: string = tree ? `?tree=${tree}` : '';
 
