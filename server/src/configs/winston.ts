@@ -5,7 +5,7 @@
 import winston from 'winston';
 import {Syslog} from 'winston-syslog';
 
-import {NODE_ENV} from './environment';
+import {NODE_ENV, RSYSLOG_HOST, RSYSLOG_TCP_PORT} from './environment';
 
 const colors: winston.config.AbstractConfigSetColors = {
   error: 'red',
@@ -76,8 +76,8 @@ export const syslogger: winston.Logger = winston.createLogger({
   ),
   transports: [
     new Syslog({
-      host: 'localhost',
-      port: 601,
+      host: RSYSLOG_HOST,
+      port: RSYSLOG_TCP_PORT,
       protocol: 'tcp4',
       type: 'RFC5424',
       eol: '\n',
