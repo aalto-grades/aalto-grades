@@ -9,9 +9,11 @@ import {NodeValuesContext} from '../../context/GraphProvider';
 
 const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
   const {nodeValues, setNodeValues} = useContext(NodeValuesContext);
-  const [value, setValue] = useState<string>(nodeValues[id].toString());
+  const [localValue, setLocalValue] = useState<string>(
+    nodeValues[id].toString()
+  );
   useEffect(() => {
-    setValue(nodeValues[id].toString());
+    setLocalValue(nodeValues[id].toString());
   }, [id, nodeValues]);
 
   return (
@@ -25,8 +27,7 @@ const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
       }}
     >
       <div>
-        <label htmlFor="text">{data.label}</label>
-        <br />
+        <h4 style={{margin: 0}}>{data.label}</h4>
         <input
           id="text"
           name="text"
@@ -40,9 +41,9 @@ const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
               newNodeValues[id] = parseInt(event.target.value);
               setNodeValues(newNodeValues);
             }
-            setValue(event.target.value);
+            setLocalValue(event.target.value);
           }}
-          value={value}
+          value={localValue}
           className="nodrag"
         />
       </div>

@@ -17,16 +17,23 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import {NodeValues, NodeValuesContext} from '../context/GraphProvider';
+import {
+  NodeSettings,
+  NodeSettingsContext,
+  NodeValues,
+  NodeValuesContext,
+} from '../context/GraphProvider';
 import './flow.css';
 import AdditionNode from './graph/AdditionNode';
 import AttanmentNode from './graph/AttainmentNode';
 import GradeNode from './graph/GradeNode';
+import StepperNode from './graph/StepperNode';
 
 const nodeTypes = {
   attainment: AttanmentNode,
   addition: AdditionNode,
   grade: GradeNode,
+  stepper: StepperNode,
 };
 
 const Graph = (): JSX.Element => {
@@ -38,13 +45,22 @@ const Graph = (): JSX.Element => {
       data: {label: 'Addition'},
     },
     {
+      id: 'stepper1',
+      type: 'stepper',
+      position: {x: 700, y: 500},
+      data: {label: 'Stepper'},
+    },
+    {
       id: 'grade',
       type: 'grade',
       position: {x: 900, y: 500},
       data: {label: 'Final grade'},
     },
   ];
-  const initialEdges = [{id: 'plus1-grade', source: 'plus1', target: 'grade'}];
+  const initialEdges = [
+    {id: 'plus1-stepper1', source: 'plus1', target: 'stepper1'},
+    {id: 'stepper1-grade', source: 'stepper1', target: 'grade'},
+  ];
   for (let i = 0; i < 10; i++) {
     initialNodes.push({
       id: `ex${i + 1}`,
@@ -58,17 +74,30 @@ const Graph = (): JSX.Element => {
       target: 'plus1',
     });
   }
-  const newValues: NodeValues = {};
+
+  const initNodeValues: NodeValues = {};
   for (const node of initialNodes) {
-    newValues[node.id] =
-      node.type === 'attainment' ? Math.floor(Math.random() * 20) : 0;
+    initNodeValues[node.id] =
+      node.type === 'attainment' ? Math.round(Math.random() * 10) : 0;
   }
+  const initNodeSettings = {
+    stepper1: {
+      numSteps: 6,
+      outputValues: [0, 1, 2, 3, 4, 5],
+      middlePoints: [17, 33, 50, 67, 83],
+    },
+  };
 
   const [nodes, _setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
-  const [nodeValues, setNodeValues] = useState<NodeValues>(newValues);
-  const [oldNodeValues, setOldNodeValues] = useState<NodeValues>(newValues);
+  const [nodeSettings, setNodeSettings] =
+    useState<NodeSettings>(initNodeSettings);
+  const [nodeValues, setNodeValues] = useState<NodeValues>(initNodeValues);
+  const [oldNodeSettings, setOldNodeSettings] =
+    useState<NodeSettings>(initNodeSettings);
+  const [oldNodeValues, setOldNodeValues] =
+    useState<NodeValues>(initNodeValues);
   const [oldEdges, setOldEdges] = useState<Edge[]>(edges);
 
   const updateValues = useCallback(
@@ -83,7 +112,7 @@ const Graph = (): JSX.Element => {
         nodeSources[edge.target].add(edge.source);
       }
 
-      type NodeTypes = 'attainment' | 'addition' | 'grade';
+      type NodeTypes = 'attainment' | 'addition' | 'stepper' | 'grade';
       const nodeTypes: {[key: string]: NodeTypes} = {};
       const noSources = [];
       for (const node of nodes) {
@@ -98,7 +127,20 @@ const Graph = (): JSX.Element => {
 
       while (noSources.length > 0) {
         const sourceId = noSources.pop() as string;
-        const sourceValue = newNodeValues[sourceId];
+        let sourceValue = newNodeValues[sourceId];
+        if (nodeTypes[sourceId] === 'stepper') {
+          const settings = nodeSettings[sourceId];
+          for (let i = 0; i < settings.numSteps; i++) {
+            if (
+              i + 1 !== settings.numSteps &&
+              sourceValue > settings.middlePoints[i]
+            )
+              continue;
+            sourceValue = settings.outputValues[i];
+            break;
+          }
+          newNodeValues[sourceId] = sourceValue;
+        }
 
         if (!(sourceId in nodeTargets)) continue;
 
@@ -108,6 +150,9 @@ const Graph = (): JSX.Element => {
 
           switch (nodeTypes[targetId]) {
             case 'addition':
+              newNodeValues[targetId] += sourceValue;
+              break;
+            case 'stepper':
               newNodeValues[targetId] += sourceValue;
               break;
             case 'grade':
@@ -120,7 +165,7 @@ const Graph = (): JSX.Element => {
       setOldNodeValues(nodeValues);
       setNodeValues(newNodeValues);
     },
-    [edges, nodeValues, nodes]
+    [edges, nodeSettings, nodeValues, nodes]
   );
 
   const isValidConnection = useCallback(
@@ -161,13 +206,23 @@ const Graph = (): JSX.Element => {
   useEffect(() => {
     if (
       JSON.stringify(oldNodeValues) !== JSON.stringify(nodeValues) ||
+      JSON.stringify(oldNodeSettings) !== JSON.stringify(nodeSettings) ||
       oldEdges.length !== edges.length
     ) {
       setOldNodeValues(nodeValues);
+      setOldNodeSettings(nodeSettings);
       setOldEdges(edges);
       updateValues();
     }
-  }, [edges, nodeValues, oldEdges, oldNodeValues, updateValues]);
+  }, [
+    edges,
+    nodeSettings,
+    nodeValues,
+    oldEdges,
+    oldNodeSettings,
+    oldNodeValues,
+    updateValues,
+  ]);
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -179,22 +234,24 @@ const Graph = (): JSX.Element => {
 
   return (
     <NodeValuesContext.Provider value={{nodeValues, setNodeValues}}>
-      <div style={{width: '100%', height: '80vh'}}>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          isValidConnection={isValidConnection}
-          nodeTypes={nodeTypes}
-          fitView
-        >
-          <Controls />
-          <MiniMap />
-          <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
-        </ReactFlow>
-      </div>
+      <NodeSettingsContext.Provider value={{nodeSettings, setNodeSettings}}>
+        <div style={{width: '100%', height: '80vh'}}>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            isValidConnection={isValidConnection}
+            nodeTypes={nodeTypes}
+            fitView
+          >
+            <Controls />
+            <MiniMap />
+            <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
+          </ReactFlow>
+        </div>
+      </NodeSettingsContext.Provider>
     </NodeValuesContext.Provider>
   );
 };

@@ -13,7 +13,7 @@ const GradeNode = ({id, data, isConnectable}: NodeProps) => {
     <div
       style={{
         height: '50px',
-        width: '50px',
+        width: '100px',
         border: '1px solid #eee',
         padding: '10px',
         borderRadius: '5px',
@@ -28,7 +28,7 @@ const GradeNode = ({id, data, isConnectable}: NodeProps) => {
       />
 
       <div>
-        <p style={{margin: 0}}>{data.label}</p>
+        <h4 style={{margin: 0}}>{data.label}</h4>
         <p style={{margin: 0}}>{nodeValues[id]}</p>
       </div>
     </div>
