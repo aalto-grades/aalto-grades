@@ -1,154 +1,31 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
-import {
-  Dispatch,
-  JSX,
-  SetStateAction,
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import {JSX, useCallback, useEffect, useState} from 'react';
 import ReactFlow, {
   Background,
   BackgroundVariant,
   Connection,
   Controls,
   Edge,
-  Handle,
   MiniMap,
   Node,
-  NodeProps,
-  Position,
   addEdge,
   useEdgesState,
   useNodesState,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
+import {NodeValues, NodeValuesContext} from '../context/GraphProvider';
 import './flow.css';
-
-type NodeValues = {[key: string]: number};
-type NodeValuesContext = {
-  nodeValues: NodeValues;
-  setNodeValues: Dispatch<SetStateAction<NodeValues>>;
-};
-const NodeValuesContext = createContext<NodeValuesContext>(
-  {} as NodeValuesContext
-);
-
-const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
-  const {nodeValues, setNodeValues} = useContext(NodeValuesContext);
-  const [value, setValue] = useState<string>(nodeValues[id].toString());
-  useEffect(() => {
-    setValue(nodeValues[id].toString());
-  }, [id, nodeValues]);
-
-  return (
-    <div
-      style={{
-        height: '50px',
-        border: '1px solid #eee',
-        padding: '10px',
-        borderRadius: '5px',
-        background: 'white',
-      }}
-    >
-      <div>
-        <label htmlFor="text">{data.label}</label>
-        <br />
-        <input
-          id="text"
-          name="text"
-          type="number"
-          onChange={event => {
-            if (parseInt(event.target.value)) {
-              const newNodeValues = {...nodeValues};
-              newNodeValues[id] = parseInt(event.target.value);
-              setNodeValues(newNodeValues);
-            }
-            setValue(event.target.value);
-          }}
-          value={value}
-          className="nodrag"
-        />
-      </div>
-      <Handle
-        type="source"
-        style={{height: '12px', width: '12px'}}
-        position={Position.Right}
-        isConnectable={isConnectable}
-      />
-    </div>
-  );
-};
-const PlusNode = ({id, data, isConnectable}: NodeProps) => {
-  const {nodeValues} = useContext(NodeValuesContext);
-  return (
-    <div
-      style={{
-        height: '50px',
-        width: '50px',
-        border: '1px solid #eee',
-        padding: '10px',
-        borderRadius: '5px',
-        background: 'white',
-      }}
-    >
-      <Handle
-        type="target"
-        style={{height: '12px', width: '12px'}}
-        position={Position.Left}
-        isConnectable={isConnectable}
-      />
-      <div>
-        <p style={{margin: 0}}>{data.label}</p>
-        <p style={{margin: 0}}>{nodeValues[id]}</p>
-      </div>
-      <Handle
-        type="source"
-        style={{height: '12px', width: '12px'}}
-        position={Position.Right}
-        id="b"
-        isConnectable={isConnectable}
-      />
-    </div>
-  );
-};
-const GradeNode = ({id, data, isConnectable}: NodeProps) => {
-  const {nodeValues} = useContext(NodeValuesContext);
-  return (
-    <div
-      style={{
-        height: '50px',
-        width: '50px',
-        border: '1px solid #eee',
-        padding: '10px',
-        borderRadius: '5px',
-        background: 'white',
-      }}
-    >
-      <Handle
-        type="target"
-        style={{height: '12px', width: '12px'}}
-        position={Position.Left}
-        isConnectable={isConnectable}
-      />
-
-      <div>
-        <p style={{margin: 0}}>{data.label}</p>
-        <p style={{margin: 0}}>{nodeValues[id]}</p>
-      </div>
-    </div>
-  );
-};
+import AdditionNode from './graph/AdditionNode';
+import AttanmentNode from './graph/AttainmentNode';
+import GradeNode from './graph/GradeNode';
 
 const nodeTypes = {
   attainment: AttanmentNode,
-  addition: PlusNode,
+  addition: AdditionNode,
   grade: GradeNode,
 };
 
@@ -168,7 +45,6 @@ const Graph = (): JSX.Element => {
     },
   ];
   const initialEdges = [{id: 'plus1-grade', source: 'plus1', target: 'grade'}];
-
   for (let i = 0; i < 10; i++) {
     initialNodes.push({
       id: `ex${i + 1}`,
@@ -196,10 +72,6 @@ const Graph = (): JSX.Element => {
   const [oldEdges, setOldEdges] = useState<Edge[]>(edges);
 
   const updateValues = useCallback(
-    // From manual
-    // we are using getNodes and getEdges helpers here
-    // to make sure we create isValidConnection function only once
-
     (newEdges: Edge[] | null = null) => {
       console.log('Updating');
       const nodeSources: {[key: string]: Set<string>} = {};
