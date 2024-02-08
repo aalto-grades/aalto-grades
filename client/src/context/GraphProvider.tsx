@@ -4,7 +4,36 @@
 
 import {Dispatch, SetStateAction, createContext} from 'react';
 
-export type NodeValues = {[key: string]: number};
+// Node values
+export type AdditionNodeIO = {
+  type: 'addition';
+  sources: number[];
+  value: number;
+};
+export type AttainmentNodeIO = {
+  type: 'attainment';
+  value: number;
+};
+export type GradeNodeIO = {
+  type: 'grade';
+  source: number;
+  value: number;
+};
+export type StepperNodeIO = {
+  type: 'stepper';
+  source: number;
+  value: number;
+};
+
+export type NodeValue =
+  | AdditionNodeIO
+  | AttainmentNodeIO
+  | GradeNodeIO
+  | StepperNodeIO;
+
+export type NodeValues = {
+  [key: string]: NodeValue;
+};
 type NodeValuesContext = {
   nodeValues: NodeValues;
   setNodeValues: Dispatch<SetStateAction<NodeValues>>;
@@ -13,15 +42,16 @@ export const NodeValuesContext = createContext<NodeValuesContext>(
   {} as NodeValuesContext
 );
 
+// Node settings
 export type StepperNodeSettings = {
   numSteps: number;
   outputValues: number[];
   middlePoints: number[];
 };
-export const initStepperNodeSettings = {
-  numSteps: 1,
-  outputValues: [0],
-  middlePoints: [],
+export type StepperNodeLocalSettings = {
+  numSteps: number;
+  outputValues: string[];
+  middlePoints: string[];
 };
 
 export type NodeSettings = {[key: string]: StepperNodeSettings};

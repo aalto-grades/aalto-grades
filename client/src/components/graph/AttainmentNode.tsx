@@ -10,25 +10,29 @@ import {NodeValuesContext} from '../../context/GraphProvider';
 const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
   const {nodeValues, setNodeValues} = useContext(NodeValuesContext);
   const [localValue, setLocalValue] = useState<string>(
-    nodeValues[id].toString()
+    nodeValues[id].value.toString()
   );
+  const [error, setError] = useState<boolean>(false);
+
   useEffect(() => {
-    setLocalValue(nodeValues[id].toString());
+    setLocalValue(nodeValues[id].value.toString());
   }, [id, nodeValues]);
 
   return (
     <div
       style={{
         height: '50px',
-        border: '1px solid #eee',
+        width: '90px',
+        border: error ? '1px solid #e00' : '1px solid #eee',
         padding: '10px',
         borderRadius: '5px',
-        background: 'white',
+        background: error ? '#fffafa' : 'white',
       }}
     >
       <div>
         <h4 style={{margin: 0}}>{data.label}</h4>
         <input
+          style={{width: 'calc(90px - 20px)'}}
           id="text"
           name="text"
           type="number"
@@ -37,9 +41,12 @@ const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
               /^\d*$/.test(event.target.value) &&
               event.target.value.length > 0
             ) {
+              setError(false);
               const newNodeValues = {...nodeValues};
-              newNodeValues[id] = parseInt(event.target.value);
+              newNodeValues[id].value = parseInt(event.target.value);
               setNodeValues(newNodeValues);
+            } else {
+              setError(true);
             }
             setLocalValue(event.target.value);
           }}

@@ -23,11 +23,12 @@ import {
   NodeValues,
   NodeValuesContext,
 } from '../context/GraphProvider';
-import './flow.css';
 import AdditionNode from './graph/AdditionNode';
 import AttanmentNode from './graph/AttainmentNode';
 import GradeNode from './graph/GradeNode';
 import StepperNode from './graph/StepperNode';
+import './graph/flow.css';
+import {calculateNewNodeValues, getInitNodeValues} from './graph/graphUtil';
 
 const nodeTypes = {
   attainment: AttanmentNode,
@@ -75,11 +76,6 @@ const Graph = (): JSX.Element => {
     });
   }
 
-  const initNodeValues: NodeValues = {};
-  for (const node of initialNodes) {
-    initNodeValues[node.id] =
-      node.type === 'attainment' ? Math.round(Math.random() * 10) : 0;
-  }
   const initNodeSettings = {
     stepper1: {
       numSteps: 6,
@@ -93,76 +89,29 @@ const Graph = (): JSX.Element => {
 
   const [nodeSettings, setNodeSettings] =
     useState<NodeSettings>(initNodeSettings);
-  const [nodeValues, setNodeValues] = useState<NodeValues>(initNodeValues);
-  const [oldNodeSettings, setOldNodeSettings] =
-    useState<NodeSettings>(initNodeSettings);
-  const [oldNodeValues, setOldNodeValues] =
-    useState<NodeValues>(initNodeValues);
+  const [nodeValues, setNodeValues] = useState<NodeValues>(
+    getInitNodeValues(nodes)
+  );
+
+  // Old values are strings to avoid problematic references
+  const [oldNodeSettings, setOldNodeSettings] = useState<string>(
+    JSON.stringify(initNodeSettings)
+  );
+  const [oldNodeValues, setOldNodeValues] = useState<string>(
+    JSON.stringify(getInitNodeValues(nodes))
+  );
   const [oldEdges, setOldEdges] = useState<Edge[]>(edges);
 
   const updateValues = useCallback(
     (newEdges: Edge[] | null = null) => {
       console.log('Updating');
-      const nodeSources: {[key: string]: Set<string>} = {};
-      const nodeTargets: {[key: string]: string[]} = {};
-      for (const edge of newEdges || edges) {
-        if (!(edge.source in nodeTargets)) nodeTargets[edge.source] = [];
-        nodeTargets[edge.source].push(edge.target);
-        if (!(edge.target in nodeSources)) nodeSources[edge.target] = new Set();
-        nodeSources[edge.target].add(edge.source);
-      }
-
-      type NodeTypes = 'attainment' | 'addition' | 'stepper' | 'grade';
-      const nodeTypes: {[key: string]: NodeTypes} = {};
-      const noSources = [];
-      for (const node of nodes) {
-        if (!(node.id in nodeSources)) noSources.push(node.id);
-        nodeTypes[node.id] = node.type as NodeTypes;
-      }
-
-      const newNodeValues = {...nodeValues};
-      for (const node of nodes) {
-        if (node.type !== 'attainment') newNodeValues[node.id] = 0;
-      }
-
-      while (noSources.length > 0) {
-        const sourceId = noSources.pop() as string;
-        let sourceValue = newNodeValues[sourceId];
-        if (nodeTypes[sourceId] === 'stepper') {
-          const settings = nodeSettings[sourceId];
-          for (let i = 0; i < settings.numSteps; i++) {
-            if (
-              i + 1 !== settings.numSteps &&
-              sourceValue > settings.middlePoints[i]
-            )
-              continue;
-            sourceValue = settings.outputValues[i];
-            break;
-          }
-          newNodeValues[sourceId] = sourceValue;
-        }
-
-        if (!(sourceId in nodeTargets)) continue;
-
-        for (const targetId of nodeTargets[sourceId]) {
-          nodeSources[targetId].delete(sourceId);
-          if (nodeSources[targetId].size === 0) noSources.push(targetId);
-
-          switch (nodeTypes[targetId]) {
-            case 'addition':
-              newNodeValues[targetId] += sourceValue;
-              break;
-            case 'stepper':
-              newNodeValues[targetId] += sourceValue;
-              break;
-            case 'grade':
-              newNodeValues[targetId] += sourceValue;
-              break;
-          }
-        }
-      }
-      console.log('Finished Updating');
-      setOldNodeValues(nodeValues);
+      const newNodeValues = calculateNewNodeValues(
+        nodeValues,
+        nodeSettings,
+        nodes,
+        newEdges || edges
+      );
+      setOldNodeValues(JSON.stringify(newNodeValues));
       setNodeValues(newNodeValues);
     },
     [edges, nodeSettings, nodeValues, nodes]
@@ -170,8 +119,6 @@ const Graph = (): JSX.Element => {
 
   const isValidConnection = useCallback(
     (connection: Connection) => {
-      // we are using getNodes and getEdges helpers here
-      // to make sure we create isValidConnection function only once
       const target = nodes.find(node => node.id === connection.target) as Node;
       const outgoers: {[key: string]: Node[]} = {};
       for (const edge of edges) {
@@ -179,6 +126,9 @@ const Graph = (): JSX.Element => {
         outgoers[edge.source].push(
           nodes.find(node => node.id === edge.target) as Node
         );
+
+        if (edge.target === target.id && target.type !== 'addition')
+          return false;
       }
 
       const hasCycle = (node: Node, visited = new Set()) => {
@@ -205,12 +155,12 @@ const Graph = (): JSX.Element => {
 
   useEffect(() => {
     if (
-      JSON.stringify(oldNodeValues) !== JSON.stringify(nodeValues) ||
-      JSON.stringify(oldNodeSettings) !== JSON.stringify(nodeSettings) ||
+      oldNodeValues !== JSON.stringify(nodeValues) ||
+      oldNodeSettings !== JSON.stringify(nodeSettings) ||
       oldEdges.length !== edges.length
     ) {
-      setOldNodeValues(nodeValues);
-      setOldNodeSettings(nodeSettings);
+      setOldNodeValues(JSON.stringify(nodeValues));
+      setOldNodeSettings(JSON.stringify(nodeSettings));
       setOldEdges(edges);
       updateValues();
     }
