@@ -103,7 +103,7 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
   return (
     <div
       style={{
-        height: '280px',
+        height: `${87 + 33.35 * localSettings.numSteps}px`,
         width: '270px',
         border: error ? '1px solid #e00' : '1px solid #eee',
         padding: '10px',
@@ -183,7 +183,47 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
             ))}
           </tbody>
         </table>
-        <p style={{margin: 0}}>{nodeValues[id].value}</p>
+        <button
+          style={{display: 'inline', marginRight: '30px'}}
+          onClick={() => {
+            const newLocalSettings = {
+              numSteps: localSettings.numSteps + 1,
+              middlePoints: localSettings.middlePoints.concat(''),
+              outputValues: localSettings.outputValues.concat(''),
+            };
+            setLocalSettings(newLocalSettings);
+            setError(true);
+          }}
+        >
+          New row
+        </button>
+        <p style={{margin: 0, display: 'inline'}}>{nodeValues[id].value}</p>
+        <button
+          style={{display: 'inline', marginLeft: '30px'}}
+          disabled={localSettings.numSteps === 1}
+          onClick={() => {
+            const newLocalSettings = {...localSettings};
+            newLocalSettings.numSteps -= 1;
+            newLocalSettings.middlePoints.pop();
+            newLocalSettings.outputValues.pop();
+            const newNodeSettings = {...nodeSettings};
+            newNodeSettings[id] = {
+              numSteps: newLocalSettings.numSteps,
+              middlePoints: newLocalSettings.middlePoints.map(val =>
+                parseInt(val)
+              ),
+              outputValues: newLocalSettings.outputValues.map(val =>
+                parseInt(val)
+              ),
+            };
+            setLocalSettings(newLocalSettings);
+            setNodeSettings(newNodeSettings);
+
+            setLocalSettings(newLocalSettings);
+          }}
+        >
+          Remove row
+        </button>
       </div>
       <Handle
         type="source"

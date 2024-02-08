@@ -42,19 +42,19 @@ const Graph = (): JSX.Element => {
     {
       id: 'plus1',
       type: 'addition',
-      position: {x: 500, y: 500},
+      position: {x: 300, y: 465},
       data: {label: 'Addition'},
     },
     {
       id: 'stepper1',
       type: 'stepper',
-      position: {x: 700, y: 500},
+      position: {x: 500, y: 350},
       data: {label: 'Stepper'},
     },
     {
       id: 'grade',
       type: 'grade',
-      position: {x: 900, y: 500},
+      position: {x: 900, y: 465},
       data: {label: 'Final grade'},
     },
   ];
@@ -66,7 +66,7 @@ const Graph = (): JSX.Element => {
     initialNodes.push({
       id: `ex${i + 1}`,
       type: 'attainment',
-      position: {x: 0, y: i * 100},
+      position: {x: 0, y: 15 + i * 100},
       data: {label: `Exercise ${i + 1}`},
     });
     initialEdges.push({
