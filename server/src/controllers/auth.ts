@@ -285,6 +285,11 @@ async function getSamlStrategy(): Promise<SamlStrategy> {
             eduUser: eduUser,
           });
         }
+        if (!user.name) {
+          user.update({
+            name: name
+          })
+        }
         // for now if teacher email is added by admin we allow the teacher to signin
         return done(null, {
           id: user.id,
