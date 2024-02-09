@@ -18,6 +18,21 @@ const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
     setLocalValue(nodeValues[id].value.toString());
   }, [id, nodeValues]);
 
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLocalValue(event.target.value);
+
+    if (!/^\d+(?:\.\d+?)?$/.test(event.target.value)) {
+      setError(true);
+      return;
+    }
+    setError(false);
+
+    const newNodeValues = {...nodeValues};
+    newNodeValues[id].value = parseFloat(event.target.value);
+    setNodeValues(newNodeValues);
+    setLocalValue(event.target.value);
+  };
+
   return (
     <div
       style={{
@@ -36,20 +51,7 @@ const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
           id="text"
           name="text"
           type="number"
-          onChange={event => {
-            if (
-              /^\d*$/.test(event.target.value) &&
-              event.target.value.length > 0
-            ) {
-              setError(false);
-              const newNodeValues = {...nodeValues};
-              newNodeValues[id].value = parseInt(event.target.value);
-              setNodeValues(newNodeValues);
-            } else {
-              setError(true);
-            }
-            setLocalValue(event.target.value);
-          }}
+          onChange={handleChange}
           value={localValue}
           className="nodrag"
         />

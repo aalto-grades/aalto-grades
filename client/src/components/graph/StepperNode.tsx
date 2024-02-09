@@ -24,23 +24,23 @@ const initialSettings = {
 };
 const checkError = (settings: StepperNodeLocalSettings): boolean => {
   for (const middleValue of settings.middlePoints) {
-    if (!/^\d*$/.test(middleValue) || middleValue.length === 0) return true;
+    if (!/^\d+(?:\.\d+?)?$/.test(middleValue)) return true;
   }
   for (const outputValue of settings.outputValues) {
-    if (!/^\d*$/.test(outputValue) || outputValue.length === 0) return true;
+    if (!/^\d+(?:\.\d+?)?$/.test(outputValue)) return true;
   }
 
   for (let i = 0; i < settings.numSteps - 1; i++) {
     if (
       i + 1 < settings.numSteps - 1 &&
-      parseInt(settings.middlePoints[i]) >=
-        parseInt(settings.middlePoints[i + 1])
+      parseFloat(settings.middlePoints[i]) >=
+        parseFloat(settings.middlePoints[i + 1])
     ) {
       return true;
     } else if (
       i > 0 &&
-      parseInt(settings.middlePoints[i]) <=
-        parseInt(settings.middlePoints[i - 1])
+      parseFloat(settings.middlePoints[i]) <=
+        parseFloat(settings.middlePoints[i - 1])
     ) {
       return true;
     }
@@ -86,8 +86,8 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
     const newNodeSettings = {...nodeSettings};
     newNodeSettings[id] = {
       numSteps: newLocalSettings.numSteps,
-      middlePoints: newLocalSettings.middlePoints.map(val => parseInt(val)),
-      outputValues: newLocalSettings.outputValues.map(val => parseInt(val)),
+      middlePoints: newLocalSettings.middlePoints.map(val => parseFloat(val)),
+      outputValues: newLocalSettings.outputValues.map(val => parseFloat(val)),
     };
     setLocalSettings(newLocalSettings);
     setNodeSettings(newNodeSettings);
@@ -97,12 +97,12 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
     const nodeValue = nodeValues[id] as StepperNodeIO;
     if (
       index > 0 &&
-      nodeValue.source <= parseInt(localSettings.middlePoints[index - 1])
+      nodeValue.source <= parseFloat(localSettings.middlePoints[index - 1])
     )
       return false;
     if (
       index < localSettings.numSteps - 1 &&
-      nodeValue.source > parseInt(localSettings.middlePoints[index])
+      nodeValue.source > parseFloat(localSettings.middlePoints[index])
     )
       return false;
     return true;
@@ -134,8 +134,8 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
     const newNodeSettings = {...nodeSettings};
     newNodeSettings[id] = {
       numSteps: newLocalSettings.numSteps,
-      middlePoints: newLocalSettings.middlePoints.map(val => parseInt(val)),
-      outputValues: newLocalSettings.outputValues.map(val => parseInt(val)),
+      middlePoints: newLocalSettings.middlePoints.map(val => parseFloat(val)),
+      outputValues: newLocalSettings.outputValues.map(val => parseFloat(val)),
     };
     setNodeSettings(newNodeSettings);
   };

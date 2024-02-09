@@ -21,7 +21,7 @@ const initialSettings = {
   nextFree: 100,
 };
 
-const convertSettingsToInts = (
+const convertSettingsToFloats = (
   settings: AverageNodeLocalSettings
 ): AverageNodeSettings => {
   const nodeSettings: AverageNodeSettings = {
@@ -29,7 +29,7 @@ const convertSettingsToInts = (
     nextFree: settings.nextFree,
   };
   for (const [key, value] of Object.entries(settings.weights))
-    nodeSettings.weights[key] = parseInt(value);
+    nodeSettings.weights[key] = parseFloat(value);
   return nodeSettings;
 };
 const convertSettingsToStrings = (
@@ -45,7 +45,7 @@ const convertSettingsToStrings = (
 };
 const checkError = (settings: AverageNodeLocalSettings): boolean => {
   for (const weight of Object.values(settings.weights)) {
-    if (!/^\d*$/.test(weight) || weight.length === 0) return true;
+    if (!/^\d+(?:\.\d+?)?$/.test(weight)) return true;
   }
   return false;
 };
@@ -79,7 +79,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
     setError(false);
 
     const newNodeSettings = {...nodeSettings};
-    newNodeSettings[id] = convertSettingsToInts(newLocalSettings);
+    newNodeSettings[id] = convertSettingsToFloats(newLocalSettings);
     setLocalSettings(newLocalSettings);
     setNodeSettings(newNodeSettings);
   };
@@ -102,7 +102,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
       delete sources[key];
       delete newLocalSettings.weights[key];
       const newNodeSettings = {...nodeSettings};
-      newNodeSettings[id] = convertSettingsToInts(newLocalSettings);
+      newNodeSettings[id] = convertSettingsToFloats(newLocalSettings);
 
       const newError = checkError(newLocalSettings);
       if (newError) {
@@ -181,7 +181,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
                   />
                 </td>
                 <td>
-                  {key in sources && key in settings.weights
+                  {key in sources && key in settings.weights && weightSum > 0
                     ? Math.round(
                         ((sources[key].sum * settings.weights[key]) /
                           weightSum) *
