@@ -14,6 +14,11 @@ export type AttainmentNodeIO = {
   type: 'attainment';
   value: number;
 };
+export type AverageNodeIO = {
+  type: 'average';
+  sources: {[key: string]: {num: number; sum: number}};
+  value: number;
+};
 export type GradeNodeIO = {
   type: 'grade';
   source: number;
@@ -28,6 +33,7 @@ export type StepperNodeIO = {
 export type NodeValue =
   | AdditionNodeIO
   | AttainmentNodeIO
+  | AverageNodeIO
   | GradeNodeIO
   | StepperNodeIO;
 
@@ -48,13 +54,14 @@ export type StepperNodeSettings = {
   outputValues: number[];
   middlePoints: number[];
 };
-export type StepperNodeLocalSettings = {
-  numSteps: number;
-  outputValues: string[];
-  middlePoints: string[];
+export type AverageNodeSettings = {
+  weights: {[key: string]: number};
+  nextFree: number;
 };
 
-export type NodeSettings = {[key: string]: StepperNodeSettings};
+export type NodeSettings = {
+  [key: string]: StepperNodeSettings | AverageNodeSettings;
+};
 type NodeSettingsContext = {
   nodeSettings: NodeSettings;
   setNodeSettings: Dispatch<SetStateAction<NodeSettings>>;

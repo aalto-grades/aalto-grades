@@ -18,6 +18,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 
 import {
+  AverageNodeSettings,
   NodeSettings,
   NodeSettingsContext,
   NodeValues,
@@ -29,20 +30,23 @@ import GradeNode from './graph/GradeNode';
 import StepperNode from './graph/StepperNode';
 import './graph/flow.css';
 import {calculateNewNodeValues, getInitNodeValues} from './graph/graphUtil';
+import AverageNode from './graph/AverageNode';
 
 const nodeTypes = {
-  attainment: AttanmentNode,
   addition: AdditionNode,
+  attainment: AttanmentNode,
+  average: AverageNode,
   grade: GradeNode,
   stepper: StepperNode,
 };
 
+const NUM_EXERCISES = 5;
 const Graph = (): JSX.Element => {
   const initialNodes = [
     {
       id: 'plus1',
       type: 'addition',
-      position: {x: 300, y: 465},
+      position: {x: 300, y: 100},
       data: {label: 'Addition'},
     },
     {
@@ -52,17 +56,23 @@ const Graph = (): JSX.Element => {
       data: {label: 'Stepper'},
     },
     {
+      id: 'average1',
+      type: 'average',
+      position: {x: 300, y: 400},
+      data: {label: 'Average'},
+    },
+    {
       id: 'grade',
       type: 'grade',
       position: {x: 900, y: 465},
       data: {label: 'Final grade'},
     },
   ];
-  const initialEdges = [
+  const initialEdges: Edge[] = [
     {id: 'plus1-stepper1', source: 'plus1', target: 'stepper1'},
     {id: 'stepper1-grade', source: 'stepper1', target: 'grade'},
   ];
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < NUM_EXERCISES; i++) {
     initialNodes.push({
       id: `ex${i + 1}`,
       type: 'attainment',
@@ -74,15 +84,26 @@ const Graph = (): JSX.Element => {
       source: `ex${i + 1}`,
       target: 'plus1',
     });
+    initialEdges.push({
+      id: `ex${i + 1}-average1`,
+      source: `ex${i + 1}`,
+      target: 'average1',
+      targetHandle: i.toString(),
+    });
   }
 
-  const initNodeSettings = {
+  const initNodeSettings: NodeSettings = {
     stepper1: {
       numSteps: 6,
       outputValues: [0, 1, 2, 3, 4, 5],
       middlePoints: [17, 33, 50, 67, 83],
     },
+    average1: {weights: {}, nextFree: 100},
   };
+  for (let i = 0; i < NUM_EXERCISES; i++) {
+    const averageSettings = initNodeSettings.average1 as AverageNodeSettings;
+    averageSettings.weights[i.toString()] = 1;
+  }
 
   const [nodes, _setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -127,8 +148,19 @@ const Graph = (): JSX.Element => {
           nodes.find(node => node.id === edge.target) as Node
         );
 
-        if (edge.target === target.id && target.type !== 'addition')
+        if (
+          edge.target === target.id &&
+          target.type !== 'addition' &&
+          target.type !== 'average'
+        ) {
           return false;
+        } else if (
+          edge.targetHandle &&
+          edge.targetHandle === connection.targetHandle &&
+          target.type === 'average'
+        ) {
+          return false;
+        }
       }
 
       const hasCycle = (node: Node, visited = new Set()) => {

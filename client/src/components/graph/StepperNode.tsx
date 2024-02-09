@@ -9,24 +9,58 @@ import {
   NodeSettingsContext,
   NodeValuesContext,
   StepperNodeIO,
-  StepperNodeLocalSettings,
+  StepperNodeSettings,
 } from '../../context/GraphProvider';
+
+type StepperNodeLocalSettings = {
+  numSteps: number;
+  outputValues: string[];
+  middlePoints: string[];
+};
+const initialSettings = {
+  numSteps: 1,
+  middlePoints: [],
+  outputValues: ['0'],
+};
+const checkError = (settings: StepperNodeLocalSettings): boolean => {
+  for (const middleValue of settings.middlePoints) {
+    if (!/^\d*$/.test(middleValue) || middleValue.length === 0) return true;
+  }
+  for (const outputValue of settings.outputValues) {
+    if (!/^\d*$/.test(outputValue) || outputValue.length === 0) return true;
+  }
+
+  for (let i = 0; i < settings.numSteps - 1; i++) {
+    if (
+      i + 1 < settings.numSteps - 1 &&
+      parseInt(settings.middlePoints[i]) >=
+        parseInt(settings.middlePoints[i + 1])
+    ) {
+      return true;
+    } else if (
+      i > 0 &&
+      parseInt(settings.middlePoints[i]) <=
+        parseInt(settings.middlePoints[i - 1])
+    ) {
+      return true;
+    }
+  }
+  return false;
+};
 
 const StepperNode = ({id, data, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
-  const [localSettings, setLocalSettings] = useState<StepperNodeLocalSettings>({
-    numSteps: 1,
-    middlePoints: [],
-    outputValues: ['0'],
-  });
+  const [localSettings, setLocalSettings] =
+    useState<StepperNodeLocalSettings>(initialSettings);
   const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
+    const stepperNodeSettings = nodeSettings[id] as StepperNodeSettings;
     setLocalSettings({
-      numSteps: nodeSettings[id].numSteps,
-      middlePoints: nodeSettings[id].middlePoints.map(val => val.toString()),
-      outputValues: nodeSettings[id].outputValues.map(val => val.toString()),
+      numSteps: stepperNodeSettings.numSteps,
+      middlePoints: stepperNodeSettings.middlePoints.map(val => val.toString()),
+      outputValues: stepperNodeSettings.outputValues.map(val => val.toString()),
     });
   }, [id, nodeSettings]);
 
@@ -43,33 +77,7 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
     }
     setLocalSettings(newLocalSettings);
 
-    let fail = false;
-    for (const middleValue of newLocalSettings.middlePoints) {
-      if (!/^\d*$/.test(middleValue) || middleValue.length === 0) fail = true;
-    }
-    for (const outputValue of newLocalSettings.outputValues) {
-      if (!/^\d*$/.test(outputValue) || outputValue.length === 0) fail = true;
-    }
-    if (fail) {
-      setError(true);
-      return;
-    }
-
-    for (let i = 0; i < newLocalSettings.numSteps - 1; i++) {
-      if (
-        i + 1 < newLocalSettings.numSteps - 1 &&
-        parseInt(newLocalSettings.middlePoints[i]) >=
-          parseInt(newLocalSettings.middlePoints[i + 1])
-      )
-        fail = true;
-      else if (
-        i > 0 &&
-        parseInt(newLocalSettings.middlePoints[i]) <=
-          parseInt(newLocalSettings.middlePoints[i - 1])
-      )
-        fail = true;
-    }
-    if (fail) {
+    if (checkError(newLocalSettings)) {
       setError(true);
       return;
     }
@@ -98,6 +106,38 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
     )
       return false;
     return true;
+  };
+
+  const handleAdd = () => {
+    const newLocalSettings = {
+      numSteps: localSettings.numSteps + 1,
+      middlePoints: localSettings.middlePoints.concat(''),
+      outputValues: localSettings.outputValues.concat(''),
+    };
+    setLocalSettings(newLocalSettings);
+    setError(true);
+  };
+
+  const handleRemove = () => {
+    const newLocalSettings = {...localSettings};
+    newLocalSettings.numSteps -= 1;
+    newLocalSettings.middlePoints.pop();
+    newLocalSettings.outputValues.pop();
+    setLocalSettings(newLocalSettings);
+
+    if (checkError(newLocalSettings)) {
+      setError(true);
+      return;
+    }
+    setError(false);
+
+    const newNodeSettings = {...nodeSettings};
+    newNodeSettings[id] = {
+      numSteps: newLocalSettings.numSteps,
+      middlePoints: newLocalSettings.middlePoints.map(val => parseInt(val)),
+      outputValues: newLocalSettings.outputValues.map(val => parseInt(val)),
+    };
+    setNodeSettings(newNodeSettings);
   };
 
   return (
@@ -185,15 +225,7 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
         </table>
         <button
           style={{display: 'inline', marginRight: '30px'}}
-          onClick={() => {
-            const newLocalSettings = {
-              numSteps: localSettings.numSteps + 1,
-              middlePoints: localSettings.middlePoints.concat(''),
-              outputValues: localSettings.outputValues.concat(''),
-            };
-            setLocalSettings(newLocalSettings);
-            setError(true);
-          }}
+          onClick={handleAdd}
         >
           New row
         </button>
@@ -201,26 +233,7 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
         <button
           style={{display: 'inline', marginLeft: '30px'}}
           disabled={localSettings.numSteps === 1}
-          onClick={() => {
-            const newLocalSettings = {...localSettings};
-            newLocalSettings.numSteps -= 1;
-            newLocalSettings.middlePoints.pop();
-            newLocalSettings.outputValues.pop();
-            const newNodeSettings = {...nodeSettings};
-            newNodeSettings[id] = {
-              numSteps: newLocalSettings.numSteps,
-              middlePoints: newLocalSettings.middlePoints.map(val =>
-                parseInt(val)
-              ),
-              outputValues: newLocalSettings.outputValues.map(val =>
-                parseInt(val)
-              ),
-            };
-            setLocalSettings(newLocalSettings);
-            setNodeSettings(newNodeSettings);
-
-            setLocalSettings(newLocalSettings);
-          }}
+          onClick={handleRemove}
         >
           Remove row
         </button>
