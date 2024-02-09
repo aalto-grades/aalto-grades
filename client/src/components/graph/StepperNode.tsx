@@ -229,7 +229,9 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
         >
           New row
         </button>
-        <p style={{margin: 0, display: 'inline'}}>{nodeValues[id].value}</p>
+        <p style={{margin: 0, display: 'inline'}}>
+          {Math.round(nodeValues[id].value * 100) / 100}
+        </p>
         <button
           style={{display: 'inline', marginLeft: '30px'}}
           disabled={localSettings.numSteps === 1}

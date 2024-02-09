@@ -28,7 +28,9 @@ const AdditionNode = ({id, data, isConnectable}: NodeProps) => {
       />
       <div>
         <h4 style={{margin: 0}}>{data.label}</h4>
-        <p style={{margin: 0}}>{nodeValues[id].value}</p>
+        <p style={{margin: 0}}>
+          {Math.round(nodeValues[id].value * 100) / 100}
+        </p>
       </div>
       <Handle
         type="source"

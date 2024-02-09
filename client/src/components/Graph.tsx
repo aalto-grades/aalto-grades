@@ -32,6 +32,7 @@ import './graph/flow.css';
 import {calculateNewNodeValues, getInitNodeValues} from './graph/graphUtil';
 import AverageNode from './graph/AverageNode';
 
+const NUM_EXERCISES = 10;
 const nodeTypes = {
   addition: AdditionNode,
   attainment: AttanmentNode,
@@ -40,20 +41,18 @@ const nodeTypes = {
   stepper: StepperNode,
 };
 
-const NUM_EXERCISES = 5;
-const Graph = (): JSX.Element => {
-  const initialNodes = [
+const createInitValues = (): {
+  nodes: Node[];
+  edges: Edge[];
+  nodeSettings: NodeSettings;
+  nodeValues: NodeValues;
+} => {
+  const nodes = [
     {
-      id: 'plus1',
+      id: 'addition1',
       type: 'addition',
       position: {x: 300, y: 100},
       data: {label: 'Addition'},
-    },
-    {
-      id: 'stepper1',
-      type: 'stepper',
-      position: {x: 500, y: 350},
-      data: {label: 'Stepper'},
     },
     {
       id: 'average1',
@@ -62,64 +61,92 @@ const Graph = (): JSX.Element => {
       data: {label: 'Average'},
     },
     {
+      id: 'stepper1',
+      type: 'stepper',
+      position: {x: 700, y: 100},
+      data: {label: 'Stepper'},
+    },
+    {
+      id: 'stepper2',
+      type: 'stepper',
+      position: {x: 700, y: 600},
+      data: {label: 'Stepper'},
+    },
+    {
       id: 'grade',
       type: 'grade',
-      position: {x: 900, y: 465},
+      position: {x: 1050, y: 465},
       data: {label: 'Final grade'},
     },
   ];
-  const initialEdges: Edge[] = [
-    {id: 'plus1-stepper1', source: 'plus1', target: 'stepper1'},
+  const edges: Edge[] = [
+    {id: 'addition1-stepper1', source: 'addition1', target: 'stepper1'},
+    {id: 'average1-stepper2', source: 'average1', target: 'stepper2'},
     {id: 'stepper1-grade', source: 'stepper1', target: 'grade'},
   ];
+
   for (let i = 0; i < NUM_EXERCISES; i++) {
-    initialNodes.push({
+    nodes.push({
       id: `ex${i + 1}`,
       type: 'attainment',
       position: {x: 0, y: 15 + i * 100},
       data: {label: `Exercise ${i + 1}`},
     });
-    initialEdges.push({
-      id: `ex${i + 1}-plus1`,
+    edges.push({
+      id: `ex${i + 1}-addition1`,
       source: `ex${i + 1}`,
-      target: 'plus1',
+      target: 'addition1',
     });
-    initialEdges.push({
+    edges.push({
       id: `ex${i + 1}-average1`,
       source: `ex${i + 1}`,
       target: 'average1',
+
       targetHandle: i.toString(),
     });
   }
 
-  const initNodeSettings: NodeSettings = {
+  const nodeSettings: NodeSettings = {
     stepper1: {
       numSteps: 6,
       outputValues: [0, 1, 2, 3, 4, 5],
       middlePoints: [17, 33, 50, 67, 83],
     },
+    stepper2: {
+      numSteps: 6,
+      outputValues: [0, 1, 2, 3, 4, 5],
+      middlePoints: [1.7, 3.3, 5, 6.7, 8.3],
+    },
     average1: {weights: {}, nextFree: 100},
   };
   for (let i = 0; i < NUM_EXERCISES; i++) {
-    const averageSettings = initNodeSettings.average1 as AverageNodeSettings;
-    averageSettings.weights[i.toString()] = 1;
+    const averageSettings = nodeSettings.average1 as AverageNodeSettings;
+    averageSettings.weights[i.toString()] = Math.round(10 * Math.random()) / 10;
   }
 
-  const [nodes, _setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const nodeValues = getInitNodeValues(nodes);
 
-  const [nodeSettings, setNodeSettings] =
-    useState<NodeSettings>(initNodeSettings);
+  return {nodes, edges, nodeSettings, nodeValues};
+};
+
+const Graph = (): JSX.Element => {
+  const initValues = createInitValues();
+
+  const [nodes, _setNodes, onNodesChange] = useNodesState(initValues.nodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initValues.edges);
+  const [nodeSettings, setNodeSettings] = useState<NodeSettings>(
+    initValues.nodeSettings
+  );
   const [nodeValues, setNodeValues] = useState<NodeValues>(
-    getInitNodeValues(nodes)
+    initValues.nodeValues
   );
 
   // Old values are strings to avoid problematic references
   const [oldNodeSettings, setOldNodeSettings] = useState<string>(
-    JSON.stringify(initNodeSettings)
+    JSON.stringify(initValues.nodeSettings)
   );
   const [oldNodeValues, setOldNodeValues] = useState<string>(
-    JSON.stringify(getInitNodeValues(nodes))
+    JSON.stringify(initValues.nodeValues)
   );
   const [oldEdges, setOldEdges] = useState<Edge[]>(edges);
 
