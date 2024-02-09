@@ -53,8 +53,9 @@ const checkError = (settings: AverageNodeLocalSettings): boolean => {
 const AverageNode = ({id, data, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
-  const [localSettings, setLocalSettings] =
-    useState<AverageNodeLocalSettings>(initialSettings);
+  const [localSettings, setLocalSettings] = useState<AverageNodeLocalSettings>(
+    JSON.parse(JSON.stringify(initialSettings))
+  );
   const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
@@ -123,13 +124,14 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
     weightSum += sources[key].num * settings.weights[key];
   }
 
+  const rowHeight = 34;
   return (
     <div
       style={{
         height: `${
-          87 + 33.35 * (Object.keys(localSettings.weights).length + 1)
+          78 + rowHeight * (Object.keys(localSettings.weights).length + 1)
         }px`,
-        width: '270px',
+        width: '200px',
         border: error ? '1px solid #e00' : '1px solid #eee',
         padding: '10px',
         borderRadius: '5px',
@@ -145,7 +147,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
             style={{
               height: '12px',
               width: '12px',
-              top: `${82 + index * 33.351}px`,
+              top: `${83 + index * rowHeight}px`,
             }}
             position={Position.Left}
             id={key}
@@ -157,7 +159,9 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
           style={{
             height: '12px',
             width: '12px',
-            top: `${82 + Object.keys(localSettings.weights).length * 33.351}px`,
+            top: `${
+              83 + Object.keys(localSettings.weights).length * rowHeight
+            }px`,
           }}
           position={Position.Left}
           id={localSettings.nextFree.toString()}

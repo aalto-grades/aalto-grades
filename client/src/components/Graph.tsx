@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {JSX, useCallback, useEffect, useState} from 'react';
+import {DragEventHandler, JSX, useCallback, useEffect, useState} from 'react';
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -11,6 +11,7 @@ import ReactFlow, {
   Edge,
   MiniMap,
   Node,
+  ReactFlowInstance,
   addEdge,
   useEdgesState,
   useNodesState,
@@ -132,7 +133,7 @@ const createInitValues = (): {
 const Graph = (): JSX.Element => {
   const initValues = createInitValues();
 
-  const [nodes, _setNodes, onNodesChange] = useNodesState(initValues.nodes);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initValues.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initValues.edges);
   const [nodeSettings, setNodeSettings] = useState<NodeSettings>(
     initValues.nodeSettings
@@ -140,6 +141,8 @@ const Graph = (): JSX.Element => {
   const [nodeValues, setNodeValues] = useState<NodeValues>(
     initValues.nodeValues
   );
+  const [reactFlowInstance, setReactFlowInstance] =
+    useState<ReactFlowInstance | null>(null);
 
   // Old values are strings to avoid problematic references
   const [oldNodeSettings, setOldNodeSettings] = useState<string>(
@@ -241,6 +244,70 @@ const Graph = (): JSX.Element => {
     [edges, setEdges, updateValues]
   );
 
+  type DropType = 'addition' | 'average' | 'stepper';
+  const onDragStart = (
+    event: React.DragEvent<HTMLDivElement>,
+    nodeType: DropType
+  ) => {
+    event.dataTransfer.setData('application/reactflow', nodeType);
+    event.dataTransfer.effectAllowed = 'move';
+  };
+  const onDragOver: DragEventHandler<HTMLDivElement> = useCallback(event => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
+  let id = 0;
+  const getId = useCallback(() => `dndnode_${id++}`, [id]);
+  const onDrop: DragEventHandler<HTMLDivElement> = useCallback(
+    event => {
+      event.preventDefault();
+
+      const type = event.dataTransfer.getData(
+        'application/reactflow'
+      ) as DropType;
+
+      if (typeof type === 'undefined' || !type || reactFlowInstance === null) {
+        return;
+      }
+
+      const position = reactFlowInstance.screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+      const newNode = {
+        id: `dnd-${type}-${getId()}`,
+        type,
+        position,
+        data: {label: type},
+      };
+
+      const newValues = {...nodeValues};
+      const newSettings = {...nodeSettings};
+      switch (type) {
+        case 'addition':
+          newValues[newNode.id] = {type: 'addition', sources: [], value: 0};
+          break;
+        case 'average':
+          newValues[newNode.id] = {type: 'average', sources: {}, value: 0};
+          newSettings[newNode.id] = {weights: {}, nextFree: 100};
+          break;
+        case 'stepper':
+          newValues[newNode.id] = {type: 'stepper', source: 0, value: 0};
+          newSettings[newNode.id] = {
+            numSteps: 1,
+            middlePoints: [],
+            outputValues: [0],
+          };
+          break;
+      }
+
+      setNodes(nodes => nodes.concat(newNode));
+      setNodeValues(newValues);
+      setNodeSettings(newSettings);
+    },
+    [getId, nodeSettings, nodeValues, reactFlowInstance, setNodes]
+  );
+
   return (
     <NodeValuesContext.Provider value={{nodeValues, setNodeValues}}>
       <NodeSettingsContext.Provider value={{nodeSettings, setNodeSettings}}>
@@ -253,12 +320,36 @@ const Graph = (): JSX.Element => {
             onConnect={onConnect}
             isValidConnection={isValidConnection}
             nodeTypes={nodeTypes}
+            onInit={setReactFlowInstance}
+            onDrop={onDrop}
+            onDragOver={onDragOver}
             fitView
           >
             <Controls />
             <MiniMap />
             <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
           </ReactFlow>
+        </div>
+        <div
+          className="dndnode"
+          onDragStart={event => onDragStart(event, 'addition')}
+          draggable
+        >
+          AdditionNode
+        </div>
+        <div
+          className="dndnode"
+          onDragStart={event => onDragStart(event, 'average')}
+          draggable
+        >
+          AverageNode
+        </div>
+        <div
+          className="dndnode"
+          onDragStart={event => onDragStart(event, 'stepper')}
+          draggable
+        >
+          StepperNode
         </div>
       </NodeSettingsContext.Provider>
     </NodeValuesContext.Provider>

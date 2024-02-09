@@ -51,8 +51,9 @@ const checkError = (settings: StepperNodeLocalSettings): boolean => {
 const StepperNode = ({id, data, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
-  const [localSettings, setLocalSettings] =
-    useState<StepperNodeLocalSettings>(initialSettings);
+  const [localSettings, setLocalSettings] = useState<StepperNodeLocalSettings>(
+    JSON.parse(JSON.stringify(initialSettings))
+  );
   const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {

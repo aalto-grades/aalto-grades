@@ -48,3 +48,14 @@
     border-bottom: 1px solid black;
   }
 }
+
+.dndnode {
+  border: 1px solid;
+  border-radius: 5px;
+  width: fit-content;
+  padding: 5px;
+  display: inline-block;
+  margin-top: 10px;
+  margin-right: 10px;
+  background-color: white;
+}
