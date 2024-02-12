@@ -11,7 +11,12 @@ import {
   StepperNodeSettings,
 } from '../../context/GraphProvider';
 
-type NodeTypes = 'attainment' | 'addition' | 'average' | 'stepper' | 'grade';
+export type NodeTypes =
+  | 'attainment'
+  | 'addition'
+  | 'average'
+  | 'stepper'
+  | 'grade';
 
 export const getInitNodeValues = (nodes: Node[]) => {
   const initNodeValues: NodeValues = {};

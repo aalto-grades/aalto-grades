@@ -6,6 +6,7 @@ import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
+  NodeHeightsContext,
   NodeSettingsContext,
   NodeValuesContext,
   StepperNodeIO,
@@ -22,6 +23,10 @@ const initialSettings = {
   middlePoints: [],
   outputValues: ['0'],
 };
+
+const initHeight = 87;
+const rowHeight = 33.35;
+
 const checkError = (settings: StepperNodeLocalSettings): boolean => {
   for (const middleValue of settings.middlePoints) {
     if (!/^\d+(?:\.\d+?)?$/.test(middleValue)) return true;
@@ -51,19 +56,31 @@ const checkError = (settings: StepperNodeLocalSettings): boolean => {
 const StepperNode = ({id, data, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
+  const {setNodeHeights} = useContext(NodeHeightsContext);
   const [localSettings, setLocalSettings] = useState<StepperNodeLocalSettings>(
     JSON.parse(JSON.stringify(initialSettings))
   );
   const [error, setError] = useState<boolean>(false);
+  const [init, setInit] = useState<boolean>(false);
 
   useEffect(() => {
-    const stepperNodeSettings = nodeSettings[id] as StepperNodeSettings;
+    if (init) return;
+    const initSettings = nodeSettings[id] as StepperNodeSettings;
     setLocalSettings({
-      numSteps: stepperNodeSettings.numSteps,
-      middlePoints: stepperNodeSettings.middlePoints.map(val => val.toString()),
-      outputValues: stepperNodeSettings.outputValues.map(val => val.toString()),
+      numSteps: initSettings.numSteps,
+      middlePoints: initSettings.middlePoints.map(val => val.toString()),
+      outputValues: initSettings.outputValues.map(val => val.toString()),
     });
-  }, [id, nodeSettings]);
+
+    setNodeHeights(nodeHeights => {
+      const newNodeHeights = {...nodeHeights};
+      newNodeHeights[id] = initHeight + (initSettings.numSteps + 1) * rowHeight;
+      return newNodeHeights;
+    });
+
+    setInit(true);
+    setError(false);
+  }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (
     type: 'middlepoint' | 'outputvalue',
@@ -84,14 +101,64 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
     }
     setError(false);
 
-    const newNodeSettings = {...nodeSettings};
-    newNodeSettings[id] = {
-      numSteps: newLocalSettings.numSteps,
-      middlePoints: newLocalSettings.middlePoints.map(val => parseFloat(val)),
-      outputValues: newLocalSettings.outputValues.map(val => parseFloat(val)),
+    setLocalSettings(newLocalSettings);
+    setNodeSettings(nodeSettings => {
+      const newNodeSettings = {...nodeSettings};
+      newNodeSettings[id] = {
+        numSteps: newLocalSettings.numSteps,
+        middlePoints: newLocalSettings.middlePoints.map(val => parseFloat(val)),
+        outputValues: newLocalSettings.outputValues.map(val => parseFloat(val)),
+      };
+      return newNodeSettings;
+    });
+  };
+
+  const handleAdd = () => {
+    setNodeHeights(nodeHeights => {
+      const newNodeHeights = {...nodeHeights};
+      newNodeHeights[id] =
+        initHeight + (localSettings.numSteps + 1) * rowHeight;
+      return newNodeHeights;
+    });
+
+    const newLocalSettings = {
+      numSteps: localSettings.numSteps + 1,
+      middlePoints: localSettings.middlePoints.concat(''),
+      outputValues: localSettings.outputValues.concat(''),
     };
     setLocalSettings(newLocalSettings);
-    setNodeSettings(newNodeSettings);
+    setError(true);
+  };
+
+  const handleRemove = () => {
+    setNodeHeights(nodeHeights => {
+      const newNodeHeights = {...nodeHeights};
+      newNodeHeights[id] =
+        initHeight + (localSettings.numSteps + 1) * rowHeight;
+      return newNodeHeights;
+    });
+
+    const newLocalSettings = {...localSettings};
+    newLocalSettings.numSteps -= 1;
+    newLocalSettings.middlePoints.pop();
+    newLocalSettings.outputValues.pop();
+    setLocalSettings(newLocalSettings);
+
+    if (checkError(newLocalSettings)) {
+      setError(true);
+      return;
+    }
+    setError(false);
+
+    setNodeSettings(nodeSettings => {
+      const newNodeSettings = {...nodeSettings};
+      newNodeSettings[id] = {
+        numSteps: newLocalSettings.numSteps,
+        middlePoints: newLocalSettings.middlePoints.map(val => parseFloat(val)),
+        outputValues: newLocalSettings.outputValues.map(val => parseFloat(val)),
+      };
+      return newNodeSettings;
+    });
   };
 
   const isCurrentSlot = (index: number): boolean => {
@@ -109,42 +176,10 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
     return true;
   };
 
-  const handleAdd = () => {
-    const newLocalSettings = {
-      numSteps: localSettings.numSteps + 1,
-      middlePoints: localSettings.middlePoints.concat(''),
-      outputValues: localSettings.outputValues.concat(''),
-    };
-    setLocalSettings(newLocalSettings);
-    setError(true);
-  };
-
-  const handleRemove = () => {
-    const newLocalSettings = {...localSettings};
-    newLocalSettings.numSteps -= 1;
-    newLocalSettings.middlePoints.pop();
-    newLocalSettings.outputValues.pop();
-    setLocalSettings(newLocalSettings);
-
-    if (checkError(newLocalSettings)) {
-      setError(true);
-      return;
-    }
-    setError(false);
-
-    const newNodeSettings = {...nodeSettings};
-    newNodeSettings[id] = {
-      numSteps: newLocalSettings.numSteps,
-      middlePoints: newLocalSettings.middlePoints.map(val => parseFloat(val)),
-      outputValues: newLocalSettings.outputValues.map(val => parseFloat(val)),
-    };
-    setNodeSettings(newNodeSettings);
-  };
-
   return (
     <div
       style={{
-        height: `${87 + 33.35 * localSettings.numSteps}px`,
+        height: `${initHeight + rowHeight * localSettings.numSteps}px`,
         width: '270px',
         border: error ? '1px solid #e00' : '1px solid #eee',
         padding: '10px',

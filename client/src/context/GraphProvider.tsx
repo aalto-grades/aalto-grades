@@ -69,3 +69,15 @@ type NodeSettingsContext = {
 export const NodeSettingsContext = createContext<NodeSettingsContext>(
   {} as NodeSettingsContext
 );
+
+// Node heights
+export type NodeHeights = {
+  [key: string]: number;
+};
+type NodeHeightsContext = {
+  nodeHeights: NodeHeights;
+  setNodeHeights: Dispatch<SetStateAction<NodeHeights>>;
+};
+export const NodeHeightsContext = createContext<NodeHeightsContext>(
+  {} as NodeHeightsContext
+);

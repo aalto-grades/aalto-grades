@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import ELK, {ElkNode} from 'elkjs/lib/elk.bundled.js';
 import {DragEventHandler, JSX, useCallback, useEffect, useState} from 'react';
 import ReactFlow, {
   Background,
@@ -20,6 +21,8 @@ import 'reactflow/dist/style.css';
 
 import {
   AverageNodeSettings,
+  NodeHeights,
+  NodeHeightsContext,
   NodeSettings,
   NodeSettingsContext,
   NodeValues,
@@ -27,11 +30,15 @@ import {
 } from '../context/GraphProvider';
 import AdditionNode from './graph/AdditionNode';
 import AttanmentNode from './graph/AttainmentNode';
+import AverageNode from './graph/AverageNode';
 import GradeNode from './graph/GradeNode';
 import StepperNode from './graph/StepperNode';
 import './graph/flow.css';
-import {calculateNewNodeValues, getInitNodeValues} from './graph/graphUtil';
-import AverageNode from './graph/AverageNode';
+import {
+  NodeTypes,
+  calculateNewNodeValues,
+  getInitNodeValues,
+} from './graph/graphUtil';
 
 const NUM_EXERCISES = 10;
 const nodeTypes = {
@@ -41,6 +48,7 @@ const nodeTypes = {
   grade: GradeNode,
   stepper: StepperNode,
 };
+const elk = new ELK();
 
 const createInitValues = (): {
   nodes: Node[];
@@ -141,6 +149,7 @@ const Graph = (): JSX.Element => {
   const [nodeValues, setNodeValues] = useState<NodeValues>(
     initValues.nodeValues
   );
+  const [nodeHeights, setNodeHeights] = useState<NodeHeights>({});
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance | null>(null);
 
@@ -179,12 +188,13 @@ const Graph = (): JSX.Element => {
         );
 
         if (
-          edge.target === target.id &&
+          edge.target === connection.target &&
           target.type !== 'addition' &&
           target.type !== 'average'
         ) {
           return false;
         } else if (
+          edge.target === connection.target &&
           edge.targetHandle &&
           edge.targetHandle === connection.targetHandle &&
           target.type === 'average'
@@ -243,6 +253,65 @@ const Graph = (): JSX.Element => {
     },
     [edges, setEdges, updateValues]
   );
+
+  const format = async () => {
+    const nodesForElk = nodes.map(node => {
+      let width = 0;
+      let height = 0;
+      switch (node.type as NodeTypes) {
+        case 'addition':
+          width = 70;
+          height = 50;
+          break;
+        case 'attainment':
+          width = 90;
+          height = 50;
+          break;
+        case 'average':
+          width = 200;
+          height = nodeHeights[node.id];
+          break;
+        case 'grade':
+          width = 100;
+          height = 50;
+          break;
+        case 'stepper':
+          width = 270;
+          height = nodeHeights[node.id];
+      }
+      return {
+        id: node.id,
+        width,
+        height,
+      };
+    });
+    const graph = {
+      id: 'root',
+      layoutOptions: {
+        'elk.algorithm': 'layered',
+        'elk.direction': 'RIGHT',
+        'nodePlacement.strategy': 'SIMPLE',
+        'elk.layered.spacing.nodeNodeBetweenLayers': '200',
+        'elk.spacing.nodeNode': '80',
+      },
+      children: nodesForElk,
+      edges: edges.map(edge => ({
+        ...edge,
+        sources: [edge.source],
+        targets: [edge.target],
+      })),
+    };
+
+    const newNodes = (await elk.layout(graph)).children as ElkNode[];
+    setNodes(
+      newNodes.map((node): Node => {
+        return {
+          ...(nodes.find(onode => onode.id === node.id) as Node),
+          position: {x: node.x as number, y: node.y as number},
+        };
+      })
+    );
+  };
 
   type DropType = 'addition' | 'average' | 'stepper';
   const onDragStart = (
@@ -311,46 +380,49 @@ const Graph = (): JSX.Element => {
   return (
     <NodeValuesContext.Provider value={{nodeValues, setNodeValues}}>
       <NodeSettingsContext.Provider value={{nodeSettings, setNodeSettings}}>
-        <div style={{width: '100%', height: '80vh'}}>
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            isValidConnection={isValidConnection}
-            nodeTypes={nodeTypes}
-            onInit={setReactFlowInstance}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            fitView
+        <NodeHeightsContext.Provider value={{nodeHeights, setNodeHeights}}>
+          <div style={{width: '100%', height: '80vh'}}>
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              isValidConnection={isValidConnection}
+              nodeTypes={nodeTypes}
+              onInit={setReactFlowInstance}
+              onDrop={onDrop}
+              onDragOver={onDragOver}
+              fitView
+            >
+              <Controls />
+              <MiniMap />
+              <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
+            </ReactFlow>
+          </div>
+          <div
+            className="dndnode"
+            onDragStart={event => onDragStart(event, 'addition')}
+            draggable
           >
-            <Controls />
-            <MiniMap />
-            <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
-          </ReactFlow>
-        </div>
-        <div
-          className="dndnode"
-          onDragStart={event => onDragStart(event, 'addition')}
-          draggable
-        >
-          AdditionNode
-        </div>
-        <div
-          className="dndnode"
-          onDragStart={event => onDragStart(event, 'average')}
-          draggable
-        >
-          AverageNode
-        </div>
-        <div
-          className="dndnode"
-          onDragStart={event => onDragStart(event, 'stepper')}
-          draggable
-        >
-          StepperNode
-        </div>
+            AdditionNode
+          </div>
+          <div
+            className="dndnode"
+            onDragStart={event => onDragStart(event, 'average')}
+            draggable
+          >
+            AverageNode
+          </div>
+          <div
+            className="dndnode"
+            onDragStart={event => onDragStart(event, 'stepper')}
+            draggable
+          >
+            StepperNode
+          </div>
+          <button onClick={format}>Format</button>
+        </NodeHeightsContext.Provider>
       </NodeSettingsContext.Provider>
     </NodeValuesContext.Provider>
   );

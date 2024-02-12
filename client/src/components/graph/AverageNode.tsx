@@ -8,6 +8,7 @@ import 'reactflow/dist/style.css';
 import {
   AverageNodeIO,
   AverageNodeSettings,
+  NodeHeightsContext,
   NodeSettingsContext,
   NodeValuesContext,
 } from '../../context/GraphProvider';
@@ -20,6 +21,9 @@ const initialSettings = {
   weights: {},
   nextFree: 100,
 };
+
+const initHeight = 78;
+const rowHeight = 34;
 
 const convertSettingsToFloats = (
   settings: AverageNodeLocalSettings
@@ -53,17 +57,65 @@ const checkError = (settings: AverageNodeLocalSettings): boolean => {
 const AverageNode = ({id, data, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
+  const {setNodeHeights} = useContext(NodeHeightsContext);
   const [localSettings, setLocalSettings] = useState<AverageNodeLocalSettings>(
     JSON.parse(JSON.stringify(initialSettings))
   );
   const [error, setError] = useState<boolean>(false);
+  const [init, setInit] = useState<boolean>(false);
 
   useEffect(() => {
-    setLocalSettings(
-      convertSettingsToStrings(nodeSettings[id] as AverageNodeSettings)
-    );
+    if (init) return;
+    const initSettings = nodeSettings[id] as AverageNodeSettings;
+    setLocalSettings(convertSettingsToStrings(initSettings));
+
+    setNodeHeights(nodeHeights => {
+      const newNodeHeights = {...nodeHeights};
+      const numRows = Object.keys(initSettings.weights).length + 1;
+      newNodeHeights[id] = initHeight + numRows * rowHeight;
+      return newNodeHeights;
+    });
+
     setError(false);
-  }, [id, nodeSettings]);
+    setInit(true);
+  }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Check for new or removed
+  useEffect(() => {
+    if (!init) return;
+    const newLocalSettings = {...localSettings};
+    const sources = (nodeValues[id] as AverageNodeIO).sources;
+    for (const key of Object.keys(sources)) {
+      if (key in localSettings.weights) continue;
+      newLocalSettings.weights[key] = '';
+      newLocalSettings.nextFree++;
+    }
+    for (const [key, source] of Object.entries(sources)) {
+      if (source.num !== 0) continue;
+      delete sources[key];
+      delete newLocalSettings.weights[key];
+    }
+
+    setLocalSettings(newLocalSettings);
+    const newError = checkError(newLocalSettings);
+    if (newError) {
+      setError(true);
+      return;
+    }
+    setError(false);
+
+    setNodeSettings(nodeSettings => {
+      const newNodeSettings = {...nodeSettings};
+      newNodeSettings[id] = convertSettingsToFloats(newLocalSettings);
+      return newNodeSettings;
+    });
+    setNodeHeights(nodeHeights => {
+      const newNodeHeights = {...nodeHeights};
+      const numRows = Object.keys(newLocalSettings.weights).length + 1;
+      newNodeHeights[id] = initHeight + numRows * rowHeight;
+      return newNodeHeights;
+    });
+  }, [nodeValues, init]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (
     key: string,
@@ -79,43 +131,13 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
     }
     setError(false);
 
-    const newNodeSettings = {...nodeSettings};
-    newNodeSettings[id] = convertSettingsToFloats(newLocalSettings);
     setLocalSettings(newLocalSettings);
-    setNodeSettings(newNodeSettings);
-  };
-
-  // Check for new or removed
-  useEffect(() => {
-    const sources = (nodeValues[id] as AverageNodeIO).sources;
-    for (const key of Object.keys(sources)) {
-      if (key in localSettings.weights) continue;
-
-      const newLocalSettings = {...localSettings};
-      newLocalSettings.weights[key] = '';
-      newLocalSettings.nextFree++;
-      setLocalSettings(newLocalSettings);
-      setError(true);
-    }
-    for (const [key, source] of Object.entries(sources)) {
-      if (source.num !== 0) continue;
-      const newLocalSettings = {...localSettings};
-      delete sources[key];
-      delete newLocalSettings.weights[key];
+    setNodeSettings(nodeSettings => {
       const newNodeSettings = {...nodeSettings};
       newNodeSettings[id] = convertSettingsToFloats(newLocalSettings);
-
-      const newError = checkError(newLocalSettings);
-      if (newError) {
-        setError(true);
-        return;
-      }
-      setError(false);
-      setNodeSettings(newNodeSettings);
-      setLocalSettings(newLocalSettings);
-      break;
-    }
-  }, [id, localSettings, nodeSettings, nodeValues, setNodeSettings]);
+      return newNodeSettings;
+    });
+  };
 
   const sources = (nodeValues[id] as AverageNodeIO).sources;
   const settings = nodeSettings[id] as AverageNodeSettings;
@@ -124,12 +146,12 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
     weightSum += sources[key].num * settings.weights[key];
   }
 
-  const rowHeight = 34;
   return (
     <div
       style={{
         height: `${
-          78 + rowHeight * (Object.keys(localSettings.weights).length + 1)
+          initHeight +
+          rowHeight * (Object.keys(localSettings.weights).length + 1)
         }px`,
         width: '200px',
         border: error ? '1px solid #e00' : '1px solid #eee',
@@ -147,7 +169,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
             style={{
               height: '12px',
               width: '12px',
-              top: `${83 + index * rowHeight}px`,
+              top: `${initHeight + 5 + index * rowHeight}px`,
             }}
             position={Position.Left}
             id={key}
@@ -160,7 +182,9 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
             height: '12px',
             width: '12px',
             top: `${
-              83 + Object.keys(localSettings.weights).length * rowHeight
+              initHeight +
+              5 +
+              Object.keys(localSettings.weights).length * rowHeight
             }px`,
           }}
           position={Position.Left}
