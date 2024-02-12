@@ -280,6 +280,7 @@ const Graph = (): JSX.Element => {
           height = nodeHeights[node.id];
       }
       return {
+        type: node.type,
         id: node.id,
         width,
         height,
@@ -294,11 +295,36 @@ const Graph = (): JSX.Element => {
         'elk.layered.spacing.nodeNodeBetweenLayers': '200',
         'elk.spacing.nodeNode': '80',
       },
-      children: nodesForElk,
+      children: nodesForElk.map(node => {
+        if (node.type !== 'average') {
+          return {
+            ...node,
+            ports: [{id: node.id}],
+          };
+        }
+        const settings = nodeSettings[node.id] as AverageNodeSettings;
+        console.log(settings.weights);
+        const sourcePorts = Object.keys(settings.weights)
+          .toReversed()
+          .map(key => ({
+            id: `${node.id}-${key}`,
+            properties: {side: 'WEST'},
+          }));
+
+        return {
+          ...node,
+          properties: {'org.eclipse.elk.portConstraints': 'FIXED_ORDER'},
+          ports: [{id: node.id}, ...sourcePorts],
+        };
+      }),
       edges: edges.map(edge => ({
         ...edge,
         sources: [edge.source],
-        targets: [edge.target],
+        targets: [
+          edge.targetHandle
+            ? `${edge.target}-${edge.targetHandle}`
+            : edge.target,
+        ],
       })),
     };
 
