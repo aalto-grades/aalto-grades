@@ -122,7 +122,7 @@ const createInitValues = (): {
   };
   for (let i = 0; i < NUM_EXERCISES; i++) {
     const averageSettings = nodeSettings.average1 as AverageNodeSettings;
-    averageSettings.weights[i.toString()] = Math.round(10 * Math.random()) / 10;
+    averageSettings.weights[i.toString()] = Math.ceil(10 * Math.random()) / 10;
   }
 
   const nodeValues = getInitNodeValues(nodes);
