@@ -50,7 +50,9 @@ const nodeTypes = {
 };
 const elk = new ELK();
 
-const createInitValues = (): {
+const createInitValues = (
+  useAverage = false
+): {
   nodes: Node[];
   edges: Edge[];
   nodeSettings: NodeSettings;
@@ -58,27 +60,9 @@ const createInitValues = (): {
 } => {
   const nodes = [
     {
-      id: 'addition1',
-      type: 'addition',
-      position: {x: 300, y: 100},
-      data: {label: 'Addition'},
-    },
-    {
-      id: 'average1',
-      type: 'average',
-      position: {x: 300, y: 400},
-      data: {label: 'Average'},
-    },
-    {
       id: 'stepper1',
       type: 'stepper',
-      position: {x: 700, y: 100},
-      data: {label: 'Stepper'},
-    },
-    {
-      id: 'stepper2',
-      type: 'stepper',
-      position: {x: 700, y: 600},
+      position: {x: 700, y: 400},
       data: {label: 'Stepper'},
     },
     {
@@ -88,9 +72,8 @@ const createInitValues = (): {
       data: {label: 'Final grade'},
     },
   ];
+
   const edges: Edge[] = [
-    {id: 'addition1-stepper1', source: 'addition1', target: 'stepper1'},
-    {id: 'average1-stepper2', source: 'average1', target: 'stepper2'},
     {id: 'stepper1-grade', source: 'stepper1', target: 'grade'},
   ];
 
@@ -101,36 +84,67 @@ const createInitValues = (): {
       position: {x: 0, y: 15 + i * 100},
       data: {label: `Exercise ${i + 1}`},
     });
-    edges.push({
-      id: `ex${i + 1}-addition1`,
-      source: `ex${i + 1}`,
-      target: 'addition1',
-    });
-    edges.push({
-      id: `ex${i + 1}-average1`,
-      source: `ex${i + 1}`,
-      target: 'average1',
+    if (useAverage) {
+      edges.push({
+        id: `ex${i + 1}-average1`,
+        source: `ex${i + 1}`,
+        target: 'average1',
 
-      targetHandle: i.toString(),
-    });
+        targetHandle: i.toString(),
+      });
+    } else {
+      edges.push({
+        id: `ex${i + 1}-addition1`,
+        source: `ex${i + 1}`,
+        target: 'addition1',
+      });
+    }
   }
 
   const nodeSettings: NodeSettings = {
-    stepper1: {
-      numSteps: 6,
-      outputValues: [0, 1, 2, 3, 4, 5],
-      middlePoints: [17, 33, 50, 67, 83],
-    },
-    stepper2: {
-      numSteps: 6,
-      outputValues: [0, 1, 2, 3, 4, 5],
-      middlePoints: [1.7, 3.3, 5, 6.7, 8.3],
-    },
+    stepper1: useAverage
+      ? {
+          numSteps: 6,
+          outputValues: [0, 1, 2, 3, 4, 5],
+          middlePoints: [1.7, 3.3, 5, 6.7, 8.3],
+        }
+      : {
+          numSteps: 6,
+          outputValues: [0, 1, 2, 3, 4, 5],
+          middlePoints: [17, 33, 50, 67, 83],
+        },
     average1: {weights: {}, nextFree: 100},
   };
-  for (let i = 0; i < NUM_EXERCISES; i++) {
-    const averageSettings = nodeSettings.average1 as AverageNodeSettings;
-    averageSettings.weights[i.toString()] = Math.ceil(10 * Math.random()) / 10;
+
+  if (useAverage) {
+    nodes.push({
+      id: 'average1',
+      type: 'average',
+      position: {x: 300, y: 400},
+      data: {label: 'Average'},
+    });
+    edges.push({
+      id: 'average1-stepper1',
+      source: 'average1',
+      target: 'stepper1',
+    });
+    for (let i = 0; i < NUM_EXERCISES; i++) {
+      const averageSettings = nodeSettings.average1 as AverageNodeSettings;
+      averageSettings.weights[i.toString()] =
+        Math.ceil(10 * Math.random()) / 10;
+    }
+  } else {
+    nodes.push({
+      id: 'addition1',
+      type: 'addition',
+      position: {x: 300, y: 400},
+      data: {label: 'Addition'},
+    });
+    edges.push({
+      id: 'addition1-stepper1',
+      source: 'addition1',
+      target: 'stepper1',
+    });
   }
 
   const nodeValues = getInitNodeValues(nodes);
@@ -293,7 +307,7 @@ const Graph = (): JSX.Element => {
         'elk.direction': 'RIGHT',
         'nodePlacement.strategy': 'SIMPLE',
         'elk.layered.spacing.nodeNodeBetweenLayers': '200',
-        'elk.spacing.nodeNode': '80',
+        'elk.spacing.nodeNode': '60',
       },
       children: nodesForElk.map(node => {
         if (node.type !== 'average') {
@@ -303,7 +317,6 @@ const Graph = (): JSX.Element => {
           };
         }
         const settings = nodeSettings[node.id] as AverageNodeSettings;
-        console.log(settings.weights);
         const sourcePorts = Object.keys(settings.weights)
           .toReversed()
           .map(key => ({
@@ -448,6 +461,38 @@ const Graph = (): JSX.Element => {
             StepperNode
           </div>
           <button onClick={format}>Format</button>
+          <button
+            onClick={() => {
+              const newInitvalues = createInitValues(false);
+              for (const node of nodes) {
+                onNodesChange([{id: node.id, type: 'remove'}]);
+              }
+              setTimeout(() => {
+                setNodes(newInitvalues.nodes);
+                setEdges(newInitvalues.edges);
+                setNodeSettings(newInitvalues.nodeSettings);
+                setNodeValues(newInitvalues.nodeValues);
+              }, 0);
+            }}
+          >
+            Load addition template
+          </button>
+          <button
+            onClick={() => {
+              const newInitvalues = createInitValues(true);
+              for (const node of nodes) {
+                onNodesChange([{id: node.id, type: 'remove'}]);
+              }
+              setTimeout(() => {
+                setNodes(newInitvalues.nodes);
+                setEdges(newInitvalues.edges);
+                setNodeSettings(newInitvalues.nodeSettings);
+                setNodeValues(newInitvalues.nodeValues);
+              }, 0);
+            }}
+          >
+            Load average template
+          </button>
         </NodeHeightsContext.Provider>
       </NodeSettingsContext.Provider>
     </NodeValuesContext.Provider>
