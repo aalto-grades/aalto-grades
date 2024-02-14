@@ -6,14 +6,14 @@ import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
-  AverageNodeIO,
+  AverageNodeValues,
   AverageNodeSettings,
   NodeHeightsContext,
   NodeSettingsContext,
   NodeValuesContext,
 } from '../../context/GraphProvider';
 
-type AverageNodeLocalSettings = {
+type LocalSettings = {
   weights: {[key: string]: string};
   nextFree: number;
 };
@@ -26,7 +26,7 @@ const initHeight = 78;
 const rowHeight = 34;
 
 const convertSettingsToFloats = (
-  settings: AverageNodeLocalSettings
+  settings: LocalSettings
 ): AverageNodeSettings => {
   const nodeSettings: AverageNodeSettings = {
     weights: {},
@@ -38,8 +38,8 @@ const convertSettingsToFloats = (
 };
 const convertSettingsToStrings = (
   settings: AverageNodeSettings
-): AverageNodeLocalSettings => {
-  const nodeSettings: AverageNodeLocalSettings = {
+): LocalSettings => {
+  const nodeSettings: LocalSettings = {
     weights: {},
     nextFree: settings.nextFree,
   };
@@ -47,7 +47,7 @@ const convertSettingsToStrings = (
     nodeSettings.weights[key] = value.toString();
   return nodeSettings;
 };
-const checkError = (settings: AverageNodeLocalSettings): boolean => {
+const checkError = (settings: LocalSettings): boolean => {
   for (const weight of Object.values(settings.weights)) {
     if (!/^\d+(?:\.\d+?)?$/.test(weight)) return true;
   }
@@ -58,13 +58,13 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
   const {setNodeHeights} = useContext(NodeHeightsContext);
-  const [localSettings, setLocalSettings] = useState<AverageNodeLocalSettings>(
+  const [localSettings, setLocalSettings] = useState<LocalSettings>(
     JSON.parse(JSON.stringify(initialSettings))
   );
   const [error, setError] = useState<boolean>(false);
   const [init, setInit] = useState<boolean>(false);
 
-  const nodeValue = nodeValues[id] as AverageNodeIO;
+  const nodeValue = nodeValues[id] as AverageNodeValues;
 
   useEffect(() => {
     if (init) return;

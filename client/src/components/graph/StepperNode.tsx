@@ -9,11 +9,11 @@ import {
   NodeHeightsContext,
   NodeSettingsContext,
   NodeValuesContext,
-  StepperNodeIO,
+  StepperNodeValues,
   StepperNodeSettings,
 } from '../../context/GraphProvider';
 
-type StepperNodeLocalSettings = {
+type LocalSettings = {
   numSteps: number;
   outputValues: string[];
   middlePoints: string[];
@@ -27,7 +27,7 @@ const initialSettings = {
 const initHeight = 87;
 const rowHeight = 33.35;
 
-const checkError = (settings: StepperNodeLocalSettings): boolean => {
+const checkError = (settings: LocalSettings): boolean => {
   for (const middleValue of settings.middlePoints) {
     if (!/^\d+(?:\.\d+?)?$/.test(middleValue)) return true;
   }
@@ -58,13 +58,13 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
   const {setNodeHeights} = useContext(NodeHeightsContext);
-  const [localSettings, setLocalSettings] = useState<StepperNodeLocalSettings>(
+  const [localSettings, setLocalSettings] = useState<LocalSettings>(
     JSON.parse(JSON.stringify(initialSettings))
   );
   const [error, setError] = useState<boolean>(false);
   const [init, setInit] = useState<boolean>(false);
 
-  const nodeValue = nodeValues[id] as StepperNodeIO;
+  const nodeValue = nodeValues[id] as StepperNodeValues;
 
   useEffect(() => {
     if (init) return;

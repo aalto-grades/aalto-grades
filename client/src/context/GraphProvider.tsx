@@ -5,37 +5,43 @@
 import {Dispatch, SetStateAction, createContext} from 'react';
 
 // Node values
-export type AdditionNodeIO = {
+export type AdditionNodeValues = {
   type: 'addition';
   sourceSum: number;
   value: number;
 };
-export type AttainmentNodeIO = {
+export type AttainmentNodeValues = {
   type: 'attainment';
   value: number | 'fail';
 };
-export type AverageNodeIO = {
+export type AverageNodeValues = {
   type: 'average';
   sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
   value: number;
 };
-export type GradeNodeIO = {
+export type GradeNodeValues = {
   type: 'grade';
   source: number;
   value: number;
 };
-export type StepperNodeIO = {
+export type MinPointsNodeValues = {
+  type: 'minpoints';
+  source: number | 'fail';
+  value: number | 'fail';
+};
+export type StepperNodeValues = {
   type: 'stepper';
   source: number;
   value: number;
 };
 
 export type NodeValue =
-  | AdditionNodeIO
-  | AttainmentNodeIO
-  | AverageNodeIO
-  | GradeNodeIO
-  | StepperNodeIO;
+  | AdditionNodeValues
+  | AttainmentNodeValues
+  | AverageNodeValues
+  | GradeNodeValues
+  | MinPointsNodeValues
+  | StepperNodeValues;
 
 export type NodeValues = {
   [key: string]: NodeValue;
@@ -49,18 +55,24 @@ export const NodeValuesContext = createContext<NodeValuesContext>(
 );
 
 // Node settings
+export type AverageNodeSettings = {
+  weights: {[key: string]: number};
+  nextFree: number;
+};
+export type MinPointsNodeSettings = {
+  minPoints: number;
+};
 export type StepperNodeSettings = {
   numSteps: number;
   outputValues: (number | 'same')[];
   middlePoints: number[];
 };
-export type AverageNodeSettings = {
-  weights: {[key: string]: number};
-  nextFree: number;
-};
 
 export type NodeSettings = {
-  [key: string]: StepperNodeSettings | AverageNodeSettings;
+  [key: string]:
+    | AverageNodeSettings
+    | MinPointsNodeSettings
+    | StepperNodeSettings;
 };
 type NodeSettingsContext = {
   nodeSettings: NodeSettings;

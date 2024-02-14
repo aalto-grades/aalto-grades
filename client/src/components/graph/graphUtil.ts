@@ -5,6 +5,7 @@
 import {Edge, Node} from 'reactflow';
 import {
   AverageNodeSettings,
+  MinPointsNodeSettings,
   NodeSettings,
   NodeValue,
   NodeValues,
@@ -16,6 +17,7 @@ export type NodeTypes =
   | 'addition'
   | 'average'
   | 'stepper'
+  | 'minpoints'
   | 'grade';
 
 export const getInitNodeValues = (nodes: Node[]) => {
@@ -37,6 +39,9 @@ export const getInitNodeValues = (nodes: Node[]) => {
       case 'grade':
         initNodeValues[node.id] = {type: 'grade', source: 0, value: 0};
         break;
+      case 'minpoints':
+        initNodeValues[node.id] = {type: 'minpoints', source: 0, value: 0};
+        break;
       case 'stepper':
         initNodeValues[node.id] = {type: 'stepper', source: 0, value: 0};
         break;
@@ -54,6 +59,8 @@ const setNodeValue = (
     case 'addition':
       nodeValue.value = nodeValue.sourceSum;
       break;
+    case 'attainment':
+      break; // Not needed
     case 'average': {
       const settings = nodeSettings[nodeId] as AverageNodeSettings;
       let valueSum = 0;
@@ -71,6 +78,13 @@ const setNodeValue = (
     case 'grade':
       nodeValue.value = nodeValue.source;
       break;
+    case 'minpoints': {
+      const settings = nodeSettings[nodeId] as MinPointsNodeSettings;
+      if (nodeValue.source === 'fail' || nodeValue.source < settings.minPoints)
+        nodeValue.value = 'fail';
+      else nodeValue.value = nodeValue.source;
+      break;
+    }
     case 'stepper': {
       const settings = nodeSettings[nodeId] as StepperNodeSettings;
       for (let i = 0; i < settings.numSteps; i++) {
@@ -142,6 +156,8 @@ export const calculateNewNodeValues = (
         case 'addition':
           nodeValue.sourceSum += sourceValue === 'fail' ? 0 : sourceValue;
           break;
+        case 'attainment':
+          throw new Error('Should not happen');
         case 'average':
           nodeValue.sources[edge.targetHandle as string] = {
             value: sourceValue,
@@ -151,6 +167,9 @@ export const calculateNewNodeValues = (
         case 'stepper':
           // TODO: handle error
           if (sourceValue === 'fail') throw new Error('fail passed to stepper');
+          nodeValue.source = sourceValue;
+          break;
+        case 'minpoints':
           nodeValue.source = sourceValue;
           break;
         case 'grade':

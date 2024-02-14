@@ -5,11 +5,14 @@
 import {useContext} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 import 'reactflow/dist/style.css';
-import {AdditionNodeIO, NodeValuesContext} from '../../context/GraphProvider';
+import {
+  AdditionNodeValues,
+  NodeValuesContext,
+} from '../../context/GraphProvider';
 
 const AdditionNode = ({id, data, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
-  const nodeValue = nodeValues[id] as AdditionNodeIO;
+  const nodeValue = nodeValues[id] as AdditionNodeValues;
 
   return (
     <div

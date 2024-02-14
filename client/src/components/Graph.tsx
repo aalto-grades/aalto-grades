@@ -39,6 +39,7 @@ import {
   calculateNewNodeValues,
   getInitNodeValues,
 } from './graph/graphUtil';
+import MinPointsNode from './graph/MinPointsNode';
 
 const NUM_EXERCISES = 10;
 const nodeTypes = {
@@ -46,6 +47,7 @@ const nodeTypes = {
   attainment: AttanmentNode,
   average: AverageNode,
   grade: GradeNode,
+  minpoints: MinPointsNode,
   stepper: StepperNode,
 };
 const elk = new ELK();
@@ -289,6 +291,10 @@ const Graph = (): JSX.Element => {
           width = 100;
           height = 50;
           break;
+        case 'minpoints':
+          width = 90;
+          height = 50;
+          break;
         case 'stepper':
           width = 270;
           height = nodeHeights[node.id];
@@ -352,7 +358,7 @@ const Graph = (): JSX.Element => {
     );
   };
 
-  type DropType = 'addition' | 'average' | 'stepper';
+  type DropType = 'addition' | 'average' | 'stepper' | 'minpoints';
   const onDragStart = (
     event: React.DragEvent<HTMLDivElement>,
     nodeType: DropType
@@ -398,6 +404,10 @@ const Graph = (): JSX.Element => {
         case 'average':
           newValues[newNode.id] = {type: 'average', sources: {}, value: 0};
           newSettings[newNode.id] = {weights: {}, nextFree: 100};
+          break;
+        case 'minpoints':
+          newValues[newNode.id] = {type: 'minpoints', source: 0, value: 0};
+          newSettings[newNode.id] = {minPoints: 0};
           break;
         case 'stepper':
           newValues[newNode.id] = {type: 'stepper', source: 0, value: 0};
@@ -459,6 +469,13 @@ const Graph = (): JSX.Element => {
             draggable
           >
             StepperNode
+          </div>
+          <div
+            className="dndnode"
+            onDragStart={event => onDragStart(event, 'minpoints')}
+            draggable
+          >
+            MinPointsNode
           </div>
           <button onClick={format}>Format</button>
           <button
