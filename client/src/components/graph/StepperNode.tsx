@@ -32,7 +32,8 @@ const checkError = (settings: StepperNodeLocalSettings): boolean => {
     if (!/^\d+(?:\.\d+?)?$/.test(middleValue)) return true;
   }
   for (const outputValue of settings.outputValues) {
-    if (!/^\d+(?:\.\d+?)?$/.test(outputValue)) return true;
+    if (!/^\d+(?:\.\d+?)?$/.test(outputValue) && outputValue !== 'same')
+      return true;
   }
 
   for (let i = 0; i < settings.numSteps - 1; i++) {
@@ -62,6 +63,8 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
   );
   const [error, setError] = useState<boolean>(false);
   const [init, setInit] = useState<boolean>(false);
+
+  const nodeValue = nodeValues[id] as StepperNodeIO;
 
   useEffect(() => {
     if (init) return;
@@ -107,7 +110,9 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
       newNodeSettings[id] = {
         numSteps: newLocalSettings.numSteps,
         middlePoints: newLocalSettings.middlePoints.map(val => parseFloat(val)),
-        outputValues: newLocalSettings.outputValues.map(val => parseFloat(val)),
+        outputValues: newLocalSettings.outputValues.map(val =>
+          val === 'same' ? 'same' : parseFloat(val)
+        ),
       };
       return newNodeSettings;
     });
@@ -162,7 +167,6 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
   };
 
   const isCurrentSlot = (index: number): boolean => {
-    const nodeValue = nodeValues[id] as StepperNodeIO;
     if (
       index > 0 &&
       nodeValue.source <= parseFloat(localSettings.middlePoints[index - 1])
@@ -248,7 +252,6 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
                 <td>
                   <input
                     style={{width: '40px'}}
-                    type="number"
                     value={localSettings.outputValues[index]}
                     onChange={event =>
                       handleChange('outputvalue', index, event)
@@ -266,7 +269,7 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
           New row
         </button>
         <p style={{margin: 0, display: 'inline'}}>
-          {Math.round(nodeValues[id].value * 100) / 100}
+          {Math.round(nodeValue.value * 100) / 100}
         </p>
         <button
           style={{display: 'inline', marginLeft: '30px'}}

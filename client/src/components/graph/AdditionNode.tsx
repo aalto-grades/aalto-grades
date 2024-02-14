@@ -5,10 +5,12 @@
 import {useContext} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 import 'reactflow/dist/style.css';
-import {NodeValuesContext} from '../../context/GraphProvider';
+import {AdditionNodeIO, NodeValuesContext} from '../../context/GraphProvider';
 
 const AdditionNode = ({id, data, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
+  const nodeValue = nodeValues[id] as AdditionNodeIO;
+
   return (
     <div
       style={{
@@ -28,9 +30,7 @@ const AdditionNode = ({id, data, isConnectable}: NodeProps) => {
       />
       <div>
         <h4 style={{margin: 0}}>{data.label}</h4>
-        <p style={{margin: 0}}>
-          {Math.round(nodeValues[id].value * 100) / 100}
-        </p>
+        <p style={{margin: 0}}>{Math.round(nodeValue.value * 100) / 100}</p>
       </div>
       <Handle
         type="source"

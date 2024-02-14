@@ -393,7 +393,7 @@ const Graph = (): JSX.Element => {
       const newSettings = {...nodeSettings};
       switch (type) {
         case 'addition':
-          newValues[newNode.id] = {type: 'addition', sources: [], value: 0};
+          newValues[newNode.id] = {type: 'addition', sourceSum: 0, value: 0};
           break;
         case 'average':
           newValues[newNode.id] = {type: 'average', sources: {}, value: 0};

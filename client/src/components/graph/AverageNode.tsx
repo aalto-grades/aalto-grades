@@ -64,6 +64,8 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
   const [error, setError] = useState<boolean>(false);
   const [init, setInit] = useState<boolean>(false);
 
+  const nodeValue = nodeValues[id] as AverageNodeIO;
+
   useEffect(() => {
     if (init) return;
     const initSettings = nodeSettings[id] as AverageNodeSettings;
@@ -84,16 +86,16 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
   useEffect(() => {
     if (!init) return;
     const newLocalSettings = {...localSettings};
-    const sources = (nodeValues[id] as AverageNodeIO).sources;
-    for (const key of Object.keys(sources)) {
-      if (key in localSettings.weights) continue;
-      newLocalSettings.weights[key] = '';
-      newLocalSettings.nextFree++;
-    }
+    const sources = nodeValue.sources;
     for (const [key, source] of Object.entries(sources)) {
-      if (source.num !== 0) continue;
-      delete sources[key];
-      delete newLocalSettings.weights[key];
+      if (!(key in localSettings.weights)) {
+        newLocalSettings.weights[key] = '';
+        newLocalSettings.nextFree++;
+      }
+      if (!source.isConnected) {
+        delete sources[key];
+        delete newLocalSettings.weights[key];
+      }
     }
 
     setLocalSettings(newLocalSettings);
@@ -115,7 +117,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
       newNodeHeights[id] = initHeight + numRows * rowHeight;
       return newNodeHeights;
     });
-  }, [nodeValues, init]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [nodeValue, init]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (
     key: string,
@@ -139,11 +141,12 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
     });
   };
 
-  const sources = (nodeValues[id] as AverageNodeIO).sources;
+  const sources = nodeValue.sources;
   const settings = nodeSettings[id] as AverageNodeSettings;
   let weightSum = 0;
   for (const key of Object.keys(settings.weights)) {
-    weightSum += sources[key].num * settings.weights[key];
+    if (nodeValue.sources[key].value !== 'fail')
+      weightSum += settings.weights[key];
   }
 
   return (
@@ -199,7 +202,12 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
               <th>value</th>
             </tr>
             {Object.entries(localSettings.weights).map(([key, weight]) => (
-              <tr key={`tr-${id}-${key}`}>
+              <tr
+                key={`tr-${id}-${key}`}
+                style={{
+                  backgroundColor: sources[key].value === 'fail' ? '#f003' : '',
+                }}
+              >
                 <td>
                   <input
                     style={{width: '40px'}}
@@ -209,13 +217,18 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
                   />
                 </td>
                 <td>
-                  {key in sources && key in settings.weights && weightSum > 0
-                    ? Math.round(
-                        ((sources[key].sum * settings.weights[key]) /
+                  {!(key in sources) ||
+                  !(key in settings.weights) ||
+                  weightSum === 0
+                    ? 0
+                    : sources[key].value === 'fail'
+                    ? 'fail'
+                    : Math.round(
+                        (((sources[key].value as number) *
+                          settings.weights[key]) /
                           weightSum) *
                           100
-                      ) / 100
-                    : 0}
+                      ) / 100}
                 </td>
               </tr>
             ))}
@@ -228,7 +241,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
           </tbody>
         </table>
         <p style={{margin: 0, display: 'inline'}}>
-          {Math.round(nodeValues[id].value * 100) / 100}
+          {Math.round(nodeValue.value * 100) / 100}
         </p>
       </div>
       <Handle

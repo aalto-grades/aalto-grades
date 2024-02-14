@@ -23,7 +23,7 @@ export const getInitNodeValues = (nodes: Node[]) => {
   for (const node of nodes) {
     switch (node.type as NodeTypes) {
       case 'addition':
-        initNodeValues[node.id] = {type: 'addition', sources: [], value: 0};
+        initNodeValues[node.id] = {type: 'addition', sourceSum: 0, value: 0};
         break;
       case 'attainment':
         initNodeValues[node.id] = {
@@ -52,7 +52,7 @@ const setNodeValue = (
 ): void => {
   switch (nodeValue.type) {
     case 'addition':
-      nodeValue.value = nodeValue.sources.reduce((sum, val) => sum + val, 0);
+      nodeValue.value = nodeValue.sourceSum;
       break;
     case 'average': {
       const settings = nodeSettings[nodeId] as AverageNodeSettings;
@@ -60,8 +60,10 @@ const setNodeValue = (
       let weightSum = 0;
       for (const key of Object.keys(settings.weights)) {
         if (!(key in nodeValue.sources)) continue;
-        valueSum += nodeValue.sources[key].sum * settings.weights[key];
-        weightSum += nodeValue.sources[key].num * settings.weights[key];
+        const source = nodeValue.sources[key];
+        if (source.value === 'fail' || !source.isConnected) continue;
+        valueSum += source.value * settings.weights[key];
+        weightSum += settings.weights[key];
       }
       nodeValue.value = weightSum === 0 ? 0 : valueSum / weightSum;
       break;
@@ -77,7 +79,10 @@ const setNodeValue = (
           nodeValue.source > settings.middlePoints[i]
         )
           continue;
-        nodeValue.value = settings.outputValues[i];
+
+        const outputValue = settings.outputValues[i];
+        if (outputValue === 'same') nodeValue.value = nodeValue.source;
+        else nodeValue.value = outputValue;
         break;
       }
       break;
@@ -108,11 +113,11 @@ export const calculateNewNodeValues = (
     const nodeValue = newNodeValues[node.id];
     if (nodeValue.type !== 'attainment') {
       if (nodeValue.type === 'addition') {
-        nodeValue.sources = [];
+        nodeValue.sourceSum = 0;
       } else if (nodeValue.type === 'average') {
         for (const value of Object.values(nodeValue.sources)) {
-          value.sum = 0;
-          value.num = 0;
+          value.value = 0;
+          value.isConnected = false;
         }
       } else {
         nodeValue.source = 0;
@@ -135,18 +140,22 @@ export const calculateNewNodeValues = (
       const nodeValue = newNodeValues[edge.target];
       switch (nodeValue.type) {
         case 'addition':
-          nodeValue.sources.push(sourceValue);
+          nodeValue.sourceSum += sourceValue === 'fail' ? 0 : sourceValue;
           break;
         case 'average':
-          if (!((edge.targetHandle as string) in nodeValue.sources))
-            nodeValue.sources[edge.targetHandle as string] = {sum: 0, num: 0};
-          nodeValue.sources[edge.targetHandle as string].sum += sourceValue;
-          nodeValue.sources[edge.targetHandle as string].num++;
+          nodeValue.sources[edge.targetHandle as string] = {
+            value: sourceValue,
+            isConnected: true,
+          };
           break;
         case 'stepper':
+          // TODO: handle error
+          if (sourceValue === 'fail') throw new Error('fail passed to stepper');
           nodeValue.source = sourceValue;
           break;
         case 'grade':
+          // TODO: handle error
+          if (sourceValue === 'fail') throw new Error('fail passed to stepper');
           nodeValue.source = sourceValue;
           break;
       }

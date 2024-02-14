@@ -7,16 +7,16 @@ import {Dispatch, SetStateAction, createContext} from 'react';
 // Node values
 export type AdditionNodeIO = {
   type: 'addition';
-  sources: number[];
+  sourceSum: number;
   value: number;
 };
 export type AttainmentNodeIO = {
   type: 'attainment';
-  value: number;
+  value: number | 'fail';
 };
 export type AverageNodeIO = {
   type: 'average';
-  sources: {[key: string]: {num: number; sum: number}};
+  sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
   value: number;
 };
 export type GradeNodeIO = {
@@ -51,7 +51,7 @@ export const NodeValuesContext = createContext<NodeValuesContext>(
 // Node settings
 export type StepperNodeSettings = {
   numSteps: number;
-  outputValues: number[];
+  outputValues: (number | 'same')[];
   middlePoints: number[];
 };
 export type AverageNodeSettings = {
