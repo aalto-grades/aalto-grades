@@ -60,7 +60,7 @@ const checkError = (settings: LocalSettings): boolean => {
 const AverageNode = ({id, data, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
-  const {setNodeHeights} = useContext(NodeHeightsContext);
+  const {setNodeHeight} = useContext(NodeHeightsContext);
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
     JSON.parse(JSON.stringify(initialSettings))
   );
@@ -73,13 +73,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
     if (init) return;
     const initSettings = nodeSettings[id] as AverageNodeSettings;
     setLocalSettings(convertSettingsToStrings(initSettings));
-
-    setNodeHeights(nodeHeights => {
-      const newNodeHeights = {...nodeHeights};
-      newNodeHeights[id] = calculateHeight(initSettings);
-      return newNodeHeights;
-    });
-
+    setNodeHeight(id, calculateHeight(initSettings));
     setError(false);
     setInit(true);
   }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -101,6 +95,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
     }
 
     setLocalSettings(newLocalSettings);
+    setNodeHeight(id, calculateHeight(newLocalSettings));
     const newError = checkError(newLocalSettings);
     if (newError) {
       setError(true);
@@ -108,16 +103,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
     }
     setError(false);
 
-    setNodeSettings(nodeSettings => {
-      const newNodeSettings = {...nodeSettings};
-      newNodeSettings[id] = convertSettingsToFloats(newLocalSettings);
-      return newNodeSettings;
-    });
-    setNodeHeights(nodeHeights => {
-      const newNodeHeights = {...nodeHeights};
-      newNodeHeights[id] = calculateHeight(newLocalSettings);
-      return newNodeHeights;
-    });
+    setNodeSettings(id, convertSettingsToFloats(newLocalSettings));
   }, [nodeValues, init]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (
@@ -135,11 +121,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
     setError(false);
 
     setLocalSettings(newLocalSettings);
-    setNodeSettings(nodeSettings => {
-      const newNodeSettings = {...nodeSettings};
-      newNodeSettings[id] = convertSettingsToFloats(newLocalSettings);
-      return newNodeSettings;
-    });
+    setNodeSettings(id, convertSettingsToFloats(newLocalSettings));
   };
 
   const sources = nodeValue.sources;

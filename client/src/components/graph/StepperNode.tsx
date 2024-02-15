@@ -59,7 +59,7 @@ const checkError = (settings: LocalSettings): boolean => {
 const StepperNode = ({id, data, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
-  const {setNodeHeights} = useContext(NodeHeightsContext);
+  const {setNodeHeight: setNodeHeights} = useContext(NodeHeightsContext);
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
     JSON.parse(JSON.stringify(initialSettings))
   );
@@ -76,13 +76,7 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
       middlePoints: initSettings.middlePoints.map(val => val.toString()),
       outputValues: initSettings.outputValues.map(val => val.toString()),
     });
-
-    setNodeHeights(nodeHeights => {
-      const newNodeHeights = {...nodeHeights};
-      newNodeHeights[id] = calculateHeight(initSettings);
-      return newNodeHeights;
-    });
-
+    setNodeHeights(id, calculateHeight(initSettings));
     setInit(true);
     setError(false);
   }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -107,16 +101,12 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
     setError(false);
 
     setLocalSettings(newLocalSettings);
-    setNodeSettings(nodeSettings => {
-      const newNodeSettings = {...nodeSettings};
-      newNodeSettings[id] = {
-        numSteps: newLocalSettings.numSteps,
-        middlePoints: newLocalSettings.middlePoints.map(val => parseFloat(val)),
-        outputValues: newLocalSettings.outputValues.map(val =>
-          val === 'same' ? 'same' : parseFloat(val)
-        ),
-      };
-      return newNodeSettings;
+    setNodeSettings(id, {
+      numSteps: newLocalSettings.numSteps,
+      middlePoints: newLocalSettings.middlePoints.map(val => parseFloat(val)),
+      outputValues: newLocalSettings.outputValues.map(val =>
+        val === 'same' ? 'same' : parseFloat(val)
+      ),
     });
   };
 
@@ -127,11 +117,7 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
       outputValues: localSettings.outputValues.concat(''),
     };
     setLocalSettings(newLocalSettings);
-    setNodeHeights(nodeHeights => {
-      const newNodeHeights = {...nodeHeights};
-      newNodeHeights[id] = calculateHeight(newLocalSettings);
-      return newNodeHeights;
-    });
+    setNodeHeights(id, calculateHeight(newLocalSettings));
     setError(true);
   };
 
@@ -141,11 +127,7 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
     newLocalSettings.middlePoints.pop();
     newLocalSettings.outputValues.pop();
     setLocalSettings(newLocalSettings);
-    setNodeHeights(nodeHeights => {
-      const newNodeHeights = {...nodeHeights};
-      newNodeHeights[id] = calculateHeight(newLocalSettings);
-      return newNodeHeights;
-    });
+    setNodeHeights(id, calculateHeight(newLocalSettings));
 
     if (checkError(newLocalSettings)) {
       setError(true);
@@ -153,14 +135,12 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
     }
     setError(false);
 
-    setNodeSettings(nodeSettings => {
-      const newNodeSettings = {...nodeSettings};
-      newNodeSettings[id] = {
-        numSteps: newLocalSettings.numSteps,
-        middlePoints: newLocalSettings.middlePoints.map(val => parseFloat(val)),
-        outputValues: newLocalSettings.outputValues.map(val => parseFloat(val)),
-      };
-      return newNodeSettings;
+    setNodeSettings(id, {
+      numSteps: newLocalSettings.numSteps,
+      middlePoints: newLocalSettings.middlePoints.map(val => parseFloat(val)),
+      outputValues: newLocalSettings.outputValues.map(val =>
+        val === 'same' ? 'same' : parseFloat(val)
+      ),
     });
   };
 

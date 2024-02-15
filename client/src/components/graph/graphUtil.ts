@@ -4,9 +4,10 @@
 
 import {Edge, Node} from 'reactflow';
 import {
+  AllNodeSettings,
   AverageNodeSettings,
+  MaxNodeSettings,
   MinPointsNodeSettings,
-  NodeSettings,
   NodeValue,
   NodeValues,
   StepperNodeSettings,
@@ -52,7 +53,7 @@ export const getInitNodeValues = (nodes: Node[]) => {
 const setNodeValue = (
   nodeId: string,
   nodeValue: NodeValue,
-  nodeSettings: NodeSettings
+  nodeSettings: AllNodeSettings
 ): void => {
   switch (nodeValue.type) {
     case 'addition':
@@ -78,7 +79,9 @@ const setNodeValue = (
       nodeValue.value = nodeValue.source;
       break;
     case 'max': {
-      let maxValue = -1;
+      const settings = nodeSettings[nodeId] as MaxNodeSettings;
+      let maxValue = settings.minValue === 'fail' ? -1 : settings.minValue;
+
       for (const value of Object.values(nodeValue.sources)) {
         if (value.isConnected && value.value !== 'fail')
           maxValue = Math.max(maxValue, value.value);
@@ -114,7 +117,7 @@ const setNodeValue = (
 
 export const calculateNewNodeValues = (
   oldNodeValues: NodeValues,
-  nodeSettings: NodeSettings,
+  nodeSettings: AllNodeSettings,
   nodes: Node[],
   edges: Edge[]
 ) => {

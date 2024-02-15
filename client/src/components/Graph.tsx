@@ -20,6 +20,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 
 import {
+  AllNodeSettings,
   AverageNodeSettings,
   NodeHeights,
   NodeHeightsContext,
@@ -59,7 +60,7 @@ const createInitValues = (
 ): {
   nodes: Node[];
   edges: Edge[];
-  nodeSettings: NodeSettings;
+  nodeSettings: AllNodeSettings;
   nodeValues: NodeValues;
 } => {
   const nodes = [
@@ -105,7 +106,7 @@ const createInitValues = (
     }
   }
 
-  const nodeSettings: NodeSettings = {
+  const nodeSettings: AllNodeSettings = {
     stepper1: useAverage
       ? {
           numSteps: 6,
@@ -161,7 +162,7 @@ const Graph = (): JSX.Element => {
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initValues.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initValues.edges);
-  const [nodeSettings, setNodeSettings] = useState<NodeSettings>(
+  const [nodeSettings, setNodeSettings] = useState<AllNodeSettings>(
     initValues.nodeSettings
   );
   const [nodeValues, setNodeValues] = useState<NodeValues>(
@@ -179,6 +180,22 @@ const Graph = (): JSX.Element => {
     JSON.stringify(initValues.nodeValues)
   );
   const [oldEdges, setOldEdges] = useState<Edge[]>(edges);
+
+  const setContextNodeSettings = (id: string, newSettings: NodeSettings) => {
+    setNodeSettings(
+      oldNodeSettings =>
+        ({
+          ...oldNodeSettings,
+          [id]: newSettings,
+        }) as AllNodeSettings
+    );
+  };
+  const setContextNodeHeight = (id: string, newHeight: number) => {
+    setNodeHeights(oldNodeHeights => ({
+      ...oldNodeHeights,
+      [id]: newHeight,
+    }));
+  };
 
   const updateValues = useCallback(
     (newEdges: Edge[] | null = null) => {
@@ -411,6 +428,7 @@ const Graph = (): JSX.Element => {
           break;
         case 'max':
           newValues[newNode.id] = {type: 'max', sources: {}, value: 0};
+          newSettings[newNode.id] = {minValue: 'fail'};
           break;
         case 'minpoints':
           newValues[newNode.id] = {type: 'minpoints', source: 0, value: 0};
@@ -435,8 +453,12 @@ const Graph = (): JSX.Element => {
 
   return (
     <NodeValuesContext.Provider value={{nodeValues, setNodeValues}}>
-      <NodeSettingsContext.Provider value={{nodeSettings, setNodeSettings}}>
-        <NodeHeightsContext.Provider value={{nodeHeights, setNodeHeights}}>
+      <NodeSettingsContext.Provider
+        value={{nodeSettings, setNodeSettings: setContextNodeSettings}}
+      >
+        <NodeHeightsContext.Provider
+          value={{nodeHeights, setNodeHeight: setContextNodeHeight}}
+        >
           <div style={{width: '100%', height: '80vh'}}>
             <ReactFlow
               nodes={nodes}

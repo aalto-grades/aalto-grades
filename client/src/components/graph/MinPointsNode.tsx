@@ -51,11 +51,7 @@ const MinPointsNode = ({id, data, isConnectable}: NodeProps) => {
     setError(false);
 
     setLocalSettings(newLocalSettings);
-    setNodeSettings(nodeSettings => {
-      const newNodeSettings = {...nodeSettings};
-      newNodeSettings[id] = {minPoints: parseFloat(newLocalSettings.minPoints)};
-      return newNodeSettings;
-    });
+    setNodeSettings(id, {minPoints: parseFloat(newLocalSettings.minPoints)});
   };
 
   return (
@@ -79,12 +75,9 @@ const MinPointsNode = ({id, data, isConnectable}: NodeProps) => {
         <h4 style={{margin: 0}}>{data.label}</h4>
         <input
           style={{width: 'calc(90px - 20px)'}}
-          id="text"
-          name="text"
           type="number"
           onChange={handleChange}
           value={localSettings.minPoints}
-          className="nodrag"
         />
       </div>
       <p style={{margin: 0, display: 'inline'}}>

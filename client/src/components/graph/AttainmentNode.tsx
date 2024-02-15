@@ -52,11 +52,8 @@ const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
         <h4 style={{margin: 0}}>{data.label}</h4>
         <input
           style={{width: 'calc(90px - 20px)'}}
-          id="text"
-          name="text"
           onChange={handleChange}
           value={localValue}
-          className="nodrag"
         />
       </div>
       <Handle

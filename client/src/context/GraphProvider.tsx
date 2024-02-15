@@ -65,6 +65,9 @@ export type AverageNodeSettings = {
   weights: {[key: string]: number};
   nextFree: number;
 };
+export type MaxNodeSettings = {
+  minValue: number | 'fail';
+};
 export type MinPointsNodeSettings = {
   minPoints: number;
 };
@@ -74,15 +77,15 @@ export type StepperNodeSettings = {
   middlePoints: number[];
 };
 
-export type NodeSettings = {
-  [key: string]:
-    | AverageNodeSettings
-    | MinPointsNodeSettings
-    | StepperNodeSettings;
-};
+export type NodeSettings =
+  | AverageNodeSettings
+  | MaxNodeSettings
+  | MinPointsNodeSettings
+  | StepperNodeSettings;
+export type AllNodeSettings = {[key: string]: NodeSettings};
 type NodeSettingsContext = {
-  nodeSettings: NodeSettings;
-  setNodeSettings: Dispatch<SetStateAction<NodeSettings>>;
+  nodeSettings: AllNodeSettings;
+  setNodeSettings: (id: string, newSettings: NodeSettings) => void;
 };
 export const NodeSettingsContext = createContext<NodeSettingsContext>(
   {} as NodeSettingsContext
@@ -94,7 +97,7 @@ export type NodeHeights = {
 };
 type NodeHeightsContext = {
   nodeHeights: NodeHeights;
-  setNodeHeights: Dispatch<SetStateAction<NodeHeights>>;
+  setNodeHeight: (id: string, newHeight: number) => void;
 };
 export const NodeHeightsContext = createContext<NodeHeightsContext>(
   {} as NodeHeightsContext
