@@ -79,3 +79,64 @@ export function useAddAssessmentModel(
     ...options,
   });
 }
+
+interface EditAssessmentModelVars {
+  courseId: Numeric;
+  assessmentModelId: Numeric;
+  assessmentModel: AssessmentModelData;
+}
+
+export type UseEditAssessmentModelResult = UseMutationResult<
+  AssessmentModelData,
+  unknown,
+  EditAssessmentModelVars
+>;
+
+export function useEditAssessmentModel(
+  options?: UseMutationOptions<AssessmentModelData, unknown, unknown>
+): UseEditAssessmentModelResult {
+  const queryClient: QueryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (vars: EditAssessmentModelVars) =>
+      (
+        await axios.put(
+          `/v1/courses/${vars.courseId}/assessment-models/${vars.assessmentModelId}`,
+          vars.assessmentModel
+        )
+      ).data.data,
+
+    onSuccess: (_data: AssessmentModelData, vars: EditAssessmentModelVars) => {
+      queryClient.invalidateQueries({
+        queryKey: ['assessment-model', vars.courseId, vars.assessmentModelId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['all-assessment-models', vars.courseId],
+      });
+    },
+    ...options,
+  });
+}
+
+export function useDeleteAssessmentModel(
+  options?: UseMutationOptions<unknown, unknown, Numeric>
+): UseMutationResult<unknown, unknown, Numeric> {
+  const queryClient: QueryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (assessmentModelId: Numeric) =>
+      await axios.delete(`/v1/assessment-models/${assessmentModelId}`),
+
+    onSuccess: (_data: unknown, assessmentModelId: Numeric) => {
+      queryClient.invalidateQueries({
+        queryKey: ['assessment-model', assessmentModelId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['all-assessment-models', assessmentModelId],
+      });
+    },
+    ...options,
+  });
+}
