@@ -128,3 +128,56 @@ export async function addAssessmentModel(
     data: assessmentModel.id,
   });
 }
+
+export async function updateAssessmentModel(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const requestSchema: yup.AnyObjectSchema = yup.object().shape({
+    name: yup.string().strict().required(),
+  });
+
+  const courseId: number = Number(req.params.courseId);
+  await idSchema.validate({id: courseId});
+  const assessmentModelId: number = Number(req.params.assessmentModelId);
+  await idSchema.validate({id: assessmentModelId});
+  const name: string = (
+    await requestSchema.validate(req.body, {abortEarly: false})
+  ).name;
+
+  // Confirm that course exists.
+  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
+
+  // Route is only available for admins and those who have teacher in charge role for the course.
+  await isTeacherInChargeOrAdmin(
+    req.user as JwtClaims,
+    courseId,
+    HttpCode.Forbidden
+  );
+
+  // Find assessment model by ID.
+  const assessmentModel: AssessmentModel = await findAssessmentModelById(
+    assessmentModelId,
+    HttpCode.NotFound
+  );
+
+  if (assessmentModel.courseId !== course.id) {
+    throw new ApiError(
+      `Assessment model with ID ${assessmentModelId} does not belong to course ID ${courseId}`,
+      HttpCode.Conflict
+    );
+  }
+
+  // Update assessment model name.
+  await assessmentModel.update({
+    name: name,
+  });
+
+  res.status(HttpCode.Ok).json({
+    data: {
+      id: assessmentModel.id,
+      courseId: assessmentModel.courseId,
+      name: assessmentModel.name,
+    },
+  });
+}

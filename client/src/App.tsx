@@ -17,7 +17,7 @@ import {
 import {SystemRole} from '@common/types';
 import {CSSProperties, JSX} from 'react';
 import {Route, Routes} from 'react-router-dom';
-// import { ReactQueryDevtools } from '@tanstack/react-query-devtools'; // For debugging
+import {ReactQueryDevtools} from '@tanstack/react-query-devtools'; // For debugging
 
 import CourseResultsView from './components/CourseResultsView';
 import CourseView from './components/CourseView';
@@ -155,6 +155,7 @@ export default function App(): JSX.Element {
     }),
     defaultOptions: {
       queries: {
+        staleTime: 1000 * 60 * 5, // 5 minutes
         retry: false,
       },
     },
@@ -241,7 +242,7 @@ export default function App(): JSX.Element {
           <Footer />
         </div>
         {/* Query Debug Tool */}
-        {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </CssVarsProvider>
   );

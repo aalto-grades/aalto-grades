@@ -32,7 +32,7 @@ export default function CourseDetails(props: {
   }
 
   return (
-    <Box sx={{display: 'flex', flexDirection: 'column', gap: 3}}>
+    <Box sx={{display: 'flex', flexDirection: 'column', gap: 0}}>
       <Box sx={{mt: 1.5}}>
         <Typography variant="h3" align="left" sx={{pt: 1.5, pb: 1}}>
           Course Details
