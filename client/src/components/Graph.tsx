@@ -32,6 +32,8 @@ import AdditionNode from './graph/AdditionNode';
 import AttanmentNode from './graph/AttainmentNode';
 import AverageNode from './graph/AverageNode';
 import GradeNode from './graph/GradeNode';
+import MaxNode from './graph/MaxNode';
+import MinPointsNode from './graph/MinPointsNode';
 import StepperNode from './graph/StepperNode';
 import './graph/flow.css';
 import {
@@ -39,7 +41,6 @@ import {
   calculateNewNodeValues,
   getInitNodeValues,
 } from './graph/graphUtil';
-import MinPointsNode from './graph/MinPointsNode';
 
 const NUM_EXERCISES = 10;
 const nodeTypes = {
@@ -47,6 +48,7 @@ const nodeTypes = {
   attainment: AttanmentNode,
   average: AverageNode,
   grade: GradeNode,
+  max: MaxNode,
   minpoints: MinPointsNode,
   stepper: StepperNode,
 };
@@ -203,17 +205,15 @@ const Graph = (): JSX.Element => {
           nodes.find(node => node.id === edge.target) as Node
         );
 
+        if (target.type === 'addition') continue; // TODO: change in the future
+
+        if (!connection.targetHandle && edge.target === connection.target) {
+          return false;
+        }
         if (
           edge.target === connection.target &&
-          target.type !== 'addition' &&
-          target.type !== 'average'
-        ) {
-          return false;
-        } else if (
-          edge.target === connection.target &&
           edge.targetHandle &&
-          edge.targetHandle === connection.targetHandle &&
-          target.type === 'average'
+          edge.targetHandle === connection.targetHandle
         ) {
           return false;
         }
@@ -291,6 +291,10 @@ const Graph = (): JSX.Element => {
           width = 100;
           height = 50;
           break;
+        case 'max':
+          width = 90;
+          height = nodeHeights[node.id];
+          break;
         case 'minpoints':
           width = 90;
           height = 50;
@@ -358,7 +362,7 @@ const Graph = (): JSX.Element => {
     );
   };
 
-  type DropType = 'addition' | 'average' | 'stepper' | 'minpoints';
+  type DropType = 'addition' | 'average' | 'stepper' | 'max' | 'minpoints';
   const onDragStart = (
     event: React.DragEvent<HTMLDivElement>,
     nodeType: DropType
@@ -404,6 +408,9 @@ const Graph = (): JSX.Element => {
         case 'average':
           newValues[newNode.id] = {type: 'average', sources: {}, value: 0};
           newSettings[newNode.id] = {weights: {}, nextFree: 100};
+          break;
+        case 'max':
+          newValues[newNode.id] = {type: 'max', sources: {}, value: 0};
           break;
         case 'minpoints':
           newValues[newNode.id] = {type: 'minpoints', source: 0, value: 0};
@@ -476,6 +483,13 @@ const Graph = (): JSX.Element => {
             draggable
           >
             MinPointsNode
+          </div>
+          <div
+            className="dndnode"
+            onDragStart={event => onDragStart(event, 'max')}
+            draggable
+          >
+            MaxNode
           </div>
           <button onClick={format}>Format</button>
           <button

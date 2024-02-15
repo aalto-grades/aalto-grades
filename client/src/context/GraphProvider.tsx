@@ -24,6 +24,11 @@ export type GradeNodeValues = {
   source: number;
   value: number;
 };
+export type MaxNodeValues = {
+  type: 'max';
+  sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
+  value: number | 'fail';
+};
 export type MinPointsNodeValues = {
   type: 'minpoints';
   source: number | 'fail';
@@ -40,6 +45,7 @@ export type NodeValue =
   | AttainmentNodeValues
   | AverageNodeValues
   | GradeNodeValues
+  | MaxNodeValues
   | MinPointsNodeValues
   | StepperNodeValues;
 

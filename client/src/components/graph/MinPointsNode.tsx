@@ -19,7 +19,6 @@ const initialSettings = {
   minPoints: '',
 };
 
-// !/^\d+(?:\.\d+?)?$/.test(minPoints)
 const MinPointsNode = ({id, data, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);

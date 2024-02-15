@@ -22,8 +22,11 @@ const initialSettings = {
   nextFree: 100,
 };
 
-const initHeight = 78;
-const rowHeight = 34;
+const nodeMinHeight = 78.683;
+const handleStartHeight = 83;
+const rowHeight = 33.9;
+const calculateHeight = (localSettings: LocalSettings | AverageNodeSettings) =>
+  nodeMinHeight + (Object.keys(localSettings.weights).length + 1) * rowHeight;
 
 const convertSettingsToFloats = (
   settings: LocalSettings
@@ -73,8 +76,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
 
     setNodeHeights(nodeHeights => {
       const newNodeHeights = {...nodeHeights};
-      const numRows = Object.keys(initSettings.weights).length + 1;
-      newNodeHeights[id] = initHeight + numRows * rowHeight;
+      newNodeHeights[id] = calculateHeight(initSettings);
       return newNodeHeights;
     });
 
@@ -113,11 +115,10 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
     });
     setNodeHeights(nodeHeights => {
       const newNodeHeights = {...nodeHeights};
-      const numRows = Object.keys(newLocalSettings.weights).length + 1;
-      newNodeHeights[id] = initHeight + numRows * rowHeight;
+      newNodeHeights[id] = calculateHeight(newLocalSettings);
       return newNodeHeights;
     });
-  }, [nodeValue, init]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [nodeValues, init]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (
     key: string,
@@ -152,10 +153,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
   return (
     <div
       style={{
-        height: `${
-          initHeight +
-          rowHeight * (Object.keys(localSettings.weights).length + 1)
-        }px`,
+        height: `${calculateHeight(localSettings)}px`,
         width: '200px',
         border: error ? '1px solid #e00' : '1px solid #eee',
         padding: '10px',
@@ -172,7 +170,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
             style={{
               height: '12px',
               width: '12px',
-              top: `${initHeight + 5 + index * rowHeight}px`,
+              top: `${handleStartHeight + index * rowHeight}px`,
             }}
             position={Position.Left}
             id={key}
@@ -185,8 +183,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
             height: '12px',
             width: '12px',
             top: `${
-              initHeight +
-              5 +
+              handleStartHeight +
               Object.keys(localSettings.weights).length * rowHeight
             }px`,
           }}

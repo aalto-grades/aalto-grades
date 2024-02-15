@@ -17,33 +17,32 @@ export type NodeTypes =
   | 'addition'
   | 'average'
   | 'stepper'
+  | 'max'
   | 'minpoints'
   | 'grade';
 
 export const getInitNodeValues = (nodes: Node[]) => {
   const initNodeValues: NodeValues = {};
   for (const node of nodes) {
-    switch (node.type as NodeTypes) {
+    const type = node.type as NodeTypes;
+    switch (type) {
+      case 'grade':
+      case 'minpoints':
+      case 'stepper':
+        initNodeValues[node.id] = {type, source: 0, value: 0};
+        break;
       case 'addition':
         initNodeValues[node.id] = {type: 'addition', sourceSum: 0, value: 0};
+        break;
+      case 'average':
+      case 'max':
+        initNodeValues[node.id] = {type, sources: {}, value: 0};
         break;
       case 'attainment':
         initNodeValues[node.id] = {
           type: 'attainment',
           value: Math.round(Math.random() * 10),
         };
-        break;
-      case 'average':
-        initNodeValues[node.id] = {type: 'average', sources: {}, value: 0};
-        break;
-      case 'grade':
-        initNodeValues[node.id] = {type: 'grade', source: 0, value: 0};
-        break;
-      case 'minpoints':
-        initNodeValues[node.id] = {type: 'minpoints', source: 0, value: 0};
-        break;
-      case 'stepper':
-        initNodeValues[node.id] = {type: 'stepper', source: 0, value: 0};
         break;
     }
   }
@@ -78,6 +77,15 @@ const setNodeValue = (
     case 'grade':
       nodeValue.value = nodeValue.source;
       break;
+    case 'max': {
+      let maxValue = -1;
+      for (const value of Object.values(nodeValue.sources)) {
+        if (value.isConnected && value.value !== 'fail')
+          maxValue = Math.max(maxValue, value.value);
+      }
+      nodeValue.value = maxValue === -1 ? 'fail' : maxValue;
+      break;
+    }
     case 'minpoints': {
       const settings = nodeSettings[nodeId] as MinPointsNodeSettings;
       if (nodeValue.source === 'fail' || nodeValue.source < settings.minPoints)
@@ -125,18 +133,25 @@ export const calculateNewNodeValues = (
     if (!(node.id in nodeSources)) noSources.push(node.id);
 
     const nodeValue = newNodeValues[node.id];
-    if (nodeValue.type !== 'attainment') {
-      if (nodeValue.type === 'addition') {
+    if (nodeValue.type !== 'attainment') nodeValue.value = 0;
+    switch (nodeValue.type) {
+      case 'attainment':
+        break;
+      case 'grade':
+      case 'stepper':
+      case 'minpoints':
+        nodeValue.source = 0;
+        break;
+      case 'addition':
         nodeValue.sourceSum = 0;
-      } else if (nodeValue.type === 'average') {
+        break;
+      case 'average':
+      case 'max':
         for (const value of Object.values(nodeValue.sources)) {
           value.value = 0;
           value.isConnected = false;
         }
-      } else {
-        nodeValue.source = 0;
-      }
-      nodeValue.value = 0;
+        break;
     }
   }
 
@@ -153,29 +168,26 @@ export const calculateNewNodeValues = (
 
       const nodeValue = newNodeValues[edge.target];
       switch (nodeValue.type) {
-        case 'addition':
-          nodeValue.sourceSum += sourceValue === 'fail' ? 0 : sourceValue;
-          break;
         case 'attainment':
           throw new Error('Should not happen');
-        case 'average':
-          nodeValue.sources[edge.targetHandle as string] = {
-            value: sourceValue,
-            isConnected: true,
-          };
+        case 'minpoints':
+          nodeValue.source = sourceValue;
           break;
+        case 'grade':
         case 'stepper':
           // TODO: handle error
           if (sourceValue === 'fail') throw new Error('fail passed to stepper');
           nodeValue.source = sourceValue;
           break;
-        case 'minpoints':
-          nodeValue.source = sourceValue;
+        case 'addition':
+          nodeValue.sourceSum += sourceValue === 'fail' ? 0 : sourceValue;
           break;
-        case 'grade':
-          // TODO: handle error
-          if (sourceValue === 'fail') throw new Error('fail passed to stepper');
-          nodeValue.source = sourceValue;
+        case 'average':
+        case 'max':
+          nodeValue.sources[edge.targetHandle as string] = {
+            value: sourceValue,
+            isConnected: true,
+          };
           break;
       }
     }

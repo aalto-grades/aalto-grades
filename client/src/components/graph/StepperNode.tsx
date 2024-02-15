@@ -24,8 +24,10 @@ const initialSettings = {
   outputValues: ['0'],
 };
 
-const initHeight = 87;
-const rowHeight = 33.35;
+const nodeMinHeight = 78.683 + 4;
+const rowHeight = 33.9;
+const calculateHeight = (localSettings: LocalSettings | StepperNodeSettings) =>
+  nodeMinHeight + (localSettings.numSteps + 2) * rowHeight;
 
 const checkError = (settings: LocalSettings): boolean => {
   for (const middleValue of settings.middlePoints) {
@@ -77,7 +79,7 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
 
     setNodeHeights(nodeHeights => {
       const newNodeHeights = {...nodeHeights};
-      newNodeHeights[id] = initHeight + (initSettings.numSteps + 1) * rowHeight;
+      newNodeHeights[id] = calculateHeight(initSettings);
       return newNodeHeights;
     });
 
@@ -119,35 +121,31 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
   };
 
   const handleAdd = () => {
-    setNodeHeights(nodeHeights => {
-      const newNodeHeights = {...nodeHeights};
-      newNodeHeights[id] =
-        initHeight + (localSettings.numSteps + 1) * rowHeight;
-      return newNodeHeights;
-    });
-
     const newLocalSettings = {
       numSteps: localSettings.numSteps + 1,
       middlePoints: localSettings.middlePoints.concat(''),
       outputValues: localSettings.outputValues.concat(''),
     };
     setLocalSettings(newLocalSettings);
+    setNodeHeights(nodeHeights => {
+      const newNodeHeights = {...nodeHeights};
+      newNodeHeights[id] = calculateHeight(newLocalSettings);
+      return newNodeHeights;
+    });
     setError(true);
   };
 
   const handleRemove = () => {
-    setNodeHeights(nodeHeights => {
-      const newNodeHeights = {...nodeHeights};
-      newNodeHeights[id] =
-        initHeight + (localSettings.numSteps + 1) * rowHeight;
-      return newNodeHeights;
-    });
-
     const newLocalSettings = {...localSettings};
     newLocalSettings.numSteps -= 1;
     newLocalSettings.middlePoints.pop();
     newLocalSettings.outputValues.pop();
     setLocalSettings(newLocalSettings);
+    setNodeHeights(nodeHeights => {
+      const newNodeHeights = {...nodeHeights};
+      newNodeHeights[id] = calculateHeight(newLocalSettings);
+      return newNodeHeights;
+    });
 
     if (checkError(newLocalSettings)) {
       setError(true);
@@ -183,7 +181,7 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
   return (
     <div
       style={{
-        height: `${initHeight + rowHeight * localSettings.numSteps}px`,
+        height: `${nodeMinHeight + rowHeight * localSettings.numSteps}px`,
         width: '270px',
         border: error ? '1px solid #e00' : '1px solid #eee',
         padding: '10px',
