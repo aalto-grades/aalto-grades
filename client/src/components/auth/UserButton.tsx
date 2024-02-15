@@ -7,7 +7,11 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import {Button, Box, Menu, MenuItem} from '@mui/material';
 import {JSX, SyntheticEvent, useState} from 'react';
 import {NavigateFunction, useNavigate} from 'react-router-dom';
-import {UseMutationResult} from '@tanstack/react-query';
+import {
+  QueryClient,
+  UseMutationResult,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 import {useLogOut} from '../../hooks/useApi';
 import useAuth, {AuthContextType} from '../../hooks/useAuth';
@@ -20,9 +24,16 @@ export default function UserButton(): JSX.Element {
     useState<Element | null>(null);
   const open: boolean = Boolean(anchorEl);
 
+  const queryClient: QueryClient = useQueryClient();
   const logOut: UseMutationResult<unknown, unknown, unknown> = useLogOut({
     onSuccess: () => {
       setAuth(null);
+      setAnchorEl(null);
+      queryClient.invalidateQueries({
+        queryKey: ['refresh-token'],
+        // refetchType: 'none', Should work, but doesn't
+        // Causes one extra call to refresh-token -> 401
+      });
       navigate('/login', {replace: true});
     },
   });

@@ -186,7 +186,6 @@ export default function App(): JSX.Element {
             <Box mx={5} my={5}>
               <AlertSnackbar snackPack={snackPack} />
               <Routes>
-                {' '}
                 {/* Add nested routes when needed */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />

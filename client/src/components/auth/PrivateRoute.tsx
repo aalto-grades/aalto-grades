@@ -25,32 +25,25 @@ export default function PrivateRoute(props: {
 
   useEffect(() => {
     if (!refresh.isLoading) {
-      setAuth(refresh.data ?? null);
+      if (refresh.data) setAuth(refresh.data);
       setLoading(false);
     }
-  }, [refresh.isLoading]);
+  }, [refresh.data, refresh.isLoading, setAuth]);
 
   // Only load page after token has been retrieved
-  if (!loading) {
-    // If auth is not null -> token exists
-    if (auth) {
-      // Check if role is in the list of authorised roles or teacher in charge.
-      if (props.roles.includes(auth.role) || isTeacherInCharge) {
-        return (
-          <>
-            {props.children}
-            <Outlet />
-          </>
-        );
-        // If the user is not authorized to access a page -> redirect to front page
-      } else {
-        return <Navigate to="/" />;
-      }
-      // No role found -> no token -> redirect to login
-    } else {
-      return <Navigate to="/login" />;
-    }
-  }
+  if (loading) return null;
 
-  return null;
+  // If auth is not null -> token exists
+  if (auth === null) return <Navigate to="/login" />;
+
+  // Check if role is in the list of authorised roles or teacher in charge.
+  if (!props.roles.includes(auth.role) && !isTeacherInCharge)
+    return <Navigate to="/" />;
+
+  return (
+    <>
+      {props.children}
+      <Outlet />
+    </>
+  );
 }
