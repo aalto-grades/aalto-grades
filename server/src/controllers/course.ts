@@ -8,6 +8,7 @@ import {
   HttpCode,
   Language,
   LocalizedString,
+  SystemRole,
   UserData,
 } from '@common/types';
 import {Request, Response} from 'express';
@@ -64,10 +65,10 @@ export async function getAllCourses(
   });
 }
 
-async function validateEmailList(
+async function createMissingUsers(
   emailList: Array<string>
 ): Promise<Array<User>> {
-  const teachers: Array<User> = await User.findAll({
+  const existingUsers: Array<User> = await User.findAll({
     attributes: ['id', 'email'],
     where: {
       email: emailList,
@@ -75,20 +76,21 @@ async function validateEmailList(
   });
 
   // Check for non existent emails.
-  if (emailList.length !== teachers.length) {
+  if (emailList.length !== existingUsers.length) {
     const missingEmails: Array<string> = emailList.filter((teacher: string) => {
-      return teachers.map((user: User) => user.email).indexOf(teacher) === -1;
+      return (
+        existingUsers.map((user: User) => user.email).indexOf(teacher) === -1
+      );
     });
-
-    throw new ApiError(
-      missingEmails.map((email: string) => {
-        return `No user with email address ${email} found`;
-      }),
-      HttpCode.UnprocessableEntity
+    // Create users if they dont exist. No reason anymore for exception
+    // since users (teachers) login only with idp, and adding a user to course
+    // implies that the user should have access to the platform.
+    const createdUsers = await User.bulkCreate(
+      missingEmails.map(email => ({email, role: SystemRole.User}))
     );
+    return [...existingUsers, ...createdUsers];
   }
-
-  return teachers;
+  return existingUsers;
 }
 
 export async function addCourse(req: Request, res: Response): Promise<void> {
@@ -118,7 +120,7 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
 
   await requestSchema.validate(req.body, {abortEarly: false});
 
-  const teachers: Array<User> = await validateEmailList(
+  const teachers: Array<User> = await createMissingUsers(
     req.body.teachersInCharge.map((teacher: UserData) => teacher.email)
   );
 
@@ -235,15 +237,15 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
       HttpCode.BadRequest
     );
   }
-
+  console.log(teachersInCharge);
   const newTeachers: Array<User> | null = teachersInCharge
-    ? await validateEmailList(
+    ? await createMissingUsers(
         // teacher.email was alread validated to be defined by Yup.
 
         teachersInCharge.map((teacher: UserData) => teacher.email!)
       )
     : null;
-
+  console.log(newTeachers);
   await sequelize.transaction(async (t: Transaction): Promise<void> => {
     await Course.update(
       {
@@ -313,17 +315,15 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
       }
 
       // Add teachers who are in the newTeachers array but not in the database.
-      if (oldTeachers.length > 0) {
-        await TeacherInCharge.bulkCreate(
-          newTeachers.map((user: User) => {
-            return {
-              userId: user.id,
-              courseId: courseId,
-            };
-          }),
-          {transaction: t}
-        );
-      }
+      await TeacherInCharge.bulkCreate(
+        newTeachers.map((user: User) => {
+          return {
+            userId: user.id,
+            courseId: courseId,
+          };
+        }),
+        {transaction: t}
+      );
     }
   });
 
