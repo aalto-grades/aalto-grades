@@ -3,7 +3,11 @@
 // SPDX-License-Identifier: MIT
 
 import {AssessmentModelData} from '@common/types';
-import {DriveFileRenameOutlineRounded} from '@mui/icons-material';
+import {
+  DriveFileRenameOutlineRounded,
+  Edit,
+  OnlinePredictionSharp,
+} from '@mui/icons-material';
 import {IconButton, List, ListItemButton} from '@mui/material';
 import React, {JSX} from 'react';
 import ModifyAssessmentModelDialog from './ModifyAssessmentModelDialog';
@@ -13,6 +17,13 @@ export default function AssessmentModelsList(props: {
   current: number;
   onClick: (assessmentModel: AssessmentModelData) => void;
 }): JSX.Element {
+  const [open, setOpen] = React.useState(false);
+  const [modelId, setModelId] =
+    React.useState<AssessmentModelData['id']>(undefined);
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   const [open, setOpen] = React.useState(false);
   const [modelId, setModelId] =
     React.useState<AssessmentModelData['id']>(undefined);
@@ -49,8 +60,36 @@ export default function AssessmentModelsList(props: {
               <DriveFileRenameOutlineRounded />
             </IconButton>
           </div>
+          <div style={{display: 'flex'}}>
+            <ListItemButton
+              key={assessmentModel.id}
+              selected={props.current === assessmentModel.id}
+              onClick={(): void => props.onClick(assessmentModel)}
+              sx={{borderRadius: 100}}
+            >
+              {assessmentModel.name}
+            </ListItemButton>
+            <IconButton
+              size="small"
+              onClick={() => {
+                setModelId(assessmentModel.id);
+                setOpen(true);
+              }}
+            >
+              {' '}
+              <DriveFileRenameOutlineRounded />
+            </IconButton>
+          </div>
         );
       })}
+      {modelId && open && (
+        <ModifyAssessmentModelDialog
+          open={open}
+          handleClose={handleClose}
+          modelId={modelId}
+          onSubmit={handleClose}
+        />
+      )}
       {modelId && open && (
         <ModifyAssessmentModelDialog
           open={open}
