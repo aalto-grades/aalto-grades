@@ -2,12 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {
-  AssessmentModelData,
-  AttainmentData,
-  Formula,
-  GradeType,
-} from '@common/types';
+import {AssessmentModelData} from '@common/types';
 import {
   Box,
   Button,
@@ -26,15 +21,6 @@ import {
   useGetAssessmentModel,
 } from '../../hooks/useApi';
 
-const defaultRoot: AttainmentData = {
-  name: 'Root',
-  daysValid: 0,
-  minRequiredGrade: 1,
-  maxGrade: 5,
-  formula: Formula.Manual,
-  formulaParams: {},
-  gradeType: GradeType.Integer,
-};
 type FormValues = {
   name: string;
 };
@@ -87,7 +73,7 @@ export default function ModifyAssessmentModelDialog(props: {
               initialValues={{name: assessmentModel.data?.name}}
               onSubmit={handleSubmit}
             >
-              {({values, handleChange, handleSubmit, isSubmitting}) => (
+              {({values, handleChange}) => (
                 <Form>
                   <TextField
                     key="name"

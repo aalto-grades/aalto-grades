@@ -3,11 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {AssessmentModelData} from '@common/types';
-import {
-  DriveFileRenameOutlineRounded,
-  Edit,
-  OnlinePredictionSharp,
-} from '@mui/icons-material';
+import {DriveFileRenameOutlineRounded} from '@mui/icons-material';
 import {IconButton, List, ListItemButton} from '@mui/material';
 import React, {JSX} from 'react';
 import ModifyAssessmentModelDialog from './ModifyAssessmentModelDialog';
