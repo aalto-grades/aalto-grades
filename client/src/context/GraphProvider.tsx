@@ -4,7 +4,38 @@
 
 import {Dispatch, SetStateAction, createContext} from 'react';
 
+import AdditionNode from '../components/graph/AdditionNode';
+import AttanmentNode from '../components/graph/AttainmentNode';
+import AverageNode from '../components/graph/AverageNode';
+import GradeNode from '../components/graph/GradeNode';
+import MaxNode from '../components/graph/MaxNode';
+import MinPointsNode from '../components/graph/MinPointsNode';
+import RequireNode from '../components/graph/RequireNode';
+import StepperNode from '../components/graph/StepperNode';
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const nodeMap = {
+  addition: AdditionNode,
+  attainment: AttanmentNode,
+  average: AverageNode,
+  grade: GradeNode,
+  max: MaxNode,
+  minpoints: MinPointsNode,
+  require: RequireNode,
+  stepper: StepperNode,
+};
+
 // Node values
+export type DropInNodes =
+  | 'addition'
+  | 'average'
+  | 'max'
+  | 'minpoints'
+  | 'require'
+  | 'stepper';
+
+export type NodeTypes = DropInNodes | 'attainment' | 'grade';
+
 export type AdditionNodeValues = {
   type: 'addition';
   sourceSum: number;
@@ -34,6 +65,11 @@ export type MinPointsNodeValues = {
   source: number | 'fail';
   value: number | 'fail';
 };
+export type RequireNodeValues = {
+  type: 'require';
+  sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
+  values: {[key: string]: number | 'fail'};
+};
 export type StepperNodeValues = {
   type: 'stepper';
   source: number;
@@ -47,6 +83,7 @@ export type NodeValue =
   | GradeNodeValues
   | MaxNodeValues
   | MinPointsNodeValues
+  | RequireNodeValues
   | StepperNodeValues;
 
 export type NodeValues = {
@@ -71,6 +108,9 @@ export type MaxNodeSettings = {
 export type MinPointsNodeSettings = {
   minPoints: number;
 };
+export type RequireNodeSettings = {
+  numMissing: number;
+};
 export type StepperNodeSettings = {
   numSteps: number;
   outputValues: (number | 'same')[];
@@ -81,6 +121,7 @@ export type NodeSettings =
   | AverageNodeSettings
   | MaxNodeSettings
   | MinPointsNodeSettings
+  | RequireNodeSettings
   | StepperNodeSettings;
 export type AllNodeSettings = {[key: string]: NodeSettings};
 type NodeSettingsContext = {

@@ -8,44 +8,55 @@ import {
   AverageNodeSettings,
   MaxNodeSettings,
   MinPointsNodeSettings,
+  NodeSettings,
+  NodeTypes,
   NodeValue,
   NodeValues,
   StepperNodeSettings,
 } from '../../context/GraphProvider';
 
-export type NodeTypes =
-  | 'attainment'
-  | 'addition'
-  | 'average'
-  | 'stepper'
-  | 'max'
-  | 'minpoints'
-  | 'grade';
-
+export const initNode = (
+  type: NodeTypes
+): {value: NodeValue; settings?: NodeSettings} => {
+  switch (type) {
+    case 'addition':
+      return {value: {type, sourceSum: 0, value: 0}};
+    case 'attainment':
+      return {value: {type, value: Math.round(Math.random() * 10)}};
+    case 'average':
+      return {
+        value: {type, sources: {}, value: 0},
+        settings: {weights: {}, nextFree: 100},
+      };
+    case 'grade':
+      return {value: {type, source: 0, value: 0}};
+    case 'max':
+      return {
+        value: {type, sources: {}, value: 0},
+        settings: {minValue: 'fail'},
+      };
+    case 'minpoints':
+      return {value: {type, source: 0, value: 0}, settings: {minPoints: 0}};
+    case 'require':
+      return {
+        value: {type, sources: {}, values: {}},
+        settings: {numMissing: 0},
+      };
+    case 'stepper':
+      return {
+        value: {type, source: 0, value: 0},
+        settings: {
+          numSteps: 1,
+          middlePoints: [],
+          outputValues: [0],
+        },
+      };
+  }
+};
 export const getInitNodeValues = (nodes: Node[]) => {
   const initNodeValues: NodeValues = {};
   for (const node of nodes) {
-    const type = node.type as NodeTypes;
-    switch (type) {
-      case 'grade':
-      case 'minpoints':
-      case 'stepper':
-        initNodeValues[node.id] = {type, source: 0, value: 0};
-        break;
-      case 'addition':
-        initNodeValues[node.id] = {type: 'addition', sourceSum: 0, value: 0};
-        break;
-      case 'average':
-      case 'max':
-        initNodeValues[node.id] = {type, sources: {}, value: 0};
-        break;
-      case 'attainment':
-        initNodeValues[node.id] = {
-          type: 'attainment',
-          value: Math.round(Math.random() * 10),
-        };
-        break;
-    }
+    initNodeValues[node.id] = initNode(node.type as NodeTypes).value;
   }
   return initNodeValues;
 };
@@ -96,6 +107,12 @@ const setNodeValue = (
       else nodeValue.value = nodeValue.source;
       break;
     }
+    case 'require':
+      // TODO: Stop if too many fails
+      for (const [nodeId, source] of Object.entries(nodeValue.sources)) {
+        if (source.isConnected) nodeValue.values[nodeId] = source.value;
+      }
+      break;
     case 'stepper': {
       const settings = nodeSettings[nodeId] as StepperNodeSettings;
       for (let i = 0; i < settings.numSteps; i++) {
@@ -136,7 +153,8 @@ export const calculateNewNodeValues = (
     if (!(node.id in nodeSources)) noSources.push(node.id);
 
     const nodeValue = newNodeValues[node.id];
-    if (nodeValue.type !== 'attainment') nodeValue.value = 0;
+    if (nodeValue.type === 'require') nodeValue.values = {};
+    else if (nodeValue.type !== 'attainment') nodeValue.value = 0;
     switch (nodeValue.type) {
       case 'attainment':
         break;
@@ -150,6 +168,7 @@ export const calculateNewNodeValues = (
         break;
       case 'average':
       case 'max':
+      case 'require':
         for (const value of Object.values(nodeValue.sources)) {
           value.value = 0;
           value.isConnected = false;
@@ -161,11 +180,16 @@ export const calculateNewNodeValues = (
   while (noSources.length > 0) {
     const sourceId = noSources.pop() as string;
     setNodeValue(sourceId, newNodeValues[sourceId], nodeSettings);
-    const sourceValue = newNodeValues[sourceId].value;
+    const sourceValue = newNodeValues[sourceId];
 
     if (!(sourceId in nodeTargets)) continue;
 
     for (const edge of nodeTargets[sourceId]) {
+      const sourceValuee =
+        sourceValue.type === 'require'
+          ? sourceValue.values[edge.sourceHandle as string]
+          : sourceValue.value;
+
       nodeSources[edge.target].delete(sourceId);
       if (nodeSources[edge.target].size === 0) noSources.push(edge.target);
 
@@ -174,21 +198,23 @@ export const calculateNewNodeValues = (
         case 'attainment':
           throw new Error('Should not happen');
         case 'minpoints':
-          nodeValue.source = sourceValue;
+          nodeValue.source = sourceValuee;
           break;
         case 'grade':
         case 'stepper':
           // TODO: handle error
-          if (sourceValue === 'fail') throw new Error('fail passed to stepper');
-          nodeValue.source = sourceValue;
+          if (sourceValuee === 'fail')
+            throw new Error('fail passed to stepper');
+          nodeValue.source = sourceValuee;
           break;
         case 'addition':
-          nodeValue.sourceSum += sourceValue === 'fail' ? 0 : sourceValue;
+          nodeValue.sourceSum += sourceValuee === 'fail' ? 0 : sourceValuee;
           break;
         case 'average':
         case 'max':
+        case 'require':
           nodeValue.sources[edge.targetHandle as string] = {
-            value: sourceValue,
+            value: sourceValuee,
             isConnected: true,
           };
           break;
