@@ -48,11 +48,11 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
 
   useEffect(() => {
     let change = false;
-    let numNew = 0;
+    let maxId = 0;
     let newHandles = [...handles];
     for (const [key, source] of Object.entries(nodeValue.sources)) {
+      maxId = Math.max(maxId, parseInt(key));
       if (!newHandles.includes(key)) {
-        numNew++;
         newHandles.push(key);
         change = true;
       }
@@ -63,7 +63,7 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
     }
     if (change) {
       setHandles(newHandles);
-      setNextFree(oldNextFree => oldNextFree + numNew);
+      setNextFree(maxId + 1);
       setNodeHeights(id, calculateHeight(newHandles));
     }
   }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -138,17 +138,19 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
             </td>
           </tr>
 
-          {Object.entries(nodeValue.sources).map(([key, source]) => (
-            <tr
-              key={`tr-${id}-${key}`}
-              style={{
-                height: rowHeight,
-                backgroundColor: source.value === 'fail' ? '#f003' : '',
-              }}
-            >
-              <td>{source.value}</td>
-            </tr>
-          ))}
+          {Object.entries(nodeValue.sources)
+            .filter(([_, source]) => source.isConnected)
+            .map(([key, source]) => (
+              <tr
+                key={`tr-${id}-${key}`}
+                style={{
+                  height: rowHeight,
+                  backgroundColor: source.value === 'fail' ? '#f003' : '',
+                }}
+              >
+                <td>{source.value}</td>
+              </tr>
+            ))}
           <tr style={{height: rowHeight}}>
             <td></td>
           </tr>

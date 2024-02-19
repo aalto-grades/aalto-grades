@@ -140,6 +140,80 @@ const setNodeValue = (
   }
 };
 
+export const findDisconnectedEdges = (
+  oldNodeValues: NodeValues,
+  nodeSettings: AllNodeSettings,
+  nodes: Node[],
+  edges: Edge[]
+) => {
+  const nodeSources: {[key: string]: Set<string>} = {};
+  const nodeTargets: {[key: string]: Edge[]} = {};
+  for (const edge of edges) {
+    if (!(edge.source in nodeTargets)) nodeTargets[edge.source] = [];
+    nodeTargets[edge.source].push(edge);
+    if (!(edge.target in nodeSources)) nodeSources[edge.target] = new Set();
+    nodeSources[edge.target].add(edge.source);
+  }
+
+  const newNodeValues = {...oldNodeValues};
+  for (const node of nodes) {
+    const nodeValue = newNodeValues[node.id];
+    switch (nodeValue.type) {
+      case 'attainment':
+      case 'grade':
+      case 'stepper':
+      case 'minpoints':
+        break; // ignore
+      case 'addition':
+      case 'average':
+      case 'max':
+      case 'require':
+        for (const value of Object.values(nodeValue.sources)) {
+          value.value = 0;
+          value.isConnected = false;
+        }
+        break;
+    }
+  }
+
+  for (const node of nodes) {
+    if (!(node.id in nodeTargets)) continue;
+    for (const edge of nodeTargets[node.id]) {
+      const nodeValue = newNodeValues[edge.target];
+      switch (nodeValue.type) {
+        case 'attainment':
+        case 'minpoints':
+        case 'grade':
+        case 'stepper':
+          break; // Ignore
+        case 'addition':
+        case 'average':
+        case 'max':
+        case 'require':
+          nodeValue.sources[edge.targetHandle as string] = {
+            value: 0,
+            isConnected: true,
+          };
+          break;
+      }
+    }
+  }
+
+  const badEdges = [];
+  for (const edge of edges) {
+    const sourceNodeValues = newNodeValues[edge.source];
+    if (sourceNodeValues.type !== 'require') continue;
+    const sourceHandle = edge.sourceHandle as string;
+    if (
+      !(sourceHandle in sourceNodeValues.sources) ||
+      !sourceNodeValues.sources[sourceHandle].isConnected
+    ) {
+      badEdges.push(edge);
+    }
+  }
+  return badEdges;
+};
+
 export const calculateNewNodeValues = (
   oldNodeValues: NodeValues,
   nodeSettings: AllNodeSettings,
@@ -208,10 +282,6 @@ export const calculateNewNodeValues = (
           break;
         case 'grade':
         case 'stepper':
-          // TODO: handle error
-          // if (sourceValuee === 'fail')
-          //   throw new Error('fail passed to stepper');
-          // nodeValue.source = sourceValuee;
           nodeValue.source = sourceValue === 'fail' ? 0 : sourceValue;
           break;
         case 'addition':

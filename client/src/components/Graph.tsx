@@ -32,7 +32,11 @@ import {
 import {createO1, createSimpleGraph, createY1} from './graph/createGraph';
 import './graph/flow.css';
 import {formatGraph} from './graph/formatGraph';
-import {calculateNewNodeValues, initNode} from './graph/graphUtil';
+import {
+  calculateNewNodeValues,
+  findDisconnectedEdges,
+  initNode,
+} from './graph/graphUtil';
 
 const Graph = (): JSX.Element => {
   const initValues = createSimpleGraph();
@@ -77,16 +81,27 @@ const Graph = (): JSX.Element => {
   const updateValues = useCallback(
     (newEdges: Edge[] | null = null) => {
       console.log('Updating');
-      const newNodeValues = calculateNewNodeValues(
+      const disconnectedEdges = findDisconnectedEdges(
         nodeValues,
         nodeSettings,
         nodes,
         newEdges || edges
       );
+      const filteredEdges = (newEdges || edges).filter(
+        edge => !disconnectedEdges.includes(edge)
+      );
+
+      const newNodeValues = calculateNewNodeValues(
+        nodeValues,
+        nodeSettings,
+        nodes,
+        filteredEdges
+      );
       setOldNodeValues(JSON.stringify(newNodeValues));
       setNodeValues(newNodeValues);
+      if (disconnectedEdges.length > 0) setEdges(filteredEdges);
     },
-    [edges, nodeSettings, nodeValues, nodes]
+    [edges, nodeSettings, nodeValues, nodes, setEdges]
   );
 
   useEffect(() => {
