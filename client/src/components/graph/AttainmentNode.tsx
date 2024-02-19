@@ -5,18 +5,23 @@
 import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 import 'reactflow/dist/style.css';
-import {NodeValuesContext} from '../../context/GraphProvider';
+import {
+  AttainmentNodeValues,
+  NodeValuesContext,
+} from '../../context/GraphProvider';
 
 const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
   const {nodeValues, setNodeValues} = useContext(NodeValuesContext);
+  const nodeValue = nodeValues[id] as AttainmentNodeValues;
+
   const [localValue, setLocalValue] = useState<string>(
-    nodeValues[id].value.toString()
+    nodeValue.value.toString()
   );
   const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
-    setLocalValue(nodeValues[id].value.toString());
-  }, [id, nodeValues]);
+    setLocalValue(nodeValue.value.toString());
+  }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLocalValue(event.target.value);
@@ -31,7 +36,7 @@ const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
     setError(false);
 
     const newNodeValues = {...nodeValues};
-    newNodeValues[id].value =
+    (newNodeValues[id] as AttainmentNodeValues).value =
       event.target.value === 'fail' ? 'fail' : parseFloat(event.target.value);
     setNodeValues(newNodeValues);
     setLocalValue(event.target.value);

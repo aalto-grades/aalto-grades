@@ -180,15 +180,15 @@ export const calculateNewNodeValues = (
   while (noSources.length > 0) {
     const sourceId = noSources.pop() as string;
     setNodeValue(sourceId, newNodeValues[sourceId], nodeSettings);
-    const sourceValue = newNodeValues[sourceId];
+    const sourceNodeValue = newNodeValues[sourceId];
 
     if (!(sourceId in nodeTargets)) continue;
 
     for (const edge of nodeTargets[sourceId]) {
-      const sourceValuee =
-        sourceValue.type === 'require'
-          ? sourceValue.values[edge.sourceHandle as string]
-          : sourceValue.value;
+      const sourceValue =
+        sourceNodeValue.type === 'require'
+          ? sourceNodeValue.values[edge.sourceHandle as string]
+          : sourceNodeValue.value;
 
       nodeSources[edge.target].delete(sourceId);
       if (nodeSources[edge.target].size === 0) noSources.push(edge.target);
@@ -198,23 +198,24 @@ export const calculateNewNodeValues = (
         case 'attainment':
           throw new Error('Should not happen');
         case 'minpoints':
-          nodeValue.source = sourceValuee;
+          nodeValue.source = sourceValue;
           break;
         case 'grade':
         case 'stepper':
           // TODO: handle error
-          if (sourceValuee === 'fail')
-            throw new Error('fail passed to stepper');
-          nodeValue.source = sourceValuee;
+          // if (sourceValuee === 'fail')
+          //   throw new Error('fail passed to stepper');
+          // nodeValue.source = sourceValuee;
+          nodeValue.source = sourceValue === 'fail' ? 0 : sourceValue;
           break;
         case 'addition':
-          nodeValue.sourceSum += sourceValuee === 'fail' ? 0 : sourceValuee;
+          nodeValue.sourceSum += sourceValue === 'fail' ? 0 : sourceValue;
           break;
         case 'average':
         case 'max':
         case 'require':
           nodeValue.sources[edge.targetHandle as string] = {
-            value: sourceValuee,
+            value: sourceValue,
             isConnected: true,
           };
           break;

@@ -13,8 +13,8 @@ import {
   RequireNodeValues,
 } from '../../context/GraphProvider';
 
-type LocalSettings = {numRequired: string};
-const initialSettings = {numRequired: 0};
+type LocalSettings = {numMissing: string};
+const initialSettings = {numMissing: 0};
 
 const nodeMinHeight = 78.683;
 const handleStartHeight = 83 + 33.9;
@@ -40,9 +40,7 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
 
   useEffect(() => {
     if (init) return;
-    setLocalSettings({
-      numRequired: (handles.length - settings.numMissing).toString(),
-    });
+    setLocalSettings({numMissing: settings.numMissing.toString()});
     setNodeHeights(id, calculateHeight(handles));
     setError(false);
     setInit(true);
@@ -50,9 +48,15 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
 
   useEffect(() => {
     let change = false;
+    let numNew = 0;
     let newHandles = [...handles];
+    console.log(newHandles);
     for (const [key, source] of Object.entries(nodeValue.sources)) {
-      if (!(key in handles)) {
+      if (!newHandles.includes(key)) {
+        console.log(
+          `'${JSON.stringify([key])}' is not in ${JSON.stringify(newHandles)}`
+        );
+        numNew++;
         newHandles.push(key);
         change = true;
       }
@@ -61,36 +65,29 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
         change = true;
       }
     }
+    console.log(newHandles);
     if (change) {
       setHandles(newHandles);
-      setNextFree(nextFree + 1);
+      setNextFree(oldNextFree => oldNextFree + numNew);
       setNodeHeights(id, calculateHeight(newHandles));
-
-      setLocalSettings({
-        numRequired: (newHandles.length - settings.numMissing).toString(),
-      });
-      setError(false);
     }
   }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const newLocalSettings = {...localSettings};
-    newLocalSettings.numRequired = event.target.value;
+    newLocalSettings.numMissing = event.target.value;
     setLocalSettings(newLocalSettings);
 
     if (
       !/^\d+$/.test(event.target.value) ||
-      parseInt(event.target.value) > handles.length
+      parseInt(event.target.value) >= handles.length
     ) {
       setError(true);
       return;
     }
     setError(false);
-
     setLocalSettings(newLocalSettings);
-    setNodeSettings(id, {
-      numMissing: parseInt(newLocalSettings.numRequired),
-    });
+    setNodeSettings(id, {numMissing: parseInt(newLocalSettings.numMissing)});
   };
 
   return (
@@ -141,7 +138,7 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
                 style={{width: 'calc(100% - 20px)'}}
                 type="number"
                 onChange={handleChange}
-                value={localSettings.numRequired}
+                value={localSettings.numMissing}
               />
             </td>
           </tr>

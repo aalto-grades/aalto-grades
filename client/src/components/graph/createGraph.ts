@@ -2,12 +2,41 @@ import {Edge, Node} from 'reactflow';
 import {
   AllNodeSettings,
   AverageNodeSettings,
+  NodeTypes,
   NodeValues,
 } from '../../context/GraphProvider';
 import {getInitNodeValues} from './graphUtil';
 
-const NUM_SIMPLE_EXERCISES = 10;
+const createNode = (
+  type: NodeTypes,
+  label: string,
+  x: number,
+  y: number
+): Node => ({
+  id: label.toLowerCase().replaceAll(' ', '-'),
+  type,
+  position: {x, y},
+  data: {label},
+});
 
+const createEdge = (
+  sourceLabel: string,
+  targetLabel: string,
+  sourceHandle?: string,
+  targetHandle?: string
+): Edge => {
+  const source = sourceLabel.toLowerCase().replaceAll(' ', '-');
+  const target = targetLabel.toLowerCase().replaceAll(' ', '-');
+  return {
+    id: `${source}-${target}`,
+    source,
+    target,
+    sourceHandle,
+    targetHandle,
+  };
+};
+
+const NUM_SIMPLE_EXERCISES = 10;
 export const createSimpleGraph = (
   useAverage = false
 ): {
@@ -17,50 +46,25 @@ export const createSimpleGraph = (
   nodeValues: NodeValues;
 } => {
   const nodes = [
-    {
-      id: 'stepper1',
-      type: 'stepper',
-      position: {x: 700, y: 400},
-      data: {label: 'Stepper'},
-    },
-    {
-      id: 'grade',
-      type: 'grade',
-      position: {x: 1050, y: 465},
-      data: {label: 'Final grade'},
-    },
+    createNode('stepper', 'Stepper', 700, 400),
+    createNode('grade', 'Final Grade', 1050, 465),
   ];
 
-  const edges: Edge[] = [
-    {id: 'stepper1-grade', source: 'stepper1', target: 'grade'},
-  ];
+  const edges: Edge[] = [createEdge('Stepper', 'Final Grade')];
 
   for (let i = 0; i < NUM_SIMPLE_EXERCISES; i++) {
-    nodes.push({
-      id: `ex${i + 1}`,
-      type: 'attainment',
-      position: {x: 0, y: 15 + i * 100},
-      data: {label: `Exercise ${i + 1}`},
-    });
+    nodes.push(createNode('attainment', `Exercise ${i + 1}`, 0, 15 + i * 100));
     if (useAverage) {
-      edges.push({
-        id: `ex${i + 1}-average1`,
-        source: `ex${i + 1}`,
-        target: 'average1',
-
-        targetHandle: i.toString(),
-      });
+      edges.push(
+        createEdge(`Exercise ${i + 1}`, 'Average', undefined, i.toString())
+      );
     } else {
-      edges.push({
-        id: `ex${i + 1}-addition1`,
-        source: `ex${i + 1}`,
-        target: 'addition1',
-      });
+      edges.push(createEdge(`Exercise ${i + 1}`, 'Addition'));
     }
   }
 
   const nodeSettings: AllNodeSettings = {
-    stepper1: useAverage
+    stepper: useAverage
       ? {
           numSteps: 6,
           outputValues: [0, 1, 2, 3, 4, 5],
@@ -71,40 +75,157 @@ export const createSimpleGraph = (
           outputValues: [0, 1, 2, 3, 4, 5],
           middlePoints: [17, 33, 50, 67, 83],
         },
-    average1: {weights: {}, nextFree: 100},
+    average: {weights: {}, nextFree: 100},
   };
 
   if (useAverage) {
-    nodes.push({
-      id: 'average1',
-      type: 'average',
-      position: {x: 300, y: 400},
-      data: {label: 'Average'},
-    });
-    edges.push({
-      id: 'average1-stepper1',
-      source: 'average1',
-      target: 'stepper1',
-    });
+    nodes.push(createNode('average', 'Average', 300, 400));
+    edges.push(createEdge('Average', 'Stepper'));
     for (let i = 0; i < NUM_SIMPLE_EXERCISES; i++) {
-      const averageSettings = nodeSettings.average1 as AverageNodeSettings;
+      const averageSettings = nodeSettings.average as AverageNodeSettings;
       averageSettings.weights[i.toString()] =
         Math.ceil(10 * Math.random()) / 10;
     }
   } else {
-    nodes.push({
-      id: 'addition1',
-      type: 'addition',
-      position: {x: 300, y: 400},
-      data: {label: 'Addition'},
-    });
-    edges.push({
-      id: 'addition1-stepper1',
-      source: 'addition1',
-      target: 'stepper1',
-    });
+    nodes.push(createNode('addition', 'Addition', 300, 400));
+    edges.push(createEdge('Addition', 'Stepper'));
   }
 
+  const nodeValues = getInitNodeValues(nodes);
+
+  return {nodes, edges, nodeSettings, nodeValues};
+};
+
+export const createO1 = (): {
+  nodes: Node[];
+  edges: Edge[];
+  nodeSettings: AllNodeSettings;
+  nodeValues: NodeValues;
+} => {
+  const nodes = [
+    createNode('attainment', 'Tier A', 0, 0),
+    createNode('attainment', 'Tier B', 0, 100),
+    createNode('attainment', 'Tier C', 0, 200),
+    createNode('addition', 'Sum ABC', 100, 0),
+    createNode('addition', 'Sum BC', 100, 100),
+    createNode('addition', 'Sum C', 100, 200),
+    createNode('max', 'Best Grade', 500, 0),
+    createNode('grade', 'Final Grade', 600, 0),
+  ];
+  const edges: Edge[] = [
+    createEdge('Tier A', 'Sum ABC'),
+    createEdge('Tier B', 'Sum ABC'),
+    createEdge('Tier C', 'Sum ABC'),
+    createEdge('Tier B', 'Sum BC'),
+    createEdge('Tier C', 'Sum BC'),
+    createEdge('Tier C', 'Sum C'),
+    createEdge('Best Grade', 'Final Grade'),
+  ];
+  const nodeSettings: AllNodeSettings = {'best-grade': {minValue: 'fail'}};
+
+  const courseGrades = [
+    [2000, 0, 0],
+    [2100, 450, 0],
+    [2100, 800, 0],
+    [2100, 800, 450],
+    [2100, 800, 625],
+  ];
+  for (let i = 0; i < courseGrades.length; i++) {
+    const [a, b, c] = courseGrades[i];
+    nodes.push(createNode('minpoints', `A Min Grade ${i + 1}`, 200, i * 300));
+    nodes.push(
+      createNode('minpoints', `B Min Grade ${i + 1}`, 200, i * 300 + 100)
+    );
+    nodes.push(
+      createNode('minpoints', `C Min Grade ${i + 1}`, 200, i * 300 + 200)
+    );
+    edges.push(createEdge('Sum ABC', `A Min Grade ${i + 1}`));
+    edges.push(createEdge('Sum BC', `B Min Grade ${i + 1}`));
+    edges.push(createEdge('Sum C', `C Min Grade ${i + 1}`));
+    nodeSettings[`a-min-grade-${i + 1}`] = {minPoints: a + b + c};
+    nodeSettings[`b-min-grade-${i + 1}`] = {minPoints: b + c};
+    nodeSettings[`c-min-grade-${i + 1}`] = {minPoints: c};
+
+    nodes.push(
+      createNode('require', `Require All 3 Grade ${i + 1}`, 300, i * 100)
+    );
+    edges.push(
+      createEdge(
+        `A Min Grade ${i + 1}`,
+        `Require All 3 Grade ${i + 1}`,
+        undefined,
+        '0'
+      )
+    );
+    edges.push(
+      createEdge(
+        `B Min Grade ${i + 1}`,
+        `Require All 3 Grade ${i + 1}`,
+        undefined,
+        '1'
+      )
+    );
+    edges.push(
+      createEdge(
+        `C Min Grade ${i + 1}`,
+        `Require All 3 Grade ${i + 1}`,
+        undefined,
+        '2'
+      )
+    );
+    nodeSettings[`require-all-3-grade-${i + 1}`] = {numMissing: 0};
+
+    nodes.push(
+      createNode('stepper', `Convert To Grade ${i + 1}`, 400, i * 100)
+    );
+    edges.push(
+      createEdge(
+        `Require All 3 Grade ${i + 1}`,
+        `Convert To Grade ${i + 1}`,
+        '0'
+      )
+    );
+    nodeSettings[`convert-to-grade-${i + 1}`] = {
+      numSteps: 2,
+      middlePoints: [0],
+      outputValues: [0, i + 1],
+    };
+
+    edges.push(
+      createEdge(
+        `Convert To Grade ${i + 1}`,
+        'Best Grade',
+        undefined,
+        i.toString()
+      )
+    );
+  }
+
+  const nodeValues = getInitNodeValues(nodes);
+  return {nodes, edges, nodeSettings, nodeValues};
+};
+
+export const createY1 = (): {
+  nodes: Node[];
+  edges: Edge[];
+  nodeSettings: AllNodeSettings;
+  nodeValues: NodeValues;
+} => {
+  const nodes = [
+    createNode('attainment', 'Bonus Round', 0, 0),
+    createNode('require', 'Can fail 3', 100, 0),
+  ];
+
+  const edges: Edge[] = [];
+
+  for (let i = 0; i < 8; i++) {
+    nodes.push(createNode('attainment', `Round ${i + 1}`, 0, (i + 1) * 100));
+    edges.push(
+      createEdge(`Round ${i + 1}`, 'can-fail-3', undefined, i.toString())
+    );
+  }
+
+  const nodeSettings: AllNodeSettings = {'can-fail-3': {numMissing: 3}};
   const nodeValues = getInitNodeValues(nodes);
 
   return {nodes, edges, nodeSettings, nodeValues};

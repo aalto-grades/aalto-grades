@@ -29,7 +29,7 @@ import {
   NodeValuesContext,
   nodeMap,
 } from '../context/GraphProvider';
-import {createSimpleGraph} from './graph/createGraph';
+import {createO1, createSimpleGraph, createY1} from './graph/createGraph';
 import './graph/flow.css';
 import {formatGraph} from './graph/formatGraph';
 import {calculateNewNodeValues, initNode} from './graph/graphUtil';
@@ -317,6 +317,38 @@ const Graph = (): JSX.Element => {
             }}
           >
             Load average template
+          </button>
+          <button
+            onClick={() => {
+              const newInitvalues = createY1();
+              for (const node of nodes) {
+                onNodesChange([{id: node.id, type: 'remove'}]);
+              }
+              setTimeout(() => {
+                setNodes(newInitvalues.nodes);
+                setEdges(newInitvalues.edges);
+                setNodeSettings(newInitvalues.nodeSettings);
+                setNodeValues(newInitvalues.nodeValues);
+              }, 0);
+            }}
+          >
+            Load Y1 template
+          </button>
+          <button
+            onClick={() => {
+              const newInitvalues = createO1();
+              for (const node of nodes) {
+                onNodesChange([{id: node.id, type: 'remove'}]);
+              }
+              setTimeout(() => {
+                setNodes(newInitvalues.nodes);
+                setEdges(newInitvalues.edges);
+                setNodeSettings(newInitvalues.nodeSettings);
+                setNodeValues(newInitvalues.nodeValues);
+              }, 0);
+            }}
+          >
+            Load O1 template
           </button>
         </NodeHeightsContext.Provider>
       </NodeSettingsContext.Provider>
