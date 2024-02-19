@@ -14,7 +14,7 @@ import {
 } from '../../context/GraphProvider';
 
 type LocalSettings = {minValue: string};
-const initialSettings = {minValue: 'fail'};
+const initialSettings = {minValue: '0'};
 
 const nodeMinHeight = 78.683;
 const handleStartHeight = 83 + 33.9;
@@ -73,22 +73,14 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
     newLocalSettings.minValue = event.target.value;
     setLocalSettings(newLocalSettings);
 
-    if (
-      !/^\d+(?:\.\d+?)?$/.test(event.target.value) &&
-      event.target.value !== 'fail'
-    ) {
+    if (!/^\d+(?:\.\d+?)?$/.test(event.target.value)) {
       setError(true);
       return;
     }
     setError(false);
 
     setLocalSettings(newLocalSettings);
-    setNodeSettings(id, {
-      minValue:
-        newLocalSettings.minValue === 'fail'
-          ? 'fail'
-          : parseFloat(newLocalSettings.minValue),
-    });
+    setNodeSettings(id, {minValue: parseFloat(newLocalSettings.minValue)});
   };
 
   let selectedIndex = -1;
@@ -96,14 +88,13 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
     selectedIndex++;
     if (value.value === nodeValue.value) break;
   }
-  if (nodeValue.value === 'fail') selectedIndex = -1;
 
   return (
     <div
       style={{
         height: `${calculateHeight(handles)}px`,
         width: '90px',
-        border: error ? '1px solid #e00' : '1px solid #eee',
+        border: error ? '1px dashed #e00' : '1px solid #eee',
         padding: '10px',
         borderRadius: '5px',
         background: error ? '#fffafa' : 'white',
@@ -145,6 +136,7 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
               <input
                 style={{width: 'calc(100% - 20px)'}}
                 onChange={handleChange}
+                type="number"
                 value={localSettings.minValue}
               />
             </td>
@@ -155,12 +147,7 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
               key={`tr-${id}-${key}`}
               style={{
                 height: rowHeight,
-                backgroundColor:
-                  source.value === 'fail'
-                    ? '#f003'
-                    : index === selectedIndex
-                    ? '#00f6'
-                    : '',
+                backgroundColor: index === selectedIndex ? '#00f6' : '',
               }}
             >
               <td>{source.value}</td>
@@ -173,9 +160,7 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
       </table>
 
       <p style={{margin: 0, display: 'inline'}}>
-        {nodeValue.value === 'fail'
-          ? 'fail'
-          : Math.round(nodeValue.value * 100) / 100}
+        {Math.round(nodeValue.value * 100) / 100}
       </p>
       <Handle
         type="source"

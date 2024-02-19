@@ -1,5 +1,5 @@
 import {Edge, Node} from 'reactflow';
-import {NodeTypes, NodeValues} from '../../context/GraphProvider';
+import {CustomNodeTypes, NodeValues} from '../../context/GraphProvider';
 import ElkConstructor, {ElkNode} from 'elkjs/lib/elk.bundled';
 
 const elk = new ElkConstructor();
@@ -13,7 +13,7 @@ export const formatGraph = async (
   const nodesForElk = nodes.map(node => {
     let width = 0;
     let height = 0;
-    switch (node.type as NodeTypes) {
+    switch (node.type as CustomNodeTypes) {
       case 'addition':
         width = 70;
         height = nodeHeights[node.id];

@@ -120,8 +120,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
   const settings = nodeSettings[id] as AverageNodeSettings;
   let weightSum = 0;
   for (const key of Object.keys(settings.weights)) {
-    if (nodeValue.sources[key].value !== 'fail')
-      weightSum += settings.weights[key];
+    weightSum += settings.weights[key];
   }
 
   return (
@@ -129,7 +128,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
       style={{
         height: `${calculateHeight(handles)}px`,
         width: '200px',
-        border: error ? '1px solid #e00' : '1px solid #eee',
+        border: error ? '1px dashed #e00' : '1px solid #eee',
         padding: '10px',
         borderRadius: '5px',
         background: error ? '#fffafa' : 'white',
@@ -173,12 +172,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
               <th>value</th>
             </tr>
             {Object.entries(localSettings.weights).map(([key, weight]) => (
-              <tr
-                key={`tr-${id}-${key}`}
-                style={{
-                  backgroundColor: sources[key].value === 'fail' ? '#f003' : '',
-                }}
-              >
+              <tr key={`tr-${id}-${key}`}>
                 <td>
                   <input
                     style={{width: '40px'}}
@@ -192,8 +186,6 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
                   !(key in settings.weights) ||
                   weightSum === 0
                     ? 0
-                    : sources[key].value === 'fail'
-                    ? 'fail'
                     : Math.round(
                         (((sources[key].value as number) *
                           settings.weights[key]) /

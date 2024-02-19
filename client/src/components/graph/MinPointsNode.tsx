@@ -59,7 +59,7 @@ const MinPointsNode = ({id, data, isConnectable}: NodeProps) => {
       style={{
         height: '50px',
         width: '90px',
-        border: error ? '1px solid #e00' : '1px solid #eee',
+        border: error ? '1px dashed #e00' : '1px solid #eee',
         padding: '10px',
         borderRadius: '5px',
         background: error ? '#fffafa' : 'white',
@@ -81,8 +81,8 @@ const MinPointsNode = ({id, data, isConnectable}: NodeProps) => {
         />
       </div>
       <p style={{margin: 0, display: 'inline'}}>
-        {nodeValue.value === 'fail'
-          ? 'fail'
+        {nodeValue.value === 'reqfail'
+          ? 'reqfail'
           : Math.round(nodeValue.value * 100) / 100}
       </p>
       <Handle

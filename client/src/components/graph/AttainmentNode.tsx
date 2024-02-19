@@ -26,18 +26,16 @@ const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLocalValue(event.target.value);
 
-    if (
-      !/^\d+(?:\.\d+?)?$/.test(event.target.value) &&
-      event.target.value !== 'fail'
-    ) {
+    if (!/^\d+(?:\.\d+?)?$/.test(event.target.value)) {
       setError(true);
       return;
     }
     setError(false);
 
     const newNodeValues = {...nodeValues};
-    (newNodeValues[id] as AttainmentNodeValues).value =
-      event.target.value === 'fail' ? 'fail' : parseFloat(event.target.value);
+    (newNodeValues[id] as AttainmentNodeValues).value = parseFloat(
+      event.target.value
+    );
     setNodeValues(newNodeValues);
     setLocalValue(event.target.value);
   };
@@ -47,7 +45,7 @@ const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
       style={{
         height: '50px',
         width: '90px',
-        border: error ? '1px solid #e00' : '1px solid #eee',
+        border: error ? '1px dashed #e00' : '1px solid #eee',
         padding: '10px',
         borderRadius: '5px',
         background: error ? '#fffafa' : 'white',
@@ -58,6 +56,7 @@ const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
         <input
           style={{width: 'calc(90px - 20px)'}}
           onChange={handleChange}
+          type="number"
           value={localValue}
         />
       </div>

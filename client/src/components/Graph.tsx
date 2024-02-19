@@ -18,6 +18,14 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
+import AdditionNode from '../components/graph/AdditionNode';
+import AttanmentNode from '../components/graph/AttainmentNode';
+import AverageNode from '../components/graph/AverageNode';
+import GradeNode from '../components/graph/GradeNode';
+import MaxNode from '../components/graph/MaxNode';
+import MinPointsNode from '../components/graph/MinPointsNode';
+import RequireNode from '../components/graph/RequireNode';
+import StepperNode from '../components/graph/StepperNode';
 import {
   AllNodeSettings,
   DropInNodes,
@@ -25,9 +33,9 @@ import {
   NodeHeightsContext,
   NodeSettings,
   NodeSettingsContext,
+  CustomNodeTypes,
   NodeValues,
   NodeValuesContext,
-  nodeMap,
 } from '../context/GraphProvider';
 import {createO1, createSimpleGraph, createY1} from './graph/createGraph';
 import './graph/flow.css';
@@ -37,6 +45,17 @@ import {
   findDisconnectedEdges,
   initNode,
 } from './graph/graphUtil';
+
+const nodeMap = {
+  addition: AdditionNode,
+  attainment: AttanmentNode,
+  average: AverageNode,
+  grade: GradeNode,
+  max: MaxNode,
+  minpoints: MinPointsNode,
+  require: RequireNode,
+  stepper: StepperNode,
+};
 
 const Graph = (): JSX.Element => {
   const initValues = createSimpleGraph();
@@ -83,7 +102,6 @@ const Graph = (): JSX.Element => {
       console.log('Updating');
       const disconnectedEdges = findDisconnectedEdges(
         nodeValues,
-        nodeSettings,
         nodes,
         newEdges || edges
       );
@@ -139,6 +157,15 @@ const Graph = (): JSX.Element => {
 
   const isValidConnection = useCallback(
     (connection: Connection) => {
+      const typeMap: {[key: string]: CustomNodeTypes} = {};
+      for (const node of nodes) typeMap[node.id] = node.type as CustomNodeTypes;
+      if (
+        typeMap[connection.source as string] === 'minpoints' &&
+        typeMap[connection.target as string] !== 'require'
+      ) {
+        return false;
+      }
+
       const target = nodes.find(node => node.id === connection.target) as Node;
       const outgoers: {[key: string]: Node[]} = {};
       for (const edge of edges) {

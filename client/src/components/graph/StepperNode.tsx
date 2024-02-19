@@ -163,7 +163,7 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
       style={{
         height: `${nodeMinHeight + rowHeight * localSettings.numSteps}px`,
         width: '270px',
-        border: error ? '1px solid #e00' : '1px solid #eee',
+        border: error ? '1px dashed #e00' : '1px solid #eee',
         padding: '10px',
         borderRadius: '5px',
         background: error ? '#fffafa' : 'white',

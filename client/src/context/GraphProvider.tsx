@@ -4,27 +4,6 @@
 
 import {Dispatch, SetStateAction, createContext} from 'react';
 
-import AdditionNode from '../components/graph/AdditionNode';
-import AttanmentNode from '../components/graph/AttainmentNode';
-import AverageNode from '../components/graph/AverageNode';
-import GradeNode from '../components/graph/GradeNode';
-import MaxNode from '../components/graph/MaxNode';
-import MinPointsNode from '../components/graph/MinPointsNode';
-import RequireNode from '../components/graph/RequireNode';
-import StepperNode from '../components/graph/StepperNode';
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const nodeMap = {
-  addition: AdditionNode,
-  attainment: AttanmentNode,
-  average: AverageNode,
-  grade: GradeNode,
-  max: MaxNode,
-  minpoints: MinPointsNode,
-  require: RequireNode,
-  stepper: StepperNode,
-};
-
 // Node values
 export type DropInNodes =
   | 'addition'
@@ -34,20 +13,20 @@ export type DropInNodes =
   | 'require'
   | 'stepper';
 
-export type NodeTypes = DropInNodes | 'attainment' | 'grade';
+export type CustomNodeTypes = DropInNodes | 'attainment' | 'grade';
 
 export type AdditionNodeValues = {
   type: 'addition';
-  sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
+  sources: {[key: string]: {isConnected: boolean; value: number}};
   value: number;
 };
 export type AttainmentNodeValues = {
   type: 'attainment';
-  value: number | 'fail';
+  value: number;
 };
 export type AverageNodeValues = {
   type: 'average';
-  sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
+  sources: {[key: string]: {isConnected: boolean; value: number}};
   value: number;
 };
 export type GradeNodeValues = {
@@ -57,18 +36,19 @@ export type GradeNodeValues = {
 };
 export type MaxNodeValues = {
   type: 'max';
-  sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
-  value: number | 'fail';
+  sources: {[key: string]: {isConnected: boolean; value: number}};
+  value: number;
 };
 export type MinPointsNodeValues = {
   type: 'minpoints';
-  source: number | 'fail';
-  value: number | 'fail';
+  source: number;
+  value: number | 'reqfail';
 };
 export type RequireNodeValues = {
   type: 'require';
-  sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
-  values: {[key: string]: number | 'fail'};
+  sources: {[key: string]: {isConnected: boolean; value: number | 'reqfail'}};
+  values: {[key: string]: number};
+  courseFail: boolean;
 };
 export type StepperNodeValues = {
   type: 'stepper';
@@ -102,13 +82,14 @@ export type AverageNodeSettings = {
   weights: {[key: string]: number};
 };
 export type MaxNodeSettings = {
-  minValue: number | 'fail';
+  minValue: number;
 };
 export type MinPointsNodeSettings = {
   minPoints: number;
 };
 export type RequireNodeSettings = {
-  numMissing: number;
+  numFail: number;
+  failSetting: 'ignore' | 'coursefail';
 };
 export type StepperNodeSettings = {
   numSteps: number;

@@ -2,7 +2,7 @@ import {Edge, Node} from 'reactflow';
 import {
   AllNodeSettings,
   AverageNodeSettings,
-  NodeTypes,
+  CustomNodeTypes,
   NodeValues,
 } from '../../context/GraphProvider';
 import {getInitNodeValues} from './graphUtil';
@@ -15,7 +15,7 @@ const sortNodes = (node1: Node, node2: Node): number => {
   return 0;
 };
 const createNode = (
-  type: NodeTypes,
+  type: CustomNodeTypes,
   label: string,
   x: number,
   y: number
@@ -129,7 +129,7 @@ export const createO1 = (): {
     createEdge('Tier C', 'Sum C', undefined, '0'),
     createEdge('Best Grade', 'Final Grade'),
   ];
-  const nodeSettings: AllNodeSettings = {'best-grade': {minValue: 'fail'}};
+  const nodeSettings: AllNodeSettings = {'best-grade': {minValue: 0}};
 
   const courseGrades = [
     [2000, 0, 0],
@@ -181,7 +181,10 @@ export const createO1 = (): {
         '2'
       )
     );
-    nodeSettings[`require-all-3-grade-${i + 1}`] = {numMissing: 0};
+    nodeSettings[`require-all-3-grade-${i + 1}`] = {
+      numFail: 0,
+      failSetting: 'ignore',
+    };
 
     nodes.push(
       createNode('stepper', `Convert To Grade ${i + 1}`, 400, i * 100)
@@ -233,7 +236,9 @@ export const createY1 = (): {
     );
   }
 
-  const nodeSettings: AllNodeSettings = {'can-fail-3': {numMissing: 3}};
+  const nodeSettings: AllNodeSettings = {
+    'can-fail-3': {numFail: 3, failSetting: 'coursefail'},
+  };
   const nodeValues = getInitNodeValues(nodes);
 
   return {nodes: nodes.toSorted(sortNodes), edges, nodeSettings, nodeValues};

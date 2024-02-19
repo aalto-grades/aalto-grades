@@ -13,14 +13,14 @@ import {
   RequireNodeValues,
 } from '../../context/GraphProvider';
 
-type LocalSettings = {numMissing: string};
-const initialSettings = {numMissing: 0};
+type LocalSettings = {numFail: string; failSetting: 'ignore' | 'coursefail'};
+const initialSettings = {numFail: 0, failSetting: 'courseFail'};
 
-const nodeMinHeight = 78.683;
-const handleStartHeight = 83 + 33.9;
+const nodeMinHeight = 180.93 - 33.9;
+const handleStartHeight = nodeMinHeight - 10 + 33.9;
 const rowHeight = 33.9;
 const calculateHeight = (handles: string[]) =>
-  nodeMinHeight + (handles.length + 2) * rowHeight;
+  nodeMinHeight + (handles.length + 1) * rowHeight;
 
 const RequireNode = ({id, data, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
@@ -40,7 +40,7 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
 
   useEffect(() => {
     if (init) return;
-    setLocalSettings({numMissing: settings.numMissing.toString()});
+    setLocalSettings({...settings, numFail: settings.numFail.toString()});
     setNodeHeights(id, calculateHeight(handles));
     setError(false);
     setInit(true);
@@ -70,30 +70,63 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const newLocalSettings = {...localSettings};
-    newLocalSettings.numMissing = event.target.value;
+    newLocalSettings.numFail = event.target.value;
     setLocalSettings(newLocalSettings);
 
     if (
       !/^\d+$/.test(event.target.value) ||
-      parseInt(event.target.value) >= handles.length
+      parseInt(event.target.value) > handles.length
     ) {
       setError(true);
       return;
     }
     setError(false);
     setLocalSettings(newLocalSettings);
-    setNodeSettings(id, {numMissing: parseInt(newLocalSettings.numMissing)});
+    setNodeSettings(id, {
+      ...newLocalSettings,
+      numFail: parseInt(newLocalSettings.numFail),
+    });
   };
+
+  const handleSelectChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ): void => {
+    if (localSettings.failSetting === event.target.value) return;
+    const newLocalSettings = {
+      ...localSettings,
+      failSetting: event.target.value as 'ignore' | 'coursefail',
+    };
+    setLocalSettings(newLocalSettings);
+    if (
+      /^\d+$/.test(newLocalSettings.numFail) &&
+      parseInt(newLocalSettings.numFail) <= handles.length
+    ) {
+      setNodeSettings(id, {
+        ...newLocalSettings,
+        numFail: parseInt(newLocalSettings.numFail),
+      });
+    }
+  };
+
+  const numFail = Object.values(nodeValue.sources).reduce(
+    (sum, source) =>
+      source.isConnected && source.value === 'reqfail' ? sum + 1 : sum,
+    0
+  );
 
   return (
     <div
       style={{
         height: `${calculateHeight(handles)}px`,
-        width: '90px',
-        border: error ? '1px solid #e00' : '1px solid #eee',
+        width: '130px',
+        border: nodeValue.courseFail
+          ? '2px solid #e00'
+          : error
+          ? '1px dashed #e00'
+          : '1px solid #eee',
         padding: '10px',
         borderRadius: '5px',
-        background: error ? '#fffafa' : 'white',
+        background: nodeValue.courseFail || error ? '#fffafa' : 'white',
       }}
     >
       <h4 style={{margin: 0}}>{data.label}</h4>
@@ -122,22 +155,24 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
         id={nextFree.toString()}
         isConnectable={isConnectable}
       />
+      <label>On fail</label>
+      <select onChange={handleSelectChange} value={localSettings.failSetting}>
+        <option value="zeroes">Output zeroes</option>
+        <option value="coursefail">Fail course</option>
+      </select>
+      <label>Allowed Fails</label>
+      <input
+        style={{width: 'calc(100% - 20px)'}}
+        type="number"
+        onChange={handleChange}
+        value={localSettings.numFail}
+      />
       <table style={{width: '100%', margin: '5px 0px'}}>
         <tbody>
           <tr>
-            <th>value</th>
+            <th>in</th>
+            <th>out</th>
           </tr>
-          <tr style={{height: rowHeight}}>
-            <td>
-              <input
-                style={{width: 'calc(100% - 20px)'}}
-                type="number"
-                onChange={handleChange}
-                value={localSettings.numMissing}
-              />
-            </td>
-          </tr>
-
           {Object.entries(nodeValue.sources)
             .filter(([_, source]) => source.isConnected)
             .map(([key, source]) => (
@@ -145,13 +180,19 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
                 key={`tr-${id}-${key}`}
                 style={{
                   height: rowHeight,
-                  backgroundColor: source.value === 'fail' ? '#f003' : '',
+                  backgroundColor: source.value === 'reqfail' ? '#f003' : '',
                 }}
               >
                 <td>{source.value}</td>
+                <td>
+                  {numFail > settings.numFail || source.value === 'reqfail'
+                    ? 0
+                    : source.value}
+                </td>
               </tr>
             ))}
           <tr style={{height: rowHeight}}>
+            <td></td>
             <td></td>
           </tr>
         </tbody>

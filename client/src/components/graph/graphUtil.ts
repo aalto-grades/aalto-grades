@@ -9,14 +9,15 @@ import {
   MaxNodeSettings,
   MinPointsNodeSettings,
   NodeSettings,
-  NodeTypes,
+  CustomNodeTypes,
   NodeValue,
   NodeValues,
+  RequireNodeSettings,
   StepperNodeSettings,
 } from '../../context/GraphProvider';
 
 export const initNode = (
-  type: NodeTypes
+  type: CustomNodeTypes
 ): {value: NodeValue; settings?: NodeSettings} => {
   switch (type) {
     case 'addition':
@@ -33,7 +34,7 @@ export const initNode = (
     case 'max':
       return {
         value: {type, sources: {}, value: 0},
-        settings: {minValue: 'fail'},
+        settings: {minValue: 0},
       };
     case 'minpoints':
       return {
@@ -42,8 +43,8 @@ export const initNode = (
       };
     case 'require':
       return {
-        value: {type, sources: {}, values: {}},
-        settings: {numMissing: 0},
+        value: {type, sources: {}, values: {}, courseFail: false},
+        settings: {numFail: 0, failSetting: 'ignore'},
       };
     case 'stepper':
       return {
@@ -59,7 +60,7 @@ export const initNode = (
 export const getInitNodeValues = (nodes: Node[]) => {
   const initNodeValues: NodeValues = {};
   for (const node of nodes) {
-    initNodeValues[node.id] = initNode(node.type as NodeTypes).value;
+    initNodeValues[node.id] = initNode(node.type as CustomNodeTypes).value;
   }
   return initNodeValues;
 };
@@ -72,9 +73,8 @@ const setNodeValue = (
   switch (nodeValue.type) {
     case 'addition': {
       let sum = 0;
-      for (const source of Object.values(nodeValue.sources)) {
-        if (source.value !== 'fail') sum += source.value;
-      }
+      for (const source of Object.values(nodeValue.sources))
+        sum += source.value;
       nodeValue.value = sum;
       break;
     }
@@ -87,7 +87,7 @@ const setNodeValue = (
       for (const key of Object.keys(settings.weights)) {
         if (!(key in nodeValue.sources)) continue;
         const source = nodeValue.sources[key];
-        if (source.value === 'fail' || !source.isConnected) continue;
+        if (!source.isConnected) continue;
         valueSum += source.value * settings.weights[key];
         weightSum += settings.weights[key];
       }
@@ -99,28 +99,36 @@ const setNodeValue = (
       break;
     case 'max': {
       const settings = nodeSettings[nodeId] as MaxNodeSettings;
-      let maxValue = settings.minValue === 'fail' ? -1 : settings.minValue;
+      let maxValue = settings.minValue;
 
       for (const value of Object.values(nodeValue.sources)) {
-        if (value.isConnected && value.value !== 'fail')
-          maxValue = Math.max(maxValue, value.value);
+        if (value.isConnected) maxValue = Math.max(maxValue, value.value);
       }
-      nodeValue.value = maxValue === -1 ? 'fail' : maxValue;
+      nodeValue.value = maxValue;
       break;
     }
     case 'minpoints': {
       const settings = nodeSettings[nodeId] as MinPointsNodeSettings;
-      if (nodeValue.source === 'fail' || nodeValue.source < settings.minPoints)
-        nodeValue.value = 'fail';
+      if (nodeValue.source < settings.minPoints) nodeValue.value = 'reqfail';
       else nodeValue.value = nodeValue.source;
       break;
     }
-    case 'require':
-      // TODO: Stop if too many fails
+    case 'require': {
+      const settings = nodeSettings[nodeId] as RequireNodeSettings;
+      let numFail = 0;
       for (const [nodeId, source] of Object.entries(nodeValue.sources)) {
-        if (source.isConnected) nodeValue.values[nodeId] = source.value;
+        if (!source.isConnected) continue;
+        nodeValue.values[nodeId] =
+          source.value === 'reqfail' ? 0 : source.value;
+        if (source.value === 'reqfail') numFail++;
+      }
+      if (settings.failSetting === 'coursefail' && numFail > settings.numFail) {
+        nodeValue.courseFail = true;
+      } else {
+        nodeValue.courseFail = false;
       }
       break;
+    }
     case 'stepper': {
       const settings = nodeSettings[nodeId] as StepperNodeSettings;
       for (let i = 0; i < settings.numSteps; i++) {
@@ -142,7 +150,6 @@ const setNodeValue = (
 
 export const findDisconnectedEdges = (
   oldNodeValues: NodeValues,
-  nodeSettings: AllNodeSettings,
   nodes: Node[],
   edges: Edge[]
 ) => {
@@ -257,11 +264,18 @@ export const calculateNewNodeValues = (
     }
   }
 
+  let courseFail = false;
   while (noSources.length > 0) {
     const sourceId = noSources.pop() as string;
     setNodeValue(sourceId, newNodeValues[sourceId], nodeSettings);
     const sourceNodeValue = newNodeValues[sourceId];
 
+    if (
+      (sourceNodeValue.type === 'require' && sourceNodeValue.courseFail) ||
+      courseFail
+    ) {
+      courseFail = true;
+    }
     if (!(sourceId in nodeTargets)) continue;
 
     for (const edge of nodeTargets[sourceId]) {
@@ -278,11 +292,9 @@ export const calculateNewNodeValues = (
         case 'attainment':
           throw new Error('Should not happen');
         case 'minpoints':
-          nodeValue.source = sourceValue;
-          break;
         case 'grade':
         case 'stepper':
-          nodeValue.source = sourceValue === 'fail' ? 0 : sourceValue;
+          nodeValue.source = sourceValue as number;
           break;
         case 'addition':
         case 'average':
@@ -296,5 +308,12 @@ export const calculateNewNodeValues = (
       }
     }
   }
+  if (courseFail) {
+    for (const node of nodes) {
+      const nodeValue = newNodeValues[node.id];
+      if (nodeValue.type === 'grade') nodeValue.value = 0;
+    }
+  }
+
   return newNodeValues;
 };
