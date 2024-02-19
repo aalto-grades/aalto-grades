@@ -16,7 +16,7 @@ export const formatGraph = async (
     switch (node.type as NodeTypes) {
       case 'addition':
         width = 70;
-        height = 50;
+        height = nodeHeights[node.id];
         break;
       case 'attainment':
         width = 90;
@@ -65,6 +65,7 @@ export const formatGraph = async (
     children: nodesForElk.map(node => {
       const nodevalue = nodeValues[node.id];
       if (
+        nodevalue.type !== 'addition' &&
         nodevalue.type !== 'average' &&
         nodevalue.type !== 'max' &&
         nodevalue.type !== 'require'

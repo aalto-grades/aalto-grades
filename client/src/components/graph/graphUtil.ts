@@ -20,13 +20,13 @@ export const initNode = (
 ): {value: NodeValue; settings?: NodeSettings} => {
   switch (type) {
     case 'addition':
-      return {value: {type, sourceSum: 0, value: 0}};
+      return {value: {type, sources: {}, value: 0}};
     case 'attainment':
       return {value: {type, value: Math.round(Math.random() * 10)}};
     case 'average':
       return {
         value: {type, sources: {}, value: 0},
-        settings: {weights: {}, nextFree: 100},
+        settings: {weights: {}},
       };
     case 'grade':
       return {value: {type, source: 0, value: 0}};
@@ -36,7 +36,10 @@ export const initNode = (
         settings: {minValue: 'fail'},
       };
     case 'minpoints':
-      return {value: {type, source: 0, value: 0}, settings: {minPoints: 0}};
+      return {
+        value: {type, source: 0, value: 0},
+        settings: {minPoints: 0},
+      };
     case 'require':
       return {
         value: {type, sources: {}, values: {}},
@@ -67,9 +70,14 @@ const setNodeValue = (
   nodeSettings: AllNodeSettings
 ): void => {
   switch (nodeValue.type) {
-    case 'addition':
-      nodeValue.value = nodeValue.sourceSum;
+    case 'addition': {
+      let sum = 0;
+      for (const source of Object.values(nodeValue.sources)) {
+        if (source.value !== 'fail') sum += source.value;
+      }
+      nodeValue.value = sum;
       break;
+    }
     case 'attainment':
       break; // Not needed
     case 'average': {
@@ -164,8 +172,6 @@ export const calculateNewNodeValues = (
         nodeValue.source = 0;
         break;
       case 'addition':
-        nodeValue.sourceSum = 0;
-        break;
       case 'average':
       case 'max':
       case 'require':
@@ -209,8 +215,6 @@ export const calculateNewNodeValues = (
           nodeValue.source = sourceValue === 'fail' ? 0 : sourceValue;
           break;
         case 'addition':
-          nodeValue.sourceSum += sourceValue === 'fail' ? 0 : sourceValue;
-          break;
         case 'average':
         case 'max':
         case 'require':

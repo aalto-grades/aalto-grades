@@ -50,12 +50,8 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
     let change = false;
     let numNew = 0;
     let newHandles = [...handles];
-    console.log(newHandles);
     for (const [key, source] of Object.entries(nodeValue.sources)) {
       if (!newHandles.includes(key)) {
-        console.log(
-          `'${JSON.stringify([key])}' is not in ${JSON.stringify(newHandles)}`
-        );
         numNew++;
         newHandles.push(key);
         change = true;
@@ -65,7 +61,6 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
         change = true;
       }
     }
-    console.log(newHandles);
     if (change) {
       setHandles(newHandles);
       setNextFree(oldNextFree => oldNextFree + numNew);

@@ -132,12 +132,9 @@ const Graph = (): JSX.Element => {
           nodes.find(node => node.id === edge.target) as Node
         );
 
-        if (target.type === 'addition') continue; // TODO: change in the future
-
         if (!connection.targetHandle && edge.target === connection.target) {
           return false;
-        }
-        if (
+        } else if (
           edge.target === connection.target &&
           edge.targetHandle &&
           edge.targetHandle === connection.targetHandle

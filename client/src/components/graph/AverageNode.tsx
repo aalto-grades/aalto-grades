@@ -13,28 +13,18 @@ import {
   NodeValuesContext,
 } from '../../context/GraphProvider';
 
-type LocalSettings = {
-  weights: {[key: string]: string};
-  nextFree: number;
-};
-const initialSettings = {
-  weights: {},
-  nextFree: 100,
-};
+type LocalSettings = {weights: {[key: string]: string}};
 
 const nodeMinHeight = 78.683;
 const handleStartHeight = 83;
 const rowHeight = 33.9;
-const calculateHeight = (localSettings: LocalSettings | AverageNodeSettings) =>
-  nodeMinHeight + (Object.keys(localSettings.weights).length + 1) * rowHeight;
+const calculateHeight = (handles: string[]) =>
+  nodeMinHeight + (handles.length + 1) * rowHeight;
 
 const convertSettingsToFloats = (
   settings: LocalSettings
 ): AverageNodeSettings => {
-  const nodeSettings: AverageNodeSettings = {
-    weights: {},
-    nextFree: settings.nextFree,
-  };
+  const nodeSettings: AverageNodeSettings = {weights: {}};
   for (const [key, value] of Object.entries(settings.weights))
     nodeSettings.weights[key] = parseFloat(value);
   return nodeSettings;
@@ -42,10 +32,7 @@ const convertSettingsToFloats = (
 const convertSettingsToStrings = (
   settings: AverageNodeSettings
 ): LocalSettings => {
-  const nodeSettings: LocalSettings = {
-    weights: {},
-    nextFree: settings.nextFree,
-  };
+  const nodeSettings: LocalSettings = {weights: {}};
   for (const [key, value] of Object.entries(settings.weights))
     nodeSettings.weights[key] = value.toString();
   return nodeSettings;
@@ -61,9 +48,13 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
   const {setNodeHeight} = useContext(NodeHeightsContext);
-  const [localSettings, setLocalSettings] = useState<LocalSettings>(
-    JSON.parse(JSON.stringify(initialSettings))
-  );
+
+  const [localSettings, setLocalSettings] = useState<LocalSettings>({
+    weights: {},
+  });
+
+  const [handles, setHandles] = useState<string[]>([]);
+  const [nextFree, setNextFree] = useState<number>(0);
   const [error, setError] = useState<boolean>(false);
   const [init, setInit] = useState<boolean>(false);
 
@@ -73,37 +64,38 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
     if (init) return;
     const initSettings = nodeSettings[id] as AverageNodeSettings;
     setLocalSettings(convertSettingsToStrings(initSettings));
-    setNodeHeight(id, calculateHeight(initSettings));
     setError(false);
     setInit(true);
   }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Check for new or removed
   useEffect(() => {
     if (!init) return;
+    let change = false;
+    let maxId = 0;
+    let newHandles = [...handles];
     const newLocalSettings = {...localSettings};
-    const sources = nodeValue.sources;
-    for (const [key, source] of Object.entries(sources)) {
-      if (!(key in localSettings.weights)) {
-        newLocalSettings.weights[key] = '';
-        newLocalSettings.nextFree++;
+    for (const [key, source] of Object.entries(nodeValue.sources)) {
+      maxId = Math.max(maxId, parseInt(key));
+      if (!handles.includes(key)) {
+        if (!(key in newLocalSettings.weights))
+          newLocalSettings.weights[key] = '';
+        newHandles.push(key);
+        change = true;
       }
       if (!source.isConnected) {
-        delete sources[key];
+        newHandles = newHandles.filter(handle => handle !== key);
         delete newLocalSettings.weights[key];
+        change = true;
       }
     }
-
-    setLocalSettings(newLocalSettings);
-    setNodeHeight(id, calculateHeight(newLocalSettings));
-    const newError = checkError(newLocalSettings);
-    if (newError) {
-      setError(true);
-      return;
+    if (change) {
+      setHandles(newHandles);
+      setLocalSettings(newLocalSettings);
+      setError(checkError(newLocalSettings));
+      setNodeSettings(id, convertSettingsToFloats(newLocalSettings));
+      setNextFree(maxId + 1);
+      setNodeHeight(id, calculateHeight(newHandles));
     }
-    setError(false);
-
-    setNodeSettings(id, convertSettingsToFloats(newLocalSettings));
   }, [nodeValues, init]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (
@@ -135,7 +127,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
   return (
     <div
       style={{
-        height: `${calculateHeight(localSettings)}px`,
+        height: `${calculateHeight(handles)}px`,
         width: '200px',
         border: error ? '1px solid #e00' : '1px solid #eee',
         padding: '10px',
@@ -145,9 +137,9 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
     >
       <div>
         <h4 style={{margin: 0}}>{data.label}</h4>
-        {Object.keys(localSettings.weights).map((key, index) => (
+        {handles.map((handleId, index) => (
           <Handle
-            key={`handle-${id}-${key}`}
+            key={`handle-${id}-${handleId}`}
             type="target"
             style={{
               height: '12px',
@@ -155,7 +147,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
               top: `${handleStartHeight + index * rowHeight}px`,
             }}
             position={Position.Left}
-            id={key}
+            id={handleId}
             isConnectable={isConnectable}
           />
         ))}
@@ -170,7 +162,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
             }px`,
           }}
           position={Position.Left}
-          id={localSettings.nextFree.toString()}
+          id={nextFree.toString()}
           isConnectable={isConnectable}
         />
 

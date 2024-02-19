@@ -38,7 +38,7 @@ export type NodeTypes = DropInNodes | 'attainment' | 'grade';
 
 export type AdditionNodeValues = {
   type: 'addition';
-  sourceSum: number;
+  sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
   value: number;
 };
 export type AttainmentNodeValues = {
@@ -100,7 +100,6 @@ export const NodeValuesContext = createContext<NodeValuesContext>(
 // Node settings
 export type AverageNodeSettings = {
   weights: {[key: string]: number};
-  nextFree: number;
 };
 export type MaxNodeSettings = {
   minValue: number | 'fail';

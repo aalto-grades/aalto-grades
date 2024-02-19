@@ -24,7 +24,7 @@ const calculateHeight = (handles: string[]) =>
 
 const MaxNode = ({id, data, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
-  const {setNodeHeight: setNodeHeights} = useContext(NodeHeightsContext);
+  const {setNodeHeight} = useContext(NodeHeightsContext);
   const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
 
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
@@ -41,16 +41,18 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
     if (init) return;
     const initSettings = nodeSettings[id] as MaxNodeSettings;
     setLocalSettings({minValue: initSettings.minValue.toString()});
-    setNodeHeights(id, calculateHeight(handles));
+    setNodeHeight(id, calculateHeight(handles));
     setError(false);
     setInit(true);
   }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     let change = false;
+    let maxId = 0;
     let newHandles = [...handles];
     for (const [key, source] of Object.entries(nodeValue.sources)) {
-      if (!(key in handles)) {
+      maxId = Math.max(maxId, parseInt(key));
+      if (!handles.includes(key)) {
         newHandles.push(key);
         change = true;
       }
@@ -61,8 +63,8 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
     }
     if (change) {
       setHandles(newHandles);
-      setNextFree(nextFree + 1);
-      setNodeHeights(id, calculateHeight(handles));
+      setNextFree(maxId + 1);
+      setNodeHeight(id, calculateHeight(newHandles));
     }
   }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -108,9 +110,9 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
       }}
     >
       <h4 style={{margin: 0}}>{data.label}</h4>
-      {handles.map((key, index) => (
+      {handles.map((handleId, index) => (
         <Handle
-          key={`handle-${id}-${key}`}
+          key={`handle-${id}-${handleId}`}
           type="target"
           style={{
             height: '12px',
@@ -118,7 +120,7 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
             top: `${handleStartHeight + index * rowHeight}px`,
           }}
           position={Position.Left}
-          id={key}
+          id={handleId}
           isConnectable={isConnectable}
         />
       ))}

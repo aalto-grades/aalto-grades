@@ -7,6 +7,13 @@ import {
 } from '../../context/GraphProvider';
 import {getInitNodeValues} from './graphUtil';
 
+const sortNodes = (node1: Node, node2: Node): number => {
+  if (node1.position.x < node2.position.x) return -1;
+  else if (node1.position.x > node2.position.x) return 1;
+  else if (node1.position.y < node2.position.y) return -1;
+  else if (node1.position.y > node2.position.y) return 1;
+  return 0;
+};
 const createNode = (
   type: NodeTypes,
   label: string,
@@ -54,13 +61,14 @@ export const createSimpleGraph = (
 
   for (let i = 0; i < NUM_SIMPLE_EXERCISES; i++) {
     nodes.push(createNode('attainment', `Exercise ${i + 1}`, 0, 15 + i * 100));
-    if (useAverage) {
-      edges.push(
-        createEdge(`Exercise ${i + 1}`, 'Average', undefined, i.toString())
-      );
-    } else {
-      edges.push(createEdge(`Exercise ${i + 1}`, 'Addition'));
-    }
+    edges.push(
+      createEdge(
+        `Exercise ${i + 1}`,
+        useAverage ? 'Average' : 'Addition',
+        undefined,
+        i.toString()
+      )
+    );
   }
 
   const nodeSettings: AllNodeSettings = {
@@ -75,7 +83,7 @@ export const createSimpleGraph = (
           outputValues: [0, 1, 2, 3, 4, 5],
           middlePoints: [17, 33, 50, 67, 83],
         },
-    average: {weights: {}, nextFree: 100},
+    average: {weights: {}},
   };
 
   if (useAverage) {
@@ -93,7 +101,7 @@ export const createSimpleGraph = (
 
   const nodeValues = getInitNodeValues(nodes);
 
-  return {nodes, edges, nodeSettings, nodeValues};
+  return {nodes: nodes.toSorted(sortNodes), edges, nodeSettings, nodeValues};
 };
 
 export const createO1 = (): {
@@ -113,12 +121,12 @@ export const createO1 = (): {
     createNode('grade', 'Final Grade', 600, 0),
   ];
   const edges: Edge[] = [
-    createEdge('Tier A', 'Sum ABC'),
-    createEdge('Tier B', 'Sum ABC'),
-    createEdge('Tier C', 'Sum ABC'),
-    createEdge('Tier B', 'Sum BC'),
-    createEdge('Tier C', 'Sum BC'),
-    createEdge('Tier C', 'Sum C'),
+    createEdge('Tier A', 'Sum ABC', undefined, '0'),
+    createEdge('Tier B', 'Sum ABC', undefined, '1'),
+    createEdge('Tier C', 'Sum ABC', undefined, '2'),
+    createEdge('Tier B', 'Sum BC', undefined, '0'),
+    createEdge('Tier C', 'Sum BC', undefined, '1'),
+    createEdge('Tier C', 'Sum C', undefined, '0'),
     createEdge('Best Grade', 'Final Grade'),
   ];
   const nodeSettings: AllNodeSettings = {'best-grade': {minValue: 'fail'}};
@@ -202,7 +210,7 @@ export const createO1 = (): {
   }
 
   const nodeValues = getInitNodeValues(nodes);
-  return {nodes, edges, nodeSettings, nodeValues};
+  return {nodes: nodes.toSorted(sortNodes), edges, nodeSettings, nodeValues};
 };
 
 export const createY1 = (): {
@@ -228,5 +236,5 @@ export const createY1 = (): {
   const nodeSettings: AllNodeSettings = {'can-fail-3': {numMissing: 3}};
   const nodeValues = getInitNodeValues(nodes);
 
-  return {nodes, edges, nodeSettings, nodeValues};
+  return {nodes: nodes.toSorted(sortNodes), edges, nodeSettings, nodeValues};
 };
