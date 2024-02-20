@@ -61,3 +61,50 @@ test('Add course', async ({page}) => {
     page.getByRole('cell', {name: 'testcourse'}).nth(1)
   ).toBeVisible();
 });
+
+test('Edit course', async ({page}) => {
+  await page.getByRole('cell', {name: 'Programming 2'}).click();
+  await page.getByRole('button', {name: 'Edit Course'}).click();
+  await page.getByLabel('Course Code*').click();
+  await page.getByLabel('Course Code*').fill('CS-A1120 - edit');
+  await page.getByLabel('Course Code*').press('Tab');
+  await page.getByLabel('Course Name in English*').fill('Programming 2 - edit');
+  await page.getByLabel('Course Name in Finnish*').click();
+  await page.getByLabel('Course Name in Finnish*').fill('Ohjelmointi 2 - edit');
+  await page.getByLabel('Course Name in Finnish*').press('Tab');
+  await page
+    .getByLabel('Course Name in Swedish*')
+    .fill('Programmering 2 - edit');
+  await page.getByLabel('Course Name in Swedish*').press('Tab');
+  await page
+    .getByLabel('Organizing department in English*')
+    .fill('Department of Computer Science - edit');
+  await page.getByLabel('Organizing department in English*').press('Tab');
+  await page
+    .getByLabel('Organizing department in Finnish*')
+    .fill('Tietotekniikan laitos - edit');
+  await page.getByLabel('Organizing department in Finnish*').press('Tab');
+  await page
+    .getByLabel('Organizing department in Swedish*')
+    .fill('Institutionen för datateknik - edit');
+  await page.getByLabel('Minimum Course Credits (ECTS)*').dblclick();
+  await page.getByLabel('Maximum Course Credits (ECTS)*').click();
+  await page.getByLabel('Maximum Course Credits (ECTS)*').fill('6');
+  await page.getByLabel('Grading Scale*').click();
+  await page.getByRole('option', {name: 'Pass-Fail'}).click();
+  await page.getByLabel('Course language*').click();
+  await page.getByRole('option', {name: 'Chinese'}).click();
+  await page.getByLabel('Teachers In Charge*').click();
+  await page.getByLabel('Teachers In Charge*').fill('ester.gross@aalto.fi');
+  await page.getByRole('button', {name: 'Add'}).click();
+  await page.getByRole('button', {name: 'Submit'}).click();
+  await page.getByRole('link', {name: 'Aalto Grades'}).click();
+  await page.getByRole('cell', {name: 'Programming 2'}).click();
+  await expect(page.getByText('Ester Gross')).toBeVisible();
+  await expect(
+    page.getByRole('heading', {name: 'CS-A1120 - edit'})
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', {name: 'Programming 2 - edit'})
+  ).toBeVisible();
+});
