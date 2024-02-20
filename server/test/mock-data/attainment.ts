@@ -4,8 +4,6 @@
 
 import {AttainmentData, Formula, GradeType} from '@common/types';
 
-import Attainment from '../../src/database/models/attainment';
-
 export const mockAttainment: AttainmentData = {
   id: 1,
   name: 'optional-exercises',
@@ -185,21 +183,3 @@ export const mockAttainment: AttainmentData = {
     },
   ],
 };
-
-export const jestMockAttainment: Attainment = new Attainment(
-  {
-    id: 1,
-    assessmentModelId: 7,
-    parentId: 1,
-    name: 'xxx',
-    daysValid: 365,
-    minRequiredGrade: 1,
-    maxGrade: 5,
-    formula: Formula.Manual,
-    formulaParams: {},
-    gradeType: GradeType.Float,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {isNewRecord: false}
-);

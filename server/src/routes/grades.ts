@@ -10,7 +10,6 @@ import path from 'path';
 
 import {
   addGrades,
-  calculateGrades,
   editUserGrade,
   getCsvTemplate,
   getFinalGrades,
@@ -96,8 +95,8 @@ router.post(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/calculate',
   passport.authenticate('jwt', {session: false}),
   express.json(),
-  handleInvalidRequestJson,
-  controllerDispatcher(calculateGrades)
+  handleInvalidRequestJson
+  // controllerDispatcher(calculateGrades)
 );
 
 router.put(

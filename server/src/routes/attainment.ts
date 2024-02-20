@@ -9,7 +9,6 @@ import {
   addAttainment,
   deleteAttainment,
   updateAttainment,
-  getRootAttainment,
   getAttainment,
   getAttainments,
 } from '../controllers/attainment';

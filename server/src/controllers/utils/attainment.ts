@@ -59,9 +59,7 @@ export async function findAttainmentGradeById(
  * with a message indicating that attainments were not found for the assessment
  * model.
  */
-export async function findAttainmentsByCourseId(
-  courseId: number
-): Promise<Array<AttainmentData>> {
+export async function findAttainmentsByCourseId(courseId: number) {
   console.log(courseId);
   const attainments: Array<Attainment> = await Attainment.findAll({
     where: {
@@ -77,22 +75,14 @@ export async function findAttainmentsByCourseId(
     );
   }
 
-  const attainmentData: Array<AttainmentData> = attainments.map(
-    (attainment: Attainment) => {
-      return {
-        id: attainment.id,
-        courseId: attainment.courseId,
-        parentId: attainment.parentId,
-        name: attainment.name,
-        daysValid: attainment.daysValid,
-        minRequiredGrade: attainment.minRequiredGrade,
-        maxGrade: attainment.maxGrade,
-        formula: attainment.formula,
-        formulaParams: attainment.formulaParams,
-        gradeType: attainment.gradeType,
-      };
-    }
-  );
+  const attainmentData = attainments.map((attainment: Attainment) => {
+    return {
+      id: attainment.id,
+      courseId: attainment.courseId,
+      name: attainment.name,
+      daysValid: attainment.daysValid,
+    };
+  });
 
   return attainmentData;
 }

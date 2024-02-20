@@ -132,6 +132,10 @@ export default {
             type: DataTypes.STRING,
             allowNull: false,
           },
+          graph_structure: {
+            type: DataTypes.JSONB,
+            allowNull: true,
+          },
           created_at: DataTypes.DATE,
           updated_at: DataTypes.DATE,
         },

@@ -116,6 +116,7 @@ export async function addAssessmentModel(
       },
       defaults: {
         name: name,
+        graphStructure: JSON.parse('{}'),
       },
     });
 

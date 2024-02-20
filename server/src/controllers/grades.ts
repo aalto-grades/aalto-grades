@@ -26,8 +26,6 @@ import AttainmentGrade from '../database/models/attainmentGrade';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 import User from '../database/models/user';
-
-import {getFormulaImplementation} from '../formulas';
 import {
   ApiError,
   AttainmentGradeModelData,
@@ -632,7 +630,7 @@ export async function getGradeTreeOfAllUsers(
   ): AttainmentGradeData {
     const root: AttainmentWithUserGrade | undefined = userGrades.find(
       (attainment: AttainmentWithUserGrade) => {
-        return id ? attainment.id === id : !attainment.parentId;
+        return id ? attainment.id === id : !attainment.id; //broken code
       }
     );
 
@@ -644,7 +642,7 @@ export async function getGradeTreeOfAllUsers(
     }
 
     const children = userGrades.filter(
-      (attainment: AttainmentWithUserGrade) => attainment.parentId === root.id
+      (attainment: AttainmentWithUserGrade) => attainment.id === root.id //broken code
     );
 
     return {
@@ -658,10 +656,7 @@ export async function getGradeTreeOfAllUsers(
               id: option.grader?.id,
               name: option.grader?.name,
             },
-            grade:
-              root.gradeType === GradeType.Integer
-                ? Math.round(option.grade)
-                : option.grade,
+            grade: option.grade,
             status: option.status as Status,
             manual: option.manual,
             exportedToSisu: option.sisuExportDate,
@@ -767,60 +762,8 @@ export async function getGradeTreeOfUser(
     ],
   })) as Array<AttainmentWithUserGrade>;
 
-  function generateAttainmentTreeWithUserGrades(
-    id?: number
-  ): AttainmentGradeData {
-    const root: AttainmentWithUserGrade | undefined = userGrades.find(
-      (attainment: AttainmentWithUserGrade) => {
-        return id ? attainment.id === id : !attainment.parentId;
-      }
-    );
-
-    if (!root) {
-      throw new ApiError(
-        `failed to find attainment with id ${id} in grade tree generation`,
-        HttpCode.InternalServerError
-      );
-    }
-
-    const children: Array<AttainmentWithUserGrade> = userGrades.filter(
-      (attainment: AttainmentWithUserGrade) => attainment.parentId === root.id
-    );
-
-    return {
-      attainmentId: root.id,
-      attainmentName: root.name,
-      grades: root.AttainmentGrades.map(
-        (option: AttainmentGrade): GradeOption => {
-          return {
-            gradeId: option.id,
-            grader: {
-              id: option.grader?.id,
-              name: option.grader?.name,
-            },
-            grade:
-              root.gradeType === GradeType.Integer
-                ? Math.round(option.grade)
-                : option.grade,
-            status: option.status as Status,
-            manual: option.manual,
-            exportedToSisu: option.sisuExportDate,
-            date: option.date ? toDateOnlyString(option.date) : undefined,
-            expiryDate: option.expiryDate
-              ? toDateOnlyString(option.expiryDate)
-              : undefined,
-            comment: option.comment ?? '',
-          };
-        }
-      ),
-      subAttainments: children.map((attainment: AttainmentWithUserGrade) => {
-        return generateAttainmentTreeWithUserGrades(attainment.id);
-      }),
-    };
-  }
-
   res.status(HttpCode.Ok).json({
-    data: generateAttainmentTreeWithUserGrades(),
+    data: {}, //broken code
   });
 }
 
@@ -951,16 +894,6 @@ export function parseGradesFromCsv(
 
       const gradeValue: number = parseFloat(gradingData[i]);
 
-      if (gradeValue > attainments[i].maxGrade) {
-        errors.push(
-          `CSV file row ${currentRow} column ${currentColumn}` +
-            ` uploaded grade "${gradeValue}" is larger than maximum` +
-            ` allowed grade "${attainments[i].maxGrade}"`
-        );
-        currentColumn++;
-        continue;
-      }
-
       if (gradeValue < 0) {
         errors.push(
           `CSV file row ${currentRow} column ${currentColumn}` +
@@ -969,18 +902,6 @@ export function parseGradesFromCsv(
         currentColumn++;
         continue;
       }
-
-      student.grades.push({
-        attainmentId: attainments[i].id,
-        gradeType: attainments[i].gradeType,
-        attainmentName: attainments[i].name,
-        grade: gradeValue,
-        manual: true,
-        status:
-          gradeValue >= attainments[i].minRequiredGrade
-            ? Status.Pass
-            : Status.Fail,
-      });
 
       currentColumn++;
     }
@@ -1223,375 +1144,6 @@ export async function addGrades(
   parser.end();
 }
 
-export async function calculateGrades(
-  req: Request,
-  res: Response
-): Promise<void> {
-  const requestSchema: yup.AnyObjectSchema = yup
-    .object()
-    .shape({
-      studentNumbers: yup.array().of(yup.string()).notRequired(),
-      instanceId: yup.number().min(1).notRequired(),
-    })
-    .test(
-      (value: {
-        studentNumbers?: yup.Maybe<Array<string | undefined> | undefined>;
-        instanceId?: yup.Maybe<number | undefined>;
-      }) => {
-        if (!value.instanceId && !value.studentNumbers) {
-          throw new ApiError(
-            'You must provide at least one of: instanceId or list of student numbers',
-            HttpCode.BadRequest
-          );
-        }
-        return true;
-      }
-    );
-
-  const {
-    studentNumbers,
-    instanceId,
-  }: {
-    studentNumbers?: Array<string>;
-    instanceId?: number;
-  } = await requestSchema.validate(req.body, {abortEarly: false});
-
-  let studentNumbersFiltered: Array<string> | undefined = studentNumbers;
-  const grader: JwtClaims = req.user as JwtClaims;
-
-  const [course, assessmentModel]: [Course, AssessmentModel] =
-    await validateAssessmentModelPath(
-      req.params.courseId,
-      req.params.assessmentModelId
-    );
-
-  await isTeacherInChargeOrAdmin(grader, course.id, HttpCode.Forbidden);
-
-  // Include students from particular instance (belonging to the assessment model) if ID provided.
-  if (instanceId) {
-    studentNumbersFiltered = await filterByInstanceAndStudentNumber(
-      instanceId,
-      studentNumbersFiltered
-    );
-  }
-
-  if (studentNumbersFiltered && studentNumbersFiltered.length !== 0) {
-    // Ensure that all students to be included in the calculation exist in the database.
-    studentNumbersExist(studentNumbersFiltered);
-  } else {
-    throw new ApiError(
-      `No student numbers found from instance ID ${instanceId}`,
-      HttpCode.NotFound
-    );
-  }
-
-  /*
-   * Get all the attainments in this assessment model.
-   */
-
-  const attainments: Array<Attainment> = await Attainment.findAll({
-    raw: true,
-    where: {
-      courseId: course.id,
-    },
-  });
-
-  /*
-   * Then we need to find the formulas used to calculate the grade of each
-   * attainment.
-   *
-   * For each attainment, we will construct a formula node object containing:
-   *   - The formula implementation storing the actual formula function as well
-   *     as the Yup schema for validating its parameters.
-   *   - The formula nodes of the subattainments of this attainment.
-   *   - The formula parameters needed for calculating the grade of this
-   *     attainment's parent attainment.
-   */
-
-  /*
-   * Stores the formula nodes of each attainment.
-   * Attainment ID -> Formula node of the given attainment.
-   */
-  const formulaNodesByAttainmentId: Map<number, FormulaNode> = new Map();
-
-  /*
-   * First find the formula implementation and formula parameters for the parent
-   * attainment's formula.
-   */
-  for (const attainment of attainments) {
-    const formula: Formula = attainment.formula;
-
-    formulaNodesByAttainmentId.set(attainment.id, {
-      formulaImplementation: getFormulaImplementation(formula as Formula),
-      subFormulaNodes: [],
-      attainment: {
-        id: attainment.id,
-        name: attainment.name,
-        daysValid: attainment.daysValid,
-        minRequiredGrade: attainment.minRequiredGrade,
-        maxGrade: attainment.maxGrade,
-        formula: attainment.formula,
-        formulaParams: attainment.formulaParams,
-        gradeType: attainment.gradeType,
-      },
-    });
-  }
-
-  /*
-   * Then we will find the formula nodes of each attainment's subattainments.
-   * This will construct a tree structure, and a reference to the root of this
-   * tree is stored in the rootFormulaNode variable.
-   */
-  let rootFormulaNode: FormulaNode | null = null;
-
-  /*
-   * Local utility function to get a formula node from formulaNodesByAttainmentId
-   * as type FormulaNode, or throw an error if the formula node is undefined.
-   */
-  function getFormulaNode(attainmentId: number): FormulaNode {
-    const formulaNode: FormulaNode | undefined =
-      formulaNodesByAttainmentId.get(attainmentId);
-
-    if (!formulaNode) {
-      throw new ApiError(
-        `found undefined formula node for attainment with ID ${attainmentId}`,
-        HttpCode.InternalServerError
-      );
-    }
-
-    return formulaNode;
-  }
-
-  for (const attainment of attainments) {
-    const formulaNode: FormulaNode = getFormulaNode(attainment.id);
-
-    /*
-     * Check whether this attainment is the root attainment. The root attainment
-     * has no parent.
-     */
-    if (attainment.parentId === null) {
-      /*
-       * This attainment is the root attainment. Store a reference to its formula
-       * node in the rootFormulaNode variable.
-       */
-
-      // There should only be one root attainment.
-      if (rootFormulaNode) {
-        throw new ApiError(
-          'duplicate root attainment',
-          HttpCode.InternalServerError
-        );
-      }
-
-      rootFormulaNode = formulaNode;
-    } else {
-      /*
-       * This attainment is not the root attainment. So we will get its parent
-       * attainment's formula node and add this attainment's formula node to
-       * the parent's list of sub formula nodes.
-       */
-
-      const parentFormulaNode: FormulaNode = getFormulaNode(
-        attainment.parentId
-      );
-      parentFormulaNode.subFormulaNodes.push(formulaNode);
-    }
-  }
-
-  /*
-   * If rootFormulaNode is still null, then no root attainment was found. This
-   * is a conflict, and we are unable to calculate the grades of this course
-   * instance.
-   */
-  if (!rootFormulaNode) {
-    throw new ApiError(
-      'no root attainment found for this assessment model; maybe there is a cycle',
-      HttpCode.Conflict
-    );
-  }
-
-  /*
-   * Now we know which formula to use to calculate the grade of each attainment
-   * as well as their parameters.
-   *
-   * Next we need to find the grades already manually specified by a teacher to
-   * use as a basis to calculate grades.
-   */
-
-  interface ManualGrade extends AttainmentGrade {
-    Attainment: Attainment;
-    User: User;
-  }
-
-  /*
-   * Stores the grades of each student for each attainment which were manually
-   * specified by a teacher.
-   */
-  const unorganizedManualGrades: Array<ManualGrade> =
-    (await AttainmentGrade.findAll({
-      where: {
-        manual: true,
-      },
-      include: [
-        {
-          model: Attainment,
-          required: true,
-          attributes: [],
-          where: {
-            assessmentModelId: assessmentModel.id,
-          },
-        },
-        {
-          model: User,
-          required: true,
-          attributes: [],
-          where: {
-            studentNumber: {
-              [Op.in]: studentNumbersFiltered,
-            },
-          },
-        },
-      ],
-      attributes: ['id', 'grade', 'attainmentId', 'userId'],
-    })) as Array<ManualGrade>;
-
-  /*
-   * Next we'll organize the manual grades by user ID and filter out expired ones.
-   */
-
-  /*
-   * Find and store all unexpired manual grades of all attainments per student.
-   * User ID -> Formula node -> Manual grade.
-   */
-  const organizedManualGrades: Map<
-    number,
-    Map<FormulaNode, number>
-  > = new Map();
-
-  for (const manualGrade of unorganizedManualGrades) {
-    let userManualGrades: Map<FormulaNode, number> | undefined =
-      organizedManualGrades.get(manualGrade.userId);
-
-    if (!userManualGrades) {
-      userManualGrades = new Map();
-      organizedManualGrades.set(manualGrade.userId, userManualGrades);
-    }
-
-    /*
-     * If a student has multiple manual grades for the same attainment, consider
-     * the best one.
-     * TODO: Should there be an option not to consider the best grade?
-     */
-    const key: FormulaNode = getFormulaNode(manualGrade.attainmentId);
-    const existingGrade: number | undefined = userManualGrades.get(key);
-
-    if (
-      !(await gradeIsExpired(manualGrade.id)) &&
-      (!existingGrade || manualGrade.grade > existingGrade)
-    ) {
-      // Grade has not expired and there is no existing grade or the new grade
-      // is better.
-      userManualGrades.set(key, manualGrade.grade);
-    }
-  }
-
-  /*
-   * Finally we're ready to calculate the grades of each student starting from
-   * the root attainment.
-   */
-
-  const calculatedGrades: Array<AttainmentGradeModelData> = [];
-
-  /*
-   * Recursively calculates the grade for a particular attainment by its formula
-   * node.
-   */
-  function calculateFormulaNode(
-    userId: number,
-    formulaNode: FormulaNode,
-    manualGrades: Map<FormulaNode, number>
-  ): CalculationResult {
-    /*
-     * If a teacher has manually specified a grade for this attainment,
-     * the manually specified grade will be used.
-     *
-     * A grade has to be manually specified when using the 'Manual' formula
-     * and a grade may be manually specified for overriding grade calculation
-     * functions in special cases.
-     */
-    const manualGrade: number | undefined = manualGrades.get(formulaNode);
-    if (manualGrade) {
-      return {
-        attainment: formulaNode.attainment,
-        status: Status.Pass,
-        grade: manualGrade,
-      };
-    }
-
-    /*
-     * A teacher has not manually specified a grade for this attainment, therefore
-     * the grade will be calculated based on the given formula and the grades
-     * from this attainment's subattainments.
-     */
-
-    // Inputs for the formula of this attainment.
-    const subGrades: Array<CalculationResult> = [];
-
-    // First, recursively calculate the grades the subattainments.
-    for (const subFormulaNode of formulaNode.subFormulaNodes) {
-      subGrades.push(
-        calculateFormulaNode(userId, subFormulaNode, manualGrades)
-      );
-    }
-
-    // Then, calculate the grade of this attainment using the formula specified
-    // for this attainment and the grades of the subattainments.
-    const calculated: CalculationResult =
-      formulaNode.formulaImplementation.formulaFunction(
-        formulaNode.attainment,
-        subGrades
-      );
-
-    if (calculated.grade > formulaNode.attainment.maxGrade)
-      throw new ApiError(
-        'A calculated grade exceeds the max grade of attainment.',
-        HttpCode.Conflict
-      );
-    if (calculated.grade < formulaNode.attainment.minRequiredGrade)
-      calculated.status = Status.Fail;
-
-    calculatedGrades.push({
-      userId: userId,
-      // The formula nodes were constructed with attainments IDs defined, so
-      // this can be asserted to be non-null.
-      attainmentId: formulaNode.attainment.id!,
-      graderId: grader.id,
-      // Round grade to closest integer if attainment is graded as integer.
-      grade:
-        formulaNode.attainment.gradeType === GradeType.Integer
-          ? Math.round(calculated.grade)
-          : calculated.grade,
-      status: calculated.status,
-      manual: false,
-      gradeType: formulaNode.attainment.gradeType,
-    });
-
-    return calculated;
-  }
-
-  for (const [userId, manualGrades] of organizedManualGrades) {
-    calculateFormulaNode(userId, rootFormulaNode, manualGrades);
-  }
-
-  await sequelize.transaction(async (transaction: Transaction) => {
-    await AttainmentGrade.bulkCreate(calculatedGrades, {transaction});
-  });
-
-  res.status(HttpCode.Ok).json({
-    data: {},
-  });
-}
-
 export async function editUserGrade(
   req: Request,
   res: Response
@@ -1630,21 +1182,6 @@ export async function editUserGrade(
       gradeData.attainmentId,
       HttpCode.NotFound
     );
-    if (
-      attainment.gradeType === GradeType.Integer &&
-      !Number.isInteger(grade)
-    ) {
-      throw new ApiError(
-        'Expected grade type integer but received float.',
-        HttpCode.BadRequest
-      );
-    }
-    if (attainment.maxGrade < grade) {
-      throw new ApiError(
-        'Grade exceeds max grade of attainment.',
-        HttpCode.BadRequest
-      );
-    }
   }
 
   await gradeData
