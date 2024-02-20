@@ -53,18 +53,19 @@ export async function findAttainmentGradeById(
 
 /**
  * Finds all attainments of a specific assessment model.
- * @param {number} assessmentModelId - The ID of the assessment model.
+ * @param {number} courseId - The ID of the assessment model.
  * @returns {Promise<Array<AttainmentData>>} - The resulting array of AttainmentData.
  * @throws {ApiError} - If no attainments were found, it throws an error
  * with a message indicating that attainments were not found for the assessment
  * model.
  */
-export async function findAttainmentsByAssessmentModel(
-  assessmentModelId: number
+export async function findAttainmentsByCourseId(
+  courseId: number
 ): Promise<Array<AttainmentData>> {
+  console.log(courseId);
   const attainments: Array<Attainment> = await Attainment.findAll({
     where: {
-      assessmentModelId: assessmentModelId,
+      courseId: courseId,
     },
     order: [['id', 'ASC']],
   });
@@ -80,7 +81,7 @@ export async function findAttainmentsByAssessmentModel(
     (attainment: Attainment) => {
       return {
         id: attainment.id,
-        assessmentModelId: attainment.assessmentModelId,
+        courseId: attainment.courseId,
         parentId: attainment.parentId,
         name: attainment.name,
         daysValid: attainment.daysValid,
@@ -121,33 +122,29 @@ export function generateAttainmentTree(
   }
 }
 
-export async function validateAttainmentPath(
-  courseId: unknown,
-  assessmentModelId: unknown,
-  attainmentId: unknown
-): Promise<[Course, AssessmentModel, Attainment]> {
-  // Validate course and assessment model
-  const [course, assessmentModel]: [Course, AssessmentModel] =
-    await validateAssessmentModelPath(courseId, assessmentModelId);
+// export async function validateAttainmentPath(
+//   courseId: unknown,
+//   attainmentId: unknown
+// ): Promise<[Course, Attainment]> {
 
-  const attainmentIdValidated: number = (
-    await idSchema.validate({id: attainmentId}, {abortEarly: false})
-  ).id;
+//   const attainmentIdValidated: number = (
+//     await idSchema.validate({id: attainmentId}, {abortEarly: false})
+//   ).id;
 
-  // Ensure that attainment exists.
-  const attainment: Attainment = await findAttainmentById(
-    attainmentIdValidated,
-    HttpCode.NotFound
-  );
+//   // Ensure that attainment exists.
+//   const attainment: Attainment = await findAttainmentById(
+//     attainmentIdValidated,
+//     HttpCode.NotFound
+//   );
 
-  // Check that attainment belongs to the assessment model.
-  if (attainment.assessmentModelId !== assessmentModel.id) {
-    throw new ApiError(
-      `attainment with ID ${attainmentId} ` +
-        `does not belong to the assessment model with ID ${assessmentModelId}`,
-      HttpCode.Conflict
-    );
-  }
+//   // Check that attainment belongs to the assessment model.
+//   if (attainment.courseId !== course.id) {
+//     throw new ApiError(
+//       `attainment with ID ${attainmentId} ` +
+//         `does not belong to the course with ID ${courseId}`,
+//       HttpCode.Conflict
+//     );
+//   }
 
-  return [course, assessmentModel, attainment];
-}
+//   return [course, attainment];
+// }

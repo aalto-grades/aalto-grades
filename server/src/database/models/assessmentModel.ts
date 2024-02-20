@@ -23,6 +23,7 @@ export default class AssessmentModel extends Model<
   declare name: string;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
+  declare graphStructure: JSON;
 }
 
 AssessmentModel.init(
@@ -43,6 +44,10 @@ AssessmentModel.init(
     name: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    graphStructure: {
+      type: DataTypes.JSONB,
+      allowNull: true,
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,

@@ -43,6 +43,7 @@ export async function getAssessmentModel(
     id: assessmentModel.id,
     courseId: assessmentModel.courseId,
     name: assessmentModel.name,
+    graphStructure: assessmentModel.graphStructure,
   };
 
   res.status(HttpCode.Ok).json({
@@ -73,6 +74,7 @@ export async function getAllAssessmentModels(
       id: assessmentModel.id,
       courseId: assessmentModel.courseId,
       name: assessmentModel.name,
+      graphStructure: assessmentModel.graphStructure,
     });
   }
 

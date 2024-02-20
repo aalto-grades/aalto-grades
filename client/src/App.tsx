@@ -39,6 +39,8 @@ import AddUserView from './components/front-page/users-view/AddUserView';
 import useSnackPackAlerts, {
   SnackPackAlertState,
 } from './hooks/useSnackPackAlerts';
+import Attainment from './components/edit-attainment-view/Attainment';
+import AttainmentsView from './components/course-view/AttainmentsView';
 
 declare module '@mui/material/styles' {
   interface PaletteOptions {
@@ -216,8 +218,16 @@ export default function App(): JSX.Element {
                   }
                 >
                   <Route
+                    path="/:courseId/attainments"
+                    element={<AttainmentsView />}
+                  />
+                  <Route
                     path="/:courseId/fetch-instances/:courseCode"
                     element={<FetchInstancesView />}
+                  />
+                  <Route
+                    path="/:courseId/course-results"
+                    element={<CourseResultsView />}
                   />
                   <Route
                     path="/:courseId/course-results/:assessmentModelId"

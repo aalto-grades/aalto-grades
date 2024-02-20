@@ -90,7 +90,7 @@ export async function getCsvTemplate(
     await Attainment.findAll({
       attributes: ['name'],
       where: {
-        assessmentModelId: assessmentModel.id,
+        courseId: course.id,
       },
     })
   ).map((attainment: {name: string}) => attainment.name);
@@ -684,7 +684,7 @@ export async function getGradeTreeOfAllUsers(
     const userGrades: Array<AttainmentWithUserGrade> =
       (await Attainment.findAll({
         where: {
-          assessmentModelId: assessmentModel.id,
+          courseId: course.id,
         },
         include: [
           {
@@ -746,7 +746,7 @@ export async function getGradeTreeOfUser(
 
   const userGrades: Array<AttainmentWithUserGrade> = (await Attainment.findAll({
     where: {
-      assessmentModelId: assessmentModel.id,
+      courseId: course.id,
     },
     include: [
       {
@@ -837,7 +837,7 @@ export async function getGradeTreeOfUser(
  */
 export async function parseHeaderFromCsv(
   header: Array<string>,
-  assessmentModelId: number
+  courseId: number
 ): Promise<Array<Attainment>> {
   const errors: Array<string> = [];
 
@@ -856,7 +856,7 @@ export async function parseHeaderFromCsv(
     where: {
       [Op.and]: [
         {
-          assessmentModelId: assessmentModelId,
+          courseId: courseId,
         },
         {
           name: {
@@ -878,7 +878,7 @@ export async function parseHeaderFromCsv(
           'Header attainment data parsing failed at column ' +
             `${attainmentNames.indexOf(attainmentName) + 2}. ` +
             `Could not find an attainment with name ${attainmentName} in ` +
-            `assessment model with ID ${assessmentModelId}.`
+            `assessment model with ID ${courseId}.`
         );
       }
     }
@@ -1292,7 +1292,7 @@ export async function calculateGrades(
   const attainments: Array<Attainment> = await Attainment.findAll({
     raw: true,
     where: {
-      assessmentModelId: assessmentModel.id,
+      courseId: course.id,
     },
   });
 

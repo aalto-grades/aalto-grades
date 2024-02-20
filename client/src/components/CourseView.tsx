@@ -32,6 +32,7 @@ import CourseDetails from './course-view/CourseDetails';
 
 import {
   useGetAllAssessmentModels,
+  useGetAttainments,
   useGetCourse,
   useGetRootAttainment,
 } from '../hooks/useApi';
@@ -86,6 +87,11 @@ export default function CourseView(): JSX.Element {
     {enabled: Boolean(currentAssessmentModel && currentAssessmentModel.id)}
   );
 
+  const attainments: UseQueryResult<Array<AttainmentData>> = useGetAttainments(
+    courseId,
+    {enabled: Boolean(currentAssessmentModel && currentAssessmentModel.id)}
+  );
+
   useEffect(() => {
     setAnimation(true);
   }, [currentAssessmentModel]);
@@ -129,6 +135,7 @@ export default function CourseView(): JSX.Element {
               </Button>
             )}
           </Box>
+          <p>{attainments.data?.toString()}</p>
           <Box>
             {
               /* a different attainment component will be created for students */

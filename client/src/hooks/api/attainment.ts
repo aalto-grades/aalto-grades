@@ -60,11 +60,64 @@ export function useGetRootAttainment(
   });
 }
 
-interface AddAttainmentVars {
+export function useGetAttainments(
+  courseId: Numeric,
+  options?: Partial<UseQueryOptions<Array<AttainmentData>>>
+): UseQueryResult<Array<AttainmentData>> {
+  return useQuery({
+    queryKey: ['attainments', courseId],
+    queryFn: async () =>
+      (await axios.get(`/v1/courses/${courseId}/attainments`)).data.data,
+    ...options,
+  });
+}
+
+// interface AddAttainmentVars {
+//   courseId: Numeric;
+//   assessmentModelId: Numeric;
+//   attainment: AttainmentData;
+// }
+
+// export type UseAddAttainmentResult = UseMutationResult<
+//   AttainmentData,
+//   unknown,
+//   AddAttainmentVars
+// >;
+
+// export function useAddAttainment(
+//   options?: UseMutationOptions<AttainmentData, unknown, unknown>
+// ): UseAddAttainmentResult {
+//   const queryClient: QueryClient = useQueryClient();
+
+//   return useMutation({
+//     mutationFn: async (vars: AddAttainmentVars) =>
+//       (
+//         await axios.post(
+//           `/v1/courses/${vars.courseId}` +
+//             `/assessment-models/${vars.assessmentModelId}` +
+//             '/attainments',
+//           vars.attainment
+//         )
+//       ).data.data,
+
+//     onSuccess: (_data: AttainmentData, vars: AddAttainmentVars) => {
+//       queryClient.invalidateQueries({
+//         queryKey: ['attainment', vars.courseId, vars.assessmentModelId],
+//       });
+
+//       queryClient.invalidateQueries({
+//         queryKey: ['root-attainment', vars.courseId, vars.assessmentModelId],
+//       });
+//     },
+//     ...options,
+//   });
+// }
+
+type AddAttainmentVars = {
   courseId: Numeric;
   assessmentModelId: Numeric;
   attainment: AttainmentData;
-}
+};
 
 export type UseAddAttainmentResult = UseMutationResult<
   AttainmentData,
@@ -72,8 +125,35 @@ export type UseAddAttainmentResult = UseMutationResult<
   AddAttainmentVars
 >;
 
+// export function useAddAttainment(
+//   options?: UseMutationOptions<AttainmentData, unknown, AddAttainmentVars>
+// ): UseAddAttainmentResult {
+//   const queryClient: QueryClient = useQueryClient();
+
+//   return useMutation({
+//     mutationFn: async (vars: AddAttainmentVars) =>
+//       (
+//         await axios.post(
+//           `/v1/courses/${vars.courseId}` + '/attainments',
+//           vars.attainment
+//         )
+//       ).data.data,
+
+//     onSuccess: (_data: AttainmentData, vars: AddAttainmentVars) => {
+//       queryClient.invalidateQueries({
+//         queryKey: ['attainments', vars.courseId],
+//       });
+
+//       queryClient.invalidateQueries({
+//         queryKey: ['root-attainment', vars.courseId],
+//       });
+//     },
+//     ...options,
+//   });
+// }
+
 export function useAddAttainment(
-  options?: UseMutationOptions<AttainmentData, unknown, unknown>
+  options?: UseMutationOptions<AttainmentData, unknown, AddAttainmentVars>
 ): UseAddAttainmentResult {
   const queryClient: QueryClient = useQueryClient();
 
@@ -81,20 +161,18 @@ export function useAddAttainment(
     mutationFn: async (vars: AddAttainmentVars) =>
       (
         await axios.post(
-          `/v1/courses/${vars.courseId}` +
-            `/assessment-models/${vars.assessmentModelId}` +
-            '/attainments',
+          `/v1/courses/${vars.courseId}` + '/attainments',
           vars.attainment
         )
       ).data.data,
 
     onSuccess: (_data: AttainmentData, vars: AddAttainmentVars) => {
       queryClient.invalidateQueries({
-        queryKey: ['attainment', vars.courseId, vars.assessmentModelId],
+        queryKey: ['attainments', vars.courseId],
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['root-attainment', vars.courseId, vars.assessmentModelId],
+        queryKey: ['root-attainment', vars.courseId],
       });
     },
     ...options,
@@ -122,16 +200,14 @@ export function useEditAttainment(
     mutationFn: async (vars: EditAttainmentVars) =>
       (
         await axios.put(
-          `/v1/courses/${vars.courseId}` +
-            `/assessment-models/${vars.assessmentModelId}` +
-            `/attainments/${vars.attainment.id}`,
+          `/v1/courses/${vars.courseId}/attainments/${vars.attainment.id}`,
           vars.attainment
         )
       ).data.data,
 
     onSuccess: (_data: AttainmentData, vars: EditAttainmentVars) => {
       queryClient.invalidateQueries({
-        queryKey: ['attainment', vars.courseId, vars.assessmentModelId],
+        queryKey: ['attainments', vars.courseId],
       });
 
       queryClient.invalidateQueries({
@@ -144,7 +220,6 @@ export function useEditAttainment(
 
 interface DeleteAttainmentVars {
   courseId: Numeric;
-  assessmentModelId: Numeric;
   attainmentId: Numeric;
 }
 
@@ -163,19 +238,17 @@ export function useDeleteAttainment(
     mutationFn: async (vars: DeleteAttainmentVars) =>
       (
         await axios.delete(
-          `/v1/courses/${vars.courseId}/assessment-models` +
-            `/${vars.assessmentModelId}` +
-            `/attainments/${vars.attainmentId}`
+          `/v1/courses/${vars.courseId}/attainments/${vars.attainmentId}`
         )
       ).data.data,
 
     onSuccess: (_data: object, vars: DeleteAttainmentVars) => {
       queryClient.invalidateQueries({
-        queryKey: ['attainment', vars.courseId, vars.assessmentModelId],
+        queryKey: ['attainments', vars.courseId],
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['root-attainment', vars.courseId, vars.assessmentModelId],
+        queryKey: ['root-attainment', vars.courseId],
       });
     },
     ...options,

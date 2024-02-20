@@ -24,6 +24,7 @@ import {validateAssessmentModelPath} from './utils/assessmentModel';
 import {
   findAttainmentById,
   findAttainmentsByAssessmentModel,
+  findAttainmentsByCourseId,
   generateAttainmentTree,
   validateAttainmentPath,
 } from './utils/attainment';
@@ -86,6 +87,43 @@ async function validateTreeParam(treeParam: string): Promise<string> {
 
   await treeSchema.validate({tree: treeParam}, {abortEarly: false});
   return treeParam;
+}
+
+export async function getAttainments(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const courseId: number = Number(req.params.courseId);
+  // const [_course]: [Course] = await validateAttainmentPath(req.params.courseId);
+
+  const attainmentData: Array<AttainmentData> =
+    await findAttainmentsByCourseId(courseId);
+
+  // const localRoot: AttainmentData | undefined = attainmentData.find(
+  //   (attainment: AttainmentData) => attainment.id === attainmentId
+  // );
+
+  // if (!localRoot) {
+  //   throw new ApiError(
+  //     `attainment with ID ${attainmentId} not found`,
+  //     HttpCode.NotFound
+  //   );
+  // }
+
+  // switch (tree) {
+  //   case 'children':
+  //     generateAttainmentTree(localRoot, attainmentData, true);
+  //     break;
+  //   case 'descendants':
+  //     generateAttainmentTree(localRoot, attainmentData);
+  //     break;
+  //   default:
+  //     break;
+  // }
+
+  res.status(HttpCode.Ok).json({
+    data: attainmentData,
+  });
 }
 
 export async function getAttainment(
@@ -188,470 +226,564 @@ export async function getRootAttainment(
   });
 }
 
+// export async function addAttainment(
+//   req: Request,
+//   res: Response
+// ): Promise<void> {
+//   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
+//     parentId: yup.number().notRequired(),
+//     name: yup.string().required(),
+//     daysValid: yup.number().min(0).required(),
+//     minRequiredGrade: yup.number().min(0).required(),
+//     maxGrade: yup.number().min(yup.ref('minRequiredGrade')).required(),
+//     formula: yup.string().oneOf(Object.values(Formula)).required(),
+//     formulaParams: yup // More thorough validation is done separately
+//       .object()
+//       .required(),
+//     gradeType: yup.string().oneOf(Object.values(GradeType)).required(),
+//     subAttainments: yup
+//       .array()
+//       .of(yup.lazy(() => requestSchema.default(undefined)))
+//       .notRequired(),
+//   });
+
+//   await requestSchema.validate(req.body, {abortEarly: false});
+
+//   const [course, assessmentModel]: [Course, AssessmentModel] =
+//     await validateAssessmentModelPath(
+//       req.params.courseId,
+//       req.params.assessmentModelId
+//     );
+//   console.log(req.body.parentId);
+//   const requestTree: AttainmentData = req.body;
+
+//   await isTeacherInChargeOrAdmin(
+//     req.user as JwtClaims,
+//     course.id,
+//     HttpCode.Forbidden
+//   );
+
+//   // Validate formula parameters for each attainment
+//   async function validateFormulaParamsTree(
+//     attainmentTree: AttainmentData
+//   ): Promise<void> {
+//     const attainmentNameExists: Attainment | null = await Attainment.findOne({
+//       where: {
+//         courseId: course.id,
+//         name: attainmentTree.name,
+//       },
+//     });
+
+//     // assessment model has an attainment with the same name.
+//     if (attainmentNameExists) {
+//       throw new ApiError(
+//         `assessment model already has attainment with name ${attainmentTree.name}`,
+//         HttpCode.Conflict
+//       );
+//     }
+//     await validateFormulaParams(
+//       attainmentTree.formula,
+//       attainmentTree.formulaParams,
+//       attainmentTree.subAttainments?.map(
+//         (subAttainment: AttainmentData) => subAttainment.name
+//       )
+//     );
+
+//     if (attainmentTree.subAttainments) {
+//       for (const subTree of attainmentTree.subAttainments) {
+//         await validateFormulaParamsTree(subTree);
+//       }
+//     }
+//   }
+
+//   await validateFormulaParamsTree(req.body);
+
+//   // If linked to a parent ID ensure that the parent attainment exists and
+//   // belongs to the same assessment model
+//   if (requestTree.parentId) {
+//     const parentAttainment: Attainment = await findAttainmentById(
+//       requestTree.parentId,
+//       HttpCode.UnprocessableEntity
+//     );
+
+//     if (parentAttainment.courseId !== course.id) {
+//       throw new ApiError(
+//         `parent attainment ID ${requestTree.parentId} does not belong ` +
+//           `to the assessment model ID ${course.id}`,
+//         HttpCode.Conflict
+//       );
+//     }
+
+//     /*
+//      * If the parent attainment has formula params defined and the formula isn't
+//      * manual, then this new attainment must be added to the children list of the
+//      * parent attainment's params.
+//      */
+//     const parentParams: ParamsObject = parentAttainment.formulaParams;
+//     if (parentParams.children) {
+//       const parentFormula: FormulaImplementation = getFormulaImplementation(
+//         parentAttainment.formula
+//       );
+
+//       parentParams.children.push([
+//         requestTree.name,
+//         parentFormula.defaultChildParams,
+//       ]);
+
+//       // Sanity check
+//       await parentFormula.paramSchema.validate(parentParams);
+
+//       await Attainment.update(
+//         {
+//           formulaParams: parentParams,
+//         },
+//         {
+//           where: {
+//             id: requestTree.parentId,
+//           },
+//         }
+//       );
+//     }
+//   } else {
+//     // Make sure that no other root attainments exist for the assessment model.
+//     const attainment: Attainment | null = await Attainment.findOne({
+//       where: {
+//         courseId: course.id,
+//         parentId: {
+//           [Op.is]: undefined,
+//         },
+//       },
+//     });
+
+//     // Root attainment exists.
+//     if (attainment) {
+//       throw new ApiError(
+//         `assessment model already has root attainment with ID ${attainment.id}`,
+//         HttpCode.Conflict
+//       );
+//     }
+//   }
+
+//   // Add all attainments to the database and construct an attainment tree with
+//   // IDs to return
+//   async function processAttainmentTree(
+//     requestTree: AttainmentData,
+//     parentId: number | undefined
+//   ): Promise<AttainmentData> {
+//     const dbEntry: Attainment = await Attainment.create({
+//       parentId: parentId,
+//       courseId: course.id,
+//       name: requestTree.name,
+//       daysValid: requestTree.daysValid,
+//       minRequiredGrade: requestTree.minRequiredGrade,
+//       maxGrade: requestTree.maxGrade,
+//       formula: requestTree.formula,
+//       formulaParams: requestTree.formulaParams,
+//       gradeType: requestTree.gradeType,
+//     });
+
+//     const attainmentTree: AttainmentData = {
+//       id: dbEntry.id,
+//       parentId: dbEntry.parentId ?? undefined,
+//       courseId: dbEntry.courseId,
+//       name: dbEntry.name,
+//       daysValid: dbEntry.daysValid,
+//       minRequiredGrade: dbEntry.minRequiredGrade,
+//       maxGrade: dbEntry.maxGrade,
+//       formula: dbEntry.formula,
+//       formulaParams: dbEntry.formulaParams,
+//       gradeType: dbEntry.gradeType,
+//       subAttainments: [],
+//     };
+
+//     if (requestTree.subAttainments) {
+//       for (const requestSubTree of requestTree.subAttainments) {
+//         attainmentTree.subAttainments?.push(
+//           await processAttainmentTree(requestSubTree, dbEntry.id)
+//         );
+//       }
+//     }
+
+//     return attainmentTree;
+//   }
+
+//   const attainmentTree: AttainmentData = await processAttainmentTree(
+//     requestTree,
+//     requestTree.parentId
+//   );
+
+//   res.status(HttpCode.Ok).json({
+//     data: attainmentTree,
+//   });
+// }
+
 export async function addAttainment(
   req: Request,
   res: Response
 ): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
-    parentId: yup.number().notRequired(),
     name: yup.string().required(),
     daysValid: yup.number().min(0).required(),
-    minRequiredGrade: yup.number().min(0).required(),
-    maxGrade: yup.number().min(yup.ref('minRequiredGrade')).required(),
-    formula: yup.string().oneOf(Object.values(Formula)).required(),
-    formulaParams: yup // More thorough validation is done separately
-      .object()
-      .required(),
-    gradeType: yup.string().oneOf(Object.values(GradeType)).required(),
-    subAttainments: yup
-      .array()
-      .of(yup.lazy(() => requestSchema.default(undefined)))
-      .notRequired(),
   });
 
   await requestSchema.validate(req.body, {abortEarly: false});
 
-  const [course, assessmentModel]: [Course, AssessmentModel] =
-    await validateAssessmentModelPath(
-      req.params.courseId,
-      req.params.assessmentModelId
-    );
+  const courseId = Number(req.params.courseId);
   console.log(req.body.parentId);
   const requestTree: AttainmentData = req.body;
 
   await isTeacherInChargeOrAdmin(
     req.user as JwtClaims,
-    course.id,
+    courseId,
     HttpCode.Forbidden
   );
 
-  // Validate formula parameters for each attainment
-  async function validateFormulaParamsTree(
-    attainmentTree: AttainmentData
-  ): Promise<void> {
-    const attainmentNameExists: Attainment | null = await Attainment.findOne({
-      where: {
-        assessmentModelId: assessmentModel.id,
-        name: attainmentTree.name,
-      },
-    });
-
-    // assessment model has an attainment with the same name.
-    if (attainmentNameExists) {
-      throw new ApiError(
-        `assessment model already has attainment with name ${attainmentTree.name}`,
-        HttpCode.Conflict
-      );
-    }
-    await validateFormulaParams(
-      attainmentTree.formula,
-      attainmentTree.formulaParams,
-      attainmentTree.subAttainments?.map(
-        (subAttainment: AttainmentData) => subAttainment.name
-      )
-    );
-
-    if (attainmentTree.subAttainments) {
-      for (const subTree of attainmentTree.subAttainments) {
-        await validateFormulaParamsTree(subTree);
-      }
-    }
-  }
-
-  await validateFormulaParamsTree(req.body);
-
-  // If linked to a parent ID ensure that the parent attainment exists and
-  // belongs to the same assessment model
-  if (requestTree.parentId) {
-    const parentAttainment: Attainment = await findAttainmentById(
-      requestTree.parentId,
-      HttpCode.UnprocessableEntity
-    );
-
-    if (parentAttainment.assessmentModelId !== assessmentModel.id) {
-      throw new ApiError(
-        `parent attainment ID ${requestTree.parentId} does not belong ` +
-          `to the assessment model ID ${assessmentModel.id}`,
-        HttpCode.Conflict
-      );
-    }
-
-    /*
-     * If the parent attainment has formula params defined and the formula isn't
-     * manual, then this new attainment must be added to the children list of the
-     * parent attainment's params.
-     */
-    const parentParams: ParamsObject = parentAttainment.formulaParams;
-    if (parentParams.children) {
-      const parentFormula: FormulaImplementation = getFormulaImplementation(
-        parentAttainment.formula
-      );
-
-      parentParams.children.push([
-        requestTree.name,
-        parentFormula.defaultChildParams,
-      ]);
-
-      // Sanity check
-      await parentFormula.paramSchema.validate(parentParams);
-
-      await Attainment.update(
-        {
-          formulaParams: parentParams,
-        },
-        {
-          where: {
-            id: requestTree.parentId,
-          },
-        }
-      );
-    }
-  } else {
-    // Make sure that no other root attainments exist for the assessment model.
-    const attainment: Attainment | null = await Attainment.findOne({
-      where: {
-        assessmentModelId: assessmentModel.id,
-        parentId: {
-          [Op.is]: undefined,
-        },
-      },
-    });
-
-    // Root attainment exists.
-    if (attainment) {
-      throw new ApiError(
-        `assessment model already has root attainment with ID ${attainment.id}`,
-        HttpCode.Conflict
-      );
-    }
-  }
-
-  // Add all attainments to the database and construct an attainment tree with
-  // IDs to return
-  async function processAttainmentTree(
-    requestTree: AttainmentData,
-    parentId: number | undefined
-  ): Promise<AttainmentData> {
-    const dbEntry: Attainment = await Attainment.create({
-      parentId: parentId,
-      assessmentModelId: assessmentModel.id,
-      name: requestTree.name,
-      daysValid: requestTree.daysValid,
-      minRequiredGrade: requestTree.minRequiredGrade,
-      maxGrade: requestTree.maxGrade,
-      formula: requestTree.formula,
-      formulaParams: requestTree.formulaParams,
-      gradeType: requestTree.gradeType,
-    });
-
-    const attainmentTree: AttainmentData = {
-      id: dbEntry.id,
-      parentId: dbEntry.parentId ?? undefined,
-      assessmentModelId: dbEntry.assessmentModelId,
-      name: dbEntry.name,
-      daysValid: dbEntry.daysValid,
-      minRequiredGrade: dbEntry.minRequiredGrade,
-      maxGrade: dbEntry.maxGrade,
-      formula: dbEntry.formula,
-      formulaParams: dbEntry.formulaParams,
-      gradeType: dbEntry.gradeType,
-      subAttainments: [],
-    };
-
-    if (requestTree.subAttainments) {
-      for (const requestSubTree of requestTree.subAttainments) {
-        attainmentTree.subAttainments?.push(
-          await processAttainmentTree(requestSubTree, dbEntry.id)
-        );
-      }
-    }
-
-    return attainmentTree;
-  }
-
-  const attainmentTree: AttainmentData = await processAttainmentTree(
-    requestTree,
-    requestTree.parentId
-  );
+  const dbEntry: Attainment = await Attainment.create({
+    courseId: courseId,
+    name: requestTree.name,
+    daysValid: requestTree.daysValid,
+  });
 
   res.status(HttpCode.Ok).json({
-    data: attainmentTree,
+    data: dbEntry,
   });
 }
 
+// export async function updateAttainment(
+//   req: Request,
+//   res: Response
+// ): Promise<void> {
+//   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
+//     parentId: yup.number().notRequired(),
+//     name: yup.string().notRequired(),
+//     daysValid: yup.number().min(0).notRequired(),
+//     minRequiredGrade: yup.number().min(0).notRequired(),
+//     maxGrade: yup.number().min(yup.ref('minRequiredGrade')).notRequired(),
+//     formula: yup
+//       .string()
+//       .transform((value: string, originalValue: string) => {
+//         return originalValue ? originalValue.toUpperCase() : value;
+//       })
+//       .oneOf(Object.values(Formula))
+//       .notRequired(),
+//     formulaParams: yup // More thorough validation is done later
+//       .object()
+//       .nullable()
+//       .notRequired(),
+//     gradeType: yup.string().oneOf(Object.values(GradeType)).notRequired(),
+//   });
+
+//   await requestSchema.validate(req.body, {abortEarly: false});
+
+//   const [course, _assessmentModel, attainment]: [
+//     Course,
+//     AssessmentModel,
+//     Attainment,
+//   ] = await validateAttainmentPath(
+//     req.params.courseId,
+//     req.params.assessmentModelId,
+//     req.params.attainmentId
+//   );
+
+//   await isTeacherInChargeOrAdmin(
+//     req.user as JwtClaims,
+//     course.id,
+//     HttpCode.Forbidden
+//   );
+
+//   const name: string | undefined = req.body.name;
+//   const daysValid: number | undefined = req.body.daysValid;
+//   const minRequiredGrade: number | undefined = req.body.minRequiredGrade;
+//   const maxGrade: number | undefined = req.body.maxGrade;
+//   const parentId: number | undefined = req.body.parentId;
+//   const formula: Formula | undefined = req.body.formula;
+//   const formulaParams: ParamsObject | undefined = req.body.formulaParams;
+//   const gradeType: GradeType | undefined = req.body.gradeType;
+
+//   if (minRequiredGrade && !maxGrade && minRequiredGrade > attainment.maxGrade) {
+//     throw new ApiError(
+//       `without updating max grade, new min required grade (${minRequiredGrade}) can't be` +
+//         ` larger than existing max grade (${attainment.maxGrade})`,
+//       HttpCode.BadRequest
+//     );
+//   } else if (
+//     maxGrade &&
+//     !minRequiredGrade &&
+//     maxGrade < attainment.minRequiredGrade
+//   ) {
+//     throw new ApiError(
+//       `without updating min required grade, new max grade (${maxGrade}) can't be` +
+//         ` smaller than existing min required grade (${attainment.minRequiredGrade})`,
+//       HttpCode.BadRequest
+//     );
+//   }
+
+//   let parentAttainment: Attainment | null = null;
+
+//   // If linked to a parent id, check that it exists and belongs
+//   // to the same assessment model as the attainment being edited.
+//   if (parentId) {
+//     // TODO: check that does not refer to itself transitionally through some other attainment.
+//     if (parentId === attainment.id) {
+//       throw new ApiError(
+//         'attainment cannot refer to itself in the parent ID',
+//         HttpCode.Conflict
+//       );
+//     }
+
+//     parentAttainment = await findAttainmentById(
+//       parentId,
+//       HttpCode.UnprocessableEntity
+//     );
+
+//     if (parentAttainment.courseId !== attainment.courseId) {
+//       throw new ApiError(
+//         `parent attainment ID ${parentId} does not belong to ` +
+//           `the same assessment model as attainment ID ${attainment.id}`,
+//         HttpCode.Conflict
+//       );
+//     }
+//   }
+
+//   await validateFormulaParams(
+//     formula ?? attainment.formula,
+//     formulaParams ?? attainment.formulaParams,
+//     (
+//       await Attainment.findAll({
+//         attributes: ['name'],
+//         where: {
+//           parentId: attainment.id,
+//         },
+//       })
+//     ).map((attainment: {name: string}): string => attainment.name)
+//   );
+
+//   if (parentId && parentId !== attainment.parentId) {
+//     if (attainment.parentId) {
+//       const oldParent: Attainment = await findAttainmentById(
+//         attainment.parentId,
+//         HttpCode.InternalServerError
+//       );
+
+//       const parentParams: ParamsObject = oldParent.formulaParams;
+//       if (parentParams.children) {
+//         for (const i in parentParams.children) {
+//           if (parentParams.children[i][0] === attainment.name) {
+//             parentParams.children.splice(Number(i), 1);
+//             break;
+//           }
+//         }
+
+//         await Attainment.update(
+//           {
+//             formulaParams: parentParams,
+//           },
+//           {
+//             where: {
+//               id: oldParent.id,
+//             },
+//           }
+//         );
+//       }
+//     }
+
+//     const newParent: Attainment = await findAttainmentById(
+//       parentId,
+//       HttpCode.InternalServerError
+//     );
+
+//     const parentParams: ParamsObject = newParent.formulaParams;
+//     if (parentParams.children) {
+//       const parentFormula: FormulaImplementation = getFormulaImplementation(
+//         newParent.formula
+//       );
+
+//       parentParams.children.push([
+//         name ?? attainment.name,
+//         parentFormula.defaultChildParams,
+//       ]);
+
+//       // Sanity check
+//       await parentFormula.paramSchema.validate(parentParams);
+
+//       await Attainment.update(
+//         {
+//           formulaParams: parentParams,
+//         },
+//         {
+//           where: {
+//             id: newParent.id,
+//           },
+//         }
+//       );
+//     }
+//   } else if (name && name !== attainment.name && attainment.parentId) {
+//     const parent: Attainment = await findAttainmentById(
+//       attainment.parentId,
+//       HttpCode.InternalServerError
+//     );
+
+//     const parentParams: ParamsObject = parent.formulaParams;
+//     if (parentParams.children) {
+//       for (const i in parentParams.children) {
+//         if (parentParams.children[i][0] === attainment.name) {
+//           parentParams.children[i][0] = name;
+//           break;
+//         }
+//       }
+
+//       await Attainment.update(
+//         {
+//           formulaParams: parentParams,
+//         },
+//         {
+//           where: {
+//             id: parent.id,
+//           },
+//         }
+//       );
+//     }
+//   }
+
+//   await attainment
+//     .set({
+//       parentId: parentId ?? attainment.parentId,
+//       name: name ?? attainment.name,
+//       daysValid: daysValid ?? attainment.daysValid,
+//       minRequiredGrade: minRequiredGrade ?? attainment.minRequiredGrade,
+//       maxGrade: maxGrade ?? attainment.maxGrade,
+//       formula: formula ?? attainment.formula,
+//       formulaParams: formulaParams ?? attainment.formulaParams,
+//       gradeType: gradeType ?? attainment.gradeType,
+//     })
+//     .save();
+
+//   const attainmentTree: AttainmentData = {
+//     id: attainment.id,
+//     parentId: attainment.parentId,
+//     courseId: attainment.courseId,
+//     name: attainment.name,
+//     daysValid: attainment.daysValid,
+//     minRequiredGrade: attainment.minRequiredGrade,
+//     maxGrade: attainment.maxGrade,
+//     formula: attainment.formula,
+//     formulaParams: attainment.formulaParams,
+//     gradeType: attainment.gradeType,
+//   };
+
+//   res.status(HttpCode.Ok).json({
+//     data: attainmentTree,
+//   });
+// }
 export async function updateAttainment(
   req: Request,
   res: Response
 ): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
-    parentId: yup.number().notRequired(),
     name: yup.string().notRequired(),
     daysValid: yup.number().min(0).notRequired(),
-    minRequiredGrade: yup.number().min(0).notRequired(),
-    maxGrade: yup.number().min(yup.ref('minRequiredGrade')).notRequired(),
-    formula: yup
-      .string()
-      .transform((value: string, originalValue: string) => {
-        return originalValue ? originalValue.toUpperCase() : value;
-      })
-      .oneOf(Object.values(Formula))
-      .notRequired(),
-    formulaParams: yup // More thorough validation is done later
-      .object()
-      .nullable()
-      .notRequired(),
-    gradeType: yup.string().oneOf(Object.values(GradeType)).notRequired(),
   });
 
   await requestSchema.validate(req.body, {abortEarly: false});
 
-  const [course, _assessmentModel, attainment]: [
-    Course,
-    AssessmentModel,
-    Attainment,
-  ] = await validateAttainmentPath(
-    req.params.courseId,
-    req.params.assessmentModelId,
-    req.params.attainmentId
-  );
+  const courseId = Number(req.params.courseId);
+  const attainmentId = Number(req.params.attainmentId);
+
+  const requestTree: AttainmentData = req.body;
 
   await isTeacherInChargeOrAdmin(
     req.user as JwtClaims,
-    course.id,
+    courseId,
     HttpCode.Forbidden
   );
 
-  const name: string | undefined = req.body.name;
-  const daysValid: number | undefined = req.body.daysValid;
-  const minRequiredGrade: number | undefined = req.body.minRequiredGrade;
-  const maxGrade: number | undefined = req.body.maxGrade;
-  const parentId: number | undefined = req.body.parentId;
-  const formula: Formula | undefined = req.body.formula;
-  const formulaParams: ParamsObject | undefined = req.body.formulaParams;
-  const gradeType: GradeType | undefined = req.body.gradeType;
-
-  if (minRequiredGrade && !maxGrade && minRequiredGrade > attainment.maxGrade) {
-    throw new ApiError(
-      `without updating max grade, new min required grade (${minRequiredGrade}) can't be` +
-        ` larger than existing max grade (${attainment.maxGrade})`,
-      HttpCode.BadRequest
-    );
-  } else if (
-    maxGrade &&
-    !minRequiredGrade &&
-    maxGrade < attainment.minRequiredGrade
-  ) {
-    throw new ApiError(
-      `without updating min required grade, new max grade (${maxGrade}) can't be` +
-        ` smaller than existing min required grade (${attainment.minRequiredGrade})`,
-      HttpCode.BadRequest
-    );
-  }
-
-  let parentAttainment: Attainment | null = null;
-
-  // If linked to a parent id, check that it exists and belongs
-  // to the same assessment model as the attainment being edited.
-  if (parentId) {
-    // TODO: check that does not refer to itself transitionally through some other attainment.
-    if (parentId === attainment.id) {
-      throw new ApiError(
-        'attainment cannot refer to itself in the parent ID',
-        HttpCode.Conflict
-      );
-    }
-
-    parentAttainment = await findAttainmentById(
-      parentId,
-      HttpCode.UnprocessableEntity
-    );
-
-    if (parentAttainment.assessmentModelId !== attainment.assessmentModelId) {
-      throw new ApiError(
-        `parent attainment ID ${parentId} does not belong to ` +
-          `the same assessment model as attainment ID ${attainment.id}`,
-        HttpCode.Conflict
-      );
-    }
-  }
-
-  await validateFormulaParams(
-    formula ?? attainment.formula,
-    formulaParams ?? attainment.formulaParams,
-    (
-      await Attainment.findAll({
-        attributes: ['name'],
-        where: {
-          parentId: attainment.id,
-        },
-      })
-    ).map((attainment: {name: string}): string => attainment.name)
+  const attainment: Attainment = await findAttainmentById(
+    attainmentId,
+    HttpCode.NotFound
   );
-
-  if (parentId && parentId !== attainment.parentId) {
-    if (attainment.parentId) {
-      const oldParent: Attainment = await findAttainmentById(
-        attainment.parentId,
-        HttpCode.InternalServerError
-      );
-
-      const parentParams: ParamsObject = oldParent.formulaParams;
-      if (parentParams.children) {
-        for (const i in parentParams.children) {
-          if (parentParams.children[i][0] === attainment.name) {
-            parentParams.children.splice(Number(i), 1);
-            break;
-          }
-        }
-
-        await Attainment.update(
-          {
-            formulaParams: parentParams,
-          },
-          {
-            where: {
-              id: oldParent.id,
-            },
-          }
-        );
-      }
-    }
-
-    const newParent: Attainment = await findAttainmentById(
-      parentId,
-      HttpCode.InternalServerError
-    );
-
-    const parentParams: ParamsObject = newParent.formulaParams;
-    if (parentParams.children) {
-      const parentFormula: FormulaImplementation = getFormulaImplementation(
-        newParent.formula
-      );
-
-      parentParams.children.push([
-        name ?? attainment.name,
-        parentFormula.defaultChildParams,
-      ]);
-
-      // Sanity check
-      await parentFormula.paramSchema.validate(parentParams);
-
-      await Attainment.update(
-        {
-          formulaParams: parentParams,
-        },
-        {
-          where: {
-            id: newParent.id,
-          },
-        }
-      );
-    }
-  } else if (name && name !== attainment.name && attainment.parentId) {
-    const parent: Attainment = await findAttainmentById(
-      attainment.parentId,
-      HttpCode.InternalServerError
-    );
-
-    const parentParams: ParamsObject = parent.formulaParams;
-    if (parentParams.children) {
-      for (const i in parentParams.children) {
-        if (parentParams.children[i][0] === attainment.name) {
-          parentParams.children[i][0] = name;
-          break;
-        }
-      }
-
-      await Attainment.update(
-        {
-          formulaParams: parentParams,
-        },
-        {
-          where: {
-            id: parent.id,
-          },
-        }
-      );
-    }
-  }
 
   await attainment
     .set({
-      parentId: parentId ?? attainment.parentId,
-      name: name ?? attainment.name,
-      daysValid: daysValid ?? attainment.daysValid,
-      minRequiredGrade: minRequiredGrade ?? attainment.minRequiredGrade,
-      maxGrade: maxGrade ?? attainment.maxGrade,
-      formula: formula ?? attainment.formula,
-      formulaParams: formulaParams ?? attainment.formulaParams,
-      gradeType: gradeType ?? attainment.gradeType,
+      name: requestTree.name ?? attainment.name,
+      daysValid: requestTree.daysValid ?? attainment.daysValid,
     })
     .save();
 
-  const attainmentTree: AttainmentData = {
-    id: attainment.id,
-    parentId: attainment.parentId,
-    assessmentModelId: attainment.assessmentModelId,
-    name: attainment.name,
-    daysValid: attainment.daysValid,
-    minRequiredGrade: attainment.minRequiredGrade,
-    maxGrade: attainment.maxGrade,
-    formula: attainment.formula,
-    formulaParams: attainment.formulaParams,
-    gradeType: attainment.gradeType,
-  };
-
   res.status(HttpCode.Ok).json({
-    data: attainmentTree,
+    // data: attainmentTree,
   });
 }
 
+// export async function deleteAttainment(
+//   req: Request,
+//   res: Response
+// ): Promise<void> {
+//   const [course, _assessmentModel, attainment]: [
+//     Course,
+//     AssessmentModel,
+//     Attainment,
+//   ] = await validateAttainmentPath(
+//     req.params.courseId,
+//     req.params.assessmentModelId,
+//     req.params.attainmentId
+//   );
+
+//   await isTeacherInChargeOrAdmin(
+//     req.user as JwtClaims,
+//     course.id,
+//     HttpCode.Forbidden
+//   );
+
+//   await sequelize.transaction(async (transaction: Transaction) => {
+//     // If parent exists, remove attainment from formulaParams children.
+//     if (attainment.parentId) {
+//       const parent: Attainment = await findAttainmentById(
+//         attainment.parentId,
+//         HttpCode.NotFound
+//       );
+
+//       const filteredChildren: Array<[string, ChildParamsObject]> =
+//         parent.formulaParams.children!.filter(
+//           (item: ParamsObject) => item[0] !== attainment.name
+//         );
+
+//       await parent
+//         .set({
+//           formulaParams: {
+//             children: filteredChildren,
+//           },
+//         })
+//         .save({transaction});
+//     }
+
+//     // Delete the attainment if found from db. This automatically
+//     // also deletes all of the subattainments of this attainment.
+//     await attainment.destroy({transaction});
+//   });
+
+//   res.status(HttpCode.Ok).send({
+//     data: {},
+//   });
+// }
 export async function deleteAttainment(
   req: Request,
   res: Response
 ): Promise<void> {
-  const [course, _assessmentModel, attainment]: [
-    Course,
-    AssessmentModel,
-    Attainment,
-  ] = await validateAttainmentPath(
-    req.params.courseId,
-    req.params.assessmentModelId,
-    req.params.attainmentId
-  );
+  const courseId = Number(req.params.courseId);
+  const attainmentId = Number(req.params.attainmentId);
 
   await isTeacherInChargeOrAdmin(
     req.user as JwtClaims,
-    course.id,
+    courseId,
     HttpCode.Forbidden
   );
 
-  await sequelize.transaction(async (transaction: Transaction) => {
-    // If parent exists, remove attainment from formulaParams children.
-    if (attainment.parentId) {
-      const parent: Attainment = await findAttainmentById(
-        attainment.parentId,
-        HttpCode.NotFound
-      );
+  const attainment: Attainment = await findAttainmentById(
+    attainmentId,
+    HttpCode.NotFound
+  );
 
-      const filteredChildren: Array<[string, ChildParamsObject]> =
-        parent.formulaParams.children!.filter(
-          (item: ParamsObject) => item[0] !== attainment.name
-        );
-
-      await parent
-        .set({
-          formulaParams: {
-            children: filteredChildren,
-          },
-        })
-        .save({transaction});
-    }
-
-    // Delete the attainment if found from db. This automatically
-    // also deletes all of the subattainments of this attainment.
-    await attainment.destroy({transaction});
-  });
+  await attainment.destroy();
 
   res.status(HttpCode.Ok).send({
     data: {},

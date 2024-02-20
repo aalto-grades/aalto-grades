@@ -10,21 +10,15 @@ export enum GradeType {
 }
 
 export interface AttainmentData {
-  id?: number;
-  assessmentModelId?: number;
-  parentId?: number;
+  id: number;
+  courseId?: number;
   name: string;
-  daysValid: number;
-  minRequiredGrade: number;
-  maxGrade: number;
-  formula: Formula;
-  formulaParams: ParamsObject;
-  gradeType: GradeType;
-  subAttainments?: Array<AttainmentData>;
+  daysValid?: number;
 }
 
 export interface AssessmentModelData {
   id?: number;
   courseId?: number;
   name: string;
+  graphStructure?: JSON;
 }
