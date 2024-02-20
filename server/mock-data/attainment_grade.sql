@@ -1,6 +1,7 @@
 -- SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
 --
 -- SPDX-License-Identifier: MIT
+ALTER TABLE public.attainment_grade DISABLE TRIGGER ALL;
 
 INSERT INTO public.attainment_grade (user_id, attainment_id, grader_id, grade, manual, status, date, expiry_date, created_at, updated_at, comment, sisu_export_date) VALUES
 (1, 14, 1, 0.37, true, 'PASS', '2022-12-20', '2023-04-23', NOW(), NOW(), NULL, NULL),
@@ -173,3 +174,5 @@ INSERT INTO public.attainment_grade (user_id, attainment_id, grader_id, grade, m
 (1, 289, 2, 5, true, 'PASS', '2023-05-01', NULL, NOW(), NOW(), NULL, NULL), -- Expired
 -- Test exceeding max grade
 (1, 5, 1, 100, true, 'PASS', '2022-12-20', '2023-04-23', NOW(), NOW(), NULL, NULL);
+
+ALTER TABLE public.attainment_grade ENABLE TRIGGER ALL;

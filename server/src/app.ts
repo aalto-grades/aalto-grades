@@ -15,7 +15,7 @@ import {router} from './routes/index';
 import {ApiError} from './types';
 
 // Register formulas before starting Express.
-require('./formulas');
+// require('./formulas');
 
 export const app: Application = express();
 
