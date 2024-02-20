@@ -176,6 +176,12 @@ const Graph = (): JSX.Element => {
 
         if (!connection.targetHandle && edge.target === connection.target) {
           return false;
+        }
+        if (
+          edge.source === connection.source &&
+          edge.target === connection.target
+        ) {
+          return false;
         } else if (
           edge.target === connection.target &&
           edge.targetHandle &&

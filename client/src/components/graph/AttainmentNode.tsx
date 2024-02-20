@@ -12,15 +12,16 @@ import {
 
 const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
   const {nodeValues, setNodeValues} = useContext(NodeValuesContext);
+  const [localValue, setLocalValue] = useState<string>('0');
+  const [error, setError] = useState<boolean>(false);
+  const [init, setInit] = useState<boolean>(false);
+
   const nodeValue = nodeValues[id] as AttainmentNodeValues;
 
-  const [localValue, setLocalValue] = useState<string>(
-    nodeValue.value.toString()
-  );
-  const [error, setError] = useState<boolean>(false);
-
   useEffect(() => {
+    if (init) return;
     setLocalValue(nodeValue.value.toString());
+    setInit(true);
   }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
