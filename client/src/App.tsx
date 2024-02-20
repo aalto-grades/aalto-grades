@@ -14,11 +14,11 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
-import {SystemRole} from '@common/types';
 import {CSSProperties, JSX} from 'react';
 import {Route, Routes} from 'react-router-dom';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'; // For debugging
 
+import {SystemRole} from '@common/types';
 import CourseResultsView from './components/CourseResultsView';
 import CourseView from './components/CourseView';
 import EditAttainmentView from './components/EditAttainmentView';
@@ -27,6 +27,7 @@ import EditInstanceView from './components/EditInstanceView';
 import FetchInstancesView from './components/FetchInstancesView';
 import Footer from './components/Footer';
 import FrontPage from './components/FrontPage';
+import Graph from './components/Graph';
 import NotFound from './components/NotFound';
 import AlertSnackbar from './components/alerts/AlertSnackbar';
 import Login from './components/auth/Login';
@@ -195,6 +196,7 @@ export default function App(): JSX.Element {
                   element={<PrivateRoute roles={Object.values(SystemRole)} />}
                 >
                   <Route path="/" element={<FrontPage />} />
+                  <Route path="/graph" element={<Graph />} />
                   <Route
                     path="/course-view/:courseId"
                     element={<CourseView />}

@@ -11,14 +11,19 @@ module.exports = {
     'plugin:react-hooks/recommended',
     '../.eslintrc.json',
   ],
-  ignorePatterns: ['dist', '.eslintrc.cjs'],
+  ignorePatterns: ['dist', '.eslintrc.cjs', 'vite-env.d.ts', 'vite.config.ts'],
   parser: '@typescript-eslint/parser',
   plugins: ['react-refresh'],
   rules: {
     'react-hooks/rules-of-hooks': 'warn',
+    '@typescript-eslint/switch-exhaustiveness-check': 'warn',
     'react-refresh/only-export-components': [
       'warn',
       {allowConstantExport: true},
     ],
+  },
+  parserOptions: {
+    project: './tsconfig.json',
+    tsconfigRootDir: __dirname,
   },
 };
