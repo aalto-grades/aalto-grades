@@ -62,6 +62,7 @@ const Graph = (): JSX.Element => {
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initValues.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initValues.edges);
+  const [initEdges, setInitEdges] = useState<Edge[]>([]);
   const [nodeSettings, setNodeSettings] = useState<AllNodeSettings>(
     initValues.nodeSettings
   );
@@ -128,9 +129,10 @@ const Graph = (): JSX.Element => {
 
   useEffect(() => {
     if (
-      oldNodeValues !== JSON.stringify(nodeValues) ||
-      oldNodeSettings !== JSON.stringify(nodeSettings) ||
-      oldEdges.length !== edges.length
+      initEdges.length === 0 &&
+      (oldNodeValues !== JSON.stringify(nodeValues) ||
+        oldNodeSettings !== JSON.stringify(nodeSettings) ||
+        oldEdges.length !== edges.length)
     ) {
       setOldNodeValues(JSON.stringify(nodeValues));
       setOldNodeSettings(JSON.stringify(nodeSettings));
@@ -139,6 +141,7 @@ const Graph = (): JSX.Element => {
     }
   }, [
     edges,
+    initEdges.length,
     nodeSettings,
     nodeValues,
     oldEdges,
@@ -146,6 +149,32 @@ const Graph = (): JSX.Element => {
     oldNodeValues,
     updateValues,
   ]);
+
+  const loadGraph = (initGraph: {
+    nodes: Node[];
+    edges: Edge[];
+    nodeSettings: AllNodeSettings;
+    nodeValues: NodeValues;
+  }) => {
+    for (const node of nodes) {
+      onNodesChange([{id: node.id, type: 'remove'}]);
+    }
+    setTimeout(() => {
+      setNodes(initGraph.nodes);
+      setInitEdges(initGraph.edges);
+      setNodeSettings(initGraph.nodeSettings);
+      setNodeValues(initGraph.nodeValues);
+    }, 0);
+  };
+  useEffect(() => {
+    if (initEdges.length > 0) {
+      formatGraph(nodes, initEdges, nodeHeights, nodeValues).then(newNodes => {
+        setEdges(initEdges);
+        setNodes(newNodes); // TODO: remove auto formatting on load in production
+        setInitEdges([]);
+      });
+    }
+  }, [initEdges]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -331,68 +360,16 @@ const Graph = (): JSX.Element => {
             RequireNode
           </div>
           <button onClick={format}>Format</button>
-          <button
-            onClick={() => {
-              const newInitvalues = createSimpleGraph(false);
-              for (const node of nodes) {
-                onNodesChange([{id: node.id, type: 'remove'}]);
-              }
-              setTimeout(() => {
-                setNodes(newInitvalues.nodes);
-                setEdges(newInitvalues.edges);
-                setNodeSettings(newInitvalues.nodeSettings);
-                setNodeValues(newInitvalues.nodeValues);
-              }, 0);
-            }}
-          >
+          <button onClick={() => loadGraph(createSimpleGraph(false))}>
             Load addition template
           </button>
-          <button
-            onClick={() => {
-              const newInitvalues = createSimpleGraph(true);
-              for (const node of nodes) {
-                onNodesChange([{id: node.id, type: 'remove'}]);
-              }
-              setTimeout(() => {
-                setNodes(newInitvalues.nodes);
-                setEdges(newInitvalues.edges);
-                setNodeSettings(newInitvalues.nodeSettings);
-                setNodeValues(newInitvalues.nodeValues);
-              }, 0);
-            }}
-          >
+          <button onClick={() => loadGraph(createSimpleGraph(true))}>
             Load average template
           </button>
-          <button
-            onClick={() => {
-              const newInitvalues = createY1();
-              for (const node of nodes) {
-                onNodesChange([{id: node.id, type: 'remove'}]);
-              }
-              setTimeout(() => {
-                setNodes(newInitvalues.nodes);
-                setEdges(newInitvalues.edges);
-                setNodeSettings(newInitvalues.nodeSettings);
-                setNodeValues(newInitvalues.nodeValues);
-              }, 0);
-            }}
-          >
+          <button onClick={() => loadGraph(createY1())}>
             Load Y1 template
           </button>
-          <button
-            onClick={() => {
-              const newInitvalues = createO1();
-              for (const node of nodes) {
-                onNodesChange([{id: node.id, type: 'remove'}]);
-              }
-              setTimeout(() => {
-                setNodes(newInitvalues.nodes);
-                setEdges(newInitvalues.edges);
-                setNodeSettings(newInitvalues.nodeSettings);
-                setNodeValues(newInitvalues.nodeValues);
-              }, 0);
-            }}
-          >
+          <button onClick={() => loadGraph(createO1())}>
             Load O1 template
           </button>
         </NodeHeightsContext.Provider>

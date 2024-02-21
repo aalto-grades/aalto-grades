@@ -57,12 +57,74 @@ export const initNode = (
       };
   }
 };
-export const getInitNodeValues = (nodes: Node[]) => {
-  const initNodeValues: NodeValues = {};
-  for (const node of nodes) {
-    initNodeValues[node.id] = initNode(node.type as CustomNodeTypes).value;
+export const getInitNodeValues = (
+  nodes: Node[],
+  edges: Edge[],
+  attainmentMaxValue: number
+) => {
+  const nodeSources: {[key: string]: Edge[]} = {};
+  const nodeTargets: {[key: string]: Edge[]} = {};
+  for (const edge of edges) {
+    if (!(edge.target in nodeSources)) nodeSources[edge.target] = [];
+    if (!(edge.source in nodeTargets)) nodeTargets[edge.source] = [];
+    nodeSources[edge.target].push(edge);
+    nodeTargets[edge.source].push(edge);
   }
-  return initNodeValues;
+
+  const nodeValues: NodeValues = {};
+  for (const node of nodes) {
+    const nodeValueSources: {
+      [key: string]: {isConnected: boolean; value: number};
+    } = {};
+    const nodeTargetValues: {
+      [key: string]: number;
+    } = {};
+    if (node.id in nodeSources) {
+      for (const edge of nodeSources[node.id]) {
+        nodeValueSources[edge.targetHandle as string] = {
+          isConnected: true,
+          value: 0,
+        };
+      }
+    }
+    if (node.id in nodeTargets) {
+      for (const edge of nodeTargets[node.id])
+        nodeTargetValues[edge.sourceHandle as string] = 0;
+    }
+
+    const type = node.type as CustomNodeTypes;
+    switch (type) {
+      case 'attainment':
+        nodeValues[node.id] = {
+          type,
+          value: Math.floor(Math.random() * (attainmentMaxValue + 1)),
+        };
+        break;
+      case 'grade':
+      case 'stepper':
+      case 'minpoints':
+        nodeValues[node.id] = {type, source: 0, value: 0};
+        break;
+      case 'addition':
+      case 'average':
+      case 'max':
+        nodeValues[node.id] = {
+          type,
+          sources: nodeValueSources,
+          value: 0,
+        };
+        break;
+      case 'require':
+        nodeValues[node.id] = {
+          type,
+          sources: nodeValueSources,
+          values: nodeTargetValues,
+          courseFail: false,
+        };
+        break;
+    }
+  }
+  return nodeValues;
 };
 
 const setNodeValue = (
