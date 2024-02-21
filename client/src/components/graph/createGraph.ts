@@ -33,17 +33,21 @@ const createNode = (
 const createEdge = (
   sourceLabel: string,
   targetLabel: string,
-  sourceHandle?: string,
-  targetHandle?: string
+  sourceHandle?: string | number,
+  targetHandle?: string | number
 ): Edge => {
   const source = sourceLabel.toLowerCase().replaceAll(' ', '-');
   const target = targetLabel.toLowerCase().replaceAll(' ', '-');
   return {
-    id: `${source}:${sourceHandle || '-'}-${target}:${targetHandle || '-'}`,
+    id: `${source}:${sourceHandle ?? ''}-${target}:${targetHandle ?? ''}`,
     source,
     target,
-    sourceHandle,
-    targetHandle,
+    sourceHandle:
+      sourceHandle !== undefined
+        ? `${source}-${sourceHandle}-source`
+        : `${source}-source`,
+    targetHandle:
+      targetHandle !== undefined ? `${target}-${targetHandle}` : target,
   };
 };
 
@@ -70,7 +74,7 @@ export const createSimpleGraph = (
         `Exercise ${i + 1}`,
         useAverage ? 'Average' : 'Addition',
         undefined,
-        i.toString()
+        i
       )
     );
   }
@@ -95,7 +99,7 @@ export const createSimpleGraph = (
     edges.push(createEdge('Average', 'Stepper'));
     for (let i = 0; i < NUM_SIMPLE_EXERCISES; i++) {
       const averageSettings = nodeSettings.average as AverageNodeSettings;
-      averageSettings.weights[i.toString()] =
+      averageSettings.weights[`average-${i}`] =
         Math.ceil(10 * Math.random()) / 10;
     }
   } else {
@@ -125,12 +129,12 @@ export const createO1 = (): {
     createNode('grade', 'Final Grade', 600, 0),
   ];
   const edges: Edge[] = [
-    createEdge('Tier A', 'Sum ABC', undefined, '0'),
-    createEdge('Tier B', 'Sum ABC', undefined, '1'),
-    createEdge('Tier C', 'Sum ABC', undefined, '2'),
-    createEdge('Tier B', 'Sum BC', undefined, '0'),
-    createEdge('Tier C', 'Sum BC', undefined, '1'),
-    createEdge('Tier C', 'Sum C', undefined, '0'),
+    createEdge('Tier A', 'Sum ABC', undefined, 0),
+    createEdge('Tier B', 'Sum ABC', undefined, 1),
+    createEdge('Tier C', 'Sum ABC', undefined, 2),
+    createEdge('Tier B', 'Sum BC', undefined, 0),
+    createEdge('Tier C', 'Sum BC', undefined, 1),
+    createEdge('Tier C', 'Sum C', undefined, 0),
     createEdge('Best Grade', 'Final Grade'),
   ];
   const nodeSettings: AllNodeSettings = {'best-grade': {minValue: 0}};
@@ -166,7 +170,7 @@ export const createO1 = (): {
         `A Min Grade ${i + 1}`,
         `Require All 3 Grade ${i + 1}`,
         undefined,
-        '0'
+        0
       )
     );
     edges.push(
@@ -174,7 +178,7 @@ export const createO1 = (): {
         `B Min Grade ${i + 1}`,
         `Require All 3 Grade ${i + 1}`,
         undefined,
-        '1'
+        1
       )
     );
     edges.push(
@@ -182,7 +186,7 @@ export const createO1 = (): {
         `C Min Grade ${i + 1}`,
         `Require All 3 Grade ${i + 1}`,
         undefined,
-        '2'
+        2
       )
     );
     nodeSettings[`require-all-3-grade-${i + 1}`] = {
@@ -194,11 +198,7 @@ export const createO1 = (): {
       createNode('stepper', `Convert To Grade ${i + 1}`, 400, i * 100)
     );
     edges.push(
-      createEdge(
-        `Require All 3 Grade ${i + 1}`,
-        `Convert To Grade ${i + 1}`,
-        '0'
-      )
+      createEdge(`Require All 3 Grade ${i + 1}`, `Convert To Grade ${i + 1}`, 0)
     );
     nodeSettings[`convert-to-grade-${i + 1}`] = {
       numSteps: 2,
@@ -207,12 +207,7 @@ export const createO1 = (): {
     };
 
     edges.push(
-      createEdge(
-        `Convert To Grade ${i + 1}`,
-        'Best Grade',
-        undefined,
-        i.toString()
-      )
+      createEdge(`Convert To Grade ${i + 1}`, 'Best Grade', undefined, i)
     );
   }
 
@@ -242,18 +237,17 @@ export const createY1 = (): {
   ];
   const edges: Edge[] = [
     createEdge('Bonus Round', 'Minpoints bonus'),
-    createEdge('Minpoints bonus', 'Substitute bonus', undefined, '4'),
-    createEdge('Substitute bonus', 'Bonus require', '4', '0'),
-    createEdge('Bonus require', 'Sum bonus', '0', '0'),
+    createEdge('Minpoints bonus', 'Substitute bonus', undefined, 4),
+    createEdge('Substitute bonus', 'Bonus require', 4, 0),
+    createEdge('Bonus require', 'Sum bonus', 0, 0),
     createEdge('Sum bonus', 'Stepper bonus'),
     createEdge('Sum nobonus', 'Stepper nobonus'),
-    createEdge('Stepper bonus', 'Max grade', undefined, '0'),
-    createEdge('Stepper nobonus', 'Max grade', undefined, '1'),
+    createEdge('Stepper bonus', 'Max grade', undefined, 0),
+    createEdge('Stepper nobonus', 'Max grade', undefined, 1),
     createEdge('Max grade', 'Final grade'),
   ];
   const nodeSettings: AllNodeSettings = {
     'minpoints-bonus': {minPoints: 600},
-    // 'convert-to-zero': {numFail: 0, failSetting: 'ignore'},
     'substitute-rounds': {numFail: 3, failSetting: 'ignore'},
     'substitute-bonus': {numFail: 1, failSetting: 'ignore'},
     'no-fails': {numFail: 0, failSetting: 'coursefail'},
@@ -281,70 +275,30 @@ export const createY1 = (): {
     nodeSettings[`minpoints-${i + 1}`] = {minPoints: minPoints[i]};
 
     edges.push(
-      createEdge(
-        `Minpoints ${i + 1}`,
-        'Substitute rounds',
-        undefined,
-        (i + 4).toString()
-      )
+      createEdge(`Minpoints ${i + 1}`, 'Substitute rounds', undefined, i + 4)
     );
 
     nodes.push(createNode('max', `Min score ${i + 1}`, 400, 0));
-    edges.push(
-      createEdge(
-        'Substitute rounds',
-        'No fails',
-        (i + 4).toString(),
-        i.toString()
-      )
-    );
+    edges.push(createEdge('Substitute rounds', 'No fails', i + 4, i));
 
-    edges.push(createEdge('No fails', `Min score ${i + 1}`, i.toString()));
+    edges.push(createEdge('No fails', `Min score ${i + 1}`, i));
     nodeSettings[`min-score-${i + 1}`] = {minValue: minPoints[i]};
 
+    edges.push(createEdge(`Min score ${i + 1}`, 'Sum nobonus', undefined, i));
     edges.push(
-      createEdge(`Min score ${i + 1}`, 'Sum nobonus', undefined, i.toString())
+      createEdge(`Min score ${i + 1}`, 'Bonus require', undefined, i + 1)
     );
-    edges.push(
-      createEdge(
-        `Min score ${i + 1}`,
-        'Bonus require',
-        undefined,
-        (i + 1).toString()
-      )
-    );
-    edges.push(
-      createEdge(
-        'Bonus require',
-        'Sum bonus',
-        (i + 1).toString(),
-        (i + 1).toString()
-      )
-    );
+    edges.push(createEdge('Bonus require', 'Sum bonus', i + 1, i + 1));
   }
   for (let i = 0; i < 4; i++) {
     nodes.push(createNode('attainment', `Substitute ${i + 1}`, 0, 0));
     edges.push(createEdge(`Substitute ${i + 1}`, `Minpoints sub ${i + 1}`));
 
     nodes.push(createNode('minpoints', `Minpoints sub ${i + 1}`, 100, 0));
-    edges.push(
-      createEdge(
-        `Minpoints sub ${i + 1}`,
-        'Substitute rounds',
-        i.toString(),
-        i.toString()
-      )
-    );
+    edges.push(createEdge(`Minpoints sub ${i + 1}`, 'Substitute rounds', i, i));
     nodeSettings[`minpoints-sub-${i + 1}`] = {minPoints: 200};
 
-    edges.push(
-      createEdge(
-        'Substitute rounds',
-        'Substitute bonus',
-        i.toString(),
-        i.toString()
-      )
-    );
+    edges.push(createEdge('Substitute rounds', 'Substitute bonus', i, i));
   }
 
   const nodeValues = getInitNodeValues(nodes);

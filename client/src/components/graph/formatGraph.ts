@@ -68,7 +68,17 @@ export const formatGraph = async (
     },
     children: nodesForElk.map(node => {
       const nodevalue = nodeValues[node.id];
-      if (
+      if (nodevalue.type === 'attainment') {
+        return {
+          ...node,
+          ports: [{id: `${node.id}-source`, properties: {side: 'EAST'}}],
+        };
+      } else if (nodevalue.type === 'grade') {
+        return {
+          ...node,
+          ports: [{id: node.id, properties: {side: 'WEST'}}],
+        };
+      } else if (
         nodevalue.type !== 'addition' &&
         nodevalue.type !== 'average' &&
         nodevalue.type !== 'max' &&
@@ -76,39 +86,40 @@ export const formatGraph = async (
       ) {
         return {
           ...node,
-          ports: [{id: node.id}],
+          ports: [
+            {id: node.id, properties: {side: 'WEST'}},
+            {id: `${node.id}-source`, properties: {side: 'EAST'}},
+          ],
         };
       }
 
       const sourcePorts = Object.keys(nodevalue.sources)
         .toReversed()
         .map(key => ({
-          id: `${node.id}-${key}`,
+          id: key,
           properties: {side: 'WEST'},
         }));
 
-      const targetPortsPorts =
+      const targetPorts =
         nodevalue.type !== 'require'
-          ? []
+          ? [{id: `${node.id}-source`, properties: {side: 'EAST'}}]
           : Object.keys(nodevalue.values)
               .toReversed()
               .map(key => ({
-                id: `${node.id}-${key}-source`,
-                properties: {side: 'WEST'},
+                id: `${key}-source`,
+                properties: {side: 'EAST'},
               }));
 
       return {
         ...node,
         properties: {'org.eclipse.elk.portConstraints': 'FIXED_ORDER'},
-        ports: [{id: node.id}, ...sourcePorts, ...targetPortsPorts],
+        ports: [...sourcePorts, ...targetPorts],
       };
     }),
     edges: edges.map(edge => ({
       ...edge,
       sources: [edge.source],
-      targets: [
-        edge.targetHandle ? `${edge.target}-${edge.targetHandle}` : edge.target,
-      ],
+      targets: [edge.targetHandle as string],
     })),
   };
 

@@ -51,7 +51,7 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
     let maxId = 0;
     let newHandles = [...handles];
     for (const [key, source] of Object.entries(nodeValue.sources)) {
-      maxId = Math.max(maxId, parseInt(key));
+      maxId = Math.max(maxId, parseInt(key.split('-')[1]));
       if (!newHandles.includes(key)) {
         newHandles.push(key);
         change = true;
@@ -132,27 +132,27 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
       <h4 style={{margin: 0}}>{data.label}</h4>
       {handles.map((key, index) => (
         <Handle
-          key={`handle-${id}-${key}`}
+          key={`handle-${key}`}
           type="target"
+          id={key}
           style={{
             height: '12px',
             width: '12px',
             top: `${handleStartHeight + index * rowHeight}px`,
           }}
           position={Position.Left}
-          id={key}
           isConnectable={isConnectable}
         />
       ))}
       <Handle
         type="target"
+        id={`${id}-${nextFree}`}
         style={{
           height: '12px',
           width: '12px',
           top: `${handleStartHeight + handles.length * rowHeight}px`,
         }}
         position={Position.Left}
-        id={nextFree.toString()}
         isConnectable={isConnectable}
       />
       <label>On fail</label>
@@ -177,7 +177,7 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
             .filter(([_, source]) => source.isConnected)
             .map(([key, source]) => (
               <tr
-                key={`tr-${id}-${key}`}
+                key={`tr-${key}`}
                 style={{
                   height: rowHeight,
                   backgroundColor: source.value === 'reqfail' ? '#f003' : '',
@@ -199,15 +199,15 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
       </table>
       {handles.map((key, index) => (
         <Handle
-          key={`handle-${id}-${key}-source`}
+          key={`handle-${key}-source`}
           type="source"
+          id={`${key}-source`}
           style={{
             height: '12px',
             width: '12px',
             top: `${handleStartHeight + index * rowHeight}px`,
           }}
           position={Position.Right}
-          id={key}
           isConnectable={isConnectable}
         />
       ))}

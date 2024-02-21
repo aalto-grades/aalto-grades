@@ -63,6 +63,7 @@ const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
       </div>
       <Handle
         type="source"
+        id={`${id}-source`}
         style={{height: '12px', width: '12px'}}
         position={Position.Right}
         isConnectable={isConnectable}

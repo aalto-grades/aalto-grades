@@ -171,6 +171,7 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
     >
       <Handle
         type="target"
+        id={id}
         style={{height: '12px', width: '12px'}}
         position={Position.Left}
         isConnectable={isConnectable}
@@ -259,6 +260,7 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
       </div>
       <Handle
         type="source"
+        id={`${id}-source`}
         style={{height: '12px', width: '12px'}}
         position={Position.Right}
         isConnectable={isConnectable}

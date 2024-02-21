@@ -168,22 +168,12 @@ export const findDisconnectedEdges = (
 
   const newNodeValues = {...oldNodeValues};
   for (const node of nodes) {
-    const nodeValue = newNodeValues[node.id];
-    switch (nodeValue.type) {
-      case 'attainment':
-      case 'grade':
-      case 'stepper':
-      case 'minpoints':
-        break; // ignore
-      case 'addition':
-      case 'average':
-      case 'max':
-      case 'require':
-        for (const value of Object.values(nodeValue.sources)) {
-          value.value = 0;
-          value.isConnected = false;
-        }
-        break;
+    const sourceNodeValue = newNodeValues[node.id];
+    if (sourceNodeValue.type === 'require') {
+      for (const value of Object.values(sourceNodeValue.sources)) {
+        value.value = 0;
+        value.isConnected = false;
+      }
     }
   }
 
@@ -191,30 +181,22 @@ export const findDisconnectedEdges = (
     if (!(node.id in nodeTargets)) continue;
     for (const edge of nodeTargets[node.id]) {
       const nodeValue = newNodeValues[edge.target];
-      switch (nodeValue.type) {
-        case 'attainment':
-        case 'minpoints':
-        case 'grade':
-        case 'stepper':
-          break; // Ignore
-        case 'addition':
-        case 'average':
-        case 'max':
-        case 'require':
-          nodeValue.sources[edge.targetHandle as string] = {
-            value: 0,
-            isConnected: true,
-          };
-          break;
-      }
+      if (nodeValue.type !== 'require') continue;
+
+      nodeValue.sources[edge.targetHandle as string] = {
+        value: 0,
+        isConnected: true,
+      };
     }
   }
 
   const badEdges = [];
   for (const edge of edges) {
     const sourceNodeValues = newNodeValues[edge.source];
+
     if (sourceNodeValues.type !== 'require') continue;
-    const sourceHandle = edge.sourceHandle as string;
+
+    const sourceHandle = (edge.sourceHandle as string).replace('-source', '');
     if (
       !(sourceHandle in sourceNodeValues.sources) ||
       !sourceNodeValues.sources[sourceHandle].isConnected
@@ -270,7 +252,7 @@ export const calculateNewNodeValues = (
 
   let courseFail = false;
   while (noSources.length > 0) {
-    const sourceId = noSources.pop() as string;
+    const sourceId = noSources.shift() as string;
     setNodeValue(sourceId, newNodeValues[sourceId], nodeSettings);
     const sourceNodeValue = newNodeValues[sourceId];
 
@@ -285,7 +267,9 @@ export const calculateNewNodeValues = (
     for (const edge of nodeTargets[sourceId]) {
       const sourceValue =
         sourceNodeValue.type === 'require'
-          ? sourceNodeValue.values[edge.sourceHandle as string]
+          ? sourceNodeValue.values[
+              (edge.sourceHandle as string).replace('-source', '')
+            ]
           : sourceNodeValue.value;
 
       nodeSources[edge.target].delete(sourceId);

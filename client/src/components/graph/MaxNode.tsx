@@ -51,7 +51,7 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
     let maxId = 0;
     let newHandles = [...handles];
     for (const [key, source] of Object.entries(nodeValue.sources)) {
-      maxId = Math.max(maxId, parseInt(key));
+      maxId = Math.max(maxId, parseInt(key.split('-')[1]));
       if (!handles.includes(key)) {
         newHandles.push(key);
         change = true;
@@ -101,29 +101,29 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
       }}
     >
       <h4 style={{margin: 0}}>{data.label}</h4>
-      {handles.map((handleId, index) => (
+      {handles.map((key, index) => (
         <Handle
-          key={`handle-${id}-${handleId}`}
+          key={`handle-${key}`}
           type="target"
+          id={key}
           style={{
             height: '12px',
             width: '12px',
             top: `${handleStartHeight + index * rowHeight}px`,
           }}
           position={Position.Left}
-          id={handleId}
           isConnectable={isConnectable}
         />
       ))}
       <Handle
         type="target"
+        id={`${id}-${nextFree}`}
         style={{
           height: '12px',
           width: '12px',
           top: `${handleStartHeight + handles.length * rowHeight}px`,
         }}
         position={Position.Left}
-        id={nextFree.toString()}
         isConnectable={isConnectable}
       />
       <table style={{width: '100%', margin: '5px 0px'}}>
@@ -164,6 +164,7 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
       </p>
       <Handle
         type="source"
+        id={`${id}-source`}
         style={{height: '12px', width: '12px'}}
         position={Position.Right}
         isConnectable={isConnectable}

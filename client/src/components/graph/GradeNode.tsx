@@ -24,6 +24,7 @@ const GradeNode = ({id, data, isConnectable}: NodeProps) => {
     >
       <Handle
         type="target"
+        id={id}
         style={{height: '12px', width: '12px'}}
         position={Position.Left}
         isConnectable={isConnectable}
