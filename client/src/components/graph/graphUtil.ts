@@ -116,16 +116,20 @@ const setNodeValue = (
     case 'require': {
       const settings = nodeSettings[nodeId] as RequireNodeSettings;
       let numFail = 0;
-      for (const [nodeId, source] of Object.entries(nodeValue.sources)) {
+      for (const [handleId, source] of Object.entries(nodeValue.sources)) {
         if (!source.isConnected) continue;
-        nodeValue.values[nodeId] =
+        nodeValue.values[handleId] =
           source.value === 'reqfail' ? 0 : source.value;
         if (source.value === 'reqfail') numFail++;
       }
-      if (settings.failSetting === 'coursefail' && numFail > settings.numFail) {
+      nodeValue.courseFail = false;
+      if (numFail > settings.numFail && settings.failSetting === 'coursefail') {
         nodeValue.courseFail = true;
-      } else {
-        nodeValue.courseFail = false;
+      } else if (numFail > settings.numFail) {
+        for (const [handleId, source] of Object.entries(nodeValue.sources)) {
+          if (!source.isConnected) continue;
+          nodeValue.values[handleId] = 0;
+        }
       }
       break;
     }
