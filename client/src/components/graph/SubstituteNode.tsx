@@ -105,6 +105,7 @@ const SubstituteNode = ({id, data, isConnectable}: NodeProps) => {
         exerciseIndex++;
         if (!newExerciseHandles.includes(key)) {
           newExerciseHandles.push(key);
+          newLocalSettings.substituteValues.push('');
           change = true;
         }
         if (!source.isConnected) {
@@ -123,6 +124,13 @@ const SubstituteNode = ({id, data, isConnectable}: NodeProps) => {
         id,
         calculateHeight(newSubstituteHandles, newExerciseHandles)
       );
+      setLocalSettings(newLocalSettings);
+
+      const error = checkError(newLocalSettings);
+      setError(error);
+      if (!error) {
+        setNodeSettings(id, convertFromLocalSettings(newLocalSettings));
+      }
     }
   }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -230,7 +238,7 @@ const SubstituteNode = ({id, data, isConnectable}: NodeProps) => {
         style={{width: 'calc(100% - 20px)'}}
         type="number"
         onChange={handleNumChange}
-        value={localSettings.maxSubstitutions}
+        value={localSettings.maxSubstitutions ?? ''}
       />
       <label>Substitutes</label>
 

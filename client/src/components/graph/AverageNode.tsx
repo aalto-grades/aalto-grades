@@ -91,10 +91,13 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
     if (change) {
       setHandles(newHandles);
       setLocalSettings(newLocalSettings);
-      setError(checkError(newLocalSettings));
-      setNodeSettings(id, convertSettingsToFloats(newLocalSettings));
+      const error = checkError(newLocalSettings);
+      setError(error);
       setNextFree(maxId + 1);
       setNodeHeight(id, calculateHeight(newHandles));
+      if (!error) {
+        setNodeSettings(id, convertSettingsToFloats(newLocalSettings));
+      }
     }
   }, [nodeValues, init]); // eslint-disable-line react-hooks/exhaustive-deps
 
