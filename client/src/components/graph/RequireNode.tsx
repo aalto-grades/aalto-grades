@@ -51,7 +51,7 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
     let maxId = 0;
     let newHandles = [...handles];
     for (const [key, source] of Object.entries(nodeValue.sources)) {
-      maxId = Math.max(maxId, parseInt(key.split('-')[1]));
+      maxId = Math.max(maxId, parseInt(key.split('-').at(-1) as string));
       if (!newHandles.includes(key)) {
         newHandles.push(key);
         change = true;

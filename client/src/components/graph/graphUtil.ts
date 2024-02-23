@@ -14,6 +14,7 @@ import {
   NodeValues,
   RequireNodeSettings,
   StepperNodeSettings,
+  SubstituteNodeSettings,
 } from '../../context/GraphProvider';
 
 export const initNode = (
@@ -53,6 +54,14 @@ export const initNode = (
           numSteps: 1,
           middlePoints: [],
           outputValues: [0],
+        },
+      };
+    case 'substitute':
+      return {
+        value: {type, sources: {}, values: {}},
+        settings: {
+          maxSubstitutions: 0,
+          substituteValues: [],
         },
       };
   }
@@ -115,6 +124,7 @@ export const getInitNodeValues = (
         };
         break;
       case 'require':
+      case 'substitute':
         nodeValues[node.id] = {
           type,
           sources: nodeValueSources,
@@ -211,6 +221,58 @@ const setNodeValue = (
       }
       break;
     }
+    case 'substitute': {
+      const settings = nodeSettings[nodeId] as SubstituteNodeSettings;
+      let numSubstitutes = 0;
+      let numToSubstitute = 0;
+      for (const [key, source] of Object.entries(nodeValue.sources)) {
+        if (
+          key.split('-').at(-2) === 'substitute' &&
+          source.isConnected &&
+          source.value !== 'reqfail'
+        )
+          numSubstitutes += 1;
+        else if (
+          key.split('-').at(-2) === 'exercise' &&
+          source.isConnected &&
+          source.value === 'reqfail'
+        )
+          numToSubstitute += 1;
+      }
+      numSubstitutes = Math.min(numSubstitutes, settings.maxSubstitutions);
+      numToSubstitute = Math.min(numToSubstitute, settings.maxSubstitutions);
+      numSubstitutes = Math.min(numSubstitutes, numToSubstitute);
+      numToSubstitute = Math.min(numSubstitutes, numToSubstitute);
+
+      let exerciseIndex = -1;
+      for (const [key, source] of Object.entries(nodeValue.sources)) {
+        if (key.split('-').at(-2) === 'substitute') {
+          if (
+            source.isConnected &&
+            source.value !== 'reqfail' &&
+            numToSubstitute > 0
+          ) {
+            numToSubstitute -= 1;
+            nodeValue.values[key] = 'reqfail';
+          } else if (source.isConnected) {
+            nodeValue.values[key] = source.value;
+          }
+        } else {
+          exerciseIndex++;
+          if (
+            source.isConnected &&
+            source.value === 'reqfail' &&
+            numSubstitutes > 0
+          ) {
+            numSubstitutes -= 1;
+            nodeValue.values[key] = settings.substituteValues[exerciseIndex];
+          } else if (source.isConnected) {
+            nodeValue.values[key] = source.value;
+          }
+        }
+      }
+      break;
+    }
   }
 };
 
@@ -290,20 +352,22 @@ export const calculateNewNodeValues = (
     if (!(node.id in nodeSources)) noSources.push(node.id);
 
     const nodeValue = newNodeValues[node.id];
-    if (nodeValue.type === 'require') nodeValue.values = {};
+    if (nodeValue.type === 'require' || nodeValue.type === 'substitute')
+      nodeValue.values = {};
     else if (nodeValue.type !== 'attainment') nodeValue.value = 0;
     switch (nodeValue.type) {
       case 'attainment':
         break;
       case 'grade':
-      case 'stepper':
       case 'minpoints':
+      case 'stepper':
         nodeValue.source = 0;
         break;
       case 'addition':
       case 'average':
       case 'max':
       case 'require':
+      case 'substitute':
         for (const value of Object.values(nodeValue.sources)) {
           value.value = 0;
           value.isConnected = false;
@@ -328,9 +392,13 @@ export const calculateNewNodeValues = (
 
     for (const edge of nodeTargets[sourceId]) {
       const sourceValue =
-        sourceNodeValue.type === 'require'
+        sourceNodeValue.type === 'require' ||
+        sourceNodeValue.type === 'substitute'
           ? sourceNodeValue.values[
-              (edge.sourceHandle as string).replace('-source', '')
+              (edge.sourceHandle as string)
+                .replace('-substitute-source', '')
+                .replace('-exercise-source', '')
+                .replace('-source', '')
             ]
           : sourceNodeValue.value;
 
@@ -350,6 +418,7 @@ export const calculateNewNodeValues = (
         case 'average':
         case 'max':
         case 'require':
+        case 'substitute':
           nodeValue.sources[edge.targetHandle as string] = {
             value: sourceValue,
             isConnected: true,

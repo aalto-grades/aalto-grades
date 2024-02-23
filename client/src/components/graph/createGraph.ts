@@ -203,9 +203,9 @@ export const createY1 = (): {
   const nodes = [
     createNode('attainment', 'Bonus Round'),
     createNode('minpoints', 'Minpoints bonus'),
-    createNode('require', 'Substitute rounds'),
+    createNode('substitute', 'Substitute rounds'),
     createNode('require', 'No fails'),
-    createNode('require', 'Substitute bonus'),
+    createNode('substitute', 'Substitute bonus'),
     createNode('addition', 'Sum bonus'),
     createNode('addition', 'Sum nobonus'),
     createNode('require', 'Bonus require'),
@@ -216,9 +216,7 @@ export const createY1 = (): {
   ];
   const edges: Edge[] = [
     createEdge('Bonus Round', 'Minpoints bonus'),
-    createEdge('Minpoints bonus', 'Substitute bonus', undefined, 4),
-    createEdge('Substitute bonus', 'Bonus require', 4, 0),
-    createEdge('Bonus require', 'Sum bonus', 0, 0),
+    createEdge('Minpoints bonus', 'Substitute bonus', undefined, 'exercise-0'),
     createEdge('Sum bonus', 'Stepper bonus'),
     createEdge('Sum nobonus', 'Stepper nobonus'),
     createEdge('Stepper bonus', 'Max grade', undefined, 0),
@@ -227,8 +225,14 @@ export const createY1 = (): {
   ];
   const nodeSettings: AllNodeSettings = {
     'minpoints-bonus': {minPoints: 600},
-    'substitute-rounds': {numFail: 3, failSetting: 'ignore'},
-    'substitute-bonus': {numFail: 1, failSetting: 'ignore'},
+    'substitute-rounds': {
+      maxSubstitutions: 3,
+      substituteValues: [360, 295, 325, 360, 335, 400, 370, 385],
+    },
+    'substitute-bonus': {
+      maxSubstitutions: 1,
+      substituteValues: [600],
+    },
     'no-fails': {numFail: 0, failSetting: 'coursefail'},
     'bonus-require': {numFail: 0, failSetting: 'ignore'},
     'stepper-bonus': {
@@ -254,31 +258,44 @@ export const createY1 = (): {
     nodeSettings[`minpoints-${i + 1}`] = {minPoints: minPoints[i]};
 
     edges.push(
-      createEdge(`Minpoints ${i + 1}`, 'Substitute rounds', undefined, i + 4)
+      createEdge(
+        `Minpoints ${i + 1}`,
+        'Substitute rounds',
+        undefined,
+        `exercise-${i}`
+      )
     );
-
-    nodes.push(createNode('max', `Min score ${i + 1}`));
-    edges.push(createEdge('Substitute rounds', 'No fails', i + 4, i));
-
-    edges.push(createEdge('No fails', `Min score ${i + 1}`, i));
-    nodeSettings[`min-score-${i + 1}`] = {minValue: minPoints[i]};
-
-    edges.push(createEdge(`Min score ${i + 1}`, 'Sum nobonus', undefined, i));
-    edges.push(
-      createEdge(`Min score ${i + 1}`, 'Bonus require', undefined, i + 1)
-    );
-    edges.push(createEdge('Bonus require', 'Sum bonus', i + 1, i + 1));
+    edges.push(createEdge('Substitute rounds', 'No fails', `exercise-${i}`, i));
+    edges.push(createEdge('No fails', 'Sum nobonus', i, i));
+    edges.push(createEdge('No fails', 'Bonus require', i, i));
+    edges.push(createEdge('Bonus require', 'Sum bonus', i, i));
   }
   for (let i = 0; i < 4; i++) {
     nodes.push(createNode('attainment', `Substitute ${i + 1}`));
     edges.push(createEdge(`Substitute ${i + 1}`, `Minpoints sub ${i + 1}`));
 
     nodes.push(createNode('minpoints', `Minpoints sub ${i + 1}`));
-    edges.push(createEdge(`Minpoints sub ${i + 1}`, 'Substitute rounds', i, i));
+    edges.push(
+      createEdge(
+        `Minpoints sub ${i + 1}`,
+        'Substitute rounds',
+        undefined,
+        `substitute-${i}`
+      )
+    );
     nodeSettings[`minpoints-sub-${i + 1}`] = {minPoints: 200};
 
-    edges.push(createEdge('Substitute rounds', 'Substitute bonus', i, i));
+    edges.push(
+      createEdge(
+        'Substitute rounds',
+        'Substitute bonus',
+        `substitute-${i}`,
+        `substitute-${i}`
+      )
+    );
   }
+  edges.push(createEdge('Substitute bonus', 'Bonus require', 'exercise-0', 8));
+  edges.push(createEdge('Bonus require', 'Sum bonus', 8, 8));
 
   const nodeValues = getInitNodeValues(nodes, edges, 500);
   return {nodes, edges, nodeSettings, nodeValues};

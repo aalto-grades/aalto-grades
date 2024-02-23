@@ -49,6 +49,10 @@ export const formatGraph = async (
       case 'stepper':
         width = 270;
         height = nodeHeights[node.id];
+        break;
+      case 'substitute':
+        width = 130;
+        height = nodeHeights[node.id];
     }
     return {
       type: node.type,
@@ -82,7 +86,8 @@ export const formatGraph = async (
         nodevalue.type !== 'addition' &&
         nodevalue.type !== 'average' &&
         nodevalue.type !== 'max' &&
-        nodevalue.type !== 'require'
+        nodevalue.type !== 'require' &&
+        nodevalue.type !== 'substitute'
       ) {
         return {
           ...node,

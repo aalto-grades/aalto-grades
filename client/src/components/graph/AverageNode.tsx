@@ -75,7 +75,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
     let newHandles = [...handles];
     const newLocalSettings = {...localSettings};
     for (const [key, source] of Object.entries(nodeValue.sources)) {
-      maxId = Math.max(maxId, parseInt(key.split('-')[1]));
+      maxId = Math.max(maxId, parseInt(key.split('-').at(-1) as string));
       if (!handles.includes(key)) {
         if (!(key in newLocalSettings.weights))
           newLocalSettings.weights[key] = '';

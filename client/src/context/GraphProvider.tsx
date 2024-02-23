@@ -11,7 +11,8 @@ export type DropInNodes =
   | 'max'
   | 'minpoints'
   | 'require'
-  | 'stepper';
+  | 'stepper'
+  | 'substitute';
 
 export type CustomNodeTypes = DropInNodes | 'attainment' | 'grade';
 
@@ -55,6 +56,11 @@ export type StepperNodeValues = {
   source: number;
   value: number;
 };
+export type SubstituteNodeValues = {
+  type: 'substitute';
+  sources: {[key: string]: {isConnected: boolean; value: number | 'reqfail'}};
+  values: {[key: string]: number | 'reqfail'};
+};
 
 export type NodeValue =
   | AdditionNodeValues
@@ -64,7 +70,8 @@ export type NodeValue =
   | MaxNodeValues
   | MinPointsNodeValues
   | RequireNodeValues
-  | StepperNodeValues;
+  | StepperNodeValues
+  | SubstituteNodeValues;
 
 export type NodeValues = {
   [key: string]: NodeValue;
@@ -96,13 +103,18 @@ export type StepperNodeSettings = {
   outputValues: (number | 'same')[];
   middlePoints: number[];
 };
+export type SubstituteNodeSettings = {
+  maxSubstitutions: number;
+  substituteValues: number[];
+};
 
 export type NodeSettings =
   | AverageNodeSettings
   | MaxNodeSettings
   | MinPointsNodeSettings
   | RequireNodeSettings
-  | StepperNodeSettings;
+  | StepperNodeSettings
+  | SubstituteNodeSettings;
 export type AllNodeSettings = {[key: string]: NodeSettings};
 type NodeSettingsContext = {
   nodeSettings: AllNodeSettings;

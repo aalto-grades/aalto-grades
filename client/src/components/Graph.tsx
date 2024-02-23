@@ -45,6 +45,7 @@ import {
   findDisconnectedEdges,
   initNode,
 } from './graph/graphUtil';
+import SubstituteNode from './graph/SubstituteNode';
 
 const nodeMap = {
   addition: AdditionNode,
@@ -55,6 +56,7 @@ const nodeMap = {
   minpoints: MinPointsNode,
   require: RequireNode,
   stepper: StepperNode,
+  substitute: SubstituteNode,
 };
 
 const Graph = (): JSX.Element => {
@@ -189,8 +191,10 @@ const Graph = (): JSX.Element => {
       const typeMap: {[key: string]: CustomNodeTypes} = {};
       for (const node of nodes) typeMap[node.id] = node.type as CustomNodeTypes;
       if (
-        typeMap[connection.source as string] === 'minpoints' &&
-        typeMap[connection.target as string] !== 'require'
+        (typeMap[connection.source as string] === 'minpoints' ||
+          typeMap[connection.target as string] === 'substitute') &&
+        typeMap[connection.target as string] !== 'require' &&
+        typeMap[connection.target as string] !== 'substitute'
       ) {
         return false;
       }
@@ -205,16 +209,16 @@ const Graph = (): JSX.Element => {
 
         if (!connection.targetHandle && edge.target === connection.target) {
           return false;
-        }
-        if (
-          edge.source === connection.source &&
-          edge.target === connection.target
-        ) {
-          return false;
         } else if (
           edge.target === connection.target &&
           edge.targetHandle &&
           edge.targetHandle === connection.targetHandle
+        ) {
+          return false;
+        } else if (
+          edge.source === connection.source &&
+          edge.sourceHandle === connection.sourceHandle &&
+          edge.target === connection.target
         ) {
           return false;
         }
@@ -253,7 +257,7 @@ const Graph = (): JSX.Element => {
     event.dataTransfer.dropEffect = 'move';
   }, []);
   let id = 0;
-  const getId = useCallback(() => `dndnode_${id++}`, [id]);
+  const getId = useCallback(() => `dndnode-${id++}`, [id]);
   const onDrop: DragEventHandler<HTMLDivElement> = useCallback(
     event => {
       event.preventDefault();
@@ -358,6 +362,13 @@ const Graph = (): JSX.Element => {
             draggable
           >
             RequireNode
+          </div>
+          <div
+            className="dndnode"
+            onDragStart={event => onDragStart(event, 'substitute')}
+            draggable
+          >
+            SubstituteNode
           </div>
           <button onClick={format}>Format</button>
           <button onClick={() => loadGraph(createSimpleGraph(false))}>
