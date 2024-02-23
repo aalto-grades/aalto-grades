@@ -2,15 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {useMeasure} from '@uidotdev/usehooks';
 import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
-  NodeHeightsContext,
+  NodeDimensionsContext,
   NodeSettingsContext,
   NodeValuesContext,
-  StepperNodeValues,
   StepperNodeSettings,
+  StepperNodeValues,
 } from '../../context/GraphProvider';
 
 type LocalSettings = {
@@ -26,8 +27,6 @@ const initialSettings = {
 
 const nodeMinHeight = 78.683 + 4;
 const rowHeight = 33.9;
-const calculateHeight = (localSettings: LocalSettings | StepperNodeSettings) =>
-  nodeMinHeight + (localSettings.numSteps + 2) * rowHeight;
 
 const checkError = (settings: LocalSettings): boolean => {
   for (const middleValue of settings.middlePoints) {
@@ -57,9 +56,10 @@ const checkError = (settings: LocalSettings): boolean => {
 };
 
 const StepperNode = ({id, data, isConnectable}: NodeProps) => {
+  const [ref, {width, height}] = useMeasure();
+  const {setNodeDimensions} = useContext(NodeDimensionsContext);
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
-  const {setNodeHeight: setNodeHeights} = useContext(NodeHeightsContext);
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
     JSON.parse(JSON.stringify(initialSettings))
   );
@@ -69,6 +69,10 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
   const nodeValue = nodeValues[id] as StepperNodeValues;
 
   useEffect(() => {
+    setNodeDimensions(id, {width: width as number, height: height as number});
+  }, [width, height]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
     if (init) return;
     const initSettings = nodeSettings[id] as StepperNodeSettings;
     setLocalSettings({
@@ -76,7 +80,6 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
       middlePoints: initSettings.middlePoints.map(val => val.toString()),
       outputValues: initSettings.outputValues.map(val => val.toString()),
     });
-    setNodeHeights(id, calculateHeight(initSettings));
     setInit(true);
     setError(false);
   }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -117,7 +120,6 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
       outputValues: localSettings.outputValues.concat(''),
     };
     setLocalSettings(newLocalSettings);
-    setNodeHeights(id, calculateHeight(newLocalSettings));
     setError(true);
   };
 
@@ -127,7 +129,6 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
     newLocalSettings.middlePoints.pop();
     newLocalSettings.outputValues.pop();
     setLocalSettings(newLocalSettings);
-    setNodeHeights(id, calculateHeight(newLocalSettings));
 
     if (checkError(newLocalSettings)) {
       setError(true);
@@ -160,6 +161,7 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
 
   return (
     <div
+      ref={ref}
       style={{
         height: `${nodeMinHeight + rowHeight * localSettings.numSteps}px`,
         width: '270px',

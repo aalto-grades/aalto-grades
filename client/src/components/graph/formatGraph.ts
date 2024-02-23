@@ -2,66 +2,25 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Edge, Node} from 'reactflow';
-import {CustomNodeTypes, NodeValues} from '../../context/GraphProvider';
 import ElkConstructor, {ElkNode} from 'elkjs/lib/elk.bundled';
+import {Edge, Node} from 'reactflow';
+import {NodeValues} from '../../context/GraphProvider';
 
 const elk = new ElkConstructor();
 
 export const formatGraph = async (
   nodes: Node[],
   edges: Edge[],
-  nodeHeights: {[key: string]: number},
+  nodeDimensions: {[key: string]: {width: number; height: number}},
   nodeValues: NodeValues
 ): Promise<Node[]> => {
-  const nodesForElk = nodes.map(node => {
-    let width = 0;
-    let height = 0;
-    // TODO: remove the ?? 100 when format on load is removed
-    switch (node.type as CustomNodeTypes) {
-      case 'addition':
-        width = 70;
-        height = nodeHeights[node.id] ?? 100;
-        break;
-      case 'attainment':
-        width = 90;
-        height = 50;
-        break;
-      case 'average':
-        width = 200;
-        height = nodeHeights[node.id] ?? 100;
-        break;
-      case 'grade':
-        width = 100;
-        height = 50;
-        break;
-      case 'max':
-        width = 90;
-        height = nodeHeights[node.id] ?? 100;
-        break;
-      case 'minpoints':
-        width = 90;
-        height = 50;
-        break;
-      case 'require':
-        width = 90;
-        height = nodeHeights[node.id] ?? 100;
-        break;
-      case 'stepper':
-        width = 270;
-        height = nodeHeights[node.id] ?? 100;
-        break;
-      case 'substitute':
-        width = 130;
-        height = nodeHeights[node.id] ?? 100;
-    }
-    return {
-      type: node.type,
-      id: node.id,
-      width,
-      height,
-    };
-  });
+  // TODO: remove the ?? 100 when format on load is removed
+  const nodesForElk = nodes.map(node => ({
+    type: node.type,
+    id: node.id,
+    width: nodeDimensions[node.id]?.width ?? 100,
+    height: nodeDimensions[node.id]?.height ?? 100,
+  }));
   const graph = {
     id: 'root',
     layoutOptions: {

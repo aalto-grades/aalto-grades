@@ -4,12 +4,14 @@
 
 import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
+import {useMeasure} from '@uidotdev/usehooks';
 import 'reactflow/dist/style.css';
 import {
   NodeSettingsContext,
   NodeValuesContext,
   MinPointsNodeSettings,
   MinPointsNodeValues,
+  NodeDimensionsContext,
 } from '../../context/GraphProvider';
 
 type LocalSettings = {
@@ -20,6 +22,8 @@ const initialSettings = {
 };
 
 const MinPointsNode = ({id, data, isConnectable}: NodeProps) => {
+  const [ref, {width, height}] = useMeasure();
+  const {setNodeDimensions} = useContext(NodeDimensionsContext);
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
@@ -29,6 +33,10 @@ const MinPointsNode = ({id, data, isConnectable}: NodeProps) => {
   const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as MinPointsNodeValues;
+
+  useEffect(() => {
+    setNodeDimensions(id, {width: width as number, height: height as number});
+  }, [width, height]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (init) return;
@@ -56,9 +64,10 @@ const MinPointsNode = ({id, data, isConnectable}: NodeProps) => {
 
   return (
     <div
+      ref={ref}
       style={{
-        height: '50px',
-        width: '90px',
+        height: 'auto',
+        width: 'auto',
         border: error ? '1px dashed #e00' : '1px solid #eee',
         padding: '10px',
         borderRadius: '5px',
@@ -75,7 +84,7 @@ const MinPointsNode = ({id, data, isConnectable}: NodeProps) => {
       <div>
         <h4 style={{margin: 0}}>{data.label}</h4>
         <input
-          style={{width: 'calc(90px - 20px)'}}
+          style={{width: '100px'}}
           type="number"
           onChange={handleChange}
           value={localSettings.minPoints}

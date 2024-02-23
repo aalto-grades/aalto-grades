@@ -125,13 +125,16 @@ export const NodeSettingsContext = createContext<NodeSettingsContext>(
 );
 
 // Node heights
-export type NodeHeights = {
-  [key: string]: number;
+export type NodeDimensions = {
+  [key: string]: {width: number; height: number};
 };
-type NodeHeightsContext = {
-  nodeHeights: NodeHeights;
-  setNodeHeight: (id: string, newHeight: number) => void;
+type NodeDimensionsContext = {
+  nodeHeights: NodeDimensions;
+  setNodeDimensions: (
+    id: string,
+    newDimensions: {width: number; height: number}
+  ) => void;
 };
-export const NodeHeightsContext = createContext<NodeHeightsContext>(
-  {} as NodeHeightsContext
+export const NodeDimensionsContext = createContext<NodeDimensionsContext>(
+  {} as NodeDimensionsContext
 );

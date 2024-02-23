@@ -29,8 +29,8 @@ import StepperNode from '../components/graph/StepperNode';
 import {
   AllNodeSettings,
   DropInNodes,
-  NodeHeights,
-  NodeHeightsContext,
+  NodeDimensions,
+  NodeDimensionsContext,
   NodeSettings,
   NodeSettingsContext,
   CustomNodeTypes,
@@ -65,7 +65,7 @@ const Graph = (): JSX.Element => {
   const [initEdges, setInitEdges] = useState<Edge[]>([]);
   const [nodeSettings, setNodeSettings] = useState<AllNodeSettings>({});
   const [nodeValues, setNodeValues] = useState<NodeValues>({});
-  const [nodeHeights, setNodeHeights] = useState<NodeHeights>({});
+  const [nodeDimensions, setNodeDimensions] = useState<NodeDimensions>({});
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance | null>(null);
 
@@ -83,10 +83,13 @@ const Graph = (): JSX.Element => {
         }) as AllNodeSettings
     );
   };
-  const setContextNodeHeight = (id: string, newHeight: number) => {
-    setNodeHeights(oldNodeHeights => ({
-      ...oldNodeHeights,
-      [id]: newHeight,
+  const setContextNodeDimensions = (
+    id: string,
+    newDimensions: {width: number; height: number}
+  ) => {
+    setNodeDimensions(oldNodeDimensions => ({
+      ...oldNodeDimensions,
+      [id]: newDimensions,
     }));
   };
 
@@ -160,11 +163,13 @@ const Graph = (): JSX.Element => {
   };
   useEffect(() => {
     if (initEdges.length > 0) {
-      formatGraph(nodes, initEdges, nodeHeights, nodeValues).then(newNodes => {
-        setEdges(initEdges);
-        setNodes(newNodes); // TODO: remove auto formatting on load in production
-        setInitEdges([]);
-      });
+      formatGraph(nodes, initEdges, nodeDimensions, nodeValues).then(
+        newNodes => {
+          setEdges(initEdges);
+          setNodes(newNodes); // TODO: remove auto formatting on load in production
+          setInitEdges([]);
+        }
+      );
     }
   }, [initEdges]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -232,7 +237,7 @@ const Graph = (): JSX.Element => {
   );
 
   const format = async () => {
-    setNodes(await formatGraph(nodes, edges, nodeHeights, nodeValues));
+    setNodes(await formatGraph(nodes, edges, nodeDimensions, nodeValues));
   };
 
   const onDragStart = (
@@ -289,8 +294,11 @@ const Graph = (): JSX.Element => {
       <NodeSettingsContext.Provider
         value={{nodeSettings, setNodeSettings: setContextNodeSettings}}
       >
-        <NodeHeightsContext.Provider
-          value={{nodeHeights, setNodeHeight: setContextNodeHeight}}
+        <NodeDimensionsContext.Provider
+          value={{
+            nodeHeights: nodeDimensions,
+            setNodeDimensions: setContextNodeDimensions,
+          }}
         >
           <div style={{width: '100%', height: '80vh'}}>
             <ReactFlow
@@ -373,7 +381,7 @@ const Graph = (): JSX.Element => {
           <button onClick={() => loadGraph(createO1())}>
             Load O1 template
           </button>
-        </NodeHeightsContext.Provider>
+        </NodeDimensionsContext.Provider>
       </NodeSettingsContext.Provider>
     </NodeValuesContext.Provider>
   );

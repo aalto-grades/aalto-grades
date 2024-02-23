@@ -2,21 +2,29 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {useMeasure} from '@uidotdev/usehooks';
 import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
   AttainmentNodeValues,
+  NodeDimensionsContext,
   NodeValuesContext,
 } from '../../context/GraphProvider';
 
 const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
+  const [ref, {width, height}] = useMeasure();
+  const {setNodeDimensions} = useContext(NodeDimensionsContext);
   const {nodeValues, setNodeValues} = useContext(NodeValuesContext);
   const [localValue, setLocalValue] = useState<string>('0');
   const [error, setError] = useState<boolean>(false);
   const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as AttainmentNodeValues;
+
+  useEffect(() => {
+    setNodeDimensions(id, {width: width as number, height: height as number});
+  }, [width, height]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (init) return;
@@ -43,9 +51,10 @@ const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
 
   return (
     <div
+      ref={ref}
       style={{
-        height: '50px',
-        width: '90px',
+        height: 'auto',
+        width: 'auto',
         border: error ? '1px dashed #e00' : '1px solid #eee',
         padding: '10px',
         borderRadius: '5px',

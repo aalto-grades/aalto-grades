@@ -2,28 +2,32 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {useMeasure} from '@uidotdev/usehooks';
 import {useContext, useEffect, useState} from 'react';
-import {Handle, NodeProps, Position} from 'reactflow';
+import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
   AdditionNodeValues,
-  NodeHeightsContext,
+  NodeDimensionsContext,
   NodeValuesContext,
 } from '../../context/GraphProvider';
 
-const nodeMinHeight = 20;
 const handleStartHeight = 37.95;
 const rowHeight = 33.9;
-const calculateHeight = (handles: string[]) =>
-  nodeMinHeight + (handles.length + 1) * rowHeight;
 
 const AdditionNode = ({id, data, isConnectable}: NodeProps) => {
+  const updateNodeInternals = useUpdateNodeInternals();
+  const [ref, {width, height}] = useMeasure();
+  const {setNodeDimensions} = useContext(NodeDimensionsContext);
   const {nodeValues} = useContext(NodeValuesContext);
-  const {setNodeHeight} = useContext(NodeHeightsContext);
   const [handles, setHandles] = useState<string[]>([]);
   const [nextFree, setNextFree] = useState<number>(0);
 
   const nodeValue = nodeValues[id] as AdditionNodeValues;
+
+  useEffect(() => {
+    setNodeDimensions(id, {width: width as number, height: height as number});
+  }, [width, height]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     let change = false;
@@ -41,17 +45,18 @@ const AdditionNode = ({id, data, isConnectable}: NodeProps) => {
       }
     }
     if (change) {
+      setTimeout(() => updateNodeInternals(id), 0);
       setHandles(newHandles);
       setNextFree(maxId + 1);
-      setNodeHeight(id, calculateHeight(newHandles));
     }
   }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div
+      ref={ref}
       style={{
-        height: `${calculateHeight(handles)}px`,
-        width: '70px',
+        height: `${40 + handles.length * rowHeight}px`, // 'auto' doesn't work here
+        width: 'auto',
         border: '1px solid #eee',
         padding: '10px',
         borderRadius: '5px',

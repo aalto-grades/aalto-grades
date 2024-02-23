@@ -3,15 +3,16 @@
 // SPDX-License-Identifier: MIT
 
 import {useContext, useEffect, useState} from 'react';
-import {Handle, NodeProps, Position} from 'reactflow';
+import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
-  NodeHeightsContext,
+  NodeDimensionsContext,
   NodeSettingsContext,
   NodeValuesContext,
   SubstituteNodeSettings,
   SubstituteNodeValues,
 } from '../../context/GraphProvider';
+import {useMeasure} from '@uidotdev/usehooks';
 
 type LocalSettings = {
   maxSubstitutions: string;
@@ -19,17 +20,9 @@ type LocalSettings = {
 };
 const initialSettings = {numSubstitute: '0', substituteValues: []};
 
-const nodeMinHeight = 85;
-const handleStartHeight = nodeMinHeight + 25 + 33.9;
+const handleStartHeight = 110 + 33.9;
 const handleMiddleHeight = 60 + 33.9;
 const rowHeight = 33.9;
-const calculateHeight = (
-  substiteHandles: string[],
-  exerciseHandles: string[]
-) =>
-  nodeMinHeight +
-  handleMiddleHeight +
-  (substiteHandles.length + exerciseHandles.length + 2) * rowHeight;
 
 const checkError = (settings: LocalSettings): boolean => {
   if (!/^\d+$/.test(settings.maxSubstitutions)) return true;
@@ -57,8 +50,10 @@ const convertFromLocalSettings = (
 });
 
 const SubstituteNode = ({id, data, isConnectable}: NodeProps) => {
+  const updateNodeInternals = useUpdateNodeInternals();
+  const [ref, {width, height}] = useMeasure();
+  const {setNodeDimensions} = useContext(NodeDimensionsContext);
   const {nodeValues} = useContext(NodeValuesContext);
-  const {setNodeHeight: setNodeHeights} = useContext(NodeHeightsContext);
   const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
 
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
@@ -74,9 +69,12 @@ const SubstituteNode = ({id, data, isConnectable}: NodeProps) => {
   const settings = nodeSettings[id] as SubstituteNodeSettings;
 
   useEffect(() => {
+    setNodeDimensions(id, {width: width as number, height: height as number});
+  }, [width, height]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
     if (init) return;
     setLocalSettings(convertToLocalSettings(settings));
-    setNodeHeights(id, calculateHeight(substituteHandles, exerciseHandles));
     setError(false);
     setInit(true);
   }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -119,13 +117,10 @@ const SubstituteNode = ({id, data, isConnectable}: NodeProps) => {
       }
     }
     if (change) {
+      setTimeout(() => updateNodeInternals(id), 0);
       setSubstituteHandles(newSubstituteHandles);
       setExerciseHandles(newExerciseHandles);
       setNextFree(maxId + 1);
-      setNodeHeights(
-        id,
-        calculateHeight(newSubstituteHandles, newExerciseHandles)
-      );
       setLocalSettings(newLocalSettings);
 
       const error = checkError(newLocalSettings);
@@ -167,9 +162,10 @@ const SubstituteNode = ({id, data, isConnectable}: NodeProps) => {
 
   return (
     <div
+      ref={ref}
       style={{
-        height: `${calculateHeight(substituteHandles, exerciseHandles)}px`,
-        width: '130px',
+        height: 'auto',
+        width: 'auto',
         border: error ? '1px dashed #e00' : '1px solid #eee',
         padding: '10px',
         borderRadius: '5px',
@@ -235,19 +231,19 @@ const SubstituteNode = ({id, data, isConnectable}: NodeProps) => {
         position={Position.Left}
         isConnectable={isConnectable}
       />
-      <label>NumSubstitutions</label>
+      <label>Number of substitutions</label>
       <input
-        style={{width: 'calc(100% - 20px)'}}
+        style={{width: '180px', display: 'block'}}
         type="number"
         onChange={handleNumChange}
         value={localSettings.maxSubstitutions ?? ''}
       />
       <label>Substitutes</label>
 
-      <table style={{width: '100%', margin: '5px 0px'}}>
+      <table style={{width: '200px', margin: '5px 0px'}}>
         <tbody>
           <tr>
-            <th style={{width: '50px'}}>in</th>
+            <th style={{width: '50%'}}>in</th>
             <th>out</th>
           </tr>
           {substituteHandles
@@ -274,10 +270,10 @@ const SubstituteNode = ({id, data, isConnectable}: NodeProps) => {
         </tbody>
       </table>
       <label>Exercises</label>
-      <table style={{width: '100%', margin: '5px 0px'}}>
+      <table style={{width: '200px', margin: '5px 0px'}}>
         <tbody>
           <tr>
-            <th style={{width: '50px'}}>in</th>
+            <th style={{width: '50%'}}>in</th>
             <th>subval</th>
           </tr>
           {exerciseHandles

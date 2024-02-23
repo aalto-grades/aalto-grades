@@ -2,17 +2,29 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {useContext} from 'react';
+import {useMeasure} from '@uidotdev/usehooks';
+import {useContext, useEffect} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 import 'reactflow/dist/style.css';
-import {GradeNodeValues, NodeValuesContext} from '../../context/GraphProvider';
+import {
+  GradeNodeValues,
+  NodeDimensionsContext,
+  NodeValuesContext,
+} from '../../context/GraphProvider';
 
 const GradeNode = ({id, data, isConnectable}: NodeProps) => {
+  const [ref, {width, height}] = useMeasure();
+  const {setNodeDimensions} = useContext(NodeDimensionsContext);
   const {nodeValues} = useContext(NodeValuesContext);
   const nodeValue = nodeValues[id] as GradeNodeValues;
 
+  useEffect(() => {
+    setNodeDimensions(id, {width: width as number, height: height as number});
+  }, [width, height]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <div
+      ref={ref}
       style={{
         height: '50px',
         width: '100px',

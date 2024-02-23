@@ -2,11 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {useMeasure} from '@uidotdev/usehooks';
 import {useContext, useEffect, useState} from 'react';
-import {Handle, NodeProps, Position} from 'reactflow';
+import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
-  NodeHeightsContext,
+  NodeDimensionsContext,
   NodeSettingsContext,
   NodeValuesContext,
   RequireNodeSettings,
@@ -16,15 +17,14 @@ import {
 type LocalSettings = {numFail: string; failSetting: 'ignore' | 'coursefail'};
 const initialSettings = {numFail: 0, failSetting: 'courseFail'};
 
-const nodeMinHeight = 180.93 - 33.9;
-const handleStartHeight = nodeMinHeight - 10 + 33.9;
+const handleStartHeight = 128.5;
 const rowHeight = 33.9;
-const calculateHeight = (handles: string[]) =>
-  nodeMinHeight + (handles.length + 1) * rowHeight;
 
 const RequireNode = ({id, data, isConnectable}: NodeProps) => {
+  const updateNodeInternals = useUpdateNodeInternals();
+  const [ref, {width, height}] = useMeasure();
+  const {setNodeDimensions} = useContext(NodeDimensionsContext);
   const {nodeValues} = useContext(NodeValuesContext);
-  const {setNodeHeight: setNodeHeights} = useContext(NodeHeightsContext);
   const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
 
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
@@ -39,9 +39,12 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
   const settings = nodeSettings[id] as RequireNodeSettings;
 
   useEffect(() => {
+    setNodeDimensions(id, {width: width as number, height: height as number});
+  }, [width, height]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
     if (init) return;
     setLocalSettings({...settings, numFail: settings.numFail.toString()});
-    setNodeHeights(id, calculateHeight(handles));
     setError(false);
     setInit(true);
   }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -62,9 +65,9 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
       }
     }
     if (change) {
+      setTimeout(() => updateNodeInternals(id), 0);
       setHandles(newHandles);
       setNextFree(maxId + 1);
-      setNodeHeights(id, calculateHeight(newHandles));
     }
   }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -116,9 +119,10 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
 
   return (
     <div
+      ref={ref}
       style={{
-        height: `${calculateHeight(handles)}px`,
-        width: '130px',
+        height: 'auto',
+        width: 'auto',
         border: nodeValue.courseFail
           ? '2px solid #e00'
           : error
@@ -155,22 +159,26 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
         position={Position.Left}
         isConnectable={isConnectable}
       />
-      <label>On fail</label>
-      <select onChange={handleSelectChange} value={localSettings.failSetting}>
-        <option value="zeroes">Output zeroes</option>
-        <option value="coursefail">Fail course</option>
-      </select>
-      <label>Allowed Fails</label>
-      <input
-        style={{width: 'calc(100% - 20px)'}}
-        type="number"
-        onChange={handleChange}
-        value={localSettings.numFail}
-      />
-      <table style={{width: '100%', margin: '5px 0px'}}>
+      <div>
+        <label>On fail </label>
+        <select onChange={handleSelectChange} value={localSettings.failSetting}>
+          <option value="zeroes">Output zeroes</option>
+          <option value="coursefail">Fail course</option>
+        </select>
+      </div>
+      <div>
+        <label>Allowed Fails </label>
+        <input
+          style={{width: '90px'}}
+          type="number"
+          onChange={handleChange}
+          value={localSettings.numFail}
+        />
+      </div>
+      <table style={{width: '200px', margin: '5px 0px'}}>
         <tbody>
           <tr>
-            <th>in</th>
+            <th style={{width: '50%'}}>in</th>
             <th>out</th>
           </tr>
           {Object.entries(nodeValue.sources)

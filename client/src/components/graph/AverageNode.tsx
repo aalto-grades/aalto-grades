@@ -2,24 +2,22 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {useMeasure} from '@uidotdev/usehooks';
 import {useContext, useEffect, useState} from 'react';
-import {Handle, NodeProps, Position} from 'reactflow';
+import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
-  AverageNodeValues,
   AverageNodeSettings,
-  NodeHeightsContext,
+  AverageNodeValues,
+  NodeDimensionsContext,
   NodeSettingsContext,
   NodeValuesContext,
 } from '../../context/GraphProvider';
 
 type LocalSettings = {weights: {[key: string]: string}};
 
-const nodeMinHeight = 78.683;
 const handleStartHeight = 83;
 const rowHeight = 33.9;
-const calculateHeight = (handles: string[]) =>
-  nodeMinHeight + (handles.length + 1) * rowHeight;
 
 const convertSettingsToFloats = (
   settings: LocalSettings
@@ -45,9 +43,11 @@ const checkError = (settings: LocalSettings): boolean => {
 };
 
 const AverageNode = ({id, data, isConnectable}: NodeProps) => {
+  const updateNodeInternals = useUpdateNodeInternals();
+  const [ref, {width, height}] = useMeasure();
+  const {setNodeDimensions} = useContext(NodeDimensionsContext);
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
-  const {setNodeHeight} = useContext(NodeHeightsContext);
 
   const [localSettings, setLocalSettings] = useState<LocalSettings>({
     weights: {},
@@ -59,6 +59,10 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
   const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as AverageNodeValues;
+
+  useEffect(() => {
+    setNodeDimensions(id, {width: width as number, height: height as number});
+  }, [width, height]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (init) return;
@@ -89,12 +93,12 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
       }
     }
     if (change) {
+      setTimeout(() => updateNodeInternals(id), 0);
       setHandles(newHandles);
       setLocalSettings(newLocalSettings);
       const error = checkError(newLocalSettings);
       setError(error);
       setNextFree(maxId + 1);
-      setNodeHeight(id, calculateHeight(newHandles));
       if (!error) {
         setNodeSettings(id, convertSettingsToFloats(newLocalSettings));
       }
@@ -128,9 +132,10 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
 
   return (
     <div
+      ref={ref}
       style={{
-        height: `${calculateHeight(handles)}px`,
-        width: '200px',
+        height: 'auto',
+        width: 'auto',
         border: error ? '1px dashed #e00' : '1px solid #eee',
         padding: '10px',
         borderRadius: '5px',
