@@ -17,10 +17,11 @@ export const formatGraph = async (
   const nodesForElk = nodes.map(node => {
     let width = 0;
     let height = 0;
+    // TODO: remove the ?? 100 when format on load is removed
     switch (node.type as CustomNodeTypes) {
       case 'addition':
         width = 70;
-        height = nodeHeights[node.id];
+        height = nodeHeights[node.id] ?? 100;
         break;
       case 'attainment':
         width = 90;
@@ -28,7 +29,7 @@ export const formatGraph = async (
         break;
       case 'average':
         width = 200;
-        height = nodeHeights[node.id];
+        height = nodeHeights[node.id] ?? 100;
         break;
       case 'grade':
         width = 100;
@@ -36,7 +37,7 @@ export const formatGraph = async (
         break;
       case 'max':
         width = 90;
-        height = nodeHeights[node.id];
+        height = nodeHeights[node.id] ?? 100;
         break;
       case 'minpoints':
         width = 90;
@@ -44,15 +45,15 @@ export const formatGraph = async (
         break;
       case 'require':
         width = 90;
-        height = nodeHeights[node.id];
+        height = nodeHeights[node.id] ?? 100;
         break;
       case 'stepper':
         width = 270;
-        height = nodeHeights[node.id];
+        height = nodeHeights[node.id] ?? 100;
         break;
       case 'substitute':
         width = 130;
-        height = nodeHeights[node.id];
+        height = nodeHeights[node.id] ?? 100;
     }
     return {
       type: node.type,

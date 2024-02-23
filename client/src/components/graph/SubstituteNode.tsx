@@ -17,7 +17,7 @@ type LocalSettings = {
   maxSubstitutions: string;
   substituteValues: string[];
 };
-const initialSettings = {numSubstitute: '0', substituteValues: {}};
+const initialSettings = {numSubstitute: '0', substituteValues: []};
 
 const nodeMinHeight = 85;
 const handleStartHeight = nodeMinHeight + 25 + 33.9;
@@ -82,6 +82,7 @@ const SubstituteNode = ({id, data, isConnectable}: NodeProps) => {
   }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (!init) return;
     let change = false;
     let maxId = 0;
     const newLocalSettings = {...localSettings};
@@ -105,7 +106,8 @@ const SubstituteNode = ({id, data, isConnectable}: NodeProps) => {
         exerciseIndex++;
         if (!newExerciseHandles.includes(key)) {
           newExerciseHandles.push(key);
-          newLocalSettings.substituteValues.push('');
+          if (exerciseIndex >= newLocalSettings.substituteValues.length)
+            newLocalSettings.substituteValues.push('');
           change = true;
         }
         if (!source.isConnected) {
@@ -132,7 +134,7 @@ const SubstituteNode = ({id, data, isConnectable}: NodeProps) => {
         setNodeSettings(id, convertFromLocalSettings(newLocalSettings));
       }
     }
-  }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [nodeValues, init]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleNumChange = (
     event: React.ChangeEvent<HTMLInputElement>

@@ -60,28 +60,18 @@ const nodeMap = {
 };
 
 const Graph = (): JSX.Element => {
-  const initValues = createSimpleGraph();
-
-  const [nodes, setNodes, onNodesChange] = useNodesState(initValues.nodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initValues.edges);
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [initEdges, setInitEdges] = useState<Edge[]>([]);
-  const [nodeSettings, setNodeSettings] = useState<AllNodeSettings>(
-    initValues.nodeSettings
-  );
-  const [nodeValues, setNodeValues] = useState<NodeValues>(
-    initValues.nodeValues
-  );
+  const [nodeSettings, setNodeSettings] = useState<AllNodeSettings>({});
+  const [nodeValues, setNodeValues] = useState<NodeValues>({});
   const [nodeHeights, setNodeHeights] = useState<NodeHeights>({});
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance | null>(null);
 
   // Old values are strings to avoid problematic references
-  const [oldNodeSettings, setOldNodeSettings] = useState<string>(
-    JSON.stringify(initValues.nodeSettings)
-  );
-  const [oldNodeValues, setOldNodeValues] = useState<string>(
-    JSON.stringify(initValues.nodeValues)
-  );
+  const [oldNodeSettings, setOldNodeSettings] = useState<string>('{}');
+  const [oldNodeValues, setOldNodeValues] = useState<string>('{}');
   const [oldEdges, setOldEdges] = useState<Edge[]>(edges);
 
   const setContextNodeSettings = (id: string, newSettings: NodeSettings) => {
@@ -126,7 +116,7 @@ const Graph = (): JSX.Element => {
   );
 
   useEffect(() => {
-    updateValues();
+    loadGraph(createSimpleGraph());
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
