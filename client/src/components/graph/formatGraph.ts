@@ -71,23 +71,23 @@ export const formatGraph = async (
       'elk.spacing.nodeNode': '60',
     },
     children: nodesForElk.map(node => {
-      const nodevalue = nodeValues[node.id];
-      if (nodevalue.type === 'attainment') {
+      const nodeValue = nodeValues[node.id];
+      if (nodeValue.type === 'attainment') {
         return {
           ...node,
           ports: [{id: `${node.id}-source`, properties: {side: 'EAST'}}],
         };
-      } else if (nodevalue.type === 'grade') {
+      } else if (nodeValue.type === 'grade') {
         return {
           ...node,
           ports: [{id: node.id, properties: {side: 'WEST'}}],
         };
       } else if (
-        nodevalue.type !== 'addition' &&
-        nodevalue.type !== 'average' &&
-        nodevalue.type !== 'max' &&
-        nodevalue.type !== 'require' &&
-        nodevalue.type !== 'substitute'
+        nodeValue.type !== 'addition' &&
+        nodeValue.type !== 'average' &&
+        nodeValue.type !== 'max' &&
+        nodeValue.type !== 'require' &&
+        nodeValue.type !== 'substitute'
       ) {
         return {
           ...node,
@@ -98,22 +98,43 @@ export const formatGraph = async (
         };
       }
 
-      const sourcePorts = Object.keys(nodevalue.sources)
-        .toReversed()
-        .map(key => ({
-          id: key,
-          properties: {side: 'WEST'},
-        }));
+      const sortedKeys: string[] = Object.keys(nodeValue.sources);
+      if (nodeValue.type === 'substitute') {
+        sortedKeys.sort((key1, key2) => {
+          if (
+            key1.split('-').at(-2) === 'exercise' &&
+            key2.split('-').at(-2) === 'substitute'
+          )
+            return 1;
+          if (
+            key2.split('-').at(-2) === 'exercise' &&
+            key1.split('-').at(-2) === 'substitute'
+          )
+            return -1;
+          return (
+            parseInt(key1.split('-').at(-1) as string) -
+            parseInt(key2.split('-').at(-1) as string)
+          );
+        });
+      } else {
+        sortedKeys.sort(
+          (key1, key2) =>
+            parseInt(key1.split('-').at(-1) as string) -
+            parseInt(key2.split('-').at(-1) as string)
+        );
+      }
+      const sourcePorts = sortedKeys.toReversed().map(key => ({
+        id: key,
+        properties: {side: 'WEST'},
+      }));
 
       const targetPorts =
-        nodevalue.type !== 'require'
+        nodeValue.type !== 'require' && nodeValue.type !== 'substitute'
           ? [{id: `${node.id}-source`, properties: {side: 'EAST'}}]
-          : Object.keys(nodevalue.values)
-              .toReversed()
-              .map(key => ({
-                id: `${key}-source`,
-                properties: {side: 'EAST'},
-              }));
+          : sortedKeys.map(key => ({
+              id: `${key}-source`,
+              properties: {side: 'EAST'},
+            }));
 
       return {
         ...node,

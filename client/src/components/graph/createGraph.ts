@@ -219,8 +219,8 @@ export const createY1 = (): {
     createEdge('Minpoints bonus', 'Substitute bonus', undefined, 'exercise-0'),
     createEdge('Sum bonus', 'Stepper bonus'),
     createEdge('Sum nobonus', 'Stepper nobonus'),
-    createEdge('Stepper bonus', 'Max grade', undefined, 0),
-    createEdge('Stepper nobonus', 'Max grade', undefined, 1),
+    createEdge('Stepper nobonus', 'Max grade', undefined, 0),
+    createEdge('Stepper bonus', 'Max grade', undefined, 1),
     createEdge('Max grade', 'Final grade'),
   ];
   const nodeSettings: AllNodeSettings = {
