@@ -4,9 +4,10 @@
 
 import {Edge, Node} from 'reactflow';
 import {
-  AllNodeSettings,
   AverageNodeSettings,
   CustomNodeTypes,
+  FullNodeData,
+  NodeSettings,
   NodeValues,
 } from '../../context/GraphProvider';
 import {getInitNodeValues} from './graphUtil';
@@ -39,13 +40,24 @@ const createEdge = (
   };
 };
 
+const getNodeData = (
+  nodes: Node[],
+  settings: {[key: string]: NodeSettings}
+): FullNodeData => {
+  const nodeData: FullNodeData = {};
+  for (const node of nodes) {
+    nodeData[node.id] = {title: node.data.label, settings: settings[node.id]};
+  }
+  return nodeData;
+};
+
 const NUM_SIMPLE_EXERCISES = 10;
 export const createSimpleGraph = (
   useAverage = false
 ): {
   nodes: Node[];
   edges: Edge[];
-  nodeSettings: AllNodeSettings;
+  nodeData: FullNodeData;
   nodeValues: NodeValues;
 } => {
   const nodes = [
@@ -67,7 +79,7 @@ export const createSimpleGraph = (
     );
   }
 
-  const nodeSettings: AllNodeSettings = {
+  const nodeSettings: {[key: string]: NodeSettings} = {
     stepper: useAverage
       ? {
           numSteps: 6,
@@ -96,13 +108,13 @@ export const createSimpleGraph = (
   }
 
   const nodeValues = getInitNodeValues(nodes, edges, 10);
-  return {nodes: nodes, edges, nodeSettings, nodeValues};
+  return {nodes, edges, nodeData: getNodeData(nodes, nodeSettings), nodeValues};
 };
 
 export const createO1 = (): {
   nodes: Node[];
   edges: Edge[];
-  nodeSettings: AllNodeSettings;
+  nodeData: FullNodeData;
   nodeValues: NodeValues;
 } => {
   const nodes = [
@@ -124,7 +136,9 @@ export const createO1 = (): {
     createEdge('Tier C', 'Sum C', undefined, 0),
     createEdge('Best Grade', 'Final Grade'),
   ];
-  const nodeSettings: AllNodeSettings = {'best-grade': {minValue: 0}};
+  const nodeSettings: {[key: string]: NodeSettings} = {
+    'best-grade': {minValue: 0},
+  };
 
   const courseGrades = [
     [2000, 0, 0],
@@ -191,13 +205,13 @@ export const createO1 = (): {
   }
 
   const nodeValues = getInitNodeValues(nodes, edges, 1500);
-  return {nodes, edges, nodeSettings, nodeValues};
+  return {nodes, edges, nodeData: getNodeData(nodes, nodeSettings), nodeValues};
 };
 
 export const createY1 = (): {
   nodes: Node[];
   edges: Edge[];
-  nodeSettings: AllNodeSettings;
+  nodeData: FullNodeData;
   nodeValues: NodeValues;
 } => {
   const nodes = [
@@ -223,7 +237,7 @@ export const createY1 = (): {
     createEdge('Stepper bonus', 'Max grade', undefined, 1),
     createEdge('Max grade', 'Final grade'),
   ];
-  const nodeSettings: AllNodeSettings = {
+  const nodeSettings: {[key: string]: NodeSettings} = {
     'minpoints-bonus': {minPoints: 600},
     'substitute-rounds': {
       maxSubstitutions: 3,
@@ -298,5 +312,5 @@ export const createY1 = (): {
   edges.push(createEdge('Bonus require', 'Sum bonus', 8, 8));
 
   const nodeValues = getInitNodeValues(nodes, edges, 500);
-  return {nodes, edges, nodeSettings, nodeValues};
+  return {nodes, edges, nodeData: getNodeData(nodes, nodeSettings), nodeValues};
 };

@@ -4,64 +4,66 @@
 
 import {Edge, Node} from 'reactflow';
 import {
-  AllNodeSettings,
   AverageNodeSettings,
   MaxNodeSettings,
   MinPointsNodeSettings,
-  NodeSettings,
   CustomNodeTypes,
   NodeValue,
   NodeValues,
   RequireNodeSettings,
   StepperNodeSettings,
   SubstituteNodeSettings,
+  FullNodeData,
+  DropInNodes,
+  NodeData,
 } from '../../context/GraphProvider';
 
 export const initNode = (
-  type: CustomNodeTypes
-): {value: NodeValue; settings?: NodeSettings} => {
+  type: DropInNodes
+): {
+  value: NodeValue;
+  data: NodeData;
+} => {
   switch (type) {
     case 'addition':
-      return {value: {type, sources: {}, value: 0}};
-    case 'attainment':
-      return {value: {type, value: Math.round(Math.random() * 10)}};
+      return {
+        value: {type, sources: {}, value: 0},
+        data: {title: 'Addition'},
+      };
     case 'average':
       return {
         value: {type, sources: {}, value: 0},
-        settings: {weights: {}},
+        data: {title: 'Average', settings: {weights: {}}},
       };
-    case 'grade':
-      return {value: {type, source: 0, value: 0}};
     case 'max':
       return {
         value: {type, sources: {}, value: 0},
-        settings: {minValue: 0},
+        data: {title: 'Max', settings: {minValue: 0}},
       };
     case 'minpoints':
       return {
         value: {type, source: 0, value: 0},
-        settings: {minPoints: 0},
+        data: {title: 'Require Points', settings: {minPoints: 0}},
       };
     case 'require':
       return {
         value: {type, sources: {}, values: {}, courseFail: false},
-        settings: {numFail: 0, failSetting: 'ignore'},
+        data: {title: 'Require', settings: {numFail: 0, failSetting: 'ignore'}},
       };
     case 'stepper':
       return {
         value: {type, source: 0, value: 0},
-        settings: {
-          numSteps: 1,
-          middlePoints: [],
-          outputValues: [0],
+        data: {
+          title: 'Stepper',
+          settings: {numSteps: 1, middlePoints: [], outputValues: [0]},
         },
       };
     case 'substitute':
       return {
         value: {type, sources: {}, values: {}},
-        settings: {
-          maxSubstitutions: 0,
-          substituteValues: [],
+        data: {
+          title: 'Substitute',
+          settings: {maxSubstitutions: 0, substituteValues: []},
         },
       };
   }
@@ -140,7 +142,7 @@ export const getInitNodeValues = (
 const setNodeValue = (
   nodeId: string,
   nodeValue: NodeValue,
-  nodeSettings: AllNodeSettings
+  nodeData: FullNodeData
 ): void => {
   switch (nodeValue.type) {
     case 'addition': {
@@ -153,7 +155,7 @@ const setNodeValue = (
     case 'attainment':
       break; // Not needed
     case 'average': {
-      const settings = nodeSettings[nodeId] as AverageNodeSettings;
+      const settings = nodeData[nodeId].settings as AverageNodeSettings;
       let valueSum = 0;
       let weightSum = 0;
       for (const key of Object.keys(settings.weights)) {
@@ -170,7 +172,7 @@ const setNodeValue = (
       nodeValue.value = nodeValue.source;
       break;
     case 'max': {
-      const settings = nodeSettings[nodeId] as MaxNodeSettings;
+      const settings = nodeData[nodeId].settings as MaxNodeSettings;
       let maxValue = settings.minValue;
 
       for (const value of Object.values(nodeValue.sources)) {
@@ -180,13 +182,13 @@ const setNodeValue = (
       break;
     }
     case 'minpoints': {
-      const settings = nodeSettings[nodeId] as MinPointsNodeSettings;
+      const settings = nodeData[nodeId].settings as MinPointsNodeSettings;
       if (nodeValue.source < settings.minPoints) nodeValue.value = 'reqfail';
       else nodeValue.value = nodeValue.source;
       break;
     }
     case 'require': {
-      const settings = nodeSettings[nodeId] as RequireNodeSettings;
+      const settings = nodeData[nodeId].settings as RequireNodeSettings;
       let numFail = 0;
       for (const [handleId, source] of Object.entries(nodeValue.sources)) {
         if (!source.isConnected) continue;
@@ -206,7 +208,7 @@ const setNodeValue = (
       break;
     }
     case 'stepper': {
-      const settings = nodeSettings[nodeId] as StepperNodeSettings;
+      const settings = nodeData[nodeId].settings as StepperNodeSettings;
       for (let i = 0; i < settings.numSteps; i++) {
         if (
           i + 1 !== settings.numSteps &&
@@ -222,7 +224,7 @@ const setNodeValue = (
       break;
     }
     case 'substitute': {
-      const settings = nodeSettings[nodeId] as SubstituteNodeSettings;
+      const settings = nodeData[nodeId].settings as SubstituteNodeSettings;
       let numSubstitutes = 0;
       let numToSubstitute = 0;
       for (const [key, source] of Object.entries(nodeValue.sources)) {
@@ -333,7 +335,7 @@ export const findDisconnectedEdges = (
 
 export const calculateNewNodeValues = (
   oldNodeValues: NodeValues,
-  nodeSettings: AllNodeSettings,
+  nodeData: FullNodeData,
   nodes: Node[],
   edges: Edge[]
 ) => {
@@ -379,7 +381,7 @@ export const calculateNewNodeValues = (
   let courseFail = false;
   while (noSources.length > 0) {
     const sourceId = noSources.shift() as string;
-    setNodeValue(sourceId, newNodeValues[sourceId], nodeSettings);
+    setNodeValue(sourceId, newNodeValues[sourceId], nodeData);
     const sourceNodeValue = newNodeValues[sourceId];
 
     if (sourceNodeValue.type === 'require' && sourceNodeValue.courseFail) {

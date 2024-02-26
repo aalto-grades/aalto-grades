@@ -2,17 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {useMeasure} from '@uidotdev/usehooks';
 import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
+  CustomNodeTypes,
   MaxNodeSettings,
   MaxNodeValues,
-  NodeDimensionsContext,
-  NodeSettingsContext,
+  NodeDataContext,
   NodeValuesContext,
 } from '../../context/GraphProvider';
+import BaseNode from './BaseNode';
 
 type LocalSettings = {minValue: string};
 const initialSettings = {minValue: '0'};
@@ -20,12 +20,10 @@ const initialSettings = {minValue: '0'};
 const handleStartHeight = 83 + 33.9;
 const rowHeight = 33.9;
 
-const MaxNode = ({id, data, isConnectable}: NodeProps) => {
+const MaxNode = ({id, type, isConnectable}: NodeProps) => {
   const updateNodeInternals = useUpdateNodeInternals();
-  const [ref, {width, height}] = useMeasure();
-  const {setNodeDimensions} = useContext(NodeDimensionsContext);
   const {nodeValues} = useContext(NodeValuesContext);
-  const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
+  const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
     JSON.parse(JSON.stringify(initialSettings))
@@ -36,18 +34,14 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
   const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as MaxNodeValues;
-
-  useEffect(() => {
-    setNodeDimensions(id, {width: width as number, height: height as number});
-  }, [width, height]); // eslint-disable-line react-hooks/exhaustive-deps
+  const settings = nodeData[id].settings as MaxNodeSettings;
 
   useEffect(() => {
     if (init) return;
-    const initSettings = nodeSettings[id] as MaxNodeSettings;
-    setLocalSettings({minValue: initSettings.minValue.toString()});
+    setLocalSettings({minValue: settings.minValue.toString()});
     setError(false);
     setInit(true);
-  }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [nodeData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     let change = false;
@@ -93,18 +87,7 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
   }
 
   return (
-    <div
-      ref={ref}
-      style={{
-        height: 'auto',
-        width: 'auto',
-        border: error ? '1px dashed #e00' : '1px solid #eee',
-        padding: '10px',
-        borderRadius: '5px',
-        background: error ? '#fffafa' : 'white',
-      }}
-    >
-      <h4 style={{margin: 0}}>{data.label}</h4>
+    <BaseNode id={id} type={type as CustomNodeTypes} error={error}>
       {handles.map((key, index) => (
         <Handle
           key={`handle-${key}`}
@@ -173,7 +156,7 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
         position={Position.Right}
         isConnectable={isConnectable}
       />
-    </div>
+    </BaseNode>
   );
 };
 

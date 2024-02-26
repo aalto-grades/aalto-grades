@@ -4,15 +4,15 @@
 
 import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
-import {useMeasure} from '@uidotdev/usehooks';
 import 'reactflow/dist/style.css';
 import {
-  NodeSettingsContext,
   NodeValuesContext,
   MinPointsNodeSettings,
   MinPointsNodeValues,
-  NodeDimensionsContext,
+  NodeDataContext,
+  CustomNodeTypes,
 } from '../../context/GraphProvider';
+import BaseNode from './BaseNode';
 
 type LocalSettings = {
   minPoints: string;
@@ -21,11 +21,9 @@ const initialSettings = {
   minPoints: '',
 };
 
-const MinPointsNode = ({id, data, isConnectable}: NodeProps) => {
-  const [ref, {width, height}] = useMeasure();
-  const {setNodeDimensions} = useContext(NodeDimensionsContext);
+const MinPointsNode = ({id, type, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
-  const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
+  const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
     JSON.parse(JSON.stringify(initialSettings))
   );
@@ -33,19 +31,15 @@ const MinPointsNode = ({id, data, isConnectable}: NodeProps) => {
   const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as MinPointsNodeValues;
-
-  useEffect(() => {
-    setNodeDimensions(id, {width: width as number, height: height as number});
-  }, [width, height]); // eslint-disable-line react-hooks/exhaustive-deps
+  const settings = nodeData[id].settings as MinPointsNodeSettings;
 
   useEffect(() => {
     if (init) return;
-    const initSettings = nodeSettings[id] as MinPointsNodeSettings;
-    setLocalSettings({minPoints: initSettings.minPoints.toString()});
+    setLocalSettings({minPoints: settings.minPoints.toString()});
 
     setError(false);
     setInit(true);
-  }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [nodeData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const newLocalSettings = {...localSettings};
@@ -63,17 +57,7 @@ const MinPointsNode = ({id, data, isConnectable}: NodeProps) => {
   };
 
   return (
-    <div
-      ref={ref}
-      style={{
-        height: 'auto',
-        width: 'auto',
-        border: error ? '1px dashed #e00' : '1px solid #eee',
-        padding: '10px',
-        borderRadius: '5px',
-        background: error ? '#fffafa' : 'white',
-      }}
-    >
+    <BaseNode id={id} type={type as CustomNodeTypes} error={error}>
       <Handle
         type="target"
         id={id}
@@ -82,7 +66,6 @@ const MinPointsNode = ({id, data, isConnectable}: NodeProps) => {
         isConnectable={isConnectable}
       />
       <div>
-        <h4 style={{margin: 0}}>{data.label}</h4>
         <input
           style={{width: '100px'}}
           type="number"
@@ -102,7 +85,7 @@ const MinPointsNode = ({id, data, isConnectable}: NodeProps) => {
         position={Position.Right}
         isConnectable={isConnectable}
       />
-    </div>
+    </BaseNode>
   );
 };
 

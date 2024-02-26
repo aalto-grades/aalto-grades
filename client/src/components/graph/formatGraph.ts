@@ -4,14 +4,14 @@
 
 import ElkConstructor, {ElkNode} from 'elkjs/lib/elk.bundled';
 import {Edge, Node} from 'reactflow';
-import {NodeValues} from '../../context/GraphProvider';
+import {NodeDimensions, NodeValues} from '../../context/GraphProvider';
 
 const elk = new ElkConstructor();
 
 export const formatGraph = async (
   nodes: Node[],
   edges: Edge[],
-  nodeDimensions: {[key: string]: {width: number; height: number}},
+  nodeDimensions: NodeDimensions,
   nodeValues: NodeValues
 ): Promise<Node[]> => {
   // TODO: remove the ?? 100 when format on load is removed

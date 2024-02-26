@@ -2,17 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {useMeasure} from '@uidotdev/usehooks';
 import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
-  NodeDimensionsContext,
-  NodeSettingsContext,
+  CustomNodeTypes,
+  NodeDataContext,
   NodeValuesContext,
   StepperNodeSettings,
   StepperNodeValues,
 } from '../../context/GraphProvider';
+import BaseNode from './BaseNode';
 
 type LocalSettings = {
   numSteps: number;
@@ -24,9 +24,6 @@ const initialSettings = {
   middlePoints: [],
   outputValues: ['0'],
 };
-
-const nodeMinHeight = 78.683 + 4;
-const rowHeight = 33.9;
 
 const checkError = (settings: LocalSettings): boolean => {
   for (const middleValue of settings.middlePoints) {
@@ -55,11 +52,9 @@ const checkError = (settings: LocalSettings): boolean => {
   return false;
 };
 
-const StepperNode = ({id, data, isConnectable}: NodeProps) => {
-  const [ref, {width, height}] = useMeasure();
-  const {setNodeDimensions} = useContext(NodeDimensionsContext);
+const StepperNode = ({id, type, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
-  const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
+  const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
     JSON.parse(JSON.stringify(initialSettings))
   );
@@ -67,22 +62,18 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
   const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as StepperNodeValues;
-
-  useEffect(() => {
-    setNodeDimensions(id, {width: width as number, height: height as number});
-  }, [width, height]); // eslint-disable-line react-hooks/exhaustive-deps
+  const settings = nodeData[id].settings as StepperNodeSettings;
 
   useEffect(() => {
     if (init) return;
-    const initSettings = nodeSettings[id] as StepperNodeSettings;
     setLocalSettings({
-      numSteps: initSettings.numSteps,
-      middlePoints: initSettings.middlePoints.map(val => val.toString()),
-      outputValues: initSettings.outputValues.map(val => val.toString()),
+      numSteps: settings.numSteps,
+      middlePoints: settings.middlePoints.map(val => val.toString()),
+      outputValues: settings.outputValues.map(val => val.toString()),
     });
     setInit(true);
     setError(false);
-  }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [nodeData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (
     type: 'middlepoint' | 'outputvalue',
@@ -160,17 +151,7 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
   };
 
   return (
-    <div
-      ref={ref}
-      style={{
-        height: `${nodeMinHeight + rowHeight * localSettings.numSteps}px`,
-        width: 'auto',
-        border: error ? '1px dashed #e00' : '1px solid #eee',
-        padding: '10px',
-        borderRadius: '5px',
-        background: error ? '#fffafa' : 'white',
-      }}
-    >
+    <BaseNode id={id} type={type as CustomNodeTypes} error={error}>
       <Handle
         type="target"
         id={id}
@@ -178,65 +159,60 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
         position={Position.Left}
         isConnectable={isConnectable}
       />
-      <div>
-        <h4 style={{margin: 0}}>{data.label}</h4>
-        <table style={{width: '100%', margin: '5px 0px'}}>
-          <tbody>
-            <tr>
-              <th>Range</th>
-              <th>Output</th>
-            </tr>
-            {new Array(localSettings.numSteps).fill(0).map((_, index) => (
-              <tr
-                key={`${id}-${index}`}
-                style={{
-                  background: !error && isCurrentSlot(index) ? '#00f6' : '',
-                }}
-              >
-                <td>
-                  <p style={{display: 'inline'}}>≤ </p>
-                  {index + 1 === localSettings.numSteps ? (
-                    <input
-                      style={{width: '40px'}}
-                      type="text"
-                      value="∞"
-                      disabled
-                    />
-                  ) : (
-                    <input
-                      style={{width: '40px'}}
-                      type="number"
-                      value={localSettings.middlePoints[index]}
-                      onChange={event =>
-                        handleChange('middlepoint', index, event)
-                      }
-                    />
-                  )}
-                </td>
-                <td>
+      <table style={{width: '100%', margin: '5px 0px'}}>
+        <tbody>
+          <tr>
+            <th>Range</th>
+            <th>Output</th>
+          </tr>
+          {new Array(localSettings.numSteps).fill(0).map((_, index) => (
+            <tr
+              key={`${id}-${index}`}
+              style={{
+                background: !error && isCurrentSlot(index) ? '#00f6' : '',
+              }}
+            >
+              <td>
+                <p style={{display: 'inline'}}>≤ </p>
+                {index + 1 === localSettings.numSteps ? (
                   <input
                     style={{width: '40px'}}
-                    value={localSettings.outputValues[index]}
+                    type="text"
+                    value="∞"
+                    disabled
+                  />
+                ) : (
+                  <input
+                    style={{width: '40px'}}
+                    type="number"
+                    value={localSettings.middlePoints[index]}
                     onChange={event =>
-                      handleChange('outputvalue', index, event)
+                      handleChange('middlepoint', index, event)
                     }
                   />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <button style={{float: 'left', marginRight: '5px'}} onClick={handleAdd}>
-          New row
-        </button>
-        <button
-          style={{float: 'right'}}
-          disabled={localSettings.numSteps === 1}
-          onClick={handleRemove}
-        >
-          Remove row
-        </button>
-      </div>
+                )}
+              </td>
+              <td>
+                <input
+                  style={{width: '40px'}}
+                  value={localSettings.outputValues[index]}
+                  onChange={event => handleChange('outputvalue', index, event)}
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <button style={{float: 'left', marginRight: '5px'}} onClick={handleAdd}>
+        New row
+      </button>
+      <button
+        style={{float: 'right'}}
+        disabled={localSettings.numSteps === 1}
+        onClick={handleRemove}
+      >
+        Remove row
+      </button>
       <Handle
         type="source"
         id={`${id}-source`}
@@ -244,7 +220,7 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
         position={Position.Right}
         isConnectable={isConnectable}
       />
-    </div>
+    </BaseNode>
   );
 };
 

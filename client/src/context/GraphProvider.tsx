@@ -84,7 +84,7 @@ export const NodeValuesContext = createContext<NodeValuesContext>(
   {} as NodeValuesContext
 );
 
-// Node settings
+// Node data
 export type AverageNodeSettings = {
   weights: {[key: string]: number};
 };
@@ -115,25 +115,24 @@ export type NodeSettings =
   | RequireNodeSettings
   | StepperNodeSettings
   | SubstituteNodeSettings;
-export type AllNodeSettings = {[key: string]: NodeSettings};
-type NodeSettingsContext = {
-  nodeSettings: AllNodeSettings;
-  setNodeSettings: (id: string, newSettings: NodeSettings) => void;
+
+export type NodeData = {title: string; settings?: NodeSettings};
+
+export type FullNodeData = {[key: string]: NodeData};
+type NodeDataContext = {
+  nodeData: {[key: string]: NodeData};
+  setNodeTitle: (id: string, title: string) => void;
+  setNodeSettings: (id: string, settings: NodeSettings) => void;
 };
-export const NodeSettingsContext = createContext<NodeSettingsContext>(
-  {} as NodeSettingsContext
+export const NodeDataContext = createContext<NodeDataContext>(
+  {} as NodeDataContext
 );
 
-// Node heights
-export type NodeDimensions = {
-  [key: string]: {width: number; height: number};
-};
+// Node dimensions
+export type NodeDimensions = {[key: string]: {width: number; height: number}};
 type NodeDimensionsContext = {
-  nodeHeights: NodeDimensions;
-  setNodeDimensions: (
-    id: string,
-    newDimensions: {width: number; height: number}
-  ) => void;
+  nodeDimensions: NodeDimensions;
+  setNodeDimensions: (id: string, width: number, height: number) => void;
 };
 export const NodeDimensionsContext = createContext<NodeDimensionsContext>(
   {} as NodeDimensionsContext

@@ -2,32 +2,27 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {useMeasure} from '@uidotdev/usehooks';
 import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
   AdditionNodeValues,
-  NodeDimensionsContext,
+  CustomNodeTypes,
   NodeValuesContext,
 } from '../../context/GraphProvider';
+import BaseNode from './BaseNode';
 
 const handleStartHeight = 45.5 + 30;
 const rowHeight = 30;
 
-const AdditionNode = ({id, data, isConnectable}: NodeProps) => {
+const AdditionNode = ({id, type, isConnectable}: NodeProps) => {
   const updateNodeInternals = useUpdateNodeInternals();
-  const [ref, {width, height}] = useMeasure();
-  const {setNodeDimensions} = useContext(NodeDimensionsContext);
   const {nodeValues} = useContext(NodeValuesContext);
+
   const [handles, setHandles] = useState<string[]>([]);
   const [nextFree, setNextFree] = useState<number>(0);
 
   const nodeValue = nodeValues[id] as AdditionNodeValues;
-
-  useEffect(() => {
-    setNodeDimensions(id, {width: width as number, height: height as number});
-  }, [width, height]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     let change = false;
@@ -52,17 +47,7 @@ const AdditionNode = ({id, data, isConnectable}: NodeProps) => {
   }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div
-      ref={ref}
-      style={{
-        height: 'auto',
-        width: 'auto',
-        border: '1px solid #eee',
-        padding: '10px',
-        borderRadius: '5px',
-        background: 'white',
-      }}
-    >
+    <BaseNode id={id} type={type as CustomNodeTypes}>
       {handles.map((key, index) => (
         <Handle
           key={`handle-${key}`}
@@ -88,25 +73,24 @@ const AdditionNode = ({id, data, isConnectable}: NodeProps) => {
         position={Position.Left}
         isConnectable={isConnectable}
       />
-      <div>
-        <h4 style={{margin: 0}}>{data.label}</h4>
-        <table style={{width: '100%'}}>
-          <tbody>
-            <tr>
-              <th>In</th>
-            </tr>
-            {Object.entries(nodeValue.sources).map(([key, source]) => (
+      <table style={{width: '100%', minWidth: '60px'}}>
+        <tbody>
+          <tr>
+            <th>In</th>
+          </tr>
+          {Object.entries(nodeValue.sources)
+            .filter(([_, source]) => source.isConnected)
+            .map(([key, source]) => (
               <tr key={`tr-${key}`}>
                 <td>{source.value}</td>
               </tr>
             ))}
-            <tr>
-              <td style={{height: '20px'}}></td>
-            </tr>
-          </tbody>
-        </table>
-        <p style={{margin: 0}}>{Math.round(nodeValue.value * 100) / 100}</p>
-      </div>
+          <tr>
+            <td style={{height: '20px'}}></td>
+          </tr>
+        </tbody>
+      </table>
+      <p style={{margin: 0}}>{Math.round(nodeValue.value * 100) / 100}</p>
       <Handle
         type="source"
         id={`${id}-source`}
@@ -114,7 +98,7 @@ const AdditionNode = ({id, data, isConnectable}: NodeProps) => {
         position={Position.Right}
         isConnectable={isConnectable}
       />
-    </div>
+    </BaseNode>
   );
 };
 

@@ -2,29 +2,23 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {useMeasure} from '@uidotdev/usehooks';
 import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
   AttainmentNodeValues,
-  NodeDimensionsContext,
+  CustomNodeTypes,
   NodeValuesContext,
 } from '../../context/GraphProvider';
+import BaseNode from './BaseNode';
 
-const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
-  const [ref, {width, height}] = useMeasure();
-  const {setNodeDimensions} = useContext(NodeDimensionsContext);
+const AttanmentNode = ({id, type, isConnectable}: NodeProps) => {
   const {nodeValues, setNodeValues} = useContext(NodeValuesContext);
   const [localValue, setLocalValue] = useState<string>('0');
   const [error, setError] = useState<boolean>(false);
   const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as AttainmentNodeValues;
-
-  useEffect(() => {
-    setNodeDimensions(id, {width: width as number, height: height as number});
-  }, [width, height]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (init) return;
@@ -50,26 +44,13 @@ const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
   };
 
   return (
-    <div
-      ref={ref}
-      style={{
-        height: 'auto',
-        width: 'auto',
-        border: error ? '1px dashed #e00' : '1px solid #eee',
-        padding: '10px',
-        borderRadius: '5px',
-        background: error ? '#fffafa' : 'white',
-      }}
-    >
-      <div>
-        <h4 style={{margin: 0}}>{data.label}</h4>
-        <input
-          style={{width: 'calc(90px - 20px)'}}
-          onChange={handleChange}
-          type="number"
-          value={localValue}
-        />
-      </div>
+    <BaseNode id={id} type={type as CustomNodeTypes} error={error}>
+      <input
+        style={{width: '70px'}}
+        onChange={handleChange}
+        type="number"
+        value={localValue}
+      />
       <Handle
         type="source"
         id={`${id}-source`}
@@ -77,7 +58,7 @@ const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
         position={Position.Right}
         isConnectable={isConnectable}
       />
-    </div>
+    </BaseNode>
   );
 };
 

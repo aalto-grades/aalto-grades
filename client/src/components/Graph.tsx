@@ -27,15 +27,15 @@ import MinPointsNode from '../components/graph/MinPointsNode';
 import RequireNode from '../components/graph/RequireNode';
 import StepperNode from '../components/graph/StepperNode';
 import {
-  AllNodeSettings,
   DropInNodes,
-  NodeDimensions,
-  NodeDimensionsContext,
   NodeSettings,
-  NodeSettingsContext,
   CustomNodeTypes,
   NodeValues,
   NodeValuesContext,
+  FullNodeData,
+  NodeDataContext,
+  NodeDimensions,
+  NodeDimensionsContext,
 } from '../context/GraphProvider';
 import {createO1, createSimpleGraph, createY1} from './graph/createGraph';
 import './graph/flow.css';
@@ -63,9 +63,11 @@ const Graph = (): JSX.Element => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [initEdges, setInitEdges] = useState<Edge[]>([]);
-  const [nodeSettings, setNodeSettings] = useState<AllNodeSettings>({});
+  const [nodeData, setNodeData] = useState<FullNodeData>({});
+  const [nodeDimensions, setNodeContextDimensions] = useState<NodeDimensions>(
+    {}
+  );
   const [nodeValues, setNodeValues] = useState<NodeValues>({});
-  const [nodeDimensions, setNodeDimensions] = useState<NodeDimensions>({});
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance | null>(null);
 
@@ -74,22 +76,28 @@ const Graph = (): JSX.Element => {
   const [oldNodeValues, setOldNodeValues] = useState<string>('{}');
   const [oldEdges, setOldEdges] = useState<Edge[]>(edges);
 
-  const setContextNodeSettings = (id: string, newSettings: NodeSettings) => {
-    setNodeSettings(
-      oldNodeSettings =>
-        ({
-          ...oldNodeSettings,
-          [id]: newSettings,
-        }) as AllNodeSettings
-    );
+  const setNodeTitle = (id: string, title: string) => {
+    setNodeData(oldNodeData => ({
+      ...oldNodeData,
+      [id]: {
+        ...oldNodeData[id],
+        title,
+      },
+    }));
   };
-  const setContextNodeDimensions = (
-    id: string,
-    newDimensions: {width: number; height: number}
-  ) => {
-    setNodeDimensions(oldNodeDimensions => ({
+  const setNodeDimensions = (id: string, width: number, height: number) => {
+    setNodeContextDimensions(oldNodeDimensions => ({
       ...oldNodeDimensions,
-      [id]: newDimensions,
+      [id]: {width, height},
+    }));
+  };
+  const setNodeSettings = (id: string, settings: NodeSettings) => {
+    setNodeData(oldNodeSettings => ({
+      ...oldNodeSettings,
+      [id]: {
+        ...oldNodeSettings[id],
+        settings,
+      },
     }));
   };
 
@@ -107,7 +115,7 @@ const Graph = (): JSX.Element => {
 
       const newNodeValues = calculateNewNodeValues(
         nodeValues,
-        nodeSettings,
+        nodeData,
         nodes,
         filteredEdges
       );
@@ -115,7 +123,7 @@ const Graph = (): JSX.Element => {
       setNodeValues(newNodeValues);
       if (disconnectedEdges.length > 0) setEdges(filteredEdges);
     },
-    [edges, nodeSettings, nodeValues, nodes, setEdges]
+    [edges, nodeData, nodeValues, nodes, setEdges]
   );
 
   useEffect(() => {
@@ -123,6 +131,10 @@ const Graph = (): JSX.Element => {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    const nodeSettings: {[key: string]: NodeSettings | undefined} = {};
+    for (const [key, value] of Object.entries(nodeData))
+      nodeSettings[key] = value.settings;
+
     if (
       initEdges.length === 0 &&
       (oldNodeValues !== JSON.stringify(nodeValues) ||
@@ -137,7 +149,7 @@ const Graph = (): JSX.Element => {
   }, [
     edges,
     initEdges.length,
-    nodeSettings,
+    nodeData,
     nodeValues,
     oldEdges,
     oldNodeSettings,
@@ -148,7 +160,7 @@ const Graph = (): JSX.Element => {
   const loadGraph = (initGraph: {
     nodes: Node[];
     edges: Edge[];
-    nodeSettings: AllNodeSettings;
+    nodeData: FullNodeData;
     nodeValues: NodeValues;
   }) => {
     for (const node of nodes) {
@@ -157,7 +169,7 @@ const Graph = (): JSX.Element => {
     setTimeout(() => {
       setNodes(initGraph.nodes);
       setInitEdges(initGraph.edges);
-      setNodeSettings(initGraph.nodeSettings);
+      setNodeData(initGraph.nodeData);
       setNodeValues(initGraph.nodeValues);
     }, 0);
   };
@@ -277,28 +289,25 @@ const Graph = (): JSX.Element => {
       };
 
       const newValues = {...nodeValues, [newNode.id]: initNode(type).value};
-      const newSettings = {
-        ...nodeSettings,
-        [newNode.id]: initNode(type).settings as NodeSettings,
+      const newData: FullNodeData = {
+        ...nodeData,
+        [newNode.id]: initNode(type).data,
       };
 
       setNodes(nodes => nodes.concat(newNode));
       setNodeValues(newValues);
-      setNodeSettings(newSettings);
+      setNodeData(newData);
     },
-    [getId, nodeSettings, nodeValues, reactFlowInstance, setNodes]
+    [getId, nodeData, nodeValues, reactFlowInstance, setNodes]
   );
 
   return (
     <NodeValuesContext.Provider value={{nodeValues, setNodeValues}}>
-      <NodeSettingsContext.Provider
-        value={{nodeSettings, setNodeSettings: setContextNodeSettings}}
+      <NodeDimensionsContext.Provider
+        value={{nodeDimensions, setNodeDimensions}}
       >
-        <NodeDimensionsContext.Provider
-          value={{
-            nodeHeights: nodeDimensions,
-            setNodeDimensions: setContextNodeDimensions,
-          }}
+        <NodeDataContext.Provider
+          value={{nodeData, setNodeTitle, setNodeSettings}}
         >
           <div style={{width: '100%', height: '80vh'}}>
             <ReactFlow
@@ -345,7 +354,7 @@ const Graph = (): JSX.Element => {
             onDragStart={event => onDragStart(event, 'minpoints')}
             draggable
           >
-            MinPointsNode
+            RequirePointsNode
           </div>
           <div
             className="dndnode"
@@ -381,8 +390,8 @@ const Graph = (): JSX.Element => {
           <button onClick={() => loadGraph(createO1())}>
             Load O1 template
           </button>
-        </NodeDimensionsContext.Provider>
-      </NodeSettingsContext.Provider>
+        </NodeDataContext.Provider>
+      </NodeDimensionsContext.Provider>
     </NodeValuesContext.Provider>
   );
 };

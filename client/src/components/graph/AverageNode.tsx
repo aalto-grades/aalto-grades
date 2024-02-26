@@ -2,17 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {useMeasure} from '@uidotdev/usehooks';
 import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
   AverageNodeSettings,
   AverageNodeValues,
-  NodeDimensionsContext,
-  NodeSettingsContext,
+  CustomNodeTypes,
+  NodeDataContext,
   NodeValuesContext,
 } from '../../context/GraphProvider';
+import BaseNode from './BaseNode';
 
 type LocalSettings = {weights: {[key: string]: string}};
 
@@ -42,12 +42,10 @@ const checkError = (settings: LocalSettings): boolean => {
   return false;
 };
 
-const AverageNode = ({id, data, isConnectable}: NodeProps) => {
+const AverageNode = ({id, type, isConnectable}: NodeProps) => {
   const updateNodeInternals = useUpdateNodeInternals();
-  const [ref, {width, height}] = useMeasure();
-  const {setNodeDimensions} = useContext(NodeDimensionsContext);
+  const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const {nodeValues} = useContext(NodeValuesContext);
-  const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
 
   const [localSettings, setLocalSettings] = useState<LocalSettings>({
     weights: {},
@@ -59,18 +57,15 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
   const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as AverageNodeValues;
-
-  useEffect(() => {
-    setNodeDimensions(id, {width: width as number, height: height as number});
-  }, [width, height]); // eslint-disable-line react-hooks/exhaustive-deps
+  const settings = nodeData[id].settings as AverageNodeSettings;
 
   useEffect(() => {
     if (init) return;
-    const initSettings = nodeSettings[id] as AverageNodeSettings;
+    const initSettings = settings;
     setLocalSettings(convertSettingsToStrings(initSettings));
     setError(false);
     setInit(true);
-  }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [nodeData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!init) return;
@@ -124,97 +119,83 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
   };
 
   const sources = nodeValue.sources;
-  const settings = nodeSettings[id] as AverageNodeSettings;
   let weightSum = 0;
   for (const key of Object.keys(settings.weights)) {
     weightSum += settings.weights[key];
   }
 
   return (
-    <div
-      ref={ref}
-      style={{
-        height: 'auto',
-        width: 'auto',
-        border: error ? '1px dashed #e00' : '1px solid #eee',
-        padding: '10px',
-        borderRadius: '5px',
-        background: error ? '#fffafa' : 'white',
-      }}
-    >
-      <div>
-        <h4 style={{margin: 0}}>{data.label}</h4>
-        {handles.map((key, index) => (
-          <Handle
-            key={`handle-${key}`}
-            type="target"
-            id={key}
-            style={{
-              height: '12px',
-              width: '12px',
-              top: `${handleStartHeight + index * rowHeight}px`,
-            }}
-            position={Position.Left}
-            isConnectable={isConnectable}
-          />
-        ))}
+    <BaseNode id={id} type={type as CustomNodeTypes} error={error}>
+      {handles.map((key, index) => (
         <Handle
+          key={`handle-${key}`}
           type="target"
-          id={`${id}-${nextFree}`}
+          id={key}
           style={{
             height: '12px',
             width: '12px',
-            top: `${
-              handleStartHeight +
-              Object.keys(localSettings.weights).length * rowHeight
-            }px`,
+            top: `${handleStartHeight + index * rowHeight}px`,
           }}
           position={Position.Left}
           isConnectable={isConnectable}
         />
+      ))}
+      <Handle
+        type="target"
+        id={`${id}-${nextFree}`}
+        style={{
+          height: '12px',
+          width: '12px',
+          top: `${
+            handleStartHeight +
+            Object.keys(localSettings.weights).length * rowHeight
+          }px`,
+        }}
+        position={Position.Left}
+        isConnectable={isConnectable}
+      />
 
-        <table style={{width: '100%', margin: '5px 0px'}}>
-          <tbody>
-            <tr>
-              <th>Weight</th>
-              <th>value</th>
-            </tr>
-            {Object.entries(localSettings.weights).map(([key, weight]) => (
-              <tr key={`tr-${id}-${key}`}>
-                <td>
-                  <input
-                    style={{width: '40px'}}
-                    type="number"
-                    value={weight}
-                    onChange={event => handleChange(key, event)}
-                  />
-                </td>
-                <td>
-                  {!(key in sources) ||
-                  !(key in settings.weights) ||
-                  weightSum === 0
-                    ? 0
-                    : Math.round(
-                        (((sources[key].value as number) *
-                          settings.weights[key]) /
-                          weightSum) *
-                          100
-                      ) / 100}
-                </td>
-              </tr>
-            ))}
-            <tr>
+      <table style={{width: '100%', margin: '5px 0px'}}>
+        <tbody>
+          <tr>
+            <th>Weight</th>
+            <th>value</th>
+          </tr>
+          {Object.entries(localSettings.weights).map(([key, weight]) => (
+            <tr key={`tr-${id}-${key}`}>
               <td>
-                <input style={{width: '40px'}} type="number" disabled />
+                <input
+                  style={{width: '40px'}}
+                  type="number"
+                  value={weight}
+                  onChange={event => handleChange(key, event)}
+                />
               </td>
-              <td>-</td>
+              <td>
+                {!(key in sources) ||
+                !(key in settings.weights) ||
+                weightSum === 0
+                  ? 0
+                  : Math.round(
+                      (((sources[key].value as number) *
+                        settings.weights[key]) /
+                        weightSum) *
+                        100
+                    ) / 100}
+              </td>
             </tr>
-          </tbody>
-        </table>
-        <p style={{margin: 0, display: 'inline'}}>
-          {Math.round(nodeValue.value * 100) / 100}
-        </p>
-      </div>
+          ))}
+          <tr>
+            <td>
+              <input style={{width: '40px'}} type="number" disabled />
+            </td>
+            <td>-</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style={{margin: 0, display: 'inline'}}>
+        {Math.round(nodeValue.value * 100) / 100}
+      </p>
       <Handle
         type="source"
         id={`${id}-source`}
@@ -222,7 +203,7 @@ const AverageNode = ({id, data, isConnectable}: NodeProps) => {
         position={Position.Right}
         isConnectable={isConnectable}
       />
-    </div>
+    </BaseNode>
   );
 };
 

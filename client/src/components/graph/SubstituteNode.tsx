@@ -6,13 +6,13 @@ import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
-  NodeDimensionsContext,
-  NodeSettingsContext,
+  CustomNodeTypes,
+  NodeDataContext,
   NodeValuesContext,
   SubstituteNodeSettings,
   SubstituteNodeValues,
 } from '../../context/GraphProvider';
-import {useMeasure} from '@uidotdev/usehooks';
+import BaseNode from './BaseNode';
 
 type LocalSettings = {
   maxSubstitutions: string;
@@ -49,12 +49,10 @@ const convertFromLocalSettings = (
   ),
 });
 
-const SubstituteNode = ({id, data, isConnectable}: NodeProps) => {
+const SubstituteNode = ({id, type, isConnectable}: NodeProps) => {
   const updateNodeInternals = useUpdateNodeInternals();
-  const [ref, {width, height}] = useMeasure();
-  const {setNodeDimensions} = useContext(NodeDimensionsContext);
   const {nodeValues} = useContext(NodeValuesContext);
-  const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
+  const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
     JSON.parse(JSON.stringify(initialSettings))
@@ -66,18 +64,14 @@ const SubstituteNode = ({id, data, isConnectable}: NodeProps) => {
   const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as SubstituteNodeValues;
-  const settings = nodeSettings[id] as SubstituteNodeSettings;
-
-  useEffect(() => {
-    setNodeDimensions(id, {width: width as number, height: height as number});
-  }, [width, height]); // eslint-disable-line react-hooks/exhaustive-deps
+  const settings = nodeData[id].settings as SubstituteNodeSettings;
 
   useEffect(() => {
     if (init) return;
     setLocalSettings(convertToLocalSettings(settings));
     setError(false);
     setInit(true);
-  }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [nodeData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!init) return;
@@ -161,18 +155,7 @@ const SubstituteNode = ({id, data, isConnectable}: NodeProps) => {
   };
 
   return (
-    <div
-      ref={ref}
-      style={{
-        height: 'auto',
-        width: 'auto',
-        border: error ? '1px dashed #e00' : '1px solid #eee',
-        padding: '10px',
-        borderRadius: '5px',
-        background: error ? '#fffafa' : 'white',
-      }}
-    >
-      <h4 style={{margin: 0}}>{data.label}</h4>
+    <BaseNode id={id} type={type as CustomNodeTypes} error={error}>
       {substituteHandles.map((key, index) => (
         <Handle
           key={`handle-${key}`}
@@ -341,7 +324,7 @@ const SubstituteNode = ({id, data, isConnectable}: NodeProps) => {
           isConnectable={isConnectable}
         />
       ))}
-    </div>
+    </BaseNode>
   );
 };
 

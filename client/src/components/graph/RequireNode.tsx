@@ -2,17 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {useMeasure} from '@uidotdev/usehooks';
 import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
-  NodeDimensionsContext,
-  NodeSettingsContext,
+  CustomNodeTypes,
+  NodeDataContext,
   NodeValuesContext,
   RequireNodeSettings,
   RequireNodeValues,
 } from '../../context/GraphProvider';
+import BaseNode from './BaseNode';
 
 type LocalSettings = {numFail: string; failSetting: 'ignore' | 'coursefail'};
 const initialSettings = {numFail: 0, failSetting: 'courseFail'};
@@ -20,12 +20,10 @@ const initialSettings = {numFail: 0, failSetting: 'courseFail'};
 const handleStartHeight = 128.5;
 const rowHeight = 33.9;
 
-const RequireNode = ({id, data, isConnectable}: NodeProps) => {
+const RequireNode = ({id, type, isConnectable}: NodeProps) => {
   const updateNodeInternals = useUpdateNodeInternals();
-  const [ref, {width, height}] = useMeasure();
-  const {setNodeDimensions} = useContext(NodeDimensionsContext);
   const {nodeValues} = useContext(NodeValuesContext);
-  const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
+  const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
     JSON.parse(JSON.stringify(initialSettings))
@@ -36,18 +34,14 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
   const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as RequireNodeValues;
-  const settings = nodeSettings[id] as RequireNodeSettings;
-
-  useEffect(() => {
-    setNodeDimensions(id, {width: width as number, height: height as number});
-  }, [width, height]); // eslint-disable-line react-hooks/exhaustive-deps
+  const settings = nodeData[id].settings as RequireNodeSettings;
 
   useEffect(() => {
     if (init) return;
     setLocalSettings({...settings, numFail: settings.numFail.toString()});
     setError(false);
     setInit(true);
-  }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [nodeData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     let change = false;
@@ -118,22 +112,12 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
   );
 
   return (
-    <div
-      ref={ref}
-      style={{
-        height: 'auto',
-        width: 'auto',
-        border: nodeValue.courseFail
-          ? '2px solid #e00'
-          : error
-          ? '1px dashed #e00'
-          : '1px solid #eee',
-        padding: '10px',
-        borderRadius: '5px',
-        background: nodeValue.courseFail || error ? '#fffafa' : 'white',
-      }}
+    <BaseNode
+      id={id}
+      type={type as CustomNodeTypes}
+      error={error}
+      courseFail={nodeValue.courseFail}
     >
-      <h4 style={{margin: 0}}>{data.label}</h4>
       {handles.map((key, index) => (
         <Handle
           key={`handle-${key}`}
@@ -219,7 +203,7 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
           isConnectable={isConnectable}
         />
       ))}
-    </div>
+    </BaseNode>
   );
 };
 
