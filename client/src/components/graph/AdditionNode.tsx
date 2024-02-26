@@ -12,8 +12,8 @@ import {
   NodeValuesContext,
 } from '../../context/GraphProvider';
 
-const handleStartHeight = 37.95;
-const rowHeight = 33.9;
+const handleStartHeight = 45.5 + 30;
+const rowHeight = 30;
 
 const AdditionNode = ({id, data, isConnectable}: NodeProps) => {
   const updateNodeInternals = useUpdateNodeInternals();
@@ -55,7 +55,7 @@ const AdditionNode = ({id, data, isConnectable}: NodeProps) => {
     <div
       ref={ref}
       style={{
-        height: `${40 + handles.length * rowHeight}px`, // 'auto' doesn't work here
+        height: 'auto',
         width: 'auto',
         border: '1px solid #eee',
         padding: '10px',
@@ -90,6 +90,21 @@ const AdditionNode = ({id, data, isConnectable}: NodeProps) => {
       />
       <div>
         <h4 style={{margin: 0}}>{data.label}</h4>
+        <table style={{width: '100%'}}>
+          <tbody>
+            <tr>
+              <th>In</th>
+            </tr>
+            {Object.entries(nodeValue.sources).map(([key, source]) => (
+              <tr key={`tr-${key}`}>
+                <td>{source.value}</td>
+              </tr>
+            ))}
+            <tr>
+              <td style={{height: '20px'}}></td>
+            </tr>
+          </tbody>
+        </table>
         <p style={{margin: 0}}>{Math.round(nodeValue.value * 100) / 100}</p>
       </div>
       <Handle

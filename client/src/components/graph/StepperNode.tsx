@@ -164,7 +164,7 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
       ref={ref}
       style={{
         height: `${nodeMinHeight + rowHeight * localSettings.numSteps}px`,
-        width: '270px',
+        width: 'auto',
         border: error ? '1px dashed #e00' : '1px solid #eee',
         padding: '10px',
         borderRadius: '5px',
@@ -194,24 +194,7 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
                 }}
               >
                 <td>
-                  {index === 0 ? (
-                    <input
-                      style={{width: '40px'}}
-                      type="text"
-                      value="-∞"
-                      disabled
-                    />
-                  ) : (
-                    <input
-                      style={{width: '40px'}}
-                      type="number"
-                      value={localSettings.middlePoints[index - 1]}
-                      onChange={event =>
-                        handleChange('middlepoint', index - 1, event)
-                      }
-                    />
-                  )}
-                  <p style={{display: 'inline'}}> {'< ... ≤'} </p>
+                  <p style={{display: 'inline'}}>≤ </p>
                   {index + 1 === localSettings.numSteps ? (
                     <input
                       style={{width: '40px'}}
@@ -243,17 +226,11 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
             ))}
           </tbody>
         </table>
-        <button
-          style={{display: 'inline', marginRight: '30px'}}
-          onClick={handleAdd}
-        >
+        <button style={{float: 'left', marginRight: '5px'}} onClick={handleAdd}>
           New row
         </button>
-        <p style={{margin: 0, display: 'inline'}}>
-          {Math.round(nodeValue.value * 100) / 100}
-        </p>
         <button
-          style={{display: 'inline', marginLeft: '30px'}}
+          style={{float: 'right'}}
           disabled={localSettings.numSteps === 1}
           onClick={handleRemove}
         >

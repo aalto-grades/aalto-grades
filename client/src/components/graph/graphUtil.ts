@@ -382,10 +382,7 @@ export const calculateNewNodeValues = (
     setNodeValue(sourceId, newNodeValues[sourceId], nodeSettings);
     const sourceNodeValue = newNodeValues[sourceId];
 
-    if (
-      (sourceNodeValue.type === 'require' && sourceNodeValue.courseFail) ||
-      courseFail
-    ) {
+    if (sourceNodeValue.type === 'require' && sourceNodeValue.courseFail) {
       courseFail = true;
     }
     if (!(sourceId in nodeTargets)) continue;

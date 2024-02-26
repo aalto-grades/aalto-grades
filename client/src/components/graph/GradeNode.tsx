@@ -26,8 +26,8 @@ const GradeNode = ({id, data, isConnectable}: NodeProps) => {
     <div
       ref={ref}
       style={{
-        height: '50px',
-        width: '100px',
+        height: 'auto',
+        width: 'auto',
         border: '1px solid #eee',
         padding: '10px',
         borderRadius: '5px',
