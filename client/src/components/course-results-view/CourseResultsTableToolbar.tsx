@@ -162,7 +162,7 @@ export default function CourseResultsTableToolbar(props: {
               </Button>
             </span>
           </Tooltip>
-          <Button
+          {/* <Button
             variant="outlined"
             color={props.selectedStudents.length != 0 ? 'error' : 'primary'}
             onClick={(): void => {
@@ -174,7 +174,7 @@ export default function CourseResultsTableToolbar(props: {
             }}
           >
             Return to course view
-          </Button>
+          </Button> */}
           <SisuDownloadDialog
             open={showSisuDialog}
             handleClose={handleCloseSisuDialog}

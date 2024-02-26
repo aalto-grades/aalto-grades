@@ -60,30 +60,31 @@ const GradeCell: FC<GradeCellProps> = (
     >
       <span>{bestGrade?.grade ?? '-'}</span>
       {/* If there are multiple grades "show more" icon*/}
-      {props.attainemntResults && props.attainemntResults.grades.length > 1 && (
-        <>
-          <Tooltip placement="top" title="Multiple grades, click to show">
-            <IconButton
-              size="small"
-              color="primary"
-              sx={{ml: 1}}
-              onClick={(): void => setGradeOptionsOpen(true)}
-            >
-              <MoreHorizIcon />
-            </IconButton>
-          </Tooltip>
-          <GradeOptionsDialog
-            title={`Grades of ${props.studentNumber} for ${
-              props.finalGrade
-                ? 'Final Grade'
-                : props.attainemntResults.attainmentName
-            }`}
-            options={props.attainemntResults.grades}
-            open={gradeOptionsOpen}
-            handleClose={(): void => setGradeOptionsOpen(false)}
-          />
-        </>
-      )}
+      {props.attainemntResults &&
+        props.attainemntResults.grades?.length > 1 && (
+          <>
+            <Tooltip placement="top" title="Multiple grades, click to show">
+              <IconButton
+                size="small"
+                color="primary"
+                sx={{ml: 1}}
+                onClick={(): void => setGradeOptionsOpen(true)}
+              >
+                <MoreHorizIcon />
+              </IconButton>
+            </Tooltip>
+            <GradeOptionsDialog
+              title={`Grades of ${props.studentNumber} for ${
+                props.finalGrade
+                  ? 'Final Grade'
+                  : props.attainemntResults.attainmentName
+              }`}
+              options={props.attainemntResults.grades}
+              open={gradeOptionsOpen}
+              handleClose={(): void => setGradeOptionsOpen(false)}
+            />
+          </>
+        )}
       {/* If grade is expired, show warning icon */}
       {isGradeExpired && (
         <>

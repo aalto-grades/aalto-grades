@@ -11,6 +11,7 @@ import {
   HttpCode,
   Status,
   StudentGradesTree,
+  studentRow,
 } from '@common/types';
 import {parse, Parser} from 'csv-parse';
 import {stringify} from 'csv-stringify';
@@ -119,6 +120,107 @@ export async function getCsvTemplate(
       return;
     }
   );
+}
+
+/**
+ * Get all course grades
+ * @param {Request} req - The HTTP request.
+ * @param {Response} res - The HTTP response containing the CSV file.
+ * @returns {Promise<void>} - A Promise that resolves when the function has completed its execution.
+ * @throws {ApiError} - If course and/or course instance not found, instance does not belong to
+ * the course, or no course results found/calculated before calling the endpoint.
+ */
+export async function getGrades(req: Request, res: Response): Promise<void> {
+  const urlParams: yup.AnyObjectSchema = yup.object({
+    studentNumbers: yup.array().json().of(yup.string()).notRequired(),
+    instanceId: yup.number().min(1).notRequired(),
+  });
+
+  const {
+    studentNumbers,
+    instanceId,
+  }: {
+    studentNumbers?: Array<string>;
+    instanceId?: number;
+  } = await urlParams.validate(req.query, {abortEarly: false});
+
+  const courseId = Number(req.params.courseId);
+
+  // Get all attainments for the course
+  const attainments: Array<Attainment> = await Attainment.findAll({
+    where: {
+      courseId: courseId,
+    },
+  });
+  // Get grades of all attainments
+  const grades = await AttainmentGrade.findAll({
+    include: {
+      all: true,
+    },
+    where: {
+      attainmentId: {
+        [Op.in]: attainments.map((attainment: Attainment) => attainment.id),
+      },
+    },
+  });
+
+  // Get dict of unique Users from the grades with key as userId from grades
+  const users = grades.reduce<{[key: string]: User}>((acc, grade) => {
+    if (!acc[grade.userId]) {
+      acc[grade.userId] = grade.User;
+    }
+    return acc;
+  }, {});
+
+  // Create a dict Group by user id and internally grouped by attainment id
+  const userGrades = grades.reduce<{
+    [key: string]: {[key: string]: AttainmentGrade[]};
+  }>((acc, grade) => {
+    const userId = grade.userId;
+    if (!acc[userId]) {
+      acc[userId] = {};
+    }
+    if (!acc[userId][grade.attainmentId]) {
+      acc[userId][grade.attainmentId] = [];
+    }
+    acc[userId][grade.attainmentId].push(grade);
+    return acc;
+  }, {});
+
+  //Cleaning the results for API response
+
+  const result: studentRow[] = Object.keys(userGrades).map(userId => {
+    // console.log(userGrades[userId]);
+    return {
+      user: users[userId],
+      attainments: attainments.map(attainment => {
+        return {
+          attainmentId: attainment.id,
+          attainmentName: attainment.name,
+          grades: userGrades[userId][attainment.id]?.map(grade => {
+            return {
+              gradeId: grade.id,
+              grader: {
+                id: grade.grader.id,
+                name: grade.grader.name,
+              },
+              grade: grade.grade,
+              exportedToSisu: grade.sisuExportDate,
+              date: grade.date ? toDateOnlyString(grade.date) : undefined,
+              expiryDate: grade.expiryDate
+                ? toDateOnlyString(grade.expiryDate)
+                : undefined,
+              comment: grade.comment,
+            };
+          }),
+        };
+      }),
+    };
+  });
+
+  res.status(HttpCode.Ok).json({
+    data: result,
+  });
 }
 
 /**

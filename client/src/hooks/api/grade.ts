@@ -117,6 +117,17 @@ export function useGetGradeTreeOfAllUsers(
     ...options,
   });
 }
+export function useGetGrades(
+  courseId: Numeric,
+  options?: Partial<UseQueryOptions<Array<StudentGradesTree>>>
+): UseQueryResult<StudentGradesTree[]> {
+  return useQuery({
+    queryKey: ['grades', courseId],
+    queryFn: async () =>
+      (await axios.get(`/v1/courses/${courseId}/grades`)).data.data,
+    ...options,
+  });
+}
 
 export function useGetGradeTreeOfUser(
   courseId: Numeric,

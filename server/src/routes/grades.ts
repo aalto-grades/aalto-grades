@@ -16,6 +16,7 @@ import {
   getSisuFormattedGradingCSV,
   getGradeTreeOfUser,
   getGradeTreeOfAllUsers,
+  getGrades,
 } from '../controllers/grades';
 import {handleInvalidRequestJson} from '../middleware';
 import {controllerDispatcher} from '../middleware/errorHandler';
@@ -53,6 +54,12 @@ const upload: Multer = multer({
     }
   },
 });
+
+router.get(
+  '/v1/courses/:courseId/grades',
+  passport.authenticate('jwt', {session: false}),
+  controllerDispatcher(getGrades)
+);
 
 router.get(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv',

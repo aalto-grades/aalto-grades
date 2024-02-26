@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {AttainmentData} from '@common/types/attainment';
 import {DateOnlyString} from './general';
 import {UserData} from './user';
 
@@ -41,6 +42,18 @@ export interface StudentGradesTree {
   grades: Array<GradeOption>;
   subAttainments?: Array<AttainmentGradeData>;
 }
+
+export type AttainmentGradesData = {
+  attainmentId: number;
+  attainmentName?: string;
+  grades: Array<GradeOption>;
+};
+
+export type studentRow = {
+  user: UserData;
+  finalGrade: FinalGrade;
+  attainments: Array<AttainmentGradesData>;
+};
 
 // TODO: Replace with a better name
 export interface FinalGrade {

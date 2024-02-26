@@ -81,15 +81,11 @@ export default function CourseTable(props: {
               key={course.id}
               hover={true}
               onClick={(): void => {
-                navigate('/course-view/' + course.id);
+                navigate('/' + course.id);
               }}
             >
               <TableCell>
-                <Link
-                  href={'/course-view/' + course.id}
-                  underline="hover"
-                  color="inherit"
-                >
+                <Link href={'/' + course.id} underline="hover" color="inherit">
                   {course.courseCode}
                 </Link>
               </TableCell>

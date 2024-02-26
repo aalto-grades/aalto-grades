@@ -217,34 +217,40 @@ export default function App(): JSX.Element {
                     <PrivateRoute roles={[SystemRole.User, SystemRole.Admin]} />
                   }
                 >
-                  <Route
-                    path="/:courseId/attainments"
-                    element={<AttainmentsView />}
-                  />
-                  <Route
-                    path="/:courseId/fetch-instances/:courseCode"
-                    element={<FetchInstancesView />}
-                  />
-                  <Route
-                    path="/:courseId/course-results"
-                    element={<CourseResultsView />}
-                  />
-                  <Route
-                    path="/:courseId/course-results/:assessmentModelId"
-                    element={<CourseResultsView />}
-                  />
-                  <Route
-                    path="/:courseId/edit-instance"
-                    element={<EditInstanceView />}
-                  />
-                  <Route
-                    path="/:courseId/edit-instance/:sisuInstanceId"
-                    element={<EditInstanceView />}
-                  />
-                  <Route
-                    path="/:courseId/attainment/:modification/:assessmentModelId/:attainmentId?"
-                    element={<EditAttainmentView />}
-                  />
+                  {/* All roles are authorised to access the front page, conditional
+                     rendering is done inside the component */}
+
+                  <Route path="/" element={<FrontPage />} />
+                  <Route path="/:courseId" element={<CourseView />}>
+                    <Route
+                      path="/:courseId/attainments"
+                      element={<AttainmentsView />}
+                    />
+                    <Route
+                      path="/:courseId/fetch-instances/:courseCode"
+                      element={<FetchInstancesView />}
+                    />
+                    <Route
+                      path="/:courseId/course-results"
+                      element={<CourseResultsView />}
+                    />
+                    <Route
+                      path="/:courseId/course-results/:assessmentModelId"
+                      element={<CourseResultsView />}
+                    />
+                    <Route
+                      path="/:courseId/edit-instance"
+                      element={<EditInstanceView />}
+                    />
+                    <Route
+                      path="/:courseId/edit-instance/:sisuInstanceId"
+                      element={<EditInstanceView />}
+                    />
+                    <Route
+                      path="/:courseId/attainment/:modification/:assessmentModelId/:attainmentId?"
+                      element={<EditAttainmentView />}
+                    />
+                  </Route>
                 </Route>
                 {/* Not found route */}
                 <Route path="*" element={<NotFound />} />

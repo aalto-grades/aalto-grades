@@ -16,6 +16,7 @@ import {
   useDownloadCsvTemplate,
   UseDownloadCsvTemplateResult,
   useGetFinalGrades,
+  useGetGrades,
   useGetGradeTreeOfAllUsers,
   useGetRootAttainment,
 } from '../hooks/useApi';
@@ -49,35 +50,36 @@ export default function CourseResultsView(): JSX.Element {
     );
   }, [selectedStudents]);
 
-  const attainmentTree: UseQueryResult<AttainmentData> = useGetRootAttainment(
-    courseId,
-    assessmentModelId,
-    'descendants'
-  );
+  // const attainmentTree: UseQueryResult<AttainmentData> = useGetRootAttainment(
+  //   courseId,
+  //   assessmentModelId,
+  //   'descendants'
+  // );
 
-  // Does not contain root attainment
-  const attainmentList: Array<AttainmentData> = [];
+  // // Does not contain root attainment
+  // const attainmentList: Array<AttainmentData> = [];
 
-  function constructAttainmentList(attainment: AttainmentData): void {
-    if (attainment.subAttainments) {
-      for (const subAttainment of attainment.subAttainments) {
-        attainmentList.push(subAttainment);
-        constructAttainmentList(subAttainment);
-      }
-    }
-  }
+  // function constructAttainmentList(attainment: AttainmentData): void {
+  //   if (attainment.subAttainments) {
+  //     for (const subAttainment of attainment.subAttainments) {
+  //       attainmentList.push(subAttainment);
+  //       constructAttainmentList(subAttainment);
+  //     }
+  //   }
+  // }
 
-  if (attainmentTree.data) constructAttainmentList(attainmentTree.data);
+  // if (attainmentTree.data) constructAttainmentList(attainmentTree.data);
 
-  const students: UseQueryResult<Array<FinalGrade>> = useGetFinalGrades(
-    courseId,
-    assessmentModelId
-  );
+  // const students: UseQueryResult<Array<FinalGrade>> = useGetFinalGrades(
+  //   courseId,
+  //   assessmentModelId
+  // );
 
   const calculateFinalGrades: UseCalculateFinalGradesResult =
     useCalculateFinalGrades();
 
-  const gradesQuery = useGetGradeTreeOfAllUsers(courseId, assessmentModelId);
+  // const gradesQuery = useGetGradeTreeOfAllUsers(courseId, assessmentModelId);
+  const gradesQuery = useGetGrades(courseId);
 
   // If asking for a refetch then it also update the selectedStudents
   async function studentsRefetch(): Promise<void> {
@@ -177,9 +179,9 @@ export default function CourseResultsView(): JSX.Element {
   return (
     <Box textAlign="left" alignItems="left">
       <AlertSnackbar snackPack={snackPack} />
-      <Typography variant="h1" sx={{flexGrow: 1, my: 4}}>
+      {/* <Typography variant="h1" sx={{flexGrow: 1, my: 4}}>
         Course Results
-      </Typography>
+      </Typography> */}
       {/* <CourseResultsGrid /> */}
       <CourseResultsTableToolbar
         calculateFinalGrades={handleCalculateFinalGrades}
@@ -191,8 +193,6 @@ export default function CourseResultsView(): JSX.Element {
       {gradesQuery.data && (
         <CourseResultsTanTable
           data={gradesQuery.data}
-          attainmentList={attainmentList}
-          attainmentTree={attainmentTree.data}
           selectedStudents={selectedStudents}
           setSelectedStudents={setSelectedStudents}
         />

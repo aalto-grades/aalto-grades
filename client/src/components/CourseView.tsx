@@ -20,6 +20,7 @@ import {
 import {JSX, useState, useEffect} from 'react';
 import {
   NavigateFunction,
+  Outlet,
   Params,
   useNavigate,
   useParams,
@@ -40,6 +41,7 @@ import useAuth, {AuthContextType} from '../hooks/useAuth';
 import {State} from '../types';
 import AssessmentModelsPicker from './course-view/AssessmentModelsPicker';
 import InstancesWidget from './course-view/InstancesWidget';
+import SideMenu from './course-view/SideMenu';
 
 export default function CourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
@@ -79,18 +81,6 @@ export default function CourseView(): JSX.Element {
       setCurrentAssessmentModel(assessmentModels.data[0]);
     else setCurrentAssessmentModel(null);
   }, [assessmentModels.data, currentAssessmentModel]);
-
-  const attainmentTree: UseQueryResult<AttainmentData> = useGetRootAttainment(
-    courseId,
-    currentAssessmentModel?.id ?? -1,
-    'descendants',
-    {enabled: Boolean(currentAssessmentModel && currentAssessmentModel.id)}
-  );
-
-  const attainments: UseQueryResult<Array<AttainmentData>> = useGetAttainments(
-    courseId,
-    {enabled: Boolean(currentAssessmentModel && currentAssessmentModel.id)}
-  );
 
   useEffect(() => {
     setAnimation(true);
@@ -135,113 +125,14 @@ export default function CourseView(): JSX.Element {
               </Button>
             )}
           </Box>
-          <p>{attainments.data?.toString()}</p>
-          <Box>
-            {
-              /* a different attainment component will be created for students */
-              (auth?.role == SystemRole.Admin || isTeacherInCharge) && (
-                <div style={{flexGrow: 3}}>
-                  <Typography variant="h3" align="left" sx={{pt: 1.5, pb: 1}}>
-                    Assessment Models
-                    {(auth?.role === SystemRole.Admin || isTeacherInCharge) && (
-                      <Tooltip title="New assessment model" placement="right">
-                        <Button
-                          onClick={(): void =>
-                            setCreateAssessmentModelOpen(true)
-                          }
-                        >
-                          New
-                        </Button>
-                      </Tooltip>
-                    )}
-                  </Typography>
-
-                  <div style={{display: 'flex', gap: 0}}>
-                    <div
-                      style={{display: 'flex', flexDirection: 'column', gap: 0}}
-                    >
-                      <AssessmentModelsPicker
-                        course={course.data}
-                        assessmentModels={assessmentModels.data}
-                        currentAssessmentModelId={currentAssessmentModel?.id}
-                        onChangeAssessmentModel={onChangeAssessmentModel}
-                        onNewAssessmentModel={(): void =>
-                          setCreateAssessmentModelOpen(true)
-                        }
-                      />
-                      <div style={{marginRight: '20px', maxWidth: '300px'}}>
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: 0,
-                          }}
-                        >
-                          <CourseDetails
-                            course={course.data}
-                            assessmentModels={assessmentModels.data}
-                            currentAssessmentModelId={
-                              currentAssessmentModel?.id
-                            }
-                            onChangeAssessmentModel={onChangeAssessmentModel}
-                            onNewAssessmentModel={(): void =>
-                              setCreateAssessmentModelOpen(true)
-                            }
-                          />
-                          <InstancesWidget />
-                        </Box>
-                      </div>
-                    </div>
-                    <div style={{width: '100%'}}>
-                      {attainmentTree.data ? (
-                        <Fade
-                          in={animation}
-                          style={{transformOrigin: '0 0 0'}}
-                          {...(animation ? {timeout: 1000} : {timeout: 0})}
-                        >
-                          <div style={{width: '100%'}}>
-                            {currentAssessmentModel && (
-                              <Attainments
-                                attainmentTree={attainmentTree.data}
-                                courseId={Number(courseId)}
-                                assessmentModel={currentAssessmentModel}
-                              />
-                            )}
-                          </div>
-                        </Fade>
-                      ) : attainmentTree.isLoading &&
-                        assessmentModels.data &&
-                        assessmentModels.data.length !== 0 ? (
-                        <div>
-                          <Box
-                            sx={{
-                              margin: 'auto',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              display: 'flex',
-                              mt: 25,
-                              mb: 5,
-                            }}
-                          >
-                            <CircularProgress />
-                          </Box>
-                          Loading attainments...
-                        </div>
-                      ) : (
-                        <Box sx={{mt: 9}}>No assessment models found.</Box>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )
-            }
-          </Box>
-          <CreateAssessmentModelDialog
-            open={createAssessmentModelOpen}
-            handleClose={(): void => setCreateAssessmentModelOpen(false)}
-            onSubmit={assessmentModels.refetch}
-            assessmentModels={assessmentModels.data}
-          />
+          <div
+            style={{
+              display: 'flex',
+            }}
+          >
+            <SideMenu />
+            <Outlet />
+          </div>
         </>
       )}
     </Box>

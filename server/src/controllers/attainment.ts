@@ -66,7 +66,7 @@ export async function addAttainment(
   await requestSchema.validate(req.body, {abortEarly: false});
 
   const courseId = Number(req.params.courseId);
-  console.log(req.body.parentId);
+
   const requestTree: AttainmentData = req.body;
 
   await isTeacherInChargeOrAdmin(
@@ -74,16 +74,19 @@ export async function addAttainment(
     courseId,
     HttpCode.Forbidden
   );
+  try {
+    const dbEntry: Attainment = await Attainment.create({
+      courseId: courseId,
+      name: requestTree.name,
+      daysValid: requestTree.daysValid,
+    });
 
-  const dbEntry: Attainment = await Attainment.create({
-    courseId: courseId,
-    name: requestTree.name,
-    daysValid: requestTree.daysValid,
-  });
-
-  res.status(HttpCode.Ok).json({
-    data: dbEntry,
-  });
+    res.status(HttpCode.Ok).json({
+      data: dbEntry,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export async function updateAttainment(

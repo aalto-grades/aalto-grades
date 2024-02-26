@@ -31,6 +31,8 @@ import {findBestGradeOption} from '../../utils';
 import PrettyChip from '../shared/PrettyChip';
 import GradeCell from './GradeCell';
 import StudentGradesDialog from './StudentGradesDialog';
+import {useGetAttainments} from '../../hooks/useApi';
+import {Params, useParams} from 'react-router-dom';
 // This module is used to create meta data for colums cells
 declare module '@tanstack/table-core' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -54,8 +56,6 @@ type GroupedStudentRow = {
 
 type PropsType = {
   data: StudentGradesTree[];
-  attainmentList: Array<AttainmentData>;
-  attainmentTree?: AttainmentData;
   selectedStudents: FinalGrade[];
   setSelectedStudents: React.Dispatch<React.SetStateAction<FinalGrade[]>>;
 };
@@ -99,16 +99,17 @@ function getAttainmentGrade(
 // Flatten the tree into a list of rows
 function flattenTree(studentTree: StudentGradesTree) {
   const result: StudentRow = {...studentTree, flatAttainments: []};
+  result.flatAttainments = studentTree.attainments ?? [];
 
-  function addSubAttainments(sAtt: AttainmentGradeData[]) {
-    if (sAtt) {
-      result.flatAttainments.push(...sAtt);
-      for (const subAtt of sAtt) {
-        addSubAttainments(subAtt.subAttainments ?? []);
-      }
-    }
-  }
-  addSubAttainments(studentTree.subAttainments ?? []);
+  // function addSubAttainments(sAtt: AttainmentGradeData[]) {
+  //   if (sAtt) {
+  //     result.flatAttainments.push(...sAtt);
+  //     for (const subAtt of sAtt) {
+  //       addSubAttainments(subAtt.attainment ?? []);
+  //     }
+  //   }
+  // }
+  // addSubAttainments(studentTree.subAttainments ?? []);
   return result;
 }
 
@@ -169,7 +170,10 @@ const columnHelper = createColumnHelper<GroupedStudentRow>();
 //TODO: Better column definitions
 //TODO: Better typing and freeze how to access data
 const CourseResultsTanTable: React.FC<PropsType> = props => {
-  console.log(props.attainmentList);
+  const {courseId} = useParams() as {
+    courseId: string;
+  };
+  const attainmentList = useGetAttainments(courseId).data ?? [];
   const flattenData = React.useMemo(
     () => props.data.map(flattenTree),
     [props.data]
@@ -204,71 +208,73 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
   // console.log(rowSelection);
 
   // Creating Grades columns
-  // const dynamicColumns = props.attainmentList.map(att => {
-  //   return columnHelper.accessor(row => getAttainmentGrade(row, att.id ?? 0), {
-  //     header: att.name,
-  //     meta: {PrettyChipPosition: 'alone'},
-  //     enableSorting: false,
-  //     cell: ({getValue}) => (
-  //       <GradeCell studentNumber={'123'} attainemntResults={getValue()} />
-  //     ),
-  //     footer: att.name,
-  //   });
-  // });
-  // Dynamic columns but instead of using the flat array of attainments, use the tree
-  function createAssignmentRow(
-    subAssignment: AttainmentData[] // : (ColumnDef<GroupedStudentRow, any>)[]
-  ): (
-    | ReturnType<typeof columnHelper.accessor>
-    | ReturnType<typeof columnHelper.group>
-  )[] {
-    return subAssignment.map(att => {
-      if ((att.subAttainments?.length ?? 0 > 0) && att.subAttainments) {
-        return columnHelper.group({
-          header: att.name,
-          meta: {PrettyChipPosition: 'alone'},
-          columns: [
-            columnHelper.accessor(row => getAttainmentGrade(row, att.id ?? 0), {
-              header: att.name,
-              meta: {PrettyChipPosition: 'alone'},
-              enableSorting: false,
-              cell: ({getValue}) => (
-                <GradeCell
-                  studentNumber={'123'}
-                  attainemntResults={getValue()}
-                  finalGrade={false}
-                />
-              ),
-            }),
-            ...createAssignmentRow(att.subAttainments),
-          ],
-        });
+  const dynamicColumns = attainmentList.map(att => {
+    return columnHelper.accessor(
+      row => row.flatAttainments?.find(a => a.attainmentId == att.id),
+      {
+        header: att.name,
+        meta: {PrettyChipPosition: 'alone'},
+        enableSorting: false,
+        cell: ({getValue}) => (
+          <GradeCell studentNumber={'123'} attainemntResults={getValue()} />
+        ),
+        footer: att.name,
       }
+    );
+  });
+  // Dynamic columns but instead of using the flat array of attainments, use the tree
+  // function createAssignmentRow(
+  //   subAssignment: AttainmentData[] // : (ColumnDef<GroupedStudentRow, any>)[]
+  // ): (
+  //   | ReturnType<typeof columnHelper.accessor>
+  //   | ReturnType<typeof columnHelper.group>
+  // )[] {
+  //   return subAssignment.map(att => {
+  //     if ((att.subAttainments?.length ?? 0 > 0) && att.subAttainments) {
+  //       return columnHelper.group({
+  //         header: att.name,
+  //         meta: {PrettyChipPosition: 'alone'},
+  //         columns: [
+  //           columnHelper.accessor(row => getAttainmentGrade(row, att.id ?? 0), {
+  //             header: att.name,
+  //             meta: {PrettyChipPosition: 'alone'},
+  //             enableSorting: false,
+  //             cell: ({getValue}) => (
+  //               <GradeCell
+  //                 studentNumber={'123'}
+  //                 attainemntResults={getValue()}
+  //                 finalGrade={false}
+  //               />
+  //             ),
+  //           }),
+  //           ...createAssignmentRow(att.subAttainments),
+  //         ],
+  //       });
+  //     }
 
-      return columnHelper.accessor(
-        row => getAttainmentGrade(row, att.id ?? 0),
-        {
-          header: att.name,
-          meta: {PrettyChipPosition: 'alone'},
-          enableSorting: false,
-          cell: ({getValue}) => (
-            <GradeCell
-              studentNumber={'123'}
-              attainemntResults={getValue()}
-              finalGrade={false}
-            />
-          ),
-        }
-      );
-    }) as (
-      | ReturnType<typeof columnHelper.accessor>
-      | ReturnType<typeof columnHelper.group>
-    )[];
-  }
+  //     return columnHelper.accessor(
+  //       row => getAttainmentGrade(row, att.id ?? 0),
+  //       {
+  //         header: att.name,
+  //         meta: {PrettyChipPosition: 'alone'},
+  //         enableSorting: false,
+  //         cell: ({getValue}) => (
+  //           <GradeCell
+  //             studentNumber={'123'}
+  //             attainemntResults={getValue()}
+  //             finalGrade={false}
+  //           />
+  //         ),
+  //       }
+  //     );
+  //   }) as (
+  //     | ReturnType<typeof columnHelper.accessor>
+  //     | ReturnType<typeof columnHelper.group>
+  //   )[];
+  // }
+  // const dynamicColumns = createAssignmentRow([]);
 
-  const dynamicColumns = createAssignmentRow(
-    props.attainmentTree?.subAttainments ?? []
-  );
+  // props.attainmentTree?.subAttainments ?? [] //broken code
 
   // Creating grouping column
   const groupingColumns =
@@ -369,7 +375,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
         />
       ),
     }),
-    columnHelper.accessor('studentNumber', {
+    columnHelper.accessor('user.studentNumber', {
       header: 'Student Number',
       meta: {PrettyChipPosition: 'first'},
       cell: ({row, getValue}) => {
