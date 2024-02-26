@@ -288,11 +288,9 @@ const Graph = (): JSX.Element => {
         data: {label: type},
       };
 
-      const newValues = {...nodeValues, [newNode.id]: initNode(type).value};
-      const newData: FullNodeData = {
-        ...nodeData,
-        [newNode.id]: initNode(type).data,
-      };
+      const initState = initNode(type);
+      const newValues = {...nodeValues, [newNode.id]: initState.value};
+      const newData: FullNodeData = {...nodeData, [newNode.id]: initState.data};
 
       setNodes(nodes => nodes.concat(newNode));
       setNodeValues(newValues);

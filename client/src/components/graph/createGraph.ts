@@ -4,13 +4,80 @@
 
 import {Edge, Node} from 'reactflow';
 import {
+  AttainmentNodeValues,
   AverageNodeSettings,
   CustomNodeTypes,
   FullNodeData,
   NodeSettings,
   NodeValues,
 } from '../../context/GraphProvider';
-import {getInitNodeValues} from './graphUtil';
+
+export const getInitNodeValues = (nodes: Node[], edges: Edge[]) => {
+  const nodeSources: {[key: string]: Edge[]} = {};
+  const nodeTargets: {[key: string]: Edge[]} = {};
+  for (const edge of edges) {
+    if (!(edge.target in nodeSources)) nodeSources[edge.target] = [];
+    if (!(edge.source in nodeTargets)) nodeTargets[edge.source] = [];
+    nodeSources[edge.target].push(edge);
+    nodeTargets[edge.source].push(edge);
+  }
+
+  const nodeValues: NodeValues = {};
+  for (const node of nodes) {
+    const nodeValueSources: {
+      [key: string]: {isConnected: boolean; value: number};
+    } = {};
+    const nodeTargetValues: {
+      [key: string]: number;
+    } = {};
+    if (node.id in nodeSources) {
+      for (const edge of nodeSources[node.id]) {
+        nodeValueSources[edge.targetHandle as string] = {
+          isConnected: true,
+          value: 0,
+        };
+      }
+    }
+    if (node.id in nodeTargets) {
+      for (const edge of nodeTargets[node.id])
+        nodeTargetValues[edge.sourceHandle as string] = 0;
+    }
+
+    const type = node.type as CustomNodeTypes;
+    switch (type) {
+      case 'attainment':
+        nodeValues[node.id] = {
+          type,
+          value: Math.floor(Math.random() * 10),
+        };
+        break;
+      case 'grade':
+      case 'stepper':
+      case 'minpoints':
+        nodeValues[node.id] = {type, source: 0, value: 0};
+        break;
+      case 'addition':
+      case 'average':
+      case 'max':
+        nodeValues[node.id] = {
+          type,
+          sources: nodeValueSources,
+          value: 0,
+        };
+        break;
+      case 'require':
+      case 'substitute':
+        nodeValues[node.id] = {
+          type,
+          sources: nodeValueSources,
+          values: nodeTargetValues,
+          courseFail: false,
+        };
+        break;
+    }
+  }
+  return nodeValues;
+};
 
 const createNode = (type: CustomNodeTypes, label: string): Node => ({
   id: label.toLowerCase().replaceAll(' ', '-'),
@@ -107,7 +174,7 @@ export const createSimpleGraph = (
     edges.push(createEdge('Addition', 'Stepper'));
   }
 
-  const nodeValues = getInitNodeValues(nodes, edges, 10);
+  const nodeValues = getInitNodeValues(nodes, edges);
   return {nodes, edges, nodeData: getNodeData(nodes, nodeSettings), nodeValues};
 };
 
@@ -204,7 +271,16 @@ export const createO1 = (): {
     );
   }
 
-  const nodeValues = getInitNodeValues(nodes, edges, 1500);
+  const nodeValues = getInitNodeValues(nodes, edges);
+  const RoundMaxPoints = [2205, 900, 725];
+  for (const node of nodes) {
+    if (node.type === 'attainment') {
+      const val = RoundMaxPoints.shift() as number;
+      (nodeValues[node.id] as AttainmentNodeValues).value = Math.floor(
+        Math.min(val, Math.random() * (val * 1.5))
+      );
+    }
+  }
   return {nodes, edges, nodeData: getNodeData(nodes, nodeSettings), nodeValues};
 };
 
@@ -311,6 +387,17 @@ export const createY1 = (): {
   edges.push(createEdge('Substitute bonus', 'Bonus require', 'exercise-0', 8));
   edges.push(createEdge('Bonus require', 'Sum bonus', 8, 8));
 
-  const nodeValues = getInitNodeValues(nodes, edges, 500);
+  const nodeValues = getInitNodeValues(nodes, edges);
+  const RoundMaxPoints = [
+    1017, 522, 590, 650, 720, 670, 714, 673, 700, 300, 300, 300, 300,
+  ];
+  for (const node of nodes) {
+    if (node.type === 'attainment') {
+      const val = RoundMaxPoints.shift() as number;
+      (nodeValues[node.id] as AttainmentNodeValues).value = Math.floor(
+        Math.min(val, Math.random() * (val * 1.3))
+      );
+    }
+  }
   return {nodes, edges, nodeData: getNodeData(nodes, nodeSettings), nodeValues};
 };
