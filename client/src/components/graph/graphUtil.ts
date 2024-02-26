@@ -224,7 +224,10 @@ export const findDisconnectedEdges = (
   const newNodeValues = {...oldNodeValues};
   for (const node of nodes) {
     const sourceNodeValue = newNodeValues[node.id];
-    if (sourceNodeValue.type === 'require') {
+    if (
+      sourceNodeValue.type === 'require' ||
+      sourceNodeValue.type === 'substitute'
+    ) {
       for (const value of Object.values(sourceNodeValue.sources)) {
         value.value = 0;
         value.isConnected = false;
@@ -236,7 +239,8 @@ export const findDisconnectedEdges = (
     if (!(node.id in nodeTargets)) continue;
     for (const edge of nodeTargets[node.id]) {
       const nodeValue = newNodeValues[edge.target];
-      if (nodeValue.type !== 'require') continue;
+      if (nodeValue.type !== 'require' && nodeValue.type !== 'substitute')
+        continue;
 
       nodeValue.sources[edge.targetHandle as string] = {
         value: 0,
@@ -249,7 +253,11 @@ export const findDisconnectedEdges = (
   for (const edge of edges) {
     const sourceNodeValues = newNodeValues[edge.source];
 
-    if (sourceNodeValues.type !== 'require') continue;
+    if (
+      sourceNodeValues.type !== 'require' &&
+      sourceNodeValues.type !== 'substitute'
+    )
+      continue;
 
     const sourceHandle = (edge.sourceHandle as string).replace('-source', '');
     if (

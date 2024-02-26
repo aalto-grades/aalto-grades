@@ -84,29 +84,28 @@ const SubstituteNode = ({id, type, isConnectable}: NodeProps) => {
     for (const [key, source] of Object.entries(nodeValue.sources)) {
       maxId = Math.max(maxId, parseInt(key.split('-').at(-1) as string));
       if (key.split('-').at(-2) === 'substitute') {
-        if (!newSubstituteHandles.includes(key)) {
+        if (source.isConnected && !newSubstituteHandles.includes(key)) {
           newSubstituteHandles.push(key);
           change = true;
-        }
-        if (!source.isConnected) {
+        } else if (!source.isConnected && newSubstituteHandles.includes(key)) {
           newSubstituteHandles = newSubstituteHandles.filter(
             handle => handle !== key
           );
           change = true;
         }
       } else {
-        exerciseIndex++;
-        if (!newExerciseHandles.includes(key)) {
+        if (source.isConnected) exerciseIndex++;
+        if (source.isConnected && !newExerciseHandles.includes(key)) {
           newExerciseHandles.push(key);
           if (exerciseIndex >= newLocalSettings.substituteValues.length)
             newLocalSettings.substituteValues.push('');
           change = true;
-        }
-        if (!source.isConnected) {
+        } else if (!source.isConnected && newExerciseHandles.includes(key)) {
           newExerciseHandles = newExerciseHandles.filter(
             handle => handle !== key
           );
-          newLocalSettings.substituteValues.splice(exerciseIndex, 1);
+          newLocalSettings.substituteValues.splice(exerciseIndex + 1, 1);
+          change = true;
         }
       }
     }

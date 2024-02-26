@@ -103,7 +103,7 @@ const Graph = (): JSX.Element => {
 
   const updateValues = useCallback(
     (newEdges: Edge[] | null = null) => {
-      console.log('Updating');
+      console.debug('Updating');
       const disconnectedEdges = findDisconnectedEdges(
         nodeValues,
         nodes,
@@ -199,7 +199,7 @@ const Graph = (): JSX.Element => {
       for (const node of nodes) typeMap[node.id] = node.type as CustomNodeTypes;
       if (
         (typeMap[connection.source as string] === 'minpoints' ||
-          typeMap[connection.target as string] === 'substitute') &&
+          typeMap[connection.source as string] === 'substitute') &&
         typeMap[connection.target as string] !== 'require' &&
         typeMap[connection.target as string] !== 'substitute'
       ) {
