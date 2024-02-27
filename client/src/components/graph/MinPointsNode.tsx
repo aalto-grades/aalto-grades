@@ -74,8 +74,8 @@ const MinPointsNode = ({id, type, isConnectable}: NodeProps) => {
         />
       </div>
       <p style={{margin: 0, display: 'inline'}}>
-        {nodeValue.value === 'reqfail'
-          ? 'reqfail'
+        {nodeValue.value === 'fail'
+          ? 'fail'
           : Math.round(nodeValue.value * 100) / 100}
       </p>
       <Handle

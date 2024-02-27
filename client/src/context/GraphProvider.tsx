@@ -43,11 +43,11 @@ export type MaxNodeValues = {
 export type MinPointsNodeValues = {
   type: 'minpoints';
   source: number;
-  value: number | 'reqfail';
+  value: number | 'fail';
 };
 export type RequireNodeValues = {
   type: 'require';
-  sources: {[key: string]: {isConnected: boolean; value: number | 'reqfail'}};
+  sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
   values: {[key: string]: number};
   courseFail: boolean;
 };
@@ -58,8 +58,8 @@ export type StepperNodeValues = {
 };
 export type SubstituteNodeValues = {
   type: 'substitute';
-  sources: {[key: string]: {isConnected: boolean; value: number | 'reqfail'}};
-  values: {[key: string]: number | 'reqfail'};
+  sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
+  values: {[key: string]: number | 'fail'};
 };
 
 export type NodeValue =

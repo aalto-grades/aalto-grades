@@ -47,7 +47,7 @@ import {
 } from './graph/graphUtil';
 import SubstituteNode from './graph/SubstituteNode';
 
-const nodeMap = {
+const nodeTypesMap = {
   addition: AdditionNode,
   attainment: AttanmentNode,
   average: AverageNode,
@@ -75,6 +75,9 @@ const Graph = (): JSX.Element => {
   const [oldNodeSettings, setOldNodeSettings] = useState<string>('{}');
   const [oldNodeValues, setOldNodeValues] = useState<string>('{}');
   const [oldEdges, setOldEdges] = useState<Edge[]>(edges);
+
+  const nodeMap: {[key: string]: Node} = {};
+  for (const node of nodes) nodeMap[node.id] = node;
 
   const setNodeTitle = (id: string, title: string) => {
     setNodeData(oldNodeData => ({
@@ -163,9 +166,7 @@ const Graph = (): JSX.Element => {
     nodeData: FullNodeData;
     nodeValues: NodeValues;
   }) => {
-    for (const node of nodes) {
-      onNodesChange([{id: node.id, type: 'remove'}]);
-    }
+    for (const node of nodes) onNodesChange([{id: node.id, type: 'remove'}]);
     setTimeout(() => {
       setNodes(initGraph.nodes);
       setInitEdges(initGraph.edges);
@@ -311,11 +312,20 @@ const Graph = (): JSX.Element => {
             <ReactFlow
               nodes={nodes}
               edges={edges}
-              onNodesChange={onNodesChange}
+              onNodesChange={changes =>
+                onNodesChange(
+                  changes.filter(
+                    change =>
+                      change.type !== 'remove' ||
+                      (nodeMap[change.id].type !== 'attainment' &&
+                        nodeMap[change.id].type !== 'grade')
+                  )
+                )
+              }
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
               isValidConnection={isValidConnection}
-              nodeTypes={nodeMap}
+              nodeTypes={nodeTypesMap}
               onInit={setReactFlowInstance}
               onDrop={onDrop}
               onDragOver={onDragOver}

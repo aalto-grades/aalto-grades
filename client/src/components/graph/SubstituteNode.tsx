@@ -266,11 +266,11 @@ const SubstituteNode = ({id, type, isConnectable}: NodeProps) => {
                 style={{
                   height: rowHeight,
                   backgroundColor:
-                    nodeValue.sources[key].value === 'reqfail' &&
-                    nodeValue.values[key] === 'reqfail'
+                    nodeValue.sources[key].value === 'fail' &&
+                    nodeValue.values[key] === 'fail'
                       ? '#f003'
-                      : nodeValue.sources[key].value === 'reqfail' &&
-                        nodeValue.values[key] !== 'reqfail'
+                      : nodeValue.sources[key].value === 'fail' &&
+                        nodeValue.values[key] !== 'fail'
                       ? '#0f03'
                       : '',
                 }}

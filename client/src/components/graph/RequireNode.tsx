@@ -107,7 +107,7 @@ const RequireNode = ({id, type, isConnectable}: NodeProps) => {
 
   const numFail = Object.values(nodeValue.sources).reduce(
     (sum, source) =>
-      source.isConnected && source.value === 'reqfail' ? sum + 1 : sum,
+      source.isConnected && source.value === 'fail' ? sum + 1 : sum,
     0
   );
 
@@ -172,12 +172,12 @@ const RequireNode = ({id, type, isConnectable}: NodeProps) => {
                 key={`tr-${key}`}
                 style={{
                   height: rowHeight,
-                  backgroundColor: source.value === 'reqfail' ? '#f003' : '',
+                  backgroundColor: source.value === 'fail' ? '#f003' : '',
                 }}
               >
                 <td>{source.value}</td>
                 <td>
-                  {numFail > settings.numFail || source.value === 'reqfail'
+                  {numFail > settings.numFail || source.value === 'fail'
                     ? 0
                     : source.value}
                 </td>

@@ -112,7 +112,7 @@ const setNodeValue = (
     }
     case 'minpoints': {
       const settings = nodeData[nodeId].settings as MinPointsNodeSettings;
-      if (nodeValue.source < settings.minPoints) nodeValue.value = 'reqfail';
+      if (nodeValue.source < settings.minPoints) nodeValue.value = 'fail';
       else nodeValue.value = nodeValue.source;
       break;
     }
@@ -121,9 +121,8 @@ const setNodeValue = (
       let numFail = 0;
       for (const [handleId, source] of Object.entries(nodeValue.sources)) {
         if (!source.isConnected) continue;
-        nodeValue.values[handleId] =
-          source.value === 'reqfail' ? 0 : source.value;
-        if (source.value === 'reqfail') numFail++;
+        nodeValue.values[handleId] = source.value === 'fail' ? 0 : source.value;
+        if (source.value === 'fail') numFail++;
       }
       nodeValue.courseFail = false;
       if (numFail > settings.numFail && settings.failSetting === 'coursefail') {
@@ -160,13 +159,13 @@ const setNodeValue = (
         if (
           key.split('-').at(-2) === 'substitute' &&
           source.isConnected &&
-          source.value !== 'reqfail'
+          source.value !== 'fail'
         )
           numSubstitutes += 1;
         else if (
           key.split('-').at(-2) === 'exercise' &&
           source.isConnected &&
-          source.value === 'reqfail'
+          source.value === 'fail'
         )
           numToSubstitute += 1;
       }
@@ -180,11 +179,11 @@ const setNodeValue = (
         if (key.split('-').at(-2) === 'substitute') {
           if (
             source.isConnected &&
-            source.value !== 'reqfail' &&
+            source.value !== 'fail' &&
             numToSubstitute > 0
           ) {
             numToSubstitute -= 1;
-            nodeValue.values[key] = 'reqfail';
+            nodeValue.values[key] = 'fail';
           } else if (source.isConnected) {
             nodeValue.values[key] = source.value;
           }
@@ -192,7 +191,7 @@ const setNodeValue = (
           exerciseIndex++;
           if (
             source.isConnected &&
-            source.value === 'reqfail' &&
+            source.value === 'fail' &&
             numSubstitutes > 0
           ) {
             numSubstitutes -= 1;
