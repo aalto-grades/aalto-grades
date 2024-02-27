@@ -33,6 +33,7 @@ import GradeCell from './GradeCell';
 import StudentGradesDialog from './StudentGradesDialog';
 import {useGetAttainments} from '../../hooks/useApi';
 import {Params, useParams} from 'react-router-dom';
+import {studentRow as StudentRow} from '@common/types';
 // This module is used to create meta data for colums cells
 declare module '@tanstack/table-core' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -41,17 +42,19 @@ declare module '@tanstack/table-core' {
   }
 }
 
-type StudentRow = {
-  attainmentId: number;
-  studentNumber: string;
-  credits: number;
-  grades: Array<GradeOption>;
-  flatAttainments: Array<AttainmentGradeData>;
-  subAttainments?: Array<AttainmentGradeData>;
-  // [attainmentId: string]: string | boolean | number;
-};
+// type StudentRow = {
+//   attainmentId: number;
+//   studentNumber: string;
+//   credits: number;
+//   grades: Array<GradeOption>;
+//   flatAttainments: Array<AttainmentGradeData>;
+//   subAttainments?: Array<AttainmentGradeData>;
+//   // [attainmentId: string]: string | boolean | number;
+// };
+
 type GroupedStudentRow = {
   grouping: string;
+  flatAttainments: Array<AttainmentGradeData>;
 } & StudentRow;
 
 type PropsType = {
@@ -501,11 +504,12 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
       <input
         type="text"
         value={
-          (table.getColumn('studentNumber')?.getFilterValue() ?? '') as string
+          (table.getColumn('user_studentNumber')?.getFilterValue() ??
+            '') as string
         }
-        onChange={e =>
-          table.getColumn('studentNumber')?.setFilterValue(e.target.value)
-        }
+        onChange={e => {
+          table.getColumn('user_studentNumber')?.setFilterValue(e.target.value);
+        }}
         placeholder={'Search...'}
         className="w-36 border shadow rounded"
       />

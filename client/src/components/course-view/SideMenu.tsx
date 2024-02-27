@@ -6,6 +6,8 @@ import {
   Button,
   Fade,
   CircularProgress,
+  ButtonBase,
+  Divider,
 } from '@mui/material';
 import React, {useState} from 'react';
 import AssessmentModelsPicker from './AssessmentModelsPicker';
@@ -29,48 +31,69 @@ const SideMenu: React.FC = () => {
     useState(false);
   return (
     <>
-      <Box>
-        {
-          /* a different attainment component will be created for students */
-          (auth?.role == SystemRole.Admin || isTeacherInCharge) && (
-            <div style={{flexGrow: 3}}>
-              <Button variant="outlined">Add Grades</Button>
-              <Typography
-                variant="h3"
-                align="left"
-                sx={{pt: 1.5, pb: 1}}
-                onClick={(): void => {
-                  navigate(`/${courseId}/course-results`);
-                }}
-              >
-                Grades
-              </Typography>
+      <Box
+        style={{
+          width: '200px',
+          minWidth: '200px',
+        }}
+      >
+        <Button variant="outlined">Upload Grades</Button>
+        <Divider sx={{my: 2}} />
+        <ButtonBase
+          sx={{
+            width: '100%',
+            padding: 1,
+            borderRadius: 100,
+            fontSize: '1rem',
+            textAlign: 'left',
+          }}
+          onClick={(): void => {
+            navigate(`/${courseId}/course-results`);
+          }}
+        >
+          Grades
+        </ButtonBase>
+        <ButtonBase
+          sx={{
+            width: '100%',
+            padding: 1,
+            borderRadius: 100,
+            fontSize: '1rem',
+          }}
+          onClick={(): void => {
+            // navigate(`/${courseId}/models`);
+          }}
+        >
+          Models
+        </ButtonBase>
+        <ButtonBase
+          sx={{
+            width: '100%',
+            padding: 1,
+            borderRadius: 100,
+            fontSize: '1rem',
+          }}
+          onClick={(): void => {
+            navigate(`/${courseId}/attainments`);
+          }}
+        >
+          Attainments
+        </ButtonBase>
 
-              <Typography variant="h3" align="left" sx={{pt: 1.5, pb: 1}}>
-                Assessment Model
-                {(auth?.role === SystemRole.Admin || isTeacherInCharge) && (
-                  <Tooltip title="New assessment model" placement="right">
-                    <Button
-                      onClick={(): void => setCreateAssessmentModelOpen(true)}
-                    >
-                      New
-                    </Button>
-                  </Tooltip>
-                )}
-              </Typography>
-              <Typography
-                variant="h3"
-                align="left"
-                sx={{pt: 1.5, pb: 1}}
-                onClick={(): void => {
-                  navigate(`/${courseId}/attainments`);
-                }}
-              >
-                Attainments
-              </Typography>
-              <div style={{display: 'flex', gap: 0}}>
-                <div style={{display: 'flex', flexDirection: 'column', gap: 0}}>
-                  {/* <AssessmentModelsPicker
+        {/* <Typography variant="h3" align="left" sx={{pt: 1.5, pb: 1}}>
+          Assessment Model
+          {(auth?.role === SystemRole.Admin || isTeacherInCharge) && (
+            <Tooltip title="New assessment model" placement="right">
+              <Button onClick={(): void => setCreateAssessmentModelOpen(true)}>
+                New
+              </Button>
+            </Tooltip>
+          )}
+        </Typography> */}
+
+        <div style={{display: 'flex', gap: 0}}>
+          <div style={{display: 'flex', flexDirection: 'column', gap: 0}}>
+            {/* <AssessmentModelsPicker
                     course={course.data}
                     assessmentModels={assessmentModels.data}
                     currentAssessmentModelId={currentAssessmentModel?.id}
@@ -79,15 +102,15 @@ const SideMenu: React.FC = () => {
                       setCreateAssessmentModelOpen(true)
                     }
                   /> */}
-                  <div style={{marginRight: '20px', maxWidth: '300px'}}>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 0,
-                      }}
-                    >
-                      {/* <CourseDetails
+            <div style={{marginRight: '20px', maxWidth: '300px'}}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 0,
+                }}
+              >
+                {/* <CourseDetails
                         course={course.data}
                         assessmentModels={assessmentModels.data}
                         currentAssessmentModelId={currentAssessmentModel?.id}
@@ -96,14 +119,11 @@ const SideMenu: React.FC = () => {
                           setCreateAssessmentModelOpen(true)
                         }
                       /> */}
-                      {/* <InstancesWidget /> */}
-                    </Box>
-                  </div>
-                </div>
-              </div>
+                {/* <InstancesWidget /> */}
+              </Box>
             </div>
-          )
-        }
+          </div>
+        </div>
       </Box>
       <CreateAssessmentModelDialog
         open={createAssessmentModelOpen}

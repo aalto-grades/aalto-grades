@@ -97,44 +97,46 @@ export default function CourseView(): JSX.Element {
   }
 
   return (
-    <Box sx={{mx: -2.5}}>
-      {course.data && (
-        <>
-          <Typography variant="h1" align="left">
-            {course.data.courseCode}
-          </Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              justifyContent: 'space-between',
-              mb: 4,
-              columnGap: 6,
-            }}
-          >
-            <Typography variant="h2" align="left">
-              {course.data.name.en}
+    <>
+      <Box sx={{mx: -2.5}}>
+        {course.data && (
+          <>
+            <Typography variant="h1" align="left">
+              {course.data.courseCode}
             </Typography>
-            {auth?.role == SystemRole.Admin && (
-              <Button
-                size="large"
-                variant="contained"
-                onClick={(): void => navigate(`/course/edit/${courseId}`)}
-              >
-                Edit Course
-              </Button>
-            )}
-          </Box>
-          <div
-            style={{
-              display: 'flex',
-            }}
-          >
-            <SideMenu />
-            <Outlet />
-          </div>
-        </>
-      )}
-    </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between',
+                mb: 4,
+                columnGap: 6,
+              }}
+            >
+              <Typography variant="h2" align="left">
+                {course.data.name.en}
+              </Typography>
+              {auth?.role == SystemRole.Admin && (
+                <Button
+                  size="large"
+                  variant="contained"
+                  onClick={(): void => navigate(`/course/edit/${courseId}`)}
+                >
+                  Edit Course
+                </Button>
+              )}
+            </Box>
+          </>
+        )}
+      </Box>
+      <Box
+        style={{
+          display: 'flex',
+        }}
+      >
+        <SideMenu />
+        <Outlet />
+      </Box>
+    </>
   );
 }

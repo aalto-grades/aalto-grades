@@ -166,13 +166,13 @@ export async function getGrades(req: Request, res: Response): Promise<void> {
 
   // Get dict of unique Users from the grades with key as userId from grades
   const users = grades.reduce<{[key: string]: User}>((acc, grade) => {
-    if (!acc[grade.userId]) {
-      acc[grade.userId] = grade.User;
+    if (grade.User && !acc[grade.User.id]) {
+      acc[grade.User.id] = grade.User;
     }
     return acc;
   }, {});
 
-  // Create a dict Group by user id and internally grouped by attainment id
+  //  a dict grouped by user id and internally grouped by attainment id
   const userGrades = grades.reduce<{
     [key: string]: {[key: string]: AttainmentGrade[]};
   }>((acc, grade) => {
@@ -201,8 +201,8 @@ export async function getGrades(req: Request, res: Response): Promise<void> {
             return {
               gradeId: grade.id,
               grader: {
-                id: grade.grader.id,
-                name: grade.grader.name,
+                id: grade?.grader?.id,
+                name: grade?.grader?.name,
               },
               grade: grade.grade,
               exportedToSisu: grade.sisuExportDate,

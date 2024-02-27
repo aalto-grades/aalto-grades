@@ -35,6 +35,8 @@ export default class AttainmentGrade extends Model<
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   grader?: User;
+  User?: User;
+  Attainment?: Attainment;
 }
 
 AttainmentGrade.init(

@@ -96,6 +96,7 @@ export async function addAssessmentModel(
   const name: string = (
     await requestSchema.validate(req.body, {abortEarly: false})
   ).name;
+  const graphStructure = req.body.graphStructure as string;
 
   // Confirm that course exists.
   const course: Course = await findCourseById(courseId, HttpCode.NotFound);
@@ -113,6 +114,7 @@ export async function addAssessmentModel(
       where: {
         name: name,
         courseId: course.id,
+        graphStructure: JSON.parse(graphStructure),
       },
       defaults: {
         name: name,
@@ -147,6 +149,7 @@ export async function updateAssessmentModel(
   const name: string = (
     await requestSchema.validate(req.body, {abortEarly: false})
   ).name;
+  const graphStructure = req.body.graphStructure as string;
 
   // Confirm that course exists.
   const course: Course = await findCourseById(courseId, HttpCode.NotFound);
@@ -174,6 +177,7 @@ export async function updateAssessmentModel(
   // Update assessment model name.
   await assessmentModel.update({
     name: name,
+    graphStructure: JSON.parse(graphStructure),
   });
 
   res.status(HttpCode.Ok).json({
