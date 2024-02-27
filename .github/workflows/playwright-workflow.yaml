@@ -7,10 +7,10 @@ name: End-to-end tests
 on:
   push:
     branches: 
-      - test-runners
+      - playwright
   pull_request:
     branches:
-      - test-runners
+      - playwright
 jobs:
   test-e2e:
     name: e2e test
