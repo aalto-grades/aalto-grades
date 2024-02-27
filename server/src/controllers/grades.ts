@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 import {
   AttainmentGradeData,
+  AttainmentGradesData,
   EditGrade,
   FinalGrade,
   Formula,
@@ -214,7 +215,7 @@ export async function getGrades(req: Request, res: Response): Promise<void> {
             };
           }),
         };
-      }),
+      }) as Array<AttainmentGradesData>,
     };
   });
 
@@ -227,17 +228,6 @@ export async function getGrades(req: Request, res: Response): Promise<void> {
  * The final grade for a student in a form returned by a database query.
  */
 interface FinalGradeRaw extends AttainmentGrade {
-  Attainment: {
-    AssessmentModel: {
-      Course: {
-        maxCredits: number;
-      };
-    };
-  };
-  User: {
-    id: number;
-    studentNumber: string;
-  };
   grader: User;
 }
 
@@ -450,7 +440,7 @@ export async function getSisuFormattedGradingCSV(
   for (const finalGrade of finalGrades) {
     const existingResult: SisuCsvFormat | undefined = courseResults.find(
       (value: SisuCsvFormat) =>
-        value.studentNumber === finalGrade.User.studentNumber
+        value.studentNumber === finalGrade.User?.studentNumber
     );
 
     if (existingResult) {
@@ -459,7 +449,7 @@ export async function getSisuFormattedGradingCSV(
 
         // There can be multiple grades, make sure only the exported grade is marked with timestamp.
         const userData: MarkSisuExport | undefined = exportedToSisu.find(
-          (value: MarkSisuExport) => value.userId === finalGrade.User.id
+          (value: MarkSisuExport) => value.userId === finalGrade.User?.id
         );
 
         if (userData) {
@@ -473,10 +463,10 @@ export async function getSisuFormattedGradingCSV(
       });
 
       courseResults.push({
-        studentNumber: finalGrade.User.studentNumber,
+        studentNumber: finalGrade.User?.studentNumber ?? 'Error',
         // Round to get final grades as an integer.
         grade: String(Math.round(finalGrade.grade)),
-        credits: finalGrade.Attainment.AssessmentModel.Course.maxCredits,
+        credits: course.maxCredits,
         // Assesment date must be in form dd.mm.yyyy.
         // HERE we want to find the latest completed attainment grade for student
         assessmentDate: (assessmentDate
@@ -616,7 +606,7 @@ export async function getFinalGrades(
       studentNumber: student.studentNumber,
       credits: course.maxCredits,
       grades: rawFinalGrades
-        .filter((grade: FinalGradeRaw) => grade.User.id === student.userId)
+        .filter((grade: FinalGradeRaw) => grade.User?.id === student.userId)
         .map((grade: FinalGradeRaw): GradeOption => {
           return {
             gradeId: grade.id,
