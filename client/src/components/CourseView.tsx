@@ -73,10 +73,11 @@ export default function CourseView(): JSX.Element {
   );
 
   useEffect(() => {
+    if (currentAssessmentModel) return;
     if (assessmentModels.data && assessmentModels.data.length > 0)
       setCurrentAssessmentModel(assessmentModels.data[0]);
     else setCurrentAssessmentModel(null);
-  }, [assessmentModels.data]);
+  }, [assessmentModels.data, currentAssessmentModel]);
 
   const attainmentTree: UseQueryResult<AttainmentData> = useGetRootAttainment(
     courseId,
@@ -166,7 +167,7 @@ export default function CourseView(): JSX.Element {
                           sx={{
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: 3,
+                            gap: 0,
                           }}
                         >
                           <CourseDetails

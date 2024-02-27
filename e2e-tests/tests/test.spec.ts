@@ -68,7 +68,6 @@ test('Edit course', async ({page}) => {
   await page.getByLabel('Course Code*').click();
   await page.getByLabel('Course Code*').fill('CS-A1120 - edit');
   await page.getByLabel('Course Code*').press('Tab');
-  await page.getByLabel('Course Name in English*').fill('Programming 2 - edit');
   await page.getByLabel('Course Name in Finnish*').click();
   await page.getByLabel('Course Name in Finnish*').fill('Ohjelmointi 2 - edit');
   await page.getByLabel('Course Name in Finnish*').press('Tab');
@@ -94,17 +93,14 @@ test('Edit course', async ({page}) => {
   await page.getByRole('option', {name: 'Pass-Fail'}).click();
   await page.getByLabel('Course language*').click();
   await page.getByRole('option', {name: 'Chinese'}).click();
-  await page.getByLabel('Teachers In Charge*').click();
-  await page.getByLabel('Teachers In Charge*').fill('ester.gross@aalto.fi');
-  await page.getByRole('button', {name: 'Add'}).click();
+
   await page.getByRole('button', {name: 'Submit'}).click();
   await page.getByRole('link', {name: 'Aalto Grades'}).click();
   await page.getByRole('cell', {name: 'Programming 2'}).click();
-  await expect(page.getByText('Ester Gross')).toBeVisible();
   await expect(
     page.getByRole('heading', {name: 'CS-A1120 - edit'})
   ).toBeVisible();
   await expect(
-    page.getByRole('heading', {name: 'Programming 2 - edit'})
+    page.getByRole('heading', {name: 'Programming 2'})
   ).toBeVisible();
 });

@@ -15,8 +15,15 @@ import {
   samlMetadata,
 } from '../controllers/auth';
 import {controllerDispatcher} from '../middleware/errorHandler';
+import {requestSyslogger} from '../middleware/requestLogger';
+import {NODE_ENV} from '../configs/environment';
 
 export const router: Router = Router();
+
+if (NODE_ENV !== 'test') {
+  // tests timeout for some reason if used
+  router.use(requestSyslogger);
+}
 
 router.get(
   '/v1/auth/self-info',

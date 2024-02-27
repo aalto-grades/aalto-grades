@@ -5,7 +5,7 @@
 import {RequestHandler} from 'express';
 import morgan from 'morgan';
 
-import logger from '../configs/winston';
+import logger, {syslogger} from '../configs/winston';
 
 /**
  * Log messages for incoming HTTP requests to the Express server. Morgan formats
@@ -26,6 +26,16 @@ export const requestLogger: RequestHandler = morgan(
   {
     stream: {
       write: (message: string) => logger.http(message.trim()),
+    },
+  }
+);
+
+export const requestSyslogger: RequestHandler = morgan(
+  ':remote-addr :remote-user ":method :url HTTP/:http-version"' +
+    ' :status :res[content-length] ":referrer" ":user-agent"',
+  {
+    stream: {
+      write: (message: string) => syslogger.info(message.trim()),
     },
   }
 );

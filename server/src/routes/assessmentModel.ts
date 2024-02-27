@@ -9,6 +9,7 @@ import {
   addAssessmentModel,
   getAllAssessmentModels,
   getAssessmentModel,
+  updateAssessmentModel,
 } from '../controllers/assessmentModel';
 import {handleInvalidRequestJson} from '../middleware';
 import {controllerDispatcher} from '../middleware/errorHandler';
@@ -33,4 +34,12 @@ router.post(
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(addAssessmentModel)
+);
+
+router.put(
+  '/v1/courses/:courseId/assessment-models/:assessmentModelId',
+  passport.authenticate('jwt', {session: false}),
+  express.json(),
+  handleInvalidRequestJson,
+  controllerDispatcher(updateAssessmentModel)
 );

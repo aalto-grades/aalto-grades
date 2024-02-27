@@ -38,5 +38,10 @@ registerFormula(
   params,
   childParams,
   {},
-  yup.object().noUnknown().strict()
+  yup
+    .object({
+      minRequiredGrade: yup.number().min(0).notRequired(),
+    })
+    .noUnknown()
+    .strict()
 );
