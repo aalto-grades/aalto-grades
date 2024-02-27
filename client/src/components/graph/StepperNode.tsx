@@ -6,12 +6,13 @@ import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
-  NodeHeightsContext,
-  NodeSettingsContext,
+  CustomNodeTypes,
+  NodeDataContext,
   NodeValuesContext,
-  StepperNodeValues,
   StepperNodeSettings,
+  StepperNodeValues,
 } from '../../context/GraphProvider';
+import BaseNode from './BaseNode';
 
 type LocalSettings = {
   numSteps: number;
@@ -23,11 +24,6 @@ const initialSettings = {
   middlePoints: [],
   outputValues: ['0'],
 };
-
-const nodeMinHeight = 78.683 + 4;
-const rowHeight = 33.9;
-const calculateHeight = (localSettings: LocalSettings | StepperNodeSettings) =>
-  nodeMinHeight + (localSettings.numSteps + 2) * rowHeight;
 
 const checkError = (settings: LocalSettings): boolean => {
   for (const middleValue of settings.middlePoints) {
@@ -56,10 +52,9 @@ const checkError = (settings: LocalSettings): boolean => {
   return false;
 };
 
-const StepperNode = ({id, data, isConnectable}: NodeProps) => {
+const StepperNode = ({id, type, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
-  const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
-  const {setNodeHeight: setNodeHeights} = useContext(NodeHeightsContext);
+  const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
     JSON.parse(JSON.stringify(initialSettings))
   );
@@ -67,19 +62,18 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
   const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as StepperNodeValues;
+  const settings = nodeData[id].settings as StepperNodeSettings;
 
   useEffect(() => {
     if (init) return;
-    const initSettings = nodeSettings[id] as StepperNodeSettings;
     setLocalSettings({
-      numSteps: initSettings.numSteps,
-      middlePoints: initSettings.middlePoints.map(val => val.toString()),
-      outputValues: initSettings.outputValues.map(val => val.toString()),
+      numSteps: settings.numSteps,
+      middlePoints: settings.middlePoints.map(val => val.toString()),
+      outputValues: settings.outputValues.map(val => val.toString()),
     });
-    setNodeHeights(id, calculateHeight(initSettings));
     setInit(true);
     setError(false);
-  }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [nodeData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (
     type: 'middlepoint' | 'outputvalue',
@@ -117,7 +111,6 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
       outputValues: localSettings.outputValues.concat(''),
     };
     setLocalSettings(newLocalSettings);
-    setNodeHeights(id, calculateHeight(newLocalSettings));
     setError(true);
   };
 
@@ -127,7 +120,6 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
     newLocalSettings.middlePoints.pop();
     newLocalSettings.outputValues.pop();
     setLocalSettings(newLocalSettings);
-    setNodeHeights(id, calculateHeight(newLocalSettings));
 
     if (checkError(newLocalSettings)) {
       setError(true);
@@ -159,111 +151,76 @@ const StepperNode = ({id, data, isConnectable}: NodeProps) => {
   };
 
   return (
-    <div
-      style={{
-        height: `${nodeMinHeight + rowHeight * localSettings.numSteps}px`,
-        width: '270px',
-        border: error ? '1px dashed #e00' : '1px solid #eee',
-        padding: '10px',
-        borderRadius: '5px',
-        background: error ? '#fffafa' : 'white',
-      }}
-    >
+    <BaseNode id={id} type={type as CustomNodeTypes} error={error}>
       <Handle
         type="target"
+        id={id}
         style={{height: '12px', width: '12px'}}
         position={Position.Left}
         isConnectable={isConnectable}
       />
-      <div>
-        <h4 style={{margin: 0}}>{data.label}</h4>
-        <table style={{width: '100%', margin: '5px 0px'}}>
-          <tbody>
-            <tr>
-              <th>Range</th>
-              <th>Output</th>
-            </tr>
-            {new Array(localSettings.numSteps).fill(0).map((_, index) => (
-              <tr
-                key={`${id}-${index}`}
-                style={{
-                  background: !error && isCurrentSlot(index) ? '#00f6' : '',
-                }}
-              >
-                <td>
-                  {index === 0 ? (
-                    <input
-                      style={{width: '40px'}}
-                      type="text"
-                      value="-∞"
-                      disabled
-                    />
-                  ) : (
-                    <input
-                      style={{width: '40px'}}
-                      type="number"
-                      value={localSettings.middlePoints[index - 1]}
-                      onChange={event =>
-                        handleChange('middlepoint', index - 1, event)
-                      }
-                    />
-                  )}
-                  <p style={{display: 'inline'}}> {'< ... ≤'} </p>
-                  {index + 1 === localSettings.numSteps ? (
-                    <input
-                      style={{width: '40px'}}
-                      type="text"
-                      value="∞"
-                      disabled
-                    />
-                  ) : (
-                    <input
-                      style={{width: '40px'}}
-                      type="number"
-                      value={localSettings.middlePoints[index]}
-                      onChange={event =>
-                        handleChange('middlepoint', index, event)
-                      }
-                    />
-                  )}
-                </td>
-                <td>
+      <table style={{width: '100%', margin: '5px 0px'}}>
+        <tbody>
+          <tr>
+            <th>Range</th>
+            <th>Output</th>
+          </tr>
+          {new Array(localSettings.numSteps).fill(0).map((_, index) => (
+            <tr
+              key={`${id}-${index}`}
+              style={{
+                background: !error && isCurrentSlot(index) ? '#00f6' : '',
+              }}
+            >
+              <td>
+                <p style={{display: 'inline'}}>≤ </p>
+                {index + 1 === localSettings.numSteps ? (
                   <input
                     style={{width: '40px'}}
-                    value={localSettings.outputValues[index]}
+                    type="text"
+                    value="∞"
+                    disabled
+                  />
+                ) : (
+                  <input
+                    style={{width: '40px'}}
+                    type="number"
+                    value={localSettings.middlePoints[index]}
                     onChange={event =>
-                      handleChange('outputvalue', index, event)
+                      handleChange('middlepoint', index, event)
                     }
                   />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <button
-          style={{display: 'inline', marginRight: '30px'}}
-          onClick={handleAdd}
-        >
-          New row
-        </button>
-        <p style={{margin: 0, display: 'inline'}}>
-          {Math.round(nodeValue.value * 100) / 100}
-        </p>
-        <button
-          style={{display: 'inline', marginLeft: '30px'}}
-          disabled={localSettings.numSteps === 1}
-          onClick={handleRemove}
-        >
-          Remove row
-        </button>
-      </div>
+                )}
+              </td>
+              <td>
+                <input
+                  style={{width: '40px'}}
+                  value={localSettings.outputValues[index]}
+                  onChange={event => handleChange('outputvalue', index, event)}
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <button style={{float: 'left', marginRight: '5px'}} onClick={handleAdd}>
+        New row
+      </button>
+      <button
+        style={{float: 'right'}}
+        disabled={localSettings.numSteps === 1}
+        onClick={handleRemove}
+      >
+        Remove row
+      </button>
       <Handle
         type="source"
+        id={`${id}-source`}
         style={{height: '12px', width: '12px'}}
         position={Position.Right}
         isConnectable={isConnectable}
       />
-    </div>
+    </BaseNode>
   );
 };
 

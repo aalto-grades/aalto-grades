@@ -11,7 +11,8 @@ export type DropInNodes =
   | 'max'
   | 'minpoints'
   | 'require'
-  | 'stepper';
+  | 'stepper'
+  | 'substitute';
 
 export type CustomNodeTypes = DropInNodes | 'attainment' | 'grade';
 
@@ -42,11 +43,11 @@ export type MaxNodeValues = {
 export type MinPointsNodeValues = {
   type: 'minpoints';
   source: number;
-  value: number | 'reqfail';
+  value: number | 'fail';
 };
 export type RequireNodeValues = {
   type: 'require';
-  sources: {[key: string]: {isConnected: boolean; value: number | 'reqfail'}};
+  sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
   values: {[key: string]: number};
   courseFail: boolean;
 };
@@ -54,6 +55,11 @@ export type StepperNodeValues = {
   type: 'stepper';
   source: number;
   value: number;
+};
+export type SubstituteNodeValues = {
+  type: 'substitute';
+  sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
+  values: {[key: string]: number | 'fail'};
 };
 
 export type NodeValue =
@@ -64,7 +70,8 @@ export type NodeValue =
   | MaxNodeValues
   | MinPointsNodeValues
   | RequireNodeValues
-  | StepperNodeValues;
+  | StepperNodeValues
+  | SubstituteNodeValues;
 
 export type NodeValues = {
   [key: string]: NodeValue;
@@ -77,7 +84,7 @@ export const NodeValuesContext = createContext<NodeValuesContext>(
   {} as NodeValuesContext
 );
 
-// Node settings
+// Node data
 export type AverageNodeSettings = {
   weights: {[key: string]: number};
 };
@@ -96,30 +103,37 @@ export type StepperNodeSettings = {
   outputValues: (number | 'same')[];
   middlePoints: number[];
 };
+export type SubstituteNodeSettings = {
+  maxSubstitutions: number;
+  substituteValues: number[];
+};
 
 export type NodeSettings =
   | AverageNodeSettings
   | MaxNodeSettings
   | MinPointsNodeSettings
   | RequireNodeSettings
-  | StepperNodeSettings;
-export type AllNodeSettings = {[key: string]: NodeSettings};
-type NodeSettingsContext = {
-  nodeSettings: AllNodeSettings;
-  setNodeSettings: (id: string, newSettings: NodeSettings) => void;
+  | StepperNodeSettings
+  | SubstituteNodeSettings;
+
+export type NodeData = {title: string; settings?: NodeSettings};
+
+export type FullNodeData = {[key: string]: NodeData};
+type NodeDataContext = {
+  nodeData: {[key: string]: NodeData};
+  setNodeTitle: (id: string, title: string) => void;
+  setNodeSettings: (id: string, settings: NodeSettings) => void;
 };
-export const NodeSettingsContext = createContext<NodeSettingsContext>(
-  {} as NodeSettingsContext
+export const NodeDataContext = createContext<NodeDataContext>(
+  {} as NodeDataContext
 );
 
-// Node heights
-export type NodeHeights = {
-  [key: string]: number;
+// Node dimensions
+export type NodeDimensions = {[key: string]: {width: number; height: number}};
+type NodeDimensionsContext = {
+  nodeDimensions: NodeDimensions;
+  setNodeDimensions: (id: string, width: number, height: number) => void;
 };
-type NodeHeightsContext = {
-  nodeHeights: NodeHeights;
-  setNodeHeight: (id: string, newHeight: number) => void;
-};
-export const NodeHeightsContext = createContext<NodeHeightsContext>(
-  {} as NodeHeightsContext
+export const NodeDimensionsContext = createContext<NodeDimensionsContext>(
+  {} as NodeDimensionsContext
 );

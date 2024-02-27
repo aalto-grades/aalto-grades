@@ -3,29 +3,27 @@
 // SPDX-License-Identifier: MIT
 
 import {useContext, useEffect, useState} from 'react';
-import {Handle, NodeProps, Position} from 'reactflow';
+import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
-  NodeHeightsContext,
-  NodeSettingsContext,
+  CustomNodeTypes,
+  NodeDataContext,
   NodeValuesContext,
   RequireNodeSettings,
   RequireNodeValues,
 } from '../../context/GraphProvider';
+import BaseNode from './BaseNode';
 
 type LocalSettings = {numFail: string; failSetting: 'ignore' | 'coursefail'};
 const initialSettings = {numFail: 0, failSetting: 'courseFail'};
 
-const nodeMinHeight = 180.93 - 33.9;
-const handleStartHeight = nodeMinHeight - 10 + 33.9;
+const handleStartHeight = 128.5;
 const rowHeight = 33.9;
-const calculateHeight = (handles: string[]) =>
-  nodeMinHeight + (handles.length + 1) * rowHeight;
 
-const RequireNode = ({id, data, isConnectable}: NodeProps) => {
+const RequireNode = ({id, type, isConnectable}: NodeProps) => {
+  const updateNodeInternals = useUpdateNodeInternals();
   const {nodeValues} = useContext(NodeValuesContext);
-  const {setNodeHeight: setNodeHeights} = useContext(NodeHeightsContext);
-  const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
+  const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
     JSON.parse(JSON.stringify(initialSettings))
@@ -36,22 +34,21 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
   const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as RequireNodeValues;
-  const settings = nodeSettings[id] as RequireNodeSettings;
+  const settings = nodeData[id].settings as RequireNodeSettings;
 
   useEffect(() => {
     if (init) return;
     setLocalSettings({...settings, numFail: settings.numFail.toString()});
-    setNodeHeights(id, calculateHeight(handles));
     setError(false);
     setInit(true);
-  }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [nodeData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     let change = false;
     let maxId = 0;
     let newHandles = [...handles];
     for (const [key, source] of Object.entries(nodeValue.sources)) {
-      maxId = Math.max(maxId, parseInt(key));
+      maxId = Math.max(maxId, parseInt(key.split('-').at(-1) as string));
       if (!newHandles.includes(key)) {
         newHandles.push(key);
         change = true;
@@ -62,9 +59,9 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
       }
     }
     if (change) {
+      setTimeout(() => updateNodeInternals(id), 0);
       setHandles(newHandles);
       setNextFree(maxId + 1);
-      setNodeHeights(id, calculateHeight(newHandles));
     }
   }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -110,82 +107,77 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
 
   const numFail = Object.values(nodeValue.sources).reduce(
     (sum, source) =>
-      source.isConnected && source.value === 'reqfail' ? sum + 1 : sum,
+      source.isConnected && source.value === 'fail' ? sum + 1 : sum,
     0
   );
 
   return (
-    <div
-      style={{
-        height: `${calculateHeight(handles)}px`,
-        width: '130px',
-        border: nodeValue.courseFail
-          ? '2px solid #e00'
-          : error
-          ? '1px dashed #e00'
-          : '1px solid #eee',
-        padding: '10px',
-        borderRadius: '5px',
-        background: nodeValue.courseFail || error ? '#fffafa' : 'white',
-      }}
+    <BaseNode
+      id={id}
+      type={type as CustomNodeTypes}
+      error={error}
+      courseFail={nodeValue.courseFail}
     >
-      <h4 style={{margin: 0}}>{data.label}</h4>
       {handles.map((key, index) => (
         <Handle
-          key={`handle-${id}-${key}`}
+          key={`handle-${key}`}
           type="target"
+          id={key}
           style={{
             height: '12px',
             width: '12px',
             top: `${handleStartHeight + index * rowHeight}px`,
           }}
           position={Position.Left}
-          id={key}
           isConnectable={isConnectable}
         />
       ))}
       <Handle
         type="target"
+        id={`${id}-${nextFree}`}
         style={{
           height: '12px',
           width: '12px',
           top: `${handleStartHeight + handles.length * rowHeight}px`,
         }}
         position={Position.Left}
-        id={nextFree.toString()}
         isConnectable={isConnectable}
       />
-      <label>On fail</label>
-      <select onChange={handleSelectChange} value={localSettings.failSetting}>
-        <option value="zeroes">Output zeroes</option>
-        <option value="coursefail">Fail course</option>
-      </select>
-      <label>Allowed Fails</label>
-      <input
-        style={{width: 'calc(100% - 20px)'}}
-        type="number"
-        onChange={handleChange}
-        value={localSettings.numFail}
-      />
-      <table style={{width: '100%', margin: '5px 0px'}}>
+      <div>
+        <label>On fail </label>
+        <select onChange={handleSelectChange} value={localSettings.failSetting}>
+          <option value="zeroes">Output zeroes</option>
+          <option value="coursefail">Fail course</option>
+        </select>
+      </div>
+      <div>
+        <label>Allowed Fails </label>
+        <input
+          style={{width: '90px'}}
+          type="number"
+          onChange={handleChange}
+          value={localSettings.numFail}
+        />
+      </div>
+      <table style={{width: '200px', margin: '5px 0px'}}>
         <tbody>
           <tr>
-            <th>in</th>
+            <th style={{width: '50%'}}>in</th>
             <th>out</th>
           </tr>
           {Object.entries(nodeValue.sources)
             .filter(([_, source]) => source.isConnected)
             .map(([key, source]) => (
               <tr
-                key={`tr-${id}-${key}`}
+                key={`tr-${key}`}
                 style={{
                   height: rowHeight,
-                  backgroundColor: source.value === 'reqfail' ? '#f003' : '',
+                  backgroundColor: source.value === 'fail' ? '#f003' : '',
                 }}
               >
                 <td>{source.value}</td>
                 <td>
-                  {numFail > settings.numFail || source.value === 'reqfail'
+                  {numFail > settings.numFail || source.value === 'fail'
                     ? 0
                     : source.value}
                 </td>
@@ -199,19 +191,19 @@ const RequireNode = ({id, data, isConnectable}: NodeProps) => {
       </table>
       {handles.map((key, index) => (
         <Handle
-          key={`handle-${id}-${key}-source`}
+          key={`handle-${key}-source`}
           type="source"
+          id={`${key}-source`}
           style={{
             height: '12px',
             width: '12px',
             top: `${handleStartHeight + index * rowHeight}px`,
           }}
           position={Position.Right}
-          id={key}
           isConnectable={isConnectable}
         />
       ))}
-    </div>
+    </BaseNode>
   );
 };
 

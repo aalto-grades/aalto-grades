@@ -27,15 +27,15 @@ import MinPointsNode from '../components/graph/MinPointsNode';
 import RequireNode from '../components/graph/RequireNode';
 import StepperNode from '../components/graph/StepperNode';
 import {
-  AllNodeSettings,
   DropInNodes,
-  NodeHeights,
-  NodeHeightsContext,
   NodeSettings,
-  NodeSettingsContext,
   CustomNodeTypes,
   NodeValues,
   NodeValuesContext,
+  FullNodeData,
+  NodeDataContext,
+  NodeDimensions,
+  NodeDimensionsContext,
 } from '../context/GraphProvider';
 import {createO1, createSimpleGraph, createY1} from './graph/createGraph';
 import './graph/flow.css';
@@ -45,8 +45,9 @@ import {
   findDisconnectedEdges,
   initNode,
 } from './graph/graphUtil';
+import SubstituteNode from './graph/SubstituteNode';
 
-const nodeMap = {
+const nodeTypesMap = {
   addition: AdditionNode,
   attainment: AttanmentNode,
   average: AverageNode,
@@ -55,51 +56,57 @@ const nodeMap = {
   minpoints: MinPointsNode,
   require: RequireNode,
   stepper: StepperNode,
+  substitute: SubstituteNode,
 };
 
 const Graph = (): JSX.Element => {
-  const initValues = createSimpleGraph();
-
-  const [nodes, setNodes, onNodesChange] = useNodesState(initValues.nodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initValues.edges);
-  const [nodeSettings, setNodeSettings] = useState<AllNodeSettings>(
-    initValues.nodeSettings
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [initEdges, setInitEdges] = useState<Edge[]>([]);
+  const [nodeData, setNodeData] = useState<FullNodeData>({});
+  const [nodeDimensions, setNodeContextDimensions] = useState<NodeDimensions>(
+    {}
   );
-  const [nodeValues, setNodeValues] = useState<NodeValues>(
-    initValues.nodeValues
-  );
-  const [nodeHeights, setNodeHeights] = useState<NodeHeights>({});
+  const [nodeValues, setNodeValues] = useState<NodeValues>({});
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance | null>(null);
 
   // Old values are strings to avoid problematic references
-  const [oldNodeSettings, setOldNodeSettings] = useState<string>(
-    JSON.stringify(initValues.nodeSettings)
-  );
-  const [oldNodeValues, setOldNodeValues] = useState<string>(
-    JSON.stringify(initValues.nodeValues)
-  );
+  const [oldNodeSettings, setOldNodeSettings] = useState<string>('{}');
+  const [oldNodeValues, setOldNodeValues] = useState<string>('{}');
   const [oldEdges, setOldEdges] = useState<Edge[]>(edges);
 
-  const setContextNodeSettings = (id: string, newSettings: NodeSettings) => {
-    setNodeSettings(
-      oldNodeSettings =>
-        ({
-          ...oldNodeSettings,
-          [id]: newSettings,
-        }) as AllNodeSettings
-    );
+  const nodeMap: {[key: string]: Node} = {};
+  for (const node of nodes) nodeMap[node.id] = node;
+
+  const setNodeTitle = (id: string, title: string) => {
+    setNodeData(oldNodeData => ({
+      ...oldNodeData,
+      [id]: {
+        ...oldNodeData[id],
+        title,
+      },
+    }));
   };
-  const setContextNodeHeight = (id: string, newHeight: number) => {
-    setNodeHeights(oldNodeHeights => ({
-      ...oldNodeHeights,
-      [id]: newHeight,
+  const setNodeDimensions = (id: string, width: number, height: number) => {
+    setNodeContextDimensions(oldNodeDimensions => ({
+      ...oldNodeDimensions,
+      [id]: {width, height},
+    }));
+  };
+  const setNodeSettings = (id: string, settings: NodeSettings) => {
+    setNodeData(oldNodeSettings => ({
+      ...oldNodeSettings,
+      [id]: {
+        ...oldNodeSettings[id],
+        settings,
+      },
     }));
   };
 
   const updateValues = useCallback(
     (newEdges: Edge[] | null = null) => {
-      console.log('Updating');
+      console.debug('Updating');
       const disconnectedEdges = findDisconnectedEdges(
         nodeValues,
         nodes,
@@ -111,7 +118,7 @@ const Graph = (): JSX.Element => {
 
       const newNodeValues = calculateNewNodeValues(
         nodeValues,
-        nodeSettings,
+        nodeData,
         nodes,
         filteredEdges
       );
@@ -119,18 +126,23 @@ const Graph = (): JSX.Element => {
       setNodeValues(newNodeValues);
       if (disconnectedEdges.length > 0) setEdges(filteredEdges);
     },
-    [edges, nodeSettings, nodeValues, nodes, setEdges]
+    [edges, nodeData, nodeValues, nodes, setEdges]
   );
 
   useEffect(() => {
-    updateValues();
+    loadGraph(createSimpleGraph());
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    const nodeSettings: {[key: string]: NodeSettings | undefined} = {};
+    for (const [key, value] of Object.entries(nodeData))
+      nodeSettings[key] = value.settings;
+
     if (
-      oldNodeValues !== JSON.stringify(nodeValues) ||
-      oldNodeSettings !== JSON.stringify(nodeSettings) ||
-      oldEdges.length !== edges.length
+      initEdges.length === 0 &&
+      (oldNodeValues !== JSON.stringify(nodeValues) ||
+        oldNodeSettings !== JSON.stringify(nodeSettings) ||
+        oldEdges.length !== edges.length)
     ) {
       setOldNodeValues(JSON.stringify(nodeValues));
       setOldNodeSettings(JSON.stringify(nodeSettings));
@@ -139,13 +151,40 @@ const Graph = (): JSX.Element => {
     }
   }, [
     edges,
-    nodeSettings,
+    initEdges.length,
+    nodeData,
     nodeValues,
     oldEdges,
     oldNodeSettings,
     oldNodeValues,
     updateValues,
   ]);
+
+  const loadGraph = (initGraph: {
+    nodes: Node[];
+    edges: Edge[];
+    nodeData: FullNodeData;
+    nodeValues: NodeValues;
+  }) => {
+    for (const node of nodes) onNodesChange([{id: node.id, type: 'remove'}]);
+    setTimeout(() => {
+      setNodes(initGraph.nodes);
+      setInitEdges(initGraph.edges);
+      setNodeData(initGraph.nodeData);
+      setNodeValues(initGraph.nodeValues);
+    }, 0);
+  };
+  useEffect(() => {
+    if (initEdges.length > 0) {
+      formatGraph(nodes, initEdges, nodeDimensions, nodeValues).then(
+        newNodes => {
+          setEdges(initEdges);
+          setNodes(newNodes); // TODO: remove auto formatting on load in production
+          setInitEdges([]);
+        }
+      );
+    }
+  }, [initEdges]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -160,8 +199,10 @@ const Graph = (): JSX.Element => {
       const typeMap: {[key: string]: CustomNodeTypes} = {};
       for (const node of nodes) typeMap[node.id] = node.type as CustomNodeTypes;
       if (
-        typeMap[connection.source as string] === 'minpoints' &&
-        typeMap[connection.target as string] !== 'require'
+        (typeMap[connection.source as string] === 'minpoints' ||
+          typeMap[connection.source as string] === 'substitute') &&
+        typeMap[connection.target as string] !== 'require' &&
+        typeMap[connection.target as string] !== 'substitute'
       ) {
         return false;
       }
@@ -180,6 +221,12 @@ const Graph = (): JSX.Element => {
           edge.target === connection.target &&
           edge.targetHandle &&
           edge.targetHandle === connection.targetHandle
+        ) {
+          return false;
+        } else if (
+          edge.source === connection.source &&
+          edge.sourceHandle === connection.sourceHandle &&
+          edge.target === connection.target
         ) {
           return false;
         }
@@ -203,7 +250,7 @@ const Graph = (): JSX.Element => {
   );
 
   const format = async () => {
-    setNodes(await formatGraph(nodes, edges, nodeHeights, nodeValues));
+    setNodes(await formatGraph(nodes, edges, nodeDimensions, nodeValues));
   };
 
   const onDragStart = (
@@ -218,7 +265,7 @@ const Graph = (): JSX.Element => {
     event.dataTransfer.dropEffect = 'move';
   }, []);
   let id = 0;
-  const getId = useCallback(() => `dndnode_${id++}`, [id]);
+  const getId = useCallback(() => `dndnode-${id++}`, [id]);
   const onDrop: DragEventHandler<HTMLDivElement> = useCallback(
     event => {
       event.preventDefault();
@@ -242,36 +289,43 @@ const Graph = (): JSX.Element => {
         data: {label: type},
       };
 
-      const newValues = {...nodeValues, [newNode.id]: initNode(type).value};
-      const newSettings = {
-        ...nodeSettings,
-        [newNode.id]: initNode(type).settings as NodeSettings,
-      };
+      const initState = initNode(type);
+      const newValues = {...nodeValues, [newNode.id]: initState.value};
+      const newData: FullNodeData = {...nodeData, [newNode.id]: initState.data};
 
       setNodes(nodes => nodes.concat(newNode));
       setNodeValues(newValues);
-      setNodeSettings(newSettings);
+      setNodeData(newData);
     },
-    [getId, nodeSettings, nodeValues, reactFlowInstance, setNodes]
+    [getId, nodeData, nodeValues, reactFlowInstance, setNodes]
   );
 
   return (
     <NodeValuesContext.Provider value={{nodeValues, setNodeValues}}>
-      <NodeSettingsContext.Provider
-        value={{nodeSettings, setNodeSettings: setContextNodeSettings}}
+      <NodeDimensionsContext.Provider
+        value={{nodeDimensions, setNodeDimensions}}
       >
-        <NodeHeightsContext.Provider
-          value={{nodeHeights, setNodeHeight: setContextNodeHeight}}
+        <NodeDataContext.Provider
+          value={{nodeData, setNodeTitle, setNodeSettings}}
         >
           <div style={{width: '100%', height: '80vh'}}>
             <ReactFlow
               nodes={nodes}
               edges={edges}
-              onNodesChange={onNodesChange}
+              onNodesChange={changes =>
+                onNodesChange(
+                  changes.filter(
+                    change =>
+                      change.type !== 'remove' ||
+                      (nodeMap[change.id].type !== 'attainment' &&
+                        nodeMap[change.id].type !== 'grade')
+                  )
+                )
+              }
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
               isValidConnection={isValidConnection}
-              nodeTypes={nodeMap}
+              nodeTypes={nodeTypesMap}
               onInit={setReactFlowInstance}
               onDrop={onDrop}
               onDragOver={onDragOver}
@@ -308,7 +362,7 @@ const Graph = (): JSX.Element => {
             onDragStart={event => onDragStart(event, 'minpoints')}
             draggable
           >
-            MinPointsNode
+            RequirePointsNode
           </div>
           <div
             className="dndnode"
@@ -324,73 +378,28 @@ const Graph = (): JSX.Element => {
           >
             RequireNode
           </div>
-          <button onClick={format}>Format</button>
-          <button
-            onClick={() => {
-              const newInitvalues = createSimpleGraph(false);
-              for (const node of nodes) {
-                onNodesChange([{id: node.id, type: 'remove'}]);
-              }
-              setTimeout(() => {
-                setNodes(newInitvalues.nodes);
-                setEdges(newInitvalues.edges);
-                setNodeSettings(newInitvalues.nodeSettings);
-                setNodeValues(newInitvalues.nodeValues);
-              }, 0);
-            }}
+          <div
+            className="dndnode"
+            onDragStart={event => onDragStart(event, 'substitute')}
+            draggable
           >
+            SubstituteNode
+          </div>
+          <button onClick={format}>Format</button>
+          <button onClick={() => loadGraph(createSimpleGraph(false))}>
             Load addition template
           </button>
-          <button
-            onClick={() => {
-              const newInitvalues = createSimpleGraph(true);
-              for (const node of nodes) {
-                onNodesChange([{id: node.id, type: 'remove'}]);
-              }
-              setTimeout(() => {
-                setNodes(newInitvalues.nodes);
-                setEdges(newInitvalues.edges);
-                setNodeSettings(newInitvalues.nodeSettings);
-                setNodeValues(newInitvalues.nodeValues);
-              }, 0);
-            }}
-          >
+          <button onClick={() => loadGraph(createSimpleGraph(true))}>
             Load average template
           </button>
-          <button
-            onClick={() => {
-              const newInitvalues = createY1();
-              for (const node of nodes) {
-                onNodesChange([{id: node.id, type: 'remove'}]);
-              }
-              setTimeout(() => {
-                setNodes(newInitvalues.nodes);
-                setEdges(newInitvalues.edges);
-                setNodeSettings(newInitvalues.nodeSettings);
-                setNodeValues(newInitvalues.nodeValues);
-              }, 0);
-            }}
-          >
+          <button onClick={() => loadGraph(createY1())}>
             Load Y1 template
           </button>
-          <button
-            onClick={() => {
-              const newInitvalues = createO1();
-              for (const node of nodes) {
-                onNodesChange([{id: node.id, type: 'remove'}]);
-              }
-              setTimeout(() => {
-                setNodes(newInitvalues.nodes);
-                setEdges(newInitvalues.edges);
-                setNodeSettings(newInitvalues.nodeSettings);
-                setNodeValues(newInitvalues.nodeValues);
-              }, 0);
-            }}
-          >
+          <button onClick={() => loadGraph(createO1())}>
             Load O1 template
           </button>
-        </NodeHeightsContext.Provider>
-      </NodeSettingsContext.Provider>
+        </NodeDataContext.Provider>
+      </NodeDimensionsContext.Provider>
     </NodeValuesContext.Provider>
   );
 };

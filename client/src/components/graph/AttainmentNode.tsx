@@ -7,20 +7,23 @@ import {Handle, NodeProps, Position} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
   AttainmentNodeValues,
+  CustomNodeTypes,
   NodeValuesContext,
 } from '../../context/GraphProvider';
+import BaseNode from './BaseNode';
 
-const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
+const AttanmentNode = ({id, type, isConnectable}: NodeProps) => {
   const {nodeValues, setNodeValues} = useContext(NodeValuesContext);
+  const [localValue, setLocalValue] = useState<string>('0');
+  const [error, setError] = useState<boolean>(false);
+  const [init, setInit] = useState<boolean>(false);
+
   const nodeValue = nodeValues[id] as AttainmentNodeValues;
 
-  const [localValue, setLocalValue] = useState<string>(
-    nodeValue.value.toString()
-  );
-  const [error, setError] = useState<boolean>(false);
-
   useEffect(() => {
+    if (init) return;
     setLocalValue(nodeValue.value.toString());
+    setInit(true);
   }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,32 +44,21 @@ const AttanmentNode = ({id, data, isConnectable}: NodeProps) => {
   };
 
   return (
-    <div
-      style={{
-        height: '50px',
-        width: '90px',
-        border: error ? '1px dashed #e00' : '1px solid #eee',
-        padding: '10px',
-        borderRadius: '5px',
-        background: error ? '#fffafa' : 'white',
-      }}
-    >
-      <div>
-        <h4 style={{margin: 0}}>{data.label}</h4>
-        <input
-          style={{width: 'calc(90px - 20px)'}}
-          onChange={handleChange}
-          type="number"
-          value={localValue}
-        />
-      </div>
+    <BaseNode id={id} type={type as CustomNodeTypes} error={error}>
+      <input
+        style={{width: '70px'}}
+        onChange={handleChange}
+        type="number"
+        value={localValue}
+      />
       <Handle
         type="source"
+        id={`${id}-source`}
         style={{height: '12px', width: '12px'}}
         position={Position.Right}
         isConnectable={isConnectable}
       />
-    </div>
+    </BaseNode>
   );
 };
 

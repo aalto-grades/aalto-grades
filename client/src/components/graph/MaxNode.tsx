@@ -3,29 +3,27 @@
 // SPDX-License-Identifier: MIT
 
 import {useContext, useEffect, useState} from 'react';
-import {Handle, NodeProps, Position} from 'reactflow';
+import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
-  NodeValuesContext,
-  MaxNodeValues,
-  NodeHeightsContext,
-  NodeSettingsContext,
+  CustomNodeTypes,
   MaxNodeSettings,
+  MaxNodeValues,
+  NodeDataContext,
+  NodeValuesContext,
 } from '../../context/GraphProvider';
+import BaseNode from './BaseNode';
 
 type LocalSettings = {minValue: string};
 const initialSettings = {minValue: '0'};
 
-const nodeMinHeight = 78.683;
 const handleStartHeight = 83 + 33.9;
 const rowHeight = 33.9;
-const calculateHeight = (handles: string[]) =>
-  nodeMinHeight + (handles.length + 2) * rowHeight;
 
-const MaxNode = ({id, data, isConnectable}: NodeProps) => {
+const MaxNode = ({id, type, isConnectable}: NodeProps) => {
+  const updateNodeInternals = useUpdateNodeInternals();
   const {nodeValues} = useContext(NodeValuesContext);
-  const {setNodeHeight} = useContext(NodeHeightsContext);
-  const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
+  const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
     JSON.parse(JSON.stringify(initialSettings))
@@ -36,22 +34,21 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
   const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as MaxNodeValues;
+  const settings = nodeData[id].settings as MaxNodeSettings;
 
   useEffect(() => {
     if (init) return;
-    const initSettings = nodeSettings[id] as MaxNodeSettings;
-    setLocalSettings({minValue: initSettings.minValue.toString()});
-    setNodeHeight(id, calculateHeight(handles));
+    setLocalSettings({minValue: settings.minValue.toString()});
     setError(false);
     setInit(true);
-  }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [nodeData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     let change = false;
     let maxId = 0;
     let newHandles = [...handles];
     for (const [key, source] of Object.entries(nodeValue.sources)) {
-      maxId = Math.max(maxId, parseInt(key));
+      maxId = Math.max(maxId, parseInt(key.split('-').at(-1) as string));
       if (!handles.includes(key)) {
         newHandles.push(key);
         change = true;
@@ -62,9 +59,9 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
       }
     }
     if (change) {
+      setTimeout(() => updateNodeInternals(id), 0);
       setHandles(newHandles);
       setNextFree(maxId + 1);
-      setNodeHeight(id, calculateHeight(newHandles));
     }
   }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -90,40 +87,30 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
   }
 
   return (
-    <div
-      style={{
-        height: `${calculateHeight(handles)}px`,
-        width: '90px',
-        border: error ? '1px dashed #e00' : '1px solid #eee',
-        padding: '10px',
-        borderRadius: '5px',
-        background: error ? '#fffafa' : 'white',
-      }}
-    >
-      <h4 style={{margin: 0}}>{data.label}</h4>
-      {handles.map((handleId, index) => (
+    <BaseNode id={id} type={type as CustomNodeTypes} error={error}>
+      {handles.map((key, index) => (
         <Handle
-          key={`handle-${id}-${handleId}`}
+          key={`handle-${key}`}
           type="target"
+          id={key}
           style={{
             height: '12px',
             width: '12px',
             top: `${handleStartHeight + index * rowHeight}px`,
           }}
           position={Position.Left}
-          id={handleId}
           isConnectable={isConnectable}
         />
       ))}
       <Handle
         type="target"
+        id={`${id}-${nextFree}`}
         style={{
           height: '12px',
           width: '12px',
           top: `${handleStartHeight + handles.length * rowHeight}px`,
         }}
         position={Position.Left}
-        id={nextFree.toString()}
         isConnectable={isConnectable}
       />
       <table style={{width: '100%', margin: '5px 0px'}}>
@@ -134,7 +121,7 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
           <tr style={{height: rowHeight}}>
             <td>
               <input
-                style={{width: 'calc(100% - 20px)'}}
+                style={{width: '70px'}}
                 onChange={handleChange}
                 type="number"
                 value={localSettings.minValue}
@@ -164,11 +151,12 @@ const MaxNode = ({id, data, isConnectable}: NodeProps) => {
       </p>
       <Handle
         type="source"
+        id={`${id}-source`}
         style={{height: '12px', width: '12px'}}
         position={Position.Right}
         isConnectable={isConnectable}
       />
-    </div>
+    </BaseNode>
   );
 };
 

@@ -6,11 +6,13 @@ import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
-  NodeSettingsContext,
   NodeValuesContext,
   MinPointsNodeSettings,
   MinPointsNodeValues,
+  NodeDataContext,
+  CustomNodeTypes,
 } from '../../context/GraphProvider';
+import BaseNode from './BaseNode';
 
 type LocalSettings = {
   minPoints: string;
@@ -19,9 +21,9 @@ const initialSettings = {
   minPoints: '',
 };
 
-const MinPointsNode = ({id, data, isConnectable}: NodeProps) => {
+const MinPointsNode = ({id, type, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
-  const {nodeSettings, setNodeSettings} = useContext(NodeSettingsContext);
+  const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
     JSON.parse(JSON.stringify(initialSettings))
   );
@@ -29,15 +31,15 @@ const MinPointsNode = ({id, data, isConnectable}: NodeProps) => {
   const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as MinPointsNodeValues;
+  const settings = nodeData[id].settings as MinPointsNodeSettings;
 
   useEffect(() => {
     if (init) return;
-    const initSettings = nodeSettings[id] as MinPointsNodeSettings;
-    setLocalSettings({minPoints: initSettings.minPoints.toString()});
+    setLocalSettings({minPoints: settings.minPoints.toString()});
 
     setError(false);
     setInit(true);
-  }, [nodeSettings]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [nodeData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const newLocalSettings = {...localSettings};
@@ -55,43 +57,35 @@ const MinPointsNode = ({id, data, isConnectable}: NodeProps) => {
   };
 
   return (
-    <div
-      style={{
-        height: '50px',
-        width: '90px',
-        border: error ? '1px dashed #e00' : '1px solid #eee',
-        padding: '10px',
-        borderRadius: '5px',
-        background: error ? '#fffafa' : 'white',
-      }}
-    >
+    <BaseNode id={id} type={type as CustomNodeTypes} error={error}>
       <Handle
         type="target"
+        id={id}
         style={{height: '12px', width: '12px'}}
         position={Position.Left}
         isConnectable={isConnectable}
       />
       <div>
-        <h4 style={{margin: 0}}>{data.label}</h4>
         <input
-          style={{width: 'calc(90px - 20px)'}}
+          style={{width: '100px'}}
           type="number"
           onChange={handleChange}
           value={localSettings.minPoints}
         />
       </div>
       <p style={{margin: 0, display: 'inline'}}>
-        {nodeValue.value === 'reqfail'
-          ? 'reqfail'
+        {nodeValue.value === 'fail'
+          ? 'fail'
           : Math.round(nodeValue.value * 100) / 100}
       </p>
       <Handle
         type="source"
+        id={`${id}-source`}
         style={{height: '12px', width: '12px'}}
         position={Position.Right}
         isConnectable={isConnectable}
       />
-    </div>
+    </BaseNode>
   );
 };
 

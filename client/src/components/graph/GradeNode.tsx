@@ -5,35 +5,29 @@
 import {useContext} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 import 'reactflow/dist/style.css';
-import {GradeNodeValues, NodeValuesContext} from '../../context/GraphProvider';
+import {
+  CustomNodeTypes,
+  GradeNodeValues,
+  NodeValuesContext,
+} from '../../context/GraphProvider';
+import BaseNode from './BaseNode';
 
-const GradeNode = ({id, data, isConnectable}: NodeProps) => {
+const GradeNode = ({id, type, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
   const nodeValue = nodeValues[id] as GradeNodeValues;
 
   return (
-    <div
-      style={{
-        height: '50px',
-        width: '100px',
-        border: '1px solid #eee',
-        padding: '10px',
-        borderRadius: '5px',
-        background: 'white',
-      }}
-    >
+    <BaseNode id={id} type={type as CustomNodeTypes}>
       <Handle
         type="target"
+        id={id}
         style={{height: '12px', width: '12px'}}
         position={Position.Left}
         isConnectable={isConnectable}
       />
 
-      <div>
-        <h4 style={{margin: 0}}>{data.label}</h4>
-        <p style={{margin: 0}}>{Math.round(nodeValue.value * 100) / 100}</p>
-      </div>
-    </div>
+      <p style={{margin: 0}}>{Math.round(nodeValue.value * 100) / 100}</p>
+    </BaseNode>
   );
 };
 
