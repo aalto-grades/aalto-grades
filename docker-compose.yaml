@@ -12,7 +12,7 @@ services:
   frontend:
     extends:
       file: ./common-services.yaml
-      service: frontend
+      service: frontend-common
     container_name: frontend-server
     ports:
       - 3005:80
@@ -21,7 +21,7 @@ services:
   backend:
     extends:
       file: ./common-services.yaml
-      service: backend
+      service: backend-common
     container_name: backend-server
     ports:
       - 3000:3000
