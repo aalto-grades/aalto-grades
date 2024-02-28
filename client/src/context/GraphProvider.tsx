@@ -2,123 +2,22 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Dispatch, SetStateAction, createContext} from 'react';
+import {createContext} from 'react';
+import {
+  NodeData,
+  NodeSettings,
+  NodeValue,
+  NodeValues,
+} from '@common/types/graph';
 
-// Node values
-export type DropInNodes =
-  | 'addition'
-  | 'average'
-  | 'max'
-  | 'minpoints'
-  | 'require'
-  | 'stepper'
-  | 'substitute';
-
-export type CustomNodeTypes = DropInNodes | 'attainment' | 'grade';
-
-export type AdditionNodeValues = {
-  type: 'addition';
-  sources: {[key: string]: {isConnected: boolean; value: number}};
-  value: number;
-};
-export type AttainmentNodeValues = {
-  type: 'attainment';
-  value: number;
-};
-export type AverageNodeValues = {
-  type: 'average';
-  sources: {[key: string]: {isConnected: boolean; value: number}};
-  value: number;
-};
-export type GradeNodeValues = {
-  type: 'grade';
-  source: number;
-  value: number;
-};
-export type MaxNodeValues = {
-  type: 'max';
-  sources: {[key: string]: {isConnected: boolean; value: number}};
-  value: number;
-};
-export type MinPointsNodeValues = {
-  type: 'minpoints';
-  source: number;
-  value: number | 'fail';
-};
-export type RequireNodeValues = {
-  type: 'require';
-  sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
-  values: {[key: string]: number};
-  courseFail: boolean;
-};
-export type StepperNodeValues = {
-  type: 'stepper';
-  source: number;
-  value: number;
-};
-export type SubstituteNodeValues = {
-  type: 'substitute';
-  sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
-  values: {[key: string]: number | 'fail'};
-};
-
-export type NodeValue =
-  | AdditionNodeValues
-  | AttainmentNodeValues
-  | AverageNodeValues
-  | GradeNodeValues
-  | MaxNodeValues
-  | MinPointsNodeValues
-  | RequireNodeValues
-  | StepperNodeValues
-  | SubstituteNodeValues;
-
-export type NodeValues = {
-  [key: string]: NodeValue;
-};
 type NodeValuesContext = {
   nodeValues: NodeValues;
-  setNodeValues: Dispatch<SetStateAction<NodeValues>>;
+  setNodeValue: (id: string, nodeValue: NodeValue) => void;
 };
 export const NodeValuesContext = createContext<NodeValuesContext>(
   {} as NodeValuesContext
 );
 
-// Node data
-export type AverageNodeSettings = {
-  weights: {[key: string]: number};
-};
-export type MaxNodeSettings = {
-  minValue: number;
-};
-export type MinPointsNodeSettings = {
-  minPoints: number;
-};
-export type RequireNodeSettings = {
-  numFail: number;
-  failSetting: 'ignore' | 'coursefail';
-};
-export type StepperNodeSettings = {
-  numSteps: number;
-  outputValues: (number | 'same')[];
-  middlePoints: number[];
-};
-export type SubstituteNodeSettings = {
-  maxSubstitutions: number;
-  substituteValues: number[];
-};
-
-export type NodeSettings =
-  | AverageNodeSettings
-  | MaxNodeSettings
-  | MinPointsNodeSettings
-  | RequireNodeSettings
-  | StepperNodeSettings
-  | SubstituteNodeSettings;
-
-export type NodeData = {title: string; settings?: NodeSettings};
-
-export type FullNodeData = {[key: string]: NodeData};
 type NodeDataContext = {
   nodeData: {[key: string]: NodeData};
   setNodeTitle: (id: string, title: string) => void;

@@ -5,20 +5,18 @@
 import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 import 'reactflow/dist/style.css';
-import {
-  AttainmentNodeValues,
-  CustomNodeTypes,
-  NodeValuesContext,
-} from '../../context/GraphProvider';
+
+import {AttainmentNodeValue, CustomNodeTypes} from '@common/types/graph';
+import {NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
 const AttanmentNode = ({id, type, isConnectable}: NodeProps) => {
-  const {nodeValues, setNodeValues} = useContext(NodeValuesContext);
+  const {nodeValues, setNodeValue} = useContext(NodeValuesContext);
   const [localValue, setLocalValue] = useState<string>('0');
   const [error, setError] = useState<boolean>(false);
   const [init, setInit] = useState<boolean>(false);
 
-  const nodeValue = nodeValues[id] as AttainmentNodeValues;
+  const nodeValue = nodeValues[id] as AttainmentNodeValue;
 
   useEffect(() => {
     if (init) return;
@@ -35,11 +33,10 @@ const AttanmentNode = ({id, type, isConnectable}: NodeProps) => {
     }
     setError(false);
 
-    const newNodeValues = {...nodeValues};
-    (newNodeValues[id] as AttainmentNodeValues).value = parseFloat(
-      event.target.value
-    );
-    setNodeValues(newNodeValues);
+    setNodeValue(id, {
+      type: 'attainment',
+      value: parseFloat(event.target.value),
+    });
     setLocalValue(event.target.value);
   };
 

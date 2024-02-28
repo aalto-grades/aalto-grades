@@ -4,7 +4,9 @@
 
 import ElkConstructor, {ElkNode} from 'elkjs/lib/elk.bundled';
 import {Edge, Node} from 'reactflow';
-import {NodeDimensions, NodeValues} from '../../context/GraphProvider';
+
+import {NodeValues} from '@common/types/graph';
+import {NodeDimensions} from '../../context/GraphProvider';
 
 const elk = new ElkConstructor();
 

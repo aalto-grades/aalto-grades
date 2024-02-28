@@ -7,6 +7,7 @@ import passport from 'passport';
 
 import {
   addAssessmentModel,
+  deleteAssessmentModel,
   getAllAssessmentModels,
   getAssessmentModel,
   updateAssessmentModel,
@@ -42,4 +43,10 @@ router.put(
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(updateAssessmentModel)
+);
+
+router.delete(
+  '/v1/courses/:courseId/assessment-models/:assessmentModelId',
+  passport.authenticate('jwt', {session: false}),
+  controllerDispatcher(deleteAssessmentModel)
 );

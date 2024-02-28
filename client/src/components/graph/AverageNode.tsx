@@ -5,13 +5,13 @@
 import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
+
 import {
   AverageNodeSettings,
-  AverageNodeValues,
+  AverageNodeValue,
   CustomNodeTypes,
-  NodeDataContext,
-  NodeValuesContext,
-} from '../../context/GraphProvider';
+} from '@common/types/graph';
+import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
 type LocalSettings = {weights: {[key: string]: string}};
@@ -56,7 +56,7 @@ const AverageNode = ({id, type, isConnectable}: NodeProps) => {
   const [error, setError] = useState<boolean>(false);
   const [init, setInit] = useState<boolean>(false);
 
-  const nodeValue = nodeValues[id] as AverageNodeValues;
+  const nodeValue = nodeValues[id] as AverageNodeValue;
   const settings = nodeData[id].settings as AverageNodeSettings;
 
   useEffect(() => {

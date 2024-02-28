@@ -5,11 +5,9 @@
 import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
-import {
-  AdditionNodeValues,
-  CustomNodeTypes,
-  NodeValuesContext,
-} from '../../context/GraphProvider';
+
+import {AdditionNodeValue, CustomNodeTypes} from '@common/types/graph';
+import {NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
 const handleStartHeight = 45.5 + 30;
@@ -22,7 +20,7 @@ const AdditionNode = ({id, type, isConnectable}: NodeProps) => {
   const [handles, setHandles] = useState<string[]>([]);
   const [nextFree, setNextFree] = useState<number>(0);
 
-  const nodeValue = nodeValues[id] as AdditionNodeValues;
+  const nodeValue = nodeValues[id] as AdditionNodeValue;
 
   useEffect(() => {
     let change = false;

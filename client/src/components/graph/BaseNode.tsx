@@ -1,12 +1,12 @@
 // SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
-import {PropsWithChildren} from 'react';
 import {useMeasure} from '@uidotdev/usehooks';
-import {useContext, useEffect, useState} from 'react';
+import {PropsWithChildren, useContext, useEffect, useState} from 'react';
 import 'reactflow/dist/style.css';
+
+import {CustomNodeTypes} from '@common/types/graph';
 import {
-  CustomNodeTypes,
   NodeDataContext,
   NodeDimensionsContext,
 } from '../../context/GraphProvider';

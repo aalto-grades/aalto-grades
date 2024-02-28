@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Formula, ParamsObject} from './formula';
+import {GraphStructure} from './graph';
 
 export enum GradeType {
   Integer = 'INTEGER',
@@ -30,5 +31,5 @@ export interface AssessmentModelData {
   id?: number;
   courseId?: number;
   name: string;
-  graphStructure?: JSON;
+  graphStructure?: GraphStructure;
 }

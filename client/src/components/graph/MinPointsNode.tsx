@@ -5,13 +5,13 @@
 import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 import 'reactflow/dist/style.css';
+
 import {
-  NodeValuesContext,
-  MinPointsNodeSettings,
-  MinPointsNodeValues,
-  NodeDataContext,
   CustomNodeTypes,
-} from '../../context/GraphProvider';
+  MinPointsNodeSettings,
+  MinPointsNodeValue,
+} from '@common/types/graph';
+import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
 type LocalSettings = {
@@ -30,7 +30,7 @@ const MinPointsNode = ({id, type, isConnectable}: NodeProps) => {
   const [error, setError] = useState<boolean>(false);
   const [init, setInit] = useState<boolean>(false);
 
-  const nodeValue = nodeValues[id] as MinPointsNodeValues;
+  const nodeValue = nodeValues[id] as MinPointsNodeValue;
   const settings = nodeData[id].settings as MinPointsNodeSettings;
 
   useEffect(() => {

@@ -15,7 +15,7 @@ import {
   FullNodeData,
   DropInNodes,
   NodeData,
-} from '../../context/GraphProvider';
+} from '@common/types/graph';
 
 export const initNode = (
   type: DropInNodes

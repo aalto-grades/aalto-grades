@@ -13,6 +13,7 @@ import {ApiError, idSchema, JwtClaims} from '../types';
 import {findAssessmentModelById} from './utils/assessmentModel';
 import {findCourseById} from './utils/course';
 import {isTeacherInChargeOrAdmin} from './utils/user';
+import {GraphStructure} from '@common/types/graph';
 
 export async function getAssessmentModel(
   req: Request,
@@ -43,7 +44,7 @@ export async function getAssessmentModel(
     id: assessmentModel.id,
     courseId: assessmentModel.courseId,
     name: assessmentModel.name,
-    graphStructure: assessmentModel.graphStructure,
+    graphStructure: assessmentModel.graphStructure as Object as GraphStructure,
   };
 
   res.status(HttpCode.Ok).json({
@@ -74,7 +75,8 @@ export async function getAllAssessmentModels(
       id: assessmentModel.id,
       courseId: assessmentModel.courseId,
       name: assessmentModel.name,
-      graphStructure: assessmentModel.graphStructure,
+      graphStructure:
+        assessmentModel.graphStructure as Object as GraphStructure,
     });
   }
 
@@ -89,6 +91,12 @@ export async function addAssessmentModel(
 ): Promise<void> {
   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
     name: yup.string().strict().required(),
+    graphStructure: yup.object({
+      nodes: yup.array(),
+      edges: yup.array(),
+      nodeData: yup.object(),
+      nodeValues: yup.object(),
+    }), // TODO: improve
   });
 
   const courseId: number = Number(req.params.courseId);
@@ -96,7 +104,7 @@ export async function addAssessmentModel(
   const name: string = (
     await requestSchema.validate(req.body, {abortEarly: false})
   ).name;
-  const graphStructure = req.body.graphStructure as string;
+  const graphStructure = req.body.graphStructure;
 
   // Confirm that course exists.
   const course: Course = await findCourseById(courseId, HttpCode.NotFound);
@@ -114,11 +122,16 @@ export async function addAssessmentModel(
       where: {
         name: name,
         courseId: course.id,
-        graphStructure: JSON.parse(graphStructure),
       },
       defaults: {
         name: name,
-        graphStructure: JSON.parse('{}'),
+        graphStructure: JSON.parse(
+          JSON.stringify({
+            ...graphStructure,
+            nodes: graphStructure.nodes,
+            edges: graphStructure.edges,
+          })
+        ),
       },
     });
 
@@ -149,7 +162,7 @@ export async function updateAssessmentModel(
   const name: string = (
     await requestSchema.validate(req.body, {abortEarly: false})
   ).name;
-  const graphStructure = req.body.graphStructure as string;
+  const graphStructure = req.body.graphStructure;
 
   // Confirm that course exists.
   const course: Course = await findCourseById(courseId, HttpCode.NotFound);
@@ -175,10 +188,7 @@ export async function updateAssessmentModel(
   }
 
   // Update assessment model name.
-  await assessmentModel.update({
-    name: name,
-    graphStructure: JSON.parse(graphStructure),
-  });
+  await assessmentModel.update({name: name, graphStructure});
 
   res.status(HttpCode.Ok).json({
     data: {
@@ -186,5 +196,44 @@ export async function updateAssessmentModel(
       courseId: assessmentModel.courseId,
       name: assessmentModel.name,
     },
+  });
+}
+export async function deleteAssessmentModel(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const courseId: number = Number(req.params.courseId);
+  await idSchema.validate({id: courseId});
+  const assessmentModelId: number = Number(req.params.assessmentModelId);
+  await idSchema.validate({id: assessmentModelId});
+
+  // Confirm that course exists.
+  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
+
+  // Route is only available for admins and those who have teacher in charge role for the course.
+  await isTeacherInChargeOrAdmin(
+    req.user as JwtClaims,
+    courseId,
+    HttpCode.Forbidden
+  );
+
+  // Find assessment model by ID.
+  const assessmentModel: AssessmentModel = await findAssessmentModelById(
+    assessmentModelId,
+    HttpCode.NotFound
+  );
+
+  if (assessmentModel.courseId !== course.id) {
+    throw new ApiError(
+      `Assessment model with ID ${assessmentModelId} does not belong to course ID ${courseId}`,
+      HttpCode.Conflict
+    );
+  }
+
+  // Delete assesment model.
+  await assessmentModel.destroy();
+
+  res.status(HttpCode.Ok).json({
+    id: assessmentModel.id,
   });
 }

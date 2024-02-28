@@ -5,13 +5,13 @@
 import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
+
 import {
   CustomNodeTypes,
   MaxNodeSettings,
-  MaxNodeValues,
-  NodeDataContext,
-  NodeValuesContext,
-} from '../../context/GraphProvider';
+  MaxNodeValue,
+} from '@common/types/graph';
+import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
 type LocalSettings = {minValue: string};
@@ -33,7 +33,7 @@ const MaxNode = ({id, type, isConnectable}: NodeProps) => {
   const [error, setError] = useState<boolean>(false);
   const [init, setInit] = useState<boolean>(false);
 
-  const nodeValue = nodeValues[id] as MaxNodeValues;
+  const nodeValue = nodeValues[id] as MaxNodeValue;
   const settings = nodeData[id].settings as MaxNodeSettings;
 
   useEffect(() => {

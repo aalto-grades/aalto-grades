@@ -5,16 +5,14 @@
 import {useContext} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 import 'reactflow/dist/style.css';
-import {
-  CustomNodeTypes,
-  GradeNodeValues,
-  NodeValuesContext,
-} from '../../context/GraphProvider';
+
+import {CustomNodeTypes, GradeNodeValue} from '@common/types/graph';
+import {NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
 const GradeNode = ({id, type, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
-  const nodeValue = nodeValues[id] as GradeNodeValues;
+  const nodeValue = nodeValues[id] as GradeNodeValue;
 
   return (
     <BaseNode id={id} type={type as CustomNodeTypes}>

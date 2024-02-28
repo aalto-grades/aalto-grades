@@ -15,11 +15,11 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
-  FormHelperText,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
+  // FormHelperText,
+  // InputLabel,
+  // MenuItem,
+  // Select,
+  // SelectChangeEvent,
   Stack,
   TextField,
 } from '@mui/material';
@@ -32,6 +32,7 @@ import {
   UseAddAssessmentModelResult,
   useAddAttainment,
   UseAddAttainmentResult,
+  useGetAttainments,
   useGetRootAttainment,
 } from '../../hooks/useApi';
 import {State} from '../../types';
@@ -52,11 +53,12 @@ export default function CreateAssessmentModelDialog(props: {
   onSubmit: () => void;
   assessmentModels?: Array<AssessmentModelData>;
 }): JSX.Element {
-  const {courseId}: Params = useParams();
+  const {courseId}: Params = useParams() as {courseId: string};
 
   const [assessmentModel, setAssessmentModel]: State<number> = useState(0);
   const [name, setName]: State<string> = useState('');
 
+  const attainments = useGetAttainments(courseId);
   const addAssessmentModel: UseAddAssessmentModelResult =
     useAddAssessmentModel();
 
@@ -79,12 +81,52 @@ export default function CreateAssessmentModelDialog(props: {
   async function handleSubmit(event: SyntheticEvent): Promise<void> {
     event.preventDefault();
 
+    if (attainments.data === undefined) return;
     if (courseId) {
       addAssessmentModel.mutate(
         {
           courseId: courseId,
           assessmentModel: {
             name: name,
+            graphStructure: {
+              nodes: [
+                {
+                  id: 'final-grade',
+                  type: 'grade',
+                  position: {x: 500, y: 0},
+                  data: {},
+                },
+                ...attainments.data.map((attainment, index) => ({
+                  id: `attainment-${attainment.id}`,
+                  type: 'attainment',
+                  position: {x: 0, y: 100 * index},
+                  data: {},
+                })),
+              ],
+              edges: [],
+              nodeData: {
+                'final-grade': {title: 'Final Grade'},
+                ...attainments.data.reduce(
+                  (map: {[key: string]: {title: string}}, attainment) => {
+                    map[`attainment-${attainment.id}`] = {
+                      title: attainment.name,
+                    };
+                    return map;
+                  },
+                  {}
+                ),
+              },
+              nodeValues: {
+                'final-grade': {type: 'grade', source: 0, value: 0},
+                ...attainments.data.reduce(
+                  (map: {[key: string]: {value: number}}, attainment) => {
+                    map[`attainment-${attainment.id}`] = {value: 0};
+                    return map;
+                  },
+                  {}
+                ),
+              },
+            },
           },
         },
         {
@@ -149,7 +191,7 @@ export default function CreateAssessmentModelDialog(props: {
                 setName(event.target.value)
               }
             />
-            {props.assessmentModels && (
+            {/* {props.assessmentModels && (
               <Box sx={{my: 2}}>
                 <InputLabel id="assessment-model-select-helper-label">
                   Assessment model
@@ -178,7 +220,7 @@ export default function CreateAssessmentModelDialog(props: {
                   Use existing assessment model as a base.
                 </FormHelperText>
               </Box>
-            )}
+            )} */}
             <Stack spacing={2} direction="row" sx={{mt: 2}}>
               <Button
                 size="large"

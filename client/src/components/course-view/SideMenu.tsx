@@ -61,7 +61,7 @@ const SideMenu: React.FC = () => {
             fontSize: '1rem',
           }}
           onClick={(): void => {
-            // navigate(`/${courseId}/models`);
+            navigate(`/${courseId}/models`);
           }}
         >
           Models
@@ -80,7 +80,7 @@ const SideMenu: React.FC = () => {
           Attainments
         </ButtonBase>
 
-        {/* <Typography variant="h3" align="left" sx={{pt: 1.5, pb: 1}}>
+        <Typography variant="h3" align="left" sx={{pt: 1.5, pb: 1}}>
           Assessment Model
           {(auth?.role === SystemRole.Admin || isTeacherInCharge) && (
             <Tooltip title="New assessment model" placement="right">
@@ -89,7 +89,7 @@ const SideMenu: React.FC = () => {
               </Button>
             </Tooltip>
           )}
-        </Typography> */}
+        </Typography>
 
         <div style={{display: 'flex', gap: 0}}>
           <div style={{display: 'flex', flexDirection: 'column', gap: 0}}>

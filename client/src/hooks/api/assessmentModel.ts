@@ -119,22 +119,27 @@ export function useEditAssessmentModel(
   });
 }
 
+type DeleteAssesmentModelVars = {courseId: Numeric; assessmentModelId: Numeric};
 export function useDeleteAssessmentModel(
-  options?: UseMutationOptions<unknown, unknown, Numeric>
-): UseMutationResult<unknown, unknown, Numeric> {
+  options?: UseMutationOptions<unknown, unknown, unknown>
+): UseMutationResult<unknown, unknown, DeleteAssesmentModelVars> {
   const queryClient: QueryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (assessmentModelId: Numeric) =>
-      await axios.delete(`/v1/assessment-models/${assessmentModelId}`),
+    mutationFn: async (vars: DeleteAssesmentModelVars) =>
+      (
+        await axios.delete(
+          `/v1/courses/${vars.courseId}/assessment-models/${vars.assessmentModelId}`
+        )
+      ).data.data,
 
-    onSuccess: (_data: unknown, assessmentModelId: Numeric) => {
+    onSuccess: (_data: unknown, vars: DeleteAssesmentModelVars) => {
       queryClient.invalidateQueries({
-        queryKey: ['assessment-model', assessmentModelId],
+        queryKey: ['assessment-model', vars.courseId],
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['all-assessment-models', assessmentModelId],
+        queryKey: ['all-assessment-models', vars.courseId],
       });
     },
     ...options,

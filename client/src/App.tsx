@@ -27,7 +27,6 @@ import EditInstanceView from './components/EditInstanceView';
 import FetchInstancesView from './components/FetchInstancesView';
 import Footer from './components/Footer';
 import FrontPage from './components/FrontPage';
-import Graph from './components/Graph';
 import NotFound from './components/NotFound';
 import AlertSnackbar from './components/alerts/AlertSnackbar';
 import Login from './components/auth/Login';
@@ -41,6 +40,7 @@ import useSnackPackAlerts, {
 } from './hooks/useSnackPackAlerts';
 import Attainment from './components/edit-attainment-view/Attainment';
 import AttainmentsView from './components/course-view/AttainmentsView';
+import ModelsView from './components/course-view/ModelsView';
 
 declare module '@mui/material/styles' {
   interface PaletteOptions {
@@ -198,7 +198,6 @@ export default function App(): JSX.Element {
                   element={<PrivateRoute roles={Object.values(SystemRole)} />}
                 >
                   <Route path="/" element={<FrontPage />} />
-                  <Route path="/graph" element={<Graph />} />
                   <Route
                     path="/course-view/:courseId"
                     element={<CourseView />}
@@ -226,6 +225,7 @@ export default function App(): JSX.Element {
                       path="/:courseId/attainments"
                       element={<AttainmentsView />}
                     />
+                    <Route path="/:courseId/models" element={<ModelsView />} />
                     <Route
                       path="/:courseId/fetch-instances/:courseCode"
                       element={<FetchInstancesView />}

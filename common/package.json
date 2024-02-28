@@ -1,0 +1,10 @@
+{
+  "author": "The Aalto Grades Developers",
+  "license": "Expat (MIT)",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "reactflow": "^11.10.4"
+  }
+}

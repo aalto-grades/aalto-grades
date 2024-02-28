@@ -18,34 +18,37 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import AdditionNode from '../components/graph/AdditionNode';
-import AttanmentNode from '../components/graph/AttainmentNode';
-import AverageNode from '../components/graph/AverageNode';
-import GradeNode from '../components/graph/GradeNode';
-import MaxNode from '../components/graph/MaxNode';
-import MinPointsNode from '../components/graph/MinPointsNode';
-import RequireNode from '../components/graph/RequireNode';
-import StepperNode from '../components/graph/StepperNode';
 import {
-  DropInNodes,
-  NodeSettings,
   CustomNodeTypes,
-  NodeValues,
-  NodeValuesContext,
+  DropInNodes,
   FullNodeData,
+  GraphStructure,
+  NodeSettings,
+  NodeValue,
+  NodeValues,
+} from '@common/types/graph';
+import {
   NodeDataContext,
   NodeDimensions,
   NodeDimensionsContext,
-} from '../context/GraphProvider';
-import {createO1, createSimpleGraph, createY1} from './graph/createGraph';
-import './graph/flow.css';
-import {formatGraph} from './graph/formatGraph';
+  NodeValuesContext,
+} from '../../context/GraphProvider';
+import AdditionNode from './AdditionNode';
+import AttanmentNode from './AttainmentNode';
+import AverageNode from './AverageNode';
+import GradeNode from './GradeNode';
+import MaxNode from './MaxNode';
+import MinPointsNode from './MinPointsNode';
+import RequireNode from './RequireNode';
+import StepperNode from './StepperNode';
+import SubstituteNode from './SubstituteNode';
+import './flow.css';
+import {formatGraph} from './formatGraph';
 import {
   calculateNewNodeValues,
   findDisconnectedEdges,
   initNode,
-} from './graph/graphUtil';
-import SubstituteNode from './graph/SubstituteNode';
+} from './graphUtil';
 
 const nodeTypesMap = {
   addition: AdditionNode,
@@ -59,10 +62,15 @@ const nodeTypesMap = {
   substitute: SubstituteNode,
 };
 
-const Graph = (): JSX.Element => {
+const Graph = ({
+  initGraph,
+  onChange,
+}: {
+  initGraph: GraphStructure;
+  onChange: (graphStructure: GraphStructure) => void;
+}): JSX.Element => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const [initEdges, setInitEdges] = useState<Edge[]>([]);
   const [nodeData, setNodeData] = useState<FullNodeData>({});
   const [nodeDimensions, setNodeContextDimensions] = useState<NodeDimensions>(
     {}
@@ -71,10 +79,13 @@ const Graph = (): JSX.Element => {
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance | null>(null);
 
+  const [loading, setLoading] = useState<boolean>(false);
+
   // Old values are strings to avoid problematic references
+  const [oldNodes, setOldNodes] = useState<Node[]>([]);
+  const [oldEdges, setOldEdges] = useState<Edge[]>([]);
   const [oldNodeSettings, setOldNodeSettings] = useState<string>('{}');
   const [oldNodeValues, setOldNodeValues] = useState<string>('{}');
-  const [oldEdges, setOldEdges] = useState<Edge[]>(edges);
 
   const nodeMap: {[key: string]: Node} = {};
   for (const node of nodes) nodeMap[node.id] = node;
@@ -103,6 +114,12 @@ const Graph = (): JSX.Element => {
       },
     }));
   };
+  const setNodeValue = (id: string, nodeValue: NodeValue) => {
+    setNodeValues(oldNodeValues => ({
+      ...oldNodeValues,
+      [id]: nodeValue,
+    }));
+  };
 
   const updateValues = useCallback(
     (newEdges: Edge[] | null = null) => {
@@ -125,13 +142,17 @@ const Graph = (): JSX.Element => {
       setOldNodeValues(JSON.stringify(newNodeValues));
       setNodeValues(newNodeValues);
       if (disconnectedEdges.length > 0) setEdges(filteredEdges);
+      onChange({
+        nodes,
+        edges: filteredEdges,
+        nodeData,
+        nodeValues: newNodeValues,
+      });
     },
-    [edges, nodeData, nodeValues, nodes, setEdges]
+    [nodeValues, nodes, edges, nodeData, setEdges, onChange]
   );
 
-  useEffect(() => {
-    loadGraph(createSimpleGraph());
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => loadGraph(initGraph), [initGraph]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const nodeSettings: {[key: string]: NodeSettings | undefined} = {};
@@ -139,26 +160,19 @@ const Graph = (): JSX.Element => {
       nodeSettings[key] = value.settings;
 
     if (
-      initEdges.length === 0 &&
-      (oldNodeValues !== JSON.stringify(nodeValues) ||
-        oldNodeSettings !== JSON.stringify(nodeSettings) ||
-        oldEdges.length !== edges.length)
+      !loading &&
+      (oldNodes.length !== nodes.length ||
+        oldEdges.length !== edges.length ||
+        oldNodeValues !== JSON.stringify(nodeValues) ||
+        oldNodeSettings !== JSON.stringify(nodeSettings))
     ) {
+      setOldNodes(nodes);
+      setOldEdges(edges);
       setOldNodeValues(JSON.stringify(nodeValues));
       setOldNodeSettings(JSON.stringify(nodeSettings));
-      setOldEdges(edges);
       updateValues();
     }
-  }, [
-    edges,
-    initEdges.length,
-    nodeData,
-    nodeValues,
-    oldEdges,
-    oldNodeSettings,
-    oldNodeValues,
-    updateValues,
-  ]);
+  }, [loading, nodes, edges, nodeData, nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadGraph = (initGraph: {
     nodes: Node[];
@@ -166,25 +180,18 @@ const Graph = (): JSX.Element => {
     nodeData: FullNodeData;
     nodeValues: NodeValues;
   }) => {
+    console.debug('Loading graph');
+    setLoading(true);
     for (const node of nodes) onNodesChange([{id: node.id, type: 'remove'}]);
+    // Timeout to prevent nodes updating with missing data
     setTimeout(() => {
       setNodes(initGraph.nodes);
-      setInitEdges(initGraph.edges);
+      setEdges(initGraph.edges);
       setNodeData(initGraph.nodeData);
       setNodeValues(initGraph.nodeValues);
+      setLoading(false);
     }, 0);
   };
-  useEffect(() => {
-    if (initEdges.length > 0) {
-      formatGraph(nodes, initEdges, nodeDimensions, nodeValues).then(
-        newNodes => {
-          setEdges(initEdges);
-          setNodes(newNodes); // TODO: remove auto formatting on load in production
-          setInitEdges([]);
-        }
-      );
-    }
-  }, [initEdges]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -282,26 +289,20 @@ const Graph = (): JSX.Element => {
         x: event.clientX,
         y: event.clientY,
       });
-      const newNode: Node = {
-        id: `dnd-${type}-${getId()}`,
-        type,
-        position,
-        data: {label: type},
-      };
-
+      const id = `dnd-${type}-${getId()}`;
       const initState = initNode(type);
-      const newValues = {...nodeValues, [newNode.id]: initState.value};
-      const newData: FullNodeData = {...nodeData, [newNode.id]: initState.data};
+      const newNode: Node = {id, type, position, data: {label: type}};
 
       setNodes(nodes => nodes.concat(newNode));
-      setNodeValues(newValues);
-      setNodeData(newData);
+      setNodeValue(id, initState.value);
+      setNodeTitle(id, initState.data.title);
+      if (initState.data.settings) setNodeSettings(id, initState.data.settings);
     },
-    [getId, nodeData, nodeValues, reactFlowInstance, setNodes]
+    [getId, reactFlowInstance, setNodes]
   );
 
   return (
-    <NodeValuesContext.Provider value={{nodeValues, setNodeValues}}>
+    <NodeValuesContext.Provider value={{nodeValues, setNodeValue}}>
       <NodeDimensionsContext.Provider
         value={{nodeDimensions, setNodeDimensions}}
       >
@@ -386,18 +387,6 @@ const Graph = (): JSX.Element => {
             SubstituteNode
           </div>
           <button onClick={format}>Format</button>
-          <button onClick={() => loadGraph(createSimpleGraph(false))}>
-            Load addition template
-          </button>
-          <button onClick={() => loadGraph(createSimpleGraph(true))}>
-            Load average template
-          </button>
-          <button onClick={() => loadGraph(createY1())}>
-            Load Y1 template
-          </button>
-          <button onClick={() => loadGraph(createO1())}>
-            Load O1 template
-          </button>
         </NodeDataContext.Provider>
       </NodeDimensionsContext.Provider>
     </NodeValuesContext.Provider>

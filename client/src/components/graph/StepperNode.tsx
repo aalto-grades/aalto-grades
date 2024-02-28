@@ -5,13 +5,13 @@
 import {useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 import 'reactflow/dist/style.css';
+
 import {
   CustomNodeTypes,
-  NodeDataContext,
-  NodeValuesContext,
   StepperNodeSettings,
-  StepperNodeValues,
-} from '../../context/GraphProvider';
+  StepperNodeValue,
+} from '@common/types/graph';
+import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
 type LocalSettings = {
@@ -61,7 +61,7 @@ const StepperNode = ({id, type, isConnectable}: NodeProps) => {
   const [error, setError] = useState<boolean>(false);
   const [init, setInit] = useState<boolean>(false);
 
-  const nodeValue = nodeValues[id] as StepperNodeValues;
+  const nodeValue = nodeValues[id] as StepperNodeValue;
   const settings = nodeData[id].settings as StepperNodeSettings;
 
   useEffect(() => {
