@@ -1,34 +1,11 @@
-import {CourseData, SystemRole} from '@common/types';
-import {
-  Box,
-  Typography,
-  Tooltip,
-  Button,
-  Fade,
-  CircularProgress,
-  ButtonBase,
-  Divider,
-} from '@mui/material';
-import React, {useState} from 'react';
-import AssessmentModelsPicker from './AssessmentModelsPicker';
-import Attainments from './Attainments';
-import CourseDetails from './CourseDetails';
-import InstancesWidget from './InstancesWidget';
-import useAuth from '../../hooks/useAuth';
-import {useGetAllAssessmentModels, useGetCourse} from '../../hooks/useApi';
+import {Box, Button, ButtonBase, Divider} from '@mui/material';
+import React from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import {UseQueryResult} from '@tanstack/react-query';
-import CreateAssessmentModelDialog from './CreateAssessmentModelDialog';
 
 const SideMenu: React.FC = () => {
-  const {auth, isTeacherInCharge, setIsTeacherInCharge} = useAuth();
   const {courseId} = useParams() as {courseId: string};
-  const course = useGetCourse(courseId);
-  const assessmentModels = useGetAllAssessmentModels(courseId);
   const navigate = useNavigate();
 
-  const [createAssessmentModelOpen, setCreateAssessmentModelOpen] =
-    useState(false);
   return (
     <>
       <Box
@@ -80,17 +57,6 @@ const SideMenu: React.FC = () => {
           Attainments
         </ButtonBase>
 
-        <Typography variant="h3" align="left" sx={{pt: 1.5, pb: 1}}>
-          Assessment Model
-          {(auth?.role === SystemRole.Admin || isTeacherInCharge) && (
-            <Tooltip title="New assessment model" placement="right">
-              <Button onClick={(): void => setCreateAssessmentModelOpen(true)}>
-                New
-              </Button>
-            </Tooltip>
-          )}
-        </Typography>
-
         <div style={{display: 'flex', gap: 0}}>
           <div style={{display: 'flex', flexDirection: 'column', gap: 0}}>
             {/* <AssessmentModelsPicker
@@ -125,12 +91,6 @@ const SideMenu: React.FC = () => {
           </div>
         </div>
       </Box>
-      <CreateAssessmentModelDialog
-        open={createAssessmentModelOpen}
-        handleClose={(): void => setCreateAssessmentModelOpen(false)}
-        onSubmit={assessmentModels.refetch}
-        assessmentModels={assessmentModels.data}
-      />
     </>
   );
 };

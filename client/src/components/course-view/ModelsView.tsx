@@ -2,7 +2,19 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Box} from '@mui/material';
+import {
+  Box,
+  Button,
+  Collapse,
+  Divider,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import {JSX, useState} from 'react';
 import {Params, useParams} from 'react-router-dom';
 
@@ -13,8 +25,13 @@ import {
 } from '../../hooks/useApi';
 import {GraphStructure} from '@common/types/graph';
 import Graph from '../graph/Graph';
+import {SystemRole} from '@common/types';
+import useAuth from '../../hooks/useAuth';
+import CreateAssessmentModelDialog from './CreateAssessmentModelDialog';
+import {Delete} from '@mui/icons-material';
 
 export default function ModelsView(): JSX.Element {
+  const {auth, isTeacherInCharge} = useAuth();
   const {courseId}: Params = useParams() as {courseId: string};
   const models = useGetAllAssessmentModels(courseId);
   const editModel = useEditAssessmentModel();
@@ -23,27 +40,33 @@ export default function ModelsView(): JSX.Element {
     {} as GraphStructure
   );
   const [initGraphId, setInitGraphId] = useState<number>(-1);
+  const [createAssessmentModelOpen, setCreateAssessmentModelOpen] =
+    useState(false);
 
-  const [open, setOpen] = useState(false);
+  const [modelOpen, setModelOpen] = useState(false);
+  const [modelsListOpen, setModelsListOpen] = useState(true);
 
   if (models.data === undefined) return <></>;
 
   const loadGraph = (id: number, graphStructure: GraphStructure): void => {
+    setModelsListOpen(false);
     setInitGraphId(id);
     setInitGraph(JSON.parse(JSON.stringify(graphStructure)));
-    setOpen(true);
+    setModelOpen(true);
   };
 
   const handleDelModel = (assessmentModelId: number): void => {
     delModel.mutate({courseId, assessmentModelId});
+    if (assessmentModelId === initGraphId) {
+      setModelOpen(false);
+    }
   };
 
-  const onChange = (graphStructure: GraphStructure): void => {
+  const onSave = (graphStructure: GraphStructure): void => {
     let name = '';
     for (const item of models.data) {
       if (item.id === initGraphId) name = item.name;
     }
-
     editModel.mutate({
       courseId,
       assessmentModelId: initGraphId,
@@ -56,32 +79,75 @@ export default function ModelsView(): JSX.Element {
 
   return (
     <Box sx={{border: '1px solid', width: '100%'}}>
-      {models.data.map(item => (
-        <div
-          key={`graph-${item.id}-select`}
-          style={{
-            borderBottom: '1px dashed',
-            padding: '3px 0px',
-            marginBottom: '10px',
-          }}
-        >
-          <h4 style={{display: 'inline', marginRight: '10px'}}>{item.name}</h4>
-          <button
-            onClick={() =>
-              loadGraph(
-                item.id as number,
-                item.graphStructure as GraphStructure
-              )
-            }
+      {(auth?.role === SystemRole.Admin || isTeacherInCharge) && (
+        <Tooltip sx={{ml: 2}} title="New assessment model" placement="right">
+          <Button
+            sx={{mt: 1}}
+            // size="small"
+            variant="outlined"
+            onClick={(): void => setCreateAssessmentModelOpen(true)}
           >
-            Load model
-          </button>
-          <button onClick={() => handleDelModel(item.id as number)}>
-            Delete model
-          </button>
-        </div>
-      ))}
-      {open && <Graph initGraph={initGraph} onChange={onChange} />}
+            Create New
+          </Button>
+        </Tooltip>
+      )}
+      <CreateAssessmentModelDialog
+        open={createAssessmentModelOpen}
+        handleClose={(): void => setCreateAssessmentModelOpen(false)}
+        onSubmit={models.refetch}
+        assessmentModels={models.data}
+      />
+
+      <Button
+        sx={{ml: 1, mt: 1}}
+        variant="outlined"
+        onClick={() => setModelsListOpen(open => !open)}
+      >
+        {modelsListOpen ? 'Hide Models' : 'Show Models'}
+      </Button>
+
+      <Collapse in={modelsListOpen}>
+        {models.data.length === 0 ? (
+          <Typography textAlign="left" sx={{p: 2}}>
+            No models
+          </Typography>
+        ) : (
+          <List sx={{width: 300}} disablePadding>
+            {models.data.map(model => (
+              <ListItem
+                key={`graph-${model.id}-select`}
+                disablePadding
+                secondaryAction={
+                  <IconButton
+                    edge="end"
+                    onClick={() => handleDelModel(model.id as number)}
+                  >
+                    <Delete />
+                  </IconButton>
+                }
+              >
+                <ListItemButton
+                  onClick={() =>
+                    loadGraph(
+                      model.id as number,
+                      model.graphStructure as GraphStructure
+                    )
+                  }
+                >
+                  <ListItemText primary={model.name} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        )}
+      </Collapse>
+
+      {modelOpen && (
+        <>
+          <Divider sx={{my: 1}} />
+          <Graph initGraph={initGraph} onSave={onSave} />
+        </>
+      )}
     </Box>
   );
 }

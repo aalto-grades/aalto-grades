@@ -2,7 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {DragEventHandler, JSX, useCallback, useEffect, useState} from 'react';
+import {
+  DragEventHandler,
+  JSX,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -49,6 +56,7 @@ import {
   findDisconnectedEdges,
   initNode,
 } from './graphUtil';
+import {Button} from '@mui/material';
 
 const nodeTypesMap = {
   addition: AdditionNode,
@@ -64,10 +72,10 @@ const nodeTypesMap = {
 
 const Graph = ({
   initGraph,
-  onChange,
+  onSave,
 }: {
   initGraph: GraphStructure;
-  onChange: (graphStructure: GraphStructure) => void;
+  onSave: (graphStructure: GraphStructure) => void;
 }): JSX.Element => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -87,8 +95,20 @@ const Graph = ({
   const [oldNodeSettings, setOldNodeSettings] = useState<string>('{}');
   const [oldNodeValues, setOldNodeValues] = useState<string>('{}');
 
-  const nodeMap: {[key: string]: Node} = {};
-  for (const node of nodes) nodeMap[node.id] = node;
+  const [unsaved, setUnsaved] = useState<boolean>(false);
+  const [originalGraphStructure, setOriginalGraphStructure] =
+    useState<GraphStructure>({
+      nodes: [],
+      edges: [],
+      nodeData: {},
+      nodeValues: {},
+    });
+
+  const nodeMap = useMemo<{[key: string]: Node}>(() => {
+    const newMap: {[key: string]: Node} = {};
+    for (const node of nodes) newMap[node.id] = node;
+    return newMap;
+  }, [nodes]);
 
   const setNodeTitle = (id: string, title: string) => {
     setNodeData(oldNodeData => ({
@@ -142,14 +162,8 @@ const Graph = ({
       setOldNodeValues(JSON.stringify(newNodeValues));
       setNodeValues(newNodeValues);
       if (disconnectedEdges.length > 0) setEdges(filteredEdges);
-      onChange({
-        nodes,
-        edges: filteredEdges,
-        nodeData,
-        nodeValues: newNodeValues,
-      });
     },
-    [nodeValues, nodes, edges, nodeData, setEdges, onChange]
+    [nodeValues, nodes, edges, nodeData, setEdges]
   );
 
   useEffect(() => loadGraph(initGraph), [initGraph]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -172,6 +186,32 @@ const Graph = ({
       setOldNodeSettings(JSON.stringify(nodeSettings));
       updateValues();
     }
+
+    const simplifyNodes = (node: Node): Node => ({
+      id: node.id,
+      type: node.type,
+      position: {
+        x: Math.round(node.position.x),
+        y: Math.round(node.position.y),
+      },
+      data: {},
+    });
+
+    if (
+      !loading &&
+      (JSON.stringify(originalGraphStructure.nodes.map(simplifyNodes)) !==
+        JSON.stringify(nodes.map(simplifyNodes)) ||
+        JSON.stringify(originalGraphStructure.edges) !==
+          JSON.stringify(edges) ||
+        JSON.stringify(originalGraphStructure.nodeData) !==
+          JSON.stringify(nodeData) ||
+        JSON.stringify(originalGraphStructure.nodeValues) !==
+          JSON.stringify(nodeValues))
+    ) {
+      setUnsaved(true);
+    } else if (!loading) {
+      setUnsaved(false);
+    }
   }, [loading, nodes, edges, nodeData, nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadGraph = (initGraph: {
@@ -189,6 +229,8 @@ const Graph = ({
       setEdges(initGraph.edges);
       setNodeData(initGraph.nodeData);
       setNodeValues(initGraph.nodeValues);
+      setOriginalGraphStructure(initGraph);
+      setUnsaved(false);
       setLoading(false);
     }, 0);
   };
@@ -260,6 +302,7 @@ const Graph = ({
     setNodes(await formatGraph(nodes, edges, nodeDimensions, nodeValues));
   };
 
+  // Handle drop-in nodes
   const onDragStart = (
     event: React.DragEvent<HTMLDivElement>,
     nodeType: DropInNodes
@@ -289,7 +332,9 @@ const Graph = ({
         x: event.clientX,
         y: event.clientY,
       });
-      const id = `dnd-${type}-${getId()}`;
+      let id = `dnd-${type}-${getId()}`;
+      while (id in nodeMap) id = `dnd-${type}-${getId()}`; // To prevent duplicates from loading existing graph
+
       const initState = initNode(type);
       const newNode: Node = {id, type, position, data: {label: type}};
 
@@ -298,7 +343,7 @@ const Graph = ({
       setNodeTitle(id, initState.data.title);
       if (initState.data.settings) setNodeSettings(id, initState.data.settings);
     },
-    [getId, reactFlowInstance, setNodes]
+    [getId, nodeMap, reactFlowInstance, setNodes]
   );
 
   return (
@@ -386,7 +431,18 @@ const Graph = ({
           >
             SubstituteNode
           </div>
-          <button onClick={format}>Format</button>
+          <Button onClick={format}>Format</Button>
+          {unsaved && <p style={{display: 'inline'}}>Unsaved progress</p>}
+          <Button
+            variant={unsaved ? 'contained' : 'text'}
+            onClick={() => {
+              onSave({nodes, edges, nodeData, nodeValues});
+              setOriginalGraphStructure({nodes, edges, nodeData, nodeValues});
+              setUnsaved(false);
+            }}
+          >
+            Save
+          </Button>
         </NodeDataContext.Provider>
       </NodeDimensionsContext.Provider>
     </NodeValuesContext.Provider>

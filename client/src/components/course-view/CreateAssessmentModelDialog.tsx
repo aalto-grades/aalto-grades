@@ -119,8 +119,14 @@ export default function CreateAssessmentModelDialog(props: {
               nodeValues: {
                 'final-grade': {type: 'grade', source: 0, value: 0},
                 ...attainments.data.reduce(
-                  (map: {[key: string]: {value: number}}, attainment) => {
-                    map[`attainment-${attainment.id}`] = {value: 0};
+                  (
+                    map: {[key: string]: {type: 'attainment'; value: number}},
+                    attainment
+                  ) => {
+                    map[`attainment-${attainment.id}`] = {
+                      type: 'attainment',
+                      value: 0,
+                    };
                     return map;
                   },
                   {}
