@@ -43,14 +43,15 @@ export default function ModelsView(): JSX.Element {
   const [loadGraphId, setLoadGraphId] = useState<number>(-1);
 
   const [createViewOpen, setCreateViewOpen] = useState(false);
-  const [modelOpen, setModelOpen] = useState(false);
   const [modelsListOpen, setModelsListOpen] = useState(true);
+  const [graphOpen, setGraphOpen] = useState(false);
 
   useEffect(() => {
     if (loadGraphId === -1 || models.data === undefined) return;
     for (const model of models.data) {
       if (model.id === loadGraphId) {
         setCurrentModel(model);
+        setGraphOpen(true);
         setLoadGraphId(-1);
       }
     }
@@ -61,13 +62,13 @@ export default function ModelsView(): JSX.Element {
   const loadGraph = (model: AssessmentModelData): void => {
     setModelsListOpen(false);
     setCurrentModel(JSON.parse(JSON.stringify(model))); // To remove references
-    setModelOpen(true);
+    setGraphOpen(true);
   };
 
   const handleDelModel = (assessmentModelId: number): void => {
     delModel.mutate({courseId, assessmentModelId});
     if (assessmentModelId === currentModel.id) {
-      setModelOpen(false);
+      setGraphOpen(false);
     }
   };
 
@@ -143,7 +144,7 @@ export default function ModelsView(): JSX.Element {
         )}
       </Collapse>
 
-      {modelOpen && (
+      {graphOpen && (
         <>
           <Divider sx={{my: 1}} />
           <Graph

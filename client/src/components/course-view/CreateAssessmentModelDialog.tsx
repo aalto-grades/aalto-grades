@@ -40,9 +40,9 @@ export default function CreateAssessmentModelDialog(props: {
   async function handleSubmit(event: SyntheticEvent): Promise<void> {
     event.preventDefault();
 
-    if (attainments.data === undefined) return;
-    if (courseId) {
-      addAssessmentModel.mutate({
+    if (attainments.data === undefined || courseId === undefined) return;
+    addAssessmentModel.mutate(
+      {
         courseId: courseId,
         assessmentModel: {
           name,
@@ -74,26 +74,16 @@ export default function CreateAssessmentModelDialog(props: {
                 {}
               ),
             },
-            nodeValues: {
-              'final-grade': {type: 'grade', source: 0, value: 0},
-              ...attainments.data.reduce(
-                (
-                  map: {[key: string]: {type: 'attainment'; value: number}},
-                  attainment
-                ) => {
-                  map[`attainment-${attainment.id}`] = {
-                    type: 'attainment',
-                    value: 0,
-                  };
-                  return map;
-                },
-                {}
-              ),
-            },
           },
         },
-      });
-    }
+      },
+      {
+        onSuccess: id => {
+          props.handleClose();
+          props.onSubmit(id);
+        },
+      }
+    );
   }
 
   return (
