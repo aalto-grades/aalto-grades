@@ -11,7 +11,6 @@ test.beforeEach(async ({page}) => {
   await page.getByLabel('Email').press('Tab');
   await page.getByLabel('Password', {exact: true}).fill('password');
   await page.getByLabel('Password', {exact: true}).press('Enter');
-
   await expect(
     page.getByRole('heading', {name: 'Log in to Aalto Grades'})
   ).toBeHidden();
@@ -22,6 +21,7 @@ test.afterEach(async ({page}) => {
   await page.goto('/');
   await page.getByRole('button', {name: 'Andy Admin'}).click();
   await page.getByRole('menuitem', {name: 'Logout'}).click();
+  // need a good way to rollback changes made to database in the tests
 });
 
 test.describe('Test Courses as Admin', () => {
@@ -137,6 +137,18 @@ test.describe('Test Courses as Admin', () => {
     await page.getByRole('button', {name: 'Submit'}).click();
     await expect(
       page.getByRole('cell', {name: 'testinst'}).first()
+    ).toBeAttached();
+  });
+});
+
+test.describe('Manage users as admin', () => {
+  test('Add user', async ({page}, testInfo) => {
+    await page.getByRole('button', {name: 'Add user'}).click();
+    await page.getByLabel('Email').click();
+    await page.getByLabel('Email').fill(`${testInfo.testId}@aalto.fi`);
+    await page.getByRole('button', {name: 'Add User'}).click();
+    await expect(
+      page.getByRole('cell', {name: `${testInfo.testId}@aalto.fi`}).first()
     ).toBeAttached();
   });
 });
