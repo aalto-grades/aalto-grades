@@ -60,7 +60,7 @@ export default function ModelsView(): JSX.Element {
 
   const loadGraph = (model: AssessmentModelData): void => {
     setModelsListOpen(false);
-    setCurrentModel(model); //JSON parse?
+    setCurrentModel(JSON.parse(JSON.stringify(model))); // To remove references
     setModelOpen(true);
   };
 

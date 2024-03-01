@@ -211,7 +211,7 @@ export const calculateNewNodeValues = (
 
     for (const edge of nodeTargets[sourceId]) {
       const sourceValue =
-        sourceNodeValue.type === 'require' ||
+        (sourceNodeValue.type === 'require' ||
         sourceNodeValue.type === 'substitute'
           ? sourceNodeValue.values[
               (edge.sourceHandle as string)
@@ -219,7 +219,7 @@ export const calculateNewNodeValues = (
                 .replace('-exercise-source', '')
                 .replace('-source', '')
             ]
-          : sourceNodeValue.value;
+          : sourceNodeValue.value) ?? 0;
 
       nodeSources[edge.target].delete(sourceId);
       if (nodeSources[edge.target].size === 0) noSources.push(edge.target);
@@ -320,7 +320,7 @@ export const batchCalculateGraph = (
 
       for (const edge of nodeTargets[sourceId]) {
         const sourceValue =
-          sourceNodeValue.type === 'require' ||
+          (sourceNodeValue.type === 'require' ||
           sourceNodeValue.type === 'substitute'
             ? sourceNodeValue.values[
                 (edge.sourceHandle as string)
@@ -328,7 +328,7 @@ export const batchCalculateGraph = (
                   .replace('-exercise-source', '')
                   .replace('-source', '')
               ]
-            : sourceNodeValue.value;
+            : sourceNodeValue.value) ?? 0;
 
         nodeSources[edge.target].delete(sourceId);
         if (nodeSources[edge.target].size === 0) noSources.push(edge.target);
