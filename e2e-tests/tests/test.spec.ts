@@ -142,13 +142,14 @@ test.describe('Test Courses as Admin', () => {
 });
 
 test.describe('Manage users as admin', () => {
-  test('Add user', async ({page}, testInfo) => {
+  test('Add user', async ({page}) => {
     await page.getByRole('button', {name: 'Add user'}).click();
     await page.getByLabel('Email').click();
-    await page.getByLabel('Email').fill(`${testInfo.testId}@aalto.fi`);
+    const unique = Date.now();
+    await page.getByLabel('Email').fill(`${unique}@aalto.fi`);
     await page.getByRole('button', {name: 'Add User'}).click();
     await expect(
-      page.getByRole('cell', {name: `${testInfo.testId}@aalto.fi`}).first()
+      page.getByRole('cell', {name: `${unique}@aalto.fi`}).first()
     ).toBeAttached();
   });
 });
