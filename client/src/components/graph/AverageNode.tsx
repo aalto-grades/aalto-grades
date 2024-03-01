@@ -177,8 +177,7 @@ const AverageNode = ({id, type, isConnectable}: NodeProps) => {
                 weightSum === 0
                   ? 0
                   : Math.round(
-                      (((sources[key].value as number) *
-                        settings.weights[key]) /
+                      ((sources[key].value * settings.weights[key]) /
                         weightSum) *
                         100
                     ) / 100}

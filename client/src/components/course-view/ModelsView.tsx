@@ -15,7 +15,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import {JSX, useState} from 'react';
+import {JSX, useEffect, useState} from 'react';
 import {Params, useParams} from 'react-router-dom';
 
 import {
@@ -25,7 +25,7 @@ import {
 } from '../../hooks/useApi';
 import {GraphStructure} from '@common/types/graph';
 import Graph from '../graph/Graph';
-import {SystemRole} from '@common/types';
+import {AssessmentModelData, SystemRole} from '@common/types';
 import useAuth from '../../hooks/useAuth';
 import CreateAssessmentModelDialog from './CreateAssessmentModelDialog';
 import {Delete} from '@mui/icons-material';
@@ -36,42 +36,47 @@ export default function ModelsView(): JSX.Element {
   const models = useGetAllAssessmentModels(courseId);
   const editModel = useEditAssessmentModel();
   const delModel = useDeleteAssessmentModel();
-  const [initGraph, setInitGraph] = useState<GraphStructure>(
-    {} as GraphStructure
-  );
-  const [initGraphId, setInitGraphId] = useState<number>(-1);
-  const [createAssessmentModelOpen, setCreateAssessmentModelOpen] =
-    useState(false);
 
+  const [currentModel, setCurrentModel] = useState<AssessmentModelData>(
+    {} as AssessmentModelData
+  );
+  const [loadGraphId, setLoadGraphId] = useState<number>(-1);
+
+  const [createViewOpen, setCreateViewOpen] = useState(false);
   const [modelOpen, setModelOpen] = useState(false);
   const [modelsListOpen, setModelsListOpen] = useState(true);
 
+  useEffect(() => {
+    if (loadGraphId === -1 || models.data === undefined) return;
+    for (const model of models.data) {
+      if (model.id === loadGraphId) {
+        setCurrentModel(model);
+        setLoadGraphId(-1);
+      }
+    }
+  }, [loadGraphId, models.data]);
+
   if (models.data === undefined) return <></>;
 
-  const loadGraph = (id: number, graphStructure: GraphStructure): void => {
+  const loadGraph = (model: AssessmentModelData): void => {
     setModelsListOpen(false);
-    setInitGraphId(id);
-    setInitGraph(JSON.parse(JSON.stringify(graphStructure)));
+    setCurrentModel(model); //JSON parse?
     setModelOpen(true);
   };
 
   const handleDelModel = (assessmentModelId: number): void => {
     delModel.mutate({courseId, assessmentModelId});
-    if (assessmentModelId === initGraphId) {
+    if (assessmentModelId === currentModel.id) {
       setModelOpen(false);
     }
   };
 
   const onSave = (graphStructure: GraphStructure): void => {
-    let name = '';
-    for (const item of models.data) {
-      if (item.id === initGraphId) name = item.name;
-    }
     editModel.mutate({
       courseId,
-      assessmentModelId: initGraphId,
+      assessmentModelId: currentModel.id as number,
       assessmentModel: {
-        name,
+        name: currentModel.name,
         graphStructure,
       },
     });
@@ -85,16 +90,20 @@ export default function ModelsView(): JSX.Element {
             sx={{mt: 1}}
             // size="small"
             variant="outlined"
-            onClick={(): void => setCreateAssessmentModelOpen(true)}
+            onClick={(): void => setCreateViewOpen(true)}
           >
             Create New
           </Button>
         </Tooltip>
       )}
       <CreateAssessmentModelDialog
-        open={createAssessmentModelOpen}
-        handleClose={(): void => setCreateAssessmentModelOpen(false)}
-        onSubmit={models.refetch}
+        open={createViewOpen}
+        handleClose={(): void => setCreateViewOpen(false)}
+        onSubmit={id => {
+          models.refetch();
+          setModelsListOpen(false);
+          setLoadGraphId(id);
+        }}
         assessmentModels={models.data}
       />
 
@@ -126,14 +135,7 @@ export default function ModelsView(): JSX.Element {
                   </IconButton>
                 }
               >
-                <ListItemButton
-                  onClick={() =>
-                    loadGraph(
-                      model.id as number,
-                      model.graphStructure as GraphStructure
-                    )
-                  }
-                >
+                <ListItemButton onClick={() => loadGraph(model)}>
                   <ListItemText primary={model.name} />
                 </ListItemButton>
               </ListItem>
@@ -145,7 +147,10 @@ export default function ModelsView(): JSX.Element {
       {modelOpen && (
         <>
           <Divider sx={{my: 1}} />
-          <Graph initGraph={initGraph} onSave={onSave} />
+          <Graph
+            initGraph={currentModel.graphStructure as GraphStructure}
+            onSave={onSave}
+          />
         </>
       )}
     </Box>

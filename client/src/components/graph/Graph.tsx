@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {Button} from '@mui/material';
 import {
   DragEventHandler,
   JSX,
@@ -34,6 +35,7 @@ import {
   NodeValue,
   NodeValues,
 } from '@common/types/graph';
+import {calculateNewNodeValues} from '@common/util/calculateGraph';
 import {
   NodeDataContext,
   NodeDimensions,
@@ -50,13 +52,7 @@ import RequireNode from './RequireNode';
 import StepperNode from './StepperNode';
 import SubstituteNode from './SubstituteNode';
 import './flow.css';
-import {formatGraph} from './formatGraph';
-import {
-  calculateNewNodeValues,
-  findDisconnectedEdges,
-  initNode,
-} from './graphUtil';
-import {Button} from '@mui/material';
+import {findDisconnectedEdges, formatGraph, initNode} from './graphUtil';
 
 const nodeTypesMap = {
   addition: AdditionNode,
@@ -166,8 +162,6 @@ const Graph = ({
     [nodeValues, nodes, edges, nodeData, setEdges]
   );
 
-  useEffect(() => loadGraph(initGraph), [initGraph]); // eslint-disable-line react-hooks/exhaustive-deps
-
   useEffect(() => {
     const nodeSettings: {[key: string]: NodeSettings | undefined} = {};
     for (const [key, value] of Object.entries(nodeData))
@@ -234,6 +228,8 @@ const Graph = ({
       setLoading(false);
     }, 0);
   };
+
+  useEffect(() => loadGraph(initGraph), [initGraph]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -354,7 +350,7 @@ const Graph = ({
         <NodeDataContext.Provider
           value={{nodeData, setNodeTitle, setNodeSettings}}
         >
-          <div style={{width: '100%', height: '80vh'}}>
+          <div style={{width: '100%', height: '60vh'}}>
             <ReactFlow
               nodes={nodes}
               edges={edges}
