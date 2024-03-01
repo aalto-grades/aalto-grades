@@ -6,7 +6,7 @@ import ElkConstructor, {ElkNode} from 'elkjs/lib/elk.bundled';
 import {Edge, Node} from 'reactflow';
 
 import {
-  DropInNodes,
+  CustomNodeTypes,
   NodeData,
   NodeValue,
   NodeValues,
@@ -14,7 +14,7 @@ import {
 import {NodeDimensions} from '../../context/GraphProvider';
 
 export const initNode = (
-  type: DropInNodes
+  type: CustomNodeTypes
 ): {
   value: NodeValue;
   data: NodeData;
@@ -25,11 +25,15 @@ export const initNode = (
         value: {type, sources: {}, value: 0},
         data: {title: 'Addition'},
       };
+    case 'attainment':
+      return {value: {type, value: 0}, data: {title: 'Attainment'}};
     case 'average':
       return {
         value: {type, sources: {}, value: 0},
         data: {title: 'Average', settings: {weights: {}}},
       };
+    case 'grade':
+      return {value: {type, source: 0, value: 0}, data: {title: 'Grade'}};
     case 'max':
       return {
         value: {type, sources: {}, value: 0},

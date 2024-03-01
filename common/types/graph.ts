@@ -113,5 +113,4 @@ export type GraphStructure = {
   nodes: Node[];
   edges: Edge[];
   nodeData: FullNodeData;
-  nodeValues: NodeValues;
 };

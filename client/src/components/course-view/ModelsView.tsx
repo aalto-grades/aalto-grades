@@ -85,10 +85,9 @@ export default function ModelsView(): JSX.Element {
   return (
     <Box sx={{border: '1px solid', width: '100%'}}>
       {(auth?.role === SystemRole.Admin || isTeacherInCharge) && (
-        <Tooltip sx={{ml: 2}} title="New assessment model" placement="right">
+        <Tooltip sx={{ml: 2}} title="New assessment model" placement="top">
           <Button
             sx={{mt: 1}}
-            // size="small"
             variant="outlined"
             onClick={(): void => setCreateViewOpen(true)}
           >

@@ -93,12 +93,7 @@ const Graph = ({
 
   const [unsaved, setUnsaved] = useState<boolean>(false);
   const [originalGraphStructure, setOriginalGraphStructure] =
-    useState<GraphStructure>({
-      nodes: [],
-      edges: [],
-      nodeData: {},
-      nodeValues: {},
-    });
+    useState<GraphStructure>({nodes: [], edges: [], nodeData: {}});
 
   const nodeMap = useMemo<{[key: string]: Node}>(() => {
     const newMap: {[key: string]: Node} = {};
@@ -198,9 +193,7 @@ const Graph = ({
         JSON.stringify(originalGraphStructure.edges) !==
           JSON.stringify(edges) ||
         JSON.stringify(originalGraphStructure.nodeData) !==
-          JSON.stringify(nodeData) ||
-        JSON.stringify(originalGraphStructure.nodeValues) !==
-          JSON.stringify(nodeValues))
+          JSON.stringify(nodeData))
     ) {
       setUnsaved(true);
     } else if (!loading) {
@@ -212,17 +205,21 @@ const Graph = ({
     nodes: Node[];
     edges: Edge[];
     nodeData: FullNodeData;
-    nodeValues: NodeValues;
   }) => {
     console.debug('Loading graph');
     setLoading(true);
     for (const node of nodes) onNodesChange([{id: node.id, type: 'remove'}]);
     // Timeout to prevent nodes updating with missing data
     setTimeout(() => {
+      const initNodeValues: {[key: string]: NodeValue} = {};
+      for (const node of initGraph.nodes)
+        initNodeValues[node.id] = initNode(node.type as CustomNodeTypes).value;
+
       setNodes(initGraph.nodes);
       setEdges(initGraph.edges);
       setNodeData(initGraph.nodeData);
-      setNodeValues(initGraph.nodeValues);
+      setNodeValues(initNodeValues);
+
       setOriginalGraphStructure(initGraph);
       setUnsaved(false);
       setLoading(false);
@@ -432,8 +429,8 @@ const Graph = ({
           <Button
             variant={unsaved ? 'contained' : 'text'}
             onClick={() => {
-              onSave({nodes, edges, nodeData, nodeValues});
-              setOriginalGraphStructure({nodes, edges, nodeData, nodeValues});
+              onSave({nodes, edges, nodeData});
+              setOriginalGraphStructure({nodes, edges, nodeData});
               setUnsaved(false);
             }}
           >
