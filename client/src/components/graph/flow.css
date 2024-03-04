@@ -31,6 +31,7 @@ SPDX-License-Identifier: MIT
     border-collapse: separate;
     border-radius: 5px;
     border: 1px solid black;
+    background-color: white;
   }
 
   /* Apply a border to the right of all but the last column */

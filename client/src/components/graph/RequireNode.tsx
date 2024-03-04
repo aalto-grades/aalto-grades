@@ -20,7 +20,7 @@ const initialSettings = {numFail: 0, failSetting: 'courseFail'};
 const handleStartHeight = 128.5;
 const rowHeight = 33.9;
 
-const RequireNode = ({id, type, isConnectable}: NodeProps) => {
+const RequireNode = ({id, type, selected, isConnectable}: NodeProps) => {
   const updateNodeInternals = useUpdateNodeInternals();
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
@@ -115,6 +115,7 @@ const RequireNode = ({id, type, isConnectable}: NodeProps) => {
     <BaseNode
       id={id}
       type={type as CustomNodeTypes}
+      selected={selected}
       error={error}
       courseFail={nodeValue.courseFail}
     >

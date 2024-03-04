@@ -42,7 +42,7 @@ const checkError = (settings: LocalSettings): boolean => {
   return false;
 };
 
-const AverageNode = ({id, type, isConnectable}: NodeProps) => {
+const AverageNode = ({id, type, selected, isConnectable}: NodeProps) => {
   const updateNodeInternals = useUpdateNodeInternals();
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const {nodeValues} = useContext(NodeValuesContext);
@@ -125,7 +125,12 @@ const AverageNode = ({id, type, isConnectable}: NodeProps) => {
   }
 
   return (
-    <BaseNode id={id} type={type as CustomNodeTypes} error={error}>
+    <BaseNode
+      id={id}
+      type={type as CustomNodeTypes}
+      selected={selected}
+      error={error}
+    >
       {handles.map((key, index) => (
         <Handle
           key={`handle-${key}`}

@@ -13,7 +13,7 @@ import BaseNode from './BaseNode';
 const handleStartHeight = 45.5 + 30;
 const rowHeight = 30;
 
-const AdditionNode = ({id, type, isConnectable}: NodeProps) => {
+const AdditionNode = ({id, type, selected, isConnectable}: NodeProps) => {
   const updateNodeInternals = useUpdateNodeInternals();
   const {nodeValues} = useContext(NodeValuesContext);
 
@@ -45,7 +45,7 @@ const AdditionNode = ({id, type, isConnectable}: NodeProps) => {
   }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <BaseNode id={id} type={type as CustomNodeTypes}>
+    <BaseNode id={id} type={type as CustomNodeTypes} selected={selected}>
       {handles.map((key, index) => (
         <Handle
           key={`handle-${key}`}

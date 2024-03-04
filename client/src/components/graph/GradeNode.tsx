@@ -10,12 +10,12 @@ import {CustomNodeTypes, GradeNodeValue} from '@common/types/graph';
 import {NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
-const GradeNode = ({id, type, isConnectable}: NodeProps) => {
+const GradeNode = ({id, type, selected, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
   const nodeValue = nodeValues[id] as GradeNodeValue;
 
   return (
-    <BaseNode id={id} type={type as CustomNodeTypes}>
+    <BaseNode id={id} type={type as CustomNodeTypes} selected={selected}>
       <Handle
         type="target"
         id={id}

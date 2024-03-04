@@ -50,7 +50,7 @@ const convertFromLocalSettings = (
   ),
 });
 
-const SubstituteNode = ({id, type, isConnectable}: NodeProps) => {
+const SubstituteNode = ({id, type, selected, isConnectable}: NodeProps) => {
   const updateNodeInternals = useUpdateNodeInternals();
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
@@ -155,7 +155,12 @@ const SubstituteNode = ({id, type, isConnectable}: NodeProps) => {
   };
 
   return (
-    <BaseNode id={id} type={type as CustomNodeTypes} error={error}>
+    <BaseNode
+      id={id}
+      type={type as CustomNodeTypes}
+      selected={selected}
+      error={error}
+    >
       {substituteHandles.map((key, index) => (
         <Handle
           key={`handle-${key}`}

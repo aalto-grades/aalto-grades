@@ -1,26 +1,27 @@
 // SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
+import WarningIcon from '@mui/icons-material/Warning';
+import {Tooltip} from '@mui/material';
 import {useMeasure} from '@uidotdev/usehooks';
 import {PropsWithChildren, useContext, useEffect, useState} from 'react';
 import 'reactflow/dist/style.css';
-import WarningIcon from '@mui/icons-material/Warning';
 
 import {CustomNodeTypes} from '@common/types/graph';
 import {
-  NodeDataContext,
   ExtraNodeDataContext,
+  NodeDataContext,
 } from '../../context/GraphProvider';
-import {Tooltip} from '@mui/material';
 
 const BaseNode: React.FC<
   PropsWithChildren<{
     id: string;
     type: CustomNodeTypes;
+    selected: boolean;
     error?: boolean;
     courseFail?: boolean;
   }>
-> = ({id, type, error, courseFail, children}) => {
+> = ({id, type, error, selected, courseFail, children}) => {
   const [ref, {width, height}] = useMeasure();
   const {nodeData, setNodeTitle} = useContext(NodeDataContext);
   const {setNodeDimensions, extraNodeData} = useContext(ExtraNodeDataContext);
@@ -51,6 +52,8 @@ const BaseNode: React.FC<
           ? '1px dashed #e00'
           : extraData?.warning
           ? '1px solid #ffb833'
+          : selected
+          ? '1px solid #99f'
           : '1px solid #eee',
         padding: '10px',
         borderRadius: '5px',
@@ -58,6 +61,8 @@ const BaseNode: React.FC<
           ? '#fffafa'
           : extraData?.warning
           ? '#fff6e5'
+          : selected
+          ? '#fafaff'
           : 'white',
       }}
     >

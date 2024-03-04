@@ -21,7 +21,7 @@ const initialSettings = {
   minPoints: '',
 };
 
-const MinPointsNode = ({id, type, isConnectable}: NodeProps) => {
+const MinPointsNode = ({id, type, selected, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
@@ -57,7 +57,12 @@ const MinPointsNode = ({id, type, isConnectable}: NodeProps) => {
   };
 
   return (
-    <BaseNode id={id} type={type as CustomNodeTypes} error={error}>
+    <BaseNode
+      id={id}
+      type={type as CustomNodeTypes}
+      selected={selected}
+      error={error}
+    >
       <Handle
         type="target"
         id={id}

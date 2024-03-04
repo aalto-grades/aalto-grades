@@ -52,7 +52,7 @@ const checkError = (settings: LocalSettings): boolean => {
   return false;
 };
 
-const StepperNode = ({id, type, isConnectable}: NodeProps) => {
+const StepperNode = ({id, type, selected, isConnectable}: NodeProps) => {
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
@@ -151,7 +151,12 @@ const StepperNode = ({id, type, isConnectable}: NodeProps) => {
   };
 
   return (
-    <BaseNode id={id} type={type as CustomNodeTypes} error={error}>
+    <BaseNode
+      id={id}
+      type={type as CustomNodeTypes}
+      selected={selected}
+      error={error}
+    >
       <Handle
         type="target"
         id={id}

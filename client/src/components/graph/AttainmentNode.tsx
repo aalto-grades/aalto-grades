@@ -10,7 +10,7 @@ import {AttainmentNodeValue, CustomNodeTypes} from '@common/types/graph';
 import {NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
-const AttanmentNode = ({id, type, isConnectable}: NodeProps) => {
+const AttanmentNode = ({id, type, isConnectable, selected}: NodeProps) => {
   const {nodeValues, setNodeValue} = useContext(NodeValuesContext);
   const [localValue, setLocalValue] = useState<string>('0');
   const [error, setError] = useState<boolean>(false);
@@ -41,7 +41,12 @@ const AttanmentNode = ({id, type, isConnectable}: NodeProps) => {
   };
 
   return (
-    <BaseNode id={id} type={type as CustomNodeTypes} error={error}>
+    <BaseNode
+      id={id}
+      type={type as CustomNodeTypes}
+      selected={selected}
+      error={error}
+    >
       <input
         style={{width: '70px'}}
         onChange={handleChange}

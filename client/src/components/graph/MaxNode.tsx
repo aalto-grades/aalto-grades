@@ -20,7 +20,7 @@ const initialSettings = {minValue: '0'};
 const handleStartHeight = 83 + 33.9;
 const rowHeight = 33.9;
 
-const MaxNode = ({id, type, isConnectable}: NodeProps) => {
+const MaxNode = ({id, type, selected, isConnectable}: NodeProps) => {
   const updateNodeInternals = useUpdateNodeInternals();
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
@@ -87,7 +87,12 @@ const MaxNode = ({id, type, isConnectable}: NodeProps) => {
   }
 
   return (
-    <BaseNode id={id} type={type as CustomNodeTypes} error={error}>
+    <BaseNode
+      id={id}
+      type={type as CustomNodeTypes}
+      selected={selected}
+      error={error}
+    >
       {handles.map((key, index) => (
         <Handle
           key={`handle-${key}`}
