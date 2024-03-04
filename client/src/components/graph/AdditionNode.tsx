@@ -80,7 +80,7 @@ const AdditionNode = ({id, type, isConnectable}: NodeProps) => {
             .filter(([_, source]) => source.isConnected)
             .map(([key, source]) => (
               <tr key={`tr-${key}`}>
-                <td>{source.value}</td>
+                <td>{Math.round(source.value * 100) / 100}</td>
               </tr>
             ))}
           <tr>

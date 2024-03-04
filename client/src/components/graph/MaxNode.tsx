@@ -139,7 +139,7 @@ const MaxNode = ({id, type, isConnectable}: NodeProps) => {
                   backgroundColor: index === selectedIndex ? '#00f6' : '',
                 }}
               >
-                <td>{source.value}</td>
+                <td>{Math.round(source.value * 100) / 100}</td>
               </tr>
             ))}
           <tr style={{height: rowHeight}}>

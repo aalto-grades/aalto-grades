@@ -242,8 +242,18 @@ const SubstituteNode = ({id, type, isConnectable}: NodeProps) => {
                       : '',
                 }}
               >
-                <td>{nodeValue.sources[key].value}</td>
-                <td>{nodeValue.values[key]}</td>
+                <td>
+                  {nodeValue.sources[key].value === 'fail'
+                    ? nodeValue.sources[key].value
+                    : Math.round(
+                        (nodeValue.sources[key].value as number) * 100
+                      ) / 100}
+                </td>
+                <td>
+                  {nodeValue.values[key] === 'fail'
+                    ? nodeValue.values[key]
+                    : Math.round((nodeValue.values[key] as number) * 100) / 100}
+                </td>
               </tr>
             ))}
           <tr style={{height: rowHeight}}>
@@ -276,7 +286,13 @@ const SubstituteNode = ({id, type, isConnectable}: NodeProps) => {
                       : '',
                 }}
               >
-                <td>{nodeValue.sources[key].value}</td>
+                <td>
+                  {nodeValue.sources[key].value === 'fail'
+                    ? nodeValue.sources[key].value
+                    : Math.round(
+                        (nodeValue.sources[key].value as number) * 100
+                      ) / 100}
+                </td>
                 <td>
                   <input
                     style={{width: '50px'}}

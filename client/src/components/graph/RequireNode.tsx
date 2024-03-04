@@ -175,11 +175,15 @@ const RequireNode = ({id, type, isConnectable}: NodeProps) => {
                   backgroundColor: source.value === 'fail' ? '#f003' : '',
                 }}
               >
-                <td>{source.value}</td>
+                <td>
+                  {source.value === 'fail'
+                    ? source.value
+                    : Math.round(source.value * 100) / 100}
+                </td>
                 <td>
                   {numFail > settings.numFail || source.value === 'fail'
                     ? 0
-                    : source.value}
+                    : Math.round(source.value * 100) / 100}
                 </td>
               </tr>
             ))}
