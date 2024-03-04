@@ -4,12 +4,14 @@
 import {useMeasure} from '@uidotdev/usehooks';
 import {PropsWithChildren, useContext, useEffect, useState} from 'react';
 import 'reactflow/dist/style.css';
+import WarningIcon from '@mui/icons-material/Warning';
 
 import {CustomNodeTypes} from '@common/types/graph';
 import {
   NodeDataContext,
-  NodeDimensionsContext,
+  ExtraNodeDataContext,
 } from '../../context/GraphProvider';
+import {Tooltip} from '@mui/material';
 
 const BaseNode: React.FC<
   PropsWithChildren<{
@@ -21,9 +23,11 @@ const BaseNode: React.FC<
 > = ({id, type, error, courseFail, children}) => {
   const [ref, {width, height}] = useMeasure();
   const {nodeData, setNodeTitle} = useContext(NodeDataContext);
-  const {setNodeDimensions} = useContext(NodeDimensionsContext);
+  const {setNodeDimensions, extraNodeData} = useContext(ExtraNodeDataContext);
   const [init, setInit] = useState<boolean>(false);
   const [localTitle, setLocalTitle] = useState<string>('');
+
+  const extraData = extraNodeData[id];
 
   useEffect(() => {
     setNodeDimensions(id, width as number, height as number);
@@ -45,10 +49,16 @@ const BaseNode: React.FC<
           ? '2px solid #e00'
           : error
           ? '1px dashed #e00'
+          : extraData?.warning
+          ? '1px solid #ffb833'
           : '1px solid #eee',
         padding: '10px',
         borderRadius: '5px',
-        background: error ? '#fffafa' : 'white',
+        background: error
+          ? '#fffafa'
+          : extraData?.warning
+          ? '#fff6e5'
+          : 'white',
       }}
     >
       <div>
@@ -60,6 +70,13 @@ const BaseNode: React.FC<
         >
           {localTitle}
         </h4>
+        {extraData?.warning && (
+          <div style={{position: 'absolute', top: '5px', right: '5px'}}>
+            <Tooltip title={extraData.warning} placement="top">
+              <WarningIcon color="warning" sx={{fontSize: '16px'}} />
+            </Tooltip>
+          </div>
+        )}
         {children}
       </div>
       <p

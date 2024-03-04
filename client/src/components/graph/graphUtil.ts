@@ -11,7 +11,7 @@ import {
   NodeValue,
   NodeValues,
 } from '@common/types/graph';
-import {NodeDimensions} from '../../context/GraphProvider';
+import {ExtraNodeData} from '../../context/GraphProvider';
 
 export const initNode = (
   type: CustomNodeTypes
@@ -136,15 +136,15 @@ const elk = new ElkConstructor();
 export const formatGraph = async (
   nodes: Node[],
   edges: Edge[],
-  nodeDimensions: NodeDimensions,
+  nodeDimensions: ExtraNodeData,
   nodeValues: NodeValues
 ): Promise<Node[]> => {
   // TODO: remove the ?? 100 when format on load is removed
   const nodesForElk = nodes.map(node => ({
     type: node.type,
     id: node.id,
-    width: nodeDimensions[node.id]?.width ?? 100,
-    height: nodeDimensions[node.id]?.height ?? 100,
+    width: nodeDimensions[node.id]?.dimensions.width ?? 100,
+    height: nodeDimensions[node.id]?.dimensions.height ?? 100,
   }));
   const graph = {
     id: 'root',

@@ -22,6 +22,7 @@ import {
   useDeleteAssessmentModel,
   useEditAssessmentModel,
   useGetAllAssessmentModels,
+  useGetAttainments,
 } from '../../hooks/useApi';
 import {GraphStructure} from '@common/types/graph';
 import Graph from '../graph/Graph';
@@ -36,6 +37,7 @@ export default function ModelsView(): JSX.Element {
   const models = useGetAllAssessmentModels(courseId);
   const editModel = useEditAssessmentModel();
   const delModel = useDeleteAssessmentModel();
+  const attainments = useGetAttainments(courseId);
 
   const [currentModel, setCurrentModel] = useState<AssessmentModelData>(
     {} as AssessmentModelData
@@ -57,7 +59,7 @@ export default function ModelsView(): JSX.Element {
     }
   }, [loadGraphId, models.data]);
 
-  if (models.data === undefined) return <></>;
+  if (models.data === undefined || attainments.data === undefined) return <></>;
 
   const loadGraph = (model: AssessmentModelData): void => {
     setModelsListOpen(false);
@@ -149,6 +151,7 @@ export default function ModelsView(): JSX.Element {
           <Divider sx={{my: 1}} />
           <Graph
             initGraph={currentModel.graphStructure as GraphStructure}
+            attainments={attainments.data}
             onSave={onSave}
           />
         </>

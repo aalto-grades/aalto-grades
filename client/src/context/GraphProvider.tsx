@@ -27,12 +27,16 @@ export const NodeDataContext = createContext<NodeDataContext>(
   {} as NodeDataContext
 );
 
-// Node dimensions
-export type NodeDimensions = {[key: string]: {width: number; height: number}};
-type NodeDimensionsContext = {
-  nodeDimensions: NodeDimensions;
+export type ExtraNodeData = {
+  [key: string]: {
+    dimensions: {width: number; height: number};
+    warning?: string;
+  };
+};
+type ExtraNodeDataContext = {
+  extraNodeData: ExtraNodeData;
   setNodeDimensions: (id: string, width: number, height: number) => void;
 };
-export const NodeDimensionsContext = createContext<NodeDimensionsContext>(
-  {} as NodeDimensionsContext
+export const ExtraNodeDataContext = createContext<ExtraNodeDataContext>(
+  {} as ExtraNodeDataContext
 );

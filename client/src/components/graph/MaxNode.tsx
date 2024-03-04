@@ -129,17 +129,19 @@ const MaxNode = ({id, type, isConnectable}: NodeProps) => {
             </td>
           </tr>
 
-          {Object.entries(nodeValue.sources).map(([key, source], index) => (
-            <tr
-              key={`tr-${id}-${key}`}
-              style={{
-                height: rowHeight,
-                backgroundColor: index === selectedIndex ? '#00f6' : '',
-              }}
-            >
-              <td>{source.value}</td>
-            </tr>
-          ))}
+          {Object.entries(nodeValue.sources)
+            .filter(([_, source]) => source.isConnected)
+            .map(([key, source], index) => (
+              <tr
+                key={`tr-${id}-${key}`}
+                style={{
+                  height: rowHeight,
+                  backgroundColor: index === selectedIndex ? '#00f6' : '',
+                }}
+              >
+                <td>{source.value}</td>
+              </tr>
+            ))}
           <tr style={{height: rowHeight}}>
             <td></td>
           </tr>

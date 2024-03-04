@@ -38,8 +38,8 @@ import {
 import {calculateNewNodeValues} from '@common/util/calculateGraph';
 import {
   NodeDataContext,
-  NodeDimensions,
-  NodeDimensionsContext,
+  ExtraNodeData,
+  ExtraNodeDataContext,
   NodeValuesContext,
 } from '../../context/GraphProvider';
 import AdditionNode from './AdditionNode';
@@ -53,6 +53,7 @@ import StepperNode from './StepperNode';
 import SubstituteNode from './SubstituteNode';
 import './flow.css';
 import {findDisconnectedEdges, formatGraph, initNode} from './graphUtil';
+import {AttainmentData} from '@common/types';
 
 const nodeTypesMap = {
   addition: AdditionNode,
@@ -68,17 +69,17 @@ const nodeTypesMap = {
 
 const Graph = ({
   initGraph,
+  attainments,
   onSave,
 }: {
   initGraph: GraphStructure;
+  attainments: AttainmentData[];
   onSave: (graphStructure: GraphStructure) => void;
 }): JSX.Element => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [nodeData, setNodeData] = useState<FullNodeData>({});
-  const [nodeDimensions, setNodeContextDimensions] = useState<NodeDimensions>(
-    {}
-  );
+  const [extraNodeData, setExtraNodeData] = useState<ExtraNodeData>({});
   const [nodeValues, setNodeValues] = useState<NodeValues>({});
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance | null>(null);
@@ -92,6 +93,7 @@ const Graph = ({
   const [oldNodeValues, setOldNodeValues] = useState<string>('{}');
 
   const [unsaved, setUnsaved] = useState<boolean>(false);
+  const [archivedAttainments, setArchivedAttainments] = useState<string[]>([]);
   const [originalGraphStructure, setOriginalGraphStructure] =
     useState<GraphStructure>({nodes: [], edges: [], nodeData: {}});
 
@@ -111,9 +113,9 @@ const Graph = ({
     }));
   };
   const setNodeDimensions = (id: string, width: number, height: number) => {
-    setNodeContextDimensions(oldNodeDimensions => ({
-      ...oldNodeDimensions,
-      [id]: {width, height},
+    setExtraNodeData(oldExtraNodeData => ({
+      ...oldExtraNodeData,
+      [id]: {...oldExtraNodeData[id], dimensions: {width, height}},
     }));
   };
   const setNodeSettings = (id: string, settings: NodeSettings) => {
@@ -201,6 +203,7 @@ const Graph = ({
     }
   }, [loading, nodes, edges, nodeData, nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Warning if leaving with unsaved
   useEffect(() => {
     const onBeforeUnload = (e: BeforeUnloadEvent) => {
       if (unsaved) {
@@ -212,32 +215,63 @@ const Graph = ({
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [unsaved]);
 
-  const loadGraph = (initGraph: {
-    nodes: Node[];
-    edges: Edge[];
-    nodeData: FullNodeData;
-  }) => {
+  useEffect(() => {
     console.debug('Loading graph');
     setLoading(true);
+
+    const attainmentIds = attainments.map(attainment => attainment.id);
+    const existingAttainments: number[] = [];
+    for (const node of initGraph.nodes) {
+      if (node.type !== 'attainment') continue;
+      const attainmentId = parseInt(node.id.split('-')[1]);
+
+      existingAttainments.push(attainmentId);
+      if (!attainmentIds.includes(attainmentId)) {
+        setExtraNodeData(oldExtraNodeData => ({
+          ...oldExtraNodeData,
+          [node.id]: {
+            ...oldExtraNodeData[node.id],
+            warning: 'Attainment is archived',
+          },
+        }));
+        setArchivedAttainments(oldArchivedAttainments =>
+          oldArchivedAttainments.concat(node.id)
+        );
+      }
+    }
+
+    const newNodes = [...initGraph.nodes];
+    const newNodeData = {...initGraph.nodeData};
+    for (const attainment of attainments) {
+      if (existingAttainments.includes(attainment.id)) continue;
+      newNodes.push({
+        id: `attainment-${attainment.id}`,
+        type: 'attainment',
+        position: {x: 0, y: 100 * newNodes.length},
+        data: {},
+      });
+      newNodeData[`attainment-${attainment.id}`] = {
+        title: attainment.name,
+      };
+    }
+
     for (const node of nodes) onNodesChange([{id: node.id, type: 'remove'}]);
     // Timeout to prevent nodes updating with missing data
     setTimeout(() => {
       const initNodeValues: {[key: string]: NodeValue} = {};
-      for (const node of initGraph.nodes)
+      for (const node of newNodes)
         initNodeValues[node.id] = initNode(node.type as CustomNodeTypes).value;
 
-      setNodes(initGraph.nodes);
+      setNodes(newNodes);
       setEdges(initGraph.edges);
-      setNodeData(initGraph.nodeData);
+      setNodeData(newNodeData);
       setNodeValues(initNodeValues);
 
       setOriginalGraphStructure(initGraph);
       setUnsaved(false);
       setLoading(false);
     }, 0);
-  };
-
-  useEffect(() => loadGraph(initGraph), [initGraph]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [initGraph]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -303,7 +337,7 @@ const Graph = ({
   );
 
   const format = async () => {
-    setNodes(await formatGraph(nodes, edges, nodeDimensions, nodeValues));
+    setNodes(await formatGraph(nodes, edges, extraNodeData, nodeValues));
   };
 
   // Handle drop-in nodes
@@ -352,9 +386,7 @@ const Graph = ({
 
   return (
     <NodeValuesContext.Provider value={{nodeValues, setNodeValue}}>
-      <NodeDimensionsContext.Provider
-        value={{nodeDimensions, setNodeDimensions}}
-      >
+      <ExtraNodeDataContext.Provider value={{extraNodeData, setNodeDimensions}}>
         <NodeDataContext.Provider
           value={{nodeData, setNodeTitle, setNodeSettings}}
         >
@@ -367,6 +399,7 @@ const Graph = ({
                   changes.filter(
                     change =>
                       change.type !== 'remove' ||
+                      archivedAttainments.includes(change.id) ||
                       (nodeMap[change.id].type !== 'attainment' &&
                         nodeMap[change.id].type !== 'grade')
                   )
@@ -448,7 +481,7 @@ const Graph = ({
             Save
           </Button>
         </NodeDataContext.Provider>
-      </NodeDimensionsContext.Provider>
+      </ExtraNodeDataContext.Provider>
     </NodeValuesContext.Provider>
   );
 };
