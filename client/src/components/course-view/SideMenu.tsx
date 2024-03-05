@@ -1,6 +1,23 @@
-import {Box, Button, ButtonBase, Divider} from '@mui/material';
+import {
+  AccountTree,
+  AccountTreeOutlined,
+  FlagCircle,
+  FlagCircleOutlined,
+  Widgets,
+  WidgetsOutlined,
+} from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  Divider,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from '@mui/material';
 import React from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
+import {NavLink, useNavigate, useParams} from 'react-router-dom';
 
 const SideMenu: React.FC = () => {
   const {courseId} = useParams() as {courseId: string};
@@ -16,47 +33,111 @@ const SideMenu: React.FC = () => {
       >
         <Button variant="outlined">Upload Grades</Button>
         <Divider sx={{my: 2}} />
-        <ButtonBase
-          sx={{
-            width: '100%',
-            padding: 1,
-            borderRadius: 100,
-            fontSize: '1rem',
-            textAlign: 'left',
-          }}
-          onClick={(): void => {
-            navigate(`/${courseId}/course-results`);
-          }}
-        >
-          Grades
-        </ButtonBase>
-        <ButtonBase
-          sx={{
-            width: '100%',
-            padding: 1,
-            borderRadius: 100,
-            fontSize: '1rem',
-          }}
-          onClick={(): void => {
-            navigate(`/${courseId}/models`);
-          }}
-        >
-          Models
-        </ButtonBase>
-        <ButtonBase
-          sx={{
-            width: '100%',
-            padding: 1,
-            borderRadius: 100,
-            fontSize: '1rem',
-          }}
-          onClick={(): void => {
-            navigate(`/${courseId}/attainments`);
-          }}
-        >
-          Attainments
-        </ButtonBase>
+        <List>
+          <ListItem disablePadding>
+            <NavLink
+              to={`/${courseId}/course-results`}
+              style={{
+                color: 'inherit',
+                width: '100%',
+                textDecoration: 'none',
+              }}
+            >
+              {({isActive, isPending, isTransitioning}) => {
+                return (
+                  <ListItemButton
+                    sx={{
+                      color: 'inherit',
+                      width: '100%',
+                      // padding: 1,
+                      borderRadius: 100,
+                      fontSize: '1rem',
+                      textAlign: 'left',
+                      backgroundColor: isActive ? 'rgba(0, 0, 0, 0.1)' : '',
+                    }}
+                    onClick={(): void => {
+                      navigate(`/${courseId}/course-results`);
+                    }}
+                  >
+                    <ListItemIcon>
+                      {isActive ? <FlagCircle /> : <FlagCircleOutlined />}
+                    </ListItemIcon>
+                    <ListItemText primary="Grades" />
+                  </ListItemButton>
+                );
+              }}
+            </NavLink>
+          </ListItem>
 
+          <ListItem disablePadding>
+            <NavLink
+              to={`/${courseId}/models`}
+              style={{
+                color: 'inherit',
+                width: '100%',
+                textDecoration: 'none',
+              }}
+            >
+              {({isActive, isPending, isTransitioning}) => {
+                return (
+                  <ListItemButton
+                    sx={{
+                      color: 'inherit',
+                      width: '100%',
+                      // padding: 1,
+                      borderRadius: 100,
+                      fontSize: '1rem',
+                      textAlign: 'left',
+                      backgroundColor: isActive ? 'rgba(0, 0, 0, 0.1)' : '',
+                    }}
+                    onClick={(): void => {
+                      navigate(`/${courseId}/models`);
+                    }}
+                  >
+                    <ListItemIcon>
+                      {isActive ? <AccountTree /> : <AccountTreeOutlined />}
+                    </ListItemIcon>
+                    <ListItemText primary="Models" />
+                  </ListItemButton>
+                );
+              }}
+            </NavLink>
+          </ListItem>
+          <ListItem disablePadding>
+            <NavLink
+              to={`/${courseId}/attainments`}
+              style={{
+                color: 'inherit',
+                width: '100%',
+                textDecoration: 'none',
+              }}
+            >
+              {({isActive, isPending, isTransitioning}) => {
+                return (
+                  <ListItemButton
+                    sx={{
+                      color: 'inherit',
+                      width: '100%',
+                      // padding: 1,
+                      borderRadius: 100,
+                      fontSize: '1rem',
+                      textAlign: 'left',
+                      backgroundColor: isActive ? 'rgba(0, 0, 0, 0.1)' : '',
+                    }}
+                    onClick={(): void => {
+                      navigate(`/${courseId}/attainments`);
+                    }}
+                  >
+                    <ListItemIcon>
+                      {isActive ? <Widgets /> : <WidgetsOutlined />}
+                    </ListItemIcon>
+                    <ListItemText primary="Attainments" />
+                  </ListItemButton>
+                );
+              }}
+            </NavLink>
+          </ListItem>
+        </List>
         <div style={{display: 'flex', gap: 0}}>
           <div style={{display: 'flex', flexDirection: 'column', gap: 0}}>
             {/* <AssessmentModelsPicker

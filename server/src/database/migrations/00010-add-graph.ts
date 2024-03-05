@@ -2,9 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {DataTypes, QueryInterface} from 'sequelize';
-
-import logger from '../../configs/winston';
+import {DataTypes, Deferrable, QueryInterface} from 'sequelize';
 
 export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
@@ -14,19 +12,28 @@ export default {
       await queryInterface.removeColumn('attainment', 'formula_params');
       await queryInterface.removeColumn('attainment', 'parent_id');
       await queryInterface.removeColumn('attainment', 'assessment_model_id');
-
-      await queryInterface.addColumn('attainment', 'course_id', {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'course',
-          key: 'id',
-        },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
-      });
     } catch (error) {
-      logger.error(error);
+      console.error(error);
+    }
+    try {
+      await queryInterface.addColumn(
+        'attainment',
+        'course_id',
+        {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          references: {
+            model: 'course',
+            key: 'id',
+            deferrable: new Deferrable.INITIALLY_DEFERRED(),
+          },
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE',
+        },
+        {}
+      );
+    } catch (error) {
+      console.error(error);
     }
   },
   down: async (queryInterface: QueryInterface): Promise<void> => {
@@ -68,7 +75,7 @@ export default {
 
       await transaction.commit();
     } catch (error) {
-      logger.error(error);
+      console.error(error);
       await transaction.rollback();
     }
   },

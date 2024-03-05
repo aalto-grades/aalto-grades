@@ -14,9 +14,9 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
+import {ReactQueryDevtools} from '@tanstack/react-query-devtools'; // For debugging
 import {CSSProperties, JSX} from 'react';
 import {Route, Routes} from 'react-router-dom';
-import {ReactQueryDevtools} from '@tanstack/react-query-devtools'; // For debugging
 
 import {SystemRole} from '@common/types';
 import CourseResultsView from './components/CourseResultsView';
@@ -35,12 +35,11 @@ import Signup from './components/auth/Signup';
 import UserButton from './components/auth/UserButton';
 import AddUserView from './components/front-page/users-view/AddUserView';
 
+import AttainmentsView from './components/course-view/AttainmentsView';
+import ModelsView from './components/course-view/ModelsView';
 import useSnackPackAlerts, {
   SnackPackAlertState,
 } from './hooks/useSnackPackAlerts';
-import Attainment from './components/edit-attainment-view/Attainment';
-import AttainmentsView from './components/course-view/AttainmentsView';
-import ModelsView from './components/course-view/ModelsView';
 
 declare module '@mui/material/styles' {
   interface PaletteOptions {
@@ -185,7 +184,7 @@ export default function App(): JSX.Element {
               <UserButton />
             </Toolbar>
           </AppBar>
-          <Container sx={{textAlign: 'center'}} maxWidth="xl">
+          <Container sx={{textAlign: 'center'}} maxWidth={false}>
             <Box mx={5} my={5}>
               <AlertSnackbar snackPack={snackPack} />
               <Routes>

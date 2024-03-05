@@ -4,20 +4,13 @@
 
 import {
   AssessmentModelData,
-  AttainmentData,
   CourseData,
   SystemRole,
   UserData,
 } from '@common/types';
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Fade,
-  Tooltip,
-  Typography,
-} from '@mui/material';
-import {JSX, useState, useEffect} from 'react';
+import {Box, Button, Typography} from '@mui/material';
+import {UseQueryResult} from '@tanstack/react-query';
+import {JSX, useEffect, useState} from 'react';
 import {
   NavigateFunction,
   Outlet,
@@ -25,22 +18,10 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom';
-import {UseQueryResult} from '@tanstack/react-query';
 
-import Attainments from './course-view/Attainments';
-import CreateAssessmentModelDialog from './course-view/CreateAssessmentModelDialog';
-import CourseDetails from './course-view/CourseDetails';
-
-import {
-  useGetAllAssessmentModels,
-  useGetAttainments,
-  useGetCourse,
-  useGetRootAttainment,
-} from '../hooks/useApi';
+import {useGetAllAssessmentModels, useGetCourse} from '../hooks/useApi';
 import useAuth, {AuthContextType} from '../hooks/useAuth';
 import {State} from '../types';
-import AssessmentModelsPicker from './course-view/AssessmentModelsPicker';
-import InstancesWidget from './course-view/InstancesWidget';
 import SideMenu from './course-view/SideMenu';
 
 export default function CourseView(): JSX.Element {
@@ -135,7 +116,14 @@ export default function CourseView(): JSX.Element {
         }}
       >
         <SideMenu />
-        <Outlet />
+        <Box
+          sx={{
+            marginLeft: 2,
+            width: '100%',
+          }}
+        >
+          <Outlet />
+        </Box>
       </Box>
     </>
   );

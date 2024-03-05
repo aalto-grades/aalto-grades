@@ -4,14 +4,14 @@
 
 import {AttainmentData, Formula, GradeType} from '@common/types';
 import {Box, Button, Container, Typography} from '@mui/material';
+import {UseQueryResult} from '@tanstack/react-query';
 import {JSX, SyntheticEvent, useState} from 'react';
 import {
   NavigateFunction,
   Params,
-  useParams,
   useNavigate,
+  useParams,
 } from 'react-router-dom';
-import {UseQueryResult} from '@tanstack/react-query';
 
 import UnsavedChangesDialog from './alerts/UnsavedChangesDialog';
 import Attainment from './edit-attainment-view/Attainment';
