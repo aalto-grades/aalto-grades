@@ -263,6 +263,7 @@ const Graph = ({
       setOriginalGraphStructure(initGraph);
       setUnsaved(false);
       setLoading(false);
+      reactFlowInstance?.fitView();
     }, 0);
   }, [initGraph]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -368,6 +369,11 @@ const Graph = ({
     setEdges(newEdges);
     setNodeData(newNodeData);
     setNodeValues(newNodeValues);
+    if (newAttainments.length > 0) {
+      setTimeout(() => {
+        reactFlowInstance?.fitView();
+      }, 0);
+    }
   };
 
   // Handle drop-in nodes
