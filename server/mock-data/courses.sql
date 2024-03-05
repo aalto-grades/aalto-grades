@@ -13,4 +13,8 @@ INSERT INTO public.course (course_code, min_credits, max_credits, grading_scale,
 ('ELEC-A7100', 5, 5, 'NUMERICAL', 'EN', NOW(), NOW()),
 ('PHYS-A1140', 5, 5, 'NUMERICAL', 'SV', NOW(), NOW()),
 ('Test edit course', 5, 5, 'PASS_FAIL', 'EN', NOW(), NOW()),
-('Test edit course and teachers', 5, 5, 'PASS_FAIL', 'EN', NOW(), NOW());
+('Test edit course and teachers', 5, 5, 'PASS_FAIL', 'EN', NOW(), NOW()),
+('CS-A????', 5, 5, 'NUMERICAL', 'EN', NOW(), NOW()),
+('CS-A????', 5, 5, 'NUMERICAL', 'EN', NOW(), NOW()),
+('CS-A????', 5, 5, 'NUMERICAL', 'EN', NOW(), NOW()),
+('CS-A????', 5, 5, 'NUMERICAL', 'EN', NOW(), NOW());

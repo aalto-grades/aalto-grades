@@ -35,4 +35,16 @@ INSERT INTO public.course_translation (course_id, language, department, course_n
 (10, 'SV', 'oredigerad institutionen', 'oredigerad namn', NOW(), NOW()),
 (11, 'EN', 'unedited department', 'unedited name', NOW(), NOW()),
 (11, 'FI', 'muokkaamaton laitos', 'muokkaamaton nimi', NOW(), NOW()),
-(11, 'SV', 'oredigerad institutionen', 'oredigerad namn', NOW(), NOW());
+(11, 'SV', 'oredigerad institutionen', 'oredigerad namn', NOW(), NOW()),
+(12, 'EN', 'Department of Computer Science', 'O1', NOW(), NOW()),
+(12, 'FI', 'Tietotekniikan laitos', 'O1', NOW(), NOW()),
+(12, 'SV', 'Institutionen för datateknik', 'O1', NOW(), NOW()),
+(13, 'EN', 'Department of Computer Science', 'Y1', NOW(), NOW()),
+(13, 'FI', 'Tietotekniikan laitos', 'Y1', NOW(), NOW()),
+(13, 'SV', 'Institutionen för datateknik', 'Y1', NOW(), NOW()),
+(14, 'EN', 'Department of Computer Science', 'Example Average', NOW(), NOW()),
+(14, 'FI', 'Tietotekniikan laitos', 'Example Average', NOW(), NOW()),
+(14, 'SV', 'Institutionen för datateknik', 'Example Average', NOW(), NOW()),
+(15, 'EN', 'Department of Computer Science', 'Example Sum', NOW(), NOW()),
+(15, 'FI', 'Tietotekniikan laitos', 'Example Sum', NOW(), NOW()),
+(15, 'SV', 'Institutionen för datateknik', 'Example Sum', NOW(), NOW());

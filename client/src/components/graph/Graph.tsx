@@ -400,7 +400,7 @@ const Graph = ({
       while (id in nodeMap) id = `dnd-${type}-${getId()}`; // To prevent duplicates from loading existing graph
 
       const initState = initNode(type);
-      const newNode: Node = {id, type, position, data: {label: type}};
+      const newNode: Node = {id, type, position, data: {}};
 
       setNodes(nodes => nodes.concat(newNode));
       setNodeValue(id, initState.value);
