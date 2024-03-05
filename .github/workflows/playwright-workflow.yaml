@@ -14,7 +14,7 @@ on:
 jobs:
   test-e2e:
     name: e2e test
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     env:
       LOCALHOST_URL: http://localhost:3005
       POSTGRES_PASSWORD: postgres
