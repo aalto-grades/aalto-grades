@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Button} from '@mui/material';
+import {Button, Divider, Typography} from '@mui/material';
 import {
   DragEventHandler,
   JSX,
@@ -26,6 +26,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
+import {AttainmentData} from '@common/types';
 import {
   CustomNodeTypes,
   DropInNodes,
@@ -37,9 +38,9 @@ import {
 } from '@common/types/graph';
 import {calculateNewNodeValues} from '@common/util/calculateGraph';
 import {
-  NodeDataContext,
   ExtraNodeData,
   ExtraNodeDataContext,
+  NodeDataContext,
   NodeValuesContext,
 } from '../../context/GraphProvider';
 import AdditionNode from './AdditionNode';
@@ -49,11 +50,11 @@ import GradeNode from './GradeNode';
 import MaxNode from './MaxNode';
 import MinPointsNode from './MinPointsNode';
 import RequireNode from './RequireNode';
+import SelectAttainmentsDialog from './SelectAttainmentsDialog';
 import StepperNode from './StepperNode';
 import SubstituteNode from './SubstituteNode';
 import './flow.css';
 import {findDisconnectedEdges, formatGraph, initNode} from './graphUtil';
-import {AttainmentData} from '@common/types';
 
 const nodeTypesMap = {
   addition: AdditionNode,
@@ -93,6 +94,8 @@ const Graph = ({
   const [oldNodeValues, setOldNodeValues] = useState<string>('{}');
 
   const [unsaved, setUnsaved] = useState<boolean>(false);
+  const [attainmentsSelectOpen, setAttainmentsSelectOpen] =
+    useState<boolean>(false);
   const [archivedAttainments, setArchivedAttainments] = useState<string[]>([]);
   const [originalGraphStructure, setOriginalGraphStructure] =
     useState<GraphStructure>({nodes: [], edges: [], nodeData: {}});
@@ -219,52 +222,38 @@ const Graph = ({
     console.debug('Loading graph');
     setLoading(true);
 
-    const attainmentIds = attainments.map(attainment => attainment.id);
-    const existingAttainments: number[] = [];
-    for (const node of initGraph.nodes) {
-      if (node.type !== 'attainment') continue;
-      const attainmentId = parseInt(node.id.split('-')[1]);
-
-      existingAttainments.push(attainmentId);
-      if (!attainmentIds.includes(attainmentId)) {
-        setExtraNodeData(oldExtraNodeData => ({
-          ...oldExtraNodeData,
-          [node.id]: {
-            ...oldExtraNodeData[node.id],
-            warning: 'Attainment is archived',
-          },
-        }));
-        setArchivedAttainments(oldArchivedAttainments =>
-          oldArchivedAttainments.concat(node.id)
-        );
-      }
-    }
-
-    const newNodes = [...initGraph.nodes];
-    const newNodeData = {...initGraph.nodeData};
-    for (const attainment of attainments) {
-      if (existingAttainments.includes(attainment.id)) continue;
-      newNodes.push({
-        id: `attainment-${attainment.id}`,
-        type: 'attainment',
-        position: {x: 0, y: 100 * newNodes.length},
-        data: {},
-      });
-      newNodeData[`attainment-${attainment.id}`] = {
-        title: attainment.name,
-      };
-    }
-
     for (const node of nodes) onNodesChange([{id: node.id, type: 'remove'}]);
+
     // Timeout to prevent nodes updating with missing data
     setTimeout(() => {
+      // Check for archived attainments
+      const attainmentIds = attainments.map(attainment => attainment.id);
+      for (const node of initGraph.nodes) {
+        if (node.type !== 'attainment') continue;
+        const attainmentId = parseInt(node.id.split('-')[1]);
+
+        if (!attainmentIds.includes(attainmentId)) {
+          setExtraNodeData(oldExtraNodeData => ({
+            ...oldExtraNodeData,
+            [node.id]: {
+              ...oldExtraNodeData[node.id],
+              warning: 'Attainment has been deleted',
+            },
+          }));
+          setArchivedAttainments(oldArchivedAttainments =>
+            oldArchivedAttainments.concat(node.id)
+          );
+        }
+      }
+
+      // Load initGraph
       const initNodeValues: {[key: string]: NodeValue} = {};
-      for (const node of newNodes)
+      for (const node of initGraph.nodes)
         initNodeValues[node.id] = initNode(node.type as CustomNodeTypes).value;
 
-      setNodes(newNodes);
+      setNodes(initGraph.nodes);
       setEdges(initGraph.edges);
-      setNodeData(newNodeData);
+      setNodeData(initGraph.nodeData);
       setNodeValues(initNodeValues);
 
       setOriginalGraphStructure(initGraph);
@@ -340,6 +329,43 @@ const Graph = ({
     setNodes(await formatGraph(nodes, edges, extraNodeData, nodeValues));
   };
 
+  const handleAttainmentSelect = (
+    newAttainments: AttainmentData[],
+    removedAttainments: AttainmentData[]
+  ) => {
+    setAttainmentsSelectOpen(false);
+
+    let newNodes = [...nodes];
+    let newEdges = [...edges];
+    const newNodeValues = {...nodeValues};
+    const newNodeData = {...nodeData};
+
+    for (const attainment of newAttainments) {
+      newNodes.push({
+        id: `attainment-${attainment.id}`,
+        type: 'attainment',
+        position: {x: 0, y: 100 * newNodes.length},
+        data: {},
+      });
+      newNodeData[`attainment-${attainment.id}`] = {
+        title: attainment.name,
+      };
+      newNodeValues[`attainment-${attainment.id}`] =
+        initNode('attainment').value;
+    }
+
+    for (const attainment of removedAttainments) {
+      const nodeId = `attainment-${attainment.id}`;
+      newNodes = newNodes.filter(nnode => nnode.id !== nodeId);
+      newEdges = newEdges.filter(edge => edge.source !== nodeId);
+    }
+
+    setNodes(newNodes);
+    setEdges(newEdges);
+    setNodeData(newNodeData);
+    setNodeValues(newNodeValues);
+  };
+
   // Handle drop-in nodes
   const onDragStart = (
     event: React.DragEvent<HTMLDivElement>,
@@ -385,104 +411,142 @@ const Graph = ({
   );
 
   return (
-    <NodeValuesContext.Provider value={{nodeValues, setNodeValue}}>
-      <ExtraNodeDataContext.Provider value={{extraNodeData, setNodeDimensions}}>
-        <NodeDataContext.Provider
-          value={{nodeData, setNodeTitle, setNodeSettings}}
+    <>
+      <SelectAttainmentsDialog
+        nodes={nodes}
+        attainments={attainments}
+        open={attainmentsSelectOpen}
+        onClose={handleAttainmentSelect}
+      />
+      <NodeValuesContext.Provider value={{nodeValues, setNodeValue}}>
+        <ExtraNodeDataContext.Provider
+          value={{extraNodeData, setNodeDimensions}}
         >
-          <div style={{width: '100%', height: '60vh'}}>
-            <ReactFlow
-              nodes={nodes}
-              edges={edges}
-              onNodesChange={changes =>
-                onNodesChange(
-                  changes.filter(
-                    change =>
-                      change.type !== 'remove' ||
-                      archivedAttainments.includes(change.id) ||
-                      (nodeMap[change.id].type !== 'attainment' &&
-                        nodeMap[change.id].type !== 'grade')
+          <NodeDataContext.Provider
+            value={{nodeData, setNodeTitle, setNodeSettings}}
+          >
+            <div style={{width: '100%', height: '60vh'}}>
+              <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={changes =>
+                  onNodesChange(
+                    changes.filter(
+                      change =>
+                        change.type !== 'remove' ||
+                        archivedAttainments.includes(change.id) ||
+                        (nodeMap[change.id].type !== 'attainment' &&
+                          nodeMap[change.id].type !== 'grade')
+                    )
                   )
-                )
-              }
-              onEdgesChange={onEdgesChange}
-              onConnect={onConnect}
-              isValidConnection={isValidConnection}
-              nodeTypes={nodeTypesMap}
-              onInit={setReactFlowInstance}
-              onDrop={onDrop}
-              onDragOver={onDragOver}
-              fitView
+                }
+                onEdgesChange={onEdgesChange}
+                onConnect={onConnect}
+                isValidConnection={isValidConnection}
+                nodeTypes={nodeTypesMap}
+                onInit={setReactFlowInstance}
+                onDrop={onDrop}
+                onDragOver={onDragOver}
+                fitView
+              >
+                <Controls />
+                <MiniMap />
+                <Background
+                  variant={BackgroundVariant.Dots}
+                  gap={12}
+                  size={1}
+                />
+              </ReactFlow>
+            </div>
+            <Divider />
+            <div style={{marginBottom: '5px'}}>
+              <div
+                className="dndnode"
+                onDragStart={event => onDragStart(event, 'addition')}
+                draggable
+              >
+                AdditionNode
+              </div>
+              <div
+                className="dndnode"
+                onDragStart={event => onDragStart(event, 'average')}
+                draggable
+              >
+                AverageNode
+              </div>
+              <div
+                className="dndnode"
+                onDragStart={event => onDragStart(event, 'stepper')}
+                draggable
+              >
+                StepperNode
+              </div>
+              <div
+                className="dndnode"
+                onDragStart={event => onDragStart(event, 'minpoints')}
+                draggable
+              >
+                RequirePointsNode
+              </div>
+              <div
+                className="dndnode"
+                onDragStart={event => onDragStart(event, 'max')}
+                draggable
+              >
+                MaxNode
+              </div>
+              <div
+                className="dndnode"
+                onDragStart={event => onDragStart(event, 'require')}
+                draggable
+              >
+                RequireNode
+              </div>
+              <div
+                className="dndnode"
+                onDragStart={event => onDragStart(event, 'substitute')}
+                draggable
+              >
+                SubstituteNode
+              </div>
+            </div>
+            <div style={{float: 'left', marginLeft: '5px'}}>
+              <Button onClick={() => setAttainmentsSelectOpen(true)}>
+                Select Attainments
+              </Button>
+              <Button onClick={format}>Format</Button>
+            </div>
+            <div
+              style={{
+                float: 'right',
+                marginBottom: '5px',
+                marginRight: '5px',
+                display: 'flex',
+              }}
             >
-              <Controls />
-              <MiniMap />
-              <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
-            </ReactFlow>
-          </div>
-          <div
-            className="dndnode"
-            onDragStart={event => onDragStart(event, 'addition')}
-            draggable
-          >
-            AdditionNode
-          </div>
-          <div
-            className="dndnode"
-            onDragStart={event => onDragStart(event, 'average')}
-            draggable
-          >
-            AverageNode
-          </div>
-          <div
-            className="dndnode"
-            onDragStart={event => onDragStart(event, 'stepper')}
-            draggable
-          >
-            StepperNode
-          </div>
-          <div
-            className="dndnode"
-            onDragStart={event => onDragStart(event, 'minpoints')}
-            draggable
-          >
-            RequirePointsNode
-          </div>
-          <div
-            className="dndnode"
-            onDragStart={event => onDragStart(event, 'max')}
-            draggable
-          >
-            MaxNode
-          </div>
-          <div
-            className="dndnode"
-            onDragStart={event => onDragStart(event, 'require')}
-            draggable
-          >
-            RequireNode
-          </div>
-          <div
-            className="dndnode"
-            onDragStart={event => onDragStart(event, 'substitute')}
-            draggable
-          >
-            SubstituteNode
-          </div>
-          <Button onClick={format}>Format</Button>
-          {unsaved && <p style={{display: 'inline'}}>Unsaved progress</p>}
-          <Button
-            variant={unsaved ? 'contained' : 'text'}
-            onClick={() => {
-              onSave({nodes, edges, nodeData});
-              setOriginalGraphStructure({nodes, edges, nodeData});
-              setUnsaved(false);
-            }}
-          >
-            Save
-          </Button>
-        </NodeDataContext.Provider>
-      </ExtraNodeDataContext.Provider>
-    </NodeValuesContext.Provider>
+              {unsaved && (
+                <Typography
+                  sx={{display: 'inline', alignSelf: 'center', mr: 1}}
+                >
+                  Unsaved progress
+                </Typography>
+              )}
+              <Button
+                variant={unsaved ? 'contained' : 'text'}
+                onClick={() => {
+                  onSave({nodes, edges, nodeData});
+                  setOriginalGraphStructure({nodes, edges, nodeData});
+                  setUnsaved(false);
+                }}
+                sx={{float: 'right'}}
+              >
+                Save
+              </Button>
+            </div>
+          </NodeDataContext.Provider>
+        </ExtraNodeDataContext.Provider>
+      </NodeValuesContext.Provider>
+    </>
   );
 };
 
