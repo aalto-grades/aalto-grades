@@ -98,7 +98,7 @@ export default function CourseResultsTableToolbar(props: {
             gap: 2,
           }}
         >
-          <MenuButton label="Import grades" options={actionOptions} />
+          {/* <MenuButton label="Import grades" options={actionOptions} /> */}
           <Tooltip
             title="Download grading template with attainment names and student numbers."
             placement="top"

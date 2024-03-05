@@ -44,7 +44,7 @@ export default function CourseResultsView(): JSX.Element {
     setHasPendingStudents(
       Boolean(
         selectedStudents.find(
-          (student: FinalGrade) => student.grades.length === 0
+          (student: FinalGrade) => student.grades?.length === 0
         )
       )
     );

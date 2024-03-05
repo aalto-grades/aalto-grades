@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {FinalGrade, GradeOption, Language} from '@common/types';
+import {FinalGrade, GradeOption, Language, studentRow} from '@common/types';
 import {
   Box,
   Button,
@@ -93,6 +93,15 @@ export default function SisuDownloadDialog(props: {
     assessmentModelId: string;
   };
 
+  let selectedStudents = [];
+  if (props?.selectedStudents?.length !== 0) {
+    selectedStudents = props.selectedStudents.map((s: studentRow) => {
+      return {
+        studentNuimner: s.user.studentNumber,
+        grades: s.finalGrade?.grades ?? [],
+      };
+    });
+  }
   // state variables handling the alert messages.
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
@@ -136,21 +145,21 @@ export default function SisuDownloadDialog(props: {
 
       switch (override) {
         case 'exported':
-          studentNumbers = props.selectedStudents
+          studentNumbers = selectedStudents
             .filter((student: FinalGrade) =>
               userGradeAlreadyExported(student.grades)
             )
             .map((student: FinalGrade) => student.studentNumber);
           break;
         case 'unexported':
-          studentNumbers = props.selectedStudents
+          studentNumbers = selectedStudents
             .filter(
               (student: FinalGrade) => !userGradeAlreadyExported(student.grades)
             )
             .map((student: FinalGrade) => student.studentNumber);
           break;
         case 'all':
-          studentNumbers = props.selectedStudents.map(
+          studentNumbers = selectedStudents.map(
             (student: FinalGrade) => student.studentNumber
           );
           break;
@@ -171,7 +180,7 @@ export default function SisuDownloadDialog(props: {
 
   function userGradeAlreadyExported(grades: Array<GradeOption>): boolean {
     return Boolean(
-      grades.find((option: GradeOption) => option.exportedToSisu != null)
+      grades?.find((option: GradeOption) => option.exportedToSisu != null)
     );
   }
 

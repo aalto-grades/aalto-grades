@@ -2,8 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {
+  AttainmentGradeData,
+  FinalGrade,
+  GradeOption,
+  StudentGradesTree,
+  studentRow as StudentRow,
+} from '@common/types';
 import {ArrowUpward, ExpandLess, ExpandMore, Sort} from '@mui/icons-material';
-import {Badge, Checkbox, IconButton, Link, Tooltip} from '@mui/material';
+import {Badge, Checkbox, Icon, IconButton, Link, Tooltip} from '@mui/material';
 import '@tanstack/react-table';
 import {
   ExpandedState,
@@ -19,21 +26,13 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import {
-  AttainmentData,
-  AttainmentGradeData,
-  FinalGrade,
-  GradeOption,
-  StudentGradesTree,
-} from '@common/types';
 import * as React from 'react';
+import {useParams} from 'react-router-dom';
+import {useGetAttainments} from '../../hooks/useApi';
 import {findBestGradeOption} from '../../utils';
 import PrettyChip from '../shared/PrettyChip';
 import GradeCell from './GradeCell';
 import StudentGradesDialog from './StudentGradesDialog';
-import {useGetAttainments} from '../../hooks/useApi';
-import {Params, useParams} from 'react-router-dom';
-import {studentRow as StudentRow} from '@common/types';
 // This module is used to create meta data for colums cells
 declare module '@tanstack/table-core' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -186,7 +185,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
     () => groupByLastAttainmentDate(flattenData),
     [flattenData]
   );
-  console.log(groupedData);
+  // console.log(groupedData);
 
   const [rowSelection, setRowSelection] = React.useState({});
   const [expanded, setExpanded] = React.useState<ExpandedState>({});
@@ -401,12 +400,12 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
         );
       },
     }),
-    columnHelper.accessor('credits', {
-      header: 'Credits',
-      enableSorting: false,
-      cell: info => info.getValue(),
-      aggregatedCell: () => null,
-    }),
+    // columnHelper.accessor('credits', {
+    //   header: 'Credits',
+    //   enableSorting: false,
+    //   cell: info => info.getValue(),
+    //   aggregatedCell: () => null,
+    // }),
     columnHelper.accessor(row => row, {
       header: 'Final Grade',
       enableSorting: false,
@@ -551,7 +550,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
                           header.getContext()
                         )}
                         {!header.column.getCanSort() ? null : (
-                          <IconButton>
+                          <Icon>
                             <>
                               {{
                                 asc: <ArrowUpward />,
@@ -562,7 +561,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
                                 <Sort></Sort>
                               )}
                             </>
-                          </IconButton>
+                          </Icon>
                         )}
                       </>
                     </PrettyChip>
