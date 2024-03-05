@@ -249,7 +249,11 @@ const Graph = ({
       // Load initGraph
       const initNodeValues: {[key: string]: NodeValue} = {};
       for (const node of initGraph.nodes)
-        initNodeValues[node.id] = initNode(node.type as CustomNodeTypes).value;
+        initNodeValues[node.id] = initNode(
+          node.type as CustomNodeTypes,
+          node.id,
+          initGraph.edges
+        ).value;
 
       setNodes(initGraph.nodes);
       setEdges(initGraph.edges);
@@ -447,6 +451,7 @@ const Graph = ({
                 onInit={setReactFlowInstance}
                 onDrop={onDrop}
                 onDragOver={onDragOver}
+                onError={(i, m) => i !== '008' && console.warn(m)} // Ignore couldn't create edge warnings
                 fitView
               >
                 <Controls />

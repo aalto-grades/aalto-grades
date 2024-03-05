@@ -75,6 +75,17 @@ export default function ModelsView(): JSX.Element {
   };
 
   const onSave = (graphStructure: GraphStructure): void => {
+    // Remove unnecessary keys from data.
+    for (const node of graphStructure.nodes) {
+      delete node.dragging;
+      delete node.selected;
+      delete node.positionAbsolute;
+      delete node.width;
+      delete node.height;
+      // This is enough accuracy.
+      node.position.x = Math.round(node.position.x);
+      node.position.y = Math.round(node.position.y);
+    }
     editModel.mutate({
       courseId,
       assessmentModelId: currentModel.id as number,
