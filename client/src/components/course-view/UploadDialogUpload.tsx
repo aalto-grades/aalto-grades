@@ -3,12 +3,14 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Alert,
   Button,
   ButtonGroup,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  Snackbar,
   TextField,
 } from '@mui/material';
 import {
@@ -33,6 +35,10 @@ const UploadDialogUpload = ({columns, rows, setRows}: PropsType) => {
     rows.length > 0 ? 'edit' : 'import'
   );
   const [editText, setEditText] = useState<boolean>(rows.length > 0);
+  const [snackbar, setSnackBar] = useState<{
+    message: string;
+    severity: 'success' | 'error';
+  } | null>(null);
 
   const dataGridToolbar = () => {
     const handleClick = () => {
@@ -121,6 +127,18 @@ const UploadDialogUpload = ({columns, rows, setRows}: PropsType) => {
         </DialogActions>
       </Dialog>
       <DialogContent sx={{minHeight: 500}}>
+        <Snackbar
+          open={snackbar !== null}
+          autoHideDuration={3000}
+          onClose={() => setSnackBar(null)}
+        >
+          <Alert
+            severity={snackbar?.severity}
+            onClose={() => setSnackBar(null)}
+          >
+            {snackbar?.message}
+          </Alert>
+        </Snackbar>
         <Accordion
           expanded={expanded === 'import'}
           onChange={(_, expanded) => setExpanded(expanded ? 'import' : '')}
@@ -174,7 +192,17 @@ const UploadDialogUpload = ({columns, rows, setRows}: PropsType) => {
                     row.id === updatedRow.id ? updatedRow : row
                   )
                 );
+                // TODO: validate better
+                for (const [key, val] of Object.entries(updatedRow)) {
+                  if (key === 'id' || key === 'studentNo') continue;
+                  if ((val as number) < 0 || (val as number) > 5000)
+                    throw new Error('Value cannot be negative');
+                }
+                setSnackBar({message: 'Row saved!', severity: 'success'});
                 return updatedRow;
+              }}
+              onProcessRowUpdateError={error => {
+                setSnackBar({message: error.message, severity: 'error'});
               }}
             />
           </AccordionDetails>
