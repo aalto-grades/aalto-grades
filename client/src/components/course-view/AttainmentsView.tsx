@@ -3,11 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 import {AttainmentData} from '@common/types';
-import {Box, Button} from '@mui/material';
+import {Box, Button, Chip, IconButton} from '@mui/material';
 import {UseQueryResult} from '@tanstack/react-query';
 import {JSX, useState} from 'react';
 import {Params, useParams} from 'react-router-dom';
 
+import {AccessTime, Delete, Tag} from '@mui/icons-material';
 import {
   useAddAttainment,
   useDeleteAttainment,
@@ -27,36 +28,80 @@ export default function CourseView(): JSX.Element {
   const deleteAttainment = useDeleteAttainment();
 
   return (
-    <Box sx={{mx: -2.5}}>
+    <>
       <Button onClick={() => setOpen(true)}>Add attainment</Button>
-      {attainments.data &&
-        attainments.data.map((attainment: AttainmentData) => (
-          <Box
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            key={attainment.id}
-          >
-            <p>
-              {attainment.id} {attainment.name} {attainment.daysValid}{' '}
-            </p>
-
-            <Button
-              onClick={() =>
-                deleteAttainment.mutate({
-                  courseId: courseId,
-                  attainmentId: attainment.id,
-                })
-              }
+      <Box
+        style={{
+          display: 'flex',
+          width: '100%',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+          gap: '1rem',
+        }}
+        sx={{mx: -2.5}}
+      >
+        {attainments.data &&
+          attainments.data.map((attainment: AttainmentData) => (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              key={attainment.id}
             >
-              Delete
-            </Button>
-          </Box>
-        ))}
-      <NewAttainmentDialog handleClose={handleClose} open={open} />
-    </Box>
+              <Box
+                sx={{
+                  border: 1,
+                  borderColor: 'info.grey',
+                  borderRadius: 1,
+                  p: 1,
+                }}
+              >
+                <p>{attainment.name}</p>
+                <Chip
+                  icon={<Tag />}
+                  label={`${attainment.id}`}
+                  variant="outlined"
+                  size="small"
+                  sx={{mr: 1}}
+                />
+                <Chip
+                  icon={<AccessTime />}
+                  label={`${attainment.daysValid} days`}
+                  variant="outlined"
+                  size="small"
+                />
+
+                {/* <Button
+                  onClick={() =>
+                    deleteAttainment.mutate({
+                      courseId: courseId,
+                      attainmentId: attainment.id,
+                    })
+                  }
+                >
+                  Delete
+                </Button> */}
+                <IconButton
+                  onClick={() =>
+                    deleteAttainment.mutate({
+                      courseId,
+                      attainmentId: attainment.id,
+                    })
+                  }
+                  aria-description="delete attainment"
+                >
+                  <Delete />
+                </IconButton>
+              </Box>
+            </Box>
+          ))}
+        <NewAttainmentDialog handleClose={handleClose} open={open} />
+      </Box>
+    </>
   );
 }
