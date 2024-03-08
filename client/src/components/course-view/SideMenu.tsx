@@ -16,10 +16,9 @@ import {
   ListItemIcon,
   ListItemText,
 } from '@mui/material';
-import React from 'react';
 import {NavLink, useNavigate, useParams} from 'react-router-dom';
 
-const SideMenu: React.FC = () => {
+const SideMenu = ({onUpload}: {onUpload: () => void}) => {
   const {courseId} = useParams() as {courseId: string};
   const navigate = useNavigate();
 
@@ -31,7 +30,9 @@ const SideMenu: React.FC = () => {
           minWidth: '200px',
         }}
       >
-        <Button variant="outlined">Upload Grades</Button>
+        <Button variant="outlined" onClick={onUpload}>
+          Upload Grades
+        </Button>
         <Divider sx={{my: 2}} />
         <List>
           <ListItem disablePadding>
@@ -43,7 +44,7 @@ const SideMenu: React.FC = () => {
                 textDecoration: 'none',
               }}
             >
-              {({isActive, isPending, isTransitioning}) => {
+              {({isActive, isPending: _, isTransitioning: __}) => {
                 return (
                   <ListItemButton
                     sx={{
@@ -78,7 +79,7 @@ const SideMenu: React.FC = () => {
                 textDecoration: 'none',
               }}
             >
-              {({isActive, isPending, isTransitioning}) => {
+              {({isActive, isPending: _, isTransitioning: __}) => {
                 return (
                   <ListItemButton
                     sx={{
@@ -112,7 +113,7 @@ const SideMenu: React.FC = () => {
                 textDecoration: 'none',
               }}
             >
-              {({isActive, isPending, isTransitioning}) => {
+              {({isActive, isPending: _, isTransitioning: __}) => {
                 return (
                   <ListItemButton
                     sx={{

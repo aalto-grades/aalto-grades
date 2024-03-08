@@ -23,28 +23,35 @@ import {useGetAllAssessmentModels, useGetCourse} from '../hooks/useApi';
 import useAuth, {AuthContextType} from '../hooks/useAuth';
 import {State} from '../types';
 import SideMenu from './course-view/SideMenu';
+import UploadDialog from './course-view/UploadDialog';
 
 export default function CourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const {courseId}: Params = useParams() as {courseId: string};
-  const {auth, isTeacherInCharge, setIsTeacherInCharge}: AuthContextType =
-    useAuth();
+  const {
+    auth,
+    isTeacherInCharge: _,
+    setIsTeacherInCharge,
+  }: AuthContextType = useAuth();
 
-  const [animation, setAnimation]: State<boolean> = useState(false);
-  const [
-    createAssessmentModelOpen,
-    setCreateAssessmentModelOpen,
-  ]: State<boolean> = useState(false);
+  const [_animation, setAnimation]: State<boolean> = useState(false);
+  const [uploadOpen, setUploadOpen] = useState<boolean>(false);
+  // const [
+  //   createAssessmentModelOpen,
+  //   setCreateAssessmentModelOpen,
+  // ]: State<boolean> = useState(false);
 
   const course: UseQueryResult<CourseData> = useGetCourse(courseId);
 
-  if (auth && course.data) {
-    const teacherInCharge: Array<UserData> =
-      course.data.teachersInCharge.filter(
-        (teacher: UserData) => teacher.id == auth.id
-      );
-    setIsTeacherInCharge(teacherInCharge.length != 0);
-  }
+  useEffect(() => {
+    if (auth && course.data) {
+      const teacherInCharge: Array<UserData> =
+        course.data.teachersInCharge.filter(
+          (teacher: UserData) => teacher.id === auth.id
+        );
+      setIsTeacherInCharge(teacherInCharge.length !== 0);
+    }
+  }, [auth, course.data, setIsTeacherInCharge]);
 
   const assessmentModels: UseQueryResult<Array<AssessmentModelData>> =
     useGetAllAssessmentModels(courseId);
@@ -67,15 +74,15 @@ export default function CourseView(): JSX.Element {
     setAnimation(true);
   }, [currentAssessmentModel]);
 
-  function onChangeAssessmentModel(assessmentModel: AssessmentModelData): void {
-    if (
-      assessmentModel.id &&
-      assessmentModel.id !== currentAssessmentModel?.id
-    ) {
-      setAnimation(false);
-      setCurrentAssessmentModel(assessmentModel);
-    }
-  }
+  // function onChangeAssessmentModel(assessmentModel: AssessmentModelData): void {
+  //   if (
+  //     assessmentModel.id &&
+  //     assessmentModel.id !== currentAssessmentModel?.id
+  //   ) {
+  //     setAnimation(false);
+  //     setCurrentAssessmentModel(assessmentModel);
+  //   }
+  // }
 
   return (
     <>
@@ -97,7 +104,7 @@ export default function CourseView(): JSX.Element {
               <Typography variant="h2" align="left">
                 {course.data.name.en}
               </Typography>
-              {auth?.role == SystemRole.Admin && (
+              {auth?.role === SystemRole.Admin && (
                 <Button
                   size="large"
                   variant="contained"
@@ -115,7 +122,8 @@ export default function CourseView(): JSX.Element {
           display: 'flex',
         }}
       >
-        <SideMenu />
+        <SideMenu onUpload={() => setUploadOpen(true)} />
+        <UploadDialog open={uploadOpen} onClose={() => setUploadOpen(false)} />
         <Box
           sx={{
             marginLeft: 2,
