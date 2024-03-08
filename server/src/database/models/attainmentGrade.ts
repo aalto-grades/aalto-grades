@@ -7,9 +7,9 @@ import {
   CreationOptional,
   DataTypes,
   ForeignKey,
-  Model,
   InferAttributes,
   InferCreationAttributes,
+  Model,
 } from 'sequelize';
 
 import {sequelize} from '..';
@@ -26,8 +26,8 @@ export default class AttainmentGrade extends Model<
   declare graderId: ForeignKey<User['id']>;
   declare grade: number;
   declare sisuExportDate: CreationOptional<Date>;
-  declare manual: boolean;
-  declare status: string;
+  declare manual?: boolean;
+  declare status?: string;
   // Date when attainment is completed (e.g., deadline or exam date)
   declare date: CreationOptional<Date | DateOnlyString>;
   declare expiryDate: CreationOptional<Date | DateOnlyString>;
@@ -76,15 +76,15 @@ AttainmentGrade.init(
       type: DataTypes.DATE,
       allowNull: true,
     },
-    manual: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-    },
-    status: {
-      type: DataTypes.ENUM('PASS', 'FAIL', 'PENDING'),
-      allowNull: false,
-      defaultValue: 'PENDING',
-    },
+    // manual: {
+    //   type: DataTypes.BOOLEAN,
+    //   allowNull: true,
+    // },
+    // status: {
+    //   type: DataTypes.ENUM('PASS', 'FAIL', 'PENDING'),
+    //   allowNull: false,
+    //   defaultValue: 'PENDING',
+    // },
     date: {
       type: DataTypes.DATEONLY,
       allowNull: false,

@@ -6,19 +6,20 @@ import {
   AttainmentGradeData,
   EditGrade,
   FinalGrade,
+  NewGrade,
   StudentGradesTree,
 } from '@common/types';
-import axios from './axios';
 import {
   QueryClient,
-  useMutation,
   UseMutationOptions,
   UseMutationResult,
-  useQuery,
-  useQueryClient,
   UseQueryOptions,
   UseQueryResult,
+  useMutation,
+  useQuery,
+  useQueryClient,
 } from '@tanstack/react-query';
+import axios from './axios';
 
 import {Numeric} from '../../types';
 
@@ -290,6 +291,26 @@ export function useEditGrade(
           vars.assessmentModelId,
           vars.userId,
         ],
+      });
+    },
+    ...options,
+  });
+}
+
+export function useAddGrades(
+  courseId: Numeric,
+  options?: UseMutationOptions<boolean, unknown, unknown>
+) {
+  const queryClient: QueryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: NewGrade[]) =>
+      (await axios.post(`/v1/courses/${courseId}/grades`, {grades: data})).data
+        .data,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['grades', courseId],
       });
     },
     ...options,

@@ -9,11 +9,11 @@ export interface AttainmentGradeModelData {
   attainmentId: number;
   graderId?: number;
   grade: number;
-  status: Status;
-  manual: boolean;
+  status?: Status;
+  manual?: boolean;
   date?: Date;
   expiryDate?: Date;
-  gradeType: GradeType;
+  gradeType?: GradeType;
   attainmentName?: string;
 }
 

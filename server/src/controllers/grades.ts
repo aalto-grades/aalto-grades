@@ -6,15 +6,14 @@ import {
   AttainmentGradesData,
   EditGrade,
   FinalGrade,
-  Formula,
   GradeOption,
   GradeType,
   HttpCode,
+  NewGrade,
   Status,
   StudentGradesTree,
   studentRow,
 } from '@common/types';
-import {parse, Parser} from 'csv-parse';
 import {stringify} from 'csv-stringify';
 import {NextFunction, Request, Response} from 'express';
 import _ from 'lodash';
@@ -31,8 +30,6 @@ import User from '../database/models/user';
 import {
   ApiError,
   AttainmentGradeModelData,
-  CalculationResult,
-  FormulaNode,
   JwtClaims,
   StudentGrades,
   idSchema,
@@ -40,7 +37,7 @@ import {
 import {validateAssessmentModelPath} from './utils/assessmentModel';
 import {findAttainmentById, findAttainmentGradeById} from './utils/attainment';
 import {toDateOnlyString} from './utils/date';
-import {gradeIsExpired, getDateOfLatestGrade} from './utils/grades';
+import {getDateOfLatestGrade} from './utils/grades';
 import {findUserById, isTeacherInChargeOrAdmin} from './utils/user';
 
 async function studentNumbersExist(
@@ -616,7 +613,7 @@ export async function getFinalGrades(
             },
             grade: Math.round(grade.grade),
             status: grade.status as Status,
-            manual: grade.manual,
+            manual: grade.manual ?? true,
             exportedToSisu: grade.sisuExportDate,
             date: grade.date ? toDateOnlyString(grade.date) : undefined,
             comment: grade.comment ?? '',
@@ -750,7 +747,7 @@ export async function getGradeTreeOfAllUsers(
             },
             grade: option.grade,
             status: option.status as Status,
-            manual: option.manual,
+            manual: option.manual ?? true,
             exportedToSisu: option.sisuExportDate,
             date: option.date ? toDateOnlyString(option.date) : undefined,
             expiryDate: option.expiryDate
@@ -1029,212 +1026,212 @@ function correctType(
     : grade.grade;
 }
 
-/**
- * Asynchronously adds grades from a CSV file to the database.
- * @param {Request} req - The HTTP request containing the CSV file.
- * @param {Response} res - The HTTP response to be sent to the client.
- * @param {NextFunction} next - The next middleware function to be executed in the pipeline.
- * @returns {Promise<void>} - A Promise that resolves when the function has completed its execution.
- * @throws {ApiError} - If CSV file loading fails, parsing the header or body of the CSV fails, or
- * the CSV file contains attainments which don't belong to the specified course or course instance.
- */
-export async function addGrades(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  const requestSchema: yup.AnyObjectSchema = yup
-    .object()
-    .shape({
-      completionDate: yup.date().required(),
-      expiryDate: yup.date().notRequired(),
-    })
-    .test(
-      (value: {
-        completionDate: yup.Maybe<Date>;
-        expiryDate?: yup.Maybe<Date | undefined>;
-      }) => {
-        if (
-          value.completionDate &&
-          value.expiryDate &&
-          value.completionDate.getTime() > value.expiryDate.getTime()
-        ) {
-          throw new ApiError(
-            'Expiry date cannot be before completion date.',
-            HttpCode.BadRequest
-          );
-        }
-        return true;
-      }
-    );
+// /**
+//  * Asynchronously adds grades from a CSV file to the database.
+//  * @param {Request} req - The HTTP request containing the CSV file.
+//  * @param {Response} res - The HTTP response to be sent to the client.
+//  * @param {NextFunction} next - The next middleware function to be executed in the pipeline.
+//  * @returns {Promise<void>} - A Promise that resolves when the function has completed its execution.
+//  * @throws {ApiError} - If CSV file loading fails, parsing the header or body of the CSV fails, or
+//  * the CSV file contains attainments which don't belong to the specified course or course instance.
+//  */
+// export async function addGrades(
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ): Promise<void> {
+//   const requestSchema: yup.AnyObjectSchema = yup
+//     .object()
+//     .shape({
+//       completionDate: yup.date().required(),
+//       expiryDate: yup.date().notRequired(),
+//     })
+//     .test(
+//       (value: {
+//         completionDate: yup.Maybe<Date>;
+//         expiryDate?: yup.Maybe<Date | undefined>;
+//       }) => {
+//         if (
+//           value.completionDate &&
+//           value.expiryDate &&
+//           value.completionDate.getTime() > value.expiryDate.getTime()
+//         ) {
+//           throw new ApiError(
+//             'Expiry date cannot be before completion date.',
+//             HttpCode.BadRequest
+//           );
+//         }
+//         return true;
+//       }
+//     );
 
-  const {
-    completionDate,
-    expiryDate,
-  }: {
-    completionDate: Date;
-    expiryDate?: Date;
-  } = await requestSchema.validate(req.body, {abortEarly: false});
+//   const {
+//     completionDate,
+//     expiryDate,
+//   }: {
+//     completionDate: Date;
+//     expiryDate?: Date;
+//   } = await requestSchema.validate(req.body, {abortEarly: false});
 
-  /** TODO: Check grading points are not higher than max points of the attainment. */
-  const grader: JwtClaims = req.user as JwtClaims;
+//   /** TODO: Check grading points are not higher than max points of the attainment. */
+//   const grader: JwtClaims = req.user as JwtClaims;
 
-  // Validation path parameters.
-  const [course, assessmentModel]: [Course, AssessmentModel] =
-    await validateAssessmentModelPath(
-      req.params.courseId,
-      req.params.assessmentModelId
-    );
+//   // Validation path parameters.
+//   const [course, assessmentModel]: [Course, AssessmentModel] =
+//     await validateAssessmentModelPath(
+//       req.params.courseId,
+//       req.params.assessmentModelId
+//     );
 
-  await isTeacherInChargeOrAdmin(grader, course.id, HttpCode.Forbidden);
+//   await isTeacherInChargeOrAdmin(grader, course.id, HttpCode.Forbidden);
 
-  if (!req?.file) {
-    throw new ApiError(
-      'CSV file not found in the request. To upload CSV file, set input field name as "csv_data"',
-      HttpCode.BadRequest
-    );
-  }
+//   if (!req?.file) {
+//     throw new ApiError(
+//       'CSV file not found in the request. To upload CSV file, set input field name as "csv_data"',
+//       HttpCode.BadRequest
+//     );
+//   }
 
-  // Convert CSV to string for the parser.
-  const data: string = req.file.buffer.toString();
+//   // Convert CSV to string for the parser.
+//   const data: string = req.file.buffer.toString();
 
-  // Array for collecting CSV row data.
-  const studentGradingData: Array<Array<string>> = [];
+//   // Array for collecting CSV row data.
+//   const studentGradingData: Array<Array<string>> = [];
 
-  // TODO: should user be allowed to define delimiter in the request.
-  const parser: Parser = parse({
-    delimiter: ',',
-  });
+//   // TODO: should user be allowed to define delimiter in the request.
+//   const parser: Parser = parse({
+//     delimiter: ',',
+//   });
 
-  parser
-    .on('readable', (): void => {
-      let row: Array<string>;
-      while ((row = parser.read()) !== null) {
-        studentGradingData.push(row);
-      }
-    })
-    .on('error', next) // Stream causes uncaught exception, pass error manually to the errorHandler.
-    .on('end', async (): Promise<void> => {
-      try {
-        // Header having colum information, e.g., "StudentNumber,exam,exercise,project,..."
-        const header: Array<string> =
-          studentGradingData.shift() as Array<string>;
+//   parser
+//     .on('readable', (): void => {
+//       let row: Array<string>;
+//       while ((row = parser.read()) !== null) {
+//         studentGradingData.push(row);
+//       }
+//     })
+//     .on('error', next) // Stream causes uncaught exception, pass error manually to the errorHandler.
+//     .on('end', async (): Promise<void> => {
+//       try {
+//         // Header having colum information, e.g., "StudentNumber,exam,exercise,project,..."
+//         const header: Array<string> =
+//           studentGradingData.shift() as Array<string>;
 
-        // Parse header and grades separately. Always first parse header before
-        // parsing the grades as the grade parser needs the attainment id array.
-        const attainments: Array<Attainment> = await parseHeaderFromCsv(
-          header,
-          assessmentModel.id
-        );
+//         // Parse header and grades separately. Always first parse header before
+//         // parsing the grades as the grade parser needs the attainment id array.
+//         const attainments: Array<Attainment> = await parseHeaderFromCsv(
+//           header,
+//           assessmentModel.id
+//         );
 
-        let parsedStudentData: Array<StudentGrades> = parseGradesFromCsv(
-          studentGradingData,
-          attainments
-        );
+//         let parsedStudentData: Array<StudentGrades> = parseGradesFromCsv(
+//           studentGradingData,
+//           attainments
+//         );
 
-        // Check all users (students) exists in db, create new users if needed.
-        const studentNumbers: Array<string> = parsedStudentData.map(
-          (student: StudentGrades) => student.studentNumber
-        );
+//         // Check all users (students) exists in db, create new users if needed.
+//         const studentNumbers: Array<string> = parsedStudentData.map(
+//           (student: StudentGrades) => student.studentNumber
+//         );
 
-        let students: Array<User> = await User.findAll({
-          attributes: ['id', 'studentNumber'],
-          where: {
-            studentNumber: {
-              [Op.in]: studentNumbers,
-            },
-          },
-        });
+//         let students: Array<User> = await User.findAll({
+//           attributes: ['id', 'studentNumber'],
+//           where: {
+//             studentNumber: {
+//               [Op.in]: studentNumbers,
+//             },
+//           },
+//         });
 
-        const foundStudents: Array<string> = students.map(
-          (student: User) => student.studentNumber
-        );
-        const nonExistingStudents: Array<string> = studentNumbers.filter(
-          (id: string) => !foundStudents.includes(id)
-        );
+//         const foundStudents: Array<string> = students.map(
+//           (student: User) => student.studentNumber
+//         );
+//         const nonExistingStudents: Array<string> = studentNumbers.filter(
+//           (id: string) => !foundStudents.includes(id)
+//         );
 
-        await sequelize.transaction(async (t: Transaction) => {
-          // Create new users (students) if any found from the CSV.
-          if (nonExistingStudents.length > 0) {
-            const newUsers: Array<User> = await User.bulkCreate(
-              nonExistingStudents.map((studentNumber: string) => {
-                return {
-                  studentNumber: studentNumber,
-                };
-              }),
-              {transaction: t}
-            );
-            students = students.concat(newUsers);
-          }
-        });
+//         await sequelize.transaction(async (t: Transaction) => {
+//           // Create new users (students) if any found from the CSV.
+//           if (nonExistingStudents.length > 0) {
+//             const newUsers: Array<User> = await User.bulkCreate(
+//               nonExistingStudents.map((studentNumber: string) => {
+//                 return {
+//                   studentNumber: studentNumber,
+//                 };
+//               }),
+//               {transaction: t}
+//             );
+//             students = students.concat(newUsers);
+//           }
+//         });
 
-        // At this point all students confirmed to exist in the database.
+//         // At this point all students confirmed to exist in the database.
 
-        // Add users' database IDs to parsedStudentData based on student number.
-        parsedStudentData = parsedStudentData.map(
-          (student: StudentGrades): StudentGrades => {
-            const matchingUser: User = students.find(
-              (user: User) =>
-                user.dataValues.studentNumber === student.studentNumber
-            ) as User;
+//         // Add users' database IDs to parsedStudentData based on student number.
+//         parsedStudentData = parsedStudentData.map(
+//           (student: StudentGrades): StudentGrades => {
+//             const matchingUser: User = students.find(
+//               (user: User) =>
+//                 user.dataValues.studentNumber === student.studentNumber
+//             ) as User;
 
-            return {
-              ...student,
-              id: matchingUser.id,
-            };
-          }
-        );
+//             return {
+//               ...student,
+//               id: matchingUser.id,
+//             };
+//           }
+//         );
 
-        // Use studentsWithId to update attainments by flatmapping each
-        // students grades into a one array of all the grades.
-        const preparedBulkCreate: Array<AttainmentGradeModelData> =
-          parsedStudentData.flatMap(
-            (student: StudentGrades): Array<AttainmentGradeModelData> => {
-              const studentNumber: string = student.studentNumber;
-              const studentGradingData: Array<AttainmentGradeModelData> =
-                student.grades.map(
-                  (
-                    grade: AttainmentGradeModelData
-                  ): AttainmentGradeModelData => {
-                    return {
-                      ...grade,
-                      userId: student.id as number,
-                      graderId: grader.id,
-                      date: completionDate,
-                      expiryDate: expiryDate,
-                      grade: correctType(grade, studentNumber),
-                    };
-                  }
-                );
-              return studentGradingData;
-            }
-          );
+//         // Use studentsWithId to update attainments by flatmapping each
+//         // students grades into a one array of all the grades.
+//         const preparedBulkCreate: Array<AttainmentGradeModelData> =
+//           parsedStudentData.flatMap(
+//             (student: StudentGrades): Array<AttainmentGradeModelData> => {
+//               const studentNumber: string = student.studentNumber;
+//               const studentGradingData: Array<AttainmentGradeModelData> =
+//                 student.grades.map(
+//                   (
+//                     grade: AttainmentGradeModelData
+//                   ): AttainmentGradeModelData => {
+//                     return {
+//                       ...grade,
+//                       userId: student.id as number,
+//                       graderId: grader.id,
+//                       date: completionDate,
+//                       expiryDate: expiryDate,
+//                       grade: correctType(grade, studentNumber),
+//                     };
+//                   }
+//                 );
+//               return studentGradingData;
+//             }
+//           );
 
-        if (gradeTypeErrors.length !== 0) {
-          throw new ApiError(gradeTypeErrors, HttpCode.BadRequest);
-        }
+//         if (gradeTypeErrors.length !== 0) {
+//           throw new ApiError(gradeTypeErrors, HttpCode.BadRequest);
+//         }
 
-        // TODO: Optimize if datasets are big.
-        await AttainmentGrade.bulkCreate(preparedBulkCreate);
+//         // TODO: Optimize if datasets are big.
+//         await AttainmentGrade.bulkCreate(preparedBulkCreate);
 
-        // After this point all the students' attainment grades have been created or
-        // updated in the database.
+//         // After this point all the students' attainment grades have been created or
+//         // updated in the database.
 
-        res.status(HttpCode.Ok).json({
-          data: {},
-        });
-        return;
-      } catch (err: unknown) {
-        next(err);
-      }
-    });
+//         res.status(HttpCode.Ok).json({
+//           data: {},
+//         });
+//         return;
+//       } catch (err: unknown) {
+//         next(err);
+//       }
+//     });
 
-  // Write stringified CSV data to the csv-parser's stream.
-  parser.write(data);
+//   // Write stringified CSV data to the csv-parser's stream.
+//   parser.write(data);
 
-  // Close the readable stream once data reading finished.
-  parser.end();
-}
+//   // Close the readable stream once data reading finished.
+//   parser.end();
+// }
 
 export async function editUserGrade(
   req: Request,
@@ -1291,4 +1288,110 @@ export async function editUserGrade(
   res.status(HttpCode.Ok).json({
     data: {},
   });
+}
+
+export async function addGrades(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const newGrades = req.body.grades as unknown as NewGrade[];
+
+  const grader: JwtClaims = req.user as JwtClaims;
+
+  // Validation path parameters.
+  const courseId = Number(req.params.courseId);
+
+  await isTeacherInChargeOrAdmin(grader, courseId, HttpCode.Forbidden);
+
+  try {
+    // Check all users (students) exists in db, create new users if needed.
+    const studentNumbers = newGrades.map(gradeEl => gradeEl.studentNumber);
+
+    let students = await User.findAll({
+      attributes: ['id', 'studentNumber'],
+      where: {
+        studentNumber: {
+          [Op.in]: studentNumbers,
+        },
+      },
+    });
+    const foundStudents = students.map(student => student.studentNumber);
+    const nonExistingStudents = studentNumbers.filter(
+      id => !foundStudents.includes(id)
+    );
+
+    await sequelize.transaction(async (t: Transaction) => {
+      // Create new users (students) if any found from the CSV.
+      if (nonExistingStudents.length > 0) {
+        const newUsers: Array<User> = await User.bulkCreate(
+          nonExistingStudents.map((studentNumber: string) => {
+            return {
+              studentNumber: studentNumber,
+            };
+          }),
+          {transaction: t}
+        );
+        students = students.concat(newUsers);
+      }
+    });
+
+    // All students now exists in the database.
+    students = await User.findAll({
+      attributes: ['id', 'studentNumber'],
+      where: {
+        studentNumber: {
+          [Op.in]: studentNumbers,
+        },
+      },
+    });
+
+    const studentsNumberToId = students.reduce(
+      (
+        obj: {
+          [key: string]: number;
+        },
+        student
+      ) => {
+        obj[student.studentNumber] = student.id;
+        return obj;
+      },
+      {}
+    );
+
+    // Use studentsWithId to update attainments by flatmapping each
+    // students grades into a one array of all the grades.
+    const preparedBulkCreate: Array<AttainmentGradeModelData> = newGrades.map(
+      gradeEntry => {
+        return {
+          userId: studentsNumberToId[gradeEntry.studentNumber],
+          attainmentId: gradeEntry.attainmentId,
+          graderId: grader.id,
+          date: gradeEntry.date,
+          expiryDate: gradeEntry.expiryDate,
+          grade: gradeEntry.grade,
+
+          // status: gradeEntry.status,
+          // manual: true,
+          // gradeType: gradeEntry.gradeType,
+        };
+      }
+    );
+
+    if (gradeTypeErrors.length !== 0) {
+      throw new ApiError(gradeTypeErrors, HttpCode.BadRequest);
+    }
+
+    // TODO: Optimize if datasets are big.
+    await AttainmentGrade.bulkCreate(preparedBulkCreate);
+
+    // After this point all the students' attainment grades have been created
+
+    res.status(HttpCode.Ok).json({
+      data: {},
+    });
+    return;
+  } catch (err: unknown) {
+    next(err);
+  }
 }

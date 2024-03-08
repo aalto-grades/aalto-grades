@@ -4,7 +4,7 @@
 
 import {HttpCode} from '@common/types';
 import express, {Request, Router} from 'express';
-import multer, {FileFilterCallback, memoryStorage, Multer} from 'multer';
+import multer, {FileFilterCallback, Multer, memoryStorage} from 'multer';
 import passport from 'passport';
 import path from 'path';
 
@@ -13,10 +13,10 @@ import {
   editUserGrade,
   getCsvTemplate,
   getFinalGrades,
-  getSisuFormattedGradingCSV,
-  getGradeTreeOfUser,
   getGradeTreeOfAllUsers,
+  getGradeTreeOfUser,
   getGrades,
+  getSisuFormattedGradingCSV,
 } from '../controllers/grades';
 import {handleInvalidRequestJson} from '../middleware';
 import {controllerDispatcher} from '../middleware/errorHandler';
@@ -91,10 +91,18 @@ router.get(
   controllerDispatcher(getGradeTreeOfUser)
 );
 
+// router.post(
+//   '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv',
+//   passport.authenticate('jwt', {session: false}),
+//   upload.single('csv_data'),
+//   controllerDispatcher(addGrades)
+// );
+
 router.post(
-  '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv',
+  '/v1/courses/:courseId/grades',
   passport.authenticate('jwt', {session: false}),
-  upload.single('csv_data'),
+  express.json(),
+  handleInvalidRequestJson,
   controllerDispatcher(addGrades)
 );
 

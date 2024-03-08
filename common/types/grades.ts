@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentData} from '@common/types/attainment';
 import {DateOnlyString} from './general';
 import {UserData} from './user';
 
@@ -23,6 +22,15 @@ export interface GradeOption {
   expiryDate?: Date | DateOnlyString;
   comment: string;
 }
+
+export type NewGrade = {
+  studentNumber: string;
+  attainmentId: number;
+  grade: number;
+  date?: Date;
+  expiryDate?: Date;
+  comment: string;
+};
 
 export interface AttainmentGradeData {
   userId?: number;

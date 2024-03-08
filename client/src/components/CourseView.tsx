@@ -19,7 +19,11 @@ import {
   useParams,
 } from 'react-router-dom';
 
-import {useGetAllAssessmentModels, useGetCourse} from '../hooks/useApi';
+import {
+  useAddGrades,
+  useGetAllAssessmentModels,
+  useGetCourse,
+} from '../hooks/useApi';
 import useAuth, {AuthContextType} from '../hooks/useAuth';
 import {State} from '../types';
 import SideMenu from './course-view/SideMenu';
@@ -84,8 +88,25 @@ export default function CourseView(): JSX.Element {
   //   }
   // }
 
+  //Add grades test
+  const addGrades = useAddGrades(courseId);
+
   return (
     <>
+      <Button
+        onClick={() =>
+          addGrades.mutate([
+            {
+              studentNumber: '123',
+              attainmentId: 1,
+              grade: 5,
+              comment: 'Test',
+            },
+          ])
+        }
+      >
+        Test
+      </Button>
       <Box sx={{mx: -2.5}}>
         {course.data && (
           <>

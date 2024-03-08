@@ -233,15 +233,15 @@ export default {
             type: DataTypes.FLOAT,
             allowNull: false,
           },
-          manual: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-          },
-          status: {
-            type: DataTypes.ENUM('PASS', 'FAIL', 'PENDING'),
-            allowNull: false,
-            defaultValue: 'PENDING',
-          },
+          // manual: {
+          //   type: DataTypes.BOOLEAN,
+          //   allowNull: false,
+          // },
+          // status: {
+          //   type: DataTypes.ENUM('PASS', 'FAIL', 'PENDING'),
+          //   allowNull: false,
+          //   defaultValue: 'PENDING',
+          // },
           date: {
             type: DataTypes.DATE,
             allowNull: true,
