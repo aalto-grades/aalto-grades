@@ -2,8 +2,11 @@ import {Delete} from '@mui/icons-material';
 import {Button, Dialog, DialogActions} from '@mui/material';
 import {GridActionsCellItem, GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import {useEffect, useState} from 'react';
+import {useParams} from 'react-router-dom';
+import {useAddGrades, useGetAttainments} from '../../hooks/useApi';
 import UploadDialogConfirm from './UploadDialogConfirm';
 import UploadDialogUpload from './UploadDialogUpload';
+import {NewGrade} from '@common/types';
 
 const UploadDialog = ({
   open,
@@ -12,8 +15,12 @@ const UploadDialog = ({
   open: boolean;
   onClose: () => void;
 }) => {
+  const {courseId} = useParams() as {courseId: string};
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
+
+  const attainments = useGetAttainments(courseId);
+  const addGrades = useAddGrades(courseId);
 
   useEffect(() => {
     if (open) {
@@ -23,17 +30,22 @@ const UploadDialog = ({
     }
   }, [open]);
 
+  if (attainments.data === undefined) return <></>;
+
   const columns: GridColDef[] = [
     {
-      field: 'studentNo',
+      field: 'StudentNo',
       headerName: 'Student Number',
       type: 'string',
       width: 120,
       editable: true,
     },
-    {field: 'tierA', headerName: 'Tier A', type: 'number', editable: true},
-    {field: 'tierB', headerName: 'Tier B', type: 'number', editable: true},
-    {field: 'tierC', headerName: 'Tier C', type: 'number', editable: true},
+    ...attainments.data.map(att => ({
+      field: att.name,
+      headerName: att.name,
+      type: 'number',
+      editable: true,
+    })),
     {
       field: 'actions',
       type: 'actions',
@@ -50,17 +62,31 @@ const UploadDialog = ({
   ];
   const readOnlycolumns: GridColDef[] = [
     {
-      field: 'studentNo',
+      field: 'StudentNo',
       headerName: 'Student Number',
       type: 'string',
     },
-    {field: 'tierA', headerName: 'Tier A', type: 'number'},
-    {field: 'tierB', headerName: 'Tier B', type: 'number'},
-    {field: 'tierC', headerName: 'Tier C', type: 'number'},
+    ...attainments.data.map(att => ({
+      field: att.name,
+      headerName: att.name,
+      type: 'number',
+    })),
   ];
 
   const onSubmit = () => {
-    console.log(rows);
+    const gradeData: NewGrade[] = [];
+
+    for (const row of rows) {
+      for (const attainment of attainments.data) {
+        gradeData.push({
+          studentNumber: row.StudentNo.toString(),
+          attainmentId: attainment.id,
+          grade: row[attainment.name],
+          comment: '',
+        });
+      }
+    }
+    addGrades.mutate(gradeData);
   };
 
   return (
