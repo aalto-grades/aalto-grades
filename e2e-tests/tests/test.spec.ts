@@ -3,6 +3,11 @@
 // SPDX-License-Identifier: MIT
 
 import {test, expect} from '@playwright/test';
+import {setupDb, cleanDb} from './helper';
+
+test.beforeAll(async () => {
+  await setupDb();
+});
 
 test.beforeEach(async ({page}) => {
   await page.goto('/login');
@@ -18,10 +23,10 @@ test.beforeEach(async ({page}) => {
 });
 
 test.afterEach(async ({page}) => {
+  await cleanDb();
   await page.goto('/');
   await page.getByRole('button', {name: 'Andy Admin'}).click();
   await page.getByRole('menuitem', {name: 'Logout'}).click();
-  // need a good way to rollback changes made to database in the tests
 });
 
 test.describe('Test Courses as Admin', () => {
@@ -142,14 +147,14 @@ test.describe('Test Courses as Admin', () => {
 });
 
 test.describe('Manage users as admin', () => {
-  // test('Add user', async ({page}) => {
-  //   await page.getByRole('button', {name: 'Add user'}).click();
-  //   await page.getByLabel('Email').click();
-  //   const unique = Date.now();
-  //   await page.getByLabel('Email').fill(`${unique}@aalto.fi`);
-  //   await page.getByRole('button', {name: 'Add User'}).click();
-  //   await expect(
-  //     page.getByRole('cell', {name: `${unique}@aalto.fi`}).first()
-  //   ).toBeAttached();
-  // });
+  test('Add user', async ({page}) => {
+    await page.getByRole('button', {name: 'Add user'}).click();
+    await page.getByLabel('Email').click();
+    await page.getByLabel('Email').fill('teste2e@aalto.fi');
+    await page.getByRole('button', {name: 'Add User'}).click();
+    await page.goto('/');
+    await expect(
+      page.getByRole('cell', {name: 'teste2e@aalto.fi'})
+    ).toBeAttached();
+  });
 });
