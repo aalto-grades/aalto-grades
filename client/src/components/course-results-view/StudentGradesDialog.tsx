@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import {UseQueryResult} from '@tanstack/react-query';
-import {AttainmentGradeData, FinalGrade} from '@common/types';
+import {AttainmentGradeData, FinalGrade, UserData} from '@common/types';
 import {JSX, useState} from 'react';
 import {Params, useParams} from 'react-router-dom';
 
@@ -27,7 +27,7 @@ import {
 
 // A Dialog component for viewing the individual grades of a user.
 export default function StudentGradesDialog(props: {
-  user: FinalGrade | null;
+  user: FinalGrade | UserData | null;
   setOpen: (open: boolean) => void;
   open: boolean;
 }): JSX.Element {
@@ -41,10 +41,17 @@ export default function StudentGradesDialog(props: {
     undefined
   );
 
+  const userId =
+    props.user === null
+      ? 0
+      : 'userId' in props.user
+      ? props.user.userId
+      : (props.user.id as number);
+
   const grades: UseQueryResult<AttainmentGradeData> = useGetGradeTreeOfUser(
     courseId,
     assessmentModelId,
-    props.user?.userId as number,
+    userId,
     {enabled: props.open}
   );
 

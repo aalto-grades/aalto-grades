@@ -7,7 +7,7 @@ import {
   FinalGrade,
   GradeOption,
   StudentGradesTree,
-  studentRow as StudentRow,
+  StudentRow,
 } from '@common/types';
 import {ArrowUpward, ExpandLess, ExpandMore, Sort} from '@mui/icons-material';
 import {Badge, Checkbox, Icon, IconButton, Link, Tooltip} from '@mui/material';

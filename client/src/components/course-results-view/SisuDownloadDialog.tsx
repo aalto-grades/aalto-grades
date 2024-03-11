@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {FinalGrade, GradeOption, Language, studentRow} from '@common/types';
+import {FinalGrade, GradeOption, Language, StudentRow} from '@common/types';
 import {
   Box,
   Button,
@@ -95,7 +95,7 @@ export default function SisuDownloadDialog(props: {
 
   let selectedStudents = [];
   if (props?.selectedStudents?.length !== 0) {
-    selectedStudents = props.selectedStudents.map((s: studentRow) => {
+    selectedStudents = props.selectedStudents.map((s: StudentRow) => {
       return {
         studentNuimner: s.user.studentNumber,
         grades: s.finalGrade?.grades ?? [],

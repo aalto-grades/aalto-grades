@@ -57,7 +57,7 @@ export type AttainmentGradesData = {
   grades: Array<GradeOption>;
 };
 
-export type studentRow = {
+export type StudentRow = {
   user: UserData;
   finalGrades?: FinalGrade[];
   attainments: Array<AttainmentGradesData>;

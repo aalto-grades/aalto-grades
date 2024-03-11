@@ -79,7 +79,12 @@ export default function GradeOptionsDialog(props: {
   });
 
   return (
-    <Dialog open={props.open} transitionDuration={{exit: 800}} maxWidth="md">
+    <Dialog
+      open={props.open}
+      transitionDuration={{exit: 800}}
+      maxWidth="md"
+      onClose={props.handleClose}
+    >
       <DialogTitle>{props.title}</DialogTitle>
       <DialogContent>
         <Table>

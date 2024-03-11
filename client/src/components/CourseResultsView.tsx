@@ -25,6 +25,7 @@ import useSnackPackAlerts, {
 } from '../hooks/useSnackPackAlerts';
 import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
 import CourseResultsTableToolbar from './course-results-view/CourseResultsTableToolbar';
+import CourseResultsMuiTable from './course-results-view/CourseResultsMuiTable';
 // import CourseResultsGrid from './course-results-view/CourseResultsGrid';
 // import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
 
@@ -196,6 +197,12 @@ export default function CourseResultsView(): JSX.Element {
           selectedStudents={selectedStudents}
           setSelectedStudents={setSelectedStudents}
         />
+      )}
+
+      {gradesQuery.data && (
+        <div style={{marginTop: '50px'}}>
+          <CourseResultsMuiTable data={gradesQuery.data} />
+        </div>
       )}
       {/* <CourseResultsTable
         students={students.data ?? []}
