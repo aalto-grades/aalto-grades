@@ -18,6 +18,7 @@ const UploadDialog = ({
   const {courseId} = useParams() as {courseId: string};
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
+  const [ready, setReady] = useState<boolean>(false);
 
   const attainments = useGetAttainments(courseId);
   const addGrades = useAddGrades(courseId);
@@ -92,7 +93,12 @@ const UploadDialog = ({
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
       {currentStep === 0 ? (
-        <UploadDialogUpload columns={columns} rows={rows} setRows={setRows} />
+        <UploadDialogUpload
+          columns={columns}
+          rows={rows}
+          setRows={setRows}
+          setReady={setReady}
+        />
       ) : (
         <UploadDialogConfirm columns={readOnlycolumns} rows={rows} />
       )}
@@ -109,7 +115,7 @@ const UploadDialog = ({
         {currentStep === 0 && (
           <Button
             onClick={() => setCurrentStep(cur => cur + 1)}
-            disabled={rows.length === 0}
+            disabled={!ready || rows.length === 0}
           >
             Next
           </Button>

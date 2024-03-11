@@ -21,14 +21,15 @@ import {
   GridValidRowModel,
 } from '@mui/x-data-grid';
 import {parse, unparse} from 'papaparse';
-import {Dispatch, SetStateAction, useState} from 'react';
+import {Dispatch, SetStateAction, useState, useEffect} from 'react';
 
 type PropsType = {
   columns: GridColDef[];
   rows: GridRowsProp;
   setRows: Dispatch<SetStateAction<GridRowsProp>>;
+  setReady: Dispatch<SetStateAction<boolean>>;
 };
-const UploadDialogUpload = ({columns, rows, setRows}: PropsType) => {
+const UploadDialogUpload = ({columns, rows, setRows, setReady}: PropsType) => {
   const [textFieldText, setTextFieldText] = useState<string>('');
   const [textFieldOpen, setTextFieldOpen] = useState<boolean>(false);
   const [expanded, setExpanded] = useState<'' | 'import' | 'edit'>(
@@ -39,6 +40,13 @@ const UploadDialogUpload = ({columns, rows, setRows}: PropsType) => {
     message: string;
     severity: 'success' | 'error';
   } | null>(null);
+  const [editing, setEditing] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (error || editing) setReady(false);
+    else setReady(true);
+  }, [error, editing]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const dataGridToolbar = () => {
     const handleClick = () => {
@@ -186,22 +194,28 @@ const UploadDialogUpload = ({columns, rows, setRows}: PropsType) => {
               rowSelection={false}
               slots={{toolbar: dataGridToolbar}}
               sx={{maxHeight: '70vh', minHeight: '20vh'}}
+              onRowEditStart={() => setEditing(true)}
+              onRowEditStop={() => setEditing(false)}
               processRowUpdate={updatedRow => {
                 setRows(oldRows =>
                   oldRows.map(row =>
                     row.id === updatedRow.id ? updatedRow : row
                   )
                 );
-                // TODO: validate better
-                for (const [key, val] of Object.entries(updatedRow)) {
-                  if (key === 'id' || key === 'studentNo') continue;
-                  if ((val as number) < 0 || (val as number) > 5000)
-                    throw new Error('Value cannot be negative');
-                }
-                setSnackBar({message: 'Row saved!', severity: 'success'});
+                // TODO: do some validation. Code below is an example.
+                // for (const [key, val] of Object.entries(updatedRow)) {
+                //   if (key === 'id' || key === 'StudentNo') continue;
+                //   if ((val as number) < 0)
+                //     throw new Error('Value cannot be negative');
+                //   else if ((val as number) > 5000)
+                //     throw new Error('Value cannot be over 5000');
+                // }
+                // setSnackBar({message: 'Row saved!', severity: 'success'});
+                setError(false);
                 return updatedRow;
               }}
               onProcessRowUpdateError={error => {
+                setError(true);
                 setSnackBar({message: error.message, severity: 'error'});
               }}
             />
