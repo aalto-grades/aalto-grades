@@ -4,7 +4,7 @@
 
 import {Client} from 'pg';
 
-const pghost = process.env.LOCALHOST_URL || 'localhost';
+const pghost = process.env.POSTGRES_URL || 'localhost';
 const pguser = process.env.POSTGRES_USER || 'postgres';
 const pgpass = process.env.POSTGRES_PASSWORD || 'postgres';
 const pgdb = process.env.POSTGRES_DATABASE || 'postgres';
