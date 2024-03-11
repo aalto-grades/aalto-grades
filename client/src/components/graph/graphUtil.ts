@@ -5,85 +5,8 @@
 import ElkConstructor, {ElkNode} from 'elkjs/lib/elk.bundled';
 import {Edge, Node} from 'reactflow';
 
-import {
-  CustomNodeTypes,
-  NodeData,
-  NodeValue,
-  NodeValues,
-} from '@common/types/graph';
+import {NodeValues} from '@common/types/graph';
 import {ExtraNodeData} from '../../context/GraphProvider';
-
-export const initNode = (
-  type: CustomNodeTypes,
-  id?: string,
-  edges?: Edge[]
-): {
-  value: NodeValue;
-  data: NodeData;
-} => {
-  const sources: {[key: string]: {isConnected: true; value: 0}} = {};
-  const values: {[key: string]: 0} = {};
-  if (edges !== undefined && id !== undefined) {
-    for (const edge of edges) {
-      if (edge.target === id) {
-        sources[edge.targetHandle as string] = {
-          isConnected: true,
-          value: 0,
-        };
-      }
-      if (edge.source === id) {
-        values[edge.sourceHandle as string] = 0;
-      }
-    }
-  }
-  switch (type) {
-    case 'addition':
-      return {
-        value: {type, sources, value: 0},
-        data: {title: 'Addition'},
-      };
-    case 'attainment':
-      return {value: {type, value: 0}, data: {title: 'Attainment'}};
-    case 'average':
-      return {
-        value: {type, sources, value: 0},
-        data: {title: 'Average', settings: {weights: {}}},
-      };
-    case 'grade':
-      return {value: {type, source: 0, value: 0}, data: {title: 'Grade'}};
-    case 'max':
-      return {
-        value: {type, sources, value: 0},
-        data: {title: 'Max', settings: {minValue: 0}},
-      };
-    case 'minpoints':
-      return {
-        value: {type, source: 0, value: 0},
-        data: {title: 'Require Points', settings: {minPoints: 0}},
-      };
-    case 'require':
-      return {
-        value: {type, sources, values, courseFail: false},
-        data: {title: 'Require', settings: {numFail: 0, failSetting: 'ignore'}},
-      };
-    case 'stepper':
-      return {
-        value: {type, source: 0, value: 0},
-        data: {
-          title: 'Stepper',
-          settings: {numSteps: 1, middlePoints: [], outputValues: [0]},
-        },
-      };
-    case 'substitute':
-      return {
-        value: {type, sources, values},
-        data: {
-          title: 'Substitute',
-          settings: {maxSubstitutions: 0, substituteValues: []},
-        },
-      };
-  }
-};
 
 export const findDisconnectedEdges = (
   oldNodeValues: NodeValues,

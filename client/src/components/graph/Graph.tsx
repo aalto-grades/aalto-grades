@@ -36,7 +36,7 @@ import {
   NodeValue,
   NodeValues,
 } from '@common/types/graph';
-import {calculateNewNodeValues} from '@common/util/calculateGraph';
+import {calculateNewNodeValues, initNode} from '@common/util/calculateGraph';
 import {
   ExtraNodeData,
   ExtraNodeDataContext,
@@ -54,7 +54,7 @@ import SelectAttainmentsDialog from './SelectAttainmentsDialog';
 import StepperNode from './StepperNode';
 import SubstituteNode from './SubstituteNode';
 import './flow.css';
-import {findDisconnectedEdges, formatGraph, initNode} from './graphUtil';
+import {findDisconnectedEdges, formatGraph} from './graphUtil';
 
 const nodeTypesMap = {
   addition: AdditionNode,
