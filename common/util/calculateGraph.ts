@@ -1,17 +1,17 @@
 import {Edge, Node} from 'reactflow';
 import {
   AverageNodeSettings,
+  CustomNodeTypes,
+  FullNodeData,
+  GraphStructure,
   MaxNodeSettings,
   MinPointsNodeSettings,
+  NodeData,
   NodeValue,
   NodeValues,
   RequireNodeSettings,
   StepperNodeSettings,
   SubstituteNodeSettings,
-  FullNodeData,
-  GraphStructure,
-  CustomNodeTypes,
-  NodeData,
 } from '../types/graph';
 
 export const initNode = (
@@ -352,9 +352,11 @@ export const batchCalculateGraph = (
   // Init Graph values
   const studentDataMap: {[key: string]: {[key: string]: number}} = {}; // {studentNum: {attId1: num, attId2: num, ...}, ...}
   for (const student of studentData) {
+    studentDataMap[student.studentNumber] = {};
     for (const attainment of student.attainments)
-      studentDataMap[student.studentNumber][attainment.attainmentId] =
-        attainment.grade;
+      studentDataMap[student.studentNumber][
+        `attainment-${attainment.attainmentId}`
+      ] = attainment.grade;
   }
   const noSources: string[] = [];
   for (const node of nodes) {
