@@ -13,7 +13,7 @@ import {
   getCourse,
 } from '../controllers/course';
 import {handleInvalidRequestJson} from '../middleware';
-import {authorization} from '../middleware/authorization';
+import {authorization, teacherInCharge} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
 export const router: Router = Router();
@@ -42,7 +42,7 @@ router.post(
 router.put(
   '/v1/courses/:courseId',
   passport.authenticate('jwt', {session: false}),
-  authorization([SystemRole.Admin]),
+  teacherInCharge(),
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(editCourse)

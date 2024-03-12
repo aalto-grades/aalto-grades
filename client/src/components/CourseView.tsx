@@ -119,7 +119,7 @@ export default function CourseView(): JSX.Element {
             <Typography variant="h2" align="left">
               {course.data.name.en}
             </Typography>
-            {auth?.role == SystemRole.Admin && (
+            {(auth?.role == SystemRole.Admin || isTeacherInCharge ) && (
               <Button
                 size="large"
                 variant="contained"

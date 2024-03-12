@@ -6,6 +6,7 @@ import {HttpCode, SystemRole} from '@common/types';
 import {NextFunction, Request, Response} from 'express';
 
 import {JwtClaims} from '../types';
+import {isTeacherInChargeOrAdmin} from '../controllers/utils/user';
 
 /**
  * Middleware function to ensure that the user has the necessary role to proceed.
@@ -31,6 +32,22 @@ export function authorization(
       });
       return;
     }
+    next();
+  };
+}
+
+export function teacherInCharge(): (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => void {
+  return async function (req: Request, res: Response, next: NextFunction) {
+    const courseId = Number(req.params.courseId);
+    await isTeacherInChargeOrAdmin(
+      req.user as JwtClaims,
+      courseId,
+      HttpCode.Forbidden
+    );
     next();
   };
 }
