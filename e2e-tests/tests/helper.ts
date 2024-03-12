@@ -29,6 +29,7 @@ const dbConfigClean = {
 };
 
 export const setupDb = async () => {
+  // Create a copy of current database
   const client = new Client(dbConfig);
   await client.connect();
   const dbQuery = await client.query(
@@ -36,23 +37,24 @@ export const setupDb = async () => {
   );
   if (dbQuery.rowCount === 0) {
     await client.query(
-      'CREATE DATABASE postgres_copy WITH TEMPLATE postgres OWNER postgres'
+      `CREATE DATABASE postgres_copy WITH TEMPLATE postgres OWNER ${pguser}`
     );
   }
   await client.end();
 };
 
 export const cleanDb = async () => {
+  // Remove current database and replace with copy
   const client = new Client(dbConfigClean);
   await client.connect();
   const dbQuery = await client.query(
-    "SELECT FROM pg_database WHERE datname = 'postgres'"
+    `SELECT FROM pg_database WHERE datname = '${pgdb}'`
   );
   if (dbQuery.rowCount !== 0) {
-    await client.query('DROP DATABASE postgres WITH (FORCE)');
+    await client.query(`DROP DATABASE ${pgdb} WITH (FORCE)`);
   }
   await client.query(
-    'CREATE DATABASE postgres WITH TEMPLATE postgres_copy OWNER postgres'
+    `CREATE DATABASE ${pgdb} WITH TEMPLATE postgres_copy OWNER ${pguser}`
   );
   await client.end();
 };
