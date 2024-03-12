@@ -3,7 +3,7 @@ import {Delete} from '@mui/icons-material';
 import {Button, Dialog, DialogActions} from '@mui/material';
 import {GridActionsCellItem, GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import dayjs, {Dayjs} from 'dayjs';
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {useAddGrades, useGetAttainments} from '../../hooks/useApi';
 import UploadDialogConfirm from './UploadDialogConfirm';
@@ -34,21 +34,6 @@ const UploadDialog = ({
       expirationDate: dayjs().add(att.daysValid as number, 'day'),
     }))
   );
-
-  useEffect(() => {
-    if (open) {
-      // reset
-      setCurrentStep(0);
-      setRows([]);
-      setDates(
-        attainmentData.map(att => ({
-          attainmentName: att.name,
-          completionDate: dayjs(),
-          expirationDate: dayjs().add(att.daysValid as number, 'day'),
-        }))
-      );
-    }
-  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (attainments.data === undefined) return <></>;
 
@@ -113,6 +98,15 @@ const UploadDialog = ({
       }
     }
     addGrades.mutate(gradeData);
+    setCurrentStep(0);
+    setRows([]);
+    setDates(
+      attainmentData.map(att => ({
+        attainmentName: att.name,
+        completionDate: dayjs(),
+        expirationDate: dayjs().add(att.daysValid as number, 'day'),
+      }))
+    );
   };
 
   return (
