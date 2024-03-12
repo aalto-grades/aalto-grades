@@ -4,9 +4,9 @@
 
 import {AttainmentData, FinalGrade} from '@common/types';
 import {Box, Typography} from '@mui/material';
+import {UseQueryResult} from '@tanstack/react-query';
 import {JSX, useEffect, useState} from 'react';
 import {Params, useParams} from 'react-router-dom';
-import {UseQueryResult} from '@tanstack/react-query';
 
 import AlertSnackbar from './alerts/AlertSnackbar';
 
@@ -23,9 +23,8 @@ import {
 import useSnackPackAlerts, {
   SnackPackAlertState,
 } from '../hooks/useSnackPackAlerts';
-import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
 import CourseResultsTableToolbar from './course-results-view/CourseResultsTableToolbar';
-import CourseResultsMuiTable from './course-results-view/CourseResultsMuiTable';
+import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
 // import CourseResultsGrid from './course-results-view/CourseResultsGrid';
 // import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
 
@@ -197,12 +196,6 @@ export default function CourseResultsView(): JSX.Element {
           selectedStudents={selectedStudents}
           setSelectedStudents={setSelectedStudents}
         />
-      )}
-
-      {gradesQuery.data && (
-        <div style={{marginTop: '50px'}}>
-          <CourseResultsMuiTable data={gradesQuery.data} />
-        </div>
       )}
       {/* <CourseResultsTable
         students={students.data ?? []}
