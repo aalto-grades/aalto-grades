@@ -50,7 +50,7 @@ const BadFieldDialog = ({
   mismatchData: MismatchData;
 }) => {
   const [selections, setSelections] = useState<{[key: string]: string}>({});
-  const [error, setError] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     const newSelections = {...selections};
@@ -64,15 +64,16 @@ const BadFieldDialog = ({
   }, [mismatchData.fields, mismatchData.keys, mismatchData.mismatches]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    let newError = false;
+    let newError = '';
 
     for (const key of mismatchData.keys) {
-      if (!(key in selections)) newError = true;
+      if (!(key in selections)) newError = 'Table header cannot be empty';
     }
 
     const usedSelections: string[] = [];
     for (const value of Object.values(selections)) {
-      if (usedSelections.includes(value)) newError = true;
+      if (usedSelections.includes(value) && value !== 'Ignore Column')
+        newError = 'The same table header cannot appear twice';
       usedSelections.push(value);
     }
     setError(newError);
@@ -82,8 +83,8 @@ const BadFieldDialog = ({
     <Dialog open={open && mismatchData !== null} fullWidth onClose={onClose}>
       <DialogTitle>Mismatching columns found</DialogTitle>
       <DialogContent>
-        <Alert severity={error ? 'error' : 'success'} sx={{mb: 2}}>
-          {error ? 'There are still errors' : 'All Done!'}
+        <Alert severity={error !== '' ? 'error' : 'success'} sx={{mb: 2}}>
+          {error !== '' ? error : 'All Done!'}
         </Alert>
         <TableContainer>
           <Table size="small">
@@ -123,6 +124,9 @@ const BadFieldDialog = ({
                             {field}
                           </MenuItem>
                         ))}
+                        <MenuItem key="Ignore Column" value="Ignore Column">
+                          Ignore Column
+                        </MenuItem>
                       </Select>
                     </FormControl>
                   </TableCell>
@@ -135,7 +139,7 @@ const BadFieldDialog = ({
       <DialogActions>
         <Button
           onClick={() => mismatchData.onImport(selections)}
-          disabled={error}
+          disabled={error !== ''}
         >
           Import
         </Button>
@@ -231,6 +235,7 @@ const UploadDialogUpload = ({columns, rows, setRows, setReady}: PropsType) => {
 
             const rowData: GridValidRowModel = {id: rowI};
             for (let i = 0; i < rows.data[rowI].length; i++) {
+              if (keyMap[resultKeys[i]] === 'Ignore Column') continue;
               rowData[keyMap[resultKeys[i]]] = rows.data[rowI][i];
             }
             newRows.push(rowData);
