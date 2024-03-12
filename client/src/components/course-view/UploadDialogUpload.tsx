@@ -10,7 +10,17 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   Snackbar,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   TextField,
 } from '@mui/material';
 import {
@@ -23,6 +33,117 @@ import {
 import {parse, unparse} from 'papaparse';
 import {Dispatch, SetStateAction, useEffect, useState} from 'react';
 
+type MismatchData = {
+  fields: string[];
+  keys: string[];
+  mismatches: string[];
+  onImport: (keyMap: {[key: string]: string}) => void;
+};
+
+const BadFieldDialog = ({
+  open,
+  onClose,
+  mismatchData,
+}: {
+  open: boolean;
+  onClose: () => void;
+  mismatchData: MismatchData;
+}) => {
+  const [selections, setSelections] = useState<{[key: string]: string}>({});
+  const [error, setError] = useState<boolean>(true);
+
+  useEffect(() => {
+    const newSelections = {...selections};
+    for (const key of mismatchData.keys) {
+      if (mismatchData.mismatches.includes(key)) continue;
+      newSelections[key] = mismatchData.fields.find(
+        field => field.toLowerCase() === key.toLowerCase()
+      ) as string;
+    }
+    setSelections(newSelections);
+  }, [mismatchData.fields, mismatchData.keys, mismatchData.mismatches]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    let newError = false;
+
+    for (const key of mismatchData.keys) {
+      if (!(key in selections)) newError = true;
+    }
+
+    const usedSelections: string[] = [];
+    for (const value of Object.values(selections)) {
+      if (usedSelections.includes(value)) newError = true;
+      usedSelections.push(value);
+    }
+    setError(newError);
+  }, [mismatchData.keys, selections]);
+
+  return (
+    <Dialog open={open && mismatchData !== null} fullWidth onClose={onClose}>
+      <DialogTitle>Mismatching columns found</DialogTitle>
+      <DialogContent>
+        <Alert severity={error ? 'error' : 'success'} sx={{mb: 2}}>
+          {error ? 'There are still errors' : 'All Done!'}
+        </Alert>
+        <TableContainer>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>CSV Header</TableCell>
+                <TableCell>Table Header</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {mismatchData.keys.map(key => (
+                <TableRow key={`mismatch-${key}`}>
+                  <TableCell>{key}</TableCell>
+                  <TableCell>
+                    <FormControl>
+                      <InputLabel id={`mismatch-select${key}`}>
+                        Table Header
+                      </InputLabel>
+                      <Select
+                        labelId={`mismatch-select${key}`}
+                        label="Table Header"
+                        size="small"
+                        value={selections[key] ?? ''}
+                        onChange={e =>
+                          setSelections(oldSelections => ({
+                            ...oldSelections,
+                            [key]: e.target.value,
+                          }))
+                        }
+                        sx={{minWidth: 200}}
+                      >
+                        {mismatchData?.fields.map(field => (
+                          <MenuItem
+                            key={`mismatch-${key}-select-${field}`}
+                            value={field}
+                          >
+                            {field}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          onClick={() => mismatchData.onImport(selections)}
+          disabled={error}
+        >
+          Import
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
 type PropsType = {
   columns: GridColDef[];
   rows: GridRowsProp;
@@ -32,6 +153,8 @@ type PropsType = {
 const UploadDialogUpload = ({columns, rows, setRows, setReady}: PropsType) => {
   const [textFieldText, setTextFieldText] = useState<string>('');
   const [textFieldOpen, setTextFieldOpen] = useState<boolean>(false);
+  const [mismatchDialogOpen, setMismatchDialogOpen] = useState<boolean>(false);
+  const [mismatchData, setMismatchData] = useState<MismatchData | null>(null);
   const [expanded, setExpanded] = useState<'' | 'import' | 'edit'>(
     rows.length > 0 ? 'edit' : 'import'
   );
@@ -87,21 +210,52 @@ const UploadDialogUpload = ({columns, rows, setRows, setReady}: PropsType) => {
       skipEmptyLines: true,
       complete: (rows: {data: string[][]}) => {
         const fields = columns.map(col => col.field);
-        const resultKeys: string[] = rows.data[0] as string[];
-        const newRows = [];
-        for (let rowI = 0; rowI < rows.data.length; rowI++) {
-          if (rowI === 0 || rows.data[rowI].length === 0) continue;
+        const resultKeys = rows.data[0];
 
-          const rowData: GridValidRowModel = {id: rowI};
-          for (let i = 0; i < rows.data[rowI].length; i++) {
-            if (!fields.includes(resultKeys[i])) continue;
-            rowData[resultKeys[i]] = rows.data[rowI][i];
-          }
-          newRows.push(rowData);
+        const mismatches: string[] = [];
+        const keyMap: {[key: string]: string} = {};
+        for (const key of resultKeys) {
+          const matchingField = fields.find(
+            field => field.toLowerCase() === key.toLowerCase()
+          );
+          if (matchingField === undefined) mismatches.push(key);
+          else keyMap[key] = matchingField;
         }
-        setRows(newRows);
-        setEditText(true);
-        setExpanded('edit');
+
+        const getData = (keyMap: {
+          [key: string]: string;
+        }): {[key: string]: string}[] => {
+          const newRows = [];
+          for (let rowI = 0; rowI < rows.data.length; rowI++) {
+            if (rowI === 0 || rows.data[rowI].length === 0) continue;
+
+            const rowData: GridValidRowModel = {id: rowI};
+            for (let i = 0; i < rows.data[rowI].length; i++) {
+              rowData[keyMap[resultKeys[i]]] = rows.data[rowI][i];
+            }
+            newRows.push(rowData);
+          }
+          return newRows;
+        };
+
+        if (mismatches.length > 0) {
+          setMismatchDialogOpen(true);
+          setMismatchData({
+            fields: fields.filter(field => field !== 'actions'),
+            keys: resultKeys,
+            mismatches,
+            onImport: (keyMap: {[key: string]: string}) => {
+              setMismatchDialogOpen(false);
+              setRows(getData(keyMap));
+              setEditText(true);
+              setExpanded('edit');
+            },
+          });
+        } else {
+          setRows(getData(keyMap));
+          setEditText(true);
+          setExpanded('edit');
+        }
       },
     });
   };
@@ -134,6 +288,19 @@ const UploadDialogUpload = ({columns, rows, setRows, setReady}: PropsType) => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <BadFieldDialog
+        open={mismatchDialogOpen}
+        onClose={() => setMismatchDialogOpen(false)}
+        mismatchData={
+          mismatchData ?? {
+            fields: [],
+            keys: [],
+            mismatches: [],
+            onImport: () => {},
+          }
+        }
+      />
 
       <DialogContent sx={{minHeight: 500}}>
         <Snackbar
