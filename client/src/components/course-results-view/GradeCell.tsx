@@ -2,13 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {AttainmentGradeData, GradeOption} from '@common/types';
 import {
   EventBusyOutlined,
   MoreHoriz as MoreHorizIcon,
 } from '@mui/icons-material';
 import {Box, IconButton, Theme, Tooltip, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import {AttainmentGradeData, GradeOption} from '@common/types';
 import {FC, useState} from 'react';
 
 import GradeOptionsDialog from './GradeOptionsDialog';
@@ -18,7 +18,7 @@ import {findBestGradeOption, isGradeDateExpired} from '../../utils';
 
 type GradeCellProps = {
   studentNumber: string;
-  attainemntResults: AttainmentGradeData | null;
+  attainemntResults?: AttainmentGradeData;
   finalGrade?: boolean;
 };
 

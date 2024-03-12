@@ -9,6 +9,8 @@ import {
   StudentGradesTree,
   StudentRow,
 } from '@common/types';
+import {GradeNodeValue} from '@common/types/graph';
+import {batchCalculateGraph} from '@common/util/calculateGraph';
 import {ArrowUpward, ExpandLess, ExpandMore, Sort} from '@mui/icons-material';
 import {Badge, Checkbox, Icon, IconButton, Link, Tooltip} from '@mui/material';
 import '@tanstack/react-table';
@@ -28,7 +30,7 @@ import {
 } from '@tanstack/react-table';
 import * as React from 'react';
 import {useParams} from 'react-router-dom';
-import {useGetAttainments} from '../../hooks/useApi';
+import {useGetAllAssessmentModels, useGetAttainments} from '../../hooks/useApi';
 import {findBestGradeOption} from '../../utils';
 import PrettyChip from '../shared/PrettyChip';
 import GradeCell from './GradeCell';
@@ -176,6 +178,8 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
     courseId: string;
   };
   const attainmentList = useGetAttainments(courseId).data ?? [];
+  const {data: assessmentModels, isLoading} =
+    useGetAllAssessmentModels(courseId) ?? [];
   const flattenData = React.useMemo(
     () => props.data.map(flattenTree),
     [props.data]
@@ -206,6 +210,9 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
       });
     });
   }, [rowSelection]);
+  React.useEffect(() => {
+    table.reset();
+  }, [assessmentModels]);
   // console.log(expanded);
   // console.log(rowSelection);
 
@@ -413,12 +420,48 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
       cell: ({getValue}) => (
         <GradeCell
           studentNumber={'123'}
-          attainemntResults={getValue()}
+          attainemntResults={getValue().finalGrades?.[0]}
           finalGrade={true}
         />
       ),
       aggregatedCell: () => null,
     }),
+    columnHelper.accessor(
+      row => {
+        console.log(row.user.studentNumber && assessmentModels?.length > 0);
+        if (row.user.studentNumber && assessmentModels?.length > 0) {
+          const modelsGrades = assessmentModels.map(model => {
+            return (
+              batchCalculateGraph(model.graphStructure!, [
+                {
+                  studentNumber: row.user.studentNumber!,
+                  attainments: row.flatAttainments.map(att => ({
+                    attainmentId: att.attainmentId,
+                    grade: att.grades[0].grade ?? 0,
+                  })),
+                },
+              ])[row.user.studentNumber!]['final-grade'] as GradeNodeValue
+            ).value;
+          });
+          console.log(modelsGrades);
+          return (
+            <Tooltip
+              placement="top"
+              title={`${assessmentModels.map(m => m.name).join(', ')}`}
+              disableInteractive
+            >
+              <>{modelsGrades.join(', ')}</>
+            </Tooltip>
+          );
+        }
+      },
+      {
+        header: 'Grade preview',
+        meta: {PrettyChipPosition: 'middle'},
+        cell: info => info.getValue(),
+        aggregatedCell: () => null,
+      }
+    ),
     columnHelper.accessor(
       row => {
         // ATTENTION this function needs to have the same parameters of the one inside the grade cell

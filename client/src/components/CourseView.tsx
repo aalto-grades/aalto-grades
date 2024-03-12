@@ -93,20 +93,6 @@ export default function CourseView(): JSX.Element {
 
   return (
     <>
-      <Button
-        onClick={() =>
-          addGrades.mutate([
-            {
-              studentNumber: '123',
-              attainmentId: 1,
-              grade: 5,
-              comment: 'Test',
-            },
-          ])
-        }
-      >
-        Test
-      </Button>
       <Box sx={{mx: -2.5}}>
         {course.data && (
           <>
