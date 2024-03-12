@@ -21,7 +21,7 @@ import {
   GridValidRowModel,
 } from '@mui/x-data-grid';
 import {parse, unparse} from 'papaparse';
-import {Dispatch, SetStateAction, useState, useEffect} from 'react';
+import {Dispatch, SetStateAction, useEffect, useState} from 'react';
 
 type PropsType = {
   columns: GridColDef[];
@@ -134,6 +134,7 @@ const UploadDialogUpload = ({columns, rows, setRows, setReady}: PropsType) => {
           </Button>
         </DialogActions>
       </Dialog>
+
       <DialogContent sx={{minHeight: 500}}>
         <Snackbar
           open={snackbar !== null}

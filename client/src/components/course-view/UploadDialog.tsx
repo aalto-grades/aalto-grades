@@ -1,12 +1,13 @@
+import {NewGrade} from '@common/types';
 import {Delete} from '@mui/icons-material';
 import {Button, Dialog, DialogActions} from '@mui/material';
 import {GridActionsCellItem, GridColDef, GridRowsProp} from '@mui/x-data-grid';
+import dayjs, {Dayjs} from 'dayjs';
 import {useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {useAddGrades, useGetAttainments} from '../../hooks/useApi';
 import UploadDialogConfirm from './UploadDialogConfirm';
 import UploadDialogUpload from './UploadDialogUpload';
-import {NewGrade} from '@common/types';
 
 const UploadDialog = ({
   open,
@@ -16,20 +17,38 @@ const UploadDialog = ({
   onClose: () => void;
 }) => {
   const {courseId} = useParams() as {courseId: string};
+  const attainments = useGetAttainments(courseId);
+  const addGrades = useAddGrades(courseId);
+
+  const attainmentData = attainments.data ?? [];
+
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [ready, setReady] = useState<boolean>(false);
-
-  const attainments = useGetAttainments(courseId);
-  const addGrades = useAddGrades(courseId);
+  const [dates, setDates] = useState<
+    {attainmentName: string; completionDate: Dayjs; expirationDate: Dayjs}[]
+  >(
+    attainmentData.map(att => ({
+      attainmentName: att.name,
+      completionDate: dayjs(),
+      expirationDate: dayjs().add(att.daysValid as number, 'day'),
+    }))
+  );
 
   useEffect(() => {
     if (open) {
       // reset
       setCurrentStep(0);
       setRows([]);
+      setDates(
+        attainmentData.map(att => ({
+          attainmentName: att.name,
+          completionDate: dayjs(),
+          expirationDate: dayjs().add(att.daysValid as number, 'day'),
+        }))
+      );
     }
-  }, [open]);
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (attainments.data === undefined) return <></>;
 
@@ -83,6 +102,12 @@ const UploadDialog = ({
           studentNumber: row.StudentNo.toString(),
           attainmentId: attainment.id,
           grade: row[attainment.name],
+          date: dates
+            .find(date => date.attainmentName === attainment.name)
+            ?.completionDate.toDate(),
+          expiryDate: dates
+            .find(date => date.attainmentName === attainment.name)
+            ?.expirationDate.toDate(),
           comment: '',
         });
       }
@@ -100,7 +125,12 @@ const UploadDialog = ({
           setReady={setReady}
         />
       ) : (
-        <UploadDialogConfirm columns={readOnlycolumns} rows={rows} />
+        <UploadDialogConfirm
+          columns={readOnlycolumns}
+          rows={rows}
+          dates={dates}
+          setDates={setDates}
+        />
       )}
 
       <DialogActions>
