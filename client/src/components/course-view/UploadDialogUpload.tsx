@@ -50,7 +50,8 @@ const BadFieldDialog = ({
   mismatchData: MismatchData;
 }) => {
   const [selections, setSelections] = useState<{[key: string]: string}>({});
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<'' | 'empty' | 'duplicate'>('');
+  const [duplicate, setDuplicate] = useState<string>('');
 
   useEffect(() => {
     const newSelections = {...selections};
@@ -64,19 +65,22 @@ const BadFieldDialog = ({
   }, [mismatchData.fields, mismatchData.keys, mismatchData.mismatches]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    let newError = '';
-
     for (const key of mismatchData.keys) {
-      if (!(key in selections)) newError = 'Table header cannot be empty';
+      if (!(key in selections)) {
+        setError('empty');
+        return;
+      }
     }
-
     const usedSelections: string[] = [];
     for (const value of Object.values(selections)) {
-      if (usedSelections.includes(value) && value !== 'Ignore Column')
-        newError = 'The same table header cannot appear twice';
+      if (usedSelections.includes(value) && value !== 'Ignore Column') {
+        setError('duplicate');
+        setDuplicate(value);
+        return;
+      }
       usedSelections.push(value);
     }
-    setError(newError);
+    setError('');
   }, [mismatchData.keys, selections]);
 
   return (
@@ -84,14 +88,18 @@ const BadFieldDialog = ({
       <DialogTitle>Mismatching columns found</DialogTitle>
       <DialogContent>
         <Alert severity={error !== '' ? 'error' : 'success'} sx={{mb: 2}}>
-          {error !== '' ? error : 'All Done!'}
+          {error === ''
+            ? 'All Done!'
+            : error === 'empty'
+            ? '"Import as" field cannot be empty'
+            : 'The same import as value cannot appear twice'}
         </Alert>
         <TableContainer>
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>CSV Header</TableCell>
-                <TableCell>Table Header</TableCell>
+                <TableCell>CSV column</TableCell>
+                <TableCell>Import as</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -99,13 +107,18 @@ const BadFieldDialog = ({
                 <TableRow key={`mismatch-${key}`}>
                   <TableCell>{key}</TableCell>
                   <TableCell>
-                    <FormControl>
+                    <FormControl
+                      error={
+                        (error === 'empty' && selections[key] === undefined) ||
+                        (error === 'duplicate' && selections[key] === duplicate)
+                      }
+                    >
                       <InputLabel id={`mismatch-select${key}`}>
-                        Table Header
+                        Import as
                       </InputLabel>
                       <Select
                         labelId={`mismatch-select${key}`}
-                        label="Table Header"
+                        label="Import as"
                         size="small"
                         value={selections[key] ?? ''}
                         onChange={e =>
@@ -116,10 +129,14 @@ const BadFieldDialog = ({
                         }
                         sx={{minWidth: 200}}
                       >
-                        {mismatchData?.fields.map(field => (
+                        {mismatchData.fields.map((field, index) => (
                           <MenuItem
                             key={`mismatch-${key}-select-${field}`}
                             value={field}
+                            divider={
+                              index === 0 ||
+                              index === mismatchData.fields.length - 1
+                            }
                           >
                             {field}
                           </MenuItem>
