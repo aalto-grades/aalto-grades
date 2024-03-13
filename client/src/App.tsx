@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AppBar, Box, Container, Link, Toolbar} from '@mui/material';
+import {AppBar, Box, Container, Toolbar, Typography} from '@mui/material';
 import {
   Experimental_CssVarsProvider as CssVarsProvider,
   CssVarsTheme,
@@ -16,7 +16,7 @@ import {
 } from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'; // For debugging
 import {CSSProperties, JSX} from 'react';
-import {Route, Routes} from 'react-router-dom';
+import {Link, Route, Routes} from 'react-router-dom';
 
 import {SystemRole} from '@common/types';
 import CourseResultsView from './components/CourseResultsView';
@@ -171,16 +171,19 @@ export default function App(): JSX.Element {
         >
           <AppBar position="static">
             <Toolbar>
-              <Link
-                href="/"
-                underline="none"
-                color="white"
+              <Typography
                 variant="h5"
-                align="left"
-                sx={{mr: 2, flexGrow: 1}}
+                component={Link}
+                to="/"
+                sx={{
+                  textDecoration: 'none',
+                  color: 'white',
+                  mr: 2,
+                  flexGrow: 1,
+                }}
               >
                 Aalto Grades
-              </Link>
+              </Typography>
               <UserButton />
             </Toolbar>
           </AppBar>

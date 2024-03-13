@@ -12,7 +12,7 @@ import {
   NewGrade,
   Status,
   StudentGradesTree,
-  studentRow,
+  StudentRow,
 } from '@common/types';
 import {stringify} from 'csv-stringify';
 import {NextFunction, Request, Response} from 'express';
@@ -187,7 +187,7 @@ export async function getGrades(req: Request, res: Response): Promise<void> {
 
   //Cleaning the results for API response
 
-  const result: studentRow[] = Object.keys(userGrades).map(userId => {
+  const result: StudentRow[] = Object.keys(userGrades).map(userId => {
     // console.log(userGrades[userId]);
     return {
       user: users[userId],

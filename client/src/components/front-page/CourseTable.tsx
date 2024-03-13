@@ -4,7 +4,6 @@
 
 import {CourseData} from '@common/types';
 import {
-  Link,
   Table,
   TableBody,
   TableCell,
@@ -64,35 +63,20 @@ export default function CourseTable(props: {
       <TableBody>
         {props.courses
           .sort((a: CourseData, b: CourseData) => {
-            const codeA: string = a.courseCode.toUpperCase();
-            const codeB: string = b.courseCode.toUpperCase();
-            if (codeA < codeB) {
-              return -1;
-            }
-            if (codeA > codeB) {
-              return 1;
-            }
+            const codeA = a.courseCode.toUpperCase();
+            const codeB = b.courseCode.toUpperCase();
+            if (codeA < codeB) return -1;
+            if (codeA > codeB) return 1;
             return 0;
           })
-          .slice()
           .map((course: CourseData) => (
             <TableRow
               id={`ag_see_instances_tr_${course.id}`}
               key={course.id}
               hover={true}
-              onClick={(): void => {
-                navigate('/' + course.id + '/course-results');
-              }}
+              onClick={() => navigate(`/${course.id}/course-results`)}
             >
-              <TableCell>
-                <Link
-                  href={'/' + course.id + '/course-results'}
-                  underline="hover"
-                  color="inherit"
-                >
-                  {course.courseCode}
-                </Link>
-              </TableCell>
+              <TableCell>{course.courseCode}</TableCell>
               <TableCell>{course.name.en}</TableCell>
               <TableCell>{course.department.en}</TableCell>
             </TableRow>
