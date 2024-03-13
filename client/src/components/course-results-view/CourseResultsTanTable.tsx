@@ -3,10 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import {
+  AssessmentModelData,
   AttainmentGradeData,
   FinalGrade,
-  GradeOption,
-  StudentGradesTree,
   StudentRow,
 } from '@common/types';
 import {GradeNodeValue} from '@common/types/graph';
@@ -43,23 +42,16 @@ declare module '@tanstack/table-core' {
   }
 }
 
-// type StudentRow = {
-//   attainmentId: number;
-//   studentNumber: string;
-//   credits: number;
-//   grades: Array<GradeOption>;
-//   flatAttainments: Array<AttainmentGradeData>;
-//   subAttainments?: Array<AttainmentGradeData>;
-//   // [attainmentId: string]: string | boolean | number;
-// };
-
 type GroupedStudentRow = {
   grouping: string;
-  flatAttainments: Array<AttainmentGradeData>;
-} & StudentRow;
+} & ExtendedStudentRow;
+
+type ExtendedStudentRow = StudentRow & {
+  assessmentModels?: AssessmentModelData[];
+};
 
 type PropsType = {
-  data: StudentGradesTree[];
+  data: StudentRow[];
   selectedStudents: FinalGrade[];
   setSelectedStudents: React.Dispatch<React.SetStateAction<FinalGrade[]>>;
 };
@@ -100,29 +92,12 @@ function getAttainmentGrade(
   return traverseTree(gradeTree);
 }
 
-// Flatten the tree into a list of rows
-function flattenTree(studentTree: StudentGradesTree) {
-  const result: StudentRow = {...studentTree, flatAttainments: []};
-  result.flatAttainments = studentTree.attainments ?? [];
-
-  // function addSubAttainments(sAtt: AttainmentGradeData[]) {
-  //   if (sAtt) {
-  //     result.flatAttainments.push(...sAtt);
-  //     for (const subAtt of sAtt) {
-  //       addSubAttainments(subAtt.attainment ?? []);
-  //     }
-  //   }
-  // }
-  // addSubAttainments(studentTree.subAttainments ?? []);
-  return result;
-}
-
 // Group the rows by the last attainment date
-function groupByLastAttainmentDate(gradesList: StudentRow[]) {
+function groupByLastAttainmentDate(gradesList: ExtendedStudentRow[]) {
   // const result: {date: string; rows: StudentGradesTree[]}[] = [];
   function findNewestDate(row: StudentRow) {
     let newestDate = new Date('1970-01-01');
-    for (const att of row.flatAttainments) {
+    for (const att of row.attainments) {
       const bestGradeDate = new Date(
         findBestGradeOption(att.grades ?? [], {
           avoidExpired: true,
@@ -153,21 +128,22 @@ function groupByLastAttainmentDate(gradesList: StudentRow[]) {
  * @param row - The student row.
  * @returns The previous grade that has been exported to Sisu, or null if none is found.
  */
-function findPreviouslyExportedToSisu(bestGrade: GradeOption, row: StudentRow) {
-  for (const gr of row.grades) {
-    if (bestGrade?.gradeId === gr.gradeId) continue; //Skip the best grade (we need to check for previous ones)
-    if (gr.exportedToSisu) {
-      //We found one!
-      if (bestGrade.exportedToSisu) {
-        //If the best grade is also exported, we need to check which one is newer
-        if (bestGrade.exportedToSisu < gr.exportedToSisu) return gr;
-      } else {
-        return gr;
-      }
-    }
-  }
-  return null;
-}
+//Commented until Final grade is reinplemented
+// function findPreviouslyExportedToSisu(bestGrade: GradeOption, row: StudentRow) {
+//   for (const gr of row.finalGrades) {
+//     if (bestGrade?.gradeId === gr.gradeId) continue; //Skip the best grade (we need to check for previous ones)
+//     if (gr.exportedToSisu) {
+//       //We found one!
+//       if (bestGrade.exportedToSisu) {
+//         //If the best grade is also exported, we need to check which one is newer
+//         if (bestGrade.exportedToSisu < gr.exportedToSisu) return gr;
+//       } else {
+//         return gr;
+//       }
+//     }
+//   }
+//   return null;
+// }
 
 const columnHelper = createColumnHelper<GroupedStudentRow>();
 
@@ -179,17 +155,15 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
   };
   const attainmentList = useGetAttainments(courseId).data ?? [];
   const {data: assessmentModels, isLoading} =
-    useGetAllAssessmentModels(courseId) ?? [];
-  const flattenData = React.useMemo(
-    () => props.data.map(flattenTree),
-    [props.data]
-  );
+    useGetAllAssessmentModels(courseId);
   // Row are always grouped, toggling grouping just add the grouping column to the table
-  const groupedData = React.useMemo(
-    () => groupByLastAttainmentDate(flattenData),
-    [flattenData]
-  );
-  // console.log(groupedData);
+  const groupedData = React.useMemo(() => {
+    return groupByLastAttainmentDate(
+      props.data.map(row => {
+        return {...row, assessmentModels: assessmentModels ?? []};
+      })
+    );
+  }, [props.data, assessmentModels]);
 
   const [rowSelection, setRowSelection] = React.useState({});
   const [expanded, setExpanded] = React.useState<ExpandedState>({});
@@ -210,6 +184,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
       });
     });
   }, [rowSelection]);
+  //When assessmentModels are retrieved, updated the
   React.useEffect(() => {
     table.reset();
   }, [assessmentModels]);
@@ -219,7 +194,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
   // Creating Grades columns
   const dynamicColumns = attainmentList.map(att => {
     return columnHelper.accessor(
-      row => row.flatAttainments?.find(a => a.attainmentId == att.id),
+      row => row.attainments?.find(a => a.attainmentId == att.id),
       {
         header: att.name,
         meta: {PrettyChipPosition: 'alone'},
@@ -413,29 +388,28 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
     //   cell: info => info.getValue(),
     //   aggregatedCell: () => null,
     // }),
-    columnHelper.accessor(row => row, {
-      header: 'Final Grade',
-      enableSorting: false,
-      // cell: info => info.getValue(),
-      cell: ({getValue}) => (
-        <GradeCell
-          studentNumber={'123'}
-          attainemntResults={getValue().finalGrades?.[0]}
-          finalGrade={true}
-        />
-      ),
-      aggregatedCell: () => null,
-    }),
+    // columnHelper.accessor(row => row, {
+    //   header: 'Final Grade',
+    //   enableSorting: false,
+    //   // cell: info => info.getValue(),
+    //   cell: ({getValue}) => (
+    //     <GradeCell
+    //       studentNumber={'123'}
+    //       attainemntResults={getValue().finalGrades?.[0]}
+    //       finalGrade={true}
+    //     />
+    //   ),
+    //   aggregatedCell: () => null,
+    // }),
     columnHelper.accessor(
       row => {
-        console.log(row.user.studentNumber && assessmentModels?.length > 0);
-        if (row.user.studentNumber && assessmentModels?.length > 0) {
-          const modelsGrades = assessmentModels.map(model => {
+        if (row.user.studentNumber && row?.assessmentModels) {
+          const modelsGrades = row.assessmentModels.map(model => {
             return (
               batchCalculateGraph(model.graphStructure!, [
                 {
                   studentNumber: row.user.studentNumber!,
-                  attainments: row.flatAttainments.map(att => ({
+                  attainments: row.attainments.map(att => ({
                     attainmentId: att.attainmentId,
                     grade: att.grades[0].grade ?? 0,
                   })),
@@ -443,14 +417,13 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
               ])[row.user.studentNumber!]['final-grade'] as GradeNodeValue
             ).value;
           });
-          console.log(modelsGrades);
           return (
             <Tooltip
               placement="top"
-              title={`${assessmentModels.map(m => m.name).join(', ')}`}
+              title={`${row.assessmentModels.map(m => m.name).join('/')}`}
               disableInteractive
             >
-              <>{modelsGrades.join(', ')}</>
+              <>{modelsGrades.join('/')}</>
             </Tooltip>
           );
         }
@@ -466,16 +439,16 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
       row => {
         // ATTENTION this function needs to have the same parameters of the one inside the grade cell
         // Clearly can be done in a better way
-        const bestGrade = findBestGradeOption(row?.grades ?? [], {
-          avoidExpired: true,
-          preferExpiredToNull: true,
-        });
-        if (!bestGrade) return '-';
-        console.log(bestGrade);
-        if (bestGrade?.exportedToSisu) return '✅';
-        console.log(findPreviouslyExportedToSisu(bestGrade, row));
-        if (findPreviouslyExportedToSisu(bestGrade, row)) return '⚠️';
-        return '❌';
+        // const bestGrade = findBestGradeOption(row?.grades ?? [], {
+        //   avoidExpired: true,
+        //   preferExpiredToNull: true,
+        // });
+        // if (!bestGrade) return '-';
+        // console.log(bestGrade);
+        // if (bestGrade?.exportedToSisu) return '✅';
+        // console.log(findPreviouslyExportedToSisu(bestGrade, row));
+        // if (findPreviouslyExportedToSisu(bestGrade, row)) return '⚠️';
+        // return '❌';
       },
       {
         header: 'Exported to Sisu',
