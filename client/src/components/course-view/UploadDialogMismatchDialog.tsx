@@ -89,10 +89,17 @@ const MismatchDialog = ({
             </TableHead>
             <TableBody>
               {mismatchData.keys.map(key => (
-                <TableRow key={`mismatch-${key}`}>
+                <TableRow
+                  key={`mismatch-${key}`}
+                  sx={{
+                    background:
+                      selections[key] === 'Ignore Column' ? '#eceff1' : '',
+                  }}
+                >
                   <TableCell>{key}</TableCell>
                   <TableCell>
                     <FormControl
+                      sx={{background: 'white'}}
                       error={
                         (error === 'empty' && selections[key] === undefined) ||
                         (error === 'duplicate' && selections[key] === duplicate)

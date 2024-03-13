@@ -99,7 +99,11 @@ const UploadDialog = ({
 
     for (const row of rows) {
       for (const attainment of attainments.data) {
-        if (!(attainment.name in row) || row[attainment.name] === null)
+        if (
+          !(attainment.name in row) ||
+          row[attainment.name] === null ||
+          row[attainment.name] === ''
+        )
           continue; // Skip empty cells
         gradeData.push({
           studentNumber: row.StudentNo.toString(),
@@ -143,6 +147,7 @@ const UploadDialog = ({
           rows={rows}
           dates={dates}
           setDates={setDates}
+          setReady={setReady}
         />
       )}
 
@@ -169,6 +174,7 @@ const UploadDialog = ({
               onClose();
               onSubmit();
             }}
+            disabled={!ready}
           >
             Submit
           </Button>
