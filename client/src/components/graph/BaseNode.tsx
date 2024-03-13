@@ -13,15 +13,22 @@ import {
   NodeDataContext,
 } from '../../context/GraphProvider';
 
-const BaseNode: React.FC<
-  PropsWithChildren<{
-    id: string;
-    type: CustomNodeTypes;
-    selected: boolean;
-    error?: boolean;
-    courseFail?: boolean;
-  }>
-> = ({id, type, error, selected, courseFail, children}) => {
+type PropsType = PropsWithChildren<{
+  id: string;
+  type: CustomNodeTypes;
+  selected: boolean;
+  error?: boolean;
+  courseFail?: boolean;
+}>;
+
+const BaseNode = ({
+  id,
+  type,
+  error = false,
+  selected,
+  courseFail = false,
+  children,
+}: PropsType) => {
   const [ref, {width, height}] = useMeasure();
   const {nodeData, setNodeTitle} = useContext(NodeDataContext);
   const {setNodeDimensions, extraNodeData} = useContext(ExtraNodeDataContext);
@@ -40,30 +47,29 @@ const BaseNode: React.FC<
     setInit(true);
   }, [nodeData]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const getBorderColor = (): string => {
+    if (courseFail) return '2px solid #e00';
+    if (error) return '1px dashed #e00';
+    if (extraData?.warning) return '1px solid #ffb833';
+    return '1px solid #eee';
+  };
+  const getBackgroundColor = (): string => {
+    if (error) return '#fffafa';
+    if (extraData?.warning) return '#fff6e5';
+    return 'white';
+  };
+
   return (
     <div
       ref={ref}
       style={{
         height: 'auto',
         width: 'auto',
-        border: courseFail
-          ? '2px solid #e00'
-          : error
-          ? '1px dashed #e00'
-          : extraData?.warning
-          ? '1px solid #ffb833'
-          : selected
-          ? '1px solid #99f'
-          : '1px solid #eee',
+        border: getBorderColor(),
         padding: '10px',
         borderRadius: '5px',
-        background: error
-          ? '#fffafa'
-          : extraData?.warning
-          ? '#fff6e5'
-          : selected
-          ? '#fafaff'
-          : 'white',
+        background: getBackgroundColor(),
+        filter: selected ? 'brightness(95%)' : '',
       }}
     >
       <div>
@@ -100,6 +106,5 @@ const BaseNode: React.FC<
     </div>
   );
 };
-BaseNode.defaultProps = {error: false, courseFail: false};
 
 export default BaseNode;
