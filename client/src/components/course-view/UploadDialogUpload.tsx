@@ -365,6 +365,7 @@ const UploadDialogUpload = ({columns, rows, setRows, setReady}: PropsType) => {
               rowHeight={25}
               editMode="row"
               rowSelection={false}
+              disableColumnSelector
               slots={{toolbar: dataGridToolbar}}
               sx={{maxHeight: '70vh', minHeight: '20vh'}}
               onRowEditStart={() => setEditing(true)}
