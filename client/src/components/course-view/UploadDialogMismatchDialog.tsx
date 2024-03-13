@@ -77,7 +77,7 @@ const MismatchDialog = ({
             ? 'All Done!'
             : error === 'empty'
             ? '"Import as" field cannot be empty'
-            : 'The same import as value cannot appear twice'}
+            : 'The same "Import as" value cannot appear twice'}
         </Alert>
         <TableContainer>
           <Table size="small">

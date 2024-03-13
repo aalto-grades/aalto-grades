@@ -99,6 +99,8 @@ const UploadDialog = ({
 
     for (const row of rows) {
       for (const attainment of attainments.data) {
+        if (!(attainment.name in row) || row[attainment.name] === null)
+          continue; // Skip empty cells
         gradeData.push({
           studentNumber: row.StudentNo.toString(),
           attainmentId: attainment.id,

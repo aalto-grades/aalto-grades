@@ -411,7 +411,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
                   studentNumber: row.user.studentNumber!,
                   attainments: row.attainments.map(att => ({
                     attainmentId: att.attainmentId,
-                    grade: att.grades[0].grade ?? 0,
+                    grade: att.grades === undefined ? 0 : att.grades[0].grade,
                   })),
                 },
               ])[row.user.studentNumber!]['final-grade'] as GradeNodeValue
