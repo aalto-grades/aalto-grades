@@ -70,6 +70,7 @@ const UploadDialogConfirm = ({columns, rows, dates, setDates}: PropsType) => {
                           <DatePicker
                             slotProps={{textField: {size: 'small'}}}
                             value={date.completionDate}
+                            format="DD.MM.YYYY"
                             onChange={e =>
                               setDates(oldDates =>
                                 oldDates.map(oldDate =>
@@ -86,6 +87,7 @@ const UploadDialogConfirm = ({columns, rows, dates, setDates}: PropsType) => {
                           <DatePicker
                             slotProps={{textField: {size: 'small'}}}
                             value={date.expirationDate}
+                            format="DD.MM.YYYY"
                             onChange={e =>
                               setDates(oldDates =>
                                 oldDates.map(oldDate =>
