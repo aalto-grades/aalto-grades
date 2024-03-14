@@ -45,7 +45,7 @@ CourseRole.init(
       },
     },
     role: {
-      type: DataTypes.ENUM('STUDENT', 'TEACHER'),
+      type: DataTypes.ENUM('STUDENT', 'TEACHER', 'ASSISTANT'),
       allowNull: false,
     },
     createdAt: DataTypes.DATE,
