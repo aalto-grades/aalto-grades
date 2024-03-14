@@ -1306,15 +1306,10 @@ export async function addGrades(
 
   try {
     // Check all users (students) exists in db, create new users if needed.
-    // Make sure each student is only in the list once
-    const usersAdded: string[] = [];
-    const studentNumbers = newGrades
-      .map(gradeEl => gradeEl.studentNumber)
-      .filter(studentNum => {
-        if (usersAdded.includes(studentNum)) return false;
-        usersAdded.push(studentNum);
-        return true;
-      });
+    // Make sure each studentNumber is only in the list once
+    const studentNumbers = Array.from(
+      new Set(newGrades.map(grade => grade.studentNumber))
+    );
 
     let students = await User.findAll({
       attributes: ['id', 'studentNumber'],

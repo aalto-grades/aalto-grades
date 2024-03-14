@@ -24,6 +24,14 @@ export default {
             key: 'id',
           },
         },
+        course_id: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          references: {
+            model: 'course',
+            key: 'id',
+          },
+        },
         assessment_model_id: {
           type: DataTypes.INTEGER,
           allowNull: false,
@@ -48,8 +56,6 @@ export default {
           type: DataTypes.FLOAT,
           allowNull: false,
         },
-        manual: {type: DataTypes.BOOLEAN, allowNull: true},
-        comment: {type: DataTypes.STRING, allowNull: true},
         sisu_export_date: {
           type: DataTypes.DATE,
           allowNull: true,

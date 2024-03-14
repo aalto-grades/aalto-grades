@@ -5,6 +5,7 @@
 export * from './attainment';
 export * from './auth';
 export * from './course';
+export * from './finalGrade';
 export * from './formula';
 export * from './general';
 export * from './grades';

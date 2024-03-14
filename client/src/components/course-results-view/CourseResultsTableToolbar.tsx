@@ -22,7 +22,7 @@ import {
 } from 'react-router-dom';
 
 import FileLoadDialog from './FileLoadDialog';
-import MenuButton, {MenuButtonOption} from './MenuButton';
+import {MenuButtonOption} from './MenuButton';
 import SisuDownloadDialog from './SisuDownloadDialog';
 
 import {State} from '../../types';
@@ -99,7 +99,7 @@ export default function CourseResultsTableToolbar(props: {
           }}
         >
           {/* <MenuButton label="Import grades" options={actionOptions} /> */}
-          <Tooltip
+          {/* <Tooltip
             title="Download grading template with attainment names and student numbers."
             placement="top"
           >
@@ -109,15 +109,15 @@ export default function CourseResultsTableToolbar(props: {
             >
               Download CSV template
             </Button>
-          </Tooltip>
-          <Tooltip title="Upload grades from a CSV file." placement="top">
+          </Tooltip> */}
+          {/* <Tooltip title="Upload grades from a CSV file." placement="top">
             <Button
               variant="outlined"
               onClick={(): void => setShowFileDialog(true)}
             >
               Upload Grade CSV
             </Button>
-          </Tooltip>
+          </Tooltip> */}
           <Tooltip
             title={
               props.selectedStudents.length === 0

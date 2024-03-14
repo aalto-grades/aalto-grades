@@ -106,13 +106,13 @@ router.post(
   controllerDispatcher(addGrades)
 );
 
-router.post(
-  '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/calculate',
-  passport.authenticate('jwt', {session: false}),
-  express.json(),
-  handleInvalidRequestJson
-  // controllerDispatcher(calculateGrades)
-);
+// router.post(
+//   '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/calculate',
+//   passport.authenticate('jwt', {session: false}),
+//   express.json(),
+//   handleInvalidRequestJson
+//   // controllerDispatcher(calculateGrades)
+// );
 
 router.put(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/:gradeId',
