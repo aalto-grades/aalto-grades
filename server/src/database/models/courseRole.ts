@@ -24,6 +24,10 @@ export default class CourseRole extends Model<
   declare role: string;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
+  static updateCourseAssistants: (
+    assistants: Array<User>,
+    courseId: number
+  ) => Promise<void>;
 }
 
 CourseRole.init(
@@ -68,3 +72,11 @@ Course.belongsToMany(User, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
 });
+
+CourseRole.updateCourseAssistants = async function (
+  assistants: Array<User>,
+  courseId: number
+): Promise<void> {
+  console.log(assistants);
+  console.log(courseId);
+};

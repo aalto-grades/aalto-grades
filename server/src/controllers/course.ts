@@ -4,6 +4,7 @@
 
 import {
   CourseData,
+  CourseRoleType,
   GradingScale,
   HttpCode,
   Language,
@@ -27,6 +28,7 @@ import {
   findCourseFullById,
   parseCourseFull,
 } from './utils/course';
+import CourseRole from '../database/models/courseRole';
 
 export async function getCourse(req: Request, res: Response): Promise<void> {
   const courseId: number = Number(req.params.courseId);
@@ -114,6 +116,14 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
         })
       )
       .required(),
+    assistants: yup
+      .array()
+      .of(
+        yup.object().shape({
+          email: yup.string().email().required(),
+        })
+      )
+      .required(),
     department: localizedStringSchema.required(),
     name: localizedStringSchema.required(),
   });
@@ -122,6 +132,10 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
 
   const teachers: Array<User> = await createMissingUsers(
     req.body.teachersInCharge.map((teacher: UserData) => teacher.email)
+  );
+
+  const assistants: Array<User> = await createMissingUsers(
+    req.body.assistants.map((assistant: UserData) => assistant.email)
   );
 
   const course: Course = await sequelize.transaction(
@@ -170,7 +184,18 @@ export async function addCourse(req: Request, res: Response): Promise<void> {
         }
       ) as Array<TeacherInCharge>;
 
+      const assistantRoles: Array<CourseRole> = assistants.map(
+        (assistant: User) => {
+          return {
+            courseId: course.id,
+            userId: assistant.id,
+            role: CourseRoleType.Assistant,
+          };
+        }
+      ) as Array<CourseRole>;
+
       await TeacherInCharge.bulkCreate(teachersInCharge, {transaction: t});
+      await CourseRole.bulkCreate(assistantRoles, {transaction: t});
 
       return course;
     }
@@ -202,6 +227,14 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
         })
       )
       .notRequired(),
+    assistants: yup
+      .array()
+      .of(
+        yup.object().shape({
+          email: yup.string().email().required(),
+        })
+      )
+      .required(),
     department: localizedStringSchema.notRequired(),
     name: localizedStringSchema.notRequired(),
   });
@@ -217,6 +250,7 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
   const gradingScale: GradingScale | undefined = req.body.gradingScale;
   const teachersInCharge: Array<UserData> | undefined =
     req.body.teachersInCharge;
+  const assistants: Array<UserData> = req.body.assistants;
   const department: LocalizedString | undefined = req.body.department;
   const name: LocalizedString | undefined = req.body.name;
   const languageOfInstruction: Language | undefined = req.body
@@ -237,15 +271,18 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
       HttpCode.BadRequest
     );
   }
-  console.log(teachersInCharge);
+
   const newTeachers: Array<User> | null = teachersInCharge
     ? await createMissingUsers(
         // teacher.email was alread validated to be defined by Yup.
-
         teachersInCharge.map((teacher: UserData) => teacher.email!)
       )
     : null;
-  console.log(newTeachers);
+
+  const newAssistants: Array<User> = await createMissingUsers(
+    assistants.map((assistant: UserData) => assistant.email!)
+  );
+
   await sequelize.transaction(async (t: Transaction): Promise<void> => {
     await Course.update(
       {
@@ -325,6 +362,7 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
         {transaction: t}
       );
     }
+    CourseRole.updateCourseAssistants(newAssistants, courseId);
   });
 
   res.status(HttpCode.Ok).json({
