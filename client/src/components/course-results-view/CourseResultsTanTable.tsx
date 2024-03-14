@@ -52,8 +52,8 @@ type ExtendedStudentRow = StudentRow & {
 
 type PropsType = {
   data: StudentRow[];
-  selectedStudents: FinalGrade[];
-  setSelectedStudents: React.Dispatch<React.SetStateAction<FinalGrade[]>>;
+  selectedStudents: StudentRow[];
+  setSelectedStudents: React.Dispatch<React.SetStateAction<StudentRow[]>>;
 };
 
 function toggleString(arr: string[], str: string): string[] {
@@ -180,7 +180,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
       return table.getSelectedRowModel().rows.map(row => {
         //Setting selectedStudnets
         console.log(row.original);
-        return row.original as unknown as FinalGrade;
+        return row.original;
       });
     });
   }, [rowSelection]);
@@ -411,7 +411,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
                   studentNumber: row.user.studentNumber!,
                   attainments: row.attainments.map(att => ({
                     attainmentId: att.attainmentId,
-                    grade: att.grades[0].grade ?? 0, //🐛 best grade should be taken
+                    grade: att.grades === undefined ? 0 : att.grades[0].grade, // TODO: best grade should be taken 🐛
                   })),
                 },
               ])[row.user.studentNumber!]['final-grade'] as GradeNodeValue

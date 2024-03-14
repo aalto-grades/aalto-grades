@@ -2,119 +2,86 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentData, FinalGrade} from '@common/types';
-import {Box, Typography} from '@mui/material';
-import {UseQueryResult} from '@tanstack/react-query';
+import {Box} from '@mui/material';
 import {JSX, useEffect, useState} from 'react';
 import {Params, useParams} from 'react-router-dom';
 
-import AlertSnackbar from './alerts/AlertSnackbar';
-
+import {StudentRow} from '@common/types';
 import {
-  useCalculateFinalGrades,
   UseCalculateFinalGradesResult,
-  useDownloadCsvTemplate,
-  UseDownloadCsvTemplateResult,
-  useGetFinalGrades,
+  useCalculateFinalGrades,
   useGetGrades,
-  useGetGradeTreeOfAllUsers,
-  useGetRootAttainment,
 } from '../hooks/useApi';
 import useSnackPackAlerts, {
   SnackPackAlertState,
 } from '../hooks/useSnackPackAlerts';
+import AlertSnackbar from './alerts/AlertSnackbar';
 import CourseResultsTableToolbar from './course-results-view/CourseResultsTableToolbar';
 import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
-// import CourseResultsGrid from './course-results-view/CourseResultsGrid';
-// import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
 
 export default function CourseResultsView(): JSX.Element {
-  const {courseId, assessmentModelId}: Params = useParams() as {
-    courseId: string;
-    assessmentModelId: string;
-  };
+  const {courseId}: Params = useParams() as {courseId: string};
 
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
-  const [hasPendingStudents, setHasPendingStudents] = useState<boolean>(false);
-  const [selectedStudents, setSelectedStudents] = useState<Array<FinalGrade>>(
-    []
-  );
+  const [missingFinalGrades, setMissingFinalGrades] = useState<boolean>(false);
+  const [selectedRows, setSelectedRows] = useState<StudentRow[]>([]);
 
   useEffect(() => {
-    setHasPendingStudents(
-      Boolean(
-        selectedStudents.find(
-          (student: FinalGrade) => student.grades?.length === 0
-        )
-      )
+    setMissingFinalGrades(
+      false
+      // Check if there are any students without final grade to prevent exporting sisu csv
+      // Currently final grade doesn't exist in the type so waiting for that.
+      // TODO: fix
+      // Boolean(
+      //   selectedRows.find(selectedRow => selectedRow.grades?.length === 0)
+      // )
     );
-  }, [selectedStudents]);
-
-  // const attainmentTree: UseQueryResult<AttainmentData> = useGetRootAttainment(
-  //   courseId,
-  //   assessmentModelId,
-  //   'descendants'
-  // );
-
-  // // Does not contain root attainment
-  // const attainmentList: Array<AttainmentData> = [];
-
-  // function constructAttainmentList(attainment: AttainmentData): void {
-  //   if (attainment.subAttainments) {
-  //     for (const subAttainment of attainment.subAttainments) {
-  //       attainmentList.push(subAttainment);
-  //       constructAttainmentList(subAttainment);
-  //     }
-  //   }
-  // }
-
-  // if (attainmentTree.data) constructAttainmentList(attainmentTree.data);
-
-  // const students: UseQueryResult<Array<FinalGrade>> = useGetFinalGrades(
-  //   courseId,
-  //   assessmentModelId
-  // );
+  }, [selectedRows]);
 
   const calculateFinalGrades: UseCalculateFinalGradesResult =
     useCalculateFinalGrades();
 
-  // const gradesQuery = useGetGradeTreeOfAllUsers(courseId, assessmentModelId);
   const gradesQuery = useGetGrades(courseId);
 
-  // If asking for a refetch then it also update the selectedStudents
-  async function studentsRefetch(): Promise<void> {
-    students.refetch().then((students: UseQueryResult<Array<FinalGrade>>) => {
-      if (students.data) {
-        const newSelectedStudents: Array<FinalGrade> = [];
-        // Refresh selectedStudents for updating childrens state
-        selectedStudents.forEach((student: FinalGrade) => {
-          const found: FinalGrade | undefined = students.data.find(
-            (element: FinalGrade) => element.userId == student.userId
-          );
-
-          if (found) {
-            newSelectedStudents.push(found);
-          }
-        });
-        setSelectedStudents(newSelectedStudents);
-      }
-    });
-  }
+  // If asking for a refetch then it also update the selectedRows
+  // Refresh selectedRows for updating childrens state
+  const studentsRefetch = (): void => {
+    // TODO: Uncomment code when finalGrades api endpoint exists
+    // finalGrades.refetch().then((finalGrades: UseQueryResult<FinalGrade[]>) => {
+    //   if (!finalGrades.data) return;
+    //   setSelectedRows(oldSelectedRows =>
+    //     oldSelectedRows.map(oldSelectedRow => ({
+    //       ...oldSelectedRow,
+    //       finalGrades: [
+    //         ...(oldSelectedRow.finalGrades ?? []),
+    //         finalGrades.data.find(
+    //           element => element.userId === oldSelectedRow.user.id
+    //         ) as FinalGrade,
+    //       ],
+    //     }))
+    //   );
+    // });
+  };
 
   // Triggers the calculation of final grades
-  async function handleCalculateFinalGrades(): Promise<void> {
-    if (courseId && assessmentModelId && selectedStudents.length > 0) {
+  const handleCalculateFinalGrades = (
+    assessmentModelId: number,
+    gradingDate: Date
+  ): void => {
+    console.log(JSON.stringify(selectedRows, null, 4));
+    if (courseId && selectedRows.length > 0) {
       snackPack.push({
         msg: 'Calculating final grades...',
         severity: 'info',
       });
 
+      // TODO: Also send gradingDate to backend
       calculateFinalGrades.mutate(
         {
           courseId: courseId,
-          assessmentModelId: assessmentModelId,
-          studentNumbers: selectedStudents.map(
-            (student: FinalGrade) => student.studentNumber
+          assessmentModelId,
+          studentNumbers: selectedRows.map(
+            selectedRow => selectedRow.user.studentNumber as string
           ),
         },
         {
@@ -124,57 +91,12 @@ export default function CourseResultsView(): JSX.Element {
               severity: 'success',
             });
             // We need to refetch the students to get the new grades
-            students
-              .refetch()
-              .then((students: UseQueryResult<Array<FinalGrade>>) => {
-                if (students.data) {
-                  const newSelectedStudents: Array<FinalGrade> = [];
-                  // Refresh selectedStudents for updating childrens state
-                  selectedStudents.forEach((student: FinalGrade) => {
-                    const found: FinalGrade | undefined = students.data.find(
-                      (element: FinalGrade) => element.userId == student.userId
-                    );
-
-                    if (found) {
-                      newSelectedStudents.push(found);
-                    }
-                  });
-                  setSelectedStudents(newSelectedStudents);
-                }
-              });
+            studentsRefetch();
           },
         }
       );
     }
-  }
-
-  const downloadCsvTemplate: UseDownloadCsvTemplateResult =
-    useDownloadCsvTemplate({
-      onSuccess: (csvTemplate: string) => {
-        const blob: Blob = new Blob([csvTemplate], {type: 'text/csv'});
-        const link: HTMLAnchorElement = document.createElement('a');
-
-        link.href = URL.createObjectURL(blob);
-        link.download = 'template.csv'; // TODO: Get filename from Content-Disposition
-        link.click();
-        URL.revokeObjectURL(link.href);
-        link.remove();
-      },
-    });
-
-  async function handleDownloadCsvTemplate(): Promise<void> {
-    if (courseId && assessmentModelId) {
-      snackPack.push({
-        msg: 'Downloading CSV template',
-        severity: 'info',
-      });
-
-      downloadCsvTemplate.mutate({
-        courseId: courseId,
-        assessmentModelId: assessmentModelId,
-      });
-    }
-  }
+  };
 
   return (
     <Box textAlign="left" alignItems="left">
@@ -185,16 +107,15 @@ export default function CourseResultsView(): JSX.Element {
       {/* <CourseResultsGrid /> */}
       <CourseResultsTableToolbar
         calculateFinalGrades={handleCalculateFinalGrades}
-        downloadCsvTemplate={handleDownloadCsvTemplate}
-        selectedStudents={selectedStudents}
-        hasPendingStudents={hasPendingStudents}
+        selectedRows={selectedRows}
+        hasPendingStudents={missingFinalGrades}
         refetch={studentsRefetch}
       />
       {gradesQuery.data && (
         <CourseResultsTanTable
           data={gradesQuery.data}
-          selectedStudents={selectedStudents}
-          setSelectedStudents={setSelectedStudents}
+          selectedStudents={selectedRows}
+          setSelectedStudents={setSelectedRows}
         />
       )}
       {/* <CourseResultsTable

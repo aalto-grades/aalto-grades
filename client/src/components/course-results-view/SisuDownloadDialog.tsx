@@ -86,22 +86,18 @@ export default function SisuDownloadDialog(props: {
   open: boolean;
   handleClose: () => void;
   handleExited: () => void;
-  selectedStudents: Array<FinalGrade>;
+  selectedRows: StudentRow[];
 }): JSX.Element {
   const {courseId, assessmentModelId}: Params = useParams() as {
     courseId: string;
     assessmentModelId: string;
   };
 
-  let selectedStudents = [];
-  if (props?.selectedStudents?.length !== 0) {
-    selectedStudents = props.selectedStudents.map((s: StudentRow) => {
-      return {
-        studentNuimner: s.user.studentNumber,
-        grades: s.finalGrade?.grades ?? [],
-      };
-    });
-  }
+  const selectedStudents = props.selectedRows.map((s: StudentRow) => ({
+    studentNumber: s.user.studentNumber as string,
+    grades: s.finalGrades ?? [],
+  }));
+
   // state variables handling the alert messages.
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
@@ -146,21 +142,17 @@ export default function SisuDownloadDialog(props: {
       switch (override) {
         case 'exported':
           studentNumbers = selectedStudents
-            .filter((student: FinalGrade) =>
-              userGradeAlreadyExported(student.grades)
-            )
-            .map((student: FinalGrade) => student.studentNumber);
+            .filter(student => userGradeAlreadyExported(student.grades))
+            .map(student => student.studentNumber);
           break;
         case 'unexported':
           studentNumbers = selectedStudents
-            .filter(
-              (student: FinalGrade) => !userGradeAlreadyExported(student.grades)
-            )
-            .map((student: FinalGrade) => student.studentNumber);
+            .filter(student => !userGradeAlreadyExported(student.grades))
+            .map(student => student.studentNumber);
           break;
         case 'all':
           studentNumbers = selectedStudents.map(
-            (student: FinalGrade) => student.studentNumber
+            student => student.studentNumber
           );
           break;
       }
@@ -178,15 +170,15 @@ export default function SisuDownloadDialog(props: {
     }
   }
 
-  function userGradeAlreadyExported(grades: Array<GradeOption>): boolean {
-    return Boolean(
-      grades?.find((option: GradeOption) => option.exportedToSisu != null)
-    );
+  function userGradeAlreadyExported(grades: FinalGrade[]): boolean {
+    return false;
+    // TODO: 'exportedToSisu' is currently missing from the type FinalGrade.
+    // return Boolean(grades?.find(option => option.exportedToSisu != null));
   }
 
   function exportedValuesInList(): boolean {
-    for (const value of props.selectedStudents) {
-      if (userGradeAlreadyExported(value.grades)) {
+    for (const value of props.selectedRows) {
+      if (userGradeAlreadyExported(value.finalGrades ?? [])) {
         return true;
       }
     }
@@ -290,12 +282,12 @@ export default function SisuDownloadDialog(props: {
           </Typography>
           <Paper sx={{maxHeight: 200, overflow: 'auto', my: 1}}>
             <List dense={true}>
-              {props.selectedStudents.map((studentGrade: FinalGrade) => (
-                <ListItem key={studentGrade.studentNumber}>
+              {props.selectedRows.map(selectedRow => (
+                <ListItem key={selectedRow.user.studentNumber}>
                   <ListItemText
-                    primary={`Student number: ${studentGrade.studentNumber}`}
+                    primary={`Student number: ${selectedRow.user.studentNumber}`}
                     secondary={
-                      userGradeAlreadyExported(studentGrade.grades)
+                      userGradeAlreadyExported(selectedRow.finalGrades ?? [])
                         ? 'User grade has been exported to Sisu already.'
                         : ''
                     }

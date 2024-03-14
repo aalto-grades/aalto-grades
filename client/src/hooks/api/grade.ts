@@ -8,6 +8,7 @@ import {
   FinalGrade,
   NewGrade,
   StudentGradesTree,
+  StudentRow,
 } from '@common/types';
 import {
   QueryClient,
@@ -120,8 +121,8 @@ export function useGetGradeTreeOfAllUsers(
 }
 export function useGetGrades(
   courseId: Numeric,
-  options?: Partial<UseQueryOptions<Array<StudentGradesTree>>>
-): UseQueryResult<StudentGradesTree[]> {
+  options?: Partial<UseQueryOptions<StudentRow[]>>
+): UseQueryResult<StudentRow[]> {
   return useQuery({
     queryKey: ['grades', courseId],
     queryFn: async () =>
