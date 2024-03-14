@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 export type NewFinalGrade = {
-  studentNumber: string;
+  userId: number;
   assessmentModelId: number;
   grade: number;
   date?: Date;

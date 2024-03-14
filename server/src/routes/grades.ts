@@ -12,7 +12,6 @@ import {
   addGrades,
   editUserGrade,
   getCsvTemplate,
-  getFinalGrades,
   getGradeTreeOfAllUsers,
   getGradeTreeOfUser,
   getGrades,
@@ -73,11 +72,11 @@ router.get(
   controllerDispatcher(getSisuFormattedGradingCSV)
 );
 
-router.get(
-  '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades',
-  passport.authenticate('jwt', {session: false}),
-  controllerDispatcher(getFinalGrades)
-);
+// router.get(
+//   '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades',
+//   passport.authenticate('jwt', {session: false}),
+//   controllerDispatcher(getFinalGrades)
+// );
 
 router.get(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/fullTree',

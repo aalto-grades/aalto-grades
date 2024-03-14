@@ -3,11 +3,8 @@
 // SPDX-License-Identifier: MIT
 import {HttpCode, NewFinalGrade} from '@common/types';
 import {NextFunction, Request, Response} from 'express';
-import {Op, Transaction} from 'sequelize';
 
-import {sequelize} from '../database';
 import FinalGrade from '../database/models/finalGrade';
-import User from '../database/models/user';
 import {JwtClaims} from '../types';
 import {FinalGradeModelData} from '../types/finalGrade';
 import {isTeacherInChargeOrAdmin} from './utils/user';
@@ -96,69 +93,12 @@ export async function addFinalGrades(
   await isTeacherInChargeOrAdmin(grader, courseId, HttpCode.Forbidden);
 
   try {
-    // Check all users (students) exists in db, create new users if needed.
-    // Make sure each studentNumber is only in the list once
-    const studentNumbers = Array.from(
-      new Set(newGrades.map(grade => grade.studentNumber))
-    );
-
-    let students = await User.findAll({
-      attributes: ['id', 'studentNumber'],
-      where: {
-        studentNumber: {
-          [Op.in]: studentNumbers,
-        },
-      },
-    });
-    const foundStudents = students.map(student => student.studentNumber);
-    const nonExistingStudents = studentNumbers.filter(
-      id => !foundStudents.includes(id)
-    );
-
-    await sequelize.transaction(async (t: Transaction) => {
-      // Create new users (students) if any found from the CSV.
-      if (nonExistingStudents.length > 0) {
-        const newUsers: Array<User> = await User.bulkCreate(
-          nonExistingStudents.map((studentNumber: string) => {
-            return {
-              studentNumber: studentNumber,
-            };
-          }),
-          {transaction: t}
-        );
-        students = students.concat(newUsers);
-      }
-    });
-
-    // All students now exists in the database.
-    students = await User.findAll({
-      attributes: ['id', 'studentNumber'],
-      where: {
-        studentNumber: {
-          [Op.in]: studentNumbers,
-        },
-      },
-    });
-
-    const studentsNumberToId = students.reduce(
-      (
-        obj: {
-          [key: string]: number;
-        },
-        student
-      ) => {
-        obj[student.studentNumber] = student.id;
-        return obj;
-      },
-      {}
-    );
-
     // Use studentsWithId to update attainments by flatmapping each
     // students grades into a one array of all the grades.
     const preparedBulkCreate: Array<FinalGradeModelData> = newGrades.map(
       gradeEntry => {
         return {
-          userId: studentsNumberToId[gradeEntry.studentNumber],
+          userId: gradeEntry.userId,
           assessmentModelId: gradeEntry.assessmentModelId ?? null,
           courseId: courseId,
           graderId: grader.id,

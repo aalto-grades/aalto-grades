@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {FinalGrade} from '@common/types/finalGrade';
 import {DateOnlyString} from './general';
 import {UserData} from './user';
 
@@ -15,8 +16,6 @@ export interface GradeOption {
   gradeId?: number;
   grader: UserData;
   grade: number;
-  status: Status;
-  manual: boolean;
   exportedToSisu?: Date;
   date?: Date | DateOnlyString;
   expiryDate?: Date | DateOnlyString;
@@ -62,14 +61,6 @@ export type StudentRow = {
   finalGrades?: FinalGrade[];
   attainments: Array<AttainmentGradesData>;
 };
-
-// TODO: Replace with a better name
-export interface FinalGrade {
-  userId: number;
-  studentNumber: string;
-  credits: number;
-  grades: Array<GradeOption>;
-}
 
 export interface EditGrade {
   grade?: number;

@@ -54,6 +54,7 @@ function parseSisuCourseInstance(
       teachersInCharge: instance.summary.teacherInCharge.map((name: string) => {
         return {
           name: name,
+          id: 0, // TODO: 🐛 This is a placeholder
         };
       }),
       department: {

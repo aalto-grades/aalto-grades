@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 export interface UserData {
-  id?: number;
+  id: number;
   name?: string;
   email?: string;
   studentNumber?: string;

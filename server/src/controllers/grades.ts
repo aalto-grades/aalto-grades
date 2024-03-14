@@ -5,7 +5,6 @@ import {
   AttainmentGradeData,
   AttainmentGradesData,
   EditGrade,
-  FinalGrade,
   GradeOption,
   GradeType,
   HttpCode,
@@ -187,20 +186,23 @@ export async function getGrades(req: Request, res: Response): Promise<void> {
 
   //Cleaning the results for API response
 
-  const result: StudentRow[] = Object.keys(userGrades).map(userId => {
-    // console.log(userGrades[userId]);
-    return {
-      user: users[userId],
+  const result = Object.keys(userGrades).map(userId => {
+    const gradeToAdd: StudentRow = {
+      user: {
+        id: users[userId].id,
+        studentNumber: users[userId].studentNumber,
+      },
       attainments: attainments.map(attainment => {
-        return {
+        const attToAdd: AttainmentGradesData = {
           attainmentId: attainment.id,
           attainmentName: attainment.name,
           grades: userGrades[userId][attainment.id]?.map(grade => {
-            return {
+            const gradeOption: GradeOption = {
               gradeId: grade.id,
               grader: {
-                id: grade?.grader?.id,
+                id: grade.grader!.id,
                 name: grade?.grader?.name,
+                studentNumber: '',
               },
               grade: grade.grade,
               exportedToSisu: grade.sisuExportDate,
@@ -210,10 +212,13 @@ export async function getGrades(req: Request, res: Response): Promise<void> {
                 : undefined,
               comment: grade.comment,
             };
+            return gradeOption;
           }),
         };
-      }) as Array<AttainmentGradesData>,
+        return attToAdd;
+      }),
     };
+    return gradeToAdd;
   });
 
   res.status(HttpCode.Ok).json({
@@ -511,121 +516,121 @@ export async function getSisuFormattedGradingCSV(
   );
 }
 
-/**
- * Get course instance final grading data in JSON format.
- * @param {Request} req - The HTTP request.
- * @param {Response} res - The HTTP response containing the CSV file.
- * @returns {Promise<void>} - A Promise that resolves when the function has completed its execution.
- * @throws {ApiError} - If course and/or course instance not found, instance does not belong to
- * the course, or no course results found/calculated before calling the endpoint.
- */
-export async function getFinalGrades(
-  req: Request,
-  res: Response
-): Promise<void> {
-  const urlParams: yup.AnyObjectSchema = yup.object({
-    studentNumbers: yup.array().json().of(yup.string()).notRequired(),
-    instanceId: yup.number().min(1).notRequired(),
-  });
+// /**
+//  * Get course instance final grading data in JSON format.
+//  * @param {Request} req - The HTTP request.
+//  * @param {Response} res - The HTTP response containing the CSV file.
+//  * @returns {Promise<void>} - A Promise that resolves when the function has completed its execution.
+//  * @throws {ApiError} - If course and/or course instance not found, instance does not belong to
+//  * the course, or no course results found/calculated before calling the endpoint.
+//  */
+// export async function getFinalGrades(
+//   req: Request,
+//   res: Response
+// ): Promise<void> {
+//   const urlParams: yup.AnyObjectSchema = yup.object({
+//     studentNumbers: yup.array().json().of(yup.string()).notRequired(),
+//     instanceId: yup.number().min(1).notRequired(),
+//   });
 
-  const {
-    studentNumbers,
-    instanceId,
-  }: {
-    studentNumbers?: Array<string>;
-    instanceId?: number;
-  } = await urlParams.validate(req.query, {abortEarly: false});
+//   const {
+//     studentNumbers,
+//     instanceId,
+//   }: {
+//     studentNumbers?: Array<string>;
+//     instanceId?: number;
+//   } = await urlParams.validate(req.query, {abortEarly: false});
 
-  const [course, assessmentModel]: [Course, AssessmentModel] =
-    await validateAssessmentModelPath(
-      req.params.courseId,
-      req.params.assessmentModelId
-    );
+//   const [course, assessmentModel]: [Course, AssessmentModel] =
+//     await validateAssessmentModelPath(
+//       req.params.courseId,
+//       req.params.assessmentModelId
+//     );
 
-  await isTeacherInChargeOrAdmin(
-    req.user as JwtClaims,
-    course.id,
-    HttpCode.Forbidden
-  );
+//   await isTeacherInChargeOrAdmin(
+//     req.user as JwtClaims,
+//     course.id,
+//     HttpCode.Forbidden
+//   );
 
-  interface IdAndStudentNumber {
-    userId: number;
-    studentNumber: string;
-  }
+//   interface IdAndStudentNumber {
+//     userId: number;
+//     studentNumber: string;
+//   }
 
-  // Raw query to enable distinct selection of students who have at least one
-  // grade for any attainment in an assessment model.
-  let students: Array<IdAndStudentNumber> = (
-    await sequelize.query(
-      `SELECT DISTINCT "user".id AS id, student_number
-       FROM attainment_grade
-       INNER JOIN attainment ON attainment.id = attainment_grade.attainment_id
-       INNER JOIN "user" ON "user".id = attainment_grade.user_id
-       WHERE attainment.assessment_model_id = :assessmentModelId`,
-      {
-        replacements: {assessmentModelId: assessmentModel.id},
-        type: QueryTypes.SELECT,
-      }
-    )
-  )
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .map((value: any) => {
-      return {
-        userId: value.id,
-        studentNumber: value.student_number,
-      };
-    });
+//   // Raw query to enable distinct selection of students who have at least one
+//   // grade for any attainment in an assessment model.
+//   let students: Array<IdAndStudentNumber> = (
+//     await sequelize.query(
+//       `SELECT DISTINCT "user".id AS id, student_number
+//        FROM attainment_grade
+//        INNER JOIN attainment ON attainment.id = attainment_grade.attainment_id
+//        INNER JOIN "user" ON "user".id = attainment_grade.user_id
+//        WHERE attainment.assessment_model_id = :assessmentModelId`,
+//       {
+//         replacements: {assessmentModelId: assessmentModel.id},
+//         type: QueryTypes.SELECT,
+//       }
+//     )
+//   )
+//     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//     .map((value: any) => {
+//       return {
+//         userId: value.id,
+//         studentNumber: value.student_number,
+//       };
+//     });
 
-  // Include students from a particular instance if an ID provided.
-  const filter: Array<string> | undefined = instanceId
-    ? await filterByInstanceAndStudentNumber(instanceId, studentNumbers)
-    : studentNumbers;
+//   // Include students from a particular instance if an ID provided.
+//   const filter: Array<string> | undefined = instanceId
+//     ? await filterByInstanceAndStudentNumber(instanceId, studentNumbers)
+//     : studentNumbers;
 
-  if (filter) {
-    await studentNumbersExist(filter);
+//   if (filter) {
+//     await studentNumbersExist(filter);
 
-    students = students.filter((student: IdAndStudentNumber) => {
-      return (filter as Array<string>).includes(student.studentNumber);
-    });
-  }
+//     students = students.filter((student: IdAndStudentNumber) => {
+//       return (filter as Array<string>).includes(student.studentNumber);
+//     });
+//   }
 
-  const finalGrades: Array<FinalGrade> = [];
+//   const finalGrades: Array<FinalGrade> = [];
 
-  const rawFinalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
-    assessmentModel.id,
-    students.map((student: IdAndStudentNumber) => student.studentNumber),
-    true
-  );
+//   const rawFinalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
+//     assessmentModel.id,
+//     students.map((student: IdAndStudentNumber) => student.studentNumber),
+//     true
+//   );
 
-  for (const student of students) {
-    finalGrades.push({
-      userId: student.userId,
-      studentNumber: student.studentNumber,
-      credits: course.maxCredits,
-      grades: rawFinalGrades
-        .filter((grade: FinalGradeRaw) => grade.User?.id === student.userId)
-        .map((grade: FinalGradeRaw): GradeOption => {
-          return {
-            gradeId: grade.id,
-            grader: {
-              id: grade.grader.id,
-              name: grade.grader.name,
-            },
-            grade: Math.round(grade.grade),
-            status: grade.status as Status,
-            manual: grade.manual ?? true,
-            exportedToSisu: grade.sisuExportDate,
-            date: grade.date ? toDateOnlyString(grade.date) : undefined,
-            comment: grade.comment ?? '',
-          };
-        }),
-    });
-  }
+//   for (const student of students) {
+//     finalGrades.push({
+//       userId: student.userId,
+//       studentNumber: student.studentNumber,
+//       credits: course.maxCredits,
+//       grades: rawFinalGrades
+//         .filter((grade: FinalGradeRaw) => grade.User?.id === student.userId)
+//         .map((grade: FinalGradeRaw): GradeOption => {
+//           return {
+//             gradeId: grade.id,
+//             grader: {
+//               id: grade.grader.id,
+//               name: grade.grader.name,
+//             },
+//             grade: Math.round(grade.grade),
+//             status: grade.status as Status,
+//             manual: grade.manual ?? true,
+//             exportedToSisu: grade.sisuExportDate,
+//             date: grade.date ? toDateOnlyString(grade.date) : undefined,
+//             comment: grade.comment ?? '',
+//           };
+//         }),
+//     });
+//   }
 
-  res.status(HttpCode.Ok).json({
-    data: finalGrades,
-  });
-}
+//   res.status(HttpCode.Ok).json({
+//     data: finalGrades,
+//   });
+// }
 
 /**
  * Get course instance final grading data in JSON format.
@@ -742,12 +747,11 @@ export async function getGradeTreeOfAllUsers(
           return {
             gradeId: option.id,
             grader: {
-              id: option.grader?.id,
+              id: option.grader!.id,
               name: option.grader?.name,
+              studentNumber: '',
             },
             grade: option.grade,
-            status: option.status as Status,
-            manual: option.manual ?? true,
             exportedToSisu: option.sisuExportDate,
             date: option.date ? toDateOnlyString(option.date) : undefined,
             expiryDate: option.expiryDate
