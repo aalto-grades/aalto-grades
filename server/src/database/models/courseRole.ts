@@ -63,12 +63,14 @@ CourseRole.init(
 
 User.belongsToMany(Course, {
   through: CourseRole,
+  as: 'hasCourse',
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
 });
 
 Course.belongsToMany(User, {
   through: CourseRole,
+  as: 'inCourse',
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
 });

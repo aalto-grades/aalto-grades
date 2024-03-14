@@ -54,12 +54,14 @@ TeacherInCharge.init(
 
 User.belongsToMany(Course, {
   through: TeacherInCharge,
+  as: 'TeachingCourses',
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
 });
 
 Course.belongsToMany(User, {
   through: TeacherInCharge,
+  as: 'Users',
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
 });

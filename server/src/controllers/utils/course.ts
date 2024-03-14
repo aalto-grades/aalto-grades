@@ -52,6 +52,7 @@ export async function findCourseFullById(
       },
       {
         model: User,
+        as: 'Users',
       },
     ],
   })) as CourseFull;
@@ -72,6 +73,7 @@ export function parseCourseFull(course: CourseFull): CourseData {
     gradingScale: course.gradingScale,
     languageOfInstruction: course.languageOfInstruction as Language,
     teachersInCharge: [],
+    assistants: [],
     department: {
       en: '',
       fi: '',
@@ -83,7 +85,7 @@ export function parseCourseFull(course: CourseFull): CourseData {
       sv: '',
     },
   };
-
+  console.log(course.dataValues);
   course.CourseTranslations.forEach((translation: CourseTranslation) => {
     switch (translation.language) {
       case Language.English:

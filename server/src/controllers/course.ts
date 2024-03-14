@@ -52,6 +52,7 @@ export async function getAllCourses(
       },
       {
         model: User,
+        as: 'Users',
       },
     ],
   })) as Array<CourseFull>;

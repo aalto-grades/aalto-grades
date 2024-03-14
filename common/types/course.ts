@@ -32,6 +32,7 @@ export interface CourseData {
   gradingScale: GradingScale;
   languageOfInstruction: Language;
   teachersInCharge: Array<UserData>;
+  assistants: Array<UserData>;
 }
 
 export interface CourseInstanceData {

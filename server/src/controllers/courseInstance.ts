@@ -44,6 +44,7 @@ export async function getCourseInstance(
             },
             {
               model: User,
+              as: 'Users',
             },
           ],
         },
@@ -112,6 +113,7 @@ export async function getAllCourseInstances(
             },
             {
               model: User,
+              as: 'Users',
             },
           ],
         },

@@ -51,6 +51,7 @@ export async function getCoursesOfUser(
       },
       {
         model: User,
+        as: 'Users',
         where: {
           id: user.id,
         },
@@ -78,6 +79,7 @@ export async function getCoursesOfUser(
               model: CourseTranslation,
             },
             {
+              as: 'Users',
               model: User,
             },
           ],
