@@ -101,7 +101,7 @@ router.get(
 router.post(
   '/v1/courses/:courseId/grades',
   passport.authenticate('jwt', {session: false}),
-  express.json(),
+  express.json({limit: '10mb'}),
   handleInvalidRequestJson,
   controllerDispatcher(addGrades)
 );
