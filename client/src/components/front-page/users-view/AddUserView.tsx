@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 import {TextField, Box, Button, Typography, Container} from '@mui/material';
 import {NavigateFunction, useNavigate} from 'react-router-dom';
-import * as yup from 'yup'
+import * as yup from 'yup';
 import {Form, Formik, FormikProps} from 'formik';
 
 import {useAddUser} from '../../../hooks/useApi';
@@ -30,9 +30,9 @@ export default function AddUserView(): JSX.Element {
           onSubmit={submitAddUser}
           validationSchema={yup.object({
             email: yup
-            .string()
-            .email('Please input valid email address')
-            .notRequired(),
+              .string()
+              .email('Please input valid email address')
+              .notRequired(),
           })}
         >
           {(form: FormikProps<{email: string}>): JSX.Element => (
@@ -59,10 +59,10 @@ export default function AddUserView(): JSX.Element {
                   onChange={form.handleChange}
                   label="Email"
                   InputLabelProps={{shrink: true}}
-                  helperText={'enter Aalto email e.g. firstname.lastname@aalto.fi'}
-                  error={
-                    Boolean(form.errors.email)
+                  helperText={
+                    'enter Aalto email e.g. firstname.lastname@aalto.fi'
                   }
+                  error={Boolean(form.errors.email)}
                 ></TextField>
               </Box>
               <Box
