@@ -43,11 +43,19 @@ export function teacherInCharge(): (
 ) => void {
   return async function (req: Request, res: Response, next: NextFunction) {
     const courseId = Number(req.params.courseId);
-    await isTeacherInChargeOrAdmin(
-      req.user as JwtClaims,
-      courseId,
-      HttpCode.Forbidden
-    );
-    next();
+    try {
+      await isTeacherInChargeOrAdmin(
+        req.user as JwtClaims,
+        courseId,
+        HttpCode.Forbidden
+      );
+      next();
+    } catch (e) {
+      res.status(HttpCode.Forbidden).send({
+        success: false,
+        errors: ['forbidden'],
+      });
+      return;
+    }
   };
 }
