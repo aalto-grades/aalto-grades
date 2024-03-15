@@ -25,6 +25,7 @@ import Attainment from '../database/models/attainment';
 import AttainmentGrade from '../database/models/attainmentGrade';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
+import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
 import {
   ApiError,
@@ -35,6 +36,7 @@ import {
 } from '../types';
 import {validateAssessmentModelPath} from './utils/assessmentModel';
 import {findAttainmentById, findAttainmentGradeById} from './utils/attainment';
+import {validateCourseId} from './utils/course';
 import {toDateOnlyString} from './utils/date';
 import {getDateOfLatestGrade} from './utils/grades';
 import {findUserById, isTeacherInChargeOrAdmin} from './utils/user';
@@ -234,10 +236,9 @@ interface FinalGradeRaw extends AttainmentGrade {
 }
 
 async function getFinalGradesFor(
-  assessmentModelId: number,
-  studentNumbers: Array<string>,
+  studentNumbers: string[],
   skipErrorOnEmpty: boolean = false
-): Promise<Array<FinalGradeRaw>> {
+): Promise<FinalGrade[]> {
   // Prepare base query options for User.
   const userQueryOptions: Includeable = {
     model: User,
@@ -254,26 +255,8 @@ async function getFinalGradesFor(
     };
   }
 
-  const finalGrades: Array<FinalGradeRaw> = (await AttainmentGrade.findAll({
+  const finalGrades = await FinalGrade.findAll({
     include: [
-      {
-        model: Attainment,
-        where: {
-          assessmentModelId: assessmentModelId,
-          parentId: null,
-        },
-        include: [
-          {
-            model: AssessmentModel,
-            include: [
-              {
-                model: Course,
-                attributes: ['maxCredits'],
-              },
-            ],
-          },
-        ],
-      },
       {
         model: User,
         required: true,
@@ -283,7 +266,7 @@ async function getFinalGradesFor(
       userQueryOptions,
     ],
     order: [['id', 'ASC']],
-  })) as Array<FinalGradeRaw>;
+  });
 
   if (finalGrades.length === 0 && !skipErrorOnEmpty) {
     throw new ApiError(
@@ -384,13 +367,9 @@ export async function getSisuFormattedGradingCSV(
     override?: boolean;
   } = await urlParams.validate(req.query, {abortEarly: false});
 
-  const sisuExportDate: Date = new Date();
+  const sisuExportDate = new Date();
 
-  const [course, assessmentModel]: [Course, AssessmentModel] =
-    await validateAssessmentModelPath(
-      req.params.courseId,
-      req.params.assessmentModelId
-    );
+  const course = await validateCourseId(req.params.courseId);
 
   await isTeacherInChargeOrAdmin(
     req.user as JwtClaims,
@@ -399,7 +378,7 @@ export async function getSisuFormattedGradingCSV(
   );
 
   // Include students from a particular instance if an ID is provided.
-  const studentNumbersFiltered: Array<string> | undefined = instanceId
+  const studentNumbersFiltered = instanceId
     ? await filterByInstanceAndStudentNumber(instanceId, studentNumbers)
     : studentNumbers;
 
@@ -410,16 +389,14 @@ export async function getSisuFormattedGradingCSV(
    * - only one grade per user per instance is allowed
    */
 
-  let finalGrades: Array<FinalGradeRaw> = await getFinalGradesFor(
-    assessmentModel.id,
-    studentNumbersFiltered ?? []
-  );
+  const finalGrades = await getFinalGradesFor(studentNumbersFiltered ?? []);
 
   if (!override) {
     // If not overridden, clean already exported grades from results.
-    finalGrades = finalGrades.filter(
-      (grade: FinalGradeRaw) => grade.sisuExportDate === null
-    );
+    // TODO: Store sisuExportDate inside final grades table
+    // finalGrades = finalGrades.filter(
+    //   (grade: FinalGradeRaw) => grade.sisuExportDate === null
+    // );
   }
 
   interface SisuCsvFormat {
@@ -473,13 +450,13 @@ export async function getSisuFormattedGradingCSV(
         // HERE we want to find the latest completed attainment grade for student
         assessmentDate: (assessmentDate
           ? new Date(assessmentDate)
-          : await getDateOfLatestGrade(finalGrade.userId, assessmentModel.id)
+          : await getDateOfLatestGrade(finalGrade.userId, course.id)
         ).toLocaleDateString('fi-FI'),
         completionLanguage: completionLanguage
           ? completionLanguage.toLowerCase()
           : course.languageOfInstruction.toLowerCase(),
         // Comment column is required, but can be empty.
-        comment: finalGrade.comment,
+        comment: '', //finalGrade.comment, TODO: Add comment to finalGrade DB table
       });
     }
   }

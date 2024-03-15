@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {FinalGrade, GradeOption, Language, StudentRow} from '@common/types';
 import {
   Box,
   Button,
@@ -20,18 +19,15 @@ import {
   Typography,
 } from '@mui/material';
 import {ChangeEvent, JSX, useState} from 'react';
-import {Params, useParams} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 
-import AlertSnackbar from '../alerts/AlertSnackbar';
-
-import {
-  useDownloadSisuGradeCsv,
-  UseDownloadSisuGradeCsvResult,
-} from '../../hooks/useApi';
+import {FinalGrade, Language, StudentRow} from '@common/types';
+import {useDownloadSisuGradeCsv} from '../../hooks/useApi';
 import useSnackPackAlerts, {
   SnackPackAlertState,
 } from '../../hooks/useSnackPackAlerts';
 import {LanguageOption, State} from '../../types';
+import AlertSnackbar from '../alerts/AlertSnackbar';
 
 // A Dialog component for downloading a Sisu grade CSV.
 const instructions: string =
@@ -88,10 +84,7 @@ export default function SisuDownloadDialog(props: {
   handleExited: () => void;
   selectedRows: StudentRow[];
 }): JSX.Element {
-  const {courseId, assessmentModelId}: Params = useParams() as {
-    courseId: string;
-    assessmentModelId: string;
-  };
+  const {courseId} = useParams() as {courseId: string};
 
   const selectedStudents = props.selectedRows.map((s: StudentRow) => ({
     studentNumber: s.user.studentNumber as string,
@@ -108,72 +101,66 @@ export default function SisuDownloadDialog(props: {
     useState<string | undefined>(undefined);
   const [override, setOverride]: State<string> = useState<string>('all');
 
-  const downloadSisuGradeCsv: UseDownloadSisuGradeCsvResult =
-    useDownloadSisuGradeCsv({
-      onSuccess: (gradeCsv: BlobPart) => {
-        // Create a blob object from the response data
-        const blob: Blob = new Blob([gradeCsv], {type: 'text/csv'});
+  const downloadSisuGradeCsv = useDownloadSisuGradeCsv({
+    onSuccess: (gradeCsv: BlobPart) => {
+      const blob: Blob = new Blob([gradeCsv], {type: 'text/csv'});
 
-        const link: HTMLAnchorElement = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        // Set file name.
-        link.download = `grades_course_${courseId}_assessment_model_${assessmentModelId}.csv`;
-        // Download file automatically to the user's computer.
-        link.click();
-        URL.revokeObjectURL(link.href);
-        link.remove();
+      const linkElement: HTMLAnchorElement = document.createElement('a');
+      linkElement.href = URL.createObjectURL(blob);
+      linkElement.download = `grades_course_${courseId}.csv`;
+      document.body.appendChild(linkElement);
+      linkElement.click();
+      document.body.removeChild(linkElement);
 
-        snackPack.push({
-          msg: 'Final grades downloaded in the Sisu CSV format succesfully.',
-          severity: 'success',
-        });
-      },
-    });
-
-  async function handleDownloadSisuGradeCsv(): Promise<void> {
-    if (courseId && assessmentModelId) {
       snackPack.push({
-        msg: 'Fetching Sisu CSV...',
-        severity: 'info',
+        msg: 'Final grades downloaded in the Sisu CSV format succesfully.',
+        severity: 'success',
       });
+    },
+  });
 
-      let studentNumbers: Array<string> = [];
-
-      switch (override) {
-        case 'exported':
-          studentNumbers = selectedStudents
-            .filter(student => userGradeAlreadyExported(student.grades))
-            .map(student => student.studentNumber);
-          break;
-        case 'unexported':
-          studentNumbers = selectedStudents
-            .filter(student => !userGradeAlreadyExported(student.grades))
-            .map(student => student.studentNumber);
-          break;
-        case 'all':
-          studentNumbers = selectedStudents.map(
-            student => student.studentNumber
-          );
-          break;
-      }
-
-      downloadSisuGradeCsv.mutate({
-        courseId: courseId,
-        assessmentModelId: assessmentModelId,
-        params: {
-          completionLanguage: completionLanguage,
-          assessmentDate: assessmentDate,
-          studentNumbers: studentNumbers,
-          override: override === 'exported' || override === 'all',
-        },
-      });
-    }
-  }
-
-  function userGradeAlreadyExported(grades: FinalGrade[]): boolean {
+  function userGradeAlreadyExported(_grades: FinalGrade[]): boolean {
     return false;
     // TODO: 'exportedToSisu' is currently missing from the type FinalGrade.
     // return Boolean(grades?.find(option => option.exportedToSisu != null));
+  }
+
+  async function handleDownloadSisuGradeCsv(): Promise<void> {
+    if (!courseId) return;
+
+    snackPack.push({
+      msg: 'Fetching Sisu CSV...',
+      severity: 'info',
+    });
+
+    let studentNumbers: Array<string> = [];
+
+    switch (override) {
+      case 'exported':
+        studentNumbers = selectedStudents
+          .filter(student => userGradeAlreadyExported(student.grades))
+          .map(student => student.studentNumber);
+        break;
+      case 'unexported':
+        studentNumbers = selectedStudents
+          .filter(student => !userGradeAlreadyExported(student.grades))
+          .map(student => student.studentNumber);
+        break;
+      case 'all':
+        studentNumbers = selectedStudents.map(student => student.studentNumber);
+        break;
+    }
+
+    await downloadSisuGradeCsv.mutateAsync({
+      courseId: courseId,
+      params: {
+        completionLanguage: completionLanguage,
+        assessmentDate: assessmentDate,
+        studentNumbers: studentNumbers,
+        override: override === 'exported' || override === 'all',
+      },
+    });
+    props.handleClose();
   }
 
   function exportedValuesInList(): boolean {
@@ -214,7 +201,7 @@ export default function SisuDownloadDialog(props: {
                 onChange={(
                   e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
                 ): void => {
-                  if (e.target.value == 'default') {
+                  if (e.target.value === 'default') {
                     setCompletionLanguage(undefined);
                   } else {
                     setCompletionLanguage(e.target.value);

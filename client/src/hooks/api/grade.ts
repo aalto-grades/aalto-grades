@@ -52,7 +52,6 @@ export function useDownloadCsvTemplate(
 
 interface DownloadSisuGradeCsvVars {
   courseId: Numeric;
-  assessmentModelId: Numeric;
   params: {
     completionLanguage?: string;
     assessmentDate?: string;
@@ -73,14 +72,10 @@ export function useDownloadSisuGradeCsv(
   return useMutation({
     mutationFn: async (vars: DownloadSisuGradeCsvVars): Promise<BlobPart> =>
       (
-        await axios.get(
-          `/v1/courses/${vars.courseId}` +
-            `/assessment-models/${vars.assessmentModelId}/grades/csv/sisu`,
-          {
-            responseType: 'blob',
-            params: vars.params,
-          }
-        )
+        await axios.get(`/v1/courses/${vars.courseId}/grades/csv/sisu`, {
+          responseType: 'blob',
+          params: vars.params,
+        })
       ).data,
     ...options,
   });

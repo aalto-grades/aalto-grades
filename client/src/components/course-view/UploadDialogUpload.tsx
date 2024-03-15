@@ -76,13 +76,14 @@ const UploadDialogUpload = ({columns, rows, setRows, setReady}: PropsType) => {
     const data = unparse([
       columns.filter(col => col.field !== 'actions').map(col => col.field),
     ]);
-    const element = document.createElement('a');
-    const file = new Blob([data], {type: 'text/plain'});
-    element.href = URL.createObjectURL(file);
-    element.download = 'template.csv';
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+    const fileBlob = new Blob([data], {type: 'text/csv'});
+
+    const linkElement = document.createElement('a');
+    linkElement.href = URL.createObjectURL(fileBlob);
+    linkElement.download = 'template.csv';
+    document.body.appendChild(linkElement);
+    linkElement.click();
+    document.body.removeChild(linkElement);
   };
 
   const loadCsv = (csvData: string | File): void => {

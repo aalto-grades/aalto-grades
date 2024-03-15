@@ -67,7 +67,7 @@ router.get(
 );
 
 router.get(
-  '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv/sisu',
+  '/v1/courses/:courseId/grades/csv/sisu',
   passport.authenticate('jwt', {session: false}),
   controllerDispatcher(getSisuFormattedGradingCSV)
 );

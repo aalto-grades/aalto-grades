@@ -9,7 +9,7 @@ import CourseTranslation from '../../database/models/courseTranslation';
 import User from '../../database/models/user';
 
 import {CourseData, Language} from '@common/types';
-import {ApiError, CourseFull} from '../../types';
+import {ApiError, CourseFull, idSchema} from '../../types';
 
 /**
  * Finds a course by its ID.
@@ -110,4 +110,18 @@ export function parseCourseFull(course: CourseFull): CourseData {
   });
 
   return courseData;
+}
+
+export async function validateCourseId(courseId: string): Promise<Course> {
+  const courseIdValidated: number = (
+    await idSchema.validate({id: courseId}, {abortEarly: false})
+  ).id;
+
+  // Ensure that course exists.
+  const course: Course = await findCourseById(
+    courseIdValidated,
+    HttpCode.NotFound
+  );
+
+  return course;
 }
