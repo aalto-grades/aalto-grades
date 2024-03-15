@@ -330,13 +330,14 @@ export const calculateNewNodeValues = (
   return newNodeValues;
 };
 
+// TODO: Also return other data to later display in grades table
 export const batchCalculateGraph = (
   graphStructure: GraphStructure,
   studentData: {
-    studentNumber: string;
+    userId: number;
     attainments: {attainmentId: number; grade: number}[];
   }[]
-) => {
+): {[key: number]: {finalGrade: number}} => {
   const {nodes, edges, nodeData} = graphStructure;
   const nodeValues: {[key: string]: {[key: string]: NodeValue}} = {};
 
@@ -350,13 +351,12 @@ export const batchCalculateGraph = (
   }
 
   // Init Graph values
-  const studentDataMap: {[key: string]: {[key: string]: number}} = {}; // {studentNum: {attId1: num, attId2: num, ...}, ...}
+  const studentDataMap: {[key: number]: {[key: string]: number}} = {}; // {studentNum: {attId1: num, attId2: num, ...}, ...}
   for (const student of studentData) {
-    studentDataMap[student.studentNumber] = {};
+    studentDataMap[student.userId] = {};
     for (const attainment of student.attainments)
-      studentDataMap[student.studentNumber][
-        `attainment-${attainment.attainmentId}`
-      ] = attainment.grade;
+      studentDataMap[student.userId][`attainment-${attainment.attainmentId}`] =
+        attainment.grade;
   }
   const noSources: string[] = [];
   for (const node of nodes) {
@@ -375,17 +375,21 @@ export const batchCalculateGraph = (
   }
 
   const courseFail: {[key: string]: boolean} = {};
-  for (const studentNum of Object.keys(studentDataMap))
-    courseFail[studentNum] = false;
+  for (const student of studentData) courseFail[student.userId] = false;
 
+  // Calculate values for all nodes
   while (noSources.length > 0) {
     const sourceId = noSources.shift() as string;
-    for (const studentNum of Object.keys(studentDataMap)) {
-      calculateNodeValue(sourceId, nodeValues[studentNum][sourceId], nodeData);
-      const sourceNodeValue = nodeValues[studentNum][sourceId];
+    for (const student of studentData) {
+      calculateNodeValue(
+        sourceId,
+        nodeValues[student.userId][sourceId],
+        nodeData
+      );
+      const sourceNodeValue = nodeValues[student.userId][sourceId];
 
       if (sourceNodeValue.type === 'require' && sourceNodeValue.courseFail) {
-        courseFail[studentNum] = true;
+        courseFail[student.userId] = true;
       }
       if (!(sourceId in nodeTargets)) continue;
 
@@ -404,7 +408,7 @@ export const batchCalculateGraph = (
         nodeSources[edge.target].delete(sourceId);
         if (nodeSources[edge.target].size === 0) noSources.push(edge.target);
 
-        const nodeValue = nodeValues[studentNum][edge.target];
+        const nodeValue = nodeValues[student.userId][edge.target];
         switch (nodeValue.type) {
           case 'attainment':
             throw new Error('Should not happen');
@@ -427,14 +431,16 @@ export const batchCalculateGraph = (
       }
     }
   }
-  for (const studentNum of Object.keys(studentDataMap)) {
-    if (courseFail[studentNum]) {
-      for (const node of nodes) {
-        const nodeValue = nodeValues[studentNum][node.id];
-        if (nodeValue.type === 'grade') nodeValue.value = 0;
-      }
+  const finalGrades: {[key: string]: {finalGrade: number}} = {};
+  for (const student of studentData) {
+    for (const node of nodes) {
+      const nodeValue = nodeValues[student.userId][node.id];
+      if (nodeValue.type !== 'grade') continue;
+
+      if (courseFail[student.userId]) nodeValue.value = 0; // Failed course
+      finalGrades[student.userId] = {finalGrade: nodeValue.value};
     }
   }
 
-  return nodeValues;
+  return finalGrades;
 };

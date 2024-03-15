@@ -82,8 +82,8 @@ export async function addFinalGrades(
   res: Response,
   next: NextFunction
 ) {
-  //Needs to be validated
-  const newGrades = req.body.grades as unknown as NewFinalGrade[];
+  // TODO: Needs to be validated
+  const newGrades = req.body.finalGrades as NewFinalGrade[];
 
   const grader: JwtClaims = req.user as JwtClaims;
 
@@ -95,17 +95,15 @@ export async function addFinalGrades(
   try {
     // Use studentsWithId to update attainments by flatmapping each
     // students grades into a one array of all the grades.
-    const preparedBulkCreate: Array<FinalGradeModelData> = newGrades.map(
-      gradeEntry => {
-        return {
-          userId: gradeEntry.userId,
-          assessmentModelId: gradeEntry.assessmentModelId ?? null,
-          courseId: courseId,
-          graderId: grader.id,
-          date: gradeEntry.date,
-          grade: gradeEntry.grade,
-        };
-      }
+    const preparedBulkCreate: FinalGradeModelData[] = newGrades.map(
+      gradeEntry => ({
+        userId: gradeEntry.userId,
+        assessmentModelId: gradeEntry.assessmentModelId ?? null,
+        courseId: courseId,
+        graderId: grader.id,
+        date: gradeEntry.date,
+        grade: gradeEntry.grade,
+      })
     );
 
     // TODO: Optimize if datasets are big.
@@ -113,10 +111,7 @@ export async function addFinalGrades(
 
     // After this point all the students' attainment grades have been created
 
-    res.status(HttpCode.Ok).json({
-      data: {},
-    });
-    return;
+    return res.status(HttpCode.Ok).json({data: {}});
   } catch (err: unknown) {
     next(err);
   }

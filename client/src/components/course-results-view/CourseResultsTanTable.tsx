@@ -403,30 +403,28 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
     // }),
     columnHelper.accessor(
       row => {
-        if (row.user.studentNumber && row?.assessmentModels) {
-          const modelsGrades = row.assessmentModels.map(model => {
-            return (
-              batchCalculateGraph(model.graphStructure!, [
-                {
-                  studentNumber: row.user.studentNumber!,
-                  attainments: row.attainments.map(att => ({
-                    attainmentId: att.attainmentId,
-                    grade: att.grades === undefined ? 0 : att.grades[0].grade, // TODO: best grade should be taken 🐛
-                  })),
-                },
-              ])[row.user.studentNumber!]['final-grade'] as GradeNodeValue
-            ).value;
-          });
-          return (
-            <Tooltip
-              placement="top"
-              title={`${row.assessmentModels.map(m => m.name).join('/')}`}
-              disableInteractive
-            >
-              <>{modelsGrades.join('/')}</>
-            </Tooltip>
-          );
-        }
+        if (row.assessmentModels === undefined) return;
+
+        const modelsGrades = row.assessmentModels.map(model => {
+          return batchCalculateGraph(model.graphStructure!, [
+            {
+              userId: row.user.id,
+              attainments: row.attainments.map(att => ({
+                attainmentId: att.attainmentId,
+                grade: att.grades === undefined ? 0 : att.grades[0].grade, // TODO: best grade should be taken 🐛
+              })),
+            },
+          ])[row.user.id].finalGrade;
+        });
+        return (
+          <Tooltip
+            placement="top"
+            title={`${row.assessmentModels.map(m => m.name).join('/')}`}
+            disableInteractive
+          >
+            <>{modelsGrades.join('/')}</>
+          </Tooltip>
+        );
       },
       {
         header: 'Grade preview',

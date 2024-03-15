@@ -7,11 +7,9 @@ import {JSX, useEffect, useState} from 'react';
 import {Params, useParams} from 'react-router-dom';
 
 import {StudentRow} from '@common/types';
-import {
-  UseCalculateFinalGradesResult,
-  useCalculateFinalGrades,
-  useGetGrades,
-} from '../hooks/useApi';
+import {batchCalculateGraph} from '@common/util/calculateGraph';
+import {useAddFinalGrades} from '../hooks/api/finalGrade';
+import {useGetAllAssessmentModels, useGetGrades} from '../hooks/useApi';
 import useSnackPackAlerts, {
   SnackPackAlertState,
 } from '../hooks/useSnackPackAlerts';
@@ -21,8 +19,10 @@ import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
 
 export default function CourseResultsView(): JSX.Element {
   const {courseId}: Params = useParams() as {courseId: string};
-
+  const addFinalGrades = useAddFinalGrades(courseId);
+  const assesmentModels = useGetAllAssessmentModels(courseId);
   const snackPack: SnackPackAlertState = useSnackPackAlerts();
+
   const [missingFinalGrades, setMissingFinalGrades] = useState<boolean>(false);
   const [selectedRows, setSelectedRows] = useState<StudentRow[]>([]);
 
@@ -37,9 +37,6 @@ export default function CourseResultsView(): JSX.Element {
       // )
     );
   }, [selectedRows]);
-
-  const calculateFinalGrades: UseCalculateFinalGradesResult =
-    useCalculateFinalGrades();
 
   const gradesQuery = useGetGrades(courseId);
 
@@ -68,34 +65,45 @@ export default function CourseResultsView(): JSX.Element {
     assessmentModelId: number,
     gradingDate: Date
   ): void => {
-    console.log(JSON.stringify(selectedRows, null, 4));
-    if (courseId && selectedRows.length > 0) {
-      snackPack.push({
-        msg: 'Calculating final grades...',
-        severity: 'info',
-      });
+    const model = assesmentModels.data?.find(
+      assesmentModel => assesmentModel.id === assessmentModelId
+    );
+    if (model === undefined) return;
 
-      // TODO: Also send gradingDate to backend
-      calculateFinalGrades.mutate(
-        {
-          courseId: courseId,
-          assessmentModelId,
-          studentNumbers: selectedRows.map(
-            selectedRow => selectedRow.user.studentNumber as string
-          ),
+    snackPack.push({
+      msg: 'Calculating final grades...',
+      severity: 'info',
+    });
+
+    const finalGrades = batchCalculateGraph(
+      model.graphStructure!,
+      selectedRows.map(selectedRow => ({
+        userId: selectedRow.user.id,
+        attainments: selectedRow.attainments.map(att => ({
+          attainmentId: att.attainmentId,
+          grade: att.grades[0].grade, // TODO: Take latest grade
+        })),
+      }))
+    );
+
+    addFinalGrades.mutate(
+      selectedRows.map(selectedRow => ({
+        userId: selectedRow.user.id,
+        assessmentModelId,
+        grade: finalGrades[selectedRow.user.id].finalGrade,
+        date: gradingDate,
+      })),
+      {
+        onSuccess: () => {
+          snackPack.push({
+            msg: 'Final grades calculated successfully.',
+            severity: 'success',
+          });
+          // We need to refetch the students to get the new grades
+          studentsRefetch();
         },
-        {
-          onSuccess: () => {
-            snackPack.push({
-              msg: 'Final grades calculated successfully.',
-              severity: 'success',
-            });
-            // We need to refetch the students to get the new grades
-            studentsRefetch();
-          },
-        }
-      );
-    }
+      }
+    );
   };
 
   return (

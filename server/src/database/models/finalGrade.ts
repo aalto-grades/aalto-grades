@@ -94,7 +94,7 @@ FinalGrade.init(
   },
   {
     sequelize,
-    tableName: 'attainment_grade',
+    tableName: 'final_grade',
   }
 );
 
@@ -118,11 +118,6 @@ User.hasMany(FinalGrade, {
   foreignKey: 'graderId',
   onDelete: 'NO ACTION',
   onUpdate: 'CASCADE',
-});
-
-FinalGrade.belongsTo(Attainment, {
-  targetKey: 'id',
-  foreignKey: 'attainmentId',
 });
 
 AssessmentModel.hasMany(FinalGrade, {

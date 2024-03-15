@@ -13,7 +13,7 @@ import axios from './axios';
 
 import {Numeric} from '../../types';
 
-export function useAddGrades(
+export function useAddFinalGrades(
   courseId: Numeric,
   options?: UseMutationOptions<boolean, unknown, unknown>
 ) {
