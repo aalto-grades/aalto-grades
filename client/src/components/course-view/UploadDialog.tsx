@@ -6,6 +6,8 @@ import dayjs, {Dayjs} from 'dayjs';
 import {useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {useAddGrades, useGetAttainments} from '../../hooks/useApi';
+import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
+import AlertSnackbar from '../alerts/AlertSnackbar';
 import UploadDialogConfirm from './UploadDialogConfirm';
 import UploadDialogUpload from './UploadDialogUpload';
 
@@ -15,10 +17,11 @@ const UploadDialog = ({
 }: {
   open: boolean;
   onClose: () => void;
-}) => {
+}): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const attainments = useGetAttainments(courseId);
   const addGrades = useAddGrades(courseId);
+  const snackPack = useSnackPackAlerts();
 
   const attainmentData = useMemo(
     () => attainments.data ?? [],
@@ -94,7 +97,7 @@ const UploadDialog = ({
     })),
   ];
 
-  const onSubmit = () => {
+  const onSubmit = async (): Promise<void> => {
     const gradeData: NewGrade[] = [];
 
     for (const row of rows) {
@@ -119,7 +122,14 @@ const UploadDialog = ({
         });
       }
     }
-    addGrades.mutate(gradeData);
+
+    await addGrades.mutateAsync(gradeData);
+
+    snackPack.push({
+      msg: 'Grades added successfully.',
+      severity: 'success',
+    });
+
     setCurrentStep(0);
     setRows([]);
     setDates(
@@ -130,57 +140,56 @@ const UploadDialog = ({
       }))
     );
     setInit(false);
+    onClose();
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
-      {currentStep === 0 ? (
-        <UploadDialogUpload
-          columns={columns}
-          rows={rows}
-          setRows={setRows}
-          setReady={setReady}
-        />
-      ) : (
-        <UploadDialogConfirm
-          columns={readOnlycolumns}
-          rows={rows}
-          dates={dates}
-          setDates={setDates}
-          setReady={setReady}
-        />
-      )}
+    <>
+      <AlertSnackbar snackPack={snackPack} />
 
-      <DialogActions>
-        {currentStep === 1 && (
-          <Button
-            onClick={() => setCurrentStep(cur => cur - 1)}
-            sx={{mr: 'auto'}}
-          >
-            Back
-          </Button>
+      <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
+        {currentStep === 0 ? (
+          <UploadDialogUpload
+            columns={columns}
+            rows={rows}
+            setRows={setRows}
+            setReady={setReady}
+          />
+        ) : (
+          <UploadDialogConfirm
+            columns={readOnlycolumns}
+            rows={rows}
+            dates={dates}
+            setDates={setDates}
+            setReady={setReady}
+          />
         )}
-        {currentStep === 0 && (
-          <Button
-            onClick={() => setCurrentStep(cur => cur + 1)}
-            disabled={!ready || rows.length === 0}
-          >
-            Next
-          </Button>
-        )}
-        {currentStep === 1 && (
-          <Button
-            onClick={() => {
-              onClose();
-              onSubmit();
-            }}
-            disabled={!ready}
-          >
-            Submit
-          </Button>
-        )}
-      </DialogActions>
-    </Dialog>
+
+        <DialogActions>
+          {currentStep === 1 && (
+            <Button
+              onClick={() => setCurrentStep(cur => cur - 1)}
+              sx={{mr: 'auto'}}
+            >
+              Back
+            </Button>
+          )}
+          {currentStep === 0 && (
+            <Button
+              onClick={() => setCurrentStep(cur => cur + 1)}
+              disabled={!ready || rows.length === 0}
+            >
+              Next
+            </Button>
+          )}
+          {currentStep === 1 && (
+            <Button onClick={onSubmit} disabled={!ready}>
+              Submit
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 export default UploadDialog;

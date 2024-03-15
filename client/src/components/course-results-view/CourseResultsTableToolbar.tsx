@@ -15,7 +15,10 @@ import SisuDownloadDialog from './SisuDownloadDialog';
 export default function CourseResultsTableToolbar(props: {
   // search: string;
   // setSearch: (search: string) => void;
-  calculateFinalGrades: (modelId: number, gradingDate: Date) => void;
+  calculateFinalGrades: (
+    modelId: number,
+    gradingDate: Date
+  ) => Promise<boolean>;
   selectedRows: StudentRow[];
   hasPendingStudents: boolean;
   refetch: () => void;

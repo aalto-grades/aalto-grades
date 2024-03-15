@@ -4,24 +4,22 @@
 
 import {Box} from '@mui/material';
 import {JSX, useEffect, useState} from 'react';
-import {Params, useParams} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 
 import {StudentRow} from '@common/types';
 import {batchCalculateGraph} from '@common/util/calculateGraph';
 import {useAddFinalGrades} from '../hooks/api/finalGrade';
 import {useGetAllAssessmentModels, useGetGrades} from '../hooks/useApi';
-import useSnackPackAlerts, {
-  SnackPackAlertState,
-} from '../hooks/useSnackPackAlerts';
+import useSnackPackAlerts from '../hooks/useSnackPackAlerts';
 import AlertSnackbar from './alerts/AlertSnackbar';
 import CourseResultsTableToolbar from './course-results-view/CourseResultsTableToolbar';
 import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
 
 export default function CourseResultsView(): JSX.Element {
-  const {courseId}: Params = useParams() as {courseId: string};
+  const {courseId} = useParams() as {courseId: string};
   const addFinalGrades = useAddFinalGrades(courseId);
   const assesmentModels = useGetAllAssessmentModels(courseId);
-  const snackPack: SnackPackAlertState = useSnackPackAlerts();
+  const snackPack = useSnackPackAlerts();
 
   const [missingFinalGrades, setMissingFinalGrades] = useState<boolean>(false);
   const [selectedRows, setSelectedRows] = useState<StudentRow[]>([]);
@@ -61,14 +59,14 @@ export default function CourseResultsView(): JSX.Element {
   };
 
   // Triggers the calculation of final grades
-  const handleCalculateFinalGrades = (
+  const handleCalculateFinalGrades = async (
     assessmentModelId: number,
     gradingDate: Date
-  ): void => {
+  ): Promise<boolean> => {
     const model = assesmentModels.data?.find(
       assesmentModel => assesmentModel.id === assessmentModelId
     );
-    if (model === undefined) return;
+    if (model === undefined) return false;
 
     snackPack.push({
       msg: 'Calculating final grades...',
@@ -85,25 +83,20 @@ export default function CourseResultsView(): JSX.Element {
         })),
       }))
     );
-
-    addFinalGrades.mutate(
+    await addFinalGrades.mutateAsync(
       selectedRows.map(selectedRow => ({
         userId: selectedRow.user.id,
         assessmentModelId,
         grade: finalGrades[selectedRow.user.id].finalGrade,
         date: gradingDate,
-      })),
-      {
-        onSuccess: () => {
-          snackPack.push({
-            msg: 'Final grades calculated successfully.',
-            severity: 'success',
-          });
-          // We need to refetch the students to get the new grades
-          studentsRefetch();
-        },
-      }
+      }))
     );
+    snackPack.push({
+      msg: 'Final grades calculated successfully.',
+      severity: 'success',
+    });
+    studentsRefetch();
+    return true;
   };
 
   return (

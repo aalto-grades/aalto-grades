@@ -21,7 +21,10 @@ type PropsType = {
   open: boolean;
   onClose: () => void;
   numSelected: number;
-  calculateFinalGrades: (modelId: number, gradingDate: Date) => void;
+  calculateFinalGrades: (
+    modelId: number,
+    gradingDate: Date
+  ) => Promise<boolean>;
 };
 
 const CalculateFinalGradesDialog = ({
@@ -45,10 +48,11 @@ const CalculateFinalGradesDialog = ({
       setSelectedModel(modelList[0].name);
   }, [modelList, selectedModel]);
 
-  const handleSubmit = (): void => {
+  const handleSubmit = async (): Promise<void> => {
     const modelId = modelList.find(model => model.name === selectedModel)?.id;
     if (modelId === undefined) return;
-    calculateFinalGrades(modelId, gradingDate.toDate());
+    const success = await calculateFinalGrades(modelId, gradingDate.toDate());
+    if (success) onClose();
   };
 
   return (
