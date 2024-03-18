@@ -96,14 +96,17 @@ export async function addFinalGrades(
     // Use studentsWithId to update attainments by flatmapping each
     // students grades into a one array of all the grades.
     const preparedBulkCreate: FinalGradeModelData[] = newGrades.map(
-      gradeEntry => ({
-        userId: gradeEntry.userId,
-        assessmentModelId: gradeEntry.assessmentModelId ?? null,
-        courseId: courseId,
-        graderId: grader.id,
-        date: gradeEntry.date,
-        grade: gradeEntry.grade,
-      })
+      gradeEntry => {
+        const finalGradeToAdd: FinalGradeModelData = {
+          userId: gradeEntry.userId,
+          assessmentModelId: gradeEntry.assessmentModelId ?? null,
+          courseId: courseId,
+          graderId: grader.id,
+          date: gradeEntry.date,
+          grade: gradeEntry.grade,
+        };
+        return finalGradeToAdd;
+      }
     );
 
     // TODO: Optimize if datasets are big.

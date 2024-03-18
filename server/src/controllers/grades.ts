@@ -5,6 +5,7 @@ import {
   AttainmentGradeData,
   AttainmentGradesData,
   EditGrade,
+  FinalGradeData,
   GradeOption,
   GradeType,
   HttpCode,
@@ -216,7 +217,17 @@ export async function getGrades(req: Request, res: Response): Promise<void> {
         id: users[userId].id,
         studentNumber: users[userId].studentNumber,
       },
-      finalGrades: finalGradesDict[userId],
+      finalGrades: finalGradesDict[userId]?.map(fGrade => {
+        const fGradeToAdd: FinalGradeData = {
+          userId: fGrade.userId,
+          courseId: fGrade.courseId,
+          assessmentModelId: fGrade.assessmentModelId,
+          graderId: fGrade.graderId,
+          grade: fGrade.grade,
+          date: fGrade.date,
+        };
+        return fGradeToAdd;
+      }),
       attainments: attainments.map(attainment => {
         const attToAdd: AttainmentGradesData = {
           attainmentId: attainment.id,

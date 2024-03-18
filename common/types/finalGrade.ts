@@ -2,18 +2,20 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {DateOnlyString} from '@common/types';
+
 export type NewFinalGrade = {
   userId: number;
   assessmentModelId: number;
   grade: number;
-  date?: Date;
+  date?: Date | DateOnlyString;
 };
 
-export type FinalGrade = {
+export type FinalGradeData = {
   userId: number;
   courseId: number;
   assessmentModelId: number;
   graderId: number;
   grade: number;
-  date?: Date;
+  date?: Date | DateOnlyString;
 };

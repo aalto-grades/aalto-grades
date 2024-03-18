@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {FinalGrade} from '@common/types/finalGrade';
+import {FinalGradeData} from '@common/types/finalGrade';
 import {DateOnlyString} from './general';
 import {UserData} from './user';
 
@@ -58,7 +58,7 @@ export type AttainmentGradesData = {
 
 export type StudentRow = {
   user: UserData;
-  finalGrades?: FinalGrade[];
+  finalGrades?: FinalGradeData[];
   attainments: Array<AttainmentGradesData>;
 };
 
