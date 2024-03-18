@@ -8,7 +8,6 @@ import {
   GradeOption,
   Status,
 } from '@common/types';
-import {Form, Formik, FormikErrors, FormikTouched} from 'formik';
 import {
   Box,
   Button,
@@ -22,6 +21,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import {Form, Formik, FormikErrors, FormikTouched} from 'formik';
 import {ChangeEvent, JSX, useEffect, useState} from 'react';
 import {Params, useParams} from 'react-router-dom';
 import * as yup from 'yup';
@@ -113,7 +113,6 @@ export default function EditGradeDialog(props: {
 
       setFormInitialValues({
         grade: toForm.grade,
-        status: toForm.status,
         date: toForm.date,
         expiryDate: toForm.expiryDate,
         comment: toForm.comment,

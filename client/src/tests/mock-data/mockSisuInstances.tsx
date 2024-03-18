@@ -18,9 +18,11 @@ export const mockSisuInstances: Array<CourseInstanceData> = [
       languageOfInstruction: Language.English,
       teachersInCharge: [
         {
+          id: 1,
           name: 'Elisa Mekler',
         },
         {
+          id: 2,
           name: 'David McGookin',
         },
       ],
@@ -49,6 +51,7 @@ export const mockSisuInstances: Array<CourseInstanceData> = [
       languageOfInstruction: Language.English,
       teachersInCharge: [
         {
+          id: 1,
           name: 'Elisa Mekler',
         },
       ],
@@ -77,6 +80,7 @@ export const mockSisuInstances: Array<CourseInstanceData> = [
       languageOfInstruction: Language.English,
       teachersInCharge: [
         {
+          id: 3,
           name: 'Kerttu Maaria Pollari-Malmi',
         },
       ],

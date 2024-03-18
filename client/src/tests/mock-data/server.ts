@@ -2,20 +2,19 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {ResponseResolver, http, DefaultBodyType, type PathParams} from 'msw';
-import {setupServer, SetupServer} from 'msw/node';
+import {DefaultBodyType, ResponseResolver, http, type PathParams} from 'msw';
+import {SetupServer, setupServer} from 'msw/node';
 
+import {type HttpRequestResolverExtras} from 'msw/lib/core/handlers/HttpHandler';
+import {Mock} from 'vitest';
 import {mockAssessmentModels} from './mockAssessmentModels';
 import {mockAttainments} from './mockAttainments';
 import {mockCourses} from './mockCourses';
 import {mockFinalGrades} from './mockFinalGrades';
+import {mockGradeFullTree} from './mockGradeFullTree';
 import {mockGradeTree} from './mockGradeTree';
 import {mockInstances} from './mockInstancesWithStringDates';
 import {mockSisuInstances} from './mockSisuInstances';
-import {mockFormulas} from './mockFormulas';
-import {type HttpRequestResolverExtras} from 'msw/lib/core/handlers/HttpHandler';
-import {Mock} from 'vitest';
-import {mockGradeFullTree} from './mockGradeFullTree';
 
 export function mockSuccess(data: unknown) {
   return async () => {
@@ -108,8 +107,8 @@ export const server: SetupServer = setupServer(
     mockSuccess(mockInstances[0])
   ),
 
-  http.get('*/v1/formulas', mockSuccess(mockFormulas)),
-  http.get('*/v1/formulas/:formulaId', mockSuccess(mockFormulas[0])),
+  // http.get('*/v1/formulas', mockSuccess(mockFormulas)),
+  // http.get('*/v1/formulas/:formulaId', mockSuccess(mockFormulas[0])),
 
   http.get('*/v1/sisu/courses/:courseCode', mockSuccess(mockSisuInstances)),
   http.get(

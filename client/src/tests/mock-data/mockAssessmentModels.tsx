@@ -9,10 +9,12 @@ export const mockAssessmentModels: Array<AssessmentModelData> = [
     id: 1,
     courseId: 1,
     name: 'Course model',
+    graphStructure: {nodes: [], edges: [], nodeData: {}},
   },
   {
     id: 2,
     courseId: 1,
     name: 'Exam model',
+    graphStructure: {nodes: [], edges: [], nodeData: {}},
   },
 ];

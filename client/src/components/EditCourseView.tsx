@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import {CourseData, GradingScale, Language, UserData} from '@common/types';
-import {Form, Formik, FormikProps} from 'formik';
 import {
   Delete as DeleteIcon,
   PersonAddAlt1 as PersonAddAlt1Icon,
@@ -24,20 +23,20 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import {JSX, ChangeEvent, HTMLInputTypeAttribute, useState} from 'react';
+import {UseQueryResult} from '@tanstack/react-query';
+import {Form, Formik, FormikProps} from 'formik';
+import {ChangeEvent, HTMLInputTypeAttribute, JSX, useState} from 'react';
 import {
   NavigateFunction,
   Params,
   useNavigate,
   useParams,
 } from 'react-router-dom';
-import {UseQueryResult} from '@tanstack/react-query';
 import * as yup from 'yup';
 
 import UnsavedChangesDialog from './alerts/UnsavedChangesDialog';
 import NotFound from './NotFound';
 
-import {languageOptions} from './course-results-view/SisuDownloadDialog';
 import {
   useAddCourse,
   UseAddCourseResult,
@@ -47,6 +46,7 @@ import {
 } from '../hooks/useApi';
 import {LanguageOption, State} from '../types';
 import {convertToClientGradingScale} from '../utils/textFormat';
+import {languageOptions} from './course-results-view/SisuDownloadDialog';
 
 interface FormData {
   courseCode: string;
@@ -236,7 +236,7 @@ export default function EditCourseView(): JSX.Element {
       teachersInCharge: teachersInCharge.map((email: string) => {
         return {
           email,
-        };
+        } as unknown as {id: number; email: string}; // TODO: Fix type?
       }),
     };
 

@@ -21,7 +21,7 @@ import {
 import {ChangeEvent, JSX, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
-import {FinalGrade, Language, StudentRow} from '@common/types';
+import {FinalGradeData, Language, StudentRow} from '@common/types';
 import {useDownloadSisuGradeCsv} from '../../hooks/useApi';
 import useSnackPackAlerts, {
   SnackPackAlertState,
@@ -119,7 +119,7 @@ export default function SisuDownloadDialog(props: {
     },
   });
 
-  function userGradeAlreadyExported(_grades: FinalGrade[]): boolean {
+  function userGradeAlreadyExported(_grades: FinalGradeData[]): boolean {
     return false;
     // TODO: 'exportedToSisu' is currently missing from the type FinalGrade.
     // return Boolean(grades?.find(option => option.exportedToSisu != null));

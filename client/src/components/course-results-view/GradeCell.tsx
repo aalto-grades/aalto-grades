@@ -30,7 +30,11 @@ const GradeCell: FC<GradeCellProps> = (
   const theme: Theme = useTheme();
   const bestGrade: GradeOption | null = findBestGradeOption(
     props.attainemntResults?.grades ?? [],
-    {avoidExpired: true, preferExpiredToNull: true}
+    {
+      avoidExpired: true,
+      preferExpiredToNull: true,
+      useLatest: false, // TODO: Read from state?
+    }
   );
   const isGradeExpired: boolean = isGradeDateExpired(bestGrade?.expiryDate);
   // console.log(bestGrade?.expiryDate, new Date(),bestGrade?.expiryDate < new Date());

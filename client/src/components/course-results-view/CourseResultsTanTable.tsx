@@ -5,7 +5,7 @@
 import {
   AssessmentModelData,
   AttainmentGradeData,
-  FinalGrade,
+  FinalGradeData,
   StudentRow,
 } from '@common/types';
 import {batchCalculateGraph} from '@common/util/calculateGraph';
@@ -33,7 +33,6 @@ import {useGetAllAssessmentModels, useGetAttainments} from '../../hooks/useApi';
 import {findBestGradeOption} from '../../utils';
 import PrettyChip from '../shared/PrettyChip';
 import GradeCell from './GradeCell';
-import StudentGradesDialog from './StudentGradesDialog';
 // This module is used to create meta data for colums cells
 declare module '@tanstack/table-core' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -102,6 +101,7 @@ function groupByLastAttainmentDate(gradesList: ExtendedStudentRow[]) {
         findBestGradeOption(att.grades ?? [], {
           avoidExpired: true,
           preferExpiredToNull: true,
+          useLatest: false, // TODO: Read from state?
         })?.date ?? ''
       );
       //Get best grade date for each attainment and get the newest
@@ -202,7 +202,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   // const [globalFilter, setGlobalFilter] = React.useState('');
   //Need to move it in a better place needed for the dialog
-  const [user, setUser] = React.useState<FinalGrade | null>(null);
+  const [user, setUser] = React.useState<FinalGradeData | null>(null);
   const [showUserGrades, setShowUserGrades] = React.useState<boolean>(false);
   //End of shame paragraph
 
@@ -392,6 +392,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
       header: 'Student Number',
       meta: {PrettyChipPosition: 'first'},
       cell: ({row, getValue}) => {
+        // TODO: Remove link
         return (
           <Tooltip
             placement="top"
@@ -401,7 +402,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
               component="button"
               variant="body2"
               onClick={(): void => {
-                setUser(row.original as unknown as FinalGrade);
+                setUser(row.original as unknown as FinalGradeData);
                 setShowUserGrades(true);
               }}
             >
@@ -436,7 +437,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
         return (
           <Tooltip
             placement="top"
-            // title={`${row.assessmentModels.map(m => m.name).join('/')}`}
+            title={'TODO: Re-add title'}
             disableInteractive
           >
             <>{row.predictedFinalGrades.join('/')}</>
@@ -807,11 +808,12 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
         </tfoot> */}
         </table>
       </div>
-      <StudentGradesDialog
-        user={user as FinalGrade}
+
+      {/* <StudentGradesDialog
+        user={user as FinalGradeData}
         setOpen={setShowUserGrades}
         open={showUserGrades}
-      />
+      /> */}
     </div>
   );
 };

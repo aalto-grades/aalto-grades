@@ -5,7 +5,7 @@
 import {
   AttainmentGradeData,
   EditGrade,
-  FinalGrade,
+  FinalGradeData,
   NewGrade,
   StudentGradesTree,
   StudentRow,
@@ -84,8 +84,8 @@ export function useDownloadSisuGradeCsv(
 export function useGetFinalGrades(
   courseId: Numeric,
   assessmentModelId: Numeric,
-  options?: Partial<UseQueryOptions<Array<FinalGrade>>>
-): UseQueryResult<Array<FinalGrade>> {
+  options?: Partial<UseQueryOptions<Array<FinalGradeData>>>
+): UseQueryResult<Array<FinalGradeData>> {
   return useQuery({
     queryKey: ['final-grades', courseId, assessmentModelId],
     queryFn: async () =>

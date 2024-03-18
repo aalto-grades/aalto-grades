@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentGradeData, Status} from '@common/types';
+import {AttainmentGradeData} from '@common/types';
 
 export const mockGradeTree: AttainmentGradeData = {
   userId: 1,
@@ -16,8 +16,6 @@ export const mockGradeTree: AttainmentGradeData = {
         name: 'Sir Teacher',
       },
       grade: 5,
-      status: Status.Pass,
-      manual: false,
       comment: '',
     },
   ],
@@ -34,8 +32,6 @@ export const mockGradeTree: AttainmentGradeData = {
             name: 'Sir Teacher',
           },
           grade: 5,
-          status: Status.Pass,
-          manual: true,
           comment: '',
         },
       ],

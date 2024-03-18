@@ -14,7 +14,6 @@ import {
 } from 'react-router-dom';
 
 import UnsavedChangesDialog from './alerts/UnsavedChangesDialog';
-import Attainment from './edit-attainment-view/Attainment';
 import ConfirmationDialog from './edit-attainment-view/ConfirmationDialog';
 import NotFound from './NotFound';
 
@@ -156,7 +155,6 @@ export default function EditAttainmentView(): JSX.Element {
       ) {
         deleteAttainment.mutate({
           courseId: courseId,
-          assessmentModelId: assessmentModelId,
           attainmentId: attainment.id,
         });
       }
@@ -231,7 +229,6 @@ export default function EditAttainmentView(): JSX.Element {
           deleteAttainment.mutate(
             {
               courseId,
-              assessmentModelId,
               attainmentId: deleteQueue[0].id,
             },
             options(deleteQueue)
@@ -241,7 +238,6 @@ export default function EditAttainmentView(): JSX.Element {
         addAttainment.mutate(
           {
             courseId,
-            assessmentModelId,
             attainment: addQueue[0],
           },
           options(addQueue)
@@ -250,7 +246,6 @@ export default function EditAttainmentView(): JSX.Element {
         editAttainment.mutate(
           {
             courseId,
-            assessmentModelId,
             attainment: editQueue[0],
           },
           options(editQueue)
@@ -264,7 +259,6 @@ export default function EditAttainmentView(): JSX.Element {
           console.log(attainmentTree.parentId);
           addAttainment.mutate({
             courseId: courseId,
-            assessmentModelId: assessmentModelId,
             attainment: attainmentTree,
           });
         } else if (modification === 'edit') {
@@ -302,7 +296,7 @@ export default function EditAttainmentView(): JSX.Element {
               px: 2,
             }}
           >
-            {attainmentTree && (
+            {/* {attainmentTree && (
               <Attainment
                 attainmentTree={attainmentTree}
                 setAttainmentTree={setAttainmentTree}
@@ -310,7 +304,7 @@ export default function EditAttainmentView(): JSX.Element {
                 getTemporaryId={getTemporaryId}
                 attainment={attainmentTree}
               />
-            )}
+            )} */}
           </Box>
           {attainmentTree && (
             <ConfirmationDialog
