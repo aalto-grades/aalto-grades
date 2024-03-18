@@ -5,12 +5,11 @@
 import {
   AssessmentModelData,
   AttainmentGradeData,
-  FinalGradeData,
   StudentRow,
 } from '@common/types';
 import {batchCalculateGraph} from '@common/util/calculateGraph';
 import {ArrowUpward, ExpandLess, ExpandMore, Sort} from '@mui/icons-material';
-import {Badge, Checkbox, Icon, IconButton, Link, Tooltip} from '@mui/material';
+import {Badge, Checkbox, Icon, IconButton, Tooltip} from '@mui/material';
 import '@tanstack/react-table';
 import {
   ExpandedState,
@@ -178,9 +177,9 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
     useGetAllAssessmentModels(courseId);
   // Row are always grouped, toggling grouping just add the grouping column to the table
   const groupedData = React.useMemo(() => {
-    const predictedGrades: ReturnType<typeof predictGrades> = [];
+    let predictedGrades: ReturnType<typeof predictGrades> = [];
     if (assessmentModels) {
-      // predictedGrades = predictGrades(props.data, assessmentModels); //Takes too much time...?
+      predictedGrades = predictGrades(props.data, assessmentModels); //Takes too much time...?
     }
 
     return groupByLastAttainmentDate(
@@ -201,10 +200,6 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
   const [grouping, setGrouping] = React.useState<GroupingState>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   // const [globalFilter, setGlobalFilter] = React.useState('');
-  //Need to move it in a better place needed for the dialog
-  const [user, setUser] = React.useState<FinalGradeData | null>(null);
-  const [showUserGrades, setShowUserGrades] = React.useState<boolean>(false);
-  //End of shame paragraph
 
   React.useEffect(() => {
     props.setSelectedStudents(_ => {
@@ -318,6 +313,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
                 checked: table.getIsAllRowsSelected(),
                 indeterminate: table.getIsSomeRowsSelected(),
                 onChange: table.getToggleAllRowsSelectedHandler(),
+                id: 'select-all',
               }}
             />
             <span style={{marginLeft: '4px', marginRight: '15px'}}>
@@ -335,6 +331,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
         <PrettyChip position="last">
           <>
             <Checkbox
+              id="select-checkbox"
               checked={row.getIsAllSubRowsSelected()}
               indeterminate={row.getIsSomeSelected()}
               // onChange={row.getToggleSelectedHandler()}
@@ -364,6 +361,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
       ),
       cell: ({row}) => (
         <Checkbox
+          id={`select-checkbox-${row.id}`}
           checked={row.getIsSelected()}
           onChange={row.getToggleSelectedHandler()}
           style={{
@@ -393,23 +391,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
       meta: {PrettyChipPosition: 'first'},
       cell: ({row, getValue}) => {
         // TODO: Remove link
-        return (
-          <Tooltip
-            placement="top"
-            title="Click to show individual grades for student"
-          >
-            <Link
-              component="button"
-              variant="body2"
-              onClick={(): void => {
-                setUser(row.original as unknown as FinalGradeData);
-                setShowUserGrades(true);
-              }}
-            >
-              {getValue()}
-            </Link>
-          </Tooltip>
-        );
+        return getValue();
       },
     }),
     // columnHelper.accessor('credits', {
@@ -455,17 +437,16 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
       row => {
         // ATTENTION this function needs to have the same parameters of the one inside the grade cell
         // Clearly can be done in a better way
-        // const bestGrade = findBestGradeOption(row?.grades ?? [], {
-        //   avoidExpired: true,
-        //   preferExpiredToNull: true,
-        // });
-        // if (!bestGrade) return '-';
+        // const bestGrade = findBestGradeOption(row?.finalGrades);
+        const bestGrade = row?.finalGrades?.[0];
+        if (!bestGrade) return '-';
         // console.log(bestGrade);
-        // if (bestGrade?.exportedToSisu) return '✅';
+        if (bestGrade?.sisuExportDate) return '✅';
         // console.log(findPreviouslyExportedToSisu(bestGrade, row));
         // if (findPreviouslyExportedToSisu(bestGrade, row)) return '⚠️';
-        // return '❌';
+        return '-';
       },
+
       {
         header: 'Exported to Sisu',
         meta: {PrettyChipPosition: 'last'},
@@ -520,14 +501,14 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
     // debugAll: true,
   });
 
-  //Virtualizer
+  // Virtualizer
   const {rows} = table.getRowModel();
   const parentRef = React.useRef<HTMLDivElement>(null);
   const virtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 20,
-    overscan: 20,
+    estimateSize: () => 50, //pixel height of each row
+    overscan: 30,
   });
 
   return (
@@ -575,7 +556,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
               // display: 'grid',
               position: 'sticky',
               top: 0,
-              zIndex: 1,
+              zIndex: 2,
             }}
           >
             {table.getHeaderGroups().map(headerGroup => (
@@ -684,6 +665,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
                             textAlign: 'center',
                             display: 'flex',
                             width: cell.column.getSize(),
+                            zIndex: 1,
                           },
                         }}
                       >

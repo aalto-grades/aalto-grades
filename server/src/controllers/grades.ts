@@ -225,6 +225,7 @@ export async function getGrades(req: Request, res: Response): Promise<void> {
           graderId: fGrade.graderId,
           grade: fGrade.grade,
           date: fGrade.date,
+          sisuExportDate: fGrade.sisuExportDate,
         };
         return fGradeToAdd;
       }),
@@ -495,7 +496,7 @@ export async function getSisuFormattedGradingCSV(
     }
   }
 
-  await AttainmentGrade.update(
+  await FinalGrade.update(
     {sisuExportDate},
     {
       where: {

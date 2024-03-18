@@ -18,4 +18,5 @@ export type FinalGradeData = {
   graderId: number;
   grade: number;
   date?: Date | DateOnlyString;
+  sisuExportDate?: Date | DateOnlyString;
 };
