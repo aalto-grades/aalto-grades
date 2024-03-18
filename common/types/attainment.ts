@@ -10,6 +10,12 @@ export enum GradeType {
   Float = 'FLOAT',
 }
 
+export interface NewAttainmentData {
+  courseId?: number;
+  name: string;
+  daysValid?: number;
+}
+
 export interface AttainmentData {
   id: number;
   courseId?: number;

@@ -46,6 +46,8 @@ const gradeIsBetter = (
   oldGrade: GradeOption | null
 ): boolean => {
   if (oldGrade === null) return true;
+  if (newGrade.grade === oldGrade.grade)
+    return gradeIsNewer(newGrade, oldGrade);
   return newGrade.grade > oldGrade.grade;
 };
 export const findBestGradeOption = (

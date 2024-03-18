@@ -18,18 +18,18 @@ import {
 import {JSX, useEffect, useState} from 'react';
 import {Params, useParams} from 'react-router-dom';
 
+import {AssessmentModelData, SystemRole} from '@common/types';
+import {GraphStructure} from '@common/types/graph';
+import {Delete} from '@mui/icons-material';
 import {
   useDeleteAssessmentModel,
   useEditAssessmentModel,
   useGetAllAssessmentModels,
   useGetAttainments,
 } from '../../hooks/useApi';
-import {GraphStructure} from '@common/types/graph';
-import Graph from '../graph/Graph';
-import {AssessmentModelData, SystemRole} from '@common/types';
 import useAuth from '../../hooks/useAuth';
+import Graph from '../graph/Graph';
 import CreateAssessmentModelDialog from './CreateAssessmentModelDialog';
-import {Delete} from '@mui/icons-material';
 
 export default function ModelsView(): JSX.Element {
   const {auth, isTeacherInCharge} = useAuth();
@@ -97,7 +97,7 @@ export default function ModelsView(): JSX.Element {
   };
 
   return (
-    <Box sx={{border: '1px solid', width: '100%'}}>
+    <Box sx={{border: '1px solid'}}>
       {(auth?.role === SystemRole.Admin || isTeacherInCharge) && (
         <Tooltip sx={{ml: 2}} title="New assessment model" placement="top">
           <Button

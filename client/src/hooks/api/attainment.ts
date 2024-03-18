@@ -2,18 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentData} from '@common/types/attainment';
-import axios from './axios';
+import {AttainmentData, NewAttainmentData} from '@common/types/attainment';
 import {
   QueryClient,
-  useMutation,
   UseMutationOptions,
   UseMutationResult,
-  useQuery,
-  useQueryClient,
   UseQueryOptions,
   UseQueryResult,
+  useMutation,
+  useQuery,
+  useQueryClient,
 } from '@tanstack/react-query';
+import axios from './axios';
 
 import {Numeric} from '../../types';
 
@@ -115,8 +115,7 @@ export function useGetAttainments(
 
 type AddAttainmentVars = {
   courseId: Numeric;
-  assessmentModelId: Numeric;
-  attainment: AttainmentData;
+  attainment: NewAttainmentData;
 };
 
 export type UseAddAttainmentResult = UseMutationResult<
@@ -181,14 +180,13 @@ export function useAddAttainment(
 
 interface EditAttainmentVars {
   courseId: Numeric;
-  assessmentModelId: Numeric;
   attainment: AttainmentData;
 }
 
 export type UseEditAttainmentResult = UseMutationResult<
   AttainmentData,
   unknown,
-  AddAttainmentVars
+  EditAttainmentVars
 >;
 
 export function useEditAttainment(
@@ -211,7 +209,7 @@ export function useEditAttainment(
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['root-attainment', vars.courseId, vars.assessmentModelId],
+        queryKey: ['root-attainment', vars.courseId],
       });
     },
     ...options,

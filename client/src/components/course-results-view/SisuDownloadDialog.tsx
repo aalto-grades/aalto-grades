@@ -176,6 +176,7 @@ export default function SisuDownloadDialog(props: {
     <>
       <Dialog
         open={props.open}
+        onClose={props.handleClose}
         transitionDuration={{exit: 800}}
         TransitionProps={{onExited: props.handleExited}}
       >
