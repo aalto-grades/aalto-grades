@@ -103,10 +103,6 @@ export default function CourseResultsView(): JSX.Element {
   return (
     <Box textAlign="left" alignItems="left">
       <AlertSnackbar snackPack={snackPack} />
-      {/* <Typography variant="h1" sx={{flexGrow: 1, my: 4}}>
-        Course Results
-      </Typography> */}
-      {/* <CourseResultsGrid /> */}
       <CourseResultsTableToolbar
         calculateFinalGrades={handleCalculateFinalGrades}
         selectedRows={selectedRows}
@@ -120,17 +116,6 @@ export default function CourseResultsView(): JSX.Element {
           setSelectedStudents={setSelectedRows}
         />
       )}
-      {/* <CourseResultsTable
-        students={students.data ?? []}
-        attainmentList={attainmentList}
-        loading={students.isLoading}
-        calculateFinalGrades={handleCalculateFinalGrades}
-        downloadCsvTemplate={handleDownloadCsvTemplate}
-        selectedStudents={selectedStudents}
-        setSelectedStudents={setSelectedStudents}
-        hasPendingStudents={hasPendingStudents}
-        refetch={studentsRefetch}
-      /> */}
     </Box>
   );
 }

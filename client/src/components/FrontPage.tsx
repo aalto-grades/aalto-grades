@@ -4,9 +4,9 @@
 
 import {CourseData, LoginResult, SystemRole} from '@common/types';
 import {Box, Button, Theme, Typography, useTheme} from '@mui/material';
+import {UseQueryResult} from '@tanstack/react-query';
 import {JSX} from 'react';
 import {NavigateFunction, useNavigate} from 'react-router-dom';
-import {UseQueryResult} from '@tanstack/react-query';
 
 import CourseTable from './front-page/CourseTable';
 import UsersView from './front-page/users-view/UsersView';
@@ -74,19 +74,14 @@ export default function FrontPage(): JSX.Element {
               Courses
             </Typography>
             {
-              /* Admins are shown the button for creating a new course */
-              auth?.role == SystemRole.Admin && (
-                <Button
-                  id="ag_new_course_btn"
-                  size="large"
-                  variant="contained"
-                  onClick={(): void => {
-                    navigate('/course/create');
-                  }}
-                >
-                  Create New Course
-                </Button>
-              )
+              <Button
+                id="ag_new_course_btn"
+                size="large"
+                variant="contained"
+                onClick={() => navigate('/course/create')}
+              >
+                Create New Course
+              </Button>
             }
           </Box>
           {courses.data && <CourseTable courses={courses.data} />}

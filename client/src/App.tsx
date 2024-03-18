@@ -21,10 +21,7 @@ import {Link, Route, Routes} from 'react-router-dom';
 import {SystemRole} from '@common/types';
 import CourseResultsView from './components/CourseResultsView';
 import CourseView from './components/CourseView';
-import EditAttainmentView from './components/EditAttainmentView';
 import EditCourseView from './components/EditCourseView';
-import EditInstanceView from './components/EditInstanceView';
-import FetchInstancesView from './components/FetchInstancesView';
 import Footer from './components/Footer';
 import FrontPage from './components/FrontPage';
 import NotFound from './components/NotFound';
@@ -224,33 +221,13 @@ export default function App(): JSX.Element {
                   <Route path="/" element={<FrontPage />} />
                   <Route path="/:courseId" element={<CourseView />}>
                     <Route
-                      path="/:courseId/attainments"
-                      element={<AttainmentsView />}
-                    />
-                    <Route path="/:courseId/models" element={<ModelsView />} />
-                    <Route
-                      path="/:courseId/fetch-instances/:courseCode"
-                      element={<FetchInstancesView />}
-                    />
-                    <Route
                       path="/:courseId/course-results"
                       element={<CourseResultsView />}
                     />
+                    <Route path="/:courseId/models" element={<ModelsView />} />
                     <Route
-                      path="/:courseId/course-results/:assessmentModelId"
-                      element={<CourseResultsView />}
-                    />
-                    <Route
-                      path="/:courseId/edit-instance"
-                      element={<EditInstanceView />}
-                    />
-                    <Route
-                      path="/:courseId/edit-instance/:sisuInstanceId"
-                      element={<EditInstanceView />}
-                    />
-                    <Route
-                      path="/:courseId/attainment/:modification/:assessmentModelId/:attainmentId?"
-                      element={<EditAttainmentView />}
+                      path="/:courseId/attainments"
+                      element={<AttainmentsView />}
                     />
                   </Route>
                 </Route>

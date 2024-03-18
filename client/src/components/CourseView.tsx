@@ -2,12 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {
-  AssessmentModelData,
-  CourseData,
-  SystemRole,
-  UserData,
-} from '@common/types';
 import {Box, Button, Typography} from '@mui/material';
 import {UseQueryResult} from '@tanstack/react-query';
 import {JSX, useEffect, useState} from 'react';
@@ -19,33 +13,23 @@ import {
   useParams,
 } from 'react-router-dom';
 
-import {
-  useAddGrades,
-  useGetAllAssessmentModels,
-  useGetCourse,
-} from '../hooks/useApi';
+import {CourseData, SystemRole, UserData} from '@common/types';
+import {useGetCourse} from '../hooks/useApi';
 import useAuth, {AuthContextType} from '../hooks/useAuth';
-import {State} from '../types';
 import SideMenu from './course-view/SideMenu';
 import UploadDialog from './course-view/UploadDialog';
 
 export default function CourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const {courseId}: Params = useParams() as {courseId: string};
+  const course: UseQueryResult<CourseData> = useGetCourse(courseId);
   const {
     auth,
     isTeacherInCharge: _,
     setIsTeacherInCharge,
   }: AuthContextType = useAuth();
 
-  const [_animation, setAnimation]: State<boolean> = useState(false);
   const [uploadOpen, setUploadOpen] = useState<boolean>(false);
-  // const [
-  //   createAssessmentModelOpen,
-  //   setCreateAssessmentModelOpen,
-  // ]: State<boolean> = useState(false);
-
-  const course: UseQueryResult<CourseData> = useGetCourse(courseId);
 
   useEffect(() => {
     if (auth && course.data) {
@@ -56,40 +40,6 @@ export default function CourseView(): JSX.Element {
       setIsTeacherInCharge(teacherInCharge.length !== 0);
     }
   }, [auth, course.data, setIsTeacherInCharge]);
-
-  const assessmentModels: UseQueryResult<Array<AssessmentModelData>> =
-    useGetAllAssessmentModels(courseId);
-
-  const [
-    currentAssessmentModel,
-    setCurrentAssessmentModel,
-  ]: State<AssessmentModelData | null> = useState<AssessmentModelData | null>(
-    null
-  );
-
-  useEffect(() => {
-    if (currentAssessmentModel) return;
-    if (assessmentModels.data && assessmentModels.data.length > 0)
-      setCurrentAssessmentModel(assessmentModels.data[0]);
-    else setCurrentAssessmentModel(null);
-  }, [assessmentModels.data, currentAssessmentModel]);
-
-  useEffect(() => {
-    setAnimation(true);
-  }, [currentAssessmentModel]);
-
-  // function onChangeAssessmentModel(assessmentModel: AssessmentModelData): void {
-  //   if (
-  //     assessmentModel.id &&
-  //     assessmentModel.id !== currentAssessmentModel?.id
-  //   ) {
-  //     setAnimation(false);
-  //     setCurrentAssessmentModel(assessmentModel);
-  //   }
-  // }
-
-  //Add grades test
-  const addGrades = useAddGrades(courseId);
 
   return (
     <>
@@ -124,11 +74,7 @@ export default function CourseView(): JSX.Element {
           </>
         )}
       </Box>
-      <Box
-        style={{
-          display: 'flex',
-        }}
-      >
+      <Box style={{display: 'flex'}}>
         <SideMenu onUpload={() => setUploadOpen(true)} />
         <UploadDialog open={uploadOpen} onClose={() => setUploadOpen(false)} />
         <Box

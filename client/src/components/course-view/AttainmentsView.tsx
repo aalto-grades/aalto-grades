@@ -3,33 +3,27 @@
 // SPDX-License-Identifier: MIT
 
 import {AttainmentData} from '@common/types';
-import {Box, Button, Chip, IconButton} from '@mui/material';
-import {UseQueryResult} from '@tanstack/react-query';
+import {Box, Button, Chip, IconButton, Typography} from '@mui/material';
 import {JSX, useState} from 'react';
 import {Params, useParams} from 'react-router-dom';
 
 import {AccessTime, Delete, Tag} from '@mui/icons-material';
-import {
-  useAddAttainment,
-  useDeleteAttainment,
-  useGetAttainments,
-} from '../../hooks/useApi';
+import {useDeleteAttainment, useGetAttainments} from '../../hooks/useApi';
 import NewAttainmentDialog from './NewAttainmentDialog';
 
 export default function CourseView(): JSX.Element {
   const {courseId}: Params = useParams() as {courseId: string};
-  const [open, setOpen] = useState(false);
-  const handleClose = () => {
-    setOpen(false);
-  };
-  const attainments: UseQueryResult<Array<AttainmentData>> =
-    useGetAttainments(courseId);
-  const addAttainment = useAddAttainment();
   const deleteAttainment = useDeleteAttainment();
+  const attainments = useGetAttainments(courseId);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Add attainment</Button>
+      <Button onClick={() => setAddDialogOpen(true)}>Add attainment</Button>
+      <NewAttainmentDialog
+        handleClose={() => setAddDialogOpen(false)}
+        open={addDialogOpen}
+      />
       <Box
         style={{
           display: 'flex',
@@ -61,7 +55,7 @@ export default function CourseView(): JSX.Element {
                   p: 1,
                 }}
               >
-                <p>{attainment.name}</p>
+                <Typography sx={{py: 1.7}}>{attainment.name}</Typography>
                 <Chip
                   icon={<Tag />}
                   label={`${attainment.id}`}
@@ -76,16 +70,6 @@ export default function CourseView(): JSX.Element {
                   size="small"
                 />
 
-                {/* <Button
-                  onClick={() =>
-                    deleteAttainment.mutate({
-                      courseId: courseId,
-                      attainmentId: attainment.id,
-                    })
-                  }
-                >
-                  Delete
-                </Button> */}
                 <IconButton
                   onClick={() =>
                     deleteAttainment.mutate({
@@ -100,7 +84,6 @@ export default function CourseView(): JSX.Element {
               </Box>
             </Box>
           ))}
-        <NewAttainmentDialog handleClose={handleClose} open={open} />
       </Box>
     </>
   );
