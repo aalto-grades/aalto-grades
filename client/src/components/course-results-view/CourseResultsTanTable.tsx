@@ -8,7 +8,6 @@ import {
   FinalGrade,
   StudentRow,
 } from '@common/types';
-import {GradeNodeValue} from '@common/types/graph';
 import {batchCalculateGraph} from '@common/util/calculateGraph';
 import {ArrowUpward, ExpandLess, ExpandMore, Sort} from '@mui/icons-material';
 import {Badge, Checkbox, Icon, IconButton, Link, Tooltip} from '@mui/material';
@@ -27,6 +26,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import {useVirtualizer} from '@tanstack/react-virtual';
 import * as React from 'react';
 import {useParams} from 'react-router-dom';
 import {useGetAllAssessmentModels, useGetAttainments} from '../../hooks/useApi';
@@ -47,7 +47,7 @@ type GroupedStudentRow = {
 } & ExtendedStudentRow;
 
 type ExtendedStudentRow = StudentRow & {
-  assessmentModels?: AssessmentModelData[];
+  predictedFinalGrades?: (string | number)[];
 };
 
 type PropsType = {
@@ -128,7 +128,7 @@ function groupByLastAttainmentDate(gradesList: ExtendedStudentRow[]) {
  * @param row - The student row.
  * @returns The previous grade that has been exported to Sisu, or null if none is found.
  */
-//Commented until Final grade is reinplemented
+//Commented until Final grade is reimplemented
 // function findPreviouslyExportedToSisu(bestGrade: GradeOption, row: StudentRow) {
 //   for (const gr of row.finalGrades) {
 //     if (bestGrade?.gradeId === gr.gradeId) continue; //Skip the best grade (we need to check for previous ones)
@@ -146,6 +146,26 @@ function groupByLastAttainmentDate(gradesList: ExtendedStudentRow[]) {
 // }
 
 const columnHelper = createColumnHelper<GroupedStudentRow>();
+//predicted grade divided by model
+function predictGrades(
+  rows: StudentRow[],
+  assessmentModels: AssessmentModelData[]
+) {
+  return assessmentModels.map(model => {
+    return batchCalculateGraph(
+      model.graphStructure,
+      rows.map(row => {
+        return {
+          userId: row.user.id,
+          attainments: row.attainments.map(att => ({
+            attainmentId: att.attainmentId,
+            grade: att.grades === undefined ? 0 : att.grades[0].grade, // TODO: best grade should be taken 🐛
+          })),
+        };
+      })
+    );
+  });
+}
 
 //TODO: Better column definitions
 //TODO: Better typing and freeze how to access data
@@ -158,9 +178,20 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
     useGetAllAssessmentModels(courseId);
   // Row are always grouped, toggling grouping just add the grouping column to the table
   const groupedData = React.useMemo(() => {
+    const predictedGrades: ReturnType<typeof predictGrades> = [];
+    if (assessmentModels) {
+      // predictedGrades = predictGrades(props.data, assessmentModels); //Takes too much time...?
+    }
+
     return groupByLastAttainmentDate(
       props.data.map(row => {
-        return {...row, assessmentModels: assessmentModels ?? []};
+        return {
+          ...row,
+          predictedFinalGrades:
+            predictedGrades?.length > 0
+              ? predictedGrades.map(pg => pg?.[row.user.id]?.finalGrade)
+              : ['No models'],
+        };
       })
     );
   }, [props.data, assessmentModels]);
@@ -179,15 +210,11 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
     props.setSelectedStudents(_ => {
       return table.getSelectedRowModel().rows.map(row => {
         //Setting selectedStudnets
-        console.log(row.original);
         return row.original;
       });
     });
   }, [rowSelection]);
-  //When assessmentModels are retrieved, updated the
-  React.useEffect(() => {
-    table.reset();
-  }, [assessmentModels]);
+
   // console.log(expanded);
   // console.log(rowSelection);
 
@@ -199,6 +226,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
         header: att.name,
         meta: {PrettyChipPosition: 'alone'},
         enableSorting: false,
+        size: 120,
         cell: ({getValue}) => (
           <GradeCell studentNumber={'123'} attainemntResults={getValue()} />
         ),
@@ -280,6 +308,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
     ...groupingColumns,
     columnHelper.display({
       id: 'select',
+      size: 70,
       meta: {PrettyChipPosition: grouping.length > 0 ? 'last' : 'alone'},
       header: ({table}) => {
         return (
@@ -388,41 +417,29 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
     //   cell: info => info.getValue(),
     //   aggregatedCell: () => null,
     // }),
-    // columnHelper.accessor(row => row, {
-    //   header: 'Final Grade',
-    //   enableSorting: false,
-    //   // cell: info => info.getValue(),
-    //   cell: ({getValue}) => (
-    //     <GradeCell
-    //       studentNumber={'123'}
-    //       attainemntResults={getValue().finalGrades?.[0]}
-    //       finalGrade={true}
-    //     />
-    //   ),
-    //   aggregatedCell: () => null,
-    // }),
+    columnHelper.accessor(row => row, {
+      header: 'Final Grade',
+      enableSorting: false,
+      // cell: info => info.getValue(),
+      cell: ({getValue}) =>
+        // <GradeCell
+        //   studentNumber={'123'}
+        //   attainemntResults={getValue().finalGrades?.[0]}
+        //   finalGrade={true}
+        // />
+        getValue().finalGrades?.[0].grade ?? '-',
+      aggregatedCell: () => null,
+    }),
     columnHelper.accessor(
       row => {
-        if (row.assessmentModels === undefined) return;
-
-        const modelsGrades = row.assessmentModels.map(model => {
-          return batchCalculateGraph(model.graphStructure!, [
-            {
-              userId: row.user.id,
-              attainments: row.attainments.map(att => ({
-                attainmentId: att.attainmentId,
-                grade: att.grades === undefined ? 0 : att.grades[0].grade, // TODO: best grade should be taken 🐛
-              })),
-            },
-          ])[row.user.id].finalGrade;
-        });
+        if (row.predictedFinalGrades === undefined) return;
         return (
           <Tooltip
             placement="top"
-            title={`${row.assessmentModels.map(m => m.name).join('/')}`}
+            // title={`${row.assessmentModels.map(m => m.name).join('/')}`}
             disableInteractive
           >
-            <>{modelsGrades.join('/')}</>
+            <>{row.predictedFinalGrades.join('/')}</>
           </Tooltip>
         );
       },
@@ -502,6 +519,16 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
     // debugAll: true,
   });
 
+  //Virtualizer
+  const {rows} = table.getRowModel();
+  const parentRef = React.useRef<HTMLDivElement>(null);
+  const virtualizer = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 20,
+    overscan: 20,
+  });
+
   return (
     <div className="p-2">
       <button
@@ -526,87 +553,143 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
         placeholder={'Search...'}
         className="w-36 border shadow rounded"
       />
-      <table style={{borderCollapse: 'collapse', borderSpacing: '0'}}>
-        <thead>
-          {table.getHeaderGroups().map(headerGroup => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map(header => (
-                <th
-                  style={{
-                    // border: '1px solid lightgray',
-                    padding: '0px',
-                    height: '50px',
-                  }}
-                  key={header.id}
-                  colSpan={header.colSpan}
-                >
-                  {header.isPlaceholder ? null : (
-                    <PrettyChip
-                      position={
-                        header.column.columnDef.meta?.PrettyChipPosition ===
-                        'alone'
-                          ? undefined
-                          : header.column.columnDef.meta?.PrettyChipPosition ??
-                            'middle'
-                      }
-                      style={{
-                        fontWeight: 'bold',
-                      }}
-                      onClick={
-                        header.column.getCanSort()
-                          ? header.column.getToggleSortingHandler()
-                          : undefined
-                      }
-                    >
-                      <>
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                        {!header.column.getCanSort() ? null : (
-                          <Icon>
-                            <>
-                              {{
-                                asc: <ArrowUpward />,
-                                desc: (
-                                  <ArrowUpward style={{rotate: '180deg'}} />
-                                ),
-                              }[header.column.getIsSorted() as string] ?? (
-                                <Sort></Sort>
-                              )}
-                            </>
-                          </Icon>
-                        )}
-                      </>
-                    </PrettyChip>
-                  )}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.map(row => (
-            <tr
-              key={row.id}
-              // style={{border: '1px solid lightgray'}}
-            >
-              {row.getVisibleCells().map(cell => {
-                return (
-                  <td
-                    key={cell.id}
-                    {...{
-                      style: {
-                        padding: '0px',
-                        height: '50px',
-                        textAlign: 'center',
-                      },
+      <div
+        className="container"
+        ref={parentRef}
+        style={{
+          overflowY: 'auto', //our scrollable table container
+          position: 'relative', //needed for sticky header
+          height: '800px', //should be a fixed height
+        }}
+      >
+        <table
+          style={{
+            borderCollapse: 'collapse',
+            borderSpacing: '0',
+            // display: 'grid',
+          }}
+        >
+          <thead
+            style={{
+              // display: 'grid',
+              position: 'sticky',
+              top: 0,
+              zIndex: 1,
+            }}
+          >
+            {table.getHeaderGroups().map(headerGroup => (
+              <tr
+                key={headerGroup.id}
+                style={{
+                  display: 'flex',
+                  width: '100%',
+                  backgroundColor: 'white',
+                }}
+              >
+                {headerGroup.headers.map(header => (
+                  <th
+                    style={{
+                      // border: '1px solid lightgray',
+                      padding: '0px',
+                      height: '50px',
+                      display: 'flex',
+                      //Calculate correct size for groupHeaders
+                      width:
+                        header.subHeaders.length !== 0
+                          ? header.subHeaders.reduce(
+                              (acc, subHeader) => acc + subHeader.getSize(),
+                              0
+                            )
+                          : header.getSize(),
                     }}
+                    key={header.id}
+                    colSpan={header.colSpan}
                   >
-                    {cell.getIsGrouped() ? (
-                      // If it's a grouped cell, add an expander and row count
-                      <>
-                        {/* <Badge
+                    {header.isPlaceholder ? null : (
+                      <PrettyChip
+                        position={
+                          header.column.columnDef.meta?.PrettyChipPosition ===
+                          'alone'
+                            ? undefined
+                            : header.column.columnDef.meta
+                                ?.PrettyChipPosition ?? 'middle'
+                        }
+                        style={{
+                          fontWeight: 'bold',
+                        }}
+                        onClick={
+                          header.column.getCanSort()
+                            ? header.column.getToggleSortingHandler()
+                            : undefined
+                        }
+                      >
+                        <>
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                          {!header.column.getCanSort() ? null : (
+                            <Icon>
+                              <>
+                                {{
+                                  asc: <ArrowUpward />,
+                                  desc: (
+                                    <ArrowUpward style={{rotate: '180deg'}} />
+                                  ),
+                                }[header.column.getIsSorted() as string] ?? (
+                                  <Sort></Sort>
+                                )}
+                              </>
+                            </Icon>
+                          )}
+                        </>
+                      </PrettyChip>
+                    )}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+
+          <tbody
+            style={{
+              display: 'grid',
+              height: `${virtualizer.getTotalSize()}px`, //tells scrollbar how big the table is
+              position: 'relative', //needed for absolute positioning of rows
+            }}
+          >
+            {virtualizer.getVirtualItems().map(virtualRow => {
+              const row = table.getRowModel().rows[virtualRow.index];
+              return (
+                <tr
+                  data-index={virtualRow.index} //needed for dynamic row height measurement
+                  ref={node => virtualizer.measureElement(node)} //measure dynamic row height
+                  key={row.id}
+                  style={{
+                    display: 'flex',
+                    position: 'absolute',
+                    transform: `translateY(${virtualRow.start}px)`, //this should always be a `style` as it changes on scroll
+                    width: '100%',
+                  }}
+                >
+                  {row.getVisibleCells().map(cell => {
+                    return (
+                      <td
+                        key={cell.id}
+                        {...{
+                          style: {
+                            padding: '0px',
+                            height: '50px',
+                            textAlign: 'center',
+                            display: 'flex',
+                            width: cell.column.getSize(),
+                          },
+                        }}
+                      >
+                        {cell.getIsGrouped() ? (
+                          // If it's a grouped cell, add an expander and row count
+                          <>
+                            {/* <Badge
                           badgeContent={
                             row.getIsExpanded() ? null : row.subRows.length
                           }
@@ -625,83 +708,88 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
                             )}
                           </IconButton>
                         </Badge> */}
-                        <PrettyChip
-                          onClick={row.getToggleExpandedHandler()}
-                          position="first"
-                        >
-                          <>
-                            <Badge
-                              badgeContent={
-                                row.getIsExpanded() ? null : row.subRows.length
-                              }
-                              color="primary"
+                            <PrettyChip
+                              onClick={row.getToggleExpandedHandler()}
+                              position="first"
                             >
-                              <IconButton
-                                size="small"
-                                color="primary"
-                                // onClick={row.getToggleExpandedHandler()}
-                                disabled={!row.getCanExpand()}
-                              >
-                                {row.getIsExpanded() ? (
-                                  <ExpandLess />
-                                ) : (
-                                  <ExpandMore />
-                                )}
-                              </IconButton>
-                            </Badge>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )}{' '}
-                          </>
-                        </PrettyChip>
-                        {/* {flexRender(
+                              <>
+                                <Badge
+                                  badgeContent={
+                                    row.getIsExpanded()
+                                      ? null
+                                      : row.subRows.length
+                                  }
+                                  color="primary"
+                                >
+                                  <IconButton
+                                    size="small"
+                                    color="primary"
+                                    // onClick={row.getToggleExpandedHandler()}
+                                    disabled={!row.getCanExpand()}
+                                  >
+                                    {row.getIsExpanded() ? (
+                                      <ExpandLess />
+                                    ) : (
+                                      <ExpandMore />
+                                    )}
+                                  </IconButton>
+                                </Badge>
+                                {flexRender(
+                                  cell.column.columnDef.cell,
+                                  cell.getContext()
+                                )}{' '}
+                              </>
+                            </PrettyChip>
+                            {/* {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
                         )}{' '} */}
-                        {/* ({row.subRows.length}) */}
-                      </>
-                    ) : cell.getIsAggregated() ? (
-                      // If the cell is aggregated, use the Aggregated
-                      // renderer for cell
-                      flexRender(
-                        cell.column.columnDef.aggregatedCell ??
-                          cell.column.columnDef.cell,
-                        cell.getContext()
-                      )
-                    ) : cell.getIsPlaceholder() ? null : ( // For cells with repeated values, render null
-                      // Otherwise, just render the regular cell
-                      <>
-                        {cell.getValue() === undefined ? (
+                            {/* ({row.subRows.length}) */}
+                          </>
+                        ) : cell.getIsAggregated() ? (
+                          // If the cell is aggregated, use the Aggregated
+                          // renderer for cell
                           flexRender(
-                            cell.column.columnDef.cell,
+                            cell.column.columnDef.aggregatedCell ??
+                              cell.column.columnDef.cell,
                             cell.getContext()
                           )
-                        ) : (
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              borderBottom: '1px solid lightgray',
-                              height: '100%',
-                            }}
-                          >
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
+                        ) : cell.getIsPlaceholder() ? null : ( // For cells with repeated values, render null
+                          // Otherwise, just render the regular cell
+                          <>
+                            {cell.getValue() === undefined ? (
+                              flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext()
+                              )
+                            ) : (
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  borderBottom: '1px solid lightgray',
+                                  height: '100%',
+                                  width: '100%',
+                                }}
+                              >
+                                {flexRender(
+                                  cell.column.columnDef.cell,
+                                  cell.getContext()
+                                )}
+                              </div>
                             )}
-                          </div>
+                          </>
                         )}
-                      </>
-                    )}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-        {/* <tfoot>
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+
+          {/* <tfoot>
           {table.getFooterGroups().map(footerGroup => (
             <tr key={footerGroup.id}>
               {footerGroup.headers.map(header => (
@@ -717,7 +805,8 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
             </tr>
           ))}
         </tfoot> */}
-      </table>
+        </table>
+      </div>
       <StudentGradesDialog
         user={user as FinalGrade}
         setOpen={setShowUserGrades}

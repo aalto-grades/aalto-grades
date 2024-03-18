@@ -187,8 +187,8 @@ export default function App(): JSX.Element {
               <UserButton />
             </Toolbar>
           </AppBar>
-          <Container sx={{textAlign: 'center'}} maxWidth={false}>
-            <Box mx={5} my={5}>
+          <Container sx={{textAlign: 'center', m: 0}} maxWidth={false}>
+            <Box>
               <AlertSnackbar snackPack={snackPack} />
               <Routes>
                 {/* Add nested routes when needed */}

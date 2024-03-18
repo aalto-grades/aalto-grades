@@ -130,18 +130,18 @@ export async function getCsvTemplate(
  * the course, or no course results found/calculated before calling the endpoint.
  */
 export async function getGrades(req: Request, res: Response): Promise<void> {
-  const urlParams: yup.AnyObjectSchema = yup.object({
-    studentNumbers: yup.array().json().of(yup.string()).notRequired(),
-    instanceId: yup.number().min(1).notRequired(),
-  });
+  // const urlParams: yup.AnyObjectSchema = yup.object({
+  //   studentNumbers: yup.array().json().of(yup.string()).notRequired(),
+  //   instanceId: yup.number().min(1).notRequired(),
+  // });
 
-  const {
-    studentNumbers,
-    instanceId,
-  }: {
-    studentNumbers?: Array<string>;
-    instanceId?: number;
-  } = await urlParams.validate(req.query, {abortEarly: false});
+  // const {
+  //   studentNumbers,
+  //   instanceId,
+  // }: {
+  //   studentNumbers?: Array<string>;
+  //   instanceId?: number;
+  // } = await urlParams.validate(req.query, {abortEarly: false});
 
   const courseId = Number(req.params.courseId);
 
@@ -163,7 +163,17 @@ export async function getGrades(req: Request, res: Response): Promise<void> {
     },
   });
 
-  // Get dict of unique Users from the grades with key as userId from grades
+  //Get finalGrades for all students
+  const finalGrades = await FinalGrade.findAll({
+    include: {
+      all: true,
+    },
+    where: {
+      courseId: courseId,
+    },
+  });
+
+  // From the grades list -> dict of unique Users, key userId
   const users = grades.reduce<{[key: string]: User}>((acc, grade) => {
     if (grade.User && !acc[grade.User.id]) {
       acc[grade.User.id] = grade.User;
@@ -171,7 +181,7 @@ export async function getGrades(req: Request, res: Response): Promise<void> {
     return acc;
   }, {});
 
-  //  a dict grouped by user id and internally grouped by attainment id
+  // Grades dict, composition: user id:attainment id=list of grades
   const userGrades = grades.reduce<{
     [key: string]: {[key: string]: AttainmentGrade[]};
   }>((acc, grade) => {
@@ -186,6 +196,18 @@ export async function getGrades(req: Request, res: Response): Promise<void> {
     return acc;
   }, {});
 
+  // FinalGrades dict, composition: user id=list of final grades
+  const finalGradesDict = finalGrades.reduce<{
+    [key: string]: FinalGrade[];
+  }>((acc, grade) => {
+    const userId = grade.userId;
+    if (!acc[userId]) {
+      acc[userId] = [];
+    }
+    acc[userId].push(grade);
+    return acc;
+  }, {});
+
   //Cleaning the results for API response
 
   const result = Object.keys(userGrades).map(userId => {
@@ -194,6 +216,7 @@ export async function getGrades(req: Request, res: Response): Promise<void> {
         id: users[userId].id,
         studentNumber: users[userId].studentNumber,
       },
+      finalGrades: finalGradesDict[userId],
       attainments: attainments.map(attainment => {
         const attToAdd: AttainmentGradesData = {
           attainmentId: attainment.id,

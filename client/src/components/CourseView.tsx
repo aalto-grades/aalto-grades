@@ -135,6 +135,7 @@ export default function CourseView(): JSX.Element {
           sx={{
             marginLeft: 2,
             width: '100%',
+            overflow: 'auto',
           }}
         >
           <Outlet />

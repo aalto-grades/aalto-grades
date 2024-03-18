@@ -116,3 +116,26 @@ export async function addFinalGrades(
     next(err);
   }
 }
+
+export async function getFinalGrades(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const courseId = Number(req.params.courseId);
+  const grader: JwtClaims = req.user as JwtClaims;
+
+  await isTeacherInChargeOrAdmin(grader, courseId, HttpCode.Forbidden);
+
+  try {
+    const finalGrades = await FinalGrade.findAll({
+      where: {
+        courseId: courseId,
+      },
+    });
+
+    return res.status(HttpCode.Ok).json({data: finalGrades});
+  } catch (err: unknown) {
+    next(err);
+  }
+}
