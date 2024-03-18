@@ -18,39 +18,60 @@ export function getParamLabel(labelKey: string): string {
   return capitalizedLabel;
 }
 
-export function findBestGradeOption(
-  options: Array<GradeOption>,
-  searchOptions: {avoidExpired: boolean; preferExpiredToNull: boolean} = {
-    avoidExpired: false, // Will not count expired grades as best
-    preferExpiredToNull: true, // Will return expired grades if no non-expired grades are found
-  }
-): GradeOption | null {
-  let bestSoFar: GradeOption | null = null;
-  let bestSoFarExpired: GradeOption | null = null;
-
-  for (const option of options) {
-    if (searchOptions.avoidExpired && isGradeDateExpired(option.expiryDate)) {
-      if (!bestSoFarExpired || option.grade > bestSoFarExpired.grade)
-        bestSoFarExpired = option;
-    } else {
-      if (!bestSoFar || option.grade > bestSoFar.grade) bestSoFar = option;
-    }
-  }
-  return !bestSoFar && searchOptions.preferExpiredToNull
-    ? bestSoFarExpired
-    : bestSoFar;
-}
-
 /**
  * Determines whether a given grade date has expired.
  * @param date - The grade date to check.
  * @returns True if the grade date has expired, false otherwise.
  */
-export function isGradeDateExpired(
+export const isGradeDateExpired = (
   date: Date | DateOnlyString | undefined
-): boolean {
+): boolean => {
   if (!date) return false;
-  const now: Date = new Date();
-  const gradeDate: Date = new Date(date);
-  return now > gradeDate;
-}
+  return new Date().getTime() > new Date(date).getTime();
+};
+const gradeIsNewer = (
+  newGrade: GradeOption,
+  oldGrade: GradeOption | null
+): boolean => {
+  if (oldGrade === null) return true;
+  if (newGrade.date === undefined) return false;
+  if (oldGrade.date === undefined) return true;
+  const newDate = new Date(newGrade.date).getTime();
+  const oldDate = new Date(oldGrade.date).getTime();
+  if (newDate !== oldDate) return newDate > oldDate;
+  return (newGrade.gradeId as number) > (oldGrade.gradeId as number);
+};
+const gradeIsBetter = (
+  newGrade: GradeOption,
+  oldGrade: GradeOption | null
+): boolean => {
+  if (oldGrade === null) return true;
+  return newGrade.grade > oldGrade.grade;
+};
+export const findBestGradeOption = (
+  options: Array<GradeOption>,
+  searchOptions: {
+    avoidExpired: boolean;
+    preferExpiredToNull: boolean;
+    useLatest: boolean;
+  } = {
+    avoidExpired: false, // Will not count expired grades as best
+    preferExpiredToNull: true, // Will return expired grades if no non-expired grades are found
+    useLatest: false, // Will return latest grade instead of the highest one
+  }
+): GradeOption | null => {
+  let bestSoFar: GradeOption | null = null;
+  let bestSoFarExpired: GradeOption | null = null;
+  const compare = searchOptions.useLatest ? gradeIsNewer : gradeIsBetter;
+
+  for (const option of options) {
+    if (searchOptions.avoidExpired && isGradeDateExpired(option.expiryDate)) {
+      if (compare(option, bestSoFarExpired)) bestSoFarExpired = option;
+    } else {
+      if (compare(option, bestSoFar)) bestSoFar = option;
+    }
+  }
+  return !bestSoFar && searchOptions.preferExpiredToNull
+    ? bestSoFarExpired
+    : bestSoFar;
+};

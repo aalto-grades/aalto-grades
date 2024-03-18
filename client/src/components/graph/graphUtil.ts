@@ -79,12 +79,11 @@ export const formatGraph = async (
   nodeDimensions: ExtraNodeData,
   nodeValues: NodeValues
 ): Promise<Node[]> => {
-  // TODO: remove the ?? 100 when format on load is removed
   const nodesForElk = nodes.map(node => ({
     type: node.type,
     id: node.id,
-    width: nodeDimensions[node.id]?.dimensions.width ?? 100,
-    height: nodeDimensions[node.id]?.dimensions.height ?? 100,
+    width: nodeDimensions[node.id].dimensions.width,
+    height: nodeDimensions[node.id].dimensions.height,
   }));
   const graph = {
     id: 'root',
