@@ -339,7 +339,7 @@ export const batchCalculateGraph = (
   }[]
 ): {[key: number]: {finalGrade: number}} => {
   const {nodes, edges, nodeData} = graphStructure;
-  const nodeValues: {[key: string]: {[key: string]: NodeValue}} = {};
+  const nodeValues: {[key: string]: {[key: string]: NodeValue}} = {}; // {userId: {nodeId: nodeval, ...}, ...}
 
   const nodeSources: {[key: string]: Set<string>} = {};
   const nodeTargets: {[key: string]: Edge[]} = {};
@@ -350,27 +350,24 @@ export const batchCalculateGraph = (
     nodeSources[edge.target].add(edge.source);
   }
 
-  // Init Graph values
-  const studentDataMap: {[key: number]: {[key: string]: number}} = {}; // {studentNum: {attId1: num, attId2: num, ...}, ...}
-  for (const student of studentData) {
-    studentDataMap[student.userId] = {};
-    for (const attainment of student.attainments)
-      studentDataMap[student.userId][`attainment-${attainment.attainmentId}`] =
-        attainment.grade;
-  }
+  // Init graph values
   const noSources: string[] = [];
   for (const node of nodes) {
     if (!(node.id in nodeSources)) noSources.push(node.id);
 
-    for (const [studentNum, attainmentVals] of Object.entries(studentDataMap)) {
-      if (!(studentNum in nodeValues)) nodeValues[studentNum] = {};
-      nodeValues[studentNum][node.id] = initNode(
-        node.type as CustomNodeTypes
-      ).value;
+    for (const student of studentData) {
+      if (!(student.userId in nodeValues)) nodeValues[student.userId] = {};
 
-      const nodeValue = nodeValues[studentNum][node.id];
-      if (nodeValue.type === 'attainment')
-        nodeValue.value = attainmentVals[node.id];
+      const nodeType = node.type as CustomNodeTypes;
+      nodeValues[student.userId][node.id] = initNode(nodeType).value;
+      const nodeValue = nodeValues[student.userId][node.id];
+      if (nodeValue.type !== 'attainment') continue;
+
+      // Find matching attainment from student data
+      for (const attainment of student.attainments) {
+        if (node.id === `attainment-${attainment.attainmentId}`)
+          nodeValue.value = attainment.grade;
+      }
     }
   }
 
@@ -380,20 +377,27 @@ export const batchCalculateGraph = (
   // Calculate values for all nodes
   while (noSources.length > 0) {
     const sourceId = noSources.shift() as string;
+    // Calculate node value for all students
     for (const student of studentData) {
       calculateNodeValue(
         sourceId,
         nodeValues[student.userId][sourceId],
         nodeData
       );
-      const sourceNodeValue = nodeValues[student.userId][sourceId];
-
-      if (sourceNodeValue.type === 'require' && sourceNodeValue.courseFail) {
+      const nodeValue = nodeValues[student.userId][sourceId];
+      if (nodeValue.type === 'require' && nodeValue.courseFail) {
         courseFail[student.userId] = true;
       }
-      if (!(sourceId in nodeTargets)) continue;
+    }
+    if (!(sourceId in nodeTargets)) continue; // Node has no targets
 
-      for (const edge of nodeTargets[sourceId]) {
+    // Update values for all node targets
+    for (const edge of nodeTargets[sourceId]) {
+      nodeSources[edge.target].delete(sourceId);
+      if (nodeSources[edge.target].size === 0) noSources.push(edge.target);
+
+      for (const student of studentData) {
+        const sourceNodeValue = nodeValues[student.userId][sourceId];
         const sourceValue =
           (sourceNodeValue.type === 'require' ||
           sourceNodeValue.type === 'substitute'
@@ -404,9 +408,6 @@ export const batchCalculateGraph = (
                   .replace('-source', '')
               ]
             : sourceNodeValue.value) ?? 0;
-
-        nodeSources[edge.target].delete(sourceId);
-        if (nodeSources[edge.target].size === 0) noSources.push(edge.target);
 
         const nodeValue = nodeValues[student.userId][edge.target];
         switch (nodeValue.type) {
@@ -431,6 +432,8 @@ export const batchCalculateGraph = (
       }
     }
   }
+
+  // Create finalGrades object and set the values for it
   const finalGrades: {[key: string]: {finalGrade: number}} = {};
   for (const student of studentData) {
     for (const node of nodes) {
