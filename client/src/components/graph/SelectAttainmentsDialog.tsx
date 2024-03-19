@@ -1,13 +1,13 @@
 import {AttainmentData} from '@common/types';
-import {Close} from '@mui/icons-material';
 import {
+  Button,
   Checkbox,
   Dialog,
+  DialogActions,
   DialogContent,
   DialogTitle,
   FormControlLabel,
   FormGroup,
-  IconButton,
 } from '@mui/material';
 import {useEffect, useState} from 'react';
 import {Node} from 'reactflow';
@@ -16,12 +16,14 @@ const SelectAttainmentsDialog = ({
   nodes,
   attainments,
   open,
-  onClose: parentOnClose,
+  onClose,
+  handleAttainmentSelect,
 }: {
   nodes: Node[];
   attainments: AttainmentData[];
   open: boolean;
-  onClose: (
+  onClose: () => void;
+  handleAttainmentSelect: (
     newAttainments: AttainmentData[],
     removedAttainments: AttainmentData[]
   ) => void;
@@ -45,6 +47,8 @@ const SelectAttainmentsDialog = ({
     for (const attainment of attainments) {
       newSelected[attainment.id] = attainmentNodeIds.includes(attainment.id);
     }
+    if (JSON.stringify(newSelected) === JSON.stringify(startSelected)) return;
+
     setSelected(newSelected);
     setStartSelected(newSelected);
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -56,7 +60,7 @@ const SelectAttainmentsDialog = ({
     }));
   };
 
-  const onClose = () => {
+  const onSubmit = () => {
     const newAttainments: AttainmentData[] = [];
     const removedAttainments: AttainmentData[] = [];
     for (const [stringKey, value] of Object.entries(selected)) {
@@ -70,24 +74,15 @@ const SelectAttainmentsDialog = ({
           attainments.find(att => att.id === key) as AttainmentData
         );
     }
-    parentOnClose(newAttainments, removedAttainments);
+    handleAttainmentSelect(newAttainments, removedAttainments);
+    onClose();
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
       <DialogTitle>Select Attainments</DialogTitle>
-      <IconButton
-        onClick={onClose}
-        sx={{
-          position: 'absolute',
-          right: 8,
-          top: 8,
-          color: theme => theme.palette.grey[500],
-        }}
-      >
-        <Close />
-      </IconButton>
-      <DialogContent sx={{minWidth: 250, pt: 0}}>
+
+      <DialogContent>
         <FormGroup>
           {attainments.map(attainment => (
             <FormControlLabel
@@ -103,6 +98,19 @@ const SelectAttainmentsDialog = ({
           ))}
         </FormGroup>
       </DialogContent>
+      <DialogActions>
+        <Button
+          onClick={() => {
+            onClose();
+            setSelected(startSelected);
+          }}
+        >
+          Cancel
+        </Button>
+        <Button variant="contained" onClick={onSubmit}>
+          Done
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 };

@@ -4,6 +4,7 @@
 
 import {Button, Divider, Typography} from '@mui/material';
 import {
+  DragEvent,
   DragEventHandler,
   JSX,
   useCallback,
@@ -378,7 +379,7 @@ const Graph = ({
 
   // Handle drop-in nodes
   const onDragStart = (
-    event: React.DragEvent<HTMLDivElement>,
+    event: DragEvent<HTMLDivElement>,
     nodeType: DropInNodes
   ) => {
     event.dataTransfer.setData('application/reactflow', nodeType);
@@ -426,7 +427,8 @@ const Graph = ({
         nodes={nodes}
         attainments={attainments}
         open={attainmentsSelectOpen}
-        onClose={handleAttainmentSelect}
+        handleAttainmentSelect={handleAttainmentSelect}
+        onClose={() => setAttainmentsSelectOpen(false)}
       />
       <NodeValuesContext.Provider value={{nodeValues, setNodeValue}}>
         <ExtraNodeDataContext.Provider
@@ -450,6 +452,7 @@ const Graph = ({
                     )
                   )
                 }
+                minZoom={0.25}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
                 isValidConnection={isValidConnection}
@@ -457,7 +460,7 @@ const Graph = ({
                 onInit={setReactFlowInstance}
                 onDrop={onDrop}
                 onDragOver={onDragOver}
-                onError={(i, m) => i !== '008' && console.warn(m)} // Ignore couldn't create edge warnings
+                onError={(i, m) => i !== '008' && console.warn(m)} // Ignore "couldn't create edge" warnings
                 fitView
               >
                 <Controls />
@@ -476,49 +479,49 @@ const Graph = ({
                 onDragStart={event => onDragStart(event, 'addition')}
                 draggable
               >
-                AdditionNode
+                Addition
               </div>
               <div
                 className="dndnode"
                 onDragStart={event => onDragStart(event, 'average')}
                 draggable
               >
-                AverageNode
+                Average
               </div>
               <div
                 className="dndnode"
                 onDragStart={event => onDragStart(event, 'stepper')}
                 draggable
               >
-                StepperNode
+                Stepper
               </div>
               <div
                 className="dndnode"
                 onDragStart={event => onDragStart(event, 'minpoints')}
                 draggable
               >
-                RequirePointsNode
+                Require Minimum Points
               </div>
               <div
                 className="dndnode"
                 onDragStart={event => onDragStart(event, 'max')}
                 draggable
               >
-                MaxNode
+                Maximum
               </div>
               <div
                 className="dndnode"
                 onDragStart={event => onDragStart(event, 'require')}
                 draggable
               >
-                RequireNode
+                Require Passing Values
               </div>
               <div
                 className="dndnode"
                 onDragStart={event => onDragStart(event, 'substitute')}
                 draggable
               >
-                SubstituteNode
+                Substitute
               </div>
             </div>
             <div style={{float: 'left', marginLeft: '5px'}}>
