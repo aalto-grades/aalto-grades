@@ -29,6 +29,12 @@ const UploadDialog = ({
   );
 
   const [currentStep, setCurrentStep] = useState<number>(0);
+  const [uploadExpanded, setUploadExpanded] = useState<'' | 'upload' | 'edit'>(
+    'upload'
+  );
+  const [confirmExpanded, setConfirmExpanded] = useState<
+    '' | 'date' | 'confirm'
+  >('date');
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [ready, setReady] = useState<boolean>(false);
   const [dates, setDates] = useState<
@@ -131,6 +137,8 @@ const UploadDialog = ({
     });
 
     setCurrentStep(0);
+    setUploadExpanded('upload');
+    setConfirmExpanded('date');
     setRows([]);
     setDates(
       attainmentData.map(att => ({
@@ -154,6 +162,8 @@ const UploadDialog = ({
             rows={rows}
             setRows={setRows}
             setReady={setReady}
+            expanded={uploadExpanded}
+            setExpanded={setUploadExpanded}
           />
         ) : (
           <UploadDialogConfirm
@@ -162,6 +172,8 @@ const UploadDialog = ({
             dates={dates}
             setDates={setDates}
             setReady={setReady}
+            expanded={confirmExpanded}
+            setExpanded={setConfirmExpanded}
           />
         )}
 
@@ -182,10 +194,13 @@ const UploadDialog = ({
               Next
             </Button>
           )}
-          {currentStep === 1 && (
-            <Button onClick={onSubmit} disabled={!ready}>
-              Submit
+          {currentStep === 1 && confirmExpanded === 'date' && (
+            <Button onClick={() => setConfirmExpanded('confirm')}>
+              Confirm
             </Button>
+          )}
+          {currentStep === 1 && confirmExpanded === 'confirm' && (
+            <Button onClick={onSubmit}>Submit</Button>
           )}
         </DialogActions>
       </Dialog>

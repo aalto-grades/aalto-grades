@@ -29,16 +29,22 @@ type PropsType = {
   rows: GridRowsProp;
   setRows: Dispatch<SetStateAction<GridRowsProp>>;
   setReady: Dispatch<SetStateAction<boolean>>;
+  expanded: '' | 'upload' | 'edit';
+  setExpanded: Dispatch<SetStateAction<'' | 'upload' | 'edit'>>;
 };
 
-const UploadDialogUpload = ({columns, rows, setRows, setReady}: PropsType) => {
+const UploadDialogUpload = ({
+  columns,
+  rows,
+  setRows,
+  setReady,
+  expanded,
+  setExpanded,
+}: PropsType) => {
   const [textFieldText, setTextFieldText] = useState<string>('');
   const [textFieldOpen, setTextFieldOpen] = useState<boolean>(false);
   const [mismatchDialogOpen, setMismatchDialogOpen] = useState<boolean>(false);
   const [mismatchData, setMismatchData] = useState<MismatchData | null>(null);
-  const [expanded, setExpanded] = useState<'' | 'import' | 'edit'>(
-    rows.length > 0 ? 'edit' : 'import'
-  );
   const [editText, setEditText] = useState<boolean>(rows.length > 0);
   const [snackbar, setSnackBar] = useState<{
     message: string;
@@ -158,10 +164,20 @@ const UploadDialogUpload = ({columns, rows, setRows, setReady}: PropsType) => {
             minRows={15}
             fullWidth
             onChange={e => setTextFieldText(e.target.value)}
+            value={textFieldText}
           />
         </DialogContent>
         <DialogActions>
           <Button
+            onClick={() => {
+              setTextFieldOpen(false);
+              setTextFieldText('');
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
             onClick={() => {
               setTextFieldOpen(false);
               loadCsv(textFieldText);
@@ -199,16 +215,16 @@ const UploadDialogUpload = ({columns, rows, setRows, setReady}: PropsType) => {
           </Alert>
         </Snackbar>
         <Accordion
-          expanded={expanded === 'import'}
-          onChange={(_, expanded) => setExpanded(expanded ? 'import' : '')}
+          expanded={expanded === 'upload'}
+          onChange={(_, expanded) => setExpanded(expanded ? 'upload' : '')}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            Import Grades
+            Upload Grades
           </AccordionSummary>
           <AccordionDetails>
             <ButtonGroup>
               <Button component="label" variant="outlined">
-                Import CSV
+                Upload CSV
                 <input
                   type="file"
                   accept=".csv"

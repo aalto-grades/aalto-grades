@@ -17,41 +17,32 @@ import {DataGrid, GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import {Dayjs} from 'dayjs';
-import {Dispatch, SetStateAction, useEffect, useMemo, useState} from 'react';
+import 'dayjs/locale/en-gb';
+import {Dispatch, SetStateAction, useMemo} from 'react';
 
+type DateType = {
+  attainmentName: string;
+  completionDate: Dayjs;
+  expirationDate: Dayjs;
+};
 type PropsType = {
   columns: GridColDef[];
   rows: GridRowsProp;
   setReady: Dispatch<SetStateAction<boolean>>;
-  dates: {
-    attainmentName: string;
-    completionDate: Dayjs;
-    expirationDate: Dayjs;
-  }[];
-  setDates: Dispatch<
-    SetStateAction<
-      {
-        attainmentName: string;
-        completionDate: Dayjs;
-        expirationDate: Dayjs;
-      }[]
-    >
-  >;
+  dates: DateType[];
+  setDates: Dispatch<SetStateAction<DateType[]>>;
+  expanded: '' | 'date' | 'confirm';
+  setExpanded: Dispatch<SetStateAction<'' | 'date' | 'confirm'>>;
 };
 
 const UploadDialogConfirm = ({
   columns,
   rows,
-  setReady,
   dates,
   setDates,
+  expanded,
+  setExpanded,
 }: PropsType) => {
-  const [expanded, setExpanded] = useState<'' | 'date' | 'confirm'>('date');
-
-  useEffect(() => {
-    setReady(expanded === 'confirm');
-  }, [expanded, setReady]);
-
   const nonEmptyCols = useMemo(() => {
     const newNonEmptyCols: string[] = [];
     for (const row of rows) {
@@ -68,6 +59,30 @@ const UploadDialogConfirm = ({
     }
     return newNonEmptyCols;
   }, [rows]);
+
+  const handleCompletionDateChange = (
+    newDate: Dayjs | null,
+    attainmentName: string
+  ): void => {
+    if (newDate === null) return;
+
+    const oldDate = dates.find(
+      oldDate => oldDate.attainmentName === attainmentName
+    ) as DateType;
+    const diff = newDate.diff(oldDate.completionDate); // Diff to update expiration date with
+
+    setDates(oldDates =>
+      oldDates.map(oldDate =>
+        oldDate.attainmentName === attainmentName && newDate !== null
+          ? {
+              ...oldDate,
+              completionDate: newDate,
+              expirationDate: oldDate.expirationDate.add(diff),
+            }
+          : oldDate
+      )
+    );
+  };
 
   return (
     <>
@@ -86,7 +101,10 @@ const UploadDialogConfirm = ({
                 Some attainments are hidden due to not having any data
               </Alert>
             )}
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <LocalizationProvider
+              dateAdapter={AdapterDayjs}
+              adapterLocale="en-gb"
+            >
               <TableContainer>
                 <Table size="small">
                   <TableHead>
@@ -108,15 +126,10 @@ const UploadDialogConfirm = ({
                             <DatePicker
                               slotProps={{textField: {size: 'small'}}}
                               value={date.completionDate}
-                              format="DD.MM.YYYY"
-                              onChange={e =>
-                                setDates(oldDates =>
-                                  oldDates.map(oldDate =>
-                                    oldDate.attainmentName ===
-                                      date.attainmentName && e !== null
-                                      ? {...oldDate, completionDate: e}
-                                      : oldDate
-                                  )
+                              onChange={value =>
+                                handleCompletionDateChange(
+                                  value,
+                                  date.attainmentName
                                 )
                               }
                             />
@@ -125,7 +138,6 @@ const UploadDialogConfirm = ({
                             <DatePicker
                               slotProps={{textField: {size: 'small'}}}
                               value={date.expirationDate}
-                              format="DD.MM.YYYY"
                               onChange={e =>
                                 setDates(oldDates =>
                                   oldDates.map(oldDate =>
