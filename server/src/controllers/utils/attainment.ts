@@ -4,14 +4,11 @@
 
 import {HttpCode} from '@common/types';
 
-import AssessmentModel from '../../database/models/assessmentModel';
 import Attainment from '../../database/models/attainment';
 import AttainmentGrade from '../../database/models/attainmentGrade';
-import Course from '../../database/models/course';
 
 import {AttainmentData} from '@common/types';
-import {validateAssessmentModelPath} from './assessmentModel';
-import {ApiError, idSchema} from '../../types';
+import {ApiError} from '../../types';
 
 /**
  * Finds an attainment by its ID.
@@ -60,20 +57,12 @@ export async function findAttainmentGradeById(
  * model.
  */
 export async function findAttainmentsByCourseId(courseId: number) {
-  console.log(courseId);
   const attainments: Array<Attainment> = await Attainment.findAll({
     where: {
       courseId: courseId,
     },
     order: [['id', 'ASC']],
   });
-
-  if (attainments.length === 0) {
-    throw new ApiError(
-      'Attainments were not found for the specified assessment model',
-      HttpCode.NotFound
-    );
-  }
 
   const attainmentData = attainments.map((attainment: Attainment) => {
     return {

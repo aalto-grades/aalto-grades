@@ -8,11 +8,10 @@ import {useParams} from 'react-router-dom';
 
 import {StudentRow} from '@common/types';
 import {batchCalculateGraph} from '@common/util/calculateGraph';
+import {enqueueSnackbar} from 'notistack';
 import {useAddFinalGrades} from '../hooks/api/finalGrade';
 import {useGetAllAssessmentModels, useGetGrades} from '../hooks/useApi';
-import useSnackPackAlerts from '../hooks/useSnackPackAlerts';
 import {findBestGradeOption} from '../utils';
-import AlertSnackbar from './alerts/AlertSnackbar';
 import CourseResultsTableToolbar from './course-results-view/CourseResultsTableToolbar';
 import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
 
@@ -20,7 +19,6 @@ export default function CourseResultsView(): JSX.Element {
   const {courseId} = useParams() as {courseId: string};
   const addFinalGrades = useAddFinalGrades(courseId);
   const assesmentModels = useGetAllAssessmentModels(courseId);
-  const snackPack = useSnackPackAlerts();
 
   const [missingFinalGrades, setMissingFinalGrades] = useState<boolean>(false);
   const [selectedRows, setSelectedRows] = useState<StudentRow[]>([]);
@@ -69,9 +67,8 @@ export default function CourseResultsView(): JSX.Element {
     );
     if (model === undefined) return false;
 
-    snackPack.push({
-      msg: 'Calculating final grades...',
-      severity: 'info',
+    enqueueSnackbar('Calculating final grades...', {
+      variant: 'info',
     });
 
     const finalGrades = batchCalculateGraph(
@@ -92,9 +89,8 @@ export default function CourseResultsView(): JSX.Element {
         date: gradingDate,
       }))
     );
-    snackPack.push({
-      msg: 'Final grades calculated successfully.',
-      severity: 'success',
+    enqueueSnackbar('Final grades calculated successfully.', {
+      variant: 'success',
     });
     studentsRefetch();
     return true;
@@ -102,7 +98,6 @@ export default function CourseResultsView(): JSX.Element {
 
   return (
     <Box textAlign="left" alignItems="left">
-      <AlertSnackbar snackPack={snackPack} />
       <CourseResultsTableToolbar
         calculateFinalGrades={handleCalculateFinalGrades}
         selectedRows={selectedRows}

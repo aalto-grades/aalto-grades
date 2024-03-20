@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {FinalGradeData, Language, StudentRow} from '@common/types';
 import {
   Box,
   Button,
@@ -18,16 +19,11 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import {enqueueSnackbar} from 'notistack';
 import {ChangeEvent, JSX, useState} from 'react';
 import {useParams} from 'react-router-dom';
-
-import {FinalGradeData, Language, StudentRow} from '@common/types';
 import {useDownloadSisuGradeCsv} from '../../hooks/useApi';
-import useSnackPackAlerts, {
-  SnackPackAlertState,
-} from '../../hooks/useSnackPackAlerts';
 import {LanguageOption, State} from '../../types';
-import AlertSnackbar from '../alerts/AlertSnackbar';
 
 // A Dialog component for downloading a Sisu grade CSV.
 const instructions: string =
@@ -91,9 +87,6 @@ export default function SisuDownloadDialog(props: {
     grades: s.finalGrades ?? [],
   }));
 
-  // state variables handling the alert messages.
-  const snackPack: SnackPackAlertState = useSnackPackAlerts();
-
   // state variables handling the assessment date and completion language.
   const [assessmentDate, setAssessmentDate]: State<string | undefined> =
     useState<string | undefined>(undefined);
@@ -112,10 +105,12 @@ export default function SisuDownloadDialog(props: {
       linkElement.click();
       document.body.removeChild(linkElement);
 
-      snackPack.push({
-        msg: 'Final grades downloaded in the Sisu CSV format succesfully.',
-        severity: 'success',
-      });
+      enqueueSnackbar(
+        'Final grades downloaded in the Sisu CSV format succesfully.',
+        {
+          variant: 'success',
+        }
+      );
     },
   });
 
@@ -128,9 +123,8 @@ export default function SisuDownloadDialog(props: {
   async function handleDownloadSisuGradeCsv(): Promise<void> {
     if (!courseId) return;
 
-    snackPack.push({
-      msg: 'Fetching Sisu CSV...',
-      severity: 'info',
+    enqueueSnackbar('Fetching Sisu CSV...', {
+      variant: 'info',
     });
 
     let studentNumbers: Array<string> = [];
@@ -299,7 +293,6 @@ export default function SisuDownloadDialog(props: {
           </Button>
         </DialogActions>
       </Dialog>
-      <AlertSnackbar snackPack={snackPack} />
     </>
   );
 }

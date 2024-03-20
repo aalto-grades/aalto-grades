@@ -3,11 +3,10 @@ import {Delete} from '@mui/icons-material';
 import {Button, Dialog, DialogActions} from '@mui/material';
 import {GridActionsCellItem, GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import dayjs, {Dayjs} from 'dayjs';
+import {enqueueSnackbar} from 'notistack';
 import {useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {useAddGrades, useGetAttainments} from '../../hooks/useApi';
-import useSnackPackAlerts from '../../hooks/useSnackPackAlerts';
-import AlertSnackbar from '../alerts/AlertSnackbar';
 import UploadDialogConfirm from './UploadDialogConfirm';
 import UploadDialogUpload from './UploadDialogUpload';
 
@@ -21,7 +20,6 @@ const UploadDialog = ({
   const {courseId} = useParams() as {courseId: string};
   const attainments = useGetAttainments(courseId);
   const addGrades = useAddGrades(courseId);
-  const snackPack = useSnackPackAlerts();
 
   const attainmentData = useMemo(
     () => attainments.data ?? [],
@@ -131,9 +129,8 @@ const UploadDialog = ({
 
     await addGrades.mutateAsync(gradeData);
 
-    snackPack.push({
-      msg: 'Grades added successfully.',
-      severity: 'success',
+    enqueueSnackbar('Grades added successfully.', {
+      variant: 'success',
     });
 
     setCurrentStep(0);
@@ -153,8 +150,6 @@ const UploadDialog = ({
 
   return (
     <>
-      <AlertSnackbar snackPack={snackPack} />
-
       <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
         {currentStep === 0 ? (
           <UploadDialogUpload

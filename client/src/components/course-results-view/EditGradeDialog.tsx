@@ -26,13 +26,10 @@ import {ChangeEvent, JSX, useEffect, useState} from 'react';
 import {Params, useParams} from 'react-router-dom';
 import * as yup from 'yup';
 
-import AlertSnackbar from '../alerts/AlertSnackbar';
+import {enqueueSnackbar} from 'notistack';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 import {UseEditGradeResult, useEditGrade} from '../../hooks/useApi';
-import useSnackPackAlerts, {
-  SnackPackAlertState,
-} from '../../hooks/useSnackPackAlerts';
 import {State} from '../../types';
 import {findBestGradeOption} from '../../utils';
 
@@ -49,7 +46,6 @@ export default function EditGradeDialog(props: {
   };
 
   const editGrade: UseEditGradeResult = useEditGrade();
-  const snackPack: SnackPackAlertState = useSnackPackAlerts();
 
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
 
@@ -92,9 +88,8 @@ export default function EditGradeDialog(props: {
         },
         {
           onSuccess: () => {
-            snackPack.push({
-              msg: 'Grade updated successfully.',
-              severity: 'success',
+            enqueueSnackbar('Grade updated successfully.', {
+              variant: 'success',
             });
             props.handleClose();
             props.refetchGrades();
@@ -336,7 +331,6 @@ export default function EditGradeDialog(props: {
           setGradeId(null);
         }}
       />
-      <AlertSnackbar snackPack={snackPack} />
     </>
   );
 }

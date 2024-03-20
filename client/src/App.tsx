@@ -25,18 +25,16 @@ import EditCourseView from './components/EditCourseView';
 import Footer from './components/Footer';
 import FrontPage from './components/FrontPage';
 import NotFound from './components/NotFound';
-import AlertSnackbar from './components/alerts/AlertSnackbar';
 import Login from './components/auth/Login';
 import PrivateRoute from './components/auth/PrivateRoute';
 import Signup from './components/auth/Signup';
 import UserButton from './components/auth/UserButton';
 import AddUserView from './components/front-page/users-view/AddUserView';
 
+import {enqueueSnackbar} from 'notistack';
 import AttainmentsView from './components/course-view/AttainmentsView';
 import ModelsView from './components/course-view/ModelsView';
-import useSnackPackAlerts, {
-  SnackPackAlertState,
-} from './hooks/useSnackPackAlerts';
+import NotistackWrapper from './context/NotistackProvider';
 
 declare module '@mui/material/styles' {
   interface PaletteOptions {
@@ -136,13 +134,10 @@ const theme: CssVarsTheme = extendTheme({
 });
 
 export default function App(): JSX.Element {
-  const snackPack: SnackPackAlertState = useSnackPackAlerts();
+  // const {enqueueSnackbar} = useSnackbar();
 
-  function handleError(error: unknown): void {
-    snackPack.push({
-      msg: (error as Error).message,
-      severity: 'error',
-    });
+  function handleError(error: Error): void {
+    enqueueSnackbar(error.message, {variant: 'error'});
   }
 
   const queryClient: QueryClient = new QueryClient({
@@ -162,9 +157,14 @@ export default function App(): JSX.Element {
 
   return (
     <CssVarsProvider theme={theme}>
+      <NotistackWrapper />
       <QueryClientProvider client={queryClient}>
         <div
-          style={{minHeight: '100vh', display: 'flex', flexDirection: 'column'}}
+          style={{
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
         >
           <AppBar position="static">
             <Toolbar>
@@ -184,9 +184,13 @@ export default function App(): JSX.Element {
               <UserButton />
             </Toolbar>
           </AppBar>
+          {/* <Button
+            onClick={() => enqueueSnackbar('Hello', {variant: 'success'})}
+          >
+            Hello
+          </Button> */}
           <Container sx={{textAlign: 'center', m: 0}} maxWidth={false}>
             <Box>
-              <AlertSnackbar snackPack={snackPack} />
               <Routes>
                 {/* Add nested routes when needed */}
                 <Route path="/login" element={<Login />} />
