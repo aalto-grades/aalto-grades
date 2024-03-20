@@ -51,6 +51,7 @@ import GradeNode from './GradeNode';
 import MaxNode from './MaxNode';
 import MinPointsNode from './MinPointsNode';
 import RequireNode from './RequireNode';
+import RoundNode from './RoundNode';
 import SelectAttainmentsDialog from './SelectAttainmentsDialog';
 import StepperNode from './StepperNode';
 import SubstituteNode from './SubstituteNode';
@@ -65,6 +66,7 @@ const nodeTypesMap = {
   max: MaxNode,
   minpoints: MinPointsNode,
   require: RequireNode,
+  round: RoundNode,
   stepper: StepperNode,
   substitute: SubstituteNode,
 };
@@ -89,10 +91,10 @@ const Graph = ({
   const [loading, setLoading] = useState<boolean>(false);
 
   // Old values are strings to avoid problematic references
-  const [oldNodes, setOldNodes] = useState<Node[]>([]);
-  const [oldEdges, setOldEdges] = useState<Edge[]>([]);
-  const [oldNodeSettings, setOldNodeSettings] = useState<string>('{}');
-  const [oldNodeValues, setOldNodeValues] = useState<string>('{}');
+  const [savedNodes, setSavedNodes] = useState<Node[]>([]);
+  const [savedEdges, setSavedEdges] = useState<Edge[]>([]);
+  const [savedNodeSettings, setSavedNodeSettings] = useState<string>('{}');
+  const [savedNodeValues, setSavedNodeValues] = useState<string>('{}');
 
   const [unsaved, setUnsaved] = useState<boolean>(false);
   const [attainmentsSelectOpen, setAttainmentsSelectOpen] =
@@ -107,7 +109,7 @@ const Graph = ({
     return newMap;
   }, [nodes]);
 
-  const setNodeTitle = (id: string, title: string) => {
+  const setNodeTitle = (id: string, title: string): void => {
     setNodeData(oldNodeData => ({
       ...oldNodeData,
       [id]: {
@@ -116,13 +118,17 @@ const Graph = ({
       },
     }));
   };
-  const setNodeDimensions = (id: string, width: number, height: number) => {
+  const setNodeDimensions = (
+    id: string,
+    width: number,
+    height: number
+  ): void => {
     setExtraNodeData(oldExtraNodeData => ({
       ...oldExtraNodeData,
       [id]: {...oldExtraNodeData[id], dimensions: {width, height}},
     }));
   };
-  const setNodeSettings = (id: string, settings: NodeSettings) => {
+  const setNodeSettings = (id: string, settings: NodeSettings): void => {
     setNodeData(oldNodeSettings => ({
       ...oldNodeSettings,
       [id]: {
@@ -131,7 +137,7 @@ const Graph = ({
       },
     }));
   };
-  const setNodeValue = (id: string, nodeValue: NodeValue) => {
+  const setNodeValue = (id: string, nodeValue: NodeValue): void => {
     setNodeValues(oldNodeValues => ({
       ...oldNodeValues,
       [id]: nodeValue,
@@ -156,7 +162,7 @@ const Graph = ({
         nodes,
         filteredEdges
       );
-      setOldNodeValues(JSON.stringify(newNodeValues));
+      setSavedNodeValues(JSON.stringify(newNodeValues));
       setNodeValues(newNodeValues);
       if (disconnectedEdges.length > 0) setEdges(filteredEdges);
     },
@@ -170,15 +176,15 @@ const Graph = ({
 
     if (
       !loading &&
-      (oldNodes.length !== nodes.length ||
-        oldEdges.length !== edges.length ||
-        oldNodeValues !== JSON.stringify(nodeValues) ||
-        oldNodeSettings !== JSON.stringify(nodeSettings))
+      (savedNodes.length !== nodes.length ||
+        savedEdges.length !== edges.length ||
+        savedNodeValues !== JSON.stringify(nodeValues) ||
+        savedNodeSettings !== JSON.stringify(nodeSettings))
     ) {
-      setOldNodes(nodes);
-      setOldEdges(edges);
-      setOldNodeValues(JSON.stringify(nodeValues));
-      setOldNodeSettings(JSON.stringify(nodeSettings));
+      setSavedNodes(nodes);
+      setSavedEdges(edges);
+      setSavedNodeValues(JSON.stringify(nodeValues));
+      setSavedNodeSettings(JSON.stringify(nodeSettings));
       updateValues();
     }
 
@@ -209,7 +215,7 @@ const Graph = ({
 
   // Warning if leaving with unsaved
   useEffect(() => {
-    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+    const onBeforeUnload = (e: BeforeUnloadEvent): void => {
       if (unsaved) {
         e.preventDefault();
         e.returnValue = '';
@@ -270,7 +276,7 @@ const Graph = ({
 
   const onConnect = useCallback(
     (params: Connection) => {
-      setEdges(edges => addEdge(params, edges));
+      setEdges(oldEdges => addEdge(params, oldEdges));
       updateValues(addEdge(params, edges));
     },
     [edges, setEdges, updateValues]
@@ -314,7 +320,7 @@ const Graph = ({
         }
       }
 
-      const hasCycle = (node: Node, visited = new Set()) => {
+      const hasCycle = (node: Node, visited = new Set()): boolean => {
         if (visited.has(node.id)) return false;
         visited.add(node.id);
 
@@ -323,6 +329,7 @@ const Graph = ({
           if (outgoer.id === connection.source) return true;
           if (hasCycle(outgoer, visited)) return true;
         }
+        return false;
       };
 
       if (target.id === connection.source) return false;
@@ -331,14 +338,14 @@ const Graph = ({
     [nodes, edges]
   );
 
-  const format = async () => {
+  const format = async (): Promise<void> => {
     setNodes(await formatGraph(nodes, edges, extraNodeData, nodeValues));
   };
 
   const handleAttainmentSelect = (
     newAttainments: AttainmentData[],
     removedAttainments: AttainmentData[]
-  ) => {
+  ): void => {
     setAttainmentsSelectOpen(false);
 
     let newNodes = [...nodes];
@@ -381,7 +388,7 @@ const Graph = ({
   const onDragStart = (
     event: DragEvent<HTMLDivElement>,
     nodeType: DropInNodes
-  ) => {
+  ): void => {
     event.dataTransfer.setData('application/reactflow', nodeType);
     event.dataTransfer.effectAllowed = 'move';
   };
@@ -407,16 +414,17 @@ const Graph = ({
         x: event.clientX,
         y: event.clientY,
       });
-      let id = `dnd-${type}-${getId()}`;
-      while (id in nodeMap) id = `dnd-${type}-${getId()}`; // To prevent duplicates from loading existing graph
+      let nodeId = `dnd-${type}-${getId()}`;
+      while (nodeId in nodeMap) nodeId = `dnd-${type}-${getId()}`; // To prevent duplicates from loading existing graph
 
       const initState = initNode(type);
-      const newNode: Node = {id, type, position, data: {}};
+      const newNode: Node = {id: nodeId, type, position, data: {}};
 
-      setNodes(nodes => nodes.concat(newNode));
-      setNodeValue(id, initState.value);
-      setNodeTitle(id, initState.data.title);
-      if (initState.data.settings) setNodeSettings(id, initState.data.settings);
+      setNodes(oldNodes => oldNodes.concat(newNode));
+      setNodeValue(nodeId, initState.value);
+      setNodeTitle(nodeId, initState.data.title);
+      if (initState.data.settings)
+        setNodeSettings(nodeId, initState.data.settings);
     },
     [getId, nodeMap, reactFlowInstance, setNodes]
   );
@@ -515,6 +523,13 @@ const Graph = ({
                 draggable
               >
                 Require Passing Values
+              </div>
+              <div
+                className="dndnode"
+                onDragStart={event => onDragStart(event, 'round')}
+                draggable
+              >
+                Round
               </div>
               <div
                 className="dndnode"

@@ -10,6 +10,7 @@ import {
   NodeValue,
   NodeValues,
   RequireNodeSettings,
+  RoundNodeSettings,
   StepperNodeSettings,
   SubstituteNodeSettings,
 } from '../types/graph';
@@ -66,6 +67,11 @@ export const initNode = (
       return {
         value: {type, sources, values, courseFail: false},
         data: {title: 'Require', settings: {numFail: 0, failSetting: 'ignore'}},
+      };
+    case 'round':
+      return {
+        value: {type, source: 0, value: 0},
+        data: {title: 'Round', settings: {roundingSetting: 'round-closest'}},
       };
     case 'stepper':
       return {
@@ -150,6 +156,21 @@ const calculateNodeValue = (
           if (!source.isConnected) continue;
           nodeValue.values[handleId] = 0;
         }
+      }
+      break;
+    }
+    case 'round': {
+      const settings = nodeData[nodeId].settings as RoundNodeSettings;
+      switch (settings.roundingSetting) {
+        case 'round-up':
+          nodeValue.value = Math.ceil(nodeValue.source);
+          break;
+        case 'round-closest':
+          nodeValue.value = Math.round(nodeValue.source);
+          break;
+        case 'round-down':
+          nodeValue.value = Math.floor(nodeValue.source);
+          break;
       }
       break;
     }
@@ -256,6 +277,7 @@ export const calculateNewNodeValues = (
         break;
       case 'grade':
       case 'minpoints':
+      case 'round':
       case 'stepper':
         nodeValue.source = 0;
         break;
@@ -304,6 +326,7 @@ export const calculateNewNodeValues = (
           throw new Error('Should not happen');
         case 'minpoints':
         case 'grade':
+        case 'round':
         case 'stepper':
           nodeValue.source = sourceValue as number;
           break;
@@ -415,6 +438,7 @@ export const batchCalculateGraph = (
             throw new Error('Should not happen');
           case 'minpoints':
           case 'grade':
+          case 'round':
           case 'stepper':
             nodeValue.source = sourceValue as number;
             break;

@@ -7,9 +7,9 @@ export type DropInNodes =
   | 'max'
   | 'minpoints'
   | 'require'
+  | 'round'
   | 'stepper'
   | 'substitute';
-
 export type CustomNodeTypes = DropInNodes | 'attainment' | 'grade';
 
 export type AdditionNodeValue = {
@@ -47,6 +47,11 @@ export type RequireNodeValue = {
   values: {[key: string]: number};
   courseFail: boolean;
 };
+export type RoundNodeValue = {
+  type: 'round';
+  source: number;
+  value: number;
+};
 export type StepperNodeValue = {
   type: 'stepper';
   source: number;
@@ -66,6 +71,7 @@ export type NodeValue =
   | MaxNodeValue
   | MinPointsNodeValue
   | RequireNodeValue
+  | RoundNodeValue
   | StepperNodeValue
   | SubstituteNodeValue;
 
@@ -87,6 +93,9 @@ export type RequireNodeSettings = {
   numFail: number;
   failSetting: 'ignore' | 'coursefail';
 };
+export type RoundNodeSettings = {
+  roundingSetting: 'round-up' | 'round-closest' | 'round-down';
+};
 export type StepperNodeSettings = {
   numSteps: number;
   outputValues: (number | 'same')[];
@@ -102,6 +111,7 @@ export type NodeSettings =
   | MaxNodeSettings
   | MinPointsNodeSettings
   | RequireNodeSettings
+  | RoundNodeSettings
   | StepperNodeSettings
   | SubstituteNodeSettings;
 
