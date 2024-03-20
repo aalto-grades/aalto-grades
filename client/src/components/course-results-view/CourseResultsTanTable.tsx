@@ -542,6 +542,8 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
           overflowY: 'auto', //our scrollable table container
           position: 'relative', //needed for sticky header
           height: '800px', //should be a fixed height
+          width: 'fit-content',
+          maxWidth: '100%',
         }}
       >
         <table
