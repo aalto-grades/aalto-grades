@@ -228,8 +228,8 @@ const calculateNodeValue = (
       const settings = nodeData[nodeId].settings as SubstituteNodeSettings;
       const getKeyType = (key: string): 'substitute' | 'exercise' =>
         key.split('-')[key.split('-').length - 2] as 'substitute' | 'exercise';
-      let numSubstitutes = 0;
-      let numToSubstitute = 0;
+      let substitutesToUse = 0;
+      let valuesToSubstitute = 0;
 
       for (const [key, source] of Object.entries(nodeValue.sources)) {
         if (
@@ -237,18 +237,21 @@ const calculateNodeValue = (
           source.isConnected &&
           source.value !== 'fail'
         )
-          numSubstitutes += 1;
+          substitutesToUse += 1;
         else if (
           getKeyType(key) === 'exercise' &&
           source.isConnected &&
           source.value === 'fail'
         )
-          numToSubstitute += 1;
+          valuesToSubstitute += 1;
       }
-      numSubstitutes = Math.min(numSubstitutes, settings.maxSubstitutions);
-      numToSubstitute = Math.min(numToSubstitute, settings.maxSubstitutions);
-      numSubstitutes = Math.min(numSubstitutes, numToSubstitute);
-      numToSubstitute = Math.min(numSubstitutes, numToSubstitute);
+      const totalSubstitutions = Math.min(
+        substitutesToUse,
+        valuesToSubstitute,
+        settings.maxSubstitutions
+      );
+      substitutesToUse = totalSubstitutions;
+      valuesToSubstitute = totalSubstitutions;
 
       let exerciseIndex = -1;
       for (const [key, source] of Object.entries(nodeValue.sources)) {
@@ -256,9 +259,9 @@ const calculateNodeValue = (
           if (
             source.isConnected &&
             source.value !== 'fail' &&
-            numToSubstitute > 0
+            substitutesToUse > 0
           ) {
-            numToSubstitute -= 1;
+            substitutesToUse -= 1;
             nodeValue.values[key] = 'fail';
           } else if (source.isConnected) {
             nodeValue.values[key] = source.value;
@@ -268,9 +271,9 @@ const calculateNodeValue = (
           if (
             source.isConnected &&
             source.value === 'fail' &&
-            numSubstitutes > 0
+            valuesToSubstitute > 0
           ) {
-            numSubstitutes -= 1;
+            valuesToSubstitute -= 1;
             nodeValue.values[key] = settings.substituteValues[exerciseIndex];
           } else if (source.isConnected) {
             nodeValue.values[key] = source.value;
@@ -329,6 +332,7 @@ export const calculateNewNodeValues = (
   }
 
   let courseFail = false;
+  const alreadyAdded = new Set();
   while (noSources.length > 0) {
     const sourceId = noSources.shift() as string;
     calculateNodeValue(sourceId, newNodeValues[sourceId], nodeData);
@@ -351,8 +355,13 @@ export const calculateNewNodeValues = (
           : sourceNodeValue.value) ?? 0;
 
       nodeSources[edge.target].delete(sourceId);
-      if (nodeSources[edge.target].size === 0) noSources.push(edge.target);
-
+      if (
+        nodeSources[edge.target].size === 0 &&
+        !alreadyAdded.has(edge.target)
+      ) {
+        noSources.push(edge.target);
+        alreadyAdded.add(edge.target);
+      }
       const nodeValue = newNodeValues[edge.target];
       switch (nodeValue.type) {
         case 'attainment':
@@ -434,6 +443,7 @@ export const batchCalculateGraph = (
 
   const courseFail: {[key: string]: boolean} = {};
   for (const student of studentData) courseFail[student.userId] = false;
+  const alreadyAdded = new Set();
 
   // Calculate values for all nodes
   while (noSources.length > 0) {
@@ -454,7 +464,13 @@ export const batchCalculateGraph = (
     // Update values for all node targets
     for (const edge of nodeTargets[sourceId]) {
       nodeSources[edge.target].delete(sourceId);
-      if (nodeSources[edge.target].size === 0) noSources.push(edge.target);
+      if (
+        nodeSources[edge.target].size === 0 &&
+        !alreadyAdded.has(edge.target)
+      ) {
+        noSources.push(edge.target);
+        alreadyAdded.add(edge.target);
+      }
 
       for (const student of studentData) {
         const sourceNodeValue = nodeValues[student.userId][sourceId];

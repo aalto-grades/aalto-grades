@@ -190,9 +190,10 @@ const RequireNode = ({
                     : Math.round(source.value * 100) / 100}
                 </td>
                 <td>
-                  {numFail > settings.numFail || source.value === 'fail'
-                    ? 0
-                    : Math.round(source.value * 100) / 100}
+                  {numFail > settings.numFail ||
+                  nodeValue.values[key] === 'fail'
+                    ? nodeValue.values[key]
+                    : Math.round((nodeValue.values[key] as number) * 100) / 100}
                 </td>
               </tr>
             ))}

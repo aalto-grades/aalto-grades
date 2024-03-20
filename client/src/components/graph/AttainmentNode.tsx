@@ -87,7 +87,16 @@ const AttanmentNode = ({
       courseFail={nodeValue.courseFail}
     >
       <div>
-        <label>On fail:</label>
+        <label>Minimum points: </label>
+        <input
+          style={{width: '70px'}}
+          onChange={handleChange}
+          type="number"
+          value={localSettings.minPoints}
+        />
+      </div>
+      <div>
+        <label>On fail: </label>
         <select
           onChange={handleSelectChange}
           value={localSettings.onFailSetting}
@@ -95,15 +104,6 @@ const AttanmentNode = ({
           <option value="coursefail">Fail course</option>
           <option value="fail">Output fail</option>
         </select>
-      </div>
-      <div>
-        <label>Minimum points</label>
-        <input
-          style={{width: '70px'}}
-          onChange={handleChange}
-          type="number"
-          value={localSettings.minPoints}
-        />
       </div>
 
       <div>
