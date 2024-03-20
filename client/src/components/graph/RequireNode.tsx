@@ -14,19 +14,24 @@ import {
 import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
-type LocalSettings = {numFail: string; failSetting: 'ignore' | 'coursefail'};
-const initialSettings = {numFail: 0, failSetting: 'courseFail'};
+type LocalSettings = {numFail: string; onFailSetting: 'coursefail' | 'fail'};
+const initialSettings = {numFail: 0, onFailSetting: 'courseFail'};
 
 const handleStartHeight = 128.5;
 const rowHeight = 33.9;
 
-const RequireNode = ({id, type, selected, isConnectable}: NodeProps) => {
+const RequireNode = ({
+  id,
+  type,
+  selected,
+  isConnectable,
+}: NodeProps): JSX.Element => {
   const updateNodeInternals = useUpdateNodeInternals();
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
-    JSON.parse(JSON.stringify(initialSettings))
+    JSON.parse(JSON.stringify(initialSettings)) as LocalSettings
   );
   const [nextFree, setNextFree] = useState<number>(0);
   const [handles, setHandles] = useState<string[]>([]);
@@ -88,10 +93,10 @@ const RequireNode = ({id, type, selected, isConnectable}: NodeProps) => {
   const handleSelectChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ): void => {
-    if (localSettings.failSetting === event.target.value) return;
+    if (localSettings.onFailSetting === event.target.value) return;
     const newLocalSettings = {
       ...localSettings,
-      failSetting: event.target.value as 'ignore' | 'coursefail',
+      onFailSetting: event.target.value as 'coursefail' | 'fail',
     };
     setLocalSettings(newLocalSettings);
     if (
@@ -146,9 +151,12 @@ const RequireNode = ({id, type, selected, isConnectable}: NodeProps) => {
       />
       <div>
         <label>On fail </label>
-        <select onChange={handleSelectChange} value={localSettings.failSetting}>
-          <option value="zeroes">Output zeroes</option>
+        <select
+          onChange={handleSelectChange}
+          value={localSettings.onFailSetting}
+        >
           <option value="coursefail">Fail course</option>
+          <option value="fail">Output fail</option>
         </select>
       </div>
       <div>

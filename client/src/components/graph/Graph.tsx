@@ -284,17 +284,6 @@ const Graph = ({
 
   const isValidConnection = useCallback(
     (connection: Connection) => {
-      const typeMap: {[key: string]: CustomNodeTypes} = {};
-      for (const node of nodes) typeMap[node.id] = node.type as CustomNodeTypes;
-      if (
-        (typeMap[connection.source as string] === 'minpoints' ||
-          typeMap[connection.source as string] === 'substitute') &&
-        typeMap[connection.target as string] !== 'require' &&
-        typeMap[connection.target as string] !== 'substitute'
-      ) {
-        return false;
-      }
-
       const target = nodes.find(node => node.id === connection.target) as Node;
       const outgoers: {[key: string]: Node[]} = {};
       for (const edge of edges) {

@@ -12,7 +12,7 @@ export const findDisconnectedEdges = (
   oldNodeValues: NodeValues,
   nodes: Node[],
   edges: Edge[]
-) => {
+): Edge[] => {
   const nodeSources: {[key: string]: Set<string>} = {};
   const nodeTargets: {[key: string]: Edge[]} = {};
   for (const edge of edges) {

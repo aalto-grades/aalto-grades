@@ -1,5 +1,6 @@
 import {Edge, Node} from 'reactflow';
 import {
+  AttainmentNodeSettings,
   AverageNodeSettings,
   CustomNodeTypes,
   FullNodeData,
@@ -45,7 +46,13 @@ export const initNode = (
         data: {title: 'Addition'},
       };
     case 'attainment':
-      return {value: {type, value: 0}, data: {title: 'Attainment'}};
+      return {
+        value: {type, source: 0, value: 0, courseFail: false},
+        data: {
+          title: 'Attainment',
+          settings: {onFailSetting: 'coursefail', minPoints: 0},
+        },
+      };
     case 'average':
       return {
         value: {type, sources, value: 0},
@@ -60,13 +67,19 @@ export const initNode = (
       };
     case 'minpoints':
       return {
-        value: {type, source: 0, value: 0},
-        data: {title: 'Require Points', settings: {minPoints: 0}},
+        value: {type, source: 0, value: 0, courseFail: false},
+        data: {
+          title: 'Require Points',
+          settings: {minPoints: 0, onFailSetting: 'coursefail'},
+        },
       };
     case 'require':
       return {
         value: {type, sources, values, courseFail: false},
-        data: {title: 'Require', settings: {numFail: 0, failSetting: 'ignore'}},
+        data: {
+          title: 'Require',
+          settings: {numFail: 0, onFailSetting: 'coursefail'},
+        },
       };
     case 'round':
       return {
@@ -105,8 +118,22 @@ const calculateNodeValue = (
       nodeValue.value = sum;
       break;
     }
-    case 'attainment':
-      break; // Not needed
+    case 'attainment': {
+      const settings = nodeData[nodeId].settings as AttainmentNodeSettings;
+      nodeValue.value = nodeValue.source;
+      nodeValue.courseFail = false;
+      if (nodeValue.source < settings.minPoints) {
+        switch (settings.onFailSetting) {
+          case 'coursefail':
+            nodeValue.courseFail = true;
+            break;
+          case 'fail':
+            nodeValue.value = 'fail';
+            break;
+        }
+      }
+      break;
+    }
     case 'average': {
       const settings = nodeData[nodeId].settings as AverageNodeSettings;
       let valueSum = 0;
@@ -136,25 +163,32 @@ const calculateNodeValue = (
     }
     case 'minpoints': {
       const settings = nodeData[nodeId].settings as MinPointsNodeSettings;
-      if (nodeValue.source < settings.minPoints) nodeValue.value = 'fail';
-      else nodeValue.value = nodeValue.source;
+      nodeValue.courseFail = false;
+      nodeValue.value = nodeValue.source;
+      if (nodeValue.source >= settings.minPoints) break;
+
+      if (settings.onFailSetting === 'coursefail') nodeValue.courseFail = true;
+      else nodeValue.value = 'fail';
       break;
     }
     case 'require': {
       const settings = nodeData[nodeId].settings as RequireNodeSettings;
+      nodeValue.courseFail = false;
+
       let numFail = 0;
       for (const [handleId, source] of Object.entries(nodeValue.sources)) {
         if (!source.isConnected) continue;
         nodeValue.values[handleId] = source.value === 'fail' ? 0 : source.value;
         if (source.value === 'fail') numFail++;
       }
-      nodeValue.courseFail = false;
-      if (numFail > settings.numFail && settings.failSetting === 'coursefail') {
+      if (numFail <= settings.numFail) break;
+
+      if (settings.onFailSetting === 'coursefail') {
         nodeValue.courseFail = true;
-      } else if (numFail > settings.numFail) {
+      } else {
         for (const [handleId, source] of Object.entries(nodeValue.sources)) {
           if (!source.isConnected) continue;
-          nodeValue.values[handleId] = 0;
+          nodeValue.values[handleId] = 'fail';
         }
       }
       break;
@@ -253,7 +287,7 @@ export const calculateNewNodeValues = (
   nodeData: FullNodeData,
   nodes: Node[],
   edges: Edge[]
-) => {
+): NodeValues => {
   const nodeSources: {[key: string]: Set<string>} = {};
   const nodeTargets: {[key: string]: Edge[]} = {};
   for (const edge of edges) {
@@ -271,7 +305,7 @@ export const calculateNewNodeValues = (
     const nodeValue = newNodeValues[node.id];
     if (nodeValue.type === 'require' || nodeValue.type === 'substitute')
       nodeValue.values = {};
-    else if (nodeValue.type !== 'attainment') nodeValue.value = 0;
+    else nodeValue.value = 0;
     switch (nodeValue.type) {
       case 'attainment':
         break;
@@ -300,9 +334,8 @@ export const calculateNewNodeValues = (
     calculateNodeValue(sourceId, newNodeValues[sourceId], nodeData);
     const sourceNodeValue = newNodeValues[sourceId];
 
-    if (sourceNodeValue.type === 'require' && sourceNodeValue.courseFail) {
+    if ('courseFail' in sourceNodeValue && sourceNodeValue.courseFail)
       courseFail = true;
-    }
     if (!(sourceId in nodeTargets)) continue;
 
     for (const edge of nodeTargets[sourceId]) {
@@ -328,11 +361,16 @@ export const calculateNewNodeValues = (
         case 'grade':
         case 'round':
         case 'stepper':
-          nodeValue.source = sourceValue as number;
+          nodeValue.source = sourceValue === 'fail' ? 0 : sourceValue;
           break;
         case 'addition':
         case 'average':
         case 'max':
+          nodeValue.sources[edge.targetHandle as string] = {
+            value: sourceValue === 'fail' ? 0 : sourceValue,
+            isConnected: true,
+          };
+          break;
         case 'require':
         case 'substitute':
           nodeValue.sources[edge.targetHandle as string] = {
@@ -389,7 +427,7 @@ export const batchCalculateGraph = (
       // Find matching attainment from student data
       for (const attainment of student.attainments) {
         if (node.id === `attainment-${attainment.attainmentId}`)
-          nodeValue.value = attainment.grade;
+          nodeValue.source = attainment.grade;
       }
     }
   }
@@ -408,9 +446,8 @@ export const batchCalculateGraph = (
         nodeData
       );
       const nodeValue = nodeValues[student.userId][sourceId];
-      if (nodeValue.type === 'require' && nodeValue.courseFail) {
+      if ('courseFail' in nodeValue && nodeValue.courseFail)
         courseFail[student.userId] = true;
-      }
     }
     if (!(sourceId in nodeTargets)) continue; // Node has no targets
 
@@ -440,11 +477,16 @@ export const batchCalculateGraph = (
           case 'grade':
           case 'round':
           case 'stepper':
-            nodeValue.source = sourceValue as number;
+            nodeValue.source = sourceValue === 'fail' ? 0 : sourceValue;
             break;
           case 'addition':
           case 'average':
           case 'max':
+            nodeValue.sources[edge.targetHandle as string] = {
+              value: sourceValue === 'fail' ? 0 : sourceValue,
+              isConnected: true,
+            };
+            break;
           case 'require':
           case 'substitute':
             nodeValue.sources[edge.targetHandle as string] = {

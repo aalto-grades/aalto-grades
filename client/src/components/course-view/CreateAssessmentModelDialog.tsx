@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AssessmentModelData} from '@common/types';
 import {
   Box,
   Button,
@@ -16,12 +15,14 @@ import {
 import {ChangeEvent, JSX, SyntheticEvent, useState} from 'react';
 import {Params, useParams} from 'react-router-dom';
 
+import {AssessmentModelData} from '@common/types';
 import {
   useAddAssessmentModel,
   UseAddAssessmentModelResult,
   useGetAttainments,
 } from '../../hooks/useApi';
 import {State} from '../../types';
+import {NodeData} from '@common/types/graph';
 
 export default function CreateAssessmentModelDialog(props: {
   handleClose: () => void;
@@ -37,7 +38,7 @@ export default function CreateAssessmentModelDialog(props: {
   const addAssessmentModel: UseAddAssessmentModelResult =
     useAddAssessmentModel();
 
-  async function handleSubmit(event: SyntheticEvent): Promise<void> {
+  const handleSubmit = (event: SyntheticEvent): void => {
     event.preventDefault();
 
     if (attainments.data === undefined || courseId === undefined) return;
@@ -57,6 +58,7 @@ export default function CreateAssessmentModelDialog(props: {
               ...attainments.data.map((attainment, index) => ({
                 id: `attainment-${attainment.id}`,
                 type: 'attainment',
+
                 position: {x: 0, y: 100 * index},
                 data: {},
               })),
@@ -65,9 +67,10 @@ export default function CreateAssessmentModelDialog(props: {
             nodeData: {
               'final-grade': {title: 'Final Grade'},
               ...attainments.data.reduce(
-                (map: {[key: string]: {title: string}}, attainment) => {
+                (map: {[key: string]: NodeData}, attainment) => {
                   map[`attainment-${attainment.id}`] = {
                     title: attainment.name,
+                    settings: {onFailSetting: 'coursefail', minPoints: 0},
                   };
                   return map;
                 },
@@ -84,7 +87,7 @@ export default function CreateAssessmentModelDialog(props: {
         },
       }
     );
-  }
+  };
 
   return (
     <Dialog open={props.open} transitionDuration={{exit: 800}}>

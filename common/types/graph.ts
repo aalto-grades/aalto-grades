@@ -19,7 +19,9 @@ export type AdditionNodeValue = {
 };
 export type AttainmentNodeValue = {
   type: 'attainment';
-  value: number;
+  source: number;
+  value: number | 'fail';
+  courseFail: boolean;
 };
 export type AverageNodeValue = {
   type: 'average';
@@ -40,11 +42,12 @@ export type MinPointsNodeValue = {
   type: 'minpoints';
   source: number;
   value: number | 'fail';
+  courseFail: boolean;
 };
 export type RequireNodeValue = {
   type: 'require';
   sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
-  values: {[key: string]: number};
+  values: {[key: string]: number | 'fail'};
   courseFail: boolean;
 };
 export type RoundNodeValue = {
@@ -83,15 +86,20 @@ export type NodeValues = {
 export type AverageNodeSettings = {
   weights: {[key: string]: number};
 };
+export type AttainmentNodeSettings = {
+  minPoints: number;
+  onFailSetting: 'coursefail' | 'fail';
+};
 export type MaxNodeSettings = {
   minValue: number;
 };
 export type MinPointsNodeSettings = {
   minPoints: number;
+  onFailSetting: 'coursefail' | 'fail';
 };
 export type RequireNodeSettings = {
   numFail: number;
-  failSetting: 'ignore' | 'coursefail';
+  onFailSetting: 'coursefail' | 'fail';
 };
 export type RoundNodeSettings = {
   roundingSetting: 'round-up' | 'round-closest' | 'round-down';
@@ -108,6 +116,7 @@ export type SubstituteNodeSettings = {
 
 export type NodeSettings =
   | AverageNodeSettings
+  | AttainmentNodeSettings
   | MaxNodeSettings
   | MinPointsNodeSettings
   | RequireNodeSettings

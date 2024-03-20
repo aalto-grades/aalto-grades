@@ -27,9 +27,8 @@ const RoundNode = ({
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
-    JSON.parse(JSON.stringify(initialSettings))
+    JSON.parse(JSON.stringify(initialSettings)) as LocalSettings
   );
-  const [error, setError] = useState<boolean>(false);
   const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as RoundNodeValue;
@@ -39,7 +38,6 @@ const RoundNode = ({
     if (init) return;
     setLocalSettings({...settings});
     setInit(true);
-    setError(false);
   }, [nodeData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>): void => {
@@ -53,12 +51,7 @@ const RoundNode = ({
   };
 
   return (
-    <BaseNode
-      id={id}
-      type={type as CustomNodeTypes}
-      selected={selected}
-      error={error}
-    >
+    <BaseNode id={id} type={type as CustomNodeTypes} selected={selected}>
       <Handle
         type="target"
         id={id}

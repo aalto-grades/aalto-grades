@@ -63,7 +63,7 @@ export default function ModelsView(): JSX.Element {
 
   const loadGraph = (model: AssessmentModelData): void => {
     setModelsListOpen(false);
-    setCurrentModel(JSON.parse(JSON.stringify(model))); // To remove references
+    setCurrentModel(JSON.parse(JSON.stringify(model)) as AssessmentModelData); // To remove references
     setGraphOpen(true);
   };
 
@@ -161,7 +161,7 @@ export default function ModelsView(): JSX.Element {
         <>
           <Divider sx={{my: 1}} />
           <Graph
-            initGraph={currentModel.graphStructure as GraphStructure}
+            initGraph={currentModel.graphStructure}
             attainments={attainments.data}
             onSave={onSave}
           />
