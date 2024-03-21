@@ -57,6 +57,7 @@ import StepperNode from './StepperNode';
 import SubstituteNode from './SubstituteNode';
 import './flow.css';
 import {findDisconnectedEdges, formatGraph} from './graphUtil';
+import AttainmentValuesDialog from './AttainmentValuesDialog';
 
 const nodeTypesMap = {
   addition: AdditionNode,
@@ -99,6 +100,8 @@ const Graph = ({
   const [unsaved, setUnsaved] = useState<boolean>(false);
   const [attainmentsSelectOpen, setAttainmentsSelectOpen] =
     useState<boolean>(false);
+  const [attainmentValuesOpen, setAttainmentValuesOpen] =
+    useState<boolean>(false);
   const [archivedAttainments, setArchivedAttainments] = useState<string[]>([]);
   const [originalGraphStructure, setOriginalGraphStructure] =
     useState<GraphStructure>({nodes: [], edges: [], nodeData: {}});
@@ -135,12 +138,6 @@ const Graph = ({
         ...oldNodeSettings[id],
         settings,
       },
-    }));
-  };
-  const setNodeValue = (id: string, nodeValue: NodeValue): void => {
-    setNodeValues(oldNodeValues => ({
-      ...oldNodeValues,
-      [id]: nodeValue,
     }));
   };
 
@@ -373,6 +370,17 @@ const Graph = ({
     }
   };
 
+  const handleSetAttainmentValues = (attainmentValues: {
+    [key: number]: number;
+  }): void => {
+    const newNodeValues = {...nodeValues};
+    for (const [attId, value] of Object.entries(attainmentValues)) {
+      const nodeValue = newNodeValues[`attainment-${attId}`];
+      if (nodeValue.type === 'attainment') nodeValue.source = value;
+    }
+    setNodeValues(newNodeValues);
+  };
+
   // Handle drop-in nodes
   const onDragStart = (
     event: DragEvent<HTMLDivElement>,
@@ -410,7 +418,10 @@ const Graph = ({
       const newNode: Node = {id: nodeId, type, position, data: {}};
 
       setNodes(oldNodes => oldNodes.concat(newNode));
-      setNodeValue(nodeId, initState.value);
+      setNodeValues(oldNodeValues => ({
+        ...oldNodeValues,
+        [nodeId]: initState.value,
+      }));
       setNodeTitle(nodeId, initState.data.title);
       if (initState.data.settings)
         setNodeSettings(nodeId, initState.data.settings);
@@ -427,7 +438,15 @@ const Graph = ({
         handleAttainmentSelect={handleAttainmentSelect}
         onClose={() => setAttainmentsSelectOpen(false)}
       />
-      <NodeValuesContext.Provider value={{nodeValues, setNodeValue}}>
+      <AttainmentValuesDialog
+        nodes={nodes}
+        nodeValues={nodeValues}
+        attainments={attainments}
+        open={attainmentValuesOpen}
+        onClose={() => setAttainmentValuesOpen(false)}
+        handleSetAttainmentValues={handleSetAttainmentValues}
+      />
+      <NodeValuesContext.Provider value={{nodeValues}}>
         <ExtraNodeDataContext.Provider
           value={{extraNodeData, setNodeDimensions}}
         >
@@ -531,6 +550,9 @@ const Graph = ({
             <div style={{float: 'left', marginLeft: '5px'}}>
               <Button onClick={() => setAttainmentsSelectOpen(true)}>
                 Select Attainments
+              </Button>
+              <Button onClick={() => setAttainmentValuesOpen(true)}>
+                Test values
               </Button>
               <Button onClick={format}>Format</Button>
             </div>

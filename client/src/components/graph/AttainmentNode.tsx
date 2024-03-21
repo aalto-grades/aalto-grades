@@ -24,7 +24,7 @@ const AttanmentNode = ({
   isConnectable,
   selected,
 }: NodeProps): JSX.Element => {
-  const {nodeValues, setNodeValue} = useContext(NodeValuesContext);
+  const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
     JSON.parse(JSON.stringify(initialSettings)) as LocalSettings
@@ -104,18 +104,6 @@ const AttanmentNode = ({
           <option value="coursefail">Fail course</option>
           <option value="fail">Output fail</option>
         </select>
-      </div>
-
-      <div>
-        <label>DEBUG value</label>
-        <input
-          style={{width: '20px'}}
-          onChange={e => {
-            const val = e.target.value;
-            if (!isNaN(parseFloat(val)))
-              setNodeValue(id, {...nodeValue, source: parseFloat(val)});
-          }}
-        />
       </div>
 
       <Handle
