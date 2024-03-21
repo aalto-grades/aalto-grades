@@ -74,7 +74,7 @@ export default function ModelsView(): JSX.Element {
     }
   };
 
-  const onSave = (graphStructure: GraphStructure): void => {
+  const onSave = async (graphStructure: GraphStructure): Promise<void> => {
     // Remove unnecessary keys from data.
     for (const node of graphStructure.nodes) {
       delete node.dragging;
@@ -86,7 +86,7 @@ export default function ModelsView(): JSX.Element {
       node.position.x = Math.round(node.position.x);
       node.position.y = Math.round(node.position.y);
     }
-    editModel.mutate({
+    await editModel.mutateAsync({
       courseId,
       assessmentModelId: currentModel.id as number,
       assessmentModel: {

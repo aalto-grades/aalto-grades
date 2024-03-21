@@ -75,12 +75,12 @@ const theme: CssVarsTheme = extendTheme({
           dark: '#519657',
           contrastText: '#000',
         },
-        info: {
-          light: '#FFC046',
-          main: '#FF8F00',
-          dark: '#C56000',
-          contrastText: '#000',
-        },
+        // info: {
+        //   light: '#FFC046',
+        //   main: '#FF8F00',
+        //   dark: '#C56000',
+        //   contrastText: '#000',
+        // },
         hoverGrey1: '#EAEAEA',
         hoverGrey2: '#F4F4F4',
         hoverGrey3: '#6E6E6E',

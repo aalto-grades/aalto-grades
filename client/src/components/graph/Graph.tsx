@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Button, Divider, Typography} from '@mui/material';
+import {Alert, Button, Divider, Typography} from '@mui/material';
+import {enqueueSnackbar} from 'notistack';
 import {
   DragEvent,
   DragEventHandler,
@@ -46,6 +47,7 @@ import {
 } from '../../context/GraphProvider';
 import AdditionNode from './AdditionNode';
 import AttanmentNode from './AttainmentNode';
+import AttainmentValuesDialog from './AttainmentValuesDialog';
 import AverageNode from './AverageNode';
 import GradeNode from './GradeNode';
 import MaxNode from './MaxNode';
@@ -57,7 +59,6 @@ import StepperNode from './StepperNode';
 import SubstituteNode from './SubstituteNode';
 import './flow.css';
 import {findDisconnectedEdges, formatGraph} from './graphUtil';
-import AttainmentValuesDialog from './AttainmentValuesDialog';
 
 const nodeTypesMap = {
   addition: AdditionNode,
@@ -79,7 +80,7 @@ const Graph = ({
 }: {
   initGraph: GraphStructure;
   attainments: AttainmentData[];
-  onSave: (graphStructure: GraphStructure) => void;
+  onSave: (graphStructure: GraphStructure) => Promise<void>;
 }): JSX.Element => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -429,8 +430,41 @@ const Graph = ({
     [getId, nodeMap, reactFlowInstance, setNodes]
   );
 
+  const courseFail = Object.values(nodeValues).find(
+    nodeVal => 'courseFail' in nodeVal && nodeVal.courseFail
+  );
   return (
     <>
+      <div style={{position: 'relative'}}>
+        {unsaved && (
+          <Alert
+            sx={{
+              position: 'absolute',
+              top: 10,
+              right: 10,
+              zIndex: 1,
+            }}
+            severity="info"
+            variant="outlined"
+          >
+            Unsaved changes
+          </Alert>
+        )}
+        {courseFail && (
+          <Alert
+            sx={{
+              position: 'absolute',
+              top: unsaved ? 70 : 10,
+              right: 10,
+              zIndex: 1,
+            }}
+            severity="warning"
+            variant="outlined"
+          >
+            Course failed
+          </Alert>
+        )}
+      </div>
       <SelectAttainmentsDialog
         nodes={nodes}
         attainments={attainments}
@@ -547,34 +581,48 @@ const Graph = ({
                 Substitute
               </div>
             </div>
-            <div style={{float: 'left', marginLeft: '5px'}}>
-              <Button onClick={() => setAttainmentsSelectOpen(true)}>
+            <div style={{float: 'left', marginTop: '5px'}}>
+              <Button
+                onClick={() => setAttainmentsSelectOpen(true)}
+                variant="outlined"
+              >
                 Select Attainments
               </Button>
-              <Button onClick={() => setAttainmentValuesOpen(true)}>
+              <Button
+                onClick={() => setAttainmentValuesOpen(true)}
+                variant="outlined"
+                sx={{ml: 1}}
+              >
                 Test values
               </Button>
-              <Button onClick={format}>Format</Button>
+              <Button onClick={format} variant="outlined" sx={{ml: 1}}>
+                Format
+              </Button>
             </div>
             <div
               style={{
                 float: 'right',
-                marginBottom: '5px',
-                marginRight: '5px',
                 display: 'flex',
+                marginTop: '5px',
               }}
             >
               {unsaved && (
                 <Typography
                   sx={{display: 'inline', alignSelf: 'center', mr: 1}}
                 >
-                  Unsaved progress
+                  Unsaved changes
                 </Typography>
               )}
               <Button
                 variant={unsaved ? 'contained' : 'text'}
-                onClick={() => {
-                  onSave({nodes, edges, nodeData});
+                onClick={async () => {
+                  enqueueSnackbar('Saving model.', {
+                    variant: 'info',
+                  });
+                  await onSave({nodes, edges, nodeData});
+                  enqueueSnackbar('Model saved successfully.', {
+                    variant: 'success',
+                  });
                   setOriginalGraphStructure({nodes, edges, nodeData});
                   setUnsaved(false);
                 }}
