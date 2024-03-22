@@ -512,7 +512,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
   });
 
   return (
-    <div className="p-2">
+    <div>
       <button
         onClick={() =>
           table.setGrouping(old => {

@@ -243,7 +243,7 @@ export default function EditCourseView(): JSX.Element {
     if (modification === 'create') {
       addCourse.mutate(courseData, {
         onSuccess: (courseId: number) => {
-          navigate(`/course-view/${courseId}`, {replace: true});
+          navigate(`/${courseId}`, {replace: true});
         },
       });
     } else if (modification === 'edit' && courseId) {
@@ -251,7 +251,7 @@ export default function EditCourseView(): JSX.Element {
         {courseId: courseId, course: courseData},
         {
           onSuccess: () => {
-            navigate(`/course-view/${courseId}`, {replace: true});
+            navigate(`/${courseId}`, {replace: true});
           },
         }
       );

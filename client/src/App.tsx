@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AppBar, Box, Container, Toolbar, Typography} from '@mui/material';
 import {
   Experimental_CssVarsProvider as CssVarsProvider,
   CssVarsTheme,
@@ -17,24 +16,18 @@ import {
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'; // For debugging
 import {enqueueSnackbar} from 'notistack';
 import {CSSProperties, JSX} from 'react';
-import {
-  Link,
-  Outlet,
-  RouterProvider,
-  createBrowserRouter,
-} from 'react-router-dom';
+import {RouterProvider, createBrowserRouter} from 'react-router-dom';
 
 import {SystemRole} from '@common/types';
+import AppView from './components/AppView';
 import CourseResultsView from './components/CourseResultsView';
 import CourseView from './components/CourseView';
 import EditCourseView from './components/EditCourseView';
-import Footer from './components/Footer';
 import FrontPage from './components/FrontPage';
 import NotFound from './components/NotFound';
 import Login from './components/auth/Login';
 import PrivateRoute from './components/auth/PrivateRoute';
 import Signup from './components/auth/Signup';
-import UserButton from './components/auth/UserButton';
 import AttainmentsView from './components/course-view/AttainmentsView';
 import ModelsView from './components/course-view/ModelsView';
 import NotistackWrapper from './context/NotistackProvider';
@@ -157,38 +150,7 @@ const Root = (): JSX.Element => {
     <CssVarsProvider theme={theme}>
       <NotistackWrapper />
       <QueryClientProvider client={queryClient}>
-        <div
-          style={{
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <AppBar position="static">
-            <Toolbar>
-              <Typography
-                variant="h5"
-                component={Link}
-                to="/"
-                sx={{
-                  textDecoration: 'none',
-                  color: 'white',
-                  mr: 2,
-                  flexGrow: 1,
-                }}
-              >
-                Aalto Grades
-              </Typography>
-              <UserButton />
-            </Toolbar>
-          </AppBar>
-          <Container sx={{textAlign: 'center', m: 0}} maxWidth={false}>
-            <Box>
-              <Outlet />
-            </Box>
-          </Container>
-          <Footer />
-        </div>
+        <AppView />
         {/* Query Debug Tool */}
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
@@ -203,17 +165,15 @@ const router = createBrowserRouter([
     children: [
       {path: '/login', element: <Login />},
       {path: '/signup', element: <Signup />},
+      // {
+      //   // All roles
+      //   path: '/',
+      //   element: <PrivateRoute roles={Object.values(SystemRole)} />,
+      //   children: [
+      //   ],
+      // },
       {
-        // All roles are authorised to access the front page, conditional rendering is done inside the component
-        path: '/',
-        element: <PrivateRoute roles={Object.values(SystemRole)} />,
-        children: [
-          {path: '/', element: <FrontPage />},
-          // {path: '/course-view/:courseId', element: <CourseView />}, Unused path?
-        ],
-      },
-      {
-        // Pages that are only authorised for admin
+        // Admin only
         path: '/',
         element: <PrivateRoute roles={[SystemRole.Admin]} />,
         children: [
@@ -224,18 +184,20 @@ const router = createBrowserRouter([
         ],
       },
       {
-        // All roles are authorised to access the front page, conditional rendering is done inside the component
+        // All Roles
         path: '/',
         element: <PrivateRoute roles={[SystemRole.User, SystemRole.Admin]} />,
         children: [
-          {
-            path: '/course/:modification/:courseId?',
-            element: <EditCourseView />,
-          },
+          {path: '/', index: true, element: <FrontPage />},
           {
             path: '/:courseId',
             element: <CourseView />,
             children: [
+              {
+                //Temporary default view
+                index: true,
+                element: <CourseResultsView />,
+              },
               {
                 path: '/:courseId/course-results',
                 element: <CourseResultsView />,
@@ -247,6 +209,16 @@ const router = createBrowserRouter([
               {
                 path: '/:courseId/attainments',
                 element: <AttainmentsView />,
+              },
+              {
+                path: '/:courseId/post/:modification?',
+                element: <PrivateRoute roles={[SystemRole.Admin]} />,
+                children: [
+                  {
+                    path: '/:courseId/post/:modification',
+                    element: <EditCourseView />,
+                  },
+                ],
               },
             ],
           },

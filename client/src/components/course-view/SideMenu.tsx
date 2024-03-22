@@ -1,6 +1,8 @@
+import {CourseData, SystemRole} from '@common/types';
 import {
   AccountTree,
   AccountTreeOutlined,
+  Edit,
   FlagCircle,
   FlagCircleOutlined,
   Widgets,
@@ -16,11 +18,22 @@ import {
   ListItemIcon,
   ListItemText,
 } from '@mui/material';
+import {UseQueryResult} from '@tanstack/react-query';
 import {NavLink, useNavigate, useParams} from 'react-router-dom';
+import {AuthContextType} from '../../context/AuthProvider';
+import {useGetCourse} from '../../hooks/useApi';
+import useAuth from '../../hooks/useAuth';
 
 const SideMenu = ({onUpload}: {onUpload: () => void}) => {
   const {courseId} = useParams() as {courseId: string};
   const navigate = useNavigate();
+
+  const course: UseQueryResult<CourseData> = useGetCourse(courseId);
+  const {
+    auth,
+    isTeacherInCharge: _,
+    setIsTeacherInCharge,
+  }: AuthContextType = useAuth();
 
   return (
     <>
@@ -30,6 +43,7 @@ const SideMenu = ({onUpload}: {onUpload: () => void}) => {
           minWidth: '200px',
         }}
       >
+        <Divider sx={{mb: 2, mt: 0}} />
         <Button variant="outlined" onClick={onUpload}>
           Upload Grades
         </Button>
@@ -138,40 +152,46 @@ const SideMenu = ({onUpload}: {onUpload: () => void}) => {
               }}
             </NavLink>
           </ListItem>
+          {auth?.role === SystemRole.Admin && (
+            <>
+              <Divider sx={{my: 2}} />
+              <ListItem disablePadding>
+                <NavLink
+                  to={`/${courseId}/post/edit`}
+                  style={{
+                    color: 'inherit',
+                    width: '100%',
+                    textDecoration: 'none',
+                  }}
+                >
+                  {({isActive, isPending: _, isTransitioning: __}) => {
+                    return (
+                      <ListItemButton
+                        sx={{
+                          color: 'inherit',
+                          width: '100%',
+                          // padding: 1,
+                          borderRadius: 100,
+                          fontSize: '1rem',
+                          textAlign: 'left',
+                          backgroundColor: isActive ? 'rgba(0, 0, 0, 0.1)' : '',
+                        }}
+                        onClick={(): void => {
+                          navigate(`/${courseId}/post/edit`);
+                        }}
+                      >
+                        <ListItemIcon>
+                          <Edit />
+                        </ListItemIcon>
+                        <ListItemText primary="Edit Course" />
+                      </ListItemButton>
+                    );
+                  }}
+                </NavLink>
+              </ListItem>
+            </>
+          )}
         </List>
-        <div style={{display: 'flex', gap: 0}}>
-          <div style={{display: 'flex', flexDirection: 'column', gap: 0}}>
-            {/* <AssessmentModelsPicker
-                    course={course.data}
-                    assessmentModels={assessmentModels.data}
-                    currentAssessmentModelId={currentAssessmentModel?.id}
-                    onChangeAssessmentModel={onChangeAssessmentModel}
-                    onNewAssessmentModel={(): void =>
-                      setCreateAssessmentModelOpen(true)
-                    }
-                  /> */}
-            <div style={{marginRight: '20px', maxWidth: '300px'}}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 0,
-                }}
-              >
-                {/* <CourseDetails
-                        course={course.data}
-                        assessmentModels={assessmentModels.data}
-                        currentAssessmentModelId={currentAssessmentModel?.id}
-                        onChangeAssessmentModel={onChangeAssessmentModel}
-                        onNewAssessmentModel={(): void =>
-                          setCreateAssessmentModelOpen(true)
-                        }
-                      /> */}
-                {/* <InstancesWidget /> */}
-              </Box>
-            </div>
-          </div>
-        </div>
       </Box>
     </>
   );

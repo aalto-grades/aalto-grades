@@ -34,7 +34,6 @@ export default function CourseView(): JSX.Element {
           flexWrap: 'wrap',
           gap: '1rem',
         }}
-        sx={{mx: -2.5}}
       >
         {attainments.data &&
           attainments.data.map((attainment: AttainmentData) => (
