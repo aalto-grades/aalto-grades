@@ -452,7 +452,7 @@ const Graph = ({
               zIndex: 1,
             }}
             severity="info"
-            variant="outlined"
+            // variant="outlined"
           >
             Unsaved changes
           </Alert>
@@ -466,7 +466,7 @@ const Graph = ({
               zIndex: 1,
             }}
             severity="warning"
-            variant="outlined"
+            // variant="outlined"
           >
             Course failed
           </Alert>

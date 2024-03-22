@@ -76,9 +76,10 @@ export const initGraph = (
               weights: Object.fromEntries(
                 attainments.map((_, i) => [
                   `average-${i}`,
-                  Math.round((1 / attainments.length) * 100) / 100,
+                  Math.round((100 / attainments.length) * 10) / 10,
                 ])
               ),
+              percentageMode: true,
             },
           };
 

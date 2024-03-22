@@ -85,6 +85,7 @@ export type NodeValues = {
 // Node data
 export type AverageNodeSettings = {
   weights: {[key: string]: number};
+  percentageMode: boolean;
 };
 export type AttainmentNodeSettings = {
   minPoints: number;

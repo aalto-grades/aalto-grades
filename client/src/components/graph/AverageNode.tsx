@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {useContext, useEffect, useState} from 'react';
+import {ChangeEvent, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -14,27 +14,37 @@ import {
 import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
-type LocalSettings = {weights: {[key: string]: string}};
+type LocalSettings = {
+  weights: {[key: string]: string};
+  percentageMode: boolean;
+};
 
-const handleStartHeight = 83;
+const handleStartHeight = 103;
 const rowHeight = 33.9;
 
 const convertSettingsToFloats = (
   settings: LocalSettings
-): AverageNodeSettings => {
-  const nodeSettings: AverageNodeSettings = {weights: {}};
-  for (const [key, value] of Object.entries(settings.weights))
-    nodeSettings.weights[key] = parseFloat(value);
-  return nodeSettings;
-};
+): AverageNodeSettings => ({
+  ...settings,
+  weights: Object.fromEntries(
+    Object.entries(settings.weights).map(([key, value]) => [
+      key,
+      parseFloat(value),
+    ])
+  ),
+});
 const convertSettingsToStrings = (
   settings: AverageNodeSettings
-): LocalSettings => {
-  const nodeSettings: LocalSettings = {weights: {}};
-  for (const [key, value] of Object.entries(settings.weights))
-    nodeSettings.weights[key] = value.toString();
-  return nodeSettings;
-};
+): LocalSettings => ({
+  ...settings,
+  weights: Object.fromEntries(
+    Object.entries(settings.weights).map(([key, value]) => [
+      key,
+      value.toString(),
+    ])
+  ),
+});
+
 const checkError = (settings: LocalSettings): boolean => {
   for (const weight of Object.values(settings.weights)) {
     if (!/^\d+(?:\.\d+?)?$/.test(weight)) return true;
@@ -42,13 +52,19 @@ const checkError = (settings: LocalSettings): boolean => {
   return false;
 };
 
-const AverageNode = ({id, type, selected, isConnectable}: NodeProps) => {
+const AverageNode = ({
+  id,
+  type,
+  selected,
+  isConnectable,
+}: NodeProps): JSX.Element => {
   const updateNodeInternals = useUpdateNodeInternals();
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const {nodeValues} = useContext(NodeValuesContext);
 
   const [localSettings, setLocalSettings] = useState<LocalSettings>({
     weights: {},
+    percentageMode: false,
   });
 
   const [handles, setHandles] = useState<string[]>([]);
@@ -91,18 +107,30 @@ const AverageNode = ({id, type, selected, isConnectable}: NodeProps) => {
       setTimeout(() => updateNodeInternals(id), 0);
       setHandles(newHandles);
       setLocalSettings(newLocalSettings);
-      const error = checkError(newLocalSettings);
-      setError(error);
       setNextFree(maxId + 1);
-      if (!error) {
-        setNodeSettings(id, convertSettingsToFloats(newLocalSettings));
+
+      if (checkError(newLocalSettings)) {
+        setError(true);
+        return;
       }
+      setError(false);
+      setNodeSettings(id, convertSettingsToFloats(newLocalSettings));
     }
   }, [nodeValues, init]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const handleCheck = (event: ChangeEvent<HTMLInputElement>): void => {
+    const newLocalSettings = {
+      ...localSettings,
+      percentageMode: event.target.checked,
+    };
+
+    setLocalSettings(newLocalSettings);
+    setError(checkError(newLocalSettings));
+  };
+
   const handleChange = (
     key: string,
-    event: React.ChangeEvent<HTMLInputElement>
+    event: ChangeEvent<HTMLInputElement>
   ): void => {
     const newLocalSettings = {...localSettings};
     newLocalSettings.weights[key] = event.target.value;
@@ -122,6 +150,13 @@ const AverageNode = ({id, type, selected, isConnectable}: NodeProps) => {
   let weightSum = 0;
   for (const key of Object.keys(settings.weights)) {
     weightSum += settings.weights[key];
+  }
+
+  let percentageSum = 0;
+  for (const key of Object.keys(localSettings.weights)) {
+    if (/^\d+(?:\.\d+?)?$/.test(localSettings.weights[key])) {
+      percentageSum += parseFloat(localSettings.weights[key]);
+    }
   }
 
   return (
@@ -160,6 +195,14 @@ const AverageNode = ({id, type, selected, isConnectable}: NodeProps) => {
         isConnectable={isConnectable}
       />
 
+      <input
+        type="checkbox"
+        id={`percentage-${id}`}
+        onChange={handleCheck}
+        checked={localSettings.percentageMode}
+      />
+      <label htmlFor={`percentage-${id}`}>Percentage mode</label>
+
       <table style={{width: '100%', margin: '5px 0px'}}>
         <tbody>
           <tr>
@@ -175,6 +218,7 @@ const AverageNode = ({id, type, selected, isConnectable}: NodeProps) => {
                   value={weight}
                   onChange={event => handleChange(key, event)}
                 />
+                {localSettings.percentageMode && <label> %</label>}
               </td>
               <td>
                 {!(key in sources) ||
@@ -192,13 +236,24 @@ const AverageNode = ({id, type, selected, isConnectable}: NodeProps) => {
           <tr>
             <td>
               <input style={{width: '40px'}} type="number" disabled />
+              {localSettings.percentageMode && <label> %</label>}
             </td>
             <td>-</td>
           </tr>
         </tbody>
       </table>
-      <p style={{margin: 0, display: 'inline'}}>
-        {Math.round(nodeValue.value * 100) / 100}
+      {localSettings.percentageMode && (
+        <p
+          style={{
+            margin: 0,
+            color: Math.abs(percentageSum - 100) >= 1 ? 'red' : '',
+          }}
+        >
+          Sum {Math.round(percentageSum * 10) / 10} %
+        </p>
+      )}
+      <p style={{margin: 0, marginLeft: '10px'}}>
+        Average {Math.round(nodeValue.value * 100) / 100}
       </p>
       <Handle
         type="source"

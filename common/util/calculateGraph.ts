@@ -56,7 +56,10 @@ export const initNode = (
     case 'average':
       return {
         value: {type, sources, value: 0},
-        data: {title: 'Average', settings: {weights: {}}},
+        data: {
+          title: 'Average',
+          settings: {weights: {}, percentageMode: false},
+        },
       };
     case 'grade':
       return {value: {type, source: 0, value: 0}, data: {title: 'Grade'}};
