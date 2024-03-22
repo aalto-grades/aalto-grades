@@ -117,7 +117,6 @@ export default function ModelsView(): JSX.Element {
           setModelsListOpen(false);
           setLoadGraphId(id);
         }}
-        assessmentModels={models.data}
       />
 
       <Button

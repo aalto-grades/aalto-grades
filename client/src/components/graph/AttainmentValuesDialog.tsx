@@ -105,7 +105,7 @@ const AttainmentValuesDialog = ({
           <TextField
             sx={{mt: 2}}
             key={`attval-${attId}`}
-            value={values[attId]}
+            value={values[attId] ?? 0}
             label={attainmentNames[attId]}
             onChange={e => onChange(attId, e)}
             error={!testFloat(values[attId])}
