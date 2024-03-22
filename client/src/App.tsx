@@ -15,8 +15,14 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'; // For debugging
+import {enqueueSnackbar} from 'notistack';
 import {CSSProperties, JSX} from 'react';
-import {Link, Route, Routes} from 'react-router-dom';
+import {
+  Link,
+  Outlet,
+  RouterProvider,
+  createBrowserRouter,
+} from 'react-router-dom';
 
 import {SystemRole} from '@common/types';
 import CourseResultsView from './components/CourseResultsView';
@@ -29,9 +35,6 @@ import Login from './components/auth/Login';
 import PrivateRoute from './components/auth/PrivateRoute';
 import Signup from './components/auth/Signup';
 import UserButton from './components/auth/UserButton';
-import AddUserView from './components/front-page/users-view/AddUserView';
-
-import {enqueueSnackbar} from 'notistack';
 import AttainmentsView from './components/course-view/AttainmentsView';
 import ModelsView from './components/course-view/ModelsView';
 import NotistackWrapper from './context/NotistackProvider';
@@ -133,20 +136,16 @@ const theme: CssVarsTheme = extendTheme({
   },
 });
 
-export default function App(): JSX.Element {
+const Root = (): JSX.Element => {
   // const {enqueueSnackbar} = useSnackbar();
 
-  function handleError(error: Error): void {
+  const handleError = (error: Error): void => {
     enqueueSnackbar(error.message, {variant: 'error'});
-  }
+  };
 
-  const queryClient: QueryClient = new QueryClient({
-    queryCache: new QueryCache({
-      onError: handleError,
-    }),
-    mutationCache: new MutationCache({
-      onError: handleError,
-    }),
+  const queryClient = new QueryClient({
+    queryCache: new QueryCache({onError: handleError}),
+    mutationCache: new MutationCache({onError: handleError}),
     defaultOptions: {
       queries: {
         staleTime: 1000 * 60 * 5, // 5 minutes
@@ -154,7 +153,6 @@ export default function App(): JSX.Element {
       },
     },
   });
-
   return (
     <CssVarsProvider theme={theme}>
       <NotistackWrapper />
@@ -184,60 +182,9 @@ export default function App(): JSX.Element {
               <UserButton />
             </Toolbar>
           </AppBar>
-          {/* <Button
-            onClick={() => enqueueSnackbar('Hello', {variant: 'success'})}
-          >
-            Hello
-          </Button> */}
           <Container sx={{textAlign: 'center', m: 0}} maxWidth={false}>
             <Box>
-              <Routes>
-                {/* Add nested routes when needed */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                {/* All roles are authorised to access the front page, conditional
-                     rendering is done inside the component */}
-                <Route
-                  element={<PrivateRoute roles={Object.values(SystemRole)} />}
-                >
-                  <Route path="/" element={<FrontPage />} />
-                  <Route
-                    path="/course-view/:courseId"
-                    element={<CourseView />}
-                  />
-                </Route>
-                {/* Pages that are only authorised for admin */}
-                <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
-                  <Route
-                    path="/course/:modification/:courseId?"
-                    element={<EditCourseView />}
-                  />
-                  <Route path="/user/add/" element={<AddUserView />} />
-                </Route>
-                <Route
-                  element={
-                    <PrivateRoute roles={[SystemRole.User, SystemRole.Admin]} />
-                  }
-                >
-                  {/* All roles are authorised to access the front page, conditional
-                     rendering is done inside the component */}
-
-                  <Route path="/" element={<FrontPage />} />
-                  <Route path="/:courseId" element={<CourseView />}>
-                    <Route
-                      path="/:courseId/course-results"
-                      element={<CourseResultsView />}
-                    />
-                    <Route path="/:courseId/models" element={<ModelsView />} />
-                    <Route
-                      path="/:courseId/attainments"
-                      element={<AttainmentsView />}
-                    />
-                  </Route>
-                </Route>
-                {/* Not found route */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <Outlet />
             </Box>
           </Container>
           <Footer />
@@ -247,4 +194,72 @@ export default function App(): JSX.Element {
       </QueryClientProvider>
     </CssVarsProvider>
   );
-}
+};
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Root />,
+    children: [
+      {path: '/login', element: <Login />},
+      {path: '/signup', element: <Signup />},
+      {
+        // All roles are authorised to access the front page, conditional rendering is done inside the component
+        path: '/',
+        element: <PrivateRoute roles={Object.values(SystemRole)} />,
+        children: [
+          {path: '/', element: <FrontPage />},
+          // {path: '/course-view/:courseId', element: <CourseView />}, Unused path?
+        ],
+      },
+      {
+        // Pages that are only authorised for admin
+        path: '/',
+        element: <PrivateRoute roles={[SystemRole.Admin]} />,
+        children: [
+          {
+            path: '/course/:modification/:courseId?',
+            element: <EditCourseView />,
+          },
+        ],
+      },
+      {
+        // All roles are authorised to access the front page, conditional rendering is done inside the component
+        path: '/',
+        element: <PrivateRoute roles={[SystemRole.User, SystemRole.Admin]} />,
+        children: [
+          {
+            path: '/course/:modification/:courseId?',
+            element: <EditCourseView />,
+          },
+          {
+            path: '/:courseId',
+            element: <CourseView />,
+            children: [
+              {
+                path: '/:courseId/course-results',
+                element: <CourseResultsView />,
+              },
+              {
+                path: '/:courseId/models',
+                element: <ModelsView />,
+              },
+              {
+                path: '/:courseId/attainments',
+                element: <AttainmentsView />,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        path: '*',
+        element: <NotFound />,
+      },
+    ],
+  },
+]);
+
+const App = (): JSX.Element => <RouterProvider router={router} />;
+
+export default App;
