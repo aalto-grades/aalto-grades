@@ -324,9 +324,9 @@ export default function EditGradeDialog(props: {
         </DialogContent>
       </Dialog>
       <UnsavedChangesDialog
-        setOpen={setShowDialog}
         open={showDialog}
-        handleDiscard={(): void => {
+        onClose={() => setShowDialog(false)}
+        handleDiscard={() => {
           props.handleClose();
           setGradeId(null);
         }}

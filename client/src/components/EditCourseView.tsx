@@ -547,9 +547,9 @@ export default function EditCourseView(): JSX.Element {
           <></>
         )}
         <UnsavedChangesDialog
-          setOpen={setShowDialog}
           open={showDialog}
-          handleDiscard={(): void => navigate('/')}
+          onClose={() => setShowDialog(false)}
+          handleDiscard={() => navigate('/')}
         />
       </Container>
     </>

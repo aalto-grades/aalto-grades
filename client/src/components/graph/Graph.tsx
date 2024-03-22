@@ -13,6 +13,7 @@ import {
   useMemo,
   useState,
 } from 'react';
+import {useBlocker} from 'react-router-dom';
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -45,6 +46,7 @@ import {
   NodeDataContext,
   NodeValuesContext,
 } from '../../context/GraphProvider';
+import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import AdditionNode from './AdditionNode';
 import AttanmentNode from './AttainmentNode';
 import AttainmentValuesDialog from './AttainmentValuesDialog';
@@ -112,6 +114,11 @@ const Graph = ({
     for (const node of nodes) newMap[node.id] = node;
     return newMap;
   }, [nodes]);
+
+  const blocker = useBlocker(
+    ({currentLocation, nextLocation}) =>
+      unsaved && currentLocation.pathname !== nextLocation.pathname
+  );
 
   const setNodeTitle = (id: string, title: string): void => {
     setNodeData(oldNodeData => ({
@@ -465,6 +472,12 @@ const Graph = ({
           </Alert>
         )}
       </div>
+      <UnsavedChangesDialog
+        open={blocker.state === 'blocked'}
+        onClose={blocker.reset ?? (() => {})}
+        handleDiscard={blocker.proceed ?? (() => {})}
+        dontCloseOnDiscard
+      />
       <SelectAttainmentsDialog
         nodes={nodes}
         attainments={attainments}

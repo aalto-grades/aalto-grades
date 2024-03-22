@@ -168,9 +168,9 @@ export default function CourseResultsTableToolbar(props: {
         </Box> */}
       </Box>
       <UnsavedChangesDialog
-        setOpen={setShowDialog}
         open={showDialog}
-        handleDiscard={(): void => navigate(-1)}
+        onClose={() => setShowDialog(false)}
+        handleDiscard={() => navigate(-1)}
       />
     </Toolbar>
   );

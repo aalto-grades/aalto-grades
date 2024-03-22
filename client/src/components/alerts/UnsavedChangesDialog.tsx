@@ -3,60 +3,53 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
-  Stack,
-  Typography,
+  DialogTitle,
 } from '@mui/material';
 import {JSX} from 'react';
 
-export default function UnsavedChangesDialog(props: {
-  setOpen: (open: boolean) => void;
+const UnsavedChangesDialog = ({
+  open,
+  onClose,
+  handleDiscard,
+  dontCloseOnDiscard = false,
+}: {
   open: boolean;
+  onClose: () => void;
   handleDiscard: () => void;
-}): JSX.Element {
-  return (
-    <Dialog
-      open={props.open}
-      onClose={(): void => props.setOpen(false)}
-      scroll="paper"
-      aria-labelledby="unsaved-changes"
-      aria-describedby="dialog-for-unsaved-changes"
-    >
-      <Box sx={{p: 2}}>
-        <DialogContent>
-          <Typography variant="h2" sx={{mb: 2}}>
-            Unsaved Changes
-          </Typography>
-          The form has unsaved changes. Data you have entered will not be saved.
-        </DialogContent>
-        <DialogActions>
-          <Stack spacing={2} direction="row" sx={{mt: 2}}>
-            <Button
-              size="large"
-              variant="outlined"
-              onClick={(): void => props.setOpen(false)}
-            >
-              Stay on this page
-            </Button>
-            <Button
-              size="large"
-              variant="contained"
-              type="submit"
-              color="error"
-              onClick={(): void => {
-                props.handleDiscard();
-                props.setOpen(false);
-              }}
-            >
-              Discard changes
-            </Button>
-          </Stack>
-        </DialogActions>
-      </Box>
-    </Dialog>
-  );
-}
+  dontCloseOnDiscard?: boolean;
+}): JSX.Element => (
+  <Dialog
+    open={open}
+    onClose={onClose}
+    scroll="paper"
+    aria-labelledby="unsaved-changes"
+    aria-describedby="dialog-for-unsaved-changes"
+  >
+    <DialogTitle>Unsaved Changes</DialogTitle>
+    <DialogContent>
+      You have unsaved changes. Data you have entered will not be saved.
+    </DialogContent>
+    <DialogActions>
+      <Button variant="outlined" onClick={onClose}>
+        Stay on this page
+      </Button>
+      <Button
+        variant="contained"
+        type="submit"
+        color="error"
+        onClick={(): void => {
+          handleDiscard();
+          if (!dontCloseOnDiscard) onClose();
+        }}
+      >
+        Discard changes
+      </Button>
+    </DialogActions>
+  </Dialog>
+);
+
+export default UnsavedChangesDialog;
