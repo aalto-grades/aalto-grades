@@ -54,6 +54,10 @@ export async function findCourseFullById(
         model: User,
         as: 'Users',
       },
+      {
+        model: User,
+        as: 'inCourse',
+      },
     ],
   })) as CourseFull;
 
@@ -85,7 +89,7 @@ export function parseCourseFull(course: CourseFull): CourseData {
       sv: '',
     },
   };
-  console.log(course.dataValues);
+
   course.CourseTranslations.forEach((translation: CourseTranslation) => {
     switch (translation.language) {
       case Language.English:
@@ -108,6 +112,14 @@ export function parseCourseFull(course: CourseFull): CourseData {
       id: teacher.id,
       name: teacher.name,
       email: teacher.email,
+    });
+  });
+
+  course.inCourse?.forEach((assistant: User) => {
+    courseData.assistants.push({
+      id: assistant.id,
+      name: assistant.name,
+      email: assistant.email,
     });
   });
 

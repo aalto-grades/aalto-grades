@@ -87,6 +87,24 @@ export async function getCoursesOfUser(
       ],
     })) as Array<CourseInstanceWithCourseFull>;
 
+  const inCourses: Array<CourseFull> = (await Course.findAll({
+    include: [
+      {
+        model: CourseTranslation,
+      },
+      {
+        model: User,
+        as: 'Users',
+      },
+      {
+        model: User,
+        as: 'inCourse',
+        where: {
+          id: user.id,
+        },
+      },
+    ],
+  })) as Array<CourseFull>;
   for (const course of inChargeCourses) {
     courses.push(parseCourseFull(course));
   }
@@ -96,6 +114,12 @@ export async function getCoursesOfUser(
       continue;
 
     courses.push(parseCourseFull(instance.Course));
+  }
+
+  for (const course of inCourses) {
+    if (courses.find((courseData: CourseData) => courseData.id === course.id))
+      continue;
+    courses.push(parseCourseFull(course));
   }
 
   res.status(HttpCode.Ok).send({

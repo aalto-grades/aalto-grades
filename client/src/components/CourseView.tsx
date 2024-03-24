@@ -43,8 +43,13 @@ import InstancesWidget from './course-view/InstancesWidget';
 export default function CourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const {courseId}: Params = useParams() as {courseId: string};
-  const {auth, isTeacherInCharge, setIsTeacherInCharge}: AuthContextType =
-    useAuth();
+  const {
+    auth,
+    isTeacherInCharge,
+    setIsTeacherInCharge,
+    isAssistant,
+    setIsAssistant,
+  }: AuthContextType = useAuth();
 
   const [animation, setAnimation]: State<boolean> = useState(false);
   const [
@@ -60,8 +65,11 @@ export default function CourseView(): JSX.Element {
         (teacher: UserData) => teacher.id == auth.id
       );
     setIsTeacherInCharge(teacherInCharge.length != 0);
+    const assistant: Array<UserData> = course.data.assistants.filter(
+      (assistant: UserData) => assistant.id === auth.id
+    );
+    setIsAssistant(assistant.length !== 0);
   }
-
   const assessmentModels: UseQueryResult<Array<AssessmentModelData>> =
     useGetAllAssessmentModels(courseId);
 
@@ -132,7 +140,9 @@ export default function CourseView(): JSX.Element {
           <Box>
             {
               /* a different attainment component will be created for students */
-              (auth?.role == SystemRole.Admin || isTeacherInCharge) && (
+              (auth?.role == SystemRole.Admin ||
+                isTeacherInCharge ||
+                isAssistant) && (
                 <div style={{flexGrow: 3}}>
                   <Typography variant="h3" align="left" sx={{pt: 1.5, pb: 1}}>
                     Assessment Models
