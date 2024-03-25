@@ -56,6 +56,7 @@ function parseSisuCourseInstance(
           name: name,
         };
       }),
+      assistants: [],
       department: {
         en: instance.organizationName.en,
         fi: instance.organizationName.fi,

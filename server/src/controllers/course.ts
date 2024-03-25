@@ -235,7 +235,7 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
           email: yup.string().email().required(),
         })
       )
-      .required(),
+      .notRequired(),
     department: localizedStringSchema.notRequired(),
     name: localizedStringSchema.notRequired(),
   });
@@ -251,7 +251,7 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
   const gradingScale: GradingScale | undefined = req.body.gradingScale;
   const teachersInCharge: Array<UserData> | undefined =
     req.body.teachersInCharge;
-  const assistants: Array<UserData> = req.body.assistants;
+  const assistants: Array<UserData> | undefined = req.body.assistants;
   const department: LocalizedString | undefined = req.body.department;
   const name: LocalizedString | undefined = req.body.name;
   const languageOfInstruction: Language | undefined = req.body
@@ -280,9 +280,11 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
       )
     : null;
 
-  const newAssistants: Array<User> = await createMissingUsers(
-    assistants.map((assistant: UserData) => assistant.email!)
-  );
+  const newAssistants: Array<User> | null = assistants
+    ? await createMissingUsers(
+        assistants.map((assistant: UserData) => assistant.email!)
+      )
+    : null;
 
   await sequelize.transaction(async (t: Transaction): Promise<void> => {
     await Course.update(
@@ -363,7 +365,9 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
         {transaction: t}
       );
     }
-    CourseRole.updateCourseAssistants(newAssistants, courseId);
+    if (newAssistants) {
+      CourseRole.updateCourseAssistants(newAssistants, courseId);
+    }
   });
 
   res.status(HttpCode.Ok).json({
