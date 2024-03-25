@@ -22,13 +22,13 @@ import {SystemRole} from '@common/types';
 import AppView from './components/AppView';
 import CourseResultsView from './components/CourseResultsView';
 import CourseView from './components/CourseView';
-import EditCourseView from './components/EditCourseView';
 import FrontPage from './components/FrontPage';
 import NotFound from './components/NotFound';
 import Login from './components/auth/Login';
 import PrivateRoute from './components/auth/PrivateRoute';
 import Signup from './components/auth/Signup';
 import AttainmentsView from './components/course-view/AttainmentsView';
+import EditCourseView from './components/course-view/EditCourseView';
 import ModelsView from './components/course-view/ModelsView';
 import NotistackWrapper from './context/NotistackProvider';
 
@@ -166,64 +166,44 @@ const router = createBrowserRouter([
       {path: '/login', element: <Login />},
       {path: '/signup', element: <Signup />},
       // {
-      //   // All roles
-      //   path: '/',
-      //   element: <PrivateRoute roles={Object.values(SystemRole)} />,
-      //   children: [
+      // // All Roles
+      // path: '/',
+      // element: <PrivateRoute roles={[SystemRole.User, SystemRole.Admin]} />,
+      // children: [
+      {path: '/', index: true, element: <FrontPage />},
+      {
+        path: '/:courseId',
+        element: <CourseView />,
+        children: [
+          {
+            // Temporary default view
+            index: true,
+            element: <CourseResultsView />,
+          },
+          {
+            path: '/:courseId/course-results',
+            element: <CourseResultsView />,
+          },
+          {
+            path: '/:courseId/models',
+            element: <ModelsView />,
+          },
+          {
+            path: '/:courseId/attainments',
+            element: <AttainmentsView />,
+          },
+          {
+            path: '/:courseId/edit',
+            element: (
+              <PrivateRoute roles={[SystemRole.Admin]}>
+                <EditCourseView />
+              </PrivateRoute>
+            ),
+          },
+        ],
+      },
       //   ],
       // },
-      {
-        // Admin only
-        path: '/',
-        element: <PrivateRoute roles={[SystemRole.Admin]} />,
-        children: [
-          {
-            path: '/course/:modification/:courseId?',
-            element: <EditCourseView />,
-          },
-        ],
-      },
-      {
-        // All Roles
-        path: '/',
-        element: <PrivateRoute roles={[SystemRole.User, SystemRole.Admin]} />,
-        children: [
-          {path: '/', index: true, element: <FrontPage />},
-          {
-            path: '/:courseId',
-            element: <CourseView />,
-            children: [
-              {
-                //Temporary default view
-                index: true,
-                element: <CourseResultsView />,
-              },
-              {
-                path: '/:courseId/course-results',
-                element: <CourseResultsView />,
-              },
-              {
-                path: '/:courseId/models',
-                element: <ModelsView />,
-              },
-              {
-                path: '/:courseId/attainments',
-                element: <AttainmentsView />,
-              },
-              {
-                path: '/:courseId/post/:modification?',
-                element: <PrivateRoute roles={[SystemRole.Admin]} />,
-                children: [
-                  {
-                    path: '/:courseId/post/:modification',
-                    element: <EditCourseView />,
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
       {
         path: '*',
         element: <NotFound />,

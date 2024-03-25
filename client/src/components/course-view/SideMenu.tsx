@@ -157,7 +157,7 @@ const SideMenu = ({onUpload}: {onUpload: () => void}) => {
               <Divider sx={{my: 2}} />
               <ListItem disablePadding>
                 <NavLink
-                  to={`/${courseId}/post/edit`}
+                  to={`/${courseId}/edit`}
                   style={{
                     color: 'inherit',
                     width: '100%',
