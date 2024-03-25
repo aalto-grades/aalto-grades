@@ -66,9 +66,12 @@ router.get(
   controllerDispatcher(getCsvTemplate)
 );
 
-router.get(
+// Actually gets the csv but must be post to be able to use request.body
+router.post(
   '/v1/courses/:courseId/grades/csv/sisu',
   passport.authenticate('jwt', {session: false}),
+  express.json({limit: '10mb'}),
+  handleInvalidRequestJson,
   controllerDispatcher(getSisuFormattedGradingCSV)
 );
 

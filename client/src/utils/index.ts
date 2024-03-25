@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {DateOnlyString, GradeOption} from '@common/types';
+import {DateOnlyString, GradeOption, Language} from '@common/types';
+import {LanguageOption} from '../types';
 
 type Resolve = (value: void | PromiseLike<void>) => void;
 
@@ -77,3 +78,47 @@ export const findBestGradeOption = (
     ? bestSoFarExpired
     : bestSoFar;
 };
+
+// Available completion languages used in Sisu.
+export const sisuLanguageOptions: LanguageOption[] = [
+  {
+    id: Language.Finnish,
+    language: 'Finnish',
+  },
+  {
+    id: Language.Swedish,
+    language: 'Swedish',
+  },
+  {
+    id: Language.English,
+    language: 'English',
+  },
+  {
+    id: Language.Spanish,
+    language: 'Spanish',
+  },
+  {
+    id: Language.Japanese,
+    language: 'Japanese',
+  },
+  {
+    id: Language.Chinese,
+    language: 'Chinese',
+  },
+  {
+    id: Language.Portuguese,
+    language: 'Portuguese',
+  },
+  {
+    id: Language.French,
+    language: 'French',
+  },
+  {
+    id: Language.German,
+    language: 'German',
+  },
+  {
+    id: Language.Russian,
+    language: 'Russian',
+  },
+];

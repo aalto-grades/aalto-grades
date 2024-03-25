@@ -52,12 +52,10 @@ export function useDownloadCsvTemplate(
 
 interface DownloadSisuGradeCsvVars {
   courseId: Numeric;
-  params: {
-    completionLanguage?: string;
-    assessmentDate?: string;
-    studentNumbers: Array<string>;
-    override: boolean;
-  };
+  completionLanguage?: string;
+  assessmentDate?: string;
+  studentNumbers: Array<string>;
+  override: boolean;
 }
 
 export type UseDownloadSisuGradeCsvResult = UseMutationResult<
@@ -72,9 +70,12 @@ export function useDownloadSisuGradeCsv(
   return useMutation({
     mutationFn: async (vars: DownloadSisuGradeCsvVars): Promise<BlobPart> =>
       (
-        await axios.get(`/v1/courses/${vars.courseId}/grades/csv/sisu`, {
+        await axios.post(`/v1/courses/${vars.courseId}/grades/csv/sisu`, {
           responseType: 'blob',
-          params: vars.params,
+          completionLanguage: vars.completionLanguage,
+          assessmentDate: vars.assessmentDate,
+          studentNumbers: vars.studentNumbers,
+          override: vars.override,
         })
       ).data,
     ...options,

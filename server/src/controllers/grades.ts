@@ -400,7 +400,7 @@ export async function getSisuFormattedGradingCSV(
     studentNumbers?: Array<string>;
     instanceId?: number;
     override?: boolean;
-  } = await urlParams.validate(req.query, {abortEarly: false});
+  } = await urlParams.validate(req.body, {abortEarly: false});
 
   const sisuExportDate = new Date();
 

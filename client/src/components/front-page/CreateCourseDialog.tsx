@@ -31,9 +31,9 @@ import * as yup from 'yup';
 
 import {CourseData, GradingScale, Language} from '@common/types';
 import {useAddCourse} from '../../hooks/useApi';
+import {sisuLanguageOptions} from '../../utils';
 import {convertToClientGradingScale} from '../../utils/textFormat';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
-import {languageOptions} from '../course-results-view/SisuDownloadDialog';
 
 const validationSchema = yup.object({
   courseCode: yup
@@ -306,7 +306,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                 helperText="Language in which the course will be conducted."
                 select
               >
-                {languageOptions.map(option => (
+                {sisuLanguageOptions.map(option => (
                   <MenuItem key={option.id} value={option.id}>
                     {option.language}
                   </MenuItem>

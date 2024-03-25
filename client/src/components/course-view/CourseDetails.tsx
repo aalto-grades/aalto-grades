@@ -3,19 +3,18 @@
 // SPDX-License-Identifier: MIT
 
 import {Box, Typography} from '@mui/material';
+import {JSX} from 'react';
+
 import {
   AssessmentModelData,
   CourseData,
   Language,
   UserData,
 } from '@common/types';
-import {JSX} from 'react';
-
-import LightLabelBoldValue from '../typography/LightLabelBoldValue';
-
 import {LanguageOption} from '../../types';
+import {sisuLanguageOptions} from '../../utils';
 import {convertToClientGradingScale} from '../../utils/textFormat';
-import {languageOptions} from '../course-results-view/SisuDownloadDialog';
+import LightLabelBoldValue from '../typography/LightLabelBoldValue';
 
 export default function CourseDetails(props: {
   course: CourseData;
@@ -25,8 +24,8 @@ export default function CourseDetails(props: {
   onNewAssessmentModel: () => void;
 }): JSX.Element {
   function getLanguageById(id: Language): string {
-    const languageOption: LanguageOption = languageOptions.find(
-      (option: LanguageOption) => option.id === id
+    const languageOption = sisuLanguageOptions.find(
+      option => option.id === id
     ) as LanguageOption;
     return languageOption.language;
   }

@@ -16,40 +16,29 @@ export async function getDateOfLatestGrade(
   userId: number,
   courseId: number
 ): Promise<Date> {
-  const grades: Array<AttainmentGrade> = await AttainmentGrade.findAll({
-    where: {
-      userId: userId,
-      manual: true,
-    },
+  const grades = await AttainmentGrade.findAll({
+    where: {userId: userId},
     include: [
       {
         model: Attainment,
-        where: {
-          courseId: courseId,
-        },
+        where: {courseId: courseId},
       },
     ],
   });
 
-  const dates: Array<Date> = grades.map(
-    (grade: AttainmentGrade) => new Date(grade.date)
-  );
-
-  let maxSoFar: Date | null = null;
+  const dates = grades.map(grade => new Date(grade.date));
+  let maxSoFar = null;
   for (const date of dates) {
     if (!maxSoFar || date > maxSoFar) {
       maxSoFar = date;
     }
   }
 
-  if (maxSoFar) {
-    return maxSoFar;
-  } else {
-    throw new Error(
-      `failed to find the date of the latest grade, user ${userId} has` +
-        ` no grades for assessment model ${courseId}`
-    );
-  }
+  if (maxSoFar) return maxSoFar;
+  throw new Error(
+    `Failed to find the date of the latest grade, user ${userId} has` +
+      ` no grades for course ${courseId}.`
+  );
 }
 
 /**
