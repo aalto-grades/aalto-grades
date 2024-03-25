@@ -165,45 +165,45 @@ const router = createBrowserRouter([
     children: [
       {path: '/login', element: <Login />},
       {path: '/signup', element: <Signup />},
-      // {
-      // // All Roles
-      // path: '/',
-      // element: <PrivateRoute roles={[SystemRole.User, SystemRole.Admin]} />,
-      // children: [
-      {path: '/', index: true, element: <FrontPage />},
       {
-        path: '/:courseId',
-        element: <CourseView />,
+        // All Roles
+        path: '/',
+        element: <PrivateRoute roles={[SystemRole.User, SystemRole.Admin]} />,
         children: [
+          {path: '/', index: true, element: <FrontPage />},
           {
-            // Temporary default view
-            index: true,
-            element: <CourseResultsView />,
-          },
-          {
-            path: '/:courseId/course-results',
-            element: <CourseResultsView />,
-          },
-          {
-            path: '/:courseId/models',
-            element: <ModelsView />,
-          },
-          {
-            path: '/:courseId/attainments',
-            element: <AttainmentsView />,
-          },
-          {
-            path: '/:courseId/edit',
-            element: (
-              <PrivateRoute roles={[SystemRole.Admin]}>
-                <EditCourseView />
-              </PrivateRoute>
-            ),
+            path: '/:courseId',
+            element: <CourseView />,
+            children: [
+              {
+                // Temporary default view
+                index: true,
+                element: <CourseResultsView />,
+              },
+              {
+                path: '/:courseId/course-results',
+                element: <CourseResultsView />,
+              },
+              {
+                path: '/:courseId/models',
+                element: <ModelsView />,
+              },
+              {
+                path: '/:courseId/attainments',
+                element: <AttainmentsView />,
+              },
+              {
+                path: '/:courseId/edit',
+                element: (
+                  <PrivateRoute roles={[SystemRole.Admin]}>
+                    <EditCourseView />
+                  </PrivateRoute>
+                ),
+              },
+            ],
           },
         ],
       },
-      //   ],
-      // },
       {
         path: '*',
         element: <NotFound />,

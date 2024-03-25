@@ -57,9 +57,21 @@ export default function CourseResultsView(): JSX.Element {
     // });
   };
 
+  const findLatestGrade = (row: StudentRow): Date => {
+    let latestDate = new Date(1970, 0, 1);
+    for (const att of row.attainments) {
+      for (const grade of att.grades) {
+        const gradeDate = new Date(grade.date!);
+        if (gradeDate.getTime() > latestDate.getTime()) latestDate = gradeDate;
+      }
+    }
+    return latestDate;
+  };
+
   // Triggers the calculation of final grades
   const handleCalculateFinalGrades = async (
     assessmentModelId: number,
+    dateOverride: boolean,
     gradingDate: Date
   ): Promise<boolean> => {
     const model = assesmentModels.data?.find(
@@ -72,7 +84,7 @@ export default function CourseResultsView(): JSX.Element {
     });
 
     const finalGrades = batchCalculateGraph(
-      model.graphStructure!,
+      model.graphStructure,
       selectedRows.map(selectedRow => ({
         userId: selectedRow.user.id,
         attainments: selectedRow.attainments.map(att => ({
@@ -86,7 +98,7 @@ export default function CourseResultsView(): JSX.Element {
         userId: selectedRow.user.id,
         assessmentModelId,
         grade: finalGrades[selectedRow.user.id].finalGrade,
-        date: gradingDate,
+        date: dateOverride ? gradingDate : findLatestGrade(selectedRow),
       }))
     );
     enqueueSnackbar('Final grades calculated successfully.', {

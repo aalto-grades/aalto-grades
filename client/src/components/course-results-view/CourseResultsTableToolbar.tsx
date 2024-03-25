@@ -17,6 +17,7 @@ export default function CourseResultsTableToolbar(props: {
   // setSearch: (search: string) => void;
   calculateFinalGrades: (
     modelId: number,
+    dateOverride: boolean,
     gradingDate: Date
   ) => Promise<boolean>;
   selectedRows: StudentRow[];
@@ -124,7 +125,7 @@ export default function CourseResultsTableToolbar(props: {
           <CalculateFinalGradesDialog
             open={showCalculateDialog}
             onClose={() => setShowCalculateDialog(false)}
-            numSelected={props.selectedRows.length}
+            selectedRows={props.selectedRows}
             calculateFinalGrades={props.calculateFinalGrades}
           />
           <SisuDownloadDialog

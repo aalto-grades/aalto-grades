@@ -1,13 +1,17 @@
+import {StudentRow} from '@common/types';
 import {
   Button,
+  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   FormControl,
+  FormControlLabel,
   InputLabel,
   MenuItem,
   Select,
+  Switch,
   Typography,
 } from '@mui/material';
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
@@ -21,9 +25,10 @@ import {useGetAllAssessmentModels} from '../../hooks/useApi';
 type PropsType = {
   open: boolean;
   onClose: () => void;
-  numSelected: number;
+  selectedRows: StudentRow[];
   calculateFinalGrades: (
     modelId: number,
+    dateOverride: boolean,
     gradingDate: Date
   ) => Promise<boolean>;
 };
@@ -31,18 +36,35 @@ type PropsType = {
 const CalculateFinalGradesDialog = ({
   open,
   onClose,
-  numSelected,
+  selectedRows,
   calculateFinalGrades,
 }: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const assesmentModels = useGetAllAssessmentModels(courseId);
 
+  const [dateOverride, setDateOverride] = useState<boolean>(false);
   const [gradingDate, setGradingDate] = useState<Dayjs>(dayjs());
   const [selectedModel, setSelectedModel] = useState<string>('');
   const modelList = useMemo(
     () => assesmentModels.data ?? [],
     [assesmentModels.data]
   );
+
+  useEffect(() => {
+    if (!open) return;
+
+    let latestDate = new Date(1970, 0, 1);
+    for (const row of selectedRows) {
+      for (const att of row.attainments) {
+        for (const grade of att.grades) {
+          const gradeDate = new Date(grade.date!);
+          if (gradeDate.getTime() > latestDate.getTime())
+            latestDate = gradeDate;
+        }
+      }
+    }
+    setGradingDate(dayjs(latestDate));
+  }, [open, selectedRows]);
 
   useEffect(() => {
     if (selectedModel === '' && modelList.length > 0)
@@ -52,7 +74,11 @@ const CalculateFinalGradesDialog = ({
   const handleSubmit = async (): Promise<void> => {
     const modelId = modelList.find(model => model.name === selectedModel)?.id;
     if (modelId === undefined) return;
-    const success = await calculateFinalGrades(modelId, gradingDate.toDate());
+    const success = await calculateFinalGrades(
+      modelId,
+      dateOverride,
+      gradingDate.toDate()
+    );
     if (success) onClose();
   };
 
@@ -61,9 +87,9 @@ const CalculateFinalGradesDialog = ({
       <DialogTitle>Calculate final grades</DialogTitle>
       <DialogContent>
         <Typography sx={{mb: 2}}>
-          {numSelected === 1
+          {selectedRows.length === 1
             ? 'Calculating final grade for 1 student'
-            : `Calculating final grades for ${numSelected} students`}
+            : `Calculating final grades for ${selectedRows.length} students`}
         </Typography>
         <FormControl sx={{display: 'block', mb: 2}}>
           <InputLabel id="calculateGradesSelect">Assesment model</InputLabel>
@@ -84,15 +110,29 @@ const CalculateFinalGradesDialog = ({
             ))}
           </Select>
         </FormControl>
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
-          <DatePicker
-            label="Grading date"
-            sx={{width: '100%'}}
-            format="DD.MM.YYYY"
-            value={gradingDate}
-            onChange={newDate => newDate !== null && setGradingDate(newDate)}
-          />
-        </LocalizationProvider>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={dateOverride}
+              onChange={e => setDateOverride(e.target.checked)}
+            />
+          }
+          label="Override grading date for all students"
+        />
+        <Collapse in={dateOverride}>
+          <LocalizationProvider
+            dateAdapter={AdapterDayjs}
+            adapterLocale="en-gb"
+          >
+            <DatePicker
+              label="Grading date"
+              sx={{width: '100%', mt: 2}}
+              format="DD.MM.YYYY"
+              value={gradingDate}
+              onChange={newDate => newDate !== null && setGradingDate(newDate)}
+            />
+          </LocalizationProvider>
+        </Collapse>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleSubmit}>Confirm</Button>
