@@ -5,7 +5,7 @@
 import express, {Router} from 'express';
 import passport from 'passport';
 
-import {addFinalGrades} from '../controllers/finalGrades';
+import {addFinalGrades, getFinalGrades} from '../controllers/finalGrades';
 import {handleInvalidRequestJson} from '../middleware';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
@@ -17,6 +17,12 @@ router.post(
   express.json(),
   handleInvalidRequestJson,
   controllerDispatcher(addFinalGrades)
+);
+
+router.get(
+  '/v1/courses/:courseId/finalGrades',
+  passport.authenticate('jwt', {session: false}),
+  controllerDispatcher(getFinalGrades)
 );
 
 router.post(

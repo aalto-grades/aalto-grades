@@ -83,17 +83,12 @@ export function useDownloadSisuGradeCsv(
 
 export function useGetFinalGrades(
   courseId: Numeric,
-  assessmentModelId: Numeric,
   options?: Partial<UseQueryOptions<Array<FinalGradeData>>>
 ): UseQueryResult<Array<FinalGradeData>> {
   return useQuery({
-    queryKey: ['final-grades', courseId, assessmentModelId],
+    queryKey: ['final-grades', courseId],
     queryFn: async () =>
-      (
-        await axios.get(
-          `/v1/courses/${courseId}/assessment-models/${assessmentModelId}/grades`
-        )
-      ).data.data,
+      (await axios.get(`/v1/courses/${courseId}/finalGrades`)).data.data,
     ...options,
   });
 }

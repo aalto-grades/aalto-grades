@@ -3,14 +3,18 @@
 // SPDX-License-Identifier: MIT
 
 import {Box} from '@mui/material';
+import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
 import {StudentRow} from '@common/types';
 import {batchCalculateGraph} from '@common/util/calculateGraph';
-import {enqueueSnackbar} from 'notistack';
 import {useAddFinalGrades} from '../hooks/api/finalGrade';
-import {useGetAllAssessmentModels, useGetGrades} from '../hooks/useApi';
+import {
+  useGetAllAssessmentModels,
+  useGetFinalGrades,
+  useGetGrades,
+} from '../hooks/useApi';
 import {findBestGradeOption} from '../utils';
 import CourseResultsTableToolbar from './course-results-view/CourseResultsTableToolbar';
 import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
@@ -19,19 +23,21 @@ export default function CourseResultsView(): JSX.Element {
   const {courseId} = useParams() as {courseId: string};
   const addFinalGrades = useAddFinalGrades(courseId);
   const assesmentModels = useGetAllAssessmentModels(courseId);
+  const getFinalGrades = useGetFinalGrades(courseId);
 
   const [missingFinalGrades, setMissingFinalGrades] = useState<boolean>(false);
   const [selectedRows, setSelectedRows] = useState<StudentRow[]>([]);
 
   useEffect(() => {
     setMissingFinalGrades(
-      false
-      // Check if there are any students without final grade to prevent exporting sisu csv
-      // Currently final grade doesn't exist in the type so waiting for that.
-      // TODO: fix
-      // Boolean(
-      //   selectedRows.find(selectedRow => selectedRow.grades?.length === 0)
-      // )
+      // Prevent exporting sisu csv if students without final grades found
+      Boolean(
+        selectedRows.find(
+          selectedRow =>
+            selectedRow.finalGrades === undefined ||
+            selectedRow.finalGrades.length === 0
+        )
+      )
     );
   }, [selectedRows]);
 
@@ -39,23 +45,22 @@ export default function CourseResultsView(): JSX.Element {
 
   // If asking for a refetch then it also update the selectedRows
   // Refresh selectedRows for updating childrens state
-  const studentsRefetch = (): void => {
-    // TODO: Uncomment code when finalGrades api endpoint exists
-    // finalGrades.refetch().then((finalGrades: UseQueryResult<FinalGrade[]>) => {
-    //   if (!finalGrades.data) return;
-    //   setSelectedRows(oldSelectedRows =>
-    //     oldSelectedRows.map(oldSelectedRow => ({
-    //       ...oldSelectedRow,
-    //       finalGrades: [
-    //         ...(oldSelectedRow.finalGrades ?? []),
-    //         finalGrades.data.find(
-    //           element => element.userId === oldSelectedRow.user.id
-    //         ) as FinalGrade,
-    //       ],
-    //     }))
-    //   );
-    // });
+  const refreshFinalGrades = (): void => {
+    getFinalGrades.refetch().then(newFinalGrades => {
+      if (!newFinalGrades.data) return;
+      setSelectedRows(oldSelectedRows =>
+        oldSelectedRows.map(oldSelectedRow => ({
+          ...oldSelectedRow,
+          finalGrades: [
+            ...newFinalGrades.data.filter(
+              element => element.userId === oldSelectedRow.user.id
+            ),
+          ],
+        }))
+      );
+    });
   };
+  console.log(selectedRows);
 
   const findLatestGrade = (row: StudentRow): Date => {
     let latestDate = new Date(1970, 0, 1);
@@ -104,7 +109,7 @@ export default function CourseResultsView(): JSX.Element {
     enqueueSnackbar('Final grades calculated successfully.', {
       variant: 'success',
     });
-    studentsRefetch();
+    refreshFinalGrades();
     return true;
   };
 
@@ -114,7 +119,7 @@ export default function CourseResultsView(): JSX.Element {
         calculateFinalGrades={handleCalculateFinalGrades}
         selectedRows={selectedRows}
         hasPendingStudents={missingFinalGrades}
-        refetch={studentsRefetch}
+        refreshFinalGrades={refreshFinalGrades}
       />
       {gradesQuery.data && (
         <CourseResultsTanTable

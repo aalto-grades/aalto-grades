@@ -22,7 +22,7 @@ export default function CourseResultsTableToolbar(props: {
   ) => Promise<boolean>;
   selectedRows: StudentRow[];
   hasPendingStudents: boolean;
-  refetch: () => void;
+  refreshFinalGrades: () => void;
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
 
@@ -37,7 +37,7 @@ export default function CourseResultsTableToolbar(props: {
   // Firing the refetch after the transition for closingis finished
   // to avoid abrupt layout changes in the dialog
   function handleExitedSisuDialog(): void {
-    props.refetch(); // Should not be necessary, but selectedStudent is not updated otherwise
+    props.refreshFinalGrades(); // Should not be necessary, but selectedStudent is not updated otherwise
   }
 
   return (

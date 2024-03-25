@@ -114,10 +114,14 @@ export default function SisuDownloadDialog(props: {
     },
   });
 
-  function userGradeAlreadyExported(_grades: FinalGradeData[]): boolean {
-    return false;
-    // TODO: 'exportedToSisu' is currently missing from the type FinalGrade.
-    // return Boolean(grades?.find(option => option.exportedToSisu != null));
+  function userGradeAlreadyExported(grades: FinalGradeData[]): boolean {
+    return Boolean(
+      grades?.find(
+        option =>
+          // TODO: Null check should be unnecessary
+          option.sisuExportDate !== undefined && option.sisuExportDate !== null
+      )
+    );
   }
 
   async function handleDownloadSisuGradeCsv(): Promise<void> {
