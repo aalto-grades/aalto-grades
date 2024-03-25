@@ -58,5 +58,5 @@ export enum CourseInstanceRoleType {
 export enum CourseRoleType {
   Teacher = 'TEACHER',
   Assistant = 'ASSISTANT',
-  Student = 'STUDENT'
+  Student = 'STUDENT',
 }
