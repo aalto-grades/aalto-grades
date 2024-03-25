@@ -55,7 +55,7 @@ describe('Tests for EditCourseView components', () => {
     expect(screen.getByLabelText('Grading Scale*')).toBeInTheDocument();
     expect(screen.getByLabelText('Course language*')).toBeInTheDocument();
     expect(screen.getByLabelText('Teachers In Charge*')).toBeDefined();
-    expect(screen.getByText('Add')).toBeDefined();
+    expect(screen.getAllByText('Add')[0]).toBeDefined();
     expect(screen.getByText('Cancel')).toBeDefined();
     expect(screen.getByText('Submit')).toBeDefined();
   });
@@ -128,12 +128,13 @@ describe('Tests for EditCourseView components', () => {
       userEvent.type(screen.getByLabelText('Teachers In Charge*'), testTeacher)
     );
 
-    act(() => userEvent.click(screen.getByText('Add')));
+    act(() => userEvent.click(screen.getAllByText('Add')[0]));
     act(() => userEvent.click(screen.getByText('Submit')));
 
     await waitFor(() => {
       expect(addCourse).toHaveBeenCalledTimes(1);
       expect(addCourse).toHaveBeenCalledWith({
+        assistants: [],
         courseCode: testCode,
         minCredits: 3,
         maxCredits: 5,
