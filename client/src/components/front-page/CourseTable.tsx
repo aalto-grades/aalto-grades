@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {CourseData} from '@common/types';
 import {
   Table,
   TableBody,
@@ -13,35 +12,25 @@ import {
   Typography,
 } from '@mui/material';
 import {JSX} from 'react';
-import {NavigateFunction, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
+import {CourseData} from '@common/types';
 import {HeadCellData} from '../../types';
 
-const headCells: Array<HeadCellData> = [
-  {
-    id: 'code',
-    label: 'Code',
-  },
-  {
-    id: 'name',
-    label: 'Name',
-  },
-  {
-    id: 'department',
-    label: 'Organizing department',
-  },
+const headCells: HeadCellData[] = [
+  {id: 'code', label: 'Code'},
+  {id: 'name', label: 'Name'},
+  {id: 'department', label: 'Organizing department'},
 ];
 
-export default function CourseTable(props: {
-  courses: Array<CourseData>;
-}): JSX.Element {
-  const navigate: NavigateFunction = useNavigate();
+const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
+  const navigate = useNavigate();
 
   return (
     <Table>
       <TableHead>
         <TableRow>
-          {headCells.map((headCell: HeadCellData) =>
+          {headCells.map(headCell =>
             headCell.id === 'code' ? (
               <TableCell key={headCell.id}>
                 <TableSortLabel active={headCell.id === 'code'} direction="asc">
@@ -61,19 +50,19 @@ export default function CourseTable(props: {
         </TableRow>
       </TableHead>
       <TableBody>
-        {props.courses
-          .sort((a: CourseData, b: CourseData) => {
+        {courses
+          .sort((a, b) => {
             const codeA = a.courseCode.toUpperCase();
             const codeB = b.courseCode.toUpperCase();
             if (codeA < codeB) return -1;
             if (codeA > codeB) return 1;
             return 0;
           })
-          .map((course: CourseData) => (
+          .map(course => (
             <TableRow
               id={`ag_see_instances_tr_${course.id}`}
               key={course.id}
-              hover={true}
+              hover
               onClick={() => navigate(`/${course.id}/course-results`)}
             >
               <TableCell>{course.courseCode}</TableCell>
@@ -84,4 +73,6 @@ export default function CourseTable(props: {
       </TableBody>
     </Table>
   );
-}
+};
+
+export default CourseTable;
