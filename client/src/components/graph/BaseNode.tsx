@@ -4,8 +4,7 @@
 import WarningIcon from '@mui/icons-material/Warning';
 import {Tooltip} from '@mui/material';
 import {useMeasure} from '@uidotdev/usehooks';
-import {PropsWithChildren, useContext, useEffect, useState} from 'react';
-import 'reactflow/dist/style.css';
+import {JSX, PropsWithChildren, useContext, useEffect, useState} from 'react';
 
 import {CustomNodeTypes} from '@common/types/graph';
 import {
@@ -28,7 +27,7 @@ const BaseNode = ({
   selected,
   courseFail = false,
   children,
-}: PropsType) => {
+}: PropsType): JSX.Element => {
   const [ref, {width, height}] = useMeasure();
   const {nodeData, setNodeTitle} = useContext(NodeDataContext);
   const {setNodeDimensions, extraNodeData} = useContext(ExtraNodeDataContext);

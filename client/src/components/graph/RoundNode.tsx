@@ -2,9 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {ChangeEvent, useContext, useEffect, useState} from 'react';
+import {ChangeEvent, JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
-import 'reactflow/dist/style.css';
 
 import {
   CustomNodeTypes,
@@ -16,7 +15,7 @@ import BaseNode from './BaseNode';
 
 type RoundSetting = 'round-up' | 'round-closest' | 'round-down';
 type LocalSettings = {roundingSetting: RoundSetting};
-const initialSettings = {roundingSetting: 'round-closest'};
+const initialSettings: LocalSettings = {roundingSetting: 'round-closest'};
 
 const RoundNode = ({
   id,
@@ -26,9 +25,8 @@ const RoundNode = ({
 }: NodeProps): JSX.Element => {
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
-  const [localSettings, setLocalSettings] = useState<LocalSettings>(
-    JSON.parse(JSON.stringify(initialSettings)) as LocalSettings
-  );
+  const [localSettings, setLocalSettings] =
+    useState<LocalSettings>(initialSettings);
   const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as RoundNodeValue;
@@ -59,6 +57,7 @@ const RoundNode = ({
         position={Position.Left}
         isConnectable={isConnectable}
       />
+
       <select
         onChange={handleSelectChange}
         value={localSettings.roundingSetting}
@@ -67,6 +66,10 @@ const RoundNode = ({
         <option value="round-closest">Round to closest</option>
         <option value="round-down">Round down</option>
       </select>
+      <p className="outputvalue">
+        Output: {Math.round(nodeValue.value * 100) / 100}
+      </p>
+
       <Handle
         type="source"
         id={`${id}-source`}
@@ -74,7 +77,6 @@ const RoundNode = ({
         position={Position.Right}
         isConnectable={isConnectable}
       />
-      <p style={{margin: 0}}>{Math.round(nodeValue.value * 100) / 100}</p>
     </BaseNode>
   );
 };

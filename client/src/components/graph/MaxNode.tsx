@@ -2,9 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {useContext, useEffect, useState} from 'react';
+import {JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
-import 'reactflow/dist/style.css';
 
 import {
   CustomNodeTypes,
@@ -20,14 +19,18 @@ const initialSettings = {minValue: '0'};
 const handleStartHeight = 83 + 33.9;
 const rowHeight = 33.9;
 
-const MaxNode = ({id, type, selected, isConnectable}: NodeProps) => {
+const MaxNode = ({
+  id,
+  type,
+  selected,
+  isConnectable,
+}: NodeProps): JSX.Element => {
   const updateNodeInternals = useUpdateNodeInternals();
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
-  const [localSettings, setLocalSettings] = useState<LocalSettings>(
-    JSON.parse(JSON.stringify(initialSettings))
-  );
+  const [localSettings, setLocalSettings] =
+    useState<LocalSettings>(initialSettings);
   const [nextFree, setNextFree] = useState<number>(0);
   const [handles, setHandles] = useState<string[]>([]);
   const [error, setError] = useState<boolean>(false);
@@ -81,9 +84,13 @@ const MaxNode = ({id, type, selected, isConnectable}: NodeProps) => {
   };
 
   let selectedIndex = -1;
+  let i = -1;
   for (const value of Object.values(nodeValue.sources)) {
-    selectedIndex++;
-    if (value.value === nodeValue.value) break;
+    i++;
+    if (value.value === nodeValue.value) {
+      selectedIndex = i;
+      break;
+    }
   }
 
   return (
@@ -118,15 +125,21 @@ const MaxNode = ({id, type, selected, isConnectable}: NodeProps) => {
         position={Position.Left}
         isConnectable={isConnectable}
       />
+
       <table style={{width: '100%', margin: '5px 0px'}}>
         <tbody>
           <tr>
             <th>value</th>
           </tr>
-          <tr style={{height: rowHeight}}>
+          <tr
+            style={{
+              height: rowHeight,
+              background: selectedIndex === -1 ? '#ccf' : '',
+            }}
+          >
             <td>
               <input
-                style={{width: '70px'}}
+                style={{width: '50px'}}
                 onChange={handleChange}
                 type="number"
                 value={localSettings.minValue}
@@ -141,7 +154,7 @@ const MaxNode = ({id, type, selected, isConnectable}: NodeProps) => {
                 key={`tr-${id}-${key}`}
                 style={{
                   height: rowHeight,
-                  backgroundColor: index === selectedIndex ? '#00f6' : '',
+                  backgroundColor: index === selectedIndex ? '#ccf' : '',
                 }}
               >
                 <td>{Math.round(source.value * 100) / 100}</td>
@@ -153,9 +166,6 @@ const MaxNode = ({id, type, selected, isConnectable}: NodeProps) => {
         </tbody>
       </table>
 
-      <p style={{margin: 0, display: 'inline'}}>
-        {Math.round(nodeValue.value * 100) / 100}
-      </p>
       <Handle
         type="source"
         id={`${id}-source`}

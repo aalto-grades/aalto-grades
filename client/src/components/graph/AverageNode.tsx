@@ -2,9 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {ChangeEvent, useContext, useEffect, useState} from 'react';
+import {ChangeEvent, JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
-import 'reactflow/dist/style.css';
 
 import {
   AverageNodeSettings,
@@ -18,6 +17,7 @@ type LocalSettings = {
   weights: {[key: string]: string};
   percentageMode: boolean;
 };
+const initialSettings = {weights: {}, percentageMode: false};
 
 const handleStartHeight = 103;
 const rowHeight = 33.9;
@@ -62,10 +62,8 @@ const AverageNode = ({
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const {nodeValues} = useContext(NodeValuesContext);
 
-  const [localSettings, setLocalSettings] = useState<LocalSettings>({
-    weights: {},
-    percentageMode: false,
-  });
+  const [localSettings, setLocalSettings] =
+    useState<LocalSettings>(initialSettings);
 
   const [handles, setHandles] = useState<string[]>([]);
   const [nextFree, setNextFree] = useState<number>(0);
@@ -203,7 +201,7 @@ const AverageNode = ({
       />
       <label htmlFor={`percentage-${id}`}>Percentage mode</label>
 
-      <table style={{width: '100%', margin: '5px 0px'}}>
+      <table style={{width: '100%', margin: '5px 0px 0px 0px'}}>
         <tbody>
           <tr>
             <th>Weight</th>
@@ -245,16 +243,17 @@ const AverageNode = ({
       {localSettings.percentageMode && (
         <p
           style={{
-            margin: 0,
+            margin: '2px 0px -2px 0px',
             color: Math.abs(percentageSum - 100) >= 1 ? 'red' : '',
           }}
         >
           Sum {Math.round(percentageSum * 10) / 10} %
         </p>
       )}
-      <p style={{margin: 0, marginLeft: '10px'}}>
-        Average {Math.round(nodeValue.value * 100) / 100}
+      <p className="outputvalue" style={{marginTop: '5px'}}>
+        Average: {Math.round(nodeValue.value * 100) / 100}
       </p>
+
       <Handle
         type="source"
         id={`${id}-source`}

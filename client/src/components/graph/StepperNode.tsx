@@ -2,9 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {useContext, useEffect, useState} from 'react';
+import {JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
-import 'reactflow/dist/style.css';
 
 import {
   CustomNodeTypes,
@@ -52,12 +51,16 @@ const checkError = (settings: LocalSettings): boolean => {
   return false;
 };
 
-const StepperNode = ({id, type, selected, isConnectable}: NodeProps) => {
+const StepperNode = ({
+  id,
+  type: nodeType,
+  selected,
+  isConnectable,
+}: NodeProps): JSX.Element => {
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
-  const [localSettings, setLocalSettings] = useState<LocalSettings>(
-    JSON.parse(JSON.stringify(initialSettings))
-  );
+  const [localSettings, setLocalSettings] =
+    useState<LocalSettings>(initialSettings);
   const [error, setError] = useState<boolean>(false);
   const [init, setInit] = useState<boolean>(false);
 
@@ -104,7 +107,7 @@ const StepperNode = ({id, type, selected, isConnectable}: NodeProps) => {
     });
   };
 
-  const handleAdd = () => {
+  const handleAdd = (): void => {
     const newLocalSettings = {
       numSteps: localSettings.numSteps + 1,
       middlePoints: localSettings.middlePoints.concat(''),
@@ -114,7 +117,7 @@ const StepperNode = ({id, type, selected, isConnectable}: NodeProps) => {
     setError(true);
   };
 
-  const handleRemove = () => {
+  const handleRemove = (): void => {
     const newLocalSettings = {...localSettings};
     newLocalSettings.numSteps -= 1;
     newLocalSettings.middlePoints.pop();
@@ -153,7 +156,7 @@ const StepperNode = ({id, type, selected, isConnectable}: NodeProps) => {
   return (
     <BaseNode
       id={id}
-      type={type as CustomNodeTypes}
+      type={nodeType as CustomNodeTypes}
       selected={selected}
       error={error}
     >
@@ -164,6 +167,7 @@ const StepperNode = ({id, type, selected, isConnectable}: NodeProps) => {
         position={Position.Left}
         isConnectable={isConnectable}
       />
+
       <table style={{width: '100%', margin: '5px 0px'}}>
         <tbody>
           <tr>
@@ -174,7 +178,7 @@ const StepperNode = ({id, type, selected, isConnectable}: NodeProps) => {
             <tr
               key={`${id}-${index}`}
               style={{
-                background: !error && isCurrentSlot(index) ? '#00f6' : '',
+                background: !error && isCurrentSlot(index) ? '#ccf' : '',
               }}
             >
               <td>
@@ -218,6 +222,7 @@ const StepperNode = ({id, type, selected, isConnectable}: NodeProps) => {
       >
         Remove row
       </button>
+
       <Handle
         type="source"
         id={`${id}-source`}

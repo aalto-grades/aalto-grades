@@ -9,7 +9,7 @@ import {
   FormControlLabel,
   FormGroup,
 } from '@mui/material';
-import {useEffect, useState} from 'react';
+import {JSX, useEffect, useState} from 'react';
 import {Node} from 'reactflow';
 
 const SelectAttainmentsDialog = ({
@@ -27,7 +27,7 @@ const SelectAttainmentsDialog = ({
     newAttainments: AttainmentData[],
     removedAttainments: AttainmentData[]
   ) => void;
-}) => {
+}): JSX.Element => {
   const attainmentNodeIds: number[] = nodes
     .filter(node => node.type === 'attainment')
     .map(node => parseInt(node.id.split('-')[1]));
@@ -53,14 +53,14 @@ const SelectAttainmentsDialog = ({
     setStartSelected(newSelected);
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const onSelect = (id: number) => {
+  const onSelect = (id: number): void => {
     setSelected(oldSelected => ({
       ...oldSelected,
       [id]: !oldSelected[id],
     }));
   };
 
-  const onSubmit = () => {
+  const onSubmit = (): void => {
     const newAttainments: AttainmentData[] = [];
     const removedAttainments: AttainmentData[] = [];
     for (const [stringKey, value] of Object.entries(selected)) {

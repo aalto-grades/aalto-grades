@@ -2,9 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {useContext, useEffect, useState} from 'react';
+import {JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
-import 'reactflow/dist/style.css';
 
 import {
   CustomNodeTypes,
@@ -15,7 +14,10 @@ import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
 type LocalSettings = {numFail: string; onFailSetting: 'coursefail' | 'fail'};
-const initialSettings = {numFail: 0, onFailSetting: 'courseFail'};
+const initialSettings: LocalSettings = {
+  numFail: '0',
+  onFailSetting: 'coursefail',
+};
 
 const handleStartHeight = 128.5;
 const rowHeight = 33.9;
@@ -30,9 +32,8 @@ const RequireNode = ({
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
-  const [localSettings, setLocalSettings] = useState<LocalSettings>(
-    JSON.parse(JSON.stringify(initialSettings)) as LocalSettings
-  );
+  const [localSettings, setLocalSettings] =
+    useState<LocalSettings>(initialSettings);
   const [nextFree, setNextFree] = useState<number>(0);
   const [handles, setHandles] = useState<string[]>([]);
   const [error, setError] = useState<boolean>(false);
@@ -149,6 +150,7 @@ const RequireNode = ({
         position={Position.Left}
         isConnectable={isConnectable}
       />
+
       <div>
         <label>On fail </label>
         <select
@@ -181,7 +183,7 @@ const RequireNode = ({
                 key={`tr-${key}`}
                 style={{
                   height: rowHeight,
-                  backgroundColor: source.value === 'fail' ? '#f003' : '',
+                  backgroundColor: source.value === 'fail' ? '#fcc' : '',
                 }}
               >
                 <td>
@@ -203,6 +205,7 @@ const RequireNode = ({
           </tr>
         </tbody>
       </table>
+
       {handles.map((key, index) => (
         <Handle
           key={`handle-${key}-source`}

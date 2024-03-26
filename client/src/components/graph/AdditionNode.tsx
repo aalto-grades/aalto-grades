@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {useContext, useEffect, useState} from 'react';
+import {JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -13,7 +13,12 @@ import BaseNode from './BaseNode';
 const handleStartHeight = 45.5 + 30;
 const rowHeight = 30;
 
-const AdditionNode = ({id, type, selected, isConnectable}: NodeProps) => {
+const AdditionNode = ({
+  id,
+  type,
+  selected,
+  isConnectable,
+}: NodeProps): JSX.Element => {
   const updateNodeInternals = useUpdateNodeInternals();
   const {nodeValues} = useContext(NodeValuesContext);
 
@@ -71,10 +76,11 @@ const AdditionNode = ({id, type, selected, isConnectable}: NodeProps) => {
         position={Position.Left}
         isConnectable={isConnectable}
       />
+
       <table style={{width: '100%', minWidth: '60px'}}>
         <tbody>
           <tr>
-            <th>In</th>
+            <th>Inputs</th>
           </tr>
           {Object.entries(nodeValue.sources)
             .filter(([_, source]) => source.isConnected)
@@ -86,9 +92,14 @@ const AdditionNode = ({id, type, selected, isConnectable}: NodeProps) => {
           <tr>
             <td style={{height: '20px'}}></td>
           </tr>
+          <tr style={{background: '#ccf'}}>
+            <td style={{height: '20px'}}>
+              = {Math.round(nodeValue.value * 100) / 100}
+            </td>
+          </tr>
         </tbody>
       </table>
-      <p style={{margin: 0}}>{Math.round(nodeValue.value * 100) / 100}</p>
+
       <Handle
         type="source"
         id={`${id}-source`}

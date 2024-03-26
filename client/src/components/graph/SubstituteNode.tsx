@@ -2,9 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {useContext, useEffect, useState} from 'react';
+import {JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
-import 'reactflow/dist/style.css';
 
 import {
   CustomNodeTypes,
@@ -12,14 +11,10 @@ import {
   SubstituteNodeValue,
 } from '@common/types/graph';
 import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
-
 import BaseNode from './BaseNode';
 
-type LocalSettings = {
-  maxSubstitutions: string;
-  substituteValues: string[];
-};
-const initialSettings = {numSubstitute: '0', substituteValues: []};
+type LocalSettings = {maxSubstitutions: string; substituteValues: string[]};
+const initialSettings = {maxSubstitutions: '0', substituteValues: []};
 
 const handleStartHeight = 110 + 33.9;
 const handleMiddleHeight = 60 + 33.9;
@@ -50,14 +45,18 @@ const convertFromLocalSettings = (
   ),
 });
 
-const SubstituteNode = ({id, type, selected, isConnectable}: NodeProps) => {
+const SubstituteNode = ({
+  id,
+  type,
+  selected,
+  isConnectable,
+}: NodeProps): JSX.Element => {
   const updateNodeInternals = useUpdateNodeInternals();
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
-  const [localSettings, setLocalSettings] = useState<LocalSettings>(
-    JSON.parse(JSON.stringify(initialSettings))
-  );
+  const [localSettings, setLocalSettings] =
+    useState<LocalSettings>(initialSettings);
   const [nextFree, setNextFree] = useState<number>(0);
   const [substituteHandles, setSubstituteHandles] = useState<string[]>([]);
   const [exerciseHandles, setExerciseHandles] = useState<string[]>([]);
@@ -117,11 +116,12 @@ const SubstituteNode = ({id, type, selected, isConnectable}: NodeProps) => {
       setNextFree(maxId + 1);
       setLocalSettings(newLocalSettings);
 
-      const error = checkError(newLocalSettings);
-      setError(error);
-      if (!error) {
-        setNodeSettings(id, convertFromLocalSettings(newLocalSettings));
+      if (checkError(newLocalSettings)) {
+        setError(true);
+        return;
       }
+      setError(false);
+      setNodeSettings(id, convertFromLocalSettings(newLocalSettings));
     }
   }, [nodeValues, init]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -219,6 +219,7 @@ const SubstituteNode = ({id, type, selected, isConnectable}: NodeProps) => {
         position={Position.Left}
         isConnectable={isConnectable}
       />
+
       <label>Number of substitutions</label>
       <input
         style={{width: '180px', display: 'block'}}
@@ -243,7 +244,7 @@ const SubstituteNode = ({id, type, selected, isConnectable}: NodeProps) => {
                   height: rowHeight,
                   backgroundColor:
                     nodeValue.sources[key].value !== nodeValue.values[key]
-                      ? '#ff03'
+                      ? '#ffc'
                       : '',
                 }}
               >
@@ -284,10 +285,10 @@ const SubstituteNode = ({id, type, selected, isConnectable}: NodeProps) => {
                   backgroundColor:
                     nodeValue.sources[key].value === 'fail' &&
                     nodeValue.values[key] === 'fail'
-                      ? '#f003'
+                      ? '#fcc'
                       : nodeValue.sources[key].value === 'fail' &&
                         nodeValue.values[key] !== 'fail'
-                      ? '#0f03'
+                      ? '#cfc'
                       : '',
                 }}
               >
@@ -313,6 +314,7 @@ const SubstituteNode = ({id, type, selected, isConnectable}: NodeProps) => {
           </tr>
         </tbody>
       </table>
+
       {substituteHandles.map((key, index) => (
         <Handle
           key={`handle-${key}-source`}

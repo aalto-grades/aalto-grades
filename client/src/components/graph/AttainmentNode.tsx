@@ -2,9 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {ChangeEvent, useContext, useEffect, useState} from 'react';
+import {ChangeEvent, JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
-import 'reactflow/dist/style.css';
 
 import {
   AttainmentNodeSettings,
@@ -16,19 +15,21 @@ import BaseNode from './BaseNode';
 
 type OnFailSetting = 'coursefail' | 'fail';
 type LocalSettings = {onFailSetting: OnFailSetting; minPoints: string};
-const initialSettings = {onFailSetting: 'coursefail', minPoints: '0'};
+const initialSettings: LocalSettings = {
+  onFailSetting: 'coursefail',
+  minPoints: '0',
+};
 
 const AttanmentNode = ({
   id,
   type,
-  isConnectable,
   selected,
+  isConnectable,
 }: NodeProps): JSX.Element => {
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
-  const [localSettings, setLocalSettings] = useState<LocalSettings>(
-    JSON.parse(JSON.stringify(initialSettings)) as LocalSettings
-  );
+  const [localSettings, setLocalSettings] =
+    useState<LocalSettings>(initialSettings);
   const [error, setError] = useState<boolean>(false);
   const [init, setInit] = useState<boolean>(false);
 
@@ -38,6 +39,7 @@ const AttanmentNode = ({
   useEffect(() => {
     if (init) return;
     setLocalSettings({...settings, minPoints: settings.minPoints.toString()});
+    setError(false);
     setInit(true);
   }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -60,10 +62,7 @@ const AttanmentNode = ({
   };
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const newLocalSettings = {
-      ...localSettings,
-      minPoints: event.target.value,
-    };
+    const newLocalSettings = {...localSettings, minPoints: event.target.value};
     setLocalSettings(newLocalSettings);
 
     if (!/^\d+(?:\.\d+?)?$/.test(newLocalSettings.minPoints)) {
@@ -95,16 +94,24 @@ const AttanmentNode = ({
           value={localSettings.minPoints}
         />
       </div>
-      <div>
-        <label>On fail: </label>
-        <select
-          onChange={handleSelectChange}
-          value={localSettings.onFailSetting}
-        >
-          <option value="coursefail">Fail course</option>
-          <option value="fail">Output fail</option>
-        </select>
-      </div>
+      {settings.minPoints > 0 && (
+        <div style={{textAlign: 'left'}}>
+          <label>On fail: </label>
+          <select
+            onChange={handleSelectChange}
+            value={localSettings.onFailSetting}
+          >
+            <option value="coursefail">Fail course</option>
+            <option value="fail">Output fail</option>
+          </select>
+        </div>
+      )}
+      <p className="outputvalue">
+        Output:{' '}
+        {nodeValue.value === 'fail'
+          ? 'fail'
+          : Math.round(nodeValue.value * 100) / 100}
+      </p>
 
       <Handle
         type="source"
@@ -113,11 +120,6 @@ const AttanmentNode = ({
         position={Position.Right}
         isConnectable={isConnectable}
       />
-      <p style={{margin: 0}}>
-        {nodeValue.value === 'fail'
-          ? nodeValue.value
-          : Math.round(nodeValue.value * 100) / 100}
-      </p>
     </BaseNode>
   );
 };

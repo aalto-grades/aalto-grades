@@ -2,9 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {useContext, useEffect, useState, ChangeEvent} from 'react';
+import {ChangeEvent, JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
-import 'reactflow/dist/style.css';
 
 import {
   CustomNodeTypes,
@@ -16,7 +15,10 @@ import BaseNode from './BaseNode';
 
 type OnFailSetting = 'coursefail' | 'fail';
 type LocalSettings = {onFailSetting: OnFailSetting; minPoints: string};
-const initialSettings = {onFailSetting: 'coursefail', minPoints: '0'};
+const initialSettings: LocalSettings = {
+  onFailSetting: 'coursefail',
+  minPoints: '0',
+};
 
 const MinPointsNode = ({
   id,
@@ -26,9 +28,8 @@ const MinPointsNode = ({
 }: NodeProps): JSX.Element => {
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
-  const [localSettings, setLocalSettings] = useState<LocalSettings>(
-    JSON.parse(JSON.stringify(initialSettings)) as LocalSettings
-  );
+  const [localSettings, setLocalSettings] =
+    useState<LocalSettings>(initialSettings);
   const [error, setError] = useState<boolean>(false);
   const [init, setInit] = useState<boolean>(false);
 
@@ -38,7 +39,6 @@ const MinPointsNode = ({
   useEffect(() => {
     if (init) return;
     setLocalSettings({...settings, minPoints: settings.minPoints.toString()});
-
     setError(false);
     setInit(true);
   }, [nodeData]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -62,17 +62,15 @@ const MinPointsNode = ({
   };
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const newLocalSettings = {...localSettings};
-    newLocalSettings.minPoints = event.target.value;
+    const newLocalSettings = {...localSettings, minPoints: event.target.value};
     setLocalSettings(newLocalSettings);
 
-    if (!/^\d+(?:\.\d+?)?$/.test(event.target.value)) {
+    if (!/^\d+(?:\.\d+?)?$/.test(newLocalSettings.minPoints)) {
       setError(true);
       return;
     }
     setError(false);
 
-    setLocalSettings(newLocalSettings);
     setNodeSettings(id, {
       ...newLocalSettings,
       minPoints: parseFloat(newLocalSettings.minPoints),
@@ -94,6 +92,7 @@ const MinPointsNode = ({
         position={Position.Left}
         isConnectable={isConnectable}
       />
+
       <div>
         <label>Minimum points: </label>
         <input
@@ -103,7 +102,7 @@ const MinPointsNode = ({
           value={localSettings.minPoints}
         />
       </div>
-      <div>
+      <div style={{textAlign: 'left'}}>
         <label>On fail: </label>
         <select
           onChange={handleSelectChange}
@@ -113,11 +112,13 @@ const MinPointsNode = ({
           <option value="fail">Output fail</option>
         </select>
       </div>
-      <p style={{margin: 0, display: 'inline'}}>
+      <p className="outputvalue">
+        Output:{' '}
         {nodeValue.value === 'fail'
           ? 'fail'
           : Math.round(nodeValue.value * 100) / 100}
       </p>
+
       <Handle
         type="source"
         id={`${id}-source`}

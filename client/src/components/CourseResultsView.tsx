@@ -60,7 +60,6 @@ export default function CourseResultsView(): JSX.Element {
       );
     });
   };
-  console.log(selectedRows);
 
   const findLatestGrade = (row: StudentRow): Date => {
     let latestDate = new Date(1970, 0, 1);

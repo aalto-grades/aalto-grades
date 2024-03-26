@@ -2,15 +2,19 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {useContext} from 'react';
+import {JSX, useContext} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
-import 'reactflow/dist/style.css';
 
 import {CustomNodeTypes, GradeNodeValue} from '@common/types/graph';
 import {NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
-const GradeNode = ({id, type, selected, isConnectable}: NodeProps) => {
+const GradeNode = ({
+  id,
+  type,
+  selected,
+  isConnectable,
+}: NodeProps): JSX.Element => {
   const {nodeValues} = useContext(NodeValuesContext);
   const nodeValue = nodeValues[id] as GradeNodeValue;
 
@@ -24,7 +28,9 @@ const GradeNode = ({id, type, selected, isConnectable}: NodeProps) => {
         isConnectable={isConnectable}
       />
 
-      <p style={{margin: 0}}>{Math.round(nodeValue.value * 100) / 100}</p>
+      <p className="outputvalue">
+        Final grade: {Math.round(nodeValue.value * 100) / 100}
+      </p>
     </BaseNode>
   );
 };

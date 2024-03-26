@@ -1,5 +1,3 @@
-import {AttainmentData} from '@common/types';
-import {NodeValues} from '@common/types/graph';
 import {
   Button,
   Dialog,
@@ -8,8 +6,11 @@ import {
   DialogTitle,
   TextField,
 } from '@mui/material';
-import {ChangeEvent, useEffect, useMemo, useState} from 'react';
+import {ChangeEvent, JSX, useEffect, useMemo, useState} from 'react';
 import {Node} from 'reactflow';
+
+import {AttainmentData} from '@common/types';
+import {NodeValues} from '@common/types/graph';
 
 const testFloat = (val: string): boolean => /^\d+(?:\.\d+?)?$/.test(val);
 
@@ -29,7 +30,7 @@ const AttainmentValuesDialog = ({
   handleSetAttainmentValues: (attainmentValues: {
     [key: number]: number;
   }) => void;
-}) => {
+}): JSX.Element => {
   const attainmentNodeIds = useMemo(
     () =>
       nodes
@@ -70,7 +71,7 @@ const AttainmentValuesDialog = ({
   const onChange = (
     id: number,
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  ): void => {
     const badValue = Object.entries(values).find(
       ([valId, val]) => parseInt(valId) !== id && !testFloat(val)
     );
@@ -84,7 +85,7 @@ const AttainmentValuesDialog = ({
     }));
   };
 
-  const onSubmit = () => {
+  const onSubmit = (): void => {
     handleSetAttainmentValues(
       Object.fromEntries(
         Object.entries(values).map(([key, value]) => [
