@@ -22,8 +22,10 @@ import UploadDialog from './course-view/UploadDialog';
 export default function CourseView(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const theme = useTheme();
-  const {courseId}: Params = useParams() as {courseId: string};
-  const course: UseQueryResult<CourseData> = useGetCourse(courseId);
+  const {courseId}: Params = useParams();
+  const course: UseQueryResult<CourseData> = useGetCourse(courseId!, {
+    enabled: !!courseId,
+  });
   const {
     auth,
     isTeacherInCharge: _,

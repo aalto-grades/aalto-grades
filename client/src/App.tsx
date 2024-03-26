@@ -16,7 +16,7 @@ import {
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'; // For debugging
 import {enqueueSnackbar} from 'notistack';
 import {CSSProperties, JSX} from 'react';
-import {RouterProvider, createBrowserRouter} from 'react-router-dom';
+import {Outlet, RouterProvider, createBrowserRouter} from 'react-router-dom';
 
 import {SystemRole} from '@common/types';
 import AppView from './components/AppView';
@@ -168,12 +168,20 @@ const router = createBrowserRouter([
       {
         // All Roles
         path: '/',
-        element: <PrivateRoute roles={[SystemRole.User, SystemRole.Admin]} />,
+        element: (
+          <PrivateRoute roles={[SystemRole.User, SystemRole.Admin]}>
+            <CourseView />
+          </PrivateRoute>
+        ),
         children: [
           {path: '/', index: true, element: <FrontPage />},
           {
             path: '/:courseId',
-            element: <CourseView />,
+            element: (
+              <>
+                <Outlet />
+              </>
+            ),
             children: [
               {
                 // Temporary default view

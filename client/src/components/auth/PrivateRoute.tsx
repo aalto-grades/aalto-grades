@@ -40,10 +40,5 @@ export default function PrivateRoute(props: {
   if (!props.roles.includes(auth.role) && !isTeacherInCharge)
     return <Navigate to="/" />;
 
-  return (
-    <>
-      {props.children}
-      <Outlet />
-    </>
-  );
+  return <>{props.children ? props.children : <Outlet />}</>;
 }

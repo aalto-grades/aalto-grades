@@ -46,6 +46,7 @@ export default function SectionTitle(): JSX.Element {
               textDecoration: 'none',
               mr: 2,
               width: '184px',
+              cursor: 'pointer',
             }}
           >
             A! Grades
@@ -96,7 +97,7 @@ export default function SectionTitle(): JSX.Element {
                     <Icon>
                       <ArrowBack />
                     </Icon>
-                    <ListItemText primary="Back" />
+                    <ListItemText primary="Courses" />
                   </ButtonBase>
                 );
               }}

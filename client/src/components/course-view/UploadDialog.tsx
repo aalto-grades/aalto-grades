@@ -17,9 +17,9 @@ const UploadDialog = ({
   open: boolean;
   onClose: () => void;
 }): JSX.Element => {
-  const {courseId} = useParams() as {courseId: string};
-  const attainments = useGetAttainments(courseId);
-  const addGrades = useAddGrades(courseId);
+  const {courseId} = useParams();
+  const attainments = useGetAttainments(courseId!, {enabled: !!courseId});
+  const addGrades = useAddGrades(courseId!);
 
   const attainmentData = useMemo(
     () => attainments.data ?? [],
