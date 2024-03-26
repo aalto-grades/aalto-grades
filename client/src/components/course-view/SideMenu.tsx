@@ -44,7 +44,7 @@ const SideMenu = ({onUpload}: {onUpload: () => void}) => {
         style={{
           width: courseId ? '204px' : '0px',
           minWidth: courseId ? '204px' : '0px',
-          transition: 'width 0.3s',
+          transition: 'all 0.3s',
           overflow: 'clip',
         }}
       >
