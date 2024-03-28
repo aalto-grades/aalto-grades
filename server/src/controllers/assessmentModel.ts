@@ -9,11 +9,11 @@ import * as yup from 'yup';
 import AssessmentModel from '../database/models/assessmentModel';
 import Course from '../database/models/course';
 
+import {GraphStructure} from '@common/types/graph';
 import {ApiError, idSchema, JwtClaims} from '../types';
 import {findAssessmentModelById} from './utils/assessmentModel';
-import {findCourseById} from './utils/course';
+import {findAndValidateCourseId, findCourseById} from './utils/course';
 import {isTeacherInChargeOrAdmin} from './utils/user';
-import {GraphStructure} from '@common/types/graph';
 
 export async function getAssessmentModel(
   req: Request,
@@ -25,7 +25,7 @@ export async function getAssessmentModel(
   const assessmentModelId: number = Number(req.params.assessmentModelId);
   await idSchema.validate({id: assessmentModelId});
 
-  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
+  const course: Course = await findCourseById(courseId);
 
   const assessmentModel: AssessmentModel = await findAssessmentModelById(
     assessmentModelId,
@@ -44,7 +44,7 @@ export async function getAssessmentModel(
     id: assessmentModel.id,
     courseId: assessmentModel.courseId,
     name: assessmentModel.name,
-    graphStructure: assessmentModel.graphStructure as Object as GraphStructure,
+    graphStructure: assessmentModel.graphStructure as object as GraphStructure,
   };
 
   res.status(HttpCode.Ok).json({
@@ -52,23 +52,17 @@ export async function getAssessmentModel(
   });
 }
 
-export async function getAllAssessmentModels(
+export const getAllAssessmentModels = async (
   req: Request,
   res: Response
-): Promise<void> {
-  const courseId: number = Number(req.params.courseId);
-  await idSchema.validate({id: courseId});
+): Promise<void> => {
+  const course = await findAndValidateCourseId(req.params.courseId);
 
-  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
+  const assessmentModels = await AssessmentModel.findAll({
+    where: {courseId: course.id},
+  });
 
-  const assessmentModels: Array<AssessmentModel> =
-    await AssessmentModel.findAll({
-      where: {
-        courseId: course.id,
-      },
-    });
-
-  const assessmentModelsData: Array<AssessmentModelData> = [];
+  const assessmentModelsData: AssessmentModelData[] = [];
 
   for (const assessmentModel of assessmentModels) {
     assessmentModelsData.push({
@@ -76,14 +70,14 @@ export async function getAllAssessmentModels(
       courseId: assessmentModel.courseId,
       name: assessmentModel.name,
       graphStructure:
-        assessmentModel.graphStructure as Object as GraphStructure,
+        assessmentModel.graphStructure as object as GraphStructure,
     });
   }
 
   res.status(HttpCode.Ok).json({
     data: assessmentModelsData,
   });
-}
+};
 
 export async function addAssessmentModel(
   req: Request,
@@ -107,7 +101,7 @@ export async function addAssessmentModel(
   const graphStructure = req.body.graphStructure;
 
   // Confirm that course exists.
-  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
+  const course: Course = await findCourseById(courseId);
 
   // Route is only available for admins and those who have teacher in charge role for the course.
   await isTeacherInChargeOrAdmin(
@@ -165,7 +159,7 @@ export async function updateAssessmentModel(
   const graphStructure = req.body.graphStructure;
 
   // Confirm that course exists.
-  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
+  const course: Course = await findCourseById(courseId);
 
   // Route is only available for admins and those who have teacher in charge role for the course.
   await isTeacherInChargeOrAdmin(
@@ -208,7 +202,7 @@ export async function deleteAssessmentModel(
   await idSchema.validate({id: assessmentModelId});
 
   // Confirm that course exists.
-  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
+  const course: Course = await findCourseById(courseId);
 
   // Route is only available for admins and those who have teacher in charge role for the course.
   await isTeacherInChargeOrAdmin(

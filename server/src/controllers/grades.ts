@@ -38,7 +38,7 @@ import {
 } from '../types';
 import {validateAssessmentModelPath} from './utils/assessmentModel';
 import {findAttainmentById, findAttainmentGradeById} from './utils/attainment';
-import {validateCourseId} from './utils/course';
+import {findAndValidateCourseId} from './utils/course';
 import {toDateOnlyString} from './utils/date';
 import {getDateOfLatestGrade} from './utils/grades';
 import {findUserById, isTeacherInChargeOrAdmin} from './utils/user';
@@ -334,7 +334,7 @@ export async function getSisuFormattedGradingCSV(
   res: Response
 ): Promise<void> {
   const sisuExportDate = new Date();
-  const course = await validateCourseId(req.params.courseId);
+  const course = await findAndValidateCourseId(req.params.courseId);
 
   await isTeacherInChargeOrAdmin(
     req.user as JwtClaims,
@@ -619,15 +619,13 @@ export async function getGradeTreeOfAllUsers(
     });
 
   // Include students from a particular instance if an ID provided.
-  const filter: Array<string> | undefined = instanceId
-    ? await filterByInstanceAndStudentNumber(instanceId, studentNumbers)
-    : studentNumbers;
+  const filter = studentNumbers;
 
   if (filter) {
     await studentNumbersExist(filter);
 
     students = students.filter((student: IdAndStudentNumber) => {
-      return (filter as Array<string>).includes(student.studentNumber);
+      return filter.includes(student.studentNumber);
     });
   }
 

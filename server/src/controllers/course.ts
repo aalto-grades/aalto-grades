@@ -207,7 +207,7 @@ export async function editCourse(req: Request, res: Response): Promise<void> {
   await requestSchema.validate(req.body, {abortEarly: false});
   const courseId: number = (await idSchema.validate({id: req.params.courseId}))
     .id;
-  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
+  const course: Course = await findCourseById(courseId);
 
   const courseCode: string | undefined = req.body.courseCode;
   const minCredits: number | undefined = req.body.minCredits;

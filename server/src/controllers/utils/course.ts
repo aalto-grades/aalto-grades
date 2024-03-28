@@ -9,26 +9,18 @@ import CourseTranslation from '../../database/models/courseTranslation';
 import User from '../../database/models/user';
 
 import {CourseData, Language} from '@common/types';
-import {ApiError, CourseFull, idSchema} from '../../types';
+import {ApiError, CourseFull, zodIdSchema} from '../../types';
 
 /**
- * Finds a course by its ID.
- * @param {number} courseId - The ID of the course.
- * @param {HttpCode} errorCode - HTTP status code to return if the course was not found.
- * @returns {Promise<Course>} - The found course model object.
- * @throws {ApiError} - If the course is not found, it throws an error with a message
- * indicating the missing course with the specific ID.
+ * Finds a course by its ID. IF course not found, will throw ApiError.
  */
-export async function findCourseById(
-  courseId: number,
-  errorCode: HttpCode
-): Promise<Course> {
-  const course: Course | null = await Course.findByPk(courseId);
+export const findCourseById = async (courseId: number): Promise<Course> => {
+  const course = await Course.findByPk(courseId);
   if (!course) {
-    throw new ApiError(`course with ID ${courseId} not found`, errorCode);
+    throw new ApiError(`course with ID ${courseId} not found`, 404);
   }
   return course;
-}
+};
 
 /**
  * Finds a course, its translations, and the teachers in charge of that course
@@ -112,16 +104,13 @@ export function parseCourseFull(course: CourseFull): CourseData {
   return courseData;
 }
 
-export async function validateCourseId(courseId: string): Promise<Course> {
-  const courseIdValidated: number = (
-    await idSchema.validate({id: courseId}, {abortEarly: false})
-  ).id;
-
-  // Ensure that course exists.
-  const course: Course = await findCourseById(
-    courseIdValidated,
-    HttpCode.NotFound
-  );
-
-  return course;
+/**
+ * Finds a course by url param id and also validates the url param.
+ */
+export async function findAndValidateCourseId(
+  courseId: string
+): Promise<Course> {
+  const result = zodIdSchema.safeParse(courseId);
+  if (!result.success) throw new ApiError(`Invalid course id ${courseId}`, 404);
+  return await findCourseById(result.data);
 }

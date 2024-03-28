@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import express, {Router} from 'express';
+import {RequestHandler} from 'express-serve-static-core';
 import passport from 'passport';
 
 import {
@@ -25,7 +26,7 @@ router.get(
 
 router.get(
   '/v1/courses/:courseId/assessment-models',
-  passport.authenticate('jwt', {session: false}),
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
   controllerDispatcher(getAllAssessmentModels)
 );
 

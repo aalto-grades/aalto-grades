@@ -81,7 +81,7 @@ const SisuDownloadDialog = ({
   }));
 
   const userGradeAlreadyExported = (grades: FinalGradeData[]): boolean =>
-    Boolean(grades?.find(finalGrade => finalGrade.sisuExportDate !== null));
+    Boolean(grades.find(finalGrade => finalGrade.sisuExportDate !== null));
 
   const exportedValuesInList = useMemo(() => {
     for (const row of selectedRows) {

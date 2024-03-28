@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import {AssessmentModelData} from '@common/types';
-import axios from './axios';
 import {
   QueryClient,
   useMutation,
@@ -14,20 +13,23 @@ import {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
-
 import {Numeric} from '../../types';
+import axios from './axios';
 
-export function useGetAllAssessmentModels(
+export const useGetAllAssessmentModels = (
   courseId: Numeric,
-  options?: Partial<UseQueryOptions<Array<AssessmentModelData>>>
-): UseQueryResult<Array<AssessmentModelData>> {
-  return useQuery({
+  options?: Partial<UseQueryOptions<AssessmentModelData[]>>
+): UseQueryResult<AssessmentModelData[]> =>
+  useQuery({
     queryKey: ['all-assessment-models', courseId],
     queryFn: async () =>
-      (await axios.get(`/v1/courses/${courseId}/assessment-models`)).data.data,
+      (
+        (await axios.get(`/v1/courses/${courseId}/assessment-models`)).data as {
+          data: AssessmentModelData[];
+        }
+      ).data,
     ...options,
   });
-}
 
 export function useGetAssessmentModel(
   courseId: Numeric,

@@ -7,8 +7,8 @@ import {HttpCode} from '@common/types';
 import AssessmentModel from '../../database/models/assessmentModel';
 import Course from '../../database/models/course';
 
-import {findCourseById} from './course';
 import {ApiError, idSchema} from '../../types';
+import {findCourseById} from './course';
 
 export async function findAssessmentModelById(
   assessmentModelId: number,
@@ -39,10 +39,7 @@ export async function validateAssessmentModelPath(
   ).id;
 
   // Ensure that course exists.
-  const course: Course = await findCourseById(
-    courseIdValidated,
-    HttpCode.NotFound
-  );
+  const course: Course = await findCourseById(courseIdValidated);
 
   // Ensure that assessment model exists.
   const assessmentModel: AssessmentModel = await findAssessmentModelById(

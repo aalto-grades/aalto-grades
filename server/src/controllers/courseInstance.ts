@@ -96,7 +96,7 @@ export async function getAllCourseInstances(
   await idSchema.validate({id: courseId});
 
   // Ensure course exists
-  await findCourseById(courseId, HttpCode.NotFound);
+  await findCourseById(courseId);
 
   const instances: Array<CourseInstanceWithCourseFull> =
     (await CourseInstance.findAll({
@@ -159,7 +159,7 @@ export async function addCourseInstance(
   await requestSchema.validate(req.body, {abortEarly: false});
 
   // Confirm that course exists.
-  await findCourseById(courseId, HttpCode.NotFound);
+  await findCourseById(courseId);
 
   // Route is only available for admins and those who have teacher in charge role for the course.
   await isTeacherInChargeOrAdmin(

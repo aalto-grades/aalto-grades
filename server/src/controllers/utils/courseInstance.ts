@@ -7,8 +7,8 @@ import {HttpCode} from '@common/types';
 import Course from '../../database/models/course';
 import CourseInstance from '../../database/models/courseInstance';
 
-import {findCourseById} from './course';
 import {ApiError, idSchema} from '../../types';
+import {findCourseById} from './course';
 
 /**
  * Finds a course instance by its ID.
@@ -52,10 +52,7 @@ export async function validateCourseInstancePath(
   ).id;
 
   // Ensure that course exists.
-  const course: Course = await findCourseById(
-    courseIdValidated,
-    HttpCode.NotFound
-  );
+  const course: Course = await findCourseById(courseIdValidated);
 
   // Ensure that course instance exists.
   const instance: CourseInstance = await findCourseInstanceById(
