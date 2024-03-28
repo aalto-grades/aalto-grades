@@ -50,7 +50,9 @@
     "winston-syslog": "^2.7.0",
     "xmldom": "^0.6.0",
     "xpath": "^0.0.34",
-    "yup": "^1.2.0"
+    "yup": "^1.2.0",
+    "zod": "^3.22.4",
+    "zod-express-middleware": "^1.4.0"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.3",

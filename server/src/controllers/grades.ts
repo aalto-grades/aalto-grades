@@ -1,6 +1,13 @@
 // SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
+import {stringify} from 'csv-stringify';
+import {NextFunction, Request, Response} from 'express';
+import {ParamsDictionary} from 'express-serve-static-core';
+import {Includeable, Op, QueryTypes, Transaction} from 'sequelize';
+import * as yup from 'yup';
+import {z} from 'zod';
+
 import {
   AttainmentGradeData,
   AttainmentGradesData,
@@ -9,23 +16,17 @@ import {
   GradeOption,
   GradeType,
   HttpCode,
+  Language,
   NewGrade,
   Status,
   StudentGradesTree,
   StudentRow,
 } from '@common/types';
-import {stringify} from 'csv-stringify';
-import {NextFunction, Request, Response} from 'express';
-import _ from 'lodash';
-import {Includeable, Op, QueryTypes, Transaction} from 'sequelize';
-import * as yup from 'yup';
-
 import {sequelize} from '../database';
 import AssessmentModel from '../database/models/assessmentModel';
 import Attainment from '../database/models/attainment';
 import AttainmentGrade from '../database/models/attainmentGrade';
 import Course from '../database/models/course';
-import CourseInstance from '../database/models/courseInstance';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
 import {
@@ -42,22 +43,18 @@ import {toDateOnlyString} from './utils/date';
 import {getDateOfLatestGrade} from './utils/grades';
 import {findUserById, isTeacherInChargeOrAdmin} from './utils/user';
 
-async function studentNumbersExist(
-  studentNumbers: Array<string>
-): Promise<void> {
-  const foundStudentNumbers: Array<string> = (
+const studentNumbersExist = async (studentNumbers: string[]): Promise<void> => {
+  const foundStudentNumbers = (
     await User.findAll({
       attributes: ['studentNumber'],
       where: {
-        studentNumber: {
-          [Op.in]: studentNumbers,
-        },
+        studentNumber: {[Op.in]: studentNumbers},
       },
     })
-  ).map((student: User) => student.studentNumber);
+  ).map(student => student.studentNumber);
 
   if (foundStudentNumbers.length !== studentNumbers.length) {
-    const errors: Array<string> = [];
+    const errors: string[] = [];
 
     for (const studentNumber of studentNumbers) {
       if (!foundStudentNumbers.includes(studentNumber)) {
@@ -67,7 +64,7 @@ async function studentNumbersExist(
 
     throw new ApiError(errors, HttpCode.UnprocessableEntity);
   }
-}
+};
 
 export async function getCsvTemplate(
   req: Request,
@@ -314,48 +311,13 @@ async function getFinalGradesFor(
   return finalGrades;
 }
 
-interface InstanceWithUsers extends CourseInstance {
-  Users: Array<User>;
-}
-
-/**
- * @param {number} instanceId - ID of the instance included in the query
- * @param {Array<string> | undefined} studentNumbers - Students numbers included in the query
- * @returns Union of studentNumbers array and student numbers enrolled in course instance.
- */
-async function filterByInstanceAndStudentNumber(
-  instanceId: number,
-  studentNumbers: Array<string> | undefined
-): Promise<Array<string> | undefined> {
-  const studentsFromInstance: InstanceWithUsers | null =
-    (await CourseInstance.findOne({
-      attributes: ['id'],
-      where: {
-        id: instanceId,
-      },
-      include: [
-        {
-          model: User,
-          attributes: ['studentNumber'],
-          order: [['id', 'ASC']],
-        },
-      ],
-    })) as InstanceWithUsers;
-
-  if (studentsFromInstance) {
-    const studentNumbersFromInstance: Array<string> =
-      studentsFromInstance.Users.map((us: User) => {
-        return us.studentNumber;
-      });
-
-    if (studentNumbers) {
-      return _.union(studentNumbers, studentNumbersFromInstance);
-    }
-    return studentNumbersFromInstance;
-  }
-
-  return studentNumbers;
-}
+export const SisuCSVSchema = z.object({
+  assessmentDate: z.string().datetime().optional(), // Assesment date override
+  // All Sisu accepted language codes.
+  completionLanguage: z.nativeEnum(Language).optional(), // Defaults to course language TODO: confirm that the Language enum is valid for SISU
+  studentNumbers: z.array(z.string()).nonempty(),
+});
+export type SisuCSVBody = z.infer<typeof SisuCSVSchema>;
 
 /**
  * Get grading data formatted to Sisu compatible format for exporting grades to Sisu.
@@ -368,42 +330,10 @@ async function filterByInstanceAndStudentNumber(
  * the course, or no course results found/calculated before calling the endpoint.
  */
 export async function getSisuFormattedGradingCSV(
-  req: Request,
+  req: Request<ParamsDictionary, any, SisuCSVBody>, // eslint-disable-line @typescript-eslint/no-explicit-any
   res: Response
 ): Promise<void> {
-  const urlParams: yup.AnyObjectSchema = yup.object({
-    assessmentDate: yup.date().notRequired(),
-    completionLanguage: yup
-      .string()
-      .transform((value: string, originalValue: string) => {
-        return originalValue
-          ? originalValue.toUpperCase()
-          : value.toUpperCase();
-      })
-      // All Sisu accepted language codes.
-      .oneOf(['FI', 'SV', 'EN', 'ES', 'JA', 'ZH', 'PT', 'FR', 'DE', 'RU'])
-      .notRequired(),
-    studentNumbers: yup.array().json().of(yup.string()).notRequired(),
-    instanceId: yup.number().min(1).notRequired(),
-    override: yup.boolean().notRequired(),
-  });
-
-  const {
-    assessmentDate,
-    completionLanguage,
-    studentNumbers,
-    instanceId,
-    override,
-  }: {
-    assessmentDate?: Date;
-    completionLanguage?: string;
-    studentNumbers?: Array<string>;
-    instanceId?: number;
-    override?: boolean;
-  } = await urlParams.validate(req.body, {abortEarly: false});
-
   const sisuExportDate = new Date();
-
   const course = await validateCourseId(req.params.courseId);
 
   await isTeacherInChargeOrAdmin(
@@ -412,86 +342,66 @@ export async function getSisuFormattedGradingCSV(
     HttpCode.Forbidden
   );
 
-  // Include students from a particular instance if an ID is provided.
-  const studentNumbersFiltered = instanceId
-    ? await filterByInstanceAndStudentNumber(instanceId, studentNumbers)
-    : studentNumbers;
-
-  if (studentNumbersFiltered) studentNumbersExist(studentNumbersFiltered);
+  await studentNumbersExist(req.body.studentNumbers);
 
   /**
-   * TODO:
-   * - only one grade per user per instance is allowed
+   * TODO: only one grade per user per instance is allowed
    */
+  const finalGrades = await getFinalGradesFor(req.body.studentNumbers);
 
-  const finalGrades = await getFinalGradesFor(studentNumbersFiltered ?? []);
-
-  if (!override) {
-    // If not overridden, clean already exported grades from results.
-    // TODO: Store sisuExportDate inside final grades table
-    // finalGrades = finalGrades.filter(
-    //   (grade: FinalGradeRaw) => grade.sisuExportDate === null
-    // );
-  }
-
-  interface SisuCsvFormat {
+  type SisuCsvFormat = {
     studentNumber: string;
     grade: string;
     credits: number;
     assessmentDate: string;
     completionLanguage: string;
     comment: string;
-  }
+  };
 
-  interface MarkSisuExport {
-    id: number;
-    userId: number;
-  }
+  type MarkSisuExport = {gradeId: number; userId: number};
 
-  const courseResults: Array<SisuCsvFormat> = [];
-  const exportedToSisu: Array<MarkSisuExport> = [];
+  const courseResults: SisuCsvFormat[] = [];
+  const exportedToSisu: MarkSisuExport[] = [];
 
   for (const finalGrade of finalGrades) {
-    const existingResult: SisuCsvFormat | undefined = courseResults.find(
-      (value: SisuCsvFormat) =>
-        value.studentNumber === finalGrade.User?.studentNumber
+    if (finalGrade.User === undefined) {
+      console.error(
+        'Final grade found with no matching user even though student nubmers were validated'
+      );
+      continue;
+    }
+    const existingResult = courseResults.find(
+      value => value.studentNumber === finalGrade.User?.studentNumber
     );
 
     if (existingResult) {
-      if (finalGrade.grade > Number(existingResult.grade)) {
-        existingResult.grade = String(Math.round(finalGrade.grade));
+      if (finalGrade.grade <= parseInt(existingResult.grade)) continue; // TODO: Maybe more options than just best grade
+      existingResult.grade = finalGrade.grade.toString(); // TODO: Confirm that finalgrade.grade is valid
 
-        // There can be multiple grades, make sure only the exported grade is marked with timestamp.
-        const userData: MarkSisuExport | undefined = exportedToSisu.find(
-          (value: MarkSisuExport) => value.userId === finalGrade.User?.id
-        );
-
-        if (userData) {
-          userData.id = finalGrade.id;
-        }
-      }
+      // There can be multiple grades, make sure only the exported grade is marked with timestamp.
+      const userData = exportedToSisu.find(
+        value => value.userId === finalGrade.User?.id
+      );
+      if (userData) userData.gradeId = finalGrade.id;
     } else {
-      exportedToSisu.push({
-        id: finalGrade.id,
-        userId: finalGrade.userId,
-      });
+      exportedToSisu.push({gradeId: finalGrade.id, userId: finalGrade.userId});
 
       courseResults.push({
-        studentNumber: finalGrade.User?.studentNumber ?? 'Error',
+        studentNumber: finalGrade.User.studentNumber,
         // Round to get final grades as an integer.
         grade: String(Math.round(finalGrade.grade)),
         credits: course.maxCredits,
         // Assesment date must be in form dd.mm.yyyy.
         // HERE we want to find the latest completed attainment grade for student
-        assessmentDate: (assessmentDate
-          ? new Date(assessmentDate)
+        assessmentDate: (req.body.assessmentDate
+          ? new Date(req.body.assessmentDate)
           : await getDateOfLatestGrade(finalGrade.userId, course.id)
         ).toLocaleDateString('fi-FI'),
-        completionLanguage: completionLanguage
-          ? completionLanguage.toLowerCase()
-          : course.languageOfInstruction.toLowerCase(),
+        completionLanguage: req.body.completionLanguage
+          ? req.body.completionLanguage
+          : course.languageOfInstruction, // TODO: Confirm that is in lower case
         // Comment column is required, but can be empty.
-        comment: '', //finalGrade.comment, TODO: Add comment to finalGrade DB table
+        comment: '', // finalGrade.comment, TODO: Add comment to finalGrade DB table
       });
     }
   }
@@ -501,7 +411,7 @@ export async function getSisuFormattedGradingCSV(
     {
       where: {
         id: {
-          [Op.or]: exportedToSisu.map((value: MarkSisuExport) => value.id),
+          [Op.or]: exportedToSisu.map(value => value.gradeId),
         },
       },
     }
@@ -513,7 +423,7 @@ export async function getSisuFormattedGradingCSV(
       header: true,
       delimiter: ',', // NOTE, accepted delimiters in Sisu are semicolon ; and comma ,
     },
-    (_err: unknown, data: string) => {
+    (_err, data) => {
       res
         .status(HttpCode.Ok)
         .setHeader('Content-Type', 'text/csv')
@@ -523,7 +433,6 @@ export async function getSisuFormattedGradingCSV(
           }_${new Date().toLocaleDateString('fi-FI')}.csv`
         )
         .send(data);
-      return;
     }
   );
 }

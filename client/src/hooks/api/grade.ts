@@ -54,8 +54,7 @@ interface DownloadSisuGradeCsvVars {
   courseId: Numeric;
   completionLanguage?: string;
   assessmentDate?: string;
-  studentNumbers: Array<string>;
-  override: boolean;
+  studentNumbers: string[];
 }
 
 export type UseDownloadSisuGradeCsvResult = UseMutationResult<
@@ -75,9 +74,8 @@ export function useDownloadSisuGradeCsv(
           completionLanguage: vars.completionLanguage,
           assessmentDate: vars.assessmentDate,
           studentNumbers: vars.studentNumbers,
-          override: vars.override,
         })
-      ).data,
+      ).data as BlobPart,
     ...options,
   });
 }

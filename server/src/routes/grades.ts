@@ -2,13 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from '@common/types';
 import express, {Request, Router} from 'express';
+import {ParamsDictionary, RequestHandler} from 'express-serve-static-core';
 import multer, {FileFilterCallback, Multer, memoryStorage} from 'multer';
 import passport from 'passport';
 import path from 'path';
+import {processRequestBody} from 'zod-express-middleware';
 
+import {HttpCode} from '@common/types';
 import {
+  SisuCSVBody,
+  SisuCSVSchema,
   addGrades,
   editUserGrade,
   getCsvTemplate,
@@ -66,12 +70,13 @@ router.get(
   controllerDispatcher(getCsvTemplate)
 );
 
-// Actually gets the csv but must be post to be able to use request.body
+// Actually gets the csv but the requirest type must be post to be able to use request.body
+type SisuCSVRequestHandler = RequestHandler<ParamsDictionary, any, SisuCSVBody>; // eslint-disable-line @typescript-eslint/no-explicit-any
 router.post(
   '/v1/courses/:courseId/grades/csv/sisu',
-  passport.authenticate('jwt', {session: false}),
+  passport.authenticate('jwt', {session: false}) as SisuCSVRequestHandler,
   express.json({limit: '10mb'}),
-  handleInvalidRequestJson,
+  processRequestBody(SisuCSVSchema),
   controllerDispatcher(getSisuFormattedGradingCSV)
 );
 
