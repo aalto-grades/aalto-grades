@@ -71,11 +71,16 @@ router.get(
 );
 
 // Actually gets the csv but the requirest type must be post to be able to use request.body
-type SisuCSVRequestHandler = RequestHandler<ParamsDictionary, any, SisuCSVBody>; // eslint-disable-line @typescript-eslint/no-explicit-any
+type SisuCSVRequestHandler = RequestHandler<
+  ParamsDictionary,
+  unknown,
+  SisuCSVBody
+>;
 router.post(
   '/v1/courses/:courseId/grades/csv/sisu',
   passport.authenticate('jwt', {session: false}) as SisuCSVRequestHandler,
   express.json({limit: '10mb'}),
+  handleInvalidRequestJson,
   processRequestBody(SisuCSVSchema),
   controllerDispatcher(getSisuFormattedGradingCSV)
 );

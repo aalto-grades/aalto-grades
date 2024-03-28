@@ -12,7 +12,7 @@ import {CourseData, Language} from '@common/types';
 import {ApiError, CourseFull, zodIdSchema} from '../../types';
 
 /**
- * Finds a course by its ID. IF course not found, will throw ApiError.
+ * Finds a course by its ID. If course not found, will throw ApiError.
  */
 export const findCourseById = async (courseId: number): Promise<Course> => {
   const course = await Course.findByPk(courseId);
@@ -107,10 +107,20 @@ export function parseCourseFull(course: CourseFull): CourseData {
 /**
  * Finds a course by url param id and also validates the url param.
  */
-export async function findAndValidateCourseId(
+export const findAndValidateCourseId = async (
   courseId: string
-): Promise<Course> {
+): Promise<Course> => {
   const result = zodIdSchema.safeParse(courseId);
   if (!result.success) throw new ApiError(`Invalid course id ${courseId}`, 404);
   return await findCourseById(result.data);
-}
+};
+
+/**
+ * Validates course id url param and returns it as a number.
+ */
+export const validateCourseId = async (courseId: string): Promise<number> => {
+  const result = zodIdSchema.safeParse(courseId);
+  if (!result.success) throw new ApiError(`Invalid course id ${courseId}`, 404);
+  await findCourseById(result.data);
+  return result.data;
+};

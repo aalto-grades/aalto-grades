@@ -330,7 +330,7 @@ export type SisuCSVBody = z.infer<typeof SisuCSVSchema>;
  * the course, or no course results found/calculated before calling the endpoint.
  */
 export async function getSisuFormattedGradingCSV(
-  req: Request<ParamsDictionary, any, SisuCSVBody>, // eslint-disable-line @typescript-eslint/no-explicit-any
+  req: Request<ParamsDictionary, unknown, SisuCSVBody>,
   res: Response
 ): Promise<void> {
   const sisuExportDate = new Date();
