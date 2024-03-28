@@ -13,6 +13,8 @@ import {errorHandler} from './middleware/errorHandler';
 import {requestLogger} from './middleware/requestLogger';
 import {router} from './routes/index';
 import {ApiError} from './types';
+import {requestSyslogger} from './middleware/requestLogger';
+import {NODE_ENV} from './configs/environment';
 
 // Register formulas before starting Express.
 require('./formulas');
@@ -20,6 +22,12 @@ require('./formulas');
 export const app: Application = express();
 
 app.use(requestLogger);
+
+if (NODE_ENV !== 'test') {
+  // tests timeout for some reason if used
+  app.use(express.json());
+  app.use(requestSyslogger);
+}
 
 app.use(
   cors({

@@ -32,7 +32,7 @@ export const requestLogger: RequestHandler = morgan(
 
 export const requestSyslogger: RequestHandler = morgan(
   ':remote-addr :remote-user ":method :url HTTP/:http-version"' +
-    ' :status :res[content-length] ":referrer" ":user-agent"',
+    ' :status  :res[content-length] ":referrer" ":user-agent"',
   {
     stream: {
       write: (message: string) => syslogger.info(message.trim()),

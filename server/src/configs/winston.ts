@@ -75,8 +75,11 @@ export const syslogger: winston.Logger = winston.createLogger({
       : 'debug',
   levels: winston.config.syslog.levels,
   format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
+    winston.format.timestamp({format: 'DD-MM-YYYY HH:mm:ss'}),
+    winston.format.printf(
+      (http: winston.Logform.TransformableInfo) =>
+        `${http.timestamp} ${http.level}: ${http.message}`
+    )
   ),
   transports: [new winston.transports.Console()],
 });
