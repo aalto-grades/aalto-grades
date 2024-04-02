@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import * as yup from 'yup';
+import {z} from 'zod';
 
 /**
  * Yup validation schema for validating localized strings in requests.
@@ -27,3 +28,13 @@ export const localizedStringSchema: yup.AnyObjectSchema = yup
   .strict()
   .noUnknown()
   .default(undefined);
+
+export const zodLocalizedStringSchema = z
+  .object({
+    fi: z.string().optional(),
+    en: z.string().optional(),
+    sv: z.string().optional(),
+  })
+  .refine(
+    val => val.fi !== undefined || val.en !== undefined || val.sv !== undefined
+  );

@@ -9,7 +9,7 @@ import User from '../../database/models/user';
 import {ApiError, CourseFull, zodIdSchema} from '../../types';
 
 /**
- * Finds a course by its ID. If course not found, will throw ApiError.
+ * Finds a course by its ID. Throws ApiError if not found.
  */
 export const findCourseById = async (courseId: number): Promise<Course> => {
   const course = await Course.findByPk(courseId);
@@ -24,38 +24,27 @@ export const findCourseById = async (courseId: number): Promise<Course> => {
 
 /**
  * Finds a course, its translations, and the teachers in charge of that course
- * by a course ID.
- * @param {number} courseId - The ID of the course.
- * @param {HttpCode} errorCode - HTTP status code to include in ApiError if the
- * course was not found.
- * @returns {Promise<CourseFull>} - The found course model object with
- * course translation and user objects included.
- * @throws {ApiError} - If the course is not found, it throws an error with a
- * message indicating the missing course with the specific ID.
+ * by a course ID. Throws ApiError if course not found
  */
-export async function findCourseFullById(
+export const findCourseFullById = async (
   courseId: number,
-  errorCode: HttpCode
-): Promise<CourseFull> {
-  const course: CourseFull | null = (await Course.findByPk(courseId, {
-    include: [
-      {
-        model: CourseTranslation,
-      },
-      {
-        model: User,
-      },
-    ],
-  })) as CourseFull;
+  errorCode?: HttpCode
+): Promise<CourseFull> => {
+  const course = (await Course.findByPk(courseId, {
+    include: [{model: CourseTranslation}, {model: User}],
+  })) as CourseFull | null;
 
-  if (!course) {
-    throw new ApiError(`course with ID ${courseId} not found`, errorCode);
+  if (course === null) {
+    throw new ApiError(
+      `course with ID ${courseId} not found`,
+      errorCode ?? HttpCode.NotFound
+    );
   }
 
   return course;
-}
+};
 
-export function parseCourseFull(course: CourseFull): CourseData {
+export const parseCourseFull = (course: CourseFull): CourseData => {
   const courseData: CourseData = {
     id: course.id,
     courseCode: course.courseCode,
@@ -64,20 +53,18 @@ export function parseCourseFull(course: CourseFull): CourseData {
     gradingScale: course.gradingScale,
     languageOfInstruction: course.languageOfInstruction as Language,
     teachersInCharge: [],
-    department: {
-      en: '',
-      fi: '',
-      sv: '',
-    },
-    name: {
-      en: '',
-      fi: '',
-      sv: '',
-    },
+    department: {en: '', fi: '', sv: ''},
+    name: {en: '', fi: '', sv: ''},
   };
 
-  course.CourseTranslations.forEach((translation: CourseTranslation) => {
-    switch (translation.language) {
+  for (const translation of course.CourseTranslations) {
+    // TODO: Mismatch in database languages and Language enum
+    const language: Language.English | Language.Finnish | Language.Swedish =
+      (translation.language as 'EN' | 'FI' | 'SE') === 'SE'
+        ? Language.Swedish
+        : (translation.language as Language.English | Language.Finnish);
+
+    switch (language) {
       case Language.English:
         courseData.department.en = translation.department;
         courseData.name.en = translation.courseName;
@@ -91,21 +78,51 @@ export function parseCourseFull(course: CourseFull): CourseData {
         courseData.name.sv = translation.courseName;
         break;
     }
-  });
+  }
 
-  course.Users.forEach((teacher: User) => {
+  for (const teacher of course.Users) {
     courseData.teachersInCharge.push({
       id: teacher.id,
       name: teacher.name,
       email: teacher.email,
     });
-  });
+  }
 
   return courseData;
-}
+};
+
+/**
+ * Checks that all emails are existing users. Throws ApiError if that's not the case.
+ */
+export const validateEmailList = async (
+  emailList: string[]
+): Promise<User[]> => {
+  const users = await User.findAll({
+    attributes: ['id', 'email'],
+    where: {email: emailList},
+  });
+
+  // Check for non existent emails.
+  if (emailList.length !== users.length) {
+    const userEmails = users.map(user => user.email);
+    const missingEmails = emailList.filter(
+      email => !userEmails.includes(email)
+    );
+
+    throw new ApiError(
+      missingEmails.map(
+        (email: string) => `No user with email address ${email} found`
+      ),
+      HttpCode.UnprocessableEntity
+    );
+  }
+
+  return users;
+};
 
 /**
  * Finds a course by url param id and also validates the url param.
+ * Throws ApiError if invalid or course not found.
  */
 export const findAndValidateCourseId = async (
   courseId: string
@@ -118,6 +135,7 @@ export const findAndValidateCourseId = async (
 
 /**
  * Validates course id url param and returns it as a number.
+ * Throws ApiError if invalid or course not found.
  */
 export const validateCourseId = async (courseId: string): Promise<number> => {
   const result = zodIdSchema.safeParse(courseId);
