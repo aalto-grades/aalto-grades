@@ -66,9 +66,7 @@ export const addAssessmentModelBodySchema = z.object({
     nodeData: z.record(z.string(), z.any()),
   }), // TODO: improve
 });
-export type AddAssessmentModelBody = z.infer<
-  typeof addAssessmentModelBodySchema
->;
+type AddAssessmentModelBody = z.infer<typeof addAssessmentModelBodySchema>;
 
 export const addAssessmentModel = async (
   req: Request<ParamsDictionary, unknown, AddAssessmentModelBody>,
@@ -109,7 +107,7 @@ export const updateAssessmentModelBodySchema = z.object({
     nodeData: z.record(z.string(), z.any()),
   }), // TODO: improve
 });
-export type UpdateAssessmentModelBody = z.infer<
+type UpdateAssessmentModelBody = z.infer<
   typeof updateAssessmentModelBodySchema
 >;
 
@@ -131,13 +129,7 @@ export const updateAssessmentModel = async (
     graphStructure: req.body.graphStructure as unknown as JSON,
   });
 
-  res.status(HttpCode.Ok).json({
-    data: {
-      id: assessmentModel.id,
-      courseId: course.id,
-      name: assessmentModel.name,
-    },
-  });
+  res.status(HttpCode.Ok).json({id: assessmentModel.id});
 };
 
 export const deleteAssessmentModel = async (

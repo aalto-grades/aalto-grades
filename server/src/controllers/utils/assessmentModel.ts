@@ -28,6 +28,7 @@ export const findAssessmentModelById = async (
 
 /**
  * Finds an assessment model by url param id and also validates the url param.
+ * Throws ApiError if not found.
  */
 const findAndValidateAssessmentModelId = async (
   courseId: string
@@ -44,6 +45,7 @@ const findAndValidateAssessmentModelId = async (
 
 /**
  * Finds the course and the assessment model by url param ids and also validates the url params.
+ * Throws ApiError if either not found.
  */
 export const validateAssessmentModelPath = async (
   courseId: string,
@@ -56,8 +58,8 @@ export const validateAssessmentModelPath = async (
   // Check that assessment model belongs to the course.
   if (assessmentModel.courseId !== course.id) {
     throw new ApiError(
-      `Assessment model with ID ${assessmentModelId} ` +
-        `does not belong to the course with ID ${courseId}`,
+      `Assessment model with ID ${assessmentModel.id} ` +
+        `does not belong to the course with ID ${course.id}`,
       HttpCode.Conflict
     );
   }

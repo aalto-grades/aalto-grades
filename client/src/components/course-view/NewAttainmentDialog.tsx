@@ -10,18 +10,15 @@ import {useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {useAddAttainment} from '../../hooks/useApi';
 
-type PropsType = {
-  handleClose: () => void;
-  open: boolean;
-};
+type PropsType = {handleClose: () => void; open: boolean};
 
 const AddAttainmentDialog = ({handleClose, open}: PropsType): JSX.Element => {
   const addAttainment = useAddAttainment();
   const [attainment, setAttainment] = useState({name: '', daysValid: 365});
   const {courseId} = useParams() as {courseId: string};
 
-  const handleSave = (): void => {
-    addAttainment.mutate({courseId, attainment});
+  const handleSave = async (): Promise<void> => {
+    await addAttainment.mutateAsync({courseId, attainment});
     setAttainment({name: '', daysValid: 365});
     handleClose();
   };

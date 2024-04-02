@@ -1168,15 +1168,11 @@ export async function editUserGrade(
 
   await isTeacherInChargeOrAdmin(grader, course.id);
 
-  const gradeData: AttainmentGrade = await findAttainmentGradeById(
-    gradeId,
-    HttpCode.NotFound
-  );
+  const gradeData: AttainmentGrade = await findAttainmentGradeById(gradeId);
 
   if (grade) {
     const attainment: Attainment = await findAttainmentById(
-      gradeData.attainmentId,
-      HttpCode.NotFound
+      gradeData.attainmentId
     );
   }
 
