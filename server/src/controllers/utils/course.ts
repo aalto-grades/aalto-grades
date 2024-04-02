@@ -2,13 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from '@common/types';
-
+import {CourseData, HttpCode, Language} from '@common/types';
 import Course from '../../database/models/course';
 import CourseTranslation from '../../database/models/courseTranslation';
 import User from '../../database/models/user';
-
-import {CourseData, Language} from '@common/types';
 import {ApiError, CourseFull, zodIdSchema} from '../../types';
 
 /**
@@ -17,7 +14,10 @@ import {ApiError, CourseFull, zodIdSchema} from '../../types';
 export const findCourseById = async (courseId: number): Promise<Course> => {
   const course = await Course.findByPk(courseId);
   if (!course) {
-    throw new ApiError(`course with ID ${courseId} not found`, 404);
+    throw new ApiError(
+      `course with ID ${courseId} not found`,
+      HttpCode.NotFound
+    );
   }
   return course;
 };
@@ -111,7 +111,8 @@ export const findAndValidateCourseId = async (
   courseId: string
 ): Promise<Course> => {
   const result = zodIdSchema.safeParse(courseId);
-  if (!result.success) throw new ApiError(`Invalid course id ${courseId}`, 404);
+  if (!result.success)
+    throw new ApiError(`Invalid course id ${courseId}`, HttpCode.NotFound);
   return await findCourseById(result.data);
 };
 
@@ -120,7 +121,8 @@ export const findAndValidateCourseId = async (
  */
 export const validateCourseId = async (courseId: string): Promise<number> => {
   const result = zodIdSchema.safeParse(courseId);
-  if (!result.success) throw new ApiError(`Invalid course id ${courseId}`, 404);
+  if (!result.success)
+    throw new ApiError(`Invalid course id ${courseId}`, HttpCode.NotFound);
   await findCourseById(result.data);
   return result.data;
 };

@@ -101,7 +101,7 @@ export const addFinalGrades = async (
   const grader = req.user as JwtClaims;
 
   const courseId = await validateCourseId(req.params.courseId);
-  await isTeacherInChargeOrAdmin(grader, courseId, HttpCode.Forbidden);
+  await isTeacherInChargeOrAdmin(grader, courseId);
 
   const preparedBulkCreate: FinalGradeModelData[] = newGrades.map(
     gradeEntry => ({
@@ -130,7 +130,7 @@ export async function getFinalGrades(
   const courseId = Number(req.params.courseId);
   const grader: JwtClaims = req.user as JwtClaims;
 
-  await isTeacherInChargeOrAdmin(grader, courseId, HttpCode.Forbidden);
+  await isTeacherInChargeOrAdmin(grader, courseId);
 
   try {
     const finalGrades = await FinalGrade.findAll({

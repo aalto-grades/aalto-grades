@@ -3,26 +3,26 @@
 // SPDX-License-Identifier: MIT
 
 import {
+  Profile,
+  Strategy as SamlStrategy,
+  VerifiedCallback as SamlVerifiedCallback,
+} from '@node-saml/passport-saml';
+import argon from 'argon2';
+import {NextFunction, Request, Response} from 'express';
+import {readFileSync} from 'fs';
+import jwt from 'jsonwebtoken';
+import passport from 'passport';
+import {Strategy as JWTStrategy, VerifiedCallback} from 'passport-jwt';
+import {IVerifyOptions, Strategy as LocalStrategy} from 'passport-local';
+import * as yup from 'yup';
+
+import {
   HttpCode,
   LoginResult,
   PlainPassword,
   SignupRequest,
   SystemRole,
 } from '@common/types';
-import argon from 'argon2';
-import {NextFunction, Request, Response} from 'express';
-import jwt from 'jsonwebtoken';
-import passport from 'passport';
-import {
-  Profile,
-  Strategy as SamlStrategy,
-  VerifiedCallback as SamlVerifiedCallback,
-} from '@node-saml/passport-saml';
-import {Strategy as JWTStrategy, VerifiedCallback} from 'passport-jwt';
-import {IVerifyOptions, Strategy as LocalStrategy} from 'passport-local';
-import * as yup from 'yup';
-import {readFileSync} from 'fs';
-
 import {JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS} from '../configs/constants';
 import {
   JWT_SECRET,
@@ -32,21 +32,19 @@ import {
   SAML_ENTITY,
   SAML_ENTRYPOINT,
   SAML_IDP_CERT,
+  SAML_METADATA_URL,
   SAML_PRIVATE_KEY,
   SAML_SP_CERT_PATH,
-  SAML_METADATA_URL,
 } from '../configs/environment';
-
 import User from '../database/models/user';
-
 import {ApiError, JwtClaims} from '../types';
-import {findUserById} from './utils/user';
 import {getIdpSignCert} from './utils/saml';
+import {findUserById} from './utils/user';
 
 export async function authSelfInfo(req: Request, res: Response): Promise<void> {
   const user: JwtClaims = req.user as JwtClaims;
 
-  const userFromDb: User = await findUserById(user.id, HttpCode.NotFound);
+  const userFromDb: User = await findUserById(user.id);
 
   const auth: LoginResult = {
     id: userFromDb.id,

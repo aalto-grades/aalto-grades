@@ -34,7 +34,7 @@ async function adminOrOwner(req: Request): Promise<User> {
   }
 
   // Confirm that user exists and return.
-  return await findUserById(userId, HttpCode.NotFound);
+  return await findUserById(userId);
 }
 
 export async function getCoursesOfUser(

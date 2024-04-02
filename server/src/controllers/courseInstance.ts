@@ -162,16 +162,12 @@ export async function addCourseInstance(
   await findCourseById(courseId);
 
   // Route is only available for admins and those who have teacher in charge role for the course.
-  await isTeacherInChargeOrAdmin(
-    req.user as JwtClaims,
-    courseId,
-    HttpCode.Forbidden
-  );
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, courseId);
 
   if (req.body.assessmentModelId) {
     const assessmentModel: AssessmentModel = await findAssessmentModelById(
-      req.body.assessmentModelId,
-      HttpCode.UnprocessableEntity
+      req.body.assessmentModelId
+      // HttpCode.UnprocessableEntity
     );
 
     if (assessmentModel.courseId !== courseId) {

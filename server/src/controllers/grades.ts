@@ -76,11 +76,7 @@ export async function getCsvTemplate(
       req.params.assessmentModelId
     );
 
-  await isTeacherInChargeOrAdmin(
-    req.user as JwtClaims,
-    course.id,
-    HttpCode.Forbidden
-  );
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id);
 
   const attainmentNames: Array<string> = (
     await Attainment.findAll({
@@ -336,11 +332,7 @@ export async function getSisuFormattedGradingCSV(
   const sisuExportDate = new Date();
   const course = await findAndValidateCourseId(req.params.courseId);
 
-  await isTeacherInChargeOrAdmin(
-    req.user as JwtClaims,
-    course.id,
-    HttpCode.Forbidden
-  );
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id);
 
   await studentNumbersExist(req.body.studentNumbers);
 
@@ -584,11 +576,7 @@ export async function getGradeTreeOfAllUsers(
       req.params.assessmentModelId
     );
 
-  await isTeacherInChargeOrAdmin(
-    req.user as JwtClaims,
-    course.id,
-    HttpCode.Forbidden
-  );
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id);
 
   interface IdAndStudentNumber {
     userId: number;
@@ -740,12 +728,8 @@ export async function getGradeTreeOfUser(
       req.params.assessmentModelId
     );
 
-  await isTeacherInChargeOrAdmin(
-    req.user as JwtClaims,
-    course.id,
-    HttpCode.Forbidden
-  );
-  await findUserById(userId, HttpCode.NotFound);
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id);
+  await findUserById(userId);
 
   interface AttainmentWithUserGrade extends Attainment {
     AttainmentGrades: Array<AttainmentGrade>;
@@ -1182,7 +1166,7 @@ export async function editUserGrade(
     req.params.assessmentModelId
   );
 
-  await isTeacherInChargeOrAdmin(grader, course.id, HttpCode.Forbidden);
+  await isTeacherInChargeOrAdmin(grader, course.id);
 
   const gradeData: AttainmentGrade = await findAttainmentGradeById(
     gradeId,
@@ -1225,7 +1209,7 @@ export async function addGrades(
   // Validation path parameters.
   const courseId = Number(req.params.courseId);
 
-  await isTeacherInChargeOrAdmin(grader, courseId, HttpCode.Forbidden);
+  await isTeacherInChargeOrAdmin(grader, courseId);
 
   try {
     // Check all users (students) exists in db, create new users if needed.

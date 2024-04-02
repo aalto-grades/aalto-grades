@@ -69,11 +69,7 @@ export async function addAttainment(
 
   const requestTree: AttainmentData = req.body;
 
-  await isTeacherInChargeOrAdmin(
-    req.user as JwtClaims,
-    courseId,
-    HttpCode.Forbidden
-  );
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, courseId);
   try {
     const dbEntry: Attainment = await Attainment.create({
       courseId: courseId,
@@ -105,11 +101,7 @@ export async function updateAttainment(
 
   const requestTree: AttainmentData = req.body;
 
-  await isTeacherInChargeOrAdmin(
-    req.user as JwtClaims,
-    courseId,
-    HttpCode.Forbidden
-  );
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, courseId);
 
   const attainment: Attainment = await findAttainmentById(
     attainmentId,
@@ -135,11 +127,7 @@ export async function deleteAttainment(
   const courseId = Number(req.params.courseId);
   const attainmentId = Number(req.params.attainmentId);
 
-  await isTeacherInChargeOrAdmin(
-    req.user as JwtClaims,
-    courseId,
-    HttpCode.Forbidden
-  );
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, courseId);
 
   const attainment: Attainment = await findAttainmentById(
     attainmentId,

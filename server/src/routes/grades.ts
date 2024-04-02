@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import express, {Request, Router} from 'express';
-import {ParamsDictionary, RequestHandler} from 'express-serve-static-core';
+import {RequestHandler} from 'express-serve-static-core';
 import multer, {FileFilterCallback, Multer, memoryStorage} from 'multer';
 import passport from 'passport';
 import path from 'path';
@@ -11,7 +11,6 @@ import {processRequestBody} from 'zod-express-middleware';
 
 import {HttpCode} from '@common/types';
 import {
-  SisuCSVBody,
   SisuCSVSchema,
   addGrades,
   editUserGrade,
@@ -25,7 +24,7 @@ import {handleInvalidRequestJson} from '../middleware';
 import {controllerDispatcher} from '../middleware/errorHandler';
 import {ApiError} from '../types';
 
-export const router: Router = Router();
+export const router = Router();
 
 /**
  * Multer middleware configuration for handling CSV file uploads.
@@ -71,14 +70,9 @@ router.get(
 );
 
 // Actually gets the csv but the requirest type must be post to be able to use request.body
-type SisuCSVRequestHandler = RequestHandler<
-  ParamsDictionary,
-  unknown,
-  SisuCSVBody
->;
 router.post(
   '/v1/courses/:courseId/grades/csv/sisu',
-  passport.authenticate('jwt', {session: false}) as SisuCSVRequestHandler,
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json({limit: '10mb'}),
   handleInvalidRequestJson,
   processRequestBody(SisuCSVSchema),
