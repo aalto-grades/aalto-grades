@@ -7,6 +7,12 @@ import morgan from 'morgan';
 
 import logger, {syslogger} from '../configs/winston';
 
+morgan.token('remote-addr', req => {
+  return (req.headers['x-real-ip'] ||
+    req.headers['x-forwarded-for'] ||
+    req.socket.remoteAddress) as string;
+});
+
 /**
  * Log messages for incoming HTTP requests to the Express server. Morgan formats
  * the requests using a custom string format, and then logs them using winston logger.

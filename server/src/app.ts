@@ -21,7 +21,10 @@ require('./formulas');
 
 export const app: Application = express();
 
-app.use(requestLogger);
+if (NODE_ENV !== 'production') {
+  // Dont use colorful logs for production syslog logging
+  app.use(requestLogger);
+}
 
 if (NODE_ENV !== 'test') {
   // tests timeout for some reason if used
