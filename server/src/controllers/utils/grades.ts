@@ -8,7 +8,7 @@ import Attainment from '../../database/models/attainment';
 import AttainmentGrade from '../../database/models/attainmentGrade';
 import FinalGrade from '../../database/models/finalGrade';
 import User from '../../database/models/user';
-import {ApiError, zodIdSchema} from '../../types';
+import {ApiError, idSchema} from '../../types';
 
 /**
  * Retrieves the date of the latest grade for a user based on an assessment model ID.
@@ -158,9 +158,9 @@ export const findAttainmentGradeById = async (
 export const findAndValidateAttainmentGrade = async (
   gradeId: string
 ): Promise<AttainmentGrade> => {
-  const result = zodIdSchema.safeParse(gradeId);
+  const result = idSchema.safeParse(gradeId);
   if (!result.success) {
-    throw new ApiError(`Invalid attainment id ${gradeId}`, HttpCode.NotFound);
+    throw new ApiError(`Invalid attainment id ${gradeId}`, HttpCode.BadRequest);
   }
   return await findAttainmentGradeById(result.data);
 };

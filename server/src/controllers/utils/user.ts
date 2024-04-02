@@ -3,9 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 import {HttpCode, SystemRole} from '@common/types';
+import {Request} from 'express';
 import TeacherInCharge from '../../database/models/teacherInCharge';
 import User from '../../database/models/user';
-import {ApiError, JwtClaims} from '../../types';
+import {ApiError, JwtClaims, idSchema} from '../../types';
 
 /**
  * Finds a user by its ID and throws ApiError if not found.
@@ -16,6 +17,30 @@ export const findUserById = async (userId: number): Promise<User> => {
     throw new ApiError(`user with ID ${userId} not found`, HttpCode.NotFound);
   }
   return user;
+};
+
+/**
+ * Finds a user by url param id and also validates the url param.
+ * Throws ApiError if not found.
+ */
+export const findAndValidateUserId = async (userId: string): Promise<User> => {
+  const result = idSchema.safeParse(userId);
+  if (!result.success) {
+    throw new ApiError(`Invalid user id ${userId}`, HttpCode.BadRequest);
+  }
+  return await findUserById(result.data);
+};
+
+/**
+ * Validates user id url param. Throws ApiError if invalid or user not found.
+ */
+export const validateUserId = async (userId: string): Promise<number> => {
+  const result = idSchema.safeParse(userId);
+  if (!result.success) {
+    throw new ApiError(`Invalid user id ${userId}`, HttpCode.BadRequest);
+  }
+  await findUserById(result.data);
+  return result.data;
 };
 
 /**
@@ -38,4 +63,20 @@ export const isTeacherInChargeOrAdmin = async (
       HttpCode.Forbidden
     );
   }
+};
+
+/**
+ * Checks if the user making the request is an admin or the owner of the data being accessed.
+ * Throws ApiError if the user id is invalid or the user does not have correct permissions.
+ */
+export const adminOrOwner = async (req: Request): Promise<User> => {
+  const userId = await validateUserId(req.params.userId);
+  const userToken = req.user as JwtClaims;
+
+  if (userId !== userToken.id && userToken.role !== SystemRole.Admin) {
+    throw new ApiError("cannot access user's courses", HttpCode.Forbidden);
+  }
+
+  // Confirm that user exists and return.
+  return await findUserById(userId);
 };

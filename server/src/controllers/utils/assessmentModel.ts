@@ -2,11 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {HttpCode} from '@common/types';
 import AssessmentModel from '../../database/models/assessmentModel';
 import Course from '../../database/models/course';
-
-import {HttpCode} from '@common/types';
-import {ApiError, zodIdSchema} from '../../types';
+import {ApiError, idSchema} from '../../types';
 import {findAndValidateCourseId} from './course';
 
 /**
@@ -33,11 +32,11 @@ export const findAssessmentModelById = async (
 const findAndValidateAssessmentModelId = async (
   courseId: string
 ): Promise<AssessmentModel> => {
-  const result = zodIdSchema.safeParse(courseId);
+  const result = idSchema.safeParse(courseId);
   if (!result.success) {
     throw new ApiError(
       `Invalid assessment model id ${courseId}`,
-      HttpCode.NotFound
+      HttpCode.BadRequest
     );
   }
   return await findAssessmentModelById(result.data);

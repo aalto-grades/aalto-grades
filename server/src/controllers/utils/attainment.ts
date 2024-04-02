@@ -5,7 +5,7 @@
 import {AttainmentData, HttpCode} from '@common/types';
 import Attainment from '../../database/models/attainment';
 import Course from '../../database/models/course';
-import {ApiError, zodIdSchema} from '../../types';
+import {ApiError, idSchema} from '../../types';
 import {findAndValidateCourseId} from './course';
 
 /**
@@ -45,11 +45,11 @@ export const findAttainmentsByCourseId = async (
 const findAndValidateAttainmentId = async (
   attainmentId: string
 ): Promise<Attainment> => {
-  const result = zodIdSchema.safeParse(attainmentId);
+  const result = idSchema.safeParse(attainmentId);
   if (!result.success) {
     throw new ApiError(
       `Invalid attainment id ${attainmentId}`,
-      HttpCode.NotFound
+      HttpCode.BadRequest
     );
   }
   return await findAttainmentById(result.data);

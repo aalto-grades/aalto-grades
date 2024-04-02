@@ -13,7 +13,7 @@ import Course from '../database/models/course';
 import CourseTranslation from '../database/models/courseTranslation';
 import TeacherInCharge from '../database/models/teacherInCharge';
 import User from '../database/models/user';
-import {ApiError, CourseFull, zodLocalizedStringSchema} from '../types';
+import {ApiError, CourseFull, localizedStringSchema} from '../types';
 import {
   findAndValidateCourseId,
   findCourseFullById,
@@ -55,8 +55,8 @@ export const addCourseBodySchema = z
     gradingScale: z.nativeEnum(GradingScale),
     languageOfInstruction: z.nativeEnum(Language),
     teachersInCharge: z.array(z.object({email: z.string().email()})),
-    department: zodLocalizedStringSchema,
-    name: zodLocalizedStringSchema,
+    department: localizedStringSchema,
+    name: localizedStringSchema,
   })
   .refine(val => val.maxCredits >= val.minCredits);
 type AddCourseBody = z.infer<typeof addCourseBodySchema>;
@@ -126,8 +126,8 @@ export const editCourseBodySchema = z
     gradingScale: z.nativeEnum(GradingScale).optional(),
     languageOfInstruction: z.nativeEnum(Language).optional(),
     teachersInCharge: z.array(z.object({email: z.string().email()})).optional(),
-    department: zodLocalizedStringSchema.optional(),
-    name: zodLocalizedStringSchema.optional(),
+    department: localizedStringSchema.optional(),
+    name: localizedStringSchema.optional(),
   })
   .refine(
     val =>

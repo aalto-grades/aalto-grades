@@ -3,53 +3,50 @@
 // SPDX-License-Identifier: MIT
 
 import express, {Router} from 'express';
+import {RequestHandler} from 'express-serve-static-core';
 import passport from 'passport';
 
-import {
-  getCoursesOfUser,
-  getUserInfo,
-  addIdpUser,
-  getIdpUsers,
-  deleteIdpUser,
-} from '../controllers/user';
-import {controllerDispatcher} from '../middleware/errorHandler';
-import {authorization} from '../middleware/authorization';
 import {SystemRole} from '@common/types';
+import {processRequestBody} from 'zod-express-middleware';
+import {
+  addIddUserBodySchema,
+  addIdpUser,
+  deleteIdpUser,
+  getCoursesOfUser,
+  getIdpUsers,
+} from '../controllers/user';
 import {handleInvalidRequestJson} from '../middleware';
+import {authorization} from '../middleware/authorization';
+import {controllerDispatcher} from '../middleware/errorHandler';
 
-export const router: Router = Router();
+export const router = Router();
 
 router.get(
   '/v1/user/:userId/courses',
-  passport.authenticate('jwt', {session: false}),
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
   controllerDispatcher(getCoursesOfUser)
-);
-
-router.get(
-  '/v1/user/:userId',
-  passport.authenticate('jwt', {session: false}),
-  controllerDispatcher(getUserInfo)
 );
 
 router.post(
   '/v1/idp-users',
-  passport.authenticate('jwt', {session: false}),
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
   authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
+  processRequestBody(addIddUserBodySchema),
   controllerDispatcher(addIdpUser)
 );
 
 router.get(
   '/v1/idp-users',
-  passport.authenticate('jwt', {session: false}),
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
   authorization([SystemRole.Admin]),
   controllerDispatcher(getIdpUsers)
 );
 
 router.delete(
   '/v1/idp-users/:userId',
-  passport.authenticate('jwt', {session: false}),
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
   authorization([SystemRole.Admin]),
   express.json(),
   controllerDispatcher(deleteIdpUser)
