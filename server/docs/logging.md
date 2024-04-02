@@ -8,10 +8,21 @@ The server handles logging using [Winston](https://github.com/winstonjs/winston)
 
 [Morgan Configuration](/server/src/middleware/requestLogger.ts)
 
-### syslog
+### Syslog
 
 Logs are logged to cli by winston and Docker forwards the logs to syslog
+using tcp. Docker sends the messages to syslog port 601. So the server syslog configuration needs to have port 601 listening.
+Our solution uses [rsyslog](https://www.rsyslog.com/doc/index.html)
 
-using tcp. See backend logging part of
 
-[Docker compose](/docker-compose-from-images.yaml)
+For actual docker configuration
+See backend part of [Docker compose](/docker-compose-from-images.yaml)
+
+### Application logs
+
+While running, the application will log:
+
+-   Server Errors that are unhandled
+-   Server Exceptions that are handled, defined in middleware/controllers
+-   All http requests, in the format: ':remote-addr :remote-user ":method :url HTTP/:http-version" :status  :res[content-length] ":referrer" ":user-agent"'
+-   Database queries
