@@ -40,14 +40,14 @@ const CalculateFinalGradesDialog = ({
   calculateFinalGrades,
 }: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
-  const assesmentModels = useGetAllAssessmentModels(courseId);
+  const assessmentModels = useGetAllAssessmentModels(courseId);
 
   const [dateOverride, setDateOverride] = useState<boolean>(false);
   const [gradingDate, setGradingDate] = useState<Dayjs>(dayjs());
   const [selectedModel, setSelectedModel] = useState<string>('');
   const modelList = useMemo(
-    () => assesmentModels.data ?? [],
-    [assesmentModels.data]
+    () => assessmentModels.data ?? [],
+    [assessmentModels.data]
   );
 
   useEffect(() => {
@@ -92,13 +92,13 @@ const CalculateFinalGradesDialog = ({
             : `Calculating final grades for ${selectedRows.length} students`}
         </Typography>
         <FormControl sx={{display: 'block', mb: 2}}>
-          <InputLabel id="calculateGradesSelect">Assesment model</InputLabel>
+          <InputLabel id="calculateGradesSelect">Assessment model</InputLabel>
           <Select
             sx={{width: '100%'}}
             labelId="calculateGradesSelect"
             value={selectedModel}
             onChange={e => setSelectedModel(e.target.value)}
-            label="Assesment model"
+            label="Assessment model"
           >
             {modelList.map(model => (
               <MenuItem

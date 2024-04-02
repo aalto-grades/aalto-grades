@@ -10,7 +10,7 @@ import {ApiError, zodIdSchema} from '../../types';
 import {findAndValidateCourseId} from './course';
 
 /**
- * Finds an assesment model by id and throws ApiError if not found.
+ * Finds an assessment model by id and throws ApiError if not found.
  */
 export const findAssessmentModelById = async (
   assessmentModelId: number
@@ -27,7 +27,7 @@ export const findAssessmentModelById = async (
 };
 
 /**
- * Finds an assesment model by url param id and also validates the url param.
+ * Finds an assessment model by url param id and also validates the url param.
  */
 const findAndValidateAssessmentModelId = async (
   courseId: string
@@ -35,7 +35,7 @@ const findAndValidateAssessmentModelId = async (
   const result = zodIdSchema.safeParse(courseId);
   if (!result.success) {
     throw new ApiError(
-      `Invalid assesment model id ${courseId}`,
+      `Invalid assessment model id ${courseId}`,
       HttpCode.NotFound
     );
   }
@@ -43,7 +43,7 @@ const findAndValidateAssessmentModelId = async (
 };
 
 /**
- * Finds the course and the assesment model by url param ids and also validates the url params.
+ * Finds the course and the assessment model by url param ids and also validates the url params.
  */
 export const validateAssessmentModelPath = async (
   courseId: string,

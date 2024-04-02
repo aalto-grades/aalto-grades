@@ -20,7 +20,7 @@ export const getAssessmentModel = async (
 ): Promise<void> => {
   const [_course, assessmentModel] = await validateAssessmentModelPath(
     req.params.courseId,
-    req.params.assesmentModelId
+    req.params.assessmentModelId
   );
 
   const assessmentModelData: AssessmentModelData = {
@@ -58,7 +58,7 @@ export const getAllAssessmentModels = async (
   res.status(HttpCode.Ok).json({data: assessmentModelsData});
 };
 
-export const addAssesmentModelBodySchema = z.object({
+export const addAssessmentModelBodySchema = z.object({
   name: z.string(),
   graphStructure: z.object({
     nodes: z.array(z.any()),
@@ -66,10 +66,12 @@ export const addAssesmentModelBodySchema = z.object({
     nodeData: z.array(z.any()),
   }), // TODO: improve
 });
-export type AddAssesmentModelBody = z.infer<typeof addAssesmentModelBodySchema>;
+export type AddAssessmentModelBody = z.infer<
+  typeof addAssessmentModelBodySchema
+>;
 
 export const addAssessmentModel = async (
-  req: Request<ParamsDictionary, unknown, AddAssesmentModelBody>,
+  req: Request<ParamsDictionary, unknown, AddAssessmentModelBody>,
   res: Response
 ): Promise<void> => {
   const course = await findAndValidateCourseId(req.params.courseId);
@@ -99,7 +101,7 @@ export const addAssessmentModel = async (
   res.status(HttpCode.Ok).json({data: assessmentModel.id});
 };
 
-export const updateAssesmentModelBodySchema = z.object({
+export const updateAssessmentModelBodySchema = z.object({
   name: z.string(),
   graphStructure: z.object({
     nodes: z.array(z.any()),
@@ -107,12 +109,12 @@ export const updateAssesmentModelBodySchema = z.object({
     nodeData: z.array(z.any()),
   }), // TODO: improve
 });
-export type UpdateAssesmentModelBody = z.infer<
-  typeof updateAssesmentModelBodySchema
+export type UpdateAssessmentModelBody = z.infer<
+  typeof updateAssessmentModelBodySchema
 >;
 
 export const updateAssessmentModel = async (
-  req: Request<ParamsDictionary, unknown, UpdateAssesmentModelBody>,
+  req: Request<ParamsDictionary, unknown, UpdateAssessmentModelBody>,
   res: Response
 ): Promise<void> => {
   const [course, assessmentModel] = await validateAssessmentModelPath(
@@ -156,7 +158,7 @@ export const deleteAssessmentModel = async (
     );
   }
 
-  // Delete assesment model.
+  // Delete assessment model.
   await assessmentModel.destroy();
 
   res.status(HttpCode.Ok).json({id: assessmentModel.id});

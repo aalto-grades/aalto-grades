@@ -308,7 +308,7 @@ async function getFinalGradesFor(
 }
 
 export const SisuCSVSchema = z.object({
-  assessmentDate: z.string().datetime().optional(), // Assesment date override
+  assessmentDate: z.string().datetime().optional(), // Assessment date override
   // All Sisu accepted language codes.
   completionLanguage: z.nativeEnum(Language).optional(), // Defaults to course language TODO: confirm that the Language enum is valid for SISU
   studentNumbers: z.array(z.string()).nonempty(),
@@ -383,7 +383,7 @@ export async function getSisuFormattedGradingCSV(
         // Round to get final grades as an integer.
         grade: String(Math.round(finalGrade.grade)),
         credits: course.maxCredits,
-        // Assesment date must be in form dd.mm.yyyy.
+        // Assessment date must be in form dd.mm.yyyy.
         // HERE we want to find the latest completed attainment grade for student
         assessmentDate: (req.body.assessmentDate
           ? new Date(req.body.assessmentDate)

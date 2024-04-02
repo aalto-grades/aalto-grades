@@ -22,7 +22,7 @@ import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
 export default function CourseResultsView(): JSX.Element {
   const {courseId} = useParams() as {courseId: string};
   const addFinalGrades = useAddFinalGrades(courseId);
-  const assesmentModels = useGetAllAssessmentModels(courseId);
+  const assessmentModels = useGetAllAssessmentModels(courseId);
   const getFinalGrades = useGetFinalGrades(courseId);
 
   const [missingFinalGrades, setMissingFinalGrades] = useState<boolean>(false);
@@ -78,8 +78,8 @@ export default function CourseResultsView(): JSX.Element {
     dateOverride: boolean,
     gradingDate: Date
   ): Promise<boolean> => {
-    const model = assesmentModels.data?.find(
-      assesmentModel => assesmentModel.id === assessmentModelId
+    const model = assessmentModels.data?.find(
+      assessmentModel => assessmentModel.id === assessmentModelId
     );
     if (model === undefined) return false;
 
