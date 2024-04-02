@@ -2,23 +2,27 @@
 //
 // SPDX-License-Identifier: MIT
 
-import express, {Router} from 'express';
-import passport from 'passport';
 import bodyParser from 'body-parser';
+import express, {Router} from 'express';
+import {RequestHandler} from 'express-serve-static-core';
+import passport from 'passport';
 
+import {processRequestBody} from 'zod-express-middleware';
+import {NODE_ENV} from '../configs/environment';
 import {
   authLogin,
   authLogout,
   authSamlLogin,
   authSelfInfo,
   authSignup,
+  authSignupBodySchema,
   samlMetadata,
 } from '../controllers/auth';
+import {handleInvalidRequestJson} from '../middleware';
 import {controllerDispatcher} from '../middleware/errorHandler';
 import {requestSyslogger} from '../middleware/requestLogger';
-import {NODE_ENV} from '../configs/environment';
 
-export const router: Router = Router();
+export const router = Router();
 
 if (NODE_ENV !== 'test') {
   // tests timeout for some reason if used
@@ -27,23 +31,27 @@ if (NODE_ENV !== 'test') {
 
 router.get(
   '/v1/auth/self-info',
-  passport.authenticate('jwt', {session: false}),
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json(),
   controllerDispatcher(authSelfInfo)
 );
 
-router.post('/v1/auth/login', express.json(), controllerDispatcher(authLogin));
+// Dispatchers not needed, because not async
+router.post('/v1/auth/login', express.json(), authLogin);
 
 router.post(
   '/v1/auth/logout',
-  passport.authenticate('jwt', {session: false}),
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json(),
-  controllerDispatcher(authLogout)
+  authLogout
 );
 
+// TODO: Remove route?
 router.post(
   '/v1/auth/signup',
   express.json(),
+  handleInvalidRequestJson,
+  processRequestBody(authSignupBodySchema),
   controllerDispatcher(authSignup)
 );
 
@@ -53,19 +61,15 @@ router.get(
     failureRedirect: '/',
     failureFlash: true,
     session: false,
-  }),
-  (req, res) => {
-    res.redirect('/');
-  }
+  }) as RequestHandler,
+  (req, res) => res.redirect('/')
 );
 
 router.post(
   '/v1/auth/login-idp/callback',
   bodyParser.urlencoded({extended: false}),
-  controllerDispatcher(authSamlLogin),
-  (req, res) => {
-    res.redirect('/');
-  }
+  authSamlLogin,
+  (req, res) => res.redirect('/')
 );
 
 router.get('/v1/auth/saml/metadata', controllerDispatcher(samlMetadata));

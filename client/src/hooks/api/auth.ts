@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import {LoginResult} from '@common/types';
-import axios from './axios';
 import {
   useMutation,
   UseMutationOptions,
@@ -12,57 +11,43 @@ import {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
-
 import {LoginCredentials, SignupCredentials} from '../../types';
+import axios from './axios';
 
-export function useGetRefreshToken(
+export const useGetRefreshToken = (
   options?: Partial<UseQueryOptions<LoginResult>>
-): UseQueryResult<LoginResult> {
-  return useQuery({
+): UseQueryResult<LoginResult> =>
+  useQuery({
     queryKey: ['refresh-token'],
     queryFn: async () =>
-      (await axios.get('/v1/auth/self-info')).data?.data ?? null,
+      (await axios.get<{data: LoginResult}>('/v1/auth/self-info')).data.data,
     ...options,
   });
-}
 
-export type UseLogInResult = UseMutationResult<
-  LoginResult,
-  unknown,
-  LoginCredentials
->;
-
-export function useLogIn(
+export const useLogIn = (
   options?: UseMutationOptions<LoginResult, unknown, LoginCredentials>
-): UseLogInResult {
-  return useMutation({
+): UseMutationResult<LoginResult, unknown, LoginCredentials> =>
+  useMutation({
     mutationFn: async (credentials: LoginCredentials) =>
-      (await axios.post('/v1/auth/login', credentials)).data.data,
+      (await axios.post<{data: LoginResult}>('/v1/auth/login', credentials))
+        .data.data,
     ...options,
   });
-}
 
-export function useLogOut(
+export const useLogOut = (
   options?: UseMutationOptions<unknown, unknown, unknown>
-): UseMutationResult<unknown, unknown, unknown> {
-  return useMutation({
+): UseMutationResult<unknown, unknown, unknown> =>
+  useMutation({
     mutationFn: async () => await axios.post('/v1/auth/logout'),
     ...options,
   });
-}
 
-export type UseSignUpResult = UseMutationResult<
-  LoginResult,
-  unknown,
-  SignupCredentials
->;
-
-export function useSignUp(
+export const useSignUp = (
   options?: UseMutationOptions<LoginResult, unknown, SignupCredentials>
-): UseSignUpResult {
-  return useMutation({
+): UseMutationResult<LoginResult, unknown, SignupCredentials> =>
+  useMutation({
     mutationFn: async (credentials: SignupCredentials) =>
-      (await axios.post('/v1/auth/signup', credentials)).data.data,
+      (await axios.post<{data: LoginResult}>('/v1/auth/signup', credentials))
+        .data.data,
     ...options,
   });
-}
