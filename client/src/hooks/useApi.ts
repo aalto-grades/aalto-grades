@@ -6,6 +6,5 @@ export * from './api/assessmentModel';
 export * from './api/attainment';
 export * from './api/auth';
 export * from './api/course';
-export * from './api/formula';
 export * from './api/grade';
 export * from './api/user';

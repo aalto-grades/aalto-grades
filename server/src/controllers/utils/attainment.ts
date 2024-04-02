@@ -4,7 +4,6 @@
 
 import {AttainmentData, HttpCode} from '@common/types';
 import Attainment from '../../database/models/attainment';
-import AttainmentGrade from '../../database/models/attainmentGrade';
 import Course from '../../database/models/course';
 import {ApiError, zodIdSchema} from '../../types';
 import {findAndValidateCourseId} from './course';
@@ -16,22 +15,6 @@ export const findAttainmentById = async (id: number): Promise<Attainment> => {
   const attainment = await Attainment.findByPk(id);
   if (!attainment) {
     throw new ApiError(`attainment with ID ${id} not found`, HttpCode.NotFound);
-  }
-  return attainment;
-};
-
-/**
- * Finds an attainment grade by its ID. Throws ApiError if not found.
- */
-export const findAttainmentGradeById = async (
-  id: number
-): Promise<AttainmentGrade> => {
-  const attainment = await AttainmentGrade.findByPk(id);
-  if (attainment === null) {
-    throw new ApiError(
-      `attainment grade with ID ${id} not found`,
-      HttpCode.NotFound
-    );
   }
   return attainment;
 };

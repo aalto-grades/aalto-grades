@@ -122,12 +122,14 @@ const SisuDownloadDialog = ({
 
     await downloadSisuGradeCsv.mutateAsync({
       courseId,
-      completionLanguage,
-      assessmentDate:
-        dateOverride && assessmentDate !== null
-          ? assessmentDate.toISOString()
-          : undefined,
-      studentNumbers,
+      data: {
+        completionLanguage,
+        assessmentDate:
+          dateOverride && assessmentDate !== null
+            ? assessmentDate.toISOString()
+            : undefined,
+        studentNumbers,
+      },
     });
     if (!exportedValuesInList) handleClose();
   };

@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {DateOnlyString} from '@common/types';
 import {
   CreationOptional,
   DataTypes,
@@ -29,8 +28,8 @@ export default class AttainmentGrade extends Model<
   declare manual?: boolean;
   declare status?: string;
   // Date when attainment is completed (e.g., deadline or exam date)
-  declare date: CreationOptional<Date | DateOnlyString>;
-  declare expiryDate: CreationOptional<Date | DateOnlyString>;
+  declare date: CreationOptional<Date>;
+  declare expiryDate: CreationOptional<Date>;
   declare comment: CreationOptional<string>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
