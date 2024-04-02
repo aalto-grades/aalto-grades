@@ -5,7 +5,6 @@
 import {
   AttainmentGradeData,
   EditGrade,
-  FinalGradeData,
   NewGrade,
   StudentGradesTree,
   StudentRow,
@@ -76,18 +75,6 @@ export function useDownloadSisuGradeCsv(
           studentNumbers: vars.studentNumbers,
         })
       ).data as BlobPart,
-    ...options,
-  });
-}
-
-export function useGetFinalGrades(
-  courseId: Numeric,
-  options?: Partial<UseQueryOptions<Array<FinalGradeData>>>
-): UseQueryResult<Array<FinalGradeData>> {
-  return useQuery({
-    queryKey: ['final-grades', courseId],
-    queryFn: async () =>
-      (await axios.get(`/v1/courses/${courseId}/finalGrades`)).data.data,
     ...options,
   });
 }

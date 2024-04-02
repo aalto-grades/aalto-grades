@@ -9,12 +9,8 @@ import {useParams} from 'react-router-dom';
 
 import {StudentRow} from '@common/types';
 import {batchCalculateGraph} from '@common/util/calculateGraph';
-import {useAddFinalGrades} from '../hooks/api/finalGrade';
-import {
-  useGetAllAssessmentModels,
-  useGetFinalGrades,
-  useGetGrades,
-} from '../hooks/useApi';
+import {useAddFinalGrades, useGetFinalGrades} from '../hooks/api/finalGrade';
+import {useGetAllAssessmentModels, useGetGrades} from '../hooks/useApi';
 import {findBestGradeOption} from '../utils';
 import CourseResultsTableToolbar from './course-results-view/CourseResultsTableToolbar';
 import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';

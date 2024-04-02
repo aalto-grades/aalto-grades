@@ -28,14 +28,6 @@ router.post(
 
 router.get(
   '/v1/courses/:courseId/finalGrades',
-  passport.authenticate('jwt', {session: false}),
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
   controllerDispatcher(getFinalGrades)
 );
-
-// router.post(
-//   '/v1/courses/:courseId/finalGrades/calculate',
-//   passport.authenticate('jwt', {session: false}),
-//   express.json(),
-//   handleInvalidRequestJson
-//   //   controllerDispatcher(calculateFinalGrades)
-// );
