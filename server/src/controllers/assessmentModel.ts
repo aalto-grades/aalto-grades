@@ -63,7 +63,7 @@ export const addAssessmentModelBodySchema = z.object({
   graphStructure: z.object({
     nodes: z.array(z.any()),
     edges: z.array(z.any()),
-    nodeData: z.array(z.any()),
+    nodeData: z.record(z.string(), z.any()),
   }), // TODO: improve
 });
 export type AddAssessmentModelBody = z.infer<
@@ -106,7 +106,7 @@ export const updateAssessmentModelBodySchema = z.object({
   graphStructure: z.object({
     nodes: z.array(z.any()),
     edges: z.array(z.any()),
-    nodeData: z.array(z.any()),
+    nodeData: z.record(z.string(), z.any()),
   }), // TODO: improve
 });
 export type UpdateAssessmentModelBody = z.infer<
