@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {DateOnlyString} from './general';
 import {Language, LocalizedString} from './language';
 import {UserData} from './user';
 
@@ -44,8 +43,8 @@ export interface CourseInstanceData {
   sisuCourseInstanceId?: string;
   startingPeriod?: Period;
   endingPeriod?: Period;
-  startDate: Date | DateOnlyString;
-  endDate: Date | DateOnlyString;
+  startDate: Date;
+  endDate: Date;
   type: string;
 }
 

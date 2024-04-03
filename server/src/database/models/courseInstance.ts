@@ -2,14 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {DateOnlyString} from '@common/types';
 import {
   CreationOptional,
   DataTypes,
   ForeignKey,
-  Model,
   InferAttributes,
   InferCreationAttributes,
+  Model,
 } from 'sequelize';
 
 import {sequelize} from '..';
@@ -33,8 +32,8 @@ export default class CourseInstance extends Model<
   declare startingPeriod: string;
   declare endingPeriod: string;
   declare type: string;
-  declare startDate: Date | DateOnlyString;
-  declare endDate: Date | DateOnlyString;
+  declare startDate: Date;
+  declare endDate: Date;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }

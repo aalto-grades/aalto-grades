@@ -14,5 +14,3 @@ export enum HttpCode {
   InternalServerError = 500,
   BadGateway = 502,
 }
-
-export type DateOnlyString = `${number}-${number}-${number}`; // Year - month - day

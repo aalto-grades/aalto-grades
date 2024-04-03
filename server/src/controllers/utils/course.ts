@@ -6,7 +6,7 @@ import {CourseData, HttpCode, Language} from '@common/types';
 import Course from '../../database/models/course';
 import CourseTranslation from '../../database/models/courseTranslation';
 import User from '../../database/models/user';
-import {ApiError, CourseFull, idSchema} from '../../types';
+import {ApiError, CourseFull, stringToIdSchema} from '../../types';
 
 /**
  * Finds a course by its ID. Throws ApiError if not found.
@@ -127,7 +127,7 @@ export const validateEmailList = async (
 export const findAndValidateCourseId = async (
   courseId: string
 ): Promise<Course> => {
-  const result = idSchema.safeParse(courseId);
+  const result = stringToIdSchema.safeParse(courseId);
   if (!result.success)
     throw new ApiError(`Invalid course id ${courseId}`, HttpCode.BadRequest);
   return await findCourseById(result.data);
@@ -138,7 +138,7 @@ export const findAndValidateCourseId = async (
  * Throws ApiError if invalid or course not found.
  */
 export const validateCourseId = async (courseId: string): Promise<number> => {
-  const result = idSchema.safeParse(courseId);
+  const result = stringToIdSchema.safeParse(courseId);
   if (!result.success)
     throw new ApiError(`Invalid course id ${courseId}`, HttpCode.BadRequest);
   await findCourseById(result.data);

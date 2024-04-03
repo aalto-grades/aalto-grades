@@ -6,7 +6,7 @@ import {HttpCode, SystemRole} from '@common/types';
 import {Request} from 'express';
 import TeacherInCharge from '../../database/models/teacherInCharge';
 import User from '../../database/models/user';
-import {ApiError, JwtClaims, idSchema} from '../../types';
+import {ApiError, JwtClaims, stringToIdSchema} from '../../types';
 
 /**
  * Finds a user by its ID and throws ApiError if not found.
@@ -24,7 +24,7 @@ export const findUserById = async (userId: number): Promise<User> => {
  * Throws ApiError if not found.
  */
 export const findAndValidateUserId = async (userId: string): Promise<User> => {
-  const result = idSchema.safeParse(userId);
+  const result = stringToIdSchema.safeParse(userId);
   if (!result.success) {
     throw new ApiError(`Invalid user id ${userId}`, HttpCode.BadRequest);
   }
@@ -35,7 +35,7 @@ export const findAndValidateUserId = async (userId: string): Promise<User> => {
  * Validates user id url param. Throws ApiError if invalid or user not found.
  */
 export const validateUserId = async (userId: string): Promise<number> => {
-  const result = idSchema.safeParse(userId);
+  const result = stringToIdSchema.safeParse(userId);
   if (!result.success) {
     throw new ApiError(`Invalid user id ${userId}`, HttpCode.BadRequest);
   }

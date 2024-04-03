@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {DateOnlyString, GradeOption, Language} from '@common/types';
+import {GradeOption, Language} from '@common/types';
 import {LanguageOption} from '../types';
 
 type Resolve = (value: void | PromiseLike<void>) => void;
@@ -24,9 +24,7 @@ export function getParamLabel(labelKey: string): string {
  * @param date - The grade date to check.
  * @returns True if the grade date has expired, false otherwise.
  */
-export const isGradeDateExpired = (
-  date: Date | DateOnlyString | undefined
-): boolean => {
+export const isGradeDateExpired = (date: Date | undefined): boolean => {
   if (!date) return false;
   return new Date().getTime() > new Date(date).getTime();
 };

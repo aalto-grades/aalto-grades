@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import {FinalGradeData} from '@common/types/finalGrade';
-import {DateOnlyString} from './general';
 import {UserData} from './user';
 
 export enum Status {
@@ -17,8 +16,8 @@ export interface GradeOption {
   grader: UserData;
   grade: number;
   exportedToSisu?: Date;
-  date?: Date | DateOnlyString;
-  expiryDate?: Date | DateOnlyString;
+  date?: Date;
+  expiryDate?: Date;
   comment: string;
 }
 
@@ -39,7 +38,7 @@ export interface AttainmentGradeData {
   subAttainments?: Array<AttainmentGradeData>;
 }
 
-//This is one element of what we receive from the backend API
+// This is one element of what we receive from the backend API
 export interface StudentGradesTree {
   userId: number;
   studentNumber: string;
@@ -65,7 +64,7 @@ export type StudentRow = {
 export interface EditGrade {
   grade?: number;
   status?: Status;
-  date?: Date | DateOnlyString;
-  expiryDate?: Date | DateOnlyString;
+  date?: Date;
+  expiryDate?: Date;
   comment?: string;
 }

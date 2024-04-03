@@ -25,7 +25,6 @@ import User from '../database/models/user';
 import {AttainmentGradeModelData, JwtClaims} from '../types';
 import {validateAssessmentModelPath} from './utils/assessmentModel';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
-import {toDateOnlyString} from './utils/date';
 import {
   findAndValidateAttainmentGrade,
   getDateOfLatestGrade,
@@ -92,8 +91,8 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
       },
       grade: grade.grade,
       exportedToSisu: grade.sisuExportDate,
-      date: toDateOnlyString(grade.date),
-      expiryDate: toDateOnlyString(grade.expiryDate),
+      date: grade.date,
+      expiryDate: grade.expiryDate,
       comment: grade.comment,
     });
   }

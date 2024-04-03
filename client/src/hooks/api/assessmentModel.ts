@@ -2,15 +2,20 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AssessmentModelData} from '@common/types';
 import {
-  useMutation,
+  AssesmentModelDataSchema,
+  AssessmentModelData,
+  AssessmentModelDataArraySchema,
+  IdSchema,
+} from '@common/types';
+import {
   UseMutationOptions,
   UseMutationResult,
-  useQuery,
-  useQueryClient,
   UseQueryOptions,
   UseQueryResult,
+  useMutation,
+  useQuery,
+  useQueryClient,
 } from '@tanstack/react-query';
 import {Numeric} from '../../types';
 import axios from './axios';
@@ -22,11 +27,9 @@ export const useGetAllAssessmentModels = (
   useQuery({
     queryKey: ['all-assessment-models', courseId],
     queryFn: async () =>
-      (
-        await axios.get<{data: AssessmentModelData[]}>(
-          `/v1/courses/${courseId}/assessment-models`
-        )
-      ).data.data,
+      AssessmentModelDataArraySchema.parse(
+        (await axios.get(`/v1/courses/${courseId}/assessment-models`)).data
+      ),
     ...options,
   });
 
@@ -34,18 +37,19 @@ export const useGetAssessmentModel = (
   courseId: Numeric,
   assessmentModelId: Numeric,
   options?: Partial<UseQueryOptions<AssessmentModelData>>
-): UseQueryResult<AssessmentModelData> => {
-  return useQuery({
+): UseQueryResult<AssessmentModelData> =>
+  useQuery({
     queryKey: ['assessment-model', courseId, assessmentModelId],
     queryFn: async () =>
-      (
-        await axios.get<{data: AssessmentModelData}>(
-          `/v1/courses/${courseId}/assessment-models/${assessmentModelId}`
-        )
-      ).data.data,
+      AssesmentModelDataSchema.parse(
+        (
+          await axios.get(
+            `/v1/courses/${courseId}/assessment-models/${assessmentModelId}`
+          )
+        ).data
+      ),
     ...options,
   });
-};
 
 type AddAssessmentModelVars = {
   courseId: Numeric;
@@ -58,12 +62,14 @@ export const useAddAssessmentModel = (
 
   return useMutation({
     mutationFn: async (vars: AddAssessmentModelVars) =>
-      (
-        await axios.post<{data: number}>(
-          `/v1/courses/${vars.courseId}/assessment-models`,
-          vars.assessmentModel
-        )
-      ).data.data,
+      IdSchema.parse(
+        (
+          await axios.post(
+            `/v1/courses/${vars.courseId}/assessment-models`,
+            vars.assessmentModel
+          )
+        ).data
+      ),
 
     onSuccess: (_data: number, vars: AddAssessmentModelVars) => {
       queryClient.invalidateQueries({
@@ -80,20 +86,18 @@ type EditAssessmentModelVars = {
   assessmentModel: AssessmentModelData;
 };
 export const useEditAssessmentModel = (
-  options?: UseMutationOptions<number, unknown, unknown>
-): UseMutationResult<number, unknown, EditAssessmentModelVars> => {
+  options?: UseMutationOptions<unknown, unknown, unknown>
+): UseMutationResult<unknown, unknown, EditAssessmentModelVars> => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (vars: EditAssessmentModelVars) =>
-      (
-        await axios.put<{id: number}>(
-          `/v1/courses/${vars.courseId}/assessment-models/${vars.assessmentModelId}`,
-          vars.assessmentModel
-        )
-      ).data.id,
+      await axios.put(
+        `/v1/courses/${vars.courseId}/assessment-models/${vars.assessmentModelId}`,
+        vars.assessmentModel
+      ),
 
-    onSuccess: (_data: number, vars: EditAssessmentModelVars) => {
+    onSuccess: (_data: unknown, vars: EditAssessmentModelVars) => {
       queryClient.invalidateQueries({
         queryKey: ['assessment-model', vars.courseId, vars.assessmentModelId],
       });
@@ -111,17 +115,15 @@ type DeleteAssessmentModelVars = {
   assessmentModelId: Numeric;
 };
 export const useDeleteAssessmentModel = (
-  options?: UseMutationOptions<number, unknown, unknown>
-): UseMutationResult<number, unknown, DeleteAssessmentModelVars> => {
+  options?: UseMutationOptions<unknown, unknown, unknown>
+): UseMutationResult<unknown, unknown, DeleteAssessmentModelVars> => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (vars: DeleteAssessmentModelVars) =>
-      (
-        await axios.delete<{id: number}>(
-          `/v1/courses/${vars.courseId}/assessment-models/${vars.assessmentModelId}`
-        )
-      ).data.id,
+      await axios.delete(
+        `/v1/courses/${vars.courseId}/assessment-models/${vars.assessmentModelId}`
+      ),
 
     onSuccess: (_data: unknown, vars: DeleteAssessmentModelVars) => {
       queryClient.invalidateQueries({
