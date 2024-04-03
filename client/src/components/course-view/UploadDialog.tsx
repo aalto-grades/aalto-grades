@@ -37,17 +37,10 @@ const UploadDialog = ({
   const [ready, setReady] = useState<boolean>(false);
   const [dates, setDates] = useState<
     {attainmentName: string; completionDate: Dayjs; expirationDate: Dayjs}[]
-  >(
-    attainmentData.map(att => ({
-      attainmentName: att.name,
-      completionDate: dayjs(),
-      expirationDate: dayjs().add(att.daysValid as number, 'day'),
-    }))
-  );
-  const [init, setInit] = useState<boolean>(false);
+  >([]);
 
   useEffect(() => {
-    if (init || attainmentData.length === 0) return;
+    if (attainmentData.length === dates.length) return;
     setDates(
       attainmentData.map(att => ({
         attainmentName: att.name,
@@ -55,8 +48,7 @@ const UploadDialog = ({
         expirationDate: dayjs().add(att.daysValid as number, 'day'),
       }))
     );
-    setInit(true);
-  }, [attainmentData, init]);
+  }, [attainmentData, dates.length]);
 
   if (attainments.data === undefined) return <></>;
 
@@ -113,9 +105,9 @@ const UploadDialog = ({
         )
           continue; // Skip empty cells
         gradeData.push({
-          studentNumber: row.StudentNo.toString(),
+          studentNumber: (row.StudentNo as string | number).toString(),
           attainmentId: attainment.id,
-          grade: row[attainment.name],
+          grade: row[attainment.name] as number,
           date: dates
             .find(date => date.attainmentName === attainment.name)
             ?.completionDate.toDate(),
@@ -144,7 +136,6 @@ const UploadDialog = ({
         expirationDate: dayjs().add(att.daysValid as number, 'day'),
       }))
     );
-    setInit(false);
     onClose();
   };
 
