@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {FinalGradeData, Status} from '@common/types';
+import {FinalGradeData} from '@common/types';
 
 export const mockFinalGrades: FinalGradeData[] = [
   {
@@ -12,6 +12,7 @@ export const mockFinalGrades: FinalGradeData[] = [
     graderId: 5,
     grade: 5,
     date: new Date('2023-01-01'),
+    sisuExportDate: null,
   },
   {
     userId: 2,
@@ -20,6 +21,7 @@ export const mockFinalGrades: FinalGradeData[] = [
     graderId: 5,
     grade: 5,
     date: new Date('2023-01-01'),
+    sisuExportDate: null,
   },
   {
     userId: 3,
@@ -28,5 +30,6 @@ export const mockFinalGrades: FinalGradeData[] = [
     graderId: 5,
     grade: 5,
     date: new Date('2023-01-01'),
+    sisuExportDate: null,
   },
 ];
