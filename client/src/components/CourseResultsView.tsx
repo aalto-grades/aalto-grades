@@ -9,12 +9,8 @@ import {useParams} from 'react-router-dom';
 
 import {StudentRow} from '@common/types';
 import {batchCalculateGraph} from '@common/util/calculateGraph';
-import {useAddFinalGrades} from '../hooks/api/finalGrade';
-import {
-  useGetAllAssessmentModels,
-  useGetFinalGrades,
-  useGetGrades,
-} from '../hooks/useApi';
+import {useAddFinalGrades, useGetFinalGrades} from '../hooks/api/finalGrade';
+import {useGetAllAssessmentModels, useGetGrades} from '../hooks/useApi';
 import {findBestGradeOption} from '../utils';
 import CourseResultsTableToolbar from './course-results-view/CourseResultsTableToolbar';
 import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
@@ -22,7 +18,7 @@ import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
 export default function CourseResultsView(): JSX.Element {
   const {courseId} = useParams() as {courseId: string};
   const addFinalGrades = useAddFinalGrades(courseId);
-  const assesmentModels = useGetAllAssessmentModels(courseId);
+  const assessmentModels = useGetAllAssessmentModels(courseId);
   const getFinalGrades = useGetFinalGrades(courseId);
 
   const [missingFinalGrades, setMissingFinalGrades] = useState<boolean>(false);
@@ -78,8 +74,8 @@ export default function CourseResultsView(): JSX.Element {
     dateOverride: boolean,
     gradingDate: Date
   ): Promise<boolean> => {
-    const model = assesmentModels.data?.find(
-      assesmentModel => assesmentModel.id === assessmentModelId
+    const model = assessmentModels.data?.find(
+      assessmentModel => assessmentModel.id === assessmentModelId
     );
     if (model === undefined) return false;
 

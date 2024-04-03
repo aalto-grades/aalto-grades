@@ -14,7 +14,7 @@ import {
 import {JSX, SyntheticEvent, useState} from 'react';
 import {NavigateFunction, useNavigate} from 'react-router-dom';
 
-import {useSignUp, UseSignUpResult} from '../../hooks/useApi';
+import {useSignUp} from '../../hooks/useApi';
 import useAuth, {AuthContextType} from '../../hooks/useAuth';
 import {State} from '../../types';
 
@@ -30,7 +30,7 @@ export default function Signup(): JSX.Element {
     SystemRole.User
   );
 
-  const signUp: UseSignUpResult = useSignUp({
+  const signUp = useSignUp({
     onSuccess: (auth: LoginResult | null) => {
       // If signup successful, save user role to context
       setAuth(auth ?? null);

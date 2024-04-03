@@ -15,10 +15,8 @@ import {router as assessmentModelRouter} from './assessmentModel';
 import {router as attainmentRouter} from './attainment';
 import {router as authRouter} from './auth';
 import {router as courseRouter} from './course';
-import {router as courseInstanceRouter} from './courseInstance';
 import {router as finalGradesRouter} from './finalGrades';
 import {router as gradesRouter} from './grades';
-import {router as sisuRouter} from './sisu';
 import {router as userRouter} from './user';
 
 const options: OAS3Options = {
@@ -35,10 +33,8 @@ router.use(assessmentModelRouter);
 router.use(attainmentRouter);
 router.use(authRouter);
 router.use(courseRouter);
-router.use(courseInstanceRouter);
 router.use(finalGradesRouter);
 router.use(gradesRouter);
-router.use(sisuRouter);
 router.use(userRouter);
 
 router.use('/api-docs', swaggerUI.serve);

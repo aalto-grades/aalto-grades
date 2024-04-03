@@ -2,21 +2,20 @@
 //
 // SPDX-License-Identifier: MIT
 
-import * as yup from 'yup';
-
+import {ZodError, z} from 'zod';
 import {localizedStringSchema} from '../../src/types';
 
 describe('Test localizedStringSchema', () => {
-  async function runValidation(input: object): Promise<void> {
-    const schema: yup.AnyObjectSchema = yup.object().shape({
-      name: localizedStringSchema.required(),
+  function runValidation(input: object): void {
+    const schema = z.object({
+      name: localizedStringSchema,
       department: localizedStringSchema,
     });
-    await schema.validate(input, {abortEarly: false});
+    schema.parse(input);
   }
 
-  it('should resolve with correct input', async () => {
-    await expect(
+  it('should resolve with correct input', () => {
+    expect(
       runValidation({
         name: {
           fi: 'Differentiaali- ja intergraalilaskenta 1',
@@ -31,7 +30,7 @@ describe('Test localizedStringSchema', () => {
       })
     ).resolves;
 
-    await expect(
+    expect(
       runValidation({
         name: {
           fi: 'Differentiaali- ja intergraalilaskenta 1',
@@ -45,8 +44,8 @@ describe('Test localizedStringSchema', () => {
     ).resolves;
   });
 
-  it('should resolve, if a non-required localized string is undefined', async () => {
-    await expect(
+  it('should resolve, if a non-required localized string is undefined', () => {
+    expect(
       runValidation({
         name: {
           fi: 'Differentiaali- ja intergraalilaskenta 1',
@@ -66,7 +65,7 @@ describe('Test localizedStringSchema', () => {
           sv: 'Institutionen för matematik och systemanalys',
         },
       })
-    ).rejects.toThrow(yup.ValidationError);
+    ).rejects.toThrow(ZodError);
   });
 
   it('should reject and throw ValidationError, if the object for a localized string is empty', async () => {
@@ -79,7 +78,7 @@ describe('Test localizedStringSchema', () => {
         },
         department: {},
       })
-    ).rejects.toThrow(yup.ValidationError);
+    ).rejects.toThrow(ZodError);
   });
 
   it(
@@ -96,7 +95,7 @@ describe('Test localizedStringSchema', () => {
             test: 'not valid',
           },
         })
-      ).rejects.toThrow(yup.ValidationError);
+      ).rejects.toThrow(ZodError);
     }
   );
 });

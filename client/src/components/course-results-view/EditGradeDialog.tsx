@@ -29,7 +29,7 @@ import * as yup from 'yup';
 import {enqueueSnackbar} from 'notistack';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
-import {UseEditGradeResult, useEditGrade} from '../../hooks/useApi';
+import {useEditGrade} from '../../hooks/useApi';
 import {State} from '../../types';
 import {findBestGradeOption} from '../../utils';
 
@@ -45,7 +45,7 @@ export default function EditGradeDialog(props: {
     assessmentModelId: string;
   };
 
-  const editGrade: UseEditGradeResult = useEditGrade();
+  const editGrade = useEditGrade();
 
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
 

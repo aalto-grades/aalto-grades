@@ -14,7 +14,6 @@ import {
 
 import {sequelize} from '..';
 import AssessmentModel from './assessmentModel';
-import Attainment from './attainment';
 import Course from './course';
 import User from './user';
 
@@ -28,9 +27,9 @@ export default class FinalGrade extends Model<
   declare assessmentModelId: ForeignKey<AssessmentModel['id']>;
   declare graderId: ForeignKey<User['id']>;
   declare grade: number;
-  declare sisuExportDate: CreationOptional<Date>;
+  declare sisuExportDate: Date | null;
   // Date when attainment is completed (e.g., deadline or exam date)
-  declare date: CreationOptional<Date | DateOnlyString>;
+  declare date: CreationOptional<Date>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   grader?: User;

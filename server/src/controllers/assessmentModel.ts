@@ -2,73 +2,48 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AssessmentModelData, HttpCode} from '@common/types';
 import {Request, Response} from 'express';
-import * as yup from 'yup';
+import {ParamsDictionary} from 'express-serve-static-core';
+import {z} from 'zod';
 
-import AssessmentModel from '../database/models/assessmentModel';
-import Course from '../database/models/course';
-
-import {ApiError, idSchema, JwtClaims} from '../types';
-import {findAssessmentModelById} from './utils/assessmentModel';
-import {findCourseById} from './utils/course';
-import {isTeacherInChargeOrAdmin} from './utils/user';
+import {AssessmentModelData, HttpCode} from '@common/types';
 import {GraphStructure} from '@common/types/graph';
+import AssessmentModel from '../database/models/assessmentModel';
+import {ApiError, JwtClaims} from '../types';
+import {validateAssessmentModelPath} from './utils/assessmentModel';
+import {findAndValidateCourseId} from './utils/course';
+import {isTeacherInChargeOrAdmin} from './utils/user';
 
-export async function getAssessmentModel(
+export const getAssessmentModel = async (
   req: Request,
   res: Response
-): Promise<void> {
-  const courseId: number = Number(req.params.courseId);
-  await idSchema.validate({id: courseId});
-
-  const assessmentModelId: number = Number(req.params.assessmentModelId);
-  await idSchema.validate({id: assessmentModelId});
-
-  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
-
-  const assessmentModel: AssessmentModel = await findAssessmentModelById(
-    assessmentModelId,
-    HttpCode.NotFound
+): Promise<void> => {
+  const [_course, assessmentModel] = await validateAssessmentModelPath(
+    req.params.courseId,
+    req.params.assessmentModelId
   );
-
-  if (assessmentModel.courseId !== course.id) {
-    throw new ApiError(
-      `assessment model with ID ${assessmentModelId} ` +
-        `does not belong to the course with ID ${courseId}`,
-      HttpCode.Conflict
-    );
-  }
 
   const assessmentModelData: AssessmentModelData = {
     id: assessmentModel.id,
     courseId: assessmentModel.courseId,
     name: assessmentModel.name,
-    graphStructure: assessmentModel.graphStructure as Object as GraphStructure,
+    graphStructure: assessmentModel.graphStructure as object as GraphStructure,
   };
 
-  res.status(HttpCode.Ok).json({
-    data: assessmentModelData,
-  });
-}
+  res.status(HttpCode.Ok).json({data: assessmentModelData});
+};
 
-export async function getAllAssessmentModels(
+export const getAllAssessmentModels = async (
   req: Request,
   res: Response
-): Promise<void> {
-  const courseId: number = Number(req.params.courseId);
-  await idSchema.validate({id: courseId});
+): Promise<void> => {
+  const course = await findAndValidateCourseId(req.params.courseId);
 
-  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
+  const assessmentModels = await AssessmentModel.findAll({
+    where: {courseId: course.id},
+  });
 
-  const assessmentModels: Array<AssessmentModel> =
-    await AssessmentModel.findAll({
-      where: {
-        courseId: course.id,
-      },
-    });
-
-  const assessmentModelsData: Array<AssessmentModelData> = [];
+  const assessmentModelsData: AssessmentModelData[] = [];
 
   for (const assessmentModel of assessmentModels) {
     assessmentModelsData.push({
@@ -76,164 +51,107 @@ export async function getAllAssessmentModels(
       courseId: assessmentModel.courseId,
       name: assessmentModel.name,
       graphStructure:
-        assessmentModel.graphStructure as Object as GraphStructure,
+        assessmentModel.graphStructure as object as GraphStructure,
     });
   }
 
-  res.status(HttpCode.Ok).json({
-    data: assessmentModelsData,
-  });
-}
+  res.status(HttpCode.Ok).json({data: assessmentModelsData});
+};
 
-export async function addAssessmentModel(
-  req: Request,
+export const addAssessmentModelBodySchema = z.object({
+  name: z.string(),
+  graphStructure: z.object({
+    nodes: z.array(z.any()),
+    edges: z.array(z.any()),
+    nodeData: z.record(z.string(), z.any()),
+  }), // TODO: improve
+});
+type AddAssessmentModelBody = z.infer<typeof addAssessmentModelBodySchema>;
+
+export const addAssessmentModel = async (
+  req: Request<ParamsDictionary, unknown, AddAssessmentModelBody>,
   res: Response
-): Promise<void> {
-  const requestSchema: yup.AnyObjectSchema = yup.object().shape({
-    name: yup.string().strict().required(),
-    graphStructure: yup.object({
-      nodes: yup.array(),
-      edges: yup.array(),
-      nodeData: yup.object(),
-      nodeValues: yup.object(),
-    }), // TODO: improve
-  });
-
-  const courseId: number = Number(req.params.courseId);
-  await idSchema.validate({id: courseId});
-  const name: string = (
-    await requestSchema.validate(req.body, {abortEarly: false})
-  ).name;
-  const graphStructure = req.body.graphStructure;
-
-  // Confirm that course exists.
-  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
+): Promise<void> => {
+  const course = await findAndValidateCourseId(req.params.courseId);
 
   // Route is only available for admins and those who have teacher in charge role for the course.
-  await isTeacherInChargeOrAdmin(
-    req.user as JwtClaims,
-    courseId,
-    HttpCode.Forbidden
-  );
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id);
 
   // Find or create new assessment model based on name and course ID.
-  const [assessmentModel, created]: [AssessmentModel, boolean] =
-    await AssessmentModel.findOrCreate({
-      where: {
-        name: name,
-        courseId: course.id,
-      },
-      defaults: {
-        name: name,
-        graphStructure: JSON.parse(
-          JSON.stringify({
-            ...graphStructure,
-            nodes: graphStructure.nodes,
-            edges: graphStructure.edges,
-          })
-        ),
-      },
-    });
+  const [assessmentModel, created] = await AssessmentModel.findOrCreate({
+    where: {
+      name: req.body.name,
+      courseId: course.id,
+    },
+    defaults: {
+      name: req.body.name,
+      graphStructure: req.body.graphStructure as unknown as JSON,
+    },
+  });
 
   if (!created) {
     throw new ApiError(
-      `Assessment model with name '${name}' already exists in course ID ${course.id}`,
+      `Assessment model with name '${req.params.name}' already exists in course ID ${course.id}`,
       HttpCode.Conflict
     );
   }
 
-  res.status(HttpCode.Ok).json({
-    data: assessmentModel.id,
-  });
-}
+  res.status(HttpCode.Ok).json({data: assessmentModel.id});
+};
 
-export async function updateAssessmentModel(
-  req: Request,
+export const updateAssessmentModelBodySchema = z.object({
+  name: z.string(),
+  graphStructure: z.object({
+    nodes: z.array(z.any()),
+    edges: z.array(z.any()),
+    nodeData: z.record(z.string(), z.any()),
+  }), // TODO: improve
+});
+type UpdateAssessmentModelBody = z.infer<
+  typeof updateAssessmentModelBodySchema
+>;
+
+export const updateAssessmentModel = async (
+  req: Request<ParamsDictionary, unknown, UpdateAssessmentModelBody>,
   res: Response
-): Promise<void> {
-  const requestSchema: yup.AnyObjectSchema = yup.object().shape({
-    name: yup.string().strict().required(),
-  });
-
-  const courseId: number = Number(req.params.courseId);
-  await idSchema.validate({id: courseId});
-  const assessmentModelId: number = Number(req.params.assessmentModelId);
-  await idSchema.validate({id: assessmentModelId});
-  const name: string = (
-    await requestSchema.validate(req.body, {abortEarly: false})
-  ).name;
-  const graphStructure = req.body.graphStructure;
-
-  // Confirm that course exists.
-  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
+): Promise<void> => {
+  const [course, assessmentModel] = await validateAssessmentModelPath(
+    req.params.courseId,
+    req.params.assessmentModelId
+  );
 
   // Route is only available for admins and those who have teacher in charge role for the course.
-  await isTeacherInChargeOrAdmin(
-    req.user as JwtClaims,
-    courseId,
-    HttpCode.Forbidden
-  );
-
-  // Find assessment model by ID.
-  const assessmentModel: AssessmentModel = await findAssessmentModelById(
-    assessmentModelId,
-    HttpCode.NotFound
-  );
-
-  if (assessmentModel.courseId !== course.id) {
-    throw new ApiError(
-      `Assessment model with ID ${assessmentModelId} does not belong to course ID ${courseId}`,
-      HttpCode.Conflict
-    );
-  }
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id);
 
   // Update assessment model name.
-  await assessmentModel.update({name: name, graphStructure});
-
-  res.status(HttpCode.Ok).json({
-    data: {
-      id: assessmentModel.id,
-      courseId: assessmentModel.courseId,
-      name: assessmentModel.name,
-    },
+  await assessmentModel.update({
+    name: req.body.name,
+    graphStructure: req.body.graphStructure as unknown as JSON,
   });
-}
-export async function deleteAssessmentModel(
+
+  res.status(HttpCode.Ok).json({id: assessmentModel.id});
+};
+
+export const deleteAssessmentModel = async (
   req: Request,
   res: Response
-): Promise<void> {
-  const courseId: number = Number(req.params.courseId);
-  await idSchema.validate({id: courseId});
-  const assessmentModelId: number = Number(req.params.assessmentModelId);
-  await idSchema.validate({id: assessmentModelId});
-
-  // Confirm that course exists.
-  const course: Course = await findCourseById(courseId, HttpCode.NotFound);
-
+): Promise<void> => {
+  const [course, assessmentModel] = await validateAssessmentModelPath(
+    req.params.courseId,
+    req.params.assessmentModelId
+  );
   // Route is only available for admins and those who have teacher in charge role for the course.
-  await isTeacherInChargeOrAdmin(
-    req.user as JwtClaims,
-    courseId,
-    HttpCode.Forbidden
-  );
-
-  // Find assessment model by ID.
-  const assessmentModel: AssessmentModel = await findAssessmentModelById(
-    assessmentModelId,
-    HttpCode.NotFound
-  );
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id);
 
   if (assessmentModel.courseId !== course.id) {
     throw new ApiError(
-      `Assessment model with ID ${assessmentModelId} does not belong to course ID ${courseId}`,
+      `Assessment model with ID ${assessmentModel.id} does not belong to course ID ${course.id}`,
       HttpCode.Conflict
     );
   }
 
-  // Delete assesment model.
+  // Delete assessment model.
   await assessmentModel.destroy();
 
-  res.status(HttpCode.Ok).json({
-    id: assessmentModel.id,
-  });
-}
+  res.status(HttpCode.Ok).json({id: assessmentModel.id});
+};

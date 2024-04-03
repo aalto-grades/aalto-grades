@@ -42,7 +42,7 @@ export interface SisuCourseInstance {
     cefrLevel: string;
     level: LocalizedString;
     teacherInCharge: Array<string>;
-    assesmentMethods: LocalizedString;
+    assesmentMethods: LocalizedString; // TODO: Typo? Should be assessmentMethods?
     substitutes: {
       fi: LocalizedString['fi'];
       sv: LocalizedString['sv'];

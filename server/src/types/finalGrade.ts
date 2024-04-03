@@ -2,20 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {DateOnlyString} from '@common/types';
-
 export interface FinalGradeModelData {
   userId?: number;
   courseId: number;
   assessmentModelId: number;
   graderId?: number;
   grade: number;
-  date?: Date | DateOnlyString;
+  date?: Date;
 }
 
 export interface StudentFinalGrades {
   // User's ID (PK) in the database user table.
   id?: number;
   studentNumber: string;
-  grades: Array<FinalGradeModelData>;
+  grades: FinalGradeModelData[];
 }

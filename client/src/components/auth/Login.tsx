@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {LoginResult} from '@common/types';
-import {VisibilityOff, Visibility} from '@mui/icons-material';
+import {Visibility, VisibilityOff} from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -19,7 +19,7 @@ import {NavigateFunction, useNavigate} from 'react-router-dom';
 
 import ExternalAuth from './ExternalAuth';
 
-import {useLogIn, UseLogInResult} from '../../hooks/useApi';
+import {useLogIn} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import {State} from '../../types';
 
@@ -41,7 +41,7 @@ export default function Login(): JSX.Element {
   const [email, setEmail]: State<string> = useState('');
   const [password, setPassword]: State<string> = useState('');
 
-  const logIn: UseLogInResult = useLogIn({
+  const logIn = useLogIn({
     onSuccess: (auth: LoginResult | null) => {
       setAuth(auth ?? null);
       navigate('/', {replace: true});

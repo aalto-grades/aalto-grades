@@ -25,11 +25,11 @@ export interface AttainmentData {
   // To dismiss
   assessmentModelId?: number;
   parentId?: number;
-  minRequiredGrade: number;
-  maxGrade: number;
-  formula: Formula;
-  formulaParams: ParamsObject;
-  gradeType: GradeType;
+  minRequiredGrade?: number;
+  maxGrade?: number;
+  formula?: Formula;
+  formulaParams?: ParamsObject;
+  gradeType?: GradeType;
   subAttainments?: Array<AttainmentData>;
 }
 

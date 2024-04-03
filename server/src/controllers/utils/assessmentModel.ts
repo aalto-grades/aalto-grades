@@ -3,61 +3,65 @@
 // SPDX-License-Identifier: MIT
 
 import {HttpCode} from '@common/types';
-
 import AssessmentModel from '../../database/models/assessmentModel';
 import Course from '../../database/models/course';
-
-import {findCourseById} from './course';
 import {ApiError, idSchema} from '../../types';
+import {findAndValidateCourseId} from './course';
 
-export async function findAssessmentModelById(
-  assessmentModelId: number,
-  errorCode: HttpCode
-): Promise<AssessmentModel> {
-  const assessmentModel: AssessmentModel | null =
-    await AssessmentModel.findByPk(assessmentModelId);
+/**
+ * Finds an assessment model by id and throws ApiError if not found.
+ */
+export const findAssessmentModelById = async (
+  assessmentModelId: number
+): Promise<AssessmentModel> => {
+  const assessmentModel = await AssessmentModel.findByPk(assessmentModelId);
 
-  if (!assessmentModel) {
+  if (assessmentModel === null) {
     throw new ApiError(
       `assessment model with ID ${assessmentModelId} not found`,
-      errorCode
+      HttpCode.NotFound
     );
   }
   return assessmentModel;
-}
+};
 
-export async function validateAssessmentModelPath(
-  courseId: unknown,
-  assessmentModelId: unknown
-): Promise<[Course, AssessmentModel]> {
-  const courseIdValidated: number = (
-    await idSchema.validate({id: courseId}, {abortEarly: false})
-  ).id;
+/**
+ * Finds an assessment model by url param id and also validates the url param.
+ * Throws ApiError if not found.
+ */
+const findAndValidateAssessmentModelId = async (
+  courseId: string
+): Promise<AssessmentModel> => {
+  const result = idSchema.safeParse(courseId);
+  if (!result.success) {
+    throw new ApiError(
+      `Invalid assessment model id ${courseId}`,
+      HttpCode.BadRequest
+    );
+  }
+  return await findAssessmentModelById(result.data);
+};
 
-  const assessmentModelIdValidated: number = (
-    await idSchema.validate({id: assessmentModelId}, {abortEarly: false})
-  ).id;
-
-  // Ensure that course exists.
-  const course: Course = await findCourseById(
-    courseIdValidated,
-    HttpCode.NotFound
-  );
-
-  // Ensure that assessment model exists.
-  const assessmentModel: AssessmentModel = await findAssessmentModelById(
-    assessmentModelIdValidated,
-    HttpCode.NotFound
-  );
+/**
+ * Finds the course and the assessment model by url param ids and also validates the url params.
+ * Throws ApiError if either not found.
+ */
+export const validateAssessmentModelPath = async (
+  courseId: string,
+  assessmentModelId: string
+): Promise<[Course, AssessmentModel]> => {
+  const course = await findAndValidateCourseId(courseId);
+  const assessmentModel =
+    await findAndValidateAssessmentModelId(assessmentModelId);
 
   // Check that assessment model belongs to the course.
   if (assessmentModel.courseId !== course.id) {
     throw new ApiError(
-      `assessment model with ID ${assessmentModelId} ` +
-        `does not belong to the course with ID ${courseId}`,
+      `Assessment model with ID ${assessmentModel.id} ` +
+        `does not belong to the course with ID ${course.id}`,
       HttpCode.Conflict
     );
   }
 
   return [course, assessmentModel];
-}
+};
