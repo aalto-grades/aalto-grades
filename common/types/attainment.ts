@@ -2,32 +2,20 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Formula, ParamsObject} from './formula';
+import {z} from 'zod';
 
-export enum GradeType {
-  Integer = 'INTEGER',
-  Float = 'FLOAT',
-}
+export const NewAttainmentDataSchema = z.object({
+  courseId: z.number().int().optional(),
+  name: z.string(),
+  daysValid: z.number().int().nonnegative().optional(),
+});
+export const AttainmentDataSchema = z.object({
+  id: z.number().int(),
+  courseId: z.number().int().optional(),
+  name: z.string(),
+  daysValid: z.number().int().nonnegative().optional(),
+});
+export const AttainmentDataArraySchema = z.array(AttainmentDataSchema);
 
-export interface NewAttainmentData {
-  courseId?: number;
-  name: string;
-  daysValid?: number;
-}
-
-export interface AttainmentData {
-  id: number;
-  courseId?: number;
-  name: string;
-  daysValid?: number;
-
-  // To dismiss
-  assessmentModelId?: number;
-  parentId?: number;
-  minRequiredGrade?: number;
-  maxGrade?: number;
-  formula?: Formula;
-  formulaParams?: ParamsObject;
-  gradeType?: GradeType;
-  subAttainments?: Array<AttainmentData>;
-}
+export type NewAttainmentData = z.infer<typeof NewAttainmentDataSchema>;
+export type AttainmentData = z.infer<typeof AttainmentDataSchema>;

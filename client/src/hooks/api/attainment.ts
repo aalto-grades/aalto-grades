@@ -2,7 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentData, NewAttainmentData} from '@common/types/attainment';
+import {IdSchema} from '@common/types';
+import {
+  AttainmentData,
+  AttainmentDataArraySchema,
+  NewAttainmentData,
+} from '@common/types/attainment';
 import {
   UseMutationOptions,
   UseMutationResult,
@@ -22,11 +27,9 @@ export const useGetAttainments = (
   useQuery({
     queryKey: ['attainments', courseId],
     queryFn: async () =>
-      (
-        await axios.get<{data: AttainmentData[]}>(
-          `/v1/courses/${courseId}/attainments`
-        )
-      ).data.data,
+      AttainmentDataArraySchema.parse(
+        (await axios.get(`/v1/courses/${courseId}/attainments`)).data
+      ),
     ...options,
   });
 
@@ -34,26 +37,23 @@ type AddAttainmentVars = {
   courseId: Numeric;
   attainment: NewAttainmentData;
 };
-type UseAddAttainmentResult = UseMutationResult<
-  AttainmentData,
-  unknown,
-  AddAttainmentVars
->;
 export const useAddAttainment = (
-  options?: UseMutationOptions<AttainmentData, unknown, AddAttainmentVars>
-): UseAddAttainmentResult => {
+  options?: UseMutationOptions<number, unknown, AddAttainmentVars>
+): UseMutationResult<number, unknown, AddAttainmentVars> => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (vars: AddAttainmentVars) =>
-      (
-        await axios.post<{data: AttainmentData}>(
-          `/v1/courses/${vars.courseId}` + '/attainments',
-          vars.attainment
-        )
-      ).data.data,
+      IdSchema.parse(
+        (
+          await axios.post(
+            `/v1/courses/${vars.courseId}` + '/attainments',
+            vars.attainment
+          )
+        ).data
+      ),
 
-    onSuccess: (_data: AttainmentData, vars: AddAttainmentVars) => {
+    onSuccess: (_data: number, vars: AddAttainmentVars) => {
       queryClient.invalidateQueries({
         queryKey: ['attainments', vars.courseId],
       });
@@ -67,22 +67,19 @@ export const useAddAttainment = (
 };
 
 type EditAttainmentVars = {courseId: Numeric; attainment: AttainmentData};
-
 export const useEditAttainment = (
-  options?: UseMutationOptions<number, unknown, unknown>
-): UseMutationResult<number, unknown, EditAttainmentVars> => {
+  options?: UseMutationOptions<unknown, unknown, unknown>
+): UseMutationResult<unknown, unknown, EditAttainmentVars> => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (vars: EditAttainmentVars) =>
-      (
-        await axios.put<{id: number}>(
-          `/v1/courses/${vars.courseId}/attainments/${vars.attainment.id}`,
-          vars.attainment
-        )
-      ).data.id,
+      await axios.put(
+        `/v1/courses/${vars.courseId}/attainments/${vars.attainment.id}`,
+        vars.attainment
+      ),
 
-    onSuccess: (_data: number, vars: EditAttainmentVars) => {
+    onSuccess: (_data: unknown, vars: EditAttainmentVars) => {
       queryClient.invalidateQueries({
         queryKey: ['attainments', vars.courseId],
       });
@@ -96,21 +93,18 @@ export const useEditAttainment = (
 };
 
 type DeleteAttainmentVars = {courseId: Numeric; attainmentId: Numeric};
-
 export const useDeleteAttainment = (
-  options?: UseMutationOptions<number, unknown, unknown>
-): UseMutationResult<number, unknown, DeleteAttainmentVars> => {
+  options?: UseMutationOptions<unknown, unknown, unknown>
+): UseMutationResult<unknown, unknown, DeleteAttainmentVars> => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (vars: DeleteAttainmentVars) =>
-      (
-        await axios.delete<{id: number}>(
-          `/v1/courses/${vars.courseId}/attainments/${vars.attainmentId}`
-        )
-      ).data.id,
+      await axios.delete(
+        `/v1/courses/${vars.courseId}/attainments/${vars.attainmentId}`
+      ),
 
-    onSuccess: (_data: number, vars: DeleteAttainmentVars) => {
+    onSuccess: (_data: unknown, vars: DeleteAttainmentVars) => {
       queryClient.invalidateQueries({
         queryKey: ['attainments', vars.courseId],
       });

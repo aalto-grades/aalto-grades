@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {GradeType, Status} from '@common/types';
+import {Status} from '@common/types';
 
 export interface AttainmentGradeModelData {
   userId?: number;
@@ -13,7 +13,6 @@ export interface AttainmentGradeModelData {
   manual?: boolean;
   date?: Date;
   expiryDate?: Date;
-  gradeType?: GradeType;
   attainmentName?: string;
 }
 

@@ -13,6 +13,9 @@ import {validateAssessmentModelPath} from './utils/assessmentModel';
 import {findAndValidateCourseId} from './utils/course';
 import {isTeacherInChargeOrAdmin} from './utils/user';
 
+/**
+ * Responds with AssessmentModelData
+ */
 export const getAssessmentModel = async (
   req: Request,
   res: Response
@@ -32,6 +35,9 @@ export const getAssessmentModel = async (
   res.json(assessmentModelData);
 };
 
+/**
+ * Responds with AssessmentModelData[]
+ */
 export const getAllAssessmentModels = async (
   req: Request,
   res: Response
@@ -57,6 +63,9 @@ export const getAllAssessmentModels = async (
   res.json(assessmentModelsData);
 };
 
+/**
+ * Responds with number
+ */
 export const addAssessmentModel = async (
   req: Request<ParamsDictionary, unknown, AssessmentModelData>,
   res: Response
