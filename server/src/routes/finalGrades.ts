@@ -7,11 +7,8 @@ import {RequestHandler} from 'express-serve-static-core';
 import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 
-import {
-  addFinalGrades,
-  addFinalGradesBodySchema,
-  getFinalGrades,
-} from '../controllers/finalGrades';
+import {NewFinalGradeArraySchema} from '@common/types';
+import {addFinalGrades, getFinalGrades} from '../controllers/finalGrades';
 import {handleInvalidRequestJson} from '../middleware';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
@@ -22,7 +19,7 @@ router.post(
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(addFinalGradesBodySchema),
+  processRequestBody(NewFinalGradeArraySchema),
   controllerDispatcher(addFinalGrades)
 );
 
