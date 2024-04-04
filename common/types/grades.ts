@@ -2,69 +2,52 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {FinalGradeData} from '@common/types/finalGrade';
-import {UserData} from './user';
+import {z} from 'zod';
+import {FinalGradeDataArraySchema} from './finalGrade';
+import {LanguageSchema} from './general';
+import {UserDataSchema} from './user';
 
-export enum Status {
-  Pass = 'PASS',
-  Fail = 'FAIL',
-  Pending = 'PENDING',
-}
+export const GradeOptionSchema = z.object({
+  gradeId: z.number().int().optional(),
+  grader: UserDataSchema,
+  grade: z.number(), // z.int()?
+  exportedToSisu: z.coerce.date().optional(),
+  date: z.coerce.date().optional(),
+  expiryDate: z.coerce.date().optional(),
+  comment: z.string(),
+});
+export const NewGradeSchema = z.object({
+  studentNumber: z.string(),
+  attainmentId: z.number().int(),
+  grade: z.number(), // z.int()?
+  date: z.coerce.date().optional(),
+  expiryDate: z.coerce.date().optional(),
+  comment: z.string(),
+});
+export const NewGradeArraySchema = z.array(NewGradeSchema);
+export const AttainmentGradesDataSchema = z.object({
+  attainmentId: z.number().int(),
+  attainmentName: z.string().optional(),
+  grades: z.array(GradeOptionSchema),
+});
+export const StudentRowSchema = z.object({
+  user: UserDataSchema,
+  finalGrades: FinalGradeDataArraySchema.optional(),
+  attainments: z.array(AttainmentGradesDataSchema),
+});
+export const StudentRowArraySchema = z.array(StudentRowSchema);
+export const PartialGradeOptionSchema = GradeOptionSchema.partial();
 
-export interface GradeOption {
-  gradeId?: number;
-  grader: UserData;
-  grade: number;
-  exportedToSisu?: Date;
-  date?: Date;
-  expiryDate?: Date;
-  comment: string;
-}
+export const SisuCsvUploadSchema = z.object({
+  assessmentDate: z.string().datetime().optional(), // Assessment date override
+  completionLanguage: LanguageSchema.optional(), // Defaults to course language TODO: confirm that the Language enum is valid for SISU
+  studentNumbers: z.array(z.string()).nonempty(),
+});
 
-export type NewGrade = {
-  studentNumber: string;
-  attainmentId: number;
-  grade: number;
-  date?: Date;
-  expiryDate?: Date;
-  comment: string;
-};
+export type GradeOption = z.infer<typeof GradeOptionSchema>;
+export type PartialGradeOption = z.infer<typeof PartialGradeOptionSchema>;
+export type NewGrade = z.infer<typeof NewGradeSchema>;
+export type AttainmentGradesData = z.infer<typeof AttainmentGradesDataSchema>;
+export type StudentRow = z.infer<typeof StudentRowSchema>;
 
-export interface AttainmentGradeData {
-  userId?: number;
-  attainmentId: number;
-  attainmentName?: string;
-  grades: Array<GradeOption>;
-  subAttainments?: Array<AttainmentGradeData>;
-}
-
-// This is one element of what we receive from the backend API
-export interface StudentGradesTree {
-  userId: number;
-  studentNumber: string;
-  attainmentId: number;
-  attainmentName?: string;
-  credits: number;
-  grades: Array<GradeOption>;
-  subAttainments?: Array<AttainmentGradeData>;
-}
-
-export type AttainmentGradesData = {
-  attainmentId: number;
-  attainmentName?: string;
-  grades: Array<GradeOption>;
-};
-
-export type StudentRow = {
-  user: UserData;
-  finalGrades?: FinalGradeData[];
-  attainments: Array<AttainmentGradesData>;
-};
-
-export interface EditGrade {
-  grade?: number;
-  status?: Status;
-  date?: Date;
-  expiryDate?: Date;
-  comment?: string;
-}
+export type SisuCsvUpload = z.infer<typeof SisuCsvUploadSchema>;

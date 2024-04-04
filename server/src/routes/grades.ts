@@ -8,11 +8,13 @@ import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 
 import {
-  SisuCSVSchema,
+  NewGradeArraySchema,
+  PartialGradeOptionSchema,
+  SisuCsvUploadSchema,
+} from '@common/types';
+import {
   addGrades,
-  addGradesBodySchema,
   editUserGrade,
-  editUserGradeBodySchema,
   getGrades,
   getSisuFormattedGradingCSV,
 } from '../controllers/grades';
@@ -33,7 +35,7 @@ router.post(
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json({limit: '10mb'}),
   handleInvalidRequestJson,
-  processRequestBody(SisuCSVSchema),
+  processRequestBody(SisuCsvUploadSchema),
   controllerDispatcher(getSisuFormattedGradingCSV)
 );
 
@@ -42,7 +44,7 @@ router.post(
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json({limit: '10mb'}),
   handleInvalidRequestJson,
-  processRequestBody(addGradesBodySchema),
+  processRequestBody(NewGradeArraySchema),
   controllerDispatcher(addGrades)
 );
 
@@ -51,6 +53,6 @@ router.put(
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(editUserGradeBodySchema),
+  processRequestBody(PartialGradeOptionSchema),
   controllerDispatcher(editUserGrade)
 );

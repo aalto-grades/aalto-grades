@@ -128,7 +128,7 @@ const SisuDownloadDialog = ({
           dateOverride && assessmentDate !== null
             ? assessmentDate.toISOString()
             : undefined,
-        studentNumbers,
+        studentNumbers: studentNumbers as [string, ...string[]], // Non-empty array
       },
     });
     if (!exportedValuesInList) handleClose();

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {z} from 'zod';
-import {LanguageSchema, LocalizedStringSchema} from './common';
+import {LanguageSchema, LocalizedStringSchema} from './general';
 import {TeacherDataSchema} from './user';
 
 export enum GradingScale {

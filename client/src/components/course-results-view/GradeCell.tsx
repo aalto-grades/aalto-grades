@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentGradeData, GradeOption} from '@common/types';
+import {AttainmentGradesData, GradeOption} from '@common/types';
 import {
   EventBusyOutlined,
   MoreHoriz as MoreHorizIcon,
@@ -18,7 +18,7 @@ import {findBestGradeOption, isGradeDateExpired} from '../../utils';
 
 type GradeCellProps = {
   studentNumber: string;
-  attainemntResults?: AttainmentGradeData;
+  attainemntResults?: AttainmentGradesData;
   finalGrade?: boolean;
 };
 

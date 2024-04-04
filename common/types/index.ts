@@ -5,7 +5,6 @@
 export * from './assessmentModel';
 export * from './attainment';
 export * from './auth';
-export * from './common';
 export * from './course';
 export * from './finalGrade';
 export * from './general';

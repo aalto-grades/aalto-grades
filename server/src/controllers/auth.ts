@@ -175,6 +175,9 @@ export const authSamlLogin = (
   )(req, res, next);
 };
 
+/**
+ * Responds with application/xml
+ */
 export const samlMetadata = async (
   req: Request,
   res: Response

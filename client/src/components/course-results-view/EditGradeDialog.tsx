@@ -3,10 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AttainmentGradeData,
-  EditGrade,
+  AttainmentGradesData,
   GradeOption,
-  Status,
+  PartialGradeOption,
 } from '@common/types';
 import {
   Box,
@@ -35,7 +34,7 @@ import {findBestGradeOption} from '../../utils';
 
 // A Dialog component for editing individual grade of a user.
 export default function EditGradeDialog(props: {
-  grade: AttainmentGradeData;
+  grade: AttainmentGradesData;
   handleClose: () => void;
   refetchGrades: () => void;
   open: boolean;
@@ -57,24 +56,23 @@ export default function EditGradeDialog(props: {
     setGradeId(findBestGradeOption(props.grade.grades)?.gradeId ?? null);
   }
 
-  const [formInitialValues, setFormInitialValues]: State<EditGrade> =
-    useState<EditGrade>({
+  const [formInitialValues, setFormInitialValues]: State<PartialGradeOption> =
+    useState<PartialGradeOption>({
       grade: 0,
-      status: Status.Pending,
       date: new Date(),
       expiryDate: new Date(),
       comment: '',
     });
 
-  async function handleSubmit(values: EditGrade): Promise<void> {
+  async function handleSubmit(values: PartialGradeOption): Promise<void> {
     if (courseId && assessmentModelId && gradeId) {
       // This very orrible solution eliminates empty values from the payload to avoid validation errors on the server
       Object.keys(values).forEach(key => {
         if (
-          values[key as keyof EditGrade] === '' ||
-          values[key as keyof EditGrade] === null
+          values[key as keyof PartialGradeOption] === '' ||
+          values[key as keyof PartialGradeOption] === null
         ) {
-          delete values[key as keyof EditGrade];
+          delete values[key as keyof PartialGradeOption];
         }
       });
 
@@ -83,7 +81,6 @@ export default function EditGradeDialog(props: {
           courseId,
           assessmentModelId,
           gradeId,
-          userId: props.grade.userId as number,
           data: values,
         },
         {
@@ -150,7 +147,6 @@ export default function EditGradeDialog(props: {
               initialValues={formInitialValues}
               validationSchema={yup.object({
                 grade: yup.number().min(0).notRequired(),
-                status: yup.string().oneOf(Object.values(Status)).notRequired(),
                 date: yup.date().notRequired(),
                 expiryDate: yup.date().notRequired(),
                 comment: yup.string().notRequired(),
@@ -165,13 +161,13 @@ export default function EditGradeDialog(props: {
                 values,
                 initialValues,
               }: {
-                errors: FormikErrors<EditGrade>;
+                errors: FormikErrors<PartialGradeOption>;
                 handleChange: (e: ChangeEvent<Element>) => void;
                 isSubmitting: boolean;
                 isValid: boolean;
-                touched: FormikTouched<EditGrade>;
-                values: EditGrade;
-                initialValues: EditGrade;
+                touched: FormikTouched<PartialGradeOption>;
+                values: PartialGradeOption;
+                initialValues: PartialGradeOption;
               }): JSX.Element => (
                 <Form>
                   <TextField
@@ -191,33 +187,6 @@ export default function EditGradeDialog(props: {
                     error={Boolean(errors.grade)}
                     onChange={handleChange}
                   />
-                  <TextField
-                    id="status"
-                    name="status"
-                    type="text"
-                    fullWidth
-                    value={values.status}
-                    disabled={isSubmitting}
-                    label="Status"
-                    InputLabelProps={{shrink: true}}
-                    margin="normal"
-                    helperText={
-                      errors.status
-                        ? String(errors.status)
-                        : 'Grading status indicator.'
-                    }
-                    error={Boolean(errors.status)}
-                    onChange={handleChange}
-                    select
-                  >
-                    {Object.values(Status).map((value: Status) => {
-                      return (
-                        <MenuItem key={value} value={value}>
-                          {value}
-                        </MenuItem>
-                      );
-                    })}
-                  </TextField>
                   <TextField
                     id="date"
                     name="date"
@@ -245,9 +214,7 @@ export default function EditGradeDialog(props: {
                     fullWidth
                     value={
                       values.expiryDate
-                        ? new Date(values.expiryDate as Date)
-                            .toISOString()
-                            .split('T')[0]
+                        ? values.expiryDate.toISOString().split('T')[0]
                         : undefined
                     }
                     disabled={isSubmitting}

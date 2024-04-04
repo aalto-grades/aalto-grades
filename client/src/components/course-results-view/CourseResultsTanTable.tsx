@@ -2,11 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {
-  AssessmentModelData,
-  AttainmentGradeData,
-  StudentRow,
-} from '@common/types';
+import {AssessmentModelData, StudentRow} from '@common/types';
 import {batchCalculateGraph} from '@common/util/calculateGraph';
 import {ArrowUpward, ExpandLess, ExpandMore, Sort} from '@mui/icons-material';
 import {Badge, Checkbox, Icon, IconButton, Tooltip} from '@mui/material';
@@ -62,32 +58,6 @@ function toggleString(arr: string[], str: string): string[] {
     arr.push(str);
   }
   return arr;
-}
-
-// Find the attainment grade from the tree
-function getAttainmentGrade(
-  gradeTree: AttainmentGradeData,
-  attainmentId: number
-): AttainmentGradeData | null {
-  if (!gradeTree.grades) return null;
-
-  function traverseTree(
-    grade: AttainmentGradeData
-  ): AttainmentGradeData | null {
-    if (grade.attainmentId === attainmentId) {
-      return grade;
-    }
-
-    if (grade.subAttainments) {
-      for (const subGrade of grade.subAttainments) {
-        const maybeFound: AttainmentGradeData | null = traverseTree(subGrade);
-        if (maybeFound) return maybeFound;
-      }
-    }
-    return null;
-  }
-
-  return traverseTree(gradeTree);
 }
 
 // Group the rows by the last attainment date
