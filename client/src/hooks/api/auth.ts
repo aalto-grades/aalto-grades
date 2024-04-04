@@ -2,16 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {LoginResult} from '@common/types';
+import {LoginResult, LoginResultSchema, SignupRequest} from '@common/types';
 import {
-  useMutation,
   UseMutationOptions,
   UseMutationResult,
-  useQuery,
   UseQueryOptions,
   UseQueryResult,
+  useMutation,
+  useQuery,
 } from '@tanstack/react-query';
-import {LoginCredentials, SignupCredentials} from '../../types';
+import {LoginCredentials} from '../../types';
 import axios from './axios';
 
 export const useGetRefreshToken = (
@@ -20,7 +20,7 @@ export const useGetRefreshToken = (
   useQuery({
     queryKey: ['refresh-token'],
     queryFn: async () =>
-      (await axios.get<{data: LoginResult}>('/v1/auth/self-info')).data.data,
+      LoginResultSchema.parse((await axios.get('/v1/auth/self-info')).data),
     ...options,
   });
 
@@ -29,8 +29,9 @@ export const useLogIn = (
 ): UseMutationResult<LoginResult, unknown, LoginCredentials> =>
   useMutation({
     mutationFn: async (credentials: LoginCredentials) =>
-      (await axios.post<{data: LoginResult}>('/v1/auth/login', credentials))
-        .data.data,
+      LoginResultSchema.parse(
+        (await axios.post('/v1/auth/login', credentials)).data
+      ),
     ...options,
   });
 
@@ -43,11 +44,12 @@ export const useLogOut = (
   });
 
 export const useSignUp = (
-  options?: UseMutationOptions<LoginResult, unknown, SignupCredentials>
-): UseMutationResult<LoginResult, unknown, SignupCredentials> =>
+  options?: UseMutationOptions<LoginResult, unknown, SignupRequest>
+): UseMutationResult<LoginResult, unknown, SignupRequest> =>
   useMutation({
-    mutationFn: async (credentials: SignupCredentials) =>
-      (await axios.post<{data: LoginResult}>('/v1/auth/signup', credentials))
-        .data.data,
+    mutationFn: async (credentials: SignupRequest) =>
+      LoginResultSchema.parse(
+        (await axios.post('/v1/auth/signup', credentials)).data
+      ),
     ...options,
   });

@@ -2,23 +2,27 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {z} from 'zod';
+
 export enum SystemRole {
   User = 'USER',
   Admin = 'ADMIN',
 }
 
-export interface LoginResult {
-  id: number;
-  name: string;
-  role: SystemRole;
-}
+export const SystemRoleSchema = z.nativeEnum(SystemRole);
 
-export type PlainPassword = string;
+export const LoginResultSchema = z.object({
+  id: z.number().int(),
+  name: z.string(),
+  role: SystemRoleSchema,
+});
+export const SignupRequestSchema = z.object({
+  name: z.string(),
+  password: z.string(),
+  email: z.string(),
+  studentNumber: z.string().optional(),
+  role: SystemRoleSchema.optional(),
+});
 
-export interface SignupRequest {
-  name: string;
-  password: PlainPassword;
-  email: string;
-  studentNumber?: string;
-  role?: SystemRole;
-}
+export type LoginResult = z.infer<typeof LoginResultSchema>;
+export type SignupRequest = z.infer<typeof SignupRequestSchema>;

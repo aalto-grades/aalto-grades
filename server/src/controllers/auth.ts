@@ -2,11 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {
-  Profile,
-  Strategy as SamlStrategy,
-  VerifiedCallback as SamlVerifiedCallback,
-} from '@node-saml/passport-saml';
 import argon from 'argon2';
 import {NextFunction, Request, Response} from 'express';
 import {ParamsDictionary, RequestHandler} from 'express-serve-static-core';
@@ -15,27 +10,18 @@ import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import {Strategy as JWTStrategy, VerifiedCallback} from 'passport-jwt';
 import {IVerifyOptions, Strategy as LocalStrategy} from 'passport-local';
-import {z} from 'zod';
 
-import {HttpCode, LoginResult, PlainPassword, SystemRole} from '@common/types';
+import {HttpCode, LoginResult, SignupRequest, SystemRole} from '@common/types';
 import {JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS} from '../configs/constants';
-import {
-  JWT_SECRET,
-  NODE_ENV,
-  SAML_CALLBACK,
-  SAML_ENCRYPT_PVK,
-  SAML_ENTITY,
-  SAML_ENTRYPOINT,
-  SAML_IDP_CERT,
-  SAML_METADATA_URL,
-  SAML_PRIVATE_KEY,
-  SAML_SP_CERT_PATH,
-} from '../configs/environment';
+import {JWT_SECRET, NODE_ENV, SAML_SP_CERT_PATH} from '../configs/environment';
 import User from '../database/models/user';
 import {ApiError, JwtClaims} from '../types';
-import {getIdpSignCert} from './utils/saml';
+import {getSamlStrategy, validateLogin} from './utils/auth';
 import {findUserById} from './utils/user';
 
+/**
+ * Responds with LoginResult
+ */
 export const authSelfInfo = async (
   req: Request,
   res: Response
@@ -49,32 +35,12 @@ export const authSelfInfo = async (
     name: userFromDb.name,
   };
 
-  res.send({data: auth});
+  res.json(auth);
 };
 
-export const validateLogin = async (
-  email: string,
-  password: PlainPassword
-): Promise<LoginResult> => {
-  const user = await User.findByEmail(email);
-
-  if (user === null) {
-    throw new ApiError('invalid credentials', HttpCode.Unauthorized);
-  }
-
-  const match = await argon.verify(user.password.trim(), password);
-
-  if (!match) {
-    throw new ApiError('invalid credentials', HttpCode.Unauthorized);
-  }
-
-  return {
-    id: user.id,
-    role: user.role as SystemRole,
-    name: user.name,
-  };
-};
-
+/**
+ * Responds with LoginResult
+ */
 export const authLogin = (
   req: Request,
   res: Response,
@@ -112,7 +78,7 @@ export const authLogin = (
             maxAge: JWT_COOKIE_EXPIRY_MS,
           });
 
-          return res.send({data: loginResult});
+          return res.json(loginResult);
         });
       }
     ) as RequestHandler
@@ -121,21 +87,14 @@ export const authLogin = (
 
 export const authLogout = (_req: Request, res: Response): void => {
   res.clearCookie('jwt', {httpOnly: true});
-
-  res.send({data: {}});
+  res.sendStatus(HttpCode.Ok);
 };
 
-export const authSignupBodySchema = z.object({
-  name: z.string(),
-  password: z.string(),
-  email: z.string().email(),
-  studentNumber: z.string().optional(),
-  role: z.nativeEnum(SystemRole).optional(),
-});
-type AuthSignupBody = z.infer<typeof authSignupBodySchema>;
-
+/**
+ * Responds with LoginResult
+ */
 export const authSignup = async (
-  req: Request<ParamsDictionary, unknown, AuthSignupBody>,
+  req: Request<ParamsDictionary, unknown, SignupRequest>,
   res: Response
 ): Promise<void> => {
   const exists = await User.findByEmail(req.body.email);
@@ -172,7 +131,7 @@ export const authSignup = async (
     name: newUser.name,
   };
 
-  res.send({data: auth});
+  res.json(auth);
 };
 
 export const authSamlLogin = (
@@ -198,7 +157,7 @@ export const authSamlLogin = (
 
           const body: JwtClaims = {id: loginResult.id, role: loginResult.role};
 
-          const token: string = jwt.sign(body, JWT_SECRET, {
+          const token = jwt.sign(body, JWT_SECRET, {
             expiresIn: JWT_EXPIRY_SECONDS,
           });
 
@@ -216,74 +175,16 @@ export const authSamlLogin = (
   )(req, res, next);
 };
 
-// should be put to a seperate file
-const getSamlStrategy = async (): Promise<SamlStrategy> =>
-  new SamlStrategy(
-    {
-      callbackUrl: SAML_CALLBACK,
-      entryPoint: SAML_ENTRYPOINT,
-      issuer: SAML_ENTITY,
-      cert: (await getIdpSignCert(SAML_METADATA_URL)) || SAML_IDP_CERT, // IdP public key in .pem format
-      decryptionPvk: SAML_ENCRYPT_PVK,
-      privateKey: SAML_PRIVATE_KEY, // SP private key in .pem format
-      signatureAlgorithm: 'sha256',
-      identifierFormat: null,
-      passReqToCallback: true, // This is required when using typescript apparently...
-    },
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    async (
-      _req: Request,
-      profile: Profile | null,
-      done: SamlVerifiedCallback
-    ) => {
-      // for signon
-      try {
-        const eduUser = profile?.['urn:oid:1.3.6.1.4.1.5923.1.1.1.6'] as string;
-        const email = profile?.['urn:oid:0.9.2342.19200300.100.1.3'] as string;
-        const name = profile?.['urn:oid:2.16.840.1.113730.3.1.241'] as string;
-        if (!email)
-          throw new ApiError('No email in assertion', HttpCode.Unauthorized);
-
-        const user = await User.findIdpUserByEmail(email);
-        if (!user) {
-          throw new ApiError(
-            'User not authorized, please ask admin for permissions',
-            HttpCode.Unauthorized
-          );
-        }
-        if (!user.eduUser) await user.update({eduUser: eduUser});
-        if (!user.name) await user.update({name: name});
-
-        // for now if teacher email is added by admin we allow the teacher to signin
-        return done(null, {
-          id: user.id,
-          role: user.role as SystemRole,
-          name: user.name,
-        });
-      } catch (err) {
-        return done(err as Error);
-      }
-    },
-    (_req: Request, profile: Profile | null, done: SamlVerifiedCallback) => {
-      // for logout
-      try {
-        return done(null, {profile});
-      } catch (err) {
-        return done(err as Error);
-      }
-    }
-  );
-
 export const samlMetadata = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  res.type('application/xml');
-  res.status(200);
   const cert = readFileSync(SAML_SP_CERT_PATH, 'utf8');
-  res.send(
-    (await getSamlStrategy()).generateServiceProviderMetadata(cert, cert)
-  );
+  res
+    .type('application/xml')
+    .send(
+      (await getSamlStrategy()).generateServiceProviderMetadata(cert, cert)
+    );
 };
 
 passport.use(

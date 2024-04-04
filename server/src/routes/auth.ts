@@ -7,6 +7,7 @@ import express, {Router} from 'express';
 import {RequestHandler} from 'express-serve-static-core';
 import passport from 'passport';
 
+import {SignupRequestSchema} from '@common/types';
 import {processRequestBody} from 'zod-express-middleware';
 import {NODE_ENV} from '../configs/environment';
 import {
@@ -15,7 +16,6 @@ import {
   authSamlLogin,
   authSelfInfo,
   authSignup,
-  authSignupBodySchema,
   samlMetadata,
 } from '../controllers/auth';
 import {handleInvalidRequestJson} from '../middleware';
@@ -51,7 +51,7 @@ router.post(
   '/v1/auth/signup',
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(authSignupBodySchema),
+  processRequestBody(SignupRequestSchema),
   controllerDispatcher(authSignup)
 );
 
