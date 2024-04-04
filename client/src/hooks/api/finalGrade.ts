@@ -26,8 +26,8 @@ export const useAddFinalGrades = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: NewFinalGrade[]) =>
-      await axios.post(`/v1/courses/${courseId}/finalGrades`, [...data]),
+    mutationFn: async (newFinalGrades: NewFinalGrade[]) =>
+      await axios.post(`/v1/courses/${courseId}/finalGrades`, newFinalGrades),
 
     onSuccess: () => {
       queryClient.invalidateQueries({

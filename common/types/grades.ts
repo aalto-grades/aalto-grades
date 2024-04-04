@@ -14,7 +14,7 @@ export const GradeOptionSchema = z.object({
   exportedToSisu: z.coerce.date().optional(),
   date: z.coerce.date().optional(),
   expiryDate: z.coerce.date().optional(),
-  comment: z.string(),
+  comment: z.string().nullable(),
 });
 export const NewGradeSchema = z.object({
   studentNumber: z.string(),

@@ -145,7 +145,7 @@ const GradeCell: FC<GradeCellProps> = (
               },
             }}
           >
-            {bestGrade?.date?.toString()}
+            {bestGrade?.date?.toLocaleDateString()}
           </Box>
         </Tooltip>
       }

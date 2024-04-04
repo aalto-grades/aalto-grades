@@ -37,14 +37,17 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
     {resetForm, setSubmitting}: FormikHelpers<FormData>
   ): void => {
     values.email;
-    addUser.mutate(values.email, {
-      onSuccess: () => {
-        enqueueSnackbar('User added succesfully', {variant: 'success'});
-        resetForm();
-        onClose();
-        setSubmitting(false);
-      },
-    });
+    addUser.mutate(
+      {email: values.email},
+      {
+        onSuccess: () => {
+          enqueueSnackbar('User added succesfully', {variant: 'success'});
+          resetForm();
+          onClose();
+          setSubmitting(false);
+        },
+      }
+    );
   };
 
   return (
