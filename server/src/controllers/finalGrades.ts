@@ -34,7 +34,7 @@ export const addFinalGrades = async (
   // TODO: Optimize if datasets are big.
   await FinalGrade.bulkCreate(preparedBulkCreate);
 
-  return res.sendStatus(HttpCode.Ok);
+  return res.sendStatus(HttpCode.Created);
 };
 
 /**

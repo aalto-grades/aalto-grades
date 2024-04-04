@@ -59,10 +59,10 @@ const findAndValidateAttainmentId = async (
  * Finds the course and the assessment model by url param ids and also validates the url params.
  * Throws ApiError if either not found.
  */
-export async function validateAttainmentPath(
+export const validateAttainmentPath = async (
   courseId: string,
   attainmentId: string
-): Promise<[Course, Attainment]> {
+): Promise<[Course, Attainment]> => {
   const course = await findAndValidateCourseId(courseId);
   const attainment = await findAndValidateAttainmentId(attainmentId);
 
@@ -76,4 +76,4 @@ export async function validateAttainmentPath(
   }
 
   return [course, attainment];
-}
+};

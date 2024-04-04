@@ -94,7 +94,7 @@ export const addAssessmentModel = async (
     );
   }
 
-  res.json(assessmentModel.id);
+  res.status(HttpCode.Created).json(assessmentModel.id);
 };
 
 export const updateAssessmentModel = async (

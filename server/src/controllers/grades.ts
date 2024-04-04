@@ -139,10 +139,10 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
  * https://wiki.aalto.fi/display/SISEN/Assessment+of+implementations
  * Responds with text/csv
  */
-export async function getSisuFormattedGradingCSV(
+export const getSisuFormattedGradingCSV = async (
   req: Request<ParamsDictionary, unknown, SisuCsvUpload>,
   res: Response
-): Promise<void> {
+): Promise<void> => {
   const sisuExportDate = new Date();
   const course = await findAndValidateCourseId(req.params.courseId);
 
@@ -240,7 +240,7 @@ export async function getSisuFormattedGradingCSV(
         .send(data);
     }
   );
-}
+};
 
 export const addGrades = async (
   req: Request<ParamsDictionary, unknown, NewGrade[]>,
@@ -317,7 +317,7 @@ export const addGrades = async (
   await AttainmentGrade.bulkCreate(preparedBulkCreate);
 
   // After this point all the students' attainment grades have been created
-  return res.sendStatus(HttpCode.Ok);
+  return res.sendStatus(HttpCode.Created);
 };
 
 export const editUserGrade = async (

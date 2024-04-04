@@ -46,7 +46,7 @@ export const addAttainment = async (
     daysValid: req.body.daysValid,
   });
 
-  res.json(newAttainment.id);
+  res.status(HttpCode.Created).json(newAttainment.id);
 };
 
 export const editAttainment = async (

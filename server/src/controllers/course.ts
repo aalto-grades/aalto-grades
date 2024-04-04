@@ -111,7 +111,7 @@ export const addCourse = async (
     return newCourse;
   });
 
-  res.json(course.id);
+  res.status(HttpCode.Created).json(course.id);
 };
 
 export const editCourse = async (
