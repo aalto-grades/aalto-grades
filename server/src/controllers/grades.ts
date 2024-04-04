@@ -200,7 +200,7 @@ export const getSisuFormattedGradingCSV = async (
         // Assessment date must be in form dd.mm.yyyy.
         // HERE we want to find the latest completed attainment grade for student
         assessmentDate: (req.body.assessmentDate
-          ? new Date(req.body.assessmentDate)
+          ? req.body.assessmentDate
           : await getDateOfLatestGrade(finalGrade.userId, course.id)
         ).toLocaleDateString('fi-FI'),
         completionLanguage: req.body.completionLanguage
@@ -303,12 +303,8 @@ export const addGrades = async (
       userId: studentNumberToId[gradeEntry.studentNumber],
       attainmentId: gradeEntry.attainmentId,
       graderId: grader.id,
-      date:
-        gradeEntry.date === undefined ? undefined : new Date(gradeEntry.date),
-      expiryDate:
-        gradeEntry.expiryDate === undefined
-          ? undefined
-          : new Date(gradeEntry.expiryDate),
+      date: gradeEntry.date,
+      expiryDate: gradeEntry.expiryDate,
       grade: gradeEntry.grade,
     })
   );
@@ -338,9 +334,8 @@ export const editUserGrade = async (
   await gradeData
     .set({
       grade: grade ?? gradeData.grade,
-      date: date === undefined ? gradeData.date : new Date(date),
-      expiryDate:
-        expiryDate === undefined ? gradeData.expiryDate : new Date(expiryDate),
+      date: date === undefined ? gradeData.date : date,
+      expiryDate: expiryDate === undefined ? gradeData.expiryDate : expiryDate,
       comment: comment && comment.length > 0 ? comment : gradeData.comment,
       manual: true,
       graderId: grader.id,

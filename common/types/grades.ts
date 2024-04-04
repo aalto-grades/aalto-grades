@@ -4,24 +4,24 @@
 
 import {z} from 'zod';
 import {FinalGradeDataArraySchema} from './finalGrade';
-import {LanguageSchema} from './general';
+import {DateSchema, LanguageSchema} from './general';
 import {UserDataSchema} from './user';
 
 export const GradeOptionSchema = z.object({
   gradeId: z.number().int().optional(),
   grader: UserDataSchema,
   grade: z.number(), // z.int()?
-  exportedToSisu: z.coerce.date().optional(),
-  date: z.coerce.date().optional(),
-  expiryDate: z.coerce.date().optional(),
+  exportedToSisu: DateSchema.nullable(),
+  date: DateSchema.optional(),
+  expiryDate: DateSchema.optional(),
   comment: z.string().nullable(),
 });
 export const NewGradeSchema = z.object({
   studentNumber: z.string(),
   attainmentId: z.number().int(),
   grade: z.number(), // z.int()?
-  date: z.coerce.date().optional(),
-  expiryDate: z.coerce.date().optional(),
+  date: DateSchema.optional(),
+  expiryDate: DateSchema.optional(),
   comment: z.string(),
 });
 export const NewGradeArraySchema = z.array(NewGradeSchema);
@@ -39,7 +39,7 @@ export const StudentRowArraySchema = z.array(StudentRowSchema);
 export const PartialGradeOptionSchema = GradeOptionSchema.partial();
 
 export const SisuCsvUploadSchema = z.object({
-  assessmentDate: z.string().datetime().optional(), // Assessment date override
+  assessmentDate: DateSchema.optional(), // Assessment date override
   completionLanguage: LanguageSchema.optional(), // Defaults to course language TODO: confirm that the Language enum is valid for SISU
   studentNumbers: z.array(z.string()).nonempty(),
 });
