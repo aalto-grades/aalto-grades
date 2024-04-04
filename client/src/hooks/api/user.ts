@@ -2,7 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {CourseData} from '@common/types';
+import {
+  AddIdpUser,
+  CourseData,
+  CourseDataArraySchema,
+  IdpUsersSchema,
+} from '@common/types';
 import {
   UseMutationOptions,
   UseMutationResult,
@@ -22,18 +27,18 @@ export const useGetCoursesOfUser = (
   return useQuery({
     queryKey: ['courses-of-user', userId],
     queryFn: async () =>
-      (await axios.get<{data: CourseData[]}>(`/v1/user/${userId}/courses`)).data
-        .data,
+      CourseDataArraySchema.parse(
+        (await axios.get(`/v1/user/${userId}/courses`)).data
+      ),
     ...options,
   });
 };
 
 export const useAddUser = (
-  options?: UseMutationOptions<unknown, unknown, string>
-): UseMutationResult<unknown, unknown, string> =>
+  options?: UseMutationOptions<unknown, unknown, AddIdpUser>
+): UseMutationResult<unknown, unknown, AddIdpUser> =>
   useMutation({
-    mutationFn: async (email: string) =>
-      await axios.post('/v1/idp-users', {email: email}),
+    mutationFn: async idpUser => await axios.post('/v1/idp-users', idpUser),
     ...options,
   });
 
@@ -43,8 +48,7 @@ export const useGetIdpUsers = (
   useQuery({
     queryKey: ['idp-users'],
     queryFn: async () =>
-      (await axios.get<{data: {email: string; id: number}[]}>('/v1/idp-users'))
-        .data.data,
+      IdpUsersSchema.parse((await axios.get('/v1/idp-users')).data),
     ...options,
   });
 

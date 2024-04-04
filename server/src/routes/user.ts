@@ -5,11 +5,10 @@
 import express, {Router} from 'express';
 import {RequestHandler} from 'express-serve-static-core';
 import passport from 'passport';
-
-import {SystemRole} from '@common/types';
 import {processRequestBody} from 'zod-express-middleware';
+
+import {AddIdpUserSchema, SystemRole} from '@common/types';
 import {
-  addIddUserBodySchema,
   addIdpUser,
   deleteIdpUser,
   getCoursesOfUser,
@@ -33,7 +32,7 @@ router.post(
   authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(addIddUserBodySchema),
+  processRequestBody(AddIdpUserSchema),
   controllerDispatcher(addIdpUser)
 );
 
