@@ -25,6 +25,7 @@ export const mockCourses: Array<CourseData> = [
     teachersInCharge: [
       {
         id: 45,
+        email: 'scooby@aalto.fi',
         name: 'Scooby Doo',
       },
     ],
@@ -49,6 +50,7 @@ export const mockCourses: Array<CourseData> = [
     teachersInCharge: [
       {
         id: 76,
+        email: 'winnie@aalto.fi',
         name: 'Winnie the Pooh',
       },
     ],

@@ -126,7 +126,7 @@ const SisuDownloadDialog = ({
         completionLanguage,
         assessmentDate:
           dateOverride && assessmentDate !== null
-            ? assessmentDate.toISOString()
+            ? assessmentDate.toDate()
             : undefined,
         studentNumbers: studentNumbers as [string, ...string[]], // Non-empty array
       },

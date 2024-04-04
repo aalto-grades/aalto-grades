@@ -7,7 +7,7 @@ import {
   GradingScale,
   HttpCode,
   Language,
-  UserData,
+  TeacherData,
 } from '@common/types';
 import supertest from 'supertest';
 
@@ -311,7 +311,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
     courseId: number,
     uneditedCourseData: object,
     edits: object,
-    editedTeachersInCharge?: Array<UserData>
+    editedTeachersInCharge?: Array<TeacherData>
   ): Promise<void> {
     async function checkCourseData(
       courseId: number,

@@ -27,5 +27,6 @@ export const IdpUsersSchema = z.array(
 );
 
 export type UserData = z.infer<typeof UserDataSchema>;
+export type TeacherData = z.infer<typeof TeacherDataSchema>;
 export type AddIdpUser = z.infer<typeof AddIdpUserSchema>;
 export type IdpUsers = z.infer<typeof IdpUsersSchema>;
