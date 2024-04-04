@@ -5,15 +5,14 @@
 import {Request, Response} from 'express';
 import {ParamsDictionary} from 'express-serve-static-core';
 import {Transaction} from 'sequelize';
-import {z} from 'zod';
 
-import {CourseData, GradingScale, HttpCode, Language} from '@common/types';
+import {CourseData, HttpCode, Language, PartialCourseData} from '@common/types';
 import {sequelize} from '../database';
 import Course from '../database/models/course';
 import CourseTranslation from '../database/models/courseTranslation';
 import TeacherInCharge from '../database/models/teacherInCharge';
 import User from '../database/models/user';
-import {ApiError, CourseFull, localizedStringSchema} from '../types';
+import {ApiError, CourseFull} from '../types';
 import {
   findAndValidateCourseId,
   findCourseFullById,
@@ -22,14 +21,22 @@ import {
   validateEmailList,
 } from './utils/course';
 
+/**
+ * Responds with CourseData
+ */
 export const getCourse = async (req: Request, res: Response): Promise<void> => {
   const courseId = await validateCourseId(req.params.courseId);
 
-  res.status(HttpCode.Ok).json({
-    data: parseCourseFull(await findCourseFullById(courseId)),
-  });
+  const courseData: CourseData = parseCourseFull(
+    await findCourseFullById(courseId)
+  );
+
+  res.json(courseData);
 };
 
+/**
+ * Responds with CourseData[]
+ */
 export const getAllCourses = async (
   _req: Request,
   res: Response
@@ -44,28 +51,17 @@ export const getAllCourses = async (
     coursesData.push(parseCourseFull(course));
   }
 
-  res.status(HttpCode.Ok).json({data: coursesData});
+  res.json(coursesData);
 };
 
-export const addCourseBodySchema = z
-  .object({
-    courseCode: z.string(),
-    minCredits: z.number().int().min(0),
-    maxCredits: z.number().int(),
-    gradingScale: z.nativeEnum(GradingScale),
-    languageOfInstruction: z.nativeEnum(Language),
-    teachersInCharge: z.array(z.object({email: z.string().email()})),
-    department: localizedStringSchema,
-    name: localizedStringSchema,
-  })
-  .refine(val => val.maxCredits >= val.minCredits);
-type AddCourseBody = z.infer<typeof addCourseBodySchema>;
-
+/**
+ * Responds with number
+ */
 export const addCourse = async (
-  req: Request<ParamsDictionary, unknown, AddCourseBody>,
+  req: Request<ParamsDictionary, unknown, CourseData>,
   res: Response
 ): Promise<void> => {
-  const teachers: User[] = await validateEmailList(
+  const teachers = await validateEmailList(
     req.body.teachersInCharge.map(teacher => teacher.email)
   );
 
@@ -86,20 +82,20 @@ export const addCourse = async (
         {
           courseId: newCourse.id,
           language: Language.Finnish,
-          department: req.body.department.fi ?? '',
-          courseName: req.body.name.fi ?? '',
+          department: req.body.department.fi,
+          courseName: req.body.name.fi,
         },
         {
           courseId: newCourse.id,
           language: Language.English,
-          department: req.body.department.en ?? '',
-          courseName: req.body.name.en ?? '',
+          department: req.body.department.en,
+          courseName: req.body.name.en,
         },
         {
           courseId: newCourse.id,
           language: Language.Swedish,
-          department: req.body.department.sv ?? '',
-          courseName: req.body.name.sv ?? '',
+          department: req.body.department.sv,
+          courseName: req.body.name.sv,
         },
       ],
       {transaction: t}
@@ -115,30 +111,11 @@ export const addCourse = async (
     return newCourse;
   });
 
-  res.status(HttpCode.Ok).json({data: course.id});
+  res.json(course.id);
 };
 
-export const editCourseBodySchema = z
-  .object({
-    courseCode: z.string().optional(),
-    minCredits: z.number().int().min(0).optional(),
-    maxCredits: z.number().int().optional(),
-    gradingScale: z.nativeEnum(GradingScale).optional(),
-    languageOfInstruction: z.nativeEnum(Language).optional(),
-    teachersInCharge: z.array(z.object({email: z.string().email()})).optional(),
-    department: localizedStringSchema.optional(),
-    name: localizedStringSchema.optional(),
-  })
-  .refine(
-    val =>
-      val.maxCredits !== undefined &&
-      val.minCredits !== undefined &&
-      val.maxCredits >= val.minCredits
-  );
-type EditCourseBody = z.infer<typeof editCourseBodySchema>;
-
 export const editCourse = async (
-  req: Request<ParamsDictionary, unknown, EditCourseBody>,
+  req: Request<ParamsDictionary, unknown, PartialCourseData>,
   res: Response
 ): Promise<void> => {
   const course = await findAndValidateCourseId(req.params.courseId);
@@ -253,7 +230,5 @@ export const editCourse = async (
     }
   });
 
-  res.status(HttpCode.Ok).json({
-    data: parseCourseFull(await findCourseFullById(course.id)),
-  });
+  res.sendStatus(HttpCode.Ok);
 };

@@ -7,12 +7,14 @@ import {RequestHandler} from 'express-serve-static-core';
 import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 
-import {SystemRole} from '@common/types';
+import {
+  CourseDataSchema,
+  PartialCourseDataSchema,
+  SystemRole,
+} from '@common/types';
 import {
   addCourse,
-  addCourseBodySchema,
   editCourse,
-  editCourseBodySchema,
   getAllCourses,
   getCourse,
 } from '../controllers/course';
@@ -40,7 +42,7 @@ router.post(
   authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(addCourseBodySchema),
+  processRequestBody(CourseDataSchema),
   controllerDispatcher(addCourse)
 );
 
@@ -50,6 +52,6 @@ router.put(
   authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(editCourseBodySchema),
+  processRequestBody(PartialCourseDataSchema),
   controllerDispatcher(editCourse)
 );
