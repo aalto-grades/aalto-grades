@@ -26,7 +26,6 @@ import FrontPage from './components/FrontPage';
 import NotFound from './components/NotFound';
 import Login from './components/auth/Login';
 import PrivateRoute from './components/auth/PrivateRoute';
-import Signup from './components/auth/Signup';
 import AttainmentsView from './components/course-view/AttainmentsView';
 import EditCourseView from './components/course-view/EditCourseView';
 import ModelsView from './components/course-view/ModelsView';
@@ -164,7 +163,6 @@ const router = createBrowserRouter([
     element: <Root />,
     children: [
       {path: '/login', element: <Login />},
-      {path: '/signup', element: <Signup />},
       {
         // All Roles
         path: '/',

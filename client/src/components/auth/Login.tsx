@@ -146,9 +146,6 @@ export default function Login(): JSX.Element {
           </Button>
         </form>
       </Box>
-      <p>
-        {"Don't have an account yet?"} <a href={'/Signup'}>Sign up</a>
-      </p>
     </Grid>
   );
 }

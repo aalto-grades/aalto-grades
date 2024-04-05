@@ -2,19 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
-import argon from 'argon2';
 import {NextFunction, Request, Response} from 'express';
-import {ParamsDictionary, RequestHandler} from 'express-serve-static-core';
+import {RequestHandler} from 'express-serve-static-core';
 import {readFileSync} from 'fs';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import {Strategy as JWTStrategy, VerifiedCallback} from 'passport-jwt';
 import {IVerifyOptions, Strategy as LocalStrategy} from 'passport-local';
 
-import {HttpCode, LoginResult, SignupRequest, SystemRole} from '@common/types';
+import {HttpCode, LoginResult, SystemRole} from '@common/types';
 import {JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS} from '../configs/constants';
 import {JWT_SECRET, NODE_ENV, SAML_SP_CERT_PATH} from '../configs/environment';
-import User from '../database/models/user';
 import {ApiError, JwtClaims} from '../types';
 import {getSamlStrategy, validateLogin} from './utils/auth';
 import {findUserById} from './utils/user';
@@ -88,50 +86,6 @@ export const authLogin = (
 export const authLogout = (_req: Request, res: Response): void => {
   res.clearCookie('jwt', {httpOnly: true});
   res.sendStatus(HttpCode.Ok);
-};
-
-/**
- * Responds with LoginResult
- */
-export const authSignup = async (
-  req: Request<ParamsDictionary, unknown, SignupRequest>,
-  res: Response
-): Promise<void> => {
-  const exists = await User.findByEmail(req.body.email);
-
-  if (exists) {
-    throw new ApiError(
-      'user account with the specified email already exists',
-      HttpCode.Conflict
-    );
-  }
-
-  const newUser = await User.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: await argon.hash(req.body.password.trim()),
-    studentNumber: req.body.studentNumber,
-    role: req.body.role ?? SystemRole.User,
-  });
-
-  const body: JwtClaims = {role: newUser.role as SystemRole, id: newUser.id};
-
-  const token = jwt.sign(body, JWT_SECRET, {expiresIn: JWT_EXPIRY_SECONDS});
-
-  res.cookie('jwt', token, {
-    httpOnly: true,
-    secure: NODE_ENV !== 'test',
-    sameSite: 'none',
-    maxAge: JWT_COOKIE_EXPIRY_MS,
-  });
-
-  const auth: LoginResult = {
-    id: newUser.id,
-    role: newUser.role as SystemRole,
-    name: newUser.name,
-  };
-
-  res.json(auth);
 };
 
 export const authSamlLogin = (

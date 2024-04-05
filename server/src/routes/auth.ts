@@ -7,18 +7,14 @@ import express, {Router} from 'express';
 import {RequestHandler} from 'express-serve-static-core';
 import passport from 'passport';
 
-import {SignupRequestSchema} from '@common/types';
-import {processRequestBody} from 'zod-express-middleware';
 import {NODE_ENV} from '../configs/environment';
 import {
   authLogin,
   authLogout,
   authSamlLogin,
   authSelfInfo,
-  authSignup,
   samlMetadata,
 } from '../controllers/auth';
-import {handleInvalidRequestJson} from '../middleware';
 import {controllerDispatcher} from '../middleware/errorHandler';
 import {requestSyslogger} from '../middleware/requestLogger';
 
@@ -44,15 +40,6 @@ router.post(
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json(),
   authLogout
-);
-
-// TODO: Remove route?
-router.post(
-  '/v1/auth/signup',
-  express.json(),
-  handleInvalidRequestJson,
-  processRequestBody(SignupRequestSchema),
-  controllerDispatcher(authSignup)
 );
 
 router.get(

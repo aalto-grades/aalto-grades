@@ -16,13 +16,5 @@ export const LoginResultSchema = z.object({
   name: z.string(),
   role: SystemRoleSchema,
 });
-export const SignupRequestSchema = z.object({
-  name: z.string(),
-  password: z.string(),
-  email: z.string(),
-  studentNumber: z.string().optional(),
-  role: SystemRoleSchema.optional(),
-});
 
 export type LoginResult = z.infer<typeof LoginResultSchema>;
-export type SignupRequest = z.infer<typeof SignupRequestSchema>;

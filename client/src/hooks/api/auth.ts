@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {LoginResult, LoginResultSchema, SignupRequest} from '@common/types';
+import {LoginResult, LoginResultSchema} from '@common/types';
 import {
   UseMutationOptions,
   UseMutationResult,
@@ -40,16 +40,5 @@ export const useLogOut = (
 ): UseMutationResult<unknown, unknown, unknown> =>
   useMutation({
     mutationFn: async () => await axios.post('/v1/auth/logout'),
-    ...options,
-  });
-
-export const useSignUp = (
-  options?: UseMutationOptions<LoginResult, unknown, SignupRequest>
-): UseMutationResult<LoginResult, unknown, SignupRequest> =>
-  useMutation({
-    mutationFn: async (credentials: SignupRequest) =>
-      LoginResultSchema.parse(
-        (await axios.post('/v1/auth/signup', credentials)).data
-      ),
     ...options,
   });
