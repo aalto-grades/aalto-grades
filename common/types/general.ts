@@ -37,6 +37,10 @@ export const DateSchema = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}/) // Also matches dates without timestamp (otherwise zod.datetime(0))
   .pipe(z.coerce.date()) as unknown as z.ZodDate; // To fix ts compatability with zod-middleware
+export const AaltoEmailSchema = z
+  .string({required_error: 'Email is required'})
+  .email()
+  .regex(/^.*@aalto\.fi$/, 'Email must be a valid aalto email');
 
 export const LocalizedStringSchema = z.object({
   fi: z.string(),

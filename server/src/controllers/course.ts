@@ -155,7 +155,7 @@ export const editCourse = async (
 
   const newTeachers =
     teachersInCharge !== undefined
-      ? await validateEmailList(teachersInCharge.map(teacher => teacher.email))
+      ? await validateEmailList(teachersInCharge)
       : null;
 
   await sequelize.transaction(async (t: Transaction): Promise<void> => {

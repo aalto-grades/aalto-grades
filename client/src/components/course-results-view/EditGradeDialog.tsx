@@ -21,16 +21,22 @@ import {
   Typography,
 } from '@mui/material';
 import {Form, Formik, FormikErrors, FormikTouched} from 'formik';
+import {enqueueSnackbar} from 'notistack';
 import {ChangeEvent, JSX, useEffect, useState} from 'react';
 import {Params, useParams} from 'react-router-dom';
-import * as yup from 'yup';
-
-import {enqueueSnackbar} from 'notistack';
-import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
+import {z} from 'zod';
 
 import {useEditGrade} from '../../hooks/useApi';
 import {State} from '../../types';
 import {findBestGradeOption} from '../../utils';
+import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
+
+const ValidationSchema = z.object({
+  grade: z.number().min(0).optional(),
+  date: z.date().optional(),
+  expiryDate: z.date().optional(),
+  comment: z.string().optional(),
+});
 
 // A Dialog component for editing individual grade of a user.
 export default function EditGradeDialog(props: {
@@ -112,6 +118,17 @@ export default function EditGradeDialog(props: {
     }
   }, [gradeId]);
 
+  const validateForm = (
+    values: PartialGradeOption
+  ): {[key in keyof PartialGradeOption]?: string[]} | void => {
+    const result = ValidationSchema.safeParse(values);
+    if (result.success) return;
+    const fieldErrors = result.error.formErrors.fieldErrors;
+    return Object.fromEntries(
+      Object.entries(fieldErrors).map(([key, val]) => [key, val[0]]) // Only the first error
+    );
+  };
+
   return (
     <>
       <Dialog open={props.open} transitionDuration={{exit: 800}}>
@@ -145,12 +162,7 @@ export default function EditGradeDialog(props: {
             <Formik
               enableReinitialize
               initialValues={formInitialValues}
-              validationSchema={yup.object({
-                grade: yup.number().min(0).notRequired(),
-                date: yup.date().notRequired(),
-                expiryDate: yup.date().notRequired(),
-                comment: yup.string().notRequired(),
-              })}
+              validate={validateForm}
               onSubmit={handleSubmit}
             >
               {({

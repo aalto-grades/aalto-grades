@@ -12,7 +12,9 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   parser: '@typescript-eslint/parser',
   ignorePatterns: ['node_modules', '.eslintrc.cjs'],
-  rules: {},
+  rules: {
+    camelcase: ['warn', {allow: ['required_error']}],
+  },
   parserOptions: {
     project: './tsconfig.json',
     tsconfigRootDir: __dirname,

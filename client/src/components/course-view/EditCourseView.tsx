@@ -31,68 +31,65 @@ import {
   useState,
 } from 'react';
 import {useParams} from 'react-router-dom';
-import * as yup from 'yup';
 
-import {CourseData, GradingScale, Language, UserData} from '@common/types';
+import {
+  AaltoEmailSchema,
+  GradingScale,
+  Language,
+  PartialCourseData,
+  UserData,
+} from '@common/types';
 import {enqueueSnackbar} from 'notistack';
+import {z} from 'zod';
 import {useEditCourse, useGetCourse} from '../../hooks/useApi';
 import {sisuLanguageOptions} from '../../utils';
 import {convertToClientGradingScale} from '../../utils/textFormat';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
-const validationSchema = yup.object({
-  courseCode: yup
-    .string()
-    .min(1)
-    .required('Course code is required (e.g. CS-A1111)'),
-  minCredits: yup
-    .number()
-    .min(0, 'Minimum credits cannot be negative')
-    .required('Minimum credits is required'),
-  maxCredits: yup
-    .number()
-    .min(
-      yup.ref('minCredits'),
-      'Maximum credits cannot be lower than minimum credits'
-    )
-    .required('Maximum credits is required'),
-  gradingScale: yup.string().oneOf(Object.values(GradingScale)).required(),
-  languageOfInstruction: yup.string().oneOf(Object.values(Language)).required(),
-  teacherEmail: yup
-    .string()
-    .email('Please input valid email address')
-    .notRequired(),
-  departmentEn: yup
-    .string()
-    .min(1)
-    .required(
-      'Please input the organizing department of the course in English'
-    ),
-  departmentFi: yup
-    .string()
-    .min(1)
-    .required(
-      'Please input the organizing department of the course in Finnish'
-    ),
-  departmentSv: yup
-    .string()
-    .min(1)
-    .required(
-      'Please input the organizing department of the course in Swedish'
-    ),
-  nameEn: yup
-    .string()
-    .min(1)
-    .required('Please input a valid course name in English'),
-  nameFi: yup
-    .string()
-    .min(1)
-    .required('Please input a valid course name in Finnish'),
-  nameSv: yup
-    .string()
-    .min(1)
-    .required('Please input a valid course name in Swedish'),
-});
+const ValidationSchema = z
+  .object({
+    courseCode: z
+      .string({required_error: 'Course code is required (e.g. CS-A1111)'})
+      .min(1),
+    minCredits: z
+      .number({required_error: 'Minimum credits is required'})
+      .min(0, 'Minimum credits cannot be negative'),
+    maxCredits: z.number({required_error: 'Maximum credits is required'}),
+    gradingScale: z.nativeEnum(GradingScale),
+    languageOfInstruction: z.nativeEnum(Language),
+    teacherEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
+    departmentEn: z
+      .string({
+        required_error:
+          'Please input the organizing department of the course in English',
+      })
+      .min(1),
+    departmentFi: z
+      .string({
+        required_error:
+          'Please input the organizing department of the course in Finnish',
+      })
+      .min(1),
+    departmentSv: z
+      .string({
+        required_error:
+          'Please input the organizing department of the course in Swedish',
+      })
+      .min(1),
+    nameEn: z
+      .string({required_error: 'Please input a valid course name in English'})
+      .min(1),
+    nameFi: z
+      .string({required_error: 'Please input a valid course name in Finnish'})
+      .min(1),
+    nameSv: z
+      .string({required_error: 'Please input a valid course name in Swedish'})
+      .min(1),
+  })
+  .refine(
+    val => val.maxCredits >= val.minCredits,
+    'Maximum credits cannot be lower than minimum credits'
+  );
 
 type FormData = {
   courseCode: string;
@@ -180,6 +177,9 @@ export default function EditCourseView(): JSX.Element {
   const editCourse = useEditCourse();
   const course = useGetCourse(courseId);
 
+  const [initTeachersInCharge, setInitTeachersInCharge] = useState<string[]>(
+    []
+  );
   const [teachersInCharge, setTeachersInCharge] = useState<string[]>([]);
   const [email, setEmail] = useState<string>('');
   const [showDialog, setShowDialog] = useState<boolean>(false);
@@ -202,13 +202,16 @@ export default function EditCourseView(): JSX.Element {
       nameSv: course.data.name.sv,
     });
 
-    if (course.data.teachersInCharge) {
-      setTeachersInCharge(
-        course.data.teachersInCharge.map(
-          (teacher: UserData) => teacher.email ?? ''
-        )
-      );
-    }
+    setInitTeachersInCharge(
+      course.data.teachersInCharge.map(
+        (teacher: UserData) => teacher.email ?? ''
+      )
+    );
+    setTeachersInCharge(
+      course.data.teachersInCharge.map(
+        (teacher: UserData) => teacher.email ?? ''
+      )
+    );
   }, [course.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const removeTeacher = (value: string): void => {
@@ -225,7 +228,7 @@ export default function EditCourseView(): JSX.Element {
     values: FormData,
     {setSubmitting}: FormikHelpers<FormData>
   ): void => {
-    const courseData: CourseData = {
+    const courseData: PartialCourseData = {
       courseCode: values.courseCode,
       minCredits: values.minCredits,
       maxCredits: values.maxCredits,
@@ -241,11 +244,7 @@ export default function EditCourseView(): JSX.Element {
         sv: values.nameSv,
         en: values.nameEn,
       },
-      teachersInCharge: teachersInCharge.map(teacherEmail => {
-        return {
-          email: teacherEmail,
-        } as unknown as {id: number; email: string}; // TODO: Fix type?
-      }),
+      teachersInCharge: teachersInCharge.map(teacherEmail => teacherEmail),
     };
 
     editCourse.mutate(
@@ -254,8 +253,38 @@ export default function EditCourseView(): JSX.Element {
         onSuccess: () => {
           enqueueSnackbar('Course details saved.', {variant: 'success'});
           setSubmitting(false);
+          setInitialValues(values);
+          setInitTeachersInCharge(teachersInCharge);
+        },
+        onError: () => {
+          setSubmitting(false);
         },
       }
+    );
+  };
+
+  const validateForm = (
+    values: FormData
+  ): {[key in keyof FormData]?: string[]} | void => {
+    const result = ValidationSchema.safeParse(values);
+    if (result.success) return;
+    const fieldErrors = result.error.formErrors.fieldErrors;
+    return Object.fromEntries(
+      Object.entries(fieldErrors).map(([key, val]) => [key, val[0]]) // Only the first error
+    );
+  };
+  const changed = (formData: FormData): boolean => {
+    if (initialValues === null) return false;
+    return (
+      JSON.stringify(initTeachersInCharge) !==
+        JSON.stringify(teachersInCharge) ||
+      !Object.keys(initialValues)
+        .filter(key => key !== 'teacherEmail')
+        .every(
+          key =>
+            JSON.stringify(initialValues[key as keyof FormData]) ===
+            JSON.stringify(formData[key as keyof FormData])
+        )
     );
   };
 
@@ -265,7 +294,7 @@ export default function EditCourseView(): JSX.Element {
     <>
       <Formik
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        validate={validateForm}
         onSubmit={handleSubmit}
       >
         {form => (
@@ -273,7 +302,10 @@ export default function EditCourseView(): JSX.Element {
             <UnsavedChangesDialog
               open={showDialog}
               onClose={() => setShowDialog(false)}
-              handleDiscard={form.resetForm}
+              handleDiscard={() => {
+                form.resetForm();
+                setTeachersInCharge(initTeachersInCharge);
+              }}
             />
             <Form>
               <Grid container justifyContent="space-around">
@@ -433,8 +465,7 @@ export default function EditCourseView(): JSX.Element {
                       />
                     )}
                   </Button>
-                  {JSON.stringify(initialValues) !==
-                    JSON.stringify(form.values) && (
+                  {changed(form.values) && (
                     <Button
                       variant="outlined"
                       disabled={form.isSubmitting}

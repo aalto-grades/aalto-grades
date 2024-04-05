@@ -10,20 +10,17 @@ import {
   TextField,
 } from '@mui/material';
 import {Formik, FormikHelpers} from 'formik';
-import {JSX, useState} from 'react';
-import * as yup from 'yup';
-
 import {enqueueSnackbar} from 'notistack';
+import {JSX, useState} from 'react';
+import {z} from 'zod';
+
+import {AaltoEmailSchema} from '@common/types';
 import {useAddUser} from '../../../hooks/useApi';
 import UnsavedChangesDialog from '../../alerts/UnsavedChangesDialog';
 
 type FormData = {email: string};
-const validationSchema = yup.object({
-  email: yup
-    .string()
-    .matches(/^.*@aalto\.fi$/, 'Email must be a valid aalto email')
-    .email('Email must be a valid aalto email')
-    .required('Email is required'),
+const ValidationSchema = z.object({
+  email: AaltoEmailSchema,
 });
 const initialValues = {email: ''};
 
@@ -50,10 +47,19 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
     );
   };
 
+  const validateForm = (values: {email: string}): {email?: string[]} | void => {
+    const result = ValidationSchema.safeParse(values);
+    if (result.success) return;
+    const fieldErrors = result.error.formErrors.fieldErrors;
+    return Object.fromEntries(
+      Object.entries(fieldErrors).map(([key, val]) => [key, val[0]]) // Only the first error
+    );
+  };
+
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={validationSchema}
+      validate={validateForm}
       onSubmit={submitAddUser}
     >
       {form => (

@@ -40,12 +40,16 @@ export const CourseDataSchema = BaseCourseDataSchema.refine(
   val => val.maxCredits >= val.minCredits
 );
 export const CourseDataArraySchema = z.array(CourseDataSchema);
-export const PartialCourseDataSchema = BaseCourseDataSchema.partial().refine(
-  val =>
-    val.maxCredits !== undefined &&
-    val.minCredits !== undefined &&
-    val.maxCredits >= val.minCredits
-);
+export const PartialCourseDataSchema = BaseCourseDataSchema.extend({
+  teachersInCharge: z.array(z.string().email()),
+})
+  .partial()
+  .refine(
+    val =>
+      val.maxCredits !== undefined &&
+      val.minCredits !== undefined &&
+      val.maxCredits >= val.minCredits
+  );
 
 export type CourseData = z.infer<typeof CourseDataSchema>;
 export type PartialCourseData = z.infer<typeof PartialCourseDataSchema>;

@@ -22,6 +22,7 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint', 'react-refresh'],
   rules: {
+    camelcase: ['warn', {allow: ['required_error']}],
     'react-refresh/only-export-components': [
       'warn',
       {allowConstantExport: true},

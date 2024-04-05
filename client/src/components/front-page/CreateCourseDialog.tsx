@@ -27,67 +27,63 @@ import {
 import {Formik, FormikProps} from 'formik';
 import {HTMLInputTypeAttribute, JSX, PropsWithChildren, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import * as yup from 'yup';
+import {z} from 'zod';
 
-import {CourseData, GradingScale, Language} from '@common/types';
+import {
+  AaltoEmailSchema,
+  CourseData,
+  GradingScale,
+  Language,
+} from '@common/types';
 import {useAddCourse} from '../../hooks/useApi';
 import {sisuLanguageOptions} from '../../utils';
 import {convertToClientGradingScale} from '../../utils/textFormat';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
-const validationSchema = yup.object({
-  courseCode: yup
-    .string()
-    .min(1)
-    .required('Course code is required (e.g. CS-A1111)'),
-  minCredits: yup
-    .number()
-    .min(0, 'Minimum credits cannot be negative')
-    .required('Minimum credits is required'),
-  maxCredits: yup
-    .number()
-    .min(
-      yup.ref('minCredits'),
-      'Maximum credits cannot be lower than minimum credits'
-    )
-    .required('Maximum credits is required'),
-  gradingScale: yup.string().oneOf(Object.values(GradingScale)).required(),
-  languageOfInstruction: yup.string().oneOf(Object.values(Language)).required(),
-  teacherEmail: yup
-    .string()
-    .email('Please input valid email address')
-    .notRequired(),
-  departmentEn: yup
-    .string()
-    .min(1)
-    .required(
-      'Please input the organizing department of the course in English'
-    ),
-  departmentFi: yup
-    .string()
-    .min(1)
-    .required(
-      'Please input the organizing department of the course in Finnish'
-    ),
-  departmentSv: yup
-    .string()
-    .min(1)
-    .required(
-      'Please input the organizing department of the course in Swedish'
-    ),
-  nameEn: yup
-    .string()
-    .min(1)
-    .required('Please input a valid course name in English'),
-  nameFi: yup
-    .string()
-    .min(1)
-    .required('Please input a valid course name in Finnish'),
-  nameSv: yup
-    .string()
-    .min(1)
-    .required('Please input a valid course name in Swedish'),
-});
+const ValidationSchema = z
+  .object({
+    courseCode: z
+      .string({required_error: 'Course code is required (e.g. CS-A1111)'})
+      .min(1),
+    minCredits: z
+      .number({required_error: 'Minimum credits is required'})
+      .min(0, 'Minimum credits cannot be negative'),
+    maxCredits: z.number({required_error: 'Maximum credits is required'}),
+    gradingScale: z.nativeEnum(GradingScale),
+    languageOfInstruction: z.nativeEnum(Language),
+    teacherEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
+    departmentEn: z
+      .string({
+        required_error:
+          'Please input the organizing department of the course in English',
+      })
+      .min(1),
+    departmentFi: z
+      .string({
+        required_error:
+          'Please input the organizing department of the course in Finnish',
+      })
+      .min(1),
+    departmentSv: z
+      .string({
+        required_error:
+          'Please input the organizing department of the course in Swedish',
+      })
+      .min(1),
+    nameEn: z
+      .string({required_error: 'Please input a valid course name in English'})
+      .min(1),
+    nameFi: z
+      .string({required_error: 'Please input a valid course name in Finnish'})
+      .min(1),
+    nameSv: z
+      .string({required_error: 'Please input a valid course name in Swedish'})
+      .min(1),
+  })
+  .refine(
+    val => val.maxCredits >= val.minCredits,
+    'Maximum credits cannot be lower than minimum credits'
+  );
 
 type FormData = {
   courseCode: string;
@@ -235,10 +231,21 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
     });
   };
 
+  const validateForm = (
+    values: FormData
+  ): {[key in keyof FormData]?: string[]} | void => {
+    const result = ValidationSchema.safeParse(values);
+    if (result.success) return;
+    const fieldErrors = result.error.formErrors.fieldErrors;
+    return Object.fromEntries(
+      Object.entries(fieldErrors).map(([key, val]) => [key, val[0]]) // Only the first error
+    );
+  };
+
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={validationSchema}
+      validate={validateForm}
       onSubmit={handleSubmit}
     >
       {form => (
@@ -249,6 +256,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
             handleDiscard={() => {
               onClose();
               form.resetForm();
+              setTeachersInCharge([]);
             }}
           />
           <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
