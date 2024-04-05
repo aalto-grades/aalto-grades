@@ -5,11 +5,7 @@
 import {JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 
-import {
-  CustomNodeTypes,
-  RequireNodeSettings,
-  RequireNodeValue,
-} from '@common/types/graph';
+import {RequireNodeSettings, RequireNodeValue} from '@common/types/graph';
 import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
@@ -22,12 +18,9 @@ const initialSettings: LocalSettings = {
 const handleStartHeight = 128.5;
 const rowHeight = 33.9;
 
-const RequireNode = ({
-  id,
-  type,
-  selected,
-  isConnectable,
-}: NodeProps): JSX.Element => {
+const RequireNode = (props: NodeProps): JSX.Element => {
+  const {id, isConnectable} = props;
+
   const updateNodeInternals = useUpdateNodeInternals();
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
@@ -118,13 +111,7 @@ const RequireNode = ({
   );
 
   return (
-    <BaseNode
-      id={id}
-      type={type as CustomNodeTypes}
-      selected={selected}
-      error={error}
-      courseFail={nodeValue.courseFail}
-    >
+    <BaseNode {...props} error={error} courseFail={nodeValue.courseFail}>
       {handles.map((key, index) => (
         <Handle
           key={`handle-${key}`}

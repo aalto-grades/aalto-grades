@@ -5,11 +5,7 @@
 import {ChangeEvent, JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 
-import {
-  CustomNodeTypes,
-  RoundNodeSettings,
-  RoundNodeValue,
-} from '@common/types/graph';
+import {RoundNodeSettings, RoundNodeValue} from '@common/types/graph';
 import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
@@ -17,12 +13,9 @@ type RoundSetting = 'round-up' | 'round-closest' | 'round-down';
 type LocalSettings = {roundingSetting: RoundSetting};
 const initialSettings: LocalSettings = {roundingSetting: 'round-closest'};
 
-const RoundNode = ({
-  id,
-  type,
-  selected,
-  isConnectable,
-}: NodeProps): JSX.Element => {
+const RoundNode = (props: NodeProps): JSX.Element => {
+  const {id, isConnectable} = props;
+
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const [localSettings, setLocalSettings] =
@@ -49,7 +42,7 @@ const RoundNode = ({
   };
 
   return (
-    <BaseNode id={id} type={type as CustomNodeTypes} selected={selected}>
+    <BaseNode {...props}>
       <Handle
         type="target"
         id={id}

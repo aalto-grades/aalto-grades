@@ -5,11 +5,7 @@
 import {JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 
-import {
-  CustomNodeTypes,
-  MaxNodeSettings,
-  MaxNodeValue,
-} from '@common/types/graph';
+import {MaxNodeSettings, MaxNodeValue} from '@common/types/graph';
 import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
@@ -19,12 +15,9 @@ const initialSettings = {minValue: '0'};
 const handleStartHeight = 83 + 33.9;
 const rowHeight = 33.9;
 
-const MaxNode = ({
-  id,
-  type,
-  selected,
-  isConnectable,
-}: NodeProps): JSX.Element => {
+const MaxNode = (props: NodeProps): JSX.Element => {
+  const {id, isConnectable} = props;
+
   const updateNodeInternals = useUpdateNodeInternals();
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
@@ -94,12 +87,7 @@ const MaxNode = ({
   }
 
   return (
-    <BaseNode
-      id={id}
-      type={type as CustomNodeTypes}
-      selected={selected}
-      error={error}
-    >
+    <BaseNode {...props} error={error}>
       {handles.map((key, index) => (
         <Handle
           key={`handle-${key}`}

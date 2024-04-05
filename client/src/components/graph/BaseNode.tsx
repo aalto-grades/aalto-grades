@@ -3,42 +3,35 @@
 // SPDX-License-Identifier: MIT
 import WarningIcon from '@mui/icons-material/Warning';
 import {Tooltip} from '@mui/material';
-import {useMeasure} from '@uidotdev/usehooks';
 import {JSX, PropsWithChildren, useContext, useEffect, useState} from 'react';
+import {NodeProps} from 'reactflow';
 
-import {CustomNodeTypes} from '@common/types/graph';
 import {
   ExtraNodeDataContext,
   NodeDataContext,
 } from '../../context/GraphProvider';
 
-type PropsType = PropsWithChildren<{
-  id: string;
-  type: CustomNodeTypes;
-  selected: boolean;
-  error?: boolean;
-  courseFail?: boolean;
-}>;
+type PropsType = PropsWithChildren<
+  NodeProps & {
+    error?: boolean;
+    courseFail?: boolean;
+  }
+>;
 
 const BaseNode = ({
   id,
   type,
-  error = false,
   selected,
+  error = false,
   courseFail = false,
   children,
 }: PropsType): JSX.Element => {
-  const [ref, {width, height}] = useMeasure();
   const {nodeData, setNodeTitle} = useContext(NodeDataContext);
-  const {setNodeDimensions, extraNodeData} = useContext(ExtraNodeDataContext);
+  const {extraNodeData} = useContext(ExtraNodeDataContext);
   const [init, setInit] = useState<boolean>(false);
   const [localTitle, setLocalTitle] = useState<string>('');
 
-  const extraData = extraNodeData[id];
-
-  useEffect(() => {
-    setNodeDimensions(id, width as number, height as number);
-  }, [width, height]); // eslint-disable-line react-hooks/exhaustive-deps
+  const extraData = id in extraNodeData ? extraNodeData[id] : {};
 
   useEffect(() => {
     if (init) return;
@@ -49,18 +42,17 @@ const BaseNode = ({
   const getBorderColor = (): string => {
     if (courseFail) return '2px solid #e00';
     if (error) return '1px dashed #e00';
-    if (extraData?.warning) return '1px solid #ffb833';
+    if (extraData.warning) return '1px solid #ffb833';
     return '1px solid #eee';
   };
   const getBackgroundColor = (): string => {
     if (error) return '#fffafa';
-    if (extraData?.warning) return '#fff6e5';
+    if (extraData.warning) return '#fff6e5';
     return 'white';
   };
 
   return (
     <div
-      ref={ref}
       style={{
         height: 'auto',
         width: 'auto',
@@ -80,7 +72,7 @@ const BaseNode = ({
         >
           {localTitle}
         </h4>
-        {extraData?.warning && (
+        {extraData.warning && (
           <div style={{position: 'absolute', top: '5px', right: '5px'}}>
             <Tooltip title={extraData.warning} placement="top">
               <WarningIcon color="warning" sx={{fontSize: '16px'}} />

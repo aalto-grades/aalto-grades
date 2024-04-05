@@ -6,19 +6,15 @@ import {JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import {AdditionNodeValue, CustomNodeTypes} from '@common/types/graph';
+import {AdditionNodeValue} from '@common/types/graph';
 import {NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
 const handleStartHeight = 45.5 + 30;
 const rowHeight = 30;
 
-const AdditionNode = ({
-  id,
-  type,
-  selected,
-  isConnectable,
-}: NodeProps): JSX.Element => {
+const AdditionNode = (props: NodeProps): JSX.Element => {
+  const {id, isConnectable} = props;
   const updateNodeInternals = useUpdateNodeInternals();
   const {nodeValues} = useContext(NodeValuesContext);
 
@@ -50,7 +46,7 @@ const AdditionNode = ({
   }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <BaseNode id={id} type={type as CustomNodeTypes} selected={selected}>
+    <BaseNode {...props}>
       {handles.map((key, index) => (
         <Handle
           key={`handle-${key}`}

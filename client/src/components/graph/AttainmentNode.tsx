@@ -5,11 +5,7 @@
 import {ChangeEvent, JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 
-import {
-  AttainmentNodeSettings,
-  AttainmentNodeValue,
-  CustomNodeTypes,
-} from '@common/types/graph';
+import {AttainmentNodeSettings, AttainmentNodeValue} from '@common/types/graph';
 import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
@@ -20,12 +16,9 @@ const initialSettings: LocalSettings = {
   minPoints: '0',
 };
 
-const AttanmentNode = ({
-  id,
-  type,
-  selected,
-  isConnectable,
-}: NodeProps): JSX.Element => {
+const AttanmentNode = (props: NodeProps): JSX.Element => {
+  const {id, isConnectable} = props;
+
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const [localSettings, setLocalSettings] =
@@ -78,13 +71,7 @@ const AttanmentNode = ({
   };
 
   return (
-    <BaseNode
-      id={id}
-      type={type as CustomNodeTypes}
-      selected={selected}
-      error={error}
-      courseFail={nodeValue.courseFail}
-    >
+    <BaseNode {...props} error={error} courseFail={nodeValue.courseFail}>
       <div>
         <label>Minimum points: </label>
         <input

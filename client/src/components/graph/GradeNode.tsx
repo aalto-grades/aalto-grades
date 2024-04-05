@@ -5,21 +5,18 @@
 import {JSX, useContext} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 
-import {CustomNodeTypes, GradeNodeValue} from '@common/types/graph';
+import {GradeNodeValue} from '@common/types/graph';
 import {NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
-const GradeNode = ({
-  id,
-  type,
-  selected,
-  isConnectable,
-}: NodeProps): JSX.Element => {
+const GradeNode = (props: NodeProps): JSX.Element => {
+  const {id, isConnectable} = props;
+
   const {nodeValues} = useContext(NodeValuesContext);
   const nodeValue = nodeValues[id] as GradeNodeValue;
 
   return (
-    <BaseNode id={id} type={type as CustomNodeTypes} selected={selected}>
+    <BaseNode {...props}>
       <Handle
         type="target"
         id={id}

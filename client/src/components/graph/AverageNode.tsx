@@ -5,11 +5,7 @@
 import {ChangeEvent, JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 
-import {
-  AverageNodeSettings,
-  AverageNodeValue,
-  CustomNodeTypes,
-} from '@common/types/graph';
+import {AverageNodeSettings, AverageNodeValue} from '@common/types/graph';
 import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
@@ -52,12 +48,9 @@ const checkError = (settings: LocalSettings): boolean => {
   return false;
 };
 
-const AverageNode = ({
-  id,
-  type,
-  selected,
-  isConnectable,
-}: NodeProps): JSX.Element => {
+const AverageNode = (props: NodeProps): JSX.Element => {
+  const {id, isConnectable} = props;
+
   const updateNodeInternals = useUpdateNodeInternals();
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const {nodeValues} = useContext(NodeValuesContext);
@@ -158,12 +151,7 @@ const AverageNode = ({
   }
 
   return (
-    <BaseNode
-      id={id}
-      type={type as CustomNodeTypes}
-      selected={selected}
-      error={error}
-    >
+    <BaseNode {...props} error={error}>
       {handles.map((key, index) => (
         <Handle
           key={`handle-${key}`}

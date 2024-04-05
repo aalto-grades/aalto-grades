@@ -82,8 +82,8 @@ export const formatGraph = async (
   const nodesForElk = nodes.map(node => ({
     type: node.type,
     id: node.id,
-    width: nodeDimensions[node.id].dimensions.width,
-    height: nodeDimensions[node.id].dimensions.height,
+    width: node.width as number,
+    height: node.height as number,
   }));
   const graph = {
     id: 'root',

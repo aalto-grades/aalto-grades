@@ -129,16 +129,6 @@ const Graph = ({
       },
     }));
   };
-  const setNodeDimensions = (
-    id: string,
-    width: number,
-    height: number
-  ): void => {
-    setExtraNodeData(oldExtraNodeData => ({
-      ...oldExtraNodeData,
-      [id]: {...oldExtraNodeData[id], dimensions: {width, height}},
-    }));
-  };
   const setNodeSettings = (id: string, settings: NodeSettings): void => {
     setNodeData(oldNodeSettings => ({
       ...oldNodeSettings,
@@ -494,9 +484,7 @@ const Graph = ({
         handleSetAttainmentValues={handleSetAttainmentValues}
       />
       <NodeValuesContext.Provider value={{nodeValues}}>
-        <ExtraNodeDataContext.Provider
-          value={{extraNodeData, setNodeDimensions}}
-        >
+        <ExtraNodeDataContext.Provider value={{extraNodeData}}>
           <NodeDataContext.Provider
             value={{nodeData, setNodeTitle, setNodeSettings}}
           >

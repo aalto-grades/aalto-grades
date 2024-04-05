@@ -5,11 +5,7 @@
 import {JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 
-import {
-  CustomNodeTypes,
-  SubstituteNodeSettings,
-  SubstituteNodeValue,
-} from '@common/types/graph';
+import {SubstituteNodeSettings, SubstituteNodeValue} from '@common/types/graph';
 import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
 import BaseNode from './BaseNode';
 
@@ -45,12 +41,9 @@ const convertFromLocalSettings = (
   ),
 });
 
-const SubstituteNode = ({
-  id,
-  type,
-  selected,
-  isConnectable,
-}: NodeProps): JSX.Element => {
+const SubstituteNode = (props: NodeProps): JSX.Element => {
+  const {id, isConnectable} = props;
+
   const updateNodeInternals = useUpdateNodeInternals();
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
@@ -155,12 +148,7 @@ const SubstituteNode = ({
   };
 
   return (
-    <BaseNode
-      id={id}
-      type={type as CustomNodeTypes}
-      selected={selected}
-      error={error}
-    >
+    <BaseNode {...props} error={error}>
       {substituteHandles.map((key, index) => (
         <Handle
           key={`handle-${key}`}

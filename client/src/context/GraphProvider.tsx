@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {createContext} from 'react';
 import {NodeData, NodeSettings, NodeValues} from '@common/types/graph';
+import {createContext} from 'react';
 
 type NodeValuesContext = {nodeValues: NodeValues};
 export const NodeValuesContext = createContext<NodeValuesContext>(
@@ -21,13 +21,11 @@ export const NodeDataContext = createContext<NodeDataContext>(
 
 export type ExtraNodeData = {
   [key: string]: {
-    dimensions: {width: number; height: number};
     warning?: string;
   };
 };
 type ExtraNodeDataContext = {
   extraNodeData: ExtraNodeData;
-  setNodeDimensions: (id: string, width: number, height: number) => void;
 };
 export const ExtraNodeDataContext = createContext<ExtraNodeDataContext>(
   {} as ExtraNodeDataContext
