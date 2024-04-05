@@ -4,7 +4,6 @@
 
 import {Request, Response} from 'express';
 import {ParamsDictionary} from 'express-serve-static-core';
-import {z} from 'zod';
 
 import {AssessmentModelData, HttpCode} from '@common/types';
 import {GraphStructure} from '@common/types/graph';
@@ -14,6 +13,9 @@ import {validateAssessmentModelPath} from './utils/assessmentModel';
 import {findAndValidateCourseId} from './utils/course';
 import {isTeacherInChargeOrAdmin} from './utils/user';
 
+/**
+ * Responds with AssessmentModelData
+ */
 export const getAssessmentModel = async (
   req: Request,
   res: Response
@@ -30,9 +32,12 @@ export const getAssessmentModel = async (
     graphStructure: assessmentModel.graphStructure as object as GraphStructure,
   };
 
-  res.status(HttpCode.Ok).json({data: assessmentModelData});
+  res.json(assessmentModelData);
 };
 
+/**
+ * Responds with AssessmentModelData[]
+ */
 export const getAllAssessmentModels = async (
   req: Request,
   res: Response
@@ -55,21 +60,14 @@ export const getAllAssessmentModels = async (
     });
   }
 
-  res.status(HttpCode.Ok).json({data: assessmentModelsData});
+  res.json(assessmentModelsData);
 };
 
-export const addAssessmentModelBodySchema = z.object({
-  name: z.string(),
-  graphStructure: z.object({
-    nodes: z.array(z.any()),
-    edges: z.array(z.any()),
-    nodeData: z.record(z.string(), z.any()),
-  }), // TODO: improve
-});
-type AddAssessmentModelBody = z.infer<typeof addAssessmentModelBodySchema>;
-
+/**
+ * Responds with number
+ */
 export const addAssessmentModel = async (
-  req: Request<ParamsDictionary, unknown, AddAssessmentModelBody>,
+  req: Request<ParamsDictionary, unknown, AssessmentModelData>,
   res: Response
 ): Promise<void> => {
   const course = await findAndValidateCourseId(req.params.courseId);
@@ -96,23 +94,11 @@ export const addAssessmentModel = async (
     );
   }
 
-  res.status(HttpCode.Ok).json({data: assessmentModel.id});
+  res.status(HttpCode.Created).json(assessmentModel.id);
 };
 
-export const updateAssessmentModelBodySchema = z.object({
-  name: z.string(),
-  graphStructure: z.object({
-    nodes: z.array(z.any()),
-    edges: z.array(z.any()),
-    nodeData: z.record(z.string(), z.any()),
-  }), // TODO: improve
-});
-type UpdateAssessmentModelBody = z.infer<
-  typeof updateAssessmentModelBodySchema
->;
-
 export const updateAssessmentModel = async (
-  req: Request<ParamsDictionary, unknown, UpdateAssessmentModelBody>,
+  req: Request<ParamsDictionary, unknown, AssessmentModelData>,
   res: Response
 ): Promise<void> => {
   const [course, assessmentModel] = await validateAssessmentModelPath(
@@ -129,7 +115,7 @@ export const updateAssessmentModel = async (
     graphStructure: req.body.graphStructure as unknown as JSON,
   });
 
-  res.status(HttpCode.Ok).json({id: assessmentModel.id});
+  res.sendStatus(HttpCode.Ok);
 };
 
 export const deleteAssessmentModel = async (
@@ -153,5 +139,5 @@ export const deleteAssessmentModel = async (
   // Delete assessment model.
   await assessmentModel.destroy();
 
-  res.status(HttpCode.Ok).json({id: assessmentModel.id});
+  res.sendStatus(HttpCode.Ok);
 };

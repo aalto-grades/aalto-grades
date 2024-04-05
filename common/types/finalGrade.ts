@@ -2,21 +2,26 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {DateOnlyString} from '@common/types';
+import {z} from 'zod';
+import {DateSchema} from './general';
 
-export type NewFinalGrade = {
-  userId: number;
-  assessmentModelId: number;
-  grade: number;
-  date?: Date | DateOnlyString;
-};
+export const NewFinalGradeSchema = z.object({
+  userId: z.number().int(),
+  assessmentModelId: z.number().int(),
+  grade: z.number().int().min(0).max(5),
+  date: DateSchema.optional(),
+});
+export const NewFinalGradeArraySchema = z.array(NewFinalGradeSchema);
+export const FinalGradeDataSchema = z.object({
+  userId: z.number().int(),
+  courseId: z.number().int(),
+  assessmentModelId: z.number().int(),
+  graderId: z.number().int(),
+  grade: z.number().int().min(0).max(5),
+  date: DateSchema.optional(),
+  sisuExportDate: DateSchema.nullable(),
+});
+export const FinalGradeDataArraySchema = z.array(FinalGradeDataSchema);
 
-export type FinalGradeData = {
-  userId: number;
-  courseId: number;
-  assessmentModelId: number;
-  graderId: number;
-  grade: number;
-  date?: Date | DateOnlyString;
-  sisuExportDate: Date | DateOnlyString | null;
-};
+export type NewFinalGrade = z.infer<typeof NewFinalGradeSchema>;
+export type FinalGradeData = z.infer<typeof FinalGradeDataSchema>;

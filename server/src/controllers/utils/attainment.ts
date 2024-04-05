@@ -5,7 +5,7 @@
 import {AttainmentData, HttpCode} from '@common/types';
 import Attainment from '../../database/models/attainment';
 import Course from '../../database/models/course';
-import {ApiError, idSchema} from '../../types';
+import {ApiError, stringToIdSchema} from '../../types';
 import {findAndValidateCourseId} from './course';
 
 /**
@@ -45,7 +45,7 @@ export const findAttainmentsByCourseId = async (
 const findAndValidateAttainmentId = async (
   attainmentId: string
 ): Promise<Attainment> => {
-  const result = idSchema.safeParse(attainmentId);
+  const result = stringToIdSchema.safeParse(attainmentId);
   if (!result.success) {
     throw new ApiError(
       `Invalid attainment id ${attainmentId}`,
@@ -59,10 +59,10 @@ const findAndValidateAttainmentId = async (
  * Finds the course and the assessment model by url param ids and also validates the url params.
  * Throws ApiError if either not found.
  */
-export async function validateAttainmentPath(
+export const validateAttainmentPath = async (
   courseId: string,
   attainmentId: string
-): Promise<[Course, Attainment]> {
+): Promise<[Course, Attainment]> => {
   const course = await findAndValidateCourseId(courseId);
   const attainment = await findAndValidateAttainmentId(attainmentId);
 
@@ -76,4 +76,4 @@ export async function validateAttainmentPath(
   }
 
   return [course, attainment];
-}
+};

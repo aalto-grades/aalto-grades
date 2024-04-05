@@ -4,9 +4,8 @@
 
 import {Request, Response} from 'express';
 import {ParamsDictionary} from 'express-serve-static-core';
-import {z} from 'zod';
 
-import {HttpCode} from '@common/types';
+import {AttainmentData, HttpCode, NewAttainmentData} from '@common/types';
 import Attainment from '../database/models/attainment';
 import {JwtClaims} from '../types';
 import {
@@ -16,48 +15,44 @@ import {
 import {findAndValidateCourseId} from './utils/course';
 import {isTeacherInChargeOrAdmin} from './utils/user';
 
+/**
+ * Responds with AttainmentData[]
+ */
 export const getAttainments = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const course = await findAndValidateCourseId(req.params.courseId);
-  const attainmentData = await findAttainmentsByCourseId(course.id);
+  const attainmentData: AttainmentData[] = await findAttainmentsByCourseId(
+    course.id
+  );
 
-  res.status(HttpCode.Ok).json({data: attainmentData});
+  res.json(attainmentData);
 };
 
-export const addAttainmentBodySchema = z.object({
-  name: z.string(),
-  daysValid: z.number().int().min(0),
-});
-type AddAttainmentBody = z.infer<typeof addAttainmentBodySchema>;
-
+/**
+ * Responds with number
+ */
 export const addAttainment = async (
-  req: Request<ParamsDictionary, unknown, AddAttainmentBody>,
+  req: Request<ParamsDictionary, unknown, NewAttainmentData>,
   res: Response
 ): Promise<void> => {
   const course = await findAndValidateCourseId(req.params.courseId);
   await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id);
 
-  const dbAttainment = await Attainment.create({
+  const newAttainment = await Attainment.create({
     courseId: course.id,
     name: req.body.name,
     daysValid: req.body.daysValid,
   });
 
-  res.status(HttpCode.Ok).json({data: dbAttainment});
+  res.status(HttpCode.Created).json(newAttainment.id);
 };
 
-export const editAttainmentBodySchema = z.object({
-  name: z.string(),
-  daysValid: z.number().int().min(0).optional(),
-});
-type EditAttainmentBody = z.infer<typeof editAttainmentBodySchema>;
-
-export async function updateAttainment(
-  req: Request<ParamsDictionary, unknown, EditAttainmentBody>,
+export const editAttainment = async (
+  req: Request<ParamsDictionary, unknown, AttainmentData>,
   res: Response
-): Promise<void> {
+): Promise<void> => {
   const [course, attainment] = await validateAttainmentPath(
     req.params.courseId,
     req.params.attainmentId
@@ -72,13 +67,13 @@ export async function updateAttainment(
     })
     .save();
 
-  res.status(HttpCode.Ok).json({id: attainment.id});
-}
+  res.sendStatus(HttpCode.Ok);
+};
 
-export async function deleteAttainment(
+export const deleteAttainment = async (
   req: Request,
   res: Response
-): Promise<void> {
+): Promise<void> => {
   const [course, attainment] = await validateAttainmentPath(
     req.params.courseId,
     req.params.attainmentId
@@ -88,5 +83,5 @@ export async function deleteAttainment(
 
   await attainment.destroy();
 
-  res.status(HttpCode.Ok).send({id: attainment.id});
-}
+  res.sendStatus(HttpCode.Ok);
+};

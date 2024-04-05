@@ -4,9 +4,14 @@
 
 import {Request, Response} from 'express';
 import {ParamsDictionary} from 'express-serve-static-core';
-import {z} from 'zod';
 
-import {CourseData, HttpCode, SystemRole} from '@common/types';
+import {
+  AddIdpUser,
+  CourseData,
+  HttpCode,
+  IdpUsers,
+  SystemRole,
+} from '@common/types';
 import Course from '../database/models/course';
 import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
@@ -19,6 +24,9 @@ import {adminOrOwner, findAndValidateUserId} from './utils/user';
 // TODO: Remove if possible.
 require('../database/models/courseInstanceRole');
 
+/**
+ * Responds with CourseData[]
+ */
 export const getCoursesOfUser = async (
   req: Request,
   res: Response
@@ -26,13 +34,7 @@ export const getCoursesOfUser = async (
   const user = await adminOrOwner(req);
 
   const inChargeCourses = (await Course.findAll({
-    include: [
-      {model: CourseTranslation},
-      {
-        model: User,
-        where: {id: user.id},
-      },
-    ],
+    include: [{model: CourseTranslation}, {model: User, where: {id: user.id}}],
   })) as CourseFull[];
 
   interface CourseInstanceWithCourseFull extends CourseInstance {
@@ -41,14 +43,8 @@ export const getCoursesOfUser = async (
 
   const instanceRoleCourses = (await CourseInstance.findAll({
     include: [
-      {
-        model: User,
-        where: {id: user.id},
-      },
-      {
-        model: Course,
-        include: [{model: CourseTranslation}, {model: User}],
-      },
+      {model: User, where: {id: user.id}},
+      {model: Course, include: [{model: CourseTranslation}, {model: User}]},
     ],
   })) as CourseInstanceWithCourseFull[];
 
@@ -63,14 +59,11 @@ export const getCoursesOfUser = async (
     courses.push(parseCourseFull(instance.Course));
   }
 
-  res.status(HttpCode.Ok).send({data: courses});
+  res.json(courses);
 };
 
-export const addIddUserBodySchema = z.object({email: z.string().email()});
-type AddIdpUserBody = z.infer<typeof addIddUserBodySchema>;
-
 export const addIdpUser = async (
-  req: Request<ParamsDictionary, unknown, AddIdpUserBody>,
+  req: Request<ParamsDictionary, unknown, AddIdpUser>,
   res: Response
 ): Promise<void> => {
   const email = req.body.email;
@@ -81,24 +74,30 @@ export const addIdpUser = async (
   }
 
   await User.create({email: email, role: SystemRole.User});
-  res.status(HttpCode.Created).send();
+  res.sendStatus(HttpCode.Created);
 };
 
-export async function getIdpUsers(req: Request, res: Response): Promise<void> {
+/**
+ * Responds with IdpUsers
+ */
+export const getIdpUsers = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const idpUsers = await User.findIdpUsers();
-  const users: {email: string; id: number}[] = idpUsers.map(user => ({
+  const users: IdpUsers = idpUsers.map(user => ({
     email: user.email,
     id: user.id,
   }));
 
-  res.status(HttpCode.Ok).json({data: users});
-}
+  res.json(users);
+};
 
-export async function deleteIdpUser(
+export const deleteIdpUser = async (
   req: Request,
   res: Response
-): Promise<void> {
+): Promise<void> => {
   const user = await findAndValidateUserId(req.params.userId);
   await user.destroy();
-  res.status(HttpCode.Ok).send();
-}
+  res.sendStatus(HttpCode.Ok);
+};

@@ -7,13 +7,12 @@ import {RequestHandler} from 'express-serve-static-core';
 import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 
+import {AttainmentDataSchema, NewAttainmentDataSchema} from '@common/types';
 import {
   addAttainment,
-  addAttainmentBodySchema,
   deleteAttainment,
-  editAttainmentBodySchema,
+  editAttainment,
   getAttainments,
-  updateAttainment,
 } from '../controllers/attainment';
 import {handleInvalidRequestJson} from '../middleware';
 import {controllerDispatcher} from '../middleware/errorHandler';
@@ -31,7 +30,7 @@ router.post(
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(addAttainmentBodySchema),
+  processRequestBody(NewAttainmentDataSchema),
   controllerDispatcher(addAttainment)
 );
 
@@ -40,8 +39,8 @@ router.put(
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(editAttainmentBodySchema),
-  controllerDispatcher(updateAttainment)
+  processRequestBody(AttainmentDataSchema),
+  controllerDispatcher(editAttainment)
 );
 
 router.delete(

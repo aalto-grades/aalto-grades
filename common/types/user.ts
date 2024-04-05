@@ -2,9 +2,31 @@
 //
 // SPDX-License-Identifier: MIT
 
-export interface UserData {
-  id: number;
-  name?: string;
-  email?: string;
-  studentNumber?: string;
-}
+import {z} from 'zod';
+
+export const UserDataSchema = z.object({
+  id: z.number().int(),
+  name: z.string().optional(),
+  email: z.string().optional(),
+  studentNumber: z.string().optional(),
+});
+export const TeacherDataSchema = z.object({
+  id: z.number().int(),
+  name: z.string().optional(),
+  email: z.string(),
+  studentNumber: z.string().optional(),
+});
+export const AddIdpUserSchema = z.object({
+  email: z.string().email(),
+});
+export const IdpUsersSchema = z.array(
+  z.object({
+    id: z.number().int(),
+    email: z.string().email(),
+  })
+);
+
+export type UserData = z.infer<typeof UserDataSchema>;
+export type TeacherData = z.infer<typeof TeacherDataSchema>;
+export type AddIdpUser = z.infer<typeof AddIdpUserSchema>;
+export type IdpUsers = z.infer<typeof IdpUsersSchema>;

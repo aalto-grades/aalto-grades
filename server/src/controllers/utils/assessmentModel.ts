@@ -5,7 +5,7 @@
 import {HttpCode} from '@common/types';
 import AssessmentModel from '../../database/models/assessmentModel';
 import Course from '../../database/models/course';
-import {ApiError, idSchema} from '../../types';
+import {ApiError, stringToIdSchema} from '../../types';
 import {findAndValidateCourseId} from './course';
 
 /**
@@ -32,7 +32,7 @@ export const findAssessmentModelById = async (
 const findAndValidateAssessmentModelId = async (
   courseId: string
 ): Promise<AssessmentModel> => {
-  const result = idSchema.safeParse(courseId);
+  const result = stringToIdSchema.safeParse(courseId);
   if (!result.success) {
     throw new ApiError(
       `Invalid assessment model id ${courseId}`,

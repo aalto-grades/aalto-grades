@@ -5,14 +5,14 @@ import {stringify} from 'csv-stringify';
 import {Request, Response} from 'express';
 import {ParamsDictionary} from 'express-serve-static-core';
 import {Op} from 'sequelize';
-import {z} from 'zod';
 
 import {
   FinalGradeData,
   GradeOption,
   HttpCode,
-  Language,
-  Status,
+  NewGrade,
+  PartialGradeOption,
+  SisuCsvUpload,
   StudentRow,
 } from '@common/types';
 import {sequelize} from '../database';
@@ -25,7 +25,6 @@ import User from '../database/models/user';
 import {AttainmentGradeModelData, JwtClaims} from '../types';
 import {validateAssessmentModelPath} from './utils/assessmentModel';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
-import {toDateOnlyString} from './utils/date';
 import {
   findAndValidateAttainmentGrade,
   getDateOfLatestGrade,
@@ -34,6 +33,9 @@ import {
 } from './utils/grades';
 import {isTeacherInChargeOrAdmin} from './utils/user';
 
+/**
+ * Responds with StudentRow[]
+ */
 export const getGrades = async (req: Request, res: Response): Promise<void> => {
   const courseId = await validateCourseId(req.params.courseId);
 
@@ -92,8 +94,8 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
       },
       grade: grade.grade,
       exportedToSisu: grade.sisuExportDate,
-      date: toDateOnlyString(grade.date),
-      expiryDate: toDateOnlyString(grade.expiryDate),
+      date: grade.date,
+      expiryDate: grade.expiryDate,
       comment: grade.comment,
     });
   }
@@ -128,26 +130,19 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
     })),
   }));
 
-  res.status(HttpCode.Ok).json({data: result});
+  res.json(result);
 };
-
-export const SisuCSVSchema = z.object({
-  assessmentDate: z.string().datetime().optional(), // Assessment date override
-  // All Sisu accepted language codes.
-  completionLanguage: z.nativeEnum(Language).optional(), // Defaults to course language TODO: confirm that the Language enum is valid for SISU
-  studentNumbers: z.array(z.string()).nonempty(),
-});
-export type SisuCSVBody = z.infer<typeof SisuCSVSchema>;
 
 /**
  * Get grading data formatted to Sisu compatible format for exporting grades to Sisu.
  * Documentation and requirements for Sisu CSV file structure available at
  * https://wiki.aalto.fi/display/SISEN/Assessment+of+implementations
+ * Responds with text/csv
  */
-export async function getSisuFormattedGradingCSV(
-  req: Request<ParamsDictionary, unknown, SisuCSVBody>,
+export const getSisuFormattedGradingCSV = async (
+  req: Request<ParamsDictionary, unknown, SisuCsvUpload>,
   res: Response
-): Promise<void> {
+): Promise<void> => {
   const sisuExportDate = new Date();
   const course = await findAndValidateCourseId(req.params.courseId);
 
@@ -205,7 +200,7 @@ export async function getSisuFormattedGradingCSV(
         // Assessment date must be in form dd.mm.yyyy.
         // HERE we want to find the latest completed attainment grade for student
         assessmentDate: (req.body.assessmentDate
-          ? new Date(req.body.assessmentDate)
+          ? req.body.assessmentDate
           : await getDateOfLatestGrade(finalGrade.userId, course.id)
         ).toLocaleDateString('fi-FI'),
         completionLanguage: req.body.completionLanguage
@@ -236,7 +231,6 @@ export async function getSisuFormattedGradingCSV(
     },
     (_err, data) => {
       res
-        .status(HttpCode.Ok)
         .setHeader('Content-Type', 'text/csv')
         .attachment(
           `final_grades_course_${
@@ -246,27 +240,12 @@ export async function getSisuFormattedGradingCSV(
         .send(data);
     }
   );
-}
-
-export const addGradesBodySchema = z.object({
-  grades: z.array(
-    z.object({
-      studentNumber: z.string(),
-      attainmentId: z.number().int().min(0),
-      grade: z.number().int().min(0),
-      date: z.string().datetime().optional(),
-      expiryDate: z.string().datetime().optional(),
-      comment: z.string(),
-    })
-  ),
-});
-type AddGradesBody = z.infer<typeof addGradesBodySchema>;
+};
 
 export const addGrades = async (
-  req: Request<ParamsDictionary, unknown, AddGradesBody>,
+  req: Request<ParamsDictionary, unknown, NewGrade[]>,
   res: Response
 ): Promise<Response | void> => {
-  const newGrades = req.body.grades;
   const grader = req.user as JwtClaims;
 
   const courseId = await validateCourseId(req.params.courseId);
@@ -276,7 +255,7 @@ export const addGrades = async (
   // Check all users (students) exists in db, create new users if needed.
   // Make sure each studentNumber is only in the list once
   const studentNumbers = Array.from(
-    new Set(newGrades.map(grade => grade.studentNumber))
+    new Set(req.body.map(grade => grade.studentNumber))
   );
 
   let students = await User.findAll({
@@ -319,17 +298,13 @@ export const addGrades = async (
 
   // Use studentsWithId to update attainments by flatmapping each
   // students grades into a one array of all the grades.
-  const preparedBulkCreate: AttainmentGradeModelData[] = newGrades.map(
+  const preparedBulkCreate: AttainmentGradeModelData[] = req.body.map(
     gradeEntry => ({
       userId: studentNumberToId[gradeEntry.studentNumber],
       attainmentId: gradeEntry.attainmentId,
       graderId: grader.id,
-      date:
-        gradeEntry.date === undefined ? undefined : new Date(gradeEntry.date),
-      expiryDate:
-        gradeEntry.expiryDate === undefined
-          ? undefined
-          : new Date(gradeEntry.expiryDate),
+      date: gradeEntry.date,
+      expiryDate: gradeEntry.expiryDate,
       grade: gradeEntry.grade,
     })
   );
@@ -338,20 +313,11 @@ export const addGrades = async (
   await AttainmentGrade.bulkCreate(preparedBulkCreate);
 
   // After this point all the students' attainment grades have been created
-  return res.status(HttpCode.Ok).json({data: {}});
+  return res.sendStatus(HttpCode.Created);
 };
 
-export const editUserGradeBodySchema = z.object({
-  grade: z.number().min(0).optional(),
-  status: z.nativeEnum(Status).optional(),
-  date: z.string().datetime().optional(),
-  expiryDate: z.string().datetime().optional(),
-  comment: z.string().optional(),
-});
-type EditUserGradeBody = z.infer<typeof editUserGradeBodySchema>;
-
 export const editUserGrade = async (
-  req: Request<ParamsDictionary, unknown, EditUserGradeBody>,
+  req: Request<ParamsDictionary, unknown, PartialGradeOption>,
   res: Response
 ): Promise<void> => {
   const [course]: [Course, AssessmentModel] = await validateAssessmentModelPath(
@@ -362,21 +328,19 @@ export const editUserGrade = async (
   const grader: JwtClaims = req.user as JwtClaims;
   await isTeacherInChargeOrAdmin(grader, course.id);
 
-  const {grade, status, date, expiryDate, comment} = req.body;
+  const {grade, date, expiryDate, comment} = req.body;
   const gradeData = await findAndValidateAttainmentGrade(req.params.gradeId);
 
   await gradeData
     .set({
       grade: grade ?? gradeData.grade,
-      status: status ?? gradeData.status,
-      date: date === undefined ? gradeData.date : new Date(date),
-      expiryDate:
-        expiryDate === undefined ? gradeData.expiryDate : new Date(expiryDate),
+      date: date === undefined ? gradeData.date : date,
+      expiryDate: expiryDate === undefined ? gradeData.expiryDate : expiryDate,
       comment: comment && comment.length > 0 ? comment : gradeData.comment,
       manual: true,
       graderId: grader.id,
     })
     .save();
 
-  res.status(HttpCode.Ok).json({data: {}});
+  res.sendStatus(HttpCode.Ok);
 };

@@ -5,7 +5,7 @@
 import {SystemRole} from '@common/types';
 import {z} from 'zod';
 
-export const idSchema = z
+export const stringToIdSchema = z
   .string()
   .regex(/^\d+$/)
   .pipe(z.coerce.number().int().min(1));

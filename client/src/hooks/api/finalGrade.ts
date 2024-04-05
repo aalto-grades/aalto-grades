@@ -2,9 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {FinalGradeData, NewFinalGrade} from '@common/types';
 import {
-  QueryClient,
+  FinalGradeData,
+  FinalGradeDataArraySchema,
+  NewFinalGrade,
+} from '@common/types';
+import {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -18,18 +21,13 @@ import axios from './axios';
 
 export const useAddFinalGrades = (
   courseId: Numeric,
-  options?: UseMutationOptions<Record<string, never>, unknown, NewFinalGrade[]>
-): UseMutationResult<Record<string, never>, unknown, NewFinalGrade[]> => {
-  const queryClient: QueryClient = useQueryClient();
+  options?: UseMutationOptions<unknown, unknown, NewFinalGrade[]>
+): UseMutationResult<unknown, unknown, NewFinalGrade[]> => {
+  const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: NewFinalGrade[]) =>
-      (
-        await axios.post<{data: Record<string, never>}>(
-          `/v1/courses/${courseId}/finalGrades`,
-          {finalGrades: data}
-        )
-      ).data.data,
+    mutationFn: async (newFinalGrades: NewFinalGrade[]) =>
+      await axios.post(`/v1/courses/${courseId}/finalGrades`, newFinalGrades),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -50,10 +48,8 @@ export const useGetFinalGrades = (
   useQuery({
     queryKey: ['final-grades', courseId],
     queryFn: async () =>
-      (
-        await axios.get<{data: FinalGradeData[]}>(
-          `/v1/courses/${courseId}/finalGrades`
-        )
-      ).data.data,
+      FinalGradeDataArraySchema.parse(
+        (await axios.get(`/v1/courses/${courseId}/finalGrades`)).data
+      ),
     ...options,
   });

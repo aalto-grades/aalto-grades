@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {DateOnlyString} from '@common/types';
 import {
   CreationOptional,
   DataTypes,

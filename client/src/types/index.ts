@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Language, SystemRole} from '@common/types';
+import {Language} from '@common/types';
 import {Dispatch, SetStateAction} from 'react';
 
 export interface ApiResponse<T> {
@@ -26,14 +26,6 @@ export interface Message {
 }
 
 export type Numeric = number | string;
-
-export interface SignupCredentials {
-  email: string;
-  password: string;
-  studentNumber?: string;
-  name: string;
-  role: SystemRole;
-}
 
 export type State<T> = [T, Dispatch<SetStateAction<T>>];
 

@@ -7,14 +7,13 @@ import {RequestHandler} from 'express-serve-static-core';
 import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 
+import {AssesmentModelDataSchema} from '@common/types';
 import {
   addAssessmentModel,
-  addAssessmentModelBodySchema,
   deleteAssessmentModel,
   getAllAssessmentModels,
   getAssessmentModel,
   updateAssessmentModel,
-  updateAssessmentModelBodySchema,
 } from '../controllers/assessmentModel';
 import {handleInvalidRequestJson} from '../middleware';
 import {controllerDispatcher} from '../middleware/errorHandler';
@@ -38,7 +37,7 @@ router.post(
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(addAssessmentModelBodySchema),
+  processRequestBody(AssesmentModelDataSchema),
   controllerDispatcher(addAssessmentModel)
 );
 
@@ -47,7 +46,7 @@ router.put(
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(updateAssessmentModelBodySchema),
+  processRequestBody(AssesmentModelDataSchema),
   controllerDispatcher(updateAssessmentModel)
 );
 

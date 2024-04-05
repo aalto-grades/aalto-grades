@@ -2,7 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {EditGrade, NewGrade, StudentRow} from '@common/types';
+import {
+  NewGrade,
+  PartialGradeOption,
+  SisuCsvUpload,
+  StudentRow,
+  StudentRowArraySchema,
+} from '@common/types';
 import {
   UseMutationOptions,
   UseMutationResult,
@@ -23,33 +29,26 @@ export const useGetGrades = (
   useQuery({
     queryKey: ['grades', courseId],
     queryFn: async () =>
-      (await axios.get<{data: StudentRow[]}>(`/v1/courses/${courseId}/grades`))
-        .data.data,
+      StudentRowArraySchema.parse(
+        (await axios.get(`/v1/courses/${courseId}/grades`)).data
+      ),
     ...options,
   });
 
-type DownloadSisuGradeCsvVars = {
-  courseId: Numeric;
-  data: {
-    completionLanguage?: string;
-    assessmentDate?: string;
-    studentNumbers: string[];
-  };
-};
+type DownloadSisuGradeCsvVars = {courseId: Numeric; data: SisuCsvUpload};
 export const useDownloadSisuGradeCsv = (
   options?: UseMutationOptions<BlobPart, unknown, DownloadSisuGradeCsvVars>
-): UseMutationResult<BlobPart, unknown, DownloadSisuGradeCsvVars> => {
-  return useMutation({
+): UseMutationResult<BlobPart, unknown, DownloadSisuGradeCsvVars> =>
+  useMutation({
     mutationFn: async vars =>
       (
         await axios.post<BlobPart>(
           `/v1/courses/${vars.courseId}/grades/csv/sisu`,
-          {responseType: 'blob', ...vars.data}
+          vars.data
         )
       ).data,
     ...options,
   });
-};
 
 export const useAddGrades = (
   courseId: Numeric,
@@ -58,10 +57,8 @@ export const useAddGrades = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: NewGrade[]) =>
-      await axios.post(`/v1/courses/${courseId}/grades`, {
-        grades: data,
-      }),
+    mutationFn: async (newGrades: NewGrade[]) =>
+      await axios.post(`/v1/courses/${courseId}/grades`, newGrades),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -76,8 +73,7 @@ type EditGradeVars = {
   courseId?: Numeric;
   assessmentModelId?: Numeric;
   gradeId?: Numeric;
-  userId?: Numeric;
-  data?: EditGrade;
+  data?: PartialGradeOption;
 };
 export const useEditGrade = (
   options?: UseMutationOptions<unknown, unknown, EditGradeVars>
