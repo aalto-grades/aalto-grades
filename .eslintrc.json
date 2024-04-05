@@ -3,10 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 {
-  "env": {
-    "browser": true
-  },
-  "extends": ["./node_modules/gts"],
   "rules": {
     // Disable all rules from the 'node' plugin inside gts
     "node/no-extraneous-import": "off",
@@ -18,16 +14,40 @@
     "node/no-unsupported-features/es-syntax": "off",
     "node/process-exit-as-throw": "off",
     "node/shebang": "off",
-    // Only warning to fix later
-    "eqeqeq": "warn",
-    // From the old team
+
+    // Extra rules on top of gts
     "camelcase": "warn",
+    "no-constant-condition": ["warn", {"checkLoops": false}],
+    "spaced-comment": ["warn", "always", {"markers": ["/"]}],
+    "eqeqeq": "warn",
+    "dot-notation": "warn",
+
+    "@typescript-eslint/explicit-function-return-type": [
+      "warn",
+      {"allowExpressions": true}
+    ],
+    "@typescript-eslint/no-use-before-define": "warn",
+    "@typescript-eslint/no-shadow": "warn",
     "@typescript-eslint/no-unused-vars": [
-      "error",
+      "warn",
       {
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_"
       }
-    ]
+    ],
+    "@typescript-eslint/switch-exhaustiveness-check": "warn",
+    "@typescript-eslint/no-unnecessary-condition": "warn",
+
+    // Convert some eslint-type-checked errors into warnings
+    "@typescript-eslint/no-unsafe-assignment": "warn",
+    "@typescript-eslint/no-unsafe-argument": "warn",
+    "@typescript-eslint/no-misused-promises": "warn",
+
+    "@typescript-eslint/restrict-template-expressions": "warn",
+    "@typescript-eslint/require-await": "warn",
+    "@typescript-eslint/no-unsafe-member-access": "warn",
+    "@typescript-eslint/no-unsafe-call": "warn",
+    "@typescript-eslint/no-unsafe-return": "warn",
+    "@typescript-eslint/restrict-plus-operands": "warn"
   }
 }

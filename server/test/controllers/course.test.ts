@@ -329,7 +329,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
       id: courseId,
     } as unknown as CourseData;
 
-    checkCourseData(courseId, course);
+    await checkCourseData(courseId, course);
 
     const res: supertest.Response = await request
       .put(`/v1/courses/${courseId}`)
@@ -346,7 +346,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
       editedCourseData.teachersInCharge = editedTeachersInCharge;
 
     expect(res.body.data).toStrictEqual(editedCourseData);
-    checkCourseData(courseId, editedCourseData);
+    await checkCourseData(courseId, editedCourseData);
   }
 
   it('should successfully update course information', async () => {

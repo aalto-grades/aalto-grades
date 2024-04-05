@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+/* eslint camelcase: off */
+
 import {DataTypes, QueryInterface, Transaction} from 'sequelize';
 
 import logger from '../../configs/winston';

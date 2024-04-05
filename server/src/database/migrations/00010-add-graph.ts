@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+/* eslint camelcase: off */
+
 import {DataTypes, Deferrable, QueryInterface} from 'sequelize';
 
 export default {
