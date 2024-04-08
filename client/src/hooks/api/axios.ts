@@ -33,7 +33,7 @@ axiosInstance.interceptors.response.use(response => {
   }
 
   // Other errors
-  if ('errors' in resData) {
+  if (typeof resData === 'object' && 'errors' in resData) {
     throw new Error(
       `${response.status} - ${response.statusText}: ` +
         resData.errors.join(', ')
