@@ -5,20 +5,6 @@
 import {GradeOption, Language} from '@common/types';
 import {LanguageOption} from '../types';
 
-type Resolve = (value: void | PromiseLike<void>) => void;
-
-export function sleep(ms: number = 2000): Promise<void> {
-  return new Promise((resolve: Resolve) => setTimeout(resolve, ms));
-}
-
-export function getParamLabel(labelKey: string): string {
-  const splitString: Array<string> = labelKey.split(/(?=[A-Z])/);
-  const label: string = splitString.join(' ');
-  const capitalizedLabel: string =
-    label.charAt(0).toUpperCase() + label.slice(1);
-  return capitalizedLabel;
-}
-
 /**
  * Determines whether a given grade date has expired.
  * @param date - The grade date to check.

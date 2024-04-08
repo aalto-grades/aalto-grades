@@ -20,20 +20,9 @@ export interface LoginCredentials {
   password: string;
 }
 
-export interface Message {
-  msg: string | Array<string>;
-  severity?: 'error' | 'warning' | 'info' | 'success';
-}
-
 export type Numeric = number | string;
 
 export type State<T> = [T, Dispatch<SetStateAction<T>>];
-
-export interface TextFieldData {
-  fieldId: string;
-  fieldLabel: string;
-  fieldHelperText?: string;
-}
 
 export interface LanguageOption {
   id: Language;
