@@ -5,6 +5,7 @@
 import {
   CreationOptional,
   DataTypes,
+  Deferrable,
   ForeignKey,
   InferAttributes,
   InferCreationAttributes,
@@ -12,7 +13,6 @@ import {
 } from 'sequelize';
 
 import {sequelize} from '..';
-
 import Course from './course';
 
 export default class Attainment extends Model<
@@ -41,6 +41,7 @@ Attainment.init(
       references: {
         model: 'course',
         key: 'id',
+        deferrable: new Deferrable.INITIALLY_DEFERRED(),
       },
     },
     name: {
@@ -61,23 +62,5 @@ Attainment.init(
   }
 );
 
-// Attainment.belongsTo(Attainment, {
-//   targetKey: 'id',
-//   foreignKey: 'parentId',
-// });
-
-// Attainment.hasMany(Attainment, {
-//   foreignKey: 'parentId',
-//   onDelete: 'CASCADE',
-//   onUpdate: 'CASCADE',
-// });
-
-Attainment.belongsTo(Course, {
-  targetKey: 'id',
-  foreignKey: 'courseId',
-});
-
-// Course.hasMany(Attainment, {
-//   onDelete: 'CASCADE',
-//   onUpdate: 'CASCADE',
-// });
+Course.hasMany(Attainment, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
+Attainment.belongsTo(Course, {foreignKey: 'courseId'});

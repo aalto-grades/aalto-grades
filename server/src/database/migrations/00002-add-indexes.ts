@@ -4,22 +4,16 @@
 
 /* eslint camelcase: off */
 
-import {QueryInterface, Transaction} from 'sequelize';
+import {QueryInterface} from 'sequelize';
 
 import logger from '../../configs/winston';
 
 export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
-    const transaction: Transaction =
-      await queryInterface.sequelize.transaction();
+    const transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.addIndex('course', ['course_code'], {
-        unique: false,
-        transaction,
-      });
-
-      await queryInterface.addIndex('course_instance', ['course_id'], {
-        unique: false,
+        unique: false, // TODO: should this be unique?
         transaction,
       });
 
@@ -27,15 +21,6 @@ export default {
         unique: false,
         transaction,
       });
-
-      await queryInterface.addIndex(
-        'course_instance_role',
-        ['user_id', 'course_instance_id'],
-        {
-          unique: true,
-          transaction,
-        }
-      );
 
       await queryInterface.addIndex(
         'teacher_in_charge',
@@ -71,8 +56,7 @@ export default {
     }
   },
   down: async (queryInterface: QueryInterface): Promise<void> => {
-    const transaction: Transaction =
-      await queryInterface.sequelize.transaction();
+    const transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.sequelize.query(
         'DROP INDEX IF EXISTS course_course_code',
@@ -80,17 +64,7 @@ export default {
       );
 
       await queryInterface.sequelize.query(
-        'DROP INDEX IF EXISTS course_instance_course_id',
-        {transaction}
-      );
-
-      await queryInterface.sequelize.query(
         'DROP INDEX IF EXISTS user_student_number',
-        {transaction}
-      );
-
-      await queryInterface.sequelize.query(
-        'DROP INDEX IF EXISTS course_instance_role_user_id_course_instance_id',
         {transaction}
       );
 

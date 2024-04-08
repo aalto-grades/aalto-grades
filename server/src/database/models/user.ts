@@ -5,9 +5,9 @@
 import {
   CreationOptional,
   DataTypes,
-  Model,
   InferAttributes,
   InferCreationAttributes,
+  Model,
   Op,
 } from 'sequelize';
 
@@ -84,24 +84,22 @@ User.init(
   }
 );
 
-User.findByEmail = async function (email: string): Promise<User | null> {
-  return await User.findOne({
+User.findByEmail = async (email: string): Promise<User | null> =>
+  await User.findOne({
     where: {
       email,
     },
   });
-};
 
-User.findByEduUser = async function (eduUser: string): Promise<User | null> {
-  return await User.findOne({
+User.findByEduUser = async (eduUser: string): Promise<User | null> =>
+  await User.findOne({
     where: {
       eduUser,
     },
   });
-};
 
-User.findIdpUserByEmail = async function (email: string): Promise<User | null> {
-  return await User.findOne({
+User.findIdpUserByEmail = async (email: string): Promise<User | null> =>
+  await User.findOne({
     where: {
       email,
       password: {
@@ -109,14 +107,12 @@ User.findIdpUserByEmail = async function (email: string): Promise<User | null> {
       },
     },
   });
-};
 
-User.findIdpUsers = async function (): Promise<Array<User>> {
-  return await User.findAll({
+User.findIdpUsers = async (): Promise<User[]> =>
+  await User.findAll({
     where: {
       password: {
         [Op.is]: undefined,
       },
     },
   });
-};

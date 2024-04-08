@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {GradingScale} from '@common/types';
 import {
   CreationOptional,
   DataTypes,
@@ -11,6 +10,7 @@ import {
   Model,
 } from 'sequelize';
 
+import {GradingScale} from '@common/types';
 import {sequelize} from '..';
 
 export default class Course extends Model<

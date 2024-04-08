@@ -94,8 +94,8 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
       },
       grade: grade.grade,
       exportedToSisu: grade.sisuExportDate,
-      date: grade.date,
-      expiryDate: grade.expiryDate,
+      date: new Date(grade.date),
+      expiryDate: new Date(grade.expiryDate),
       comment: grade.comment,
     });
   }
@@ -112,7 +112,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
       assessmentModelId: fGrade.assessmentModelId,
       graderId: fGrade.graderId,
       grade: fGrade.grade,
-      date: fGrade.date,
+      date: new Date(fGrade.date),
       sisuExportDate: fGrade.sisuExportDate,
     });
   }
@@ -337,7 +337,6 @@ export const editUserGrade = async (
       date: date === undefined ? gradeData.date : date,
       expiryDate: expiryDate === undefined ? gradeData.expiryDate : expiryDate,
       comment: comment && comment.length > 0 ? comment : gradeData.comment,
-      manual: true,
       graderId: grader.id,
     })
     .save();

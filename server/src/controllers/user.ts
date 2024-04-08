@@ -13,16 +13,11 @@ import {
   SystemRole,
 } from '@common/types';
 import Course from '../database/models/course';
-import CourseInstance from '../database/models/courseInstance';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 import {ApiError, CourseFull} from '../types';
 import {parseCourseFull} from './utils/course';
 import {adminOrOwner, findAndValidateUserId} from './utils/user';
-
-// Sequelize says User is not associated to CourseInstance unless this is here.
-// TODO: Remove if possible.
-require('../database/models/courseInstanceRole');
 
 /**
  * Responds with CourseData[]
@@ -37,29 +32,12 @@ export const getCoursesOfUser = async (
     include: [{model: CourseTranslation}, {model: User, where: {id: user.id}}],
   })) as CourseFull[];
 
-  interface CourseInstanceWithCourseFull extends CourseInstance {
-    Course: CourseFull;
-  }
-
-  const instanceRoleCourses = (await CourseInstance.findAll({
-    include: [
-      {model: User, where: {id: user.id}},
-      {model: Course, include: [{model: CourseTranslation}, {model: User}]},
-    ],
-  })) as CourseInstanceWithCourseFull[];
-
-  const courses: CourseData[] = [];
+  const courseData: CourseData[] = [];
   for (const course of inChargeCourses) {
-    courses.push(parseCourseFull(course));
+    courseData.push(parseCourseFull(course));
   }
 
-  for (const instance of instanceRoleCourses) {
-    if (courses.find(course => course.id === instance.Course.id)) continue;
-
-    courses.push(parseCourseFull(instance.Course));
-  }
-
-  res.json(courses);
+  res.json(courseData);
 };
 
 export const addIdpUser = async (

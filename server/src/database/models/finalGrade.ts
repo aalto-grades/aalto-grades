@@ -28,7 +28,7 @@ export default class FinalGrade extends Model<
   declare grade: number;
   declare sisuExportDate: Date | null;
   // Date when attainment is completed (e.g., deadline or exam date)
-  declare date: CreationOptional<Date>;
+  declare date: CreationOptional<Date | string>; // Database outputs yyyy-mm-dd but inserting date is allowed
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   grader?: User;
@@ -96,29 +96,21 @@ FinalGrade.init(
   }
 );
 
-FinalGrade.belongsTo(User, {
-  targetKey: 'id',
-  foreignKey: 'userId',
-});
+User.hasMany(FinalGrade, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
+FinalGrade.belongsTo(User, {foreignKey: 'userId'});
 
-User.hasMany(FinalGrade, {
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE',
-});
-
-FinalGrade.belongsTo(User, {
-  as: 'grader',
-  targetKey: 'id',
-  foreignKey: 'graderId',
-});
-
-User.hasMany(FinalGrade, {
-  foreignKey: 'graderId',
-  onDelete: 'NO ACTION',
-  onUpdate: 'CASCADE',
-});
+Course.hasMany(FinalGrade, {onDelete: 'NO ACTION', onUpdate: 'CASCADE'}); // TODO: Cascade ?
+FinalGrade.belongsTo(Course, {foreignKey: 'courseId'});
 
 AssessmentModel.hasMany(FinalGrade, {
   onDelete: 'NO ACTION',
   onUpdate: 'CASCADE',
 });
+FinalGrade.belongsTo(AssessmentModel, {foreignKey: 'assessmentModelId'});
+
+User.hasMany(FinalGrade, {
+  foreignKey: 'graderId',
+  onDelete: 'NO ACTION',
+  onUpdate: 'CASCADE',
+});
+FinalGrade.belongsTo(User, {foreignKey: 'graderId', as: 'grader'});
