@@ -8,7 +8,7 @@ import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 
 import {
-  CourseDataSchema,
+  CreateCourseDataSchema,
   PartialCourseDataSchema,
   SystemRole,
 } from '@common/types';
@@ -42,7 +42,7 @@ router.post(
   authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(CourseDataSchema),
+  processRequestBody(CreateCourseDataSchema),
   controllerDispatcher(addCourse)
 );
 

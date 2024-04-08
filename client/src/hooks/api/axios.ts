@@ -2,26 +2,41 @@
 //
 // SPDX-License-Identifier: MIT
 
-import axios, {AxiosInstance, AxiosResponse} from 'axios';
+import axios from 'axios';
+import {ZodError} from 'zod';
 
-import {ApiResponse} from '../../types';
+const BACKEND_URL =
+  (import.meta.env.VITE_APP_BACKEND_URL as string | undefined) ||
+  'http://back-end';
+const BACKEND_PORT =
+  (import.meta.env.VITE_APP_BACKEND_PORT as string | undefined) || '3000';
 
-const BACKEND_URL: string =
-  import.meta.env.VITE_APP_BACKEND_URL || 'http://back-end';
-const BACKEND_PORT: string = import.meta.env.VITE_APP_BACKEND_PORT || '3000';
-
-const axiosInstance: AxiosInstance = axios.create({
+const axiosInstance = axios.create({
   baseURL: `${BACKEND_URL}:${BACKEND_PORT}`,
   withCredentials: true,
   validateStatus: (status: number) => status < 600 && status >= 100,
 });
 
-axiosInstance.interceptors.response.use((response: AxiosResponse) => {
-  const res: ApiResponse<unknown> = response.data;
-  if (res.errors) {
+axiosInstance.interceptors.response.use(response => {
+  const resData = response.data as {errors: string[]} | {errors: ZodError}[]; // Type is missing non-error states
+
+  // Zod error
+  if (response.status === 400 && Array.isArray(resData)) {
+    const resErrors = resData[0];
+    console.log(resErrors.errors.issues);
     throw new Error(
-      `${response.status} - ${response.statusText}` +
-        res.errors.map((str: string) => ', ' + str)
+      `${response.status} - ${response.statusText}: ` +
+        resErrors.errors.issues
+          .map(issue => `'/${issue.path.join('/')} : ${issue.message}'`)
+          .join(', ')
+    );
+  }
+
+  // Other errors
+  if ('errors' in resData) {
+    throw new Error(
+      `${response.status} - ${response.statusText}: ` +
+        resData.errors.join(', ')
     );
   }
 

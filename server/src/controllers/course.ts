@@ -6,7 +6,13 @@ import {Request, Response} from 'express';
 import {ParamsDictionary} from 'express-serve-static-core';
 import {Transaction} from 'sequelize';
 
-import {CourseData, HttpCode, Language, PartialCourseData} from '@common/types';
+import {
+  CourseData,
+  CreateCourseData,
+  HttpCode,
+  Language,
+  PartialCourseData,
+} from '@common/types';
 import {sequelize} from '../database';
 import Course from '../database/models/course';
 import CourseTranslation from '../database/models/courseTranslation';
@@ -58,12 +64,10 @@ export const getAllCourses = async (
  * Responds with number
  */
 export const addCourse = async (
-  req: Request<ParamsDictionary, unknown, CourseData>,
+  req: Request<ParamsDictionary, unknown, CreateCourseData>,
   res: Response
 ): Promise<void> => {
-  const teachers = await validateEmailList(
-    req.body.teachersInCharge.map(teacher => teacher.email)
-  );
+  const teachers = await validateEmailList(req.body.teachersInCharge);
 
   const course = await sequelize.transaction(async (t): Promise<Course> => {
     const newCourse = await Course.create(

@@ -86,10 +86,10 @@ const ValidationSchema = z
       .string({required_error: 'Please input a valid course name in Swedish'})
       .min(1),
   })
-  .refine(
-    val => val.maxCredits >= val.minCredits,
-    'Maximum credits cannot be lower than minimum credits'
-  );
+  .refine(val => val.maxCredits >= val.minCredits, {
+    path: ['maxCredits'],
+    message: 'Maximum credits cannot be lower than minimum credits',
+  });
 
 type FormData = {
   courseCode: string;
@@ -222,6 +222,7 @@ export default function EditCourseView(): JSX.Element {
 
   const addTeacher = (): void => {
     setTeachersInCharge([...teachersInCharge, email]);
+    setEmail('');
   };
 
   const handleSubmit = (

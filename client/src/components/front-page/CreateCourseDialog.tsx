@@ -24,14 +24,14 @@ import {
   MenuItem,
   TextField,
 } from '@mui/material';
-import {Formik, FormikProps} from 'formik';
+import {Formik, FormikHelpers, FormikProps} from 'formik';
 import {HTMLInputTypeAttribute, JSX, PropsWithChildren, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {z} from 'zod';
 
 import {
   AaltoEmailSchema,
-  CourseData,
+  CreateCourseData,
   GradingScale,
   Language,
 } from '@common/types';
@@ -80,10 +80,10 @@ const ValidationSchema = z
       .string({required_error: 'Please input a valid course name in Swedish'})
       .min(1),
   })
-  .refine(
-    val => val.maxCredits >= val.minCredits,
-    'Maximum credits cannot be lower than minimum credits'
-  );
+  .refine(val => val.maxCredits >= val.minCredits, {
+    path: ['maxCredits'],
+    message: 'Maximum credits cannot be lower than minimum credits',
+  });
 
 type FormData = {
   courseCode: string;
@@ -200,8 +200,11 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
     setTeachersInCharge([...teachersInCharge, email]);
   };
 
-  const handleSubmit = (values: FormData): void => {
-    const courseData: CourseData = {
+  const handleSubmit = (
+    values: FormData,
+    {setSubmitting}: FormikHelpers<FormData>
+  ): void => {
+    const courseData: CreateCourseData = {
       courseCode: values.courseCode,
       minCredits: values.minCredits,
       maxCredits: values.maxCredits,
@@ -217,17 +220,14 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
         sv: values.nameSv,
         en: values.nameEn,
       },
-      teachersInCharge: teachersInCharge.map(teacherEmail => {
-        return {
-          email: teacherEmail,
-        } as unknown as {id: number; email: string}; // TODO: Fix type?
-      }),
+      teachersInCharge,
     };
 
     addCourse.mutate(courseData, {
       onSuccess: newCourseId => {
         navigate(`/${newCourseId}`, {replace: true});
       },
+      onError: () => setSubmitting(false),
     });
   };
 

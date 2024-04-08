@@ -5,11 +5,6 @@
 import {Language} from '@common/types';
 import {Dispatch, SetStateAction} from 'react';
 
-export interface ApiResponse<T> {
-  data?: T;
-  errors?: Array<string>;
-}
-
 export interface HeadCellData {
   id: string;
   label: string;
