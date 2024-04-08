@@ -4,7 +4,7 @@
 import {Request, Response} from 'express';
 import {ParamsDictionary} from 'express-serve-static-core';
 
-import {HttpCode, NewFinalGrade} from '@common/types';
+import {FinalGradeData, HttpCode, NewFinalGrade} from '@common/types';
 import FinalGrade from '../database/models/finalGrade';
 import {JwtClaims} from '../types';
 import {FinalGradeModelData} from '../types/finalGrade';
@@ -38,7 +38,7 @@ export const addFinalGrades = async (
 };
 
 /**
- * Responds with FinalGrade[]
+ * Responds with FinalGradeData[]
  */
 export const getFinalGrades = async (
   req: Request,
@@ -49,9 +49,14 @@ export const getFinalGrades = async (
 
   await isTeacherInChargeOrAdmin(grader, courseId);
 
-  const finalGrades: FinalGrade[] = await FinalGrade.findAll({
-    where: {courseId: courseId},
-  });
+  const finalGrades: FinalGradeData[] = (
+    await FinalGrade.findAll({
+      where: {courseId: courseId},
+    })
+  ).map(finalGrade => ({
+    ...finalGrade.dataValues,
+    date: new Date(finalGrade.dataValues.date),
+  }));
 
   return res.json(finalGrades);
 };

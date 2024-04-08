@@ -43,8 +43,8 @@ export const useAddUser = (
   });
 
 export const useGetIdpUsers = (
-  options?: Partial<UseQueryOptions<{email: string; id: number}[]>>
-): UseQueryResult<{email: string; id: number}[]> =>
+  options?: Partial<UseQueryOptions<{email: string | null; id: number}[]>>
+): UseQueryResult<{email: string | null; id: number}[]> =>
   useQuery({
     queryKey: ['idp-users'],
     queryFn: async () =>

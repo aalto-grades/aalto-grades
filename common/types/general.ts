@@ -35,7 +35,7 @@ export const LanguageSchema = z.nativeEnum(Language);
 export const IdSchema = z.number().int();
 export const DateSchema = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}/) // Also matches dates without timestamp (otherwise zod.datetime(0))
+  .datetime()
   .pipe(z.coerce.date()) as unknown as z.ZodDate; // To fix ts compatability with zod-middleware
 export const AaltoEmailSchema = z
   .string({required_error: 'Email is required'})

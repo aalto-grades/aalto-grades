@@ -22,7 +22,7 @@ export const AddIdpUserSchema = z.object({
 export const IdpUsersSchema = z.array(
   z.object({
     id: z.number().int(),
-    email: z.string().email(),
+    email: z.string().email().nullable(),
   })
 );
 
