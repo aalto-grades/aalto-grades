@@ -7,7 +7,6 @@ import express, {Router} from 'express';
 import {RequestHandler} from 'express-serve-static-core';
 import passport from 'passport';
 
-import {NODE_ENV} from '../configs/environment';
 import {
   authLogin,
   authLogout,
@@ -16,14 +15,8 @@ import {
   samlMetadata,
 } from '../controllers/auth';
 import {controllerDispatcher} from '../middleware/errorHandler';
-import {requestSyslogger} from '../middleware/requestLogger';
 
 export const router = Router();
-
-if (NODE_ENV !== 'test') {
-  // tests timeout for some reason if used
-  router.use(requestSyslogger);
-}
 
 router.get(
   '/v1/auth/self-info',
