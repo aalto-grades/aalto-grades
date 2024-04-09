@@ -88,6 +88,21 @@ For instructions on running tests or individual parts of the system, see the
 README file of the corresponding directory, such as `client/README.md` and
 `server/README.md`.
 
+## How to contribute
+
+### New feature
+
+1. Create a local development branch from the 'dev' branch.
+2. Do your additions and changes.
+3. Create tests for new functionality and check that all tests pass.
+4. Run linters.
+5. Check that the changes are in line with [Code style](https://github.com/aalto-grades/base-repository/wiki/Code-style) and [Design guidelines](https://github.com/aalto-grades/base-repository/wiki/Design-Guidelines) and [Licensing guidelines](https://github.com/aalto-grades/base-repository/wiki/Licensing-Guidelines).
+6. Update documentation and API definition as needed.
+7. Merge your changes to the 'dev' branch and push
+8. Create pull request from 'dev' to main
+9. Check that all tests pass and the staging system is working
+10. Assign someone to review your PR
+
 ## License
 
 Aalto Grades is free software released under the Expat (or "MIT") License.
