@@ -12,21 +12,25 @@ ARG VITE_APP_BACKEND_URL="https://aalto-grades.cs.aalto.fi"
 ARG VITE_APP_BACKEND_PORT="443"
 
 # Install packages first to make following builds faster
+WORKDIR /app/common
+COPY common/package.json common/package-lock.json ./
+RUN npm ci
+
 WORKDIR /app/client
 COPY client/package.json client/package-lock.json ./
 RUN npm ci
 
-# Copy common first
-WORKDIR /app
-COPY common/types common/types
+# Copy only necessary files
+WORKDIR /app/common
+COPY common/types types
+COPY common/util util
 
-# Copy only necessary client files
 WORKDIR /app/client
 COPY client/tsconfig.json client/index.html client/vite.config.ts client/build.sh ./
 COPY client/public ./public
 COPY client/src ./src
 
-# Build and run
+# Build
 RUN npm run build
 
 # Run stage

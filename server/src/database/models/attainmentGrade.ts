@@ -2,14 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {DateOnlyString} from '@common/types';
 import {
   CreationOptional,
   DataTypes,
   ForeignKey,
-  Model,
   InferAttributes,
   InferCreationAttributes,
+  Model,
 } from 'sequelize';
 
 import {sequelize} from '..';
@@ -26,15 +25,15 @@ export default class AttainmentGrade extends Model<
   declare graderId: ForeignKey<User['id']>;
   declare grade: number;
   declare sisuExportDate: CreationOptional<Date>;
-  declare manual: boolean;
-  declare status: string;
   // Date when attainment is completed (e.g., deadline or exam date)
-  declare date: CreationOptional<Date | DateOnlyString>;
-  declare expiryDate: CreationOptional<Date | DateOnlyString>;
+  declare date: CreationOptional<Date | string>; // Database outputs yyyy-mm-dd but inserting date is allowed
+  declare expiryDate: CreationOptional<Date | string>; // Database outputs yyyy-mm-dd but inserting date is allowed
   declare comment: CreationOptional<string>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   grader?: User;
+  User?: User;
+  Attainment?: Attainment;
 }
 
 AttainmentGrade.init(
@@ -74,15 +73,6 @@ AttainmentGrade.init(
       type: DataTypes.DATE,
       allowNull: true,
     },
-    manual: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-    },
-    status: {
-      type: DataTypes.ENUM('PASS', 'FAIL', 'PENDING'),
-      allowNull: false,
-      defaultValue: 'PENDING',
-    },
     date: {
       type: DataTypes.DATEONLY,
       allowNull: false,
@@ -104,34 +94,15 @@ AttainmentGrade.init(
   }
 );
 
-AttainmentGrade.belongsTo(User, {
-  targetKey: 'id',
-  foreignKey: 'userId',
-});
+User.hasMany(AttainmentGrade, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
+AttainmentGrade.belongsTo(User, {foreignKey: 'userId'});
 
-User.hasMany(AttainmentGrade, {
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE',
-});
-
-AttainmentGrade.belongsTo(User, {
-  as: 'grader',
-  targetKey: 'id',
-  foreignKey: 'graderId',
-});
+Attainment.hasMany(AttainmentGrade, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
+AttainmentGrade.belongsTo(Attainment, {foreignKey: 'attainmentId'});
 
 User.hasMany(AttainmentGrade, {
   foreignKey: 'graderId',
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
 });
-
-AttainmentGrade.belongsTo(Attainment, {
-  targetKey: 'id',
-  foreignKey: 'attainmentId',
-});
-
-Attainment.hasMany(AttainmentGrade, {
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE',
-});
+AttainmentGrade.belongsTo(User, {foreignKey: 'graderId', as: 'grader'});

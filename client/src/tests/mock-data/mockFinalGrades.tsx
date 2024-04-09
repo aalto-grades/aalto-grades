@@ -2,64 +2,34 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {FinalGrade, Status} from '@common/types';
+import {FinalGradeData} from '@common/types';
 
-export const mockFinalGrades: Array<FinalGrade> = [
+export const mockFinalGrades: FinalGradeData[] = [
   {
     userId: 1,
-    studentNumber: '12345A',
-    credits: 5,
-    grades: [
-      {
-        gradeId: 1,
-        grader: {
-          id: 5,
-          name: 'Good teacher',
-        },
-        grade: 5,
-        status: Status.Pass,
-        manual: true,
-        date: new Date('2023-01-01'),
-        comment: 'nice work',
-      },
-    ],
+    courseId: 1,
+    assessmentModelId: 1,
+    graderId: 5,
+    grade: 5,
+    date: new Date('2023-01-01'),
+    sisuExportDate: null,
   },
   {
     userId: 2,
-    studentNumber: '98745A',
-    credits: 5,
-    grades: [
-      {
-        gradeId: 1,
-        grader: {
-          id: 5,
-          name: 'Evil teacher',
-        },
-        grade: 5,
-        status: Status.Pass,
-        manual: true,
-        date: new Date('2023-01-01'),
-        comment: 'bad work',
-      },
-    ],
+    courseId: 1,
+    assessmentModelId: 1,
+    graderId: 5,
+    grade: 5,
+    date: new Date('2023-01-01'),
+    sisuExportDate: null,
   },
   {
     userId: 3,
-    studentNumber: '12859A',
-    credits: 5,
-    grades: [
-      {
-        gradeId: 1,
-        grader: {
-          id: 5,
-          name: 'Declarative teacher',
-        },
-        grade: 5,
-        status: Status.Pass,
-        manual: true,
-        date: new Date('2023-01-01'),
-        comment: 'you shall pass',
-      },
-    ],
+    courseId: 1,
+    assessmentModelId: 1,
+    graderId: 5,
+    grade: 5,
+    date: new Date('2023-01-01'),
+    sisuExportDate: null,
   },
 ];

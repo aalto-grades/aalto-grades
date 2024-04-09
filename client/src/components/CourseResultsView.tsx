@@ -2,212 +2,127 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentData, FinalGrade} from '@common/types';
-import {Box, Typography} from '@mui/material';
+import {Box} from '@mui/material';
+import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useState} from 'react';
-import {Params, useParams} from 'react-router-dom';
-import {UseQueryResult} from '@tanstack/react-query';
+import {useParams} from 'react-router-dom';
 
-import AlertSnackbar from './alerts/AlertSnackbar';
-
-import {
-  useCalculateFinalGrades,
-  UseCalculateFinalGradesResult,
-  useDownloadCsvTemplate,
-  UseDownloadCsvTemplateResult,
-  useGetFinalGrades,
-  useGetGradeTreeOfAllUsers,
-  useGetRootAttainment,
-} from '../hooks/useApi';
-import useSnackPackAlerts, {
-  SnackPackAlertState,
-} from '../hooks/useSnackPackAlerts';
-import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
+import {StudentRow} from '@common/types';
+import {batchCalculateGraph} from '@common/util/calculateGraph';
+import {useAddFinalGrades, useGetFinalGrades} from '../hooks/api/finalGrade';
+import {useGetAllAssessmentModels, useGetGrades} from '../hooks/useApi';
+import {findBestGradeOption} from '../utils';
 import CourseResultsTableToolbar from './course-results-view/CourseResultsTableToolbar';
-// import CourseResultsGrid from './course-results-view/CourseResultsGrid';
-// import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
+import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
 
 export default function CourseResultsView(): JSX.Element {
-  const {courseId, assessmentModelId}: Params = useParams() as {
-    courseId: string;
-    assessmentModelId: string;
-  };
+  const {courseId} = useParams() as {courseId: string};
+  const addFinalGrades = useAddFinalGrades(courseId);
+  const assessmentModels = useGetAllAssessmentModels(courseId);
+  const getFinalGrades = useGetFinalGrades(courseId);
 
-  const snackPack: SnackPackAlertState = useSnackPackAlerts();
-  const [hasPendingStudents, setHasPendingStudents] = useState<boolean>(false);
-  const [selectedStudents, setSelectedStudents] = useState<Array<FinalGrade>>(
-    []
-  );
+  const [missingFinalGrades, setMissingFinalGrades] = useState<boolean>(false);
+  const [selectedRows, setSelectedRows] = useState<StudentRow[]>([]);
 
   useEffect(() => {
-    setHasPendingStudents(
+    setMissingFinalGrades(
+      // Prevent exporting sisu csv if students without final grades found
       Boolean(
-        selectedStudents.find(
-          (student: FinalGrade) => student.grades.length === 0
+        selectedRows.find(
+          selectedRow =>
+            selectedRow.finalGrades === undefined ||
+            selectedRow.finalGrades.length === 0
         )
       )
     );
-  }, [selectedStudents]);
+  }, [selectedRows]);
 
-  const attainmentTree: UseQueryResult<AttainmentData> = useGetRootAttainment(
-    courseId,
-    assessmentModelId,
-    'descendants'
-  );
+  const gradesQuery = useGetGrades(courseId);
 
-  // Does not contain root attainment
-  const attainmentList: Array<AttainmentData> = [];
+  // If asking for a refetch then it also update the selectedRows
+  // Refresh selectedRows for updating childrens state
+  const refreshFinalGrades = (): void => {
+    getFinalGrades.refetch().then(newFinalGrades => {
+      if (!newFinalGrades.data) return;
+      setSelectedRows(oldSelectedRows =>
+        oldSelectedRows.map(oldSelectedRow => ({
+          ...oldSelectedRow,
+          finalGrades: [
+            ...newFinalGrades.data.filter(
+              element => element.userId === oldSelectedRow.user.id
+            ),
+          ],
+        }))
+      );
+    });
+  };
 
-  function constructAttainmentList(attainment: AttainmentData): void {
-    if (attainment.subAttainments) {
-      for (const subAttainment of attainment.subAttainments) {
-        attainmentList.push(subAttainment);
-        constructAttainmentList(subAttainment);
+  const findLatestGrade = (row: StudentRow): Date => {
+    let latestDate = new Date(1970, 0, 1);
+    for (const att of row.attainments) {
+      for (const grade of att.grades) {
+        const gradeDate = new Date(grade.date!);
+        if (gradeDate.getTime() > latestDate.getTime()) latestDate = gradeDate;
       }
     }
-  }
-
-  if (attainmentTree.data) constructAttainmentList(attainmentTree.data);
-
-  const students: UseQueryResult<Array<FinalGrade>> = useGetFinalGrades(
-    courseId,
-    assessmentModelId
-  );
-
-  const calculateFinalGrades: UseCalculateFinalGradesResult =
-    useCalculateFinalGrades();
-
-  const gradesQuery = useGetGradeTreeOfAllUsers(courseId, assessmentModelId);
-
-  // If asking for a refetch then it also update the selectedStudents
-  async function studentsRefetch(): Promise<void> {
-    students.refetch().then((students: UseQueryResult<Array<FinalGrade>>) => {
-      if (students.data) {
-        const newSelectedStudents: Array<FinalGrade> = [];
-        // Refresh selectedStudents for updating childrens state
-        selectedStudents.forEach((student: FinalGrade) => {
-          const found: FinalGrade | undefined = students.data.find(
-            (element: FinalGrade) => element.userId == student.userId
-          );
-
-          if (found) {
-            newSelectedStudents.push(found);
-          }
-        });
-        setSelectedStudents(newSelectedStudents);
-      }
-    });
-  }
+    return latestDate;
+  };
 
   // Triggers the calculation of final grades
-  async function handleCalculateFinalGrades(): Promise<void> {
-    if (courseId && assessmentModelId && selectedStudents.length > 0) {
-      snackPack.push({
-        msg: 'Calculating final grades...',
-        severity: 'info',
-      });
+  const handleCalculateFinalGrades = async (
+    assessmentModelId: number,
+    dateOverride: boolean,
+    gradingDate: Date
+  ): Promise<boolean> => {
+    const model = assessmentModels.data?.find(
+      assessmentModel => assessmentModel.id === assessmentModelId
+    );
+    if (model === undefined) return false;
 
-      calculateFinalGrades.mutate(
-        {
-          courseId: courseId,
-          assessmentModelId: assessmentModelId,
-          studentNumbers: selectedStudents.map(
-            (student: FinalGrade) => student.studentNumber
-          ),
-        },
-        {
-          onSuccess: () => {
-            snackPack.push({
-              msg: 'Final grades calculated successfully.',
-              severity: 'success',
-            });
-            // We need to refetch the students to get the new grades
-            students
-              .refetch()
-              .then((students: UseQueryResult<Array<FinalGrade>>) => {
-                if (students.data) {
-                  const newSelectedStudents: Array<FinalGrade> = [];
-                  // Refresh selectedStudents for updating childrens state
-                  selectedStudents.forEach((student: FinalGrade) => {
-                    const found: FinalGrade | undefined = students.data.find(
-                      (element: FinalGrade) => element.userId == student.userId
-                    );
-
-                    if (found) {
-                      newSelectedStudents.push(found);
-                    }
-                  });
-                  setSelectedStudents(newSelectedStudents);
-                }
-              });
-          },
-        }
-      );
-    }
-  }
-
-  const downloadCsvTemplate: UseDownloadCsvTemplateResult =
-    useDownloadCsvTemplate({
-      onSuccess: (csvTemplate: string) => {
-        const blob: Blob = new Blob([csvTemplate], {type: 'text/csv'});
-        const link: HTMLAnchorElement = document.createElement('a');
-
-        link.href = URL.createObjectURL(blob);
-        link.download = 'template.csv'; // TODO: Get filename from Content-Disposition
-        link.click();
-        URL.revokeObjectURL(link.href);
-        link.remove();
-      },
+    enqueueSnackbar('Calculating final grades...', {
+      variant: 'info',
     });
 
-  async function handleDownloadCsvTemplate(): Promise<void> {
-    if (courseId && assessmentModelId) {
-      snackPack.push({
-        msg: 'Downloading CSV template',
-        severity: 'info',
-      });
-
-      downloadCsvTemplate.mutate({
-        courseId: courseId,
-        assessmentModelId: assessmentModelId,
-      });
-    }
-  }
+    const finalGrades = batchCalculateGraph(
+      model.graphStructure,
+      selectedRows.map(selectedRow => ({
+        userId: selectedRow.user.id,
+        attainments: selectedRow.attainments.map(att => ({
+          attainmentId: att.attainmentId,
+          grade: findBestGradeOption(att.grades)!.grade, // TODO: Manage expired attainments
+        })),
+      }))
+    );
+    await addFinalGrades.mutateAsync(
+      selectedRows.map(selectedRow => ({
+        userId: selectedRow.user.id,
+        assessmentModelId,
+        grade: finalGrades[selectedRow.user.id].finalGrade,
+        date: dateOverride ? gradingDate : findLatestGrade(selectedRow),
+      }))
+    );
+    enqueueSnackbar('Final grades calculated successfully.', {
+      variant: 'success',
+    });
+    refreshFinalGrades();
+    return true;
+  };
 
   return (
     <Box textAlign="left" alignItems="left">
-      <AlertSnackbar snackPack={snackPack} />
-      <Typography variant="h1" sx={{flexGrow: 1, my: 4}}>
-        Course Results
-      </Typography>
-      {/* <CourseResultsGrid /> */}
       <CourseResultsTableToolbar
         calculateFinalGrades={handleCalculateFinalGrades}
-        downloadCsvTemplate={handleDownloadCsvTemplate}
-        selectedStudents={selectedStudents}
-        hasPendingStudents={hasPendingStudents}
-        refetch={studentsRefetch}
+        selectedRows={selectedRows}
+        hasPendingStudents={missingFinalGrades}
+        refreshFinalGrades={refreshFinalGrades}
       />
       {gradesQuery.data && (
         <CourseResultsTanTable
           data={gradesQuery.data}
-          attainmentList={attainmentList}
-          attainmentTree={attainmentTree.data}
-          selectedStudents={selectedStudents}
-          setSelectedStudents={setSelectedStudents}
+          selectedStudents={selectedRows}
+          setSelectedStudents={setSelectedRows}
         />
       )}
-      {/* <CourseResultsTable
-        students={students.data ?? []}
-        attainmentList={attainmentList}
-        loading={students.isLoading}
-        calculateFinalGrades={handleCalculateFinalGrades}
-        downloadCsvTemplate={handleDownloadCsvTemplate}
-        selectedStudents={selectedStudents}
-        setSelectedStudents={setSelectedStudents}
-        hasPendingStudents={hasPendingStudents}
-        refetch={studentsRefetch}
-      /> */}
     </Box>
   );
 }

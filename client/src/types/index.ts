@@ -2,13 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Language, SystemRole} from '@common/types';
+import {Language} from '@common/types';
 import {Dispatch, SetStateAction} from 'react';
-
-export interface ApiResponse<T> {
-  data?: T;
-  errors?: Array<string>;
-}
 
 export interface HeadCellData {
   id: string;
@@ -20,28 +15,9 @@ export interface LoginCredentials {
   password: string;
 }
 
-export interface Message {
-  msg: string | Array<string>;
-  severity?: 'error' | 'warning' | 'info' | 'success';
-}
-
 export type Numeric = number | string;
 
-export interface SignupCredentials {
-  email: string;
-  password: string;
-  studentNumber?: string;
-  name: string;
-  role: SystemRole;
-}
-
 export type State<T> = [T, Dispatch<SetStateAction<T>>];
-
-export interface TextFieldData {
-  fieldId: string;
-  fieldLabel: string;
-  fieldHelperText?: string;
-}
 
 export interface LanguageOption {
   id: Language;

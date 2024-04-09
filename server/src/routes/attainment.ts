@@ -3,50 +3,48 @@
 // SPDX-License-Identifier: MIT
 
 import express, {Router} from 'express';
+import {RequestHandler} from 'express-serve-static-core';
 import passport from 'passport';
+import {processRequestBody} from 'zod-express-middleware';
 
+import {AttainmentDataSchema, NewAttainmentDataSchema} from '@common/types';
 import {
   addAttainment,
   deleteAttainment,
-  updateAttainment,
-  getRootAttainment,
-  getAttainment,
+  editAttainment,
+  getAttainments,
 } from '../controllers/attainment';
 import {handleInvalidRequestJson} from '../middleware';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
-export const router: Router = Router();
+export const router = Router();
 
 router.get(
-  '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
-  passport.authenticate('jwt', {session: false}),
-  controllerDispatcher(getAttainment)
-);
-
-router.get(
-  '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments',
-  passport.authenticate('jwt', {session: false}),
-  controllerDispatcher(getRootAttainment)
+  '/v1/courses/:courseId/attainments',
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  controllerDispatcher(getAttainments)
 );
 
 router.post(
-  '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments',
-  passport.authenticate('jwt', {session: false}),
+  '/v1/courses/:courseId/attainments',
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json(),
   handleInvalidRequestJson,
+  processRequestBody(NewAttainmentDataSchema),
   controllerDispatcher(addAttainment)
 );
 
 router.put(
-  '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
-  passport.authenticate('jwt', {session: false}),
+  '/v1/courses/:courseId/attainments/:attainmentId',
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json(),
   handleInvalidRequestJson,
-  controllerDispatcher(updateAttainment)
+  processRequestBody(AttainmentDataSchema),
+  controllerDispatcher(editAttainment)
 );
 
 router.delete(
-  '/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
-  passport.authenticate('jwt', {session: false}),
+  '/v1/courses/:courseId/attainments/:attainmentId',
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
   controllerDispatcher(deleteAttainment)
 );

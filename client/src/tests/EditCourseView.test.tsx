@@ -3,14 +3,14 @@
 // SPDX-License-Identifier: MIT
 
 import {GradingScale, Language} from '@common/types';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {http} from 'msw';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 
 import {act, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import EditCourseView from '../components/EditCourseView';
+import EditCourseView from '../components/course-view/EditCourseView';
 import {mockPostSuccess, server} from './mock-data/server';
 
 describe('Tests for EditCourseView components', () => {

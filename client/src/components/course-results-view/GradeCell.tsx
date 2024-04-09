@@ -2,13 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {AttainmentGradesData, GradeOption} from '@common/types';
 import {
   EventBusyOutlined,
   MoreHoriz as MoreHorizIcon,
 } from '@mui/icons-material';
 import {Box, IconButton, Theme, Tooltip, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import {AttainmentGradeData, GradeOption} from '@common/types';
 import {FC, useState} from 'react';
 
 import GradeOptionsDialog from './GradeOptionsDialog';
@@ -18,7 +18,7 @@ import {findBestGradeOption, isGradeDateExpired} from '../../utils';
 
 type GradeCellProps = {
   studentNumber: string;
-  attainemntResults: AttainmentGradeData | null;
+  attainemntResults?: AttainmentGradesData;
   finalGrade?: boolean;
 };
 
@@ -30,7 +30,11 @@ const GradeCell: FC<GradeCellProps> = (
   const theme: Theme = useTheme();
   const bestGrade: GradeOption | null = findBestGradeOption(
     props.attainemntResults?.grades ?? [],
-    {avoidExpired: true, preferExpiredToNull: true}
+    {
+      avoidExpired: true,
+      preferExpiredToNull: true,
+      useLatest: false, // TODO: Read from state?
+    }
   );
   const isGradeExpired: boolean = isGradeDateExpired(bestGrade?.expiryDate);
   // console.log(bestGrade?.expiryDate, new Date(),bestGrade?.expiryDate < new Date());
@@ -60,30 +64,31 @@ const GradeCell: FC<GradeCellProps> = (
     >
       <span>{bestGrade?.grade ?? '-'}</span>
       {/* If there are multiple grades "show more" icon*/}
-      {props.attainemntResults && props.attainemntResults.grades.length > 1 && (
-        <>
-          <Tooltip placement="top" title="Multiple grades, click to show">
-            <IconButton
-              size="small"
-              color="primary"
-              sx={{ml: 1}}
-              onClick={(): void => setGradeOptionsOpen(true)}
-            >
-              <MoreHorizIcon />
-            </IconButton>
-          </Tooltip>
-          <GradeOptionsDialog
-            title={`Grades of ${props.studentNumber} for ${
-              props.finalGrade
-                ? 'Final Grade'
-                : props.attainemntResults.attainmentName
-            }`}
-            options={props.attainemntResults.grades}
-            open={gradeOptionsOpen}
-            handleClose={(): void => setGradeOptionsOpen(false)}
-          />
-        </>
-      )}
+      {props.attainemntResults &&
+        props.attainemntResults.grades?.length > 1 && (
+          <>
+            <Tooltip placement="top" title="Multiple grades, click to show">
+              <IconButton
+                size="small"
+                color="primary"
+                sx={{ml: 1}}
+                onClick={(): void => setGradeOptionsOpen(true)}
+              >
+                <MoreHorizIcon />
+              </IconButton>
+            </Tooltip>
+            <GradeOptionsDialog
+              title={`Grades of ${props.studentNumber} for ${
+                props.finalGrade
+                  ? 'Final Grade'
+                  : props.attainemntResults.attainmentName
+              }`}
+              options={props.attainemntResults.grades}
+              open={gradeOptionsOpen}
+              handleClose={(): void => setGradeOptionsOpen(false)}
+            />
+          </>
+        )}
       {/* If grade is expired, show warning icon */}
       {isGradeExpired && (
         <>
@@ -140,7 +145,7 @@ const GradeCell: FC<GradeCellProps> = (
               },
             }}
           >
-            {bestGrade?.date?.toString()}
+            {bestGrade?.date?.toLocaleDateString()}
           </Box>
         </Tooltip>
       }

@@ -2,19 +2,21 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {QueryInterface, Transaction, Op} from 'sequelize';
+/* eslint camelcase: off */
+
+import {Op, QueryInterface} from 'sequelize';
 
 import {sequelize} from '..';
 import logger from '../../configs/winston';
 
 export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
-    const transaction: Transaction =
-      await queryInterface.sequelize.transaction();
+    const transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.addConstraint('course', {
         fields: ['min_credits'],
         type: 'check',
+        name: 'course_min_credits_ck',
         where: {
           min_credits: {
             [Op.lte]: sequelize.col('max_credits'),
@@ -23,21 +25,22 @@ export default {
         transaction,
       });
 
-      await queryInterface.addConstraint('course_instance', {
-        fields: ['start_date'],
-        type: 'check',
-        where: {
-          start_date: {
-            [Op.lte]: sequelize.col('end_date'),
-          },
-        },
+      await queryInterface.addConstraint('assessment_model', {
+        fields: ['course_id', 'name'],
+        type: 'unique',
+        name: 'course_assessment_model_name_un',
         transaction,
       });
 
-      await queryInterface.addConstraint('attainment', {
-        fields: ['assessment_model_id', 'name'],
-        type: 'unique',
-        name: 'attainment_assessment_model_id_name_ck',
+      await queryInterface.addConstraint('attainment_grade', {
+        fields: ['date'],
+        type: 'check',
+        name: 'attainment_grade_date_ck',
+        where: {
+          date: {
+            [Op.lte]: sequelize.col('expiry_date'),
+          },
+        },
         transaction,
       });
 
@@ -48,22 +51,21 @@ export default {
     }
   },
   down: async (queryInterface: QueryInterface): Promise<void> => {
-    const transaction: Transaction =
-      await queryInterface.sequelize.transaction();
+    const transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.removeConstraint('course', 'course_min_credits_ck', {
         transaction,
       });
 
       await queryInterface.removeConstraint(
-        'course_instance',
-        'course_instance_start_date_ck',
+        'assessment_model',
+        'course_assessment_model_name_un',
         {transaction}
       );
 
       await queryInterface.removeConstraint(
-        'attainment',
-        'attainment_assessment_model_id_name_ck',
+        'attainment_grade',
+        'attainment_grade_date_ck',
         {transaction}
       );
 

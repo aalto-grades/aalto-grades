@@ -2,19 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {SystemRole} from '@common/types';
-import {JSX} from 'react';
 import {Box, Button, Typography} from '@mui/material';
-import {NavigateFunction, useNavigate} from 'react-router-dom';
+import {JSX, useState} from 'react';
 
-import useAuth, {AuthContextType} from '../../../hooks/useAuth';
+import AddUserDialog from './AddUserDialog';
 import UsersTable from './UsersTable';
 
-export default function UsersView(): JSX.Element {
-  const navigate: NavigateFunction = useNavigate();
-  const {auth}: AuthContextType = useAuth();
+// Assumes admin validation is already done TODO: maybe change in the future
+const UsersView = (): JSX.Element => {
+  const [addOpen, setAddOpen] = useState<boolean>(false);
   return (
     <>
+      <AddUserDialog open={addOpen} onClose={() => setAddOpen(false)} />
       <Box
         component="span"
         sx={{
@@ -28,23 +27,18 @@ export default function UsersView(): JSX.Element {
         <Typography variant="h2" align="left" sx={{flexGrow: 1}}>
           Users
         </Typography>
-        {
-          /* Admins are shown the button for  a user */
-          auth?.role === SystemRole.Admin && (
-            <Button
-              id="ag_new_course_btn"
-              size="large"
-              variant="contained"
-              onClick={(): void => {
-                navigate('/user/add');
-              }}
-            >
-              Add user
-            </Button>
-          )
-        }
+        <Button
+          id="ag_new_course_btn"
+          size="large"
+          variant="contained"
+          onClick={() => setAddOpen(true)}
+        >
+          Add user
+        </Button>
       </Box>
       <UsersTable />
     </>
   );
-}
+};
+
+export default UsersView;

@@ -2,83 +2,76 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {CourseData} from '@common/types';
-import axios from './axios';
 import {
-  QueryClient,
-  useMutation,
+  CourseData,
+  CourseDataArraySchema,
+  CourseDataSchema,
+  CreateCourseData,
+  IdSchema,
+  PartialCourseData,
+} from '@common/types';
+import {
   UseMutationOptions,
   UseMutationResult,
-  useQuery,
-  useQueryClient,
   UseQueryOptions,
   UseQueryResult,
+  useMutation,
+  useQuery,
+  useQueryClient,
 } from '@tanstack/react-query';
-
 import {Numeric} from '../../types';
+import axios from './axios';
 
-export function useGetCourse(
+export const useGetCourse = (
   courseId: Numeric,
   options?: Partial<UseQueryOptions<CourseData>>
-): UseQueryResult<CourseData> {
-  return useQuery({
+): UseQueryResult<CourseData> =>
+  useQuery({
     queryKey: ['course', courseId],
-    queryFn: async () => (await axios.get(`/v1/courses/${courseId}`)).data.data,
+    queryFn: async () =>
+      CourseDataSchema.parse((await axios.get(`/v1/courses/${courseId}`)).data),
     ...options,
   });
-}
 
-export function useGetAllCourses(
-  options?: Partial<UseQueryOptions<Array<CourseData>>>
-): UseQueryResult<Array<CourseData>> {
-  return useQuery({
+export const useGetAllCourses = (
+  options?: Partial<UseQueryOptions<CourseData[]>>
+): UseQueryResult<CourseData[]> =>
+  useQuery({
     queryKey: ['all-courses'],
-    queryFn: async () => (await axios.get('/v1/courses')).data.data,
+    queryFn: async () =>
+      CourseDataArraySchema.parse((await axios.get('/v1/courses')).data),
     ...options,
   });
-}
 
-export type UseAddCourseResult = UseMutationResult<number, unknown, CourseData>;
-
-export function useAddCourse(
-  options?: UseMutationOptions<number, unknown, CourseData>
-): UseAddCourseResult {
-  const queryClient: QueryClient = useQueryClient();
+export const useAddCourse = (
+  options?: UseMutationOptions<number, unknown, CreateCourseData>
+): UseMutationResult<number, unknown, CreateCourseData> => {
+  const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (course: CourseData) =>
-      (await axios.post('/v1/courses', course)).data.data,
+    mutationFn: async (course: CreateCourseData) =>
+      IdSchema.parse((await axios.post('/v1/courses', course)).data),
 
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['all-courses']});
     },
     ...options,
   });
-}
+};
 
-interface EditCourseVars {
-  courseId: Numeric;
-  course: CourseData;
-}
-
-export type UseEditCourseResult = UseMutationResult<
-  CourseData,
-  unknown,
-  EditCourseVars
->;
-
-export function useEditCourse(
-  options?: UseMutationOptions<CourseData, unknown, EditCourseVars>
-): UseEditCourseResult {
-  const queryClient: QueryClient = useQueryClient();
+type EditCourseVars = {courseId: Numeric; course: PartialCourseData};
+export const useEditCourse = (
+  options?: UseMutationOptions<unknown, unknown, EditCourseVars>
+): UseMutationResult<unknown, unknown, EditCourseVars> => {
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (vars: EditCourseVars) =>
-      (await axios.put(`/v1/courses/${vars.courseId}`, vars.course)).data.data,
+      await axios.put(`/v1/courses/${vars.courseId}`, vars.course),
 
-    onSuccess: (_data: CourseData, vars: EditCourseVars) => {
+    onSuccess: (_data: unknown, vars: EditCourseVars) => {
       queryClient.invalidateQueries({queryKey: ['course', vars.courseId]});
     },
     ...options,
   });
-}
+};

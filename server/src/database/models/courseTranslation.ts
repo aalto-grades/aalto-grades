@@ -6,9 +6,9 @@ import {
   CreationOptional,
   DataTypes,
   ForeignKey,
-  Model,
   InferAttributes,
   InferCreationAttributes,
+  Model,
 } from 'sequelize';
 
 import {sequelize} from '..';
@@ -63,12 +63,5 @@ CourseTranslation.init(
   }
 );
 
-CourseTranslation.belongsTo(Course, {
-  targetKey: 'id',
-  foreignKey: 'courseId',
-});
-
-Course.hasMany(CourseTranslation, {
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE',
-});
+Course.hasMany(CourseTranslation, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
+CourseTranslation.belongsTo(Course, {foreignKey: 'courseId'});

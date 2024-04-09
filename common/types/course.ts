@@ -2,16 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {DateOnlyString} from './general';
-import {Language, LocalizedString} from './language';
-import {UserData} from './user';
+import {z} from 'zod';
+import {LanguageSchema, LocalizedStringSchema} from './general';
+import {TeacherDataSchema} from './user';
 
 export enum GradingScale {
   PassFail = 'PASS_FAIL',
   Numerical = 'NUMERICAL',
   SecondNationalLanguage = 'SECOND_NATIONAL_LANGUAGE',
 }
-
 export enum Period {
   I = 'I',
   II = 'II',
@@ -20,36 +19,43 @@ export enum Period {
   V = 'V',
 }
 
-export interface CourseData {
+export const GradingScaleSchema = z.nativeEnum(GradingScale);
+export const PeriodSchema = z.nativeEnum(Period);
+
+const BaseCourseDataSchema = z.object({
   // Course ID is either number type ID in the Aalto Grades database or
   // undefined when representing parsed Sisu data.
-  id?: number;
-  courseCode: string;
-  minCredits: number;
-  maxCredits: number;
-  department: LocalizedString;
-  name: LocalizedString;
-  gradingScale: GradingScale;
-  languageOfInstruction: Language;
-  teachersInCharge: Array<UserData>;
-}
+  id: z.number().int().optional(),
+  courseCode: z.string(),
+  minCredits: z.number().int().min(0),
+  maxCredits: z.number().int(),
+  department: LocalizedStringSchema,
+  name: LocalizedStringSchema,
+  gradingScale: GradingScaleSchema,
+  languageOfInstruction: LanguageSchema,
+  teachersInCharge: z.array(TeacherDataSchema),
+});
 
-export interface CourseInstanceData {
-  courseData?: CourseData;
-  // Course instance and assessment model IDs can be null when representing
-  // Sisu course instance data
-  id?: number;
-  assessmentModelId?: number;
-  sisuInstanceInUse?: boolean;
-  sisuCourseInstanceId?: string;
-  startingPeriod?: Period;
-  endingPeriod?: Period;
-  startDate: Date | DateOnlyString;
-  endDate: Date | DateOnlyString;
-  type: string;
-}
+export const CourseDataSchema = BaseCourseDataSchema.refine(
+  val => val.maxCredits >= val.minCredits
+);
+export const CourseDataArraySchema = z.array(CourseDataSchema);
 
-export enum CourseInstanceRoleType {
-  Student = 'STUDENT',
-  Teacher = 'TEACHER',
-}
+export const CreateCourseDataSchema = BaseCourseDataSchema.extend({
+  teachersInCharge: z.array(z.string().email()),
+}).refine(val => val.maxCredits >= val.minCredits);
+
+export const PartialCourseDataSchema = BaseCourseDataSchema.extend({
+  teachersInCharge: z.array(z.string().email()),
+})
+  .partial()
+  .refine(
+    val =>
+      val.maxCredits !== undefined &&
+      val.minCredits !== undefined &&
+      val.maxCredits >= val.minCredits
+  );
+
+export type CourseData = z.infer<typeof CourseDataSchema>;
+export type CreateCourseData = z.infer<typeof CreateCourseDataSchema>;
+export type PartialCourseData = z.infer<typeof PartialCourseDataSchema>;

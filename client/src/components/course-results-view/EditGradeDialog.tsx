@@ -3,12 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AttainmentGradeData,
-  EditGrade,
+  AttainmentGradesData,
   GradeOption,
-  Status,
+  PartialGradeOption,
 } from '@common/types';
-import {Form, Formik, FormikErrors, FormikTouched} from 'formik';
 import {
   Box,
   Button,
@@ -22,23 +20,27 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import {Form, Formik, FormikErrors, FormikTouched} from 'formik';
+import {enqueueSnackbar} from 'notistack';
 import {ChangeEvent, JSX, useEffect, useState} from 'react';
 import {Params, useParams} from 'react-router-dom';
-import * as yup from 'yup';
+import {z} from 'zod';
 
-import AlertSnackbar from '../alerts/AlertSnackbar';
-import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
-
-import {UseEditGradeResult, useEditGrade} from '../../hooks/useApi';
-import useSnackPackAlerts, {
-  SnackPackAlertState,
-} from '../../hooks/useSnackPackAlerts';
+import {useEditGrade} from '../../hooks/useApi';
 import {State} from '../../types';
 import {findBestGradeOption} from '../../utils';
+import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
+
+const ValidationSchema = z.object({
+  grade: z.number().min(0).optional(),
+  date: z.date().optional(),
+  expiryDate: z.date().optional(),
+  comment: z.string().optional(),
+});
 
 // A Dialog component for editing individual grade of a user.
 export default function EditGradeDialog(props: {
-  grade: AttainmentGradeData;
+  grade: AttainmentGradesData;
   handleClose: () => void;
   refetchGrades: () => void;
   open: boolean;
@@ -48,8 +50,7 @@ export default function EditGradeDialog(props: {
     assessmentModelId: string;
   };
 
-  const editGrade: UseEditGradeResult = useEditGrade();
-  const snackPack: SnackPackAlertState = useSnackPackAlerts();
+  const editGrade = useEditGrade();
 
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
 
@@ -61,24 +62,23 @@ export default function EditGradeDialog(props: {
     setGradeId(findBestGradeOption(props.grade.grades)?.gradeId ?? null);
   }
 
-  const [formInitialValues, setFormInitialValues]: State<EditGrade> =
-    useState<EditGrade>({
+  const [formInitialValues, setFormInitialValues]: State<PartialGradeOption> =
+    useState<PartialGradeOption>({
       grade: 0,
-      status: Status.Pending,
       date: new Date(),
       expiryDate: new Date(),
       comment: '',
     });
 
-  async function handleSubmit(values: EditGrade): Promise<void> {
+  async function handleSubmit(values: PartialGradeOption): Promise<void> {
     if (courseId && assessmentModelId && gradeId) {
       // This very orrible solution eliminates empty values from the payload to avoid validation errors on the server
       Object.keys(values).forEach(key => {
         if (
-          values[key as keyof EditGrade] === '' ||
-          values[key as keyof EditGrade] === null
+          values[key as keyof PartialGradeOption] === '' ||
+          values[key as keyof PartialGradeOption] === null
         ) {
-          delete values[key as keyof EditGrade];
+          delete values[key as keyof PartialGradeOption];
         }
       });
 
@@ -87,14 +87,12 @@ export default function EditGradeDialog(props: {
           courseId,
           assessmentModelId,
           gradeId,
-          userId: props.grade.userId as number,
           data: values,
         },
         {
           onSuccess: () => {
-            snackPack.push({
-              msg: 'Grade updated successfully.',
-              severity: 'success',
+            enqueueSnackbar('Grade updated successfully.', {
+              variant: 'success',
             });
             props.handleClose();
             props.refetchGrades();
@@ -113,13 +111,23 @@ export default function EditGradeDialog(props: {
 
       setFormInitialValues({
         grade: toForm.grade,
-        status: toForm.status,
         date: toForm.date,
         expiryDate: toForm.expiryDate,
         comment: toForm.comment,
       });
     }
   }, [gradeId]);
+
+  const validateForm = (
+    values: PartialGradeOption
+  ): {[key in keyof PartialGradeOption]?: string[]} | void => {
+    const result = ValidationSchema.safeParse(values);
+    if (result.success) return;
+    const fieldErrors = result.error.formErrors.fieldErrors;
+    return Object.fromEntries(
+      Object.entries(fieldErrors).map(([key, val]) => [key, val[0]]) // Only the first error
+    );
+  };
 
   return (
     <>
@@ -154,13 +162,7 @@ export default function EditGradeDialog(props: {
             <Formik
               enableReinitialize
               initialValues={formInitialValues}
-              validationSchema={yup.object({
-                grade: yup.number().min(0).notRequired(),
-                status: yup.string().oneOf(Object.values(Status)).notRequired(),
-                date: yup.date().notRequired(),
-                expiryDate: yup.date().notRequired(),
-                comment: yup.string().notRequired(),
-              })}
+              validate={validateForm}
               onSubmit={handleSubmit}
             >
               {({
@@ -171,13 +173,13 @@ export default function EditGradeDialog(props: {
                 values,
                 initialValues,
               }: {
-                errors: FormikErrors<EditGrade>;
+                errors: FormikErrors<PartialGradeOption>;
                 handleChange: (e: ChangeEvent<Element>) => void;
                 isSubmitting: boolean;
                 isValid: boolean;
-                touched: FormikTouched<EditGrade>;
-                values: EditGrade;
-                initialValues: EditGrade;
+                touched: FormikTouched<PartialGradeOption>;
+                values: PartialGradeOption;
+                initialValues: PartialGradeOption;
               }): JSX.Element => (
                 <Form>
                   <TextField
@@ -197,33 +199,6 @@ export default function EditGradeDialog(props: {
                     error={Boolean(errors.grade)}
                     onChange={handleChange}
                   />
-                  <TextField
-                    id="status"
-                    name="status"
-                    type="text"
-                    fullWidth
-                    value={values.status}
-                    disabled={isSubmitting}
-                    label="Status"
-                    InputLabelProps={{shrink: true}}
-                    margin="normal"
-                    helperText={
-                      errors.status
-                        ? String(errors.status)
-                        : 'Grading status indicator.'
-                    }
-                    error={Boolean(errors.status)}
-                    onChange={handleChange}
-                    select
-                  >
-                    {Object.values(Status).map((value: Status) => {
-                      return (
-                        <MenuItem key={value} value={value}>
-                          {value}
-                        </MenuItem>
-                      );
-                    })}
-                  </TextField>
                   <TextField
                     id="date"
                     name="date"
@@ -251,9 +226,7 @@ export default function EditGradeDialog(props: {
                     fullWidth
                     value={
                       values.expiryDate
-                        ? new Date(values.expiryDate as Date)
-                            .toISOString()
-                            .split('T')[0]
+                        ? values.expiryDate.toISOString().split('T')[0]
                         : undefined
                     }
                     disabled={isSubmitting}
@@ -330,14 +303,13 @@ export default function EditGradeDialog(props: {
         </DialogContent>
       </Dialog>
       <UnsavedChangesDialog
-        setOpen={setShowDialog}
         open={showDialog}
-        handleDiscard={(): void => {
+        onClose={() => setShowDialog(false)}
+        handleDiscard={() => {
           props.handleClose();
           setGradeId(null);
         }}
       />
-      <AlertSnackbar snackPack={snackPack} />
     </>
   );
 }

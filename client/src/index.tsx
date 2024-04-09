@@ -2,13 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
-import ReactDOM, {Root} from 'react-dom/client';
-import {BrowserRouter} from 'react-router-dom';
+import {StrictMode} from 'react';
+import ReactDOM from 'react-dom/client';
 import {createGlobalStyle} from 'styled-components';
 
 import App from './App';
-
 import {AuthProvider} from './context/AuthProvider';
 
 const GlobalStyles = createGlobalStyle`
@@ -27,18 +25,16 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
-const rootElement: HTMLElement | null = document.getElementById('root');
+const rootElement = document.getElementById('root');
 
 if (rootElement) {
-  const root: Root = ReactDOM.createRoot(rootElement);
+  const root = ReactDOM.createRoot(rootElement);
   root.render(
-    <React.StrictMode>
+    <StrictMode>
       <GlobalStyles />
-      <BrowserRouter>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
-      </BrowserRouter>
-    </React.StrictMode>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </StrictMode>
   );
 }

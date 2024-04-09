@@ -9,7 +9,7 @@
 version: "3.7"
 
 services:
-  frontend:
+  frontend-common:
     build:
       context: .
       dockerfile: ./client/Dockerfile
@@ -25,14 +25,14 @@ services:
     networks:
       - local
 
-  backend:
+  backend-common:
     build:
       context: .
       dockerfile: ./server/dockerfiles/Dockerfile
     extends:
       service: backend-minimum
 
-  backendtest:
+  backend-commontest:
     build:
       context: .
       dockerfile: ./server/dockerfiles/Dockerfile.test

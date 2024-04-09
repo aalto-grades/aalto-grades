@@ -6,9 +6,9 @@
 // if not, the user is redirected to the login page
 
 import {LoginResult, SystemRole} from '@common/types';
+import {UseQueryResult} from '@tanstack/react-query';
 import {JSX, useEffect, useState} from 'react';
 import {Navigate, Outlet} from 'react-router-dom';
-import {UseQueryResult} from '@tanstack/react-query';
 
 import {useGetRefreshToken} from '../../hooks/useApi';
 import useAuth, {AuthContextType} from '../../hooks/useAuth';
@@ -40,10 +40,5 @@ export default function PrivateRoute(props: {
   if (!props.roles.includes(auth.role) && !isTeacherInCharge)
     return <Navigate to="/" />;
 
-  return (
-    <>
-      {props.children}
-      <Outlet />
-    </>
-  );
+  return <>{props.children ? props.children : <Outlet />}</>;
 }

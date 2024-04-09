@@ -17,7 +17,7 @@ import {requestSyslogger} from './middleware/requestLogger';
 import {NODE_ENV} from './configs/environment';
 
 // Register formulas before starting Express.
-require('./formulas');
+// require('./formulas');
 
 export const app: Application = express();
 

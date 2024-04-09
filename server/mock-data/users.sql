@@ -6,6 +6,9 @@
 -- All names and student numbers portrayed in this file are fictitious.
 -- Any resemblance to actual person or student id, living or dead, active or inactive, is purely coincidental.
 INSERT INTO public.user (email, student_number, password, name, created_at, updated_at, role) VALUES
+('admin@aalto.fi', NULL, '$argon2i$v=19$m=4096,t=3,p=1$8GviC+qQHFqBG1PJZd+PCg$jWayurCVLCvJPn//oNR+5UIiQWqMhpNRJbrLaqIk1gM', 'Andy Admin', '2023-1-23', '2023-1-24', 'ADMIN'),
+('teacher@aalto.fi', '123456', '$argon2i$v=19$m=4096,t=3,p=1$8GviC+qQHFqBG1PJZd+PCg$jWayurCVLCvJPn//oNR+5UIiQWqMhpNRJbrLaqIk1gM', 'Timmy Teacher', '2023-1-23', '2023-1-24', 'USER'),
+
 ('amanda.germain@aalto.fi', '352772', 'oybqmgvqaftydpssvufmdpiqyaknxqhpeoqavmcuryaaswntzovmeqadyunz', 'Amanda Germain', '2020-10-15', '2021-7-2', 'USER'),
 ('beth.holmes@aalto.fi', '476617', 'bdrvtzjvbdgzefoofabxkttdqfokxopkvevlprmrdavrlbqqnvwprylymjlp', 'Beth Holmes', '2020-7-9', '2021-4-1', 'USER'),
 ('mark.ortiz@aalto.fi', '344625', 'onlcozbrcxrrevpcqqreqknwwrstjeymjdfnwzndgqgykkwgwouzaedqmdvr', 'Mark Ortiz', '2020-5-17', '2021-3-10', 'USER'),
@@ -2509,6 +2512,4 @@ INSERT INTO public.user (email, student_number, password, name, created_at, upda
 ('jolene.jenkins@aalto.fi', '497596', 'knsccbfyejkgahkkcjybqcasjmpwtmrdbihwsiuzgxlekkkfvwiaffzcogsy', 'Jolene Jenkins', '2022-3-8', '2021-8-3', 'USER'),
 ('jolene.jenkins@teacherincharge.fi', '4975961', 'knsccbfyejkgahkkcjybqcasjmpwtmrdbihwsiuzgxlekkkfvwiaffzcogsy', 'Jolene Jenkins', '2022-3-8', '2021-8-3', 'USER'),
 ('jolene.jenkins@courseinstancerole.fi', '4975962', 'knsccbfyejkgahkkcjybqcasjmpwtmrdbihwsiuzgxlekkkfvwiaffzcogsy', 'Jolene Jenkins', '2022-3-8', '2021-8-3', 'USER'),
-('jolene.jenkins@both.fi', '4975963', 'knsccbfyejkgahkkcjybqcasjmpwtmrdbihwsiuzgxlekkkfvwiaffzcogsy', 'Jolene Jenkins', '2022-3-8', '2021-8-3', 'USER'),
-('teacher@aalto.fi', '123456', '$argon2i$v=19$m=4096,t=3,p=1$8GviC+qQHFqBG1PJZd+PCg$jWayurCVLCvJPn//oNR+5UIiQWqMhpNRJbrLaqIk1gM', 'Timmy Teacher', '2023-1-23', '2023-1-24', 'USER'),
-('admin@aalto.fi', NULL, '$argon2i$v=19$m=4096,t=3,p=1$8GviC+qQHFqBG1PJZd+PCg$jWayurCVLCvJPn//oNR+5UIiQWqMhpNRJbrLaqIk1gM', 'Andy Admin', '2023-1-23', '2023-1-24', 'ADMIN');
+('jolene.jenkins@both.fi', '4975963', 'knsccbfyejkgahkkcjybqcasjmpwtmrdbihwsiuzgxlekkkfvwiaffzcogsy', 'Jolene Jenkins', '2022-3-8', '2021-8-3', 'USER');
