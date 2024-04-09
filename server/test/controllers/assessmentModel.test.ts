@@ -2,21 +2,26 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from '@common/types';
+/* eslint @typescript-eslint/no-unsafe-member-access: off */
+
 import supertest from 'supertest';
+import {z} from 'zod';
 
-import TeacherInCharge from '../../src/database/models/teacherInCharge';
-
-import {mockTeacher} from '../mock-data/misc';
+import {AssessmentModelDataSchema, HttpCode} from '@common/types';
 import {app} from '../../src/app';
+import {AverageAssessmentModelGraphStructure} from '../mock-data/assessmentModel';
+import {ErrorSchema, ZodErrorSchema} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
 
 const request = supertest(app);
-const badId: number = 1000000;
-let cookies: Cookies = {
-  adminCookie: [],
-  userCookie: [],
-};
+let cookies: Cookies = {adminCookie: [], teacherCookie: []};
+
+const normalId = 5;
+const assessmentModId = 5;
+const otherAssessmentModId = 1;
+const noModelslId = 6;
+const noTeacherId = 6;
+const badId = 1000000;
 
 beforeAll(async () => {
   cookies = await getCookies();
@@ -27,197 +32,214 @@ describe(
     ' - get assessment model',
   () => {
     it('should respond with correct data when assessment model exists', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/1/assessment-models/1')
+      const res = await request
+        .get(`/v1/courses/${normalId}/assessment-models/${assessmentModId}`)
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      expect(res.body.errors).not.toBeDefined();
-      expect(res.body.data.id).toBeDefined();
-      expect(res.body.data.courseId).toBeDefined();
-      expect(res.body.data.name).toBeDefined();
+      const result = await AssessmentModelDataSchema.strict().safeParseAsync(
+        res.body
+      );
+      expect(result.success).toBeTruthy();
     });
 
     it('should respond with 404 not found when assessment model does not exist', async () => {
-      const res: supertest.Response = await request
-        .get(`/v1/courses/1/assessment-models/${badId}`)
+      const res = await request
+        .get(`/v1/courses/${normalId}/assessment-models/${badId}`)
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.NotFound);
 
-      expect(res.body.errors).toBeDefined();
-      expect(res.body.data).not.toBeDefined();
+      const result = await ErrorSchema.safeParseAsync(res.body);
+      expect(result.success).toBeTruthy();
     });
 
     it('should respond with 404 not found when course does not exist', async () => {
-      const res: supertest.Response = await request
-        .get(`/v1/courses/${badId}/assessment-models/1`)
+      const res = await request
+        .get(`/v1/courses/${badId}/assessment-models/${assessmentModId}`)
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.NotFound);
 
-      expect(res.body.errors).toBeDefined();
-      expect(res.body.data).not.toBeDefined();
+      const result = await ErrorSchema.safeParseAsync(res.body);
+      expect(result.success).toBeTruthy();
     });
 
     it('should respond with 409 conflict when assessment model does not belong to course', async () => {
-      const res: supertest.Response = await request
-        .get('/v1/courses/1/assessment-models/2')
+      const res = await request
+        .get(
+          `/v1/courses/${normalId}/assessment-models/${otherAssessmentModId}`
+        )
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Conflict);
 
-      expect(res.body.errors).toBeDefined();
-      expect(res.body.data).not.toBeDefined();
+      const result = await ErrorSchema.safeParseAsync(res.body);
+      expect(result.success).toBeTruthy();
     });
   }
 );
 
 describe('Test GET /v1/courses/:courseId/assessment-models - get all assessment models', () => {
   it('should respond with correct data when assessment models exist', async () => {
-    const res: supertest.Response = await request
-      .get('/v1/courses/1/assessment-models')
+    const res = await request
+      .get(`/v1/courses/${normalId}/assessment-models`)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    expect(res.body.errors).not.toBeDefined();
-    expect(res.body.data).toBeDefined();
-    expect(res.body.data[0].id).toBeDefined();
-    expect(res.body.data[0].courseId).toBeDefined();
-    expect(res.body.data[0].name).toBeDefined();
+    const Schema = z.array(AssessmentModelDataSchema.strict()).nonempty();
+    const result = await Schema.safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
   });
 
   it('should respond with correct data when no assessment models exist', async () => {
-    const res: supertest.Response = await request
-      .get('/v1/courses/7/assessment-models')
+    const res = await request
+      .get(`/v1/courses/${noModelslId}/assessment-models`)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    expect(res.body.errors).not.toBeDefined();
-    expect(res.body.data).toBeDefined();
-    expect(res.body.data.length).toBe(0);
+    const Schema = z.array(z.any()).length(0);
+    const result = await Schema.safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
   });
 
   it('should respond with 404 not found when course does not exist', async () => {
-    const res: supertest.Response = await request
+    const res = await request
       .get(`/v1/courses/${badId}/assessment-models`)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.NotFound);
 
-    expect(res.body.errors).toBeDefined();
-    expect(res.body.data).not.toBeDefined();
+    const result = await ErrorSchema.safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
   });
 });
 
 describe('Test POST /v1/courses/:courseId/assessment-models - add assessment model', () => {
   it('should add an assessment model when course exists (admin user)', async () => {
-    const res: supertest.Response = await request
-      .post('/v1/courses/1/assessment-models')
+    const res = await request
+      .post(`/v1/courses/${normalId}/assessment-models`)
       .send({
-        name: 'new-model-1',
+        name: 'New model',
+        graphStructure: AverageAssessmentModelGraphStructure,
       })
       .set('Content-Type', 'application/json')
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
-      .expect(HttpCode.Ok);
+      .expect(HttpCode.Created);
 
-    expect(res.body.errors).not.toBeDefined();
-    expect(res.body.data).toBeDefined();
+    const Schema = z.number().int();
+    const result = await Schema.safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
   });
 
   it('should add an assessment model when course exists (teacher in charge)', async () => {
-    jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
-
-    const res: supertest.Response = await request
-      .post('/v1/courses/1/assessment-models')
+    const res = await request
+      .post(`/v1/courses/${normalId}/assessment-models`)
       .send({
-        name: 'new-model-2',
+        name: 'New model 2',
+        graphStructure: AverageAssessmentModelGraphStructure,
       })
       .set('Content-Type', 'application/json')
-      .set('Cookie', cookies.userCookie)
+      .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
-      .expect(HttpCode.Ok);
+      .expect(HttpCode.Created);
 
-    expect(res.body.errors).not.toBeDefined();
-    expect(res.body.data).toBeDefined();
+    const Schema = z.number().int();
+    const result = await Schema.safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
   });
 
   it('should respond with 400 bad request if validation fails', async () => {
-    async function badInput(input: unknown): Promise<void> {
-      const res: supertest.Response = await request
-        .post('/v1/courses/1/assessment-models')
+    const badInput = async (input: unknown): Promise<void> => {
+      const res = await request
+        .post(`/v1/courses/${normalId}/assessment-models`)
         .send(input as object)
         .set('Content-Type', 'application/json')
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.BadRequest);
 
-      expect(res.body.errors).toBeDefined();
-      expect(res.body.data).not.toBeDefined();
-    }
+      const Schema = z.union([ErrorSchema, ZodErrorSchema]);
+      const result = await Schema.safeParseAsync(res.body);
+      expect(result.success).toBeTruthy();
+    };
 
-    await badInput({name: 5});
-    await badInput({name: {name: 'string'}});
+    await badInput({
+      name: 5,
+      graphStructure: AverageAssessmentModelGraphStructure,
+    });
+    await badInput({
+      name: {name: 'string'},
+      graphStructure: AverageAssessmentModelGraphStructure,
+    });
     await badInput(10);
-    await badInput({nam: 'a name'});
+    await badInput({
+      name: 'a name',
+      graphStructure: {nodes: [], edges: [], nodeDat: {}},
+    });
   });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
-    await request
-      .post('/v1/courses/1/assessment-models')
-      .send({})
+    const res = await request
+      .post(`/v1/courses/${normalId}/assessment-models`)
+      .send({
+        name: 'Not added',
+        graphStructure: AverageAssessmentModelGraphStructure,
+      })
       .set('Accept', 'application/json')
       .expect(HttpCode.Unauthorized);
+
+    expect(JSON.stringify(res.body)).toBe('{}'); // Passport does not call next() on error
   });
 
   it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
-    const res: supertest.Response = await request
-      .post('/v1/courses/1/assessment-models')
+    const res = await request
+      .post(`/v1/courses/${noTeacherId}/assessment-models`)
       .send({
-        name: 'new-model',
+        name: 'Not added',
+        graphStructure: AverageAssessmentModelGraphStructure,
       })
-      .set('Cookie', cookies.userCookie)
+      .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Forbidden);
 
-    expect(res.body.data).not.toBeDefined();
-    expect(res.body.errors).toBeDefined();
+    const result = await ErrorSchema.safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
   });
 
   it('should respond with 404 not found when course does not exist', async () => {
-    const res: supertest.Response = await request
+    const res = await request
       .post(`/v1/courses/${badId}/assessment-models`)
       .send({
-        name: 'new-model',
+        name: 'Not added',
+        graphStructure: AverageAssessmentModelGraphStructure,
       })
       .set('Content-Type', 'application/json')
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.NotFound);
 
-    expect(res.body.errors).toBeDefined();
-    expect(res.body.data).not.toBeDefined();
+    const result = await ErrorSchema.safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
   });
 
   it('should respond with 409 Conflict, if course already has assessment model with same name', async () => {
-    const res: supertest.Response = await request
-      .post('/v1/courses/1/assessment-models')
+    const res = await request
+      .post(`/v1/courses/${normalId}/assessment-models`)
       .send({
-        name: 'new-model-1',
+        name: 'New model',
+        graphStructure: AverageAssessmentModelGraphStructure,
       })
       .set('Content-Type', 'application/json')
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Conflict);
 
-    expect(res.body.errors).toBeDefined();
-    expect(res.body.errors[0]).toBe(
-      "Assessment model with name 'new-model-1' already exists in course ID 1"
-    );
-    expect(res.body.data).not.toBeDefined();
+    const result = await ErrorSchema.safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
   });
 });

@@ -6,12 +6,14 @@ import {z} from 'zod';
 import {GraphStructureSchema} from './graph';
 
 // Types
-export const AssesmentModelDataSchema = z.object({
+export const AssessmentModelDataSchema = z.object({
   id: z.number().int().optional(),
   courseId: z.number().int().optional(),
   name: z.string(),
   graphStructure: GraphStructureSchema,
 });
-export const AssessmentModelDataArraySchema = z.array(AssesmentModelDataSchema);
+export const AssessmentModelDataArraySchema = z.array(
+  AssessmentModelDataSchema
+);
 
-export type AssessmentModelData = z.infer<typeof AssesmentModelDataSchema>;
+export type AssessmentModelData = z.infer<typeof AssessmentModelDataSchema>;

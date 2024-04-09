@@ -7,8 +7,8 @@ import supertest from 'supertest';
 
 import TeacherInCharge from '../../src/database/models/teacherInCharge';
 
-import {mockTeacher} from '../mock-data/misc';
 import {app} from '../../src/app';
+import {mockTeacher} from '../mock-data/misc';
 import {Cookies, getCookies} from '../util/getCookies';
 
 const request = supertest(app);
@@ -17,7 +17,7 @@ const dateOnlyRegExp: RegExp =
   /^\d{4}[/-](0?[1-9]|1[012])[/-](0?[1-9]|[12][0-9]|3[01])$/;
 let cookies: Cookies = {
   adminCookie: [],
-  userCookie: [],
+  teacherCookie: [],
 };
 
 beforeAll(async () => {
@@ -221,7 +221,7 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
         startDate: '2022-7-10',
         endDate: '2022-11-10',
       })
-      .set('Cookie', cookies.userCookie)
+      .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
@@ -283,7 +283,7 @@ describe('Test POST /v1/courses/:courseId/instances - create new course instance
         startDate: '2022-7-10',
         endDate: '2022-11-10',
       })
-      .set('Cookie', cookies.userCookie)
+      .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Forbidden);
 

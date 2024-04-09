@@ -20,6 +20,13 @@ insert into public.attainment (course_id, name, days_valid, created_at, updated_
 (3, 'Exam', 365, NOW(), NOW()),
 (4, 'Round 1', 365, NOW(), NOW()),
 (4, 'Round 2', 365, NOW(), NOW()),
-(4, 'Round 3', 365, NOW(), NOW());
+(4, 'Round 3', 365, NOW(), NOW()),
+
+(5, 'Exercise 1', 365, NOW(), NOW()),
+(5, 'Exercise 2', 365, NOW(), NOW()),
+(5, 'Exam', 365, NOW(), NOW()),
+(6, 'Exercise 1', 365, NOW(), NOW()),
+(6, 'Exercise 2', 365, NOW(), NOW()),
+(6, 'Exam', 365, NOW(), NOW());
 
 SELECT setval('attainment_id_seq', COALESCE((SELECT MAX(id)+1 FROM attainment), 1), false);

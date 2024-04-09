@@ -6,13 +6,13 @@ import {HttpCode} from '@common/types';
 import supertest from 'supertest';
 
 import {app} from '../../src/app';
-import {getCookies, Cookies} from '../util/getCookies';
+import {Cookies, getCookies} from '../util/getCookies';
 
 const request = supertest(app);
 let res: supertest.Response;
 let cookies: Cookies = {
   adminCookie: [],
-  userCookie: [],
+  teacherCookie: [],
 };
 
 beforeAll(async () => {

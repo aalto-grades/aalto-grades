@@ -18,7 +18,7 @@ const mockedAxios: jest.Mocked<AxiosStatic> = axios as jest.Mocked<
 const request = supertest(app);
 let cookies: Cookies = {
   adminCookie: [],
-  userCookie: [],
+  teacherCookie: [],
 };
 
 beforeAll(async () => {

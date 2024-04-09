@@ -22,7 +22,7 @@ const request = supertest(app);
 const badId: number = 1000000;
 let cookies: Cookies = {
   adminCookie: [],
-  userCookie: [],
+  teacherCookie: [],
 };
 
 beforeAll(async () => {
@@ -209,7 +209,7 @@ describe('Test POST /v1/courses - create new course', () => {
     await request
       .post('/v1/courses')
       .send({})
-      .set('Cookie', cookies.userCookie)
+      .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Forbidden);
   });
@@ -481,7 +481,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
     await request
       .put('/v1/courses/10')
       .send(courseDataEdits)
-      .set('Cookie', cookies.userCookie)
+      .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Forbidden);
   });

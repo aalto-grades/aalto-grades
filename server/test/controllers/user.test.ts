@@ -6,13 +6,13 @@ import {HttpCode} from '@common/types';
 import supertest from 'supertest';
 
 import {app} from '../../src/app';
-import {Cookies, getCookies} from '../util/getCookies';
 import User from '../../src/database/models/user';
+import {Cookies, getCookies} from '../util/getCookies';
 
 const request = supertest(app);
 let cookies: Cookies = {
   adminCookie: [],
-  userCookie: [],
+  teacherCookie: [],
 };
 
 beforeAll(async () => {
@@ -68,13 +68,13 @@ describe('Test GET /v1/user/:userId/courses - get all courses user has role in',
     // Check for user.
     let res: supertest.Response = await request
       .get('/v1/auth/self-info')
-      .set('Cookie', cookies.userCookie)
+      .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
     res = await request
       .get(`/v1/user/${res.body.data.id}/courses`)
-      .set('Cookie', cookies.userCookie)
+      .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
@@ -158,7 +158,7 @@ describe('Test GET /v1/user/:userId/courses - get all courses user has role in',
   it('should respond with 403 forbidden, if trying to access other users courses (not admin)', async () => {
     const res: supertest.Response = await request
       .get('/v1/user/1/courses')
-      .set('Cookie', cookies.userCookie)
+      .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Forbidden);
 
@@ -187,13 +187,13 @@ describe('Test GET /v1/user/:userId - get user information', () => {
     // Check for user.
     let res: supertest.Response = await request
       .get('/v1/auth/self-info')
-      .set('Cookie', cookies.userCookie)
+      .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
     res = await request
       .get(`/v1/user/${res.body.data.id}`)
-      .set('Cookie', cookies.userCookie)
+      .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
@@ -238,7 +238,7 @@ describe('Test GET /v1/user/:userId - get user information', () => {
   it('should respond with 403 forbidden, if trying to access other users information (not admin)', async () => {
     const res: supertest.Response = await request
       .get('/v1/user/1')
-      .set('Cookie', cookies.userCookie)
+      .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Forbidden);
 
@@ -287,13 +287,13 @@ describe('Test GET /v1/idp-users/ - get idp users information', () => {
   it('should respond with 403 forbidden, if not admin', async () => {
     await request
       .get('/v1/auth/self-info')
-      .set('Cookie', cookies.userCookie)
+      .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
     await request
       .get('/v1/idp-users')
-      .set('Cookie', cookies.userCookie)
+      .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Forbidden);
   });
@@ -325,7 +325,7 @@ describe('Test POST /v1/idp-users/ - get idp users information', () => {
     await request
       .post('/v1/idp-users')
       .send({email: 'idp@user.com'})
-      .set('Cookie', cookies.userCookie)
+      .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Forbidden);
   });
