@@ -6,9 +6,9 @@ import {
   CreationOptional,
   DataTypes,
   ForeignKey,
-  Model,
   InferAttributes,
   InferCreationAttributes,
+  Model,
 } from 'sequelize';
 
 import {sequelize} from '..';
@@ -21,6 +21,7 @@ export default class AssessmentModel extends Model<
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
   declare name: string;
+  declare graphStructure: JSON;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -44,6 +45,10 @@ AssessmentModel.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    graphStructure: {
+      type: DataTypes.JSONB,
+      allowNull: true,
+    },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },
@@ -53,12 +58,5 @@ AssessmentModel.init(
   }
 );
 
-AssessmentModel.belongsTo(Course, {
-  targetKey: 'id',
-  foreignKey: 'courseId',
-});
-
-Course.hasMany(AssessmentModel, {
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE',
-});
+Course.hasMany(AssessmentModel, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
+AssessmentModel.belongsTo(Course, {foreignKey: 'courseId'});

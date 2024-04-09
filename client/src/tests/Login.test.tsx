@@ -24,6 +24,8 @@ describe('Tests for Login and LoginForm components', () => {
             setAuth: vi.fn(),
             isTeacherInCharge: false,
             setIsTeacherInCharge: vi.fn(),
+            setIsAssistant: vi.fn(),
+            isAssistant: false,
           }}
         >
           <BrowserRouter>

@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 export * from './error';
-export * from './formulas';
 export * from './general';
 export * from './grades';
 export * from './language';

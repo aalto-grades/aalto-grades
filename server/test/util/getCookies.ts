@@ -4,8 +4,8 @@
 
 import supertest from 'supertest';
 
-import {app} from '../../src/app';
 import {SystemRole} from '@common/types';
+import {app} from '../../src/app';
 
 const request = supertest(app);
 
@@ -24,6 +24,7 @@ export async function getCookies(): Promise<Cookies> {
   const adminEmail: string = `admin${new Date().getTime()}@aalto.fi`;
   const userEmail: string = `user${new Date().getTime()}@aalto.fi`;
 
+  // TODO: Signup route has been removed, use login instead
   const adminRes: supertest.Response = await request
     .post('/v1/auth/signup')
     .set('Accept', 'application/json')

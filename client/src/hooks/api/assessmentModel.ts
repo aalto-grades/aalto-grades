@@ -2,74 +2,74 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AssessmentModelData} from '@common/types';
-import axios from './axios';
 import {
-  QueryClient,
-  useMutation,
+  AssesmentModelDataSchema,
+  AssessmentModelData,
+  AssessmentModelDataArraySchema,
+  IdSchema,
+} from '@common/types';
+import {
   UseMutationOptions,
   UseMutationResult,
-  useQuery,
-  useQueryClient,
   UseQueryOptions,
   UseQueryResult,
+  useMutation,
+  useQuery,
+  useQueryClient,
 } from '@tanstack/react-query';
-
 import {Numeric} from '../../types';
+import axios from './axios';
 
-export function useGetAllAssessmentModels(
+export const useGetAllAssessmentModels = (
   courseId: Numeric,
-  options?: Partial<UseQueryOptions<Array<AssessmentModelData>>>
-): UseQueryResult<Array<AssessmentModelData>> {
-  return useQuery({
+  options?: Partial<UseQueryOptions<AssessmentModelData[]>>
+): UseQueryResult<AssessmentModelData[]> =>
+  useQuery({
     queryKey: ['all-assessment-models', courseId],
     queryFn: async () =>
-      (await axios.get(`/v1/courses/${courseId}/assessment-models`)).data.data,
+      AssessmentModelDataArraySchema.parse(
+        (await axios.get(`/v1/courses/${courseId}/assessment-models`)).data
+      ),
     ...options,
   });
-}
 
-export function useGetAssessmentModel(
+export const useGetAssessmentModel = (
   courseId: Numeric,
   assessmentModelId: Numeric,
   options?: Partial<UseQueryOptions<AssessmentModelData>>
-): UseQueryResult<AssessmentModelData> {
-  return useQuery({
+): UseQueryResult<AssessmentModelData> =>
+  useQuery({
     queryKey: ['assessment-model', courseId, assessmentModelId],
     queryFn: async () =>
-      (
-        await axios.get(
-          `/v1/courses/${courseId}/assessment-models/${assessmentModelId}`
-        )
-      ).data.data,
+      AssesmentModelDataSchema.parse(
+        (
+          await axios.get(
+            `/v1/courses/${courseId}/assessment-models/${assessmentModelId}`
+          )
+        ).data
+      ),
     ...options,
   });
-}
 
-interface AddAssessmentModelVars {
+type AddAssessmentModelVars = {
   courseId: Numeric;
   assessmentModel: AssessmentModelData;
-}
-
-export type UseAddAssessmentModelResult = UseMutationResult<
-  number,
-  unknown,
-  AddAssessmentModelVars
->;
-
-export function useAddAssessmentModel(
+};
+export const useAddAssessmentModel = (
   options?: UseMutationOptions<number, unknown, unknown>
-): UseAddAssessmentModelResult {
-  const queryClient: QueryClient = useQueryClient();
+): UseMutationResult<number, unknown, AddAssessmentModelVars> => {
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (vars: AddAssessmentModelVars) =>
-      (
-        await axios.post(
-          `/v1/courses/${vars.courseId}/assessment-models`,
-          vars.assessmentModel
-        )
-      ).data.data,
+      IdSchema.parse(
+        (
+          await axios.post(
+            `/v1/courses/${vars.courseId}/assessment-models`,
+            vars.assessmentModel
+          )
+        ).data
+      ),
 
     onSuccess: (_data: number, vars: AddAssessmentModelVars) => {
       queryClient.invalidateQueries({
@@ -78,35 +78,26 @@ export function useAddAssessmentModel(
     },
     ...options,
   });
-}
+};
 
-interface EditAssessmentModelVars {
+type EditAssessmentModelVars = {
   courseId: Numeric;
   assessmentModelId: Numeric;
   assessmentModel: AssessmentModelData;
-}
-
-export type UseEditAssessmentModelResult = UseMutationResult<
-  AssessmentModelData,
-  unknown,
-  EditAssessmentModelVars
->;
-
-export function useEditAssessmentModel(
-  options?: UseMutationOptions<AssessmentModelData, unknown, unknown>
-): UseEditAssessmentModelResult {
-  const queryClient: QueryClient = useQueryClient();
+};
+export const useEditAssessmentModel = (
+  options?: UseMutationOptions<unknown, unknown, unknown>
+): UseMutationResult<unknown, unknown, EditAssessmentModelVars> => {
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (vars: EditAssessmentModelVars) =>
-      (
-        await axios.put(
-          `/v1/courses/${vars.courseId}/assessment-models/${vars.assessmentModelId}`,
-          vars.assessmentModel
-        )
-      ).data.data,
+      await axios.put(
+        `/v1/courses/${vars.courseId}/assessment-models/${vars.assessmentModelId}`,
+        vars.assessmentModel
+      ),
 
-    onSuccess: (_data: AssessmentModelData, vars: EditAssessmentModelVars) => {
+    onSuccess: (_data: unknown, vars: EditAssessmentModelVars) => {
       queryClient.invalidateQueries({
         queryKey: ['assessment-model', vars.courseId, vars.assessmentModelId],
       });
@@ -117,26 +108,32 @@ export function useEditAssessmentModel(
     },
     ...options,
   });
-}
+};
 
-export function useDeleteAssessmentModel(
-  options?: UseMutationOptions<unknown, unknown, Numeric>
-): UseMutationResult<unknown, unknown, Numeric> {
-  const queryClient: QueryClient = useQueryClient();
+type DeleteAssessmentModelVars = {
+  courseId: Numeric;
+  assessmentModelId: Numeric;
+};
+export const useDeleteAssessmentModel = (
+  options?: UseMutationOptions<unknown, unknown, unknown>
+): UseMutationResult<unknown, unknown, DeleteAssessmentModelVars> => {
+  const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (assessmentModelId: Numeric) =>
-      await axios.delete(`/v1/assessment-models/${assessmentModelId}`),
+    mutationFn: async (vars: DeleteAssessmentModelVars) =>
+      await axios.delete(
+        `/v1/courses/${vars.courseId}/assessment-models/${vars.assessmentModelId}`
+      ),
 
-    onSuccess: (_data: unknown, assessmentModelId: Numeric) => {
+    onSuccess: (_data: unknown, vars: DeleteAssessmentModelVars) => {
       queryClient.invalidateQueries({
-        queryKey: ['assessment-model', assessmentModelId],
+        queryKey: ['assessment-model', vars.courseId],
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['all-assessment-models', assessmentModelId],
+        queryKey: ['all-assessment-models', vars.courseId],
       });
     },
     ...options,
   });
-}
+};

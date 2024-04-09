@@ -51,6 +51,8 @@ describe('FileLoadDialog test with proper csv', () => {
               setAuth: vi.fn(),
               isTeacherInCharge: false,
               setIsTeacherInCharge: vi.fn(),
+              setIsAssistant: vi.fn(),
+              isAssistant: false,
             }}
           >
             <Routes>
@@ -171,6 +173,8 @@ describe('FileLoadDialog test where server does not accept the file', () => {
               setAuth: vi.fn(),
               isTeacherInCharge: false,
               setIsTeacherInCharge: vi.fn(),
+              setIsAssistant: vi.fn,
+              isAssistant: false,
             }}
           >
             <Routes>

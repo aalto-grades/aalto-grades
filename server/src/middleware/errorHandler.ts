@@ -6,8 +6,7 @@ import {HttpCode} from '@common/types';
 import {AxiosError} from 'axios';
 import {CsvError} from 'csv-parse';
 import {NextFunction, Request, RequestHandler, Response} from 'express';
-import {MulterError} from 'multer';
-import {ValidationError} from 'yup';
+import {ZodError} from 'zod';
 
 import logger from '../configs/winston';
 import {ApiError} from '../types';
@@ -63,8 +62,8 @@ export function errorHandler(
     return;
   }
 
-  if (err instanceof ValidationError) {
-    logger.error(`${err.name}: ${err.errors}`);
+  if (err instanceof ZodError) {
+    logger.error(`${err.name}: ${err.message}`);
 
     res.status(HttpCode.BadRequest).send({
       success: false,
@@ -80,14 +79,14 @@ export function errorHandler(
       success: false,
       errors: [
         err.response
-          ? `external API error: ${err.response?.status}`
+          ? `external API error: ${err.response.status}`
           : err.message,
       ],
     });
     return;
   }
 
-  if (err instanceof CsvError || err instanceof MulterError) {
+  if (err instanceof CsvError) {
     // If field name is incorrect, change the error message to more informative.
     const message: string =
       err.message === 'Unexpected field'

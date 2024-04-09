@@ -2,62 +2,81 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from '@common/types';
-
-import User from '../../database/models/user';
+import {HttpCode, SystemRole} from '@common/types';
+import {Request} from 'express';
 import TeacherInCharge from '../../database/models/teacherInCharge';
-
-import {SystemRole} from '@common/types';
-import {ApiError, JwtClaims} from '../../types';
+import User from '../../database/models/user';
+import {ApiError, JwtClaims, stringToIdSchema} from '../../types';
 
 /**
- * Finds a user by its ID.
- * @param {number} userId - The ID of the user to be found.
- * @param {HttpCode} errorCode - HTTP status code to return if the user was not found.
- * @returns {Promise<User>} - A promise that resolves with the found user model object.
- * @throws {ApiError} - If the user is not found, it throws an error with a message
- * indicating the missing user with the specific ID.
+ * Finds a user by its ID and throws ApiError if not found.
  */
-export async function findUserById(
-  userId: number,
-  errorCode: HttpCode
-): Promise<User> {
-  const user: User | null = await User.findByPk(userId);
-  if (!user) {
-    throw new ApiError(`user with ID ${userId} not found`, errorCode);
+export const findUserById = async (userId: number): Promise<User> => {
+  const user = await User.findByPk(userId);
+  if (user === null) {
+    throw new ApiError(`user with ID ${userId} not found`, HttpCode.NotFound);
   }
   return user;
-}
+};
 
 /**
- * Function for checking is the user either admin on system level or
- * teacher in charge on course level.
- * @param {JwtClaims} user - User data from JWT.
- * @param {number} courseId - The ID of the course.
- * @param {HttpCode} errorCode - HTTP status code to return if the user access is denied.
- * @returns {Promise<User>} - A promise that resolves with the found user model object.
- * @throws {ApiError} - If the user is either admin or teacher in charge.
+ * Finds a user by url param id and also validates the url param.
+ * Throws ApiError if not found.
  */
-export async function isTeacherInChargeOrAdmin(
-  user: JwtClaims,
-  courseId: number,
-  errorCode: HttpCode
-): Promise<void> {
-  if (user.role === SystemRole.Admin) {
-    return;
+export const findAndValidateUserId = async (userId: string): Promise<User> => {
+  const result = stringToIdSchema.safeParse(userId);
+  if (!result.success) {
+    throw new ApiError(`Invalid user id ${userId}`, HttpCode.BadRequest);
   }
+  return await findUserById(result.data);
+};
 
-  const teacher: TeacherInCharge | null = await TeacherInCharge.findOne({
-    where: {
-      userId: user.id,
-      courseId,
-    },
+/**
+ * Validates user id url param. Throws ApiError if invalid or user not found.
+ */
+export const validateUserId = async (userId: string): Promise<number> => {
+  const result = stringToIdSchema.safeParse(userId);
+  if (!result.success) {
+    throw new ApiError(`Invalid user id ${userId}`, HttpCode.BadRequest);
+  }
+  await findUserById(result.data);
+  return result.data;
+};
+
+/**
+ * Function for checking is the user either admin on system level or teacher in charge on course level.
+ * Throws ApiError if the user is neither an admin or the teacher in charge.
+ */
+export const isTeacherInChargeOrAdmin = async (
+  user: JwtClaims,
+  courseId: number
+): Promise<void> => {
+  if (user.role === SystemRole.Admin) return;
+
+  const teacher = await TeacherInCharge.findOne({
+    where: {userId: user.id, courseId},
   });
 
-  if (!teacher) {
+  if (teacher === null) {
     throw new ApiError(
       `user with ID ${user.id} is not allowed not execute the action`,
-      errorCode
+      HttpCode.Forbidden
     );
   }
-}
+};
+
+/**
+ * Checks if the user making the request is an admin or the owner of the data being accessed.
+ * Throws ApiError if the user id is invalid or the user does not have correct permissions.
+ */
+export const adminOrOwner = async (req: Request): Promise<User> => {
+  const userId = await validateUserId(req.params.userId);
+  const userToken = req.user as JwtClaims;
+
+  if (userId !== userToken.id && userToken.role !== SystemRole.Admin) {
+    throw new ApiError("cannot access user's courses", HttpCode.Forbidden);
+  }
+
+  // Confirm that user exists and return.
+  return await findUserById(userId);
+};

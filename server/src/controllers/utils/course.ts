@@ -2,49 +2,34 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from '@common/types';
-
+import {CourseData, HttpCode, Language} from '@common/types';
 import Course from '../../database/models/course';
 import CourseTranslation from '../../database/models/courseTranslation';
 import User from '../../database/models/user';
-
-import {CourseData, Language} from '@common/types';
-import {ApiError, CourseFull} from '../../types';
+import {ApiError, CourseFull, stringToIdSchema} from '../../types';
 
 /**
- * Finds a course by its ID.
- * @param {number} courseId - The ID of the course.
- * @param {HttpCode} errorCode - HTTP status code to return if the course was not found.
- * @returns {Promise<Course>} - The found course model object.
- * @throws {ApiError} - If the course is not found, it throws an error with a message
- * indicating the missing course with the specific ID.
+ * Finds a course by its ID. Throws ApiError if not found.
  */
-export async function findCourseById(
-  courseId: number,
-  errorCode: HttpCode
-): Promise<Course> {
-  const course: Course | null = await Course.findByPk(courseId);
+export const findCourseById = async (courseId: number): Promise<Course> => {
+  const course = await Course.findByPk(courseId);
   if (!course) {
-    throw new ApiError(`course with ID ${courseId} not found`, errorCode);
+    throw new ApiError(
+      `course with ID ${courseId} not found`,
+      HttpCode.NotFound
+    );
   }
   return course;
-}
+};
 
 /**
  * Finds a course, its translations, and the teachers in charge of that course
- * by a course ID.
- * @param {number} courseId - The ID of the course.
- * @param {HttpCode} errorCode - HTTP status code to include in ApiError if the
- * course was not found.
- * @returns {Promise<CourseFull>} - The found course model object with
- * course translation and user objects included.
- * @throws {ApiError} - If the course is not found, it throws an error with a
- * message indicating the missing course with the specific ID.
+ * by a course ID. Throws ApiError if course not found
  */
-export async function findCourseFullById(
+export const findCourseFullById = async (
   courseId: number,
-  errorCode: HttpCode
-): Promise<CourseFull> {
+  errorCode?: HttpCode
+): Promise<CourseFull> => {
   const course: CourseFull | null = (await Course.findByPk(courseId, {
     include: [
       {
@@ -61,14 +46,17 @@ export async function findCourseFullById(
     ],
   })) as CourseFull;
 
-  if (!course) {
-    throw new ApiError(`course with ID ${courseId} not found`, errorCode);
+  if (course === null) {
+    throw new ApiError(
+      `course with ID ${courseId} not found`,
+      errorCode ?? HttpCode.NotFound
+    );
   }
 
   return course;
-}
+};
 
-export function parseCourseFull(course: CourseFull): CourseData {
+export const parseCourseFull = (course: CourseFull): CourseData => {
   const courseData: CourseData = {
     id: course.id,
     courseCode: course.courseCode,
@@ -90,8 +78,14 @@ export function parseCourseFull(course: CourseFull): CourseData {
     },
   };
 
-  course.CourseTranslations.forEach((translation: CourseTranslation) => {
-    switch (translation.language) {
+  for (const translation of course.CourseTranslations) {
+    // TODO: Mismatch in database languages and Language enum
+    const language: Language.English | Language.Finnish | Language.Swedish =
+      (translation.language as 'EN' | 'FI' | 'SE') === 'SE'
+        ? Language.Swedish
+        : (translation.language as Language.English | Language.Finnish);
+
+    switch (language) {
       case Language.English:
         courseData.department.en = translation.department;
         courseData.name.en = translation.courseName;
@@ -105,15 +99,15 @@ export function parseCourseFull(course: CourseFull): CourseData {
         courseData.name.sv = translation.courseName;
         break;
     }
-  });
+  }
 
-  course.Users.forEach((teacher: User) => {
+  for (const teacher of course.Users) {
     courseData.teachersInCharge.push({
       id: teacher.id,
       name: teacher.name,
       email: teacher.email,
     });
-  });
+  }
 
   course.inCourse?.forEach((assistant: User) => {
     courseData.assistants.push({
@@ -124,4 +118,58 @@ export function parseCourseFull(course: CourseFull): CourseData {
   });
 
   return courseData;
-}
+};
+
+/**
+ * Checks that all emails are existing users. Throws ApiError if that's not the case.
+ */
+export const validateEmailList = async (
+  emailList: string[]
+): Promise<User[]> => {
+  const users = await User.findAll({
+    attributes: ['id', 'email'],
+    where: {email: emailList},
+  });
+
+  // Check for non existent emails.
+  if (emailList.length !== users.length) {
+    const userEmails = users.map(user => user.email);
+    const missingEmails = emailList.filter(
+      email => !userEmails.includes(email)
+    );
+
+    throw new ApiError(
+      missingEmails.map(
+        (email: string) => `No user with email address ${email} found`
+      ),
+      HttpCode.UnprocessableEntity
+    );
+  }
+
+  return users;
+};
+
+/**
+ * Finds a course by url param id and also validates the url param.
+ * Throws ApiError if invalid or course not found.
+ */
+export const findAndValidateCourseId = async (
+  courseId: string
+): Promise<Course> => {
+  const result = stringToIdSchema.safeParse(courseId);
+  if (!result.success)
+    throw new ApiError(`Invalid course id ${courseId}`, HttpCode.BadRequest);
+  return await findCourseById(result.data);
+};
+
+/**
+ * Validates course id url param and returns it as a number.
+ * Throws ApiError if invalid or course not found.
+ */
+export const validateCourseId = async (courseId: string): Promise<number> => {
+  const result = stringToIdSchema.safeParse(courseId);
+  if (!result.success)
+    throw new ApiError(`Invalid course id ${courseId}`, HttpCode.BadRequest);
+  await findCourseById(result.data);
+  return result.data;
+};

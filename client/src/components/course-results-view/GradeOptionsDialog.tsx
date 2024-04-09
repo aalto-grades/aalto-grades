@@ -48,14 +48,6 @@ export default function GradeOptionsDialog(props: {
       label: 'Grade',
     },
     {
-      id: 'status',
-      label: 'Status',
-    },
-    {
-      id: 'manual',
-      label: 'Manual',
-    },
-    {
       id: 'date',
       label: 'Date',
     },
@@ -76,10 +68,16 @@ export default function GradeOptionsDialog(props: {
   const bestGrade = findBestGradeOption(props.options, {
     avoidExpired: true,
     preferExpiredToNull: true,
+    useLatest: false, // TODO: Read from state?
   });
 
   return (
-    <Dialog open={props.open} transitionDuration={{exit: 800}} maxWidth="md">
+    <Dialog
+      open={props.open}
+      transitionDuration={{exit: 800}}
+      maxWidth="md"
+      onClose={props.handleClose}
+    >
       <DialogTitle>{props.title}</DialogTitle>
       <DialogContent>
         <Table>

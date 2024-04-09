@@ -2,51 +2,30 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {
-  HttpCode,
-  LoginResult,
-  PlainPassword,
-  SignupRequest,
-  SystemRole,
-} from '@common/types';
-import argon from 'argon2';
 import {NextFunction, Request, Response} from 'express';
+import {RequestHandler} from 'express-serve-static-core';
+import {readFileSync} from 'fs';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
-import {
-  Profile,
-  Strategy as SamlStrategy,
-  VerifiedCallback as SamlVerifiedCallback,
-} from '@node-saml/passport-saml';
 import {Strategy as JWTStrategy, VerifiedCallback} from 'passport-jwt';
 import {IVerifyOptions, Strategy as LocalStrategy} from 'passport-local';
-import * as yup from 'yup';
-import {readFileSync} from 'fs';
 
+import {HttpCode, LoginResult, SystemRole} from '@common/types';
 import {JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS} from '../configs/constants';
-import {
-  JWT_SECRET,
-  NODE_ENV,
-  SAML_CALLBACK,
-  SAML_ENCRYPT_PVK,
-  SAML_ENTITY,
-  SAML_ENTRYPOINT,
-  SAML_IDP_CERT,
-  SAML_PRIVATE_KEY,
-  SAML_SP_CERT_PATH,
-  SAML_METADATA_URL,
-} from '../configs/environment';
-
-import User from '../database/models/user';
-
+import {JWT_SECRET, NODE_ENV, SAML_SP_CERT_PATH} from '../configs/environment';
 import {ApiError, JwtClaims} from '../types';
+import {getSamlStrategy, validateLogin} from './utils/auth';
 import {findUserById} from './utils/user';
-import {getIdpSignCert} from './utils/saml';
 
-export async function authSelfInfo(req: Request, res: Response): Promise<void> {
-  const user: JwtClaims = req.user as JwtClaims;
-
-  const userFromDb: User = await findUserById(user.id, HttpCode.NotFound);
+/**
+ * Responds with LoginResult
+ */
+export const authSelfInfo = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const user = req.user as JwtClaims;
+  const userFromDb = await findUserById(user.id);
 
   const auth: LoginResult = {
     id: userFromDb.id,
@@ -54,271 +33,116 @@ export async function authSelfInfo(req: Request, res: Response): Promise<void> {
     name: userFromDb.name,
   };
 
-  res.send({
-    data: auth,
-  });
-}
+  res.json(auth);
+};
 
-export async function validateLogin(
-  email: string,
-  password: PlainPassword
-): Promise<LoginResult> {
-  const user: User | null = await User.findByEmail(email);
-
-  if (user === null) {
-    throw new ApiError('invalid credentials', HttpCode.Unauthorized);
-  }
-
-  const match: boolean = await argon.verify(user.password.trim(), password);
-
-  if (!match) {
-    throw new ApiError('invalid credentials', HttpCode.Unauthorized);
-  }
-
-  return {
-    id: user.id,
-    role: user.role as SystemRole,
-    name: user.name ?? '-',
-  };
-}
-
-export async function authLogin(
+/**
+ * Responds with LoginResult
+ */
+export const authLogin = (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> {
-  passport.authenticate(
-    'login',
-    async (error: unknown, loginResult: LoginResult | boolean) => {
-      if (error) {
-        return next(error);
-      }
-      if (typeof loginResult === 'boolean') {
-        return res.status(HttpCode.Unauthorized).send({
-          success: false,
-          errors: ['incorrect email or password'],
-        });
-      }
+): void => {
+  (
+    passport.authenticate(
+      'login',
+      (error: unknown, loginResult: LoginResult | boolean) => {
+        if (error) return next(error);
 
-      req.login(loginResult, {session: false}, async (error: unknown) => {
-        if (error) {
-          return next(error);
+        if (typeof loginResult === 'boolean') {
+          return res.status(HttpCode.Unauthorized).send({
+            success: false,
+            errors: ['incorrect email or password'],
+          });
         }
 
-        const body: JwtClaims = {
-          id: loginResult.id,
-          role: loginResult.role,
-        };
+        req.login(loginResult, {session: false}, (loginError: unknown) => {
+          if (loginError) return next(loginError);
 
-        const token: string = jwt.sign(body, JWT_SECRET, {
-          expiresIn: JWT_EXPIRY_SECONDS,
-        });
+          const body: JwtClaims = {
+            id: loginResult.id,
+            role: loginResult.role,
+          };
 
-        res.cookie('jwt', token, {
-          httpOnly: true,
-          secure: NODE_ENV !== 'test',
-          sameSite: 'none',
-          maxAge: JWT_COOKIE_EXPIRY_MS,
-        });
+          const token = jwt.sign(body, JWT_SECRET, {
+            expiresIn: JWT_EXPIRY_SECONDS,
+          });
 
-        return res.send({
-          data: loginResult,
+          res.cookie('jwt', token, {
+            httpOnly: true,
+            secure: NODE_ENV !== 'test',
+            sameSite: 'none',
+            maxAge: JWT_COOKIE_EXPIRY_MS,
+          });
+
+          return res.json(loginResult);
         });
-      });
-    }
+      }
+    ) as RequestHandler
   )(req, res, next);
-}
+};
 
-export async function authLogout(_req: Request, res: Response): Promise<void> {
-  res.clearCookie('jwt', {
-    httpOnly: true,
-  });
+export const authLogout = (_req: Request, res: Response): void => {
+  res.clearCookie('jwt', {httpOnly: true});
+  res.sendStatus(HttpCode.Ok);
+};
 
-  res.send({
-    data: {},
-  });
-}
-
-export async function authSignup(req: Request, res: Response): Promise<void> {
-  const requestSchema: yup.AnyObjectSchema = yup.object().shape({
-    name: yup.string().required(),
-    password: yup.string().required(),
-    email: yup.string().email().required(),
-    studentID: yup.string().notRequired(),
-    role: yup
-      .string()
-      .transform((value: string, originalValue: string) => {
-        return originalValue ? originalValue.toUpperCase() : value;
-      })
-      .oneOf(Object.values(SystemRole))
-      .notRequired(),
-  });
-
-  const request: SignupRequest = await requestSchema.validate(req.body, {
-    abortEarly: false,
-  });
-
-  const exists: User | null = await User.findByEmail(request.email);
-
-  if (exists) {
-    throw new ApiError(
-      'user account with the specified email already exists',
-      HttpCode.Conflict
-    );
-  }
-
-  const newUser: User = await User.create({
-    name: request.name,
-    email: request.email,
-    password: await argon.hash(request.password.trim()),
-    studentNumber: request.studentNumber,
-    role: request.role ?? SystemRole.User,
-  });
-
-  const body: JwtClaims = {
-    role: newUser.role as SystemRole,
-    id: newUser.id,
-  };
-
-  const token: string = jwt.sign(body, JWT_SECRET, {
-    expiresIn: JWT_EXPIRY_SECONDS,
-  });
-
-  res.cookie('jwt', token, {
-    httpOnly: true,
-    secure: NODE_ENV !== 'test',
-    sameSite: 'none',
-    maxAge: JWT_COOKIE_EXPIRY_MS,
-  });
-
-  const auth: LoginResult = {
-    id: newUser.id,
-    role: newUser.role as SystemRole,
-    name: newUser.name,
-  };
-
-  res.send({
-    data: auth,
-  });
-}
-
-export async function authSamlLogin(
+export const authSamlLogin = (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> {
-  passport.authenticate(
-    'saml',
-    async (error: Error | null, loginResult: LoginResult | undefined) => {
-      if (error) {
-        return next(error);
-      }
-      if (loginResult === undefined) {
-        return res.status(HttpCode.Unauthorized).send({
-          success: false,
-          errors: ['Authentication failed'],
-        });
-      }
+): void => {
+  (
+    passport.authenticate(
+      'saml',
+      (error: Error | null, loginResult: LoginResult | undefined) => {
+        if (error) return next(error);
 
-      req.login(loginResult, {session: false}, async (error: unknown) => {
-        if (error) {
-          return next(error);
+        if (loginResult === undefined) {
+          return res.status(HttpCode.Unauthorized).send({
+            success: false,
+            errors: ['Authentication failed'],
+          });
         }
 
-        const body: JwtClaims = {
-          id: loginResult.id,
-          role: loginResult.role,
-        };
+        req.login(loginResult, {session: false}, (loginError: unknown) => {
+          if (loginError) return next(loginError);
 
-        const token: string = jwt.sign(body, JWT_SECRET, {
-          expiresIn: JWT_EXPIRY_SECONDS,
+          const body: JwtClaims = {id: loginResult.id, role: loginResult.role};
+
+          const token = jwt.sign(body, JWT_SECRET, {
+            expiresIn: JWT_EXPIRY_SECONDS,
+          });
+
+          res.cookie('jwt', token, {
+            httpOnly: true,
+            secure: NODE_ENV !== 'test',
+            sameSite: 'none',
+            maxAge: JWT_COOKIE_EXPIRY_MS,
+          });
+
+          return res.redirect('/');
         });
-
-        res.cookie('jwt', token, {
-          httpOnly: true,
-          secure: NODE_ENV !== 'test',
-          sameSite: 'none',
-          maxAge: JWT_COOKIE_EXPIRY_MS,
-        });
-
-        return res.redirect('/');
-      });
-    }
+      }
+    ) as RequestHandler
   )(req, res, next);
-}
+};
 
-// should be put to a seperate file
-async function getSamlStrategy(): Promise<SamlStrategy> {
-  return new SamlStrategy(
-    {
-      callbackUrl: SAML_CALLBACK,
-      entryPoint: SAML_ENTRYPOINT,
-      issuer: SAML_ENTITY,
-      cert: (await getIdpSignCert(SAML_METADATA_URL)) || SAML_IDP_CERT, //IdP public key in .pem format
-      decryptionPvk: SAML_ENCRYPT_PVK,
-      privateKey: SAML_PRIVATE_KEY, //SP private key in .pem format
-      signatureAlgorithm: 'sha256',
-      identifierFormat: null,
-      passReqToCallback: true, // This is required when using typescript apparently...
-    },
-    async (
-      _req: Request,
-      profile: Profile | null,
-      done: SamlVerifiedCallback
-    ) => {
-      // for signon
-      try {
-        const eduUser = profile?.['urn:oid:1.3.6.1.4.1.5923.1.1.1.6'] as string;
-        const email = profile?.['urn:oid:0.9.2342.19200300.100.1.3'] as string;
-        const name = profile?.['urn:oid:2.16.840.1.113730.3.1.241'] as string;
-        if (!email)
-          throw new ApiError('No email in assertion', HttpCode.Unauthorized);
-        const user: User | null = await User.findIdpUserByEmail(email);
-        if (!user) {
-          throw new ApiError(
-            'User not authorized, please ask admin for permissions',
-            HttpCode.Unauthorized
-          );
-        }
-        if (!user.eduUser) {
-          user.update({
-            eduUser: eduUser,
-          });
-        }
-        if (!user.name) {
-          user.update({
-            name: name,
-          });
-        }
-        // for now if teacher email is added by admin we allow the teacher to signin
-        return done(null, {
-          id: user.id,
-          role: user.role as SystemRole,
-          name: user.name ?? name ?? '-',
-        });
-      } catch (err: unknown) {
-        return done(err as Error);
-      }
-    },
-    (_req: Request, profile: Profile | null, done: SamlVerifiedCallback) => {
-      // for logout
-      try {
-        return done(null, {profile});
-      } catch (err: unknown) {
-        return done(err as Error);
-      }
-    }
-  );
-}
-
-export async function samlMetadata(req: Request, res: Response): Promise<void> {
-  res.type('application/xml');
-  res.status(200);
+/**
+ * Responds with application/xml
+ */
+export const samlMetadata = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const cert = readFileSync(SAML_SP_CERT_PATH, 'utf8');
-  res.send(
-    (await getSamlStrategy()).generateServiceProviderMetadata(cert, cert)
-  );
-}
+  res
+    .type('application/xml')
+    .send(
+      (await getSamlStrategy()).generateServiceProviderMetadata(cert, cert)
+    );
+};
 
 passport.use(
   'login',
@@ -327,19 +151,20 @@ passport.use(
       usernameField: 'email',
       passwordField: 'password',
     },
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     async (
       email: string,
       password: string,
       done: (
-        error: unknown | null,
+        error: unknown,
         user?: LoginResult | false,
         options?: IVerifyOptions
       ) => void
     ) => {
       try {
-        const role: LoginResult = await validateLogin(email, password);
+        const role = await validateLogin(email, password);
         return done(null, role, {message: 'success'});
-      } catch (error: unknown) {
+      } catch (error) {
         if (error instanceof ApiError) {
           return done(null, false, {message: error.message});
         }
@@ -354,22 +179,22 @@ passport.use(
   new JWTStrategy(
     {
       secretOrKey: JWT_SECRET,
-      jwtFromRequest: (req: Request): string | null => {
-        return req && req.cookies ? req.cookies['jwt'] : null;
-      },
+      jwtFromRequest: (req: Request): string | null =>
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        req && req.cookies ? (req.cookies.jwt as string) : null,
     },
-    async (token: JwtClaims, done: VerifiedCallback): Promise<void> => {
+    (token: JwtClaims, done: VerifiedCallback) => {
       try {
         return done(null, token);
-      } catch (error: unknown) {
+      } catch (error) {
         return done(error, false);
       }
     }
   )
 );
 
-async function useSamlStrategy(): Promise<void> {
+const useSamlStrategy = async (): Promise<void> => {
   passport.use('saml', await getSamlStrategy());
-}
+};
 
-useSamlStrategy();
+useSamlStrategy(); // eslint-disable-line @typescript-eslint/no-floating-promises

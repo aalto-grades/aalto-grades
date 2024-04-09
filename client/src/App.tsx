@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AppBar, Box, Container, Link, Toolbar} from '@mui/material';
 import {
   Experimental_CssVarsProvider as CssVarsProvider,
   CssVarsTheme,
@@ -14,30 +13,23 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
-import {SystemRole} from '@common/types';
-import {CSSProperties, JSX} from 'react';
-import {Route, Routes} from 'react-router-dom';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'; // For debugging
+import {enqueueSnackbar} from 'notistack';
+import {CSSProperties, JSX} from 'react';
+import {Outlet, RouterProvider, createBrowserRouter} from 'react-router-dom';
 
+import {SystemRole} from '@common/types';
+import AppView from './components/AppView';
 import CourseResultsView from './components/CourseResultsView';
 import CourseView from './components/CourseView';
-import EditAttainmentView from './components/EditAttainmentView';
-import EditCourseView from './components/EditCourseView';
-import EditInstanceView from './components/EditInstanceView';
-import FetchInstancesView from './components/FetchInstancesView';
-import Footer from './components/Footer';
 import FrontPage from './components/FrontPage';
 import NotFound from './components/NotFound';
-import AlertSnackbar from './components/alerts/AlertSnackbar';
 import Login from './components/auth/Login';
 import PrivateRoute from './components/auth/PrivateRoute';
-import Signup from './components/auth/Signup';
-import UserButton from './components/auth/UserButton';
-import AddUserView from './components/front-page/users-view/AddUserView';
-
-import useSnackPackAlerts, {
-  SnackPackAlertState,
-} from './hooks/useSnackPackAlerts';
+import AttainmentsView from './components/course-view/AttainmentsView';
+import EditCourseView from './components/course-view/EditCourseView';
+import ModelsView from './components/course-view/ModelsView';
+import NotistackWrapper from './context/NotistackProvider';
 
 declare module '@mui/material/styles' {
   interface PaletteOptions {
@@ -78,12 +70,12 @@ const theme: CssVarsTheme = extendTheme({
           dark: '#519657',
           contrastText: '#000',
         },
-        info: {
-          light: '#FFC046',
-          main: '#FF8F00',
-          dark: '#C56000',
-          contrastText: '#000',
-        },
+        // info: {
+        //   light: '#FFC046',
+        //   main: '#FF8F00',
+        //   dark: '#C56000',
+        //   contrastText: '#000',
+        // },
         hoverGrey1: '#EAEAEA',
         hoverGrey2: '#F4F4F4',
         hoverGrey3: '#6E6E6E',
@@ -136,23 +128,16 @@ const theme: CssVarsTheme = extendTheme({
   },
 });
 
-export default function App(): JSX.Element {
-  const snackPack: SnackPackAlertState = useSnackPackAlerts();
+const Root = (): JSX.Element => {
+  // const {enqueueSnackbar} = useSnackbar();
 
-  function handleError(error: unknown): void {
-    snackPack.push({
-      msg: (error as Error).message,
-      severity: 'error',
-    });
-  }
+  const handleError = (error: Error): void => {
+    enqueueSnackbar(error.message, {variant: 'error'});
+  };
 
-  const queryClient: QueryClient = new QueryClient({
-    queryCache: new QueryCache({
-      onError: handleError,
-    }),
-    mutationCache: new MutationCache({
-      onError: handleError,
-    }),
+  const queryClient = new QueryClient({
+    queryCache: new QueryCache({onError: handleError}),
+    mutationCache: new MutationCache({onError: handleError}),
     defaultOptions: {
       queries: {
         staleTime: 1000 * 60 * 5, // 5 minutes
@@ -160,90 +145,79 @@ export default function App(): JSX.Element {
       },
     },
   });
-
   return (
     <CssVarsProvider theme={theme}>
+      <NotistackWrapper />
       <QueryClientProvider client={queryClient}>
-        <div
-          style={{minHeight: '100vh', display: 'flex', flexDirection: 'column'}}
-        >
-          <AppBar position="static">
-            <Toolbar>
-              <Link
-                href="/"
-                underline="none"
-                color="white"
-                variant="h5"
-                align="left"
-                sx={{mr: 2, flexGrow: 1}}
-              >
-                Aalto Grades
-              </Link>
-              <UserButton />
-            </Toolbar>
-          </AppBar>
-          <Container sx={{textAlign: 'center'}} maxWidth="xl">
-            <Box mx={5} my={5}>
-              <AlertSnackbar snackPack={snackPack} />
-              <Routes>
-                {/* Add nested routes when needed */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                {/* All roles are authorised to access the front page, conditional
-                     rendering is done inside the component */}
-                <Route
-                  element={<PrivateRoute roles={Object.values(SystemRole)} />}
-                >
-                  <Route path="/" element={<FrontPage />} />
-                  <Route
-                    path="/course-view/:courseId"
-                    element={<CourseView />}
-                  />
-                </Route>
-                {/* Pages that are only authorised for admin */}
-                <Route element={<PrivateRoute roles={[SystemRole.Admin]} />}>
-                  <Route
-                    path="/course/:modification/:courseId?"
-                    element={<EditCourseView />}
-                  />
-                  <Route path="/user/add/" element={<AddUserView />} />
-                </Route>
-                <Route
-                  element={
-                    <PrivateRoute roles={[SystemRole.User, SystemRole.Admin]} />
-                  }
-                >
-                  <Route
-                    path="/:courseId/fetch-instances/:courseCode"
-                    element={<FetchInstancesView />}
-                  />
-                  <Route
-                    path="/:courseId/course-results/:assessmentModelId"
-                    element={<CourseResultsView />}
-                  />
-                  <Route
-                    path="/:courseId/edit-instance"
-                    element={<EditInstanceView />}
-                  />
-                  <Route
-                    path="/:courseId/edit-instance/:sisuInstanceId"
-                    element={<EditInstanceView />}
-                  />
-                  <Route
-                    path="/:courseId/attainment/:modification/:assessmentModelId/:attainmentId?"
-                    element={<EditAttainmentView />}
-                  />
-                </Route>
-                {/* Not found route */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Box>
-          </Container>
-          <Footer />
-        </div>
+        <AppView />
         {/* Query Debug Tool */}
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </CssVarsProvider>
   );
-}
+};
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Root />,
+    children: [
+      {path: '/login', element: <Login />},
+      {
+        // All Roles
+        path: '/',
+        element: (
+          <PrivateRoute roles={[SystemRole.User, SystemRole.Admin]}>
+            <CourseView />
+          </PrivateRoute>
+        ),
+        children: [
+          {path: '/', index: true, element: <FrontPage />},
+          {
+            path: '/:courseId',
+            element: (
+              <>
+                <Outlet />
+              </>
+            ),
+            children: [
+              {
+                // Temporary default view
+                index: true,
+                element: <CourseResultsView />,
+              },
+              {
+                path: '/:courseId/course-results',
+                element: <CourseResultsView />,
+              },
+              {
+                path: '/:courseId/models',
+                element: <ModelsView />,
+              },
+              {
+                path: '/:courseId/attainments',
+                element: <AttainmentsView />,
+              },
+              {
+                path: '/:courseId/edit',
+                element: (
+                  <PrivateRoute roles={[SystemRole.Admin]}>
+                    <EditCourseView />
+                  </PrivateRoute>
+                ),
+              },
+            ],
+          },
+        ],
+      },
+      {
+        path: '*',
+        element: <NotFound />,
+      },
+    ],
+  },
+]);
+
+const App = (): JSX.Element => <RouterProvider router={router} />;
+
+export default App;

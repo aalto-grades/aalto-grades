@@ -9,19 +9,24 @@ WORKDIR /app
 RUN mkdir common server
 
 # Install packages first to make following builds faster
+WORKDIR /app/common
+COPY common/package.json common/package-lock.json ./
+RUN npm ci
+
 WORKDIR /app/server
 COPY server/package.json server/package-lock.json ./
 RUN npm ci
 
-# Copy common first
-WORKDIR /app
-COPY common/types common/types
+# Copy only necessary files
+WORKDIR /app/common
+COPY common/types types
+COPY common/util util
 
-# Copy only necessary server files
 WORKDIR /app/server
 COPY server/tsconfig.json ./
 COPY server/src ./src
 
+# Build
 RUN npm run build
 
 # Run stage

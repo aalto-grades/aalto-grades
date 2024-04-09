@@ -2,315 +2,262 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {FinalGrade, GradeOption, Language} from '@common/types';
 import {
   Box,
   Button,
+  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  FormControlLabel,
   List,
   ListItem,
   ListItemText,
   MenuItem,
   Paper,
+  Switch,
   TextField,
   Typography,
 } from '@mui/material';
-import {ChangeEvent, JSX, useState} from 'react';
-import {Params, useParams} from 'react-router-dom';
+import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
+import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs, {Dayjs} from 'dayjs';
+import 'dayjs/locale/en-gb';
+import {enqueueSnackbar} from 'notistack';
+import {JSX, useMemo, useState} from 'react';
+import {useParams} from 'react-router-dom';
 
-import AlertSnackbar from '../alerts/AlertSnackbar';
+import {FinalGradeData, Language, StudentRow} from '@common/types';
+import {useDownloadSisuGradeCsv} from '../../hooks/useApi';
+import {sisuLanguageOptions} from '../../utils';
 
-import {
-  useDownloadSisuGradeCsv,
-  UseDownloadSisuGradeCsvResult,
-} from '../../hooks/useApi';
-import useSnackPackAlerts, {
-  SnackPackAlertState,
-} from '../../hooks/useSnackPackAlerts';
-import {LanguageOption, State} from '../../types';
+type DownloadOption = 'all' | 'exported' | 'unexported';
 
-// A Dialog component for downloading a Sisu grade CSV.
-const instructions: string =
-  'Set the completion language and assessment date for the grading, these values' +
-  ' are optional. Click download to download the grades.';
-
-// Available completion languages used in Sisu.
-export const languageOptions: Array<LanguageOption> = [
-  {
-    id: Language.Finnish,
-    language: 'Finnish',
-  },
-  {
-    id: Language.Swedish,
-    language: 'Swedish',
-  },
-  {
-    id: Language.English,
-    language: 'English',
-  },
-  {
-    id: Language.Spanish,
-    language: 'Spanish',
-  },
-  {
-    id: Language.Japanese,
-    language: 'Japanese',
-  },
-  {
-    id: Language.Chinese,
-    language: 'Chinese',
-  },
-  {
-    id: Language.Portuguese,
-    language: 'Portuguese',
-  },
-  {
-    id: Language.French,
-    language: 'French',
-  },
-  {
-    id: Language.German,
-    language: 'German',
-  },
-  {
-    id: Language.Russian,
-    language: 'Russian',
-  },
-];
-
-export default function SisuDownloadDialog(props: {
+const SisuDownloadDialog = ({
+  open,
+  handleClose,
+  handleExited,
+  selectedRows,
+}: {
   open: boolean;
   handleClose: () => void;
   handleExited: () => void;
-  selectedStudents: Array<FinalGrade>;
-}): JSX.Element {
-  const {courseId, assessmentModelId}: Params = useParams() as {
-    courseId: string;
-    assessmentModelId: string;
-  };
+  selectedRows: StudentRow[];
+}): JSX.Element => {
+  const {courseId} = useParams() as {courseId: string};
 
-  // state variables handling the alert messages.
-  const snackPack: SnackPackAlertState = useSnackPackAlerts();
+  const downloadSisuGradeCsv = useDownloadSisuGradeCsv({
+    onSuccess: gradeCsv => {
+      const blob = new Blob([gradeCsv], {type: 'text/csv'});
+
+      const linkElement = document.createElement('a');
+      linkElement.href = URL.createObjectURL(blob);
+      linkElement.download = `grades_course_${courseId}.csv`;
+      document.body.appendChild(linkElement);
+      linkElement.click();
+      document.body.removeChild(linkElement);
+
+      enqueueSnackbar(
+        'Final grades downloaded in the Sisu CSV format succesfully.',
+        {variant: 'success'}
+      );
+    },
+  });
 
   // state variables handling the assessment date and completion language.
-  const [assessmentDate, setAssessmentDate]: State<string | undefined> =
-    useState<string | undefined>(undefined);
-  const [completionLanguage, setCompletionLanguage]: State<string | undefined> =
-    useState<string | undefined>(undefined);
-  const [override, setOverride]: State<string> = useState<string>('all');
+  const [dateOverride, setDateOverride] = useState<boolean>(false);
+  const [assessmentDate, setAssessmentDate] = useState<Dayjs | null>(dayjs());
+  const [completionLanguage, setCompletionLanguage] = useState<
+    Language | undefined
+  >(undefined);
+  const [downloadOption, setDownloadOption] =
+    useState<DownloadOption>('unexported');
 
-  const downloadSisuGradeCsv: UseDownloadSisuGradeCsvResult =
-    useDownloadSisuGradeCsv({
-      onSuccess: (gradeCsv: BlobPart) => {
-        // Create a blob object from the response data
-        const blob: Blob = new Blob([gradeCsv], {type: 'text/csv'});
+  const selectedStudents = selectedRows.map(row => ({
+    studentNumber: row.user.studentNumber as string,
+    grades: row.finalGrades ?? [],
+  }));
 
-        const link: HTMLAnchorElement = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        // Set file name.
-        link.download = `grades_course_${courseId}_assessment_model_${assessmentModelId}.csv`;
-        // Download file automatically to the user's computer.
-        link.click();
-        URL.revokeObjectURL(link.href);
-        link.remove();
+  const userGradeAlreadyExported = (grades: FinalGradeData[]): boolean =>
+    Boolean(grades.find(finalGrade => finalGrade.sisuExportDate !== null));
 
-        snackPack.push({
-          msg: 'Final grades downloaded in the Sisu CSV format succesfully.',
-          severity: 'success',
-        });
-      },
-    });
-
-  async function handleDownloadSisuGradeCsv(): Promise<void> {
-    if (courseId && assessmentModelId) {
-      snackPack.push({
-        msg: 'Fetching Sisu CSV...',
-        severity: 'info',
-      });
-
-      let studentNumbers: Array<string> = [];
-
-      switch (override) {
-        case 'exported':
-          studentNumbers = props.selectedStudents
-            .filter((student: FinalGrade) =>
-              userGradeAlreadyExported(student.grades)
-            )
-            .map((student: FinalGrade) => student.studentNumber);
-          break;
-        case 'unexported':
-          studentNumbers = props.selectedStudents
-            .filter(
-              (student: FinalGrade) => !userGradeAlreadyExported(student.grades)
-            )
-            .map((student: FinalGrade) => student.studentNumber);
-          break;
-        case 'all':
-          studentNumbers = props.selectedStudents.map(
-            (student: FinalGrade) => student.studentNumber
-          );
-          break;
-      }
-
-      downloadSisuGradeCsv.mutate({
-        courseId: courseId,
-        assessmentModelId: assessmentModelId,
-        params: {
-          completionLanguage: completionLanguage,
-          assessmentDate: assessmentDate,
-          studentNumbers: studentNumbers,
-          override: override === 'exported' || override === 'all',
-        },
-      });
-    }
-  }
-
-  function userGradeAlreadyExported(grades: Array<GradeOption>): boolean {
-    return Boolean(
-      grades.find((option: GradeOption) => option.exportedToSisu != null)
-    );
-  }
-
-  function exportedValuesInList(): boolean {
-    for (const value of props.selectedStudents) {
-      if (userGradeAlreadyExported(value.grades)) {
+  const exportedValuesInList = useMemo(() => {
+    for (const row of selectedRows) {
+      if (userGradeAlreadyExported(row.finalGrades ?? [])) {
         return true;
       }
     }
     return false;
-  }
+  }, [selectedRows]);
+
+  const handleDownloadSisuGradeCsv = async (): Promise<void> => {
+    if (!courseId) return;
+
+    enqueueSnackbar('Fetching Sisu CSV...', {variant: 'info'});
+
+    let studentNumbers: string[] = [];
+    switch (downloadOption) {
+      case 'exported':
+        studentNumbers = selectedStudents
+          .filter(student => userGradeAlreadyExported(student.grades))
+          .map(student => student.studentNumber);
+        break;
+      case 'unexported':
+        studentNumbers = selectedStudents
+          .filter(student => !userGradeAlreadyExported(student.grades))
+          .map(student => student.studentNumber);
+        break;
+      case 'all':
+        studentNumbers = selectedStudents.map(student => student.studentNumber);
+        break;
+    }
+    if (studentNumbers.length === 0) {
+      enqueueSnackbar('You must download data for at least one student.', {
+        variant: 'warning',
+      });
+      return;
+    }
+
+    await downloadSisuGradeCsv.mutateAsync({
+      courseId,
+      data: {
+        completionLanguage,
+        assessmentDate:
+          dateOverride && assessmentDate !== null
+            ? assessmentDate.toDate()
+            : undefined,
+        studentNumbers: studentNumbers as [string, ...string[]], // Non-empty array
+      },
+    });
+    if (!exportedValuesInList) handleClose();
+  };
 
   return (
-    <>
-      <Dialog
-        open={props.open}
-        transitionDuration={{exit: 800}}
-        TransitionProps={{onExited: props.handleExited}}
-      >
-        <DialogTitle>Download final grades as Sisu CSV</DialogTitle>
-        <DialogContent sx={{pb: 0}}>
-          <DialogContentText sx={{mb: 3, color: 'black'}}>
-            {instructions}
-          </DialogContentText>
-          <Box
-            component="form"
-            sx={{
-              '& .MuiTextField-root': {m: 1, width: '25ch'},
-            }}
-            noValidate
-            autoComplete="off"
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      transitionDuration={{exit: 800}}
+      TransitionProps={{onExited: handleExited}}
+      fullWidth
+    >
+      <DialogTitle>Download final grades as Sisu CSV</DialogTitle>
+      <DialogContent sx={{pb: 0}}>
+        <DialogContentText sx={{mb: 3, color: 'black'}}>
+          Grading date defaults to the latest submission of the student.
+        </DialogContentText>
+        <TextField
+          id="select-grading-completion-language"
+          select
+          fullWidth
+          margin="normal"
+          label="Completion language"
+          value={completionLanguage ?? 'default'}
+          onChange={e => {
+            if (e.target.value === 'default') {
+              setCompletionLanguage(undefined);
+            } else {
+              setCompletionLanguage(e.target.value as Language);
+            }
+          }}
+        >
+          <MenuItem value="default">Use course language</MenuItem>
+          {sisuLanguageOptions.map(option => (
+            <MenuItem key={option.id} value={option.id}>
+              {option.language}
+            </MenuItem>
+          ))}
+        </TextField>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={dateOverride}
+              onChange={e => setDateOverride(e.target.checked)}
+            />
+          }
+          label="Override grading date for all students"
+        />
+        <Collapse in={dateOverride}>
+          <LocalizationProvider
+            dateAdapter={AdapterDayjs}
+            adapterLocale="en-gb"
           >
-            <Box sx={{mb: 1}}>
-              <TextField
-                id="select-grading-completion-language"
-                select
-                label="Completion language"
-                defaultValue="default"
-                onChange={(
-                  e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-                ): void => {
-                  if (e.target.value == 'default') {
-                    setCompletionLanguage(undefined);
-                  } else {
-                    setCompletionLanguage(e.target.value);
-                  }
-                }}
-              >
-                <MenuItem value="default">Use course language</MenuItem>
-                {languageOptions.map((option: LanguageOption) => (
-                  <MenuItem key={option.id} value={option.id}>
-                    {option.language}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Box>
-            <Box>
-              <TextField
-                id="select-grading-assessment-date"
-                InputLabelProps={{shrink: true}}
-                type="date"
-                label="Assessment Date"
-                helperText="If not provided, the default will be course instance ending date."
-                onChange={(
-                  e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-                ): void => {
-                  setAssessmentDate(e.target.value);
-                }}
-              />
-            </Box>
-            {exportedValuesInList() && (
-              <Box sx={{ml: 1, my: 2, mr: 10}}>
-                <Typography variant="body2" sx={{color: 'red'}}>
-                  The list of students includes students who have already been
-                  included in a Sisu CSV previously. Please select a download
-                  option from the drop-down menu.
-                </Typography>
-                <Typography variant="body2" sx={{mt: 1, color: 'red'}}>
-                  This dialog will NOT close after downloading a CSV file. You
-                  may download multiple CSV files with different options
-                </Typography>
-                <TextField
-                  id="export-option"
-                  select
-                  defaultValue="all"
-                  onChange={(
-                    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-                  ): void => {
-                    setOverride(e.target.value);
-                  }}
-                >
-                  <MenuItem value="all">
-                    Download all selected grades in a single CSV
-                  </MenuItem>
-                  <MenuItem value="unexported">
-                    Only download unexported grades
-                  </MenuItem>
-                  <MenuItem value="exported">
-                    Only download previously exported grades
-                  </MenuItem>
-                </TextField>
-              </Box>
-            )}
+            <DatePicker
+              sx={{mt: 2}}
+              label="Assessment Date"
+              value={assessmentDate}
+              onChange={newDate => newDate && setAssessmentDate(newDate)}
+            />
+          </LocalizationProvider>
+        </Collapse>
+        {exportedValuesInList && (
+          <Box sx={{my: 2}}>
+            <Typography variant="body2" sx={{color: 'red'}}>
+              The list of students includes students who have already been
+              included in a Sisu CSV previously. Please select a download option
+              from the drop-down menu.
+            </Typography>
+            <Typography variant="body2" sx={{mt: 1, color: 'red'}}>
+              This dialog will NOT close after downloading a CSV file. You may
+              download multiple CSV files with different options
+            </Typography>
+            <TextField
+              id="export-option"
+              select
+              fullWidth
+              defaultValue="all"
+              value={downloadOption}
+              onChange={e =>
+                setDownloadOption(e.target.value as DownloadOption)
+              }
+            >
+              <MenuItem value="all">
+                Download all selected grades in a single CSV
+              </MenuItem>
+              <MenuItem value="unexported">
+                Only download unexported grades
+              </MenuItem>
+              <MenuItem value="exported">
+                Only download previously exported grades
+              </MenuItem>
+            </TextField>
           </Box>
-          <Typography variant="h6" sx={{mt: 1}}>
-            Selected students:
-          </Typography>
-          <Paper sx={{maxHeight: 200, overflow: 'auto', my: 1}}>
-            <List dense={true}>
-              {props.selectedStudents.map((studentGrade: FinalGrade) => (
-                <ListItem key={studentGrade.studentNumber}>
-                  <ListItemText
-                    primary={`Student number: ${studentGrade.studentNumber}`}
-                    secondary={
-                      userGradeAlreadyExported(studentGrade.grades)
-                        ? 'User grade has been exported to Sisu already.'
-                        : ''
-                    }
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </Paper>
-        </DialogContent>
-        <DialogActions sx={{pr: 4, pb: 3}}>
-          <Button size="medium" variant="outlined" onClick={props.handleClose}>
-            Cancel
-          </Button>
-          <Button
-            id="ag_confirm_file_upload_btn"
-            size="medium"
-            variant="contained"
-            onClick={handleDownloadSisuGradeCsv}
-          >
-            Download
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <AlertSnackbar snackPack={snackPack} />
-    </>
+        )}
+        <Typography variant="h6" sx={{mt: 1}}>
+          Selected students:
+        </Typography>
+        <Paper sx={{maxHeight: 200, overflow: 'auto', my: 1}}>
+          <List dense>
+            {selectedRows.map(row => (
+              <ListItem key={row.user.studentNumber}>
+                <ListItemText
+                  primary={`Student number: ${row.user.studentNumber}`}
+                  secondary={
+                    userGradeAlreadyExported(row.finalGrades ?? [])
+                      ? 'User grade has been exported to Sisu already.'
+                      : ''
+                  }
+                />
+              </ListItem>
+            ))}
+          </List>
+        </Paper>
+      </DialogContent>
+      <DialogActions>
+        <Button variant="outlined" onClick={handleClose}>
+          Cancel
+        </Button>
+        <Button
+          id="ag_confirm_file_upload_btn"
+          variant="contained"
+          onClick={handleDownloadSisuGradeCsv}
+        >
+          Download
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
-}
+};
+
+export default SisuDownloadDialog;

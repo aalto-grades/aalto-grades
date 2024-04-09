@@ -11,7 +11,7 @@ services:
   backend:
     extends:
       file: ../common-services.yaml
-      service: backend${NODE_ENV}
+      service: backend-common${NODE_ENV}
     container_name: "backend-server-${NODE_ENV}"
     ports:
       - 3000:3000

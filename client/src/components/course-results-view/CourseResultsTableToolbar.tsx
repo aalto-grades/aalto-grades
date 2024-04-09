@@ -2,67 +2,34 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {FinalGrade} from '@common/types';
-// import DownloadIcon from '@mui/icons-material/Download';
-// import FilterListIcon from '@mui/icons-material/FilterList';
-import {
-  Box,
-  Button,
-  // IconButton,
-  // TextField,
-  Toolbar,
-  Tooltip,
-} from '@mui/material';
+import {Box, Button, Toolbar, Tooltip} from '@mui/material';
 import {JSX, useState} from 'react';
-import {
-  NavigateFunction,
-  Params,
-  useNavigate,
-  useParams,
-} from 'react-router-dom';
+import {NavigateFunction, useNavigate} from 'react-router-dom';
 
-import FileLoadDialog from './FileLoadDialog';
-import MenuButton, {MenuButtonOption} from './MenuButton';
-import SisuDownloadDialog from './SisuDownloadDialog';
-
+import {StudentRow} from '@common/types';
 import {State} from '../../types';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
+import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
+import SisuDownloadDialog from './SisuDownloadDialog';
 
 export default function CourseResultsTableToolbar(props: {
   // search: string;
   // setSearch: (search: string) => void;
-  calculateFinalGrades: () => Promise<void>;
-  downloadCsvTemplate: () => Promise<void>;
-  selectedStudents: Array<FinalGrade>;
+  calculateFinalGrades: (
+    modelId: number,
+    dateOverride: boolean,
+    gradingDate: Date
+  ) => Promise<boolean>;
+  selectedRows: StudentRow[];
   hasPendingStudents: boolean;
-  refetch: () => void;
+  refreshFinalGrades: () => void;
 }): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
-  const {assessmentModelId}: Params = useParams();
 
-  const [showFileDialog, setShowFileDialog]: State<boolean> = useState(false);
+  const [showCalculateDialog, setShowCalculateDialog] =
+    useState<boolean>(false);
   const [showSisuDialog, setShowSisuDialog]: State<boolean> = useState(false);
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
-
-  const actionOptions: Array<MenuButtonOption> = [
-    {
-      description: 'Import from A+',
-      handleClick: (): void => {
-        alert('Importing from A+ is not implemented');
-      },
-    },
-    {
-      description: 'Import from MyCourses',
-      handleClick: (): void => {
-        alert('Importing from MyCourses is not implemented');
-      },
-    },
-  ];
-
-  function handleCloseFileDialog(): void {
-    setShowFileDialog(false);
-    props.refetch();
-  }
 
   function handleCloseSisuDialog(): void {
     setShowSisuDialog(false);
@@ -70,7 +37,7 @@ export default function CourseResultsTableToolbar(props: {
   // Firing the refetch after the transition for closingis finished
   // to avoid abrupt layout changes in the dialog
   function handleExitedSisuDialog(): void {
-    props.refetch(); // Should not be necessary, but selectedStudent is not updated otherwise
+    props.refreshFinalGrades(); // Should not be necessary, but selectedStudent is not updated otherwise
   }
 
   return (
@@ -98,29 +65,9 @@ export default function CourseResultsTableToolbar(props: {
             gap: 2,
           }}
         >
-          <MenuButton label="Import grades" options={actionOptions} />
-          <Tooltip
-            title="Download grading template with attainment names and student numbers."
-            placement="top"
-          >
-            <Button
-              variant="outlined"
-              onClick={(): Promise<void> => props.downloadCsvTemplate()}
-            >
-              Download CSV template
-            </Button>
-          </Tooltip>
-          <Tooltip title="Upload grades from a CSV file." placement="top">
-            <Button
-              variant="outlined"
-              onClick={(): void => setShowFileDialog(true)}
-            >
-              Upload Grade CSV
-            </Button>
-          </Tooltip>
           <Tooltip
             title={
-              props.selectedStudents.length === 0
+              props.selectedRows.length === 0
                 ? 'Select at least one student number for grade calculation.'
                 : 'Calculate course final grades for selected students.'
             }
@@ -129,8 +76,8 @@ export default function CourseResultsTableToolbar(props: {
             <span>
               <Button
                 variant="outlined"
-                onClick={(): Promise<void> => props.calculateFinalGrades()}
-                disabled={props.selectedStudents.length === 0}
+                onClick={() => setShowCalculateDialog(true)}
+                disabled={props.selectedRows.length === 0}
               >
                 Calculate final grades
               </Button>
@@ -138,7 +85,7 @@ export default function CourseResultsTableToolbar(props: {
           </Tooltip>
           <Tooltip
             title={
-              props.selectedStudents.length === 0
+              props.selectedRows.length === 0
                 ? 'Select at least one student number for downloading grades.'
                 : props.hasPendingStudents
                 ? 'Grades with status "PENDING" cannot be downloaded, ' +
@@ -156,13 +103,13 @@ export default function CourseResultsTableToolbar(props: {
                     setShowSisuDialog(true);
                   }
                 }}
-                disabled={props.selectedStudents.length === 0}
+                disabled={props.selectedRows.length === 0}
               >
                 Download Sisu CSV
               </Button>
             </span>
           </Tooltip>
-          <Button
+          {/* <Button
             variant="outlined"
             color={props.selectedStudents.length != 0 ? 'error' : 'primary'}
             onClick={(): void => {
@@ -174,17 +121,18 @@ export default function CourseResultsTableToolbar(props: {
             }}
           >
             Return to course view
-          </Button>
+          </Button> */}
+          <CalculateFinalGradesDialog
+            open={showCalculateDialog}
+            onClose={() => setShowCalculateDialog(false)}
+            selectedRows={props.selectedRows}
+            calculateFinalGrades={props.calculateFinalGrades}
+          />
           <SisuDownloadDialog
             open={showSisuDialog}
             handleClose={handleCloseSisuDialog}
             handleExited={handleExitedSisuDialog}
-            selectedStudents={props.selectedStudents}
-          />
-          <FileLoadDialog
-            assessmentModelId={Number(assessmentModelId)}
-            open={showFileDialog}
-            handleClose={handleCloseFileDialog}
+            selectedRows={props.selectedRows}
           />
         </Box>
         {/* <Box
@@ -221,9 +169,9 @@ export default function CourseResultsTableToolbar(props: {
         </Box> */}
       </Box>
       <UnsavedChangesDialog
-        setOpen={setShowDialog}
         open={showDialog}
-        handleDiscard={(): void => navigate(-1)}
+        onClose={() => setShowDialog(false)}
+        handleDiscard={() => navigate(-1)}
       />
     </Toolbar>
   );

@@ -3,221 +3,123 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AssessmentModelData,
-  AttainmentData,
-  Formula,
-  GradeType,
-} from '@common/types';
-import {
-  Box,
   Button,
   CircularProgress,
   Dialog,
+  DialogActions,
   DialogContent,
   DialogTitle,
-  FormHelperText,
+  FormControl,
   InputLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
-  Stack,
   TextField,
 } from '@mui/material';
-import {ChangeEvent, JSX, SyntheticEvent, useState} from 'react';
-import {Params, useParams} from 'react-router-dom';
-import {QueryObserverResult, UseQueryResult} from '@tanstack/react-query';
+import {JSX, useState} from 'react';
+import {useParams} from 'react-router-dom';
 
-import {
-  useAddAssessmentModel,
-  UseAddAssessmentModelResult,
-  useAddAttainment,
-  UseAddAttainmentResult,
-  useGetRootAttainment,
-} from '../../hooks/useApi';
-import {State} from '../../types';
+import {useAddAssessmentModel, useGetAttainments} from '../../hooks/useApi';
+import {GraphTemplate, initGraph} from '../graph/initGraph';
 
-const defaultRoot: AttainmentData = {
-  name: 'Root',
-  daysValid: 0,
-  minRequiredGrade: 1,
-  maxGrade: 5,
-  formula: Formula.Manual,
-  formulaParams: {},
-  gradeType: GradeType.Integer,
-};
-
-export default function CreateAssessmentModelDialog(props: {
+const CreateAssessmentModelDialog = ({
+  handleClose,
+  open,
+  onSubmit,
+}: {
   handleClose: () => void;
   open: boolean;
-  onSubmit: () => void;
-  assessmentModels?: Array<AssessmentModelData>;
-}): JSX.Element {
-  const {courseId}: Params = useParams();
+  onSubmit: (id: number) => void;
+}): JSX.Element => {
+  const {courseId} = useParams() as {courseId: string};
+  const attainments = useGetAttainments(courseId);
+  const addAssessmentModel = useAddAssessmentModel();
 
-  const [assessmentModel, setAssessmentModel]: State<number> = useState(0);
-  const [name, setName]: State<string> = useState('');
+  const [name, setName] = useState<string>('');
+  const [template, setTemplate] = useState<GraphTemplate>('none');
 
-  const addAssessmentModel: UseAddAssessmentModelResult =
-    useAddAssessmentModel();
-
-  const addAttainment: UseAddAttainmentResult = useAddAttainment({
-    onSuccess: () => {
-      props.handleClose();
-      props.onSubmit();
-      setName('');
-      setAssessmentModel(0);
-    },
-  });
-
-  const attainment: UseQueryResult<AttainmentData> = useGetRootAttainment(
-    Number(courseId),
-    assessmentModel,
-    'descendants',
-    {enabled: false} // Disable this query from automatically running, only if needed.
-  );
-
-  async function handleSubmit(event: SyntheticEvent): Promise<void> {
-    event.preventDefault();
-
-    if (courseId) {
-      addAssessmentModel.mutate(
-        {
-          courseId: courseId,
-          assessmentModel: {
-            name: name,
-          },
+  const handleSubmit = (): void => {
+    if (attainments.data === undefined) return;
+    addAssessmentModel.mutate(
+      {
+        courseId: courseId,
+        assessmentModel: {
+          name,
+          graphStructure: initGraph(template, attainments.data),
         },
-        {
-          onSuccess: async (assessmentModelId: number) => {
-            if (courseId) {
-              const modelTemplate: AssessmentModelData | undefined =
-                props.assessmentModels?.find(
-                  (model: AssessmentModelData) => model.id == assessmentModel
-                );
-
-              // If template is selected, get attainments and pass them to the new assessment model.
-              if (modelTemplate) {
-                attainment
-                  .refetch()
-                  .then(
-                    (data: QueryObserverResult<AttainmentData, unknown>) => {
-                      addAttainment.mutate({
-                        courseId: courseId,
-                        assessmentModelId: assessmentModelId,
-                        attainment: data.data ?? defaultRoot,
-                      });
-                    }
-                  );
-              } else {
-                addAttainment.mutate({
-                  courseId: courseId,
-                  assessmentModelId: assessmentModelId,
-                  attainment: defaultRoot,
-                });
-              }
-            }
-          },
-        }
-      );
-    }
-  }
+      },
+      {
+        onSuccess: id => {
+          handleClose();
+          onSubmit(id);
+          setName('');
+          setTemplate('none');
+        },
+      }
+    );
+  };
 
   return (
-    <Dialog open={props.open} transitionDuration={{exit: 800}}>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          flexDirection: 'column',
-          p: 2,
-        }}
-      >
-        <DialogTitle>Create Assessment Model</DialogTitle>
-        <DialogContent>
-          <form onSubmit={handleSubmit}>
-            <TextField
-              key="name"
-              id="name"
-              type="text"
-              label="Name*"
-              fullWidth
-              InputLabelProps={{shrink: true}}
-              margin="normal"
-              value={name}
-              disabled={addAssessmentModel.isPending || addAttainment.isPending}
-              onChange={(event: ChangeEvent<HTMLInputElement>): void =>
-                setName(event.target.value)
-              }
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs">
+      <DialogTitle>Create Assessment Model</DialogTitle>
+      <DialogContent>
+        <TextField
+          sx={{mt: 1}}
+          label="Name"
+          required
+          fullWidth
+          value={name}
+          disabled={addAssessmentModel.isPending}
+          onChange={e => setName(e.target.value)}
+        />
+        <FormControl
+          fullWidth
+          sx={{mt: 2}}
+          disabled={addAssessmentModel.isPending}
+        >
+          <InputLabel id="select-model-template">Select template</InputLabel>
+          <Select
+            labelId="select-model-template"
+            value={template}
+            label="Select template"
+            onChange={e => setTemplate(e.target.value as GraphTemplate)}
+          >
+            <MenuItem value={'none'}>None</MenuItem>
+            <MenuItem value={'addition'}>Addition</MenuItem>
+            <MenuItem value={'average'}>Average</MenuItem>
+          </Select>
+        </FormControl>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          variant="outlined"
+          onClick={handleClose}
+          disabled={addAssessmentModel.isPending}
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          type="submit"
+          disabled={name.length === 0 || addAssessmentModel.isPending}
+        >
+          Submit
+          {addAssessmentModel.isPending && (
+            <CircularProgress
+              size={24}
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                marginTop: '-12px',
+                marginLeft: '-12px',
+              }}
             />
-            {props.assessmentModels && (
-              <Box sx={{my: 2}}>
-                <InputLabel id="assessment-model-select-helper-label">
-                  Assessment model
-                </InputLabel>
-                <Select
-                  labelId="assessmentModelSelect"
-                  id="assessmentModelSelectId"
-                  value={String(assessmentModel)}
-                  label="Assessment model"
-                  fullWidth
-                  disabled={
-                    addAssessmentModel.isPending || addAttainment.isPending
-                  }
-                  onChange={(event: SelectChangeEvent): void => {
-                    setAssessmentModel(Number(event.target.value));
-                  }}
-                >
-                  <MenuItem value={0}>use empty</MenuItem>
-                  {props.assessmentModels.map((model: AssessmentModelData) => (
-                    <MenuItem key={model.id} value={model.id}>
-                      {model.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-                <FormHelperText>
-                  Use existing assessment model as a base.
-                </FormHelperText>
-              </Box>
-            )}
-            <Stack spacing={2} direction="row" sx={{mt: 2}}>
-              <Button
-                size="large"
-                variant="outlined"
-                onClick={props.handleClose}
-                disabled={
-                  addAssessmentModel.isPending || addAttainment.isPending
-                }
-              >
-                Cancel
-              </Button>
-              <Button
-                size="large"
-                variant="contained"
-                type="submit"
-                disabled={
-                  name.length === 0 ||
-                  addAssessmentModel.isPending ||
-                  addAttainment.isPending
-                }
-              >
-                Submit
-                {(addAssessmentModel.isPending || addAttainment.isPending) && (
-                  <CircularProgress
-                    size={24}
-                    sx={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      marginTop: '-12px',
-                      marginLeft: '-12px',
-                    }}
-                  />
-                )}
-              </Button>
-            </Stack>
-          </form>
-        </DialogContent>
-      </Box>
+          )}
+        </Button>
+      </DialogActions>
     </Dialog>
   );
-}
+};
+
+export default CreateAssessmentModelDialog;

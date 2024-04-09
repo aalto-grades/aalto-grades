@@ -33,6 +33,8 @@ describe('Tests for button component displaying user data and logout', () => {
               setAuth: vi.fn(),
               isTeacherInCharge: false,
               setIsTeacherInCharge: vi.fn(),
+              setIsAssistant: vi.fn(),
+              isAssistant: false,
             }}
           >
             <UserButton />

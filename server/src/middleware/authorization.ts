@@ -47,7 +47,6 @@ export function teacherInCharge(): (
       await isTeacherInChargeOrAdmin(
         req.user as JwtClaims,
         courseId,
-        HttpCode.Forbidden
       );
       next();
     } catch (e) {

@@ -2,28 +2,22 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {CourseData, LoginResult, SystemRole} from '@common/types';
-import {Box, Button, Theme, Typography, useTheme} from '@mui/material';
-import {JSX} from 'react';
-import {NavigateFunction, useNavigate} from 'react-router-dom';
-import {UseQueryResult} from '@tanstack/react-query';
+import {Box, Button, Typography, useTheme} from '@mui/material';
+import {JSX, useState} from 'react';
 
+import {LoginResult, SystemRole} from '@common/types';
+import {useGetAllCourses, useGetCoursesOfUser} from '../hooks/useApi';
+import useAuth from '../hooks/useAuth';
 import CourseTable from './front-page/CourseTable';
+import CreateCourseDialog from './front-page/CreateCourseDialog';
 import UsersView from './front-page/users-view/UsersView';
 
-import {useGetAllCourses, useGetCoursesOfUser} from '../hooks/useApi';
-import useAuth, {AuthContextType} from '../hooks/useAuth';
-
 export default function FrontPage(): JSX.Element {
-  const navigate: NavigateFunction = useNavigate();
-  const {auth}: AuthContextType = useAuth();
-
-  const theme: Theme = useTheme();
-
-  const courses: UseQueryResult<Array<CourseData>> = useGetAllCourses();
-  const coursesOfUser: UseQueryResult<Array<CourseData>> = useGetCoursesOfUser(
-    (auth as LoginResult).id
-  );
+  const theme = useTheme();
+  const {auth} = useAuth();
+  const courses = useGetAllCourses();
+  const coursesOfUser = useGetCoursesOfUser((auth as LoginResult).id);
+  const [createDialogOpen, setCreateDialogOpen] = useState<boolean>(false);
 
   return (
     <>
@@ -60,6 +54,10 @@ export default function FrontPage(): JSX.Element {
       )}
       {auth?.role === SystemRole.Admin && (
         <>
+          <CreateCourseDialog
+            open={createDialogOpen}
+            onClose={() => setCreateDialogOpen(false)}
+          />
           <Box
             component="span"
             sx={{
@@ -74,19 +72,14 @@ export default function FrontPage(): JSX.Element {
               Courses
             </Typography>
             {
-              /* Admins are shown the button for creating a new course */
-              auth?.role == SystemRole.Admin && (
-                <Button
-                  id="ag_new_course_btn"
-                  size="large"
-                  variant="contained"
-                  onClick={(): void => {
-                    navigate('/course/create');
-                  }}
-                >
-                  Create New Course
-                </Button>
-              )
+              <Button
+                id="ag_new_course_btn"
+                size="large"
+                variant="contained"
+                onClick={() => setCreateDialogOpen(true)}
+              >
+                Create New Course
+              </Button>
             }
           </Box>
           {courses.data && <CourseTable courses={courses.data} />}

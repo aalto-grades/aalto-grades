@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {z} from 'zod';
+
 export enum HttpCode {
   Ok = 200,
   Created = 201,
@@ -15,52 +17,35 @@ export enum HttpCode {
   BadGateway = 502,
 }
 
-type Day =
-  | '01'
-  | '02'
-  | '03'
-  | '04'
-  | '05'
-  | '06'
-  | '07'
-  | '08'
-  | '09'
-  | '10'
-  | '11'
-  | '12'
-  | '13'
-  | '14'
-  | '15'
-  | '16'
-  | '17'
-  | '18'
-  | '19'
-  | '20'
-  | '21'
-  | '22'
-  | '23'
-  | '24'
-  | '25'
-  | '26'
-  | '27'
-  | '28'
-  | '29'
-  | '30'
-  | '31';
+export enum Language {
+  English = 'EN',
+  Finnish = 'FI',
+  Swedish = 'SV',
+  Spanish = 'ES',
+  Japanese = 'JA',
+  Chinese = 'ZH',
+  Portuguese = 'PT',
+  French = 'FR',
+  German = 'DE',
+  Russian = 'RU',
+}
 
-type Month =
-  | '01'
-  | '02'
-  | '03'
-  | '04'
-  | '05'
-  | '06'
-  | '07'
-  | '08'
-  | '09'
-  | '10'
-  | '11'
-  | '12';
+export const LanguageSchema = z.nativeEnum(Language);
 
-export type DateOnlyString =
-  `${number}${number}${number}${number}-${Month}-${Day}`;
+export const IdSchema = z.number().int();
+export const DateSchema = z
+  .string()
+  .datetime()
+  .pipe(z.coerce.date()) as unknown as z.ZodDate; // To fix ts compatability with zod-middleware
+export const AaltoEmailSchema = z
+  .string({required_error: 'Email is required'})
+  .email()
+  .regex(/^.*@aalto\.fi$/, 'Email must be a valid aalto email');
+
+export const LocalizedStringSchema = z.object({
+  fi: z.string(),
+  en: z.string(),
+  sv: z.string(),
+});
+
+export type LocalizedString = z.infer<typeof LocalizedStringSchema>;
