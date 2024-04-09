@@ -29,8 +29,9 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import {AttainmentData} from '@common/types';
+import {AttainmentData, AttainmentGradesData} from '@common/types';
 import {
+  AttainmentNodeValue,
   CustomNodeTypes,
   DropInNodes,
   FullNodeData,
@@ -46,6 +47,7 @@ import {
   NodeDataContext,
   NodeValuesContext,
 } from '../../context/GraphProvider';
+import {findBestGradeOption} from '../../utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import AdditionNode from './AdditionNode';
 import AttanmentNode from './AttainmentNode';
@@ -78,10 +80,12 @@ const nodeTypesMap = {
 const Graph = ({
   initGraph,
   attainments,
+  userGrades,
   onSave,
 }: {
   initGraph: GraphStructure;
   attainments: AttainmentData[];
+  userGrades: AttainmentGradesData[] | null;
   onSave: (graphStructure: GraphStructure) => Promise<void>;
 }): JSX.Element => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -266,8 +270,27 @@ const Graph = ({
       setUnsaved(false);
       setLoading(false);
       reactFlowInstance?.fitView();
-    }, 0);
+    }, 50);
   }, [initGraph]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (loading || userGrades === null) return;
+    const newNodeValues = {...nodeValues};
+    let change = false;
+
+    for (const attainment of userGrades) {
+      const attId = `attainment-${attainment.attainmentId}`;
+      if (!(attId in newNodeValues)) continue;
+
+      const newValue = newNodeValues[attId] as AttainmentNodeValue;
+      const bestGrade = findBestGradeOption(attainment.grades)!;
+      if (newValue.value !== bestGrade.grade) {
+        newValue.source = bestGrade.grade;
+        change = true;
+      }
+    }
+    if (change) setNodeValues(newNodeValues);
+  }, [loading, nodeValues, userGrades]);
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -397,9 +420,9 @@ const Graph = ({
     event => {
       event.preventDefault();
 
-      const type = event.dataTransfer.getData(
-        'application/reactflow'
-      ) as DropInNodes;
+      const type = event.dataTransfer.getData('application/reactflow') as
+        | DropInNodes
+        | '';
 
       if (typeof type === 'undefined' || !type || reactFlowInstance === null) {
         return;

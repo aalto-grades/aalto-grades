@@ -191,7 +191,7 @@ const router = createBrowserRouter([
                 element: <CourseResultsView />,
               },
               {
-                path: '/:courseId/models',
+                path: '/:courseId/models/:modelId?/:userId?',
                 element: <ModelsView />,
               },
               {
