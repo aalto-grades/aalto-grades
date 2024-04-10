@@ -9,4 +9,5 @@ INSERT INTO public.course (course_code, min_credits, max_credits, grading_scale,
 ('CS-A????', 5, 5, 'NUMERICAL', 'EN', NOW(), NOW()), -- Example sum
 
 ('CS-A????', 5, 5, 'NUMERICAL', 'EN', NOW(), NOW()), -- [Test] Normal | Average (teacher in charge)
-('CS-A????', 5, 5, 'NUMERICAL', 'EN', NOW(), NOW()); -- [Test] No models | Average (teacher not in charge)
+('CS-A????', 5, 5, 'NUMERICAL', 'EN', NOW(), NOW()), -- [Test] No models | Average (teacher not in charge)
+('CS-A????', 5, 5, 'NUMERICAL', 'EN', NOW(), NOW()); -- [Test] Edit course

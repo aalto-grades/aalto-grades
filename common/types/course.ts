@@ -22,7 +22,7 @@ export enum Period {
 export const GradingScaleSchema = z.nativeEnum(GradingScale);
 export const PeriodSchema = z.nativeEnum(Period);
 
-const BaseCourseDataSchema = z.object({
+export const BaseCourseDataSchema = z.object({
   // Course ID is either number type ID in the Aalto Grades database or
   // undefined when representing parsed Sisu data.
   id: z.number().int().optional(),
@@ -50,7 +50,7 @@ export enum CourseRoleType {
 export const CreateCourseDataSchema = BaseCourseDataSchema.extend({
   teachersInCharge: z.array(z.string().email()),
   assistants: z.array(z.string().email()),
-}).refine(val => val.maxCredits >= val.minCredits);
+}).refine(val => val.maxCredits >= val.minCredits, {path: ['maxCredits']});
 
 export const PartialCourseDataSchema = BaseCourseDataSchema.extend({
   teachersInCharge: z.array(z.string().email()),
@@ -59,9 +59,10 @@ export const PartialCourseDataSchema = BaseCourseDataSchema.extend({
   .partial()
   .refine(
     val =>
-      val.maxCredits !== undefined &&
-      val.minCredits !== undefined &&
-      val.maxCredits >= val.minCredits
+      val.maxCredits === undefined ||
+      val.minCredits === undefined ||
+      val.maxCredits >= val.minCredits,
+    {path: ['maxCredits']}
   );
 
 export type CourseData = z.infer<typeof CourseDataSchema>;

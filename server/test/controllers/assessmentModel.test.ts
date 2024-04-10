@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-/* eslint @typescript-eslint/no-unsafe-member-access: off */
-
 import supertest from 'supertest';
 import {z} from 'zod';
 

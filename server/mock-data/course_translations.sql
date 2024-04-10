@@ -21,4 +21,7 @@ INSERT INTO public.course_translation (course_id, language, department, course_n
 (5, 'SV', 'Institutionen för datateknik', '[Test] Normal | Average', NOW(), NOW()),
 (6, 'EN', 'Department of Computer Science', '[Test] No models | Average', NOW(), NOW()),
 (6, 'FI', 'Tietotekniikan laitos', '[Test] No models | Average', NOW(), NOW()),
-(6, 'SV', 'Institutionen för datateknik', '[Test] No models | Average', NOW(), NOW());
+(6, 'SV', 'Institutionen för datateknik', '[Test] No models | Average', NOW(), NOW()),
+(7, 'EN', 'Department of Computer Science', '[Test] Edit course', NOW(), NOW()),
+(7, 'FI', 'Tietotekniikan laitos', '[Test] Edit course', NOW(), NOW()),
+(7, 'SV', 'Institutionen för datateknik', '[Test] Edit course', NOW(), NOW());
