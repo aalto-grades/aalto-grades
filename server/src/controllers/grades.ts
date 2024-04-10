@@ -153,7 +153,10 @@ export const getSisuFormattedGradingCSV = async (
   /**
    * TODO: only one grade per user per instance is allowed
    */
-  const finalGrades = await getFinalGradesFor(req.body.studentNumbers);
+  const finalGrades = await getFinalGradesFor(
+    course.id,
+    req.body.studentNumbers
+  );
 
   type SisuCsvFormat = {
     studentNumber: string;

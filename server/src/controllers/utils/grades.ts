@@ -96,6 +96,7 @@ export const studentNumbersExist = async (
 };
 
 export const getFinalGradesFor = async (
+  courseId: number,
   studentNumbers: string[],
   skipErrorOnEmpty: boolean = false
 ): Promise<FinalGrade[]> => {
@@ -116,6 +117,7 @@ export const getFinalGradesFor = async (
   }
 
   const finalGrades = await FinalGrade.findAll({
+    where: {courseId: courseId},
     include: [
       {
         model: User,

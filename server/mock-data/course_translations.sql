@@ -24,4 +24,10 @@ INSERT INTO public.course_translation (course_id, language, department, course_n
 (6, 'SV', 'Institutionen för datateknik', '[Test] No models | Average', NOW(), NOW()),
 (7, 'EN', 'Department of Computer Science', '[Test] Edit course', NOW(), NOW()),
 (7, 'FI', 'Tietotekniikan laitos', '[Test] Edit course', NOW(), NOW()),
-(7, 'SV', 'Institutionen för datateknik', '[Test] Edit course', NOW(), NOW());
+(7, 'SV', 'Institutionen för datateknik', '[Test] Edit course', NOW(), NOW()),
+(8, 'EN', 'Department of Computer Science', '[Test] Final grades', NOW(), NOW()),
+(8, 'FI', 'Tietotekniikan laitos', '[Test] Final grades', NOW(), NOW()),
+(8, 'SV', 'Institutionen för datateknik', '[Test] Final grades', NOW(), NOW()),
+(9, 'EN', 'Department of Computer Science', '[Test] Final grades 2', NOW(), NOW()),
+(9, 'FI', 'Tietotekniikan laitos', '[Test] Final grades 2', NOW(), NOW()),
+(9, 'SV', 'Institutionen för datateknik', '[Test] Final grades 2', NOW(), NOW());

@@ -23,14 +23,15 @@ INSERT INTO public.user (email, student_number, password, name, created_at, upda
 ('toney.ham@aalto.fi', '495298', 'hbvoandilxduusmpibctrpvwwpgeagzfopfqcumrngnpeqbonbpsbinjzxxk', 'Toney Ham', '2020-4-10', '2022-10-18', 'USER'),
 ('carl.kleckner@aalto.fi', '638843', 'jltmyjyklorsnpdodxxuicpskvwbqprcgvwwesixgubjecmxhsdsztfyedyr', 'Carl Kleckner', '2022-11-14', '2021-4-4', 'USER'),
 ('mary.christie@aalto.fi', '216384', 'dsyqoqhkqkolscsudvnamtwmdryftfltgxlxcmtmolodgghygxjvuxhscvun', 'Mary Christie', '2020-2-14', '2022-10-10', 'USER'),
-('lawrence.smith@aalto.fi', '573857', 'fuqsorgejwmeslcgxelvuoionwkrflyoabwcsduktgxlhqmtuoxpygpopeph', 'Lawrence Smith', '2021-6-6', '2022-1-10', 'USER'),
+
+('lawrence.smith@aalto.fi', '573857', 'fuqsorgejwmeslcgxelvuoionwkrflyoabwcsduktgxlhqmtuoxpygpopeph', 'Lawrence Smith', '2021-6-6', '2022-1-10', 'USER'), -- id 16
 ('joshua.mann@aalto.fi', '169639', 'emzrjejhikwpmrhhgpoeitnbwpzfjbmdlchmqmdhzigtyvcqoedwdcmlnjlk', 'Joshua Mann', '2020-1-15', '2022-7-8', 'USER'),
 ('theresa.lowery@aalto.fi', '581953', 'elomazckdrcmoibgpynvdivoakvpfhgqwrwbhdpjyaihddcwhdlukrasajnh', 'Theresa Lowery', '2021-5-19', '2022-6-4', 'USER'),
-('sysadmin@aalto.fi', '000000', '$argon2id$v=19$m=16,t=2,p=1$b005WTVET0RNbDRUWTBweg$cbF8wtyWQsJBNFTvj7fpnA', 'Aalto Sysadmin', '2023-1-23', '2023-1-24', 'ADMIN'),
 ('richard.young@aalto.fi', '156214', 'qecpydzstiwapxhdhuunadzxbvcstlxbxudtpnpmtlgkscakfekbaemthmbl', 'Richard Young', '2020-3-6', '2020-11-16', 'USER'),
 ('april.velazquez@aalto.fi', '519334', 'rmfgjsluikcikphceibmmbebvnaeujkmzrhoamcbejinougkmjvjiihporgo', 'April Velazquez', '2021-8-6', '2022-9-17', 'USER'),
 ('james.hillsgrove@aalto.fi', '112239', 'ejwrcljhucqpbmtihaavkgrlxdectwmsxdfbfokdvipjlqrvansnvawedara', 'James Hillsgrove', '2022-1-14', '2022-2-11', 'USER'),
 ('arthur.james@aalto.fi', '118345', 'pxdgrricyrevfyskewnjaicpgcghuiafbpaijrbqkhzzwlinehjaqvmksbwr', 'Arthur James', '2022-6-10', '2022-5-20', 'USER'),
+
 ('laila.schulz@aalto.fi', '349825', 'owtghhhbjjsnixdvdzvoctxodttfhelmmhxmnsihnrprmvlssibzpshuvovg', 'Laila Schulz', '2021-1-19', '2021-3-19', 'USER'),
 ('jazmine.joyce@aalto.fi', '261258', 'jnegbicwagqklzoccmasarbfmrnpenbklnuchqjjrkyvkdsfzrweobrquloc', 'Jazmine Joyce', '2020-4-11', '2020-7-10', 'USER'),
 ('angela.gomez@aalto.fi', '963929', 'xbxwnqtkpswgpcjwompztlyyfpdfmntjybqckfxckcbcqhqnafipkvnfxyvv', 'Angela Gomez', '2022-1-1', '2022-8-7', 'USER'),
