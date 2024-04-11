@@ -32,7 +32,8 @@ INSERT INTO public.user (email, student_number, password, name, created_at, upda
 ('james.hillsgrove@aalto.fi', '112239', 'ejwrcljhucqpbmtihaavkgrlxdectwmsxdfbfokdvipjlqrvansnvawedara', 'James Hillsgrove', '2022-1-14', '2022-2-11', 'USER'),
 ('arthur.james@aalto.fi', '118345', 'pxdgrricyrevfyskewnjaicpgcghuiafbpaijrbqkhzzwlinehjaqvmksbwr', 'Arthur James', '2022-6-10', '2022-5-20', 'USER'),
 
-('laila.schulz@aalto.fi', '349825', 'owtghhhbjjsnixdvdzvoctxodttfhelmmhxmnsihnrprmvlssibzpshuvovg', 'Laila Schulz', '2021-1-19', '2021-3-19', 'USER'),
+('laila.schulz@aalto.fi', '349825', 'owtghhhbjjsnixdvdzvoctxodttfhelmmhxmnsihnrprmvlssibzpshuvovg', 'Laila Schulz', '2021-1-19', '2021-3-19', 'USER'), -- id 23
+
 ('jazmine.joyce@aalto.fi', '261258', 'jnegbicwagqklzoccmasarbfmrnpenbklnuchqjjrkyvkdsfzrweobrquloc', 'Jazmine Joyce', '2020-4-11', '2020-7-10', 'USER'),
 ('angela.gomez@aalto.fi', '963929', 'xbxwnqtkpswgpcjwompztlyyfpdfmntjybqckfxckcbcqhqnafipkvnfxyvv', 'Angela Gomez', '2022-1-1', '2022-8-7', 'USER'),
 ('bryan.crockett@aalto.fi', '185228', 'xjnszwfrsojuxzazyocawthehytksweqxycbfqdyoykbtsfvxrwwavvcsdcy', 'Bryan Crockett', '2020-4-8', '2020-8-18', 'USER'),
