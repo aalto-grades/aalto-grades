@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 export const AverageAssessmentModelGraphStructure = {
   nodes: [
     {id: 'final-grade', position: {x: 1199, y: 181}, data: {}, type: 'grade'},
