@@ -9,9 +9,7 @@ import {HttpCode, NewGrade} from '@common/types';
 import {app} from '../../src/app';
 import * as gradesUtil from '../../src/controllers/utils/grades';
 import AttainmentGrade from '../../src/database/models/attainmentGrade';
-import TeacherInCharge from '../../src/database/models/teacherInCharge';
 import User from '../../src/database/models/user';
-import {mockTeacher} from '../mock-data/misc';
 import {ErrorSchema, ZodErrorSchema} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
 
@@ -87,8 +85,6 @@ describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatib
   });
 
   it('should export CSV succesfully when course results are found (teacher in charge)', async () => {
-    jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
-
     const res = await request
       .post(`/v1/courses/${testCourseId}/grades/csv/sisu`)
       .send({studentNumbers})

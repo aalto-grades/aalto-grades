@@ -7,15 +7,14 @@ import supertest from 'supertest';
 import {app} from '../../src/app';
 
 const request = supertest(app);
-
-export interface Cookies {
+export type Cookies = {
   adminCookie: string[];
   teacherCookie: string[];
-}
+};
 
 /**
  * Utility function to generate and retrieve cookies for an admin and teacher account.
- * The function simulates sign up requests for both roles and extracts cookies from the response.
+ * The function simulates login requests for both roles and extracts cookies from the response.
  * These cookies can be used to simulate authenticated requests in testing scenarios.
  * @returns {Promise<Cookies>} Generated cookies.
  */
