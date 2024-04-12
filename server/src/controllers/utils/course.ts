@@ -32,19 +32,11 @@ export const findCourseFullById = async (
 ): Promise<CourseFull> => {
   const course: CourseFull | null = (await Course.findByPk(courseId, {
     include: [
-      {
-        model: CourseTranslation,
-      },
-      {
-        model: User,
-        as: 'Users',
-      },
-      {
-        model: User,
-        as: 'inCourse',
-      },
+      {model: CourseTranslation},
+      {model: User, as: 'Users'},
+      {model: User, as: 'inCourse'},
     ],
-  })) as CourseFull;
+  })) as CourseFull | null;
 
   if (course === null) {
     throw new ApiError(
@@ -66,16 +58,8 @@ export const parseCourseFull = (course: CourseFull): CourseData => {
     languageOfInstruction: course.languageOfInstruction as Language,
     teachersInCharge: [],
     assistants: [],
-    department: {
-      en: '',
-      fi: '',
-      sv: '',
-    },
-    name: {
-      en: '',
-      fi: '',
-      sv: '',
-    },
+    department: {en: '', fi: '', sv: ''},
+    name: {en: '', fi: '', sv: ''},
   };
 
   for (const translation of course.CourseTranslations) {

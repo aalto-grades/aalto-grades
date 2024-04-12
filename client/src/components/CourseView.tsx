@@ -5,22 +5,15 @@
 import {Box, useTheme} from '@mui/material';
 import {UseQueryResult} from '@tanstack/react-query';
 import {JSX, useEffect, useState} from 'react';
-import {
-  NavigateFunction,
-  Outlet,
-  Params,
-  useNavigate,
-  useParams,
-} from 'react-router-dom';
+import {Outlet, Params, useParams} from 'react-router-dom';
 
-import {CourseData, UserData} from '@common/types';
+import {CourseData} from '@common/types';
 import {useGetCourse} from '../hooks/useApi';
 import useAuth, {AuthContextType} from '../hooks/useAuth';
 import SideMenu from './course-view/SideMenu';
 import UploadDialog from './course-view/UploadDialog';
 
 export default function CourseView(): JSX.Element {
-  const navigate: NavigateFunction = useNavigate();
   const theme = useTheme();
   const {courseId}: Params = useParams();
   const course: UseQueryResult<CourseData> = useGetCourse(courseId!, {
@@ -37,17 +30,15 @@ export default function CourseView(): JSX.Element {
 
   useEffect(() => {
     if (auth && course.data) {
-      const teacherInCharge: Array<UserData> =
-        course.data.teachersInCharge.filter(
-          (teacher: UserData) => teacher.id === auth.id
-        );
+      const teacherInCharge = course.data.teachersInCharge.filter(
+        teacher => teacher.id === auth.id
+      );
       setIsTeacherInCharge(teacherInCharge.length !== 0);
-      if (course.data.assistants !== undefined) {
-        const assistant: Array<UserData> = course.data.assistants.filter(
-          (assistant: UserData) => assistant.id === auth.id
-        );
-        setIsAssistant(assistant.length !== 0);
-      }
+
+      const assistant = course.data.assistants.filter(
+        user => user.id === auth.id
+      );
+      setIsAssistant(assistant.length !== 0);
     }
   }, [auth, course.data, setIsTeacherInCharge, setIsAssistant]);
 

@@ -28,39 +28,28 @@ export const getCoursesOfUser = async (
 ): Promise<void> => {
   const user = await adminOrOwner(req);
 
-  const inChargeCourses: Array<CourseFull> = (await Course.findAll({
+  const inChargeCourses: CourseFull[] = (await Course.findAll({
     include: [
-      {
-        model: CourseTranslation,
-      },
+      {model: CourseTranslation},
       {
         model: User,
         as: 'Users',
-        where: {
-          id: user.id,
-        },
+        where: {id: user.id},
       },
     ],
-  })) as Array<CourseFull>;
+  })) as CourseFull[];
 
-  const inCourses: Array<CourseFull> = (await Course.findAll({
+  const inCourses: CourseFull[] = (await Course.findAll({
     include: [
-      {
-        model: CourseTranslation,
-      },
-      {
-        model: User,
-        as: 'Users',
-      },
+      {model: CourseTranslation},
+      {model: User, as: 'Users'},
       {
         model: User,
         as: 'inCourse',
-        where: {
-          id: user.id,
-        },
+        where: {id: user.id},
       },
     ],
-  })) as Array<CourseFull>;
+  })) as CourseFull[];
 
   const courseData: CourseData[] = [];
   for (const course of inChargeCourses) {
@@ -68,30 +57,12 @@ export const getCoursesOfUser = async (
   }
 
   for (const course of inCourses) {
-    if (courseData.find((courseIn: CourseData) => courseIn.id === course.id))
-      continue;
+    if (courseData.find(courseIn => courseIn.id === course.id)) continue;
     courseData.push(parseCourseFull(course));
   }
 
   res.json(courseData);
 };
-
-
-
-// export async function getUserInfo(req: Request, res: Response): Promise<void> {
-//   const user: User = await adminOrOwner(req);
-
-//   const userData: UserData = {
-//     id: user.id,
-//     studentNumber: user.studentNumber,
-//     name: user.name,
-//     email: user.email,
-//   };
-
-//   res.status(HttpCode.Ok).send({
-//     data: userData,
-//   });
-// }
 
 export const addIdpUser = async (
   req: Request<ParamsDictionary, unknown, AddIdpUser>,

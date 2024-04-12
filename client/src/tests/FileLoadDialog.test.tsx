@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import {HttpCode, LoginResult, SystemRole} from '@common/types';
-import {http} from 'msw';
-import {MemoryRouter, Routes, Route} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {http} from 'msw';
+import {MemoryRouter, Route, Routes} from 'react-router-dom';
 
 import {
   act,

@@ -14,8 +14,10 @@ import {
   Language,
   PartialCourseData,
 } from '@common/types';
+import logger from '../configs/winston';
 import {sequelize} from '../database';
 import Course from '../database/models/course';
+import CourseRole from '../database/models/courseRole';
 import CourseTranslation from '../database/models/courseTranslation';
 import TeacherInCharge from '../database/models/teacherInCharge';
 import User from '../database/models/user';
@@ -27,8 +29,6 @@ import {
   validateCourseId,
   validateEmailList,
 } from './utils/course';
-import CourseRole from '../database/models/courseRole';
-import logger from '../configs/winston';
 
 /**
  * Responds with CourseData
@@ -50,17 +50,9 @@ export const getAllCourses = async (
   _req: Request,
   res: Response
 ): Promise<void> => {
-  const courses: Array<CourseFull> = (await Course.findAll({
-    include: [
-      {
-        model: CourseTranslation,
-      },
-      {
-        model: User,
-        as: 'Users',
-      },
-    ],
-  })) as Array<CourseFull>;
+  const courses = (await Course.findAll({
+    include: [{model: CourseTranslation}, {model: User, as: 'Users'}],
+  })) as CourseFull[];
 
   const coursesData: CourseData[] = [];
 
@@ -79,10 +71,7 @@ export const addCourse = async (
   res: Response
 ): Promise<void> => {
   const teachers = await validateEmailList(req.body.teachersInCharge);
-  const assistants =
-    req.body.assistants !== undefined
-      ? await validateEmailList(req.body.assistants)
-      : null
+  const assistants = await validateEmailList(req.body.assistants);
 
   const course = await sequelize.transaction(async (t): Promise<Course> => {
     const newCourse = await Course.create(
@@ -127,62 +116,23 @@ export const addCourse = async (
 
     await TeacherInCharge.bulkCreate(teachersInCharge, {transaction: t});
 
-    if (assistants !== null) {
-      const assistantRoles: Array<CourseRole> = assistants.map(
-        (assistant: User) => {
-          return {
+    if (assistants.length > 0) {
+      const assistantRoles: CourseRole[] = assistants.map(
+        assistant =>
+          ({
             courseId: newCourse.id,
             userId: assistant.id,
             role: CourseRoleType.Assistant,
-          };
-        }
-      ) as Array<CourseRole>;
+          }) as CourseRole
+      );
       await CourseRole.bulkCreate(assistantRoles, {transaction: t});
     }
 
     return newCourse;
-  }
-  );
+  });
 
   res.status(HttpCode.Created).json(course.id);
-}
-
-// export async function editCourse(req: Request, res: Response): Promise<void> {
-//   const requestSchema: yup.AnyObjectSchema = yup.object().shape({
-//     courseCode: yup.string().notRequired(),
-//     minCredits: yup.number().min(0).notRequired(),
-//     maxCredits: yup.number().min(yup.ref('minCredits')).notRequired(),
-//     gradingScale: yup.string().oneOf(Object.values(GradingScale)).notRequired(),
-//     languageOfInstruction: yup
-//       .string()
-//       .transform((value: string, originalValue: string) => {
-//         return originalValue ? originalValue.toUpperCase() : value;
-//       })
-//       .oneOf(Object.values(Language))
-//       .notRequired(),
-//     teachersInCharge: yup
-//       .array()
-//       .of(
-//         yup.object().shape({
-//           email: yup.string().email().required(),
-//         })
-//       )
-//       .notRequired(),
-//     assistants: yup
-//       .array()
-//       .of(
-//         yup.object().shape({
-//           email: yup.string().email().required(),
-//         })
-//       )
-//       .notRequired(),
-//     department: localizedStringSchema.notRequired(),
-//     name: localizedStringSchema.notRequired(),
-//     return newCourse;
-//   });
-
-//   res.status(HttpCode.Created).json(course.id);
-// };
+};
 
 export const editCourse = async (
   req: Request<ParamsDictionary, unknown, PartialCourseData>,
@@ -230,9 +180,7 @@ export const editCourse = async (
       : null;
 
   const newAssistants: Array<User> | null =
-    assistants !== undefined
-      ? await validateEmailList(assistants)
-      : null;
+    assistants !== undefined ? await validateEmailList(assistants) : null;
 
   await sequelize.transaction(async (t: Transaction): Promise<void> => {
     await Course.update(

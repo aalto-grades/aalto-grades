@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import {LoginResult, SystemRole} from '@common/types';
-import {BrowserRouter} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {BrowserRouter} from 'react-router-dom';
 
 import {
   act,

@@ -207,9 +207,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
   };
 
   const removeAssistant = (value: string): void => {
-    setAssistants(
-      assistants.filter((teacher: string) => teacher !== value)
-    );
+    setAssistants(assistants.filter(assistant => assistant !== value));
   };
 
   const addAssistant = (): void => {
@@ -410,79 +408,79 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                 )}
               </Box>
               <TextField
-                    id="assistantEmail"
-                    type="text"
-                    fullWidth
-                    value={form.values.assistantEmail}
-                    disabled={form.isSubmitting}
-                    label="Assistants*"
-                    margin="normal"
-                    InputLabelProps={{shrink: true}}
-                    helperText={
-                      form.errors.assistantEmail
-                        ? form.errors.assistantEmail
-                        : assistants.length === 0
-                        ? 'Input the email address of at least one assitant of the course'
-                        : assistants.includes(email)
-                        ? 'Email already on list.'
-                        : 'Add emails of the teachers in charge of the course.'
-                    }
-                    error={
-                      form.touched.assistantEmail &&
-                      Boolean(form.errors.assistantEmail)
-                    }
-                    onChange={e => {
-                      setAssistantEmail(e.currentTarget.value);
-                      form.handleChange(e);
-                    }}
-                  />
-                  <Button
-                    variant="outlined"
-                    startIcon={<PersonAddAlt1Icon />}
-                    disabled={
-                      // Allow submit of email only if validation passes and not on list.
-                      Boolean(form.errors.assistantEmail) ||
-                      form.values.assistantEmail.length === 0 ||
-                      assistants.includes(email) ||
-                      form.isSubmitting
-                    }
-                    onClick={(): void => addAssistant()}
-                    sx={{mt: 1}}
-                  >
-                    Add
-                  </Button>
-                  <Box sx={{mt: 3, mb: 2}}>
-                    {assistants.length === 0 ? (
-                      'No assistants in the course'
-                    ) : (
-                      <List dense={true}>
-                        {assistants.map((emailAssistant: string) => (
-                          <ListItem
-                            key={emailAssistant}
-                            secondaryAction={
-                              <IconButton
-                                edge="end"
-                                disabled={form.isSubmitting}
-                                aria-label="delete"
-                                onClick={(): void => {
-                                  removeAssistant(emailAssistant);
-                                }}
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            }
+                id="assistantEmail"
+                type="text"
+                fullWidth
+                value={form.values.assistantEmail}
+                disabled={form.isSubmitting}
+                label="Assistants*"
+                margin="normal"
+                InputLabelProps={{shrink: true}}
+                helperText={
+                  form.errors.assistantEmail
+                    ? form.errors.assistantEmail
+                    : assistants.length === 0
+                    ? 'Input the email address of at least one assitant of the course'
+                    : assistants.includes(email)
+                    ? 'Email already on list.'
+                    : 'Add emails of the teachers in charge of the course.'
+                }
+                error={
+                  form.touched.assistantEmail &&
+                  Boolean(form.errors.assistantEmail)
+                }
+                onChange={e => {
+                  setAssistantEmail(e.currentTarget.value);
+                  form.handleChange(e);
+                }}
+              />
+              <Button
+                variant="outlined"
+                startIcon={<PersonAddAlt1Icon />}
+                disabled={
+                  // Allow submit of email only if validation passes and not on list.
+                  Boolean(form.errors.assistantEmail) ||
+                  form.values.assistantEmail.length === 0 ||
+                  assistants.includes(email) ||
+                  form.isSubmitting
+                }
+                onClick={(): void => addAssistant()}
+                sx={{mt: 1}}
+              >
+                Add
+              </Button>
+              <Box sx={{mt: 3, mb: 2}}>
+                {assistants.length === 0 ? (
+                  'No assistants in the course'
+                ) : (
+                  <List dense={true}>
+                    {assistants.map((emailAssistant: string) => (
+                      <ListItem
+                        key={emailAssistant}
+                        secondaryAction={
+                          <IconButton
+                            edge="end"
+                            disabled={form.isSubmitting}
+                            aria-label="delete"
+                            onClick={(): void => {
+                              removeAssistant(emailAssistant);
+                            }}
                           >
-                            <ListItemAvatar>
-                              <Avatar>
-                                <PersonIcon />
-                              </Avatar>
-                            </ListItemAvatar>
-                            <ListItemText primary={emailAssistant} />
-                          </ListItem>
-                        ))}
-                      </List>
-                    )}
-                  </Box>
+                            <DeleteIcon />
+                          </IconButton>
+                        }
+                      >
+                        <ListItemAvatar>
+                          <Avatar>
+                            <PersonIcon />
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText primary={emailAssistant} />
+                      </ListItem>
+                    ))}
+                  </List>
+                )}
+              </Box>
             </DialogContent>
             <DialogActions>
               <Button

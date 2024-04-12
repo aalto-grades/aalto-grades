@@ -9,7 +9,7 @@ import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
 export interface CourseFull extends Course {
-  CourseTranslations: Array<CourseTranslation>;
-  Users: Array<User>;
-  inCourse?: Array<User>;
+  CourseTranslations: CourseTranslation[];
+  Users: User[];
+  inCourse?: User[];
 }

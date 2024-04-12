@@ -2,14 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {DataTypes, QueryInterface, Transaction} from 'sequelize';
+/* eslint camelcase: off */
+
+import {DataTypes, QueryInterface} from 'sequelize';
 
 import logger from '../../configs/winston';
 
 export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
-    const transaction: Transaction =
-      await queryInterface.sequelize.transaction();
+    const transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.createTable(
         'course_role',
@@ -49,9 +50,9 @@ export default {
       logger.error(error);
     }
   },
+
   down: async (queryInterface: QueryInterface): Promise<void> => {
-    const transaction: Transaction =
-      await queryInterface.sequelize.transaction();
+    const transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.dropTable('course_role', {transaction});
 

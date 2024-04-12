@@ -5,8 +5,8 @@
 import {HttpCode, SystemRole} from '@common/types';
 import {NextFunction, Request, Response} from 'express';
 
-import {JwtClaims} from '../types';
 import {isTeacherInChargeOrAdmin} from '../controllers/utils/user';
+import {JwtClaims} from '../types';
 
 /**
  * Middleware function to ensure that the user has the necessary role to proceed.
@@ -19,10 +19,10 @@ import {isTeacherInChargeOrAdmin} from '../controllers/utils/user';
  * // Protect an endpoint so only admins can access it.
  * app.post('/v1/courses', authorization([SystemRole.Admin]), (req, res) => { ... });
  */
-export function authorization(
+export const authorization = (
   allowedRoles: Array<SystemRole>
-): (req: Request, res: Response, next: NextFunction) => void {
-  return async function (req: Request, res: Response, next: NextFunction) {
+): ((req: Request, res: Response, next: NextFunction) => void) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     const user: JwtClaims = req.user as JwtClaims;
 
     if (!allowedRoles.includes(user.role)) {
@@ -34,20 +34,17 @@ export function authorization(
     }
     next();
   };
-}
+};
 
 export function teacherInCharge(): (
   req: Request,
   res: Response,
   next: NextFunction
-) => void {
-  return async function (req: Request, res: Response, next: NextFunction) {
+) => Promise<void> {
+  return async (req: Request, res: Response, next: NextFunction) => {
     const courseId = Number(req.params.courseId);
     try {
-      await isTeacherInChargeOrAdmin(
-        req.user as JwtClaims,
-        courseId,
-      );
+      await isTeacherInChargeOrAdmin(req.user as JwtClaims, courseId);
       next();
     } catch (e) {
       res.status(HttpCode.Forbidden).send({

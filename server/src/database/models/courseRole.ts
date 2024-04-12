@@ -6,15 +6,15 @@ import {
   CreationOptional,
   DataTypes,
   ForeignKey,
-  Model,
   InferAttributes,
   InferCreationAttributes,
+  Model,
 } from 'sequelize';
 
+import {CourseRoleType} from '@common/types';
 import {sequelize} from '..';
 import Course from './course';
 import User from './user';
-import {CourseRoleType} from '@common/types';
 
 export default class CourseRole extends Model<
   InferAttributes<CourseRole>,
@@ -80,16 +80,10 @@ CourseRole.updateCourseAssistants = async function (
   assistants: Array<User>,
   courseId: number
 ): Promise<void> {
-  const oldAssistants: Array<CourseRole> = await CourseRole.findAll({
-    where: {
-      courseId: courseId,
-    },
-  });
+  const oldAssistants = await CourseRole.findAll({where: {courseId: courseId}});
   for (const oldAssistant of oldAssistants) {
     const existingAssistantIndex: number = assistants.findIndex(
-      (assistant: User) => {
-        return assistant.id === oldAssistant.userId;
-      }
+      assistant => assistant.id === oldAssistant.userId
     );
     if (existingAssistantIndex >= 0) {
       assistants.splice(existingAssistantIndex, 1);
@@ -99,12 +93,10 @@ CourseRole.updateCourseAssistants = async function (
   }
 
   await CourseRole.bulkCreate(
-    assistants.map((user: User) => {
-      return {
-        userId: user.id,
-        courseId: courseId,
-        role: CourseRoleType.Assistant,
-      };
-    })
+    assistants.map(assistant => ({
+      userId: assistant.id,
+      courseId: courseId,
+      role: CourseRoleType.Assistant,
+    }))
   );
 };

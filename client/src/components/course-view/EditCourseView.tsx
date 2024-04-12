@@ -183,9 +183,7 @@ export default function EditCourseView(): JSX.Element {
     []
   );
   const [teachersInCharge, setTeachersInCharge] = useState<string[]>([]);
-  const [initAssistants, setInitAssistants] = useState<string[]>(
-    []
-  );
+  const [initAssistants, setInitAssistants] = useState<string[]>([]);
   const [assistants, setAssistants] = useState<string[]>([]);
   const [email, setEmail] = useState<string>('');
   const [assistantEmail, setAssistantEmail] = useState<string>('');
@@ -211,25 +209,13 @@ export default function EditCourseView(): JSX.Element {
     });
 
     setInitTeachersInCharge(
-      course.data.teachersInCharge.map(
-        (teacher: UserData) => teacher.email ?? ''
-      )
+      course.data.teachersInCharge.map(teacher => teacher.email)
     );
     setTeachersInCharge(
-      course.data.teachersInCharge.map(
-        (teacher: UserData) => teacher.email ?? ''
-      )
+      course.data.teachersInCharge.map(teacher => teacher.email)
     );
-    setInitAssistants(
-      course.data.assistants.map(
-        (assistant: UserData) => assistant.email ?? ''
-      )
-    );
-    setAssistants(
-      course.data.assistants.map(
-        (assistant: UserData) => assistant.email ?? ''
-      )
-    );
+    setInitAssistants(course.data.assistants.map(assistant => assistant.email));
+    setAssistants(course.data.assistants.map(assistant => assistant.email));
   }, [course.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const removeTeacher = (value: string): void => {
@@ -244,9 +230,7 @@ export default function EditCourseView(): JSX.Element {
   };
 
   const removeAssistant = (value: string): void => {
-    setAssistants(
-      assistants.filter((teacher: string) => teacher !== value)
-    );
+    setAssistants(assistants.filter(assistant => assistant !== value));
   };
 
   const addAssistant = (): void => {
@@ -285,7 +269,7 @@ export default function EditCourseView(): JSX.Element {
           setSubmitting(false);
           setInitialValues(values);
           setInitTeachersInCharge(teachersInCharge);
-          setInitAssistants(assistants)
+          setInitAssistants(assistants);
         },
         onError: () => {
           setSubmitting(false);
@@ -336,7 +320,7 @@ export default function EditCourseView(): JSX.Element {
               handleDiscard={() => {
                 form.resetForm();
                 setTeachersInCharge(initTeachersInCharge);
-                setAssistants(initAssistants)
+                setAssistants(initAssistants);
               }}
             />
             <Form>
