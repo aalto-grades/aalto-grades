@@ -43,22 +43,6 @@ export const getDateOfLatestGrade = async (
   );
 };
 
-/**
- * Determines if a grade has expired based on its ID.
- * Throws Error if the grade ID is invalid.
- */
-export const gradeIsExpired = async (gradeId: number): Promise<boolean> => {
-  const grade = await AttainmentGrade.findByPk(gradeId);
-
-  if (grade === null) {
-    throw new Error(
-      `failed to determine whether grade is expired, invalid ID ${gradeId}`
-    );
-  }
-
-  return new Date().getTime() >= new Date(grade.expiryDate).getTime();
-};
-
 export const studentNumbersExist = async (
   studentNumbers: string[]
 ): Promise<void> => {
