@@ -2,9 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 ---
-
-name: Image Creation Workflow
-run-name: ${{ github.actor }} pull request
+name: Main Image Creation Workflow
+run-name: ${{ github.actor }} main container creation
 on:
   push:
     branches:

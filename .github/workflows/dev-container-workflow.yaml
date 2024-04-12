@@ -2,17 +2,16 @@
 #
 # SPDX-License-Identifier: MIT
 ---
-
-name: Image Creation Workflow
-run-name: ${{ github.actor }} test merge
+name: Dev Image Creation Workflow
+run-name: ${{ github.actor }} dev container creation
 on:
   push:
     branches:
-      - test
+      - dev
 env:
   REGISTRY: ghcr.io
-  FRONTEND_IMAGE_NAME: aalto-grades/aalto-grades-frontend-test
-  BACKEND_IMAGE_NAME: aalto-grades/aalto-grades-backend-test
+  FRONTEND_IMAGE_NAME: aalto-grades/aalto-grades-frontend-dev
+  BACKEND_IMAGE_NAME: aalto-grades/aalto-grades-backend-dev
 
 jobs:
   build_and_push_frontend_and_backend:

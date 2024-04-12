@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 ---
-
 name: PR Workflow
 run-name: ${{ github.actor }} pull request
 on:
@@ -12,6 +11,7 @@ on:
   pull_request:
     branches:
       - main
+      - dev
 
 jobs:
   test_and_lint_client:
@@ -73,10 +73,12 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
+      - name: Install dependencies
+        run: npm ci
       - name: Install linter dependencies
         run: npm --prefix .. ci
       - name: Run linter
-        run: npm run lint-common
+        run: npm run lint
 
   lint_yaml_files:
     name: Lint project YAML files

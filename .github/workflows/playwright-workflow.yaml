@@ -2,15 +2,15 @@
 #
 # SPDX-License-Identifier: MIT
 ---
-
 name: End-to-end tests
 on:
   push:
-    branches: 
-      - playwright
+    branches:
+      - main
   pull_request:
     branches:
-      - playwright
+      - main
+      - dev
 jobs:
   test-e2e:
     name: e2e test
