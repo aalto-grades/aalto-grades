@@ -59,11 +59,9 @@ const checkGradeAmount = async (
   student: {id: number},
   expectedGrades: number[]
 ): Promise<void> => {
-  console.log({userId: student.id, courseId: testCourseAddId});
   const dbAttainmentGrades = await FinalGrade.findAll({
     where: {userId: student.id, courseId: testCourseAddId},
   });
-  console.log(JSON.stringify(dbAttainmentGrades, null, 4));
 
   const dbGrades = dbAttainmentGrades.map(
     attainmentGrade => attainmentGrade.grade

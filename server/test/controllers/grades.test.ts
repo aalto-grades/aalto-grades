@@ -63,8 +63,6 @@ describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatib
       .set('Accept', 'text/csv')
       .expect(HttpCode.Ok);
 
-    console.log(JSON.stringify(res.body, null, 4));
-
     expect(res.text)
       .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
 325235,2,5,21.6.2023,EN,
