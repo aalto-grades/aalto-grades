@@ -8,13 +8,16 @@ import {Transaction} from 'sequelize';
 
 import {
   CourseData,
+  CourseRoleType,
   CreateCourseData,
   HttpCode,
   Language,
   PartialCourseData,
 } from '@common/types';
+import logger from '../configs/winston';
 import {sequelize} from '../database';
 import Course from '../database/models/course';
+import CourseRole from '../database/models/courseRole';
 import CourseTranslation from '../database/models/courseTranslation';
 import TeacherInCharge from '../database/models/teacherInCharge';
 import User from '../database/models/user';
@@ -48,7 +51,7 @@ export const getAllCourses = async (
   res: Response
 ): Promise<void> => {
   const courses = (await Course.findAll({
-    include: [{model: CourseTranslation}, {model: User}],
+    include: [{model: CourseTranslation}, {model: User, as: 'Users'}],
   })) as CourseFull[];
 
   const coursesData: CourseData[] = [];
@@ -68,6 +71,7 @@ export const addCourse = async (
   res: Response
 ): Promise<void> => {
   const teachers = await validateEmailList(req.body.teachersInCharge);
+  const assistants = await validateEmailList(req.body.assistants);
 
   const course = await sequelize.transaction(async (t): Promise<Course> => {
     const newCourse = await Course.create(
@@ -112,6 +116,18 @@ export const addCourse = async (
 
     await TeacherInCharge.bulkCreate(teachersInCharge, {transaction: t});
 
+    if (assistants.length > 0) {
+      const assistantRoles: CourseRole[] = assistants.map(
+        assistant =>
+          ({
+            courseId: newCourse.id,
+            userId: assistant.id,
+            role: CourseRoleType.Assistant,
+          }) as CourseRole
+      );
+      await CourseRole.bulkCreate(assistantRoles, {transaction: t});
+    }
+
     return newCourse;
   });
 
@@ -133,6 +149,7 @@ export const editCourse = async (
     teachersInCharge,
     department,
     name,
+    assistants,
   } = req.body;
 
   if (
@@ -161,6 +178,9 @@ export const editCourse = async (
     teachersInCharge !== undefined
       ? await validateEmailList(teachersInCharge)
       : null;
+
+  const newAssistants: Array<User> | null =
+    assistants !== undefined ? await validateEmailList(assistants) : null;
 
   await sequelize.transaction(async (t: Transaction): Promise<void> => {
     await Course.update(
@@ -222,7 +242,8 @@ export const editCourse = async (
       }
 
       // Add teachers who are in the newTeachers array but not in the database.
-      if (oldTeachers.length > 0) {
+
+      if (newTeachers.length > 0) {
         await TeacherInCharge.bulkCreate(
           newTeachers.map(teacher => ({
             userId: teacher.id,
@@ -233,6 +254,10 @@ export const editCourse = async (
       }
     }
   });
+
+  if (newAssistants) {
+    await CourseRole.updateCourseAssistants(newAssistants, course.id);
+  }
 
   res.sendStatus(HttpCode.Ok);
 };

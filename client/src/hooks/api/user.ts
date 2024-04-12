@@ -36,11 +36,16 @@ export const useGetCoursesOfUser = (
 
 export const useAddUser = (
   options?: UseMutationOptions<unknown, unknown, AddIdpUser>
-): UseMutationResult<unknown, unknown, AddIdpUser> =>
-  useMutation({
+): UseMutationResult<unknown, unknown, AddIdpUser> => {
+  const queryClient = useQueryClient();
+  return useMutation({
     mutationFn: async idpUser => await axios.post('/v1/idp-users', idpUser),
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['idp-users']});
+    },
     ...options,
   });
+};
 
 export const useGetIdpUsers = (
   options?: Partial<UseQueryOptions<{email: string | null; id: number}[]>>

@@ -29,6 +29,7 @@ export const mockCourses: Array<CourseData> = [
         name: 'Scooby Doo',
       },
     ],
+    assistants: [],
   },
   {
     id: 1,
@@ -54,5 +55,6 @@ export const mockCourses: Array<CourseData> = [
         name: 'Winnie the Pooh',
       },
     ],
+    assistants: [],
   },
 ];

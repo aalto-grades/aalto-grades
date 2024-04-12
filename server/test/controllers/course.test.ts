@@ -120,6 +120,7 @@ describe('Test POST /v1/courses - create new course', () => {
           email: 'thomas.siegel@aalto.fi',
         },
       ],
+      assistants: [],
       department: {
         fi: 'Sähkötekniikan korkeakoulu',
         en: 'School of Electrical Engineering',
@@ -155,6 +156,7 @@ describe('Test POST /v1/courses - create new course', () => {
           email: 'arthur.james@aalto.fi',
         },
       ],
+      assistants: [],
       department: {
         fi: 'Sähkötekniikan korkeakoulu',
         en: 'School of Electrical Engineering',
@@ -212,7 +214,7 @@ describe('Test POST /v1/courses - create new course', () => {
       .expect(HttpCode.Forbidden);
   });
 
-  it('should respond with 422 unprocessable entity, if teacher email is not found from database', async () => {
+  it('should respond with 200 and add email to allowed idp users, if teacher email is not found from database', async () => {
     const input: object = {
       courseCode: 'ELEC-A7200',
       minCredits: 5,
@@ -224,6 +226,7 @@ describe('Test POST /v1/courses - create new course', () => {
           email: 'not.found@aalto.fi',
         },
       ],
+      assistants: [],
       department: {
         fi: 'Sähkötekniikan korkeakoulu',
         en: 'School of Electrical Engineering',
@@ -241,13 +244,9 @@ describe('Test POST /v1/courses - create new course', () => {
       .send(input)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
-      .expect(HttpCode.UnprocessableEntity);
+      .expect(HttpCode.Ok);
 
-    expect(res.body.errors).toBeDefined();
-    expect(res.body.errors[0]).toBe(
-      'No user with email address not.found@aalto.fi found'
-    );
-    expect(res.body.data).not.toBeDefined();
+    expect(res.body.errors).not.toBeDefined();
   });
 
   /* TODO: move next test case elsewhere in future, after refactoring commonly
@@ -275,6 +274,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
   const uneditedCourseDataBase: object = {
     minCredits: 5,
     maxCredits: 5,
+    assistants: [],
     gradingScale: GradingScale.PassFail,
     languageOfInstruction: Language.English,
     department: {
@@ -495,7 +495,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
       .expect(HttpCode.NotFound);
   });
 
-  it('should respond with 422 unprocessable entity, if teacher email is not found from database', async () => {
+  it('should respond 200 and add idp user, if teacher email is not found from database', async () => {
     await request
       .put('/v1/courses/10')
       .send({
@@ -503,6 +503,6 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
       })
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
-      .expect(HttpCode.UnprocessableEntity);
+      .expect(HttpCode.Ok);
   });
 });

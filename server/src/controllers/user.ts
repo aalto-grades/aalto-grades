@@ -28,12 +28,36 @@ export const getCoursesOfUser = async (
 ): Promise<void> => {
   const user = await adminOrOwner(req);
 
-  const inChargeCourses = (await Course.findAll({
-    include: [{model: CourseTranslation}, {model: User, where: {id: user.id}}],
+  const inChargeCourses: CourseFull[] = (await Course.findAll({
+    include: [
+      {model: CourseTranslation},
+      {
+        model: User,
+        as: 'Users',
+        where: {id: user.id},
+      },
+    ],
+  })) as CourseFull[];
+
+  const inCourses: CourseFull[] = (await Course.findAll({
+    include: [
+      {model: CourseTranslation},
+      {model: User, as: 'Users'},
+      {
+        model: User,
+        as: 'inCourse',
+        where: {id: user.id},
+      },
+    ],
   })) as CourseFull[];
 
   const courseData: CourseData[] = [];
   for (const course of inChargeCourses) {
+    courseData.push(parseCourseFull(course));
+  }
+
+  for (const course of inCourses) {
+    if (courseData.find(courseIn => courseIn.id === course.id)) continue;
     courseData.push(parseCourseFull(course));
   }
 

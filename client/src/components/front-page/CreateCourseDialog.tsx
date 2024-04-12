@@ -4,6 +4,7 @@
 
 import {
   Delete as DeleteIcon,
+  MarkEmailUnreadTwoTone,
   PersonAddAlt1 as PersonAddAlt1Icon,
   Person as PersonIcon,
 } from '@mui/icons-material';
@@ -52,6 +53,7 @@ const ValidationSchema = z
     gradingScale: z.nativeEnum(GradingScale),
     languageOfInstruction: z.nativeEnum(Language),
     teacherEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
+    assistantEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
     departmentEn: z
       .string({
         required_error:
@@ -91,6 +93,7 @@ type FormData = {
   maxCredits: number;
   gradingScale: GradingScale;
   teacherEmail: string;
+  assistantEmail: string;
   departmentEn: string;
   departmentFi: string;
   departmentSv: string;
@@ -173,6 +176,7 @@ const initialValues = {
   gradingScale: GradingScale.Numerical,
   languageOfInstruction: Language.English,
   teacherEmail: '',
+  assistantEmail: '',
   departmentEn: '',
   departmentFi: '',
   departmentSv: '',
@@ -188,6 +192,8 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
 
   const [teachersInCharge, setTeachersInCharge] = useState<string[]>([]);
   const [email, setEmail] = useState<string>('');
+  const [assistants, setAssistants] = useState<string[]>([]);
+  const [assistantEmail, setAssistantEmail] = useState<string>('');
   const [showUnsavedDialog, setShowUnsavedDialog] = useState<boolean>(false);
 
   const removeTeacher = (value: string): void => {
@@ -198,6 +204,14 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
 
   const addTeacher = (): void => {
     setTeachersInCharge([...teachersInCharge, email]);
+  };
+
+  const removeAssistant = (value: string): void => {
+    setAssistants(assistants.filter(assistant => assistant !== value));
+  };
+
+  const addAssistant = (): void => {
+    setAssistants([...assistants, assistantEmail]);
   };
 
   const handleSubmit = (
@@ -221,6 +235,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
         en: values.nameEn,
       },
       teachersInCharge,
+      assistants,
     };
 
     addCourse.mutate(courseData, {
@@ -257,6 +272,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               onClose();
               form.resetForm();
               setTeachersInCharge([]);
+              setAssistants([]);
             }}
           />
           <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
@@ -386,6 +402,80 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                           </Avatar>
                         </ListItemAvatar>
                         <ListItemText primary={teacherEmail} />
+                      </ListItem>
+                    ))}
+                  </List>
+                )}
+              </Box>
+              <TextField
+                id="assistantEmail"
+                type="text"
+                fullWidth
+                value={form.values.assistantEmail}
+                disabled={form.isSubmitting}
+                label="Assistants*"
+                margin="normal"
+                InputLabelProps={{shrink: true}}
+                helperText={
+                  form.errors.assistantEmail
+                    ? form.errors.assistantEmail
+                    : assistants.length === 0
+                    ? 'Input the email address of at least one assitant of the course'
+                    : assistants.includes(email)
+                    ? 'Email already on list.'
+                    : 'Add emails of the teachers in charge of the course.'
+                }
+                error={
+                  form.touched.assistantEmail &&
+                  Boolean(form.errors.assistantEmail)
+                }
+                onChange={e => {
+                  setAssistantEmail(e.currentTarget.value);
+                  form.handleChange(e);
+                }}
+              />
+              <Button
+                variant="outlined"
+                startIcon={<PersonAddAlt1Icon />}
+                disabled={
+                  // Allow submit of email only if validation passes and not on list.
+                  Boolean(form.errors.assistantEmail) ||
+                  form.values.assistantEmail.length === 0 ||
+                  assistants.includes(email) ||
+                  form.isSubmitting
+                }
+                onClick={(): void => addAssistant()}
+                sx={{mt: 1}}
+              >
+                Add
+              </Button>
+              <Box sx={{mt: 3, mb: 2}}>
+                {assistants.length === 0 ? (
+                  'No assistants in the course'
+                ) : (
+                  <List dense={true}>
+                    {assistants.map((emailAssistant: string) => (
+                      <ListItem
+                        key={emailAssistant}
+                        secondaryAction={
+                          <IconButton
+                            edge="end"
+                            disabled={form.isSubmitting}
+                            aria-label="delete"
+                            onClick={(): void => {
+                              removeAssistant(emailAssistant);
+                            }}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        }
+                      >
+                        <ListItemAvatar>
+                          <Avatar>
+                            <PersonIcon />
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText primary={emailAssistant} />
                       </ListItem>
                     ))}
                   </List>

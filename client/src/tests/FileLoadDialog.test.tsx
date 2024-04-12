@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import {HttpCode, LoginResult, SystemRole} from '@common/types';
-import {http} from 'msw';
-import {MemoryRouter, Routes, Route} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {http} from 'msw';
+import {MemoryRouter, Route, Routes} from 'react-router-dom';
 
 import {
   act,
@@ -51,6 +51,8 @@ describe('FileLoadDialog test with proper csv', () => {
               setAuth: vi.fn(),
               isTeacherInCharge: false,
               setIsTeacherInCharge: vi.fn(),
+              setIsAssistant: vi.fn(),
+              isAssistant: false,
             }}
           >
             <Routes>
@@ -171,6 +173,8 @@ describe('FileLoadDialog test where server does not accept the file', () => {
               setAuth: vi.fn(),
               isTeacherInCharge: false,
               setIsTeacherInCharge: vi.fn(),
+              setIsAssistant: vi.fn,
+              isAssistant: false,
             }}
           >
             <Routes>

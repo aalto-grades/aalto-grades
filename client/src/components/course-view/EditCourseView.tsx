@@ -58,6 +58,7 @@ const ValidationSchema = z
     gradingScale: z.nativeEnum(GradingScale),
     languageOfInstruction: z.nativeEnum(Language),
     teacherEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
+    assistantEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
     departmentEn: z
       .string({
         required_error:
@@ -97,6 +98,7 @@ type FormData = {
   maxCredits: number;
   gradingScale: GradingScale;
   teacherEmail: string;
+  assistantEmail: string;
   departmentEn: string;
   departmentFi: string;
   departmentSv: string;
@@ -181,7 +183,10 @@ export default function EditCourseView(): JSX.Element {
     []
   );
   const [teachersInCharge, setTeachersInCharge] = useState<string[]>([]);
+  const [initAssistants, setInitAssistants] = useState<string[]>([]);
+  const [assistants, setAssistants] = useState<string[]>([]);
   const [email, setEmail] = useState<string>('');
+  const [assistantEmail, setAssistantEmail] = useState<string>('');
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [initialValues, setInitialValues] = useState<FormData | null>(null);
 
@@ -194,6 +199,7 @@ export default function EditCourseView(): JSX.Element {
       gradingScale: course.data.gradingScale,
       languageOfInstruction: course.data.languageOfInstruction,
       teacherEmail: '',
+      assistantEmail: '',
       departmentEn: course.data.department.en,
       departmentFi: course.data.department.fi,
       departmentSv: course.data.department.sv,
@@ -203,15 +209,13 @@ export default function EditCourseView(): JSX.Element {
     });
 
     setInitTeachersInCharge(
-      course.data.teachersInCharge.map(
-        (teacher: UserData) => teacher.email ?? ''
-      )
+      course.data.teachersInCharge.map(teacher => teacher.email)
     );
     setTeachersInCharge(
-      course.data.teachersInCharge.map(
-        (teacher: UserData) => teacher.email ?? ''
-      )
+      course.data.teachersInCharge.map(teacher => teacher.email)
     );
+    setInitAssistants(course.data.assistants.map(assistant => assistant.email));
+    setAssistants(course.data.assistants.map(assistant => assistant.email));
   }, [course.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const removeTeacher = (value: string): void => {
@@ -223,6 +227,14 @@ export default function EditCourseView(): JSX.Element {
   const addTeacher = (): void => {
     setTeachersInCharge([...teachersInCharge, email]);
     setEmail('');
+  };
+
+  const removeAssistant = (value: string): void => {
+    setAssistants(assistants.filter(assistant => assistant !== value));
+  };
+
+  const addAssistant = (): void => {
+    setAssistants([...assistants, assistantEmail]);
   };
 
   const handleSubmit = (
@@ -246,6 +258,7 @@ export default function EditCourseView(): JSX.Element {
         en: values.nameEn,
       },
       teachersInCharge: teachersInCharge.map(teacherEmail => teacherEmail),
+      assistants: assistants.map(assistant => assistant),
     };
 
     editCourse.mutate(
@@ -256,6 +269,7 @@ export default function EditCourseView(): JSX.Element {
           setSubmitting(false);
           setInitialValues(values);
           setInitTeachersInCharge(teachersInCharge);
+          setInitAssistants(assistants);
         },
         onError: () => {
           setSubmitting(false);
@@ -306,6 +320,7 @@ export default function EditCourseView(): JSX.Element {
               handleDiscard={() => {
                 form.resetForm();
                 setTeachersInCharge(initTeachersInCharge);
+                setAssistants(initAssistants);
               }}
             />
             <Form>
@@ -438,6 +453,76 @@ export default function EditCourseView(): JSX.Element {
                               </Avatar>
                             </ListItemAvatar>
                             <ListItemText primary={teacherEmail} />
+                          </ListItem>
+                        ))}
+                      </List>
+                    )}
+                  </Box>
+                  <TextField
+                    id="assistantEmail"
+                    type="text"
+                    fullWidth
+                    value={form.values.assistantEmail}
+                    disabled={form.isSubmitting}
+                    label="Assistants"
+                    margin="normal"
+                    InputLabelProps={{shrink: true}}
+                    helperText={
+                      form.errors.assistantEmail
+                        ? form.errors.assistantEmail
+                        : assistants.includes(assistantEmail)
+                        ? 'Email already on list.'
+                        : 'Add emails of the assistants of the course.'
+                    }
+                    error={
+                      form.touched.assistantEmail &&
+                      Boolean(form.errors.assistantEmail)
+                    }
+                    onChange={e => {
+                      setAssistantEmail(e.currentTarget.value);
+                      form.handleChange(e);
+                    }}
+                  />
+                  <Button
+                    variant="outlined"
+                    startIcon={<PersonAddAlt1Icon />}
+                    disabled={
+                      // Allow submit of email only if validation passes and not on list.
+                      Boolean(form.errors.assistantEmail) ||
+                      form.values.assistantEmail.length === 0 ||
+                      assistants.includes(assistantEmail) ||
+                      form.isSubmitting
+                    }
+                    onClick={() => addAssistant()}
+                    sx={{mt: 1, float: 'left'}}
+                  >
+                    Add
+                  </Button>
+                  <Box sx={{mt: 8, mb: 2, width: '50%'}}>
+                    {assistants.length === 0 ? (
+                      'No assistants'
+                    ) : (
+                      <List dense>
+                        {assistants.map(emailAssistant => (
+                          <ListItem
+                            key={emailAssistant}
+                            secondaryAction={
+                              <IconButton
+                                edge="end"
+                                disabled={form.isSubmitting}
+                                aria-label="delete"
+                                onClick={() => removeAssistant(emailAssistant)}
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            }
+                          >
+                            <ListItemAvatar>
+                              <Avatar>
+                                <PersonIcon />
+                              </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText primary={emailAssistant} />
                           </ListItem>
                         ))}
                       </List>

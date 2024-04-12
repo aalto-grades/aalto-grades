@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import {LoginResult, SystemRole} from '@common/types';
-import {BrowserRouter} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {BrowserRouter} from 'react-router-dom';
 
 import {
   act,
@@ -33,6 +33,8 @@ describe('Tests for button component displaying user data and logout', () => {
               setAuth: vi.fn(),
               isTeacherInCharge: false,
               setIsTeacherInCharge: vi.fn(),
+              setIsAssistant: vi.fn(),
+              isAssistant: false,
             }}
           >
             <UserButton />

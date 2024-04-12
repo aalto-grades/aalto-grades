@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {http} from 'msw';
 import {BrowserRouter} from 'react-router-dom';
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 
 import {act, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -24,6 +24,8 @@ describe('Tests for Login and LoginForm components', () => {
             setAuth: vi.fn(),
             isTeacherInCharge: false,
             setIsTeacherInCharge: vi.fn(),
+            setIsAssistant: vi.fn(),
+            isAssistant: false,
           }}
         >
           <BrowserRouter>

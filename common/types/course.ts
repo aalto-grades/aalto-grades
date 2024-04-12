@@ -34,6 +34,7 @@ const BaseCourseDataSchema = z.object({
   gradingScale: GradingScaleSchema,
   languageOfInstruction: LanguageSchema,
   teachersInCharge: z.array(TeacherDataSchema),
+  assistants: z.array(TeacherDataSchema),
 });
 
 export const CourseDataSchema = BaseCourseDataSchema.refine(
@@ -41,12 +42,19 @@ export const CourseDataSchema = BaseCourseDataSchema.refine(
 );
 export const CourseDataArraySchema = z.array(CourseDataSchema);
 
+export enum CourseRoleType {
+  Teacher = 'TEACHER',
+  Assistant = 'ASSISTANT',
+  Student = 'STUDENT',
+}
 export const CreateCourseDataSchema = BaseCourseDataSchema.extend({
   teachersInCharge: z.array(z.string().email()),
+  assistants: z.array(z.string().email()),
 }).refine(val => val.maxCredits >= val.minCredits);
 
 export const PartialCourseDataSchema = BaseCourseDataSchema.extend({
   teachersInCharge: z.array(z.string().email()),
+  assistants: z.array(z.string().email()),
 })
   .partial()
   .refine(

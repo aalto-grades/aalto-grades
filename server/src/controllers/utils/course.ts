@@ -30,8 +30,12 @@ export const findCourseFullById = async (
   courseId: number,
   errorCode?: HttpCode
 ): Promise<CourseFull> => {
-  const course = (await Course.findByPk(courseId, {
-    include: [{model: CourseTranslation}, {model: User}],
+  const course: CourseFull | null = (await Course.findByPk(courseId, {
+    include: [
+      {model: CourseTranslation},
+      {model: User, as: 'Users'},
+      {model: User, as: 'inCourse'},
+    ],
   })) as CourseFull | null;
 
   if (course === null) {
@@ -53,6 +57,7 @@ export const parseCourseFull = (course: CourseFull): CourseData => {
     gradingScale: course.gradingScale,
     languageOfInstruction: course.languageOfInstruction as Language,
     teachersInCharge: [],
+    assistants: [],
     department: {en: '', fi: '', sv: ''},
     name: {en: '', fi: '', sv: ''},
   };
@@ -87,6 +92,14 @@ export const parseCourseFull = (course: CourseFull): CourseData => {
       email: teacher.email,
     });
   }
+
+  course.inCourse?.forEach((assistant: User) => {
+    courseData.assistants.push({
+      id: assistant.id,
+      name: assistant.name,
+      email: assistant.email,
+    });
+  });
 
   return courseData;
 };
