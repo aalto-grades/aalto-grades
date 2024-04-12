@@ -67,7 +67,7 @@ function groupByLastAttainmentDate(gradesList: ExtendedStudentRow[]) {
     let newestDate = new Date('1970-01-01');
     for (const att of row.attainments) {
       const bestGradeDate = new Date(
-        findBestGradeOption(att.grades ?? [], {
+        findBestGradeOption(att.grades, {
           avoidExpired: true,
           preferExpiredToNull: true,
           useLatest: false, // TODO: Read from state?
@@ -128,7 +128,7 @@ function predictGrades(
           userId: row.user.id,
           attainments: row.attainments.map(att => ({
             attainmentId: att.attainmentId,
-            grade: att.grades === undefined ? 0 : att.grades[0].grade, // TODO: best grade should be taken 🐛
+            grade: att.grades.length === 0 ? 0 : att.grades[0].grade, // TODO: best grade should be taken 🐛
           })),
         };
       })

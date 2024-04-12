@@ -126,7 +126,8 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
     attainments: attainments.map(attainment => ({
       attainmentId: attainment.id,
       attainmentName: attainment.name,
-      grades: userGrades[userId][attainment.id],
+      grades:
+        (userGrades[userId][attainment.id] as GradeOption[] | undefined) ?? [],
     })),
   }));
 
