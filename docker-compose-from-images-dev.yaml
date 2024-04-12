@@ -30,7 +30,7 @@ services:
     extends:
       file: ./common-services.yaml
       service: frontend-minimum
-    image: ghcr.io/aalto-grades/aalto-grades-frontend-test:test
+    image: ghcr.io/aalto-grades/aalto-grades-frontend-dev:dev
     container_name: frontend-server
 
   backend:
@@ -39,7 +39,7 @@ services:
       service: backend-minimum
     build:
       context: .
-      dockerfile: ./server/dockerfiles/Dockerfile.prod.run.test
+      dockerfile: ./server/dockerfiles/Dockerfile.prod.run.dev
     container_name: backend-server
     environment:
       AALTO_GRADES_JWT_SECRET: "${AALTO_GRADES_JWT_SECRET}"
