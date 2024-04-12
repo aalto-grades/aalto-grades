@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {test, expect} from '@playwright/test';
-import {setupDb, cleanDb} from './helper';
+import {expect, test} from '@playwright/test';
+import {cleanDb, setupDb} from './helper';
 
 test.beforeAll(async () => {
   await setupDb();
@@ -31,8 +31,8 @@ test.afterEach(async ({page}) => {
 
 test.describe('Test Courses as Admin', () => {
   test('Check course', async ({page}) => {
-    await page.getByRole('cell', {name: 'Programming 1'}).click();
-    await expect(page.getByText('William Thomas')).toBeVisible();
+    await page.getByRole('cell', {name: 'O1'}).click();
+    await expect(page.getByRole('heading', {name: 'O1'})).toBeVisible();
   });
 
   test('Add course', async ({page}) => {
@@ -59,18 +59,21 @@ test.describe('Test Courses as Admin', () => {
     await page.getByLabel('Course language*').click();
     await page.getByRole('option', {name: 'Japanese'}).click();
     await page.getByLabel('Teachers In Charge*').click();
-    await page.getByLabel('Teachers In Charge*').fill('admin@aalto.fi');
-    await page.getByRole('button', {name: 'Add'}).click();
-    await page.getByText('Create a New CourseCourse').click();
+    await page.getByLabel('Teachers In Charge*').fill('teacher@aalto.fi');
+    await page.getByRole('button', {name: 'Add'}).first().click();
+    await page.getByLabel('Assistants*').click();
+    await page.getByLabel('Assistants*').fill('teacher2@aalto.fi');
+    await page.getByRole('button', {name: 'Add'}).nth(1).click();
     await page.getByRole('button', {name: 'Submit'}).click();
-    await page.getByRole('link', {name: 'Aalto Grades'}).click();
+    await expect(page.getByRole('heading', {name: 'testcourse'})).toBeVisible();
+    await page.getByRole('link', {name: 'A! Grades'}).click();
     await expect(
       page.getByRole('cell', {name: 'testcourse'}).nth(1)
     ).toBeVisible();
   });
 
   test('Edit course', async ({page}) => {
-    await page.getByRole('cell', {name: 'Programming 2'}).click();
+    await page.getByRole('cell', {name: 'O1'}).click();
     await page.getByRole('button', {name: 'Edit Course'}).click();
     await page.getByLabel('Course Code*').click();
     await page.getByLabel('Course Code*').fill('CS-A1120 - edit');
@@ -103,46 +106,31 @@ test.describe('Test Courses as Admin', () => {
     await page.getByLabel('Course language*').click();
     await page.getByRole('option', {name: 'Chinese'}).click();
 
-    await page.getByRole('button', {name: 'Submit'}).click();
-    await page.getByRole('link', {name: 'Aalto Grades'}).click();
-    await page.getByRole('cell', {name: 'Programming 2'}).click();
-    await expect(
-      page.getByRole('heading', {name: 'CS-A1120 - edit'})
-    ).toBeVisible();
-    await expect(
-      page.getByRole('heading', {name: 'Programming 2'})
-    ).toBeVisible();
+    await page.getByRole('button', {name: 'Save'}).click();
+    await page.getByRole('link', {name: 'A! Grades'}).click();
+    await page.getByRole('cell', {name: 'O1'}).click();
+    await expect(page.getByText('CS-A1120 - edit')).toBeVisible();
+    await expect(page.getByRole('heading', {name: 'O1'})).toBeVisible();
   });
 
-  // We know these are currently broken because of API
-  // test('Create assessment model', async ({page}) => {
-  //   await page.getByRole('cell', {name: 'Programming 2'}).click();
-  //   await page.getByLabel('New assessment model').click();
-  //   await page.getByLabel('Name*').click();
-  //   await page.getByLabel('Name*').fill('testmodel');
-  //   await page.getByRole('button', {name: 'Submit'}).click();
-  //   await expect(page.getByText('testmodel')).toBeAttached();
-  // });
-
-  test('Create course instance', async ({page}) => {
-    await page.getByRole('cell', {name: 'Programming 2'}).click();
-    await page.getByRole('button', {name: 'Add instance'}).click();
-    await expect(
-      page.getByRole('heading', {name: 'Instances Found from Sisu'})
-    ).toBeVisible();
-    await page.getByRole('button', {name: 'Start from Scratch'}).click();
-    await page.getByLabel('Type*').click();
-    await page.getByLabel('Type*').fill('testinst');
-    await page.getByLabel('Starting Date*').click();
-    await page.getByLabel('Ending Date*').click();
-    await page.getByLabel('Starting Period*').click();
-    await page.locator('#menu-startingPeriod div').first().click();
-    await page.getByLabel('Ending Period*').click();
-    await page.locator('#menu-endingPeriod div').first().click();
+  test('Create assessment model', async ({page}) => {
+    await page.getByRole('cell', {name: 'O1'}).click();
+    await page.getByRole('button', {name: 'Grading Models'}).click();
+    await page.getByLabel('New assessment model').click();
+    await page.getByLabel('Name *').click();
+    await page.getByLabel('Name *').fill('test');
+    await page.getByLabel('Select template').click();
+    await page.getByRole('option', {name: 'Addition'}).click();
     await page.getByRole('button', {name: 'Submit'}).click();
+    await expect(page.getByTestId('rf__node-addition')).toBeVisible();
+    await page.getByRole('button', {name: 'Format'}).click();
     await expect(
-      page.getByRole('cell', {name: 'testinst'}).first()
-    ).toBeAttached();
+      page.locator('p').filter({hasText: 'Unsaved changes'})
+    ).toBeVisible();
+    await page.getByRole('button', {name: 'Save'}).click();
+    await page.getByRole('button', {name: 'Grades', exact: true}).click();
+    await page.getByRole('button', {name: 'Grading Models'}).click();
+    await expect(page.getByRole('button', {name: 'test'})).toBeVisible();
   });
 });
 
@@ -150,11 +138,11 @@ test.describe('Manage users as admin', () => {
   test('Add user', async ({page}) => {
     await page.getByRole('button', {name: 'Add user'}).click();
     await page.getByLabel('Email').click();
-    await page.getByLabel('Email').fill('teste2e@aalto.fi');
+    await page.getByLabel('Email').fill('testuser@aalto.fi');
     await page.getByRole('button', {name: 'Add User'}).click();
     await page.goto('/');
     await expect(
-      page.getByRole('cell', {name: 'teste2e@aalto.fi'})
+      page.getByRole('cell', {name: 'testuser@aalto.fi'})
     ).toBeAttached();
   });
 });
