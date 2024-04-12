@@ -1,0 +1,19 @@
+// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
+// For @typescript-eslint to work
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "paths": {
+      "@common/*": ["../common/*"]
+    },
+    "esModuleInterop": true,
+    "strict": true,
+    "target": "es6"
+  },
+  "exclude": ["node_modules"],
+  "include": ["tests/**/*", "playwright.config.ts"]
+}
