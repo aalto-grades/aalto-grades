@@ -4,51 +4,33 @@
 
 import supertest from 'supertest';
 
-import {SystemRole} from '@common/types';
 import {app} from '../../src/app';
 
 const request = supertest(app);
-
-export interface Cookies {
+export type Cookies = {
   adminCookie: string[];
-  userCookie: string[];
-}
+  teacherCookie: string[];
+};
 
 /**
- * Utility function to generate and retrieve cookies for an admin and user account.
- * The function simulates sign up requests for both roles and extracts cookies from the response.
+ * Utility function to generate and retrieve cookies for an admin and teacher account.
+ * The function simulates login requests for both roles and extracts cookies from the response.
  * These cookies can be used to simulate authenticated requests in testing scenarios.
  * @returns {Promise<Cookies>} Generated cookies.
  */
-export async function getCookies(): Promise<Cookies> {
-  const adminEmail: string = `admin${new Date().getTime()}@aalto.fi`;
-  const userEmail: string = `user${new Date().getTime()}@aalto.fi`;
-
-  // TODO: Signup route has been removed, use login instead
-  const adminRes: supertest.Response = await request
-    .post('/v1/auth/signup')
+export const getCookies = async (): Promise<Cookies> => {
+  const adminRes = await request
+    .post('/v1/auth/login')
     .set('Accept', 'application/json')
-    .send({
-      email: adminEmail,
-      name: 'aalto tester',
-      password: 'grades',
-      studentNumber: new Date().getTime(),
-      role: SystemRole.Admin,
-    });
+    .send({email: 'admin@aalto.fi', password: 'password'});
 
-  const userRes: supertest.Response = await request
-    .post('/v1/auth/signup')
+  const teacherRes = await request
+    .post('/v1/auth/login')
     .set('Accept', 'application/json')
-    .send({
-      email: userEmail,
-      name: 'aalto tester',
-      password: 'grades',
-      studentNumber: new Date().getTime(),
-      role: SystemRole.User,
-    });
+    .send({email: 'teacher@aalto.fi', password: 'password'});
 
   return {
     adminCookie: [adminRes.headers['set-cookie']],
-    userCookie: [userRes.headers['set-cookie']],
+    teacherCookie: [teacherRes.headers['set-cookie']],
   };
-}
+};

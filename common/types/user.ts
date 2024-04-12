@@ -19,12 +19,11 @@ export const TeacherDataSchema = z.object({
 export const AddIdpUserSchema = z.object({
   email: z.string().email(),
 });
-export const IdpUsersSchema = z.array(
-  z.object({
-    id: z.number().int(),
-    email: z.string().email().nullable(),
-  })
-);
+export const IdpUserSchema = z.object({
+  id: z.number().int(),
+  email: z.string().email().nullable(),
+});
+export const IdpUsersSchema = z.array(IdpUserSchema);
 
 export type UserData = z.infer<typeof UserDataSchema>;
 export type TeacherData = z.infer<typeof TeacherDataSchema>;

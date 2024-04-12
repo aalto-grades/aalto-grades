@@ -43,33 +43,6 @@ export const getDateOfLatestGrade = async (
   );
 };
 
-/**
- * Determines if a grade has expired based on its ID.
- * Throws Error if the grade ID is invalid.
- */
-export const gradeIsExpired = async (gradeId: number): Promise<boolean> => {
-  interface GradeWithAttainment extends AttainmentGrade {
-    Attainment: Attainment;
-  }
-
-  const grade = (await AttainmentGrade.findByPk(gradeId, {
-    include: [{model: Attainment}],
-  })) as GradeWithAttainment | null;
-
-  if (grade === null) {
-    throw new Error(
-      `failed to determine whether grade is expired, invalid ID ${gradeId}`
-    );
-  }
-
-  const date = await getDateOfLatestGrade(
-    grade.userId,
-    grade.Attainment.courseId
-  );
-
-  return date >= grade.expiryDate;
-};
-
 export const studentNumbersExist = async (
   studentNumbers: string[]
 ): Promise<void> => {
@@ -96,6 +69,7 @@ export const studentNumbersExist = async (
 };
 
 export const getFinalGradesFor = async (
+  courseId: number,
   studentNumbers: string[],
   skipErrorOnEmpty: boolean = false
 ): Promise<FinalGrade[]> => {
@@ -116,6 +90,7 @@ export const getFinalGradesFor = async (
   }
 
   const finalGrades = await FinalGrade.findAll({
+    where: {courseId: courseId},
     include: [
       {
         model: User,

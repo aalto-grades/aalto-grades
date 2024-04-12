@@ -49,13 +49,19 @@ export const getFinalGrades = async (
 
   await isTeacherInChargeOrAdmin(grader, courseId);
 
-  const finalGrades: FinalGradeData[] = (
-    await FinalGrade.findAll({
-      where: {courseId: courseId},
-    })
-  ).map(finalGrade => ({
-    ...finalGrade.dataValues,
-    date: new Date(finalGrade.dataValues.date),
+  const dbFinalGrades = await FinalGrade.findAll({where: {courseId: courseId}});
+
+  const finalGrades: FinalGradeData[] = dbFinalGrades.map(finalGrade => ({
+    userId: finalGrade.userId,
+    courseId: finalGrade.courseId,
+    assessmentModelId: finalGrade.assessmentModelId,
+    graderId: finalGrade.graderId,
+    grade: finalGrade.grade,
+    date: new Date(finalGrade.date),
+    sisuExportDate:
+      finalGrade.sisuExportDate === null
+        ? null
+        : new Date(finalGrade.sisuExportDate),
   }));
 
   return res.json(finalGrades);

@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AssesmentModelDataSchema,
   AssessmentModelData,
   AssessmentModelDataArraySchema,
+  AssessmentModelDataSchema,
   IdSchema,
 } from '@common/types';
 import {
@@ -41,7 +41,7 @@ export const useGetAssessmentModel = (
   useQuery({
     queryKey: ['assessment-model', courseId, assessmentModelId],
     queryFn: async () =>
-      AssesmentModelDataSchema.parse(
+      AssessmentModelDataSchema.parse(
         (
           await axios.get(
             `/v1/courses/${courseId}/assessment-models/${assessmentModelId}`

@@ -42,7 +42,7 @@ router.post(
 router.post(
   '/v1/courses/:courseId/grades',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  express.json({limit: '10mb'}),
+  express.json({limit: '25mb'}),
   handleInvalidRequestJson,
   processRequestBody(NewGradeArraySchema),
   controllerDispatcher(addGrades)

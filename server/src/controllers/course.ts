@@ -242,7 +242,6 @@ export const editCourse = async (
       }
 
       // Add teachers who are in the newTeachers array but not in the database.
-
       if (newTeachers.length > 0) {
         await TeacherInCharge.bulkCreate(
           newTeachers.map(teacher => ({

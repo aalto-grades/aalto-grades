@@ -2,27 +2,23 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode, SystemRole} from '@common/types';
-import {Cookie, CookieAccessInfo} from 'cookiejar';
+import {CookieAccessInfo} from 'cookiejar';
 import * as fs from 'fs';
 import mockdate from 'mockdate';
 import supertest from 'supertest';
 
+import {HttpCode, LoginResultSchema, SystemRole} from '@common/types';
+import {app} from '../../src/app';
 import {
   JWT_COOKIE_EXPIRY_MS,
   JWT_EXPIRY_SECONDS,
 } from '../../src/configs/constants';
-
-import {app} from '../../src/app';
+import {ErrorSchema} from '../util/general';
 
 const request = supertest(app);
 
-jest.mock('fs', () => {
-  return {
-    __esModule: true,
-    ...jest.requireActual('fs'),
-  };
-});
+// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+jest.mock('fs', () => ({__esModule: true, ...jest.requireActual('fs')}));
 
 describe('Test GET /v1/auth/self-info - check users own info', () => {
   it('should act differently when user is logged in or out', async () => {
@@ -35,21 +31,16 @@ describe('Test GET /v1/auth/self-info - check users own info', () => {
     await agent
       .post('/v1/auth/login')
       .withCredentials(true)
-      .send({email: 'sysadmin@aalto.fi', password: 'grades'})
+      .send({email: 'admin@aalto.fi', password: 'password'})
       .expect('Content-Type', /json/)
       .expect(HttpCode.Ok)
       .expect('set-cookie', /jwt=/)
       .expect('set-cookie', /httponly/i);
 
-    await agent
+    const res = await agent
       .get('/v1/auth/self-info')
       .withCredentials(true)
-      .expect(HttpCode.Ok)
-      .then((res: supertest.Response) => {
-        expect(res.body.errors).not.toBeDefined();
-        expect(res.body.data.role).toBe(SystemRole.Admin);
-        expect(res.body.data.name).toBe('Aalto Sysadmin');
-      });
+      .expect(HttpCode.Ok);
     await agent
       .post('/v1/auth/logout')
       .withCredentials(true)
@@ -59,43 +50,50 @@ describe('Test GET /v1/auth/self-info - check users own info', () => {
       .get('/v1/auth/self-info')
       .withCredentials(true)
       .expect(HttpCode.Unauthorized);
+
+    const result = await LoginResultSchema.strict().safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
   });
 });
 
 describe('Test POST /v1/auth/login - logging in with an existing user', () => {
   it('should respond with 401 unauthorized, if logging in with invalid credentials', async () => {
-    async function badCreds(credentials: {
+    const badCreds = async (credentials: {
       email: string;
       password: string;
-    }): Promise<void> {
-      return request
+    }): Promise<void> => {
+      const res = await request
         .post('/v1/auth/login')
         .set('Accept', 'application/json')
         .send(credentials)
         .expect(HttpCode.Unauthorized)
-        .expect('Content-Type', /json/)
-        .then((res: supertest.Response) => {
-          expect(res.body.data).not.toBeDefined();
-          expect(res.body.errors[0]).toMatch(/incorrect email or password/);
-        });
-    }
-    await badCreds({email: 'aalto', password: 'grades'});
-    await badCreds({email: 'aalto', password: ''});
-    await badCreds({email: 'sysadmin@aalto.fi', password: ''});
-    await badCreds({email: 'sysadmin@aalto.fi', password: 'grade'});
+        .expect('Content-Type', /json/);
+
+      const result = await ErrorSchema.safeParseAsync(res.body);
+      expect(result.success).toBeTruthy();
+      if (result.success)
+        expect(result.data.errors[0]).toMatch(/incorrect email or password/);
+    };
+
+    await badCreds({email: 'admin', password: 'password'});
+    await badCreds({email: 'aalto.fi', password: 'password'});
+    await badCreds({email: 'admin@aalto.fi', password: ''});
+    await badCreds({email: 'admin@aalto.fi', password: 'password '});
   });
 
   it('should allow logging in with the correct credentials', async () => {
-    await request
+    const res = await request
       .post('/v1/auth/login')
-      .send({email: 'sysadmin@aalto.fi', password: 'grades'})
+      .send({email: 'admin@aalto.fi', password: 'password'})
       .expect('Content-Type', /json/)
-      .expect(HttpCode.Ok)
-      .then((res: supertest.Response) => {
-        expect(res.body.errors).not.toBeDefined();
-        expect(res.body.data.role).toBe(SystemRole.Admin);
-        expect(res.body.data.name).toBe('Aalto Sysadmin');
-      });
+      .expect(HttpCode.Ok);
+
+    const result = await LoginResultSchema.strict().safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
+    if (result.success) {
+      expect(result.data.role).toBe(SystemRole.Admin);
+      expect(result.data.name).toBe('Andy Admin');
+    }
   });
 });
 
@@ -103,30 +101,27 @@ describe('Test POST /v1/auth/login and expiry', () => {
   it('should expire the session after a set time', async () => {
     // Use the agent for cookie persistence
     const agent = supertest.agent(app);
-    const realDate: Date = new Date();
+    const realDate = new Date();
     await agent
       .post('/v1/auth/login')
       .withCredentials(true)
-      .send({email: 'sysadmin@aalto.fi', password: 'grades'})
+      .send({email: 'admin@aalto.fi', password: 'password'})
       .expect('Content-Type', /json/)
       .expect(HttpCode.Ok);
     await agent
       .get('/v1/auth/self-info')
       .withCredentials(true)
       .expect(HttpCode.Ok);
-    const jwt: Cookie | undefined = agent.jar.getCookie(
-      'jwt',
-      CookieAccessInfo.All
-    );
-    if (!jwt) {
-      throw new Error('jwt not available');
-    }
+    const jwt = agent.jar.getCookie('jwt', CookieAccessInfo.All);
+    if (!jwt) throw new Error('jwt not available');
+
     // Simulate situtation where the browser does not properly expire the cookie
     mockdate.set(
       realDate.setMilliseconds(
         realDate.getMilliseconds() + JWT_COOKIE_EXPIRY_MS + 1
       )
     );
+    // eslint-disable-next-line camelcase
     jwt.expiration_date = realDate.setSeconds(
       realDate.getSeconds() + JWT_EXPIRY_SECONDS * 2
     );
@@ -147,20 +142,17 @@ describe('Test POST /v1/auth/login and expiry', () => {
 
 describe('Test GET /v1/auth/login-idp - check redirect', () => {
   it('should redirect to idp', async () => {
-    await request.get('/v1/auth/login-idp').then((res: supertest.Response) => {
-      expect(res.headers.location).toContain('idp.aalto');
-    });
+    const res = await request.get('/v1/auth/login-idp');
+    expect(res.headers.location).toContain('idp.aalto');
   });
 });
 
 describe('Test GET /v1/auth/saml/metadata - check metadata file exists', () => {
   it('should get a metadata file', async () => {
     jest.spyOn(fs, 'readFileSync').mockImplementationOnce(() => 'mock');
-    await request
-      .get('/v1/auth/saml/metadata')
-      .then((res: supertest.Response) => {
-        expect(res.headers['content-type']).toContain('application/xml');
-        expect(res.text).toContain('X509Certificate');
-      });
+
+    const res = await request.get('/v1/auth/saml/metadata');
+    expect(res.headers['content-type']).toContain('application/xml');
+    expect(res.text).toContain('X509Certificate');
   });
 });
