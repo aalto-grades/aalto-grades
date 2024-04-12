@@ -17,4 +17,4 @@ done
 sleep 10
 echo "URL reached"
 
-${cmd}
+npx playwright test

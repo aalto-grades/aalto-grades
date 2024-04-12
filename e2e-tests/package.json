@@ -1,22 +1,21 @@
 {
-  "name": "aalto-grades-e2e-tests",
+  "name": "playwright",
   "version": "1.0.0",
   "description": "",
-  "scripts": {
-    "lint": "eslint . --ext ts --report-unused-disable-directives",
-    "lint:fix": "eslint . --ext ts --report-unused-disable-directives --fix"
-  },
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "engines": {
     "node": ">=18.0.0"
   },
-  "author": "The Aalto Grades Developers",
-  "license": "Expat (MIT)",
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^6.4.0",
-    "@typescript-eslint/parser": "^6.4.0",
-    "cypress": "^13.6.3",
-    "eslint": "^8.47.0",
-    "eslint-plugin-cypress": "^2.14.0",
-    "typescript": "^5.1.6"
+    "@playwright/test": "^1.41.1",
+    "@types/node": "^20.11.15",
+    "@types/pg": "^8.11.2"
+  },
+  "dependencies": {
+    "pg": "^8.11.3"
   }
 }
