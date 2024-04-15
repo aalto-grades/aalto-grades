@@ -3,15 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {
-  RenderResult,
-  act,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react';
+import {RenderResult, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {wait} from '@testing-library/user-event/dist/utils';
 import {http} from 'msw';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 
@@ -31,39 +24,39 @@ describe('Tests for EditCourseView components', () => {
       </QueryClientProvider>
     );
 
-  test('EditCourseView should render all of the appropriate components', async () => {
+  test('EditCourseView should render all of the appropriate components', () => {
     renderEditCourseView();
-    await act(async () => await wait(200));
 
-    expect(screen.getByLabelText('Course Code*')).toBeDefined();
-    expect(screen.getByLabelText('Course Name in English*')).toBeDefined();
-    expect(screen.getByLabelText('Course Name in Finnish*')).toBeDefined();
-    expect(screen.getByLabelText('Course Name in Swedish*')).toBeDefined();
-    expect(
-      screen.getByLabelText('Organizing department in English*')
-    ).toBeDefined();
-    expect(
-      screen.getByLabelText('Organizing department in Finnish*')
-    ).toBeDefined();
-    expect(
-      screen.getByLabelText('Organizing department in Swedish*')
-    ).toBeDefined();
-    expect(
-      screen.getByLabelText('Minimum Course Credits (ECTS)*')
-    ).toBeDefined();
-    expect(
-      screen.getByLabelText('Maximum Course Credits (ECTS)*')
-    ).toBeDefined();
-    expect(screen.getByLabelText('Grading Scale*')).toBeInTheDocument();
-    expect(screen.getByLabelText('Course language*')).toBeInTheDocument();
-    expect(screen.getByLabelText('Teachers In Charge*')).toBeDefined();
-    expect(screen.getAllByText('Add')[0]).toBeDefined();
-    expect(screen.getByText('Save')).toBeDefined();
+    waitFor(() => {
+      expect(screen.getByLabelText('Course Code*')).toBeDefined();
+      expect(screen.getByLabelText('Course Name in English*')).toBeDefined();
+      expect(screen.getByLabelText('Course Name in Finnish*')).toBeDefined();
+      expect(screen.getByLabelText('Course Name in Swedish*')).toBeDefined();
+      expect(
+        screen.getByLabelText('Organizing department in English*')
+      ).toBeDefined();
+      expect(
+        screen.getByLabelText('Organizing department in Finnish*')
+      ).toBeDefined();
+      expect(
+        screen.getByLabelText('Organizing department in Swedish*')
+      ).toBeDefined();
+      expect(
+        screen.getByLabelText('Minimum Course Credits (ECTS)*')
+      ).toBeDefined();
+      expect(
+        screen.getByLabelText('Maximum Course Credits (ECTS)*')
+      ).toBeDefined();
+      expect(screen.getByLabelText('Grading Scale*')).toBeInTheDocument();
+      expect(screen.getByLabelText('Course language*')).toBeInTheDocument();
+      expect(screen.getByLabelText('Teachers In Charge*')).toBeDefined();
+      expect(screen.getAllByText('Add')[0]).toBeDefined();
+      expect(screen.getByText('Save')).toBeDefined();
+    });
   });
 
-  test('EditCourseView should allow an admin to create a course', async () => {
+  test('EditCourseView should allow an admin to create a course', () => {
     renderEditCourseView();
-    await act(async () => await wait(200));
 
     const addCourse = vi.fn();
     server.use(http.put('/v1/courses/1', mockPostSuccess(addCourse, {})));
@@ -96,21 +89,20 @@ describe('Tests for EditCourseView components', () => {
     };
     const testTeacher = 'new.teacher@aalto.fi';
 
-    for (const {label, value} of Object.values(testValues)) {
-      act(() => {
-        userEvent.clear(screen.getByLabelText(label));
-        userEvent.type(screen.getByLabelText(label), value.toString());
-      });
-    }
+    waitFor(async () => {
+      for (const {label, value} of Object.values(testValues)) {
+        await userEvent.clear(screen.getByLabelText(label));
+        await userEvent.type(screen.getByLabelText(label), value.toString());
+      }
 
-    act(() =>
-      userEvent.type(screen.getByLabelText('Teachers In Charge*'), testTeacher)
-    );
-    act(() => userEvent.click(screen.getAllByText('Add')[0]));
+      await userEvent.type(
+        screen.getByLabelText('Teachers In Charge*'),
+        testTeacher
+      );
+      await userEvent.click(screen.getAllByText('Add')[0]);
 
-    act(() => userEvent.click(screen.getByText('Save')));
+      await userEvent.click(screen.getByText('Save'));
 
-    await waitFor(() => {
       expect(addCourse).toHaveBeenCalledTimes(1);
       expect(addCourse).toHaveBeenCalledWith({
         courseCode: testValues.courseCode.value,

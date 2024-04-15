@@ -5,7 +5,6 @@
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {
   RenderResult,
-  act,
   cleanup,
   render,
   screen,
@@ -56,13 +55,13 @@ describe('Tests for button component displaying user data and logout', () => {
     );
   });
 
-  test('Clicking user button should display logout option', () => {
+  test('Clicking user button should display logout option', async () => {
     const auth: LoginResult = {id: 1, role: SystemRole.User, name: 'John Doe'};
     renderButton(auth);
 
     const button: HTMLElement = screen.getByText('John Doe');
     expect(button).toBeDefined();
-    act(() => userEvent.click(button));
+    await userEvent.click(button);
 
     const logoutButton: HTMLElement = screen.getByText('Logout');
     expect(logoutButton).toBeDefined();
