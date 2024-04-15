@@ -2,95 +2,95 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {DefaultBodyType, ResponseResolver, http, type PathParams} from 'msw';
+import {ResponseResolver, http} from 'msw';
 import {SetupServer, setupServer} from 'msw/node';
-
-import {type HttpRequestResolverExtras} from 'msw/lib/core/handlers/HttpHandler';
 import {Mock} from 'vitest';
-import {mockAssessmentModels} from './mockAssessmentModels';
-import {mockAttainments} from './mockAttainments';
-import {mockCourses} from './mockCourses';
-import {mockFinalGrades} from './mockFinalGrades';
 
-export function mockSuccess(data: unknown) {
-  return async () => {
-    return new Response(JSON.stringify({data: data}), {
-      headers: {
-        'Content-Type': 'application/json',
-      },
+import {mockAssessmentModel} from './mockAssessmentModel';
+import {mockAttainments} from './mockAttainments';
+import {mockCourse} from './mockCourse';
+import {mockFinalGrades} from './mockFinalGrades';
+import {mockGrades} from './mockGrades';
+
+export const mockSuccess = (data: unknown): ResponseResolver => {
+  return () =>
+    new Response(JSON.stringify(data), {
+      headers: {'Content-Type': 'application/json'},
       status: 200,
     });
-  };
-}
+};
 
-export function mockFailure(errors: Array<string>, status: number) {
-  return async () => {
-    return new Response(JSON.stringify({errors: errors}), {
-      headers: {
-        'Content-Type': 'application/json',
-      },
+export function mockFailure(
+  errors: string[],
+  status: number
+): ResponseResolver {
+  return () =>
+    new Response(JSON.stringify({errors: errors}), {
+      headers: {'Content-Type': 'application/json'},
       status: status,
     });
-  };
 }
 
-export function mockPostSuccess(
+export const mockPostSuccess = (
   func: Mock,
   data: unknown
-): ResponseResolver<
-  HttpRequestResolverExtras<PathParams>,
-  DefaultBodyType,
-  undefined
-> {
+): ResponseResolver => {
   return async ({request}) => {
     func(await request.json());
     return new Response(JSON.stringify({data: data}), {
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: {'Content-Type': 'application/json'},
       status: 200,
     });
   };
-}
+};
 
 export const server: SetupServer = setupServer(
-  http.get('*/v1/courses', mockSuccess(mockCourses)),
-  http.get('*/v1/courses/:courseId', mockSuccess(mockCourses[0])),
+  http.get('/v1/courses/1/grades', mockSuccess(mockGrades)),
+  http.get(
+    '/v1/courses/1/assessment-models',
+    mockSuccess([mockAssessmentModel])
+  ),
+  http.get('/v1/courses/1/finalGrades', mockSuccess(mockFinalGrades)),
+  http.get('/v1/courses/1/attainments', mockSuccess(mockAttainments)),
+  http.get('/v1/courses/1', mockSuccess(mockCourse))
 
-  http.get(
-    '*/v1/courses/:courseId/assessment-models',
-    mockSuccess(mockAssessmentModels)
-  ),
-  http.get(
-    '*/v1/courses/:courseId/assessment-models:assessmentModelId',
-    mockSuccess(mockAssessmentModels[0])
-  ),
+  // http.get('*/v1/courses', mockSuccess(mockCourses)),
+  // http.get('*/v1/courses/:courseId', mockSuccess(mockCourses[0])),
 
-  http.get(
-    '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments',
-    mockSuccess(mockAttainments)
-  ),
-  http.get(
-    '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
-    // mockSuccess(mockAttainments.subAttainments![2])
-    mockSuccess(mockAttainments)
-  ),
+  // http.get(
+  //   '*/v1/courses/:courseId/assessment-models',
+  //   mockSuccess(mockAssessmentModels)
+  // ),
+  // http.get(
+  //   '*/v1/courses/:courseId/assessment-models:assessmentModelId',
+  //   mockSuccess(mockAssessmentModels[0])
+  // ),
 
-  http.get(
-    '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades',
-    mockSuccess(mockFinalGrades)
-  ),
-  http.post(
-    '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/calculate',
-    mockSuccess({})
-  ),
-  http.post(
-    '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv',
-    mockSuccess({})
-  ),
+  // http.get(
+  //   '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments',
+  //   mockSuccess(mockAttainments)
+  // ),
+  // http.get(
+  //   '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
+  //   // mockSuccess(mockAttainments.subAttainments![2])
+  //   mockSuccess(mockAttainments)
+  // ),
+
+  // http.get(
+  //   '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades',
+  //   mockSuccess(mockFinalGrades)
+  // ),
+  // http.post(
+  //   '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/calculate',
+  //   mockSuccess({})
+  // ),
+  // http.post(
+  //   '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv',
+  //   mockSuccess({})
+  // ),
 
   // http.get('*/v1/formulas', mockSuccess(mockFormulas)),
   // http.get('*/v1/formulas/:formulaId', mockSuccess(mockFormulas[0])),
 
-  http.get('*/v1/user/:userId/courses', mockSuccess(mockCourses))
+  // http.get('*/v1/user/:userId/courses', mockSuccess(mockCourses))
 );

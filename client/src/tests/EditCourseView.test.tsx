@@ -2,37 +2,39 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {GradingScale, Language} from '@common/types';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {
+  RenderResult,
+  act,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import {wait} from '@testing-library/user-event/dist/utils';
 import {http} from 'msw';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 
-import {act, render, screen, waitFor} from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-
+import {GradingScale, Language} from '@common/types';
 import EditCourseView from '../components/course-view/EditCourseView';
 import {mockPostSuccess, server} from './mock-data/server';
 
 describe('Tests for EditCourseView components', () => {
-  function renderEditCourseView(): void {
+  const renderEditCourseView = (): RenderResult =>
     render(
       <QueryClientProvider client={new QueryClient()}>
-        <MemoryRouter initialEntries={['/course/create']}>
+        <MemoryRouter initialEntries={['/1/edit']}>
           <Routes>
-            <Route
-              path="/course/:modification/:courseId?"
-              element={<EditCourseView />}
-            />
+            <Route path=":courseId/edit" element={<EditCourseView />} />
           </Routes>
         </MemoryRouter>
       </QueryClientProvider>
     );
-  }
 
-  test('EditCourseView should render all of the appropriate components', () => {
+  test('EditCourseView should render all of the appropriate components', async () => {
     renderEditCourseView();
+    await act(async () => await wait(200));
 
-    expect(screen.getByText('Create a New Course')).toBeDefined();
     expect(screen.getByLabelText('Course Code*')).toBeDefined();
     expect(screen.getByLabelText('Course Name in English*')).toBeDefined();
     expect(screen.getByLabelText('Course Name in Finnish*')).toBeDefined();
@@ -56,105 +58,78 @@ describe('Tests for EditCourseView components', () => {
     expect(screen.getByLabelText('Course language*')).toBeInTheDocument();
     expect(screen.getByLabelText('Teachers In Charge*')).toBeDefined();
     expect(screen.getAllByText('Add')[0]).toBeDefined();
-    expect(screen.getByText('Cancel')).toBeDefined();
-    expect(screen.getByText('Submit')).toBeDefined();
+    expect(screen.getByText('Save')).toBeDefined();
   });
 
   test('EditCourseView should allow an admin to create a course', async () => {
     renderEditCourseView();
+    await act(async () => await wait(200));
 
     const addCourse = vi.fn();
-    server.use(http.post('*/v1/courses', mockPostSuccess(addCourse, 1)));
+    server.use(http.put('/v1/courses/1', mockPostSuccess(addCourse, {})));
 
-    const testCode: string = 'Test code';
-    const testNameEn: string = 'Test name';
-    const testNameFi: string = 'Testi nimi';
-    const testNameSv: string = 'Sama ruotsiksi';
-    const testDepartmentEn: string = 'Test department';
-    const testDepartmentFi: string = 'Laitos xxx';
-    const testDepartmentSv: string = 'samma på svenska';
-    const testTeacher: string = 'Elon.Musk@twitter.com';
+    const testValues = {
+      courseCode: {label: 'Course Code*', value: 'Test code'},
+      nameFi: {label: 'Course Name in Finnish*', value: 'Testi nimi'},
+      nameEn: {label: 'Course Name in English*', value: 'Test name'},
+      nameSv: {label: 'Course Name in Swedish*', value: 'Sama ruotsiksi'},
+      departmentFi: {
+        label: 'Organizing department in Finnish*',
+        value: 'Laitos xxx',
+      },
+      departmentEn: {
+        label: 'Organizing department in English*',
+        value: 'Test department',
+      },
+      departmentSv: {
+        label: 'Organizing department in Swedish*',
+        value: 'samma på svenska',
+      },
+      minCredits: {
+        label: 'Minimum Course Credits (ECTS)*',
+        value: 3,
+      },
+      maxCredits: {
+        label: 'Maximum Course Credits (ECTS)*',
+        value: 5,
+      },
+    };
+    const testTeacher = 'new.teacher@aalto.fi';
 
-    act(() => userEvent.type(screen.getByLabelText('Course Code*'), testCode));
-    act(() =>
-      userEvent.type(
-        screen.getByLabelText('Course Name in English*'),
-        testNameEn
-      )
-    );
-    act(() =>
-      userEvent.type(
-        screen.getByLabelText('Course Name in Finnish*'),
-        testNameFi
-      )
-    );
-    act(() =>
-      userEvent.type(
-        screen.getByLabelText('Course Name in Swedish*'),
-        testNameSv
-      )
-    );
-    act(() =>
-      userEvent.type(
-        screen.getByLabelText('Organizing department in English*'),
-        testDepartmentEn
-      )
-    );
-    act(() =>
-      userEvent.type(
-        screen.getByLabelText('Organizing department in Finnish*'),
-        testDepartmentFi
-      )
-    );
-    act(() =>
-      userEvent.type(
-        screen.getByLabelText('Organizing department in Swedish*'),
-        testDepartmentSv
-      )
-    );
-    act(() =>
-      userEvent.type(
-        screen.getByLabelText('Minimum Course Credits (ECTS)*'),
-        '3'
-      )
-    );
-    act(() =>
-      userEvent.type(
-        screen.getByLabelText('Maximum Course Credits (ECTS)*'),
-        '5'
-      )
-    );
+    for (const {label, value} of Object.values(testValues)) {
+      act(() => {
+        userEvent.clear(screen.getByLabelText(label));
+        userEvent.type(screen.getByLabelText(label), value.toString());
+      });
+    }
+
     act(() =>
       userEvent.type(screen.getByLabelText('Teachers In Charge*'), testTeacher)
     );
-
     act(() => userEvent.click(screen.getAllByText('Add')[0]));
-    act(() => userEvent.click(screen.getByText('Submit')));
+
+    act(() => userEvent.click(screen.getByText('Save')));
 
     await waitFor(() => {
       expect(addCourse).toHaveBeenCalledTimes(1);
       expect(addCourse).toHaveBeenCalledWith({
-        assistants: [],
-        courseCode: testCode,
-        minCredits: 3,
-        maxCredits: 5,
+        courseCode: testValues.courseCode.value,
+        minCredits: testValues.minCredits.value,
+        maxCredits: testValues.maxCredits.value,
         gradingScale: GradingScale.Numerical,
         languageOfInstruction: Language.English,
         department: {
-          fi: testDepartmentFi,
-          sv: testDepartmentSv,
-          en: testDepartmentEn,
+          fi: testValues.departmentFi.value,
+          en: testValues.departmentEn.value,
+          sv: testValues.departmentSv.value,
         },
         name: {
-          fi: testNameFi,
-          sv: testNameSv,
-          en: testNameEn,
+          fi: testValues.nameFi.value,
+          en: testValues.nameEn.value,
+          sv: testValues.nameSv.value,
         },
-        teachersInCharge: [
-          {
-            email: testTeacher,
-          },
-        ],
+        teachersInCharge: ['teacher@aalto.fi', testTeacher],
+        assistants: [],
       });
     });
   });
