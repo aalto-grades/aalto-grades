@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import {StudentRow} from '@common/types';
 
 export const mockGrades: StudentRow[] = [

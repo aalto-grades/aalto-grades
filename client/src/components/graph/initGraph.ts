@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import {AttainmentData} from '@common/types';
 import {FullNodeData, GraphStructure, NodeData} from '@common/types/graph';
 import {Edge, Node} from 'reactflow';
