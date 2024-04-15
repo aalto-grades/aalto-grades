@@ -27,6 +27,8 @@ jobs:
           node-version: '18'
       - name: Install dependencies
         run: npm ci
+      - name: Install common dependencies
+        run: npm --prefix ../common ci
       - name: Run tests
         run: npm test
       - name: Install linter dependencies
@@ -51,6 +53,8 @@ jobs:
           node-version: '18'
       - name: Install dependencies
         run: npm ci
+      - name: Install common dependencies
+        run: npm --prefix ../common ci
       - name: Docker compose down
         run: docker-compose down --volumes --remove-orphans
       - name: Docker compose build
