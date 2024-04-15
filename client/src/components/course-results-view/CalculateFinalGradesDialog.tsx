@@ -135,7 +135,10 @@ const CalculateFinalGradesDialog = ({
         </Collapse>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleSubmit}>Confirm</Button>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={handleSubmit} variant="contained">
+          Confirm
+        </Button>
       </DialogActions>
     </Dialog>
   );

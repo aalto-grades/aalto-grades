@@ -6,30 +6,21 @@ import {FinalGradeData} from '@common/types';
 
 export const mockFinalGrades: FinalGradeData[] = [
   {
-    userId: 1,
+    userId: 6,
     courseId: 1,
     assessmentModelId: 1,
-    graderId: 5,
-    grade: 5,
-    date: new Date('2023-01-01'),
+    graderId: 2,
+    grade: 4,
+    date: new Date(),
     sisuExportDate: null,
   },
   {
-    userId: 2,
+    userId: 7,
     courseId: 1,
     assessmentModelId: 1,
-    graderId: 5,
-    grade: 5,
-    date: new Date('2023-01-01'),
-    sisuExportDate: null,
-  },
-  {
-    userId: 3,
-    courseId: 1,
-    assessmentModelId: 1,
-    graderId: 5,
-    grade: 5,
-    date: new Date('2023-01-01'),
+    graderId: 2,
+    grade: 0,
+    date: new Date(),
     sisuExportDate: null,
   },
 ];

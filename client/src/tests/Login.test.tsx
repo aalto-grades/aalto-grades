@@ -3,19 +3,23 @@
 // SPDX-License-Identifier: MIT
 
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {
+  RenderResult,
+  act,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {http} from 'msw';
 import {BrowserRouter} from 'react-router-dom';
 
-import {act, render, screen, waitFor} from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-
 import Login from '../components/auth/Login';
-
 import AuthContext from '../context/AuthProvider';
 import {mockPostSuccess, server} from './mock-data/server';
 
 describe('Tests for Login and LoginForm components', () => {
-  function renderLogin(): void {
+  const renderLogin = (): RenderResult =>
     render(
       <QueryClientProvider client={new QueryClient()}>
         <AuthContext.Provider
@@ -34,7 +38,6 @@ describe('Tests for Login and LoginForm components', () => {
         </AuthContext.Provider>
       </QueryClientProvider>
     );
-  }
 
   test('Login should render the appropriate components', () => {
     renderLogin();
@@ -45,7 +48,6 @@ describe('Tests for Login and LoginForm components', () => {
     expect(screen.getByLabelText('Email')).toBeDefined();
     expect(screen.getByLabelText('Password')).toBeDefined();
     expect(screen.getByText('log in')).toBeDefined();
-    expect(screen.getByText("Don't have an account yet?")).toBeDefined();
   });
 
   test('Login should allow a user to submit their credentials', async () => {

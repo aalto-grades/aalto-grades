@@ -123,5 +123,16 @@ export const mockGrades: StudentRow[] = [
         ],
       },
     ],
+    finalGrades: [
+      {
+        userId: 7,
+        courseId: 1,
+        assessmentModelId: 1,
+        graderId: 2,
+        grade: 0,
+        date: new Date(),
+        sisuExportDate: null,
+      },
+    ],
   },
 ];

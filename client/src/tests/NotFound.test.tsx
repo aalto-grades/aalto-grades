@@ -2,24 +2,23 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-
 import {
+  RenderResult,
   cleanup,
   render,
-  RenderResult,
   screen,
   waitFor,
 } from '@testing-library/react';
+import {MemoryRouter, Route, Routes} from 'react-router-dom';
 
 import NotFound from '../components/NotFound';
 
 afterEach(cleanup);
 
 describe('Tests for NotFound component', () => {
-  function renderFetchInstancesView(): RenderResult {
-    return render(
+  const renderFetchInstancesView = (): RenderResult =>
+    render(
       <QueryClientProvider client={new QueryClient()}>
         <MemoryRouter initialEntries={['/course-view/4/notfound']}>
           <Routes>
@@ -28,7 +27,6 @@ describe('Tests for NotFound component', () => {
         </MemoryRouter>
       </QueryClientProvider>
     );
-  }
 
   test('Not found page should display message when route does not exist', async () => {
     renderFetchInstancesView();
