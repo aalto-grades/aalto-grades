@@ -53,44 +53,4 @@ export const server: SetupServer = setupServer(
   http.get('/v1/courses/1/finalGrades', mockSuccess(mockFinalGrades)),
   http.get('/v1/courses/1/attainments', mockSuccess(mockAttainments)),
   http.get('/v1/courses/1', mockSuccess(mockCourse))
-
-  // http.get('*/v1/courses', mockSuccess(mockCourses)),
-  // http.get('*/v1/courses/:courseId', mockSuccess(mockCourses[0])),
-
-  // http.get(
-  //   '*/v1/courses/:courseId/assessment-models',
-  //   mockSuccess(mockAssessmentModels)
-  // ),
-  // http.get(
-  //   '*/v1/courses/:courseId/assessment-models:assessmentModelId',
-  //   mockSuccess(mockAssessmentModels[0])
-  // ),
-
-  // http.get(
-  //   '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments',
-  //   mockSuccess(mockAttainments)
-  // ),
-  // http.get(
-  //   '*/v1/courses/:courseId/assessment-models/:assessmentModelId/attainments/:attainmentId',
-  //   // mockSuccess(mockAttainments.subAttainments![2])
-  //   mockSuccess(mockAttainments)
-  // ),
-
-  // http.get(
-  //   '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades',
-  //   mockSuccess(mockFinalGrades)
-  // ),
-  // http.post(
-  //   '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/calculate',
-  //   mockSuccess({})
-  // ),
-  // http.post(
-  //   '*/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/csv',
-  //   mockSuccess({})
-  // ),
-
-  // http.get('*/v1/formulas', mockSuccess(mockFormulas)),
-  // http.get('*/v1/formulas/:formulaId', mockSuccess(mockFormulas[0])),
-
-  // http.get('*/v1/user/:userId/courses', mockSuccess(mockCourses))
 );
