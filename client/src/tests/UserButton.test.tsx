@@ -2,29 +2,26 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {LoginResult, SystemRole} from '@common/types';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {BrowserRouter} from 'react-router-dom';
-
 import {
-  act,
+  RenderResult,
   cleanup,
   render,
-  RenderResult,
   screen,
   waitFor,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {BrowserRouter} from 'react-router-dom';
 
+import {LoginResult, SystemRole} from '@common/types';
 import UserButton from '../components/auth/UserButton';
-
 import AuthContext from '../context/AuthProvider';
 
 afterEach(cleanup);
 
 describe('Tests for button component displaying user data and logout', () => {
-  function renderButton(auth: LoginResult | null): RenderResult {
-    return render(
+  const renderButton = (auth: LoginResult | null): RenderResult =>
+    render(
       <QueryClientProvider client={new QueryClient()}>
         <BrowserRouter>
           <AuthContext.Provider
@@ -42,7 +39,6 @@ describe('Tests for button component displaying user data and logout', () => {
         </BrowserRouter>
       </QueryClientProvider>
     );
-  }
 
   test('User button should display the currently logged in users name', async () => {
     const auth: LoginResult = {id: 1, role: SystemRole.User, name: 'John Doe'};
@@ -65,7 +61,7 @@ describe('Tests for button component displaying user data and logout', () => {
 
     const button: HTMLElement = screen.getByText('John Doe');
     expect(button).toBeDefined();
-    act(() => userEvent.click(button));
+    await userEvent.click(button);
 
     const logoutButton: HTMLElement = screen.getByText('Logout');
     expect(logoutButton).toBeDefined();

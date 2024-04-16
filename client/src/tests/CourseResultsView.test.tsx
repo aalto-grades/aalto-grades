@@ -2,23 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-
-import {
-  act,
-  render,
-  RenderResult,
-  screen,
-  // waitFor,
-} from '@testing-library/react';
+import {RenderResult, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {MemoryRouter, Route, Routes} from 'react-router-dom';
 
 import CourseResultsView from '../components/CourseResultsView';
 
 describe('Tests for CourseResultsView components', () => {
-  function renderCourseResultsView(): RenderResult {
-    return render(
+  const renderCourseResultsView = (): RenderResult =>
+    render(
       <QueryClientProvider client={new QueryClient()}>
         <MemoryRouter initialEntries={['/1/course-results/1']}>
           <Routes>
@@ -30,107 +23,74 @@ describe('Tests for CourseResultsView components', () => {
         </MemoryRouter>
       </QueryClientProvider>
     );
-  }
 
-  // Not really doing its job
-  // test('CourseResultsTable should render the correct number of rows', async () => {
-  //   renderCourseResultsView();
-
-  //   await waitFor(() => {
-  //     expect(screen.getByText('Course Results')).toBeInTheDocument();
-  //     expect(screen.getByText('Student Number')).toBeInTheDocument();
-  //     expect(screen.getByText('Final Grade')).toBeInTheDocument();
-  //     expect(screen.getByText('Calculate final grades')).toBeInTheDocument();
-  //   });
-  // });
-
-  test(
-    'CourseResultsTable should show a dialog for uploading a file after' +
-      ' clicking the upload button',
-    async () => {
-      renderCourseResultsView();
-
-      const uploadOption: HTMLElement = screen.getByText('Upload Grade CSV');
-      expect(uploadOption).toBeDefined();
-      act(() => userEvent.click(uploadOption));
-
-      const dialogTitle: HTMLElement = screen.getByText('Add Grades from File');
-      const uploadFileButton: HTMLElement = screen.getByText('Upload file');
-      const cancelButton: HTMLElement = screen.getByText('Cancel');
-      const submitButton: HTMLElement = screen.getByText('Submit');
-
-      expect(dialogTitle).toBeVisible();
-      expect(uploadFileButton).toBeVisible();
-      expect(cancelButton).toBeVisible();
-      expect(submitButton).toBeVisible();
-
-      act(() => userEvent.click(cancelButton));
-      expect(dialogTitle).not.toBeVisible();
-    }
-  );
-
-  /*
-  test(
-    'CourseResultsTable should show a dialog for downloading a Sisu CSV'
-    + ' after clicking the download button',
-    async () => {
-
-      renderCourseResultsView();
-
-      await waitFor(async () => {
-        const selectAllCheckBox: HTMLInputElement = screen.getByLabelText('Select all');
-        act(() => userEvent.click(selectAllCheckBox));
-        expect(selectAllCheckBox).toBeChecked();
-
-        const downloadSisuCsvButton: HTMLElement = await screen.findByText('Download Sisu CSV');
-        expect(downloadSisuCsvButton).toBeDefined();
-        act(() => userEvent.click(downloadSisuCsvButton));
-
-        const dialogTitle: HTMLElement = screen.getByText('Download final grades as Sisu CSV');
-        const exportButton: HTMLElement = screen.getByText('Download');
-        const cancelButton: HTMLElement = screen.getByText('Cancel');
-
-        expect(dialogTitle).toBeVisible();
-        expect(exportButton).toBeVisible();
-        expect(cancelButton).toBeVisible();
-
-        act(() => userEvent.click(cancelButton));
-        expect(dialogTitle).not.toBeVisible();
-      });
-
-    }
-  );
-  */
-
-  // Not true anymore
-  // test('CourseResultsTable should not render any rows before grades are imported', async () => {
-  //   renderCourseResultsView();
-
-  //   const studentRows: Array<HTMLElement> = await screen.findAllByRole('row');
-  //   expect(studentRows.length).toEqual(1); // 25 rows are displayed by default + 1 for header row
-  // });
-
-  /*
-  test('CourseResultsView should display an alert when grade calculation is started', async () => {
-
+  test('CourseResultsTable header is rendered', async () => {
     renderCourseResultsView();
 
-    await waitFor( async () => {
-      const selectAllCheckBox: HTMLInputElement = screen.getByLabelText('Select all');
-      act(() => userEvent.click(selectAllCheckBox));
-      expect(selectAllCheckBox).toBeChecked();
-
-      expect(screen.getByText('12345A')).toBeInTheDocument();
-      expect(screen.getByText('98745A')).toBeInTheDocument();
-      expect(screen.getByText('12859A')).toBeInTheDocument();
-      expect(screen.queryByText('Calculating final grades...')).not.toBeInTheDocument();
-
-      const calculateGradesButton: HTMLElement = screen.getByText('Calculate final grades');
-      act(() => userEvent.click(calculateGradesButton));
-
-      expect(await screen.findByText('Calculating final grades...')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Student Number')).toBeVisible();
+      expect(screen.getByText('Final Grade')).toBeVisible();
+      expect(screen.getByText('Exported to Sisu')).toBeVisible();
+      expect(screen.getByText('Attainments')).toBeVisible();
+      expect(screen.getByText('Exercise 1')).toBeVisible();
+      expect(screen.getByText('Exercise 2')).toBeVisible();
+      expect(screen.getByText('Exam')).toBeVisible();
     });
-
   });
-  */
+
+  test('CourseResultsTable should show a dialog when clicking calculate final grades', async () => {
+    renderCourseResultsView();
+
+    await waitFor(async () => {
+      const checkBox = screen.getByRole('checkbox');
+      await userEvent.click(checkBox);
+      expect(checkBox).toBeChecked();
+
+      const uploadOption = screen.getByText('Calculate final grades');
+      expect(uploadOption).toBeVisible();
+      await userEvent.click(uploadOption);
+
+      const statusText = screen.getByText(
+        'Calculating final grades for 2 students'
+      );
+      expect(statusText).toBeVisible();
+      expect(
+        screen.getByText('Override grading date for all students')
+      ).toBeVisible();
+      expect(screen.getByText('Confirm')).toBeVisible();
+
+      const cancelButton = screen.getByText('Cancel');
+      expect(cancelButton).toBeVisible();
+      await userEvent.click(cancelButton);
+
+      expect(statusText).not.toBeVisible();
+    });
+  });
+
+  test('CourseResultsTable should show a dialog when clicking Download Sisu CSV', async () => {
+    renderCourseResultsView();
+
+    await waitFor(async () => {
+      const checkBox = screen.getByRole('checkbox');
+      await userEvent.click(checkBox);
+      expect(checkBox).toBeChecked();
+
+      const uploadOption = screen.getByText('Download Sisu CSV');
+      expect(uploadOption).toBeVisible();
+      await userEvent.click(uploadOption);
+
+      const title = screen.getByText('Download final grades as Sisu CSV');
+      expect(title).toBeVisible();
+      expect(
+        screen.getByText('Override grading date for all students')
+      ).toBeVisible();
+      expect(screen.getByText('Download')).toBeVisible();
+
+      const cancelButton = screen.getByText('Cancel');
+      expect(cancelButton).toBeVisible();
+      await userEvent.click(cancelButton);
+
+      expect(title).not.toBeVisible();
+    });
+  });
 });

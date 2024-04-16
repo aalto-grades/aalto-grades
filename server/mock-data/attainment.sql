@@ -1,3 +1,7 @@
+-- SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+--
+-- SPDX-License-Identifier: MIT
+
 insert into public.attainment (course_id, name, days_valid, created_at, updated_at) values
 (1, 'Tier A', 365, NOW(), NOW()),
 (1, 'Tier B', 365, NOW(), NOW()),

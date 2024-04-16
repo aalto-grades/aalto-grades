@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import {StudentRow} from '@common/types';
 import {
   Button,
@@ -135,7 +139,10 @@ const CalculateFinalGradesDialog = ({
         </Collapse>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleSubmit}>Confirm</Button>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={handleSubmit} variant="contained">
+          Confirm
+        </Button>
       </DialogActions>
     </Dialog>
   );
