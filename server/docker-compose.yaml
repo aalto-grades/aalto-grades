@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-# This is a Docker Compose configuration for running backend unit tests or development
+# This is a Docker Compose configuration for running the backend
 ---
 
 version: "3.7"
