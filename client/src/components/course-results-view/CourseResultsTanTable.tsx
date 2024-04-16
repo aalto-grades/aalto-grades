@@ -73,7 +73,7 @@ function groupByLastAttainmentDate(gradesList: ExtendedStudentRow[]) {
           useLatest: false, // TODO: Read from state?
         })?.date ?? ''
       );
-      //Get best grade date for each attainment and get the newest
+      // Get best grade date for each attainment and get the newest
       newestDate =
         newestDate && new Date(bestGradeDate ?? '') > newestDate
           ? bestGradeDate
@@ -82,7 +82,7 @@ function groupByLastAttainmentDate(gradesList: ExtendedStudentRow[]) {
     return newestDate.toISOString().split('T')[0];
   }
 
-  //Array implementation
+  // Array implementation
   const result: Array<GroupedStudentRow> = [];
   for (const row of gradesList) {
     const date = findNewestDate(row);
@@ -97,7 +97,7 @@ function groupByLastAttainmentDate(gradesList: ExtendedStudentRow[]) {
  * @param row - The student row.
  * @returns The previous grade that has been exported to Sisu, or null if none is found.
  */
-//Commented until Final grade is reimplemented
+// Commented until Final grade is reimplemented
 // function findPreviouslyExportedToSisu(bestGrade: GradeOption, row: StudentRow) {
 //   for (const gr of row.finalGrades) {
 //     if (bestGrade?.gradeId === gr.gradeId) continue; //Skip the best grade (we need to check for previous ones)
@@ -115,7 +115,7 @@ function groupByLastAttainmentDate(gradesList: ExtendedStudentRow[]) {
 // }
 
 const columnHelper = createColumnHelper<GroupedStudentRow>();
-//predicted grade divided by model
+// predicted grade divided by model
 function predictGrades(
   rows: StudentRow[],
   assessmentModels: AssessmentModelData[]
@@ -136,9 +136,10 @@ function predictGrades(
   });
 }
 
-//TODO: Better column definitions
-//TODO: Better typing and freeze how to access data
+// TODO: Better column definitions
+// TODO: Better typing and freeze how to access data
 const CourseResultsTanTable: React.FC<PropsType> = props => {
+  const [isPending, startTransition] = React.useTransition();
   const {courseId} = useParams() as {
     courseId: string;
   };
@@ -149,7 +150,9 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
   const groupedData = React.useMemo(() => {
     let predictedGrades: ReturnType<typeof predictGrades> = [];
     if (assessmentModels) {
-      predictedGrades = predictGrades(props.data, assessmentModels); //Takes too much time...?
+      startTransition(() => {
+        predictedGrades = predictGrades(props.data, assessmentModels); // Takes too much time...?
+      });
     }
 
     return groupByLastAttainmentDate(
@@ -157,8 +160,8 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
         return {
           ...row,
           predictedFinalGrades:
-            predictedGrades?.length > 0
-              ? predictedGrades.map(pg => pg?.[row.user.id]?.finalGrade)
+            predictedGrades.length > 0
+              ? predictedGrades.map(pg => pg[row.user.id].finalGrade)
               : ['No models'],
         };
       })
@@ -174,7 +177,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
   React.useEffect(() => {
     props.setSelectedStudents(_ => {
       return table.getSelectedRowModel().rows.map(row => {
-        //Setting selectedStudnets
+        // Setting selectedStudnets
         return row.original;
       });
     });
@@ -186,7 +189,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
   // Creating Grades columns
   const dynamicColumns = attainmentList.map(att => {
     return columnHelper.accessor(
-      row => row.attainments?.find(a => a.attainmentId == att.id),
+      row => row.attainments.find(a => a.attainmentId == att.id),
       {
         header: att.name,
         meta: {PrettyChipPosition: 'alone'},
@@ -268,7 +271,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
         ]
       : [];
 
-  //Creating static columns
+  // Creating static columns
   const staticColumns = [
     ...groupingColumns,
     columnHelper.display({
@@ -408,10 +411,10 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
         // ATTENTION this function needs to have the same parameters of the one inside the grade cell
         // Clearly can be done in a better way
         // const bestGrade = findBestGradeOption(row?.finalGrades);
-        const bestGrade = row?.finalGrades?.[0];
+        const bestGrade = row.finalGrades?.[0];
         if (!bestGrade) return '-';
         // console.log(bestGrade);
-        if (bestGrade?.sisuExportDate) return '✅';
+        if (bestGrade.sisuExportDate) return '✅';
         // console.log(findPreviouslyExportedToSisu(bestGrade, row));
         // if (findPreviouslyExportedToSisu(bestGrade, row)) return '⚠️';
         return '-';
@@ -477,8 +480,8 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
   const virtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 50, //pixel height of each row
-    overscan: 30,
+    estimateSize: () => 50, // pixel height of each row
+    overscan: 5,
   });
 
   return (
@@ -493,6 +496,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
       >
         Group by Date
       </button>
+      {isPending && <>Is Pending</>}
       <input
         type="text"
         value={
@@ -509,9 +513,9 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
         className="container"
         ref={parentRef}
         style={{
-          overflowY: 'auto', //our scrollable table container
-          position: 'relative', //needed for sticky header
-          height: '800px', //should be a fixed height
+          overflowY: 'auto', // our scrollable table container
+          position: 'relative', // needed for sticky header
+          height: '80vh', // should be a fixed height
           width: 'fit-content',
           maxWidth: '100%',
         }}
@@ -547,7 +551,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
                       padding: '0px',
                       height: '50px',
                       display: 'flex',
-                      //Calculate correct size for groupHeaders
+                      // Calculate correct size for groupHeaders
                       width:
                         header.subHeaders.length !== 0
                           ? header.subHeaders.reduce(
@@ -608,21 +612,21 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
           <tbody
             style={{
               display: 'grid',
-              height: `${virtualizer.getTotalSize()}px`, //tells scrollbar how big the table is
-              position: 'relative', //needed for absolute positioning of rows
+              height: `${virtualizer.getTotalSize()}px`, // tells scrollbar how big the table is
+              position: 'relative', // needed for absolute positioning of rows
             }}
           >
             {virtualizer.getVirtualItems().map(virtualRow => {
               const row = table.getRowModel().rows[virtualRow.index];
               return (
                 <tr
-                  data-index={virtualRow.index} //needed for dynamic row height measurement
-                  ref={node => virtualizer.measureElement(node)} //measure dynamic row height
+                  data-index={virtualRow.index} // needed for dynamic row height measurement
+                  ref={node => virtualizer.measureElement(node)} // measure dynamic row height
                   key={row.id}
                   style={{
                     display: 'flex',
                     position: 'absolute',
-                    transform: `translateY(${virtualRow.start}px)`, //this should always be a `style` as it changes on scroll
+                    transform: `translateY(${virtualRow.start}px)`, // this should always be a `style` as it changes on scroll
                     width: '100%',
                   }}
                 >
