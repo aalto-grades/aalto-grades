@@ -81,7 +81,8 @@ export const getSamlStrategy = async (): Promise<SamlStrategy> =>
           );
         }
         if (!user.eduUser) await user.update({eduUser: eduUser});
-        if (!user.name) await user.update({name: name});
+        if (!user.name || user.name === user.email)
+          await user.update({name: name});
 
         // for now if teacher email is added by admin we allow the teacher to signin
         return done(null, {

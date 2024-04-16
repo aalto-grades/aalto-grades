@@ -75,7 +75,7 @@ export const addIdpUser = async (
     throw new ApiError('User already exists', HttpCode.Conflict);
   }
 
-  await User.create({email: email, role: SystemRole.User});
+  await User.create({email: email, role: SystemRole.User, name: email});
   res.sendStatus(HttpCode.Created);
 };
 
