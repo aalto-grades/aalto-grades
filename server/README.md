@@ -9,40 +9,47 @@ SPDX-License-Identifier: MIT
 ## Running
 
 ### Running on local environment
+
 <!-- TODO: Setting up a database needs a more detailed explanation -->
+
 > If the command `npm install` fails on Apple Silicon, check that there are NO spaces in the folder path
 
 #### Running postgreSQL and pgAdmin with docker
-For development purposes, you can easily run the database and pgadmin in docker 
+
+For development purposes, you can easily run the database and pgadmin in docker
 and then start node server locally in development mode.
 
-
-
 Set the following environment variables:
+
 ```
 $ export POSTGRES_PASSWORD=postgres
 
 ```
+
 Start the postgreSQL and pgadmin:
+
 ```
 $ docker compose up database pgadmin
 ```
+
 pgAdmin will be
 available at http://localhost:5050.
-
 
 You can now setup the node environment by following the instructions and to start e.g.
 the development server to start developing.
 
-
 When you are done with these stop the container and run:
+
 ```
 $ docker compose down --remove-orphans
 ```
+
 to remove containers and network
 
 #### Setting up local node environment
+
 In a `.env` file setup the node env variables (.env.example included as an example)
+
 ```
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
@@ -51,14 +58,19 @@ POSTGRES_URL=localhost
 ```
 
 Install the necessary Node modules:
+
 ```
 $ npm ci
 ```
+
 Build the server:
+
 ```
 $ npm run build
 ```
+
 Run migrations and seeder:
+
 ```
 $ npm run migration:up
 $ npm run seed:up
@@ -67,6 +79,7 @@ $ npm run seed:up
 ### Running the server
 
 Start the server:
+
 ```
 $ npm run start
 ```
@@ -77,6 +90,7 @@ http://localhost:3000.
 ### Running in development mode
 
 You can run the server in development mode with the command:
+
 ```
 $ npm run dev
 ```
@@ -89,6 +103,7 @@ the code are saved.
 You can also run the server and database using Docker Compose. You only need to
 define the `POSTGRES_PASSWORD` with a password of your choice, and then execute
 Docker Compose:
+
 ```
 $ export POSTGRES_PASSWORD=XXXX
 $ docker compose up
@@ -100,6 +115,7 @@ for accessing and configuring database using a browser. pgAdmin will be
 available at http://localhost:5050.
 
 Login credentials for pgAdmin:
+
 - Email: `admin@admin.com`
 - Password: `root`
 
@@ -110,6 +126,7 @@ Grades database. If prompted, use the password `postgres` to connect.
 
 To use the routes which communicate with Sisu, the environment variables
 `SISU_API_KEY` and `SISU_API_URL` must be provided. For example:
+
 ```
 $ export SISU_API_KEY="your-api-key"
 $ export SISU_API_URL=www.api.com/api/sisu/v1
@@ -126,13 +143,8 @@ is used for testing API functionality.
 The easiest way to run the tests is with Docker using the Docker Compose
 configuration located in this directory.
 
-In order to run it, you must define `POSTGRES_PASSWORD` as before and set
-`NODE_ENV` to `test` as follows:
+Execute Docker Compose to run the tests:
+
 ```
-$ export POSTGRES_PASSWORD="postgres"
-$ export NODE_ENV="test"
-```
-Then execute Docker Compose to run the tests:
-```
-$ docker compose up --abort-on-container-exit --exit-code-from backend
+$ docker compose -f docker-compose-test.yaml up --abort-on-container-exit --exit-code-from backend
 ```

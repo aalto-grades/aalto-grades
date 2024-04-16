@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import {NewGrade} from '@common/types';
 import {Delete} from '@mui/icons-material';
 import {Button, Dialog, DialogActions} from '@mui/material';

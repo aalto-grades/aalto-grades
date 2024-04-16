@@ -62,8 +62,12 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
             <TableRow
               id={`ag_see_instances_tr_${course.id}`}
               key={course.id}
-              hover
-              onClick={() => navigate(`/${course.id}/course-results`)}
+              hover={true}
+              onClick={() =>
+                navigate(`/${course.id}/course-results`, {
+                  unstable_viewTransition: true,
+                })
+              }
             >
               <TableCell>{course.courseCode}</TableCell>
               <TableCell>{course.name.en}</TableCell>

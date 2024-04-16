@@ -9,7 +9,7 @@ Files:
  client/package*.json
  client/license-exceptions.json
  client/.env
- common/package.json
+ common/package*.json
  e2e-tests/package*.json
  server/package*.json
  server/pgAdminpass

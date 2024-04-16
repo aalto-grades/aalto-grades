@@ -44,17 +44,30 @@ export default function CourseView(): JSX.Element {
 
   return (
     <>
-      <Box style={{display: 'flex'}}>
-        <SideMenu onUpload={() => setUploadOpen(true)} />
+      <Box style={{display: 'flex', height: '100%'}}>
+        <Box
+          sx={{
+            display: courseId ? 'block' : 'none',
+            width: courseId ? '204px' : '0px',
+            minWidth: courseId ? '204px' : '0px',
+            // transition: 'all 0.3s',
+            overflow: 'clip',
+            viewTransitionName: 'side-menu',
+            mr: 2,
+            boxSizing: 'border-box',
+          }}
+        >
+          <SideMenu onUpload={() => setUploadOpen(true)} />
+        </Box>
 
         <Box
           sx={{
-            marginLeft: 2,
             width: '100%',
             overflow: 'auto',
             backgroundColor: theme.vars.palette.background.paper,
             borderRadius: '15px',
             padding: 2,
+            viewTransitionName: 'content',
           }}
         >
           <Outlet />

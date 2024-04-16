@@ -2,19 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from '@common/types';
 import cors from 'cors';
 import express, {Application, Request} from 'express';
 import helmet from 'helmet';
 
-import {FRONTEND_ORIGIN} from './configs/environment';
-
+import {HttpCode} from '@common/types';
+import {FRONTEND_ORIGIN, NODE_ENV} from './configs/environment';
 import {errorHandler} from './middleware/errorHandler';
-import {requestLogger} from './middleware/requestLogger';
+import {requestLogger, requestSyslogger} from './middleware/requestLogger';
 import {router} from './routes/index';
 import {ApiError} from './types';
-import {requestSyslogger} from './middleware/requestLogger';
-import {NODE_ENV} from './configs/environment';
 
 // Register formulas before starting Express.
 // require('./formulas');
@@ -28,7 +25,10 @@ if (NODE_ENV !== 'production') {
 
 if (NODE_ENV !== 'test') {
   // tests timeout for some reason if used
-  app.use(express.json());
+
+  // app.use(express.json()); Commented out because maybe not needed?
+  // If enabled use {limit: '25mb'} to allow uploading a big list of grades
+
   app.use(requestSyslogger);
 }
 
