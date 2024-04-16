@@ -42,7 +42,6 @@ jobs:
     env:
       POSTGRES_PASSWORD: postgres
       NODE_ENV: test
-      SERVER_SKIP_NPM_CI: 1
     defaults:
       run:
         working-directory: ./server
@@ -51,16 +50,16 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
-      - name: Install dependencies
-        run: npm ci
-      - name: Install common dependencies
-        run: npm --prefix ../common ci
       - name: Docker compose down
         run: docker-compose down --volumes --remove-orphans
       - name: Docker compose build
         run: docker-compose build --no-cache
       - name: Run tests
-        run: docker-compose up --abort-on-container-exit --exit-code-from backend
+        run: docker-compose -f docker-compose-test.yaml up --abort-on-container-exit --exit-code-from backend
+      - name: Install dependencies
+        run: npm ci
+      - name: Install common dependencies
+        run: npm --prefix ../common ci
       - name: Install linter dependencies
         run: npm --prefix .. ci
       - name: Run linter

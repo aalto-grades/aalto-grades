@@ -5,8 +5,7 @@
 # This Docker Compose file defines common configuration for use in all other
 # Docker Compose files
 ---
-
-version: "3.7"
+version: '3.7'
 
 services:
   frontend-common:
@@ -20,8 +19,8 @@ services:
     restart: always
     tty: true
     environment:
-      BACKEND_URL: "backend"
-      BACKEND_PORT: "3000"
+      BACKEND_URL: 'backend'
+      BACKEND_PORT: '3000'
     networks:
       - local
 
@@ -32,7 +31,7 @@ services:
     extends:
       service: backend-minimum
 
-  backend-commontest:
+  backend-common-test:
     build:
       context: .
       dockerfile: ./server/dockerfiles/Dockerfile.test
@@ -42,12 +41,12 @@ services:
   backend-minimum:
     tty: true
     environment:
-      POSTGRES_URL: "database"
-      POSTGRES_USER: "postgres"
-      POSTGRES_DATABASE: "postgres"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      SISU_API_KEY: "${SISU_API_KEY}"
-      SISU_API_URL: "${SISU_API_URL}"
+      POSTGRES_URL: 'database'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_DATABASE: 'postgres'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
+      SISU_API_KEY: '${SISU_API_KEY}'
+      SISU_API_URL: '${SISU_API_URL}'
     networks:
       - local
 
@@ -55,7 +54,7 @@ services:
     image: postgres
     restart: always
     environment:
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
     networks:
       - local
 

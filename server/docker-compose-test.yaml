@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+
+# This is a Docker Compose configuration for running backend unit tests or development
+---
+
+version: "3.7"
+
+services:
+  backend:
+    extends:
+      file: ../common-services.yaml
+      service: backend-common-test
+    container_name: "backend-server-test"
+
+  database:
+    extends:
+      file: ../common-services.yaml
+      service: database
+    ports:
+      - 5432:5432
+
+networks:
+  local:
+    driver: bridge
