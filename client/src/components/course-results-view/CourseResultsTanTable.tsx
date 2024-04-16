@@ -5,7 +5,7 @@
 import {AssessmentModelData, StudentRow} from '@common/types';
 import {batchCalculateGraph} from '@common/util/calculateGraph';
 import {ArrowUpward, ExpandLess, ExpandMore, Sort} from '@mui/icons-material';
-import {Badge, Checkbox, Icon, IconButton, Tooltip} from '@mui/material';
+import {Badge, Checkbox, Icon, IconButton} from '@mui/material';
 import '@tanstack/react-table';
 import {
   ExpandedState,
@@ -28,6 +28,8 @@ import {useGetAllAssessmentModels, useGetAttainments} from '../../hooks/useApi';
 import {findBestGradeOption} from '../../utils';
 import PrettyChip from '../shared/PrettyChip';
 import GradeCell from './GradeCell';
+import PredictedGradeCell from './PredictedGradeCell';
+import UserGraphDialog from './UserGraphDialog';
 // This module is used to create meta data for colums cells
 declare module '@tanstack/table-core' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -36,7 +38,7 @@ declare module '@tanstack/table-core' {
   }
 }
 
-type GroupedStudentRow = {
+export type GroupedStudentRow = {
   grouping: string;
 } & ExtendedStudentRow;
 
@@ -172,6 +174,9 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
   const [expanded, setExpanded] = React.useState<ExpandedState>({});
   const [grouping, setGrouping] = React.useState<GroupingState>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [userGraphOpen, setUserGraphOpen] = React.useState<boolean>(false);
+  const [userGraphData, setUserGraphData] =
+    React.useState<GroupedStudentRow | null>(null);
   // const [globalFilter, setGlobalFilter] = React.useState('');
 
   React.useEffect(() => {
@@ -386,26 +391,36 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
         getValue().finalGrades?.[0].grade ?? '-',
       aggregatedCell: () => null,
     }),
-    columnHelper.accessor(
-      row => {
-        if (row.predictedFinalGrades === undefined) return;
-        return (
-          <Tooltip
-            placement="top"
-            title={'TODO: Re-add title'}
-            disableInteractive
-          >
-            <>{row.predictedFinalGrades.join('/')}</>
-          </Tooltip>
-        );
+    columnHelper.accessor(row => row, {
+      header: 'Grade preview',
+      meta: {PrettyChipPosition: 'middle'},
+      sortingFn: (a, b, columnId) => {
+        const valA =
+          a.getValue<GroupedStudentRow>(columnId).predictedFinalGrades;
+        const valB =
+          b.getValue<GroupedStudentRow>(columnId).predictedFinalGrades;
+        if (valB === undefined) return 1;
+        if (valA === undefined) return -1;
+        for (let i = 0; i < valA.length; i++) {
+          if (valA[i] < valB[i]) return -1;
+          if (valA[i] > valB[i]) return 1;
+        }
+        return 0;
       },
-      {
-        header: 'Grade preview',
-        meta: {PrettyChipPosition: 'middle'},
-        cell: info => info.getValue(),
-        aggregatedCell: () => null,
-      }
-    ),
+      cell: info => (
+        <PredictedGradeCell
+          row={info.getValue()}
+          assessmentModelIds={assessmentModels?.map(model => model.id)}
+          onClick={() => {
+            if (assessmentModels === undefined || assessmentModels.length === 0)
+              return;
+            setUserGraphData(info.getValue());
+            setUserGraphOpen(true);
+          }}
+        />
+      ),
+      aggregatedCell: () => null,
+    }),
     columnHelper.accessor(
       row => {
         // ATTENTION this function needs to have the same parameters of the one inside the grade cell
@@ -486,6 +501,12 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
 
   return (
     <div>
+      <UserGraphDialog
+        open={userGraphOpen}
+        onClose={() => setUserGraphOpen(false)}
+        assessmentModels={assessmentModels}
+        row={userGraphData}
+      />
       <button
         onClick={() =>
           table.setGrouping(old => {

@@ -82,11 +82,13 @@ const Graph = ({
   attainments,
   userGrades,
   onSave,
+  readOnly = false,
 }: {
   initGraph: GraphStructure;
-  attainments: AttainmentData[];
+  attainments: {id: number; name: string}[];
   userGrades: AttainmentGradesData[] | null;
-  onSave: (graphStructure: GraphStructure) => Promise<void>;
+  onSave?: (graphStructure: GraphStructure) => Promise<void>;
+  readOnly?: boolean;
 }): JSX.Element => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -536,6 +538,9 @@ const Graph = ({
                 onDragOver={onDragOver}
                 onError={(i, m) => i !== '008' && console.warn(m)} // Ignore "couldn't create edge" warnings
                 fitView
+                elementsSelectable={!readOnly}
+                nodesConnectable={!readOnly}
+                nodesDraggable={!readOnly}
               >
                 <Controls />
                 <MiniMap />
@@ -546,115 +551,119 @@ const Graph = ({
                 />
               </ReactFlow>
             </div>
-            <Divider />
-            <div style={{marginBottom: '5px'}}>
-              <div
-                className="dndnode"
-                onDragStart={event => onDragStart(event, 'addition')}
-                draggable
-              >
-                Addition
-              </div>
-              <div
-                className="dndnode"
-                onDragStart={event => onDragStart(event, 'average')}
-                draggable
-              >
-                Average
-              </div>
-              <div
-                className="dndnode"
-                onDragStart={event => onDragStart(event, 'stepper')}
-                draggable
-              >
-                Stepper
-              </div>
-              <div
-                className="dndnode"
-                onDragStart={event => onDragStart(event, 'minpoints')}
-                draggable
-              >
-                Require Minimum Points
-              </div>
-              <div
-                className="dndnode"
-                onDragStart={event => onDragStart(event, 'max')}
-                draggable
-              >
-                Maximum
-              </div>
-              <div
-                className="dndnode"
-                onDragStart={event => onDragStart(event, 'require')}
-                draggable
-              >
-                Require Passing Values
-              </div>
-              <div
-                className="dndnode"
-                onDragStart={event => onDragStart(event, 'round')}
-                draggable
-              >
-                Round
-              </div>
-              <div
-                className="dndnode"
-                onDragStart={event => onDragStart(event, 'substitute')}
-                draggable
-              >
-                Substitute
-              </div>
-            </div>
-            <div style={{float: 'left', marginTop: '5px'}}>
-              <Button
-                onClick={() => setAttainmentsSelectOpen(true)}
-                variant="outlined"
-              >
-                Select Attainments
-              </Button>
-              <Button
-                onClick={() => setAttainmentValuesOpen(true)}
-                variant="outlined"
-                sx={{ml: 1}}
-              >
-                Test values
-              </Button>
-              <Button onClick={format} variant="outlined" sx={{ml: 1}}>
-                Format
-              </Button>
-            </div>
-            <div
-              style={{
-                float: 'right',
-                display: 'flex',
-                marginTop: '5px',
-              }}
-            >
-              {unsaved && (
-                <Typography
-                  sx={{display: 'inline', alignSelf: 'center', mr: 1}}
+            {!readOnly && onSave !== undefined && (
+              <>
+                <Divider />
+                <div style={{marginBottom: '5px'}}>
+                  <div
+                    className="dndnode"
+                    onDragStart={event => onDragStart(event, 'addition')}
+                    draggable
+                  >
+                    Addition
+                  </div>
+                  <div
+                    className="dndnode"
+                    onDragStart={event => onDragStart(event, 'average')}
+                    draggable
+                  >
+                    Average
+                  </div>
+                  <div
+                    className="dndnode"
+                    onDragStart={event => onDragStart(event, 'stepper')}
+                    draggable
+                  >
+                    Stepper
+                  </div>
+                  <div
+                    className="dndnode"
+                    onDragStart={event => onDragStart(event, 'minpoints')}
+                    draggable
+                  >
+                    Require Minimum Points
+                  </div>
+                  <div
+                    className="dndnode"
+                    onDragStart={event => onDragStart(event, 'max')}
+                    draggable
+                  >
+                    Maximum
+                  </div>
+                  <div
+                    className="dndnode"
+                    onDragStart={event => onDragStart(event, 'require')}
+                    draggable
+                  >
+                    Require Passing Values
+                  </div>
+                  <div
+                    className="dndnode"
+                    onDragStart={event => onDragStart(event, 'round')}
+                    draggable
+                  >
+                    Round
+                  </div>
+                  <div
+                    className="dndnode"
+                    onDragStart={event => onDragStart(event, 'substitute')}
+                    draggable
+                  >
+                    Substitute
+                  </div>
+                </div>
+                <div style={{float: 'left', marginTop: '5px'}}>
+                  <Button
+                    onClick={() => setAttainmentsSelectOpen(true)}
+                    variant="outlined"
+                  >
+                    Select Attainments
+                  </Button>
+                  <Button
+                    onClick={() => setAttainmentValuesOpen(true)}
+                    variant="outlined"
+                    sx={{ml: 1}}
+                  >
+                    Test values
+                  </Button>
+                  <Button onClick={format} variant="outlined" sx={{ml: 1}}>
+                    Format
+                  </Button>
+                </div>
+                <div
+                  style={{
+                    float: 'right',
+                    display: 'flex',
+                    marginTop: '5px',
+                  }}
                 >
-                  Unsaved changes
-                </Typography>
-              )}
-              <Button
-                variant={unsaved ? 'contained' : 'text'}
-                onClick={async () => {
-                  enqueueSnackbar('Saving model.', {
-                    variant: 'info',
-                  });
-                  await onSave({nodes, edges, nodeData});
-                  enqueueSnackbar('Model saved successfully.', {
-                    variant: 'success',
-                  });
-                  setOriginalGraphStructure({nodes, edges, nodeData});
-                  setUnsaved(false);
-                }}
-                sx={{float: 'right'}}
-              >
-                Save
-              </Button>
-            </div>
+                  {unsaved && (
+                    <Typography
+                      sx={{display: 'inline', alignSelf: 'center', mr: 1}}
+                    >
+                      Unsaved changes
+                    </Typography>
+                  )}
+                  <Button
+                    variant={unsaved ? 'contained' : 'text'}
+                    onClick={async () => {
+                      enqueueSnackbar('Saving model.', {
+                        variant: 'info',
+                      });
+                      await onSave({nodes, edges, nodeData});
+                      enqueueSnackbar('Model saved successfully.', {
+                        variant: 'success',
+                      });
+                      setOriginalGraphStructure({nodes, edges, nodeData});
+                      setUnsaved(false);
+                    }}
+                    sx={{float: 'right'}}
+                  >
+                    Save
+                  </Button>
+                </div>
+              </>
+            )}
           </NodeDataContext.Provider>
         </ExtraNodeDataContext.Provider>
       </NodeValuesContext.Provider>
