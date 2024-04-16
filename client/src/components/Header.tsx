@@ -125,10 +125,13 @@ export default function Header(): JSX.Element {
                 //   border: '1px solid gray',
                 width: 'fit-content',
                 borderRadius: '15px',
-                translateY: '-50%',
+                // translateY: '-50%',
+                height: '40px',
               }}
             >
-              <span style={{display: 'flex', alignItems: 'center'}}>
+              <span
+                style={{display: 'flex', alignItems: 'center', height: '100%'}}
+              >
                 <div
                   style={{
                     padding: '0px 5px',
@@ -137,17 +140,24 @@ export default function Header(): JSX.Element {
                     marginRight: '10px',
                     display: 'flex',
                     alignItems: 'center',
-                    height: 'fit-content',
                     viewTransitionName: `code-${course.data.id}`,
+                    minWidth: 'fit-content',
+                    maxWidth: 'fit-content',
                   }}
                 >
                   <Typography align="left">{course.data.courseCode}</Typography>
                 </div>
 
                 <Typography
-                  variant="h2"
+                  variant="h3"
                   align="left"
-                  sx={{viewTransitionName: `course-name-${course.data.id}`}}
+                  sx={{
+                    viewTransitionName: `course-name-${course.data.id}`,
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    maxWidth: '300px',
+                  }}
                 >
                   {course.data.name.en}
                 </Typography>
