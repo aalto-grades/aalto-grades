@@ -78,14 +78,16 @@ const GradeCell: FC<GradeCellProps> = (
               </IconButton>
             </Tooltip>
             <GradeOptionsDialog
+              open={gradeOptionsOpen}
+              onClose={() => setGradeOptionsOpen(false)}
+              studentNumber={props.studentNumber}
+              attainmentId={props.attainemntResults.attainmentId}
               title={`Grades of ${props.studentNumber} for ${
                 props.finalGrade
                   ? 'Final Grade'
                   : props.attainemntResults.attainmentName
               }`}
-              options={props.attainemntResults.grades}
-              open={gradeOptionsOpen}
-              handleClose={(): void => setGradeOptionsOpen(false)}
+              grades={props.attainemntResults.grades}
             />
           </>
         )}

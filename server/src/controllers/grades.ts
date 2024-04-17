@@ -3,30 +3,28 @@
 // SPDX-License-Identifier: MIT
 import {stringify} from 'csv-stringify';
 import {Request, Response} from 'express';
-import {ParamsDictionary} from 'express-serve-static-core';
 import {Op} from 'sequelize';
+import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
   FinalGradeData,
   GradeOption,
   HttpCode,
-  NewGrade,
-  PartialGradeOption,
-  SisuCsvUpload,
+  NewGradeArraySchema,
+  PartialGradeOptionSchema,
+  SisuCsvUploadSchema,
   StudentRow,
 } from '@common/types';
 import {sequelize} from '../database';
-import AssessmentModel from '../database/models/assessmentModel';
 import Attainment from '../database/models/attainment';
 import AttainmentGrade from '../database/models/attainmentGrade';
-import Course from '../database/models/course';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
 import {AttainmentGradeModelData, JwtClaims} from '../types';
-import {validateAssessmentModelPath} from './utils/assessmentModel';
+import {validateAttainmentBelongsToCourse} from './utils/attainment';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {
-  findAndValidateAttainmentGrade,
+  findAndValidateAttainmentGradePath,
   getDateOfLatestGrade,
   getFinalGradesFor,
   studentNumbersExist,
@@ -141,7 +139,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
  * Responds with text/csv
  */
 export const getSisuFormattedGradingCSV = async (
-  req: Request<ParamsDictionary, unknown, SisuCsvUpload>,
+  req: TypedRequestBody<typeof SisuCsvUploadSchema>,
   res: Response
 ): Promise<void> => {
   const sisuExportDate = new Date();
@@ -247,7 +245,7 @@ export const getSisuFormattedGradingCSV = async (
 };
 
 export const addGrades = async (
-  req: Request<ParamsDictionary, unknown, NewGrade[]>,
+  req: TypedRequestBody<typeof NewGradeArraySchema>,
   res: Response
 ): Promise<Response | void> => {
   const grader = req.user as JwtClaims;
@@ -255,6 +253,13 @@ export const addGrades = async (
   const courseId = await validateCourseId(req.params.courseId);
 
   await isTeacherInChargeOrAdmin(grader, courseId);
+
+  // Validate that attainments belong to correct course
+  const attainmentIds = new Set<number>();
+  for (const grade of req.body) attainmentIds.add(grade.attainmentId);
+  for (const gradeId of attainmentIds) {
+    await validateAttainmentBelongsToCourse(courseId, gradeId);
+  }
 
   // Check all users (students) exists in db, create new users if needed.
   // Make sure each studentNumber is only in the list once
@@ -320,20 +325,19 @@ export const addGrades = async (
   return res.sendStatus(HttpCode.Created);
 };
 
-export const editUserGrade = async (
-  req: Request<ParamsDictionary, unknown, PartialGradeOption>,
+export const editGrade = async (
+  req: TypedRequestBody<typeof PartialGradeOptionSchema>,
   res: Response
 ): Promise<void> => {
-  const [course]: [Course, AssessmentModel] = await validateAssessmentModelPath(
+  const [course, gradeData] = await findAndValidateAttainmentGradePath(
     req.params.courseId,
-    req.params.assessmentModelId
+    req.params.gradeId
   );
 
-  const grader: JwtClaims = req.user as JwtClaims;
+  const grader = req.user as JwtClaims;
   await isTeacherInChargeOrAdmin(grader, course.id);
 
   const {grade, date, expiryDate, comment} = req.body;
-  const gradeData = await findAndValidateAttainmentGrade(req.params.gradeId);
 
   await gradeData
     .set({
@@ -344,6 +348,21 @@ export const editUserGrade = async (
       graderId: grader.id,
     })
     .save();
+
+  res.sendStatus(HttpCode.Ok);
+};
+
+export const deleteGrade = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const [course, grade] = await findAndValidateAttainmentGradePath(
+    req.params.courseId,
+    req.params.gradeId
+  );
+  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id);
+
+  await grade.destroy();
 
   res.sendStatus(HttpCode.Ok);
 };
