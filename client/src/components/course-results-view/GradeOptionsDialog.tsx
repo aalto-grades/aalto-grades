@@ -25,6 +25,7 @@ import {GradeOption, NewGrade, PartialGradeOption} from '@common/types';
 import {useParams} from 'react-router-dom';
 import {useAddGrades, useDeleteGrade, useEditGrade} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
+import {findBestGradeOption} from '../../utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 type ColTypes = {
@@ -36,6 +37,7 @@ type ColTypes = {
   expiryDate: Date;
   exported: boolean;
   comment: string;
+  selected: string;
 };
 
 type PropsType = {
@@ -68,9 +70,29 @@ const GradeOptionsDialog = ({
   const [error, setError] = useState<boolean>(false);
 
   const changes = useMemo(
-    () => JSON.stringify(rows) !== JSON.stringify(initRows),
+    () =>
+      JSON.stringify(rows.map(row => ({...row, selected: ''}))) !==
+      JSON.stringify(initRows),
     [initRows, rows]
   );
+
+  const bestGrade = useMemo(
+    () =>
+      findBestGradeOption(rows, {
+        avoidExpired: true,
+        preferExpiredToNull: true,
+        useLatest: false, // TODO: Read from state?
+      }),
+    [rows]
+  );
+
+  useEffect(() => {
+    const newRows = rows.map(row => ({
+      ...row,
+      selected: bestGrade !== null && row.id === bestGrade.id ? 'selected' : '',
+    }));
+    if (JSON.stringify(rows) !== JSON.stringify(newRows)) setRows(newRows);
+  }, [bestGrade, rows]);
 
   useEffect(() => {
     const newRows = grades.map((grade, gradeId) => ({
@@ -82,6 +104,7 @@ const GradeOptionsDialog = ({
       expiryDate: grade.expiryDate!,
       exported: grade.exportedToSisu !== null,
       comment: grade.comment ?? '',
+      selected: '',
     }));
     setRows(newRows);
     setInitRows(structuredClone(newRows));
@@ -141,6 +164,12 @@ const GradeOptionsDialog = ({
         />,
       ],
     },
+    {
+      field: 'selected',
+      type: 'string',
+      headerName: '',
+      disableColumnMenu: true,
+    },
   ];
 
   const dataGridToolbar = (): JSX.Element => {
@@ -159,6 +188,7 @@ const GradeOptionsDialog = ({
           ),
           exported: false,
           comment: '',
+          selected: '',
         };
         return oldRows.concat(newRow);
       });
@@ -215,13 +245,6 @@ const GradeOptionsDialog = ({
     enqueueSnackbar('Grades saved successfully', {variant: 'success'});
     setInitRows(structuredClone(rows));
   };
-
-  // TODO: Highlight best grade
-  // const bestGrade = findBestGradeOption(grades, {
-  //   avoidExpired: true,
-  //   preferExpiredToNull: true,
-  //   useLatest: false, // TODO: Read from state?
-  // });
 
   return (
     <>

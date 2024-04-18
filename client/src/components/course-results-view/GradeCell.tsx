@@ -2,19 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentGradesData, GradeOption} from '@common/types';
-import {
-  EventBusyOutlined,
-  MoreHoriz as MoreHorizIcon,
-} from '@mui/icons-material';
+import {EventBusyOutlined, MoreVert} from '@mui/icons-material';
 import {Box, IconButton, Theme, Tooltip, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import {FC, useState} from 'react';
 
-import GradeOptionsDialog from './GradeOptionsDialog';
-
+import {AttainmentGradesData, GradeOption} from '@common/types';
 import {State} from '../../types';
-import {findBestGradeOption, isGradeDateExpired} from '../../utils';
+import {findBestGradeOption, gradeIsExpired} from '../../utils';
+import GradeOptionsDialog from './GradeOptionsDialog';
 
 type GradeCellProps = {
   studentNumber: string;
@@ -25,6 +21,7 @@ type GradeCellProps = {
 const GradeCell: FC<GradeCellProps> = (
   props = {finalGrade: false} as GradeCellProps
 ) => {
+  const [hover, setHover] = useState<boolean>(false);
   const [gradeOptionsOpen, setGradeOptionsOpen]: State<boolean> =
     useState(false);
   const theme: Theme = useTheme();
@@ -36,10 +33,12 @@ const GradeCell: FC<GradeCellProps> = (
       useLatest: false, // TODO: Read from state?
     }
   );
-  const isGradeExpired: boolean = isGradeDateExpired(bestGrade?.expiryDate);
+  const isGradeExpired: boolean = gradeIsExpired(bestGrade);
   // console.log(bestGrade?.expiryDate, new Date(),bestGrade?.expiryDate < new Date());
   return (
     <Box
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
       sx={{
         position: 'relative',
         minWidth: '100px',
@@ -65,16 +64,26 @@ const GradeCell: FC<GradeCellProps> = (
       <span>{bestGrade?.grade ?? '-'}</span>
       {/* If there are multiple grades "show more" icon*/}
       {props.attainemntResults &&
-        props.attainemntResults.grades?.length > 1 && (
+        (props.attainemntResults.grades.length > 1 || hover) && (
           <>
-            <Tooltip placement="top" title="Multiple grades, click to show">
+            <Tooltip
+              placement="top"
+              title={
+                props.attainemntResults.grades.length === 1
+                  ? 'Edit grades'
+                  : 'Multiple grades, click to show'
+              }
+            >
               <IconButton
-                size="small"
                 color="primary"
-                sx={{ml: 1}}
+                sx={{
+                  position: 'absolute',
+                  right: '0px',
+                  top: 'calc(50% - 20px)',
+                }}
                 onClick={(): void => setGradeOptionsOpen(true)}
               >
-                <MoreHorizIcon />
+                <MoreVert />
               </IconButton>
             </Tooltip>
             <GradeOptionsDialog

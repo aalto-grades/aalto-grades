@@ -2,21 +2,24 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {GradeOption, Language} from '@common/types';
+import {Language} from '@common/types';
 import {LanguageOption} from '../types';
 
-/**
- * Determines whether a given grade date has expired.
- * @param date - The grade date to check.
- * @returns True if the grade date has expired, false otherwise.
- */
-export const isGradeDateExpired = (date: Date | undefined): boolean => {
-  if (!date) return false;
-  return new Date().getTime() > new Date(date).getTime();
+type BaseType = {
+  gradeId?: number | undefined;
+  grade: number;
+  date?: Date;
+  expiryDate?: Date;
 };
+
+export const gradeIsExpired = (grade: BaseType | null): boolean => {
+  if (grade === null || grade.expiryDate === undefined) return false;
+  return new Date().getTime() > grade.expiryDate.getTime();
+};
+
 const gradeIsNewer = (
-  newGrade: GradeOption,
-  oldGrade: GradeOption | null
+  newGrade: BaseType,
+  oldGrade: BaseType | null
 ): boolean => {
   if (oldGrade === null) return true;
   if (newGrade.date === undefined) return false;
@@ -26,17 +29,20 @@ const gradeIsNewer = (
   if (newDate !== oldDate) return newDate > oldDate;
   return (newGrade.gradeId as number) > (oldGrade.gradeId as number);
 };
+
 const gradeIsBetter = (
-  newGrade: GradeOption,
-  oldGrade: GradeOption | null
+  newGrade: BaseType,
+  oldGrade: BaseType | null
 ): boolean => {
   if (oldGrade === null) return true;
   if (newGrade.grade === oldGrade.grade)
     return gradeIsNewer(newGrade, oldGrade);
   return newGrade.grade > oldGrade.grade;
 };
-export const findBestGradeOption = (
-  options: Array<GradeOption>,
+
+// The type is a template to be able to use with GradeOptionsDialog rows.
+export const findBestGradeOption = <T extends BaseType>(
+  grades: readonly T[],
   searchOptions: {
     avoidExpired: boolean;
     preferExpiredToNull: boolean;
@@ -46,19 +52,18 @@ export const findBestGradeOption = (
     preferExpiredToNull: true, // Will return expired grades if no non-expired grades are found
     useLatest: false, // Will return latest grade instead of the highest one
   }
-): GradeOption | null => {
-  let bestSoFar: GradeOption | null = null;
-  let bestSoFarExpired: GradeOption | null = null;
-  const compare = searchOptions.useLatest ? gradeIsNewer : gradeIsBetter;
-
-  for (const option of options) {
-    if (searchOptions.avoidExpired && isGradeDateExpired(option.expiryDate)) {
-      if (compare(option, bestSoFarExpired)) bestSoFarExpired = option;
+): T | null => {
+  let bestSoFar: T | null = null;
+  let bestSoFarExpired: T | null = null;
+  const isBetter = searchOptions.useLatest ? gradeIsNewer : gradeIsBetter;
+  for (const grade of grades) {
+    if (searchOptions.avoidExpired && gradeIsExpired(grade)) {
+      if (isBetter(grade, bestSoFarExpired)) bestSoFarExpired = grade;
     } else {
-      if (compare(option, bestSoFar)) bestSoFar = option;
+      if (isBetter(grade, bestSoFar)) bestSoFar = grade;
     }
   }
-  return !bestSoFar && searchOptions.preferExpiredToNull
+  return bestSoFar === null && searchOptions.preferExpiredToNull
     ? bestSoFarExpired
     : bestSoFar;
 };

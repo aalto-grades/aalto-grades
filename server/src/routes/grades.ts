@@ -58,7 +58,7 @@ router.put(
   controllerDispatcher(editGrade)
 );
 
-router.put(
+router.delete(
   '/v1/courses/:courseId/grades/:gradeId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   controllerDispatcher(deleteGrade)
