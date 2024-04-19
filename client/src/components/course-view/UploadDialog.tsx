@@ -64,12 +64,15 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       width: 120,
       editable: true,
     },
-    ...attainments.data.map(att => ({
-      field: att.name,
-      headerName: att.name,
-      type: 'number',
-      editable: true,
-    })),
+    {field: 'test', headerName: 'test', type: 'number', editable: true},
+    ...attainments.data.map(
+      (att): GridColDef<GradeUploadColTypes> => ({
+        field: att.name,
+        headerName: att.name,
+        type: 'number',
+        editable: true,
+      })
+    ),
     {
       field: 'actions',
       type: 'actions',
@@ -90,11 +93,13 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       headerName: 'Student Number',
       type: 'string',
     },
-    ...attainments.data.map(att => ({
-      field: att.name,
-      headerName: att.name,
-      type: 'number',
-    })),
+    ...attainments.data.map(
+      (att): GridColDef<GradeUploadColTypes> => ({
+        field: att.name,
+        headerName: att.name,
+        type: 'number',
+      })
+    ),
   ];
 
   const onSubmit = async (): Promise<void> => {

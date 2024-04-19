@@ -6,7 +6,7 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^6.4.0",
+    "@typescript-eslint/eslint-plugin": "^7.7.0",
     "gts": "^5.2.0"
   },
   "scripts": {

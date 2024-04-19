@@ -88,9 +88,9 @@ export default function CourseResultsTableToolbar(props: {
               props.selectedRows.length === 0
                 ? 'Select at least one student number for downloading grades.'
                 : props.hasPendingStudents
-                ? 'Grades with status "PENDING" cannot be downloaded, ' +
-                  'unselect or calculate grades for these.'
-                : 'Download final course grades as a Sisu compatible CSV file.'
+                  ? 'Grades with status "PENDING" cannot be downloaded, ' +
+                    'unselect or calculate grades for these.'
+                  : 'Download final course grades as a Sisu compatible CSV file.'
             }
             placement="top"
           >
