@@ -18,7 +18,7 @@ export const FinalGradeDataSchema = z.object({
   assessmentModelId: z.number().int(),
   graderId: z.number().int(),
   grade: z.number().int().min(0).max(5),
-  date: DateSchema.optional(),
+  date: DateSchema,
   sisuExportDate: DateSchema.nullable(),
 });
 export const FinalGradeDataArraySchema = z.array(FinalGradeDataSchema);

@@ -61,8 +61,8 @@ export default function CourseResultsView(): JSX.Element {
     let latestDate = new Date(1970, 0, 1);
     for (const att of row.attainments) {
       for (const grade of att.grades) {
-        const gradeDate = new Date(grade.date!);
-        if (gradeDate.getTime() > latestDate.getTime()) latestDate = gradeDate;
+        if (grade.date.getTime() > latestDate.getTime())
+          latestDate = grade.date;
       }
     }
     return latestDate;

@@ -131,7 +131,7 @@ const ModelsView = (): JSX.Element => {
     }
     await editModel.mutateAsync({
       courseId,
-      assessmentModelId: currentModel.id as number,
+      assessmentModelId: currentModel.id,
       assessmentModel: {
         name: currentModel.name,
         graphStructure,
@@ -187,7 +187,7 @@ const ModelsView = (): JSX.Element => {
                 secondaryAction={
                   <IconButton
                     edge="end"
-                    onClick={() => handleDelModel(model.id as number)}
+                    onClick={() => handleDelModel(model.id)}
                   >
                     <Delete />
                   </IconButton>

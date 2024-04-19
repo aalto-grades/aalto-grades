@@ -7,11 +7,11 @@ import {Op} from 'sequelize';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
+  EditGradeOptionSchema,
   FinalGradeData,
   GradeOption,
   HttpCode,
   NewGradeArraySchema,
-  PartialGradeOptionSchema,
   SisuCsvUploadSchema,
   StudentRow,
 } from '@common/types';
@@ -326,7 +326,7 @@ export const addGrades = async (
 };
 
 export const editGrade = async (
-  req: TypedRequestBody<typeof PartialGradeOptionSchema>,
+  req: TypedRequestBody<typeof EditGradeOptionSchema>,
   res: Response
 ): Promise<void> => {
   const [course, gradeData] = await findAndValidateAttainmentGradePath(

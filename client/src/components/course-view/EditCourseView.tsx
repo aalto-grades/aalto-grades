@@ -34,10 +34,9 @@ import {useParams} from 'react-router-dom';
 
 import {
   AaltoEmailSchema,
+  EditCourseData,
   GradingScale,
   Language,
-  PartialCourseData,
-  UserData,
 } from '@common/types';
 import {enqueueSnackbar} from 'notistack';
 import {z} from 'zod';
@@ -241,7 +240,7 @@ export default function EditCourseView(): JSX.Element {
     values: FormData,
     {setSubmitting}: FormikHelpers<FormData>
   ): void => {
-    const courseData: PartialCourseData = {
+    const courseData: EditCourseData = {
       courseCode: values.courseCode,
       minCredits: values.minCredits,
       maxCredits: values.maxCredits,

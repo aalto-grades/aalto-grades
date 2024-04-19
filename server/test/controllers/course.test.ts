@@ -9,10 +9,10 @@ import {
   BaseCourseDataSchema,
   CourseData,
   CreateCourseData,
+  EditCourseData,
   GradingScale,
   HttpCode,
   Language,
-  PartialCourseData,
   TeacherData,
 } from '@common/types';
 import {app} from '../../src/app';
@@ -260,7 +260,7 @@ describe('Test POST /v1/courses - create new course', () => {
 });
 
 describe('Test PUT /v1/courses/:courseId - edit course', () => {
-  const uneditedCourseDataBase: CourseData = {
+  const uneditedCourseDataBase: EditCourseData = {
     courseCode: 'CS-A????',
     teachersInCharge: [],
     minCredits: 5,
@@ -280,7 +280,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
     },
   };
 
-  const courseDataEdits: PartialCourseData = {
+  const courseDataEdits: EditCourseData = {
     courseCode: 'edited',
     teachersInCharge: [],
     minCredits: 3,
@@ -300,8 +300,8 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
   };
 
   const testCourseEditSuccess = async (
-    uneditedCourseData: PartialCourseData,
-    edits: PartialCourseData,
+    uneditedCourseData: EditCourseData,
+    edits: EditCourseData,
     uneditedTeachersInCharge: TeacherData[],
     editedTeachersInCharge: TeacherData[]
   ): Promise<void> => {

@@ -7,7 +7,7 @@ import {RequestHandler} from 'express-serve-static-core';
 import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 
-import {AttainmentDataSchema, NewAttainmentDataSchema} from '@common/types';
+import {EditAttainmentDataSchema, NewAttainmentDataSchema} from '@common/types';
 import {
   addAttainment,
   deleteAttainment,
@@ -39,7 +39,7 @@ router.put(
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(AttainmentDataSchema),
+  processRequestBody(EditAttainmentDataSchema),
   controllerDispatcher(editAttainment)
 );
 

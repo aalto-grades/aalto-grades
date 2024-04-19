@@ -52,7 +52,7 @@ const UserGraphDialog = ({
             initGraph={selectedModel.graphStructure}
             attainments={row.attainments.map(att => ({
               id: att.attainmentId,
-              name: att.attainmentName ?? 'Deleted attainment', // TODO: other reasons for undefined?
+              name: att.attainmentName,
             }))}
             userGrades={row.attainments}
             readOnly

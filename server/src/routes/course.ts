@@ -9,7 +9,7 @@ import {processRequestBody} from 'zod-express-middleware';
 
 import {
   CreateCourseDataSchema,
-  PartialCourseDataSchema,
+  EditCourseDataSchema,
   SystemRole,
 } from '@common/types';
 import {
@@ -52,6 +52,6 @@ router.put(
   authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(PartialCourseDataSchema),
+  processRequestBody(EditCourseDataSchema),
   controllerDispatcher(editCourse)
 );

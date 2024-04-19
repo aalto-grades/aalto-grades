@@ -3,10 +3,15 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
-import {ParamsDictionary} from 'express-serve-static-core';
 
-import {AssessmentModelData, HttpCode} from '@common/types';
+import {
+  AssessmentModelData,
+  EditAssessmentModelDataSchema,
+  HttpCode,
+  NewAssessmentModelDataSchema,
+} from '@common/types';
 import {GraphStructure} from '@common/types/graph';
+import {TypedRequestBody} from 'zod-express-middleware';
 import AssessmentModel from '../database/models/assessmentModel';
 import {ApiError, JwtClaims} from '../types';
 import {validateAssessmentModelPath} from './utils/assessmentModel';
@@ -67,7 +72,7 @@ export const getAllAssessmentModels = async (
  * Responds with number
  */
 export const addAssessmentModel = async (
-  req: Request<ParamsDictionary, unknown, AssessmentModelData>,
+  req: TypedRequestBody<typeof NewAssessmentModelDataSchema>,
   res: Response
 ): Promise<void> => {
   const course = await findAndValidateCourseId(req.params.courseId);
@@ -98,7 +103,7 @@ export const addAssessmentModel = async (
 };
 
 export const updateAssessmentModel = async (
-  req: Request<ParamsDictionary, unknown, AssessmentModelData>,
+  req: TypedRequestBody<typeof EditAssessmentModelDataSchema>,
   res: Response
 ): Promise<void> => {
   const [course, assessmentModel] = await validateAssessmentModelPath(
@@ -111,8 +116,11 @@ export const updateAssessmentModel = async (
 
   // Update assessment model name.
   await assessmentModel.update({
-    name: req.body.name,
-    graphStructure: req.body.graphStructure as unknown as JSON,
+    name: req.body.name ?? assessmentModel.name,
+    graphStructure:
+      req.body.graphStructure === undefined
+        ? assessmentModel.graphStructure
+        : (req.body.graphStructure as unknown as JSON),
   });
 
   res.sendStatus(HttpCode.Ok);

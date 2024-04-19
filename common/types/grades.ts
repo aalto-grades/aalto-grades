@@ -10,24 +10,24 @@ import {UserDataSchema} from './user';
 export const GradeOptionSchema = z.object({
   gradeId: z.number().int().optional(),
   grader: UserDataSchema,
-  grade: z.number(), // z.int()?
+  grade: z.number(),
   exportedToSisu: DateSchema.nullable(),
-  date: DateSchema.optional(),
-  expiryDate: DateSchema.optional(),
+  date: DateSchema,
+  expiryDate: DateSchema,
   comment: z.string().nullable(),
 });
 export const NewGradeSchema = z.object({
   studentNumber: z.string(),
   attainmentId: z.number().int(),
-  grade: z.number(), // z.int()?
-  date: DateSchema.optional(),
-  expiryDate: DateSchema.optional(),
+  grade: z.number(),
+  date: DateSchema,
+  expiryDate: DateSchema,
   comment: z.string(),
 });
 export const NewGradeArraySchema = z.array(NewGradeSchema);
 export const AttainmentGradesDataSchema = z.object({
   attainmentId: z.number().int(),
-  attainmentName: z.string().optional(),
+  attainmentName: z.string(),
   grades: z.array(GradeOptionSchema),
 });
 export const StudentRowSchema = z.object({
@@ -36,7 +36,10 @@ export const StudentRowSchema = z.object({
   attainments: z.array(AttainmentGradesDataSchema),
 });
 export const StudentRowArraySchema = z.array(StudentRowSchema);
-export const PartialGradeOptionSchema = GradeOptionSchema.partial();
+export const EditGradeOptionSchema = GradeOptionSchema.omit({
+  gradeId: true,
+  grader: true,
+}).partial();
 
 export const SisuCsvUploadSchema = z.object({
   assessmentDate: DateSchema.optional(), // Assessment date override
@@ -45,7 +48,7 @@ export const SisuCsvUploadSchema = z.object({
 });
 
 export type GradeOption = z.infer<typeof GradeOptionSchema>;
-export type PartialGradeOption = z.infer<typeof PartialGradeOptionSchema>;
+export type PartialGradeOption = z.infer<typeof EditGradeOptionSchema>;
 export type NewGrade = z.infer<typeof NewGradeSchema>;
 export type AttainmentGradesData = z.infer<typeof AttainmentGradesDataSchema>;
 export type StudentRow = z.infer<typeof StudentRowSchema>;

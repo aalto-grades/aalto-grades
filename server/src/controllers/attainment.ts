@@ -5,7 +5,13 @@
 import {Request, Response} from 'express';
 import {ParamsDictionary} from 'express-serve-static-core';
 
-import {AttainmentData, HttpCode, NewAttainmentData} from '@common/types';
+import {
+  AttainmentData,
+  EditAttainmentDataSchema,
+  HttpCode,
+  NewAttainmentData,
+} from '@common/types';
+import {TypedRequestBody} from 'zod-express-middleware';
 import Attainment from '../database/models/attainment';
 import {JwtClaims} from '../types';
 import {
@@ -50,7 +56,7 @@ export const addAttainment = async (
 };
 
 export const editAttainment = async (
-  req: Request<ParamsDictionary, unknown, AttainmentData>,
+  req: TypedRequestBody<typeof EditAttainmentDataSchema>,
   res: Response
 ): Promise<void> => {
   const [course, attainment] = await validateAttainmentPath(
@@ -62,7 +68,7 @@ export const editAttainment = async (
 
   await attainment
     .set({
-      name: req.body.name,
+      name: req.body.name ?? attainment.name,
       daysValid: req.body.daysValid ?? attainment.daysValid,
     })
     .save();

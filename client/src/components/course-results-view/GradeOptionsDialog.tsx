@@ -100,8 +100,8 @@ const GradeOptionsDialog = ({
       gradeId: grade.gradeId!,
       grader: grade.grader.name!,
       grade: grade.grade,
-      date: grade.date!,
-      expiryDate: grade.expiryDate!,
+      date: grade.date,
+      expiryDate: grade.expiryDate,
       exported: grade.exportedToSisu !== null,
       comment: grade.comment ?? '',
       selected: '',
@@ -205,7 +205,7 @@ const GradeOptionsDialog = ({
   const handleSubmit = async (): Promise<void> => {
     const newGrades: NewGrade[] = [];
     const deletedGrades: number[] = [];
-    const editedGrades: PartialGradeOption[] = [];
+    const editedGrades: ({gradeId: number} & PartialGradeOption)[] = [];
 
     for (const row of rows) {
       if (row.gradeId === -1) {
@@ -238,7 +238,7 @@ const GradeOptionsDialog = ({
       addGrades.mutateAsync(newGrades),
       ...deletedGrades.map(gradeId => deleteGrade.mutateAsync(gradeId)),
       ...editedGrades.map(grade =>
-        editGrade.mutateAsync({gradeId: grade.gradeId!, data: grade})
+        editGrade.mutateAsync({gradeId: grade.gradeId, data: grade})
       ),
     ]);
 

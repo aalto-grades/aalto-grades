@@ -79,7 +79,7 @@ AttainmentGrade.init(
     },
     expiryDate: {
       type: DataTypes.DATEONLY,
-      allowNull: true,
+      allowNull: false,
     },
     comment: {
       type: DataTypes.STRING,
