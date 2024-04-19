@@ -3,42 +3,139 @@
 // SPDX-License-Identifier: MIT
 
 import {Box, Button, Toolbar, Tooltip} from '@mui/material';
-import {JSX, useState} from 'react';
-import {NavigateFunction, useNavigate} from 'react-router-dom';
+import {JSX, useEffect, useState} from 'react';
+import {NavigateFunction, useNavigate, useParams} from 'react-router-dom';
 
 import {StudentRow} from '@common/types';
+import {batchCalculateGraph} from '@common/util/calculateGraph';
+import {enqueueSnackbar} from 'notistack';
+import {useTableContext} from '../../context/GradesTableProvider';
+import {useAddFinalGrades} from '../../hooks/api/finalGrade';
+import {useGetAllAssessmentModels, useGetGrades} from '../../hooks/useApi';
 import {State} from '../../types';
+import {findBestGrade} from '../../utils';
+import {findLatestGrade} from '../../utils/table';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
 import SisuDownloadDialog from './SisuDownloadDialog';
 
-export default function CourseResultsTableToolbar(props: {
-  // search: string;
-  // setSearch: (search: string) => void;
-  calculateFinalGrades: (
-    modelId: number,
-    dateOverride: boolean,
-    gradingDate: Date
-  ) => Promise<boolean>;
-  selectedRows: StudentRow[];
-  hasPendingStudents: boolean;
-  refreshFinalGrades: () => void;
-}): JSX.Element {
+function toggleString(arr: string[], str: string): string[] {
+  const index = arr.indexOf(str);
+  if (index > -1) {
+    arr.splice(index, 1);
+  } else {
+    arr.push(str);
+  }
+  return arr;
+}
+
+export default function CourseResultsTableToolbar(): JSX.Element {
+  const {table} = useTableContext();
   const navigate: NavigateFunction = useNavigate();
+  const {courseId} = useParams() as {courseId: string};
+  const assessmentModels = useGetAllAssessmentModels(courseId);
+  const addFinalGrades = useAddFinalGrades(courseId);
+  const getGrades = useGetGrades(courseId);
 
   const [showCalculateDialog, setShowCalculateDialog] =
     useState<boolean>(false);
   const [showSisuDialog, setShowSisuDialog]: State<boolean> = useState(false);
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
 
+  const [missingFinalGrades, setMissingFinalGrades] = useState<boolean>(false);
+  useEffect(() => {
+    setMissingFinalGrades(
+      // Prevent exporting sisu csv if students without final grades found
+      Boolean(
+        table
+          .getSelectedRowModel()
+          .rows.find(
+            selectedRow =>
+              selectedRow.original.finalGrades === undefined ||
+              selectedRow.original.finalGrades.length === 0
+          )
+      )
+    );
+    console.log('missingFinalGrades', missingFinalGrades);
+    console.log(
+      table
+        .getSelectedRowModel()
+        .rows.find(
+          selectedRow =>
+            selectedRow.original.finalGrades === undefined ||
+            selectedRow.original.finalGrades.length === 0
+        )
+    );
+  }, [table.getSelectedRowModel().rows]);
+
   function handleCloseSisuDialog(): void {
     setShowSisuDialog(false);
   }
-  // Firing the refetch after the transition for closingis finished
+
+  // // If asking for a refetch then it also update the selectedRows
+  // // Refresh selectedRows for updating childrens state
+  // const refreshFinalGrades = (): void => {
+  //   getFinalGrades.refetch().then(newFinalGrades => {
+  //     if (!newFinalGrades.data) return;
+  //     setSelectedRows(oldSelectedRows =>
+  //       oldSelectedRows.map(oldSelectedRow => ({
+  //         ...oldSelectedRow,
+  //         finalGrades: [
+  //           ...newFinalGrades.data.filter(
+  //             element => element.userId === oldSelectedRow.user.id
+  //           ),
+  //         ],
+  //       }))
+  //     );
+  //   });
+  // };
+
+  // Firing the refetch after the transition for closing is finished
   // to avoid abrupt layout changes in the dialog
   function handleExitedSisuDialog(): void {
-    props.refreshFinalGrades(); // Should not be necessary, but selectedStudent is not updated otherwise
+    getGrades.refetch();
   }
+
+  // Triggers the calculation of final grades
+  const handleCalculateFinalGrades = async (
+    selectedRows: StudentRow[],
+    assessmentModelId: number,
+    dateOverride: boolean,
+    gradingDate: Date
+  ): Promise<boolean> => {
+    const model = assessmentModels.data?.find(
+      assessmentModel => assessmentModel.id === assessmentModelId
+    );
+    if (model === undefined) return false;
+
+    enqueueSnackbar('Calculating final grades...', {
+      variant: 'info',
+    });
+
+    const finalGrades = batchCalculateGraph(
+      model.graphStructure,
+      selectedRows.map(selectedRow => ({
+        userId: selectedRow.user.id,
+        attainments: selectedRow.attainments.map(att => ({
+          attainmentId: att.attainmentId,
+          grade: findBestGrade(att.grades)!.grade, // TODO: Manage expired attainments
+        })),
+      }))
+    );
+    await addFinalGrades.mutateAsync(
+      selectedRows.map(selectedRow => ({
+        userId: selectedRow.user.id,
+        assessmentModelId,
+        grade: finalGrades[selectedRow.user.id].finalGrade,
+        date: dateOverride ? gradingDate : findLatestGrade(selectedRow),
+      }))
+    );
+    enqueueSnackbar('Final grades calculated successfully.', {
+      variant: 'success',
+    });
+    // refreshFinalGrades();
+    return true;
+  };
 
   return (
     <Toolbar
@@ -47,6 +144,29 @@ export default function CourseResultsTableToolbar(props: {
         py: 2,
       }}
     >
+      <button
+        onClick={() =>
+          table.setGrouping(old => {
+            const res = [...toggleString(old, 'grouping')];
+            return res;
+          })
+        }
+      >
+        Group by Date
+      </button>
+      <input
+        type="text"
+        value={
+          (table.getColumn('user_studentNumber')?.getFilterValue() ??
+            '') as string
+        }
+        onChange={e => {
+          table.getColumn('user_studentNumber')?.setFilterValue(e.target.value);
+        }}
+        placeholder={'Search...'}
+        className="w-36 border shadow rounded"
+      />
+
       <Box
         sx={{
           display: 'flex',
@@ -67,7 +187,7 @@ export default function CourseResultsTableToolbar(props: {
         >
           <Tooltip
             title={
-              props.selectedRows.length === 0
+              table.getSelectedRowModel().rows.length === 0
                 ? 'Select at least one student number for grade calculation.'
                 : 'Calculate course final grades for selected students.'
             }
@@ -77,7 +197,7 @@ export default function CourseResultsTableToolbar(props: {
               <Button
                 variant="outlined"
                 onClick={() => setShowCalculateDialog(true)}
-                disabled={props.selectedRows.length === 0}
+                disabled={table.getSelectedRowModel().rows.length === 0}
               >
                 Calculate final grades
               </Button>
@@ -85,9 +205,9 @@ export default function CourseResultsTableToolbar(props: {
           </Tooltip>
           <Tooltip
             title={
-              props.selectedRows.length === 0
+              table.getSelectedRowModel().rows.length === 0
                 ? 'Select at least one student number for downloading grades.'
-                : props.hasPendingStudents
+                : missingFinalGrades
                 ? 'Grades with status "PENDING" cannot be downloaded, ' +
                   'unselect or calculate grades for these.'
                 : 'Download final course grades as a Sisu compatible CSV file.'
@@ -97,13 +217,13 @@ export default function CourseResultsTableToolbar(props: {
             <span>
               <Button
                 variant="outlined"
-                color={props.hasPendingStudents ? 'error' : 'primary'}
+                color={missingFinalGrades ? 'error' : 'primary'}
                 onClick={(): void => {
-                  if (!props.hasPendingStudents) {
+                  if (!missingFinalGrades) {
                     setShowSisuDialog(true);
                   }
                 }}
-                disabled={props.selectedRows.length === 0}
+                disabled={table.getSelectedRowModel().rows.length === 0}
               >
                 Download Sisu CSV
               </Button>
@@ -125,14 +245,14 @@ export default function CourseResultsTableToolbar(props: {
           <CalculateFinalGradesDialog
             open={showCalculateDialog}
             onClose={() => setShowCalculateDialog(false)}
-            selectedRows={props.selectedRows}
-            calculateFinalGrades={props.calculateFinalGrades}
+            selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
+            calculateFinalGrades={handleCalculateFinalGrades}
           />
           <SisuDownloadDialog
             open={showSisuDialog}
             handleClose={handleCloseSisuDialog}
             handleExited={handleExitedSisuDialog}
-            selectedRows={props.selectedRows}
+            selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
           />
         </Box>
         {/* <Box
