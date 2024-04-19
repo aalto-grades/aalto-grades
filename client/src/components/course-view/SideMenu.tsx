@@ -6,6 +6,7 @@ import {
   AccountTree,
   AccountTreeOutlined,
   Edit,
+  EditOutlined,
   FlagCircle,
   FlagCircleOutlined,
   Widgets,
@@ -21,17 +22,71 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  SvgIconTypeMap,
 } from '@mui/material';
+import {OverridableComponent} from '@mui/types';
 import {JSX} from 'react';
 import {NavLink, useNavigate, useParams} from 'react-router-dom';
 
 import {SystemRole} from '@common/types';
 import useAuth from '../../hooks/useAuth';
 
-const SideMenu = ({onUpload}: {onUpload: () => void}): JSX.Element => {
-  const {courseId} = useParams();
+const SideMenuButton = ({
+  text,
+  to,
+  Icon,
+  IconOutlined,
+}: {
+  text: string;
+  to: string;
+  Icon: OverridableComponent<SvgIconTypeMap<{}, 'svg'>> & {muiName: string};
+  IconOutlined: OverridableComponent<SvgIconTypeMap<{}, 'svg'>> & {
+    muiName: string;
+  };
+}): JSX.Element => {
   const navigate = useNavigate();
 
+  return (
+    <ListItem disablePadding>
+      <NavLink
+        to={to}
+        style={{
+          color: 'inherit',
+          width: '100%',
+          textDecoration: 'none',
+        }}
+      >
+        {({isActive, isPending, isTransitioning}) => (
+          <ListItemButton
+            sx={{
+              color: 'inherit',
+              width: '100%',
+              borderRadius: 100,
+              fontSize: '1rem',
+              textAlign: 'left',
+              backgroundColor: isActive ? 'rgba(0, 0, 0, 0.1)' : '',
+            }}
+            onClick={() => navigate(to)}
+          >
+            <ListItemIcon>
+              {isPending || isTransitioning ? (
+                <CircularProgress />
+              ) : isActive ? (
+                <Icon />
+              ) : (
+                <IconOutlined />
+              )}
+            </ListItemIcon>
+            <ListItemText primary={text} />
+          </ListItemButton>
+        )}
+      </NavLink>
+    </ListItem>
+  );
+};
+
+const SideMenu = ({onUpload}: {onUpload: () => void}): JSX.Element => {
+  const {courseId} = useParams();
   const {auth} = useAuth();
 
   return (
@@ -41,46 +96,12 @@ const SideMenu = ({onUpload}: {onUpload: () => void}): JSX.Element => {
         minWidth: '204px',
       }}
     >
-      <ListItem disablePadding>
-        <NavLink
-          to={'/'}
-          style={{
-            color: 'inherit',
-            width: '100%',
-            textDecoration: 'none',
-          }}
-        >
-          {({isActive, isPending}) => {
-            return (
-              <ListItemButton
-                sx={{
-                  color: 'inherit',
-                  width: '100%',
-                  // padding: 1,
-                  borderRadius: 100,
-                  fontSize: '1rem',
-                  textAlign: 'left',
-                  backgroundColor: isActive ? 'rgba(0, 0, 0, 0.1)' : '',
-                }}
-                onClick={(): void => {
-                  navigate('/');
-                }}
-              >
-                <ListItemIcon>
-                  {isPending ? (
-                    <CircularProgress />
-                  ) : isActive ? (
-                    <FlagCircle />
-                  ) : (
-                    <FlagCircleOutlined />
-                  )}
-                </ListItemIcon>
-                <ListItemText primary="Courses List" />
-              </ListItemButton>
-            );
-          }}
-        </NavLink>
-      </ListItem>
+      <SideMenuButton
+        text="Courses List"
+        to="/"
+        Icon={FlagCircle}
+        IconOutlined={FlagCircleOutlined}
+      />
 
       <Divider sx={{mb: 2, mt: 1}} />
       <Button variant="outlined" onClick={onUpload}>
@@ -88,152 +109,33 @@ const SideMenu = ({onUpload}: {onUpload: () => void}): JSX.Element => {
       </Button>
       <Divider sx={{my: 2}} />
       <List>
-        <ListItem disablePadding>
-          <NavLink
-            to={`/${courseId}/course-results`}
-            style={{
-              color: 'inherit',
-              width: '100%',
-              textDecoration: 'none',
-            }}
-          >
-            {({isActive, isPending, isTransitioning}) => {
-              return (
-                <ListItemButton
-                  sx={{
-                    color: 'inherit',
-                    width: '100%',
-                    // padding: 1,
-                    borderRadius: 100,
-                    fontSize: '1rem',
-                    textAlign: 'left',
-                    backgroundColor: isActive ? 'rgba(0, 0, 0, 0.1)' : '',
-                  }}
-                  onClick={(): void => {
-                    navigate(`/${courseId}/course-results`);
-                  }}
-                >
-                  <ListItemIcon>
-                    {isPending || isTransitioning ? (
-                      <CircularProgress />
-                    ) : isActive ? (
-                      <FlagCircle />
-                    ) : (
-                      <FlagCircleOutlined />
-                    )}
-                  </ListItemIcon>
-                  <ListItemText primary="Grades" />
-                </ListItemButton>
-              );
-            }}
-          </NavLink>
-        </ListItem>
-
-        <ListItem disablePadding>
-          <NavLink
-            to={`/${courseId}/models`}
-            style={{
-              color: 'inherit',
-              width: '100%',
-              textDecoration: 'none',
-            }}
-          >
-            {({isActive, isPending: _, isTransitioning: __}) => {
-              return (
-                <ListItemButton
-                  sx={{
-                    color: 'inherit',
-                    width: '100%',
-                    // padding: 1,
-                    borderRadius: 100,
-                    fontSize: '1rem',
-                    textAlign: 'left',
-                    backgroundColor: isActive ? 'rgba(0, 0, 0, 0.1)' : '',
-                  }}
-                  onClick={(): void => {
-                    navigate(`/${courseId}/models`);
-                  }}
-                >
-                  <ListItemIcon>
-                    {isActive ? <AccountTree /> : <AccountTreeOutlined />}
-                  </ListItemIcon>
-                  <ListItemText primary="Grading Models" />
-                </ListItemButton>
-              );
-            }}
-          </NavLink>
-        </ListItem>
-        <ListItem disablePadding>
-          <NavLink
-            to={`/${courseId}/attainments`}
-            style={{
-              color: 'inherit',
-              width: '100%',
-              textDecoration: 'none',
-            }}
-          >
-            {({isActive, isPending: _, isTransitioning: __}) => {
-              return (
-                <ListItemButton
-                  sx={{
-                    color: 'inherit',
-                    width: '100%',
-                    // padding: 1,
-                    borderRadius: 100,
-                    fontSize: '1rem',
-                    textAlign: 'left',
-                    backgroundColor: isActive ? 'rgba(0, 0, 0, 0.1)' : '',
-                  }}
-                  onClick={(): void => {
-                    navigate(`/${courseId}/attainments`);
-                  }}
-                >
-                  <ListItemIcon>
-                    {isActive ? <Widgets /> : <WidgetsOutlined />}
-                  </ListItemIcon>
-                  <ListItemText primary="Attainments" />
-                </ListItemButton>
-              );
-            }}
-          </NavLink>
-        </ListItem>
+        <SideMenuButton
+          text="Grades"
+          to={`/${courseId}/course-results`}
+          Icon={FlagCircle}
+          IconOutlined={FlagCircleOutlined}
+        />
+        <SideMenuButton
+          text="Grading Models"
+          to={`/${courseId}/models`}
+          Icon={AccountTree}
+          IconOutlined={AccountTreeOutlined}
+        />
+        <SideMenuButton
+          text="Attainments"
+          to={`/${courseId}/attainments`}
+          Icon={Widgets}
+          IconOutlined={WidgetsOutlined}
+        />
         {auth?.role === SystemRole.Admin && (
           <>
             <Divider sx={{my: 2}} />
-            <ListItem disablePadding>
-              <NavLink
-                to={`/${courseId}/edit`}
-                style={{
-                  color: 'inherit',
-                  width: '100%',
-                  textDecoration: 'none',
-                }}
-              >
-                {({isActive, isPending: _, isTransitioning: __}) => {
-                  return (
-                    <ListItemButton
-                      sx={{
-                        color: 'inherit',
-                        width: '100%',
-                        // padding: 1,
-                        borderRadius: 100,
-                        fontSize: '1rem',
-                        textAlign: 'left',
-                        backgroundColor: isActive ? 'rgba(0, 0, 0, 0.1)' : '',
-                      }}
-                      onClick={(): void => {
-                        navigate(`/${courseId}/post/edit`);
-                      }}
-                    >
-                      <ListItemIcon>
-                        <Edit />
-                      </ListItemIcon>
-                      <ListItemText primary="Edit Course" />
-                    </ListItemButton>
-                  );
-                }}
-              </NavLink>
-            </ListItem>
+            <SideMenuButton
+              text="Edit Course"
+              to={`/${courseId}/edit`}
+              Icon={Edit}
+              IconOutlined={EditOutlined}
+            />
           </>
         )}
       </List>
