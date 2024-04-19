@@ -10,10 +10,3 @@ export interface FinalGradeModelData {
   grade: number;
   date?: Date;
 }
-
-export interface StudentFinalGrades {
-  // User's ID (PK) in the database user table.
-  id?: number;
-  studentNumber: string;
-  grades: FinalGradeModelData[];
-}
