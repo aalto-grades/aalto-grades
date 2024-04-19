@@ -56,6 +56,26 @@ const findAndValidateAttainmentId = async (
 };
 
 /**
+ * Validates that the attainment id belongs to the course.
+ * Throws ApiError if attainment not found or didn't belong to course.
+ */
+export const validateAttainmentBelongsToCourse = async (
+  courseId: number,
+  attainmentId: number
+): Promise<void> => {
+  const attainment = await findAttainmentById(attainmentId);
+
+  // Check that assessment model belongs to the course.
+  if (attainment.courseId !== courseId) {
+    throw new ApiError(
+      `Attainment ID ${attainment.id} ` +
+        `does not belong to the course with ID ${courseId}`,
+      HttpCode.Conflict
+    );
+  }
+};
+
+/**
  * Finds the course and the assessment model by url param ids and also validates the url params.
  * Throws ApiError if either not found.
  */

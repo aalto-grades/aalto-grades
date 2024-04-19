@@ -61,12 +61,11 @@ const UserGraphDialog = ({
       </DialogContent>
       <DialogActions>
         {assessmentModels !== undefined && assessmentModels.length > 0 && (
-          <FormControl>
+          <FormControl size="small">
             <InputLabel id="assessment-model-select-label">
               Assessment model
             </InputLabel>
             <Select
-              size="small"
               sx={{minWidth: '150px'}}
               labelId="assessment-model-select-label"
               value={selectedModel?.id || assessmentModels[0].id}
@@ -80,7 +79,9 @@ const UserGraphDialog = ({
               }}
             >
               {assessmentModels.map(model => (
-                <MenuItem value={model.id}>{model.name}</MenuItem>
+                <MenuItem key={model.id} value={model.id}>
+                  {model.name}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>

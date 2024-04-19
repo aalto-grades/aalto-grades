@@ -61,7 +61,7 @@ import RoundNode from './RoundNode';
 import SelectAttainmentsDialog from './SelectAttainmentsDialog';
 import StepperNode from './StepperNode';
 import SubstituteNode from './SubstituteNode';
-import './flow.css';
+import './flow.scss';
 import {findDisconnectedEdges, formatGraph} from './graphUtil';
 
 const nodeTypesMap = {

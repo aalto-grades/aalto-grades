@@ -69,22 +69,39 @@ export const useAddGrades = (
   });
 };
 
-type EditGradeVars = {
-  courseId?: Numeric;
-  assessmentModelId?: Numeric;
-  gradeId?: Numeric;
-  data?: PartialGradeOption;
-};
+type EditGradeVars = {gradeId: Numeric; data: PartialGradeOption};
 export const useEditGrade = (
+  courseId: Numeric,
   options?: UseMutationOptions<unknown, unknown, EditGradeVars>
 ): UseMutationResult<unknown, unknown, EditGradeVars> =>
   useMutation({
     mutationFn: async (vars: EditGradeVars) =>
       await axios.put(
-        `/v1/courses/${vars.courseId}/assessment-models/` +
-          `${vars.assessmentModelId}/grades/${vars.gradeId}`,
+        `/v1/courses/${courseId}/grades/${vars.gradeId}`,
         vars.data
       ),
-
     ...options,
   });
+
+export const useDeleteGrade = (
+  courseId: Numeric,
+  options?: UseMutationOptions<unknown, unknown, Numeric>
+): UseMutationResult<unknown, unknown, Numeric> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (gradeId: Numeric) =>
+      await axios.delete(`/v1/courses/${courseId}/grades/${gradeId}`),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['attainments', courseId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['root-attainment', courseId],
+      });
+    },
+    ...options,
+  });
+};

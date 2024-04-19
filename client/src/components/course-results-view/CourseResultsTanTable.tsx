@@ -194,14 +194,17 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
   // Creating Grades columns
   const dynamicColumns = attainmentList.map(att => {
     return columnHelper.accessor(
-      row => row.attainments.find(a => a.attainmentId == att.id),
+      row => row.attainments.find(a => a.attainmentId === att.id),
       {
         header: att.name,
         meta: {PrettyChipPosition: 'alone'},
         enableSorting: false,
         size: 120,
-        cell: ({getValue}) => (
-          <GradeCell studentNumber={'123'} attainemntResults={getValue()} />
+        cell: ({getValue, row}) => (
+          <GradeCell
+            studentNumber={row.original.user.studentNumber ?? 'N/A'}
+            attainemntResults={getValue()}
+          />
         ),
         footer: att.name,
       }

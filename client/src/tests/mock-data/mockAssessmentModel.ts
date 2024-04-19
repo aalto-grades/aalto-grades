@@ -5,6 +5,8 @@
 import {AssessmentModelData} from '@common/types';
 
 export const mockAssessmentModel: AssessmentModelData = {
+  id: 1,
+  courseId: 1,
   name: 'Average',
   graphStructure: {
     nodes: [

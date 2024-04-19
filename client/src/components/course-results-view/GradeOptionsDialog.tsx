@@ -2,149 +2,337 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {GradeOption} from '@common/types';
+import {Add, Delete} from '@mui/icons-material';
 import {
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Theme,
-  Typography,
-  useTheme,
 } from '@mui/material';
-import {JSX} from 'react';
+import {
+  DataGrid,
+  GridActionsCellItem,
+  GridColDef,
+  GridRowModel,
+  GridRowsProp,
+  GridToolbarContainer,
+} from '@mui/x-data-grid';
+import {enqueueSnackbar} from 'notistack';
+import {JSX, useEffect, useMemo, useState} from 'react';
 
-import {findBestGradeOption, isGradeDateExpired} from '../../utils';
+import {GradeOption, NewGrade, PartialGradeOption} from '@common/types';
+import {useParams} from 'react-router-dom';
+import {useAddGrades, useDeleteGrade, useEditGrade} from '../../hooks/useApi';
+import useAuth from '../../hooks/useAuth';
+import {findBestGradeOption} from '../../utils';
+import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
-export default function GradeOptionsDialog(props: {
-  title: string;
-  options: Array<GradeOption>;
+type ColTypes = {
+  id: number;
+  gradeId: number;
+  grader: string;
+  grade: number;
+  date: Date;
+  expiryDate: Date;
+  exported: boolean;
+  comment: string;
+  selected: string;
+};
+
+type PropsType = {
   open: boolean;
-  handleClose: () => void;
-}): JSX.Element {
-  const theme: Theme = useTheme();
-  interface Cell {
-    id: keyof GradeOption;
-    label: string;
-  }
+  onClose: () => void;
+  studentNumber: string;
+  attainmentId: number;
+  title: string;
+  grades: GradeOption[];
+};
+const GradeOptionsDialog = ({
+  open,
+  onClose,
+  studentNumber,
+  attainmentId,
+  title,
+  grades,
+}: PropsType): JSX.Element => {
+  const {auth} = useAuth();
+  const {courseId} = useParams() as {courseId: string};
 
-  const headCells: Array<Cell> = [
+  const addGrades = useAddGrades(courseId);
+  const deleteGrade = useDeleteGrade(courseId);
+  const editGrade = useEditGrade(courseId);
+
+  const [initRows, setInitRows] = useState<GridRowsProp<ColTypes>>([]);
+  const [rows, setRows] = useState<GridRowsProp<ColTypes>>([]);
+  const [unsavedOpen, setUnsavedOpen] = useState<boolean>(false);
+  const [editing, setEditing] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+
+  const changes = useMemo(
+    () =>
+      JSON.stringify(rows.map(row => ({...row, selected: ''}))) !==
+      JSON.stringify(initRows),
+    [initRows, rows]
+  );
+
+  const bestGrade = useMemo(
+    () =>
+      findBestGradeOption(rows, {
+        avoidExpired: true,
+        preferExpiredToNull: true,
+        useLatest: false, // TODO: Read from state?
+      }),
+    [rows]
+  );
+
+  useEffect(() => {
+    const newRows = rows.map(row => ({
+      ...row,
+      selected: bestGrade !== null && row.id === bestGrade.id ? 'selected' : '',
+    }));
+    if (JSON.stringify(rows) !== JSON.stringify(newRows)) setRows(newRows);
+  }, [bestGrade, rows]);
+
+  useEffect(() => {
+    const newRows = grades.map((grade, gradeId) => ({
+      id: gradeId,
+      gradeId: grade.gradeId!,
+      grader: grade.grader.name!,
+      grade: grade.grade,
+      date: grade.date!,
+      expiryDate: grade.expiryDate!,
+      exported: grade.exportedToSisu !== null,
+      comment: grade.comment ?? '',
+      selected: '',
+    }));
+    setRows(newRows);
+    setInitRows(structuredClone(newRows));
+  }, [grades]);
+
+  if (!auth) return <>Not permitted</>; // Not needed?
+
+  const columns: GridColDef<ColTypes>[] = [
     {
-      id: 'gradeId',
-      label: 'Grade ID',
+      field: 'grader',
+      headerName: 'Grader',
+      type: 'string',
+      editable: false,
     },
     {
-      id: 'grader',
-      label: 'Grader',
+      field: 'grade',
+      headerName: 'Grade',
+      type: 'number',
+      editable: true,
     },
     {
-      id: 'grade',
-      label: 'Grade',
+      field: 'date',
+      headerName: 'Date',
+      type: 'date',
+      editable: true,
+      width: 120,
     },
     {
-      id: 'date',
-      label: 'Date',
+      field: 'expiryDate',
+      headerName: 'Expiry Date',
+      type: 'date',
+      editable: true,
+      width: 120,
     },
     {
-      id: 'expiryDate',
-      label: 'Expiry Date',
+      field: 'exported',
+      headerName: 'Exported',
+      type: 'boolean',
+      editable: false,
     },
     {
-      id: 'exportedToSisu',
-      label: 'Exported',
+      field: 'comment',
+      headerName: 'Comment',
+      type: 'string',
+      editable: true,
     },
     {
-      id: 'comment',
-      label: 'Comment',
+      field: 'actions',
+      type: 'actions',
+      getActions: params => [
+        <GridActionsCellItem
+          icon={<Delete />}
+          label="Delete"
+          onClick={() =>
+            setRows(oldRows => oldRows.filter(row => row.id !== params.id))
+          }
+        />,
+      ],
+    },
+    {
+      field: 'selected',
+      type: 'string',
+      headerName: '',
+      disableColumnMenu: true,
     },
   ];
 
-  const bestGrade = findBestGradeOption(props.options, {
-    avoidExpired: true,
-    preferExpiredToNull: true,
-    useLatest: false, // TODO: Read from state?
-  });
+  const dataGridToolbar = (): JSX.Element => {
+    const handleClick = (): void => {
+      setRows(oldRows => {
+        const freeId =
+          oldRows.reduce((mxVal, row) => Math.max(mxVal, row.id), 0) + 1;
+        const newRow: ColTypes = {
+          id: freeId,
+          gradeId: -1,
+          grader: auth.name,
+          grade: 0,
+          date: new Date(),
+          expiryDate: new Date(
+            new Date().getTime() + 365 * 24 * 60 * 60 * 1000
+          ),
+          exported: false,
+          comment: '',
+          selected: '',
+        };
+        return oldRows.concat(newRow);
+      });
+    };
+    return (
+      <GridToolbarContainer>
+        <Button startIcon={<Add />} onClick={handleClick}>
+          Add Grade
+        </Button>
+      </GridToolbarContainer>
+    );
+  };
+
+  const handleSubmit = async (): Promise<void> => {
+    const newGrades: NewGrade[] = [];
+    const deletedGrades: number[] = [];
+    const editedGrades: PartialGradeOption[] = [];
+
+    for (const row of rows) {
+      if (row.gradeId === -1) {
+        newGrades.push({
+          studentNumber,
+          attainmentId,
+          grade: row.grade,
+          date: row.date,
+          expiryDate: row.expiryDate,
+          comment: row.comment,
+        });
+      } else {
+        editedGrades.push({
+          gradeId: row.gradeId,
+          grade: row.grade,
+          date: row.date,
+          expiryDate: row.expiryDate,
+          comment: row.comment,
+        });
+      }
+    }
+
+    const rowIds = rows.map(row => row.gradeId);
+    for (const initRow of initRows) {
+      if (!rowIds.includes(initRow.gradeId))
+        deletedGrades.push(initRow.gradeId);
+    }
+
+    await Promise.all([
+      addGrades.mutateAsync(newGrades),
+      ...deletedGrades.map(gradeId => deleteGrade.mutateAsync(gradeId)),
+      ...editedGrades.map(grade =>
+        editGrade.mutateAsync({gradeId: grade.gradeId!, data: grade})
+      ),
+    ]);
+
+    enqueueSnackbar('Grades saved successfully', {variant: 'success'});
+    setInitRows(structuredClone(rows));
+  };
 
   return (
-    <Dialog
-      open={props.open}
-      transitionDuration={{exit: 800}}
-      maxWidth="md"
-      onClose={props.handleClose}
-    >
-      <DialogTitle>{props.title}</DialogTitle>
-      <DialogContent>
-        <Table>
-          <TableHead>
-            <TableRow>
-              {headCells.map((cell: Cell) => (
-                <TableCell key={cell.id}>{cell.label}</TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {props.options.map((option: GradeOption) => (
-              <TableRow
-                key={option.gradeId}
-                style={{
-                  border:
-                    bestGrade?.gradeId === option.gradeId
-                      ? `3px solid ${theme.palette.primary.main}`
-                      : 'inherit',
-                  backgroundColor: isGradeDateExpired(option.expiryDate)
-                    ? `rgba(${theme.vars.palette.error.mainChannel} / 0.1)`
-                    : 'inherit',
-                }}
-              >
-                {headCells.map((cell: Cell) => (
-                  <TableCell
-                    key={cell.id}
-                    style={{
-                      whiteSpace: 'normal',
-                      wordWrap: 'break-word',
-                    }}
-                  >
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        maxWidth: 100,
-                        color:
-                          cell.id === 'expiryDate' &&
-                          isGradeDateExpired(option.expiryDate)
-                            ? 'error.main'
-                            : 'inherit',
-                        fontWeight:
-                          cell.id === 'expiryDate' &&
-                          isGradeDateExpired(option.expiryDate)
-                            ? 'bold'
-                            : 'inherit',
-                      }}
-                    >
-                      {cell.id === 'grader'
-                        ? option.grader.name
-                        : option[cell.id] === null ||
-                          option[cell.id] === undefined
-                        ? '-'
-                        : String(option[cell.id])}
-                    </Typography>
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </DialogContent>
-      <DialogActions sx={{pr: 4, pb: 3}}>
-        <Button size="medium" variant="outlined" onClick={props.handleClose}>
-          Close
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <>
+      <UnsavedChangesDialog
+        open={unsavedOpen}
+        onClose={() => setUnsavedOpen(false)}
+        handleDiscard={() => {
+          onClose();
+          setRows(structuredClone(initRows));
+        }}
+      />
+      <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+        <DialogTitle>{title}</DialogTitle>
+        <DialogContent>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            rowHeight={25}
+            editMode="row"
+            rowSelection={false}
+            disableColumnSelector
+            slots={{toolbar: dataGridToolbar}}
+            sx={{maxHeight: '70vh', minHeight: '20vh'}}
+            initialState={{
+              sorting: {sortModel: [{field: 'date', sort: 'desc'}]},
+            }}
+            onRowEditStart={() => setEditing(true)}
+            onRowEditStop={() => setEditing(false)}
+            processRowUpdate={(
+              updatedRow: GridRowModel<ColTypes>,
+              oldRow: GridRowModel<ColTypes>
+            ) => {
+              const diff = updatedRow.date.getTime() - oldRow.date.getTime(); // Diff to update expiration date with
+
+              if (
+                diff !== 0 &&
+                updatedRow.expiryDate.getTime() === oldRow.expiryDate.getTime()
+              ) {
+                updatedRow.expiryDate = new Date(
+                  updatedRow.expiryDate.getTime() + diff
+                );
+              }
+
+              setRows((oldRows: GridRowsProp<ColTypes>) =>
+                oldRows.map(row =>
+                  row.id === updatedRow.id ? updatedRow : row
+                )
+              );
+              // // TODO: do some validation. Code below is an example.
+              // for (const [key, val] of Object.entries(updatedRow)) {
+              //   if (key === 'id' || key === 'StudentNo') continue;
+              //   if ((val as number) < 0)
+              //     throw new Error('Value cannot be negative');
+              //   else if ((val as number) > 5000)
+              //     throw new Error('Value cannot be over 5000');
+              // }
+              // enqueueSnackbar('Row saved!', {variant: 'success'});
+              setError(false);
+              return updatedRow;
+            }}
+            onProcessRowUpdateError={(rowError: Error) => {
+              setError(true);
+              enqueueSnackbar(rowError.message, {variant: 'error'});
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              if (changes) setUnsavedOpen(true);
+              else onClose();
+            }}
+          >
+            {changes ? 'Discard' : 'Close'}
+          </Button>
+          <Button
+            onClick={() => {
+              if (changes) handleSubmit();
+            }}
+            variant={changes ? 'contained' : 'text'}
+            disabled={error || editing}
+          >
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
-}
+};
+
+export default GradeOptionsDialog;

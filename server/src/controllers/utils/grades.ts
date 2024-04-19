@@ -6,9 +6,12 @@ import {HttpCode} from '@common/types';
 import {Includeable, Op} from 'sequelize';
 import Attainment from '../../database/models/attainment';
 import AttainmentGrade from '../../database/models/attainmentGrade';
+import Course from '../../database/models/course';
 import FinalGrade from '../../database/models/finalGrade';
 import User from '../../database/models/user';
 import {ApiError, stringToIdSchema} from '../../types';
+import {findAttainmentById} from './attainment';
+import {findAndValidateCourseId, findCourseById} from './course';
 
 /**
  * Retrieves the date of the latest grade for a user based on an assessment model ID.
@@ -130,12 +133,33 @@ export const findAttainmentGradeById = async (
   return attainment;
 };
 
-export const findAndValidateAttainmentGrade = async (
+/**
+ * Finds and attainment grade by id and also validates
+ * that it belongs to the correct course.
+ * Throws ApiError if invalid ids, not found, or didn't match.
+ */
+export const findAndValidateAttainmentGradePath = async (
+  courseId: string,
   gradeId: string
-): Promise<AttainmentGrade> => {
+): Promise<[Course, AttainmentGrade]> => {
   const result = stringToIdSchema.safeParse(gradeId);
   if (!result.success) {
     throw new ApiError(`Invalid attainment id ${gradeId}`, HttpCode.BadRequest);
   }
-  return await findAttainmentGradeById(result.data);
+  const targetCourse = await findAndValidateCourseId(courseId);
+  const grade = await findAttainmentGradeById(result.data);
+
+  const attainment = await findAttainmentById(grade.attainmentId);
+  const course = await findCourseById(attainment.courseId);
+
+  // Check that assessment model belongs to the course.
+  if (course.id !== targetCourse.id) {
+    throw new ApiError(
+      `Grade ID ${grade.id} ` +
+        `does not belong to the course with ID ${targetCourse.id}`,
+      HttpCode.Conflict
+    );
+  }
+
+  return [course, grade];
 };

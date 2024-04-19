@@ -14,7 +14,8 @@ import {
 } from '@common/types';
 import {
   addGrades,
-  editUserGrade,
+  deleteGrade,
+  editGrade,
   getGrades,
   getSisuFormattedGradingCSV,
 } from '../controllers/grades';
@@ -49,10 +50,16 @@ router.post(
 );
 
 router.put(
-  '/v1/courses/:courseId/assessment-models/:assessmentModelId/grades/:gradeId',
+  '/v1/courses/:courseId/grades/:gradeId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(PartialGradeOptionSchema),
-  controllerDispatcher(editUserGrade)
+  controllerDispatcher(editGrade)
+);
+
+router.delete(
+  '/v1/courses/:courseId/grades/:gradeId',
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  controllerDispatcher(deleteGrade)
 );

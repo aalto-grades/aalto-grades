@@ -38,6 +38,8 @@ const studentNumbers = students.map(student => student.studentNumber);
 
 // TODO: Test multiple final grades
 // TODO: Test getting grades
+// TODO: Test grades/attainments not belonging to course
+// TODO: Test deleting grades
 
 beforeAll(async () => {
   cookies = await getCookies();
@@ -459,10 +461,10 @@ describe('Test POST /v1/courses/:courseId/grades - post grades', () => {
   });
 });
 
-describe('Test PUT /v1/courses/:courseId/assessment-models/:assessmentModelId/grades/:gradeId - edit user grade data', () => {
+describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit user grade data', () => {
   it('should edit user attainment grade data (admin user)', async () => {
     const res = await request
-      .put(`/v1/courses/${testCourseId}/assessment-models/7/grades/4`)
+      .put(`/v1/courses/${testCourseId}/grades/4`)
       .send({
         grade: 5,
         date: new Date(),
@@ -476,7 +478,7 @@ describe('Test PUT /v1/courses/:courseId/assessment-models/:assessmentModelId/gr
 
   it('should edit user attainment grade data (teacher in charge)', async () => {
     const res = await request
-      .put(`/v1/courses/${testCourseId}/assessment-models/7/grades/5`)
+      .put(`/v1/courses/${testCourseId}/grades/5`)
       .send({
         grade: 5,
         date: new Date(),
@@ -490,7 +492,7 @@ describe('Test PUT /v1/courses/:courseId/assessment-models/:assessmentModelId/gr
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
     const res = await request
-      .put('/v1/courses/1/assessment-models/1/grades/1')
+      .put('/v1/courses/1/grades/1')
       .set('Accept', 'application/json')
       .expect(HttpCode.Unauthorized);
 
@@ -499,7 +501,7 @@ describe('Test PUT /v1/courses/:courseId/assessment-models/:assessmentModelId/gr
 
   it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
     const res = await request
-      .put(`/v1/courses/${testCourse2Id}/assessment-models/8/grades/4`)
+      .put(`/v1/courses/${testCourse2Id}/grades/34`)
       .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Forbidden);
@@ -510,18 +512,7 @@ describe('Test PUT /v1/courses/:courseId/assessment-models/:assessmentModelId/gr
 
   it('should respond with 404 not found, if grade does not exist', async () => {
     const res = await request
-      .put(`/v1/courses/${testCourseId}/assessment-models/7/grades/${badId}`)
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.NotFound);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
-  });
-
-  it('should respond with 404 not found, if assessment model does not exist', async () => {
-    const res = await request
-      .put(`/v1/courses/${testCourseId}/assessment-models/${badId}/grades/4`)
+      .put(`/v1/courses/${testCourseId}/grades/${badId}`)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.NotFound);
@@ -532,21 +523,10 @@ describe('Test PUT /v1/courses/:courseId/assessment-models/:assessmentModelId/gr
 
   it('should respond with 404 not found, if course does not exist', async () => {
     const res = await request
-      .put(`/v1/courses/${badId}/assessment-models/7/grades/4`)
+      .put(`/v1/courses/${badId}/grades/4`)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.NotFound);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
-  });
-
-  it('should respond with 409 conflict, if assessment model does not belong to the course', async () => {
-    const res = await request
-      .put(`/v1/courses/${testCourseId}/assessment-models/1/grades/4`)
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Conflict);
 
     const result = await ErrorSchema.safeParseAsync(res.body);
     expect(result.success).toBeTruthy();
