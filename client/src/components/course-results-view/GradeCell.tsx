@@ -103,7 +103,7 @@ const GradeCell: FC<GradeCellProps> = (
         <>
           <Tooltip
             placement="top"
-            title={`Grade expired on ${bestGrade?.expiryDate}`}
+            title={`Grade expired on ${bestGrade?.expiryDate.toString()}`}
           >
             {/* <IconButton
                   size='small'
@@ -134,7 +134,7 @@ const GradeCell: FC<GradeCellProps> = (
       {
         <Tooltip
           placement="top"
-          title={`Grade obtained on ${bestGrade?.date}`}
+          title={`Grade obtained on ${bestGrade?.date.toString()}`}
           disableInteractive
         >
           <Box

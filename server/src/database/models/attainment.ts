@@ -5,7 +5,6 @@
 import {
   CreationOptional,
   DataTypes,
-  Deferrable,
   ForeignKey,
   InferAttributes,
   InferCreationAttributes,

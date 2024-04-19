@@ -4,8 +4,7 @@
 
 /* eslint camelcase: off */
 
-import {DataTypes, Deferrable, QueryInterface} from 'sequelize';
-
+import {DataTypes, QueryInterface} from 'sequelize';
 import logger from '../../configs/winston';
 
 export default {

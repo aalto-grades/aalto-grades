@@ -351,15 +351,15 @@ export const calculateNewNodeValues = (
 
     for (const edge of nodeTargets[sourceId]) {
       const sourceValue =
-        (sourceNodeValue.type === 'require' ||
+        sourceNodeValue.type === 'require' ||
         sourceNodeValue.type === 'substitute'
           ? sourceNodeValue.values[
               (edge.sourceHandle as string)
                 .replace('-substitute-source', '')
                 .replace('-exercise-source', '')
                 .replace('-source', '')
-            ]
-          : sourceNodeValue.value) ?? 0;
+            ] ?? 0
+          : sourceNodeValue.value;
 
       nodeSources[edge.target].delete(sourceId);
       if (
@@ -482,15 +482,15 @@ export const batchCalculateGraph = (
       for (const student of studentData) {
         const sourceNodeValue = nodeValues[student.userId][sourceId];
         const sourceValue =
-          (sourceNodeValue.type === 'require' ||
+          sourceNodeValue.type === 'require' ||
           sourceNodeValue.type === 'substitute'
             ? sourceNodeValue.values[
                 (edge.sourceHandle as string)
                   .replace('-substitute-source', '')
                   .replace('-exercise-source', '')
                   .replace('-source', '')
-              ]
-            : sourceNodeValue.value) ?? 0;
+              ] ?? 0
+            : sourceNodeValue.value;
 
         const nodeValue = nodeValues[student.userId][edge.target];
         switch (nodeValue.type) {

@@ -39,7 +39,12 @@ export async function connectToDatabase(): Promise<void> {
     await sequelize.authenticate();
     logger.info('database connected');
   } catch (error) {
-    logger.error(`database connection failed: ${error}`);
+    if (typeof error === 'string' || error instanceof Error) {
+      logger.error(`database connection failed: ${error.toString()}`);
+    } else {
+      logger.error('database connection failed with an unknown error type');
+    }
+
     throw new Error('database connection failed');
   }
 }
