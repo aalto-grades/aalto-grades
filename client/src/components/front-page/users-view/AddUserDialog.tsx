@@ -88,11 +88,11 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
                 label="Email"
                 InputLabelProps={{shrink: true}}
                 helperText={
-                  form.errors['email']
-                    ? form.errors['email']
+                  form.errors.email
+                    ? form.errors.email
                     : 'Aalto email e.g. firstname.lastname@aalto.fi'
                 }
-                error={form.touched['email'] && Boolean(form.errors['email'])}
+                error={form.touched.email && Boolean(form.errors.email)}
               />
             </DialogContent>
             <DialogActions>

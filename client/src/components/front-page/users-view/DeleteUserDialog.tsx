@@ -18,7 +18,7 @@ type PropsType = {
   handleClose: () => void;
   description: string;
   open: boolean;
-  userId: number;
+  userId: number | null;
 };
 const DeleteUserDialog = ({
   title,
@@ -42,7 +42,13 @@ const DeleteUserDialog = ({
     </DialogContent>
     <DialogActions>
       <Button onClick={handleClose}>Cancel</Button>
-      <Button onClick={() => handleAccept(userId)} autoFocus>
+      <Button
+        onClick={() => {
+          if (userId !== null) handleAccept(userId);
+          else console.error('UserId was null');
+        }}
+        autoFocus
+      >
         Delete
       </Button>
     </DialogActions>

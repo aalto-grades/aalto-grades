@@ -33,7 +33,7 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
           {headCells.map(headCell =>
             headCell.id === 'code' ? (
               <TableCell key={headCell.id}>
-                <TableSortLabel active={headCell.id === 'code'} direction="asc">
+                <TableSortLabel active direction="asc">
                   <Typography sx={{fontWeight: 'bold'}}>
                     {headCell.label}
                   </Typography>

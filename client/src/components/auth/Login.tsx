@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {LoginResult} from '@common/types';
 import {Visibility, VisibilityOff} from '@mui/icons-material';
 import {
   Box,
@@ -15,47 +14,31 @@ import {
   Typography,
 } from '@mui/material';
 import {JSX, SyntheticEvent, useState} from 'react';
-import {NavigateFunction, useNavigate} from 'react-router-dom';
-
-import ExternalAuth from './ExternalAuth';
+import {useNavigate} from 'react-router-dom';
 
 import {useLogIn} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import {State} from '../../types';
+import ExternalAuth from './ExternalAuth';
 
 export default function Login(): JSX.Element {
-  const navigate: NavigateFunction = useNavigate();
-  const {setAuth}: {setAuth: (auth: LoginResult | null) => void} = useAuth();
-  const [showPassword, setShowPassword]: State<boolean> = useState(false);
+  const navigate = useNavigate();
+  const {setAuth} = useAuth();
 
-  function handleClickShowPassword(): void {
-    setShowPassword(!showPassword);
-  }
-
-  function handleMouseDownPassword(
-    event: React.MouseEvent<HTMLButtonElement>
-  ): void {
-    event.preventDefault();
-  }
-
-  const [email, setEmail]: State<string> = useState('');
-  const [password, setPassword]: State<string> = useState('');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
 
   const logIn = useLogIn({
-    onSuccess: (auth: LoginResult | null) => {
-      setAuth(auth ?? null);
+    onSuccess: auth => {
+      setAuth(auth);
       navigate('/', {replace: true});
     },
   });
 
-  async function handleSubmit(event: SyntheticEvent): Promise<void> {
+  const handleSubmit = (event: SyntheticEvent): void => {
     event.preventDefault();
-
-    logIn.mutate({
-      email: email,
-      password: password,
-    });
-  }
+    logIn.mutate({email: email, password: password});
+  };
 
   return (
     <Grid
@@ -114,8 +97,8 @@ export default function Login(): JSX.Element {
                 <InputAdornment position="start">
                   <IconButton
                     aria-label="toggle password visibility"
-                    onClick={handleClickShowPassword}
-                    onMouseDown={handleMouseDownPassword}
+                    onClick={() => setShowPassword(!showPassword)}
+                    onMouseDown={event => event.preventDefault()}
                     edge="end"
                   >
                     <Tooltip
@@ -140,7 +123,7 @@ export default function Login(): JSX.Element {
             type="submit"
             fullWidth
             sx={{mt: 1}}
-            disabled={email == '' || password == ''}
+            disabled={email === '' || password === ''}
           >
             log in
           </Button>

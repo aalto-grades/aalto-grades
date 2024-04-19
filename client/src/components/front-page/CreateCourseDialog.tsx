@@ -4,7 +4,6 @@
 
 import {
   Delete as DeleteIcon,
-  MarkEmailUnreadTwoTone,
   PersonAddAlt1 as PersonAddAlt1Icon,
   Person as PersonIcon,
 } from '@mui/icons-material';

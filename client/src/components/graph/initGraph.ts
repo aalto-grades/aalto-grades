@@ -95,7 +95,7 @@ export const initGraph = (
       data: {},
     });
     edges.push(createEdge(middleNodeId, 'stepper'));
-    nodeData['stepper'] = {
+    nodeData.stepper = {
       title: 'Convert to grade',
       settings: {
         numSteps: 6,

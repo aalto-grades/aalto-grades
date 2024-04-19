@@ -213,7 +213,7 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
         style={{width: '180px', display: 'block'}}
         type="number"
         onChange={handleNumChange}
-        value={localSettings.maxSubstitutions ?? ''}
+        value={localSettings.maxSubstitutions}
       />
       <label>Substitutes</label>
 

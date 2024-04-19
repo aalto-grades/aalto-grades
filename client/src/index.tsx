@@ -9,7 +9,10 @@ import {createGlobalStyle} from 'styled-components';
 import App from './App';
 import {AuthProvider} from './context/AuthProvider';
 
-const GlobalStyles = createGlobalStyle`
+const rootElement = document.getElementById('root');
+
+if (rootElement) {
+  const GlobalStyles = createGlobalStyle`
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -25,9 +28,6 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
-const rootElement = document.getElementById('root');
-
-if (rootElement) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
