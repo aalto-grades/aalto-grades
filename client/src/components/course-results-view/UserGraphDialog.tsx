@@ -16,8 +16,8 @@ import {
 import {JSX, useEffect, useState} from 'react';
 
 import {AssessmentModelData} from '@common/types';
+import {GroupedStudentRow} from '../../context/GradesTableProvider';
 import Graph from '../graph/Graph';
-import {GroupedStudentRow} from './CourseResultsTanTable';
 
 type PropsType = {
   open: boolean;
