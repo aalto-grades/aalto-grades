@@ -20,7 +20,7 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import {useEffect, useState} from 'react';
+import {JSX, useEffect, useState} from 'react';
 
 export type MismatchData = {
   fields: string[];
@@ -37,7 +37,7 @@ const MismatchDialog = ({
   open: boolean;
   onClose: () => void;
   mismatchData: MismatchData;
-}) => {
+}): JSX.Element => {
   const [selections, setSelections] = useState<{[key: string]: string}>({});
   const [error, setError] = useState<'' | 'empty' | 'duplicate'>('');
   const [duplicate, setDuplicate] = useState<string>('');
@@ -73,7 +73,7 @@ const MismatchDialog = ({
   }, [mismatchData.keys, selections]);
 
   return (
-    <Dialog open={open && mismatchData !== null} fullWidth onClose={onClose}>
+    <Dialog open={open} onClose={onClose} fullWidth>
       <DialogTitle>Mismatching columns found</DialogTitle>
       <DialogContent>
         <Alert severity={error !== '' ? 'error' : 'success'} sx={{mb: 2}}>
@@ -105,7 +105,7 @@ const MismatchDialog = ({
                     <FormControl
                       sx={{background: 'white'}}
                       error={
-                        (error === 'empty' && selections[key] === undefined) ||
+                        (error === 'empty' && !(key in selections)) ||
                         (error === 'duplicate' && selections[key] === duplicate)
                       }
                     >
