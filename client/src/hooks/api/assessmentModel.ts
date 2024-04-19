@@ -6,7 +6,9 @@ import {
   AssessmentModelData,
   AssessmentModelDataArraySchema,
   AssessmentModelDataSchema,
+  EditAssessmentModelData,
   IdSchema,
+  NewAssessmentModelData,
 } from '@common/types';
 import {
   UseMutationOptions,
@@ -53,7 +55,7 @@ export const useGetAssessmentModel = (
 
 type AddAssessmentModelVars = {
   courseId: Numeric;
-  assessmentModel: AssessmentModelData;
+  assessmentModel: NewAssessmentModelData;
 };
 export const useAddAssessmentModel = (
   options?: UseMutationOptions<number, unknown, unknown>
@@ -83,7 +85,7 @@ export const useAddAssessmentModel = (
 type EditAssessmentModelVars = {
   courseId: Numeric;
   assessmentModelId: Numeric;
-  assessmentModel: AssessmentModelData;
+  assessmentModel: EditAssessmentModelData;
 };
 export const useEditAssessmentModel = (
   options?: UseMutationOptions<unknown, unknown, unknown>

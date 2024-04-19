@@ -11,7 +11,7 @@ import {StudentRow} from '@common/types';
 import {batchCalculateGraph} from '@common/util/calculateGraph';
 import {useAddFinalGrades, useGetFinalGrades} from '../hooks/api/finalGrade';
 import {useGetAllAssessmentModels, useGetGrades} from '../hooks/useApi';
-import {findBestGradeOption} from '../utils';
+import {findBestGrade} from '../utils';
 import CourseResultsTableToolbar from './course-results-view/CourseResultsTableToolbar';
 import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
 
@@ -61,8 +61,8 @@ export default function CourseResultsView(): JSX.Element {
     let latestDate = new Date(1970, 0, 1);
     for (const att of row.attainments) {
       for (const grade of att.grades) {
-        const gradeDate = new Date(grade.date!);
-        if (gradeDate.getTime() > latestDate.getTime()) latestDate = gradeDate;
+        if (grade.date.getTime() > latestDate.getTime())
+          latestDate = grade.date;
       }
     }
     return latestDate;
@@ -89,7 +89,7 @@ export default function CourseResultsView(): JSX.Element {
         userId: selectedRow.user.id,
         attainments: selectedRow.attainments.map(att => ({
           attainmentId: att.attainmentId,
-          grade: findBestGradeOption(att.grades)!.grade, // TODO: Manage expired attainments
+          grade: findBestGrade(att.grades)!.grade, // TODO: Manage expired attainments
         })),
       }))
     );

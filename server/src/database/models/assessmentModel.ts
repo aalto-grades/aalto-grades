@@ -47,7 +47,7 @@ AssessmentModel.init(
     },
     graphStructure: {
       type: DataTypes.JSONB,
-      allowNull: true,
+      allowNull: false,
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,

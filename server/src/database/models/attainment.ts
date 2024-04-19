@@ -23,7 +23,7 @@ export default class Attainment extends Model<
   declare courseId: ForeignKey<Course['id']>;
   declare name: string;
   // Default value, expiry date in AttainmentGrade takes precedence
-  declare daysValid?: number;
+  declare daysValid: number;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -37,20 +37,19 @@ Attainment.init(
     },
     courseId: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       references: {
         model: 'course',
         key: 'id',
-        deferrable: new Deferrable.INITIALLY_DEFERRED(),
       },
     },
     name: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     daysValid: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       defaultValue: 365,
     },
     createdAt: DataTypes.DATE,

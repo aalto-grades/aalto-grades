@@ -6,6 +6,7 @@ import {IdSchema} from '@common/types';
 import {
   AttainmentData,
   AttainmentDataArraySchema,
+  EditAttainmentData,
   NewAttainmentData,
 } from '@common/types/attainment';
 import {
@@ -47,7 +48,7 @@ export const useAddAttainment = (
       IdSchema.parse(
         (
           await axios.post(
-            `/v1/courses/${vars.courseId}` + '/attainments',
+            `/v1/courses/${vars.courseId}/attainments`,
             vars.attainment
           )
         ).data
@@ -66,7 +67,11 @@ export const useAddAttainment = (
   });
 };
 
-type EditAttainmentVars = {courseId: Numeric; attainment: AttainmentData};
+type EditAttainmentVars = {
+  courseId: Numeric;
+  attainmentId: Numeric;
+  attainment: EditAttainmentData;
+};
 export const useEditAttainment = (
   options?: UseMutationOptions<unknown, unknown, unknown>
 ): UseMutationResult<unknown, unknown, EditAttainmentVars> => {
@@ -75,7 +80,7 @@ export const useEditAttainment = (
   return useMutation({
     mutationFn: async (vars: EditAttainmentVars) =>
       await axios.put(
-        `/v1/courses/${vars.courseId}/attainments/${vars.attainment.id}`,
+        `/v1/courses/${vars.courseId}/attainments/${vars.attainmentId}`,
         vars.attainment
       ),
 

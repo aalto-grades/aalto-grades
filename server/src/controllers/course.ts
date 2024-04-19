@@ -10,11 +10,10 @@ import {
   CourseData,
   CourseRoleType,
   CreateCourseData,
+  EditCourseData,
   HttpCode,
   Language,
-  PartialCourseData,
 } from '@common/types';
-import logger from '../configs/winston';
 import {sequelize} from '../database';
 import Course from '../database/models/course';
 import CourseRole from '../database/models/courseRole';
@@ -135,7 +134,7 @@ export const addCourse = async (
 };
 
 export const editCourse = async (
-  req: Request<ParamsDictionary, unknown, PartialCourseData>,
+  req: Request<ParamsDictionary, unknown, EditCourseData>,
   res: Response
 ): Promise<void> => {
   const course = await findAndValidateCourseId(req.params.courseId);

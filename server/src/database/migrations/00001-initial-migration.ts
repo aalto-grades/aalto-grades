@@ -135,7 +135,7 @@ export default {
           },
           graph_structure: {
             type: DataTypes.JSONB,
-            allowNull: true,
+            allowNull: false,
           },
           created_at: DataTypes.DATE,
           updated_at: DataTypes.DATE,
@@ -157,7 +157,6 @@ export default {
             references: {
               model: 'course',
               key: 'id',
-              deferrable: new Deferrable.INITIALLY_DEFERRED(),
             },
             onDelete: 'CASCADE',
             onUpdate: 'CASCADE',
@@ -168,7 +167,7 @@ export default {
           },
           days_valid: {
             type: DataTypes.INTEGER,
-            allowNull: true,
+            allowNull: false,
             defaultValue: 365,
           },
           created_at: DataTypes.DATE,
@@ -223,11 +222,11 @@ export default {
           },
           date: {
             type: DataTypes.DATEONLY,
-            allowNull: true,
+            allowNull: false,
           },
           expiry_date: {
             type: DataTypes.DATEONLY,
-            allowNull: true,
+            allowNull: false,
           },
           comment: {
             type: DataTypes.STRING,

@@ -13,7 +13,6 @@ import {
 import {ChangeEvent, JSX, useEffect, useMemo, useState} from 'react';
 import {Node} from 'reactflow';
 
-import {AttainmentData} from '@common/types';
 import {NodeValues} from '@common/types/graph';
 
 const testFloat = (val: string): boolean => /^\d+(?:\.\d+?)?$/.test(val);
@@ -28,7 +27,7 @@ const AttainmentValuesDialog = ({
 }: {
   nodes: Node[];
   nodeValues: NodeValues;
-  attainments: AttainmentData[];
+  attainments: {id: number; name: string}[];
   open: boolean;
   onClose: () => void;
   handleSetAttainmentValues: (attainmentValues: {

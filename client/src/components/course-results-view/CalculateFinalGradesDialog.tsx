@@ -61,9 +61,8 @@ const CalculateFinalGradesDialog = ({
     for (const row of selectedRows) {
       for (const att of row.attainments) {
         for (const grade of att.grades) {
-          const gradeDate = new Date(grade.date!);
-          if (gradeDate.getTime() > latestDate.getTime())
-            latestDate = gradeDate;
+          if (grade.date.getTime() > latestDate.getTime())
+            latestDate = grade.date;
         }
       }
     }

@@ -49,7 +49,7 @@ const UploadDialog = ({
       attainmentData.map(att => ({
         attainmentName: att.name,
         completionDate: dayjs(),
-        expirationDate: dayjs().add(att.daysValid as number, 'day'),
+        expirationDate: dayjs().add(att.daysValid, 'day'),
       }))
     );
   }, [attainmentData, dates.length]);
@@ -108,16 +108,19 @@ const UploadDialog = ({
           row[attainment.name] === ''
         )
           continue; // Skip empty cells
+        const dateData = dates.find(
+          date => date.attainmentName === attainment.name
+        );
+        if (dateData === undefined) {
+          console.error('DateData was undefined');
+          continue;
+        }
         gradeData.push({
           studentNumber: (row.StudentNo as string | number).toString(),
           attainmentId: attainment.id,
           grade: row[attainment.name] as number,
-          date: dates
-            .find(date => date.attainmentName === attainment.name)
-            ?.completionDate.toDate(),
-          expiryDate: dates
-            .find(date => date.attainmentName === attainment.name)
-            ?.expirationDate.toDate(),
+          date: dateData.completionDate.toDate(),
+          expiryDate: dateData.expirationDate.toDate(),
           comment: '',
         });
       }
@@ -137,7 +140,7 @@ const UploadDialog = ({
       attainmentData.map(att => ({
         attainmentName: att.name,
         completionDate: dayjs(),
-        expirationDate: dayjs().add(att.daysValid as number, 'day'),
+        expirationDate: dayjs().add(att.daysValid, 'day'),
       }))
     );
     onClose();

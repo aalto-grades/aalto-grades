@@ -7,8 +7,8 @@ import {
   CourseDataArraySchema,
   CourseDataSchema,
   CreateCourseData,
+  EditCourseData,
   IdSchema,
-  PartialCourseData,
 } from '@common/types';
 import {
   UseMutationOptions,
@@ -59,7 +59,7 @@ export const useAddCourse = (
   });
 };
 
-type EditCourseVars = {courseId: Numeric; course: PartialCourseData};
+type EditCourseVars = {courseId: Numeric; course: EditCourseData};
 export const useEditCourse = (
   options?: UseMutationOptions<unknown, unknown, EditCourseVars>
 ): UseMutationResult<unknown, unknown, EditCourseVars> => {

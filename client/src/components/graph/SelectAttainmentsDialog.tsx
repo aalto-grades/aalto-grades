@@ -24,7 +24,7 @@ const SelectAttainmentsDialog = ({
   handleAttainmentSelect,
 }: {
   nodes: Node[];
-  attainments: AttainmentData[];
+  attainments: {id: number; name: string}[];
   open: boolean;
   onClose: () => void;
   handleAttainmentSelect: (

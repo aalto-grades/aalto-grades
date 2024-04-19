@@ -25,7 +25,7 @@ import {useVirtualizer} from '@tanstack/react-virtual';
 import * as React from 'react';
 import {useParams} from 'react-router-dom';
 import {useGetAllAssessmentModels, useGetAttainments} from '../../hooks/useApi';
-import {findBestGradeOption} from '../../utils';
+import {findBestGrade} from '../../utils';
 import PrettyChip from '../shared/PrettyChip';
 import GradeCell from './GradeCell';
 import PredictedGradeCell from './PredictedGradeCell';
@@ -69,7 +69,7 @@ function groupByLastAttainmentDate(gradesList: ExtendedStudentRow[]) {
     let newestDate = new Date('1970-01-01');
     for (const att of row.attainments) {
       const bestGradeDate = new Date(
-        findBestGradeOption(att.grades, {
+        findBestGrade(att.grades, {
           avoidExpired: true,
           preferExpiredToNull: true,
           useLatest: false, // TODO: Read from state?
@@ -428,7 +428,7 @@ const CourseResultsTanTable: React.FC<PropsType> = props => {
       row => {
         // ATTENTION this function needs to have the same parameters of the one inside the grade cell
         // Clearly can be done in a better way
-        // const bestGrade = findBestGradeOption(row?.finalGrades);
+        // const bestGrade = findBestGrade(row?.finalGrades);
         const bestGrade = row.finalGrades?.[0];
         if (!bestGrade) return '-';
         // console.log(bestGrade);

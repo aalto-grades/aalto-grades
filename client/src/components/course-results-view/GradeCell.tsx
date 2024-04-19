@@ -7,10 +7,9 @@ import {Box, IconButton, Theme, Tooltip, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import {FC, useState} from 'react';
 
-import {AttainmentGradesData, GradeOption} from '@common/types';
-import {State} from '../../types';
-import {findBestGradeOption, gradeIsExpired} from '../../utils';
-import GradeOptionsDialog from './GradeOptionsDialog';
+import {AttainmentGradesData, GradeData} from '@common/types';
+import {findBestGrade, gradeIsExpired} from '../../utils';
+import EditGradesDialog from './EditGradesDialog';
 
 type GradeCellProps = {
   studentNumber: string;
@@ -22,10 +21,9 @@ const GradeCell: FC<GradeCellProps> = (
   props = {finalGrade: false} as GradeCellProps
 ) => {
   const [hover, setHover] = useState<boolean>(false);
-  const [gradeOptionsOpen, setGradeOptionsOpen]: State<boolean> =
-    useState(false);
+  const [gradeDialogOpen, setGradeDialogOpen] = useState(false);
   const theme: Theme = useTheme();
-  const bestGrade: GradeOption | null = findBestGradeOption(
+  const bestGrade: GradeData | null = findBestGrade(
     props.attainemntResults?.grades ?? [],
     {
       avoidExpired: true,
@@ -81,14 +79,14 @@ const GradeCell: FC<GradeCellProps> = (
                   right: '0px',
                   top: 'calc(50% - 20px)',
                 }}
-                onClick={(): void => setGradeOptionsOpen(true)}
+                onClick={(): void => setGradeDialogOpen(true)}
               >
                 <MoreVert />
               </IconButton>
             </Tooltip>
-            <GradeOptionsDialog
-              open={gradeOptionsOpen}
-              onClose={() => setGradeOptionsOpen(false)}
+            <EditGradesDialog
+              open={gradeDialogOpen}
+              onClose={() => setGradeDialogOpen(false)}
               studentNumber={props.studentNumber}
               attainmentId={props.attainemntResults.attainmentId}
               title={`Grades of ${props.studentNumber} for ${
