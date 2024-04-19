@@ -11,7 +11,7 @@ import {StudentRow} from '@common/types';
 import {batchCalculateGraph} from '@common/util/calculateGraph';
 import {useAddFinalGrades, useGetFinalGrades} from '../hooks/api/finalGrade';
 import {useGetAllAssessmentModels, useGetGrades} from '../hooks/useApi';
-import {findBestGradeOption} from '../utils';
+import {findBestGrade} from '../utils';
 import CourseResultsTableToolbar from './course-results-view/CourseResultsTableToolbar';
 import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
 
@@ -89,7 +89,7 @@ export default function CourseResultsView(): JSX.Element {
         userId: selectedRow.user.id,
         attainments: selectedRow.attainments.map(att => ({
           attainmentId: att.attainmentId,
-          grade: findBestGradeOption(att.grades)!.grade, // TODO: Manage expired attainments
+          grade: findBestGrade(att.grades)!.grade, // TODO: Manage expired attainments
         })),
       }))
     );

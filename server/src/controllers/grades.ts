@@ -7,9 +7,9 @@ import {Op} from 'sequelize';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
-  EditGradeOptionSchema,
+  EditGradeDataSchema,
   FinalGradeData,
-  GradeOption,
+  GradeData,
   HttpCode,
   NewGradeArraySchema,
   SisuCsvUploadSchema,
@@ -70,8 +70,8 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
     }
   }
 
-  // Grades dict {userId: {attId: GradeOption[], ...}, ...}
-  const userGrades: {[key: string]: {[key: string]: GradeOption[]}} = {};
+  // Grades dict {userId: {attId: GradeData[], ...}, ...}
+  const userGrades: {[key: string]: {[key: string]: GradeData[]}} = {};
   for (const grade of grades) {
     if (grade.grader === undefined) {
       console.error('Found an grade with no grader');
@@ -125,7 +125,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
       attainmentId: attainment.id,
       attainmentName: attainment.name,
       grades:
-        (userGrades[userId][attainment.id] as GradeOption[] | undefined) ?? [],
+        (userGrades[userId][attainment.id] as GradeData[] | undefined) ?? [],
     })),
   }));
 
@@ -326,7 +326,7 @@ export const addGrades = async (
 };
 
 export const editGrade = async (
-  req: TypedRequestBody<typeof EditGradeOptionSchema>,
+  req: TypedRequestBody<typeof EditGradeDataSchema>,
   res: Response
 ): Promise<void> => {
   const [course, gradeData] = await findAndValidateAttainmentGradePath(

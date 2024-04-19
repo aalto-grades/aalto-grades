@@ -8,7 +8,7 @@ import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 
 import {
-  EditGradeOptionSchema,
+  EditGradeDataSchema,
   NewGradeArraySchema,
   SisuCsvUploadSchema,
 } from '@common/types';
@@ -54,7 +54,7 @@ router.put(
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(EditGradeOptionSchema),
+  processRequestBody(EditGradeDataSchema),
   controllerDispatcher(editGrade)
 );
 

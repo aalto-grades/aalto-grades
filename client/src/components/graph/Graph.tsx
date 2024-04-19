@@ -47,7 +47,7 @@ import {
   NodeDataContext,
   NodeValuesContext,
 } from '../../context/GraphProvider';
-import {findBestGradeOption} from '../../utils';
+import {findBestGrade} from '../../utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import AdditionNode from './AdditionNode';
 import AttanmentNode from './AttainmentNode';
@@ -285,7 +285,7 @@ const Graph = ({
       if (!(attId in newNodeValues)) continue;
 
       const newValue = newNodeValues[attId] as AttainmentNodeValue;
-      const bestGrade = findBestGradeOption(attainment.grades)!;
+      const bestGrade = findBestGrade(attainment.grades)!;
       if (newValue.value !== bestGrade.grade) {
         newValue.source = bestGrade.grade;
         change = true;

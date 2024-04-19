@@ -21,11 +21,11 @@ import {
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useMemo, useState} from 'react';
 
-import {GradeOption, NewGrade, PartialGradeOption} from '@common/types';
+import {EditGradeData, GradeData, NewGrade} from '@common/types';
 import {useParams} from 'react-router-dom';
 import {useAddGrades, useDeleteGrade, useEditGrade} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import {findBestGradeOption} from '../../utils';
+import {findBestGrade} from '../../utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 type ColTypes = {
@@ -46,9 +46,9 @@ type PropsType = {
   studentNumber: string;
   attainmentId: number;
   title: string;
-  grades: GradeOption[];
+  grades: GradeData[];
 };
-const GradeOptionsDialog = ({
+const EditGradesDialog = ({
   open,
   onClose,
   studentNumber,
@@ -78,7 +78,7 @@ const GradeOptionsDialog = ({
 
   const bestGrade = useMemo(
     () =>
-      findBestGradeOption(rows, {
+      findBestGrade(rows, {
         avoidExpired: true,
         preferExpiredToNull: true,
         useLatest: false, // TODO: Read from state?
@@ -205,7 +205,7 @@ const GradeOptionsDialog = ({
   const handleSubmit = async (): Promise<void> => {
     const newGrades: NewGrade[] = [];
     const deletedGrades: number[] = [];
-    const editedGrades: ({gradeId: number} & PartialGradeOption)[] = [];
+    const editedGrades: ({gradeId: number} & EditGradeData)[] = [];
 
     for (const row of rows) {
       if (row.gradeId === -1) {
@@ -335,4 +335,4 @@ const GradeOptionsDialog = ({
   );
 };
 
-export default GradeOptionsDialog;
+export default EditGradesDialog;

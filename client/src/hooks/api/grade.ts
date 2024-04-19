@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import {
+  EditGradeData,
   NewGrade,
-  PartialGradeOption,
   SisuCsvUpload,
   StudentRow,
   StudentRowArraySchema,
@@ -69,7 +69,7 @@ export const useAddGrades = (
   });
 };
 
-type EditGradeVars = {gradeId: Numeric; data: PartialGradeOption};
+type EditGradeVars = {gradeId: Numeric; data: EditGradeData};
 export const useEditGrade = (
   courseId: Numeric,
   options?: UseMutationOptions<unknown, unknown, EditGradeVars>

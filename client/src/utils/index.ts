@@ -40,8 +40,8 @@ const gradeIsBetter = (
   return newGrade.grade > oldGrade.grade;
 };
 
-// The type is a template to be able to use with GradeOptionsDialog rows.
-export const findBestGradeOption = <T extends BaseType>(
+// The type is a template to be able to use with EditGradesDialog rows.
+export const findBestGrade = <T extends BaseType>(
   grades: readonly T[],
   searchOptions: {
     avoidExpired: boolean;
