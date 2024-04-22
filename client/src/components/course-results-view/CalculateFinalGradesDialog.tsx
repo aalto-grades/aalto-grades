@@ -31,6 +31,7 @@ type PropsType = {
   onClose: () => void;
   selectedRows: StudentRow[];
   calculateFinalGrades: (
+    selectedRows: StudentRow[],
     modelId: number,
     dateOverride: boolean,
     gradingDate: Date
@@ -78,6 +79,7 @@ const CalculateFinalGradesDialog = ({
     const modelId = modelList.find(model => model.name === selectedModel)?.id;
     if (modelId === undefined) return;
     const success = await calculateFinalGrades(
+      selectedRows,
       modelId,
       dateOverride,
       gradingDate.toDate()

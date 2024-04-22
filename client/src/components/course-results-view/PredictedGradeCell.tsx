@@ -5,7 +5,7 @@
 import {MoreVert} from '@mui/icons-material';
 import {IconButton, Tooltip} from '@mui/material';
 import {JSX, useState} from 'react';
-import {GroupedStudentRow} from './CourseResultsTanTable';
+import {GroupedStudentRow} from '../../context/GradesTableProvider';
 
 type PropsType = {
   row: GroupedStudentRow;
