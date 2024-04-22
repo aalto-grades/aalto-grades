@@ -2,37 +2,30 @@
 //
 // SPDX-License-Identifier: MIT
 
-import PersonIcon from '@mui/icons-material/Person';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import {Button, Box, Menu, MenuItem} from '@mui/material';
-import {JSX, SyntheticEvent, useState} from 'react';
-import {NavigateFunction, useNavigate} from 'react-router-dom';
-import {
-  QueryClient,
-  UseMutationResult,
-  useQueryClient,
-} from '@tanstack/react-query';
+import PersonIcon from '@mui/icons-material/Person';
+import {Box, Button, Menu, MenuItem} from '@mui/material';
+import {useQueryClient} from '@tanstack/react-query';
+import {JSX, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 
 import {useLogOut} from '../../hooks/useApi';
-import useAuth, {AuthContextType} from '../../hooks/useAuth';
-import {State} from '../../types';
+import useAuth from '../../hooks/useAuth';
 
-export default function UserButton(): JSX.Element {
-  const navigate: NavigateFunction = useNavigate();
-  const {auth, setAuth}: AuthContextType = useAuth();
-  const [anchorEl, setAnchorEl]: State<Element | null> =
-    useState<Element | null>(null);
-  const open: boolean = Boolean(anchorEl);
+const UserButton = (): JSX.Element => {
+  const navigate = useNavigate();
+  const {auth, setAuth} = useAuth();
+  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
+  const open = Boolean(anchorEl);
 
-  const queryClient: QueryClient = useQueryClient();
-  const logOut: UseMutationResult<unknown, unknown, unknown> = useLogOut({
+  const queryClient = useQueryClient();
+  const logOut = useLogOut({
     onSuccess: () => {
       setAuth(null);
       setAnchorEl(null);
       queryClient.invalidateQueries({
         queryKey: ['refresh-token'],
-        // refetchType: 'none', Should work, but doesn't
-        // Causes one extra call to refresh-token -> 401
+        refetchType: 'none',
       });
       navigate('/login', {replace: true});
     },
@@ -50,9 +43,7 @@ export default function UserButton(): JSX.Element {
         aria-controls={open ? 'basic-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
-        onClick={(event: SyntheticEvent): void =>
-          setAnchorEl(event.currentTarget)
-        }
+        onClick={event => setAnchorEl(event.currentTarget)}
       >
         <Box sx={{marginRight: 1, marginTop: 1}}>
           <PersonIcon color="inherit" />
@@ -64,13 +55,13 @@ export default function UserButton(): JSX.Element {
         id="basic-menu"
         anchorEl={anchorEl}
         open={open}
-        onClose={(): void => setAnchorEl(null)}
-        MenuListProps={{
-          'aria-labelledby': 'basic-button',
-        }}
+        onClose={() => setAnchorEl(null)}
+        MenuListProps={{'aria-labelledby': 'basic-button'}}
       >
-        <MenuItem onClick={(): void => logOut.mutate(null)}>Logout</MenuItem>
+        <MenuItem onClick={() => logOut.mutate(null)}>Logout</MenuItem>
       </Menu>
     </>
   );
-}
+};
+
+export default UserButton;

@@ -5,30 +5,26 @@
 // Used to determine if a user is authenticated and if they are allowed to access a page
 // if not, the user is redirected to the login page
 
-import {LoginResult, SystemRole} from '@common/types';
-import {UseQueryResult} from '@tanstack/react-query';
 import {JSX, useEffect, useState} from 'react';
 import {Navigate, Outlet} from 'react-router-dom';
 
+import {SystemRole} from '@common/types';
 import {useGetRefreshToken} from '../../hooks/useApi';
-import useAuth, {AuthContextType} from '../../hooks/useAuth';
-import {State} from '../../types';
+import useAuth from '../../hooks/useAuth';
 
-export default function PrivateRoute(props: {
-  children?: JSX.Element;
-  roles: Array<SystemRole>;
-}): JSX.Element | null {
-  const {auth, setAuth, isTeacherInCharge}: AuthContextType = useAuth();
-  const [loading, setLoading]: State<boolean> = useState(true);
+type PropsType = {children?: JSX.Element; roles: SystemRole[]};
+const PrivateRoute = ({children, roles}: PropsType): JSX.Element | null => {
+  const {auth, setAuth, isTeacherInCharge} = useAuth();
+  const [loading, setLoading] = useState<boolean>(auth !== null);
 
-  const refresh: UseQueryResult<LoginResult> = useGetRefreshToken();
+  const refresh = useGetRefreshToken({enabled: auth !== null});
 
   useEffect(() => {
     if (!refresh.isLoading) {
       if (refresh.data) setAuth(refresh.data);
       setLoading(false);
     }
-  }, [refresh.data, refresh.isLoading, setAuth]);
+  }, [refresh, setAuth]);
 
   // Only load page after token has been retrieved
   if (loading) return null;
@@ -37,8 +33,10 @@ export default function PrivateRoute(props: {
   if (auth === null) return <Navigate to="/login" />;
 
   // Check if role is in the list of authorised roles or teacher in charge.
-  if (!props.roles.includes(auth.role) && !isTeacherInCharge)
+  if (!roles.includes(auth.role) && !isTeacherInCharge)
     return <Navigate to="/" />;
 
-  return <>{props.children ? props.children : <Outlet />}</>;
-}
+  return <>{children ?? <Outlet />}</>;
+};
+
+export default PrivateRoute;
