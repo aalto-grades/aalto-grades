@@ -29,7 +29,7 @@ router.get(
 router.post(
   '/v1/courses/:courseId/attainments',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  controllerDispatcher(teacherInCharge()),
+  teacherInCharge(),
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(NewAttainmentDataSchema),
@@ -39,7 +39,7 @@ router.post(
 router.put(
   '/v1/courses/:courseId/attainments/:attainmentId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  controllerDispatcher(teacherInCharge()),
+  teacherInCharge(),
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(EditAttainmentDataSchema),
@@ -49,6 +49,6 @@ router.put(
 router.delete(
   '/v1/courses/:courseId/attainments/:attainmentId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  controllerDispatcher(teacherInCharge()),
+  teacherInCharge(),
   controllerDispatcher(deleteAttainment)
 );

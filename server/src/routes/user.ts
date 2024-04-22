@@ -15,7 +15,7 @@ import {
   getIdpUsers,
 } from '../controllers/user';
 import {handleInvalidRequestJson} from '../middleware';
-import {authorization} from '../middleware/authorization';
+import {adminOrOwner, authorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
 export const router = Router();
@@ -23,6 +23,7 @@ export const router = Router();
 router.get(
   '/v1/user/:userId/courses',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  adminOrOwner(),
   controllerDispatcher(getCoursesOfUser)
 );
 

@@ -39,7 +39,7 @@ router.get(
 router.post(
   '/v1/courses/:courseId/assessment-models',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  controllerDispatcher(teacherInCharge()),
+  teacherInCharge(),
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(NewAssessmentModelDataSchema),
@@ -49,7 +49,7 @@ router.post(
 router.put(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  controllerDispatcher(teacherInCharge()),
+  teacherInCharge(),
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(EditAssessmentModelDataSchema),
@@ -59,6 +59,6 @@ router.put(
 router.delete(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  controllerDispatcher(teacherInCharge()),
+  teacherInCharge(),
   controllerDispatcher(deleteAssessmentModel)
 );

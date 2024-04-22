@@ -18,7 +18,7 @@ export const router = Router();
 router.post(
   '/v1/courses/:courseId/finalGrades',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  controllerDispatcher(teacherInCharge()),
+  teacherInCharge(),
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(NewFinalGradeArraySchema),
@@ -28,6 +28,6 @@ router.post(
 router.get(
   '/v1/courses/:courseId/finalGrades',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  controllerDispatcher(teacherInCharge()),
+  teacherInCharge(),
   controllerDispatcher(getFinalGrades)
 );
