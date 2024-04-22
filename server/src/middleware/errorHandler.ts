@@ -2,12 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from '@common/types';
 import {AxiosError} from 'axios';
-import {CsvError} from 'csv-parse';
 import {NextFunction, Request, RequestHandler, Response} from 'express';
-import {ZodError} from 'zod';
 
+import {HttpCode} from '@common/types';
 import logger from '../configs/winston';
 import {ApiError} from '../types';
 
@@ -62,16 +60,6 @@ export function errorHandler(
     return;
   }
 
-  if (err instanceof ZodError) {
-    logger.error(`${err.name}: ${err.message}`);
-
-    res.status(HttpCode.BadRequest).send({
-      success: false,
-      errors: err.errors,
-    });
-    return;
-  }
-
   if (err instanceof AxiosError) {
     logger.error(`${err.name}: ${err.message}`);
 
@@ -82,22 +70,6 @@ export function errorHandler(
           ? `external API error: ${err.response.status}`
           : err.message,
       ],
-    });
-    return;
-  }
-
-  if (err instanceof CsvError) {
-    // If field name is incorrect, change the error message to more informative.
-    const message: string =
-      err.message === 'Unexpected field'
-        ? 'Unexpected field. To upload CSV file, set input field name as "csv_data"'
-        : err.message;
-
-    logger.error(`${err.name}: ${message}`);
-
-    res.status(HttpCode.BadRequest).send({
-      success: false,
-      errors: [message],
     });
     return;
   }
