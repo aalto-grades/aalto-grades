@@ -15,9 +15,9 @@ import useAuth from '../../hooks/useAuth';
 type PropsType = {children?: JSX.Element; roles: SystemRole[]};
 const PrivateRoute = ({children, roles}: PropsType): JSX.Element | null => {
   const {auth, setAuth, isTeacherInCharge} = useAuth();
-  const [loading, setLoading] = useState<boolean>(auth !== null);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const refresh = useGetRefreshToken({enabled: auth !== null});
+  const refresh = useGetRefreshToken();
 
   useEffect(() => {
     if (!refresh.isLoading) {
