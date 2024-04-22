@@ -37,16 +37,14 @@ export default function UsersTable(): JSX.Element {
 
   return (
     <>
-      {toBeDeleted !== null && (
-        <DeleteUserDialog
-          title="Delete User"
-          handleAccept={handleDelete}
-          handleClose={() => setToBeDeleted(null)}
-          open={toBeDeleted !== null}
-          userId={toBeDeleted}
-          description="Do you want to delete this user?"
-        />
-      )}
+      <DeleteUserDialog
+        title="Delete User"
+        handleAccept={handleDelete}
+        handleClose={() => setToBeDeleted(null)}
+        open={toBeDeleted !== null}
+        userId={toBeDeleted}
+        description="Do you want to delete this user?"
+      />
 
       <Table>
         <TableHead>

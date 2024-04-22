@@ -14,13 +14,13 @@ import {useAddGrades, useGetAttainments} from '../../hooks/useApi';
 import UploadDialogConfirm from './UploadDialogConfirm';
 import UploadDialogUpload from './UploadDialogUpload';
 
-const UploadDialog = ({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}): JSX.Element => {
+export type GradeUploadColTypes = Record<string, number | null> & {
+  id: number;
+  studentNo: string;
+};
+
+type PropsType = {open: boolean; onClose: () => void};
+const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   const {courseId} = useParams();
   const attainments = useGetAttainments(courseId!, {enabled: !!courseId});
   const addGrades = useAddGrades(courseId!);
@@ -37,7 +37,7 @@ const UploadDialog = ({
   const [confirmExpanded, setConfirmExpanded] = useState<
     '' | 'date' | 'confirm'
   >('date');
-  const [rows, setRows] = useState<GridRowsProp>([]);
+  const [rows, setRows] = useState<GridRowsProp<GradeUploadColTypes>>([]);
   const [ready, setReady] = useState<boolean>(false);
   const [dates, setDates] = useState<
     {attainmentName: string; completionDate: Dayjs; expirationDate: Dayjs}[]
@@ -56,20 +56,23 @@ const UploadDialog = ({
 
   if (attainments.data === undefined) return <></>;
 
-  const columns: GridColDef[] = [
+  const columns: GridColDef<GradeUploadColTypes>[] = [
     {
-      field: 'StudentNo',
+      field: 'studentNo',
       headerName: 'Student Number',
       type: 'string',
       width: 120,
       editable: true,
     },
-    ...attainments.data.map(att => ({
-      field: att.name,
-      headerName: att.name,
-      type: 'number',
-      editable: true,
-    })),
+    {field: 'test', headerName: 'test', type: 'number', editable: true},
+    ...attainments.data.map(
+      (att): GridColDef<GradeUploadColTypes> => ({
+        field: att.name,
+        headerName: att.name,
+        type: 'number',
+        editable: true,
+      })
+    ),
     {
       field: 'actions',
       type: 'actions',
@@ -84,17 +87,19 @@ const UploadDialog = ({
       ],
     },
   ];
-  const readOnlycolumns: GridColDef[] = [
+  const readOnlycolumns: GridColDef<GradeUploadColTypes>[] = [
     {
-      field: 'StudentNo',
+      field: 'studentNo',
       headerName: 'Student Number',
       type: 'string',
     },
-    ...attainments.data.map(att => ({
-      field: att.name,
-      headerName: att.name,
-      type: 'number',
-    })),
+    ...attainments.data.map(
+      (att): GridColDef<GradeUploadColTypes> => ({
+        field: att.name,
+        headerName: att.name,
+        type: 'number',
+      })
+    ),
   ];
 
   const onSubmit = async (): Promise<void> => {
@@ -102,12 +107,9 @@ const UploadDialog = ({
 
     for (const row of rows) {
       for (const attainment of attainments.data) {
-        if (
-          !(attainment.name in row) ||
-          row[attainment.name] === null ||
-          row[attainment.name] === ''
-        )
-          continue; // Skip empty cells
+        const grade = row[attainment.name];
+        if (!(attainment.name in row) || grade === null) continue; // Skip empty cells
+
         const dateData = dates.find(
           date => date.attainmentName === attainment.name
         );
@@ -116,9 +118,9 @@ const UploadDialog = ({
           continue;
         }
         gradeData.push({
-          studentNumber: (row.StudentNo as string | number).toString(),
+          studentNumber: row.studentNo,
           attainmentId: attainment.id,
-          grade: row[attainment.name] as number,
+          grade: grade,
           date: dateData.completionDate.toDate(),
           expiryDate: dateData.expirationDate.toDate(),
           comment: '',

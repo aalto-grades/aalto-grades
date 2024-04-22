@@ -213,7 +213,7 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
         style={{width: '180px', display: 'block'}}
         type="number"
         onChange={handleNumChange}
-        value={localSettings.maxSubstitutions ?? ''}
+        value={localSettings.maxSubstitutions}
       />
       <label>Substitutes</label>
 
@@ -275,9 +275,9 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
                     nodeValue.values[key] === 'fail'
                       ? '#fcc'
                       : nodeValue.sources[key].value === 'fail' &&
-                        nodeValue.values[key] !== 'fail'
-                      ? '#cfc'
-                      : '',
+                          nodeValue.values[key] !== 'fail'
+                        ? '#cfc'
+                        : '',
                 }}
               >
                 <td>

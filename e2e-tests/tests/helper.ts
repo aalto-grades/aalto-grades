@@ -28,7 +28,7 @@ const dbConfigClean = {
   database: 'postgres_copy',
 };
 
-export const setupDb = async () => {
+export const setupDb = async (): Promise<void> => {
   // Create a copy of current database
   const client = new Client(dbConfig);
   await client.connect();
@@ -43,7 +43,7 @@ export const setupDb = async () => {
   await client.end();
 };
 
-export const cleanDb = async () => {
+export const cleanDb = async (): Promise<void> => {
   // Remove current database and replace with copy
   const client = new Client(dbConfigClean);
   await client.connect();

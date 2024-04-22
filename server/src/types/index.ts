@@ -5,6 +5,4 @@
 export * from './error';
 export * from './general';
 export * from './grades';
-export * from './language';
 export * from './model';
-export * from './sisu';

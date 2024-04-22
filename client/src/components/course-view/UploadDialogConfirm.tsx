@@ -22,7 +22,9 @@ import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import {Dayjs} from 'dayjs';
 import 'dayjs/locale/en-gb';
-import {Dispatch, SetStateAction, useMemo} from 'react';
+import {Dispatch, JSX, SetStateAction, useMemo} from 'react';
+
+import {GradeUploadColTypes} from './UploadDialog';
 
 type DateType = {
   attainmentName: string;
@@ -31,7 +33,7 @@ type DateType = {
 };
 type PropsType = {
   columns: GridColDef[];
-  rows: GridRowsProp;
+  rows: GridRowsProp<GradeUploadColTypes>;
   setReady: Dispatch<SetStateAction<boolean>>;
   dates: DateType[];
   setDates: Dispatch<SetStateAction<DateType[]>>;
@@ -46,18 +48,12 @@ const UploadDialogConfirm = ({
   setDates,
   expanded,
   setExpanded,
-}: PropsType) => {
+}: PropsType): JSX.Element => {
   const nonEmptyCols = useMemo(() => {
     const newNonEmptyCols: string[] = [];
     for (const row of rows) {
       for (const [key, value] of Object.entries(row)) {
-        if (
-          key === 'id' ||
-          key === 'StudentNo' ||
-          value === '' ||
-          value === null
-        )
-          continue;
+        if (key === 'id' || key === 'StudentNo' || value === null) continue;
         if (!newNonEmptyCols.includes(key)) newNonEmptyCols.push(key);
       }
     }
@@ -65,23 +61,21 @@ const UploadDialogConfirm = ({
   }, [rows]);
 
   const handleCompletionDateChange = (
-    newDate: Dayjs | null,
+    newCompletionDate: Dayjs | null,
     attainmentName: string
   ): void => {
-    if (newDate === null) return;
+    if (newCompletionDate === null) return;
 
-    const oldDate = dates.find(
-      oldDate => oldDate.attainmentName === attainmentName
-    ) as DateType;
-    const diff = newDate.diff(oldDate.completionDate); // Diff to update expiration date with
-
+    // Move expiration date the same amount as the new date
     setDates(oldDates =>
       oldDates.map(oldDate =>
-        oldDate.attainmentName === attainmentName && newDate !== null
+        oldDate.attainmentName === attainmentName
           ? {
               ...oldDate,
-              completionDate: newDate,
-              expirationDate: oldDate.expirationDate.add(diff),
+              completionDate: newCompletionDate,
+              expirationDate: oldDate.expirationDate.add(
+                newCompletionDate.diff(oldDate.completionDate)
+              ),
             }
           : oldDate
       )
@@ -94,7 +88,7 @@ const UploadDialogConfirm = ({
       <DialogContent>
         <Accordion
           expanded={expanded === 'date'}
-          onChange={(_, expanded) => setExpanded(expanded ? 'date' : '')}
+          onChange={(_, newExpanded) => setExpanded(newExpanded ? 'date' : '')}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
             Completion And Expiration Dates
@@ -165,7 +159,9 @@ const UploadDialogConfirm = ({
 
         <Accordion
           expanded={expanded === 'confirm'}
-          onChange={(_, expanded) => setExpanded(expanded ? 'confirm' : '')}
+          onChange={(_, newExpanded) =>
+            setExpanded(newExpanded ? 'confirm' : '')
+          }
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
             Confirm Data

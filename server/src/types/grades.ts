@@ -12,10 +12,3 @@ export interface AttainmentGradeModelData {
   expiryDate?: Date;
   attainmentName?: string;
 }
-
-export interface StudentGrades {
-  // User's ID (PK) in the database user table.
-  id?: number;
-  studentNumber: string;
-  grades: Array<AttainmentGradeModelData>;
-}

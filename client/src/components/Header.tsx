@@ -13,20 +13,12 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import {
-  Link,
-  NavLink,
-  useLocation,
-  useNavigate,
-  useParams,
-} from 'react-router-dom';
+import {Link, NavLink, useParams} from 'react-router-dom';
 import {useGetCourse} from '../hooks/useApi';
 import UserButton from './auth/UserButton';
 
 export default function Header(): JSX.Element {
   const theme = useTheme();
-  const navigate = useNavigate();
-  const location = useLocation();
   const {courseId} = useParams<{courseId: string}>();
   const course = useGetCourse(courseId ?? '', {enabled: !!courseId});
 

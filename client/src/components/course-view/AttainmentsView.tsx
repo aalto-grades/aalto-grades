@@ -36,11 +36,8 @@ export default function CourseView(): JSX.Element {
   const [layout, setLayout] = useState<'table' | 'grid'>('table');
   // const {openConfirmDialog} = useConfirmDialog();
 
-  const handleConfirmDelete = (attId: Numeric) => {
-    deleteAttainment.mutate({
-      courseId,
-      attainmentId: attId,
-    });
+  const handleConfirmDelete = (attId: Numeric): void => {
+    deleteAttainment.mutate({courseId, attainmentId: attId});
   };
 
   const columns: GridColDef[] = [

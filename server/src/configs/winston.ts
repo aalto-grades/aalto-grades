@@ -71,8 +71,8 @@ export const syslogger: winston.Logger = winston.createLogger({
     NODE_ENV === 'production'
       ? 'info'
       : NODE_ENV === 'test'
-      ? 'error'
-      : 'debug',
+        ? 'error'
+        : 'debug',
   levels: winston.config.syslog.levels,
   format: winston.format.combine(
     winston.format.timestamp({format: 'DD-MM-YYYY HH:mm:ss'}),

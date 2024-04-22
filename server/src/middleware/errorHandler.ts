@@ -53,7 +53,7 @@ export function errorHandler(
   _next: NextFunction
 ): void {
   if (err instanceof ApiError) {
-    logger.error(`${err.name}: ${err.statusCode} - ${err.errors}`);
+    logger.error(`${err.name}: ${err.statusCode} - ${err.errors.toString()}`);
 
     res.status(err.statusCode).send({
       success: false,

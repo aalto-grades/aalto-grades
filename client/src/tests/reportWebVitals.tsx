@@ -4,8 +4,8 @@
 
 import {ReportCallback} from 'web-vitals';
 
-export default function reportWebVitals(onPerfEntry: ReportCallback): void {
-  if (onPerfEntry && onPerfEntry instanceof Function) {
+const reportWebVitals = (onPerfEntry: ReportCallback): void => {
+  if (onPerfEntry instanceof Function) {
     import('web-vitals').then(({onCLS, onFID, onFCP, onLCP, onTTFB}) => {
       onCLS(onPerfEntry);
       onFID(onPerfEntry);
@@ -14,4 +14,6 @@ export default function reportWebVitals(onPerfEntry: ReportCallback): void {
       onTTFB(onPerfEntry);
     });
   }
-}
+};
+
+export default reportWebVitals;
