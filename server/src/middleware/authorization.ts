@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode, SystemRole} from '@common/types';
 import {NextFunction, Request, Response} from 'express';
 
+import {HttpCode, SystemRole} from '@common/types';
 import {isTeacherInChargeOrAdmin} from '../controllers/utils/user';
-import {JwtClaims} from '../types';
+import {JwtClaims, stringToIdSchema} from '../types';
 
 /**
  * Middleware function to ensure that the user has the necessary role to proceed.
@@ -20,10 +20,10 @@ import {JwtClaims} from '../types';
  * app.post('/v1/courses', authorization([SystemRole.Admin]), (req, res) => { ... });
  */
 export const authorization = (
-  allowedRoles: Array<SystemRole>
+  allowedRoles: SystemRole[]
 ): ((req: Request, res: Response, next: NextFunction) => void) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const user: JwtClaims = req.user as JwtClaims;
+    const user = req.user as JwtClaims;
 
     if (!allowedRoles.includes(user.role)) {
       res.status(HttpCode.Forbidden).send({
@@ -36,22 +36,29 @@ export const authorization = (
   };
 };
 
-export function teacherInCharge(): (
+export const teacherInCharge = (): ((
   req: Request,
   res: Response,
   next: NextFunction
-) => Promise<void> {
+) => Promise<void>) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const courseId = Number(req.params.courseId);
-    try {
-      await isTeacherInChargeOrAdmin(req.user as JwtClaims, courseId);
-      next();
-    } catch (e) {
-      res.status(HttpCode.Forbidden).send({
+    const result = stringToIdSchema.safeParse(req.params.courseId);
+    if (!result.success) {
+      res.status(HttpCode.BadRequest).send({
         success: false,
-        errors: ['forbidden'],
+        errors: [`Invalid course id ${req.params.courseId}`],
       });
       return;
     }
+
+    try {
+      await isTeacherInChargeOrAdmin(req.user as JwtClaims, result.data);
+      next();
+    } catch (e) {
+      res
+        .status(HttpCode.Forbidden)
+        .send({success: false, errors: ['forbidden']});
+      return;
+    }
   };
-}
+};

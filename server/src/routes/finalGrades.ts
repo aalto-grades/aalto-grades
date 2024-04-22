@@ -10,6 +10,7 @@ import {processRequestBody} from 'zod-express-middleware';
 import {NewFinalGradeArraySchema} from '@common/types';
 import {addFinalGrades, getFinalGrades} from '../controllers/finalGrades';
 import {handleInvalidRequestJson} from '../middleware';
+import {teacherInCharge} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
 export const router = Router();
@@ -17,6 +18,7 @@ export const router = Router();
 router.post(
   '/v1/courses/:courseId/finalGrades',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  controllerDispatcher(teacherInCharge()),
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(NewFinalGradeArraySchema),
@@ -26,5 +28,6 @@ router.post(
 router.get(
   '/v1/courses/:courseId/finalGrades',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  controllerDispatcher(teacherInCharge()),
   controllerDispatcher(getFinalGrades)
 );

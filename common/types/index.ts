@@ -9,4 +9,5 @@ export * from './course';
 export * from './finalGrade';
 export * from './general';
 export * from './grades';
+export * from './graph';
 export * from './user';

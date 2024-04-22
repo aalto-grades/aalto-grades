@@ -20,6 +20,7 @@ import {
   getSisuFormattedGradingCSV,
 } from '../controllers/grades';
 import {handleInvalidRequestJson} from '../middleware';
+import {teacherInCharge} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
 export const router = Router();
@@ -34,6 +35,7 @@ router.get(
 router.post(
   '/v1/courses/:courseId/grades/csv/sisu',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  controllerDispatcher(teacherInCharge()),
   express.json({limit: '10mb'}),
   handleInvalidRequestJson,
   processRequestBody(SisuCsvUploadSchema),
@@ -43,6 +45,7 @@ router.post(
 router.post(
   '/v1/courses/:courseId/grades',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  controllerDispatcher(teacherInCharge()), // TODO: Also allow teaching assistant
   express.json({limit: '25mb'}),
   handleInvalidRequestJson,
   processRequestBody(NewGradeArraySchema),
@@ -52,6 +55,7 @@ router.post(
 router.put(
   '/v1/courses/:courseId/grades/:gradeId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  controllerDispatcher(teacherInCharge()), // TODO: Also allow teaching assistant?
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(EditGradeDataSchema),
@@ -61,5 +65,6 @@ router.put(
 router.delete(
   '/v1/courses/:courseId/grades/:gradeId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  controllerDispatcher(teacherInCharge()), // TODO: Also allow teaching assistant?
   controllerDispatcher(deleteGrade)
 );
