@@ -13,4 +13,5 @@ INSERT INTO public.course (course_code, min_credits, max_credits, grading_scale,
 ('CS-A????', 5, 5, 'NUMERICAL', 'EN', NOW(), NOW()), -- [Test] Edit course
 ('CS-A????', 5, 5, 'NUMERICAL', 'EN', NOW(), NOW()), -- [Test] Final grades
 ('CS-A????', 5, 5, 'NUMERICAL', 'EN', NOW(), NOW()), -- [Test] Final grades 2 (teacher not in charge, no final grades)
-('CS-A????', 5, 5, 'NUMERICAL', 'EN', NOW(), NOW()); -- [Test] Final grades add
+('CS-A????', 5, 5, 'NUMERICAL', 'EN', NOW(), NOW()), -- [Test] Final grades add
+('CS-A????', 5, 5, 'NUMERICAL', 'EN', NOW(), NOW()); -- [Test] Attainments
