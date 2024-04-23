@@ -20,7 +20,7 @@ const PrettyChip: FC<PropsType & ButtonProps> = props => {
         // borderLeft: '1px black solid',
         display: 'flex',
         alignItems: 'center',
-        overflow: 'hidden',
+        // overflow: 'hidden',
       }}
     >
       <Button
@@ -42,10 +42,10 @@ const PrettyChip: FC<PropsType & ButtonProps> = props => {
               !props.position
                 ? '50px 50px 50px 50px'
                 : props.position === 'first'
-                  ? '50px 0px 0px 50px'
-                  : props.position === 'last'
-                    ? '0px 50px 50px 0px'
-                    : '0px'
+                ? '50px 0px 0px 50px'
+                : props.position === 'last'
+                ? '0px 50px 50px 0px'
+                : '0px'
             }`,
 
             width: '100%',

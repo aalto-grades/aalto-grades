@@ -14,7 +14,6 @@ import {
 } from '@mui/icons-material';
 import {
   Box,
-  Button,
   CircularProgress,
   Divider,
   List,
@@ -96,7 +95,7 @@ const SideMenu = ({onUpload}: {onUpload: () => void}): JSX.Element => {
         minWidth: '204px',
       }}
     >
-      <SideMenuButton
+      {/* <SideMenuButton
         text="Courses List"
         to="/"
         Icon={FlagCircle}
@@ -107,7 +106,7 @@ const SideMenu = ({onUpload}: {onUpload: () => void}): JSX.Element => {
       <Button variant="outlined" onClick={onUpload}>
         Upload Grades
       </Button>
-      <Divider sx={{my: 2}} />
+      <Divider sx={{my: 2}} /> */}
       <List>
         <SideMenuButton
           text="Grades"

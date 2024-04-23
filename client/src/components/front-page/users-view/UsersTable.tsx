@@ -60,19 +60,22 @@ export default function UsersTable(): JSX.Element {
         </TableHead>
         <TableBody>
           {users.data &&
-            users.data.map(user => (
-              <TableRow key={user.email ?? `user-${user.id}`} hover={true}>
-                <TableCell>{user.email ?? 'No email'}</TableCell>
-                <TableCell>
-                  <IconButton
-                    aria-label="delete"
-                    onClick={() => setToBeDeleted(user.id)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
+            users.data.map(
+              user =>
+                user.email && (
+                  <TableRow key={user.email ?? `user-${user.id}`} hover={true}>
+                    <TableCell>{user.email ?? 'No email'}</TableCell>
+                    <TableCell>
+                      <IconButton
+                        aria-label="delete"
+                        onClick={() => setToBeDeleted(user.id)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                )
+            )}
         </TableBody>
       </Table>
     </>

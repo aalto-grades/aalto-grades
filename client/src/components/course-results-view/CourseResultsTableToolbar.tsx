@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Box, Button, Toolbar, Tooltip} from '@mui/material';
+import {Box, Button, Tooltip} from '@mui/material';
 import {JSX, useEffect, useState} from 'react';
 import {NavigateFunction, useNavigate, useParams} from 'react-router-dom';
 
@@ -138,10 +138,10 @@ export default function CourseResultsTableToolbar(): JSX.Element {
   };
 
   return (
-    <Toolbar
+    <Box
       sx={{
         mx: 1,
-        py: 2,
+        display: 'flex',
       }}
     >
       <button
@@ -208,9 +208,9 @@ export default function CourseResultsTableToolbar(): JSX.Element {
               table.getSelectedRowModel().rows.length === 0
                 ? 'Select at least one student number for downloading grades.'
                 : missingFinalGrades
-                  ? 'Grades with status "PENDING" cannot be downloaded, ' +
-                    'unselect or calculate grades for these.'
-                  : 'Download final course grades as a Sisu compatible CSV file.'
+                ? 'Grades with status "PENDING" cannot be downloaded, ' +
+                  'unselect or calculate grades for these.'
+                : 'Download final course grades as a Sisu compatible CSV file.'
             }
             placement="top"
           >
@@ -293,6 +293,6 @@ export default function CourseResultsTableToolbar(): JSX.Element {
         onClose={() => setShowDialog(false)}
         handleDiscard={() => navigate(-1)}
       />
-    </Toolbar>
+    </Box>
   );
 }
