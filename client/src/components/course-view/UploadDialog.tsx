@@ -64,7 +64,6 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       width: 120,
       editable: true,
     },
-    {field: 'test', headerName: 'test', type: 'number', editable: true},
     ...attainments.data.map(
       (att): GridColDef<GradeUploadColTypes> => ({
         field: att.name,
