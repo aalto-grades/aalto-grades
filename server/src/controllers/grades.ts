@@ -29,7 +29,6 @@ import {
   getFinalGradesFor,
   studentNumbersExist,
 } from './utils/grades';
-import {isTeacherInChargeOrAdmin} from './utils/user';
 
 /**
  * Responds with StudentRow[]
@@ -142,12 +141,10 @@ export const getSisuFormattedGradingCSV = async (
   req: TypedRequestBody<typeof SisuCsvUploadSchema>,
   res: Response
 ): Promise<void> => {
-  const sisuExportDate = new Date();
   const course = await findAndValidateCourseId(req.params.courseId);
-
-  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id);
-
   await studentNumbersExist(req.body.studentNumbers);
+
+  const sisuExportDate = new Date();
 
   /**
    * TODO: only one grade per user per instance is allowed
@@ -249,10 +246,7 @@ export const addGrades = async (
   res: Response
 ): Promise<Response | void> => {
   const grader = req.user as JwtClaims;
-
   const courseId = await validateCourseId(req.params.courseId);
-
-  await isTeacherInChargeOrAdmin(grader, courseId);
 
   // Validate that attainments belong to correct course
   const attainmentIds = new Set<number>();
@@ -329,13 +323,11 @@ export const editGrade = async (
   req: TypedRequestBody<typeof EditGradeDataSchema>,
   res: Response
 ): Promise<void> => {
-  const [course, gradeData] = await findAndValidateAttainmentGradePath(
+  const grader = req.user as JwtClaims;
+  const [_, gradeData] = await findAndValidateAttainmentGradePath(
     req.params.courseId,
     req.params.gradeId
   );
-
-  const grader = req.user as JwtClaims;
-  await isTeacherInChargeOrAdmin(grader, course.id);
 
   const {grade, date, expiryDate, comment} = req.body;
 
@@ -356,11 +348,10 @@ export const deleteGrade = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const [course, grade] = await findAndValidateAttainmentGradePath(
+  const [_, grade] = await findAndValidateAttainmentGradePath(
     req.params.courseId,
     req.params.gradeId
   );
-  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id);
 
   await grade.destroy();
 

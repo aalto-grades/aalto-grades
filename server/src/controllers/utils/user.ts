@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import {HttpCode, SystemRole} from '@common/types';
-import {Request} from 'express';
 import TeacherInCharge from '../../database/models/teacherInCharge';
 import User from '../../database/models/user';
 import {ApiError, JwtClaims, stringToIdSchema} from '../../types';
@@ -69,14 +68,8 @@ export const isTeacherInChargeOrAdmin = async (
  * Checks if the user making the request is an admin or the owner of the data being accessed.
  * Throws ApiError if the user id is invalid or the user does not have correct permissions.
  */
-export const adminOrOwner = async (req: Request): Promise<User> => {
-  const userId = await validateUserId(req.params.userId);
-  const userToken = req.user as JwtClaims;
-
+export const isAdminOrOwner = (userToken: JwtClaims, userId: number): void => {
   if (userId !== userToken.id && userToken.role !== SystemRole.Admin) {
-    throw new ApiError("cannot access user's courses", HttpCode.Forbidden);
+    throw new ApiError("Cannot access user's data", HttpCode.Forbidden);
   }
-
-  // Confirm that user exists and return.
-  return await findUserById(userId);
 };

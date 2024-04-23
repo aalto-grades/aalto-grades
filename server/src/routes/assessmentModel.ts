@@ -19,6 +19,7 @@ import {
   updateAssessmentModel,
 } from '../controllers/assessmentModel';
 import {handleInvalidRequestJson} from '../middleware';
+import {teacherInCharge} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
 export const router = Router();
@@ -38,6 +39,7 @@ router.get(
 router.post(
   '/v1/courses/:courseId/assessment-models',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  teacherInCharge(),
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(NewAssessmentModelDataSchema),
@@ -47,6 +49,7 @@ router.post(
 router.put(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  teacherInCharge(),
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(EditAssessmentModelDataSchema),
@@ -56,5 +59,6 @@ router.put(
 router.delete(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  teacherInCharge(),
   controllerDispatcher(deleteAssessmentModel)
 );

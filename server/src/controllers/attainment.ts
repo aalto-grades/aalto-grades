@@ -4,6 +4,7 @@
 
 import {Request, Response} from 'express';
 import {ParamsDictionary} from 'express-serve-static-core';
+import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
   AttainmentData,
@@ -11,15 +12,12 @@ import {
   HttpCode,
   NewAttainmentData,
 } from '@common/types';
-import {TypedRequestBody} from 'zod-express-middleware';
 import Attainment from '../database/models/attainment';
-import {JwtClaims} from '../types';
 import {
   findAttainmentsByCourseId,
   validateAttainmentPath,
 } from './utils/attainment';
-import {findAndValidateCourseId} from './utils/course';
-import {isTeacherInChargeOrAdmin} from './utils/user';
+import {findAndValidateCourseId, validateCourseId} from './utils/course';
 
 /**
  * Responds with AttainmentData[]
@@ -43,11 +41,10 @@ export const addAttainment = async (
   req: Request<ParamsDictionary, unknown, NewAttainmentData>,
   res: Response
 ): Promise<void> => {
-  const course = await findAndValidateCourseId(req.params.courseId);
-  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id);
+  const courseId = await validateCourseId(req.params.courseId);
 
   const newAttainment = await Attainment.create({
-    courseId: course.id,
+    courseId: courseId,
     name: req.body.name,
     daysValid: req.body.daysValid,
   });
@@ -59,12 +56,10 @@ export const editAttainment = async (
   req: TypedRequestBody<typeof EditAttainmentDataSchema>,
   res: Response
 ): Promise<void> => {
-  const [course, attainment] = await validateAttainmentPath(
+  const [_, attainment] = await validateAttainmentPath(
     req.params.courseId,
     req.params.attainmentId
   );
-
-  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id);
 
   await attainment
     .set({
@@ -80,12 +75,10 @@ export const deleteAttainment = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const [course, attainment] = await validateAttainmentPath(
+  const [_, attainment] = await validateAttainmentPath(
     req.params.courseId,
     req.params.attainmentId
   );
-
-  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id);
 
   await attainment.destroy();
 

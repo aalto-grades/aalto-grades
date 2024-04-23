@@ -17,7 +17,7 @@ import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 import {ApiError, CourseFull} from '../types';
 import {parseCourseFull} from './utils/course';
-import {adminOrOwner, findAndValidateUserId} from './utils/user';
+import {findAndValidateUserId, validateUserId} from './utils/user';
 
 /**
  * Responds with CourseData[]
@@ -26,7 +26,7 @@ export const getCoursesOfUser = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const user = await adminOrOwner(req);
+  const userId = await validateUserId(req.params.userId);
 
   const inChargeCourses: CourseFull[] = (await Course.findAll({
     include: [
@@ -34,7 +34,7 @@ export const getCoursesOfUser = async (
       {
         model: User,
         as: 'Users',
-        where: {id: user.id},
+        where: {id: userId},
       },
     ],
   })) as CourseFull[];
@@ -46,7 +46,7 @@ export const getCoursesOfUser = async (
       {
         model: User,
         as: 'inCourse',
-        where: {id: user.id},
+        where: {id: userId},
       },
     ],
   })) as CourseFull[];

@@ -15,6 +15,7 @@ import {
   getAttainments,
 } from '../controllers/attainment';
 import {handleInvalidRequestJson} from '../middleware';
+import {teacherInCharge} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
 export const router = Router();
@@ -28,6 +29,7 @@ router.get(
 router.post(
   '/v1/courses/:courseId/attainments',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  teacherInCharge(),
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(NewAttainmentDataSchema),
@@ -37,6 +39,7 @@ router.post(
 router.put(
   '/v1/courses/:courseId/attainments/:attainmentId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  teacherInCharge(),
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(EditAttainmentDataSchema),
@@ -46,5 +49,6 @@ router.put(
 router.delete(
   '/v1/courses/:courseId/attainments/:attainmentId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  teacherInCharge(),
   controllerDispatcher(deleteAttainment)
 );

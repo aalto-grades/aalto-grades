@@ -3,20 +3,19 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
+import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
   AssessmentModelData,
   EditAssessmentModelDataSchema,
+  GraphStructure,
   HttpCode,
   NewAssessmentModelDataSchema,
 } from '@common/types';
-import {GraphStructure} from '@common/types/graph';
-import {TypedRequestBody} from 'zod-express-middleware';
 import AssessmentModel from '../database/models/assessmentModel';
-import {ApiError, JwtClaims} from '../types';
+import {ApiError} from '../types';
 import {validateAssessmentModelPath} from './utils/assessmentModel';
-import {findAndValidateCourseId} from './utils/course';
-import {isTeacherInChargeOrAdmin} from './utils/user';
+import {findAndValidateCourseId, validateCourseId} from './utils/course';
 
 /**
  * Responds with AssessmentModelData
@@ -75,16 +74,13 @@ export const addAssessmentModel = async (
   req: TypedRequestBody<typeof NewAssessmentModelDataSchema>,
   res: Response
 ): Promise<void> => {
-  const course = await findAndValidateCourseId(req.params.courseId);
-
-  // Route is only available for admins and those who have teacher in charge role for the course.
-  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id);
+  const courseId = await validateCourseId(req.params.courseId);
 
   // Find or create new assessment model based on name and course ID.
   const [assessmentModel, created] = await AssessmentModel.findOrCreate({
     where: {
       name: req.body.name,
-      courseId: course.id,
+      courseId: courseId,
     },
     defaults: {
       name: req.body.name,
@@ -94,7 +90,7 @@ export const addAssessmentModel = async (
 
   if (!created) {
     throw new ApiError(
-      `Assessment model with name '${req.params.name}' already exists in course ID ${course.id}`,
+      `Assessment model with name '${req.params.name}' already exists in course ID ${courseId}`,
       HttpCode.Conflict
     );
   }
@@ -106,13 +102,10 @@ export const updateAssessmentModel = async (
   req: TypedRequestBody<typeof EditAssessmentModelDataSchema>,
   res: Response
 ): Promise<void> => {
-  const [course, assessmentModel] = await validateAssessmentModelPath(
+  const [_, assessmentModel] = await validateAssessmentModelPath(
     req.params.courseId,
     req.params.assessmentModelId
   );
-
-  // Route is only available for admins and those who have teacher in charge role for the course.
-  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id);
 
   // Update assessment model name.
   await assessmentModel.update({
@@ -130,22 +123,12 @@ export const deleteAssessmentModel = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const [course, assessmentModel] = await validateAssessmentModelPath(
+  const [_, assessmentModel] = await validateAssessmentModelPath(
     req.params.courseId,
     req.params.assessmentModelId
   );
-  // Route is only available for admins and those who have teacher in charge role for the course.
-  await isTeacherInChargeOrAdmin(req.user as JwtClaims, course.id);
 
-  if (assessmentModel.courseId !== course.id) {
-    throw new ApiError(
-      `Assessment model with ID ${assessmentModel.id} does not belong to course ID ${course.id}`,
-      HttpCode.Conflict
-    );
-  }
-
-  // Delete assessment model.
-  await assessmentModel.destroy();
+  await assessmentModel.destroy(); // Delete assessment model.
 
   res.sendStatus(HttpCode.Ok);
 };

@@ -9,16 +9,13 @@ import FinalGrade from '../database/models/finalGrade';
 import {JwtClaims} from '../types';
 import {FinalGradeModelData} from '../types/finalGrade';
 import {validateCourseId} from './utils/course';
-import {isTeacherInChargeOrAdmin} from './utils/user';
 
 export const addFinalGrades = async (
   req: Request<ParamsDictionary, unknown, NewFinalGrade[]>,
   res: Response
 ): Promise<void | Response> => {
   const grader = req.user as JwtClaims;
-
   const courseId = await validateCourseId(req.params.courseId);
-  await isTeacherInChargeOrAdmin(grader, courseId);
 
   const preparedBulkCreate: FinalGradeModelData[] = req.body.map(
     gradeEntry => ({
@@ -45,9 +42,6 @@ export const getFinalGrades = async (
   res: Response
 ): Promise<void | Response> => {
   const courseId = await validateCourseId(req.params.courseId);
-  const grader = req.user as JwtClaims;
-
-  await isTeacherInChargeOrAdmin(grader, courseId);
 
   const dbFinalGrades = await FinalGrade.findAll({where: {courseId: courseId}});
 
