@@ -15,7 +15,9 @@ import UsersView from './front-page/users-view/UsersView';
 export default function FrontPage(): JSX.Element {
   const theme = useTheme();
   const {auth} = useAuth();
-  const courses = useGetAllCourses();
+  const courses = useGetAllCourses({
+    enabled: auth !== null && auth.role === SystemRole.Admin,
+  });
   const coursesOfUser = useGetCoursesOfUser((auth as LoginResult).id);
   const [createDialogOpen, setCreateDialogOpen] = useState<boolean>(false);
 
