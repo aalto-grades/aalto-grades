@@ -8,7 +8,6 @@ import {z} from 'zod';
 import {FinalGradeDataSchema, HttpCode, NewFinalGrade} from '@common/types';
 import {app} from '../../src/app';
 import FinalGrade from '../../src/database/models/finalGrade';
-import TeacherInCharge from '../../src/database/models/teacherInCharge';
 import {ErrorSchema} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
 
@@ -34,16 +33,6 @@ const students = [
   {id: 14, studentNumber: '638843', finalGrade: 3},
   {id: 15, studentNumber: '216384', finalGrade: 2},
 ];
-
-export const mockTeacher: TeacherInCharge = new TeacherInCharge(
-  {
-    userId: 1,
-    courseId: 1,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {isNewRecord: false}
-);
 
 // TODO: Test multiple final grades
 
@@ -83,8 +72,6 @@ describe('Test GET /v1/courses/:courseId/finalGrades - get final grades', () => 
   });
 
   it('should get final grades succesfully when course results are found (teacher in charge)', async () => {
-    jest.spyOn(TeacherInCharge, 'findOne').mockResolvedValueOnce(mockTeacher);
-
     const res = await request
       .get(`/v1/courses/${testCourseId}/finalGrades`)
       .set('Cookie', cookies.teacherCookie)

@@ -8,6 +8,7 @@ import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 
 import {
+  CourseRoleType,
   CreateCourseDataSchema,
   EditCourseDataSchema,
   SystemRole,
@@ -19,7 +20,7 @@ import {
   getCourse,
 } from '../controllers/course';
 import {handleInvalidRequestJson} from '../middleware';
-import {authorization} from '../middleware/authorization';
+import {authorization, courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
 export const router = Router();
@@ -27,12 +28,18 @@ export const router = Router();
 router.get(
   '/v1/courses/:courseId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  courseAuthorization([
+    CourseRoleType.Teacher,
+    CourseRoleType.Assistant,
+    CourseRoleType.Student,
+  ]),
   controllerDispatcher(getCourse)
 );
 
 router.get(
   '/v1/courses',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  authorization([SystemRole.Admin]),
   controllerDispatcher(getAllCourses)
 );
 

@@ -7,7 +7,11 @@ import {RequestHandler} from 'express-serve-static-core';
 import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 
-import {EditAttainmentDataSchema, NewAttainmentDataSchema} from '@common/types';
+import {
+  CourseRoleType,
+  EditAttainmentDataSchema,
+  NewAttainmentDataSchema,
+} from '@common/types';
 import {
   addAttainment,
   deleteAttainment,
@@ -15,7 +19,7 @@ import {
   getAttainments,
 } from '../controllers/attainment';
 import {handleInvalidRequestJson} from '../middleware';
-import {teacherInCharge} from '../middleware/authorization';
+import {courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
 export const router = Router();
@@ -23,13 +27,18 @@ export const router = Router();
 router.get(
   '/v1/courses/:courseId/attainments',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  courseAuthorization([
+    CourseRoleType.Teacher,
+    CourseRoleType.Assistant,
+    CourseRoleType.Student,
+  ]),
   controllerDispatcher(getAttainments)
 );
 
 router.post(
   '/v1/courses/:courseId/attainments',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  teacherInCharge(),
+  courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(NewAttainmentDataSchema),
@@ -39,7 +48,7 @@ router.post(
 router.put(
   '/v1/courses/:courseId/attainments/:attainmentId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  teacherInCharge(),
+  courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(EditAttainmentDataSchema),
@@ -49,6 +58,6 @@ router.put(
 router.delete(
   '/v1/courses/:courseId/attainments/:attainmentId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  teacherInCharge(),
+  courseAuthorization([CourseRoleType.Teacher]),
   controllerDispatcher(deleteAttainment)
 );
