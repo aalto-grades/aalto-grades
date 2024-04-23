@@ -12,10 +12,9 @@ import {ErrorSchema} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
 
 const request = supertest(app);
-let cookies: Cookies = {
-  adminCookie: [],
-  teacherCookie: [],
-};
+let cookies: Cookies = {} as Cookies;
+
+const deleteUserId = 24;
 
 const CourseSchema = BaseCourseDataSchema.strict().refine(
   val => val.maxCredits >= val.minCredits
@@ -178,12 +177,12 @@ describe('Test POST /v1/idp-users/ - get idp users information', () => {
 describe('Test DELETE /v1/idp-users/:userId - get idp users information', () => {
   it('should delete idp user when admin', async () => {
     const res = await request
-      .delete('/v1/idp-users/23')
+      .delete(`/v1/idp-users/${deleteUserId}`)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    const deletedUser = await User.findByPk(23);
+    const deletedUser = await User.findByPk(deleteUserId);
 
     expect(JSON.stringify(res.body)).toBe('{}');
     expect(deletedUser).toBe(null);

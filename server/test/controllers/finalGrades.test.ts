@@ -12,26 +12,23 @@ import {ErrorSchema} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
 
 const request = supertest(app);
-let cookies: Cookies = {
-  adminCookie: [],
-  teacherCookie: [],
-};
+let cookies: Cookies = {} as Cookies;
 
 const testCourseId = 8;
 const testCourse2Id = 9; // Not teacher in charge, final grade not calculated
 const testCourseAddId = 10;
 const badId = 1000000;
 const students = [
-  {id: 6, studentNumber: '325235', finalGrade: 2},
-  {id: 7, studentNumber: '826139', finalGrade: 3},
-  {id: 8, studentNumber: '849946', finalGrade: 2},
-  {id: 9, studentNumber: '183958', finalGrade: 0},
-  {id: 10, studentNumber: '686426', finalGrade: 0},
-  {id: 11, studentNumber: '753213', finalGrade: 3},
-  {id: 12, studentNumber: '279337', finalGrade: 5},
-  {id: 13, studentNumber: '495298', finalGrade: 5},
-  {id: 14, studentNumber: '638843', finalGrade: 3},
-  {id: 15, studentNumber: '216384', finalGrade: 2},
+  {id: 8, studentNumber: '325235', finalGrade: 2},
+  {id: 9, studentNumber: '826139', finalGrade: 3},
+  {id: 10, studentNumber: '849946', finalGrade: 2},
+  {id: 11, studentNumber: '183958', finalGrade: 0},
+  {id: 12, studentNumber: '686426', finalGrade: 0},
+  {id: 13, studentNumber: '753213', finalGrade: 3},
+  {id: 14, studentNumber: '279337', finalGrade: 5},
+  {id: 15, studentNumber: '495298', finalGrade: 5},
+  {id: 16, studentNumber: '638843', finalGrade: 3},
+  {id: 17, studentNumber: '216384', finalGrade: 2},
 ];
 
 // TODO: Test multiple final grades

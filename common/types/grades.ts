@@ -16,14 +16,16 @@ export const GradeDataSchema = z.object({
   expiryDate: DateSchema,
   comment: z.string().nullable(),
 });
-export const NewGradeSchema = z.object({
-  studentNumber: z.string(),
-  attainmentId: z.number().int(),
-  grade: z.number(),
-  date: DateSchema,
-  expiryDate: DateSchema,
-  comment: z.string(),
-});
+export const NewGradeSchema = z
+  .object({
+    studentNumber: z.string(),
+    attainmentId: z.number().int(),
+    grade: z.number(),
+    date: DateSchema,
+    expiryDate: DateSchema,
+    comment: z.string(),
+  })
+  .refine(val => val.expiryDate >= val.date);
 export const NewGradeArraySchema = z.array(NewGradeSchema);
 export const AttainmentGradesDataSchema = z.object({
   attainmentId: z.number().int(),
@@ -39,8 +41,15 @@ export const StudentRowArraySchema = z.array(StudentRowSchema);
 export const EditGradeDataSchema = GradeDataSchema.omit({
   gradeId: true,
   grader: true,
-}).partial();
-
+})
+  .partial()
+  .refine(
+    val =>
+      val.date === undefined ||
+      val.expiryDate === undefined ||
+      val.expiryDate >= val.date,
+    {path: ['maxCredits']}
+  );
 export const SisuCsvUploadSchema = z.object({
   assessmentDate: DateSchema.optional(), // Assessment date override
   completionLanguage: LanguageSchema.optional(), // Defaults to course language TODO: confirm that the Language enum is valid for SISU
