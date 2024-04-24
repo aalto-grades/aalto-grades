@@ -11,18 +11,22 @@ import {
   TextField,
 } from '@mui/material';
 import {useState} from 'react';
-import {useParams} from 'react-router-dom';
-import {useAddAttainment} from '../../hooks/useApi';
 
-type PropsType = {handleClose: () => void; open: boolean};
+type PropsType = {
+  handleClose: () => void;
+  open: boolean;
+  onSave: (name: string, daysValid: number) => Promise<void>;
+};
 
-const AddAttainmentDialog = ({handleClose, open}: PropsType): JSX.Element => {
-  const addAttainment = useAddAttainment();
+const AddAttainmentDialog = ({
+  handleClose,
+  open,
+  onSave,
+}: PropsType): JSX.Element => {
   const [attainment, setAttainment] = useState({name: '', daysValid: 365});
-  const {courseId} = useParams() as {courseId: string};
 
   const handleSave = async (): Promise<void> => {
-    await addAttainment.mutateAsync({courseId, attainment});
+    await onSave(attainment.name, attainment.daysValid);
     setAttainment({name: '', daysValid: 365});
     handleClose();
   };

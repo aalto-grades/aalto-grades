@@ -34,33 +34,25 @@ export const useGetAttainments = (
     ...options,
   });
 
-type AddAttainmentVars = {
-  courseId: Numeric;
-  attainment: NewAttainmentData;
-};
 export const useAddAttainment = (
-  options?: UseMutationOptions<number, unknown, AddAttainmentVars>
-): UseMutationResult<number, unknown, AddAttainmentVars> => {
+  courseId: Numeric,
+  options?: UseMutationOptions<number, unknown, NewAttainmentData>
+): UseMutationResult<number, unknown, NewAttainmentData> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: AddAttainmentVars) =>
+    mutationFn: async (att: NewAttainmentData) =>
       IdSchema.parse(
-        (
-          await axios.post(
-            `/v1/courses/${vars.courseId}/attainments`,
-            vars.attainment
-          )
-        ).data
+        (await axios.post(`/v1/courses/${courseId}/attainments`, att)).data
       ),
 
-    onSuccess: (_data: number, vars: AddAttainmentVars) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['attainments', vars.courseId],
+        queryKey: ['attainments', courseId],
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['root-attainment', vars.courseId],
+        queryKey: ['root-attainment', courseId],
       });
     },
     ...options,
@@ -68,54 +60,52 @@ export const useAddAttainment = (
 };
 
 type EditAttainmentVars = {
-  courseId: Numeric;
   attainmentId: Numeric;
   attainment: EditAttainmentData;
 };
 export const useEditAttainment = (
-  options?: UseMutationOptions<unknown, unknown, unknown>
+  courseId: Numeric,
+  options?: UseMutationOptions<unknown, unknown, EditAttainmentVars>
 ): UseMutationResult<unknown, unknown, EditAttainmentVars> => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (vars: EditAttainmentVars) =>
       await axios.put(
-        `/v1/courses/${vars.courseId}/attainments/${vars.attainmentId}`,
+        `/v1/courses/${courseId}/attainments/${vars.attainmentId}`,
         vars.attainment
       ),
 
-    onSuccess: (_data: unknown, vars: EditAttainmentVars) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['attainments', vars.courseId],
+        queryKey: ['attainments', courseId],
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['root-attainment', vars.courseId],
+        queryKey: ['root-attainment', courseId],
       });
     },
     ...options,
   });
 };
 
-type DeleteAttainmentVars = {courseId: Numeric; attainmentId: Numeric};
 export const useDeleteAttainment = (
-  options?: UseMutationOptions<unknown, unknown, unknown>
-): UseMutationResult<unknown, unknown, DeleteAttainmentVars> => {
+  courseId: Numeric,
+  options?: UseMutationOptions<unknown, unknown, Numeric>
+): UseMutationResult<unknown, unknown, Numeric> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: DeleteAttainmentVars) =>
-      await axios.delete(
-        `/v1/courses/${vars.courseId}/attainments/${vars.attainmentId}`
-      ),
+    mutationFn: async (attainmentId: Numeric) =>
+      await axios.delete(`/v1/courses/${courseId}/attainments/${attainmentId}`),
 
-    onSuccess: (_data: unknown, vars: DeleteAttainmentVars) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['attainments', vars.courseId],
+        queryKey: ['attainments', courseId],
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['root-attainment', vars.courseId],
+        queryKey: ['root-attainment', courseId],
       });
     },
     ...options,
