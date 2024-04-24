@@ -232,13 +232,13 @@ const AttainmentsView = (): JSX.Element => {
           if (blocker.state === 'blocked') blocker.reset();
         }}
         handleDiscard={() => {
+          setRows(structuredClone(initRows));
+
           if (layoutChange) {
             setLayoutChange(false);
             setLayout('grid');
           } else if (blocker.state === 'blocked') {
             blocker.proceed();
-          } else {
-            setRows(structuredClone(initRows));
           }
         }}
       />
