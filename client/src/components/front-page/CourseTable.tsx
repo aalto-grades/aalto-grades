@@ -14,17 +14,20 @@ import {
 import {JSX} from 'react';
 import {useNavigate} from 'react-router-dom';
 
-import {CourseData} from '@common/types';
+import {CourseData, LoginResult, UserData, SystemRole} from '@common/types';
 import {HeadCellData} from '../../types';
+import useAuth from '../../hooks/useAuth';
 
 const headCells: HeadCellData[] = [
   {id: 'code', label: 'Code'},
   {id: 'name', label: 'Name'},
   {id: 'department', label: 'Organizing department'},
+  {id: 'role', label: 'Role'},
 ];
 
 const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
   const navigate = useNavigate();
+  const {auth} = useAuth();
 
   return (
     <Table>
@@ -72,6 +75,19 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
               <TableCell>{course.courseCode}</TableCell>
               <TableCell>{course.name.en}</TableCell>
               <TableCell>{course.department.en}</TableCell>
+              <TableCell>
+                {auth?.role === SystemRole.Admin
+                  ? 'Admin'
+                  : course.teachersInCharge.filter(
+                      (x: UserData) => x.id === (auth as LoginResult).id
+                    ).length > 0
+                  ? 'Teacher'
+                  : course.assistants.filter(
+                      (x: UserData) => x.id === (auth as LoginResult).id
+                    ).length > 0
+                  ? 'Assistant'
+                  : 'Student'}
+              </TableCell>
             </TableRow>
           ))}
       </TableBody>
