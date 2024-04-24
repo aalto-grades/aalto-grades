@@ -13,6 +13,8 @@ INSERT INTO public.user (email, student_number, password, name, created_at, upda
 ('teacher2@aalto.fi', '476617', 'bdrvtzjvbdgzefoofabxkttdqfokxopkvevlprmrdavrlbqqnvwprylymjlp', 'Beth Holmes', '2020-7-9', '2021-4-1', 'USER'),
 ('teacher3@aalto.fi', '344625', 'onlcozbrcxrrevpcqqreqknwwrstjeymjdfnwzndgqgykkwgwouzaedqmdvr', 'Mark Ortiz', '2020-5-17', '2021-3-10', 'USER'),
 
+('idpuser@aalto.fi', '435215', null, 'idp user', '2023-1-24', '2023-1-25', 'USER'),
+
 ('carolyn.janek@aalto.fi', '325235', 'kmeiaknfjjaakqgscpfqcggqmukkvlrjxxpdsnnhrgiqshbeeocxfvnfkfqp', 'Carolyn Janek', '2020-5-8', '2021-10-1', 'USER'),
 ('vonda.morgan@aalto.fi', '826139', 'dkatkrzhspaekfmebongpsebjvqlzvtlwydkooptebpteccwcvwauvnbpyzt', 'Vonda Morgan', '2020-11-18', '2022-9-15', 'USER'),
 ('monica.johnson@aalto.fi', '849946', 'rdsznqhfgkkrqhpoprmtggcnbuztxdqqamlzchpwgfsnfmxlixhirknwlwdk', 'Monica Johnson', '2020-3-14', '2021-6-19', 'USER'),

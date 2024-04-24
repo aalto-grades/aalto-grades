@@ -29,6 +29,30 @@ test.afterEach(async ({page}) => {
   await page.getByRole('menuitem', {name: 'Logout'}).click();
 });
 
+test.describe('Manage users as admin', () => {
+  test('Add user', async ({page}) => {
+    await page.getByRole('button', {name: 'Add user'}).click();
+    await page.getByLabel('Email').click();
+    await page.getByLabel('Email').fill('testuser@aalto.fi');
+    await page.getByRole('button', {name: 'Add User'}).click();
+    await page.goto('/');
+    await expect(
+      page.getByRole('cell', {name: 'testuser@aalto.fi'})
+    ).toBeAttached();
+  });
+
+  test('Delete user', async ({page}) => {
+    await page.goto('/');
+    const cell = page.getByRole('cell', {name: 'idpuser@aalto.fi'});
+    await expect(cell).toBeAttached();
+    const parent = page.getByRole('row').filter({has: cell});
+    await parent.getByTestId('DeleteIcon').click();
+    await expect(page.getByRole('heading', {name: 'Delete User'})).toBeVisible();
+    await page.getByRole('button', {name: 'Delete'}).click();
+    await expect(cell).not.toBeAttached();
+  });
+});
+
 test.describe('Test Courses as Admin', () => {
   test('Check course', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
@@ -134,15 +158,3 @@ test.describe('Test Courses as Admin', () => {
   });
 });
 
-test.describe('Manage users as admin', () => {
-  test('Add user', async ({page}) => {
-    await page.getByRole('button', {name: 'Add user'}).click();
-    await page.getByLabel('Email').click();
-    await page.getByLabel('Email').fill('testuser@aalto.fi');
-    await page.getByRole('button', {name: 'Add User'}).click();
-    await page.goto('/');
-    await expect(
-      page.getByRole('cell', {name: 'testuser@aalto.fi'})
-    ).toBeAttached();
-  });
-});
