@@ -398,10 +398,10 @@ export default function EditCourseView(): JSX.Element {
                       form.errors.teacherEmail
                         ? form.errors.teacherEmail
                         : teachersInCharge.length === 0
-                          ? 'Input the email address of at least one teacher in charge of the course'
-                          : teachersInCharge.includes(email)
-                            ? 'Email already on list.'
-                            : 'Add emails of the teachers in charge of the course.'
+                        ? 'Input the email address of at least one teacher in charge of the course'
+                        : teachersInCharge.includes(email)
+                        ? 'Email already on list.'
+                        : 'Add emails of the teachers in charge of the course.'
                     }
                     error={
                       form.touched.teacherEmail &&
@@ -470,8 +470,8 @@ export default function EditCourseView(): JSX.Element {
                       form.errors.assistantEmail
                         ? form.errors.assistantEmail
                         : assistants.includes(assistantEmail)
-                          ? 'Email already on list.'
-                          : 'Add emails of the assistants of the course.'
+                        ? 'Email already on list.'
+                        : 'Add emails of the assistants of the course.'
                     }
                     error={
                       form.touched.assistantEmail &&

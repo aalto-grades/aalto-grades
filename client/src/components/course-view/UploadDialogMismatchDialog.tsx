@@ -80,8 +80,8 @@ const MismatchDialog = ({
           {error === ''
             ? 'All Done!'
             : error === 'empty'
-              ? '"Import as" field cannot be empty'
-              : 'The same "Import as" value cannot appear twice'}
+            ? '"Import as" field cannot be empty'
+            : 'The same "Import as" value cannot appear twice'}
         </Alert>
         <TableContainer>
           <Table size="small">
