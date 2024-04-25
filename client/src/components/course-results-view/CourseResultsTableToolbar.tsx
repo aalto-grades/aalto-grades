@@ -3,15 +3,16 @@
 // SPDX-License-Identifier: MIT
 
 import {Box, Button, Tooltip} from '@mui/material';
-import {JSX, useEffect, useState} from 'react';
+import {JSX, useEffect, useMemo, useState} from 'react';
 import {NavigateFunction, useNavigate, useParams} from 'react-router-dom';
 
-import {StudentRow} from '@common/types';
+import {StudentRow, SystemRole} from '@common/types';
 import {batchCalculateGraph} from '@common/util/calculateGraph';
 import {enqueueSnackbar} from 'notistack';
 import {useTableContext} from '../../context/GradesTableProvider';
 import {useAddFinalGrades} from '../../hooks/api/finalGrade';
 import {useGetAllAssessmentModels, useGetGrades} from '../../hooks/useApi';
+import useAuth from '../../hooks/useAuth';
 import {State} from '../../types';
 import {findBestGrade} from '../../utils';
 import {findLatestGrade} from '../../utils/table';
@@ -30,9 +31,11 @@ function toggleString(arr: string[], str: string): string[] {
 }
 
 export default function CourseResultsTableToolbar(): JSX.Element {
+  const {courseId} = useParams() as {courseId: string};
+  const {auth, isTeacherInCharge} = useAuth();
   const {table} = useTableContext();
   const navigate: NavigateFunction = useNavigate();
-  const {courseId} = useParams() as {courseId: string};
+
   const assessmentModels = useGetAllAssessmentModels(courseId);
   const addFinalGrades = useAddFinalGrades(courseId);
   const getGrades = useGetGrades(courseId);
@@ -41,8 +44,13 @@ export default function CourseResultsTableToolbar(): JSX.Element {
     useState<boolean>(false);
   const [showSisuDialog, setShowSisuDialog]: State<boolean> = useState(false);
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
-
   const [missingFinalGrades, setMissingFinalGrades] = useState<boolean>(false);
+
+  const editRights = useMemo(
+    () => auth?.role === SystemRole.Admin || isTeacherInCharge,
+    [auth?.role, isTeacherInCharge]
+  );
+
   useEffect(() => {
     setMissingFinalGrades(
       // Prevent exporting sisu csv if students without final grades found
@@ -176,85 +184,91 @@ export default function CourseResultsTableToolbar(): JSX.Element {
           width: '100%',
         }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            gap: 2,
-          }}
-        >
-          <Tooltip
-            title={
-              table.getSelectedRowModel().rows.length === 0
-                ? 'Select at least one student number for grade calculation.'
-                : 'Calculate course final grades for selected students.'
-            }
-            placement="top"
-          >
-            <span>
-              <Button
-                variant="outlined"
-                onClick={() => setShowCalculateDialog(true)}
-                disabled={table.getSelectedRowModel().rows.length === 0}
-              >
-                Calculate final grades
-              </Button>
-            </span>
-          </Tooltip>
-          <Tooltip
-            title={
-              table.getSelectedRowModel().rows.length === 0
-                ? 'Select at least one student number for downloading grades.'
-                : missingFinalGrades
-                ? 'Grades with status "PENDING" cannot be downloaded, ' +
-                  'unselect or calculate grades for these.'
-                : 'Download final course grades as a Sisu compatible CSV file.'
-            }
-            placement="top"
-          >
-            <span>
-              <Button
-                variant="outlined"
-                color={missingFinalGrades ? 'error' : 'primary'}
-                onClick={(): void => {
-                  if (!missingFinalGrades) {
-                    setShowSisuDialog(true);
-                  }
-                }}
-                disabled={table.getSelectedRowModel().rows.length === 0}
-              >
-                Download Sisu CSV
-              </Button>
-            </span>
-          </Tooltip>
-          {/* <Button
-            variant="outlined"
-            color={props.selectedStudents.length != 0 ? 'error' : 'primary'}
-            onClick={(): void => {
-              if (props.selectedStudents.length != 0) {
-                setShowDialog(true);
-              } else {
-                navigate(-1);
-              }
+        {editRights && (
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              gap: 2,
             }}
           >
-            Return to course view
-          </Button> */}
-          <CalculateFinalGradesDialog
-            open={showCalculateDialog}
-            onClose={() => setShowCalculateDialog(false)}
-            selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
-            calculateFinalGrades={handleCalculateFinalGrades}
-          />
-          <SisuDownloadDialog
-            open={showSisuDialog}
-            handleClose={handleCloseSisuDialog}
-            handleExited={handleExitedSisuDialog}
-            selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
-          />
-        </Box>
+            <Tooltip
+              title={
+                table.getSelectedRowModel().rows.length === 0
+                  ? 'Select at least one student number for grade calculation.'
+                  : 'Calculate course final grades for selected students.'
+              }
+              placement="top"
+            >
+              <span>
+                <Button
+                  variant="outlined"
+                  onClick={() => setShowCalculateDialog(true)}
+                  disabled={table.getSelectedRowModel().rows.length === 0}
+                >
+                  Calculate final grades
+                </Button>
+              </span>
+            </Tooltip>
+            <Tooltip
+              title={
+                table.getSelectedRowModel().rows.length === 0
+                  ? 'Select at least one student number for downloading grades.'
+                  : missingFinalGrades
+                    ? 'Grades with status "PENDING" cannot be downloaded, ' +
+                      'unselect or calculate grades for these.'
+                    : 'Download final course grades as a Sisu compatible CSV file.'
+              }
+              placement="top"
+            >
+              <span>
+                <Button
+                  variant="outlined"
+                  color={missingFinalGrades ? 'error' : 'primary'}
+                  onClick={(): void => {
+                    if (!missingFinalGrades) {
+                      setShowSisuDialog(true);
+                    }
+                  }}
+                  disabled={table.getSelectedRowModel().rows.length === 0}
+                >
+                  Download Sisu CSV
+                </Button>
+              </span>
+            </Tooltip>
+            {/* <Button
+              variant="outlined"
+              color={props.selectedStudents.length != 0 ? 'error' : 'primary'}
+              onClick={(): void => {
+                if (props.selectedStudents.length != 0) {
+                  setShowDialog(true);
+                } else {
+                  navigate(-1);
+                }
+              }}
+            >
+              Return to course view
+            </Button> */}
+            <CalculateFinalGradesDialog
+              open={showCalculateDialog}
+              onClose={() => setShowCalculateDialog(false)}
+              selectedRows={table
+                .getSelectedRowModel()
+                .rows.map(r => r.original)}
+              calculateFinalGrades={handleCalculateFinalGrades}
+            />
+            <SisuDownloadDialog
+              open={showSisuDialog}
+              handleClose={handleCloseSisuDialog}
+              handleExited={handleExitedSisuDialog}
+              selectedRows={table
+                .getSelectedRowModel()
+                .rows.map(r => r.original)}
+            />
+          </Box>
+        )}
         {/* <Box
           sx={{
             display: 'flex',

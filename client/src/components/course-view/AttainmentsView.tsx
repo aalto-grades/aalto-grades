@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentData} from '@common/types';
+import {AttainmentData, SystemRole} from '@common/types';
 import {
   Box,
   Button,
@@ -11,8 +11,8 @@ import {
   IconButton,
   Typography,
 } from '@mui/material';
-import {JSX, useState} from 'react';
-import {Params, useParams} from 'react-router-dom';
+import {JSX, useMemo, useState} from 'react';
+import {useParams} from 'react-router-dom';
 
 import {
   AccessTime,
@@ -25,16 +25,25 @@ import {
 } from '@mui/icons-material';
 import {DataGrid, GridActionsCellItem, GridColDef} from '@mui/x-data-grid';
 import {useDeleteAttainment, useGetAttainments} from '../../hooks/useApi';
+import useAuth from '../../hooks/useAuth';
 import {Numeric} from '../../types';
 import NewAttainmentDialog from './NewAttainmentDialog';
 
 export default function CourseView(): JSX.Element {
-  const {courseId}: Params = useParams() as {courseId: string};
+  const {courseId} = useParams() as {courseId: string};
+  const {auth, isTeacherInCharge} = useAuth();
+
   const deleteAttainment = useDeleteAttainment();
   const attainments = useGetAttainments(courseId);
+
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [layout, setLayout] = useState<'table' | 'grid'>('table');
   // const {openConfirmDialog} = useConfirmDialog();
+
+  const editRights = useMemo(
+    () => auth?.role === SystemRole.Admin || isTeacherInCharge,
+    [auth?.role, isTeacherInCharge]
+  );
 
   const handleConfirmDelete = (attId: Numeric): void => {
     deleteAttainment.mutate({courseId, attainmentId: attId});
@@ -67,23 +76,29 @@ export default function CourseView(): JSX.Element {
       width: 120,
       editable: true,
     },
-    {
-      field: 'actions',
-      type: 'actions',
-      getActions: params => [
-        <GridActionsCellItem
-          icon={<Delete />}
-          label="Delete"
-          onClick={() => handleConfirmDelete(params.id)}
-        />,
-      ],
-    },
+    ...(editRights
+      ? [
+          {
+            field: 'actions',
+            type: 'actions',
+            getActions: params => [
+              <GridActionsCellItem
+                icon={<Delete />}
+                label="Delete"
+                onClick={() => handleConfirmDelete(params.id)}
+              />,
+            ],
+          } as GridColDef,
+        ]
+      : []),
   ];
 
   return (
     <>
       <Box sx={{display: 'flex', mb: 1}}>
-        <Button onClick={() => setAddDialogOpen(true)}>Add attainment</Button>
+        {editRights && (
+          <Button onClick={() => setAddDialogOpen(true)}>Add attainment</Button>
+        )}
         <ButtonGroup>
           <Button onClick={() => setLayout('table')}>
             {layout === 'table' ? <TableRows /> : <TableRowsOutlined />}
@@ -140,12 +155,14 @@ export default function CourseView(): JSX.Element {
                     size="small"
                   />
 
-                  <IconButton
-                    onClick={() => handleConfirmDelete(attainment.id)}
-                    aria-description="delete attainment"
-                  >
-                    <Delete />
-                  </IconButton>
+                  {editRights && (
+                    <IconButton
+                      onClick={() => handleConfirmDelete(attainment.id)}
+                      aria-description="delete attainment"
+                    >
+                      <Delete />
+                    </IconButton>
+                  )}
                 </Box>
               </Box>
             ))}

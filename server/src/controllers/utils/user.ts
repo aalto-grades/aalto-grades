@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {HttpCode, SystemRole} from '@common/types';
-import TeacherInCharge from '../../database/models/teacherInCharge';
+import CourseRole from '../../database/models/courseRole';
 import User from '../../database/models/user';
 import {ApiError, JwtClaims, stringToIdSchema} from '../../types';
 
@@ -43,25 +43,25 @@ export const validateUserId = async (userId: string): Promise<number> => {
 };
 
 /**
- * Function for checking is the user either admin on system level or teacher in charge on course level.
- * Throws ApiError if the user is neither an admin or the teacher in charge.
+ * Fetches user role in given course.
+ * Throws ApiError if the course role is not found.
  */
-export const isTeacherInChargeOrAdmin = async (
-  user: JwtClaims,
-  courseId: number
-): Promise<void> => {
-  if (user.role === SystemRole.Admin) return;
-
-  const teacher = await TeacherInCharge.findOne({
-    where: {userId: user.id, courseId},
+export const getUserCourseRole = async (
+  courseId: number,
+  user: JwtClaims
+): Promise<CourseRole> => {
+  const courseRole = await CourseRole.findOne({
+    where: {courseId, userId: user.id},
   });
 
-  if (teacher === null) {
+  if (courseRole === null) {
     throw new ApiError(
-      `user with ID ${user.id} is not allowed not execute the action`,
-      HttpCode.Forbidden
+      `user with ID ${user.id} is does not have a role in the course ${courseId}`,
+      HttpCode.NotFound
     );
   }
+
+  return courseRole;
 };
 
 /**

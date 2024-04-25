@@ -17,7 +17,7 @@ import {
   Typography,
 } from '@mui/material';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, useCallback, useEffect, useState} from 'react';
+import {JSX, useCallback, useEffect, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import {AssessmentModelData, StudentRow, SystemRole} from '@common/types';
@@ -54,6 +54,11 @@ const ModelsView = (): JSX.Element => {
   const [createViewOpen, setCreateViewOpen] = useState(false);
   const [modelsListOpen, setModelsListOpen] = useState(true);
   const [graphOpen, setGraphOpen] = useState(false);
+
+  const editRights = useMemo(
+    () => auth?.role === SystemRole.Admin || isTeacherInCharge,
+    [auth?.role, isTeacherInCharge]
+  );
 
   useEffect(() => {
     if (loadGraphId === -1 || models.data === undefined) return;
@@ -185,12 +190,14 @@ const ModelsView = (): JSX.Element => {
                 key={`graph-${model.id}-select`}
                 disablePadding
                 secondaryAction={
-                  <IconButton
-                    edge="end"
-                    onClick={() => handleDelModel(model.id)}
-                  >
-                    <Delete />
-                  </IconButton>
+                  editRights ? (
+                    <IconButton
+                      edge="end"
+                      onClick={() => handleDelModel(model.id)}
+                    >
+                      <Delete />
+                    </IconButton>
+                  ) : null
                 }
               >
                 <ListItemButton
@@ -221,6 +228,7 @@ const ModelsView = (): JSX.Element => {
             userGrades={
               currentUserRow === null ? null : currentUserRow.attainments
             }
+            readOnly={!editRights}
             onSave={onSave}
           />
         </>
