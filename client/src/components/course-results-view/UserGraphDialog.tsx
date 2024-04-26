@@ -74,7 +74,7 @@ const UserGraphDialog = ({
                 setSelectedModel(
                   assessmentModels.find(
                     model => model.id === event.target.value
-                  )
+                  )!
                 );
               }}
             >
