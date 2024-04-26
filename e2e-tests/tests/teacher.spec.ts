@@ -35,6 +35,14 @@ test.describe('Test Courses as Teacher', () => {
     await expect(page.getByRole('heading', {name: 'O1'})).toBeVisible();
   });
 
+  test('View assessment model', async ({page}) => {
+    await page.getByRole('cell', {name: 'O1'}).click();
+    await page.getByRole('button', {name: 'Grading Models'}).click();
+
+    await page.getByRole('button', {name: 'O1 Grading'}).click();
+    await expect(page.getByTestId('rf__wrapper')).toBeVisible();
+  });
+
   test('Create assessment model', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await page.getByRole('button', {name: 'Grading Models'}).click();
@@ -53,5 +61,30 @@ test.describe('Test Courses as Teacher', () => {
     await page.getByRole('button', {name: 'Grades', exact: true}).click();
     await page.getByRole('button', {name: 'Grading Models'}).click();
     await expect(page.getByRole('button', {name: 'test'})).toBeVisible();
+  });
+
+  test('View Attainments', async ({page}) => {
+    await page.getByRole('cell', {name: 'O1'}).click();
+    await page
+      .getByRole('link', {name: 'Attainments'})
+      .getByRole('button')
+      .click();
+    await expect(page.getByText('Days valid')).toBeVisible();
+    await expect(page.getByText('Tier A')).toBeVisible();
+  });
+
+  test('Add Attainment', async ({page}) => {
+    await page.getByRole('cell', {name: 'O1'}).click();
+    await page
+      .getByRole('link', {name: 'Attainments'})
+      .getByRole('button')
+      .click();
+    await expect(page.getByText('Days valid')).toBeVisible();
+    await expect(page.getByText('Tier A')).toBeVisible();
+    await page.getByRole('button', {name: 'Add attainment'}).click();
+    await page.getByRole('textbox', {name: 'Name'}).fill('test Tier D');
+    await page.getByRole('button', {name: 'Save'}).click();
+    await page.getByRole('button', {name: 'Save'}).click();
+    await expect(page.getByText('test Tier D')).toBeVisible();
   });
 });

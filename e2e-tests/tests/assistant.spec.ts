@@ -45,7 +45,10 @@ test.describe('Test Courses as Assistant', () => {
 
   test('View Attainments', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
-    await page.getByRole('button', {name: 'Attainments'}).click();
+    await page
+      .getByRole('link', {name: 'Attainments'})
+      .getByRole('button')
+      .click();
     await expect(page.getByText('Tier A')).toBeVisible();
   });
 });
