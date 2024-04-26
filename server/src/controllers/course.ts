@@ -18,7 +18,6 @@ import {sequelize} from '../database';
 import Course from '../database/models/course';
 import CourseRole from '../database/models/courseRole';
 import CourseTranslation from '../database/models/courseTranslation';
-import TeacherInCharge from '../database/models/teacherInCharge';
 import User from '../database/models/user';
 import {ApiError, CourseFull} from '../types';
 import {
@@ -108,24 +107,26 @@ export const addCourse = async (
       {transaction: t}
     );
 
-    const teachersInCharge = teachers.map(teacher => ({
-      courseId: newCourse.id as number,
-      userId: teacher.id as number,
-    })) as TeacherInCharge[];
-
-    await TeacherInCharge.bulkCreate(teachersInCharge, {transaction: t});
-
-    if (assistants.length > 0) {
-      const assistantRoles: CourseRole[] = assistants.map(
-        assistant =>
-          ({
-            courseId: newCourse.id,
-            userId: assistant.id,
-            role: CourseRoleType.Assistant,
-          }) as CourseRole
-      );
-      await CourseRole.bulkCreate(assistantRoles, {transaction: t});
-    }
+    // Add teacher and assistant roles
+    const teacherRoles: CourseRole[] = teachers.map(
+      teacher =>
+        ({
+          courseId: newCourse.id,
+          userId: teacher.id,
+          role: CourseRoleType.Teacher,
+        }) as CourseRole
+    );
+    const assistantRoles: CourseRole[] = assistants.map(
+      assistant =>
+        ({
+          courseId: newCourse.id,
+          userId: assistant.id,
+          role: CourseRoleType.Assistant,
+        }) as CourseRole
+    );
+    await CourseRole.bulkCreate([...teacherRoles, ...assistantRoles], {
+      transaction: t,
+    });
 
     return newCourse;
   });
@@ -178,7 +179,7 @@ export const editCourse = async (
       ? await validateEmailList(teachersInCharge)
       : null;
 
-  const newAssistants: Array<User> | null =
+  const newAssistants: User[] | null =
     assistants !== undefined ? await validateEmailList(assistants) : null;
 
   await sequelize.transaction(async (t: Transaction): Promise<void> => {
@@ -215,46 +216,10 @@ export const editCourse = async (
     await updateTranslation(Language.English, 'en');
     await updateTranslation(Language.Finnish, 'fi');
     await updateTranslation(Language.Swedish, 'sv');
-
-    if (newTeachers !== null) {
-      const oldTeachers = await TeacherInCharge.findAll({
-        where: {courseId: course.id},
-      });
-
-      // Delete teachers who are not in the newTeachers array.
-      for (const oldTeacher of oldTeachers) {
-        // Find old teacher index in new teacher list.
-        const existingTeacherIndex = newTeachers.findIndex(
-          (newTeacher: User) => {
-            return newTeacher.id === oldTeacher.userId;
-          }
-        );
-
-        if (existingTeacherIndex >= 0) {
-          // If yes, nothing needs to be done. Just remove oldTeacher from the
-          // newTeachers array because it doesn't need to be considered further.
-          newTeachers.splice(existingTeacherIndex, 1);
-        } else {
-          // If not, oldTeacher needs to be removed from the database.
-          await oldTeacher.destroy({transaction: t});
-        }
-      }
-
-      // Add teachers who are in the newTeachers array but not in the database.
-      if (newTeachers.length > 0) {
-        await TeacherInCharge.bulkCreate(
-          newTeachers.map(teacher => ({
-            userId: teacher.id,
-            courseId: course.id,
-          })),
-          {transaction: t}
-        );
-      }
-    }
   });
 
-  if (newAssistants) {
-    await CourseRole.updateCourseAssistants(newAssistants, course.id);
+  if (newTeachers !== null || newAssistants !== null) {
+    await CourseRole.updateCourseRoles(newTeachers, newAssistants, course.id);
   }
 
   res.sendStatus(HttpCode.Ok);

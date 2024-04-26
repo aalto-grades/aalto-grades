@@ -9,6 +9,7 @@ import {
   InferAttributes,
   InferCreationAttributes,
   Model,
+  Op,
 } from 'sequelize';
 
 import {CourseRoleType} from '@common/types';
@@ -25,8 +26,14 @@ export default class CourseRole extends Model<
   declare role: string;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
-  static updateCourseAssistants: (
-    assistants: Array<User>,
+  /**
+   * Updates database to match new teachers and assistants.
+   * If value is null, it won't be updated.
+   * Will mutate the arrays.
+   */
+  static updateCourseRoles: (
+    teachers: User[] | null,
+    assistants: User[] | null,
     courseId: number
   ) => Promise<void>;
 }
@@ -64,39 +71,57 @@ CourseRole.init(
 
 User.belongsToMany(Course, {
   through: CourseRole,
-  as: 'hasCourse',
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
 });
 
 Course.belongsToMany(User, {
   through: CourseRole,
-  as: 'inCourse',
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
 });
 
-CourseRole.updateCourseAssistants = async function (
-  assistants: Array<User>,
+CourseRole.updateCourseRoles = async (
+  teachers: User[] | null,
+  assistants: User[] | null,
   courseId: number
-): Promise<void> {
-  const oldAssistants = await CourseRole.findAll({where: {courseId: courseId}});
-  for (const oldAssistant of oldAssistants) {
-    const existingAssistantIndex: number = assistants.findIndex(
-      assistant => assistant.id === oldAssistant.userId
-    );
-    if (existingAssistantIndex >= 0) {
-      assistants.splice(existingAssistantIndex, 1);
-    } else {
-      await oldAssistant.destroy();
-    }
-  }
-
-  await CourseRole.bulkCreate(
-    assistants.map(assistant => ({
-      userId: assistant.id,
+): Promise<void> => {
+  const oldRoles = await CourseRole.findAll({
+    where: {
       courseId: courseId,
-      role: CourseRoleType.Assistant,
-    }))
-  );
+      role: {
+        [Op.or]: [CourseRoleType.Teacher, CourseRoleType.Assistant],
+      },
+    },
+  });
+
+  const updateForRole = async (
+    role: CourseRoleType,
+    users: User[] | null
+  ): Promise<void> => {
+    if (users === null) return;
+
+    for (const oldRole of oldRoles) {
+      if ((oldRole.role as CourseRoleType) !== role) continue;
+
+      const existingUserIndex = users.findIndex(
+        teacher => teacher.id === oldRole.userId
+      );
+      if (existingUserIndex >= 0) users.splice(existingUserIndex, 1);
+      else await oldRole.destroy();
+    }
+
+    if (users.length > 0) {
+      await CourseRole.bulkCreate(
+        users.map(user => ({
+          userId: user.id,
+          courseId: courseId,
+          role: role,
+        }))
+      );
+    }
+  };
+
+  await updateForRole(CourseRoleType.Teacher, teachers);
+  await updateForRole(CourseRoleType.Assistant, assistants);
 };

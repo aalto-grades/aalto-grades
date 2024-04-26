@@ -8,6 +8,7 @@ import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 
 import {
+  CourseRoleType,
   EditAssessmentModelDataSchema,
   NewAssessmentModelDataSchema,
 } from '@common/types';
@@ -19,7 +20,7 @@ import {
   updateAssessmentModel,
 } from '../controllers/assessmentModel';
 import {handleInvalidRequestJson} from '../middleware';
-import {teacherInCharge} from '../middleware/authorization';
+import {courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
 export const router = Router();
@@ -27,19 +28,21 @@ export const router = Router();
 router.get(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]), // TODO: Allow students to view assessment models?
   controllerDispatcher(getAssessmentModel)
 );
 
 router.get(
   '/v1/courses/:courseId/assessment-models',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   controllerDispatcher(getAllAssessmentModels)
 );
 
 router.post(
   '/v1/courses/:courseId/assessment-models',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  teacherInCharge(),
+  courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(NewAssessmentModelDataSchema),
@@ -49,7 +52,7 @@ router.post(
 router.put(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  teacherInCharge(),
+  courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(EditAssessmentModelDataSchema),
@@ -59,6 +62,6 @@ router.put(
 router.delete(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  teacherInCharge(),
+  courseAuthorization([CourseRoleType.Teacher]),
   controllerDispatcher(deleteAssessmentModel)
 );

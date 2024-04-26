@@ -7,20 +7,33 @@ import {RenderResult, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 
+import {SystemRole} from '@common/types';
 import CourseResultsView from '../components/CourseResultsView';
+import AuthContext from '../context/AuthProvider';
 
 describe('Tests for CourseResultsView components', () => {
   const renderCourseResultsView = (): RenderResult =>
     render(
       <QueryClientProvider client={new QueryClient()}>
-        <MemoryRouter initialEntries={['/1/course-results/1']}>
-          <Routes>
-            <Route
-              path=":courseId/course-results/:assessmentModelId"
-              element={<CourseResultsView />}
-            />
-          </Routes>
-        </MemoryRouter>
+        <AuthContext.Provider
+          value={{
+            auth: {id: 2, name: 'Timmy Teacher', role: SystemRole.User},
+            setAuth: vi.fn(),
+            isTeacherInCharge: true,
+            setIsTeacherInCharge: vi.fn(),
+            setIsAssistant: vi.fn(),
+            isAssistant: false,
+          }}
+        >
+          <MemoryRouter initialEntries={['/1/course-results/1']}>
+            <Routes>
+              <Route
+                path=":courseId/course-results/:assessmentModelId"
+                element={<CourseResultsView />}
+              />
+            </Routes>
+          </MemoryRouter>
+        </AuthContext.Provider>
       </QueryClientProvider>
     );
 

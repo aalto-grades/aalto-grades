@@ -4,16 +4,13 @@
 
 import {NextFunction, Request, Response} from 'express';
 
-import {HttpCode, SystemRole} from '@common/types';
-import {
-  isAdminOrOwner,
-  isTeacherInChargeOrAdmin,
-} from '../controllers/utils/user';
+import {CourseRoleType, HttpCode, SystemRole} from '@common/types';
+import {getUserCourseRole, isAdminOrOwner} from '../controllers/utils/user';
 import {JwtClaims, stringToIdSchema} from '../types';
 
 /**
  * Middleware function to ensure that the user has the necessary role to proceed.
- * @param {Array<SystemRole>} allowedRoles - List of roles that are permitted to access
+ * @param {SystemRole[]} allowedRoles - List of roles that are permitted to access
  * the resource.
  * @returns {Function} Returns a middleware function that checks the user's role against
  * the allowed roles.
@@ -29,13 +26,12 @@ export const authorization = (
     const user = req.user as JwtClaims;
 
     if (!allowedRoles.includes(user.role)) {
-      res.status(HttpCode.Forbidden).send({
+      return res.status(HttpCode.Forbidden).send({
         success: false,
         errors: ['forbidden'],
       });
-      return;
     }
-    next();
+    return next();
   };
 };
 
@@ -45,15 +41,15 @@ type HandlerType = (
   next: NextFunction
 ) => Promise<void | Response>;
 /**
- * Validates that the user is either an admin or the teacher in charge for the given course.
- * Do not use in a controller, instead prefer the middleware.
+ * Validates that the user is either an admin or has one of the given roles in the course.
  */
-export const teacherInCharge = (): ((
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => void) => {
+export const courseAuthorization = (
+  allowedRoles: CourseRoleType[]
+): ((req: Request, res: Response, next: NextFunction) => void) => {
   const handler: HandlerType = async (req, res, next) => {
+    const user = req.user as JwtClaims;
+    if (user.role === SystemRole.Admin) return next(); // Allow admins
+
     const result = stringToIdSchema.safeParse(req.params.courseId);
     if (!result.success) {
       return res.status(HttpCode.BadRequest).send({
@@ -63,7 +59,16 @@ export const teacherInCharge = (): ((
     }
 
     try {
-      await isTeacherInChargeOrAdmin(req.user as JwtClaims, result.data);
+      const courseRole = await getUserCourseRole(
+        result.data,
+        req.user as JwtClaims
+      );
+      if (!allowedRoles.includes(courseRole.role as CourseRoleType)) {
+        return res
+          .status(HttpCode.Forbidden)
+          .send({success: false, errors: ['forbidden']});
+      }
+
       return next();
     } catch (e) {
       return res
@@ -80,7 +85,6 @@ export const teacherInCharge = (): ((
 
 /**
  * Validates that the user is either an admin or the same user as in the url param.
- * Do not use in a controller, instead prefer the middleware.
  */
 export const adminOrOwner = (): ((
   req: Request,

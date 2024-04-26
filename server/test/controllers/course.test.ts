@@ -24,14 +24,16 @@ import {ErrorSchema, ZodErrorSchema} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
 
 const request = supertest(app);
-let cookies: Cookies = {
-  adminCookie: [],
-  teacherCookie: [],
-};
+let cookies: Cookies = {} as Cookies;
 
 const testCourseId = 5;
 const editCourseId = 7;
 const badId = 1000000;
+const teachers: TeacherData[] = [
+  {id: 5, name: 'Amanda Germain', email: 'teacher1@aalto.fi'},
+  {id: 6, name: 'Beth Holmes', email: 'teacher2@aalto.fi'},
+  {id: 7, name: 'Mark Ortiz', email: 'teacher3@aalto.fi'},
+];
 
 const CourseSchema = BaseCourseDataSchema.strict().refine(
   val => val.maxCredits >= val.minCredits
@@ -358,7 +360,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
         assistants: [],
       },
       courseDataEdits,
-      [{id: 3, name: 'Amanda Germain', email: 'teacher1@aalto.fi'}],
+      [teachers[0]],
       []
     );
   });
@@ -374,11 +376,8 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
       {
         teachersInCharge: ['teacher1@aalto.fi', 'teacher2@aalto.fi'],
       },
-      [{id: 3, name: 'Amanda Germain', email: 'teacher1@aalto.fi'}],
-      [
-        {id: 3, name: 'Amanda Germain', email: 'teacher1@aalto.fi'},
-        {id: 4, name: 'Beth Holmes', email: 'teacher2@aalto.fi'},
-      ]
+      [teachers[0]],
+      [teachers[0], teachers[1]]
     );
   });
 
@@ -391,11 +390,8 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
         assistants: [],
       },
       {teachersInCharge: ['teacher2@aalto.fi']},
-      [
-        {id: 3, name: 'Amanda Germain', email: 'teacher1@aalto.fi'},
-        {id: 4, name: 'Beth Holmes', email: 'teacher2@aalto.fi'},
-      ],
-      [{id: 4, name: 'Beth Holmes', email: 'teacher2@aalto.fi'}]
+      [teachers[0], teachers[1]],
+      [teachers[1]]
     );
   });
 
@@ -415,15 +411,8 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
         ...courseDataEdits,
         teachersInCharge: ['teacher2@aalto.fi', 'teacher3@aalto.fi'],
       },
-      [
-        {id: 3, name: 'Amanda Germain', email: 'teacher1@aalto.fi'},
-        {id: 4, name: 'Beth Holmes', email: 'teacher2@aalto.fi'},
-        {id: 5, name: 'Mark Ortiz', email: 'teacher3@aalto.fi'},
-      ],
-      [
-        {id: 4, name: 'Beth Holmes', email: 'teacher2@aalto.fi'},
-        {id: 5, name: 'Mark Ortiz', email: 'teacher3@aalto.fi'},
-      ]
+      [teachers[0], teachers[1], teachers[2]],
+      [teachers[1], teachers[2]]
     );
   });
 

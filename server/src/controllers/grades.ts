@@ -20,7 +20,7 @@ import Attainment from '../database/models/attainment';
 import AttainmentGrade from '../database/models/attainmentGrade';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
-import {AttainmentGradeModelData, JwtClaims} from '../types';
+import {ApiError, AttainmentGradeModelData, JwtClaims} from '../types';
 import {validateAttainmentBelongsToCourse} from './utils/attainment';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {
@@ -330,6 +330,28 @@ export const editGrade = async (
   );
 
   const {grade, date, expiryDate, comment} = req.body;
+
+  if (
+    date !== undefined &&
+    expiryDate === undefined &&
+    date > gradeData.expiryDate
+  ) {
+    throw new ApiError(
+      `New date (${date.toString()}) can't be later than` +
+        ` existing expiration date (${gradeData.expiryDate.toString()})`,
+      HttpCode.BadRequest
+    );
+  } else if (
+    expiryDate !== undefined &&
+    date === undefined &&
+    gradeData.date > expiryDate
+  ) {
+    throw new ApiError(
+      `New expiration date (${expiryDate.toString()}) can't be before` +
+        ` existing date (${gradeData.date.toString()})`,
+      HttpCode.BadRequest
+    );
+  }
 
   await gradeData
     .set({

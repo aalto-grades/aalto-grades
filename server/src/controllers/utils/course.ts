@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {CourseData, HttpCode, Language} from '@common/types';
+import {CourseData, CourseRoleType, HttpCode, Language} from '@common/types';
 import Course from '../../database/models/course';
 import CourseTranslation from '../../database/models/courseTranslation';
 import User from '../../database/models/user';
@@ -33,8 +33,10 @@ export const findCourseFullById = async (
   const course: CourseFull | null = (await Course.findByPk(courseId, {
     include: [
       {model: CourseTranslation},
-      {model: User, as: 'Users'},
-      {model: User, as: 'inCourse'},
+      {
+        model: User,
+        through: {attributes: ['role']},
+      },
     ],
   })) as CourseFull | null;
 
@@ -85,21 +87,21 @@ export const parseCourseFull = (course: CourseFull): CourseData => {
     }
   }
 
-  for (const teacher of course.Users) {
-    courseData.teachersInCharge.push({
-      id: teacher.id,
-      name: teacher.name,
-      email: teacher.email,
-    });
+  for (const user of course.Users) {
+    if (user.CourseRole.role === CourseRoleType.Teacher) {
+      courseData.teachersInCharge.push({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      });
+    } else if (user.CourseRole.role === CourseRoleType.Assistant) {
+      courseData.assistants.push({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      });
+    }
   }
-
-  course.inCourse?.forEach((assistant: User) => {
-    courseData.assistants.push({
-      id: assistant.id,
-      name: assistant.name,
-      email: assistant.email,
-    });
-  });
 
   return courseData;
 };

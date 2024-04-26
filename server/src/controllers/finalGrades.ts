@@ -10,30 +10,6 @@ import {JwtClaims} from '../types';
 import {FinalGradeModelData} from '../types/finalGrade';
 import {validateCourseId} from './utils/course';
 
-export const addFinalGrades = async (
-  req: Request<ParamsDictionary, unknown, NewFinalGrade[]>,
-  res: Response
-): Promise<void | Response> => {
-  const grader = req.user as JwtClaims;
-  const courseId = await validateCourseId(req.params.courseId);
-
-  const preparedBulkCreate: FinalGradeModelData[] = req.body.map(
-    gradeEntry => ({
-      userId: gradeEntry.userId,
-      assessmentModelId: gradeEntry.assessmentModelId,
-      courseId: courseId,
-      graderId: grader.id,
-      date: gradeEntry.date,
-      grade: gradeEntry.grade,
-    })
-  );
-
-  // TODO: Optimize if datasets are big.
-  await FinalGrade.bulkCreate(preparedBulkCreate);
-
-  return res.sendStatus(HttpCode.Created);
-};
-
 /**
  * Responds with FinalGradeData[]
  */
@@ -59,4 +35,28 @@ export const getFinalGrades = async (
   }));
 
   return res.json(finalGrades);
+};
+
+export const addFinalGrades = async (
+  req: Request<ParamsDictionary, unknown, NewFinalGrade[]>,
+  res: Response
+): Promise<void | Response> => {
+  const grader = req.user as JwtClaims;
+  const courseId = await validateCourseId(req.params.courseId);
+
+  const preparedBulkCreate: FinalGradeModelData[] = req.body.map(
+    gradeEntry => ({
+      userId: gradeEntry.userId,
+      assessmentModelId: gradeEntry.assessmentModelId,
+      courseId: courseId,
+      graderId: grader.id,
+      date: gradeEntry.date,
+      grade: gradeEntry.grade,
+    })
+  );
+
+  // TODO: Optimize if datasets are big.
+  await FinalGrade.bulkCreate(preparedBulkCreate);
+
+  return res.sendStatus(HttpCode.Created);
 };
