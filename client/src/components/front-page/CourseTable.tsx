@@ -79,14 +79,14 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
                 {auth?.role === SystemRole.Admin
                   ? 'Admin'
                   : course.teachersInCharge.filter(
-                      (x: UserData) => x.id === (auth as LoginResult).id
-                    ).length > 0
-                  ? 'Teacher'
-                  : course.assistants.filter(
-                      (x: UserData) => x.id === (auth as LoginResult).id
-                    ).length > 0
-                  ? 'Assistant'
-                  : 'Student'}
+                        (x: UserData) => x.id === (auth as LoginResult).id
+                      ).length > 0
+                    ? 'Teacher'
+                    : course.assistants.filter(
+                          (x: UserData) => x.id === (auth as LoginResult).id
+                        ).length > 0
+                      ? 'Assistant'
+                      : 'Student'}
               </TableCell>
             </TableRow>
           ))}

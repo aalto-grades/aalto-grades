@@ -275,9 +275,9 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
                     nodeValue.values[key] === 'fail'
                       ? '#fcc'
                       : nodeValue.sources[key].value === 'fail' &&
-                        nodeValue.values[key] !== 'fail'
-                      ? '#cfc'
-                      : '',
+                          nodeValue.values[key] !== 'fail'
+                        ? '#cfc'
+                        : '',
                 }}
               >
                 <td>

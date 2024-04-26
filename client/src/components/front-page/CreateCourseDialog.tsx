@@ -348,10 +348,10 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                   form.errors.teacherEmail
                     ? form.errors.teacherEmail
                     : teachersInCharge.length === 0
-                    ? 'Input the email address of at least one teacher in charge of the course'
-                    : teachersInCharge.includes(email)
-                    ? 'Email already on list.'
-                    : 'Add emails of the teachers in charge of the course.'
+                      ? 'Input the email address of at least one teacher in charge of the course'
+                      : teachersInCharge.includes(email)
+                        ? 'Email already on list.'
+                        : 'Add emails of the teachers in charge of the course.'
                 }
                 error={
                   form.touched.teacherEmail && Boolean(form.errors.teacherEmail)
@@ -419,10 +419,10 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                   form.errors.assistantEmail
                     ? form.errors.assistantEmail
                     : assistants.length === 0
-                    ? 'Input the email address of at least one assitant of the course'
-                    : assistants.includes(email)
-                    ? 'Email already on list.'
-                    : 'Add emails of the teachers in charge of the course.'
+                      ? 'Input the email address of at least one assitant of the course'
+                      : assistants.includes(email)
+                        ? 'Email already on list.'
+                        : 'Add emails of the teachers in charge of the course.'
                 }
                 error={
                   form.touched.assistantEmail &&
