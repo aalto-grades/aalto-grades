@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 ---
-
 definitions:
   AssessmentModelId:
     type: integer
@@ -10,6 +9,7 @@ definitions:
     format: int32
     minimum: 1
     example: 1
+
   AssessmentModelData:
     type: object
     description: Assessment model information.
@@ -21,104 +21,45 @@ definitions:
       name:
         type: string
         decription: Name of the assessment model.
-        example: Exam model
+        example: Main model
+      graphStructure:
+        type: object
+        description: Graph structure
+        example: {'nodes': [], 'edges': [], 'nodeData': {}}
+    required:
+      - id
+      - courseId
+      - name
+      - graphStructure
 
-/v1/courses/{courseId}/assessment-models:
-  get:
-    tags: [Assessment Model]
-    description: Get information about all the assessment models of a course.
-    parameters:
-      - $ref: '#/components/parameters/courseId'
-    responses:
-      200:
-        description: >
-          A course with the given ID was found and information about all of
-          its assessment models, if any, are returned in the
-          AssessmentModelData format.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                data:
-                  type: array
-                  items:
-                    $ref: '#/definitions/AssessmentModelData'
-      400:
-        description: >
-          A validation error has occurred in the URL, the given course ID is
-          not a positive integer.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-      401:
-        $ref: '#/components/responses/AuthenticationError'
-      403:
-        $ref: '#/components/responses/AuthorizationError'
-      404:
-        description: >
-          A course with the given course ID was not found.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-    security:
-      - cookieAuth: []
-  post:
-    tags: [Assessment Model]
-    description: >
-      Add an attainment model to a course.
-      Available only to admin users and teachers in charge of the course.
-    parameters:
-      - $ref: '#/components/parameters/courseId'
-    requestBody:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-                description: Name of the assessment model.
-    responses:
-      200:
-        description: >
-          The attainment model was added successfully.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                data:
-                  $ref: '#/definitions/AssessmentModelId'
-      400:
-        description: >
-          A validation error has occurred in the URL, the given course ID is
-          not a positive integer.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-      401:
-        $ref: '#/components/responses/AuthenticationError'
-      403:
-        $ref: '#/components/responses/AuthorizationError'
-      404:
-        description: >
-          A course with the given course ID was not found.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-      409:
-        description: Assessment model with same name already exists on the Course.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-    security:
-      - cookieAuth: []
+  NewAssessmentModelData:
+    type: object
+    description: Assessment model information.
+    properties:
+      name:
+        type: string
+        decription: Name of the assessment model.
+        example: Main model
+      graphStructure:
+        type: object
+        description: Graph structure
+        example: {'nodes': [], 'edges': [], 'nodeData': {}}
+    required:
+      - name
+      - graphStructure
+
+  EditAssessmentModelData:
+    type: object
+    description: Assessment model information.
+    properties:
+      name:
+        type: string
+        decription: Name of the assessment model.
+        example: Main model
+      graphStructure:
+        type: object
+        description: Graph structure
+        example: {'nodes': [], 'edges': [], 'nodeData': {}}
 
 /v1/courses/{courseId}/assessment-models/{assessmentModelId}:
   get:
@@ -129,43 +70,130 @@ definitions:
       - $ref: '#/components/parameters/assessmentModelId'
     responses:
       200:
-        description: >
-          An assessment model with the given ID was found and information
-          about it is returned in the AssessmentModelData format.
+        description: Returns assessment model with given ID.
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                data:
-                  $ref: '#/definitions/AssessmentModelData'
+              $ref: '#/definitions/AssessmentModelData'
       400:
-        description: >
-          A validation error has occurred in the URL, the given course
-          or assessment model ID is not a positive integer.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
+        $ref: '#/components/responses/BadRequest'
       401:
-        $ref: '#/components/responses/AuthenticationError'
+        $ref: '#/components/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/AuthorizationError'
+        $ref: '#/components/responses/Forbidden'
       404:
-        description: >
-          A course with the given course ID or an assessment model with the
-          given assessment model ID was not found.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
+        $ref: '#/components/responses/NotFound'
       409:
-        description: >
-          The found assessment model with the given assessment model ID does
-          not belong to the course with the given course ID.
+        $ref: '#/components/responses/Conflict'
+    security:
+      - cookieAuth: []
+  put:
+    tags: [Assessment Model]
+    description: >
+      Edit specified attainment model.
+      Available only to admin users and teacers of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+      - $ref: '#/components/parameters/assessmentModelId'
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/definitions/EditAssessmentModelData'
+    responses:
+      200:
+        description: Assessment model updated
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+      409:
+        $ref: '#/components/responses/Conflict'
+    security:
+      - cookieAuth: []
+  delete:
+    tags: [Assessment Model]
+    description: >
+      Deletes specified attainment model.
+      Available only to admin users and teacers of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+      - $ref: '#/components/parameters/assessmentModelId'
+    responses:
+      200:
+        description: Assessment model deleted
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+      409:
+        $ref: '#/components/responses/Conflict'
+    security:
+      - cookieAuth: []
+
+/v1/courses/{courseId}/assessment-models:
+  get:
+    tags: [Assessment Model]
+    description: >
+      Get all the assessment models of a course.
+      Available only to admin users and teacers and assistants of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+    responses:
+      200:
+        description: Returns all assessment models of the course
         content:
           application/json:
             schema:
-              $ref: '#/definitions/Failure'
+              type: array
+              items:
+                $ref: '#/definitions/AssessmentModelData'
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+    security:
+      - cookieAuth: []
+  post:
+    tags: [Assessment Model]
+    description: >
+      Add an attainment model to a course.
+      Available only to admin users and teacers of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/definitions/NewAssessmentModelData'
+    responses:
+      201:
+        description: Assessment model created
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/AssessmentModelId'
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+      409:
+        $ref: '#/components/responses/Conflict'
     security:
       - cookieAuth: []
