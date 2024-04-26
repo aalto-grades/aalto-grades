@@ -12,7 +12,7 @@ test.beforeAll(async () => {
 test.beforeEach(async ({page}) => {
   await page.goto('/login');
   await page.getByLabel('Email').click();
-  await page.getByLabel('Email').fill('teacher@aalto.fi');
+  await page.getByLabel('Email').fill('assistant@aalto.fi');
   await page.getByLabel('Email').press('Tab');
   await page.getByLabel('Password', {exact: true}).fill('password');
   await page.getByLabel('Password', {exact: true}).press('Enter');
@@ -25,33 +25,27 @@ test.beforeEach(async ({page}) => {
 test.afterEach(async ({page}) => {
   await cleanDb();
   await page.goto('/');
-  await page.getByRole('button', {name: 'Timmy Teacher'}).click();
+  await page.getByRole('button', {name: 'Alex Assistant'}).click();
   await page.getByRole('menuitem', {name: 'Logout'}).click();
 });
 
-test.describe('Test Courses as Teacher', () => {
+test.describe('Test Courses as Assistant', () => {
   test('Check course', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await expect(page.getByRole('heading', {name: 'O1'})).toBeVisible();
   });
 
-  test('Create assessment model', async ({page}) => {
+  test('View assessment model', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await page.getByRole('button', {name: 'Grading Models'}).click();
-    await page.getByLabel('New assessment model').click();
-    await page.getByLabel('Name *').click();
-    await page.getByLabel('Name *').fill('test');
-    await page.getByLabel('Select template').click();
-    await page.getByRole('option', {name: 'Addition'}).click();
-    await page.getByRole('button', {name: 'Submit'}).click();
-    await expect(page.getByTestId('rf__node-addition')).toBeVisible();
-    await page.getByRole('button', {name: 'Format'}).click();
-    await expect(
-      page.locator('p').filter({hasText: 'Unsaved changes'})
-    ).toBeVisible();
-    await page.getByRole('button', {name: 'Save'}).click();
-    await page.getByRole('button', {name: 'Grades', exact: true}).click();
-    await page.getByRole('button', {name: 'Grading Models'}).click();
-    await expect(page.getByRole('button', {name: 'test'})).toBeVisible();
+
+    await page.getByRole('button', {name: 'O1 Grading'}).click();
+    await expect(page.getByTestId('rf__wrapper')).toBeVisible();
+  });
+
+  test('View Attainments', async ({page}) => {
+    await page.getByRole('cell', {name: 'O1'}).click();
+    await page.getByRole('button', {name: 'Attainments'}).click();
+    await expect(page.getByText('Tier A')).toBeVisible();
   });
 });

@@ -47,7 +47,9 @@ test.describe('Manage users as admin', () => {
     await expect(cell).toBeAttached();
     const parent = page.getByRole('row').filter({has: cell});
     await parent.getByTestId('DeleteIcon').click();
-    await expect(page.getByRole('heading', {name: 'Delete User'})).toBeVisible();
+    await expect(
+      page.getByRole('heading', {name: 'Delete User'})
+    ).toBeVisible();
     await page.getByRole('button', {name: 'Delete'}).click();
     await expect(cell).not.toBeAttached();
   });
@@ -157,4 +159,3 @@ test.describe('Test Courses as Admin', () => {
     await expect(page.getByRole('button', {name: 'test'})).toBeVisible();
   });
 });
-
