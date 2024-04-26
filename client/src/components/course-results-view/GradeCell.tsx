@@ -3,11 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 import {EventBusyOutlined, MoreVert} from '@mui/icons-material';
-import {Box, IconButton, Theme, Tooltip, useTheme} from '@mui/material';
+import {Box, IconButton, Tooltip, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import {FC, useState} from 'react';
+import {JSX, useState} from 'react';
 
-import {AttainmentGradesData, GradeData} from '@common/types';
+import {AttainmentGradesData} from '@common/types';
+import {useTableContext} from '../../context/GradesTableProvider';
 import {findBestGrade, gradeIsExpired} from '../../utils';
 import EditGradesDialog from './EditGradesDialog';
 
@@ -16,23 +17,24 @@ type GradeCellProps = {
   attainemntResults?: AttainmentGradesData;
   finalGrade?: boolean;
 };
+const GradeCell = ({
+  studentNumber,
+  attainemntResults,
+  finalGrade = false,
+}: GradeCellProps): JSX.Element => {
+  const {gradeSelectOption} = useTableContext();
+  const theme = useTheme();
 
-const GradeCell: FC<GradeCellProps> = (
-  props = {finalGrade: false} as GradeCellProps
-) => {
   const [hover, setHover] = useState<boolean>(false);
   const [gradeDialogOpen, setGradeDialogOpen] = useState(false);
-  const theme: Theme = useTheme();
-  const bestGrade: GradeData | null = findBestGrade(
-    props.attainemntResults?.grades ?? [],
-    {
-      avoidExpired: true,
-      preferExpiredToNull: true,
-      useLatest: false, // TODO: Read from state?
-    }
-  );
-  const isGradeExpired: boolean = gradeIsExpired(bestGrade);
+
+  const bestGrade = findBestGrade(attainemntResults?.grades ?? [], {
+    expiredOption: 'prefer_non_expired',
+    gradeSelectOption,
+  });
+  const isGradeExpired = gradeIsExpired(bestGrade);
   // console.log(bestGrade?.expiryDate, new Date(),bestGrade?.expiryDate < new Date());
+
   return (
     <Box
       onMouseEnter={() => setHover(true)}
@@ -61,43 +63,42 @@ const GradeCell: FC<GradeCellProps> = (
     >
       <span>{bestGrade?.grade ?? '-'}</span>
       {/* If there are multiple grades "show more" icon*/}
-      {props.attainemntResults &&
-        (props.attainemntResults.grades.length > 1 || hover) && (
-          <>
-            <Tooltip
-              placement="top"
-              title={
-                props.attainemntResults.grades.length === 1
-                  ? 'Edit grades'
-                  : 'Multiple grades, click to show'
-              }
+      {attainemntResults && (attainemntResults.grades.length > 1 || hover) && (
+        <>
+          <Tooltip
+            placement="top"
+            title={
+              attainemntResults.grades.length === 1
+                ? 'Edit grades'
+                : 'Multiple grades, click to show'
+            }
+          >
+            <IconButton
+              color="primary"
+              sx={{
+                position: 'absolute',
+                right: '0px',
+                top: 'calc(50% - 20px)',
+              }}
+              onClick={(): void => setGradeDialogOpen(true)}
             >
-              <IconButton
-                color="primary"
-                sx={{
-                  position: 'absolute',
-                  right: '0px',
-                  top: 'calc(50% - 20px)',
-                }}
-                onClick={(): void => setGradeDialogOpen(true)}
-              >
-                <MoreVert />
-              </IconButton>
-            </Tooltip>
-            <EditGradesDialog
-              open={gradeDialogOpen}
-              onClose={() => setGradeDialogOpen(false)}
-              studentNumber={props.studentNumber}
-              attainmentId={props.attainemntResults.attainmentId}
-              title={`Grades of ${props.studentNumber} for ${
-                props.finalGrade
-                  ? 'Final Grade'
-                  : props.attainemntResults.attainmentName
-              }`}
-              grades={props.attainemntResults.grades}
-            />
-          </>
-        )}
+              <MoreVert />
+            </IconButton>
+          </Tooltip>
+        </>
+      )}
+      {attainemntResults && (
+        <EditGradesDialog
+          open={gradeDialogOpen}
+          onClose={() => setGradeDialogOpen(false)}
+          studentNumber={studentNumber}
+          attainmentId={attainemntResults.attainmentId}
+          title={`Grades of ${studentNumber} for ${
+            finalGrade ? 'Final Grade' : attainemntResults.attainmentName
+          }`}
+          grades={attainemntResults.grades}
+        />
+      )}
       {/* If grade is expired, show warning icon */}
       {isGradeExpired && (
         <>

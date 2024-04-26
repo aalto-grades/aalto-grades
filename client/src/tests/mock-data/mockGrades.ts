@@ -62,6 +62,7 @@ export const mockGrades: StudentRow[] = [
     ],
     finalGrades: [
       {
+        finalGradeId: 1,
         userId: 6,
         courseId: 1,
         assessmentModelId: 1,
@@ -129,6 +130,7 @@ export const mockGrades: StudentRow[] = [
     ],
     finalGrades: [
       {
+        finalGradeId: 2,
         userId: 7,
         courseId: 1,
         assessmentModelId: 1,

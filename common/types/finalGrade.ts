@@ -13,6 +13,7 @@ export const NewFinalGradeSchema = z.object({
 });
 export const NewFinalGradeArraySchema = z.array(NewFinalGradeSchema);
 export const FinalGradeDataSchema = z.object({
+  finalGradeId: z.number().int(),
   userId: z.number().int(),
   courseId: z.number().int(),
   assessmentModelId: z.number().int(),

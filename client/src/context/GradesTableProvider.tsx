@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {StudentRow} from '@common/types';
 import {Badge, Checkbox} from '@mui/material';
 import {
   ExpandedState,
@@ -17,28 +16,41 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import React, {createContext} from 'react';
+import {
+  Dispatch,
+  JSX,
+  PropsWithChildren,
+  SetStateAction,
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  useTransition,
+} from 'react';
 import {useParams} from 'react-router-dom';
+
+import {StudentRow} from '@common/types';
 import GradeCell from '../components/course-results-view/GradeCell';
 import PredictedGradeCell from '../components/course-results-view/PredictedGradeCell';
 import UserGraphDialog from '../components/course-results-view/UserGraphDialog';
 import PrettyChip from '../components/shared/PrettyChip';
 import {useGetAllAssessmentModels, useGetAttainments} from '../hooks/useApi';
-import {groupByLastAttainmentDate, predictGrades} from '../utils/table';
+import {groupByLatestBestGrade, predictGrades} from '../utils/table';
 
 // Define the shape of the context
-interface TableContextProps {
+type TableContextProps = {
   table: ReturnType<typeof useReactTable<GroupedStudentRow>>;
-  //   setTable: React.Dispatch<React.SetStateAction<typeof table>;
-}
+  //   setTable: Dispatch<SetStateAction<typeof table>;
+  gradeSelectOption: 'best' | 'latest';
+  setGradeSelectOption: Dispatch<SetStateAction<'best' | 'latest'>>;
+};
 // Create the context
 export const GradesTableContext = createContext<TableContextProps | undefined>(
   undefined
 );
 
-type PropsType = {
+type PropsType = PropsWithChildren & {
   data: StudentRow[];
-  children?: React.ReactNode;
 };
 
 // // TABLE CREATION
@@ -60,24 +72,40 @@ export type ExtendedStudentRow = StudentRow & {
 const columnHelper = createColumnHelper<GroupedStudentRow>();
 
 // Create a provider component
-export const GradesTableProvider: React.FC<PropsType> = props => {
-  const [isPending, startTransition] = React.useTransition();
-  const {courseId} = useParams() as {
-    courseId: string;
-  };
+export const GradesTableProvider = (props: PropsType): JSX.Element => {
+  const {courseId} = useParams() as {courseId: string};
+  const [_isPending, startTransition] = useTransition();
   const attainmentList = useGetAttainments(courseId).data ?? [];
   const {data: assessmentModels, isLoading} =
     useGetAllAssessmentModels(courseId);
+
+  const [rowSelection, setRowSelection] = useState({});
+  const [expanded, setExpanded] = useState<ExpandedState>({});
+  const [grouping, setGrouping] = useState<GroupingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [userGraphOpen, setUserGraphOpen] = useState<boolean>(false);
+  const [userGraphData, setUserGraphData] = useState<GroupedStudentRow | null>(
+    null
+  );
+
+  const [gradeSelectOption, setGradeSelectOption] = useState<'best' | 'latest'>(
+    'best'
+  );
+
   // Row are always grouped, toggling grouping just add the grouping column to the table
-  const groupedData = React.useMemo(() => {
+  const groupedData = useMemo(() => {
     let predictedGrades: ReturnType<typeof predictGrades> = [];
     if (assessmentModels) {
       startTransition(() => {
-        predictedGrades = predictGrades(props.data, assessmentModels); // Takes too much time...?
+        predictedGrades = predictGrades(
+          props.data,
+          assessmentModels,
+          gradeSelectOption
+        );
       });
     }
 
-    return groupByLastAttainmentDate(
+    return groupByLatestBestGrade(
       props.data.map(row => {
         return {
           ...row,
@@ -86,20 +114,14 @@ export const GradesTableProvider: React.FC<PropsType> = props => {
               ? predictedGrades.map(pg => pg[row.user.id].finalGrade)
               : ['No models'],
         };
-      })
+      }),
+      gradeSelectOption
     );
-  }, [props.data, assessmentModels]);
+  }, [assessmentModels, props.data, gradeSelectOption]);
 
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [expanded, setExpanded] = React.useState<ExpandedState>({});
-  const [grouping, setGrouping] = React.useState<GroupingState>([]);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [userGraphOpen, setUserGraphOpen] = React.useState<boolean>(false);
-  const [userGraphData, setUserGraphData] =
-    React.useState<GroupedStudentRow | null>(null);
-  // const [globalFilter, setGlobalFilter] = React.useState('');
+  // const [globalFilter, setGlobalFilter] = useState('');
 
-  //   React.useEffect(() => {
+  //   useEffect(() => {
   //     props.setSelectedStudents(_ => {
   //       return table?.getSelectedRowModel().rows.map(row => {
   //         // Setting selectedStudnets
@@ -185,12 +207,15 @@ export const GradesTableProvider: React.FC<PropsType> = props => {
               onChange={() => {
                 if (row.getIsSomeSelected()) {
                   // If some rows are selected, select all
-                  row.subRows.map(row => {
-                    !row.getIsSelected() && row.getToggleSelectedHandler()(row);
+                  row.subRows.map(subRow => {
+                    !subRow.getIsSelected() &&
+                      subRow.getToggleSelectedHandler()(subRow);
                   });
                 } else {
                   // All rows are selected, deselect all (and viceversa)
-                  row.subRows.map(row => row.getToggleSelectedHandler()(row));
+                  row.subRows.map(subRow =>
+                    subRow.getToggleSelectedHandler()(subRow)
+                  );
                 }
               }}
             />
@@ -358,7 +383,9 @@ export const GradesTableProvider: React.FC<PropsType> = props => {
     // debugAll: true,
   });
   return (
-    <GradesTableContext.Provider value={{table}}>
+    <GradesTableContext.Provider
+      value={{table, gradeSelectOption, setGradeSelectOption}}
+    >
       <UserGraphDialog
         open={userGraphOpen}
         onClose={() => setUserGraphOpen(false)}
@@ -369,8 +396,8 @@ export const GradesTableProvider: React.FC<PropsType> = props => {
     </GradesTableContext.Provider>
   );
 };
-export const useTableContext = () => {
-  const context = React.useContext(GradesTableContext);
+export const useTableContext = (): TableContextProps => {
+  const context = useContext(GradesTableContext);
   if (context === undefined) {
     throw new Error('useTableContext must be used within a TableProvider');
   }

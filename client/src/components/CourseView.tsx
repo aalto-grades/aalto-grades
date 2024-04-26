@@ -4,14 +4,13 @@
 
 import {Box, useTheme} from '@mui/material';
 import {UseQueryResult} from '@tanstack/react-query';
-import {JSX, useEffect, useState} from 'react';
+import {JSX, useEffect} from 'react';
 import {Outlet, Params, useParams} from 'react-router-dom';
 
 import {CourseData} from '@common/types';
 import {useGetCourse} from '../hooks/useApi';
 import useAuth, {AuthContextType} from '../hooks/useAuth';
 import SideMenu from './course-view/SideMenu';
-import UploadDialog from './course-view/UploadDialog';
 
 export default function CourseView(): JSX.Element {
   const theme = useTheme();
@@ -25,8 +24,6 @@ export default function CourseView(): JSX.Element {
     setIsTeacherInCharge,
     setIsAssistant,
   }: AuthContextType = useAuth();
-
-  const [uploadOpen, setUploadOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (auth && course.data) {
@@ -57,7 +54,7 @@ export default function CourseView(): JSX.Element {
             boxSizing: 'border-box',
           }}
         >
-          <SideMenu onUpload={() => setUploadOpen(true)} />
+          <SideMenu />
         </Box>
 
         <Box
@@ -73,7 +70,6 @@ export default function CourseView(): JSX.Element {
           <Outlet />
         </Box>
       </Box>
-      <UploadDialog open={uploadOpen} onClose={() => setUploadOpen(false)} />
     </>
   );
 }

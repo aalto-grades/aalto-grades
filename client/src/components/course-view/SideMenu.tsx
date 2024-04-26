@@ -84,7 +84,7 @@ const SideMenuButton = ({
   );
 };
 
-const SideMenu = ({onUpload}: {onUpload: () => void}): JSX.Element => {
+const SideMenu = (): JSX.Element => {
   const {courseId} = useParams();
   const {auth} = useAuth();
 
