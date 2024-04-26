@@ -14,9 +14,9 @@ import {
 import {JSX} from 'react';
 import {useNavigate} from 'react-router-dom';
 
-import {CourseData, LoginResult, UserData, SystemRole} from '@common/types';
-import {HeadCellData} from '../../types';
+import {CourseData, SystemRole} from '@common/types';
 import useAuth from '../../hooks/useAuth';
+import {HeadCellData} from '../../types';
 
 const headCells: HeadCellData[] = [
   {id: 'code', label: 'Code'},
@@ -28,6 +28,19 @@ const headCells: HeadCellData[] = [
 const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
   const navigate = useNavigate();
   const {auth} = useAuth();
+
+  const getCourseRole = (course: CourseData): string => {
+    if (auth === null) return 'Not logged in';
+    if (auth.role === SystemRole.Admin) return 'Admin';
+
+    const {teachersInCharge, assistants} = course;
+    const isTeacher = teachersInCharge.find(teacher => teacher.id === auth.id);
+    const isAssistant = assistants.find(assistant => assistant.id === auth.id);
+
+    if (isTeacher !== undefined) return 'Teacher';
+    if (isAssistant !== undefined) return 'Assistant';
+    return 'Student';
+  };
 
   return (
     <Table>
@@ -75,19 +88,7 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
               <TableCell>{course.courseCode}</TableCell>
               <TableCell>{course.name.en}</TableCell>
               <TableCell>{course.department.en}</TableCell>
-              <TableCell>
-                {auth?.role === SystemRole.Admin
-                  ? 'Admin'
-                  : course.teachersInCharge.filter(
-                        (x: UserData) => x.id === (auth as LoginResult).id
-                      ).length > 0
-                    ? 'Teacher'
-                    : course.assistants.filter(
-                          (x: UserData) => x.id === (auth as LoginResult).id
-                        ).length > 0
-                      ? 'Assistant'
-                      : 'Student'}
-              </TableCell>
+              <TableCell>{getCourseRole(course)}</TableCell>
             </TableRow>
           ))}
       </TableBody>
