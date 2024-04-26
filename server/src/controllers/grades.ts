@@ -104,6 +104,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
     if (!(userId in finalGradesDict)) finalGradesDict[userId] = [];
 
     finalGradesDict[userId].push({
+      finalGradeId: fGrade.id,
       userId: fGrade.userId,
       courseId: fGrade.courseId,
       assessmentModelId: fGrade.assessmentModelId,

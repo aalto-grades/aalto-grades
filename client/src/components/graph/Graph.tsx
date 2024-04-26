@@ -47,7 +47,7 @@ import {
   NodeDataContext,
   NodeValuesContext,
 } from '../../context/GraphProvider';
-import {findBestGrade} from '../../utils';
+import {GradeSelectOption, findBestGrade} from '../../utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import AdditionNode from './AdditionNode';
 import AttanmentNode from './AttainmentNode';
@@ -77,19 +77,22 @@ const nodeTypesMap = {
   substitute: SubstituteNode,
 };
 
+type GraphProps = {
+  initGraph: GraphStructure;
+  attainments: {id: number; name: string}[];
+  userGrades: AttainmentGradesData[] | null;
+  gradeSelectOption?: GradeSelectOption;
+  onSave?: (graphStructure: GraphStructure) => Promise<void>;
+  readOnly?: boolean;
+};
 const Graph = ({
   initGraph,
   attainments,
   userGrades,
+  gradeSelectOption,
   onSave,
   readOnly = false,
-}: {
-  initGraph: GraphStructure;
-  attainments: {id: number; name: string}[];
-  userGrades: AttainmentGradesData[] | null;
-  onSave?: (graphStructure: GraphStructure) => Promise<void>;
-  readOnly?: boolean;
-}): JSX.Element => {
+}: GraphProps): JSX.Element => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [nodeData, setNodeData] = useState<FullNodeData>({});
@@ -285,14 +288,17 @@ const Graph = ({
       if (!(attId in newNodeValues)) continue;
 
       const newValue = newNodeValues[attId] as AttainmentNodeValue;
-      const bestGrade = findBestGrade(attainment.grades)!;
-      if (newValue.value !== bestGrade.grade) {
-        newValue.source = bestGrade.grade;
+      const bestGrade =
+        attainment.grades.length === 0
+          ? 0
+          : findBestGrade(attainment.grades, {gradeSelectOption})!.grade;
+      if (newValue.value !== bestGrade) {
+        newValue.source = bestGrade;
         change = true;
       }
     }
     if (change) setNodeValues(newNodeValues);
-  }, [loading, nodeValues, userGrades]);
+  }, [gradeSelectOption, loading, nodeValues, userGrades]);
 
   const onConnect = useCallback(
     (params: Connection) => {

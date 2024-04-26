@@ -8,8 +8,8 @@ import {useParams} from 'react-router-dom';
 
 import {GradesTableProvider} from '../context/GradesTableProvider';
 import {useGetGrades} from '../hooks/useApi';
+import CourseResultsTable from './course-results-view/CourseResultsTable';
 import CourseResultsTableToolbar from './course-results-view/CourseResultsTableToolbar';
-import CourseResultsTanTable from './course-results-view/CourseResultsTanTable';
 
 export default function CourseResultsView(): JSX.Element {
   const {courseId} = useParams() as {courseId: string};
@@ -21,7 +21,7 @@ export default function CourseResultsView(): JSX.Element {
       {gradesQuery.data && (
         <GradesTableProvider data={gradesQuery.data}>
           <CourseResultsTableToolbar />
-          <CourseResultsTanTable />
+          <CourseResultsTable />
         </GradesTableProvider>
       )}
     </Box>

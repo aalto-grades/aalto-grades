@@ -8,7 +8,7 @@ import {DateSchema, LanguageSchema} from './general';
 import {UserDataSchema} from './user';
 
 export const GradeDataSchema = z.object({
-  gradeId: z.number().int().optional(),
+  gradeId: z.number().int(),
   grader: UserDataSchema,
   grade: z.number(),
   exportedToSisu: DateSchema.nullable(),
@@ -34,8 +34,8 @@ export const AttainmentGradesDataSchema = z.object({
 });
 export const StudentRowSchema = z.object({
   user: UserDataSchema,
-  finalGrades: FinalGradeDataArraySchema.optional(),
   attainments: z.array(AttainmentGradesDataSchema),
+  finalGrades: FinalGradeDataArraySchema.optional(),
 });
 export const StudentRowArraySchema = z.array(StudentRowSchema);
 export const EditGradeDataSchema = GradeDataSchema.omit({
