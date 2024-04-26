@@ -188,7 +188,11 @@ const CourseResultsTableToolbar = (): JSX.Element => {
       </FormControl>
       <Divider orientation="vertical" sx={{mx: 1}} flexItem />
       <button
-        onClick={() => table.setGrouping(old => toggleString(old, 'grouping'))}
+        onClick={() =>
+          table.setGrouping(old =>
+            structuredClone(toggleString(old, 'grouping'))
+          )
+        }
       >
         Group by Date
       </button>
