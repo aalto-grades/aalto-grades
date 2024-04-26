@@ -23,6 +23,7 @@ import {JSX, useEffect, useMemo, useState} from 'react';
 
 import {EditGradeData, GradeData, NewGrade} from '@common/types';
 import {useParams} from 'react-router-dom';
+import {useTableContext} from '../../context/GradesTableProvider';
 import {useAddGrades, useDeleteGrade, useEditGrade} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import {findBestGrade} from '../../utils';
@@ -58,6 +59,7 @@ const EditGradesDialog = ({
 }: PropsType): JSX.Element => {
   const {auth} = useAuth();
   const {courseId} = useParams() as {courseId: string};
+  const {gradeSelectOption} = useTableContext();
 
   const addGrades = useAddGrades(courseId);
   const deleteGrade = useDeleteGrade(courseId);
@@ -79,11 +81,10 @@ const EditGradesDialog = ({
   const bestGrade = useMemo(
     () =>
       findBestGrade(rows, {
-        avoidExpired: true,
-        preferExpiredToNull: true,
-        useLatest: false, // TODO: Read from state?
+        expiredOption: 'prefer_non_expired',
+        gradeSelectOption,
       }),
-    [rows]
+    [gradeSelectOption, rows]
   );
 
   useEffect(() => {
@@ -97,7 +98,7 @@ const EditGradesDialog = ({
   useEffect(() => {
     const newRows = grades.map((grade, gradeId) => ({
       id: gradeId,
-      gradeId: grade.gradeId!,
+      gradeId: grade.gradeId,
       grader: grade.grader.name!,
       grade: grade.grade,
       date: grade.date,

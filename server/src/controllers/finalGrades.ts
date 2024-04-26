@@ -22,6 +22,7 @@ export const getFinalGrades = async (
   const dbFinalGrades = await FinalGrade.findAll({where: {courseId: courseId}});
 
   const finalGrades: FinalGradeData[] = dbFinalGrades.map(finalGrade => ({
+    finalGradeId: finalGrade.id,
     userId: finalGrade.userId,
     courseId: finalGrade.courseId,
     assessmentModelId: finalGrade.assessmentModelId,

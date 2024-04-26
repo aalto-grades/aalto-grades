@@ -2,8 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {Experimental_CssVarsProvider as CssVarsProvider} from '@mui/material';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {RenderResult, render, screen, waitFor} from '@testing-library/react';
+import {
+  RenderResult,
+  configure,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 
@@ -14,28 +21,48 @@ import AuthContext from '../context/AuthProvider';
 describe('Tests for CourseResultsView components', () => {
   const renderCourseResultsView = (): RenderResult =>
     render(
-      <QueryClientProvider client={new QueryClient()}>
-        <AuthContext.Provider
-          value={{
-            auth: {id: 2, name: 'Timmy Teacher', role: SystemRole.User},
-            setAuth: vi.fn(),
-            isTeacherInCharge: true,
-            setIsTeacherInCharge: vi.fn(),
-            setIsAssistant: vi.fn(),
-            isAssistant: false,
-          }}
-        >
-          <MemoryRouter initialEntries={['/1/course-results/1']}>
-            <Routes>
-              <Route
-                path=":courseId/course-results/:assessmentModelId"
-                element={<CourseResultsView />}
-              />
-            </Routes>
-          </MemoryRouter>
-        </AuthContext.Provider>
-      </QueryClientProvider>
+      <CssVarsProvider>
+        <QueryClientProvider client={new QueryClient()}>
+          <AuthContext.Provider
+            value={{
+              auth: {id: 2, name: 'Timmy Teacher', role: SystemRole.User},
+              setAuth: vi.fn(),
+              isTeacherInCharge: true,
+              setIsTeacherInCharge: vi.fn(),
+              setIsAssistant: vi.fn(),
+              isAssistant: false,
+            }}
+          >
+            <MemoryRouter initialEntries={['/1/course-results/1']}>
+              <Routes>
+                <Route
+                  path=":courseId/course-results/:assessmentModelId"
+                  element={<CourseResultsView />}
+                />
+              </Routes>
+            </MemoryRouter>
+          </AuthContext.Provider>
+        </QueryClientProvider>
+      </CssVarsProvider>
     );
+
+  beforeEach(() => {
+    // Tests will fail without this
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockImplementation((query: string) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(), // Deprecated
+        removeListener: vi.fn(), // Deprecated
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    });
+    configure({testIdAttribute: 'id'});
+  });
 
   test('CourseResultsTable header is rendered', async () => {
     renderCourseResultsView();
@@ -55,7 +82,7 @@ describe('Tests for CourseResultsView components', () => {
     renderCourseResultsView();
 
     await waitFor(async () => {
-      const checkBox = screen.getByRole('checkbox');
+      const checkBox = screen.getByTestId('select-all');
       await userEvent.click(checkBox);
       expect(checkBox).toBeChecked();
 
@@ -84,7 +111,7 @@ describe('Tests for CourseResultsView components', () => {
     renderCourseResultsView();
 
     await waitFor(async () => {
-      const checkBox = screen.getByRole('checkbox');
+      const checkBox = screen.getByTestId('select-all');
       await userEvent.click(checkBox);
       expect(checkBox).toBeChecked();
 

@@ -41,31 +41,43 @@ const gradeIsBetter = (
 };
 
 // The type is a template to be able to use with EditGradesDialog rows.
+
+export type GradeSelectOption = 'best' | 'latest';
+/**
+ * Finds the best grade from a list of grades based on provided search options.
+ * @param {readonly T[]} grades - An array of grades to search through.
+ * @param {Object} [searchOptions] - Options for customizing the search behavior.
+ * @param {'any' | 'prefer_non_expired' | 'non_expired'} [searchOptions.expiredOption='any']
+ *   - Specifies how to handle expired grades.
+ * @param {'best' | 'latest'} [searchOptions.gradeSelectOption='best']
+ *   - Specifies the criteria for selecting the best grade.
+ * @returns {T | null} The best grade found based on the search options, or null if no suitable grade is found.
+ */
 export const findBestGrade = <T extends BaseType>(
   grades: readonly T[],
   searchOptions: {
-    avoidExpired: boolean;
-    preferExpiredToNull: boolean;
-    useLatest: boolean;
+    expiredOption?: 'any' | 'prefer_non_expired' | 'non_expired';
+    gradeSelectOption?: GradeSelectOption;
   } = {
-    avoidExpired: false, // Will not count expired grades as best
-    preferExpiredToNull: true, // Will return expired grades if no non-expired grades are found
-    useLatest: false, // Will return latest grade instead of the highest one
+    expiredOption: 'any',
+    gradeSelectOption: 'best',
   }
 ): T | null => {
   let bestSoFar: T | null = null;
   let bestSoFarExpired: T | null = null;
-  const isBetter = searchOptions.useLatest ? gradeIsNewer : gradeIsBetter;
+  const isBetter =
+    searchOptions.gradeSelectOption === 'latest' ? gradeIsNewer : gradeIsBetter;
   for (const grade of grades) {
-    if (searchOptions.avoidExpired && gradeIsExpired(grade)) {
+    if (searchOptions.expiredOption !== 'any' && gradeIsExpired(grade)) {
       if (isBetter(grade, bestSoFarExpired)) bestSoFarExpired = grade;
     } else {
       if (isBetter(grade, bestSoFar)) bestSoFar = grade;
     }
   }
-  return bestSoFar === null && searchOptions.preferExpiredToNull
-    ? bestSoFarExpired
-    : bestSoFar;
+
+  if (bestSoFar !== null) return bestSoFar;
+  if (searchOptions.expiredOption === 'non_expired') return null;
+  return bestSoFarExpired;
 };
 
 // Available completion languages used in Sisu.

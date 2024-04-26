@@ -16,7 +16,10 @@ import {
 import {JSX, useEffect, useState} from 'react';
 
 import {AssessmentModelData} from '@common/types';
-import {GroupedStudentRow} from '../../context/GradesTableProvider';
+import {
+  GroupedStudentRow,
+  useTableContext,
+} from '../../context/GradesTableProvider';
 import Graph from '../graph/Graph';
 
 type PropsType = {
@@ -31,6 +34,7 @@ const UserGraphDialog = ({
   assessmentModels,
   row,
 }: PropsType): JSX.Element => {
+  const {gradeSelectOption} = useTableContext();
   const [selectedModel, setSelectedModel] =
     useState<AssessmentModelData | null>(null);
 
@@ -55,6 +59,7 @@ const UserGraphDialog = ({
               name: att.attainmentName,
             }))}
             userGrades={row.attainments}
+            gradeSelectOption={gradeSelectOption}
             readOnly
           />
         )}

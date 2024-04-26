@@ -7,40 +7,43 @@ import {Badge, Icon, IconButton} from '@mui/material';
 import '@tanstack/react-table';
 import {flexRender} from '@tanstack/react-table';
 import {useVirtualizer} from '@tanstack/react-virtual';
-import * as React from 'react';
+import {JSX, useRef} from 'react';
+
+import {FinalGradeData, StudentRow} from '@common/types';
 import {useTableContext} from '../../context/GradesTableProvider';
 import PrettyChip from '../shared/PrettyChip';
 
 /**
- * Finds the previous grade that has been exported to Sisu, excluding the best grade.
- * @param bestGrade - The best grade option.
- * @param row - The student row.
- * @returns The previous grade that has been exported to Sisu, or null if none is found.
+ * Finds a previous grade that has been exported to Sisu, excluding the best grade.
+ * @returns The previous grade that has been exported to Sisu, or null if not found.
  */
-// Commented until Final grade is reimplemented
-// function findPreviouslyExportedToSisu(bestGrade: GradeOption, row: StudentRow) {
-//   for (const gr of row.finalGrades) {
-//     if (bestGrade?.gradeId === gr.gradeId) continue; //Skip the best grade (we need to check for previous ones)
-//     if (gr.exportedToSisu) {
-//       //We found one!
-//       if (bestGrade.exportedToSisu) {
-//         //If the best grade is also exported, we need to check which one is newer
-//         if (bestGrade.exportedToSisu < gr.exportedToSisu) return gr;
-//       } else {
-//         return gr;
-//       }
-//     }
-//   }
-//   return null;
-// }
+const findPreviouslyExportedToSisu = (
+  bestGrade: FinalGradeData,
+  row: StudentRow
+): FinalGradeData | null => {
+  if (row.finalGrades === undefined) return null;
+
+  for (const gr of row.finalGrades) {
+    if (bestGrade.finalGradeId === gr.finalGradeId) continue; // Skip the best grade
+    if (gr.sisuExportDate === null) continue; // and those not exported to sisu
+
+    if (bestGrade.sisuExportDate !== null) {
+      // If the best grade is also exported, we need to check which one is newer
+      if (bestGrade.sisuExportDate < gr.sisuExportDate) return gr;
+    } else {
+      return gr;
+    }
+  }
+  return null;
+};
 
 // TODO: Better column definitions
 // TODO: Better typing and freeze how to access data
-const CourseResultsTanTable: React.FC = props => {
+const CourseResultsTable = (): JSX.Element => {
   const {table} = useTableContext();
-  // Virtualizer
   const {rows} = table.getRowModel();
-  const parentRef = React.useRef<HTMLDivElement>(null);
+
+  const parentRef = useRef<HTMLDivElement>(null);
   const virtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => parentRef.current,
@@ -175,15 +178,13 @@ const CourseResultsTanTable: React.FC = props => {
                     return (
                       <td
                         key={cell.id}
-                        {...{
-                          style: {
-                            padding: '0px',
-                            height: '50px',
-                            textAlign: 'center',
-                            display: 'flex',
-                            width: cell.column.getSize(),
-                            zIndex: 1,
-                          },
+                        style={{
+                          padding: '0px',
+                          height: '50px',
+                          textAlign: 'center',
+                          display: 'flex',
+                          width: cell.column.getSize(),
+                          zIndex: 1,
                         }}
                       >
                         {cell.getIsGrouped() ? (
@@ -237,13 +238,13 @@ const CourseResultsTanTable: React.FC = props => {
                                 {flexRender(
                                   cell.column.columnDef.cell,
                                   cell.getContext()
-                                )}{' '}
+                                )}
                               </>
                             </PrettyChip>
                             {/* {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
-                        )}{' '} */}
+                        )} */}
                             {/* ({row.subRows.length}) */}
                           </>
                         ) : cell.getIsAggregated() ? (
@@ -316,4 +317,4 @@ const CourseResultsTanTable: React.FC = props => {
     </div>
   );
 };
-export default CourseResultsTanTable;
+export default CourseResultsTable;
