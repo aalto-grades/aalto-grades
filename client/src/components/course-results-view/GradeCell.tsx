@@ -84,20 +84,22 @@ const GradeCell: FC<GradeCellProps> = (
                 <MoreVert />
               </IconButton>
             </Tooltip>
-            <EditGradesDialog
-              open={gradeDialogOpen}
-              onClose={() => setGradeDialogOpen(false)}
-              studentNumber={props.studentNumber}
-              attainmentId={props.attainemntResults.attainmentId}
-              title={`Grades of ${props.studentNumber} for ${
-                props.finalGrade
-                  ? 'Final Grade'
-                  : props.attainemntResults.attainmentName
-              }`}
-              grades={props.attainemntResults.grades}
-            />
           </>
         )}
+      {props.attainemntResults && (
+        <EditGradesDialog
+          open={gradeDialogOpen}
+          onClose={() => setGradeDialogOpen(false)}
+          studentNumber={props.studentNumber}
+          attainmentId={props.attainemntResults.attainmentId}
+          title={`Grades of ${props.studentNumber} for ${
+            props.finalGrade
+              ? 'Final Grade'
+              : props.attainemntResults.attainmentName
+          }`}
+          grades={props.attainemntResults.grades}
+        />
+      )}
       {/* If grade is expired, show warning icon */}
       {isGradeExpired && (
         <>

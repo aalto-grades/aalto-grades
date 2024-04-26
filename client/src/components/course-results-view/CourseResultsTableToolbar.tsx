@@ -2,12 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Box, Button, Tooltip} from '@mui/material';
+import {Box, Button, Divider, Tooltip, useTheme} from '@mui/material';
 import {JSX, useEffect, useMemo, useState} from 'react';
 import {NavigateFunction, useNavigate, useParams} from 'react-router-dom';
 
 import {StudentRow, SystemRole} from '@common/types';
 import {batchCalculateGraph} from '@common/util/calculateGraph';
+import {Add} from '@mui/icons-material';
 import {enqueueSnackbar} from 'notistack';
 import {useTableContext} from '../../context/GradesTableProvider';
 import {useAddFinalGrades} from '../../hooks/api/finalGrade';
@@ -17,6 +18,7 @@ import {State} from '../../types';
 import {findBestGrade} from '../../utils';
 import {findLatestGrade} from '../../utils/table';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
+import UploadDialog from '../course-view/UploadDialog';
 import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
 import SisuDownloadDialog from './SisuDownloadDialog';
 
@@ -31,6 +33,7 @@ function toggleString(arr: string[], str: string): string[] {
 }
 
 export default function CourseResultsTableToolbar(): JSX.Element {
+  const theme = useTheme();
   const {courseId} = useParams() as {courseId: string};
   const {auth, isTeacherInCharge} = useAuth();
   const {table} = useTableContext();
@@ -45,6 +48,8 @@ export default function CourseResultsTableToolbar(): JSX.Element {
   const [showSisuDialog, setShowSisuDialog]: State<boolean> = useState(false);
   const [showDialog, setShowDialog]: State<boolean> = useState(false);
   const [missingFinalGrades, setMissingFinalGrades] = useState<boolean>(false);
+
+  const [uploadOpen, setUploadOpen] = useState<boolean>(false);
 
   const editRights = useMemo(
     () => auth?.role === SystemRole.Admin || isTeacherInCharge,
@@ -148,10 +153,21 @@ export default function CourseResultsTableToolbar(): JSX.Element {
   return (
     <Box
       sx={{
-        mx: 1,
+        // mx: 1,
+        p: 1,
+        borderRadius: 1,
         display: 'flex',
+        backgroundColor: theme.vars.palette.hoverGrey2,
       }}
     >
+      <Button
+        variant="outlined"
+        onClick={() => setUploadOpen(true)}
+        startIcon={<Add />}
+      >
+        Add Grades
+      </Button>
+      <Divider orientation="vertical" sx={{mx: 1}} flexItem />
       <button
         onClick={() =>
           table.setGrouping(old => {
@@ -174,71 +190,63 @@ export default function CourseResultsTableToolbar(): JSX.Element {
         placeholder={'Search...'}
         className="w-36 border shadow rounded"
       />
+      <Divider orientation="vertical" sx={{mx: 1}} flexItem />
 
-      <Box
-        sx={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          width: '100%',
-        }}
-      >
-        {editRights && (
-          <Box
-            sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              gap: 2,
-            }}
+      {editRights && (
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            gap: 2,
+          }}
+        >
+          <Tooltip
+            title={
+              table.getSelectedRowModel().rows.length === 0
+                ? 'Select at least one student number for grade calculation.'
+                : 'Calculate course final grades for selected students.'
+            }
+            placement="top"
           >
-            <Tooltip
-              title={
-                table.getSelectedRowModel().rows.length === 0
-                  ? 'Select at least one student number for grade calculation.'
-                  : 'Calculate course final grades for selected students.'
-              }
-              placement="top"
-            >
-              <span>
-                <Button
-                  variant="outlined"
-                  onClick={() => setShowCalculateDialog(true)}
-                  disabled={table.getSelectedRowModel().rows.length === 0}
-                >
-                  Calculate final grades
-                </Button>
-              </span>
-            </Tooltip>
-            <Tooltip
-              title={
-                table.getSelectedRowModel().rows.length === 0
-                  ? 'Select at least one student number for downloading grades.'
-                  : missingFinalGrades
-                    ? 'Grades with status "PENDING" cannot be downloaded, ' +
-                      'unselect or calculate grades for these.'
-                    : 'Download final course grades as a Sisu compatible CSV file.'
-              }
-              placement="top"
-            >
-              <span>
-                <Button
-                  variant="outlined"
-                  color={missingFinalGrades ? 'error' : 'primary'}
-                  onClick={(): void => {
-                    if (!missingFinalGrades) {
-                      setShowSisuDialog(true);
-                    }
-                  }}
-                  disabled={table.getSelectedRowModel().rows.length === 0}
-                >
-                  Download Sisu CSV
-                </Button>
-              </span>
-            </Tooltip>
-            {/* <Button
+            <span>
+              <Button
+                variant="outlined"
+                onClick={() => setShowCalculateDialog(true)}
+                disabled={table.getSelectedRowModel().rows.length === 0}
+              >
+                Calculate final grades
+              </Button>
+            </span>
+          </Tooltip>
+          <Tooltip
+            title={
+              table.getSelectedRowModel().rows.length === 0
+                ? 'Select at least one student number for downloading grades.'
+                : missingFinalGrades
+                ? 'Grades with status "PENDING" cannot be downloaded, ' +
+                  'unselect or calculate grades for these.'
+                : 'Download final course grades as a Sisu compatible CSV file.'
+            }
+            placement="top"
+          >
+            <span>
+              <Button
+                variant="outlined"
+                color={missingFinalGrades ? 'error' : 'primary'}
+                onClick={(): void => {
+                  if (!missingFinalGrades) {
+                    setShowSisuDialog(true);
+                  }
+                }}
+                disabled={table.getSelectedRowModel().rows.length === 0}
+              >
+                Download Sisu CSV
+              </Button>
+            </span>
+          </Tooltip>
+          {/* <Button
               variant="outlined"
               color={props.selectedStudents.length != 0 ? 'error' : 'primary'}
               onClick={(): void => {
@@ -251,25 +259,21 @@ export default function CourseResultsTableToolbar(): JSX.Element {
             >
               Return to course view
             </Button> */}
-            <CalculateFinalGradesDialog
-              open={showCalculateDialog}
-              onClose={() => setShowCalculateDialog(false)}
-              selectedRows={table
-                .getSelectedRowModel()
-                .rows.map(r => r.original)}
-              calculateFinalGrades={handleCalculateFinalGrades}
-            />
-            <SisuDownloadDialog
-              open={showSisuDialog}
-              handleClose={handleCloseSisuDialog}
-              handleExited={handleExitedSisuDialog}
-              selectedRows={table
-                .getSelectedRowModel()
-                .rows.map(r => r.original)}
-            />
-          </Box>
-        )}
-        {/* <Box
+          <CalculateFinalGradesDialog
+            open={showCalculateDialog}
+            onClose={() => setShowCalculateDialog(false)}
+            selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
+            calculateFinalGrades={handleCalculateFinalGrades}
+          />
+          <SisuDownloadDialog
+            open={showSisuDialog}
+            handleClose={handleCloseSisuDialog}
+            handleExited={handleExitedSisuDialog}
+            selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
+          />
+        </Box>
+      )}
+      {/* <Box
           sx={{
             display: 'flex',
             flexWrap: 'wrap',
@@ -301,7 +305,8 @@ export default function CourseResultsTableToolbar(): JSX.Element {
             </IconButton>
           </Tooltip>
         </Box> */}
-      </Box>
+
+      <UploadDialog open={uploadOpen} onClose={() => setUploadOpen(false)} />
       <UnsavedChangesDialog
         open={showDialog}
         onClose={() => setShowDialog(false)}
