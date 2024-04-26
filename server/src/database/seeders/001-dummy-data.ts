@@ -14,7 +14,7 @@ const readSql = (fileName: string): string =>
 
 const users = readSql('users.sql');
 const courses = readSql('courses.sql');
-const teachersInCharge = readSql('teachers_in_charge.sql');
+const courseRole = readSql('course_role.sql');
 const courseTranslation = readSql('course_translations.sql');
 const assessmentModel = readSql('assessment_model.sql');
 const attainment = readSql('attainment.sql');
@@ -32,7 +32,7 @@ export default {
       await queryInterface.sequelize.query(attainmentGrade, {transaction});
       await queryInterface.sequelize.query(finalGrade, {transaction});
       await queryInterface.sequelize.query(courseTranslation, {transaction});
-      await queryInterface.sequelize.query(teachersInCharge, {transaction});
+      await queryInterface.sequelize.query(courseRole, {transaction});
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
@@ -42,7 +42,7 @@ export default {
   down: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction = await queryInterface.sequelize.transaction();
     try {
-      await queryInterface.bulkDelete('teacher_in_charge', {}, {transaction});
+      await queryInterface.bulkDelete('course_role', {}, {transaction});
       await queryInterface.bulkDelete('course_translation', {}, {transaction});
       await queryInterface.bulkDelete('final_grade', {}, {transaction});
       await queryInterface.bulkDelete('attainment_grade', {}, {transaction});
@@ -86,7 +86,7 @@ export default {
         {transaction}
       );
 
-      // 'ALTER SEQUENCE' not needed for teacher_in_charge
+      // 'ALTER SEQUENCE' not needed for course_role
 
       await transaction.commit();
     } catch (error) {

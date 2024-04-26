@@ -238,7 +238,7 @@ export default {
       );
 
       await queryInterface.createTable(
-        'teacher_in_charge',
+        'course_role',
         {
           user_id: {
             type: DataTypes.INTEGER,
@@ -259,6 +259,10 @@ export default {
             },
             onDelete: 'CASCADE',
             onUpdate: 'CASCADE',
+          },
+          role: {
+            type: DataTypes.ENUM('TEACHER', 'ASSISTANT', 'STUDENT'),
+            allowNull: false,
           },
           created_at: DataTypes.DATE,
           updated_at: DataTypes.DATE,
@@ -387,7 +391,7 @@ export default {
     try {
       await queryInterface.dropTable('final_grade', {transaction});
       await queryInterface.dropTable('course_translation', {transaction});
-      await queryInterface.dropTable('teacher_in_charge', {transaction});
+      await queryInterface.dropTable('course_role', {transaction});
       await queryInterface.dropTable('attainment_grade', {transaction});
       await queryInterface.dropTable('attainment', {transaction});
       await queryInterface.dropTable('assessment_model', {transaction});
@@ -414,6 +418,11 @@ export default {
 
       await queryInterface.sequelize.query(
         'DROP TYPE IF EXISTS enum_course_translation_language;',
+        {transaction}
+      );
+
+      await queryInterface.sequelize.query(
+        'DROP TYPE IF EXISTS enum_course_role_role;',
         {transaction}
       );
 

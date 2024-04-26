@@ -12,7 +12,7 @@ import {ErrorSchema, ZodErrorSchema} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
 
 const request = supertest(app);
-let cookies: Cookies = {adminCookie: [], teacherCookie: []};
+let cookies: Cookies = {} as Cookies;
 
 const normalId = 5;
 const assessmentModId = 5;

@@ -42,11 +42,10 @@ export const getCoursesOfUser = async (
   const inCourses: CourseFull[] = (await Course.findAll({
     include: [
       {model: CourseTranslation},
-      {model: User, as: 'Users'},
       {
         model: User,
-        as: 'inCourse',
         where: {id: userId},
+        through: {attributes: ['role']},
       },
     ],
   })) as CourseFull[];

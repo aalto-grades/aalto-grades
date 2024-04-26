@@ -371,6 +371,7 @@ const Graph = ({
       });
       newNodeData[`attainment-${attainment.id}`] = {
         title: attainment.name,
+        settings: {minPoints: 0, onFailSetting: 'coursefail'},
       };
       newNodeValues[`attainment-${attainment.id}`] =
         initNode('attainment').value;

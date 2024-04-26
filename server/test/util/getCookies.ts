@@ -10,6 +10,8 @@ const request = supertest(app);
 export type Cookies = {
   adminCookie: string[];
   teacherCookie: string[];
+  assistantCookie: string[];
+  studentCookie: string[];
 };
 
 /**
@@ -29,8 +31,20 @@ export const getCookies = async (): Promise<Cookies> => {
     .set('Accept', 'application/json')
     .send({email: 'teacher@aalto.fi', password: 'password'});
 
+  const assistantRes = await request
+    .post('/v1/auth/login')
+    .set('Accept', 'application/json')
+    .send({email: 'assistant@aalto.fi', password: 'password'});
+
+  const studentRes = await request
+    .post('/v1/auth/login')
+    .set('Accept', 'application/json')
+    .send({email: 'student@aalto.fi', password: 'password'});
+
   return {
     adminCookie: [adminRes.headers['set-cookie']],
     teacherCookie: [teacherRes.headers['set-cookie']],
+    assistantCookie: [assistantRes.headers['set-cookie']],
+    studentCookie: [studentRes.headers['set-cookie']],
   };
 };
