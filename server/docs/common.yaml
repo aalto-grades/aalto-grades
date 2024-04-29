@@ -92,7 +92,7 @@ components:
             $ref: '#/definitions/Error'
     Conflict:
       description: >
-        The url params do not belong to each other or 
+        The url params do not belong to each other or
         a similar item already exists in the database.
       content:
         application/json:

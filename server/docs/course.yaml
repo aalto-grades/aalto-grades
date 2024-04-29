@@ -182,7 +182,7 @@ definitions:
   post:
     tags: [Course]
     description: >
-      Create a new course. 
+      Create a new course.
       Available only to admin users.
     requestBody:
       content:
