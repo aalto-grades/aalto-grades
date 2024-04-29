@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 ---
-
 definitions:
   UserId:
     type: integer
@@ -20,10 +19,6 @@ definitions:
     format: email
     description: Email address, to be used as a credential.
     example: john.doe@aalto.fi
-  StudentNumber:
-    type: string
-    description: The student number assigned by the university.
-    example: 12345A
   Name:
     type: string
     description: A personal name of the user (not a credential).'
@@ -38,67 +33,40 @@ definitions:
     properties:
       email:
         $ref: '#/definitions/Email'
-        required: true
       password:
         $ref: '#/definitions/Password'
-        required: true
+    required:
+      - email
+      - password
   LoginResult:
     type: object
     properties:
-      data:
-        type: object
-        properties:
-          id:
-            $ref: '#/definitions/UserId'
-          role:
-            $ref: '#/definitions/SystemRole'
-          name:
-            $ref: '#/definitions/Name'
-  SignupRequest:
-    type: object
-    properties:
-      email:
-        $ref: '#/definitions/Email'
-        required: true
-      password:
-        $ref: '#/definitions/Password'
-        required: true
-      studentNumber:
-        $ref: '#/definitions/StudentNumber'
-        required: false
+      id:
+        $ref: '#/definitions/UserId'
       name:
         $ref: '#/definitions/Name'
-        required: true
       role:
         $ref: '#/definitions/SystemRole'
-        required: true
-  SignupAndSelfInfo:
-    type: object
-    properties:
-      data:
-        type: object
-        properties:
-          id:
-            $ref: '#/definitions/UserId'
-          role:
-            $ref: '#/definitions/SystemRole'
-          name:
-            $ref: '#/definitions/Name'
+    required:
+      - id
+      - name
+      - role
 
 /v1/auth/self-info:
   get:
     tags: [Auth]
-    description: >
-      Retrieves information about the user that is currently logged in.
+    description: Retrieves information about the user that is currently logged in.
     responses:
       200:
         description: Information about the user who is logged in.
         content:
           application/json:
             schema:
-              $ref: '#/definitions/SignupAndSelfInfo'
+              $ref: '#/definitions/LoginResult'
       401:
-        $ref: '#/components/responses/AuthenticationError'
+        $ref: '#/components/responses/Unauthorized'
+      404:
+        $ref: '#/components/responses/NotFound'
     security:
       - cookieAuth: []
 
@@ -126,12 +94,7 @@ definitions:
               type: string
               example: jwt=wliuerhlwieurh; Secure; HttpOnly; SameSite=None
       401:
-        description: >
-          The login has failed, due to invalid credentials or an invalid request format.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
+        $ref: '#/components/responses/Unauthorized'
 
 /v1/auth/logout:
   post:
@@ -145,65 +108,15 @@ definitions:
     responses:
       200:
         description: The user has successfully logged out.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                data:
-                  description: Empty data object.
-                  type: object
       401:
-        $ref: '#/components/responses/AuthenticationError'
+        $ref: '#/components/responses/Unauthorized'
     security:
       - cookieAuth: []
-
-/v1/auth/signup:
-  post:
-    tags: [Auth]
-    description: >
-      Attempts to create a new user with the specified information, for
-      logging in to the system.
-    requestBody:
-      description: Basic user information.
-      content:
-        application/json:
-          schema:
-            $ref: '#/definitions/SignupRequest'
-    responses:
-      200:
-        description: The user has been created and logged in.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/SignupAndSelfInfo'
-        headers:
-          Set-Cookie:
-            description: JWT token, storing an access token to allow using the API.
-            schema:
-              type: string
-              example: jwt=wliuerhlwieurh; Secure; HttpOnly; SameSite=None
-      409:
-        description: A user with the specified email already exists.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-
-/v1/auth/saml/metadata:
-  get:
-    tags: [Auth]
-    description: >
-      A xml metadata file describing Service Provider SAML attributes
-    responses:
-      200:
-        description: Xml read successfully
 
 /v1/auth/login-idp:
   get:
     tags: [Auth]
-    description: >
-      redirect to idp login page
+    description: redirect to idp login page
     responses:
       303:
         description: User redirected to idp login page
@@ -227,9 +140,13 @@ definitions:
               type: string
               example: jwt=wliuerhlwieurh; Secure; HttpOnly; SameSite=None
       401:
-        description: >
-          The login has failed, due to invalid credentials or an invalid request format.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
+        $ref: '#/components/responses/Unauthorized'
+
+/v1/auth/saml/metadata:
+  get:
+    tags: [Auth]
+    description: >
+      A xml metadata file describing Service Provider SAML attributes
+    responses:
+      200:
+        description: Xml read successfully

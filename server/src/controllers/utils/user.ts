@@ -7,7 +7,11 @@ import CourseRole from '../../database/models/courseRole';
 import User from '../../database/models/user';
 import {ApiError, JwtClaims, stringToIdSchema} from '../../types';
 
-/** Finds a user by its ID and throws ApiError if not found. */
+/**
+ * Finds a user by its ID.
+ *
+ * @throws ApiError(404) if not found.
+ */
 export const findUserById = async (userId: number): Promise<User> => {
   const user = await User.findByPk(userId);
   if (user === null) {

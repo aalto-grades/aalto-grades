@@ -17,7 +17,11 @@ import {ApiError, JwtClaims} from '../types';
 import {getSamlStrategy, validateLogin} from './utils/auth';
 import {findUserById} from './utils/user';
 
-/** Responds with LoginResult */
+/**
+ * Responds with LoginResult
+ *
+ * @throws ApiError(404)
+ */
 export const authSelfInfo = async (
   req: Request,
   res: Response
@@ -34,7 +38,11 @@ export const authSelfInfo = async (
   res.json(auth);
 };
 
-/** Responds with LoginResult */
+/**
+ * Responds with LoginResult
+ *
+ * @throws ApiError(401)
+ */
 export const authLogin = (
   req: Request,
   res: Response,

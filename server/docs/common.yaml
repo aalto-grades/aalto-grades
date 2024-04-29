@@ -133,7 +133,7 @@ components:
           schema:
             $ref: '#/definitions/Error'
     NotFound:
-      description: Item with id given in url not found.
+      description: Item with id given in the url or request body not found.
       content:
         application/json:
           schema:
