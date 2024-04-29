@@ -284,4 +284,4 @@ definitions:
         content:
           application/json:
             schema:
-              $ref: '#/definitions/Failure'
+              $ref: '#/definitions/Error'

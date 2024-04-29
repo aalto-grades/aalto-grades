@@ -21,8 +21,9 @@ export const findUserById = async (userId: number): Promise<User> => {
 };
 
 /**
- * Finds a user by url param id and also validates the url param. Throws
- * ApiError if not found.
+ * Finds a user by url param id and also validates the url param.
+ *
+ * @throws ApiError(400|404) if invalid or not found.
  */
 export const findAndValidateUserId = async (userId: string): Promise<User> => {
   const result = stringToIdSchema.safeParse(userId);
@@ -32,7 +33,10 @@ export const findAndValidateUserId = async (userId: string): Promise<User> => {
   return await findUserById(result.data);
 };
 
-/** Validates user id url param. Throws ApiError if invalid or user not found. */
+/**
+ * Validates user id url param. @Throws ApiError(400|404) if invalid or user not
+ * found.
+ */
 export const validateUserId = async (userId: string): Promise<number> => {
   const result = stringToIdSchema.safeParse(userId);
   if (!result.success) {

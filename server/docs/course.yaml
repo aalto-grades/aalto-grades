@@ -53,28 +53,6 @@ definitions:
     enum: [FI, SV, EN, ES, JA, ZH, PT, FR, DE, RU]
     description: Course language.
     example: EN
-  UserEmail:
-    type: string
-    description: User's email address.
-    example: john.doe@aalto.fi
-  UserWithEmail:
-    type: object
-    properties:
-      id:
-        $ref: '#/definitions/UserId'
-      name:
-        type: string
-        description: User's name.
-        example: John Doe
-      email:
-        $ref: '#/definitions/UserEmail'
-      studentNumber:
-        type: string
-        description: User's student number
-        example: 1234567
-    required:
-      - id
-      - email
 
   CourseData:
     type: object
@@ -229,7 +207,7 @@ definitions:
         content:
           application/json:
             schema:
-              $ref: '#/definitions/Failure'
+              $ref: '#/definitions/Error'
     security:
       - cookieAuth: []
 
@@ -293,6 +271,6 @@ definitions:
         content:
           application/json:
             schema:
-              $ref: '#/definitions/Failure'
+              $ref: '#/definitions/Error'
     security:
       - cookieAuth: []
