@@ -1,0 +1,131 @@
+# SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+---
+definitions:
+  FinalGradeId:
+    type: integer
+    description: Internal final grade database ID.
+    format: int32
+    minimum: 0
+    maximum: 5
+    example: 1
+  FinalGrade:
+    type: number
+    description: The numerical grade of a student for an attainment.
+    format: int32
+    minimum: 0
+    example: 5
+
+  FinalGradeData:
+    type: object
+    description: Final grade data.
+    properties:
+      finalGradeId:
+        $ref: '#/definitions/FinalGradeId'
+      userId:
+        $ref: '#/definitions/UserId'
+      courseId:
+        $ref: '#/definitions/CourseId'
+      assessmentModelId:
+        $ref: '#/definitions/AssessmentModelId'
+      graderId:
+        $ref: '#/definitions/UserId'
+      grade:
+        $ref: '#/definitions/FinalGrade'
+      date:
+        type: string
+        format: date
+        description: Date when attainment is completed (e.g., deadline or exam date)
+        example: 2024-04-01T00:00:00.000Z
+      sisuExportDate:
+        type: string
+        nullable: true
+        format: date
+        description: Date when the grade was exported to sisu.
+        example: 2025-04-01T00:00:00.000Z
+    required:
+      - finalGradeId
+      - userId
+      - courseId
+      - assessmentModelId
+      - graderId
+      - grade
+      - date
+      - sisuExportDate
+
+  NewFinalGrade:
+    type: object
+    description: Final grade data.
+    properties:
+      userId:
+        $ref: '#/definitions/UserId'
+      assessmentModelId:
+        $ref: '#/definitions/AssessmentModelId'
+      grade:
+        $ref: '#/definitions/FinalGrade'
+      date:
+        type: string
+        format: date
+        description: Date when attainment is completed (e.g., deadline or exam date)
+        example: 2024-04-01T00:00:00.000Z
+    required:
+      - userId
+      - assessmentModelId
+      - grade
+      - date
+
+/v1/courses/{courseId}/finalGrades:
+  get:
+    tags: [FinalGrades]
+    description: >
+      Get the final grades of all students.
+      Available only to admin users and teachers in charge of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+    responses:
+      200:
+        description: Returns all final grades of the course.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/FinalGradeData'
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+    security:
+      - cookieAuth: []
+  post:
+    tags: [FinalGrades]
+    description: >
+      Add new final grades to the course.
+      Available only to admin users and teachers in charge of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/NewFinalGrade'
+    responses:
+      201:
+        description: Final grades added.
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+    security:
+      - cookieAuth: []

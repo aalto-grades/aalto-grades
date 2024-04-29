@@ -10,7 +10,11 @@ import {JwtClaims} from '../types';
 import {FinalGradeModelData} from '../types/finalGrade';
 import {validateCourseId} from './utils/course';
 
-/** Responds with FinalGradeData[] */
+/**
+ * Responds with FinalGradeData[]
+ *
+ * @throws ApiError(400|404)
+ */
 export const getFinalGrades = async (
   req: Request,
   res: Response
@@ -36,6 +40,7 @@ export const getFinalGrades = async (
   return res.json(finalGrades);
 };
 
+/** @throws ApiError(400|404) */
 export const addFinalGrades = async (
   req: Request<ParamsDictionary, unknown, NewFinalGrade[]>,
   res: Response

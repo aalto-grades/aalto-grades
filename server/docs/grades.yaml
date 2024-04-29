@@ -145,7 +145,7 @@ definitions:
   get:
     tags: [Grades]
     description: >
-      Get the final grades of all students.
+      Get the grades of all students.
       Available only to admin users and teachers in charge of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
@@ -166,6 +166,8 @@ definitions:
         $ref: '#/components/responses/Forbidden'
       404:
         $ref: '#/components/responses/NotFound'
+    security:
+      - cookieAuth: []
   post:
     tags: [Grades]
     description: >
@@ -193,6 +195,8 @@ definitions:
         $ref: '#/components/responses/NotFound'
       409:
         $ref: '#/components/responses/Conflict'
+    security:
+      - cookieAuth: []
 
 /v1/courses/{courseId}/grades/{gradeId}:
   put:
@@ -221,6 +225,8 @@ definitions:
         $ref: '#/components/responses/NotFound'
       409:
         $ref: '#/components/responses/Conflict'
+    security:
+      - cookieAuth: []
   delete:
     tags: [Grades]
     description: >
@@ -242,6 +248,8 @@ definitions:
         $ref: '#/components/responses/NotFound'
       409:
         $ref: '#/components/responses/Conflict'
+    security:
+      - cookieAuth: []
 
 /v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/csv/sisu:
   get:
@@ -285,3 +293,5 @@ definitions:
           application/json:
             schema:
               $ref: '#/definitions/Error'
+    security:
+      - cookieAuth: []
