@@ -46,6 +46,11 @@ export const getDateOfLatestGrade = async (
   );
 };
 
+/**
+ * Validates that all student numbers in the array exist
+ *
+ * @throws Apierror(422) If a student number is not found in the database
+ */
 export const studentNumbersExist = async (
   studentNumbers: string[]
 ): Promise<void> => {
@@ -71,6 +76,11 @@ export const studentNumbersExist = async (
   }
 };
 
+/**
+ * Find all final grades for given course and student numbers
+ *
+ * @throws ApiError(404)
+ */
 export const getFinalGradesFor = async (
   courseId: number,
   studentNumbers: string[],
@@ -133,7 +143,9 @@ export const findAttainmentGradeById = async (
 
 /**
  * Finds and attainment grade by id and also validates that it belongs to the
- * correct course. Throws ApiError if invalid ids, not found, or didn't match.
+ * correct course.
+ *
+ * @throws ApiError(400|404|409) if invalid ids, not found, or didn't match.
  */
 export const findAndValidateAttainmentGradePath = async (
   courseId: string,
